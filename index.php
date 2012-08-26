@@ -32,7 +32,7 @@
 
 	<tr>
 	<td class="submenu">
-	<span><a href="./expense.php">Spend</a></span><span><a href="./income.php">Income</a></span>
+	<span><a href="./expense.php">Spend</a></span><span><a href="./income.php">Income</a></span><span><a href="./transfer.php">Transfer</a></span>
 	</td>
 	</tr>
 
