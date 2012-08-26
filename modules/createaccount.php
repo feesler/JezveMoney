@@ -4,8 +4,7 @@ require_once("../db.php");
 
 session_start();
 
-if (isset($_SESSION["userid"]))
-	$userid = $_SESSION["userid"];
+$userid = checkUser('../login.php');
 
 
 $name = mysql_real_escape_string($_POST['accname']);

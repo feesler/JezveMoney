@@ -11,8 +11,7 @@ function fail()
 
 session_start();
 
-if (isset($_SESSION["userid"]))
-	$userid = $_SESSION["userid"];
+$userid = checkUser('../login.php');
 
 if ($_POST['acc_id'] != intval($_POST['acc_id']))
 	fail();

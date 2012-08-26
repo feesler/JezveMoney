@@ -4,15 +4,7 @@ require_once("./common.php");
 
 session_start();
 
-if (isset($_SESSION["userid"]))
-{
-	$userid = intval($_SESSION["userid"]);
-}
-else
-{
-	header("Location: ./login.php");
-	exit();
-}
+$userid = checkUser('./login.php');
 ?>
 <!DOCTYPE html>
 <html>
