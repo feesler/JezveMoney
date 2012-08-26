@@ -4,8 +4,6 @@ require_once("./common.php");
 
 function fail()
 {
-echo("<!-- fail -->");
-
 	header("Location: ./manage.php");
 	exit();
 }
@@ -15,8 +13,7 @@ session_start();
 
 $userid = checkUser("./login.php");
 
-
-if ($_GET['id'] != intval($_GET['id']))
+if (!is_numeric($_GET['id']))
 	fail();
 
 $acc_id = intval($_GET['id']);
