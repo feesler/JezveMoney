@@ -240,10 +240,7 @@ function onInput(obj)
 				echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
 			}
 
-		foreach($totalArr as $key => $value)
-		{
-			$arr = selectQuery('*', 'currency', 'id='.$key);
-			if ($arr)
+			foreach($totalArr as $key => $value)
 			{
 				$arr = selectQuery('*', 'currency', 'id='.$key);
 				if ($arr)
