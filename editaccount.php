@@ -63,7 +63,7 @@ function onSubmit(frm)
 </script>
 </head>
 <body>
-<table align="center" valign="center" style="width: 100%; height: 100%;">
+<table class="maintable">
 	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
 
 <?php
@@ -71,7 +71,7 @@ function onSubmit(frm)
 	require_once("./templates/mainmenu.php");
 ?>
 	<tr>
-	<td style="padding-left: 50px;"><span style="margin-right: 25px; margin-left: 25px;"><a href="./createaccount.php">Create new</a></span><span style="margin-right: 25px; margin-left: 25px;"><b>Edit account</b><s/apn></td>
+	<td class="submenu"><span><a href="./createaccount.php">Create new</a></span><span><b>Edit account</b></span></td>
 	</tr>
 
 	<tr>
