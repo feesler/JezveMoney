@@ -214,10 +214,6 @@ function onInput(obj)
 	<td>
 	<table>
 <?php
-	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
-	if(!mysql_errno())
-		$accounts = mysql_num_rows($result);
 	if ($accounts < 2)
 	{
 		echo("\t\t<tr><td><span>You need at least two accounts to transfer.</span></td></tr>\r\n");
@@ -226,16 +222,20 @@ function onInput(obj)
 	{
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
-		while($row = mysql_fetch_array($result))
+		$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
+		$result = mysql_query($query, $dbcnx);
+		if(!mysql_errno() && mysql_num_rows($result) > 0)
 		{
-			$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
-			$currname = ($arr ? $arr['name'] : '');
-			$balfmt = currFormat(($arr ? $arr['format'] : ''), $row['balance']);
+			while($row = mysql_fetch_array($result))
+			{
+				$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
+				$currname = ($arr ? $arr['name'] : '');
+				$balfmt = currFormat(($arr ? $arr['format'] : ''), $row['balance']);
 
-			if ($currname != '' && !$totalArr[$row['curr_id']])
-				$totalArr[$row['curr_id']] = 0;
+				if ($currname != '' && !$totalArr[$row['curr_id']])
+					$totalArr[$row['curr_id']] = 0;
 
-			$totalArr[$row['curr_id']] += $row['balance'];
+				$totalArr[$row['curr_id']] += $row['balance'];
 
 				echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
 			}
