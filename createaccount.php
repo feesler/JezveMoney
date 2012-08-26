@@ -63,15 +63,13 @@ function onSubmit()
 	</tr>
 
 	<tr>
-	<td style="padding-left: 50px;">
-	<span style="font-weight: bold; margin-right: 25px; margin-left: 25px;">Accounts</span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Transactions</a></span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Statistics</a></span>
+	<td class="mainmenu">
+	<span><a href="./index.php">Main</a></span><span><a href="./accounts.php">Accounts</a></span>
 	</td>
 	</tr>
 
 	<tr>
-	<td style="padding-left: 50px;"><b>Create new</b></td>
+	<td class="submenu"><span><b>Create new</b></span></td>
 	</tr>
 
 	<tr>
