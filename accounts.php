@@ -25,7 +25,7 @@
 
 	<tr>
 	<td class="submenu">
-	<span><a href="./createaccount.php">Create new</a></span>
+	<span><a href="./createaccount.php">Create new</a></span><span><a href="./resetaccounts.php">Reset</a></span>
 	</td>
 	</tr>
 
@@ -48,6 +48,12 @@
 			echo("<span style=\"color: #20FF20;\">Account data saved.</span>");
 		else if ($_GET['edit'] == fail)
 			echo("<span style=\"color: #FF2020;\">Fail to edit account.</span>");
+		echo("</td></tr>");
+	}
+	else if (isset($_GET['reset']) && $_GET['reset'] == "ok")
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+		echo("<span style=\"color: #20FF20;\">Accounts is successfully reseted.</span>");
 		echo("</td></tr>");
 	}
 ?>

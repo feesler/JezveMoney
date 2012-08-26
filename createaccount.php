@@ -55,7 +55,7 @@ function onSubmit(frm)
 ?>
 
 	<tr>
-	<td class="submenu"><span><b>Create new</b></span></td>
+	<td class="submenu"><span><b>Create new</b></span><span><a href="./resetaccounts.php">Reset</a></span></td>
 	</tr>
 
 	<tr>
