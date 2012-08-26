@@ -168,9 +168,6 @@ function onChangeAcc()
 <?php
 	}
 ?>
-	</table>
-	</td>
-	</tr>
 </table>
 </body>
 </html>
