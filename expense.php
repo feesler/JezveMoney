@@ -120,6 +120,9 @@ function onChangeAcc()
 			}
 		}
 ?>
+	</table>
+	</td>
+	</tr>
 
 	<tr>
 	<td>

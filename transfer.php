@@ -254,13 +254,16 @@ function onInput(obj)
 			}
 		}
 ?>
+	</table>
+	</td>
+	</tr>
 
 	<tr>
 	<td>
 	<form id="tranfrm" name="tranfrm" method="post" action="./modules/transfer.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Source account</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Source account</span></td>
 		<td>
 			<select class="inp" id="srcid" name="srcid" onchange="onChangeSource();">
 <?php
@@ -271,7 +274,7 @@ function onInput(obj)
 		$i = 1;
 		while($row = mysql_fetch_array($result))
 		{
-			echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i==1)?"selected":"").">".$row['name']."</option>\r\n");
+			echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i==1)?" selected":"").">".$row['name']."</option>\r\n");
 			$i++;
 		}
 	}
@@ -281,7 +284,7 @@ function onInput(obj)
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Destination account</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Destination account</span></td>
 		<td>
 			<select class="inp" id="destid" name="destid" onchange="onChangeDest();">
 <?php
@@ -292,7 +295,7 @@ function onInput(obj)
 		$i = 1;
 		while($row = mysql_fetch_array($result))
 		{
-			echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i==2)?"selected":"").">".$row['name']."</option>\r\n");
+			echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i==2)?" selected":"").">".$row['name']."</option>\r\n");
 			$i++;
 		}
 	}
@@ -322,7 +325,7 @@ function onInput(obj)
 		</tr>
 
 		<tr>
-		<td colspan="2" align="center"><input class="btn" type="submit" value="ok"></td>
+		<td colspan="2" style="text-align: center;"><input class="btn" type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>
@@ -332,9 +335,6 @@ function onInput(obj)
 <?php
 	}
 ?>
-	</table>
-	</td>
-	</tr>
 </table>
 </body>
 </html>
