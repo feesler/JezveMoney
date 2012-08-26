@@ -1,6 +1,4 @@
 <?php
-require_once('./db.php');
-
 
 // Check is user logged in or redirect to specified URL
 function checkUser($url)
