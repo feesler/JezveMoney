@@ -24,6 +24,25 @@
 ?>
 	<tr>
 	<td class="submenu">
+<?php
+	if (isset($_GET["type"]) && ($_GET["type"] == "expense" || $_GET["type"] == "income" || $_GET["type"] == "transfer"))
+		$transType = $_GET["type"];
+	else
+		$transType = "expense";
+
+	if ($transType == "expense")
+	{
+		echo("<span>Expenses</span><span><a href=\"./transactions.php?type=income\">Income</a></span><span><a href=\"./transactions.php?type=transfer\">Transfers</a></span>");
+	}
+	else if ($transType == "income")
+	{
+		echo("<span><a href=\"./transactions.php?type=expense\">Expenses</a></span><span>Income</span><span><a href=\"./transactions.php?type=transfer\">Transfers</a></span>");
+	}
+	else if ($transType == "transfer")
+	{
+		echo("<span><a href=\"./transactions.php?type=expense\">Expenses</a></span><span><a href=\"./transactions.php?type=income\">Income</a></span><span>Transfers</span>");
+	}
+?>
 	</td>
 	</tr>
 
@@ -42,45 +61,75 @@
 	else
 	{
 
-		$query = "SELECT * FROM `transactions`;";
+		//$query = "SELECT * FROM `transactions`;";
 /*
 $query = "SELECT t.id AS id, t.amount AS amount, t.charge AS charge";
 $query .= " FROM `transactions` AS t, `accounts` AS a";
 $query .= " WHERE a.`user_id`='".$userid."' AND `accounts`.`id`=`transactions`.src_id;";
 */
+
+		$query = "SELECT * FROM `transactions` AS t WHERE t.type=";
+		if ($transType == "expense")
+			$query .= "1";
+		else if ($transType == "income")
+			$query .= "2";
+		else if ($transType == "transfer")
+			$query .= "3";
+
+		$query .= ";";
+
+echo("<!-- query: ".$query." -->\r\n");
+
 		$result = mysql_query($query, $dbcnx);
+
+echo("<!-- errno: ".mysql_errno().", message: ".mysql_error()."-->\r\n");
+
 		if (!mysql_errno())
 		{
 			if (mysql_num_rows($result) > 0)
 			{
-				echo("<tr><td>id</td><td>Source</td><td>Destination</td><td>Amount</td><td>Charge</td><td>Type</td><td>Comment</td></tr>");
+				echo("<tr>");
+
+				if ($transType == "expense")
+					echo("<td>Source</td>");
+				else if ($transType == "income")
+					echo("<td>Destination</td>");
+				else if ($transType == "transfer")
+					echo("<td>Source</td><td>Destination</td>");
+
+				echo("<td>Amount</td><td>Comment</td></tr>");
 
 				while($row = mysql_fetch_array($result))
 				{
-					echo("<tr><td>".$row['id']."</td>");
+					echo("<tr>");
 
-					$arr = selectQuery('*', 'accounts', 'id='.$row['src_id']);
-					if ($arr)
-						echo("<td>".$arr['name']."</td>");
-					else
-						echo("<td></td>");
+					if ($transType == "expense" || $transType == "transfer")
+					{
+						$arr = selectQuery('*', 'accounts', 'id='.$row['src_id']);
+						if ($arr)
+							echo("<td>".$arr['name']."</td>");
+						else
+							echo("<td></td>");
+					}
 
-					$arr = selectQuery('*', 'accounts', 'id='.$row['dest_id']);
-					if ($arr)
-						echo("<td>".$arr['name']."</td>");
-					else
-						echo("<td></td>");
+					if ($transType == "income" || $transType == "transfer")
+					{
+						$arr = selectQuery('*', 'accounts', 'id='.$row['dest_id']);
+						if ($arr)
+							echo("<td>".$arr['name']."</td>");
+						else
+							echo("<td></td>");
+					}
 
-					echo("<td>".$row['amount']."</td><td>".$row['charge']."</td>");
+					echo("<td>".$row['amount']);
+					if ($row["charge"] != $row["amount"])
+					{
+						$arr = selectQuery('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
 
-					if ($row['type'] == 1)
-						echo("<td>Spend</td>");
-					else if ($row['type'] == 2)
-						echo("<td>Income</td>");
-					else if ($row['type'] == 3)
-						echo("<td>Transfer</td>");
-					else
-						echo("<td></td>");
+						$chargefmt = currFormat(($arr ? $arr["format"] : ''), $row["charge"]);
+						echo(" (".$chargefmt.")");
+					}
+					echo("</td>");
 
 					echo("<td>".$row['comment']."</td></tr>");
 				}
