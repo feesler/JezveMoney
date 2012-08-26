@@ -101,7 +101,7 @@ function onSubmit(frm)
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Initial balance</span></td>
-			<td><input class="inp" id="initbal" name="initbal" type="text" value="<?php echo($arr['initbalance']); ?>"></td>
+			<td><input class="inp" id="initbal" name="initbal" type="text" value="<?php echo($arr['initbalance']); ?>" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center"><input class="btn" type="submit" value="Ok"></td>

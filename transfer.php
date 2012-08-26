@@ -151,7 +151,7 @@ function onChangeDest()
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Transfer amount</span></td>
-		<td><input class="inp" id="amount" name="amount"></td>
+		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>

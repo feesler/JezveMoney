@@ -84,7 +84,7 @@ function onSubmit(frm)
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Initial balance</span></td>
-			<td><input class="inp" id="accbalance" name="accbalance" type="text" value="0"></td>
+			<td><input class="inp" id="accbalance" name="accbalance" type="text" value="0" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center"><input class="btn" type="submit" value="Ok"></td>

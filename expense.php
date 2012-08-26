@@ -117,7 +117,7 @@ function onSubmit(frm)
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input class="inp" id="amount" name="amount"></td>
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>
