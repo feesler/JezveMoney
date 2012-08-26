@@ -16,14 +16,13 @@ $userid = checkUser('./login.php');
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
-function onSubmit()
+function onSubmit(frm)
 {
-	var newaccfrm, accname, accbalance;
+	var accname, accbalance;
 
-	newaccfrm = ge('newaccfrm');
 	accname = ge('accname');
 	accbalance = ge('accbalance');
-	if (!newaccfrm || !accname || !accbalance)
+	if (!frm || !accname || !accbalance)
 		return false;
 
 	if (!accname.value || !accname.value.length)
@@ -32,8 +31,15 @@ function onSubmit()
 		return false;
 	}
 
-	newaccfrm.action = './modules/createaccount.php';
-	newaccfrm.submit();
+	if (!accbalance.value || !accbalance.value.length || !isNum(fixFloat(accbalance.value)))
+	{
+		alert('Please input correct balance.');
+		return false;
+	}
+
+	accbalance.value = fixFloat(accbalance.value);
+
+	frm.submit();
 
 	return true;
 }
@@ -54,7 +60,7 @@ function onSubmit()
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="newaccfrm" name="newaccfrm" method="post" accept-charset="utf-8" action="" onsubmit="return onSubmit()">
+	<form id="newaccfrm" name="newaccfrm" method="post" accept-charset="utf-8" action="./modules/createaccount.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Account name</span></td>
