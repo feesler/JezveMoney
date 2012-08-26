@@ -1,14 +1,14 @@
 <?php
-require_once("./db.php");
-require_once("./common.php");
+	require_once("./db.php");
+	require_once("./common.php");
 
-session_start();
+	session_start();
 
-if (isset($_SESSION["userid"]))
-{
-	header("Location: ./index.php");
-	exit();
-}
+	if (isset($_SESSION["userid"]))
+	{
+		header("Location: ./index.php");
+		exit();
+	}
 ?>
 <!DOCTYPE html>
 <html>
