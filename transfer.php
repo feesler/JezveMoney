@@ -48,13 +48,13 @@ function isDiffCurr()
 
 function onSubmit(frm)
 {
-	var amount, charge, exchrate;
+	var amount, charge, exchrate, trdate;
 
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
-
-	if (!frm || !amount || !charge || !exchrate)
+	trdate = ge('date');
+	if (!frm || !amount || !charge || !exchrate || !trdate)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -66,6 +66,12 @@ function onSubmit(frm)
 	if (isDiffCurr() && (!charge.value || !charge.value.length || !isNum(fixFloat(charge.value))))
 	{
 		alert('Please input correct charge off.');
+		return false;
+	}
+
+	if (!checkDate(trdate.value))
+	{
+		alert('Please input correct date.');
 		return false;
 	}
 
@@ -314,6 +320,11 @@ function onInput(obj)
 		<tr id="exchange" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
 		<td><input class="inp" id="exchrate" name="exchrate" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"></td>
+		</tr>
+
+		<tr>
+		<td align="right"><span style="margin-right: 5px;">Date</span></td>
+		<td><input class="inp" id="date" name="date" value="<?php echo(date("d.m.Y")); ?>"></td>
 		</tr>
 
 		<tr>

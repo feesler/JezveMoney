@@ -19,9 +19,10 @@ $src_id = intval($_POST['srcid']);
 $dest_id = intval($_POST['destid']);
 $amount = floatval($_POST['amount']);
 $charge = floatval($_POST['charge']);
+$trdate = strtotime($_POST['date']);
 $comment = mysql_real_escape_string($_POST['comm']);
 
-if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0)
+if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 	fail();
 
 
@@ -31,8 +32,8 @@ if (mysql_errno() || mysql_num_rows($result) != 2)
 	fail();
 
 
-$query = "INSERT INTO transactions (`id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `comment`) ".
-			"VALUES (NULL, '".$src_id."', '".$dest_id."', 3, '".$amount."', '".$charge."', '".$comment."');";
+$query = "INSERT INTO transactions (`id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `date`, `comment`) ".
+			"VALUES (NULL, '".$src_id."', '".$dest_id."', 3, '".$amount."', '".$charge."', ".$trdate.", '".$comment."');";
 $result = mysql_query($query, $dbcnx);
 if (mysql_errno())
 	fail();

@@ -132,3 +132,25 @@ function onFieldKey(event, obj)
 
 	return true;
 }
+
+
+// Check string is correct date in dd.mm.yyyy format
+function checkDate(str)
+{
+	var sparr;
+
+	if (!str || !str.length)
+		return false;
+
+	sparr = str.split('.');
+	if (sparr.length != 3)
+		return false;
+
+	if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2]))
+		return false;
+
+	if (sparr[0] < 1 || sparr[0] > 31 || sparr[1] < 1 || sparr[1] > 12)
+		return false;
+
+	return true;
+}

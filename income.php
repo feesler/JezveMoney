@@ -34,11 +34,12 @@
 
 function onSubmit(frm)
 {
-	var accid, amount;
+	var accid, amount, trdate;
 
 	accid = ge('accid');
 	amount = ge('amount');
-	if (!frm || !accid || !amount)
+	trdate = ge('date');
+	if (!frm || !accid || !amount || !trdate)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -48,6 +49,13 @@ function onSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+
+	if (!checkDate(trdate.value))
+	{
+		alert('Please input correct date.');
+		return false;
+	}
+
 	frm.submit();
 
 	return true;
@@ -70,7 +78,6 @@ function onChangeAcc()
 <body>
 <table class="maintable">
 	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
-
 <?php
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
@@ -152,6 +159,11 @@ function onChangeAcc()
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Incoming amount</span></td>
 		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo($cursign[0]); ?></span></td>
+		</tr>
+
+		<tr>
+		<td align="right"><span style="margin-right: 5px;">Date</span></td>
+		<td><input class="inp" id="date" name="date" value="<?php echo(date("d.m.Y")); ?>"></td>
 		</tr>
 
 		<tr>
