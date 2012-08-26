@@ -3,27 +3,36 @@
 require_once("../db.php");
 require_once("../common.php");
 
+
+function fail()
+{
+	header("Location: ../index.php?trans=fail");
+	exit();
+}
+
+
 session_start();
 
 $userid = checkUser('../login.php');
 
 $acc_id = intval($_POST['accid']);
-$value = floatval($_POST['amount']);
+$amount = floatval($_POST['amount']);
 $comment = mysql_real_escape_string($_POST['comm']);
 
-if ($acc_id != 0 && $value != 0.0)
-{
-	$query = "INSERT INTO transactions (`id`, `account_id`, `type`, `value`, `comment`) ".
-			"VALUES (NULL, '".$acc_id."', '2', '".$value."', '".$comment."');";
-	$result = mysql_query($query, $dbcnx);
+if (!$acc_id != 0 || $amount == 0.0)
+	fail();
 
-	if (!mysql_errno())
-	{
-		$query2 = "UPDATE accounts SET balance = balance + ".$value." WHERE id=".$acc_id.";";
-		$result2 = mysql_query($query2, $dbcnx);
-	}
-}
+$query = "INSERT INTO transactions (`id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `comment`) ".
+			"VALUES (NULL, 0, '".$acc_id."', 2, '".$amount."', '".$amount."', '".$comment."');";
+$result = mysql_query($query, $dbcnx);
+if (mysql_errno())
+	fail();
 
-header("Location: ../index.php?income=ok");
+$query = "UPDATE accounts SET balance = balance + ".$amount." WHERE id=".$acc_id.";";
+$result = mysql_query($query, $dbcnx);
+if (mysql_errno())
+	fail();
+
+header("Location: ../index.php?trans=ok");
 
 ?>
