@@ -75,9 +75,9 @@ $query .= " WHERE a.`user_id`='".$userid."' AND `accounts`.`id`=`transactions`.s
 
 					if ($row['type'] == 1)
 						echo("<td>Spend</td>");
-					else if ($row['type'] == 1)
-						echo("<td>Income</td>");
 					else if ($row['type'] == 2)
+						echo("<td>Income</td>");
+					else if ($row['type'] == 3)
 						echo("<td>Transfer</td>");
 					else
 						echo("<td></td>");
