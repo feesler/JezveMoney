@@ -10,14 +10,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money</title>
+<title>jezve Money - Accounts</title>
 <?php
 	getStyle($sitetheme);
 ?>
 </head>
 <body>
 <table class="maintable">
-	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money - Accounts</h1></td></tr>
 <?php
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");

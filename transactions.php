@@ -10,7 +10,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money</title>
+<title>jezve Money - Transactions</title>
 <?php
 	getStyle($sitetheme);
 ?>
