@@ -60,14 +60,6 @@
 	}
 	else
 	{
-
-		//$query = "SELECT * FROM `transactions`;";
-/*
-$query = "SELECT t.id AS id, t.amount AS amount, t.charge AS charge";
-$query .= " FROM `transactions` AS t, `accounts` AS a";
-$query .= " WHERE a.`user_id`='".$userid."' AND `accounts`.`id`=`transactions`.src_id;";
-*/
-
 		$query = "SELECT * FROM `transactions` AS t WHERE t.type=";
 		if ($transType == "expense")
 			$query .= "1";
@@ -75,15 +67,9 @@ $query .= " WHERE a.`user_id`='".$userid."' AND `accounts`.`id`=`transactions`.s
 			$query .= "2";
 		else if ($transType == "transfer")
 			$query .= "3";
-
 		$query .= ";";
 
-echo("<!-- query: ".$query." -->\r\n");
-
 		$result = mysql_query($query, $dbcnx);
-
-echo("<!-- errno: ".mysql_errno().", message: ".mysql_error()."-->\r\n");
-
 		if (!mysql_errno())
 		{
 			if (mysql_num_rows($result) > 0)
