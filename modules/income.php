@@ -24,6 +24,6 @@ if ($acc_id != 0 && $value != 0.0)
 	}
 }
 
-header("Location: ../index.php?trans=ok");
+header("Location: ../index.php?income=ok");
 
 ?>
