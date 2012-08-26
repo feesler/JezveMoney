@@ -118,7 +118,7 @@ function onSubmit()
 
 	<tr>
 	<td>
-	<form id="spendfrm" name="spendfrm" mathod="post" action="" onsubmit="return onSubmit()">
+	<form id="spendfrm" name="spendfrm" method="post" action="" onsubmit="return onSubmit()">
 	<table>
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
