@@ -16,14 +16,13 @@ $userid = checkUser('./login.php');
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
-function onSubmit()
+function onSubmit(frm)
 {
-	var spendfrm, accid, amount;
+	var accid, amount;
 
-	spendfrm = ge('spendfrm');
 	accid = ge('accid');
 	amount = ge('amount');
-	if (!spendfrm || !accid || !amount)
+	if (!frm || !accid || !amount)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(amount.value))
@@ -32,8 +31,8 @@ function onSubmit()
 		return false;
 	}
 
-	spendfrm.action = './modules/spend.php';
-	spendfrm.submit();
+	amount.value = fixFloat(amount.value);
+	frm.submit();
 
 	return true;
 }
@@ -95,7 +94,7 @@ function onSubmit()
 
 	<tr>
 	<td>
-	<form id="spendfrm" name="spendfrm" method="post" action="" onsubmit="return onSubmit()">
+	<form id="spendfrm" name="spendfrm" method="post" action="./modules/spend.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>

@@ -1,28 +1,30 @@
 <?php
-require_once("./db.php");
+	require_once("./db.php");
+	require_once("./common.php");
+
+	session_start();
+
+	if (isset($_SESSION["userid"]))
+	{
+		header("Location: ./index.php");
+		exit();
+	}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <title>jezve Money</title>
-<link rel="stylesheet" type="text/css" href="./css/common.css">
 <?php
-echo("<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/");
-if ($sitetheme == 1)
-	echo("white.css");
-else
-	echo("black.css");
-echo("\">\r\n");
+	getStyle($sitetheme);
 ?>
 <script>
-function onBtnClick()
+function onSubmit(frm)
 {
-	var regfrm, logacc, logpwd;
+	var logacc, logpwd;
 
-	regfrm = document.getElementById('regfrm');
-	logacc = document.getElementById('logacc');
-	logpwd = document.getElementById('logpwd');
-	if (!regfrm || !logacc || !logpwd)
+	logacc = ge('logacc');
+	logpwd = ge('logpwd');
+	if (!frm || !logacc || !logpwd)
 		return false;
 
 	if (!logacc.value || logacc.value.length < 1)
@@ -37,13 +39,14 @@ function onBtnClick()
 		return false;
 	}
 
-	regfrm.action = './modules/register.php';
 	regfrm.submit();
+
+	retrun true;
 }
 </script>
 </head>
 <body>
-<form id="regfrm" name="regfrm" method="post" action="">
+<form id="regfrm" name="regfrm" method="post" action="./modules/register.php" onsubmit="return onSubmit(this);">
 <table align="center" valign="center" style="width: 100%; height: 100%;">
 	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
 	<tr>
@@ -58,7 +61,7 @@ function onBtnClick()
 			</tr>
 			<tr>
 				<td></td>
-				<td><input type="button" class="btn" onclick="onBtnClick()" value="ok"></td>
+				<td><input type="submit" class="btn" value="ok"></td>
 			</tr>
 		</table>
 	</td>

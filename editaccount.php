@@ -34,14 +34,13 @@ if (!$arr)
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
-function onSubmit()
+function onSubmit(frm)
 {
-	var editaccfrm, accname, accbalance;
+	var accname, accbalance;
 
-	editaccfrm = ge('editaccfrm');
 	accname = ge('accname');
 	initbal = ge('initbal');
-	if (!editaccfrm || !accname || !initbal)
+	if (!frm || !accname || !initbal)
 		return false;
 
 	if (!accname.value || !accname.value.length)
@@ -56,8 +55,8 @@ function onSubmit()
 		return false;
 	}
 
-	editaccfrm.action = './modules/editaccount.php';
-	editaccfrm.submit();
+	initbal.value = fixFloat(initbal.value);
+	frm.submit();
 
 	return true;
 }
@@ -77,7 +76,7 @@ function onSubmit()
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="editaccfrm" name="editaccfrm" method="post" accept-charset="utf-8" action="" onsubmit="return onSubmit()">
+	<form id="editaccfrm" name="editaccfrm" method="post" accept-charset="utf-8" action="./modules/editaccount.php" onsubmit="return onSubmit(this);">
 	<input id="accid" name="accid" type="hidden" value="<?php echo($acc_id); ?>">
 	<table>
 		<tr>

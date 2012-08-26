@@ -16,14 +16,13 @@
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
-function onSubmit()
+function onSubmit(frm)
 {
-	var incomefrm, accid, amount;
+	var accid, amount;
 
-	incomefrm = ge('incomefrm');
 	accid = ge('accid');
 	amount = ge('amount');
-	if (!incomefrm || !accid || !amount)
+	if (!frm || !accid || !amount)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(amount.value))
@@ -32,8 +31,8 @@ function onSubmit()
 		return false;
 	}
 
-	incomefrm.action = './modules/income.php';
-	incomefrm.submit();
+	amount.value = fixFloat(amount.value);
+	frm.submit();
 
 	return true;
 }
@@ -97,7 +96,7 @@ function onSubmit()
 
 	<tr>
 	<td>
-	<form id="incomefrm" name="incomefrm" method="post" action="" onsubmit="return onSubmit()">
+	<form id="incomefrm" name="incomefrm" method="post" action="./modules/income.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>

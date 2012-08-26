@@ -16,14 +16,13 @@
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
-function onSubmit()
+function onSubmit(frm)
 {
-	var tranfrm, accid, amount;
+	var accid, amount;
 
-	tranfrm = ge('tranfrm');
 	accid = ge('accid');
 	amount = ge('amount');
-	if (!tranfrm || !accid || !amount)
+	if (!frm || !accid || !amount)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(amount.value))
@@ -32,8 +31,7 @@ function onSubmit()
 		return false;
 	}
 
-	tranfrm.action = './modules/transfer.php';
-	tranfrm.submit();
+	frm.submit();
 
 	return true;
 }
@@ -107,7 +105,7 @@ function onChangeDest()
 
 	<tr>
 	<td>
-	<form id="tranfrm" name="tranfrm" method="post" action="" onsubmit="return onSubmit()">
+	<form id="tranfrm" name="tranfrm" method="post" action="./modules/transfer.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Source account</span></td>
