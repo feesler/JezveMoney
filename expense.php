@@ -64,14 +64,13 @@ function onSubmit()
 
 	<tr>
 	<td class="mainmenu">
-	<span><b>Main</b></span>
-	<span><a href="./manage.php">Manage</a></span>
+	<span><a href="./index.php">Main</a></span><span><a href="./accounts.php">Accounts</a></span>
 	</td>
 	</tr>
 
 	<tr>
 	<td class="submenu">
-	<span><b>Spend</b></span><span><a href="./income.php">Income</a></span>
+	<span><b>Spend</b></span><span><a href="./income.php">Income</a></span><span><a href="./transfer.php">Transfer</a></span>
 	</td>
 	</tr>
 

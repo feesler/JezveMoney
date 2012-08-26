@@ -39,15 +39,14 @@
 	</tr>
 
 	<tr>
-	<td style="padding-left: 50px;">
-	<span style="margin-right: 25px; margin-left: 25px;"><b>Accounts</b></span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Transactions</a></span>
+	<td class="mainmenu">
+	<span><a href="./index.php">Main</a></span><span><b>Accounts</b></span>
 	</td>
 	</tr>
 
 	<tr>
-	<td style="padding-left: 50px;">
-	<a href="./createaccount.php">Create new</a>
+	<td class="submenu">
+	<span><a href="./createaccount.php">Create new</a></span>
 	</td>
 	</tr>
 

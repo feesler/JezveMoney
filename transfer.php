@@ -74,8 +74,8 @@ function onChangeDest()
 
 	<tr>
 	<td class="mainmenu">
-	<span><b>Main</b></span>
-	<span><a href="./manage.php">Manage</a></span>
+	<span><a href="./index.php">Main</a></span>
+	<span><a href="./accounts.php">Accounts</a></span>
 	</td>
 	</tr>
 
