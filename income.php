@@ -16,6 +16,22 @@
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
+<?php
+	$query = "SELECT currency.id AS curr_id, currency.sign AS sign FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
+	$result = mysql_query($query, $dbcnx);
+	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
+
+	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
+
+	$i = 1;
+	while($row = mysql_fetch_array($result))
+	{
+		echo("[".$row['curr_id'].", '".$row['sign']."']".(($i < $accounts) ? ", " : "];\r\n"));
+		$cursign[$i - 1] = $row['sign'];
+		$i++;
+	}
+?>
+
 function onSubmit(frm)
 {
 	var accid, amount;
@@ -35,6 +51,19 @@ function onSubmit(frm)
 	frm.submit();
 
 	return true;
+}
+
+
+function onChangeAcc()
+{
+	var accid, amountsign;
+
+	accid = ge('accid');
+	amountsign = ge('amountsign');
+	if (!accid || !amountsign)
+		return false;
+
+	amountsign.innerHTML = acccur[accid.selectedIndex][1];
 }
 </script>
 </head>
@@ -101,7 +130,7 @@ function onSubmit(frm)
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-			<select class="inp" id="accid" name="accid">
+			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
 <?php
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
 	$result = mysql_query($query, $dbcnx);
@@ -119,7 +148,7 @@ function onSubmit(frm)
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Incoming amount</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);">
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo($cursign[0]); ?></span></td>
 		</tr>
 
 		<tr>
