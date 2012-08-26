@@ -150,6 +150,11 @@ function onChangeAcc()
 		</tr>
 
 		<tr>
+		<td align="right"><span style="margin-right: 5px;">Comment</span></td>
+		<td><input class="inp" id="comm" name="comm"></td>
+		</tr>
+
+		<tr>
 		<td colspan="2" align="center"><input class="btn" type="submit" value="ok"></td>
 		</tr>
 	</table>
