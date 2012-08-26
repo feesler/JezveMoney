@@ -19,6 +19,10 @@ if (!is_numeric($_GET['id']))
 
 $acc_id = intval($_GET['id']);
 
+$arr = selectQuery('*', 'accounts', 'id='.$acc_id);
+if (!$arr)
+	fail();
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -73,7 +77,7 @@ function onSubmit()
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<span style="font-weight: bold; margin-right: 25px; margin-left: 25px;">Accounts</span>
+	<span style="margin-right: 25px; margin-left: 25px;"><a href="./accounts.php"><b>Accounts</b></a></span>
 	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Transactions</a></span>
 	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Statistics</a></span>
 	</td>
@@ -86,11 +90,11 @@ function onSubmit()
 	<tr>
 	<td style="padding-left: 50px;">
 	<form id="editaccfrm" name="editaccfrm" method="post" accept-charset="utf-8" action="" onsubmit="return onSubmit()">
-	<input id="acc_id" name="acc_id" type="hidden" value="<?php echo($acc_id); ?>">
+	<input id="accid" name="accid" type="hidden" value="<?php echo($acc_id); ?>">
 	<table>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Account name</span></td>
-			<td><input class="inp" id="accname" name="accname" type="text"></td>
+			<td><input class="inp" id="accname" name="accname" type="text" value="<?php echo($arr['name']); ?>"></td>
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
@@ -102,7 +106,7 @@ function onSubmit()
 	{
 		while($row = mysql_fetch_array($result))
 		{
-			echo("\t\t\t<option value=\"".$row['id']."\">".$row['name']."</option>\r\n");
+			echo("\t\t\t<option value=\"".$row['id']."\"".(($arr['curr_id'] == $row['id']) ? " selected" : "").">".$row['name']."</option>\r\n");
 		}
 	}
 ?>
@@ -110,7 +114,7 @@ function onSubmit()
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Initial balance</span></td>
-			<td><input class="inp" id="initbal" name="initbal" type="text" value="0"></td>
+			<td><input class="inp" id="initbal" name="initbal" type="text" value="<?php echo($arr['initbalance']); ?>"></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center"><input class="btn" type="submit" value="Ok"></td>
