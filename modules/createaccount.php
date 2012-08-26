@@ -19,11 +19,11 @@ if ($name && $name != "" && $curr_id != 0)
 
 	if (!mysql_errno())
 	{
-		header("Location: ../index.php?newacc=ok");
+		header("Location: ../accounts.php?newacc=ok");
 		exit();
 	}
 }
 
-header("Location: ../index.php?newacc=fail");
+header("Location: ../accounts.php?newacc=fail");
 
 ?>

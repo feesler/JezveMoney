@@ -1,31 +1,18 @@
 <?php
-require_once("./db.php");
+	require_once("./db.php");
+	require_once("./common.php");
 
-session_start();
+	session_start();
 
-if (isset($_SESSION["userid"]))
-{
-	$userid = $_SESSION["userid"];
-}
-else
-{
-	header("Location: ./login.php");
-	exit();
-}
+	$userid = checkUser('./login.php');
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>jezve Money</title>
-<link rel="stylesheet" type="text/css" href="./css/common.css">
 <?php
-echo("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-if ($sitetheme == 1)
-	echo("./css/white.css");
-else
-	echo("./css/black.css");
-echo("\">\r\n");
+	getStyle($sitetheme);
 ?>
 </head>
 <body>
@@ -53,17 +40,8 @@ echo("\">\r\n");
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<span style="margin-right: 25px; margin-left: 25px;">Accounts</span>
+	<span style="margin-right: 25px; margin-left: 25px;"><b>Accounts</b></span>
 	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Transactions</a></span>
-	<span style="margin-right: 25px; margin-left: 25px;"><b>Manage</b></span>
-	</td>
-	</tr>
-
-	<tr>
-	<td style="padding-left: 50px;">
-	<span style="font-weight: bold; margin-right: 25px; margin-left: 25px;">Accounts</span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Transactions</a></span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Statistics</a></span>
 	</td>
 	</tr>
 
@@ -84,20 +62,22 @@ echo("\">\r\n");
 			echo("<span style=\"color: #FF2020;\">Fail to add account.</span>");
 		echo("</td></tr>");
 	}
+	else if (isset($_GET['edit']))
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+
+		if ($_GET['edit'] == "ok")
+			echo("<span style=\"color: #20FF20;\">Account data saved.</span>");
+		else if ($_GET['edit'] == fail)
+			echo("<span style=\"color: #FF2020;\">Fail to edit account.</span>");
+		echo("</td></tr>");
+	}
 ?>
 
 	<tr>
 	<td style="padding-left: 50px;">
 	<table>
 <?php
-	function currFormat($ftmStr, $balValue)
-	{
-		$balance = number_format($row['balance'], 2, ',', ' ');
-		$balfmt = sprintf($arr['format'], $balance);
-
-		return $resStr;
-	}
-
 	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
 	$result = mysql_query($query, $dbcnx);
 	if(!mysql_errno())

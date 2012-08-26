@@ -4,7 +4,7 @@ require_once("./common.php");
 
 function fail()
 {
-	header("Location: ./manage.php");
+	header("Location: ./accounts.php");
 	exit();
 }
 
