@@ -21,7 +21,7 @@ function onSubmit()
 	var spendfrm, accid, amount;
 
 	spendfrm = ge('spendfrm');
-	accid = ge('acc_id');
+	accid = ge('accid');
 	amount = ge('amount');
 	if (!spendfrm || !accid || !amount)
 		return false;
@@ -123,7 +123,7 @@ function onSubmit()
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-			<select class="inp" id="acc_id" name="acc_id">
+			<select class="inp" id="accid" name="accid">
 <?php
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
 	$result = mysql_query($query, $dbcnx);

@@ -17,16 +17,13 @@ if ($acc_id != 0 && $value != 0.0)
 			"VALUES (NULL, '".$acc_id."', '1', '".$value."', '".$comment."');";
 	$result = mysql_query($query, $dbcnx);
 
-echo($query."\r\n");
-echo(mysql_errno().":".mysql_error()."\r\n");
-/*
 	if (!mysql_errno())
 	{
 		$query2 = "UPDATE accounts SET balance = balance - ".$value." WHERE id=".$acc_id.";";
 		$result2 = mysql_query($query2, $dbcnx);
-	}*/
+	}
 }
 
-//header("Location: ../index.php");
+header("Location: ../index.php?spend=ok");
 
 ?>
