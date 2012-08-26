@@ -67,22 +67,10 @@ function onSubmit()
 <table align="center" valign="center" style="width: 100%; height: 100%;">
 	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
 
-	<tr>
-	<td style="margin-top: 15px; margin-right: 30px; width: 100%; height: 30px;" align="right">
-	<form id="logoutfrm" name="logoutfrm" method="post" action="./modules/logout.php">
-	<span style="margin-right: 20px;"><?php	echo(getUserName($userid)); ?> logged in</span><input class="btn" type="submit" value="Logout">
-	</form>
-	</td>
-	</tr>
-
-	<tr>
-	<td style="padding-left: 50px;">
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="./accounts.php"><b>Accounts</b></a></span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Transactions</a></span>
-	<span style="margin-right: 25px; margin-left: 25px;"><a href="#">Statistics</a></span>
-	</td>
-	</tr>
-
+<?php
+	require_once("./templates/userblock.php");
+	require_once("./templates/mainmenu.php");
+?>
 	<tr>
 	<td style="padding-left: 50px;"><span style="margin-right: 25px; margin-left: 25px;"><a href="./createaccount.php">Create new</a></span><span style="margin-right: 25px; margin-left: 25px;"><b>Edit account</b><s/apn></td>
 	</tr>

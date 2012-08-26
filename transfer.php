@@ -53,31 +53,10 @@ function onChangeDest()
 <table class="maintable">
 	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
 
-	<tr>
-	<td style="margin-top: 15px; margin-right: 30px; width: 100%; height: 30px;" align="right">
-	<form id="logoutfrm" name="logoutfrm" method="post" action="./modules/logout.php">
-	<span style="margin-right: 20px;"><?php
-	$query = "SELECT * FROM `users` WHERE `id`='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
-	if(!mysql_errno() && mysql_num_rows($result) == 1)
-	{
-		$row = mysql_fetch_array($result);
-		if ($row)
-		{
-			echo($row["login"]." logged in");
-		}
-	}
-?></span><input class="btn" type="submit" value="Logout">
-	</form>
-	</td>
-	</tr>
-
-	<tr>
-	<td class="mainmenu">
-	<span><a href="./index.php">Main</a></span>
-	<span><a href="./accounts.php">Accounts</a></span>
-	</td>
-	</tr>
+<?php
+	require_once("./templates/userblock.php");
+	require_once("./templates/mainmenu.php");
+?>
 
 	<tr>
 	<td class="submenu">

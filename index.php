@@ -21,14 +21,8 @@
 
 <?php
 	require_once("./templates/userblock.php");
+	require_once("./templates/mainmenu.php");
 ?>
-
-	<tr>
-	<td class="mainmenu">
-	<span><b>Main</b></span>
-	<span><a href="./accounts.php">Accounts</a></span>
-	</td>
-	</tr>
 
 	<tr>
 	<td class="submenu">
