@@ -10,7 +10,7 @@ $userid = checkUser('./login.php');
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money - Create new account</title>
+<title>jezve Money - Reset accounts</title>
 <?php
 	getStyle($sitetheme);
 ?>

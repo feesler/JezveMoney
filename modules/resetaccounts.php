@@ -26,7 +26,7 @@ while($row = mysql_fetch_array($result))
 {
 	$acc_id = $row["id"];
 
-	$query2 = "DELETE FROM accounts WHERE src_id=".$acc_id." OR dest_id=".$acc_id.";";
+	$query2 = "DELETE FROM transactions WHERE src_id=".$acc_id." OR dest_id=".$acc_id.";";
 	$result2 = mysql_query($query2, $dbcnx);
 	if (mysql_errno())
 		fail();
