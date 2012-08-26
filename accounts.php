@@ -16,7 +16,7 @@
 ?>
 </head>
 <body>
-<table align="center" valign="center" style="width: 100%; height: 100%;">
+<table class="maintable">
 	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
 
 	<tr>
