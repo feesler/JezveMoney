@@ -49,6 +49,10 @@ function onSubmit(frm)
 <form id="regfrm" name="regfrm" method="post" action="./modules/register.php" onsubmit="return onSubmit(this);">
 <table align="center" valign="center" style="width: 100%; height: 100%;">
 	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
+<?php
+	if (isset($_GET['act']) && $_GET['act'] == 'fail')
+		echo("<tr><td><span style=\"color: #FF0000;\">Registration error</span></td></tr>");
+?>
 	<tr>
 	<td style="width: 100%; height: 100%;" align="center" valign="center">
 		<table width="300px" height="150px">
