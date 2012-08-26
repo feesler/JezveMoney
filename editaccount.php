@@ -49,7 +49,7 @@ function onSubmit(frm)
 		return false;
 	}
 
-	if (!initbal.value || !initbal.value.length || !isNum(initbal.value))
+	if (!initbal.value || !initbal.value.length || !isNum(fixFloat(initbal.value)))
 	{
 		alert('Please input correct initial balance.');
 		return false;

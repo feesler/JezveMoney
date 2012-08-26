@@ -25,7 +25,7 @@ function onSubmit(frm)
 	if (!frm || !accid || !amount)
 		return false;
 
-	if (!amount.value || !amount.value.length || !isNum(amount.value))
+	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
 	{
 		alert('Please input correct amount.');
 		return false;
