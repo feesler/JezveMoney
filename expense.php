@@ -61,11 +61,11 @@ function onSubmit(frm)
 		$accounts = mysql_num_rows($result);
 	if (!$accounts)
 	{
-		echo("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
+		echo("\t\t<tr><td><span>You have no one account. Please create one.</span></td></tr>\r\n");
 	}
 	else
 	{
-		echo("<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>");
+		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
 		while($row = mysql_fetch_array($result))
 		{
@@ -78,7 +78,7 @@ function onSubmit(frm)
 
 			$totalArr[$row['curr_id']] += $row['balance'];
 
-			echo("<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>");
+			echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
 		}
 
 		foreach($totalArr as $key => $value)
@@ -87,7 +87,7 @@ function onSubmit(frm)
 			if ($arr)
 			{
 				$valfmt = currFormat($arr['format'], $value);
-				echo("<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td></tr>");
+				echo("\t\t<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td></tr>\r\n");
 			}
 		}
 ?>
