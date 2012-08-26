@@ -5,8 +5,7 @@ require_once("../common.php");
 
 session_start();
 
-if (isset($_SESSION["userid"]))
-	$userid = $_SESSION["userid"];
+$userid = checkUser('../login.php');
 
 $acc_id = intval($_POST['acc_id']);
 $value = floatval($_POST['amount']);
