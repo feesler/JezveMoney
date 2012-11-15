@@ -17,7 +17,7 @@ $userid = checkUser('./login.php');
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
 <?php
-	$query = "SELECT currency.id AS curr_id, currency.sign AS sign FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
+	$query = "SELECT currency.id AS curr_id, currency.sign AS sign, accounts.balance AS balance FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
 	$result = mysql_query($query, $dbcnx);
 	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
 
@@ -26,8 +26,21 @@ $userid = checkUser('./login.php');
 	$i = 1;
 	while($row = mysql_fetch_array($result))
 	{
-		echo("[".$row['curr_id'].", '".$row['sign']."']".(($i < $accounts) ? ", " : "];\r\n"));
+		echo("[".$row['curr_id'].", '".$row['sign']."', ".$row['balance']."]".(($i < $accounts) ? ", " : "];\r\n"));
 		$cursign[$i - 1] = $row['sign'];
+		$i++;
+	}
+
+	$query = "SELECT id, name, sign FROM currency ORDER BY id;";
+	$result = mysql_query($query, $dbcnx);
+	$currcount = ((mysql_errno()) ? 0 : mysql_num_rows($result));
+
+	echo("var currency = [");
+
+	$i = 1;
+	while($row = mysql_fetch_array($result))
+	{
+		echo("[".$row['id'].", '".$row['name']."', '".$row['sign']."']".(($i < $currcount) ? ", " : "];\r\n"));
 		$i++;
 	}
 ?>
@@ -72,6 +85,165 @@ function onChangeAcc()
 		return false;
 
 	amountsign.innerHTML = acccur[accid.selectedIndex][1];
+}
+
+
+function showCurrList()
+{
+	var transcurr, ancurrbtn;
+
+	transcurr = ge('transcurr');
+	ancurrbtn = ge('ancurrbtn');
+	if (!transcurr || !ancurrbtn)
+		return;
+
+	transcurr.style.display = '';
+	ancurrbtn.style.display = 'none';
+}
+
+
+
+var S1;		// balance before transaction
+var a;		// amount in currency of transaction
+var d;		// charge off in currency of account
+var e;		// exchange rate
+var S2;		// balance after transaction
+
+// Main formula
+// S2 = S1 - d
+// d = a * e
+
+
+function f1(){	S2 = S1 - d;	}
+function f2(){	d = a * e;		}
+function f3(){	d = S1 - S2;	}
+function f4(){	a = d / e;		}
+function f5(){	e = d / a;		}
+
+function getValues()
+{
+	var accid, amount, charge, exchrate, resbal;
+
+	accid = ge('accid');
+	amount = ge('amount');
+	charge = ge('charge');
+	exchrate = ge('exchrate');
+	resbal = ge('resbal');
+	if (!accid || !amount || !charge || !exchrate || !resbal)
+		return;
+
+	S1 = acccur[accid.selectedIndex][2];
+	a = amount.value;
+	d = charge.value;
+	e = exchrate.value;
+	S2 = resbal.value;
+}
+
+
+function setValues()
+{
+	var amount, charge, exchrate, resbal;
+
+	amount = ge('amount');
+	charge = ge('charge');
+	exchrate = ge('exchrate');
+	resbal = ge('resbal');
+	if (!amount || !charge || !exchrate || !resbal)
+		return;
+
+	amount.value = a;
+	charge.value = d;
+	exchrate.value = e;
+	resbal.value = S2;
+}
+
+
+
+function onFInput(obj)
+{
+	getValues();
+
+	if (S1 != '' && S2 != '' && d != '' && e != '' && a != '')
+	{
+		if (obj.id == 'charge')		// d is changed, update S2 and e
+		{
+			f5();
+			f1();
+		}
+		else if (obj.id == 'resbal')	// S2 is changed, update d and e
+		{
+			f3();
+			f5();
+		}
+		else if (obj.id == 'amount' || obj.id == 'exchrate')	// a or e is changed, update S2 and d
+		{
+			f2();
+			f1();
+		}
+	}
+	else if (e == 1)		// account currency is the same as operation currency
+	{
+		d = a;
+		f1();
+	}
+	else				// account currency is different from operation currency
+	{
+		if (S1 != '' && e != '' && S2 != '')
+		{
+			f3();
+			f4();
+		}
+		else if (S1 != '' && e != '' && a != '')
+		{
+			f2();
+			f1();
+		}
+		else if (S1 != '' && e != '' && d != '')
+		{
+			f1();
+			f4();
+		}
+		else if (S1 != '' && S2 != '' && a != '')
+		{
+			f3();
+			f5();
+		}
+		else if (S1 != '' && S2 != '' && d != '' && e == '' && a == '')
+		{
+			return;
+		}
+		else if (S1 != '' && a != '' && d != '')
+		{
+			f1();
+			f5();
+		}
+	}
+
+	setValues();
+
+	return true;
+}
+
+
+function onChangeTransCurr()
+{
+	var accid, transcurr, chargeoff, exchange, exchrate, chargesign, amountsign;
+
+	accid = ge('accid');
+	transcurr = ge('transcurr');
+	chargeoff = ge('chargeoff');
+	exchange = ge('exchange');
+	exchrate = ge('exchrate');
+	chargesign = ge('chargesign');
+	amountsign = ge('amountsign');
+	if (!accid || !transcurr || !chargeoff || !chargesign || !amountsign)
+		return;
+
+	chargeoff.style.display = '';
+	exchange.style.display = '';
+
+	chargesign.innerHTML = acccur[accid.selectedIndex][1];
+	amountsign.innerHTML = currency[transcurr.selectedIndex][2];
 }
 </script>
 </head>
@@ -145,9 +317,16 @@ function onChangeAcc()
 	$result = mysql_query($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
+		$curAccCurr = 0;
 		while($row = mysql_fetch_array($result))
 		{
-			echo("\t\t\t\t<option value=\"".$row['id']."\">".$row['name']."</option>\r\n");
+			echo("\t\t\t\t<option value=\"".$row['id']."\"");
+			if ($curAccCurr == 0)
+				echo(" selected");
+			echo(">".$row['name']."</option>\r\n");
+
+			if ($curAccCurr == 0)
+				$curAccCurr = $row['curr_id'];
 		}
 	}
 ?>
@@ -157,7 +336,41 @@ function onChangeAcc()
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo($cursign[0]); ?></span></td>
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($cursign[0]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
+			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
+<?php
+	$query = "SELECT * FROM `currency`;";
+	$result = mysql_query($query, $dbcnx);
+	if(!mysql_errno() && mysql_num_rows($result) > 0)
+	{
+		while($row = mysql_fetch_array($result))
+		{
+			echo("\t\t\t<option value=\"".$row['id']."\"");
+
+			if ($row['id'] == $curAccCurr)
+				echo(" selected");
+
+			echo(">".$row['name']."</option>\r\n");
+		}
+	}
+?>
+			</select>
+		</td>
+		</tr>
+
+		<tr id="chargeoff" style="display: none;">
+		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($cursign[1]); ?></span></td>
+		</tr>
+
+		<tr id="exchange" style="display: none;">
+		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
+		<td><input class="inp" id="exchrate" name="exchrate" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"></td>
+		</tr>
+
+		<tr>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Result balance</span></td>
+		<td><input class="inp" id="resbal" name="resbal" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>
