@@ -35,8 +35,15 @@ function currFormat($format, $value)
 // Return user name
 function getUserName($id)
 {
+	global $db;
+
+	$arr = $db->selectQ('login', 'users', '`id`='.$id);
+
+	return ((count($arr) == 1) ? $arr[0]['login'] : '');
+/*
 	$arr = selectQuery('login', 'users', '`id`='.$id);
 	return (($arr) ? $arr['login'] : '');
+*/
 }
 
 

@@ -1,6 +1,5 @@
 <?php
-	require_once("./db.php");
-	require_once("./common.php");
+	require_once("./setup.php");
 
 	session_start();
 
@@ -51,7 +50,7 @@
 	<table>
 <?php
 	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno())
 		$accounts = mysql_num_rows($result);
 	if (!$accounts)
@@ -69,7 +68,7 @@
 			$query .= "3";
 		$query .= ";";
 
-		$result = mysql_query($query, $dbcnx);
+		$result = $db->rawQ($query, $dbcnx);
 		if (!mysql_errno())
 		{
 			if (mysql_num_rows($result) > 0)
@@ -91,28 +90,49 @@
 
 					if ($transType == "expense" || $transType == "transfer")
 					{
+						$arr = $db->selectQ('*', 'accounts', 'id='.$row['src_id']);
+
+						if (count($arr) == 1)
+							echo("<td>".$arr[0]['name']."</td>");
+						else
+							echo("<td></td>");
+/*
 						$arr = selectQuery('*', 'accounts', 'id='.$row['src_id']);
 						if ($arr)
 							echo("<td>".$arr['name']."</td>");
 						else
 							echo("<td></td>");
+*/
 					}
 
 					if ($transType == "income" || $transType == "transfer")
 					{
+						$arr = $db->selectQ('*', 'accounts', 'id='.$row['dest_id']);
+
+						if (count($arr) == 1)
+							echo("<td>".$arr[0]['name']."</td>");
+						else
+							echo("<td></td>");
+/*
 						$arr = selectQuery('*', 'accounts', 'id='.$row['dest_id']);
 						if ($arr)
 							echo("<td>".$arr['name']."</td>");
 						else
 							echo("<td></td>");
+*/
 					}
 
 					echo("<td>".$row['amount']);
 					if ($row["charge"] != $row["amount"])
 					{
+						$arr = $db->selectQ('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
+
+						$chargefmt = currFormat(((count($arr) == 1) ? $arr["format"] : ''), $row["charge"]);
+/*
 						$arr = selectQuery('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
 
 						$chargefmt = currFormat(($arr ? $arr["format"] : ''), $row["charge"]);
+*/
 						echo(" (".$chargefmt.")");
 					}
 					echo("</td>");

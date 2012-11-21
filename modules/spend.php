@@ -1,7 +1,6 @@
 <?php
 
-require_once("../db.php");
-require_once("../common.php");
+require_once("../setup.php");
 
 
 function fail()
@@ -28,12 +27,12 @@ if (!$acc_id || $amount == 0.0 || $trdate == -1)
 
 $query = "INSERT INTO transactions (`id`, `user_id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `cur_id`, `date`, `comment`) ".
 			"VALUES (NULL, '".$userid."', '".$acc_id."', 0, 1, '".$amount."', '".$charge."', ".$transcurr.", ".$trdate.", '".$comment."');";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 
 $query = "UPDATE accounts SET balance = balance - ".$charge." WHERE id=".$acc_id.";";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 

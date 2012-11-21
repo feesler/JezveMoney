@@ -1,6 +1,5 @@
 <?php
-require_once("./db.php");
-require_once("./common.php");
+require_once("./setup.php");
 
 session_start();
 
@@ -18,7 +17,7 @@ $userid = checkUser('./login.php');
 <script>
 <?php
 	$query = "SELECT currency.id AS curr_id, currency.sign AS sign, accounts.balance AS balance FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
 
 	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
@@ -32,7 +31,7 @@ $userid = checkUser('./login.php');
 	}
 
 	$query = "SELECT id, name, sign FROM currency ORDER BY id;";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	$currcount = ((mysql_errno()) ? 0 : mysql_num_rows($result));
 
 	echo("var currency = [");
@@ -265,7 +264,7 @@ function onChangeTransCurr()
 	<table>
 <?php
 	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno())
 		$accounts = mysql_num_rows($result);
 	if (!$accounts)
@@ -278,9 +277,14 @@ function onChangeTransCurr()
 
 		while($row = mysql_fetch_array($result))
 		{
+			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
+			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
+			$balfmt = currFormat((count($arr) == 1 ? $arr[0]['format'] : ''), $row['balance']);
+/*
 			$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
 			$currname = ($arr ? $arr['name'] : '');
 			$balfmt = currFormat(($arr ? $arr['format'] : ''), $row['balance']);
+*/
 
 			if ($currname != '' && !$totalArr[$row['curr_id']])
 				$totalArr[$row['curr_id']] = 0;
@@ -292,12 +296,20 @@ function onChangeTransCurr()
 
 		foreach($totalArr as $key => $value)
 		{
+			$arr = $db->selectQ('*', 'currency', 'id='.$key);
+			if (count($arr) == 1)
+			{
+				$valfmt = currFormat($arr[0]['format'], $value);
+				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>");
+			}
+/*
 			$arr = selectQuery('*', 'currency', 'id='.$key);
 			if ($arr)
 			{
 				$valfmt = currFormat($arr['format'], $value);
 				echo("\t\t<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td></tr>\r\n");
 			}
+*/
 		}
 ?>
 	</table>
@@ -314,7 +326,7 @@ function onChangeTransCurr()
 			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
 <?php
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
 		$curAccCurr = 0;
@@ -340,7 +352,7 @@ function onChangeTransCurr()
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
 	$query = "SELECT * FROM `currency`;";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
 		while($row = mysql_fetch_array($result))

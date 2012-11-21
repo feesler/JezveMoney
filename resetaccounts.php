@@ -1,6 +1,5 @@
 <?php
-require_once("./db.php");
-require_once("./common.php");
+require_once("./setup.php");
 
 session_start();
 

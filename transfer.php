@@ -1,6 +1,5 @@
 <?php
-	require_once("./db.php");
-	require_once("./common.php");
+	require_once("./setup.php");
 
 	session_start();
 
@@ -18,7 +17,7 @@
 <script>
 <?php
 	$query = "SELECT currency.id AS curr_id, currency.sign AS sign FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
 
 	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
@@ -229,14 +228,19 @@ function onInput(obj)
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
 		$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-		$result = mysql_query($query, $dbcnx);
+		$result = $db->rawQ($query, $dbcnx);
 		if(!mysql_errno() && mysql_num_rows($result) > 0)
 		{
 			while($row = mysql_fetch_array($result))
 			{
+				$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
+				$currname = ($arr ? $arr[0]['name'] : '');
+				$balfmt = currFormat(($arr ? $arr[0]['format'] : ''), $row['balance']);
+/*
 				$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
 				$currname = ($arr ? $arr['name'] : '');
 				$balfmt = currFormat(($arr ? $arr['format'] : ''), $row['balance']);
+*/
 
 				if ($currname != '' && !$totalArr[$row['curr_id']])
 					$totalArr[$row['curr_id']] = 0;
@@ -248,12 +252,20 @@ function onInput(obj)
 
 			foreach($totalArr as $key => $value)
 			{
+				$arr = $db->selectQ('*', 'currency', 'id='.$key);
+				if (count($arr) == 1)
+				{
+					$valfmt = currFormat($arr[0]['format'], $value);
+					echo("\t\t<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>\r\n");
+				}
+/*
 				$arr = selectQuery('*', 'currency', 'id='.$key);
 				if ($arr)
 				{
 					$valfmt = currFormat($arr['format'], $value);
 					echo("\t\t<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td></tr>\r\n");
 				}
+*/
 			}
 		}
 ?>
@@ -271,7 +283,7 @@ function onInput(obj)
 			<select class="inp" id="srcid" name="srcid" onchange="onChangeSource();">
 <?php
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
 		$i = 1;
@@ -292,7 +304,7 @@ function onInput(obj)
 			<select class="inp" id="destid" name="destid" onchange="onChangeDest();">
 <?php
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
 		$i = 1;

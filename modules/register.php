@@ -1,6 +1,6 @@
 <?php
 
-require_once("../db.php");
+require_once("../setup.php");
 
 
 function fail()
@@ -19,7 +19,7 @@ if (!$login || $login == "" || !$pass || $pass == "")
 $passhash = md5($pass);
 
 $query = "INSERT INTO users (`id`, `login`, `passhash`) VALUES (NULL, '".$login."', '".$passhash."');";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 

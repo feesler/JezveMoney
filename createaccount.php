@@ -1,6 +1,5 @@
 <?php
-require_once("./db.php");
-require_once("./common.php");
+require_once("./setup.php");
 
 session_start();
 
@@ -71,7 +70,7 @@ function onSubmit(frm)
 			<td><select class="inp" id="acccurr" name="acccurr">
 <?php
 	$query = "SELECT * FROM `currency`;";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
 		while($row = mysql_fetch_array($result))

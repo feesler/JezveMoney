@@ -1,6 +1,5 @@
 <?php
-require_once("./db.php");
-require_once("./common.php");
+require_once("./setup.php");
 
 
 function fail()
@@ -19,9 +18,15 @@ if (!is_numeric($_GET['id']))
 
 $acc_id = intval($_GET['id']);
 
+$arr = $db->selectQ('*', 'accounts', 'id='.$acc_id);
+if (count($arr) != 1)
+	fail();
+
+/*
 $arr = selectQuery('*', 'accounts', 'id='.$acc_id);
 if (!$arr)
 	fail();
+*/
 
 ?>
 <!DOCTYPE html>
@@ -88,7 +93,7 @@ function onSubmit(frm)
 			<td><select class="inp" id="acccurr" name="acccurr">
 <?php
 	$query = "SELECT * FROM `currency`;";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
 	{
 		while($row = mysql_fetch_array($result))

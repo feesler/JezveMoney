@@ -1,7 +1,6 @@
 <?php
 
-require_once("../db.php");
-require_once("../common.php");
+require_once("../setup.php");
 
 function fail()
 {
@@ -27,24 +26,24 @@ if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 
 
 $query = "SELECT id FROM accounts WHERE id=".$src_id." OR id=".$dest_id.";";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno() || mysql_num_rows($result) != 2)
 	fail();
 
 
 $query = "INSERT INTO transactions (`id`, `user_id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `date`, `comment`) ".
 			"VALUES (NULL, '".$userid."', '".$src_id."', '".$dest_id."', 3, '".$amount."', '".$charge."', ".$trdate.", '".$comment."');";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 
 $query = "UPDATE accounts SET balance = balance - ".$amount." WHERE id=".$src_id.";";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 
 $query = "UPDATE accounts SET balance = balance + ".$charge." WHERE id=".$dest_id.";";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 

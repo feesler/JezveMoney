@@ -1,5 +1,5 @@
 <?php
-require_once("../db.php");
+require_once("../setup.php");
 
 
 $login = $_POST['logacc'];
@@ -10,7 +10,7 @@ if ($login && $login != "" && $pass && $pass != "")
 	$passhash = md5($pass);
 
 	$query = "SELECT * FROM `users` WHERE `login`='".$qlogin."' AND `passhash`='".$passhash."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if (!mysql_errno() && mysql_num_rows($result) == 1)
 	{
 		$row = mysql_fetch_array($result);

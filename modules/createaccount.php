@@ -1,7 +1,6 @@
 <?php
 
-require_once("../db.php");
-require_once("../common.php");
+require_once("../setup.php");
 
 
 function fail()
@@ -26,7 +25,7 @@ if (!$name || $name == "" || $curr_id == 0)
 
 $query = "INSERT INTO accounts (`id`, `user_id`, `curr_id`, `balance`, `initbalance`, `name`)";
 $query .= " VALUES (NULL, '".$userid."', '".$curr_id."', '".$balance."', '".$balance."', '".$name."');";
-$result = mysql_query($query, $dbcnx);
+$result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 

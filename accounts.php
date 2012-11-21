@@ -1,6 +1,5 @@
 <?php
-	require_once("./db.php");
-	require_once("./common.php");
+	require_once("./setup.php");
 
 	session_start();
 
@@ -63,7 +62,7 @@
 	<table>
 <?php
 	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-	$result = mysql_query($query, $dbcnx);
+	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno())
 	$accounts = mysql_num_rows($result);
 	if (!$accounts)
@@ -76,6 +75,14 @@
 
 		while($row = mysql_fetch_array($result))
 		{
+			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
+			if (count($arr) == 1)
+			{
+				$balance = number_format($row['balance'], 2, ',', ' ');
+				$balfmt = sprintf($arr[0]['format'], $balance);
+				$currname = $arr[0]['name'];
+			}
+/*
 			$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
 			if ($arr)
 			{
@@ -83,6 +90,7 @@
 				$balfmt = sprintf($arr['format'], $balance);
 				$currname = $arr['name'];
 			}
+*/
 			else
 			{
 				$balfmt = number_format($row['balance'], 2, ',', ' ');
@@ -100,6 +108,15 @@
 
 		foreach($totalArr as $key => $value)
 		{
+			$arr = $db->selectQ('*', 'currency', 'id='.$key);
+			if (count($arr) == 1)
+			{
+				$val = number_format($value, 2, ',', ' ');
+				$valfmt = sprintf($arr[0]['format'], $val);
+
+				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td><td></td></tr>");
+			}
+/*
 			$arr = selectQuery('*', 'currency', 'id='.$key);
 			if ($arr)
 			{
@@ -108,6 +125,7 @@
 
 				echo("<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td><td></td></tr>");
 			}
+*/
 		}
 	}
 ?>
