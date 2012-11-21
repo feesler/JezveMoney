@@ -25,14 +25,6 @@ if (!$name || $name == "" || $curr_id == 0)
 if (!$db->insertQ("accounts", array("id", "user_id", "curr_id", "balance", "initbalance", "name"), array(NULL, $userid, $curr_id, $balance, $balance, $name)))
 	fail();
 
-/*
-$query = "INSERT INTO accounts (`id`, `user_id`, `curr_id`, `balance`, `initbalance`, `name`)";
-$query .= " VALUES (NULL, '".$userid."', '".$curr_id."', '".$balance."', '".$balance."', '".$name."');";
-$result = $db->rawQ($query, $dbcnx);
-if (mysql_errno())
-	fail();
-*/
-
 header("Location: ../accounts.php?newacc=ok");
 
 ?>

@@ -20,9 +20,6 @@ $amount = floatval($_POST['amount']);
 $charge = floatval($_POST['charge']);
 $trdate = strtotime($_POST['date']);
 $comment = $db->escape($_POST['comm']);
-/*
-$comment = mysql_real_escape_string($_POST['comm']);
-*/
 
 if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 	fail();
@@ -32,21 +29,9 @@ $resArr = $db->selectQ("id", "accounts", "id=".$src_id." OR id=".$dest_id");
 if (count($resArr) != 2)
 	fail();
 
-if ($db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "date", "comment")),
-							array(NULL, $userid, $src_id, $dest_id, 3, $amount, $charge, $trdate, $comment))
-/*
-$query = "SELECT id FROM accounts WHERE id=".$src_id." OR id=".$dest_id.";";
-$result = $db->rawQ($query, $dbcnx);
-if (mysql_errno() || mysql_num_rows($result) != 2)
+if ($db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "date", "comment"),
+							array(NULL, $userid, $src_id, $dest_id, 3, $amount, $charge, $trdate, $comment)))
 	fail();
-
-
-$query = "INSERT INTO transactions (`id`, `user_id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `date`, `comment`) ".
-			"VALUES (NULL, '".$userid."', '".$src_id."', '".$dest_id."', 3, '".$amount."', '".$charge."', ".$trdate.", '".$comment."');";
-$result = $db->rawQ($query, $dbcnx);
-if (mysql_errno())
-	fail();
-*/
 
 $query = "UPDATE accounts SET balance = balance - ".$amount." WHERE id=".$src_id.";";
 $result = $db->rawQ($query, $dbcnx);

@@ -92,17 +92,6 @@ function onSubmit(frm)
 	{
 		echo("\t\t\t<option value=\"".$row['id']."\"".(($arr['curr_id'] == $row['id']) ? " selected" : "").">".$row['name']."</option>\r\n");
 	}
-/*
-	$query = "SELECT * FROM `currency`;";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno() && mysql_num_rows($result) > 0)
-	{
-		while($row = mysql_fetch_array($result))
-		{
-			echo("\t\t\t<option value=\"".$row['id']."\"".(($arr['curr_id'] == $row['id']) ? " selected" : "").">".$row['name']."</option>\r\n");
-		}
-	}
-*/
 ?>
 			</select></td>
 		</tr>

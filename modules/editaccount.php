@@ -33,22 +33,12 @@ if ($acc_id != 0 && $curr_id != 0)
 	$resArr = $db->selectQ("id", "currency", "id=".$curr_id);
 	if (!count($resArr))
 		fail();
-/*
-	$arr = selectQuery('id', 'currency', 'id='.$curr_id);
-	if (!$arr)
-		fail();
-*/
 
 // get initial balance to calc difference
 	$resArr = $db->selectQ("initbalance", "accounts", "id=".$acc_id);
 	if (!count($resArr))
 		fail();
 	$arr = $resArr[0];
-/*
-	$arr = selectQuery('initbalance', 'accounts', 'id='.$acc_id);
-	if (!$arr)
-		fail();
-*/
 
 	$diff = $initbal - $arr['initbalance'];
 

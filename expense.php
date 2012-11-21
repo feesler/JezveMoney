@@ -33,35 +33,6 @@ $userid = checkUser('./login.php');
 		echo("[".$row['id'].", '".$row['name']."', '".$row['sign']."']".(($i < $currcount - 1) ? ", " : "];\r\n"));
 		$cursign[$i] = $row['sign'];
 	}
-
-/*
-	$query = "SELECT currency.id AS curr_id, currency.sign AS sign, accounts.balance AS balance FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
-	$result = $db->rawQ($query, $dbcnx);
-	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
-
-	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
-
-	$i = 1;
-	while($row = mysql_fetch_array($result))
-	{
-		echo("[".$row['curr_id'].", '".$row['sign']."', ".$row['balance']."]".(($i < $accounts) ? ", " : "];\r\n"));
-		$cursign[$i - 1] = $row['sign'];
-		$i++;
-	}
-
-	$query = "SELECT id, name, sign FROM currency ORDER BY id;";
-	$result = $db->rawQ($query, $dbcnx);
-	$currcount = ((mysql_errno()) ? 0 : mysql_num_rows($result));
-
-	echo("var currency = [");
-
-	$i = 1;
-	while($row = mysql_fetch_array($result))
-	{
-		echo("[".$row['id'].", '".$row['name']."', '".$row['sign']."']".(($i < $currcount) ? ", " : "];\r\n"));
-		$i++;
-	}
-*/
 ?>
 
 function onSubmit(frm)
@@ -285,12 +256,6 @@ function onChangeTransCurr()
 <?php
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	$accounts = count($resArr);
-/*
-	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno())
-		$accounts = mysql_num_rows($result);
-*/
 	if (!$accounts)
 	{
 		echo("\t\t<tr><td><span>You have no one account. Please create one.</span></td></tr>\r\n");
@@ -300,9 +265,6 @@ function onChangeTransCurr()
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
 		foreach($resArr as $row)
-/*
-		while($row = mysql_fetch_array($result))
-*/
 		{
 			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
 			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
@@ -350,24 +312,6 @@ function onChangeTransCurr()
 		if ($curAccCurr == 0)
 			$curAccCurr = $row['curr_id'];
 	}
-/*
-	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno() && mysql_num_rows($result) > 0)
-	{
-		$curAccCurr = 0;
-		while($row = mysql_fetch_array($result))
-		{
-			echo("\t\t\t\t<option value=\"".$row['id']."\"");
-			if ($curAccCurr == 0)
-				echo(" selected");
-			echo(">".$row['name']."</option>\r\n");
-
-			if ($curAccCurr == 0)
-				$curAccCurr = $row['curr_id'];
-		}
-	}
-*/
 ?>
 			</select>
 		</td>
@@ -388,22 +332,6 @@ function onChangeTransCurr()
 
 		echo(">".$row['name']."</option>\r\n");
 	}
-/*
-	$query = "SELECT * FROM `currency`;";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno() && mysql_num_rows($result) > 0)
-	{
-		while($row = mysql_fetch_array($result))
-		{
-			echo("\t\t\t<option value=\"".$row['id']."\"");
-
-			if ($row['id'] == $curAccCurr)
-				echo(" selected");
-
-			echo(">".$row['name']."</option>\r\n");
-		}
-	}
-*/
 ?>
 			</select>
 		</td>

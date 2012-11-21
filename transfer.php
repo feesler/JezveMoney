@@ -24,21 +24,6 @@
 		echo("[".$row['curr_id'].", '".$row['sign']."']".(($i < $accounts - 1) ? ", " : "];\r\n"));
 		$cursign[$i] = $row['sign'];
 	}
-/*
-	$query = "SELECT currency.id AS curr_id, currency.sign AS sign FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
-	$result = $db->rawQ($query, $dbcnx);
-	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
-
-	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
-
-	$i = 1;
-	while($row = mysql_fetch_array($result))
-	{
-		echo("[".$row['curr_id'].", '".$row['sign']."']".(($i < $accounts) ? ", " : "];\r\n"));
-		$cursign[$i - 1] = $row['sign'];
-		$i++;
-	}
-*/
 ?>
 
 function isDiffCurr()
@@ -263,36 +248,6 @@ function onInput(obj)
 				echo("\t\t<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>\r\n");
 			}
 		}
-/*
-		$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
-		$result = $db->rawQ($query, $dbcnx);
-		if(!mysql_errno() && mysql_num_rows($result) > 0)
-		{
-			while($row = mysql_fetch_array($result))
-			{
-				$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
-				$currname = ($arr ? $arr[0]['name'] : '');
-				$balfmt = currFormat(($arr ? $arr[0]['format'] : ''), $row['balance']);
-
-				if ($currname != '' && !$totalArr[$row['curr_id']])
-					$totalArr[$row['curr_id']] = 0;
-
-				$totalArr[$row['curr_id']] += $row['balance'];
-
-				echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
-			}
-
-			foreach($totalArr as $key => $value)
-			{
-				$arr = $db->selectQ('*', 'currency', 'id='.$key);
-				if (count($arr) == 1)
-				{
-					$valfmt = currFormat($arr[0]['format'], $value);
-					echo("\t\t<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>\r\n");
-				}
-			}
-		}
-*/
 ?>
 	</table>
 	</td>
@@ -312,19 +267,6 @@ function onInput(obj)
 	{
 		echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i == 0) ? " selected" : "").">".$row['name']."</option>\r\n");
 	}
-/*
-	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno() && mysql_num_rows($result) > 0)
-	{
-		$i = 1;
-		while($row = mysql_fetch_array($result))
-		{
-			echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i==1)?" selected":"").">".$row['name']."</option>\r\n");
-			$i++;
-		}
-	}
-*/
 ?>
 			</select>
 		</td>
@@ -340,19 +282,6 @@ function onInput(obj)
 	{
 		echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i == 1) ? " selected" : "").">".$row['name']."</option>\r\n");
 	}
-/*
-	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno() && mysql_num_rows($result) > 0)
-	{
-		$i = 1;
-		while($row = mysql_fetch_array($result))
-		{
-			echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i==2)?" selected":"").">".$row['name']."</option>\r\n");
-			$i++;
-		}
-	}
-*/
 ?>
 			</select>
 		</td>
