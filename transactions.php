@@ -60,7 +60,7 @@
 	}
 	else
 	{
-		$query = "SELECT * FROM `transactions` AS t WHERE t.type=";
+		$query = "SELECT * FROM `transactions` AS t WHERE t.user_id='".$userid."' AND t.type=";
 		if ($transType == "expense")
 			$query .= "1";
 		else if ($transType == "income")

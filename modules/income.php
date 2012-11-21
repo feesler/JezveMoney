@@ -25,8 +25,8 @@ $comment = mysql_real_escape_string($_POST['comm']);
 if (!$acc_id != 0 || $amount == 0.0 || $trdate == -1)
 	fail();
 
-$query = "INSERT INTO transactions (`id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `cur_id`, `date`, `comment`) ".
-			"VALUES (NULL, 0, '".$acc_id."', 2, '".$amount."', '".$receipt."', ".$transcurr.", ".$trdate.", '".$comment."');";
+$query = "INSERT INTO transactions (`id`, `user_id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `cur_id`, `date`, `comment`) ".
+			"VALUES (NULL, '".$userid."', 0, '".$acc_id."', 2, '".$amount."', '".$receipt."', ".$transcurr.", ".$trdate.", '".$comment."');";
 $result = mysql_query($query, $dbcnx);
 if (mysql_errno())
 	fail();

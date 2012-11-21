@@ -32,8 +32,8 @@ if (mysql_errno() || mysql_num_rows($result) != 2)
 	fail();
 
 
-$query = "INSERT INTO transactions (`id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `date`, `comment`) ".
-			"VALUES (NULL, '".$src_id."', '".$dest_id."', 3, '".$amount."', '".$charge."', ".$trdate.", '".$comment."');";
+$query = "INSERT INTO transactions (`id`, `user_id`, `src_id`, `dest_id`, `type`, `amount`, `charge`, `date`, `comment`) ".
+			"VALUES (NULL, '".$userid."', '".$src_id."', '".$dest_id."', 3, '".$amount."', '".$charge."', ".$trdate.", '".$comment."');";
 $result = mysql_query($query, $dbcnx);
 if (mysql_errno())
 	fail();
