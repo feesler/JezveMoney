@@ -59,6 +59,73 @@
 	}
 	else
 	{
+		$trtype_id = 0;
+		if ($transType == "expense")
+			$trtype_id = 1;
+		else if ($transType == "income")
+			$trtype_id = 2;
+		else if ($transType == "transfer")
+			$trtype_id = 3;
+
+		$resArr = $db->selectQ("*", "transactions AS t", "t.user_id=".$userid." AND t.type=".$trtype_id);
+		$rowCount = count($resArr);
+		if (!$rowCount)
+		{
+			echo("<tr><td>You have no one transaction yet.</td></tr>");
+		}
+		else
+		{
+			echo("<tr>");
+
+			if ($transType == "expense")
+				echo("<td>Source</td>");
+			else if ($transType == "income")
+				echo("<td>Destination</td>");
+			else if ($transType == "transfer")
+				echo("<td>Source</td><td>Destination</td>");
+
+			echo("<td>Amount</td><td>Comment</td></tr>");
+
+			foreach($resArr as $row)
+			{
+				echo("<tr>");
+
+				if ($transType == "expense" || $transType == "transfer")
+				{
+					$arr = $db->selectQ('*', 'accounts', 'id='.$row['src_id']);
+
+					if (count($arr) == 1)
+						echo("<td>".$arr[0]['name']."</td>");
+					else
+						echo("<td></td>");
+				}
+
+				if ($transType == "income" || $transType == "transfer")
+				{
+					$arr = $db->selectQ('*', 'accounts', 'id='.$row['dest_id']);
+
+					if (count($arr) == 1)
+						echo("<td>".$arr[0]['name']."</td>");
+					else
+						echo("<td></td>");
+				}
+
+				echo("<td>".$row['amount']);
+				if ($row["charge"] != $row["amount"])
+				{
+					$arr = $db->selectQ('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
+
+					$chargefmt = currFormat(((count($arr) == 1) ? $arr["format"] : ''), $row["charge"]);
+
+					echo(" (".$chargefmt.")");
+				}
+				echo("</td>");
+
+				echo("<td>".$row['comment']."</td></tr>");
+			}
+		}
+
+/*
 		$query = "SELECT * FROM `transactions` AS t WHERE t.user_id='".$userid."' AND t.type=";
 		if ($transType == "expense")
 			$query .= "1";
@@ -127,6 +194,7 @@
 				echo("<tr><td>You have no one transaction yet.</td></tr>");
 			}
 		}
+*/
 	}
 ?>
 	</table>

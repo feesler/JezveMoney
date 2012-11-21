@@ -16,6 +16,25 @@ $userid = checkUser('./login.php');
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
 <?php
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id='".$userid."' AND c.id=a.curr_id");
+	$accounts = count($resArr);
+	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
+	foreach($resArr as $i => $row)
+	{
+		echo("[".$row['curr_id'].", '".$row['sign']."', ".$row['balance']."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		$cursign[$i] = $row['sign'];
+	}
+
+	$resArr = $db->selectQ("id, name, sign", "currency", NULL, NULL, "id");
+	$currcount = count($resArr);
+	echo("var currency = [");
+	foreach($resArr as $i => $row)
+	{
+		echo("[".$row['id'].", '".$row['name']."', '".$row['sign']."']".(($i < $currcount - 1) ? ", " : "];\r\n"));
+		$cursign[$i] = $row['sign'];
+	}
+
+/*
 	$query = "SELECT currency.id AS curr_id, currency.sign AS sign, accounts.balance AS balance FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
 	$result = $db->rawQ($query, $dbcnx);
 	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
@@ -42,6 +61,7 @@ $userid = checkUser('./login.php');
 		echo("[".$row['id'].", '".$row['name']."', '".$row['sign']."']".(($i < $currcount) ? ", " : "];\r\n"));
 		$i++;
 	}
+*/
 ?>
 
 function onSubmit(frm)
@@ -263,10 +283,14 @@ function onChangeTransCurr()
 	<td>
 	<table>
 <?php
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+	$accounts = count($resArr);
+/*
 	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno())
 		$accounts = mysql_num_rows($result);
+*/
 	if (!$accounts)
 	{
 		echo("\t\t<tr><td><span>You have no one account. Please create one.</span></td></tr>\r\n");
@@ -275,7 +299,10 @@ function onChangeTransCurr()
 	{
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
+		foreach($resArr as $row)
+/*
 		while($row = mysql_fetch_array($result))
+*/
 		{
 			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
 			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
@@ -312,6 +339,18 @@ function onChangeTransCurr()
 		<td>
 			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
 <?php
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+	foreach($resArr sa $row)
+	{
+		echo("\t\t\t\t<option value=\"".$row['id']."\"");
+		if ($curAccCurr == 0)
+			echo(" selected");
+		echo(">".$row['name']."</option>\r\n");
+
+		if ($curAccCurr == 0)
+			$curAccCurr = $row['curr_id'];
+	}
+/*
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -328,6 +367,7 @@ function onChangeTransCurr()
 				$curAccCurr = $row['curr_id'];
 		}
 	}
+*/
 ?>
 			</select>
 		</td>
@@ -338,6 +378,17 @@ function onChangeTransCurr()
 		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($cursign[0]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
+	$resArr = $db->selectQ("*", "currency");
+	foreach($resArr sa $row)
+	{
+		echo("\t\t\t<option value=\"".$row['id']."\"");
+
+		if ($row['id'] == $curAccCurr)
+			echo(" selected");
+
+		echo(">".$row['name']."</option>\r\n");
+	}
+/*
 	$query = "SELECT * FROM `currency`;";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -352,6 +403,7 @@ function onChangeTransCurr()
 			echo(">".$row['name']."</option>\r\n");
 		}
 	}
+*/
 ?>
 			</select>
 		</td>

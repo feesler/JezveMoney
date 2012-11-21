@@ -18,10 +18,11 @@ if (!is_numeric($_GET['id']))
 
 $acc_id = intval($_GET['id']);
 
-$arr = $db->selectQ('*', 'accounts', 'id='.$acc_id);
-if (count($arr) != 1)
+$resArr = $db->selectQ('*', 'accounts', 'id='.$acc_id);
+if (count($resArr) != 1)
 	fail();
 
+$arr = $resArr[0];
 ?>
 <!DOCTYPE html>
 <html>
@@ -86,6 +87,12 @@ function onSubmit(frm)
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
 			<td><select class="inp" id="acccurr" name="acccurr">
 <?php
+	$resArr = $db->selectQ("*", "currency");
+	foreach($resArr as $row)
+	{
+		echo("\t\t\t<option value=\"".$row['id']."\"".(($arr['curr_id'] == $row['id']) ? " selected" : "").">".$row['name']."</option>\r\n");
+	}
+/*
 	$query = "SELECT * FROM `currency`;";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -95,6 +102,7 @@ function onSubmit(frm)
 			echo("\t\t\t<option value=\"".$row['id']."\"".(($arr['curr_id'] == $row['id']) ? " selected" : "").">".$row['name']."</option>\r\n");
 		}
 	}
+*/
 ?>
 			</select></td>
 		</tr>

@@ -61,10 +61,14 @@
 	<td style="padding-left: 50px;">
 	<table>
 <?php
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+	$accounts = count($resArr);
+/*
 	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno())
 	$accounts = mysql_num_rows($result);
+*/
 	if (!$accounts)
 	{
 		echo("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
@@ -73,7 +77,10 @@
 	{
 		echo("<tr><td>Name</td><td>Currency</td><td>Balance</td><td></td></tr>");
 
+		foreach($resArr as $row)
+/*
 		while($row = mysql_fetch_array($result))
+*/
 		{
 			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
 			if (count($arr) == 1)

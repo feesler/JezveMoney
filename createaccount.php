@@ -69,6 +69,12 @@ function onSubmit(frm)
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
 			<td><select class="inp" id="acccurr" name="acccurr">
 <?php
+	$resArr = $db->selectQ("*", "currency");
+	foreach($resArr as $row)
+	{
+		echo("\t\t\t<option value=\"".$row['id']."\">".$row['name']."</option>\r\n");
+	}
+/*
 	$query = "SELECT * FROM `currency`;";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -78,6 +84,7 @@ function onSubmit(frm)
 			echo("\t\t\t<option value=\"".$row['id']."\">".$row['name']."</option>\r\n");
 		}
 	}
+*/
 ?>
 			</select></td>
 		</tr>

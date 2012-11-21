@@ -16,6 +16,15 @@
 <script type="text/javascript" src="./js/common.js"></script>
 <script>
 <?php
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id='".$userid."' AND c.id=a.curr_id");
+	$accounts = count($resArr);
+	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
+	foreach($resArr as $i => $row)
+	{
+		echo("[".$row['curr_id'].", '".$row['sign']."']".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		$cursign[$i] = $row['sign'];
+	}
+/*
 	$query = "SELECT currency.id AS curr_id, currency.sign AS sign FROM accounts, currency WHERE accounts.user_id='".$userid."' AND currency.id=accounts.curr_id;";
 	$result = $db->rawQ($query, $dbcnx);
 	$accounts = ((mysql_errno()) ? 0 : mysql_num_rows($result));
@@ -29,6 +38,7 @@
 		$cursign[$i - 1] = $row['sign'];
 		$i++;
 	}
+*/
 ?>
 
 function isDiffCurr()
@@ -227,6 +237,33 @@ function onInput(obj)
 	{
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
+		$totalArr = array();
+
+		$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+		foreach($resArr as $row)
+		{
+			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
+			$currname = ($arr ? $arr[0]['name'] : '');
+			$balfmt = currFormat(($arr ? $arr[0]['format'] : ''), $row['balance']);
+
+			if ($currname != '' && !$totalArr[$row['curr_id']])
+				$totalArr[$row['curr_id']] = 0;
+
+			$totalArr[$row['curr_id']] += $row['balance'];
+
+			echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
+		}
+
+		foreach($totalArr as $key => $value)
+		{
+			$arr = $db->selectQ('*', 'currency', 'id='.$key);
+			if (count($arr) == 1)
+			{
+				$valfmt = currFormat($arr[0]['format'], $value);
+				echo("\t\t<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>\r\n");
+			}
+		}
+/*
 		$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
 		$result = $db->rawQ($query, $dbcnx);
 		if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -255,6 +292,7 @@ function onInput(obj)
 				}
 			}
 		}
+*/
 ?>
 	</table>
 	</td>
@@ -269,6 +307,12 @@ function onInput(obj)
 		<td>
 			<select class="inp" id="srcid" name="srcid" onchange="onChangeSource();">
 <?php
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+	foreach($resArr as $i => $row)
+	{
+		echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i == 0) ? " selected" : "").">".$row['name']."</option>\r\n");
+	}
+/*
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -280,6 +324,7 @@ function onInput(obj)
 			$i++;
 		}
 	}
+*/
 ?>
 			</select>
 		</td>
@@ -290,6 +335,12 @@ function onInput(obj)
 		<td>
 			<select class="inp" id="destid" name="destid" onchange="onChangeDest();">
 <?php
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+	foreach($resArr as $i => $row)
+	{
+		echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i == 1) ? " selected" : "").">".$row['name']."</option>\r\n");
+	}
+/*
 	$query = "SELECT * FROM `accounts` WHERE user_id='".$userid."';";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno() && mysql_num_rows($result) > 0)
@@ -301,6 +352,7 @@ function onInput(obj)
 			$i++;
 		}
 	}
+*/
 ?>
 			</select>
 		</td>

@@ -18,10 +18,14 @@ if (!$login || $login == "" || !$pass || $pass == "")
 
 $passhash = md5($pass);
 
+if (!$db->insertQ("users", array(id, login, passhash), array(NULL, $login, $passhash)))
+	fail();
+/*
 $query = "INSERT INTO users (`id`, `login`, `passhash`) VALUES (NULL, '".$login."', '".$passhash."');";
 $result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
+*/
 
 
 header("Location: ../index.php");

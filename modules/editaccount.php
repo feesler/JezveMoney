@@ -30,14 +30,25 @@ if ($acc_id != 0 && $curr_id != 0)
 	$diff = 0.0;
 
 // check is currency exist
+	$resArr = $db->selectQ("id", "currency", "id=".$curr_id);
+	if (!count($resArr))
+		fail();
+/*
 	$arr = selectQuery('id', 'currency', 'id='.$curr_id);
 	if (!$arr)
 		fail();
+*/
 
 // get initial balance to calc difference
+	$resArr = $db->selectQ("initbalance", "accounts", "id=".$acc_id);
+	if (!count($resArr))
+		fail();
+	$arr = $resArr[0];
+/*
 	$arr = selectQuery('initbalance', 'accounts', 'id='.$acc_id);
 	if (!$arr)
 		fail();
+*/
 
 	$diff = $initbal - $arr['initbalance'];
 
@@ -48,7 +59,7 @@ if ($acc_id != 0 && $curr_id != 0)
 
 	$query .= " WHERE id=".$acc_id.";";
 
-	$result = $db->rawQ($query, $dbcnx);
+	$result = $db->rawQ($query);
 	if (mysql_errno())
 		fail();
 }
