@@ -57,67 +57,9 @@
 	}
 ?>
 
-<!--
-	<tr>
-	<td style="padding-left: 50px;">
-	<table>
--->
 <?php
 	getAccountsTable($userid);
-/*
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	$accounts = count($resArr);
-	if (!$accounts)
-	{
-		echo("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
-	}
-	else
-	{
-		echo("<tr><td>Name</td><td>Currency</td><td>Balance</td><td></td></tr>");
-
-		foreach($resArr as $row)
-		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
-			if (count($arr) == 1)
-			{
-				$balance = number_format($row['balance'], 2, ',', ' ');
-				$balfmt = sprintf($arr[0]['format'], $balance);
-				$currname = $arr[0]['name'];
-			}
-			else
-			{
-				$balfmt = number_format($row['balance'], 2, ',', ' ');
-				$currname = '';
-			}
-
-			if ($currname != '' && !$totalArr[$row['curr_id']])
-				$totalArr[$row['curr_id']] = 0;
-
-			$totalArr[$row['curr_id']] += $row['balance'];
-
-			echo("<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td>");
-			echo("<td><a href=\"./editaccount.php?id=".$row['id']."\">edit</a></td></tr>");
-		}
-
-		foreach($totalArr as $key => $value)
-		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$key);
-			if (count($arr) == 1)
-			{
-				$val = number_format($value, 2, ',', ' ');
-				$valfmt = sprintf($arr[0]['format'], $val);
-
-				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td><td></td></tr>");
-			}
-		}
-	}
-*/
 ?>
-<!--
-	</table>
-	</td>
-	</tr>
--->
 </table>
 </body>
 </html>

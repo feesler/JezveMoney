@@ -210,58 +210,12 @@ function onInput(obj)
 	</td>
 	</tr>
 
-<!--
-	<tr>
-	<td>
-	<table>
--->
 <?php
 	getAccountsTable($userid, TRUE);
 	$accounts = $db->countQ("accounts", "user_id=".$userid);
 	if ($accounts > 0)
 	{
-/*
-	if ($accounts < 2)
-	{
-		echo("\t\t<tr><td><span>You need at least two accounts to transfer.</span></td></tr>\r\n");
-	}
-	else
-	{
-		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
-
-		$totalArr = array();
-
-		$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-		foreach($resArr as $row)
-		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
-			$currname = ($arr ? $arr[0]['name'] : '');
-			$balfmt = currFormat(($arr ? $arr[0]['format'] : ''), $row['balance']);
-
-			if ($currname != '' && !$totalArr[$row['curr_id']])
-				$totalArr[$row['curr_id']] = 0;
-
-			$totalArr[$row['curr_id']] += $row['balance'];
-
-			echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
-		}
-
-		foreach($totalArr as $key => $value)
-		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$key);
-			if (count($arr) == 1)
-			{
-				$valfmt = currFormat($arr[0]['format'], $value);
-				echo("\t\t<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>\r\n");
-			}
-		}
-*/
 ?>
-<!--
-	</table>
-	</td>
-	</tr>
--->
 
 	<tr>
 	<td>

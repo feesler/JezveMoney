@@ -29,53 +29,9 @@
 	</td>
 	</tr>
 
-<!--
-	<tr>
-	<td>
-	<table>
--->
 <?php
 	getAccountsTable($userid);
-/*
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	$accounts = count($resArr);
-	if (!$accounts)
-	{
-		echo("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
-	}
-	else
-	{
-		echo("<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>");
-
-		foreach($resArr as $row)
-		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
-			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
-			$balfmt = currFormat((count($arr) == 1 ? $arr[0]['format'] : ''), $row['balance']);
-
-			if ($currname != '' && !$totalArr[$row['curr_id']])
-				$totalArr[$row['curr_id']] = 0;
-
-			$totalArr[$row['curr_id']] += $row['balance'];
-
-			echo("<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>");
-		}
-
-		foreach($totalArr as $key => $value)
-		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$key);
-			if (count($arr) == 1)
-			{
-				$valfmt = currFormat($arr[0]['format'], $value);
-				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>");
-			}
-		}
-	}
-*/
 ?>
-	</table>
-	</td>
-	</tr>
 </table>
 </body>
 </html>
