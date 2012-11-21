@@ -210,10 +210,17 @@ function onInput(obj)
 	</td>
 	</tr>
 
+<!--
 	<tr>
 	<td>
 	<table>
+-->
 <?php
+	getAccountsTable($userid, TRUE);
+	$accounts = $db->countQ("accounts", "user_id=".$userid);
+	if ($accounts > 0)
+	{
+/*
 	if ($accounts < 2)
 	{
 		echo("\t\t<tr><td><span>You need at least two accounts to transfer.</span></td></tr>\r\n");
@@ -248,10 +255,13 @@ function onInput(obj)
 				echo("\t\t<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>\r\n");
 			}
 		}
+*/
 ?>
+<!--
 	</table>
 	</td>
 	</tr>
+-->
 
 	<tr>
 	<td>

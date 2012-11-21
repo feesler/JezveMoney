@@ -250,10 +250,17 @@ function onChangeTransCurr()
 	</td>
 	</tr>
 
+<!--
 	<tr>
 	<td>
 	<table>
+-->
 <?php
+	getAccountsTable($userid);
+	$accounts = $db->countQ("accounts", "user_id=".$userid);
+	if ($accounts > 0)
+	{
+/*
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	$accounts = count($resArr);
 	if (!$accounts)
@@ -287,10 +294,13 @@ function onChangeTransCurr()
 				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>");
 			}
 		}
+*/
 ?>
+<!--
 	</table>
 	</td>
 	</tr>
+-->
 
 	<tr>
 	<td>

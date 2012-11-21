@@ -57,10 +57,14 @@
 	}
 ?>
 
+<!--
 	<tr>
 	<td style="padding-left: 50px;">
 	<table>
+-->
 <?php
+	getAccountsTable($userid);
+/*
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	$accounts = count($resArr);
 	if (!$accounts)
@@ -107,10 +111,13 @@
 			}
 		}
 	}
+*/
 ?>
+<!--
 	</table>
 	</td>
 	</tr>
+-->
 </table>
 </body>
 </html>

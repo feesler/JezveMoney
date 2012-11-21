@@ -29,11 +29,14 @@
 	</td>
 	</tr>
 
+<!--
 	<tr>
 	<td>
 	<table>
+-->
 <?php
-
+	getAccountsTable($userid);
+/*
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	$accounts = count($resArr);
 	if (!$accounts)
@@ -68,6 +71,7 @@
 			}
 		}
 	}
+*/
 ?>
 	</table>
 	</td>
