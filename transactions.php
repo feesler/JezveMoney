@@ -96,13 +96,6 @@
 							echo("<td>".$arr[0]['name']."</td>");
 						else
 							echo("<td></td>");
-/*
-						$arr = selectQuery('*', 'accounts', 'id='.$row['src_id']);
-						if ($arr)
-							echo("<td>".$arr['name']."</td>");
-						else
-							echo("<td></td>");
-*/
 					}
 
 					if ($transType == "income" || $transType == "transfer")
@@ -113,13 +106,6 @@
 							echo("<td>".$arr[0]['name']."</td>");
 						else
 							echo("<td></td>");
-/*
-						$arr = selectQuery('*', 'accounts', 'id='.$row['dest_id']);
-						if ($arr)
-							echo("<td>".$arr['name']."</td>");
-						else
-							echo("<td></td>");
-*/
 					}
 
 					echo("<td>".$row['amount']);
@@ -128,11 +114,7 @@
 						$arr = $db->selectQ('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
 
 						$chargefmt = currFormat(((count($arr) == 1) ? $arr["format"] : ''), $row["charge"]);
-/*
-						$arr = selectQuery('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
 
-						$chargefmt = currFormat(($arr ? $arr["format"] : ''), $row["charge"]);
-*/
 						echo(" (".$chargefmt.")");
 					}
 					echo("</td>");

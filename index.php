@@ -50,11 +50,6 @@
 			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
 			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
 			$balfmt = currFormat((count($arr) == 1 ? $arr[0]['format'] : ''), $row['balance']);
-/*
-			$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
-			$currname = ($arr ? $arr['name'] : '');
-			$balfmt = currFormat(($arr ? $arr['format'] : ''), $row['balance']);
-*/
 
 			if ($currname != '' && !$totalArr[$row['curr_id']])
 				$totalArr[$row['curr_id']] = 0;
@@ -72,14 +67,6 @@
 				$valfmt = currFormat($arr[0]['format'], $value);
 				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>");
 			}
-/*
-			$arr = selectQuery('*', 'currency', 'id='.$key);
-			if ($arr)
-			{
-				$valfmt = currFormat($arr['format'], $value);
-				echo("<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td></tr>");
-			}
-*/
 		}
 	}
 ?>

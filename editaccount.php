@@ -22,12 +22,6 @@ $arr = $db->selectQ('*', 'accounts', 'id='.$acc_id);
 if (count($arr) != 1)
 	fail();
 
-/*
-$arr = selectQuery('*', 'accounts', 'id='.$acc_id);
-if (!$arr)
-	fail();
-*/
-
 ?>
 <!DOCTYPE html>
 <html>

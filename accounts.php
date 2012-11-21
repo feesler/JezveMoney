@@ -82,15 +82,6 @@
 				$balfmt = sprintf($arr[0]['format'], $balance);
 				$currname = $arr[0]['name'];
 			}
-/*
-			$arr = selectQuery('*', 'currency', 'id='.$row['curr_id']);
-			if ($arr)
-			{
-				$balance = number_format($row['balance'], 2, ',', ' ');
-				$balfmt = sprintf($arr['format'], $balance);
-				$currname = $arr['name'];
-			}
-*/
 			else
 			{
 				$balfmt = number_format($row['balance'], 2, ',', ' ');
@@ -116,16 +107,6 @@
 
 				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td><td></td></tr>");
 			}
-/*
-			$arr = selectQuery('*', 'currency', 'id='.$key);
-			if ($arr)
-			{
-				$val = number_format($value, 2, ',', ' ');
-				$valfmt = sprintf($arr['format'], $val);
-
-				echo("<tr><td>Total</td><td>".$arr['name']."</td><td>".$valfmt."</td><td></td></tr>");
-			}
-*/
 		}
 	}
 ?>

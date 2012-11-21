@@ -40,10 +40,6 @@ function getUserName($id)
 	$arr = $db->selectQ('login', 'users', '`id`='.$id);
 
 	return ((count($arr) == 1) ? $arr[0]['login'] : '');
-/*
-	$arr = selectQuery('login', 'users', '`id`='.$id);
-	return (($arr) ? $arr['login'] : '');
-*/
 }
 
 
