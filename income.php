@@ -303,7 +303,7 @@ function onChangeTransCurr()
 			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
 <?php
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	foreach($resArr sa $row)
+	foreach($resArr as $row)
 	{
 		echo("\t\t\t\t<option value=\"".$row['id']."\"");
 		if ($curAccCurr == 0)
@@ -324,7 +324,7 @@ function onChangeTransCurr()
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
 	$resArr = $db->selectQ("*", "currency");
-	foreach($resArr sa $row)
+	foreach($resArr as $row)
 	{
 		echo("\t\t\t<option value=\"".$row['id']."\"");
 
