@@ -80,21 +80,23 @@ function getAccountsTable($user_id, $transfer = FALSE)
 	else
 	{
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
-	
+
 		foreach($resArr as $row)
 		{
 			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
 			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
 			$balfmt = currFormat((count($arr) == 1 ? $arr[0]['format'] : ''), $row['balance']);
-	
+
 			if ($currname != '' && !$totalArr[$row['curr_id']])
 				$totalArr[$row['curr_id']] = 0;
-	
+
 			$totalArr[$row['curr_id']] += $row['balance'];
-	
+
 			echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
 		}
-	
+
+		echo("\t\t<tr><td colspan=\"3\" style=\"height: 10px;\"></td></tr>\r\n");
+
 		foreach($totalArr as $key => $value)
 		{
 			$arr = $db->selectQ('*', 'currency', 'id='.$key);
@@ -104,7 +106,6 @@ function getAccountsTable($user_id, $transfer = FALSE)
 				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>");
 			}
 		}
-
 	}
 
 	echo("\t</table>\r\n");
