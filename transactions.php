@@ -49,10 +49,9 @@
 	<td>
 	<table>
 <?php
-	$query = "SELECT * FROM `accounts` WHERE `user_id`=".$userid.";";
-	$result = $db->rawQ($query, $dbcnx);
-	if(!mysql_errno())
-		$accounts = mysql_num_rows($result);
+
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+	$accounts = count($resArr);
 	if (!$accounts)
 	{
 		echo("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
@@ -67,7 +66,7 @@
 		else if ($transType == "transfer")
 			$trtype_id = 3;
 
-		$resArr = $db->selectQ("*", "transactions AS t", "t.user_id=".$userid." AND t.type=".$trtype_id);
+		$resArr = $db->selectQ("*", "transactions AS t", "t.user_id=".$userid." AND t.type=".$trtype_id, NULL, "date");
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
@@ -95,14 +94,17 @@
 				if ($transType == "income" || $transType == "transfer")
 					echo("<td>".getAccountName($row["dest_id"])."</td>");
 
-				echo("<td>".$row["amount"]);
+				echo("<td>".currFormat($row["amount"], $row["curr_id"]));
 				if ($row["charge"] != $row["amount"])
 				{
-					$arr = $db->selectQ("*", "`accounts` AS a, `currency` AS c", "a.id=".$row["dest_id"]." AND c.id=a.curr_id");
+					echo(" (");
 
-					$chargefmt = currFormat(((count($arr) == 1) ? $arr["format"] : ""), $row["charge"]);
+					if ($trtype_id == 1 || $trtype_id == 3)		// expense or transfer
+						echo(currFormat($row["charge"], getAccountCurrency($row["src_id"])));
+					else if ($trtype_id == 2)					// income
+						echo(currFormat($row["charge"], getAccountCurrency($row["dest_id"])));
 
-					echo(" (".$chargefmt.")");
+					echo(")");
 				}
 				echo("</td>");
 
