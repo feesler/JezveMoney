@@ -29,13 +29,45 @@ function getStyle($theme)
 }
 
 
-// Format value in specified currency
-function currFormat($format, $value)
+// Format value
+function valFormat($format, $value)
 {
 	if ($format && $format != "")
 		return sprintf($format, number_format($value, 2, ",", " "));
 	else
 		return number_format($value, 2, ",", " ");
+}
+
+
+// Format value in specified currency
+function currFormat($value, $curr_id)
+{
+	global $db;
+
+	$resArr = $db->selectQ("format", "currency", "id=".$curr_id);
+	return valFormat((count($resArr) == 1) ? $resArr[0]["format"] : "", $value);
+}
+
+
+// Return currency name
+function getCurrencyName($curr_id)
+{
+	global $db;
+
+	$resArr = $db->selectQ("name", "currency", "id=".$curr_id);
+
+	return ((count($resArr) == 1) ? $resArr[0]["name"] : "");
+}
+
+
+// Return currency of account
+function getAccountCurrency($account_id)
+{
+	global $db;
+
+	$resArr = $db->selectQ("curr_id", "accounts", "id=".$account_id);
+
+	return ((count($resArr) == 1) ? intval($resArr[0]["curr_id"]) : 0);
 }
 
 
@@ -88,11 +120,16 @@ function getAccountsTable($user_id, $transfer = FALSE)
 	{
 		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
 
+		$totalArr = array();
 		foreach($resArr as $row)
 		{
+			$balfmt = currFormat($row["balance"], $row["curr_id"]);
+			$currname = getCurrencyName($row["curr_id"]);
+/*
 			$arr = $db->selectQ("*", "currency", "id=".$row["curr_id"]);
 			$currname = (count($arr) == 1 ? $arr[0]["name"] : "");
 			$balfmt = currFormat((count($arr) == 1 ? $arr[0]["format"] : ""), $row["balance"]);
+*/
 
 			if ($currname != "" && !$totalArr[$row["curr_id"]])
 				$totalArr[$row["curr_id"]] = 0;
@@ -106,12 +143,9 @@ function getAccountsTable($user_id, $transfer = FALSE)
 
 		foreach($totalArr as $key => $value)
 		{
-			$arr = $db->selectQ("*", "currency", "id=".$key);
-			if (count($arr) == 1)
-			{
-				$valfmt = currFormat($arr[0]["format"], $value);
-				echo("<tr><td>Total</td><td>".$arr[0]["name"]."</td><td>".$valfmt."</td></tr>");
-			}
+			$valfmt = currFormat($value, $key);
+			$currname = getCurrencyName($key);
+			echo("<tr><td>Total</td><td>".$currname."</td><td>".$valfmt."</td></tr>");
 		}
 	}
 
