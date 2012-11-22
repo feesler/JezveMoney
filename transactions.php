@@ -91,24 +91,9 @@
 				echo("<tr>");
 
 				if ($transType == "expense" || $transType == "transfer")
-				{
-					$arr = $db->selectQ("*", "accounts", "id=".$row["src_id"]);
-
-					if (count($arr) == 1)
-						echo("<td>".$arr[0]["name"]."</td>");
-					else
-						echo("<td></td>");
-				}
-
+					echo("<td>".getAccountName($row["src_id"])."</td>");
 				if ($transType == "income" || $transType == "transfer")
-				{
-					$arr = $db->selectQ("*", "accounts", "id=".$row["dest_id"]);
-
-					if (count($arr) == 1)
-						echo("<td>".$arr[0]["name"]."</td>");
-					else
-						echo("<td></td>");
-				}
+					echo("<td>".getAccountName($row["dest_id"])."</td>");
 
 				echo("<td>".$row["amount"]);
 				if ($row["charge"] != $row["amount"])

@@ -119,4 +119,16 @@ function getAccountsTable($user_id, $transfer = FALSE)
 	echo("\t</td>\r\n");
 	echo("\t</tr>\r\n");
 }
+
+
+// Return account name
+function getAccountName($account_id)
+{
+	global $db;
+
+	$resArr = $db->selectQ("*", "accounts", "id=".intval($account_id));
+
+	return (count($resArr) == 1) ? $resArr[0]["name"] : "";
+}
+
 ?>
