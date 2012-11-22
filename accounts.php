@@ -58,7 +58,7 @@
 ?>
 
 <?php
-	getAccountsTable($userid, FALSE, TRUE);
+	echo(getAccountsTable($userid, FALSE, TRUE));
 ?>
 </table>
 </body>

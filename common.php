@@ -101,27 +101,27 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 {
 	global $db;
 
-	echo("\t<tr>\r\n");
-	echo("\t<td>\r\n");
-	echo("\t<table>\r\n");
+	$resStr = "";
+
+	$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table>\r\n";
 
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$user_id);
 	$accounts = count($resArr);
 	if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
 	{
-		echo("\t\t<tr><td><span>");
+		$resStr .= "\t\t<tr><td><span>";
 		if ($transfer)
-			echo("You need at least two accounts to transfer.");
+			$resStr .= "You need at least two accounts to transfer.";
 		else
-			echo("You have no one account. Please create one.");
-		echo("</span></td></tr>\r\n");
+			$resStr .= "You have no one account. Please create one.";
+		$resStr .= "</span></td></tr>\r\n";
 	}
 	else
 	{
-		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td>");
+		$resStr .= "\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td>";
 		if ($editlink == TRUE)
-			echo("<td></td>");
-		echo("</tr>\r\n");
+			$resStr .= "<td></td>";
+		$resStr .= "</tr>\r\n";
 
 		$totalArr = array();
 		foreach($resArr as $row)
@@ -134,25 +134,25 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 
 			$totalArr[$row["curr_id"]] += $row["balance"];
 
-			echo("\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td>".$balfmt."</td>");
+			$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td>".$balfmt."</td>";
 			if ($editlink == TRUE)
-				echo("<td><a href=\"./editaccount.php?id=".$row["id"]."\">edit</a></td>");
-			echo("</tr>\r\n");
+				$resStr .= "<td><a href=\"./editaccount.php?id=".$row["id"]."\">edit</a></td>";
+			$resStr .= "</tr>\r\n";
 		}
 
-		echo("\t\t<tr><td colspan=\"3\" style=\"height: 10px;\"></td></tr>\r\n");
+		$resStr .= "\t\t<tr><td colspan=\"3\" style=\"height: 10px;\"></td></tr>\r\n";
 
 		foreach($totalArr as $key => $value)
 		{
 			$valfmt = currFormat($value, $key);
 			$currname = getCurrencyName($key);
-			echo("<tr><td>Total</td><td>".$currname."</td><td>".$valfmt."</td></tr>");
+			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td>".$valfmt."</td></tr>";
 		}
 	}
 
-	echo("\t</table>\r\n");
-	echo("\t</td>\r\n");
-	echo("\t</tr>\r\n");
+	$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+
+	return $resStr;
 }
 
 

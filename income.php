@@ -196,7 +196,8 @@ function onChangeTransCurr()
 	</tr>
 
 <?php
-	getAccountsTable($userid);
+	echo(getAccountsTable($userid));
+
 	$accounts = $db->countQ("accounts", "user_id=".$userid);
 	if ($accounts > 0)
 	{

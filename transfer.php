@@ -45,7 +45,8 @@
 	</tr>
 
 <?php
-	getAccountsTable($userid, TRUE);
+	echo(getAccountsTable($userid, TRUE));
+
 	$accounts = $db->countQ("accounts", "user_id=".$userid);
 	if ($accounts > 0)
 	{

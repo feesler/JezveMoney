@@ -30,7 +30,7 @@
 	</tr>
 
 <?php
-	getAccountsTable($userid);
+	echo(getAccountsTable($userid));
 ?>
 </table>
 </body>
