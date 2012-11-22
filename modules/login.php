@@ -13,7 +13,7 @@ if ($login && $login != "" && $pass && $pass != "")
 	if (count($resArr) == 1)
 	{
 		session_start();
-		$_SESSION["userid"] = $row["id"];
+		$_SESSION["userid"] = intval($resArr[0]["id"]);
 		header("Location: ../index.php");
 		exit();
 	}
