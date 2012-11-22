@@ -128,11 +128,6 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 		{
 			$balfmt = currFormat($row["balance"], $row["curr_id"]);
 			$currname = getCurrencyName($row["curr_id"]);
-/*
-			$arr = $db->selectQ("*", "currency", "id=".$row["curr_id"]);
-			$currname = (count($arr) == 1 ? $arr[0]["name"] : "");
-			$balfmt = currFormat((count($arr) == 1 ? $arr[0]["format"] : ""), $row["balance"]);
-*/
 
 			if ($currname != "" && !$totalArr[$row["curr_id"]])
 				$totalArr[$row["curr_id"]] = 0;
