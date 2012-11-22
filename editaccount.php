@@ -13,7 +13,7 @@ session_start();
 
 $userid = checkUser("./login.php");
 
-if (!is_numeric($_GET["id"]))
+if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
 	fail();
 
 $acc_id = intval($_GET["id"]);
