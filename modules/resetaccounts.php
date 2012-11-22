@@ -4,7 +4,7 @@ require_once("../setup.php");
 
 function fail()
 {
-	header("Location: ../resetaccounts.php?act=fail");
+	setLocation("../resetaccounts.php?act=fail");
 	exit();
 }
 
@@ -29,6 +29,6 @@ foreach($resArr as $row)
 if (!$db->deleteQ("accounts", "user_id=".$userid))
 	fail();
 
-header("Location: ../accounts.php?reset=ok");
+setLocation("../accounts.php?reset=ok");
 
 ?>

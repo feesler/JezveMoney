@@ -4,7 +4,7 @@ require_once("../setup.php");
 
 function fail()
 {
-	header("Location: ../accounts.php?edit=fail");
+	setLocation("../accounts.php?edit=fail");
 }
 
 
@@ -55,6 +55,6 @@ if ($acc_id != 0 && $curr_id != 0)
 }
 
 
-header("Location: ../accounts.php?edit=ok");
+setLocation("../accounts.php?edit=ok");
 
 ?>

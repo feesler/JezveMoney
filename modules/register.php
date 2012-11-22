@@ -5,7 +5,7 @@ require_once("../setup.php");
 
 function fail()
 {
-	header("Location: ../registration.php?act=fail");
+	setLocation("../registration.php?act=fail");
 	exit();
 }
 
@@ -22,6 +22,6 @@ if (!$db->insertQ("users", array(id, login, passhash), array(NULL, $login, $pass
 	fail();
 
 
-header("Location: ../index.php");
+setLocation("../index.php");
 
 ?>

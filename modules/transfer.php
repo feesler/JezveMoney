@@ -4,7 +4,7 @@ require_once("../setup.php");
 
 function fail()
 {
-	header("Location: ../index.php?trans=fail");
+	setLocation("../index.php?trans=fail");
 	exit();
 }
 
@@ -43,6 +43,6 @@ $result = $db->rawQ($query, $dbcnx);
 if (mysql_errno())
 	fail();
 
-header("Location: ../index.php?trans=ok");
+setLocation("../index.php?trans=ok");
 
 ?>

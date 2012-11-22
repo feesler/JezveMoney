@@ -5,7 +5,7 @@ require_once("../setup.php");
 
 function fail()
 {
-	header("Location: ../accounts.php?newacc=fail");
+	setLocation("../accounts.php?newacc=fail");
 	exit();
 }
 
@@ -25,6 +25,6 @@ if (!$name || $name == "" || $curr_id == 0)
 if (!$db->insertQ("accounts", array("id", "user_id", "curr_id", "balance", "initbalance", "name"), array(NULL, $userid, $curr_id, $balance, $balance, $name)))
 	fail();
 
-header("Location: ../accounts.php?newacc=ok");
+setLocation("../accounts.php?newacc=ok");
 
 ?>

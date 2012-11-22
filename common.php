@@ -1,5 +1,12 @@
 <?php
 
+// Set location header to redirect page
+function setLocation($loc)
+{
+	header("Location: ".$loc);
+}
+
+
 // Check is user logged in or redirect to specified URL
 function checkUser($url)
 {
@@ -9,7 +16,7 @@ function checkUser($url)
 	}
 	else
 	{
-		header("Location: $url");
+		setLocation($url);
 		exit();
 	}
 }

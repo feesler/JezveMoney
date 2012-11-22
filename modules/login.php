@@ -14,12 +14,11 @@ if ($login && $login != "" && $pass && $pass != "")
 	{
 		session_start();
 		$_SESSION["userid"] = intval($resArr[0]["id"]);
-		header("Location: ../index.php");
+		setLocation("../index.php");
 		exit();
 	}
 }
 
-header("Location: ../login.php?act=wrong");
-exit();
+setLocation("../login.php?act=wrong");
 
 ?>

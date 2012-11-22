@@ -19,11 +19,6 @@
 	}
 
 
-	function setLocation($loc)
-	{
-		header("Location: ".$loc);
-	}
-
 	$sitetheme = 1;
 
 	$db = new mysqlDB();
