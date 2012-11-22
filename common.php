@@ -166,4 +166,24 @@ function getAccountName($account_id)
 	return (count($resArr) == 1) ? $resArr[0]["name"] : "";
 }
 
+
+// Return HTML string of currencies for select control
+function getCurrencyList($selected_id = 0)
+{
+	global $db;
+
+	$resStr = "";
+
+	$resArr = $db->selectQ("*", "currency");
+	foreach($resArr as $row)
+	{
+		echo("\t\t\t<option value=\"".$row["id"]."\"");
+		if ($row["id"] == $selected_id)
+			echo(" selected");
+		echo(">".$row["name"]."</option>\r\n");
+	}
+
+	return $resStr;
+}
+
 ?>
