@@ -97,7 +97,7 @@ function getUserBlock($id)
 
 
 // Return table of accounts of user
-function getAccountsTable($user_id, $transfer = FALSE)
+function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 {
 	global $db;
 
@@ -118,7 +118,10 @@ function getAccountsTable($user_id, $transfer = FALSE)
 	}
 	else
 	{
-		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td></tr>\r\n");
+		echo("\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td>");
+		if ($editlink == TRUE)
+			echo("<td></td>");
+		echo("</tr>\r\n");
 
 		$totalArr = array();
 		foreach($resArr as $row)
@@ -136,7 +139,10 @@ function getAccountsTable($user_id, $transfer = FALSE)
 
 			$totalArr[$row["curr_id"]] += $row["balance"];
 
-			echo("\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
+			echo("\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td>".$balfmt."</td>");
+			if ($editlink == TRUE)
+				echo("<td><a href=\"./editaccount.php?id=".$row["id"]."\">edit</a></td>");
+			echo("</tr>\r\n");
 		}
 
 		echo("\t\t<tr><td colspan=\"3\" style=\"height: 10px;\"></td></tr>\r\n");
