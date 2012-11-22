@@ -29,8 +29,8 @@ $resArr = $db->selectQ("id", "accounts", "id=".$src_id." OR id=".$dest_id");
 if (count($resArr) != 2)
 	fail();
 
-if ($db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "date", "comment"),
-							array(NULL, $userid, $src_id, $dest_id, 3, $amount, $charge, $trdate, $comment)))
+if ($db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
+							array(NULL, $userid, $src_id, $dest_id, 3, $amount, $charge, $dest_id, $trdate, $comment)))
 	fail();
 
 $query = "UPDATE accounts SET balance = balance - ".$amount." WHERE id=".$src_id.";";

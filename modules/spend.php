@@ -25,8 +25,8 @@ $comment = $db->escape($_POST["comm"]);
 if (!$acc_id || $amount == 0.0 || $trdate == -1)
 	fail();
 
-if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "cur_id", "date", "comment"),
-							array(NULL, $userid, $acc_id, 0, 1, $amount, $charge, ".$transcurr.", ".$trdate.", $comment)))
+if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
+							array(NULL, $userid, $acc_id, 0, 1, $amount, $charge, $transcurr, $trdate, $comment)))
 	fail();
 
 $query = "UPDATE accounts SET balance = balance - ".$charge." WHERE id=".$acc_id.";";

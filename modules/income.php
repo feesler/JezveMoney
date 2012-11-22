@@ -25,8 +25,8 @@ if (!$acc_id != 0 || $amount == 0.0 || $trdate == -1)
 	fail();
 
 
-if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "cur_id", "date", "comment"),
-							array(NULL, $userid, 0, $acc_id, 2, $amount, $receipt, ".$transcurr.", ".$trdate.", $comment)))
+if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
+							array(NULL, $userid, 0, $acc_id, 2, $amount, $receipt, $transcurr, $trdate, $comment)))
 	fail();
 
 $query = "UPDATE accounts SET balance = balance + ".$receipt." WHERE id=".$acc_id.";";
