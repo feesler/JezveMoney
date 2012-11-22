@@ -4,7 +4,7 @@ require_once("./setup.php");
 
 function fail()
 {
-	header("Location: ./accounts.php");
+	setLocation("./accounts.php");
 	exit();
 }
 
