@@ -49,7 +49,7 @@ function onSubmit(frm)
 <table align="center" valign="center" style="width: 100%; height: 100%;">
 	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
 <?php
-	if (isset($_GET['act']) && $_GET['act'] == 'fail')
+	if (isset($_GET["act"]) && $_GET["act"] == "fail")
 		echo("<tr><td><span style=\"color: #FF0000;\">Registration error</span></td></tr>");
 ?>
 	<tr>

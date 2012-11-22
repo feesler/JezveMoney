@@ -3,7 +3,7 @@ require_once("./setup.php");
 
 session_start();
 
-$userid = checkUser('./login.php');
+$userid = checkUser("./login.php");
 ?>
 <!DOCTYPE html>
 <html>

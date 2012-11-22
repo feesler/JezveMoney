@@ -3,7 +3,7 @@ require_once("./setup.php");
 
 session_start();
 
-$userid = checkUser('./login.php');
+$userid = checkUser("./login.php");
 ?>
 <!DOCTYPE html>
 <html>
@@ -17,13 +17,13 @@ $userid = checkUser('./login.php');
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
-	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id='".$userid."' AND c.id=a.curr_id");
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
 	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
 	foreach($resArr as $i => $row)
 	{
-		echo("[".$row['curr_id'].", '".$row['sign']."', ".$row['balance']."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row['sign'];
+		echo("[".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		$cursign[$i] = $row["sign"];
 	}
 
 	$resArr = $db->selectQ("id, name, sign", "currency", NULL, NULL, "id");
@@ -31,8 +31,8 @@ $userid = checkUser('./login.php');
 	echo("var currency = [");
 	foreach($resArr as $i => $row)
 	{
-		echo("[".$row['id'].", '".$row['name']."', '".$row['sign']."']".(($i < $currcount - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row['sign'];
+		echo("[".$row["id"].", ".json_encode($row["name"]).", ".json_encode($row["sign"])."]".(($i < $currcount - 1) ? ", " : "];\r\n"));
+		$cursign[$i] = $row["sign"];
 	}
 ?>
 
@@ -213,13 +213,13 @@ function onChangeTransCurr()
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	foreach($resArr as $row)
 	{
-		echo("\t\t\t\t<option value=\"".$row['id']."\"");
+		echo("\t\t\t\t<option value=\"".$row["id"]."\"");
 		if ($curAccCurr == 0)
 			echo(" selected");
-		echo(">".$row['name']."</option>\r\n");
+		echo(">".$row["name"]."</option>\r\n");
 
 		if ($curAccCurr == 0)
-			$curAccCurr = $row['curr_id'];
+			$curAccCurr = $row["curr_id"];
 	}
 ?>
 			</select>
@@ -234,12 +234,12 @@ function onChangeTransCurr()
 	$resArr = $db->selectQ("*", "currency");
 	foreach($resArr as $row)
 	{
-		echo("\t\t\t<option value=\"".$row['id']."\"");
+		echo("\t\t\t<option value=\"".$row["id"]."\"");
 
-		if ($row['id'] == $curAccCurr)
+		if ($row["id"] == $curAccCurr)
 			echo(" selected");
 
-		echo(">".$row['name']."</option>\r\n");
+		echo(">".$row["name"]."</option>\r\n");
 	}
 ?>
 			</select>

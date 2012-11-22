@@ -49,7 +49,7 @@
 	<td>
 	<table>
 <?php
-	$query = "SELECT * FROM `accounts` WHERE `user_id`='".$userid."';";
+	$query = "SELECT * FROM `accounts` WHERE `user_id`=".$userid.";";
 	$result = $db->rawQ($query, $dbcnx);
 	if(!mysql_errno())
 		$accounts = mysql_num_rows($result);
@@ -92,36 +92,36 @@
 
 				if ($transType == "expense" || $transType == "transfer")
 				{
-					$arr = $db->selectQ('*', 'accounts', 'id='.$row['src_id']);
+					$arr = $db->selectQ("*", "accounts", "id=".$row["src_id"]);
 
 					if (count($arr) == 1)
-						echo("<td>".$arr[0]['name']."</td>");
+						echo("<td>".$arr[0]["name"]."</td>");
 					else
 						echo("<td></td>");
 				}
 
 				if ($transType == "income" || $transType == "transfer")
 				{
-					$arr = $db->selectQ('*', 'accounts', 'id='.$row['dest_id']);
+					$arr = $db->selectQ("*", "accounts", "id=".$row["dest_id"]);
 
 					if (count($arr) == 1)
-						echo("<td>".$arr[0]['name']."</td>");
+						echo("<td>".$arr[0]["name"]."</td>");
 					else
 						echo("<td></td>");
 				}
 
-				echo("<td>".$row['amount']);
+				echo("<td>".$row["amount"]);
 				if ($row["charge"] != $row["amount"])
 				{
-					$arr = $db->selectQ('*', '`accounts` AS a, `currency` AS c', 'a.id='.$row["dest_id"].' AND c.id=a.curr_id');
+					$arr = $db->selectQ("*", "`accounts` AS a, `currency` AS c", "a.id=".$row["dest_id"]." AND c.id=a.curr_id");
 
-					$chargefmt = currFormat(((count($arr) == 1) ? $arr["format"] : ''), $row["charge"]);
+					$chargefmt = currFormat(((count($arr) == 1) ? $arr["format"] : ""), $row["charge"]);
 
 					echo(" (".$chargefmt.")");
 				}
 				echo("</td>");
 
-				echo("<td>".$row['comment']."</td></tr>");
+				echo("<td>".$row["comment"]."</td></tr>");
 			}
 		}
 	}

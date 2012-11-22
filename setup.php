@@ -29,7 +29,7 @@
 		exit();
 
 	$db->rawQ("SET NAMES 'utf8';");
-	date_default_timezone_set('Europe/Moscow');
+	date_default_timezone_set("Europe/Moscow");
 
 	require_once($docroot.$rootdir."common.php");
 ?>

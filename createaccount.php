@@ -3,7 +3,7 @@ require_once("./setup.php");
 
 session_start();
 
-$userid = checkUser('./login.php');
+$userid = checkUser("./login.php");
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,20 +19,20 @@ function onSubmit(frm)
 {
 	var accname, accbalance;
 
-	accname = ge('accname');
-	accbalance = ge('accbalance');
+	accname = ge("accname");
+	accbalance = ge("accbalance");
 	if (!frm || !accname || !accbalance)
 		return false;
 
 	if (!accname.value || !accname.value.length)
 	{
-		alert('Please input account name.');
+		alert("Please input account name.");
 		return false;
 	}
 
 	if (!accbalance.value || !accbalance.value.length || !isNum(fixFloat(accbalance.value)))
 	{
-		alert('Please input correct balance.');
+		alert("Please input correct balance.");
 		return false;
 	}
 
@@ -72,7 +72,7 @@ function onSubmit(frm)
 	$resArr = $db->selectQ("*", "currency");
 	foreach($resArr as $row)
 	{
-		echo("\t\t\t<option value=\"".$row['id']."\">".$row['name']."</option>\r\n");
+		echo("\t\t\t<option value=\"".$row["id"]."\">".$row["name"]."</option>\r\n");
 	}
 ?>
 			</select></td>

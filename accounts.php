@@ -3,7 +3,7 @@
 
 	session_start();
 
-	$userid = checkUser('./login.php');
+	$userid = checkUser("./login.php");
 ?>
 <!DOCTYPE html>
 <html>
@@ -29,27 +29,27 @@
 	</tr>
 
 <?php
-	if (isset($_GET['newacc']))
+	if (isset($_GET["newacc"]))
 	{
 		echo("<tr><td style=\"padding-left: 50px;\">");
 
-		if ($_GET['newacc'] == "ok")
+		if ($_GET["newacc"] == "ok")
 			echo("<span style=\"color: #20FF20;\">Account added.</span>");
-		else if ($_GET['newacc'] == fail)
+		else if ($_GET["newacc"] == fail)
 			echo("<span style=\"color: #FF2020;\">Fail to add account.</span>");
 		echo("</td></tr>");
 	}
-	else if (isset($_GET['edit']))
+	else if (isset($_GET["edit"]))
 	{
 		echo("<tr><td style=\"padding-left: 50px;\">");
 
-		if ($_GET['edit'] == "ok")
+		if ($_GET["edit"] == "ok")
 			echo("<span style=\"color: #20FF20;\">Account data saved.</span>");
-		else if ($_GET['edit'] == fail)
+		else if ($_GET["edit"] == fail)
 			echo("<span style=\"color: #FF2020;\">Fail to edit account.</span>");
 		echo("</td></tr>");
 	}
-	else if (isset($_GET['reset']) && $_GET['reset'] == "ok")
+	else if (isset($_GET["reset"]) && $_GET["reset"] == "ok")
 	{
 		echo("<tr><td style=\"padding-left: 50px;\">");
 		echo("<span style=\"color: #20FF20;\">Accounts is successfully reseted.</span>");

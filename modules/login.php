@@ -2,14 +2,14 @@
 require_once("../setup.php");
 
 
-$login = $_POST['logacc'];
-$pass = $_POST['logpwd'];
+$login = $_POST["logacc"];
+$pass = $_POST["logpwd"];
 if ($login && $login != "" && $pass && $pass != "")
 {
 	$qlogin = $db->escape($login);
 	$passhash = md5($pass);
 
-	$resArr = $db->selectQ("*", "users", "login='".$qlogin."' AND passhash='".$passhash."'");
+	$resArr = $db->selectQ("*", "users", "login=".qnull($qlogin)." AND passhash=".qnull($passhash));
 	if (count($resArr) == 1)
 	{
 		session_start();

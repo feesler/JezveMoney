@@ -13,12 +13,12 @@ session_start();
 
 $userid = checkUser("./login.php");
 
-if (!is_numeric($_GET['id']))
+if (!is_numeric($_GET["id"]))
 	fail();
 
-$acc_id = intval($_GET['id']);
+$acc_id = intval($_GET["id"]);
 
-$resArr = $db->selectQ('*', 'accounts', 'id='.$acc_id);
+$resArr = $db->selectQ("*", "accounts", "id=".$acc_id);
 if (count($resArr) != 1)
 	fail();
 
@@ -81,7 +81,7 @@ function onSubmit(frm)
 	<table>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Account name</span></td>
-			<td><input class="inp" id="accname" name="accname" type="text" value="<?php echo($arr['name']); ?>"></td>
+			<td><input class="inp" id="accname" name="accname" type="text" value="<?php echo($arr["name"]); ?>"></td>
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
@@ -90,14 +90,14 @@ function onSubmit(frm)
 	$resArr = $db->selectQ("*", "currency");
 	foreach($resArr as $row)
 	{
-		echo("\t\t\t<option value=\"".$row['id']."\"".(($arr['curr_id'] == $row['id']) ? " selected" : "").">".$row['name']."</option>\r\n");
+		echo("\t\t\t<option value=\"".$row["id"]."\"".(($arr["curr_id"] == $row["id"]) ? " selected" : "").">".$row["name"]."</option>\r\n");
 	}
 ?>
 			</select></td>
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Initial balance</span></td>
-			<td><input class="inp" id="initbal" name="initbal" type="text" value="<?php echo($arr['initbalance']); ?>" onkeypress="return onFieldKey(event, this);"></td>
+			<td><input class="inp" id="initbal" name="initbal" type="text" value="<?php echo($arr["initbalance"]); ?>" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center"><input class="btn" type="submit" value="Ok"></td>

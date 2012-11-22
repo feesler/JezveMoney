@@ -33,9 +33,9 @@ function getStyle($theme)
 function currFormat($format, $value)
 {
 	if ($format && $format != "")
-		return sprintf($format, number_format($value, 2, ',', ' '));
+		return sprintf($format, number_format($value, 2, ",", " "));
 	else
-		return number_format($value, 2, ',', ' ');
+		return number_format($value, 2, ",", " ");
 }
 
 
@@ -44,9 +44,9 @@ function getUserName($id)
 {
 	global $db;
 
-	$arr = $db->selectQ('login', 'users', '`id`='.$id);
+	$arr = $db->selectQ("login", "users", "id=".$id);
 
-	return ((count($arr) == 1) ? $arr[0]['login'] : '');
+	return ((count($arr) == 1) ? $arr[0]["login"] : "");
 }
 
 
@@ -90,27 +90,27 @@ function getAccountsTable($user_id, $transfer = FALSE)
 
 		foreach($resArr as $row)
 		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$row['curr_id']);
-			$currname = (count($arr) == 1 ? $arr[0]['name'] : '');
-			$balfmt = currFormat((count($arr) == 1 ? $arr[0]['format'] : ''), $row['balance']);
+			$arr = $db->selectQ("*", "currency", "id=".$row["curr_id"]);
+			$currname = (count($arr) == 1 ? $arr[0]["name"] : "");
+			$balfmt = currFormat((count($arr) == 1 ? $arr[0]["format"] : ""), $row["balance"]);
 
-			if ($currname != '' && !$totalArr[$row['curr_id']])
-				$totalArr[$row['curr_id']] = 0;
+			if ($currname != "" && !$totalArr[$row["curr_id"]])
+				$totalArr[$row["curr_id"]] = 0;
 
-			$totalArr[$row['curr_id']] += $row['balance'];
+			$totalArr[$row["curr_id"]] += $row["balance"];
 
-			echo("\t\t<tr><td>".$row['name']."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
+			echo("\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td>".$balfmt."</td></tr>\r\n");
 		}
 
 		echo("\t\t<tr><td colspan=\"3\" style=\"height: 10px;\"></td></tr>\r\n");
 
 		foreach($totalArr as $key => $value)
 		{
-			$arr = $db->selectQ('*', 'currency', 'id='.$key);
+			$arr = $db->selectQ("*", "currency", "id=".$key);
 			if (count($arr) == 1)
 			{
-				$valfmt = currFormat($arr[0]['format'], $value);
-				echo("<tr><td>Total</td><td>".$arr[0]['name']."</td><td>".$valfmt."</td></tr>");
+				$valfmt = currFormat($arr[0]["format"], $value);
+				echo("<tr><td>Total</td><td>".$arr[0]["name"]."</td><td>".$valfmt."</td></tr>");
 			}
 		}
 	}

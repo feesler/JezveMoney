@@ -10,19 +10,19 @@ function fail()
 
 session_start();
 
-$userid = checkUser('../login.php');
+$userid = checkUser("../login.php");
 
 
-if (!is_numeric($_POST['accid']))
+if (!is_numeric($_POST["accid"]))
 	fail();
-$acc_id = intval($_POST['accid']);
+$acc_id = intval($_POST["accid"]);
 
-if (!is_numeric($_POST['acccurr']))
+if (!is_numeric($_POST["acccurr"]))
 	fail();
-$curr_id = intval($_POST['acccurr']);
+$curr_id = intval($_POST["acccurr"]);
 
-$initbal = floatval($_POST['initbal']);
-$accname = mysql_real_escape_string($_POST['accname']);
+$initbal = floatval($_POST["initbal"]);
+$accname = mysql_real_escape_string($_POST["accname"]);
 
 
 if ($acc_id != 0 && $curr_id != 0)
@@ -40,9 +40,9 @@ if ($acc_id != 0 && $curr_id != 0)
 		fail();
 	$arr = $resArr[0];
 
-	$diff = $initbal - $arr['initbalance'];
+	$diff = $initbal - $arr["initbalance"];
 
-	$query = "UPDATE accounts SET name = '".$accname."', curr_id = ".$curr_id;
+	$query = "UPDATE accounts SET name = ".qnull($accname).", curr_id = ".$curr_id;
 
 	if (abs($diff) > 0.01)
 		$query .= ", balance = balance + ".$diff.", initbalance = ".$initbal;

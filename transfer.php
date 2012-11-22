@@ -3,7 +3,7 @@
 
 	session_start();
 
-	$userid = checkUser('./login.php');
+	$userid = checkUser("./login.php");
 ?>
 <!DOCTYPE html>
 <html>
@@ -17,13 +17,13 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
-	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id='".$userid."' AND c.id=a.curr_id");
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
 	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
 	foreach($resArr as $i => $row)
 	{
-		echo("[".$row['curr_id'].", '".$row['sign']."']".(($i < $accounts - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row['sign'];
+		echo("[".$row["curr_id"].", ".json_encode($row["sign"])."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		$cursign[$i] = $row["sign"];
 	}
 ?>
 
@@ -63,7 +63,7 @@
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	foreach($resArr as $i => $row)
 	{
-		echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i == 0) ? " selected" : "").">".$row['name']."</option>\r\n");
+		echo("\t\t\t\t<option value=\"".$row["id"]."\"".(($i == 0) ? " selected" : "").">".$row["name"]."</option>\r\n");
 	}
 ?>
 			</select>
@@ -78,7 +78,7 @@
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
 	foreach($resArr as $i => $row)
 	{
-		echo("\t\t\t\t<option value=\"".$row['id']."\"".(($i == 1) ? " selected" : "").">".$row['name']."</option>\r\n");
+		echo("\t\t\t\t<option value=\"".$row["id"]."\"".(($i == 1) ? " selected" : "").">".$row["name"]."</option>\r\n");
 	}
 ?>
 			</select>

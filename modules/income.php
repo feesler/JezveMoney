@@ -12,14 +12,14 @@ function fail()
 
 session_start();
 
-$userid = checkUser('../login.php');
+$userid = checkUser("../login.php");
 
-$acc_id = intval($_POST['accid']);
-$amount = floatval($_POST['amount']);
-$receipt = floatval($_POST['receipt']);
-$transcurr = intval($_POST['transcurr']);
-$trdate = strtotime($_POST['date']);
-$comment = $db->escape($_POST['comm']);
+$acc_id = intval($_POST["accid"]);
+$amount = floatval($_POST["amount"]);
+$receipt = floatval($_POST["receipt"]);
+$transcurr = intval($_POST["transcurr"]);
+$trdate = strtotime($_POST["date"]);
+$comment = $db->escape($_POST["comm"]);
 
 if (!$acc_id != 0 || $amount == 0.0 || $trdate == -1)
 	fail();

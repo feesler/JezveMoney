@@ -11,7 +11,7 @@ function fail()
 
 session_start();
 
-$userid = checkUser('../login.php');
+$userid = checkUser("../login.php");
 if (!is_numeric($userid))
 	fail();
 
