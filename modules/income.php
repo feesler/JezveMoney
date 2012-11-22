@@ -19,6 +19,7 @@ $amount = floatval($_POST["amount"]);
 $receipt = floatval($_POST["receipt"]);
 $transcurr = intval($_POST["transcurr"]);
 $trdate = strtotime($_POST["date"]);
+$fdate = date("Y-m-d H:i:s", $trdate);
 $comment = $db->escape($_POST["comm"]);
 
 if (!$acc_id != 0 || $amount == 0.0 || $trdate == -1)
@@ -26,7 +27,7 @@ if (!$acc_id != 0 || $amount == 0.0 || $trdate == -1)
 
 
 if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
-							array(NULL, $userid, 0, $acc_id, 2, $amount, $receipt, $transcurr, $trdate, $comment)))
+							array(NULL, $userid, 0, $acc_id, 2, $amount, $receipt, $transcurr, $fdate, $comment)))
 	fail();
 
 $query = "UPDATE accounts SET balance = balance + ".$receipt." WHERE id=".$acc_id.";";

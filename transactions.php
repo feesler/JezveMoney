@@ -66,7 +66,7 @@
 		else if ($transType == "transfer")
 			$trtype_id = 3;
 
-		$resArr = $db->selectQ("*", "transactions AS t", "t.user_id=".$userid." AND t.type=".$trtype_id, NULL, "date");
+		$resArr = $db->selectQ("*", "transactions", "user_id=".$userid." AND type=".$trtype_id, NULL, "date ASC");
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
@@ -83,7 +83,7 @@
 			else if ($transType == "transfer")
 				echo("<td>Source</td><td>Destination</td>");
 
-			echo("<td>Amount</td><td>Comment</td></tr>");
+			echo("<td>Amount</td><td>Date</td><td>Comment</td></tr>");
 
 			foreach($resArr as $row)
 			{
@@ -108,6 +108,9 @@
 				}
 				echo("</td>");
 
+				$fdate = date("d.m.Y", strtotime($row["date"]));
+
+				echo("<td>".$fdate."</td>");
 				echo("<td>".$row["comment"]."</td></tr>");
 			}
 		}

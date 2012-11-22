@@ -19,6 +19,7 @@ $dest_id = intval($_POST["destid"]);
 $amount = floatval($_POST["amount"]);
 $charge = floatval($_POST["charge"]);
 $trdate = strtotime($_POST["date"]);
+$fdate = date("Y-m-d H:i:s", $trdate);
 $comment = $db->escape($_POST["comm"]);
 
 if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
