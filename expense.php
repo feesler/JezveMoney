@@ -14,6 +14,7 @@ $userid = checkUser('./login.php');
 	getStyle($sitetheme);
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
+<script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
 	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id='".$userid."' AND c.id=a.curr_id");
@@ -34,63 +35,6 @@ $userid = checkUser('./login.php');
 		$cursign[$i] = $row['sign'];
 	}
 ?>
-
-function onSubmit(frm)
-{
-	var accid, amount, trdate;
-
-	accid = ge('accid');
-	amount = ge('amount');
-	trdate = ge('date');
-	if (!frm || !accid || !amount || !trdate)
-		return false;
-
-	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
-	{
-		alert('Please input correct amount.');
-		return false;
-	}
-
-	amount.value = fixFloat(amount.value);
-
-	if (!checkDate(trdate.value))
-	{
-		alert('Please input correct date.');
-		return false;
-	}
-
-	frm.submit();
-
-	return true;
-}
-
-
-function onChangeAcc()
-{
-	var accid, amountsign;
-
-	accid = ge('accid');
-	amountsign = ge('amountsign');
-	if (!accid || !amountsign)
-		return false;
-
-	amountsign.innerHTML = acccur[accid.selectedIndex][1];
-}
-
-
-function showCurrList()
-{
-	var transcurr, ancurrbtn;
-
-	transcurr = ge('transcurr');
-	ancurrbtn = ge('ancurrbtn');
-	if (!transcurr || !ancurrbtn)
-		return;
-
-	transcurr.style.display = '';
-	ancurrbtn.style.display = 'none';
-}
-
 
 
 var S1;		// balance before transaction

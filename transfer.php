@@ -14,6 +14,7 @@
 	getStyle($sitetheme);
 ?>
 <script type="text/javascript" src="./js/common.js"></script>
+<script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
 	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id='".$userid."' AND c.id=a.curr_id");
@@ -26,173 +27,6 @@
 	}
 ?>
 
-function isDiffCurr()
-{
-	var src, dest;
-
-	src = ge('srcid');
-	dest = ge('destid');
-
-	if (!src || !dest)
-		return false;
-
-	return (acccur[src.selectedIndex][0] != acccur[dest.selectedIndex][0]);
-}
-
-
-function onSubmit(frm)
-{
-	var amount, charge, exchrate, trdate;
-
-	amount = ge('amount');
-	charge = ge('charge');
-	exchrate = ge('exchrate');
-	trdate = ge('date');
-	if (!frm || !amount || !charge || !exchrate || !trdate)
-		return false;
-
-	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
-	{
-		alert('Please input correct amount.');
-		return false;
-	}
-
-	if (isDiffCurr() && (!charge.value || !charge.value.length || !isNum(fixFloat(charge.value))))
-	{
-		alert('Please input correct charge off.');
-		return false;
-	}
-
-	if (!checkDate(trdate.value))
-	{
-		alert('Please input correct date.');
-		return false;
-	}
-
-	amount.value = fixFloat(amount.value);
-	charge.value = fixFloat(charge.value);
-	exchrate.value = fixFloat(exchrate.value);
-	frm.submit();
-
-	return true;
-}
-
-
-function updControls()
-{
-	var src, dest, amount, charge, exchrate, chargeoff, exchange, amountsign, chargesign, dstyle;
-
-	src = ge('srcid');
-	dest = ge('destid');
-	amount = ge('amount');
-	charge = ge('charge');
-	exchrate = ge('exchrate');
-	chargeoff = ge('chargeoff');
-	exchange = ge('exchange');
-	chargesign = ge('chargesign');
-	amountsign = ge('amountsign');
-
-	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !amountsign || !chargesign)
-		return;
-
-	exchange.value = '';
-	if (isDiffCurr())
-	{
-		dstyle = '';
-		charge.value = '';
-	}
-	else
-	{
-		dstyle = 'none';
-		charge.value = amount.value;
-	}
-
-	chargeoff.style.display = dstyle;
-	exchange.style.display = dstyle;
-
-	amountsign.innerHTML = acccur[src.selectedIndex][1];
-	chargesign.innerHTML = acccur[dest.selectedIndex][1];
-}
-
-
-function onChangeSource()
-{
-	var src, dest;
-
-	src = ge('srcid');
-	dest = ge('destid');
-
-	if (!src || !dest)
-		return;
-
-	if (src.selectedIndex == dest.selectedIndex)
-	{
-		if (dest.selectedIndex == 0)
-			dest.selectedIndex = accounts - 1;
-		else
-			dest.selectedIndex--;
-	}
-
-	updControls();
-}
-
-
-function onChangeDest()
-{
-	var src, dest;
-
-	src = ge('srcid');
-	dest = ge('destid');
-	if (!src || !dest)
-		return;
-
-	if (src.selectedIndex == dest.selectedIndex)
-	{
-		if (src.selectedIndex == accounts - 1)
-			src.selectedIndex = 0;
-		else
-			src.selectedIndex++;
-	}
-
-	updControls();
-}
-
-
-function onInput(obj)
-{
-	var amount, charge, exchrate;
-
-	amount = ge('amount');
-	charge = ge('charge');
-	exchrate = ge('exchrate');
-
-	if (!obj || !amount || !charge || !exchrate)
-		return false;
-
-	if (obj == amount)
-	{
-		if (!isDiffCurr())
-		{
-			charge.value = amount.value;
-		}
-	}
-	else if (obj == charge)
-	{
-		if (amount.value && isNum(fixFloat(amount.value)) && charge.value && isNum(fixFloat(charge.value)))
-		{
-			exchrate.value = fixFloat(charge.value) / fixFloat(amount.value);
-		}
-	}
-	else if (obj == exchrate)
-	{
-		if (amount.value && isNum(fixFloat(amount.value)) && exchrate.value && isNum(fixFloat(exchrate.value)))
-		{
-			charge.value = fixFloat(exchrate.value) * fixFloat(amount.value);
-		}
-	}
-
-	return true;
-}
 </script>
 </head>
 <body>
@@ -219,7 +53,7 @@ function onInput(obj)
 
 	<tr>
 	<td>
-	<form id="tranfrm" name="tranfrm" method="post" action="./modules/transfer.php" onsubmit="return onSubmit(this);">
+	<form id="tranfrm" name="tranfrm" method="post" action="./modules/transfer.php" onsubmit="return onTransferSubmit(this);">
 	<table>
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Source account</span></td>
