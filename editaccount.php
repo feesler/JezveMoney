@@ -88,14 +88,6 @@ function onSubmit(frm)
 			<td><select class="inp" id="acccurr" name="acccurr">
 <?php
 	echo(getCurrencyList($arr["curr_id"]));
-
-/*
-	$resArr = $db->selectQ("*", "currency");
-	foreach($resArr as $row)
-	{
-		echo("\t\t\t<option value=\"".$row["id"]."\"".(($arr["curr_id"] == $row["id"]) ? " selected" : "").">".$row["name"]."</option>\r\n");
-	}
-*/
 ?>
 			</select></td>
 		</tr>

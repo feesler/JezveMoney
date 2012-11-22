@@ -232,16 +232,7 @@ function onChangeTransCurr()
 		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($cursign[0]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
-	$resArr = $db->selectQ("*", "currency");
-	foreach($resArr as $row)
-	{
-		echo("\t\t\t<option value=\"".$row["id"]."\"");
-
-		if ($row["id"] == $curAccCurr)
-			echo(" selected");
-
-		echo(">".$row["name"]."</option>\r\n");
-	}
+	echo(getCurrencyList($curAccCurr));
 ?>
 			</select>
 		</td>

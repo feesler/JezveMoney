@@ -69,11 +69,7 @@ function onSubmit(frm)
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
 			<td><select class="inp" id="acccurr" name="acccurr">
 <?php
-	$resArr = $db->selectQ("*", "currency");
-	foreach($resArr as $row)
-	{
-		echo("\t\t\t<option value=\"".$row["id"]."\">".$row["name"]."</option>\r\n");
-	}
+	echo(getCurrencyList());
 ?>
 			</select></td>
 		</tr>
