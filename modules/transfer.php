@@ -26,7 +26,7 @@ if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 	fail();
 
 
-$resArr = $db->selectQ("id", "accounts", "id=".$src_id." OR id=".$dest_id");
+$resArr = $db->selectQ("id", "accounts", "id=".$src_id." OR id=".$dest_id);
 if (count($resArr) != 2)
 	fail();
 
