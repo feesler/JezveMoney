@@ -134,7 +134,7 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 
 			$totalArr[$row["curr_id"]] += $row["balance"];
 
-			$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td>".$balfmt."</td>";
+			$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
 			if ($editlink == TRUE)
 				$resStr .= "<td><a href=\"./editaccount.php?id=".$row["id"]."\">edit</a></td>";
 			$resStr .= "</tr>\r\n";
@@ -146,7 +146,7 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 		{
 			$valfmt = currFormat($value, $key);
 			$currname = getCurrencyName($key);
-			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td>".$valfmt."</td></tr>";
+			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td style=\"text-align: right;\">".$valfmt."</td></tr>";
 		}
 	}
 

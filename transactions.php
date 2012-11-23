@@ -94,7 +94,7 @@
 				if ($transType == "income" || $transType == "transfer")
 					echo("<td>".getAccountName($row["dest_id"])."</td>");
 
-				echo("<td>".currFormat($row["amount"], $row["curr_id"]));
+				echo("<td style=\"text-align: right;\">".currFormat($row["amount"], $row["curr_id"]));
 				if ($row["charge"] != $row["amount"])
 				{
 					echo(" (");
