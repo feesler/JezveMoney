@@ -77,13 +77,13 @@
 			echo("<tr>");
 
 			if ($transType == "expense")
-				echo("<td>Source</td>");
+				echo("<td><b>Source</b></b></td>");
 			else if ($transType == "income")
-				echo("<td>Destination</td>");
+				echo("<td><b>Destination</b></td>");
 			else if ($transType == "transfer")
-				echo("<td>Source</td><td>Destination</td>");
+				echo("<td><b>Source</b></td><td><b>Destination</b></td>");
 
-			echo("<td>Amount</td><td>Date</td><td>Comment</td></tr>");
+			echo("<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td></tr>");
 
 			foreach($resArr as $row)
 			{

@@ -118,7 +118,7 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 	}
 	else
 	{
-		$resStr .= "\t\t<tr><td>Name</td><td>Currency</td><td>Balance</td>";
+		$resStr .= "\t\t<tr><td><b>Name</b></td><td><b>Currency</b></td><td><b>Balance</b></td>";
 		if ($editlink == TRUE)
 			$resStr .= "<td></td>";
 		$resStr .= "</tr>\r\n";
