@@ -83,7 +83,7 @@
 			else if ($transType == "transfer")
 				echo("<td><b>Source</b></td><td><b>Destination</b></td>");
 
-			echo("<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td></tr>");
+			echo("<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>");
 
 			foreach($resArr as $row)
 			{
@@ -111,7 +111,9 @@
 				$fdate = date("d.m.Y", strtotime($row["date"]));
 
 				echo("<td>".$fdate."</td>");
-				echo("<td>".$row["comment"]."</td></tr>");
+				echo("<td>".$row["comment"]."</td>");
+				echo("<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a></td>");
+				echo("</tr>");
 			}
 		}
 	}

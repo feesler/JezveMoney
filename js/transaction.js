@@ -90,6 +90,38 @@ function onSubmit(frm)
 }
 
 
+// Edit transaction submit event handler
+function onEditTransSubmit(frm)
+{
+	var srcid, destid, amount, trdate;
+
+	srcid = ge('srcid');
+	destid = ge('destid');
+	amount = ge('amount');
+	trdate = ge('date');
+	if (!frm || (!srcid && !destid) || !amount || !trdate)
+		return false;
+
+	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
+	{
+		alert('Please input correct amount.');
+		return false;
+	}
+
+	amount.value = fixFloat(amount.value);
+
+	if (!checkDate(trdate.value))
+	{
+		alert('Please input correct date.');
+		return false;
+	}
+
+	frm.submit();
+
+	return true;
+}
+
+
 // Change account event handler
 function onChangeAcc()
 {
