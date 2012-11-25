@@ -79,13 +79,6 @@
 			<select class="inp" id="srcid" name="srcid" onchange="onChangeSource();">
 <?php
 	echo(getAccountsList($userid, $src_id));
-/*
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	foreach($resArr as $i => $row)
-	{
-		echo("\t\t\t\t<option value=\"".$row["id"]."\"".(($i == 0) ? " selected" : "").">".$row["name"]."</option>\r\n");
-	}
-*/
 ?>
 			</select>
 		</td>
@@ -97,13 +90,6 @@
 			<select class="inp" id="destid" name="destid" onchange="onChangeDest();">
 <?php
 	echo(getAccountsList($userid, $dest_id));
-/*
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	foreach($resArr as $i => $row)
-	{
-		echo("\t\t\t\t<option value=\"".$row["id"]."\"".(($i == 1) ? " selected" : "").">".$row["name"]."</option>\r\n");
-	}
-*/
 ?>
 			</select>
 		</td>
