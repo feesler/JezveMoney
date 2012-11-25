@@ -329,12 +329,16 @@ function onChangeTransCurr()
 ?>
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($accCurSign[$transAccCur]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
-			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($accCurSign[$transAccCur]); ?></span>
 <?php
-	echo(getCurrencyList($trans_curr));
+	if ($trans_type == 1 || $trans_type == 2)
+	{
+		echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
+		echo("\t\t\t<select class=\"inp\" id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
+		echo(getCurrencyList($trans_curr));
+		echo("</select>");
+	}
 ?>
-			</select>
 		</td>
 		</tr>
 
