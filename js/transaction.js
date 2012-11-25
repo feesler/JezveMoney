@@ -210,7 +210,7 @@ function updControls()
 	exchange.style.display = dstyle;
 
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
-	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+	chargeCurr = getCurrencyOfAccount(selectedValue(src));
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
