@@ -186,4 +186,24 @@ function getCurrencyList($selected_id = 0)
 	return $resStr;
 }
 
+
+// Return HTML string of accounts for select control
+function getAccountsList($user_id, $selected_id = 0)
+{
+	global $db;
+
+	$resStr = "";
+
+	$resArr = $db->selectQ("*", "accounts", "user_id=".$user_id);
+	foreach($resArr as $row)
+	{
+		$resStr .= "\t\t\t\t<option value=\"".$row["id"]."\"";
+		if (intval($row["id"]) == $selected_id)
+			$resStr .= " selected";
+		$resStr .= ">".$row["name"]."</option>\r\n";
+	}
+
+	return $resStr;
+}
+
 ?>
