@@ -117,12 +117,13 @@ else if ($trans_type == 3)	// transfer
 	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 	if (count($resArr) != 1)
 		fail();
+	$dest_curr_id = intval($resArr[0]["curr_id"]);
 
 	$oldDestBalance = floatval($resArr[0]["balance"]);
 
 	// update transaction
-	if (!$db->updateQ("transactions", array("amount", "charge", "date", "comment"),
-								array($amount, $charge, $fdate, $comment), "id=".$trans_id))
+	if (!$db->updateQ("transactions", array("amount", "charge", "curr_id", "date", "comment"),
+								array($amount, $charge, $dest_curr_id, $fdate, $comment), "id=".$trans_id))
 		fail();
 
 	// update balance of source account
