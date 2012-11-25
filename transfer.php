@@ -17,13 +17,30 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
-	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
+	$resArr = $db->selectQ("a.id AS id, c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
-	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
+
+	$src_id = 0;
+	$dest_id = 0;
+	echo("var accounts = [");
 	foreach($resArr as $i => $row)
 	{
-		echo("[".$row["curr_id"].", ".json_encode($row["sign"])."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row["sign"];
+		echo("[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"])."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		$accCurr[intval($row["id"])] = intval($row["curr_id"]);
+		$accCurSign[intval($row["id"])] = $row["sign"];
+
+		if ($i == 0)		// First account
+			$src_id = intval($row["id"]);
+		else if ($i == 1)	//Second account
+			$dest_id = intval($row["id"]);
+	}
+
+	$resArr = $db->selectQ("id, name, sign", "currency", NULL, NULL, "id");
+	$currcount = count($resArr);
+	echo("var currency = [");
+	foreach($resArr as $i => $row)
+	{
+		echo("[".$row["id"].", ".json_encode($row["name"]).", ".json_encode($row["sign"])."]".(($i < $currcount - 1) ? ", " : "];\r\n"));
 	}
 ?>
 
@@ -88,15 +105,25 @@
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Transfer amount</span></td>
-		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo($cursign[0]); ?></span></td>
+		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo($accCurSign[$src_id]); ?></span></td>
 		</tr>
 
-		<tr id="chargeoff" style="display: none;">
+<?php
+		echo("<tr id=\"chargeoff\"");
+		if ($accCurr[$src_id] == $accCurr[$dest_id])
+			echo(" style=\"display: none;\"");
+		echo(">\r\n");
+?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($cursign[1]); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($accCurSign[$dest_id]); ?></span></td>
 		</tr>
 
-		<tr id="exchange" style="display: none;">
+<?php
+		echo("<tr id=\"exchange\"");
+		if ($accCurr[$src_id] == $accCurr[$dest_id])
+			echo(" style=\"display: none;\"");
+		echo(">\r\n");
+?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
 		<td><input class="inp" id="exchrate" name="exchrate" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>

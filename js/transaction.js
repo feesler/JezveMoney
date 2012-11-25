@@ -1,3 +1,64 @@
+// Return value of selected option of select object
+function selectedValue(selectObj)
+{
+	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+		return -1;
+
+	return selectObj.options[selectObj.selectedIndex].value
+}
+
+
+// Retunr sign of specified currency
+function getCurrencySign(curr_id)
+{
+	var currSign = '';
+
+	currency.some(function(curr)
+	{
+		if (curr[0] == curr_id)
+			currSign = curr[2];
+
+		return (curr[0] == curr_id);
+	});
+
+	return currSign;
+}
+
+
+// Retunr currency id of specified account
+function getCurrencyOfAccount(account_id)
+{
+	var curr_id = '';
+
+	accounts.some(function(acc)
+	{
+		if (acc[0] == account_id)
+			curr_id = acc[1];
+
+		return (acc[0] == account_id);
+	});
+
+	return curr_id;
+}
+
+
+// Retunr balance of specified account
+function getBalanceOfAccount(account_id)
+{
+	var balance = 0;
+
+	accounts.some(function(acc)
+	{
+		if (acc[0] == account_id)
+			balance = acc[2];
+
+		return (acc[0] == account_id);
+	});
+
+	return balance;
+}
+
+
 // Spend/Income transaction event handler
 function onSubmit(frm)
 {
@@ -33,13 +94,16 @@ function onSubmit(frm)
 function onChangeAcc()
 {
 	var accid, amountsign;
+	var amountCurr;
 
 	accid = ge('accid');
 	amountsign = ge('amountsign');
 	if (!accid || !amountsign)
 		return false;
 
-	amountsign.innerHTML = acccur[accid.selectedIndex][1];
+	amountCurr = selectedValue(srcid);
+
+	amountsign.innerHTML = getCurrencySign(amountCurr);
 }
 
 
@@ -69,7 +133,7 @@ function isDiffCurr()
 	if (!src || !dest)
 		return false;
 
-	return (acccur[src.selectedIndex][0] != acccur[dest.selectedIndex][0]);
+	return (getCurrencyOfAccount(selectedValue(src)) != getCurrencyOfAccount(selectedValue(dest)));
 }
 
 
@@ -145,8 +209,11 @@ function updControls()
 	chargeoff.style.display = dstyle;
 	exchange.style.display = dstyle;
 
-	amountsign.innerHTML = acccur[src.selectedIndex][1];
-	chargesign.innerHTML = acccur[dest.selectedIndex][1];
+	amountCurr = getCurrencyOfAccount(selectedValue(dest));
+	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+
+	chargesign.innerHTML = getCurrencySign(chargeCurr);
+	amountsign.innerHTML = getCurrencySign(amountCurr);
 }
 
 
