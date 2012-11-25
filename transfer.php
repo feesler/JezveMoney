@@ -101,7 +101,7 @@
 		</tr>
 
 <?php
-		echo("<tr id=\"chargeoff\"");
+		echo("\t\t<tr id=\"chargeoff\"");
 		if ($accCurr[$src_id] == $accCurr[$dest_id])
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
@@ -111,7 +111,7 @@
 		</tr>
 
 <?php
-		echo("<tr id=\"exchange\"");
+		echo("\t\t<tr id=\"exchange\"");
 		if ($accCurr[$src_id] == $accCurr[$dest_id])
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
