@@ -295,7 +295,12 @@ function onChangeTransCurr()
 		else
 			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select class=\"inp\" id=\"srcid\" name=\"srcid\" onchange=\"onChangeAcc();\">\r\n");
+		echo("\t\t\t<select class=\"inp\" id=\"srcid\" name=\"srcid\" onchange=\"");
+		if ($trans_type == 1)
+			echo("onChangeAcc();");
+		else
+			echo("onChangeSource();");
+		echo("\">\r\n");
 		echo(getAccountsList($userid, intval($arr["src_id"])));
 		echo("\t\t\t</select>\r\n");
 		echo("\t\t</td>\r");
@@ -310,7 +315,12 @@ function onChangeTransCurr()
 		else
 			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
-		echo("<select class=\"inp\" id=\"destid\" name=\"destid\" onchange=\"onChangeAcc();\">\r\n");
+		echo("\t\t\t<select class=\"inp\" id=\"destid\" name=\"destid\" onchange=\"");
+		if ($trans_type == 2)
+			echo("onChangeAcc();");
+		else
+			echo("onChangeDest();");
+		echo("\">\r\n");
 		echo(getAccountsList($userid, intval($arr["dest_id"])));
 		echo("\t</select>\r\n");
 		echo("\t\t</td>\r");
