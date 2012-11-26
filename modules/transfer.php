@@ -31,7 +31,7 @@ if (count($resArr) != 1)
 	fail();
 
 
-$resArr = $db->selectQ("id", "accounts", "id=".$dest_id);
+$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
 if (count($resArr) != 1)
 	fail();
 $dest_curr_id = intval($resArr[0]["curr_id"]);
