@@ -92,9 +92,18 @@ function setValues()
 
 function onFInput(obj)
 {
+	var s1valid, s2valid, dvalid, evalid, avalid;
+
 	getValues();
 
-	if (S1 != '' && S2 != '' && d != '' && e != '' && a != '')
+	s1valid = (S1 !== '');
+	s2valid = (S2 !== '');
+	dvalid = (d !== '');
+	evalid = (e !== '');
+	avalid = (a !== '');
+
+
+	if (s1valid && s2valid && dvalid && evalid && avalid)
 	{
 		if (obj.id == 'receipt')		// d is changed, update S2 and e
 		{
@@ -119,31 +128,31 @@ function onFInput(obj)
 	}
 	else				// account currency is different from operation currency
 	{
-		if (S1 != '' && e != '' && S2 != '')
+		if (s1valid && evalid && s2valid)
 		{
 			f3();
 			f4();
 		}
-		else if (S1 != '' && e != '' && a != '')
+		else if (s1valid && evalid && avalid)
 		{
 			f2();
 			f1();
 		}
-		else if (S1 != '' && e != '' && d != '')
+		else if (s1valid && evalid && dvalid)
 		{
 			f1();
 			f4();
 		}
-		else if (S1 != '' && S2 != '' && a != '')
+		else if (s1valid && s2valid && avalid)
 		{
 			f3();
 			f5();
 		}
-		else if (S1 != '' && S2 != '' && d != '' && e == '' && a == '')
+		else if (s1valid && s2valid && dvalid && !evalid && !avalid)
 		{
 			return;
 		}
-		else if (S1 != '' && a != '' && d != '')
+		else if (s1valid && avalid && dvalid)
 		{
 			f1();
 			f5();
