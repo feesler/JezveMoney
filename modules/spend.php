@@ -14,7 +14,7 @@ session_start();
 
 $userid = checkUser("../login.php");
 
-$acc_id = intval($_POST["accid"]);
+$src_id = intval($_POST["srcid"]);
 $amount = floatval($_POST["amount"]);
 $charge = floatval($_POST["charge"]);
 $transcurr = intval($_POST["transcurr"]);
@@ -23,14 +23,14 @@ $fdate = date("Y-m-d H:i:s", $trdate);
 $comment = $db->escape($_POST["comm"]);
 
 
-if (!$acc_id || $amount == 0.0 || $trdate == -1)
+if (!$src_id || $amount == 0.0 || $trdate == -1)
 	fail();
 
 if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
-							array(NULL, $userid, $acc_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment)))
+							array(NULL, $userid, $src_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment)))
 	fail();
 
-$query = "UPDATE accounts SET balance = balance - ".$charge." WHERE id=".$acc_id.";";
+$query = "UPDATE accounts SET balance = balance - ".$charge." WHERE id=".$src_id.";";
 $result = $db->rawQ($query);
 if (mysql_errno())
 	fail();

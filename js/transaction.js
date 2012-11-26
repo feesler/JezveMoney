@@ -62,12 +62,13 @@ function getBalanceOfAccount(account_id)
 // Spend/Income transaction event handler
 function onSubmit(frm)
 {
-	var accid, amount, trdate;
+	var srcid, destid, amount, trdate;
 
-	accid = ge('accid');
+	srcid = ge('srcid');
+	destid = ge('destid');
 	amount = ge('amount');
 	trdate = ge('date');
-	if (!frm || !accid || !amount || !trdate)
+	if (!frm || (!srcid && !destid) || !amount || !trdate)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -125,15 +126,16 @@ function onEditTransSubmit(frm)
 // Change account event handler
 function onChangeAcc()
 {
-	var accid, amountsign;
+	var srcid, destid, amountsign;
 	var amountCurr;
 
-	accid = ge('accid');
+	srcid = ge('srcid');
+	destid = ge('destid');
 	amountsign = ge('amountsign');
-	if (!accid || !amountsign)
+	if ((!srcid && !destid) || !amountsign)
 		return false;
 
-	amountCurr = selectedValue(srcid);
+	amountCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
 
 	amountsign.innerHTML = getCurrencySign(amountCurr);
 }

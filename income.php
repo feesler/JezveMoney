@@ -23,7 +23,11 @@
 	foreach($resArr as $i => $row)
 	{
 		echo("[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row["sign"];
+		$accCurr[intval($row["id"])] = intval($row["curr_id"]);
+		$accCurSign[intval($row["id"])] = $row["sign"];
+
+		if ($i == 0)		// First account
+			$dest_id = intval($row["id"]);
 	}
 
 	echo(getCurrencyArray());
@@ -203,7 +207,7 @@ function onChangeTransCurr()
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
+			<select class="inp" id="destid" name="destid" onchange="onChangeAcc();">
 <?php
 	echo(getAccountsList($userid, $dest_id));
 ?>
@@ -213,10 +217,10 @@ function onChangeTransCurr()
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Incoming amount</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($cursign[0]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($accCurSign[$dest_id]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
-	echo(getCurrencyList($curAccCurr));
+	echo(getCurrencyList($accCurr[$dest_id]));
 ?>
 			</select>
 		</td>
@@ -224,7 +228,7 @@ function onChangeTransCurr()
 
 		<tr id="receiptrow" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Receipt</span></td>
-		<td><input class="inp" id="receipt" name="receipt" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($cursign[1]); ?></span></td>
+		<td><input class="inp" id="receipt" name="receipt" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($accCurSign[$dest_id]); ?></span></td>
 		</tr>
 
 		<tr id="exchange" style="display: none;">

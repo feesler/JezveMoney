@@ -23,7 +23,11 @@ $userid = checkUser("./login.php");
 	foreach($resArr as $i => $row)
 	{
 		echo("[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row["sign"];
+		$accCurr[intval($row["id"])] = intval($row["curr_id"]);
+		$accCurSign[intval($row["id"])] = $row["sign"];
+
+		if ($i == 0)		// First account
+			$src_id = intval($row["id"]);
 	}
 
 	echo(getCurrencyArray());
@@ -49,17 +53,20 @@ function f5(){	e = d / a;		}
 
 function getValues()
 {
-	var accid, amount, charge, exchrate, resbal;
+	var srcid, amount, charge, exchrate, resbal;
 
-	accid = ge('accid');
+	srcid = ge('srcid');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
 	resbal = ge('resbal');
-	if (!accid || !amount || !charge || !exchrate || !resbal)
+	if (!srcid || !amount || !charge || !exchrate || !resbal)
 		return;
 
+	S1 = getBalanceOfAccount(selectedValue(srcid));
+/*
 	S1 = acccur[accid.selectedIndex][2];
+*/
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
@@ -154,23 +161,30 @@ function onFInput(obj)
 
 function onChangeTransCurr()
 {
-	var accid, transcurr, chargeoff, exchange, exchrate, chargesign, amountsign;
+	var srcid, transcurr, chargeoff, exchange, exchrate, chargesign, amountsign;
 
-	accid = ge('accid');
+	srcid = ge('srcid');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if (!accid || !transcurr || !chargeoff || !chargesign || !amountsign)
+	if (!srcid || !transcurr || !chargeoff || !chargesign || !amountsign)
 		return;
 
+	amountCurr = selectedValue(transcurr);
+	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+
+	chargesign.innerHTML = getCurrencySign(chargeCurr);
+	amountsign.innerHTML = getCurrencySign(amountCurr);
+/*
 	chargeoff.style.display = '';
 	exchange.style.display = '';
 
 	chargesign.innerHTML = acccur[accid.selectedIndex][1];
 	amountsign.innerHTML = currency[transcurr.selectedIndex][2];
+*/
 }
 </script>
 </head>
@@ -202,7 +216,7 @@ function onChangeTransCurr()
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
+			<select class="inp" id="srcid" name="srcid" onchange="onChangeAcc();">
 <?php
 	echo(getAccountsList($userid, $src_id));
 ?>
@@ -212,10 +226,10 @@ function onChangeTransCurr()
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($cursign[0]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($accCurSign[$src_id]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
-	echo(getCurrencyList($curAccCurr));
+	echo(getCurrencyList($accCurr[$src_id]));
 ?>
 			</select>
 		</td>
@@ -223,7 +237,7 @@ function onChangeTransCurr()
 
 		<tr id="chargeoff" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($cursign[1]); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($accCurSign[$src_id]); ?></span></td>
 		</tr>
 
 		<tr id="exchange" style="display: none;">
