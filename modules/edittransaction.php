@@ -114,15 +114,6 @@ if (count($transArr) != 1)
 // cancel transaction
 if (!cancelTransaction($trans_id))
 	fail();
-/*
-// check transaction type is the same
-if (intval($transArr[0]["type"]) != $trans_type)
-	fail();
-
-$oldAmount = floatval($transArr[0]["amount"]);
-$oldCharge = floatval($transArr[0]["charge"]);
-*/
-
 
 if ($trans_type == 1)	// spend
 {
@@ -136,26 +127,6 @@ if ($trans_type == 1)	// spend
 		fail();
 
 	setLocation("../transactions.php?type=expense&edit=ok");
-/*
-	if (!$src_id)
-		fail();
-
-	// check account is exist
-	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-	if (count($resArr) != 1)
-		fail();
-
-	$oldBalance = floatval($resArr[0]["balance"]);
-
-	if (!$db->updateQ("transactions", array("amount", "charge", "date", "comment"),
-								array($amount, $charge, $fdate, $comment), "id=".$trans_id))
-		fail();
-
-	// update balance of account
-	$newBalance = $oldBalance + $oldCharge - $charge;
-	if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
-		fail();
-*/
 }
 else if ($trans_type == 2)	// income
 {
@@ -169,27 +140,6 @@ else if ($trans_type == 2)	// income
 		fail();
 
 	setLocation("../transactions.php?type=income&edit=ok");
-/*
-	if (!$dest_id)
-		fail();
-
-	// check account is exist
-	$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-	if (count($resArr) != 1)
-		fail();
-
-	$oldBalance = floatval($resArr[0]["balance"]);
-
-	// update transaction
-	if (!$db->updateQ("transactions", array("amount", "charge", "date", "comment"),
-								array($amount, $charge, $fdate, $comment), "id=".$trans_id))
-		fail();
-
-	// update balance of account
-	$newBalance = $oldBalance - $oldCharge + $charge;
-	if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
-		fail();
-*/
 }
 else if ($trans_type == 3)	// transfer
 {
@@ -213,40 +163,6 @@ else if ($trans_type == 3)	// transfer
 		fail();
 
 	setLocation("../transactions.php?type=transfer&edit=ok");
-/*
-	if (!$src_id || !$dest_id)
-		fail();
-
-	// check source account is exist
-	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-	if (count($resArr) != 1)
-		fail();
-
-	$oldSrcBalance = floatval($resArr[0]["balance"]);
-
-	// check destination account is exist
-	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-	if (count($resArr) != 1)
-		fail();
-	$dest_curr_id = intval($resArr[0]["curr_id"]);
-
-	$oldDestBalance = floatval($resArr[0]["balance"]);
-
-	// update transaction
-	if (!$db->updateQ("transactions", array("amount", "charge", "curr_id", "date", "comment"),
-								array($amount, $charge, $dest_curr_id, $fdate, $comment), "id=".$trans_id))
-		fail();
-
-	// update balance of source account
-	$newBalance = $oldSrcBalance + $oldAmount - $amount;
-	if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
-		fail();
-
-	// update balance of destination account
-	$newBalance = $oldDestBalance - $charge + $amount;
-	if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
-		fail();
-*/
 }
 else
 	fail();
