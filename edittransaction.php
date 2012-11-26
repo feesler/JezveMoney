@@ -354,7 +354,8 @@ function onChangeTransCurr()
 
 <?php
 		echo("\t\t<tr id=\"chargeoff\"");
-		if ($accCurr[$trans_scr_id] == $accCurr[$trans_dest_id])
+		if (($trans_type == 3 && $accCurr[$trans_src_id] == $accCurr[$trans_dest_id]) ||
+			(($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
@@ -364,7 +365,8 @@ function onChangeTransCurr()
 
 <?php
 		echo("\t\t<tr id=\"exchange\"");
-		if ($accCurr[$trans_src_id] == $accCurr[$trans_dest_id])
+		if (($trans_type == 3 && $accCurr[$trans_src_id] == $accCurr[$trans_dest_id]) ||
+			(($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
