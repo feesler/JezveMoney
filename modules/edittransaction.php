@@ -134,7 +134,7 @@ else if ($trans_type == 2)	// income
 								array(0, $dest_id, 2, $amount, $charge, $transcurr, $fdate, $comment), "id=".$trans_id))
 		fail();
 	
-	$query = "UPDATE accounts SET balance = balance + ".$charge." WHERE id=".$acc_id.";";
+	$query = "UPDATE accounts SET balance = balance + ".$charge." WHERE id=".$dest_id.";";
 	$result = $db->rawQ($query);
 	if (mysql_errno())
 		fail();
