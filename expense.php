@@ -205,19 +205,6 @@ function onChangeTransCurr()
 			<select class="inp" id="accid" name="accid" onchange="onChangeAcc();">
 <?php
 	echo(getAccountsList($userid, $src_id));
-/*
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	foreach($resArr as $row)
-	{
-		echo("\t\t\t\t<option value=\"".$row["id"]."\"");
-		if ($curAccCurr == 0)
-			echo(" selected");
-		echo(">".$row["name"]."</option>\r\n");
-
-		if ($curAccCurr == 0)
-			$curAccCurr = $row["curr_id"];
-	}
-*/
 ?>
 			</select>
 		</td>
