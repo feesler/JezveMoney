@@ -17,12 +17,12 @@ $userid = checkUser("./login.php");
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
-	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.id AS id, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
-	echo("var accounts = ".$accounts.";\r\nvar acccur = [");
+	echo("var accounts = [");
 	foreach($resArr as $i => $row)
 	{
-		echo("[".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		echo("[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
 		$cursign[$i] = $row["sign"];
 	}
 

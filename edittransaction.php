@@ -45,7 +45,7 @@ $trans_chanrge = floatval($arr["charge"]);
 	echo("\tvar accounts = [");
 	foreach($resArr as $i => $row)
 	{
-		echo("[".$row["id"].", ".$row["curr_id"].", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
+		echo("[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
 		$accCurr[intval($row["id"])] = intval($row["curr_id"]);
 		$accCurSign[intval($row["curr_id"])] = $row["sign"];
 	}

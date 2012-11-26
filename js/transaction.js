@@ -50,7 +50,7 @@ function getBalanceOfAccount(account_id)
 	accounts.some(function(acc)
 	{
 		if (acc[0] == account_id)
-			balance = acc[2];
+			balance = acc[3];
 
 		return (acc[0] == account_id);
 	});
