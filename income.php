@@ -170,7 +170,7 @@ function onFInput(obj)
 
 function onChangeTransCurr()
 {
-	var destid, amount, transcurr, receiptrow, exchange, exchrate, charge, chargesign, amountsign;
+	var destid, amount, transcurr, receiptrow, exchange, exchrate, charge, receipt, chargesign, amountsign;
 	var amountCurr, chargeCurr;
 
 	destid = ge('destid');
@@ -180,20 +180,27 @@ function onChangeTransCurr()
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
+	receipt = ge('receipt');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if (!destid || !amount || !transcurr || !receiptrow || !exchange || !exchrate || !charge || !chargesign || !amountsign)
+	if (!destid || !amount || !transcurr || !receiptrow || !exchange || !exchrate || (!charge && !receipt) || !chargesign || !amountsign)
 		return;
 
 	amountCurr = selectedValue(transcurr);
-	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+	chargeCurr = getCurrencyOfAccount(selectedValue(destid));
 
 	if (amountCurr == chargeCurr)
 	{
-		chargeoff.style.display = 'none';
+		if (receiptrow)
+			receiptrow.style.display = 'none';
+		else
+			chargeoff.style.display = 'none';
 		exchange.style.display = 'none';
 		exchrate.value = 1;
-		charge.value = amount.value;
+		if (receipt)
+			receipt.value = amount.value;
+		else
+			charge.value = amount.value;
 
 		getValues();
 		f5();
@@ -202,7 +209,10 @@ function onChangeTransCurr()
 	}
 	else
 	{
-		chargeoff.style.display = '';
+		if (receiptrow)
+			receiptrow.style.display = '';
+		else
+			chargeoff.style.display = '';
 		exchange.style.display = '';
 	}
 

@@ -126,7 +126,7 @@ function onEditTransSubmit(frm)
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, amountsign, exchange, exchrate, charge, chargesign;
+	var srcid, destid, amount, transcurr, chargeoff, receiptrow, amountsign, exchange, exchrate, charge, receipt, chargesign;
 	var amountCurr;
 
 	srcid = ge('srcid');
@@ -134,12 +134,14 @@ function onChangeAcc()
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
+	receiptrow = ge('receiptrow');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
+	receipt = ge('receipt');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
+	if ((!srcid && !destid) || !amount || !transcurr  || (!chargeoff && !receiptrow) || !exchange || !exchrate || (!charge && !receipt) || !chargesign || !amountsign)
 		return false;
 
 /*
@@ -150,10 +152,16 @@ function onChangeAcc()
 
 	if (amountCurr == chargeCurr)
 	{
-		chargeoff.style.display = 'none';
+		if (receiptrow)
+			receiptrow.style.display = 'none';
+		else
+			chargeoff.style.display = 'none';
 		exchange.style.display = 'none';
 		exchrate.value = 1;
-		charge.value = amount.value;
+		if (receipt)
+			receipt.value = amount.value;
+		else
+			charge.value = amount.value;
 
 		getValues();
 		f5();
@@ -162,7 +170,10 @@ function onChangeAcc()
 	}
 	else
 	{
-		chargeoff.style.display = '';
+		if (receiptrow)
+			receiptrow.style.display = '';
+		else
+			chargeoff.style.display = '';
 		exchange.style.display = '';
 	}
 
