@@ -56,18 +56,7 @@ $trans_chanrge = floatval($arr["charge"]);
 	else if ($trans_type == 2 && $trans_dest_id != 0 && $trans_scr_id == 0)
 		$transAccCur = $accCurr[$trans_dest_id];
 
-
 	echo(getCurrencyArray());
-/*
-	$resArr = $db->selectQ("id, name, sign", "currency", NULL, NULL, "id");
-	$currcount = count($resArr);
-	echo("var currency = [");
-	foreach($resArr as $i => $row)
-	{
-		echo("[".$row["id"].", ".json_encode($row["name"]).", ".json_encode($row["sign"])."]".(($i < $currcount - 1) ? ", " : "];\r\n"));
-		$cursign[$i] = $row["sign"];
-	}
-*/
 
 	echo("\r\n\r\nvar transaction =\r\n{\r\n");
 	echo("\tsrcAcc : ".$trans_scr_id.",\r\n");

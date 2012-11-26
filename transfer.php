@@ -36,15 +36,6 @@
 	}
 
 	echo(getCurrencyArray());
-/*
-	$resArr = $db->selectQ("id, name, sign", "currency", NULL, NULL, "id");
-	$currcount = count($resArr);
-	echo("var currency = [");
-	foreach($resArr as $i => $row)
-	{
-		echo("[".$row["id"].", ".json_encode($row["name"]).", ".json_encode($row["sign"])."]".(($i < $currcount - 1) ? ", " : "];\r\n"));
-	}
-*/
 ?>
 
 </script>
