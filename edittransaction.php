@@ -216,26 +216,43 @@ function onFInput(obj)
 
 function onChangeTransCurr()
 {
-	var srcid, transcurr, chargeoff, exchange, exchrate, chargesign, amountsign;
+	var srcid, amount, transcurr, chargeoff, exchange, exchrate, charge, chargesign, amountsign;
 	var amountCurr, chargeCurr;
 
 	srcid = ge('srcid');
+	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
+	charge = ge('charge');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if (!srcid || !transcurr || !chargeoff || !chargesign || !amountsign)
+	if (!srcid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
 		return;
 	if (transcurr.selectedIndex == -1 || srcid.selectedIndex == -1)
 		return
 
-	chargeoff.style.display = '';
-	exchange.style.display = '';
-
 	amountCurr = selectedValue(transcurr);
 	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+
+	if (amountCurr == chargeCurr)
+	{
+		chargeoff.style.display = 'none';
+		exchange.style.display = 'none';
+		exchrate.value = 1;
+		charge.value = amount.value;
+
+		getValues();
+		f5();
+		f1();
+		setValues();
+	}
+	else
+	{
+		chargeoff.style.display = '';
+		exchange.style.display = '';
+	}
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);

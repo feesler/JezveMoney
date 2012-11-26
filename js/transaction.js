@@ -126,17 +126,47 @@ function onEditTransSubmit(frm)
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amountsign;
+	var srcid, destid, amount, transcurr, chargeoff, amountsign, exchange, exchrate, charge, chargesign;
 	var amountCurr;
 
 	srcid = ge('srcid');
 	destid = ge('destid');
+	amount = ge('amount');
+	transcurr = ge('transcurr');
+	chargeoff = ge('chargeoff');
+	exchange = ge('exchange');
+	exchrate = ge('exchrate');
+	charge = ge('charge');
+	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if ((!srcid && !destid) || !amountsign)
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
 		return false;
 
+/*
 	amountCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
+*/
+	amountCurr = selectedValue(transcurr);
+	chargeCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
 
+	if (amountCurr == chargeCurr)
+	{
+		chargeoff.style.display = 'none';
+		exchange.style.display = 'none';
+		exchrate.value = 1;
+		charge.value = amount.value;
+
+		getValues();
+		f5();
+		f1();
+		setValues();
+	}
+	else
+	{
+		chargeoff.style.display = '';
+		exchange.style.display = '';
+	}
+
+	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
 }
 

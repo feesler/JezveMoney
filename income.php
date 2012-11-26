@@ -171,6 +171,7 @@ function onFInput(obj)
 function onChangeTransCurr()
 {
 	var destid, amount, transcurr, receiptrow, exchange, exchrate, charge, chargesign, amountsign;
+	var amountCurr, chargeCurr;
 
 	destid = ge('destid');
 	amount = ge('amount');

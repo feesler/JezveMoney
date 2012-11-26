@@ -171,6 +171,7 @@ function onFInput(obj)
 function onChangeTransCurr()
 {
 	var srcid, amount, transcurr, chargeoff, exchange, exchrate, charge, chargesign, amountsign;
+	var amountCurr, chargeCurr;
 
 	srcid = ge('srcid');
 	amount = ge('amount');
@@ -183,6 +184,8 @@ function onChangeTransCurr()
 	amountsign = ge('amountsign');
 	if (!srcid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
 		return;
+	if (transcurr.selectedIndex == -1 || srcid.selectedIndex == -1)
+		return
 
 	amountCurr = selectedValue(transcurr);
 	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
