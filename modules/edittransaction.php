@@ -33,36 +33,22 @@ $transArr = $db->selectQ("*", "transactions", "id=".$trans_id);
 if (count($transArr) != 1)
 	fail();
 
-wlog("1");
-
 // check transaction type is the same
 if (intval($transArr[0]["type"]) != $trans_type)
 	fail();
 
-wlog("2");
-
 $oldAmount = floatval($transArr[0]["amount"]);
 $oldCharge = floatval($transArr[0]["charge"]);
 
-
-wlog("trans_type=".$trans_type);
-
 if ($trans_type == 1)	// spend
 {
-wlog("3");
-wlog("src_id=".$src_id);
-
 	if (!$src_id)
 		fail();
-
-wlog("4");
 
 	// check account is exist
 	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 	if (count($resArr) != 1)
 		fail();
-
-wlog("5");
 
 	$oldBalance = floatval($resArr[0]["balance"]);
 
@@ -70,14 +56,10 @@ wlog("5");
 								array($amount, $charge, $fdate, $comment), "id=".$trans_id))
 		fail();
 
-wlog("6");
-
 	// update balance of account
 	$newBalance = $oldBalance + $oldCharge - $charge;
 	if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
 		fail();
-
-wlog("7");
 }
 else if ($trans_type == 2)	// income
 {
