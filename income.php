@@ -53,17 +53,20 @@ function f5(){	e = d / a;		}
 
 function getValues()
 {
-	var accid, amount, receipt, exchrate, resbal;
+	var destid, amount, receipt, exchrate, resbal;
 
-	accid = ge('accid');
+	destid = ge('destid');
 	amount = ge('amount');
 	receipt = ge('receipt');
 	exchrate = ge('exchrate');
 	resbal = ge('resbal');
-	if (!accid || !amount || !receipt || !exchrate || !resbal)
+	if (!destid || !amount || !receipt || !exchrate || !resbal)
 		return;
 
+	S1 = getBalanceOfAccount(selectedValue(destid));
+/*
 	S1 = acccur[accid.selectedIndex][2];
+*/
 	a = amount.value;
 	d = receipt.value;
 	e = exchrate.value;
@@ -167,23 +170,30 @@ function onFInput(obj)
 
 function onChangeTransCurr()
 {
-	var accid, transcurr, receiptrow, exchange, exchrate, chargesign, amountsign;
+	var destid, transcurr, receiptrow, exchange, exchrate, chargesign, amountsign;
 
-	accid = ge('accid');
+	destid = ge('destid');
 	transcurr = ge('transcurr');
 	receiptrow = ge('receiptrow');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if (!accid || !transcurr || !receiptrow || !chargesign || !amountsign)
+	if (!destid || !transcurr || !receiptrow || !chargesign || !amountsign)
 		return;
 
+	amountCurr = selectedValue(transcurr);
+	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+
+	chargesign.innerHTML = getCurrencySign(chargeCurr);
+	amountsign.innerHTML = getCurrencySign(amountCurr);
+/*
 	receiptrow.style.display = '';
 	exchange.style.display = '';
 
 	chargesign.innerHTML = acccur[accid.selectedIndex][1];
 	amountsign.innerHTML = currency[transcurr.selectedIndex][2];
+*/
 }
 </script>
 </head>
