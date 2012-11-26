@@ -281,9 +281,6 @@ function onChangeTransCurr()
 <?php
 	}
 ?>
-	</table>
-	</td>
-	</tr>
 </table>
 </body>
 </html>
