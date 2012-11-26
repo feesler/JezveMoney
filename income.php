@@ -170,20 +170,41 @@ function onFInput(obj)
 
 function onChangeTransCurr()
 {
-	var destid, transcurr, receiptrow, exchange, exchrate, chargesign, amountsign;
+	var destid, amount, transcurr, receiptrow, exchange, exchrate, charge, chargesign, amountsign;
 
 	destid = ge('destid');
+	amount = ge('amount');
 	transcurr = ge('transcurr');
 	receiptrow = ge('receiptrow');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
+	charge = ge('charge');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if (!destid || !transcurr || !receiptrow || !chargesign || !amountsign)
+	if (!destid || !amount || !transcurr || !receiptrow || !exchange || !exchrate || !charge || !chargesign || !amountsign)
 		return;
 
 	amountCurr = selectedValue(transcurr);
 	chargeCurr = getCurrencyOfAccount(selectedValue(srcid));
+
+	if (amountCurr == chargeCurr)
+	{
+		chargeoff.style.display = 'none';
+		exchange.style.display = 'none';
+		exchrate.value = 1;
+		charge.value = amount.value;
+
+		getValues();
+		f5();
+		f1();
+		setValues();
+	}
+	else
+	{
+		chargeoff.style.display = '';
+		exchange.style.display = '';
+	}
+
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
