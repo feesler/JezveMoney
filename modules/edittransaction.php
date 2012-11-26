@@ -98,6 +98,7 @@ $src_id = intval($_POST["srcid"]);
 $dest_id = intval($_POST["destid"]);
 $amount = floatval($_POST["amount"]);
 $charge = floatval($_POST["charge"]);
+$transcurr = intval($_POST["transcurr"]);
 $trdate = strtotime($_POST["date"]);
 $fdate = date("Y-m-d H:i:s", $trdate);
 $comment = $db->escape($_POST["comm"]);
@@ -118,7 +119,7 @@ if (!cancelTransaction($trans_id))
 if ($trans_type == 1)	// spend
 {
 	if (!$db->updateQ("transactions", array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
-								array($src_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment), "id=".$trans_id))
+					array($src_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment), "id=".$trans_id))
 		fail();
 
 	$query = "UPDATE accounts SET balance = balance - ".$charge." WHERE id=".$src_id.";";
@@ -131,7 +132,7 @@ if ($trans_type == 1)	// spend
 else if ($trans_type == 2)	// income
 {
 	if (!$db->updateQ("transactions", array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
-								array(0, $dest_id, 2, $amount, $charge, $transcurr, $fdate, $comment), "id=".$trans_id))
+					array(0, $dest_id, 2, $amount, $charge, $transcurr, $fdate, $comment), "id=".$trans_id))
 		fail();
 	
 	$query = "UPDATE accounts SET balance = balance + ".$charge." WHERE id=".$dest_id.";";
@@ -143,7 +144,7 @@ else if ($trans_type == 2)	// income
 }
 else if ($trans_type == 3)	// transfer
 {
-	$resArr = $db->selectQ("id", "accounts", "id=".$dest_id);
+	$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
 	if (count($resArr) != 1)
 		fail();
 	$dest_curr_id = intval($resArr[0]["curr_id"]);		// currency of destination account is currency of transaction
