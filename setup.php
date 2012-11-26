@@ -3,6 +3,7 @@
 
 	$docroot = $_SERVER["DOCUMENT_ROOT"];
 	$ruri = $_SERVER["REQUEST_URI"];
+	$userAgent = $_SERVER["HTTP_USER_AGENT"];
 	$rootdir = "/money/";
 
 	require_once($docroot.$rootdir."class/mysql.php");
