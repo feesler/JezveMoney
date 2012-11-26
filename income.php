@@ -17,7 +17,7 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
-	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.id AS id, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
 	echo("var accounts = [");
 	foreach($resArr as $i => $row)
