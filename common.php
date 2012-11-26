@@ -206,4 +206,24 @@ function getAccountsList($user_id, $selected_id = 0)
 	return $resStr;
 }
 
+
+// Return Javascript array of currencies
+function getCurrencyArray()
+{
+	global $db;
+
+	$resStr = "";
+
+	$resArr = $db->selectQ("id, name, sign", "currency", NULL, NULL, "id");
+	$currcount = count($resArr);
+	$resStr .= "var currency = [");
+	foreach($resArr as $i => $row)
+	{
+		$resStr .= "[".$row["id"].", ".json_encode($row["name"]).", ".json_encode($row["sign"])."]".(($i < $currcount - 1) ? ", " : "];\r\n"));
+	}
+
+	return $resStr;
+}
+
+
 ?>
