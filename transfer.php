@@ -17,6 +17,12 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
+	echo(getAccountsArray($userid));
+
+	$accCurr = getAccCurrInfo($userid);
+	$src_id = (count($accCurr) > 0) ? $accCurr[0]["id"] : 0;
+	$dest_id = (count($accCurr) > 1) ? $accCurr[1]["id"] : 0;
+/*
 	$resArr = $db->selectQ("a.id AS id, c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
 
@@ -34,6 +40,7 @@
 		else if ($i == 1)	//Second account
 			$dest_id = intval($row["id"]);
 	}
+*/
 
 	echo(getCurrencyArray());
 ?>
@@ -91,22 +98,28 @@
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Transfer amount</span></td>
-		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo($accCurSign[$src_id]); ?></span></td>
+		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); /*echo($accCurSign[$src_id]);*/ ?></span></td>
 		</tr>
 
 <?php
 		echo("\t\t<tr id=\"chargeoff\"");
+/*
 		if ($accCurr[$src_id] == $accCurr[$dest_id])
+*/
+		if (getCurrId($accCurr, $src_id) == getCurrId($accCurr, $dest_id))
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($accCurSign[$dest_id]); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); /*echo($accCurSign[$dest_id]);*/ ?></span></td>
 		</tr>
 
 <?php
 		echo("\t\t<tr id=\"exchange\"");
+/*
 		if ($accCurr[$src_id] == $accCurr[$dest_id])
+*/
+		if (getCurrId($accCurr, $src_id) == getCurrId($accCurr, $dest_id))
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>

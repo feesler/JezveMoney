@@ -17,6 +17,11 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
+	echo(getAccountsArray($userid));
+
+	$accCurr = getAccCurrInfo($userid);
+	$src_id = count($accCurr) ? $accCurr[0]["id"] : 0;
+/*
 	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.id AS id, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
 	$accounts = count($resArr);
 	echo("var accounts = [");
@@ -29,6 +34,7 @@
 		if ($i == 0)		// First account
 			$src_id = intval($row["id"]);
 	}
+*/
 
 	echo(getCurrencyArray());
 ?>
@@ -249,10 +255,13 @@ function onChangeTransCurr()
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo($accCurSign[$src_id]); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo(getCurSign($accCurr, $src_id)); /*echo($accCurSign[$src_id]);*/ ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
+	echo(getCurrencyList(getCurrId($accCurr, $src_id)));
+/*
 	echo(getCurrencyList($accCurr[$src_id]));
+*/
 ?>
 			</select>
 		</td>
@@ -260,7 +269,7 @@ function onChangeTransCurr()
 
 		<tr id="chargeoff" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($accCurSign[$src_id]); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); /*echo($accCurSign[$src_id]);*/ ?></span></td>
 		</tr>
 
 		<tr id="exchange" style="display: none;">

@@ -226,4 +226,89 @@ function getCurrencyArray()
 }
 
 
+// Return Javascript array of accounts
+function getAccountsArray($user_id)
+{
+	global $db;
+
+	$resStr = "";
+
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.id AS id, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$user_id." AND c.id=a.curr_id");
+	$accounts = count($resArr);
+	$resStr .= "var accounts = [";
+	foreach($resArr as $i => $row)
+	{
+		$resStr .= "[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n");
+	}
+
+	return $resStr;
+}
+
+
+// Return array of currency information of accounts
+function getAccCurrInfo($user_id)
+{
+	global $db;
+
+	$accCurr = array();
+
+	$resArr = $db->selectQ("c.id AS curr_id, c.sign AS sign, a.id AS id, a.balance AS balance", "accounts AS a, currency AS c", "a.user_id=".$user_id." AND c.id=a.curr_id");
+	foreach($resArr as $i => $row)
+	{
+		$accCurr[$i]["id"] = intval($row["id"]);
+		$accCurr[$i]["curr_id"] = intval($row["curr_id"]);
+		$accCurr[$i]["sign"] = $row["sign"];
+	}
+
+	return $accCurr;
+}
+
+
+// Return currency id of specified account from information array
+function getCurrId($accCurr, $account_id)
+{
+	if (!count($accCurr) || !$account_id)
+		return 0;
+
+	foreach($accCurr as $ac)
+	{
+		if (intval($ac["id"]) == $account_id)
+			return $ac["curr_id"];
+	}
+
+	return 0;
+}
+
+
+// Return currency sign of specified account from information array
+function getCurSign($accCurr, $account_id)
+{
+	if (!count($accCurr) || !$account_id)
+		return NULL;
+
+	foreach($accCurr as $ac)
+	{
+		if (intval($ac["id"]) == $account_id)
+			return $ac["sign"];
+	}
+
+	return NULL;
+}
+
+
+// Return currency sign by specified id
+function getSign($accCurr, $curr_id)
+{
+	if (!count($accCurr) || !$curr_id)
+		return NULL;
+
+	foreach($accCurr as $ac)
+	{
+		if (intval($ac["curr_id"]) == $curr_id)
+			return $ac["sign"];
+	}
+
+	return NULL;
+}
+
 ?>
