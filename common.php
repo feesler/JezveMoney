@@ -177,10 +177,10 @@ function getCurrencyList($selected_id = 0)
 	$resArr = $db->selectQ("*", "currency");
 	foreach($resArr as $row)
 	{
-		echo("\t\t\t<option value=\"".$row["id"]."\"");
+		$resStr .= "\t\t\t<option value=\"".$row["id"]."\"";
 		if ($row["id"] == $selected_id)
-			echo(" selected");
-		echo(">".$row["name"]."</option>\r\n");
+			$resStr .= " selected";
+		$resStr .= ">".$row["name"]."</option>\r\n";
 	}
 
 	return $resStr;
