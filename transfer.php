@@ -22,25 +22,6 @@
 	$accCurr = getAccCurrInfo($userid);
 	$src_id = (count($accCurr) > 0) ? $accCurr[0]["id"] : 0;
 	$dest_id = (count($accCurr) > 1) ? $accCurr[1]["id"] : 0;
-/*
-	$resArr = $db->selectQ("a.id AS id, c.id AS curr_id, c.sign AS sign", "accounts AS a, currency AS c", "a.user_id=".$userid." AND c.id=a.curr_id");
-	$accounts = count($resArr);
-
-	$src_id = 0;
-	$dest_id = 0;
-	echo("var accounts = [");
-	foreach($resArr as $i => $row)
-	{
-		echo("[".$row["id"].", ".$row["curr_id"].", ".json_encode($row["sign"]).", ".$row["balance"]."]".(($i < $accounts - 1) ? ", " : "];\r\n"));
-		$accCurr[intval($row["id"])] = intval($row["curr_id"]);
-		$accCurSign[intval($row["id"])] = $row["sign"];
-
-		if ($i == 0)		// First account
-			$src_id = intval($row["id"]);
-		else if ($i == 1)	//Second account
-			$dest_id = intval($row["id"]);
-	}
-*/
 
 	echo(getCurrencyArray());
 ?>
@@ -98,27 +79,21 @@
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Transfer amount</span></td>
-		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); /*echo($accCurSign[$src_id]);*/ ?></span></td>
+		<td><input class="inp" id="amount" name="amount" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); ?></span></td>
 		</tr>
 
 <?php
 		echo("\t\t<tr id=\"chargeoff\"");
-/*
-		if ($accCurr[$src_id] == $accCurr[$dest_id])
-*/
 		if (getCurrId($accCurr, $src_id) == getCurrId($accCurr, $dest_id))
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); /*echo($accCurSign[$dest_id]);*/ ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
 		</tr>
 
 <?php
 		echo("\t\t<tr id=\"exchange\"");
-/*
-		if ($accCurr[$src_id] == $accCurr[$dest_id])
-*/
 		if (getCurrId($accCurr, $src_id) == getCurrId($accCurr, $dest_id))
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
