@@ -69,7 +69,7 @@ function cancelTransaction($trans_id)
 			return FALSE;
 
 		// check destination account is exist
-		$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
+		$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
 		if (count($resArr) != 1)
 			return FALSE;
 
