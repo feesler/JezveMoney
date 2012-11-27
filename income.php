@@ -64,9 +64,6 @@ function getValues()
 		return;
 
 	S1 = getBalanceOfAccount(selectedValue(destid));
-/*
-	S1 = acccur[accid.selectedIndex][2];
-*/
 	a = amount.value;
 	d = receipt.value;
 	e = exchrate.value;
@@ -219,13 +216,6 @@ function onChangeTransCurr()
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
-/*
-	receiptrow.style.display = '';
-	exchange.style.display = '';
-
-	chargesign.innerHTML = acccur[accid.selectedIndex][1];
-	amountsign.innerHTML = currency[transcurr.selectedIndex][2];
-*/
 }
 </script>
 </head>

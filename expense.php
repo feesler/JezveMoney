@@ -1,9 +1,9 @@
 <?php
-require_once("./setup.php");
+	require_once("./setup.php");
 
-session_start();
+	session_start();
 
-$userid = checkUser("./login.php");
+	$userid = checkUser("./login.php");
 ?>
 <!DOCTYPE html>
 <html>
@@ -64,9 +64,6 @@ function getValues()
 		return;
 
 	S1 = getBalanceOfAccount(selectedValue(srcid));
-/*
-	S1 = acccur[accid.selectedIndex][2];
-*/
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
@@ -211,13 +208,6 @@ function onChangeTransCurr()
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
-/*
-	chargeoff.style.display = '';
-	exchange.style.display = '';
-
-	chargesign.innerHTML = acccur[accid.selectedIndex][1];
-	amountsign.innerHTML = currency[transcurr.selectedIndex][2];
-*/
 }
 </script>
 </head>
