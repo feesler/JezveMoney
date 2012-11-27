@@ -103,7 +103,7 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 
 	$resStr = "";
 
-	$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table>\r\n";
+	$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table class=\"infotable\">\r\n";
 
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$user_id);
 	$accounts = count($resArr);
@@ -140,13 +140,13 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 			$resStr .= "</tr>\r\n";
 		}
 
-		$resStr .= "\t\t<tr><td colspan=\"3\" style=\"height: 10px;\"></td></tr>\r\n";
+		$resStr .= "\t\t<tr style=\"background-color: transparent;\"><td colspan=\"4\" style=\"height: 10px;\"></td></tr>\r\n";
 
 		foreach($totalArr as $key => $value)
 		{
 			$valfmt = currFormat($value, $key);
 			$currname = getCurrencyName($key);
-			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td style=\"text-align: right;\">".$valfmt."</td></tr>";
+			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td style=\"text-align: right;\">".$valfmt."</td><td></td></tr>";
 		}
 	}
 

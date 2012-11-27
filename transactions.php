@@ -47,7 +47,7 @@
 
 	<tr>
 	<td>
-	<table>
+	<table class="infotable">
 <?php
 
 	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);

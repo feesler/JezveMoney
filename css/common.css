@@ -92,3 +92,9 @@ a:hover
 {
 	margin: 0px 25px;
 }
+
+
+.infotable tr:nth-child(even)
+{
+	background-color: #E0E0E0;
+}
