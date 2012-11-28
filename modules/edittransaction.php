@@ -26,58 +26,52 @@ function cancelTransaction($trans_id)
 	$transAmount = floatval($trans["amount"]);
 	$transCharge = floatval($trans["charge"]);
 
-	if ($transType == 1)		// spend
+	// check source account is exist
+	$srcBalance = 0;
+	if ($src_id != 0)
 	{
-		// check account is exist
 		$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 		if (count($resArr) != 1)
 			return FALSE;
+	
+		$srcBalance = floatval($resArr[0]["balance"]);
+	}
 
-		$oldBalance = floatval($resArr[0]["balance"]);
+	// check destination account is exist
+	$destBalance = 0;
+	if ($dest_id != 0)
+	{
+		$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
+		if (count($resArr) != 1)
+			return FALSE;
 
+		$destBalance = floatval($resArr[0]["balance"]);
+	}
+
+	if ($transType == 1)		// spend
+	{
 		// update balance of account
-		$newBalance = $oldBalance + $transCharge;
-		if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
+		$srcBalance += $transCharge;
+		if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 			fail();
 	}
 	else if ($transType == 2)		// income
 	{
-		// check account is exist
-		$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-		if (count($resArr) != 1)
-			return FALSE;
-
-		$oldBalance = floatval($resArr[0]["balance"]);
-
 		// update balance of account
-		$newBalance = $oldBalance - $transCharge;
-		if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$dest_id))
+		$destBalance -= $transCharge;
+		if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 			fail();
 	}
 	else if ($transType == 3)		// transfer
 	{
-		// check source account is exist
-		$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-		if (count($resArr) != 1)
-			return FALSE;
-
-		$oldSrcBalance = floatval($resArr[0]["balance"]);
-
 		// update balance of source account
-		$newBalance = $oldSrcBalance + $transAmount;
-		if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$src_id))
+		$srcBalance += $transAmount;
+		if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 			return FALSE;
-
-		// check destination account is exist
-		$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-		if (count($resArr) != 1)
-			return FALSE;
-
-		$oldDestBalance = floatval($resArr[0]["balance"]);
 
 		// update balance of destination account
-		$newBalance = $oldDestBalance - $transCharge;
-		if (!$db->updateQ("accounts", array("balance"), array($newBalance), "id=".$dest_id))
+		$destBalance -= $transCharge;
+		if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 			return FALSE;
 	}
 	else
