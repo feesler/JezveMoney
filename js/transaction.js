@@ -150,6 +150,7 @@ function onChangeAcc()
 	amountCurr = selectedValue(transcurr);
 	chargeCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
 
+/*
 	if (amountCurr == chargeCurr)
 	{
 		if (receiptrow)
@@ -176,6 +177,7 @@ function onChangeAcc()
 			chargeoff.style.display = '';
 		exchange.style.display = '';
 	}
+*/
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
@@ -254,7 +256,7 @@ function onTransferSubmit(frm)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, chargeoff, exchange, amountsign, chargesign, dstyle;
+	var src, dest, amount, charge, exchrate, chargeoff, exchange, amountsign, chargesign, resbal, dstyle;
 
 	src = ge('srcid');
 	dest = ge('destid');
@@ -265,8 +267,8 @@ function updControls()
 	exchange = ge('exchange');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-
-	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !amountsign || !chargesign)
+	resbal = ge('resbal');
+	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !amountsign || !chargesign || !resbal)
 		return;
 
 	exchange.value = '';
@@ -274,11 +276,14 @@ function updControls()
 	{
 		dstyle = '';
 		charge.value = '';
+		resbal.value = '';
 	}
 	else
 	{
 		dstyle = 'none';
 		charge.value = amount.value;
+		exchrate.value = 1;
+		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
 	}
 
 	chargeoff.style.display = dstyle;

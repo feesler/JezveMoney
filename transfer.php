@@ -115,8 +115,16 @@ function onFInput(obj)
 	}
 	else if (e == 1)		// account currency is the same as operation currency
 	{
-		d = a;
-		f1();
+		if (obj.id == 'charge')		// d is changed, update S2 and e
+		{
+			f5();
+			f1();
+		}
+		else
+		{
+			d = a;
+			f1();
+		}
 	}
 	else				// account currency is different from operation currency
 	{

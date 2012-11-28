@@ -46,7 +46,7 @@ $trans_chanrge = floatval($arr["charge"]);
 
 	$transAcc_id = 0;	// main transaction account id
 	$transAccCur = 0;	// currency of transaction account
-	if (($trans_type == 1 && $trans_dest_id == 0) || ($trans_type == 3 && $trans_dest_id != 0) && $trans_scr_id != 0)
+	if ((($trans_type == 1 && $trans_dest_id == 0) || ($trans_type == 3 && $trans_dest_id != 0)) && $trans_scr_id != 0)
 		$transAcc_id = $trans_scr_id;
 	else if ($trans_type == 2 && $trans_dest_id != 0 && $trans_scr_id == 0)
 		$transAcc_id = $trans_dest_id;
