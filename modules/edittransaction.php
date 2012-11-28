@@ -155,24 +155,9 @@ else if ($trans_type == 3)	// transfer
 		fail();
 
 /*
-	$query = "UPDATE accounts SET balance = balance - ".$amount." WHERE id=".$src_id.";";
-	$result = $db->rawQ($query, $dbcnx);
-	if (mysql_errno())
-		fail();
-*/
-
 	$resArr = $db->selectQ("balance", "accounts", "id=".$dest_id);
 	if (count($resArr == 1))
 		$balance = floatval($resArr[0]["balance"]);
-	$balance += $charge;
-	if (!$db->updateQ("accounts", array("balance"), array($balance), "id=".$dest_id))
-		fail();
-
-/*
-	$query = "UPDATE accounts SET balance = balance + ".$charge." WHERE id=".$dest_id.";";
-	$result = $db->rawQ($query, $dbcnx);
-	if (mysql_errno())
-		fail();
 */
 
 	setLocation("../transactions.php?type=transfer&edit=ok");
