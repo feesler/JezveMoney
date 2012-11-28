@@ -335,7 +335,7 @@ function onChangeTransCurr()
 ?>
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo(getCurSign($accCurr, $transAcc_id)); ?></span>
+		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo(getSign($accCurr, $trans_curr)); ?></span>
 <?php
 	if ($trans_type == 1 || $trans_type == 2)
 	{
@@ -356,7 +356,7 @@ function onChangeTransCurr()
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" style="margin-left: 5px;"><?php echo(getSign($accCurr, $trans_curr)); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $transAcc_id)); ?></span></td>
 		</tr>
 
 <?php

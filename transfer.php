@@ -209,7 +209,7 @@ function onFInput(obj)
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Transfer amount</span></td>
-		<td><input class="inp" id="amount" name="amount" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); ?></span></td>
+		<td><input class="inp" id="amount" name="amount" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
 		</tr>
 
 <?php
@@ -219,7 +219,7 @@ function onFInput(obj)
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); ?></span></td>
 		</tr>
 
 <?php

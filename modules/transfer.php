@@ -41,11 +41,17 @@ if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "t
 							array(NULL, $userid, $src_id, $dest_id, 3, $amount, $charge, $dest_curr_id, $fdate, $comment)))
 	fail();
 
+/*
 $srcBalance -= $amount;
+*/
+$srcBalance -= $charge;
 if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 	fail();
 
+/*
 $destBalance += $charge;
+*/
+$destBalance += $amount;
 if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 	fail();
 
