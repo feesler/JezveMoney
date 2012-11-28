@@ -146,7 +146,10 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 		{
 			$valfmt = currFormat($value, $key);
 			$currname = getCurrencyName($key);
-			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td style=\"text-align: right;\">".$valfmt."</td><td></td></tr>";
+			$resStr .= "<tr><td>Total</td><td>".$currname."</td><td style=\"text-align: right;\">".$valfmt."</td>";
+			if ($editlink == TRUE)
+				$resStr .= "<td></td>";
+			$resStr .= "</tr>";
 		}
 	}
 
