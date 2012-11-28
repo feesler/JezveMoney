@@ -45,6 +45,27 @@
 	</td>
 	</tr>
 
+<?php
+	if (isset($_GET["edit"]))
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+		if ($_GET["edit"] == "ok")
+			echo("<span style=\"color: #20FF20;\">Transaction successfully updated.</span>");
+		else if ($_GET["edit"] == "fail")
+			echo("<span style=\"color: #FF2020;\">Fail to updated transaction.</span>");
+		echo("</td></tr>");
+	}
+	else if (isset($_GET["del"]))
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+		if ($_GET["del"] == "ok")
+			echo("<span style=\"color: #20FF20;\">Transaction successfully deleted.</span>");
+		else if ($_GET["del"] == "fail")
+			echo("<span style=\"color: #FF2020;\">Fail to delete transaction.</span>");
+		echo("</td></tr>");
+	}
+?>
+
 	<tr>
 	<td>
 	<table class="infotable">
