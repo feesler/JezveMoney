@@ -143,12 +143,6 @@ if ($trans_type == 1)	// spend
 	$srcBalance -= $charge;
 	if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 		fail();
-/*
-	$query = "UPDATE accounts SET balance = balance - ".$charge." WHERE id=".$src_id.";";
-	$result = $db->rawQ($query);
-	if (mysql_errno())
-		fail();
-*/
 
 	setLocation("../transactions.php?type=expense&edit=ok");
 }
@@ -161,42 +155,19 @@ else if ($trans_type == 2)	// income
 	$destBalance += $charge;
 	if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 		fail();	
-/*
-	$query = "UPDATE accounts SET balance = balance + ".$charge." WHERE id=".$dest_id.";";
-	$result = $db->rawQ($query);
-	if (mysql_errno())
-		fail();
-*/
 
 	setLocation("../transactions.php?type=income&edit=ok");
 }
 else if ($trans_type == 3)	// transfer
 {
-/*
-	$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-	if (count($resArr) != 1)
-		fail();
-	$dest_curr_id = intval($resArr[0]["curr_id"]);		// currency of destination account is currency of transaction
-*/
-
 	if (!$db->updateQ("transactions", array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
 								array($src_id, $dest_id, 3, $amount, $charge, $dest_curr_id, $fdate, $comment), "id=".$trans_id))
 		fail();
 
-/*
-	$resArr = $db->selectQ("balance", "accounts", "id=".$src_id);
-	if (count($resArr == 1))
-		$balance = floatval($resArr[0]["balance"]);
-*/
 	$srcBalance -= $amount;
 	if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 		fail();
 
-/*
-	$resArr = $db->selectQ("balance", "accounts", "id=".$dest_id);
-	if (count($resArr == 1))
-		$balance = floatval($resArr[0]["balance"]);
-*/
 	$destBalance += $charge;
 	if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 		fail();
