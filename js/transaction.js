@@ -144,40 +144,8 @@ function onChangeAcc()
 	if ((!srcid && !destid) || !amount || !transcurr  || (!chargeoff && !receiptrow) || !exchange || !exchrate || (!charge && !receipt) || !chargesign || !amountsign)
 		return false;
 
-/*
-	amountCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
-*/
 	amountCurr = selectedValue(transcurr);
 	chargeCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
-
-/*
-	if (amountCurr == chargeCurr)
-	{
-		if (receiptrow)
-			receiptrow.style.display = 'none';
-		else
-			chargeoff.style.display = 'none';
-		exchange.style.display = 'none';
-		exchrate.value = 1;
-		if (receipt)
-			receipt.value = amount.value;
-		else
-			charge.value = amount.value;
-
-		getValues();
-		f5();
-		f1();
-		setValues();
-	}
-	else
-	{
-		if (receiptrow)
-			receiptrow.style.display = '';
-		else
-			chargeoff.style.display = '';
-		exchange.style.display = '';
-	}
-*/
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);

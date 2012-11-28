@@ -65,17 +65,11 @@ function cancelTransaction($trans_id)
 	else if ($transType == 3)		// transfer
 	{
 		// update balance of source account
-/*
-		$srcBalance += $transAmount;
-*/
 		$srcBalance += $transCharge;
 		if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 			return FALSE;
 
 		// update balance of destination account
-/*
-		$destBalance -= $transCharge;
-*/
 		$destBalance -= $transAmount;
 		if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 			return FALSE;
