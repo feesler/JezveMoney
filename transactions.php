@@ -112,7 +112,7 @@
 
 				echo("<td>".$fdate."</td>");
 				echo("<td>".$row["comment"]."</td>");
-				echo("<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a></td>");
+				echo("<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a> <a href=\"./deltransaction.php?id=".$row["id"]."\">delete</a></td>");
 				echo("</tr>");
 			}
 		}
