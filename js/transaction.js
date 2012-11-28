@@ -306,7 +306,7 @@ function onChangeSource()
 	if (src.selectedIndex == dest.selectedIndex)
 	{
 		if (dest.selectedIndex == 0)
-			dest.selectedIndex = accounts - 1;
+			dest.selectedIndex = accounts.length - 1;
 		else
 			dest.selectedIndex--;
 	}
@@ -327,7 +327,7 @@ function onChangeDest()
 
 	if (src.selectedIndex == dest.selectedIndex)
 	{
-		if (src.selectedIndex == accounts - 1)
+		if (src.selectedIndex == accounts.length - 1)
 			src.selectedIndex = 0;
 		else
 			src.selectedIndex++;
