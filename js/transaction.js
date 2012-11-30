@@ -8,6 +8,27 @@ function selectedValue(selectObj)
 }
 
 
+// Select item with specified value if exist
+function selectByValue(selectObj, selValue)
+{
+	var i;
+
+	if (!selectObj || !selectObj.options)
+		return -1;
+
+	for(i = 0, l = selectObj.options.length; i < l; i++)
+	{
+		if (selectObj.options[i] && selectObj.options[i].value == selValue)
+		{
+			selectObj.selectedIndex = i;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 // Retunr sign of specified currency
 function getCurrencySign(curr_id)
 {
@@ -144,8 +165,37 @@ function onChangeAcc()
 	if ((!srcid && !destid) || !amount || !transcurr  || (!chargeoff && !receiptrow) || !exchange || !exchrate || (!charge && !receipt) || !chargesign || !amountsign)
 		return false;
 
+/*
 	amountCurr = selectedValue(transcurr);
+*/
 	chargeCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
+
+	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
+		selectByValue(transcurr, chargeCurr);		// update currency of transaction
+
+	amountCurr = selectedValue(transcurr);
+
+	if (amountCurr == chargeCurr)
+	{
+		if (receiptrow)
+			receiptrow.style.display = 'none';
+		else
+			chargeoff.style.display = 'none';
+		exchange.style.display = 'none';
+		exchrate.value = 1;
+		if (receipt)
+			receipt.value = amount.value;
+		else
+			charge.value = amount.value;
+
+		getValues();
+		f5();
+		f1();
+		setValues();
+	}
+
+	trans_curr = amountCurr;
+	trans_acc_curr = chargeCurr;
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);

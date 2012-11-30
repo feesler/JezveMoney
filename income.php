@@ -23,6 +23,9 @@
 	$dest_id = count($accCurr) ? $accCurr[0]["id"] : 0;
 
 	echo(getCurrencyArray());
+
+	echo("var trans_curr = ".$accCurr[0]["curr_id"].";\r\n");
+	echo("var trans_acc_curr = ".$accCurr[0]["curr_id"].";\r\n");
 ?>
 
 
@@ -205,6 +208,7 @@ function onChangeTransCurr()
 		exchange.style.display = '';
 	}
 
+	trans_curr = amountCurr;
 
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
