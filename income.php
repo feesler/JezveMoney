@@ -48,19 +48,19 @@ function f5(){	e = d / a;		}
 
 function getValues()
 {
-	var destid, amount, receipt, exchrate, resbal;
+	var destid, amount, charge, exchrate, resbal;
 
 	destid = ge('destid');
 	amount = ge('amount');
-	receipt = ge('receipt');
+	charge = ge('charge');
 	exchrate = ge('exchrate');
 	resbal = ge('resbal');
-	if (!destid || !amount || !receipt || !exchrate || !resbal)
+	if (!destid || !amount || !charge || !exchrate || !resbal)
 		return;
 
 	S1 = getBalanceOfAccount(selectedValue(destid));
 	a = amount.value;
-	d = receipt.value;
+	d = charge.value;
 	e = exchrate.value;
 	S2 = resbal.value;
 }
@@ -68,17 +68,17 @@ function getValues()
 
 function setValues()
 {
-	var amount, receipt, exchrate, resbal;
+	var amount, charge, exchrate, resbal;
 
 	amount = ge('amount');
-	receipt = ge('receipt');
+	charge = ge('charge');
 	exchrate = ge('exchrate');
 	resbal = ge('resbal');
-	if (!amount || !receipt || !exchrate || !resbal)
+	if (!amount || !charge || !exchrate || !resbal)
 		return;
 
 	amount.value = a;
-	receipt.value = d;
+	charge.value = d;
 	exchrate.value = e;
 	resbal.value = S2;
 }
@@ -100,7 +100,7 @@ function onFInput(obj)
 
 	if (s1valid && s2valid && dvalid && evalid && avalid)
 	{
-		if (obj.id == 'receipt')		// d is changed, update S2 and e
+		if (obj.id == 'charge')		// d is changed, update S2 and e
 		{
 			f5();
 			f1();
@@ -162,20 +162,19 @@ function onFInput(obj)
 
 function onChangeTransCurr()
 {
-	var destid, amount, transcurr, receiptrow, exchange, exchrate, charge, receipt, chargesign, amountsign;
+	var destid, amount, transcurr, chargeoff, exchange, exchrate, charge, chargesign, amountsign;
 	var amountCurr, chargeCurr;
 
 	destid = ge('destid');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
-	receiptrow = ge('receiptrow');
+	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
-	receipt = ge('receipt');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if (!destid || !amount || !transcurr || !receiptrow || !exchange || !exchrate || (!charge && !receipt) || !chargesign || !amountsign)
+	if (!destid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
 		return;
 
 	amountCurr = selectedValue(transcurr);
@@ -183,16 +182,10 @@ function onChangeTransCurr()
 
 	if (amountCurr == chargeCurr)
 	{
-		if (receiptrow)
-			receiptrow.style.display = 'none';
-		else
-			chargeoff.style.display = 'none';
+		chargeoff.style.display = 'none';
 		exchange.style.display = 'none';
 		exchrate.value = 1;
-		if (receipt)
-			receipt.value = amount.value;
-		else
-			charge.value = amount.value;
+		charge.value = amount.value;
 
 		getValues();
 		f5();
@@ -201,10 +194,7 @@ function onChangeTransCurr()
 	}
 	else
 	{
-		if (receiptrow)
-			receiptrow.style.display = '';
-		else
-			chargeoff.style.display = '';
+		chargeoff.style.display = '';
 		exchange.style.display = '';
 	}
 
@@ -263,9 +253,9 @@ function onChangeTransCurr()
 		</td>
 		</tr>
 
-		<tr id="receiptrow" style="display: none;">
+		<tr id="chargeoff" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Receipt</span></td>
-		<td><input class="inp" id="receipt" name="receipt" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
+		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
 		</tr>
 
 		<tr id="exchange" style="display: none;">

@@ -147,46 +147,38 @@ function onEditTransSubmit(frm)
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, receiptrow, amountsign, exchange, exchrate, charge, receipt, chargesign;
-	var amountCurr;
+	var srcid, destid, amount, transcurr, chargeoff, amountsign, exchange, exchrate, charge, chargesign;
+	var sync = false;
 
 	srcid = ge('srcid');
 	destid = ge('destid');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
-	receiptrow = ge('receiptrow');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
-	receipt = ge('receipt');
 	chargesign = ge('chargesign');
 	amountsign = ge('amountsign');
-	if ((!srcid && !destid) || !amount || !transcurr  || (!chargeoff && !receiptrow) || !exchange || !exchrate || (!charge && !receipt) || !chargesign || !amountsign)
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
 		return false;
 
-/*
-	amountCurr = selectedValue(transcurr);
-*/
-	chargeCurr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
-
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
-		selectByValue(transcurr, chargeCurr);		// update currency of transaction
+		sync = true;
 
-	amountCurr = selectedValue(transcurr);
+	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
+	if (sync)
+		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
-	if (amountCurr == chargeCurr)
+	trans_curr = selectedValue(transcurr);
+
+	// hide charge and exchange rate if new currencies is the same
+	if (trans_curr == trans_acc_curr)
 	{
-		if (receiptrow)
-			receiptrow.style.display = 'none';
-		else
-			chargeoff.style.display = 'none';
+		chargeoff.style.display = 'none';
 		exchange.style.display = 'none';
 		exchrate.value = 1;
-		if (receipt)
-			receipt.value = amount.value;
-		else
-			charge.value = amount.value;
+		charge.value = amount.value;
 
 		getValues();
 		f5();
@@ -194,11 +186,8 @@ function onChangeAcc()
 		setValues();
 	}
 
-	trans_curr = amountCurr;
-	trans_acc_curr = chargeCurr;
-
-	chargesign.innerHTML = getCurrencySign(chargeCurr);
-	amountsign.innerHTML = getCurrencySign(amountCurr);
+	chargesign.innerHTML = getCurrencySign(trans_acc_curr);
+	amountsign.innerHTML = getCurrencySign(trans_curr);
 }
 
 
