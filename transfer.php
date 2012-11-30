@@ -27,22 +27,6 @@
 
 	echo("var trans_type = 3;\r\n");
 ?>
-
-var S1;		// balance before transaction
-var a;		// amount in currency of transaction
-var d;		// charge off in currency of account
-var e;		// exchange rate
-var S2;		// balance after transaction
-
-// Main formula
-// S2 = S1 - d
-// d = a * e
-
-function f1(){	S2 = S1 - d;	}
-function f2(){	d = a * e;		}
-function f3(){	d = S1 - S2;	}
-function f4(){	a = d / e;		}
-function f5(){	e = d / a;		}
 </script>
 </head>
 <body>

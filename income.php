@@ -28,24 +28,6 @@
 	echo("var trans_acc_curr = ".$accCurr[0]["curr_id"].";\r\n");
 	echo("var trans_type = 2;\r\n");
 ?>
-
-
-var S1;		// balance before transaction
-var a;		// amount in currency of transaction
-var d;		// receipt in currency of account
-var e;		// exchange rate
-var S2;		// balance after transaction
-
-// Main formula
-// S2 = S1 - d
-// d = a * e
-
-
-function f1(){	S2 = S1 + d;	}
-function f2(){	d = a * e;		}
-function f3(){	d = S2 - S1;	}
-function f4(){	a = d / e;		}
-function f5(){	e = d / a;		}
 </script>
 </head>
 <body>

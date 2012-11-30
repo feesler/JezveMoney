@@ -1,3 +1,55 @@
+var S1;		// balance before transaction
+var a;		// amount in currency of transaction
+var d;		// charge off/receipt in currency of account
+var e;		// exchange rate
+var S2;		// balance after transaction
+
+// Main formula
+// S2 = S1 - d		for expense/transfer
+// S2 = S1 + d		for income
+// d = a * e
+
+// Calculate charge off/receipt amount by initial and result balance
+function f1()
+{
+	if (trans_type == 2)		// income
+		S2 = S1 + d;
+	else
+		S2 = S1 - d;
+}
+
+
+// Calculate charge off/receipt amount by transaction amount and exchange rate
+function f2()
+{
+	d = a * e;
+}
+
+
+// Calculate charge off/receipt amount by initial and result balance
+function f3()
+{
+	if (trans_type == 2)		// income
+		d = S2 - S1;
+	else
+		d = S1 - S2;
+}
+
+
+// Calculate transaction amount by charge off/receipt and exchange rate
+function f4()
+{
+	a = d / e;
+}
+
+
+// Calculate exchange rate by charge off/receipt and transaction amount
+function f5()
+{
+	e = d / a;
+}
+
+
 // Return value of selected option of select object
 function selectedValue(selectObj)
 {
