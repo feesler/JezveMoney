@@ -80,6 +80,15 @@ function getBalanceOfAccount(account_id)
 }
 
 
+// Set currency sign for amount or charge field
+function setSign(isAmount, curr_id)
+{
+	var signobj = ge((isAmount=== true) ? 'amountsign' : 'chargesign');
+	if (signobj)
+		signobj.innerHTML = getCurrencySign(curr_id);
+}
+
+
 // Spend/Income transaction event handler
 function onSubmit(frm)
 {
@@ -147,7 +156,7 @@ function onEditTransSubmit(frm)
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, amountsign, exchange, exchrate, charge, chargesign;
+	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, charge;
 	var sync = false;
 
 	srcid = ge('srcid');
@@ -158,9 +167,7 @@ function onChangeAcc()
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
-	chargesign = ge('chargesign');
-	amountsign = ge('amountsign');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
@@ -189,8 +196,8 @@ function onChangeAcc()
 		}
 	}
 
-	chargesign.innerHTML = getCurrencySign(trans_acc_curr);
-	amountsign.innerHTML = getCurrencySign(trans_curr);
+	setSign(false, trans_acc_curr);
+	setSign(true, trans_curr);
 }
 
 
@@ -266,7 +273,7 @@ function onTransferSubmit(frm)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, chargeoff, exchange, amountsign, chargesign, resbal, dstyle;
+	var src, dest, amount, charge, exchrate, chargeoff, exchange, resbal, dstyle;
 
 	src = ge('srcid');
 	dest = ge('destid');
@@ -275,10 +282,8 @@ function updControls()
 	exchrate = ge('exchrate');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
-	chargesign = ge('chargesign');
-	amountsign = ge('amountsign');
 	resbal = ge('resbal');
-	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !amountsign || !chargesign || !resbal)
+	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal)
 		return;
 
 	exchange.value = '';
@@ -302,8 +307,8 @@ function updControls()
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
 	chargeCurr = getCurrencyOfAccount(selectedValue(src));
 
-	chargesign.innerHTML = getCurrencySign(chargeCurr);
-	amountsign.innerHTML = getCurrencySign(amountCurr);
+	setSign(false, chargeCurr);
+	setSign(true, amountCurr);
 }
 
 
@@ -517,7 +522,7 @@ function onFInput(obj)
 // Currency of transaction change event handler
 function onChangeTransCurr()
 {
-	var accid, amount, transcurr, chargeoff, exchange, exchrate, charge, chargesign, amountsign;
+	var accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
 	var amountCurr, chargeCurr;
 
 	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
@@ -527,9 +532,7 @@ function onChangeTransCurr()
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
-	chargesign = ge('chargesign');
-	amountsign = ge('amountsign');
-	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !charge || !chargesign || !amountsign)
+	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !charge)
 		return;
 	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
 		return
@@ -560,6 +563,6 @@ function onChangeTransCurr()
 
 	trans_curr = amountCurr;
 
-	chargesign.innerHTML = getCurrencySign(chargeCurr);
-	amountsign.innerHTML = getCurrencySign(amountCurr);
+	setSign(false, chargeCurr);
+	setSign(true, amountCurr);
 }
