@@ -24,6 +24,8 @@
 	$dest_id = (count($accCurr) > 1) ? $accCurr[1]["id"] : 0;
 
 	echo(getCurrencyArray());
+
+	echo("var trans_type = 3;\r\n");
 ?>
 
 var S1;		// balance before transaction
@@ -43,6 +45,7 @@ function f3(){	d = S1 - S2;	}
 function f4(){	a = d / e;		}
 function f5(){	e = d / a;		}
 
+/*
 function getValues()
 {
 	var srcid, amount, charge, exchrate, resbal;
@@ -163,6 +166,7 @@ function onFInput(obj)
 
 	return true;
 }
+*/
 
 </script>
 </head>

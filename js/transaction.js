@@ -392,7 +392,7 @@ function getValues()
 {
 	var accid, amount, charge, exchrate, resbal;
 
-	accid = ge((trans_type == 1) ? 'srcid' : 'destid');
+	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
@@ -517,7 +517,7 @@ function onChangeTransCurr()
 	var accid, amount, transcurr, chargeoff, exchange, exchrate, charge, chargesign, amountsign;
 	var amountCurr, chargeCurr;
 
-	accid = ge((trans_type == 1) ? 'srcid' : 'destid');
+	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
