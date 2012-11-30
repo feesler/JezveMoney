@@ -181,9 +181,12 @@ function onChangeAcc()
 		charge.value = amount.value;
 
 		getValues();
-		f5();
-		f1();
-		setValues();
+		if (d !== '' && a !== '')
+		{
+			f5();
+			f1();
+			setValues();
+		}
 	}
 
 	chargesign.innerHTML = getCurrencySign(trans_acc_curr);
@@ -542,9 +545,12 @@ function onChangeTransCurr()
 		charge.value = amount.value;
 
 		getValues();
-		f5();
-		f1();
-		setValues();
+		if (d !== '' && a !== '')
+		{
+			f5();
+			f1();
+			setValues();
+		}
 	}
 	else
 	{
