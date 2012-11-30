@@ -26,6 +26,7 @@
 
 	echo("var trans_curr = ".$accCurr[0]["curr_id"].";\r\n");
 	echo("var trans_acc_curr = ".$accCurr[0]["curr_id"].";\r\n");
+	echo("var trans_type = 2;\r\n");
 ?>
 
 
@@ -46,6 +47,7 @@ function f3(){	d = S2 - S1;	}
 function f4(){	a = d / e;		}
 function f5(){	e = d / a;		}
 
+/*
 function getValues()
 {
 	var destid, amount, charge, exchrate, resbal;
@@ -203,6 +205,7 @@ function onChangeTransCurr()
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
 }
+*/
 </script>
 </head>
 <body>
