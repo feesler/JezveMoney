@@ -4,6 +4,8 @@ var d;		// charge off/receipt in currency of account
 var e;		// exchange rate
 var S2;		// balance after transaction
 
+var s1valid, s2valid, dvalid, evalid, avalid;
+
 // Main formula
 // S2 = S1 - d		for expense/transfer
 // S2 = S1 + d		for income
@@ -465,6 +467,24 @@ function getValues()
 	d = charge.value;
 	e = exchrate.value;
 	S2 = resbal.value;
+
+	s1valid = (S1 !== '');
+	s2valid = (S2 !== '');
+	dvalid = (d !== '');
+	evalid = (e !== '');
+	avalid = (a !== '');
+
+	if (s1valid)
+		S1 = parseFloat(S1);
+	if (s2valid)
+		S2 = parseFloat(S2);
+	if (dvalid)
+		d = parseFloat(d);
+	if (evalid)
+		e = parseFloat(e);
+	if (avalid)
+		a = parseFloat(a);
+
 }
 
 
@@ -490,16 +510,7 @@ function setValues()
 // Field input event handler
 function onFInput(obj)
 {
-	var s1valid, s2valid, dvalid, evalid, avalid;
-
 	getValues();
-
-	s1valid = (S1 !== '');
-	s2valid = (S2 !== '');
-	dvalid = (d !== '');
-	evalid = (e !== '');
-	avalid = (a !== '');
-
 
 	if (s1valid && s2valid && dvalid && evalid && avalid)
 	{
