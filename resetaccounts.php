@@ -17,7 +17,7 @@ $userid = checkUser("./login.php");
 </head>
 <body>
 <table class="maintable">
-	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
 
 <?php
 	require_once("./templates/userblock.php");

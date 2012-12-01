@@ -50,7 +50,7 @@ function onSubmit()
 <body>
 <form id="loginfrm" name="loginfrm" method="post" action="" onsubmit="return onSubmit()">
 <table align="center" valign="center" style="width: 100%; height: 100%;">
-	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
 <?php
 	if ($_GET["act"] == "wrong")
 		echo("<tr><td>Wrong login/password. Please check it and try to retype again.</td></tr>");

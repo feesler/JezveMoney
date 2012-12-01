@@ -16,7 +16,7 @@
 </head>
 <body>
 <table class="maintable">
-	<tr><td style="width: 500px;"><h1 class="maintitle">jezve Money - Accounts</h1></td></tr>
+	<tr><td><h1 class="maintitle">jezve Money - Accounts</h1></td></tr>
 <?php
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
