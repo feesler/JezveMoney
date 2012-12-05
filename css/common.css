@@ -121,3 +121,10 @@ a:hover
 {
 	background-color: #E0E0E0;
 }
+
+
+.currsign
+{
+	margin: 0 5px;
+	float: left;
+}
