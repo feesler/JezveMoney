@@ -58,7 +58,7 @@
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-			<select class="inp" id="srcid" name="srcid" onchange="onChangeAcc();">
+			<select class="sel" id="srcid" name="srcid" onchange="onChangeAcc();">
 <?php
 	echo(getAccountsList($userid, $src_id));
 ?>
@@ -69,7 +69,7 @@
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Amount to spend</span></td>
 		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" style="margin-left: 5px; margin-right: 5px;"><?php echo(getCurSign($accCurr, $src_id)); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
-			<select class="inp" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
+			<select class="sel" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
 	echo(getCurrencyList(getCurrId($accCurr, $src_id)));
 ?>

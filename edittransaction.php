@@ -301,7 +301,7 @@ function onChangeTransCurr()
 		else
 			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select class=\"inp\" id=\"srcid\" name=\"srcid\" onchange=\"");
+		echo("\t\t\t<select class=\"sel\" id=\"srcid\" name=\"srcid\" onchange=\"");
 		if ($trans_type == 1)
 			echo("onChangeAcc();");
 		else
@@ -321,7 +321,7 @@ function onChangeTransCurr()
 		else
 			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select class=\"inp\" id=\"destid\" name=\"destid\" onchange=\"");
+		echo("\t\t\t<select class=\"sel\" id=\"destid\" name=\"destid\" onchange=\"");
 		if ($trans_type == 2)
 			echo("onChangeAcc();");
 		else
@@ -349,7 +349,7 @@ function onChangeTransCurr()
 	if ($trans_type == 1 || $trans_type == 2)
 	{
 		echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
-		echo("\t\t\t<select class=\"inp\" id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
+		echo("\t\t\t<select class=\"sel\" id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
 		echo(getCurrencyList($trans_curr));
 		echo("</select>");
 	}

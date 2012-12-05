@@ -67,6 +67,7 @@ a:hover
 	padding: 2px 20px;
 	height: 30px;
 	display: inline-block;
+	float: left;
 }
 
 
@@ -77,6 +78,18 @@ a:hover
 	padding: 2px 5px;
 	height: 22px;
 	display: inline-block;
+	float: left;
+}
+
+
+.sel
+{
+	font-family: Verdana, sans-serif;
+	font-weight: bold;
+	padding: 2px 5px;
+	height: 30px;
+	display: inline-block;
+	float: left;
 }
 
 

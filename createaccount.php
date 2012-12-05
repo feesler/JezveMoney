@@ -67,7 +67,7 @@ function onSubmit(frm)
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
-			<td><select class="inp" id="acccurr" name="acccurr">
+			<td><select class="sel" id="acccurr" name="acccurr">
 <?php
 	echo(getCurrencyList());
 ?>

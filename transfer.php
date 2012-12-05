@@ -59,7 +59,7 @@
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Source account</span></td>
 		<td>
-			<select class="inp" id="srcid" name="srcid" onchange="onChangeSource();">
+			<select class="sel" id="srcid" name="srcid" onchange="onChangeSource();">
 <?php
 	echo(getAccountsList($userid, $src_id));
 ?>
@@ -70,7 +70,7 @@
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Destination account</span></td>
 		<td>
-			<select class="inp" id="destid" name="destid" onchange="onChangeDest();">
+			<select class="sel" id="destid" name="destid" onchange="onChangeDest();">
 <?php
 	echo(getAccountsList($userid, $dest_id));
 ?>

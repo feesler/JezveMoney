@@ -26,7 +26,7 @@ a, a:visited
 }
 
 
-.inp
+.inp, .sel
 {
 	border: 2px solid #000000;
 	background-color: #FFFFFF;
