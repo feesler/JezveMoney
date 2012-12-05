@@ -4,6 +4,7 @@ var d;		// charge off/receipt in currency of account
 var e;		// exchange rate
 var S2;		// balance after transaction
 
+var fS1, fa, fd, fe, fS2;	// parsed float values
 var s1valid, s2valid, dvalid, evalid, avalid;
 
 // Main formula
@@ -15,16 +16,16 @@ var s1valid, s2valid, dvalid, evalid, avalid;
 function f1()
 {
 	if (trans_type == 2)		// income
-		S2 = S1 + d;
+		fS2 = S2 = fS1 + fd;
 	else
-		S2 = S1 - d;
+		fS2 = S2 = fS1 - fd;
 }
 
 
 // Calculate charge off/receipt amount by transaction amount and exchange rate
 function f2()
 {
-	d = a * e;
+	fd = d = fa * fe;
 }
 
 
@@ -32,23 +33,23 @@ function f2()
 function f3()
 {
 	if (trans_type == 2)		// income
-		d = S2 - S1;
+		fd = d = fS2 - fS1;
 	else
-		d = S1 - S2;
+		fd = d = fS1 - fS2;
 }
 
 
 // Calculate transaction amount by charge off/receipt and exchange rate
 function f4()
 {
-	a = d / e;
+	fa = a = fd / fe;
 }
 
 
 // Calculate exchange rate by charge off/receipt and transaction amount
 function f5()
 {
-	e = d / a;
+	fe = e = fd / fa;
 }
 
 
@@ -474,17 +475,11 @@ function getValues()
 	evalid = (e !== '');
 	avalid = (a !== '');
 
-	if (s1valid)
-		S1 = parseFloat(S1);
-	if (s2valid)
-		S2 = parseFloat(S2);
-	if (dvalid)
-		d = parseFloat(d);
-	if (evalid)
-		e = parseFloat(e);
-	if (avalid)
-		a = parseFloat(a);
-
+	fS1 = (s1valid) ? parseFloat(S1) : S1;
+	fS2 = (s2valid) ? parseFloat(S2) : S2;
+	fd = (dvalid) ? parseFloat(d) : d;
+	fe = (evalid) ? parseFloat(e) : e;
+	fa = (avalid) ? parseFloat(a) : a;
 }
 
 
@@ -530,7 +525,7 @@ function onFInput(obj)
 			f1();
 		}
 	}
-	else if (e == 1)		// account currency is the same as operation currency
+	else if (fe == 1)		// account currency is the same as operation currency
 	{
 		if (obj.id == 'charge')		// d is changed, update S2 and e
 		{
@@ -539,7 +534,7 @@ function onFInput(obj)
 		}
 		else
 		{
-			d = a;
+			fd = d = fa;
 			f1();
 		}
 	}
