@@ -136,7 +136,7 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 
 			$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
 			if ($editlink == TRUE)
-				$resStr .= "<td><a href=\"./editaccount.php?id=".$row["id"]."\">edit</a></td>";
+				$resStr .= "<td><a href=\"./editaccount.php?id=".$row["id"]."\">edit</a> <a href=\"./checkbalance.php?id=".$row["id"]."\">check</a></td>";
 			$resStr .= "</tr>\r\n";
 		}
 
