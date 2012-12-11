@@ -1,3 +1,4 @@
+
 	<tr>
 	<td class="submenu">
 <?php
@@ -7,6 +8,7 @@
 
 		if (!is_array($arr))
 			return FALSE;
+		$dir = "/money/";
 
 		foreach($arr as $key => $value)
 		{
@@ -24,6 +26,7 @@
 
 		if (!is_array($arr))
 			return;
+		$dir = "/money/";
 
 		foreach($arr as $key => $value)
 		{
@@ -40,7 +43,7 @@
 	$subMenuArr = array("Spend" => "expense.php", "Income" => "income.php", "Transfer" => "transfer.php");
 
 	if (isInArray($subMenuArr))
-		showSubMenu(($subMenuArr);
+		showSubMenu($subMenuArr);
 
 ?>
 	</td>
