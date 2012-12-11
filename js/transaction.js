@@ -16,16 +16,20 @@ var s1valid, s2valid, dvalid, evalid, avalid;
 function f1()
 {
 	if (trans_type == 2)		// income
-		fS2 = S2 = fS1 + fd;
+		S2 = fS1 + fd;
 	else
-		fS2 = S2 = fS1 - fd;
+		S2 = fS1 - fd;
+
+	fS2 = S2;
 }
 
 
 // Calculate charge off/receipt amount by transaction amount and exchange rate
 function f2()
 {
-	fd = d = fa * fe;
+	d = fa * fe;
+
+	fd = d;
 }
 
 
@@ -33,23 +37,29 @@ function f2()
 function f3()
 {
 	if (trans_type == 2)		// income
-		fd = d = fS2 - fS1;
+		d = fS2 - fS1;
 	else
-		fd = d = fS1 - fS2;
+		d = fS1 - fS2;
+
+	fd = d;
 }
 
 
 // Calculate transaction amount by charge off/receipt and exchange rate
 function f4()
 {
-	fa = a = fd / fe;
+	a = fd / fe;
+
+	fa = a;
 }
 
 
 // Calculate exchange rate by charge off/receipt and transaction amount
 function f5()
 {
-	fe = e = fd / fa;
+	e = fd / fa;
+
+	fe = e;
 }
 
 
@@ -502,11 +512,84 @@ function setValues()
 }
 
 
+// Amount field input event handler
+function onAmountInput()
+{
+	if (!s1valid)
+		return;
+
+	if (evalid)
+	{
+		f2();		// calculate d
+		f1();		// calculate S2
+	}
+	else if (dvalid)
+		f5();		// calculate e
+}
+
+
+// Charge/receipt field input event handler
+function onChargeInput()
+{
+	if (!s1valid)
+		return;
+
+	f1();			// calculate S2
+	if (avalid)
+		f5();		// calculate e
+	else if (evalid)
+		f4();		// calculate a
+}
+
+
+// Exchange rate field input event handler
+function onExchangeInput()
+{
+	if (!s1valid)
+		return;
+
+	if (avalid)
+	{
+		f2();		// calculate d
+		f1();		// calculate S2
+	}
+	else if (dvalid)
+		f4();		// calculate a
+}
+
+
+// Result balance field input event handler
+function onResBalanceInput()
+{
+	if (!s1valid)
+		return;
+
+	f3();		// calculate d
+
+	if (evalid)
+		f4();				// calculate a
+	else if (avalid)
+		f5();				// calculate e
+}
+
+
+
 // Field input event handler
 function onFInput(obj)
 {
 	getValues();
 
+	if (obj.id == 'amount')
+		onAmountInput();
+	else if (obj.id == 'charge')
+		onChargeInput();
+	else if (obj.id == 'exchrate')
+		onExchangeInput();
+	else if (obj.id == 'resbal')
+		onResBalanceInput();
+
+
+/*
 	if (s1valid && s2valid && dvalid && evalid && avalid)
 	{
 		if (obj.id == 'charge')		// d is changed, update S2 and e
@@ -571,6 +654,7 @@ function onFInput(obj)
 		}
 	}
 
+*/
 	setValues();
 
 	return true;
