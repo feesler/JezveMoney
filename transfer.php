@@ -37,9 +37,7 @@
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
 	require_once("./templates/submenu.php");
-?>
 
-<?php
 	echo(getAccountsTable($userid, TRUE));
 
 	$accounts = $db->countQ("accounts", "user_id=".$userid);

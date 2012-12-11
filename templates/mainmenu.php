@@ -1,8 +1,6 @@
 	<tr>
 	<td class="mainmenu">
 <?php
-	$ruri = $_SERVER["REQUEST_URI"];
-
 	$menuArr = array("Main" => "index.php", "Accounts" => "accounts.php", "Transactions" => "transactions.php");
 	$dir = "/money/";
 
