@@ -565,13 +565,11 @@ function onResBalanceInput()
 		return;
 
 	f3();		// calculate d
-
 	if (evalid)
 		f4();				// calculate a
 	else if (avalid)
 		f5();				// calculate e
 }
-
 
 
 // Field input event handler
@@ -588,73 +586,6 @@ function onFInput(obj)
 	else if (obj.id == 'resbal')
 		onResBalanceInput();
 
-
-/*
-	if (s1valid && s2valid && dvalid && evalid && avalid)
-	{
-		if (obj.id == 'charge')		// d is changed, update S2 and e
-		{
-			f5();
-			f1();
-		}
-		else if (obj.id == 'resbal')	// S2 is changed, update d and e
-		{
-			f3();
-			f5();
-		}
-		else if (obj.id == 'amount' || obj.id == 'exchrate')	// a or e is changed, update S2 and d
-		{
-			f2();
-			f1();
-		}
-	}
-	else if (fe == 1)		// account currency is the same as operation currency
-	{
-		if (obj.id == 'charge')		// d is changed, update S2 and e
-		{
-			f5();
-			f1();
-		}
-		else
-		{
-			fd = d = fa;
-			f1();
-		}
-	}
-	else				// account currency is different from operation currency
-	{
-		if (s1valid && evalid && s2valid)
-		{
-			f3();
-			f4();
-		}
-		else if (s1valid && evalid && avalid)
-		{
-			f2();
-			f1();
-		}
-		else if (s1valid && evalid && dvalid)
-		{
-			f1();
-			f4();
-		}
-		else if (s1valid && s2valid && avalid)
-		{
-			f3();
-			f5();
-		}
-		else if (s1valid && s2valid && dvalid && !evalid && !avalid)
-		{
-			return;
-		}
-		else if (s1valid && avalid && dvalid)
-		{
-			f1();
-			f5();
-		}
-	}
-
-*/
 	setValues();
 
 	return true;
