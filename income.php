@@ -36,13 +36,8 @@
 <?php
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
+	require_once("./templates/submenu.php");
 ?>
-
-	<tr>
-	<td class="submenu">
-	<span><a href="./expense.php">Spend</a></span><span><b>Income</b></span><span><a href="./transfer.php">Transfer</a></span>
-	</td>
-	</tr>
 
 <?php
 	echo(getAccountsTable($userid));
