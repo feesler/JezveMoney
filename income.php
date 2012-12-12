@@ -27,6 +27,7 @@
 	echo("var trans_curr = ".$accCurr[0]["curr_id"].";\r\n");
 	echo("var trans_acc_curr = ".$accCurr[0]["curr_id"].";\r\n");
 	echo("var trans_type = 2;\r\n");
+	echo("var edit_mode = false;\r\n");
 ?>
 </script>
 </head>

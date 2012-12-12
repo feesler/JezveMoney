@@ -26,6 +26,7 @@
 	echo(getCurrencyArray());
 
 	echo("var trans_type = 3;\r\n");
+	echo("var edit_mode = false;\r\n");
 ?>
 </script>
 </head>

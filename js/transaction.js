@@ -20,6 +20,8 @@ function f1()
 	else
 		S2 = fS1 - fd;
 
+	if (edit_mode)
+		S2 += (trans_type == 2) ? -transaction.charge : transaction.charge;
 	fS2 = S2;
 }
 

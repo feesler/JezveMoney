@@ -62,9 +62,11 @@ $trans_chanrge = floatval($arr["charge"]);
 	echo("\tcurr_id : ".$trans_curr.",\r\n");
 	echo("\ttype : ".$trans_type."\r\n");
 	echo("};\r\n");
+	echo("var edit_mode = true;r\n");
+	echo("var trans_type = ".$trans_type.";\r\n");
 ?>
 
-
+/*
 var S1;		// balance before transaction
 var a;		// amount in currency of transaction
 var d;		// charge off in currency of account
@@ -208,7 +210,7 @@ function onFInput(obj)
 
 	return true;
 }
-
+*/
 
 function onChangeTransCurr()
 {
