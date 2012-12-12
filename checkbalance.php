@@ -6,6 +6,13 @@
 		echo($str."\r\n");
 	}
 
+
+	function htmlComm($str)
+	{
+		echo("<!-- ".$str." -->\r\n");
+	}
+
+
 	function fail()
 	{
 		ebr("fail");
@@ -27,11 +34,14 @@
 	ebr("<html>");
 	ebr("<head>");
 	ebr("<title>Check balance</title>");
+	ebr("<style>");
+	ebr("td{ padding: 2px 5px; }");
+	ebr("</style>");
 	ebr("</head>");
 	ebr("<body>");
 
 	ebr("<table>");
-	ebr("<tr><td colspan=\"3\">".getAccountName($checkAccount_id)."</td></tr>");
+	ebr("<tr><td colspan=\"6\">".getAccountName($checkAccount_id)."</td></tr>");
 
 	$resArr = $db->selectQ("*", "accounts", "id=".$checkAccount_id." AND user_id=".$userid);
 	if (count($resArr) != 1)
@@ -40,12 +50,77 @@
 	$initBalance = floatval($resArr[0]["initbalance"]);
 	$curBalance = floatval($resArr[0]["balance"]);
 
-	ebr("<tr><td colspan=\"3\">initBalance: ".$initBalance."</td></tr>");
-	ebr("<tr><td colspan=\"3\">curBalance: ".$curBalance."</td></tr>");
+	ebr("<tr><td colspan=\"6\">initBalance: ".$initBalance."</td></tr>");
+	ebr("<tr><td colspan=\"6\">curBalance: ".$curBalance."</td></tr>");
 	ebr();
 
 	$realBalance = $initBalance;
 
+
+	ebr("<tr><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td></tr>");
+
+	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3)) ORDER BY id ASC, date ASC");
+	foreach($resArr as $row)
+	{
+		$tr_type = intval($row["type"]);
+		$tr_src_id = intval($row["src_id"]);
+		$tr_dest_id = intval($row["dest_id"]);
+		$amount = floatval($row["amount"]);
+		$charge = floatval($row["charge"]);
+		$comment = $row["comment"];
+		$trdate = $row["date"];
+
+		echo("<tr>");
+
+		if ($tr_type == 1)				// expense
+		{
+			echo("<td>Expense</td><td");
+
+			if ($amount == $charge)
+				echo(" colspan=\"2\" align=\"center\">-".$charge."</td>");
+			else
+				echo(">-".$amount."</td><td style=\"background-color: #B0FFB0;\">-".$charge."</td>");
+
+			$realBalance -= $charge;
+		}
+		else if ($tr_type == 2)			// income
+		{
+			echo("<td>Income</td><td");
+
+			if ($amount == $charge)
+				echo(" colspan=\"2\" align=\"center\">+".$charge."</td>");
+			else
+				echo(">+".$amount."</td><td style=\"background-color: #B0FFB0;\">+".$charge."</td>");
+
+			$realBalance += $charge;
+		}
+		else if ($tr_type == 3 && $tr_dest_id == $checkAccount_id)			// transfer to
+		{
+			echo("<td>Transfer to</td><td");
+
+			if ($amount == $charge)
+				echo(" colspan=\"2\" align=\"center\">+".$charge."</td>");
+			else
+				echo(" style=\"background-color: #B0FFB0;\">+".$amount."</td><td>+".$charge."</td>");
+
+			$realBalance += $amount;
+		}
+		else if ($tr_type == 3 && $tr_src_id == $checkAccount_id)			// transfer from
+		{
+			echo("<td>Transfer from</td><td");
+
+			if ($amount == $charge)
+				echo(" colspan=\"2\" align=\"center\">-".$charge."</td>");
+			else
+				echo(">+".$amount."</td><td style=\"background-color: #B0FFB0;\">+".$charge."</td>");
+
+			$realBalance -= $charge;
+		}
+
+		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td></tr>");
+	}
+
+/*
 	// incomes
 	ebr();
 	ebr("<tr><td colspan=\"3\">incomes</td></tr>");
@@ -101,10 +176,11 @@
 		$realBalance += $amount;
 		ebr("<tr><td>+".$amount.(($charge != $amount) ? " (".$charge.")" : "")."</td><td>".$comment."</td><td>".$realBalance."</td></tr>");
 	}
+*/
 
-	ebr("<tr><td colspan=\"3\"></td></tr>");
-	ebr("<tr><td colspan=\"3\">realBalance: ".$realBalance."</td></tr>");
-	ebr("<tr><td colspan=\"3\">diference: ".($realBalance - $curBalance)."</td></tr>");
+	ebr("<tr><td colspan=\"6\"></td></tr>");
+	ebr("<tr><td colspan=\"6\">realBalance: ".$realBalance."</td></tr>");
+	ebr("<tr><td colspan=\"6\">diference: ".($realBalance - $curBalance)."</td></tr>");
 	ebr("</table>");
 
 	ebr("</body>");
