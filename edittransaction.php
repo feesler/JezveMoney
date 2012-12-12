@@ -63,6 +63,8 @@ $trans_chanrge = floatval($arr["charge"]);
 	echo("\ttype : ".$trans_type."\r\n");
 	echo("};\r\n");
 	echo("var edit_mode = true;r\n");
+	echo("var trans_curr = ".$trans_curr.";\r\n");
+	echo("var trans_acc_curr = ".$trans_curr.";\r\n");
 	echo("var trans_type = ".$trans_type.";\r\n");
 ?>
 
@@ -212,6 +214,7 @@ function onFInput(obj)
 }
 */
 
+/*
 function onChangeTransCurr()
 {
 	var srcid, amount, transcurr, chargeoff, exchange, exchrate, charge, chargesign, amountsign;
@@ -255,6 +258,7 @@ function onChangeTransCurr()
 	chargesign.innerHTML = getCurrencySign(chargeCurr);
 	amountsign.innerHTML = getCurrencySign(amountCurr);
 }
+*/
 </script>
 </head>
 <body>
