@@ -81,7 +81,7 @@
 			else
 				echo(">-".$amount."</td><td style=\"background-color: #B0FFB0;\">-".$charge."</td>");
 
-			$realBalance -= $charge;
+			$realBalance = round($realBalance - $charge, 2);
 		}
 		else if ($tr_type == 2)			// income
 		{
@@ -92,7 +92,7 @@
 			else
 				echo(">+".$amount."</td><td style=\"background-color: #B0FFB0;\">+".$charge."</td>");
 
-			$realBalance += $charge;
+			$realBalance = round($realBalance + $charge, 2);
 		}
 		else if ($tr_type == 3 && $tr_dest_id == $checkAccount_id)			// transfer to
 		{
@@ -103,7 +103,7 @@
 			else
 				echo(" style=\"background-color: #B0FFB0;\">+".$amount."</td><td>+".$charge."</td>");
 
-			$realBalance += $amount;
+			$realBalance = round($realBalance + $amount, 2);
 		}
 		else if ($tr_type == 3 && $tr_src_id == $checkAccount_id)			// transfer from
 		{
@@ -114,7 +114,7 @@
 			else
 				echo(">+".$amount."</td><td style=\"background-color: #B0FFB0;\">+".$charge."</td>");
 
-			$realBalance -= $charge;
+			$realBalance = round($realBalance - $charge, 2);
 		}
 
 		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td></tr>");
@@ -180,7 +180,7 @@
 
 	ebr("<tr><td colspan=\"6\"></td></tr>");
 	ebr("<tr><td colspan=\"6\">realBalance: ".$realBalance."</td></tr>");
-	ebr("<tr><td colspan=\"6\">diference: ".($realBalance - $curBalance)."</td></tr>");
+	ebr("<tr><td colspan=\"6\">diference: ".round($realBalance - $curBalance, 2)."</td></tr>");
 	ebr("</table>");
 
 	ebr("</body>");
