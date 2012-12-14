@@ -114,7 +114,7 @@
 			if ($amount == $charge)
 				echo(" colspan=\"2\" align=\"center\">-".$charge."</td>");
 			else
-				echo(">+".$amount."</td><td style=\"background-color: #B0FFB0;\">+".$charge."</td>");
+				echo(">-".$amount."</td><td style=\"background-color: #B0FFB0;\">-".$charge."</td>");
 
 			$realBalance = round($realBalance - $charge, 2);
 		}
