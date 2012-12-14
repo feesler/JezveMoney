@@ -41,7 +41,7 @@
 	ebr("<body>");
 
 	ebr("<table>");
-	ebr("<tr><td colspan=\"6\">".getAccountName($checkAccount_id)."</td></tr>");
+	ebr("<tr><td colspan=\"8\">".getAccountName($checkAccount_id)."</td></tr>");
 
 	$resArr = $db->selectQ("*", "accounts", "id=".$checkAccount_id." AND user_id=".$userid);
 	if (count($resArr) != 1)
@@ -50,18 +50,19 @@
 	$initBalance = floatval($resArr[0]["initbalance"]);
 	$curBalance = floatval($resArr[0]["balance"]);
 
-	ebr("<tr><td colspan=\"6\">initBalance: ".$initBalance."</td></tr>");
-	ebr("<tr><td colspan=\"6\">curBalance: ".$curBalance."</td></tr>");
+	ebr("<tr><td colspan=\"8\">initBalance: ".$initBalance."</td></tr>");
+	ebr("<tr><td colspan=\"8\">curBalance: ".$curBalance."</td></tr>");
 	ebr();
 
 	$realBalance = $initBalance;
 
 
-	ebr("<tr><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td></tr>");
+	ebr("<tr><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td><td>ID</td></tr>");
 
-	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3)) ORDER BY id ASC, date ASC");
+	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3))", NULL, "pos" /*"ORDER BY id ASC, date ASC"*/);
 	foreach($resArr as $row)
 	{
+		$tr_id = intval($row["id"]);
 		$tr_type = intval($row["type"]);
 		$tr_src_id = intval($row["src_id"]);
 		$tr_dest_id = intval($row["dest_id"]);
@@ -69,6 +70,7 @@
 		$charge = floatval($row["charge"]);
 		$comment = $row["comment"];
 		$trdate = $row["date"];
+		$tr_pos = intval($row["pos"]);
 
 		echo("<tr>");
 
@@ -117,7 +119,7 @@
 			$realBalance = round($realBalance - $charge, 2);
 		}
 
-		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td></tr>");
+		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td>".$tr_pos."</td><td>".$tr_id."</td></tr>");
 	}
 
 /*
@@ -178,9 +180,9 @@
 	}
 */
 
-	ebr("<tr><td colspan=\"6\"></td></tr>");
-	ebr("<tr><td colspan=\"6\">realBalance: ".$realBalance."</td></tr>");
-	ebr("<tr><td colspan=\"6\">diference: ".round($realBalance - $curBalance, 2)."</td></tr>");
+	ebr("<tr><td colspan=\"8\"></td></tr>");
+	ebr("<tr><td colspan=\"8\">realBalance: ".$realBalance."</td></tr>");
+	ebr("<tr><td colspan=\"8\">diference: ".round($realBalance - $curBalance, 2)."</td></tr>");
 	ebr("</table>");
 
 	ebr("</body>");
