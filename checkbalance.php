@@ -78,7 +78,7 @@
 
 	ebr("<tr><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td><td>ID</td></tr>");
 
-	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3))", NULL, "pos" /*"ORDER BY id ASC, date ASC"*/);
+	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3))", NULL, "pos");
 	foreach($resArr as $row)
 	{
 		$tr_id = intval($row["id"]);
