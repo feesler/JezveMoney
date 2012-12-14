@@ -30,6 +30,22 @@
 	if (!$checkAccount_id)
 		fail();
 
+	$fixed = FALSE;
+
+	if (isset($_GET["act"]) && $_GET["act"] == "fix")
+	{
+		if (isset($_POST["fixbal"]))
+		{
+			$fixbal = floatval($_POST["fixbal"]);
+
+			if (!$db->updateQ("accounts", array("balance"), array($fixbal), "id=".$checkAccount_id))
+				fail();
+
+			$fixed = TRUE;
+		}
+	}
+
+
 	ebr("<!DOCTYPE HTML>");
 	ebr("<html>");
 	ebr("<head>");
@@ -39,6 +55,9 @@
 	ebr("</style>");
 	ebr("</head>");
 	ebr("<body>");
+
+	if ($fixed)
+		ebr("<span style=\"color: #80FF80;\">Balance value was fixed</span><br>");
 
 	ebr("<table>");
 	ebr("<tr><td colspan=\"8\">".getAccountName($checkAccount_id)."</td></tr>");
@@ -180,10 +199,21 @@
 	}
 */
 
+	$balanceDiff = round($realBalance - $curBalance, 2);
+
 	ebr("<tr><td colspan=\"8\"></td></tr>");
 	ebr("<tr><td colspan=\"8\">realBalance: ".$realBalance."</td></tr>");
-	ebr("<tr><td colspan=\"8\">diference: ".round($realBalance - $curBalance, 2)."</td></tr>");
+	ebr("<tr><td colspan=\"8\">diference: ".$balanceDiff."</td></tr>");
 	ebr("</table>");
+
+	if ($balanceDiff != 0)
+	{
+		ebr("<form method=\"post\" action=\"./checkbalance.php?id=".$checkAccount_id."&act=fix\">");
+		ebr("<input name=\"fixbal\" type=\"hidden\" value=\"".$realBalance."\">");
+		ebr("<input type=\"submit\" value=\"Fix balance\">");
+		ebr("</form>");
+	}
+
 
 	ebr("</body>");
 	ebr("</html>");
