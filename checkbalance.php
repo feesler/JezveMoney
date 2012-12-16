@@ -76,7 +76,7 @@
 	$realBalance = $initBalance;
 
 
-	ebr("<tr><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td><td>ID</td></tr>");
+	ebr("<tr><td>ID</td><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>");
 
 	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3))", NULL, "pos");
 	foreach($resArr as $row)
@@ -91,7 +91,7 @@
 		$trdate = $row["date"];
 		$tr_pos = intval($row["pos"]);
 
-		echo("<tr>");
+		echo("<tr><td style=\"background-color: #D0D0D0;\">".$tr_id."</td>");
 
 		if ($tr_type == 1)				// expense
 		{
@@ -138,7 +138,7 @@
 			$realBalance = round($realBalance - $charge, 2);
 		}
 
-		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td>".$tr_pos."</td><td>".$tr_id."</td></tr>");
+		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td>".$tr_pos."</td></tr>");
 	}
 
 /*
