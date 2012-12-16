@@ -30,8 +30,11 @@ if (count($resArr) != 1)
 	fail();
 $srcBalance = floatval($resArr[0]["balance"]);
 
-if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment"),
-							array(NULL, $userid, $src_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment)))
+$tr_pos = getLatestTransactionPos($userid);
+$tr_pos++;
+
+if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
+							array(NULL, $userid, $src_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment, $tr_pos)))
 	fail();
 
 $srcBalance -= $charge;

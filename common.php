@@ -386,4 +386,26 @@ function cancelTransaction($trans_id)
 	return TRUE;
 }
 
+
+// Return latest position of user transactions
+function getLatestTransactionPos($user_id)
+{
+	global $db;
+
+	$user_id = intval($user_id);
+	if (!user_id)
+		return 0;
+
+	$resArr = $db->selectQ("pos",
+				"transactions",
+				"user_id=".$user_id,
+				NULL,
+				"pos DESC LIMIT 1");
+
+	if (count($resArr) != 1)
+		return 0;
+
+	return intval($resArr[0]["pos"]);
+}
+
 ?>
