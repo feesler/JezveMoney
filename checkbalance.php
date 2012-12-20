@@ -45,10 +45,12 @@
 		}
 	}
 
+	header("Content-type: text/html; charset=utf-8");
 
 	ebr("<!DOCTYPE HTML>");
 	ebr("<html>");
 	ebr("<head>");
+	ebr("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
 	ebr("<title>Check balance</title>");
 	ebr("<style>");
 	ebr("td{ padding: 2px 5px; }");
