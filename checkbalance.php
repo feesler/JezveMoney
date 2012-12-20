@@ -141,64 +141,6 @@
 		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td>".$tr_pos."</td></tr>");
 	}
 
-/*
-	// incomes
-	ebr();
-	ebr("<tr><td colspan=\"3\">incomes</td></tr>");
-	$resArr = $db->selectQ("*", "transactions", "dest_id=".$checkAccount_id." AND type=2 ORDER BY date ASC");
-	foreach($resArr as $row)
-	{
-		$amount = floatval($row["amount"]);
-		$charge = floatval($row["charge"]);
-		$comment = $row["comment"];
-
-		$realBalance += $charge;
-		ebr("<tr><td>+".$charge.(($charge != $amount) ? " (".$amount.")" : "")."</td><td>".$comment."</td><td>".$realBalance."</td></tr>");
-	}
-
-	// expenses
-	ebr();
-	ebr("<tr><td colspan=\"3\">expenses</td></tr>");
-	$resArr = $db->selectQ("*", "transactions", "src_id=".$checkAccount_id." AND type=1 ORDER BY date ASC");
-	foreach($resArr as $row)
-	{
-		$amount = floatval($row["amount"]);
-		$charge = floatval($row["charge"]);
-		$comment = $row["comment"];
-
-		$realBalance -= $charge;
-		ebr("<tr><td>-".$charge.(($charge != $amount) ? " (".$amount.")" : "")."</td><td>".$comment."</td><td>".$realBalance."</td></tr>");
-	}
-
-	// transfers
-	ebr();
-	ebr("<tr><td colspan=\"3\">transfers from</td></tr>");
-	$resArr = $db->selectQ("*", "transactions", "src_id=".$checkAccount_id." AND type=3 ORDER BY date ASC");
-	foreach($resArr as $row)
-	{
-		$amount = floatval($row["amount"]);
-		$charge = floatval($row["charge"]);
-		$comment = $row["comment"];
-
-		$realBalance -= $charge;
-		ebr("<tr><td>-".$charge.(($charge != $amount) ? " (".$amount.")" : "")."</td><td>".$comment."</td><td>".$realBalance."</td></tr>");
-	}
-
-	// transfers
-	ebr();
-	ebr("<tr><td colspan=\"3\">transfers to</td></tr>");
-	$resArr = $db->selectQ("*", "transactions", "dest_id=".$checkAccount_id." AND type=3 ORDER BY date ASC");
-	foreach($resArr as $row)
-	{
-		$amount = floatval($row["amount"]);
-		$charge = floatval($row["charge"]);
-		$comment = $row["comment"];
-
-		$realBalance += $amount;
-		ebr("<tr><td>+".$amount.(($charge != $amount) ? " (".$charge.")" : "")."</td><td>".$comment."</td><td>".$realBalance."</td></tr>");
-	}
-*/
-
 	$balanceDiff = round($realBalance - $curBalance, 2);
 
 	ebr("<tr><td colspan=\"8\"></td></tr>");
