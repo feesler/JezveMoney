@@ -487,11 +487,11 @@ function getValues()
 	evalid = (e !== '');
 	avalid = (a !== '');
 
-	fS1 = (s1valid) ? parseFloat(S1) : S1;
-	fS2 = (s2valid) ? parseFloat(S2) : S2;
-	fd = (dvalid) ? parseFloat(d) : d;
-	fe = (evalid) ? parseFloat(e) : e;
-	fa = (avalid) ? parseFloat(a) : a;
+	fS1 = (s1valid) ? parseFloat(fixFloat(S1)) : S1;
+	fS2 = (s2valid) ? parseFloat(fixFloat(S2)) : S2;
+	fd = (dvalid) ? parseFloat(fixFloat(d)) : d;
+	fe = (evalid) ? parseFloat(fixFloat(e)) : e;
+	fa = (avalid) ? parseFloat(fixFloat(a)) : a;
 }
 
 
