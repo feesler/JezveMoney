@@ -221,7 +221,14 @@
 			$realBalance = round($realBalance - $charge, 2);
 		}
 
-		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td id=\"tr_".$tr_id."\"><input type=\"button\" value=\"".$tr_pos."\" onclick=\"showChangePos(".$tr_id.", ".$tr_pos.");\"></td></tr>");
+		echo("<td>".$comment."</td>");
+		echo("<td");
+		if ($realBalance < 0.0)
+			echo(" style=\"background-color: #FFB0B0;\"");
+		echo(">".$realBalance."</td>");
+		echo("<td>".date("d.m.Y", strtotime($trdate))."</td>");
+		echo("<td id=\"tr_".$tr_id."\"><input type=\"button\" value=\"".$tr_pos."\" onclick=\"showChangePos(".$tr_id.", ".$tr_pos.");\"></td>");
+		ebr("</tr>");
 	}
 
 	$balanceDiff = round($realBalance - $curBalance, 2);
