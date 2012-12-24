@@ -45,6 +45,15 @@
 		}
 	}
 
+
+	if (isset($_GET["pos"]))
+	{
+		if ($_GET["pos"] == "ok")
+			$posUpd = TRUE;
+		else if ($_GET["pos"] == "fail")
+			$posUpd = FALSE;
+	}
+
 	header("Content-type: text/html; charset=utf-8");
 
 	ebr("<!DOCTYPE HTML>");
@@ -54,12 +63,74 @@
 	ebr("<title>Check balance</title>");
 	ebr("<style>");
 	ebr("td{ padding: 2px 5px; }");
+	ebr("input[type=\"button\"]{ border: 0 none; padding: 2px 5px; }");
 	ebr("</style>");
+	ebr("<script type=\"text/javascript\" src=\"./js/common.js\"></script>");
+	ebr("<script>");
+?>
+	var chPosObj = null;
+
+	function onSubmitNewPos()
+	{
+		var frm, trans_pos, posField;
+
+		frm = ge('trposfrm');
+		trans_pos = ge('trans_pos');
+		if (!frm || !trans_pos)
+			return;
+
+		if (!chPosObj || !chPosObj.firstElementChild)
+			return;
+
+		posField = chPosObj.firstElementChild;
+		if (posField.tagName.toLowerCase() != 'input' || !posField.value || posField.value == '' || !isNum(posField.value))
+			return;
+
+		trans_pos.value = parseInt(posField.value);
+
+		frm.submit();
+	}
+
+
+	function showChangePos(tr_id, curPos)
+	{
+		var tr_cell, trans_id;
+
+		tr_cell = ge('tr_' + tr_id);
+		trans_id = ge('trans_id');
+		if (!tr_cell || !trans_id)
+			return;
+
+		if (chPosObj != null)
+		{
+			chPosObj.parentNode.removeChild(chPosObj);
+			chPosObj = null;
+		}
+
+		posObj = ce('div', { style : { display : 'inline-block', marginLeft : '5px' } },
+							[ ce('input', { type : 'text', value : curPos, style : { width : '60px' } }),
+							ce('input', { type : 'button', value : 'ok', onclick : onSubmitNewPos })]);
+		if (posObj)
+		{
+			tr_cell.appendChild(posObj);
+			chPosObj = posObj;
+			trans_id.value = parseInt(tr_id);
+		}
+	}
+<?php
+	ebr("</script>");
 	ebr("</head>");
 	ebr("<body>");
 
 	if ($fixed)
 		ebr("<span style=\"color: #80FF80;\">Balance value was fixed</span><br>");
+	if (isset($posUpd))
+	{
+		if ($posUpd == TRUE)
+			ebr("<span style=\"color: #80FF80;\">Position was updated</span><br>");
+		else if ($posUpd == TRUE)
+			ebr("<span style=\"color: #FF8080;\">Fail to update position</span><br>");
+	}
 
 	ebr("<table>");
 	ebr("<tr><td colspan=\"8\">".getAccountName($checkAccount_id)."</td></tr>");
@@ -140,7 +211,7 @@
 			$realBalance = round($realBalance - $charge, 2);
 		}
 
-		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td>".$tr_pos."</td></tr>");
+		ebr("<td>".$comment."</td><td>".$realBalance."</td><td>".date("d.m.Y", strtotime($trdate))."</td><td id=\"tr_".$tr_id."\"><input type=\"button\" value=\"".$tr_pos."\" onclick=\"showChangePos(".$tr_id.", ".$tr_pos.");\"></td></tr>");
 	}
 
 	$balanceDiff = round($realBalance - $curBalance, 2);
@@ -158,6 +229,11 @@
 		ebr("</form>");
 	}
 
+	ebr("<form id=\"trposfrm\" method=\"post\" action=\"./modules/setpos.php\">");
+	ebr("<input id=\"trans_id\" name=\"trans_id\" type=\"hidden\" value=\"0\">");
+	ebr("<input id=\"trans_pos\" name=\"trans_pos\" type=\"hidden\" value=\"0\">");
+	ebr("<input name=\"trans_acc\" type=\"hidden\" value=\"".$checkAccount_id."\">");
+	ebr("</form>");
 
 	ebr("</body>");
 	ebr("</html>");

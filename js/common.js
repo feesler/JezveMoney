@@ -1,12 +1,65 @@
-function dw(a)
+// Return DOM element by id
+function ge(a)
 {
-	document.write(a);
+	return (typeof a == 'string') ? document.getElementById(a) : a;
 }
 
 
-function ge(a)
+// Check object is array
+function isArray(obj)
 {
-	return document.getElementById(a);
+	return (typeof obj === 'object' && obj.constructor.toString().indexOf("Array") != -1);
+}
+
+
+// Set parameters of object
+function setParam(obj, params)
+{
+	var par, val;
+
+	if (!obj || !params)
+		return;
+
+	for(par in params)
+	{
+		val = params[par];
+		if (typeof val === 'object')
+			setParam(obj[par], val);
+		else
+			obj[par] = val;
+	}
+}
+
+
+// Create specified DOM element and set parameters if specified
+function ce(tagName, params, childs)
+{
+	var obj, par;
+
+	if (typeof tagName !== 'string')
+		return null;
+
+	obj = document.createElement(tagName);
+	if (!obj)
+		return null;
+
+	setParam(obj, params);
+
+	if (isArray(childs))
+	{
+		childs.forEach(function(child){
+			obj.appendChild(child);
+		});
+	}
+
+	return obj;
+}
+
+
+// document.write wrapper
+function dw(a)
+{
+	document.write(a);
 }
 
 
