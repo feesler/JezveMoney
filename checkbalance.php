@@ -200,7 +200,7 @@
 		}
 		else if ($tr_type == 3 && $tr_dest_id == $checkAccount_id)			// transfer to
 		{
-			echo("<td>Transfer to</td><td");
+			echo("<td>Transfer from ".$src_name."</td><td");
 
 			if ($amount == $charge)
 				echo(" colspan=\"2\" align=\"center\">+".$charge."</td>");
@@ -211,7 +211,7 @@
 		}
 		else if ($tr_type == 3 && $tr_src_id == $checkAccount_id)			// transfer from
 		{
-			echo("<td>Transfer from</td><td");
+			echo("<td>Transfer to ".$dest_name."</td><td");
 
 			if ($amount == $charge)
 				echo(" colspan=\"2\" align=\"center\">-".$charge."</td>");
