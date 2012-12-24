@@ -151,6 +151,8 @@
 
 	ebr("<tr><td>ID</td><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>");
 
+	$accNameCache = array();
+
 	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3))", NULL, "pos");
 	foreach($resArr as $row)
 	{
@@ -163,6 +165,14 @@
 		$comment = $row["comment"];
 		$trdate = $row["date"];
 		$tr_pos = intval($row["pos"]);
+
+		if (!isset($accNameCache[$tr_src_id]))
+			$accNameCache[$tr_src_id] = getAccountName($tr_src_id);
+		if (!isset($accNameCache[$tr_dest_id]))
+			$accNameCache[$tr_dest_id] = getAccountName($tr_dest_id);
+
+		$src_name = $accNameCache[$tr_src_id];
+		$dest_name = $accNameCache[$tr_dest_id];
 
 		echo("<tr><td style=\"background-color: #D0D0D0;\">".$tr_id."</td>");
 
