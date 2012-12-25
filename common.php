@@ -438,7 +438,7 @@ function getAmount($trans_row)
 
 
 // Return javascript array of amounts of specified transactions for statistics use
-function getStatArray($user_id, $account_id, $trans_type)
+function getStatArray($user_id, $account_id, $trans_type, $group_type = 0)
 {
 	global $db;
 
@@ -453,13 +453,71 @@ function getStatArray($user_id, $account_id, $trans_type)
 
 	$cond =  "user_id=".$user_id." AND type=".$trans_type;
 
-	if ($trans_type == 1)			// expense
+	if ($trans_type == 1)			// expense or transfer
 		$cond .= " AND src_id=".$account_id;
 	else if ($trans_type == 2)		// income
 		$cond .= " AND dest_id=".$account_id;
 
-	$resArr = $db->selectQ("*", "transactions", $cond);
+	$resArr = $db->selectQ("*", "transactions", $cond, NULL, "pos ASC");
+	$rowCount = count($resArr);
+
+	$chargeArr = array();
+	$sumDate = NULL;
+	$curSum = 0.0;
+	$itemNum = 0;
+
+	for($i = 0; $i < $rowCount; $i++)
+	{
+		$row = $resArr[$i];
+		$trans_time = strtotime($row["date"]);
+
+		if ($group_type == 0)		// no grouping
+		{
+			$chargeArr[$i] = getCharge($row);
+		}
+		else if ($group_type == 1)	// group by day
+		{
+			$dateInfo = getdate($trans_time);
+			$curDate = $dateInfo["mday"];
+		}
+		else if ($group_type == 2)	// group by week
+		{
+			$curDate = intval(date("W", $trans_time));
+		}
+		else if ($group_type == 3)	// group by month
+		{
+			$dateInfo = getdate($trans_time);
+			$curDate = $dateInfo["mon"];
+		}
+		else if ($group_type == 4)	// group by year
+		{
+			$dateInfo = getdate($trans_time);
+			$curDate = $dateInfo["year"];
+		}
+
+		if ($sumDate == NULL)		// first iteration
+		{
+			$sumDate = $curDate;
+		}
+		else	if ($sumDate != NULL && $sumDate != $curDate)
+		{
+			$sumDate = $curDate;
+			$chargeArr[$itemNum] = $curSum;
+			$curSum = 0.0;
+			$itemNum++;
+		}
+
+		$curSum += getCharge($row);
+	}
+
+	if ($group_type != 0 && $curSum != 0.0)
+	{
+		$chargeArr[$itemNum] = $curSum;
+	}
+
+/*
 	$chargeArr = array_map("getCharge", $resArr);
+*/
 	$resStr .= implode(", ", $chargeArr);
 
 	return $resStr;

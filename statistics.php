@@ -7,6 +7,17 @@ function fail()
 	exit();
 }
 
+
+// Return string with first capital letter and small others
+function firstCap($str)
+{
+	if (!$str || $str == "")
+		return $str;
+
+	return strtoupper($str[0]).strtolower(substr($str, 1));
+}
+
+
 session_start();
 
 $userid = checkUser("./login.php");
@@ -42,6 +53,26 @@ else if ($transType == "income")
 	$transType_id = 2;
 else if ($transType == "transfer")
 	$transType_id = 3;
+
+
+$groupTypes = array("None", "Day", "Week", "Month", "Year");
+
+$groupType = NULL;
+$groupType_id = 0;
+if (isset($_GET["group"]))
+{
+	foreach($groupTypes as $val => $grtype)
+	{
+		if (strtolower($_GET["group"]) == strtolower($grtype))
+		{
+			$groupType_id = $val;
+			break;
+		}
+	}
+
+	if ($groupType_id != 0)
+		$groupType = strtolower($groupTypes[$groupType_id]);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -56,23 +87,63 @@ else if ($transType == "transfer")
 <script type="text/javascript" src="./js/chart.js"></script>
 <script>
 <?php
-	echo("\tvar transType = '".$transType."';\r\n");
+	echo("\tvar transType = ".json_encode($transType).";\r\n");
+	echo("\tvar groupType = ".json_encode($groupType).";\r\n");
 
-	$statArr = getStatArray($userid, $acc_id, $transType_id);
+	$statArr = getStatArray($userid, $acc_id, $transType_id, $groupType_id);
 	echo("\tvar chartData = [".$statArr."];\r\n");
 ?>
 
-// Accountchange event handler
-function onAccountChange(obj)
-{
-	var acc_id;
 
-	if (!obj)
+// Return group parameter for specifyed type
+function getGroupParam(id)
+{
+	if (id == 1)
+		return '&group=day';
+	else if (id == 2)
+		return '&group=week';
+	else if (id == 3)
+		return '&group=month';
+	else if (id == 4)
+		return '&group=year';
+	else
+		return '';
+}
+
+
+// Group change event handler
+function onGroupChange(obj)
+{
+	var acc_id, group_id;
+	var accsel, groupsel;
+
+	accsel = ge('accsel');
+	groupsel = ge('groupsel');
+	if (!accsel || !groupsel)
 		return;
 
-	acc_id = parseInt(selectedValue(obj));
+	acc_id = parseInt(selectedValue(accsel));
+	group_id = parseInt(selectedValue(groupsel))
 
-	window.location = './statistics.php?id=' + acc_id + '&type=' + transType;
+	window.location = './statistics.php?id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
+}
+
+
+// Account change event handler
+function onAccountChange()
+{
+	var acc_id, group_id;
+	var accsel, groupsel;
+
+	accsel = ge('accsel');
+	groupsel = ge('groupsel');
+	if (!accsel || !groupsel)
+		return;
+
+	acc_id = parseInt(selectedValue(accsel));
+	group_id = parseInt(selectedValue(groupsel));
+
+	window.location = './statistics.php?id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
 }
 </script>
 </head>
@@ -110,9 +181,26 @@ function onAccountChange(obj)
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-		<select id="accsel" class="sel" onchange="onAccountChange(this);">
+		<select id="accsel" class="sel" onchange="onAccountChange();">
 <?php
 	echo(getAccountsList($userid, $acc_id));
+?>
+		</select>
+		</td>
+		</tr>
+
+		<tr>
+		<td align="right"><span style="margin-right: 5px;">Group by</span></td>
+		<td>
+		<select id="groupsel" class="sel" onchange="onGroupChange();">
+<?php
+	foreach($groupTypes as $val => $grtype)
+	{
+		echo("\t\t\t<option value=\"".$val."\"");
+		if ($val == $groupType_id)
+			echo(" selected");
+		echo(">".$grtype."</option>\r\n");
+	}
 ?>
 		</select>
 		</td>
