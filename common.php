@@ -37,6 +37,26 @@ function getStyle($theme)
 }
 
 
+// Print string with carriage return
+function ebr($str = "")
+{
+	echo($str."\r\n");
+}
+
+
+// Print HTML comment
+function htmlComm($str)
+{
+	echo("<!-- ".$str." -->\r\n");
+}
+
+// Print JavaScript comment
+function jsComm($str)
+{
+	echo("/* ".$str." */\r\n");
+}
+
+
 // Format value
 function valFormat($format, $value)
 {

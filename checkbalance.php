@@ -1,18 +1,6 @@
 <?php
 	require_once("./setup.php");
 
-	function ebr($str = "")
-	{
-		echo($str."\r\n");
-	}
-
-
-	function htmlComm($str)
-	{
-		echo("<!-- ".$str." -->\r\n");
-	}
-
-
 	function fail()
 	{
 		ebr("fail");
