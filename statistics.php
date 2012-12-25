@@ -78,7 +78,7 @@ if (isset($_GET["group"]))
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money - Delete transaction</title>
+<title>jezve Money - Statistics</title>
 <?php
 	getStyle($sitetheme);
 	echo(getCSS("chart.css"));
