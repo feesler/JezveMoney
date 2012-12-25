@@ -95,18 +95,4 @@
 		fail($acc_id);
 
 	setLocation("../checkbalance.php?id=".$acc_id."&pos=ok");
-
-
-/*
-	$tr_pos = 1;
-
-	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3)) ORDER BY id ASC, date ASC");
-	foreach($resArr as $row)
-	{
-		$tr_id = intval($row["id"]);
-
-		$db->updateQ("transactions", array("pos"), array($tr_pos), "id=".$tr_id);
-		$tr_pos++;
-	}
-*/
 ?>
