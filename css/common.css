@@ -66,8 +66,6 @@ a:hover
 	text-transform: lowercase;
 	padding: 2px 20px;
 	height: 30px;
-	display: inline-block;
-	float: left;
 }
 
 
@@ -82,14 +80,13 @@ a:hover
 }
 
 
-.sel
+select
 {
 	font-family: Verdana, sans-serif;
 	font-weight: bold;
 	padding: 2px 5px;
 	height: 30px;
-	display: inline-block;
-	float: left;
+	margin: 0;
 }
 
 
@@ -126,5 +123,6 @@ a:hover
 .currsign
 {
 	margin: 0 5px;
-	float: left;
+	display: inline-block;
+	line-height: 30px;
 }
