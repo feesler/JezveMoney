@@ -60,15 +60,15 @@ function onSubmit()
 	<table width="300px" height="150px">
 		<tr>
 			<td align="right"><span style="margin-right: 5px; text-align: right;">Login</span></td>
-			<td><input type="text" class="inp" id="logacc" name="logacc"></td>
+			<td><input id="logacc" name="logacc" type="text"></td>
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px; text-align: right;">Password</span></td>
-			<td><input type="password" class="inp" id="logpwd" name="logpwd"></td>
+			<td><input id="logpwd" name="logpwd" type="password"></td>
 		</tr>
 		<tr>
 			<td></td>
-			<td><input type="submit" class="btn" value="ok"><a style="margin-left: 5px;" href="./registration.php">sign in</a></td>
+			<td><input value="ok" type="submit"><a style="margin-left: 5px;" href="./registration.php">sign in</a></td>
 		</tr>
 	</table>
 	</td>
