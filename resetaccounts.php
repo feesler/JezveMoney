@@ -48,7 +48,7 @@ $userid = checkUser("./login.php");
 		</tr>
 
 		<tr>
-			<td align="center"><input class="btn" type="submit" value="Ok"></td>
+			<td align="center"><input type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

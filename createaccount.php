@@ -63,11 +63,11 @@ function onSubmit(frm)
 	<table>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Account name</span></td>
-			<td><input class="inp" id="accname" name="accname" type="text"></td>
+			<td><input id="accname" name="accname" type="text"></td>
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
-			<td><select class="sel" id="acccurr" name="acccurr">
+			<td><select id="acccurr" name="acccurr">
 <?php
 	echo(getCurrencyList());
 ?>
@@ -75,10 +75,10 @@ function onSubmit(frm)
 		</tr>
 		<tr>
 			<td align="right"><span style="margin-right: 5px;">Initial balance</span></td>
-			<td><input class="inp" id="accbalance" name="accbalance" type="text" value="0" onkeypress="return onFieldKey(event, this);"></td>
+			<td><input id="accbalance" name="accbalance" type="text" value="0" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center"><input class="btn" type="submit" value="Ok"></td>
+			<td colspan="2" align="center"><input type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

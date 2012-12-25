@@ -53,7 +53,7 @@
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Source account</span></td>
 		<td>
-			<select class="sel" id="srcid" name="srcid" onchange="onChangeSource();">
+			<select id="srcid" name="srcid" onchange="onChangeSource();">
 <?php
 	echo(getAccountsList($userid, $src_id));
 ?>
@@ -64,7 +64,7 @@
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Destination account</span></td>
 		<td>
-			<select class="sel" id="destid" name="destid" onchange="onChangeDest();">
+			<select id="destid" name="destid" onchange="onChangeDest();">
 <?php
 	echo(getAccountsList($userid, $dest_id));
 ?>
@@ -74,7 +74,7 @@
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Transfer amount</span></td>
-		<td><input class="inp" id="amount" name="amount" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" class="currsign"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
+		<td><input id="amount" name="amount" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" class="currsign"><?php echo(getCurSign($accCurr, $dest_id)); ?></span></td>
 		</tr>
 
 <?php
@@ -84,7 +84,7 @@
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" class="currsign"><?php echo(getCurSign($accCurr, $src_id)); ?></span></td>
+		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" class="currsign"><?php echo(getCurSign($accCurr, $src_id)); ?></span></td>
 		</tr>
 
 <?php
@@ -94,26 +94,26 @@
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
-		<td><input class="inp" id="exchrate" name="exchrate" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"></td>
+		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"></td>
 		</tr>
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Result balance</span></td>
-		<td><input class="inp" id="resbal" name="resbal" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
+		<td><input id="resbal" name="resbal" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Date</span></td>
-		<td><input class="inp" id="date" name="date" value="<?php echo(date("d.m.Y")); ?>"></td>
+		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>"></td>
 		</tr>
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Comment</span></td>
-		<td><input class="inp" id="comm" name="comm"></td>
+		<td><input id="comm" name="comm" type="text"></td>
 		</tr>
 
 		<tr>
-		<td colspan="2" style="text-align: center;"><input class="btn" type="submit" value="ok"></td>
+		<td colspan="2" style="text-align: center;"><input type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>

@@ -115,7 +115,7 @@ $trans_chanrge = floatval($arr["charge"]);
 		else
 			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select class=\"sel\" id=\"srcid\" name=\"srcid\" onchange=\"");
+		echo("\t\t\t<select id=\"srcid\" name=\"srcid\" onchange=\"");
 		if ($trans_type == 1)
 			echo("onChangeAcc();");
 		else
@@ -135,7 +135,7 @@ $trans_chanrge = floatval($arr["charge"]);
 		else
 			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select class=\"sel\" id=\"destid\" name=\"destid\" onchange=\"");
+		echo("\t\t\t<select id=\"destid\" name=\"destid\" onchange=\"");
 		if ($trans_type == 2)
 			echo("onChangeAcc();");
 		else
@@ -158,12 +158,12 @@ $trans_chanrge = floatval($arr["charge"]);
 			echo("Transfer amount");
 		echo("</span></td>");
 ?>
-		<td><input class="inp" id="amount" name="amount" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" class="currsign"><?php echo(getSign($accCurr, $trans_curr)); ?></span>
+		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" class="currsign"><?php echo(getSign($accCurr, $trans_curr)); ?></span>
 <?php
 	if ($trans_type == 1 || $trans_type == 2)
 	{
-		echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
-		echo("\t\t\t<select class=\"sel\" id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
+		echo("<input id=\"ancurrbtn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
+		echo("\t\t\t<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
 		echo(getCurrencyList($trans_curr));
 		echo("</select>");
 	}
@@ -185,7 +185,7 @@ $trans_chanrge = floatval($arr["charge"]);
 			echo("Receipt");
 		echo("</span></td>");
 ?>
-		<td><input class="inp" id="charge" name="charge" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" class="currsign"><?php echo(getCurSign($accCurr, $transAcc_id)); ?></span></td>
+		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" class="currsign"><?php echo(getCurSign($accCurr, $transAcc_id)); ?></span></td>
 		</tr>
 
 <?php
@@ -196,26 +196,26 @@ $trans_chanrge = floatval($arr["charge"]);
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
-		<td><input class="inp" id="exchrate" name="exchrate" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"></td>
+		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"></td>
 		</tr>
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Result balance</span></td>
-		<td><input class="inp" id="resbal" name="resbal" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
+		<td><input id="resbal" name="resbal" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Date</span></td>
-		<td><input class="inp" id="date" name="date" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"></td>
+		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"></td>
 		</tr>
 
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Comment</span></td>
-		<td><input class="inp" id="comm" name="comm" value="<?php echo($arr["comment"]); ?>"></td>
+		<td><input id="comm" name="comm" type="text" value="<?php echo($arr["comment"]); ?>"></td>
 		</tr>
 
 		<tr>
-		<td colspan="2" align="center"><input class="btn" type="submit" value="ok"></td>
+		<td colspan="2" align="center"><input type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>

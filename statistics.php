@@ -181,7 +181,7 @@ function onAccountChange()
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
-		<select id="accsel" class="sel" onchange="onAccountChange();">
+		<select id="accsel" onchange="onAccountChange();">
 <?php
 	echo(getAccountsList($userid, $acc_id));
 ?>
@@ -192,7 +192,7 @@ function onAccountChange()
 		<tr>
 		<td align="right"><span style="margin-right: 5px;">Group by</span></td>
 		<td>
-		<select id="groupsel" class="sel" onchange="onGroupChange();">
+		<select id="groupsel" onchange="onGroupChange();">
 <?php
 	foreach($groupTypes as $val => $grtype)
 	{

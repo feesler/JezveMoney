@@ -11,7 +11,7 @@ a, a:visited
 }
 
 
-.btn
+input[type="button"], input[type="submit"], button
 {
 	border: 2px solid #FFFFFF;
 	background-color: #000000;
@@ -26,7 +26,7 @@ a, a:visited
 }
 
 
-.inp, .sel
+input[type="text"], select
 {
 	border: 2px solid #FFFFFF;
 	background-color: #000000;
