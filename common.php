@@ -515,9 +515,6 @@ function getStatArray($user_id, $account_id, $trans_type, $group_type = 0)
 		$chargeArr[$itemNum] = $curSum;
 	}
 
-/*
-	$chargeArr = array_map("getCharge", $resArr);
-*/
 	$resStr .= implode(", ", $chargeArr);
 
 	return $resStr;
