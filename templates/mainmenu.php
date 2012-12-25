@@ -1,7 +1,10 @@
 	<tr>
 	<td class="mainmenu">
 <?php
-	$menuArr = array("Main" => "index.php", "Accounts" => "accounts.php", "Transactions" => "transactions.php");
+	$menuArr = array("Main" => "index.php",
+					"Accounts" => "accounts.php",
+					"Transactions" => "transactions.php",
+					"Statistics" => "statistics.php");
 	$dir = "/money/";
 
 	foreach($menuArr as $key => $value)

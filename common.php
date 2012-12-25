@@ -416,4 +416,54 @@ function getLatestTransactionPos($user_id)
 	return intval($resArr[0]["pos"]);
 }
 
+
+// Return charge from transaction array
+function getCharge($trans_row)
+{
+	if ($trans_row)
+		return floatval($trans_row["charge"]);
+	else
+		return 0.0;
+}
+
+
+// Return amount from transaction array
+function getAmount($trans_row)
+{
+	if ($trans_row)
+		return floatval($trans_row["amount"]);
+	else
+		return 0.0;
+}
+
+
+// Return javascript array of amounts of specified transactions for statistics use
+function getStatArray($user_id, $account_id, $trans_type)
+{
+	global $db;
+
+	$resStr = "";
+
+	$user_id = intval($user_id);
+	$account_id = intval($account_id);
+	$trans_type = intval($trans_type);
+
+	if (!$user_id || !$account_id || !$trans_type)
+		return $resStr;
+
+	$cond =  "user_id=".$user_id." AND type=".$trans_type;
+
+	if ($trans_type == 1)			// expense
+		$cond .= " AND src_id=".$account_id;
+	else if ($trans_type == 2)		// income
+		$cond .= " AND dest_id=".$account_id;
+
+	$resArr = $db->selectQ("*", "transactions", $cond);
+	$chargeArr = array_map("getCharge", $resArr);
+	$resStr .= implode(", ", $chargeArr);
+
+	return $resStr;
+}
+
+
 ?>
