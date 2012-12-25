@@ -10,12 +10,36 @@ function setLocation($loc)
 // Check is user logged in or redirect to specified URL
 function checkUser($url)
 {
+	global $db;
+
 	if (isset($_SESSION["userid"]))
 	{
 		return intval($_SESSION["userid"]);
 	}
 	else
 	{
+		if (isset($_COOKIE["login"]) && isset($_COOKIE["passhash"]))
+		{
+			$qlogin = $_COOKIE["login"];
+			$passhash = $_COOKIE["passhash"];
+
+			$resArr = $db->selectQ("*", "users", "login=".qnull($qlogin)." AND passhash=".qnull($passhash));
+			if (count($resArr) == 1)
+			{
+				session_start();
+				$_SESSION["userid"] = intval($resArr[0]["id"]);
+
+				$expTime = time() + 31536000;	// year after now
+				$path = "/money/";
+				$domain = "jezve.net";
+
+				setcookie("login", $qlogin, $expTime, $path, $domain);
+				setcookie("passhash", $passhash, $expTime, $path, $domain);
+
+				return intval($resArr[0]["id"]);
+			}
+		}
+
 		setLocation($url);
 		exit();
 	}
