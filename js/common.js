@@ -207,3 +207,34 @@ function checkDate(str)
 
 	return true;
 }
+
+
+// Return value of selected option of select object
+function selectedValue(selectObj)
+{
+	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+		return -1;
+
+	return selectObj.options[selectObj.selectedIndex].value
+}
+
+
+// Select item with specified value if exist
+function selectByValue(selectObj, selValue)
+{
+	var i;
+
+	if (!selectObj || !selectObj.options)
+		return -1;
+
+	for(i = 0, l = selectObj.options.length; i < l; i++)
+	{
+		if (selectObj.options[i] && selectObj.options[i].value == selValue)
+		{
+			selectObj.selectedIndex = i;
+			return true;
+		}
+	}
+
+	return false;
+}
