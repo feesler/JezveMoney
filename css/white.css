@@ -27,7 +27,7 @@ a, a:visited
 }
 
 
-input[type="text"], select
+input[type="text"], input[type="password"], select
 {
 	border: 2px solid #000000;
 	background-color: #FFFFFF;
