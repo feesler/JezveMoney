@@ -22,10 +22,18 @@ function checkUser($url)
 }
 
 
+// Return string for CSS style link
+function getCSS($filename)
+{
+	return "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/".$filename."\">\r\n";
+}
+
+
+// Print common styles for specifyed theme
 function getStyle($theme)
 {
-	echo("<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/common.css\">\r\n");
-	echo("<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/".(($theme == 1) ? "white" : "black").".css\">\r\n");
+	echo(getCSS("common.css"));
+	echo(getCSS((($theme == 1) ? "white.css" : "black.css")));
 }
 
 
