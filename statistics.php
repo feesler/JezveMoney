@@ -161,15 +161,15 @@ function onAccountChange()
 <?php
 	if ($transType == "expense")
 	{
-		echo("<span>Expenses</span><span><a href=\"./statistics.php?id=".$acc_id."&type=income\">Income</a></span><span><a href=\"./statistics.php?id=".$acc_id."&type=transfer\">Transfers</a></span>");
+		echo("<span>Expenses</span><span><a href=\"./statistics.php?id=".$acc_id."&amp;type=income\">Income</a></span><span><a href=\"./statistics.php?id=".$acc_id."&amp;type=transfer\">Transfers</a></span>");
 	}
 	else if ($transType == "income")
 	{
-		echo("<span><a href=\"./statistics.php?id=".$acc_id."&type=expense\">Expenses</a></span><span>Income</span><span><a href=\"./statistics.php?id=".$acc_id."&type=transfer\">Transfers</a></span>");
+		echo("<span><a href=\"./statistics.php?id=".$acc_id."&amp;type=expense\">Expenses</a></span><span>Income</span><span><a href=\"./statistics.php?id=".$acc_id."&amp;type=transfer\">Transfers</a></span>");
 	}
 	else if ($transType == "transfer")
 	{
-		echo("<span><a href=\"./statistics.php?id=".$acc_id."&type=expense\">Expenses</a></span><span><a href=\"./statistics.php?id=".$acc_id."&type=income\">Income</a></span><span>Transfers</span>");
+		echo("<span><a href=\"./statistics.php?id=".$acc_id."&amp;type=expense\">Expenses</a></span><span><a href=\"./statistics.php?id=".$acc_id."&amp;type=income\">Income</a></span><span>Transfers</span>");
 	}
 ?>
 	</td>
@@ -179,7 +179,7 @@ function onAccountChange()
 	<td style="padding-left: 50px;">
 	<table>
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
 		<select id="accsel" onchange="onAccountChange();">
 <?php
@@ -190,7 +190,7 @@ function onAccountChange()
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Group by</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Group by</span></td>
 		<td>
 		<select id="groupsel" onchange="onGroupChange();">
 <?php

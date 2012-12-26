@@ -51,11 +51,11 @@ if (count($resArr) != 1)
 	<input name="transid" type="hidden" value="<?php echo($trans_id); ?>">
 	<table>
 		<tr>
-			<td align="right" style="padding-top: 50px;"><span>Are you sure want to delete transaction?</span></td>
+			<td style="text-align: right; padding-top: 50px;"><span>Are you sure want to delete transaction?</span></td>
 		</tr>
 
 		<tr>
-			<td align="center"><input type="submit" value="Ok"></td>
+			<td style="text-align: center;"><input type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

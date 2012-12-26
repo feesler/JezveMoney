@@ -51,7 +51,7 @@
 	<form id="incomefrm" name="incomefrm" method="post" action="./modules/income.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Account name</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>
 		<td>
 			<select class="sel" id="destid" name="destid" onchange="onChangeAcc();">
 <?php
@@ -62,7 +62,7 @@
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Incoming amount</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Incoming amount</span></td>
 		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" class="currsign"><?php echo(getCurSign($accCurr, $dest_id)); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="sel" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
@@ -88,17 +88,17 @@
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Date</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Date</span></td>
 		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>"></td>
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Comment</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Comment</span></td>
 		<td><input id="comm" name="comm" type="text"></td>
 		</tr>
 
 		<tr>
-		<td colspan="2" align="center"><input type="submit" value="ok"></td>
+		<td colspan="2" style="text-align: center;"><input type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>

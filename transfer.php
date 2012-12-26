@@ -103,12 +103,12 @@
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Date</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Date</span></td>
 		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>"></td>
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Comment</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Comment</span></td>
 		<td><input id="comm" name="comm" type="text"></td>
 		</tr>
 

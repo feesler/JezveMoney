@@ -44,11 +44,11 @@ $userid = checkUser("./login.php");
 	<form id="resetfrm" name="resetfrm" method="post" accept-charset="utf-8" action="./modules/resetaccounts.php">
 	<table>
 		<tr>
-			<td align="right" style="padding-top: 50px;"><span>Are you sure want to reset all the data?</span></td>
+			<td style="text-align: right; padding-top: 50px;"><span>Are you sure want to reset all the data?</span></td>
 		</tr>
 
 		<tr>
-			<td align="center"><input type="submit" value="Ok"></td>
+			<td style="text-align: center;"><input type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

@@ -98,7 +98,7 @@
 			echo("<tr>");
 
 			if ($transType == "expense")
-				echo("<td><b>Source</b></b></td>");
+				echo("<td><b>Source</b></td>");
 			else if ($transType == "income")
 				echo("<td><b>Destination</b></td>");
 			else if ($transType == "transfer")

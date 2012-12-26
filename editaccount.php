@@ -80,11 +80,11 @@ function onSubmit(frm)
 	<input id="accid" name="accid" type="hidden" value="<?php echo($acc_id); ?>">
 	<table>
 		<tr>
-			<td align="right"><span style="margin-right: 5px;">Account name</span></td>
+			<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>
 			<td><input id="accname" name="accname" type="text" value="<?php echo($arr["name"]); ?>"></td>
 		</tr>
 		<tr>
-			<td align="right"><span style="margin-right: 5px;">Currency</span></td>
+			<td style="text-align: right;"><span style="margin-right: 5px;">Currency</span></td>
 			<td><select id="acccurr" name="acccurr">
 <?php
 	echo(getCurrencyList($arr["curr_id"]));
@@ -92,11 +92,11 @@ function onSubmit(frm)
 			</select></td>
 		</tr>
 		<tr>
-			<td align="right"><span style="margin-right: 5px;">Initial balance</span></td>
+			<td style="text-align: right;"><span style="margin-right: 5px;">Initial balance</span></td>
 			<td><input id="initbal" name="initbal" type="text" value="<?php echo($arr["initbalance"]); ?>" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center"><input type="submit" value="Ok"></td>
+			<td colspan="2" style="text-align: center;"><input type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

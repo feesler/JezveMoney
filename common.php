@@ -319,7 +319,8 @@ function getAccountsTable($user_id, $transfer = FALSE, $editlink = FALSE)
 			$resStr .= "</tr>\r\n";
 		}
 
-		$resStr .= "\t\t<tr style=\"background-color: transparent;\"><td colspan=\"4\" style=\"height: 10px;\"></td></tr>\r\n";
+		$resStr .= "\t\t<tr style=\"background-color: transparent;\">";
+		$resStr .= "<td colspan=\"".(($editlink == TRUE) ? "4" : "3")."\" style=\"height: 10px;\"></td></tr>\r\n";
 
 		foreach($totalArr as $key => $value)
 		{

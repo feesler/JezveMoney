@@ -111,9 +111,9 @@ $trans_chanrge = floatval($arr["charge"]);
 	{
 		echo("\t\t<tr>\r\n");
 		if ($trans_type == 3)
-			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Source account</span></td>\r\n");
+			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Source account</span></td>\r\n");
 		else
-			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
+			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
 		echo("\t\t\t<select id=\"srcid\" name=\"srcid\" onchange=\"");
 		if ($trans_type == 1)
@@ -131,9 +131,9 @@ $trans_chanrge = floatval($arr["charge"]);
 	{
 		echo("\t\t<tr>\r\n");
 		if ($trans_type == 3)
-			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Destination account</span></td>\r\n");
+			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Destination account</span></td>\r\n");
 		else
-			echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
+			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
 		echo("\t\t\t<select id=\"destid\" name=\"destid\" onchange=\"");
 		if ($trans_type == 2)
@@ -149,7 +149,7 @@ $trans_chanrge = floatval($arr["charge"]);
 ?>
 		<tr>
 <?php
-		echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">");
+		echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">");
 		if ($trans_type == 1)
 			echo("Amount to spend");
 		else if ($trans_type == 2)
@@ -178,7 +178,7 @@ $trans_chanrge = floatval($arr["charge"]);
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 
-		echo("\t\t<td align=\"right\"><span style=\"margin-right: 5px;\">");
+		echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">");
 		if ($trans_type == 1 || $trans_type == 3)
 			echo("Charge off");
 		else if ($trans_type == 2)
@@ -205,17 +205,17 @@ $trans_chanrge = floatval($arr["charge"]);
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Date</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Date</span></td>
 		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"></td>
 		</tr>
 
 		<tr>
-		<td align="right"><span style="margin-right: 5px;">Comment</span></td>
+		<td style="text-align: right;"><span style="margin-right: 5px;">Comment</span></td>
 		<td><input id="comm" name="comm" type="text" value="<?php echo($arr["comment"]); ?>"></td>
 		</tr>
 
 		<tr>
-		<td colspan="2" align="center"><input type="submit" value="ok"></td>
+		<td colspan="2" style="text-align: center;"><input type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>
