@@ -6,6 +6,20 @@ $login = $_POST["logacc"];
 $pass = $_POST["logpwd"];
 if ($login && $login != "" && $pass && $pass != "")
 {
+	$elogin = $db->escape($login);
+	if (checkLoginData($elogin, $pass))
+	{
+		session_start();
+		$_SESSION["userid"] = getUserId($login);
+
+		$preHash = createPreHash($login, $pass);
+
+		setupCookies($login, $preHash);
+
+		setLocation("../index.php");
+		exit();
+	}
+/*
 	$qlogin = $db->escape($login);
 	$passhash = md5($pass);
 
@@ -25,6 +39,7 @@ if ($login && $login != "" && $pass && $pass != "")
 		setLocation("../index.php");
 		exit();
 	}
+*/
 }
 
 setLocation("../login.php?act=wrong");
