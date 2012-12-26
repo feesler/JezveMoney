@@ -252,6 +252,8 @@ function getAccountCurrency($account_id)
 
 
 // Return user name
+/*
+// Return user name
 function getUserName($id)
 {
 	global $db;
@@ -259,6 +261,19 @@ function getUserName($id)
 	$arr = $db->selectQ("login", "users", "id=".$id);
 
 	return ((count($arr) == 1) ? $arr[0]["login"] : "");
+}
+*/
+function getUserName($id)
+{
+	global $db;
+
+	$eid = intval($id);
+	if (!$eid)
+		return NULL;
+
+	$resArr = $db->selectQ("login", "users", "id=".$eid);
+
+	return ((count($resArr) == 1) ? $resArr[0]["login"] : NULL);
 }
 
 
