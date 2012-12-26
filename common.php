@@ -146,26 +146,6 @@ function checkUser($url)
 
 				return $user_id;
 			}
-/*
-			$qlogin = $_COOKIE["login"];
-			$passhash = $_COOKIE["passhash"];
-
-			$resArr = $db->selectQ("*", "users", "login=".qnull($qlogin)." AND passhash=".qnull($passhash));
-			if (count($resArr) == 1)
-			{
-				session_start();
-				$_SESSION["userid"] = intval($resArr[0]["id"]);
-
-				$expTime = time() + 31536000;	// year after now
-				$path = "/money/";
-				$domain = "jezve.net";
-
-				setcookie("login", $qlogin, $expTime, $path, $domain);
-				setcookie("passhash", $passhash, $expTime, $path, $domain);
-
-				return intval($resArr[0]["id"]);
-			}
-*/
 		}
 
 		setLocation($url);
@@ -252,17 +232,6 @@ function getAccountCurrency($account_id)
 
 
 // Return user name
-/*
-// Return user name
-function getUserName($id)
-{
-	global $db;
-
-	$arr = $db->selectQ("login", "users", "id=".$id);
-
-	return ((count($arr) == 1) ? $arr[0]["login"] : "");
-}
-*/
 function getUserName($id)
 {
 	global $db;

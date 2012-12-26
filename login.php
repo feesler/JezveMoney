@@ -25,27 +25,6 @@
 				header("Location: ./index.php");
 				exit();
 			}
-/*
-			$qlogin = $_COOKIE["login"];
-			$passhash = $_COOKIE["passhash"];
-
-			$resArr = $db->selectQ("*", "users", "login=".qnull($qlogin)." AND passhash=".qnull($passhash));
-			if (count($resArr) == 1)
-			{
-				session_start();
-				$_SESSION["userid"] = intval($resArr[0]["id"]);
-
-				$expTime = time() + 31536000;	// year after now
-				$path = "/money/";
-				$domain = "jezve.net";
-
-				setcookie("login", $qlogin, $expTime, $path, $domain);
-				setcookie("passhash", $passhash, $expTime, $path, $domain);
-
-				header("Location: ./index.php");
-				exit();
-			}
-*/
 		}
 	}
 ?>
