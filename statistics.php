@@ -1,80 +1,80 @@
 <?php
-require_once("./setup.php");
-require_once("./class/user.php");
-require_once("./class/currency.php");
-require_once("./class/account.php");
+	require_once("./setup.php");
+	require_once("./class/user.php");
+	require_once("./class/currency.php");
+	require_once("./class/account.php");
 
-function fail()
-{
-	setLocation("./index.php");
-	exit();
-}
-
-
-// Return string with first capital letter and small others
-function firstCap($str)
-{
-	if (!$str || $str == "")
-		return $str;
-
-	return strtoupper($str[0]).strtolower(substr($str, 1));
-}
-
-
-session_start();
-
-$userid = checkUser("./login.php");
-
-if (isset($_GET["id"]) && is_numeric($_GET["id"]))
-{
-	$acc_id = intval($_GET["id"]);
-
-	$resArr = $db->selectQ("*", "accounts", "id=".$acc_id." AND user_id=".$userid);
-	if (count($resArr) != 1)
-		fail();
-}
-else		// try to get first account of user
-{
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	if (count($resArr) == 0)
-		fail();
-}
-
-$acc_id = intval($resArr[0]["id"]);
-if (!$acc_id)
-	fail();
-
-
-if (isset($_GET["type"]) && ($_GET["type"] == "expense" || $_GET["type"] == "income" || $_GET["type"] == "transfer"))
-	$transType = $_GET["type"];
-else
-	$transType = "expense";
-
-if ($transType == "expense")
-	$transType_id = 1;
-else if ($transType == "income")
-	$transType_id = 2;
-else if ($transType == "transfer")
-	$transType_id = 3;
-
-
-$groupTypes = array("None", "Day", "Week", "Month", "Year");
-
-$groupType = NULL;
-$groupType_id = 0;
-if (isset($_GET["group"]))
-{
-	foreach($groupTypes as $val => $grtype)
+	function fail()
 	{
-		if (strtolower($_GET["group"]) == strtolower($grtype))
-		{
-			$groupType_id = $val;
-			break;
-		}
+		setLocation("./index.php");
+		exit();
 	}
 
-	if ($groupType_id != 0)
-		$groupType = strtolower($groupTypes[$groupType_id]);
+
+	// Return string with first capital letter and small others
+	function firstCap($str)
+	{
+		if (!$str || $str == "")
+			return $str;
+
+		return strtoupper($str[0]).strtolower(substr($str, 1));
+	}
+
+
+	session_start();
+
+	$userid = checkUser("./login.php");
+
+	if (isset($_GET["id"]) && is_numeric($_GET["id"]))
+	{
+		$acc_id = intval($_GET["id"]);
+
+		$resArr = $db->selectQ("*", "accounts", "id=".$acc_id." AND user_id=".$userid);
+		if (count($resArr) != 1)
+			fail();
+	}
+	else		// try to get first account of user
+	{
+		$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
+		if (count($resArr) == 0)
+			fail();
+	}
+
+	$acc_id = intval($resArr[0]["id"]);
+	if (!$acc_id)
+		fail();
+
+
+	if (isset($_GET["type"]) && ($_GET["type"] == "expense" || $_GET["type"] == "income" || $_GET["type"] == "transfer"))
+		$transType = $_GET["type"];
+	else
+		$transType = "expense";
+
+	if ($transType == "expense")
+		$transType_id = 1;
+	else if ($transType == "income")
+		$transType_id = 2;
+	else if ($transType == "transfer")
+		$transType_id = 3;
+
+
+	$groupTypes = array("None", "Day", "Week", "Month", "Year");
+
+	$groupType = NULL;
+	$groupType_id = 0;
+	if (isset($_GET["group"]))
+	{
+		foreach($groupTypes as $val => $grtype)
+		{
+			if (strtolower($_GET["group"]) == strtolower($grtype))
+			{
+				$groupType_id = $val;
+				break;
+			}
+		}
+
+		if ($groupType_id != 0)
+			$groupType = strtolower($groupTypes[$groupType_id]);
 }
 ?>
 <!DOCTYPE html>

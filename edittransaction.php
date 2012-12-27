@@ -1,35 +1,35 @@
 <?php
-require_once("./setup.php");
-require_once("./class/user.php");
-require_once("./class/currency.php");
-require_once("./class/account.php");
+	require_once("./setup.php");
+	require_once("./class/user.php");
+	require_once("./class/currency.php");
+	require_once("./class/account.php");
 
-function fail()
-{
-	setLocation("./transactions.php");
-	exit();
-}
+	function fail()
+	{
+		setLocation("./transactions.php");
+		exit();
+	}
 
-session_start();
+	session_start();
 
-$userid = checkUser("./login.php");
+	$userid = checkUser("./login.php");
 
-if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
-	fail();
+	if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
+		fail();
 
-$trans_id = intval($_GET["id"]);
+	$trans_id = intval($_GET["id"]);
 
-$resArr = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$userid);
-if (count($resArr) != 1)
-	fail();
+	$resArr = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$userid);
+	if (count($resArr) != 1)
+		fail();
 
-$arr = $resArr[0];
-$trans_scr_id = intval($arr["src_id"]);
-$trans_dest_id = intval($arr["dest_id"]);
-$trans_type = intval($arr["type"]);
-$trans_curr = intval($arr["curr_id"]);
-$trans_amount = floatval($arr["amount"]);
-$trans_chanrge = floatval($arr["charge"]);
+	$arr = $resArr[0];
+	$trans_scr_id = intval($arr["src_id"]);
+	$trans_dest_id = intval($arr["dest_id"]);
+	$trans_type = intval($arr["type"]);
+	$trans_curr = intval($arr["curr_id"]);
+	$trans_amount = floatval($arr["amount"]);
+	$trans_chanrge = floatval($arr["charge"]);
 ?>
 <!DOCTYPE html>
 <html>

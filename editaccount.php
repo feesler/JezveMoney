@@ -1,31 +1,31 @@
 <?php
-require_once("./setup.php");
-require_once("./class/user.php");
-require_once("./class/currency.php");
-require_once("./class/account.php");
+	require_once("./setup.php");
+	require_once("./class/user.php");
+	require_once("./class/currency.php");
+	require_once("./class/account.php");
 
 
-function fail()
-{
-	setLocation("./accounts.php");
-	exit();
-}
+	function fail()
+	{
+		setLocation("./accounts.php");
+		exit();
+	}
 
 
-session_start();
+	session_start();
 
-$userid = checkUser("./login.php");
+	$userid = checkUser("./login.php");
 
-if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
-	fail();
+	if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
+		fail();
 
-$acc_id = intval($_GET["id"]);
+	$acc_id = intval($_GET["id"]);
 
-$resArr = $db->selectQ("*", "accounts", "id=".$acc_id);
-if (count($resArr) != 1)
-	fail();
+	$resArr = $db->selectQ("*", "accounts", "id=".$acc_id);
+	if (count($resArr) != 1)
+		fail();
 
-$arr = $resArr[0];
+	$arr = $resArr[0];
 ?>
 <!DOCTYPE html>
 <html>
