@@ -26,12 +26,14 @@
 		fail();
 
 	$arr = $resArr[0];
+
+	$titleString = "jezve Money - Edit account";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money - Edit account</title>
+<title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
 ?>
@@ -67,7 +69,7 @@ function onSubmit(frm)
 </head>
 <body>
 <table class="maintable">
-	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 
 <?php
 	require_once("./templates/userblock.php");

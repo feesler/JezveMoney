@@ -30,12 +30,14 @@
 	$trans_curr = intval($arr["curr_id"]);
 	$trans_amount = floatval($arr["amount"]);
 	$trans_chanrge = floatval($arr["charge"]);
+
+	$titleString = "jezve Money - Edit transaction";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money - Edit transaction</title>
+<title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
 ?>
@@ -74,7 +76,7 @@
 </head>
 <body>
 <table class="maintable">
-	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 <?php
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");

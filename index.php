@@ -7,19 +7,21 @@
 	session_start();
 
 	$userid = checkUser("./login.php");
+
+	$titleString = "jezve Money";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money</title>
+<title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
 ?>
 </head>
 <body>
 <table class="maintable">
-	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 
 <?php
 	require_once("./templates/userblock.php");

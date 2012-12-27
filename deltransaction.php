@@ -22,12 +22,14 @@
 	$resArr = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$userid);
 	if (count($resArr) != 1)
 		fail();
+
+	$titleString = "jezve Money - Delete transaction";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>jezve Money - Delete transaction</title>
+<title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
 ?>
@@ -35,7 +37,7 @@
 </head>
 <body>
 <table class="maintable">
-	<tr><td><h1 class="maintitle">jezve Money</h1></td></tr>
+	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 
 <?php
 	require_once("./templates/userblock.php");
