@@ -431,6 +431,44 @@ function onInput(obj)
 }
 
 
+// Set exchange rate comment
+function setExchangeComment()
+{
+	var exchcomm, transcurr, accid, taccid;
+	var chargeSign, amountSign;
+	var invExch;
+
+	exchcomm = ge('exchcomm');
+	if (trans_type == 1 || trans_type == 2)
+		transcurr = ge('transcurr');
+	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
+	if (trans_type == 3)
+		taccid = ge('destid');
+	if (!exchcomm || !accid || (!transcurr && !taccid))
+		return;
+
+	if (fe == 1.0)
+	{
+		exchcomm.innerHTML = '';
+	}
+	else
+	{
+		if ((transcurr && transcurr.selectedIndex == -1) || (taccid && taccid.selectedIndex == -1) || accid.selectedIndex == -1)
+			return;
+
+		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
+		if (trans_type == 3)
+			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
+		else
+			amountSign = getCurrencySign(selectedValue(transcurr));
+
+		invExch = parseFloat((1 / fe).toFixed(5));
+
+		exchcomm.innerHTML = chargeSign + '/' + amountSign + ' ('  + invExch + ' ' + amountSign + '/' + chargeSign + ')';
+	}
+}
+
+
 // Get values of transaction from input fields
 function getValues()
 {
@@ -496,6 +534,8 @@ function onAmountInput()
 	}
 	else if (dvalid)
 		f5();		// calculate e
+
+	setExchangeComment();
 }
 
 
@@ -510,6 +550,8 @@ function onChargeInput()
 		f5();		// calculate e
 	else if (evalid)
 		f4();		// calculate a
+
+	setExchangeComment();
 }
 
 
@@ -526,6 +568,8 @@ function onExchangeInput()
 	}
 	else if (dvalid)
 		f4();		// calculate a
+
+	setExchangeComment();
 }
 
 

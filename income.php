@@ -79,7 +79,7 @@
 
 		<tr id="exchange" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
-		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"></td>
+		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"><span id="exchcomm" style="margin-left: 5px;"></span></td>
 		</tr>
 
 		<tr>

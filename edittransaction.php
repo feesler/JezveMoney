@@ -196,7 +196,7 @@ $trans_chanrge = floatval($arr["charge"]);
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
-		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"></td>
+		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"><span id="exchcomm" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $transAcc_id)."/".getSign($accCurr, $trans_curr)." (".round($arr["charge"] / $arr["amount"], 5)." ".getSign($accCurr, $trans_curr)."/".getCurSign($accCurr, $transAcc_id).")"); ?></span></td>
 		</tr>
 
 		<tr>
