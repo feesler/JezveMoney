@@ -4,17 +4,6 @@
 	require_once("../class/currency.php");
 	require_once("../class/account.php");
 
-	function ebr($str = "")
-	{
-		echo($str."\r\n");
-	}
-
-
-	function htmlComm($str)
-	{
-		echo("<!-- ".$str." -->\r\n");
-	}
-
 
 	function fail($acc_id = 0)
 	{
