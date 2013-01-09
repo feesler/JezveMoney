@@ -24,7 +24,7 @@
 		fail();
 
 	$arr = $resArr[0];
-	$trans_scr_id = intval($arr["src_id"]);
+	$trans_src_id = intval($arr["src_id"]);
 	$trans_dest_id = intval($arr["dest_id"]);
 	$trans_type = intval($arr["type"]);
 	$trans_curr = intval($arr["curr_id"]);
@@ -51,9 +51,9 @@
 
 	$transAcc_id = 0;	// main transaction account id
 	$transAccCur = 0;	// currency of transaction account
-	if ((($trans_type == 1 && $trans_dest_id == 0) || ($trans_type == 3 && $trans_dest_id != 0)) && $trans_scr_id != 0)
-		$transAcc_id = $trans_scr_id;
-	else if ($trans_type == 2 && $trans_dest_id != 0 && $trans_scr_id == 0)
+	if ((($trans_type == 1 && $trans_dest_id == 0) || ($trans_type == 3 && $trans_dest_id != 0)) && $trans_src_id != 0)
+		$transAcc_id = $trans_src_id;
+	else if ($trans_type == 2 && $trans_dest_id != 0 && $trans_src_id == 0)
 		$transAcc_id = $trans_dest_id;
 	$transAccCur = getCurrId($accCurr, $transAcc_id);
 
@@ -148,8 +148,8 @@
 		echo("\">\r\n");
 		echo(getAccountsList($userid, intval($arr["dest_id"])));
 		echo("\t</select>\r\n");
-		echo("\t\t</td>\r");
-		echo("\t\t</tr>\r");
+		echo("\t\t</td>\r\n");
+		echo("\t\t</tr>\r\n");
 	}
 ?>
 		<tr>
@@ -161,7 +161,7 @@
 			echo("Incoming amount");
 		else if ($trans_type == 3)
 			echo("Transfer amount");
-		echo("</span></td>");
+		echo("</span></td>\r\n");
 ?>
 		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" class="currsign"><?php echo(getSign($accCurr, $trans_curr)); ?></span>
 <?php
