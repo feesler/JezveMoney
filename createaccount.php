@@ -74,7 +74,12 @@ function onSubmit(frm)
 			<td style="text-align: right;"><span style="margin-right: 5px;">Currency</span></td>
 			<td><select id="acccurr" name="acccurr">
 <?php
+	$curr = new Currency;
+
+	echo($curr->getList());
+/*
 	echo(getCurrencyList());
+*/
 ?>
 			</select></td>
 		</tr>

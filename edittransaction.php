@@ -45,9 +45,14 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
+	$acc = new Account($userid);
+
+	echo($acc->getArray());
+/*
 	echo(getAccountsArray($userid));
 
 	$accCurr = getAccCurrInfo($userid);
+*/
 
 	$transAcc_id = 0;	// main transaction account id
 	$transAccCur = 0;	// currency of transaction account
@@ -55,9 +60,21 @@
 		$transAcc_id = $trans_src_id;
 	else if ($trans_type == 2 && $trans_dest_id != 0 && $trans_src_id == 0)
 		$transAcc_id = $trans_dest_id;
+
+	$src_curr = $acc->getCurrency($trans_src_id);
+	$dest_curr = $acc->getCurrency($trans_dest_id);
+	$transAccCur = $acc->getCurrency($transAcc_id);
+
+	echo(Currency::getArray());
+
+
+	$amount_sign = Currency::getSign($trans_curr);
+	$charge_sign = Currency::getSign($transAccCur);
+/*
 	$transAccCur = getCurrId($accCurr, $transAcc_id);
 
 	echo(getCurrencyArray());
+*/
 
 	echo("\r\n\r\nvar transaction =\r\n{\r\n");
 	echo("\tsrcAcc : ".$trans_src_id.",\r\n");
@@ -98,9 +115,14 @@
 		echo("</td></tr>");
 	}
 
+	echo($acc->getTable(TRUE));
+
+	$accounts = $acc->getCount();
+/*
 	echo(getAccountsTable($userid));
 
 	$accounts = $db->countQ("accounts", "user_id=".$userid);
+*/
 	if ($accounts > 0)
 	{
 ?>
@@ -126,7 +148,10 @@
 		else
 			echo("onChangeSource();");
 		echo("\">\r\n");
+		echo($acc->getList($trans_src_id));
+/*
 		echo(getAccountsList($userid, intval($arr["src_id"])));
+*/
 		echo("\t\t\t</select>\r\n");
 		echo("\t\t</td>\r");
 		echo("\t\t</tr>\r");
@@ -146,7 +171,10 @@
 		else
 			echo("onChangeDest();");
 		echo("\">\r\n");
+		echo($acc->getList($trans_dest_id));
+/*
 		echo(getAccountsList($userid, intval($arr["dest_id"])));
+*/
 		echo("\t</select>\r\n");
 		echo("\t\t</td>\r\n");
 		echo("\t\t</tr>\r\n");
@@ -163,13 +191,16 @@
 			echo("Transfer amount");
 		echo("</span></td>\r\n");
 ?>
-		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" class="currsign"><?php echo(getSign($accCurr, $trans_curr)); ?></span>
+		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" class="currsign"><?php echo($amount_sign); /* echo(getSign($accCurr, $trans_curr)); */ ?></span>
 <?php
 	if ($trans_type == 1 || $trans_type == 2)
 	{
 		echo("<input id=\"ancurrbtn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
 		echo("\t\t\t<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
+		echo(Currency::getList($trans_curr));
+/*
 		echo(getCurrencyList($trans_curr));
+*/
 		echo("</select>");
 	}
 ?>
@@ -178,8 +209,11 @@
 
 <?php
 		echo("\t\t<tr id=\"chargeoff\"");
+		if (($trans_type == 3 && $src_curr == $dest_curr) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
+/*
 		if (($trans_type == 3 && getCurrId($accCurr, $trans_src_id) == getCurrId($accCurr, $trans_dest_id)) ||
 			(($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
+*/
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 
@@ -190,18 +224,21 @@
 			echo("Receipt");
 		echo("</span></td>");
 ?>
-		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" class="currsign"><?php echo(getCurSign($accCurr, $transAcc_id)); ?></span></td>
+		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" class="currsign"><?php echo($charge_sign); /* echo(getCurSign($accCurr, $transAcc_id)); */ ?></span></td>
 		</tr>
 
 <?php
 		echo("\t\t<tr id=\"exchange\"");
+		if (($trans_type == 3 && $src_curr == $dest_curr) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
+/*
 		if (($trans_type == 3 && getCurrId($accCurr, $trans_src_id) == getCurrId($accCurr, $trans_dest_id)) ||
 			(($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
+*/
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
-		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"><span id="exchcomm" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $transAcc_id)."/".getSign($accCurr, $trans_curr)." (".round($arr["charge"] / $arr["amount"], 5)." ".getSign($accCurr, $trans_curr)."/".getCurSign($accCurr, $transAcc_id).")"); ?></span></td>
+		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"><span id="exchcomm" style="margin-left: 5px;"><?php echo($charge_sign /* getCurSign($accCurr, $transAcc_id) */ ."/". $amount_sign /* getSign($accCurr, $trans_curr) */." (".round($arr["charge"] / $arr["amount"], 5)." ". $amount_sign /* getSign($accCurr, $trans_curr) */ ."/". $charge_sign /* getCurSign($accCurr, $transAcc_id) */ .")"); ?></span></td>
 		</tr>
 
 		<tr>

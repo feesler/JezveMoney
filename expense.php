@@ -22,6 +22,18 @@
 <script type="text/javascript" src="./js/transaction.js"></script>
 <script>
 <?php
+	$acc = new Account($userid);
+
+	echo($acc->getArray());
+
+	$src_id = $acc->getIdByPos(0);
+	$src_curr = $acc->getCurrency($src_id);
+	$src_sign = Currency::getSign($src_curr);
+
+	echo(Currency::getArray());
+	echo("var trans_curr = ".$src_curr.";\r\n");
+	echo("var trans_acc_curr = ".$src_curr.";\r\n");
+/*
 	echo(getAccountsArray($userid));
 
 	$accCurr = getAccCurrInfo($userid);
@@ -31,6 +43,7 @@
 
 	echo("var trans_curr = ".$accCurr[0]["curr_id"].";\r\n");
 	echo("var trans_acc_curr = ".$accCurr[0]["curr_id"].";\r\n");
+*/
 	echo("var trans_type = 1;\r\n");
 	echo("var edit_mode = false;\r\n");
 ?>
@@ -44,9 +57,14 @@
 	require_once("./templates/mainmenu.php");
 	require_once("./templates/submenu.php");
 
+	echo($acc->getTable(TRUE));
+
+	$accounts = $acc->getCount();
+/*
 	echo(getAccountsTable($userid));
 
 	$accounts = $db->countQ("accounts", "user_id=".$userid);
+*/
 	if ($accounts > 0)
 	{
 ?>
@@ -60,7 +78,10 @@
 		<td>
 			<select class="sel" id="srcid" name="srcid" onchange="onChangeAcc();">
 <?php
+	echo($acc->getList($src_id));
+/*
 	echo(getAccountsList($userid, $src_id));
+*/
 ?>
 			</select>
 		</td>
@@ -68,10 +89,13 @@
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Amount to spend</span></td>
-		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" class="currsign"><?php echo(getCurSign($accCurr, $src_id)); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
+		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" class="currsign"><?php echo($src_sign); /* echo(getCurSign($accCurr, $src_id)); */ ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="sel" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
+	echo(Currency::getList($src_curr));
+/*
 	echo(getCurrencyList(getCurrId($accCurr, $src_id)));
+*/
 ?>
 			</select>
 		</td>
@@ -79,7 +103,7 @@
 
 		<tr id="chargeoff" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Charge off</span></td>
-		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo(getCurSign($accCurr, $src_id)); ?></span></td>
+		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($src_sign); /* echo(getCurSign($accCurr, $src_id)); */ ?></span></td>
 		</tr>
 
 		<tr id="exchange" style="display: none;">
