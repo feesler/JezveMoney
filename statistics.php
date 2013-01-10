@@ -33,29 +33,13 @@
 
 		if (!$acc->is_exist($acc_id))
 			fail();
-/*
-		$resArr = $db->selectQ("*", "accounts", "id=".$acc_id." AND user_id=".$userid);
-		if (count($resArr) != 1)
-			fail();
-*/
 	}
 	else		// try to get first account of user
 	{
 		$acc_id = $acc->getIdByPos(0);
 		if (!$acc_id)
 			fail();
-/*
-		$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-		if (count($resArr) == 0)
-			fail();
-*/
 	}
-
-/*
-	$acc_id = intval($resArr[0]["id"]);
-	if (!$acc_id)
-		fail();
-*/
 
 
 	if (isset($_GET["type"]) && ($_GET["type"] == "expense" || $_GET["type"] == "income" || $_GET["type"] == "transfer"))
@@ -202,9 +186,6 @@ function onAccountChange()
 		<select id="accsel" onchange="onAccountChange();">
 <?php
 	echo($acc->getList($acc_id));
-/*
-	echo(getAccountsList($userid, $acc_id));
-*/
 ?>
 		</select>
 		</td>

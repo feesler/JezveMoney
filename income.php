@@ -33,17 +33,6 @@
 	echo(Currency::getArray());
 	echo("var trans_curr = ".$dest_curr.";\r\n");
 	echo("var trans_acc_curr = ".$dest_curr.";\r\n");
-/*
-	echo(getAccountsArray($userid));
-
-	$accCurr = getAccCurrInfo($userid);
-	$dest_id = count($accCurr) ? $accCurr[0]["id"] : 0;
-
-	echo(getCurrencyArray());
-
-	echo("var trans_curr = ".$accCurr[0]["curr_id"].";\r\n");
-	echo("var trans_acc_curr = ".$accCurr[0]["curr_id"].";\r\n");
-*/
 	echo("var trans_type = 2;\r\n");
 	echo("var edit_mode = false;\r\n");
 ?>
@@ -60,11 +49,6 @@
 	echo($acc->getTable(TRUE));
 
 	$accounts = $acc->getCount();
-/*
-	echo(getAccountsTable($userid));
-
-	$accounts = $db->countQ("accounts", "user_id=".$userid);
-*/
 	if ($accounts > 0)
 	{
 ?>
@@ -79,9 +63,6 @@
 			<select class="sel" id="destid" name="destid" onchange="onChangeAcc();">
 <?php
 	echo($acc->getList($dest_id));
-/*
-	echo(getAccountsList($userid, $dest_id));
-*/
 ?>
 			</select>
 		</td>
@@ -89,13 +70,10 @@
 
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Incoming amount</span></td>
-		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" class="currsign"><?php echo($dest_sign); /* echo(getCurSign($accCurr, $dest_id)); */ ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
+		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);"><span id="amountsign" class="currsign"><?php echo($dest_sign); ?></span><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
 			<select class="sel" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
 <?php
 	echo(Currency::getList($dest_curr));
-/*
-	echo(getCurrencyList(getCurrId($accCurr, $dest_id)));
-*/
 ?>
 			</select>
 		</td>
@@ -103,7 +81,7 @@
 
 		<tr id="chargeoff" style="display: none;">
 		<td style="text-align: right;"><span style="margin-right: 5px;">Receipt</span></td>
-		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($dest_sign); /* echo(getCurSign($accCurr, $dest_id)); */ ?></span></td>
+		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" style="margin-left: 5px;"><?php echo($dest_sign); ?></span></td>
 		</tr>
 
 		<tr id="exchange" style="display: none;">

@@ -78,10 +78,6 @@
 	$acc = new Account($userid);
 
 	$accounts = $acc->getCount();
-/*
-	$resArr = $db->selectQ("*", "accounts", "user_id=".$userid);
-	$accounts = count($resArr);
-*/
 	if (!$accounts)
 	{
 		echo("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
@@ -120,26 +116,18 @@
 				echo("<tr>");
 
 				if ($transType == "expense" || $transType == "transfer")
-					echo("<td>".$acc->getName($row["src_id"]) /* getAccountName($row["src_id"]) */."</td>");
+					echo("<td>".$acc->getName($row["src_id"])."</td>");
 				if ($transType == "income" || $transType == "transfer")
-					echo("<td>".$acc->getName($row["dest_id"]) /* getAccountName($row["dest_id"]) */."</td>");
+					echo("<td>".$acc->getName($row["dest_id"])."</td>");
 
-				echo("<td style=\"text-align: right;\">". Currency::format($row["amount"], $row["curr_id"]) /* currFormat($row["amount"], $row["curr_id"]) */);
+				echo("<td style=\"text-align: right;\">". Currency::format($row["amount"], $row["curr_id"]));
 				if ($row["charge"] != $row["amount"])
 				{
 					echo(" (");
-
 					if ($trtype_id == 1 || $trtype_id == 3)		// expense or transfer
 						echo(Currency::format($row["charge"], $acc->getCurrency($row["src_id"])));
 					else if ($trtype_id == 2)					// income
 						echo(Currency::format($row["charge"], $acc->getCurrency($row["dest_id"])));
-/*
-					if ($trtype_id == 1 || $trtype_id == 3)		// expense or transfer
-						echo(currFormat($row["charge"], getAccountCurrency($row["src_id"])));
-					else if ($trtype_id == 2)					// income
-						echo(currFormat($row["charge"], getAccountCurrency($row["dest_id"])));
-*/
-
 					echo(")");
 				}
 				echo("</td>");

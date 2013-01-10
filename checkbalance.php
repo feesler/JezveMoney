@@ -128,7 +128,7 @@
 	$acc = new Account($userid);
 
 	ebr("<table>");
-	ebr("<tr><td colspan=\"8\">".$acc->getName($checkAccount_id) /* getAccountName($checkAccount_id) */."</td></tr>");
+	ebr("<tr><td colspan=\"8\">".$acc->getName($checkAccount_id)."</td></tr>");
 
 	$resArr = $db->selectQ("*", "accounts", "id=".$checkAccount_id." AND user_id=".$userid);
 	if (count($resArr) != 1)
@@ -163,15 +163,6 @@
 
 		$src_name = $acc->getName($tr_src_id);
 		$dest_name = $acc->getName($tr_dest_id);
-/*
-		if (!isset($accNameCache[$tr_src_id]))
-			$accNameCache[$tr_src_id] = getAccountName($tr_src_id);
-		if (!isset($accNameCache[$tr_dest_id]))
-			$accNameCache[$tr_dest_id] = getAccountName($tr_dest_id);
-
-		$src_name = $accNameCache[$tr_src_id];
-		$dest_name = $accNameCache[$tr_dest_id];
-*/
 
 		echo("<tr><td style=\"background-color: #D0D0D0;\">".$tr_id."</td>");
 

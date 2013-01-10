@@ -38,9 +38,6 @@
 	$acc = new Account($userid);
 
 	echo($acc->getTable(TRUE));
-/*
-	echo(getAccountsTable($userid));
-*/
 ?>
 </table>
 </body>

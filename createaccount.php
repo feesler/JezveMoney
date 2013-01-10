@@ -77,9 +77,6 @@ function onSubmit(frm)
 	$curr = new Currency;
 
 	echo($curr->getList());
-/*
-	echo(getCurrencyList());
-*/
 ?>
 			</select></td>
 		</tr>
