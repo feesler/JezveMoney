@@ -60,7 +60,7 @@
 	echo(getCurrencyArray());
 
 	echo("\r\n\r\nvar transaction =\r\n{\r\n");
-	echo("\tsrcAcc : ".$trans_scr_id.",\r\n");
+	echo("\tsrcAcc : ".$trans_src_id.",\r\n");
 	echo("\tdestAcc : ".$trans_dest_id.",\r\n");
 	echo("\tamount : ".$trans_amount.",\r\n");
 	echo("\tcharge : ".$trans_chanrge.",\r\n");
