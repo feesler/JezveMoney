@@ -100,6 +100,20 @@ class Account
 	}
 
 
+	// Return current balance of account
+	public function getBalance($acc_id)
+	{
+		return $this->getCache($acc_id, "balance");
+	}
+
+
+	// Return name of account
+	public function getInitBalance($acc_id)
+	{
+		return $this->getCache($acc_id, "initbalance");
+	}
+
+
 	// Return id of account by specified position
 	public function getIdByPos($position)
 	{
