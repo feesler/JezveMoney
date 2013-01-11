@@ -25,13 +25,6 @@
 
 	if (!$acc->is_exist($acc_id))
 		fail();
-/*
-	$resArr = $db->selectQ("*", "accounts", "id=".$acc_id);
-	if (count($resArr) != 1)
-		fail();
-
-	$arr = $resArr[0];
-*/
 
 	$titleString = "jezve Money - Edit account";
 ?>
@@ -92,22 +85,19 @@ function onSubmit(frm)
 	<table>
 		<tr>
 			<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>
-			<td><input id="accname" name="accname" type="text" value="<?php echo($acc->getName($acc_id)); /* echo($arr["name"]); */ ?>"></td>
+			<td><input id="accname" name="accname" type="text" value="<?php echo($acc->getName($acc_id)); ?>"></td>
 		</tr>
 		<tr>
 			<td style="text-align: right;"><span style="margin-right: 5px;">Currency</span></td>
 			<td><select id="acccurr" name="acccurr">
 <?php
 	echo(Currency::getList($acc->getCurrency($acc_id)));
-/*
-	echo(getCurrencyList($arr["curr_id"]));
-*/
 ?>
 			</select></td>
 		</tr>
 		<tr>
 			<td style="text-align: right;"><span style="margin-right: 5px;">Initial balance</span></td>
-			<td><input id="initbal" name="initbal" type="text" value="<?php echo($acc->getInitBalance($acc_id)); /* echo($arr["initbalance"]); */ ?>" onkeypress="return onFieldKey(event, this);"></td>
+			<td><input id="initbal" name="initbal" type="text" value="<?php echo($acc->getInitBalance($acc_id)); ?>" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
 			<td colspan="2" style="text-align: center;"><input type="submit" value="Ok"></td>
