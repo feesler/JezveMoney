@@ -49,6 +49,33 @@ class Currency
 	}
 
 
+	// Return count of currencies
+	public function getCount()
+	{
+		if (!$this->checkCache())
+			return 0;
+
+		return count(self::$cache);
+	}
+
+
+	// Check is specified currency is exist
+	public function is_exist($curr_id)
+	{
+		if (!is_numeric($curr_id))
+			return FALSE;
+
+		$curr_id = intval($curr_id);
+		if (!$curr_id)
+			return FALSE;
+
+		if (!self::checkCache())
+			return FALSE;
+
+		return isset(self::$cache[$curr_id]);
+	}
+
+
 	// Return name of specified currency
 	public static function getName($curr_id)
 	{
