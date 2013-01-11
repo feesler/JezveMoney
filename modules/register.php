@@ -11,6 +11,17 @@
 	}
 
 
+	$userid = User::check();
+	if ($userid != 0)
+		setLocation("../index.php");
+
+	if (!isset($_POST["logacc"]) || !isset($_POST["logpwd"]))
+		fail();
+
+	if (!User::register($_POST["logacc"], $_POST["logpwd"]))
+		fail();
+
+/*
 	if (!isset($_POST["logacc"]) || $_POST["logacc"] == "" || !isset($_POST["logpwd"]) || $_POST["logpwd"] == "")
 		fail();
 
@@ -20,6 +31,7 @@
 
 	if (!$db->insertQ("users", array("id", "login", "passhash"), array(NULL, $elogin, $passhash)))
 		fail();
+*/
 
 	setLocation("../index.php");
 

@@ -1,10 +1,10 @@
 <?php
-
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
 	require_once("../class/account.php");
 	require_once("../class/transaction.php");
+
 
 	function fail()
 	{
@@ -12,9 +12,14 @@
 	}
 
 
+	$userid = User::check();
+	if (!$userid)
+		setLocation("../login.php");
+/*
 	session_start();
 
 	$userid = checkUser("../login.php");
+*/
 
 
 	$trans_id = intval($_POST["transid"]);

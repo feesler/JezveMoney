@@ -4,9 +4,15 @@
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
 
+
+	$userid = User::check();
+	if (!$userid)
+		setLocation("./login.php");
+/*
 	session_start();
 
 	$userid = checkUser("./login.php");
+*/
 
 	$titleString = "jezve Money - Transfer";
 ?>

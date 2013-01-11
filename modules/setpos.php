@@ -70,9 +70,14 @@
 	}
 
 
+	$userid = User::check();
+	if (!$userid)
+		setLocation("../login.php");
+/*
 	session_start();
 
 	$userid = checkUser("./login.php");
+*/
 
 	if (!isset($_POST["trans_id"]) || !is_numeric($_POST["trans_id"]) ||
 		!isset($_POST["trans_pos"]) || !is_numeric($_POST["trans_pos"]) ||

@@ -5,6 +5,25 @@
 	require_once("../class/account.php");
 
 
+	function fail()
+	{
+		setLocation("../login.php?act=wrong");
+	}
+
+
+	$userid = User::check();
+	if ($userid != 0)
+		setLocation("../index.php");
+
+	if (!isset($_POST["logacc"]) || !isset($_POST["logpwd"]))
+		fail();
+
+	if (!User::login($_POST["logacc"], $_POST["logpwd"]))
+		fail();
+
+	setLocation("../index.php");
+
+/*
 	$login = $_POST["logacc"];
 	$pass = $_POST["logpwd"];
 	if ($login && $login != "" && $pass && $pass != "")
@@ -24,5 +43,6 @@
 	}
 
 	setLocation("../login.php?act=wrong");
+*/
 
 ?>

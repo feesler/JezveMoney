@@ -4,6 +4,11 @@
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
 
+
+	$userid = User::check();
+	if ($userid != 0)
+		setLocation("./index.php");
+/*
 	session_start();
 
 	if (isset($_SESSION["userid"]))
@@ -30,6 +35,7 @@
 			}
 		}
 	}
+*/
 
 	$titleString = "jezve Money - Log in";
 ?>

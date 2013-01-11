@@ -10,6 +10,19 @@
 		setLocation("../profile.php?act=fail");
 	}
 
+
+	$userid = User::check();
+	if (!$userid)
+		setLocation("../login.php");
+
+	if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
+		fail();
+
+	$login = User::getName($userid);
+	if (!User::changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
+		fail();
+
+/*
 	session_start();
 
 	$userid = checkUser("../login.php");
@@ -31,6 +44,7 @@
 
 	$preHash = createPreHash($login, $newpwd);
 	setupCookies($login, $preHash);
+*/
 
 	setLocation("../profile.php?act=ok");
 
