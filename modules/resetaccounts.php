@@ -21,19 +21,5 @@
 	if (!$acc->reset())
 		fail();
 
-/*
-	if (!is_numeric($userid))
-		fail();
-
-	// delete all transactions of user
-	if (!$db->deleteQ("transactions", "user_id=".$userid))
-		fail();
-
-	// delete all accounts of user
-	if (!$db->deleteQ("accounts", "user_id=".$userid))
-		fail();
-*/
-
 	setLocation("../accounts.php?reset=ok");
-
 ?>
