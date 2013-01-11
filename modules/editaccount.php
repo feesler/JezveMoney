@@ -15,7 +15,15 @@
 
 	$userid = checkUser("../login.php");
 
+	if (!isset($_POST["accid"]) || !isset($_POST["accname"]) || !isset($_POST["acccurr"]) || !isset($_POST["initbal"]))
+		fail();
 
+	$acc = new Account($userid);
+
+	if (!$acc->edit($_POST["accid"], $_POST["accname"], $_POST["initbal"], $_POST["acccurr"]))
+		fail();
+
+/*
 	if (!is_numeric($_POST["accid"]))
 		fail();
 	$acc_id = intval($_POST["accid"]);
@@ -56,6 +64,7 @@
 		if (mysql_errno())
 			fail();
 	}
+*/
 
 
 	setLocation("../accounts.php?edit=ok");

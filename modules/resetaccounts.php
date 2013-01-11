@@ -15,6 +15,13 @@
 	session_start();
 
 	$userid = checkUser("../login.php");
+
+	$acc = new Account($userid);
+
+	if (!$acc->reset())
+		fail();
+
+/*
 	if (!is_numeric($userid))
 		fail();
 
@@ -25,6 +32,7 @@
 	// delete all accounts of user
 	if (!$db->deleteQ("accounts", "user_id=".$userid))
 		fail();
+*/
 
 	setLocation("../accounts.php?reset=ok");
 

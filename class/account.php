@@ -76,6 +76,9 @@ class Account
 	// Check is specified account is exist
 	public function is_exist($acc_id)
 	{
+		if (!is_numeric($acc_id))
+			return FALSE;
+
 		$acc_id = intval($acc_id);
 		if (!$acc_id)
 			return FALSE;
@@ -84,6 +87,102 @@ class Account
 			return FALSE;
 
 		return isset(self::$cache[$acc_id]);
+	}
+
+
+	// Create new account for current user
+	public function create($accname, $balance, $curr_id)
+	{
+		global $db;
+
+		if (!$accname || !is_numeric($balance) || !is_numeric($curr_id))
+			return FALSE;
+
+		$accname = $db->escape($accname);
+		$balance = floatval($balance);
+		$curr_id = intval($curr_id);
+	
+		if (!$accname || $accname == "" || !$curr_id)
+			return FALSE;
+	
+		if (!$db->insertQ("accounts", array("id", "user_id", "curr_id", "balance", "initbalance", "name"),
+								array(NULL, self::$user_id, $curr_id, $balance, $balance, $accname)))
+			return FALSE;
+
+		self::updateCache();
+
+		return TRUE;
+	}
+
+
+	// Update account information
+	public function edit($acc_id, $accname, $balance, $curr_id)
+	{
+		global $db;
+
+		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
+			return FALSE;
+
+		$acc_id = intval($acc_id);
+		$accname = $db->escape($accname);
+		$balance = floatval($balance);
+		$curr_id = intval($curr_id);
+
+		// check account is exist
+		if (!$this->is_exist($acc_id))
+			return FALSE;
+
+		// check user of account
+		if ($this->getUser($acc_id) != self::$user_id)
+			return FALSE;
+
+		// check is currency exist
+		if (!Currency::is_exist($curr_id))
+			return FALSE;
+
+		// get initial balance to calc difference
+		$diff = 0.0;
+		$initbalance = $this->getInitBalance($acc_id);
+		$diff = $balance - $initbalance;
+
+		$fields = array("name", "curr_id");
+		$values = array($accname, $curr_id);
+
+		if (abs($diff) > 0.01)
+		{
+			$newbalance = $this->getBalance($acc_id) + $diff;
+
+			$fields[] = "balance";
+			$values[] = $newbalance;
+			$fields[] = "initbalance";
+			$values[] = $balance;
+		}
+
+		if (!$db->updateQ("accounts", $fields, $values, "id=".$acc_id))
+			return FALSE;
+
+		self::updateCache();
+
+		return TRUE;
+	}
+
+
+	// Delete all accounts of user
+	public function reset()
+	{
+		global $db;
+
+		// delete all transactions of user
+		if (!$db->deleteQ("transactions", "user_id=".self::$user_id))
+			return FALSE;
+
+		// delete all accounts of user
+		if (!$db->deleteQ("accounts", "user_id=".self::$user_id))
+			return FALSE;
+
+		self::updateCache();
+
+		return TRUE;
 	}
 
 
