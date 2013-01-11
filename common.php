@@ -1,9 +1,10 @@
 <?php
 	
-	// Set location header to redirect page
+	// Set location header to redirect page and exit from script
 	function setLocation($loc)
 	{
 		header("Location: ".$loc);
+		exit();
 	}
 
 

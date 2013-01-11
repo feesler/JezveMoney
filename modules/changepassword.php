@@ -8,7 +8,6 @@
 	function fail()
 	{
 		setLocation("../profile.php?act=fail");
-		exit();
 	}
 
 	session_start();

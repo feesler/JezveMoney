@@ -8,7 +8,6 @@
 	function fail()
 	{
 		setLocation("../accounts.php?edit=fail");
-		exit();
 	}
 
 

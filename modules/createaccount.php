@@ -8,7 +8,6 @@
 	function fail()
 	{
 		setLocation("../accounts.php?newacc=fail");
-		exit();
 	}
 
 

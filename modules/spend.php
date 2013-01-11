@@ -10,7 +10,6 @@
 	function fail()
 	{
 		setLocation("../index.php?trans=fail");
-		exit();
 	}
 
 

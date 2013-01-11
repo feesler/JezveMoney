@@ -20,7 +20,6 @@
 			setupCookies($login, $preHash);
 
 			setLocation("../index.php");
-			exit();
 		}
 	}
 

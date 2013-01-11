@@ -8,10 +8,12 @@
 	function fail($acc_id = 0)
 	{
 		if (!$acc_id)
+		{
 			echo("fail to update position");
+			exit();
+		}
 		else
 			setLocation("../checkbalance.php?id=".$acc_id."&pos=fail");
-		exit();
 	}
 
 

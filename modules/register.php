@@ -8,7 +8,6 @@
 	function fail()
 	{
 		setLocation("../registration.php?act=fail");
-		exit();
 	}
 
 

@@ -8,7 +8,6 @@
 	function fail()
 	{
 		setLocation("../resetaccounts.php?act=fail");
-		exit();
 	}
 
 

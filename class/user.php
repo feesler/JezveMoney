@@ -143,7 +143,6 @@
 			}
 
 			setLocation($url);
-			exit();
 		}
 	}
 

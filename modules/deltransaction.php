@@ -9,7 +9,6 @@
 	function fail()
 	{
 		setLocation("../transactions.php?del=fail");
-		exit();
 	}
 
 
