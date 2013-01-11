@@ -27,6 +27,7 @@ class Account
 		{
 			$acc_id = $row["id"];
 
+			self::$cache[$acc_id]["user_id"] = $row["user_id"];
 			self::$cache[$acc_id]["name"] = $row["name"];
 			self::$cache[$acc_id]["curr_id"] = intval($row["curr_id"]);
 			self::$cache[$acc_id]["balance"] = floatval($row["balance"]);
@@ -83,6 +84,13 @@ class Account
 			return FALSE;
 
 		return isset(self::$cache[$acc_id]);
+	}
+
+
+	// Return user of account
+	public function getUser($acc_id)
+	{
+		return $this->getCache($acc_id, "user_id");
 	}
 
 
