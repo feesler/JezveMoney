@@ -15,12 +15,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("../login.php");
-/*
-	session_start();
-
-	$userid = checkUser("../login.php");
-*/
-
 
 	$trans_id = intval($_POST["transid"]);
 	if (!$trans_id)

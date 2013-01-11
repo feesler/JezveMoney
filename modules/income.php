@@ -15,11 +15,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("../login.php");
-/*
-	session_start();
-
-	$userid = checkUser("../login.php");
-*/
 
 	$dest_id = intval($_POST["destid"]);
 	$amount = floatval($_POST["amount"]);

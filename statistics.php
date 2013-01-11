@@ -24,11 +24,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("./login.php");
-/*
-	session_start();
-
-	$userid = checkUser("./login.php");
-*/
 
 	$acc = new Account($userid);
 

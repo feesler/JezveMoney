@@ -8,11 +8,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("./login.php");
-/*
-	session_start();
-
-	$userid = checkUser("./login.php");
-*/
 
 	$titleString = "jezve Money - Profile";
 ?>

@@ -23,26 +23,4 @@
 
 	setLocation("../index.php");
 
-/*
-	$login = $_POST["logacc"];
-	$pass = $_POST["logpwd"];
-	if ($login && $login != "" && $pass && $pass != "")
-	{
-		$elogin = $db->escape($login);
-		if (checkLoginData($elogin, $pass))
-		{
-			session_start();
-			$_SESSION["userid"] = getUserId($login);
-
-			$preHash = createPreHash($login, $pass);
-
-			setupCookies($login, $preHash);
-
-			setLocation("../index.php");
-		}
-	}
-
-	setLocation("../login.php?act=wrong");
-*/
-
 ?>

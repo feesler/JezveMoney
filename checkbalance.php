@@ -14,11 +14,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("./login.php");
-/*
-	session_start();
-
-	$userid = checkUser("./login.php");
-*/
 
 	if (!isset($_GET["id"]))
 		fail();

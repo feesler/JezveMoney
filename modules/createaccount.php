@@ -14,11 +14,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("../login.php");
-/*
-	session_start();
-
-	$userid = checkUser("../login.php");
-*/
 
 	if (!isset($_POST["accname"]) || !isset($_POST["accbalance"]) || !isset($_POST["acccurr"]))
 		fail();

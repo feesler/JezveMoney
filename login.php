@@ -8,34 +8,6 @@
 	$userid = User::check();
 	if ($userid != 0)
 		setLocation("./index.php");
-/*
-	session_start();
-
-	if (isset($_SESSION["userid"]))
-	{
-		header("Location: ./index.php");
-		exit();
-	}
-	else
-	{
-		if (isset($_COOKIE["login"]) && isset($_COOKIE["passhash"]))
-		{
-			$loginCook = $_COOKIE["login"];
-			$passCook = $_COOKIE["passhash"];
-
-			if (checkCookie($loginCook, $passCook))
-			{
-				session_start();
-				$_SESSION["userid"] = getUserId($loginCook);
-
-				setupCookies($loginCook, $passCook);
-
-				header("Location: ./index.php");
-				exit();
-			}
-		}
-	}
-*/
 
 	$titleString = "jezve Money - Log in";
 ?>
@@ -43,7 +15,6 @@
 <html>
 <head>
 <title><?php echo($titleString); ?></title>
-<link rel="stylesheet" type="text/css" href="./css/common.css">
 <?php
 	getStyle($sitetheme);
 ?>

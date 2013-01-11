@@ -15,11 +15,6 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("../login.php");
-/*
-	session_start();
-
-	$userid = checkUser("../login.php");
-*/
 
 	$src_id = intval($_POST["srcid"]);
 	$dest_id = intval($_POST["destid"]);
