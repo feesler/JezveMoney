@@ -104,17 +104,6 @@ class Transaction
 		$transAmount = $this->getCache($trans_id, "amount");
 		$transCharge = $this->getCache($trans_id, "charge");
 
-/*
-		$trans = self::$cache[$trans_id];
-
-		$transUser = intval($trans["user_id"]);
-		$src_id = intval($trans["src_id"]);
-		$dest_id = intval($trans["dest_id"]);
-		$transType = intval($trans["type"]);
-		$transAmount = floatval($trans["amount"]);
-		$transCharge = floatval($trans["charge"]);
-*/
-
 		// check user is the same
 		if ($transUser != self::$user_id)
 			return FALSE;
@@ -129,13 +118,6 @@ class Transaction
 				return FALSE;
 
 			$srcBalance = $acc->getBalance($src_id);
-/*
-			$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-			if (count($resArr) != 1)
-				return FALSE;
-	
-			$srcBalance = floatval($resArr[0]["balance"]);
-*/
 		}
 
 		// check destination account is exist
@@ -146,13 +128,6 @@ class Transaction
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
-/*
-			$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-			if (count($resArr) != 1)
-				return FALSE;
-
-			$destBalance = floatval($resArr[0]["balance"]);
-*/
 		}
 
 		if ($transType == 1)		// spend
@@ -162,10 +137,6 @@ class Transaction
 
 			if (!$acc->setBalance($src_id, $srcBalance))
 				return FALSE;
-/*
-			if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
-				fail();
-*/
 		}
 		else if ($transType == 2)		// income
 		{
@@ -173,10 +144,6 @@ class Transaction
 			$destBalance -= $transCharge;
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
-/*
-			if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
-				fail();
-*/
 		}
 		else if ($transType == 3)		// transfer
 		{
@@ -184,19 +151,11 @@ class Transaction
 			$srcBalance += $transCharge;
 			if (!$acc->setBalance($src_id, $srcBalance))
 				return FALSE;
-/*
-			if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
-				return FALSE;
-*/
 
 			// update balance of destination account
 			$destBalance -= $transAmount;
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
-/*
-			if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
-				return FALSE;
-*/
 		}
 		else
 			return FALSE;
