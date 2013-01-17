@@ -36,28 +36,42 @@
 	if (!$trans->cancel($trans_id))
 		fail();
 
+	$acc = new Account($userid);
 
 	// check source account is exist
 	$srcBalance = 0;
 	if ($src_id != 0)
 	{
+		if (!$acc->is_exist($src_id))
+			return FALSE;
+
+		$srcBalance = $acc->getBalance($src_id);
+/*
 		$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 		if (count($resArr) != 1)
 			return FALSE;
 
 		$srcBalance = floatval($resArr[0]["balance"]);
+*/
 	}
 
 	// check destination account is exist
 	$destBalance = 0;
 	if ($dest_id != 0)
 	{
+		if (!$acc->is_exist($dest_id))
+			return FALSE;
+
+		$destBalance = $acc->getBalance($dest_id);
+		$dest_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
+/*
 		$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
 		if (count($resArr) != 1)
 			return FALSE;
 
 		$destBalance = floatval($resArr[0]["balance"]);
 		$dest_curr_id = intval($resArr[0]["curr_id"]);		// currency of destination account is currency of transfer transaction
+*/
 	}
 
 	if ($trans_type == 1)	// spend
@@ -67,8 +81,12 @@
 			fail();
 
 		$srcBalance -= $charge;
+		if (!$acc->setBalance($src_id, $srcBalance))
+			fail();
+/*
 		if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 			fail();
+*/
 
 		setLocation("../transactions.php?type=expense&edit=ok");
 	}
@@ -79,8 +97,12 @@
 			fail();
 
 		$destBalance += $charge;
+		if (!$acc->setBalance($dest_id, $destBalance))
+			fail();
+/*
 		if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
-			fail();	
+			fail();
+*/
 
 		setLocation("../transactions.php?type=income&edit=ok");
 	}
@@ -91,12 +113,20 @@
 			fail();
 
 		$srcBalance -= $charge;
+		if (!$acc->setBalance($src_id, $srcBalance))
+			fail();
+/*
 		if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 			fail();
+*/
 
 		$destBalance += $amount;
+		if (!$acc->setBalance($dest_id, $destBalance))
+			fail();
+/*
 		if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 			fail();
+*/
 
 		setLocation("../transactions.php?type=transfer&edit=ok");
 	}
