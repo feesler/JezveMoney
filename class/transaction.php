@@ -59,7 +59,7 @@ class Transaction
 	private function getCache($trans_id, $val)
 	{
 		$trans_id = intval($trans_id);
-		if (!$trans_id || !$val)
+		if (!$trans_id || is_null($val) || $val == "")
 			return NULL;
 
 		if (!$this->checkCache($trans_id))
@@ -97,6 +97,14 @@ class Transaction
 		if (!$this->is_exist($trans_id))
 			return FALSE;
 
+		$transUser = $this->getCache($trans_id, "user_id");
+		$src_id = $this->getCache($trans_id, "src_id");
+		$dest_id = $this->getCache($trans_id, "dest_id");
+		$transType = $this->getCache($trans_id, "type");
+		$transAmount = $this->getCache($trans_id, "amount");
+		$transCharge = $this->getCache($trans_id, "charge");
+
+/*
 		$trans = self::$cache[$trans_id];
 
 		$transUser = intval($trans["user_id"]);
@@ -105,61 +113,95 @@ class Transaction
 		$transType = intval($trans["type"]);
 		$transAmount = floatval($trans["amount"]);
 		$transCharge = floatval($trans["charge"]);
+*/
 
 		// check user is the same
 		if ($transUser != self::$user_id)
 			return FALSE;
 
+		$acc = new Account(self::$user_id);
+
 		// check source account is exist
 		$srcBalance = 0;
 		if ($src_id != 0)
 		{
+			if (!$acc->is_exist($src_id))
+				return FALSE;
+
+			$srcBalance = $acc->getBalance($src_id);
+/*
 			$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 			if (count($resArr) != 1)
 				return FALSE;
 	
 			$srcBalance = floatval($resArr[0]["balance"]);
+*/
 		}
 
 		// check destination account is exist
 		$destBalance = 0;
 		if ($dest_id != 0)
 		{
+			if (!$acc->is_exist($dest_id))
+				return FALSE;
+
+			$destBalance = $acc->getBalance($dest_id);
+/*
 			$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
 			if (count($resArr) != 1)
 				return FALSE;
 
 			$destBalance = floatval($resArr[0]["balance"]);
+*/
 		}
 
 		if ($transType == 1)		// spend
 		{
 			// update balance of account
 			$srcBalance += $transCharge;
+
+			if (!$acc->setBalance($src_id, $srcBalance))
+				return FALSE;
+/*
 			if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 				fail();
+*/
 		}
 		else if ($transType == 2)		// income
 		{
 			// update balance of account
 			$destBalance -= $transCharge;
+			if (!$acc->setBalance($dest_id, $destBalance))
+				return FALSE;
+/*
 			if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 				fail();
+*/
 		}
 		else if ($transType == 3)		// transfer
 		{
 			// update balance of source account
 			$srcBalance += $transCharge;
+			if (!$acc->setBalance($src_id, $srcBalance))
+				return FALSE;
+/*
 			if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 				return FALSE;
+*/
 
 			// update balance of destination account
 			$destBalance -= $transAmount;
+			if (!$acc->setBalance($dest_id, $destBalance))
+				return FALSE;
+/*
 			if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 				return FALSE;
+*/
 		}
 		else
 			return FALSE;
+
+		self::updateCache($trans_id);
 
 		return TRUE;
 	}
