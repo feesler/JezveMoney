@@ -167,6 +167,21 @@ class Account
 	}
 
 
+	// Set new value of account
+	private function setValue($acc_id, $field, $newValue)
+	{
+		if (!$acc_id || !is_null($field) || $field == "")
+			return FALSE;
+
+		if (!$db->updateQ("accounts", array($field), array($newValue), "id=".$acc_id))
+			return FALSE;
+
+		self::updateCache();
+
+		return TRUE;
+	}
+
+
 	// Delete all accounts of user
 	public function reset()
 	{
@@ -200,10 +215,30 @@ class Account
 	}
 
 
+	// Set currency of account
+	public function setCurrency($acc_id, $curr_id)
+	{
+		if (!$acc_id || is_numeric($curr_id))
+			return FALSE;
+
+		return $this->setValue($acc_id, "curr_id", intval($curr_id));
+	}
+
+
 	// Return name of account
 	public function getName($acc_id)
 	{
 		return $this->getCache($acc_id, "name");
+	}
+
+
+	// Set initial balance of account
+	public function setName($acc_id, $name)
+	{
+		if (!$acc_id || is_null($name) || $name == "")
+			return FALSE;
+
+		return $this->setValue($acc_id, "name", $name);
 	}
 
 
@@ -214,10 +249,30 @@ class Account
 	}
 
 
+	// Set balance of account
+	public function setBalance($acc_id, $balance)
+	{
+		if (!$acc_id || !is_numeric($balance))
+			return FALSE;
+
+		return $this->setValue($acc_id, "balance", floatval($balance));
+	}
+
+
 	// Return name of account
 	public function getInitBalance($acc_id)
 	{
 		return $this->getCache($acc_id, "initbalance");
+	}
+
+
+	// Set initial balance of account
+	public function setInitBalance($acc_id, $initbalance)
+	{
+		if (!$acc_id || !is_numeric($initbalance))
+			return FALSE;
+
+		return $this->setValue($acc_id, "initbalance", floatval($initbalance));
 	}
 
 
