@@ -18,6 +18,7 @@
 	}
 
 
+/*
 	function setPos($trans_id, $new_pos)
 	{
 		global $db;
@@ -69,6 +70,7 @@
 
 		return TRUE;
 	}
+*/
 
 
 	$userid = User::check();
@@ -86,8 +88,13 @@
 	if (!$tr_id || !$to_pos || !$acc_id)
 		fail();
 
+	$trans = new Transaction($userid);
+	if (!$trans->updatePos($tr_id, $to_pos))
+		fail($acc_id);
+/*
 	if (!setPos($tr_id, $to_pos))
 		fail($acc_id);
+*/
 
 	setLocation("../checkbalance.php?id=".$acc_id."&pos=ok");
 ?>

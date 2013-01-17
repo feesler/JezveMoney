@@ -31,6 +31,12 @@
 		fail();
 
 
+	// cancel transaction
+	$trans = new Transaction($userid);
+	if (!$trans->cancel($trans_id))
+		fail();
+
+/*
 	// check transaction is exist
 	$transArr = $db->selectQ("*", "transactions", "id=".$trans_id);
 	if (count($transArr) != 1)
@@ -39,6 +45,7 @@
 	// cancel transaction
 	if (!cancelTransaction($trans_id))
 		fail();
+*/
 
 
 	// check source account is exist

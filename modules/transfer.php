@@ -39,7 +39,11 @@
 	$dest_curr_id = intval($resArr[0]["curr_id"]);
 	$destBalance = floatval($resArr[0]["balance"]);
 
+	$trans = new Transaction($userid);
+	$tr_pos = $trans->getLatestPos();
+/*
 	$tr_pos = getLatestTransactionPos($userid);
+*/
 	$tr_pos++;
 
 	if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
