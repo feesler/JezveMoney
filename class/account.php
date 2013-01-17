@@ -170,7 +170,9 @@ class Account
 	// Set new value of account
 	private function setValue($acc_id, $field, $newValue)
 	{
-		if (!$acc_id || !is_null($field) || $field == "")
+		global $db;
+
+		if (!$acc_id || is_null($field) || $field == "")
 			return FALSE;
 
 		if (!$db->updateQ("accounts", array($field), array($newValue), "id=".$acc_id))
