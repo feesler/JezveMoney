@@ -18,61 +18,6 @@
 	}
 
 
-/*
-	function setPos($trans_id, $new_pos)
-	{
-		global $db;
-
-		$trans_id = intval($trans_id);
-		$new_pos = intval($new_pos);
-		if (!$trans_id || !$new_pos)
-			return FALSE;
-
-		$resArr = $db->selectQ("*", "transactions", "id=".$trans_id);
-		if (count($resArr) != 1)
-			return FALSE;
-
-		$old_pos = intval($resArr[0]["pos"]);
-		$user_id = intval($resArr[0]["user_id"]);
-		if ($old_pos == $new_pos)
-		{
-			return TRUE;
-		}
-		else if ($old_pos == 0)			// insert with specified position
-		{
-			$latest = getLatestTransactionPos($user_id);
-
-			$query = "UPDATE `transactions` SET pos=pos+1 WHERE pos >= ".$new_pos." AND pos <= ".$latest.";";
-
-			$db->rawQ($query);
-			if (mysql_errno() != 0)
-				return FALSE;
-		}
-		else if ($new_pos < $old_pos)		// moving up
-		{
-			$query = "UPDATE `transactions` SET pos=pos+1 WHERE pos >= ".$new_pos." AND pos < ".$old_pos.";";
-
-			$db->rawQ($query);
-			if (mysql_errno() != 0)
-				return FALSE;
-		}
-		else if ($new_pos > $old_pos)		// moving down
-		{
-			$query = "UPDATE `transactions` SET pos=pos-1 WHERE pos > ".$old_pos." AND pos <= ".$new_pos.";";
-
-			$db->rawQ($query);
-			if (mysql_errno() != 0)
-				return FALSE;
-		}
-
-		if (!$db->updateQ("transactions", array("pos"), array($new_pos), "id=".$trans_id))
-			return FALSE;
-
-		return TRUE;
-	}
-*/
-
-
 	$userid = User::check();
 	if (!$userid)
 		setLocation("../login.php");
@@ -91,10 +36,6 @@
 	$trans = new Transaction($userid);
 	if (!$trans->updatePos($tr_id, $to_pos))
 		fail($acc_id);
-/*
-	if (!setPos($tr_id, $to_pos))
-		fail($acc_id);
-*/
 
 	setLocation("../checkbalance.php?id=".$acc_id."&pos=ok");
 ?>

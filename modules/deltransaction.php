@@ -33,15 +33,6 @@
 
 	if (!$trans->del($trans_id))
 		fail();
-/*
-	// cancel transaction
-	if (!cancelTransaction($trans_id))
-		fail();
-
-	// delete transaction record
-	if (!$db->deleteQ("transactions", "id=".$trans_id))
-		fail();
-*/
 
 	if ($trans_type == 1)
 		setLocation("../transactions.php?type=expense&del=ok");
