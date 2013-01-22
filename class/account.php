@@ -101,10 +101,10 @@ class Account
 		$accname = $db->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
-	
+
 		if (!$accname || $accname == "" || !$curr_id)
 			return FALSE;
-	
+
 		if (!$db->insertQ("accounts", array("id", "user_id", "curr_id", "balance", "initbalance", "name"),
 								array(NULL, self::$user_id, $curr_id, $balance, $balance, $accname)))
 			return FALSE;

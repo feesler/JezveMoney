@@ -150,38 +150,6 @@ class Transaction
 				return FALSE;
 		}
 
-/*
-		if ($transType == 1)		// spend
-		{
-			// update balance of account
-			$srcBalance += $transCharge;
-
-			if (!$acc->setBalance($src_id, $srcBalance))
-				return FALSE;
-		}
-		else if ($transType == 2)		// income
-		{
-			// update balance of account
-			$destBalance -= $transCharge;
-			if (!$acc->setBalance($dest_id, $destBalance))
-				return FALSE;
-		}
-		else if ($transType == 3)		// transfer
-		{
-			// update balance of source account
-			$srcBalance += $transCharge;
-			if (!$acc->setBalance($src_id, $srcBalance))
-				return FALSE;
-
-			// update balance of destination account
-			$destBalance -= $transAmount;
-			if (!$acc->setBalance($dest_id, $destBalance))
-				return FALSE;
-		}
-		else
-			return FALSE;
-*/
-
 		self::updateCache($trans_id);
 
 		return TRUE;
