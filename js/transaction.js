@@ -309,7 +309,7 @@ function onTransferSubmit(frm)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, chargeoff, exchange, resbal, dstyle;
+	var src, dest, amount, charge, exchrate, chargeoff, exchange, resbal, dstyle, transcurr;
 
 	src = ge('srcid');
 	dest = ge('destid');
@@ -342,6 +342,13 @@ function updControls()
 
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
 	chargeCurr = getCurrencyOfAccount(selectedValue(src));
+
+	if (trans_type == 3)
+	{
+		transcurr = ge('transcurr');
+		if (transcurr)
+			transcurr.value = amountCurr;
+	}
 
 	setSign(false, chargeCurr);
 	setSign(true, amountCurr);

@@ -166,7 +166,72 @@ class Transaction
 	}
 
 
-	// Update position of transaction
+	// Update specified transaction
+	public function edit($trans_id, $trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $trans_date, $comment)
+	{
+		global $db;
+
+		if (!$trans_id || ($trans_type != 1 && $trans_type != 2 && $trans_type != 3) || (!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trans_date == -1)
+			return FALSE;
+
+		// cancel transaction
+		if (!$this->cancel($trans_id))
+			return FALSE;
+
+		$acc = new Account(self::$user_id);
+
+		// check source account is exist
+		$srcBalance = 0;
+		if ($src_id != 0)
+		{
+			if (!$acc->is_exist($src_id))
+				return FALSE;
+
+			$srcBalance = $acc->getBalance($src_id);
+		}
+
+		// check destination account is exist
+		$destBalance = 0;
+		$trans_curr_id = $transcurr;
+		if ($dest_id != 0)
+		{
+			if (!$acc->is_exist($dest_id))
+				return FALSE;
+
+			$destBalance = $acc->getBalance($dest_id);
+			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
+		}
+
+		if (!$trans_curr_id)
+			return FALSE;
+
+		$fieldsArr = array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment");
+		$valuesArr = array($src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment);
+
+		if (!$db->updateQ("transactions", $fieldsArr, $valuesArr, "id=".$trans_id))
+			return FALSE;
+
+		// update balance of source account
+		if ($trans_type == 1 || $trans_type == 3)		// spend or transfer
+		{
+			$srcBalance -= $charge;
+			if (!$acc->setBalance($src_id, $srcBalance))
+				return FALSE;
+		}
+
+		// update balance of destination account
+		if ($trans_type == 2 || $trans_type == 3)		// income or transfer
+		{
+			$destBalance += (($trans_type == 2) ? $charge : $amount);
+			if (!$acc->setBalance($dest_id, $destBalance))
+				return FALSE;
+		}
+
+		return TRUE;
+	}
+
+
+	// Update position of specified transaction and fix position of 
 	function updatePos($trans_id, $new_pos)
 	{
 		global $db;
@@ -252,6 +317,20 @@ class Transaction
 			return 0;
 
 		return intval($resArr[0]["pos"]);
+	}
+
+
+	// Return string for specified transaction type
+	public static function getTypeString($trans_type)
+	{
+		if ($trans_type == 1)
+			return "expense";
+		else if ($trans_type == 2)
+			return "income";
+		else if ($trans_type == 3)
+			return "transfer";
+		else
+			return NULL;
 	}
 }
 

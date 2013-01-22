@@ -179,6 +179,10 @@
 		echo(Currency::getList($trans_curr));
 		echo("</select>");
 	}
+	else if ($trans_type == 3)
+	{
+		echo("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$acc->getCurrency($trans_dest_id)."\">");
+	}
 ?>
 		</td>
 		</tr>

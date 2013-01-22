@@ -27,6 +27,18 @@
 	$fdate = date("Y-m-d H:i:s", $trdate);
 	$comment = $db->escape($_POST["comm"]);
 
+
+	$trans = new Transaction($userid);
+	if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
+		fail();
+
+	$ttStr = Transaction::getTypeString($trans_type);
+	if (is_null($ttStr))
+		fail();
+
+	setLocation("../transactions.php?type=".$ttStr."&edit=ok");
+
+/*
 	if (!$trans_id || !$trans_type || (!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
@@ -101,5 +113,6 @@
 	}
 	else
 		fail();
+*/
 
 ?>
