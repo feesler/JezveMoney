@@ -31,13 +31,4 @@
 		fail();
 
 	setLocation("../transactions.php?type=".$ttStr."&del=ok");
-
-/*
-	if ($trans_type == 1)
-		setLocation("../transactions.php?type=expense&del=ok");
-	else if ($trans_type == 2)
-		setLocation("../transactions.php?type=income&del=ok");
-	else if ($trans_type == 3)
-		setLocation("../transactions.php?type=transfer&del=ok");
-*/
 ?>

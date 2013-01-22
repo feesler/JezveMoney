@@ -105,15 +105,6 @@ class Transaction
 		$transAmount = $this->getAmount($trans_id);
 		$transCharge = $this->getCharge($trans_id);
 
-/*
-		$transUser = $this->getCache($trans_id, "user_id");
-		$src_id = $this->getCache($trans_id, "src_id");
-		$dest_id = $this->getCache($trans_id, "dest_id");
-		$transType = $this->getCache($trans_id, "type");
-		$transAmount = $this->getCache($trans_id, "amount");
-		$transCharge = $this->getCache($trans_id, "charge");
-*/
-
 		// check type of transaction
 		if ($transType != 1 && $transType != 2 && $transType != 3)
 			return FALSE;
