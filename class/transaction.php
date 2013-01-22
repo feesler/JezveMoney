@@ -97,12 +97,22 @@ class Transaction
 		if (!$this->is_exist($trans_id))
 			return FALSE;
 
+
+		$transUser = $this->getUser($trans_id);
+		$src_id = $this->getSource($trans_id);
+		$dest_id = $this->getDest($trans_id, "dest_id");
+		$transType = $this->getType($trans_id);
+		$transAmount = $this->getAmount($trans_id);
+		$transCharge = $this->getCharge($trans_id);
+
+/*
 		$transUser = $this->getCache($trans_id, "user_id");
 		$src_id = $this->getCache($trans_id, "src_id");
 		$dest_id = $this->getCache($trans_id, "dest_id");
 		$transType = $this->getCache($trans_id, "type");
 		$transAmount = $this->getCache($trans_id, "amount");
 		$transCharge = $this->getCache($trans_id, "charge");
+*/
 
 		// check type of transaction
 		if ($transType != 1 && $transType != 2 && $transType != 3)
@@ -321,6 +331,69 @@ class Transaction
 			return "transfer";
 		else
 			return NULL;
+	}
+
+
+	// Return user id of transaction
+	public function getUser($trans_id)
+	{
+		return $this->getCache($trans_id, "user_id");
+	}
+
+
+	// Return source account of transaction
+	public function getSource($trans_id)
+	{
+		return $this->getCache($trans_id, "src_id");
+	}
+
+
+	// Return destination account of transaction
+	public function getDest($trans_id)
+	{
+		return $this->getCache($trans_id, "dest_id");
+	}
+
+
+	// Return type of transaction
+	public function getType($trans_id)
+	{
+		return $this->getCache($trans_id, "type");
+	}
+
+
+	// Return amount of transaction
+	public function getAmount($trans_id)
+	{
+		return $this->getCache($trans_id, "amount");
+	}
+
+
+	// Return charge of transaction
+	public function getCharge($trans_id)
+	{
+		return $this->getCache($trans_id, "charge");
+	}
+
+
+	// Return date of transaction
+	public function getDate($trans_id)
+	{
+		return $this->getCache($trans_id, "date");
+	}
+
+
+	// Return comment of transaction
+	public function getComment($trans_id)
+	{
+		return $this->getCache($trans_id, "comment");
+	}
+
+
+	// Return position of transaction
+	public function getPos($trans_id)
+	{
+		return $this->getCache($trans_id, "pos");
 	}
 }
 
