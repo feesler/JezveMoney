@@ -104,6 +104,10 @@ class Transaction
 		$transAmount = $this->getCache($trans_id, "amount");
 		$transCharge = $this->getCache($trans_id, "charge");
 
+		// check type of transaction
+		if ($transType != 1 && $transType != 2 && $transType != 3)
+			return FALSE;
+
 		// check user is the same
 		if ($transUser != self::$user_id)
 			return FALSE;
@@ -130,6 +134,23 @@ class Transaction
 			$destBalance = $acc->getBalance($dest_id);
 		}
 
+		// update balance of source account
+		if ($transType == 1 || $transType == 3)		// spend or transfer
+		{
+			$srcBalance += $transCharge;
+			if (!$acc->setBalance($src_id, $srcBalance))
+				return FALSE;
+		}
+
+		// update balance of destination account
+		if ($transType == 2 || $transType == 3)		// income or transfer
+		{
+			$destBalance -= ($transType == 2) ? $transCharge : $transAmount;
+			if (!$acc->setBalance($dest_id, $destBalance))
+				return FALSE;
+		}
+
+/*
 		if ($transType == 1)		// spend
 		{
 			// update balance of account
@@ -159,6 +180,7 @@ class Transaction
 		}
 		else
 			return FALSE;
+*/
 
 		self::updateCache($trans_id);
 
