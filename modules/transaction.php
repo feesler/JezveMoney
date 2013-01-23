@@ -18,13 +18,8 @@
 
 	if (!isset($_GET["type"]))
 		fail();
-	if ($_GET["type"] == "expense")
-		$trans_type = 1;
-	else if ($_GET["type"] == "income")
-		$trans_type = 2;
-	else if ($_GET["type"] == "transfer")
-		$trans_type = 3;
-	else
+	$trans_type = Transaction::getStringType($_GET["type"]);
+	if (!$trans_type)
 		fail();
 
 	$src_id = (isset($_POST["srcid"])) ? intval($_POST["srcid"]) : 0;

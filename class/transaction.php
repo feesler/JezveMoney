@@ -370,6 +370,20 @@ class Transaction
 
 
 	// Return string for specified transaction type
+	public static function getStringType($trans_type)
+	{
+		if ($trans_type == "expense")
+			return 1;
+		else if ($trans_type == "income")
+			return 2;
+		else if ($trans_type == "transfer")
+			return 3;
+		else
+			return 0;
+	}
+
+
+	// Return string for specified transaction type
 	public static function getTypeString($trans_type)
 	{
 		if ($trans_type == 1)
