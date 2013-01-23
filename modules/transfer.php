@@ -27,6 +27,10 @@
 	if (!$src_id || !$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
+	$trans = new Transaction($userid);
+	if (!$trans->create(3, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
+		fail();
+/*
 	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 	if (count($resArr) != 1)
 		fail();
@@ -54,6 +58,7 @@
 	$destBalance += $amount;
 	if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 		fail();
+*/
 
 
 	setLocation("../index.php?trans=ok");

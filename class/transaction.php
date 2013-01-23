@@ -88,6 +88,59 @@ class Transaction
 	}
 
 
+	// Create new transaction
+	public function create($trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $trans_date, $comment)
+	{
+		global $db;
+
+		if (($trans_type != 1 && $trans_type != 2 && $trans_type != 3) || (!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
+			return FALSE;
+
+		$acc = new Account(self::$user_id);
+
+		if ($src_id != 0)
+		{
+			if (!$acc->is_exist($src_id))
+				return FALSE;
+			$srcBalance = $acc->getBalance($src_id);
+		}
+
+		$trans_curr_id = $transcurr;
+		if ($dest_id != 0)
+		{
+			if (!$acc->is_exist($dest_id))
+				return FALSE;
+			$destBalance = $acc->getBalance($dest_id);
+			$dest_curr_id = $acc->getCurrency($dest_id);
+		}
+
+		$tr_pos = $this->getLatestPos();
+		$tr_pos++;
+
+		if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
+									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $transcurr, $fdate, $comment, $tr_pos)))
+			return FALSE;
+
+		// update balance of source account
+		if ($trans_type == 1 || $trans_type == 3)
+		{
+			$srcBalance -= $charge;
+			if (!$acc->setBalance($src_id, $srcBalance))
+				return FALSE;
+		}
+
+		// update balance of destination account
+		if ($trans_type == 2 || $trans_type == 3)
+		{
+			$destBalance += $charge;
+			if (!$acc->setBalance($dest_id, $destBalance))
+				return FALSE;
+		}
+
+		return TRUE;
+	}
+
+
 	// Cancel changes of transaction
 	public function cancel($trans_id)
 	{

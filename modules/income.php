@@ -24,6 +24,11 @@
 	$fdate = date("Y-m-d H:i:s", $trdate);
 	$comment = $db->escape($_POST["comm"]);
 
+
+	$trans = new Transaction($userid);
+	if (!$trans->create(2, 0, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
+		fail();
+/*
 	if (!$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
@@ -43,6 +48,7 @@
 	$destBalance += $charge;
 	if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
 		fail();
+*/
 
 
 	setLocation("../index.php?trans=ok");

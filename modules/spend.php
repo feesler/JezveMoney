@@ -27,6 +27,10 @@
 	if (!$src_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
+	$trans = new Transaction($userid);
+	if (!$trans->create(1, $src_id, 0, $amount, $charge, $transcurr, $fdate, $comment))
+		fail();
+/*
 	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
 	if (count($resArr) != 1)
 		fail();
@@ -44,6 +48,7 @@
 	$srcBalance -= $charge;
 	if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
 		fail();
+*/
 
 
 	setLocation("../index.php?spend=ok");
