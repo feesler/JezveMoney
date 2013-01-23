@@ -132,7 +132,7 @@ class Transaction
 		// update balance of destination account
 		if ($trans_type == 2 || $trans_type == 3)
 		{
-			$destBalance += $charge;
+			$destBalance += ($trans_type == 2) ? $charge : $amount;
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
 		}
