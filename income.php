@@ -56,7 +56,7 @@
 
 	<tr>
 	<td>
-	<form id="incomefrm" name="incomefrm" method="post" action="./modules/income.php" onsubmit="return onSubmit(this);">
+	<form id="incomefrm" name="incomefrm" method="post" action="./modules/transaction.php?type=income" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>

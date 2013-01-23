@@ -56,7 +56,7 @@
 
 	<tr>
 	<td>
-	<form id="spendfrm" name="spendfrm" method="post" action="./modules/spend.php" onsubmit="return onSubmit(this);">
+	<form id="spendfrm" name="spendfrm" method="post" action="./modules/transaction.php?type=expense" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>

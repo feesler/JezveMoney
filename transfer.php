@@ -60,7 +60,7 @@
 
 	<tr>
 	<td>
-	<form id="tranfrm" name="tranfrm" method="post" action="./modules/transfer.php" onsubmit="return onTransferSubmit(this);">
+	<form id="tranfrm" name="tranfrm" method="post" action="./modules/transaction.php?type=transfer" onsubmit="return onTransferSubmit(this);">
 	<table>
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Source account</span></td>
