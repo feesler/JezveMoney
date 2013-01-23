@@ -30,27 +30,6 @@
 	$trans = new Transaction($userid);
 	if (!$trans->create(1, $src_id, 0, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
-/*
-	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-	if (count($resArr) != 1)
-		fail();
-	$srcBalance = floatval($resArr[0]["balance"]);
-
-
-	$trans = new Transaction($userid);
-	$tr_pos = $trans->getLatestPos();
-	$tr_pos++;
-
-	if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
-								array(NULL, $userid, $src_id, 0, 1, $amount, $charge, $transcurr, $fdate, $comment, $tr_pos)))
-		fail();
-
-	$srcBalance -= $charge;
-	if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
-		fail();
-*/
-
 
 	setLocation("../index.php?spend=ok");
-
 ?>

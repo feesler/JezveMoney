@@ -30,37 +30,6 @@
 	$trans = new Transaction($userid);
 	if (!$trans->create(3, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
-/*
-	$resArr = $db->selectQ("*", "accounts", "id=".$src_id);
-	if (count($resArr) != 1)
-		fail();
-	$srcBalance = floatval($resArr[0]["balance"]);
-
-
-	$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-	if (count($resArr) != 1)
-		fail();
-	$dest_curr_id = intval($resArr[0]["curr_id"]);
-	$destBalance = floatval($resArr[0]["balance"]);
-
-	$trans = new Transaction($userid);
-	$tr_pos = $trans->getLatestPos();
-	$tr_pos++;
-
-	if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
-								array(NULL, $userid, $src_id, $dest_id, 3, $amount, $charge, $dest_curr_id, $fdate, $comment, $tr_pos)))
-		fail();
-
-	$srcBalance -= $charge;
-	if (!$db->updateQ("accounts", array("balance"), array($srcBalance), "id=".$src_id))
-		fail();
-
-	$destBalance += $amount;
-	if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
-		fail();
-*/
-
 
 	setLocation("../index.php?trans=ok");
-
 ?>

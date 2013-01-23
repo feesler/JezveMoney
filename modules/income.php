@@ -24,33 +24,12 @@
 	$fdate = date("Y-m-d H:i:s", $trdate);
 	$comment = $db->escape($_POST["comm"]);
 
+	if (!$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
+		fail();
 
 	$trans = new Transaction($userid);
 	if (!$trans->create(2, 0, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
-/*
-	if (!$dest_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
-		fail();
-
-	$resArr = $db->selectQ("*", "accounts", "id=".$dest_id);
-	if (count($resArr) != 1)
-		fail();
-	$destBalance = floatval($resArr[0]["balance"]);
-
-	$trans = new Transaction($userid);
-	$tr_pos = $trans->getLatestPos();
-	$tr_pos++;
-
-	if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
-								array(NULL, $userid, 0, $dest_id, 2, $amount, $charge, $transcurr, $fdate, $comment, $tr_pos)))
-		fail();
-
-	$destBalance += $charge;
-	if (!$db->updateQ("accounts", array("balance"), array($destBalance), "id=".$dest_id))
-		fail();
-*/
-
 
 	setLocation("../index.php?trans=ok");
-
 ?>
