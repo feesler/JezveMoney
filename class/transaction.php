@@ -150,13 +150,13 @@ class Transaction
 		if (!$this->is_exist($trans_id))
 			return FALSE;
 
-
 		$transUser = $this->getUser($trans_id);
 		$src_id = $this->getSource($trans_id);
-		$dest_id = $this->getDest($trans_id, "dest_id");
+		$dest_id = $this->getDest($trans_id);
 		$transType = $this->getType($trans_id);
 		$transAmount = $this->getAmount($trans_id);
 		$transCharge = $this->getCharge($trans_id);
+		$transCurr = $this->getCurrency($trans_id);
 
 		// check type of transaction
 		if ($transType != 1 && $transType != 2 && $transType != 3)
@@ -180,13 +180,18 @@ class Transaction
 
 		// check destination account is exist
 		$destBalance = 0;
+		$trans_curr_id = $transCurr;
 		if ($dest_id != 0)
 		{
 			if (!$acc->is_exist($dest_id))
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
+			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
+
+		if (!$trans_curr_id)
+			return FALSE;
 
 		// update balance of source account
 		if ($transType == 1 || $transType == 3)		// spend or transfer
@@ -276,7 +281,7 @@ class Transaction
 
 
 	// Update position of specified transaction and fix position of 
-	function updatePos($trans_id, $new_pos)
+	public function updatePos($trans_id, $new_pos)
 	{
 		global $db;
 
@@ -328,7 +333,7 @@ class Transaction
 
 
 	// Delete specified transaction
-	public static function del($trans_id)
+	public function del($trans_id)
 	{
 		global $db;
 
@@ -417,6 +422,13 @@ class Transaction
 	public function getCharge($trans_id)
 	{
 		return $this->getCache($trans_id, "charge");
+	}
+
+
+	// Return currency of transaction
+	public function getCurrency($trans_id)
+	{
+		return $this->getCache($trans_id, "curr_id");
 	}
 
 
