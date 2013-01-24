@@ -2,49 +2,30 @@
 	<tr>
 	<td class="submenu">
 <?php
-	function isInArray($arr)
-	{
-		global $ruri;
-
-		if (!is_array($arr))
-			return FALSE;
-		$dir = "/money/";
-
-		foreach($arr as $key => $value)
-		{
-			if (!strncmp($ruri, $dir.$value, strlen($dir.$value)))
-				return TRUE;
-		}
-
-		return FALSE;
-	}
-
+	$subMenuArr = array(array(1, "Spend", "newtransaction.php?type=expense"),
+						array(2, "Income", "newtransaction.php?type=income"),
+						array(3, "Transfer", "newtransaction.php?type=transfer"));
 
 	function showSubMenu($arr)
 	{
 		global $ruri;
+		global $trans_type;
 
 		if (!is_array($arr))
 			return;
-		$dir = "/money/";
 
-		foreach($arr as $key => $value)
+		foreach($arr as $trTypeArr)
 		{
 			echo("<span>");
-			if (!strncmp($ruri, $dir.$value, strlen($dir.$value)))
-				echo("<b>".$key."</b>");
+			if ($trans_type == $trTypeArr[0])
+				echo("<b>".$trTypeArr[1]."</b>");
 			else
-				echo("<a href=\"./".$value."\">".$key."</a>");
+				echo("<a href=\"./".$trTypeArr[2]."\">".$trTypeArr[1]."</a>");
 			echo("</span>");
 		}
 	}
 
-
-	$subMenuArr = array("Spend" => "expense.php", "Income" => "income.php", "Transfer" => "transfer.php");
-
-	if (isInArray($subMenuArr))
-		showSubMenu($subMenuArr);
-
+	showSubMenu($subMenuArr);
 ?>
 	</td>
 	</tr>
