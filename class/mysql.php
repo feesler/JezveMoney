@@ -33,6 +33,8 @@ class mysqlDB
 	{
 		$this->conn = NULL;
 		$this->dbname = NULL;
+
+		wlog("");
 	}
 
 
@@ -68,7 +70,12 @@ class mysqlDB
 	// Raw query to database
 	function rawQ($query)
 	{
+		wlog("Query: ".$query);
+
 		$res = mysql_query($query, $this->conn);
+
+		$errno = mysql_errno();
+		wlog("Result: ".($errno ? (mysql_errno()." - ".mysql_error()) : "ok"));
 
 		return ($res != FALSE) ? $res : NULL;
 	}
