@@ -36,6 +36,7 @@
 		echo("<!-- ".$str." -->\r\n");
 	}
 
+
 	// Print JavaScript comment
 	function jsComm($str)
 	{
