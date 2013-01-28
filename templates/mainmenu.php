@@ -1,26 +1,31 @@
 <?php
-	html("<tr>");
-	html("<td class=\"mainmenu\">");
-
-	$menuArr = array("Main" => "index.php",
-					"Accounts" => "accounts.php",
-					"Transactions" => "transactions.php",
-					"Statistics" => "statistics.php");
-	$dir = "/money/";
-
-	foreach($menuArr as $key => $value)
+	function getMainMenu()
 	{
-		if (!strncmp($ruri, $dir.$value, strlen($dir.$value)))
+		global $ruri;
+
+		$menuArr = array("Main" => "index.php",
+						"Accounts" => "accounts.php",
+						"Transactions" => "transactions.php",
+						"Statistics" => "statistics.php");
+		$dir = "/money/";
+
+		$resStr = "";
+		foreach($menuArr as $key => $value)
 		{
-			echo("<span><b>".$key."</b></span>");
+			$resStr .= "<span>";
+
+			if (!strncmp($ruri, $dir.$value, strlen($dir.$value)))
+				$resStr .= "<b>".$key."</b>";
+			else
+				$resStr .= "<a href=\"./".$value."\">".$key."</a>";
+
+			$resStr .= "</span>";
 		}
-		else
-		{
-			echo("<span><a href=\"./".$value."\">".$key."</a></span>");
-		}
+
+		return $resStr;
 	}
 
-	html();
-	html("</td>");
+	html("<tr>");
+	html("<td class=\"mainmenu\">".getMainMenu()."</td>");
 	html("</tr>");
 ?>
