@@ -31,7 +31,7 @@
 
 	$acc = new Account($userid);
 
-	echo($acc->getTable(TRUE));
+	echo($acc->getTable());
 ?>
 </table>
 </body>
