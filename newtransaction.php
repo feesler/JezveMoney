@@ -56,7 +56,7 @@
 	echo(getJS("common.js"));
 	echo(getJS("transaction.js"));
 
-	echo("<script>\r\n");
+	html("<script>");
 
 	$acc = new Account($userid);
 
@@ -76,12 +76,12 @@
 	echo(Currency::getArray());
 	if ($trans_type == 1 || $trans_type == 2)
 	{
-		echo("var trans_curr = ".(($trans_type == 1) ? $src_curr : $dest_curr).";\r\n");
-		echo("var trans_acc_curr = ".(($trans_type == 1) ? $src_curr : $dest_curr).";\r\n");
+		html("var trans_curr = ".(($trans_type == 1) ? $src_curr : $dest_curr).";");
+		html("var trans_acc_curr = ".(($trans_type == 1) ? $src_curr : $dest_curr).";");
 	}
-	echo("var trans_type = ".$trans_type.";\r\n");
-	echo("var edit_mode = false;\r\n");
-	echo("</script>\r\n");
+	html("var trans_type = ".$trans_type.";");
+	html("var edit_mode = false;");
+	html("</script>");
 ?>
 </head>
 <body>
@@ -95,98 +95,117 @@
 
 	echo($acc->getTable(TRUE));
 
-	echo("\r\n");
+	html();
 
 	$accounts = $acc->getCount();
 	if ($accounts > 0)
 	{
 
-	echo("\t<tr>\r\n");
-	echo("\t<td>\r\n");
-	echo("\t<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">\r\n");
-	echo("\t<table>\r\n");
+	setTab(1);
+
+	html("<tr>");
+	html("<td>");
+	html("<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">");
+	html("<table>");
+
+	setTab(2);
 
 	if ($trans_type == 1 || $trans_type == 3)
 	{
-		echo("\t\t<tr>\r\n");
-		echo("\t\t<td class=\"lblcell\"><span>".$srcLbl."</span></td>\r\n");
-		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select id=\"srcid\" name=\"srcid\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">\r\n");
+		html("<tr>");
+		html("<td class=\"lblcell\"><span>".$srcLbl."</span></td>");
+		html("<td>");
+
+		setTab(3);
+		html("<select id=\"srcid\" name=\"srcid\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
 		echo($acc->getList($src_id));
-		echo("\t\t\t</select>\r\n");
-		echo("\t\t</td>\r\n");
-		echo("\t\t</tr>\r\n\r\n");
+		html("</select>");
+		setTab(2);
+
+		html("</td>");
+		html("</tr>");
+		html();
 	}
 
 	if ($trans_type == 2 || $trans_type == 3)
 	{
-		echo("\t\t<tr>\r\n");
-		echo("\t\t<td class=\"lblcell\"><span>".$destLbl."</span></td>\r\n");
-		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select id=\"destid\" name=\"destid\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">\r\n");
+		html("<tr>");
+		html("<td class=\"lblcell\"><span>".$destLbl."</span></td>");
+		html("<td>");
+		setTab(3);
+		html("<select id=\"destid\" name=\"destid\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
 		echo($acc->getList($dest_id));
-		echo("\t\t\t</select>\r\n");
-		echo("\t\t</td>\r\n");
-		echo("\t\t</tr>\r\n\r\n");
+		html("</select>");
+		setTab(2);
+		html("</td>");
+		html("</tr>");
+		html();
 	}
 
-	echo("\t\t<tr>\r\n");
-	echo("\t\t<td class=\"lblcell\"><span>".$amountLbl."</span></td>\r\n");
-	echo("\t\t<td><input id=\"amount\" name=\"amount\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+	html("<tr>");
+	html("<td class=\"lblcell\"><span>".$amountLbl."</span></td>");
+	echo($tabStr."<td><input id=\"amount\" name=\"amount\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 	echo("<span id=\"amountsign\" class=\"currsign\">".(($trans_type == 1) ? $src_sign : $dest_sign)."</span>");
 	if ($trans_type != 3)
 	{
-		echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
-		echo("\t\t\t<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">\r\n");
+		echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">");
+		html();
+		setTab(3);
+		html("<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
 		echo(Currency::getList($src_curr));
-		echo("\t\t\t</select>\r\n");
+		html("</select>");
+		setTab(2);
 	}
-	echo("\t\t</td>\r\n");
-	echo("\t\t</tr>\r\n\r\n");
+	html("</td>");
+	html("</tr>");
+	html();
 
-	echo("\t\t<tr id=\"chargeoff\"");
-	if ($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr))
-		echo(" style=\"display: none;\"");
-	echo(">\r\n");
+	$disp = (($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr)) ? " style=\"display: none;\"" : "");
+	html("<tr id=\"chargeoff\"".$disp.">");
+	html("<td class=\"lblcell\"><span>".$chargeLbl."</span></td>");
+	html("<td><input id=\"charge\" name=\"charge\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\"><span id=\"chargesign\" class=\"currsign\">".$src_sign."</span></td>");
+	html("</tr>");
+	html();
 
-	echo("\t\t<td class=\"lblcell\"><span>".$chargeLbl."</span></td>\r\n");
-	echo("\t\t<td><input id=\"charge\" name=\"charge\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\"><span id=\"chargesign\" class=\"currsign\">".$src_sign."</span></td>\r\n");
-	echo("\t\t</tr>\r\n\r\n");
+	$disp = (($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr)) ? " style=\"display: none;\"" : "");
+	html("<tr id=\"exchange\"".$disp.">");
+	html("<td class=\"lblcell\"><span>Exchange rate</span></td>");
+	html("<td><input id=\"exchrate\" name=\"exchrate\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\" value=\"1\"><span id=\"exchcomm\" style=\"margin-left: 5px;\"></span></td>");
+	html("</tr>");
+	html();
 
-	echo("\t\t<tr id=\"exchange\"");
-	if ($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr))
-		echo(" style=\"display: none;\"");
-	echo(">\r\n");
+	html("<tr>");
+	html("<td class=\"lblcell\"><span>Result balance</span></td>");
+	html("<td><input id=\"resbal\" name=\"resbal\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\"></td>");
+	html("</tr>");
+	html();
 
-	echo("\t\t<td class=\"lblcell\"><span>Exchange rate</span></td>\r\n");
-	echo("\t\t<td><input id=\"exchrate\" name=\"exchrate\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\" value=\"1\"><span id=\"exchcomm\" style=\"margin-left: 5px;\"></span></td>\r\n");
-	echo("\t\t</tr>\r\n\r\n");
+	html("<tr>");
+	html("<td class=\"lblcell\"><span>Date</span></td>");
+	html("<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"></td>");
+	html("</tr>");
+	html();
 
-	echo("\t\t<tr>\r\n");
-	echo("\t\t<td class=\"lblcell\"><span>Result balance</span></td>\r\n");
-	echo("\t\t<td><input id=\"resbal\" name=\"resbal\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\"></td>\r\n");
-	echo("\t\t</tr>\r\n\r\n");
+	html("<tr>");
+	html("<td class=\"lblcell\"><span>Comment</span></td>");
+	html("<td><input id=\"comm\" name=\"comm\" type=\"text\"></td>");
+	html("</tr>");
+	html();
 
-	echo("\t\t<tr>\r\n");
-	echo("\t\t<td class=\"lblcell\"><span>Date</span></td>\r\n");
-	echo("\t\t<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"></td>\r\n");
-	echo("\t\t</tr>\r\n\r\n");
+	html("<tr>");
+	html("<td colspan=\"2\" style=\"text-align: center;\"><input type=\"submit\" value=\"ok\"></td>");
+	html("</tr>");
+	setTab(1);
 
-	echo("\t\t<tr>\r\n");
-	echo("\t\t<td class=\"lblcell\"><span>Comment</span></td>\r\n");
-	echo("\t\t<td><input id=\"comm\" name=\"comm\" type=\"text\"></td>\r\n");
-	echo("\t\t</tr>\r\n\r\n");
+	html("</table>");
+	html("</form>");
+	html("</td>");
+	html("</tr>");
 
-	echo("\t\t<tr>\r\n");
-	echo("\t\t<td colspan=\"2\" style=\"text-align: center;\"><input type=\"submit\" value=\"ok\"></td>\r\n");
-	echo("\t\t</tr>\r\n");
-	echo("\t</table>\r\n");
-	echo("\t</form>\r\n");
-	echo("\t</td>\r\n");
-	echo("\t</tr>\r\n");
-
+	setTab(0);
 	}
+
+	html("</table>");
+	html("</body>");
+	html("</html>");
 ?>
-</table>
-</body>
-</html>

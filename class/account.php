@@ -295,6 +295,8 @@ class Account
 	// Return HTML string of accounts for select control
 	public function getList($selected_id = 0)
 	{
+		global $tabStr;
+
 		$resStr = "";
 
 		if (!$this->checkCache())
@@ -302,7 +304,7 @@ class Account
 
 		foreach(self::$cache as $acc_id => $row)
 		{
-			$resStr .= "\t\t\t<option value=\"".$acc_id."\"";
+			$resStr .= $tabStr."<option value=\"".$acc_id."\"";
 			if ($acc_id == $selected_id)
 				$resStr .= " selected";
 			$resStr .= ">".$row["name"]."</option>\r\n";

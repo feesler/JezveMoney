@@ -109,6 +109,8 @@ class Currency
 	// Return HTML string of currencies for select control
 	public static function getList($selected_id = 0)
 	{
+		global $tabStr;
+
 		$resStr = "";
 
 		if (!self::checkCache())
@@ -116,7 +118,7 @@ class Currency
 
 		foreach(self::$cache as $curr_id => $row)
 		{
-			$resStr .= "\t\t\t<option value=\"".$curr_id."\"";
+			$resStr .= $tabStr."<option value=\"".$curr_id."\"";
 			if ($curr_id == $selected_id)
 				$resStr .= " selected";
 			$resStr .= ">".$row["name"]."</option>\r\n";

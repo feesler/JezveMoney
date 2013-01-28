@@ -30,6 +30,37 @@
 	}
 
 
+	static $tabbing = 0;
+	static $tabStr = "";
+
+
+	// Set count of tabs
+	function setTab($tabCount)
+	{
+		global $tabbing, $tabStr;
+
+		if ($tabbing == $tabCount)
+			return;
+
+		$tabStr = "";
+		for($i = 0; $i < $tabCount; $i++)
+			$tabStr .= "\t";
+		$tabbing = $tabCount;
+	}
+
+
+	// Print specified HTML string with tabbing and carriage return
+	function html($str = "")
+	{
+		global $tabStr;
+
+		if (!is_null($str) && $str != "")
+			echo($tabStr.$str."\r\n");
+		else
+			echo("\r\n");
+	}
+
+
 	// Print string with carriage return
 	function ebr($str = "")
 	{
