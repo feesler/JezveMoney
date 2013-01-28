@@ -86,118 +86,105 @@
 </head>
 <body>
 <table class="maintable">
-	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 <?php
+	echo("\t<tr><td><h1 class=\"maintitle\">".$titleString."</h1></td></tr>\r\n");
+
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
 	require_once("./templates/submenu.php");
 
 	echo($acc->getTable(TRUE));
 
+	echo("\r\n");
+
 	$accounts = $acc->getCount();
 	if ($accounts > 0)
 	{
-?>
 
-	<tr>
-	<td>
-	<form method="post" action="./modules/transaction.php?type=<?php echo($type_str); ?>" onsubmit="<?php echo(($trans_type == 3) ? "return onTransferSubmit(this);" : "return onSubmit(this);"); ?>">
-	<table>
-<?php
+	echo("\t<tr>\r\n");
+	echo("\t<td>\r\n");
+	echo("\t<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">\r\n");
+	echo("\t<table>\r\n");
+
 	if ($trans_type == 1 || $trans_type == 3)
 	{
-?>
-		<tr>
-		<td class="lblcell"><span><?php echo($srcLbl); ?></span></td>
-		<td>
-			<select id="srcid" name="srcid" onchange="<?php echo(($trans_type == 3) ? "onChangeSource();" : "onChangeAcc();"); ?>">
-<?php
-	echo($acc->getList($src_id));
-?>
-			</select>
-		</td>
-		</tr>
-<?php
+		echo("\t\t<tr>\r\n");
+		echo("\t\t<td class=\"lblcell\"><span>".$srcLbl."</span></td>\r\n");
+		echo("\t\t<td>\r\n");
+		echo("\t\t\t<select id=\"srcid\" name=\"srcid\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">\r\n");
+		echo($acc->getList($src_id));
+		echo("\t\t\t</select>\r\n");
+		echo("\t\t</td>\r\n");
+		echo("\t\t</tr>\r\n\r\n");
 	}
 
 	if ($trans_type == 2 || $trans_type == 3)
 	{
-?>
-		<tr>
-		<td class="lblcell"><span><?php echo($destLbl); ?></span></td>
-		<td>
-			<select id="destid" name="destid" onchange="<?php echo(($trans_type == 3) ? "onChangeDest();" : "onChangeAcc();"); ?>">
-<?php
-	echo($acc->getList($dest_id));
-?>
-			</select>
-		</td>
-		</tr>
-<?php
+		echo("\t\t<tr>\r\n");
+		echo("\t\t<td class=\"lblcell\"><span>".$destLbl."</span></td>\r\n");
+		echo("\t\t<td>\r\n");
+		echo("\t\t\t<select id=\"destid\" name=\"destid\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">\r\n");
+		echo($acc->getList($dest_id));
+		echo("\t\t\t</select>\r\n");
+		echo("\t\t</td>\r\n");
+		echo("\t\t</tr>\r\n\r\n");
 	}
-?>
 
-		<tr>
-		<td class="lblcell"><span><?php echo($amountLbl); ?></span></td>
-		<td><input id="amount" name="amount" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" class="currsign"><?php echo(($trans_type == 1) ? $src_sign : $dest_sign); ?></span><?php
+	echo("\t\t<tr>\r\n");
+	echo("\t\t<td class=\"lblcell\"><span>".$amountLbl."</span></td>\r\n");
+	echo("\t\t<td><input id=\"amount\" name=\"amount\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+	echo("<span id=\"amountsign\" class=\"currsign\">".(($trans_type == 1) ? $src_sign : $dest_sign)."</span>");
 	if ($trans_type != 3)
 	{
-?><input id="ancurrbtn" class="btn" type="button" onclick="showCurrList();" value="currency">
-			<select class="sel" id="transcurr" name="transcurr" style="display: none;" onchange="onChangeTransCurr();">
-<?php
-	echo(Currency::getList($src_curr));
-?>
-			</select>
-<?php
+		echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
+		echo("\t\t\t<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">\r\n");
+		echo(Currency::getList($src_curr));
+		echo("\t\t\t</select>\r\n");
 	}
-?>
-		</td>
-		</tr>
+	echo("\t\t</td>\r\n");
+	echo("\t\t</tr>\r\n\r\n");
 
-<?php
-		echo("\t\t<tr id=\"chargeoff\"");
-		if ($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr))
-			echo(" style=\"display: none;\"");
-		echo(">\r\n");
-?>
-		<td class="lblcell"><span><?php echo($chargeLbl); ?></span></td>
-		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" class="currsign"><?php echo($src_sign); ?></span></td>
-		</tr>
+	echo("\t\t<tr id=\"chargeoff\"");
+	if ($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr))
+		echo(" style=\"display: none;\"");
+	echo(">\r\n");
 
-<?php
-		echo("\t\t<tr id=\"exchange\"");
-		if ($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr))
-			echo(" style=\"display: none;\"");
-		echo(">\r\n");
-?>
-		<td class="lblcell"><span>Exchange rate</span></td>
-		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"><span id="exchcomm" style="margin-left: 5px;"></span></td>
-		</tr>
+	echo("\t\t<td class=\"lblcell\"><span>".$chargeLbl."</span></td>\r\n");
+	echo("\t\t<td><input id=\"charge\" name=\"charge\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\"><span id=\"chargesign\" class=\"currsign\">".$src_sign."</span></td>\r\n");
+	echo("\t\t</tr>\r\n\r\n");
 
-		<tr>
-		<td class="lblcell"><span>Result balance</span></td>
-		<td><input id="resbal" name="resbal" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
-		</tr>
+	echo("\t\t<tr id=\"exchange\"");
+	if ($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr))
+		echo(" style=\"display: none;\"");
+	echo(">\r\n");
 
-		<tr>
-		<td class="lblcell"><span>Date</span></td>
-		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>"></td>
-		</tr>
+	echo("\t\t<td class=\"lblcell\"><span>Exchange rate</span></td>\r\n");
+	echo("\t\t<td><input id=\"exchrate\" name=\"exchrate\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\" value=\"1\"><span id=\"exchcomm\" style=\"margin-left: 5px;\"></span></td>\r\n");
+	echo("\t\t</tr>\r\n\r\n");
 
-		<tr>
-		<td class="lblcell"><span>Comment</span></td>
-		<td><input id="comm" name="comm" type="text"></td>
-		</tr>
+	echo("\t\t<tr>\r\n");
+	echo("\t\t<td class=\"lblcell\"><span>Result balance</span></td>\r\n");
+	echo("\t\t<td><input id=\"resbal\" name=\"resbal\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\"></td>\r\n");
+	echo("\t\t</tr>\r\n\r\n");
 
-		<tr>
-		<td colspan="2" style="text-align: center;"><input type="submit" value="ok"></td>
-		</tr>
-	</table>
-	</form>
-	</td>
-	</tr>
+	echo("\t\t<tr>\r\n");
+	echo("\t\t<td class=\"lblcell\"><span>Date</span></td>\r\n");
+	echo("\t\t<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"></td>\r\n");
+	echo("\t\t</tr>\r\n\r\n");
 
-<?php
+	echo("\t\t<tr>\r\n");
+	echo("\t\t<td class=\"lblcell\"><span>Comment</span></td>\r\n");
+	echo("\t\t<td><input id=\"comm\" name=\"comm\" type=\"text\"></td>\r\n");
+	echo("\t\t</tr>\r\n\r\n");
+
+	echo("\t\t<tr>\r\n");
+	echo("\t\t<td colspan=\"2\" style=\"text-align: center;\"><input type=\"submit\" value=\"ok\"></td>\r\n");
+	echo("\t\t</tr>\r\n");
+	echo("\t</table>\r\n");
+	echo("\t</form>\r\n");
+	echo("\t</td>\r\n");
+	echo("\t</tr>\r\n");
+
 	}
 ?>
 </table>
