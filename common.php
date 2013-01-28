@@ -11,22 +11,22 @@
 	// Return string for CSS style link
 	function getCSS($filename)
 	{
-		return "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/".$filename."\">\r\n";
+		return "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/".$filename."\">";
 	}
 
 
 	// Print common styles for specifyed theme
 	function getStyle($theme)
 	{
-		echo(getCSS("common.css"));
-		echo(getCSS((($theme == 1) ? "white.css" : "black.css")));
+		html(getCSS("common.css"));
+		html(getCSS((($theme == 1) ? "white.css" : "black.css")));
 	}
 
 
 	// Return string for JavaScript include
 	function getJS($filename)
 	{
-		return "<script type=\"text/javascript\" src=\"./js/".$filename."\"></script>\r\n";
+		return "<script type=\"text/javascript\" src=\"./js/".$filename."\"></script>";
 	}
 
 

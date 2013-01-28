@@ -45,16 +45,16 @@
 		$amountLbl = "Transfer amount";
 		$chargeLbl = "Charge off";
 	}
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title><?php echo($titleString); ?></title>
-<?php
+
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
+	html("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+	html("<title>".$titleString."</title>");
+
 	getStyle($sitetheme);
-	echo(getJS("common.js"));
-	echo(getJS("transaction.js"));
+	html(getJS("common.js"));
+	html(getJS("transaction.js"));
 
 	html("<script>");
 
