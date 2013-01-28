@@ -151,7 +151,7 @@
 		echo("<span id=\"amountsign\" class=\"currsign\">".(($trans_type == 1) ? $src_sign : $dest_sign)."</span>");
 		if ($trans_type != 3)
 		{
-			echo("<input id=\"ancurrbtn\" class=\"btn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">");
+			echo("<input id=\"ancurrbtn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">");
 			html();
 			setTab(3);
 			html("<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
