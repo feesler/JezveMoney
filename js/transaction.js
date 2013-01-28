@@ -454,7 +454,7 @@ function setExchangeComment()
 	if (!exchcomm || !accid || (!transcurr && !taccid))
 		return;
 
-	if (fe == 1.0)
+	if (fe == 1.0 || fe == 0.0 || e == '')
 	{
 		exchcomm.innerHTML = '';
 	}
