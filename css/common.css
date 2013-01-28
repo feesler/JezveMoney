@@ -126,3 +126,15 @@ select
 	display: inline-block;
 	line-height: 30px;
 }
+
+
+.lblcell
+{
+	text-align: right;
+}
+
+
+.lblcell span
+{
+	margin-right: 5px;
+}

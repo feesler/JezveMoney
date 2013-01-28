@@ -108,7 +108,7 @@
 	{
 ?>
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;"><?php echo($srcLbl); ?></span></td>
+		<td class="lblcell"><span><?php echo($srcLbl); ?></span></td>
 		<td>
 			<select id="srcid" name="srcid" onchange="<?php echo(($trans_type == 3) ? "onChangeSource();" : "onChangeAcc();"); ?>">
 <?php
@@ -124,7 +124,7 @@
 	{
 ?>
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;"><?php echo($destLbl); ?></span></td>
+		<td class="lblcell"><span><?php echo($destLbl); ?></span></td>
 		<td>
 			<select id="destid" name="destid" onchange="<?php echo(($trans_type == 3) ? "onChangeDest();" : "onChangeAcc();"); ?>">
 <?php
@@ -138,7 +138,7 @@
 ?>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;"><?php echo($amountLbl); ?></span></td>
+		<td class="lblcell"><span><?php echo($amountLbl); ?></span></td>
 		<td><input id="amount" name="amount" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="amountsign" class="currsign"><?php echo(($trans_type == 1) ? $src_sign : $dest_sign); ?></span><?php
 	if ($trans_type != 3)
 	{
@@ -160,7 +160,7 @@
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
-		<td style="text-align: right;"><span style="margin-right: 5px;"><?php echo($chargeLbl); ?></span></td>
+		<td class="lblcell"><span><?php echo($chargeLbl); ?></span></td>
 		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"><span id="chargesign" class="currsign"><?php echo($src_sign); ?></span></td>
 		</tr>
 
@@ -170,22 +170,22 @@
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
+		<td class="lblcell"><span>Exchange rate</span></td>
 		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="1"><span id="exchcomm" style="margin-left: 5px;"></span></td>
 		</tr>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Result balance</span></td>
+		<td class="lblcell"><span>Result balance</span></td>
 		<td><input id="resbal" name="resbal" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Date</span></td>
+		<td class="lblcell"><span>Date</span></td>
 		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>"></td>
 		</tr>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Comment</span></td>
+		<td class="lblcell"><span>Comment</span></td>
 		<td><input id="comm" name="comm" type="text"></td>
 		</tr>
 
