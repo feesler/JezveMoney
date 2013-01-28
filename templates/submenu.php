@@ -1,7 +1,7 @@
-
-	<tr>
-	<td class="submenu">
 <?php
+	html("<tr>");
+	html("<td class=\"submenu\">");
+
 	$subMenuArr = array(array(1, "Spend", "newtransaction.php?type=expense"),
 						array(2, "Income", "newtransaction.php?type=income"),
 						array(3, "Transfer", "newtransaction.php?type=transfer"));
@@ -26,6 +26,8 @@
 	}
 
 	showSubMenu($subMenuArr);
+
+	html();
+	html("</td>");
+	html("</tr>");
 ?>
-	</td>
-	</tr>

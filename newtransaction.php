@@ -82,12 +82,16 @@
 	html("var trans_type = ".$trans_type.";");
 	html("var edit_mode = false;");
 	html("</script>");
-?>
-</head>
-<body>
-<table class="maintable">
-<?php
-	echo("\t<tr><td><h1 class=\"maintitle\">".$titleString."</h1></td></tr>\r\n");
+
+	setTab(0);
+
+	html("</head>");
+	html("<body>");
+	html("<table class=\"maintable\">");
+
+	setTab(1);
+
+	html("<tr><td><h1 class=\"maintitle\">".$titleString."</h1></td></tr>");
 
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");

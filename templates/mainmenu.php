@@ -1,6 +1,7 @@
-	<tr>
-	<td class="mainmenu">
 <?php
+	html("<tr>");
+	html("<td class=\"mainmenu\">");
+
 	$menuArr = array("Main" => "index.php",
 					"Accounts" => "accounts.php",
 					"Transactions" => "transactions.php",
@@ -18,6 +19,8 @@
 			echo("<span><a href=\"./".$value."\">".$key."</a></span>");
 		}
 	}
+
+	html();
+	html("</td>");
+	html("</tr>");
 ?>
-	</td>
-	</tr>
