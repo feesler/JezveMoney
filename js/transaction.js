@@ -661,3 +661,32 @@ function onChangeTransCurr()
 	setSign(false, chargeCurr);
 	setSign(true, amountCurr);
 }
+
+
+// Set specified date of transaction
+function setTransactionDate(tr_date)
+{
+	var day, month, year;
+	var dateinp = ge('date');
+
+	if (!dateinp || !tr_date)
+		return;
+
+	day = tr_date.getDate();
+	month = tr_date.getMonth() + 1;
+	year = tr_date.getFullYear();
+
+	dateinp.value = ((day < 10) ? '0' : '') + day + '.' + ((month < 10) ? '0' : '') + month + '.' + year;
+}
+
+
+// Set date of transaction to yesterday
+function setYesterday()
+{
+	var yesterday;
+
+	yesterday = new Date();
+	yesterday.setDate(yesterday.getDate() - 1);
+
+	setTransactionDate(yesterday);
+}

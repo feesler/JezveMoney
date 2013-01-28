@@ -185,7 +185,7 @@
 
 		html("<tr>");
 		html("<td class=\"lblcell\"><span>Date</span></td>");
-		html("<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"></td>");
+		html("<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"><input id=\"yestbtn\" style=\"margin-left: 5px;\" type=\"button\" onclick=\"setYesterday();\" value=\"yesterday\"></td>");
 		html("</tr>");
 		html();
 
