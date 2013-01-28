@@ -58,7 +58,7 @@
 	ebr("td{ padding: 2px 5px; }");
 	ebr("input[type=\"button\"]{ border: 0 none; padding: 2px 5px; }");
 	ebr("</style>");
-	ebr("<script type=\"text/javascript\" src=\"./js/common.js\"></script>");
+	echo(getJS("common.js"));
 	ebr("<script>");
 ?>
 	var chPosObj = null;

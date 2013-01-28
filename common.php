@@ -23,6 +23,13 @@
 	}
 
 
+	// Return string for JavaScript include
+	function getJS($filename)
+	{
+		return "<script type=\"text/javascript\" src=\"./js/".$filename."\"></script>\r\n";
+	}
+
+
 	// Print string with carriage return
 	function ebr($str = "")
 	{

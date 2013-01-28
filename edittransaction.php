@@ -41,11 +41,11 @@
 <title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
-?>
-<script type="text/javascript" src="./js/common.js"></script>
-<script type="text/javascript" src="./js/transaction.js"></script>
-<script>
-<?php
+	echo(getJS("common.js"));
+	echo(getJS("transaction.js"));
+
+	echo("<script>\r\n");
+
 	$acc = new Account($userid);
 
 	echo($acc->getArray());
@@ -78,8 +78,9 @@
 	echo("var trans_curr = ".$trans_curr.";\r\n");
 	echo("var trans_acc_curr = ".$trans_curr.";\r\n");
 	echo("var trans_type = ".$trans_type.";\r\n");
+
+	echo("</script>\r\n");
 ?>
-</script>
 </head>
 <body>
 <table class="maintable">

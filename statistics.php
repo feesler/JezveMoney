@@ -84,11 +84,11 @@
 <?php
 	getStyle($sitetheme);
 	echo(getCSS("chart.css"));
-?>
-<script type="text/javascript" src="./js/common.js"></script>
-<script type="text/javascript" src="./js/chart.js"></script>
-<script>
-<?php
+	echo(getJS("common.js"));
+	echo(getJS("chart.js"));
+
+	echo("<script>\r\n");
+
 	echo("\tvar transType = ".json_encode($transType).";\r\n");
 	echo("\tvar groupType = ".json_encode($groupType).";\r\n");
 

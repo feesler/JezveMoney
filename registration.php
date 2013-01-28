@@ -17,6 +17,7 @@
 <title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
+	echo(getJS("common.js"));
 ?>
 <script>
 function onSubmit(frm)
