@@ -114,6 +114,12 @@ select
 }
 
 
+.infotable
+{
+	border-spacing: 0;
+}
+
+
 .infotable tr:nth-child(even)
 {
 	background-color: #E0E0E0;
