@@ -134,7 +134,7 @@ select
 }
 
 
-.lblcell
+.lblcell, .sumcell
 {
 	text-align: right;
 }
