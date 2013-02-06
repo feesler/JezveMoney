@@ -393,6 +393,8 @@ class Transaction
 		$condition = "user_id=".self::$user_id;
 		if ($trans_type != 4)
 			$condition .= " AND type=".$trans_type;
+		if ($acc_id != 0)
+			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
 
 		$resArr = $db->selectQ("*", "transactions", $condition, NULL, "date ASC");
 		$rowCount = count($resArr);

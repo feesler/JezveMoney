@@ -3,11 +3,6 @@
 						array(2, "Income", "newtransaction.php?type=income"),
 						array(3, "Transfer", "newtransaction.php?type=transfer"));
 
-	$transactionsArr = array(array(4, "All", "transactions.php?type=all"),
-						array(1, "Expenses", "transactions.php?type=expense"),
-						array(2, "Incomes", "transactions.php?type=income"),
-						array(3, "Transfers", "transactions.php?type=transfer"));
-
 	function showSubMenu($arr)
 	{
 		global $ruri;

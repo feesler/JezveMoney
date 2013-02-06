@@ -16,6 +16,13 @@
 	if (!$trans_type)
 		fail();
 
+
+	$acc = new Account($userid);
+
+	$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
+	if ($acc_id && !$acc->is_exist($acc_id))
+		$acc_id = 0;
+
 	$titleString = "jezve Money - Transactions";
 ?>
 <!DOCTYPE html>
@@ -25,7 +32,28 @@
 <title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
+	html(getJS("common.js"));
+
+	html("<script>");
+	html("var transType = ".json_encode($type_str).";");
+	html("var curAccId = ".json_encode($acc_id).";");
 ?>
+
+// Account change event handler
+function onAccountChange()
+{
+	var acc_id;
+	var accsel;
+
+	accsel = ge('accsel');
+	if (!accsel)
+		return;
+
+	acc_id = parseInt(selectedValue(accsel));
+
+	window.location = './transactions.php?type=' + transType + '&acc_id=' + acc_id;
+}
+</script>
 </head>
 <body>
 <table class="maintable">
@@ -34,6 +62,13 @@
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
 	require_once("./templates/submenu.php");
+
+	$accLinkStr = ($acc_id ? "&acc_id=".$acc_id : "");
+
+	$transactionsArr = array(array(4, "All", "transactions.php?type=all".$accLinkStr),
+						array(1, "Expenses", "transactions.php?type=expense".$accLinkStr),
+						array(2, "Incomes", "transactions.php?type=income".$accLinkStr),
+						array(3, "Transfers", "transactions.php?type=transfer".$accLinkStr));
 
 	showSubMenu($transactionsArr);
 
@@ -56,9 +91,26 @@
 		echo("</td></tr>");
 	}
 
+	echo("<tr><td style=\"padding-left: 50px;\">");
+
+	html("<table>");
+	html("<tr>");
+	html("<td class=\"lblcell\"><span>Account</span></td>");
+	html("<td>");
+
+	html("<select id=\"accsel\" onchange=\"onAccountChange();\">");
+	html("<option value=\"0\"".(($acc_id == 0) ? " selected" : "").">All</option>");
+	echo($acc->getList($acc_id));
+	html("</select>");
+
+	html("</td>");
+	html("</tr>");
+	html("</table>");
+	html("</td></tr>");
+
 	$trans = new Transaction($userid);
 
-	echo($trans->getTable($trans_type));
+	echo($trans->getTable($trans_type, $acc_id));
 ?>
 </table>
 </body>
