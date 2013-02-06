@@ -55,12 +55,17 @@
 			echo("<span style=\"color: #FF2020;\">Fail to delete transaction.</span>");
 		echo("</td></tr>");
 	}
+
+	$trans = new Transaction($userid);
+
+	echo($trans->getTable($trans_type));
 ?>
 
-	<tr>
+	<!-- tr>
 	<td>
-	<table class="infotable">
+	<table class="infotable" -->
 <?php
+/*
 	$acc = new Account($userid);
 
 	$accounts = $acc->getCount();
@@ -119,10 +124,11 @@
 			}
 		}
 	}
+*/
 ?>
-	</table>
+	<!-- /table>
 	</td>
-	</tr>
+	</tr -->
 </table>
 </body>
 </html>

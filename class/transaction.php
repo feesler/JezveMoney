@@ -369,6 +369,82 @@ class Transaction
 	}
 
 
+	// Return table of transactions
+	public function getTable($trans_type, $acc_id = 0)
+	{
+		global $db;
+
+		$resStr = "";
+
+		if (!self::$user_id)
+			return $resStr;
+
+		$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table class=\"infotable\">\r\n";
+
+		$acc = new Account(self::$user_id);
+		$accounts = $acc->getCount();
+		if (!$accounts)
+		{
+			$resStr .= "\t\t<tr><td><span>You have no one account. Please create one.</span></td></tr>";
+			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+			return $resStr;
+		}
+
+		$resArr = $db->selectQ("*", "transactions", "user_id=".self::$user_id." AND type=".$trans_type, NULL, "date ASC");
+		$rowCount = count($resArr);
+		if (!$rowCount)
+		{
+			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
+			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+			return $resStr;
+		}
+
+		$resStr .= "\t\t<tr>";
+
+		if ($trans_type == 1)
+			$resStr .= "<td><b>Source</b></td>";
+		else if ($trans_type == 2)
+			$resStr .= "<td><b>Destination</b></td>";
+		else if ($trans_type == 3)
+			$resStr .= "<td><b>Source</b></td><td><b>Destination</b></td>";
+
+		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
+
+		foreach($resArr as $row)
+		{
+			$resStr .= "\t\t<tr>";
+
+			if ($trans_type == 1 || $trans_type == 3)
+				$resStr .= "<td>".$acc->getName($row["src_id"])."</td>";
+			if ($trans_type == 2 || $trans_type == 3)
+				$resStr .= "<td>".$acc->getName($row["dest_id"])."</td>";
+
+			$resStr .= "<td style=\"text-align: right;\">". Currency::format($row["amount"], $row["curr_id"]);
+			if ($row["charge"] != $row["amount"])
+			{
+				$resStr .= " (";
+				if ($trans_type == 1 || $trans_type == 3)		// expense or transfer
+					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
+				else if ($trans_type == 2)					// income
+					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
+				$resStr .= ")";
+			}
+			$resStr .= "</td>";
+
+			$fdate = date("d.m.Y", strtotime($row["date"]));
+
+			$resStr .= "<td>".$fdate."</td>";
+			$resStr .= "<td>".$row["comment"]."</td>";
+			$resStr .= "<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a> <a href=\"./deltransaction.php?id=".$row["id"]."\">delete</a></td>";
+			$resStr .= "</tr>\r\n";
+		}
+
+		$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+
+		return $resStr;
+	}
+
+
 	// Return string for specified transaction type
 	public static function getStringType($trans_type)
 	{
