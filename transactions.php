@@ -62,27 +62,6 @@
 	}
 
 	showSubMenu($subMenuArr);
-
-/*
-	if (isset($_GET["type"]) && ($_GET["type"] == "expense" || $_GET["type"] == "income" || $_GET["type"] == "transfer"))
-		$transType = $_GET["type"];
-	else
-		$transType = "expense";
-
-	if ($transType == "expense")
-	{
-		echo("<span>Expenses</span><span><a href=\"./transactions.php?type=income\">Income</a></span><span><a href=\"./transactions.php?type=transfer\">Transfers</a></span>");
-	}
-	else if ($transType == "income")
-	{
-		echo("<span><a href=\"./transactions.php?type=expense\">Expenses</a></span><span>Income</span><span><a href=\"./transactions.php?type=transfer\">Transfers</a></span>");
-	}
-	else if ($transType == "transfer")
-	{
-		echo("<span><a href=\"./transactions.php?type=expense\">Expenses</a></span><span><a href=\"./transactions.php?type=income\">Income</a></span><span>Transfers</span>");
-	}
-
-*/
 ?>
 	</td>
 	</tr>
@@ -122,17 +101,6 @@
 	else
 	{
 		$resArr = $db->selectQ("*", "transactions", "user_id=".$userid." AND type=".$trans_type, NULL, "date ASC");
-/*
-		$trtype_id = 0;
-		if ($transType == "expense")
-			$trtype_id = 1;
-		else if ($transType == "income")
-			$trtype_id = 2;
-		else if ($transType == "transfer")
-			$trtype_id = 3;
-
-		$resArr = $db->selectQ("*", "transactions", "user_id=".$userid." AND type=".$trtype_id, NULL, "date ASC");
-*/
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
@@ -148,14 +116,6 @@
 				echo("<td><b>Destination</b></td>");
 			else if ($trans_type == 3)
 				echo("<td><b>Source</b></td><td><b>Destination</b></td>");
-/*
-			if ($transType == "expense")
-				echo("<td><b>Source</b></td>");
-			else if ($transType == "income")
-				echo("<td><b>Destination</b></td>");
-			else if ($transType == "transfer")
-				echo("<td><b>Source</b></td><td><b>Destination</b></td>");
-*/
 
 			echo("<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>");
 
@@ -167,12 +127,6 @@
 					echo("<td>".$acc->getName($row["src_id"])."</td>");
 				if ($trans_type == 2 || $trans_type == 3)
 					echo("<td>".$acc->getName($row["dest_id"])."</td>");
-/*
-				if ($transType == "expense" || $transType == "transfer")
-					echo("<td>".$acc->getName($row["src_id"])."</td>");
-				if ($transType == "income" || $transType == "transfer")
-					echo("<td>".$acc->getName($row["dest_id"])."</td>");
-*/
 
 				echo("<td style=\"text-align: right;\">". Currency::format($row["amount"], $row["curr_id"]));
 				if ($row["charge"] != $row["amount"])
