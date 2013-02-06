@@ -29,6 +29,8 @@
 	require_once("./templates/mainmenu.php");
 	require_once("./templates/submenu.php");
 
+	showSubMenu($newTransArr);
+
 	$acc = new Account($userid);
 
 	echo($acc->getTable());

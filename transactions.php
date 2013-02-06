@@ -33,40 +33,10 @@
 <?php
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
-?>
-	<tr>
-	<td class="submenu">
-<?php
+	require_once("./templates/submenu.php");
 
-	$subMenuArr = array(array(1, "Expenses", "transactions.php?type=expense"),
-						array(2, "Incomes", "transactions.php?type=income"),
-						array(3, "Transfers", "transactions.php?type=transfer"));
+	showSubMenu($transactionsArr);
 
-	function showSubMenu($arr)
-	{
-		global $ruri;
-		global $trans_type;
-
-		if (!is_array($arr))
-			return;
-
-		foreach($arr as $trTypeArr)
-		{
-			echo("<span>");
-			if ($trans_type == $trTypeArr[0])
-				echo("<b>".$trTypeArr[1]."</b>");
-			else
-				echo("<a href=\"./".$trTypeArr[2]."\">".$trTypeArr[1]."</a>");
-			echo("</span>");
-		}
-	}
-
-	showSubMenu($subMenuArr);
-?>
-	</td>
-	</tr>
-
-<?php
 	if (isset($_GET["edit"]))
 	{
 		echo("<tr><td style=\"padding-left: 50px;\">");

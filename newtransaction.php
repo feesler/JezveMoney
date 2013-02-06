@@ -97,6 +97,8 @@
 	require_once("./templates/mainmenu.php");
 	require_once("./templates/submenu.php");
 
+	showSubMenu($newTransArr);
+
 	echo($acc->getTable(TRUE));
 
 	html();

@@ -1,10 +1,11 @@
 <?php
-	html("<tr>");
-	html("<td class=\"submenu\">");
-
-	$subMenuArr = array(array(1, "Spend", "newtransaction.php?type=expense"),
+	$newTransArr = array(array(1, "Spend", "newtransaction.php?type=expense"),
 						array(2, "Income", "newtransaction.php?type=income"),
 						array(3, "Transfer", "newtransaction.php?type=transfer"));
+
+	$transactionsArr = array(array(1, "Expenses", "transactions.php?type=expense"),
+						array(2, "Incomes", "transactions.php?type=income"),
+						array(3, "Transfers", "transactions.php?type=transfer"));
 
 	function showSubMenu($arr)
 	{
@@ -13,6 +14,9 @@
 
 		if (!is_array($arr))
 			return;
+
+		html("<tr>");
+		html("<td class=\"submenu\">");
 
 		foreach($arr as $trTypeArr)
 		{
@@ -23,11 +27,9 @@
 				echo("<a href=\"./".$trTypeArr[2]."\">".$trTypeArr[1]."</a>");
 			echo("</span>");
 		}
+
+		html();
+		html("</td>");
+		html("</tr>");
 	}
-
-	showSubMenu($subMenuArr);
-
-	html();
-	html("</td>");
-	html("</tr>");
 ?>
