@@ -390,7 +390,11 @@ class Transaction
 			return $resStr;
 		}
 
-		$resArr = $db->selectQ("*", "transactions", "user_id=".self::$user_id." AND type=".$trans_type, NULL, "date ASC");
+		$condition = "user_id=".self::$user_id;
+		if ($trans_type != 4)
+			$condition .= " AND type=".$trans_type;
+
+		$resArr = $db->selectQ("*", "transactions", $condition, NULL, "date ASC");
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
@@ -405,7 +409,7 @@ class Transaction
 			$resStr .= "<td><b>Source</b></td>";
 		else if ($trans_type == 2)
 			$resStr .= "<td><b>Destination</b></td>";
-		else if ($trans_type == 3)
+		else if ($trans_type == 3 || $trans_type == 4)
 			$resStr .= "<td><b>Source</b></td><td><b>Destination</b></td>";
 
 		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
@@ -414,18 +418,24 @@ class Transaction
 		{
 			$resStr .= "\t\t<tr>";
 
-			if ($trans_type == 1 || $trans_type == 3)
-				$resStr .= "<td>".$acc->getName($row["src_id"])."</td>";
-			if ($trans_type == 2 || $trans_type == 3)
-				$resStr .= "<td>".$acc->getName($row["dest_id"])."</td>";
+			$cur_trans_type = intval($row["type"]);
+
+			$resStr .= "<td>";
+			if ($cur_trans_type == 1 || $cur_trans_type == 3)
+				$resStr .= $acc->getName($row["src_id"]);
+			if ($trans_type == 3 || $trans_type == 4)
+				$resStr .= "</td><td>";
+			if ($cur_trans_type == 2 || $cur_trans_type == 3)
+				$resStr .= $acc->getName($row["dest_id"]);
+			$resStr .= "</td>";
 
 			$resStr .= "<td style=\"text-align: right;\">". Currency::format($row["amount"], $row["curr_id"]);
 			if ($row["charge"] != $row["amount"])
 			{
 				$resStr .= " (";
-				if ($trans_type == 1 || $trans_type == 3)		// expense or transfer
+				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
-				else if ($trans_type == 2)					// income
+				else if ($cur_trans_type == 2)					// income
 					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
 				$resStr .= ")";
 			}
@@ -454,6 +464,8 @@ class Transaction
 			return 2;
 		else if ($trans_type == "transfer")
 			return 3;
+		else if ($trans_type == "all")
+			return 4;
 		else
 			return 0;
 	}
@@ -468,6 +480,8 @@ class Transaction
 			return "income";
 		else if ($trans_type == 3)
 			return "transfer";
+		else if ($trans_type == 4)
+			return "all";
 		else
 			return NULL;
 	}
