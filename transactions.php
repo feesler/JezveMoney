@@ -102,9 +102,9 @@
 				if ($row["charge"] != $row["amount"])
 				{
 					echo(" (");
-					if ($trtype_id == 1 || $trtype_id == 3)		// expense or transfer
+					if ($trans_type == 1 || $trans_type == 3)		// expense or transfer
 						echo(Currency::format($row["charge"], $acc->getCurrency($row["src_id"])));
-					else if ($trtype_id == 2)					// income
+					else if ($trans_type == 2)					// income
 						echo(Currency::format($row["charge"], $acc->getCurrency($row["dest_id"])));
 					echo(")");
 				}
