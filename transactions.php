@@ -42,8 +42,8 @@
 // Account change event handler
 function onAccountChange()
 {
-	var acc_id;
-	var accsel;
+	var acc_id, accsel;
+	var newLocation;
 
 	accsel = ge('accsel');
 	if (!accsel)
@@ -51,7 +51,14 @@ function onAccountChange()
 
 	acc_id = parseInt(selectedValue(accsel));
 
-	window.location = './transactions.php?type=' + transType + '&acc_id=' + acc_id;
+	if (curAccId == acc_id)
+		return;
+
+	newLocation = './transactions.php?type=' + transType;
+	if (acc_id != 0)
+		newLocation += '&acc_id=' + acc_id;
+
+	window.location = newLocation;
 }
 </script>
 </head>
