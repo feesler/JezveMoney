@@ -11,21 +11,27 @@
 		if (!is_array($arr))
 			return;
 
+		setTab(1);
 		html("<tr>");
 		html("<td class=\"submenu\">");
 
+		$t_str = "";
 		foreach($arr as $trTypeArr)
 		{
-			echo("<span>");
+			$t_str .= "<span>";
 			if ($trans_type == $trTypeArr[0])
-				echo("<b>".$trTypeArr[1]."</b>");
+				$t_str .= "<b>".$trTypeArr[1]."</b>";
 			else
-				echo("<a href=\"./".$trTypeArr[2]."\">".$trTypeArr[1]."</a>");
-			echo("</span>");
+				$t_str .= "<a href=\"./".$trTypeArr[2]."\">".$trTypeArr[1]."</a>";
+			$t_str .= "</span>";
 		}
 
-		html();
+		setTab(2);
+		html($t_str);
+
+		setTab(1);
 		html("</td>");
 		html("</tr>");
+		html();
 	}
 ?>
