@@ -41,9 +41,9 @@ function onSubmit(frm)
 		return false;
 	}
 
-	regfrm.submit();
+	frm.submit();
 
-	retrun true;
+	return true;
 }
 </script>
 </head>
