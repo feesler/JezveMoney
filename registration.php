@@ -63,7 +63,7 @@ function onSubmit(frm)
 			</tr>
 			<tr>
 				<td class="lblcell"><span>Password</span></td>
-				<td><input id="logpwd" name="logpwd" type="text"><br></td>
+				<td><input id="logpwd" name="logpwd" type="password"><br></td>
 			</tr>
 			<tr>
 				<td></td>
