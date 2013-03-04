@@ -59,10 +59,10 @@ function onSubmit(frm)
 	<td style="width: 100%; height: 100%;" align="center" valign="center">
 		<table width="300px" height="150px">
 			<tr>
-				<td style="text-align: right;"><span style="margin-right: 5px; text-align: right;">Login</span></td><td><input id="logacc" name="logacc" type="text"></td>
+				<td class="lblcell"><span>Login</span></td><td><input id="logacc" name="logacc" type="text"></td>
 			</tr>
 			<tr>
-				<td style="text-align: right;"><span style="margin-right: 5px; text-align: right;">Password</span></td>
+				<td class="lblcell"><span>Password</span></td>
 				<td><input id="logpwd" name="logpwd" type="text"><br></td>
 			</tr>
 			<tr>

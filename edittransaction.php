@@ -124,9 +124,9 @@
 	{
 		echo("\t\t<tr>\r\n");
 		if ($trans_type == 3)
-			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Source account</span></td>\r\n");
+			echo("\t\t<td class=\"lblcell\"><span>Source account</span></td>\r\n");
 		else
-			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
+			echo("\t\t<td class=\"lblcell\"><span>Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
 		echo("\t\t\t<select id=\"srcid\" name=\"srcid\" onchange=\"");
 		if ($trans_type == 1)
@@ -144,9 +144,9 @@
 	{
 		echo("\t\t<tr>\r\n");
 		if ($trans_type == 3)
-			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Destination account</span></td>\r\n");
+			echo("\t\t<td class=\"lblcell\"><span>Destination account</span></td>\r\n");
 		else
-			echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">Account name</span></td>\r\n");
+			echo("\t\t<td class=\"lblcell\"><span>Account name</span></td>\r\n");
 		echo("\t\t<td>\r\n");
 		echo("\t\t\t<select id=\"destid\" name=\"destid\" onchange=\"");
 		if ($trans_type == 2)
@@ -162,7 +162,7 @@
 ?>
 		<tr>
 <?php
-		echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">");
+		echo("\t\t<td class=\"lblcell\"><span>");
 		if ($trans_type == 1)
 			echo("Amount to spend");
 		else if ($trans_type == 2)
@@ -194,7 +194,7 @@
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 
-		echo("\t\t<td style=\"text-align: right;\"><span style=\"margin-right: 5px;\">");
+		echo("\t\t<td class=\"lblcell\"><span>");
 		if ($trans_type == 1 || $trans_type == 3)
 			echo("Charge off");
 		else if ($trans_type == 2)
@@ -210,22 +210,22 @@
 			echo(" style=\"display: none;\"");
 		echo(">\r\n");
 ?>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Exchange rate</span></td>
+		<td class="lblcell"><span>Exchange rate</span></td>
 		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"><span id="exchcomm" style="margin-left: 5px;"><?php echo($charge_sign."/".$amount_sign." (".round($arr["charge"] / $arr["amount"], 5)." ".$amount_sign."/". $charge_sign.")"); ?></span></td>
 		</tr>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Result balance</span></td>
+		<td class="lblcell"><span>Result balance</span></td>
 		<td><input id="resbal" name="resbal" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Date</span></td>
+		<td class="lblcell"><span>Date</span></td>
 		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"></td>
 		</tr>
 
 		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Comment</span></td>
+		<td class="lblcell"><span>Comment</span></td>
 		<td><input id="comm" name="comm" type="text" value="<?php echo($arr["comment"]); ?>"></td>
 		</tr>
 
