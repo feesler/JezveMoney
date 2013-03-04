@@ -106,7 +106,7 @@
 		echo("</td></tr>");
 	}
 
-	echo($acc->getTable(TRUE));
+	echo($acc->getTable());
 
 	$accounts = $acc->getCount();
 	if ($accounts > 0)
