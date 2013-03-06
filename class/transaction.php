@@ -118,7 +118,7 @@ class Transaction
 		$tr_pos++;
 
 		if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
-									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $transcurr, $fdate, $comment, $tr_pos)))
+									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $transcurr, $trans_date, $comment, $tr_pos)))
 			return FALSE;
 
 		// update balance of source account
