@@ -99,7 +99,7 @@
 
 	showSubMenu($newTransArr);
 
-	echo($acc->getTable(TRUE));
+	echo($acc->getTable());
 
 	html();
 
