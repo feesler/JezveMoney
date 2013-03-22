@@ -93,10 +93,14 @@ class Transaction
 	{
 		global $db;
 
-		if (($trans_type != 1 && $trans_type != 2 && $trans_type != 3) || (!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
+		if (!is_numeric($trans_type) || !is_numeric($src_id) || !is_numeric($dest_id) || !is_numeric($transcurr))
 			return FALSE;
 
-		$acc = new Account(self::$user_id);
+		if (($trans_type != 1 && $trans_type != 2 && $trans_type != 3 && $trans_type != 4) ||
+			(!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
+			return FALSE;
+
+		$acc = new Account(self::$user_id, TRUE);
 
 		if ($src_id != 0)
 		{
@@ -122,7 +126,7 @@ class Transaction
 			return FALSE;
 
 		// update balance of source account
-		if ($trans_type == 1 || $trans_type == 3)
+		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
 		{
 			$srcBalance -= $charge;
 			if (!$acc->setBalance($src_id, $srcBalance))
@@ -130,7 +134,7 @@ class Transaction
 		}
 
 		// update balance of destination account
-		if ($trans_type == 2 || $trans_type == 3)
+		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)
 		{
 			$destBalance += ($trans_type == 2) ? $charge : $amount;
 			if (!$acc->setBalance($dest_id, $destBalance))
@@ -468,6 +472,8 @@ class Transaction
 			return 3;
 		else if ($trans_type == "all")
 			return 4;
+		else if ($trans_type == "debt")
+			return 5;
 		else
 			return 0;
 	}
@@ -484,6 +490,8 @@ class Transaction
 			return "transfer";
 		else if ($trans_type == 4)
 			return "all";
+		else if ($trans_type == 5)
+			return "debt";
 		else
 			return NULL;
 	}

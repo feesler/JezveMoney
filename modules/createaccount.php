@@ -19,7 +19,8 @@
 		fail();
 
 	$acc = new Account($userid);
-	if (!$acc->create($_POST["accname"], $_POST["accbalance"], $_POST["acccurr"]))
+	$owner_id = User::getOwner($userid);
+	if (!$acc->create($owner_id, $_POST["accname"], $_POST["accbalance"], $_POST["acccurr"]))
 		fail();
 
 	setLocation("../accounts.php?newacc=ok");

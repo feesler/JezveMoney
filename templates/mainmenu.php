@@ -6,6 +6,7 @@
 		$menuArr = array("Main" => "index.php",
 						"Accounts" => "accounts.php",
 						"Transactions" => "transactions.php",
+						"Debts" => "debts.php",
 						"Statistics" => "statistics.php");
 		$dir = "/money/";
 

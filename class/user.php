@@ -154,6 +154,40 @@ class User
 
 
 	// Set password hash for specified user
+	public function setOwner($user_id, $owner_id)
+	{
+		global $db;
+
+		$u_id = intval($user_id);
+		$o_id = intval($owner_id);
+		if (!$u_id || !$o_id)
+			return FALSE;
+
+		return $db->updateQ("users", array("owner_id"), array($owner_id), "id=".qnull($u_id));
+	}
+
+
+	// Return password hash for specified user
+	public function getOwner($user_id)
+	{
+		global $db;
+
+		if (!is_numeric($user_id))
+			return 0;
+
+		$u_id = intval($user_id);
+		if (!$u_id)
+			return 0;
+
+		$resArr = $db->selectQ("owner_id", "users", "id=".qnull($u_id));
+		if (count($resArr) == 1)
+			return intval($resArr[0]["owner_id"]);
+		else
+			return 0;
+	}
+
+
+	// Set password hash for specified user
 	public function setPassHash($login, $passhash)
 	{
 		global $db;
@@ -180,11 +214,11 @@ class User
 
 
 	// Register new user
-	public static function register($login, $password)
+	public static function register($login, $password, $p_name)
 	{
 		global $db;
 
-		if (!$login || $login == "" || !$password || $password == "")
+		if (!$login || $login == "" || !$password || $password == "" || !$p_name || $p_name == "")
 			return FALSE;
 
 		// check user exist
@@ -194,7 +228,17 @@ class User
 		$passhash = self::createHash($login, $password);
 		$elogin = $db->escape($login);
 
-		return $db->insertQ("users", array("id", "login", "passhash"), array(NULL, $elogin, $passhash));
+		if (!$db->insertQ("users", array("id", "login", "passhash"), array(NULL, $elogin, $passhash)))
+			return FALSE;
+
+		$user_id = $db->insertId();
+
+		$p = new Person($user_id);
+		$p_id = $p->create($p_name);
+
+		self::setOwner($user_id, $p_id);
+
+		return TRUE;
 	}
 
 

@@ -4,11 +4,15 @@ class Account
 {
 	static private $cache = NULL;
 	static private $user_id = 0;
+	static private $owner_id = 0;
+	static private $full_list = FALSE;
 
 
 	// Class constructor
-	function __construct($user_id)
+	function __construct($user_id, $full = FALSE)
 	{
+		self::$full_list = $full;
+
 		if ($user_id != self::$user_id)
 			self::$cache = NULL;
 		self::$user_id = intval($user_id);
@@ -22,13 +26,23 @@ class Account
 
 		self::$cache = array();
 
-		$resArr = $db->selectQ("*", "accounts", "user_id=".self::$user_id);
+		// find owner person
+		$resArr = $db->selectQ("*", "users", "id=".self::$user_id);
+		if (count($resArr) == 1)
+			self::$owner_id = intval($resArr[0]["owner_id"]);
+
+		$condition = "user_id=".self::$user_id;
+		if (!self::$full_list && self::$owner_id != 0)
+			$condition .= " AND owner_id=".self::$owner_id;
+
+		$resArr = $db->selectQ("*", "accounts", $condition);
 		foreach($resArr as $row)
 		{
 			$acc_id = $row["id"];
 
 			self::$cache[$acc_id]["user_id"] = $row["user_id"];
 			self::$cache[$acc_id]["name"] = $row["name"];
+			self::$cache[$acc_id]["owner_id"] = intval($row["owner_id"]);
 			self::$cache[$acc_id]["curr_id"] = intval($row["curr_id"]);
 			self::$cache[$acc_id]["balance"] = floatval($row["balance"]);
 			self::$cache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
@@ -91,13 +105,14 @@ class Account
 
 
 	// Create new account for current user
-	public function create($accname, $balance, $curr_id)
+	public function create($owner_id, $accname, $balance, $curr_id)
 	{
 		global $db;
 
-		if (!$accname || !is_numeric($balance) || !is_numeric($curr_id))
+		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
 			return FALSE;
 
+		$owner_id = intval($owner_id);
 		$accname = $db->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
@@ -105,8 +120,8 @@ class Account
 		if (!$accname || $accname == "" || !$curr_id)
 			return FALSE;
 
-		if (!$db->insertQ("accounts", array("id", "user_id", "curr_id", "balance", "initbalance", "name"),
-								array(NULL, self::$user_id, $curr_id, $balance, $balance, $accname)))
+		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name"),
+								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname)))
 			return FALSE;
 
 		self::updateCache();
@@ -203,6 +218,13 @@ class Account
 	}
 
 
+	// Return owner of account
+	public function getOwner($acc_id)
+	{
+		return $this->getCache($acc_id, "owner_id");
+	}
+
+
 	// Return user of account
 	public function getUser($acc_id)
 	{
@@ -248,6 +270,16 @@ class Account
 	public function getBalance($acc_id)
 	{
 		return $this->getCache($acc_id, "balance");
+	}
+
+
+	// Set owner of account
+	public function setOwner($acc_id, $owner_id)
+	{
+		if (!$acc_id || !$owner_id || !is_numeric($owner_id))
+			return FALSE;
+
+		return $this->setValue($acc_id, "owner_id", intval($owner_id));
 	}
 
 

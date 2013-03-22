@@ -85,6 +85,26 @@ function isNum(val)
 }
 
 
+// Show specified object
+function show(obj, val)
+{
+	var robj = ge(obj);
+
+	if (robj)
+		robj.style.display = (val) ? '' : 'none';
+}
+
+
+// Enable or disable specified object
+function enable(obj, val)
+{
+	var robj = ge(obj);
+
+	if (robj)
+		robj.disabled = (!val);
+}
+
+
 // Get key code from event
 function getCode(e)
 {
@@ -237,4 +257,43 @@ function selectByValue(selectObj, selValue)
 	}
 
 	return false;
+}
+
+
+// Return closure for function within specified context and arguments
+function bind(func, context)
+{
+	var bindArgs = [].slice.call(arguments, 2);
+
+	function wrapper()
+	{
+		var args = [].slice.call(arguments); 
+		var unshiftArgs = bindArgs.concat(args);
+		return func.apply(context, unshiftArgs);
+	}
+
+	return wrapper;
+}
+
+
+// Insert one DOM element after specified
+function insertAfter(elem, refElem)
+{
+	var parent = refElem.parentNode;
+	var next = refElem.nextSibling;
+	if (next)
+		return parent.insertBefore(elem, next);
+	else
+		return parent.appendChild(elem);
+}
+
+
+// Remove all child nodes of specified element
+function removeChilds(obj)
+{
+	if (!obj)
+		return;
+
+	while(obj.childNodes.length > 0) 
+		 obj.removeChild(obj.childNodes[0]);
 }

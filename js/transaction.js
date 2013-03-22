@@ -448,7 +448,7 @@ function setExchangeComment()
 	exchcomm = ge('exchcomm');
 	if (trans_type == 1 || trans_type == 2)
 		transcurr = ge('transcurr');
-	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
+	accid = ge((trans_type == 2) ? 'destid' : (trans_type == 4) ? 'accid' : 'srcid');
 	if (trans_type == 3)
 		taccid = ge('destid');
 	if (!exchcomm || !accid || (!transcurr && !taccid))
@@ -481,7 +481,7 @@ function getValues()
 {
 	var accid, amount, charge, exchrate, resbal;
 
-	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
+	accid = ge((trans_type == 2) ? 'destid' : (trans_type == 4) ? 'accid' : 'srcid');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
@@ -620,7 +620,7 @@ function onChangeTransCurr()
 	var accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
 	var amountCurr, chargeCurr;
 
-	accid = ge((trans_type == 2) ? 'destid' : 'srcid');
+	accid = ge((trans_type == 2) ? 'destid' : (trans_type == 4) ? 'accid' : 'srcid');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
@@ -689,4 +689,72 @@ function setYesterday()
 	yesterday.setDate(yesterday.getDate() - 1);
 
 	setTransactionDate(yesterday);
+}
+
+
+// Debt operation type change event handler
+function onChangeDebtOp()
+{
+	var acclbl, debtType, debtgive, debttake;
+
+	acclbl = ge('acclbl');
+	debtgive = ge('debtgive');
+	debttake = ge('debttake');
+	if (!acclbl || !debtgive || !debttake)
+		return;
+
+	debtType = debttake.checked;
+
+	acclbl.innerHTML = (debttake.checked) ? 'Source account' : 'Destination account';
+}
+
+
+// Show controls to add new person
+function togglePerson()
+{
+	var personbtn, personname, personid, personsel, newpersonbtn;
+
+	personbtn = ge('personbtn');
+	personname = ge('personname');
+	personid = ge('personid');
+	personsel = ge('personsel');
+	personbtn = ge('personbtn');
+	if (!personbtn || !personname || !personid || !personsel || !newpersonbtn)
+		return;
+
+	if (personname.type == 'hidden')	// select mode
+	{
+		personbtn.value = 'select';
+
+		personid.value = 0;
+		personname.type = 'text';
+	
+		show(personname, true);
+		show(personsel, false);
+		enable(newpersonbtn, false);
+	}
+	else if (personname.type == 'text')	// new person mode
+	{
+		personbtn.value = 'new';
+
+		personname.value = selectedValue(personsel);
+		personid.value = personsel.selectedIndex;
+	}
+}
+
+
+// Person select event handler
+function onPersonSel(obj)
+{
+	var personname, personid;
+
+	personname = ge('personname');
+	personid = ge('personid');
+	if (!personname || !personid)
+		return;
+	if (!obj || typeof(obj.selectedIndex) == "undefined" || obj.selectedIndex == -1)
+		return;
+
+	personname.value = selectedValue(obj);
+	personid.value = obj.selectedIndex;
 }

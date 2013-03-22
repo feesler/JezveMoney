@@ -22,16 +22,23 @@
 <script>
 function onSubmit(frm)
 {
-	var logacc, logpwd;
+	var logacc, logpwd, username;
 
 	logacc = ge('logacc');
 	logpwd = ge('logpwd');
-	if (!frm || !logacc || !logpwd)
+	username = ge('username');
+	if (!frm || !logacc || !logpwd || !username)
 		return false;
 
 	if (!logacc.value || logacc.value.length < 1)
 	{
 		alert('Please type your login.');
+		return false;
+	}
+
+	if (!username.value || username.value.length < 1)
+	{
+		alert('Please type your name.');
 		return false;
 	}
 
@@ -60,6 +67,10 @@ function onSubmit(frm)
 		<table width="300px" height="150px">
 			<tr>
 				<td class="lblcell"><span>Login</span></td><td><input id="logacc" name="logacc" type="text"></td>
+			</tr>
+			<tr>
+				<td class="lblcell"><span>Name</span></td>
+				<td><input id="username" name="username" type="text"><br></td>
 			</tr>
 			<tr>
 				<td class="lblcell"><span>Password</span></td>
