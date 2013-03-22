@@ -120,12 +120,6 @@ select
 }
 
 
-.infotable tr:nth-child(even)
-{
-	background-color: #E0E0E0;
-}
-
-
 .currsign
 {
 	margin: 0 5px;

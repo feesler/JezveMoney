@@ -21,6 +21,24 @@ input[type="button"]:active, input[type="submit"]:active, button:active
 }
 
 
+input[type="button"]:disabled, input[type="submit"]:disabled, button:disabled
+{
+	border: 2px solid #808080;
+	background-color: #FFFFFF;
+	color: #808080;
+}
+
+
+input[type="button"]:disabled:hover, input[type="submit"]:disabled:hover, button:disabled:hover,
+input[type="button"]:disabled:active, input[type="submit"]:disabled:active, button:disabled:active,
+input[type="button"]:disabled:focus, input[type="submit"]:disabled:focus, button:disabled:focus
+{
+	border: 2px solid #808080;
+	background-color: #FFFFFF;
+	color: #808080;
+}
+
+
 a, a:visited
 {
 	color: #000000;
@@ -32,4 +50,10 @@ input[type="text"], input[type="password"], select
 	border: 2px solid #000000;
 	background-color: #FFFFFF;
 	color: #000000;
+}
+
+
+.infotable tr:nth-child(even)
+{
+	background-color: #E0E0E0;
 }
