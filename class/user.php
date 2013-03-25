@@ -57,7 +57,7 @@ class User
 
 
 	// Check correctness cookies data
-	static function checkCookie($login, $passhash)
+	private static function checkCookie($login, $passhash)
 	{
 		$salt = self::getSalt($login);
 		$userHash = self::getPassHash($login);
@@ -67,7 +67,7 @@ class User
 
 
 	// Setup cookies
-	function setupCookies($login, $passhash)
+	private static function setupCookies($login, $passhash)
 	{
 		$expTime = time() + 31536000;	// year after now
 		$path = "/money/";
@@ -79,7 +79,7 @@ class User
 
 
 	// Delete cookies
-	function deleteCookies()
+	private static function deleteCookies()
 	{
 		$expTime = time() - 3600;	// hour before now
 		$path = "/money/";
@@ -124,7 +124,7 @@ class User
 
 
 	// Return user name
-	public function getName($id)
+	public static function getName($id)
 	{
 		global $db;
 
@@ -139,7 +139,7 @@ class User
 
 
 	// Return user id by specified login
-	public function getId($login)
+	public static function getId($login)
 	{
 		global $db;
 
@@ -154,7 +154,7 @@ class User
 
 
 	// Set password hash for specified user
-	public function setOwner($user_id, $owner_id)
+	public static function setOwner($user_id, $owner_id)
 	{
 		global $db;
 
@@ -168,7 +168,7 @@ class User
 
 
 	// Return password hash for specified user
-	public function getOwner($user_id)
+	public static function getOwner($user_id)
 	{
 		global $db;
 
@@ -188,7 +188,7 @@ class User
 
 
 	// Set password hash for specified user
-	public function setPassHash($login, $passhash)
+	public static function setPassHash($login, $passhash)
 	{
 		global $db;
 
@@ -199,7 +199,7 @@ class User
 
 
 	// Return password hash for specified user
-	public function getPassHash($login)
+	public static function getPassHash($login)
 	{
 		global $db;
 
