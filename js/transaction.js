@@ -12,16 +12,24 @@ var s1valid, s2valid, dvalid, evalid, avalid;
 // S2 = S1 + d		for income
 // d = a * e
 
-// Calculate charge off/receipt amount by initial and result balance
+
+// Check current transaction is income
+function isIncome()
+{
+	return (trans_type == 2 || (trans_type == 4 && typeof(debtType) != "undefined" && debtType));
+}
+
+
+// Calculate result balance by initial and charge off/receipt
 function f1()
 {
-	if (trans_type == 2)		// income
+	if (isIncome())
 		S2 = fS1 + fd;
 	else
 		S2 = fS1 - fd;
 
 	if (edit_mode)
-		S2 += (trans_type == 2) ? -transaction.charge : transaction.charge;
+		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
 	fS2 = S2;
 }
 
@@ -38,7 +46,7 @@ function f2()
 // Calculate charge off/receipt amount by initial and result balance
 function f3()
 {
-	if (trans_type == 2)		// income
+	if (isIncome())
 		d = fS2 - fS1;
 	else
 		d = fS1 - fS2;
@@ -205,24 +213,25 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, charge;
+	var srcid, destid, accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
 	var sync = false;
 
 	srcid = ge('srcid');
 	destid = ge('destid');
+	accid = ge('accid');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	charge = ge('charge');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge)
+	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
 		sync = true;
 
-	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
+	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : (destid ? destid : accid)));
 	if (sync)
 		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
@@ -696,7 +705,7 @@ function setYesterday()
 // Debt operation type change event handler
 function onChangeDebtOp()
 {
-	var acclbl, debtType, debtgive, debttake;
+	var acclbl, debtgive, debttake;
 
 	acclbl = ge('acclbl');
 	debtgive = ge('debtgive');
@@ -704,9 +713,11 @@ function onChangeDebtOp()
 	if (!acclbl || !debtgive || !debttake)
 		return;
 
-	debtType = debttake.checked;
+	debtType = debtgive.checked;
 
-	acclbl.innerHTML = (debttake.checked) ? 'Source account' : 'Destination account';
+	acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+
+	updateExchAndRes();
 }
 
 
