@@ -189,6 +189,19 @@ function onEditTransSubmit(frm)
 }
 
 
+// Update exchange rate and result balance values
+function updateExchAndRes()
+{
+	getValues();
+	if (d !== '' && a !== '')
+	{
+		f5();
+		f1();
+		setValues();
+	}
+}
+
+
 // Change account event handler
 function onChangeAcc()
 {
@@ -222,15 +235,9 @@ function onChangeAcc()
 		exchange.style.display = 'none';
 		exchrate.value = 1;
 		charge.value = amount.value;
-
-		getValues();
-		if (d !== '' && a !== '')
-		{
-			f5();
-			f1();
-			setValues();
-		}
 	}
+
+	updateExchAndRes();
 
 	setSign(false, trans_acc_curr);
 	setSign(true, trans_curr);
@@ -642,13 +649,7 @@ function onChangeTransCurr()
 		exchrate.value = 1;
 		charge.value = amount.value;
 
-		getValues();
-		if (d !== '' && a !== '')
-		{
-			f5();
-			f1();
-			setValues();
-		}
+		updateExchAndRes();
 	}
 	else
 	{
