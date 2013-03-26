@@ -77,15 +77,19 @@ Class Debt
 		}
 		else
 		{
-			$resStr .= "\t\t<tr><td><b>Person</b></td><td><b>Balance</b></td></tr>\r\n";
+			$resStr .= "\t\t<tr><td><b>Person</b></td><td><b>Relation</b></td><td><b>Balance</b></td></tr>\r\n";
 
 			foreach($resArr as $row)
 			{
 				$acc_bal = floatval($row["balance"]);
+				$lend = ($acc_bal < 0);
+				$acc_bal = abs($acc_bal);
 				$curr_id = intval($row["curr_id"]);
 				$balfmt = Currency::format($acc_bal, $curr_id);
 
-				$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$balfmt."</td></tr>\r\n";
+				$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>";
+				$resStr .= $lend ? "lent" : "borrowed";
+				$resStr .= "</td><td>".$balfmt."</td></tr>\r\n";
 			}
 		}
 
