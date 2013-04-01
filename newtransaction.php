@@ -53,8 +53,10 @@
 	html("<title>".$titleString."</title>");
 
 	getStyle($sitetheme);
+	html(getCSS("calendar.css"));
 	html(getJS("common.js"));
 	html(getJS("transaction.js"));
+	html(getJS("calendar.js"));
 
 	html("<script>");
 
@@ -187,7 +189,8 @@
 
 		html("<tr>");
 		html("<td class=\"lblcell\"><span>Date</span></td>");
-		html("<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"><input id=\"yestbtn\" style=\"margin-left: 5px;\" type=\"button\" onclick=\"setYesterday();\" value=\"yesterday\"></td>");
+		html("<td><input id=\"date\" name=\"date\" type=\"text\" value=\"".date("d.m.Y")."\"><input id=\"yestbtn\" style=\"margin-left: 5px;\" type=\"button\" onclick=\"setYesterday();\" value=\"yesterday\"><input type=\"button\" value=\"calendar\" onclick=\"showCalendar();\"><div id=\"calendar\" class=\"calWrap\" style=\"display: none;\"></div></td>");
+		html("<script>buildCalendar();</script>");
 		html("</tr>");
 		html();
 

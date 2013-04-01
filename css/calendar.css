@@ -1,0 +1,151 @@
+.calWrap
+{
+	position: absolute;
+	float: left;
+}
+
+
+.calTbl
+{
+	border: 1px solid #000000;
+	margin: 0;
+	padding: 0;
+	border-spacing: 0;
+	background-color: #FFFFFF;
+}
+
+
+.calHeadTbl
+{
+	border: 0 none;
+	padding: 0;
+	margin: 0;
+	border-spacing: 0;
+	width: 100%;
+	color: #000000;
+}
+
+
+.calHeadTbl > thead > tr > td
+{
+	margin: 0;
+	padding: 0;
+	height: 37px;
+}
+
+
+.calHeadTbl > thead > tr > td.hMonth
+{
+	width: 100%;
+	height: 37px;
+}
+
+
+.calHeadTbl > thead > tr > td.pnMonth
+{
+	width: 23px;
+	height: 37px;
+}
+
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn
+{
+	border: 0 none;
+	padding: 0;
+	width: 23px;
+	height: 23px;
+	margin: 7px 0px;
+	background-color: #FFFFFF;
+}
+
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn > div
+{
+	width: 0px;
+	height: 0px;
+	border: 6px solid transparent;
+}
+
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn > div.prev
+{
+	margin: 1px 7px 7px 1px;
+	border-right-color: #B0B0B0;
+}
+
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn:hover
+{
+	background-color: #FFFFFF;
+}
+
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn > div.next
+{
+	margin: 1px 7px 7px 7px;
+	border-left-color: #B0B0B0;
+}
+
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn:hover > div.prev
+{
+	border-right-color: #80D0FF;
+}
+
+.calHeadTbl > thead > tr > td > button.pnMonthBtn:hover > div.next
+{
+	border-left-color: #80D0FF;
+}
+
+
+
+.calTbl > thead > tr > td
+{
+	margin: 0;
+	padding: 0px;
+	border: 0px none;
+	text-align: center;
+	width: 34px;
+	height: 23px;
+	color: #000000;
+}
+
+
+.calTbl > thead > tr > td > button
+{
+	margin: 0px 5px;
+	padding: 0;
+	border: 0px none;
+	width: 34px;
+	height: 23px;
+	background-color: #FFFFFF;
+	color: #000000;
+	text-align: right;
+	border: 1px solid #FFFFFF;
+}
+
+
+.calTbl > thead > tr > td > button:hover
+{
+	background-color: #80D0FF;
+}
+
+
+.calTbl > thead > tr > td > button:focus,
+.calTbl > thead > tr > td > button:active
+{
+	border: 1px solid #20D0FF;
+}
+
+
+.calTbl > thead > tr > td.today > button
+{
+	border: 1px dashed #20D0FF;
+}
+
+
+/* previous and next month days style */
+.calTbl > thead > tr > td.omonth > button
+{
+	color: #B0B0B0;
+}
