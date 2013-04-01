@@ -1,13 +1,13 @@
 <?php
 
-Class Person
+class Person
 {
 	private $user_id = 0;
 	private $owner_id = 0;		// person of user
 
 
 	// Class constructor
-	function __construct($user_id)
+	public function __construct($user_id)
 	{
 		global $db;
 
