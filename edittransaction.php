@@ -41,8 +41,10 @@
 <title><?php echo($titleString); ?></title>
 <?php
 	getStyle($sitetheme);
+	html(getCSS("calendar.css"));
 	echo(getJS("common.js"));
 	echo(getJS("transaction.js"));
+	html(getJS("calendar.js"));
 
 	echo("<script>\r\n");
 
@@ -221,7 +223,8 @@
 
 		<tr>
 		<td class="lblcell"><span>Date</span></td>
-		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"></td>
+		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"><input type="button" value="calendar" style="margin-left: 5px;" onclick="showCalendar();"><div id="calendar" class="calWrap" style="display: none;"></div></td>
+		<script>buildCalendar();</script>
 		</tr>
 
 		<tr>
