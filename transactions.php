@@ -23,6 +23,8 @@
 	if ($acc_id && !$acc->is_exist($acc_id))
 		$acc_id = 0;
 
+	$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
+
 	$titleString = "jezve Money - Transactions";
 ?>
 <!DOCTYPE html>
@@ -117,7 +119,7 @@ function onAccountChange()
 
 	$trans = new Transaction($userid);
 
-	echo($trans->getTable($trans_type, $acc_id));
+	echo($trans->getTable($trans_type, $acc_id, 30, $page_num));
 ?>
 </table>
 </body>

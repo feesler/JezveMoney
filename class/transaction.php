@@ -373,8 +373,82 @@ class Transaction
 	}
 
 
+	// Return link to specified page
+	private function getPageLink($trans_type, $acc_id, $page_num, $is_active)
+	{
+		$resStr = "<span>";
+
+		if ($is_active)
+		{
+			$resStr .= "<b>";
+		}
+		else
+		{
+			$resStr .= "<a href=\"./transactions.php?";
+			$resStr .= "type=".$this->getTypeString($trans_type);
+			if ($acc_id != 0)
+				$resStr .= "&acc_id=".$acc_id;
+			$resStr .= "&page=".$page_num;
+			$resStr .= "\">";
+		}
+		$resStr .= $page_num;
+		$resStr .= ($is_active) ? "</b>" : "</a>";
+		$resStr .= "</span>";
+
+		return $resStr;
+	}
+
+
+	// Return paginator for transaction table
+	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count)
+	{
+		$resStr = "";
+
+		$breakLimit = 5;
+		$groupLimit = 3;
+
+		if ($pages_count > $breakLimit)
+		{
+			if ($page_num < $groupLimit)		// 1 2 3 4 5 ... 18
+			{
+				for($i = 0; $i < $breakLimit; $i++)
+				{
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num))." ";
+				}
+				$resStr .= " ... ".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE);
+			}
+			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
+			{
+				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE)." ... ";
+				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
+				{
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num))." ";
+				}
+				$resStr .= " ... ".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE)." ";
+			}
+			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
+			{
+				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE)." ... ";
+				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
+				{
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num))." ";
+				}
+			}
+		}
+		else		// 1 2 3 4 5
+		{
+			for($i = 0; $i < $pages_count; $i++)
+			{
+				$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
+			}
+		}
+
+		return $resStr;
+	}
+
+
 	// Return table of transactions
-	public function getTable($trans_type, $acc_id = 0)
+	public function getTable($trans_type, $acc_id = 0, $tr_on_page = 0, $page_num = 0)
 	{
 		global $db;
 
@@ -400,7 +474,18 @@ class Transaction
 		if ($acc_id != 0)
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
 
-		$resArr = $db->selectQ("*", "transactions", $condition, NULL, "date ASC");
+		$orderAndLimit = "date ASC";
+		if ($tr_on_page > 0)
+		{
+			$transCount = $db->countQ("transactions", $condition);
+
+			$limitOffset = ($tr_on_page * $page_num);
+			$limitRows = min($transCount - $limitOffset, $tr_on_page);
+
+			$orderAndLimit .= " LIMIT ".$limitOffset.", ".$limitRows;
+		}
+
+		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
@@ -408,6 +493,18 @@ class Transaction
 			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
 			return $resStr;
 		}
+
+		if ($tr_on_page > 0)
+		{
+			$pageCount = ceil($transCount / $tr_on_page);
+
+			$resStr .= "\t\t<tr>\r\n";
+			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
+			$resStr .= "</td>\r\n";
+			$resStr .= "\t\t</tr>\r\n";
+		}
+
 
 		$resStr .= "\t\t<tr>";
 
@@ -453,6 +550,15 @@ class Transaction
 			$resStr .= "<td>".$row["comment"]."</td>";
 			$resStr .= "<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a> <a href=\"./deltransaction.php?id=".$row["id"]."\">delete</a></td>";
 			$resStr .= "</tr>\r\n";
+		}
+
+		if ($tr_on_page > 0)
+		{
+			$resStr .= "\t\t<tr>";
+			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
+			$resStr .= "\t\t\t</td>";
+			$resStr .= "\t\t</tr>";
 		}
 
 		$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";

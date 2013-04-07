@@ -120,6 +120,20 @@ select
 }
 
 
+.pages
+{
+	padding: 5px 0px;
+	text-align: right;
+}
+
+
+.pages span
+{
+	font-size: 14px;
+	margin-left: 5px;
+}
+
+
 .currsign
 {
 	margin: 0 5px;
