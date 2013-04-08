@@ -532,7 +532,7 @@ class Transaction
 				$resStr .= $acc->getName($row["dest_id"]);
 			$resStr .= "</td>";
 
-			$resStr .= "<td class=\"sumcell;\">". Currency::format($row["amount"], $row["curr_id"]);
+			$resStr .= "<td class=\"sumcell\">". Currency::format($row["amount"], $row["curr_id"]);
 			if ($row["charge"] != $row["amount"])
 			{
 				$resStr .= " (";
