@@ -567,6 +567,90 @@ class Transaction
 	}
 
 
+	// Return table of latest transactions
+	public function getLatest($tr_count)
+	{
+		global $db;
+
+		$resStr = "";
+
+		if (!self::$user_id)
+			return $resStr;
+
+		$acc = new Account(self::$user_id);
+		$accounts = $acc->getCount();
+		if (!$accounts)
+			return $resStr;
+
+		$resStr .= "\t<table class=\"infotable\">\r\n";
+
+		$tr_limit = intval($tr_count);
+		if (!is_numeric($tr_count) || !$tr_limit)
+			return $resStr;
+
+		$condition = "user_id=".self::$user_id;
+		$orderAndLimit = "date DESC LIMIT 0,".$tr_limit;
+
+		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
+		$rowCount = count($resArr);
+		if (!$rowCount)
+		{
+			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
+			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+			return $resStr;
+		}
+
+		$resStr .= "\t\t<tr>";
+
+		$resStr .= "<td><b>Description</b></td>";
+		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
+
+		foreach($resArr as $row)
+		{
+			$resStr .= "\t\t<tr>";
+
+			$cur_trans_type = intval($row["type"]);
+
+			$resStr .= "<td>";
+			if ($cur_trans_type == 1)			// expense
+			{
+				$resStr .= "Expense from ".$acc->getName($row["src_id"]);
+			}
+			else if ($cur_trans_type == 2)		// income
+			{
+				$resStr .= "Income to ".$acc->getName($row["dest_id"]);
+			}
+			else if ($cur_trans_type == 3)		// transfer
+			{
+				$resStr .= "Transfer from ".$acc->getName($row["src_id"])." to ".$acc->getName($row["dest_id"]);
+			}
+			$resStr .= "</td>\r\n";
+
+			$resStr .= "<td class=\"sumcell\">". Currency::format($row["amount"], $row["curr_id"]);
+			if ($row["charge"] != $row["amount"])
+			{
+				$resStr .= " (";
+				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
+					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
+				else if ($cur_trans_type == 2)					// income
+					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
+				$resStr .= ")";
+			}
+			$resStr .= "</td>";
+
+			$fdate = date("d.m.Y", strtotime($row["date"]));
+
+			$resStr .= "<td>".$fdate."</td>";
+			$resStr .= "<td>".$row["comment"]."</td>";
+			$resStr .= "</tr>\r\n";
+		}
+
+		$resStr .= "\t</table>\r\n";
+
+		return $resStr;
+	}
+
+
 	// Return string for specified transaction type
 	public static function getStringType($trans_type)
 	{
