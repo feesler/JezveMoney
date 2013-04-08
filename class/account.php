@@ -414,7 +414,7 @@ class Account
 			{
 				$valfmt = Currency::format($value, $key);
 				$currname = Currency::getName($key);
-				$resStr .= "\t\t<tr><td>Total</td><td>".$currname."</td><td style=\"text-align: right;\">".$valfmt."</td>";
+				$resStr .= "\t\t<tr><td>Total</td><td>".$currname."</td><td class=\"sumcell\">".$valfmt."</td>";
 				if ($editlink == TRUE)
 					$resStr .= "<td></td>";
 				$resStr .= "</tr>\r\n";
