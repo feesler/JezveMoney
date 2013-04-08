@@ -3,6 +3,7 @@
 	require_once("./class/user.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
+	require_once("./class/transaction.php");
 
 
 	$userid = User::check();
@@ -32,11 +33,22 @@
 	showSubMenu($newTransArr);
 
 	$acc = new Account($userid);
+	$trans = new Transaction($userid);
 
 	setTab(1);
 	html("<tr>");
 	html("<td>");
+
+	setTab(2);
+	html("<div class=\"mainwidget\">");
+	html("<span>Accounts</span>");
 	echo($acc->getTable());
+	html("</div>");
+	html("<div class=\"mainwidget\">");
+	html("<span>Latest transactions</span>");
+	echo($trans->getLatest(10));
+	html("</div>");
+
 	html("</td>");
 	html("</tr>");
 ?>

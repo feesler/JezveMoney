@@ -152,3 +152,19 @@ select
 {
 	margin-right: 5px;
 }
+
+
+/* widget on main page */
+.mainwidget
+{
+	display: inline-block;
+	float: left;
+	margin: 20px 30px 0px 0px;
+}
+
+
+.mainwidget > span
+{
+	font-size: 18px;
+	padding-left: 20px;
+}
