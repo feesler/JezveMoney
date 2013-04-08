@@ -101,7 +101,12 @@
 
 	showSubMenu($newTransArr);
 
+	setTab(1);
+	html("<tr>");
+	html("<td>");
 	echo($acc->getTable());
+	html("</td>");
+	html("</tr>");
 
 	html();
 

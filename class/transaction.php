@@ -457,7 +457,7 @@ class Transaction
 		if (!self::$user_id)
 			return $resStr;
 
-		$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table class=\"infotable\">\r\n";
+		$resStr .= "\t<table class=\"infotable\">\r\n";
 
 		$acc = new Account(self::$user_id);
 		$accounts = $acc->getCount();
@@ -561,7 +561,7 @@ class Transaction
 			$resStr .= "\t\t</tr>";
 		}
 
-		$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+		$resStr .= "\t</table>\r\n";
 
 		return $resStr;
 	}

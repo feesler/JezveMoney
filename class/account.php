@@ -371,7 +371,7 @@ class Account
 		if (!$this->checkCache())
 			return $resStr;
 
-		$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table class=\"infotable\">\r\n";
+		$resStr .= "\t<table class=\"infotable\">\r\n";
 
 		$accounts = count(self::$cache);
 		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
@@ -421,7 +421,7 @@ class Account
 			}
 		}
 
-		$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+		$resStr .= "\t</table>\r\n";
 
 		return $resStr;
 	}

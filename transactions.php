@@ -119,7 +119,11 @@ function onAccountChange()
 
 	$trans = new Transaction($userid);
 
+	html("<tr>");
+	html("<td>");
 	echo($trans->getTable($trans_type, $acc_id, 30, $page_num));
+	html("</td>");
+	html("</tr>");
 ?>
 </table>
 </body>

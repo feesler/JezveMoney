@@ -66,7 +66,12 @@
 <?php
 	$acc = new Account($userid);
 
+	setTab(1);
+	html("<tr>");
+	html("<td>");
 	echo($acc->getTable(FALSE, TRUE));
+	html("</td>");
+	html("</tr>");
 ?>
 </table>
 </body>

@@ -108,7 +108,12 @@
 		echo("</td></tr>");
 	}
 
+	setTab(1);
+	html("<tr>");
+	html("<td>");
 	echo($acc->getTable());
+	html("</td>");
+	html("</tr>");
 
 	$accounts = $acc->getCount();
 	if ($accounts > 0)
