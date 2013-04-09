@@ -603,7 +603,7 @@ class Transaction
 		$resStr .= "\t\t<tr>";
 
 		$resStr .= "<td><b>Description</b></td>";
-		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
+		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td></tr>\r\n";
 
 		foreach($resArr as $row)
 		{
