@@ -464,7 +464,7 @@ class Transaction
 		if (!$accounts)
 		{
 			$resStr .= "\t\t<tr><td><span>You have no one account. Please create one.</span></td></tr>";
-			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+			$resStr .= "\t</table>\r\n";
 			return $resStr;
 		}
 
@@ -490,7 +490,7 @@ class Transaction
 		if (!$rowCount)
 		{
 			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
-			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+			$resStr .= "\t</table>\r\n";
 			return $resStr;
 		}
 
@@ -596,7 +596,7 @@ class Transaction
 		if (!$rowCount)
 		{
 			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
-			$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
+			$resStr .= "\t</table>\r\n";
 			return $resStr;
 		}
 
