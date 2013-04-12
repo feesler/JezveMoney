@@ -45,7 +45,7 @@
 	echo($acc->getTable());
 	html("</div>");
 	html("<div class=\"mainwidget\">");
-	html("<span>Latest transactions</span>");
+	html("<span>Latest</span>");
 	echo($trans->getLatest(10));
 	html("</div>");
 
