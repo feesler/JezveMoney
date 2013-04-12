@@ -589,7 +589,7 @@ class Transaction
 			return $resStr;
 
 		$condition = "user_id=".self::$user_id;
-		$orderAndLimit = "date DESC LIMIT 0,".$tr_limit;
+		$orderAndLimit = "pos DESC LIMIT 0,".$tr_limit;
 
 		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
 		$rowCount = count($resArr);
