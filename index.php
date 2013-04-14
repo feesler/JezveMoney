@@ -53,53 +53,6 @@
 <?php
 	echo($trans->getLatest(5));
 ?>
-<!--
-			<table class="tbl">
-				<tr>
-					<td class="latest">
-						<span class="latest_acc_name">Visa Electron</span>
-						<span class="latest_sum">+ 3 480,00 р.</span>
-						<span class="latest_date">12.04.2013</span>
-						<span class="latest_comm">Salary</span>
-					</td>
-				</tr>
-
-				<tr class="even_row">
-					<td class="latest">
-						<span class="latest_acc_name">На руках</span>
-						<span class="latest_sum">- 116,00 р.</span>
-						<span class="latest_date">11.04.2013</span>
-						<span class="latest_comm">Сигареты</span>
-					</td>
-				</tr>
-
-				<tr>
-					<td class="latest">
-						<span class="latest_acc_name">На руках</span>
-						<span class="latest_sum">- 30,00 р.</span>
-						<span class="latest_date">11.04.2013</span>
-						<span class="latest_comm">Ватрушка</span>
-					</td>
-				</tr>
-
-				<tr class="even_row">
-					<td class="latest">
-						<span class="latest_acc_name">Visa Electron</span>
-						<span class="latest_sum">- 520,00 р.</span>
-						<span class="latest_date">10.04.2013</span>
-						<span class="latest_comm">Starbucks</span>
-					</td>
-				</tr>
-
-				<tr>
-					<td class="latest">
-						<span class="latest_acc_name">Visa Electron → На руках</span>
-						<span class="latest_sum">500,00 р.</span>
-						<span class="latest_date">09.04.2013</span>
-					</td>
-				</tr>
-			</table>
--->
 		</div>
 	</div>
 
