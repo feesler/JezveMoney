@@ -1,0 +1,42 @@
+.tiles
+{
+	max-width: 450px;
+}
+
+
+.tile
+{
+	width: 100px;
+	height: 100px;
+	background-color: #20A0FF;
+	margin: 5px;
+	display: inline-block;
+	float: left;
+	position: relative;
+	overflow: hidden;
+}
+
+
+.tile > span
+{
+	position: absolute;
+	color: #FFFFFF;
+	white-space: nowrap;
+}
+
+
+.acc_name
+{
+	position: absolute;
+	left: 5px;
+	bottom: 2px;
+	font-size: 20px;
+}
+
+
+.acc_bal
+{
+	top: 5px;
+	right: 5px;
+	font-size: 14px;
+}
