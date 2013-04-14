@@ -436,6 +436,8 @@ class Account
 			return $resStr;
 
 		$resStr .= "<div class=\"tile\">";
+		$resStr .= "<a href=\"#\" class=\"tilelink\">";
+		$resStr .= "<div>";
 
 		$acc_curr = $this->getCurrency($acc_id);
 		$acc_balance = $this->getBalance($acc_id);
@@ -446,6 +448,9 @@ class Account
 		$acc_name = $this->getName($acc_id);
 
 		$resStr .= "<span class=\"acc_name\">".$acc_name."</span>";
+
+		$resStr .= "</div>";
+		$resStr .= "</a>";
 		$resStr .= "</div>";
 
 		return $resStr;

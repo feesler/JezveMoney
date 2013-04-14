@@ -10,6 +10,7 @@
 	height: 100px;
 	background-color: #20A0FF;
 	margin: 5px;
+	padding: 0;
 	display: inline-block;
 	float: left;
 	position: relative;
@@ -17,7 +18,16 @@
 }
 
 
-.tile > span
+.tilelink > div
+{
+	height: 100px;
+	width: 100px;
+	margin: 0;
+	padding: 0;
+}
+
+
+.tilelink > div > span
 {
 	position: absolute;
 	color: #FFFFFF;
