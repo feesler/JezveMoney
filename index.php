@@ -62,37 +62,6 @@
 <?php
 	echo($acc->getTotals());
 ?>
-<!--
-			<table class="tbl">
-				<tr>
-					<td class="latest">
-						<span class="latest_acc_name">RUR</span>
-						<span class="latest_sum">20 826,27 р.</span>
-					</td>
-				</tr>
-
-				<tr class="even_row">
-					<td class="latest">
-						<span class="latest_acc_name">EUR</span>
-						<span class="latest_sum">€ 0,00</span>
-					</td>
-				</tr>
-
-				<tr>
-					<td class="latest">
-						<span class="latest_acc_name">USD</span>
-						<span class="latest_sum">$ 5,60</span>
-					</td>
-				</tr>
-
-				<tr class="even_row">
-					<td class="latest">
-						<span class="latest_acc_name">PLN</span>
-						<span class="latest_sum">11,30 zł</span>
-					</td>
-				</tr>
-			</table>
--->
 		</div>
 	</div>
 
