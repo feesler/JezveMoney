@@ -59,6 +59,10 @@
 	<div>
 		<span class="widget_title">Total &gt;</span>
 		<div>
+<?php
+	echo($acc->getTotals());
+?>
+<!--
 			<table class="tbl">
 				<tr>
 					<td class="latest">
@@ -88,6 +92,7 @@
 					</td>
 				</tr>
 			</table>
+-->
 		</div>
 	</div>
 

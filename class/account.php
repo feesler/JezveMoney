@@ -467,6 +467,77 @@ class Account
 
 		return $resStr;
 	}
+
+
+	// Return HTMl for total sums per each currency
+	public function getTotals()
+	{
+		global $tabStr;
+
+		$resStr = "";
+
+		if (!$this->checkCache())
+			return $resStr;
+
+		setTab(3);
+		$resStr .= $tabStr."<table class=\"tbl\">\r\n";
+		pushTab();
+
+		$accounts = count(self::$cache);
+		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
+		{
+			$resStr .= $tabStr."<tr><td><span>";
+			if ($transfer)
+				$resStr .= "You need at least two accounts to transfer.";
+			else
+				$resStr .= "You have no one account. Please create one.";
+			$resStr .= "</span></td></tr>\r\n";
+		}
+		else
+		{
+			$totalArr = array();
+			foreach(self::$cache as $acc_id => $row)
+			{
+				$currname = Currency::getName($row["curr_id"]);
+
+				if ($currname != "" && !$totalArr[$row["curr_id"]])
+					$totalArr[$row["curr_id"]] = 0;
+
+				$totalArr[$row["curr_id"]] += $row["balance"];
+			}
+
+			$i = 0;
+			foreach($totalArr as $key => $value)
+			{
+				$i++;
+
+				$resStr .= $tabStr."<tr";
+				if ($i % 2 == 0)
+					$resStr .= " class=\"even_row\"";
+				$resStr .= ">\r\n";
+				pushTab();
+
+				$resStr .= $tabStr."<td class=\"latest\">\r\n";
+				pushTab();
+
+				$valfmt = Currency::format($value, $key);
+				$currName = Currency::getName($key);
+
+				$resStr .= $tabStr."<span class=\"latest_acc_name\">".$currName."</span>\r\n";
+				$resStr .= $tabStr."<span class=\"latest_sum\">".$valfmt."</span>\r\n";
+
+				popTab();
+				$resStr .= $tabStr."</td>\r\n";
+				popTab();
+				$resStr .= $tabStr."</tr>\r\n";
+			}
+		}
+
+		popTab();
+		$resStr .= $tabStr."</table>\r\n";
+
+		return $resStr;
+	}
 }
 
 ?>
