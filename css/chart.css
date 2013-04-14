@@ -1,0 +1,62 @@
+.chartcontent
+{
+	width: 500px;
+	height: 300px;		/* 300 + 16 for scrollbar */
+	display: inline-block;
+	position: relative;
+	top: -300px;
+	float: left;
+	overflow: auto;
+	margin-bottom: 16px;
+}
+
+
+.datacontent
+{
+	margin: 10px;
+	display: inline-block;
+	background-color: #D0FFD0;
+	float: left;
+}
+
+
+.chartbar
+{
+	display: block;
+	position: absolute;
+	background-color: #0080FF;
+	bottom: 0;
+}
+
+.chartbar:hover
+{
+	background-color: #20A0FF;
+}
+
+
+.chartback
+{
+	border-spacing: 0;
+	border-collapse: collapse;
+	padding: 0;
+}
+
+
+.chartback td
+{
+	padding: 0;
+	margin: 0;
+}
+
+
+.chartback td.dash
+{
+	border: 1px dashed;
+}
+
+
+.chartback td.price
+{
+	vertical-align: top;
+}
+
