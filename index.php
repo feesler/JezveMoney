@@ -18,12 +18,12 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0" />
 <?php
-	echo("<title>".$titleString."</title>\r\n");
-	echo(getCSS("common.css"));
-	echo(getCSS("tiles.css"));
-	echo(getCSS("table.css"));
-	echo(getJS("common.js"));
-	echo(getJS("main.js"));
+	html("<title>".$titleString."</title>");
+	html(getCSS("common.css"));
+	html(getCSS("tiles.css"));
+	html(getCSS("table.css"));
+	html(getJS("common.js"));
+	html(getJS("main.js"));
 ?>
 </head>
 <body>
