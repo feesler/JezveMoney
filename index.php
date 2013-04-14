@@ -5,12 +5,12 @@
 	require_once("./class/account.php");
 	require_once("./class/transaction.php");
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("./login.php");
 
-	$acc = new Account($userid);
-	$trans = new Transaction($userid);
+	$acc = new Account($user_id);
+	$trans = new Transaction($user_id);
 
 	$titleString = "Jezve Money | Design template";
 ?>
