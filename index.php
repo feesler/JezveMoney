@@ -3,12 +3,14 @@
 	require_once("./class/user.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
+	require_once("./class/transaction.php");
 
 	$userid = User::check();
 	if (!$userid)
 		setLocation("./login.php");
 
 	$acc = new Account($userid);
+	$trans = new Transaction($userid);
 
 	$titleString = "Jezve Money | Design template";
 ?>
@@ -48,6 +50,10 @@
 	<div>
 		<span class="widget_title">Latest &gt;</span>
 		<div>
+<?php
+	echo($trans->getLatest(5));
+?>
+<!--
 			<table class="tbl">
 				<tr>
 					<td class="latest">
@@ -93,6 +99,7 @@
 					</td>
 				</tr>
 			</table>
+-->
 		</div>
 	</div>
 
