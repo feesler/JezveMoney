@@ -159,11 +159,9 @@ div
 
 .content > div
 {
-	/*max-width: 50%;*/
 	height: 100%;
 	display: inline-block;
 	float: left;
-	border: 1px solid #9BEEFF;
 }
 
 
