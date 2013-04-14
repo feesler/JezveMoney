@@ -638,11 +638,11 @@ class Transaction
 			$resStr .= $tabStr."<span class=\"latest_sum\">";
 			if ($cur_trans_type == 1)			// expense
 			{
-				$resStr .= "+ ";
+				$resStr .= "- ";
 			}
 			else if ($cur_trans_type == 2)		// income
 			{
-				$resStr .= "- ";
+				$resStr .= "+ ";
 			}
 
 			$resStr .= Currency::format($row["amount"], $row["curr_id"]);
