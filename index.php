@@ -1,5 +1,14 @@
 ﻿<?php
 	require_once("./setup.php");
+	require_once("./class/user.php");
+	require_once("./class/currency.php");
+	require_once("./class/account.php");
+
+	$userid = User::check();
+	if (!$userid)
+		setLocation("./login.php");
+
+	$acc = new Account($userid);
 
 	$titleString = "Jezve Money | Design template";
 ?>
@@ -33,15 +42,7 @@
 <div class="content">
 	<div>
 		<span class="widget_title">Accounts &gt;</span>
-		<div class="tiles">
-			<div class="tile"><span class="acc_bal">317,00 р.</span><span class="acc_name">На руках</span></div>
-			<div class="tile"><span class="acc_bal">5 249,81 р.</span><span class="acc_name">Visa Electron</span></div>
-			<div class="tile"><span class="acc_bal">15 256,83 р.</span><span class="acc_name">Visa Classic</span></div>
-			<div class="tile"><span class="acc_bal">$ 5,60</span><span class="acc_name">Master Card</span></div>
-			<div class="tile"><span class="acc_bal">2,63 р.</span><span class="acc_name">QIWI Wallet</span></div>
-			<div class="tile"><span class="acc_bal">11,30 zł</span><span class="acc_name">На руках PLN</span></div>
-			<div class="tile"><span class="acc_bal">€ 0,00</span><span class="acc_name">На руках Euro</span></div>
-		</div>
+		<div class="tiles"><?php echo($acc->getTiles()); ?></div>
 	</div>
 
 	<div>
