@@ -1,18 +1,25 @@
-﻿<!DOCTYPE html>
+﻿<?php
+	require_once("./setup.php");
+
+	$titleString = "Jezve Money | Design template";
+?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0" />
-<title>Design template</title>
-<link rel="stylesheet" type="text/css" href="./css/common.css">
-<link rel="stylesheet" type="text/css" href="./css/tiles.css">
-<link rel="stylesheet" type="text/css" href="./css/table.css">
-<script src="./js/common.js"></script>
-<script src="./js/main.js"></script>
+<?php
+	echo("<title>".$titleString."</title>\r\n");
+	echo(getCSS("common.css"));
+	echo(getCSS("tiles.css"));
+	echo(getCSS("table.css"));
+	echo(getJS("common.js"));
+	echo(getJS("main.js"));
+?>
 </head>
 <body>
 <div class="header">
-	<div class="logo"><a href="./designtemplate.html"><span>Jezve Money</span></a></div>
+	<div class="logo"><a href="./index.php"><span>Jezve Money</span></a></div>
 	<div class="userblock">
 		<button onclick="onUserClick()"><span>username</span></button>
 		<div id="menupopup" class="usermenu" style="display: none;">
