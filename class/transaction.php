@@ -665,7 +665,7 @@ class Transaction
 
 			if ($row["comment"] != "")
 			{
-				$resStr .= $tabStr."<span class=\"latest_comm\">";
+				$resStr .= $tabStr."<span class=\"latest_comm\"> | ";
 				$resStr .= $row["comment"];
 				$resStr .= "</span>\r\n";
 			}
