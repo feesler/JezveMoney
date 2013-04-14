@@ -32,7 +32,7 @@
 <div class="header">
 	<div class="logo"><a href="./index.php"><span>Jezve Money</span></a></div>
 	<div class="userblock">
-		<button onclick="onUserClick()"><span>username</span></button>
+		<button onclick="onUserClick()"><span><?php echo(User::getName($user_id)); ?></span></button>
 		<div id="menupopup" class="usermenu" style="display: none;">
 			<ul>
 				<li><a href="#">profile</a></li>
