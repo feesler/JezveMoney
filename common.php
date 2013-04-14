@@ -49,6 +49,27 @@
 	}
 
 
+	// Increase count of tabs
+	function pushTab($pushCount = 1)
+	{
+		global $tabbing;
+
+		setTab($tabbing + $pushCount);
+	}
+
+
+	// Decrease count of tabs
+	function popTab($popCount = 1)
+	{
+		global $tabbing;
+
+		if (!$tabbing)
+			return;
+
+		setTab(($popCount >= $tabbing) ? 0 : ($tabbing - $popCount));
+	}
+
+
 	// Print specified HTML string with tabbing and carriage return
 	function html($str = "")
 	{
