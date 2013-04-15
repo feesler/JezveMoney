@@ -48,19 +48,19 @@
 	</div>
 
 	<div>
-		<span class="widget_title">Latest &gt;</span>
+		<span class="widget_title">Total &gt;</span>
 		<div>
 <?php
-	echo($trans->getLatest(5));
+	echo($acc->getTotals());
 ?>
 		</div>
 	</div>
 
 	<div>
-		<span class="widget_title">Total &gt;</span>
+		<span class="widget_title">Latest &gt;</span>
 		<div>
 <?php
-	echo($acc->getTotals());
+	echo($trans->getLatest(5));
 ?>
 		</div>
 	</div>
