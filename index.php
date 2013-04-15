@@ -29,18 +29,9 @@
 ?>
 </head>
 <body>
-<div class="header">
-	<div class="logo"><a href="./index.php"><span>Jezve Money</span></a></div>
-	<div class="userblock">
-		<button onclick="onUserClick()"><span><?php echo(User::getName($user_id)); ?></span></button>
-		<div id="menupopup" class="usermenu" style="display: none;">
-			<ul>
-				<li><a href="#">profile</a></li>
-				<li><a href="#">logout</a></li>
-			</ul>
-		</div>
-	</div>
-</div>
+<?php
+	require_once("./templates/header.php");
+?>
 <div class="content">
 	<div>
 		<span class="widget_title">Accounts &gt;</span>
