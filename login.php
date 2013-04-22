@@ -74,9 +74,14 @@
 }
 
 
-.ok_btn
+.box > div > .ok_btn
 {
+	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
 	margin: 29px 0px 8px 5px;
+	padding: 4px 22px;
+	border: 0 none;
+	background-color: #4040FF;
+	color: #FFFFFF;
 }
 </style>
 </head>
