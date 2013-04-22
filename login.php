@@ -32,33 +32,25 @@
 {
 	margin-top: 55px;
 	border: 1px solid #00FFFF;
-
-	background-color: #00FFFF;
+/*	background-color: #00FFFF; */
 }
 
 
 .box
 {
 	max-width: 600px;
-	min-width: 150px;
+	min-width: 130px;
 	margin: 0 auto;
-
-
-	background-color: #FFB0FF;
+/*	background-color: #FFB0FF; */
 }
 
 
 .ldiv
 {
-	float: left;
-
 	width: 150px;
-	height: 50px;
-
-	line-height: 50px;
-	text-align: right;
-
-	background-color: #80FF80;
+	height: 20px;
+	line-height: 20px;
+/*	background-color: #80FF80; */
 }
 
 
@@ -70,25 +62,18 @@
 
 .rdiv
 {
-	float: left;
-
 	width: 100%;
-	min-width: 390px;	/* margins + width */
-
-	margin-left: -150px;
-
+	min-width: 240px;
 	height: 50px;
 }
 
 
 .rdiv > div
 {
-	margin-left: 150px;
-
 	height: 32px;
 	padding: 8px 19px 10px 5px;
 
-	background-color: #FFFFB0;
+/*	background-color: #FFFFB0; */
 }
 
 
