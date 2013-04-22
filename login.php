@@ -84,8 +84,14 @@
 	margin: 29px 0px 8px 5px;
 	padding: 4px 22px;
 	border: 0 none;
-	background-color: #2672EC;
+	background-color: #0072C6;
 	color: #FFFFFF;
+}
+
+
+.box > div > .ok_btn:hover
+{
+	background-color: #1E82CC;
 }
 </style>
 </head>
