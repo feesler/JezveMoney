@@ -31,7 +31,9 @@
 .cont
 {
 	margin-top: 55px;
-	border: 1px solid cyan;
+	border: 1px solid #00FFFF;
+
+	background-color: #00FFFF;
 }
 
 
@@ -56,7 +58,7 @@
 	line-height: 50px;
 	text-align: right;
 
-	background-color: #40FFFF;
+	background-color: #80FF80;
 }
 
 
@@ -68,16 +70,25 @@
 
 .rdiv
 {
-	margin-left: 150px;
+	float: left;
+
+	width: 100%;
+	max-width: 450px;
+
+	margin-left: -150px;
+ 	margin-right: 150px;
 
 	height: 50px;
-
-	background-color: #FFB0B0;
 }
 
 
 .rdiv > div
 {
+	max-width: 450px;
+
+	margin-left: 150px;
+	margin-right: -150px;
+
 	height: 32px;
 	padding: 8px 19px 10px 5px;
 
