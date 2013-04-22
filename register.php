@@ -5,11 +5,9 @@
 	require_once("./class/account.php");
 	require_once("./class/transaction.php");
 
-/*
 	$user_id = User::check();
 	if ($user_id != 0)
 		setLocation("./index.php");
-*/
 
 	$titleString = "Jezve Money | Registration";
 ?>
