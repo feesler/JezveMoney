@@ -30,7 +30,11 @@
 /* layered layout */
 .cont
 {
-	margin-top: 50px;
+	position: absolute;
+	top: 50%;
+	left: 0%;
+	margin-top: -77px;
+	width: 100%;
 }
 
 
