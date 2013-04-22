@@ -27,6 +27,7 @@
 	html(getJS("main.js"));
 ?>
 <style>
+/* layered layout */
 .cont
 {
 	margin-top: 55px;
@@ -36,44 +37,59 @@
 
 .box
 {
-	max-width: 400px;
-	min-width: 240px;
-	border: 1px solid magenta;
-	margin: 0 auto 0 auto;
+	max-width: 600px;
+	min-width: 150px;
+	margin: 0 auto;
+
+
+	background-color: #FFB0FF;
 }
 
 
-.box > table
+.ldiv
 {
-	width: 100%;
-	border-collapse: collapse;
-}
+	float: left;
 
+	width: 150px;
+	height: 50px;
 
-.lcell
-{
-	border: 1px solid lightgreen;
+	line-height: 50px;
 	text-align: right;
+
+	background-color: #40FFFF;
 }
 
 
-.rcell
+.ldiv > span
 {
-	border: 1px solid magenta;
-	text-align: left;
+	padding: 0px 5px;
+}
+
+
+.rdiv
+{
+	margin-left: 150px;
+
+	height: 50px;
+
+	background-color: #FFB0B0;
+}
+
+
+.rdiv > div
+{
+	height: 32px;
+	padding: 8px 19px 10px 5px;
+
+	background-color: #FFFFB0;
+}
+
+
+.rdiv > div > .rinp
+{
 	width: 100%;
-	padding: 2px 5px;
-}
-
-.rcell > div
-{
-	margin: 10px;
-}
-
-
-.rcinp
-{
-	width: 100%;
+	height: 26px;
+	margin: 0;
 }
 </style>
 </head>
@@ -84,16 +100,10 @@
 <form action="./modules/login.php" method="post">
 <div class="cont">
 	<div class="box">
-		<table>
-			<tr>
-				<td class="lcell"><label for="login">Username</label></td>
-				<td class="rcell"><div><input class="rcinp" id="login" name="login" type="text"></div></td>
-			</tr>
-			<tr>
-				<td class="lcell"><label for="pass">Password</label></td>
-				<td class="rcell"><div><input class="rcinp" id="pass" name="pass" type="text"></div></td>
-			</tr>
-		</table>
+		<div class="ldiv"><span>Username</span></div>
+		<div class="rdiv"><div><input class="rinp" type="text"></div></div>
+		<div class="ldiv"><span>Password</span></div>
+		<div class="rdiv"><div><input class="rinp" type="text"></div></div>
 	</div>
 </div>
 </form>
