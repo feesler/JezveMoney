@@ -30,9 +30,7 @@
 /* layered layout */
 .cont
 {
-	margin-top: 55px;
-	border: 1px solid #00FFFF;
-/*	background-color: #00FFFF; */
+	margin-top: 50px;
 }
 
 
@@ -41,7 +39,6 @@
 	max-width: 600px;
 	min-width: 130px;
 	margin: 0 auto;
-/*	background-color: #FFB0FF; */
 }
 
 
@@ -50,7 +47,6 @@
 	width: 150px;
 	height: 20px;
 	line-height: 20px;
-/*	background-color: #80FF80; */
 }
 
 
@@ -72,8 +68,6 @@
 {
 	height: 32px;
 	padding: 8px 19px 10px 5px;
-
-/*	background-color: #FFFFB0; */
 }
 
 
