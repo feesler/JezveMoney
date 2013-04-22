@@ -84,7 +84,7 @@
 	margin: 29px 0px 8px 5px;
 	padding: 4px 22px;
 	border: 0 none;
-	background-color: #4040FF;
+	background-color: #2672EC;
 	color: #FFFFFF;
 }
 </style>
