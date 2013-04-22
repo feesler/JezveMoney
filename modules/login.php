@@ -15,10 +15,10 @@
 	if ($userid != 0)
 		setLocation("../index.php");
 
-	if (!isset($_POST["logacc"]) || !isset($_POST["logpwd"]))
+	if (!isset($_POST["login"]) || !isset($_POST["password"]))
 		fail();
 
-	if (!User::login($_POST["logacc"], $_POST["logpwd"]))
+	if (!User::login($_POST["login"], $_POST["password"]))
 		fail();
 
 	setLocation("../index.php");
