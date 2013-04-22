@@ -66,7 +66,7 @@
 }
 
 
-.rdiv > div > .rinp
+.rdiv > div > input
 {
 	width: 100%;
 	height: 26px;
@@ -88,9 +88,9 @@
 <div class="cont">
 	<div class="box">
 		<label for="login">Username</label>
-		<div class="rdiv"><div><input id="login" class="rinp" type="text"></div></div>
+		<div class="rdiv"><div><input id="login" type="text"></div></div>
 		<label for="password">Password</label>
-		<div class="rdiv"><div><input id="password" class="rinp" type="text"></div></div>
+		<div class="rdiv"><div><input id="password" type="text"></div></div>
 		<div><input class="ok_btn" type="submit" value="Log in"></div>
 	</div>
 </div>
