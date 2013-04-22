@@ -31,7 +31,7 @@
 	require_once("./templates/header.php");
 ?>
 <form action="./modules/register.php" method="post" onsubmit="return onLoginSubmit(this);">
-<div class="cont">
+<div class="cont register_cont">
 	<div class="box">
 		<label for="login">Account name</label>
 		<div class="rdiv"><div><input id="login" name="login" type="text"></div></div>
