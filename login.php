@@ -72,6 +72,12 @@
 	height: 26px;
 	margin: 0;
 }
+
+
+.ok_btn
+{
+	margin: 29px 0px 8px 5px;
+}
 </style>
 </head>
 <body>
@@ -85,6 +91,7 @@
 		<div class="rdiv"><div><input id="login" class="rinp" type="text"></div></div>
 		<label for="password">Password</label>
 		<div class="rdiv"><div><input id="password" class="rinp" type="text"></div></div>
+		<div><input class="ok_btn" type="submit" value="Log in"></div>
 	</div>
 </div>
 </form>
