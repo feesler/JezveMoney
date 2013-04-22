@@ -93,6 +93,24 @@
 {
 	background-color: #1E82CC;
 }
+
+
+.register_link
+{
+	margin: 0px 20px;
+}
+
+
+.register_link > a,
+.register_link > a:visited
+{
+	color: #0072C6;
+}
+
+.register_link > a:hover
+{
+	color: #1E82CC;
+}
 </style>
 </head>
 <body>
@@ -106,7 +124,7 @@
 		<div class="rdiv"><div><input id="login" type="text"></div></div>
 		<label for="password">Password</label>
 		<div class="rdiv"><div><input id="password" type="text"></div></div>
-		<div><input class="ok_btn" type="submit" value="Log in"></div>
+		<div><input class="ok_btn" type="submit" value="Log in"><span class="register_link"><a href="./register.php">Register</a></span></div>
 	</div>
 </div>
 </form>
