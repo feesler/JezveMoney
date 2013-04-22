@@ -73,10 +73,9 @@
 	float: left;
 
 	width: 100%;
-	max-width: 450px;
+	min-width: 390px;	/* margins + width */
 
 	margin-left: -150px;
- 	margin-right: 150px;
 
 	height: 50px;
 }
@@ -84,10 +83,7 @@
 
 .rdiv > div
 {
-	max-width: 450px;
-
 	margin-left: 150px;
-	margin-right: -150px;
 
 	height: 32px;
 	padding: 8px 19px 10px 5px;
