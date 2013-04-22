@@ -42,16 +42,11 @@
 }
 
 
-.ldiv
+.box > label
 {
 	width: 150px;
 	height: 20px;
 	line-height: 20px;
-}
-
-
-.ldiv > span
-{
 	padding: 0px 5px;
 }
 
@@ -86,10 +81,10 @@
 <form action="./modules/login.php" method="post">
 <div class="cont">
 	<div class="box">
-		<div class="ldiv"><span>Username</span></div>
-		<div class="rdiv"><div><input class="rinp" type="text"></div></div>
-		<div class="ldiv"><span>Password</span></div>
-		<div class="rdiv"><div><input class="rinp" type="text"></div></div>
+		<label for="login">Username</label>
+		<div class="rdiv"><div><input id="login" class="rinp" type="text"></div></div>
+		<label for="password">Password</label>
+		<div class="rdiv"><div><input id="password" class="rinp" type="text"></div></div>
 	</div>
 </div>
 </form>
