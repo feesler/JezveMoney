@@ -129,6 +129,7 @@ input[type="text"], input[type="password"], select
 /*	border: 1px solid red; */
 	line-height: 50px;
 	color: #FFFFFF;
+	white-space: nowrap;
 }
 
 
