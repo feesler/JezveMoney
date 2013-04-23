@@ -8,6 +8,18 @@
 	}
 
 
+	// Return string for common headers
+	function getCommonHeaders()
+	{
+		$resStr = "";
+
+		$resStr .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\r\n";
+		$resStr .= "<meta name=\"viewport\" content=\"width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0\">";
+
+		return $resStr;
+	}
+
+
 	// Return string for CSS style link
 	function getCSS($filename)
 	{
