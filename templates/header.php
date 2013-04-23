@@ -7,7 +7,7 @@
 	{
 		html("<div class=\"userblock\">");
 		pushTab();
-			html("<button onclick=\"onUserClick()\"><span>".(User::getName($user_id))."</span></button>");
+			html("<button id=\"userbtn\" onclick=\"onUserClick()\"><span>".(User::getName($user_id))."</span></button>");
 			html("<div id=\"menupopup\" class=\"usermenu\" style=\"display: none;\">");
 			pushTab();
 				html("<ul>");
