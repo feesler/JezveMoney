@@ -5,9 +5,13 @@
 
 	if ($user_id != 0)
 	{
+		$owner_id = User::getOwner($user_id);
+		$pers = new Person($user_id);
+		$owner_name = $pers->getName($owner_id);
+
 		html("<div class=\"userblock\">");
 		pushTab();
-			html("<button id=\"userbtn\" onclick=\"onUserClick()\"><span>".(User::getName($user_id))."</span></button>");
+			html("<button id=\"userbtn\" onclick=\"onUserClick()\"><span>".$owner_name."</span></button>");
 			html("<div id=\"menupopup\" class=\"usermenu\" style=\"display: none;\">");
 			pushTab();
 				html("<ul>");
