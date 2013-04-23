@@ -38,7 +38,7 @@
 		<div class="rdiv"><div><input id="name" name="name" type="text"></div></div>
 		<label for="password">Password</label>
 		<div class="rdiv"><div><input id="password" name="password" type="password"></div></div>
-		<div><input class="ok_btn" type="submit" value="ok"><span class="register_link"><a href="./login.php">Log in</a></span></div>
+		<div><input class="ok_btn" type="submit" value="ok"><span class="alter_link"><a href="./login.php">Log in</a></span></div>
 	</div>
 </div>
 </form>
