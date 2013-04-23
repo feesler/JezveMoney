@@ -155,10 +155,15 @@ function isDigit(iCode)
 // Return caret position in specified input control
 function getCaretPos(obj)
 {
+	if (!obj)
+		return 0;
+
 	obj.focus();
 
 	if (obj.selectionStart)			//Gecko
+	{
 		return obj.selectionStart;
+	}
 	else if (document.selection)		//IE
 	{
 		var sel = document.selection.createRange();
