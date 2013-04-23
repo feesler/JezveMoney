@@ -213,7 +213,7 @@ input[type="text"], input[type="password"], select
 {
 	color: #FFFFFF;
 	list-style-image: none;
-	border: 1px solid #FFFFFF;
+	border: 0 none;
 	padding: 5px 15px;
 }
 
