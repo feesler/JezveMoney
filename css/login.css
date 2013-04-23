@@ -107,13 +107,89 @@
 
 
 /* profile */
-.profile_common
+.profile_content
 {
-	margin: 0px 20px;
+	margin-top: 55px;
+	z-index: 1;
 }
 
 
-.profile_common > label
+.profile_content > div
+{
+}
+
+
+.profile_summary
+{
+	margin: 20px 5px 5px 30px;
+	max-width: 300px;
+}
+
+
+.profile_summary > h1
+{
+	font-size: 32px;
+	font-weight: normal;
+	margin: 0px 0px 10px 0px;
+}
+
+
+.account_name
+{
+	margin: 0px 0px 10px 0px;
+}
+
+
+.account_name > b
+{
+	font-size: 18px;
+	font-weight: normal;
+	display: block;
+}
+
+
+.account_name > span
+{
+	font-size: 16px;
+}
+
+
+.person_name
+{
+	margin: 0px 0px 10px 0px;
+}
+
+
+.person_name > b
+{
+	font-size: 18px;
+	font-weight: normal;
+	display: block;
+}
+
+
+.person_name > span
+{
+	font-size: 16px;
+}
+
+
+.profile_common
+{
+	max-width: 300px;
+	margin: 30px 5px 5px 25px;
+}
+
+
+.profile_common > h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	margin: 2px 5px;
+}
+
+
+.profile_common > div > label
 {
 	width: 150px;
 	height: 20px;
@@ -122,7 +198,7 @@
 }
 
 
-.profile_common > div > .ok_btn
+.profile_common > div > div > .ok_btn
 {
 	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
 	margin: 29px 0px 8px 5px;

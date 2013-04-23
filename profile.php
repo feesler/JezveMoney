@@ -39,30 +39,36 @@
 <?php
 	require_once("./templates/header.php");
 ?>
-<div class="content">
-	<div>
+<div class="profile_content">
+	<div class="profile_summary">
+		<h1>User profile</h1>
+		<div class="account_name"><b>Account name</b><span><?php echo($user_name); ?></span></div>
+		<div class="person_name"><b>Name</b><span><?php echo($person_name); ?></span></div>
+	</div>
+
 		<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
-		<span class="widget_title">Change password</span>
 		<div class="profile_common">
+		<h2>Change password</h2>
+		<div>
 			<label for="oldpwd">Current password</label>
 			<div class="rdiv"><div><input id="oldpwd" name="oldpwd" type="password"></div></div>
 			<label for="newpwd">New password</label>
 			<div class="rdiv"><div><input id="newpwd" name="newpwd" type="password"></div></div>
 			<div><input class="ok_btn" type="submit" value="ok"></div>
 		</div>
-		</form>
 	</div>
+	</form>
 
-	<div>
 		<form method="post" action="./modules/changename.php" onsubmit="return onChangeNameSubmit(this);">
-		<span class="widget_title">Change name</span>
 		<div class="profile_common">
+		<h2>Change name</h2>
+		<div>
 			<label for="newpwd">New name</label>
 			<div class="rdiv"><div><input id="newname" name="newname" type="text"></div></div>
 			<div><input class="ok_btn" type="submit" value="ok"></div>
 		</div>
-		</form>
 	</div>
+	</form>
 </div>
 </body>
 </html>
