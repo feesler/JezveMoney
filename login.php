@@ -29,7 +29,7 @@
 	require_once("./templates/header.php");
 ?>
 <form action="./modules/login.php" method="post" onsubmit="return onLoginSubmit(this);">
-<div class="cont">
+<div class="cont login_cont">
 	<div class="box">
 		<label for="login">Username</label>
 		<div class="rdiv"><div><input id="login" name="login" type="text"></div></div>
