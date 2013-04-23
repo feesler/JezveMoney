@@ -126,3 +126,28 @@ function onChangePassSubmit(frm)
 
 	return true;
 }
+
+
+// Change name submit event handler
+function onChangeNameSubmit(frm)
+{
+	var newname;
+
+	newname = ge('newname');
+	if (!frm || !newname)
+		return false;
+
+	if (!newname.value || newname.value.length < 1)
+	{
+		alert('Please type new name.');
+		return false;
+	}
+
+	if (newname.value == p_name)
+	{
+		alert('New name must be different from the old.');
+		return false;
+	}
+
+	return true;
+}
