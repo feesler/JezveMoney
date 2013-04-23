@@ -104,3 +104,36 @@
 {
 	color: #1E82CC;
 }
+
+
+/* profile */
+.profile_common
+{
+	margin: 0px 20px;
+}
+
+
+.profile_common > label
+{
+	width: 150px;
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 5px;
+}
+
+
+.profile_common > div > .ok_btn
+{
+	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
+	margin: 29px 0px 8px 5px;
+	padding: 4px 22px;
+	border: 0 none;
+	background-color: #0072C6;
+	color: #FFFFFF;
+}
+
+
+.profile_common > div > .ok_btn:hover
+{
+	background-color: #1E82CC;
+}

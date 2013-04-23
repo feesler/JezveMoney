@@ -12,7 +12,7 @@
 			pushTab();
 				html("<ul>");
 					pushTab();
-					html("<li><a href=\"#\">profile</a></li>");
+					html("<li><a href=\"./profile.php\">profile</a></li>");
 					html("<li><a href=\"./modules/logout.php\">logout</a></li>");
 					popTab();
 				html("</ul>");

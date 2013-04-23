@@ -96,3 +96,37 @@ function onRegisterSubmit(frm)
 
 	return true;
 }
+
+
+// Change password submit event handler
+function onChangePassSubmit(frm)
+{
+	var oldpwd, newpwd;
+
+	oldpwd = ge('oldpwd');
+	newpwd = ge('newpwd');
+	if (!frm || !oldpwd || !newpwd)
+		return false;
+
+	if (!oldpwd.value || oldpwd.value.length < 1)
+	{
+		alert('Please type your current password.');
+		return false;
+	}
+
+	if (!newpwd.value || newpwd.value.length < 1)
+	{
+		alert('Please type new password.');
+		return false;
+	}
+
+	if (newpwd.value == oldpwd.value)
+	{
+		alert('New password must be different from the old.');
+		return false;
+	}
+
+	frm.submit();
+
+	return true;
+}
