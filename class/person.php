@@ -131,14 +131,12 @@ class Person
 		global $db;
 
 		if (!$p_id || !is_numeric($p_id))
-			return FALSE;
+			return "";
 
 		$person_id = intval($p_id);
 
 		$resArr = $db->selectQ("name", "persons", "user_id=".$this->user_id." AND id=".$person_id);
 		return ((count($resArr) == 1) ? $resArr[0]["name"] : "");
-
-		return TRUE;
 	}
 
 
