@@ -92,8 +92,6 @@ function onRegisterSubmit(frm)
 		return false;
 	}
 
-	frm.submit();
-
 	return true;
 }
 
@@ -125,8 +123,6 @@ function onChangePassSubmit(frm)
 		alert('New password must be different from the old.');
 		return false;
 	}
-
-	frm.submit();
 
 	return true;
 }
