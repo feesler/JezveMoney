@@ -31,6 +31,7 @@
 <form action="./modules/login.php" method="post" onsubmit="return onLoginSubmit(this);">
 <div class="cont login_cont">
 	<div class="box">
+		<h1>Log in</h1>
 		<label for="login">Username</label>
 		<div class="rdiv"><div><input id="login" name="login" type="text"></div></div>
 		<label for="password">Password</label>

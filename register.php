@@ -31,6 +31,7 @@
 <form action="./modules/register.php" method="post" onsubmit="return onLoginSubmit(this);">
 <div class="cont register_cont">
 	<div class="box">
+		<h1>Registration</h1>
 		<label for="login">Account name</label>
 		<div class="rdiv"><div><input id="login" name="login" type="text"></div></div>
 		<label for="login">Name</label>

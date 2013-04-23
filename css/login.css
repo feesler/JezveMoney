@@ -10,13 +10,13 @@
 
 .login_cont
 {
-	margin-top: -77px;
+	margin-top: -109px;
 }
 
 
 .register_cont
 {
-	margin-top: -112px;
+	margin-top: -145px;
 }
 
 
@@ -25,6 +25,15 @@
 	max-width: 400px;
 	min-width: 130px;
 	margin: 0 auto;
+}
+
+
+/* page header */
+.box > h1
+{
+	font-size: 32px;
+	font-weight: normal;
+	margin: 0px 3px 10px 3px;
 }
 
 
