@@ -13,7 +13,7 @@
 	$acc = new Account($user_id);
 	$trans = new Transaction($user_id);
 
-	$titleString = "Jezve Money | Design template";
+	$titleString = "Jezve Money";
 ?>
 <!DOCTYPE html>
 <html>
