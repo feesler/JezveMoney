@@ -179,3 +179,22 @@
 {
 	background-color: #1E82CC;
 }
+
+
+.profile_common > div > div > .cancel_btn
+{
+	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	text-decoration: none;
+	margin: 29px 0px 8px 15px;
+	padding: 6px 22px;
+	border: 0 none;
+	background-color: #B0B0B0;
+	color: #FFFFFF;
+}
+
+.profile_common > div > div > .cancel_btn:hover
+{
+	background-color: #C0C0C0;
+}
