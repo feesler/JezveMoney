@@ -7,6 +7,15 @@
 	if (!$user_id)
 		setLocation("./login.php");
 
+	$action = "";
+	if (isset($_GET["act"]))
+	{
+		if ($_GET["act"] == "changepassword" || $_GET["act"] == "changename")
+			$action = $_GET["act"];
+		else
+			setLocation("./profile.php");
+	}
+
 	$user_name = User::getName($user_id);
 
 	$person_name = "";
@@ -50,15 +59,33 @@
 		<div>
 			<h2>User name</h2>
 			<span><?php echo($user_name); ?></span>
+<?php
+	if ($action != "changename")
+	{
+?>
 			<div><a href="./profile.php?act=changename">Change</a></div>
+<?php
+	}
+?>
 		</div>
 
+<?php
+	if ($action != "changepassword")
+	{
+?>
 		<div>
 			<h2>Security</h2>
 			<div><a href="./profile.php?act=changepassword">Change password</a></div>
 		</div>
+<?php
+	}
+?>
 	</div>
 
+<?php
+	if ($action == "changepassword")
+	{
+?>
 		<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
 		<div class="profile_common">
 		<h2>Change password</h2>
@@ -71,7 +98,11 @@
 		</div>
 	</div>
 	</form>
-
+<?php
+	}
+	else if ($action == "changename")
+	{
+?>
 		<form method="post" action="./modules/changename.php" onsubmit="return onChangeNameSubmit(this);">
 		<div class="profile_common">
 		<h2>Change name</h2>
@@ -82,6 +113,9 @@
 		</div>
 	</div>
 	</form>
+<?php
+	}
+?>
 </div>
 </body>
 </html>
