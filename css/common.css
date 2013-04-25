@@ -20,6 +20,19 @@ div
 }
 
 
+/* link style */
+a, a:visited
+{
+	color: #0072C6;
+}
+
+
+a:hover
+{
+	color: #1E82CC;
+}
+
+
 /* Input controls */
 input[type="button"], input[type="submit"], button
 {

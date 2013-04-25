@@ -93,19 +93,6 @@
 }
 
 
-.alter_link > a,
-.alter_link > a:visited
-{
-	color: #0072C6;
-}
-
-
-.alter_link > a:hover
-{
-	color: #1E82CC;
-}
-
-
 /* profile */
 .profile_content
 {
