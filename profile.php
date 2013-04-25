@@ -42,8 +42,21 @@
 <div class="profile_content">
 	<div class="profile_summary">
 		<h1>User profile</h1>
-		<div class="account_name"><b>Account name</b><span><?php echo($user_name); ?></span></div>
-		<div class="person_name"><b>Name</b><span><?php echo($person_name); ?></span></div>
+		<div>
+			<h2>Account name</h2>
+			<span><?php echo($user_name); ?></span>
+		</div>
+
+		<div>
+			<h2>User name</h2>
+			<span><?php echo($user_name); ?></span>
+			<div><a href="./profile.php?act=changename">Change</a></div>
+		</div>
+
+		<div>
+			<h2>Security</h2>
+			<div><a href="./profile.php?act=changepassword">Change password</a></div>
+		</div>
 	</div>
 
 		<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
