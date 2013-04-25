@@ -183,7 +183,7 @@ input[type="text"], input[type="password"], select
 {
 	height: 16px;
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: normal;
 	color: #FFFFFF;
 	text-transform: none;
 }
