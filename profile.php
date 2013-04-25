@@ -26,6 +26,10 @@
 	$person_name = $person->getName($owner_id);
 
 	$titleString = "Jezve Money | Profile";
+	if ($action == "changename")
+		$titleString .= " | Change name";
+	else if ($action == "changepassword")
+		$titleString .= " | Change password";
 ?>
 <!DOCTYPE html>
 <html>
