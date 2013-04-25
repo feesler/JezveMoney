@@ -209,7 +209,7 @@ input[type="text"], input[type="password"], select
 	display: inline-block;
 	position: absolute;
 	top: 50px;
-	right: 30px;
+	right: 0px;
 }
 
 
@@ -228,7 +228,7 @@ input[type="text"], input[type="password"], select
 	color: #FFFFFF;
 	list-style-image: none;
 	border: 0 none;
-	padding: 5px 15px;
+	padding: 10px 30px;
 }
 
 
