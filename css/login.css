@@ -175,7 +175,7 @@
 }
 
 
-.profile_common > div > .ok_btn:hover
+.profile_common > div > div > .ok_btn:hover
 {
 	background-color: #1E82CC;
 }
