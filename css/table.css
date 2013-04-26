@@ -43,6 +43,13 @@
 }
 
 
+.tbl
+{
+	border: 0 none;
+	border-collapse: collapse;
+}
+
+
 .tbl tr
 {
 	background-color: #E0E0E0;
