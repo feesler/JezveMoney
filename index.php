@@ -35,12 +35,12 @@
 ?>
 <div class="content">
 	<div>
-		<span class="widget_title">Accounts &gt;</span>
+		<div class="widget_title">Accounts &gt;</div>
 		<div class="tiles"><?php echo($acc->getTiles()); ?></div>
 	</div>
 
 	<div>
-		<span class="widget_title">Total &gt;</span>
+		<div class="widget_title">Total &gt;</div>
 		<div>
 <?php
 	echo($acc->getTotals());
@@ -49,7 +49,7 @@
 	</div>
 
 	<div>
-		<span class="widget_title">Latest &gt;</span>
+		<div class="widget_title">Latest &gt;</div>
 		<div>
 <?php
 	echo($trans->getLatest(5));

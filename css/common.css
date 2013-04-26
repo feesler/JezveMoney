@@ -259,13 +259,13 @@ input[type="text"], input[type="password"], select
 	height: 100%;
 	display: inline-block;
 	float: left;
+	margin: 0px 0px 30px 30px;
 }
 
 
 .content > div > div
 {
 	height: 100%;
-	margin: 10px;
 }
 
 
@@ -273,5 +273,5 @@ input[type="text"], input[type="password"], select
 .widget_title
 {
 	font-size: 20px;
-	padding: 0px 15px;
+	margin: 10px 0px;
 }
