@@ -90,8 +90,8 @@
 	if ($action == "changepassword")
 	{
 ?>
-		<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
-		<div class="profile_common">
+	<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
+	<div class="profile_common">
 		<h2>Change password</h2>
 		<div>
 			<label for="oldpwd">Current password</label>
@@ -107,8 +107,8 @@
 	else if ($action == "changename")
 	{
 ?>
-		<form method="post" action="./modules/changename.php" onsubmit="return onChangeNameSubmit(this);">
-		<div class="profile_common">
+	<form method="post" action="./modules/changename.php" onsubmit="return onChangeNameSubmit(this);">
+	<div class="profile_common">
 		<h2>Change name</h2>
 		<div>
 			<label for="newpwd">New name</label>

@@ -160,11 +160,11 @@ function getCaretPos(obj)
 
 	obj.focus();
 
-	if (obj.selectionStart)			//Gecko
+	if (obj.selectionStart)			// Gecko
 	{
 		return obj.selectionStart;
 	}
-	else if (document.selection)		//IE
+	else if (document.selection)		// IE
 	{
 		var sel = document.selection.createRange();
 		var clone = sel.duplicate();
