@@ -285,6 +285,16 @@ class User
 		if (!self::checkLoginData($login, $oldpass))
 			return FALSE;
 
+		return self::setPassword($login, $newpass);
+	}
+
+
+	// Set up new password for user
+	public static function setPassword($login, $newpass)
+	{
+		if (!$login || !$newpass)
+			return FALSE;
+
 		$user_id = self::getId($login);
 
 		$passhash = self::createHash($login, $newpass);
