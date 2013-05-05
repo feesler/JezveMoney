@@ -148,6 +148,8 @@
 
 	$accNameCache = array();
 
+	$prev_date = 0;
+
 	$resArr = $db->selectQ("*", "transactions", "(src_id=".$checkAccount_id." AND (type=1 OR type=3)) OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3))", NULL, "pos");
 	foreach($resArr as $row)
 	{
@@ -216,7 +218,15 @@
 		if ($realBalance < 0.0)
 			echo(" style=\"background-color: #FFB0B0;\"");
 		echo(">".$realBalance."</td>");
-		echo("<td>".date("d.m.Y", strtotime($trdate))."</td>");
+
+		echo("<td");
+		$trans_date = strtotime($trdate);
+		if ($trans_date < $prev_date)
+			echo(" style=\"background-color: #FFB0B0;\"");
+		else if ($trans_date > $prev_date)
+			$prev_date = $trans_date;
+
+		echo(">".date("d.m.Y", strtotime($trdate))."</td>");
 		echo("<td id=\"tr_".$tr_id."\"><input type=\"button\" value=\"".$tr_pos."\" onclick=\"showChangePos(".$tr_id.", ".$tr_pos.");\"></td>");
 		ebr("</tr>");
 	}
