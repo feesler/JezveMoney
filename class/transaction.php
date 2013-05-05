@@ -311,37 +311,16 @@ class Transaction
 
 			$condition .= " AND pos >= ".$new_pos." AND pos <= ".$latest;
 			$assignment = "pos=pos+1";
-/*
-			$query = "UPDATE `transactions` SET pos=pos+1 WHERE pos >= ".$new_pos." AND pos <= ".$latest.";";
-
-			$db->rawQ($query);
-			if (mysql_errno() != 0)
-				return FALSE;
-*/
 		}
 		else if ($new_pos < $old_pos)		// moving up
 		{
 			$condition .= " AND pos >= ".$new_pos." AND pos < ".$old_pos;
 			$assignment = "pos=pos+1";
-/*
-			$query = "UPDATE `transactions` SET pos=pos+1 WHERE pos >= ".$new_pos." AND pos < ".$old_pos.";";
-
-			$db->rawQ($query);
-			if (mysql_errno() != 0)
-				return FALSE;
-*/
 		}
 		else if ($new_pos > $old_pos)		// moving down
 		{
 			$condition .= " AND pos > ".$old_pos." AND pos <= ".$new_pos;
 			$assignment = "pos=pos-1";
-/*
-			$query = "UPDATE `transactions` SET pos=pos-1 WHERE pos > ".$old_pos." AND pos <= ".$new_pos.";";
-
-			$db->rawQ($query);
-			if (mysql_errno() != 0)
-				return FALSE;
-*/
 		}
 
 		$query = "UPDATE `transactions` SET ".$assignment." WHERE ".$condition.";";
