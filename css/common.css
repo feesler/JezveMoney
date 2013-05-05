@@ -120,6 +120,12 @@ select
 }
 
 
+.infotable > tbody > tr.extra_row
+{
+	background-color: transparent;
+}
+
+
 .pages
 {
 	padding: 5px 0px;

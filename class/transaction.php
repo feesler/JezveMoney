@@ -498,7 +498,7 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			$resStr .= "\t\t<tr>\r\n";
+			$resStr .= "\t\t<tr class=\"extra_row\">\r\n";
 			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
 			$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
 			$resStr .= "</td>\r\n";
@@ -554,7 +554,7 @@ class Transaction
 
 		if ($tr_on_page > 0)
 		{
-			$resStr .= "\t\t<tr>";
+			$resStr .= "\t\t<tr class=\"extra_row\">";
 			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
 			$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
 			$resStr .= "\t\t\t</td>";
