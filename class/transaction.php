@@ -118,12 +118,26 @@ class Transaction
 			$dest_curr_id = $acc->getCurrency($dest_id);
 		}
 
-		$tr_pos = $this->getLatestPos();
-		$tr_pos++;
+
+		// check target date is today
+		$today_date = getdate();
+		$target_date = getdate(strtotime($trans_date));
+
+		if (mktime(0, 0, 0, $today_date["mon"], $today_date["mday"], $today_date["year"]) > mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]))
+		{
+			$tr_pos = 0;
+		}
+		else
+		{
+			$tr_pos = $this->getLatestPos();
+			$tr_pos++;
+		}
 
 		if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
 									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $transcurr, $trans_date, $comment, $tr_pos)))
 			return FALSE;
+
+		$trans_id = $db->insertId();
 
 		// update balance of source account
 		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
@@ -139,6 +153,14 @@ class Transaction
 			$destBalance += ($trans_type == 2) ? $charge : $amount;
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
+		}
+
+		// update position of transaction if target date is not today
+		if ($tr_pos == 0)
+		{
+			$latest_pos = $this->getLatestPos($trans_date);
+
+			$this->updatePos($trans_id, $latest_pos + 1);
 		}
 
 		return TRUE;
@@ -357,14 +379,18 @@ class Transaction
 
 
 	// Return latest position of user transactions
-	public function getLatestPos()
+	public function getLatestPos($trans_date = -1)
 	{
 		global $db;
 
 		if (!self::$user_id)
 			return 0;
 
-		$resArr = $db->selectQ("pos", "transactions", "user_id=".self::$user_id, NULL, "pos DESC LIMIT 1");
+		$condition = "user_id=".self::$user_id;
+		if ($trans_date != -1)
+			$condition .= " AND date <= ".qnull($trans_date);
+
+		$resArr = $db->selectQ("pos", "transactions", $condition, NULL, "pos DESC LIMIT 1");
 		if (count($resArr) != 1)
 			return 0;
 
