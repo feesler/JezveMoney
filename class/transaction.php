@@ -489,7 +489,7 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
+			$resStr .= "\t\t<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>";
 			$resStr .= "\t</table>\r\n";
 			return $resStr;
 		}
@@ -595,7 +595,7 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
+			$resStr .= "\t\t<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>";
 			$resStr .= "\t</table>\r\n";
 			return $resStr;
 		}

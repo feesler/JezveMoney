@@ -376,7 +376,7 @@ class Account
 		$accounts = count(self::$cache);
 		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
 		{
-			$resStr .= "\t\t<tr><td><span>";
+			$resStr .= "\t\t<tr class=\"extra_row\"><td><span>";
 			if ($transfer)
 				$resStr .= "You need at least two accounts to transfer.";
 			else
