@@ -407,7 +407,7 @@ class Account
 				$resStr .= "</tr>\r\n";
 			}
 
-			$resStr .= "\t\t<tr style=\"background-color: transparent;\">";
+			$resStr .= "\t\t<tr class=\"extra_row\">";
 			$resStr .= "<td colspan=\"".(($editlink == TRUE) ? "4" : "3")."\" style=\"height: 10px;\"></td></tr>\r\n";
 
 			foreach($totalArr as $key => $value)
