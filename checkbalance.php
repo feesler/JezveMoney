@@ -166,7 +166,7 @@
 		$src_name = $acc->getName($tr_src_id);
 		$dest_name = $acc->getName($tr_dest_id);
 
-		echo("<tr><td style=\"background-color: #D0D0D0;\">".$tr_id."</td>");
+		echo("<tr><td style=\"background-color: #D0D0D0;\"><a href=\"./edittransaction.php?id=".$tr_id."\" target=\"_blank\">".$tr_id."</a></td>");
 
 		if ($tr_type == 1)				// expense
 		{
@@ -226,7 +226,7 @@
 		else if ($trans_date > $prev_date)
 			$prev_date = $trans_date;
 
-		echo(">".date("d.m.Y", strtotime($trdate))."</td>");
+		echo(">".date("d.m.Y", $trans_date)."</td>");
 		echo("<td id=\"tr_".$tr_id."\"><input type=\"button\" value=\"".$tr_pos."\" onclick=\"showChangePos(".$tr_id.", ".$tr_pos.");\"></td>");
 		ebr("</tr>");
 	}
