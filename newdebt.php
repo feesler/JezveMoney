@@ -67,7 +67,11 @@
 
 	$debt = new Debt($userid);
 
+	html("<tr>");
+	html("<td>");
 	echo($acc->getTable());
+	html("</td>");
+	html("</tr>");
 
 	html();
 
