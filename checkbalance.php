@@ -57,6 +57,9 @@
 	ebr("<style>");
 	ebr("td{ padding: 2px 5px; }");
 	ebr("input[type=\"button\"]{ border: 0 none; padding: 2px 5px; }");
+	ebr(".sum_cell{ text-align: right; }");
+	ebr(".act_sum{ background-color: #B0FFB0; }");
+	ebr(".bad_val{ background-color: #FFB0B0; }");
 	ebr("</style>");
 	echo(getJS("common.js"));
 	ebr("<script>");
@@ -170,23 +173,23 @@
 
 		if ($tr_type == 1)				// expense
 		{
-			echo("<td>Expense</td><td");
+			echo("<td>Expense</td><td class=\"sum_cell\"");
 
 			if ($amount == $charge)
-				echo(" colspan=\"2\" align=\"center\">-".$charge."</td>");
+				echo(" colspan=\"2\">-".$charge."</td>");
 			else
-				echo(">-".$amount."</td><td style=\"background-color: #B0FFB0;\">-".$charge."</td>");
+				echo(">-".$amount."</td><td class=\"sum_cell act_sum\">-".$charge."</td>");
 
 			$realBalance = round($realBalance - $charge, 2);
 		}
 		else if ($tr_type == 2)			// income
 		{
-			echo("<td>Income</td><td");
+			echo("<td>Income</td><td class=\"sum_cell\"");
 
 			if ($amount == $charge)
-				echo(" colspan=\"2\" align=\"center\">+".$charge."</td>");
+				echo(" colspan=\"2\">+".$charge."</td>");
 			else
-				echo(">+".$amount."</td><td style=\"background-color: #B0FFB0;\">+".$charge."</td>");
+				echo(">+".$amount."</td><td class=\"sum_cell act_sum\">+".$charge."</td>");
 
 			$realBalance = round($realBalance + $charge, 2);
 		}
@@ -195,34 +198,34 @@
 			echo("<td>Transfer from ".$src_name."</td><td");
 
 			if ($amount == $charge)
-				echo(" colspan=\"2\" align=\"center\">+".$charge."</td>");
+				echo(" class=\"sum_cell\" colspan=\"2\">+".$charge."</td>");
 			else
-				echo(" style=\"background-color: #B0FFB0;\">+".$amount."</td><td>+".$charge."</td>");
+				echo(" class=\"sum_cell act_sum\">+".$amount."</td><td class=\"sum_cell\">+".$charge."</td>");
 
 			$realBalance = round($realBalance + $amount, 2);
 		}
 		else if ($tr_type == 3 && $tr_src_id == $checkAccount_id)			// transfer from
 		{
-			echo("<td>Transfer to ".$dest_name."</td><td");
+			echo("<td>Transfer to ".$dest_name."</td><td class=\"sum_cell\"");
 
 			if ($amount == $charge)
-				echo(" colspan=\"2\" align=\"center\">-".$charge."</td>");
+				echo(" colspan=\"2\">-".$charge."</td>");
 			else
-				echo(">-".$amount."</td><td style=\"background-color: #B0FFB0;\">-".$charge."</td>");
+				echo(">-".$amount."</td><td class=\"sum_cell act_sum\">-".$charge."</td>");
 
 			$realBalance = round($realBalance - $charge, 2);
 		}
 
 		echo("<td>".$comment."</td>");
-		echo("<td");
+		echo("<td class=\"sum_cell");
 		if ($realBalance < 0.0)
-			echo(" style=\"background-color: #FFB0B0;\"");
-		echo(">".$realBalance."</td>");
+			echo(" bad_val");
+		echo("\">".$realBalance."</td>");
 
 		echo("<td");
 		$trans_date = strtotime($trdate);
 		if ($trans_date < $prev_date)
-			echo(" style=\"background-color: #FFB0B0;\"");
+			echo(" class=\"bad_val\"");
 		else if ($trans_date > $prev_date)
 			$prev_date = $trans_date;
 
