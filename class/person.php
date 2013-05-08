@@ -171,6 +171,21 @@ class Person
 				return 0;
 		}
 	}
+
+
+	// Search person with specified name and return id if success
+	public function findByName($p_name)
+	{
+		global $db;
+
+		$e_name = $db->escape($p_name);
+
+		$resArr = $db->selectQ("id", "persons", "name=".qnull($e_name));
+		if (count($resArr) != 1)
+			return 0;
+
+		return intval($resArr[0]["id"]);
+	}
 }
 
 ?>
