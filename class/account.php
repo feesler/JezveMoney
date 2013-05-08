@@ -11,10 +11,10 @@ class Account
 	// Class constructor
 	function __construct($user_id, $full = FALSE)
 	{
-		self::$full_list = $full;
-
-		if ($user_id != self::$user_id)
+		if ($user_id != self::$user_id || $full != self::$full_list)
 			self::$cache = NULL;
+
+		self::$full_list = $full;
 		self::$user_id = intval($user_id);
 	}
 
