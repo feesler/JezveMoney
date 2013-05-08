@@ -695,33 +695,37 @@ function onChangeDebtOp()
 // Show controls to add new person
 function togglePerson()
 {
-	var personbtn, personname, personid, personsel, newpersonbtn;
+	var personname, personid, personsel, personbtn;
 
-	personbtn = ge('personbtn');
 	personname = ge('personname');
 	personid = ge('personid');
 	personsel = ge('personsel');
 	personbtn = ge('personbtn');
-	if (!personbtn || !personname || !personid || !personsel || !newpersonbtn)
+	if (!personbtn || !personname || !personid || !personsel)
 		return;
 
-	if (personname.type == 'hidden')	// select mode
+	if (personname.type == 'hidden')		// select mode
 	{
 		personbtn.value = 'select';
 
 		personid.value = 0;
 		personname.type = 'text';
-	
+		personname.value = '';
+
 		show(personname, true);
 		show(personsel, false);
-		enable(newpersonbtn, false);
 	}
-	else if (personname.type == 'text')	// new person mode
+	else if (personname.type == 'text')		// new person mode
 	{
 		personbtn.value = 'new';
 
-		personname.value = selectedValue(personsel);
+		personname.value = selectedText(personsel);
 		personid.value = personsel.selectedIndex;
+
+		show(personname, false);
+		show(personsel, true);
+
+		personname.type = 'hidden';
 	}
 }
 
