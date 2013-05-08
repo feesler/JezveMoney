@@ -32,6 +32,7 @@
 	html("var p_name = ".json_encode($person_name).";");
 ?>
 
+// Change password submit event handler
 function onSubmit(frm)
 {
 	var oldpwd, newpwd;
@@ -111,7 +112,7 @@ function onNameSubmit(frm)
 
 	<tr>
 	<td>
-	<form id="pdwchangefrm" name="pdwchangefrm" method="post" action="./modules/changepassword.php" onsubmit="return onSubmit(this);">
+	<form method="post" action="./modules/changepassword.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">Old password</span></td>
@@ -138,7 +139,7 @@ function onNameSubmit(frm)
 
 	<tr>
 	<td>
-	<form id="namechangefrm" name="namechangefrm" method="post" action="./modules/changename.php" onsubmit="return onNameSubmit(this);">
+	<form method="post" action="./modules/changename.php" onsubmit="return onNameSubmit(this);">
 	<table>
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">New name</span></td>
