@@ -229,6 +229,16 @@ function checkDate(str)
 }
 
 
+// Return text of selected option of select object
+function selectedText(selectObj)
+{
+	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+		return -1;
+
+	return selectObj.options[selectObj.selectedIndex].textContent;
+}
+
+
 // Return value of selected option of select object
 function selectedValue(selectObj)
 {
