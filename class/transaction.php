@@ -115,7 +115,7 @@ class Transaction
 			if (!$acc->is_exist($dest_id))
 				return FALSE;
 			$destBalance = $acc->getBalance($dest_id);
-			$dest_curr_id = $acc->getCurrency($dest_id);
+			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
 
@@ -134,7 +134,7 @@ class Transaction
 		}
 
 		if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
-									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $transcurr, $trans_date, $comment, $tr_pos)))
+									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment, $tr_pos)))
 			return FALSE;
 
 		$trans_id = $db->insertId();
