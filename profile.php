@@ -1,6 +1,7 @@
 <?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
+	require_once("./class/person.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
 
@@ -8,6 +9,13 @@
 	$userid = User::check();
 	if (!$userid)
 		setLocation("./login.php");
+
+	$person_name = "";
+	$owner_id = User::getOwner($userid);
+
+	$person = new Person($userid);
+
+	$person_name = $person->getName($owner_id);
 
 	$titleString = "jezve Money - Profile";
 ?>
@@ -20,6 +28,10 @@
 	echo(getJS("common.js"));
 ?>
 <script>
+<?php
+	html("var p_name = ".json_encode($person_name).";");
+?>
+
 function onSubmit(frm)
 {
 	var oldpwd, newpwd;
@@ -48,6 +60,31 @@ function onSubmit(frm)
 	}
 
 	frm.submit();
+
+	return true;
+}
+
+
+// Change name form submit event handler
+function onNameSubmit(frm)
+{
+	var newname;
+
+	newname = ge('newname');
+	if (!frm || !newname)
+		return false;
+
+	if (!newname.value || newname.value.length < 1)
+	{
+		alert('Please type new name.');
+		return false;
+	}
+
+	if (newname.value == p_name)
+	{
+		alert('New name must be different from the old.');
+		return false;
+	}
 
 	return true;
 }
@@ -84,6 +121,28 @@ function onSubmit(frm)
 		<tr>
 		<td style="text-align: right;"><span style="margin-right: 5px;">New password</span></td>
 		<td><input id="newpwd" name="newpwd" type="password"></td>
+		</tr>
+
+		<tr>
+		<td></td>
+		<td><input type="submit" value="ok"></td>
+		</tr>
+	</table>
+	</form>
+	</td>
+	</tr>
+
+	<tr>
+	<td class="submenu"><span><b>Change name</b></span></td>
+	</tr>
+
+	<tr>
+	<td>
+	<form id="namechangefrm" name="namechangefrm" method="post" action="./modules/changename.php" onsubmit="return onNameSubmit(this);">
+	<table>
+		<tr>
+		<td style="text-align: right;"><span style="margin-right: 5px;">New name</span></td>
+		<td><input id="newname" name="newname" type="text"></td>
 		</tr>
 
 		<tr>
