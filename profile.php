@@ -98,12 +98,19 @@ function onNameSubmit(frm)
 	require_once("./templates/userblock.php");
 	require_once("./templates/mainmenu.php");
 
-	if (isset($_GET["act"]))
+	if (isset($_GET["pwd"]))
 	{
-		if ($_GET["act"] == "fail")
+		if ($_GET["pwd"] == "fail")
 			echo("<tr><td><span style=\"color: #FF0000;\">Fail to change password</span></td></tr>");
-		else if ($_GET["act"] == "ok")
+		else if ($_GET["pwd"] == "ok")
 			echo("<tr><td><span style=\"color: #00FF00;\">Password was successfully changed</span></td></tr>");
+	}
+	else if (isset($_GET["name"]))
+	{
+		if ($_GET["name"] == "fail")
+			echo("<tr><td><span style=\"color: #FF0000;\">Fail to change name</span></td></tr>");
+		else if ($_GET["name"] == "ok")
+			echo("<tr><td><span style=\"color: #00FF00;\">Name was successfully changed</span></td></tr>");
 	}
 ?>
 	<tr>

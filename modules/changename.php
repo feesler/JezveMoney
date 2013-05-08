@@ -6,7 +6,7 @@
 
 	function fail()
 	{
-		setLocation("../profile.php?act=fail");
+		setLocation("../profile.php?name=fail");
 	}
 
 
@@ -31,6 +31,6 @@
 	if (!$person->edit($owner_id, $new_name))
 		fail();
 
-	setLocation("../profile.php?act=ok");
+	setLocation("../profile.php?name=ok");
 
 ?>
