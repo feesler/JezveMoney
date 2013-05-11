@@ -186,6 +186,18 @@ class Person
 
 		return intval($resArr[0]["id"]);
 	}
+
+
+	// Delete all persons except owner of user
+	public function reset()
+	{
+		global $db;
+
+		if (!$db->deleteQ("persons", "user_id=".$this->user_id." AND id<>".$this->owner_id))
+			return FALSE;
+
+		return TRUE;
+	}
 }
 
 ?>
