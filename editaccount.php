@@ -67,7 +67,7 @@ function onSubmit(frm)
 		return false;
 	}
 
-	initbal.value = fixFloat(initbal.value);
+	initbal.value = parseFloat(fixFloat(initbal.value)).toFixed(2);
 
 	submitStarted = true;
 	enable(submitbtn, false);

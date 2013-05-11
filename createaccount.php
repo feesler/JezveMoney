@@ -51,7 +51,7 @@ function onSubmit(frm)
 		return false;
 	}
 
-	accbalance.value = fixFloat(accbalance.value);
+	accbalance.value = parseFloat(fixFloat(accbalance.value)).toFixed(2);
 
 	submitStarted = true;
 	enable(submitbtn, false);
