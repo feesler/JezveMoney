@@ -745,3 +745,59 @@ function onPersonSel(obj)
 	personname.value = selectedValue(obj);
 	personid.value = obj.selectedIndex;
 }
+
+
+// New debt form submit event handler
+function onDebtSubmit(frm)
+{
+	var accid, amount, trdate, personname;
+
+	personname = ge('personname');
+	if (!frm || !personname)
+		return false;
+
+	if (!personname.value || personname.value.length < 1)
+	{
+		if (personname.type == 'hidden')
+			alert('Please select person.');
+		else
+			alert('Please type name of person.');
+		return false;
+	}
+
+	accid = ge('accid');
+	amount = ge('amount');
+	trdate = ge('date');
+	if (!frm || !accid || !amount || !trdate)
+		return false;
+
+	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
+	{
+		alert('Please input correct amount.');
+		return false;
+	}
+
+	amount.value = fixFloat(amount.value);
+
+	if (!checkDate(trdate.value))
+	{
+		alert('Please input correct date.');
+		return false;
+	}
+
+	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
+	{
+		alert('Please input correct amount.');
+		return false;
+	}
+
+	amount.value = fixFloat(amount.value);
+
+	if (!checkDate(trdate.value))
+	{
+		alert('Please input correct date.');
+		return false;
+	}
+
+	return true;
+}
