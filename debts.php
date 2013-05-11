@@ -33,6 +33,16 @@
 
 	showSubMenu($debtsArr);
 
+	if (isset($_GET["debt"]))
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+		if ($_GET["debt"] == "ok")
+			echo("<span style=\"color: #20FF20;\">Debt successfully created.</span>");
+		else if ($_GET["debt"] == "fail")
+			echo("<span style=\"color: #FF2020;\">Fail to create new debt.</span>");
+		echo("</td></tr>");
+	}
+
 	$debt = new Debt($userid);
 
 	echo($debt->getTable());
