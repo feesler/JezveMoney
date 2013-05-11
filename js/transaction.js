@@ -30,6 +30,9 @@ function f1()
 
 	if (edit_mode)
 		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
+
+	S2 = S2.toFixed(2);
+
 	fS2 = S2;
 }
 
