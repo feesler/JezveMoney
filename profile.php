@@ -112,6 +112,13 @@ function onNameSubmit(frm)
 		else if ($_GET["name"] == "ok")
 			echo("<tr><td><span style=\"color: #00FF00;\">Name was successfully changed</span></td></tr>");
 	}
+	else if (isset($_GET["resetall"]))
+	{
+		if ($_GET["resetall"] == "fail")
+			echo("<tr><td><span style=\"color: #FF0000;\">Fail to reset all the data</span></td></tr>");
+		else if ($_GET["resetall"] == "ok")
+			echo("<tr><td><span style=\"color: #00FF00;\">Data successfully resetted</span></td></tr>");
+	}
 ?>
 	<tr>
 	<td class="submenu"><span><b>Change password</b></span></td>
@@ -159,6 +166,20 @@ function onNameSubmit(frm)
 		</tr>
 	</table>
 	</form>
+	</td>
+	</tr>
+
+	<tr>
+	<td class="submenu"><span><b>Reset all data</b></span></td>
+	</tr>
+
+	<tr>
+	<td>
+	<table>
+		<tr>
+		<td>To reset all data click <a href="./resetall.php">here</a></td>
+		</tr>
+	</table>
 	</td>
 	</tr>
 </table>
