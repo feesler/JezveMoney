@@ -20,6 +20,22 @@ function isIncome()
 }
 
 
+// Correct calculated value
+function correct(val, prec)
+{
+	prec = prec || 2;
+
+	return parseFloat(parseFloat(val).toFixed(prec));
+}
+
+
+// Correct calculated exchange rate value
+function correctExch(val)
+{
+	return correct(val, 5);
+}
+
+
 // Calculate result balance by initial and charge off/receipt
 function f1()
 {
@@ -31,7 +47,7 @@ function f1()
 	if (edit_mode)
 		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
 
-	S2 = S2.toFixed(2);
+	S2 = correct(S2);
 
 	fS2 = S2;
 }
@@ -42,7 +58,7 @@ function f2()
 {
 	d = fa * fe;
 
-	d = d.toFixed(2);
+	d = correct(d);
 
 	fd = d;
 }
@@ -56,7 +72,7 @@ function f3()
 	else
 		d = fS1 - fS2;
 
-	d = d.toFixed(2);
+	d = correct(d);
 
 	fd = d;
 }
@@ -67,7 +83,7 @@ function f4()
 {
 	a = fd / fe;
 
-	a = a.toFixed(2);
+	a = correct(a);
 
 	fa = a;
 }
@@ -78,7 +94,7 @@ function f5()
 {
 	e = fd / fa;
 
-	e = e.toFixed(2);
+	e = correctExch(e);
 
 	fe = e;
 }
@@ -498,6 +514,22 @@ function setExchangeComment()
 }
 
 
+// Normalize monetary value from string
+function normalize(val, prec)
+{
+	prec = prec || 2;
+
+	return parseFloat(parseFloat(fixFloat(val)).toFixed(prec));
+}
+
+
+// Normalize exchange rate value from string
+function normalizeExch(val)
+{
+	return normalize(val, 5);
+}
+
+
 // Get values of transaction from input fields
 function getValues()
 {
@@ -523,11 +555,11 @@ function getValues()
 	evalid = (e !== '');
 	avalid = (a !== '');
 
-	fS1 = (s1valid) ? parseFloat(fixFloat(S1)) : S1;
-	fS2 = (s2valid) ? parseFloat(fixFloat(S2)) : S2;
-	fd = (dvalid) ? parseFloat(fixFloat(d)) : d;
-	fe = (evalid) ? parseFloat(fixFloat(e)) : e;
-	fa = (avalid) ? parseFloat(fixFloat(a)) : a;
+	fS1 = (s1valid) ? normalize(S1) : S1;
+	fS2 = (s2valid) ? normalize(S2) : S2;
+	fd = (dvalid) ? normalize(d) : d;
+	fe = (evalid) ? normalizeExch(e) : e;
+	fa = (avalid) ? normalize(a) : a;
 }
 
 
