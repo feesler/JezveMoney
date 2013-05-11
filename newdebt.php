@@ -65,6 +65,15 @@
 
 	showSubMenu($debtsArr);
 
+	if (isset($_GET["act"]) && isset($_GET["detail"]))
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+		if ($_GET["act"] == "fail" && $_GET["detail"] == "person")
+			echo("<span style=\"color: #FF2020;\">Person already exist.</span>");
+		echo("</td></tr>");
+	}
+
+
 	$debt = new Debt($userid);
 
 	html("<tr>");

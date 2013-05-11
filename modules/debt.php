@@ -37,6 +37,9 @@
 	$pers = new Person($userid);
 	if (!$person_id || !$pers->is_exist($person_id))
 	{
+		$check_id = $pers->findByName($person_name);
+		if ($check_id != 0)
+			setLocation("../newdebt.php?act=fail&detail=person");
 		$person_id = $pers->create($person_name);
 	}
 
