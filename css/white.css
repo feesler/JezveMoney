@@ -53,7 +53,7 @@ input[type="text"], input[type="password"], select
 }
 
 
-.infotable tr:nth-child(even)
+.infotable > tbody > tr.even_row
 {
 	background-color: #E0E0E0;
 }

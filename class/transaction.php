@@ -531,7 +531,7 @@ class Transaction
 		}
 
 
-		$resStr .= "\t\t<tr>";
+		$resStr .= "\t\t<tr class=\"even_row\">";
 
 		if ($trans_type == 1)
 			$resStr .= "<td><b>Source</b></td>";
@@ -542,9 +542,13 @@ class Transaction
 
 		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
 
+		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			$resStr .= "\t\t<tr>";
+			$resStr .= "\t\t<tr";
+			if (($row_num % 2) == 0)
+				$resStr .= " class=\"even_row\"";
+			$resStr .= ">";
 
 			$cur_trans_type = intval($row["type"]);
 
@@ -575,6 +579,8 @@ class Transaction
 			$resStr .= "<td>".$row["comment"]."</td>";
 			$resStr .= "<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a> <a href=\"./deltransaction.php?id=".$row["id"]."\">delete</a></td>";
 			$resStr .= "</tr>\r\n";
+
+			$row_num++;
 		}
 
 		if ($tr_on_page > 0)
@@ -625,14 +631,18 @@ class Transaction
 			return $resStr;
 		}
 
-		$resStr .= "\t\t<tr>";
+		$resStr .= "\t\t<tr class=\"even_row\">";
 
 		$resStr .= "<td><b>Description</b></td>";
 		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td></tr>\r\n";
 
+		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			$resStr .= "\t\t<tr>";
+			$resStr .= "\t\t<tr";
+			if (($row_num % 2) == 0)
+				$resStr .= " class=\"even_row\"";
+			$resStr .= ">";
 
 			$cur_trans_type = intval($row["type"]);
 
@@ -668,6 +678,8 @@ class Transaction
 			$resStr .= "<td>".$fdate."</td>";
 			$resStr .= "<td>".$row["comment"]."</td>";
 			$resStr .= "</tr>\r\n";
+
+			$row_num++;
 		}
 
 		$resStr .= "\t</table>\r\n";

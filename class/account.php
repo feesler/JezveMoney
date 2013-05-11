@@ -385,12 +385,14 @@ class Account
 		}
 		else
 		{
-			$resStr .= "\t\t<tr><td><b>Name</b></td><td><b>Currency</b></td><td><b>Balance</b></td>";
+			$resStr .= "\t\t<tr class=\"even_row\"><td><b>Name</b></td><td><b>Currency</b></td><td><b>Balance</b></td>";
 			if ($editlink == TRUE)
 				$resStr .= "<td></td>";
 			$resStr .= "</tr>\r\n";
 
 			$totalArr = array();
+
+			$row_num = 1;
 			foreach(self::$cache as $acc_id => $row)
 			{
 				$balfmt = Currency::format($row["balance"], $row["curr_id"]);
@@ -401,10 +403,15 @@ class Account
 
 				$totalArr[$row["curr_id"]] += $row["balance"];
 
-				$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
+				$resStr .= "\t\t<tr";
+				if (($row_num % 2) == 0)
+					$resStr .= " class=\"even_row\"";
+				$resStr .= "><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
 				if ($editlink == TRUE)
 					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a></td>";
 				$resStr .= "</tr>\r\n";
+
+				$row_num++;
 			}
 
 			$resStr .= "\t\t<tr class=\"extra_row\">";
@@ -414,10 +421,16 @@ class Account
 			{
 				$valfmt = Currency::format($value, $key);
 				$currname = Currency::getName($key);
-				$resStr .= "\t\t<tr><td>Total</td><td>".$currname."</td><td class=\"sumcell\">".$valfmt."</td>";
+
+				$resStr .= "\t\t<tr";
+				if (($row_num % 2) == 0)
+					$resStr .= " class=\"even_row\"";
+				$resStr .= "><td>Total</td><td>".$currname."</td><td class=\"sumcell\">".$valfmt."</td>";
 				if ($editlink == TRUE)
 					$resStr .= "<td></td>";
 				$resStr .= "</tr>\r\n";
+
+				$row_num++;
 			}
 		}
 
