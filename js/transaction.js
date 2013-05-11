@@ -42,6 +42,8 @@ function f2()
 {
 	d = fa * fe;
 
+	d = d.toFixed(2);
+
 	fd = d;
 }
 
@@ -54,6 +56,8 @@ function f3()
 	else
 		d = fS1 - fS2;
 
+	d = d.toFixed(2);
+
 	fd = d;
 }
 
@@ -63,6 +67,8 @@ function f4()
 {
 	a = fd / fe;
 
+	a = a.toFixed(2);
+
 	fa = a;
 }
 
@@ -71,6 +77,8 @@ function f4()
 function f5()
 {
 	e = fd / fa;
+
+	e = e.toFixed(2);
 
 	fe = e;
 }
