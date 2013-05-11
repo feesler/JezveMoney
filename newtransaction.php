@@ -206,7 +206,7 @@
 		html();
 
 		html("<tr>");
-		html("<td colspan=\"2\" style=\"text-align: center;\"><input type=\"submit\" value=\"ok\"></td>");
+		html("<td colspan=\"2\" style=\"text-align: center;\"><input id=\"submitbtn\" type=\"submit\" value=\"ok\"></td>");
 		html("</tr>");
 		setTab(1);
 

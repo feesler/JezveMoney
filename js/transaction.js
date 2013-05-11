@@ -13,6 +13,9 @@ var s1valid, s2valid, dvalid, evalid, avalid;
 // d = a * e
 
 
+var submitStarted = false;
+
+
 // Check current transaction is income
 function isIncome()
 {
@@ -164,12 +167,17 @@ function setSign(isAmount, curr_id)
 function onSubmit(frm)
 {
 	var srcid, destid, amount, trdate;
+	var submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	srcid = ge('srcid');
 	destid = ge('destid');
 	amount = ge('amount');
 	trdate = ge('date');
-	if (!frm || (!srcid && !destid) || !amount || !trdate)
+	submitbtn = ge('submitbtn');
+	if (!frm || (!srcid && !destid) || !amount || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -185,6 +193,9 @@ function onSubmit(frm)
 		alert('Please input correct date.');
 		return false;
 	}
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -310,12 +321,17 @@ function isDiffCurr()
 function onTransferSubmit(frm)
 {
 	var amount, charge, exchrate, trdate;
+	var submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
 	trdate = ge('date');
-	if (!frm || !amount || !charge || !exchrate || !trdate)
+	submitbtn = ge('submitbtn');
+	if (!frm || !amount || !charge || !exchrate || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -339,6 +355,9 @@ function onTransferSubmit(frm)
 	amount.value = fixFloat(amount.value);
 	charge.value = fixFloat(charge.value);
 	exchrate.value = fixFloat(exchrate.value);
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
