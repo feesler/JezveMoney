@@ -159,8 +159,6 @@ function onSubmit(frm)
 		return false;
 	}
 
-	frm.submit();
-
 	return true;
 }
 
@@ -190,8 +188,6 @@ function onEditTransSubmit(frm)
 		alert('Please input correct date.');
 		return false;
 	}
-
-	frm.submit();
 
 	return true;
 }
@@ -316,7 +312,6 @@ function onTransferSubmit(frm)
 	amount.value = fixFloat(amount.value);
 	charge.value = fixFloat(charge.value);
 	exchrate.value = fixFloat(exchrate.value);
-	frm.submit();
 
 	return true;
 }
