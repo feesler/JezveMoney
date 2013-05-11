@@ -36,6 +36,28 @@
 	getStyle($sitetheme);
 	echo(getJS("common.js"));
 ?>
+<script>
+var submitStarted = false;
+
+
+// Delete transaction form submit event handler
+function onSubmit(frm)
+{
+	var submitbtn;
+
+	if (submitStarted)
+		return false;
+
+	submitbtn = ge('submitbtn');
+	if (!frm || !submitbtn)
+		return false;
+
+	submitStarted = true;
+	enable(submitbtn, false);
+
+	return true;
+}
+</script>
 </head>
 <body>
 <table class="maintable">
@@ -54,7 +76,7 @@
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="resetfrm" name="resetfrm" method="post" accept-charset="utf-8" action="./modules/deltransaction.php">
+	<form id="resetfrm" name="resetfrm" method="post" accept-charset="utf-8" action="./modules/deltransaction.php" onsubmit="return onSubmit(this);">
 	<input name="transid" type="hidden" value="<?php echo($trans_id); ?>">
 	<table>
 		<tr>
@@ -62,7 +84,7 @@
 		</tr>
 
 		<tr>
-			<td style="text-align: center;"><input type="submit" value="Ok"></td>
+			<td style="text-align: center;"><input id="submitbtn" type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

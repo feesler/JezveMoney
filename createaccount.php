@@ -21,13 +21,22 @@
 	echo(getJS("common.js"));
 ?>
 <script>
+var submitStarted = false;
+
+
+// Submit new account event handler
 function onSubmit(frm)
 {
 	var accname, accbalance;
+	var submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	accname = ge("accname");
 	accbalance = ge("accbalance");
-	if (!frm || !accname || !accbalance)
+	submitbtn = ge('submitbtn');
+	if (!frm || !accname || !accbalance || !submitbtn)
 		return false;
 
 	if (!accname.value || !accname.value.length)
@@ -44,7 +53,8 @@ function onSubmit(frm)
 
 	accbalance.value = fixFloat(accbalance.value);
 
-	frm.submit();
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -86,7 +96,7 @@ function onSubmit(frm)
 			<td><input id="accbalance" name="accbalance" type="text" value="0" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
-			<td colspan="2" style="text-align: center;"><input type="submit" value="Ok"></td>
+			<td colspan="2" style="text-align: center;"><input id="submitbtn" type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

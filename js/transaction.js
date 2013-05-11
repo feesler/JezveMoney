@@ -204,13 +204,17 @@ function onSubmit(frm)
 // Edit transaction submit event handler
 function onEditTransSubmit(frm)
 {
-	var srcid, destid, amount, trdate;
+	var srcid, destid, amount, trdate, submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	srcid = ge('srcid');
 	destid = ge('destid');
 	amount = ge('amount');
 	trdate = ge('date');
-	if (!frm || (!srcid && !destid) || !amount || !trdate)
+	submitbtn = ge('submitbtn');
+	if (!frm || (!srcid && !destid) || !amount || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -226,6 +230,9 @@ function onEditTransSubmit(frm)
 		alert('Please input correct date.');
 		return false;
 	}
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -808,9 +815,14 @@ function onPersonSel(obj)
 function onDebtSubmit(frm)
 {
 	var accid, amount, trdate, personname;
+	var submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	personname = ge('personname');
-	if (!frm || !personname)
+	submitbtn = ge('submitbtn');
+	if (!frm || !personname || !submitbtn)
 		return false;
 
 	if (!personname.value || personname.value.length < 1)
@@ -855,6 +867,9 @@ function onDebtSubmit(frm)
 		alert('Please input correct date.');
 		return false;
 	}
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }

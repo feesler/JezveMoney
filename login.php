@@ -20,14 +20,22 @@
 	echo(getJS("common.js"));
 ?>
 <script>
+var submitStarted = false;
+
+
+// Log in form submit event handler
 function onSubmit()
 {
 	var loginfrm, logacc, logpwd;
 
+	if (submitStarted)
+		return false;
+
 	loginfrm = document.getElementById('loginfrm');
 	logacc = document.getElementById('logacc');
 	logpwd = document.getElementById('logpwd');
-	if (!loginfrm || !logacc || !logpwd)
+	submitbtn = document.getElementById('submitbtn');
+	if (!loginfrm || !logacc || !logpwd || !submitbtn)
 		return false;
 
 	if (!logacc.value || logacc.value.length < 1)
@@ -43,7 +51,9 @@ function onSubmit()
 	}
 
 	loginfrm.action = './modules/login.php';
-	loginfrm.submit();
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -70,7 +80,7 @@ function onSubmit()
 		</tr>
 		<tr>
 			<td></td>
-			<td><input value="ok" type="submit"><a style="margin-left: 5px;" href="./registration.php">sign in</a></td>
+			<td><input id="submitbtn" value="ok" type="submit"><a style="margin-left: 5px;" href="./registration.php">sign in</a></td>
 		</tr>
 	</table>
 	</td>

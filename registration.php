@@ -20,14 +20,22 @@
 	echo(getJS("common.js"));
 ?>
 <script>
+var submitStarted = false;
+
+
+// Registration form submit event handler
 function onSubmit(frm)
 {
-	var logacc, logpwd, username;
+	var logacc, logpwd, username, submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	logacc = ge('logacc');
 	logpwd = ge('logpwd');
 	username = ge('username');
-	if (!frm || !logacc || !logpwd || !username)
+	submitbtn = ge('submitbtn');
+	if (!frm || !logacc || !logpwd || !username || !submitbtn)
 		return false;
 
 	if (!logacc.value || logacc.value.length < 1)
@@ -48,7 +56,8 @@ function onSubmit(frm)
 		return false;
 	}
 
-	frm.submit();
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -78,7 +87,7 @@ function onSubmit(frm)
 			</tr>
 			<tr>
 				<td></td>
-				<td><input type="submit" value="ok"></td>
+				<td><input id="submitbtn" type="submit" value="ok"></td>
 			</tr>
 		</table>
 	</td>

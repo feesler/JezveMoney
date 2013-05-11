@@ -38,13 +38,21 @@
 	echo(getJS("common.js"));
 ?>
 <script>
+var submitStarted = false;
+
+
+// Edit account form submit event handler
 function onSubmit(frm)
 {
-	var accname, accbalance;
+	var accname, accbalance, submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	accname = ge('accname');
 	initbal = ge('initbal');
-	if (!frm || !accname || !initbal)
+	submitbtn = ge('submitbtn');
+	if (!frm || !accname || !initbal || !submitbtn)
 		return false;
 
 	if (!accname.value || !accname.value.length)
@@ -60,7 +68,9 @@ function onSubmit(frm)
 	}
 
 	initbal.value = fixFloat(initbal.value);
-	frm.submit();
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -100,7 +110,7 @@ function onSubmit(frm)
 			<td><input id="initbal" name="initbal" type="text" value="<?php echo($acc->getInitBalance($acc_id)); ?>" onkeypress="return onFieldKey(event, this);"></td>
 		</tr>
 		<tr>
-			<td colspan="2" style="text-align: center;"><input type="submit" value="Ok"></td>
+			<td colspan="2" style="text-align: center;"><input id="submitbtn" type="submit" value="Ok"></td>
 		</tr>
 	</table>
 	</form>

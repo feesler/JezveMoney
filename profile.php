@@ -31,15 +31,21 @@
 <?php
 	html("var p_name = ".json_encode($person_name).";");
 ?>
+var submitStarted = false;
+
 
 // Change password submit event handler
 function onSubmit(frm)
 {
-	var oldpwd, newpwd;
+	var oldpwd, newpwd, submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	oldpwd = ge('oldpwd');
 	newpwd = ge('newpwd');
-	if (!frm || !oldpwd || !newpwd)
+	submitbtn = ge('submitbtn');
+	if (!frm || !oldpwd || !newpwd || !submitbtn)
 		return false;
 
 	if (!oldpwd.value || oldpwd.value.length < 1)
@@ -60,7 +66,8 @@ function onSubmit(frm)
 		return false;
 	}
 
-	frm.submit();
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -69,10 +76,14 @@ function onSubmit(frm)
 // Change name form submit event handler
 function onNameSubmit(frm)
 {
-	var newname;
+	var newname, submitbtn;
+
+	if (submitStarted)
+		return false;
 
 	newname = ge('newname');
-	if (!frm || !newname)
+	submitbtn = ge('submitbtn');
+	if (!frm || !newname || !submitbtn)
 		return false;
 
 	if (!newname.value || newname.value.length < 1)
@@ -86,6 +97,9 @@ function onNameSubmit(frm)
 		alert('New name must be different from the old.');
 		return false;
 	}
+
+	submitStarted = true;
+	enable(submitbtn, false);
 
 	return true;
 }
@@ -140,7 +154,7 @@ function onNameSubmit(frm)
 
 		<tr>
 		<td></td>
-		<td><input type="submit" value="ok"></td>
+		<td><input id="submitbtn" type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>
@@ -162,7 +176,7 @@ function onNameSubmit(frm)
 
 		<tr>
 		<td></td>
-		<td><input type="submit" value="ok"></td>
+		<td><input id="submitbtn" type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>

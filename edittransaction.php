@@ -238,7 +238,7 @@
 		</tr>
 
 		<tr>
-		<td colspan="2" style="text-align: center;"><input type="submit" value="ok"></td>
+		<td colspan="2" style="text-align: center;"><input id="submitbtn" type="submit" value="ok"></td>
 		</tr>
 	</table>
 	</form>

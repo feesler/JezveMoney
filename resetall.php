@@ -20,6 +20,28 @@
 	getStyle($sitetheme);
 	echo(getJS("common.js"));
 ?>
+<script>
+var submitStarted = false;
+
+
+// Reset all data form submit event handler
+function onSubmit(frm)
+{
+	var submitbtn;
+
+	if (submitStarted)
+		return false;
+
+	submitbtn = ge('submitbtn');
+	if (!frm || !submitbtn)
+		return false;
+
+	submitStarted = true;
+	enable(submitbtn, false);
+
+	return true;
+}
+</script>
 </head>
 <body>
 <table class="maintable">
@@ -32,14 +54,14 @@
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form method="post" action="./modules/resetall.php">
+	<form method="post" action="./modules/resetall.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 			<td style="padding-top: 50px;"><span>Are you sure want to reset all the data?<br>All accounts, transactions and persons will be lost.</span></td>
 		</tr>
 
 		<tr>
-			<td style="text-align: center;"><input type="submit" value="Ok"><a href="./profile.php" style="margin-left: 10px;">Cancel</a></td>
+			<td style="text-align: center;"><input id="submitbtn" type="submit" value="Ok"><a href="./profile.php" style="margin-left: 10px;">Cancel</a></td>
 		</tr>
 	</table>
 	</form>
