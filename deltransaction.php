@@ -76,7 +76,7 @@ function onSubmit(frm)
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="resetfrm" name="resetfrm" method="post" accept-charset="utf-8" action="./modules/deltransaction.php" onsubmit="return onSubmit(this);">
+	<form method="post" action="./modules/deltransaction.php" onsubmit="return onSubmit(this);">
 	<input name="transid" type="hidden" value="<?php echo($trans_id); ?>">
 	<table>
 		<tr>

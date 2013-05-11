@@ -69,7 +69,7 @@ function onSubmit(frm)
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="resetfrm" name="resetfrm" method="post" accept-charset="utf-8" action="./modules/resetaccounts.php" onsubmit="return onSubmit(this);">
+	<form method="post" action="./modules/resetaccounts.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 			<td style="text-align: right; padding-top: 50px;"><span>Are you sure want to reset all the data?</span></td>

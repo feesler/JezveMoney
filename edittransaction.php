@@ -122,7 +122,7 @@
 
 	<tr>
 	<td>
-	<form id="spendfrm" name="spendfrm" method="post" action="./modules/edittransaction.php" onsubmit="return onEditTransSubmit(this);">
+	<form method="post" action="./modules/edittransaction.php" onsubmit="return onEditTransSubmit(this);">
 	<input name="transid" type="hidden" value="<?php echo($arr["id"]); ?>">
 	<input name="transtype" type="hidden" value="<?php echo($arr["type"]); ?>">
 	<table>

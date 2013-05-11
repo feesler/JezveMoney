@@ -90,7 +90,7 @@ function onSubmit(frm)
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="editaccfrm" name="editaccfrm" method="post" accept-charset="utf-8" action="./modules/editaccount.php" onsubmit="return onSubmit(this);">
+	<form method="post" action="./modules/editaccount.php" onsubmit="return onSubmit(this);">
 	<input id="accid" name="accid" type="hidden" value="<?php echo($acc_id); ?>">
 	<table>
 		<tr>

@@ -24,18 +24,17 @@ var submitStarted = false;
 
 
 // Log in form submit event handler
-function onSubmit()
+function onSubmit(frm)
 {
-	var loginfrm, logacc, logpwd;
+	var logacc, logpwd, submitbtn;
 
 	if (submitStarted)
 		return false;
 
-	loginfrm = document.getElementById('loginfrm');
-	logacc = document.getElementById('logacc');
-	logpwd = document.getElementById('logpwd');
-	submitbtn = document.getElementById('submitbtn');
-	if (!loginfrm || !logacc || !logpwd || !submitbtn)
+	logacc = ge('logacc');
+	logpwd = ge('logpwd');
+	submitbtn = ge('submitbtn');
+	if (!frm || !logacc || !logpwd || !submitbtn)
 		return false;
 
 	if (!logacc.value || logacc.value.length < 1)
@@ -50,8 +49,6 @@ function onSubmit()
 		return false;
 	}
 
-	loginfrm.action = './modules/login.php';
-
 	submitStarted = true;
 	enable(submitbtn, false);
 
@@ -60,7 +57,7 @@ function onSubmit()
 </script>
 </head>
 <body>
-<form id="loginfrm" name="loginfrm" method="post" action="" onsubmit="return onSubmit()">
+<form method="post" action="./modules/login.php" onsubmit="return onSubmit(this);">
 <table align="center" valign="center" style="width: 100%; height: 100%;">
 	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 <?php

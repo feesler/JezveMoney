@@ -75,7 +75,7 @@ function onSubmit(frm)
 
 	<tr>
 	<td style="padding-left: 50px;">
-	<form id="newaccfrm" name="newaccfrm" method="post" accept-charset="utf-8" action="./modules/createaccount.php" onsubmit="return onSubmit(this);">
+	<form method="post" action="./modules/createaccount.php" onsubmit="return onSubmit(this);">
 	<table>
 		<tr>
 			<td style="text-align: right;"><span style="margin-right: 5px;">Account name</span></td>

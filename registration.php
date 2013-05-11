@@ -64,7 +64,7 @@ function onSubmit(frm)
 </script>
 </head>
 <body>
-<form id="regfrm" name="regfrm" method="post" action="./modules/register.php" onsubmit="return onSubmit(this);">
+<form method="post" action="./modules/register.php" onsubmit="return onSubmit(this);">
 <table align="center" valign="center" style="width: 100%; height: 100%;">
 	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
 <?php
