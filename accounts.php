@@ -30,7 +30,7 @@
 
 	<tr>
 	<td class="submenu">
-	<span><a href="./createaccount.php">Create new</a></span><span><a href="./resetaccounts.php">Reset</a></span>
+	<span><a href="./createaccount.php">Create new</a></span><span><a href="./resetaccounts.php">Reset</a></span><span><a href="./checkbalance.php?id=all">Check all</a></span>
 	</td>
 	</tr>
 
