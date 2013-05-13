@@ -186,8 +186,8 @@
 	if ($checkAccount_id != 0)
 	{
 		$condition = "user_id=".$userid." AND (";
-		$condition .= "(src_id=".$checkAccount_id." AND (type=1 OR type=3))";	// source
-		$condition .= " OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3)))";	// destination
+		$condition .= "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
+		$condition .= " OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4)))";	// destination
 	}
 	else	// all accounts
 	{
