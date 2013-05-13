@@ -182,16 +182,13 @@
 
 	$prev_date = 0;
 
-
+	$condition = "user_id=".$userid;
 	if ($checkAccount_id != 0)
 	{
-		$condition = "user_id=".$userid." AND (";
+		$condition .= " AND (";
 		$condition .= "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
-		$condition .= " OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4)))";	// destination
-	}
-	else	// all accounts
-	{
-		$condition = "user_id=".$userid;
+		$condition .= " OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))";	// destination
+		$condition .= ")";
 	}
 
 	$resArr = $db->selectQ("*", "transactions", $condition, NULL, "pos");
