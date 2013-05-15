@@ -180,7 +180,11 @@ class Person
 
 		$e_name = $db->escape($p_name);
 
-		$resArr = $db->selectQ("id", "persons", "name=".qnull($e_name));
+		$condition = "user_id=".$this->user_id;		// look only for persons of current user
+		$condition .= " AND id<>".$this->owner_id;	// exclude owner person
+		$condition .= " AND name=".qnull($e_name);
+
+		$resArr = $db->selectQ("id", "persons", $condition);
 		if (count($resArr) != 1)
 			return 0;
 
