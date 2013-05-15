@@ -608,7 +608,13 @@ class Transaction
 		if (!self::$user_id)
 			return $resStr;
 
-		$acc = new Account(self::$user_id);
+		$owner_id = User::getOwner(self::$user_id);
+		if (!$owner_id)
+			return $resStr;
+
+		$pers = new Person(self::$user_id);
+
+		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 			return $resStr;
@@ -658,6 +664,22 @@ class Transaction
 			else if ($cur_trans_type == 3)		// transfer
 			{
 				$resStr .= "Transfer from ".$acc->getName($row["src_id"])." to ".$acc->getName($row["dest_id"]);
+			}
+			else if ($cur_trans_type == 4)		// debt
+			{
+				$src_owner_id = $acc->getOwner($row["src_id"]);
+				$dest_owner_id = $acc->getOwner($row["dest_id"]);
+
+				$resStr .= "Debt: from ";
+
+				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
+				{
+					$resStr .= $acc->getName($row["src_id"])." to ".$pers->getName($dest_owner_id);
+				}
+				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
+				{
+					$resStr .= $pers->getName($src_owner_id)." to ".$acc->getName($row["dest_id"]);
+				}
 			}
 			$resStr .= "</td>\r\n";
 
