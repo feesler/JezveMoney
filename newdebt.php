@@ -106,7 +106,7 @@
 		else
 		{
 			html("<input id=\"personname\" name=\"personname\" type=\"hidden\" value=\"".$fperson_name."\">");
-			html("<select id=\"personsel\" onchange=\"onPersonSel();\">");
+			html("<select id=\"personsel\" onchange=\"onPersonSel(this);\">");
 			setTab(3);
 			echo($person->getList());
 			setTab(2);

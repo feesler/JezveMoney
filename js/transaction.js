@@ -806,8 +806,8 @@ function onPersonSel(obj)
 	if (!obj || typeof(obj.selectedIndex) == "undefined" || obj.selectedIndex == -1)
 		return;
 
-	personname.value = selectedValue(obj);
-	personid.value = obj.selectedIndex;
+	personname.value = selectedText(obj);
+	personid.value = selectedValue(obj);
 }
 
 
