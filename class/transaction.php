@@ -651,54 +651,59 @@ class Transaction
 			$resStr .= ">";
 
 			$cur_trans_type = intval($row["type"]);
+			$src_id = intval($row["src_id"]);
+			$dest_id = intval($row["dest_id"]);
+			$amount = floatval($row["amount"]);
+			$charge = floatval($row["charge"]);
+			$curr_id = intval($row["curr_id"]);
+			$comment = $row["comment"];
+			$fdate = date("d.m.Y", strtotime($row["date"]));
 
 			$resStr .= "<td>";
 			if ($cur_trans_type == 1)			// expense
 			{
-				$resStr .= "Expense from ".$acc->getName($row["src_id"]);
+				$resStr .= "Expense from ".$acc->getName($src_id);
 			}
 			else if ($cur_trans_type == 2)		// income
 			{
-				$resStr .= "Income to ".$acc->getName($row["dest_id"]);
+				$resStr .= "Income to ".$acc->getName($dest_id);
 			}
 			else if ($cur_trans_type == 3)		// transfer
 			{
-				$resStr .= "Transfer from ".$acc->getName($row["src_id"])." to ".$acc->getName($row["dest_id"]);
+				$resStr .= "Transfer from ".$acc->getName($src_id)." to ".$acc->getName($dest_id);
 			}
 			else if ($cur_trans_type == 4)		// debt
 			{
-				$src_owner_id = $acc->getOwner($row["src_id"]);
-				$dest_owner_id = $acc->getOwner($row["dest_id"]);
+				$src_owner_id = $acc->getOwner($src_id);
+				$dest_owner_id = $acc->getOwner($dest_id);
 
 				$resStr .= "Debt: from ";
 
 				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
 				{
-					$resStr .= $acc->getName($row["src_id"])." to ".$pers->getName($dest_owner_id);
+					$resStr .= $acc->getName($src_id)." to ".$pers->getName($dest_owner_id);
 				}
 				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
 				{
-					$resStr .= $pers->getName($src_owner_id)." to ".$acc->getName($row["dest_id"]);
+					$resStr .= $pers->getName($src_owner_id)." to ".$acc->getName($dest_id);
 				}
 			}
 			$resStr .= "</td>\r\n";
 
-			$resStr .= "<td class=\"sumcell\">". Currency::format($row["amount"], $row["curr_id"]);
-			if ($row["charge"] != $row["amount"])
+			$resStr .= "<td class=\"sumcell\">". Currency::format($amount, $curr_id);
+			if ($amount != $charge)
 			{
 				$resStr .= " (";
 				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
+					$resStr .= Currency::format($charge, $acc->getCurrency($src_id));
 				else if ($cur_trans_type == 2)					// income
-					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
+					$resStr .= Currency::format($charge, $acc->getCurrency($dest_id));
 				$resStr .= ")";
 			}
 			$resStr .= "</td>";
 
-			$fdate = date("d.m.Y", strtotime($row["date"]));
-
 			$resStr .= "<td>".$fdate."</td>";
-			$resStr .= "<td>".$row["comment"]."</td>";
+			$resStr .= "<td>".$comment."</td>";
 			$resStr .= "</tr>\r\n";
 
 			$row_num++;
