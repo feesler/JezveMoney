@@ -482,9 +482,15 @@ class Transaction
 		if (!self::$user_id)
 			return $resStr;
 
+		$owner_id = User::getOwner(self::$user_id);
+		if (!$owner_id)
+			return $resStr;
+
+		$pers = new Person(self::$user_id);
+
 		$resStr .= "\t<table class=\"infotable\">\r\n";
 
-		$acc = new Account(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
@@ -552,13 +558,35 @@ class Transaction
 
 			$cur_trans_type = intval($row["type"]);
 
+			if ($cur_trans_type == 4)
+			{
+				$src_owner_id = $acc->getOwner($row["src_id"]);
+				$dest_owner_id = $acc->getOwner($row["dest_id"]);
+			}
+
 			$resStr .= "<td>";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)
 				$resStr .= $acc->getName($row["src_id"]);
+			else if ($cur_trans_type == 4)
+			{
+				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
+					$resStr .= $acc->getName($row["src_id"]);
+				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
+					$resStr .= $pers->getName($src_owner_id);
+			}
+
 			if ($trans_type == 3 || $trans_type == 4)
 				$resStr .= "</td><td>";
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)
 				$resStr .= $acc->getName($row["dest_id"]);
+			else if ($cur_trans_type == 4)
+			{
+				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
+					$resStr .= $pers->getName($dest_owner_id);
+				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
+					$resStr .= $acc->getName($row["dest_id"]);
+			}
+
 			$resStr .= "</td>";
 
 			$resStr .= "<td class=\"sumcell\">". Currency::format($row["amount"], $row["curr_id"]);
