@@ -23,7 +23,7 @@
 	$sitetheme = 1;
 
 	$db = new mysqlDB();
-	if (!$db->connect("localhost", "feesler", "liXhcEIMEe"))
+	if (!$db->connect("localhost", "feesler", "jqmWFX6wEp3ruU"))
 		exit();
 
 	if (!$db->selectDB("feesler"))
