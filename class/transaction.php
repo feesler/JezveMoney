@@ -592,24 +592,14 @@ class Transaction
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)
 				$resStr .= $acc->getName($src_id);
 			else if ($cur_trans_type == 4)
-			{
-				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
-					$resStr .= $acc->getName($src_id);
-				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
-					$resStr .= $pers->getName($src_owner_id);
-			}
+				$resStr .= $acc->getNameOrPerson($src_id);
 
 			if ($trans_type == 3 || $trans_type == 4)
 				$resStr .= "</td><td>";
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)
 				$resStr .= $acc->getName($dest_id);
 			else if ($cur_trans_type == 4)
-			{
-				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
-					$resStr .= $pers->getName($dest_owner_id);
-				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
-					$resStr .= $acc->getName($dest_id);
-			}
+				$resStr .= $acc->getNameOrPerson($dest_id);
 
 			$resStr .= "</td>";
 
@@ -725,19 +715,7 @@ class Transaction
 			}
 			else if ($cur_trans_type == 4)		// debt
 			{
-				$src_owner_id = $acc->getOwner($src_id);
-				$dest_owner_id = $acc->getOwner($dest_id);
-
-				$resStr .= "Debt: from ";
-
-				if ($src_owner_id == $owner_id && $dest_owner_id != $owner_id)	// give to person
-				{
-					$resStr .= $acc->getName($src_id)." to ".$pers->getName($dest_owner_id);
-				}
-				else if ($src_owner_id != $owner_id && $dest_owner_id == $owner_id)	// take from person
-				{
-					$resStr .= $pers->getName($src_owner_id)." to ".$acc->getName($dest_id);
-				}
+				$resStr .= "Debt: from ".$acc->getNameOrPerson($src_id)." to ".$acc->getNameOrPerson($dest_id);
 			}
 			$resStr .= "</td>\r\n";
 

@@ -1,6 +1,7 @@
 <?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
+	require_once("./class/person.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
 
@@ -163,7 +164,7 @@
 		$acc_id = intval($row["id"]);
 		$initBalance[$acc_id] = floatval($row["initbalance"]);
 		$curBalance[$acc_id] = floatval($row["balance"]);
-		$accName[$acc_id] = $row["name"];
+		$accName[$acc_id] = $acc->getNameOrPerson($acc_id);
 
 		echo("<tr><td>".$accName[$acc_id]."</td>");
 		echo("<td>".$initBalance[$acc_id]."</td>");
@@ -204,8 +205,8 @@
 		$trdate = $row["date"];
 		$tr_pos = intval($row["pos"]);
 
-		$src_name = $acc->getName($tr_src_id);
-		$dest_name = $acc->getName($tr_dest_id);
+		$src_name = $acc->getNameOrPerson($tr_src_id);
+		$dest_name = $acc->getNameOrPerson($tr_dest_id);
 
 
 		echo("<tr><td");
