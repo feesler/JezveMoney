@@ -185,14 +185,14 @@ class Transaction
 		$transCurr = $this->getCurrency($trans_id);
 
 		// check type of transaction
-		if ($transType != 1 && $transType != 2 && $transType != 3)
+		if ($transType != 1 && $transType != 2 && $transType != 3 && $transType != 4)
 			return FALSE;
 
 		// check user is the same
 		if ($transUser != self::$user_id)
 			return FALSE;
 
-		$acc = new Account(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -220,7 +220,7 @@ class Transaction
 			return FALSE;
 
 		// update balance of source account
-		if ($transType == 1 || $transType == 3)		// spend or transfer
+		if ($transType == 1 || $transType == 3 || $transType == 4)		// spend, transfer or debt
 		{
 			$srcBalance += $transCharge;
 			if (!$acc->setBalance($src_id, $srcBalance))
@@ -228,7 +228,7 @@ class Transaction
 		}
 
 		// update balance of destination account
-		if ($transType == 2 || $transType == 3)		// income or transfer
+		if ($transType == 2 || $transType == 3 || $transType == 4)		// income, transfer or debt
 		{
 			$destBalance -= ($transType == 2) ? $transCharge : $transAmount;
 			if (!$acc->setBalance($dest_id, $destBalance))
@@ -253,7 +253,7 @@ class Transaction
 		if (!$this->cancel($trans_id))
 			return FALSE;
 
-		$acc = new Account(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
 
 		// check source account is exist
 		$srcBalance = 0;
