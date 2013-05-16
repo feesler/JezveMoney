@@ -306,6 +306,18 @@ class Transaction
 	}
 
 
+	// Check is transaction with specified position exist
+	public function isPosExist($trans_pos)
+	{
+		global $db;
+
+		$tr_pos = intval($trans_pos);
+
+		$resArr = $db->selectQ("pos", "transactions", "user_id=".self::$user_id." AND pos=".$tr_pos);
+		return (count($resArr) == 1);
+	}
+
+
 	// Update position of specified transaction and fix position of 
 	public function updatePos($trans_id, $new_pos)
 	{
