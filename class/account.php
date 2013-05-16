@@ -324,6 +324,29 @@ class Account
 	}
 
 
+	// Return name of account if owner is user or name of person else
+	public function getNameOrPerson($acc_id)
+	{
+		if (!is_numeric($acc_id))
+			return "";
+
+		$acc_id = intval($acc_id);
+		if (!$acc_id)
+			return "";
+
+		$acc_onwer = $this->getOwner($acc_id);
+		if (self::$owner_id == $acc_onwer)
+		{
+			return $this->getName($acc_id);
+		}
+		else
+		{
+			$pers = new Person(self::$user_id);
+			return $pers->getName($acc_onwer);
+		}
+	}
+
+
 	// Return HTML string of accounts for select control
 	public function getList($selected_id = 0)
 	{
