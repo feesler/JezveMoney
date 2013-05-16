@@ -339,28 +339,31 @@ class Transaction
 		{
 			return TRUE;
 		}
-		else if ($old_pos == 0)			// insert with specified position
+		else if ($this->isPosExist($new_pos))
 		{
-			$latest = $this->getLatestPos();
+			if ($old_pos == 0)			// insert with specified position
+			{
+				$latest = $this->getLatestPos();
 
-			$condition .= " AND pos >= ".$new_pos." AND pos <= ".$latest;
-			$assignment = "pos=pos+1";
-		}
-		else if ($new_pos < $old_pos)		// moving up
-		{
-			$condition .= " AND pos >= ".$new_pos." AND pos < ".$old_pos;
-			$assignment = "pos=pos+1";
-		}
-		else if ($new_pos > $old_pos)		// moving down
-		{
-			$condition .= " AND pos > ".$old_pos." AND pos <= ".$new_pos;
-			$assignment = "pos=pos-1";
-		}
+				$condition .= " AND pos >= ".$new_pos." AND pos <= ".$latest;
+				$assignment = "pos=pos+1";
+			}
+			else if ($new_pos < $old_pos)		// moving up
+			{
+				$condition .= " AND pos >= ".$new_pos." AND pos < ".$old_pos;
+				$assignment = "pos=pos+1";
+			}
+			else if ($new_pos > $old_pos)		// moving down
+			{
+				$condition .= " AND pos > ".$old_pos." AND pos <= ".$new_pos;
+				$assignment = "pos=pos-1";
+			}
 
-		$query = "UPDATE `transactions` SET ".$assignment." WHERE ".$condition.";";
-		$db->rawQ($query);
-		if (mysql_errno() != 0)
-			return FALSE;
+			$query = "UPDATE `transactions` SET ".$assignment." WHERE ".$condition.";";
+			$db->rawQ($query);
+			if (mysql_errno() != 0)
+				return FALSE;
+		}
 
 		if (!$db->updateQ("transactions", array("pos"), array($new_pos), "id=".$trans_id))
 			return FALSE;
