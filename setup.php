@@ -14,6 +14,7 @@
 
 		wlog("\r\nBEGIN");
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
+		wlog("Time: ".date("r"));
 		wlog("User agent: ".$userAgent);
 		wlog("Referer: ".$_SERVER["HTTP_REFERER"]);
 		wlog("Request: ".$ruri);
