@@ -151,3 +151,84 @@ function onChangeNameSubmit(frm)
 
 	return true;
 }
+
+
+var accounts =
+{
+	selectedArr : [],
+
+	// Return position of account in selectedArr
+	getPos : function(acc_id)
+	{
+		return this.selectedArr.indexOf(acc_id);
+	},
+
+
+	isSelected : function(acc_id)
+	{
+		return this.selectedArr.some(function(account_id){ return account_id == acc_id; });
+	},
+
+
+	selectAccount : function(acc_id)
+	{
+		if (!acc_id || this.isSelected(acc_id))
+			return false;
+
+		this.selectedArr.push(acc_id);
+		return true;
+	},
+
+
+	deselectAccount : function(acc_id)
+	{
+		var acc_pos = this.getPos(acc_id);
+
+		if (acc_pos == -1)
+			return false;
+
+		this.selectedArr.splice(acc_pos, 1);
+		return true;
+	},
+
+
+	selectedCount : function()
+	{
+		return this.selectedArr.length;
+	}
+};
+
+
+
+// Tile click event handler
+function onTileClick(acc_id)
+{
+	var tile, edit_btn, del_btn;
+	var actDiv;
+
+	tile = ge('acc_' + acc_id);
+	edit_btn = ge('edit_btn');
+	del_btn = ge('del_btn');
+	if (!tile || !edit_btn)
+		return;
+
+	if (accounts.isSelected(acc_id))
+	{
+		accounts.deselectAccount(acc_id);
+
+		actDiv = ge('act_' + acc_id);
+		if (actDiv)
+			tile.removeChild(actDiv);
+	}
+	else
+	{
+		accounts.selectAccount(acc_id);
+
+		actDiv = ce('div', { id : 'act_' + acc_id, className : 'act', onclick : bind(onTileClick, null, acc_id) });
+
+		tile.appendChild(actDiv);
+	}
+
+	show(edit_btn, (accounts.selectedCount() == 1));
+	show(del_btn, (accounts.selectedCount() > 0));
+}
