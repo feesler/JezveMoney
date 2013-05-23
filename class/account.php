@@ -427,7 +427,37 @@ class Account
 	}
 
 
-	// Return HTMl for account tile
+	// Return HTML for account tile button
+	public function getButtonTile($acc_id)
+	{
+		$resStr = "";
+
+		if (!$this->is_exist($acc_id))
+			return $resStr;
+
+		$resStr .= "<div id=\"acc_".$acc_id."\" class=\"tile\">";
+		$resStr .= "<button class=\"tilelink\" onclick=\"onTileClick(".$acc_id.")\">";
+		$resStr .= "<div>";
+
+		$acc_curr = $this->getCurrency($acc_id);
+		$acc_balance = $this->getBalance($acc_id);
+		$balance_fmt = Currency::format($acc_balance, $acc_curr);
+
+		$resStr .= "<span class=\"acc_bal\">".$balance_fmt."</span>";
+
+		$acc_name = $this->getName($acc_id);
+
+		$resStr .= "<span class=\"acc_name\">".$acc_name."</span>";
+
+		$resStr .= "</div>";
+		$resStr .= "</button>";
+		$resStr .= "</div>";
+
+		return $resStr;
+	}
+
+
+	// Return HTML for account tile
 	public function getTile($acc_id)
 	{
 		$resStr = "";
@@ -458,7 +488,7 @@ class Account
 
 
 	// Return HTML for accounts of user
-	public function getTiles()
+	public function getTiles($buttons = FALSE)
 	{
 		$resStr = "";
 
@@ -467,7 +497,10 @@ class Account
 
 		foreach(self::$cache as $acc_id => $row)
 		{
-			$resStr .= $this->getTile($acc_id);
+			if ($buttons)
+				$resStr .= $this->getButtonTile($acc_id);
+			else
+				$resStr .= $this->getTile($acc_id);
 		}
 
 		return $resStr;
