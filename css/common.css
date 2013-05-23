@@ -275,3 +275,48 @@ input[type="text"], input[type="password"], select
 	font-size: 20px;
 	margin: 10px 0px;
 }
+
+
+.widget_title > a,
+.widget_title > a:hover
+{
+	color: #000000;
+	text-decoration: none;
+}
+
+
+/* accounts page*/
+.heading
+{
+	clear: both;
+}
+
+
+.heading > h1
+{
+	display: inline-block;
+	float: left;
+	margin: 0px 0px 10px;
+}
+
+
+.heading > .iconlink
+{
+	display: inline-block;
+	float: left;
+	clear: right;
+	margin: 9px 0px 0px 30px;
+}
+
+
+.control_icons
+{
+	clear: both;
+}
+
+
+.control_icons > .iconlink
+{
+	clear: both;
+	margin: 5px 0px;
+}

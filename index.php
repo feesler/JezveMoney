@@ -35,7 +35,7 @@
 ?>
 <div class="content">
 	<div>
-		<div class="widget_title">Accounts &gt;</div>
+		<div class="widget_title"><a href="./accounts.php">Accounts &gt;</a></div>
 		<div class="tiles"><?php echo($acc->getTiles()); ?></div>
 	</div>
 

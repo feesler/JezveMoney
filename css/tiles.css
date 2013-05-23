@@ -1,5 +1,7 @@
 .tiles
 {
+	display: block;
+	clear: both;
 	max-width: 450px;
 }
 
@@ -15,6 +17,37 @@
 	float: left;
 	position: relative;
 	overflow: hidden;
+}
+
+
+.tile:hover
+{
+	background-color: #1E82CC;
+}
+
+
+.act
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 94px;
+	height: 94px;
+	border: 3px solid #0072C6;
+	cursor: pointer;
+}
+
+
+button.tilelink
+{
+	width: 100px;
+	height: 100px;
+	border: 0 none;
+	background: none;
+	padding: 0;
+	margin: 0;
+	text-transform: none;
+	font-weight: normal;
 }
 
 
