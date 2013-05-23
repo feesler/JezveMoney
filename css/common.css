@@ -20,6 +20,14 @@ div
 }
 
 
+/* headings */
+h1
+{
+	font-size: 32px;
+	font-weight: normal;
+}
+
+
 /* link style */
 a, a:visited
 {
