@@ -62,7 +62,7 @@
 
 		<div>
 			<h2>User name</h2>
-			<span><?php echo($user_name); ?></span>
+			<span><?php echo($person_name); ?></span>
 <?php
 	if ($action != "changename")
 	{
