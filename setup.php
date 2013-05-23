@@ -14,6 +14,7 @@
 
 		wlog("\r\nBEGIN");
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
+		wlog("Time: ".date("r"));
 		wlog("User agent: ".$userAgent);
 		wlog("Referer: ".$_SERVER["HTTP_REFERER"]);
 		wlog("Request: ".$ruri);
@@ -23,7 +24,7 @@
 	$sitetheme = 1;
 
 	$db = new mysqlDB();
-	if (!$db->connect("localhost", "feesler", "liXhcEIMEe"))
+	if (!$db->connect("localhost", "feesler", "jqmWFX6wEp3ruU"))
 		exit();
 
 	if (!$db->selectDB("feesler"))

@@ -115,7 +115,7 @@ class Transaction
 			if (!$acc->is_exist($dest_id))
 				return FALSE;
 			$destBalance = $acc->getBalance($dest_id);
-			$dest_curr_id = $acc->getCurrency($dest_id);
+			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
 
@@ -134,7 +134,7 @@ class Transaction
 		}
 
 		if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
-									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $transcurr, $trans_date, $comment, $tr_pos)))
+									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment, $tr_pos)))
 			return FALSE;
 
 		$trans_id = $db->insertId();
@@ -185,14 +185,14 @@ class Transaction
 		$transCurr = $this->getCurrency($trans_id);
 
 		// check type of transaction
-		if ($transType != 1 && $transType != 2 && $transType != 3)
+		if ($transType != 1 && $transType != 2 && $transType != 3 && $transType != 4)
 			return FALSE;
 
 		// check user is the same
 		if ($transUser != self::$user_id)
 			return FALSE;
 
-		$acc = new Account(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -220,7 +220,7 @@ class Transaction
 			return FALSE;
 
 		// update balance of source account
-		if ($transType == 1 || $transType == 3)		// spend or transfer
+		if ($transType == 1 || $transType == 3 || $transType == 4)		// spend, transfer or debt
 		{
 			$srcBalance += $transCharge;
 			if (!$acc->setBalance($src_id, $srcBalance))
@@ -228,7 +228,7 @@ class Transaction
 		}
 
 		// update balance of destination account
-		if ($transType == 2 || $transType == 3)		// income or transfer
+		if ($transType == 2 || $transType == 3 || $transType == 4)		// income, transfer or debt
 		{
 			$destBalance -= ($transType == 2) ? $transCharge : $transAmount;
 			if (!$acc->setBalance($dest_id, $destBalance))
@@ -253,7 +253,7 @@ class Transaction
 		if (!$this->cancel($trans_id))
 			return FALSE;
 
-		$acc = new Account(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -306,6 +306,18 @@ class Transaction
 	}
 
 
+	// Check is transaction with specified position exist
+	public function isPosExist($trans_pos)
+	{
+		global $db;
+
+		$tr_pos = intval($trans_pos);
+
+		$resArr = $db->selectQ("pos", "transactions", "user_id=".self::$user_id." AND pos=".$tr_pos);
+		return (count($resArr) == 1);
+	}
+
+
 	// Update position of specified transaction and fix position of 
 	public function updatePos($trans_id, $new_pos)
 	{
@@ -327,28 +339,31 @@ class Transaction
 		{
 			return TRUE;
 		}
-		else if ($old_pos == 0)			// insert with specified position
+		else if ($this->isPosExist($new_pos))
 		{
-			$latest = $this->getLatestPos();
+			if ($old_pos == 0)			// insert with specified position
+			{
+				$latest = $this->getLatestPos();
 
-			$condition .= " AND pos >= ".$new_pos." AND pos <= ".$latest;
-			$assignment = "pos=pos+1";
-		}
-		else if ($new_pos < $old_pos)		// moving up
-		{
-			$condition .= " AND pos >= ".$new_pos." AND pos < ".$old_pos;
-			$assignment = "pos=pos+1";
-		}
-		else if ($new_pos > $old_pos)		// moving down
-		{
-			$condition .= " AND pos > ".$old_pos." AND pos <= ".$new_pos;
-			$assignment = "pos=pos-1";
-		}
+				$condition .= " AND pos >= ".$new_pos." AND pos <= ".$latest;
+				$assignment = "pos=pos+1";
+			}
+			else if ($new_pos < $old_pos)		// moving up
+			{
+				$condition .= " AND pos >= ".$new_pos." AND pos < ".$old_pos;
+				$assignment = "pos=pos+1";
+			}
+			else if ($new_pos > $old_pos)		// moving down
+			{
+				$condition .= " AND pos > ".$old_pos." AND pos <= ".$new_pos;
+				$assignment = "pos=pos-1";
+			}
 
-		$query = "UPDATE `transactions` SET ".$assignment." WHERE ".$condition.";";
-		$db->rawQ($query);
-		if (mysql_errno() != 0)
-			return FALSE;
+			$query = "UPDATE `transactions` SET ".$assignment." WHERE ".$condition.";";
+			$db->rawQ($query);
+			if (mysql_errno() != 0)
+				return FALSE;
+		}
 
 		if (!$db->updateQ("transactions", array("pos"), array($new_pos), "id=".$trans_id))
 			return FALSE;
@@ -482,9 +497,15 @@ class Transaction
 		if (!self::$user_id)
 			return $resStr;
 
+		$owner_id = User::getOwner(self::$user_id);
+		if (!$owner_id)
+			return $resStr;
+
+		$pers = new Person(self::$user_id);
+
 		$resStr .= "\t<table class=\"infotable\">\r\n";
 
-		$acc = new Account(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
@@ -514,7 +535,7 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			$resStr .= "\t\t<tr><td>You have no one transaction yet.</td></tr>";
+			$resStr .= "\t\t<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>";
 			$resStr .= "\t</table>\r\n";
 			return $resStr;
 		}
@@ -523,15 +544,16 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			$resStr .= "\t\t<tr>\r\n";
+			$resStr .= "\t\t<tr class=\"extra_row\">\r\n";
 			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
-			$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
+			if ($transCount > $tr_on_page)
+				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
 			$resStr .= "</td>\r\n";
 			$resStr .= "\t\t</tr>\r\n";
 		}
 
 
-		$resStr .= "\t\t<tr>";
+		$resStr .= "\t\t<tr class=\"even_row\">";
 
 		if ($trans_type == 1)
 			$resStr .= "<td><b>Source</b></td>";
@@ -542,46 +564,71 @@ class Transaction
 
 		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
 
+		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			$resStr .= "\t\t<tr>";
+			$resStr .= "\t\t<tr";
+			if (($row_num % 2) == 0)
+				$resStr .= " class=\"even_row\"";
+			$resStr .= ">";
 
+			$trans_id = intval($row["id"]);
 			$cur_trans_type = intval($row["type"]);
+			$src_id = intval($row["src_id"]);
+			$dest_id = intval($row["dest_id"]);
+			$amount = floatval($row["amount"]);
+			$charge = floatval($row["charge"]);
+			$curr_id = intval($row["curr_id"]);
+			$comment = $row["comment"];
+			$fdate = date("d.m.Y", strtotime($row["date"]));
+
+			if ($cur_trans_type == 4)
+			{
+				$src_owner_id = $acc->getOwner($src_id);
+				$dest_owner_id = $acc->getOwner($dest_id);
+			}
 
 			$resStr .= "<td>";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)
-				$resStr .= $acc->getName($row["src_id"]);
+				$resStr .= $acc->getName($src_id);
+			else if ($cur_trans_type == 4)
+				$resStr .= $acc->getNameOrPerson($src_id);
+
 			if ($trans_type == 3 || $trans_type == 4)
 				$resStr .= "</td><td>";
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)
-				$resStr .= $acc->getName($row["dest_id"]);
+				$resStr .= $acc->getName($dest_id);
+			else if ($cur_trans_type == 4)
+				$resStr .= $acc->getNameOrPerson($dest_id);
+
 			$resStr .= "</td>";
 
-			$resStr .= "<td class=\"sumcell\">". Currency::format($row["amount"], $row["curr_id"]);
-			if ($row["charge"] != $row["amount"])
+			$resStr .= "<td class=\"sumcell\">". Currency::format($amount, $curr_id);
+			if ($charge != $amount)
 			{
 				$resStr .= " (";
 				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
+					$resStr .= Currency::format($charge, $acc->getCurrency($src_id));
 				else if ($cur_trans_type == 2)					// income
-					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
+					$resStr .= Currency::format($charge, $acc->getCurrency($dest_id));
 				$resStr .= ")";
 			}
 			$resStr .= "</td>";
 
-			$fdate = date("d.m.Y", strtotime($row["date"]));
-
 			$resStr .= "<td>".$fdate."</td>";
-			$resStr .= "<td>".$row["comment"]."</td>";
-			$resStr .= "<td><a href=\"./edittransaction.php?id=".$row["id"]."\">edit</a> <a href=\"./deltransaction.php?id=".$row["id"]."\">delete</a></td>";
+			$resStr .= "<td>".$comment."</td>";
+			$resStr .= "<td><a href=\"./edittransaction.php?id=".$trans_id."\">edit</a> <a href=\"./deltransaction.php?id=".$trans_id."\">delete</a></td>";
 			$resStr .= "</tr>\r\n";
+
+			$row_num++;
 		}
 
 		if ($tr_on_page > 0)
 		{
-			$resStr .= "\t\t<tr>";
+			$resStr .= "\t\t<tr class=\"extra_row\">";
 			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
-			$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
+			if ($transCount > $tr_on_page)
+				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
 			$resStr .= "\t\t\t</td>";
 			$resStr .= "\t\t</tr>";
 		}

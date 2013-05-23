@@ -7,7 +7,7 @@
 
 	function fail()
 	{
-		setLocation("../profile.php?act=fail");
+		setLocation("../profile.php?pwd=fail");
 	}
 
 
@@ -22,6 +22,6 @@
 	if (!User::changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
 		fail();
 
-	setLocation("../profile.php?act=ok");
+	setLocation("../profile.php?pwd=ok");
 
 ?>

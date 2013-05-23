@@ -171,6 +171,37 @@ class Person
 				return 0;
 		}
 	}
+
+
+	// Search person with specified name and return id if success
+	public function findByName($p_name)
+	{
+		global $db;
+
+		$e_name = $db->escape($p_name);
+
+		$condition = "user_id=".$this->user_id;		// look only for persons of current user
+		$condition .= " AND id<>".$this->owner_id;	// exclude owner person
+		$condition .= " AND name=".qnull($e_name);
+
+		$resArr = $db->selectQ("id", "persons", $condition);
+		if (count($resArr) != 1)
+			return 0;
+
+		return intval($resArr[0]["id"]);
+	}
+
+
+	// Delete all persons except owner of user
+	public function reset()
+	{
+		global $db;
+
+		if (!$db->deleteQ("persons", "user_id=".$this->user_id." AND id<>".$this->owner_id))
+			return FALSE;
+
+		return TRUE;
+	}
 }
 
 ?>

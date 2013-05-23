@@ -6,15 +6,9 @@
 	require_once("../class/transaction.php");
 
 
-	function fail($acc_id = 0)
+	function fail($acc_id)
 	{
-		if (!$acc_id)
-		{
-			echo("fail to update position");
-			exit();
-		}
-		else
-			setLocation("../checkbalance.php?id=".$acc_id."&pos=fail");
+		setLocation("../checkbalance.php?id=".$acc_id."&pos=fail");
 	}
 
 
@@ -30,8 +24,10 @@
 	$tr_id = intval($_POST["trans_id"]);
 	$to_pos = intval($_POST["trans_pos"]);
 	$acc_id = intval($_POST["trans_acc"]);
-	if (!$tr_id || !$to_pos || !$acc_id)
-		fail();
+	if ($acc_id == 0)
+		$acc_id = "all";
+	if (!$tr_id || !$to_pos)
+		fail($acc_id);
 
 	$trans = new Transaction($userid);
 	if (!$trans->updatePos($tr_id, $to_pos))

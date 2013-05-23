@@ -11,10 +11,10 @@ class Account
 	// Class constructor
 	function __construct($user_id, $full = FALSE)
 	{
-		self::$full_list = $full;
-
-		if ($user_id != self::$user_id)
+		if ($user_id != self::$user_id || $full != self::$full_list)
 			self::$cache = NULL;
+
+		self::$full_list = $full;
 		self::$user_id = intval($user_id);
 	}
 
@@ -27,9 +27,7 @@ class Account
 		self::$cache = array();
 
 		// find owner person
-		$resArr = $db->selectQ("*", "users", "id=".self::$user_id);
-		if (count($resArr) == 1)
-			self::$owner_id = intval($resArr[0]["owner_id"]);
+		self::$owner_id = User::getOwner(self::$user_id);
 
 		$condition = "user_id=".self::$user_id;
 		if (!self::$full_list && self::$owner_id != 0)
@@ -324,6 +322,29 @@ class Account
 	}
 
 
+	// Return name of account if owner is user or name of person else
+	public function getNameOrPerson($acc_id)
+	{
+		if (!is_numeric($acc_id))
+			return "";
+
+		$acc_id = intval($acc_id);
+		if (!$acc_id)
+			return "";
+
+		$acc_onwer = $this->getOwner($acc_id);
+		if (self::$owner_id == $acc_onwer)
+		{
+			return $this->getName($acc_id);
+		}
+		else
+		{
+			$pers = new Person(self::$user_id);
+			return $pers->getName($acc_onwer);
+		}
+	}
+
+
 	// Return HTML string of accounts for select control
 	public function getList($selected_id = 0)
 	{
@@ -376,7 +397,7 @@ class Account
 		$accounts = count(self::$cache);
 		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
 		{
-			$resStr .= "\t\t<tr><td><span>";
+			$resStr .= "\t\t<tr class=\"extra_row\"><td><span>";
 			if ($transfer)
 				$resStr .= "You need at least two accounts to transfer.";
 			else
@@ -385,12 +406,14 @@ class Account
 		}
 		else
 		{
-			$resStr .= "\t\t<tr><td><b>Name</b></td><td><b>Currency</b></td><td><b>Balance</b></td>";
+			$resStr .= "\t\t<tr class=\"even_row\"><td><b>Name</b></td><td><b>Currency</b></td><td><b>Balance</b></td>";
 			if ($editlink == TRUE)
 				$resStr .= "<td></td>";
 			$resStr .= "</tr>\r\n";
 
 			$totalArr = array();
+
+			$row_num = 1;
 			foreach(self::$cache as $acc_id => $row)
 			{
 				$balfmt = Currency::format($row["balance"], $row["curr_id"]);
@@ -401,23 +424,34 @@ class Account
 
 				$totalArr[$row["curr_id"]] += $row["balance"];
 
-				$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
+				$resStr .= "\t\t<tr";
+				if (($row_num % 2) == 0)
+					$resStr .= " class=\"even_row\"";
+				$resStr .= "><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
 				if ($editlink == TRUE)
-					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a></td>";
+					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a> <a href=\"./csvexport.php?id=".$acc_id."\">export to csv</a></td>";
 				$resStr .= "</tr>\r\n";
+
+				$row_num++;
 			}
 
-			$resStr .= "\t\t<tr style=\"background-color: transparent;\">";
+			$resStr .= "\t\t<tr class=\"extra_row\">";
 			$resStr .= "<td colspan=\"".(($editlink == TRUE) ? "4" : "3")."\" style=\"height: 10px;\"></td></tr>\r\n";
 
 			foreach($totalArr as $key => $value)
 			{
 				$valfmt = Currency::format($value, $key);
 				$currname = Currency::getName($key);
-				$resStr .= "\t\t<tr><td>Total</td><td>".$currname."</td><td class=\"sumcell\">".$valfmt."</td>";
+
+				$resStr .= "\t\t<tr";
+				if (($row_num % 2) == 0)
+					$resStr .= " class=\"even_row\"";
+				$resStr .= "><td>Total</td><td>".$currname."</td><td class=\"sumcell\">".$valfmt."</td>";
 				if ($editlink == TRUE)
 					$resStr .= "<td></td>";
 				$resStr .= "</tr>\r\n";
+
+				$row_num++;
 			}
 		}
 
