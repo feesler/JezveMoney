@@ -230,10 +230,13 @@
 	font-weight: bold;
 	text-decoration: none;
 	margin: 29px 0px 8px 15px;
-	padding: 6px 22px;
+	padding: 4px 22px;
 	border: 0 none;
 	background-color: #B0B0B0;
 	color: #FFFFFF;
+	line-height: 22px;
+	height: 22px;
+	display: inline-block;
 }
 
 .profile_common > div > div > .cancel_btn:hover
