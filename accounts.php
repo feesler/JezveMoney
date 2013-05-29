@@ -37,7 +37,7 @@
 	<div>
 		<div class="heading">
 			<h1>Accounts</h1>
-			<div id="add_btn" class="iconlink"><a href="./createaccount.php"><div class="add"></div><span>New</span></a></div>
+			<div id="add_btn" class="iconlink"><a href="./newaccount.php"><div class="add"></div><span>New</span></a></div>
 		</div>
 		<div class="tiles"><?php echo($acc->getTiles(TRUE)); ?></div>
 		<div class="control_icons">

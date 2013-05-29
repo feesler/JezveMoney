@@ -232,3 +232,74 @@ function onTileClick(acc_id)
 	show(edit_btn, (accounts.selectedCount() == 1));
 	show(del_btn, (accounts.selectedCount() > 0));
 }
+
+
+// Retunr sign of specified currency
+function getCurrencySign(curr_id)
+{
+	var currSign = '';
+
+	if (!currency)
+		return currSign;
+
+	currency.some(function(curr)
+	{
+		if (curr[0] == curr_id)
+			currSign = curr[2];
+
+		return (curr[0] == curr_id);
+	});
+
+	return currSign;
+}
+
+
+// Set currency sign
+function setSign(signobj, curr_id)
+{
+	if (!signobj)
+		return;
+
+	signobj.innerHTML = getCurrencySign(curr_id);
+}
+
+
+// Currency change event handler
+function onChangeAccountCurrency(obj)
+{
+	var currsign, curr_id;
+
+	currsign = ge('currsign');
+	if (!obj || !currsign)
+		return;
+
+	curr_id = selectedValue(obj);
+
+	setSign(currsign, curr_id);
+}
+
+
+// New account submit event handler
+function onNewAccountSubmit(frm)
+{
+	var accname, balance;
+
+	accname = ge('accname');
+	balance = ge('balance');
+	if (!frm || !accname || !balance)
+		return false;
+
+	if (!accname.value || accname.value.length < 1)
+	{
+		alert('Please type name of account.');
+		return false;
+	}
+
+	if (!balance.value || balance.value.length < 1 || !isNum(balance.value))
+	{
+		alert('Please type correct initial balance.');
+		return false;
+	}
+
+	return true;
+}

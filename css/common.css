@@ -327,3 +327,30 @@ input[type="text"], input[type="password"], select
 	clear: both;
 	margin: 5px 0px;
 }
+
+
+.summ_text
+{
+	text-align: right;
+}
+
+
+.curr_sign
+{
+	margin: 0px 5px;
+}
+
+
+.acc_content
+{
+	margin-top: 55px;
+	z-index: 1;
+}
+
+
+.acc_content > div
+{
+}
+
+
+

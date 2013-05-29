@@ -80,9 +80,8 @@
 
 .rdiv
 {
-	width: 100%;
-	min-width: 240px;
 	height: 50px;
+	overflow: hidden;
 }
 
 
@@ -98,6 +97,19 @@
 	width: 100%;
 	height: 26px;
 	margin: 0;
+}
+
+
+.rtext
+{
+	float: right;
+}
+
+
+.rtext > span
+{
+	line-height: 50px;
+	height: 50px;
 }
 
 
