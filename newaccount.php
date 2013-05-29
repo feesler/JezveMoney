@@ -45,7 +45,7 @@
 			<div class="rdiv"><div><input id="accname" name="accname" type="text"></div></div>
 			<label for="currency">Currency</label>
 			<div class="rdiv">
-				<div style="padding: 8px 70px 10px 5px;">
+				<div>
 					<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
 <?php
 	setTab(6);
