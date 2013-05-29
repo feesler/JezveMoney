@@ -15,12 +15,12 @@
 	if (!$userid)
 		setLocation("../login.php");
 
-	if (!isset($_POST["accid"]) || !isset($_POST["accname"]) || !isset($_POST["acccurr"]) || !isset($_POST["initbal"]))
+	if (!isset($_POST["accid"]) || !isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]))
 		fail();
 
 	$acc = new Account($userid);
 
-	if (!$acc->edit($_POST["accid"], $_POST["accname"], $_POST["initbal"], $_POST["acccurr"]))
+	if (!$acc->edit($_POST["accid"], $_POST["accname"], $_POST["balance"], $_POST["currency"]))
 		fail();
 
 	setLocation("../accounts.php?edit=ok");

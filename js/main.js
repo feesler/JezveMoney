@@ -231,6 +231,12 @@ function onTileClick(acc_id)
 
 	show(edit_btn, (accounts.selectedCount() == 1));
 	show(del_btn, (accounts.selectedCount() > 0));
+
+	if (accounts.selectedCount() == 1)
+	{
+		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			edit_btn.firstElementChild.href = './editaccount.php?id=' + accounts.selectedArr[0];
+	}
 }
 
 
