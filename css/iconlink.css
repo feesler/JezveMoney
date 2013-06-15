@@ -54,7 +54,7 @@
 .iconlink > button
 {
 	height: 32px;
-	border: none 0px;
+	border: 0 none;
 	cursor: pointer;
 	padding: 0;
 	background: none;
