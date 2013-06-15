@@ -437,3 +437,31 @@ input[type="text"], input[type="password"], select
 	vertical-align: middle;
 }
 
+
+.ok_btn,
+.ok_btn:visited
+{
+	background-color: #0072C6;
+}
+
+
+.ok_btn:hover
+{
+	background-color: #1E82CC;
+}
+
+
+.cancel_btn,
+.cancel_btn:visited
+{
+	background-color: #B0B0B0;
+}
+
+
+.cancel_btn:hover
+{
+	background-color: #C0C0C0;
+}
+
+
+
