@@ -42,6 +42,8 @@ a:hover
 
 
 /* Input controls */
+
+/*
 input[type="button"], input[type="submit"], button
 {
 	font-weight: bold;
@@ -111,6 +113,7 @@ input[type="text"], input[type="password"], select
 	background-color: #FFFFFF;
 	color: #000000;
 }
+*/
 
 
 /* header */

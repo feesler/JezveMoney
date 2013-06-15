@@ -1,4 +1,4 @@
-/* layered layout */
+﻿/* layered layout */
 .page
 {
 	position: absolute;
@@ -113,6 +113,7 @@
 }
 
 
+/*
 .box > div > .ok_btn
 {
 	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
@@ -128,6 +129,7 @@
 {
 	background-color: #1E82CC;
 }
+*/
 
 
 /* alternative link */
@@ -206,6 +208,7 @@
 }
 
 
+/*
 .profile_common > div > div > .ok_btn
 {
 	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
@@ -243,3 +246,4 @@
 {
 	background-color: #C0C0C0;
 }
+*/
