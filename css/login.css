@@ -119,25 +119,6 @@
 }
 
 
-/*
-.box > div > .ok_btn
-{
-	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
-	margin: 29px 0px 8px 5px;
-	padding: 4px 22px;
-	border: 0 none;
-	background-color: #0072C6;
-	color: #FFFFFF;
-}
-
-
-.box > div > .ok_btn:hover
-{
-	background-color: #1E82CC;
-}
-*/
-
-
 /* alternative link */
 .alter_link
 {
@@ -218,43 +199,3 @@
 {
 	padding: 5px;
 }
-
-/*
-.profile_common > div > div > .ok_btn
-{
-	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
-	margin: 29px 0px 8px 5px;
-	padding: 4px 22px;
-	border: 0 none;
-	background-color: #0072C6;
-	color: #FFFFFF;
-}
-
-
-.profile_common > div > div > .ok_btn:hover
-{
-	background-color: #1E82CC;
-}
-
-
-.profile_common > div > div > .cancel_btn
-{
-	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
-	font-size: 13px;
-	font-weight: bold;
-	text-decoration: none;
-	margin: 29px 0px 8px 15px;
-	padding: 4px 22px;
-	border: 0 none;
-	background-color: #B0B0B0;
-	color: #FFFFFF;
-	line-height: 22px;
-	height: 22px;
-	display: inline-block;
-}
-
-.profile_common > div > div > .cancel_btn:hover
-{
-	background-color: #C0C0C0;
-}
-*/

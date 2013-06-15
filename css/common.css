@@ -42,19 +42,6 @@ a:hover
 
 
 /* Input controls */
-
-/*
-input[type="button"], input[type="submit"], button
-{
-	font-weight: bold;
-	cursor: pointer;
-	text-transform: lowercase;
-	padding: 2px 20px;
-	height: 30px;
-}
-*/
-
-
 input[type="text"], input[type="password"]
 {
 	font-size: 16px;
@@ -73,41 +60,6 @@ select
 	margin: 0;
 }
 
-
-/*
-input[type="button"], input[type="submit"], button
-{
-	border: 2px solid #000000;
-	background-color: #FFFFFF;
-	color: #000000;
-}
-
-
-input[type="button"]:hover, input[type="submit"]:hover, button:hover,
-input[type="button"]:active, input[type="submit"]:active, button:active
-{
-	background-color: #000000;
-	color: #FFFFFF;
-}
-
-
-input[type="button"]:disabled, input[type="submit"]:disabled, button:disabled
-{
-	border: 2px solid #808080;
-	background-color: #FFFFFF;
-	color: #808080;
-}
-
-
-input[type="button"]:disabled:hover, input[type="submit"]:disabled:hover, button:disabled:hover,
-input[type="button"]:disabled:active, input[type="submit"]:disabled:active, button:disabled:active,
-input[type="button"]:disabled:focus, input[type="submit"]:disabled:focus, button:disabled:focus
-{
-	border: 2px solid #808080;
-	background-color: #FFFFFF;
-	color: #808080;
-}
-*/
 
 input[type="text"], input[type="password"], select
 {
@@ -164,7 +116,6 @@ button::-moz-focus-inner
 .header > div > a > span,
 .header > div > button > span
 {
-/*	border: 1px solid red; */
 	line-height: 50px;
 	color: #FFFFFF;
 	white-space: nowrap;
@@ -449,11 +400,9 @@ button::-moz-focus-inner
 	display: inline-block;
 	color: #FFFFFF;
 	text-decoration: none;
-
 	border: 0 none;
 	padding: 4px 22px;
 	margin-right: 15px;
-
 	vertical-align: middle;
 }
 
