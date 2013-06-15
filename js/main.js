@@ -30,38 +30,22 @@ function setEmptyClick(callback, elem)
 // Hide usem menu popup
 function hidePopup()
 {
-	var e, userbtn;
-
-	e = event;
-
-	userbtn = ge('userbtn');
-	if (!userbtn)
-		return;
-
-	if (e.target != userbtn && e.target.parentNode != userbtn)
-	{
-		show(menupopup, false);
-		document.documentElement.onclick = null;
-	}
+	show('menupopup', false);
+	setEmptyClick();
 }
 
 
 // Show/hide user menu by click
 function onUserClick()
 {
-	var menupopup, popupVisible;
-
-	menupopup = ge('menupopup');
-	if (!menupopup)
-		return;
-
-	popupVisible = isVisible(menupopup);
-
-	show(menupopup, !popupVisible);
-
-	if (document.documentElement)
+	if (isVisible('menupopup'))
 	{
-		document.documentElement.onclick = (popupVisible) ? null : hidePopup;
+		hidePopup();
+	}
+	else
+	{
+		show('menupopup', true);
+		setEmptyClick(hidePopup, 'userbtn');
 	}
 }
 
