@@ -1,4 +1,33 @@
-﻿// Hide usem menu popup
+﻿// Handler for click on empty space event
+function onEmptyClick(callback, elem)
+{
+	var e, elem;
+
+	callback = callback || null;
+	if (!callback)
+		return;
+	e = event;
+	elem = ge(elem) || null;
+
+	if ((elem && (e.target != elem && e.target.parentNode != elem)) || !elem)
+		callback();
+}
+
+
+// Set or unset event handler for 
+function setEmptyClick(callback, elem)
+{
+	callback = callback || null;
+	elem = elem || null;
+
+	if (document.documentElement)
+	{
+		document.documentElement.onclick = ((callback) ? bind(onEmptyClick, null, callback, elem) : null);
+	}
+}
+
+
+// Hide usem menu popup
 function hidePopup()
 {
 	var e, userbtn;
