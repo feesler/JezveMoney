@@ -25,8 +25,10 @@
 	html(getCSS("common.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("popup.css"));
 	html(getJS("common.js"));
 	html(getJS("main.js"));
+	html(getJS("popup.js"));
 ?>
 </head>
 <body>
