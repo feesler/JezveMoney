@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -98,7 +98,7 @@
 			<div class="rdiv"><div><input id="oldpwd" name="oldpwd" type="password"></div></div>
 			<label for="newpwd">New password</label>
 			<div class="rdiv"><div><input id="newpwd" name="newpwd" type="password"></div></div>
-			<div><input class="ok_btn" type="submit" value="ok"><a class="cancel_btn" href="./profile.php">cancel</a></div>
+			<div class="profile_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./profile.php">cancel</a></div>
 		</div>
 	</div>
 	</form>
@@ -113,7 +113,7 @@
 		<div>
 			<label for="newpwd">New name</label>
 			<div class="rdiv"><div><input id="newname" name="newname" type="text"></div></div>
-			<div><input class="ok_btn" type="submit" value="ok"><a class="cancel_btn" href="./profile.php">cancel</a></div>
+			<div class="profile_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./profile.php">cancel</a></div>
 		</div>
 	</div>
 	</form>

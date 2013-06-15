@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/currency.php");
@@ -37,7 +37,7 @@
 			<div class="rdiv"><div><input id="login" name="login" type="text"></div></div>
 			<label for="password">Password</label>
 			<div class="rdiv"><div><input id="password" name="password" type="password"></div></div>
-			<div><input class="ok_btn" type="submit" value="Log in"><span class="alter_link"><a href="./register.php">Register</a></span></div>
+			<div class="login_controls"><input class="btn ok_btn" type="submit" value="Log in"><span class="alter_link"><a href="./register.php">Register</a></span></div>
 		</div>
 	</div>
 </div>

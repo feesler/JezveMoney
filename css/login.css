@@ -43,6 +43,12 @@
 }
 
 
+.login_controls
+{
+	padding: 5px;
+}
+
+
 /* registration page */
 .register_page
 {
@@ -207,6 +213,11 @@
 	padding: 0px 5px;
 }
 
+
+.profile_controls
+{
+	padding: 5px;
+}
 
 /*
 .profile_common > div > div > .ok_btn

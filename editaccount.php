@@ -80,7 +80,7 @@
 					</div>
 				</div>
 			</div>
-			<div><input class="ok_btn" type="submit" value="ok"><a class="cancel_btn" href="./accounts.php">cancel</a></div>
+			<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
 		</div>
 	</div>
 </div>
