@@ -1,4 +1,4 @@
-// Hide usem menu popup
+﻿// Hide usem menu popup
 function hidePopup()
 {
 	var e, userbtn;
@@ -308,4 +308,33 @@ function onNewAccountSubmit(frm)
 	}
 
 	return true;
+}
+
+
+// Create popup DOM structure and return object
+function createPopup(p_id, title, msg)
+{
+	var popup;
+
+	popup = ce('div', { id : p_id, className : 'popup' },
+					[
+						ce('div', { className : 'popup_back' }),
+						ce('div', { className : 'popup_content' }, 
+							[
+								ce('div', { className : 'box' },
+									[
+										ce('h1', { className : 'popup_title', innerHTML : title }),
+										ce('div', { className : 'popup_message' }, [ ce('div', { innerHTML : msg }) ]),
+										ce('div', { className : 'popup_controls' }, 
+											[
+												ce('input', { className : 'btn ok_btn', type : 'submit', value : 'ok' }),
+												ce('button', { className : 'btn cancel_btn', onclick : hidePopupBox, innerHTML : 'cancel' })
+											]),
+									])
+							])
+					]);
+
+	show(popup, false);
+
+	return popup;
 }
