@@ -324,12 +324,48 @@ function onNewAccountSubmit(frm)
 }
 
 
+// Create and show delete warning popup box
+function showPopupBox()
+{
+	var popup;
+
+	popup = createPopup('delete_warning', 'Delete account', 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.');
+
+	if (!popup)
+		return;
+
+	document.body.appendChild(popup);
+	popup = ge('delete_warning');
+		
+
+
+	document.body.style.overflow = 'hidden';
+	document.documentElement.scrollTop = 0;
+	show(popup, true);
+}
+
+
+// Close delete warning popup box
+function hidePopupBox()
+{
+	var popup;
+
+	popup = ge('delete_warning');
+	if (!popup)
+		return;
+
+	show(popup, false);
+	document.body.style.overflow = '';
+	popup.parentNode.removeChild(popup);
+}
+
+
 // Create popup DOM structure and return object
 function createPopup(p_id, title, msg)
 {
 	var popup;
 
-	popup = ce('div', { id : p_id, className : 'popup' },
+	popup = ce('div', { id : p_id, className : 'popup', style : { display : 'none' } },
 					[
 						ce('div', { className : 'popup_back' }),
 						ce('div', { className : 'popup_content' }, 
@@ -346,8 +382,6 @@ function createPopup(p_id, title, msg)
 									])
 							])
 					]);
-
-	show(popup, false);
 
 	return popup;
 }

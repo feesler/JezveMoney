@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -42,7 +42,7 @@
 		<div class="tiles"><?php echo($acc->getTiles(TRUE)); ?></div>
 		<div class="control_icons">
 			<div id="edit_btn" class="iconlink" style="display: none;"><a href="#"><div class="edit"></div><span>Edit</span></a></div>
-			<div id="del_btn" class="iconlink" style="display: none;"><a href="#"><div class="del"></div><span>Delete</span></a></div>
+			<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showPopupBox();"><div class="del"></div><span>Delete</span></button></div>
 		</div>
 	</div>
 </div>
