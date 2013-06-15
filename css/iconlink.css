@@ -1,4 +1,4 @@
-/* icon link */
+﻿/* icon link */
 .iconlink
 {
 	display: inline-block;
@@ -30,6 +30,10 @@
 	float: left;
 	white-space: nowrap;
 	line-height: 32px;
+	font-size: 16px;
+	font-weight: normal;
+	text-decoration: none;
+	text-transform: none;
 }
 
 
