@@ -1,4 +1,4 @@
-// Return DOM element by id
+﻿// Return DOM element by id
 function ge(a)
 {
 	return (typeof a == 'string') ? document.getElementById(a) : a;
@@ -31,6 +31,18 @@ function setParam(obj, params)
 }
 
 
+// Append elements from array to object
+function addChilds(obj, childs)
+{
+	if (!obj || !childs || !isArray(childs))
+		return;
+
+	childs.forEach(function(child){
+		obj.appendChild(child);
+	});
+}
+
+
 // Create specified DOM element and set parameters if specified
 function ce(tagName, params, childs)
 {
@@ -44,13 +56,7 @@ function ce(tagName, params, childs)
 		return null;
 
 	setParam(obj, params);
-
-	if (isArray(childs))
-	{
-		childs.forEach(function(child){
-			obj.appendChild(child);
-		});
-	}
+	addChilds(obj, childs);
 
 	return obj;
 }
