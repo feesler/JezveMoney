@@ -17,7 +17,7 @@ function setParam(obj, params)
 {
 	var par, val;
 
-	if (!obj || !params)
+	if (!obj || !params || typeof params !== 'object')
 		return;
 
 	for(par in params)
@@ -38,7 +38,8 @@ function addChilds(obj, childs)
 		return;
 
 	childs.forEach(function(child){
-		obj.appendChild(child);
+		if (child)
+			obj.appendChild(child);
 	});
 }
 
