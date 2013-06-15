@@ -27,8 +27,8 @@
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
-	html(getJS("main.js"));
 	html(getJS("popup.js"));
+	html(getJS("main.js"));
 ?>
 </head>
 <body>
@@ -44,7 +44,7 @@
 		<div class="tiles"><?php echo($acc->getTiles(TRUE)); ?></div>
 		<div class="control_icons">
 			<div id="edit_btn" class="iconlink" style="display: none;"><a href="#"><div class="edit"></div><span>Edit</span></a></div>
-			<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showPopupBox();"><div class="del"></div><span>Delete</span></button></div>
+			<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showDeletePopup();"><div class="del"></div><span>Delete</span></button></div>
 		</div>
 	</div>
 </div>
