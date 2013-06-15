@@ -116,6 +116,21 @@ input[type="text"], input[type="password"], select
 */
 
 
+/* Firefox fix */
+button::-moz-focus-inner
+{
+	padding:0;
+	border:0;
+}
+
+
+/* WebKit focus fix */
+*:focus
+{
+	outline: none;
+}
+
+
 /* header */
 .header
 {
