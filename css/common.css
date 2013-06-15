@@ -417,3 +417,23 @@ input[type="text"], input[type="password"], select
 
 
 
+/* buttons */
+.btn,
+.btn:visited
+{
+	font-family: "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
+	font-weight: normal;
+	font-size: 16px;
+
+	float: left;
+	display: inline-block;
+	color: #FFFFFF;
+	text-decoration: none;
+
+	border: 0 none;
+	padding: 4px 22px;
+	margin-right: 15px;
+
+	vertical-align: middle;
+}
+
