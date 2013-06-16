@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -66,6 +66,8 @@
 	ebr("<style>");
 	ebr("table{border-collapse:collapse;}");
 	ebr("td{ padding: 2px 5px; border:1px solid #000000; }");
+	ebr(".id_cell{ background-color: #D0D0D0; }");
+	ebr(".id_cell > a{ text-decoration: none; }");
 	ebr("input[type=\"button\"]{ border: 0 none; padding: 2px 5px; }");
 	ebr(".sum_cell{ text-align: right; }");
 	ebr(".act_sum{ background-color: #B0FFB0; }");
@@ -212,7 +214,7 @@
 		echo("<tr><td");
 		if ($checkAccount_id == 0 && $tr_type == 3)
 			echo(" rowspan=\"2\"");
-		echo(" style=\"background-color: #D0D0D0;\"><a href=\"./edittransaction.php?id=".$tr_id."\" target=\"_blank\">".$tr_id."</a></td>");
+		echo(" class=\"id_cell\"><a href=\"./edittransaction.php?id=".$tr_id."\" target=\"_blank\">".$tr_id."</a></td>");
 
 		if ($tr_type == 1)				// expense
 		{
