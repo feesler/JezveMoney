@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -41,6 +41,10 @@
 		if ($check_id != 0)
 			setLocation("../newdebt.php?act=fail&detail=person");
 		$person_id = $pers->create($person_name);
+	}
+	else if (!$pers->is_exist($person_id))
+	{
+		fail();
 	}
 
 	$debt = new Debt($userid);
