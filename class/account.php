@@ -464,7 +464,7 @@ class Account
 					$resStr .= " class=\"even_row\"";
 				$resStr .= "><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
 				if ($editlink == TRUE)
-					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a> <a href=\"./csvexport.php?id=".$acc_id."\">export to csv</a></td>";
+					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a> <a href=\"./csvexport.php?id=".$acc_id."\">export to csv</a> <a href=\"./delaccount.php?id=".$acc_id."\">delete</a></td>";
 				$resStr .= "</tr>\r\n";
 
 				$row_num++;
