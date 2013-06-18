@@ -280,8 +280,21 @@ class Transaction
 		if (!$trans_curr_id)
 			return FALSE;
 
-		$fieldsArr = array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment");
-		$valuesArr = array($src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment);
+		// check date is changed
+		$orig_date = getdate($this->getDate($trans_id));
+		$target_date = getdate(strtotime($trans_date));
+
+		if (mktime(0, 0, 0, $orig_date["mon"], $orig_date["mday"], $orig_date["year"]) != mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]))
+		{
+			$tr_pos = 0;
+		}
+		else
+		{
+			$tr_pos = $this->getPos($trans_id);
+		}
+
+		$fieldsArr = array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos");
+		$valuesArr = array($src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment, $tr_pos);
 
 		if (!$db->updateQ("transactions", $fieldsArr, $valuesArr, "id=".$trans_id))
 			return FALSE;
@@ -300,6 +313,14 @@ class Transaction
 			$destBalance += (($trans_type == 2) ? $charge : $amount);
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
+		}
+
+		// update position of transaction if target date is not today
+		if ($tr_pos == 0)
+		{
+			$latest_pos = $this->getLatestPos($trans_date);
+
+			$this->updatePos($trans_id, $latest_pos + 1);
 		}
 
 		return TRUE;
@@ -410,6 +431,36 @@ class Transaction
 			return 0;
 
 		return intval($resArr[0]["pos"]);
+	}
+
+
+	// Remove specified account from transactions
+	public function onAccountDelete($acc_id)
+	{
+		global $db;
+
+		if (!self::$user_id)
+			return FALSE;
+
+		$condition = "user_id=".self::$user_id;
+
+		// delete expenses and incomes
+		if (!$db->deleteQ("transactions", $condition." AND ((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))"))
+			return FALSE;
+
+		// delete debts
+		if (!$db->deleteQ("transactions", $condition." AND (src_id=".$acc_id." OR dest_id=".$acc_id.") AND type=4"))
+			return FALSE;
+
+		// set transfer from as income to destination account
+		if (!$db->updateQ("transactions", array("src_id", "type"), array(0, 2), $condition." AND src_id=".$acc_id." AND type=3"))
+			return FALSE;
+
+		// set transfer to as expense from source account
+		if (!$db->updateQ("transactions", array("dest_id", "type"), array(0, 1), $condition." AND dest_id=".$acc_id." AND type=3"))
+			return FALSE;
+
+		return TRUE;
 	}
 
 

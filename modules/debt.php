@@ -42,6 +42,10 @@
 			setLocation("../newdebt.php?act=fail&detail=person");
 		$person_id = $pers->create($person_name);
 	}
+	else if (!$pers->is_exist($person_id))
+	{
+		fail();
+	}
 
 	$debt = new Debt($userid);
 	if (!$debt->create($debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))

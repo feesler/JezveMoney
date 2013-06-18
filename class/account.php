@@ -180,6 +180,41 @@ class Account
 	}
 
 
+	// Delete account
+	public function del($acc_id)
+	{
+		global $db;
+
+		if (!$acc_id || !is_numeric($acc_id))
+			return FALSE;
+
+		$acc_id = intval($acc_id);
+
+		// check account is exist
+		if (!$this->is_exist($acc_id))
+			return FALSE;
+
+		// check user of account
+		if ($this->getUser($acc_id) != self::$user_id)
+			return FALSE;
+
+		$trans = new Transaction(self::$user_id);
+		if (!$trans->onAccountDelete($acc_id))
+		{
+			wlog("trans->onAccountDelete(".$acc_id.") return FALSE");
+			return FALSE;
+		}
+
+		// delete account
+		if (!$db->deleteQ("accounts", "user_id=".self::$user_id." AND id=".$acc_id))
+			return FALSE;
+
+		self::updateCache();
+
+		return TRUE;
+	}
+
+
 	// Set new value of account
 	private function setValue($acc_id, $field, $newValue)
 	{
@@ -429,7 +464,7 @@ class Account
 					$resStr .= " class=\"even_row\"";
 				$resStr .= "><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
 				if ($editlink == TRUE)
-					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a> <a href=\"./csvexport.php?id=".$acc_id."\">export to csv</a></td>";
+					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a> <a href=\"./csvexport.php?id=".$acc_id."\">export to csv</a> <a href=\"./delaccount.php?id=".$acc_id."\">delete</a></td>";
 				$resStr .= "</tr>\r\n";
 
 				$row_num++;
