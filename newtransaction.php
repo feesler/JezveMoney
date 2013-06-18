@@ -104,14 +104,14 @@
 	setTab(1);
 	html("<tr>");
 	html("<td>");
-	echo($acc->getTable());
+	echo($acc->getTable(($trans_type == 3)));
 	html("</td>");
 	html("</tr>");
 
 	html();
 
 	$accounts = $acc->getCount();
-	if ($accounts > 0)
+	if (($trans_type != 3 && $accounts > 0) || ($trans_type == 3 && $accounts > 1))
 	{
 		setTab(1);
 
