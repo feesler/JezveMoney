@@ -48,8 +48,8 @@
 		</div>
 	</div>
 </div>
-<div class="footer">
-	<div id="edit_btn" class="iconlink" style="display: none;"><a href="#"><div class="edit"></div><span>Edit</span></a></div>
-</div>
+<form id="delfrom" method="post" action="./modules/delaccount.php">
+<input id="delaccounts" name="accounts" type="hidden" value="">
+</form>
 </body>
 </html>

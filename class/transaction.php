@@ -434,6 +434,36 @@ class Transaction
 	}
 
 
+	// Remove specified account from transactions
+	public function onAccountDelete($acc_id)
+	{
+		global $db;
+
+		if (!self::$user_id)
+			return FALSE;
+
+		$condition = "user_id=".self::$user_id;
+
+		// delete expenses and incomes
+		if (!$db->deleteQ("transactions", $condition." AND ((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))"))
+			return FALSE;
+
+		// delete debts
+		if (!$db->deleteQ("transactions", $condition." AND (src_id=".$acc_id." OR dest_id=".$acc_id.") AND type=4"))
+			return FALSE;
+
+		// set transfer from as income to destination account
+		if (!$db->updateQ("transactions", array("src_id", "type"), array(0, 2), $condition." AND src_id=".$acc_id." AND type=3"))
+			return FALSE;
+
+		// set transfer to as expense from source account
+		if (!$db->updateQ("transactions", array("dest_id", "type"), array(0, 1), $condition." AND dest_id=".$acc_id." AND type=3"))
+			return FALSE;
+
+		return TRUE;
+	}
+
+
 	// Return link to specified page
 	private function getPageLink($trans_type, $acc_id, $page_num, $is_active)
 	{
