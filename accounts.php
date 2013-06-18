@@ -48,5 +48,8 @@
 		</div>
 	</div>
 </div>
+<form id="delfrom" method="post" action="./modules/delaccount.php">
+<input id="delaccounts" name="accounts" type="hidden" value="">
+</form>
 </body>
 </html>

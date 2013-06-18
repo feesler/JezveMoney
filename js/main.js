@@ -219,13 +219,14 @@ var accounts =
 // Tile click event handler
 function onTileClick(acc_id)
 {
-	var tile, edit_btn, del_btn;
+	var tile, edit_btn, del_btn, delaccounts;
 	var actDiv;
 
 	tile = ge('acc_' + acc_id);
 	edit_btn = ge('edit_btn');
 	del_btn = ge('del_btn');
-	if (!tile || !edit_btn)
+	delaccounts = ge('delaccounts');
+	if (!tile || !edit_btn || !delaccounts)
 		return;
 
 	if (accounts.isSelected(acc_id))
@@ -247,6 +248,8 @@ function onTileClick(acc_id)
 
 	show(edit_btn, (accounts.selectedCount() == 1));
 	show(del_btn, (accounts.selectedCount() > 0));
+
+	delaccounts.value = accounts.selectedArr.join();
 
 	if (accounts.selectedCount() == 1)
 	{
@@ -327,17 +330,49 @@ function onNewAccountSubmit(frm)
 }
 
 
+var multiAccDeleteMsg = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
+var singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
+
+
+// Delete popup callback
+function onDeletePopup(res)
+{
+	var delfrom;
+
+	if (!dwPopup)
+		return;
+
+	dwPopup.close();
+	dwPopup = null;
+
+	if (res)
+	{
+		delfrom = ge('delfrom');
+		if (delfrom)
+			delfrom.submit();
+	}
+}
+
+
 // Create and show account delete warning popup
 function showDeletePopup()
 {
+	if (accounts.selectedCount() == 0)
+		return;
+
+	// check popup already created
+	if (dwPopup)
+		return;
+
 	dwPopup = new Popup();
 	if (!dwPopup)
 		return;
 
 	if (!dwPopup.create({ id : 'delete_warning',
 						title : 'Delete account',
-						msg : 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.',
-						btn : { okBtn : { type : 'submit' }, cancelBtn : { } }
+						msg : (accounts.selectedCount() > 1) ? multiAccDeleteMsg : singleAccDeleteMsg,
+						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
+								cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
 						}))
 	{
 		dwPopup = null;
