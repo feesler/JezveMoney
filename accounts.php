@@ -41,7 +41,7 @@
 
 		if ($_GET["newacc"] == "ok")
 			echo("<span style=\"color: #20FF20;\">Account added.</span>");
-		else if ($_GET["newacc"] == fail)
+		else if ($_GET["newacc"] == "fail")
 			echo("<span style=\"color: #FF2020;\">Fail to add account.</span>");
 		echo("</td></tr>");
 	}
@@ -51,7 +51,7 @@
 
 		if ($_GET["edit"] == "ok")
 			echo("<span style=\"color: #20FF20;\">Account data saved.</span>");
-		else if ($_GET["edit"] == fail)
+		else if ($_GET["edit"] == "fail")
 			echo("<span style=\"color: #FF2020;\">Fail to edit account.</span>");
 		echo("</td></tr>");
 	}
@@ -59,6 +59,16 @@
 	{
 		echo("<tr><td style=\"padding-left: 50px;\">");
 		echo("<span style=\"color: #20FF20;\">Accounts is successfully reseted.</span>");
+		echo("</td></tr>");
+	}
+	else if (isset($_GET["del"]))
+	{
+		echo("<tr><td style=\"padding-left: 50px;\">");
+
+		if ($_GET["del"] == "ok")
+			echo("<span style=\"color: #20FF20;\">Account deleted.</span>");
+		else if ($_GET["del"] == "fail")
+			echo("<span style=\"color: #FF2020;\">Fail to delete account.</span>");
 		echo("</td></tr>");
 	}
 ?>
