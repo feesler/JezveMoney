@@ -571,7 +571,7 @@ class Transaction
 		if ($acc_id != 0)
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
 
-		$orderAndLimit = "date ASC";
+		$orderAndLimit = "pos ASC";
 		if ($tr_on_page > 0)
 		{
 			$transCount = $db->countQ("transactions", $condition);
