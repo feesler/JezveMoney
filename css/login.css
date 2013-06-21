@@ -186,12 +186,13 @@
 }
 
 
-.profile_common > div > label
+.profile_common label
 {
 	width: 150px;
 	height: 20px;
 	line-height: 20px;
 	padding: 0px 5px;
+	font-size: 14px;
 }
 
 
