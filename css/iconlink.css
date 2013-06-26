@@ -97,3 +97,14 @@
 	background-position: -64px -32px;
 }
 
+
+.iconlink div.calendar
+{
+	background-position: -96px 0px;
+}
+
+
+.iconlink > *:hover > div.calendar
+{
+	background-position: -96px -32px;
+}
