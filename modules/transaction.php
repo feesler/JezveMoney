@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -22,8 +22,8 @@
 	if (!$trans_type)
 		fail();
 
-	$src_id = (isset($_POST["srcid"])) ? intval($_POST["srcid"]) : 0;
-	$dest_id = (isset($_POST["destid"])) ? intval($_POST["destid"]) : 0;
+	$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
+	$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
 	$amount = floatval($_POST["amount"]);
 	$charge = floatval($_POST["charge"]);
 	$transcurr = (isset($_POST["transcurr"])) ? intval($_POST["transcurr"]) : 0;

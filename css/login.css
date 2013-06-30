@@ -98,10 +98,12 @@
 }
 
 
-.rdiv > div > input
+.rdiv > div > input,
+.rdiv > div > span
 {
 	width: 100%;
 	height: 26px;
+	line-height: 26px;
 	margin: 0;
 }
 

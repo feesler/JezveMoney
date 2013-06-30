@@ -312,6 +312,36 @@ button::-moz-focus-inner
 }
 
 
+.rdiv > .currency_block
+{
+	padding: 8px 5px 10px 5px;
+}
+
+
+.rdiv > .balance_block
+{
+	text-align: right;
+	padding: 10px 7px;
+	height: 26px;
+}
+
+
+.rdiv > .balance_block > div
+{
+	padding: 2px 5px;
+	height: 26px;
+	border: 1px dashed #0072C6;
+	cursor: pointer;
+}
+
+
+.rdiv > .balance_block > div > span
+{
+	height: 26px;
+	line-height: 26px;
+}
+
+
 .acc_content
 {
 	margin-top: 55px;
@@ -373,4 +403,24 @@ button::-moz-focus-inner
 }
 
 
+/* sub menu header */
+.subHeader
+{
+	margin: 10px 5px;
+	font-size: 16px;
+}
+
+
+.subHeader > span
+{
+	padding: 0 20px 0 0;
+}
+
+
+/* transaction */
+.cal_btn
+{
+	border: 2px solid #000000;
+	background-color: #FFFFFF;
+}
 

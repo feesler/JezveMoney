@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class Account
 {
@@ -535,7 +535,7 @@ class Account
 			return $resStr;
 
 		$resStr .= "<div class=\"tile\">";
-		$resStr .= "<a href=\"#\" class=\"tilelink\">";
+		$resStr .= "<a href=\"./newtransaction.php?acc_id=".$acc_id."\" class=\"tilelink\">";
 		$resStr .= "<div>";
 
 		$acc_curr = $this->getCurrency($acc_id);
