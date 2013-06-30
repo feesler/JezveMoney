@@ -357,6 +357,7 @@ button::-moz-focus-inner
 .acc_controls
 {
 	padding: 5px;
+	clear: both;
 }
 
 
