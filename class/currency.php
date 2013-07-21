@@ -83,9 +83,9 @@ class Currency
 
 		$curr_name = $db->escape($curr_name);
 		$curr_sign = $db->escape($curr_sign);
-		$curr_format = $db->escape($curr_format);
+		$curr_format = intval($curr_format);
 
-		if (!$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "" || !$curr_format || $curr_format == "")
+		if (!$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
 			return 0;
 
 		if (!$db->insertQ("currency", array("id", "name", "sign", "format"),
@@ -106,9 +106,9 @@ class Currency
 		$curr_id = intval($curr_id);
 		$curr_name = $db->escape($curr_name);
 		$curr_sign = $db->escape($curr_sign);
-		$curr_format = $db->escape($curr_format);
+		$curr_format = intval($curr_format);
 
-		if (!$curr_id || !$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "" || !$curr_format || $curr_format == "")
+		if (!$curr_id || !$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
 			return FALSE;
 
 		if (!self::is_exist($curr_id))
@@ -191,8 +191,10 @@ class Currency
 	public static function format($value, $curr_id)
 	{
 		$fmt = self::getFormat($curr_id);
+		$sign = self::getSign($curr_id);
 
-		return valFormat((is_null($fmt) ? "" : $fmt), $value);
+		$sfmt = (($fmt) ? ($sign." %s") : ("%s ".$sign));
+		return valFormat($sfmt, $value);
 	}
 
 

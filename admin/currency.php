@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -58,7 +58,7 @@ function setCurrencyValues(currObj)
 		del_curr_id.value = currObj[0];
 		curr_name.value = currObj[1];
 		curr_sign.value = currObj[2];
-		curr_format.value = currObj[3];
+		curr_format.checked = (currObj[3] == 1);
 	}
 	else			// clean
 	{
@@ -66,7 +66,7 @@ function setCurrencyValues(currObj)
 		curr_id.value = '';
 		curr_name.value = '';
 		curr_sign.value = '';
-		curr_format.value = '';
+		curr_format.checked = false;
 	}
 }
 
@@ -190,7 +190,7 @@ function onDeleteSubmit(frm)
 	html("<input id=\"curr_id\" name=\"curr_id\" type=\"hidden\"><br>");
 	html("<label for=\"curr_name\">name</label><br><input id=\"curr_name\" name=\"curr_name\" type=\"text\"><br>");
 	html("<label for=\"curr_sign\">sign</label><br><input id=\"curr_sign\" name=\"curr_sign\" type=\"text\"><br>");
-	html("<label for=\"curr_format\">format</label><br><input id=\"curr_format\" name=\"curr_format\" type=\"text\"><br>");
+	html("<input id=\"curr_format\" name=\"curr_format\" type=\"checkbox\"><label for=\"curr_format\">sign before value</label><br>");
 	html("<input type=\"submit\" value=\"ok\">");
 	html("</form>");
 
