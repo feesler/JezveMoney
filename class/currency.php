@@ -219,7 +219,7 @@ class Currency
 
 
 	// Return Javascript array of currencies
-	public static function getArray()
+	public static function getArray($ext = FALSE)
 	{
 		if (!self::checkCache())
 			return "";
@@ -228,7 +228,10 @@ class Currency
 
 		foreach(self::$cache as $curr_id => $row)
 		{
-			$resArr[] = array($curr_id, $row["name"], $row["sign"]);
+			if ($ext)
+				$resArr[] = array($curr_id, $row["name"], $row["sign"], $row["format"]);
+			else
+				$resArr[] = array($curr_id, $row["name"], $row["sign"]);
 		}
 
 		return "var currency = ".json_encode($resArr).";\r\n";
