@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class Currency
 {
@@ -73,6 +73,96 @@ class Currency
 			return FALSE;
 
 		return isset(self::$cache[$curr_id]);
+	}
+
+
+	// Create new currency and return id if successfully
+	public static function create($curr_name, $curr_sign, $curr_format)
+	{
+		global $db;
+
+		$curr_name = $db->escape($curr_name);
+		$curr_sign = $db->escape($curr_sign);
+		$curr_format = $db->escape($curr_format);
+
+		if (!$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "" || !$curr_format || $curr_format == "")
+			return 0;
+
+		if (!$db->insertQ("currency", array("id", "name", "sign", "format"),
+							array(NULL, $curr_name, $curr_sign, $curr_format)))
+			return 0;
+
+		self::updateCache();
+
+		return $db->insertId();
+	}
+
+
+	// Edit specified currency
+	public static function edit($curr_id, $curr_name, $curr_sign, $curr_format)
+	{
+		global $db;
+
+		$curr_id = intval($curr_id);
+		$curr_name = $db->escape($curr_name);
+		$curr_sign = $db->escape($curr_sign);
+		$curr_format = $db->escape($curr_format);
+
+		if (!$curr_id || !$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "" || !$curr_format || $curr_format == "")
+			return FALSE;
+
+		if (!self::is_exist($curr_id))
+			return FALSE;
+
+		if (!$db->updateQ("currency", array("name", "sign", "format"),
+								array($curr_name, $curr_sign, $curr_format),
+								"id=".$curr_id))
+			return FALSE;
+
+		self::updateCache();
+
+		return TRUE;
+	}
+
+
+	// Check currency is in use
+	public static function isInUse($curr_id)
+	{
+		global $db;
+
+		$curr_id = intval($curr_id);
+		if (!$curr_id)
+			return FALSE;
+
+		$resArr = $db->selectQ("id", "account", "curr_id=".$curr_id);
+		if (count($resArr) > 0)
+			return TRUE;
+
+		$resArr = $db->selectQ("id", "transactions", "curr_id=".$curr_id);
+		if (count($resArr) > 0)
+			return TRUE;
+
+		return FALSE;
+	}
+
+
+	// Delete specified currency
+	public static function del($curr_id)
+	{
+		global $db;
+
+		$curr_id = intval($curr_id);
+		if (!$curr_id)
+			return FALSE;
+
+		// don't delete currencies in use
+		if (self::isInUse($curr_id))
+			return FALSE;
+
+		if (!$db->deleteQ("currency", "id=".$curr_id))
+			return FALSE;
+
+		return TRUE;
 	}
 
 
