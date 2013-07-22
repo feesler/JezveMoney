@@ -328,3 +328,38 @@ function removeChilds(obj)
 	while(obj.childNodes.length > 0) 
 		 obj.removeChild(obj.childNodes[0]);
 }
+
+
+// Fix IE event object
+function fixEvent(e, _this)
+{
+	e = e || window.event;
+
+	if (!e.currentTarget) e.currentTarget = _this;
+	if (!e.target) e.target = e.srcElement;
+
+	if (!e.relatedTarget)
+	{
+		if (e.type == 'mouseover') e.relatedTarget = e.fromElement;
+		if (e.type == 'mouseout') e.relatedTarget = e.toElement;
+	}
+
+	if (e.pageX == null && e.clientX != null )
+	{
+		var html = document.documentElement;
+		var body = document.body;
+
+		e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0);
+		e.pageX -= html.clientLeft || 0;
+
+		e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0);
+		e.pageY -= html.clientTop || 0;
+	}
+
+	if (!e.which && e.button)
+	{
+		e.which = e.button & 1 ? 1 : ( e.button & 2 ? 3 : (e.button & 4 ? 2 : 0) );
+	}
+
+	return e;
+}
