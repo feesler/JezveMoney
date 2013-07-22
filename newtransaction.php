@@ -280,6 +280,13 @@
 		html("<div id=\"destination\" style=\"display: none;\">");
 ?>
 				<label for="dest_id">Destination account</label>
+				<div class="tile_container">
+<?php
+	echo($acc->getButtonTile($dest_id));
+?>
+				</div>
+				<div class="tile_right_block">
+				</div>
 				<div class="rdiv">
 					<div>
 <?php
