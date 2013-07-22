@@ -196,6 +196,20 @@
 }
 
 
+.acc_sel
+{
+	position: absolute;
+	opacity: 0;
+}
+
+
+.acc_sel > div > select
+{
+	width: 100px;
+	height: 100px;
+}
+
+
 .tile_container
 {
 	padding: 0px 5px;
@@ -255,10 +269,22 @@
 
 	echo($acc->getButtonTile($src_id));
 ?>
+					<div class="acc_sel">
+						<div>
+<?php
+	setTab(6);
+	html("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
+	pushTab();
+	echo($acc->getList($src_id));
+	popTab();
+	html("</select>");
+?>
+						</div>
+					</div>
 				</div>
 				<div class="tile_right_block">
 				</div>
-				<div class="rdiv">
+				<!-- div class="rdiv">
 					<div>
 <?php
 	setTab(6);
@@ -269,7 +295,7 @@
 ?>
 						</select>
 					</div>
-				</div>
+				</div -->
 			</div>
 
 <?php
@@ -284,10 +310,22 @@
 <?php
 	echo($acc->getButtonTile($dest_id));
 ?>
+					<div class="acc_sel">
+						<div>
+<?php
+	setTab(6);
+	html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
+	pushTab();
+	echo($acc->getList($dest_id));
+	popTab();
+	html("</select>");
+?>
+						</div>
+					</div>
 				</div>
 				<div class="tile_right_block">
 				</div>
-				<div class="rdiv">
+				<!-- div class="rdiv">
 					<div>
 <?php
 	setTab(6);
@@ -298,7 +336,7 @@
 ?>
 						</select>
 					</div>
-				</div>
+				</div -->
 			</div>
 
 			<div>
