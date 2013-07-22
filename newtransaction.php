@@ -266,7 +266,6 @@
 				<label for="src_id">Source account</label>
 				<div class="tile_container">
 <?php
-
 	echo($acc->getButtonTile($src_id));
 ?>
 					<div class="acc_sel">
@@ -284,18 +283,6 @@
 				</div>
 				<div class="tile_right_block">
 				</div>
-				<!-- div class="rdiv">
-					<div>
-<?php
-	setTab(6);
-	html("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
-	pushTab();
-	echo($acc->getList($src_id));
-	popTab();
-?>
-						</select>
-					</div>
-				</div -->
 			</div>
 
 <?php
@@ -325,18 +312,6 @@
 				</div>
 				<div class="tile_right_block">
 				</div>
-				<!-- div class="rdiv">
-					<div>
-<?php
-	setTab(6);
-	html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
-	pushTab();
-	echo($acc->getList($dest_id));
-	popTab();
-?>
-						</select>
-					</div>
-				</div -->
 			</div>
 
 			<div>
