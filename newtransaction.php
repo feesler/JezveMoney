@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -194,6 +194,20 @@
 {
 	color: red;
 }
+
+
+.tile_container
+{
+	padding: 0px 5px;
+}
+
+
+.tile_right_block
+{
+	height: 100px;
+	margin: 0px 0px 10px 0px;
+	overflow: hidden;
+}
 </style>
 <?php
 	html(getJS("common.js"));
@@ -236,6 +250,14 @@
 		html("<div id=\"source\" style=\"display: none;\">");
 ?>
 				<label for="src_id">Source account</label>
+				<div class="tile_container">
+<?php
+
+	echo($acc->getButtonTile($src_id));
+?>
+				</div>
+				<div class="tile_right_block">
+				</div>
 				<div class="rdiv">
 					<div>
 <?php
