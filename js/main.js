@@ -9,7 +9,7 @@ function onEmptyClick(callback, elem)
 	callback = callback || null;
 	if (!callback)
 		return;
-	e = event;
+	e = fixEvent(event);
 	elem = ge(elem) || null;
 
 	if ((elem && (e.target != elem && e.target.parentNode != elem)) || !elem)
