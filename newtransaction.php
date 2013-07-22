@@ -153,10 +153,10 @@
 }
 
 
-.curr_btn
+/* dashed underline button */
+.dashed_btn
 {
 	margin: 0 0 8px 0;
-	padding: 0px 5px;
 	border: 0 none;
 	clear: both;
 	cursor: pointer;
@@ -164,13 +164,11 @@
 }
 
 
-.curr_btn > span
+.dashed_btn > span
 {
-	font-size: 12px;
 	color: #0072C6;
 	padding: 0;
 	margin-top: -10px;
-
 	border-top: 0 none;
 	border-right: 0 none;
 	border-left: 0 none;
@@ -178,9 +176,21 @@
 }
 
 
-.curr_btn:hover > span
+.dashed_btn:hover > span
 {
 	border-bottom: 1px solid #0072C6;
+}
+
+
+/* select currency button */
+.curr_btn
+{
+	padding: 0px 5px;
+}
+
+.curr_btn > span
+{
+	font-size: 12px;
 }
 
 
@@ -340,7 +350,7 @@
 								<input id="amount" name="amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 							</div>
 						</div>
-						<button id="ancurrbtn" class="curr_btn" type="button" onclick="showCurrList();"><span>Select currency</span></button>
+						<button id="ancurrbtn" class="dashed_btn curr_btn" type="button" onclick="showCurrList();"><span>Select currency</span></button>
 					</div>
 				</div>
 			</div>
