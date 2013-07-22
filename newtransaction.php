@@ -425,11 +425,24 @@
 			<div id="result_balance" style="display: none;">
 				<label for="resbal">Result balance<? if ($trans_type == 3) echo(" (Source)"); ?></label>
 				<div>
-					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]); ?></span></span></div>
+					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
 					<div class="rdiv">
 						<div class="balance_block">
 							<div onclick="onResBalanceSelect();"><span id="resbal_l" class="summ_text"></span></div>
 							<input id="resbal" name="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="result_balance_dest" style="display: none;">
+				<label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label>
+				<div>
+					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
+					<div class="rdiv">
+						<div class="balance_block">
+							<div onclick="onResBalanceDestSelect();"><span id="resbal_d_l" class="summ_text"></span></div>
+							<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
 						</div>
 					</div>
 				</div>
