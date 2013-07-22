@@ -302,7 +302,8 @@
 				<label for="src_id">Source account</label>
 				<div class="tile_container">
 <?php
-	echo($acc->getButtonTile($src_id));
+	setTab(5);
+	html($acc->getButtonTile($src_id));
 ?>
 					<div class="acc_sel">
 						<div>
@@ -373,7 +374,7 @@
 	echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
 	if ($trans_type == 3)
 		echo(" style=\"display: none;\"");
-	html("><span>Select currency</span></button>");
+	echo("><span>Select currency</span></button>\r\n");
 ?>
 					<div>
 						<div class="rtext"><span id="amountsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]) ?></span></div>
