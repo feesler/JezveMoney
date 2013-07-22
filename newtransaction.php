@@ -206,6 +206,32 @@
 }
 
 
+/* seems to be the same as .profile_common */
+.tr_content > div
+{
+	max-width: 300px;
+	margin: 30px 5px 5px 25px;
+}
+
+
+.tr_content > div > h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	margin: 2px 5px;
+}
+
+
+.tr_content label
+{
+	width: 150px;
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 5px;
+	font-size: 14px;
+}
+
+
 .acc_sel
 {
 	position: absolute;
@@ -259,8 +285,8 @@
 
 	html("<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">");
 ?>
-<div class="acc_content">
-	<div class="profile_common">
+<div class="tr_content">
+	<div>
 		<h2>Create new transaction</h2>
 		<div>
 <?php
@@ -341,7 +367,14 @@
 				</div>
 
 				<div>
-					<label for="amount">Amount</label>
+<?php
+	setTab(5);
+	echo($tabStr."<label for=\"amount\">Amount</label>");
+	echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
+	if ($trans_type == 3)
+		echo(" style=\"display: none;\"");
+	html("><span>Select currency</span></button>");
+?>
 					<div>
 						<div class="rtext"><span id="amountsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]) ?></span></div>
 						<div class="rdiv">
@@ -350,7 +383,6 @@
 								<input id="amount" name="amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 							</div>
 						</div>
-						<button id="ancurrbtn" class="dashed_btn curr_btn" type="button" onclick="showCurrList();"><span>Select currency</span></button>
 					</div>
 				</div>
 			</div>
