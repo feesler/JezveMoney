@@ -25,6 +25,7 @@
 
 		$resArr = array();
 		$resArr["id"] = $acc_id;
+		$resArr["balance"] = $acc->getBalance($acc_id);
 		$resArr["curr"] = $acc->getCurrency($acc_id);
 		$resArr["sign"] = Currency::getSign($resArr["curr"]);
 
@@ -194,6 +195,13 @@
 }
 
 
+/* result balance button */
+.resbal_btn
+{
+	font-size: 16px;
+}
+
+
 .form_iconlink
 {
 	margin: 9px 5px;
@@ -319,6 +327,19 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
+					<div id="src_res_balance_left">
+						<span>Result balance</span>
+						<div>
+							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo($src["balance"]); ?></span></button>
+						</div>
+					</div>
+
+					<div id="src_amount_left" style="display: none;">
+						<span>Amount</span>
+						<div>
+							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span></span></button>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -348,6 +369,18 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
+					<div id="dest_res_balance_left">
+						<span>Result balance</span>
+						<div>
+							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo($dest["balance"]); ?></span></button>
+						</div>
+					</div>
+					<div id="dest_charge_left" style="display: none;">
+						<span>Charge</span>
+						<div>
+							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span></span></button>
+						</div>
+					</div>
 				</div>
 			</div>
 
