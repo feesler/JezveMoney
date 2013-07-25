@@ -412,7 +412,7 @@ class Account
 
 		foreach(self::$cache as $acc_id => $row)
 		{
-			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"]);
+			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"], $row["name"]);
 		}
 
 		return "var accounts = ".json_encode($resArr).";\r\n";
