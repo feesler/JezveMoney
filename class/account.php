@@ -496,6 +496,33 @@ class Account
 	}
 
 
+	// Return HTML for simple account tile
+	public function getDivTile($acc_id)
+	{
+		$resStr = "";
+
+		if (!$this->is_exist($acc_id))
+			return $resStr;
+
+		$resStr .= "<div id=\"acc_".$acc_id."\" class=\"tile\">";
+		$resStr .= "<div class=\"tilelink\"><div>";
+
+		$acc_curr = $this->getCurrency($acc_id);
+		$acc_balance = $this->getBalance($acc_id);
+		$balance_fmt = Currency::format($acc_balance, $acc_curr);
+
+		$resStr .= "<span class=\"acc_bal\">".$balance_fmt."</span>";
+
+		$acc_name = $this->getName($acc_id);
+
+		$resStr .= "<span class=\"acc_name\">".$acc_name."</span>";
+
+		$resStr .= "</div></div></div>";
+
+		return $resStr;
+	}
+
+
 	// Return HTML for account tile button
 	public function getButtonTile($acc_id)
 	{

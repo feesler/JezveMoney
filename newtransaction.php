@@ -311,7 +311,7 @@
 				<div class="tile_container">
 <?php
 	setTab(5);
-	html($acc->getButtonTile($src_id));
+	html($acc->getDivTile($src_id));
 ?>
 					<div class="acc_sel">
 						<div>
@@ -354,7 +354,7 @@
 				<div class="tile_container">
 <?php
 	setTab(5);
-	html($acc->getButtonTile($dest_id));
+	html($acc->getDivTile($dest_id));
 ?>
 					<div class="acc_sel">
 						<div>
