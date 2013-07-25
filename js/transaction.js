@@ -120,6 +120,23 @@ function getCurrencySign(curr_id)
 }
 
 
+// Return sign format of specified currency(before or after value)
+function getCurrencyFormat(curr_id)
+{
+	var currFmt = false;
+
+	currency.some(function(curr)
+	{
+		if (curr[0] == curr_id)
+			currFmt = curr[3];
+
+		return (curr[0] == curr_id);
+	});
+
+	return currFmt;
+}
+
+
 // Return currency id of specified account
 function getCurrencyOfAccount(account_id)
 {
