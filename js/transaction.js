@@ -171,6 +171,23 @@ function getBalanceOfAccount(account_id)
 }
 
 
+// Return name of specified account
+function getNameOfAccount(account_id)
+{
+	var name = '';
+
+	accounts.some(function(acc)
+	{
+		if (acc[0] == account_id)
+			name = acc[4];
+
+		return (acc[0] == account_id);
+	});
+
+	return name;
+}
+
+
 // Set currency sign for amount or charge field
 function setSign(isAmount, curr_id)
 {
