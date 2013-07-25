@@ -421,6 +421,13 @@ button::-moz-focus-inner
 
 
 /* transaction */
+.tr_content
+{
+	margin-top: 55px;
+	z-index: 1;
+}
+
+
 .cal_btn
 {
 	border: 2px solid #000000;
