@@ -1,4 +1,4 @@
-var S1;		// balance before transaction
+﻿var S1;		// balance before transaction
 var a;		// amount in currency of transaction
 var d;		// charge off/receipt in currency of account
 var e;		// exchange rate
@@ -103,7 +103,7 @@ function f5()
 }
 
 
-// Retunr sign of specified currency
+// Return sign of specified currency
 function getCurrencySign(curr_id)
 {
 	var currSign = '';
@@ -120,7 +120,7 @@ function getCurrencySign(curr_id)
 }
 
 
-// Retunr currency id of specified account
+// Return currency id of specified account
 function getCurrencyOfAccount(account_id)
 {
 	var curr_id = '';
@@ -137,7 +137,7 @@ function getCurrencyOfAccount(account_id)
 }
 
 
-// Retunr balance of specified account
+// Return balance of specified account
 function getBalanceOfAccount(account_id)
 {
 	var balance = 0;

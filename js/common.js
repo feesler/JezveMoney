@@ -266,7 +266,7 @@ function selectedValue(selectObj)
 	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
 		return -1;
 
-	return selectObj.options[selectObj.selectedIndex].value
+	return selectObj.options[selectObj.selectedIndex].value;
 }
 
 

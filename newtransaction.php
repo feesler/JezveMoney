@@ -316,7 +316,7 @@
 					<div class="acc_sel">
 						<div>
 <?php
-	setTab(6);
+	setTab(7);
 	html("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
 	pushTab();
 	echo($acc->getList($src_id));
@@ -353,12 +353,13 @@
 				<label for="dest_id">Destination account</label>
 				<div class="tile_container">
 <?php
-	echo($acc->getButtonTile($dest_id));
+	setTab(5);
+	html($acc->getButtonTile($dest_id));
 ?>
 					<div class="acc_sel">
 						<div>
 <?php
-	setTab(6);
+	setTab(7);
 	html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
 	pushTab();
 	echo($acc->getList($dest_id));
