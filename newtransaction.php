@@ -281,10 +281,10 @@
 		html("var trans_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
 		html("var trans_acc_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
 	}
+
 	html("var trans_type = ".$trans_type.";");
 	html("var edit_mode = false;");
 	html("</script>");
-
 ?>
 </head>
 <body>
@@ -311,7 +311,7 @@
 				<div class="tile_container">
 <?php
 	setTab(5);
-	html($acc->getDivTile($src_id));
+	html($acc->getDivTile($src_id, "source_tile"));
 ?>
 					<div class="acc_sel">
 						<div>
@@ -330,7 +330,7 @@
 					<div id="src_res_balance_left">
 						<span>Result balance</span>
 						<div>
-							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo($src["balance"]); ?></span></button>
+							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($src["balance"], $src["curr"])); ?></span></button>
 						</div>
 					</div>
 
@@ -354,7 +354,7 @@
 				<div class="tile_container">
 <?php
 	setTab(5);
-	html($acc->getDivTile($dest_id));
+	html($acc->getDivTile($dest_id, "dest_tile"));
 ?>
 					<div class="acc_sel">
 						<div>
@@ -373,7 +373,7 @@
 					<div id="dest_res_balance_left">
 						<span>Result balance</span>
 						<div>
-							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo($dest["balance"]); ?></span></button>
+							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
 						</div>
 					</div>
 					<div id="dest_charge_left" style="display: none;">
@@ -385,7 +385,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div id="amount_row">
 				<div id="curr_block" style="float: right; display: none;">
 					<label for="transcurr">Currency</label>
 					<div class="rdiv">
