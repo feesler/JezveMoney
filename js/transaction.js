@@ -23,6 +23,13 @@ function isIncome()
 }
 
 
+// Check current transaction is transfer
+function isTransfer()
+{
+	return (trans_type == 3);
+}
+
+
 // Correct calculated value
 function correct(val, prec)
 {
@@ -445,7 +452,7 @@ function updControls()
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
 	chargeCurr = getCurrencyOfAccount(selectedValue(src));
 
-	if (trans_type == 3)
+	if (isTransfer())
 	{
 		transcurr = ge('transcurr');
 		if (transcurr)
@@ -553,7 +560,7 @@ function setExchangeComment()
 	if (trans_type == 1 || trans_type == 2)
 		transcurr = ge('transcurr');
 	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
-	if (trans_type == 3)
+	if (isTransfer())
 		taccid = ge('dest_id');
 	if (!exchcomm || !accid || (!transcurr && !taccid))
 		return;
@@ -568,7 +575,7 @@ function setExchangeComment()
 			return;
 
 		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
-		if (trans_type == 3)
+		if (isTransfer())
 			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
 		else
 			amountSign = getCurrencySign(selectedValue(transcurr));
