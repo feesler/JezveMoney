@@ -761,9 +761,7 @@ function setValues()
 
 	amount.value = a;
 	amount_l.innerHTML = a;
-	amount_b.firstElementChild.innerHTML = formatCurrency(a, selectedValue(ge('transcurr')));
-	if (a !== '')	// TODO : avalid
-		show('src_amount_left', true);
+	amount_b.firstElementChild.innerHTML = formatCurrency(((a !== '') ? a : 0), selectedValue(ge('transcurr')));		// TODO : avalid
 
 	charge.value = d;
 	charge_l.innerHTML = d;
@@ -1111,10 +1109,7 @@ function amountSwitch(showInput)
 	else
 	{
 		show('amount_row', false);
-
-		getValues();
-		if (avalid)
-			show('src_amount_left', true);
+		show('src_amount_left', true);
 
 		show(amount_l.parentNode, true);
 		amount_l.parentNode.parentNode.className = 'balance_block';
