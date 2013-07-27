@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)
@@ -116,12 +116,22 @@
 
 
 	// Format value
-	function valFormat($format, $value)
+	function valFormat($format, $val)
 	{
-		if ($format && $format != "")
-			return sprintf($format, number_format($value, 2, ",", " "));
+		if (!is_numeric($val))
+			return "";
+
+		$val = floatval($val);
+
+		if (floor($val) == $val)
+			$nf = number_format($val, 0, "", " ");
 		else
-			return number_format($value, 2, ",", " ");
+			$nf = number_format($val, 2, ",", " ");
+
+		if ($format && $format != "")
+			return sprintf($format, $nf);
+		else
+			return $nf;
 	}
 
 
