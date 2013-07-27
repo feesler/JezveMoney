@@ -7,10 +7,18 @@ var S2;		// balance after transaction
 var fS1, fa, fd, fe, fS2;	// parsed float values
 var s1valid, s2valid, dvalid, evalid, avalid;
 
+// transfer only
+var S1_d;		// balance of destination account before transaction
+var S2_d;		// balance of destintation account after transaction
+
+var fS1_d, fS2_d;
+var s1dvalid, s2dvalid;
+
 // Main formula
-// S2 = S1 - d		for expense/transfer
-// S2 = S1 + d		for income
+// S2 = S1 - d			for expense/transfer
+// S2 = S1 + d			for income
 // d = a * e
+// S2_d = S1_d + a		for transfer
 
 
 var submitStarted = false;
@@ -60,6 +68,13 @@ function f1()
 	S2 = correct(S2);
 
 	fS2 = S2;
+
+	if (isTransfer())
+	{
+		S2_d = fS1_d + fa;
+		S2_d = correct(S2_d);
+		fS2_d = S2_d;
+	}
 }
 
 
@@ -88,6 +103,17 @@ function f3()
 }
 
 
+// Calculate amount amount by initial and result balance of destination account
+function f3_d()
+{
+	a = fS2_d - fS1_d;
+
+	a = correct(a);
+
+	fa = a;
+}
+
+
 // Calculate transaction amount by charge off/receipt and exchange rate
 function f4()
 {
@@ -96,6 +122,13 @@ function f4()
 	a = correct(a);
 
 	fa = a;
+
+	if (isTransfer())
+	{
+		S2_d = fS1_d + fa;
+		S2_d = correct(S2_d);
+		fS2_d = S2_d;
+	}
 }
 
 
@@ -413,6 +446,53 @@ function onTransferSubmit(frm)
 }
 
 
+//
+function formatValue(val)
+{
+	return val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
+}
+
+
+// Format value with rules of specified currency
+function formatCurrency(val, curr_id)
+{
+	var isBefore = getCurrencyFormat(curr_id);
+	var sign = getCurrencySign(curr_id);
+
+	if (isBefore)
+		return sign + ' ' + formatValue(val);
+	else
+		return formatValue(val) + ' ' + sign;
+}
+
+
+// Format balance of account value with currency
+function formatAccoutBalance(acc_id)
+{
+	return formatCurrency(getBalanceOfAccount(acc_id), getCurrencyOfAccount(acc_id));
+}
+
+
+// Set source tile to the specified account
+function setTileAccount(tile_id, acc_id)
+{
+	var tileObj, src, balanceEl, nameEl;
+
+	if (!tile_id || !acc_id)
+		return;
+
+	tileObj = ge(tile_id);
+	if (!tileObj)
+		return;
+
+	balanceEl = tileObj.firstElementChild.firstElementChild.firstElementChild;
+	balanceEl.innerHTML = formatAccoutBalance(acc_id);
+
+	nameEl = balanceEl.nextElementSibling;
+	nameEl.innerHTML = getNameOfAccount(acc_id);
+}
+
+
 // Update controls of transfer transaction form
 function updControls()
 {
@@ -461,6 +541,9 @@ function updControls()
 
 	setSign(false, chargeCurr);
 	setSign(true, amountCurr);
+
+	setTileAccount('source_tile', selectedValue(src));
+	setTileAccount('dest_tile', selectedValue(dest));
 }
 
 
@@ -603,6 +686,13 @@ function normalizeExch(val)
 }
 
 
+// Check value is valid
+function isValidValue(val)
+{
+	return (val && val !== '');
+}
+
+
 // Get values of transaction from input fields
 function getValues()
 {
@@ -617,6 +707,11 @@ function getValues()
 		return;
 
 	S1 = getBalanceOfAccount(selectedValue(accid));
+	if (isTransfer())
+	{
+		S1_d = getBalanceOfAccount(selectedValue(ge('dest_id')));		// TODO: fix here
+		S2_d = ge('resbal_d').value;
+	}
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
@@ -624,12 +719,22 @@ function getValues()
 
 	s1valid = (S1 !== '');
 	s2valid = (S2 !== '');
+	if (isTransfer())
+	{
+		s1dvalid = (S1_d !== '');
+		s2dvalid = (S2_d !== '');
+	}
 	dvalid = (d !== '');
 	evalid = (e !== '');
 	avalid = (a !== '');
 
 	fS1 = (s1valid) ? normalize(S1) : S1;
 	fS2 = (s2valid) ? normalize(S2) : S2;
+	if (isTransfer())
+	{
+		fS1_d = (s1dvalid) ? normalize(S1_d) : S1_d;
+		fS2_d = (s2dvalid) ? normalize(S2_d) : S2_d;
+	}
 	fd = (dvalid) ? normalize(d) : d;
 	fe = (evalid) ? normalizeExch(e) : e;
 	fa = (avalid) ? normalize(a) : a;
@@ -639,27 +744,43 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var amount, amount_l, charge, charge_l, exchrate, resbal, resbal_l;
+	var amount, amount_l, amount_b, charge, charge_l, exchrate, resbal, resbal_l;
 
 	amount = ge('amount');
 	amount_l = ge('amount_l');
+	amount_b = ge('amount_b');
 	charge = ge('charge');
 	charge_l = ge('charge_l');
 	exchrate = ge('exchrate');
 	exchrate_l = ge('exchrate_l');
 	resbal = ge('resbal');
 	resbal_l = ge('resbal_l');
-	if (!amount || !amount_l || !charge || !charge_l || !exchrate || !exchrate_l || !resbal || !resbal_l)
+	resbal_b = ge('resbal_b');
+	if (!amount || !amount_l || !amount_b || !charge || !charge_l || !exchrate || !exchrate_l || !resbal || !resbal_l || !resbal_b)
 		return;
 
 	amount.value = a;
 	amount_l.innerHTML = a;
+	amount_b.firstElementChild.innerHTML = formatCurrency(a, selectedValue(ge('transcurr')));
+	if (a !== '')	// TODO : avalid
+		show('src_amount_left', true);
+
 	charge.value = d;
 	charge_l.innerHTML = d;
 	exchrate.value = e;
 	exchrate_l.innerHTML = e;
 	resbal.value = S2;
 	resbal_l.innerHTML = S2;
+	resbal_b.firstElementChild.innerHTML = formatCurrency(S2, selectedValue(ge('transcurr')));
+
+	if (isTransfer())
+	{
+		var resbal_d_b = ge('resbal_d_b');
+		if (!resbal_d_b)
+			return;
+
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(S2_d, selectedValue(ge('transcurr')));
+	}
 }
 
 
@@ -729,6 +850,18 @@ function onResBalanceInput()
 }
 
 
+// Result balance field input event handler
+function onResBalanceDestInput()
+{
+	if (!s1dvalid)
+		return;
+
+	f3_d();		// calculate a
+	f2();			// calculate d
+	f1();			// calculate S1
+}
+
+
 // Field input event handler
 function onFInput(obj)
 {
@@ -742,6 +875,8 @@ function onFInput(obj)
 		onExchangeInput();
 	else if (obj.id == 'resbal')
 		onResBalanceInput();
+	else if (obj.id == 'resbal_d' && isTransfer())
+		onResBalanceDestInput();
 
 	setValues();
 
@@ -966,11 +1101,21 @@ function amountSwitch(showInput)
 		show(amount_l.parentNode, false);
 		amount_l.parentNode.parentNode.className = '';
 		show(amount, true);
+
+		show('src_amount_left', false);
+		show('amount_row', true);
+
 		amount.focus();
 		resBalanceSwitch(false);
 	}
 	else
 	{
+		show('amount_row', false);
+
+		getValues();
+		if (avalid)
+			show('src_amount_left', true);
+
 		show(amount_l.parentNode, true);
 		amount_l.parentNode.parentNode.className = 'balance_block';
 
@@ -1024,9 +1169,14 @@ function resBalanceSwitch(showInput)
 	if (showInput)
 	{
 		show(resbal_l.parentNode, false);
+
 		resbal_l.parentNode.parentNode.className = '';
 		show(resbal, true);
 		amountSwitch(false);
+
+		show('result_balance', true);
+		show('src_res_balance_left', false);
+
 		resbal.focus();
 	}
 	else
@@ -1035,6 +1185,47 @@ function resBalanceSwitch(showInput)
 		resbal_l.parentNode.parentNode.className = 'balance_block';
 
 		show(resbal, false);
+
+		show('result_balance', false);
+		show('src_res_balance_left', true);
+	}
+}
+
+
+// Show input control or static block for result balance value
+function resBalanceDestSwitch(showInput)
+{
+	var resbal, resbal_l;
+
+	resbal = ge('resbal_d');
+	resbal_l = ge('resbal_d_l');
+	if (!resbal_l)
+		return;
+
+	showInput = showInput | false;
+
+	if (showInput)
+	{
+		show(resbal_l.parentNode, false);
+
+		resbal_l.parentNode.parentNode.className = '';
+		show(resbal, true);
+		amountSwitch(false);
+
+		show('result_balance_dest', true);
+		show('dest_res_balance_left', false);
+
+		resbal.focus();
+	}
+	else
+	{
+		show(resbal_l.parentNode, true);
+		resbal_l.parentNode.parentNode.className = 'balance_block';
+
+		show(resbal, false);
+
+		show('result_balance_dest', false);
+		show('dest_res_balance_left', true);
 	}
 }
 
@@ -1089,6 +1280,16 @@ function onChargeSelect()
 function onResBalanceSelect()
 {
 	resBalanceSwitch(true);
+	resBalanceDestSwitch(false);
+	exchRateSwitch(false);
+}
+
+
+// Result balance static click event handler
+function onResBalanceDestSelect()
+{
+	resBalanceSwitch(false);
+	resBalanceDestSwitch(true);
 	exchRateSwitch(false);
 }
 
