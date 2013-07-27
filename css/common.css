@@ -420,17 +420,30 @@ button::-moz-focus-inner
 }
 
 
-/* transaction */
-.tr_content
+/* dashed underline button */
+.dashed_btn
 {
-	margin-top: 55px;
-	z-index: 1;
-}
-
-
-.cal_btn
-{
-	border: 2px solid #000000;
+	margin: 0 0 8px 0;
+	border: 0 none;
+	clear: both;
+	cursor: pointer;
 	background-color: #FFFFFF;
 }
 
+
+.dashed_btn > span
+{
+	color: #0072C6;
+	padding: 0;
+	margin-top: -10px;
+	border-top: 0 none;
+	border-right: 0 none;
+	border-left: 0 none;
+	border-bottom: 1px dashed #0072C6;	/* TODO : try png background */
+}
+
+
+.dashed_btn:hover > span
+{
+	border-bottom: 1px solid #0072C6;
+}
