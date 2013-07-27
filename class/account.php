@@ -497,14 +497,17 @@ class Account
 
 
 	// Return HTML for simple account tile
-	public function getDivTile($acc_id)
+	public function getDivTile($acc_id, $tile_id = "")
 	{
 		$resStr = "";
 
 		if (!$this->is_exist($acc_id))
 			return $resStr;
 
-		$resStr .= "<div id=\"acc_".$acc_id."\" class=\"tile\">";
+		if ($tile_id == "")
+			$tile_id = "acc_".$acc_id;
+
+		$resStr .= "<div id=\"".$tile_id."\" class=\"tile\">";
 		$resStr .= "<div class=\"tilelink\"><div>";
 
 		$acc_curr = $this->getCurrency($acc_id);
@@ -524,14 +527,17 @@ class Account
 
 
 	// Return HTML for account tile button
-	public function getButtonTile($acc_id)
+	public function getButtonTile($acc_id, $tile_id = "")
 	{
 		$resStr = "";
 
 		if (!$this->is_exist($acc_id))
 			return $resStr;
 
-		$resStr .= "<div id=\"acc_".$acc_id."\" class=\"tile\">";
+		if ($tile_id == "")
+			$tile_id = "acc_".$acc_id;
+
+		$resStr .= "<div id=\"".$tile_id."\" class=\"tile\">";
 		$resStr .= "<button class=\"tilelink\" onclick=\"onTileClick(".$acc_id.")\">";
 		$resStr .= "<div>";
 
@@ -554,14 +560,17 @@ class Account
 
 
 	// Return HTML for account tile
-	public function getTile($acc_id)
+	public function getTile($acc_id, $tile_id = "")
 	{
 		$resStr = "";
 
 		if (!$this->is_exist($acc_id))
 			return $resStr;
 
-		$resStr .= "<div class=\"tile\">";
+		if ($tile_id == "")
+			$tile_id = "acc_".$acc_id;
+
+		$resStr .= "<div id=\"".$tile_id."\" class=\"tile\">";
 		$resStr .= "<a href=\"./newtransaction.php?acc_id=".$acc_id."\" class=\"tilelink\">";
 		$resStr .= "<div>";
 
