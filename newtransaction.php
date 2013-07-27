@@ -307,7 +307,7 @@
 	else
 		html("<div id=\"source\" style=\"display: none;\">");
 ?>
-				<label for="src_id">Source account</label>
+				<div><label for="src_id">Source account</label></div>
 				<div class="tile_container">
 <?php
 	setTab(5);
@@ -350,7 +350,7 @@
 	else
 		html("<div id=\"destination\" style=\"display: none;\">");
 ?>
-				<label for="dest_id">Destination account</label>
+				<div><label for="dest_id">Destination account</label></div>
 				<div class="tile_container">
 <?php
 	setTab(5);
@@ -387,7 +387,7 @@
 
 			<div id="amount_row">
 				<div id="curr_block" style="float: right; display: none;">
-					<label for="transcurr">Currency</label>
+					<div><label for="transcurr">Currency</label></div>
 					<div class="rdiv">
 						<div class="currency_block">
 							<select id="transcurr" name="transcurr" onchange="onChangeTransCurr(this);">
@@ -404,7 +404,7 @@
 				<div>
 <?php
 	setTab(5);
-	echo($tabStr."<label for=\"amount\">Amount</label>");
+	echo($tabStr."<div><label for=\"amount\">Amount</label></div>");
 	echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
 	if ($trans_type == 3)
 		echo(" style=\"display: none;\"");
@@ -427,7 +427,7 @@
 	setTab(3);
 	html("<div id=\"chargeoff\"".$disp.">");
 ?>
-				<label for="charge">Charge</label>
+				<div><label for="charge">Charge</label></div>
 				<div>
 					<div class="rtext"><span id="ch_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
 					<div class="rdiv">
@@ -444,7 +444,7 @@
 	setTab(3);
 	html("<div id=\"exchange\"".$disp.">");
 ?>
-				<label for="exchrate">Exchange rate</label>
+				<div><label for="exchrate">Exchange rate</label></div>
 				<div>
 					<div class="rtext"><span id="exchcomm" style="margin-left: 5px;"></span></div>
 					<div class="rdiv">
@@ -457,7 +457,7 @@
 			</div>
 
 			<div id="result_balance" style="display: none;">
-				<label for="resbal">Result balance<? if ($trans_type == 3) echo(" (Source)"); ?></label>
+				<div><label for="resbal">Result balance<? if ($trans_type == 3) echo(" (Source)"); ?></label></div>
 				<div>
 					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
 					<div class="rdiv">
@@ -470,7 +470,7 @@
 			</div>
 
 			<div id="result_balance_dest" style="display: none;">
-				<label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label>
+				<div><label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label></div>
 				<div>
 					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
 					<div class="rdiv">
@@ -485,7 +485,7 @@
 			<div style="clear: both;">
 				<div id="calendar_btn" class="iconlink form_iconlink"><button type="button" onclick="showCalendar();"><div class="calendar"></div><span>Change date</span></button></div>
 				<div id="date_block" style="display: none;">
-					<label for="date">Date</label>
+					<div><label for="date">Date</label></div>
 					<div>
 						<div class="rtext"></div>
 						<div class="rdiv">
@@ -502,7 +502,7 @@
 			<div style="clear: both;">
 				<div id="comm_btn" class="iconlink form_iconlink"><button type="button" onclick="showComment();"><div class="add"></div><span>Add comment</span></button></div>
 				<div id="comment_block" style="display: none;">
-					<label for="comm">Comment</label>
+					<div><label for="comm">Comment</label></div>
 					<div>
 						<div class="rdiv">
 							<div>
