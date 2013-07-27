@@ -1,0 +1,90 @@
+﻿/* select currency button */
+.curr_btn
+{
+	padding: 0px 5px;
+}
+
+.curr_btn > span
+{
+	font-size: 12px;
+}
+
+
+/* result balance button */
+.resbal_btn
+{
+	font-size: 16px;
+}
+
+
+.form_iconlink
+{
+	margin: 9px 5px;
+}
+
+
+.inv_result
+{
+	color: red;
+}
+
+
+/* seems to be the same as .profile_common */
+.tr_content
+{
+	margin-top: 55px;
+	z-index: 1;
+}
+
+
+.tr_content > div
+{
+	max-width: 300px;
+	margin: 30px 5px 5px 25px;
+}
+
+
+.tr_content > div > h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	margin: 2px 5px;
+}
+
+
+.tr_content label
+{
+	width: 150px;
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 5px;
+	font-size: 14px;
+}
+
+
+.acc_sel
+{
+	position: absolute;
+	opacity: 0;
+}
+
+
+.acc_sel > div > select
+{
+	width: 100px;
+	height: 100px;
+}
+
+
+.tile_container
+{
+	padding: 0px 5px;
+}
+
+
+.tile_right_block
+{
+	height: 100px;
+	margin: 0px 0px 10px 0px;
+	overflow: hidden;
+}
