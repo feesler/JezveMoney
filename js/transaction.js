@@ -356,8 +356,8 @@ function onChangeAcc()
 	// hide charge and exchange rate if new currencies is the same
 	if (trans_curr == trans_acc_curr)
 	{
-		chargeoff.style.display = 'none';
-		exchange.style.display = 'none';
+		show(chargeoff, false);
+		show(exchange, false);
 		exchrate.value = 1;
 		exchrate_l.innerHTML = '1';
 		exchrate_b.firstElementChild.innerHTML = '1';
@@ -505,7 +505,7 @@ function setTileAccount(tile_id, acc_id)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, exchrate_l, exchrate_b, chargeoff, exchange, resbal, dstyle, transcurr;
+	var src, dest, amount, charge, exchrate, exchrate_l, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -521,15 +521,14 @@ function updControls()
 		return;
 
 	exchange.value = '';
-	if (isDiffCurr())
+	isDiff = isDiffCurr();
+	if (isDiff)
 	{
-		dstyle = '';
 		charge.value = '';
 		resbal.value = '';
 	}
 	else
 	{
-		dstyle = 'none';
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_l.innerHTML = '1';
@@ -537,8 +536,8 @@ function updControls()
 		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
 	}
 
-	chargeoff.style.display = dstyle;
-	exchange.style.display = dstyle;
+	show(chargeoff, isDiff);
+	show(exchange, isDiff);
 
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
 	chargeCurr = getCurrencyOfAccount(selectedValue(src));
@@ -913,7 +912,7 @@ function onFInput(obj)
 function onChangeTransCurr()
 {
 	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_l, exchrate_b, charge;
-	var amountCurr, chargeCurr;
+	var amountCurr, chargeCurr, isDiff;
 
 	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
 	amount = ge('amount');
@@ -932,10 +931,9 @@ function onChangeTransCurr()
 	amountCurr = selectedValue(transcurr);
 	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
 
-	if (amountCurr == chargeCurr)
+	isDiff = (amountCurr == chargeCurr);
+	if (isDiff)
 	{
-		chargeoff.style.display = 'none';
-		exchange.style.display = 'none';
 		exchrate.value = 1;
 		exchrate_l.innerHTML = '1';
 		exchrate_b.firstElementChild.innerHTML = '1';
@@ -943,11 +941,9 @@ function onChangeTransCurr()
 
 		updateExchAndRes();
 	}
-	else
-	{
-		chargeoff.style.display = '';
-		exchange.style.display = '';
-	}
+
+	show(chargeoff, !isDiff);
+	show(chargeoff, !isDiff);
 
 	trans_curr = amountCurr;
 
