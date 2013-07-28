@@ -266,7 +266,7 @@
 							<select id="transcurr" name="transcurr" onchange="onChangeTransCurr(this);">
 <?php
 	setTab(8);
-	echo(Currency::getList());
+	echo(Currency::getList($src["curr"]));
 	popTab();
 ?>
 							</select>
