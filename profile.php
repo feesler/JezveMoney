@@ -95,9 +95,9 @@
 		<h2>Change password</h2>
 		<div>
 			<label for="oldpwd">Current password</label>
-			<div class="rdiv"><div><input id="oldpwd" name="oldpwd" type="password"></div></div>
+			<div class="stretch_input profile_input"><div><input id="oldpwd" name="oldpwd" type="password"></div></div>
 			<label for="newpwd">New password</label>
-			<div class="rdiv"><div><input id="newpwd" name="newpwd" type="password"></div></div>
+			<div class="stretch_input profile_input"><div><input id="newpwd" name="newpwd" type="password"></div></div>
 			<div class="profile_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./profile.php">cancel</a></div>
 		</div>
 	</div>
@@ -112,7 +112,7 @@
 		<h2>Change name</h2>
 		<div>
 			<label for="newpwd">New name</label>
-			<div class="rdiv"><div><input id="newname" name="newname" type="text"></div></div>
+			<div class="stretch_input profile_input"><div><input id="newname" name="newname" type="text"></div></div>
 			<div class="profile_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./profile.php">cancel</a></div>
 		</div>
 	</div>
