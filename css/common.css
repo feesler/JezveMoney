@@ -340,9 +340,9 @@ button::-moz-focus-inner
 }
 
 
-.rdiv > .currency_block
+.trans_input > .currency_block
 {
-	padding: 8px 5px 10px 5px;
+	padding: 0;
 }
 
 

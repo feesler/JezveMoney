@@ -261,7 +261,7 @@
 			<div id="amount_row" class="non_float">
 				<div id="curr_block" class="right_float" style="display: none;">
 					<div><label for="transcurr">Currency</label></div>
-					<div class="rdiv">
+					<div class="stretch_input trans_input">
 						<div class="currency_block">
 							<select id="transcurr" name="transcurr" onchange="onChangeTransCurr(this);">
 <?php
