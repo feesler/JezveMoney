@@ -98,44 +98,6 @@
 	padding: 8px 5px;
 }
 
-/*
-.rdiv
-{
-	height: 50px;
-	overflow: hidden;
-}
-
-
-.rdiv > div
-{
-	height: 32px;
-	padding: 8px 19px 10px 5px;
-}
-
-
-.rdiv > div > input,
-.rdiv > div > span
-{
-	width: 100%;
-	height: 26px;
-	line-height: 26px;
-	margin: 0;
-}
-
-
-.rtext
-{
-	float: right;
-}
-
-
-.rtext > span
-{
-	line-height: 50px;
-	height: 50px;
-}
-*/
-
 
 /* alternative link */
 .alter_link
