@@ -204,7 +204,7 @@
 					<div id="src_amount_left" style="display: none;">
 						<span>Amount</span>
 						<div>
-							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo("0 ".($trans_type == 1) ? $src["sign"] : $dest["sign"]); ?></span></button>
+							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
 						</div>
 					</div>
 
