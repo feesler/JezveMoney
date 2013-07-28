@@ -96,6 +96,12 @@
 }
 
 
+.tile_right_block > div
+{
+	margin: 0px 0px 10px 0px;
+}
+
+
 .acc_float
 {
 	min-width: 100px;
