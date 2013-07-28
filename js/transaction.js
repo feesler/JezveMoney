@@ -316,7 +316,7 @@ function onEditTransSubmit(frm)
 function updateExchAndRes()
 {
 	getValues();
-	if (d !== '' && a !== '')
+	if (isValidValue(d) && isValidValue(a))
 	{
 		f5();
 		f1();
@@ -717,16 +717,16 @@ function getValues()
 	e = exchrate.value;
 	S2 = resbal.value;
 
-	s1valid = (S1 !== '');
-	s2valid = (S2 !== '');
+	s1valid = isValidValue(S1);
+	s2valid = isValidValue(S2);
 	if (isTransfer())
 	{
-		s1dvalid = (S1_d !== '');
-		s2dvalid = (S2_d !== '');
+		s1dvalid = isValidValue(S1_d);
+		s2dvalid = isValidValue(S2_d);
 	}
-	dvalid = (d !== '');
-	evalid = (e !== '');
-	avalid = (a !== '');
+	dvalid = isValidValue(d);
+	evalid = isValidValue(e);
+	avalid = isValidValue(a);
 
 	fS1 = (s1valid) ? normalize(S1) : S1;
 	fS2 = (s2valid) ? normalize(S2) : S2;
@@ -761,7 +761,7 @@ function setValues()
 
 	amount.value = a;
 	amount_l.innerHTML = a;
-	amount_b.firstElementChild.innerHTML = formatCurrency(((a !== '') ? a : 0), selectedValue(ge('transcurr')));		// TODO : avalid
+	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), selectedValue(ge('transcurr')));
 
 	charge.value = d;
 	charge_l.innerHTML = d;
