@@ -145,6 +145,7 @@
 	html(getJS("main.js"));
 	html(getJS("calendar.js"));
 	html(getJS("transaction.js"));
+	html(getJS("transaction_layout.js"));
 
 	html("<script>");
 	echo($acc->getArray());
