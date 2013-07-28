@@ -84,6 +84,12 @@
 }
 
 
+.profile_input
+{
+	padding: 8px 5px;
+}
+
+/*
 .rdiv
 {
 	height: 50px;
@@ -119,6 +125,7 @@
 	line-height: 50px;
 	height: 50px;
 }
+*/
 
 
 /* alternative link */
