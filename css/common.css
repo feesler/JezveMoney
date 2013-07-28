@@ -346,24 +346,23 @@ button::-moz-focus-inner
 }
 
 
-.rdiv > .balance_block
+.trans_input > .balance_block
 {
 	text-align: right;
-	padding: 10px 7px;
-	height: 26px;
+	height: 28px;
 }
 
 
-.rdiv > .balance_block > div
+.trans_input > .balance_block > div
 {
 	padding: 2px 5px;
-	height: 26px;
+	height: 28px;
 	border: 1px dashed #0072C6;
 	cursor: pointer;
 }
 
 
-.rdiv > .balance_block > div > span
+.trans_input > .balance_block > div > span
 {
 	height: 26px;
 	line-height: 26px;
