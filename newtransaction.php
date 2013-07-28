@@ -302,7 +302,7 @@
 ?>
 				<div><label for="charge">Charge</label></div>
 				<div>
-					<div class="right_float"><span id="ch_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
+					<div class="right_float"><span id="chargesign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
 					<div class="stretch_input trans_input">
 						<div>
 							<div onclick="onChargeSelect();" style="display: none;"><span id="charge_l" class="summ_text"></span></div>
