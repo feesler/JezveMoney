@@ -105,7 +105,7 @@
 	$acc_id = 0;
 	if (isset($_GET["acc_id"]))
 		$acc_id = intval($_GET["acc_id"]);
-	if (!$acc_id)
+	if (!$acc_id || !$acc->is_exist($acc_id))		// TODO : think about redirect or warning message
 		$acc_id = $acc->getIdByPos(0);
 	if (!$acc_id)
 		fail();
