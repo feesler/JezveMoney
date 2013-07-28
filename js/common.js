@@ -335,13 +335,17 @@ function fixEvent(e, _this)
 {
 	e = e || window.event;
 
-	if (!e.currentTarget) e.currentTarget = _this;
-	if (!e.target) e.target = e.srcElement;
+	if (!e.currentTarget)
+		e.currentTarget = _this;
+	if (!e.target)
+		e.target = e.srcElement;
 
 	if (!e.relatedTarget)
 	{
-		if (e.type == 'mouseover') e.relatedTarget = e.fromElement;
-		if (e.type == 'mouseout') e.relatedTarget = e.toElement;
+		if (e.type == 'mouseover')
+			e.relatedTarget = e.fromElement;
+		if (e.type == 'mouseout')
+			e.relatedTarget = e.toElement;
 	}
 
 	if (e.pageX == null && e.clientX != null )
@@ -358,7 +362,7 @@ function fixEvent(e, _this)
 
 	if (!e.which && e.button)
 	{
-		e.which = e.button & 1 ? 1 : ( e.button & 2 ? 3 : (e.button & 4 ? 2 : 0) );
+		e.which = (e.button & 1) ? 1 : ((e.button & 2) ? 3 : ((e.button & 4) ? 2 : 0));
 	}
 
 	return e;
