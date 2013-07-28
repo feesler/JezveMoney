@@ -298,7 +298,7 @@
 <?php
 	$disp = (($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr)) ? " style=\"display: none;\"" : "");
 	setTab(3);
-	html("<div id=\"chargeoff\"".$disp.">");
+	html("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
 ?>
 				<div><label for="charge">Charge</label></div>
 				<div>
@@ -315,7 +315,7 @@
 <?php
 	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
 	setTab(3);
-	html("<div id=\"exchange\"".$disp.">");
+	html("<div id=\"exchange\" class=\"non_float\"".$disp.">");
 ?>
 				<div><label for="exchrate">Exchange rate</label></div>
 				<div>
