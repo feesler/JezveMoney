@@ -1126,7 +1126,7 @@ function amountSwitch(showInput)
 		show('src_amount_left', true);
 
 		show(amount_l.parentNode, true);
-		amount_l.parentNode.parentNode.className = 'balance_block';
+		amount_l.parentNode.parentNode.className = 'dashed_static';
 
 		show(amount, false);
 	}
@@ -1156,7 +1156,7 @@ function chargeSwitch(showInput)
 	else
 	{
 		show(charge_l.parentNode, true);
-		charge_l.parentNode.parentNode.className = 'balance_block';
+		charge_l.parentNode.parentNode.className = 'dashed_static';
 
 		show(charge, false);
 	}
@@ -1191,7 +1191,7 @@ function resBalanceSwitch(showInput)
 	else
 	{
 		show(resbal_l.parentNode, true);
-		resbal_l.parentNode.parentNode.className = 'balance_block';
+		resbal_l.parentNode.parentNode.className = 'dashed_static';
 
 		show(resbal, false);
 
@@ -1229,7 +1229,7 @@ function resBalanceDestSwitch(showInput)
 	else
 	{
 		show(resbal_l.parentNode, true);
-		resbal_l.parentNode.parentNode.className = 'balance_block';
+		resbal_l.parentNode.parentNode.className = 'dashed_static';
 
 		show(resbal, false);
 
@@ -1262,7 +1262,7 @@ function exchRateSwitch(showInput)
 	else
 	{
 		show(exchrate_l.parentNode, true);
-		exchrate_l.parentNode.parentNode.className = 'balance_block';
+		exchrate_l.parentNode.parentNode.className = 'dashed_static';
 
 		show(exchrate, false);
 	}

@@ -128,7 +128,7 @@
 
 
 /* Dashed static block for input */
-.trans_input > .balance_block
+.trans_input > .dashed_static
 {
 	text-align: right;
 	height: 34px;
@@ -136,7 +136,7 @@
 }
 
 
-.trans_input > .balance_block > div
+.trans_input > .dashed_static > div
 {
 	padding: 2px 5px;
 	height: 28px;
@@ -145,7 +145,7 @@
 }
 
 
-.trans_input > .balance_block > div > span
+.trans_input > .dashed_static > div > span
 {
 	height: 26px;
 	line-height: 26px;
