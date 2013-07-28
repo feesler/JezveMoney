@@ -68,6 +68,15 @@
 }
 
 
+.register_page label
+{
+	width: 150px;
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 5px;
+}
+
+
 /* page header */
 .box > h1
 {
@@ -75,7 +84,7 @@
 }
 
 
-.box > label
+.login_page label
 {
 	width: 150px;
 	height: 20px;
