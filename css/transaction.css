@@ -116,3 +116,12 @@
 {
 	padding: 8px 5px;
 }
+
+
+/* exchange rate comment */
+.exchrate_comm
+{
+	margin: 0px 5px;
+	height: 50px;
+	line-height: 50px;
+}

@@ -319,7 +319,7 @@
 ?>
 				<div><label for="exchrate">Exchange rate</label></div>
 				<div>
-					<div class="right_float"><span id="exchcomm" style="margin-left: 5px;"></span></div>
+					<div class="right_float"><span id="exchcomm" class="exchrate_comm"></span></div>
 					<div class="stretch_input trans_input">
 						<div class="balance_block">
 							<div onclick="onExchRateSelect();"><span id="exchrate_l" class="summ_text">1</span></div>
