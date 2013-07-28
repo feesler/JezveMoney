@@ -922,8 +922,9 @@ function onChangeTransCurr()
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	exchrate_l = ge('exchrate_l');
+	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_l || !charge)
+	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_l || !exchrate_b || !charge)
 		return;
 	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
 		return
