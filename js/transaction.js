@@ -328,12 +328,11 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
+	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, charge;
 	var sync = false;
 
 	srcid = ge('src_id');
 	destid = ge('dest_id');
-	accid = ge('accid');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
@@ -341,13 +340,13 @@ function onChangeAcc()
 	exchrate = ge('exchrate');
 	exchrate_l = ge('exchrate_l');
 	charge = ge('charge');
-	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_l || !charge)
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_l || !charge)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
 		sync = true;
 
-	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : (destid ? destid : accid)));
+	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
 	if (sync)
 		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
@@ -547,6 +546,9 @@ function updControls()
 
 	setTileAccount('source_tile', selectedValue(src));
 	setTileAccount('dest_tile', selectedValue(dest));
+
+	getValues();
+	setExchangeComment();
 }
 
 
@@ -653,7 +655,13 @@ function setExchangeComment()
 
 	if (fe == 1.0 || fe == 0.0 || e == '')
 	{
-		exchcomm.innerHTML = '';
+		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
+		if (isTransfer())
+			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
+		else
+			amountSign = getCurrencySign(selectedValue(transcurr));
+
+		exchcomm.innerHTML = chargeSign + '/' + amountSign;
 	}
 	else
 	{
@@ -927,6 +935,9 @@ function onChangeTransCurr()
 
 	setSign(false, chargeCurr);
 	setSign(true, amountCurr);
+
+	getValues();
+	setExchangeComment();
 }
 
 
