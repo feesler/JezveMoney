@@ -1273,6 +1273,8 @@ function exchRateSwitch(showInput)
 		show(exchrate_l.parentNode, false);
 		exchrate_l.parentNode.parentNode.className = '';
 
+		show('exch_left', false);
+
 		show(exchrate, true);
 		exchrate.focus();
 	}
@@ -1280,6 +1282,8 @@ function exchRateSwitch(showInput)
 	{
 		show(exchrate_l.parentNode, true);
 		exchrate_l.parentNode.parentNode.className = 'dashed_static';
+
+		show('exch_left', true);
 
 		show(exchrate, false);
 	}
@@ -1323,8 +1327,8 @@ function onResBalanceDestSelect()
 // Exchange rate static click event handler
 function onExchRateSelect()
 {
-	exchRateSwitch(true);
 	amountSwitch(true);
+	exchRateSwitch(true);
 	chargeSwitch(false);
 	resBalanceSwitch(false);
 }
