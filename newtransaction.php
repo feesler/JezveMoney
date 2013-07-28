@@ -277,11 +277,11 @@
 				<div>
 <?php
 	setTab(5);
-	echo($tabStr."<div><label for=\"amount\">Amount</label></div>");
+	echo($tabStr."<div><label for=\"amount\">Amount</label>");
 	echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
 	if ($trans_type == 3)
 		echo(" style=\"display: none;\"");
-	echo("><span>Select currency</span></button>\r\n");
+	echo("><span>Select currency</span></button></div>\r\n");
 ?>
 					<div>
 						<div class="right_float"><span id="amountsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]) ?></span></div>
