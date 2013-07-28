@@ -177,9 +177,9 @@
 
 	setTab(3);
 	if ($trans_type == 1 || $trans_type == 3)		// expense or transfer
-		html("<div id=\"source\">");
+		html("<div id=\"source\" class=\"acc_float\">");
 	else
-		html("<div id=\"source\" style=\"display: none;\">");
+		html("<div id=\"source\" class=\"acc_float\" style=\"display: none;\">");
 ?>
 				<div><label for="src_id">Source account</label></div>
 				<div class="tile_container">
@@ -220,9 +220,9 @@
 <?php
 	setTab(3);
 	if ($trans_type == 2 || $trans_type == 3)		// income or transfer
-		html("<div id=\"destination\">");
+		html("<div id=\"destination\" class=\"acc_float\">");
 	else
-		html("<div id=\"destination\" style=\"display: none;\">");
+		html("<div id=\"destination\" class=\"acc_float\" style=\"display: none;\">");
 ?>
 				<div><label for="dest_id">Destination account</label></div>
 				<div class="tile_container">
@@ -259,7 +259,7 @@
 				</div>
 			</div>
 
-			<div id="amount_row">
+			<div id="amount_row" class="non_float">
 				<div id="curr_block" style="float: right; display: none;">
 					<div><label for="transcurr">Currency</label></div>
 					<div class="rdiv">
@@ -330,7 +330,7 @@
 				</div>
 			</div>
 
-			<div id="result_balance" style="display: none;">
+			<div id="result_balance" class="non_float" style="display: none;">
 				<div><label for="resbal">Result balance<? if ($trans_type == 3) echo(" (Source)"); ?></label></div>
 				<div>
 					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
@@ -343,7 +343,7 @@
 				</div>
 			</div>
 
-			<div id="result_balance_dest" style="display: none;">
+			<div id="result_balance_dest" class="non_float" style="display: none;">
 				<div><label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label></div>
 				<div>
 					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
@@ -356,7 +356,7 @@
 				</div>
 			</div>
 
-			<div style="clear: both;">
+			<div class="non_float">
 				<div id="calendar_btn" class="iconlink form_iconlink"><button type="button" onclick="showCalendar();"><div class="calendar"></div><span>Change date</span></button></div>
 				<div id="date_block" style="display: none;">
 					<div><label for="date">Date</label></div>
@@ -373,7 +373,7 @@
 				</div>
 			</div>
 
-			<div style="clear: both;">
+			<div class="non_float">
 				<div id="comm_btn" class="iconlink form_iconlink"><button type="button" onclick="showComment();"><div class="add"></div><span>Add comment</span></button></div>
 				<div id="comment_block" style="display: none;">
 					<div><label for="comm">Comment</label></div>

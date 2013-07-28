@@ -39,7 +39,8 @@
 
 .tr_content > div
 {
-	max-width: 300px;
+	min-width: 100px;
+	max-width: 600px;
 	margin: 30px 5px 5px 25px;
 }
 
@@ -85,6 +86,23 @@
 .tile_right_block
 {
 	height: 100px;
-	margin: 0px 0px 10px 0px;
+	min-width: 100px;
+	margin: 0px 20px 10px 0px;
 	overflow: hidden;
+}
+
+
+.acc_float
+{
+	min-width: 100px;
+	max-width: 300px;
+
+	float: left;
+}
+
+
+.non_float
+{
+	clear: both;
+	max-width: 300px;
 }
