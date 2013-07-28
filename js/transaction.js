@@ -328,7 +328,7 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, charge;
+	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_l, exchrate_b, charge;
 	var sync = false;
 
 	srcid = ge('src_id');
@@ -339,8 +339,9 @@ function onChangeAcc()
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	exchrate_l = ge('exchrate_l');
+	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_l || !charge)
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_l || !exchrate_b || !charge)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
@@ -359,6 +360,7 @@ function onChangeAcc()
 		exchange.style.display = 'none';
 		exchrate.value = 1;
 		exchrate_l.innerHTML = '1';
+		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 	}
 
@@ -498,7 +500,7 @@ function setTileAccount(tile_id, acc_id)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, exchrate_l, chargeoff, exchange, resbal, dstyle, transcurr;
+	var src, dest, amount, charge, exchrate, exchrate_l, exchrate_b, chargeoff, exchange, resbal, dstyle, transcurr;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -506,6 +508,7 @@ function updControls()
 	charge = ge('charge');
 	exchrate = ge('exchrate');
 	exchrate_l = ge('exchrate_l');
+	exchrate_b = ge('exchrate_b');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	resbal = ge('resbal');
@@ -525,6 +528,7 @@ function updControls()
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_l.innerHTML = '1';
+		exchrate_b.firstElementChild.innerHTML = '1';
 		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
 	}
 
@@ -640,17 +644,18 @@ function onInput(obj)
 // Set exchange rate comment
 function setExchangeComment()
 {
-	var exchcomm, transcurr, accid, taccid;
+	var exchcomm, exchrate_b, transcurr, accid, taccid;
 	var chargeSign, amountSign;
 	var invExch;
 
 	exchcomm = ge('exchcomm');
+	exchrate_b = ge('exchrate_b');
 	if (trans_type == 1 || trans_type == 2)
 		transcurr = ge('transcurr');
 	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
 	if (isTransfer())
 		taccid = ge('dest_id');
-	if (!exchcomm || !accid || (!transcurr && !taccid))
+	if (!exchcomm || !exchrate_b || !accid || (!transcurr && !taccid))
 		return;
 
 	if (fe == 1.0 || fe == 0.0 || e == '')
@@ -678,6 +683,8 @@ function setExchangeComment()
 
 		exchcomm.innerHTML = chargeSign + '/' + amountSign + ' ('  + invExch + ' ' + amountSign + '/' + chargeSign + ')';
 	}
+
+	exchrate_b.firstElementChild.innerHTML = fe + ' ' + exchcomm.innerHTML;
 }
 
 
@@ -755,7 +762,7 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var amount, amount_l, amount_b, charge, charge_l, exchrate, resbal, resbal_l;
+	var amount, amount_l, amount_b, charge, charge_l, exchrate, exchrate_l, exchcomm, exchrate_b, resbal, resbal_l;
 
 	amount = ge('amount');
 	amount_l = ge('amount_l');
@@ -764,10 +771,12 @@ function setValues()
 	charge_l = ge('charge_l');
 	exchrate = ge('exchrate');
 	exchrate_l = ge('exchrate_l');
+	exchcomm = ge('exchcomm');
+	exchrate_b = ge('exchrate_b');
 	resbal = ge('resbal');
 	resbal_l = ge('resbal_l');
 	resbal_b = ge('resbal_b');
-	if (!amount || !amount_l || !amount_b || !charge || !charge_l || !exchrate || !exchrate_l || !resbal || !resbal_l || !resbal_b)
+	if (!amount || !amount_l || !amount_b || !charge || !charge_l || !exchrate || !exchrate_l || !exchrate_b || !resbal || !resbal_l || !resbal_b)
 		return;
 
 	amount.value = a;
@@ -778,6 +787,8 @@ function setValues()
 	charge_l.innerHTML = d;
 	exchrate.value = e;
 	exchrate_l.innerHTML = e;
+	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
+
 	resbal.value = S2;
 	resbal_l.innerHTML = S2;
 	resbal_b.firstElementChild.innerHTML = formatCurrency(S2, getCurrencyOfAccount(selectedValue(ge('src_id'))));
@@ -896,7 +907,7 @@ function onFInput(obj)
 // Currency of transaction change event handler
 function onChangeTransCurr()
 {
-	var accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
+	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_l, exchrate_b, charge;
 	var amountCurr, chargeCurr;
 
 	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
@@ -921,6 +932,7 @@ function onChangeTransCurr()
 		exchange.style.display = 'none';
 		exchrate.value = 1;
 		exchrate_l.innerHTML = '1';
+		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 
 		updateExchAndRes();

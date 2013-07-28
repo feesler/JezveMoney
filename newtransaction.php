@@ -210,7 +210,18 @@
 					<div id="src_amount_left" style="display: none;">
 						<span>Amount</span>
 						<div>
-							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span></span></button>
+							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo("0 ".($trans_type == 1) ? $src["sign"] : $dest["sign"]); ?></span></button>
+						</div>
+					</div>
+
+<?php
+	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
+	setTab(5);
+	echo($tabStr."<div id=\"src_exch_left\"".$disp.">");
+?>
+						<span>Exchange rate</span>
+						<div>
+							<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?php echo("1 ".$src["sign"]."/".$dest["sign"]); ?></span></button>
 						</div>
 					</div>
 				</div>
