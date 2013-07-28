@@ -136,7 +136,6 @@
 
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
-	html(getCSS("login.css"));
 	html(getCSS("transaction.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
@@ -260,7 +259,7 @@
 			</div>
 
 			<div id="amount_row" class="non_float">
-				<div id="curr_block" style="float: right; display: none;">
+				<div id="curr_block" class="right_float" style="display: none;">
 					<div><label for="transcurr">Currency</label></div>
 					<div class="rdiv">
 						<div class="currency_block">
@@ -285,8 +284,8 @@
 	echo("><span>Select currency</span></button>\r\n");
 ?>
 					<div>
-						<div class="rtext"><span id="amountsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]) ?></span></div>
-						<div class="rdiv">
+						<div class="right_float"><span id="amountsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]) ?></span></div>
+						<div class="stretch_input trans_input">
 							<div>
 								<div onclick="onAmountSelect();" style="display: none;"><span id="amount_l" class="summ_text"></span></div>
 								<input id="amount" name="amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
@@ -303,8 +302,8 @@
 ?>
 				<div><label for="charge">Charge</label></div>
 				<div>
-					<div class="rtext"><span id="ch_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
-					<div class="rdiv">
+					<div class="right_float"><span id="ch_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
+					<div class="stretch_input trans_input">
 						<div>
 							<div onclick="onChargeSelect();" style="display: none;"><span id="charge_l" class="summ_text"></span></div>
 							<input id="charge" name="charge" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
@@ -320,8 +319,8 @@
 ?>
 				<div><label for="exchrate">Exchange rate</label></div>
 				<div>
-					<div class="rtext"><span id="exchcomm" style="margin-left: 5px;"></span></div>
-					<div class="rdiv">
+					<div class="right_float"><span id="exchcomm" style="margin-left: 5px;"></span></div>
+					<div class="stretch_input trans_input">
 						<div class="balance_block">
 							<div onclick="onExchRateSelect();"><span id="exchrate_l" class="summ_text">1</span></div>
 							<input id="exchrate" name="exchrate" class="summ_text" type="text" value="1" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
@@ -333,8 +332,8 @@
 			<div id="result_balance" class="non_float" style="display: none;">
 				<div><label for="resbal">Result balance<? if ($trans_type == 3) echo(" (Source)"); ?></label></div>
 				<div>
-					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
-					<div class="rdiv">
+					<div class="right_float"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
+					<div class="stretch_input trans_input">
 						<div class="balance_block">
 							<div onclick="onResBalanceSelect();"><span id="resbal_l" class="summ_text"></span></div>
 							<input id="resbal" name="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
@@ -346,8 +345,8 @@
 			<div id="result_balance_dest" class="non_float" style="display: none;">
 				<div><label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label></div>
 				<div>
-					<div class="rtext"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
-					<div class="rdiv">
+					<div class="right_float"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
+					<div class="stretch_input trans_input">
 						<div class="balance_block">
 							<div onclick="onResBalanceDestSelect();"><span id="resbal_d_l" class="summ_text"></span></div>
 							<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
@@ -361,8 +360,8 @@
 				<div id="date_block" style="display: none;">
 					<div><label for="date">Date</label></div>
 					<div>
-						<div class="rtext"></div>
-						<div class="rdiv">
+						<div class="right_float"></div>
+						<div class="stretch_input trans_input">
 							<div>
 								<input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>">
 							</div>
@@ -378,7 +377,7 @@
 				<div id="comment_block" style="display: none;">
 					<div><label for="comm">Comment</label></div>
 					<div>
-						<div class="rdiv">
+						<div class="stretch_input trans_input">
 							<div>
 								<input id="comm" name="comm" type="text" value="">
 							</div>
