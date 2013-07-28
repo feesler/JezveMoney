@@ -796,7 +796,7 @@ function setValues()
 
 	resbal.value = S2;
 	resbal_l.innerHTML = S2;
-	resbal_b.firstElementChild.innerHTML = formatCurrency(S2, getCurrencyOfAccount(selectedValue(ge('src_id'))));
+	resbal_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, getCurrencyOfAccount(selectedValue(ge('src_id'))));
 
 	if (isTransfer())
 	{
@@ -804,7 +804,7 @@ function setValues()
 		if (!resbal_d_b)
 			return;
 
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(S2_d, getCurrencyOfAccount(selectedValue(ge('dest_id'))));
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, getCurrencyOfAccount(selectedValue(ge('dest_id'))));
 	}
 }
 
