@@ -59,7 +59,7 @@
 	height: 20px;
 	line-height: 20px;
 	padding: 0px 5px;
-	font-size: 14px;
+	font-size: 16px;
 }
 
 
@@ -79,7 +79,11 @@
 
 .tile_container
 {
-	padding: 0px 5px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	clear: left;
+	padding: 8px 5px;
 }
 
 
@@ -87,7 +91,7 @@
 {
 	height: 100px;
 	min-width: 100px;
-	margin: 0px 20px 10px 0px;
+	margin: 8px 20px 10px 0px;
 	overflow: hidden;
 }
 
@@ -96,7 +100,6 @@
 {
 	min-width: 100px;
 	max-width: 300px;
-
 	float: left;
 }
 
