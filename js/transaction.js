@@ -780,7 +780,7 @@ function setValues()
 	exchrate_l.innerHTML = e;
 	resbal.value = S2;
 	resbal_l.innerHTML = S2;
-	resbal_b.firstElementChild.innerHTML = formatCurrency(S2, selectedValue(ge('transcurr')));
+	resbal_b.firstElementChild.innerHTML = formatCurrency(S2, getCurrencyOfAccount(selectedValue(ge('src_id'))));
 
 	if (isTransfer())
 	{
@@ -788,7 +788,7 @@ function setValues()
 		if (!resbal_d_b)
 			return;
 
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(S2_d, selectedValue(ge('transcurr')));
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(S2_d, getCurrencyOfAccount(selectedValue(ge('dest_id'))));
 	}
 }
 
