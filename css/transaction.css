@@ -82,7 +82,6 @@
 	width: 100px;
 	height: 100px;
 	float: left;
-	clear: left;
 	padding: 8px 5px;
 }
 
@@ -93,6 +92,7 @@
 	min-width: 100px;
 	margin: 8px 20px 10px 0px;
 	overflow: hidden;
+	float: left;
 }
 
 
