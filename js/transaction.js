@@ -375,6 +375,9 @@ function showCurrList()
 {
 	var transcurr, ancurrbtn;
 
+	if (isTransfer())
+		return;
+
 	curr_block = ge('curr_block');
 	ancurrbtn = ge('ancurrbtn');
 	if (!curr_block || !ancurrbtn)
