@@ -200,13 +200,6 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
-					<div id="src_res_balance_left">
-						<span>Result balance</span>
-						<div>
-							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($src["balance"], $src["curr"])); ?></span></button>
-						</div>
-					</div>
-
 					<div id="src_amount_left" style="display: none;">
 						<span>Amount</span>
 						<div>
@@ -222,6 +215,13 @@
 						<span>Exchange rate</span>
 						<div>
 							<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?php echo("1 ".$src["sign"]."/".$dest["sign"]); ?></span></button>
+						</div>
+					</div>
+
+					<div id="src_res_balance_left">
+						<span>Result balance</span>
+						<div>
+							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($src["balance"], $src["curr"])); ?></span></button>
 						</div>
 					</div>
 				</div>
@@ -254,16 +254,17 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
-					<div id="dest_res_balance_left">
-						<span>Result balance</span>
-						<div>
-							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
-						</div>
-					</div>
 					<div id="dest_charge_left" style="display: none;">
 						<span>Charge</span>
 						<div>
 							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span></span></button>
+						</div>
+					</div>
+
+					<div id="dest_res_balance_left">
+						<span>Result balance</span>
+						<div>
+							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
 						</div>
 					</div>
 				</div>
