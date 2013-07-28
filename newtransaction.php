@@ -217,7 +217,7 @@
 <?php
 	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
 	setTab(5);
-	echo($tabStr."<div id=\"exch_left\"".$disp.">");
+	html("<div id=\"exch_left\"".$disp.">");
 ?>
 						<span>Exchange rate</span>
 						<div>
