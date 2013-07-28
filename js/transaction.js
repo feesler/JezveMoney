@@ -368,6 +368,11 @@ function onChangeAcc()
 
 	setSign(false, trans_acc_curr);
 	setSign(true, trans_curr);
+
+	if (isIncome())
+		setTileAccount('dest_tile', selectedValue(destid));
+	else
+		setTileAccount('source_tile', selectedValue(srcid));
 }
 
 
