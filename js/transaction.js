@@ -180,7 +180,11 @@ function getCurrencyFormat(curr_id)
 // Return currency id of specified account
 function getCurrencyOfAccount(account_id)
 {
-	var curr_id = '';
+	var curr_id = 0;
+
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return curr_id;
 
 	accounts.some(function(acc)
 	{
