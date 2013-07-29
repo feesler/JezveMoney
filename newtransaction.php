@@ -176,10 +176,8 @@
 	showSubMenu();
 
 	setTab(3);
-	if ($trans_type == 1 || $trans_type == 3)		// expense or transfer
-		html("<div id=\"source\" class=\"acc_float\">");
-	else
-		html("<div id=\"source\" class=\"acc_float\" style=\"display: none;\">");
+	$disp = (($trans_type == 1 || $trans_type == 3) ? "" : " style=\"display: none;\"");
+	html("<div id=\"source\" class=\"acc_float\"".$disp.">");
 ?>
 				<div><label for="src_id">Source account</label></div>
 				<div class="tile_container">
@@ -243,10 +241,8 @@
 
 <?php
 	setTab(3);
-	if ($trans_type == 2 || $trans_type == 3)		// income or transfer
-		html("<div id=\"destination\" class=\"acc_float\">");
-	else
-		html("<div id=\"destination\" class=\"acc_float\" style=\"display: none;\">");
+	$disp = (($trans_type == 2 || $trans_type == 3) ?  "" : " style=\"display: none;\"");
+	html("<div id=\"destination\" class=\"acc_float\"".$disp.">");
 ?>
 				<div><label for="dest_id">Destination account</label></div>
 				<div class="tile_container">
