@@ -328,7 +328,7 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_l, exchrate_b, charge;
+	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
 	var sync = false;
 
 	srcid = ge('src_id');
@@ -338,10 +338,9 @@ function onChangeAcc()
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
-	exchrate_l = ge('exchrate_l');
 	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_l || !exchrate_b || !charge)
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
@@ -359,7 +358,6 @@ function onChangeAcc()
 		show(chargeoff, false);
 		show(exchange, false);
 		exchrate.value = 1;
-		exchrate_l.innerHTML = '1';
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 	}
@@ -505,19 +503,18 @@ function setTileAccount(tile_id, acc_id)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, exchrate_l, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
+	var src, dest, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
-	exchrate_l = ge('exchrate_l');
 	exchrate_b = ge('exchrate_b');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	resbal = ge('resbal');
-	if (!src || !dest || !amount || !charge || !exchrate || !exchrate_l || !chargeoff || !exchange || !resbal)
+	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal)
 		return;
 
 	exchange.value = '';
@@ -531,7 +528,6 @@ function updControls()
 	{
 		charge.value = amount.value;
 		exchrate.value = 1;
-		exchrate_l.innerHTML = '1';
 		exchrate_b.firstElementChild.innerHTML = '1';
 		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
 	}
@@ -613,7 +609,6 @@ function onInput(obj)
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
-	exchrate_l = ge('exchrate_l');
 
 	if (!obj || !amount || !charge || !exchrate || !exchrate_l)
 		return false;
@@ -630,7 +625,6 @@ function onInput(obj)
 		if (amount.value && isNum(fixFloat(amount.value)) && charge.value && isNum(fixFloat(charge.value)))
 		{
 			exchrate.value = fixFloat(charge.value) / fixFloat(amount.value);
-			exchrate_l.innerHTML = exchrate.value;
 		}
 	}
 	else if (obj == exchrate)
@@ -766,35 +760,27 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var amount, amount_l, amount_b, charge, charge_l, exchrate, exchrate_l, exchcomm, exchrate_b, resbal, resbal_l;
+	var amount, amount_b, charge, exchrate, exchcomm, exchrate_b, resbal;
 
 	amount = ge('amount');
-	amount_l = ge('amount_l');
 	amount_b = ge('amount_b');
 	charge = ge('charge');
-	charge_l = ge('charge_l');
 	exchrate = ge('exchrate');
-	exchrate_l = ge('exchrate_l');
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
 	resbal = ge('resbal');
-	resbal_l = ge('resbal_l');
 	resbal_b = ge('resbal_b');
-	if (!amount || !amount_l || !amount_b || !charge || !charge_l || !exchrate || !exchrate_l || !exchrate_b || !resbal || !resbal_l || !resbal_b)
+	if (!amount || !amount_l || !amount_b || !charge || !charge_l || !exchrate || !exchrate_l || !exchrate_b || !resbal || !resbal_b)
 		return;
 
 	amount.value = a;
-	amount_l.innerHTML = a;
 	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), selectedValue(ge('transcurr')));
 
 	charge.value = d;
-	charge_l.innerHTML = d;
 	exchrate.value = e;
-	exchrate_l.innerHTML = e;
 	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
 
 	resbal.value = S2;
-	resbal_l.innerHTML = S2;
 	resbal_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, getCurrencyOfAccount(selectedValue(ge('src_id'))));
 
 	if (isTransfer())
@@ -911,7 +897,7 @@ function onFInput(obj)
 // Currency of transaction change event handler
 function onChangeTransCurr()
 {
-	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_l, exchrate_b, charge;
+	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
 	var amountCurr, chargeCurr, isDiff;
 
 	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
@@ -920,10 +906,9 @@ function onChangeTransCurr()
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
-	exchrate_l = ge('exchrate_l');
 	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_l || !exchrate_b || !charge)
+	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge)
 		return;
 	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
 		return
@@ -935,7 +920,6 @@ function onChangeTransCurr()
 	if (isDiff)
 	{
 		exchrate.value = 1;
-		exchrate_l.innerHTML = '1';
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 
