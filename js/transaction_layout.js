@@ -55,98 +55,52 @@ function showComment()
 }
 
 
+// Common function for toggle switch
+function commonSwitch(input_block_id, static_block_id, input_id, showInput)
+{
+	var inpObj = ge(input_id);
+	showInput = showInput | false;
+
+	show(input_block_id, showInput);
+	show(static_block_id, !showInput);
+
+	if (showInput && inpObj)
+		inpObj.focus();
+}
+
+
 // Show input control or static block for amount value
 function amountSwitch(showInput)
 {
-	var amount;
-
-	amount = ge('amount');
-	if (!amount)
-		return;
-
-	showInput = showInput | false;
-
-	show('amount_row', showInput);			// show entire row instead of input
-	show('amount_left', !showInput);
-
-	if (showInput)
-		amount.focus();
+	commonSwitch('amount_row', 'amount_left', 'amount', showInput);
 }
 
 
 // Show input control or static block for charge value
 function chargeSwitch(showInput)
 {
-	var charge;
-
-	charge = ge('charge');
-	if (!charge)
-		return;
-
-	showInput = showInput | false;
-
-	show('chargeoff', showInput);
-	show('charge_left', !showInput);
-
-	if (showInput)
-		charge.focus();
+	commonSwitch('chargeoff', 'charge_left', 'charge', showInput);
 }
 
 
 // Show input control or static block for result balance value
 function resBalanceSwitch(showInput)
 {
-	var resbal;
-
-	resbal = ge('resbal');
-	if (!resbal)
-		return;
-
-	showInput = showInput | false;
-
-	show('result_balance', showInput);
-	show('src_res_balance_left', !showInput);
-
-	if (showInput)
-		resbal.focus();
+	commonSwitch('result_balance', 'src_res_balance_left', 'resbal', showInput);
 }
 
 
 // Show input control or static block for result balance value
 function resBalanceDestSwitch(showInput)
 {
-	var resbal;
-
-	resbal = ge('resbal_d');
-	if (!resbal)
-		return;
-
-	showInput = showInput | false;
-
-	show('result_balance_dest', showInput);
-	show('dest_res_balance_left', !showInput);
-
-	if (showInput)
-		resbal.focus();
+	commonSwitch('result_balance_dest', 'dest_res_balance_left', 'resbal_d', showInput);
 }
 
 
 // Show input control or static block for exchange rate value
 function exchRateSwitch(showInput)
 {
-	var exchrate;
-
-	exchrate = ge('exchrate');
-	if (!exchrate)
-		return;
-
-	showInput = showInput | false;
-
-	show('exchange', showInput);
-	show('exch_left', !showInput);
-
-	if (showInput)
-		exchrate.focus();
+	commonSwitch('exchange', 'exch_left', 'exchrate', showInput);
 }
 
 
