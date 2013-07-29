@@ -333,7 +333,7 @@
 					<div class="right_float"><span id="exchcomm" class="exchrate_comm"><?php echo($src["sign"]."/".$dest["sign"]); ?></span></div>
 					<div class="stretch_input trans_input">
 						<div>
-							<input id="exchrate" name="exchrate" class="summ_text" type="text" value="1" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
+							<input id="exchrate" name="exchrate" class="summ_text" type="text" value="1" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 						</div>
 					</div>
 				</div>
@@ -345,7 +345,7 @@
 					<div class="right_float"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
 					<div class="stretch_input trans_input">
 						<div>
-							<input id="resbal" name="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
+							<input id="resbal" name="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 						</div>
 					</div>
 				</div>
@@ -357,7 +357,7 @@
 					<div class="right_float"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
 					<div class="stretch_input trans_input">
 						<div>
-							<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" style="display: none;">
+							<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 						</div>
 					</div>
 				</div>

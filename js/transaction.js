@@ -356,7 +356,9 @@ function onChangeAcc()
 	if (trans_curr == trans_acc_curr)
 	{
 		show(chargeoff, false);
+		show('dest_charge_left', true);
 		show(exchange, false);
+		show('exch_left', true);
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
@@ -533,7 +535,9 @@ function updControls()
 	}
 
 	show(chargeoff, isDiff);
+	show('dest_charge_left', !isDiff);
 	show(exchange, isDiff);
+	show('exch_left', !isDiff);
 
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
 	chargeCurr = getCurrencyOfAccount(selectedValue(src));
@@ -927,7 +931,9 @@ function onChangeTransCurr()
 	}
 
 	show(chargeoff, !isDiff);
-	show(chargeoff, !isDiff);
+	show('dest_charge_left', isDiff);
+	show(exchange, !isDiff);
+	show('exch_left', isDiff);
 
 	trans_curr = amountCurr;
 
