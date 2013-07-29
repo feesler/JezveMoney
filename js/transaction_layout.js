@@ -66,22 +66,11 @@ function amountSwitch(showInput)
 
 	showInput = showInput | false;
 
+	show('amount_row', showInput);			// show entire row instead of input
+	show('amount_left', !showInput);
+
 	if (showInput)
-	{
-		show(amount, true);
-
-		show('src_amount_left', false);
-		show('amount_row', true);
-
 		amount.focus();
-		resBalanceSwitch(false);
-	}
-	else
-	{
-		show('amount_row', false);
-		show('src_amount_left', true);
-		show(amount, false);
-	}
 }
 
 
@@ -96,16 +85,11 @@ function chargeSwitch(showInput)
 
 	showInput = showInput | false;
 
+	show('chargeoff', showInput);
+	show('charge_left', !showInput);
+
 	if (showInput)
-	{
-		show(charge, true);
 		charge.focus();
-		resBalanceSwitch(false);
-	}
-	else
-	{
-		show(charge, false);
-	}
 }
 
 
@@ -120,23 +104,11 @@ function resBalanceSwitch(showInput)
 
 	showInput = showInput | false;
 
+	show('result_balance', showInput);
+	show('src_res_balance_left', !showInput);
+
 	if (showInput)
-	{
-		show(resbal, true);
-		amountSwitch(false);
-
-		show('result_balance', true);
-		show('src_res_balance_left', false);
-
 		resbal.focus();
-	}
-	else
-	{
-		show(resbal, false);
-
-		show('result_balance', false);
-		show('src_res_balance_left', true);
-	}
 }
 
 
@@ -151,23 +123,11 @@ function resBalanceDestSwitch(showInput)
 
 	showInput = showInput | false;
 
+	show('result_balance_dest', showInput);
+	show('dest_res_balance_left', !showInput);
+
 	if (showInput)
-	{
-		show(resbal, true);
-		amountSwitch(false);
-
-		show('result_balance_dest', true);
-		show('dest_res_balance_left', false);
-
 		resbal.focus();
-	}
-	else
-	{
-		show(resbal, false);
-
-		show('result_balance_dest', false);
-		show('dest_res_balance_left', true);
-	}
 }
 
 
@@ -182,19 +142,11 @@ function exchRateSwitch(showInput)
 
 	showInput = showInput | false;
 
+	show('exchange', showInput);
+	show('exch_left', !showInput);
+
 	if (showInput)
-	{
-		show('exch_left', false);
-
-		show(exchrate, true);
 		exchrate.focus();
-	}
-	else
-	{
-		show('exch_left', true);
-
-		show(exchrate, false);
-	}
 }
 
 
@@ -202,7 +154,7 @@ function exchRateSwitch(showInput)
 function onAmountSelect()
 {
 	amountSwitch(true);
-	exchRateSwitch(false);
+	resBalanceSwitch(false);
 }
 
 
@@ -219,7 +171,7 @@ function onResBalanceSelect()
 {
 	resBalanceSwitch(true);
 	resBalanceDestSwitch(false);
-	exchRateSwitch(false);
+	amountSwitch(false);
 }
 
 
@@ -228,15 +180,24 @@ function onResBalanceDestSelect()
 {
 	resBalanceSwitch(false);
 	resBalanceDestSwitch(true);
-	exchRateSwitch(false);
+	amountSwitch(false);
 }
 
 
 // Exchange rate static click event handler
 function onExchRateSelect()
 {
-	amountSwitch(true);
 	exchRateSwitch(true);
 	chargeSwitch(false);
-	resBalanceSwitch(false);
+}
+
+
+// Hide both charge and exchange rate controls
+function hideChargeAndExchange()
+{
+	show('chargeoff', false);
+	show('charge_left',  false);
+
+	show('exchange', false);
+	show('exch_left', false);
 }

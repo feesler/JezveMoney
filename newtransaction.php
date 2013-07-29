@@ -201,7 +201,7 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
-					<div id="src_amount_left" style="display: none;">
+					<div id="amount_left" style="display: none;">
 						<span>Amount</span>
 						<div>
 							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
@@ -225,6 +225,19 @@
 							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($src["balance"], $src["curr"])); ?></span></button>
 						</div>
 					</div>
+<?php
+	if ($trans_type == 1 || $trans_type == 2)
+	{
+?>
+					<div id="charge_left" style="display: none;">
+						<span>Charge</span>
+						<div>
+							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
+						</div>
+					</div>
+<?php
+	}
+?>
 				</div>
 			</div>
 
@@ -255,7 +268,7 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
-					<div id="dest_charge_left" style="display: none;">
+					<div id="charge_left" style="display: none;">
 						<span>Charge</span>
 						<div>
 							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span></span></button>

@@ -359,10 +359,14 @@ function onChangeAcc()
 	// hide charge and exchange rate if new currencies is the same
 	if (trans_curr == trans_acc_curr)
 	{
+		chargeSwitch(false, true);
+		exchRateSwitch(false, true);
+/*
 		show(chargeoff, false);
 		show('dest_charge_left', true);
 		show(exchange, false);
 		show('exch_left', true);
+*/
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
@@ -538,10 +542,14 @@ function updControls()
 		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
 	}
 
+	chargeSwitch(isDiff);
+	exchRateSwitch(isDiff);
+/*
 	show(chargeoff, isDiff);
 	show('dest_charge_left', !isDiff);
 	show(exchange, isDiff);
 	show('exch_left', !isDiff);
+*/
 
 	amountCurr = getCurrencyOfAccount(selectedValue(dest));
 	chargeCurr = getCurrencyOfAccount(selectedValue(src));
@@ -921,23 +929,32 @@ function onChangeTransCurr()
 	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
 		return
 
-	amountCurr = selectedValue(transcurr);
+	amountCurr = parseInt(selectedValue(transcurr));
 	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
 
-	isDiff = (amountCurr == chargeCurr);
+	isDiff = (amountCurr != chargeCurr);
 	if (isDiff)
+	{
+		chargeSwitch(true);
+		exchRateSwitch(false);
+	}
+	else
 	{
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 
 		updateExchAndRes();
+
+		hideChargeAndExchange();
 	}
 
+/*	
 	show(chargeoff, !isDiff);
 	show('dest_charge_left', isDiff);
 	show(exchange, !isDiff);
 	show('exch_left', isDiff);
+*/
 
 	trans_curr = amountCurr;
 
