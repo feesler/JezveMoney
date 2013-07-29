@@ -614,7 +614,7 @@ function onInput(obj)
 	charge = ge('charge');
 	exchrate = ge('exchrate');
 
-	if (!obj || !amount || !charge || !exchrate || !exchrate_l)
+	if (!obj || !amount || !charge || !exchrate)
 		return false;
 
 	if (obj == amount)
@@ -774,7 +774,7 @@ function setValues()
 	exchrate_b = ge('exchrate_b');
 	resbal = ge('resbal');
 	resbal_b = ge('resbal_b');
-	if (!amount || !amount_l || !amount_b || !charge || !charge_l || !exchrate || !exchrate_l || !exchrate_b || !resbal || !resbal_b)
+	if (!amount || !amount_b || !charge || !exchrate || !exchrate_b || !resbal || !resbal_b)
 		return;
 
 	amount.value = a;
