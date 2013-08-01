@@ -331,9 +331,9 @@
 			</div>
 
 <?php
-	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
+	//$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
 	setTab(3);
-	html("<div id=\"exchange\" class=\"non_float\"".$disp.">");
+	html("<div id=\"exchange\" class=\"non_float\" style=\"display: none;\">");
 ?>
 				<div><label for="exchrate">Exchange rate</label></div>
 				<div>
