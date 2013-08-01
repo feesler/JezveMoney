@@ -315,7 +315,7 @@
 			</div>
 
 <?php
-	$disp = (($trans_type != 3 || ($trans_type == 3 && $src_curr == $dest_curr)) ? " style=\"display: none;\"" : "");
+	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
 	setTab(3);
 	html("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
 ?>
