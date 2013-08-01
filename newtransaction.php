@@ -330,12 +330,12 @@
 					</div>
 <?php
 	}
-
-	}
 ?>
 				</div>
 			</div>
-
+<?php
+	}
+?>
 			<div id="amount_row" class="non_float">
 				<div id="curr_block" class="right_float" style="display: none;">
 					<div><label for="transcurr">Currency</label></div>
