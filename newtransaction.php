@@ -176,7 +176,9 @@
 	showSubMenu();
 
 	setTab(3);
-	$disp = (($trans_type == 1 || $trans_type == 3) ? "" : " style=\"display: none;\"");
+//	$disp = (($trans_type == 1 || $trans_type == 3) ? "" : " style=\"display: none;\"");
+	if ($trans_type == 1 || $trans_type == 3)
+	{
 	html("<div id=\"source\" class=\"acc_float\"".$disp.">");
 ?>
 				<div><label for="src_id">Source account</label></div>
@@ -199,6 +201,10 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
+<?php
+	if ($trans_type == 1)
+	{
+?>
 					<div id="amount_left" style="display: none;">
 						<span>Amount</span>
 						<div>
@@ -206,7 +212,9 @@
 						</div>
 					</div>
 <?php
-	if ($trans_type == 1 || $trans_type == 2)
+	}
+
+	if ($trans_type == 1 || $trans_type == 3)
 	{
 ?>
 					<div id="charge_left" style="display: none;">
@@ -238,9 +246,15 @@
 			</div>
 
 <?php
+	}
+
 	setTab(3);
-	$disp = (($trans_type == 2 || $trans_type == 3) ?  "" : " style=\"display: none;\"");
-	html("<div id=\"destination\" class=\"acc_float\"".$disp.">");
+
+
+//	$disp = (($trans_type == 2 || $trans_type == 3) ?  "" : " style=\"display: none;\"");
+	if ($trans_type == 2 || $trans_type == 3)
+	{
+		html("<div id=\"destination\" class=\"acc_float\"".$disp.">");
 ?>
 				<div><label for="dest_id">Destination account</label></div>
 				<div class="tile_container">
@@ -262,10 +276,49 @@
 					</div>
 				</div>
 				<div class="tile_right_block">
+<?php
+	if ($trans_type == 2)
+	{
+?>
+					<div id="amount_left" style="display: none;">
+						<span>Amount</span>
+						<div>
+							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
+						</div>
+					</div>
+
 					<div id="charge_left" style="display: none;">
 						<span>Charge</span>
 						<div>
 							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span></span></button>
+						</div>
+					</div>
+
+<?php
+	setTab(5);
+	html("<div id=\"exch_left\" style=\"display: none;\">");
+?>
+						<span>Exchange rate</span>
+						<div>
+							<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?php echo("1 ".$src["sign"]."/".$dest["sign"]); ?></span></button>
+						</div>
+					</div>
+
+					<div id="src_res_balance_left">
+						<span>Result balance</span>
+						<div>
+							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
+						</div>
+					</div>
+<?php
+	}
+	else if ($trans_type == 3)
+	{
+?>
+					<div id="amount_left" style="display: none;">
+						<span>Amount</span>
+						<div>
+							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
 						</div>
 					</div>
 
@@ -275,6 +328,11 @@
 							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
 						</div>
 					</div>
+<?php
+	}
+
+	}
+?>
 				</div>
 			</div>
 
