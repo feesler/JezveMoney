@@ -416,6 +416,10 @@
 				</div>
 			</div>
 
+<?php
+	if ($trans_type == 3)
+	{
+?>
 			<div id="result_balance_dest" class="non_float" style="display: none;">
 				<div><label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label></div>
 				<div>
@@ -427,6 +431,9 @@
 					</div>
 				</div>
 			</div>
+<?php
+	}
+?>
 
 			<div class="non_float">
 				<div id="calendar_btn" class="iconlink form_iconlink"><button type="button" onclick="showCalendar();"><div class="calendar"></div><span>Change date</span></button></div>
