@@ -149,7 +149,7 @@
 
 	html("<script>");
 	echo($acc->getArray());
-	echo(Currency::getArray());
+	echo(Currency::getArray(TRUE));
 	if ($trans_type == 1 || $trans_type == 2)
 	{
 		html("var trans_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
