@@ -721,7 +721,7 @@ function normalizeExch(val)
 // Check value is valid
 function isValidValue(val)
 {
-	return (val && val !== '');
+	return (val != undefined && val != null && val !== '');
 }
 
 
