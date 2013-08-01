@@ -127,13 +127,12 @@
 	$dest = getAccountProperties($dest_id);
 
 	$titleString = "Jezve Money | New transaction";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<?php
-	html(getCommonHeaders());
 
+// Start render page
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
+	html(getCommonHeaders());
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
 	html(getCSS("transaction.css"));
@@ -159,317 +158,412 @@
 	html("var trans_type = ".$trans_type.";");
 	html("var edit_mode = false;");
 	html("</script>");
-?>
-</head>
-<body>
-<?php
+
+	html("</head>");
+	html("<body>");
+
 	require_once("./templates/header.php");
 
 	html("<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">");
-?>
-<div class="tr_content">
-	<div>
-		<h2>Create new transaction</h2>
-		<div>
-<?php
-	setTab(3);
-	showSubMenu();
 
-	setTab(3);
-//	$disp = (($trans_type == 1 || $trans_type == 3) ? "" : " style=\"display: none;\"");
-	if ($trans_type == 1 || $trans_type == 3)
-	{
-	html("<div id=\"source\" class=\"acc_float\"".$disp.">");
-?>
-				<div><label for="src_id">Source account</label></div>
-				<div class="tile_container">
-<?php
-	setTab(5);
-	html($acc->getDivTile($src_id, "source_tile"));
-?>
-					<div class="acc_sel">
-						<div>
-<?php
-	setTab(7);
-	html("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
+	html("<div class=\"tr_content\">");
 	pushTab();
-	echo($acc->getList($src_id));
-	popTab();
-	html("</select>");
-?>
-						</div>
-					</div>
-				</div>
-				<div class="tile_right_block">
-<?php
-	if ($trans_type == 1)
-	{
-?>
-					<div id="amount_left" style="display: none;">
-						<span>Amount</span>
-						<div>
-							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
-						</div>
-					</div>
-<?php
-	}
+		html("<div>");
+		pushTab();
+			html("<h2>Create new transaction</h2>");
+			html("<div>");
+			pushTab();
+				showSubMenu();
 
 	if ($trans_type == 1 || $trans_type == 3)
 	{
-?>
-					<div id="charge_left" style="display: none;">
-						<span>Charge</span>
-						<div>
-							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
-						</div>
-					</div>
-<?php
+		html("<div id=\"source\" class=\"acc_float\">");
+		pushTab();
+			html("<div><label for=\"src_id\">Source account</label></div>");
+			html("<div class=\"tile_container\">");
+			pushTab();
+				html($acc->getDivTile($src_id, "source_tile"));
+				html("<div class=\"acc_sel\">");
+				pushTab();
+					html("<div>");
+					pushTab();
+						html("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
+						pushTab();
+						echo($acc->getList($src_id));
+						popTab();
+						html("</select>");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+
+			html();
+			html("<div class=\"tile_right_block\">");
+			pushTab();
+
+				if ($trans_type == 1)
+				{
+					html("<div id=\"amount_left\" style=\"display: none;\">");
+					pushTab();
+						html("<span>Amount</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"amount_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onAmountSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+				}
+
+				if ($trans_type == 1 || $trans_type == 3)
+				{
+					html("<div id=\"charge_left\" style=\"display: none;\">");
+					pushTab();
+						html("<span>Charge</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"charge_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onChargeSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+				}
+
+				$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
+				html("<div id=\"exch_left\"".$disp.">");
+				pushTab();
+					html("<span>Exchange rate</span>");
+					html("<div>");
+					pushTab();
+						html("<button id=\"exchrate_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onExchRateSelect();\"><span>1 ".$src["sign"]."/".$dest["sign"]."</span></button>");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+
+				html("<div id=\"src_res_balance_left\">");
+				pushTab();
+					html("<span>Result balance</span>");
+					html("<div>");
+					pushTab();
+						html("<button id=\"resbal_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onResBalanceSelect();\"><span>".Currency::format($src["balance"], $src["curr"])."</span></button>");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
 	}
 
-	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
-	setTab(5);
-	html("<div id=\"exch_left\"".$disp.">");
-?>
-						<span>Exchange rate</span>
-						<div>
-							<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?php echo("1 ".$src["sign"]."/".$dest["sign"]); ?></span></button>
-						</div>
-					</div>
-
-					<div id="src_res_balance_left">
-						<span>Result balance</span>
-						<div>
-							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($src["balance"], $src["curr"])); ?></span></button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-<?php
-	}
-
-	setTab(3);
-
-
-//	$disp = (($trans_type == 2 || $trans_type == 3) ?  "" : " style=\"display: none;\"");
 	if ($trans_type == 2 || $trans_type == 3)
 	{
+		html();
 		html("<div id=\"destination\" class=\"acc_float\"".$disp.">");
-?>
-				<div><label for="dest_id">Destination account</label></div>
-				<div class="tile_container">
-<?php
-	setTab(5);
-	html($acc->getDivTile($dest_id, "dest_tile"));
-?>
-					<div class="acc_sel">
-						<div>
-<?php
-	setTab(7);
-	html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
+		pushTab();
+				html("<div><label for=\"dest_id\">Destination account</label></div>");
+				html("<div class=\"tile_container\">");
+				pushTab();
+					html($acc->getDivTile($dest_id, "dest_tile"));
+					html("<div class=\"acc_sel\">");
+					pushTab();
+						html("<div>");
+						pushTab();
+							html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
+							pushTab();
+								echo($acc->getList($dest_id));
+							popTab();
+							html("</select>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+
+				html();
+				html("<div class=\"tile_right_block\">");
+				pushTab();
+
+				if ($trans_type == 2)
+				{
+					html("<div id=\"amount_left\" style=\"display: none;\">");
+					pushTab();
+						html("<span>Amount</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"amount_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onAmountSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+
+					html("<div id=\"charge_left\" style=\"display: none;\">");
+					pushTab();
+						html("<span>Charge</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"charge_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onChargeSelect();\"><span></span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+
+					html("<div id=\"exch_left\" style=\"display: none;\">");
+					pushTab();
+						html("<span>Exchange rate</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"exchrate_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onExchRateSelect();\"><span>1 ".$src["sign"]."/".$dest["sign"]."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+
+					html("<div id=\"src_res_balance_left\">");
+					pushTab();
+						html("<span>Result balance</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"resbal_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onResBalanceSelect();\"><span>".Currency::format($dest["balance"], $dest["curr"])."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+				}
+				else if ($trans_type == 3)
+				{
+					html("<div id=\"amount_left\" style=\"display: none;\">");
+					pushTab();
+						html("<span>Amount</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"amount_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onAmountSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+
+					html("<div id=\"dest_res_balance_left\">");
+					pushTab();
+						html("<span>Result balance</span>");
+						html("<div>");
+						pushTab();
+							html("<button id=\"resbal_d_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onResBalanceDestSelect();\"><span>".Currency::format($dest["balance"], $dest["curr"])."</span></button>");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+				}
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	}
+
+	html();
+	html("<div id=\"amount_row\" class=\"non_float\">");
 	pushTab();
-	echo($acc->getList($dest_id));
+		html("<div id=\"curr_block\" class=\"right_float\" style=\"display: none;\">");
+		pushTab();
+			html("<div><label for=\"transcurr\">Currency</label></div>");
+			html("<div class=\"stretch_input trans_input\">");
+			pushTab();
+				html("<div class=\"currency_block\">");
+				pushTab();
+					html("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
+					pushTab();
+						echo(Currency::getList($src["curr"]));
+					popTab();
+					html("</select>");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+
+		html();
+		html("<div>");
+		pushTab();
+			echo($tabStr."<div><label for=\"amount\">Amount</label>");
+			echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
+			if ($trans_type == 3)
+				echo(" style=\"display: none;\"");
+			echo("><span>Select currency</span></button></div>\r\n");
+			html("<div>");
+			pushTab();
+				html("<div class=\"right_float\"><span id=\"amountsign\" class=\"curr_sign\">".(($trans_type == 1) ? $src["sign"] : $dest["sign"])."</span></div>");
+				html("<div class=\"stretch_input trans_input\">");
+				pushTab();
+					html("<div>");
+					pushTab();
+						html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
 	popTab();
-	html("</select>");
-?>
-						</div>
-					</div>
-				</div>
-				<div class="tile_right_block">
-<?php
-	if ($trans_type == 2)
-	{
-?>
-					<div id="amount_left" style="display: none;">
-						<span>Amount</span>
-						<div>
-							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
-						</div>
-					</div>
+	html("</div>");
 
-					<div id="charge_left" style="display: none;">
-						<span>Charge</span>
-						<div>
-							<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span></span></button>
-						</div>
-					</div>
-
-<?php
-	setTab(5);
-	html("<div id=\"exch_left\" style=\"display: none;\">");
-?>
-						<span>Exchange rate</span>
-						<div>
-							<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?php echo("1 ".$src["sign"]."/".$dest["sign"]); ?></span></button>
-						</div>
-					</div>
-
-					<div id="src_res_balance_left">
-						<span>Result balance</span>
-						<div>
-							<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
-						</div>
-					</div>
-<?php
-	}
-	else if ($trans_type == 3)
-	{
-?>
-					<div id="amount_left" style="display: none;">
-						<span>Amount</span>
-						<div>
-							<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?php echo(Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])); ?></span></button>
-						</div>
-					</div>
-
-					<div id="dest_res_balance_left">
-						<span>Result balance</span>
-						<div>
-							<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?php echo(Currency::format($dest["balance"], $dest["curr"])); ?></span></button>
-						</div>
-					</div>
-<?php
-	}
-?>
-				</div>
-			</div>
-<?php
-	}
-?>
-			<div id="amount_row" class="non_float">
-				<div id="curr_block" class="right_float" style="display: none;">
-					<div><label for="transcurr">Currency</label></div>
-					<div class="stretch_input trans_input">
-						<div class="currency_block">
-							<select id="transcurr" name="transcurr" onchange="onChangeTransCurr(this);">
-<?php
-	setTab(8);
-	echo(Currency::getList($src["curr"]));
-	popTab();
-?>
-							</select>
-						</div>
-					</div>
-				</div>
-
-				<div>
-<?php
-	setTab(5);
-	echo($tabStr."<div><label for=\"amount\">Amount</label>");
-	echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
-	if ($trans_type == 3)
-		echo(" style=\"display: none;\"");
-	echo("><span>Select currency</span></button></div>\r\n");
-?>
-					<div>
-						<div class="right_float"><span id="amountsign" class="curr_sign"><?php echo(($trans_type == 1) ? $src["sign"] : $dest["sign"]) ?></span></div>
-						<div class="stretch_input trans_input">
-							<div>
-								<input id="amount" name="amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-<?php
 	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
-	setTab(3);
+	html();
 	html("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
-?>
-				<div><label for="charge">Charge</label></div>
-				<div>
-					<div class="right_float"><span id="chargesign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
-					<div class="stretch_input trans_input">
-						<div>
-							<input id="charge" name="charge" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
-						</div>
-					</div>
-				</div>
-			</div>
+	pushTab();
+		html("<div><label for=\"charge\">Charge</label></div>");
+		html("<div>");
+		pushTab();
+			html("<div class=\"right_float\"><span id=\"chargesign\" class=\"curr_sign\">".$src["sign"]."</span></div>");
+			html("<div class=\"stretch_input trans_input\">");
+			pushTab();
+				html("<div>");
+				pushTab();
+					html("<input id=\"charge\" name=\"charge\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	popTab();
+	html("</div>");
 
-<?php
-	//$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
-	setTab(3);
+	html();
 	html("<div id=\"exchange\" class=\"non_float\" style=\"display: none;\">");
-?>
-				<div><label for="exchrate">Exchange rate</label></div>
-				<div>
-					<div class="right_float"><span id="exchcomm" class="exchrate_comm"><?php echo($src["sign"]."/".$dest["sign"]); ?></span></div>
-					<div class="stretch_input trans_input">
-						<div>
-							<input id="exchrate" name="exchrate" class="summ_text" type="text" value="1" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
-						</div>
-					</div>
-				</div>
-			</div>
+	pushTab();
+		html("<div><label for=\"exchrate\">Exchange rate</label></div>");
+		html("<div>");
+		pushTab();
+			html("<div class=\"right_float\"><span id=\"exchcomm\" class=\"exchrate_comm\">".$src["sign"]."/".$dest["sign"]."</span></div>");
+			html("<div class=\"stretch_input trans_input\">");
+			pushTab();
+				html("<div>");
+				pushTab();
+					html("<input id=\"exchrate\" name=\"exchrate\" class=\"summ_text\" type=\"text\" value=\"1\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	popTab();
+	html("</div>");
 
-			<div id="result_balance" class="non_float" style="display: none;">
-				<div><label for="resbal">Result balance<? if ($trans_type == 3) echo(" (Source)"); ?></label></div>
-				<div>
-					<div class="right_float"><span id="res_currsign" class="curr_sign"><?php echo($src["sign"]); ?></span></div>
-					<div class="stretch_input trans_input">
-						<div>
-							<input id="resbal" name="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
-						</div>
-					</div>
-				</div>
-			</div>
+	html();
+	html("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
+	pushTab();
+		html("<div><label for=\"resbal\">Result balance".(($trans_type == 3) ? " (Source)" : "")."</label></div>");
+		html("<div>");
+		pushTab();
+			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$src["sign"]."</span></div>");
+			html("<div class=\"stretch_input trans_input\">");
+			pushTab();
+				html("<div>");
+				pushTab();
+					html("<input id=\"resbal\" name=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	popTab();
+	html("</div>");
 
-<?php
 	if ($trans_type == 3)
 	{
-?>
-			<div id="result_balance_dest" class="non_float" style="display: none;">
-				<div><label for="resbal_d">Result balance<? if ($trans_type == 3) echo(" (Destination)"); ?></label></div>
-				<div>
-					<div class="right_float"><span id="res_currsign" class="curr_sign"><?php echo($dest["sign"]); ?></span></div>
-					<div class="stretch_input trans_input">
-						<div>
-							<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
-						</div>
-					</div>
-				</div>
-			</div>
-<?php
+		html();
+		html("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
+		pushTab();
+			html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
+			html("<div>");
+			pushTab();
+				html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$dest["sign"]."</span></div>");
+				html("<div class=\"stretch_input trans_input\">");
+				pushTab();
+					html("<div>");
+					pushTab();
+						html("<input id=\"resbal_d\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
 	}
+
+	setTab(3);
+	html();
+	html("<div class=\"non_float\">");
+	pushTab();
+		html("<div id=\"calendar_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showCalendar();\"><div class=\"calendar\"></div><span>Change date</span></button></div>");
+		html("<div id=\"date_block\" style=\"display: none;\">");
+		pushTab();
+			html("<div><label for=\"date\">Date</label></div>");
+			html("<div>");
+			pushTab();
+				html("<div class=\"right_float\"></div>");
+				html("<div class=\"stretch_input trans_input\">");
+				pushTab();
+					html("<div>");
+					pushTab();
+						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".(date("d.m.Y"))."\">");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+				html("<div id=\"calendar\" class=\"calWrap\" style=\"display: none;\"></div>");
+				html("<script>buildCalendar();</script>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	popTab();
+	html("</div>");
+
+	html();
+	html("<div class=\"non_float\">");
+	pushTab();
+		html("<div id=\"comm_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showComment();\"><div class=\"add\"></div><span>Add comment</span></button></div>");
+		html("<div id=\"comment_block\" style=\"display: none;\">");
+		pushTab();
+			html("<div><label for=\"comm\">Comment</label></div>");
+			html("<div>");
+			pushTab();
+				html("<div class=\"stretch_input trans_input\">");
+				pushTab();
+					html("<div>");
+					pushTab();
+						html("<input id=\"comm\" name=\"comm\" type=\"text\" value=\"\">");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	popTab();
+	html("</div>");
+
+	html();
+	html("<div class=\"acc_controls\"><input id=\"submitbtn\" class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
+	popTab();
+	html("</div>");
+	popTab();
+	html("</div>");
+	popTab();
+	html("</div>");
+	html("</form>");
+	html("</body>");
+	html("</html>");
 ?>
-
-			<div class="non_float">
-				<div id="calendar_btn" class="iconlink form_iconlink"><button type="button" onclick="showCalendar();"><div class="calendar"></div><span>Change date</span></button></div>
-				<div id="date_block" style="display: none;">
-					<div><label for="date">Date</label></div>
-					<div>
-						<div class="right_float"></div>
-						<div class="stretch_input trans_input">
-							<div>
-								<input id="date" name="date" type="text" value="<?php echo(date("d.m.Y")); ?>">
-							</div>
-						</div>
-						<div id="calendar" class="calWrap" style="display: none;"></div>
-						<script>buildCalendar();</script>
-					</div>
-				</div>
-			</div>
-
-			<div class="non_float">
-				<div id="comm_btn" class="iconlink form_iconlink"><button type="button" onclick="showComment();"><div class="add"></div><span>Add comment</span></button></div>
-				<div id="comment_block" style="display: none;">
-					<div><label for="comm">Comment</label></div>
-					<div>
-						<div class="stretch_input trans_input">
-							<div>
-								<input id="comm" name="comm" type="text" value="">
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="acc_controls"><input id="submitbtn" class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
-		</div>
-	</div>
-</div>
-</form>
-</body>
-</html>
