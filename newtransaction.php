@@ -446,7 +446,7 @@
 			pushTab();
 				html("<div>");
 				pushTab();
-					html("<input id=\"exchrate\" name=\"exchrate\" class=\"summ_text\" type=\"text\" value=\"1\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					html("<input id=\"exchrate\" class=\"summ_text\" type=\"text\" value=\"1\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 				popTab();
 				html("</div>");
 			popTab();
@@ -467,7 +467,7 @@
 			pushTab();
 				html("<div>");
 				pushTab();
-					html("<input id=\"resbal\" name=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					html("<input id=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 				popTab();
 				html("</div>");
 			popTab();
