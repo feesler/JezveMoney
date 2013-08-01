@@ -776,28 +776,36 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var amount, amount_b, charge, exchrate, exchcomm, exchrate_b, resbal;
+	var amount, amount_b, charge, charge_b, exchrate, exchcomm, exchrate_b, resbal;
+	var selCurrVal;
 
 	amount = ge('amount');
 	amount_b = ge('amount_b');
 	charge = ge('charge');
+	charge_b = ge('charge_b');
 	exchrate = ge('exchrate');
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
 	resbal = ge('resbal');
 	resbal_b = ge('resbal_b');
-	if (!amount || !amount_b || !charge || !exchrate || !exchrate_b || !resbal || !resbal_b)
+	if (!amount || !amount_b || !charge || !charge_b || !exchrate || !exchrate_b || !resbal || !resbal_b)
 		return;
 
 	amount.value = a;
 	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), selectedValue(ge('transcurr')));
 
+
+	selCurrVal = getCurrencyOfAccount(selectedValue(ge(isIncome() ? 'dest_id' : 'src_id')));
+
 	charge.value = d;
+	charge_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(d) ? d : 0), selCurrVal);
+
 	exchrate.value = e;
 	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
 
 	resbal.value = S2;
-	resbal_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, getCurrencyOfAccount(selectedValue(ge('src_id'))));
+
+	resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
 
 	if (isTransfer())
 	{
