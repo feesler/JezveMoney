@@ -262,7 +262,7 @@
 	if ($trans_type == 2 || $trans_type == 3)
 	{
 		html();
-		html("<div id=\"destination\" class=\"acc_float\"".$disp.">");
+		html("<div id=\"destination\" class=\"acc_float\">");
 		pushTab();
 				html("<div><label for=\"dest_id\">Destination account</label></div>");
 				html("<div class=\"tile_container\">");
