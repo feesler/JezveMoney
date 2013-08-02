@@ -524,7 +524,8 @@ function updControls()
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	resbal = ge('resbal');
-	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal)
+	resbal_b = ge('resbal_b');
+	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
 		return;
 
 	exchange.value = '';
@@ -533,17 +534,29 @@ function updControls()
 	{
 		charge.value = '';
 		resbal.value = '';
+
+		chargeSwitch(true);
+		exchRateSwitch(false);
 	}
 	else
 	{
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
+		resbal.value = getBalanceOfAccount(selectedValue(src)) - charge.value;
+
+		resbal_b.firstElementChild.innerHTML = formatValue(resbal.value, getCurrencyOfAccount(selectedValue(src)));
+
+		if (isTransfer())
+		{
+			var resbal_d_b = ge('resbal_d_b');
+
+			resbal_d_b.firstElementChild.innerHTML = formatValue(getBalanceOfAccount(selectedValue(dest)) + amount.value, getCurrencyOfAccount(selectedValue(dest)));
+		}
+
+		hideChargeAndExchange();
 	}
 
-	chargeSwitch(isDiff);
-	exchRateSwitch(isDiff);
 /*
 	show(chargeoff, isDiff);
 	show('dest_charge_left', !isDiff);
