@@ -231,7 +231,7 @@ class Currency
 		foreach(self::$cache as $curr_id => $row)
 		{
 			if ($ext)
-				$resArr[] = array($curr_id, $row["name"], $row["sign"], $row["format"]);
+				$resArr[] = array($curr_id, $row["name"], $row["sign"], intval($row["format"]));
 			else
 				$resArr[] = array($curr_id, $row["name"], $row["sign"]);
 		}
