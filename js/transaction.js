@@ -344,7 +344,8 @@ function onChangeAcc()
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge)
+	resbal_b = ge('resbal_b');
+	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge || !resbal_b)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
@@ -359,8 +360,7 @@ function onChangeAcc()
 	// hide charge and exchange rate if new currencies is the same
 	if (trans_curr == trans_acc_curr)
 	{
-		chargeSwitch(false, true);
-		exchRateSwitch(false, true);
+		hideChargeAndExchange();
 /*
 		show(chargeoff, false);
 		show('dest_charge_left', true);
@@ -370,6 +370,8 @@ function onChangeAcc()
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
+
+		resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(selectedValue(isIncome() ? destid : srcid)) - charge.value, getCurrencyOfAccount(selectedValue(isIncome() ? destid : srcid)));
 	}
 
 	updateExchAndRes();
