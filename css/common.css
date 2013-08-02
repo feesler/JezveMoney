@@ -87,6 +87,13 @@ select
 }
 
 
+.stretch_input > div > select
+{
+	width: 100%;
+	margin: 0;
+}
+
+
 /* Input controls color */
 input[type="text"], input[type="password"], select
 {
