@@ -529,8 +529,11 @@ function updControls()
 	isDiff = isDiffCurr();
 	if (isDiff)
 	{
-		charge.value = '';
-		resbal.value = '';
+		if (!edit_mode)
+		{
+			charge.value = '';
+			resbal.value = '';
+		}
 
 		chargeSwitch(true);
 		exchRateSwitch(false);

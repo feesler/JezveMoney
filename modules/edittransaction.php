@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -18,8 +18,8 @@
 
 	$trans_id = intval($_POST["transid"]);
 	$trans_type = intval($_POST["transtype"]);
-	$src_id = intval($_POST["srcid"]);
-	$dest_id = intval($_POST["destid"]);
+	$src_id = intval($_POST["src_id"]);
+	$dest_id = intval($_POST["dest_id"]);
 	$amount = floatval($_POST["amount"]);
 	$charge = floatval($_POST["charge"]);
 	$transcurr = intval($_POST["transcurr"]);
