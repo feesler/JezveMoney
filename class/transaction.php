@@ -613,19 +613,6 @@ class Transaction
 			html("</tr>");
 		}
 
-
-		$resStr = "<tr class=\"even_row\">";
-
-		if ($trans_type == 1)
-			$resStr .= "<td><b>Source</b></td>";
-		else if ($trans_type == 2)
-			$resStr .= "<td><b>Destination</b></td>";
-		else if ($trans_type == 0 || $trans_type == 3 || $trans_type == 4)
-			$resStr .= "<td><b>Source</b></td><td><b>Destination</b></td>";
-
-		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>";
-		html($resStr);
-
 		$row_num = 1;
 		foreach($resArr as $row)
 		{
@@ -634,6 +621,8 @@ class Transaction
 				$resStr .= " class=\"even_row\"";
 			$resStr .= ">";
 			html($resStr);
+			pushTab();
+			html("<td class=\"latest\">");
 
 			$trans_id = intval($row["id"]);
 			$cur_trans_type = intval($row["type"]);
@@ -651,65 +640,62 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			$resStr .= "<td>";
-			if ($cur_trans_type == 1 || $cur_trans_type == 3)
+			$resStr = "<span class=\"latest_acc_name\">";
+			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
-			else if ($cur_trans_type == 4)
-				$resStr .= $acc->getNameOrPerson($src_id);
-
-			if ($trans_type == 0 || $trans_type == 3 || $trans_type == 4)
-				$resStr .= "</td><td>";
-			if ($cur_trans_type == 2 || $cur_trans_type == 3)
+			if ($cur_trans_type == 3)
+				$resStr .= " → ";
+			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
 				$resStr .= $acc->getName($dest_id);
-			else if ($cur_trans_type == 4)
-				$resStr .= $acc->getNameOrPerson($dest_id);
+			$resStr .= "</span>";
+			html($resStr);
 
-			$resStr .= "</td>";
+			$resStr = "<span class=\"latest_sum\">";
+			if ($cur_trans_type == 1)			// expense
+				$resStr .= "- ";
+			else if ($cur_trans_type == 2)			// income
+				$resStr .= "+ ";
 
-			$resStr .= "<td class=\"sumcell\">". Currency::format($amount, $curr_id);
+			$resStr .= Currency::format($amount, $curr_id);
 			if ($charge != $amount)
 			{
 				$resStr .= " (";
-				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-					$resStr .= Currency::format($charge, $acc->getCurrency($src_id));
-				else if ($cur_trans_type == 2)					// income
-					$resStr .= Currency::format($charge, $acc->getCurrency($dest_id));
+				$acc_curr = $acc->getCurrency(($cur_trans_type == 2) ? $dest_id : $src_id);
+				$resStr .= Currency::format($charge, $acc_curr);
 				$resStr .= ")";
 			}
-			$resStr .= "</td>";
+			$resStr .= "</span>";
+			html($resStr);
 
-			$resStr .= "<td>".$fdate."</td>";
-			$resStr .= "<td>".$comment."</td>";
-			$resStr .= "<td><a href=\"./edittransaction.php?id=".$trans_id."\">edit</a> <a href=\"./deltransaction.php?id=".$trans_id."\">delete</a></td>";
-			$resStr .= "</tr>\r\n";
+			html("<span class=\"latest_date\">".$fdate."</span>");
+
+			if ($comment != "")
+				html("<span class=\"latest_comm\"> | ".$comment."</span>");
+
+			html("</td>");
+			popTab();
+			html("</tr>");
 
 			$row_num++;
 		}
 
 		if ($tr_on_page > 0)
 		{
-			$resStr .= $tabStr."<tr class=\"extra_row\">";
-			$resStr .= "\r\n";
+			html("<tr class=\"extra_row\">");
 			pushTab();
-			$resStr .= $tabStr."<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
-			$resStr .= "\r\n";
+			html("<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">");
 			if ($transCount > $tr_on_page)
-				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
-			$resStr .= $tabStr."</td>";
-			$resStr .= "\r\n";
+				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
+			html("</td>");
 			popTab();
-			$resStr .= $tabStr."</tr>";
-			$resStr .= "\r\n";
+			html("</tr>");
 		}
 
 		popTab();
-		$resStr .= $tabStr."</table>";
-		$resStr .= "\r\n";
+		html("</table>");
 		popTab();
-		$resStr .= $tabStr."</div>";
-		$resStr .= "\r\n";
-
-		html($resStr);
+		html("</div>");
+		html();
 	}
 
 

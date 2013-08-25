@@ -1,4 +1,4 @@
-.latest
+﻿.latest
 {
 	padding: 5px;
 }
@@ -52,13 +52,13 @@
 
 .tbl tr
 {
-	background-color: #E0E0E0;
+	background-color: #FFFFFF;
 }
 
 
 .tbl tr.even_row
 {
-	background-color: #FFFFFF;
+	background-color: #E0E0E0;
 }
 
 
