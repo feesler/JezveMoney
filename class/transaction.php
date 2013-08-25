@@ -763,57 +763,45 @@ class Transaction
 			$resStr .= $tabStr."<td class=\"latest\">\r\n";
 			pushTab();
 
+			$trans_id = intval($row["id"]);
 			$cur_trans_type = intval($row["type"]);
+			$src_id = intval($row["src_id"]);
+			$dest_id = intval($row["dest_id"]);
+			$amount = floatval($row["amount"]);
+			$charge = floatval($row["charge"]);
+			$curr_id = intval($row["curr_id"]);
+			$comment = $row["comment"];
+			$fdate = date("d.m.Y", strtotime($row["date"]));
 
 			$resStr .= $tabStr."<span class=\"latest_acc_name\">";
-			if ($cur_trans_type == 1)			// expense
-			{
-				$resStr .= $acc->getName($row["src_id"]);
-			}
-			else if ($cur_trans_type == 2)			// income
-			{
-				$resStr .= $acc->getName($row["dest_id"]);
-			}
-			else if ($cur_trans_type == 3)			// transfer
-			{
-				$resStr .= $acc->getName($row["src_id"])." → ".$acc->getName($row["dest_id"]);
-			}
+			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
+				$resStr .= $acc->getName($src_id);
+			if ($cur_trans_type == 3)
+				$resStr .= " → ";
+			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
+				$resStr .= $acc->getName($dest_id);
 			$resStr .= "</span>\r\n";
 
 			$resStr .= $tabStr."<span class=\"latest_sum\">";
 			if ($cur_trans_type == 1)			// expense
-			{
 				$resStr .= "- ";
-			}
 			else if ($cur_trans_type == 2)			// income
-			{
 				$resStr .= "+ ";
-			}
 
-			$resStr .= Currency::format($row["amount"], $row["curr_id"]);
-			if ($row["charge"] != $row["amount"])
+			$resStr .= Currency::format($amount, $curr_id);
+			if ($charge != $amount)
 			{
 				$resStr .= " (";
-				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
-				else if ($cur_trans_type == 2)						// income
-					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
+				$acc_curr = $acc->getCurrency(($cur_trans_type == 2) ? $dest_id : $src_id);
+				$resStr .= Currency::format($charge, $acc_curr);
 				$resStr .= ")";
 			}
 			$resStr .= "</span>\r\n";
 
-			$resStr .= $tabStr."<span class=\"latest_date\">";
-			$fdate = date("d.m.Y", strtotime($row["date"]));
+			$resStr .= $tabStr."<span class=\"latest_date\">".$fdate."</span>\r\n";
 
-			$resStr .= $fdate;
-			$resStr .= "</span>\r\n";
-
-			if ($row["comment"] != "")
-			{
-				$resStr .= $tabStr."<span class=\"latest_comm\"> | ";
-				$resStr .= $row["comment"];
-				$resStr .= "</span>\r\n";
-			}
+			if ($comment != "")
+				$resStr .= $tabStr."<span class=\"latest_comm\"> | ".$comment."</span>\r\n";
 
 			popTab();
 			$resStr .= $tabStr."</td>\r\n";
