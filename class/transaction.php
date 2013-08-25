@@ -541,9 +541,7 @@ class Transaction
 	// Return table of transactions
 	public function getTable($trans_type, $acc_id = 0, $tr_on_page = 0, $page_num = 0)
 	{
-		global $db, $tabStr;
-
-		$resStr = "";
+		global $db;
 
 		if (!self::$user_id)
 			return $resStr;
@@ -554,25 +552,19 @@ class Transaction
 
 		$pers = new Person(self::$user_id);
 
-		$resStr .= $tabStr."<div class=\"trans_list\">";
-		$resStr .= "\r\n";
+		html("<div class=\"trans_list\">");
 		pushTab();
-			$resStr .= $tabStr."<table class=\"tbl\">";
-			$resStr .= "\r\n";
+		html("<table class=\"tbl\">");
 
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
-			$resStr .= $tabStr."<tr><td><span>You have no one account. Please create one.</span></td></tr>";
+			html("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
 			popTab();
-			$resStr .= $tabStr."</table>";
-			$resStr .= "\r\n";
+			html("</table>");
 			popTab();
-			$resStr .= $tabStr."</div>";
-			$resStr .= "\r\n";
-
-			html($resStr);
+			html("</div>");
 			return;
 		}
 
@@ -597,13 +589,11 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			$resStr .= $tabStr."<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>";
-			$resStr .= "\r\n";
+			html("<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>");
 			popTab();
-			$resStr .= $tabStr."</table>\r\n";
+			html("</table>");
 			popTab();
 
-			html($resStr);
 			return;
 		}
 
@@ -611,24 +601,20 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			$resStr .= $tabStr."<tr class=\"extra_row\">";
-			$resStr .= "\r\n";
+			html("<tr class=\"extra_row\">");
 			pushTab();
 
-			$resStr .= $tabStr."<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
-			$resStr .= "\r\n";
+			html("<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">");
 			if ($transCount > $tr_on_page)
-				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
-			$resStr .= $tabStr."</td>";
-			$resStr .= "\r\n";
+				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
+			html("</td>");
 			popTab();
 
-			$resStr .= $tabStr."</tr>";
-			$resStr .= "\r\n";
+			html("</tr>");
 		}
 
 
-		$resStr .= $tabStr."<tr class=\"even_row\">";
+		$resStr = "<tr class=\"even_row\">";
 
 		if ($trans_type == 1)
 			$resStr .= "<td><b>Source</b></td>";
@@ -637,15 +623,17 @@ class Transaction
 		else if ($trans_type == 0 || $trans_type == 3 || $trans_type == 4)
 			$resStr .= "<td><b>Source</b></td><td><b>Destination</b></td>";
 
-		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
+		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>";
+		html($resStr);
 
 		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			$resStr .= $tabStr."<tr";
+			$resStr = "<tr";
 			if (($row_num % 2) == 0)
 				$resStr .= " class=\"even_row\"";
 			$resStr .= ">";
+			html($resStr);
 
 			$trans_id = intval($row["id"]);
 			$cur_trans_type = intval($row["type"]);
