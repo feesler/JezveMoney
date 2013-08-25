@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -143,7 +143,7 @@
 			html("<div>");
 			pushTab();
 				showSubMenu();
-				echo($trans->getTable($trans_type, $acc_id, 30, $page_num));
+				$trans->getTable($trans_type, $acc_id, 30, $page_num);
 			popTab();
 			html("</div>");
 

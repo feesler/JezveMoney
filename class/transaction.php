@@ -715,26 +715,22 @@ class Transaction
 	// Return table of latest transactions
 	public function getLatest($tr_count)
 	{
-		global $db, $tabStr;
-
-		$resStr = "";
+		global $db;
 
 		if (!self::$user_id)
-			return $resStr;
+			return;
 
 		$acc = new Account(self::$user_id);
 		$accounts = $acc->getCount();
 		if (!$accounts)
-			return $resStr;
-
-		setTab(3);
-
-		$resStr .= $tabStr."<table class=\"tbl\">\r\n";
-		pushTab();
+			return;
 
 		$tr_limit = intval($tr_count);
 		if (!is_numeric($tr_count) || !$tr_limit)
-			return $resStr;
+			return;
+
+		html("<table class=\"tbl\">");
+		pushTab();
 
 		$condition = "user_id=".self::$user_id;
 		$orderAndLimit = "pos DESC LIMIT 0,".$tr_limit;
@@ -743,10 +739,10 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			$resStr .= $tabStr."<tr><td>You have no one transaction yet.</td></tr>";
+			html("<tr><td>You have no one transaction yet.</td></tr>");
 			popTab();
-			$resStr .= $tabStr."</table>\r\n";
-			return $resStr;
+			html("</table>");
+			return;
 		}
 
 		$i = 0;
@@ -754,13 +750,14 @@ class Transaction
 		{
 			$i++;
 
-			$resStr .= $tabStr."<tr";
-
+			$resStr = "<tr";
 			if ($i % 2 == 0)
 				$resStr .= " class=\"even_row\"";
-			$resStr .= ">\r\n";
+			$resStr .= ">";
+			html($resStr);
 			pushTab();
-			$resStr .= $tabStr."<td class=\"latest\">\r\n";
+
+			html("<td class=\"latest\">");
 			pushTab();
 
 			$trans_id = intval($row["id"]);
@@ -773,16 +770,17 @@ class Transaction
 			$comment = $row["comment"];
 			$fdate = date("d.m.Y", strtotime($row["date"]));
 
-			$resStr .= $tabStr."<span class=\"latest_acc_name\">";
+			$resStr = "<span class=\"latest_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
 			if ($cur_trans_type == 3)
 				$resStr .= " → ";
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
 				$resStr .= $acc->getName($dest_id);
-			$resStr .= "</span>\r\n";
+			$resStr .= "</span>";
+			html($resStr);
 
-			$resStr .= $tabStr."<span class=\"latest_sum\">";
+			$resStr = "<span class=\"latest_sum\">";
 			if ($cur_trans_type == 1)			// expense
 				$resStr .= "- ";
 			else if ($cur_trans_type == 2)			// income
@@ -796,23 +794,23 @@ class Transaction
 				$resStr .= Currency::format($charge, $acc_curr);
 				$resStr .= ")";
 			}
-			$resStr .= "</span>\r\n";
+			$resStr .= "</span>";
+			html($resStr);
 
-			$resStr .= $tabStr."<span class=\"latest_date\">".$fdate."</span>\r\n";
+			html("<span class=\"latest_date\">".$fdate."</span>");
 
 			if ($comment != "")
-				$resStr .= $tabStr."<span class=\"latest_comm\"> | ".$comment."</span>\r\n";
+				html("<span class=\"latest_comm\"> | ".$comment."</span>");
 
 			popTab();
-			$resStr .= $tabStr."</td>\r\n";
+			html("</td>");
 			popTab();
-			$resStr .= $tabStr."</tr>\r\n\r\n";
+			html("</tr>");
+			html();
 		}
 
 		popTab();
-		$resStr .= $tabStr."</table>\r\n";
-
-		return $resStr;
+		html("</table>");
 	}
 
 
