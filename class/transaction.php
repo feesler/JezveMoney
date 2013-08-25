@@ -572,7 +572,8 @@ class Transaction
 			$resStr .= $tabStr."</div>";
 			$resStr .= "\r\n";
 
-			return $resStr;
+			html($resStr);
+			return;
 		}
 
 		$condition = "user_id=".self::$user_id;
@@ -596,23 +597,29 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			$resStr .= "\t\t<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>";
-			$resStr .= "\t</table>\r\n";
-			return $resStr;
+			$resStr .= $tabStr."<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>";
+			$resStr .= "\r\n";
+			popTab();
+			$resStr .= $tabStr."</table>\r\n";
+			popTab();
+
+			html($resStr);
+			return;
 		}
 
 		if ($tr_on_page > 0)
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			$resStr .= $tabStr."<tr class=\"extra_row\">\r\n";
+			$resStr .= $tabStr."<tr class=\"extra_row\">";
 			$resStr .= "\r\n";
 			pushTab();
 
 			$resStr .= $tabStr."<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= "\r\n";
 			if ($transCount > $tr_on_page)
 				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
-			$resStr .= "</td>";
+			$resStr .= $tabStr."</td>";
 			$resStr .= "\r\n";
 			popTab();
 
@@ -693,12 +700,18 @@ class Transaction
 
 		if ($tr_on_page > 0)
 		{
-			$resStr .= "\t\t<tr class=\"extra_row\">";
-			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= $tabStr."<tr class=\"extra_row\">";
+			$resStr .= "\r\n";
+			pushTab();
+			$resStr .= $tabStr."<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= "\r\n";
 			if ($transCount > $tr_on_page)
 				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
-			$resStr .= "\t\t\t</td>";
-			$resStr .= "\t\t</tr>";
+			$resStr .= $tabStr."</td>";
+			$resStr .= "\r\n";
+			popTab();
+			$resStr .= $tabStr."</tr>";
+			$resStr .= "\r\n";
 		}
 
 		popTab();
@@ -708,7 +721,7 @@ class Transaction
 		$resStr .= $tabStr."</div>";
 		$resStr .= "\r\n";
 
-		return $resStr;
+		html($resStr);
 	}
 
 
