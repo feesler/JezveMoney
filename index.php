@@ -49,7 +49,7 @@
 	</div>
 
 	<div>
-		<div class="widget_title">Latest &gt;</div>
+		<div class="widget_title"><a href="./transactions.php">Latest &gt;</a></div>
 		<div>
 <?php
 	echo($trans->getLatest(5));

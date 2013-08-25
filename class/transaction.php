@@ -541,7 +541,7 @@ class Transaction
 	// Return table of transactions
 	public function getTable($trans_type, $acc_id = 0, $tr_on_page = 0, $page_num = 0)
 	{
-		global $db;
+		global $db, $tabStr;
 
 		$resStr = "";
 
@@ -554,19 +554,29 @@ class Transaction
 
 		$pers = new Person(self::$user_id);
 
-		$resStr .= "\t<table class=\"infotable\">\r\n";
+		$resStr .= $tabStr."<div class=\"trans_list\">";
+		$resStr .= "\r\n";
+		pushTab();
+			$resStr .= $tabStr."<table class=\"tbl\">";
+			$resStr .= "\r\n";
 
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
-			$resStr .= "\t\t<tr><td><span>You have no one account. Please create one.</span></td></tr>";
-			$resStr .= "\t</table>\r\n";
+			$resStr .= $tabStr."<tr><td><span>You have no one account. Please create one.</span></td></tr>";
+			popTab();
+			$resStr .= $tabStr."</table>";
+			$resStr .= "\r\n";
+			popTab();
+			$resStr .= $tabStr."</div>";
+			$resStr .= "\r\n";
+
 			return $resStr;
 		}
 
 		$condition = "user_id=".self::$user_id;
-		if ($trans_type != 4)
+		if ($trans_type != 0)
 			$condition .= " AND type=".$trans_type;
 		if ($acc_id != 0)
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
@@ -595,22 +605,29 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			$resStr .= "\t\t<tr class=\"extra_row\">\r\n";
-			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= $tabStr."<tr class=\"extra_row\">\r\n";
+			$resStr .= "\r\n";
+			pushTab();
+
+			$resStr .= $tabStr."<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
 			if ($transCount > $tr_on_page)
 				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
-			$resStr .= "</td>\r\n";
-			$resStr .= "\t\t</tr>\r\n";
+			$resStr .= "</td>";
+			$resStr .= "\r\n";
+			popTab();
+
+			$resStr .= $tabStr."</tr>";
+			$resStr .= "\r\n";
 		}
 
 
-		$resStr .= "\t\t<tr class=\"even_row\">";
+		$resStr .= $tabStr."<tr class=\"even_row\">";
 
 		if ($trans_type == 1)
 			$resStr .= "<td><b>Source</b></td>";
 		else if ($trans_type == 2)
 			$resStr .= "<td><b>Destination</b></td>";
-		else if ($trans_type == 3 || $trans_type == 4)
+		else if ($trans_type == 0 || $trans_type == 3 || $trans_type == 4)
 			$resStr .= "<td><b>Source</b></td><td><b>Destination</b></td>";
 
 		$resStr .= "<td><b>Amount</b></td><td><b>Date</b></td><td><b>Comment</b></td><td></td></tr>\r\n";
@@ -618,7 +635,7 @@ class Transaction
 		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			$resStr .= "\t\t<tr";
+			$resStr .= $tabStr."<tr";
 			if (($row_num % 2) == 0)
 				$resStr .= " class=\"even_row\"";
 			$resStr .= ">";
@@ -645,7 +662,7 @@ class Transaction
 			else if ($cur_trans_type == 4)
 				$resStr .= $acc->getNameOrPerson($src_id);
 
-			if ($trans_type == 3 || $trans_type == 4)
+			if ($trans_type == 0 || $trans_type == 3 || $trans_type == 4)
 				$resStr .= "</td><td>";
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)
 				$resStr .= $acc->getName($dest_id);
@@ -677,14 +694,19 @@ class Transaction
 		if ($tr_on_page > 0)
 		{
 			$resStr .= "\t\t<tr class=\"extra_row\">";
-			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
+			$resStr .= "\t\t\t<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">";
 			if ($transCount > $tr_on_page)
 				$resStr .= $this->getPaginator($trans_type, $acc_id, $page_num, $pageCount);
 			$resStr .= "\t\t\t</td>";
 			$resStr .= "\t\t</tr>";
 		}
 
-		$resStr .= "\t</table>\r\n";
+		popTab();
+		$resStr .= $tabStr."</table>";
+		$resStr .= "\r\n";
+		popTab();
+		$resStr .= $tabStr."</div>";
+		$resStr .= "\r\n";
 
 		return $resStr;
 	}
@@ -748,11 +770,11 @@ class Transaction
 			{
 				$resStr .= $acc->getName($row["src_id"]);
 			}
-			else if ($cur_trans_type == 2)		// income
+			else if ($cur_trans_type == 2)			// income
 			{
 				$resStr .= $acc->getName($row["dest_id"]);
 			}
-			else if ($cur_trans_type == 3)		// transfer
+			else if ($cur_trans_type == 3)			// transfer
 			{
 				$resStr .= $acc->getName($row["src_id"])." → ".$acc->getName($row["dest_id"]);
 			}
@@ -763,7 +785,7 @@ class Transaction
 			{
 				$resStr .= "- ";
 			}
-			else if ($cur_trans_type == 2)		// income
+			else if ($cur_trans_type == 2)			// income
 			{
 				$resStr .= "+ ";
 			}
@@ -774,7 +796,7 @@ class Transaction
 				$resStr .= " (";
 				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["src_id"]));
-				else if ($cur_trans_type == 2)					// income
+				else if ($cur_trans_type == 2)						// income
 					$resStr .= Currency::format($row["charge"], $acc->getCurrency($row["dest_id"]));
 				$resStr .= ")";
 			}
@@ -809,16 +831,16 @@ class Transaction
 	// Return string for specified transaction type
 	public static function getStringType($trans_type)
 	{
-		if ($trans_type == "expense")
+		if ($trans_type == "all")
+			return 0;
+		else if ($trans_type == "expense")
 			return 1;
 		else if ($trans_type == "income")
 			return 2;
 		else if ($trans_type == "transfer")
 			return 3;
-		else if ($trans_type == "all")
-			return 4;
 		else if ($trans_type == "debt")
-			return 5;
+			return 4;
 		else
 			return 0;
 	}
@@ -827,15 +849,15 @@ class Transaction
 	// Return string for specified transaction type
 	public static function getTypeString($trans_type)
 	{
-		if ($trans_type == 1)
+		if ($trans_type == 0)
+			return "all";
+		else if ($trans_type == 1)
 			return "expense";
 		else if ($trans_type == 2)
 			return "income";
 		else if ($trans_type == 3)
 			return "transfer";
 		else if ($trans_type == 4)
-			return "all";
-		else if ($trans_type == 5)
 			return "debt";
 		else
 			return NULL;

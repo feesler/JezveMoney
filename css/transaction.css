@@ -156,3 +156,42 @@
 	height: 26px;
 	line-height: 26px;
 }
+
+
+/* Transactions page content */
+.trans_cont
+{
+	margin-top: 55px;
+	z-index: 1;
+}
+
+
+.trans_cont > div
+{
+	height: 100%;
+	display: block;
+	float: none;
+	clear: both;
+	margin: 30px 5px 5px 25px;
+}
+
+
+.trans_cont > div > div
+{
+	height: 100%;
+	clear: both;
+}
+
+
+.trans_cont > div > div > h1
+{
+	margin: 2px 5px;
+}
+
+
+.trans_list
+{
+	margin: 2px 5px;
+}
+
+
