@@ -18,13 +18,9 @@
 	{
 		global $db, $user_id;
 
-	wlog("getTransProperties(trans_id = ".$trans_id.")");
-
 		$resArr = array();
 
 		$qRes = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$user_id);
-
-	wlog("count(qRes) = ".count($qRes));
 
 		if (count($qRes) != 1)
 			return $resArr;
