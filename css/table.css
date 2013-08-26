@@ -67,3 +67,15 @@
 	width: 500px;
 	height: 30px;
 }
+
+
+.paginator
+{
+	padding: 5px 0px;
+}
+
+
+.paginator > span
+{
+	margin-right: 5px;
+}

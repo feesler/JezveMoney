@@ -504,25 +504,25 @@ class Transaction
 			{
 				for($i = 0; $i < $breakLimit; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num))." ";
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
 				}
-				$resStr .= " ... ".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE);
+				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE);
 			}
 			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
 			{
-				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE)." ... ";
+				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE)."<span>...</span>";
 				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num))." ";
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
 				}
-				$resStr .= " ... ".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE)." ";
+				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE);
 			}
 			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE)." ... ";
+				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE)."<span>...</span>";
 				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num))." ";
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
 				}
 			}
 		}
@@ -601,7 +601,7 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			html("<tr class=\"extra_row\">");
+			html("<tr class=\"paginator\">");
 			pushTab();
 
 			html("<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">");
@@ -681,7 +681,7 @@ class Transaction
 
 		if ($tr_on_page > 0)
 		{
-			html("<tr class=\"extra_row\">");
+			html("<tr class=\"paginator\">");
 			pushTab();
 			html("<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">");
 			if ($transCount > $tr_on_page)
