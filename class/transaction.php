@@ -554,15 +554,12 @@ class Transaction
 
 		html("<div class=\"trans_list\">");
 		pushTab();
-		html("<table class=\"tbl\">");
 
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
-			html("<tr><td><span>You have no one account. Please create one.</span></td></tr>");
-			popTab();
-			html("</table>");
+			html("<span>You have no one account. Please create one.</span>");
 			popTab();
 			html("</div>");
 			return;
@@ -589,10 +586,9 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			html("<tr class=\"extra_row\"><td>You have no one transaction yet.</td></tr>");
+			html("<span>You have no one transaction yet.</span>");
 			popTab();
-			html("</table>");
-			popTab();
+			html("</div>");
 
 			return;
 		}
@@ -601,28 +597,21 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			html("<tr class=\"paginator\">");
+			html("<div class=\"paginator\">");
 			pushTab();
 
-			html("<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">");
 			if ($transCount > $tr_on_page)
 				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
-			html("</td>");
 			popTab();
 
-			html("</tr>");
+			html("</div>");
 		}
 
 		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			$resStr = "<tr";
-			if (($row_num % 2) == 0)
-				$resStr .= " class=\"even_row\"";
-			$resStr .= ">";
-			html($resStr);
+			html("<div class=\"latest".((($row_num % 2) == 0) ? " even_row" : "")."\">");
 			pushTab();
-			html("<td class=\"latest\">");
 
 			$trans_id = intval($row["id"]);
 			$cur_trans_type = intval($row["type"]);
@@ -640,17 +629,17 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			$resStr = "<span class=\"latest_acc_name\">";
+			$resStr = "<div><span class=\"latest_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
 			if ($cur_trans_type == 3)
 				$resStr .= " → ";
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
 				$resStr .= $acc->getName($dest_id);
-			$resStr .= "</span>";
+			$resStr .= "</span></div>";
 			html($resStr);
 
-			$resStr = "<span class=\"latest_sum\">";
+			$resStr = "<div><span class=\"latest_sum\">";
 			if ($cur_trans_type == 1)			// expense
 				$resStr .= "- ";
 			else if ($cur_trans_type == 2)			// income
@@ -664,31 +653,30 @@ class Transaction
 				$resStr .= Currency::format($charge, $acc_curr);
 				$resStr .= ")";
 			}
-			$resStr .= "</span>";
+			$resStr .= "</span></div>";
 			html($resStr);
 
+			html("<div>");
+			pushTab();
 			html("<span class=\"latest_date\">".$fdate."</span>");
-
 			if ($comment != "")
 				html("<span class=\"latest_comm\"> | ".$comment."</span>");
-
-			html("</td>");
 			popTab();
-			html("</tr>");
+			html("</div>");
+
+			popTab();
+			html("</div>");
 
 			$row_num++;
 		}
 
 		if ($tr_on_page > 0)
 		{
-			html("<tr class=\"paginator\">");
+			html("<div class=\"paginator\">");
 			pushTab();
-			html("<td colspan=\"".(($trans_type == 0 || $trans_type == 3 || $trans_type == 4) ? 6 : 5)."\" class=\"pages\">");
 			if ($transCount > $tr_on_page)
 				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
-			html("</td>");
-			popTab();
-			html("</tr>");
+			html("</div>");
 		}
 
 		popTab();
