@@ -146,7 +146,7 @@
 			html("<div>");
 			pushTab();
 				showSubMenu();
-				$trans->getTable($trans_type, $acc_id, 30, $page_num);
+				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num);
 			popTab();
 			html("</div>");
 

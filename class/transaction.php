@@ -548,7 +548,7 @@ class Transaction
 
 
 	// Return table of transactions
-	public function getTable($trans_type, $acc_id = 0, $tr_on_page = 0, $page_num = 0)
+	public function getTable($trans_type, $acc_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0)
 	{
 		global $db;
 
@@ -580,7 +580,7 @@ class Transaction
 		if ($acc_id != 0)
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
 
-		$orderAndLimit = "date ASC";
+		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
 		if ($tr_on_page > 0)
 		{
 			$transCount = $db->countQ("transactions", $condition);
