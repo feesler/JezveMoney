@@ -610,9 +610,6 @@ class Transaction
 		$row_num = 1;
 		foreach($resArr as $row)
 		{
-			html("<div class=\"latest".((($row_num % 2) == 0) ? " even_row" : "")."\">");
-			pushTab();
-
 			$trans_id = intval($row["id"]);
 			$cur_trans_type = intval($row["type"]);
 			$src_id = intval($row["src_id"]);
@@ -628,6 +625,12 @@ class Transaction
 				$src_owner_id = $acc->getOwner($src_id);
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
+
+			html("<div id=\"tr_".$trans_id."\" class=\"latest".((($row_num % 2) == 0) ? " even_row" : "")."\" onclick=\"onTransClick(".$trans_id.");\">");
+			pushTab();
+
+			html("<div>");
+			pushTab();
 
 			$resStr = "<div><span class=\"latest_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
@@ -661,6 +664,9 @@ class Transaction
 			html("<span class=\"latest_date\">".$fdate."</span>");
 			if ($comment != "")
 				html("<span class=\"latest_comm\"> | ".$comment."</span>");
+			popTab();
+			html("</div>");
+
 			popTab();
 			html("</div>");
 

@@ -1,8 +1,22 @@
 ﻿.latest
 {
 	display: block;
-	padding: 5px;
 	background-color: #FFFFFF;
+	position: relative;
+}
+
+.latest > div
+{
+	padding: 8px;
+	border: 0px none;
+}
+
+
+.latest > div.act_tr
+{
+	padding: 5px;
+	border: 3px solid #0072C6;
+	cursor: pointer;
 }
 
 
