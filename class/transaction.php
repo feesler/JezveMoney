@@ -20,27 +20,34 @@ class Transaction
 	{
 		global $db;
 
-		self::$cache = array();
-
 		$cond = "user_id=".self::$user_id;
 		if ($trans_id != 0)
 			$cond .= " AND id=".$trans_id;
+		else
+			self::$cache = array();
 
 		$resArr = $db->selectQ("*", "transactions", $cond);
-		foreach($resArr as $row)
+		if (!count($resArr))		// delete transaction from cache if can't find it
 		{
-			$trans_id = intval($row["id"]);
+			unset(self::$cache[$trans_id]);
+		}
+		else
+		{
+			foreach($resArr as $row)
+			{
+				$trans_id = intval($row["id"]);
 
-			self::$cache[$trans_id]["user_id"] = intval($row["user_id"]);
-			self::$cache[$trans_id]["src_id"] = intval($row["src_id"]);
-			self::$cache[$trans_id]["dest_id"] = intval($row["dest_id"]);
-			self::$cache[$trans_id]["type"] = intval($row["type"]);
-			self::$cache[$trans_id]["amount"] = floatval($row["amount"]);
-			self::$cache[$trans_id]["charge"] = floatval($row["charge"]);
-			self::$cache[$trans_id]["curr_id"] = intval($row["curr_id"]);
-			self::$cache[$trans_id]["date"] = $row["date"];
-			self::$cache[$trans_id]["comment"] = $row["comment"];
-			self::$cache[$trans_id]["pos"] = intval($row["pos"]);
+				self::$cache[$trans_id]["user_id"] = intval($row["user_id"]);
+				self::$cache[$trans_id]["src_id"] = intval($row["src_id"]);
+				self::$cache[$trans_id]["dest_id"] = intval($row["dest_id"]);
+				self::$cache[$trans_id]["type"] = intval($row["type"]);
+				self::$cache[$trans_id]["amount"] = floatval($row["amount"]);
+				self::$cache[$trans_id]["charge"] = floatval($row["charge"]);
+				self::$cache[$trans_id]["curr_id"] = intval($row["curr_id"]);
+				self::$cache[$trans_id]["date"] = $row["date"];
+				self::$cache[$trans_id]["comment"] = $row["comment"];
+				self::$cache[$trans_id]["pos"] = intval($row["pos"]);
+			}
 		}
 	}
 
@@ -48,7 +55,7 @@ class Transaction
 	// Check state of cache and update if needed
 	private function checkCache($trans_id = 0)
 	{
-		if (is_null(self::$cache))
+		if (is_null(self::$cache) || $trans_id != 0)
 			$this->updateCache($trans_id);
 
 		return (!is_null(self::$cache));
