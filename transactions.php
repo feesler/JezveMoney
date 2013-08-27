@@ -97,6 +97,8 @@
 	if (is_null($trans_type))
 		fail();
 
+	$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
+
 	$titleString = "Jezve Money | Transactions";
 
 	html("<!DOCTYPE html>");
