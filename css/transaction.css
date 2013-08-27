@@ -169,7 +169,6 @@
 
 .trans_cont > div
 {
-	height: 100%;
 	display: block;
 	float: none;
 	clear: both;
@@ -179,7 +178,6 @@
 
 .trans_cont > div > div
 {
-	height: 100%;
 	clear: both;
 }
 

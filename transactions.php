@@ -117,7 +117,6 @@
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
 	html(getJS("popup.js"));
-	html(getJS("main.js"));
 	html(getJS("tr_list.js"));
 
 	html("<script>");
