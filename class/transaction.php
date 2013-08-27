@@ -695,8 +695,6 @@ class Transaction
 		}
 
 		popTab();
-		html("</table>");
-		popTab();
 		html("</div>");
 		html();
 	}
