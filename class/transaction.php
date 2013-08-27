@@ -548,7 +548,7 @@ class Transaction
 
 
 	// Return table of transactions
-	public function getTable($trans_type, $acc_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0)
+	public function getTable($trans_type, $acc_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $active = TRUE)
 	{
 		global $db;
 
@@ -602,7 +602,7 @@ class Transaction
 			return;
 		}
 
-		if ($tr_on_page > 0)
+		if ($tr_on_page > 0 && $showPaginator == TRUE)
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
@@ -635,7 +635,11 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			html("<div id=\"tr_".$trans_id."\" class=\"latest".((($row_num % 2) == 0) ? " even_row" : "")."\" onclick=\"onTransClick(".$trans_id.");\">");
+			$resStr = "<div id=\"tr_".$trans_id."\" class=\"latest".((($row_num % 2) == 0) ? " even_row" : "")."\"";
+			if ($active == TRUE)
+				$resStr .= " onclick=\"onTransClick(".$trans_id.");\"";
+			$resStr .= ">";
+			html($resStr);
 			pushTab();
 
 			html("<div>");
@@ -685,7 +689,7 @@ class Transaction
 			$row_num++;
 		}
 
-		if ($tr_on_page > 0)
+		if ($tr_on_page > 0 && $showPaginator == TRUE)
 		{
 			html("<div class=\"paginator\">");
 			pushTab();
