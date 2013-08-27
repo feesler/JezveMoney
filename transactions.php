@@ -114,6 +114,7 @@
 	html(getCSS("popup.css"));
 	html(getCSS("transaction.css"));
 	html(getCSS("table.css"));
+	html(getCSS("popup.css"));
 	html(getJS("common.js"));
 	html(getJS("popup.js"));
 	html(getJS("main.js"));
@@ -159,7 +160,7 @@
 		html("</div>");
 	popTab();
 	html("</div>");
-	html("<form id=\"delfrom\" method=\"post\" action=\"./modules/deltransaction.php\">");
+	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");
 	html("<input id=\"deltrans\" name=\"transactions\" type=\"hidden\" value=\"\">");
 	html("</form>");
 	html("</body>");

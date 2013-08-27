@@ -1,3 +1,6 @@
+﻿var dwPopup;
+
+
 var transactions =
 {
 	selectedArr : [],
@@ -17,7 +20,7 @@ var transactions =
 
 	selectAccount : function(tr_id)
 	{
-		if (!acc_id || this.isSelected(tr_id))
+		if (!tr_id || this.isSelected(tr_id))
 			return false;
 
 		this.selectedArr.push(tr_id);
@@ -81,20 +84,79 @@ function onTransClick(tr_id)
 	if (!transObj || !edit_btn || !deltrans)
 		return;
 
-	if (accounts.isSelected(tr_id))
+	if (transactions.isSelected(tr_id))
 	{
-		accounts.deselectAccount(tr_id);
+		transactions.deselectAccount(tr_id);
 
 		transObj.firstElementChild.className = '';
 	}
 	else
 	{
-		accounts.selectAccount(tr_id);
+		transactions.selectAccount(tr_id);
 
 		transObj.firstElementChild.className = 'act_tr';
 	}
 
-	show(edit_btn, (accounts.selectedCount() == 1));
-	show(del_btn, (accounts.selectedCount() > 0));
+	show(edit_btn, (transactions.selectedCount() == 1));
+	show(del_btn, (transactions.selectedCount() > 0));
+
+	deltrans.value = transactions.selectedArr.join();
+
+	if (transactions.selectedCount() == 1)
+	{
+		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			edit_btn.firstElementChild.href = './edittransaction.php?id=' + transactions.selectedArr[0];
+	}
 }
 
+var multiTransDeleteMsg = 'Are you sure want to delete selected accounts?<br>Changes in the balance of affected accounts will be canceled.';
+var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+
+
+// Delete popup callback
+function onDeletePopup(res)
+{
+	var delform;
+
+	if (!dwPopup)
+		return;
+
+	dwPopup.close();
+	dwPopup = null;
+
+	if (res)
+	{
+		delform = ge('delform');
+		if (delform)
+			delform.submit();
+	}
+}
+
+
+// Create and show account delete warning popup
+function showDeletePopup()
+{
+	if (transactions.selectedCount() == 0)
+		return;
+
+	// check popup already created
+	if (dwPopup)
+		return;
+
+	dwPopup = new Popup();
+	if (!dwPopup)
+		return;
+
+	if (!dwPopup.create({ id : 'delete_warning',
+						title : 'Delete account',
+						msg : (transactions.selectedCount() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
+						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
+								cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						}))
+	{
+		dwPopup = null;
+		return;
+	}
+
+	dwPopup.show();
+}
