@@ -269,6 +269,7 @@ button::-moz-focus-inner
 {
 	display: inline-block;
 	float: left;
+	min-width: 200px;
 	margin: 0px 0px 30px 30px;
 }
 
