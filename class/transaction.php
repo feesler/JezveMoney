@@ -410,6 +410,8 @@ class Transaction
 		if (!$db->deleteQ("transactions", "id=".$trans_id))
 			return FALSE;
 
+		self::updateCache($trans_id);
+
 		return TRUE;
 	}
 
