@@ -159,6 +159,8 @@
 		html("</div>");
 	popTab();
 	html("</div>");
+	popTab();
+	html("</div>");
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");
 	html("<input id=\"deltrans\" name=\"transactions\" type=\"hidden\" value=\"\">");
 	html("</form>");
