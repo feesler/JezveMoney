@@ -337,7 +337,7 @@ var singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All i
 // Delete popup callback
 function onDeletePopup(res)
 {
-	var delfrom;
+	var delform;
 
 	if (!dwPopup)
 		return;
@@ -347,9 +347,9 @@ function onDeletePopup(res)
 
 	if (res)
 	{
-		delfrom = ge('delfrom');
-		if (delfrom)
-			delfrom.submit();
+		delform = ge('delform');
+		if (delform)
+			delform.submit();
 	}
 }
 
