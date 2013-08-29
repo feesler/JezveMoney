@@ -52,21 +52,16 @@
 
 	require_once("./templates/header.php");
 
-	html("<div class=\"profile_content\">");
-	pushTab();
-		html("<div class=\"profile_summary\">");
-		pushTab();
+	html("<div class=\"profile_content\">", PUSH_AFTER);
+		html("<div class=\"profile_summary\">", PUSH_AFTER);
 			html("<h1>User profile</h1>");
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 				html("<h2>Account name</h2>");
 				html("<span>".$user_name."</span>");
-			popTab();
-			html("</div>");
+			html("</div>", POP_BEFORE);
 
 			html();
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 				html("<h2>User name</h2>");
 				html("<span>".$person_name."</span>");
 
@@ -75,61 +70,49 @@
 				html("<div><a href=\"./profile.php?act=changename\">Change</a></div>");
 			}
 
-			popTab();
-			html("</div>");
+			html("</div>", POP_BEFORE);
 
 			if ($action != "changepassword")
 			{
 				html();
-				html("<div>");
-				pushTab();
+				html("<div>", PUSH_AFTER);
 					html("<h2>Security</h2>");
 					html("<div><a href=\"./profile.php?act=changepassword\">Change password</a></div>");
-				popTab();
-				html("</div>");
+				html("</div>", POP_BEFORE);
 			}
 
-		popTab();
-		html("</div>");
+		html("</div>", POP_BEFORE);
 
 	if ($action == "changepassword")
 	{
 		html("<form method=\"post\" action=\"./modules/changepassword.php\" onsubmit=\"return onChangePassSubmit(this);\">");
-		html("<div class=\"profile_common\">");
-		pushTab();
+		html("<div class=\"profile_common\">", PUSH_AFTER);
 			html("<h2>Change password</h2>");
-			html("<div>");
+			html("<div>", PUSH_AFTER);
 				html("<label for=\"oldpwd\">Current password</label>");
 				html("<div class=\"stretch_input profile_input\"><div><input id=\"oldpwd\" name=\"oldpwd\" type=\"password\"></div></div>");
 				html("<label for=\"newpwd\">New password</label>");
 				html("<div class=\"stretch_input profile_input\"><div><input id=\"newpwd\" name=\"newpwd\" type=\"password\"></div></div>");
 				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
-			popTab();
-			html("</div>");
-		popTab();
-		html("</div>");
+			html("</div>", POP_BEFORE);
+		html("</div>", POP_BEFORE);
 		html("</form>");
 	}
 	else if ($action == "changename")
 	{
 		html("<form method=\"post\" action=\"./modules/changename.php\" onsubmit=\"return onChangeNameSubmit(this);\">");
-		html("<div class=\"profile_common\">");
-		pushTab();
+		html("<div class=\"profile_common\">", PUSH_AFTER);
 			html("<h2>Change name</h2>");
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 				html("<label for=\"newpwd\">New name</label>");
 				html("<div class=\"stretch_input profile_input\"><div><input id=\"newname\" name=\"newname\" type=\"text\"></div></div>");
 				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
-			popTab();
-			html("</div>");
-		popTab();
-		html("</div>");
+			html("</div>", POP_BEFORE);
+		html("</div>", POP_BEFORE);
 		html("</form>");
 	}
 
-	popTab();
-	html("</div>");
+	html("</div>", POP_BEFORE);
 	html("</body>");
 	html("</html>");
 ?>

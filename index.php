@@ -33,41 +33,28 @@
 
 	require_once("./templates/header.php");
 
-	html("<div class=\"content\">");
-	pushTab();
-		html("<div>");
-		pushTab();
+	html("<div class=\"content\">", PUSH_AFTER);
+		html("<div>", PUSH_AFTER);
 			html("<div class=\"widget_title\"><a href=\"./accounts.php\">Accounts &gt;</a></div>");
 			html("<div class=\"tiles\">".$acc->getTiles()."</div>");
-		popTab();
-		html("</div>");
+		html("</div>", POP_BEFORE);
 
 		html();
-		html("<div>");
-		pushTab();
+		html("<div>", PUSH_AFTER);
 			html("<div class=\"widget_title\">Total &gt;</div>");
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 				echo($acc->getTotals());
-	
-			popTab();
-			html("</div>");
-		popTab();
-		html("</div>");
+			html("</div>", POP_BEFORE);
+		html("</div>", POP_BEFORE);
 
 		html();
-		html("<div>");
-		pushTab();
+		html("<div>", PUSH_AFTER);
 			html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 				$trans->getLatest(5);
-			popTab();
-			html("</div>");
-		popTab();
-		html("</div>");
-	popTab();
-	html("</div>");
+			html("</div>", POP_BEFORE);
+		html("</div>", POP_BEFORE);
+	html("</div>", POP_BEFORE);
 	html("</body>");
 	html("</html>");
 ?>
