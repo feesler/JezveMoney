@@ -1,7 +1,7 @@
 <?php
 	html("<div class=\"header\">");
 	pushTab();
-	html("<div class=\"logo\"><a href=\"./index.php\"><span>Jezve Money</span></a></div>");
+		html("<div class=\"logo\"><a href=\"./index.php\"><span>Jezve Money</span></a></div>");
 
 	if ($user_id != 0)
 	{

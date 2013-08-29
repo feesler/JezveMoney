@@ -30,11 +30,11 @@
 		$titleString .= " | Change name";
 	else if ($action == "changepassword")
 		$titleString .= " | Change password";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<?php
+
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
+
 	html(getCommonHeaders());
 
 	html("<title>".$titleString."</title>");
@@ -46,80 +46,90 @@
 	html("<script>");
 	html("var p_name = ".json_encode($person_name).";");
 	html("</script>");
-?>
-</head>
-<body>
-<?php
+
+	html("</head>");
+	html("<body>");
+
 	require_once("./templates/header.php");
-?>
-<div class="profile_content">
-	<div class="profile_summary">
-		<h1>User profile</h1>
-		<div>
-			<h2>Account name</h2>
-			<span><?php echo($user_name); ?></span>
-		</div>
 
-		<div>
-			<h2>User name</h2>
-			<span><?php echo($person_name); ?></span>
-<?php
-	if ($action != "changename")
-	{
-?>
-			<div><a href="./profile.php?act=changename">Change</a></div>
-<?php
-	}
-?>
-		</div>
+	html("<div class=\"profile_content\">");
+	pushTab();
+		html("<div class=\"profile_summary\">");
+		pushTab();
+			html("<h1>User profile</h1>");
+			html("<div>");
+			pushTab();
+				html("<h2>Account name</h2>");
+				html("<span>".$user_name."</span>");
+			popTab();
+			html("</div>");
 
-<?php
-	if ($action != "changepassword")
-	{
-?>
-		<div>
-			<h2>Security</h2>
-			<div><a href="./profile.php?act=changepassword">Change password</a></div>
-		</div>
-<?php
-	}
-?>
-	</div>
+			html();
+			html("<div>");
+			pushTab();
+				html("<h2>User name</h2>");
+				html("<span>".$person_name."</span>");
 
-<?php
+			if ($action != "changename")
+			{
+				html("<div><a href=\"./profile.php?act=changename\">Change</a></div>");
+			}
+
+			popTab();
+			html("</div>");
+
+			if ($action != "changepassword")
+			{
+				html();
+				html("<div>");
+				pushTab();
+					html("<h2>Security</h2>");
+					html("<div><a href=\"./profile.php?act=changepassword\">Change password</a></div>");
+				popTab();
+				html("</div>");
+			}
+
+		popTab();
+		html("</div>");
+
 	if ($action == "changepassword")
 	{
-?>
-	<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
-	<div class="profile_common">
-		<h2>Change password</h2>
-		<div>
-			<label for="oldpwd">Current password</label>
-			<div class="stretch_input profile_input"><div><input id="oldpwd" name="oldpwd" type="password"></div></div>
-			<label for="newpwd">New password</label>
-			<div class="stretch_input profile_input"><div><input id="newpwd" name="newpwd" type="password"></div></div>
-			<div class="profile_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./profile.php">cancel</a></div>
-		</div>
-	</div>
-	</form>
-<?php
+		html("<form method=\"post\" action=\"./modules/changepassword.php\" onsubmit=\"return onChangePassSubmit(this);\">");
+		html("<div class=\"profile_common\">");
+		pushTab();
+			html("<h2>Change password</h2>");
+			html("<div>");
+				html("<label for=\"oldpwd\">Current password</label>");
+				html("<div class=\"stretch_input profile_input\"><div><input id=\"oldpwd\" name=\"oldpwd\" type=\"password\"></div></div>");
+				html("<label for=\"newpwd\">New password</label>");
+				html("<div class=\"stretch_input profile_input\"><div><input id=\"newpwd\" name=\"newpwd\" type=\"password\"></div></div>");
+				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+		html("</form>");
 	}
 	else if ($action == "changename")
 	{
-?>
-	<form method="post" action="./modules/changename.php" onsubmit="return onChangeNameSubmit(this);">
-	<div class="profile_common">
-		<h2>Change name</h2>
-		<div>
-			<label for="newpwd">New name</label>
-			<div class="stretch_input profile_input"><div><input id="newname" name="newname" type="text"></div></div>
-			<div class="profile_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./profile.php">cancel</a></div>
-		</div>
-	</div>
-	</form>
-<?php
+		html("<form method=\"post\" action=\"./modules/changename.php\" onsubmit=\"return onChangeNameSubmit(this);\">");
+		html("<div class=\"profile_common\">");
+		pushTab();
+			html("<h2>Change name</h2>");
+			html("<div>");
+			pushTab();
+				html("<label for=\"newpwd\">New name</label>");
+				html("<div class=\"stretch_input profile_input\"><div><input id=\"newname\" name=\"newname\" type=\"text\"></div></div>");
+				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+		html("</form>");
 	}
+
+	popTab();
+	html("</div>");
+	html("</body>");
+	html("</html>");
 ?>
-</div>
-</body>
-</html>

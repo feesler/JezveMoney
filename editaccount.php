@@ -29,11 +29,11 @@
 	$curr_sign = Currency::getSign($acc_curr);
 
 	$titleString = "Jezve Money | Edit account";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<?php
+
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
+
 	html(getCommonHeaders());
 
 	html("<title>".$titleString."</title>");
@@ -45,45 +45,60 @@
 	html("<script>");
 	echo(Currency::getArray());
 	html("</script>");
-?>
-</head>
-<body>
-<?php
+
+	html("</head>");
+	html("<body>");
+
 	require_once("./templates/header.php");
-?>
-<form method="post" action="./modules/editaccount.php" onsubmit="return onNewAccountSubmit(this);">
-<input id="accid" name="accid" type="hidden" value="<?php echo($acc_id); ?>">
-<div class="acc_content">
-	<div class="profile_common">
-		<h2>Edit account</h2>
-		<div>
-			<label for="accname">Account name</label>
-			<div class="rdiv"><div><input id="accname" name="accname" type="text" value="<?php echo($acc_name); ?>"></div></div>
-			<label for="currency">Currency</label>
-			<div class="rdiv">
-				<div>
-					<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
-<?php
-	setTab(6);
-	echo(Currency::getList($acc_curr));
+
+	html("<form method=\"post\" action=\"./modules/editaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
+	html("<input id=\"accid\" name=\"accid\" type=\"hidden\" value=\"".$acc_id."\">");
+	html("<div class=\"acc_content\">");
+	pushTab();
+		html("<div class=\"profile_common\">");
+		pushTab();
+			html("<h2>Edit account</h2>");
+			html("<div>");
+			pushTab();
+				html("<label for=\"accname\">Account name</label>");
+				html("<div class=\"rdiv\"><div><input id=\"accname\" name=\"accname\" type=\"text\" value=\"".$acc_name."\"></div></div>");
+				html("<label for=\"currency\">Currency</label>");
+				html("<div class=\"rdiv\">");
+				pushTab();
+					html("<div>");
+					pushTab();
+						html("<select id=\"currency\" name=\"currency\" onchange=\"onChangeAccountCurrency(this);\">");
+						pushTab();
+							echo(Currency::getList($acc_curr));
+						popTab();
+						html("</select>");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+				html("<label for=\"balance\">Initial balance</label>");
+				html("<div>");
+				pushTab();
+					html("<div class=\"rtext\"><span id=\"currsign\" class=\"curr_sign\">".$curr_sign."</span></div>");
+					html("<div class=\"rdiv\">");
+					pushTab();
+						html("<div>");
+						pushTab();
+							html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"".$acc_bal."\">");
+						popTab();
+						html("</div>");
+					popTab();
+					html("</div>");
+				popTab();
+				html("</div>");
+				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
 	popTab();
+	html("</div>");
+	html("</form>");
+	html("</body>");
+	html("</html>");
 ?>
-					</select>
-				</div>
-			</div>
-			<label for="balance">Initial balance</label>
-			<div>
-				<div class="rtext"><span id="currsign" class="curr_sign"><?php echo($curr_sign); ?></span></div>
-				<div class="rdiv">
-					<div>
-						<input class="summ_text" id="balance" name="balance" type="text" value="<?php echo($acc_bal); ?>">
-					</div>
-				</div>
-			</div>
-			<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
-		</div>
-	</div>
-</div>
-</form>
-</body>
-</html>

@@ -14,11 +14,11 @@
 	$trans = new Transaction($user_id);
 
 	$titleString = "Jezve Money";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<?php
+
+
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
 	html(getCommonHeaders());
 
 	html("<title>".$titleString."</title>");
@@ -27,36 +27,47 @@
 	html(getCSS("table.css"));
 	html(getJS("common.js"));
 	html(getJS("main.js"));
-?>
-</head>
-<body>
-<?php
+
+	html("</head>");
+	html("<body>");
+
 	require_once("./templates/header.php");
-?>
-<div class="content">
-	<div>
-		<div class="widget_title"><a href="./accounts.php">Accounts &gt;</a></div>
-		<div class="tiles"><?php echo($acc->getTiles()); ?></div>
-	</div>
 
-	<div>
-		<div class="widget_title">Total &gt;</div>
-		<div>
-<?php
-	echo($acc->getTotals());
-?>
-		</div>
-	</div>
+	html("<div class=\"content\">");
+	pushTab();
+		html("<div>");
+		pushTab();
+			html("<div class=\"widget_title\"><a href=\"./accounts.php\">Accounts &gt;</a></div>");
+			html("<div class=\"tiles\">".$acc->getTiles()."</div>");
+		popTab();
+		html("</div>");
 
-	<div>
-		<div class="widget_title"><a href="./transactions.php">Latest &gt;</a></div>
-		<div>
-<?php
-	setTab(3);
-	$trans->getLatest(5);
+		html();
+		html("<div>");
+		pushTab();
+			html("<div class=\"widget_title\">Total &gt;</div>");
+			html("<div>");
+			pushTab();
+				echo($acc->getTotals());
+	
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+
+		html();
+		html("<div>");
+		pushTab();
+			html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
+			html("<div>");
+			pushTab();
+				$trans->getLatest(5);
+			popTab();
+			html("</div>");
+		popTab();
+		html("</div>");
+	popTab();
+	html("</div>");
+	html("</body>");
+	html("</html>");
 ?>
-		</div>
-	</div>
-</div>
-</body>
-</html>
