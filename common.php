@@ -82,15 +82,30 @@
 	}
 
 
+	define("PUSH_AFTER", 1, TRUE);
+	define("PUSH_BEFORE", 2, TRUE);
+	define("POP_AFTER", 3, TRUE);
+	define("POP_BEFORE", 4, TRUE);
+
 	// Print specified HTML string with tabbing and carriage return
-	function html($str = "")
+	function html($str = "", $opt = 0)
 	{
 		global $tabStr;
+
+		if ($opt == POP_BEFORE)
+			popTab();
+		else if ($opt == PUSH_BEFORE)
+			pushTab();
 
 		if (!is_null($str) && $str != "")
 			echo($tabStr.$str."\r\n");
 		else
 			echo("\r\n");
+
+		if ($opt == POP_AFTER)
+			popTab();
+		else if ($opt == PUSH_AFTER)
+			pushTab();
 	}
 
 
