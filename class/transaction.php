@@ -561,16 +561,14 @@ class Transaction
 
 		$pers = new Person(self::$user_id);
 
-		html("<div class=\"trans_list\">");
-		pushTab();
+		html("<div class=\"trans_list\">", PUSH_AFTER);
 
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
 			html("<span>You have no one account. Please create one.</span>");
-			popTab();
-			html("</div>");
+			html("</div>", POP_BEFORE);
 			return;
 		}
 
@@ -596,8 +594,7 @@ class Transaction
 		if (!$rowCount)
 		{
 			html("<span>You have no one transaction yet.</span>");
-			popTab();
-			html("</div>");
+			html("</div>", POP_BEFORE);
 
 			return;
 		}
@@ -606,14 +603,12 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			html("<div class=\"paginator\">");
-			pushTab();
+			html("<div class=\"paginator\">", PUSH_AFTER);
 
 			if ($transCount > $tr_on_page)
 				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
-			popTab();
 
-			html("</div>");
+			html("</div>", POP_BEFORE);
 		}
 
 		$row_num = 1;
@@ -639,11 +634,9 @@ class Transaction
 			if ($active == TRUE)
 				$resStr .= " onclick=\"onTransClick(".$trans_id.");\"";
 			$resStr .= ">";
-			html($resStr);
-			pushTab();
+			html($resStr, PUSH_AFTER);
 
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 
 			$resStr = "<div><span class=\"latest_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
@@ -664,42 +657,33 @@ class Transaction
 			$resStr .= Currency::format($amount, $curr_id);
 			if ($charge != $amount)
 			{
-				$resStr .= " (";
 				$acc_curr = $acc->getCurrency(($cur_trans_type == 2) ? $dest_id : $src_id);
-				$resStr .= Currency::format($charge, $acc_curr);
-				$resStr .= ")";
+				$resStr .= " (".Currency::format($charge, $acc_curr).")";
 			}
 			$resStr .= "</span></div>";
 			html($resStr);
 
-			html("<div>");
-			pushTab();
+			html("<div>", PUSH_AFTER);
 			html("<span class=\"latest_date\">".$fdate."</span>");
 			if ($comment != "")
 				html("<span class=\"latest_comm\"> | ".$comment."</span>");
-			popTab();
-			html("</div>");
 
-			popTab();
-			html("</div>");
-
-			popTab();
-			html("</div>");
+			html("</div>", POP_BEFORE);
+			html("</div>", POP_BEFORE);
+			html("</div>", POP_BEFORE);
 
 			$row_num++;
 		}
 
 		if ($tr_on_page > 0 && $showPaginator == TRUE)
 		{
-			html("<div class=\"paginator\">");
-			pushTab();
+			html("<div class=\"paginator\">", PUSH_AFTER);
 			if ($transCount > $tr_on_page)
 				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
-			html("</div>");
+			html("</div>", POP_BEFORE);
 		}
 
-		popTab();
-		html("</div>");
+		html("</div>", POP_BEFORE);
 		html();
 	}
 
