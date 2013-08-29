@@ -622,19 +622,12 @@ class Account
 		if (!$this->checkCache())
 			return $resStr;
 
-		setTab(3);
-		$resStr .= $tabStr."<table class=\"tbl\">\r\n";
-		pushTab();
+		html("<div class=\"trans_list\">", PUSH_AFTER);
 
 		$accounts = count(self::$cache);
 		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
 		{
-			$resStr .= $tabStr."<tr><td><span>";
-			if ($transfer)
-				$resStr .= "You need at least two accounts to transfer.";
-			else
-				$resStr .= "You have no one account. Please create one.";
-			$resStr .= "</span></td></tr>\r\n";
+			html("<span>You have no one account. Please create one.</span>");
 		}
 		else
 		{
@@ -654,32 +647,23 @@ class Account
 			{
 				$i++;
 
-				$resStr .= $tabStr."<tr";
+				$resStr = "<div class=\"latest";
 				if ($i % 2 == 0)
-					$resStr .= " class=\"even_row\"";
-				$resStr .= ">\r\n";
-				pushTab();
-
-				$resStr .= $tabStr."<td class=\"latest\">\r\n";
-				pushTab();
+					$resStr .= " even_row";
+				$resStr .= "\">";
+				html($resStr, PUSH_AFTER);
 
 				$valfmt = Currency::format($value, $key);
 				$currName = Currency::getName($key);
 
-				$resStr .= $tabStr."<span class=\"latest_acc_name\">".$currName."</span>\r\n";
-				$resStr .= $tabStr."<span class=\"latest_sum\">".$valfmt."</span>\r\n";
+				html("<div><span class=\"latest_acc_name\">".$currName."</span></div>");
+				html("<div><span class=\"latest_sum\">".$valfmt."</span></div>");
 
-				popTab();
-				$resStr .= $tabStr."</td>\r\n";
-				popTab();
-				$resStr .= $tabStr."</tr>\r\n";
+				html("</div>", POP_BEFORE);
 			}
 		}
 
-		popTab();
-		$resStr .= $tabStr."</table>\r\n";
-
-		return $resStr;
+		html("</div>", POP_BEFORE);
 	}
 }
 
