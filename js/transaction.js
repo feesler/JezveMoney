@@ -543,7 +543,7 @@ function updControls()
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		resbal.value = getBalanceOfAccount(selectedValue(src)) - charge.value;
+		resbal.value = normalize(getBalanceOfAccount(selectedValue(src)) - normalize(charge.value));
 
 		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(selectedValue(src)));
 
@@ -551,7 +551,7 @@ function updControls()
 		{
 			var resbal_d_b = ge('resbal_d_b');
 
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(selectedValue(dest)) + amount.value, getCurrencyOfAccount(selectedValue(dest)));
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(selectedValue(dest)) + normalize(amount.value), getCurrencyOfAccount(selectedValue(dest)));
 		}
 
 		hideChargeAndExchange();
