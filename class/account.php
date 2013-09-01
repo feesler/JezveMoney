@@ -510,7 +510,7 @@ class Account
 		$acc_balance = $this->getBalance($acc_id);
 		$balance_fmt = Currency::format($acc_balance, $acc_curr);
 
-		return getTile(STATIC_TILE, $tile_id, $acc_name, $balance_fmt, "onTileClick(".$acc_id.");");
+		return getTile(STATIC_TILE, $tile_id, $acc_name, $balance_fmt);
 	}
 
 
