@@ -164,6 +164,24 @@
 	}
 
 
+	// Return markup for right tile block
+	function getRightTileBlock($div_id, $isVisible, $label_str, $btn_id, $btn_event, $btn_str)
+	{
+		$d_id = (($div_id && $div_id != "") ? " id=\"".$div_id."\"" : "");
+		$disp = ($isVisible ? "" : " style=\"display: none;\"");
+		$b_id = (($btn_id && $btn_id != "") ? " id=\"".$btn_id."\"" : "");
+		$b_ev = (($btn_event && $btn_event != "") ? " onclick=\"".$btn_event."\"" : "");
+
+		html_op("<div".$d_id.$disp.">");
+			if ($label_str && $label_str != "")
+				html("<span>".$label_str."</span>");
+			html_op("<div>");
+				html("<button".$b_id." class=\"dashed_btn resbal_btn\" type=\"button\"".$b_ev."><span>".$btn_str."</span></button>");
+			html_cl("</div>");
+		html_cl("</div>");
+	}
+
+
 	// Return javascript array of amounts of specified transactions for statistics use
 	function getStatArray($user_id, $account_id, $trans_type, $group_type = 0)
 	{
