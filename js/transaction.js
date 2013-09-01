@@ -511,6 +511,7 @@ function setTileAccount(tile_id, acc_id)
 function updControls()
 {
 	var src, dest, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
+	var src_acc, dest_acc;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -524,6 +525,9 @@ function updControls()
 	resbal_b = ge('resbal_b');
 	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
 		return;
+
+	src_acc = selectedValue(src);
+	dest_acc = selectedValue(dest);
 
 	exchange.value = '';
 	isDiff = isDiffCurr();
@@ -543,22 +547,25 @@ function updControls()
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		resbal.value = normalize(getBalanceOfAccount(selectedValue(src)) - normalize(charge.value));
+		if (edit_mode)
+			resbal.value = normalize(getBalanceOfAccount(src_acc) + transaction.charge - normalize(charge.value));
+		else
+			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(charge.value));
 
-		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(selectedValue(src)));
+		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
 
 		if (isTransfer())
 		{
 			var resbal_d_b = ge('resbal_d_b');
 
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(selectedValue(dest)) + normalize(amount.value), getCurrencyOfAccount(selectedValue(dest)));
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(dest_acc) + normalize(amount.value), getCurrencyOfAccount(dest_acc));
 		}
 
 		hideChargeAndExchange();
 	}
 
-	amountCurr = getCurrencyOfAccount(selectedValue(dest));
-	chargeCurr = getCurrencyOfAccount(selectedValue(src));
+	amountCurr = getCurrencyOfAccount(dest_acc);
+	chargeCurr = getCurrencyOfAccount(src_acc);
 
 	if (isTransfer())
 	{
@@ -570,8 +577,8 @@ function updControls()
 	setSign(false, chargeCurr);
 	setSign(true, amountCurr);
 
-	setTileAccount('source_tile', selectedValue(src));
-	setTileAccount('dest_tile', selectedValue(dest));
+	setTileAccount('source_tile', src_acc);
+	setTileAccount('dest_tile', dest_acc);
 
 	getValues();
 	setExchangeComment();
