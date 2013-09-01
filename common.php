@@ -164,6 +164,55 @@
 	}
 
 
+	define("STATIC_TILE", 1, TRUE);
+	define("LINK_TILE", 2, TRUE);
+	define("BUTTON_TILE", 3, TRUE);
+
+	// Return markup for tile
+	function getTile($tile_type, $tile_id, $tile_title, $tile_subtitle, $tile_action)
+	{
+		$resStr = "";
+
+		if ($tile_type != STATIC_TILE && $tile_type != LINK_TILE && $tile_type != BUTTON_TILE)
+			return $resStr;
+
+		$t_id = ($tile_id && $tile_id != "") ? " id=\"".$tile_id."\"" : "";
+
+		$resStr .= "<div".$t_id." class=\"tile\">";
+		if ($tile_type == STATIC_TILE)
+		{
+			$resStr .= "<div class=\"tilelink\">";
+		}
+		else if ($tile_type == LINK_TILE)
+		{
+			$t_href = ($tile_action && $tile_action != "") ? " href=\"".$tile_action."\"" : "";
+
+			$resStr .= "<a".$t_href." class=\"tilelink\">";
+		}
+		else if ($tile_type == BUTTON_TILE)
+		{
+			$t_click = ($tile_action && $tile_action != "") ? " onclick=\"".$tile_action."\"" : "";
+			$resStr .= "<button class=\"tilelink\"".$t_click.">";
+		}
+
+		$resStr .= "<div>";
+
+		$resStr .= "<span class=\"acc_bal\">".$tile_subtitle."</span>";
+		$resStr .= "<span class=\"acc_name\">".$tile_title."</span>";
+
+		$resStr .= "</div>";
+		if ($tile_type == STATIC_TILE)
+			$resStr .= "</div>";
+		else if ($tile_type == LINK_TILE)
+			$resStr .= "</a>";
+		else if ($tile_type == BUTTON_TILE)
+			$resStr .= "</button>";
+		$resStr .= "</div>";
+
+		return $resStr;
+	}
+
+
 	// Return markup for right tile block
 	function getRightTileBlock($div_id, $isVisible, $label_str, $btn_id, $btn_event, $btn_str)
 	{
