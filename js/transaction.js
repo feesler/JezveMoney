@@ -556,9 +556,18 @@ function updControls()
 
 		if (isTransfer())
 		{
+			var resbal_d = ge('resbal_d');
 			var resbal_d_b = ge('resbal_d_b');
 
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(dest_acc) + normalize(amount.value), getCurrencyOfAccount(dest_acc));
+			if (!resbal_d || !resbal_d_b)
+				return;
+
+			if (edit_mode && dest_acc == transaction.destAcc)
+				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) - transaction.amount + normalize(amount.value));
+			else
+				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(amount.value));
+
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
 		}
 
 		hideChargeAndExchange();
