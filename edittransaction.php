@@ -210,7 +210,7 @@
 		html_op("<div id=\"source\" class=\"acc_float\">");
 			html("<div><label for=\"src_id\">Source account</label></div>");
 			html_op("<div class=\"tile_container\">");
-				html($acc->getTile(STATIC_TILE, $tr["src_id"], "source_tile"));
+				html($acc->getTileEx(STATIC_TILE, $tr["src_id"], $tr["amount"], "source_tile"));
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
@@ -252,7 +252,7 @@
 		html_op("<div id=\"destination\" class=\"acc_float\">");
 			html("<div><label for=\"dest_id\">Destination account</label></div>");
 			html_op("<div class=\"tile_container\">");
-				html($acc->getTile(STATIC_TILE, $tr["dest_id"], "dest_tile"));
+				html($acc->getTileEx(STATIC_TILE, $tr["dest_id"], -$tr["charge"], "dest_tile"));
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
