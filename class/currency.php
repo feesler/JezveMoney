@@ -198,6 +198,20 @@ class Currency
 	}
 
 
+	// Return id of account by specified position
+	public static function getIdByPos($position)
+	{
+		if (!self::checkCache())
+			return 0;
+
+		$keys = array_keys(self::$cache);
+		if (isset($keys[$position]))
+			return $keys[$position];
+
+		return 0;
+	}
+
+
 	// Return HTML string of currencies for select control
 	public static function getList($selected_id = 0)
 	{
