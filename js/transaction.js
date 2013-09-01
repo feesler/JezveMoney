@@ -547,7 +547,7 @@ function updControls()
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		if (edit_mode && src_acc == transaction.src_id)
+		if (edit_mode && src_acc == transaction.srcAcc)
 			resbal.value = normalize(getBalanceOfAccount(src_acc) + transaction.charge - normalize(charge.value));
 		else
 			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(charge.value));
