@@ -526,8 +526,8 @@ function updControls()
 	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
 		return;
 
-	src_acc = selectedValue(src);
-	dest_acc = selectedValue(dest);
+	src_acc = parseInt(selectedValue(src));
+	dest_acc = parseInt(selectedValue(dest));
 
 	exchange.value = '';
 	isDiff = isDiffCurr();
@@ -547,7 +547,7 @@ function updControls()
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		if (edit_mode)
+		if (edit_mode && src_acc == transaction.src_id)
 			resbal.value = normalize(getBalanceOfAccount(src_acc) + transaction.charge - normalize(charge.value));
 		else
 			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(charge.value));
