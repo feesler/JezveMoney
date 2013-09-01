@@ -29,42 +29,6 @@
 }
 
 
-/* seems to be the same as .profile_common */
-/*
-.tr_content
-{
-	margin-top: 55px;
-	z-index: 1;
-}
-
-
-.tr_content > div
-{
-	min-width: 100px;
-	max-width: 600px;
-	margin: 30px 5px 5px 25px;
-}
-
-
-.tr_content > div > h2
-{
-	font-size: 20px;
-	font-weight: normal;
-	margin: 2px 5px;
-}
-
-
-.tr_content label
-{
-	width: 150px;
-	height: 20px;
-	line-height: 20px;
-	padding: 0px 5px;
-	font-size: 16px;
-}
-*/
-
-
 .acc_sel
 {
 	position: absolute;
@@ -187,5 +151,3 @@
 {
 	margin: 2px 5px;
 }
-
-

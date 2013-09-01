@@ -41,6 +41,21 @@ a:hover
 }
 
 
+/* single line block */
+.non_float
+{
+	clear: both;
+	max-width: 300px;
+}
+
+
+/* right float block */
+.right_float
+{
+	float: right;
+}
+
+
 /* Input controls */
 input[type="text"], input[type="password"]
 {
@@ -60,14 +75,6 @@ select
 	height: 34px;
 	margin: 0;
 	border: 2px solid;
-}
-
-
-/* single line block */
-.non_float
-{
-	clear: both;
-	max-width: 300px;
 }
 
 
@@ -503,11 +510,4 @@ button::-moz-focus-inner
 .dashed_btn:hover > span
 {
 	border-bottom: 1px solid #0072C6;
-}
-
-
-/* right float block */
-.right_float
-{
-	float: right;
 }

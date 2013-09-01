@@ -107,20 +107,6 @@
 
 
 /* profile */
-/*
-.profile_content
-{
-	margin-top: 55px;
-	z-index: 1;
-}
-
-
-.profile_content > div
-{
-}
-*/
-
-
 .profile_summary
 {
 	margin: 20px 5px 5px 30px;
@@ -152,33 +138,6 @@
 {
 	font-size: 16px;
 }
-
-
-/*
-.profile_common
-{
-	max-width: 300px;
-	margin: 30px 5px 5px 25px;
-}
-
-
-.profile_common > h2
-{
-	font-size: 20px;
-	font-weight: normal;
-	margin: 2px 5px;
-}
-
-
-.profile_common label
-{
-	width: 150px;
-	height: 20px;
-	line-height: 20px;
-	padding: 0px 5px;
-	font-size: 16px;
-}
-*/
 
 
 .profile_controls
