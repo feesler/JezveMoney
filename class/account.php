@@ -497,7 +497,7 @@ class Account
 
 
 	// Return HTML for account tile
-	public function getTile($tile_type, $acc_id, $tile_id = "")
+	public function getTileEx($tile_type, $acc_id, $bal_corr, $tile_id = "")
 	{
 		if (!$this->is_exist($acc_id))
 			return "";
@@ -505,10 +505,12 @@ class Account
 		if ($tile_id == "")
 			$tile_id = "acc_".$acc_id;
 
+		$b_corr = floatVal($bal_corr);
+
 		$acc_name = $this->getName($acc_id);
 		$acc_curr = $this->getCurrency($acc_id);
 		$acc_balance = $this->getBalance($acc_id);
-		$balance_fmt = Currency::format($acc_balance, $acc_curr);
+		$balance_fmt = Currency::format($acc_balance + $b_corr, $acc_curr);
 
 		$tile_act = NULL;
 		if ($tile_type == LINK_TILE)
@@ -517,6 +519,13 @@ class Account
 			$tile_act = "onTileClick(".$acc_id.");";
 
 		return getTile($tile_type, $tile_id, $acc_name, $balance_fmt, $tile_act);
+	}
+
+
+	// Return HTML for account tile
+	public function getTile($tile_type, $acc_id, $tile_id = "")
+	{
+		return $this->getTileEx($tile_type, $acc_id, 0.0, $tile_id);
 	}
 
 
