@@ -395,6 +395,12 @@ button::-moz-focus-inner
 }
 
 
+.acc_content > div > div > div
+{
+	margin: 9px 0px;
+}
+
+
 .acc_controls
 {
 	padding: 5px;
