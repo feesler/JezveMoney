@@ -496,44 +496,8 @@ class Account
 	}
 
 
-	// Return HTML for simple account tile
-	public function getDivTile($acc_id, $tile_id = "")
-	{
-		if (!$this->is_exist($acc_id))
-			return "";
-
-		if ($tile_id == "")
-			$tile_id = "acc_".$acc_id;
-
-		$acc_name = $this->getName($acc_id);
-		$acc_curr = $this->getCurrency($acc_id);
-		$acc_balance = $this->getBalance($acc_id);
-		$balance_fmt = Currency::format($acc_balance, $acc_curr);
-
-		return getTile(STATIC_TILE, $tile_id, $acc_name, $balance_fmt);
-	}
-
-
-	// Return HTML for account tile button
-	public function getButtonTile($acc_id, $tile_id = "")
-	{
-		if (!$this->is_exist($acc_id))
-			return "";
-
-		if ($tile_id == "")
-			$tile_id = "acc_".$acc_id;
-
-		$acc_name = $this->getName($acc_id);
-		$acc_curr = $this->getCurrency($acc_id);
-		$acc_balance = $this->getBalance($acc_id);
-		$balance_fmt = Currency::format($acc_balance, $acc_curr);
-
-		return getTile(BUTTON_TILE, $tile_id, $acc_name, $balance_fmt, "onTileClick(".$acc_id.");");
-	}
-
-
 	// Return HTML for account tile
-	public function getTile($acc_id, $tile_id = "")
+	public function getTile($tile_type, $acc_id, $tile_id = "")
 	{
 		if (!$this->is_exist($acc_id))
 			return "";
@@ -546,7 +510,13 @@ class Account
 		$acc_balance = $this->getBalance($acc_id);
 		$balance_fmt = Currency::format($acc_balance, $acc_curr);
 
-		return getTile(LINK_TILE, $tile_id, $acc_name, $balance_fmt, "./newtransaction.php?acc_id=".$acc_id);
+		$tile_act = NULL;
+		if ($tile_type == LINK_TILE)
+			$tile_act = "./newtransaction.php?acc_id=".$acc_id;
+		else if ($tile_type == BUTTON_TILE)
+			$tile_act = "onTileClick(".$acc_id.");";
+
+		return getTile($tile_type, $tile_id, $acc_name, $balance_fmt, $tile_act);
 	}
 
 
@@ -561,9 +531,9 @@ class Account
 		foreach(self::$cache as $acc_id => $row)
 		{
 			if ($buttons)
-				$resStr .= $this->getButtonTile($acc_id);
+				$resStr .= $this->getTile(BUTTON_TILE, $acc_id);
 			else
-				$resStr .= $this->getTile($acc_id);
+				$resStr .= $this->getTile(LINK_TILE, $acc_id);
 		}
 
 		return $resStr;
