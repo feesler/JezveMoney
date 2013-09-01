@@ -49,7 +49,7 @@
 	}
 
 
-	//
+	// Return markup for transaction type menu
 	function showSubMenu()
 	{
 		global $trans_type;
@@ -101,7 +101,6 @@
 				html("<button".$b_id." class=\"dashed_btn resbal_btn\" type=\"button\"".$b_ev."><span>".$btn_str."</span></button>");
 			html_cl("</div>");
 		html_cl("</div>");
-
 	}
 
 
@@ -211,53 +210,20 @@
 				{
 					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
 											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-/*
-					html_op("<div id=\"amount_left\" style=\"display: none;\">");
-						html("<span>Amount</span>");
-						html_op("<div>");
-							html("<button id=\"amount_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onAmountSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 				}
 
 				if ($trans_type == 1 || $trans_type == 3)
 				{
 					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
 											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-/*
-					html_op("<div id=\"charge_left\" style=\"display: none;\">");
-						html("<span>Charge</span>");
-						html_op("<div>");
-							html("<button id=\"charge_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onChargeSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 				}
 
 				$disp = ($trans_type == 3 && $src["curr"] != $dest["curr"]);
 				getRightTileBlock("exch_left", $disp, "Exchange rate", "exchrate_b", "onExchRateSelect();",
 											"1 ".$src["sign"]."/".$dest["sign"]);
-/*
-				$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
-				html_op("<div id=\"exch_left\"".$disp.">");
-					html("<span>Exchange rate</span>");
-					html_op("<div>");
-						html("<button id=\"exchrate_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onExchRateSelect();\"><span>1 ".$src["sign"]."/".$dest["sign"]."</span></button>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 
 				getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
 											Currency::format($src["balance"], $src["curr"]));
-/*
-				html_op("<div id=\"src_res_balance_left\">");
-					html("<span>Result balance</span>");
-					html_op("<div>");
-						html("<button id=\"resbal_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onResBalanceSelect();\"><span>".Currency::format($src["balance"], $src["curr"])."</span></button>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 		html_cl("</div>");
 	}
@@ -285,70 +251,22 @@
 				{
 					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
 											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-/*
-					html_op("<div id=\"amount_left\" style=\"display: none;\">");
-						html("<span>Amount</span>");
-						html_op("<div>");
-							html("<button id=\"amount_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onAmountSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 
 					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();", "");
-/*
-					html_op("<div id=\"charge_left\" style=\"display: none;\">");
-						html("<span>Charge</span>");
-						html_op("<div>");
-							html("<button id=\"charge_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onChargeSelect();\"><span></span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 
 					getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
 											"1 ".$src["sign"]."/".$dest["sign"]);
-/*
-					html_op("<div id=\"exch_left\" style=\"display: none;\">");
-						html("<span>Exchange rate</span>");
-						html_op("<div>");
-							html("<button id=\"exchrate_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onExchRateSelect();\"><span>1 ".$src["sign"]."/".$dest["sign"]."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 
 					getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
 											Currency::format($dest["balance"], $dest["curr"]));
-/*
-					html_op("<div id=\"src_res_balance_left\">");
-						html("<span>Result balance</span>");
-						html_op("<div>");
-							html("<button id=\"resbal_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onResBalanceSelect();\"><span>".Currency::format($dest["balance"], $dest["curr"])."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 				}
 				else if ($trans_type == 3)
 				{
 					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
 											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-/*
-					html_op("<div id=\"amount_left\" style=\"display: none;\">");
-						html("<span>Amount</span>");
-						html_op("<div>");
-							html("<button id=\"amount_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onAmountSelect();\"><span>".Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"])."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 
 					getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
 											Currency::format($dest["balance"], $dest["curr"]));
-/*
-					html_op("<div id=\"dest_res_balance_left\">");
-						html("<span>Result balance</span>");
-						html_op("<div>");
-							html("<button id=\"resbal_d_b\" class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onResBalanceDestSelect();\"><span>".Currency::format($dest["balance"], $dest["curr"])."</span></button>");
-						html_cl("</div>");
-					html_cl("</div>");
-*/
 				}
 			html_cl("</div>");
 		html_cl("</div>");
