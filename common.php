@@ -164,40 +164,6 @@
 	}
 
 
-	// Return user block string
-	function getUserBlock($id)
-	{
-		$resStr = "\t<tr>\r\n\t<td style=\"margin-top: 15px; margin-right: 30px; width: 100%; height: 30px;\" align=\"right\">";
-		$resStr .= "\t\t<form id=\"logoutfrm\" name=\"logoutfrm\" method=\"post\" action=\"./modules/logout.php\">";
-		$resStr .= "\t\t<span style=\"margin-right: 20px;\">".
-		$resStr .= getUserName($id);
-		$resStr .= " logged in</span><input class=\"btn\" type=\"submit\" value=\"Logout\">";
-		$resStr .= "\t</form>\r\n\t</td>\r\n\t</tr>\r\n";
-
-		return $resStr;
-	}
-	
-
-	// Return charge from transaction array
-	function getCharge($trans_row)
-	{
-		if ($trans_row)
-			return floatval($trans_row["charge"]);
-		else
-			return 0.0;
-	}
-
-
-	// Return amount from transaction array
-	function getAmount($trans_row)
-	{
-		if ($trans_row)
-			return floatval($trans_row["amount"]);
-		else
-			return 0.0;
-	}
-
-
 	// Return javascript array of amounts of specified transactions for statistics use
 	function getStatArray($user_id, $account_id, $trans_type, $group_type = 0)
 	{
