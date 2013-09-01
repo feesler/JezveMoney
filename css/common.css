@@ -102,6 +102,13 @@ select
 }
 
 
+/* standard for text input controls */
+.std_input
+{
+	padding: 8px 5px;
+}
+
+
 /* Input controls color */
 input[type="text"], input[type="password"], select
 {
@@ -355,6 +362,7 @@ button::-moz-focus-inner
 }
 
 
+/* very similar to .tr_content in transaction.css */
 .acc_content
 {
 	margin-top: 55px;
@@ -364,6 +372,26 @@ button::-moz-focus-inner
 
 .acc_content > div
 {
+	max-width: 300px;
+	max-width: 600px;
+	margin: 30px 5px 5px 25px;
+}
+
+
+.acc_content > div > h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	margin: 2px 5px;
+}
+
+.acc_content label
+{
+	width: 150px;
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 5px;
+	font-size: 16px;
 }
 
 

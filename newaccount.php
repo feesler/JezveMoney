@@ -37,28 +37,37 @@
 
 	html("<form method=\"post\" action=\"./modules/createaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
 	html_op("<div class=\"acc_content\">");
-		html_op("<div class=\"profile_common\">");
+		html_op("<div>");
 			html("<h2>Create new account</h2>");
 			html_op("<div>");
-				html("<label for=\"accname\">Account name</label>");
-				html("<div class=\"rdiv\"><div><input id=\"accname\" name=\"accname\" type=\"text\"></div></div>");
-				html("<label for=\"currency\">Currency</label>");
-				html_op("<div class=\"rdiv\">");
-					html_op("<div>");
-						html_op("<select id=\"currency\" name=\"currency\" onchange=\"onChangeAccountCurrency(this);\">");
-							echo(Currency::getList());
-						html_cl("</select>");
-					html_cl("</div>");
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"accname\">Account name</label>");
+					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\"></div></div>");
 				html_cl("</div>");
-				html("<label for=\"balance\">Initial balance</label>");
-				html_op("<div>");
-					html("<div class=\"rtext\"><span id=\"currsign\" class=\"curr_sign\">р.</span></div>");
-					html_op("<div class=\"rdiv\">");
+
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"currency\">Currency</label>");
+					html_op("<div class=\"std_input\">");
 						html_op("<div>");
-							html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"0\">");
+							html_op("<select id=\"currency\" name=\"currency\" onchange=\"onChangeAccountCurrency(this);\">");
+								echo(Currency::getList());
+							html_cl("</select>");
 						html_cl("</div>");
 					html_cl("</div>");
 				html_cl("</div>");
+
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"balance\">Initial balance</label>");
+					html_op("<div>");
+						html("<div class=\"right_float\"><span id=\"currsign\" class=\"curr_sign\">р.</span></div>");
+						html_op("<div class=\"stretch_input std_input\">");
+							html_op("<div>");
+								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"0\">");
+							html_cl("</div>");
+						html_cl("</div>");
+					html_cl("</div>");
+				html_cl("</div>");
+
 				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
 			html_cl("</div>");
 		html_cl("</div>");
