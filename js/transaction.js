@@ -553,8 +553,11 @@ function updControls()
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		if (edit_mode && src_acc == transaction.srcAcc)
-			resbal.value = normalize(getBalanceOfAccount(src_acc) + transaction.charge - normalize(charge.value));
+		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
+		{
+			var fixedBalance = getBalanceOfAccount(src_acc) + ((src_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
+			resbal.value = normalize(fixedBalance - normalize(charge.value));
+		}
 		else
 			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(charge.value));
 
@@ -568,8 +571,11 @@ function updControls()
 			if (!resbal_d || !resbal_d_b)
 				return;
 
-			if (edit_mode && dest_acc == transaction.destAcc)
-				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) - transaction.amount + normalize(amount.value));
+			if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
+			{
+				var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
+				resbal_d.value = normalize(fixedBalance + normalize(amount.value));
+			}
 			else
 				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(amount.value));
 
