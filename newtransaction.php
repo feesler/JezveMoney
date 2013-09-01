@@ -232,39 +232,33 @@
 	{
 		html();
 		html_op("<div id=\"destination\" class=\"acc_float\">");
-				html("<div><label for=\"dest_id\">Destination account</label></div>");
-				html_op("<div class=\"tile_container\">");
-					html($acc->getDivTile($dest_id, "dest_tile"));
-					html_op("<div class=\"acc_sel\">");
-						html_op("<div>");
-							html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
-								echo($acc->getList($dest_id));
-							html_cl("</select>");
-						html_cl("</div>");
+			html("<div><label for=\"dest_id\">Destination account</label></div>");
+			html_op("<div class=\"tile_container\">");
+				html($acc->getDivTile($dest_id, "dest_tile"));
+				html_op("<div class=\"acc_sel\">");
+					html_op("<div>");
+						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
+							echo($acc->getList($dest_id));
+						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+			html_cl("</div>");
 
-				html();
-				html_op("<div class=\"tile_right_block\">");
+			html();
+			html_op("<div class=\"tile_right_block\">");
 
+				getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
+										Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
 				if ($trans_type == 2)
 				{
-					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
-											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-
 					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();", "");
-
 					getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
 											"1 ".$src["sign"]."/".$dest["sign"]);
-
 					getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
 											Currency::format($dest["balance"], $dest["curr"]));
 				}
 				else if ($trans_type == 3)
 				{
-					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
-											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-
 					getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
 											Currency::format($dest["balance"], $dest["curr"]));
 				}
