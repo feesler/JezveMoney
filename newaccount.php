@@ -13,6 +13,9 @@
 	$acc = new Account($user_id);
 	$trans = new Transaction($user_id);
 
+	$curr_id = Currency::getIdByPos(0);
+	$curr_sign = Currency::getSign($curr_id);
+
 	$titleString = "Jezve Money | New account";
 
 	html("<!DOCTYPE html>");
@@ -59,7 +62,7 @@
 				html_op("<div class=\"non_float\">");
 					html("<label for=\"balance\">Initial balance</label>");
 					html_op("<div>");
-						html("<div class=\"right_float\"><span id=\"currsign\" class=\"curr_sign\">р.</span></div>");
+						html("<div class=\"right_float\"><span id=\"currsign\" class=\"curr_sign\">".$curr_sign."</span></div>");
 						html_op("<div class=\"stretch_input std_input\">");
 							html_op("<div>");
 								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"0\">");
