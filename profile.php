@@ -52,16 +52,16 @@
 
 	require_once("./templates/header.php");
 
-	html("<div class=\"profile_content\">", PUSH_AFTER);
-		html("<div class=\"profile_summary\">", PUSH_AFTER);
+	html_op("<div class=\"profile_content\">");
+		html_op("<div class=\"profile_summary\">");
 			html("<h1>User profile</h1>");
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				html("<h2>Account name</h2>");
 				html("<span>".$user_name."</span>");
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 
 			html();
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				html("<h2>User name</h2>");
 				html("<span>".$person_name."</span>");
 
@@ -70,49 +70,49 @@
 				html("<div><a href=\"./profile.php?act=changename\">Change</a></div>");
 			}
 
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 
 			if ($action != "changepassword")
 			{
 				html();
-				html("<div>", PUSH_AFTER);
+				html_op("<div>");
 					html("<h2>Security</h2>");
 					html("<div><a href=\"./profile.php?act=changepassword\">Change password</a></div>");
-				html("</div>", POP_BEFORE);
+				html_cl("</div>");
 			}
 
-		html("</div>", POP_BEFORE);
+		html_cl("</div>");
 
 	if ($action == "changepassword")
 	{
 		html("<form method=\"post\" action=\"./modules/changepassword.php\" onsubmit=\"return onChangePassSubmit(this);\">");
-		html("<div class=\"profile_common\">", PUSH_AFTER);
+		html_op("<div class=\"profile_common\">");
 			html("<h2>Change password</h2>");
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				html("<label for=\"oldpwd\">Current password</label>");
 				html("<div class=\"stretch_input profile_input\"><div><input id=\"oldpwd\" name=\"oldpwd\" type=\"password\"></div></div>");
 				html("<label for=\"newpwd\">New password</label>");
 				html("<div class=\"stretch_input profile_input\"><div><input id=\"newpwd\" name=\"newpwd\" type=\"password\"></div></div>");
 				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
-			html("</div>", POP_BEFORE);
-		html("</div>", POP_BEFORE);
+			html_cl("</div>");
+		html_cl("</div>");
 		html("</form>");
 	}
 	else if ($action == "changename")
 	{
 		html("<form method=\"post\" action=\"./modules/changename.php\" onsubmit=\"return onChangeNameSubmit(this);\">");
-		html("<div class=\"profile_common\">", PUSH_AFTER);
+		html_op("<div class=\"profile_common\">");
 			html("<h2>Change name</h2>");
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				html("<label for=\"newpwd\">New name</label>");
 				html("<div class=\"stretch_input profile_input\"><div><input id=\"newname\" name=\"newname\" type=\"text\"></div></div>");
 				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
-			html("</div>", POP_BEFORE);
-		html("</div>", POP_BEFORE);
+			html_cl("</div>");
+		html_cl("</div>");
 		html("</form>");
 	}
 
-	html("</div>", POP_BEFORE);
+	html_cl("</div>");
 	html("</body>");
 	html("</html>");
 ?>

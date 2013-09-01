@@ -18,7 +18,7 @@
 
 		$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
 
-		html("<div class=\"subHeader\">", PUSH_AFTER);
+		html_op("<div class=\"subHeader\">");
 
 			$resStr = "<span>";
 			$resStr .= (($trans_type == 0) ? "<b>" : "<a href=\"./transactions.php?type=all".$acc_par."\">");
@@ -55,7 +55,7 @@
 			$resStr .= "</span>";
 			html($resStr);
 
-		html("</div>", POP_BEFORE);
+		html_cl("</div>");
 	}
 
 
@@ -129,25 +129,25 @@
 
 	require_once("./templates/header.php");
 
-	html("<div class=\"trans_cont\">", PUSH_AFTER);
-		html("<div>", PUSH_AFTER);
-			html("<div class=\"heading\">", PUSH_AFTER);
+	html_op("<div class=\"trans_cont\">");
+		html_op("<div>");
+			html_op("<div class=\"heading\">");
 				html("<h1>Transactions</h1>");
 				html("<div id=\"add_btn\" class=\"iconlink\"><a href=\"./newtransaction.php\"><div class=\"add\"></div><span>New</span></a></div>");
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				showSubMenu();
 				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num);
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 
-			html("<div class=\"control_icons\">", PUSH_AFTER);
+			html_op("<div class=\"control_icons\">");
 				html("<div id=\"edit_btn\" class=\"iconlink\" style=\"display: none;\"><a href=\"#\"><div class=\"edit\"></div><span>Edit</span></a></div>");
 				html("<div id=\"del_btn\" class=\"iconlink\" style=\"display: none;\"><button onclick=\"showDeletePopup();\"><div class=\"del\"></div><span>Delete</span></button></div>");
-			html("</div>", POP_BEFORE);
-		html("</div>", POP_BEFORE);
-	html("</div>", POP_BEFORE);
-	html("</div>", POP_BEFORE);
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+	html_cl("</div>");
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");
 	html("<input id=\"deltrans\" name=\"transactions\" type=\"hidden\" value=\"\">");
 	html("</form>");

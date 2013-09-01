@@ -622,7 +622,7 @@ class Account
 		if (!$this->checkCache())
 			return $resStr;
 
-		html("<div class=\"trans_list\">", PUSH_AFTER);
+		html_op("<div class=\"trans_list\">");
 
 		$accounts = count(self::$cache);
 		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
@@ -651,7 +651,7 @@ class Account
 				if ($i % 2 == 0)
 					$resStr .= " even_row";
 				$resStr .= "\">";
-				html($resStr, PUSH_AFTER);
+				html_op($resStr);
 
 				$valfmt = Currency::format($value, $key);
 				$currName = Currency::getName($key);
@@ -659,11 +659,11 @@ class Account
 				html("<div><span class=\"latest_acc_name\">".$currName."</span></div>");
 				html("<div><span class=\"latest_sum\">".$valfmt."</span></div>");
 
-				html("</div>", POP_BEFORE);
+				html_cl("</div>");
 			}
 		}
 
-		html("</div>", POP_BEFORE);
+		html_cl("</div>");
 	}
 }
 

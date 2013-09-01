@@ -561,14 +561,14 @@ class Transaction
 
 		$pers = new Person(self::$user_id);
 
-		html("<div class=\"trans_list\">", PUSH_AFTER);
+		html_op("<div class=\"trans_list\">");
 
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
 		{
 			html("<span>You have no one account. Please create one.</span>");
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 			return;
 		}
 
@@ -594,7 +594,7 @@ class Transaction
 		if (!$rowCount)
 		{
 			html("<span>You have no one transaction yet.</span>");
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 
 			return;
 		}
@@ -603,12 +603,12 @@ class Transaction
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
 
-			html("<div class=\"paginator\">", PUSH_AFTER);
+			html_op("<div class=\"paginator\">");
 
 			if ($transCount > $tr_on_page)
 				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
 
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 		}
 
 		$row_num = 1;
@@ -634,9 +634,9 @@ class Transaction
 			if ($active == TRUE)
 				$resStr .= " onclick=\"onTransClick(".$trans_id.");\"";
 			$resStr .= ">";
-			html($resStr, PUSH_AFTER);
+			html_op($resStr);
 
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 
 			$resStr = "<div><span class=\"latest_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
@@ -663,27 +663,27 @@ class Transaction
 			$resStr .= "</span></div>";
 			html($resStr);
 
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 			html("<span class=\"latest_date\">".$fdate."</span>");
 			if ($comment != "")
 				html("<span class=\"latest_comm\"> | ".$comment."</span>");
 
-			html("</div>", POP_BEFORE);
-			html("</div>", POP_BEFORE);
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
+			html_cl("</div>");
+			html_cl("</div>");
 
 			$row_num++;
 		}
 
 		if ($tr_on_page > 0 && $showPaginator == TRUE)
 		{
-			html("<div class=\"paginator\">", PUSH_AFTER);
+			html_op("<div class=\"paginator\">");
 			if ($transCount > $tr_on_page)
 				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
-			html("</div>", POP_BEFORE);
+			html_cl("</div>");
 		}
 
-		html("</div>", POP_BEFORE);
+		html_cl("</div>");
 		html();
 	}
 

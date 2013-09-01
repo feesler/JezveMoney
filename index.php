@@ -33,28 +33,28 @@
 
 	require_once("./templates/header.php");
 
-	html("<div class=\"content\">", PUSH_AFTER);
-		html("<div>", PUSH_AFTER);
+	html_op("<div class=\"content\">");
+		html_op("<div>");
 			html("<div class=\"widget_title\"><a href=\"./accounts.php\">Accounts &gt;</a></div>");
 			html("<div class=\"tiles\">".$acc->getTiles()."</div>");
-		html("</div>", POP_BEFORE);
+		html_cl("</div>");
 
 		html();
-		html("<div>", PUSH_AFTER);
+		html_op("<div>");
 			html("<div class=\"widget_title\">Total &gt;</div>");
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				echo($acc->getTotals());
-			html("</div>", POP_BEFORE);
-		html("</div>", POP_BEFORE);
+			html_cl("</div>");
+		html_cl("</div>");
 
 		html();
-		html("<div>", PUSH_AFTER);
+		html_op("<div>");
 			html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
-			html("<div>", PUSH_AFTER);
+			html_op("<div>");
 				$trans->getLatest(5);
-			html("</div>", POP_BEFORE);
-		html("</div>", POP_BEFORE);
-	html("</div>", POP_BEFORE);
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
 	html("</body>");
 	html("</html>");
 ?>
