@@ -363,29 +363,30 @@ button::-moz-focus-inner
 
 
 /* very similar to .tr_content in transaction.css */
-.acc_content
+.form_content
 {
 	margin-top: 55px;
 	z-index: 1;
 }
 
 
-.acc_content > div
+.content_wrap
 {
-	max-width: 300px;
+	min-width: 150px;
 	max-width: 600px;
 	margin: 30px 5px 5px 25px;
 }
 
 
-.acc_content > div > h2
+.form_content h2
 {
 	font-size: 20px;
 	font-weight: normal;
 	margin: 2px 5px;
 }
 
-.acc_content label
+
+.form_content label
 {
 	width: 150px;
 	height: 20px;

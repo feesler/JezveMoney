@@ -164,8 +164,8 @@
 
 	html("<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">");
 
-	html_op("<div class=\"tr_content\">");
-		html_op("<div>");
+	html_op("<div class=\"form_content\">");
+		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new transaction</h2>");
 			html_op("<div>");
 				showSubMenu();

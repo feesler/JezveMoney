@@ -52,7 +52,7 @@
 
 	require_once("./templates/header.php");
 
-	html_op("<div class=\"profile_content\">");
+	html_op("<div class=\"form_content\">");
 		html_op("<div class=\"profile_summary\">");
 			html("<h1>User profile</h1>");
 			html_op("<div>");
@@ -86,13 +86,19 @@
 	if ($action == "changepassword")
 	{
 		html("<form method=\"post\" action=\"./modules/changepassword.php\" onsubmit=\"return onChangePassSubmit(this);\">");
-		html_op("<div class=\"profile_common\">");
+		html_op("<div class=\"content_wrap\">");
 			html("<h2>Change password</h2>");
 			html_op("<div>");
-				html("<label for=\"oldpwd\">Current password</label>");
-				html("<div class=\"stretch_input profile_input\"><div><input id=\"oldpwd\" name=\"oldpwd\" type=\"password\"></div></div>");
-				html("<label for=\"newpwd\">New password</label>");
-				html("<div class=\"stretch_input profile_input\"><div><input id=\"newpwd\" name=\"newpwd\" type=\"password\"></div></div>");
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"oldpwd\">Current password</label>");
+					html("<div class=\"stretch_input profile_input\"><div><input id=\"oldpwd\" name=\"oldpwd\" type=\"password\"></div></div>");
+				html_cl("</div>");
+
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"newpwd\">New password</label>");
+					html("<div class=\"stretch_input profile_input\"><div><input id=\"newpwd\" name=\"newpwd\" type=\"password\"></div></div>");
+				html_cl("</div>");
+
 				html("<div class=\"profile_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
 			html_cl("</div>");
 		html_cl("</div>");
@@ -101,7 +107,7 @@
 	else if ($action == "changename")
 	{
 		html("<form method=\"post\" action=\"./modules/changename.php\" onsubmit=\"return onChangeNameSubmit(this);\">");
-		html_op("<div class=\"profile_common\">");
+		html_op("<div class=\"content_wrap\">");
 			html("<h2>Change name</h2>");
 			html_op("<div>");
 				html("<label for=\"newpwd\">New name</label>");
