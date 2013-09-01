@@ -63,6 +63,14 @@ select
 }
 
 
+/* single line block */
+.non_float
+{
+	clear: both;
+	max-width: 300px;
+}
+
+
 /* wrap for input with 100% width of parent */
 .stretch_input
 {
