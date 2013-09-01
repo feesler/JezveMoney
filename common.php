@@ -109,6 +109,20 @@
 	}
 
 
+	// Alias for html(str, PUSH_AFTER)
+	html_op($str)
+	{
+		html($str, PUSH_AFTER);
+	}
+
+
+	// Alias for html(str, POP_BEFORE)
+	html_cl($str)
+	{
+		html($str, POP_BEFORE);
+	}
+
+
 	// Print string with carriage return
 	function ebr($str = "")
 	{
