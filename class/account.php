@@ -499,10 +499,6 @@ class Account
 	// Return HTML for simple account tile
 	public function getDivTile($acc_id, $tile_id = "")
 	{
-/*
-		$resStr = "";
-*/
-
 		if (!$this->is_exist($acc_id))
 			return "";
 
@@ -515,34 +511,12 @@ class Account
 		$balance_fmt = Currency::format($acc_balance, $acc_curr);
 
 		return getTile(STATIC_TILE, $tile_id, $acc_name, $balance_fmt, "onTileClick(".$acc_id.");");
-/*
-		$resStr .= "<div id=\"".$tile_id."\" class=\"tile\">";
-		$resStr .= "<div class=\"tilelink\"><div>";
-
-		$acc_curr = $this->getCurrency($acc_id);
-		$acc_balance = $this->getBalance($acc_id);
-		$balance_fmt = Currency::format($acc_balance, $acc_curr);
-
-		$resStr .= "<span class=\"acc_bal\">".$balance_fmt."</span>";
-
-		$acc_name = $this->getName($acc_id);
-
-		$resStr .= "<span class=\"acc_name\">".$acc_name."</span>";
-
-		$resStr .= "</div></div></div>";
-
-		return $resStr;
-*/
 	}
 
 
 	// Return HTML for account tile button
 	public function getButtonTile($acc_id, $tile_id = "")
 	{
-/*
-		$resStr = "";
-*/
-
 		if (!$this->is_exist($acc_id))
 			return "";
 
@@ -555,37 +529,12 @@ class Account
 		$balance_fmt = Currency::format($acc_balance, $acc_curr);
 
 		return getTile(BUTTON_TILE, $tile_id, $acc_name, $balance_fmt, "onTileClick(".$acc_id.");");
-/*
-		$resStr .= "<div id=\"".$tile_id."\" class=\"tile\">";
-		$resStr .= "<button class=\"tilelink\" onclick=\"onTileClick(".$acc_id.")\">";
-		$resStr .= "<div>";
-
-		$acc_curr = $this->getCurrency($acc_id);
-		$acc_balance = $this->getBalance($acc_id);
-		$balance_fmt = Currency::format($acc_balance, $acc_curr);
-
-		$resStr .= "<span class=\"acc_bal\">".$balance_fmt."</span>";
-
-		$acc_name = $this->getName($acc_id);
-
-		$resStr .= "<span class=\"acc_name\">".$acc_name."</span>";
-
-		$resStr .= "</div>";
-		$resStr .= "</button>";
-		$resStr .= "</div>";
-
-		return $resStr;
-*/
 	}
 
 
 	// Return HTML for account tile
 	public function getTile($acc_id, $tile_id = "")
 	{
-/*
-		$resStr = "";
-*/
-
 		if (!$this->is_exist($acc_id))
 			return "";
 
@@ -598,27 +547,6 @@ class Account
 		$balance_fmt = Currency::format($acc_balance, $acc_curr);
 
 		return getTile(LINK_TILE, $tile_id, $acc_name, $balance_fmt, "./newtransaction.php?acc_id=".$acc_id);
-/*
-		$resStr .= "<div id=\"".$tile_id."\" class=\"tile\">";
-		$resStr .= "<a href=\"./newtransaction.php?acc_id=".$acc_id."\" class=\"tilelink\">";
-		$resStr .= "<div>";
-
-		$acc_curr = $this->getCurrency($acc_id);
-		$acc_balance = $this->getBalance($acc_id);
-		$balance_fmt = Currency::format($acc_balance, $acc_curr);
-
-		$resStr .= "<span class=\"acc_bal\">".$balance_fmt."</span>";
-
-		$acc_name = $this->getName($acc_id);
-
-		$resStr .= "<span class=\"acc_name\">".$acc_name."</span>";
-
-		$resStr .= "</div>";
-		$resStr .= "</a>";
-		$resStr .= "</div>";
-
-		return $resStr;
-*/
 	}
 
 
