@@ -235,7 +235,7 @@
 	define("ICON_BUTTON", 2, TRUE);
 
 	// Return amrkup for icon link element
-	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action)
+	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "")
 	{
 		$resStr = "";
 
@@ -249,7 +249,7 @@
 
 		if ($il_type == ICON_LINK)
 		{
-			$il_href = ($action && $tile_action != "") ? " href=\"".$action."\"" : "";
+			$il_href = ($action && $action != "") ? " href=\"".$action."\"" : "";
 
 			$resStr .= "<a".$il_href.">";
 		}
