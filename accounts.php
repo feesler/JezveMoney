@@ -40,18 +40,11 @@
 			html_op("<div class=\"heading\">");
 				html("<h1>Accounts</h1>");
 				html(getIconLink(ICON_LINK, "add_btn", "add", "New", TRUE, "./newaccount.php"));
-/*
-				html("<div id=\"add_btn\" class=\"iconlink\"><a href=\"./newaccount.php\"><div class=\"add\"></div><span>New</span></a></div>");
-*/
 			html_cl("</div>");
 			html("<div class=\"tiles\">".$acc->getTiles(TRUE)."</div>");
 			html_op("<div class=\"control_icons\">");
 				html(getIconLink(ICON_LINK, "edit_btn", "edit", "Edit", FALSE, "#"));
 				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", FALSE, "showDeletePopup();"));
-/*
-				html("<div id=\"edit_btn\" class=\"iconlink\" style=\"display: none;\"><a href=\"#\"><div class=\"edit\"></div><span>Edit</span></a></div>");
-				html("<div id=\"del_btn\" class=\"iconlink\" style=\"display: none;\"><button onclick=\"showDeletePopup();\"><div class=\"del\"></div><span>Delete</span></button></div>");
-*/
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
