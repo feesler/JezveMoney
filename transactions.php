@@ -59,30 +59,6 @@
 	}
 
 
-	// Return amrkup for icon link element
-	function getIconLink($text, $iconClass, $visible, $isButton, $action, $div_id)
-	{
-		$resStr = "";
-
-		$resStr .= "<div ";
-		if ($div_id && $div_id != "")
-			$resStr .= " id=\"".$div_id."\"";
-		$resStr .= " class=\"iconlink\"";
-		$resStr .= ">";
-
-		$resStr .= ($isButton) ? "<button" : "<a";
-		if ($action && $action != "")
-			$resStr .= " ".(($isButton) ? "onclick" : "href")."=\"".$action."\"";
-		$resStr .= ">";
-
-		$resStr .= "<div class=\"".$iconClass."\"></div>";
-		$resStr .= "<span>".$text."</span>";
-
-		$resStr .= ($isButton) ? "</button>" : "</a>";
-		$resStr .= "</div>";
-	}
-
-
 	$user_id = User::check();
 	if (!$user_id)
 		setLocation("./login.php");
