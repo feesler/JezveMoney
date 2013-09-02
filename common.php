@@ -231,27 +231,42 @@
 	}
 
 
+	define("ICON_LINK", 1, TRUE);
+	define("ICON_BUTTON", 2, TRUE);
+
 	// Return amrkup for icon link element
-	function getIconLink($text, $iconClass, $visible, $isButton, $action, $div_id)
+	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action)
 	{
 		$resStr = "";
 
-		$resStr .= "<div ";
-		if ($div_id && $div_id != "")
-			$resStr .= " id=\"".$div_id."\"";
-		$resStr .= " class=\"iconlink\"";
-		$resStr .= ">";
+		if ($il_type != ICON_LINK && $il_type != ICON_BUTTON)
+			return $resStr;
 
-		$resStr .= ($isButton) ? "<button" : "<a";
-		if ($action && $action != "")
-			$resStr .= " ".(($isButton) ? "onclick" : "href")."=\"".$action."\"";
-		$resStr .= ">";
+		$d_id = (($div_id && $div_id != "") ? " id=\"".$div_id."\"" : "");
+		$disp = ($isVisible ? "" : " style=\"display: none;\"");
 
-		$resStr .= "<div class=\"".$iconClass."\"></div>";
+		$resStr .= "<div".$d_id." class=\"iconlink\"".$disp.">";
+
+		if ($il_type == ICON_LINK)
+		{
+			$il_href = ($action && $tile_action != "") ? " href=\"".$action."\"" : "";
+
+			$resStr .= "<a".$il_href.">";
+		}
+		else if ($il_type == ICON_BUTTON)
+		{
+			$il_click = ($action && $action != "") ? " onclick=\"".$action."\"" : "";
+			$resStr .= "<button".$il_click.">";
+		}
+
+		$il_icon = ($iconClass && $iconClass != "") ? " class=\"".$iconClass."\"" : "";
+		$resStr .= "<div".$il_icon."></div>";
 		$resStr .= "<span>".$text."</span>";
 
-		$resStr .= ($isButton) ? "</button>" : "</a>";
+		$resStr .= ($il_type == ICON_BUTTON) ? "</button>" : "</a>";
 		$resStr .= "</div>";
+
+		return $resStr;
 	}
 
 
