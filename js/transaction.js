@@ -509,26 +509,22 @@ function setTileInfo(tile_id, title, subTitle)
 // Set source tile to the specified account
 function setTileAccount(tile_id, acc_id)
 {
-	var tileObj, src, balanceEl, nameEl;
+	var name, balance;
 
 	if (!tile_id || !acc_id)
 		return;
 
-	tileObj = ge(tile_id);
-	if (!tileObj)
-		return;
+	name = getNameOfAccount(acc_id);
 
-	balanceEl = tileObj.firstElementChild.firstElementChild.firstElementChild;
 	if (edit_mode && (acc_id == transaction.srcAcc || acc_id == transaction.destAcc))
 	{
 		var fixedBalance = getBalanceOfAccount(acc_id) + ((acc_id == transaction.srcAcc) ? transaction.charge : -transaction.amount);
-		balanceEl.innerHTML = formatCurrency(fixedBalance, getCurrencyOfAccount(acc_id));
+		balance = formatCurrency(fixedBalance, getCurrencyOfAccount(acc_id));
 	}
 	else
-		balanceEl.innerHTML = formatAccoutBalance(acc_id);
+		balance = formatAccoutBalance(acc_id);
 
-	nameEl = balanceEl.nextElementSibling;
-	nameEl.innerHTML = getNameOfAccount(acc_id);
+	setTileInfo(tile_id, name, balance);
 }
 
 
