@@ -552,10 +552,6 @@ class Account
 	// Return HTMl for total sums per each currency
 	public function getTotals()
 	{
-		global $tabStr;
-
-		$resStr = "";
-
 		if (!$this->checkCache())
 			return $resStr;
 
