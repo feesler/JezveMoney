@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class Person
 {
@@ -199,6 +199,74 @@ class Person
 			return FALSE;
 
 		return TRUE;
+	}
+
+
+	// Return HTML for table of persons
+	public function getTable()
+	{
+		global $db;
+
+		html_op("<div class=\"trans_list\">");
+
+		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
+		$persons = count($resArr);
+		if (!$persons)
+		{
+			html("<span>No persons here.</span>");
+		}
+		else
+		{
+			$acc = new Account($this->user_id, TRUE);
+
+			$i = 0;
+			foreach($resArr as $row)
+			{
+				$i++;
+
+				wlog("person: ".$row["name"]);
+
+
+				$pName = $row["name"];
+				$p_id = intval($row["id"]);
+
+				$accArr = $db->selectQ("*", "accounts", "user_id=".$this->user_id." AND owner_id=".$p_id." AND owner_id<>".$this->owner_id);
+				$totalArr = array();
+				foreach($accArr as $accRow)
+				{
+					$curr_id = intval($accRow["curr_id"]);
+
+					wlog("account: ".$accRow["name"].", ".$accRow["balance"]." curr: ".$curr_id);
+
+					if (!isset($totalArr[$curr_id]))
+						$totalArr[$curr_id] = 0.0;
+
+					$totalArr[$curr_id] += floatval($accRow["balance"]);
+				}
+
+				$pBalance = "";
+				foreach($totalArr as $curr_id => $bal)
+				{
+					if ($pBalance != "")
+						$pBalance .= "<br>";
+					$pBalance .= Currency::format($bal, $curr_id);
+				}
+
+
+				$resStr = "<div class=\"latest";
+				if ($i % 2 == 0)
+					$resStr .= " even_row";
+				$resStr .= "\">";
+				html_op($resStr);
+
+				html("<div><span class=\"latest_acc_name\">".$pName."</span></div>");
+				html("<div><span class=\"latest_sum\">".$pBalance."</span></div>");
+
+				html_cl("</div>");
+			}
+		}
+
+		html_cl("</div>");
 	}
 }
 
