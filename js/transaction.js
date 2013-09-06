@@ -532,7 +532,7 @@ function setTileAccount(tile_id, acc_id)
 function updControls()
 {
 	var src, dest, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
-	var src_acc, dest_acc;
+	var src_acc, dest_acc, tramount, trcharge;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -565,16 +565,19 @@ function updControls()
 	}
 	else
 	{
+		tramount = (amount.value != '') ? amount.value : 0;
+		trcharge = tramount;
+
 		charge.value = amount.value;
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
 		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
 		{
 			var fixedBalance = getBalanceOfAccount(src_acc) + ((src_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
-			resbal.value = normalize(fixedBalance - normalize(charge.value));
+			resbal.value = normalize(fixedBalance - normalize(trcharge));
 		}
 		else
-			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(charge.value));
+			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trcharge));
 
 		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
 
@@ -589,10 +592,10 @@ function updControls()
 			if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
 			{
 				var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
-				resbal_d.value = normalize(fixedBalance + normalize(amount.value));
+				resbal_d.value = normalize(fixedBalance + normalize(tramount));
 			}
 			else
-				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(amount.value));
+				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(tramount));
 
 			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
 		}
