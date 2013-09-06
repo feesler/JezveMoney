@@ -93,20 +93,18 @@ class Person
 	{
 		global $db;
 
-		$resStr = "";
-
 		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
 		foreach($resArr as $row)
 		{
 			$person_id = $row["id"];
 
-			$resStr .= $tabStr."<option value=\"".$person_id."\"";
+			$resStr = "<option value=\"".$person_id."\"";
 			if ($person_id == $selected_id)
 				$resStr .= " selected";
-			$resStr .= ">".$row["name"]."</option>\r\n";
-		}
+			$resStr .= ">".$row["name"]."</option>";
 
-		return $resStr;
+			html($resStr);
+		}
 	}
 
 
