@@ -12,6 +12,7 @@
 
 	$acc = new Account($user_id);
 	$trans = new Transaction($user_id);
+	$pers = new Person($user_id);
 
 	$titleString = "Jezve Money";
 
@@ -52,6 +53,14 @@
 			html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
 			html_op("<div>");
 				$trans->getLatest(5);
+			html_cl("</div>");
+		html_cl("</div>");
+
+		html();
+		html_op("<div>");
+			html("<div class=\"widget_title\"><a href=\"./persons.php\">Persons &gt;</a></div>");
+			html_op("<div>");
+				$pers->getTable();
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
