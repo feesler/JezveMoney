@@ -487,6 +487,25 @@ function formatAccoutBalance(acc_id)
 }
 
 
+// Update tile information
+function setTileInfo(tile_id, title, subTitle)
+{
+	var tileObj, titleObj, subTitleObj;
+
+	tileObj = ge(tile_id);
+	if (!tileObj)
+		return;
+
+	subTitleObj = tileObj.firstElementChild.firstElementChild.firstElementChild;
+	if (subTitleObj)
+		subTitleObj.innerHTML = subTitle;
+
+	titleObj = subTitleObj.nextElementSibling;
+	if (titleObj)
+		titleObj.innerHTML = title;
+}
+
+
 // Set source tile to the specified account
 function setTileAccount(tile_id, acc_id)
 {
