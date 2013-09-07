@@ -537,12 +537,20 @@ class Account
 		if (!$this->checkCache())
 			return $resStr;
 
-		foreach(self::$cache as $acc_id => $row)
+		$accounts = count(self::$cache);
+		if (!$accounts)
 		{
-			if ($buttons)
-				$resStr .= $this->getTile(BUTTON_TILE, $acc_id);
-			else
-				$resStr .= $this->getTile(LINK_TILE, $acc_id);
+			html("<span>You have no one account. Please create one.</span>");
+		}
+		else
+		{
+			foreach(self::$cache as $acc_id => $row)
+			{
+				if ($buttons)
+					$resStr .= $this->getTile(BUTTON_TILE, $acc_id);
+				else
+					$resStr .= $this->getTile(LINK_TILE, $acc_id);
+			}
 		}
 
 		return $resStr;
