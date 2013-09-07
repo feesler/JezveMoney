@@ -202,6 +202,51 @@ class Person
 	}
 
 
+	// Return javascript array of persons
+	public function getArray()
+	{
+		global $db;
+
+		$resArr = $db->selectQ("p.name AS name, p.id AS pid, a.id AS aid, a.curr_id AS curr_id, a.balance AS balance",
+							"persons AS p, accounts AS a",
+							"p.user_id=".$this->user_id." AND p.id<>".$this->owner_id." AND a.owner_id=p.id");
+		$pArr = array();
+		foreach($resArr as $row)
+		{
+			$p_id = intval($row["pid"]);
+			$p_name = $row["name"];
+			$acc_id = intval($row["aid"]);
+			$curr_id = intval($row["curr_id"]);
+			$balance = floatval($row["balance"]);
+
+			$ind = 0;
+			foreach($pArr as $pInd => $pVal)
+			{
+				if ($pVal[0] == $p_id)
+				{
+					$ind = $pInd;
+					break;
+				}
+			}
+
+			if (!$ind)
+			{
+				$pArr[] = array();
+				$ind = count($pArr) - 1;
+			}
+
+			$pArr[$ind][0] = $p_id;
+			$pArr[$ind][1] = $p_name;
+			if (!isset($pArr[$ind][2]))
+				$pArr[$ind][2] = array();
+			$pArr[$ind][2][] = array($acc_id, $curr_id, $balance);
+
+		}
+
+		html("var persons = ".json_encode($pArr).";");
+	}
+
+
 	// Return HTML for table of persons
 	public function getTable()
 	{
