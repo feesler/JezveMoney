@@ -540,7 +540,7 @@ class Account
 		$accounts = count(self::$cache);
 		if (!$accounts)
 		{
-			html("<span>You have no one account. Please create one.</span>");
+			$resStr .= "<span>You have no one account. Please create one.</span>";
 		}
 		else
 		{
