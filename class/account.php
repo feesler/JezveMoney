@@ -557,7 +557,7 @@ class Account
 	}
 
 
-	// Return HTMl for total sums per each currency
+	// Return HTML for total sums per each currency
 	public function getTotals()
 	{
 		if (!$this->checkCache())
@@ -566,7 +566,7 @@ class Account
 		html_op("<div class=\"trans_list\">");
 
 		$accounts = count(self::$cache);
-		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
+		if (!$accounts)
 		{
 			html("<span>You have no one account. Please create one.</span>");
 		}

@@ -21,7 +21,7 @@ class Person
 	}
 
 
-	// Check is specified account is exist
+	// Check is specified person is exist
 	public function is_exist($p_id)
 	{
 		global $db;
