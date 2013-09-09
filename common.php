@@ -356,19 +356,27 @@
 
 
 	// Return markup for transaction type menu
-	function showSubMenu()
+	function showSubMenu($cmp_val, $menuArr)
 	{
-		global $trans_type;
-
-		$acc_id = 0;
-		if (isset($_GET["acc_id"]))
-			$acc_id = intval($_GET["acc_id"]);
-
-		$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
-		$d_acc_par = (($acc_id != 0) ? "?acc_id=".$acc_id : "");
+		if (!is_array($menuArr))
+			return;
 
 		html_op("<div id=\"trtype_menu\" class=\"subHeader\">");
 
+			forEach($menuArr as $menuItem)
+			{
+				if (!is_array($menuItem))
+					break;
+
+				$resStr = "<span>";
+				if ($menuItem[0] == $cmp_val)
+					$resStr .= "<b>".$menuItem[1]."</b>";
+				else
+					$resStr .= "<a href=\"".$menuItem[2]."\">".$menuItem[1]."</a>";
+				$resStr .= "</span>";
+				html($resStr);
+			}
+/*
 			$resStr = "<span>";
 			$resStr .= (($trans_type == 1) ? "<b>" : "<a href=\"./newtransaction.php?type=expense".$acc_par."\">");
 			$resStr .= "Expense";
@@ -394,6 +402,7 @@
 			$resStr .= "</span>";
 
 			html($resStr);
+*/
 
 		html_cl("</div>");
 	}
