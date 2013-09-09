@@ -186,13 +186,16 @@
 
 					html();
 					html_op("<div class=\"tile_right_block\">");		// tile_right_block person_trb
-						getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
+						getRightTileBlock("amount_left", FALSE, "Amount", "amount_b",
+													"onAmountSelect();",
 													Currency::format(0, $debtAcc["curr"]));
 
-						getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
+						getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b",
+													"onExchRateSelect();",
 													"1 ".$debtAcc["sign"]."/".$debtAcc["sign"]);
 
-						getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
+						getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b",
+													"onResBalanceSelect();",
 													Currency::format($fperson_balance, $debtAcc["curr"]));
 					html_cl("</div>");
 				html_cl("</div>");
@@ -218,7 +221,8 @@
 				getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
 										Currency::format(0, $debtAcc["curr"]));
 
-				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
+				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b",
+										"onResBalanceDestSelect();",
 										Currency::format($debtAcc["balance"], $debtAcc["curr"]));
 			html_cl("</div>");
 		html_cl("</div>");
