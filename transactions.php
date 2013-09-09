@@ -7,6 +7,7 @@
 	require_once("./class/transaction.php");
 
 
+/*
 	// Print markup for submenu
 	function showSubMenu()
 	{
@@ -57,6 +58,7 @@
 
 		html_cl("</div>");
 	}
+*/
 
 
 	$user_id = User::check();
@@ -113,7 +115,14 @@
 			html_cl("</div>");
 
 			html_op("<div>");
-				showSubMenu();
+				$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
+				$transMenu = array(array(0, "All", "./transactions.php?type=all".$acc_par),
+										array(1, "Expense", "./transactions.php?type=expense".$acc_par),
+										array(2, "Income", "./transactions.php?type=income".$acc_par),
+										array(3, "Transfer", "./transactions.php?type=transfer".$acc_par),
+										array(4, "Debt", "./transactions.php?type=debt".$acc_par));
+				showSubMenu($trans_type, $transMenu);
+
 				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num);
 			html_cl("</div>");
 
