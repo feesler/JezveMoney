@@ -38,6 +38,19 @@
 }
 
 
+/* inactive tile */
+.inact
+{
+	background-color: #B0B0B0;
+}
+
+
+.inact:hover
+{
+	background-color: #C0C0C0;
+}
+
+
 button.tilelink
 {
 	width: 100px;
