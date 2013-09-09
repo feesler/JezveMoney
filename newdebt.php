@@ -135,10 +135,8 @@
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new transaction</h2>");
 			html_op("<div>");
-
 				$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
 				$d_acc_par = (($acc_id != 0) ? "?acc_id=".$acc_id : "");
-
 				$newTransMenu = array(array(1, "Expense", "./newtransaction.php?type=expense".$acc_par),
 										array(2, "Income", "./newtransaction.php?type=income".$acc_par),
 										array(3, "Transfer", "./newtransaction.php?type=transfer".$acc_par),
