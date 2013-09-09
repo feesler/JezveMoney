@@ -169,7 +169,7 @@
 	define("BUTTON_TILE", 3, TRUE);
 
 	// Return markup for tile
-	function getTile($tile_type, $tile_id, $tile_title, $tile_subtitle, $tile_action)
+	function getTile($tile_type, $tile_id, $tile_title, $tile_subtitle, $tile_action, $add_class = "")
 	{
 		$resStr = "";
 
@@ -177,8 +177,9 @@
 			return $resStr;
 
 		$t_id = ($tile_id && $tile_id != "") ? " id=\"".$tile_id."\"" : "";
+		$t_class = "tile".(($add_class && $add_class != "") ? " ".$add_class : "");
 
-		$resStr .= "<div".$t_id." class=\"tile\">";
+		$resStr .= "<div".$t_id." class=\"".$t_class."\">";
 		if ($tile_type == STATIC_TILE)
 		{
 			$resStr .= "<div class=\"tilelink\">";
