@@ -151,3 +151,39 @@
 {
 	margin: 2px 5px;
 }
+
+
+/* Debt operation type selector */
+.op_sel
+{
+	margin: 2px 5px 10px 5px;
+}
+
+
+.op_sel  > span
+{
+	margin: 0px 10px 0px 5px;
+}
+
+
+/* person name input control */
+.debt_input
+{
+	padding: 8px 5px;
+	overflow: hidden;
+}
+
+
+.person_float
+{
+	clear: both;
+	float: none;
+	height: 139px;
+	max-width: 400px;
+}
+
+
+.person_trb
+{
+	float: right;
+}

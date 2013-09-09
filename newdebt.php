@@ -1,10 +1,11 @@
-﻿<?php
+<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
 	require_once("./class/transaction.php");
+	require_once("./class/debt.php");
 
 
 	function fail()
@@ -97,14 +98,13 @@
 	if (!$user_id)
 		setLocation("./login.php");
 
-	// check predefined type of transaction
-	$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
-	$trans_type = Transaction::getStringType($type_str);
-	if (!$trans_type)
-		fail();
+	$trans_type = 4;
+	$give = TRUE;
 
 	$acc = new Account($user_id);
 	$trans = new Transaction($user_id);
+	$debt = new Debt($user_id);
+	$person = new Person($user_id);
 
 	// check predefined account
 	$acc_id = 0;
@@ -114,24 +114,29 @@
 		$acc_id = $acc->getIdByPos(0);
 	if (!$acc_id)
 		fail();
-
+	$debtAcc = getAccountProperties($acc_id);
 	$acc_count = $acc->getCount();
 
-	// set source and destination accounts
-	$src_id = 0;
-	$dest_id = 0;
-	if ($trans_type == 1 || $trans_type == 3)			// expense or transfer
-		$src_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
-	else if ($trans_type == 2)		// income
-		$dest_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
 
-	if ($trans_type == 3)
-		$dest_id = getAnotherAccount($src_id);
+	$fperson_id = $person->getIdByPos(0);
+	$fperson_name = $person->getName($fperson_id);
 
-	$src = getAccountProperties($src_id);
-	$dest = getAccountProperties($dest_id);
+	$fperson_acc = $person->getAccount($fperson_id, $debtAcc["curr"]);
+	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
+	$fperson_balance = $acc->getBalance($fperson_acc, TRUE);
+	$acc = new Account($user_id);
 
-	$titleString = "Jezve Money | New transaction";
+	wlog("fperson_id = ".$fperson_id);
+	wlog("fperson_acc = ".$fperson_acc);
+	wlog("fperson_balance = ".$fperson_balance);
+
+	$titleString = "jezve Money - New debt";
+	if ($give)
+		$accLbl = "Destination account";
+	else
+		$accLbl = "Source account";
+
+	$titleString = "Jezve Money | New debt";
 
 // Start render page
 	html("<!DOCTYPE html>");
@@ -154,11 +159,10 @@
 	html("<script>");
 	echo($acc->getArray());
 	echo(Currency::getArray(TRUE));
-	if ($trans_type == 1 || $trans_type == 2)
-	{
-		html("var trans_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
-		html("var trans_acc_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
-	}
+	html("var trans_curr = ".$debtAcc["curr"].";");
+	html("var trans_acc_curr = ".$debtAcc["curr"].";");
+
+	$person->getArray();
 
 	html("var trans_type = ".$trans_type.";");
 	html("var edit_mode = false;");
@@ -169,7 +173,7 @@
 
 	require_once("./templates/header.php");
 
-	html("<form method=\"post\" action=\"./modules/transaction.php?type=".$type_str."\" onsubmit=\"return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);\">");
+	html("<form method=\"post\" action=\"./modules/debt.php\" onsubmit=\"return onDebtSubmit(this);\">");
 
 	html_op("<div class=\"form_content\">");
 		html_op("<div class=\"content_wrap\">");
@@ -177,16 +181,71 @@
 			html_op("<div>");
 				showSubMenu();
 
-	if ($trans_type == 1 || $trans_type == 3)
-	{
+				if (isset($_GET["act"]) && isset($_GET["detail"]))
+				{
+					html_op("<div style=\"padding-left: 50px;\">");
+					if ($_GET["act"] == "fail" && $_GET["detail"] == "person")
+						html("<span style=\"color: #FF2020;\">Person already exist.</span>");
+					html_cl("</div>");
+				}
+
+
+			html_op("<div id=\"person\" class=\"person_float\">");
+				html("<input id=\"person_id\" name=\"person_id\" type=\"hidden\" value=\"".$fperson_id."\">");
+				html("<div><label for=\"personsel\">Person name</label></div>");
+				html_op("<div>");
+					if (!$person->getCount())
+					{
+						html_op("<div class=\"stretch_input trans_input\">");
+							html_op("<div>");
+								html("<input id=\"personname\" name=\"personname\" type=\"text\" value=\"\">");
+							html_cl("</div>");
+						html_cl("</div>");
+					}
+					else
+					{
+						html_op("<div class=\"tile_container\">");
+							html(getTile(STATIC_TILE, "person_tile", $fperson_name,
+												Currency::format($fperson_balance, $debtAcc["curr"]),
+												NULL));
+
+							html("<input id=\"personname\" name=\"personname\" type=\"hidden\" value=\"".$fperson_name."\">");
+							html_op("<div class=\"acc_sel\">");
+								html_op("<div>");
+									html_op("<select id=\"personsel\" onchange=\"onPersonSel(this);\">");
+										echo($person->getList());
+									html_cl("</select>");
+								html_cl("</div>");
+							html_cl("</div>");
+
+							getIconLink(ICON_BUTTON, "personbtn", "add", "New", TRUE, "togglePerson();");
+						html_cl("</div>");
+					}
+
+					html();
+					html_op("<div class=\"tile_right_block\">");		// tile_right_block person_trb
+						getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
+													Currency::format(0, $debtAcc["curr"]));
+
+						getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
+													"1 ".$debtAcc["sign"]."/".$debtAcc["sign"]);
+
+						getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
+													Currency::format($fperson_balance, $debtAcc["curr"]));
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+			html();
+
+
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			html("<div><label for=\"src_id\">Source account</label></div>");
+			html("<div><label id=\"acclbl\" for=\"src_id\">".$accLbl."</label></div>");
 			html_op("<div class=\"tile_container\">");
-				html($acc->getTile(STATIC_TILE, $src_id, "source_tile"));
+				html($acc->getTile(STATIC_TILE, $acc_id, "source_tile"));
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
-						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
-							echo($acc->getList($src_id));
+						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onChangeAcc();\">");
+							echo($acc->getList($acc_id));
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
@@ -194,66 +253,22 @@
 
 			html();
 			html_op("<div class=\"tile_right_block\">");
+				getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
+										Currency::format(0, $debtAcc["curr"]));
 
-				if ($trans_type == 1)
-				{
-					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
-											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-				}
-
-				if ($trans_type == 1 || $trans_type == 3)
-				{
-					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
-											Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-				}
-
-				$disp = ($trans_type == 3 && $src["curr"] != $dest["curr"]);
-				getRightTileBlock("exch_left", $disp, "Exchange rate", "exchrate_b", "onExchRateSelect();",
-											"1 ".$src["sign"]."/".$dest["sign"]);
-
-				getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
-											Currency::format($src["balance"], $src["curr"]));
+				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
+										Currency::format($debtAcc["balance"], $debtAcc["curr"]));
 			html_cl("</div>");
 		html_cl("</div>");
-	}
 
-	if ($trans_type == 2 || $trans_type == 3)
-	{
-		html();
-		html_op("<div id=\"destination\" class=\"acc_float\">");
-			html("<div><label for=\"dest_id\">Destination account</label></div>");
-			html_op("<div class=\"tile_container\">");
-				html($acc->getTile(STATIC_TILE, $dest_id, "dest_tile"));
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
-							echo($acc->getList($dest_id));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-			html_cl("</div>");
-
-			html();
-			html_op("<div class=\"tile_right_block\">");
-
-				getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
-										Currency::format(0, ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-				if ($trans_type == 2)
-				{
-					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();", "");
-					getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
-											"1 ".$src["sign"]."/".$dest["sign"]);
-					getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
-											Currency::format($dest["balance"], $dest["curr"]));
-				}
-				else if ($trans_type == 3)
-				{
-					getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
-											Currency::format($dest["balance"], $dest["curr"]));
-				}
-			html_cl("</div>");
+	html_op("<div id=\"operation\" class=\"non_float\">");
+		html("<div><label for=\"debtop\">Operation</label></div>");
+		html_op("<div class=\"op_sel\">");
+			html("<input id=\"debtgive\" name=\"debtop\" type=\"radio\" value=\"1\" onchange=\"onChangeDebtOp();\" checked><span>give</span>");
+			html("<input id=\"debttake\" name=\"debtop\" type=\"radio\" value=\"2\" onchange=\"onChangeDebtOp();\"><span>take</span>");
 		html_cl("</div>");
-	}
+	html_cl("</div>");
+	html();
 
 	html();
 	html_op("<div id=\"amount_row\" class=\"non_float\">");
@@ -262,7 +277,7 @@
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div class=\"currency_block\">");
 					html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-						echo(Currency::getList($src["curr"]));
+						echo(Currency::getList($debtAcc["curr"]));
 					html_cl("</select>");
 				html_cl("</div>");
 			html_cl("</div>");
@@ -270,13 +285,12 @@
 
 		html();
 		html_op("<div>");
-			echo($tabStr."<div><label for=\"amount\">Amount</label>");
-			echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
-			if ($trans_type == 3)
-				echo(" style=\"display: none;\"");
-			echo("><span>Select currency</span></button></div>\r\n");
+			$resStr = "<div><label for=\"amount\">Amount</label>";
+			$resStr .="<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"";
+			$resStr .= " style=\"display: none;\"><span>Select currency</span></button></div>";
+			html($resStr);
 			html_op("<div>");
-				html("<div class=\"right_float\"><span id=\"amountsign\" class=\"curr_sign\">".(($trans_type == 1) ? $src["sign"] : $dest["sign"])."</span></div>");
+				html("<div class=\"right_float\"><span id=\"amountsign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
 				html_op("<div class=\"stretch_input trans_input\">");
 					html_op("<div>");
 						html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
@@ -286,12 +300,11 @@
 		html_cl("</div>");
 	html_cl("</div>");
 
-	$disp = (($trans_type != 3 || ($trans_type == 3 && $src["curr"] == $dest["curr"])) ? " style=\"display: none;\"" : "");
 	html();
-	html_op("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
+	html_op("<div id=\"chargeoff\" class=\"non_float\" style=\"display: none;\">");
 		html("<div><label for=\"charge\">Charge</label></div>");
 		html_op("<div>");
-			html("<div class=\"right_float\"><span id=\"chargesign\" class=\"curr_sign\">".$src["sign"]."</span></div>");
+			html("<div class=\"right_float\"><span id=\"chargesign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
 					html("<input id=\"charge\" name=\"charge\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
@@ -304,7 +317,7 @@
 	html_op("<div id=\"exchange\" class=\"non_float\" style=\"display: none;\">");
 		html("<div><label for=\"exchrate\">Exchange rate</label></div>");
 		html_op("<div>");
-			html("<div class=\"right_float\"><span id=\"exchcomm\" class=\"exchrate_comm\">".$src["sign"]."/".$dest["sign"]."</span></div>");
+			html("<div class=\"right_float\"><span id=\"exchcomm\" class=\"exchrate_comm\">".$debtAcc["sign"]."/".$debtAcc["sign"]."</span></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
 					html("<input id=\"exchrate\" class=\"summ_text\" type=\"text\" value=\"1\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
@@ -315,9 +328,9 @@
 
 	html();
 	html_op("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
-		html("<div><label for=\"resbal\">Result balance".(($trans_type == 3) ? " (Source)" : "")."</label></div>");
+		html("<div><label for=\"resbal\">Result balance (Source)</label></div>");
 		html_op("<div>");
-			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$src["sign"]."</span></div>");
+			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
 					html("<input id=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
@@ -326,21 +339,18 @@
 		html_cl("</div>");
 	html_cl("</div>");
 
-	if ($trans_type == 3)
-	{
-		html();
-		html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
-			html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
-			html_op("<div>");
-				html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$dest["sign"]."</span></div>");
-				html_op("<div class=\"stretch_input trans_input\">");
-					html_op("<div>");
-						html("<input id=\"resbal_d\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
-					html_cl("</div>");
+	html();
+	html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
+		html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
+		html_op("<div>");
+			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
+			html_op("<div class=\"stretch_input trans_input\">");
+				html_op("<div>");
+					html("<input id=\"resbal_d\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 				html_cl("</div>");
 			html_cl("</div>");
 		html_cl("</div>");
-	}
+	html_cl("</div>");
 
 	setTab(3);
 	html();

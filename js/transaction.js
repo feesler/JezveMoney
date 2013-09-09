@@ -332,11 +332,12 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
+	var srcid, destid, accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
 	var sync = false;
 
 	srcid = ge('src_id');
 	destid = ge('dest_id');
+	accid = ge('acc_id');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
@@ -345,13 +346,13 @@ function onChangeAcc()
 	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
 	resbal_b = ge('resbal_b');
-	if ((!srcid && !destid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge || !resbal_b)
+	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge || !resbal_b)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
 		sync = true;
 
-	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : destid));
+	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : (destid ? destid : accid)));
 	if (sync)
 		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
@@ -528,11 +529,12 @@ function setTileAccount(tile_id, acc_id)
 // Update controls of transfer transaction form
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
+	var src, dest, acc, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
 	var src_acc, dest_acc, tramount, trcharge;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
+	acc = ge('acc_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
@@ -541,7 +543,7 @@ function updControls()
 	exchange = ge('exchange');
 	resbal = ge('resbal');
 	resbal_b = ge('resbal_b');
-	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
+	if ((!src || !dest && !acc) || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
 		return;
 
 	src_acc = parseInt(selectedValue(src));
@@ -715,7 +717,7 @@ function setExchangeComment()
 	exchrate_b = ge('exchrate_b');
 	if (trans_type == 1 || trans_type == 2)
 		transcurr = ge('transcurr');
-	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
+	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'acc_id' : 'src_id');
 	if (isTransfer())
 		taccid = ge('dest_id');
 	if (!exchcomm || !exchrate_b || !accid || (!transcurr && !taccid))
@@ -779,7 +781,7 @@ function getValues()
 {
 	var accid, amount, charge, exchrate, resbal;
 
-	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
+	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
@@ -973,7 +975,7 @@ function onChangeTransCurr()
 	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
 	var amountCurr, chargeCurr, isDiff;
 
-	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'accid' : 'src_id');
+	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
@@ -1035,20 +1037,53 @@ function onChangeDebtOp()
 }
 
 
+// Return array of balance
+function getPersonBalance(p_id)
+{
+	var pObj = null, resArr = [];
+
+	if (!persons)
+		return null;
+
+	persons.some(function(person)
+	{
+		if (person[0] == p_id)
+			pObj = person;
+		return (person[0] == p_id);
+	});
+
+	if (!pObj || !isArray(pObj) || pObj.length < 3 || !isArray(pObj[2]))
+		return null;
+
+	pObj[2].forEach(function(acc)
+	{
+		resArr.push(formatCurrency(acc[2], acc[1]));
+	});
+
+	return resArr;
+}
+
+
 // Person select event handler
 function onPersonSel(obj)
 {
-	var personname, personid;
+	var personname, personid, pbalance, resbal_b;
 
 	personname = ge('personname');
-	personid = ge('personid');
-	if (!personname || !personid)
+	personid = ge('person_id');
+	resbal_b = ge('resbal_b');
+	if (!personname || !personid || !resbal_b)
 		return;
 	if (!obj || typeof(obj.selectedIndex) == "undefined" || obj.selectedIndex == -1)
 		return;
 
 	personname.value = selectedText(obj);
 	personid.value = selectedValue(obj);
+	pbalance = getPersonBalance(parseInt(personid.value));
+
+	setTileInfo(ge('person_tile'), personname.value, pbalance ? pbalance.join(',<br>') : '');
+
+	updControls();
 }
 
 
@@ -1075,7 +1110,7 @@ function onDebtSubmit(frm)
 		return false;
 	}
 
-	accid = ge('accid');
+	accid = ge('acc_id');
 	amount = ge('amount');
 	trdate = ge('date');
 	if (!frm || !accid || !amount || !trdate)
