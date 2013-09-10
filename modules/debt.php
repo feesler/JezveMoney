@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -10,7 +10,7 @@
 
 	function fail()
 	{
-		setLocation("../debts.php?debt=fail");
+		setLocation("../transactions.php?type=debt&act=fail");
 	}
 
 
@@ -51,5 +51,5 @@
 	if (!$debt->create($debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 
-	setLocation("../debts.php?debt=ok");
+	setLocation("../transactions.php?type=debt&act=ok");
 ?>
