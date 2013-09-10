@@ -1,37 +1,44 @@
 ﻿
 
 // Show controls to add new person
-function togglePerson()
+function togglePerson(val)
 {
 	var personname, personid, personsel, personbtn;
 
 	personname = ge('personname');
-	personid = ge('personid');
+	personid = ge('person_id');
 	personsel = ge('personsel');
 	personbtn = ge('personbtn');
 	if (!personbtn || !personname || !personid || !personsel)
 		return;
 
-	if (personname.type == 'hidden')		// select mode
+	//if (personname.type == 'hidden')		// select mode
+	if (val)
 	{
-		personbtn.value = 'select';
+		//personbtn.value = 'select';
 
 		personid.value = 0;
 		personname.type = 'text';
 		personname.value = '';
 
-		show(personname, true);
-		show(personsel, false);
+		//show(personname, true);
+		show('personname_block', true);
+
+		//show(personsel, false);
+		show(personbtn, false);
 	}
-	else if (personname.type == 'text')		// new person mode
+	//else if (personname.type == 'text')		// new person mode
+	else
 	{
-		personbtn.value = 'new';
+		//personbtn.value = 'new';
 
 		personname.value = selectedText(personsel);
 		personid.value = personsel.selectedIndex;
 
-		show(personname, false);
-		show(personsel, true);
+		//show(personname, false);
+		show('personname_block', false);
+		//show(personsel, true);
+		show(personbtn, true);
 
 		personname.type = 'hidden';
 	}

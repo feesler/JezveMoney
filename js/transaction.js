@@ -1083,7 +1083,16 @@ function onPersonSel(obj)
 
 	setTileInfo(ge('person_tile'), personname.value, pbalance ? pbalance.join(',<br>') : '');
 
+	togglePerson(false);
+
 	updControls();
+}
+
+
+// New person icon link click event
+function onNewPerson()
+{
+	togglePerson(true);
 }
 
 

@@ -157,16 +157,16 @@
 		}
 		else
 		{
-			html_op("<div id=\"person\" class=\"person_float\">");
+			html_op("<div id=\"person\" class=\"acc_float\">");
 				html("<input id=\"person_id\" name=\"person_id\" type=\"hidden\" value=\"".$fperson_id."\">");
 				html("<div><label for=\"personsel\">Person name</label></div>");
 				html_op("<div>");
 					if (!$person->getCount())
 					{
-						html_op("<div class=\"stretch_input trans_input\">");
-							html_op("<div>");
-								html("<input id=\"personname\" name=\"personname\" type=\"text\" value=\"\">");
-							html_cl("</div>");
+						html_op("<div class=\"tile_container\">");
+							html(getTile(STATIC_TILE, "person_tile", "New person",
+													Currency::format(0, $debtAcc["curr"]),
+													NULL, "inact"));
 						html_cl("</div>");
 					}
 					else
@@ -175,8 +175,6 @@
 							html(getTile(STATIC_TILE, "person_tile", $fperson_name,
 												Currency::format($fperson_balance, $debtAcc["curr"]),
 												NULL));
-
-							html("<input id=\"personname\" name=\"personname\" type=\"hidden\" value=\"".$fperson_name."\">");
 							html_op("<div class=\"acc_sel\">");
 								html_op("<div>");
 									html_op("<select id=\"personsel\" onchange=\"onPersonSel(this);\">");
@@ -184,8 +182,6 @@
 									html_cl("</select>");
 								html_cl("</div>");
 							html_cl("</div>");
-
-							getIconLink(ICON_BUTTON, "personbtn", "add", "New", TRUE, "togglePerson();");
 						html_cl("</div>");
 					}
 
@@ -203,6 +199,22 @@
 													"onResBalanceSelect();",
 													Currency::format($fperson_balance, $debtAcc["curr"]));
 					html_cl("</div>");
+
+				$disp = (($person->getCount()) ? " style=\"display: none;\"" : "");
+				$p_inpType = (($person->getCount()) ? "hidden": "text");
+
+				html_op("<div id=\"personname_block\" class=\"person_input\"".$disp.">");
+					html_op("<div class=\"stretch_input trans_input\">");		// $disp
+						html_op("<div>");
+							html("<input id=\"personname\" name=\"personname\" type=\"".$p_inpType."\" value=\"".$fperson_name."\">");
+						html_cl("</div>");
+					html_cl("</div>");
+				html_cl("</div>");
+
+					html_op("<div id=\"personbtn\" class=\"person_icon\"".$btn_disp.">");
+						html(getIconLink(ICON_BUTTON, "", "add", "New", TRUE, "onNewPerson();", "form_iconlink"));
+					html_cl("</div>");
+
 				html_cl("</div>");
 			html_cl("</div>");
 			html();
