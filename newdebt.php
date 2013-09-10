@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -151,7 +151,12 @@
 					html_cl("</div>");
 				}
 
-
+		if (!$acc_count)
+		{
+			html("<div class=\"align_block\"><span>You have no one account. Please create one.</span></div>");
+		}
+		else
+		{
 			html_op("<div id=\"person\" class=\"person_float\">");
 				html("<input id=\"person_id\" name=\"person_id\" type=\"hidden\" value=\"".$fperson_id."\">");
 				html("<div><label for=\"personsel\">Person name</label></div>");
@@ -354,6 +359,9 @@
 
 	html();
 	html("<div class=\"acc_controls\"><input id=\"submitbtn\" class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
+
+	}
+
 	html_cl("</div>");
 	html_cl("</div>");
 	html_cl("</div>");

@@ -139,6 +139,13 @@
 										array(4, "Debt", "./newdebt.php".$d_acc_par));
 				showSubMenu($trans_type, $newTransMenu);
 
+if (!$acc_count)
+{
+	html("<div class=\"align_block\"><span>You have no one account. Please create one.</span></div>");
+}
+else
+{
+
 	if ($trans_type == 1 || $trans_type == 3)
 	{
 		html_op("<div id=\"source\" class=\"acc_float\">");
@@ -340,6 +347,8 @@
 
 	html();
 	html("<div class=\"acc_controls\"><input id=\"submitbtn\" class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
+}
+
 	html_cl("</div>");
 	html_cl("</div>");
 	html_cl("</div>");
