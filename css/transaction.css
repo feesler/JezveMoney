@@ -174,22 +174,7 @@
 }
 
 
-/*
-.person_float
-{
-	clear: both;
-	float: none;
-	height: 139px;
-	max-width: 400px;
-}
-
-
-.person_trb
-{
-	float: right;
-}
-*/
-.person_tile 
+.person_tile
 {
 	clear: both;
 	height: 118px;

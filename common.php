@@ -169,7 +169,7 @@
 	define("BUTTON_TILE", 3, TRUE);
 
 	// Return markup for tile
-	function getTile($tile_type, $tile_id, $tile_title, $tile_subtitle, $tile_action, $add_class = "")
+	function getTile($tile_type, $tile_id, $tile_title, $tile_subtitle, $tile_action = "", $add_class = "")
 	{
 		$resStr = "";
 
@@ -187,7 +187,6 @@
 		else if ($tile_type == LINK_TILE)
 		{
 			$t_href = ($tile_action && $tile_action != "") ? " href=\"".$tile_action."\"" : "";
-
 			$resStr .= "<a".$t_href." class=\"tilelink\">";
 		}
 		else if ($tile_type == BUTTON_TILE)
@@ -235,7 +234,7 @@
 	define("ICON_LINK", 1, TRUE);
 	define("ICON_BUTTON", 2, TRUE);
 
-	// Return amrkup for icon link element
+	// Return markup for icon link element
 	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "", $add_class = "")
 	{
 		$resStr = "";

@@ -133,7 +133,7 @@
 
 	html_op("<div class=\"form_content\">");
 		html_op("<div class=\"content_wrap\">");
-			html("<h2>Create new transaction</h2>");
+			html("<h2>Create new debt</h2>");
 			html_op("<div>");
 				$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
 				$d_acc_par = (($acc_id != 0) ? "?acc_id=".$acc_id : "");
@@ -335,13 +335,9 @@
 		html_cl("</div>");
 	html_cl("</div>");
 
-	setTab(3);
 	html();
 	html_op("<div class=\"non_float\">");
 		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink"));
-/*
-		html("<div id=\"calendar_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showCalendar();\"><div class=\"calendar\"></div><span>Change date</span></button></div>");
-*/
 		html_op("<div id=\"date_block\" style=\"display: none;\">");
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
@@ -360,9 +356,6 @@
 	html();
 	html_op("<div class=\"non_float\">");
 		html(getIconLink(ICON_BUTTON, "comm_btn", "add", "Add comment", TRUE, "showComment();", "form_iconlink"));
-/*
-		html("<div id=\"comm_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showComment();\"><div class=\"add\"></div><span>Add comment</span></button></div>");
-*/
 		html_op("<div id=\"comment_block\" style=\"display: none;\">");
 			html("<div><label for=\"comm\">Comment</label></div>");
 			html_op("<div>");

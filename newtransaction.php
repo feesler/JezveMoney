@@ -311,13 +311,9 @@ else
 		html_cl("</div>");
 	}
 
-	setTab(3);
 	html();
 	html_op("<div class=\"non_float\">");
 		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink"));
-/*
-		html("<div id=\"calendar_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showCalendar();\"><div class=\"calendar\"></div><span>Change date</span></button></div>");
-*/
 		html_op("<div id=\"date_block\" style=\"display: none;\">");
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
@@ -336,9 +332,6 @@ else
 	html();
 	html_op("<div class=\"non_float\">");
 		html(getIconLink(ICON_BUTTON, "comm_btn", "add", "Add comment", TRUE, "showComment();", "form_iconlink"));
-/*
-		html("<div id=\"comm_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showComment();\"><div class=\"add\"></div><span>Add comment</span></button></div>");
-*/
 		html_op("<div id=\"comment_block\" style=\"display: none;\">");
 			html("<div><label for=\"comm\">Comment</label></div>");
 			html_op("<div>");
