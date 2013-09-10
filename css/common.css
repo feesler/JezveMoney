@@ -416,6 +416,13 @@ button::-moz-focus-inner
 }
 
 
+/* block aligned to the left rule by margins */
+.align_block
+{
+	margin: 0px 5px;
+}
+
+
 /* buttons */
 .std_btn
 {
