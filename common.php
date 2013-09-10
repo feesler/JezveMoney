@@ -236,7 +236,7 @@
 	define("ICON_BUTTON", 2, TRUE);
 
 	// Return amrkup for icon link element
-	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "")
+	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "", $add_class = "")
 	{
 		$resStr = "";
 
@@ -245,8 +245,9 @@
 
 		$d_id = (($div_id && $div_id != "") ? " id=\"".$div_id."\"" : "");
 		$disp = ($isVisible ? "" : " style=\"display: none;\"");
+		$il_class = "iconlink".(($add_class && $add_class != "") ? " ".$add_class : "");
 
-		$resStr .= "<div".$d_id." class=\"iconlink\"".$disp.">";
+		$resStr .= "<div".$d_id." class=\"".$il_class."\"".$disp.">";
 
 		if ($il_type == ICON_LINK)
 		{
