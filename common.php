@@ -193,7 +193,7 @@
 		else if ($tile_type == BUTTON_TILE)
 		{
 			$t_click = ($tile_action && $tile_action != "") ? " onclick=\"".$tile_action."\"" : "";
-			$resStr .= "<button class=\"tilelink\"".$t_click.">";
+			$resStr .= "<button class=\"tilelink\"".$t_click." type=\"button\">";
 		}
 
 		$resStr .= "<div>";
@@ -258,7 +258,7 @@
 		else if ($il_type == ICON_BUTTON)
 		{
 			$il_click = ($action && $action != "") ? " onclick=\"".$action."\"" : "";
-			$resStr .= "<button".$il_click.">";
+			$resStr .= "<button".$il_click." type=\"button\">";
 		}
 
 		$il_icon = ($iconClass && $iconClass != "") ? " class=\"".$iconClass."\"" : "";
