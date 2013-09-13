@@ -76,43 +76,6 @@
 	}
 
 
-	// Return markup for transaction type menu
-	function showSubMenu()
-	{
-		global $trans_type;
-
-		$acc_id = 0;
-		if (isset($_GET["acc_id"]))
-			$acc_id = intval($_GET["acc_id"]);
-
-		$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
-
-		html_op("<div id=\"trtype_menu\" class=\"subHeader\">");
-
-			$resStr = "<span>";
-			$resStr .= (($trans_type == 1) ? "<b>" : "<a href=\"./newtransaction.php?type=expense".$acc_par."\">");
-			$resStr .= "Expense";
-			$resStr .= (($trans_type == 1) ? "</b>" : "</a>");
-			$resStr .= "</span>";
-
-			$resStr .= "<span>";
-			$resStr .= (($trans_type == 2) ? "<b>" : "<a href=\"./newtransaction.php?type=income".$acc_par."\">");
-			$resStr .= "Income";
-			$resStr .= (($trans_type == 2) ? "</b>" : "</a>");
-			$resStr .= "</span>";
-
-			$resStr .= "<span>";
-			$resStr .= (($trans_type == 3) ? "<b>" : "<a href=\"./newtransaction.php?type=transfer".$acc_par."\">");
-			$resStr .= "Transfer";
-			$resStr .= (($trans_type == 3) ? "</b>" : "</a>");
-			$resStr .= "</span>";
-
-			html($resStr);
-
-		html_cl("</div>");
-	}
-
-
 	$user_id = User::check();
 	if (!$user_id)
 		setLocation("./login.php");
@@ -203,7 +166,11 @@
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Edit transaction</h2>");
 			html_op("<div>");
-				showSubMenu();
+				$newTransMenu = array(array(1, "Expense", "./newtransaction.php?type=expense".$acc_par),
+										array(2, "Income", "./newtransaction.php?type=income".$acc_par),
+										array(3, "Transfer", "./newtransaction.php?type=transfer".$acc_par),
+										array(4, "Debt", "./newdebt.php".$d_acc_par));
+				showSubMenu($trans_type, $newTransMenu);
 
 	if ($trans_type == 1 || $trans_type == 3)
 	{
