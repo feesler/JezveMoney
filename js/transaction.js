@@ -24,6 +24,13 @@ var s1dvalid, s2dvalid;
 var submitStarted = false;
 
 
+// Check current transaction is expense
+function isExpense()
+{
+	return (trans_type == 1);
+}
+
+
 // Check current transaction is income
 function isIncome()
 {
@@ -35,6 +42,13 @@ function isIncome()
 function isTransfer()
 {
 	return (trans_type == 3);
+}
+
+
+// Check current transaction is debt
+function isDebt()
+{
+	return (trans_type == 4);
 }
 
 
