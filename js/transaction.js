@@ -729,9 +729,9 @@ function setExchangeComment()
 
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
-	if (trans_type == 1 || trans_type == 2)
+	if (IsExpense() || isIncome())
 		transcurr = ge('transcurr');
-	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'acc_id' : 'src_id');
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	if (isTransfer())
 		taccid = ge('dest_id');
 	if (!exchcomm || !exchrate_b || !accid || (!transcurr && !taccid))
@@ -795,7 +795,7 @@ function getValues()
 {
 	var accid, amount, charge, exchrate, resbal;
 
-	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'acc_id' : 'src_id');
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
@@ -989,7 +989,7 @@ function onChangeTransCurr()
 	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
 	var amountCurr, chargeCurr, isDiff;
 
-	accid = ge((trans_type == 2) ? 'dest_id' : (trans_type == 4) ? 'acc_id' : 'src_id');
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
