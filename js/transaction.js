@@ -34,7 +34,7 @@ function isExpense()
 // Check current transaction is income
 function isIncome()
 {
-	return (trans_type == 2 || (trans_type == 4 && typeof(debtType) != "undefined" && debtType));
+	return (trans_type == 2);
 }
 
 
