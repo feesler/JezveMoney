@@ -311,7 +311,7 @@
 
 	html();
 	html_op("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
-		html("<div><label for=\"resbal\">Result balance (Source)</label></div>");
+		html("<div><label for=\"resbal\">Result balance (Person)</label></div>");
 		html_op("<div>");
 			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
@@ -324,7 +324,7 @@
 
 	html();
 	html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
-		html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
+		html("<div><label for=\"resbal_d\">Result balance (Account)</label></div>");
 		html_op("<div>");
 			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
