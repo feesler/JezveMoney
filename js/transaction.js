@@ -83,7 +83,7 @@ function f1()
 
 	fS2 = S2;
 
-	if (isTransfer())
+	if (isTransfer() || isDebt())
 	{
 		S2_d = fS1_d + fa;
 		S2_d = correct(S2_d);
@@ -137,7 +137,7 @@ function f4()
 
 	fa = a;
 
-	if (isTransfer())
+	if (isTransfer() || isDebt())
 	{
 		S2_d = fS1_d + fa;
 		S2_d = correct(S2_d);
@@ -347,7 +347,7 @@ function updateExchAndRes()
 function onChangeAcc()
 {
 	var srcid, destid, accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
-	var sync = false;
+	var sync = false, target_id, new_acc_id;
 
 	srcid = ge('src_id');
 	destid = ge('dest_id');
@@ -359,14 +359,17 @@ function onChangeAcc()
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	resbal_b = ge('resbal_b');
+	resbal_b = ge(isDebt() ? 'resbal_d_b' : 'resbal_b');
 	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge || !resbal_b)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
 		sync = true;
 
-	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : (destid ? destid : accid)));
+	target_id = isIncome() ? destid : (isDebt() ? accid : srcid);
+	new_acc_id = selectedValue(target_id);
+
+	trans_acc_curr = getCurrencyOfAccount(new_acc_id);
 	if (sync)
 		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
@@ -381,7 +384,7 @@ function onChangeAcc()
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 
-		resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(selectedValue(isIncome() ? destid : srcid)) - charge.value, getCurrencyOfAccount(selectedValue(isIncome() ? destid : srcid)));
+		resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - charge.value, getCurrencyOfAccount(new_acc_id));
 	}
 
 	updateExchAndRes();
@@ -389,10 +392,13 @@ function onChangeAcc()
 	setSign(false, trans_acc_curr);
 	setSign(true, trans_curr);
 
+	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
+/*
 	if (isIncome())
 		setTileAccount('dest_tile', selectedValue(destid));
 	else
 		setTileAccount('source_tile', selectedValue(srcid));
+*/
 }
 
 
@@ -594,7 +600,7 @@ function updControls()
 
 		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
 
-		if (isTransfer())
+		if (isTransfer() || isDebt())
 		{
 			var resbal_d = ge('resbal_d');
 			var resbal_d_b = ge('resbal_d_b');
@@ -729,7 +735,7 @@ function setExchangeComment()
 
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
-	if (IsExpense() || isIncome())
+	if (isExpense() || isIncome())
 		transcurr = ge('transcurr');
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	if (isTransfer())
@@ -809,6 +815,23 @@ function getValues()
 		S1_d = getBalanceOfAccount(selectedValue(ge('dest_id')));		// TODO: fix here
 		S2_d = ge('resbal_d').value;
 	}
+	else if (isDebt())
+	{
+		if (debtType)	// person account is source
+		{
+			S1 = getCurPersonBalance(trans_curr);
+			S2 = ge('resbal').value;
+			S1_d = getBalanceOfAccount(selectedValue(accid));
+			S2_d = ge('resbal_d').value;
+		}
+		else			// person account is destination
+		{
+			S1 = getBalanceOfAccount(selectedValue(accid));
+			S2 = ge('resbal').value;
+			S1_d = getCurPersonBalance(trans_curr);
+			S2_d = ge('resbal_d').value;
+		}
+	}
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
@@ -816,7 +839,7 @@ function getValues()
 
 	s1valid = isValidValue(S1);
 	s2valid = isValidValue(S2);
-	if (isTransfer())
+	if (isTransfer() || isDebt())
 	{
 		s1dvalid = isValidValue(S1_d);
 		s2dvalid = isValidValue(S2_d);
@@ -827,7 +850,7 @@ function getValues()
 
 	fS1 = (s1valid) ? normalize(S1) : S1;
 	fS2 = (s2valid) ? normalize(S2) : S2;
-	if (isTransfer())
+	if (isTransfer() || isDebt())
 	{
 		fS1_d = (s1dvalid) ? normalize(S1_d) : S1_d;
 		fS2_d = (s2dvalid) ? normalize(S2_d) : S2_d;
@@ -860,7 +883,7 @@ function setValues()
 	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), selectedValue(ge('transcurr')));
 
 
-	selCurrVal = getCurrencyOfAccount(selectedValue(ge(isIncome() ? 'dest_id' : 'src_id')));
+	selCurrVal = getCurrencyOfAccount(selectedValue(ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')));
 
 	charge.value = d;
 	charge_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(d) ? d : 0), selCurrVal);
@@ -870,15 +893,21 @@ function setValues()
 
 	resbal.value = S2;
 
-	resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
+	if (isDebt() && debtType == false)
+		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
+	else
+		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
 
-	if (isTransfer())
+	if (isTransfer() || isDebt())
 	{
 		var resbal_d_b = ge('resbal_d_b');
 		if (!resbal_d_b)
 			return;
 
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, getCurrencyOfAccount(selectedValue(ge('dest_id'))));
+		if (isDebt() && debtType == false)
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, selCurrVal);
+		else
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
 	}
 }
 
@@ -974,7 +1003,7 @@ function onFInput(obj)
 		onExchangeInput();
 	else if (obj.id == 'resbal')
 		onResBalanceInput();
-	else if (obj.id == 'resbal_d' && isTransfer())
+	else if (obj.id == 'resbal_d' && (isTransfer() || isDebt()))
 		onResBalanceDestInput();
 
 	setValues();

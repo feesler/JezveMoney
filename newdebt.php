@@ -121,6 +121,7 @@
 	$person->getArray();
 
 	html("var trans_type = ".$trans_type.";");
+	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");
 	html("var edit_mode = false;");
 	html("</script>");
 
@@ -221,9 +222,9 @@
 
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			html("<div><label id=\"acclbl\" for=\"src_id\">".$accLbl."</label></div>");
+			html("<div><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label></div>");
 			html_op("<div class=\"tile_container\">");
-				html($acc->getTile(STATIC_TILE, $acc_id, "source_tile"));
+				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onChangeAcc();\">");
