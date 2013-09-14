@@ -1078,6 +1078,44 @@ function getPersonBalance(p_id)
 }
 
 
+// Return balance of current person in specified currency
+function getCurPersonBalance(curr_id)
+{
+	var personid, p_id;
+	var pObj = null, resBal = 0.0;
+
+	personid = ge('person_id');
+
+	if (!personid || !persons)
+		return null;
+
+	p_id = parseInt(personid.value);
+	if (p_id == 0)
+		return resStr;
+
+	persons.some(function(person)
+	{
+		if (person[0] == p_id)
+			pObj = person;
+		return (person[0] == p_id);
+	});
+
+	if (!pObj || !isArray(pObj) || pObj.length < 3 || !isArray(pObj[2]))
+		return resStr;
+
+	// check person have account in specified currency
+	pObj[2].some(function(acc)
+	{
+		if (acc[1] == curr_id)
+			resBal = acc[2];
+
+		return (acc[1] == curr_id);
+	});
+
+	return resBal;
+}
+
+
 // Person select event handler
 function onPersonSel(obj)
 {
