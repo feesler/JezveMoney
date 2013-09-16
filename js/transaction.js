@@ -1080,6 +1080,26 @@ function onChangeDebtOp()
 }
 
 
+// Return object for specified person
+function getPersonObject(person_id)
+{
+	var pObj = null, p_id;
+
+	p_id = parseInt(person_id);
+	if (!persons || !p_id)
+		return null;
+
+	persons.some(function(person)
+	{
+		if (person[0] == p_id)
+			pObj = person;
+		return (person[0] == p_id);
+	});
+
+	return pObj;
+}
+
+
 // Return array of balance
 function getPersonBalance(p_id)
 {
