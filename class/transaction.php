@@ -641,10 +641,17 @@ class Transaction
 			$resStr = "<div><span class=\"latest_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
-			if ($cur_trans_type == 3)
+			else if ($cur_trans_type == 4)
+				$resStr .= $acc->getNameOrPerson($src_id);
+
+			if ($cur_trans_type == 3 || $cur_trans_type == 4)
 				$resStr .= " → ";
+
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
 				$resStr .= $acc->getName($dest_id);
+			else if ($cur_trans_type == 4)
+				$resStr .= $acc->getNameOrPerson($dest_id);
+
 			$resStr .= "</span></div>";
 			html($resStr);
 
