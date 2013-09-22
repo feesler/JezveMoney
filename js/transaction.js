@@ -634,6 +634,8 @@ function updControls()
 
 	setSign('chargesign', chargeCurr);
 	setSign('amountsign', amountCurr);
+	setSign('res_currsign', chargeCurr);
+	setSign('res_currsign_d', amountCurr);
 
 	setTileAccount('source_tile', src_acc);
 	setTileAccount('dest_tile', dest_acc);
