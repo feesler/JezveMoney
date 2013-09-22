@@ -105,6 +105,7 @@ function onAmountSelect()
 {
 	amountSwitch(true);
 	resBalanceSwitch(false);
+	resBalanceDestSwitch(false);
 }
 
 
