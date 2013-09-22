@@ -246,10 +246,10 @@ function getNameOfAccount(account_id)
 }
 
 
-// Set currency sign for amount or charge field
-function setSign(isAmount, curr_id)
+// Set currency sign for specified field
+function setSign(obj, curr_id)
 {
-	var signobj = ge((isAmount=== true) ? 'amountsign' : 'chargesign');
+	var signobj = ge(obj);
 	if (signobj)
 		signobj.innerHTML = getCurrencySign(curr_id);
 }
@@ -389,8 +389,8 @@ function onChangeAcc()
 
 	updateExchAndRes();
 
-	setSign(false, trans_acc_curr);
-	setSign(true, trans_curr);
+	setSign('chargesign', trans_acc_curr);
+	setSign('amountsign', trans_curr);
 
 	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
 /*
@@ -632,8 +632,8 @@ function updControls()
 			transcurr.value = amountCurr;
 	}
 
-	setSign(false, chargeCurr);
-	setSign(true, amountCurr);
+	setSign('chargesign', chargeCurr);
+	setSign('amountsign', amountCurr);
 
 	setTileAccount('source_tile', src_acc);
 	setTileAccount('dest_tile', dest_acc);
@@ -1053,8 +1053,8 @@ function onChangeTransCurr()
 
 	trans_curr = amountCurr;
 
-	setSign(false, chargeCurr);
-	setSign(true, amountCurr);
+	setSign('chargesign', chargeCurr);
+	setSign('amountsign', amountCurr);
 
 	getValues();
 	setExchangeComment();
