@@ -575,8 +575,34 @@ function updControls()
 	{
 		if (!edit_mode)
 		{
+			tramount = (amount.value != '') ? amount.value : 0;
+			trcharge = 0;
+
 			charge.value = '';
-			resbal.value = '';
+			//resbal.value = '';
+
+			resbal.value = normalize(getBalanceOfAccount(src_acc));
+			resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
+
+			if (isTransfer() || isDebt())
+			{
+				var resbal_d = ge('resbal_d');
+				var resbal_d_b = ge('resbal_d_b');
+
+				if (!resbal_d || !resbal_d_b)
+					return;
+
+				if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
+				{
+					var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
+					resbal_d.value = normalize(fixedBalance + normalize(tramount));
+				}
+				else
+					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(tramount));
+
+				resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
+			}
+
 		}
 
 		chargeSwitch(true);
