@@ -656,9 +656,9 @@ class Transaction
 			html($resStr);
 
 			$resStr = "<div><span class=\"latest_sum\">";
-			if ($cur_trans_type == 1)			// expense
+			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
 				$resStr .= "- ";
-			else if ($cur_trans_type == 2)			// income
+			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
 				$resStr .= "+ ";
 
 			$resStr .= Currency::format($amount, $curr_id);
