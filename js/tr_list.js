@@ -109,7 +109,9 @@ function onTransClick(tr_id)
 	}
 }
 
-var multiTransDeleteMsg = 'Are you sure want to delete selected accounts?<br>Changes in the balance of affected accounts will be canceled.';
+var singleTransDeleteTitle = 'Delete transaction';
+var multiTransDeleteTitle = 'Delete transactions';
+var multiTransDeleteMsg = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 
 
@@ -148,7 +150,7 @@ function showDeletePopup()
 		return;
 
 	if (!dwPopup.create({ id : 'delete_warning',
-						title : 'Delete account',
+						title : (transactions.selectedCount() > 1) ? multiTransDeleteTitle : singleTransDeleteTitle,
 						msg : (transactions.selectedCount() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
 						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
 								cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
