@@ -333,6 +333,7 @@ function onNewAccountSubmit(frm)
 var multiAccDeleteMsg = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
 var singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
 var resetAccMsg = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
+var resetAllMsg = 'Are you sure to reset all your data?<br>Everything will be lost.';
 
 
 // Delete popup callback
@@ -420,6 +421,52 @@ function showResetAccountsPopup()
 						msg : resetAccMsg,
 						btn : { okBtn : { onclick : bind(onAccResetPopup, null, true) },
 								cancelBtn : { onclick : bind(onAccResetPopup, null, false) } }
+						}))
+	{
+		dwPopup = null;
+		return;
+	}
+
+	dwPopup.show();
+}
+
+
+// Reset accounts popup callback
+function onResetAllPopup(res)
+{
+	var resetall_form;
+
+	if (!dwPopup)
+		return;
+
+	dwPopup.close();
+	dwPopup = null;
+
+	if (res)
+	{
+		resetall_form = ge('resetall_form');
+		if (resetall_form)
+			resetall_form.submit();
+	}
+}
+
+
+// Create and show reset data all warning popup
+function showResetAllPopup()
+{
+	// check popup already created
+	if (dwPopup)
+		return;
+
+	dwPopup = new Popup();
+	if (!dwPopup)
+		return;
+
+	if (!dwPopup.create({ id : 'reset_warning',
+						title : 'Reset all data',
+						msg : resetAllMsg,
+						btn : { okBtn : { onclick : bind(onResetAllPopup, null, true) },
+								cancelBtn : { onclick : bind(onResetAllPopup, null, false) } }
 						}))
 	{
 		dwPopup = null;
