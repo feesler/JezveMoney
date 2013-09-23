@@ -24,7 +24,7 @@ function togglePerson(val)
 	else
 	{
 		personname.value = selectedText(personsel);
-		personid.value = personsel.selectedIndex;
+		personid.value = selectedValue(personsel);
 
 		show('personname_block', false);
 		show(personbtn, true);
