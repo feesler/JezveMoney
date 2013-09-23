@@ -39,8 +39,10 @@
 
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
+	html(getCSS("popup.css"));
 	html(getCSS("login.css"));
 	html(getJS("common.js"));
+	html(getJS("popup.js"));
 	html(getJS("main.js"));
 
 	html("<script>");
@@ -80,6 +82,17 @@
 					html("<div><a href=\"./profile.php?act=changepassword\">Change password</a></div>");
 				html_cl("</div>");
 			}
+
+			html();
+			html_op("<div>");
+				html("<h2>Reset data</h2>");
+				html_op("<div>");
+					html("<span>You also may reset all your accounts data.<br>");
+					html("<form id=\"resetacc_form\" method=\"post\" action=\"./modules/resetaccounts.php\">");
+					html("</form>");
+					html("<input class=\"btn ok_btn\" type=\"button\" onclick=\"showResetAccountsPopup();\" value=\"Reset\"></span>");
+				html_cl("</div>");
+			html_cl("</div>");
 
 		html_cl("</div>");
 
