@@ -202,6 +202,7 @@
 					html_cl("</div>");
 
 				$disp = (($person->getCount()) ? " style=\"display: none;\"" : "");
+				$btn_disp = (($person->getCount()) ? "" : " style=\"display: none;\"");
 				$p_inpType = (($person->getCount()) ? "hidden": "text");
 
 				html_op("<div id=\"personname_block\" class=\"person_input\"".$disp.">");
