@@ -71,7 +71,22 @@ function correctExch(val)
 // Calculate result balance by initial and charge off/receipt
 function f1()
 {
-	if (isIncome())
+	if (isDebt())
+	{
+		if (debtType)		// person give
+		{
+			S2 = fS1 - fa;
+			S2 = correct(S2);
+			fS2 = S2;
+		}
+		else				// person take
+		{
+			S2 = fS1 - fd;
+			S2 = correct(S2);
+			fS2 = S2;
+		}
+	}
+	else if (isIncome())
 		S2 = fS1 + fd;
 	else
 		S2 = fS1 - fd;
@@ -83,11 +98,26 @@ function f1()
 
 	fS2 = S2;
 
-	if (isTransfer() || isDebt())
+	if (isTransfer())
 	{
 		S2_d = fS1_d + fa;
 		S2_d = correct(S2_d);
 		fS2_d = S2_d;
+	}
+	else if (isDebt())
+	{
+		if (debtType)		// person give
+		{
+			S2_d = fS1_d + fd;
+			S2_d = correct(S2_d);
+			fS2_d = S2_d;
+		}
+		else				// person take
+		{
+			S2_d = fS1_d + fa;
+			S2_d = correct(S2_d);
+			fS2_d = S2_d;
+		}
 	}
 }
 
@@ -137,11 +167,26 @@ function f4()
 
 	fa = a;
 
-	if (isTransfer() || isDebt())
+	if (isTransfer())
 	{
 		S2_d = fS1_d + fa;
 		S2_d = correct(S2_d);
 		fS2_d = S2_d;
+	}
+	else if (isDebt())
+	{
+		if (debtType)		// person give
+		{
+			S2_d = fS1_d + fd;
+			S2_d = correct(S2_d);
+			fS2_d = S2_d;
+		}
+		else				// person take
+		{
+			S2_d = fS1_d + fa;
+			S2_d = correct(S2_d);
+			fS2_d = S2_d;
+		}
 	}
 }
 
@@ -839,6 +884,7 @@ function getValues()
 		return;
 
 	S1 = getBalanceOfAccount(selectedValue(accid));
+	S2 = ((isIncome()) ? resbal_d.value : resbal.value);
 	if (isTransfer())
 	{
 		S1_d = getBalanceOfAccount(selectedValue(ge('dest_id')));		// TODO: fix here
@@ -864,7 +910,6 @@ function getValues()
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
-	S2 = ((isIncome()) ? resbal_d.value : resbal.value);
 
 	s1valid = isValidValue(S1);
 	s2valid = isValidValue(S2);
@@ -922,24 +967,46 @@ function setValues()
 	exchrate.value = e;
 	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
 
-	if (isIncome())
+	if (isDebt())
+	{
+		if (debtType)		// person give to us
+		{
+			resbal.value = S2;
+			resbal_d.value = S2_d;
+		}
+		else				// person take from us
+		{
+			resbal_d.value = S2;
+			resbal.value = S2_d;
+		}
+	}
+	else if (isIncome())
 		resbal_d.value = S2;
 	else
 		resbal.value = S2;
 
-	if (isIncome())
+	if (isDebt())
+	{
+		if (debtType)
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
+		else
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
+	}
+	else if (isIncome())
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
-	else if (isDebt() && debtType == false)
-		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
 	else
 		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
 
-	if (isTransfer() || isDebt())
+	if (isTransfer())
 	{
-		if (isDebt() && debtType == false)
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, selCurrVal);
-		else
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
+	}
+	else if (isDebt())
+	{
+		if (debtType)		// person give
 			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
+		else				// person take
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, selCurrVal);
 	}
 }
 
