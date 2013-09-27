@@ -827,14 +827,15 @@ function isValidValue(val)
 // Get values of transaction from input fields
 function getValues()
 {
-	var accid, amount, charge, exchrate, resbal;
+	var accid, amount, charge, exchrate, resbal, resbal_d;
 
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
 	resbal = ge('resbal');
-	if (!accid || !amount || !charge || !exchrate || !resbal)
+	resbal_d = ge('resbal_d');
+	if (!accid || !amount || !charge || !exchrate || (!resbal && !resbal_d))
 		return;
 
 	S1 = getBalanceOfAccount(selectedValue(accid));
@@ -863,7 +864,7 @@ function getValues()
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
-	S2 = resbal.value;
+	S2 = ((isIncome()) ? resbal_d.value : resbal.value);
 
 	s1valid = isValidValue(S1);
 	s2valid = isValidValue(S2);
@@ -892,7 +893,7 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var amount, amount_b, charge, charge_b, exchrate, exchcomm, exchrate_b, resbal;
+	var amount, amount_b, charge, charge_b, exchrate, exchcomm, exchrate_b, resbal, resbal_d, resbal_b, resbal_d_b;
 	var selCurrVal;
 
 	amount = ge('amount');
@@ -903,8 +904,10 @@ function setValues()
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
 	resbal = ge('resbal');
+	resbal_d = ge('resbal_d');
 	resbal_b = ge('resbal_b');
-	if (!amount || !amount_b || !charge || !charge_b || !exchrate || !exchrate_b || !resbal || !resbal_b)
+	resbal_d_b = ge('resbal_d_b');
+	if (!amount || !amount_b || !charge || !charge_b || !exchrate || !exchrate_b || (!resbal && !resbal_d) || (!resbal_b && !resbal_d_b))
 		return;
 
 	amount.value = a;
@@ -919,19 +922,20 @@ function setValues()
 	exchrate.value = e;
 	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
 
-	resbal.value = S2;
+	if (isIncome())
+		resbal_d.value = S2;
+	else
+		resbal.value = S2;
 
-	if (isDebt() && debtType == false)
+	if (isIncome())
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
+	else if (isDebt() && debtType == false)
 		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
 	else
 		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
 
 	if (isTransfer() || isDebt())
 	{
-		var resbal_d_b = ge('resbal_d_b');
-		if (!resbal_d_b)
-			return;
-
 		if (isDebt() && debtType == false)
 			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, selCurrVal);
 		else
