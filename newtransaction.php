@@ -227,7 +227,7 @@ else
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div class=\"currency_block\">");
 					html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-						echo(Currency::getList($src["curr"]));
+						echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
 					html_cl("</select>");
 				html_cl("</div>");
 			html_cl("</div>");
