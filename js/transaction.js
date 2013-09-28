@@ -808,7 +808,7 @@ function setExchangeComment()
 
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
-	if (isExpense() || isIncome())
+	if (isExpense() || isIncome() || isDebt())
 		transcurr = ge('transcurr');
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	if (isTransfer())
@@ -988,9 +988,9 @@ function setValues()
 	if (isDebt())
 	{
 		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
 		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
 	}
 	else if (isIncome())
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
@@ -1157,6 +1157,18 @@ function onChangeTransCurr()
 
 	getValues();
 	setExchangeComment();
+
+	if (isDebt())
+	{
+		var resbal_b = ge('resbal_b');
+		if (!resbal_b)
+			return;
+
+		if (debtType)
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+		else
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+	}
 }
 
 
