@@ -110,11 +110,8 @@
 	html("<script>");
 	echo($acc->getArray());
 	echo(Currency::getArray(TRUE));
-	if ($trans_type == 1 || $trans_type == 2)
-	{
-		html("var trans_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
-		html("var trans_acc_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
-	}
+	html("var trans_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
+	html("var trans_acc_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
 
 	html("var trans_type = ".$trans_type.";");
 	html("var edit_mode = false;");
