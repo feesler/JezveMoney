@@ -150,7 +150,10 @@ class Transaction
 		// update balance of source account
 		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
 		{
-			$srcBalance -= $charge;
+			if ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id)))		// person give to us
+				$srcBalance -= $amount;
+			else
+				$srcBalance -= $charge;
 			if (!$acc->setBalance($src_id, $srcBalance))
 				return FALSE;
 		}
@@ -158,7 +161,10 @@ class Transaction
 		// update balance of destination account
 		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)
 		{
-			$destBalance += ($trans_type == 2) ? $charge : $amount;
+			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id))))		// income or person give to us
+				$destBalance += $charge;
+			else
+				$destBalance += $amount;
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
 		}
@@ -231,7 +237,11 @@ class Transaction
 		// update balance of source account
 		if ($transType == 1 || $transType == 3 || $transType == 4)		// spend, transfer or debt
 		{
-			$srcBalance += $transCharge;
+			if ($transType == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id)))		// person give to us
+				$srcBalance += $transAmount;
+			else
+				$srcBalance += $transCharge;
+
 			if (!$acc->setBalance($src_id, $srcBalance))
 				return FALSE;
 		}
@@ -239,7 +249,11 @@ class Transaction
 		// update balance of destination account
 		if ($transType == 2 || $transType == 3 || $transType == 4)		// income, transfer or debt
 		{
-			$destBalance -= ($transType == 2) ? $transCharge : $transAmount;
+			if (($transType == 2) || ($transType == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id))))		// income or person give to us
+				$destBalance -= $transCharge;
+			else
+				$destBalance -= $transAmount;
+
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
 		}
@@ -310,17 +324,25 @@ class Transaction
 			return FALSE;
 
 		// update balance of source account
-		if ($trans_type == 1 || $trans_type == 3)		// spend or transfer
+		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)				// spend, transfer or debt
 		{
-			$srcBalance -= $charge;
+			if ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id)))		// person give to us
+				$srcBalance -= $amount;
+			else
+				$srcBalance -= $charge;
+
 			if (!$acc->setBalance($src_id, $srcBalance))
 				return FALSE;
 		}
 
 		// update balance of destination account
-		if ($trans_type == 2 || $trans_type == 3)		// income or transfer
+		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)		// income, transfer or debt
 		{
-			$destBalance += (($trans_type == 2) ? $charge : $amount);
+			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id))))		// income or person give to us
+				$destBalance += $charge;
+			else
+				$destBalance += $amount;
+
 			if (!$acc->setBalance($dest_id, $destBalance))
 				return FALSE;
 		}
