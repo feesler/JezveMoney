@@ -227,7 +227,7 @@ class Transaction
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
-			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+			if ($transType == 3 || ($transType == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
 				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
