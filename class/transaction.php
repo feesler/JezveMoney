@@ -667,7 +667,10 @@ class Transaction
 			$resStr .= Currency::format($amount, $curr_id);
 			if ($charge != $amount)
 			{
-				$acc_curr = $acc->getCurrency(($cur_trans_type == 2) ? $dest_id : $src_id);
+				if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))
+					$acc_curr = $acc->getCurrency($dest_id);
+				else
+					$acc_curr = $acc->getCurrency($src_id);
 				$resStr .= " (".Currency::format($charge, $acc_curr).")";
 			}
 			$resStr .= "</span></div>";
