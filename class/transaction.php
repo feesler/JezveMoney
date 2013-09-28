@@ -122,7 +122,8 @@ class Transaction
 			if (!$acc->is_exist($dest_id))
 				return FALSE;
 			$destBalance = $acc->getBalance($dest_id);
-			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
+			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
 
@@ -220,7 +221,8 @@ class Transaction
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
-			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
+			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
 		if (!$trans_curr_id)
@@ -281,7 +283,8 @@ class Transaction
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
-			$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
+			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
 		if (!$trans_curr_id)
