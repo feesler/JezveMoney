@@ -883,28 +883,38 @@ function getValues()
 	if (!accid || !amount || !charge || !exchrate || (!resbal && !resbal_d))
 		return;
 
-	S1 = getBalanceOfAccount(selectedValue(accid));
-	S2 = ((isIncome()) ? resbal_d.value : resbal.value);
-	if (isTransfer())
+	if (isExpense())
 	{
+		S1 = getBalanceOfAccount(selectedValue(accid));
+		S2 = resbal.value;
+	}
+	else if (isIncome())
+	{
+		S1_d = getBalanceOfAccount(selectedValue(accid));
+		S2_d = resbal_d.value;
+	}
+	else if (isTransfer())
+	{
+		S1 = getBalanceOfAccount(selectedValue(accid));
+		S2 = resbal.value;
 		S1_d = getBalanceOfAccount(selectedValue(ge('dest_id')));		// TODO: fix here
-		S2_d = ge('resbal_d').value;
+		S2_d = resbal_d.value;
 	}
 	else if (isDebt())
 	{
 		if (debtType)	// person account is source
 		{
 			S1 = getCurPersonBalance(trans_curr);
-			S2 = ge('resbal').value;
+			S2 = resbal.value;
 			S1_d = getBalanceOfAccount(selectedValue(accid));
-			S2_d = ge('resbal_d').value;
+			S2_d = resbal_d.value;
 		}
 		else			// person account is destination
 		{
 			S1 = getBalanceOfAccount(selectedValue(accid));
-			S2 = ge('resbal').value;
+			S2 = resbal_d.value;
 			S1_d = getCurPersonBalance(trans_curr);
-			S2_d = ge('resbal_d').value;
+			S2_d = resbal.value;
 		}
 	}
 	a = amount.value;
