@@ -592,10 +592,11 @@ function setTileAccount(tile_id, acc_id)
 
 
 // Update controls of transfer transaction form
+/* TODO : don't calculate values here; we have getValues(), f1-5() */
 function updControls()
 {
 	var src, dest, acc, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
-	var src_acc, dest_acc, tramount, trcharge;
+	var src_acc, dest_acc, debt_acc, tramount, trcharge, selCurrVal;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -608,11 +609,13 @@ function updControls()
 	exchange = ge('exchange');
 	resbal = ge('resbal');
 	resbal_b = ge('resbal_b');
-	if ((!src || !dest && !acc) || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
+	if ((!src && !dest && !acc) || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
 		return;
 
 	src_acc = parseInt(selectedValue(src));
 	dest_acc = parseInt(selectedValue(dest));
+	debt_acc = parseInt(selectedValue(acc));
+	selCurrVal = getCurrencyOfAccount(isDebt() ? debt_acc : src_acc);
 
 	exchange.value = '';
 	isDiff = isDiffCurr();
@@ -667,9 +670,18 @@ function updControls()
 			resbal.value = normalize(fixedBalance - normalize(trcharge));
 		}
 		else
-			resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trcharge));
+		{
+			if (isDebt())
+			{
+				resbal.value = normalize(getCurPersonBalance(trans_curr) + normalize((debtType) ? -tramount : trcharge));
+			}
+			else
+			{
+				resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trcharge));
+			}
+		}
 
-		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
+		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, trans_curr);
 
 		if (isTransfer() || isDebt())
 		{
@@ -685,9 +697,18 @@ function updControls()
 				resbal_d.value = normalize(fixedBalance + normalize(tramount));
 			}
 			else
-				resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(tramount));
+			{
+				if (isDebt())
+				{
+					resbal_d.value = normalize(getBalanceOfAccount(debt_acc) + normalize(tramount));
+				}
+				else
+				{
+					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(tramount));
+				}
+			}
 
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, selCurrVal);
 		}
 
 		hideChargeAndExchange();
