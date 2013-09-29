@@ -1014,7 +1014,7 @@ function setValues()
 // Amount field input event handler
 function onAmountInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
 	if (evalid)
@@ -1032,7 +1032,7 @@ function onAmountInput()
 // Charge/receipt field input event handler
 function onChargeInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
 	f1();			// calculate S2
@@ -1048,7 +1048,7 @@ function onChargeInput()
 // Exchange rate field input event handler
 function onExchangeInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
 	if (avalid)
@@ -1066,7 +1066,7 @@ function onExchangeInput()
 // Result balance field input event handler
 function onResBalanceInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
 	f3();		// calculate d
@@ -1102,7 +1102,7 @@ function onFInput(obj)
 		onExchangeInput();
 	else if (obj.id == 'resbal')
 		onResBalanceInput();
-	else if (obj.id == 'resbal_d' && (isTransfer() || isDebt()))
+	else if (obj.id == 'resbal_d')
 		onResBalanceDestInput();
 
 	setValues();
