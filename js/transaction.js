@@ -438,12 +438,6 @@ function onChangeAcc()
 	setSign('amountsign', trans_curr);
 
 	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
-/*
-	if (isIncome())
-		setTileAccount('dest_tile', selectedValue(destid));
-	else
-		setTileAccount('source_tile', selectedValue(srcid));
-*/
 }
 
 
@@ -941,14 +935,14 @@ function getValues()
 	}
 	else if (isDebt())
 	{
-		if (debtType)	// person account is source
+		if (debtType)	// person give to us; person account is source
 		{
 			S1 = getCurPersonBalance(trans_curr);
 			S2 = resbal.value;
 			S1_d = getBalanceOfAccount(selectedValue(accid));
 			S2_d = resbal_d.value;
 		}
-		else			// person account is destination
+		else			// person take from us; person account is destination
 		{
 			S1 = getBalanceOfAccount(selectedValue(accid));
 			S2 = resbal_d.value;
@@ -1005,7 +999,7 @@ function setValues()
 		return;
 
 	amount.value = a;
-	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), trans_curr /*selectedValue(ge('transcurr')) */);
+	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), trans_curr);
 
 
 	selCurrVal = getCurrencyOfAccount(selectedValue(ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')));
@@ -1312,23 +1306,6 @@ function getCurPersonBalance(curr_id)
 // Person select event handler
 function onPersonSel(obj)
 {
-	var personname, personid, pbalance, resbal_b;
-
-	personname = ge('personname');
-	personid = ge('person_id');
-	resbal_b = ge('resbal_b');
-	if (!personname || !personid || !resbal_b)
-		return;
-	if (!obj || typeof(obj.selectedIndex) == "undefined" || obj.selectedIndex == -1)
-		return;
-/*
-	personname.value = selectedText(obj);
-	personid.value = selectedValue(obj);
-	pbalance = getPersonBalance(parseInt(personid.value));
-
-	setTileInfo(ge('person_tile'), personname.value, pbalance ? pbalance.join(',<br>') : '');
-*/
-
 	togglePerson(false);
 
 	updControls();

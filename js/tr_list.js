@@ -153,7 +153,7 @@ function showDeletePopup()
 						title : (transactions.selectedCount() > 1) ? multiTransDeleteTitle : singleTransDeleteTitle,
 						msg : (transactions.selectedCount() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
 						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
-								cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
 						}))
 	{
 		dwPopup = null;

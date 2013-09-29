@@ -35,14 +35,14 @@
 		fail();
 
 	$pers = new Person($user_id);
-	if (!$person_id)
+	if (!$person_id)		// id is zero, name specified: new person sent
 	{
 		$check_id = $pers->findByName($person_name);
 		if ($check_id != 0)
 			setLocation("../newdebt.php?act=fail&detail=person");
 		$person_id = $pers->create($person_name);
 	}
-	else if (!$pers->is_exist($person_id))
+	else if (!$pers->is_exist($person_id))		// id specified: person should exist
 	{
 		fail();
 	}

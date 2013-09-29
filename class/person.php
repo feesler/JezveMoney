@@ -269,9 +269,6 @@ class Person
 			{
 				$i++;
 
-				wlog("person: ".$row["name"]);
-
-
 				$pName = $row["name"];
 				$p_id = intval($row["id"]);
 
@@ -280,8 +277,6 @@ class Person
 				foreach($accArr as $accRow)
 				{
 					$curr_id = intval($accRow["curr_id"]);
-
-					wlog("account: ".$accRow["name"].", ".$accRow["balance"]." curr: ".$curr_id);
 
 					if (!isset($totalArr[$curr_id]))
 						$totalArr[$curr_id] = 0.0;

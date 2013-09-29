@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class User
 {
@@ -153,7 +153,7 @@ class User
 	}
 
 
-	// Set password hash for specified user
+	// Set owner person for specified user
 	public static function setOwner($user_id, $owner_id)
 	{
 		global $db;
@@ -167,7 +167,7 @@ class User
 	}
 
 
-	// Return password hash for specified user
+	// Return owner person of specified user
 	public static function getOwner($user_id)
 	{
 		global $db;
