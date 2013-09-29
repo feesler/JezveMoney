@@ -1009,7 +1009,7 @@ function setValues()
 
 	if (isTransfer())
 	{
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, trans_curr);
 	}
 	else if (isDebt())
 	{
