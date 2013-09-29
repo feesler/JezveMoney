@@ -136,13 +136,13 @@
 										array(4, "Debt", "./newdebt.php".$d_acc_par));
 				showSubMenu($trans_type, $newTransMenu);
 
-if (!$acc_count)
-{
-	html("<div class=\"align_block\"><span>You have no one account. Please create one.</span></div>");
-}
-else if ($acc_count < 2 && $trans_type == 3)
+if ($acc_count < 2 && $trans_type == 3)
 {
 	html("<div class=\"align_block\"><span>You need at lease two accounts for transfer.</span></div>");
+}
+else if (!$acc_count && $trans_type != 3)
+{
+	html("<div class=\"align_block\"><span>You have no one account. Please create one.</span></div>");
 }
 else
 {
