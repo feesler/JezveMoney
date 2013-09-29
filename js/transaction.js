@@ -708,8 +708,26 @@ function updControls()
 	setSign('res_currsign', chargeCurr);
 	setSign('res_currsign_d', amountCurr);
 
-	setTileAccount('source_tile', src_acc);
-	setTileAccount('dest_tile', dest_acc);
+	if (isDebt())
+	{
+		var personname, personid, pbalance;
+
+		personname = ge('personname');
+		personid = ge('person_id');
+		if (!personname || !personid)
+			return;
+
+		pbalance = getPersonBalance(parseInt(personid.value));
+
+		setTileInfo(ge('person_tile'), personname.value, pbalance ? pbalance.join(',<br>') : '');
+
+		setTileAccount('acc_tile', parseInt(selectedValue(acc)));
+	}
+	else
+	{
+		setTileAccount('source_tile', src_acc);
+		setTileAccount('dest_tile', dest_acc);
+	}
 
 	getValues();
 	setExchangeComment();
@@ -1282,12 +1300,13 @@ function onPersonSel(obj)
 		return;
 	if (!obj || typeof(obj.selectedIndex) == "undefined" || obj.selectedIndex == -1)
 		return;
-
+/*
 	personname.value = selectedText(obj);
 	personid.value = selectedValue(obj);
 	pbalance = getPersonBalance(parseInt(personid.value));
 
 	setTileInfo(ge('person_tile'), personname.value, pbalance ? pbalance.join(',<br>') : '');
+*/
 
 	togglePerson(false);
 
