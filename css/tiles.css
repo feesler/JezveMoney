@@ -1,4 +1,4 @@
-.tiles
+﻿.tiles
 {
 	display: block;
 	clear: both;
@@ -95,4 +95,5 @@ button.tilelink
 	top: 5px;
 	right: 5px;
 	font-size: 14px;
+	text-align: right;
 }
