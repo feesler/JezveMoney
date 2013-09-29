@@ -1171,6 +1171,7 @@ function onChangeTransCurr()
 	}
 
 	getValues();
+	updateExchAndRes();
 	setExchangeComment();
 
 	if (isDebt())
