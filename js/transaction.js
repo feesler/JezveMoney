@@ -1164,6 +1164,11 @@ function onChangeTransCurr()
 
 	setSign('chargesign', chargeCurr);
 	setSign('amountsign', amountCurr);
+	if (isDebt())
+	{
+		setSign('res_currsign', amountCurr);
+		setSign('res_currsign_d', chargeCurr);
+	}
 
 	getValues();
 	setExchangeComment();
