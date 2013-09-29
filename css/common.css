@@ -363,7 +363,7 @@ button::-moz-focus-inner
 }
 
 
-.trans_input > .currency_block
+.stretch_input > .currency_block
 {
 	padding: 0;
 }
