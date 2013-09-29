@@ -1,29 +1,6 @@
 ﻿var dwPopup;
 
 
-// Hide usem menu popup
-function hidePopup()
-{
-	show('menupopup', false);
-	setEmptyClick();
-}
-
-
-// Show/hide user menu by click
-function onUserClick()
-{
-	if (isVisible('menupopup'))
-	{
-		hidePopup();
-	}
-	else
-	{
-		show('menupopup', true);
-		setEmptyClick(hidePopup, 'userbtn');
-	}
-}
-
-
 // Log in form submit event handler
 function onLoginSubmit(frm)
 {

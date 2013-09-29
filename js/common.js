@@ -396,3 +396,26 @@ function setEmptyClick(callback, elem)
 		document.documentElement.onclick = ((callback) ? bind(onEmptyClick, null, callback, elem) : null);
 	}
 }
+
+
+// Hide usem menu popup
+function hidePopup()
+{
+	show('menupopup', false);
+	setEmptyClick();
+}
+
+
+// Show/hide user menu by click
+function onUserClick()
+{
+	if (isVisible('menupopup'))
+	{
+		hidePopup();
+	}
+	else
+	{
+		show('menupopup', true);
+		setEmptyClick(hidePopup, 'userbtn');
+	}
+}
