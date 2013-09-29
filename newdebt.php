@@ -271,8 +271,8 @@
 		html();
 		html_op("<div>");
 			$resStr = "<div><label for=\"amount\">Amount</label>";
-			$resStr .="<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"";
-			$resStr .= " style=\"display: none;\"><span>Select currency</span></button></div>";
+			$resStr .="<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\">";
+			$resStr .= "<span>Select currency</span></button></div>";
 			html($resStr);
 			html_op("<div>");
 				html("<div class=\"right_float\"><span id=\"amountsign\" class=\"curr_sign\">".$debtAcc["sign"]."</span></div>");
