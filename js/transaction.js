@@ -437,6 +437,19 @@ function onChangeAcc()
 	setSign('chargesign', trans_acc_curr);
 	setSign('amountsign', trans_curr);
 
+	if (isDebt())
+	{
+		var person_tile, personname, pbalance;
+
+		person_tile = ge('person_tile');
+		personname = ge('personname');
+		if (!person_tile || !personname)
+			return;
+
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname.value, formatCurrency(pbalance, trans_curr));
+	}
+
 	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
 }
 
@@ -730,16 +743,15 @@ function updControls()
 
 	if (isDebt())
 	{
-		var personname, personid, pbalance;
+		var person_tile, personname, pbalance;
 
+		person_tile = ge('person_tile');
 		personname = ge('personname');
-		personid = ge('person_id');
-		if (!personname || !personid)
+		if (!person_tile || !personname)
 			return;
 
-		pbalance = getPersonBalance(parseInt(personid.value));
-
-		setTileInfo(ge('person_tile'), personname.value, pbalance ? pbalance.join(',<br>') : '');
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname.value, formatCurrency(pbalance, trans_curr));
 
 		setTileAccount('acc_tile', parseInt(selectedValue(acc)));
 	}
