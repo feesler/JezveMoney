@@ -1226,9 +1226,16 @@ function onChangeTransCurr()
 
 	if (isDebt())
 	{
-		var resbal_b = ge('resbal_b');
-		if (!resbal_b)
+		var person_tile, personname, pbalance, resbal_b;
+
+		person_tile = ge('person_tile');
+		personname = ge('personname');
+		resbal_b = ge('resbal_b');
+		if (!person_tile || !personname || !resbal_b)
 			return;
+
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname.value, formatCurrency(pbalance, trans_curr));
 
 		if (debtType)
 			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
