@@ -612,17 +612,18 @@ function updControls()
 	debt_acc = parseInt(selectedValue(acc));
 	selCurrVal = getCurrencyOfAccount(isDebt() ? debt_acc : src_acc);
 
-	amountCurr = getCurrencyOfAccount(dest_acc);
-	chargeCurr = getCurrencyOfAccount(src_acc);
-
 	if (isTransfer())
 	{
+		amountCurr = getCurrencyOfAccount(dest_acc);
+		chargeCurr = getCurrencyOfAccount(src_acc);
 		transcurr.value = amountCurr;
 		trans_curr = amountCurr;
 	}
 	else if (isDebt())
 	{
 		trans_curr = selectedValue(transcurr);
+		amountCurr = trans_curr;
+		chargeCurr = getCurrencyOfAccount(debt_acc);
 	}
 
 	exchange.value = '';
