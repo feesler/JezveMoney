@@ -611,6 +611,21 @@ function updControls()
 	debt_acc = parseInt(selectedValue(acc));
 	selCurrVal = getCurrencyOfAccount(isDebt() ? debt_acc : src_acc);
 
+	amountCurr = getCurrencyOfAccount(dest_acc);
+	chargeCurr = getCurrencyOfAccount(src_acc);
+
+	if (isTransfer())
+	{
+		transcurr = ge('transcurr');
+		if (transcurr)
+			transcurr.value = amountCurr;
+		trans_curr = amountCurr;
+	}
+	else if (isDebt())
+	{
+		trans_curr = selectedValue(ge('transcurr'));
+	}
+
 	exchange.value = '';
 	isDiff = isDiffCurr();
 	if (isDiff)
@@ -706,16 +721,6 @@ function updControls()
 		}
 
 		hideChargeAndExchange();
-	}
-
-	amountCurr = getCurrencyOfAccount(dest_acc);
-	chargeCurr = getCurrencyOfAccount(src_acc);
-
-	if (isTransfer())
-	{
-		transcurr = ge('transcurr');
-		if (transcurr)
-			transcurr.value = amountCurr;
 	}
 
 	setSign('chargesign', chargeCurr);
