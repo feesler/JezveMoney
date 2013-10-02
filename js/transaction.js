@@ -383,8 +383,8 @@ function updateExchAndRes()
 	{
 		f5();
 		f1();
-		setValues();
 	}
+	setValues();
 }
 
 
