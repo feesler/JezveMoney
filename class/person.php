@@ -219,7 +219,7 @@ class Person
 			$curr_id = intval($row["curr_id"]);
 			$balance = floatval($row["balance"]);
 
-			$ind = 0;
+			$ind = NULL;
 			foreach($pArr as $pInd => $pVal)
 			{
 				if ($pVal[0] == $p_id)
@@ -229,7 +229,7 @@ class Person
 				}
 			}
 
-			if (!$ind)
+			if (is_null($ind))
 			{
 				$pArr[] = array();
 				$ind = count($pArr) - 1;
