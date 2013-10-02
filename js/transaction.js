@@ -602,7 +602,7 @@ function setTileAccount(tile_id, acc_id)
 /* TODO : don't calculate values here; we have getValues(), f1-5() */
 function updControls()
 {
-	var src, dest, acc, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, isDiff, transcurr;
+	var src, dest, acc, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, transcurr;
 	var src_acc, dest_acc, debt_acc, tramount, trcharge, selCurrVal;
 
 	src = ge('src_id');
@@ -634,14 +634,13 @@ function updControls()
 	}
 	else if (isDebt())
 	{
-		trans_curr = selectedValue(transcurr);
+		trans_curr = parseInt(selectedValue(transcurr));
 		amountCurr = trans_curr;
 		chargeCurr = getCurrencyOfAccount(debt_acc);
 	}
 
 	exchange.value = '';
-	isDiff = isDiffCurr();
-	if (isDiff)
+	if (amountCurr != chargeCurr)
 	{
 		if (!edit_mode)
 		{
