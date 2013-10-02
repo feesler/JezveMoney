@@ -603,7 +603,8 @@ function updControls()
 	exchange = ge('exchange');
 	resbal = ge('resbal');
 	resbal_b = ge('resbal_b');
-	if ((!src && !dest && !acc) || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b)
+	transcurr = ge('transcurr');
+	if ((!src && !dest && !acc) || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b || !transcurr)
 		return;
 
 	src_acc = parseInt(selectedValue(src));
@@ -616,14 +617,12 @@ function updControls()
 
 	if (isTransfer())
 	{
-		transcurr = ge('transcurr');
-		if (transcurr)
-			transcurr.value = amountCurr;
+		transcurr.value = amountCurr;
 		trans_curr = amountCurr;
 	}
 	else if (isDebt())
 	{
-		trans_curr = selectedValue(ge('transcurr'));
+		trans_curr = selectedValue(transcurr);
 	}
 
 	exchange.value = '';
