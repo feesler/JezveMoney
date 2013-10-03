@@ -473,6 +473,7 @@ function showCurrList()
 
 
 // Check selected currencies is different
+// TODO : remove this function
 function isDiffCurr()
 {
 	var src, dest;
@@ -1075,6 +1076,11 @@ function onAmountInput()
 {
 	if (!s1valid && !s1dvalid)
 		return;
+
+// TODO : try to input amount and charge independently and calculate exchange rate instead
+// ex.:
+// if (amountCurr != chargeCurr)
+// 	f5();
 
 	if (evalid)
 	{
