@@ -113,6 +113,31 @@ function onNewPersonSubmit(frm)
 	return true;
 }
 
+
+// Edit person form submit event handler
+function onEditPersonSubmit(frm)
+{
+	var pid, p_name;
+
+	if (!frm)
+		return false;
+
+	pid = ge('pid');
+	p_name = ge('pname');
+	if (!pid || !p_name)
+		return false;
+
+	if (!p_name.value || p_name.value == '')
+	{
+		alert('Please input person name.');
+		p_name.focus();
+		return false;
+	}
+
+	return true;
+}
+
+
 var singlePersonDeleteTitle = 'Delete person';
 var multiPersonsDeleteTitle = 'Delete persons';
 var multiPersonsDeleteMsg = 'Are you sure want to delete selected persons?<br>Debt operations will be converted into expense or income.';
