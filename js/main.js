@@ -1,4 +1,4 @@
-﻿var dwPopup;
+﻿var dwPopup;		// delete warning popup
 
 
 // Log in form submit event handler
@@ -207,7 +207,7 @@ function onTileClick(acc_id)
 }
 
 
-// Retunr sign of specified currency
+// Return sign of specified currency
 function getCurrencySign(curr_id)
 {
 	var currSign = '';

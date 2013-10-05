@@ -135,7 +135,7 @@ function onDeletePopup(res)
 }
 
 
-// Create and show account delete warning popup
+// Create and show transaction delete warning popup
 function showDeletePopup()
 {
 	if (transactions.selectedCount() == 0)
