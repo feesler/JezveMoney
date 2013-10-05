@@ -247,6 +247,64 @@ class Person
 	}
 
 
+	// Return HTML for person tile
+	public function getTileEx($tile_type, $person_id, $bal_corr, $tile_id = "")
+	{
+		if (!$this->is_exist($person_id))
+			return "";
+
+		if ($tile_id == "")
+			$tile_id = "p_".$person_id;
+
+		$b_corr = floatVal($bal_corr);
+
+		$acc_name = $this->getName($person_id);
+
+		$tile_act = NULL;
+		if ($tile_type == LINK_TILE)
+			$tile_act = "./newtransaction.php?type=debt";
+		else if ($tile_type == BUTTON_TILE)
+			$tile_act = "onTileClick(".$person_id.");";
+
+		return getTile($tile_type, $tile_id, $acc_name, "", $tile_act);
+	}
+
+
+	// Return HTML for person tile
+	public function getTile($tile_type, $person_id, $tile_id = "")
+	{
+		return $this->getTileEx($tile_type, $person_id, 0.0, $tile_id);
+	}
+
+
+	// Return HTML for persons of user
+	public function getTiles($buttons = FALSE)
+	{
+		global $db;
+
+		$resStr = "";
+
+		$tileType = ($buttons) ? BUTTON_TILE : LINK_TILE;
+
+		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
+		if (!count($resArr))
+		{
+			$resStr .= "<span>You have no one person. Please create one.</span>";
+		}
+		else
+		{
+			foreach($resArr as $row)
+			{
+				$p_id = intval($row["id"]);
+
+				$resStr .= $this->getTile($tileType, $p_id);
+			}
+		}
+
+		return $resStr;
+	}
+
+
 	// Return HTML for table of persons
 	public function getTable()
 	{
