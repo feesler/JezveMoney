@@ -78,6 +78,38 @@ class Person
 	}
 
 
+	// Delete person
+	public function del($p_id)
+	{
+		global $db;
+
+		if (!$p_id || !is_numeric($p_id))
+			return FALSE;
+		$p_id = intval($p_id);
+
+		// check person is exist
+		if (!$this->is_exist($p_id))
+			return FALSE;
+
+		// check user of person
+		if ($this->getUser($p_id) != $this->user_id)
+			return FALSE;
+
+		$acc = new Account($this->user_id, TRUE);
+		if (!$acc->onPersonDelete($p_id))
+		{
+			wlog("acc->onPersonDelete(".$p_id.") return FALSE");
+			return FALSE;
+		}
+
+		// delete person
+		if (!$db->deleteQ("persons", "user_id=".$this->user_id." AND id=".$p_id))
+			return FALSE;
+
+		return TRUE;
+	}
+
+
 	// Return count of persons of current user
 	public function getCount()
 	{
