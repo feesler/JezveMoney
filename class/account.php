@@ -215,6 +215,30 @@ class Account
 	}
 
 
+	// Remove accounts of specified person
+	public function onPersonDelete($p_id)
+	{
+		global $db;
+
+		if (!self::$full_list)
+			return FALSE;
+
+		if (!$this->checkCache())
+			return FALSE;
+
+		foreach(self::$cache as $acc_id => $row)
+		{
+			if ($row["owner_id"] == $p_id)
+			{
+				if (!$this->del($acc_id))
+					return FALSE;
+			}
+		}
+
+		return TRUE;
+	}
+
+
 	// Set new value of account
 	private function setValue($acc_id, $field, $newValue)
 	{
