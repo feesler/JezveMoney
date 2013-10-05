@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -21,6 +21,7 @@
 	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
 	html(getJS("common.js"));
+	html(getJS("persons.js"));
 
 	html("</head>");
 	html("<body>");
