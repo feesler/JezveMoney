@@ -392,7 +392,7 @@ class Account
 			return "";
 
 		$acc_onwer = $this->getOwner($acc_id);
-		if (self::$owner_id == $acc_onwer)
+		if (self::$owner_id == $acc_onwer || !self::$full_list)
 		{
 			return $this->getName($acc_id);
 		}
