@@ -138,6 +138,21 @@ class Person
 	}
 
 
+	// Return user of specified person
+	public function getUser($p_id)
+	{
+		global $db;
+
+		if (!$p_id || !is_numeric($p_id))
+			return 0;
+
+		$person_id = intval($p_id);
+
+		$resArr = $db->selectQ("user_id", "persons", "id=".$person_id);
+		return ((count($resArr) == 1) ? $resArr[0]["user_id"] : 0);
+	}
+
+
 	// Return account with specified currency or create new
 	public function getAccount($person_id, $curr_id)
 	{
