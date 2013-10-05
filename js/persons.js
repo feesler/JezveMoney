@@ -1,4 +1,4 @@
-var dwPopup;		// delete warning popup
+﻿var dwPopup;		// delete warning popup
 
 
 var persons =
@@ -89,6 +89,29 @@ function onTileClick(p_id)
 	}
 }
 
+
+// New person form submit event handler
+function onNewPersonSubmit(frm)
+{
+	var pid, p_name;
+
+	if (!frm)
+		return false;
+
+	pid = ge('pid');
+	p_name = ge('pname');
+	if (!pid || !p_name)
+		return false;
+
+	if (!p_name.value || p_name.value == '')
+	{
+		alert('Please input person name.');
+		p_name.focus();
+		return false;
+	}
+
+	return true;
+}
 
 var singlePersonDeleteTitle = 'Delete person';
 var multiPersonsDeleteTitle = 'Delete persons';
