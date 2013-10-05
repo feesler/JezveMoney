@@ -278,6 +278,8 @@ function onNewAccountSubmit(frm)
 }
 
 
+var singleAccDeleteTitle = 'Delete account';
+var multiAccDeleteTitle = 'Delete accounts';
 var multiAccDeleteMsg = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
 var singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
 var resetAccMsg = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
@@ -307,6 +309,8 @@ function onDeletePopup(res)
 // Create and show account delete warning popup
 function showDeletePopup()
 {
+	var multi;
+
 	if (accounts.selectedCount() == 0)
 		return;
 
@@ -318,9 +322,10 @@ function showDeletePopup()
 	if (!dwPopup)
 		return;
 
+	multi = (accounts.selectedCount() > 1);
 	if (!dwPopup.create({ id : 'delete_warning',
-						title : 'Delete account',
-						msg : (accounts.selectedCount() > 1) ? multiAccDeleteMsg : singleAccDeleteMsg,
+						title : (multi) ? multiAccDeleteTitle : singleAccDeleteTitle,
+						msg : (multi) ? multiAccDeleteMsg : singleAccDeleteMsg,
 						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
 								cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
 						}))
