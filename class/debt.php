@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 Class Debt
 {
@@ -41,12 +41,20 @@ Class Debt
 		if ($op == 1)		// give
 		{
 			$src_id = $person->getAccount($person_id, $curr_id);
+			if (!$src_id)
+				$src_id = $person->createAccount($person_id, $curr_id);
+			if (!$src_id)
+				return FALSE;
 			$dest_id = $account_id;
 		}
 		else if ($op == 2)	// take
 		{
 			$src_id = $account_id;
 			$dest_id = $person->getAccount($person_id, $curr_id);
+			if (!$dest_id)
+				$dest_id = $person->createAccount($person_id, $curr_id);
+			if (!$dest_id)
+				return FALSE;
 		}
 
 		$trans = new Transaction($this->user_id);

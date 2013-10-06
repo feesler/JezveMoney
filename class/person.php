@@ -198,23 +198,32 @@ class Person
 
 		$resArr = $db->selectQ("id", "accounts",
 							"user_id=".$this->user_id." AND owner_id=".$p_id." AND curr_id=".$c_id);
-		if (count($resArr) > 0)
-		{
-			return intval($resArr[0]["id"]);
-		}
-		else
-		{
-			$acc = new Account($this->user_id);
-			if (!$acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id))
-				return 0;
+		if (count($resArr) != 1)
+			return 0;
 
-			$resArr = $db->selectQ("id", "accounts",
-								"user_id=".$this->user_id." AND owner_id=".$person_id." AND curr_id=".$curr_id);
-			if (count($resArr) > 0)
-				return intval($resArr[0]["id"]);
-			else
-				return 0;
-		}
+		return intval($resArr[0]["id"]);
+	}
+
+
+	// Create account of specified currency for person
+	public function createAccount($person_id, $curr_id)
+	{
+		global $db;
+
+		if (!is_numeric($person_id) || !is_numeric($curr_id))
+			return 0;
+
+		$p_id = intval($person_id);
+		$c_id = intval($curr_id);
+		if (!$p_id || !$c_id)
+			return 0;
+
+		// check user of person
+		if ($this->getUser($p_id) != $this->user_id)
+			return FALSE;
+
+		$acc = new Account($this->user_id);
+		return $acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id));
 	}
 
 
