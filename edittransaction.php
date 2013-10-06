@@ -343,13 +343,15 @@
 	setTab(3);
 	html();
 	html_op("<div class=\"non_float\">");
-		html_op("<div id=\"date_block\">");
+		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
+		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink", $dateFmt));
+		html_op("<div id=\"date_block\" style=\"display: none;\">");
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
-				html("<div class=\"right_float\"><div id=\"calendar_btn\" class=\"iconlink form_iconlink\"><button type=\"button\" onclick=\"showCalendar();\"><div class=\"calendar\"></div><span style=\"display: none;\">Change date</span></button></div></div>");
+				html("<div class=\"right_float\"></div>");
 				html_op("<div class=\"stretch_input trans_input\">");
 					html_op("<div>");
-						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".(date("d.m.Y", strtotime($tr["date"])))."\">");
+						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".$dateFmt."\">");
 					html_cl("</div>");
 				html_cl("</div>");
 				html("<div id=\"calendar\" class=\"calWrap\" style=\"display: none;\"></div>");

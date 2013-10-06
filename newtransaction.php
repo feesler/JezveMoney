@@ -313,14 +313,15 @@ else
 
 	html();
 	html_op("<div class=\"non_float\">");
-		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink"));
+		$today = date("d.m.Y");
+		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink", $today));
 		html_op("<div id=\"date_block\" style=\"display: none;\">");
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
 				html("<div class=\"right_float\"></div>");
 				html_op("<div class=\"stretch_input trans_input\">");
 					html_op("<div>");
-						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".(date("d.m.Y"))."\">");
+						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".$today."\">");
 					html_cl("</div>");
 				html_cl("</div>");
 				html("<div id=\"calendar\" class=\"calWrap\" style=\"display: none;\"></div>");
