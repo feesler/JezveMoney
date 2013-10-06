@@ -8,7 +8,7 @@
 }
 
 
-.iconlink div
+.iconlink .icon
 {
 	width: 32px;
 	height: 32px;
@@ -33,6 +33,42 @@
 	font-weight: normal;
 	text-decoration: none;
 	text-transform: none;
+}
+
+
+.iconlink .icontitle
+{
+	float: left;
+}
+
+
+.iconlink .maintitle
+{
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 0px 0px 5px;
+	float: left;
+	white-space: nowrap;
+	font-size: 16px;
+	font-weight: normal;
+	text-decoration: none;
+	text-transform: none;
+
+	clear: both;
+}
+
+
+.iconlink .addtitle
+{
+	height: 12px;
+	line-height: 12px;
+	clear: both;
+	float : left;
+	padding: 0px 0px 0px 5px;
+	color: #20A0FF;
+	font-size: 10px;
+	font-weight: bold;
+	white-space: nowrap;
 }
 
 

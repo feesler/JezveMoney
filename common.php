@@ -235,7 +235,7 @@
 	define("ICON_BUTTON", 2, TRUE);
 
 	// Return markup for icon link element
-	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "", $add_class = "")
+	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "", $add_class = "", $addText = "")
 	{
 		$resStr = "";
 
@@ -260,9 +260,20 @@
 			$resStr .= "<button".$il_click." type=\"button\">";
 		}
 
-		$il_icon = ($iconClass && $iconClass != "") ? " class=\"".$iconClass."\"" : "";
+		$il_icon = ($iconClass && $iconClass != "") ? " class=\"icon ".$iconClass."\"" : "";
 		$resStr .= "<div".$il_icon."></div>";
-		$resStr .= "<span>".$text."</span>";
+
+		$resStr .= "<div class=\"icontitle\">";
+		if ($addText && $addText != "")
+		{
+			$resStr .= "<span class=\"maintitle\">".$text."</span><br>";
+			$resStr .= "<span class=\"addtitle\">".$addText."</span>";
+		}
+		else
+		{
+			$resStr .= "<span>".$text."</span>";
+		}
+		$resStr .= "</div>";
 
 		$resStr .= ($il_type == ICON_BUTTON) ? "</button>" : "</a>";
 		$resStr .= "</div>";
