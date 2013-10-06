@@ -399,12 +399,20 @@ class Person
 				}
 
 				$pBalance = "";
+				$noDebts = TRUE;
 				foreach($totalArr as $curr_id => $bal)
 				{
-					if ($pBalance != "")
-						$pBalance .= "<br>";
-					$pBalance .= Currency::format($bal, $curr_id);
+					if ($bal != 0.0)
+					{
+						$noDebts = FALSE;
+						if ($pBalance != "")
+							$pBalance .= "<br>";
+						$pBalance .= Currency::format($bal, $curr_id);
+					}
 				}
+
+				if ($noDebts)
+					$pBalance = "No debts";
 
 
 				$resStr = "<div class=\"latest";
