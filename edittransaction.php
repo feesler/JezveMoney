@@ -362,7 +362,7 @@
 
 	html();
 	html_op("<div class=\"non_float\">");
-		html("<div id=\"comm_btn\" class=\"iconlink form_iconlink\"".(($tr["comment"] == "") ? "" : " style=\"display: none;\"")."><button type=\"button\" onclick=\"showComment();\"><div class=\"add\"></div><span>Add comment</span></button></div>");
+		html(getIconLink(ICON_BUTTON, "comm_btn", "add", "Add comment", ($tr["comment"] == ""), "showComment();", "form_iconlink"));
 		html_op("<div id=\"comment_block\"".(($tr["comment"] != "") ? "" : " style=\"display: none;\"").">");
 			html("<div><label for=\"comm\">Comment</label></div>");
 			html_op("<div>");
