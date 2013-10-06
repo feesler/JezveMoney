@@ -108,7 +108,7 @@ class Account
 		global $db;
 
 		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
-			return FALSE;
+			return 0;
 
 		$owner_id = intval($owner_id);
 		$accname = $db->escape($accname);
@@ -116,15 +116,17 @@ class Account
 		$curr_id = intval($curr_id);
 
 		if (!$accname || $accname == "" || !$curr_id)
-			return FALSE;
+			return 0;
 
 		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name"),
 								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname)))
-			return FALSE;
+			return 0;
+
+		$acc_id = $db->insertId();
 
 		self::updateCache();
 
-		return TRUE;
+		return $acc_id;
 	}
 
 
