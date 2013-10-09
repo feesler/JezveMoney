@@ -74,17 +74,9 @@ function f1()
 	if (isDebt())
 	{
 		if (debtType)		// person give
-		{
 			S2 = fS1 - fa;
-			S2 = correct(S2);
-			fS2 = S2;
-		}
 		else				// person take
-		{
 			S2 = fS1 - fd;
-			S2 = correct(S2);
-			fS2 = S2;
-		}
 	}
 	else if (isIncome())
 		S2_d = fS1_d + fd;
@@ -94,34 +86,29 @@ function f1()
 	if (edit_mode)
 		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
 
-	S2 = correct(S2);
-
-	fS2 = S2;
-
 	if (isTransfer())
 	{
 		S2_d = fS1_d + fa;
-		S2_d = correct(S2_d);
-		fS2_d = S2_d;
 	}
 	else if (isDebt())
 	{
 		if (debtType)		// person give
-		{
 			S2_d = fS1_d + fd;
-			S2_d = correct(S2_d);
-			fS2_d = S2_d;
-		}
 		else				// person take
-		{
 			S2_d = fS1_d + fa;
-			S2_d = correct(S2_d);
-			fS2_d = S2_d;
-		}
 	}
 
-	S2_d = correct(S2_d);
-	fS2_d = S2_d
+	if (isExpense() || isTransfer() || isDebt())
+	{
+		S2 = correct(S2);
+		fS2 = S2;
+	}
+
+	if (isIncome() || isTransfer() || isDebt())
+	{
+		S2_d = correct(S2_d);
+		fS2_d = S2_d;
+	}
 }
 
 
