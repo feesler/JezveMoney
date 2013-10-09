@@ -152,31 +152,25 @@ function f3_d()
 function f4()
 {
 	a = fd / fe;
-
 	a = correct(a);
-
 	fa = a;
 
 	if (isTransfer())
 	{
 		S2_d = fS1_d + fa;
-		S2_d = correct(S2_d);
-		fS2_d = S2_d;
 	}
 	else if (isDebt())
 	{
 		if (debtType)		// person give
-		{
 			S2_d = fS1_d + fd;
-			S2_d = correct(S2_d);
-			fS2_d = S2_d;
-		}
 		else				// person take
-		{
 			S2_d = fS1_d + fa;
-			S2_d = correct(S2_d);
-			fS2_d = S2_d;
-		}
+	}
+
+	if (isTransfer() || isDebt())
+	{
+		S2_d = correct(S2_d);
+		fS2_d = S2_d;
 	}
 }
 
