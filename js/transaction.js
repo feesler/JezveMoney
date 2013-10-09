@@ -119,6 +119,9 @@ function f1()
 			fS2_d = S2_d;
 		}
 	}
+
+	S2_d = correct(S2_d);
+	fS2_d = S2_d
 }
 
 
