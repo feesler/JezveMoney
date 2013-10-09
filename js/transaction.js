@@ -71,55 +71,35 @@ function correctExch(val)
 // Calculate result balance by initial and charge off/receipt
 function f1()
 {
+	// calculate S2
 	if (isDebt())
-	{
-		if (debtType)		// person give
-			S2 = fS1 - fa;
-		else				// person take
-			S2 = fS1 - fd;
-	}
-	else if (isIncome())
-		S2_d = fS1_d + fd;
-	else
+		S2 = fS1 - ((debtType) ? fa : fd);
+	else if (isExpense() || isTransfer())
 		S2 = fS1 - fd;
 
 	if (edit_mode)
 		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
 
-	if (isTransfer())
-	{
-		S2_d = fS1_d + fa;
-	}
-	else if (isDebt())
-	{
-		if (debtType)		// person give
-			S2_d = fS1_d + fd;
-		else				// person take
-			S2_d = fS1_d + fa;
-	}
-
 	if (isExpense() || isTransfer() || isDebt())
-	{
-		S2 = correct(S2);
-		fS2 = S2;
-	}
+		fS2 = S2 = correct(S2);
+
+	// calculate S2_d
+	if (isIncome())
+		S2_d = fS1_d + fd;
+	else if (isTransfer())
+		S2_d = fS1_d + fa;
+	else if (isDebt())
+		S2_d = fS1_d + ((debtType) ? fd : fa);
 
 	if (isIncome() || isTransfer() || isDebt())
-	{
-		S2_d = correct(S2_d);
-		fS2_d = S2_d;
-	}
+		fS2_d = S2_d = correct(S2_d);
 }
 
 
 // Calculate charge off/receipt amount by transaction amount and exchange rate
 function f2()
 {
-	d = fa * fe;
-
-	d = correct(d);
-
-	fd = d;
+	fd = d = correct(fa * fe);
 }
 
 
@@ -131,58 +111,36 @@ function f3()
 	else
 		d = fS1 - fS2;
 
-	d = correct(d);
-
-	fd = d;
+	fd = d = correct(d);
 }
 
 
 // Calculate amount amount by initial and result balance of destination account
 function f3_d()
 {
-	a = fS2_d - fS1_d;
-
-	a = correct(a);
-
-	fa = a;
+	fa = a = correct(fS2_d - fS1_d);
 }
 
 
 // Calculate transaction amount by charge off/receipt and exchange rate
 function f4()
 {
-	a = fd / fe;
-	a = correct(a);
-	fa = a;
+	fa = a = correct(fd / fe);
 
 	if (isTransfer())
-	{
 		S2_d = fS1_d + fa;
-	}
 	else if (isDebt())
-	{
-		if (debtType)		// person give
-			S2_d = fS1_d + fd;
-		else				// person take
-			S2_d = fS1_d + fa;
-	}
+		S2_d = fS1_d + ((debtType) ? fd : fa);
 
 	if (isTransfer() || isDebt())
-	{
-		S2_d = correct(S2_d);
-		fS2_d = S2_d;
-	}
+		fS2_d = S2_d = correct(S2_d);
 }
 
 
 // Calculate exchange rate by charge off/receipt and transaction amount
 function f5()
 {
-	e = fd / fa;
-
-	e = correctExch(e);
-
-	fe = e;
+	fe = e = correctExch(fd / fa);
 }
 
 
