@@ -1,4 +1,4 @@
-var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+﻿var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 var weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 
@@ -62,7 +62,8 @@ function getMonthBtn(month, year, isPrev)
 {
 	return ce('button', { className : 'pnMonthBtn',
 					type : 'button',
-					onclick  : bind(createCalendar, null, 1, month, year) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+//					onclick  : bind(createCalendar, null, 1, month, year) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+					onclick  : schedule(bind(createCalendar, null, 1, month, year)) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
 }
 
 
@@ -307,5 +308,5 @@ function showCalendar()
 
 	setCalendarIconLink(false);
 
-	setEmptyClick(hideCalendar, 'calendar_btn');
+	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn']);
 }
