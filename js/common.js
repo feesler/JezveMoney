@@ -406,12 +406,6 @@ function onEmptyClick(callback, elem)
 		return;
 	e = fixEvent(event);
 
-/*
-	elem = ge(elem) || null;
-
-	if ((elem && (e.target != elem && e.target.parentNode != elem)) || !elem)
-*/
-
 	if (!isArray(elem))
 		elem = [elem];
 

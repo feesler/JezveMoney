@@ -62,7 +62,6 @@ function getMonthBtn(month, year, isPrev)
 {
 	return ce('button', { className : 'pnMonthBtn',
 					type : 'button',
-//					onclick  : bind(createCalendar, null, 1, month, year) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
 					onclick  : schedule(bind(createCalendar, null, 1, month, year)) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
 }
 
