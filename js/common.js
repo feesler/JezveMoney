@@ -369,6 +369,13 @@ function fixEvent(e, _this)
 }
 
 
+// Return wrapper to schedule specified function for execution after current script
+function schedule(func)
+{
+	return bind(setTimeout, null, func, 0);
+}
+
+
 // Handler for click on empty space event
 function onEmptyClick(callback, elem)
 {
