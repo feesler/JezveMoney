@@ -319,6 +319,26 @@ function insertAfter(elem, refElem)
 }
 
 
+// Check specified element is child of specified
+function isChild(elem, refElem)
+{
+	var curParent = null;
+
+	if (!elem || !refElem)
+		return false;
+
+	curParent = elem.parentNode;
+	while(curParent)
+	{
+		if (curParent != refElem)
+			break;
+		curParent = curParent.parentNode;
+	}
+
+	return (curParent == refElem);
+}
+
+
 // Remove all child nodes of specified element
 function removeChilds(obj)
 {
