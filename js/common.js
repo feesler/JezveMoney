@@ -455,6 +455,6 @@ function onUserClick()
 	else
 	{
 		show('menupopup', true);
-		setEmptyClick(hidePopup, 'userbtn');
+		setEmptyClick(hidePopup, ['menupopup', 'userbtn']);
 	}
 }
