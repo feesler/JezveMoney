@@ -111,7 +111,12 @@ function f3()
 	else
 		d = fS1 - fS2;
 
-	fd = d = correct(d);
+	d = correct(d);
+
+	if (edit_mode)
+		d += (isIncome()) ? -transaction.charge : transaction.charge;
+
+	fd = d;
 }
 
 
