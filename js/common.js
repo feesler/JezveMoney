@@ -330,7 +330,7 @@ function isChild(elem, refElem)
 	curParent = elem.parentNode;
 	while(curParent)
 	{
-		if (curParent != refElem)
+		if (curParent == refElem)
 			break;
 		curParent = curParent.parentNode;
 	}
