@@ -66,6 +66,15 @@
 	$acc_id = 0;
 	if (isset($_GET["acc_id"]))
 		$acc_id = intval($_GET["acc_id"]);
+
+	if ($trans_type == 4)
+	{
+		$newDebtLocation = "./newdebt.php";
+		if (!$acc_id || !$acc->is_exist($acc_id))
+			$newDebtLocation .= "?acc_id=".$acc_id;
+		setLocation($newDebtLocation);
+	}
+
 	if (!$acc_id || !$acc->is_exist($acc_id))		// TODO : think about redirect or warning message
 		$acc_id = $acc->getIdByPos(0);
 	if (!$acc_id)
