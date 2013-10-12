@@ -267,11 +267,12 @@
 
 		html();
 		html_op("<div>");
-			echo($tabStr."<div><label for=\"amount\">Amount</label>");
-			echo("<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"");
+			$resStr = "<div><label for=\"amount\">Amount</label>";
+			$resStr .= "<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\"";
 			if ($trans_type == 3)
-				echo(" style=\"display: none;\"");
-			echo("><span>Select currency</span></button></div>\r\n");
+				$resStr .= " style=\"display: none;\"";
+			$resStr .= "><span>Select currency</span></button></div>";
+			html($resStr);
 			html_op("<div>");
 				html("<div class=\"right_float\"><span id=\"amountsign\" class=\"curr_sign\">".$amount_sign."</span></div>");
 				html_op("<div class=\"stretch_input trans_input\">");

@@ -86,7 +86,6 @@
 	wlog("fperson_acc = ".$fperson_acc);
 	wlog("fperson_balance = ".$fperson_balance);
 
-	$titleString = "jezve Money - New debt";
 	if ($give)
 		$accLbl = "Destination account";
 	else
@@ -271,7 +270,7 @@
 		html();
 		html_op("<div>");
 			$resStr = "<div><label for=\"amount\">Amount</label>";
-			$resStr .="<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\">";
+			$resStr .= "<button id=\"ancurrbtn\" class=\"dashed_btn curr_btn\" type=\"button\" onclick=\"showCurrList();\">";
 			$resStr .= "<span>Select currency</span></button></div>";
 			html($resStr);
 			html_op("<div>");
