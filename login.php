@@ -35,9 +35,9 @@
 			html_op("<div class=\"box\">");
 				html("<h1>Log in</h1>");
 				html("<label for=\"login\">Username</label>");
-				html("<div class=\"stretch_input profile_input\"><div><input id=\"login\" name=\"login\" type=\"text\"></div></div>");
+				html("<div class=\"stretch_input std_input\"><div><input id=\"login\" name=\"login\" type=\"text\"></div></div>");
 				html("<label for=\"password\">Password</label>");
-				html("<div class=\"stretch_input profile_input\"><div><input id=\"password\" name=\"password\" type=\"password\"></div></div>");
+				html("<div class=\"stretch_input std_input\"><div><input id=\"password\" name=\"password\" type=\"password\"></div></div>");
 				html("<div class=\"login_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"Log in\"><span class=\"alter_link\"><a href=\"./register.php\">Register</a></span></div>");
 			html_cl("</div>");
 		html_cl("</div>");

@@ -21,6 +21,7 @@
 	max-width: 400px;
 	min-width: 130px;
 	margin: 0 auto;
+	padding: 0px 12px;
 }
 
 
@@ -45,16 +46,7 @@
 
 .login_controls
 {
-	padding: 5px;
-}
-
-
-.login_page label
-{
-	width: 150px;
-	height: 20px;
-	line-height: 20px;
-	padding: 0px 5px;
+	padding: 5px 0px;
 }
 
 
@@ -77,19 +69,10 @@
 }
 
 
-.register_page label
-{
-	width: 150px;
-	height: 20px;
-	line-height: 20px;
-	padding: 0px 5px;
-}
-
-
 /* page header */
 .box > h1
 {
-	margin: 0px 3px 10px 3px;
+	margin: 0px 0px 10px 0px;
 }
 
 
