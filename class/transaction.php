@@ -269,7 +269,7 @@ class Transaction
 	{
 		global $db;
 
-		if (!$trans_id || ($trans_type != 1 && $trans_type != 2 && $trans_type != 3) || (!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trans_date == -1)
+		if (!$trans_id || ($trans_type != 1 && $trans_type != 2 && $trans_type != 3 && $trans_type != 4) || (!$src_id && !$dest_id) || $amount == 0.0 || $charge == 0.0 || $trans_date == -1)
 			return FALSE;
 
 		// cancel transaction
