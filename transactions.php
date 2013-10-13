@@ -53,8 +53,8 @@
 
 	require_once("./templates/header.php");
 
-	html_op("<div class=\"trans_cont\">");
-		html_op("<div>");
+	html_op("<div class=\"content\">");
+		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"heading\">");
 				html("<h1>Transactions</h1>");
 				html(getIconLink(ICON_LINK, "add_btn", "add", "New", TRUE, "./newtransaction.php"));

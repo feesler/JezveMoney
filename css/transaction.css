@@ -93,65 +93,10 @@
 }
 
 
-/* Dashed static block for input */
-.trans_input > .dashed_static
-{
-	text-align: right;
-	height: 34px;
-	padding: 0;
-}
-
-
-.trans_input > .dashed_static > div
-{
-	padding: 2px 5px;
-	height: 28px;
-	border: 1px dashed #0072C6;
-	cursor: pointer;
-}
-
-
-.trans_input > .dashed_static > div > span
-{
-	height: 26px;
-	line-height: 26px;
-}
-
-
 /* Transactions page content */
-.trans_cont
-{
-	margin: 55px auto 0px auto;
-	max-width: 800px;
-	min-width: 200px;
-	z-index: 1;
-}
-
-
-.trans_cont > div
-{
-	display: block;
-	float: none;
-	clear: both;
-	margin: 30px 25px 5px 25px;
-}
-
-
-.trans_cont > div > div
-{
-	clear: both;
-}
-
-
-.trans_cont > div > div > h1
-{
-	margin: 2px 5px;
-}
-
-
 .trans_list
 {
-	margin: 2px 5px;
+	clear: both;
 }
 
 
