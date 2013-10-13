@@ -93,12 +93,6 @@
 }
 
 
-.profile_input
-{
-	padding: 8px 5px;
-}
-
-
 /* alternative link */
 .alter_link
 {
@@ -109,8 +103,7 @@
 /* profile */
 .profile_summary
 {
-	margin: 20px 5px 5px 30px;
-	max-width: 300px;
+	padding: 0px 12px;
 }
 
 
