@@ -172,7 +172,7 @@ button::-moz-focus-inner
 {
 	display: inline-block;
 	height: 50px;
-	padding: 0px 30px;
+	padding: 0px 12px;
 }
 
 
@@ -195,7 +195,6 @@ button::-moz-focus-inner
 .logo > a
 {
 	text-decoration: none;
-	padding: 0px 30px;
 }
 
 
@@ -392,9 +391,7 @@ button::-moz-focus-inner
 
 .content_wrap
 {
-	min-width: 150px;
-	max-width: 600px;
-	margin: 30px 5px 5px 25px;
+	margin: 0px 12px;
 }
 
 
@@ -402,7 +399,7 @@ button::-moz-focus-inner
 {
 	font-size: 20px;
 	font-weight: normal;
-	margin: 2px 5px;
+	padding: 2px 0px;
 }
 
 
@@ -411,7 +408,6 @@ button::-moz-focus-inner
 	width: 150px;
 	height: 20px;
 	line-height: 20px;
-	padding: 0px 5px;
 	font-size: 16px;
 }
 
@@ -424,7 +420,7 @@ button::-moz-focus-inner
 
 .acc_controls
 {
-	padding: 5px;
+	padding: 5px 0px;
 	clear: both;
 }
 
@@ -494,7 +490,7 @@ button::-moz-focus-inner
 /* sub menu header */
 .subHeader
 {
-	margin: 10px 5px;
+	padding: 10px 0px;
 	font-size: 16px;
 }
 

@@ -19,7 +19,7 @@
 
 .form_iconlink
 {
-	margin: 9px 5px;
+	margin: 9px 0px;
 }
 
 
@@ -48,7 +48,7 @@
 	width: 100px;
 	height: 100px;
 	float: left;
-	padding: 8px 5px;
+	padding: 8px 5px 8px 0px;
 }
 
 
@@ -79,7 +79,7 @@
 /* text input controls */
 .trans_input
 {
-	padding: 8px 5px;
+	padding: 8px 0px;
 }
 
 
