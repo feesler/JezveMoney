@@ -91,6 +91,9 @@
 	$tr = getTransProperties($trans_id);
 	$trans_type = $tr["type"];			// TODO : temporarily
 
+	if ($trans_type == 4)
+		setLocation("./editdebt.php?id=".$trans_id);
+
 	$acc_count = $acc->getCount($trans_id);
 
 	// get information about source and destination accounts
