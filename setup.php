@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	$dev = TRUE;
 
 	$docroot = $_SERVER["DOCUMENT_ROOT"];
@@ -23,11 +23,13 @@
 
 	$sitetheme = 1;
 
+	require_once($docroot.$rootdir."dbsetup.php");
+
 	$db = new mysqlDB();
-	if (!$db->connect("localhost", "feesler", "jqmWFX6wEp3ruU"))
+	if (!$db->connect($db_location, $db_user, $db_password))
 		exit();
 
-	if (!$db->selectDB("feesler"))
+	if (!$db->selectDB($db_name))
 		exit();
 
 	$db->rawQ("SET NAMES 'utf8';");
