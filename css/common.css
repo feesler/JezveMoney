@@ -492,6 +492,7 @@ button::-moz-focus-inner
 {
 	padding: 10px 0px;
 	font-size: 16px;
+	clear: both;
 }
 
 
