@@ -101,12 +101,6 @@
 
 
 /* profile */
-.profile_summary
-{
-	padding: 0px 12px;
-}
-
-
 .profile_summary > h1
 {
 	margin: 0px 0px 10px 0px;
@@ -132,8 +126,3 @@
 	font-size: 16px;
 }
 
-
-.profile_controls
-{
-	padding: 5px;
-}
