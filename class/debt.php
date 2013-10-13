@@ -63,6 +63,49 @@ Class Debt
 	}
 
 
+	// Update debt operation
+	public function edit($trans_id, $op, $acc_id, $p_id, $amount, $charge, $curr_id, $tr_date, $comment)
+	{
+		if (!is_numeric($trans_id) || !is_numeric($acc_id) || !is_numeric($p_id) || !is_numeric($curr_id))
+			return FALSE;
+
+		$tr_id = intval($trans_id);
+		$account_id = intval($acc_id);
+		$person_id = intval($p_id);
+		$curr_id = intval($curr_id);
+
+		if (!$tr_id || !$account_id || !$person_id || !$curr_id)
+			return FALSE;
+
+		$person = new Person($this->user_id);
+		if (!$person->is_exist($person_id))
+			return FALSE;
+
+		$p_acc = $person->getAccount($person_id, $curr_id);
+		if (!$p_acc)
+			$p_acc = $person->createAccount($person_id, $curr_id);
+		if (!$p_acc)
+			return FALSE;
+
+		if ($op == 1)		// give
+		{
+			$src_id = $p_acc;
+			$dest_id = $account_id;
+		}
+		else if ($op == 2)	// take
+		{
+			$src_id = $account_id;
+			$dest_id = $p_acc;
+		}
+
+		$trans = new Transaction($this->user_id);
+		if (!$trans->edit($tr_id, 4, $src_id, $dest_id, $amount, $charge, $curr_id, $tr_date, $comment))
+			return FALSE;
+
+		return TRUE;
+	}
+
+
 	// Return table of current debts
 	public function getTable()
 	{
