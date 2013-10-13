@@ -120,9 +120,10 @@
 /* Transactions page content */
 .trans_cont
 {
-	margin-top: 55px;
+	margin: 55px auto 0px auto;
+	max-width: 800px;
+	min-width: 200px;
 	z-index: 1;
-	max-width: 600px;
 }
 
 

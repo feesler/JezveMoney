@@ -155,12 +155,20 @@ button::-moz-focus-inner
 
 .header > div
 {
+	margin: 0 auto;
+	max-width: 800px;
+	min-width: 200px;
+}
+
+
+.header > div > div 
+{
 	height: 50px;
 }
 
 
-.header > div > a,
-.header > div > button
+.header > div > div > a,
+.header > div > div > button
 {
 	display: inline-block;
 	height: 50px;
@@ -168,8 +176,8 @@ button::-moz-focus-inner
 }
 
 
-.header > div > a > span,
-.header > div > button > span
+.header > div > div > a > span,
+.header > div > div > button > span
 {
 	line-height: 50px;
 	color: #FFFFFF;
@@ -209,6 +217,7 @@ button::-moz-focus-inner
 .userblock
 {
 	float: right;
+	position: relative;
 }
 
 
@@ -282,7 +291,9 @@ button::-moz-focus-inner
 /* content */
 .content
 {
-	margin-top: 55px;
+	margin: 55px auto 0px auto;
+	max-width: 800px;
+	min-width: 200px;
 	z-index: 1;
 }
 
@@ -372,7 +383,9 @@ button::-moz-focus-inner
 /* very similar to .tr_content in transaction.css */
 .form_content
 {
-	margin-top: 55px;
+	margin: 55px auto 0px auto;
+	max-width: 800px;
+	min-width: 200px;
 	z-index: 1;
 }
 

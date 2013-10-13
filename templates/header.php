@@ -1,6 +1,7 @@
 ﻿<?php
 	html_op("<div class=\"header\">");
-		html("<div class=\"logo\"><a href=\"./index.php\"><span>Jezve Money</span></a></div>");
+		html_op("<div>");
+			html("<div class=\"logo\"><a href=\"./index.php\"><span>Jezve Money</span></a></div>");
 
 	if ($user_id != 0)
 	{
@@ -19,5 +20,6 @@
 		html_cl("</div>");
 	}
 
+		html_cl("</div>");
 	html_cl("</div>");
 ?>
