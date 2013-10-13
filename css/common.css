@@ -112,7 +112,7 @@ select
 /* standard for text input controls */
 .std_input
 {
-	padding: 8px 5px;
+	padding: 8px 0px;
 }
 
 
