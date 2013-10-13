@@ -29,7 +29,7 @@
 	require_once("./templates/header.php");
 
 	html("<form method=\"post\" action=\"./modules/createperson.php\" onsubmit=\"return onNewPersonSubmit(this);\">");
-	html_op("<div class=\"form_content acc_content\">");
+	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new person</h2>");
 			html_op("<div>");

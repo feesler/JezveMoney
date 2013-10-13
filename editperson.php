@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -44,7 +44,7 @@
 
 	html("<form method=\"post\" action=\"./modules/editperson.php\" onsubmit=\"return onEditPersonSubmit(this);\">");
 	html("<input id=\"pid\" name=\"pid\" type=\"hidden\" value=\"".$p_id."\">");
-	html_op("<div class=\"form_content acc_content\">");
+	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Edit person</h2>");
 			html_op("<div>");

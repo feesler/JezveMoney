@@ -39,7 +39,7 @@
 	require_once("./templates/header.php");
 
 	html("<form method=\"post\" action=\"./modules/createaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
-	html_op("<div class=\"form_content acc_content\">");
+	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new account</h2>");
 			html_op("<div>");

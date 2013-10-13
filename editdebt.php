@@ -182,7 +182,7 @@
 	html("<input name=\"transid\" type=\"hidden\" value=\"".$tr["id"]."\">");
 	html("<input name=\"transtype\" type=\"hidden\" value=\"".$tr["type"]."\">");
 
-	html_op("<div class=\"form_content\">");
+	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Edit debt</h2>");
 			html_op("<div>");

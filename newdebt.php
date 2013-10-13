@@ -131,7 +131,7 @@
 
 	html("<form method=\"post\" action=\"./modules/debt.php\" onsubmit=\"return onDebtSubmit(this);\">");
 
-	html_op("<div class=\"form_content\">");
+	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new debt</h2>");
 			html_op("<div>");

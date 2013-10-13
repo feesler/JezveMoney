@@ -54,7 +54,7 @@
 
 	require_once("./templates/header.php");
 
-	html_op("<div class=\"form_content\">");
+	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap profile_summary\">");
 			html("<h1>User profile</h1>");
 			html_op("<div>");

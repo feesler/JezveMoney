@@ -53,7 +53,7 @@
 
 	html("<form method=\"post\" action=\"./modules/editaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
 	html("<input id=\"accid\" name=\"accid\" type=\"hidden\" value=\"".$acc_id."\">");
-	html_op("<div class=\"form_content acc_content\">");
+	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Edit account</h2>");
 			html_op("<div>");
