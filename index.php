@@ -35,13 +35,13 @@
 	require_once("./templates/header.php");
 
 	html_op("<div class=\"content\">");
-		html_op("<div>");
+		html_op("<div class=\"widget\">");
 			html("<div class=\"widget_title\"><a href=\"./accounts.php\">Accounts &gt;</a></div>");
 			html("<div class=\"tiles\">".$acc->getTiles()."</div>");
 		html_cl("</div>");
 
 		html();
-		html_op("<div>");
+		html_op("<div class=\"widget\">");
 			html("<div class=\"widget_title\">Total &gt;</div>");
 			html_op("<div>");
 				$acc->getTotals();
@@ -49,7 +49,7 @@
 		html_cl("</div>");
 
 		html();
-		html_op("<div>");
+		html_op("<div class=\"widget\">");
 			html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
 			html_op("<div>");
 				$trans->getLatest(5);
@@ -57,7 +57,7 @@
 		html_cl("</div>");
 
 		html();
-		html_op("<div>");
+		html_op("<div class=\"widget\">");
 			html("<div class=\"widget_title\"><a href=\"./persons.php\">Persons &gt;</a></div>");
 			html_op("<div>");
 				$pers->getTable();
