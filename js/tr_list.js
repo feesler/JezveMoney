@@ -128,10 +128,27 @@ function onAccountChange()
 	newLocation = './transactions.php?type=' + transType;
 	if (acc_id != 0)
 		newLocation += '&acc_id=' + acc_id;
+	if (searchRequest)
+		newLocation += '&search=' + encodeURI(searchRequest);
 
 	window.location = newLocation;
 }
 
+
+// Transaction search form submit event handler
+function onSearchSubmit(frm)
+{
+	if (!frm)
+		return false;
+
+	frm.action = './transactions.php?type=' + transType;
+	if (curAccId != 0)
+		newLocation += '&acc_id=' + curAccId;
+
+	frm.action = './transactions.php';
+
+	return true;
+}
 
 
 var singleTransDeleteTitle = 'Delete transaction';

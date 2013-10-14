@@ -26,6 +26,9 @@
 	if ($acc_id && !$acc->is_exist($acc_id))
 		$acc_id = 0;
 
+	$searchReq = (isset($_GET["search"]) ? $_GET["search"] : null);
+
+
 	$titleString = "Jezve Money | Transactions";
 
 	html("<!DOCTYPE html>");
@@ -50,6 +53,7 @@
 	pushTab();
 		html("var transType = ".json_encode($type_str).";");
 		html("var curAccId = ".json_encode($acc_id).";");
+		html("var searchRequest = ".json_encode($searchReq).";");
 	popTab();
 	html("</script>");
 
@@ -83,7 +87,16 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num);
+				html("<form method=\"get\" action=\"./transactions.php\" onsubmit=\"return onSearchSubmit(this);\">");
+				html_op("<div class=\"search_input std_input\">");
+					html_op("<div>");
+						html("<input id=\"search\" name=\"search\" type=\"text\" value=\"".(is_null($searchReq) ? "" : $searchReq)."\">");
+						html("<input class=\"btn search_btn\" type=\"submit\" value=\"Search\">");
+					html_cl("</div>");
+				html_cl("</div>");
+				html("</form>");
+
+				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, TRUE, $searchReq);
 			html_cl("</div>");
 
 			html_op("<div class=\"control_icons\">");
