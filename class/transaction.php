@@ -601,6 +601,13 @@ class Transaction
 			return;
 		}
 
+		if (!$db->countQ("transactions", "user_id=".self::$user_id))
+		{
+			html("<span>You have no one transaction yet.</span>");
+			html_cl("</div>");
+			return;
+		}
+
 		$condition = "user_id=".self::$user_id;
 		if ($trans_type != 0)
 			$condition .= " AND type=".$trans_type;
@@ -625,7 +632,7 @@ class Transaction
 		$rowCount = count($resArr);
 		if (!$rowCount)
 		{
-			html("<span>You have no one transaction yet.</span>");
+			html("<span>No transactions found.</span>");
 			html_cl("</div>");
 
 			return;
