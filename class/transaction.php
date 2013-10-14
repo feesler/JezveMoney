@@ -577,7 +577,7 @@ class Transaction
 
 
 	// Return table of transactions
-	public function getTable($trans_type, $acc_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $active = TRUE, $searchStr = NULL)
+	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $active = TRUE, $searchStr = NULL)
 	{
 		global $db;
 
@@ -608,14 +608,18 @@ class Transaction
 			return;
 		}
 
+		$tr_type = intval($trans_type);
+		$acc_id = intval($account_id);
+		$sReq = $db->escape($searchStr);
+
 		$condition = "user_id=".self::$user_id;
-		if ($trans_type != 0)
-			$condition .= " AND type=".$trans_type;
+		if ($tr_type != 0)
+			$condition .= " AND type=".$tr_type;
 		if ($acc_id != 0)
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
 
-		if (!is_null($searchStr))
-			$condition .= " AND comment LIKE '%".$searchStr."%'";
+		if (!is_null($sReq))
+			$condition .= " AND comment LIKE '%".$sReq."%'";
 
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
 		if ($tr_on_page > 0)
