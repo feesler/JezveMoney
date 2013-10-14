@@ -139,3 +139,10 @@
 {
 	clear: both;
 }
+
+
+/* transactions page filer */
+.tr_filter
+{
+	float: left;
+}

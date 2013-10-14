@@ -109,6 +109,31 @@ function onTransClick(tr_id)
 	}
 }
 
+
+// Account change event handler
+function onAccountChange()
+{
+	var acc_id, accsel;
+	var newLocation;
+
+	accsel = ge('acc_id');
+	if (!accsel)
+		return;
+
+	acc_id = parseInt(selectedValue(accsel));
+
+	if (curAccId == acc_id)
+		return;
+
+	newLocation = './transactions.php?type=' + transType;
+	if (acc_id != 0)
+		newLocation += '&acc_id=' + acc_id;
+
+	window.location = newLocation;
+}
+
+
+
 var singleTransDeleteTitle = 'Delete transaction';
 var multiTransDeleteTitle = 'Delete transactions';
 var multiTransDeleteMsg = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';

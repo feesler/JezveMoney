@@ -12,6 +12,7 @@
 		setLocation("./login.php");
 
 	$trans = new Transaction($user_id);
+	$acc = new Account($user_id);
 
 	$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
 
@@ -20,6 +21,10 @@
 		fail();
 
 	$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
+
+	$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
+	if ($acc_id && !$acc->is_exist($acc_id))
+		$acc_id = 0;
 
 	$titleString = "Jezve Money | Transactions";
 
@@ -68,6 +73,15 @@
 										array(3, "Transfer", "./transactions.php?type=transfer".$acc_par),
 										array(4, "Debt", "./transactions.php?type=debt".$acc_par));
 				showSubMenu($trans_type, $transMenu);
+
+				html_op("<div class=\"tr_filter std_input\">");
+					html_op("<div>");
+						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onAccountChange(this);\">");
+							html("<option value=\"0\">All</option>");
+							echo($acc->getList($acc_id));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
 
 				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num);
 			html_cl("</div>");
