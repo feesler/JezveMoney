@@ -217,86 +217,8 @@ function createCalendar(date, month, year)
 }
 
 
-function buildCalendar()
-{
-	var today = new Date();
-
-	createCalendar(today.getDate(), today.getMonth(), today.getFullYear());
-}
-
-
 // Format date as DD.MM.YYYY
 function formatDate(date, month, year)
 {
 	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year
-}
-
-
-// Date select callback
-function onSelectDate(date, month, year)
-{
-	var datefield;
-
-	datefield = ge('date');
-	if (!datefield)
-		return;
-
-	datefield.value = formatDate(date, month, year);
-
-	hideCalendar();
-}
-
-
-// Hide calendar block
-function hideCalendar()
-{
-	show('calendar', false);
-//	show('date_block', false);
-//	setCalendarIconLink(true);
-}
-
-
-// Set calendar iconlink to idle/active state
-function setCalendarIconLink(idle)
-{
-	var calendar_btn, date_block, iconlinkText;
-
-	date_block = ge('date_block');
-	calendar_btn = re('calendar_btn');
-	if (!date_block || !calendar_btn)
-		return;
-
-	idle = idle || false;
-
-	iconlinkText = calendar_btn.firstElementChild.firstElementChild.nextElementSibling;
-
-	if (idle)
-	{
-		date_block.parentNode.insertBefore(calendar_btn, date_block);
-		show(iconlinkText, true);
-	}
-	else
-	{
-		date_block.firstElementChild.nextElementSibling.firstElementChild.appendChild(calendar_btn);
-		show(iconlinkText, false);
-	}
-}
-
-
-// Show calendar block
-function showCalendar()
-{
-	var date_block, calendar;
-
-	date_block = ge('date_block');
-	calendar = ge('calendar');
-	if (!date_block || !calendar)
-		return;
-
-	show(calendar, (calendar.style.display == 'none'));
-	show(date_block, true);
-
-	setCalendarIconLink(false);
-
-	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn']);
 }
