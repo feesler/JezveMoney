@@ -78,15 +78,6 @@
 										array(4, "Debt", "./transactions.php?type=debt".$acc_par));
 				showSubMenu($trans_type, $transMenu);
 
-				html_op("<div class=\"tr_filter std_input\">");
-					html_op("<div>");
-						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onAccountChange(this);\">");
-							html("<option value=\"0\">All</option>");
-							echo($acc->getList($acc_id));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-
 				html("<form method=\"get\" action=\"./transactions.php\" onsubmit=\"return onSearchSubmit(this);\">");
 				html_op("<div class=\"search_input std_input\">");
 					html_op("<div>");
@@ -95,6 +86,15 @@
 					html_cl("</div>");
 				html_cl("</div>");
 				html("</form>");
+
+				html_op("<div class=\"tr_filter std_input\">");
+					html_op("<div>");
+						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onAccountChange(this);\">");
+							html("<option value=\"0\">All</option>");
+							echo($acc->getList($acc_id));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
 
 				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, TRUE, $searchReq);
 			html_cl("</div>");
