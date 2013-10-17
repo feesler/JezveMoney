@@ -63,6 +63,15 @@ function ce(tagName, params, childs)
 }
 
 
+// Remove element from DOM and return
+function re(obj)
+{
+	var robj = ge(obj);
+
+	return robj ? robj.parentNode.removeChild(robj) : null;
+}
+
+
 // document.write wrapper
 function dw(a)
 {

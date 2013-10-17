@@ -256,15 +256,6 @@ function hideCalendar()
 }
 
 
-// Remove element from DOM and return
-function re(obj)
-{
-	var robj = ge(obj);
-
-	return robj ? robj.parentNode.removeChild(robj) : null;
-}
-
-
 // Set calendar iconlink to idle/active state
 function setCalendarIconLink(idle)
 {
