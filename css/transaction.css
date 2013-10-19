@@ -158,13 +158,26 @@
 .search_input > div > input[type="text"]
 {
 	height: 26px;
+	border-width: 2px 0px 2px 2px;
 }
 
 
 .search_btn
 {
-	color: #FFFFFF;
-	background-color: #000000;
+	width: 34px;
 	height: 34px;
-	padding: 4px;
+	padding: 2px;
+	color: #FFFFFF;
+	background-color: #0072C6;
 }
+
+
+.search_btn > div
+{
+	width: 34px;
+	height: 34px;
+	background-image: url('../img/icons.png');
+	background-repeat: no-repeat;
+	background-position: -160px 0px;
+}
+

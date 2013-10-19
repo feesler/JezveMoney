@@ -82,7 +82,7 @@
 				html_op("<div class=\"search_input std_input\">");
 					html_op("<div>");
 						html("<input id=\"search\" name=\"search\" type=\"text\" value=\"".(is_null($searchReq) ? "" : $searchReq)."\">");
-						html("<input class=\"btn search_btn\" type=\"submit\" value=\"Search\">");
+						html("<button class=\"btn search_btn\" type=\"submit\"><div></div></button>");
 					html_cl("</div>");
 				html_cl("</div>");
 				html("</form>");
