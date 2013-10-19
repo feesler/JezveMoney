@@ -144,3 +144,15 @@
 {
 	background-position: -96px -32px;
 }
+
+
+.iconlink div.search
+{
+	background-position: -128px 0px;
+}
+
+
+.iconlink > *:hover > div.search
+{
+	background-position: -128px -32px;
+}
