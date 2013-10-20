@@ -1295,7 +1295,7 @@ function onNewPerson()
 }
 
 
-// New debt form submit event handler
+// Debt form submit event handler
 function onDebtSubmit(frm)
 {
 	var accid, amount, trdate, personname;
