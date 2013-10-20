@@ -232,6 +232,7 @@ else
 
 	html();
 	html_op("<div id=\"amount_row\" class=\"non_float\">");
+/*
 		html_op("<div id=\"curr_block\" class=\"right_float\" style=\"display: none;\">");
 			html("<div><label for=\"transcurr\">Currency</label></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
@@ -257,6 +258,31 @@ else
 					html_op("<div>");
 						html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+*/
+		html("<div><label for=\"amount\">Amount</label></div>");
+		html_op("<div>");
+			html_op("<div class=\"curr_container\">");
+				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
+				html("<div class=\"".$currBtnClass."\" type=\"button\"><div id=\"amountsign\">".(($trans_type == 1) ? $src["sign"] : $dest["sign"])."</div></div>");
+				if ($trans_type != 3)
+				{
+					html_op("<div class=\"rcurr_sel\">");
+						html_op("<div>");
+							html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
+								echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
+							html_cl("</select>");
+						html_cl("</div>");
+					html_cl("</div>");
+				}
+			html_cl("</div>");
+
+			$inputType = ($trans_type == 3) ? "trans_input" : "rbtn_input";
+			html_op("<div class=\"stretch_input ".$inputType."\">");
+				html_op("<div>");
+					html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 				html_cl("</div>");
 			html_cl("</div>");
 		html_cl("</div>");

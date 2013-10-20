@@ -290,6 +290,7 @@
 
 	html();
 	html_op("<div id=\"amount_row\" class=\"non_float\">");
+/*
 		html_op("<div id=\"curr_block\" class=\"right_float\" style=\"display: none;\">");
 			html("<div><label for=\"transcurr\">Currency</label></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
@@ -313,6 +314,26 @@
 					html_op("<div>");
 						html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"".$tr["amount"]."\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+*/
+		html("<div><label for=\"amount\">Amount</label></div>");
+		html_op("<div>");
+			html_op("<div class=\"curr_container\">");
+				html("<div class=\"btn rcurr_btn\" type=\"button\"><div id=\"amountsign\">".$amount_sign."</div></div>");
+				html_op("<div class=\"rcurr_sel\">");
+					html_op("<div>");
+						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
+							echo(Currency::getList($debtAcc["curr"]));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+
+			html_op("<div class=\"stretch_input rbtn_input\">");
+				html_op("<div>");
+					html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"".$tr["amount"]."\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
 				html_cl("</div>");
 			html_cl("</div>");
 		html_cl("</div>");
