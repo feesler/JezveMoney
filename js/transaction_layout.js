@@ -105,11 +105,12 @@ function showCalendar()
 		return;
 
 	show(calendar, (calendar.style.display == 'none'));
+	show('calendar_btn', false);
 	show(date_block, true);
 
-	setCalendarIconLink(false);
+	//setCalendarIconLink(false);
 
-	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn']);
+	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
 }
 
 

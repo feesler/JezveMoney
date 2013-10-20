@@ -379,8 +379,10 @@
 		html_op("<div id=\"date_block\" style=\"display: none;\">");
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
-				html("<div class=\"right_float\"></div>");
-				html_op("<div class=\"stretch_input trans_input\">");
+				html_op("<div class=\"right_float\">");
+					html("<button id=\"cal_rbtn\" class=\"btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><div></div></button>");
+				html_cl("</div>");
+				html_op("<div class=\"stretch_input rbtn_input\">");
 					html_op("<div>");
 						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".$dateFmt."\">");
 					html_cl("</div>");
