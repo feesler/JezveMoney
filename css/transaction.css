@@ -84,6 +84,25 @@
 }
 
 
+/* text input controls with button on the right */
+.rbtn_input
+{
+	padding: 8px 0px;
+}
+
+
+.rbtn_input > div
+{
+	padding: 0px 12px 2px 0px;
+}
+
+
+.rbtn_input > div > input
+{
+	border-width: 2px 0px 2px 2px;
+}
+
+
 /* exchange rate comment */
 .exchrate_comm
 {
