@@ -262,16 +262,14 @@
 			html_op("<div class=\"curr_container\">");
 				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
 				html("<div class=\"".$currBtnClass."\" type=\"button\"><div id=\"amountsign\">".$amount_sign."</div></div>");
-				if ($trans_type != 3)
-				{
-					html_op("<div class=\"rcurr_sel\">");
-						html_op("<div>");
-							html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-								echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
-							html_cl("</select>");
-						html_cl("</div>");
+				$disp = ($trans_type == 3) ? " style=\"display: none;\"" : "";
+				html_op("<div class=\"rcurr_sel\"".$disp.">");
+					html_op("<div>");
+						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
+							echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
+						html_cl("</select>");
 					html_cl("</div>");
-				}
+				html_cl("</div>");
 			html_cl("</div>");
 
 			$inputType = ($trans_type == 3) ? "trans_input" : "rbtn_input";
