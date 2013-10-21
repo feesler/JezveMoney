@@ -71,7 +71,7 @@ function getMonthBtn(month, year, isPrev)
 
 function createCalendar(date, month, year, dayCallback)
 {
-	var mainTable, thead, tr, td;
+	var mainTable, tbody, tr, td;
 	var i, daysInRow;
 	var daysInWeek = 7;
 	var daysInMonth;
@@ -109,8 +109,8 @@ function createCalendar(date, month, year, dayCallback)
 	if (!mainTable)
 		return;
 
-	thead = ce('thead');
-	if (!thead)
+	tbody = ce('tbody');
+	if (!tbody)
 		return;
 
 	// month name
@@ -126,7 +126,7 @@ function createCalendar(date, month, year, dayCallback)
 
 	var headTbl = ce('table', { className : 'calHeadTbl' },
 							[
-								ce('thead', {},
+								ce('tbody', {},
 										[
 											ce('tr', {},
 													[
@@ -140,7 +140,7 @@ function createCalendar(date, month, year, dayCallback)
 	td.appendChild(headTbl);
 
 	tr.appendChild(td);
-	thead.appendChild(tr);
+	tbody.appendChild(tr);
 
 
 	// week days
@@ -150,7 +150,7 @@ function createCalendar(date, month, year, dayCallback)
 	weekdays.forEach(function(wd){
 		tr.appendChild(ce('td', { innerHTML : wd }));
 	});
-	thead.appendChild(tr);
+	tbody.appendChild(tr);
 
 	tr = ce('tr');
 	if (!tr)
@@ -185,7 +185,7 @@ function createCalendar(date, month, year, dayCallback)
 		{
 			if (tr != null)
 			{
-				thead.appendChild(tr);
+				tbody.appendChild(tr);
 				tr = null;
 			}
 
@@ -208,10 +208,10 @@ function createCalendar(date, month, year, dayCallback)
 			tr.appendChild(dayCell);
 		}
 
-		thead.appendChild(tr);
+		tbody.appendChild(tr);
 	}
 
-	mainTable.appendChild(thead);
+	mainTable.appendChild(tbody);
 
 	return mainTable;
 }
