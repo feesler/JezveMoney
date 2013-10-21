@@ -61,11 +61,28 @@ function getNextMonth(month, year)
 }
 
 
-function getMonthBtn(month, year, isPrev)
+function getMonthBtn(obj, month, year, callback, isPrev)
 {
 	return ce('button', { className : 'pnMonthBtn',
 					type : 'button',
-					onclick  : schedule(bind(createCalendar, null, 1, month, year)) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+					onclick  : schedule(bind(updateCalendar, null, obj, month, year, callback)) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+}
+
+
+function updateCalendar(obj, month, year, callback)
+{
+	var calObj;
+
+	if (!obj)
+		return;
+
+	calObj = createCalendar(1, month, year, callback);
+	if (!calObj)
+		return;
+
+	insertAfter(calObj, obj);
+	if (obj.parentNode)
+		obj.parentNode.removeChild(obj);
 }
 
 
@@ -130,9 +147,9 @@ function createCalendar(date, month, year, dayCallback)
 										[
 											ce('tr', {},
 													[
-														ce('td', { className : 'pnMonth' }, [ getMonthBtn(prevMonth.month, prevMonth.year, true) ]),
+														ce('td', { className : 'pnMonth' }, [ getMonthBtn(mainTable, prevMonth.month, prevMonth.year, dayCallback, true) ]),
 														ce('td', { className : 'hMonth', innerHTML : months[rMonth] + ' ' + rYear }),
-														ce('td', {}, [ getMonthBtn(nextMonth.month, nextMonth.year, false) ])
+														ce('td', {}, [ getMonthBtn(mainTable, nextMonth.month, nextMonth.year, dayCallback, false) ])
 													])
 										])
 							]);
