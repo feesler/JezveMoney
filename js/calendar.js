@@ -22,9 +22,12 @@ function getDaysInMonth(month, year)
 
 
 // Return cell object for specified date
-function getDayCell(date, month, year)
+function getDayCell(date, month, year, callback)
 {
 	var td, btn;
+
+	if (!callback)
+		return null;
 
 	td = ce('td');
 	if (!td)
@@ -32,7 +35,7 @@ function getDayCell(date, month, year)
 
 	btn = ce('button', { type : 'button',
 					innerHTML : date,
-					onclick : bind(onSelectDate, null, date, month, year) });
+					onclick : bind(callback, null, date, month, year) });
 	if (!btn)
 		return null;
 
@@ -66,7 +69,7 @@ function getMonthBtn(month, year, isPrev)
 }
 
 
-function createCalendar(date, month, year)
+function createCalendar(date, month, year, dayCallback)
 {
 	var mainTable, thead, tr, td;
 	var i, daysInRow;
@@ -83,6 +86,10 @@ function createCalendar(date, month, year)
 	var tMonth = today.getMonth();
 	var tYear = today.getFullYear();
 	var tDate = today.getDate();
+
+
+	if (!dayCallback)
+		return null;
 
 	// get real date from specified
 	day = new Date(year, month, date);
@@ -154,7 +161,7 @@ function createCalendar(date, month, year)
 	pMonthDays = getDaysInMonth(prevMonth.month, prevMonth.year);
 	for(i = 1; i < dayOfWeek; i++)
 	{
-		dayCell = getDayCell((pMonthDays - (dayOfWeek - i) + 1), prevMonth.month, prevMonth.year);
+		dayCell = getDayCell((pMonthDays - (dayOfWeek - i) + 1), prevMonth.month, prevMonth.year, dayCallback);
 		if (!dayCell)
 			return;
 		dayCell.className = 'omonth';
@@ -165,7 +172,7 @@ function createCalendar(date, month, year)
 	// days of current month
 	for(i = 1; i < daysInMonth + 1; i++)
 	{
-		dayCell = getDayCell(i, rMonth, rYear);
+		dayCell = getDayCell(i, rMonth, rYear, dayCallback);
 		if (!dayCell)
 			return;
 
@@ -194,7 +201,7 @@ function createCalendar(date, month, year)
 		// append days of next month
 		for(i = daysInRow; i < daysInWeek; i++)
 		{
-			dayCell = getDayCell(i - daysInRow + 1, nextMonth.month, nextMonth.year);
+			dayCell = getDayCell(i - daysInRow + 1, nextMonth.month, nextMonth.year, dayCallback);
 			if (!dayCell)
 				return;
 			dayCell.className = 'omonth';

@@ -40,7 +40,7 @@ function buildCalendar()
 {
 	var today = new Date();
 
-	return createCalendar(today.getDate(), today.getMonth(), today.getFullYear());
+	return createCalendar(today.getDate(), today.getMonth(), today.getFullYear(), onSelectDate);
 }
 
 
