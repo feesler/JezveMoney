@@ -345,7 +345,6 @@
 					html_cl("</div>");
 				html_cl("</div>");
 				html("<div id=\"calendar\" class=\"calWrap\" style=\"display: none;\"></div>");
-				html("<script>buildCalendar();</script>");
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");

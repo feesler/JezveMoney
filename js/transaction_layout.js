@@ -1,4 +1,5 @@
-﻿
+﻿var calendarObj = null;
+
 
 // Show controls to add new person
 function togglePerson(val)
@@ -39,7 +40,7 @@ function buildCalendar()
 {
 	var today = new Date();
 
-	createCalendar(today.getDate(), today.getMonth(), today.getFullYear());
+	return createCalendar(today.getDate(), today.getMonth(), today.getFullYear());
 }
 
 
@@ -68,11 +69,22 @@ function onSelectDate(date, month, year)
 // Show calendar block
 function showCalendar()
 {
+/*
 	var calendar;
 
 	calendar = ge('calendar');
 	if (!calendar)
 		return;
+*/
+
+	if (!calendarObj)
+	{
+		calendarObj = ge('calendar');
+		if (!calendarObj)
+			return;
+
+		calendarObj.appendChild(buildCalendar());
+	}
 
 	show(calendarObj, !isVisible(calendarObj));
 	show('calendar_btn', false);
