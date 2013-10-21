@@ -68,16 +68,15 @@ function onSelectDate(date, month, year)
 // Show calendar block
 function showCalendar()
 {
-	var date_block, calendar;
+	var calendar;
 
-	date_block = ge('date_block');
 	calendar = ge('calendar');
-	if (!date_block || !calendar)
+	if (!calendar)
 		return;
 
-	show(calendar, (calendar.style.display == 'none'));
+	show(calendarObj, !isVisible(calendarObj));
 	show('calendar_btn', false);
-	show(date_block, true);
+	show('date_block', true);
 
 	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
 }
