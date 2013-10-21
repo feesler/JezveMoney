@@ -68,7 +68,6 @@ function getMonthBtn(month, year, isPrev)
 
 function createCalendar(date, month, year)
 {
-	var calDiv;
 	var mainTable, thead, tr, td;
 	var i, daysInRow;
 	var daysInWeek = 7;
@@ -98,10 +97,6 @@ function createCalendar(date, month, year)
 	dayOfWeek = firstDay.getDay();
 	if (dayOfWeek == 0)	// fix first day of week is sunday
 		dayOfWeek = 7;
-
-	calDiv = ge('calendar');
-	if (!calDiv)
-		return;
 
 	mainTable = ce('table', { className : 'calTbl' });
 	if (!mainTable)
@@ -211,9 +206,7 @@ function createCalendar(date, month, year)
 
 	mainTable.appendChild(thead);
 
-	removeChilds(calDiv);
-
-	calDiv.appendChild(mainTable);
+	return mainTable;
 }
 
 
