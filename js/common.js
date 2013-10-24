@@ -12,6 +12,13 @@ function isArray(obj)
 }
 
 
+// Check object is date
+function isDate(obj)
+{
+	return (typeof obj === 'object' && obj.constructor.toString().indexOf("Date") != -1);
+}
+
+
 // Set parameters of object
 function setParam(obj, params)
 {
