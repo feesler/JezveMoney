@@ -8,6 +8,13 @@
 	}
 
 
+	// Check string is not null and not empty
+	function is_empty($str)
+	{
+		return is_null($str) || $str == "";
+	}
+
+
 	// Return string for common headers
 	function getCommonHeaders()
 	{
