@@ -237,5 +237,12 @@ function createCalendar(date, month, year, dayCallback)
 // Format date as DD.MM.YYYY
 function formatDate(date, month, year)
 {
-	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year
+	if (isDate(date) && !month && !year)
+	{
+		month = date.getMonth();
+		year = date.getFullYear();
+		date = date.getDate();
+	}
+
+	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year;
 }
