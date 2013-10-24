@@ -617,8 +617,7 @@ class Transaction
 			$condition .= " AND type=".$tr_type;
 		if ($acc_id != 0)
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
-
-		if (!is_null($sReq))
+		if (!is_empty($sReq))
 			$condition .= " AND comment LIKE '%".$sReq."%'";
 
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
