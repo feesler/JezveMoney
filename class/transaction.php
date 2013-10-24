@@ -577,7 +577,7 @@ class Transaction
 
 
 	// Return table of transactions
-	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $active = TRUE, $searchStr = NULL)
+	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $active = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
 	{
 		global $db;
 
@@ -619,6 +619,19 @@ class Transaction
 			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
 		if (!is_empty($sReq))
 			$condition .= " AND comment LIKE '%".$sReq."%'";
+
+		if (!is_null($startDate) && !is_null($endDate))
+		{
+			$stdate = strtotime($startDate);
+			$enddate = strtotime($endDate);
+			if ($stdate != -1 && $enddate != -1)
+			{
+				$fstdate = date("Y-m-d H:i:s", $stdate);
+				$fenddate = date("Y-m-d H:i:s", $enddate);
+
+				$condition .= " AND date >= ".qnull($fstdate)." AND date <= ".qnull($fenddate);
+			}
+		}
 
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
 		if ($tr_on_page > 0)
