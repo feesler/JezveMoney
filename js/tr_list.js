@@ -1,4 +1,6 @@
 ﻿var dwPopup;
+var calendarObj = null;
+var startDate = null, endDate = null;
 
 
 var transactions =
@@ -203,4 +205,102 @@ function showDeletePopup()
 	}
 
 	dwPopup.show();
+}
+
+
+// Create calendar object
+function buildCalendar(callback)
+{
+	var today = new Date();
+
+	return createCalendar(today.getDate(), today.getMonth(), today.getFullYear(), callback);
+}
+
+
+// Hide calendar block
+function hideCalendar()
+{
+	show('calendar', false);
+}
+
+
+// Start date select callback
+function onSelectStartDate(date, month, year)
+{
+	var datefield;
+
+	datefield = ge('date');
+	if (!datefield)
+		return;
+
+	startDate = new Date(year, month, date);
+
+	if (startDate && endDate)
+	{
+		hideCalendar();
+		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
+
+		newLocation = './transactions.php?type=' + transType;
+		if (acc_id != 0)
+			newLocation += '&acc_id=' + curAccId;
+		if (searchRequest)
+			newLocation += '&search=' + encodeURI(searchRequest);
+		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
+
+		window.location = newLocation;
+	}
+}
+
+
+// End date select callback
+function onSelectEndDate(date, month, year)
+{
+	var datefield;
+
+	datefield = ge('date');
+	if (!datefield)
+		return;
+
+	endDate = new Date(year, month, date);
+
+	if (startDate && endDate)
+	{
+		hideCalendar();
+		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
+
+		newLocation = './transactions.php?type=' + transType;
+		if (acc_id != 0)
+			newLocation += '&acc_id=' + curAccId;
+		if (searchRequest)
+			newLocation += '&search=' + encodeURI(searchRequest);
+		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
+
+		window.location = newLocation;
+	}
+}
+
+
+// Show calendar block
+function showCalendar()
+{
+	if (!calendarObj)
+	{
+		calendarObj = ge('calendar');
+		if (!calendarObj)
+			return;
+
+		var cal1, cal2;
+
+		cal1 = ce('div', {}, [ buildCalendar(onSelectStartDate) ]);
+		cal2 = ce('div', {}, [ buildCalendar(onSelectEndDate) ]);
+
+		calendarObj.appendChild(cal1);
+		calendarObj.appendChild(cal2);
+	}
+
+	show(calendarObj, !isVisible(calendarObj));
+	show('calendar_btn', false);
+	show('date_block', true);
+
+	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
 }

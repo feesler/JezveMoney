@@ -28,6 +28,18 @@
 
 	$searchReq = (isset($_GET["search"]) ? $_GET["search"] : null);
 
+	$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
+	$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
+
+	$dateFmt = "";
+	if (!is_null($stDate) && !is_null($endDate))
+	{
+		$sdate = strtotime($stDate);
+		$edate = strtotime($endDate);
+		if ($sdate != -1 && $edate != -1)
+			$dateFmt = date("d.m.Y", $sdate)." - ".date("d.m.Y", $edate);
+	}
+
 
 	$titleString = "Jezve Money | Transactions";
 
@@ -42,10 +54,12 @@
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
+	html(getCSS("calendar.css"));
 	html(getCSS("transaction.css"));
 	html(getCSS("table.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
 	html(getJS("tr_list.js"));
 
@@ -96,7 +110,24 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, TRUE, $searchReq);
+				html_op("<div class=\"tr_filter date_filter\">");
+					html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Select range", TRUE, "showCalendar();", "form_iconlink"));
+					html_op("<div id=\"date_block\" style=\"display: none;\">");
+						html_op("<div>");
+							html_op("<div class=\"right_float\">");
+								html("<button id=\"cal_rbtn\" class=\"btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><div></div></button>");
+							html_cl("</div>");
+							html_op("<div class=\"stretch_input rbtn_input\">");
+								html_op("<div>");
+									html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".$dateFmt."\">");
+								html_cl("</div>");
+							html_cl("</div>");
+							html("<div id=\"calendar\" class=\"calWrap transCalWrap\" style=\"display: none;\"></div>");
+						html_cl("</div>");
+					html_cl("</div>");
+				html_cl("</div>");
+
+				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, TRUE, $searchReq, $stDate, $endDate);
 			html_cl("</div>");
 
 			html_op("<div class=\"control_icons\">");
