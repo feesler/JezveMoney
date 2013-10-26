@@ -330,7 +330,8 @@ button::-moz-focus-inner
 }
 
 
-.heading > h1
+.heading > h1,
+.heading > h2
 {
 	display: inline-block;
 	float: left;
@@ -343,6 +344,12 @@ button::-moz-focus-inner
 	float: left;
 	clear: right;
 	margin: 9px 0px 0px 30px;
+}
+
+
+.h2_heading > .iconlink
+{
+	margin: 0px 0px 0px 30px;
 }
 
 

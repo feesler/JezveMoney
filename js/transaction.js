@@ -21,6 +21,7 @@ var s1dvalid, s2dvalid;
 // S2_d = S1_d + a		for transfer
 
 
+var dwPopup = null;		// delete warning popup
 var submitStarted = false;
 
 
@@ -320,6 +321,64 @@ function onEditTransSubmit(frm)
 
 	return true;
 }
+
+
+// Delete transaction icon link click event handler
+function onDelete()
+{
+	showDeletePopup();
+}
+
+
+var singleTransDeleteTitle = 'Delete transaction';
+var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+
+
+// Delete popup callback
+function onDeletePopup(res)
+{
+	var delform;
+
+	if (!dwPopup)
+		return;
+
+	dwPopup.close();
+	dwPopup = null;
+
+	if (res)
+	{
+		delform = ge('delform');
+		if (delform)
+			delform.submit();
+	}
+}
+
+
+// Create and show transaction delete warning popup
+function showDeletePopup()
+{
+	// check popup already created
+	if (dwPopup)
+		return;
+
+	dwPopup = new Popup();
+	if (!dwPopup)
+		return;
+
+	if (!dwPopup.create({ id : 'delete_warning',
+						title : singleTransDeleteTitle,
+						msg : singleTransDeleteMsg,
+						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
+						cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						}))
+	{
+		dwPopup = null;
+		return;
+	}
+
+	dwPopup.show();
+}
+
 
 
 // Update exchange rate and result balance values

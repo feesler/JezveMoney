@@ -111,12 +111,13 @@
 	html(getCSS("common.css"));
 	html(getCSS("transaction.css"));
 	html(getCSS("tiles.css"));
+	html(getCSS("popup.css"));
 	html(getCSS("iconlink.css"));
 	html(getCSS("calendar.css"));
 
 	html(getJS("common.js"));
-	html(getJS("main.js"));
 	html(getJS("calendar.js"));
+	html(getJS("popup.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
 
@@ -167,7 +168,10 @@
 
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
-			html("<h2>Edit transaction</h2>");
+			html_op("<div class=\"heading h2_heading\">");
+				html("<h2>Edit transaction</h2>");
+				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", TRUE, "onDelete();"));
+			html_cl("</div>");
 			html_op("<div>");
 				$newTransMenu = array(array(1, "Expense", "./newtransaction.php?type=expense".$acc_par),
 										array(2, "Income", "./newtransaction.php?type=income".$acc_par),
@@ -380,6 +384,11 @@
 	html_cl("</div>");
 	html_cl("</div>");
 	html("</form>");
+
+	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");
+	html("<input name=\"transactions\" type=\"hidden\" value=\"".$tr["id"]."\">");
+	html("</form>");
+
 	html("</body>");
 	html("</html>");
 ?>
