@@ -30,10 +30,14 @@
 	html(getCSS("common.css"));
 	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
+	html(getCSS("iconlink.css"));
+	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("popup.js"));
 	html(getJS("persons.js"));
 
 	html("<script>");
+	html("var person_id = ".$p_id.";");
 	html("var personName = ".json_encode($pName).";");
 	html("</script>");
 
@@ -46,7 +50,10 @@
 	html("<input id=\"pid\" name=\"pid\" type=\"hidden\" value=\"".$p_id."\">");
 	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
-			html("<h2>Edit person</h2>");
+			html_op("<div class=\"heading h2_heading\">");
+				html("<h2>Edit person</h2>");
+				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", TRUE, "onDelete();"));
+			html_cl("</div>");
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
 					html("<label for=\"pname\">Person name</label>");
@@ -60,6 +67,11 @@
 		html_cl("</div>");
 	html_cl("</div>");
 	html("</form>");
+
+	html("<form id=\"delform\" method=\"post\" action=\"./modules/delperson.php\">");
+	html("<input name=\"persons\" type=\"hidden\" value=\"".$p_id."\">");
+	html("</form>");
+
 	html("</body>");
 	html("</html>");
 ?>

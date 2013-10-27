@@ -143,6 +143,15 @@ var multiPersonsDeleteMsg = 'Are you sure want to delete selected persons?<br>De
 var singlePersonDeleteMsg = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
 
 
+// Delete person iconlink click event handler
+function onDelete()
+{
+	persons.selectPerson(person_id);
+
+	showDeletePopup();
+}
+
+
 // Delete popup callback
 function onDeletePopup(res)
 {
