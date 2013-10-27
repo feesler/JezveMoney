@@ -286,6 +286,15 @@ var resetAccMsg = 'Are you sure want to reset all your accounts?<br>All accounts
 var resetAllMsg = 'Are you sure to reset all your data?<br>Everything will be lost.';
 
 
+// Delete account iconlink click event handler
+function onDelete()
+{
+	accounts.selectAccount(account_id);
+
+	showDeletePopup();
+}
+
+
 // Delete popup callback
 function onDeletePopup(res)
 {

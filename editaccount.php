@@ -40,10 +40,14 @@
 	html(getCSS("common.css"));
 	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
+	html(getCSS("iconlink.css"));
+	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("popup.js"));
 	html(getJS("main.js"));
 	html("<script>");
 	echo(Currency::getArray());
+	html("var account_id = ".$acc_id.";");
 	html("</script>");
 
 	html("</head>");
@@ -55,7 +59,11 @@
 	html("<input id=\"accid\" name=\"accid\" type=\"hidden\" value=\"".$acc_id."\">");
 	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
-			html("<h2>Edit account</h2>");
+			html_op("<div class=\"heading h2_heading\">");
+				html("<h2>Edit account</h2>");
+				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", TRUE, "onDelete();"));
+			html_cl("</div>");
+
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
 					html("<label for=\"accname\">Account name</label>");
@@ -90,6 +98,11 @@
 		html_cl("</div>");
 	html_cl("</div>");
 	html("</form>");
+
+	html("<form id=\"delform\" method=\"post\" action=\"./modules/delaccount.php\">");
+	html("<input name=\"accounts\" type=\"hidden\" value=\"".$acc_id."\">");
+	html("</form>");
+
 	html("</body>");
 	html("</html>");
 ?>
