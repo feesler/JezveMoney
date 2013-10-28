@@ -414,16 +414,9 @@ class Person
 				if ($noDebts)
 					$pBalance = "No debts";
 
-
-				$resStr = "<div class=\"latest";
-				if ($i % 2 == 0)
-					$resStr .= " even_row";
-				$resStr .= "\">";
-				html_op($resStr);
-
-				html("<div><span class=\"latest_acc_name\">".$pName."</span></div>");
-				html("<div><span class=\"latest_sum\">".$pBalance."</span></div>");
-
+				html_op("<div class=\"info_tile\">");
+					html("<span class=\"info_title\">".$pName."</span>");
+					html("<span class=\"info_subtitle\">".$pBalance."</span>");
 				html_cl("</div>");
 			}
 		}

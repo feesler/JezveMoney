@@ -60,7 +60,7 @@
 			html();
 			html_op("<div class=\"widget\">");
 				html("<div class=\"widget_title\"><a href=\"./persons.php\">Persons &gt;</a></div>");
-				html_op("<div>");
+				html_op("<div class=\"info_tiles\">");
 					$pers->getTable();
 				html_cl("</div>");
 			html_cl("</div>");
