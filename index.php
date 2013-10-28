@@ -50,7 +50,7 @@
 			html_cl("</div>");
 
 			html();
-			html_op("<div class=\"widget\">");
+			html_op("<div class=\"widget break_widget\">");
 				html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
 				html_op("<div>");
 					$trans->getLatest(5);
