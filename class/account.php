@@ -614,18 +614,12 @@ class Account
 			{
 				$i++;
 
-				$resStr = "<div class=\"latest";
-				if ($i % 2 == 0)
-					$resStr .= " even_row";
-				$resStr .= "\">";
-				html_op($resStr);
+				html_op("<div class=\"info_tile\">");
+					$valfmt = Currency::format($value, $key);
+					$currName = Currency::getName($key);
 
-				$valfmt = Currency::format($value, $key);
-				$currName = Currency::getName($key);
-
-				html("<div><span class=\"latest_acc_name\">".$currName."</span></div>");
-				html("<div><span class=\"latest_sum\">".$valfmt."</span></div>");
-
+					html("<span class=\"info_title\">".$currName."</span>");
+					html("<span class=\"info_subtitle\">".$valfmt."</span>");
 				html_cl("</div>");
 			}
 		}

@@ -44,7 +44,7 @@
 			html();
 			html_op("<div class=\"widget\">");
 				html("<div class=\"widget_title\">Total &gt;</div>");
-				html_op("<div>");
+				html_op("<div class=\"info_tiles\">");
 					$acc->getTotals();
 				html_cl("</div>");
 			html_cl("</div>");

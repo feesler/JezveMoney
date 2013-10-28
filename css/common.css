@@ -525,3 +525,40 @@ label
 {
 	border-bottom: 1px solid #0072C6;
 }
+
+
+/* Information tiles */
+.info_tiles
+{
+	min-width: 220px;
+	max-width: 300px;
+}
+
+.info_tile
+{
+	float: left;
+	width: 80px;
+	height: 80px;
+	margin: 0px 10px 10px 0px;
+	padding: 5px;
+	background-color: #D0D0D0;
+	position: relative;
+	overflow: hidden;
+}
+
+
+.info_title
+{
+	font-size: 16px;
+	bottom: 5px;
+	position: absolute;
+}
+
+
+.info_subtitle
+{
+	font-size: 12px;
+	top: 5px;
+	right: 5px;
+	position: absolute;
+}
