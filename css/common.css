@@ -157,7 +157,7 @@ button::-moz-focus-inner
 .header > div
 {
 	margin: 0 auto;
-	max-width: 800px;
+	max-width: 824px;
 	min-width: 200px;
 }
 
@@ -292,7 +292,7 @@ button::-moz-focus-inner
 .content
 {
 	margin: 55px auto 0px auto;
-	max-width: 800px;
+	max-width: 824px;
 	min-width: 200px;
 	z-index: 1;
 }
@@ -303,7 +303,7 @@ button::-moz-focus-inner
 	display: inline-block;
 	float: left;
 	min-width: 200px;
-	margin: 0px 30px 30px 0px;
+	margin: 0px 20px 20px 0px;
 }
 
 
