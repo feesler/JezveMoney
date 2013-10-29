@@ -26,7 +26,7 @@
 	if ($acc_id && !$acc->is_exist($acc_id))
 		$acc_id = 0;
 
-	$searchReq = (isset($_GET["search"]) ? $_GET["search"] : null);
+	$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
 
 	$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 	$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
