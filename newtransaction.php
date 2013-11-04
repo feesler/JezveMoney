@@ -236,7 +236,7 @@ else
 		html_op("<div>");
 			html_op("<div class=\"curr_container\">");
 				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
-				html("<div class=\"".$currBtnClass."\" type=\"button\"><div id=\"amountsign\">".(($trans_type == 1) ? $src["sign"] : $dest["sign"])."</div></div>");
+				html("<div class=\"".$currBtnClass."\"><div id=\"amountsign\">".(($trans_type == 1) ? $src["sign"] : $dest["sign"])."</div></div>");
 
 				$disp = ($trans_type == 3) ? " style=\"display: none;\"" : "";
 				html_op("<div class=\"rcurr_sel\"".$disp.">");

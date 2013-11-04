@@ -259,7 +259,7 @@
 		html("<div><label for=\"amount\">Amount</label></div>");
 		html_op("<div>");
 			html_op("<div class=\"curr_container\">");
-				html("<div class=\"btn rcurr_btn\" type=\"button\"><div id=\"amountsign\">".$debtAcc["sign"]."</div></div>");
+				html("<div class=\"btn rcurr_btn\"><div id=\"amountsign\">".$debtAcc["sign"]."</div></div>");
 				html_op("<div class=\"rcurr_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");

@@ -21,7 +21,6 @@
 	if (!$acc->is_exist($acc_id))
 		fail();
 
-
 	$acc_name = $acc->getName($acc_id);
 	$acc_curr = $acc->getCurrency($acc_id);
 	$acc_bal = $acc->getInitBalance($acc_id);
