@@ -53,6 +53,23 @@
 				html_cl("</div>");
 
 				html_op("<div class=\"non_float\">");
+					html("<label for=\"currency\">Icon</label>");
+					html_op("<div class=\"std_input\">");
+						html_op("<div>");
+							html_op("<select id=\"icon\" name=\"icon\" onchange=\"onChangeIcon(this);\">");
+								html("<option value=\"0\">No icon</option>");
+								html("<option value=\"1\">Purse</option>");
+								html("<option value=\"2\">Safe</option>");
+								html("<option value=\"3\">Card</option>");
+								html("<option value=\"4\">Percent</option>");
+								html("<option value=\"5\">Bank</option>");
+								html("<option value=\"5\">Cash</option>");
+							html_cl("</select>");
+						html_cl("</div>");
+					html_cl("</div>");
+				html_cl("</div>");
+
+				html_op("<div class=\"non_float\">");
 					html("<label for=\"accname\">Account name</label>");
 					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\" oninput=\"return onAccNameInput(this);\"></div></div>");
 				html_cl("</div>");

@@ -353,6 +353,35 @@ function onAccBalanceInput(obj)
 }
 
 
+// Icon change event handler
+function onChangeIcon(obj)
+{
+	var acc_tile, icon_id, tileClass;
+
+	acc_tile = ge('acc_tile');
+	if (!obj || !acc_tile)
+		return;
+
+	tileClass = "tile";
+
+	icon_id = selectedValue(obj);
+	if (icon_id == 1)
+		tileClass += " purse_icon";
+	else if (icon_id == 2)
+		tileClass += " safe_icon";
+	else if (icon_id == 3)
+		tileClass += " card_icon";
+	else if (icon_id == 4)
+		tileClass += " percent_icon";
+	else if (icon_id == 5)
+		tileClass += " bank_icon";
+	else if (icon_id == 6)
+		tileClass += " cash_icon";
+
+	acc_tile.className = tileClass;
+
+}
+
 
 // New account submit event handler
 function onNewAccountSubmit(frm)

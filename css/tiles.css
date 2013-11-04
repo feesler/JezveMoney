@@ -98,3 +98,46 @@ button.tilelink
 	font-size: 14px;
 	text-align: right;
 }
+
+
+/* tile icons */
+.purse_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px 0px;
+}
+
+
+.safe_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -100px;
+}
+
+
+.card_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -200px;
+}
+
+
+.percent_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -300px;
+}
+
+
+.bank_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -400px;
+}
+
+
+.cash_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -500px;
+}

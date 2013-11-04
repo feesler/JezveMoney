@@ -44,6 +44,7 @@ class Account
 			self::$cache[$acc_id]["curr_id"] = intval($row["curr_id"]);
 			self::$cache[$acc_id]["balance"] = floatval($row["balance"]);
 			self::$cache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
+			self::$cache[$acc_id]["icon"] = intval($row["icon"]);
 		}
 	}
 
@@ -103,23 +104,24 @@ class Account
 
 
 	// Create new account for current user
-	public function create($owner_id, $accname, $balance, $curr_id)
+	public function create($owner_id, $accname, $balance, $curr_id, $icon_type)
 	{
 		global $db;
 
-		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
+		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
 			return 0;
 
 		$owner_id = intval($owner_id);
 		$accname = $db->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
+		$icon_type = intval($icon_type);
 
 		if (!$accname || $accname == "" || !$curr_id)
 			return 0;
 
-		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name"),
-								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname)))
+		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon"),
+								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type)))
 			return 0;
 
 		$acc_id = $db->insertId();
@@ -131,17 +133,18 @@ class Account
 
 
 	// Update account information
-	public function edit($acc_id, $accname, $balance, $curr_id)
+	public function edit($acc_id, $accname, $balance, $curr_id, $icon_type)
 	{
 		global $db;
 
-		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
+		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
 			return FALSE;
 
 		$acc_id = intval($acc_id);
 		$accname = $db->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
+		$icon_type = intval($icon_type);
 
 		// check account is exist
 		if (!$this->is_exist($acc_id))
@@ -160,8 +163,8 @@ class Account
 		$initbalance = $this->getInitBalance($acc_id);
 		$diff = $balance - $initbalance;
 
-		$fields = array("name", "curr_id");
-		$values = array($accname, $curr_id);
+		$fields = array("name", "curr_id", "icon");
+		$values = array($accname, $curr_id, $icon_type);
 
 		if (abs($diff) > 0.01)
 		{
@@ -369,6 +372,23 @@ class Account
 	}
 
 
+	// Return icon type of account
+	public function getIcon($acc_id)
+	{
+		return $this->getCache($acc_id, "icon");
+	}
+
+
+	// Return name of account
+	public function setIcon($acc_id, $icon_type)
+	{
+		if (!$acc_id || !is_numeric($icon_type))
+			return FALSE;
+
+		return $this->setValue($acc_id, "icon", intval($icon_type));
+	}
+
+
 	// Return id of account by specified position
 	public function getIdByPos($position)
 	{
@@ -536,6 +556,7 @@ class Account
 		$acc_name = $this->getName($acc_id);
 		$acc_curr = $this->getCurrency($acc_id);
 		$acc_balance = $this->getBalance($acc_id);
+		$acc_icon = $this->getIcon($acc_id);
 		$balance_fmt = Currency::format($acc_balance + $b_corr, $acc_curr);
 
 		$tile_act = NULL;
@@ -544,7 +565,24 @@ class Account
 		else if ($tile_type == BUTTON_TILE)
 			$tile_act = "onTileClick(".$acc_id.");";
 
-		return getTile($tile_type, $tile_id, $acc_name, $balance_fmt, $tile_act);
+		$addClass = NULL;
+		if ($acc_icon != 0)
+		{
+			if ($acc_icon == 1)
+				$addClass = "purse_icon";
+			else if ($acc_icon == 2)
+				$addClass = "safe_icon";
+			else if ($acc_icon == 3)
+				$addClass = "card_icon";
+			else if ($acc_icon == 4)
+				$addClass = "percent_icon";
+			else if ($acc_icon == 5)
+				$addClass = "bank_icon";
+			else if ($acc_icon == 6)
+				$addClass = "cash_icon";
+		}
+
+		return getTile($tile_type, $tile_id, $acc_name, $balance_fmt, $tile_act, $addClass);
 	}
 
 
