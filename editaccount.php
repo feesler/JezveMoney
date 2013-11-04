@@ -46,8 +46,11 @@
 	html(getJS("popup.js"));
 	html(getJS("main.js"));
 	html("<script>");
-	echo(Currency::getArray());
+	echo(Currency::getArray(TRUE));
 	html("var account_id = ".$acc_id.";");
+	html("var acc_name = ".json_encode($acc_name).";");
+	html("var acc_currency = ".$acc_curr.";");
+	html("var acc_balance = ".$acc_bal.";");
 	html("</script>");
 
 	html("</head>");
@@ -66,8 +69,12 @@
 
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
+					html($acc->getTile(BUTTON_TILE, $acc_id, "acc_tile"));
+				html_cl("</div>");
+
+				html_op("<div class=\"non_float\">");
 					html("<label for=\"accname\">Account name</label>");
-					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\" value=\"".$acc_name."\"></div></div>");
+					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\" value=\"".$acc_name."\" oninput=\"return onAccNameInput(this);\"></div></div>");
 				html_cl("</div>");
 
 				html_op("<div class=\"non_float\">");
@@ -87,7 +94,7 @@
 						html("<div class=\"right_float\"><span id=\"currsign\" class=\"curr_sign\">".$curr_sign."</span></div>");
 						html_op("<div class=\"stretch_input std_input\">");
 							html_op("<div>");
-								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"".$acc_bal."\">");
+								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"".$acc_bal."\" oninput=\"return onAccBalanceInput(this);\">");
 							html_cl("</div>");
 						html_cl("</div>");
 					html_cl("</div>");

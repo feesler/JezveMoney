@@ -15,6 +15,8 @@
 
 	$curr_id = Currency::getIdByPos(0);
 	$curr_sign = Currency::getSign($curr_id);
+	$acc_name = "New account";
+	$acc_bal = 0.0;
 
 	$titleString = "Jezve Money | New account";
 
@@ -30,7 +32,10 @@
 	html(getJS("common.js"));
 	html(getJS("main.js"));
 	html("<script>");
-	echo(Currency::getArray());
+	echo(Currency::getArray(TRUE));
+	html("var acc_name = ".json_encode($acc_name).";");
+	html("var acc_currency = ".$curr_id.";");
+	html("var acc_balance = ".$acc_bal.";");
 	html("</script>");
 
 	html("</head>");
@@ -44,8 +49,12 @@
 			html("<h2>Create new account</h2>");
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
+					html(getTile(BUTTON_TILE, "acc_tile", "New account", Currency::format($acc_bal, $curr_id), "", ""));
+				html_cl("</div>");
+
+				html_op("<div class=\"non_float\">");
 					html("<label for=\"accname\">Account name</label>");
-					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\"></div></div>");
+					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\" oninput=\"return onAccNameInput(this);\"></div></div>");
 				html_cl("</div>");
 
 				html_op("<div class=\"non_float\">");
@@ -65,7 +74,7 @@
 						html("<div class=\"right_float\"><span id=\"currsign\" class=\"curr_sign\">".$curr_sign."</span></div>");
 						html_op("<div class=\"stretch_input std_input\">");
 							html_op("<div>");
-								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"0\">");
+								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"0\" oninput=\"return onAccBalanceInput(this);\">");
 							html_cl("</div>");
 						html_cl("</div>");
 					html_cl("</div>");
