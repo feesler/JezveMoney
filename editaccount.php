@@ -107,7 +107,7 @@
 				html_op("<div class=\"non_float\">");
 					html("<label for=\"balance\">Initial balance</label>");
 					html_op("<div>");
-						html("<div class=\"right_float\"><span id=\"currsign\" class=\"curr_sign\">".$curr_sign."</span></div>");
+						html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"currsign\">".$curr_sign."</div></div></div>");
 						html_op("<div class=\"stretch_input std_input\">");
 							html_op("<div>");
 								html("<input class=\"summ_text\" id=\"balance\" name=\"balance\" type=\"text\" value=\"".$acc_bal."\" oninput=\"return onAccBalanceInput(this);\">");
