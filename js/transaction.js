@@ -622,7 +622,7 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 // Set source tile to the specified account
 function setTileAccount(tile_id, acc_id)
 {
-	var name, formatBalance, balance;
+	var name, formatBalance, balance, icon;
 
 	if (!tile_id || !acc_id)
 		return;
@@ -634,7 +634,9 @@ function setTileAccount(tile_id, acc_id)
 		balance += ((acc_id == transaction.srcAcc) ? transaction.charge : -transaction.amount);
 	formatBalance = formatCurrency(balance, getCurrencyOfAccount(acc_id));
 
-	setTileInfo(tile_id, name, formatBalance);
+	icon = getIconOfAccount(acc_id);
+
+	setTileInfo(tile_id, name, formatBalance, icon);
 }
 
 
