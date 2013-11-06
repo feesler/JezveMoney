@@ -372,6 +372,16 @@ function onAccBalanceInput(obj)
 // Icon change event handler
 function onChangeIcon(obj)
 {
+	var formatBalance, iconType;
+
+	if (!obj)
+		return;
+
+	formatBalance = formatCurrency(acc_balance, acc_currency);
+	iconType = parseInt(selectedValue(obj));
+
+	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
+/*
 	var acc_tile, icon_id, tileClass;
 
 	acc_tile = ge('acc_tile');
@@ -395,7 +405,7 @@ function onChangeIcon(obj)
 		tileClass += " cash_icon";
 
 	acc_tile.className = tileClass;
-
+*/
 }
 
 
