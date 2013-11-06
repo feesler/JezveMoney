@@ -291,7 +291,7 @@
 	html_op("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
 		html("<div><label for=\"charge\">Charge</label></div>");
 		html_op("<div>");
-			html("<div class=\"right_float\"><span id=\"chargesign\" class=\"curr_sign\">".$charge_sign."</span></div>");
+			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"chargesign\">".$charge_sign."</div></div></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
 					html("<input id=\"charge\" name=\"charge\" class=\"summ_text\" type=\"text\" value=\"".$tr["charge"]."\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
@@ -317,7 +317,7 @@
 	html_op("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
 		html("<div><label for=\"resbal\">Result balance".(($trans_type == 3) ? " (Source)" : "")."</label></div>");
 		html_op("<div>");
-			html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$src["sign"]."</span></div>");
+			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$src["sign"]."</div></div></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
 					html("<input id=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
@@ -332,7 +332,7 @@
 		html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
 			html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
 			html_op("<div>");
-				html("<div class=\"right_float\"><span id=\"res_currsign\" class=\"curr_sign\">".$dest["sign"]."</span></div>");
+				html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$dest["sign"]."</div></div></div>");
 				html_op("<div class=\"stretch_input trans_input\">");
 					html_op("<div>");
 						html("<input id=\"resbal_d\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
