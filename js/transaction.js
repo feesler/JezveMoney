@@ -239,6 +239,23 @@ function getNameOfAccount(account_id)
 }
 
 
+// Return icon type за specified account
+function getIconOfAccount(account_id)
+{
+	var iconType = 0;
+
+	accounts.some(function(acc)
+	{
+		if (acc[0] == account_id)
+			iconType = acc[5];
+
+		return (acc[0] == account_id);
+	});
+
+	return iconType;
+}
+
+
 // Set currency sign for specified field
 function setSign(obj, curr_id)
 {
