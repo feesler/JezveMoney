@@ -63,7 +63,7 @@
 								html("<option value=\"3\">Card</option>");
 								html("<option value=\"4\">Percent</option>");
 								html("<option value=\"5\">Bank</option>");
-								html("<option value=\"5\">Cash</option>");
+								html("<option value=\"6\">Cash</option>");
 							html_cl("</select>");
 						html_cl("</div>");
 					html_cl("</div>");
