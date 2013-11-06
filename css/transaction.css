@@ -112,62 +112,6 @@
 }
 
 
-/* */
-.curr_container
-{
-	width: 34px;
-	height: 50px;
-	float: right;
-	position: relative;
-}
-
-
-/* currency button */
-.rcurr_btn
-{
-	width: 30px;
-	height: 30px;
-	padding: 2px;
-	margin: 8px 0px;
-	color: #FFFFFF;
-	background-color: #0072C6;
-	cursor: pointer;
-	position: relative;
-}
-
-
-.inact_rbtn
-{
-	color: #000000;
-	background-color: #FFFFFF;
-	cursor: default;
-}
-
-
-.rcurr_btn > div
-{
-	text-align: center;
-	height: 30px;
-	line-height: 30px;
-}
-
-
-.rcurr_sel
-{
-	position: absolute;
-	opacity: 0;
-	top: 0px;
-	margin: 8px 0px;
-}
-
-
-.rcurr_sel > div > select
-{
-	width: 34px;
-	height: 34px;
-}
-
-
 /* calendar button */
 .cal_btn
 {
