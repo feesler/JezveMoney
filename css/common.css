@@ -244,6 +244,18 @@ button::-moz-focus-inner
 }
 
 
+.user_icon
+{
+	width: 32px;
+	height: 32px;
+	overflow: hidden;
+	float: left;
+	margin: 9px 0px;
+	background-image: url('../img/icons.png');
+	background-position: -192px 0px;
+}
+
+
 /* drop down user menu */
 .usermenu
 {
