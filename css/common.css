@@ -221,20 +221,20 @@ button::-moz-focus-inner
 }
 
 
-.userblock > button
+.user_button
 {
 	border: 0 none;
 	background-color: #404040;
 }
 
 
-.userblock > button:hover
+.user_button:hover
 {
 	background-color: #606060;
 }
 
 
-.userblock > button > span
+.user_button > span
 {
 	height: 16px;
 	font-size: 16px;
