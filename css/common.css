@@ -146,11 +146,6 @@ button::-moz-focus-inner
 {
 	height: 50px;
 	background-color: #404040;
-	position: fixed;
-	width: 100%;
-	z-index: 10;
-	top: 0;
-	left: 0;
 }
 
 
@@ -303,10 +298,9 @@ button::-moz-focus-inner
 /* content */
 .content
 {
-	margin: 55px auto 0px auto;
+	margin: 0 auto;
 	max-width: 824px;
 	min-width: 200px;
-	z-index: 1;
 }
 
 
