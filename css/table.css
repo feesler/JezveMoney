@@ -3,6 +3,8 @@
 	display: block;
 	background-color: #FFFFFF;
 	position: relative;
+	width: 100%;
+	float: left;
 }
 
 .latest > div

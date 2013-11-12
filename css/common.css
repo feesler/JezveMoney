@@ -629,6 +629,13 @@ label
 
 
 /* main page latest transactions widget */
+.latest_widget
+{
+	max-width: 350px;
+}
+
+
+/*
 .latest_list
 {
 	max-width: 300px;
@@ -652,3 +659,4 @@ label
 	display: block;
 	width: 100%;
 }
+*/

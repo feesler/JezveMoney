@@ -50,11 +50,9 @@
 			html_cl("</div>");
 
 			html();
-			html_op("<div class=\"widget break_widget\">");
+			html_op("<div class=\"widget break_widget latest_widget\">");
 				html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
-				html_op("<div>");
-					$trans->getLatest(5);
-				html_cl("</div>");
+				$trans->getLatest(5);
 			html_cl("</div>");
 
 			html();
