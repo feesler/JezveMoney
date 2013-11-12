@@ -93,13 +93,15 @@
 
 .rbtn_input > div
 {
-	padding: 0px 12px 2px 0px;
+	padding: 0px 16px 2px 0px;
+	margin: 0px -2px 0px 0px;
 }
 
 
 .rbtn_input > div > input
 {
 	border-width: 2px 0px 2px 2px;
+	padding: 2px 7px 2px 5px;
 }
 
 
