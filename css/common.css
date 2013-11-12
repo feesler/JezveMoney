@@ -544,6 +544,7 @@ label
 	max-width: 300px;
 }
 
+
 .info_tile
 {
 	float: left;
@@ -572,6 +573,7 @@ label
 	right: 5px;
 	position: absolute;
 }
+
 
 /* currency button */
 .curr_container
@@ -633,30 +635,3 @@ label
 {
 	max-width: 350px;
 }
-
-
-/*
-.latest_list
-{
-	max-width: 300px;
-}
-
-
-.latest_list > div
-{
-	max-width: 300px;
-}
-
-
-.latest_list > div > div
-{
-	max-width: 300px;
-}
-
-
-.latest_list > div > div > div
-{
-	display: block;
-	width: 100%;
-}
-*/
