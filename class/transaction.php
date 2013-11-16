@@ -756,7 +756,7 @@ class Transaction
 	// Return table of latest transactions
 	public function getLatest($tr_count)
 	{
-		return $this->getTable(0, 0, TRUE, $tr_count, 0, FALSE);
+		return $this->getTable(0, 0, TRUE, $tr_count, 0, FALSE, FALSE);
 	}
 
 
