@@ -135,10 +135,8 @@ var dragMaster = (function()
 	
 	function getCurrentTarget(e)
 	{
-		var x = e.clientX, y = e.clientY;
-
 		dragObject.hide();
-		var elem = document.elementFromPoint(x, y);
+		var elem = document.elementFromPoint(e.clientX, e.clientY);
 		dragObject.show();
 
 		// look for deepest dropTarget
