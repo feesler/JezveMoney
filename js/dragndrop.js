@@ -275,78 +275,55 @@ function DropTarget(element)
 	{
 		var dragSource = dragObject.getElement().parentNode;
 
-		//element.style.backgroundColor =  '#808080';
-
-		if (element != dragSource)
+		if (element == dragSource)
+			return;
+		var whatToMove;
+		var whereToMove = null;
+		var isPrev = true;
+		var telem = element.previousElementSibling;
+		while(telem)
 		{
-			var whatToMove;
-/*
-			if (whatToMove)
+			if (telem == dragSource)
 			{
-*/
-				var whereToMove = null;
-				var isPrev = true;
-				var telem = element.previousElementSibling;
-				while(telem)
-				{
-					if (telem == dragSource)
-					{
-						whereToMove = telem;
-						break;
-					}
-					telem = telem.previousElementSibling;
-				}
-
-				if (!whereToMove)
-				{
-					isPrev = false;
-					telem = element.nextElementSibling;
-					while(telem)
-					{
-						if (telem == dragSource)
-						{
-							whereToMove = telem;
-							break;
-						}
-						telem = telem.nextElementSibling;
-					}
-				}
-
-/*
-				if (element.previousElementSibling && element.previousElementSibling == dragSource)
-					whereToMove = element.previousElementSibling;
-				else if (element.nextElementSibling && element.nextElementSibling == dragSource)
-					whereToMove = element.nextElementSibling;
-*/
-
-				if (whereToMove)
-				{
-					telem = whereToMove;
-					while(telem != element)
-					{
-						telem = (isPrev) ? telem.nextElementSibling : telem.previousElementSibling;
-
-						whatToMove = re(telem.firstElementChild);
-						whereToMove.appendChild(whatToMove);
-						whereToMove.className = 'trlist_item_wrap';
-
-						whereToMove = telem;
-					}
-
-/*
-					whereToMove.appendChild(whatToMove);
-*/
-					element.className = 'drop_item';
-/*
-					whereToMove.className = 'trlist_item_wrap';
-*/
-				}
-
-				element.appendChild(re(dragObject.getElement()));
-/*
+				whereToMove = telem;
+				break;
 			}
-*/
+			telem = telem.previousElementSibling;
 		}
+
+		if (!whereToMove)
+		{
+			isPrev = false;
+			telem = element.nextElementSibling;
+			while(telem)
+			{
+				if (telem == dragSource)
+				{
+					whereToMove = telem;
+					break;
+				}
+				telem = telem.nextElementSibling;
+			}
+		}
+
+		if (whereToMove)
+		{
+			telem = whereToMove;
+			while(telem != element)
+			{
+				telem = (isPrev) ? telem.nextElementSibling : telem.previousElementSibling;
+
+				whatToMove = re(telem.firstElementChild);
+				whereToMove.appendChild(whatToMove);
+				whereToMove.className = 'trlist_item_wrap';
+
+				whereToMove = telem;
+			}
+
+			element.className = 'drop_item';
+		}
+
+		element.appendChild(re(dragObject.getElement()));
 	}
 
 
