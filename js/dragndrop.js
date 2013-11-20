@@ -191,6 +191,7 @@ function DragObject(element)
 		var s = element.style;
 		rememberPosition = { top: s.top, left: s.left, position: s.position };
 		s.position = 'absolute';
+		element.parentNode.className = 'drop_item';
 
 		mouseOffset = offset;
 	}
@@ -224,6 +225,7 @@ function DragObject(element)
 		s.top = rememberPosition.top;
 		s.left = rememberPosition.left;
 		s.position = rememberPosition.position;
+		element.parentNode.className = 'trlist_item_wrap';
 	}
 
 
@@ -286,7 +288,11 @@ function DropTarget(element)
 					whereToMove = element.nextElementSibling;
 
 				if (whereToMove)
+				{
 					whereToMove.appendChild(whatToMove);
+					element.className = 'drop_item';
+					whereToMove.className = 'trlist_item_wrap';
+				}
 
 				element.appendChild(re(dragObject.getElement()));
 			}

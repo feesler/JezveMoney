@@ -59,8 +59,10 @@
 	html(getCSS("table.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
+	html(getJS("dragndrop.js"));
 	html(getJS("tr_list.js"));
 
 	html("<script>");
@@ -68,6 +70,8 @@
 		html("var transType = ".json_encode($type_str).";");
 		html("var curAccId = ".json_encode($acc_id).";");
 		html("var searchRequest = ".json_encode($searchReq).";");
+		html();
+		html("onReady(initTransListDrag);");
 	popTab();
 	html("</script>");
 

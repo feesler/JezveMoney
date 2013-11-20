@@ -112,6 +112,29 @@ function onTransClick(tr_id)
 }
 
 
+// Initialization of drap and drop features
+function initTransListDrag()
+{
+	var trlist, listItem;
+
+	trlist = ge('trlist');
+	if (!trlist)
+		return;
+
+	listItem = trlist.firstElementChild;
+	while(listItem)
+	{
+		if (listItem.className == 'trlist_item_wrap')
+		{
+			new DropTarget(listItem);
+			new DragObject(listItem.firstElementChild);
+		}
+
+		listItem = listItem.nextElementSibling;
+	}
+}
+
+
 // Account change event handler
 function onAccountChange()
 {

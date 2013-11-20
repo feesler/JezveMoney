@@ -590,7 +590,7 @@ class Transaction
 
 		$pers = new Person(self::$user_id);
 
-		html_op("<div class=\"trans_list\">");
+		html_op("<div id=\"trlist\" class=\"trans_list\">");
 
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
