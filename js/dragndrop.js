@@ -189,8 +189,10 @@ function DragObject(element)
 	this.onDragStart = function(offset)
 	{
 		var s = element.style;
-		rememberPosition = { top: s.top, left: s.left, position: s.position };
+		var origWidth = element.offsetWidth;
+		rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
 		s.position = 'absolute';
+		s.width = (origWidth - 16) + 'px';
 		element.parentNode.className = 'drop_item';
 
 		mouseOffset = offset;
@@ -225,6 +227,7 @@ function DragObject(element)
 		s.top = rememberPosition.top;
 		s.left = rememberPosition.left;
 		s.position = rememberPosition.position;
+		s.width = rememberPosition.width;
 		element.parentNode.className = 'trlist_item_wrap';
 	}
 
