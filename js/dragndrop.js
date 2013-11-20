@@ -1,4 +1,4 @@
-//
+﻿//
 function getOffset(elem)
 {
 	if (elem.getBoundingClientRect)
@@ -279,24 +279,73 @@ function DropTarget(element)
 
 		if (element != dragSource)
 		{
-			var whatToMove = re(element.firstElementChild);
+			var whatToMove;
+/*
 			if (whatToMove)
 			{
+*/
 				var whereToMove = null;
+				var isPrev = true;
+				var telem = element.previousElementSibling;
+				while(telem)
+				{
+					if (telem == dragSource)
+					{
+						whereToMove = telem;
+						break;
+					}
+					telem = telem.previousElementSibling;
+				}
+
+				if (!whereToMove)
+				{
+					isPrev = false;
+					telem = element.nextElementSibling;
+					while(telem)
+					{
+						if (telem == dragSource)
+						{
+							whereToMove = telem;
+							break;
+						}
+						telem = telem.nextElementSibling;
+					}
+				}
+
+/*
 				if (element.previousElementSibling && element.previousElementSibling == dragSource)
 					whereToMove = element.previousElementSibling;
 				else if (element.nextElementSibling && element.nextElementSibling == dragSource)
 					whereToMove = element.nextElementSibling;
+*/
 
 				if (whereToMove)
 				{
+					telem = whereToMove;
+					while(telem != element)
+					{
+						telem = (isPrev) ? telem.nextElementSibling : telem.previousElementSibling;
+
+						whatToMove = re(telem.firstElementChild);
+						whereToMove.appendChild(whatToMove);
+						whereToMove.className = 'trlist_item_wrap';
+
+						whereToMove = telem;
+					}
+
+/*
 					whereToMove.appendChild(whatToMove);
+*/
 					element.className = 'drop_item';
+/*
 					whereToMove.className = 'trlist_item_wrap';
+*/
 				}
 
 				element.appendChild(re(dragObject.getElement()));
+/*
 			}
+*/
 		}
 	}
 
