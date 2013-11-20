@@ -90,7 +90,7 @@ function onTransClick(tr_id)
 	{
 		transactions.deselectAccount(tr_id);
 
-		transObj.firstElementChild.className = '';
+		transObj.firstElementChild.className = 'trlist_item';
 	}
 	else
 	{
