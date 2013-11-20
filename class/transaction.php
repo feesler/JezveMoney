@@ -666,7 +666,6 @@ class Transaction
 			html_cl("</div>");
 		}
 
-		$row_num = 1;
 		foreach($resArr as $row)
 		{
 			$trans_id = intval($row["id"]);
@@ -685,7 +684,7 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			$resStr = "<div id=\"tr_".$trans_id."\" class=\"trlist_item_wrap".((($row_num % 2) == 0) ? " even_row" : "")."\"";
+			$resStr = "<div id=\"tr_".$trans_id."\" class=\"trlist_item_wrap\"";
 			if ($active == TRUE)
 				$resStr .= " onclick=\"onTransClick(".$trans_id.");\"";
 			$resStr .= ">";
@@ -736,8 +735,6 @@ class Transaction
 			html_cl("</div>");
 			html_cl("</div>");
 			html_cl("</div>");
-
-			$row_num++;
 		}
 
 		if ($tr_on_page > 0 && $showPaginator == TRUE)

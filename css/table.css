@@ -1,13 +1,14 @@
 ﻿.trlist_item_wrap
 {
-	background-color: #FFFFFF;
 	width: 100%;
 	float: left;
+	margin: 2px 0px;
 }
 
 
 .trlist_item
 {
+	background-color: #F0F0F0;
 	padding: 8px;
 	border: 0px none;
 }
@@ -16,6 +17,7 @@
 .act_tr
 {
 	padding: 5px;
+	background-color: #F0F0F0;
 	border: 3px solid #0072C6;
 	cursor: pointer;
 }
@@ -50,12 +52,6 @@
 {
 	font-size: 12px;
 	color: #808080;
-}
-
-
-.even_row
-{
-	background-color: #E0E0E0;
 }
 
 
