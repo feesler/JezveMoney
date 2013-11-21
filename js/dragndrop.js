@@ -278,20 +278,26 @@ function DropTarget(element)
 		if (element == dragSource)
 			return;
 		var whatToMove;
-		var whereToMove = null;
-		var isPrev = true;
-		var telem = element.previousElementSibling;
+		var whereToMove = element;
+		var isPrev;
+		var telem;
+		var found = false;
+
+		// Move from drop object upward
+		isPrev = true;
+		telem = element.previousElementSibling;
 		while(telem)
 		{
 			if (telem == dragSource)
 			{
-				whereToMove = telem;
+				found = true;
 				break;
 			}
 			telem = telem.previousElementSibling;
 		}
 
-		if (!whereToMove)
+		// Move from drop object downward
+		if (!found)
 		{
 			isPrev = false;
 			telem = element.nextElementSibling;
@@ -299,15 +305,30 @@ function DropTarget(element)
 			{
 				if (telem == dragSource)
 				{
-					whereToMove = telem;
+					found = true;
 					break;
 				}
 				telem = telem.nextElementSibling;
 			}
 		}
 
-		if (whereToMove)
+		if (found)
 		{
+			var newBlock = ce('div', { id : dragSource.id, className : 'drop_item', onclick : dragSource.onclick });
+
+			//whatToMove = re(dragSource);
+
+			if (!isPrev)
+				whereToMove.parentNode.insertBefore(newBlock, whereToMove);
+			else
+				insertAfter(newBlock, whereToMove);
+
+			whatToMove = re(dragObject.getElement());
+			newBlock.appendChild(whatToMove);
+
+			re(dragSource);
+
+/*
 			telem = whereToMove;
 			while(telem != element)
 			{
@@ -321,9 +342,12 @@ function DropTarget(element)
 			}
 
 			element.className = 'drop_item';
+*/
 		}
 
+/*
 		element.appendChild(re(dragObject.getElement()));
+*/
 	}
 
 
