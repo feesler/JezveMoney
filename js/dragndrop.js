@@ -259,7 +259,6 @@ function DropTarget(element)
 	{
 		this.onLeave();
 		
-		//dragObject.hide();
 		dragObject.onDragFail();
 	}
 
@@ -316,8 +315,6 @@ function DropTarget(element)
 		{
 			var newBlock = ce('div', { id : dragSource.id, className : 'drop_item', onclick : dragSource.onclick });
 
-			//whatToMove = re(dragSource);
-
 			if (!isPrev)
 				whereToMove.parentNode.insertBefore(newBlock, whereToMove);
 			else
@@ -327,27 +324,7 @@ function DropTarget(element)
 			newBlock.appendChild(whatToMove);
 
 			re(dragSource);
-
-/*
-			telem = whereToMove;
-			while(telem != element)
-			{
-				telem = (isPrev) ? telem.nextElementSibling : telem.previousElementSibling;
-
-				whatToMove = re(telem.firstElementChild);
-				whereToMove.appendChild(whatToMove);
-				whereToMove.className = 'trlist_item_wrap';
-
-				whereToMove = telem;
-			}
-
-			element.className = 'drop_item';
-*/
 		}
-
-/*
-		element.appendChild(re(dragObject.getElement()));
-*/
 	}
 
 
