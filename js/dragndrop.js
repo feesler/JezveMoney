@@ -311,19 +311,23 @@ function DropTarget(element)
 
 		if (found)
 		{
+/*
 			var newBlock = ce('div', { id : dragSource.id, className : 'trlist_item_wrap', onclick : dragSource.onclick });
 
 			new DropTarget(newBlock);
+*/
+			var newBlock = re(dragSource);
 
 			if (!isPrev)
 				whereToMove.parentNode.insertBefore(newBlock, whereToMove);
 			else
 				insertAfter(newBlock, whereToMove);
-
+/*
 			whatToMove = re(dragObject.getElement());
 			newBlock.appendChild(whatToMove);
 
 			re(dragSource);
+*/
 		}
 	}
 
