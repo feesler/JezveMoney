@@ -692,7 +692,7 @@ class Transaction
 
 			html_op("<div class=\"trlist_item\">");
 
-			$resStr = "<div><span class=\"latest_acc_name\">";
+			$resStr = "<div><span class=\"tritem_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
 			else if ($cur_trans_type == 4)
@@ -709,7 +709,7 @@ class Transaction
 			$resStr .= "</span></div>";
 			html($resStr);
 
-			$resStr = "<div><span class=\"latest_sum\">";
+			$resStr = "<div><span class=\"tritem_sum\">";
 			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
 				$resStr .= "- ";
 			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
@@ -728,9 +728,9 @@ class Transaction
 			html($resStr);
 
 			html_op("<div>");
-			html("<span class=\"latest_date\">".$fdate."</span>");
+			html("<span class=\"tritem_date\">".$fdate."</span>");
 			if ($comment != "")
-				html("<span class=\"latest_comm\"> | ".$comment."</span>");
+				html("<span class=\"tritem_comm\"> | ".$comment."</span>");
 
 			html_cl("</div>");
 			html_cl("</div>");
