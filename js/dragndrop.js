@@ -169,6 +169,16 @@ function DragObject(element)
 	}
 
 
+	this.resetDrag = function()
+	{
+		var s = element.style;
+		s.top = rememberPosition.top;
+		s.left = rememberPosition.left;
+		s.position = rememberPosition.position;
+		s.width = rememberPosition.width;
+	}
+
+
 	this.onDragMove = function(x, y)
 	{
 		element.style.top =  y - mouseOffset.y + 'px';
@@ -181,11 +191,7 @@ function DragObject(element)
 
 	this.onDragFail = function()
 	{
-		var s = element.style;
-		s.top = rememberPosition.top;
-		s.left = rememberPosition.left;
-		s.position = rememberPosition.position;
-		s.width = rememberPosition.width;
+		this.resetDrag();
 	}
 
 
@@ -218,7 +224,7 @@ function DropTarget(element)
 	{
 		this.onLeave();
 
-		dragObject.onDragFail();
+		dragObject.resetDrag();
 	}
 
 
