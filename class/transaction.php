@@ -727,10 +727,10 @@ class Transaction
 			$resStr .= "</span></div>";
 			html($resStr);
 
-			html_op("<div>");
-			html("<span class=\"tritem_date\">".$fdate."</span>");
+			html_op("<div class=\"tritem_date_comm\">");
+			html("<span>".$fdate."</span>");
 			if ($comment != "")
-				html("<span class=\"tritem_comm\"> | ".$comment."</span>");
+				html("<span class=\"tritem_comm\">".$comment."</span>");
 
 			html_cl("</div>");
 			html_cl("</div>");
