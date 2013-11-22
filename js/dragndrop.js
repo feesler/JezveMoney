@@ -1,4 +1,4 @@
-﻿//
+﻿// Calculate offset of element
 function getOffset(elem)
 {
 	if (elem.getBoundingClientRect)
@@ -8,7 +8,7 @@ function getOffset(elem)
 }
 
 
-//
+// Calculate offset of element using getBoundingClientRect() method
 function getOffsetRect(elem)
 {
 	var box = elem.getBoundingClientRect();
@@ -26,7 +26,7 @@ function getOffsetRect(elem)
 }
 
 
-//
+// Calculate offset of element by sum of offsets of parents
 function getOffsetSum(elem)
 {
 	var top = 0, left = 0;
@@ -43,14 +43,15 @@ function getOffsetSum(elem)
 
 
 
-//
+// Main drag and drop class
 var dragMaster = (function()
 {
 	var dragObject;
 	var mouseDownAt;
 	var currentDropTarget;
 
-	
+
+	// Mouse down on drag object element event handler
 	function mouseDown(e)
 	{
 		e = fixEvent(e);
@@ -66,6 +67,7 @@ var dragMaster = (function()
 	}
 
 
+	// Document mouse move event handler
 	function mouseMove(e)
 	{
 		e = fixEvent(e);
@@ -100,7 +102,8 @@ var dragMaster = (function()
 		return false;
 	}
 	
-	
+
+	// Document mouse up event handler
 	function mouseUp()
 	{
 		if (!dragObject)
@@ -121,7 +124,7 @@ var dragMaster = (function()
 
 			dragObject = null;
 		}
-	
+
 		removeDocumentEventHandlers();
 	}
 
@@ -132,7 +135,8 @@ var dragMaster = (function()
 		return {x:x - docPos.left, y:y - docPos.top};
 	}
 
-	
+
+	// Try to find drop target under mouse cursor
 	function getCurrentTarget(e)
 	{
 		dragObject.hide();
@@ -151,6 +155,7 @@ var dragMaster = (function()
 	}
 
 
+	// Set event handlers for document
 	function addDocumentEventHandlers()
 	{
 		document.onmousemove = mouseMove;
@@ -159,6 +164,7 @@ var dragMaster = (function()
 	}
 
 
+	// Remove event handler from document
 	function removeDocumentEventHandlers()
 	{
 		document.onmousemove = document.onmouseup = document.ondragstart = document.body.onselectstart = null;
@@ -173,7 +179,7 @@ var dragMaster = (function()
 }());
 
 
-//
+// Drag object class
 function DragObject(element)
 {
 	element.dragObject = this;
@@ -198,13 +204,13 @@ function DragObject(element)
 
 	this.hide = function()
 	{
-		element.style.display = 'none';
+		show(element, false);
 	}
 
 
 	this.show = function()
 	{
-		element.style.display = '';
+		show(element, true);
 	}
 
 
@@ -241,7 +247,7 @@ function DragObject(element)
 }
 
 
-//
+// Drop target class
 function DropTarget(element)
 {
 	element.dropTarget = this;
@@ -256,14 +262,13 @@ function DropTarget(element)
 	this.accept = function(dragObject)
 	{
 		this.onLeave();
-		
+
 		dragObject.onDragFail();
 	}
 
 
 	this.onLeave = function(dragObject)
 	{
-		element.style.backgroundColor =  '';
 	}
 
 
@@ -274,14 +279,10 @@ function DropTarget(element)
 
 		if (element == dragSource)
 			return;
-		var whatToMove;
-		var whereToMove = element;
-		var isPrev;
-		var telem;
-		var found = false;
+
+		var isPrev = true, found = false, telem;
 
 		// Move from drop object upward
-		isPrev = true;
 		telem = element.previousElementSibling;
 		while(telem)
 		{
@@ -311,23 +312,12 @@ function DropTarget(element)
 
 		if (found)
 		{
-/*
-			var newBlock = ce('div', { id : dragSource.id, className : 'trlist_item_wrap', onclick : dragSource.onclick });
+			var cutSource = re(dragSource);
 
-			new DropTarget(newBlock);
-*/
-			var newBlock = re(dragSource);
-
-			if (!isPrev)
-				whereToMove.parentNode.insertBefore(newBlock, whereToMove);
+			if (isPrev)
+				insertAfter(cutSource, element);
 			else
-				insertAfter(newBlock, whereToMove);
-/*
-			whatToMove = re(dragObject.getElement());
-			newBlock.appendChild(whatToMove);
-
-			re(dragSource);
-*/
+				element.parentNode.insertBefore(cutSource, element);
 		}
 	}
 
