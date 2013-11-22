@@ -313,6 +313,8 @@ function DropTarget(element)
 		{
 			var newBlock = ce('div', { id : dragSource.id, className : 'trlist_item_wrap', onclick : dragSource.onclick });
 
+			new DropTarget(newBlock);
+
 			if (!isPrev)
 				whereToMove.parentNode.insertBefore(newBlock, whereToMove);
 			else
