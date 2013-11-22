@@ -191,7 +191,6 @@ function DragObject(element)
 		rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
 		s.position = 'absolute';
 		s.width = (origWidth - 16) + 'px';
-		element.parentNode.className = 'drop_item';
 
 		mouseOffset = offset;
 	}
@@ -226,7 +225,6 @@ function DragObject(element)
 		s.left = rememberPosition.left;
 		s.position = rememberPosition.position;
 		s.width = rememberPosition.width;
-		element.parentNode.className = 'trlist_item_wrap';
 	}
 
 
@@ -313,7 +311,7 @@ function DropTarget(element)
 
 		if (found)
 		{
-			var newBlock = ce('div', { id : dragSource.id, className : 'drop_item', onclick : dragSource.onclick });
+			var newBlock = ce('div', { id : dragSource.id, className : 'trlist_item_wrap', onclick : dragSource.onclick });
 
 			if (!isPrev)
 				whereToMove.parentNode.insertBefore(newBlock, whereToMove);
