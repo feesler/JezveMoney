@@ -115,17 +115,18 @@ function onTransClick(tr_id)
 // Initialization of drap and drop features
 function initTransListDrag()
 {
-	var trlist, listItem, trans_id;
+	var trlist, listItem_wr, listItem, trans_id;
 
 	trlist = ge('trlist');
 	if (!trlist)
 		return;
 
-	listItem = trlist.firstElementChild;
-	while(listItem)
+	listItem_wr = trlist.firstElementChild;
+	while(listItem_wr)
 	{
-		if (listItem.className == 'trlist_item_wrap')
+		if (listItem_wr.className == 'trlist_item_wrap')
 		{
+			listItem = listItem_wr.firstElementChild;
 			trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
 			if (trans_id)
 			{
@@ -133,11 +134,11 @@ function initTransListDrag()
 				listItem.firstElementChild.style.cursor = 'pointer';
 			}
 
-			new DropTarget(listItem);
-			new DragObject(listItem.firstElementChild);
+			new DropTarget(listItem_wr);
+			new DragObject(listItem);
 		}
 
-		listItem = listItem.nextElementSibling;
+		listItem_wr = listItem_wr.nextElementSibling;
 	}
 }
 

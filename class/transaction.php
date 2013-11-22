@@ -684,10 +684,8 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			$resStr = "<div id=\"tr_".$trans_id."\" class=\"trlist_item_wrap\">";
-			html_op($resStr);
-
-			html_op("<div class=\"trlist_item\">");
+			html_op("<div class=\"trlist_item_wrap\">");
+			html_op("<div id=\"tr_".$trans_id."\" class=\"trlist_item\">");
 
 			$resStr = "<div><span class=\"tritem_acc_name\">";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
