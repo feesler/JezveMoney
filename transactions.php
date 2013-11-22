@@ -131,7 +131,7 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, TRUE, $searchReq, $stDate, $endDate);
+				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate);
 			html_cl("</div>");
 
 			html_op("<div class=\"control_icons\">");

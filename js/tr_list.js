@@ -115,7 +115,7 @@ function onTransClick(tr_id)
 // Initialization of drap and drop features
 function initTransListDrag()
 {
-	var trlist, listItem;
+	var trlist, listItem, trans_id;
 
 	trlist = ge('trlist');
 	if (!trlist)
@@ -126,6 +126,13 @@ function initTransListDrag()
 	{
 		if (listItem.className == 'trlist_item_wrap')
 		{
+			trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
+			if (trans_id)
+			{
+				listItem.onclick = bind(onTransClick, null, trans_id);
+				listItem.firstElementChild.style.cursor = 'pointer';
+			}
+
 			new DropTarget(listItem);
 			new DragObject(listItem.firstElementChild);
 		}

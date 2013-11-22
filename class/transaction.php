@@ -577,7 +577,7 @@ class Transaction
 
 
 	// Return table of transactions
-	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $active = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
 	{
 		global $db;
 
@@ -684,10 +684,7 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			$resStr = "<div id=\"tr_".$trans_id."\" class=\"trlist_item_wrap\"";
-			if ($active == TRUE)
-				$resStr .= " onclick=\"onTransClick(".$trans_id.");\"";
-			$resStr .= ">";
+			$resStr = "<div id=\"tr_".$trans_id."\" class=\"trlist_item_wrap\">";
 			html_op($resStr);
 
 			html_op("<div class=\"trlist_item\">");
@@ -753,7 +750,7 @@ class Transaction
 	// Return table of latest transactions
 	public function getLatest($tr_count)
 	{
-		return $this->getTable(0, 0, TRUE, $tr_count, 0, FALSE, FALSE);
+		return $this->getTable(0, 0, TRUE, $tr_count, 0, FALSE);
 	}
 
 
