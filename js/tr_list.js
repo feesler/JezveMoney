@@ -153,13 +153,13 @@ function onTransClick(tr_id)
 	{
 		transactions.deselect(tr_id);
 
-		transObj.firstElementChild.className = 'trlist_item';
+		transObj.className = 'trlist_item';
 	}
 	else
 	{
 		transactions.select(tr_id);
 
-		transObj.firstElementChild.className = 'act_tr';
+		transObj.className = 'act_tr';
 	}
 
 	show(edit_btn, (transactions.selectedCount() == 1));
