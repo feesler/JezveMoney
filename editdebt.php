@@ -245,7 +245,7 @@
 				html_op("<div id=\"personname_block\" class=\"person_input\"".$disp.">");
 					html_op("<div class=\"stretch_input trans_input\">");		// $disp
 						html_op("<div>");
-							html("<input id=\"personname\" name=\"personname\" type=\"".$p_inpType."\" value=\"".$fperson_name."\">");
+							html("<input id=\"personname\" name=\"personname\" type=\"".$p_inpType."\" value=\"".$person_name."\">");
 						html_cl("</div>");
 					html_cl("</div>");
 				html_cl("</div>");
