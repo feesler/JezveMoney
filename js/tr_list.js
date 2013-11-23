@@ -45,6 +45,69 @@ var transactions =
 	selectedCount : function()
 	{
 		return this.selectedArr.length;
+	},
+
+
+	findById : function(tr_id)
+	{
+		var tr_info = null;
+
+		if (transArr)
+		{
+			transArr.some(function(trans)
+			{
+				if (trans[0] == tr_id)
+					tr_info = trans; 
+			});
+		}
+
+		return tr_info;
+	},
+
+
+	setPos : function(tr_id, pos)
+	{
+		var tr_info, oldPos;
+
+		tr_info = this.findById(tr_id);
+		if (!tr_info)
+			return false;
+
+		oldPos = tr_info[8];
+		if (oldPos == pos)
+		{
+			return true;
+		}
+		else
+		{
+			transArr.forEach(function(trans)
+			{
+				if (trans[0] == tr_id)
+				{
+					trans[8] = pos;
+				}
+				else
+				{
+					if (oldPos == 0)			// insert with specified position
+					{
+						if (trans[8] >= pos)
+							trans[8] += 1;
+					}
+					else if (pos < oldPos)		// moving up
+					{
+						if (trans[8] >= pos && trans[8] < oldPos)
+							trans[8] += 1;
+					}
+					else if (pos > oldPos)		// moving down
+					{
+						if (trans[8] > oldPos && trans[8] <= pos)
+							trans[8] -= 1;
+					}
+				}
+			});
+		}
+
+		return true;
 	}
 };
 
@@ -141,6 +204,79 @@ function initTransListDrag()
 		listItem_wr = listItem_wr.nextElementSibling;
 	}
 }
+
+
+
+function sendChangePosRequest(trans_id, newPos)
+{
+	getData('./modules/setpos.php?id=' + trans_id + '&pos=' + newPos, onChangePosCallback(trans_id, newPos));
+}
+
+
+
+function onChangePosCallback(trans_id, newPos)
+{
+	return function(result)
+	{
+		if (result && result == 'ok')
+		{
+			updateTransArrPos(trans_id, newPos);
+		}
+		else
+		{
+			cancelPosChange();
+		}
+	}
+}
+
+
+function updateTransArrPos(trans_id, newPos)
+{
+	dbgTransArr();
+
+	transactions.setPos(trans_id, newPos);
+
+	dbgTransArr();
+}
+
+
+function cancelPosChange()
+{
+
+}
+
+
+
+function dbgTransArr()
+{
+	var darr = [];
+
+	if (transArr)
+	{
+		transArr.some(function(trans)
+		{
+			darr.push(trans[8]);
+		});
+
+		dout(darr.join(', '));
+	}
+}
+
+
+
+function onTransPosChanged(trans_id, retrans_id)
+{
+	var replacedItem, newPos;
+
+	replacedItem = transactions.findById(retrans_id);
+
+	if (replacedItem)
+	{
+		newPos = replacedItem[8];
+		sendChangePosRequest(trans_id, newPos);
+	}
+}
+
 
 
 // Account change event handler

@@ -143,6 +143,7 @@ function DragObject(element)
 
 	var rememberPosition;
 	var mouseOffset;
+	var ins_id = 0;
 
 
 	this.onDragStart = function(offset)
@@ -186,7 +187,12 @@ function DragObject(element)
 	}
 
 
-	this.onDragSuccess = function(dropTarget){}
+	this.onDragSuccess = function(dropTarget)
+	{
+		var tr_id =  (element && element.id.length > 3) ? parseInt(element.id.substr(3)) : 0;
+
+		onTransPosChanged(tr_id, ins_id);
+	}
 
 
 	this.onDragFail = function()
@@ -204,6 +210,12 @@ function DragObject(element)
 	this.getElement = function()
 	{
 		return element;
+	}
+
+
+	this.onInsertAt = function(obj)
+	{
+		ins_id = (obj && obj.id.length > 3) ? parseInt(obj.id.substr(3)) : 0;
 	}
 }
 
@@ -279,6 +291,8 @@ function DropTarget(element)
 				insertAfter(cutSource, element);
 			else
 				element.parentNode.insertBefore(cutSource, element);
+
+			dragObject.onInsertAt(element.firstElementChild);
 		}
 	}
 
