@@ -502,6 +502,115 @@ class Transaction
 	}
 
 
+
+	// Return array of transactions
+	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	{
+		global $db;
+
+		$res = array();
+
+		if (!self::$user_id)
+			return $res;
+
+		$owner_id = User::getOwner(self::$user_id);
+		if (!$owner_id)
+			return $res;
+
+		$pers = new Person(self::$user_id);
+		$acc = new Account(self::$user_id, TRUE);
+		$accounts = $acc->getCount();
+		if (!$accounts)
+			return $res;
+
+		if (!$db->countQ("transactions", "user_id=".self::$user_id))
+			return $res;
+
+		$tr_type = intval($trans_type);
+		$acc_id = intval($account_id);
+		$sReq = $db->escape($searchStr);
+
+		$condition = "user_id=".self::$user_id;
+		if ($tr_type != 0)
+			$condition .= " AND type=".$tr_type;
+		if ($acc_id != 0)
+			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
+		if (!is_empty($sReq))
+			$condition .= " AND comment LIKE '%".$sReq."%'";
+
+		if (!is_null($startDate) && !is_null($endDate))
+		{
+			$stdate = strtotime($startDate);
+			$enddate = strtotime($endDate);
+			if ($stdate != -1 && $enddate != -1)
+			{
+				$fstdate = date("Y-m-d H:i:s", $stdate);
+				$fenddate = date("Y-m-d H:i:s", $enddate);
+
+				$condition .= " AND date >= ".qnull($fstdate)." AND date <= ".qnull($fenddate);
+			}
+		}
+
+		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
+		if ($tr_on_page > 0)
+		{
+			$transCount = $db->countQ("transactions", $condition);
+
+			$limitOffset = ($tr_on_page * $page_num);
+			$limitRows = min($transCount - $limitOffset, $tr_on_page);
+
+			$orderAndLimit .= " LIMIT ".$limitOffset.", ".$limitRows;
+		}
+
+		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
+		$rowCount = count($resArr);
+		if (!$rowCount)
+			return $res;
+
+		foreach($resArr as $row)
+		{
+			$trans_id = intval($row["id"]);
+			$cur_trans_type = intval($row["type"]);
+			$src_id = intval($row["src_id"]);
+			$dest_id = intval($row["dest_id"]);
+			$amount = floatval($row["amount"]);
+			$charge = floatval($row["charge"]);
+			$curr_id = intval($row["curr_id"]);
+			$comment = $row["comment"];
+			$fdate = date("d.m.Y", strtotime($row["date"]));
+			$trans_pos = intval($row["pos"]);
+
+			if ($cur_trans_type == 4)
+			{
+				$src_owner_id = $acc->getOwner($src_id);
+				$dest_owner_id = $acc->getOwner($dest_id);
+			}
+
+			$famount .= Currency::format($amount, $curr_id);
+			if ($charge != $amount)
+			{
+				if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))
+					$acc_curr = $acc->getCurrency($dest_id);
+				else
+					$acc_curr = $acc->getCurrency($src_id);
+
+				$fcharge = "";
+				if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
+					$fcharge .= "- ";
+				else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
+					$fcharge .= "+ ";
+				$fcharge .= " (".Currency::format($charge, $acc_curr).")";
+			}
+			else
+				$fcharge = $famount;
+
+			$res[] = array($trans_id, $src_id, $dest_id, $famount, $fcharge, $cur_trans_type, $fdate, $comment, $trans_pos);
+		}
+
+		return $res;
+	}
+
+
 	// Return link to specified page
 	private function getPageLink($trans_type, $acc_id, $page_num, $is_active)
 	{
