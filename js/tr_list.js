@@ -20,7 +20,7 @@ var transactions =
 	},
 
 
-	selectAccount : function(tr_id)
+	select : function(tr_id)
 	{
 		if (!tr_id || this.isSelected(tr_id))
 			return false;
@@ -30,7 +30,7 @@ var transactions =
 	},
 
 
-	deselectAccount : function(tr_id)
+	deselect : function(tr_id)
 	{
 		var tr_pos = this.getPos(tr_id);
 
@@ -151,13 +151,13 @@ function onTransClick(tr_id)
 
 	if (transactions.isSelected(tr_id))
 	{
-		transactions.deselectAccount(tr_id);
+		transactions.deselect(tr_id);
 
 		transObj.firstElementChild.className = 'trlist_item';
 	}
 	else
 	{
-		transactions.selectAccount(tr_id);
+		transactions.select(tr_id);
 
 		transObj.firstElementChild.className = 'act_tr';
 	}
