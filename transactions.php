@@ -59,6 +59,7 @@
 	html(getCSS("table.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("ajax.js"));
 	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
@@ -67,6 +68,7 @@
 
 	html("<script>");
 	pushTab();
+		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate)).";");
 		html("var transType = ".json_encode($type_str).";");
 		html("var curAccId = ".json_encode($acc_id).";");
 		html("var searchRequest = ".json_encode($searchReq).";");
