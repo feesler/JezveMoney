@@ -325,7 +325,7 @@
 
 			if ($group_type == 0)		// no grouping
 			{
-				$chargeArr[$i] = getCharge($row);
+				$chargeArr[$i] = floatval($row["charge"]);
 			}
 			else if ($group_type == 1)	// group by day
 			{
@@ -359,7 +359,7 @@
 				$itemNum++;
 			}
 
-			$curSum += getCharge($row);
+			$curSum += floatval($row["charge"]);
 		}
 
 		if ($group_type != 0 && $curSum != 0.0)
