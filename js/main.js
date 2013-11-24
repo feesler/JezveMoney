@@ -167,14 +167,15 @@ var accounts =
 // Tile click event handler
 function onTileClick(acc_id)
 {
-	var tile, edit_btn, del_btn, delaccounts;
+	var tile, edit_btn, del_btn, delaccounts, export_btn;
 	var actDiv;
 
 	tile = ge('acc_' + acc_id);
 	edit_btn = ge('edit_btn');
 	del_btn = ge('del_btn');
 	delaccounts = ge('delaccounts');
-	if (!tile || !edit_btn || !delaccounts)
+	export_btn = ge('export_btn');
+	if (!tile || !edit_btn || !delaccounts || !export_btn)
 		return;
 
 	if (accounts.isSelected(acc_id))
@@ -195,6 +196,7 @@ function onTileClick(acc_id)
 	}
 
 	show(edit_btn, (accounts.selectedCount() == 1));
+	show(export_btn, (accounts.selectedCount() == 1));
 	show(del_btn, (accounts.selectedCount() > 0));
 
 	delaccounts.value = accounts.selectedArr.join();
@@ -203,6 +205,8 @@ function onTileClick(acc_id)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
 			edit_btn.firstElementChild.href = './editaccount.php?id=' + accounts.selectedArr[0];
+		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			export_btn.firstElementChild.href = './csvexport.php?id=' + accounts.selectedArr[0];
 	}
 }
 

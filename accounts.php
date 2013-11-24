@@ -44,6 +44,7 @@
 			html("<div class=\"tiles\">".$acc->getTiles(TRUE)."</div>");
 			html_op("<div class=\"control_icons\">");
 				html(getIconLink(ICON_LINK, "edit_btn", "edit", "Edit", FALSE, "#"));
+				html(getIconLink(ICON_LINK, "export_btn", "export", "Export to CSV", FALSE, "#"));
 				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", FALSE, "showDeletePopup();"));
 			html_cl("</div>");
 		html_cl("</div>");
