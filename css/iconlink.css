@@ -160,11 +160,11 @@
 
 .iconlink div.export
 {
-	background-position: -128px 0px;
+	background-position: -160px 0px;
 }
 
 
 .iconlink > *:hover > div.export
 {
-	background-position: -128px -32px;
+	background-position: -160px -32px;
 }
