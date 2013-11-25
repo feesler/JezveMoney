@@ -1,0 +1,131 @@
+.chart_wrap
+{
+	clear: both;
+	width: 100%;
+	overflow: auto;
+}
+
+
+.chart_content
+{
+}
+
+
+/* transactions page filer */
+/* TODO :remove duplication with transaction.css */
+.form_iconlink
+{
+	margin: 9px 0px;
+}
+
+
+.tr_filter
+{
+	float: left;
+}
+
+
+.group_filter
+{
+	margin: 0px 0px 0px 15px;
+}
+
+
+.date_filter
+{
+	margin: 0px 0px 0px 15px;
+}
+
+
+.transCalWrap
+{
+	z-index: 10;
+	margin: 0;
+}
+
+
+.transCalWrap > div
+{
+	float : left;
+}
+
+
+.search_input
+{
+	float: right;
+	margin: 0px 0px 0px 15px;
+}
+
+
+.search_input > div > input[type="text"]
+{
+	height: 26px;
+	border-width: 2px 0px 2px 2px;
+}
+
+
+.search_btn
+{
+	width: 34px;
+	height: 34px;
+	padding: 2px;
+	margin: 0;
+	color: #FFFFFF;
+	background-color: #0072C6;
+	cursor: pointer;
+}
+
+
+.search_btn > div
+{
+	width: 34px;
+	height: 34px;
+	background-image: url('../img/icons.png');
+	background-repeat: no-repeat;
+	background-position: -192px 0px;
+}
+
+
+/* TODO: merge with search_btn */
+/* calendar button */
+.cal_btn
+{
+	width: 34px;
+	height: 34px;
+	padding: 2px;
+	margin: 8px 0px;
+	color: #FFFFFF;
+	background-color: #0072C6;
+	cursor: pointer;
+}
+
+
+.cal_btn > div
+{
+	width: 34px;
+	height: 34px;
+	background-image: url('../img/icons.png');
+	background-repeat: no-repeat;
+	background-position: -192px -32px;
+}
+
+
+/* text input controls with button on the right */
+.rbtn_input
+{
+	padding: 8px 0px;
+}
+
+
+.rbtn_input > div
+{
+	padding: 0px 16px 2px 0px;
+	margin: 0px -2px 0px 0px;
+}
+
+
+.rbtn_input > div > input
+{
+	border-width: 2px 0px 2px 2px;
+	padding: 2px 7px 2px 5px;
+}
