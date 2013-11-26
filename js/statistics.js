@@ -72,6 +72,16 @@ function getMax(arrObj)
 }
 
 
+// Return function to convert relative value to absolute
+function convertRelToAbs(maxVal, absMaxVal)
+{
+	return function(val)
+	{
+		return Math.round(absMaxVal * (val / maxVal));
+	}
+}
+
+
 // Create bar chart
 function initBarChart(fitToWidth)
 {
@@ -81,12 +91,14 @@ function initBarChart(fitToWidth)
 	var barMargin = 10;
 	var chartWidth, chartHeight = 300;
 	var dashed, gridY, gridStep;
+	var getHeight;
 
 	chart = ge('chart');
 	if (!chart || !chartData)
 		return;
 
 	maxVal = getMax(chartData);
+	getHeight = convertRelToAbs(maxVal, chartHeight);
 
 	fitToWidth = fitToWidth || false;
 	if (fitToWidth)
@@ -112,10 +124,10 @@ function initBarChart(fitToWidth)
 		gridStep /= 2;
 
 	// calculate y of first grid line
-	relHeight = (maxVal % gridStep) / maxVal;
-	gridY = Math.round(chartHeight * relHeight);
+	gridY = getHeight(maxVal % gridStep);
+
 	// calculate absolute grid step
-	gridStep = Math.round(chartHeight * (gridStep / maxVal));
+	gridStep = getHeight(gridStep);
 
 	while(gridY < chartHeight)
 	{
@@ -126,8 +138,7 @@ function initBarChart(fitToWidth)
 	// create bars
 	chartData.forEach(function(val)
 	{
-		relHeight = val / maxVal;
-		barHeight = Math.round(chartHeight * relHeight);
+		barHeight = getHeight(val);
 
 		barRect = r.rect(leftPos, chartHeight - barHeight, barWidth, barHeight);
 		barRect.attr({fill : "#00bfff", 'fill-opacity' : 1, stroke : 'none' });
