@@ -75,11 +75,12 @@ function getMax(arrObj)
 // Create bar chart
 function initBarChart(fitToWidth)
 {
-	var chart, r, barRect;
+	var chart, r, barRect, gridPath;
 	var maxVal;
 	var leftPos = 0, relHeight, barWidth, barHeight;
 	var barMargin = 10;
 	var chartWidth, chartHeight = 300;
+	var dashed, gridY, gridStep;
 
 	chart = ge('chart');
 	if (!chart || !chartData)
@@ -99,6 +100,30 @@ function initBarChart(fitToWidth)
 
 	r = Raphael('chart', chartWidth, chartHeight);
 
+	// create grid
+	dashed = { fill : 'none', stroke : '#000000', 'stroke-dasharray' : '- '};
+
+	// calculate vertical grid step
+	gridStep = 5;
+	while((maxVal / gridStep) > 1)
+		gridStep *= 10;
+
+	while((maxVal / gridStep) < 5)
+		gridStep /= 2;
+
+	// calculate y of first grid line
+	relHeight = (maxVal % gridStep) / maxVal;
+	gridY = Math.round(chartHeight * relHeight);
+	// calculate absolute grid step
+	gridStep = Math.round(chartHeight * (gridStep / maxVal));
+
+	while(gridY < chartHeight)
+	{
+		r.path('M0,' + gridY + '.5L' + chartWidth + ',' + gridY + '.5').attr(dashed);
+		gridY += gridStep;
+	}
+
+	// create bars
 	chartData.forEach(function(val)
 	{
 		relHeight = val / maxVal;
