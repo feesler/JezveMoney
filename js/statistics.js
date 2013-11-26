@@ -127,7 +127,7 @@ function initBarChart(fitToWidth)
 	chartData.forEach(function(val)
 	{
 		relHeight = val / maxVal;
-		barHeight = chartHeight * relHeight;
+		barHeight = Math.round(chartHeight * relHeight);
 
 		barRect = r.rect(leftPos, chartHeight - barHeight, barWidth, barHeight);
 		barRect.attr({fill : "#00bfff", 'fill-opacity' : 1, stroke : 'none' });
