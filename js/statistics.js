@@ -77,7 +77,7 @@ function convertRelToAbs(maxVal, absMaxVal)
 {
 	return function(val)
 	{
-		return Math.round(absMaxVal * (val / maxVal));
+		return absMaxVal * (val / maxVal);
 	}
 }
 
@@ -89,7 +89,9 @@ function initBarChart(fitToWidth)
 	var maxVal;
 	var leftPos = 0, relHeight, barWidth, barHeight;
 	var barMargin = 10;
-	var chartWidth, chartHeight = 300;
+	var paperHeight = 300;
+	var hLabelsHeight = 20;
+	var chartWidth, chartHeight;
 	var dashed, gridY, valStep, gridStep;
 	var getHeight;
 
@@ -98,21 +100,22 @@ function initBarChart(fitToWidth)
 	if (!chart || !vert_labels || !chartData)
 		return;
 
-	maxVal = getMax(chartData);
+	chartHeight = paperHeight - hLabelsHeight;
+	maxVal = getMax(chartData[0]);
 	getHeight = convertRelToAbs(maxVal, chartHeight);
 
 	fitToWidth = fitToWidth || false;
 	if (fitToWidth)
-		barWidth = (chart.offsetWidth / chartData.length) - barMargin;
+		barWidth = (chart.offsetWidth / chartData[0].length) - barMargin;
 	else
 		barWidth = 38;
 
-	chartWidth = chartData.length * (barWidth + barMargin);
+	chartWidth = chartData[0].length * (barWidth + barMargin);
 
 	chart.style.width = chartWidth + 'px';
 
-	r = Raphael('chart', chartWidth, chartHeight);
-	lr = Raphael('vert_labels', 100, chartHeight + 20);
+	r = Raphael('chart', chartWidth, paperHeight);
+	lr = Raphael('vert_labels', 100, paperHeight + 20);
 
 	// create grid
 	dashed = { fill : 'none', stroke : '#808080', 'stroke-dasharray' : '- '};
@@ -134,18 +137,18 @@ function initBarChart(fitToWidth)
 	// calculate first label value
 	val = maxVal - (maxVal % valStep);
 
-	while(gridY < chartHeight)
+	while(gridY <= chartHeight)
 	{
-		r.path('M0,' + gridY + '.5L' + chartWidth + ',' + gridY + '.5').attr(dashed);
+		r.path('M0,' + Math.round(gridY) + '.5L' + chartWidth + ',' + Math.round(gridY) + '.5').attr(dashed);
 
-		lr.text(5, gridY, val).attr({ 'font-size' : 14, 'text-anchor' : 'start' });
+		lr.text(5, Math.round(gridY), val).attr({ 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' });
 		val -= valStep;
 
 		gridY += gridStep;
 	}
 
 	// create bars
-	chartData.forEach(function(val)
+	chartData[0].forEach(function(val)
 	{
 		barHeight = getHeight(val);
 
@@ -163,6 +166,25 @@ function initBarChart(fitToWidth)
 		});
 
 		leftPos += barWidth + barMargin;
+	});
+
+
+	labelShift = 0;
+	prevCount = 0;
+	itemsInGroup = 0;
+	chartData[1].forEach(function(val, itemNum)
+	{
+		itemDate = val[0];
+		itemsCount = val[1];
+
+		if ((itemsInGroup % 3) == 0 || prevCount > 1)
+		{
+			r.text(labelShift, paperHeight - (hLabelsHeight / 2), itemDate).attr({ 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' });
+			itemsInGroup = 0;
+		}
+		labelShift += itemsCount * (barWidth + barMargin);
+		prevCount = itemsCount;
+		itemsInGroup++;
 	});
 }
 
