@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
@@ -160,8 +160,15 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				html_op("<div class=\"chart_wrap\">");
-					html("<div id=\"chart\" class=\"chart_content\"></div>");
+				html("<div class=\"charts\">");
+					html_op("<div class=\"right_float right_labels\">");
+						html("<div id=\"vert_labels\"></div>");
+					html_cl("</div>");
+					html_op("<div class=\"chart_wrap\">");
+						html_op("<div class=\"chart_content\">");
+							html("<div id=\"chart\"></div>");
+						html_cl("</div>");
+					html_cl("</div>");
 				html_cl("</div>");
 
 			html_cl("</div>");

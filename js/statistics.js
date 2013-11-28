@@ -1,4 +1,4 @@
-var calendarObj = null;
+﻿var calendarObj = null;
 var startDate = null, endDate = null;
 
 
@@ -85,16 +85,17 @@ function convertRelToAbs(maxVal, absMaxVal)
 // Create bar chart
 function initBarChart(fitToWidth)
 {
-	var chart, r, barRect, gridPath;
+	var chart, vert_labels, r, lr, barRect, gridPath;
 	var maxVal;
 	var leftPos = 0, relHeight, barWidth, barHeight;
 	var barMargin = 10;
 	var chartWidth, chartHeight = 300;
-	var dashed, gridY, gridStep;
+	var dashed, gridY, valStep, gridStep;
 	var getHeight;
 
 	chart = ge('chart');
-	if (!chart || !chartData)
+	vert_labels = ge('vert_labels');
+	if (!chart || !vert_labels || !chartData)
 		return;
 
 	maxVal = getMax(chartData);
@@ -111,27 +112,35 @@ function initBarChart(fitToWidth)
 	chart.style.width = chartWidth + 'px';
 
 	r = Raphael('chart', chartWidth, chartHeight);
+	lr = Raphael('vert_labels', 100, chartHeight + 20);
 
 	// create grid
 	dashed = { fill : 'none', stroke : '#000000', 'stroke-dasharray' : '- '};
 
 	// calculate vertical grid step
-	gridStep = 5;
-	while((maxVal / gridStep) > 1)
-		gridStep *= 10;
+	valStep = 5;
+	while((maxVal / valStep) > 1)
+		valStep *= 10;
 
-	while((maxVal / gridStep) < 5)
-		gridStep /= 2;
+	while((maxVal / valStep) < 5)
+		valStep /= 2;
 
 	// calculate y of first grid line
-	gridY = getHeight(maxVal % gridStep);
+	gridY = getHeight(maxVal % valStep);
 
 	// calculate absolute grid step
-	gridStep = getHeight(gridStep);
+	gridStep = getHeight(valStep);
+
+	// calculate first label value
+	val = maxVal - (maxVal % valStep);
 
 	while(gridY < chartHeight)
 	{
 		r.path('M0,' + gridY + '.5L' + chartWidth + ',' + gridY + '.5').attr(dashed);
+
+		lr.text(5, gridY, val).attr({ 'font-size' : 14, 'text-anchor' : 'start' });
+		val -= valStep;
+
 		gridY += gridStep;
 	}
 
