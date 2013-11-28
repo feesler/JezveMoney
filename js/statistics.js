@@ -115,7 +115,7 @@ function initBarChart(fitToWidth)
 	lr = Raphael('vert_labels', 100, chartHeight + 20);
 
 	// create grid
-	dashed = { fill : 'none', stroke : '#000000', 'stroke-dasharray' : '- '};
+	dashed = { fill : 'none', stroke : '#808080', 'stroke-dasharray' : '- '};
 
 	// calculate vertical grid step
 	valStep = 5;
