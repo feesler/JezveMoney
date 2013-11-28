@@ -110,7 +110,7 @@ function initBarChart(fitToWidth)
 	else
 		barWidth = 38;
 
-	chartWidth = chartData[0].length * (barWidth + barMargin);
+	chartWidth = Math.max(chart.offsetWidth, chartData[0].length * (barWidth + barMargin));
 
 	chart.style.width = chartWidth + 'px';
 
