@@ -312,18 +312,31 @@
 		$rowCount = count($resArr);
 
 		$chargeArr = array();
+		$groupArr = array();
 		$sumDate = NULL;
+		$curDate = NULL;
+		$prevDate = NULL;
 		$curSum = 0.0;
 		$itemNum = 0;
+		$itemsInGroup = 0;
 
 		for($i = 0; $i < $rowCount; $i++)
 		{
 			$row = $resArr[$i];
 			$trans_time = strtotime($row["date"]);
+			$itemsInGroup++;
 
 			if ($group_type == 0)		// no grouping
 			{
 				$chargeArr[$i] = floatval($row["charge"]);
+
+				$dateInfo = getdate($trans_time);
+				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
+				{
+					$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
+					$itemsInGroup = 0;
+				}
+				$prevDate = $dateInfo["mday"];
 			}
 			else if ($group_type == 1)	// group by day
 			{
@@ -355,6 +368,8 @@
 				$chargeArr[$itemNum] = $curSum;
 				$curSum = 0.0;
 				$itemNum++;
+
+				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
 
 			$curSum += floatval($row["charge"]);
@@ -363,9 +378,12 @@
 		if ($group_type != 0 && $curSum != 0.0)
 		{
 			$chargeArr[$itemNum] = $curSum;
+			$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
 		}
 
-		return $chargeArr;
+		$res = array($chargeArr, $groupArr);
+
+		return $res;
 	}
 
 
