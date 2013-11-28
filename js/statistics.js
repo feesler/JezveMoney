@@ -177,7 +177,8 @@ function initBarChart(fitToWidth)
 		itemDate = val[0];
 		itemsCount = val[1];
 
-		if ((itemsInGroup % 3) == 0 || prevCount > 1)
+		if (((itemsInGroup % 3) == 0 || prevCount > 1) &&
+			!(itemNum == chartData[1].length - 1 && itemsCount == 1 && chartWidth > chart.parentNode.offsetWidth))
 		{
 			r.text(labelShift, paperHeight - (hLabelsHeight / 2), itemDate).attr({ 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' });
 			itemsInGroup = 0;
