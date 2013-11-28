@@ -301,6 +301,14 @@
 		if (!$user_id || !$account_id || !$trans_type)
 			return NULL;
 
+		$chargeArr = array();
+		$groupArr = array();
+		$sumDate = NULL;
+		$curDate = NULL;
+		$prevDate = NULL;
+		$curSum = 0.0;
+		$itemsInGroup = 0;
+
 		$cond =  "user_id=".$user_id." AND type=".$trans_type;
 
 		if ($trans_type == 1)			// expense or transfer
@@ -309,28 +317,16 @@
 			$cond .= " AND dest_id=".$account_id;
 
 		$resArr = $db->selectQ("*", "transactions", $cond, NULL, "pos ASC");
-		$rowCount = count($resArr);
-
-		$chargeArr = array();
-		$groupArr = array();
-		$sumDate = NULL;
-		$curDate = NULL;
-		$prevDate = NULL;
-		$curSum = 0.0;
-		$itemNum = 0;
-		$itemsInGroup = 0;
-
-		for($i = 0; $i < $rowCount; $i++)
+		foreach($resArr as $row)
 		{
-			$row = $resArr[$i];
 			$trans_time = strtotime($row["date"]);
+			$dateInfo = getdate($trans_time);
 			$itemsInGroup++;
 
 			if ($group_type == 0)		// no grouping
 			{
-				$chargeArr[$i] = floatval($row["charge"]);
+				$chargeArr[] = floatval($row["charge"]);
 
-				$dateInfo = getdate($trans_time);
 				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
 				{
 					$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
@@ -340,7 +336,6 @@
 			}
 			else if ($group_type == 1)	// group by day
 			{
-				$dateInfo = getdate($trans_time);
 				$curDate = $dateInfo["mday"];
 			}
 			else if ($group_type == 2)	// group by week
@@ -349,12 +344,10 @@
 			}
 			else if ($group_type == 3)	// group by month
 			{
-				$dateInfo = getdate($trans_time);
 				$curDate = $dateInfo["mon"];
 			}
 			else if ($group_type == 4)	// group by year
 			{
-				$dateInfo = getdate($trans_time);
 				$curDate = $dateInfo["year"];
 			}
 
@@ -365,10 +358,8 @@
 			else	if ($sumDate != NULL && $sumDate != $curDate)
 			{
 				$sumDate = $curDate;
-				$chargeArr[$itemNum] = $curSum;
+				$chargeArr[] = $curSum;
 				$curSum = 0.0;
-				$itemNum++;
-
 				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
 
@@ -377,13 +368,11 @@
 
 		if ($group_type != 0 && $curSum != 0.0)
 		{
-			$chargeArr[$itemNum] = $curSum;
+			$chargeArr[] = $curSum;
 			$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
 		}
 
-		$res = array($chargeArr, $groupArr);
-
-		return $res;
+		return array($chargeArr, $groupArr);
 	}
 
 
