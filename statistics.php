@@ -97,7 +97,7 @@
 		html("var transType = ".json_encode($type_str).";");
 		html("var groupType = ".json_encode($groupType).";");
 		html("var curAccId = ".json_encode($acc_id).";");
-		echo("\tvar chartData = [".getStatArray($user_id, $acc_id, $trans_type, $groupType_id)."];\r\n");
+		echo("\tvar chartData = ".json_encode(getStatArray($user_id, $acc_id, $trans_type, $groupType_id)).";\r\n");
 
 		html();
 		html("onReady(initBarChart);");

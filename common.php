@@ -294,14 +294,12 @@
 	{
 		global $db;
 
-		$resStr = "";
-
 		$user_id = intval($user_id);
 		$account_id = intval($account_id);
 		$trans_type = intval($trans_type);
 
 		if (!$user_id || !$account_id || !$trans_type)
-			return $resStr;
+			return NULL;
 
 		$cond =  "user_id=".$user_id." AND type=".$trans_type;
 
@@ -367,9 +365,7 @@
 			$chargeArr[$itemNum] = $curSum;
 		}
 
-		$resStr .= implode(", ", $chargeArr);
-
-		return $resStr;
+		return $chargeArr;
 	}
 
 
