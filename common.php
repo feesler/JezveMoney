@@ -368,8 +368,7 @@
 
 		if ($group_type != 0 && $curSum != 0.0)
 		{
-			$chargeArr[] = $curSum;
-			$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
+			$chargeArr[count($chargeArr) - 1] += $curSum;
 		}
 
 		return array($chargeArr, $groupArr);
