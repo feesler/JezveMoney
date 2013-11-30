@@ -427,7 +427,7 @@ function onChangeAcc()
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	resbal_b = ge(isDebt() ? 'resbal_d_b' : 'resbal_b');
+	resbal_b = ge(((isDebt() && !debtType) || isIncome()) ? 'resbal_d_b' : 'resbal_b');
 	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge || !resbal_b)
 		return false;
 
