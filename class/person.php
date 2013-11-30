@@ -223,7 +223,7 @@ class Person
 			return FALSE;
 
 		$acc = new Account($this->user_id);
-		return $acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id);
+		return $acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id, 0);
 	}
 
 
