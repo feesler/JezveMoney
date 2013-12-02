@@ -82,18 +82,34 @@ function convertRelToAbs(maxVal, absMaxVal)
 }
 
 
+var lr = null;
+var paperHeight = 300;
+var vLabelsWidth = 10;
+
+
+// Set new width for vertical labels block and SVG object
+function setVertLabelsWidth(width)
+{
+	if (lr)
+	{
+		lr.setSize(width, paperHeight + 20);
+		vLabelsWidth = width;
+	}
+}
+
+
 // Create bar chart
 function initBarChart(fitToWidth)
 {
-	var chart, vert_labels, r, lr, barRect, gridPath;
+	var chart, vert_labels, r, barRect, gridPath;
 	var maxVal;
 	var leftPos = 0, relHeight, barWidth, barHeight;
 	var barMargin = 10;
-	var paperHeight = 300;
 	var hLabelsHeight = 20;
 	var chartWidth, chartHeight;
 	var dashed, gridY, valStep, gridStep;
 	var getHeight;
+	var txtEl, bbObj;
 
 	chart = ge('chart');
 	vert_labels = ge('vert_labels');
@@ -115,7 +131,7 @@ function initBarChart(fitToWidth)
 	chart.style.width = chartWidth + 'px';
 
 	r = Raphael('chart', chartWidth, paperHeight);
-	lr = Raphael('vert_labels', 100, paperHeight + 20);
+	lr = Raphael('vert_labels', vLabelsWidth, paperHeight + 20);
 
 	// create grid
 	dashed = { fill : 'none', stroke : '#808080', 'stroke-dasharray' : '- '};
@@ -141,7 +157,12 @@ function initBarChart(fitToWidth)
 	{
 		r.path('M0,' + Math.round(gridY) + '.5L' + chartWidth + ',' + Math.round(gridY) + '.5').attr(dashed);
 
-		lr.text(5, Math.round(gridY), val).attr({ 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' });
+		txtEl = lr.text(5, Math.round(gridY), val).attr({ 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' });
+
+		bbObj = txtEl.getBBox();
+		if (bbObj.width + 10 > vLabelsWidth)
+			setVertLabelsWidth(bbObj.width + 10);
+
 		val -= valStep;
 
 		gridY += gridStep;
