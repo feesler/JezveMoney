@@ -308,6 +308,7 @@
 		$prevDate = NULL;
 		$curSum = 0.0;
 		$itemsInGroup = 0;
+		$trans_time = 0;
 
 		$cond =  "user_id=".$user_id." AND type=".$trans_type;
 
@@ -368,7 +369,15 @@
 
 		if ($group_type != 0 && $curSum != 0.0)
 		{
-			$chargeArr[count($chargeArr) - 1] += $curSum;
+			if ($sumDate != NULL && $sumDate != $curDate)
+			{
+				$chargeArr[] = $curSum;
+				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+			}
+			else
+			{
+				$chargeArr[count($chargeArr) - 1] += $curSum;
+			}
 		}
 
 		return array($chargeArr, $groupArr);
