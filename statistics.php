@@ -91,18 +91,15 @@
 	html(getJS("raphael.js"));
 	html(getJS("statistics.js"));
 
-	html("<script>");
-	pushTab();
+	html_op("<script>");
 		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate)).";");
 		html("var transType = ".json_encode($type_str).";");
 		html("var groupType = ".json_encode($groupType).";");
 		html("var curAccId = ".json_encode($acc_id).";");
-		echo("\tvar chartData = ".json_encode(getStatArray($user_id, $acc_id, $trans_type, $groupType_id)).";\r\n");
-
+		html("var chartData = ".json_encode(getStatArray($user_id, $acc_id, $trans_type, $groupType_id)).";");
 		html();
 		html("onReady(initBarChart);");
-	popTab();
-	html("</script>");
+	html_cl("</script>");
 
 	html("</head>");
 	html("<body>");
@@ -160,7 +157,7 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				html("<div class=\"charts\">");
+				html_op("<div class=\"charts\">");
 					html_op("<div class=\"right_float\">");
 						html("<div id=\"vert_labels\"></div>");
 					html_cl("</div>");

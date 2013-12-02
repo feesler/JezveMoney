@@ -174,16 +174,16 @@ function initBarChart(fitToWidth)
 		barHeight = getHeight(val);
 
 		barRect = r.rect(leftPos, chartHeight - barHeight, barWidth, barHeight);
-		barRect.attr({fill : "#00bfff", 'fill-opacity' : 1, stroke : 'none' });
+		barRect.attr({ fill : "#00bfff", 'fill-opacity' : 1, stroke : 'none' });
 
 		barRect.mouseover(function()
 		{
-			this.attr({fill : '#00ffbf'});
+			this.attr({ fill : '#00ffbf' });
 		});
 
 		barRect.mouseout(function()
 		{
-			this.attr({fill : '#00bfff'});
+			this.attr({ fill : '#00bfff' });
 		});
 
 		leftPos += barWidth + barMargin;
