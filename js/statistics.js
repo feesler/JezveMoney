@@ -82,29 +82,67 @@ function convertRelToAbs(maxVal, absMaxVal)
 }
 
 
-var lr = null;
+var r, lr = null;
 var paperHeight = 300;
 var vLabelsWidth = 10;
+var barMargin = 10;
+var barWidth;
+var chartOffset;
+
+
+
+// Save total width of chart block with labels
+function getChartOffset()
+{
+	var chart;
+
+	chart = ge('chart');
+	if (!chart || !chart.parentNode || !chart.parentNode.parentNode || !chart.parentNode.parentNode.parentNode)
+		return;
+
+	chartOffset = chart.parentNode.parentNode.parentNode.offsetWidth;
+}
+
+
+// Update width of chart block
+function updateChartWidth()
+{
+	var paperWidth;
+
+	if (!r)
+		return;
+
+	getChartOffset();
+	paperWidth = Math.max(chartOffset - vLabelsWidth, chartData[0].length * (barWidth + barMargin));
+
+	r.setSize(paperWidth, paperHeight);
+}
 
 
 // Set new width for vertical labels block and SVG object
 function setVertLabelsWidth(width)
 {
-	if (lr)
-	{
-		lr.setSize(width, paperHeight + 20);
-		vLabelsWidth = width;
-	}
+	var chart, dw;
+
+	chart = ge('chart');
+	if (!lr || !chart)
+		return;
+
+	dw = vLabelsWidth - width;
+
+	lr.setSize(width, paperHeight + 20);
+	vLabelsWidth = width;
+
+	updateChartWidth();
 }
 
 
 // Create bar chart
 function initBarChart(fitToWidth)
 {
-	var chart, vert_labels, r, barRect, gridPath;
+	var chart, vert_labels, barRect, gridPath;
 	var maxVal;
-	var leftPos = 0, relHeight, barWidth, barHeight;
-	var barMargin = 10;
+	var leftPos = 0, relHeight, barHeight;
 	var hLabelsHeight = 20;
 	var chartWidth, chartHeight;
 	var dashed, gridY, valStep, gridStep;
@@ -127,8 +165,6 @@ function initBarChart(fitToWidth)
 		barWidth = 38;
 
 	chartWidth = Math.max(chart.offsetWidth, chartData[0].length * (barWidth + barMargin));
-
-	chart.style.width = chartWidth + 'px';
 
 	r = Raphael('chart', chartWidth, paperHeight);
 	lr = Raphael('vert_labels', vLabelsWidth, paperHeight + 20);
