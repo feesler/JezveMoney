@@ -117,7 +117,7 @@ function initBarChart(fitToWidth)
 		return;
 
 	chartHeight = paperHeight - hLabelsHeight;
-	maxVal = getMax(chartData[0]);
+	maxVal = getMax(chartData[0]) * 1.05;
 	getHeight = convertRelToAbs(maxVal, chartHeight);
 
 	fitToWidth = fitToWidth || false;
