@@ -161,7 +161,7 @@
 				html_cl("</div>");
 
 				html("<div class=\"charts\">");
-					html_op("<div class=\"right_float right_labels\">");
+					html_op("<div class=\"right_float\">");
 						html("<div id=\"vert_labels\"></div>");
 					html_cl("</div>");
 					html_op("<div class=\"chart_wrap\">");

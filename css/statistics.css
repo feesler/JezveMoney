@@ -1,14 +1,12 @@
 ﻿/* Main container for charts */
 .charts
 {
-	position: relative;
 	clear: both;
 }
 
 
 .chart_wrap
 {
-	margin: 0px 100px 0px 0px;
 	overflow: hidden;
 }
 
@@ -19,23 +17,6 @@
 	margin: 0;
 	padding: 0;
 	overflow: auto;
-}
-
-
-/* Labels block on the right */
-.right_labels
-{
-	width: 100px;
-	height: 100%;
-	position: absolute;
-	right: 0;
-	top: 0;
-}
-
-
-.right_labels > div
-{
-	height: 100%;
 }
 
 
