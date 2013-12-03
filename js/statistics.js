@@ -147,15 +147,16 @@ function initBarChart(fitToWidth)
 	var chartWidth, chartHeight;
 	var dashed, gridY, valStep, gridStep;
 	var getHeight;
-	var txtEl, bbObj;
+	var txtEl, bbObj, steps;
+	var chartMarginTop = 10;
 
 	chart = ge('chart');
 	vert_labels = ge('vert_labels');
 	if (!chart || !vert_labels || !chartData)
 		return;
 
-	chartHeight = paperHeight - hLabelsHeight;
-	maxVal = getMax(chartData[0]) * 1.05;
+	chartHeight = paperHeight - hLabelsHeight - chartMarginTop;
+	maxVal = getMax(chartData[0]);
 	getHeight = convertRelToAbs(maxVal, chartHeight);
 
 	fitToWidth = fitToWidth || false;
@@ -181,15 +182,16 @@ function initBarChart(fitToWidth)
 		valStep /= 2;
 
 	// calculate y of first grid line
-	gridY = getHeight(maxVal % valStep);
+	gridY = getHeight(maxVal % valStep) + chartMarginTop;
 
 	// calculate absolute grid step
-	gridStep = getHeight(valStep);
+	steps = Math.floor(maxVal / valStep);
+	gridStep = (chartHeight - gridY + chartMarginTop) / steps;
 
 	// calculate first label value
 	val = maxVal - (maxVal % valStep);
 
-	while(gridY <= chartHeight)
+	for(var i = 0; i <= steps; i++)
 	{
 		r.path('M0,' + Math.round(gridY) + '.5L' + chartWidth + ',' + Math.round(gridY) + '.5').attr(dashed);
 
@@ -209,7 +211,7 @@ function initBarChart(fitToWidth)
 	{
 		barHeight = getHeight(val);
 
-		barRect = r.rect(leftPos, chartHeight - barHeight, barWidth, barHeight);
+		barRect = r.rect(leftPos, chartHeight - barHeight + chartMarginTop, barWidth, barHeight);
 		barRect.attr({ fill : "#00bfff", 'fill-opacity' : 1, stroke : 'none' });
 
 		barRect.mouseover(function()
