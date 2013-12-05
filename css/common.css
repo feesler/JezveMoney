@@ -259,6 +259,7 @@ button::-moz-focus-inner
 	position: absolute;
 	top: 50px;
 	right: 0px;
+	z-index: 10;
 }
 
 
