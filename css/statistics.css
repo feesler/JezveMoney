@@ -20,6 +20,16 @@
 }
 
 
+/* Bar chart information popup */
+.chart_popup
+{
+	position: absolute;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	padding: 5px;
+}
+
+
 /* transactions page filer */
 /* TODO :remove duplication with transaction.css */
 .form_iconlink

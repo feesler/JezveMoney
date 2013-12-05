@@ -224,6 +224,8 @@ function initBarChart(fitToWidth)
 			this.attr({ fill : '#00bfff' });
 		});
 
+		barRect.click(bind(onBarClick, barRect, val));
+
 		leftPos += barWidth + barMargin;
 	});
 
@@ -246,6 +248,62 @@ function initBarChart(fitToWidth)
 		prevCount = itemsCount;
 		itemsInGroup++;
 	});
+}
+
+
+// Hide usem menu popup
+function hideChartPopup()
+{
+	show('chpopup', false);
+	setEmptyClick();
+}
+
+
+// Show/hide chart popup by click
+function onBarClick(val)
+{
+	var isRelative = true;
+	var popupX, popupY;
+	var rectBBox, chartsBRect;
+	var popup, charts, chart, chartContent;
+
+	popup = ge('chpopup');
+	chart = ge('chart');
+	if (!popup || !chart)
+		return;
+
+	charts = popup.parentNode;
+	chartContent = chart.parentNode;
+	if (!charts || !chartContent)
+		return;
+
+	e = fixEvent(event);
+
+	charts.style.position = (isRelative) ? 'relative' : '';
+
+	popup.innerHTML = val;
+
+
+	rectBBox = this.getBBox();
+	chartsBRect = charts.getBoundingClientRect();
+
+	chartContent.onscroll = hideChartPopup;
+
+	popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
+	popupY = e.clientY - chartsBRect.top - 10;
+
+	popup.style.left = popupX + 'px';
+	popup.style.top = popupY + 'px';
+
+	if (isVisible(popup))
+	{
+		hideChartPopup();
+	}
+	else
+	{
+		show(popup, true);
+		setEmptyClick(hideChartPopup, [this[0]]);
+	}
 }
 
 

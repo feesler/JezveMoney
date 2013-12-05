@@ -166,6 +166,7 @@
 							html("<div id=\"chart\"></div>");
 						html_cl("</div>");
 					html_cl("</div>");
+					html("<div id=\"chpopup\" class=\"chart_popup\" style=\"display: none;\"></div>");
 				html_cl("</div>");
 
 			html_cl("</div>");
