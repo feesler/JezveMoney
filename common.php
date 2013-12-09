@@ -290,15 +290,15 @@
 
 
 	// Return javascript array of amounts of specified transactions for statistics use
-	function getStatArray($user_id, $account_id, $trans_type, $group_type = 0)
+	function getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $group_type = 0)
 	{
 		global $db;
 
 		$user_id = intval($user_id);
-		$account_id = intval($account_id);
+		$curr_acc_id = intval($curr_acc_id);
 		$trans_type = intval($trans_type);
 
-		if (!$user_id || !$account_id || !$trans_type)
+		if (!$user_id || !$curr_acc_id || !$trans_type)
 			return NULL;
 
 		$chargeArr = array();
@@ -310,14 +310,28 @@
 		$itemsInGroup = 0;
 		$trans_time = 0;
 
-		$cond =  "user_id=".$user_id." AND type=".$trans_type;
+		$fields = "tr.date AS date, tr.charge AS charge";
+		$tables = "transactions AS tr";
+		$cond =  "tr.user_id=".$user_id." AND tr.type=".$trans_type;
 
-		if ($trans_type == 1)			// expense or transfer
-			$cond .= " AND src_id=".$account_id;
-		else if ($trans_type == 2)		// income
-			$cond .= " AND dest_id=".$account_id;
+		if ($byCurrency)
+		{
+			$tables .= ", accounts AS a";
+			$cond .= " AND a.curr_id=".$curr_acc_id;
+			if ($trans_type == 1)			// expense or transfer
+				$cond .= " AND tr.src_id=a.id";
+			else if ($trans_type == 2)		// income
+				$cond .= " AND tr.dest_id=a.id";
+		}
+		else
+		{
+			if ($trans_type == 1)			// expense or transfer
+				$cond .= " AND tr.src_id=".$curr_acc_id;
+			else if ($trans_type == 2)		// income
+				$cond .= " AND tr.dest_id=".$curr_acc_id;
+		}
 
-		$resArr = $db->selectQ("*", "transactions", $cond, NULL, "pos ASC");
+		$resArr = $db->selectQ($fields, $tables, $cond, NULL, "pos ASC");
 		foreach($resArr as $row)
 		{
 			$trans_time = strtotime($row["date"]);
