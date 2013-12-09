@@ -20,6 +20,9 @@
 
 	$trans = new Transaction($user_id);
 	$acc = new Account($user_id);
+	$curr = new Currency();
+
+	$byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
 
 	$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
 
@@ -27,17 +30,37 @@
 	if (is_null($trans_type))
 		fail();
 
-	if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"]))
+	if ($byCurrency)
 	{
-		$acc_id = intval($_GET["acc_id"]);
-		if (!$acc->is_exist($acc_id))
-			fail();
+		if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"]))
+		{
+			$curr_id = intval($_GET["curr_id"]);
+			if (!$curr->is_exist($curr_id))
+				fail();
+		}
+		else		// try to get first currency
+		{
+			$curr_id = Currency::getIdByPos(0);
+			if (!$curr_id)
+				fail();
+		}
+		$curr_acc_id = $curr_id;
 	}
-	else		// try to get first account of user
+	else
 	{
-		$acc_id = $acc->getIdByPos(0);
-		if (!$acc_id)
-			fail();
+		if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"]))
+		{
+			$acc_id = intval($_GET["acc_id"]);
+			if (!$acc->is_exist($acc_id))
+				fail();
+		}
+		else		// try to get first account of user
+		{
+			$acc_id = $acc->getIdByPos(0);
+			if (!$acc_id)
+				fail();
+		}
+		$curr_acc_id = $acc_id;
 	}
 
 	$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
@@ -93,12 +116,12 @@
 
 	html_op("<script>");
 		echo(Currency::getArray(TRUE));
-		html("var accCurr = ".$acc->getCurrency($acc_id).";");
+		html("var accCurr = ".(($byCurrency) ? $curr_id : $acc->getCurrency($acc_id)).";");
 		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate)).";");
 		html("var transType = ".json_encode($type_str).";");
 		html("var groupType = ".json_encode($groupType).";");
 		html("var curAccId = ".json_encode($acc_id).";");
-		html("var chartData = ".json_encode(getStatArray($user_id, $acc_id, $trans_type, $groupType_id)).";");
+		html("var chartData = ".json_encode(getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id)).";");
 		html();
 		html("onReady(initBarChart);");
 	html_cl("</script>");
@@ -123,10 +146,29 @@
 										array(4, "Debt", "./statistics.php?type=debt".$acc_par));
 				showSubMenu($trans_type, $transMenu);
 
-				html_op("<div class=\"tr_filter std_input\">");
+				html_op("<div class=\"tr_filter std_input filter_sel\">");
+					html_op("<div>");
+						html_op("<select id=\"filter_type\" onchange=\"onFilterChange(this);\">");
+							html("<option value=\"0\"".(($byCurrency) ? "" : " selected").">Accounts</option>");
+							html("<option  value=\"1\"".(($byCurrency) ? " selected" : "").">Currencies</option>");
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
+
+				$disp = ($byCurrency) ? " style=\"display: none;\"" : "";
+				html_op("<div id=\"acc_block\" class=\"tr_filter std_input\"".$disp.">");
 					html_op("<div>");
 						html_op("<select id=\"acc_id\" onchange=\"onAccountChange(this);\">");
 							echo($acc->getList($acc_id));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
+
+				$disp = ($byCurrency) ? "" : " style=\"display: none;\"";
+				html_op("<div id=\"curr_block\" class=\"tr_filter std_input\"".$disp.">");
+					html_op("<div>");
+						html_op("<select id=\"curr_id\" onchange=\"onCurrChange(this);\">");
+							echo(Currency::getList($curr_id));
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");

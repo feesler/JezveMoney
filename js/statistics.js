@@ -18,21 +18,68 @@ function getGroupParam(id)
 }
 
 
-// Group change event handler
-function onGroupChange(obj)
+// Return filter parameter for specified type
+function getFilterParam(id)
 {
-	var acc_id, group_id;
+	if (id == 1)
+		return 'filter=currency';
+	else
+		return '';
+}
+
+
+// Filter type change event handler
+function onFilterChange(obj)
+{
+	var filter_id, acc_id, group_id;
 	var accsel, groupsel;
+	var filter_type;
 
 	accsel = ge('acc_id');
 	groupsel = ge('groupsel');
-	if (!accsel || !groupsel)
+	filter_type = ge('filter_type');
+	if (!accsel || !groupsel || !filter_type)
 		return;
 
+	filter_id = parseInt(selectedValue(filter_type));
 	acc_id = parseInt(selectedValue(accsel));
 	group_id = parseInt(selectedValue(groupsel))
 
-	window.location = './statistics.php?acc_id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
+	show('acc_block', (filter_id == 0));
+	show('curr_block', (filter_id == 1));
+
+	window.location = './statistics.php?' + getFilterParam(filter_id) + '&type=' + transType + getGroupParam(group_id);
+}
+
+
+// Group change event handler
+function onGroupChange(obj)
+{
+	var newLocation;
+	var filter_id, acc_id, curr_id, group_id;
+	var accsel, currsel, groupsel;
+	var filter_type;
+
+	accsel = ge('acc_id');
+	currsel = ge('curr_id');
+	groupsel = ge('groupsel');
+	filter_type = ge('filter_type');
+	if (!accsel || !groupsel || !filter_type)
+		return;
+
+	filter_id = parseInt(selectedValue(filter_type));
+	acc_id = parseInt(selectedValue(accsel));
+	curr_id = parseInt(selectedValue(currsel));
+	group_id = parseInt(selectedValue(groupsel))
+
+	newLocation = './statistics.php?' + getFilterParam(filter_id);
+	if (filter_id == 1)
+		newLocation += '&curr_id=' + curr_id;
+	else
+		newLocation += '&acc_id=' + acc_id;
+	newLocation += '&type=' + transType + getGroupParam(group_id);
+
+	window.location = newLocation;
 }
 
 
@@ -51,6 +98,27 @@ function onAccountChange()
 	group_id = parseInt(selectedValue(groupsel));
 
 	window.location = './statistics.php?acc_id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
+}
+
+
+// Currency change event handler
+function onCurrChange()
+{
+	var filter_id, curr_id, group_id;
+	var currsel, groupsel;
+	var filter_type;
+
+	currsel = ge('curr_id');
+	groupsel = ge('groupsel');
+	filter_type = ge('filter_type');
+	if (!currsel || !groupsel || !filter_type)
+		return;
+
+	filter_id = parseInt(selectedValue(filter_type));
+	curr_id = parseInt(selectedValue(currsel));
+	group_id = parseInt(selectedValue(groupsel));
+
+	window.location = './statistics.php?' + getFilterParam(filter_id) + '&curr_id=' + curr_id + '&type=' + transType + getGroupParam(group_id);
 }
 
 

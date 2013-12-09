@@ -148,3 +148,10 @@
 	border-width: 2px 0px 2px 2px;
 	padding: 2px 7px 2px 5px;
 }
+
+
+/* Filter select */
+.filter_sel
+{
+	margin: 0px 15px 0px 0px;
+}
