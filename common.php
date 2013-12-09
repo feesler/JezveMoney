@@ -390,7 +390,11 @@
 			}
 			else
 			{
-				$chargeArr[count($chargeArr) - 1] += $curSum;
+				if (!count($chargeArr))
+					$chargeArr[] = $curSum;
+				else
+					$chargeArr[count($chargeArr) - 1] += $curSum;
+				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
 		}
 
