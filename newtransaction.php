@@ -304,7 +304,7 @@ else
 	{
 		html();
 		html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
-			html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
+			html("<div><label for=\"resbal_d\">Result balance".(($trans_type == 3) ? " (Destination)" : "")."</label></div>");
 			html_op("<div>");
 				html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign_d\">".$dest["sign"]."</div></div></div>");
 				html_op("<div class=\"stretch_input trans_input\">");
