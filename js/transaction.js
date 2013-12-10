@@ -1131,7 +1131,17 @@ function onAmountInput()
 	if (evalid)
 	{
 		f2();		// calculate d
-		f1();		// calculate S2
+		if (isIncome())
+		{
+			f1_d();			// calculate S2_d
+		}
+		else if (isTransfer() || isDebt())
+		{
+			f1_d();			// calculate S2_d
+			f1();				// calculate S2
+		}
+		else
+			f1();				// calculate S2
 	}
 	else if (dvalid)
 		f5();		// calculate e
