@@ -83,7 +83,12 @@ function f1()
 
 	if (isExpense() || isTransfer() || isDebt())
 		fS2 = S2 = correct(S2);
+}
 
+
+// Calculate result balance of destination account by initial and charge off/receipt
+function f1_d()
+{
 	// calculate S2_d
 	if (isIncome())
 		S2_d = fS1_d + fd;
