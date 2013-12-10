@@ -1180,11 +1180,28 @@ function onResBalanceInput()
 	if (!s1valid && !s1dvalid)
 		return;
 
-	f3();		// calculate d
-	if (evalid)
-		f4();				// calculate a
-	else if (avalid)
-		f5();				// calculate e
+	if (isDebt())
+	{
+		if (debtType)
+		{
+			f3();			// calculate d
+			f4();			// calculate a and S2_d
+		}
+		else
+		{
+			f3_d();		// calculate a
+			f2();			// calculate d
+			f1();			// calculate S2
+		}
+	}
+	else
+	{
+		f3();		// calculate d
+		if (evalid)
+			f4();				// calculate a
+		else if (avalid)
+			f5();				// calculate e
+	}
 }
 
 
@@ -1194,9 +1211,26 @@ function onResBalanceDestInput()
 	if (!s1dvalid)
 		return;
 
-	f3_d();		// calculate a
-	f2();			// calculate d
-	f1();			// calculate S1
+	if (isTransfer() || isIncome())
+	{
+		f3_d();		// calculate a
+		f2();			// calculate d
+		f1();			// calculate S2
+	}
+	else if (isDebt())
+	{
+		if (debtType)
+		{
+			f3_d();		// calculate a
+			f2();			// calculate d
+			f1();			// calculate S2
+		}
+		else
+		{
+			f3();			// calculate d
+			f4();			// calculate a and S2_d
+		}
+	}
 }
 
 
