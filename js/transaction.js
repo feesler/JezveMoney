@@ -273,7 +273,7 @@ function setSign(obj, curr_id)
 // Spend/Income transaction event handler
 function onSubmit(frm)
 {
-	var srcid, destid, amount, trdate;
+	var srcid, destid, amount, charge, trdate;
 	var submitbtn;
 
 	if (submitStarted)
@@ -282,9 +282,10 @@ function onSubmit(frm)
 	srcid = ge('src_id');
 	destid = ge('dest_id');
 	amount = ge('amount');
+	charge = ge('charge');
 	trdate = ge('date');
 	submitbtn = ge('submitbtn');
-	if (!frm || (!srcid && !destid) || !amount || !trdate || !submitbtn)
+	if (!frm || (!srcid && !destid) || !amount || !charge || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -294,6 +295,7 @@ function onSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+	charge.value = fixFloat(charge.value);
 
 	if (!checkDate(trdate.value))
 	{
@@ -311,7 +313,7 @@ function onSubmit(frm)
 // Edit transaction submit event handler
 function onEditTransSubmit(frm)
 {
-	var srcid, destid, amount, trdate, submitbtn;
+	var srcid, destid, amount, charge, trdate, submitbtn;
 
 	if (submitStarted)
 		return false;
@@ -319,9 +321,10 @@ function onEditTransSubmit(frm)
 	srcid = ge('src_id');
 	destid = ge('dest_id');
 	amount = ge('amount');
+	charge = ge('charge');
 	trdate = ge('date');
 	submitbtn = ge('submitbtn');
-	if (!frm || (!srcid && !destid) || !amount || !trdate || !submitbtn)
+	if (!frm || (!srcid && !destid) || !amount || !charge || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -331,6 +334,7 @@ function onEditTransSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+	charge.value = fixFloat(charge.value);
 
 	if (!checkDate(trdate.value))
 	{
