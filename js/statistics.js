@@ -2,7 +2,7 @@
 var startDate = null, endDate = null;
 
 
-// Return group parameter for specifyed type
+// Return group parameter for specified type
 function getGroupParam(id)
 {
 	if (id == 1)

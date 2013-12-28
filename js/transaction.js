@@ -126,7 +126,7 @@ function f3()
 }
 
 
-// Calculate amount amount by initial and result balance of destination account
+// Calculate amount by initial and result balance of destination account
 function f3_d()
 {
 	fa = a = correct(fS2_d - fS1_d);

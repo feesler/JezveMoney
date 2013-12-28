@@ -381,6 +381,7 @@
 			$curSum += floatval($row["charge"]);
 		}
 
+		// save remain value
 		if ($group_type != 0 && $curSum != 0.0)
 		{
 			if ($sumDate != NULL && $sumDate != $curDate)
