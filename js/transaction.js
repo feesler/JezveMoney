@@ -1445,7 +1445,7 @@ function onNewPerson()
 // Debt form submit event handler
 function onDebtSubmit(frm)
 {
-	var accid, amount, trdate, personname;
+	var accid, amount, charge, trdate, personname;
 	var submitbtn;
 
 	if (submitStarted)
@@ -1467,8 +1467,9 @@ function onDebtSubmit(frm)
 
 	accid = ge('acc_id');
 	amount = ge('amount');
+	charge = ge('charge');
 	trdate = ge('date');
-	if (!frm || !accid || !amount || !trdate)
+	if (!frm || !accid || !amount || !charge || !trdate)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -1476,8 +1477,6 @@ function onDebtSubmit(frm)
 		alert('Please input correct amount.');
 		return false;
 	}
-
-	amount.value = fixFloat(amount.value);
 
 	if (!checkDate(trdate.value))
 	{
@@ -1492,6 +1491,7 @@ function onDebtSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+	charge.value = fixFloat(charge.value);
 
 	if (!checkDate(trdate.value))
 	{
