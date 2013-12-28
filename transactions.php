@@ -56,7 +56,7 @@
 	html(getCSS("popup.css"));
 	html(getCSS("calendar.css"));
 	html(getCSS("transaction.css"));
-	html(getCSS("table.css"));
+	html(getCSS("trlist.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
 	html(getJS("ajax.js"));

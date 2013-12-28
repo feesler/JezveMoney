@@ -25,7 +25,7 @@
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
 	html(getCSS("tiles.css"));
-	html(getCSS("table.css"));
+	html(getCSS("trlist.css"));
 	html(getJS("common.js"));
 	html(getJS("main.js"));
 
