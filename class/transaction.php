@@ -685,6 +685,104 @@ class Transaction
 	}
 
 
+	// Return balance of accounts after specified transaction
+	public function getBalance($trans_id)
+	{
+		global $db;
+
+		if (!self::$user_id)
+			return NULL;
+
+		if (!$this->is_exist($trans_id))
+			return NULL;
+
+		$src_id = $this->getSource($trans_id);
+		$dest_id = $this->getDest($trans_id);
+		if (!$src_id && !$dest_id)
+			return NULL;
+
+		$acc = new Account(self::$user_id, TRUE);
+
+		$balArr = array($src_id => 0, $dest_id => 0);
+		$balArr[$src_id] = ($src_id != 0) ? $acc->getInitBalance($src_id) : 0;
+		$balArr[$dest_id] = ($dest_id != 0) ? $acc->getInitBalance($dest_id) : 0;
+
+		$condition = "user_id=".self::$user_id;
+		$orCond = array();
+		if ($src_id != 0)
+		{
+			$orCond[] = "src_id=".$src_id;
+			$orCond[] = "dest_id=".$src_id;
+		}
+		if ($dest_id != 0)
+		{
+			$orCond[] = "src_id=".$dest_id;
+			$orCond[] = "dest_id=".$dest_id;
+		}
+		if (count($orCond) > 0)
+			$condition .= " AND (".implode(" OR ", $orCond).")";
+
+		$resArr = $db->selectQ("*", "transactions", $condition, NULL, "pos ASC");
+		foreach($resArr as $row)
+		{
+			$tr_id = intval($row["id"]);
+			$tr_src_id = intval($row["src_id"]);
+			$tr_dest_id = intval($row["dest_id"]);
+			$tr_amount = floatval($row["amount"]);
+			$tr_charge = floatval($row["charge"]);
+			$tr_type = intval($row["type"]);
+
+
+			if (($src_id != 0 && $tr_src_id == $src_id) || ($dest_id != 0 && $tr_src_id == $dest_id))
+			{
+				$acc_id = ($tr_src_id == $src_id) ? $src_id : $dest_id;
+
+				if ($tr_type == 1)				// expense
+				{
+					$balArr[$acc_id] = round($balArr[$acc_id] - $tr_charge, 2);
+				}
+				else if ($tr_type == 3)			// transfer from
+				{
+					$balArr[$acc_id] = round($balArr[$acc_id] - $tr_charge, 2);
+				}
+				else if ($tr_type == 4)			// debt
+				{
+					if ($acc->getOwner($acc_id) != User::getOwner(self::$user_id))		// person give to us
+						$balArr[$acc_id] = round($balArr[$acc_id] - $tr_amount, 2);
+					else
+						$balArr[$acc_id] = round($balArr[$acc_id] - $tr_charge, 2);
+				}
+			}
+
+			if (($src_id != 0 && $tr_dest_id == $src_id) || ($dest_id != 0 && $tr_dest_id == $dest_id))
+			{
+				$acc_id = ($tr_dest_id == $src_id) ? $src_id : $dest_id;
+
+				if ($tr_type == 2)				// income
+				{
+					$balArr[$acc_id] = round($balArr[$acc_id] + $tr_charge, 2);
+				}
+				else if ($tr_type == 3)			// transfer to
+				{
+					$balArr[$acc_id] = round($balArr[$acc_id] + $tr_amount, 2);
+				}
+				else if ($tr_type == 4)			// debt
+				{
+					if ($acc->getOwner($acc_id) != User::getOwner(self::$user_id))		// person give to us
+						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_charge, 2);
+					else
+						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_amount, 2);
+				}
+			}
+
+			if ($trans_id == $tr_id)
+				break;
+		}
+
+		return $balArr;
+	}
+
+
 	// Return table of transactions
 	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
 	{
