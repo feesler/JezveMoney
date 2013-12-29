@@ -40,6 +40,9 @@
 			$dateFmt = date("d.m.Y", $sdate)." - ".date("d.m.Y", $edate);
 	}
 
+	$showDetails = FALSE;
+	if (isset($_GET["mode"]) && $_GET["mode"] == "details")
+		$showDetails = TRUE;
 
 	$titleString = "Jezve Money | Transactions";
 
@@ -133,7 +136,7 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate);
+				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate, $showDetails);
 			html_cl("</div>");
 
 			html_op("<div class=\"control_icons\">");

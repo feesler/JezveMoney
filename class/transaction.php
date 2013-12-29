@@ -784,7 +784,7 @@ class Transaction
 
 
 	// Return table of transactions
-	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
 	{
 		global $db;
 
@@ -861,6 +861,16 @@ class Transaction
 			return;
 		}
 
+		if ($showPaginator == TRUE)
+		{
+			html("<div class=\"mode_selector\">");
+			if ($details)
+				html("<span><a href=\"./transactions.php?mode=classic\">Classic</a></span><spanb><b>Details</b></span>");
+			else
+				html("<span><b>Classic</b></span<span><a href=\"./transactions.php?mode=details\">Details</a></span>");
+			html("</div>");
+		}
+
 		if ($tr_on_page > 0 && $showPaginator == TRUE)
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
@@ -911,7 +921,36 @@ class Transaction
 			$resStr .= "</span></div>";
 			html($resStr);
 
-			$resStr = "<div><span class=\"tritem_sum\">";
+			if ($details)
+			{
+				$balArr = $this->getBalance($trans_id);
+				if (is_array($balArr))
+				{
+					html_op("<div class=\"tritem_balance\">");
+
+					if ($cur_trans_type == 1 || $cur_trans_type == 2)
+					{
+						$tr_acc_id = ($cur_trans_type == 1) ? $src_id : $dest_id;
+
+						$balance = $balArr[$tr_acc_id];
+						$acc_curr = $acc->getCurrency($tr_acc_id);
+						html("<span>".Currency::format($balance, $acc_curr)."</span>");
+					}
+					else if ($cur_trans_type == 3 || $cur_trans_type == 4)
+					{
+						$balance = $balArr[$src_id];
+						$acc_curr = $acc->getCurrency($src_id);
+						html("<span>".Currency::format($balance, $acc_curr)."</span>");
+
+						$balance = $balArr[$dest_id];
+						$acc_curr = $acc->getCurrency($dest_id);
+						html("<span>".Currency::format($balance, $acc_curr)."</span>");
+					}
+					html_cl("</div>");
+				}
+			}
+
+			$resStr = "<div class=\"tritem_sum\"><span>";
 			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
 				$resStr .= "- ";
 			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income

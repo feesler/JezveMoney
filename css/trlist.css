@@ -37,9 +37,10 @@
 {
 	font-size: 16px;
 	font-weight: bold;
-	clear: both;
+	clear: left;
 	height: 23px;
 	line-height: 23px;
+	overflow: hidden;
 }
 
 
@@ -59,6 +60,30 @@
 	padding: 0px 0px 0px 5px;
 	border: 0px solid #808080;
 	border-left-width: 1px;
+}
+
+
+.tritem_balance
+{
+	float: right;
+}
+
+
+.tritem_balance > span
+{
+	margin: 0px 0px 0px 10px;
+}
+
+
+.mode_selector
+{
+	float: left;
+}
+
+
+.mode_selector > span
+{
+	margin: 0px 10px 0px 0px;
 }
 
 
