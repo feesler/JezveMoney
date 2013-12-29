@@ -865,9 +865,9 @@ class Transaction
 		{
 			html("<div class=\"mode_selector\">");
 			if ($details)
-				html("<span><a href=\"./transactions.php?mode=classic\">Classic</a></span><spanb><b>Details</b></span>");
+				html("<span><a href=\"./transactions.php?mode=classic\">Classic</a></span><span><b>Details</b></span>");
 			else
-				html("<span><b>Classic</b></span<span><a href=\"./transactions.php?mode=details\">Details</a></span>");
+				html("<span><b>Classic</b></span><span><a href=\"./transactions.php?mode=details\">Details</a></span>");
 			html("</div>");
 		}
 
