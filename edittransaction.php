@@ -252,14 +252,10 @@
 											Currency::format($tr["charge"], ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
 					getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
 											round($tr["amount"] / $tr["charge"], 5)." ".$charge_sign."/".$amount_sign);
-					getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
-											Currency::format($dest["balance"], $dest["curr"]));
 				}
-				else if ($trans_type == 3)
-				{
-					getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
-											Currency::format($dest["balance"], $dest["curr"]));
-				}
+
+				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
+										Currency::format($dest["balance"], $dest["curr"]));
 			html_cl("</div>");
 		html_cl("</div>");
 	}
@@ -318,24 +314,27 @@
 		html_cl("</div>");
 	html_cl("</div>");
 
-	html();
-	html_op("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
-		html("<div><label for=\"resbal\">Result balance".(($trans_type == 3) ? " (Source)" : "")."</label></div>");
-		html_op("<div>");
-			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$src["sign"]."</div></div></div>");
-			html_op("<div class=\"stretch_input trans_input\">");
-				html_op("<div>");
-					html("<input id=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+	if ($trans_type == 1 || $trans_type == 3)
+	{
+		html();
+		html_op("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
+			html("<div><label for=\"resbal\">Result balance".(($trans_type == 3) ? " (Source)" : "")."</label></div>");
+			html_op("<div>");
+				html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$src["sign"]."</div></div></div>");
+				html_op("<div class=\"stretch_input trans_input\">");
+					html_op("<div>");
+						html("<input id=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					html_cl("</div>");
 				html_cl("</div>");
 			html_cl("</div>");
 		html_cl("</div>");
-	html_cl("</div>");
+	}
 
-	if ($trans_type == 3)
+	if ($trans_type == 2 || $trans_type == 3)
 	{
 		html();
 		html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
-			html("<div><label for=\"resbal_d\">Result balance (Destination)</label></div>");
+			html("<div><label for=\"resbal_d\">Result balance".(($trans_type == 3) ? " (Destination)" : "")."</label></div>");
 			html_op("<div>");
 				html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$dest["sign"]."</div></div></div>");
 				html_op("<div class=\"stretch_input trans_input\">");
