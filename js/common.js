@@ -335,7 +335,7 @@ function insertAfter(elem, refElem)
 }
 
 
-// Check specified element is child of specified
+// Check element is child of specified
 function isChild(elem, refElem)
 {
 	var curParent = null;

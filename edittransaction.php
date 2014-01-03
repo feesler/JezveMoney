@@ -234,7 +234,7 @@
 				html($acc->getTileEx(STATIC_TILE, $tr["dest_id"], $balDiff, "dest_tile"));
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
-						html("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
+						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
 							echo($acc->getList($tr["dest_id"]));
 						html_cl("</select>");
 					html_cl("</div>");
