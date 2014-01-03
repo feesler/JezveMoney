@@ -10,7 +10,7 @@
 
 	function fail()
 	{
-		echo("fail");
+		setLocation("./index.php?newdebt=fail");
 	}
 
 
