@@ -79,7 +79,14 @@ function f1()
 		S2 = fS1 - fd;
 
 	if (edit_mode)
-		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
+	{
+		var income = isIncome();
+		var accid = ge(income ? 'dest_id' : 'src_id');
+		var traccid = income ? transaction.destAcc : transaction.srcAcc;
+
+		if (accid && (traccid == parseInt(selectedValue(accid))))
+			S2 += income ? -transaction.charge : transaction.charge;
+	}
 
 	if (isExpense() || isTransfer() || isDebt())
 		fS2 = S2 = correct(S2);
