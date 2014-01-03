@@ -57,6 +57,11 @@
 	$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
 	$trans_type = Transaction::getStringType($type_str);
 	if (!$trans_type)
+	{
+		$type_str = "expense";
+		$trans_type = Transaction::getStringType($type_str);
+	}
+	if (!$trans_type)
 		fail();
 
 	$acc = new Account($user_id);
