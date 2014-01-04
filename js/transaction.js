@@ -1128,6 +1128,31 @@ function setValues()
 }
 
 
+// Check currency of amount and currency of charge is different
+function isDiff()
+{
+	var amountCurr, chargeCurr;
+	var accid, destid;
+
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
+	transcurr = ge('transcurr');
+
+	if (isExpense() || isIncome() || isDebt())
+	{
+		amountCurr = parseInt(selectedValue(transcurr));
+	}
+	else if (isTransfer())
+	{
+		destid = ge('dest_id');
+		amountCurr = getCurrencyOfAccount(selectedValue(destid));
+	}
+
+	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
+
+	return (amountCurr != chargeCurr);
+}
+
+
 // Amount field input event handler
 function onAmountInput()
 {
