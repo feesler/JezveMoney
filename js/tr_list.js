@@ -187,7 +187,7 @@ function initTransListDrag()
 	listItem_wr = trlist.firstElementChild;
 	while(listItem_wr)
 	{
-		if (listItem_wr.className == 'trlist_item_wrap')
+		if (listItem_wr.className.indexOf('trlist_item_wrap') != -1)
 		{
 			listItem = listItem_wr.firstElementChild;
 			trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
