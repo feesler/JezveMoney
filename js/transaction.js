@@ -1159,12 +1159,24 @@ function onAmountInput()
 	if (!s1valid && !s1dvalid)
 		return;
 
-// TODO : try to input amount and charge independently and calculate exchange rate instead
-// ex.:
-// if (amountCurr != chargeCurr)
-// 	f5();
+	if (isDiff())
+	{
+		var tfd = fd;
 
-	if (evalid)
+		if (!dvalid)
+			fd = fa;
+
+		if (isIncome() || isTransfer() || isDebt())
+			f1_d();			// calculate S2_d
+		else if (isExpense())
+			f1();				// calculate S2
+
+		if (!dvalid)
+			fd = tfd;
+		if (dvalid)
+			f5();		// calculate e
+	}
+	else
 	{
 		f2();		// calculate d
 		if (isIncome())
@@ -1179,8 +1191,6 @@ function onAmountInput()
 		else
 			f1();				// calculate S2
 	}
-	else if (dvalid)
-		f5();		// calculate e
 
 	setExchangeComment();
 }
