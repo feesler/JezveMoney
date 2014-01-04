@@ -1202,11 +1202,20 @@ function onChargeInput()
 	if (!s1valid && !s1dvalid)
 		return;
 
-	f1();			// calculate S2
+	var tfa = fa;
+
+	if (!avalid)
+		fa = fd;
+
+	if (isIncome())
+		f1_d();		// calculate S2_d
+	else
+		f1();			// calculate S2
+
+	if (!avalid)
+		fa = tfa;
 	if (avalid)
 		f5();		// calculate e
-	else if (evalid)
-		f4();		// calculate a
 
 	setExchangeComment();
 }
