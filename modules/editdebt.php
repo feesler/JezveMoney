@@ -21,7 +21,6 @@
 	$trans_id = intval($_POST["transid"]);
 	$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
 	$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
-	$person_name = $db->escape($_POST["personname"]);
 	$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
 	$amount = floatval($_POST["amount"]);
 	$charge = floatval($_POST["charge"]);
@@ -32,18 +31,11 @@
 
 	if ($debt_op != 1 && $debt_op != 2)
 		fail();
-	if ($amount == 0.0 || $charge == 0.0 || $trdate == -1 || $person_name == "")
+	if (!$person_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
 	$pers = new Person($user_id);
-	if (!$person_id)		// id is zero, name specified: new person sent
-	{
-		$check_id = $pers->findByName($person_name);
-		if ($check_id != 0)
-			setLocation("../editdebt.php?act=fail&detail=person");
-		$person_id = $pers->create($person_name);
-	}
-	else if (!$pers->is_exist($person_id))		// id specified: person should exist
+	if (!$pers->is_exist($person_id))		// person should exist
 	{
 		fail();
 	}

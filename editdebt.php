@@ -237,23 +237,6 @@
 													"onResBalanceSelect();",
 													Currency::format($person_res_balance, $debtAcc["curr"]));
 					html_cl("</div>");
-
-				$disp = (($person->getCount()) ? " style=\"display: none;\"" : "");
-				$btn_disp = (($person->getCount()) ? "" : " style=\"display: none;\"");
-				$p_inpType = (($person->getCount()) ? "hidden": "text");
-
-				html_op("<div id=\"personname_block\" class=\"person_input\"".$disp.">");
-					html_op("<div class=\"stretch_input trans_input\">");		// $disp
-						html_op("<div>");
-							html("<input id=\"personname\" name=\"personname\" type=\"".$p_inpType."\" value=\"".$person_name."\">");
-						html_cl("</div>");
-					html_cl("</div>");
-				html_cl("</div>");
-
-					html_op("<div id=\"personbtn\" class=\"person_icon\"".$btn_disp.">");
-						html(getIconLink(ICON_BUTTON, "", "add", "New", TRUE, "onNewPerson();", "form_iconlink"));
-					html_cl("</div>");
-
 				html_cl("</div>");
 			html_cl("</div>");
 			html();

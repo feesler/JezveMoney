@@ -1,40 +1,6 @@
 ﻿var calendarObj = null;
 
 
-// Show controls to add new person
-function togglePerson(val)
-{
-	var personname, personid, personsel, personbtn;
-
-	personname = ge('personname');
-	personid = ge('person_id');
-	personsel = ge('personsel');
-	personbtn = ge('personbtn');
-	if (!personbtn || !personname || !personid || !personsel)
-		return;
-
-	if (val)
-	{
-		personid.value = 0;
-		personname.type = 'text';
-		personname.value = '';
-
-		show('personname_block', true);
-		show(personbtn, false);
-	}
-	else
-	{
-		personname.value = selectedText(personsel);
-		personid.value = selectedValue(personsel);
-
-		show('personname_block', false);
-		show(personbtn, true);
-
-		personname.type = 'hidden';
-	}
-}
-
-
 // Create calendar for select date of transaction
 function buildCalendar()
 {
