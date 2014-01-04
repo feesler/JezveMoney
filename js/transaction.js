@@ -422,6 +422,7 @@ function updateExchAndRes()
 	{
 		f5();
 		f1();
+		f1_d();
 	}
 	setValues();
 }
