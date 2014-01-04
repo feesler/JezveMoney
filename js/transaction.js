@@ -1166,9 +1166,9 @@ function onAmountInput()
 		if (!dvalid)
 			fd = fa;
 
-		if (isIncome() || isTransfer() || isDebt())
+		if (isIncome() || isTransfer() || (isDebt() && !debtType))
 			f1_d();			// calculate S2_d
-		else if (isExpense())
+		else if (isExpense() || (isDebt() && debtType))
 			f1();				// calculate S2
 
 		if (!dvalid)
@@ -1207,9 +1207,9 @@ function onChargeInput()
 	if (!avalid)
 		fa = fd;
 
-	if (isIncome())
+	if (isIncome() || (isDebt() && debtType))
 		f1_d();		// calculate S2_d
-	else
+	else if (isExpense() || isTransfer() || (isDebt() && !debtType))
 		f1();			// calculate S2
 
 	if (!avalid)
