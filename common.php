@@ -290,7 +290,7 @@
 
 
 	// Return javascript array of amounts of specified transactions for statistics use
-	function getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $group_type = 0)
+	function getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
 	{
 		global $db;
 
@@ -397,6 +397,28 @@
 					$chargeArr[count($chargeArr) - 1] += $curSum;
 				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
+		}
+
+		if ($limit > 0)
+		{
+			$chargeCount = count($chargeArr);
+			$limitCount = min($chargeCount, $limit);
+			$chargeArr = array_slice($chargeArr, -$limitCount);
+
+			$groupCount = count($groupArr);
+
+			$newGroupsCount = 0;
+			$groupLimit = 0;
+			$i = $groupCount - 1;
+			while($i >= 0 && $groupLimit < $limitCount)
+			{
+				$groupLimit += $groupArr[$i][1];
+
+				$newGroupsCount++;
+				$i--;
+			}
+
+			$groupArr = array_slice($groupArr, -$newGroupsCount);
 		}
 
 		return array($chargeArr, $groupArr);
