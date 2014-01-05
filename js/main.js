@@ -577,3 +577,11 @@ function showResetAllPopup()
 
 	dwPopup.show();
 }
+
+
+
+// Init statistics widget
+function initStatWidget()
+{
+	initBarChart();
+}

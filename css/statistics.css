@@ -5,6 +5,12 @@
 }
 
 
+.widget_charts
+{
+	max-width: 500px;
+}
+
+
 .chart_wrap
 {
 	overflow: hidden;
