@@ -206,7 +206,7 @@ function setVertLabelsWidth(width)
 
 
 // Create bar chart
-function initBarChart(fitToWidth)
+function initBarChart(fitToWidth, heightSet)
 {
 	var chart, vert_labels, barRect, gridPath;
 	var maxVal;
@@ -222,6 +222,8 @@ function initBarChart(fitToWidth)
 	vert_labels = ge('vert_labels');
 	if (!chart || !vert_labels || !chartData)
 		return;
+
+	paperHeight = heightSet || paperHeight;
 
 	chartHeight = paperHeight - hLabelsHeight - chartMarginTop;
 	maxVal = getMax(chartData[0]);
