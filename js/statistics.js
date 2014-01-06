@@ -421,6 +421,9 @@ function onBarClick(val)
 	popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
 	popupY = e.clientY - chartsBRect.top - 10;
 
+	if (popup.offsetWidth + popupX > chartsBRect.width)
+		popupX -= popup.offsetWidth + rectBBox.width + 20;
+
 	popup.style.left = popupX + 'px';
 	popup.style.top = popupY + 'px';
 
