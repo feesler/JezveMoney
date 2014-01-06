@@ -213,7 +213,7 @@ function initBarChart(fitToWidth, heightSet)
 	var leftPos = 0, relHeight, barHeight;
 	var hLabelsHeight = 20;
 	var chartWidth, chartHeight;
-	var dashed, gridY, valStep, gridStep;
+	var dashed, gridY, valStep, gridStepRatio, gridStep;
 	var getHeight;
 	var txtEl, bbObj, steps;
 	var chartMarginTop = 10;
@@ -246,10 +246,16 @@ function initBarChart(fitToWidth, heightSet)
 	// calculate vertical grid step
 	valStep = 5;
 	while((maxVal / valStep) > 1)
+	{
 		valStep *= 10;
+	}
 
-	while((maxVal / valStep) < 5)
+	gridStepRatio = Math.floor(chartHeight / 50);
+
+	while((maxVal / valStep) < gridStepRatio)
+	{
 		valStep /= 2;
+	}
 
 	// calculate y of first grid line
 	gridY = getHeight(maxVal % valStep) + chartMarginTop;
