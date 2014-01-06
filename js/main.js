@@ -583,5 +583,5 @@ function showResetAllPopup()
 // Init statistics widget
 function initStatWidget()
 {
-	initBarChart();
+	initBarChart(true, 200);
 }
