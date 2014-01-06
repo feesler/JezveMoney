@@ -407,26 +407,6 @@ function onBarClick(val)
 	if (!charts || !chartContent)
 		return;
 
-	e = fixEvent(event);
-
-	charts.style.position = (isRelative) ? 'relative' : '';
-
-	popup.innerHTML = formatCurrency(val, accCurr);
-
-	rectBBox = this.getBBox();
-	chartsBRect = charts.getBoundingClientRect();
-
-	chartContent.onscroll = hideChartPopup;
-
-	popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
-	popupY = e.clientY - chartsBRect.top - 10;
-
-	if (popup.offsetWidth + popupX > chartsBRect.width)
-		popupX -= popup.offsetWidth + rectBBox.width + 20;
-
-	popup.style.left = popupX + 'px';
-	popup.style.top = popupY + 'px';
-
 	if (isVisible(popup))
 	{
 		hideChartPopup();
@@ -434,6 +414,27 @@ function onBarClick(val)
 	else
 	{
 		show(popup, true);
+
+		e = fixEvent(event);
+
+		charts.style.position = (isRelative) ? 'relative' : '';
+
+		popup.innerHTML = formatCurrency(val, accCurr);
+
+		rectBBox = this.getBBox();
+		chartsBRect = charts.getBoundingClientRect();
+
+		chartContent.onscroll = hideChartPopup;
+
+		popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
+		popupY = e.clientY - chartsBRect.top - 10;
+
+		if (popup.offsetWidth + popupX > chartsBRect.width)
+			popupX -= popup.offsetWidth + rectBBox.width + 20;
+
+		popup.style.left = popupX + 'px';
+		popup.style.top = popupY + 'px';
+
 		setEmptyClick(hideChartPopup, [this[0]]);
 	}
 }
