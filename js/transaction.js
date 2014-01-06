@@ -871,44 +871,6 @@ function onChangeDest()
 }
 
 
-// 
-function onInput(obj)
-{
-	var amount, charge, exchrate;
-
-	amount = ge('amount');
-	charge = ge('charge');
-	exchrate = ge('exchrate');
-
-	if (!obj || !amount || !charge || !exchrate)
-		return false;
-
-	if (obj == amount)
-	{
-		if (!isDiffCurr())
-		{
-			charge.value = amount.value;
-		}
-	}
-	else if (obj == charge)
-	{
-		if (amount.value && isNum(fixFloat(amount.value)) && charge.value && isNum(fixFloat(charge.value)))
-		{
-			exchrate.value = fixFloat(charge.value) / fixFloat(amount.value);
-		}
-	}
-	else if (obj == exchrate)
-	{
-		if (amount.value && isNum(fixFloat(amount.value)) && exchrate.value && isNum(fixFloat(exchrate.value)))
-		{
-			charge.value = fixFloat(exchrate.value) * fixFloat(amount.value);
-		}
-	}
-
-	return true;
-}
-
-
 // Set exchange rate comment
 function setExchangeComment()
 {

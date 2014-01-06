@@ -206,14 +206,14 @@ function initTransListDrag()
 }
 
 
-
+// Sent AJAX request to server to change position of transaction
 function sendChangePosRequest(trans_id, newPos)
 {
 	getData('./modules/setpos.php?id=' + trans_id + '&pos=' + newPos, onChangePosCallback(trans_id, newPos));
 }
 
 
-
+// Return callback function for position change request
 function onChangePosCallback(trans_id, newPos)
 {
 	return function(result)
@@ -230,40 +230,21 @@ function onChangePosCallback(trans_id, newPos)
 }
 
 
+// Update local transactions array on successfull result from server
 function updateTransArrPos(trans_id, newPos)
 {
-	dbgTransArr();
-
 	transactions.setPos(trans_id, newPos);
-
-	dbgTransArr();
 }
 
 
+// Cancel local changes on transaction position update fail
 function cancelPosChange()
 {
 
 }
 
 
-
-function dbgTransArr()
-{
-	var darr = [];
-
-	if (transArr)
-	{
-		transArr.some(function(trans)
-		{
-			darr.push(trans[8]);
-		});
-
-		dout(darr.join(', '));
-	}
-}
-
-
-
+// Transaction item drop callback
 function onTransPosChanged(trans_id, retrans_id)
 {
 	var replacedItem, newPos;
@@ -276,7 +257,6 @@ function onTransPosChanged(trans_id, retrans_id)
 		sendChangePosRequest(trans_id, newPos);
 	}
 }
-
 
 
 // Account change event handler
