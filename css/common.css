@@ -654,3 +654,10 @@ label
 	color: #F02020;
 	border-color: #F02020;
 }
+
+
+.msg .close_btn
+{
+	float: right;
+}
+

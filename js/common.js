@@ -512,3 +512,10 @@ function getOffsetSum(elem)
 
 	return { top: top, left: left };
 }
+
+
+// Close message box
+function onCloseMessage()
+{
+	re('action_msg');
+}
