@@ -1,55 +1,68 @@
 ﻿<?php
 
+	$msgCounter = 0;
+
+	// Define new message constant
+	function addMessage($constName)
+	{
+		global $msgCounter;
+
+		define($constName, $msgCounter, TRUE);
+		$msgCounter++;
+	}
+
+
 	// Type of messages
 	define("MSG_TYPE_NONE", 0, TRUE);
 	define("MSG_TYPE_SUCCESS", 1, TRUE);
 	define("MSG_TYPE_ERROR", 2, TRUE);
 
-	define("MSG_NONE", 0, TRUE);
 
-	define("MSG_REGISTER", 1, TRUE);
-	define("ERR_REGISTER_FAIL", 2, TRUE);
-	define("MSG_LOGIN", 3, TRUE);
-	define("ERR_LOGIN_FAIL", 4, TRUE);
-	define("MSG_PROFILE_NAME", 5, TRUE);
-	define("ERR_PROFILE_NAME", 6, TRUE);
-	define("MSG_PROFILE_PASSWORD", 7, TRUE);
-	define("ERR_PROFILE_PASSWORD", 8, TRUE);
-	define("MSG_PROFILE_RESETALL", 9, TRUE);
-	define("ERR_PROFILE_RESETALL", 10, TRUE);
+	addMessage("MSG_NONE");
 
-	define("MSG_ACCOUNT_CREATE", 11, TRUE);
-	define("ERR_ACCOUNT_CREATE", 12, TRUE);
-	define("MSG_ACCOUNT_UPDATE", 13, TRUE);
-	define("ERR_ACCOUNT_UPDATE", 14, TRUE);
-	define("MSG_ACCOUNT_DELETE", 15, TRUE);
-	define("ERR_ACCOUNT_DELETE", 16, TRUE);
-	define("MSG_ACCOUNTS_RESET", 17, TRUE);
-	define("ERR_ACCOUNTS_RESET", 18, TRUE);
+	addMessage("MSG_REGISTER");
+	addMessage("ERR_REGISTER_FAIL");
+	addMessage("MSG_LOGIN");
+	addMessage("ERR_LOGIN_FAIL");
+	addMessage("MSG_PROFILE_NAME");
+	addMessage("ERR_PROFILE_NAME");
+	addMessage("MSG_PROFILE_PASSWORD");
+	addMessage("ERR_PROFILE_PASSWORD");
+	addMessage("MSG_PROFILE_RESETALL");
+	addMessage("ERR_PROFILE_RESETALL");
 
-	define("MSG_CURRENCY_CREATE", 19, TRUE);
-	define("ERR_CURRENCY_CREATE", 20, TRUE);
-	define("MSG_CURRENCY_DELETE", 21, TRUE);
-	define("ERR_CURRENCY_DELETE", 22, TRUE);
+	addMessage("MSG_ACCOUNT_CREATE");
+	addMessage("ERR_ACCOUNT_CREATE");
+	addMessage("MSG_ACCOUNT_UPDATE");
+	addMessage("ERR_ACCOUNT_UPDATE");
+	addMessage("MSG_ACCOUNT_DELETE");
+	addMessage("ERR_ACCOUNT_DELETE");
+	addMessage("MSG_ACCOUNTS_RESET");
+	addMessage("ERR_ACCOUNTS_RESET");
 
-	define("MSG_PERSON_CREATE", 23, TRUE);
-	define("ERR_PERSON_CREATE", 24, TRUE);
-	define("MSG_PERSON_UPDATE", 25, TRUE);
-	define("ERR_PERSON_UPDATE", 26, TRUE);
-	define("MSG_PERSON_DELETE", 27, TRUE);
-	define("ERR_PERSON_DELETE", 28, TRUE);
+	addMessage("MSG_CURRENCY_CREATE");
+	addMessage("ERR_CURRENCY_CREATE");
+	addMessage("MSG_CURRENCY_DELETE");
+	addMessage("ERR_CURRENCY_DELETE");
 
-	define("MSG_TRANS_CREATE", 29, TRUE);
-	define("ERR_TRANS_CREATE", 30, TRUE);
-	define("MSG_TRANS_UPDATE", 31, TRUE);
-	define("ERR_TRANS_UPDATE", 32, TRUE);
-	define("MSG_TRANS_DELETE", 33, TRUE);
-	define("ERR_TRANS_DELETE", 34, TRUE);
+	addMessage("MSG_PERSON_CREATE");
+	addMessage("ERR_PERSON_CREATE");
+	addMessage("MSG_PERSON_UPDATE");
+	addMessage("ERR_PERSON_UPDATE");
+	addMessage("MSG_PERSON_DELETE");
+	addMessage("ERR_PERSON_DELETE");
 
-	define("MSG_DEBT_CREATE", 35, TRUE);
-	define("ERR_DEBT_CREATE", 36, TRUE);
-	define("MSG_DEBT_UPDATE", 37, TRUE);
-	define("ERR_DEBT_UPDATE", 38, TRUE);
+	addMessage("MSG_TRANS_CREATE");
+	addMessage("ERR_TRANS_CREATE");
+	addMessage("MSG_TRANS_UPDATE");
+	addMessage("ERR_TRANS_UPDATE");
+	addMessage("MSG_TRANS_DELETE");
+	addMessage("ERR_TRANS_DELETE");
+
+	addMessage("MSG_DEBT_CREATE");
+	addMessage("ERR_DEBT_CREATE");
+	addMessage("MSG_DEBT_UPDATE");
+	addMessage("ERR_DEBT_UPDATE");
 
 
 	$msgArray = array(
