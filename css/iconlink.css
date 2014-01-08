@@ -197,3 +197,17 @@
 {
 	background-position: -160px -32px;
 }
+
+
+.iconlink div.close
+{
+	width: 16px;
+	height: 16px;
+	background-position: -232px -32px;
+}
+
+
+.iconlink > *:hover > div.close
+{
+	background-position: -232px -48px;
+}
