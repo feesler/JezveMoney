@@ -635,10 +635,21 @@ label
 /* Messages */
 .msg
 {
-	margin: 5px auto 5px auto;
-	max-width: 300px;
-	padding: 10px;
+	position: absolute;
+	top: 50px;
+	width: 100%;
+	z-index: 10;
+}
+
+
+.msg > div
+{
+	margin: 0 auto;
+	max-width: 798px;		/* 824 - 2 (border) - 24 (padding) */
+	min-width: 174px;		/* 200 + 2 (border) + 24 (padding) */
 	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	padding: 12px;
 }
 
 

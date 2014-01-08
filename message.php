@@ -119,10 +119,12 @@
 		else if ($msgType == MSG_TYPE_ERROR)
 			$msgClass .= " msg_error";
 		html_op("<div id=\"action_msg\" class=\"".$msgClass."\">");
-			html_op("<div class=\"close_btn\">");
-				html(getIconLink(ICON_BUTTON, NULL, "close", NULL, TRUE, "onCloseMessage();", "small_icon"));
+			html_op("<div>");
+				html_op("<div class=\"close_btn\">");
+					html(getIconLink(ICON_BUTTON, NULL, "close", NULL, TRUE, "onCloseMessage();", "small_icon"));
+				html_cl("</div>");
+				html("<span>".$msgMessage."</span>");
 			html_cl("</div>");
-			html("<span>".$msgMessage."</span>");
 		html_cl("</div>");
 
 		$_SESSION["msg"] = MSG_NONE;
