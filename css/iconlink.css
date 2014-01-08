@@ -97,6 +97,35 @@
 }
 
 
+/* 16x16 iconlink */
+.small_icon
+{
+	height: 16px;
+}
+
+
+.small_icon .icon
+{
+	width: 16px;
+	height: 16px;
+}
+
+
+.small_icon span
+{
+	height: 16px;
+	line-height: 16px;
+	font-size: 10px;
+}
+
+
+.small_icon > a,
+.small_icon > button
+{
+	height: 16px;
+}
+
+
 /* iconlink icons */
 .iconlink div.add
 {
