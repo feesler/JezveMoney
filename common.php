@@ -270,17 +270,20 @@
 		$il_icon = ($iconClass && $iconClass != "") ? " class=\"icon ".$iconClass."\"" : "";
 		$resStr .= "<div".$il_icon."></div>";
 
-		$resStr .= "<div class=\"icontitle\">";
-		if ($addText && $addText != "")
+		if ($text && $text != "")
 		{
-			$resStr .= "<span class=\"maintitle\">".$text."</span><br>";
-			$resStr .= "<span class=\"addtitle\">".$addText."</span>";
+			$resStr .= "<div class=\"icontitle\">";
+			if ($addText && $addText != "")
+			{
+				$resStr .= "<span class=\"maintitle\">".$text."</span><br>";
+				$resStr .= "<span class=\"addtitle\">".$addText."</span>";
+			}
+			else
+			{
+				$resStr .= "<span>".$text."</span>";
+			}
+			$resStr .= "</div>";
 		}
-		else
-		{
-			$resStr .= "<span>".$text."</span>";
-		}
-		$resStr .= "</div>";
 
 		$resStr .= ($il_type == ICON_BUTTON) ? "</button>" : "</a>";
 		$resStr .= "</div>";
