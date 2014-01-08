@@ -448,4 +448,13 @@
 		html_cl("</div>");
 	}
 
+
+	// Check session and start if it is not started yet
+	function sessionStart()
+	{
+		if (session_id())
+			return;
+
+		session_start();
+	}
 ?>
