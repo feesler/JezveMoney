@@ -36,4 +36,5 @@
 	date_default_timezone_set("Europe/Moscow");
 
 	require_once($docroot.$rootdir."common.php");
+	require_once($docroot.$rootdir."message.php");
 ?>

@@ -630,3 +630,27 @@ label
 {
 	max-width: 350px;
 }
+
+
+/* Messages */
+.msg
+{
+	margin: 5px auto 5px auto;
+	max-width: 300px;
+	padding: 10px;
+	border: 1px solid #000000;
+}
+
+
+.msg_success
+{
+	color: #20D040;
+	border-color: #20D040;
+}
+
+
+.msg_error
+{
+	color: #F02020;
+	border-color: #F02020;
+}
