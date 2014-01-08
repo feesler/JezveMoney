@@ -1,123 +1,76 @@
 ﻿<?php
-
-	$msgCounter = 0;
-
-	// Define new message constant
-	function addMessage($constName)
-	{
-		global $msgCounter;
-
-		define($constName, $msgCounter, TRUE);
-		$msgCounter++;
-	}
-
-
 	// Type of messages
 	define("MSG_TYPE_NONE", 0, TRUE);
 	define("MSG_TYPE_SUCCESS", 1, TRUE);
 	define("MSG_TYPE_ERROR", 2, TRUE);
 
+	$msgArray = array();
+
+
+	// Define new message constant
+	function addMessage($constName, $msgType = MSG_TYPE_NONE, $message = NULL)
+	{
+		global $msgArray;
+
+		$msgCounter = count($msgArray);
+		define($constName, $msgCounter, TRUE);
+
+		if ($msgType != MSG_TYPE_NONE && !is_null($message))
+			$msgArray[$msgCounter] = array($msgType, $message);
+		else
+			$msgArray[$msgCounter] = array(MSG_TYPE_NONE);
+	}
+
 
 	addMessage("MSG_NONE");
 
 	addMessage("MSG_REGISTER");
-	addMessage("ERR_REGISTER_FAIL");
+	addMessage("ERR_REGISTER_FAIL", MSG_TYPE_ERROR, "Fail to register.");
 	addMessage("MSG_LOGIN");
-	addMessage("ERR_LOGIN_FAIL");
-	addMessage("MSG_PROFILE_NAME");
-	addMessage("ERR_PROFILE_NAME");
-	addMessage("MSG_PROFILE_PASSWORD");
-	addMessage("ERR_PROFILE_PASSWORD");
-	addMessage("MSG_PROFILE_RESETALL");
-	addMessage("ERR_PROFILE_RESETALL");
+	addMessage("ERR_LOGIN_FAIL", MSG_TYPE_ERROR, "Wrong login/password. Please check it and try to retype again.");
+	addMessage("MSG_PROFILE_NAME", MSG_TYPE_SUCCESS, "User name successfully updated.");
+	addMessage("ERR_PROFILE_NAME", MSG_TYPE_ERROR, "Fail to update user name.");
+	addMessage("MSG_PROFILE_PASSWORD", MSG_TYPE_SUCCESS, "Password successfully updated.");
+	addMessage("ERR_PROFILE_PASSWORD", MSG_TYPE_ERROR, "Fail to update password.");
+	addMessage("MSG_PROFILE_RESETALL", MSG_TYPE_SUCCESS, "All data successfully reseted.");
+	addMessage("ERR_PROFILE_RESETALL", MSG_TYPE_ERROR, "Fail to reset.");
 
 	addMessage("MSG_ACCOUNT_CREATE");
-	addMessage("ERR_ACCOUNT_CREATE");
+	addMessage("ERR_ACCOUNT_CREATE", MSG_TYPE_ERROR, "Fail to create new account.");
 	addMessage("MSG_ACCOUNT_UPDATE");
-	addMessage("ERR_ACCOUNT_UPDATE");
+	addMessage("ERR_ACCOUNT_UPDATE", MSG_TYPE_ERROR, "Fail to update account.");
 	addMessage("MSG_ACCOUNT_DELETE");
-	addMessage("ERR_ACCOUNT_DELETE");
-	addMessage("MSG_ACCOUNTS_RESET");
-	addMessage("ERR_ACCOUNTS_RESET");
+	addMessage("ERR_ACCOUNT_DELETE", MSG_TYPE_ERROR, "Fail to delete account.");
+	addMessage("MSG_ACCOUNTS_RESET", MSG_TYPE_SUCCESS, "Accounts successfully reseted");
+	addMessage("ERR_ACCOUNTS_RESET", MSG_TYPE_ERROR, "Fail to reset.");
 
-	addMessage("MSG_CURRENCY_CREATE");
-	addMessage("ERR_CURRENCY_CREATE");
-	addMessage("MSG_CURRENCY_UPDATE");
-	addMessage("ERR_CURRENCY_UPDATE");
-	addMessage("MSG_CURRENCY_DELETE");
-	addMessage("ERR_CURRENCY_DELETE");
+	addMessage("MSG_CURRENCY_CREATE", MSG_TYPE_SUCCESS, "Currency successfully created.");
+	addMessage("ERR_CURRENCY_CREATE", MSG_TYPE_ERROR, "Fail to create new currency.");
+	addMessage("MSG_CURRENCY_UPDATE", MSG_TYPE_SUCCESS, "Currency successfully updated.");
+	addMessage("ERR_CURRENCY_UPDATE", MSG_TYPE_ERROR, "Fail to update currency.");
+	addMessage("MSG_CURRENCY_DELETE", MSG_TYPE_SUCCESS, "Currency successfully deleted.");
+	addMessage("ERR_CURRENCY_DELETE", MSG_TYPE_ERROR, "Fail to delete currency.");
 
 	addMessage("MSG_PERSON_CREATE");
-	addMessage("ERR_PERSON_CREATE");
-	addMessage("ERR_PERSON_CREATE_EXIST");
+	addMessage("ERR_PERSON_CREATE", MSG_TYPE_ERROR, "Fail to create new person.");
+	addMessage("ERR_PERSON_CREATE_EXIST", MSG_TYPE_ERROR, "Fail to update person. Person with same name already exist.");
 	addMessage("MSG_PERSON_UPDATE");
-	addMessage("ERR_PERSON_UPDATE");
-	addMessage("ERR_PERSON_UPDATE_EXIST");
+	addMessage("ERR_PERSON_UPDATE", MSG_TYPE_ERROR, "Fail to update person.");
+	addMessage("ERR_PERSON_UPDATE_EXIST", MSG_TYPE_ERROR, "Fail to update person. Person with same name already exist.");
 	addMessage("MSG_PERSON_DELETE");
-	addMessage("ERR_PERSON_DELETE");
+	addMessage("ERR_PERSON_DELETE", MSG_TYPE_ERROR, "Fail to delete person.");
 
 	addMessage("MSG_TRANS_CREATE");
-	addMessage("ERR_TRANS_CREATE");
+	addMessage("ERR_TRANS_CREATE", MSG_TYPE_ERROR, "Fail to create new transaction.");
 	addMessage("MSG_TRANS_UPDATE");
-	addMessage("ERR_TRANS_UPDATE");
+	addMessage("ERR_TRANS_UPDATE", MSG_TYPE_ERROR, "Fail to update transaction.");
 	addMessage("MSG_TRANS_DELETE");
-	addMessage("ERR_TRANS_DELETE");
+	addMessage("ERR_TRANS_DELETE", MSG_TYPE_ERROR, "Fail to delete transaction.");
 
 	addMessage("MSG_DEBT_CREATE");
-	addMessage("ERR_DEBT_CREATE");
+	addMessage("ERR_DEBT_CREATE", MSG_TYPE_ERROR, "Fail to create new debt.");
 	addMessage("MSG_DEBT_UPDATE");
-	addMessage("ERR_DEBT_UPDATE");
-
-
-	$msgArray = array(
-		MSG_REGISTER => array(MSG_TYPE_NONE),
-		ERR_REGISTER_FAIL => array(MSG_TYPE_ERROR, "Fail to register."),
-		MSG_LOGIN => array(MSG_TYPE_NONE),
-		ERR_LOGIN_FAIL => array(MSG_TYPE_ERROR, "Wrong login/password. Please check it and try to retype again."),
-		MSG_PROFILE_NAME => array(MSG_TYPE_SUCCESS, "User name successfully updated."),
-		ERR_PROFILE_NAME => array(MSG_TYPE_ERROR, "Fail to update user name."),
-		MSG_PROFILE_PASSWORD => array(MSG_TYPE_SUCCESS, "Password successfully updated."),
-		ERR_PROFILE_PASSWORD => array(MSG_TYPE_ERROR, "Fail to update password."),
-		MSG_PROFILE_RESETALL => array(MSG_TYPE_SUCCESS, "All data successfully reseted."),
-		ERR_PROFILE_RESETALL => array(MSG_TYPE_ERROR, "Fail to reset."),
-
-		MSG_ACCOUNT_CREATE => array(MSG_TYPE_NONE),
-		ERR_ACCOUNT_CREATE => array(MSG_TYPE_ERROR, "Fail to create new account."),
-		MSG_ACCOUNT_UPDATE => array(MSG_TYPE_NONE),
-		ERR_ACCOUNT_UPDATE => array(MSG_TYPE_ERROR, "Fail to update account."),
-		MSG_ACCOUNT_DELETE => array(MSG_TYPE_NONE),
-		ERR_ACCOUNT_DELETE => array(MSG_TYPE_ERROR, "Fail to delete account."),
-		MSG_ACCOUNTS_RESET => array(MSG_TYPE_SUCCESS, "Accounts successfully reseted"),
-		ERR_ACCOUNTS_RESET => array(MSG_TYPE_ERROR, "Fail to reset accounts."),
-
-		MSG_CURRENCY_CREATE => array(MSG_TYPE_SUCCESS, "Currency successfully created."),
-		ERR_CURRENCY_CREATE => array(MSG_TYPE_ERROR, "Fail to create new currency."),
-		MSG_CURRENCY_UPDATE => array(MSG_TYPE_SUCCESS, "Currency successfully updated."),
-		ERR_CURRENCY_UPDATE => array(MSG_TYPE_ERROR, "Fail to update currency."),
-		MSG_CURRENCY_DELETE => array(MSG_TYPE_SUCCESS, "Currency successfully deleted."),
-		ERR_CURRENCY_DELETE => array(MSG_TYPE_ERROR, "Fail to delete currency."),
-
-		MSG_PERSON_CREATE => array(MSG_TYPE_NONE),
-		ERR_PERSON_CREATE => array(MSG_TYPE_ERROR, "Fail to create new person."),
-		ERR_PERSON_CREATE_EXIST => array(MSG_TYPE_ERROR, "Fail to create new person. Person with same name already exist."),
-		MSG_PERSON_UPDATE => array(MSG_TYPE_NONE),
-		ERR_PERSON_UPDATE => array(MSG_TYPE_ERROR, "Fail to update person."),
-		ERR_PERSON_UPDATE_EXIST => array(MSG_TYPE_ERROR, "Fail to update person. Person with same name already exist."),
-		MSG_PERSON_DELETE => array(MSG_TYPE_NONE),
-		ERR_PERSON_DELETE => array(MSG_TYPE_ERROR, "Fail to delete person."),
-
-		MSG_TRANS_CREATE => array(MSG_TYPE_NONE),
-		ERR_TRANS_CREATE => array(MSG_TYPE_ERROR, "Fail to create new transaction."),
-		MSG_TRANS_UPDATE => array(MSG_TYPE_NONE),
-		ERR_TRANS_UPDATE => array(MSG_TYPE_ERROR, "Fail to update transaction."),
-		MSG_TRANS_DELETE => array(MSG_TYPE_NONE),
-		ERR_TRANS_DELETE => array(MSG_TYPE_ERROR, "Fail to delete transaction."),
-
-		MSG_DEBT_CREATE => array(MSG_TYPE_NONE),
-		ERR_DEBT_CREATE => array(MSG_TYPE_ERROR, "Fail to create new debt."),
-		MSG_DEBT_UPDATE => array(MSG_TYPE_NONE),
-		ERR_DEBT_UPDATE => array(MSG_TYPE_ERROR, "Fail to update debt."),
-	);
+	addMessage("ERR_DEBT_UPDATE", MSG_TYPE_ERROR, "Fail to update debt.");
 
 
 	// Try to set message
