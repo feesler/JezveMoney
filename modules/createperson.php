@@ -4,7 +4,7 @@
 	require_once("../class/person.php");
 
 
-	function fail()
+	function fail($msg = ERR_PERSON_CREATE)
 	{
 		setMessage(ERR_PERSON_CREATE);
 		setLocation("../persons.php");
@@ -23,10 +23,7 @@
 	$person = new Person($user_id);
 	$check_id = $person->findByName($person_name);
 	if ($check_id != 0)
-	{
-		setMessage(ERR_PERSON_CREATE_EXIST);
-		setLocation("../persons.php");
-	}
+		fail(ERR_PERSON_CREATE_EXIST);
 	if (!$person->create($person_name))
 		fail();
 

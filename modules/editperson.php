@@ -4,9 +4,9 @@
 	require_once("../class/person.php");
 
 
-	function fail()
+	function fail($msg = ERR_PERSON_UPDATE)
 	{
-		setMessage(ERR_PERSON_UPDATE);
+		setMessage($msg);
 		setLocation("../persons.php");
 	}
 
@@ -24,10 +24,7 @@
 	$person = new Person($user_id);
 	$check_id = $person->findByName($person_name);
 	if ($check_id != 0)
-	{
-		setMessage(ERR_PERSON_UPDATE_EXIST);
-		setLocation("../persons.php");
-	}
+		fail(ERR_PERSON_UPDATE_EXIST);
 	if (!$person->edit($person_id, $person_name))
 		fail();
 
