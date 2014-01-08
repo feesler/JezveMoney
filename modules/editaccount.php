@@ -7,7 +7,8 @@
 
 	function fail()
 	{
-		setLocation("../accounts.php?edit=fail");
+		setMessage(ERR_ACCOUNT_UPDATE);
+		setLocation("../accounts.php");
 	}
 
 
@@ -23,5 +24,6 @@
 	if (!$acc->edit($_POST["accid"], $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
 		fail();
 
-	setLocation("../accounts.php?edit=ok");
+	setMessage(MSG_ACCOUNT_UPDATE);
+	setLocation("../accounts.php");
 ?>

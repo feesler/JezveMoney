@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once($docroot.$rootdir."class/person.php");
 	require_once($docroot.$rootdir."class/user.php");
@@ -9,7 +9,8 @@
 
 	function fail()
 	{
-		setLocation("../registration.php?act=fail");
+		setMessage(ERR_REGISTER_FAIL);
+		setLocation("../registration.php");
 	}
 
 
@@ -23,6 +24,7 @@
 	if (!User::register($_POST["login"], $_POST["password"], $_POST["name"]))
 		fail();
 
+	setMessage(MSG_REGISTER);
 	setLocation("../index.php");
 
 ?>

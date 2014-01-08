@@ -10,7 +10,8 @@
 
 	function fail()
 	{
-		setLocation("../transactions.php?type=debt&act=fail");
+		setMessage(ERR_DEBT_UPDATE);
+		setLocation("../transactions.php?type=debt");
 	}
 
 
@@ -44,5 +45,6 @@
 	if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 
-	setLocation("../transactions.php?type=debt&act=ok");
+	setMessage(MSG_DEBT_UPDATE);
+	setLocation("../transactions.php?type=debt");
 ?>

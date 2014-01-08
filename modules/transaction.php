@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../index.php?trans=fail");
+		setMessage(ERR_TRANS_CREATE);
+		setLocation("../index.php");
 	}
 
 
@@ -44,5 +45,6 @@
 	if (!$trans->create($trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 
-	setLocation("../index.php?trans=ok");
+	setMessage(MSG_TRANS_CREATE);
+	setLocation("../index.php");
 ?>

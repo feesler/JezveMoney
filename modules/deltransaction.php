@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../transactions.php?del=fail");
+		setMessage(ERR_TRANS_DELETE);
+		setLocation("../transactions.php");
 	}
 
 
@@ -30,5 +31,6 @@
 			fail();
 	}
 
-	setLocation("../transactions.php?del=ok");
+	setMessage(MSG_TRANS_DELETE);
+	setLocation("../transactions.php");
 ?>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -7,7 +7,8 @@
 
 	function fail()
 	{
-		setLocation("../login.php?act=wrong");
+		setMessage(ERR_LOGIN_FAIL);
+		setLocation("../login.php");
 	}
 
 
@@ -21,6 +22,7 @@
 	if (!User::login($_POST["login"], $_POST["password"]))
 		fail();
 
+	setMessage(MSG_LOGIN);
 	setLocation("../index.php");
 
 ?>

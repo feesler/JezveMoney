@@ -7,7 +7,8 @@
 
 	function fail()
 	{
-		setLocation("../accounts.php?newacc=fail");
+		setMessage(ERR_ACCOUNT_CREATE);
+		setLocation("../accounts.php");
 	}
 
 
@@ -23,5 +24,6 @@
 	if (!$acc->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
 		fail();
 
-	setLocation("../accounts.php?newacc=ok");
+	setMessage(MSG_ACCOUNT_CREATE);
+	setLocation("../accounts.php");
 ?>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../profile.php?resetall=fail");
+		setMessage(ERR_PROFILE_RESETALL);
+		setLocation("../profile.php");
 	}
 
 
@@ -27,5 +28,6 @@
 		fail();
 
 
-	setLocation("../profile.php?resetall=ok");
+	setMessage(MSG_PROFILE_RESETALL);
+	setLocation("../profile.php");
 ?>

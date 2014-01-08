@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/account.php");
@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../persons.php?del=fail");
+		setMessage(ERR_PERSON_DELETE);
+		setLocation("../persons.php");
 	}
 
 
@@ -30,5 +31,6 @@
 			fail();
 	}
 
-	setLocation("../persons.php?del=ok");
+	setMessage(MSG_PERSON_DELETE);
+	setLocation("../persons.php");
 ?>

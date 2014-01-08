@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -7,7 +7,8 @@
 
 	function fail()
 	{
-		setLocation("../resetaccounts.php?act=fail");
+		setMessage(ERR_ACCOUNTS_RESET);
+		setLocation("../resetaccounts.php");
 	}
 
 
@@ -20,5 +21,6 @@
 	if (!$acc->reset())
 		fail();
 
-	setLocation("../accounts.php?reset=ok");
+	setMessage(MSG_ACCOUNTS_RESET);
+	setLocation("../accounts.php");
 ?>

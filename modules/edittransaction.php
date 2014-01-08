@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../transactions.php?edit=fail");
+		setMessage(ERR_TRANS_UPDATE);
+		setLocation("../transactions.php");
 	}
 
 
@@ -36,5 +37,6 @@
 	if (is_null($ttStr))
 		fail();
 
-	setLocation("../transactions.php?type=".$ttStr."&edit=ok");
+	setMessage(MSG_TRANS_UPDATE);
+	setLocation("../transactions.php?type=".$ttStr);
 ?>
