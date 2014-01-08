@@ -1,6 +1,7 @@
-<?php
+﻿<?php
 
 	// Type of messages
+	define("MSG_TYPE_NONE", 0, TRUE);
 	define("MSG_TYPE_SUCCESS", 1, TRUE);
 	define("MSG_TYPE_ERROR", 2, TRUE);
 
@@ -44,6 +45,12 @@
 
 		$msgParam = $msgArray[$msg_id];
 		$msgType = $msgParam[0];
+		if ($msgType == MSG_TYPE_NONE)
+		{
+			$_SESSION["msg"] = MSG_NONE;
+			return;
+		}
+
 		$msgMessage = $msgParam[1];
 
 		$msgClass = "msg";
