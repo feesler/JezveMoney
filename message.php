@@ -42,13 +42,17 @@
 
 	addMessage("MSG_CURRENCY_CREATE");
 	addMessage("ERR_CURRENCY_CREATE");
+	addMessage("MSG_CURRENCY_UPDATE");
+	addMessage("ERR_CURRENCY_UPDATE");
 	addMessage("MSG_CURRENCY_DELETE");
 	addMessage("ERR_CURRENCY_DELETE");
 
 	addMessage("MSG_PERSON_CREATE");
 	addMessage("ERR_PERSON_CREATE");
+	addMessage("ERR_PERSON_CREATE_EXIST");
 	addMessage("MSG_PERSON_UPDATE");
 	addMessage("ERR_PERSON_UPDATE");
+	addMessage("ERR_PERSON_UPDATE_EXIST");
 	addMessage("MSG_PERSON_DELETE");
 	addMessage("ERR_PERSON_DELETE");
 
