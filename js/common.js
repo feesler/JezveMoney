@@ -437,12 +437,18 @@ function onEmptyClick(callback, elem)
 // Set or unset event handler for 
 function setEmptyClick(callback, elem)
 {
+	var onClickHandler;
+
 	callback = callback || null;
 	elem = elem || null;
 
 	if (document.documentElement)
 	{
-		document.documentElement.onclick = ((callback) ? bind(onEmptyClick, null, callback, elem) : null);
+		onClickHandler = ((callback) ? bind(onEmptyClick, null, callback, elem) : null);
+
+		if (onClickHandler && document.documentElement.onclick)
+			document.documentElement.onclick();			// run previously set callback
+		document.documentElement.onclick = onClickHandler;
 	}
 }
 
