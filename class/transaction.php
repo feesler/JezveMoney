@@ -616,6 +616,43 @@ class Transaction
 	}
 
 
+	// Return total count of transactions for specified condition
+	public function getTransCount($trans_type, $account_id = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	{
+		global $db;
+
+		if (!self::$user_id)
+			return 0;
+
+		$tr_type = intval($trans_type);
+		$acc_id = intval($account_id);
+		$sReq = $db->escape($searchStr);
+
+		$condition = "user_id=".self::$user_id;
+		if ($tr_type != 0)
+			$condition .= " AND type=".$tr_type;
+		if ($acc_id != 0)
+			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
+		if (!is_empty($sReq))
+			$condition .= " AND comment LIKE '%".$sReq."%'";
+
+		if (!is_null($startDate) && !is_null($endDate))
+		{
+			$stdate = strtotime($startDate);
+			$enddate = strtotime($endDate);
+			if ($stdate != -1 && $enddate != -1)
+			{
+				$fstdate = date("Y-m-d H:i:s", $stdate);
+				$fenddate = date("Y-m-d H:i:s", $enddate);
+
+				$condition .= " AND date >= ".qnull($fstdate)." AND date <= ".qnull($fenddate);
+			}
+		}
+
+		return $db->countQ("transactions", $condition);
+	}
+
+
 	// Return link to specified page
 	private function getPageLink($trans_type, $acc_id, $page_num, $is_active)
 	{
