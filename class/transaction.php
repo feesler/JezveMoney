@@ -820,6 +820,7 @@ class Transaction
 			return;
 		}
 
+/*
 		$tr_type = intval($trans_type);
 		$acc_id = intval($account_id);
 		$sReq = $db->escape($searchStr);
@@ -859,6 +860,9 @@ class Transaction
 		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
 		$rowCount = count($resArr);
 		if (!$rowCount)
+*/
+		$transArr = $this->getArray($trans_type, $account_id, $isDesc, $tr_on_page, $page_num, $showPaginator, $searchStr, $startDate, $endDate, $details);
+		if (!count($transArr))
 		{
 			html("<span>No transactions found.</span>");
 			html_cl("</div>");
@@ -888,6 +892,7 @@ class Transaction
 			html_cl("</div>");
 		}
 
+/*
 		foreach($resArr as $row)
 		{
 			$trans_id = intval($row["id"]);
@@ -899,6 +904,17 @@ class Transaction
 			$curr_id = intval($row["curr_id"]);
 			$comment = $row["comment"];
 			$fdate = date("d.m.Y", strtotime($row["date"]));
+*/
+		foreach($transArr as $trans)
+		{
+			$trans_id = $trans[0];
+			$src_id = $trans[1];
+			$dest_id = $trans[2];
+			$famount = $trans[3];
+			$fcharge = $trans[4];
+			$cur_trans_type = $trans[5];
+			$fdate = $trans[6];
+			$comment = $trans[7];
 
 			if ($cur_trans_type == 4)
 			{
@@ -956,6 +972,7 @@ class Transaction
 			}
 
 			$resStr = "<div class=\"tritem_sum\"><span>";
+/*
 			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
 				$resStr .= "- ";
 			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
@@ -970,6 +987,12 @@ class Transaction
 					$acc_curr = $acc->getCurrency($src_id);
 				$resStr .= " (".Currency::format($charge, $acc_curr).")";
 			}
+			$resStr .= "</span></div>";
+*/
+			$resStr .= $famount;
+			if ($famount != $fcharge)
+				$resStr .= " (".$fcharge.")";
+
 			$resStr .= "</span></div>";
 			html($resStr);
 
