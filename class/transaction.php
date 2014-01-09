@@ -907,10 +907,13 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			html_op("<div class=\"trlist_item_wrap\">");
+			$itemClass = "trlist_item_wrap";
+			if ($details)
+				$itemClass .= " trlist_detail_item";
+			html_op("<div class=\"".$itemClass."\">");
 			html_op("<div id=\"tr_".$trans_id."\" class=\"trlist_item\">");
 
-			$resStr = "<div><span class=\"tritem_acc_name\">";
+			$resStr = "<div class=\"tritem_acc_name\"><span>";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
 			else if ($cur_trans_type == 4)
@@ -924,6 +927,13 @@ class Transaction
 			else if ($cur_trans_type == 4)
 				$resStr .= $acc->getNameOrPerson($dest_id);
 
+			$resStr .= "</span></div>";
+			html($resStr);
+
+			$resStr = "<div class=\"tritem_sum\"><span>";
+			$resStr .= $famount;
+			if ($famount != $fcharge)
+				$resStr .= " (".$fcharge.")";
 			$resStr .= "</span></div>";
 			html($resStr);
 
@@ -955,13 +965,6 @@ class Transaction
 					html_cl("</div>");
 				}
 			}
-
-			$resStr = "<div class=\"tritem_sum\"><span>";
-			$resStr .= $famount;
-			if ($famount != $fcharge)
-				$resStr .= " (".$fcharge.")";
-			$resStr .= "</span></div>";
-			html($resStr);
 
 			html_op("<div class=\"tritem_date_comm\">");
 				html("<span>".$fdate."</span>");
