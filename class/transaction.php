@@ -820,47 +820,6 @@ class Transaction
 			return;
 		}
 
-/*
-		$tr_type = intval($trans_type);
-		$acc_id = intval($account_id);
-		$sReq = $db->escape($searchStr);
-
-		$condition = "user_id=".self::$user_id;
-		if ($tr_type != 0)
-			$condition .= " AND type=".$tr_type;
-		if ($acc_id != 0)
-			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
-		if (!is_empty($sReq))
-			$condition .= " AND comment LIKE '%".$sReq."%'";
-
-		if (!is_null($startDate) && !is_null($endDate))
-		{
-			$stdate = strtotime($startDate);
-			$enddate = strtotime($endDate);
-			if ($stdate != -1 && $enddate != -1)
-			{
-				$fstdate = date("Y-m-d H:i:s", $stdate);
-				$fenddate = date("Y-m-d H:i:s", $enddate);
-
-				$condition .= " AND date >= ".qnull($fstdate)." AND date <= ".qnull($fenddate);
-			}
-		}
-
-		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
-		if ($tr_on_page > 0)
-		{
-			$transCount = $db->countQ("transactions", $condition);
-
-			$limitOffset = ($tr_on_page * $page_num);
-			$limitRows = min($transCount - $limitOffset, $tr_on_page);
-
-			$orderAndLimit .= " LIMIT ".$limitOffset.", ".$limitRows;
-		}
-
-		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
-		$rowCount = count($resArr);
-		if (!$rowCount)
-*/
 		$transArr = $this->getArray($trans_type, $account_id, $isDesc, $tr_on_page, $page_num, $showPaginator, $searchStr, $startDate, $endDate, $details);
 		if (!count($transArr))
 		{
@@ -892,19 +851,6 @@ class Transaction
 			html_cl("</div>");
 		}
 
-/*
-		foreach($resArr as $row)
-		{
-			$trans_id = intval($row["id"]);
-			$cur_trans_type = intval($row["type"]);
-			$src_id = intval($row["src_id"]);
-			$dest_id = intval($row["dest_id"]);
-			$amount = floatval($row["amount"]);
-			$charge = floatval($row["charge"]);
-			$curr_id = intval($row["curr_id"]);
-			$comment = $row["comment"];
-			$fdate = date("d.m.Y", strtotime($row["date"]));
-*/
 		foreach($transArr as $trans)
 		{
 			$trans_id = $trans[0];
@@ -972,36 +918,18 @@ class Transaction
 			}
 
 			$resStr = "<div class=\"tritem_sum\"><span>";
-/*
-			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
-				$resStr .= "- ";
-			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
-				$resStr .= "+ ";
-
-			$resStr .= Currency::format($amount, $curr_id);
-			if ($charge != $amount)
-			{
-				if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))
-					$acc_curr = $acc->getCurrency($dest_id);
-				else
-					$acc_curr = $acc->getCurrency($src_id);
-				$resStr .= " (".Currency::format($charge, $acc_curr).")";
-			}
-			$resStr .= "</span></div>";
-*/
 			$resStr .= $famount;
 			if ($famount != $fcharge)
 				$resStr .= " (".$fcharge.")";
-
 			$resStr .= "</span></div>";
 			html($resStr);
 
 			html_op("<div class=\"tritem_date_comm\">");
-			html("<span>".$fdate."</span>");
-			if ($comment != "")
-				html("<span class=\"tritem_comm\">".$comment."</span>");
-
+				html("<span>".$fdate."</span>");
+				if ($comment != "")
+					html("<span class=\"tritem_comm\">".$comment."</span>");
 			html_cl("</div>");
+
 			html_cl("</div>");
 			html_cl("</div>");
 		}
