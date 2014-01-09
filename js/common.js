@@ -75,7 +75,7 @@ function re(obj)
 {
 	var robj = ge(obj);
 
-	return robj ? robj.parentNode.removeChild(robj) : null;
+	return (robj && robj.parentNode) ? robj.parentNode.removeChild(robj) : null;
 }
 
 
