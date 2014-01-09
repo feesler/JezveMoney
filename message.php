@@ -89,6 +89,29 @@
 	}
 
 
+	// Check message is set
+	function isMessageSet()
+	{
+		global $msgArray;
+
+		sessionStart();
+
+		if (!isset($_SESSION["msg"]))
+			return FALSE;
+
+		$msg_id = intval($_SESSION["msg"]);
+		if ($msg_id == MSG_NONE || !isset($msgArray[$msg_id]))
+			return FALSE;
+
+		$msgParam = $msgArray[$msg_id];
+		$msgType = $msgParam[0];
+		if ($msgType == MSG_TYPE_NONE)
+			return FALSE;
+
+		return TRUE;
+	}
+
+
 	// Check message and show it if available
 	function checkMessage()
 	{
