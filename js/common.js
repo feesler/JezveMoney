@@ -524,4 +524,12 @@ function getOffsetSum(elem)
 function onCloseMessage()
 {
 	re('action_msg');
+	setEmptyClick();
+}
+
+
+// Initialization of message hiding
+function initMessage()
+{
+	setEmptyClick(onCloseMessage, ['action_msg']);
 }
