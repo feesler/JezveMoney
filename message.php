@@ -149,7 +149,6 @@
 					html_cl("</div>");
 					html("<span>".$msgMessage."</span>");
 				html_cl("</div>");
-				html("<span>".$msgMessage."</span>");
 			html_cl("</div>");
 		html_cl("</div>");
 
