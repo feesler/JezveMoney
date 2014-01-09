@@ -27,15 +27,19 @@
 
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
+	html(getCSS("iconlink.css"));
 	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("main.js"));
 	html("<script>");
 	echo(Currency::getArray(TRUE));
 	html("var acc_name = ".json_encode($acc_name).";");
 	html("var acc_currency = ".$curr_id.";");
 	html("var acc_balance = ".$acc_bal.";");
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

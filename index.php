@@ -24,6 +24,7 @@
 
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
+	html(getCSS("iconlink.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("trlist.css"));
 	html(getCSS("statistics.css"));
@@ -48,6 +49,8 @@
 		html("var groupType = ".json_encode($groupType).";");
 		html("var chartData = ".json_encode(getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id, 5)).";");
 		html();
+		if (isMessageSet())
+			html("onReady(initMessage);");
 		html("onReady(initStatWidget);");
 	html_cl("</script>");
 	html("</head>");

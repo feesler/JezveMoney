@@ -28,17 +28,21 @@
 
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
+	html(getCSS("iconlink.css"));
 	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("popup.js"));
 	html(getJS("persons.js"));
 
 	html("<script>");
 	html("var person_id = ".$p_id.";");
 	html("var personName = ".json_encode($pName).";");
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

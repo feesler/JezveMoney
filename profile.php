@@ -41,12 +41,16 @@
 	html(getCSS("common.css"));
 	html(getCSS("popup.css"));
 	html(getCSS("login.css"));
+	html(getCSS("iconlink.css"));
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("popup.js"));
 	html(getJS("main.js"));
 
 	html("<script>");
 	html("var p_name = ".json_encode($person_name).";");
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

@@ -27,8 +27,16 @@
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("popup.js"));
 	html(getJS("main.js"));
+
+	if (isMessageSet())
+	{
+		html_op("<script>");
+			html("onReady(initMessage);");
+		html_op("</script>");
+	}
 
 	html("</head>");
 	html("<body>");

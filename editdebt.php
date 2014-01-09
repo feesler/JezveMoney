@@ -141,6 +141,7 @@
 	html(getCSS("popup.css"));
 
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
 	html(getJS("transaction.js"));
@@ -171,7 +172,8 @@
 
 	html("var trans_type = ".$tr["type"].";");
 	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");
-
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

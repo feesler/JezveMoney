@@ -42,6 +42,7 @@
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("popup.js"));
 	html(getJS("main.js"));
 	html("<script>");
@@ -50,6 +51,8 @@
 	html("var acc_name = ".json_encode($acc_name).";");
 	html("var acc_currency = ".$acc_curr.";");
 	html("var acc_balance = ".$acc_bal.";");
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

@@ -106,6 +106,7 @@
 	html(getCSS("calendar.css"));
 
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("main.js"));
 	html(getJS("calendar.js"));
 	html(getJS("transaction.js"));
@@ -122,6 +123,9 @@
 	html("var trans_type = ".$trans_type.";");
 	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");
 	html("var edit_mode = false;");
+
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

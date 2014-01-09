@@ -116,6 +116,7 @@
 	html(getCSS("calendar.css"));
 
 	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
 	html(getJS("transaction.js"));
@@ -155,6 +156,8 @@
 	html("var trans_acc_curr = ".$tr["curr"].";");
 	html("var trans_type = ".$tr["type"].";");
 
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");

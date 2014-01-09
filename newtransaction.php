@@ -117,6 +117,7 @@
 
 	html(getJS("common.js"));
 	html(getJS("main.js"));
+	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
@@ -129,6 +130,9 @@
 
 	html("var trans_type = ".$trans_type.";");
 	html("var edit_mode = false;");
+
+	if (isMessageSet())
+		html("onReady(initMessage);");
 	html("</script>");
 
 	html("</head>");
