@@ -866,6 +866,8 @@ class Transaction
 			return;
 		}
 
+		$transCount = $this->getTransCount($trans_type, $account_id, $searchStr, $startDate, $endDate);
+
 		if ($showPaginator == TRUE)
 		{
 			html("<div class=\"mode_selector\">");
