@@ -586,6 +586,11 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
+			$famount = "";
+			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
+				$famount .= "- ";
+			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
+				$famount .= "+ ";
 			$famount .= Currency::format($amount, $curr_id);
 			if ($charge != $amount)
 			{
@@ -599,7 +604,7 @@ class Transaction
 					$fcharge .= "- ";
 				else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
 					$fcharge .= "+ ";
-				$fcharge .= " (".Currency::format($charge, $acc_curr).")";
+				$fcharge .= Currency::format($charge, $acc_curr);
 			}
 			else
 				$fcharge = $famount;
