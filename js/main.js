@@ -579,7 +579,6 @@ function showResetAllPopup()
 }
 
 
-
 // Init statistics widget
 function initStatWidget()
 {

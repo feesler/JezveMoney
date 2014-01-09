@@ -36,9 +36,7 @@
 
 	$pers = new Person($user_id);
 	if (!$pers->is_exist($person_id))		// person should exist
-	{
 		fail();
-	}
 
 	$debt = new Debt($user_id);
 	if (!$debt->create($debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))
