@@ -636,7 +636,7 @@ label
 .msg
 {
 	position: absolute;
-	top: 50px;
+	top: 55px;
 	width: 100%;
 	z-index: 10;
 }
@@ -645,30 +645,42 @@ label
 .msg > div
 {
 	margin: 0 auto;
-	max-width: 798px;		/* 824 - 2 (border) - 24 (padding) */
-	min-width: 174px;		/* 200 + 2 (border) + 24 (padding) */
+	max-width: 824px;
+	min-width: 200px;
+	position: relative;
+}
+
+
+.msg > div > div
+{
+	max-width: 300px;
+	min-width: 200px;
 	border: 1px solid #000000;
+	color: #FFFFFF;
 	background-color: #FFFFFF;
 	padding: 12px;
+	position: absolute;
+	right: 0px;
 }
 
 
-.msg_success
+.msg_success > div > div
 {
-	color: #20D040;
 	border-color: #20D040;
+	background-color: #40D060;
 }
 
 
-.msg_error
+.msg_error > div > div
 {
-	color: #F02020;
 	border-color: #F02020;
+	background-color: #F02020;
 }
 
 
 .msg .close_btn
 {
 	float: right;
+	margin: 4px 0px 0px 10px;
 }
 
