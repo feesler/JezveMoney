@@ -912,7 +912,7 @@ class Transaction
 
 			if ($details)
 			{
-				html_op("<tr>");
+				html_op("<tr id=\"tr_".$trans_id."\">");
 			}
 			else
 			{
