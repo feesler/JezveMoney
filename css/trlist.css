@@ -65,6 +65,38 @@
 }
 
 
+/* Ellipsis cell */
+.ellipsis_cell > div
+{
+	position: relative;
+	overflow: hidden;
+	height: 23px;
+}
+
+
+/* visible content */
+.ellipsis_cell > div > span
+{
+	display: block;
+	position: absolute;	
+	max-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 23px;		/* for vertical align of text */
+}
+
+
+/* cell stretching content */
+.ellipsis_cell > div:after
+{
+	content: attr(title);
+	overflow: hidden;
+	height: 0;
+	display: block;
+}
+
+
 /* Details mode */
 .trlist_detail_item
 {
