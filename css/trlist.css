@@ -32,6 +32,7 @@
 
 
 .trlist_item > div > span,
+.act_tr > div > span,
 .details_table span
 {
 	height: 23px;
