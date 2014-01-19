@@ -110,6 +110,7 @@
 	padding: 2px 0px;
 }
 
+
 .details_table td > div
 {
 	height: 23px;
@@ -155,54 +156,6 @@
 	white-space: nowrap;
 }
 
-/*
-.trlist_detail_item
-{
-	height: 39px;
-}
-
-
-.trlist_detail_item > div
-{
-	height: 23px;
-}
-
-
-.trlist_detail_item > div > div
-{
-	float: left;
-	clear: none;
-
-	white-space: nowrap;
-}
-
-
-.trlist_detail_item .tritem_acc_name
-{
-	width: 30%;
-}
-
-
-.trlist_detail_item .tritem_sum
-{
-	color: #0080B0;
-	width: 25%;
-}
-
-
-.trlist_detail_item .tritem_date_comm
-{
-	width: 20%;
-}
-
-
-.tritem_balance
-{
-	width: 25%;
-	text-align: right;
-}
-
-*/
 
 .tritem_balance > span
 {
