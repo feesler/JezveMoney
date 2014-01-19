@@ -912,7 +912,7 @@ class Transaction
 
 			if ($details)
 			{
-				html_op("<tr id=\"tr_".$trans_id."\">");
+				html_op("<tbody><tr id=\"tr_".$trans_id."\">");
 			}
 			else
 			{
@@ -1008,7 +1008,7 @@ class Transaction
 			if ($details)
 			{
 				html_cl("</div></td>");
-				html_cl("</tr>");
+				html_cl("</tr></tbody>");
 			}
 			else
 			{
