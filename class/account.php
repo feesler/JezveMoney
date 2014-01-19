@@ -627,7 +627,7 @@ class Account
 		if (!$this->checkCache())
 			return $resStr;
 
-		html_op("<div class=\"trans_list\">");
+		html_op("<div>");
 
 		$accounts = count(self::$cache);
 		if (!$accounts)

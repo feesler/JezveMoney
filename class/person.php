@@ -366,7 +366,7 @@ class Person
 	{
 		global $db;
 
-		html_op("<div class=\"trans_list\">");
+		html_op("<div>");
 
 		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
 		$persons = count($resArr);
