@@ -77,6 +77,7 @@
 		html("var transType = ".json_encode($type_str).";");
 		html("var curAccId = ".json_encode($acc_id).";");
 		html("var searchRequest = ".json_encode($searchReq).";");
+		html("var detailsMode = ".(($showDetails) ? "true" : "false").";");
 		html();
 		html("onReady(initTransListDrag);");
 	popTab();

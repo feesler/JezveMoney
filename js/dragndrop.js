@@ -135,11 +135,13 @@ var dragMaster = (function()
 
 
 // Drag object class
-function DragObject(element)
+function DragObject(element, isTable)
 {
 	element.dragObject = this;
 
 	dragMaster.makeDraggable(element);
+
+	isTable = isTable || false;
 
 	var rememberPosition;
 	var mouseOffset;
@@ -153,6 +155,14 @@ function DragObject(element)
 		rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
 		s.position = 'absolute';
 		s.width = (origWidth - 16) + 'px';
+
+		if (isTable)
+		{
+			if (element.parentNode && element.parentNode.tagName == 'TBODY')
+			{
+				element.parentNode.appendChild(ce('tr', { className : 'drag_spacer' }, [ ce('td', { colSpan : 5 }) ]));
+			}
+		}
 
 		mouseOffset = offset;
 	}
@@ -190,6 +200,24 @@ function DragObject(element)
 	this.onDragSuccess = function(dropTarget)
 	{
 		var tr_id =  (element && element.id.length > 3) ? parseInt(element.id.substr(3)) : 0;
+
+		if (isTable)
+		{
+			if (element.parentNode && element.parentNode.tagName == 'TBODY')
+			{
+				var tr = element.parentNode.firstElementChild;
+				while(tr)
+				{
+					if (tr.className.indexOf('drag_spacer') != -1)
+					{
+						re(tr);
+						break;
+					}
+
+					tr = tr.nextElementSibling;
+				}
+			}
+		}
 
 		onTransPosChanged(tr_id, ins_id);
 	}

@@ -185,20 +185,43 @@ function initTransListDrag()
 		return;
 
 	listItem_wr = trlist.firstElementChild;
+	listItem = null;
 	while(listItem_wr)
 	{
-		if (listItem_wr.className.indexOf('trlist_item_wrap') != -1)
+		if (detailsMode)
 		{
-			listItem = listItem_wr.firstElementChild;
-			trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
-			if (trans_id)
-			{
-				listItem.onclick = bind(onTransClick, null, trans_id);
-				listItem.firstElementChild.style.cursor = 'pointer';
-			}
+			if (listItem_wr.className.indexOf('details_table') != -1)
+				listItem_wr = listItem_wr.firstElementChild;
 
-			new DropTarget(listItem_wr);
-			new DragObject(listItem);
+			if (listItem_wr.tagName && listItem_wr.tagName == 'TBODY')
+			{
+				listItem = listItem_wr.firstElementChild;		// get tr element
+				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
+				if (trans_id)
+				{
+					listItem.onclick = bind(onTransClick, null, trans_id);
+					listItem.firstElementChild.style.cursor = 'pointer';
+				}
+
+				new DropTarget(listItem_wr);
+				new DragObject(listItem, true);
+			}
+		}
+		else
+		{
+			if (!detailsMode && listItem_wr.className.indexOf('trlist_item_wrap') != -1)
+			{
+				listItem = listItem_wr.firstElementChild;
+				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
+				if (trans_id)
+				{
+					listItem.onclick = bind(onTransClick, null, trans_id);
+					listItem.firstElementChild.style.cursor = 'pointer';
+				}
+
+				new DropTarget(listItem_wr);
+				new DragObject(listItem);
+			}
 		}
 
 		listItem_wr = listItem_wr.nextElementSibling;

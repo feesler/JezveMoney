@@ -116,6 +116,12 @@
 }
 
 
+.details_table > tbody
+{
+	height: 43px;
+}
+
+
 .details_table td
 {
 	padding: 2px 0px;
@@ -163,6 +169,13 @@
 .tritem_balance > span
 {
 	margin: 0px 10px 0px 0px;
+}
+
+
+/* Table drag&drop spacer row */
+.drag_spacer > td
+{
+	height: 43px;
 }
 
 
