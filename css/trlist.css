@@ -98,6 +98,64 @@
 
 
 /* Details mode */
+.details_table
+{
+	border-collapse: collapse;
+	width: 100%;
+}
+
+
+.details_table td
+{
+	padding: 2px 0px;
+}
+
+.details_table td > div
+{
+	height: 23px;
+	padding: 8px;
+	background-color: #F0F0F0;
+}
+
+
+.details_table .tritem_acc_name
+{
+	white-space: nowrap;
+}
+
+
+.details_table .tritem_sum
+{
+	font-size: 14px;
+	color: #0080B0;
+	white-space: nowrap;
+}
+
+
+.details_table .tritem_date_comm
+{
+	min-width: 10px;
+}
+
+
+.details_table .tritem_comm
+{
+	font-size: 12px;
+	color: #808080;
+	margin: 0;
+	padding: 0;
+	border: 0px none;
+}
+
+
+.details_table .tritem_balance
+{
+	font-size: 14px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+/*
 .trlist_detail_item
 {
 	height: 39px;
@@ -144,6 +202,7 @@
 	text-align: right;
 }
 
+*/
 
 .tritem_balance > span
 {

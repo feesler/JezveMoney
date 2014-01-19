@@ -890,6 +890,9 @@ class Transaction
 			html_cl("</div>");
 		}
 
+		if ($details)
+			html_op("<table class=\"details_table\">");
+
 		foreach($transArr as $trans)
 		{
 			$trans_id = $trans[0];
@@ -907,13 +910,20 @@ class Transaction
 				$dest_owner_id = $acc->getOwner($dest_id);
 			}
 
-			$itemClass = "trlist_item_wrap";
 			if ($details)
-				$itemClass .= " trlist_detail_item";
-			html_op("<div class=\"".$itemClass."\">");
-			html_op("<div id=\"tr_".$trans_id."\" class=\"trlist_item\">");
+			{
+				html_op("<tr>");
+			}
+			else
+			{
+				html_op("<div class=\"trlist_item_wrap\">");
+				html_op("<div id=\"tr_".$trans_id."\" class=\"trlist_item\">");
+			}
 
-			$resStr = "<div class=\"tritem_acc_name\"><span>";
+			$resStr = "";
+			if ($details)
+				$resStr .= "<td>";
+			$resStr .= "<div class=\"tritem_acc_name\"><span>";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
 				$resStr .= $acc->getName($src_id);
 			else if ($cur_trans_type == 4)
@@ -928,13 +938,20 @@ class Transaction
 				$resStr .= $acc->getNameOrPerson($dest_id);
 
 			$resStr .= "</span></div>";
+			if ($details)
+				$resStr .= "</td>";
 			html($resStr);
 
-			$resStr = "<div class=\"tritem_sum\"><span>";
+			$resStr = "";
+			if ($details)
+				$resStr .= "<td>";
+			$resStr .= "<div class=\"tritem_sum\"><span>";
 			$resStr .= $famount;
 			if ($famount != $fcharge)
 				$resStr .= " (".$fcharge.")";
 			$resStr .= "</span></div>";
+			if ($details)
+				$resStr .= "</td>";
 			html($resStr);
 
 			if ($details)
@@ -942,7 +959,7 @@ class Transaction
 				$balArr = $this->getBalance($trans_id);
 				if (is_array($balArr))
 				{
-					html_op("<div class=\"tritem_balance\">");
+					html_op("<td><div class=\"tritem_balance\">");
 
 					if ($cur_trans_type == 1 || $cur_trans_type == 2)
 					{
@@ -962,19 +979,42 @@ class Transaction
 						$acc_curr = $acc->getCurrency($dest_id);
 						html("<span>".Currency::format($balance, $acc_curr)."</span>");
 					}
-					html_cl("</div>");
+					html_cl("</div></td>");
 				}
 			}
 
+
+			if ($details)
+				html_op("<td>");
 			html_op("<div class=\"tritem_date_comm\">");
 				html("<span>".$fdate."</span>");
+
+			if ($details)
+			{
+					html_cl("</div>");
+				html_cl("</td>");
+				html_op("<td><div class=\"ellipsis_cell\">");
+
+				$titleStr = ($comment != "") ? " title=\"".$comment."\"" : "";
+					html_op("<div".$titleStr.">");
+			}
 				if ($comment != "")
 					html("<span class=\"tritem_comm\">".$comment."</span>");
 			html_cl("</div>");
-
-			html_cl("</div>");
-			html_cl("</div>");
+			if ($details)
+			{
+				html_cl("</div></td>");
+				html_cl("</tr>");
+			}
+			else
+			{
+				html_cl("</div>");
+				html_cl("</div>");
+			}
 		}
+
+		if ($details)
+			html_cl("</table>");
 
 		if ($tr_on_page > 0 && $showPaginator == TRUE)
 		{
