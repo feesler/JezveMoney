@@ -1,4 +1,11 @@
-﻿.trlist_item_wrap
+﻿/* Transactions page content */
+.trans_list
+{
+	clear: both;
+}
+
+
+.trlist_item_wrap
 {
 	width: 100%;
 	float: left;
