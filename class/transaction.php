@@ -920,26 +920,30 @@ class Transaction
 				html_op("<div id=\"tr_".$trans_id."\" class=\"trlist_item\">");
 			}
 
-			$resStr = "";
-			if ($details)
-				$resStr .= "<td>";
-			$resStr .= "<div class=\"tritem_acc_name\"><span>";
+			// Make accounts string
+			$accStr = "";
 			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-				$resStr .= $acc->getName($src_id);
+				$accStr .= $acc->getName($src_id);
 			else if ($cur_trans_type == 4)
-				$resStr .= $acc->getNameOrPerson($src_id);
+				$accStr .= $acc->getNameOrPerson($src_id);
 
 			if ($cur_trans_type == 3 || $cur_trans_type == 4)
-				$resStr .= " → ";
+				$accStr .= " → ";
 
 			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
-				$resStr .= $acc->getName($dest_id);
+				$accStr .= $acc->getName($dest_id);
 			else if ($cur_trans_type == 4)
-				$resStr .= $acc->getNameOrPerson($dest_id);
+				$accStr .= $acc->getNameOrPerson($dest_id);
 
+			$resStr = "";
+			$titleStr = ($details) ? " title=\"".$accStr."\"" : "";
+			if ($details)
+				$resStr .= "<td><div class=\"ellipsis_cell\">";
+			$resStr .= "<div class=\"tritem_acc_name\"".$titleStr."><span>";
+			$resStr .= $accStr;
 			$resStr .= "</span></div>";
 			if ($details)
-				$resStr .= "</td>";
+				$resStr .= "</div></td>";
 			html($resStr);
 
 			$resStr = "";
