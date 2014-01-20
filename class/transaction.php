@@ -504,7 +504,7 @@ class Transaction
 
 
 	// Return array of transactions
-	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
 	{
 		global $db;
 
@@ -609,7 +609,15 @@ class Transaction
 			else
 				$fcharge = $famount;
 
-			$res[] = array($trans_id, $src_id, $dest_id, $famount, $fcharge, $cur_trans_type, $fdate, $comment, $trans_pos);
+			$trArr = array($trans_id, $src_id, $dest_id, $famount, $fcharge, $cur_trans_type, $fdate, $comment, $trans_pos);
+			if ($details)
+			{
+				$balArr = $this->getBalance($trans_id);
+
+				$trArr[] = (($src_id != 0 && isset($balArr[$src_id])) ? $balArr[$src_id] : 0.0);
+				$trArr[] = (($dest_id != 0 && isset($balArr[$dest_id])) ? $balArr[$dest_id] : 0.0);
+			}
+			$res[] = $trArr;
 		}
 
 		return $res;
