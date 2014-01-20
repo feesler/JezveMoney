@@ -912,6 +912,12 @@ class Transaction
 			$fdate = $trans[6];
 			$comment = $trans[7];
 
+			if ($details)
+			{
+				$src_balance = $trans[9];
+				$dest_balance = $trans[10];
+			}
+
 			if ($cur_trans_type == 4)
 			{
 				$src_owner_id = $acc->getOwner($src_id);
@@ -968,31 +974,25 @@ class Transaction
 
 			if ($details)
 			{
-				$balArr = $this->getBalance($trans_id);
-				if (is_array($balArr))
+				html_op("<td><div class=\"tritem_balance\">");
+
+				if ($cur_trans_type == 1 || $cur_trans_type == 2)
 				{
-					html_op("<td><div class=\"tritem_balance\">");
+					$tr_acc_id = ($cur_trans_type == 1) ? $src_id : $dest_id;
 
-					if ($cur_trans_type == 1 || $cur_trans_type == 2)
-					{
-						$tr_acc_id = ($cur_trans_type == 1) ? $src_id : $dest_id;
-
-						$balance = $balArr[$tr_acc_id];
-						$acc_curr = $acc->getCurrency($tr_acc_id);
-						html("<span>".Currency::format($balance, $acc_curr)."</span>");
-					}
-					else if ($cur_trans_type == 3 || $cur_trans_type == 4)
-					{
-						$balance = $balArr[$src_id];
-						$acc_curr = $acc->getCurrency($src_id);
-						html("<span>".Currency::format($balance, $acc_curr)."</span>");
-
-						$balance = $balArr[$dest_id];
-						$acc_curr = $acc->getCurrency($dest_id);
-						html("<span>".Currency::format($balance, $acc_curr)."</span>");
-					}
-					html_cl("</div></td>");
+					$balance = ($cur_trans_type == 1) ? $src_balance : $dest_balance;
+					$acc_curr = $acc->getCurrency($tr_acc_id);
+					html("<span>".Currency::format($balance, $acc_curr)."</span>");
 				}
+				else if ($cur_trans_type == 3 || $cur_trans_type == 4)
+				{
+					$acc_curr = $acc->getCurrency($src_id);
+					html("<span>".Currency::format($src_balance, $acc_curr)."</span>");
+
+					$acc_curr = $acc->getCurrency($dest_id);
+					html("<span>".Currency::format($dest_balance, $acc_curr)."</span>");
+				}
+				html_cl("</div></td>");
 			}
 
 
