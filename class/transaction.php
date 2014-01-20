@@ -504,7 +504,7 @@ class Transaction
 
 
 	// Return array of transactions
-	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
 	{
 		global $db;
 
@@ -857,7 +857,7 @@ class Transaction
 			return;
 		}
 
-		$transArr = $this->getArray($trans_type, $account_id, $isDesc, $tr_on_page, $page_num, $showPaginator, $searchStr, $startDate, $endDate, $details);
+		$transArr = $this->getArray($trans_type, $account_id, $isDesc, $tr_on_page, $page_num, $searchStr, $startDate, $endDate, $details);
 		if (!count($transArr))
 		{
 			html("<span>No transactions found.</span>");

@@ -117,7 +117,7 @@
 	html_op("<script>");
 		echo(Currency::getArray(TRUE));
 		html("var accCurr = ".(($byCurrency) ? $curr_id : $acc->getCurrency($acc_id)).";");
-		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate)).";");
+		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate)).";");
 		html("var transType = ".json_encode($type_str).";");
 		html("var groupType = ".json_encode($groupType).";");
 		html("var curAccId = ".json_encode($acc_id).";");
