@@ -153,7 +153,7 @@ function onTransClick(tr_id)
 	{
 		transactions.deselect(tr_id);
 
-		transObj.className = 'trlist_item';
+		transObj.className = (detailsMode) ? '' : 'trlist_item';
 	}
 	else
 	{
