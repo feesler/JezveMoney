@@ -3,6 +3,83 @@ var calendarObj = null;
 var startDate = null, endDate = null;
 
 
+
+//
+function formatValue(val)
+{
+	return val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
+}
+
+
+// Return sign of specified currency
+function getCurrencySign(curr_id)
+{
+	var currSign = '';
+
+	currency.some(function(curr)
+	{
+		if (curr[0] == curr_id)
+			currSign = curr[2];
+
+		return (curr[0] == curr_id);
+	});
+
+	return currSign;
+}
+
+
+// Return sign format of specified currency(before or after value)
+function getCurrencyFormat(curr_id)
+{
+	var currFmt = false;
+
+	currency.some(function(curr)
+	{
+		if (curr[0] == curr_id)
+			currFmt = curr[3];
+
+		return (curr[0] == curr_id);
+	});
+
+	return currFmt;
+}
+
+
+// Format value with rules of specified currency
+function formatCurrency(val, curr_id)
+{
+	var isBefore = getCurrencyFormat(curr_id);
+	var sign = getCurrencySign(curr_id);
+
+	if (isBefore)
+		return sign + ' ' + formatValue(val);
+	else
+		return formatValue(val) + ' ' + sign;
+}
+
+
+// Return currency id of specified account
+function getCurrencyOfAccount(account_id)
+{
+	var curr_id = 0;
+
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return curr_id;
+
+	accounts.some(function(acc)
+	{
+		if (acc[0] == account_id)
+			curr_id = acc[1];
+
+		return (acc[0] == account_id);
+	});
+
+	return curr_id;
+}
+
+
+
 var transactions =
 {
 	selectedArr : [],
@@ -65,6 +142,101 @@ var transactions =
 	},
 
 
+	updateBalance : function(trans, src_bal, dest_bal)
+	{
+		var tr_id, tr_type, charge;
+		var trRow, trBalanceItem;
+
+		if (!trans)
+			return;
+
+		tr_id = trans[0];
+		tr_type = trans[5];
+		amount = trans[12];
+		charge = trans[13];
+
+		if (tr_type == 1)		// expense
+		{
+			if (src_bal === null)
+				src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
+			trans[9] = src_bal - charge;
+			trans[10] = 0;
+		}
+		else if (tr_type == 2)	// income
+		{
+			if (dest_bal === null)
+				dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.charge
+			trans[9] = 0;
+			trans[10] = dest_bal + charge;
+		}
+		else if (tr_type == 3)
+		{
+			if (src_bal === null)
+				src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
+			trans[9] = src_bal - charge;
+
+			if (dest_bal === null)
+				dest_bal = trans[10] - trans[12];		// trans.dest_bal - trans.amount
+			trans[10] = dest_bal + amount;
+		}
+		else if (tr_type == 4)
+		{
+			if (trans[11] == 1)		// person give to us
+			{
+				if (src_bal === null)
+					src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
+				trans[9] = src_bal - charge;
+				if (dest_bal === null)
+					dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.amount
+				trans[10] = dest_bal + amount;
+			}
+			else if (trans[11] == 2)	// person take from us
+			{
+				if (src_bal === null)
+					src_bal = trans[9] + trans[12];		// trans.src_bal + trans.amount
+				trans[9] = src_bal - amount;
+				if (dest_bal === null)
+					dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.charge
+				trans[10] = dest_bal + charge;
+			}
+		}
+
+		trRow = ge('tr_' + tr_id);
+		if (!trRow)	// tr
+			return;
+		trBalanceItem = trRow.firstElementChild;		// td
+		if (!trBalanceItem)
+			return;
+		trBalanceItem = trBalanceItem.nextElementSibling;
+		if (!trBalanceItem)
+			return;
+		trBalanceItem = trBalanceItem.nextElementSibling;
+		if (!trBalanceItem)
+			return;
+		trBalanceItem = trBalanceItem.firstElementChild;		// div tritem_balance
+		if (!trBalanceItem)
+			return;
+
+		removeChilds(trBalanceItem);
+
+		var balSpan;
+
+		if (tr_type == 1 || tr_type == 3 || tr_type == 4)
+		{
+			balSpan = ce('span');
+			balSpan.innerHTML = formatCurrency(trans[9], getCurrencyOfAccount(src_id));
+			trBalanceItem.appendChild(balSpan);
+		}
+
+		if (tr_type == 2 || tr_type == 3 || tr_type == 4)
+		{
+			balSpan = ce('span');
+			balSpan.innerHTML = formatCurrency(trans[10], getCurrencyOfAccount(dest_id));
+			trBalanceItem.appendChild(balSpan);
+		}
+	},
+
+
 	setPos : function(tr_id, pos)
 	{
 		var tr_info, oldPos;
@@ -80,8 +252,24 @@ var transactions =
 		}
 		else
 		{
+			var initBalArr = [];
+
+			transArr.sort(function(tr1, tr2)
+			{
+				if (tr1[8] < tr2[8])
+					return -1;
+				else if (tr1[8] > tr2[8])
+					return 1;
+
+				return 0;
+			});
+
 			transArr.forEach(function(trans)
 			{
+				src_id = trans[1];
+				dest_id = trans[2];
+				tr_type = trans[5];
+
 				if (trans[0] == tr_id)
 				{
 					trans[8] = pos;
@@ -104,7 +292,68 @@ var transactions =
 							trans[8] -= 1;
 					}
 				}
+
+				if (src_id && initBalArr[src_id] === undefined)
+				{
+					if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[11] == 1))	// expense, transfer or debt
+						initBalArr[src_id] = trans[9] + trans[13];		// src_bal + charge
+					else if (tr_type == 4 && trans[11] == 2)
+						initBalArr[src_id] = trans[9] - trans[12];		// src_bal + amount
+					dout('initBalArr[' + src_id + '] = ' + initBalArr[src_id]);
+				}
+
+				if (dest_id && initBalArr[dest_id] === undefined)
+				{
+					if (tr_type == 2 || tr_type == 3 || (tr_type == 4 && trans[11] == 1))				// income, transfer or debt
+						initBalArr[dest_id] = trans[10] - trans[13];		// dest_bal - charge
+					else if (tr_type == 4 && trans[11] == 2)
+						initBalArr[dest_id] = trans[10] - trans[12];	// dest_bal - amount
+				}
 			});
+
+			transArr.sort(function(tr1, tr2)
+			{
+				if (tr1[8] < tr2[8])
+					return -1;
+				else if (tr1[8] > tr2[8])
+					return 1;
+
+				return 0;
+			});
+
+			var tBalanceArr = [];
+
+			transArr.forEach(function(trans)
+			{
+				src_id = trans[1];
+				dest_id = trans[2];
+
+				src_bal = (src_id != 0 && tBalanceArr[src_id] !== undefined) ? tBalanceArr[src_id] : initBalArr[src_id] /*null*/;
+				dest_bal = (dest_id != 0 && tBalanceArr[dest_id] !== undefined) ? tBalanceArr[dest_id] : initBalArr[dest_id] /*null*/;
+
+				if (oldPos == 0)			// insert with specified position
+				{
+					if (trans[8] >= pos)
+					{
+						this.updateBalance(trans, src_bal, dest_bal);
+					}
+				}
+				else if (pos < oldPos)		// moving up
+				{
+					if (trans[8] >= pos && trans[8] <= oldPos)
+					{
+						this.updateBalance(trans, src_bal, dest_bal);
+					}
+				}
+				else if (pos > oldPos)		// moving down
+				{
+					if (trans[8] >= oldPos && trans[8] <= pos)
+						this.updateBalance(trans, src_bal, dest_bal);
+				}
+
+				tBalanceArr[src_id] = trans[9];
+				tBalanceArr[dest_id] = trans[10];
+			}, this);
 		}
 
 		return true;
