@@ -71,7 +71,9 @@
 
 	html("<script>");
 	pushTab();
-		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate)).";");
+		echo($acc->getArray());
+		echo(Currency::getArray(TRUE));
+		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate, TRUE)).";");
 		$acc = new Account($user_id);	// fix cache of accounts
 
 		html("var transType = ".json_encode($type_str).";");
