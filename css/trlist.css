@@ -213,12 +213,7 @@ div.act_tr
 .mode_selector
 {
 	float: left;
-}
-
-
-.mode_selector > span
-{
-	margin: 0px 10px 0px 0px;
+	padding: 5px 0px;
 }
 
 
@@ -262,5 +257,7 @@ div.act_tr
 .paginator > span
 {
 	margin-left: 5px;
+	height: 22px;
+	line-height: 22px;
 }
 
