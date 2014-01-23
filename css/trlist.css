@@ -222,6 +222,36 @@ div.act_tr
 }
 
 
+.mode_selector span
+{
+	height: 22px;
+	line-height: 22px;
+	float: left;
+	padding: 0px 10px 0px 5px;
+}
+
+
+.mode_selector div
+{
+	width: 22px;
+	height: 22px;
+	background-image: url('../img/icons.png');
+	float: left;
+}
+
+
+.mode_selector .list_mode > div
+{
+	background-position: -261px -5px;
+}
+
+
+.mode_selector .details_mode > div
+{
+	background-position: -261px -37px;
+}
+
+
 .paginator
 {
 	padding: 5px 0px;
