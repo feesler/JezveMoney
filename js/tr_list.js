@@ -551,6 +551,8 @@ function onAccountChange()
 		newLocation += '&acc_id=' + acc_id;
 	if (searchRequest)
 		newLocation += '&search=' + encodeURI(searchRequest);
+	if (detailsMode)
+		newLocation += '&mode=details';
 
 	window.location = newLocation;
 }
@@ -565,6 +567,8 @@ function onSearchSubmit(frm)
 	frm.action = './transactions.php?type=' + transType;
 	if (curAccId != 0)
 		newLocation += '&acc_id=' + curAccId;
+	if (detailsMode)
+		newLocation += '&mode=details';
 
 	frm.action = './transactions.php';
 
@@ -664,6 +668,8 @@ function onSelectStartDate(date, month, year)
 			newLocation += '&acc_id=' + curAccId;
 		if (searchRequest)
 			newLocation += '&search=' + encodeURI(searchRequest);
+		if (detailsMode)
+			newLocation += '&mode=details';
 		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
 
 		window.location = newLocation;
@@ -692,6 +698,8 @@ function onSelectEndDate(date, month, year)
 			newLocation += '&acc_id=' + curAccId;
 		if (searchRequest)
 			newLocation += '&search=' + encodeURI(searchRequest);
+		if (detailsMode)
+			newLocation += '&mode=details';
 		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
 
 		window.location = newLocation;

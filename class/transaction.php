@@ -666,7 +666,7 @@ class Transaction
 
 
 	// Return link to specified page
-	private function getPageLink($trans_type, $acc_id, $page_num, $is_active)
+	private function getPageLink($trans_type, $acc_id, $page_num, $is_active, $details)
 	{
 		$resStr = "<span>";
 
@@ -681,6 +681,8 @@ class Transaction
 			if ($acc_id != 0)
 				$resStr .= "&acc_id=".$acc_id;
 			$resStr .= "&page=".$page_num;
+			if ($details == TRUE)
+				$resStr .= "&mode=details";
 			$resStr .= "\">";
 		}
 		$resStr .= $page_num;
@@ -692,7 +694,7 @@ class Transaction
 
 
 	// Return paginator for transaction table
-	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count)
+	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count, $details)
 	{
 		$resStr = "";
 
@@ -705,25 +707,25 @@ class Transaction
 			{
 				for($i = 0; $i < $breakLimit; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
 				}
-				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE);
+				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $details);
 			}
 			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
 			{
-				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE)."<span>...</span>";
+				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE, $details)."<span>...</span>";
 				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
 				}
-				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE);
+				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $details);
 			}
 			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE)."<span>...</span>";
+				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE, $details)."<span>...</span>";
 				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
 				}
 			}
 		}
@@ -897,7 +899,7 @@ class Transaction
 			html_op("<div class=\"paginator\">");
 
 			if ($transCount > $tr_on_page)
-				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
+				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $details));
 
 			html_cl("</div>");
 		}
@@ -1036,7 +1038,7 @@ class Transaction
 		{
 			html_op("<div class=\"paginator\">");
 			if ($transCount > $tr_on_page)
-				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount));
+				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $details));
 			html_cl("</div>");
 		}
 
