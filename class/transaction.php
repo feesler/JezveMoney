@@ -679,10 +679,10 @@ class Transaction
 			$resStr .= "<a href=\"./transactions.php?";
 			$resStr .= "type=".$this->getTypeString($trans_type);
 			if ($acc_id != 0)
-				$resStr .= "&acc_id=".$acc_id;
-			$resStr .= "&page=".$page_num;
+				$resStr .= "&amp;acc_id=".$acc_id;
+			$resStr .= "&amp;page=".$page_num;
 			if ($details == TRUE)
-				$resStr .= "&mode=details";
+				$resStr .= "&amp;mode=details";
 			$resStr .= "\">";
 		}
 		$resStr .= $page_num;
