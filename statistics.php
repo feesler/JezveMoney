@@ -109,6 +109,7 @@
 	html(getCSS("calendar.css"));
 	html(getCSS("statistics.css"));
 	html(getJS("common.js"));
+	html(getJS("currency.js"));
 	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("raphael.js"));

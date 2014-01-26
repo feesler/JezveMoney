@@ -119,6 +119,7 @@
 	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
+	html(getJS("currency.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
 

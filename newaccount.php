@@ -32,6 +32,7 @@
 	html(getCSS("tiles.css"));
 	html(getJS("common.js"));
 	html(getJS("ready.js"));
+	html(getJS("currency.js"));
 	html(getJS("main.js"));
 	html("<script>");
 	echo(Currency::getArray(TRUE));
