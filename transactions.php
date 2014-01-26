@@ -63,6 +63,7 @@
 	html(getCSS("popup.css"));
 	html(getJS("common.js"));
 	html(getJS("currency.js"));
+	html(getJS("account.js"));
 	html(getJS("ajax.js"));
 	html(getJS("ready.js"));
 	html(getJS("calendar.js"));

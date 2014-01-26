@@ -120,6 +120,7 @@
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
 	html(getJS("currency.js"));
+	html(getJS("account.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
 

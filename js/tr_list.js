@@ -3,28 +3,6 @@ var calendarObj = null;
 var startDate = null, endDate = null;
 
 
-// Return currency id of specified account
-function getCurrencyOfAccount(account_id)
-{
-	var curr_id = 0;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return curr_id;
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			curr_id = acc[1];
-
-		return (acc[0] == account_id);
-	});
-
-	return curr_id;
-}
-
-
-
 var transactions =
 {
 	selectedArr : [],

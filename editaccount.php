@@ -45,6 +45,7 @@
 	html(getJS("ready.js"));
 	html(getJS("popup.js"));
 	html(getJS("currency.js"));
+	html(getJS("account.js"));
 	html(getJS("main.js"));
 	html("<script>");
 	echo(Currency::getArray(TRUE));

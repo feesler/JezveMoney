@@ -238,41 +238,6 @@ function onChangeAccountCurrency(obj)
 }
 
 
-// Update tile information
-function setTileInfo(tile_id, title, subTitle, iconType)
-{
-	var tileObj, titleObj, subTitleObj, tileClass;
-
-	tileObj = ge(tile_id);
-	if (!tileObj)
-		return;
-
-	subTitleObj = tileObj.firstElementChild.firstElementChild.firstElementChild;
-	if (subTitleObj)
-		subTitleObj.innerHTML = subTitle;
-
-	titleObj = subTitleObj.nextElementSibling;
-	if (titleObj)
-		titleObj.innerHTML = title;
-
-	iconType = iconType | 0;
-	tileClass = "tile";
-	if (iconType == 1)
-		tileClass += " purse_icon";
-	else if (iconType == 2)
-		tileClass += " safe_icon";
-	else if (iconType == 3)
-		tileClass += " card_icon";
-	else if (iconType == 4)
-		tileClass += " percent_icon";
-	else if (iconType == 5)
-		tileClass += " bank_icon";
-	else if (iconType == 6)
-		tileClass += " cash_icon";
-	tileObj.className = tileClass;
-}
-
-
 // Account name input event handler
 function onAccNameInput(obj)
 {
