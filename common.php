@@ -398,7 +398,10 @@
 					$chargeArr[] = $curSum;
 				else
 					$chargeArr[count($chargeArr) - 1] += $curSum;
-				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+				if (!count($groupArr))
+					$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+				else if ($group_type == 0)
+					$groupArr[count($groupArr) - 1][1]++;
 			}
 		}
 
