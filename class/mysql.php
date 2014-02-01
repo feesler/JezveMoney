@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 // Return quotted string or NULL
 function qnull($str)
@@ -11,6 +11,9 @@ function qnull($str)
 function qjoin($glue, $pieces)
 {
 	$res = "";
+
+	if (!is_array($pieces))
+		return $res;
 
 	for($i = 0; $i < count($pieces); $i++)
 	{
