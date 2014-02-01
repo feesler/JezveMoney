@@ -58,7 +58,7 @@ class mysqlDB
 
 
 	// Constructor
-	function mysqlDB()
+	public function __construct()
 	{
 		$this->conn = NULL;
 		$this->dbname = NULL;
@@ -68,7 +68,7 @@ class mysqlDB
 
 
 	// Connect to database server
-	function connect($dblocation, $dbuser, $dbpasswd)
+	public function connect($dblocation, $dbuser, $dbpasswd)
 	{
 		$dbcnx = mysql_connect($dblocation, $dbuser, $dbpasswd);
 		if ($dbcnx)
@@ -79,7 +79,7 @@ class mysqlDB
 
 
 	// Select database
-	function selectDB($name)
+	public function selectDB($name)
 	{
 		$res = mysql_select_db($name, $this->conn);
 		if ($res)
@@ -90,14 +90,14 @@ class mysqlDB
 
 
 	// Return escaped string
-	function escape($str)
+	public function escape($str)
 	{
 		return mysql_real_escape_string($str);
 	}
 
 
 	// Raw query to database
-	function rawQ($query)
+	public function rawQ($query)
 	{
 		wlog("Query: ".$query);
 
@@ -111,7 +111,7 @@ class mysqlDB
 
 
 	// Select query
-	function selectQ($fields, $tables, $condition = NULL, $group = NULL, $order = NULL)
+	public function selectQ($fields, $tables, $condition = NULL, $group = NULL, $order = NULL)
 	{
 		$resArr = array();
 
@@ -140,7 +140,7 @@ class mysqlDB
 
 
 	// Insert query
-	function insertQ($table, $fields, $values)
+	public function insertQ($table, $fields, $values)
 	{
 		if (!$table || $table == "" || !$fields || $fields == "" || !$values || $values == "")
 			return FALSE;
@@ -154,14 +154,14 @@ class mysqlDB
 
 
 	// Return last insert id
-	function insertId()
+	public function insertId()
 	{
 		return mysql_insert_id();
 	}
 
 
 	// Update query
-	function updateQ($table, $fields, $values, $condition = NULL)
+	public function updateQ($table, $fields, $values, $condition = NULL)
 	{
 		if (!$table || $table == "" || !$fields || $fields == "" || !$values || $values == "")
 			return FALSE;
@@ -193,7 +193,7 @@ class mysqlDB
 
 
 	// Truncate table query
-	function truncateQ($table)
+	public function truncateQ($table)
 	{
 		if (!$table || $table == "")
 			return FALSE;
@@ -205,7 +205,7 @@ class mysqlDB
 
 
 	// Delete query
-	function deleteQ($table, $condition = NULL)
+	public function deleteQ($table, $condition = NULL)
 	{
 		if (!$table || $table == "")
 			return FALSE;
@@ -221,7 +221,7 @@ class mysqlDB
 
 
 	// Return count of rows
-	function countQ($table, $condition = NULL)
+	public function countQ($table, $condition = NULL)
 	{
 		$res = 0;
 
@@ -245,7 +245,7 @@ class mysqlDB
 	
 	
 	// Create table if not exist query
-	function createTableQ($table, $defs, $options)
+	public function createTableQ($table, $defs, $options)
 	{
 		if (!$table || $table == "" || !$defs || $defs == "")
 			return FALSE;
@@ -259,7 +259,7 @@ class mysqlDB
 
 
 	// Drop table if exist query
-	function dropTableQ($table)
+	public function dropTableQ($table)
 	{
 		if (!$table || $table == "")
 			return FALSE;
