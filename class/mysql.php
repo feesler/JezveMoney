@@ -104,7 +104,7 @@ class mysqlDB
 		$res = mysql_query($query, $this->conn);
 
 		$errno = mysql_errno();
-		wlog("Result: ".($errno ? (mysql_errno()." - ".mysql_error()) : "ok"));
+		wlog("Result: ".($errno ? ($errno." - ".mysql_error()) : "ok"));
 
 		return ($res != FALSE) ? $res : NULL;
 	}
