@@ -380,8 +380,8 @@ function onBarClick(val)
 		if (popup.offsetWidth + popupX > chartsBRect.width)
 			popupX -= popup.offsetWidth + rectBBox.width + 20;
 
-		popup.style.left = popupX + 'px';
-		popup.style.top = popupY + 'px';
+		popup.style.left = px(popupX);
+		popup.style.top = px(popupY);
 
 		setEmptyClick(hideChartPopup, [this[0]]);
 	}

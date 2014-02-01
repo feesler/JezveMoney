@@ -1,4 +1,4 @@
-// Main drag and drop class
+﻿// Main drag and drop class
 var dragMaster = (function()
 {
 	var dragObject;
@@ -154,7 +154,7 @@ function DragObject(element, isTable)
 		var origWidth = element.offsetWidth;
 		rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
 		s.position = 'absolute';
-		s.width = (origWidth - 16) + 'px';
+		s.width = px(origWidth - 16);
 
 		if (isTable)
 		{
@@ -192,8 +192,8 @@ function DragObject(element, isTable)
 
 	this.onDragMove = function(x, y)
 	{
-		element.style.top =  y - mouseOffset.y + 'px';
-		element.style.left = x - mouseOffset.x + 'px';
+		element.style.top =  px(y - mouseOffset.y);
+		element.style.left = px(x - mouseOffset.x);
 	}
 
 
