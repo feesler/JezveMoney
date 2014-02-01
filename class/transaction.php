@@ -308,7 +308,10 @@ class Transaction
 		$orig_date = getdate(strtotime($this->getDate($trans_id)));
 		$target_date = getdate(strtotime($trans_date));
 
-		if (mktime(0, 0, 0, $orig_date["mon"], $orig_date["mday"], $orig_date["year"]) != mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]))
+		$orig_time = mktime(0, 0, 0, $orig_date["mon"], $orig_date["mday"], $orig_date["year"]);
+		$target_time = mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]);
+
+		if ($orig_time != $target_time)
 		{
 			$tr_pos = 0;
 		}
