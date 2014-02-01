@@ -236,7 +236,7 @@ function initBarChart(fitToWidth, heightSet)
 	else
 		barWidth = 38;
 
-	chartContentWidth = chartData[0].length * (barWidth + barMargin);
+	chartContentWidth = (chartData[0].length + 1) * (barWidth + barMargin);
 	chartWidth = Math.max(chart.offsetWidth, chartContentWidth);
 
 	r = Raphael('chart', chartWidth, paperHeight);
@@ -316,8 +316,7 @@ function initBarChart(fitToWidth, heightSet)
 		itemDate = val[0];
 		itemsCount = val[1];
 
-		if (((itemsInGroup % 3) == 0 || prevCount > 1) &&
-			!(chartData[1].length > 1 && itemNum == chartData[1].length - 1 && itemsCount == 1 && chartWidth > chart.parentNode.offsetWidth))
+		if ((itemsInGroup % 3) == 0 || prevCount > 1)
 		{
 			r.text(labelShift, paperHeight - (hLabelsHeight / 2), itemDate).attr({ 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' });
 			itemsInGroup = 0;
