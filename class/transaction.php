@@ -305,7 +305,7 @@ class Transaction
 			return FALSE;
 
 		// check date is changed
-		$orig_date = getdate($this->getDate($trans_id));
+		$orig_date = getdate(strtotime($this->getDate($trans_id)));
 		$target_date = getdate(strtotime($trans_date));
 
 		if (mktime(0, 0, 0, $orig_date["mon"], $orig_date["mday"], $orig_date["year"]) != mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]))
