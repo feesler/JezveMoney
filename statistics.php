@@ -119,6 +119,7 @@
 		echo(Currency::getArray(TRUE));
 		html("var accCurr = ".(($byCurrency) ? $curr_id : $acc->getCurrency($acc_id)).";");
 		html("var transArr = ".f_json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate)).";");
+		$acc = new Account($user_id);	// fix cache of accounts
 		html("var transType = ".json_encode($type_str).";");
 		html("var groupType = ".json_encode($groupType).";");
 		html("var curAccId = ".json_encode($acc_id).";");
