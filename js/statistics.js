@@ -308,6 +308,7 @@ function initBarChart(fitToWidth, heightSet)
 	});
 
 
+	// create horizontal labels
 	labelShift = 0;
 	prevCount = 0;
 	itemsInGroup = 0;

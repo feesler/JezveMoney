@@ -347,7 +347,7 @@ function onTransClick(tr_id)
 }
 
 
-// Initialization of drap and drop features
+// Initialization of drag and drop features
 function initTransListDrag()
 {
 	var trlist, listItem_wr, listItem, trans_id;

@@ -373,7 +373,7 @@
 			{
 				$sumDate = $curDate;
 			}
-			else	if ($sumDate != NULL && $sumDate != $curDate)
+			else if ($sumDate != NULL && $sumDate != $curDate)
 			{
 				$sumDate = $curDate;
 				$chargeArr[] = $curSum;
