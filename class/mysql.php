@@ -115,7 +115,12 @@ class mysqlDB
 	{
 		$resArr = array();
 
-		$query = "SELECT ".$fields." FROM ".$tables;
+		$fstr = asJoin($fields);
+		$tstr = asJoin($tables);
+		if (!$fstr || !$tstr)
+			return $resArr;
+
+		$query = "SELECT ".$fstr." FROM ".$tstr;
 		if ($condition)
 			$query .= " WHERE ".$condition;
 		if ($group)
