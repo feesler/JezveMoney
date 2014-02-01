@@ -733,7 +733,7 @@ class Transaction
 		{
 			for($i = 0; $i < $pages_count; $i++)
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num));
+				$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
 			}
 		}
 
