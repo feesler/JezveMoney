@@ -114,26 +114,45 @@
 }
 
 
-/* calendar button */
-.cal_btn
+/* square button with icon */
+.icon_btn
 {
 	width: 34px;
 	height: 34px;
 	padding: 2px;
-	margin: 8px 0px;
+	margin: 0px;
 	color: #FFFFFF;
 	background-color: #0072C6;
 	cursor: pointer;
 }
 
 
-.cal_btn > div
+.icon_btn > div
 {
 	width: 34px;
 	height: 34px;
 	background-image: url('../img/icons.png');
 	background-repeat: no-repeat;
+}
+
+
+/* calendar button */
+.cal_btn
+{
+	margin: 8px 0px;
+}
+
+
+.cal_btn > div
+{
 	background-position: -192px -32px;
+}
+
+
+/* search button */
+.search_btn > div
+{
+	background-position: -192px 0px;
 }
 
 
@@ -215,27 +234,5 @@
 {
 	height: 26px;
 	border-width: 2px 0px 2px 2px;
-}
-
-
-.search_btn
-{
-	width: 34px;
-	height: 34px;
-	padding: 2px;
-	margin: 0;
-	color: #FFFFFF;
-	background-color: #0072C6;
-	cursor: pointer;
-}
-
-
-.search_btn > div
-{
-	width: 34px;
-	height: 34px;
-	background-image: url('../img/icons.png');
-	background-repeat: no-repeat;
-	background-position: -192px 0px;
 }
 

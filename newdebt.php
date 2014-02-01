@@ -326,7 +326,7 @@
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
 				html_op("<div class=\"right_float\">");
-					html("<button id=\"cal_rbtn\" class=\"btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><div></div></button>");
+					html("<button id=\"cal_rbtn\" class=\"btn icon_btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><div></div></button>");
 				html_cl("</div>");
 				html_op("<div class=\"stretch_input rbtn_input\">");
 					html_op("<div>");
