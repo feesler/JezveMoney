@@ -533,3 +533,10 @@ function initMessage()
 {
 	setEmptyClick(onCloseMessage, ['action_msg']);
 }
+
+
+// Add 'px' to value
+function px(val)
+{
+	return val + 'px';
+}
