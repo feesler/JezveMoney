@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class Account
 {
@@ -44,6 +44,7 @@ class Account
 			self::$cache[$acc_id]["curr_id"] = intval($row["curr_id"]);
 			self::$cache[$acc_id]["balance"] = floatval($row["balance"]);
 			self::$cache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
+			self::$cache[$acc_id]["icon"] = intval($row["icon"]);
 		}
 	}
 
@@ -103,43 +104,47 @@ class Account
 
 
 	// Create new account for current user
-	public function create($owner_id, $accname, $balance, $curr_id)
+	public function create($owner_id, $accname, $balance, $curr_id, $icon_type)
 	{
 		global $db;
 
-		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
-			return FALSE;
+		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
+			return 0;
 
 		$owner_id = intval($owner_id);
 		$accname = $db->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
+		$icon_type = intval($icon_type);
 
 		if (!$accname || $accname == "" || !$curr_id)
-			return FALSE;
+			return 0;
 
-		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name"),
-								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname)))
-			return FALSE;
+		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon"),
+								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type)))
+			return 0;
+
+		$acc_id = $db->insertId();
 
 		self::updateCache();
 
-		return TRUE;
+		return $acc_id;
 	}
 
 
 	// Update account information
-	public function edit($acc_id, $accname, $balance, $curr_id)
+	public function edit($acc_id, $accname, $balance, $curr_id, $icon_type)
 	{
 		global $db;
 
-		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id))
+		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
 			return FALSE;
 
 		$acc_id = intval($acc_id);
 		$accname = $db->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
+		$icon_type = intval($icon_type);
 
 		// check account is exist
 		if (!$this->is_exist($acc_id))
@@ -158,8 +163,8 @@ class Account
 		$initbalance = $this->getInitBalance($acc_id);
 		$diff = $balance - $initbalance;
 
-		$fields = array("name", "curr_id");
-		$values = array($accname, $curr_id);
+		$fields = array("name", "curr_id", "icon");
+		$values = array($accname, $curr_id, $icon_type);
 
 		if (abs($diff) > 0.01)
 		{
@@ -210,6 +215,30 @@ class Account
 			return FALSE;
 
 		self::updateCache();
+
+		return TRUE;
+	}
+
+
+	// Remove accounts of specified person
+	public function onPersonDelete($p_id)
+	{
+		global $db;
+
+		if (!self::$full_list)
+			return FALSE;
+
+		if (!$this->checkCache())
+			return FALSE;
+
+		foreach(self::$cache as $acc_id => $row)
+		{
+			if ($row["owner_id"] == $p_id)
+			{
+				if (!$this->del($acc_id))
+					return FALSE;
+			}
+		}
 
 		return TRUE;
 	}
@@ -343,6 +372,23 @@ class Account
 	}
 
 
+	// Return icon type of account
+	public function getIcon($acc_id)
+	{
+		return $this->getCache($acc_id, "icon");
+	}
+
+
+	// Return name of account
+	public function setIcon($acc_id, $icon_type)
+	{
+		if (!$acc_id || !is_numeric($icon_type))
+			return FALSE;
+
+		return $this->setValue($acc_id, "icon", intval($icon_type));
+	}
+
+
 	// Return id of account by specified position
 	public function getIdByPos($position)
 	{
@@ -368,7 +414,7 @@ class Account
 			return "";
 
 		$acc_onwer = $this->getOwner($acc_id);
-		if (self::$owner_id == $acc_onwer)
+		if (self::$owner_id == $acc_onwer || !self::$full_list)
 		{
 			return $this->getName($acc_id);
 		}
@@ -412,87 +458,134 @@ class Account
 
 		foreach(self::$cache as $acc_id => $row)
 		{
-			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"]);
+			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"], $row["name"], $row["icon"]);
 		}
 
 		return "var accounts = ".json_encode($resArr).";\r\n";
 	}
 
 
-	// Return table of user accounts
-	public function getTable($transfer = FALSE, $editlink = FALSE)
+	// Return HTML for account tile
+	public function getTileEx($tile_type, $acc_id, $bal_corr, $tile_id = "")
+	{
+		if (!$this->is_exist($acc_id))
+			return "";
+
+		if ($tile_id == "")
+			$tile_id = "acc_".$acc_id;
+
+		$b_corr = floatVal($bal_corr);
+
+		$acc_name = $this->getName($acc_id);
+		$acc_curr = $this->getCurrency($acc_id);
+		$acc_balance = $this->getBalance($acc_id);
+		$acc_icon = $this->getIcon($acc_id);
+		$balance_fmt = Currency::format($acc_balance + $b_corr, $acc_curr);
+
+		$tile_act = NULL;
+		if ($tile_type == LINK_TILE)
+			$tile_act = "./newtransaction.php?acc_id=".$acc_id;
+		else if ($tile_type == BUTTON_TILE)
+			$tile_act = "onTileClick(".$acc_id.");";
+
+		$addClass = NULL;
+		if ($acc_icon != 0)
+		{
+			if ($acc_icon == 1)
+				$addClass = "purse_icon";
+			else if ($acc_icon == 2)
+				$addClass = "safe_icon";
+			else if ($acc_icon == 3)
+				$addClass = "card_icon";
+			else if ($acc_icon == 4)
+				$addClass = "percent_icon";
+			else if ($acc_icon == 5)
+				$addClass = "bank_icon";
+			else if ($acc_icon == 6)
+				$addClass = "cash_icon";
+		}
+
+		return getTile($tile_type, $tile_id, $acc_name, $balance_fmt, $tile_act, $addClass);
+	}
+
+
+	// Return HTML for account tile
+	public function getTile($tile_type, $acc_id, $tile_id = "")
+	{
+		return $this->getTileEx($tile_type, $acc_id, 0.0, $tile_id);
+	}
+
+
+	// Return HTML for accounts of user
+	public function getTiles($buttons = FALSE)
 	{
 		$resStr = "";
 
 		if (!$this->checkCache())
 			return $resStr;
 
-		$resStr .= "\t<table class=\"infotable\">\r\n";
-
 		$accounts = count(self::$cache);
-		if ((!$accounts && !$transfer) || ($accounts < 2 && $transfer))
+		if (!$accounts)
 		{
-			$resStr .= "\t\t<tr class=\"extra_row\"><td><span>";
-			if ($transfer)
-				$resStr .= "You need at least two accounts to transfer.";
-			else
-				$resStr .= "You have no one account. Please create one.";
-			$resStr .= "</span></td></tr>\r\n";
+			$resStr .= "<span>You have no one account. Please create one.</span>";
 		}
 		else
 		{
-			$resStr .= "\t\t<tr class=\"even_row\"><td><b>Name</b></td><td><b>Currency</b></td><td><b>Balance</b></td>";
-			if ($editlink == TRUE)
-				$resStr .= "<td></td>";
-			$resStr .= "</tr>\r\n";
-
-			$totalArr = array();
-
-			$row_num = 1;
 			foreach(self::$cache as $acc_id => $row)
 			{
-				$balfmt = Currency::format($row["balance"], $row["curr_id"]);
+				if ($buttons)
+					$resStr .= $this->getTile(BUTTON_TILE, $acc_id);
+				else
+					$resStr .= $this->getTile(LINK_TILE, $acc_id);
+			}
+		}
+
+		return $resStr;
+	}
+
+
+	// Return HTML for total sums per each currency
+	public function getTotals()
+	{
+		if (!$this->checkCache())
+			return $resStr;
+
+		html_op("<div>");
+
+		$accounts = count(self::$cache);
+		if (!$accounts)
+		{
+			html("<span>You have no one account. Please create one.</span>");
+		}
+		else
+		{
+			$totalArr = array();
+			foreach(self::$cache as $acc_id => $row)
+			{
 				$currname = Currency::getName($row["curr_id"]);
 
 				if ($currname != "" && !$totalArr[$row["curr_id"]])
 					$totalArr[$row["curr_id"]] = 0;
 
 				$totalArr[$row["curr_id"]] += $row["balance"];
-
-				$resStr .= "\t\t<tr";
-				if (($row_num % 2) == 0)
-					$resStr .= " class=\"even_row\"";
-				$resStr .= "><td>".$row["name"]."</td><td>".$currname."</td><td style=\"text-align: right;\">".$balfmt."</td>";
-				if ($editlink == TRUE)
-					$resStr .= "<td><a href=\"./editaccount.php?id=".$acc_id."\">edit</a> <a href=\"./checkbalance.php?id=".$acc_id."\">check</a> <a href=\"./csvexport.php?id=".$acc_id."\">export to csv</a> <a href=\"./delaccount.php?id=".$acc_id."\">delete</a></td>";
-				$resStr .= "</tr>\r\n";
-
-				$row_num++;
 			}
 
-			$resStr .= "\t\t<tr class=\"extra_row\">";
-			$resStr .= "<td colspan=\"".(($editlink == TRUE) ? "4" : "3")."\" style=\"height: 10px;\"></td></tr>\r\n";
-
+			$i = 0;
 			foreach($totalArr as $key => $value)
 			{
-				$valfmt = Currency::format($value, $key);
-				$currname = Currency::getName($key);
+				$i++;
 
-				$resStr .= "\t\t<tr";
-				if (($row_num % 2) == 0)
-					$resStr .= " class=\"even_row\"";
-				$resStr .= "><td>Total</td><td>".$currname."</td><td class=\"sumcell\">".$valfmt."</td>";
-				if ($editlink == TRUE)
-					$resStr .= "<td></td>";
-				$resStr .= "</tr>\r\n";
+				html_op("<div class=\"info_tile\">");
+					$valfmt = Currency::format($value, $key);
+					$currName = Currency::getName($key);
 
-				$row_num++;
+					html("<span class=\"info_title\">".$currName."</span>");
+					html("<span class=\"info_subtitle\">".$valfmt."</span>");
+				html_cl("</div>");
 			}
 		}
 
-		$resStr .= "\t</table>\r\n";
-
-		return $resStr;
+		html_cl("</div>");
 	}
 }
 

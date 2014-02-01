@@ -9,7 +9,8 @@
 
 	function fail()
 	{
-		setLocation("../registration.php?act=fail");
+		setMessage(ERR_REGISTER_FAIL);
+		setLocation("../registration.php");
 	}
 
 
@@ -17,12 +18,13 @@
 	if ($userid != 0)
 		setLocation("../index.php");
 
-	if (!isset($_POST["logacc"]) || !isset($_POST["logpwd"]) || !isset($_POST["username"]))
+	if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
 		fail();
 
-	if (!User::register($_POST["logacc"], $_POST["logpwd"], $_POST["username"]))
+	if (!User::register($_POST["login"], $_POST["password"], $_POST["name"]))
 		fail();
 
+	setMessage(MSG_REGISTER);
 	setLocation("../index.php");
 
 ?>

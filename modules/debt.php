@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	require_once("../setup.php");
 	require_once("../class/user.php");
 	require_once("../class/currency.php");
@@ -10,18 +10,18 @@
 
 	function fail()
 	{
-		setLocation("../debts.php?debt=fail");
+		setMessage(ERR_DEBT_CREATE);
+		setLocation("../transactions.php?type=debt");
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("../login.php");
 
 	$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
-	$person_id = (isset($_POST["personid"])) ? intval($_POST["personid"]) : 0;
-	$person_name = $db->escape($_POST["personname"]);
-	$acc_id = (isset($_POST["accid"])) ? intval($_POST["accid"]) : 0;
+	$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
+	$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
 	$amount = floatval($_POST["amount"]);
 	$charge = floatval($_POST["charge"]);
 	$transcurr = (isset($_POST["transcurr"])) ? intval($_POST["transcurr"]) : 0;
@@ -31,25 +31,17 @@
 
 	if ($debt_op != 1 && $debt_op != 2)
 		fail();
-	if ($amount == 0.0 || $charge == 0.0 || $trdate == -1 || $person_name == "")
+	if (!$person_id || $amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
-	$pers = new Person($userid);
-	if (!$person_id)
-	{
-		$check_id = $pers->findByName($person_name);
-		if ($check_id != 0)
-			setLocation("../newdebt.php?act=fail&detail=person");
-		$person_id = $pers->create($person_name);
-	}
-	else if (!$pers->is_exist($person_id))
-	{
+	$pers = new Person($user_id);
+	if (!$pers->is_exist($person_id))		// person should exist
 		fail();
-	}
 
-	$debt = new Debt($userid);
+	$debt = new Debt($user_id);
 	if (!$debt->create($debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 
-	setLocation("../debts.php?debt=ok");
+	setMessage(MSG_DEBT_CREATE);
+	setLocation("../transactions.php?type=debt");
 ?>

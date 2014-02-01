@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../index.php?trans=fail");
+		setMessage(ERR_TRANS_CREATE);
+		setLocation("../index.php");
 	}
 
 
@@ -22,8 +23,8 @@
 	if (!$trans_type)
 		fail();
 
-	$src_id = (isset($_POST["srcid"])) ? intval($_POST["srcid"]) : 0;
-	$dest_id = (isset($_POST["destid"])) ? intval($_POST["destid"]) : 0;
+	$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
+	$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
 	$amount = floatval($_POST["amount"]);
 	$charge = floatval($_POST["charge"]);
 	$transcurr = (isset($_POST["transcurr"])) ? intval($_POST["transcurr"]) : 0;
@@ -44,5 +45,6 @@
 	if (!$trans->create($trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 
-	setLocation("../index.php?trans=ok");
+	setMessage(MSG_TRANS_CREATE);
+	setLocation("../index.php");
 ?>

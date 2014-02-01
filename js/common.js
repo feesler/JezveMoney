@@ -1,4 +1,4 @@
-// Return DOM element by id
+﻿// Return DOM element by id
 function ge(a)
 {
 	return (typeof a == 'string') ? document.getElementById(a) : a;
@@ -12,12 +12,19 @@ function isArray(obj)
 }
 
 
+// Check object is date
+function isDate(obj)
+{
+	return (typeof obj === 'object' && obj.constructor.toString().indexOf("Date") != -1);
+}
+
+
 // Set parameters of object
 function setParam(obj, params)
 {
 	var par, val;
 
-	if (!obj || !params)
+	if (!obj || !params || typeof params !== 'object')
 		return;
 
 	for(par in params)
@@ -28,6 +35,19 @@ function setParam(obj, params)
 		else
 			obj[par] = val;
 	}
+}
+
+
+// Append elements from array to object
+function addChilds(obj, childs)
+{
+	if (!obj || !childs || !isArray(childs))
+		return;
+
+	childs.forEach(function(child){
+		if (child)
+			obj.appendChild(child);
+	});
 }
 
 
@@ -44,15 +64,18 @@ function ce(tagName, params, childs)
 		return null;
 
 	setParam(obj, params);
-
-	if (isArray(childs))
-	{
-		childs.forEach(function(child){
-			obj.appendChild(child);
-		});
-	}
+	addChilds(obj, childs);
 
 	return obj;
+}
+
+
+// Remove element from DOM and return
+function re(obj)
+{
+	var robj = ge(obj);
+
+	return (robj && robj.parentNode) ? robj.parentNode.removeChild(robj) : null;
 }
 
 
@@ -82,6 +105,15 @@ function isNum(val)
 		return true;
 	else
 		return res = (val / val) ? true : false;
+}
+
+
+// Return object visibility
+function isVisible(obj)
+{
+	var robj = ge(obj);
+
+	return (robj && robj.style && robj.style.display != 'none');
 }
 
 
@@ -146,11 +178,16 @@ function isDigit(iCode)
 // Return caret position in specified input control
 function getCaretPos(obj)
 {
+	if (!obj)
+		return 0;
+
 	obj.focus();
 
-	if (obj.selectionStart)			//Gecko
+	if (obj.selectionStart)			// Gecko
+	{
 		return obj.selectionStart;
-	else if (document.selection)		//IE
+	}
+	else if (document.selection)		// IE
 	{
 		var sel = document.selection.createRange();
 		var clone = sel.duplicate();
@@ -245,7 +282,7 @@ function selectedValue(selectObj)
 	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
 		return -1;
 
-	return selectObj.options[selectObj.selectedIndex].value
+	return selectObj.options[selectObj.selectedIndex].value;
 }
 
 
@@ -298,6 +335,26 @@ function insertAfter(elem, refElem)
 }
 
 
+// Check element is child of specified
+function isChild(elem, refElem)
+{
+	var curParent = null;
+
+	if (!elem || !refElem)
+		return false;
+
+	curParent = elem.parentNode;
+	while(curParent)
+	{
+		if (curParent == refElem)
+			break;
+		curParent = curParent.parentNode;
+	}
+
+	return (curParent == refElem);
+}
+
+
 // Remove all child nodes of specified element
 function removeChilds(obj)
 {
@@ -306,4 +363,173 @@ function removeChilds(obj)
 
 	while(obj.childNodes.length > 0) 
 		 obj.removeChild(obj.childNodes[0]);
+}
+
+
+// Fix IE event object
+function fixEvent(e, _this)
+{
+	e = e || window.event;
+
+	if (!e.currentTarget)
+		e.currentTarget = _this;
+	if (!e.target)
+		e.target = e.srcElement;
+
+	if (!e.relatedTarget)
+	{
+		if (e.type == 'mouseover')
+			e.relatedTarget = e.fromElement;
+		if (e.type == 'mouseout')
+			e.relatedTarget = e.toElement;
+	}
+
+	if (e.pageX == null && e.clientX != null )
+	{
+		var html = document.documentElement;
+		var body = document.body;
+
+		e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0);
+		e.pageX -= html.clientLeft || 0;
+
+		e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0);
+		e.pageY -= html.clientTop || 0;
+	}
+
+	if (!e.which && e.button)
+	{
+		e.which = (e.button & 1) ? 1 : ((e.button & 2) ? 3 : ((e.button & 4) ? 2 : 0));
+	}
+
+	return e;
+}
+
+
+// Return wrapper to schedule specified function for execution after current script
+function schedule(func)
+{
+	return bind(setTimeout, null, func, 0);
+}
+
+
+// Handler for click on empty space event
+function onEmptyClick(callback, elem)
+{
+	var e, elem;
+
+	callback = callback || null;
+	if (!callback)
+		return;
+	e = fixEvent(event);
+
+	if (!isArray(elem))
+		elem = [elem];
+
+	if (elem.every(function(el){
+		el = ge(el) || null;
+
+		return ((el && !isChild(e.target, el) && el != e.target) || !el);
+	}))
+		callback();
+}
+
+
+// Set or unset event handler for 
+function setEmptyClick(callback, elem)
+{
+	var onClickHandler;
+
+	callback = callback || null;
+	elem = elem || null;
+
+	if (document.documentElement)
+	{
+		onClickHandler = ((callback) ? bind(onEmptyClick, null, callback, elem) : null);
+
+		if (onClickHandler && document.documentElement.onclick)
+			document.documentElement.onclick();			// run previously set callback
+		document.documentElement.onclick = onClickHandler;
+	}
+}
+
+
+// Hide usem menu popup
+function hidePopup()
+{
+	show('menupopup', false);
+	setEmptyClick();
+}
+
+
+// Show/hide user menu by click
+function onUserClick()
+{
+	if (isVisible('menupopup'))
+	{
+		hidePopup();
+	}
+	else
+	{
+		show('menupopup', true);
+		setEmptyClick(hidePopup, ['menupopup', 'userbtn']);
+	}
+}
+
+
+// Calculate offset of element
+function getOffset(elem)
+{
+	if (elem.getBoundingClientRect)
+		return getOffsetRect(elem);
+	else
+		return getOffsetSum(elem);
+}
+
+
+// Calculate offset of element using getBoundingClientRect() method
+function getOffsetRect(elem)
+{
+	var box = elem.getBoundingClientRect();
+	var body = document.body;
+	var docElem = document.documentElement;
+
+	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+	var clientTop = docElem.clientTop || body.clientTop || 0;
+	var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+	var top  = box.top +  scrollTop - clientTop;
+	var left = box.left + scrollLeft - clientLeft;
+
+	return { top: Math.round(top), left: Math.round(left) };
+}
+
+
+// Calculate offset of element by sum of offsets of parents
+function getOffsetSum(elem)
+{
+	var top = 0, left = 0;
+
+	while(elem)
+	{
+		top = top + parseInt(elem.offsetTop);
+		left = left + parseInt(elem.offsetLeft);
+		elem = elem.offsetParent;
+	}
+
+	return { top: top, left: left };
+}
+
+
+// Close message box
+function onCloseMessage()
+{
+	re('action_msg');
+	setEmptyClick();
+}
+
+
+// Initialization of message hiding
+function initMessage()
+{
+	setEmptyClick(onCloseMessage, ['action_msg']);
 }

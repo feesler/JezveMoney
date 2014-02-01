@@ -1,88 +1,57 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
+	require_once("./class/transaction.php");
 
-
-	$userid = User::check();
-	if ($userid != 0)
+	$user_id = User::check();
+	if ($user_id != 0)
 		setLocation("./index.php");
 
-	$titleString = "jezve Money - Log in";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<title><?php echo($titleString); ?></title>
-<?php
-	getStyle($sitetheme);
-	echo(getJS("common.js"));
-?>
-<script>
-var submitStarted = false;
+	$titleString = "Jezve Money | Log in";
 
 
-// Log in form submit event handler
-function onSubmit(frm)
-{
-	var logacc, logpwd, submitbtn;
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
 
-	if (submitStarted)
-		return false;
+	html(getCommonHeaders());
 
-	logacc = ge('logacc');
-	logpwd = ge('logpwd');
-	submitbtn = ge('submitbtn');
-	if (!frm || !logacc || !logpwd || !submitbtn)
-		return false;
+	html("<title>".$titleString."</title>");
+	html(getCSS("common.css"));
+	html(getCSS("login.css"));
+	html(getCSS("iconlink.css"));
+	html(getJS("common.js"));
+	html(getJS("ready.js"));
+	html(getJS("main.js"));
 
-	if (!logacc.value || logacc.value.length < 1)
+	if (isMessageSet())
 	{
-		alert('Please type your login.');
-		return false;
+		html_op("<script>");
+			html("onReady(initMessage);");
+		html_op("</script>");
 	}
 
-	if (!logpwd.value || logpwd.value.length < 1)
-	{
-		alert('Please type your password.');
-		return false;
-	}
+	html("</head>");
+	html("<body>");
 
-	submitStarted = true;
-	enable(submitbtn, false);
+	require_once("./templates/header.php");
 
-	return true;
-}
-</script>
-</head>
-<body>
-<form method="post" action="./modules/login.php" onsubmit="return onSubmit(this);">
-<table align="center" valign="center" style="width: 100%; height: 100%;">
-	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
-<?php
-	if ($_GET["act"] == "wrong")
-		echo("<tr><td>Wrong login/password. Please check it and try to retype again.</td></tr>");
+	html("<form action=\"./modules/login.php\" method=\"post\" onsubmit=\"return onLoginSubmit(this);\">");
+	html_op("<div class=\"page login_page\">");
+		html_op("<div class=\"cont\">");
+			html_op("<div class=\"box\">");
+				html("<h1>Log in</h1>");
+				html("<label for=\"login\">Username</label>");
+				html("<div class=\"stretch_input std_input\"><div><input id=\"login\" name=\"login\" type=\"text\"></div></div>");
+				html("<label for=\"password\">Password</label>");
+				html("<div class=\"stretch_input std_input\"><div><input id=\"password\" name=\"password\" type=\"password\"></div></div>");
+				html("<div class=\"login_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"Log in\"><span class=\"alter_link\"><a href=\"./register.php\">Register</a></span></div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+	html("</form>");
+	html("</body>");
+	html("</html>");
 ?>
-	<tr height="100%">
-	<td style="width: 100%; height: 100%;" align="center" valign="center">
-	<table width="300px" height="150px">
-		<tr>
-			<td class="lblcell"><span>Login</span></td>
-			<td><input id="logacc" name="logacc" type="text"></td>
-		</tr>
-		<tr>
-			<td class="lblcell"><span>Password</span></td>
-			<td><input id="logpwd" name="logpwd" type="password"></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td><input id="submitbtn" value="ok" type="submit"><a style="margin-left: 5px;" href="./registration.php">sign in</a></td>
-		</tr>
-	</table>
-	</td>
-	</tr>
-</table>
-</form>
-</body>
-</html>

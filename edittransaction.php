@@ -1,18 +1,83 @@
 <?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
+	require_once("./class/person.php");
 	require_once("./class/currency.php");
 	require_once("./class/account.php");
+	require_once("./class/transaction.php");
+
 
 	function fail()
 	{
-		setLocation("./transactions.php");
-		exit();
+		setLocation("./index.php?edittrans=fail");
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	// Build array with properties of transaction
+	function getTransProperties($trans_id)
+	{
+		global $db, $user_id;
+
+		$resArr = array();
+
+		$qRes = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$user_id);
+
+		if (count($qRes) != 1)
+			return $resArr;
+
+		$row = $qRes[0];
+		$resArr["id"] = $trans_id;
+		$resArr["src_id"] = intval($row["src_id"]);
+		$resArr["dest_id"] = intval($row["dest_id"]);
+		$resArr["type"] = intval($row["type"]);
+		$resArr["curr"] = intval($row["curr_id"]);
+		$resArr["amount"] = floatval($row["amount"]);
+		$resArr["charge"] = floatval($row["charge"]);
+		$resArr["date"] = $row["date"];
+		$resArr["comment"] = $row["comment"];
+
+		return $resArr;
+	}
+
+
+	// Build array with some account properties
+	function getAccountProperties($acc_id)
+	{
+		global $acc;
+
+		if (!$acc_id || !is_numeric($acc_id))
+			return NULL;
+
+		$acc_id = intval($acc_id);
+
+		$resArr = array();
+		$resArr["id"] = $acc_id;
+		$resArr["balance"] = $acc->getBalance($acc_id);
+		$resArr["curr"] = $acc->getCurrency($acc_id);
+		$resArr["sign"] = Currency::getSign($resArr["curr"]);
+
+		return $resArr;
+	}
+
+
+	// Try to find account different from specified
+	function getAnotherAccount($acc_id)
+	{
+		global $acc;
+
+		if ($acc_id != 0 && $acc->getCount() < 2)
+			return 0;
+
+		$newacc_id = $acc->getIdByPos(0);
+		if ($newacc_id == $acc_id)
+			$newacc_id = $acc->getIdByPos(1);
+
+		return $newacc_id;
+	}
+
+
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("./login.php");
 
 	if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
@@ -20,234 +85,319 @@
 
 	$trans_id = intval($_GET["id"]);
 
-	$resArr = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$userid);
-	if (count($resArr) != 1)
-		fail();
+	$acc = new Account($user_id);
+	$trans = new Transaction($user_id);
 
-	$arr = $resArr[0];
-	$trans_src_id = intval($arr["src_id"]);
-	$trans_dest_id = intval($arr["dest_id"]);
-	$trans_type = intval($arr["type"]);
-	$trans_curr = intval($arr["curr_id"]);
-	$trans_amount = floatval($arr["amount"]);
-	$trans_chanrge = floatval($arr["charge"]);
+	$tr = getTransProperties($trans_id);
+	$trans_type = $tr["type"];			// TODO : temporarily
 
-	$titleString = "jezve Money - Edit transaction";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title><?php echo($titleString); ?></title>
-<?php
-	getStyle($sitetheme);
+	if ($trans_type == 4)
+		setLocation("./editdebt.php?id=".$trans_id);
+
+	$acc_count = $acc->getCount($trans_id);
+
+	// get information about source and destination accounts
+	$src = getAccountProperties($tr["src_id"]);
+	$dest = getAccountProperties($tr["dest_id"]);
+
+	$titleString = "Jezve Money | Edit transaction";
+
+// Start render page
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
+	html(getCommonHeaders());
+	html("<title>".$titleString."</title>");
+	html(getCSS("common.css"));
+	html(getCSS("transaction.css"));
+	html(getCSS("tiles.css"));
+	html(getCSS("popup.css"));
+	html(getCSS("iconlink.css"));
 	html(getCSS("calendar.css"));
-	echo(getJS("common.js"));
-	echo(getJS("transaction.js"));
+
+	html(getJS("common.js"));
+	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
+	html(getJS("popup.js"));
+	html(getJS("currency.js"));
+	html(getJS("account.js"));
+	html(getJS("transaction.js"));
+	html(getJS("transaction_layout.js"));
 
-	echo("<script>\r\n");
-
-	$acc = new Account($userid);
-
+	html("<script>");
 	echo($acc->getArray());
 
 	$transAcc_id = 0;	// main transaction account id
 	$transAccCur = 0;	// currency of transaction account
-	if ((($trans_type == 1 && $trans_dest_id == 0) || ($trans_type == 3 && $trans_dest_id != 0)) && $trans_src_id != 0)
-		$transAcc_id = $trans_src_id;
-	else if ($trans_type == 2 && $trans_dest_id != 0 && $trans_src_id == 0)
-		$transAcc_id = $trans_dest_id;
+	if ((($trans_type == 1 && $tr["dest_id"] == 0) || ($trans_type == 3 && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
+		$transAcc_id = $tr["src_id"];
+	else if ($trans_type == 2 && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
+		$transAcc_id = $tr["dest_id"];
 
-	$src_curr = $acc->getCurrency($trans_src_id);
-	$dest_curr = $acc->getCurrency($trans_dest_id);
+	$src_curr = $acc->getCurrency($tr["src_id"]);
+	$dest_curr = $acc->getCurrency($tr["dest_id"]);
 	$transAccCur = $acc->getCurrency($transAcc_id);
 
-	echo(Currency::getArray());
+	echo(Currency::getArray(TRUE));
 
-	$amount_sign = Currency::getSign($trans_curr);
+	$amount_sign = Currency::getSign($tr["curr"]);
 	$charge_sign = Currency::getSign($transAccCur);
 
-	echo("\r\n\r\nvar transaction =\r\n{\r\n");
-	echo("\tsrcAcc : ".$trans_src_id.",\r\n");
-	echo("\tdestAcc : ".$trans_dest_id.",\r\n");
-	echo("\tamount : ".$trans_amount.",\r\n");
-	echo("\tcharge : ".$trans_chanrge.",\r\n");
-	echo("\tcurr_id : ".$trans_curr.",\r\n");
-	echo("\ttype : ".$trans_type."\r\n");
-	echo("};\r\n");
-	echo("var edit_mode = true;\r\n");
-	echo("var trans_curr = ".$trans_curr.";\r\n");
-	echo("var trans_acc_curr = ".$trans_curr.";\r\n");
-	echo("var trans_type = ".$trans_type.";\r\n");
+	html();
+	html("var transaction =");
+	html_op("{");
+		html("srcAcc : ".$tr["src_id"].",");
+		html("destAcc : ".$tr["dest_id"].",");
+		html("amount : ".$tr["amount"].",");
+		html("charge : ".$tr["charge"].",");
+		html("curr_id : ".$tr["curr"].",");
+		html("type : ".$tr["type"]);
+	html_cl("};");
+	html("var edit_mode = true;");
+	html("var trans_curr = ".$tr["curr"].";");
+	html("var trans_acc_curr = ".$tr["curr"].";");
+	html("var trans_type = ".$tr["type"].";");
 
-	echo("</script>\r\n");
-?>
-</head>
-<body>
-<table class="maintable">
-	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
-<?php
-	require_once("./templates/userblock.php");
-	require_once("./templates/mainmenu.php");
-?>
-	<tr>
-	<td class="submenu">
-	<span><b>Edit transaction</b></span>
-	</td>
-	</tr>
-<?php
-	if (isset($_GET["edit"]))
-	{
-		echo("<tr><td style=\"padding-left: 50px;\">");
+	if (isMessageSet())
+		html("onReady(initMessage);");
+	html("</script>");
 
-		if ($_GET["edit"] == "ok")
-			echo("<span style=\"color: #20FF20;\">Transaction updated.</span>");
-		else if ($_GET["edit"] == fail)
-			echo("<span style=\"color: #FF2020;\">Fail to update transaction.</span>");
-		echo("</td></tr>");
-	}
+	html("</head>");
+	html("<body>");
 
-	setTab(1);
-	html("<tr>");
-	html("<td>");
-	echo($acc->getTable());
-	html("</td>");
-	html("</tr>");
+	require_once("./templates/header.php");
 
-	$accounts = $acc->getCount();
-	if ($accounts > 0)
-	{
-?>
+	html("<form method=\"post\" action=\"./modules/edittransaction.php\" onsubmit=\"return onEditTransSubmit(this);\">");
+	html("<input name=\"transid\" type=\"hidden\" value=\"".$tr["id"]."\">");
+	html("<input name=\"transtype\" type=\"hidden\" value=\"".$tr["type"]."\">");
 
-	<tr>
-	<td>
-	<form method="post" action="./modules/edittransaction.php" onsubmit="return onEditTransSubmit(this);">
-	<input name="transid" type="hidden" value="<?php echo($arr["id"]); ?>">
-	<input name="transtype" type="hidden" value="<?php echo($arr["type"]); ?>">
-	<table>
-<?php
+	html_op("<div class=\"content\">");
+		html_op("<div class=\"content_wrap\">");
+			html_op("<div class=\"heading h2_heading\">");
+				html("<h2>Edit transaction</h2>");
+				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", TRUE, "onDelete();"));
+			html_cl("</div>");
+			html_op("<div>");
+				$newTransMenu = array(array(1, "Expense", "./newtransaction.php?type=expense".$acc_par),
+										array(2, "Income", "./newtransaction.php?type=income".$acc_par),
+										array(3, "Transfer", "./newtransaction.php?type=transfer".$acc_par),
+										array(4, "Debt", "./newdebt.php".$d_acc_par));
+				showSubMenu($trans_type, $newTransMenu);
+
 	if ($trans_type == 1 || $trans_type == 3)
 	{
-		echo("\t\t<tr>\r\n");
-		if ($trans_type == 3)
-			echo("\t\t<td class=\"lblcell\"><span>Source account</span></td>\r\n");
-		else
-			echo("\t\t<td class=\"lblcell\"><span>Account name</span></td>\r\n");
-		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select id=\"srcid\" name=\"srcid\" onchange=\"");
-		if ($trans_type == 1)
-			echo("onChangeAcc();");
-		else
-			echo("onChangeSource();");
-		echo("\">\r\n");
-		echo($acc->getList($trans_src_id));
-		echo("\t\t\t</select>\r\n");
-		echo("\t\t</td>\r");
-		echo("\t\t</tr>\r");
+		html_op("<div id=\"source\" class=\"acc_float\">");
+			html("<div><label for=\"src_id\">Source account</label></div>");
+			html_op("<div class=\"tile_container\">");
+				$balDiff = $tr["charge"];
+				html($acc->getTileEx(STATIC_TILE, $tr["src_id"], $balDiff, "source_tile"));
+				html_op("<div class=\"acc_sel\">");
+					html_op("<div>");
+						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
+							echo($acc->getList($tr["src_id"]));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+
+			html();
+			html_op("<div class=\"tile_right_block\">");
+				if ($trans_type == 1)
+				{
+					getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
+											Currency::format($tr["amount"], ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
+				}
+
+				if ($trans_type == 1 || $trans_type == 3)
+				{
+					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
+											Currency::format($tr["charge"], ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
+				}
+
+				$disp = (($trans_type == 3 && $src["curr"] == $dest["curr"]) ||
+						(($trans_type == 1 || $trans_type == 2) && $transAccCur == $tr["curr"]));
+				$disp = !$disp;
+				getRightTileBlock("exch_left", $disp, "Exchange rate", "exchrate_b", "onExchRateSelect();",
+											round($tr["amount"] / $tr["charge"], 5)." ".$charge_sign."/".$amount_sign);
+
+				getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b", "onResBalanceSelect();",
+											Currency::format($src["balance"], $src["curr"]));
+			html_cl("</div>");
+		html_cl("</div>");
 	}
 
 	if ($trans_type == 2 || $trans_type == 3)
 	{
-		echo("\t\t<tr>\r\n");
-		if ($trans_type == 3)
-			echo("\t\t<td class=\"lblcell\"><span>Destination account</span></td>\r\n");
-		else
-			echo("\t\t<td class=\"lblcell\"><span>Account name</span></td>\r\n");
-		echo("\t\t<td>\r\n");
-		echo("\t\t\t<select id=\"destid\" name=\"destid\" onchange=\"");
-		if ($trans_type == 2)
-			echo("onChangeAcc();");
-		else
-			echo("onChangeDest();");
-		echo("\">\r\n");
-		echo($acc->getList($trans_dest_id));
-		echo("\t</select>\r\n");
-		echo("\t\t</td>\r\n");
-		echo("\t\t</tr>\r\n");
+		html();
+		html_op("<div id=\"destination\" class=\"acc_float\">");
+			html("<div><label for=\"dest_id\">Destination account</label></div>");
+			html_op("<div class=\"tile_container\">");
+				if ($trans_type == 2)		// income or person give to us
+					$balDiff = -$tr["charge"];
+				else
+					$balDiff = -$tr["amount"];
+				html($acc->getTileEx(STATIC_TILE, $tr["dest_id"], $balDiff, "dest_tile"));
+				html_op("<div class=\"acc_sel\">");
+					html_op("<div>");
+						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
+							echo($acc->getList($tr["dest_id"]));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+
+			html();
+			html_op("<div class=\"tile_right_block\">");
+
+				getRightTileBlock("amount_left", FALSE, "Amount", "amount_b", "onAmountSelect();",
+										Currency::format($tr["amount"], ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
+				if ($trans_type == 2)
+				{
+					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
+											Currency::format($tr["charge"], ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
+					getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
+											round($tr["amount"] / $tr["charge"], 5)." ".$charge_sign."/".$amount_sign);
+				}
+
+				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b", "onResBalanceDestSelect();",
+										Currency::format($dest["balance"], $dest["curr"]));
+			html_cl("</div>");
+		html_cl("</div>");
 	}
-?>
-		<tr>
-<?php
-		echo("\t\t<td class=\"lblcell\"><span>");
-		if ($trans_type == 1)
-			echo("Amount to spend");
-		else if ($trans_type == 2)
-			echo("Incoming amount");
-		else if ($trans_type == 3)
-			echo("Transfer amount");
-		echo("</span></td>\r\n");
-?>
-		<td><input id="amount" name="amount" type="text" onkeypress="return onFieldKey(event, this);" oninput="onFInput(this);" value="<?php echo($arr["amount"]); ?>"><span id="amountsign" class="currsign"><?php echo($amount_sign); ?></span>
-<?php
-	if ($trans_type == 1 || $trans_type == 2)
+
+	html();
+	html_op("<div id=\"amount_row\" class=\"non_float\">");
+		html("<div><label for=\"amount\">Amount</label></div>");
+		html_op("<div>");
+			html_op("<div class=\"curr_container\">");
+				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
+				html("<div class=\"".$currBtnClass."\"><div id=\"amountsign\">".$amount_sign."</div></div>");
+				$disp = ($trans_type == 3) ? " style=\"display: none;\"" : "";
+				html_op("<div class=\"rcurr_sel\"".$disp.">");
+					html_op("<div>");
+						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
+							echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
+						html_cl("</select>");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+
+			$inputType = ($trans_type == 3) ? "trans_input" : "rbtn_input";
+			html_op("<div class=\"stretch_input ".$inputType."\">");
+				html_op("<div>");
+					html("<input id=\"amount\" name=\"amount\" class=\"summ_text\" type=\"text\" value=\"".$tr["amount"]."\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
+
+	$disp = ((($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $tr["curr"])) ? " style=\"display: none;\"" : "");
+	html();
+	html_op("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
+		html("<div><label for=\"charge\">Charge</label></div>");
+		html_op("<div>");
+			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"chargesign\">".$charge_sign."</div></div></div>");
+			html_op("<div class=\"stretch_input trans_input\">");
+				html_op("<div>");
+					html("<input id=\"charge\" name=\"charge\" class=\"summ_text\" type=\"text\" value=\"".$tr["charge"]."\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
+	html();
+	html_op("<div id=\"exchange\" class=\"non_float\" style=\"display: none;\">");
+		html("<div><label for=\"exchrate\">Exchange rate</label></div>");
+		html_op("<div>");
+			html("<div class=\"right_float\"><span id=\"exchcomm\" class=\"exchrate_comm\">".$charge_sign."/".$amount_sign."</span></div>");
+			html_op("<div class=\"stretch_input trans_input\">");
+				html_op("<div>");
+					html("<input id=\"exchrate\" class=\"summ_text\" type=\"text\" value=\"1\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\" value=\"".round($tr["amount"] / $tr["charge"], 5)."\">");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
+	if ($trans_type == 1 || $trans_type == 3)
 	{
-		echo("<input id=\"ancurrbtn\" type=\"button\" onclick=\"showCurrList();\" value=\"currency\">\r\n");
-		echo("\t\t\t<select id=\"transcurr\" name=\"transcurr\" style=\"display: none;\" onchange=\"onChangeTransCurr();\">");
-		echo(Currency::getList($trans_curr));
-		echo("</select>");
+		html();
+		html_op("<div id=\"result_balance\" class=\"non_float\" style=\"display: none;\">");
+			html("<div><label for=\"resbal\">Result balance".(($trans_type == 3) ? " (Source)" : "")."</label></div>");
+			html_op("<div>");
+				html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$src["sign"]."</div></div></div>");
+				html_op("<div class=\"stretch_input trans_input\">");
+					html_op("<div>");
+						html("<input id=\"resbal\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
 	}
-	else if ($trans_type == 3)
+
+	if ($trans_type == 2 || $trans_type == 3)
 	{
-		echo("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$acc->getCurrency($trans_dest_id)."\">");
+		html();
+		html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
+			html("<div><label for=\"resbal_d\">Result balance".(($trans_type == 3) ? " (Destination)" : "")."</label></div>");
+			html_op("<div>");
+				html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$dest["sign"]."</div></div></div>");
+				html_op("<div class=\"stretch_input trans_input\">");
+					html_op("<div>");
+						html("<input id=\"resbal_d\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
 	}
+
+	setTab(3);
+	html();
+	html_op("<div class=\"non_float\">");
+		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
+		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink", $dateFmt));
+		html_op("<div id=\"date_block\" style=\"display: none;\">");
+			html("<div><label for=\"date\">Date</label></div>");
+			html_op("<div>");
+				html_op("<div class=\"right_float\">");
+					html("<button id=\"cal_rbtn\" class=\"btn icon_btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><div></div></button>");
+				html_cl("</div>");
+				html_op("<div class=\"stretch_input rbtn_input\">");
+					html_op("<div>");
+						html("<input id=\"date\" name=\"date\" type=\"text\" value=\"".$dateFmt."\">");
+					html_cl("</div>");
+				html_cl("</div>");
+				html("<div id=\"calendar\" class=\"calWrap\" style=\"display: none;\"></div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
+	html();
+	html_op("<div class=\"non_float\">");
+		html(getIconLink(ICON_BUTTON, "comm_btn", "add", "Add comment", ($tr["comment"] == ""), "showComment();", "form_iconlink"));
+		html_op("<div id=\"comment_block\"".(($tr["comment"] != "") ? "" : " style=\"display: none;\"").">");
+			html("<div><label for=\"comm\">Comment</label></div>");
+			html_op("<div>");
+				html_op("<div class=\"stretch_input trans_input\">");
+					html_op("<div>");
+						html("<input id=\"comm\" name=\"comm\" type=\"text\" value=\"".$tr["comment"]."\">");
+					html_cl("</div>");
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
+	html();
+	html("<div class=\"acc_controls\"><input id=\"submitbtn\" class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
+	html_cl("</div>");
+	html_cl("</div>");
+	html_cl("</div>");
+	html("</form>");
+
+	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");
+	html("<input name=\"transactions\" type=\"hidden\" value=\"".$tr["id"]."\">");
+	html("</form>");
+
+	html("</body>");
+	html("</html>");
 ?>
-		</td>
-		</tr>
-
-<?php
-		echo("\t\t<tr id=\"chargeoff\"");
-		if (($trans_type == 3 && $src_curr == $dest_curr) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
-			echo(" style=\"display: none;\"");
-		echo(">\r\n");
-
-		echo("\t\t<td class=\"lblcell\"><span>");
-		if ($trans_type == 1 || $trans_type == 3)
-			echo("Charge off");
-		else if ($trans_type == 2)
-			echo("Receipt");
-		echo("</span></td>");
-?>
-		<td><input id="charge" name="charge" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["charge"]); ?>"><span id="chargesign" class="currsign"><?php echo($charge_sign); ?></span></td>
-		</tr>
-
-<?php
-		echo("\t\t<tr id=\"exchange\"");
-		if (($trans_type == 3 && $src_curr == $dest_curr) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $trans_curr))
-			echo(" style=\"display: none;\"");
-		echo(">\r\n");
-?>
-		<td class="lblcell"><span>Exchange rate</span></td>
-		<td><input id="exchrate" name="exchrate" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?php echo($arr["amount"] / $arr["charge"]); ?>"><span id="exchcomm" style="margin-left: 5px;"><?php echo($charge_sign."/".$amount_sign." (".round($arr["charge"] / $arr["amount"], 5)." ".$amount_sign."/". $charge_sign.")"); ?></span></td>
-		</tr>
-
-		<tr>
-		<td class="lblcell"><span>Result balance</span></td>
-		<td><input id="resbal" name="resbal" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);"></td>
-		</tr>
-
-		<tr>
-		<td class="lblcell"><span>Date</span></td>
-		<td><input id="date" name="date" type="text" value="<?php echo(date("d.m.Y", strtotime($arr["date"]))); ?>"><input type="button" value="calendar" style="margin-left: 5px;" onclick="showCalendar();"><div id="calendar" class="calWrap" style="display: none;"></div></td>
-		<script>buildCalendar();</script>
-		</tr>
-
-		<tr>
-		<td class="lblcell"><span>Comment</span></td>
-		<td><input id="comm" name="comm" type="text" value="<?php echo($arr["comment"]); ?>"></td>
-		</tr>
-
-		<tr>
-		<td colspan="2" style="text-align: center;"><input id="submitbtn" type="submit" value="ok"></td>
-		</tr>
-	</table>
-	</form>
-	</td>
-	</tr>
-
-<?php
-	}
-?>
-</table>
-</body>
-</html>

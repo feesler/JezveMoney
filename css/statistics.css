@@ -1,0 +1,118 @@
+/* Main container for charts */
+.charts
+{
+	clear: both;
+}
+
+
+.widget_charts
+{
+	max-width: 500px;
+}
+
+
+.chart_wrap
+{
+	overflow: hidden;
+}
+
+
+.chart_content
+{
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: auto;
+}
+
+
+/* Bar chart information popup */
+.chart_popup
+{
+	position: absolute;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	padding: 5px;
+	white-space: nowrap;
+}
+
+
+/* transactions page filer */
+/* TODO :remove duplication with transaction.css */
+.form_iconlink
+{
+	margin: 9px 0px;
+}
+
+
+.tr_filter
+{
+	float: left;
+}
+
+
+.group_filter
+{
+	margin: 0px 0px 0px 15px;
+}
+
+
+.date_filter
+{
+	margin: 0px 0px 0px 15px;
+}
+
+
+.transCalWrap
+{
+	z-index: 10;
+	margin: 0;
+}
+
+
+.transCalWrap > div
+{
+	float : left;
+}
+
+
+.search_input
+{
+	float: right;
+	margin: 0px 0px 0px 15px;
+}
+
+
+.search_input > div > input[type="text"]
+{
+	height: 26px;
+	border-width: 2px 0px 2px 2px;
+}
+
+
+/* text input controls with button on the right */
+.rbtn_input
+{
+	padding: 8px 0px;
+}
+
+
+.rbtn_input > div
+{
+	padding: 0px 16px 2px 0px;
+	margin: 0px -2px 0px 0px;
+}
+
+
+.rbtn_input > div > input
+{
+	border-width: 2px 0px 2px 2px;
+	padding: 2px 7px 2px 5px;
+}
+
+
+/* Filter select */
+.filter_sel
+{
+	margin: 0px 15px 0px 0px;
+}

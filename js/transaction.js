@@ -1,4 +1,4 @@
-var S1;		// balance before transaction
+﻿var S1;		// balance before transaction
 var a;		// amount in currency of transaction
 var d;		// charge off/receipt in currency of account
 var e;		// exchange rate
@@ -7,19 +7,49 @@ var S2;		// balance after transaction
 var fS1, fa, fd, fe, fS2;	// parsed float values
 var s1valid, s2valid, dvalid, evalid, avalid;
 
+// transfer only
+var S1_d;		// balance of destination account before transaction
+var S2_d;		// balance of destintation account after transaction
+
+var fS1_d, fS2_d;
+var s1dvalid, s2dvalid;
+
 // Main formula
-// S2 = S1 - d		for expense/transfer
-// S2 = S1 + d		for income
+// S2 = S1 - d			for expense/transfer
+// S2 = S1 + d			for income
 // d = a * e
+// S2_d = S1_d + a		for transfer
 
 
+var dwPopup = null;		// delete warning popup
 var submitStarted = false;
+
+
+// Check current transaction is expense
+function isExpense()
+{
+	return (trans_type == 1);
+}
 
 
 // Check current transaction is income
 function isIncome()
 {
-	return (trans_type == 2 || (trans_type == 4 && typeof(debtType) != "undefined" && debtType));
+	return (trans_type == 2);
+}
+
+
+// Check current transaction is transfer
+function isTransfer()
+{
+	return (trans_type == 3);
+}
+
+
+// Check current transaction is debt
+function isDebt()
+{
+	return (trans_type == 4);
 }
 
 
@@ -42,28 +72,47 @@ function correctExch(val)
 // Calculate result balance by initial and charge off/receipt
 function f1()
 {
-	if (isIncome())
-		S2 = fS1 + fd;
-	else
+	// calculate S2
+	if (isDebt())
+		S2 = fS1 - ((debtType) ? fa : fd);
+	else if (isExpense() || isTransfer())
 		S2 = fS1 - fd;
 
 	if (edit_mode)
-		S2 += (isIncome()) ? -transaction.charge : transaction.charge;
+	{
+		var income = isIncome();
+		var accid = ge(income ? 'dest_id' : 'src_id');
+		var traccid = income ? transaction.destAcc : transaction.srcAcc;
 
-	S2 = correct(S2);
+		if (accid && (traccid == parseInt(selectedValue(accid))))
+			S2 += income ? -transaction.charge : transaction.charge;
+	}
 
-	fS2 = S2;
+	if (isExpense() || isTransfer() || isDebt())
+		fS2 = S2 = correct(S2);
+}
+
+
+// Calculate result balance of destination account by initial and charge off/receipt
+function f1_d()
+{
+	// calculate S2_d
+	if (isIncome())
+		S2_d = fS1_d + fd;
+	else if (isTransfer())
+		S2_d = fS1_d + fa;
+	else if (isDebt())
+		S2_d = fS1_d + ((debtType) ? fd : fa);
+
+	if (isIncome() || isTransfer() || isDebt())
+		fS2_d = S2_d = correct(S2_d);
 }
 
 
 // Calculate charge off/receipt amount by transaction amount and exchange rate
 function f2()
 {
-	d = fa * fe;
-
-	d = correct(d);
-
-	fd = d;
+	fd = d = correct(fa * fe);
 }
 
 
@@ -77,87 +126,46 @@ function f3()
 
 	d = correct(d);
 
+	if (edit_mode)
+		d += (isIncome()) ? -transaction.charge : transaction.charge;
+
 	fd = d;
+}
+
+
+// Calculate amount by initial and result balance of destination account
+function f3_d()
+{
+	fa = a = correct(fS2_d - fS1_d);
 }
 
 
 // Calculate transaction amount by charge off/receipt and exchange rate
 function f4()
 {
-	a = fd / fe;
+	fa = a = correct(fd / fe);
 
-	a = correct(a);
+	if (isTransfer())
+		S2_d = fS1_d + fa;
+	else if (isDebt())
+		S2_d = fS1_d + ((debtType) ? fd : fa);
 
-	fa = a;
+	if (isTransfer() || isDebt())
+		fS2_d = S2_d = correct(S2_d);
 }
 
 
 // Calculate exchange rate by charge off/receipt and transaction amount
 function f5()
 {
-	e = fd / fa;
-
-	e = correctExch(e);
-
-	fe = e;
+	fe = e = correctExch(fd / fa);
 }
 
 
-// Retunr sign of specified currency
-function getCurrencySign(curr_id)
+// Set currency sign for specified field
+function setSign(obj, curr_id)
 {
-	var currSign = '';
-
-	currency.some(function(curr)
-	{
-		if (curr[0] == curr_id)
-			currSign = curr[2];
-
-		return (curr[0] == curr_id);
-	});
-
-	return currSign;
-}
-
-
-// Retunr currency id of specified account
-function getCurrencyOfAccount(account_id)
-{
-	var curr_id = '';
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			curr_id = acc[1];
-
-		return (acc[0] == account_id);
-	});
-
-	return curr_id;
-}
-
-
-// Retunr balance of specified account
-function getBalanceOfAccount(account_id)
-{
-	var balance = 0;
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			balance = acc[3];
-
-		return (acc[0] == account_id);
-	});
-
-	return balance;
-}
-
-
-// Set currency sign for amount or charge field
-function setSign(isAmount, curr_id)
-{
-	var signobj = ge((isAmount=== true) ? 'amountsign' : 'chargesign');
+	var signobj = ge(obj);
 	if (signobj)
 		signobj.innerHTML = getCurrencySign(curr_id);
 }
@@ -166,18 +174,19 @@ function setSign(isAmount, curr_id)
 // Spend/Income transaction event handler
 function onSubmit(frm)
 {
-	var srcid, destid, amount, trdate;
+	var srcid, destid, amount, charge, trdate;
 	var submitbtn;
 
 	if (submitStarted)
 		return false;
 
-	srcid = ge('srcid');
-	destid = ge('destid');
+	srcid = ge('src_id');
+	destid = ge('dest_id');
 	amount = ge('amount');
+	charge = ge('charge');
 	trdate = ge('date');
 	submitbtn = ge('submitbtn');
-	if (!frm || (!srcid && !destid) || !amount || !trdate || !submitbtn)
+	if (!frm || (!srcid && !destid) || !amount || !charge || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -187,6 +196,7 @@ function onSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+	charge.value = fixFloat(charge.value);
 
 	if (!checkDate(trdate.value))
 	{
@@ -204,17 +214,18 @@ function onSubmit(frm)
 // Edit transaction submit event handler
 function onEditTransSubmit(frm)
 {
-	var srcid, destid, amount, trdate, submitbtn;
+	var srcid, destid, amount, charge, trdate, submitbtn;
 
 	if (submitStarted)
 		return false;
 
-	srcid = ge('srcid');
-	destid = ge('destid');
+	srcid = ge('src_id');
+	destid = ge('dest_id');
 	amount = ge('amount');
+	charge = ge('charge');
 	trdate = ge('date');
 	submitbtn = ge('submitbtn');
-	if (!frm || (!srcid && !destid) || !amount || !trdate || !submitbtn)
+	if (!frm || (!srcid && !destid) || !amount || !charge || !trdate || !submitbtn)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -224,6 +235,7 @@ function onEditTransSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+	charge.value = fixFloat(charge.value);
 
 	if (!checkDate(trdate.value))
 	{
@@ -238,41 +250,105 @@ function onEditTransSubmit(frm)
 }
 
 
+// Delete transaction icon link click event handler
+function onDelete()
+{
+	showDeletePopup();
+}
+
+
+var singleTransDeleteTitle = 'Delete transaction';
+var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+
+
+// Delete popup callback
+function onDeletePopup(res)
+{
+	var delform;
+
+	if (!dwPopup)
+		return;
+
+	dwPopup.close();
+	dwPopup = null;
+
+	if (res)
+	{
+		delform = ge('delform');
+		if (delform)
+			delform.submit();
+	}
+}
+
+
+// Create and show transaction delete warning popup
+function showDeletePopup()
+{
+	// check popup already created
+	if (dwPopup)
+		return;
+
+	dwPopup = new Popup();
+	if (!dwPopup)
+		return;
+
+	if (!dwPopup.create({ id : 'delete_warning',
+						title : singleTransDeleteTitle,
+						msg : singleTransDeleteMsg,
+						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
+						cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						}))
+	{
+		dwPopup = null;
+		return;
+	}
+
+	dwPopup.show();
+}
+
+
+
 // Update exchange rate and result balance values
 function updateExchAndRes()
 {
 	getValues();
-	if (d !== '' && a !== '')
+	if (isValidValue(d) && isValidValue(a))
 	{
 		f5();
 		f1();
-		setValues();
+		f1_d();
 	}
+	setValues();
 }
 
 
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
-	var sync = false;
+	var srcid, destid, accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
+	var sync = false, target_id, new_acc_id;
 
-	srcid = ge('srcid');
-	destid = ge('destid');
-	accid = ge('accid');
+	srcid = ge('src_id');
+	destid = ge('dest_id');
+	accid = ge('acc_id');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
+	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !charge)
+	resbal_b = ge(((isDebt() && !debtType) || isIncome()) ? 'resbal_d_b' : 'resbal_b');
+	if ((!srcid && !destid && !accid) || !amount || !transcurr  || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge || !resbal_b)
 		return false;
 
 	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
 		sync = true;
 
-	trans_acc_curr = getCurrencyOfAccount(selectedValue(srcid ? srcid : (destid ? destid : accid)));
+	target_id = isIncome() ? destid : (isDebt() ? accid : srcid);
+	new_acc_id = selectedValue(target_id);
+
+	trans_acc_curr = getCurrencyOfAccount(new_acc_id);
 	if (sync)
 		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
@@ -281,16 +357,35 @@ function onChangeAcc()
 	// hide charge and exchange rate if new currencies is the same
 	if (trans_curr == trans_acc_curr)
 	{
-		chargeoff.style.display = 'none';
-		exchange.style.display = 'none';
+		hideChargeAndExchange();
+
 		exchrate.value = 1;
+		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
+
+		resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - charge.value, getCurrencyOfAccount(new_acc_id));
 	}
 
 	updateExchAndRes();
 
-	setSign(false, trans_acc_curr);
-	setSign(true, trans_curr);
+	setSign('chargesign', trans_acc_curr);
+	setSign('amountsign', trans_curr);
+
+	if (isDebt())
+	{
+		var person_tile, personsel, personname, pbalance;
+
+		person_tile = ge('person_tile');
+		personsel = ge('personsel');
+		if (!person_tile || !personsel)
+			return;
+
+		personname = selectedText(personsel);
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+	}
+
+	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
 }
 
 
@@ -299,23 +394,27 @@ function showCurrList()
 {
 	var transcurr, ancurrbtn;
 
-	transcurr = ge('transcurr');
-	ancurrbtn = ge('ancurrbtn');
-	if (!transcurr || !ancurrbtn)
+	if (isTransfer())
 		return;
 
-	transcurr.style.display = '';
-	ancurrbtn.style.display = 'none';
+	curr_block = ge('curr_block');
+	ancurrbtn = ge('ancurrbtn');
+	if (!curr_block || !ancurrbtn)
+		return;
+
+	show(curr_block, true);
+	show(ancurrbtn, false);
 }
 
 
 // Check selected currencies is different
+// TODO : remove this function
 function isDiffCurr()
 {
 	var src, dest;
 
-	src = ge('srcid');
-	dest = ge('destid');
+	src = ge('src_id');
+	dest = ge('dest_id');
 
 	if (!src || !dest)
 		return false;
@@ -371,51 +470,170 @@ function onTransferSubmit(frm)
 
 
 // Update controls of transfer transaction form
+/* TODO : don't calculate values here; we have getValues(), f1-5() */
 function updControls()
 {
-	var src, dest, amount, charge, exchrate, chargeoff, exchange, resbal, dstyle, transcurr;
+	var src, dest, acc, amount, charge, exchrate, exchrate_b, chargeoff, exchange, resbal, transcurr;
+	var src_acc, dest_acc, debt_acc, tramount, trcharge, selCurrVal;
 
-	src = ge('srcid');
-	dest = ge('destid');
+	src = ge('src_id');
+	dest = ge('dest_id');
+	acc = ge('acc_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
+	exchrate_b = ge('exchrate_b');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	resbal = ge('resbal');
-	if (!src || !dest || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal)
+	resbal_b = ge('resbal_b');
+	transcurr = ge('transcurr');
+	if ((!src && !dest && !acc) || !amount || !charge || !exchrate || !chargeoff || !exchange || !resbal || !resbal_b || !transcurr)
 		return;
 
-	exchange.value = '';
-	if (isDiffCurr())
+	src_acc = parseInt(selectedValue(src));
+	dest_acc = parseInt(selectedValue(dest));
+	debt_acc = parseInt(selectedValue(acc));
+	selCurrVal = getCurrencyOfAccount(isDebt() ? debt_acc : src_acc);
+
+	if (isTransfer())
 	{
-		dstyle = '';
-		charge.value = '';
-		resbal.value = '';
+		amountCurr = getCurrencyOfAccount(dest_acc);
+		chargeCurr = getCurrencyOfAccount(src_acc);
+		transcurr.value = amountCurr;
+		trans_curr = amountCurr;
+	}
+	else if (isDebt())
+	{
+		trans_curr = parseInt(selectedValue(transcurr));
+		amountCurr = trans_curr;
+		chargeCurr = getCurrencyOfAccount(debt_acc);
+	}
+
+	exchange.value = '';
+	if (amountCurr != chargeCurr)
+	{
+		if (!edit_mode)
+		{
+			tramount = (amount.value != '') ? amount.value : 0;
+			trcharge = 0;
+
+			charge.value = '';
+			//resbal.value = '';
+
+			resbal.value = normalize(getBalanceOfAccount(src_acc));
+			resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
+
+			if (isTransfer() || isDebt())
+			{
+				var resbal_d = ge('resbal_d');
+				var resbal_d_b = ge('resbal_d_b');
+
+				if (!resbal_d || !resbal_d_b)
+					return;
+
+				if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
+				{
+					var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
+					resbal_d.value = normalize(fixedBalance + normalize(tramount));
+				}
+				else
+					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(tramount));
+
+				resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
+			}
+
+		}
+
+		chargeSwitch(true);
+		exchRateSwitch(false);
 	}
 	else
 	{
-		dstyle = 'none';
+		tramount = (amount.value != '') ? amount.value : 0;
+		trcharge = tramount;
+
 		charge.value = amount.value;
 		exchrate.value = 1;
-		resbal.value = getBalanceOfAccount(selectedValue(src)) - amount.value;
+		exchrate_b.firstElementChild.innerHTML = '1';
+		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
+		{
+			var fixedBalance = getBalanceOfAccount(src_acc) + ((src_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
+			resbal.value = normalize(fixedBalance - normalize(trcharge));
+		}
+		else
+		{
+			if (isDebt())
+			{
+				resbal.value = normalize(getCurPersonBalance(trans_curr) + normalize((debtType) ? -tramount : trcharge));
+			}
+			else
+			{
+				resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trcharge));
+			}
+		}
+
+		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, trans_curr);
+
+		if (isTransfer() || isDebt())
+		{
+			var resbal_d = ge('resbal_d');
+			var resbal_d_b = ge('resbal_d_b');
+
+			if (!resbal_d || !resbal_d_b)
+				return;
+
+			if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
+			{
+				var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.charge : -transaction.amount);
+				resbal_d.value = normalize(fixedBalance + normalize(tramount));
+			}
+			else
+			{
+				if (isDebt())
+				{
+					resbal_d.value = normalize(getBalanceOfAccount(debt_acc) + normalize(tramount));
+				}
+				else
+				{
+					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(tramount));
+				}
+			}
+
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, selCurrVal);
+		}
+
+		hideChargeAndExchange();
 	}
 
-	chargeoff.style.display = dstyle;
-	exchange.style.display = dstyle;
+	setSign('chargesign', chargeCurr);
+	setSign('amountsign', amountCurr);
+	setSign('res_currsign', chargeCurr);
+	setSign('res_currsign_d', amountCurr);
 
-	amountCurr = getCurrencyOfAccount(selectedValue(dest));
-	chargeCurr = getCurrencyOfAccount(selectedValue(src));
-
-	if (trans_type == 3)
+	if (isDebt())
 	{
-		transcurr = ge('transcurr');
-		if (transcurr)
-			transcurr.value = amountCurr;
+		var person_tile, personsel, personname, pbalance;
+
+		person_tile = ge('person_tile');
+		personsel = ge('personsel');
+		if (!person_tile || !personsel)
+			return;
+
+		personname = selectedText(personsel);
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+
+		setTileAccount('acc_tile', parseInt(selectedValue(acc)));
+	}
+	else
+	{
+		setTileAccount('source_tile', src_acc);
+		setTileAccount('dest_tile', dest_acc);
 	}
 
-	setSign(false, chargeCurr);
-	setSign(true, amountCurr);
+	getValues();
+	setExchangeComment();
 }
 
 
@@ -424,8 +642,8 @@ function onChangeSource()
 {
 	var src, dest;
 
-	src = ge('srcid');
-	dest = ge('destid');
+	src = ge('src_id');
+	dest = ge('dest_id');
 
 	if (!src || !dest)
 		return;
@@ -447,8 +665,8 @@ function onChangeDest()
 {
 	var src, dest;
 
-	src = ge('srcid');
-	dest = ge('destid');
+	src = ge('src_id');
+	dest = ge('dest_id');
 	if (!src || !dest)
 		return;
 
@@ -464,63 +682,32 @@ function onChangeDest()
 }
 
 
-// 
-function onInput(obj)
-{
-	var amount, charge, exchrate;
-
-	amount = ge('amount');
-	charge = ge('charge');
-	exchrate = ge('exchrate');
-
-	if (!obj || !amount || !charge || !exchrate)
-		return false;
-
-	if (obj == amount)
-	{
-		if (!isDiffCurr())
-		{
-			charge.value = amount.value;
-		}
-	}
-	else if (obj == charge)
-	{
-		if (amount.value && isNum(fixFloat(amount.value)) && charge.value && isNum(fixFloat(charge.value)))
-		{
-			exchrate.value = fixFloat(charge.value) / fixFloat(amount.value);
-		}
-	}
-	else if (obj == exchrate)
-	{
-		if (amount.value && isNum(fixFloat(amount.value)) && exchrate.value && isNum(fixFloat(exchrate.value)))
-		{
-			charge.value = fixFloat(exchrate.value) * fixFloat(amount.value);
-		}
-	}
-
-	return true;
-}
-
-
 // Set exchange rate comment
 function setExchangeComment()
 {
-	var exchcomm, transcurr, accid, taccid;
+	var exchcomm, exchrate_b, transcurr, accid, taccid;
 	var chargeSign, amountSign;
 	var invExch;
 
 	exchcomm = ge('exchcomm');
-	if (trans_type == 1 || trans_type == 2)
+	exchrate_b = ge('exchrate_b');
+	if (isExpense() || isIncome() || isDebt())
 		transcurr = ge('transcurr');
-	accid = ge((trans_type == 2) ? 'destid' : (trans_type == 4) ? 'accid' : 'srcid');
-	if (trans_type == 3)
-		taccid = ge('destid');
-	if (!exchcomm || !accid || (!transcurr && !taccid))
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
+	if (isTransfer())
+		taccid = ge('dest_id');
+	if (!exchcomm || !exchrate_b || !accid || (!transcurr && !taccid))
 		return;
 
 	if (fe == 1.0 || fe == 0.0 || e == '')
 	{
-		exchcomm.innerHTML = '';
+		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
+		if (isTransfer())
+			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
+		else
+			amountSign = getCurrencySign(selectedValue(transcurr));
+
+		exchcomm.innerHTML = chargeSign + '/' + amountSign;
 	}
 	else
 	{
@@ -528,7 +715,7 @@ function setExchangeComment()
 			return;
 
 		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
-		if (trans_type == 3)
+		if (isTransfer())
 			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
 		else
 			amountSign = getCurrencySign(selectedValue(transcurr));
@@ -537,6 +724,8 @@ function setExchangeComment()
 
 		exchcomm.innerHTML = chargeSign + '/' + amountSign + ' ('  + invExch + ' ' + amountSign + '/' + chargeSign + ')';
 	}
+
+	exchrate_b.firstElementChild.innerHTML = fe + ' ' + exchcomm.innerHTML;
 }
 
 
@@ -556,33 +745,83 @@ function normalizeExch(val)
 }
 
 
+// Check value is valid
+function isValidValue(val)
+{
+	return (val != undefined && val != null && val !== '');
+}
+
+
 // Get values of transaction from input fields
 function getValues()
 {
-	var accid, amount, charge, exchrate, resbal;
+	var accid, amount, charge, exchrate, resbal, resbal_d;
 
-	accid = ge((trans_type == 2) ? 'destid' : (trans_type == 4) ? 'accid' : 'srcid');
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	charge = ge('charge');
 	exchrate = ge('exchrate');
 	resbal = ge('resbal');
-	if (!accid || !amount || !charge || !exchrate || !resbal)
+	resbal_d = ge('resbal_d');
+	if (!accid || !amount || !charge || !exchrate || (!resbal && !resbal_d))
 		return;
 
-	S1 = getBalanceOfAccount(selectedValue(accid));
+	if (isExpense())
+	{
+		S1 = getBalanceOfAccount(selectedValue(accid));
+		S2 = resbal.value;
+	}
+	else if (isIncome())
+	{
+		S1_d = getBalanceOfAccount(selectedValue(accid));
+		S2_d = resbal_d.value;
+	}
+	else if (isTransfer())
+	{
+		S1 = getBalanceOfAccount(selectedValue(accid));
+		S2 = resbal.value;
+		S1_d = getBalanceOfAccount(selectedValue(ge('dest_id')));		// TODO: fix here
+		S2_d = resbal_d.value;
+	}
+	else if (isDebt())
+	{
+		if (debtType)	// person give to us; person account is source
+		{
+			S1 = getCurPersonBalance(trans_curr);
+			S2 = resbal.value;
+			S1_d = getBalanceOfAccount(selectedValue(accid));
+			S2_d = resbal_d.value;
+		}
+		else			// person take from us; person account is destination
+		{
+			S1 = getBalanceOfAccount(selectedValue(accid));
+			S2 = resbal_d.value;
+			S1_d = getCurPersonBalance(trans_curr);
+			S2_d = resbal.value;
+		}
+	}
 	a = amount.value;
 	d = charge.value;
 	e = exchrate.value;
-	S2 = resbal.value;
 
-	s1valid = (S1 !== '');
-	s2valid = (S2 !== '');
-	dvalid = (d !== '');
-	evalid = (e !== '');
-	avalid = (a !== '');
+	s1valid = isValidValue(S1);
+	s2valid = isValidValue(S2);
+	if (isIncome() || isTransfer() || isDebt())
+	{
+		s1dvalid = isValidValue(S1_d);
+		s2dvalid = isValidValue(S2_d);
+	}
+	dvalid = isValidValue(d);
+	evalid = isValidValue(e);
+	avalid = isValidValue(a);
 
 	fS1 = (s1valid) ? normalize(S1) : S1;
 	fS2 = (s2valid) ? normalize(S2) : S2;
+	if (isIncome() || isTransfer() || isDebt())
+	{
+		fS1_d = (s1dvalid) ? normalize(S1_d) : S1_d;
+		fS2_d = (s2dvalid) ? normalize(S2_d) : S2_d;
+	}
 	fd = (dvalid) ? normalize(d) : d;
 	fe = (evalid) ? normalizeExch(e) : e;
 	fa = (avalid) ? normalize(a) : a;
@@ -592,35 +831,142 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var amount, charge, exchrate, resbal;
+	var amount, amount_b, charge, charge_b, exchrate, exchcomm, exchrate_b, resbal, resbal_d, resbal_b, resbal_d_b;
+	var selCurrVal;
 
 	amount = ge('amount');
+	amount_b = ge('amount_b');
 	charge = ge('charge');
+	charge_b = ge('charge_b');
 	exchrate = ge('exchrate');
+	exchcomm = ge('exchcomm');
+	exchrate_b = ge('exchrate_b');
 	resbal = ge('resbal');
-	if (!amount || !charge || !exchrate || !resbal)
+	resbal_d = ge('resbal_d');
+	resbal_b = ge('resbal_b');
+	resbal_d_b = ge('resbal_d_b');
+	if (!amount || !amount_b || !charge || !charge_b || !exchrate || !exchrate_b || (!resbal && !resbal_d) || (!resbal_b && !resbal_d_b))
 		return;
 
 	amount.value = a;
+	amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(a) ? a : 0), trans_curr);
+
+
+	selCurrVal = getCurrencyOfAccount(selectedValue(ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')));
+
 	charge.value = d;
+	charge_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(d) ? d : 0), selCurrVal);
+
 	exchrate.value = e;
-	resbal.value = S2;
+	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
+
+	if (isDebt())
+	{
+		if (debtType)		// person give to us
+		{
+			resbal.value = S2;
+			resbal_d.value = S2_d;
+		}
+		else				// person take from us
+		{
+			resbal_d.value = S2;
+			resbal.value = S2_d;
+		}
+	}
+	else if (isIncome())
+		resbal_d.value = S2_d;
+	else
+		resbal.value = S2;
+
+	if (isDebt())
+	{
+		if (debtType)
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+		else
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+	}
+	else if (isIncome())
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
+	else
+		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
+
+	if (isTransfer())
+	{
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, trans_curr);
+	}
+	else if (isDebt())
+	{
+		if (debtType)		// person give
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
+		else				// person take
+			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, selCurrVal);
+	}
+}
+
+
+// Check currency of amount and currency of charge is different
+function isDiff()
+{
+	var amountCurr, chargeCurr;
+	var accid, destid;
+
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
+	transcurr = ge('transcurr');
+
+	if (isExpense() || isIncome() || isDebt())
+	{
+		amountCurr = parseInt(selectedValue(transcurr));
+	}
+	else if (isTransfer())
+	{
+		destid = ge('dest_id');
+		amountCurr = getCurrencyOfAccount(selectedValue(destid));
+	}
+
+	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
+
+	return (amountCurr != chargeCurr);
 }
 
 
 // Amount field input event handler
 function onAmountInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
-	if (evalid)
+	if (isDiff())
+	{
+		var tfd = fd;
+
+		if (!dvalid)
+			fd = fa;
+
+		if (isIncome() || isTransfer() || (isDebt() && !debtType))
+			f1_d();			// calculate S2_d
+		else if (isExpense() || (isDebt() && debtType))
+			f1();				// calculate S2
+
+		if (!dvalid)
+			fd = tfd;
+		if (dvalid)
+			f5();		// calculate e
+	}
+	else
 	{
 		f2();		// calculate d
-		f1();		// calculate S2
+		if (isIncome())
+		{
+			f1_d();			// calculate S2_d
+		}
+		else if (isTransfer() || isDebt())
+		{
+			f1_d();			// calculate S2_d
+			f1();				// calculate S2
+		}
+		else
+			f1();				// calculate S2
 	}
-	else if (dvalid)
-		f5();		// calculate e
 
 	setExchangeComment();
 }
@@ -629,14 +975,23 @@ function onAmountInput()
 // Charge/receipt field input event handler
 function onChargeInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
-	f1();			// calculate S2
+	var tfa = fa;
+
+	if (!avalid)
+		fa = fd;
+
+	if (isIncome() || (isDebt() && debtType))
+		f1_d();		// calculate S2_d
+	else if (isExpense() || isTransfer() || (isDebt() && !debtType))
+		f1();			// calculate S2
+
+	if (!avalid)
+		fa = tfa;
 	if (avalid)
 		f5();		// calculate e
-	else if (evalid)
-		f4();		// calculate a
 
 	setExchangeComment();
 }
@@ -645,7 +1000,7 @@ function onChargeInput()
 // Exchange rate field input event handler
 function onExchangeInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
 	if (avalid)
@@ -663,14 +1018,60 @@ function onExchangeInput()
 // Result balance field input event handler
 function onResBalanceInput()
 {
-	if (!s1valid)
+	if (!s1valid && !s1dvalid)
 		return;
 
-	f3();		// calculate d
-	if (evalid)
-		f4();				// calculate a
-	else if (avalid)
-		f5();				// calculate e
+	if (isDebt())
+	{
+		if (debtType)
+		{
+			f3();			// calculate d
+			f4();			// calculate a and S2_d
+		}
+		else
+		{
+			f3_d();		// calculate a
+			f2();			// calculate d
+			f1();			// calculate S2
+		}
+	}
+	else
+	{
+		f3();		// calculate d
+		if (evalid)
+			f4();				// calculate a
+		else if (avalid)
+			f5();				// calculate e
+	}
+}
+
+
+// Result balance field input event handler
+function onResBalanceDestInput()
+{
+	if (!s1dvalid)
+		return;
+
+	if (isTransfer() || isIncome())
+	{
+		f3_d();		// calculate a
+		f2();			// calculate d
+		f1();			// calculate S2
+	}
+	else if (isDebt())
+	{
+		if (debtType)
+		{
+			f3_d();		// calculate a
+			f2();			// calculate d
+			f1();			// calculate S2
+		}
+		else
+		{
+			f3();			// calculate d
+			f4();			// calculate a and S2_d
+		}
+	}
 }
 
 
@@ -687,6 +1088,8 @@ function onFInput(obj)
 		onExchangeInput();
 	else if (obj.id == 'resbal')
 		onResBalanceInput();
+	else if (obj.id == 'resbal_d')
+		onResBalanceDestInput();
 
 	setValues();
 
@@ -697,43 +1100,75 @@ function onFInput(obj)
 // Currency of transaction change event handler
 function onChangeTransCurr()
 {
-	var accid, amount, transcurr, chargeoff, exchange, exchrate, charge;
-	var amountCurr, chargeCurr;
+	var accid, amount, transcurr, chargeoff, exchange, exchrate, exchrate_b, charge;
+	var amountCurr, chargeCurr, isDiff;
 
-	accid = ge((trans_type == 2) ? 'destid' : (trans_type == 4) ? 'accid' : 'srcid');
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	amount = ge('amount');
 	transcurr = ge('transcurr');
 	chargeoff = ge('chargeoff');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
+	exchrate_b = ge('exchrate_b');
 	charge = ge('charge');
-	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !charge)
+	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge)
 		return;
 	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
 		return
 
-	amountCurr = selectedValue(transcurr);
+	amountCurr = parseInt(selectedValue(transcurr));
 	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
 
-	if (amountCurr == chargeCurr)
+	isDiff = (amountCurr != chargeCurr);
+	if (isDiff)
 	{
-		chargeoff.style.display = 'none';
-		exchange.style.display = 'none';
-		exchrate.value = 1;
-		charge.value = amount.value;
-
-		updateExchAndRes();
+		chargeSwitch(true);
+		exchRateSwitch(false);
 	}
 	else
 	{
-		chargeoff.style.display = '';
-		exchange.style.display = '';
+		exchrate.value = 1;
+		exchrate_b.firstElementChild.innerHTML = '1';
+		charge.value = amount.value;
+
+		updateExchAndRes();
+
+		hideChargeAndExchange();
 	}
 
 	trans_curr = amountCurr;
 
-	setSign(false, chargeCurr);
-	setSign(true, amountCurr);
+	setSign('chargesign', chargeCurr);
+	setSign('amountsign', amountCurr);
+	if (isDebt())
+	{
+		setSign('res_currsign', amountCurr);
+		setSign('res_currsign_d', chargeCurr);
+	}
+
+	getValues();
+	updateExchAndRes();
+	setExchangeComment();
+
+	if (isDebt())
+	{
+		var person_tile, personsel, personname, pbalance, resbal_b;
+
+		person_tile = ge('person_tile');
+		personsel = ge('personsel');
+		resbal_b = ge('resbal_b');
+		if (!person_tile || !personsel || !resbal_b)
+			return;
+
+		personname = selectedText(personsel);
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+
+		if (debtType)
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+		else
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+	}
 }
 
 
@@ -756,88 +1191,103 @@ function onChangeDebtOp()
 }
 
 
-// Show controls to add new person
-function togglePerson()
+// Return object for specified person
+function getPersonObject(person_id)
 {
-	var personname, personid, personsel, personbtn;
+	var pObj = null, p_id;
 
-	personname = ge('personname');
-	personid = ge('personid');
-	personsel = ge('personsel');
-	personbtn = ge('personbtn');
-	if (!personbtn || !personname || !personid || !personsel)
-		return;
+	p_id = parseInt(person_id);
+	if (!persons || !p_id)
+		return null;
 
-	if (personname.type == 'hidden')		// select mode
+	persons.some(function(person)
 	{
-		personbtn.value = 'select';
+		if (person[0] == p_id)
+			pObj = person;
+		return (person[0] == p_id);
+	});
 
-		personid.value = 0;
-		personname.type = 'text';
-		personname.value = '';
+	return pObj;
+}
 
-		show(personname, true);
-		show(personsel, false);
-	}
-	else if (personname.type == 'text')		// new person mode
+
+// Return array of balance
+function getPersonBalance(p_id)
+{
+	var person, resArr = [];
+
+	person = getPersonObject(p_id);
+	if (!person || !isArray(person) || person.length < 3 || !isArray(person[2]))
+		return null;
+
+	person[2].forEach(function(acc)
 	{
-		personbtn.value = 'new';
+		resArr.push(formatCurrency(acc[2], acc[1]));
+	});
 
-		personname.value = selectedText(personsel);
-		personid.value = personsel.selectedIndex;
+	return resArr;
+}
 
-		show(personname, false);
-		show(personsel, true);
 
-		personname.type = 'hidden';
-	}
+// Return balance of current person in specified currency
+function getCurPersonBalance(curr_id)
+{
+	var personid, p_id, person, resBal = 0.0;
+
+	personid = ge('person_id');
+	if (!personid || !curr_id)
+		return resBal;
+	person = getPersonObject(personid.value);
+	if (!person || !isArray(person) || person.length < 3 || !isArray(person[2]))
+		return resBal;
+
+	// check person have account in specified currency
+	person[2].some(function(acc)
+	{
+		if (acc[1] == curr_id)
+			resBal = acc[2];
+
+		return (acc[1] == curr_id);
+	});
+
+	return resBal;
 }
 
 
 // Person select event handler
 function onPersonSel(obj)
 {
-	var personname, personid;
+	var personsel, personid;
 
-	personname = ge('personname');
-	personid = ge('personid');
-	if (!personname || !personid)
-		return;
-	if (!obj || typeof(obj.selectedIndex) == "undefined" || obj.selectedIndex == -1)
+	personsel = ge('personsel');
+	personid = ge('person_id');
+	if (!personsel || !personid)
 		return;
 
-	personname.value = selectedText(obj);
-	personid.value = selectedValue(obj);
+	personid.value = selectedValue(personsel);
+
+	updControls();
 }
 
 
-// New debt form submit event handler
+// Debt form submit event handler
 function onDebtSubmit(frm)
 {
-	var accid, amount, trdate, personname;
+	var accid, amount, charge, trdate;
 	var submitbtn;
 
 	if (submitStarted)
 		return false;
 
-	personname = ge('personname');
 	submitbtn = ge('submitbtn');
-	if (!frm || !personname || !submitbtn)
+	if (!frm || !submitbtn)
 		return false;
 
-	if (!personname.value || personname.value.length < 1)
-	{
-		if (personname.type == 'hidden')
-			alert('Please select person.');
-		else
-			alert('Please type name of person.');
-		return false;
-	}
-
-	accid = ge('accid');
+	accid = ge('acc_id');
 	amount = ge('amount');
+	charge = ge('charge');
 	trdate = ge('date');
-	if (!frm || !accid || !amount || !trdate)
+	if (!frm || !accid || !amount || !charge || !trdate)
 		return false;
 
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
@@ -845,8 +1295,6 @@ function onDebtSubmit(frm)
 		alert('Please input correct amount.');
 		return false;
 	}
-
-	amount.value = fixFloat(amount.value);
 
 	if (!checkDate(trdate.value))
 	{
@@ -861,6 +1309,7 @@ function onDebtSubmit(frm)
 	}
 
 	amount.value = fixFloat(amount.value);
+	charge.value = fixFloat(charge.value);
 
 	if (!checkDate(trdate.value))
 	{
@@ -873,3 +1322,4 @@ function onDebtSubmit(frm)
 
 	return true;
 }
+

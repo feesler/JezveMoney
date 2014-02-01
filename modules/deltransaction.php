@@ -8,27 +8,29 @@
 
 	function fail()
 	{
-		setLocation("../transactions.php?del=fail");
+		setMessage(ERR_TRANS_DELETE);
+		setLocation("../transactions.php");
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("../login.php");
 
-	$trans_id = intval($_POST["transid"]);
-	if (!$trans_id)
+	$trans_list = $db->escape($_POST["transactions"]);
+	if (!$trans_list || $trans_list == "")
 		fail();
 
+	$trans = new Transaction($user_id);
 
-	$trans = new Transaction($userid);
-	$trans_type = $trans->getType($trans_id);
-	if (!$trans->del($trans_id))
-		fail();
+	$trans_arr = explode(",", $trans_list);
+	foreach($trans_arr as $trans_id)
+	{
+		$trans_id = intval($trans_id);
+		if (!$trans->del($trans_id))
+			fail();
+	}
 
-	$ttStr = Transaction::getTypeString($trans_type);
-	if (is_null($ttStr))
-		fail();
-
-	setLocation("../transactions.php?type=".$ttStr."&del=ok");
+	setMessage(MSG_TRANS_DELETE);
+	setLocation("../transactions.php");
 ?>

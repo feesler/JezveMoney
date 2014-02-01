@@ -1,0 +1,143 @@
+.tiles
+{
+	display: block;
+	clear: both;
+	max-width: 440px;
+}
+
+
+.tile
+{
+	width: 100px;
+	height: 100px;
+	background-color: #20A0FF;
+	margin: 0px 10px 10px 0px;
+	padding: 0;
+	display: inline-block;
+	float: left;
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+
+.tile:hover
+{
+	background-color: #1E82CC;
+}
+
+
+.act
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 94px;
+	height: 94px;
+	border: 3px solid #0072C6;
+	cursor: pointer;
+}
+
+
+/* inactive tile */
+.inact
+{
+	background-color: #B0B0B0;
+}
+
+
+.inact:hover
+{
+	background-color: #C0C0C0;
+}
+
+
+button.tilelink
+{
+	width: 100px;
+	height: 100px;
+	border: 0 none;
+	background: none;
+	padding: 0;
+	margin: 0;
+	text-transform: none;
+	font-weight: normal;
+}
+
+
+.tilelink > div
+{
+	height: 100px;
+	width: 100px;
+	margin: 0;
+	padding: 0;
+}
+
+
+.tilelink > div > span
+{
+	position: absolute;
+	color: #FFFFFF;
+	white-space: nowrap;
+}
+
+
+.acc_name
+{
+	left: 5px;
+	bottom: 2px;
+	font-size: 18px;
+	text-align: left;
+}
+
+
+.acc_bal
+{
+	top: 5px;
+	right: 5px;
+	font-size: 14px;
+	text-align: right;
+}
+
+
+/* tile icons */
+.purse_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px 0px;
+}
+
+
+.safe_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -100px;
+}
+
+
+.card_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -200px;
+}
+
+
+.percent_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -300px;
+}
+
+
+.bank_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -400px;
+}
+
+
+.cash_icon
+{
+	background-image: url('../img/tileicons.png');
+	background-position: 0px -500px;
+}

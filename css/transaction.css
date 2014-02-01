@@ -1,0 +1,196 @@
+﻿/* select currency button */
+.curr_btn
+{
+	padding: 0px 5px;
+}
+
+
+.curr_btn > span
+{
+	font-size: 12px;
+}
+
+
+/* result balance button */
+.resbal_btn
+{
+	font-size: 16px;
+}
+
+
+.form_iconlink
+{
+	margin: 9px 0px;
+}
+
+
+.inv_result
+{
+	color: red;
+}
+
+
+.acc_sel
+{
+	position: absolute;
+	opacity: 0;
+}
+
+
+.acc_sel > div > select
+{
+	width: 100px;
+	height: 100px;
+}
+
+
+.tile_container
+{
+	width: 100px;
+	height: 100px;
+	float: left;
+	padding: 8px 5px 8px 0px;
+}
+
+
+.tile_right_block
+{
+	height: 100px;
+	min-width: 100px;
+	margin: 8px 20px 10px 0px;
+	overflow: hidden;
+	float: left;
+}
+
+
+.tile_right_block > div
+{
+	margin: 0px 0px 10px 0px;
+}
+
+
+.acc_float
+{
+	min-width: 100px;
+	max-width: 400px;
+	float: left;
+}
+
+
+/* text input controls */
+.trans_input
+{
+	padding: 8px 0px;
+}
+
+
+/* text input controls with button on the right */
+.rbtn_input
+{
+	padding: 8px 0px;
+}
+
+
+.rbtn_input > div
+{
+	padding: 0px 16px 2px 0px;
+	margin: 0px -2px 0px 0px;
+}
+
+
+.rbtn_input > div > input
+{
+	border-width: 2px 0px 2px 2px;
+	padding: 2px 7px 2px 5px;
+}
+
+
+/* exchange rate comment */
+.exchrate_comm
+{
+	margin: 0px 5px;
+	height: 50px;
+	line-height: 50px;
+}
+
+
+/* Debt operation type selector */
+.op_sel
+{
+	margin: 2px 0px 10px 0px;
+}
+
+
+.op_sel  > span
+{
+	margin: 0px 10px 0px 5px;
+}
+
+
+/* person name input control */
+.debt_input
+{
+	padding: 8px 5px;
+	overflow: hidden;
+}
+
+
+.person_tile
+{
+	clear: both;
+	height: 118px;
+}
+
+
+.person_icon
+{
+	height: 50px;
+	clear: both;
+}
+
+
+.person_input
+{
+	clear: both;
+}
+
+
+/* transactions page filer */
+.tr_filter
+{
+	float: left;
+}
+
+
+.date_filter
+{
+	margin: 0px 0px 0px 15px;
+}
+
+
+.transCalWrap
+{
+	z-index: 10;
+	margin: 0;
+}
+
+
+.transCalWrap > div
+{
+	float : left;
+}
+
+
+.search_input
+{
+	float: right;
+	margin: 0px 0px 0px 15px;
+}
+
+
+.search_input > div > input[type="text"]
+{
+	height: 26px;
+	border-width: 2px 0px 2px 2px;
+}
+

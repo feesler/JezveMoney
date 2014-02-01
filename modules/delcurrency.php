@@ -6,7 +6,8 @@
 
 	function fail()
 	{
-		setLocation("../admin/currency.php?del=fail");
+		setMessage(ERR_CURRENCY_DELETE);
+		setLocation("../admin/currency.php");
 	}
 
 
@@ -20,5 +21,6 @@
 	if (!Currency::del($_POST["curr_id"]))
 		fail();
 
-	setLocation("../admin/currency.php?del=ok");
+	setMessage(MSG_CURRENCY_DELETE);
+	setLocation("../admin/currency.php");
 ?>

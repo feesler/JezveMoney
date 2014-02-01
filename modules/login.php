@@ -7,7 +7,8 @@
 
 	function fail()
 	{
-		setLocation("../login.php?act=wrong");
+		setMessage(ERR_LOGIN_FAIL);
+		setLocation("../login.php");
 	}
 
 
@@ -15,12 +16,13 @@
 	if ($userid != 0)
 		setLocation("../index.php");
 
-	if (!isset($_POST["logacc"]) || !isset($_POST["logpwd"]))
+	if (!isset($_POST["login"]) || !isset($_POST["password"]))
 		fail();
 
-	if (!User::login($_POST["logacc"], $_POST["logpwd"]))
+	if (!User::login($_POST["login"], $_POST["password"]))
 		fail();
 
+	setMessage(MSG_LOGIN);
 	setLocation("../index.php");
 
 ?>

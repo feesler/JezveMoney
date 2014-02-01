@@ -1,0 +1,180 @@
+var calendarObj = null;
+
+
+// Create calendar for select date of transaction
+function buildCalendar()
+{
+	var today = new Date();
+
+	return createCalendar(today.getDate(), today.getMonth(), today.getFullYear(), onSelectDate);
+}
+
+
+// Hide calendar block
+function hideCalendar()
+{
+	show('calendar', false);
+}
+
+
+// Date select callback
+function onSelectDate(date, month, year)
+{
+	var datefield;
+
+	datefield = ge('date');
+	if (!datefield)
+		return;
+
+	datefield.value = formatDate(date, month, year);
+
+	hideCalendar();
+}
+
+
+// Show calendar block
+function showCalendar()
+{
+/*
+	var calendar;
+
+	calendar = ge('calendar');
+	if (!calendar)
+		return;
+*/
+
+	if (!calendarObj)
+	{
+		calendarObj = ge('calendar');
+		if (!calendarObj)
+			return;
+
+		calendarObj.appendChild(buildCalendar());
+	}
+
+	show(calendarObj, !isVisible(calendarObj));
+	show('calendar_btn', false);
+	show('date_block', true);
+
+	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
+}
+
+
+// Show comment field
+function showComment()
+{
+	var comm_btn, comment_block, comm;
+
+	comm_btn = ge('comm_btn');
+	comment_block = ge('comment_block');
+	comm = ge('comm');
+	if (!comm_btn || !comment_block || !comm)
+		return;
+
+	show(comm_btn, false);
+	show(comment_block, true);
+	comm.focus();
+}
+
+
+// Common function for toggle switch
+function commonSwitch(input_block_id, static_block_id, input_id, showInput)
+{
+	var inpObj = ge(input_id);
+	showInput = showInput | false;
+
+	show(input_block_id, showInput);
+	show(static_block_id, !showInput);
+
+	if (showInput && inpObj)
+		inpObj.focus();
+}
+
+
+// Show input control or static block for amount value
+function amountSwitch(showInput)
+{
+	commonSwitch('amount_row', 'amount_left', 'amount', showInput);
+}
+
+
+// Show input control or static block for charge value
+function chargeSwitch(showInput)
+{
+	commonSwitch('chargeoff', 'charge_left', 'charge', showInput);
+}
+
+
+// Show input control or static block for result balance value
+function resBalanceSwitch(showInput)
+{
+	commonSwitch('result_balance', 'src_res_balance_left', 'resbal', showInput);
+}
+
+
+// Show input control or static block for result balance value
+function resBalanceDestSwitch(showInput)
+{
+	commonSwitch('result_balance_dest', 'dest_res_balance_left', 'resbal_d', showInput);
+}
+
+
+// Show input control or static block for exchange rate value
+function exchRateSwitch(showInput)
+{
+	commonSwitch('exchange', 'exch_left', 'exchrate', showInput);
+}
+
+
+// Amount static click event handler
+function onAmountSelect()
+{
+	amountSwitch(true);
+	resBalanceSwitch(false);
+	resBalanceDestSwitch(false);
+}
+
+
+// Charge static click event handler
+function onChargeSelect()
+{
+	chargeSwitch(true);
+	exchRateSwitch(false);
+}
+
+
+// Result balance static click event handler
+function onResBalanceSelect()
+{
+	resBalanceSwitch(true);
+	resBalanceDestSwitch(false);
+	amountSwitch(false);
+}
+
+
+// Result balance static click event handler
+function onResBalanceDestSelect()
+{
+	resBalanceSwitch(false);
+	resBalanceDestSwitch(true);
+	amountSwitch(false);
+}
+
+
+// Exchange rate static click event handler
+function onExchRateSelect()
+{
+	exchRateSwitch(true);
+	chargeSwitch(false);
+}
+
+
+// Hide both charge and exchange rate controls
+function hideChargeAndExchange()
+{
+	show('chargeoff', false);
+	show('charge_left',  false);
+
+	show('exchange', false);
+	show('exch_left', false);
+}

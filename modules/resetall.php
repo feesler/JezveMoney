@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../profile.php?resetall=fail");
+		setMessage(ERR_PROFILE_RESETALL);
+		setLocation("../profile.php");
 	}
 
 
@@ -27,5 +28,6 @@
 		fail();
 
 
-	setLocation("../profile.php?resetall=ok");
+	setMessage(MSG_PROFILE_RESETALL);
+	setLocation("../profile.php");
 ?>

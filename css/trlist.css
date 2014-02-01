@@ -1,0 +1,263 @@
+/* Transactions page content */
+.trans_list
+{
+	clear: both;
+}
+
+
+.trlist_item_wrap
+{
+	width: 100%;
+	float: left;
+	margin: 2px 0px;
+	height: 85px;
+}
+
+
+.trlist_item
+{
+	background-color: #F0F0F0;
+	padding: 8px;
+	border: 0px none;
+}
+
+
+div.act_tr
+{
+	padding: 5px;
+	background-color: #F0F0F0;
+	border: 3px solid #0072C6;
+	cursor: pointer;
+}
+
+
+.trlist_item > div > span,
+.act_tr > div > span,
+.details_table span
+{
+	height: 23px;
+	line-height: 23px;
+}
+
+
+.tritem_acc_name
+{
+	font-size: 14px;
+	clear: both;
+}
+
+
+.tritem_sum
+{
+	font-size: 16px;
+	font-weight: bold;
+	clear: left;
+}
+
+
+.tritem_date_comm
+{
+	font-size: 12px;
+	color: #808080;
+	clear: both;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+
+.tritem_comm
+{
+	margin: 0px 0px 0px 5px;
+	padding: 0px 0px 0px 5px;
+	border: 0px solid #808080;
+	border-left-width: 1px;
+}
+
+
+/* Ellipsis cell */
+.ellipsis_cell > div
+{
+	position: relative;
+	overflow: hidden;
+	height: 23px;
+}
+
+
+/* visible content */
+.ellipsis_cell > div > span
+{
+	display: block;
+	position: absolute;	
+	max-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 23px;		/* for vertical align of text */
+}
+
+
+/* cell stretching content */
+.ellipsis_cell > div:after
+{
+	content: attr(title);
+	overflow: hidden;
+	height: 0;
+	display: block;
+	font-size: 14px;
+}
+
+
+/* Details mode */
+.details_table
+{
+	border-collapse: collapse;
+	width: 100%;
+}
+
+
+.details_table > tbody
+{
+	height: 43px;
+}
+
+
+.details_table td
+{
+	padding: 2px 0px;
+}
+
+
+.details_table span
+{
+	font-size: 14px;
+}
+
+
+.details_table td > div
+{
+	height: 23px;
+	padding: 8px;
+	background-color: #F0F0F0;
+}
+
+
+/* Active table row */
+.details_table tr.act_tr > td > div
+{
+	padding: 5px 8px;
+	background-color: #F0F0F0;
+	border-top: 3px solid #0072C6;
+	border-bottom: 3px solid #0072C6;
+	cursor: pointer;
+}
+
+
+.details_table tr.act_tr > td:first-child > div
+{
+	padding: 5px 8px 5px 5px;
+	background-color: #F0F0F0;
+	border: 3px solid #0072C6;
+	border-right: 0px none;
+	cursor: pointer;
+}
+
+
+.details_table tr.act_tr > td:last-child > div
+{
+	padding: 5px 8px 5px 5px;
+	background-color: #F0F0F0;
+	border: 3px solid #0072C6;
+	border-left: 0px none;
+	cursor: pointer;
+}
+
+
+.details_table .tritem_sum
+{
+	color: #0080B0;
+	white-space: nowrap;
+	text-align: right;
+}
+
+
+.details_table .tritem_comm
+{
+	color: #808080;
+	margin: 0;
+	padding: 0;
+	border: 0px none;
+}
+
+
+.details_table .tritem_balance
+{
+	text-align: right;
+	white-space: nowrap;
+}
+
+
+.tritem_balance > span
+{
+	margin: 0px 10px 0px 0px;
+}
+
+
+/* Table drag&drop spacer row */
+.drag_spacer > td
+{
+	height: 43px;
+}
+
+
+.mode_selector
+{
+	float: left;
+	padding: 5px 0px;
+}
+
+
+.mode_selector span
+{
+	height: 22px;
+	line-height: 22px;
+	float: left;
+	padding: 0px 10px 0px 5px;
+}
+
+
+.mode_selector div
+{
+	width: 22px;
+	height: 22px;
+	background-image: url('../img/icons.png');
+	float: left;
+}
+
+
+.mode_selector .list_mode > div
+{
+	background-position: -261px -5px;
+}
+
+
+.mode_selector .details_mode > div
+{
+	background-position: -261px -37px;
+}
+
+
+.paginator
+{
+	padding: 5px 0px;
+	text-align: right;
+}
+
+
+.paginator > span
+{
+	margin-left: 5px;
+	height: 22px;
+	line-height: 22px;
+}
+

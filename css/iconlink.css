@@ -1,0 +1,255 @@
+/* icon link */
+.iconlink
+{
+	display: inline-block;
+	float: left;
+	overflow: hidden;
+	height: 32px;
+}
+
+
+.iconlink .icon
+{
+	width: 32px;
+	height: 32px;
+	background: url('../img/icons.png') no-repeat;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+}
+
+
+.iconlink span
+{
+	height: 32px;
+	color: #000000;
+	display: table-cell;
+	vertical-align: middle;
+	padding: 0px 0px 0px 5px;
+	float: left;
+	white-space: nowrap;
+	line-height: 32px;
+	font-size: 16px;
+	font-weight: normal;
+	text-decoration: none;
+	text-transform: none;
+}
+
+
+.iconlink .icontitle
+{
+	float: left;
+}
+
+
+.iconlink .maintitle
+{
+	height: 20px;
+	line-height: 20px;
+	padding: 0px 0px 0px 5px;
+	float: left;
+	white-space: nowrap;
+	font-size: 16px;
+	font-weight: normal;
+	text-decoration: none;
+	text-transform: none;
+
+	clear: both;
+}
+
+
+.iconlink .addtitle
+{
+	height: 12px;
+	line-height: 12px;
+	clear: both;
+	float : left;
+	padding: 0px 0px 0px 5px;
+	color: #20A0FF;
+	font-size: 10px;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+
+.iconlink > *:hover > span
+{
+	color: #000000;
+}
+
+
+.iconlink > a
+{
+	height: 32px;
+	display: table-cell;
+	vertical-align: middle;
+	text-decoration: none;
+}
+
+
+.iconlink > button
+{
+	height: 32px;
+	border: 0 none;
+	cursor: pointer;
+	padding: 0;
+	background: none;
+}
+
+
+/* 16x16 iconlink */
+.small_icon
+{
+	height: 16px;
+}
+
+
+.small_icon .icon
+{
+	width: 16px;
+	height: 16px;
+}
+
+
+.small_icon span
+{
+	height: 16px;
+	line-height: 16px;
+	font-size: 10px;
+}
+
+
+.small_icon > a,
+.small_icon > button
+{
+	height: 16px;
+}
+
+
+/* flat square button with icon */
+.icon_btn
+{
+	width: 34px;
+	height: 34px;
+	padding: 2px;
+	margin: 0px;
+	color: #FFFFFF;
+	background-color: #0072C6;
+	cursor: pointer;
+}
+
+
+.icon_btn > div
+{
+	width: 34px;
+	height: 34px;
+	background-image: url('../img/icons.png');
+	background-repeat: no-repeat;
+}
+
+
+/* calendar button */
+.cal_btn
+{
+	margin: 8px 0px;
+}
+
+
+.cal_btn > div
+{
+	background-position: -192px -32px;
+}
+
+
+/* search button */
+.search_btn > div
+{
+	background-position: -192px 0px;
+}
+
+
+/* iconlink icons */
+.iconlink div.add
+{
+	background-position: 0px 0px;
+}
+
+
+.iconlink > *:hover > div.add
+{
+	background-position: 0px -32px;
+}
+
+
+.iconlink div.edit
+{
+	background-position: -32px 0px;
+}
+
+
+.iconlink > *:hover > div.edit
+{
+	background-position: -32px -32px;
+}
+
+
+.iconlink div.del
+{
+	background-position: -64px 0px;
+}
+
+
+.iconlink > *:hover > div.del
+{
+	background-position: -64px -32px;
+}
+
+
+.iconlink div.calendar
+{
+	background-position: -96px 0px;
+}
+
+
+.iconlink > *:hover > div.calendar
+{
+	background-position: -96px -32px;
+}
+
+
+.iconlink div.search
+{
+	background-position: -128px 0px;
+}
+
+
+.iconlink > *:hover > div.search
+{
+	background-position: -128px -32px;
+}
+
+
+.iconlink div.export
+{
+	background-position: -160px 0px;
+}
+
+
+.iconlink > *:hover > div.export
+{
+	background-position: -160px -32px;
+}
+
+
+.iconlink div.close
+{
+	width: 16px;
+	height: 16px;
+	background-position: -232px -32px;
+}
+
+
+.iconlink > *:hover > div.close
+{
+	background-position: -232px -48px;
+}

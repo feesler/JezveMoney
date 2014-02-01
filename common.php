@@ -1,10 +1,29 @@
-<?php
+﻿<?php
 	
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)
 	{
 		header("Location: ".$loc);
 		exit();
+	}
+
+
+	// Check string is not null and not empty
+	function is_empty($str)
+	{
+		return is_null($str) || $str == "";
+	}
+
+
+	// Return string for common headers
+	function getCommonHeaders()
+	{
+		$resStr = "";
+
+		$resStr .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\r\n";
+		$resStr .= "<meta name=\"viewport\" content=\"width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0\">";
+
+		return $resStr;
 	}
 
 
@@ -70,15 +89,44 @@
 	}
 
 
+	define("PUSH_AFTER", 1, TRUE);
+	define("PUSH_BEFORE", 2, TRUE);
+	define("POP_AFTER", 3, TRUE);
+	define("POP_BEFORE", 4, TRUE);
+
 	// Print specified HTML string with tabbing and carriage return
-	function html($str = "")
+	function html($str = "", $opt = 0)
 	{
 		global $tabStr;
+
+		if ($opt == POP_BEFORE)
+			popTab();
+		else if ($opt == PUSH_BEFORE)
+			pushTab();
 
 		if (!is_null($str) && $str != "")
 			echo($tabStr.$str."\r\n");
 		else
 			echo("\r\n");
+
+		if ($opt == POP_AFTER)
+			popTab();
+		else if ($opt == PUSH_AFTER)
+			pushTab();
+	}
+
+
+	// Alias for html(str, PUSH_AFTER)
+	function html_op($str)
+	{
+		html($str, PUSH_AFTER);
+	}
+
+
+	// Alias for html(str, POP_BEFORE)
+	function html_cl($str)
+	{
+		html($str, POP_BEFORE);
 	}
 
 
@@ -104,90 +152,208 @@
 
 
 	// Format value
-	function valFormat($format, $value)
+	function valFormat($format, $val)
 	{
-		if ($format && $format != "")
-			return sprintf($format, number_format($value, 2, ",", " "));
+		if (!is_numeric($val))
+			return "";
+
+		$val = floatval($val);
+
+		if (floor($val) == $val)
+			$nf = number_format($val, 0, "", " ");
 		else
-			return number_format($value, 2, ",", " ");
+			$nf = number_format($val, 2, ",", " ");
+
+		if ($format && $format != "")
+			return sprintf($format, $nf);
+		else
+			return $nf;
 	}
 
 
-	// Return user block string
-	function getUserBlock($id)
+	define("STATIC_TILE", 1, TRUE);
+	define("LINK_TILE", 2, TRUE);
+	define("BUTTON_TILE", 3, TRUE);
+
+	// Return markup for tile
+	function getTile($tile_type, $tile_id, $tile_title, $tile_subtitle, $tile_action = "", $add_class = "")
 	{
-		$resStr = "\t<tr>\r\n\t<td style=\"margin-top: 15px; margin-right: 30px; width: 100%; height: 30px;\" align=\"right\">";
-		$resStr .= "\t\t<form id=\"logoutfrm\" name=\"logoutfrm\" method=\"post\" action=\"./modules/logout.php\">";
-		$resStr .= "\t\t<span style=\"margin-right: 20px;\">".
-		$resStr .= getUserName($id);
-		$resStr .= " logged in</span><input class=\"btn\" type=\"submit\" value=\"Logout\">";
-		$resStr .= "\t</form>\r\n\t</td>\r\n\t</tr>\r\n";
+		$resStr = "";
+
+		if ($tile_type != STATIC_TILE && $tile_type != LINK_TILE && $tile_type != BUTTON_TILE)
+			return $resStr;
+
+		$t_id = ($tile_id && $tile_id != "") ? " id=\"".$tile_id."\"" : "";
+		$t_class = "tile".(($add_class && $add_class != "") ? " ".$add_class : "");
+
+		$resStr .= "<div".$t_id." class=\"".$t_class."\">";
+		if ($tile_type == STATIC_TILE)
+		{
+			$resStr .= "<div class=\"tilelink\">";
+		}
+		else if ($tile_type == LINK_TILE)
+		{
+			$t_href = ($tile_action && $tile_action != "") ? " href=\"".$tile_action."\"" : "";
+			$resStr .= "<a".$t_href." class=\"tilelink\">";
+		}
+		else if ($tile_type == BUTTON_TILE)
+		{
+			$t_click = ($tile_action && $tile_action != "") ? " onclick=\"".$tile_action."\"" : "";
+			$resStr .= "<button class=\"tilelink\"".$t_click." type=\"button\">";
+		}
+
+		$resStr .= "<div>";
+
+		$resStr .= "<span class=\"acc_bal\">".$tile_subtitle."</span>";
+		$resStr .= "<span class=\"acc_name\">".$tile_title."</span>";
+
+		$resStr .= "</div>";
+		if ($tile_type == STATIC_TILE)
+			$resStr .= "</div>";
+		else if ($tile_type == LINK_TILE)
+			$resStr .= "</a>";
+		else if ($tile_type == BUTTON_TILE)
+			$resStr .= "</button>";
+		$resStr .= "</div>";
 
 		return $resStr;
 	}
-	
 
-	// Return charge from transaction array
-	function getCharge($trans_row)
+
+	// Return markup for right tile block
+	function getRightTileBlock($div_id, $isVisible, $label_str, $btn_id, $btn_event, $btn_str)
 	{
-		if ($trans_row)
-			return floatval($trans_row["charge"]);
-		else
-			return 0.0;
+		$d_id = (($div_id && $div_id != "") ? " id=\"".$div_id."\"" : "");
+		$disp = ($isVisible ? "" : " style=\"display: none;\"");
+		$b_id = (($btn_id && $btn_id != "") ? " id=\"".$btn_id."\"" : "");
+		$b_ev = (($btn_event && $btn_event != "") ? " onclick=\"".$btn_event."\"" : "");
+
+		html_op("<div".$d_id.$disp.">");
+			if ($label_str && $label_str != "")
+				html("<span>".$label_str."</span>");
+			html_op("<div>");
+				html("<button".$b_id." class=\"dashed_btn resbal_btn\" type=\"button\"".$b_ev."><span>".$btn_str."</span></button>");
+			html_cl("</div>");
+		html_cl("</div>");
 	}
 
 
-	// Return amount from transaction array
-	function getAmount($trans_row)
+	define("ICON_LINK", 1, TRUE);
+	define("ICON_BUTTON", 2, TRUE);
+
+	// Return markup for icon link element
+	function getIconLink($il_type, $div_id, $iconClass, $text, $isVisible, $action = "", $add_class = "", $addText = "")
 	{
-		if ($trans_row)
-			return floatval($trans_row["amount"]);
-		else
-			return 0.0;
+		$resStr = "";
+
+		if ($il_type != ICON_LINK && $il_type != ICON_BUTTON)
+			return $resStr;
+
+		$d_id = (($div_id && $div_id != "") ? " id=\"".$div_id."\"" : "");
+		$disp = ($isVisible ? "" : " style=\"display: none;\"");
+		$il_class = "iconlink".(($add_class && $add_class != "") ? " ".$add_class : "");
+
+		$resStr .= "<div".$d_id." class=\"".$il_class."\"".$disp.">";
+
+		if ($il_type == ICON_LINK)
+		{
+			$il_href = ($action && $action != "") ? " href=\"".$action."\"" : "";
+
+			$resStr .= "<a".$il_href.">";
+		}
+		else if ($il_type == ICON_BUTTON)
+		{
+			$il_click = ($action && $action != "") ? " onclick=\"".$action."\"" : "";
+			$resStr .= "<button".$il_click." type=\"button\">";
+		}
+
+		$il_icon = ($iconClass && $iconClass != "") ? " class=\"icon ".$iconClass."\"" : "";
+		$resStr .= "<div".$il_icon."></div>";
+
+		if ($text && $text != "")
+		{
+			$resStr .= "<div class=\"icontitle\">";
+			if ($addText && $addText != "")
+			{
+				$resStr .= "<span class=\"maintitle\">".$text."</span><br>";
+				$resStr .= "<span class=\"addtitle\">".$addText."</span>";
+			}
+			else
+			{
+				$resStr .= "<span>".$text."</span>";
+			}
+			$resStr .= "</div>";
+		}
+
+		$resStr .= ($il_type == ICON_BUTTON) ? "</button>" : "</a>";
+		$resStr .= "</div>";
+
+		return $resStr;
 	}
 
 
 	// Return javascript array of amounts of specified transactions for statistics use
-	function getStatArray($user_id, $account_id, $trans_type, $group_type = 0)
+	function getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
 	{
 		global $db;
 
-		$resStr = "";
-
 		$user_id = intval($user_id);
-		$account_id = intval($account_id);
+		$curr_acc_id = intval($curr_acc_id);
 		$trans_type = intval($trans_type);
 
-		if (!$user_id || !$account_id || !$trans_type)
-			return $resStr;
-
-		$cond =  "user_id=".$user_id." AND type=".$trans_type;
-
-		if ($trans_type == 1)			// expense or transfer
-			$cond .= " AND src_id=".$account_id;
-		else if ($trans_type == 2)		// income
-			$cond .= " AND dest_id=".$account_id;
-
-		$resArr = $db->selectQ("*", "transactions", $cond, NULL, "pos ASC");
-		$rowCount = count($resArr);
+		if (!$user_id || !$curr_acc_id || !$trans_type)
+			return NULL;
 
 		$chargeArr = array();
+		$groupArr = array();
 		$sumDate = NULL;
+		$curDate = NULL;
+		$prevDate = NULL;
 		$curSum = 0.0;
-		$itemNum = 0;
+		$itemsInGroup = 0;
+		$trans_time = 0;
 
-		for($i = 0; $i < $rowCount; $i++)
+		$fields = "tr.date AS date, tr.charge AS charge";
+		$tables = "transactions AS tr";
+		$cond =  "tr.user_id=".$user_id." AND tr.type=".$trans_type;
+
+		if ($byCurrency)
 		{
-			$row = $resArr[$i];
+			$tables .= ", accounts AS a";
+			$cond .= " AND a.curr_id=".$curr_acc_id;
+			if ($trans_type == 1)			// expense or transfer
+				$cond .= " AND tr.src_id=a.id";
+			else if ($trans_type == 2)		// income
+				$cond .= " AND tr.dest_id=a.id";
+		}
+		else
+		{
+			if ($trans_type == 1)			// expense or transfer
+				$cond .= " AND tr.src_id=".$curr_acc_id;
+			else if ($trans_type == 2)		// income
+				$cond .= " AND tr.dest_id=".$curr_acc_id;
+		}
+
+		$resArr = $db->selectQ($fields, $tables, $cond, NULL, "pos ASC");
+		foreach($resArr as $row)
+		{
 			$trans_time = strtotime($row["date"]);
+			$dateInfo = getdate($trans_time);
+			$itemsInGroup++;
 
 			if ($group_type == 0)		// no grouping
 			{
-				$chargeArr[$i] = getCharge($row);
+				$chargeArr[] = floatval($row["charge"]);
+
+				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
+				{
+					$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
+					$itemsInGroup = 0;
+				}
+				$prevDate = $dateInfo["mday"];
 			}
 			else if ($group_type == 1)	// group by day
 			{
-				$dateInfo = getdate($trans_time);
 				$curDate = $dateInfo["mday"];
 			}
 			else if ($group_type == 2)	// group by week
@@ -196,12 +362,10 @@
 			}
 			else if ($group_type == 3)	// group by month
 			{
-				$dateInfo = getdate($trans_time);
 				$curDate = $dateInfo["mon"];
 			}
 			else if ($group_type == 4)	// group by year
 			{
-				$dateInfo = getdate($trans_time);
 				$curDate = $dateInfo["year"];
 			}
 
@@ -209,26 +373,108 @@
 			{
 				$sumDate = $curDate;
 			}
-			else	if ($sumDate != NULL && $sumDate != $curDate)
+			else if ($sumDate != NULL && $sumDate != $curDate)
 			{
 				$sumDate = $curDate;
-				$chargeArr[$itemNum] = $curSum;
+				$chargeArr[] = $curSum;
 				$curSum = 0.0;
-				$itemNum++;
+				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
 
-			$curSum += getCharge($row);
+			$curSum += floatval($row["charge"]);
 		}
 
+		// save remain value
 		if ($group_type != 0 && $curSum != 0.0)
 		{
-			$chargeArr[$itemNum] = $curSum;
+			if ($sumDate != NULL && $sumDate != $curDate)
+			{
+				$chargeArr[] = $curSum;
+				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+			}
+			else
+			{
+				if (!count($chargeArr))
+					$chargeArr[] = $curSum;
+				else
+					$chargeArr[count($chargeArr) - 1] += $curSum;
+				if (!count($groupArr))
+					$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+				else if ($group_type == 0)
+					$groupArr[count($groupArr) - 1][1]++;
+			}
 		}
 
-		$resStr .= implode(", ", $chargeArr);
+		if ($limit > 0)
+		{
+			$chargeCount = count($chargeArr);
+			$limitCount = min($chargeCount, $limit);
+			$chargeArr = array_slice($chargeArr, -$limitCount);
 
-		return $resStr;
+			$groupCount = count($groupArr);
+
+			$newGroupsCount = 0;
+			$groupLimit = 0;
+			$i = $groupCount - 1;
+			while($i >= 0 && $groupLimit < $limitCount)
+			{
+				$groupLimit += $groupArr[$i][1];
+
+				$newGroupsCount++;
+				$i--;
+			}
+
+			$groupArr = array_slice($groupArr, -$newGroupsCount);
+		}
+
+		return array($chargeArr, $groupArr);
 	}
 
 
+	// Return markup for transaction type menu
+	function showSubMenu($cmp_val, $menuArr)
+	{
+		if (!is_array($menuArr))
+			return;
+
+		html_op("<div id=\"trtype_menu\" class=\"subHeader\">");
+			forEach($menuArr as $menuItem)
+			{
+				if (!is_array($menuItem))
+					break;
+
+				$resStr = "<span>";
+				if ($menuItem[0] == $cmp_val)
+					$resStr .= "<b>".$menuItem[1]."</b>";
+				else
+					$resStr .= "<a href=\"".$menuItem[2]."\">".$menuItem[1]."</a>";
+				$resStr .= "</span>";
+				html($resStr);
+			}
+		html_cl("</div>");
+	}
+
+
+	// Check session and start if it is not started yet
+	function sessionStart()
+	{
+		if (session_id())
+			return;
+
+		session_start();
+	}
+
+
+	// Prepare matches callback for preg_replace_callback
+	function prepareUTF8($matches)
+	{
+		return json_decode('"'.$matches[1].'"');
+	}
+
+
+	// Fixed json_encode function
+	function f_json_encode($obj)
+	{
+		return preg_replace_callback('/((\\\u[01-9a-fA-F]{4})+)/', 'prepareUTF8', json_encode($obj));
+	}
 ?>

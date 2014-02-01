@@ -8,30 +8,27 @@
 
 	function fail($acc_id)
 	{
-		setLocation("../checkbalance.php?id=".$acc_id."&pos=fail");
+		echo("fail");
+		exit();
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
-		setLocation("../login.php");
+	$user_id = User::check();
+	if (!$user_id)
+		echo("fail");
 
-	if (!isset($_POST["trans_id"]) || !is_numeric($_POST["trans_id"]) ||
-		!isset($_POST["trans_pos"]) || !is_numeric($_POST["trans_pos"]) ||
-		!isset($_POST["trans_acc"]) || !is_numeric($_POST["trans_acc"]))
+	if (!isset($_GET["id"]) || !is_numeric($_GET["id"]) ||
+		!isset($_GET["pos"]) || !is_numeric($_GET["pos"]))
 		fail();
 
-	$tr_id = intval($_POST["trans_id"]);
-	$to_pos = intval($_POST["trans_pos"]);
-	$acc_id = intval($_POST["trans_acc"]);
-	if ($acc_id == 0)
-		$acc_id = "all";
+	$tr_id = intval($_GET["id"]);
+	$to_pos = intval($_GET["pos"]);
 	if (!$tr_id || !$to_pos)
-		fail($acc_id);
+		fail();
 
-	$trans = new Transaction($userid);
+	$trans = new Transaction($user_id);
 	if (!$trans->updatePos($tr_id, $to_pos))
-		fail($acc_id);
+		fail();
 
-	setLocation("../checkbalance.php?id=".$acc_id."&pos=ok");
+	echo("ok");
 ?>

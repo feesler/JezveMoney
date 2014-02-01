@@ -1,0 +1,98 @@
+/* layered layout */
+.page
+{
+	position: absolute;
+	top: 50px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+
+.cont
+{
+	position: relative;
+	top: 50%;
+}
+
+
+.box
+{
+	max-width: 400px;
+	min-width: 130px;
+	margin: 0 auto;
+	padding: 0px 12px;
+}
+
+
+/* login page */
+.login_page
+{
+	min-height: 264px;
+}
+
+
+.login_page > .cont
+{
+	margin-top: -132px;	
+}
+
+
+.login_page > .cont > .box
+{
+	height: 264px;
+}
+
+
+.login_controls
+{
+	padding: 5px 0px;
+}
+
+
+/* registration page */
+.register_page
+{
+	min-height: 335px;
+}
+
+
+.register_page > .cont
+{
+	margin-top: -168px;
+}
+
+
+.register_page > .cont > .box
+{
+	height: 335px;
+}
+
+
+/* alternative link */
+.alter_link
+{
+	margin: 0px 20px;
+}
+
+
+/* profile */
+.profile_summary > div
+{
+	margin: 10px 0px 20px 0px;
+}
+
+
+.profile_summary > div > h2
+{
+	font-size: 18px;
+	font-weight: normal;
+	margin: 0px;
+}
+
+
+.profile_summary > div > span
+{
+	font-size: 16px;
+}
+

@@ -1,201 +1,150 @@
-<?php
+﻿<?php
 	require_once("./setup.php");
 	require_once("./class/user.php");
 	require_once("./class/person.php");
-	require_once("./class/currency.php");
-	require_once("./class/account.php");
 
-
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("./login.php");
 
-	$person_name = "";
-	$owner_id = User::getOwner($userid);
+	$action = "";
+	if (isset($_GET["act"]))
+	{
+		if ($_GET["act"] == "changepassword" || $_GET["act"] == "changename")
+			$action = $_GET["act"];
+		else
+			setLocation("./profile.php");
+	}
 
-	$person = new Person($userid);
+	$user_name = User::getName($user_id);
+
+	$person_name = "";
+	$owner_id = User::getOwner($user_id);
+
+	$person = new Person($user_id);
 
 	$person_name = $person->getName($owner_id);
 
-	$titleString = "jezve Money - Profile";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<title><?php echo($titleString); ?></title>
-<?php
-	getStyle($sitetheme);
-	echo(getJS("common.js"));
-?>
-<script>
-<?php
+	$titleString = "Jezve Money | Profile";
+	if ($action == "changename")
+		$titleString .= " | Change name";
+	else if ($action == "changepassword")
+		$titleString .= " | Change password";
+
+	html("<!DOCTYPE html>");
+	html("<html>");
+	html("<head>");
+
+	html(getCommonHeaders());
+
+	html("<title>".$titleString."</title>");
+	html(getCSS("common.css"));
+	html(getCSS("popup.css"));
+	html(getCSS("login.css"));
+	html(getCSS("iconlink.css"));
+	html(getJS("common.js"));
+	html(getJS("ready.js"));
+	html(getJS("popup.js"));
+	html(getJS("main.js"));
+
+	html("<script>");
 	html("var p_name = ".json_encode($person_name).";");
+	if (isMessageSet())
+		html("onReady(initMessage);");
+	html("</script>");
+
+	html("</head>");
+	html("<body>");
+
+	require_once("./templates/header.php");
+
+	html_op("<div class=\"content\">");
+		html_op("<div class=\"content_wrap profile_summary\">");
+			html("<h1>User profile</h1>");
+			html_op("<div>");
+				html("<h2>Account name</h2>");
+				html("<span>".$user_name."</span>");
+			html_cl("</div>");
+
+			html();
+			html_op("<div>");
+				html("<h2>User name</h2>");
+				html("<span>".$person_name."</span>");
+
+			if ($action != "changename")
+			{
+				html("<div><a href=\"./profile.php?act=changename\">Change</a></div>");
+			}
+
+			html_cl("</div>");
+
+			if ($action != "changepassword")
+			{
+				html();
+				html_op("<div>");
+					html("<h2>Security</h2>");
+					html("<div><a href=\"./profile.php?act=changepassword\">Change password</a></div>");
+				html_cl("</div>");
+			}
+
+			html();
+			html_op("<div>");
+				html("<h2>Reset data</h2>");
+				html_op("<div>");
+					html("<span>You also may reset all your accounts data.<br>");
+					html("<form id=\"resetacc_form\" method=\"post\" action=\"./modules/resetaccounts.php\">");
+					html("</form>");
+					html("<input class=\"btn ok_btn\" type=\"button\" onclick=\"showResetAccountsPopup();\" value=\"Reset\"></span>");
+				html_cl("</div>");
+				html_op("<div style=\"margin-top: 15px;\">");
+					html("<span>You may also reset all your data and start from the scratch.<br>");
+					html("<form id=\"resetall_form\" method=\"post\" action=\"./modules/resetall.php\">");
+					html("</form>");
+					html("<input class=\"btn ok_btn\" type=\"button\" onclick=\"showResetAllPopup();\" value=\"Reset all\"></span>");
+				html_cl("</div>");
+			html_cl("</div>");
+
+		html_cl("</div>");
+
+	if ($action == "changepassword")
+	{
+		html("<form method=\"post\" action=\"./modules/changepassword.php\" onsubmit=\"return onChangePassSubmit(this);\">");
+		html_op("<div class=\"content_wrap\">");
+			html("<h2>Change password</h2>");
+			html_op("<div>");
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"oldpwd\">Current password</label>");
+					html("<div class=\"stretch_input std_input\"><div><input id=\"oldpwd\" name=\"oldpwd\" type=\"password\"></div></div>");
+				html_cl("</div>");
+
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"newpwd\">New password</label>");
+					html("<div class=\"stretch_input std_input\"><div><input id=\"newpwd\" name=\"newpwd\" type=\"password\"></div></div>");
+				html_cl("</div>");
+
+				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
+			html_cl("</div>");
+		html_cl("</div>");
+		html("</form>");
+	}
+	else if ($action == "changename")
+	{
+		html("<form method=\"post\" action=\"./modules/changename.php\" onsubmit=\"return onChangeNameSubmit(this);\">");
+		html_op("<div class=\"content_wrap\">");
+			html("<h2>Change name</h2>");
+			html_op("<div>");
+				html_op("<div class=\"non_float\">");
+					html("<label for=\"newpwd\">New name</label>");
+					html("<div class=\"stretch_input std_input\"><div><input id=\"newname\" name=\"newname\" type=\"text\"></div></div>");
+				html_cl("</div>");
+
+				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
+			html_cl("</div>");
+		html_cl("</div>");
+		html("</form>");
+	}
+
+	html_cl("</div>");
+	html("</body>");
+	html("</html>");
 ?>
-var submitStarted = false;
-
-
-// Change password submit event handler
-function onSubmit(frm)
-{
-	var oldpwd, newpwd, submitbtn;
-
-	if (submitStarted)
-		return false;
-
-	oldpwd = ge('oldpwd');
-	newpwd = ge('newpwd');
-	submitbtn = ge('submitbtn');
-	if (!frm || !oldpwd || !newpwd || !submitbtn)
-		return false;
-
-	if (!oldpwd.value || oldpwd.value.length < 1)
-	{
-		alert('Please type your current password.');
-		return false;
-	}
-
-	if (!newpwd.value || newpwd.value.length < 1)
-	{
-		alert('Please type new password.');
-		return false;
-	}
-
-	if (newpwd.value == oldpwd.value)
-	{
-		alert('New password must be different from the old.');
-		return false;
-	}
-
-	submitStarted = true;
-	enable(submitbtn, false);
-
-	return true;
-}
-
-
-// Change name form submit event handler
-function onNameSubmit(frm)
-{
-	var newname, submitbtn;
-
-	if (submitStarted)
-		return false;
-
-	newname = ge('newname');
-	submitbtn = ge('submitbtn');
-	if (!frm || !newname || !submitbtn)
-		return false;
-
-	if (!newname.value || newname.value.length < 1)
-	{
-		alert('Please type new name.');
-		return false;
-	}
-
-	if (newname.value == p_name)
-	{
-		alert('New name must be different from the old.');
-		return false;
-	}
-
-	submitStarted = true;
-	enable(submitbtn, false);
-
-	return true;
-}
-</script>
-</head>
-<body>
-<table class="maintable">
-	<tr><td><h1 class="maintitle"><?php echo($titleString); ?></h1></td></tr>
-<?php
-	require_once("./templates/userblock.php");
-	require_once("./templates/mainmenu.php");
-
-	if (isset($_GET["pwd"]))
-	{
-		if ($_GET["pwd"] == "fail")
-			echo("<tr><td><span style=\"color: #FF0000;\">Fail to change password</span></td></tr>");
-		else if ($_GET["pwd"] == "ok")
-			echo("<tr><td><span style=\"color: #00FF00;\">Password was successfully changed</span></td></tr>");
-	}
-	else if (isset($_GET["name"]))
-	{
-		if ($_GET["name"] == "fail")
-			echo("<tr><td><span style=\"color: #FF0000;\">Fail to change name</span></td></tr>");
-		else if ($_GET["name"] == "ok")
-			echo("<tr><td><span style=\"color: #00FF00;\">Name was successfully changed</span></td></tr>");
-	}
-	else if (isset($_GET["resetall"]))
-	{
-		if ($_GET["resetall"] == "fail")
-			echo("<tr><td><span style=\"color: #FF0000;\">Fail to reset all the data</span></td></tr>");
-		else if ($_GET["resetall"] == "ok")
-			echo("<tr><td><span style=\"color: #00FF00;\">Data successfully resetted</span></td></tr>");
-	}
-?>
-	<tr>
-	<td class="submenu"><span><b>Change password</b></span></td>
-	</tr>
-
-	<tr>
-	<td>
-	<form method="post" action="./modules/changepassword.php" onsubmit="return onSubmit(this);">
-	<table>
-		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">Old password</span></td>
-		<td><input id="oldpwd" name="oldpwd" type="password"></td>
-		</tr>
-
-		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">New password</span></td>
-		<td><input id="newpwd" name="newpwd" type="password"></td>
-		</tr>
-
-		<tr>
-		<td></td>
-		<td><input id="submitbtn" type="submit" value="ok"></td>
-		</tr>
-	</table>
-	</form>
-	</td>
-	</tr>
-
-	<tr>
-	<td class="submenu"><span><b>Change name</b></span></td>
-	</tr>
-
-	<tr>
-	<td>
-	<form method="post" action="./modules/changename.php" onsubmit="return onNameSubmit(this);">
-	<table>
-		<tr>
-		<td style="text-align: right;"><span style="margin-right: 5px;">New name</span></td>
-		<td><input id="newname" name="newname" type="text"></td>
-		</tr>
-
-		<tr>
-		<td></td>
-		<td><input id="submitbtn" type="submit" value="ok"></td>
-		</tr>
-	</table>
-	</form>
-	</td>
-	</tr>
-
-	<tr>
-	<td class="submenu"><span><b>Reset all data</b></span></td>
-	</tr>
-
-	<tr>
-	<td>
-	<table>
-		<tr>
-		<td>To reset all data click <a href="./resetall.php">here</a></td>
-		</tr>
-	</table>
-	</td>
-	</tr>
-</table>
-</body>
-</html>

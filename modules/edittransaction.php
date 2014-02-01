@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../transactions.php?edit=fail");
+		setMessage(ERR_TRANS_UPDATE);
+		setLocation("../transactions.php");
 	}
 
 
@@ -18,8 +19,8 @@
 
 	$trans_id = intval($_POST["transid"]);
 	$trans_type = intval($_POST["transtype"]);
-	$src_id = intval($_POST["srcid"]);
-	$dest_id = intval($_POST["destid"]);
+	$src_id = intval($_POST["src_id"]);
+	$dest_id = intval($_POST["dest_id"]);
 	$amount = floatval($_POST["amount"]);
 	$charge = floatval($_POST["charge"]);
 	$transcurr = intval($_POST["transcurr"]);
@@ -36,5 +37,6 @@
 	if (is_null($ttStr))
 		fail();
 
-	setLocation("../transactions.php?type=".$ttStr."&edit=ok");
+	setMessage(MSG_TRANS_UPDATE);
+	setLocation("../transactions.php?type=".$ttStr);
 ?>

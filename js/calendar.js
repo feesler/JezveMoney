@@ -1,4 +1,4 @@
-var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+﻿var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 var weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 
@@ -22,9 +22,12 @@ function getDaysInMonth(month, year)
 
 
 // Return cell object for specified date
-function getDayCell(date, month, year)
+function getDayCell(date, month, year, callback)
 {
 	var td, btn;
+
+	if (!callback)
+		return null;
 
 	td = ce('td');
 	if (!td)
@@ -32,7 +35,7 @@ function getDayCell(date, month, year)
 
 	btn = ce('button', { type : 'button',
 					innerHTML : date,
-					onclick : bind(onSelectDate, null, date, month, year) });
+					onclick : bind(callback, null, date, month, year) });
 	if (!btn)
 		return null;
 
@@ -58,18 +61,34 @@ function getNextMonth(month, year)
 }
 
 
-function getMonthBtn(month, year, isPrev)
+function getMonthBtn(obj, month, year, callback, isPrev)
 {
 	return ce('button', { className : 'pnMonthBtn',
 					type : 'button',
-					onclick  : bind(createCalendar, null, 1, month, year) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+					onclick  : schedule(bind(updateCalendar, null, obj, month, year, callback)) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
 }
 
 
-function createCalendar(date, month, year)
+function updateCalendar(obj, month, year, callback)
 {
-	var calDiv;
-	var mainTable, thead, tr, td;
+	var calObj;
+
+	if (!obj)
+		return;
+
+	calObj = createCalendar(1, month, year, callback);
+	if (!calObj)
+		return;
+
+	insertAfter(calObj, obj);
+	if (obj.parentNode)
+		obj.parentNode.removeChild(obj);
+}
+
+
+function createCalendar(date, month, year, dayCallback)
+{
+	var mainTable, tbody, tr, td;
 	var i, daysInRow;
 	var daysInWeek = 7;
 	var daysInMonth;
@@ -85,6 +104,10 @@ function createCalendar(date, month, year)
 	var tYear = today.getFullYear();
 	var tDate = today.getDate();
 
+
+	if (!dayCallback)
+		return null;
+
 	// get real date from specified
 	day = new Date(year, month, date);
 	rMonth = day.getMonth();
@@ -99,16 +122,12 @@ function createCalendar(date, month, year)
 	if (dayOfWeek == 0)	// fix first day of week is sunday
 		dayOfWeek = 7;
 
-	calDiv = ge('calendar');
-	if (!calDiv)
-		return;
-
 	mainTable = ce('table', { className : 'calTbl' });
 	if (!mainTable)
 		return;
 
-	thead = ce('thead');
-	if (!thead)
+	tbody = ce('tbody');
+	if (!tbody)
 		return;
 
 	// month name
@@ -124,13 +143,13 @@ function createCalendar(date, month, year)
 
 	var headTbl = ce('table', { className : 'calHeadTbl' },
 							[
-								ce('thead', {},
+								ce('tbody', {},
 										[
 											ce('tr', {},
 													[
-														ce('td', { className : 'pnMonth' }, [ getMonthBtn(prevMonth.month, prevMonth.year, true) ]),
+														ce('td', { className : 'pnMonth' }, [ getMonthBtn(mainTable, prevMonth.month, prevMonth.year, dayCallback, true) ]),
 														ce('td', { className : 'hMonth', innerHTML : months[rMonth] + ' ' + rYear }),
-														ce('td', {}, [ getMonthBtn(nextMonth.month, nextMonth.year, false) ])
+														ce('td', {}, [ getMonthBtn(mainTable, nextMonth.month, nextMonth.year, dayCallback, false) ])
 													])
 										])
 							]);
@@ -138,7 +157,7 @@ function createCalendar(date, month, year)
 	td.appendChild(headTbl);
 
 	tr.appendChild(td);
-	thead.appendChild(tr);
+	tbody.appendChild(tr);
 
 
 	// week days
@@ -148,7 +167,7 @@ function createCalendar(date, month, year)
 	weekdays.forEach(function(wd){
 		tr.appendChild(ce('td', { innerHTML : wd }));
 	});
-	thead.appendChild(tr);
+	tbody.appendChild(tr);
 
 	tr = ce('tr');
 	if (!tr)
@@ -159,7 +178,7 @@ function createCalendar(date, month, year)
 	pMonthDays = getDaysInMonth(prevMonth.month, prevMonth.year);
 	for(i = 1; i < dayOfWeek; i++)
 	{
-		dayCell = getDayCell((pMonthDays - (dayOfWeek - i) + 1), prevMonth.month, prevMonth.year);
+		dayCell = getDayCell((pMonthDays - (dayOfWeek - i) + 1), prevMonth.month, prevMonth.year, dayCallback);
 		if (!dayCell)
 			return;
 		dayCell.className = 'omonth';
@@ -170,7 +189,7 @@ function createCalendar(date, month, year)
 	// days of current month
 	for(i = 1; i < daysInMonth + 1; i++)
 	{
-		dayCell = getDayCell(i, rMonth, rYear);
+		dayCell = getDayCell(i, rMonth, rYear, dayCallback);
 		if (!dayCell)
 			return;
 
@@ -183,7 +202,7 @@ function createCalendar(date, month, year)
 		{
 			if (tr != null)
 			{
-				thead.appendChild(tr);
+				tbody.appendChild(tr);
 				tr = null;
 			}
 
@@ -199,69 +218,31 @@ function createCalendar(date, month, year)
 		// append days of next month
 		for(i = daysInRow; i < daysInWeek; i++)
 		{
-			dayCell = getDayCell(i - daysInRow + 1, nextMonth.month, nextMonth.year);
+			dayCell = getDayCell(i - daysInRow + 1, nextMonth.month, nextMonth.year, dayCallback);
 			if (!dayCell)
 				return;
 			dayCell.className = 'omonth';
 			tr.appendChild(dayCell);
 		}
 
-		thead.appendChild(tr);
+		tbody.appendChild(tr);
 	}
 
-	mainTable.appendChild(thead);
+	mainTable.appendChild(tbody);
 
-	removeChilds(calDiv);
-
-	calDiv.appendChild(mainTable);
-}
-
-
-function buildCalendar()
-{
-	var today = new Date();
-
-	createCalendar(today.getDate(), today.getMonth(), today.getFullYear());
+	return mainTable;
 }
 
 
 // Format date as DD.MM.YYYY
 function formatDate(date, month, year)
 {
-	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year
-}
+	if (isDate(date) && !month && !year)
+	{
+		month = date.getMonth();
+		year = date.getFullYear();
+		date = date.getDate();
+	}
 
-
-// Date select callback
-function onSelectDate(date, month, year)
-{
-	var datefield;
-
-	datefield = ge('date');
-	if (!datefield)
-		return;
-
-	datefield.value = formatDate(date, month, year);
-
-	hideCalendar();
-}
-
-
-// Hide calendar block
-function hideCalendar()
-{
-	show('calendar', false);
-}
-
-
-// Show calendar block
-function showCalendar()
-{
-	var calendar;
-
-	calendar = ge('calendar');
-	if (!calendar)
-		return;
-
-	show(calendar, (calendar.style.display == 'none'));
+	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year;
 }

@@ -8,7 +8,8 @@
 
 	function fail()
 	{
-		setLocation("../accounts.php?del=fail");
+		setMessage(ERR_ACCOUNT_DELETE);
+		setLocation("../accounts.php");
 	}
 
 
@@ -30,5 +31,6 @@
 			fail();
 	}
 
-	setLocation("../accounts.php?del=ok");
+	setMessage(MSG_ACCOUNT_DELETE);
+	setLocation("../accounts.php");
 ?>
