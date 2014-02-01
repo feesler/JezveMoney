@@ -156,6 +156,7 @@ var vLabelsWidth = 10;
 var barMargin = 10;
 var barWidth;
 var chartOffset;
+var chartContentWidth;
 
 
 
@@ -181,7 +182,7 @@ function updateChartWidth()
 		return;
 
 	getChartOffset();
-	paperWidth = Math.max(chartOffset - vLabelsWidth, chartData[0].length * (barWidth + barMargin));
+	paperWidth = Math.max(chartOffset - vLabelsWidth, chartContentWidth);
 
 	r.setSize(paperWidth, paperHeight);
 }
@@ -235,7 +236,8 @@ function initBarChart(fitToWidth, heightSet)
 	else
 		barWidth = 38;
 
-	chartWidth = Math.max(chart.offsetWidth, chartData[0].length * (barWidth + barMargin));
+	chartContentWidth = chartData[0].length * (barWidth + barMargin);
+	chartWidth = Math.max(chart.offsetWidth, chartContentWidth);
 
 	r = Raphael('chart', chartWidth, paperHeight);
 	lr = Raphael('vert_labels', vLabelsWidth, paperHeight + 20);
