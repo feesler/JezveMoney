@@ -24,6 +24,32 @@ function qjoin($glue, $pieces)
 }
 
 
+// Prepare string for fields or tables list of query
+function asJoin($pieces)
+{
+	$fstr = NULL;
+
+	if (is_array($pieces))
+	{
+		$parr = array();
+		foreach($pieces as $pkey => $pval)
+		{
+			if (is_string($pkey))
+				$parr[] = $pkey." AS ".$pval;
+			else
+				$parr[] = $pval;
+		}
+		$fstr = implode(", ", $parr);
+	}
+	else if (is_string($pieces))
+	{
+		$fstr = $pieces;
+	}
+
+	return $fstr;
+}
+
+
 class mysqlDB
 {
 
