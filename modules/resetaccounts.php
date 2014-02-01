@@ -8,7 +8,7 @@
 	function fail()
 	{
 		setMessage(ERR_ACCOUNTS_RESET);
-		setLocation("../resetaccounts.php");
+		setLocation("../profile.php");
 	}
 
 
