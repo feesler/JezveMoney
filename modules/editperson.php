@@ -1,7 +1,5 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
-	require_once("../class/user.php");
-	require_once("../class/person.php");
 
 
 	function fail($msg = ERR_PERSON_UPDATE)

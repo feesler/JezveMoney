@@ -37,4 +37,6 @@
 
 	require_once($docroot.$rootdir."common.php");
 	require_once($docroot.$rootdir."message.php");
+
+	spl_autoload_register("autoLoadClass");
 ?>

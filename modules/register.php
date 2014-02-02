@@ -1,10 +1,5 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
-	require_once($docroot.$rootdir."class/person.php");
-	require_once($docroot.$rootdir."class/user.php");
-	require_once($docroot.$rootdir."class/currency.php");
-	require_once($docroot.$rootdir."class/account.php");
-	require_once("../class/person.php");
 
 
 	function fail()
