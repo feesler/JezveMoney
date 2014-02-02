@@ -8,6 +8,31 @@
 	}
 
 
+	$classes = array("Account" => "class/account.php",
+					"Currency" => "class/currency.php",
+					"Debt" => "class/debt.php",
+					"Currency" => "class/currency.php",
+					"mysqlDB" => "class/mysql.php",
+					"Person" => "class/person.php",
+					"Transaction" => "class/transaction.php",
+					"User" => "class/user.php");
+
+	// Check class name and try to load file
+	function autoLoadClass($className)
+	{
+		global $docroot, $rootdir, $classes;
+
+		foreach($classes as $clName => $clPath)
+		{
+			if ($clName == $className)
+			{
+				require($docroot.$rootdir.$clPath);
+				break;
+			}
+		}
+	}
+
+
 	// Check string is not null and not empty
 	function is_empty($str)
 	{
