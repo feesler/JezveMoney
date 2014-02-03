@@ -123,6 +123,23 @@ class User
 	}
 
 
+	// Check user has admin access
+	public static function isAdmin($id)
+	{
+		global $db;
+
+		$eid = intval($id);
+		if (!$eid)
+			return FALSE;
+
+		$resArr = $db->selectQ("access", "users", "id=".$eid);
+		if (count($resArr) != 1)
+			return FALSE;
+
+		return (($resArr[0]["access"] & 0x1) == 0x1);
+	}
+
+
 	// Return user name
 	public static function getName($id)
 	{
