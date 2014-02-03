@@ -13,7 +13,7 @@
 	html("</head>");
 	html("<body>");
 	html("<b>Admin</b><br>");
-	html("<a href=\"./currency.php\">Currencies</a>");
+	html("<a href=\"./currency.php\">Currencies</a> <a href=\"./query.php\">Queries</a>");
 	html("</body>");
 	html("</html>");
 ?>
