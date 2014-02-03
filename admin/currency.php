@@ -131,7 +131,7 @@ function onDeleteSubmit(frm)
 	html("</script>");
 	html("</head>");
 	html("<body>");
-	html("<a href=\"./admin.php\">Admin</a><br>");
+	html("<a href=\"./index.php\">Admin</a><br>");
 	html("<b>Currencies</b>");
 
 	if (isset($_GET["add"]))
