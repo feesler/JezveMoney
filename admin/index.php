@@ -3,7 +3,7 @@
 
 
 	$user_id = User::check();
-	if (!$user_id || $user_id != 1)
+	if (!$user_id || ($user_id != 1 && $user_id != 2))
 		setLocation("../login.php");
 
 	html("<!DOCTYPE html>");
