@@ -1,9 +1,9 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 
 
 	$user_id = User::check();
-	if (!$user_id || ($user_id != 1 && $user_id != 2))
+	if (!$user_id || !User::isAdmin($user_id))
 		setLocation("../login.php");
 
 	html("<!DOCTYPE html>");
