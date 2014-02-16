@@ -448,7 +448,7 @@ class Account
 	}
 
 
-	// Return Javascript array of accounts
+	// Return array of accounts
 	public function getArray()
 	{
 		if (!$this->checkCache())
@@ -461,7 +461,7 @@ class Account
 			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"], $row["name"], $row["icon"]);
 		}
 
-		return "var accounts = ".json_encode($resArr).";\r\n";
+		return $resArr;
 	}
 
 
