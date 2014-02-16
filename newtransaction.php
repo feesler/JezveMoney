@@ -120,7 +120,7 @@
 	html(getJS("transaction_layout.js"));
 
 	html("<script>");
-	echo($acc->getArray());
+	html("var accounts = ".f_json_encode($acc->getArray()).";");
 	echo(Currency::getArray(TRUE));
 	html("var trans_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");
 	html("var trans_acc_curr = ".(($trans_type == 1) ? $src["curr"] : $dest["curr"]).";");

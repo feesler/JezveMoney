@@ -68,7 +68,7 @@
 
 	html("<script>");
 	pushTab();
-		echo($acc->getArray());
+		html("var accounts = ".f_json_encode($acc->getArray()).";");
 		echo(Currency::getArray(TRUE));
 		html("var transArr = ".json_encode($trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate, TRUE)).";");
 		$acc = new Account($user_id);	// fix cache of accounts

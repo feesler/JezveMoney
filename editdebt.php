@@ -144,7 +144,7 @@
 	html(getJS("transaction_layout.js"));
 
 	html("<script>");
-	echo($acc->getArray());
+	html("var accounts = ".f_json_encode($acc->getArray()).";");
 	echo(Currency::getArray(TRUE));
 
 	$amount_sign = Currency::getSign($tr["curr"]);

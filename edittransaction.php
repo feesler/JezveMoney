@@ -120,7 +120,7 @@
 	html(getJS("transaction_layout.js"));
 
 	html("<script>");
-	echo($acc->getArray());
+	html("var accounts = ".f_json_encode($acc->getArray()).";");
 
 	$transAcc_id = 0;	// main transaction account id
 	$transAccCur = 0;	// currency of transaction account
