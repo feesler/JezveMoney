@@ -858,6 +858,8 @@ class Transaction
 
 		html_op("<div id=\"trlist\" class=\"trans_list\">");
 
+		$acc_id = intval($account_id);
+
 		$acc = new Account(self::$user_id, TRUE);
 		$accounts = $acc->getCount();
 		if (!$accounts)
@@ -874,7 +876,7 @@ class Transaction
 			return;
 		}
 
-		$transArr = $this->getArray($trans_type, $account_id, $isDesc, $tr_on_page, $page_num, $searchStr, $startDate, $endDate, $details);
+		$transArr = $this->getArray($trans_type, $acc_id, $isDesc, $tr_on_page, $page_num, $searchStr, $startDate, $endDate, $details);
 		if (!count($transArr))
 		{
 			html("<span>No transactions found.</span>");
@@ -883,7 +885,7 @@ class Transaction
 			return;
 		}
 
-		$transCount = $this->getTransCount($trans_type, $account_id, $searchStr, $startDate, $endDate);
+		$transCount = $this->getTransCount($trans_type, $acc_id, $searchStr, $startDate, $endDate);
 
 		if ($showPaginator == TRUE)
 		{
