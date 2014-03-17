@@ -448,7 +448,7 @@ class Account
 	}
 
 
-	// Return array of accounts
+	// Return Javascript array of accounts
 	public function getArray()
 	{
 		if (!$this->checkCache())

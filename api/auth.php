@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	require_once("../setup.php");
 
 	class apiResponse
@@ -8,7 +8,7 @@
 
 		public function render()
 		{
-			return json_encode($this)
+			return json_encode($this);
 		}
 	}
 
