@@ -149,10 +149,6 @@ class Person
 		if (!$this->is_exist($p_id))
 			return FALSE;
 
-		// check user of person
-		if ($this->getUser($p_id) != self::$user_id)
-			return FALSE;
-
 		$acc = new Account(self::$user_id, TRUE);
 		if (!$acc->onPersonDelete($p_id))
 		{
@@ -260,8 +256,7 @@ class Person
 		if (!$p_id || !$c_id)
 			return 0;
 
-		// check user of person
-		if ($this->getUser($p_id) != self::$user_id)
+		if (!$this->is_exist($p_id))
 			return FALSE;
 
 		$acc = new Account(self::$user_id);
