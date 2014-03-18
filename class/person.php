@@ -239,7 +239,7 @@ class Person
 		$c_id = intval($curr_id);
 
 		$resArr = $db->selectQ("id", "accounts",
-							"user_id=".$this->user_id." AND owner_id=".$p_id." AND curr_id=".$c_id);
+							"user_id=".self::$user_id." AND owner_id=".$p_id." AND curr_id=".$c_id);
 		if (count($resArr) != 1)
 			return 0;
 
@@ -261,10 +261,10 @@ class Person
 			return 0;
 
 		// check user of person
-		if ($this->getUser($p_id) != $this->user_id)
+		if ($this->getUser($p_id) != self::$user_id)
 			return FALSE;
 
-		$acc = new Account($this->user_id);
+		$acc = new Account(self::$user_id);
 		return $acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id, 0);
 	}
 
@@ -294,7 +294,10 @@ class Person
 	{
 		global $db;
 
-		if (!$db->deleteQ("persons", "user_id=".$this->user_id." AND id<>".$this->owner_id))
+		if (!self::$user_id || !self::$owner_id)
+			return FALSE;
+
+		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id<>".self::$owner_id))
 			return FALSE;
 
 		self::updateCache();
