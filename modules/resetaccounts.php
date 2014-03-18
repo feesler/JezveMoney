@@ -15,7 +15,6 @@
 		setLocation("../login.php");
 
 	$acc = new Account($user_id);
-
 	if (!$acc->reset())
 		fail();
 
