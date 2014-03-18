@@ -139,7 +139,7 @@ class User
 	}
 
 
-	// Check correctness cookies data
+	// Check correctness of cookies data
 	private function checkCookie($login, $passhash)
 	{
 		$salt = $this->getSalt($login);
@@ -217,19 +217,6 @@ class User
 	public function isAdmin($id)
 	{
 		return (($this->getAccess($id) & 0x1) == 0x1);
-/*
-		global $db;
-
-		$eid = intval($id);
-		if (!$eid)
-			return FALSE;
-
-		$resArr = $db->selectQ("access", "users", "id=".$eid);
-		if (count($resArr) != 1)
-			return FALSE;
-
-		return (($resArr[0]["access"] & 0x1) == 0x1);
-*/
 	}
 
 
@@ -237,17 +224,6 @@ class User
 	public function getName($id)
 	{
 		return $this->getCache($id, "name");
-/*
-		global $db;
-
-		$eid = intval($id);
-		if (!$eid)
-			return NULL;
-
-		$resArr = $db->selectQ("login", "users", "id=".$eid);
-
-		return ((count($resArr) == 1) ? $resArr[0]["login"] : NULL);
-*/
 	}
 
 
@@ -264,17 +240,6 @@ class User
 		}
 
 		return 0;
-/*
-		global $db;
-
-		$elogin = $db->escape($login);
-		if (!$elogin)
-			return 0;
-
-		$resArr = $db->selectQ("id", "users", "login=".qnull($elogin));
-
-		return ((count($resArr) == 1) ? intval($resArr[0]["id"]) : 0);
-*/
 	}
 
 
@@ -296,22 +261,6 @@ class User
 	public function getOwner($user_id)
 	{
 		return $this->getCache($user_id, "owner_id");
-/*
-		global $db;
-
-		if (!is_numeric($user_id))
-			return 0;
-
-		$u_id = intval($user_id);
-		if (!$u_id)
-			return 0;
-
-		$resArr = $db->selectQ("owner_id", "users", "id=".qnull($u_id));
-		if (count($resArr) == 1)
-			return intval($resArr[0]["owner_id"]);
-		else
-			return 0;
-*/
 	}
 
 
@@ -337,17 +286,6 @@ class User
 		$u_id = $this->getId($login);
 
 		return $this->getCache($u_id, "passhash");
-/*
-		global $db;
-
-		$elogin = $db->escape($login);
-
-		$resArr = $db->selectQ("passhash", "users", "login=".qnull($elogin));
-		if (count($resArr) == 1)
-			return $resArr[0]["passhash"];
-		else
-			return NULL;
-*/
 	}
 
 
@@ -385,13 +323,10 @@ class User
 	// Loggin in user
 	public function login($login, $password)
 	{
-		global $db;
-
 		if (!$login || $login == "" || !$password || $password == "")
 			return FALSE;
 
-		$elogin = $db->escape($login);
-		if (!$this->checkLoginData($elogin, $password))
+		if (!$this->checkLoginData($login, $password))
 			return FALSE;
 
 		session_start();
