@@ -10,8 +10,6 @@ class Person
 	// Class constructor
 	public function __construct($user_id)
 	{
-		global $db;
-
 		self::$user_id = intval($user_id);
 		// find owner person
 		self::$owner_id = User::getOwner(self::$user_id);
@@ -46,7 +44,7 @@ class Person
 	}
 
 
-	// Return value of specified account from cache
+	// Return value of specified person from cache
 	private function getCache($p_id, $val)
 	{
 		$p_id = intval($p_id);
@@ -246,8 +244,6 @@ class Person
 	// Create account of specified currency for person
 	public function createAccount($person_id, $curr_id)
 	{
-		global $db;
-
 		if (!is_numeric($person_id) || !is_numeric($curr_id))
 			return 0;
 
@@ -270,11 +266,9 @@ class Person
 		if (!$this->checkCache())
 			return 0;
 
-		$e_name = $db->escape($p_name);
-
 		foreach(self::$cache as $p_id => $row)
 		{
-			if ($p_id != self::$owner_id && $row["name"] == $e_name)
+			if ($p_id != self::$owner_id && $row["name"] == $p_name)
 			{
 				return $row["name"];
 			}
