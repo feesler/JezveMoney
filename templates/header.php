@@ -5,7 +5,7 @@
 
 	if ($user_id != 0)
 	{
-		$owner_id = User::getOwner($user_id);
+		$owner_id = $u->getOwner($user_id);
 		$pers = new Person($user_id);
 		$owner_name = $pers->getName($owner_id);
 

@@ -9,7 +9,8 @@
 	}
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if (!$user_id)
 		setLocation("../login.php");
 
@@ -20,7 +21,7 @@
 	if (is_null($new_name) || $new_name == "")
 		fail();
 
-	$owner_id = User::getOwner($user_id);
+	$owner_id = $u->getOwner($user_id);
 	$person = new Person($user_id);
 	$old_name = $person->getName($owner_id);
 

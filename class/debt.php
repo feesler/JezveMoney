@@ -13,11 +13,15 @@ Class Debt
 
 		$this->user_id = intval($user_id);
 
+		$u = new User();
+		$this->owner_id = $u->getOwner($this->user_id);
+/*
 		$resArr = $db->selectQ("owner_id", "users", "id=".$this->user_id);
 		if (count($resArr) == 1)
 		{
 			$this->owner_id = intval($resArr[0]["owner_id"]);
 		}
+*/
 	}
 
 

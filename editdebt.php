@@ -72,7 +72,8 @@
 	}
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if (!$user_id)
 		setLocation("./login.php");
 
@@ -95,7 +96,7 @@
 	$src = getAccountProperties($tr["src_id"]);
 	$dest = getAccountProperties($tr["dest_id"]);
 
-	$user_owner = User::getOwner($user_id);
+	$user_owner = $u->getOwner($user_id);
 	$give = ($src["owner"] != $user_owner);
 
 	$person_id = ($give) ? $src["owner"] : $dest["owner"];

@@ -108,6 +108,7 @@ class Transaction
 			return FALSE;
 
 		$acc = new Account(self::$user_id, TRUE);
+		$u = new User();
 
 		if ($src_id != 0)
 		{
@@ -122,7 +123,7 @@ class Transaction
 			if (!$acc->is_exist($dest_id))
 				return FALSE;
 			$destBalance = $acc->getBalance($dest_id);
-			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
 				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
@@ -150,7 +151,7 @@ class Transaction
 		// update balance of source account
 		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
 		{
-			if ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id)))		// person give to us
+			if ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id)))		// person give to us
 				$srcBalance -= $amount;
 			else
 				$srcBalance -= $charge;
@@ -161,7 +162,7 @@ class Transaction
 		// update balance of destination account
 		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)
 		{
-			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id))))		// income or person give to us
+			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id))))		// income or person give to us
 				$destBalance += $charge;
 			else
 				$destBalance += $amount;
@@ -207,6 +208,7 @@ class Transaction
 			return FALSE;
 
 		$acc = new Account(self::$user_id, TRUE);
+		$u = new User();
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -227,7 +229,7 @@ class Transaction
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
-			if ($transType == 3 || ($transType == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+			if ($transType == 3 || ($transType == 4 && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
 				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
@@ -237,7 +239,7 @@ class Transaction
 		// update balance of source account
 		if ($transType == 1 || $transType == 3 || $transType == 4)		// spend, transfer or debt
 		{
-			if ($transType == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id)))		// person give to us
+			if ($transType == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id)))		// person give to us
 				$srcBalance += $transAmount;
 			else
 				$srcBalance += $transCharge;
@@ -249,7 +251,7 @@ class Transaction
 		// update balance of destination account
 		if ($transType == 2 || $transType == 3 || $transType == 4)		// income, transfer or debt
 		{
-			if (($transType == 2) || ($transType == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id))))		// income or person give to us
+			if (($transType == 2) || ($transType == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id))))		// income or person give to us
 				$destBalance -= $transCharge;
 			else
 				$destBalance -= $transAmount;
@@ -277,6 +279,7 @@ class Transaction
 			return FALSE;
 
 		$acc = new Account(self::$user_id, TRUE);
+		$u = new User();
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -297,7 +300,7 @@ class Transaction
 				return FALSE;
 
 			$destBalance = $acc->getBalance($dest_id);
-			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != User::getOwner(self::$user_id)))
+			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
 				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
@@ -329,7 +332,7 @@ class Transaction
 		// update balance of source account
 		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)				// spend, transfer or debt
 		{
-			if ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id)))		// person give to us
+			if ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id)))		// person give to us
 				$srcBalance -= $amount;
 			else
 				$srcBalance -= $charge;
@@ -341,7 +344,7 @@ class Transaction
 		// update balance of destination account
 		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)		// income, transfer or debt
 		{
-			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != User::getOwner(self::$user_id))))		// income or person give to us
+			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id))))		// income or person give to us
 				$destBalance += $charge;
 			else
 				$destBalance += $amount;
@@ -516,7 +519,8 @@ class Transaction
 		if (!self::$user_id)
 			return $res;
 
-		$owner_id = User::getOwner(self::$user_id);
+		$u = new User();
+		$owner_id = $u->getOwner(self::$user_id);
 		if (!$owner_id)
 			return $res;
 
@@ -761,6 +765,7 @@ class Transaction
 			return NULL;
 
 		$acc = new Account(self::$user_id, TRUE);
+		$u = new User();
 
 		$balArr = array($src_id => 0, $dest_id => 0);
 		$balArr[$src_id] = ($src_id != 0) ? $acc->getInitBalance($src_id) : 0;
@@ -806,7 +811,7 @@ class Transaction
 				}
 				else if ($tr_type == 4)			// debt
 				{
-					if ($acc->getOwner($acc_id) != User::getOwner(self::$user_id))		// person give to us
+					if ($acc->getOwner($acc_id) != $u->getOwner(self::$user_id))		// person give to us
 						$balArr[$acc_id] = round($balArr[$acc_id] - $tr_amount, 2);
 					else
 						$balArr[$acc_id] = round($balArr[$acc_id] - $tr_charge, 2);
@@ -827,7 +832,7 @@ class Transaction
 				}
 				else if ($tr_type == 4)			// debt
 				{
-					if ($acc->getOwner($acc_id) != User::getOwner(self::$user_id))		// person give to us
+					if ($acc->getOwner($acc_id) != $u->getOwner(self::$user_id))		// person give to us
 						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_charge, 2);
 					else
 						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_amount, 2);
@@ -850,7 +855,8 @@ class Transaction
 		if (!self::$user_id)
 			return $resStr;
 
-		$owner_id = User::getOwner(self::$user_id);
+		$u = new User();
+		$owner_id = $u->getOwner(self::$user_id);
 		if (!$owner_id)
 			return $resStr;
 

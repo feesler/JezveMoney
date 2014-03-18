@@ -9,14 +9,15 @@
 	}
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if ($user_id != 0)
 		setLocation("../index.php");
 
 	if (!isset($_POST["login"]) || !isset($_POST["password"]))
 		fail();
 
-	if (!User::login($_POST["login"], $_POST["password"]))
+	if (!$u->login($_POST["login"], $_POST["password"]))
 		fail();
 
 	setMessage(MSG_LOGIN);

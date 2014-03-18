@@ -9,7 +9,8 @@
 	}
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if (!$user_id)
 		setLocation("../login.php");
 
@@ -17,7 +18,7 @@
 		fail();
 
 	$acc = new Account($user_id);
-	$owner_id = User::getOwner($user_id);
+	$owner_id = $u->getOwner($user_id);
 	if (!$acc->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
 		fail();
 

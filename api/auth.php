@@ -35,15 +35,15 @@
 	}
 
 
-
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if ($user_id != 0)
 		ok();
 
 	if (!isset($_GET["login"]) || !isset($_GET["pwd"]))
 		fail();
 
-	if (!User::login($_GET["login"], $_GET["pwd"]))
+	if (!$u->login($_GET["login"], $_GET["pwd"]))
 		fail();
 
 	ok();

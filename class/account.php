@@ -27,7 +27,8 @@ class Account
 		self::$cache = array();
 
 		// find owner person
-		self::$owner_id = User::getOwner(self::$user_id);
+		$u = new User();
+		self::$owner_id = $u->getOwner(self::$user_id);
 
 		$condition = "user_id=".self::$user_id;
 		if (!self::$full_list && self::$owner_id != 0)

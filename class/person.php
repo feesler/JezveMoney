@@ -12,7 +12,8 @@ class Person
 	{
 		self::$user_id = intval($user_id);
 		// find owner person
-		self::$owner_id = User::getOwner(self::$user_id);
+		$u = new User();
+		self::$owner_id = $u->getOwner(self::$user_id);
 	}
 
 

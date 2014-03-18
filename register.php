@@ -2,7 +2,8 @@
 	require_once("./setup.php");
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if ($user_id != 0)
 		setLocation("./index.php");
 

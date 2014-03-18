@@ -2,7 +2,8 @@
 	require_once("./setup.php");
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if (!$user_id)
 		setLocation("./login.php");
 
@@ -15,10 +16,10 @@
 			setLocation("./profile.php");
 	}
 
-	$user_name = User::getName($user_id);
+	$user_name = $u->getName($user_id);
 
 	$person_name = "";
-	$owner_id = User::getOwner($user_id);
+	$owner_id = $u->getOwner($user_id);
 
 	$person = new Person($user_id);
 

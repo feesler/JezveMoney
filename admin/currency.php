@@ -2,8 +2,9 @@
 	require_once("../setup.php");
 
 
-	$user_id = User::check();
-	if (!$user_id || !User::isAdmin($user_id))
+	$u = new User();
+	$user_id = $u->check();
+	if (!$user_id || !$u->isAdmin($user_id))
 		setLocation("../login.php");
 
 	html("<!DOCTYPE html>");

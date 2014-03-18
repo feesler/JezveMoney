@@ -71,7 +71,8 @@
 	}
 
 
-	$user_id = User::check();
+	$u = new User();
+	$user_id = $u->check();
 	if (!$user_id)
 		setLocation("./login.php");
 

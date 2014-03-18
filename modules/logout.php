@@ -2,7 +2,8 @@
 	require_once("../setup.php");
 
 
-	User::logout();
+	$u = new User();
+	$u->logout();
 
 	setLocation("../login.php");
 
