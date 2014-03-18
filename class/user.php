@@ -2,8 +2,14 @@
 
 class User
 {
+	// Class constructor
+	public function __construct()
+	{
+	}
+
+
 	// Return salt for specified string
-	private static function getSalt($str)
+	private function getSalt($str)
 	{
 		$bfPrefix = "\$2a\$10\$";
 
@@ -12,14 +18,14 @@ class User
 
 
 	// Return hash for specified string and salt
-	private static function getHash($str, $salt)
+	private function getHash($str, $salt)
 	{
 		return substr(crypt($str, $salt), 28);
 	}
 
 
 	// Check correctness of hash
-	private static function checkHash($str, $salt, $hash)
+	private function checkHash($str, $salt, $hash)
 	{
 		$full_hash = $salt.$hash;
 
@@ -28,46 +34,46 @@ class User
 
 
 	// Create pre hash
-	private static function createPreHash($login, $password)
+	private function createPreHash($login, $password)
 	{
-		$salt = self::getSalt($login);
-		return self::getHash($password, $salt);
+		$salt = $this->getSalt($login);
+		return $this->getHash($password, $salt);
 	}
 
 
 	// Create hash for user
-	private static function createHash($login, $password)
+	private function createHash($login, $password)
 	{
-		$salt = self::getSalt($login);
-		$hashed = self::getHash($password, $salt);
+		$salt = $this->getSalt($login);
+		$hashed = $this->getHash($password, $salt);
 
-		return self::getHash($hashed, $salt);
+		return $this->getHash($hashed, $salt);
 	}
 
 
 	// Check correctness login/password data
-	private static function checkLoginData($login, $password)
+	private function checkLoginData($login, $password)
 	{
-		$salt = self::getSalt($login);
-		$hashed = self::getHash($password, $salt);
-		$passHash = self::getPassHash($login);
+		$salt = $this->getSalt($login);
+		$hashed = $this->getHash($password, $salt);
+		$passHash = $this->getPassHash($login);
 
-		return self::checkHash($hashed, $salt, $passHash);
+		return $this->checkHash($hashed, $salt, $passHash);
 	}
 
 
 	// Check correctness cookies data
-	private static function checkCookie($login, $passhash)
+	private function checkCookie($login, $passhash)
 	{
-		$salt = self::getSalt($login);
-		$userHash = self::getPassHash($login);
+		$salt = $this->getSalt($login);
+		$userHash = $this->getPassHash($login);
 
-		return self::checkHash($passhash, $salt, $userHash);
+		return $this->checkHash($passhash, $salt, $userHash);
 	}
 
 
 	// Setup cookies
-	private static function setupCookies($login, $passhash)
+	private function setupCookies($login, $passhash)
 	{
 		$expTime = time() + 31536000;	// year after now
 		$path = "/money/";
@@ -79,7 +85,7 @@ class User
 
 
 	// Delete cookies
-	private static function deleteCookies()
+	private function deleteCookies()
 	{
 		$expTime = time() - 3600;	// hour before now
 		$path = "/money/";
@@ -91,7 +97,7 @@ class User
 
 
 	// Check is user logged in and return id
-	public static function check()
+	public function check()
 	{
 		session_start();
 
@@ -108,23 +114,23 @@ class User
 		$loginCook = $_COOKIE["login"];
 		$passCook = $_COOKIE["passhash"];
 
-		if (!self::checkCookie($loginCook, $passCook))
+		if (!$this->checkCookie($loginCook, $passCook))
 		{
-			self::deleteCookies();
+			$this->deleteCookies();
 			return 0;
 		}
 
-		$user_id = self::getId($loginCook);
+		$user_id = $this->getId($loginCook);
 		$_SESSION["userid"] = $user_id;
 
-		self::setupCookies($loginCook, $passCook);
+		$this->setupCookies($loginCook, $passCook);
 
 		return $user_id;
 	}
 
 
 	// Check user has admin access
-	public static function isAdmin($id)
+	public function isAdmin($id)
 	{
 		global $db;
 
@@ -141,7 +147,7 @@ class User
 
 
 	// Return user name
-	public static function getName($id)
+	public function getName($id)
 	{
 		global $db;
 
@@ -156,7 +162,7 @@ class User
 
 
 	// Return user id by specified login
-	public static function getId($login)
+	public function getId($login)
 	{
 		global $db;
 
@@ -171,7 +177,7 @@ class User
 
 
 	// Set owner person for specified user
-	public static function setOwner($user_id, $owner_id)
+	public function setOwner($user_id, $owner_id)
 	{
 		global $db;
 
@@ -185,7 +191,7 @@ class User
 
 
 	// Return owner person of specified user
-	public static function getOwner($user_id)
+	public function getOwner($user_id)
 	{
 		global $db;
 
@@ -205,7 +211,7 @@ class User
 
 
 	// Set password hash for specified user
-	public static function setPassHash($login, $passhash)
+	public function setPassHash($login, $passhash)
 	{
 		global $db;
 
@@ -216,7 +222,7 @@ class User
 
 
 	// Return password hash for specified user
-	public static function getPassHash($login)
+	public function getPassHash($login)
 	{
 		global $db;
 
@@ -231,7 +237,7 @@ class User
 
 
 	// Register new user
-	public static function register($login, $password, $p_name)
+	public function register($login, $password, $p_name)
 	{
 		global $db;
 
@@ -239,10 +245,10 @@ class User
 			return FALSE;
 
 		// check user exist
-		if (self::getId($login) != 0)
+		if ($this->getId($login) != 0)
 			return FALSE;
 
-		$passhash = self::createHash($login, $password);
+		$passhash = $this->createHash($login, $password);
 		$elogin = $db->escape($login);
 
 		if (!$db->insertQ("users", array("id", "login", "passhash"), array(NULL, $elogin, $passhash)))
@@ -253,14 +259,14 @@ class User
 		$p = new Person($user_id);
 		$p_id = $p->create($p_name);
 
-		self::setOwner($user_id, $p_id);
+		$this->setOwner($user_id, $p_id);
 
 		return TRUE;
 	}
 
 
 	// Loggin in user
-	public static function login($login, $password)
+	public function login($login, $password)
 	{
 		global $db;
 
@@ -268,58 +274,58 @@ class User
 			return FALSE;
 
 		$elogin = $db->escape($login);
-		if (!self::checkLoginData($elogin, $password))
+		if (!$this->checkLoginData($elogin, $password))
 			return FALSE;
 
 		session_start();
-		$_SESSION["userid"] = self::getId($login);
+		$_SESSION["userid"] = $this->getId($login);
 
-		$preHash = self::createPreHash($login, $password);
+		$preHash = $this->createPreHash($login, $password);
 
-		self::setupCookies($login, $preHash);
+		$this->setupCookies($login, $preHash);
 
 		return TRUE;
 	}
 
 
 	// Loggin out user
-	public static function logout()
+	public function logout()
 	{
 		session_start();
 		session_unset();
 		session_destroy();
 
-		self::deleteCookies();
+		$this->deleteCookies();
 	}
 
 
 	// Change user password
-	public static function changePassword($login, $oldpass, $newpass)
+	public function changePassword($login, $oldpass, $newpass)
 	{
 		if (!$login || !$oldpass || !$newpass)
 			return FALSE;
 
-		if (!self::checkLoginData($login, $oldpass))
+		if (!$this->checkLoginData($login, $oldpass))
 			return FALSE;
 
-		return self::setPassword($login, $newpass);
+		return $this->setPassword($login, $newpass);
 	}
 
 
 	// Set up new password for user
-	public static function setPassword($login, $newpass)
+	public function setPassword($login, $newpass)
 	{
 		if (!$login || !$newpass)
 			return FALSE;
 
-		$user_id = self::getId($login);
+		$user_id = $this->getId($login);
 
-		$passhash = self::createHash($login, $newpass);
-		if (!self::setPassHash($login, $passhash))
+		$passhash = $this->createHash($login, $newpass);
+		if (!$this->setPassHash($login, $passhash))
 			return FALSE;
 
-		$preHash = self::createPreHash($login, $newpass);
-		self::setupCookies($login, $preHash);
+		$preHash = $this->createPreHash($login, $newpass);
+		$this->setupCookies($login, $preHash);
 
 		return TRUE;
 	}
