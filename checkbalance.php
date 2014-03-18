@@ -9,8 +9,8 @@
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("./login.php");
 
 	if (!isset($_GET["id"]))
@@ -137,14 +137,14 @@
 			ebr("<span style=\"color: #FF8080;\">Fail to update position</span><br>");
 	}
 
-	$acc = new Account($userid, TRUE);
+	$acc = new Account($user_id, TRUE);
 
 	ebr("<table>");
 
 	if ($checkAccount_id == 0)
 		ebr("<tr><td colspan=\"8\">All accounts</td></tr>");
 
-	$condition = "user_id=".$userid;
+	$condition = "user_id=".$user_id;
 	if ($checkAccount_id != 0)
 		$condition .= " AND id=".$checkAccount_id;
 	$resArr = $db->selectQ("*", "accounts", $condition);
@@ -182,7 +182,7 @@
 
 	$prev_date = 0;
 
-	$condition = "user_id=".$userid;
+	$condition = "user_id=".$user_id;
 	if ($checkAccount_id != 0)
 	{
 		$condition .= " AND (";

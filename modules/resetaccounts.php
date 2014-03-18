@@ -9,11 +9,11 @@
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("../login.php");
 
-	$acc = new Account($userid);
+	$acc = new Account($user_id);
 
 	if (!$acc->reset())
 		fail();

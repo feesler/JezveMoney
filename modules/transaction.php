@@ -9,8 +9,8 @@
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("../login.php");
 
 	if (!isset($_GET["type"]))
@@ -37,7 +37,7 @@
 	if ($amount == 0.0 || $charge == 0.0 || $trdate == -1)
 		fail();
 
-	$trans = new Transaction($userid);
+	$trans = new Transaction($user_id);
 	if (!$trans->create($trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 

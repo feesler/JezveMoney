@@ -9,14 +9,14 @@
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("../login.php");
 
 	if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
 		fail();
 
-	$login = User::getName($userid);
+	$login = User::getName($user_id);
 	if (!User::changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
 		fail();
 

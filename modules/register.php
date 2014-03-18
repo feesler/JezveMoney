@@ -9,8 +9,8 @@
 	}
 
 
-	$userid = User::check();
-	if ($userid != 0)
+	$user_id = User::check();
+	if ($user_id != 0)
 		setLocation("../index.php");
 
 	if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))

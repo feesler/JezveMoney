@@ -9,8 +9,8 @@
 	}
 
 
-	$userid = User::check();
-	if (!$userid)
+	$user_id = User::check();
+	if (!$user_id)
 		setLocation("../login.php");
 
 	$trans_id = intval($_POST["transid"]);
@@ -25,7 +25,7 @@
 	$comment = $db->escape($_POST["comm"]);
 
 
-	$trans = new Transaction($userid);
+	$trans = new Transaction($user_id);
 	if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 		fail();
 
