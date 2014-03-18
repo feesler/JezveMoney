@@ -58,6 +58,13 @@ class User
 	}
 
 
+	// Clean cached data. Next getCache() request will update cache
+	protected function cleanCache()
+	{
+		self::$cache = NULL;
+	}
+
+
 	// Return count of users
 	public function getCount()
 	{
@@ -253,7 +260,12 @@ class User
 		if (!$u_id || !$o_id)
 			return FALSE;
 
-		return $db->updateQ("users", array("owner_id"), array($owner_id), "id=".qnull($u_id));
+		if (!$db->updateQ("users", array("owner_id"), array($owner_id), "id=".qnull($u_id)))
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
 	}
 
 
@@ -274,7 +286,7 @@ class User
 		if (!$db->updateQ("users", array("passhash"), array($passhash), "login=".qnull($elogin)))
 			return FALSE;
 
-		$this->updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -314,7 +326,7 @@ class User
 
 		$this->setOwner($user_id, $p_id);
 
-		$this->updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}

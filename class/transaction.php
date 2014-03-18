@@ -79,6 +79,13 @@ class Transaction
 	}
 
 
+	// Clean cached data. Next getCache() request will update cache
+	protected function cleanCache()
+	{
+		self::$cache = NULL;
+	}
+
+
 	// Check transaction is exist for current user
 	public function is_exist($trans_id)
 	{
@@ -260,7 +267,7 @@ class Transaction
 				return FALSE;
 		}
 
-		self::updateCache($trans_id);
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -448,7 +455,7 @@ class Transaction
 		if (!$db->deleteQ("transactions", "id=".$trans_id))
 			return FALSE;
 
-		self::updateCache($trans_id);
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -487,6 +494,8 @@ class Transaction
 		// delete expenses and incomes
 		if (!$db->deleteQ("transactions", $condition." AND ((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))"))
 			return FALSE;
+
+		self::cleanCache();
 
 /*
 		// delete debts

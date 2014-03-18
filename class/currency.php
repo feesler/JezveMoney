@@ -49,6 +49,13 @@ class Currency
 	}
 
 
+	// Clean cached data. Next getCache() request will update cache
+	protected static function cleanCache()
+	{
+		self::$cache = NULL;
+	}
+
+
 	// Return count of currencies
 	public function getCount()
 	{
@@ -92,7 +99,7 @@ class Currency
 							array(NULL, $curr_name, $curr_sign, $curr_format)))
 			return 0;
 
-		self::updateCache();
+		self::cleanCache();
 
 		return $db->insertId();
 	}
@@ -119,7 +126,7 @@ class Currency
 								"id=".$curr_id))
 			return FALSE;
 
-		self::updateCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -161,6 +168,8 @@ class Currency
 
 		if (!$db->deleteQ("currency", "id=".$curr_id))
 			return FALSE;
+
+		self::cleanCache();
 
 		return TRUE;
 	}

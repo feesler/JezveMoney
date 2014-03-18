@@ -62,6 +62,13 @@ class Person
 	}
 
 
+	// Clean cached data. Next getCache() request will update cache
+	protected function cleanCache()
+	{
+		self::$cache = NULL;
+	}
+
+
 	// Return count of persons
 	public function getCount()
 	{
@@ -105,7 +112,7 @@ class Person
 
 		$p_id = $db->insertId();
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return $p_id;
 	}
@@ -129,7 +136,7 @@ class Person
 		if (!$db->updateQ("persons", array("name"), array($person_name), "id=".$person_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -159,7 +166,7 @@ class Person
 		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id=".$p_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -290,7 +297,7 @@ class Person
 		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id<>".self::$owner_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}

@@ -77,6 +77,13 @@ class Account
 	}
 
 
+	// Clean cached data. Next getCache() request will update cache
+	protected function cleanCache()
+	{
+		self::$cache = NULL;
+	}
+
+
 	// Return count of user accounts
 	public function getCount()
 	{
@@ -127,7 +134,7 @@ class Account
 
 		$acc_id = $db->insertId();
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return $acc_id;
 	}
@@ -180,7 +187,7 @@ class Account
 		if (!$db->updateQ("accounts", $fields, $values, "id=".$acc_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -215,7 +222,7 @@ class Account
 		if (!$db->deleteQ("accounts", "user_id=".self::$user_id." AND id=".$acc_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -256,7 +263,7 @@ class Account
 		if (!$db->updateQ("accounts", array($field), array($newValue), "id=".$acc_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -275,7 +282,7 @@ class Account
 		if (!$db->deleteQ("accounts", "user_id=".self::$user_id))
 			return FALSE;
 
-		self::updateCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
