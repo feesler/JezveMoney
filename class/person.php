@@ -2,8 +2,9 @@
 
 class Person
 {
-	private $user_id = 0;
-	private $owner_id = 0;		// person of user
+	static private $cache = NULL;
+	static private $user_id = 0;
+	static private $owner_id = 0;		// person of user
 
 
 	// Class constructor
@@ -11,6 +12,10 @@ class Person
 	{
 		global $db;
 
+		self::$user_id = intval($user_id);
+		// find owner person
+		self::$owner_id = User::getOwner(self::$user_id);
+/*
 		$this->user_id = intval($user_id);
 
 		$resArr = $db->selectQ("owner_id", "users", "id=".$this->user_id);
@@ -18,12 +23,80 @@ class Person
 		{
 			$this->owner_id = intval($resArr[0]["owner_id"]);
 		}
+*/
+	}
+
+
+	// Update cache
+	private function updateCache()
+	{
+		global $db;
+
+		self::$cache = array();
+
+		$resArr = $db->selectQ("*", "persons", "user_id=".self::$user_id);
+		foreach($resArr as $row)
+		{
+			$person_id = $row["id"];
+
+			self::$cache[$person_id]["name"] = $row["name"];
+			self::$cache[$person_id]["user_id"] = intval($row["user_id"]);
+		}
+	}
+
+
+	// Check state of cache and update if needed
+	private function checkCache()
+	{
+		if (is_null(self::$cache))
+			$this->updateCache();
+
+		return (!is_null(self::$cache));
+	}
+
+
+	// Return value of specified account from cache
+	private function getCache($p_id, $val)
+	{
+		$p_id = intval($p_id);
+		if (!$p_id || !$val)
+			return NULL;
+
+		if (!$this->checkCache())
+			return NULL;
+
+		if (!isset(self::$cache[$p_id]))
+			return NULL;
+
+		return self::$cache[$p_id][$val];
+	}
+
+
+	// Return count of persons
+	public function getCount()
+	{
+		if (!$this->checkCache())
+			return 0;
+
+		return count(self::$cache);
 	}
 
 
 	// Check is specified person is exist
 	public function is_exist($p_id)
 	{
+		if (!is_numeric($p_id))
+			return FALSE;
+
+		$p_id = intval($p_id);
+		if (!$p_id)
+			return FALSE;
+
+		if (!$this->checkCache())
+			return FALSE;
+
+		return isset(self::$cache[$p_id]);
+/*
 		global $db;
 
 		if (!is_numeric($p_id))
@@ -35,6 +108,7 @@ class Person
 
 		$resArr = $db->selectQ("id", "persons", "id=".$person_id);
 		return (count($resArr) == 1 && intval($resArr[0]["id"]) == $person_id);
+*/
 	}
 
 
@@ -49,10 +123,14 @@ class Person
 		$person_name = $db->escape($pname);
 
 		if (!$db->insertQ("persons", array("id", "name", "user_id"),
-								array(NULL, $person_name, $this->user_id)))
+								array(NULL, $person_name, self::$user_id)))
 			return 0;
 
-		return $db->insertId();
+		$p_id = $db->insertId();
+
+		self::updateCache();
+
+		return $p_id;
 	}
 
 
@@ -74,6 +152,8 @@ class Person
 		if (!$db->updateQ("persons", array("name"), array($person_name), "id=".$person_id))
 			return FALSE;
 
+		self::updateCache();
+
 		return TRUE;
 	}
 
@@ -92,10 +172,10 @@ class Person
 			return FALSE;
 
 		// check user of person
-		if ($this->getUser($p_id) != $this->user_id)
+		if ($this->getUser($p_id) != self::$user_id)
 			return FALSE;
 
-		$acc = new Account($this->user_id, TRUE);
+		$acc = new Account(self::$user_id, TRUE);
 		if (!$acc->onPersonDelete($p_id))
 		{
 			wlog("acc->onPersonDelete(".$p_id.") return FALSE");
@@ -103,13 +183,16 @@ class Person
 		}
 
 		// delete person
-		if (!$db->deleteQ("persons", "user_id=".$this->user_id." AND id=".$p_id))
+		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id=".$p_id))
 			return FALSE;
+
+		self::updateCache();
 
 		return TRUE;
 	}
 
 
+/*
 	// Return count of persons of current user
 	public function getCount()
 	{
@@ -118,11 +201,28 @@ class Person
 		$resArr = $db->selectQ("id", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
 		return count($resArr);
 	}
+*/
 
 
 	// Return HTML string of persons for select control
 	public function getList($selected_id = 0)
 	{
+		if (!$this->checkCache())
+			return;
+
+		foreach(self::$cache as $person_id => $row)
+		{
+			if ($person_id != self::$owner_id)
+			{
+				$resStr = "<option value=\"".$person_id."\"";
+				if ($person_id == $selected_id)
+					$resStr .= " selected";
+				$resStr .= ">".$row["name"]."</option>";
+
+				html($resStr);
+			}
+		}
+/*
 		global $db;
 
 		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
@@ -137,12 +237,30 @@ class Person
 
 			html($resStr);
 		}
+*/
 	}
 
 
 	// Return person id by specified position
 	public function getIdByPos($pos = 0)
 	{
+		if (!$this->checkCache())
+			return 0;
+
+		if (count(self::$cache) == 1)		// no persons except user owner
+			return 0;
+
+		$keys = array_keys(self::$cache);
+		if (isset($keys[$pos]))
+		{
+			if ($keys[$pos] == self::$owner_id)
+				return ($pos < count($keys) - 1) ? $keys[$pos + 1] : $keys[$pos - 1];
+			else
+				return $keys[$pos];
+		}
+
+		return 0;
+/*
 		global $db;
 
 		$resStr = "";
@@ -152,12 +270,15 @@ class Person
 
 		$resArr = $db->selectQ("id", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
 		return (($pos < count($resArr)) ? intval($resArr[$pos]["id"]) : 0);
+*/
 	}
 
 
 	// Return person name by specified id
 	public function getName($p_id)
 	{
+		return $this->getCache($p_id, "name");
+/*
 		global $db;
 
 		if (!$p_id || !is_numeric($p_id))
@@ -167,12 +288,15 @@ class Person
 
 		$resArr = $db->selectQ("name", "persons", "user_id=".$this->user_id." AND id=".$person_id);
 		return ((count($resArr) == 1) ? $resArr[0]["name"] : "");
+*/
 	}
 
 
 	// Return user of specified person
 	public function getUser($p_id)
 	{
+		return $this->getCache($p_id, "user_id");
+/*
 		global $db;
 
 		if (!$p_id || !is_numeric($p_id))
@@ -182,6 +306,7 @@ class Person
 
 		$resArr = $db->selectQ("user_id", "persons", "id=".$person_id);
 		return ((count($resArr) == 1) ? $resArr[0]["user_id"] : 0);
+*/
 	}
 
 
@@ -230,6 +355,21 @@ class Person
 	// Search person with specified name and return id if success
 	public function findByName($p_name)
 	{
+		if (!$this->checkCache())
+			return 0;
+
+		$e_name = $db->escape($p_name);
+
+		foreach(self::$cache as $p_id => $row)
+		{
+			if ($p_id != self::$owner_id && $row["name"] == $e_name)
+			{
+				return $row["name"];
+			}
+		}
+
+		return 0;
+/*
 		global $db;
 
 		$e_name = $db->escape($p_name);
@@ -243,6 +383,7 @@ class Person
 			return 0;
 
 		return intval($resArr[0]["id"]);
+*/
 	}
 
 
@@ -253,6 +394,8 @@ class Person
 
 		if (!$db->deleteQ("persons", "user_id=".$this->user_id." AND id<>".$this->owner_id))
 			return FALSE;
+
+		self::updateCache();
 
 		return TRUE;
 	}
@@ -265,7 +408,7 @@ class Person
 
 		$resArr = $db->selectQ("p.name AS name, p.id AS pid, a.id AS aid, a.curr_id AS curr_id, a.balance AS balance",
 							"persons AS p, accounts AS a",
-							"p.user_id=".$this->user_id." AND p.id<>".$this->owner_id." AND a.owner_id=p.id");
+							"p.user_id=".self::$user_id." AND p.id<>".self::$owner_id." AND a.owner_id=p.id");
 		$pArr = array();
 		foreach($resArr as $row)
 		{
@@ -336,24 +479,36 @@ class Person
 	// Return HTML for persons of user
 	public function getTiles($buttons = FALSE)
 	{
+/*
 		global $db;
+*/
 
 		$resStr = "";
 
 		$tileType = ($buttons) ? BUTTON_TILE : LINK_TILE;
 
+/*
 		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
 		if (!count($resArr))
+*/
+		if ($this->getCount() < 2)
 		{
 			$resStr .= "<span>You have no one person. Please create one.</span>";
 		}
 		else
 		{
+/*
 			foreach($resArr as $row)
+*/
+			foreach(self::$cache as $p_id => $row)
 			{
+/*
 				$p_id = intval($row["id"]);
-
-				$resStr .= $this->getTile($tileType, $p_id);
+*/
+				if ($p_id != self::$owner_id)
+				{
+					$resStr .= $this->getTile($tileType, $p_id);
+				}
 			}
 		}
 
@@ -368,25 +523,35 @@ class Person
 
 		html_op("<div>");
 
+/*
 		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
 		$persons = count($resArr);
 		if (!$persons)
+*/
+		if ($this->getCount() < 2)
 		{
 			html("<span>No persons here.</span>");
 		}
 		else
 		{
-			$acc = new Account($this->user_id, TRUE);
+			$acc = new Account(self::$user_id, TRUE);
 
 			$i = 0;
+/*
 			foreach($resArr as $row)
+*/
+			foreach(self::$cache as $p_id => $row)
 			{
+				if ($p_id == self::$owner_id)
+					continue;
 				$i++;
 
 				$pName = $row["name"];
+/*
 				$p_id = intval($row["id"]);
+*/
 
-				$accArr = $db->selectQ("*", "accounts", "user_id=".$this->user_id." AND owner_id=".$p_id." AND owner_id<>".$this->owner_id);
+				$accArr = $db->selectQ("*", "accounts", "user_id=".self::$user_id." AND owner_id=".$p_id." AND owner_id<>".self::$owner_id);
 				$totalArr = array();
 				foreach($accArr as $accRow)
 				{
