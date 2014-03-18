@@ -311,9 +311,18 @@ class Person
 	{
 		global $db;
 
+		$resArr = $db->selectQ(array("p.name" => "name",
+									"p.id" => "pid",
+									"a.id" => "aid",
+									"a.curr_id" => "curr_id",
+									"a.balance" => "balance"),
+							array("persons" => "p", "accounts" => "a"),
+							"p.user_id=".self::$user_id." AND p.id<>".self::$owner_id." AND a.owner_id=p.id");
+/*
 		$resArr = $db->selectQ("p.name AS name, p.id AS pid, a.id AS aid, a.curr_id AS curr_id, a.balance AS balance",
 							"persons AS p, accounts AS a",
 							"p.user_id=".self::$user_id." AND p.id<>".self::$owner_id." AND a.owner_id=p.id");
+*/
 		$pArr = array();
 		foreach($resArr as $row)
 		{
