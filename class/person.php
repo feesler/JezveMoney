@@ -15,15 +15,6 @@ class Person
 		self::$user_id = intval($user_id);
 		// find owner person
 		self::$owner_id = User::getOwner(self::$user_id);
-/*
-		$this->user_id = intval($user_id);
-
-		$resArr = $db->selectQ("owner_id", "users", "id=".$this->user_id);
-		if (count($resArr) == 1)
-		{
-			$this->owner_id = intval($resArr[0]["owner_id"]);
-		}
-*/
 	}
 
 
@@ -96,19 +87,6 @@ class Person
 			return FALSE;
 
 		return isset(self::$cache[$p_id]);
-/*
-		global $db;
-
-		if (!is_numeric($p_id))
-			return FALSE;
-
-		$person_id = intval($p_id);
-		if (!$person_id)
-			return FALSE;
-
-		$resArr = $db->selectQ("id", "persons", "id=".$person_id);
-		return (count($resArr) == 1 && intval($resArr[0]["id"]) == $person_id);
-*/
 	}
 
 
@@ -192,18 +170,6 @@ class Person
 	}
 
 
-/*
-	// Return count of persons of current user
-	public function getCount()
-	{
-		global $db;
-
-		$resArr = $db->selectQ("id", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
-		return count($resArr);
-	}
-*/
-
-
 	// Return HTML string of persons for select control
 	public function getList($selected_id = 0)
 	{
@@ -222,22 +188,6 @@ class Person
 				html($resStr);
 			}
 		}
-/*
-		global $db;
-
-		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
-		foreach($resArr as $row)
-		{
-			$person_id = $row["id"];
-
-			$resStr = "<option value=\"".$person_id."\"";
-			if ($person_id == $selected_id)
-				$resStr .= " selected";
-			$resStr .= ">".$row["name"]."</option>";
-
-			html($resStr);
-		}
-*/
 	}
 
 
@@ -260,17 +210,6 @@ class Person
 		}
 
 		return 0;
-/*
-		global $db;
-
-		$resStr = "";
-
-		if (!is_numeric($pos) || $pos < 0)
-			return 0;
-
-		$resArr = $db->selectQ("id", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
-		return (($pos < count($resArr)) ? intval($resArr[$pos]["id"]) : 0);
-*/
 	}
 
 
@@ -278,17 +217,6 @@ class Person
 	public function getName($p_id)
 	{
 		return $this->getCache($p_id, "name");
-/*
-		global $db;
-
-		if (!$p_id || !is_numeric($p_id))
-			return "";
-
-		$person_id = intval($p_id);
-
-		$resArr = $db->selectQ("name", "persons", "user_id=".$this->user_id." AND id=".$person_id);
-		return ((count($resArr) == 1) ? $resArr[0]["name"] : "");
-*/
 	}
 
 
@@ -296,17 +224,6 @@ class Person
 	public function getUser($p_id)
 	{
 		return $this->getCache($p_id, "user_id");
-/*
-		global $db;
-
-		if (!$p_id || !is_numeric($p_id))
-			return 0;
-
-		$person_id = intval($p_id);
-
-		$resArr = $db->selectQ("user_id", "persons", "id=".$person_id);
-		return ((count($resArr) == 1) ? $resArr[0]["user_id"] : 0);
-*/
 	}
 
 
@@ -369,21 +286,6 @@ class Person
 		}
 
 		return 0;
-/*
-		global $db;
-
-		$e_name = $db->escape($p_name);
-
-		$condition = "user_id=".$this->user_id;		// look only for persons of current user
-		$condition .= " AND id<>".$this->owner_id;	// exclude owner person
-		$condition .= " AND name=".qnull($e_name);
-
-		$resArr = $db->selectQ("id", "persons", $condition);
-		if (count($resArr) != 1)
-			return 0;
-
-		return intval($resArr[0]["id"]);
-*/
 	}
 
 
@@ -479,32 +381,18 @@ class Person
 	// Return HTML for persons of user
 	public function getTiles($buttons = FALSE)
 	{
-/*
-		global $db;
-*/
-
 		$resStr = "";
 
 		$tileType = ($buttons) ? BUTTON_TILE : LINK_TILE;
 
-/*
-		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
-		if (!count($resArr))
-*/
 		if ($this->getCount() < 2)
 		{
 			$resStr .= "<span>You have no one person. Please create one.</span>";
 		}
 		else
 		{
-/*
-			foreach($resArr as $row)
-*/
 			foreach(self::$cache as $p_id => $row)
 			{
-/*
-				$p_id = intval($row["id"]);
-*/
 				if ($p_id != self::$owner_id)
 				{
 					$resStr .= $this->getTile($tileType, $p_id);
@@ -523,11 +411,6 @@ class Person
 
 		html_op("<div>");
 
-/*
-		$resArr = $db->selectQ("*", "persons", "user_id=".$this->user_id." AND id<>".$this->owner_id);
-		$persons = count($resArr);
-		if (!$persons)
-*/
 		if ($this->getCount() < 2)
 		{
 			html("<span>No persons here.</span>");
@@ -536,20 +419,12 @@ class Person
 		{
 			$acc = new Account(self::$user_id, TRUE);
 
-			$i = 0;
-/*
-			foreach($resArr as $row)
-*/
 			foreach(self::$cache as $p_id => $row)
 			{
 				if ($p_id == self::$owner_id)
 					continue;
-				$i++;
 
 				$pName = $row["name"];
-/*
-				$p_id = intval($row["id"]);
-*/
 
 				$accArr = $db->selectQ("*", "accounts", "user_id=".self::$user_id." AND owner_id=".$p_id." AND owner_id<>".self::$owner_id);
 				$totalArr = array();
