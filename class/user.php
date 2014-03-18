@@ -2,9 +2,86 @@
 
 class User
 {
+	static private $cache = NULL;
+
+
 	// Class constructor
 	public function __construct()
 	{
+	}
+
+
+	// Update cache
+	private function updateCache()
+	{
+		global $db;
+
+		self::$cache = array();
+
+		$resArr = $db->selectQ("*", "users");
+		foreach($resArr as $row)
+		{
+			$user_id = $row["id"];
+
+			self::$cache[$user_id]["login"] = $row["login"];
+			self::$cache[$user_id]["passhash"] = $row["passhash"];
+			self::$cache[$user_id]["owner_id"] = intval($row["owner_id"]);
+			self::$cache[$user_id]["access"] = intval($row["access"]);
+		}
+	}
+
+
+	// Check state of cache and update if needed
+	private function checkCache()
+	{
+		if (is_null(self::$cache))
+			$this->updateCache();
+
+		return (!is_null(self::$cache));
+	}
+
+
+	// Return value of specified person from cache
+	private function getCache($u_id, $val)
+	{
+		$u_id = intval($u_id);
+		if (!$u_id || !$val)
+			return NULL;
+
+		if (!$this->checkCache())
+			return NULL;
+
+		if (!isset(self::$cache[$u_id]))
+			return NULL;
+
+		return self::$cache[$u_id][$val];
+	}
+
+
+	// Return count of users
+	public function getCount()
+	{
+		if (!$this->checkCache())
+			return 0;
+
+		return count(self::$cache);
+	}
+
+
+	// Check is specified user is exist
+	public function is_exist($u_id)
+	{
+		if (!is_numeric($u_id))
+			return FALSE;
+
+		$u_id = intval($u_id);
+		if (!$u_id)
+			return FALSE;
+
+		if (!$this->checkCache())
+			return FALSE;
+
+		return isset(self::$cache[$u_id]);
 	}
 
 
@@ -129,9 +206,18 @@ class User
 	}
 
 
+	// Return access type of specified user
+	public function getAccess($id)
+	{
+		return $this->getCache($id, "access");
+	}
+
+
 	// Check user has admin access
 	public function isAdmin($id)
 	{
+		return (($this->getAccess($id) & 0x1) == 0x1);
+/*
 		global $db;
 
 		$eid = intval($id);
@@ -143,12 +229,15 @@ class User
 			return FALSE;
 
 		return (($resArr[0]["access"] & 0x1) == 0x1);
+*/
 	}
 
 
 	// Return user name
 	public function getName($id)
 	{
+		return $this->getCache($id, "name");
+/*
 		global $db;
 
 		$eid = intval($id);
@@ -158,12 +247,24 @@ class User
 		$resArr = $db->selectQ("login", "users", "id=".$eid);
 
 		return ((count($resArr) == 1) ? $resArr[0]["login"] : NULL);
+*/
 	}
 
 
 	// Return user id by specified login
 	public function getId($login)
 	{
+		if (!$this->checkCache())
+			return 0;
+
+		foreach(self::$cache as $u_id => $row)
+		{
+			if ($row["login"] == $login)
+				return $u_id;
+		}
+
+		return 0;
+/*
 		global $db;
 
 		$elogin = $db->escape($login);
@@ -173,6 +274,7 @@ class User
 		$resArr = $db->selectQ("id", "users", "login=".qnull($elogin));
 
 		return ((count($resArr) == 1) ? intval($resArr[0]["id"]) : 0);
+*/
 	}
 
 
@@ -193,6 +295,8 @@ class User
 	// Return owner person of specified user
 	public function getOwner($user_id)
 	{
+		return $this->getCache($user_id, "owner_id");
+/*
 		global $db;
 
 		if (!is_numeric($user_id))
@@ -207,6 +311,7 @@ class User
 			return intval($resArr[0]["owner_id"]);
 		else
 			return 0;
+*/
 	}
 
 
@@ -217,13 +322,22 @@ class User
 
 		$elogin = $db->escape($login);
 
-		return $db->updateQ("users", array("passhash"), array($passhash), "login=".qnull($elogin));
+		if (!$db->updateQ("users", array("passhash"), array($passhash), "login=".qnull($elogin)))
+			return FALSE;
+
+		$this->updateCache();
+
+		return TRUE;
 	}
 
 
 	// Return password hash for specified user
 	public function getPassHash($login)
 	{
+		$u_id = $this->getId($login);
+
+		return $this->getCache($u_id, "passhash");
+/*
 		global $db;
 
 		$elogin = $db->escape($login);
@@ -233,6 +347,7 @@ class User
 			return $resArr[0]["passhash"];
 		else
 			return NULL;
+*/
 	}
 
 
@@ -260,6 +375,8 @@ class User
 		$p_id = $p->create($p_name);
 
 		$this->setOwner($user_id, $p_id);
+
+		$this->updateCache();
 
 		return TRUE;
 	}
