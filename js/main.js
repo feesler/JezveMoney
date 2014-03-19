@@ -1,4 +1,4 @@
-var dwPopup;		// delete warning popup
+﻿var dwPopup;		// delete warning popup
 
 
 // Log in form submit event handler
@@ -224,60 +224,67 @@ function setSign(signobj, curr_id)
 // Currency change event handler
 function onChangeAccountCurrency(obj)
 {
-	var currsign, formatBalance;
+	var currsign, formatBalance, icon, iconType;
 
 	currsign = ge('currsign');
-	if (!obj || !currsign)
+	icon = ge('icon');
+	if (!obj || !currsign || !icon)
 		return;
 
 	acc_currency = selectedValue(obj);
 	formatBalance = formatCurrency(acc_balance, acc_currency);
+	iconType = parseInt(selectedValue(icon));
 
 	setSign(currsign, acc_currency);
-	setTileInfo('acc_tile', acc_name, formatBalance);
+	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
 }
 
 
 // Account name input event handler
 function onAccNameInput(obj)
 {
-	var formatBalance;
+	var formatBalance, icon, iconType;
 
-	if (!obj)
+	icon = ge('icon');
+	if (!obj || !icon)
 		return;
 
 	acc_name = obj.value;
 	formatBalance = formatCurrency(acc_balance, acc_currency);
+	iconType = parseInt(selectedValue(icon));
 
-	setTileInfo('acc_tile', acc_name, formatBalance);
+	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
 }
 
 
 // Account initial balance input event handler
 function onAccBalanceInput(obj)
 {
-	var formatBalance;
+	var formatBalance, icon, iconType;
 
-	if (!obj)
+	icon = ge('icon');
+	if (!obj || !icon)
 		return;
 
 	acc_balance = obj.value;
 	formatBalance = formatCurrency(acc_balance, acc_currency);
+	iconType = parseInt(selectedValue(icon));
 
-	setTileInfo('acc_tile', acc_name, formatBalance);
+	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
 }
 
 
 // Icon change event handler
 function onChangeIcon(obj)
 {
-	var formatBalance, iconType;
+	var formatBalance, icon, iconType;
 
-	if (!obj)
+	icon = ge('icon');
+	if (!obj || !icon)
 		return;
 
 	formatBalance = formatCurrency(acc_balance, acc_currency);
-	iconType = parseInt(selectedValue(obj));
+	iconType = parseInt(selectedValue(icon));
 
 	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
 }
