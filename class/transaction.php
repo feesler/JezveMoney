@@ -23,7 +23,8 @@ class Transaction
 		$cond = "user_id=".self::$user_id;
 		if ($trans_id != 0)
 			$cond .= " AND id=".$trans_id;
-		else
+		// create empty cache array if needed
+		if ($trans_id == 0 || is_null(self::$cache))
 			self::$cache = array();
 
 		$resArr = $db->selectQ("*", "transactions", $cond);
