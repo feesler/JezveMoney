@@ -221,72 +221,69 @@ function setSign(signobj, curr_id)
 }
 
 
-// Currency change event handler
-function onChangeAccountCurrency(obj)
+// Update account tile with the current values
+function updateAccountTile()
 {
-	var currsign, formatBalance, icon, iconType;
+	var formatBalance, icon, iconType;
 
-	currsign = ge('currsign');
 	icon = ge('icon');
-	if (!obj || !currsign || !icon)
+	if (!icon)
 		return;
 
-	acc_currency = selectedValue(obj);
 	formatBalance = formatCurrency(acc_balance, acc_currency);
 	iconType = parseInt(selectedValue(icon));
 
-	setSign(currsign, acc_currency);
 	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
+}
+
+
+// Currency change event handler
+function onChangeAccountCurrency(obj)
+{
+	var currsign;
+
+	currsign = ge('currsign');
+	if (!obj || !currsign)
+		return;
+
+	acc_currency = selectedValue(obj);
+	setSign(currsign, acc_currency);
+
+	updateAccountTile();
 }
 
 
 // Account name input event handler
 function onAccNameInput(obj)
 {
-	var formatBalance, icon, iconType;
-
-	icon = ge('icon');
-	if (!obj || !icon)
+	if (!obj)
 		return;
 
 	acc_name = obj.value;
-	formatBalance = formatCurrency(acc_balance, acc_currency);
-	iconType = parseInt(selectedValue(icon));
 
-	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
+	updateAccountTile();
 }
 
 
 // Account initial balance input event handler
 function onAccBalanceInput(obj)
 {
-	var formatBalance, icon, iconType;
-
-	icon = ge('icon');
-	if (!obj || !icon)
+	if (!obj)
 		return;
 
 	acc_balance = obj.value;
-	formatBalance = formatCurrency(acc_balance, acc_currency);
-	iconType = parseInt(selectedValue(icon));
 
-	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
+	updateAccountTile();
 }
 
 
 // Icon change event handler
 function onChangeIcon(obj)
 {
-	var formatBalance, icon, iconType;
-
-	icon = ge('icon');
-	if (!obj || !icon)
+	if (!obj)
 		return;
 
-	formatBalance = formatCurrency(acc_balance, acc_currency);
-	iconType = parseInt(selectedValue(icon));
-
-	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
+	updateAccountTile();
 }
 
 
