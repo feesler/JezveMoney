@@ -225,8 +225,8 @@ class User
 	}
 
 
-	// Return user name
-	public function getName($id)
+	// Return login of user
+	public function getLogin($id)
 	{
 		return $this->getCache($id, "name");
 	}

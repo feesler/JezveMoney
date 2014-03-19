@@ -17,7 +17,7 @@
 	if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
 		fail();
 
-	$login = $u->getName($user_id);
+	$login = $u->getLogin($user_id);
 	if (!$u->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
 		fail();
 

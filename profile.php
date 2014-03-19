@@ -16,7 +16,7 @@
 			setLocation("./profile.php");
 	}
 
-	$user_name = $u->getName($user_id);
+	$user_login = $u->getLogin($user_id);
 
 	$person_name = "";
 	$owner_id = $u->getOwner($user_id);
@@ -63,7 +63,7 @@
 			html("<h1>User profile</h1>");
 			html_op("<div>");
 				html("<h2>Account name</h2>");
-				html("<span>".$user_name."</span>");
+				html("<span>".$user_login."</span>");
 			html_cl("</div>");
 
 			html();
