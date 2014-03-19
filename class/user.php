@@ -3,6 +3,8 @@
 class User
 {
 	static private $cache = NULL;
+	static private $path = "/money/";
+	static private $domain = "jezve.net";
 
 
 	// Class constructor
@@ -160,11 +162,9 @@ class User
 	private function setupCookies($login, $passhash)
 	{
 		$expTime = time() + 31536000;	// year after now
-		$path = "/money/";
-		$domain = "jezve.net";
 
-		setcookie("login", $login, $expTime, $path, $domain);
-		setcookie("passhash", $passhash, $expTime, $path, $domain);
+		setcookie("login", $login, $expTime, self::$path, self::$domain);
+		setcookie("passhash", $passhash, $expTime, self::$path, self::$domain);
 	}
 
 
@@ -172,11 +172,9 @@ class User
 	private function deleteCookies()
 	{
 		$expTime = time() - 3600;	// hour before now
-		$path = "/money/";
-		$domain = "jezve.net";
 
-		setcookie("login", "", $expTime, $path, $domain);
-		setcookie("passhash", "", $expTime, $path, $domain);
+		setcookie("login", "", $expTime, self::$path, self::$domain);
+		setcookie("passhash", "", $expTime, self::$path, self::$domain);
 	}
 
 
