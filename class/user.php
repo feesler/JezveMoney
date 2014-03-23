@@ -14,7 +14,7 @@ class User
 
 
 	// Update cache
-	private function updateCache()
+	protected static function updateCache()
 	{
 		global $db;
 
@@ -34,23 +34,23 @@ class User
 
 
 	// Check state of cache and update if needed
-	private function checkCache()
+	protected static function checkCache()
 	{
 		if (is_null(self::$cache))
-			$this->updateCache();
+			self::updateCache();
 
 		return (!is_null(self::$cache));
 	}
 
 
 	// Return value of specified person from cache
-	private function getCache($u_id, $val)
+	protected static function getCache($u_id, $val)
 	{
 		$u_id = intval($u_id);
 		if (!$u_id || !$val)
 			return NULL;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return NULL;
 
 		if (!isset(self::$cache[$u_id]))
@@ -61,7 +61,7 @@ class User
 
 
 	// Clean cached data. Next getCache() request will update cache
-	protected function cleanCache()
+	protected static function cleanCache()
 	{
 		self::$cache = NULL;
 	}
@@ -70,7 +70,7 @@ class User
 	// Return count of users
 	public function getCount()
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		return count(self::$cache);
@@ -87,7 +87,7 @@ class User
 		if (!$u_id)
 			return FALSE;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return FALSE;
 
 		return isset(self::$cache[$u_id]);
@@ -235,7 +235,7 @@ class User
 	// Return user id by specified login
 	public function getId($login)
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		foreach(self::$cache as $u_id => $row)
@@ -261,7 +261,7 @@ class User
 		if (!$db->updateQ("users", array("owner_id"), array($owner_id), "id=".qnull($u_id)))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -284,7 +284,7 @@ class User
 		if (!$db->updateQ("users", array("passhash"), array($passhash), "login=".qnull($elogin)))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -324,7 +324,7 @@ class User
 
 		$this->setOwner($user_id, $p_id);
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}

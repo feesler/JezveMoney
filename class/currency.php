@@ -57,9 +57,9 @@ class Currency
 
 
 	// Return count of currencies
-	public function getCount()
+	public static function getCount()
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		return count(self::$cache);

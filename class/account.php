@@ -9,7 +9,7 @@ class Account
 
 
 	// Class constructor
-	function __construct($user_id, $full = FALSE)
+	public function __construct($user_id, $full = FALSE)
 	{
 		if ($user_id != self::$user_id || $full != self::$full_list)
 			self::$cache = NULL;
@@ -20,7 +20,7 @@ class Account
 
 
 	// Update cache
-	private function updateCache()
+	protected static function updateCache()
 	{
 		global $db;
 
@@ -51,23 +51,23 @@ class Account
 
 
 	// Check state of cache and update if needed
-	private function checkCache()
+	protected static function checkCache()
 	{
 		if (is_null(self::$cache))
-			$this->updateCache();
+			self::updateCache();
 
 		return (!is_null(self::$cache));
 	}
 
 
 	// Return value of specified account from cache
-	private function getCache($acc_id, $val)
+	protected static function getCache($acc_id, $val)
 	{
 		$acc_id = intval($acc_id);
 		if (!$acc_id || !$val)
 			return NULL;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return NULL;
 
 		if (!isset(self::$cache[$acc_id]))
@@ -78,16 +78,16 @@ class Account
 
 
 	// Clean cached data. Next getCache() request will update cache
-	protected function cleanCache()
+	protected static function cleanCache()
 	{
 		self::$cache = NULL;
 	}
 
 
 	// Return count of user accounts
-	public function getCount()
+	public static function getCount()
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		return count(self::$cache);
@@ -104,7 +104,7 @@ class Account
 		if (!$acc_id)
 			return FALSE;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return FALSE;
 
 		return isset(self::$cache[$acc_id]);
@@ -134,7 +134,7 @@ class Account
 
 		$acc_id = $db->insertId();
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return $acc_id;
 	}
@@ -187,7 +187,7 @@ class Account
 		if (!$db->updateQ("accounts", $fields, $values, "id=".$acc_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -222,7 +222,7 @@ class Account
 		if (!$db->deleteQ("accounts", "user_id=".self::$user_id." AND id=".$acc_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -236,7 +236,7 @@ class Account
 		if (!self::$full_list)
 			return FALSE;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return FALSE;
 
 		foreach(self::$cache as $acc_id => $row)
@@ -263,7 +263,7 @@ class Account
 		if (!$db->updateQ("accounts", array($field), array($newValue), "id=".$acc_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -282,7 +282,7 @@ class Account
 		if (!$db->deleteQ("accounts", "user_id=".self::$user_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -291,21 +291,21 @@ class Account
 	// Return owner of account
 	public function getOwner($acc_id)
 	{
-		return $this->getCache($acc_id, "owner_id");
+		return self::getCache($acc_id, "owner_id");
 	}
 
 
 	// Return user of account
 	public function getUser($acc_id)
 	{
-		return $this->getCache($acc_id, "user_id");
+		return self::getCache($acc_id, "user_id");
 	}
 
 
 	// Return currency of account
 	public function getCurrency($acc_id)
 	{
-		return $this->getCache($acc_id, "curr_id");
+		return self::getCache($acc_id, "curr_id");
 	}
 
 
@@ -322,7 +322,7 @@ class Account
 	// Return name of account
 	public function getName($acc_id)
 	{
-		return $this->getCache($acc_id, "name");
+		return self::getCache($acc_id, "name");
 	}
 
 
@@ -339,7 +339,7 @@ class Account
 	// Return current balance of account
 	public function getBalance($acc_id)
 	{
-		return $this->getCache($acc_id, "balance");
+		return self::getCache($acc_id, "balance");
 	}
 
 
@@ -366,7 +366,7 @@ class Account
 	// Return name of account
 	public function getInitBalance($acc_id)
 	{
-		return $this->getCache($acc_id, "initbalance");
+		return self::getCache($acc_id, "initbalance");
 	}
 
 
@@ -383,7 +383,7 @@ class Account
 	// Return icon type of account
 	public function getIcon($acc_id)
 	{
-		return $this->getCache($acc_id, "icon");
+		return self::getCache($acc_id, "icon");
 	}
 
 
@@ -400,7 +400,7 @@ class Account
 	// Return id of account by specified position
 	public function getIdByPos($position)
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		$keys = array_keys(self::$cache);
@@ -441,7 +441,7 @@ class Account
 
 		$resStr = "";
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return $resStr;
 
 		foreach(self::$cache as $acc_id => $row)
@@ -459,7 +459,7 @@ class Account
 	// Return Javascript array of accounts
 	public function getArray()
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return "";
 
 		$resArr = array();
@@ -529,7 +529,7 @@ class Account
 	{
 		$resStr = "";
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return $resStr;
 
 		$accounts = count(self::$cache);
@@ -555,7 +555,7 @@ class Account
 	// Return HTML for total sums per each currency
 	public function getTotals()
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return $resStr;
 
 		html_op("<div>");

@@ -16,7 +16,7 @@ class Transaction
 
 
 	// Update cache
-	private function updateCache($trans_id = 0)
+	protected static function updateCache($trans_id = 0)
 	{
 		global $db;
 
@@ -54,23 +54,23 @@ class Transaction
 
 
 	// Check state of cache and update if needed
-	private function checkCache($trans_id = 0)
+	protected static function checkCache($trans_id = 0)
 	{
 		if (is_null(self::$cache) || $trans_id != 0)
-			$this->updateCache($trans_id);
+			self::updateCache($trans_id);
 
 		return (!is_null(self::$cache));
 	}
 
 
 	// Return value of specified transaction from cache
-	private function getCache($trans_id, $val)
+	protected static function getCache($trans_id, $val)
 	{
 		$trans_id = intval($trans_id);
 		if (!$trans_id || is_null($val) || $val == "")
 			return NULL;
 
-		if (!$this->checkCache($trans_id))
+		if (!self::checkCache($trans_id))
 			return NULL;
 
 		if (!isset(self::$cache[$trans_id]))
@@ -81,7 +81,7 @@ class Transaction
 
 
 	// Clean cached data. Next getCache() request will update cache
-	protected function cleanCache()
+	protected static function cleanCache()
 	{
 		self::$cache = NULL;
 	}
@@ -96,7 +96,7 @@ class Transaction
 		if (!$trans_id)
 			return FALSE;
 
-		if (!$this->checkCache($trans_id))
+		if (!self::checkCache($trans_id))
 			return FALSE;
 
 		return (isset(self::$cache) && isset(self::$cache[$trans_id]));
@@ -1114,70 +1114,70 @@ class Transaction
 	// Return user id of transaction
 	public function getUser($trans_id)
 	{
-		return $this->getCache($trans_id, "user_id");
+		return self::getCache($trans_id, "user_id");
 	}
 
 
 	// Return source account of transaction
 	public function getSource($trans_id)
 	{
-		return $this->getCache($trans_id, "src_id");
+		return self::getCache($trans_id, "src_id");
 	}
 
 
 	// Return destination account of transaction
 	public function getDest($trans_id)
 	{
-		return $this->getCache($trans_id, "dest_id");
+		return self::getCache($trans_id, "dest_id");
 	}
 
 
 	// Return type of transaction
 	public function getType($trans_id)
 	{
-		return $this->getCache($trans_id, "type");
+		return self::getCache($trans_id, "type");
 	}
 
 
 	// Return amount of transaction
 	public function getAmount($trans_id)
 	{
-		return $this->getCache($trans_id, "amount");
+		return self::getCache($trans_id, "amount");
 	}
 
 
 	// Return charge of transaction
 	public function getCharge($trans_id)
 	{
-		return $this->getCache($trans_id, "charge");
+		return self::getCache($trans_id, "charge");
 	}
 
 
 	// Return currency of transaction
 	public function getCurrency($trans_id)
 	{
-		return $this->getCache($trans_id, "curr_id");
+		return self::getCache($trans_id, "curr_id");
 	}
 
 
 	// Return date of transaction
 	public function getDate($trans_id)
 	{
-		return $this->getCache($trans_id, "date");
+		return self::getCache($trans_id, "date");
 	}
 
 
 	// Return comment of transaction
 	public function getComment($trans_id)
 	{
-		return $this->getCache($trans_id, "comment");
+		return self::getCache($trans_id, "comment");
 	}
 
 
 	// Return position of transaction
 	public function getPos($trans_id)
 	{
-		return $this->getCache($trans_id, "pos");
+		return self::getCache($trans_id, "pos");
 	}
 }
 

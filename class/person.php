@@ -18,7 +18,7 @@ class Person
 
 
 	// Update cache
-	private function updateCache()
+	protected static function updateCache()
 	{
 		global $db;
 
@@ -36,23 +36,23 @@ class Person
 
 
 	// Check state of cache and update if needed
-	private function checkCache()
+	protected static function checkCache()
 	{
 		if (is_null(self::$cache))
-			$this->updateCache();
+			self::updateCache();
 
 		return (!is_null(self::$cache));
 	}
 
 
 	// Return value of specified person from cache
-	private function getCache($p_id, $val)
+	protected static function getCache($p_id, $val)
 	{
 		$p_id = intval($p_id);
 		if (!$p_id || !$val)
 			return NULL;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return NULL;
 
 		if (!isset(self::$cache[$p_id]))
@@ -63,16 +63,16 @@ class Person
 
 
 	// Clean cached data. Next getCache() request will update cache
-	protected function cleanCache()
+	protected static function cleanCache()
 	{
 		self::$cache = NULL;
 	}
 
 
 	// Return count of persons
-	public function getCount()
+	public static function getCount()
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		return count(self::$cache);
@@ -89,7 +89,7 @@ class Person
 		if (!$p_id)
 			return FALSE;
 
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return FALSE;
 
 		return isset(self::$cache[$p_id]);
@@ -112,7 +112,7 @@ class Person
 
 		$p_id = $db->insertId();
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return $p_id;
 	}
@@ -136,7 +136,7 @@ class Person
 		if (!$db->updateQ("persons", array("name"), array($person_name), "id=".$person_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -166,7 +166,7 @@ class Person
 		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id=".$p_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
@@ -175,7 +175,7 @@ class Person
 	// Return HTML string of persons for select control
 	public function getList($selected_id = 0)
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return;
 
 		foreach(self::$cache as $person_id => $row)
@@ -196,7 +196,7 @@ class Person
 	// Return person id by specified position
 	public function getIdByPos($pos = 0)
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		if (count(self::$cache) == 1)		// no persons except user owner
@@ -271,7 +271,7 @@ class Person
 	// Search person with specified name and return id if success
 	public function findByName($p_name)
 	{
-		if (!$this->checkCache())
+		if (!self::checkCache())
 			return 0;
 
 		foreach(self::$cache as $p_id => $row)
@@ -297,7 +297,7 @@ class Person
 		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id<>".self::$owner_id))
 			return FALSE;
 
-		$this->cleanCache();
+		self::cleanCache();
 
 		return TRUE;
 	}
