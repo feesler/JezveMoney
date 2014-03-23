@@ -186,6 +186,8 @@ class Transaction
 			$this->updatePos($trans_id, $latest_pos + 1);
 		}
 
+		self::cleanCache();
+
 		return TRUE;
 	}
 
@@ -369,6 +371,8 @@ class Transaction
 			$this->updatePos($trans_id, $latest_pos + 1);
 		}
 
+		self::cleanCache();
+
 		return TRUE;
 	}
 
@@ -434,6 +438,8 @@ class Transaction
 
 		if (!$db->updateQ("transactions", array("pos"), array($new_pos), "id=".$trans_id))
 			return FALSE;
+
+		self::cleanCache();
 
 		return TRUE;
 	}
