@@ -52,9 +52,8 @@ function asJoin($pieces)
 
 class mysqlDB
 {
-
-	var $conn;		// connection
-	var $dbname;		// current database name
+	private $conn;			// connection
+	private $dbname;		// current database name
 
 
 	// Constructor

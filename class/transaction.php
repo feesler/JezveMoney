@@ -7,7 +7,7 @@ class Transaction
 
 
 	// Class constructor
-	function __construct($user_id)
+	public function __construct($user_id)
 	{
 		if ($user_id != self::$user_id)
 			self::$cache = NULL;

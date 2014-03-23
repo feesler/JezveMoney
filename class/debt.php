@@ -7,7 +7,7 @@ Class Debt
 
 
 	// Class constructor
-	function __construct($user_id)
+	public function __construct($user_id)
 	{
 		global $db;
 
