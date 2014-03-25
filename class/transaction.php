@@ -1,8 +1,8 @@
 ﻿<?php
 
-class Transaction
+class Transaction extends CachedTable
 {
-	static private $cache = NULL;
+	static private $dcache = NULL;
 	static private $user_id = 0;
 
 
@@ -10,13 +10,20 @@ class Transaction
 	public function __construct($user_id)
 	{
 		if ($user_id != self::$user_id)
-			self::$cache = NULL;
+			self::$dcache = NULL;
 		self::$user_id = intval($user_id);
 	}
 
 
+	// Return link to cache of derived class
+	protected function &getDerivedCache()
+	{
+		return self::$dcache;
+	}
+
+
 	// Update cache
-	protected static function updateCache($trans_id = 0)
+	protected function updateCache($trans_id = 0)
 	{
 		global $db;
 
@@ -24,13 +31,13 @@ class Transaction
 		if ($trans_id != 0)
 			$cond .= " AND id=".$trans_id;
 		// create empty cache array if needed
-		if ($trans_id == 0 || is_null(self::$cache))
-			self::$cache = array();
+		if ($trans_id == 0 || is_null(self::$dcache))
+			self::$dcache = array();
 
 		$resArr = $db->selectQ("*", "transactions", $cond);
 		if (!count($resArr))		// delete transaction from cache if can't find it
 		{
-			unset(self::$cache[$trans_id]);
+			unset(self::$dcache[$trans_id]);
 		}
 		else
 		{
@@ -38,21 +45,22 @@ class Transaction
 			{
 				$trans_id = intval($row["id"]);
 
-				self::$cache[$trans_id]["user_id"] = intval($row["user_id"]);
-				self::$cache[$trans_id]["src_id"] = intval($row["src_id"]);
-				self::$cache[$trans_id]["dest_id"] = intval($row["dest_id"]);
-				self::$cache[$trans_id]["type"] = intval($row["type"]);
-				self::$cache[$trans_id]["amount"] = floatval($row["amount"]);
-				self::$cache[$trans_id]["charge"] = floatval($row["charge"]);
-				self::$cache[$trans_id]["curr_id"] = intval($row["curr_id"]);
-				self::$cache[$trans_id]["date"] = $row["date"];
-				self::$cache[$trans_id]["comment"] = $row["comment"];
-				self::$cache[$trans_id]["pos"] = intval($row["pos"]);
+				self::$dcache[$trans_id]["user_id"] = intval($row["user_id"]);
+				self::$dcache[$trans_id]["src_id"] = intval($row["src_id"]);
+				self::$dcache[$trans_id]["dest_id"] = intval($row["dest_id"]);
+				self::$dcache[$trans_id]["type"] = intval($row["type"]);
+				self::$dcache[$trans_id]["amount"] = floatval($row["amount"]);
+				self::$dcache[$trans_id]["charge"] = floatval($row["charge"]);
+				self::$dcache[$trans_id]["curr_id"] = intval($row["curr_id"]);
+				self::$dcache[$trans_id]["date"] = $row["date"];
+				self::$dcache[$trans_id]["comment"] = $row["comment"];
+				self::$dcache[$trans_id]["pos"] = intval($row["pos"]);
 			}
 		}
 	}
 
 
+/*
 	// Check state of cache and update if needed
 	protected static function checkCache($trans_id = 0)
 	{
@@ -101,6 +109,7 @@ class Transaction
 
 		return (isset(self::$cache) && isset(self::$cache[$trans_id]));
 	}
+*/
 
 
 	// Create new transaction
@@ -186,7 +195,7 @@ class Transaction
 			$this->updatePos($trans_id, $latest_pos + 1);
 		}
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -270,7 +279,7 @@ class Transaction
 				return FALSE;
 		}
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -371,7 +380,7 @@ class Transaction
 			$this->updatePos($trans_id, $latest_pos + 1);
 		}
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -399,10 +408,10 @@ class Transaction
 		if (!$trans_id || !$new_pos)
 			return FALSE;
 
-		self::updateCache($trans_id);
+		$this->updateCache($trans_id);
 
-		$old_pos = self::$cache[$trans_id]["pos"];
-		$user_id = self::$cache[$trans_id]["user_id"];
+		$old_pos = self::$dcache[$trans_id]["pos"];
+		$user_id = self::$dcache[$trans_id]["user_id"];
 
 		$condition = "user_id=".$user_id;
 
@@ -439,7 +448,7 @@ class Transaction
 		if (!$db->updateQ("transactions", array("pos"), array($new_pos), "id=".$trans_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -462,7 +471,7 @@ class Transaction
 		if (!$db->deleteQ("transactions", "id=".$trans_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -502,7 +511,7 @@ class Transaction
 		if (!$db->deleteQ("transactions", $condition." AND ((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))"))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 /*
 		// delete debts
@@ -1120,70 +1129,70 @@ class Transaction
 	// Return user id of transaction
 	public function getUser($trans_id)
 	{
-		return self::getCache($trans_id, "user_id");
+		return $this->getCache($trans_id, "user_id");
 	}
 
 
 	// Return source account of transaction
 	public function getSource($trans_id)
 	{
-		return self::getCache($trans_id, "src_id");
+		return $this->getCache($trans_id, "src_id");
 	}
 
 
 	// Return destination account of transaction
 	public function getDest($trans_id)
 	{
-		return self::getCache($trans_id, "dest_id");
+		return $this->getCache($trans_id, "dest_id");
 	}
 
 
 	// Return type of transaction
 	public function getType($trans_id)
 	{
-		return self::getCache($trans_id, "type");
+		return $this->getCache($trans_id, "type");
 	}
 
 
 	// Return amount of transaction
 	public function getAmount($trans_id)
 	{
-		return self::getCache($trans_id, "amount");
+		return $this->getCache($trans_id, "amount");
 	}
 
 
 	// Return charge of transaction
 	public function getCharge($trans_id)
 	{
-		return self::getCache($trans_id, "charge");
+		return $this->getCache($trans_id, "charge");
 	}
 
 
 	// Return currency of transaction
 	public function getCurrency($trans_id)
 	{
-		return self::getCache($trans_id, "curr_id");
+		return $this->getCache($trans_id, "curr_id");
 	}
 
 
 	// Return date of transaction
 	public function getDate($trans_id)
 	{
-		return self::getCache($trans_id, "date");
+		return $this->getCache($trans_id, "date");
 	}
 
 
 	// Return comment of transaction
 	public function getComment($trans_id)
 	{
-		return self::getCache($trans_id, "comment");
+		return $this->getCache($trans_id, "comment");
 	}
 
 
 	// Return position of transaction
 	public function getPos($trans_id)
 	{
-		return self::getCache($trans_id, "pos");
+		return $this->getCache($trans_id, "pos");
 	}
 }
 
