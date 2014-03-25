@@ -1,8 +1,8 @@
 ﻿<?php
 
-class Account
+class Account extends CachedTable
 {
-	static private $cache = NULL;
+	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $owner_id = 0;
 	static private $full_list = FALSE;
@@ -12,19 +12,26 @@ class Account
 	public function __construct($user_id, $full = FALSE)
 	{
 		if ($user_id != self::$user_id || $full != self::$full_list)
-			self::$cache = NULL;
+			self::$dcache = NULL;
 
 		self::$full_list = $full;
 		self::$user_id = intval($user_id);
 	}
 
 
+	// Return link to cache of derived class
+	protected function &getDerivedCache()
+	{
+		return self::$dcache;
+	}
+
+
 	// Update cache
-	protected static function updateCache()
+	protected function updateCache()
 	{
 		global $db;
 
-		self::$cache = array();
+		self::$dcache = array();
 
 		// find owner person
 		$u = new User();
@@ -39,17 +46,18 @@ class Account
 		{
 			$acc_id = $row["id"];
 
-			self::$cache[$acc_id]["user_id"] = $row["user_id"];
-			self::$cache[$acc_id]["name"] = $row["name"];
-			self::$cache[$acc_id]["owner_id"] = intval($row["owner_id"]);
-			self::$cache[$acc_id]["curr_id"] = intval($row["curr_id"]);
-			self::$cache[$acc_id]["balance"] = floatval($row["balance"]);
-			self::$cache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
-			self::$cache[$acc_id]["icon"] = intval($row["icon"]);
+			self::$dcache[$acc_id]["user_id"] = $row["user_id"];
+			self::$dcache[$acc_id]["name"] = $row["name"];
+			self::$dcache[$acc_id]["owner_id"] = intval($row["owner_id"]);
+			self::$dcache[$acc_id]["curr_id"] = intval($row["curr_id"]);
+			self::$dcache[$acc_id]["balance"] = floatval($row["balance"]);
+			self::$dcache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
+			self::$dcache[$acc_id]["icon"] = intval($row["icon"]);
 		}
 	}
 
 
+/*
 	// Check state of cache and update if needed
 	protected static function checkCache()
 	{
@@ -109,6 +117,7 @@ class Account
 
 		return isset(self::$cache[$acc_id]);
 	}
+*/
 
 
 	// Create new account for current user
@@ -134,7 +143,7 @@ class Account
 
 		$acc_id = $db->insertId();
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return $acc_id;
 	}
@@ -187,7 +196,7 @@ class Account
 		if (!$db->updateQ("accounts", $fields, $values, "id=".$acc_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -222,7 +231,7 @@ class Account
 		if (!$db->deleteQ("accounts", "user_id=".self::$user_id." AND id=".$acc_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -236,10 +245,10 @@ class Account
 		if (!self::$full_list)
 			return FALSE;
 
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return FALSE;
 
-		foreach(self::$cache as $acc_id => $row)
+		foreach(self::$dcache as $acc_id => $row)
 		{
 			if ($row["owner_id"] == $p_id)
 			{
@@ -263,7 +272,7 @@ class Account
 		if (!$db->updateQ("accounts", array($field), array($newValue), "id=".$acc_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -282,7 +291,7 @@ class Account
 		if (!$db->deleteQ("accounts", "user_id=".self::$user_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -291,21 +300,21 @@ class Account
 	// Return owner of account
 	public function getOwner($acc_id)
 	{
-		return self::getCache($acc_id, "owner_id");
+		return $this->getCache($acc_id, "owner_id");
 	}
 
 
 	// Return user of account
 	public function getUser($acc_id)
 	{
-		return self::getCache($acc_id, "user_id");
+		return $this->getCache($acc_id, "user_id");
 	}
 
 
 	// Return currency of account
 	public function getCurrency($acc_id)
 	{
-		return self::getCache($acc_id, "curr_id");
+		return $this->getCache($acc_id, "curr_id");
 	}
 
 
@@ -322,7 +331,7 @@ class Account
 	// Return name of account
 	public function getName($acc_id)
 	{
-		return self::getCache($acc_id, "name");
+		return $this->getCache($acc_id, "name");
 	}
 
 
@@ -339,7 +348,7 @@ class Account
 	// Return current balance of account
 	public function getBalance($acc_id)
 	{
-		return self::getCache($acc_id, "balance");
+		return $this->getCache($acc_id, "balance");
 	}
 
 
@@ -366,7 +375,7 @@ class Account
 	// Return name of account
 	public function getInitBalance($acc_id)
 	{
-		return self::getCache($acc_id, "initbalance");
+		return $this->getCache($acc_id, "initbalance");
 	}
 
 
@@ -383,7 +392,7 @@ class Account
 	// Return icon type of account
 	public function getIcon($acc_id)
 	{
-		return self::getCache($acc_id, "icon");
+		return $this->getCache($acc_id, "icon");
 	}
 
 
@@ -400,10 +409,10 @@ class Account
 	// Return id of account by specified position
 	public function getIdByPos($position)
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return 0;
 
-		$keys = array_keys(self::$cache);
+		$keys = array_keys(self::$dcache);
 		if (isset($keys[$position]))
 			return $keys[$position];
 
@@ -441,10 +450,10 @@ class Account
 
 		$resStr = "";
 
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return $resStr;
 
-		foreach(self::$cache as $acc_id => $row)
+		foreach(self::$dcache as $acc_id => $row)
 		{
 			$resStr .= $tabStr."<option value=\"".$acc_id."\"";
 			if ($acc_id == $selected_id)
@@ -459,12 +468,12 @@ class Account
 	// Return Javascript array of accounts
 	public function getArray()
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return "";
 
 		$resArr = array();
 
-		foreach(self::$cache as $acc_id => $row)
+		foreach(self::$dcache as $acc_id => $row)
 		{
 			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"], $row["name"], $row["icon"]);
 		}
@@ -529,17 +538,17 @@ class Account
 	{
 		$resStr = "";
 
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return $resStr;
 
-		$accounts = count(self::$cache);
+		$accounts = count(self::$dcache);
 		if (!$accounts)
 		{
 			$resStr .= "<span>You have no one account. Please create one.</span>";
 		}
 		else
 		{
-			foreach(self::$cache as $acc_id => $row)
+			foreach(self::$dcache as $acc_id => $row)
 			{
 				if ($buttons)
 					$resStr .= $this->getTile(BUTTON_TILE, $acc_id);
@@ -555,12 +564,12 @@ class Account
 	// Return HTML for total sums per each currency
 	public function getTotals()
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return $resStr;
 
 		html_op("<div>");
 
-		$accounts = count(self::$cache);
+		$accounts = count(self::$dcache);
 		if (!$accounts)
 		{
 			html("<span>You have no one account. Please create one.</span>");
@@ -568,7 +577,7 @@ class Account
 		else
 		{
 			$totalArr = array();
-			foreach(self::$cache as $acc_id => $row)
+			foreach(self::$dcache as $acc_id => $row)
 			{
 				$currname = Currency::getName($row["curr_id"]);
 
