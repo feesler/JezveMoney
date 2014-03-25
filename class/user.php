@@ -40,69 +40,6 @@ class User extends CachedTable
 	}
 
 
-/*
-	// Check state of cache and update if needed
-	protected static function checkCache()
-	{
-		if (is_null(self::$cache))
-			self::updateCache();
-
-		return (!is_null(self::$cache));
-	}
-
-
-	// Return value of specified person from cache
-	protected static function getCache($u_id, $val)
-	{
-		$u_id = intval($u_id);
-		if (!$u_id || !$val)
-			return NULL;
-
-		if (!self::checkCache())
-			return NULL;
-
-		if (!isset(self::$cache[$u_id]))
-			return NULL;
-
-		return self::$cache[$u_id][$val];
-	}
-
-
-	// Clean cached data. Next getCache() request will update cache
-	protected static function cleanCache()
-	{
-		self::$cache = NULL;
-	}
-
-
-	// Return count of users
-	public function getCount()
-	{
-		if (!self::checkCache())
-			return 0;
-
-		return count(self::$cache);
-	}
-
-
-	// Check is specified user is exist
-	public function is_exist($u_id)
-	{
-		if (!is_numeric($u_id))
-			return FALSE;
-
-		$u_id = intval($u_id);
-		if (!$u_id)
-			return FALSE;
-
-		if (!self::checkCache())
-			return FALSE;
-
-		return isset(self::$cache[$u_id]);
-	}
-*/
-
-
 	// Return salt for specified string
 	private function getSalt($str)
 	{

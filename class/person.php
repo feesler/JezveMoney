@@ -42,69 +42,6 @@ class Person extends CachedTable
 	}
 
 
-/*
-	// Check state of cache and update if needed
-	protected static function checkCache()
-	{
-		if (is_null(self::$cache))
-			self::updateCache();
-
-		return (!is_null(self::$cache));
-	}
-
-
-	// Return value of specified person from cache
-	protected static function getCache($p_id, $val)
-	{
-		$p_id = intval($p_id);
-		if (!$p_id || !$val)
-			return NULL;
-
-		if (!self::checkCache())
-			return NULL;
-
-		if (!isset(self::$cache[$p_id]))
-			return NULL;
-
-		return self::$cache[$p_id][$val];
-	}
-
-
-	// Clean cached data. Next getCache() request will update cache
-	protected static function cleanCache()
-	{
-		self::$cache = NULL;
-	}
-
-
-	// Return count of persons
-	public static function getCount()
-	{
-		if (!self::checkCache())
-			return 0;
-
-		return count(self::$cache);
-	}
-
-
-	// Check is specified person is exist
-	public function is_exist($p_id)
-	{
-		if (!is_numeric($p_id))
-			return FALSE;
-
-		$p_id = intval($p_id);
-		if (!$p_id)
-			return FALSE;
-
-		if (!self::checkCache())
-			return FALSE;
-
-		return isset(self::$cache[$p_id]);
-	}
-*/
-
-
 	// Create new person
 	public function create($pname)
 	{

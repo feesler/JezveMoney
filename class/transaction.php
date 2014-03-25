@@ -60,58 +60,6 @@ class Transaction extends CachedTable
 	}
 
 
-/*
-	// Check state of cache and update if needed
-	protected static function checkCache($trans_id = 0)
-	{
-		if (is_null(self::$cache) || $trans_id != 0)
-			self::updateCache($trans_id);
-
-		return (!is_null(self::$cache));
-	}
-
-
-	// Return value of specified transaction from cache
-	protected static function getCache($trans_id, $val)
-	{
-		$trans_id = intval($trans_id);
-		if (!$trans_id || is_null($val) || $val == "")
-			return NULL;
-
-		if (!self::checkCache($trans_id))
-			return NULL;
-
-		if (!isset(self::$cache[$trans_id]))
-			return NULL;
-
-		return self::$cache[$trans_id][$val];
-	}
-
-
-	// Clean cached data. Next getCache() request will update cache
-	protected static function cleanCache()
-	{
-		self::$cache = NULL;
-	}
-
-
-	// Check transaction is exist for current user
-	public function is_exist($trans_id)
-	{
-		global $db;
-
-		$trans_id = intval($trans_id);
-		if (!$trans_id)
-			return FALSE;
-
-		if (!self::checkCache($trans_id))
-			return FALSE;
-
-		return (isset(self::$cache) && isset(self::$cache[$trans_id]));
-	}
-*/
-
-
 	// Create new transaction
 	public function create($trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $trans_date, $comment)
 	{

@@ -57,69 +57,6 @@ class Account extends CachedTable
 	}
 
 
-/*
-	// Check state of cache and update if needed
-	protected static function checkCache()
-	{
-		if (is_null(self::$cache))
-			self::updateCache();
-
-		return (!is_null(self::$cache));
-	}
-
-
-	// Return value of specified account from cache
-	protected static function getCache($acc_id, $val)
-	{
-		$acc_id = intval($acc_id);
-		if (!$acc_id || !$val)
-			return NULL;
-
-		if (!self::checkCache())
-			return NULL;
-
-		if (!isset(self::$cache[$acc_id]))
-			return NULL;
-
-		return self::$cache[$acc_id][$val];
-	}
-
-
-	// Clean cached data. Next getCache() request will update cache
-	protected static function cleanCache()
-	{
-		self::$cache = NULL;
-	}
-
-
-	// Return count of user accounts
-	public static function getCount()
-	{
-		if (!self::checkCache())
-			return 0;
-
-		return count(self::$cache);
-	}
-
-
-	// Check is specified account is exist
-	public function is_exist($acc_id)
-	{
-		if (!is_numeric($acc_id))
-			return FALSE;
-
-		$acc_id = intval($acc_id);
-		if (!$acc_id)
-			return FALSE;
-
-		if (!self::checkCache())
-			return FALSE;
-
-		return isset(self::$cache[$acc_id]);
-	}
-*/
-
-
 	// Create new account for current user
 	public function create($owner_id, $accname, $balance, $curr_id, $icon_type)
 	{
