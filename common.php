@@ -8,7 +8,8 @@
 	}
 
 
-	$classes = array("Account" => "class/account.php",
+	$classes = array("CachedTable" => "class/cachedTable.php",
+					"Account" => "class/account.php",
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",
 					"Currency" => "class/currency.php",
