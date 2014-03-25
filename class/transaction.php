@@ -369,10 +369,14 @@ class Transaction extends CachedTable
 		if (!$trans_id || !$new_pos)
 			return FALSE;
 
+/*
 		$this->updateCache($trans_id);
 
 		$old_pos = self::$dcache[$trans_id]["pos"];
 		$user_id = self::$dcache[$trans_id]["user_id"];
+*/
+		$old_pos = $this->getPos($trans_id);
+		$user_id = $this->getUser($trans_id);
 
 		$condition = "user_id=".$user_id;
 
