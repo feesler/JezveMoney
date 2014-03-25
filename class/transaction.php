@@ -341,8 +341,21 @@ class Transaction extends CachedTable
 
 		$tr_pos = intval($trans_pos);
 
+		if (!$this->checkCache())
+			return FALSE;
+
+		foreach(self::$dcache as $tr_id => $row)
+		{
+			if ($row["pos"] == $tr_pos)
+				return TRUE;
+		}
+
+		return FALSE;
+
+/*
 		$resArr = $db->selectQ("pos", "transactions", "user_id=".self::$user_id." AND pos=".$tr_pos);
 		return (count($resArr) == 1);
+*/
 	}
 
 
