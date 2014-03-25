@@ -1,8 +1,8 @@
 ﻿<?php
 
-class Person
+class Person extends CachedTable
 {
-	static private $cache = NULL;
+	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $owner_id = 0;		// person of user
 
@@ -17,24 +17,32 @@ class Person
 	}
 
 
+	// Return link to cache of derived class
+	protected function &getDerivedCache()
+	{
+		return self::$dcache;
+	}
+
+
 	// Update cache
-	protected static function updateCache()
+	protected function updateCache()
 	{
 		global $db;
 
-		self::$cache = array();
+		self::$dcache = array();
 
 		$resArr = $db->selectQ("*", "persons", "user_id=".self::$user_id);
 		foreach($resArr as $row)
 		{
 			$person_id = $row["id"];
 
-			self::$cache[$person_id]["name"] = $row["name"];
-			self::$cache[$person_id]["user_id"] = intval($row["user_id"]);
+			self::$dcache[$person_id]["name"] = $row["name"];
+			self::$dcache[$person_id]["user_id"] = intval($row["user_id"]);
 		}
 	}
 
 
+/*
 	// Check state of cache and update if needed
 	protected static function checkCache()
 	{
@@ -94,6 +102,7 @@ class Person
 
 		return isset(self::$cache[$p_id]);
 	}
+*/
 
 
 	// Create new person
@@ -112,7 +121,7 @@ class Person
 
 		$p_id = $db->insertId();
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return $p_id;
 	}
@@ -136,7 +145,7 @@ class Person
 		if (!$db->updateQ("persons", array("name"), array($person_name), "id=".$person_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -166,7 +175,7 @@ class Person
 		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id=".$p_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -175,10 +184,10 @@ class Person
 	// Return HTML string of persons for select control
 	public function getList($selected_id = 0)
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return;
 
-		foreach(self::$cache as $person_id => $row)
+		foreach(self::$dcache as $person_id => $row)
 		{
 			if ($person_id != self::$owner_id)
 			{
@@ -196,13 +205,13 @@ class Person
 	// Return person id by specified position
 	public function getIdByPos($pos = 0)
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return 0;
 
-		if (count(self::$cache) == 1)		// no persons except user owner
+		if (count(self::$dcache) == 1)		// no persons except user owner
 			return 0;
 
-		$keys = array_keys(self::$cache);
+		$keys = array_keys(self::$dcache);
 		if (isset($keys[$pos]))
 		{
 			if ($keys[$pos] == self::$owner_id)
@@ -271,10 +280,10 @@ class Person
 	// Search person with specified name and return id if success
 	public function findByName($p_name)
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return 0;
 
-		foreach(self::$cache as $p_id => $row)
+		foreach(self::$dcache as $p_id => $row)
 		{
 			if ($p_id != self::$owner_id && $row["name"] == $p_name)
 			{
@@ -297,7 +306,7 @@ class Person
 		if (!$db->deleteQ("persons", "user_id=".self::$user_id." AND id<>".self::$owner_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -395,7 +404,7 @@ class Person
 		}
 		else
 		{
-			foreach(self::$cache as $p_id => $row)
+			foreach(self::$dcache as $p_id => $row)
 			{
 				if ($p_id != self::$owner_id)
 				{
@@ -423,7 +432,7 @@ class Person
 		{
 			$acc = new Account(self::$user_id, TRUE);
 
-			foreach(self::$cache as $p_id => $row)
+			foreach(self::$dcache as $p_id => $row)
 			{
 				if ($p_id == self::$owner_id)
 					continue;
