@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 abstract class CachedTable
 {
@@ -20,12 +20,12 @@ abstract class CachedTable
 
 
 	// Check state of cache and update if needed
-	protected function checkCache()
+	protected function checkCache($obj_id = 0)
 	{
 		$this->cache =& $this->getDerivedCache();
 
-		if (is_null($this->cache))
-			$this->updateCache();
+		if (is_null($this->cache) || $obj_id != 0)
+			$this->updateCache($obj_id);
 
 		return (!is_null($this->cache));
 	}
