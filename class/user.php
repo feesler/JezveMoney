@@ -1,8 +1,8 @@
 ﻿<?php
 
-class User
+class User extends CachedTable
 {
-	static private $cache = NULL;
+	static private $dcache = NULL;
 	static private $path = "/money/";
 	static private $domain = "jezve.net";
 
@@ -13,26 +13,34 @@ class User
 	}
 
 
+	// Return link to cache of derived class
+	protected function &getDerivedCache()
+	{
+		return self::$dcache;
+	}
+
+
 	// Update cache
-	protected static function updateCache()
+	protected function updateCache()
 	{
 		global $db;
 
-		self::$cache = array();
+		self::$dcache = array();
 
 		$resArr = $db->selectQ("*", "users");
 		foreach($resArr as $row)
 		{
 			$user_id = $row["id"];
 
-			self::$cache[$user_id]["login"] = $row["login"];
-			self::$cache[$user_id]["passhash"] = $row["passhash"];
-			self::$cache[$user_id]["owner_id"] = intval($row["owner_id"]);
-			self::$cache[$user_id]["access"] = intval($row["access"]);
+			self::$dcache[$user_id]["login"] = $row["login"];
+			self::$dcache[$user_id]["passhash"] = $row["passhash"];
+			self::$dcache[$user_id]["owner_id"] = intval($row["owner_id"]);
+			self::$dcache[$user_id]["access"] = intval($row["access"]);
 		}
 	}
 
 
+/*
 	// Check state of cache and update if needed
 	protected static function checkCache()
 	{
@@ -92,6 +100,7 @@ class User
 
 		return isset(self::$cache[$u_id]);
 	}
+*/
 
 
 	// Return salt for specified string
@@ -235,10 +244,10 @@ class User
 	// Return user id by specified login
 	public function getId($login)
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return 0;
 
-		foreach(self::$cache as $u_id => $row)
+		foreach(self::$dcache as $u_id => $row)
 		{
 			if ($row["login"] == $login)
 				return $u_id;
@@ -261,7 +270,7 @@ class User
 		if (!$db->updateQ("users", array("owner_id"), array($owner_id), "id=".qnull($u_id)))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -284,7 +293,7 @@ class User
 		if (!$db->updateQ("users", array("passhash"), array($passhash), "login=".qnull($elogin)))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -324,7 +333,7 @@ class User
 
 		$this->setOwner($user_id, $p_id);
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
