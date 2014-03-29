@@ -222,7 +222,6 @@ var transactions =
 						initBalArr[src_id] = trans[9] + trans[13];		// src_bal + charge
 					else if (tr_type == 4 && trans[11] == 2)
 						initBalArr[src_id] = trans[9] - trans[12];		// src_bal + amount
-					dout('initBalArr[' + src_id + '] = ' + initBalArr[src_id]);
 				}
 
 				if (dest_id && initBalArr[dest_id] === undefined)
@@ -234,6 +233,7 @@ var transactions =
 				}
 			});
 
+			// Sort array of  transaction by position again
 			transArr.sort(function(tr1, tr2)
 			{
 				if (tr1[8] < tr2[8])
@@ -246,39 +246,39 @@ var transactions =
 
 			if (detailsMode)
 			{
-			var tBalanceArr = [];
+				var tBalanceArr = [];
 
-			transArr.forEach(function(trans)
-			{
-				src_id = trans[1];
-				dest_id = trans[2];
-
-				src_bal = (src_id != 0 && tBalanceArr[src_id] !== undefined) ? tBalanceArr[src_id] : initBalArr[src_id] /*null*/;
-				dest_bal = (dest_id != 0 && tBalanceArr[dest_id] !== undefined) ? tBalanceArr[dest_id] : initBalArr[dest_id] /*null*/;
-
-				if (oldPos == 0)			// insert with specified position
+				transArr.forEach(function(trans)
 				{
-					if (trans[8] >= pos)
+					src_id = trans[1];
+					dest_id = trans[2];
+
+					src_bal = (src_id != 0 && tBalanceArr[src_id] !== undefined) ? tBalanceArr[src_id] : initBalArr[src_id] /*null*/;
+					dest_bal = (dest_id != 0 && tBalanceArr[dest_id] !== undefined) ? tBalanceArr[dest_id] : initBalArr[dest_id] /*null*/;
+
+					if (oldPos == 0)			// insert with specified position
 					{
-						this.updateBalance(trans, src_bal, dest_bal);
+						if (trans[8] >= pos)
+						{
+							this.updateBalance(trans, src_bal, dest_bal);
+						}
 					}
-				}
-				else if (pos < oldPos)		// moving up
-				{
-					if (trans[8] >= pos && trans[8] <= oldPos)
+					else if (pos < oldPos)		// moving up
 					{
-						this.updateBalance(trans, src_bal, dest_bal);
+						if (trans[8] >= pos && trans[8] <= oldPos)
+						{
+							this.updateBalance(trans, src_bal, dest_bal);
+						}
 					}
-				}
-				else if (pos > oldPos)		// moving down
-				{
-					if (trans[8] >= oldPos && trans[8] <= pos)
-						this.updateBalance(trans, src_bal, dest_bal);
-				}
+					else if (pos > oldPos)		// moving down
+					{
+						if (trans[8] >= oldPos && trans[8] <= pos)
+							this.updateBalance(trans, src_bal, dest_bal);
+					}
 
-				tBalanceArr[src_id] = trans[9];
-				tBalanceArr[dest_id] = trans[10];
-			}, this);
+					tBalanceArr[src_id] = trans[9];
+					tBalanceArr[dest_id] = trans[10];
+				}, this);
 			}
 		}
 
