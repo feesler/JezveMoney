@@ -244,6 +244,8 @@ var transactions =
 				return 0;
 			});
 
+			if (detailsMode)
+			{
 			var tBalanceArr = [];
 
 			transArr.forEach(function(trans)
@@ -277,6 +279,7 @@ var transactions =
 				tBalanceArr[src_id] = trans[9];
 				tBalanceArr[dest_id] = trans[10];
 			}, this);
+			}
 		}
 
 		return true;
