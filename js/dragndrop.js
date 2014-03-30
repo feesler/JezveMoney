@@ -152,9 +152,30 @@ function DragObject(element, isTable)
 	{
 		var s = element.style;
 		var origWidth = element.offsetWidth;
-		rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
+
+		if (isTable)
+		{
+			var cellEl;
+
+			rememberPosition = { top: s.top, left: s.left, position: s.position };
+			rememberPosition.width = [];
+
+			// Save width of all cells
+			cellEl = element.firstElementChild;
+			while(cellEl)
+			{
+				rememberPosition.width[rememberPosition.width.length] = cellEl.offsetWidth;
+				cellEl.style.width = px(cellEl.offsetWidth);
+
+				cellEl = cellEl.nextElementSibling;
+			}
+		}
+		else
+		{
+			rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
+			s.width = px(origWidth - 16);
+		}
 		s.position = 'absolute';
-		s.width = px(origWidth - 16);
 
 		if (isTable)
 		{
@@ -186,7 +207,20 @@ function DragObject(element, isTable)
 		s.top = rememberPosition.top;
 		s.left = rememberPosition.left;
 		s.position = rememberPosition.position;
-		s.width = rememberPosition.width;
+		if (isTable)
+		{
+			// Reset width of all cells
+			var cellEl = element.firstElementChild;
+			while(cellEl)
+			{
+				cellEl.style.width = '';
+				cellEl = cellEl.nextElementSibling;
+			}
+		}
+		else
+		{
+			s.width = rememberPosition.width;
+		}
 	}
 
 
