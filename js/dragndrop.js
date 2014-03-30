@@ -172,8 +172,13 @@ function DragObject(element, isTable)
 		}
 		else
 		{
+			var padding;
+			var computedStyle = window.getComputedStyle ? getComputedStyle(element, '') : element.currentStyle;
+
 			rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
-			s.width = px(origWidth - 16);
+
+			padding = parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
+			s.width = px(origWidth - padding);
 		}
 		s.position = 'absolute';
 
