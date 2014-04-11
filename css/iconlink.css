@@ -19,6 +19,17 @@
 }
 
 
+.iconlink .icon_white
+{
+	width: 32px;
+	height: 32px;
+	background: url('../img/icons_white.png') no-repeat;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+}
+
+
 .iconlink span
 {
 	height: 32px;
