@@ -520,6 +520,32 @@ function getOffsetSum(elem)
 }
 
 
+// Return page scroll
+function getPageScroll()
+{
+	if (window.pageXOffset != undefined)
+	{
+		return {
+			left: pageXOffset,
+			top: pageYOffset
+		};
+	}
+	else
+	{
+		var html = document.documentElement;
+		var body = document.body;
+
+		var top = html.scrollTop || body && body.scrollTop || 0;
+		top -= html.clientTop;
+
+		var left = html.scrollLeft || body && body.scrollLeft || 0;
+		left -= html.clientLeft;
+
+		return { top: top, left: left };
+	}
+}
+
+
 // Close message box
 function onCloseMessage()
 {
