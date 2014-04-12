@@ -208,6 +208,12 @@ function onTileClick(acc_id)
 		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
 			export_btn.firstElementChild.href = './csvexport.php?id=' + accounts.selectedArr[0];
 	}
+
+	if (accounts.selectedCount() > 0)
+	{
+		show('toolbar', true);
+		onScroll();
+	}
 }
 
 

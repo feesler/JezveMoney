@@ -87,12 +87,7 @@ body
 }
 
 
-.sidebar > div > .siderbar_content
-{
-	display: none;
-}
-
-
+.sidebar > div > .siderbar_content,
 .sidebar.active > div > .siderbar_content
 {
 	display: block;
@@ -107,6 +102,7 @@ body
 }
 
 
+/*
 .siderbar_content > div
 {
 	display: inline-block;
@@ -114,10 +110,12 @@ body
 	line-height: 32px;
 	margin: 9px 12px;
 }
+*/
 
 
 .siderbar_content > .iconlink
 {
 	clear: none;
+	float: left;
 	margin: 9px 0px 9px 12px;
 }
