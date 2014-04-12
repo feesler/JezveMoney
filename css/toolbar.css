@@ -84,6 +84,7 @@ body
 {
 	overflow: hidden;
 	min-height: 1px;
+	position: relative;
 /*	display: none;	*/
 }
 
