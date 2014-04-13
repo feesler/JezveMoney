@@ -15,14 +15,6 @@ body
 }
 
 
-.centered
-{
-	margin: 0 auto;
-	max-width: 824px;
-	min-width: 200px;
-}
-
-
 .page
 {
 	display: table;
