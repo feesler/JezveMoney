@@ -22,9 +22,12 @@
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
+	html(getCSS("toolbar.css"));
+	html("<link rel=\"stylesheet\" media=\"all and (min-width: 701px)\" type=\"text/css\" href=\"./css/screen.css\" />");
 	html(getJS("common.js"));
 	html(getJS("ready.js"));
 	html(getJS("popup.js"));
+	html(getJS("toolbar.js"));
 	html(getJS("persons.js"));
 
 	if (isMessageSet())
@@ -50,15 +53,23 @@
 				html(getIconLink(ICON_LINK, "add_btn", "add", "New", TRUE, "./newperson.php"));
 			html_cl("</div>");
 			html("<div class=\"tiles\">".$pers->getTiles(TRUE)."</div>");
-			html_op("<div class=\"control_icons\">");
-				html(getIconLink(ICON_LINK, "edit_btn", "edit", "Edit", FALSE, "#"));
-				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", FALSE, "showDeletePopup();"));
-			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
 
 			html_cl("</div>");
 		html_cl("</div>");
+
+		html_op("<div id=\"toolbar\" class=\"sidebar\" style=\"display: none;\">");
+			html_op("<div>");
+				html_op("<div id=\"tb_content\" class=\"siderbar_content\">");
+					html("<div id=\"sbEllipsis\" class=\"sidebar_ellipsis\"></div>");
+
+					html(getIconLink(ICON_LINK, "edit_btn", "icon_white edit", "Edit", FALSE, "#"));
+					html(getIconLink(ICON_BUTTON, "del_btn", "icon_white del", "Delete", FALSE, "showDeletePopup();"));
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+
 	html_cl("</div>");
 
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/delperson.php\">");
