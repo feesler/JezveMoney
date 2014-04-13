@@ -44,9 +44,12 @@
 	html("</head>");
 	html("<body>");
 
+	html_op("<div class=\"page\">");
+	html_op("<div class=\"page_wrapper\">");
+
 	require_once("./templates/header.php");
 
-	html_op("<div class=\"page_wrapper\">");
+	html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"heading\">");
@@ -63,6 +66,10 @@
 */
 		html_cl("</div>");
 
+	html_cl("</div>");
+	html_cl("</div>");
+	html_cl("</div>");
+
 		html_op("<div id=\"toolbar\" class=\"sidebar\" style=\"display: none;\">");
 			html_op("<div>");
 				html_op("<div id=\"tb_content\" class=\"siderbar_content\">");
@@ -74,7 +81,6 @@
 			html_cl("</div>");
 		html_cl("</div>");
 
-	html_cl("</div>");
 	html_cl("</div>");
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/delaccount.php\">");
 	html("<input id=\"delaccounts\" name=\"accounts\" type=\"hidden\" value=\"\">");

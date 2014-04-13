@@ -146,6 +146,10 @@ button::-moz-focus-inner
 {
 	height: 50px;
 	background-color: #404040;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 10;
 }
 
 
@@ -297,12 +301,14 @@ button::-moz-focus-inner
 
 
 /* content */
+/*
 .content
 {
 	margin: 0 auto;
 	max-width: 824px;
 	min-width: 200px;
 }
+*/
 
 
 .widget
@@ -393,10 +399,12 @@ button::-moz-focus-inner
 }
 
 
+/*
 .content_wrap
 {
 	padding: 0px 12px;
 }
+*/
 
 
 h2
