@@ -51,7 +51,7 @@
 	require_once("./templates/header.php");
 
 		html_op("<div class=\"container centered\">");
-	html_op("<div class=\"content acc_content\">");
+	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new account</h2>");
 			html_op("<div>");
