@@ -300,17 +300,6 @@ button::-moz-focus-inner
 }
 
 
-/* content */
-/*
-.content
-{
-	margin: 0 auto;
-	max-width: 824px;
-	min-width: 200px;
-}
-*/
-
-
 .widget
 {
 	display: inline-block;
@@ -397,14 +386,6 @@ button::-moz-focus-inner
 {
 	padding: 0;
 }
-
-
-/*
-.content_wrap
-{
-	padding: 0px 12px;
-}
-*/
 
 
 h2
