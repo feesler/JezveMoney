@@ -29,7 +29,6 @@
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
 	html(getCSS("iconlink.css"));
-	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
