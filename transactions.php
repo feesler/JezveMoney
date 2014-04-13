@@ -128,7 +128,7 @@
 				html_cl("</div>");
 
 				html_op("<div class=\"tr_filter date_filter\">");
-					html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Select range", TRUE, "showCalendar();", "form_iconlink", (is_empty($dateFmt) ? NULL : $dateFmt)));
+					html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Select range", TRUE, "showCalendar();", "std_margin", (is_empty($dateFmt) ? NULL : $dateFmt)));
 					html_op("<div id=\"date_block\" style=\"display: none;\">");
 						html_op("<div>");
 							html_op("<div class=\"right_float\">");

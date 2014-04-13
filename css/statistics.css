@@ -38,13 +38,6 @@
 
 
 /* transactions page filer */
-/* TODO :remove duplication with transaction.css */
-.form_iconlink
-{
-	margin: 9px 0px;
-}
-
-
 .tr_filter
 {
 	float: left;

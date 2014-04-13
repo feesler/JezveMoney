@@ -355,7 +355,7 @@
 	html();
 	html_op("<div class=\"non_float\">");
 		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
-		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "form_iconlink", $dateFmt));
+		html(getIconLink(ICON_BUTTON, "calendar_btn", "calendar", "Change date", TRUE, "showCalendar();", "std_margin", $dateFmt));
 		html_op("<div id=\"date_block\" style=\"display: none;\">");
 			html("<div><label for=\"date\">Date</label></div>");
 			html_op("<div>");
@@ -374,7 +374,7 @@
 
 	html();
 	html_op("<div class=\"non_float\">");
-		html(getIconLink(ICON_BUTTON, "comm_btn", "add", "Add comment", ($tr["comment"] == ""), "showComment();", "form_iconlink"));
+		html(getIconLink(ICON_BUTTON, "comm_btn", "add", "Add comment", ($tr["comment"] == ""), "showComment();", "std_margin"));
 		html_op("<div id=\"comment_block\"".(($tr["comment"] != "") ? "" : " style=\"display: none;\"").">");
 			html("<div><label for=\"comm\">Comment</label></div>");
 			html_op("<div>");
