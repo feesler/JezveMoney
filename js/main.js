@@ -209,9 +209,9 @@ function onTileClick(acc_id)
 			export_btn.firstElementChild.href = './csvexport.php?id=' + accounts.selectedArr[0];
 	}
 
+	show('toolbar', (accounts.selectedCount() > 0));
 	if (accounts.selectedCount() > 0)
 	{
-		show('toolbar', true);
 		onScroll();
 	}
 }
