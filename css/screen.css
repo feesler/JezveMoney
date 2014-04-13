@@ -22,18 +22,6 @@
 }
 
 
-.sidebar_ellipsis
-{
-	display: none;
-}
-
-
-.sidebar.active > div
-{
-	width: auto;
-}
-
-
 .sidebar > div > .siderbar_content,
 .sidebar.active > div > .siderbar_content
 {
@@ -45,6 +33,12 @@
 	margin: 0px auto;
 	max-width: 824px;
 	min-width: 200px;
+}
+
+
+.sidebar_ellipsis
+{
+	display: none;
 }
 
 
