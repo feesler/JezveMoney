@@ -53,8 +53,12 @@
 	html("</head>");
 	html("<body>");
 
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
 	require_once("./templates/header.php");
 
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"widget\">");
@@ -98,6 +102,10 @@
 					html_cl("</div>");
 					html("<div id=\"chpopup\" class=\"chart_popup\" style=\"display: none;\"></div>");
 				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");

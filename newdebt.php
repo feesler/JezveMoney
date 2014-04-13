@@ -128,10 +128,14 @@
 	html("</head>");
 	html("<body>");
 
-	require_once("./templates/header.php");
-
 	html("<form method=\"post\" action=\"./modules/debt.php\" onsubmit=\"return onDebtSubmit(this);\">");
 
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
+	require_once("./templates/header.php");
+
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new debt</h2>");
@@ -356,6 +360,11 @@
 	html_cl("</div>");
 	html_cl("</div>");
 	html_cl("</div>");
+
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 	html("</form>");
 	html("</body>");
 	html("</html>");

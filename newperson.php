@@ -35,9 +35,14 @@
 	html("</head>");
 	html("<body>");
 
+	html("<form method=\"post\" action=\"./modules/createperson.php\" onsubmit=\"return onNewPersonSubmit(this);\">");
+
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
 	require_once("./templates/header.php");
 
-	html("<form method=\"post\" action=\"./modules/createperson.php\" onsubmit=\"return onNewPersonSubmit(this);\">");
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new person</h2>");
@@ -51,6 +56,11 @@
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
+
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 	html("</form>");
 	html("</body>");
 	html("</html>");

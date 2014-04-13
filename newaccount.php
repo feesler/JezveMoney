@@ -44,9 +44,14 @@
 	html("</head>");
 	html("<body>");
 
+	html("<form method=\"post\" action=\"./modules/createaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
+
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
 	require_once("./templates/header.php");
 
-	html("<form method=\"post\" action=\"./modules/createaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new account</h2>");
@@ -101,6 +106,10 @@
 				html_cl("</div>");
 
 				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./accounts.php\">cancel</a></div>");
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");

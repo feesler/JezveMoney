@@ -37,8 +37,12 @@
 	html("</head>");
 	html("<body>");
 
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
 	require_once("./templates/header.php");
 
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"heading\">");
@@ -52,6 +56,11 @@
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
+
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/delperson.php\">");
 	html("<input id=\"delpersons\" name=\"persons\" type=\"hidden\" value=\"\">");
 	html("</form>");

@@ -40,7 +40,6 @@
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
 	html(getCSS("popup.css"));
-	html(getCSS("login.css"));
 	html(getCSS("iconlink.css"));
 	html(getJS("common.js"));
 	html(getJS("ready.js"));
@@ -56,8 +55,12 @@
 	html("</head>");
 	html("<body>");
 
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
 	require_once("./templates/header.php");
 
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap profile_summary\">");
 			html("<h1>User profile</h1>");
@@ -144,6 +147,10 @@
 		html("</form>");
 	}
 
+	html_cl("</div>");
+
+			html_cl("</div>");
+		html_cl("</div>");
 	html_cl("</div>");
 	html("</body>");
 	html("</html>");

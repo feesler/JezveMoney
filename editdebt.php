@@ -176,12 +176,16 @@
 	html("</head>");
 	html("<body>");
 
-	require_once("./templates/header.php");
-
 	html("<form method=\"post\" action=\"./modules/editdebt.php\" onsubmit=\"return onDebtSubmit(this);\">");
 	html("<input name=\"transid\" type=\"hidden\" value=\"".$tr["id"]."\">");
 	html("<input name=\"transtype\" type=\"hidden\" value=\"".$tr["type"]."\">");
 
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
+	require_once("./templates/header.php");
+
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"heading h2_heading\">");
@@ -391,6 +395,11 @@
 	html_cl("</div>");
 	html_cl("</div>");
 	html_cl("</div>");
+
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 	html("</form>");
 
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");

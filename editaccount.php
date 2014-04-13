@@ -34,7 +34,6 @@
 
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
-	html(getCSS("login.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
@@ -57,10 +56,15 @@
 	html("</head>");
 	html("<body>");
 
-	require_once("./templates/header.php");
-
 	html("<form method=\"post\" action=\"./modules/editaccount.php\" onsubmit=\"return onNewAccountSubmit(this);\">");
 	html("<input id=\"accid\" name=\"accid\" type=\"hidden\" value=\"".$acc_id."\">");
+
+	html_op("<div class=\"page\">");
+		html_op("<div class=\"page_wrapper\">");
+
+	require_once("./templates/header.php");
+
+		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content acc_content\">");
 		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"heading h2_heading\">");
@@ -122,6 +126,11 @@
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
+
+			html_cl("</div>");
+		html_cl("</div>");
+	html_cl("</div>");
+
 	html("</form>");
 
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/delaccount.php\">");
