@@ -107,12 +107,9 @@
 				html_cl("</div>");
 			html_cl("</div>");
 
-		html_cl("</div>");
-
 	if ($action == "changepassword")
 	{
 		html("<form method=\"post\" action=\"./modules/changepassword.php\" onsubmit=\"return onChangePassSubmit(this);\">");
-		html_op("<div class=\"content_wrap\">");
 			html("<h2>Change password</h2>");
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
@@ -127,13 +124,11 @@
 
 				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
 			html_cl("</div>");
-		html_cl("</div>");
 		html("</form>");
 	}
 	else if ($action == "changename")
 	{
 		html("<form method=\"post\" action=\"./modules/changename.php\" onsubmit=\"return onChangeNameSubmit(this);\">");
-		html_op("<div class=\"content_wrap\">");
 			html("<h2>Change name</h2>");
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
@@ -143,9 +138,10 @@
 
 				html("<div class=\"acc_controls\"><input class=\"btn ok_btn\" type=\"submit\" value=\"ok\"><a class=\"btn cancel_btn\" href=\"./profile.php\">cancel</a></div>");
 			html_cl("</div>");
-		html_cl("</div>");
 		html("</form>");
 	}
+
+		html_cl("</div>");
 
 	html_cl("</div>");
 
