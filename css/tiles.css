@@ -3,6 +3,7 @@
 	display: block;
 	clear: both;
 	max-width: 440px;
+	overflow: hidden;
 }
 
 
