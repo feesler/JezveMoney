@@ -57,6 +57,8 @@
 	html(getCSS("transaction.css"));
 	html(getCSS("trlist.css"));
 	html(getCSS("popup.css"));
+	html(getCSS("toolbar.css"));
+	html("<link rel=\"stylesheet\" media=\"all and (min-width: 701px)\" type=\"text/css\" href=\"./css/screen.css\" />");
 	html(getJS("common.js"));
 	html(getJS("currency.js"));
 	html(getJS("account.js"));
@@ -65,6 +67,7 @@
 	html(getJS("calendar.js"));
 	html(getJS("popup.js"));
 	html(getJS("dragndrop.js"));
+	html(getJS("toolbar.js"));
 	html(getJS("tr_list.js"));
 
 	html("<script>");
@@ -146,17 +149,24 @@
 
 				$trans->getTable($trans_type, $acc_id, TRUE, 10, $page_num, TRUE, $searchReq, $stDate, $endDate, $showDetails);
 			html_cl("</div>");
-
-			html_op("<div class=\"control_icons\">");
-				html(getIconLink(ICON_LINK, "edit_btn", "edit", "Edit", FALSE, "#"));
-				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", FALSE, "showDeletePopup();"));
-			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
 	html_cl("</div>");
 
 			html_cl("</div>");
 		html_cl("</div>");
+
+		html_op("<div id=\"toolbar\" class=\"sidebar\" style=\"display: none;\">");
+			html_op("<div>");
+				html_op("<div id=\"tb_content\" class=\"siderbar_content\">");
+					html("<div id=\"sbEllipsis\" class=\"sidebar_ellipsis\"></div>");
+
+					html(getIconLink(ICON_LINK, "edit_btn", "icon_white edit", "Edit", FALSE, "#"));
+					html(getIconLink(ICON_BUTTON, "del_btn", "icon_white del", "Delete", FALSE, "showDeletePopup();"));
+				html_cl("</div>");
+			html_cl("</div>");
+		html_cl("</div>");
+
 	html_cl("</div>");
 
 	html("<form id=\"delform\" method=\"post\" action=\"./modules/deltransaction.php\">");

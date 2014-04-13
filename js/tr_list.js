@@ -347,6 +347,12 @@ function onTransClick(tr_id)
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
 			edit_btn.firstElementChild.href = './edittransaction.php?id=' + transactions.selectedArr[0];
 	}
+
+	show('toolbar', (transactions.selectedCount() > 0));
+	if (transactions.selectedCount() > 0)
+	{
+		onScroll();
+	}
 }
 
 
