@@ -42,11 +42,11 @@
 	require_once("./templates/header.php");
 
 		html_op("<div class=\"container centered\">");
-	html_op("<div class=\"content acc_content\">");
+	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new person</h2>");
 			html_op("<div>");
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html("<label for=\"pname\">Person name</label>");
 					html("<div class=\"stretch_input std_input\"><div><input id=\"pname\" name=\"pname\" type=\"text\"></div></div>");
 				html_cl("</div>");

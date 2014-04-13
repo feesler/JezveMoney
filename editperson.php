@@ -56,14 +56,14 @@
 	require_once("./templates/header.php");
 
 		html_op("<div class=\"container centered\">");
-	html_op("<div class=\"content acc_content\">");
+	html_op("<div class=\"content\">");
 		html_op("<div class=\"content_wrap\">");
 			html_op("<div class=\"heading h2_heading\">");
 				html("<h2>Edit person</h2>");
 				html(getIconLink(ICON_BUTTON, "del_btn", "del", "Delete", TRUE, "onDelete();"));
 			html_cl("</div>");
 			html_op("<div>");
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html("<label for=\"pname\">Person name</label>");
 					html_op("<div class=\"stretch_input std_input\">");
 						html("<div><input id=\"pname\" name=\"pname\" type=\"text\" value =\"".$pName."\"></div>");

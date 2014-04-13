@@ -55,11 +55,11 @@
 		html_op("<div class=\"content_wrap\">");
 			html("<h2>Create new account</h2>");
 			html_op("<div>");
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html(getTile(BUTTON_TILE, "acc_tile", "New account", Currency::format($acc_bal, $curr_id), "", ""));
 				html_cl("</div>");
 
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html("<label for=\"currency\">Icon</label>");
 					html_op("<div class=\"std_input\">");
 						html_op("<div>");
@@ -76,12 +76,12 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html("<label for=\"accname\">Account name</label>");
 					html("<div class=\"stretch_input std_input\"><div><input id=\"accname\" name=\"accname\" type=\"text\" oninput=\"return onAccNameInput(this);\"></div></div>");
 				html_cl("</div>");
 
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html("<label for=\"currency\">Currency</label>");
 					html_op("<div class=\"std_input\">");
 						html_op("<div>");
@@ -92,7 +92,7 @@
 					html_cl("</div>");
 				html_cl("</div>");
 
-				html_op("<div class=\"non_float\">");
+				html_op("<div class=\"non_float std_margin\">");
 					html("<label for=\"balance\">Initial balance</label>");
 					html_op("<div>");
 						html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"currsign\">".$curr_sign."</div></div></div>");
