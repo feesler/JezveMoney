@@ -1,6 +1,6 @@
 <?php
 	html_op("<div class=\"header\">");
-		html_op("<div>");
+		html_op("<div class=\"centered\">");
 			html("<div class=\"logo\"><a href=\"./index.php\"><span>Jezve Money</span></a></div>");
 
 	if ($user_id != 0)

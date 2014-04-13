@@ -162,14 +162,6 @@ button::-moz-focus-inner
 }
 
 
-.header > div
-{
-	margin: 0 auto;
-	max-width: 824px;
-	min-width: 200px;
-}
-
-
 .header > div > div 
 {
 	height: 50px;
