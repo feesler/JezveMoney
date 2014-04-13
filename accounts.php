@@ -39,7 +39,7 @@
 			html("onReady(initMessage);");
 		}
 		html("onReady(initToolbar);");
-	html_op("</script>");
+	html_cl("</script>");
 
 	html("</head>");
 	html("<body>");
