@@ -14,7 +14,7 @@
    id="svg3078"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   inkscape:export-filename="D:\Downloads\details.png"
+   inkscape:export-filename="D:\Downloads\details2.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
    sodipodi:docname="icons.svg">
@@ -33,8 +33,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="258.47289"
-     inkscape:cy="15.462374"
+     inkscape:cx="283.79612"
+     inkscape:cy="61.923396"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -939,6 +939,41 @@
          id="rect3128-48"
          d="m 76.91807,439.26934 0,3 8.999999,0 0,-3 z"
          style="fill:#ff0000;fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       id="g3965"
+       style="fill:#ff0000"
+       transform="translate(462,-41.999999)">
+      <path
+         transform="matrix(0.92753623,0,0,0.92753623,60.512273,416.74762)"
+         d="m 17.6875,7.03125 c 0,1.190864 -0.965386,2.15625 -2.15625,2.15625 -1.190864,0 -2.15625,-0.965386 -2.15625,-2.15625 0,-1.190864 0.965386,-2.15625 2.15625,-2.15625 1.190864,0 2.15625,0.965386 2.15625,2.15625 z"
+         sodipodi:ry="2.15625"
+         sodipodi:rx="2.15625"
+         sodipodi:cy="7.03125"
+         sodipodi:cx="15.53125"
+         id="path3116"
+         style="fill:#ff0000;fill-opacity:1;stroke:none"
+         sodipodi:type="arc" />
+      <path
+         transform="matrix(0.92753623,0,0,0.92753623,60.512273,424.74761)"
+         d="m 17.6875,7.03125 c 0,1.190864 -0.965386,2.15625 -2.15625,2.15625 -1.190864,0 -2.15625,-0.965386 -2.15625,-2.15625 0,-1.190864 0.965386,-2.15625 2.15625,-2.15625 1.190864,0 2.15625,0.965386 2.15625,2.15625 z"
+         sodipodi:ry="2.15625"
+         sodipodi:rx="2.15625"
+         sodipodi:cy="7.03125"
+         sodipodi:cx="15.53125"
+         id="path3116-4"
+         style="fill:#ff0000;fill-opacity:1;stroke:none"
+         sodipodi:type="arc" />
+      <path
+         transform="matrix(0.92753623,0,0,0.92753623,60.512273,432.74762)"
+         d="m 17.6875,7.03125 c 0,1.190864 -0.965386,2.15625 -2.15625,2.15625 -1.190864,0 -2.15625,-0.965386 -2.15625,-2.15625 0,-1.190864 0.965386,-2.15625 2.15625,-2.15625 1.190864,0 2.15625,0.965386 2.15625,2.15625 z"
+         sodipodi:ry="2.15625"
+         sodipodi:rx="2.15625"
+         sodipodi:cy="7.03125"
+         sodipodi:cx="15.53125"
+         id="path3116-0"
+         style="fill:#ff0000;fill-opacity:1;stroke:none"
+         sodipodi:type="arc" />
     </g>
   </g>
 </svg>
