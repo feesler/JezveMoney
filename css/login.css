@@ -1,5 +1,5 @@
 /* layered layout */
-.page
+.layer
 {
 	position: absolute;
 	top: 50px;
@@ -29,19 +29,19 @@
 
 
 /* login page */
-.login_page
+.login_layer
 {
 	min-height: 264px;
 }
 
 
-.login_page > .cont
+.login_layer > .cont
 {
 	margin-top: -132px;	
 }
 
 
-.login_page > .cont > .box
+.login_layer > .cont > .box
 {
 	height: 264px;
 }
@@ -54,19 +54,19 @@
 
 
 /* registration page */
-.register_page
+.register_layer
 {
 	min-height: 335px;
 }
 
 
-.register_page > .cont
+.register_layer > .cont
 {
 	margin-top: -168px;
 }
 
 
-.register_page > .cont > .box
+.register_layer > .cont > .box
 {
 	height: 335px;
 }

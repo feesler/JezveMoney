@@ -37,7 +37,7 @@
 	require_once("./templates/header.php");
 
 	html("<form action=\"./modules/login.php\" method=\"post\" onsubmit=\"return onLoginSubmit(this);\">");
-	html_op("<div class=\"page login_page\">");
+	html_op("<div class=\"layer login_layer\">");
 		html_op("<div class=\"cont\">");
 			html_op("<div class=\"box\">");
 				html("<h1>Log in</h1>");
