@@ -41,6 +41,7 @@
 	html(getCSS("common.css"));
 	html(getCSS("popup.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("user.css"));
 	html(getJS("common.js"));
 	html(getJS("ready.js"));
 	html(getJS("popup.js"));
