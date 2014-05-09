@@ -8,14 +8,73 @@ function ge(a)
 // Check object is array
 function isArray(obj)
 {
-	return (typeof obj === 'object' && obj.constructor.toString().indexOf("Array") != -1);
+	return (typeof obj === 'object' && obj.constructor.toString().indexOf('Array') != -1);
 }
 
 
 // Check object is date
 function isDate(obj)
 {
-	return (typeof obj === 'object' && obj.constructor.toString().indexOf("Date") != -1);
+	return (typeof obj === 'object' && obj.constructor.toString().indexOf('Date') != -1);
+}
+
+
+// Check object is function
+function isFunction(obj)
+{
+	var getType = {};
+	return obj && getType.toString.call(obj) === '[object Function]';
+}
+
+
+// Check item is in array
+function inArray(arr, val)
+{
+	if (!isArray(arr))
+		return false;
+
+	if (Array.prototype.indexOf)
+	{
+		return (arr.indexOf(val) != -1);
+	}
+	else
+	{
+		var i = arr.length;
+
+		while(i--)
+		{
+			if (arr[i] === val)
+				return true;
+		}
+
+		return false;
+	}
+}
+
+
+// Wrapper for Array.prototype.every
+function every(arr, func)
+{
+	if (!isArray(arr))
+		throw new TypeError();
+
+	if (!isFunction(func))
+		throw new TypeError();
+
+	if (Array.prototype.every)
+	{
+		return arr.every(func);
+	}
+	else
+	{
+		for(var i = 0; i < arr.length; i++)
+		{
+			if (!func(arr[i], i, arr))
+				return false;
+		}
+
+		return true;
+	}
 }
 
 
@@ -134,6 +193,19 @@ function enable(obj, val)
 
 	if (robj)
 		robj.disabled = (!val);
+}
+
+
+// Return current computed style of element
+function computedStyle(obj)
+{
+	if (!obj)
+		return null;
+
+	if (window.getComputedStyle)
+		return getComputedStyle(obj, '');
+	else
+		return obj.currentStyle;
 }
 
 
@@ -323,6 +395,16 @@ function bind(func, context)
 }
 
 
+// Insert one DOM element before specified
+function insertBefore(elem, refElem)
+{
+	if (!refElem || !refElem.parentNode)
+		return null;
+
+	return refElem.parentNode.insertBefore(elem, refElem);
+}
+
+
 // Insert one DOM element after specified
 function insertAfter(elem, refElem)
 {
@@ -413,14 +495,14 @@ function schedule(func)
 
 
 // Handler for click on empty space event
-function onEmptyClick(callback, elem)
+function onEmptyClick(e, callback, elem)
 {
 	var e, elem;
 
 	callback = callback || null;
 	if (!callback)
 		return;
-	e = fixEvent(event);
+	e = fixEvent(e);
 
 	if (!isArray(elem))
 		elem = [elem];
@@ -444,7 +526,11 @@ function setEmptyClick(callback, elem)
 
 	if (document.documentElement)
 	{
-		onClickHandler = ((callback) ? bind(onEmptyClick, null, callback, elem) : null);
+		onClickHandler = ((callback) ? function(event)
+		{
+			event = event || window.event;
+			onEmptyClick(event, callback, elem);
+		} : null);
 
 		if (onClickHandler && document.documentElement.onclick)
 			document.documentElement.onclick();			// run previously set callback
@@ -520,6 +606,67 @@ function getOffsetSum(elem)
 }
 
 
+// Add CSS class to element
+function addClass(elem, clName)
+{ 
+	var clArr, i;
+
+	if (!elem || elem.className === undefined || !clName)
+		return;
+
+	clArr = (elem.className != '') ? elem.className.split(' ') : [];
+	arr = isArray(clName);
+	for(i = 0; i < clArr.length; i++)
+	{
+		if ((arr && inArray(clName, clArr[i])) || (!arr && clArr[i] == clName))
+		{
+			clArr.splice(i--, 1);
+		}
+	}
+	clArr = clArr.concat(clName);
+	elem.className = clArr.join(' ');
+}
+
+
+// Remove specified CSS class from emelent
+function removeClass(elem, clName)
+{
+	var clArr, i, arr;
+
+	if (!elem || !elem.className || !clName)
+		return;
+
+	clArr = (elem.className != '') ? elem.className.split(' ') : [];
+	arr = isArray(clName);
+	for (i = 0; i < clArr.length; i++)
+	{
+		if ((arr && inArray(clName, clArr[i])) || (!arr && clArr[i] == clName))
+		{
+			clArr.splice(i--, 1);
+		}
+	}
+
+	elem.className = clArr.join(' ');
+}
+
+
+// Check emelent has specified CSS class
+function hasClass(elem, clName)
+{
+	var clArr, i;
+
+	if (!elem || !elem.className || !clName)
+		return false;
+
+	clArr = (elem.className != '') ? elem.className.split(' ') : [];
+	clName = isArray(clName) ? clName : [clName];
+	return every(clName, function(cls)
+	{
+		return inArray(clArr, cls);
+	});
+}
+
+
 // Return page scroll
 function getPageScroll()
 {
@@ -561,7 +708,7 @@ function initMessage()
 }
 
 
-// Add 'px' to value
+// Return string for value in pixels
 function px(val)
 {
 	return val + 'px';
