@@ -410,21 +410,6 @@ button::-moz-focus-inner
 }
 
 
-/*
-.control_icons
-{
-	clear: both;
-}
-
-
-.control_icons > .iconlink
-{
-	clear: both;
-	margin: 5px 0px;
-}
-*/
-
-
 .summ_text
 {
 	text-align: right;
