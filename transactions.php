@@ -54,6 +54,7 @@
 	html(getCSS("iconlink.css"));
 	html(getCSS("popup.css"));
 	html(getCSS("calendar.css"));
+	html(getCSS("ddlist.css"));
 	html(getCSS("transaction.css"));
 	html(getCSS("trlist.css"));
 	html(getCSS("popup.css"));
@@ -68,6 +69,7 @@
 	html(getJS("popup.js"));
 	html(getJS("dragndrop.js"));
 	html(getJS("toolbar.js"));
+	html(getJS("ddlist.js"));
 	html(getJS("tr_list.js"));
 
 	html("<script>");

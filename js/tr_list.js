@@ -356,10 +356,45 @@ function onTransClick(tr_id)
 }
 
 
+// Account select callback
+function onAccountSel(obj)
+{
+	var accSel;
+
+	if (!obj)
+		return;
+	accSel = ge('acc_id');
+	if (!accSel)
+		return;
+
+	selectByValue(accSel, obj.id);
+
+	this.setText(obj.str);
+
+	onAccountChange();
+}
+
+
+// Initialization of page controls
+function initControls()
+{
+	var isMobile;
+	var accDDList;
+
+	isMobile = (document.documentElement.clientWidth < 700);
+
+	accDDList = new DDList();
+	if (!accDDList.create({ input_id : 'acc_id', selCB : onAccountSel, editable : false, mobile : isMobile }))
+		accDDList = null;
+}
+
+
 // Initialization of drag and drop features
 function initTransListDrag()
 {
 	var trlist, listItem_wr, listItem, trans_id;
+
+	initControls();
 
 	trlist = ge('trlist');
 	if (!trlist)
