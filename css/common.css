@@ -366,6 +366,9 @@ button::-moz-focus-inner
 {
 	float: none;
 	display: block;
+	margin: 0px;
+	padding: 0px 0px 20px 0px;
+	overflow: hidden;
 }
 
 
