@@ -60,7 +60,7 @@
 				html_cl("</div>");
 
 				html_op("<div class=\"non_float std_margin\">");
-					html("<label for=\"currency\">Icon</label>");
+					html("<label for=\"icon\">Icon</label>");
 					html_op("<div class=\"std_input\">");
 						html_op("<div>");
 							html_op("<select id=\"icon\" name=\"icon\" onchange=\"onChangeIcon(this);\">");
