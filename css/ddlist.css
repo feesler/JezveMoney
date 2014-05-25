@@ -158,3 +158,32 @@
 	height: 30px;
 	width: 100%;
 }
+
+
+
+/* Attached drop down list */
+.dd_attached
+{
+	position: relative;
+}
+
+
+.dd_attached .ddlist
+{
+	border: 2px solid #000000;
+	left: 0px;
+	width: auto;
+}
+
+
+.dd_attached .ddmobile
+{
+	border: 0 none;
+	height: 100%;
+	width: 100%;
+}
+
+.dd_attached .ddmobile > select
+{
+	height: 100%;
+}

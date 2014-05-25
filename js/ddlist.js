@@ -61,7 +61,7 @@ function DDList()
 	this.skipKeyPress = false;
 	this.maxHeight = 4;
 	this.itemHeight = 37;
-
+	this.listAttach = false;
 	this.isMobile = false;
 
 
@@ -97,61 +97,85 @@ function DDList()
 		if (!params.input_id || !params.selCB)
 			return false;
 
+		this.listAttach = params.listAttach || false;
+
 		inpObj = ge(params.input_id);
 		if (!inpObj || !inpObj.parentNode)
 			return false;
 
-		if (inpObj.tagName == 'SELECT')
+		if (!this.listAttach)
 		{
-			selectMode = true;
-			selObj = inpObj;
-			inpObj = null;
-		}
+				if (inpObj.tagName == 'SELECT')
+				{
+					selectMode = true;
+					selObj = inpObj;
+					inpObj = null;
+				}
 
-		// Create container
-		inpCont = ce('div');
-		contObj = ce('div', { className : 'dd_container' },
-					[ ce('div', { className : 'dd_input_cont' },
-						[ inpCont ]) ]);
-		if (!contObj)
-			return false;
-		if (params.extClass)
-			addClass(contObj, params.extClass);
+				// Create container
+				inpCont = ce('div');
+				contObj = ce('div', { className : 'dd_container' },
+							[ ce('div', { className : 'dd_input_cont' },
+								[ inpCont ]) ]);
+				if (!contObj)
+					return false;
+				if (params.extClass)
+					addClass(contObj, params.extClass);
 
-		if (selectMode)
-		{
-			insertAfter(contObj, selObj);
-			selObj = re(selObj);
-			inpObj = ce('input');
-			if (!inpObj)
-				return false;
-			inpCont.appendChild(inpObj);
+				if (selectMode)
+				{
+					insertAfter(contObj, selObj);
+					selObj = re(selObj);
+					inpObj = ce('input');
+					if (!inpObj)
+						return false;
+					inpCont.appendChild(inpObj);
+				}
+				else
+				{
+					insertAfter(contObj, inpObj);
+					inpObj = re(inpObj);
+					if (!inpObj)
+						return false;
+					inpCont.appendChild(inpObj);
+				}
+
+				// create static element
+				statObj = ce('span', { className : 'statsel',
+									style : {
+										width : px(inpObj.offsetWidth),
+										display : (params.editable == false) ? '' : 'none' } });
+
+				insertBefore(statObj, inpObj);
+
+				if (params.editable == false)
+				{
+					this.editable = false;
+					inpObj.style.display = 'none';
+				}
+				else
+				{
+					inpObj.className = 'ddinp';
+				}
 		}
 		else
 		{
+			contObj = ce('div', { className : 'dd_attached' });
+			if (!contObj)
+				return false;
+			if (params.extClass)
+				addClass(contObj, params.extClass);
+
 			insertAfter(contObj, inpObj);
+			contObj.style.width = px(inpObj.offsetWidth);
+			contObj.style.height = px(inpObj.offsetHeight);
+
 			inpObj = re(inpObj);
 			if (!inpObj)
 				return false;
-			inpCont.appendChild(inpObj);
-		}
+			contObj.appendChild(inpObj);
 
-		// create static element
-		statObj = ce('span', { className : 'statsel',
-							style : {
-								width : px(inpObj.offsetWidth),
-								display : (params.editable == false) ? '' : 'none' } });
-
-		insertBefore(statObj, inpObj);
-
-		if (params.editable == false)
-		{
-			this.editable = false;
-			inpObj.style.display = 'none';
-		}
-		else
-		{
-			inpObj.className = 'ddinp';
+			inpObj.onclick = bind(this.dropDown, this);
 		}
 
 		if (params.mobile)
@@ -193,14 +217,31 @@ function DDList()
 		contObj.appendChild(divObj);
 
 		// create elements of drop down button
-		btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'idle' } ) ]);
-		if (!btnObj)
-			return false;
-		if (!this.isMobile)
-			btnObj.onclick = bind(this.dropDown, this);
+		if (!this.listAttach)
+		{
+				btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'idle' } ) ]);
+				if (!btnObj)
+					return false;
+				if (!this.isMobile)
+					btnObj.onclick = bind(this.dropDown, this);
 
-		if (!insertBefore(btnObj, contObj.firstElementChild))
-			return false;
+				if (!insertBefore(btnObj, contObj.firstElementChild))
+					return false;
+		}
+		else
+		{
+			if (this.isMobile)
+			{
+				divObj.style.top = 0;
+
+				divObj.style.height = px(contObj.offsetHeight);
+				divObj.style.width = px(contObj.offsetWidth);
+			}
+			else
+			{
+				divObj.style.top = px(contObj.offsetHeight);
+			}
+		}
 
 		this.hostObj = inpObj;
 		this.statObj = statObj;
