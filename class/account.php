@@ -6,6 +6,7 @@ class Account extends CachedTable
 	static private $user_id = 0;
 	static private $owner_id = 0;
 	static private $full_list = FALSE;
+	static private $icons = array("No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash");
 
 
 	// Class constructor
@@ -396,6 +397,25 @@ class Account extends CachedTable
 			if ($acc_id == $selected_id)
 				$resStr .= " selected";
 			$resStr .= ">".$row["name"]."</option>\r\n";
+		}
+
+		return $resStr;
+	}
+
+
+	// Return HTML string of icons for select control
+	public function getIconsList($selected_id = 0)
+	{
+		global $tabStr;
+
+		$resStr = "";
+
+		foreach(self::$icons as $icon_id => $icon_name)
+		{
+			$resStr .= $tabStr."<option value=\"".$icon_id."\"";
+			if ($icon_id == $selected_id)
+				$resStr .= " selected";
+			$resStr .= ">".$icon_name."</option>\r\n";
 		}
 
 		return $resStr;
