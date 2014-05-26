@@ -163,6 +163,61 @@ var accounts =
 };
 
 
+// Icon select callback
+function onIconSel(obj)
+{
+	var iconSel;
+
+	if (!obj)
+		return;
+	iconSel = ge('icon');
+	if (!iconSel)
+		return;
+
+	selectByValue(iconSel, obj.id);
+
+	this.setText(obj.str);
+
+	onChangeIcon(iconSel);
+}
+
+
+// Currency select callback
+function onCurrencySel(obj)
+{
+	var currSel, idval;
+
+	if (!obj)
+		return;
+	currSel = ge('currency');
+	if (!currSel)
+		return;
+
+	selectByValue(currSel, obj.id);
+
+	this.setText(obj.str);
+
+	onChangeAccountCurrency(currSel);
+}
+
+
+// Initialization of page controls
+function initControls()
+{
+	var isMobile;
+	var currDDList, iconDDList;
+
+	isMobile = (document.documentElement.clientWidth < 700);
+
+	iconDDList = new DDList();
+	if (!iconDDList.create({ input_id : 'icon', itemPrefix : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
+		iconDDList = null;
+
+	currDDList = new DDList();
+	if (!currDDList.create({ input_id : 'currency', itemPrefix : 'curr', selCB : onCurrencySel, editable : false, mobile : isMobile }))
+		currDDList = null;
+}
+
 
 // Tile click event handler
 function onTileClick(acc_id)

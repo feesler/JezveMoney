@@ -25,11 +25,13 @@
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("ddlist.css"));
 	html(getCSS("tiles.css"));
 	html(getJS("common.js"));
 	html(getJS("ready.js"));
 	html(getJS("currency.js"));
 	html(getJS("account.js"));
+	html(getJS("ddlist.js"));
 	html(getJS("main.js"));
 	html("<script>");
 	echo(Currency::getArray(TRUE));
@@ -38,6 +40,7 @@
 	html("var acc_balance = ".$acc_bal.";");
 	if (isMessageSet())
 		html("onReady(initMessage);");
+	html("onReady(initControls);");
 	html("</script>");
 
 	html("</head>");
