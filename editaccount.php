@@ -84,15 +84,6 @@
 						html_op("<div>");
 							html_op("<select id=\"icon\" name=\"icon\" onchange=\"onChangeIcon(this);\">");
 								echo($acc->getIconsList($acc_icon));
-/*
-								html("<option value=\"0\">No icon</option>");
-								html("<option value=\"1\">Purse</option>");
-								html("<option value=\"2\">Safe</option>");
-								html("<option value=\"3\">Card</option>");
-								html("<option value=\"4\">Percent</option>");
-								html("<option value=\"5\">Bank</option>");
-								html("<option value=\"6\">Cash</option>");
-*/
 							html_cl("</select>");
 						html_cl("</div>");
 					html_cl("</div>");
