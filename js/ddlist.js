@@ -63,6 +63,7 @@ function DDList()
 	this.itemHeight = 37;
 	this.listAttach = false;
 	this.isMobile = false;
+	this.itemPrefix = null;
 
 
 
@@ -98,6 +99,7 @@ function DDList()
 			return false;
 
 		this.listAttach = params.listAttach || false;
+		this.itemPrefix = params.itemPrefix || null;
 
 		inpObj = ge(params.input_id);
 		if (!inpObj || !inpObj.parentNode)
@@ -384,6 +386,18 @@ function DDList()
 	}
 
 
+	this.prepareId = function(id)
+	{
+		var idval;
+
+		idval = id.toString();
+		if (this.itemPrefix)
+			idval = idval.substr(this.itemPrefix.length);
+
+		return idval;
+	}
+
+
 	this.onChange = function()
 	{
 		var selectedOption, resObj = {};
@@ -397,7 +411,7 @@ function DDList()
 		if (!selectedOption)
 			return;
 
-		resObj.id = selectedOption.id;
+		resObj.id = this.prepareId(selectedOption.id);
 		resObj.str = selectedOption.innerHTML;
 
 		this.selcb.call(this, resObj);
@@ -406,17 +420,18 @@ function DDList()
 
 	this.select = function(sel_id)
 	{
-		var chnodes;
+		var chnodes, idval;
 
 		if (!this.ulobj)
 			return;
 
+		idval = ((this.itemPrefix) ? this.itemPrefix : '') + sel_id;
 		chnodes = this.ulobj.childNodes;
 		for(i = 0; i < chnodes.length; i++)
 		{
 			if (chnodes[i].nodeType == 1)		// ELEMENT_NODE
 			{
-				if (chnodes[i].firstElementChild.id == sel_id)
+				if (chnodes[i].firstElementChild.id == idval)
 				{
 					this.onSelItem(chnodes[i]);
 					break;
@@ -435,7 +450,7 @@ function DDList()
 
 		if (obj.firstElementChild)
 		{
-			resObj.id = obj.firstElementChild.id;
+			resObj.id = this.prepareId(obj.firstElementChild.id);
 			resObj.str = obj.firstElementChild.innerHTML;
 
 			this.selcb.call(this, resObj);
@@ -636,16 +651,16 @@ function DDList()
 
 	this.addItem = function(item_id, str)
 	{
-		var liobj, divobj;
+		var liobj, divobj, idval;
 
 		if (!item_id || !this.list || !this.ulobj)
 			return false;
 
-		divobj = ce('div', { id : item_id, innerHTML : str, className : 'idle' } );
+		idval = ((this.itemPrefix) ? this.itemPrefix : '') + item_id;
+		divobj = ce('div', { id : idval, innerHTML : str, className : 'idle' } );
 		if (!divobj)
 			return false;
 		divobj.onmouseover = bind(this.setActive, this, divobj);
-
 
 		if (this.isMobile)
 		{
