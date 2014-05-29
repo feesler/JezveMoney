@@ -178,3 +178,82 @@ function hideChargeAndExchange()
 	show('exchange', false);
 	show('exch_left', false);
 }
+
+
+// Source account select callback
+function onSrcAccSel(obj)
+{
+	var src_id;
+
+	if (!obj)
+		return;
+	src_id = ge('src_id');
+	if (!src_id)
+		return;
+
+	src_id.value = obj.id;
+
+
+	if (trans_type == 3)
+		onChangeSource();
+	else
+		onChangeAcc();
+}
+
+
+// Destination account select callback
+function onDestAccSel(obj)
+{
+	var dest_id;
+
+	if (!obj)
+		return;
+	dest_id = ge('dest_id');
+	if (!dest_id)
+		return;
+
+	dest_id.value = obj.id;
+
+	if (trans_type == 3)
+		onChangeDest();
+	else
+		onChangeAcc();
+}
+
+
+// Initialization of page controls
+function initControls()
+{
+	var isMobile;
+	var srcDDList, destDDList, transCurrDDList;
+
+	isMobile = (document.documentElement.clientWidth < 700);
+
+	srcDDList = new DDList();
+	if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
+	{
+		accounts.forEach(function(acc)
+		{
+			accId = acc[0];
+			accName = acc[4];
+
+			srcDDList.addItem(accId, accName);
+		});
+	}
+	else
+		srcDDList = null;
+
+	destDDList = new DDList();
+	if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : isMobile }))
+	{
+		accounts.forEach(function(acc)
+		{
+			accId = acc[0];
+			accName = acc[4];
+
+			destDDList.addItem(accId, accName);
+		});
+	}
+	else
+		destDDList = null;
+}

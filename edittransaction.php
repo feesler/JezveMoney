@@ -109,6 +109,7 @@
 	html(getCSS("tiles.css"));
 	html(getCSS("popup.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("ddlist.css"));
 	html(getCSS("calendar.css"));
 
 	html(getJS("common.js"));
@@ -117,6 +118,7 @@
 	html(getJS("popup.js"));
 	html(getJS("currency.js"));
 	html(getJS("account.js"));
+	html(getJS("ddlist.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
 
@@ -156,6 +158,7 @@
 
 	if (isMessageSet())
 		html("onReady(initMessage);");
+	html("onReady(initControls);");
 	html("</script>");
 
 	html("</head>");
@@ -191,6 +194,8 @@
 			html_op("<div class=\"tile_container\">");
 				$balDiff = $tr["charge"];
 				html($acc->getTileEx(STATIC_TILE, $tr["src_id"], $balDiff, "source_tile"));
+				html("<input id=\"src_id\" name=\"src_id\" type=\"hidden\" value=\"".$tr["src_id"]."\">");
+/*
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
@@ -198,6 +203,7 @@
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+*/
 			html_cl("</div>");
 
 			html();
@@ -237,6 +243,8 @@
 				else
 					$balDiff = -$tr["amount"];
 				html($acc->getTileEx(STATIC_TILE, $tr["dest_id"], $balDiff, "dest_tile"));
+				html("<input id=\"dest_id\" name=\"dest_id\" type=\"hidden\" value=\"".$tr["dest_id"]."\">");
+/*
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
@@ -244,6 +252,7 @@
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+*/
 			html_cl("</div>");
 
 			html();

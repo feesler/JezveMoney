@@ -109,6 +109,7 @@
 	html(getCSS("transaction.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("ddlist.css"));
 	html(getCSS("calendar.css"));
 
 	html(getJS("common.js"));
@@ -117,6 +118,7 @@
 	html(getJS("main.js"));
 	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
+	html(getJS("ddlist.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
 
@@ -131,6 +133,7 @@
 
 	if (isMessageSet())
 		html("onReady(initMessage);");
+	html("onReady(initControls);");
 	html("</script>");
 
 	html("</head>");
@@ -173,6 +176,8 @@ else
 			html("<div><label for=\"src_id\">Source account</label></div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $src_id, "source_tile"));
+				html("<input id=\"src_id\" name=\"src_id\" type=\"hidden\" value=\"".$src_id."\">");
+/*
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
@@ -180,6 +185,7 @@ else
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+*/
 			html_cl("</div>");
 
 			html();
@@ -214,6 +220,8 @@ else
 			html("<div><label for=\"dest_id\">Destination account</label></div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $dest_id, "dest_tile"));
+				html("<input id=\"dest_id\" name=\"dest_id\" type=\"hidden\" value=\"".$dest_id."\">");
+/*
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
@@ -221,6 +229,7 @@ else
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+*/
 			html_cl("</div>");
 
 			html();
