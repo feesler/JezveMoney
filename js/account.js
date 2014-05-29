@@ -24,6 +24,10 @@ function getBalanceOfAccount(account_id)
 {
 	var balance = 0;
 
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return balance;
+
 	accounts.some(function(acc)
 	{
 		if (acc[0] == account_id)
@@ -41,6 +45,10 @@ function getNameOfAccount(account_id)
 {
 	var name = '';
 
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return name;
+
 	accounts.some(function(acc)
 	{
 		if (acc[0] == account_id)
@@ -57,6 +65,10 @@ function getNameOfAccount(account_id)
 function getIconOfAccount(account_id)
 {
 	var iconType = 0;
+
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return iconType;
 
 	accounts.some(function(acc)
 	{
