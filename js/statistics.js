@@ -485,3 +485,110 @@ function showCalendar()
 
 	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
 }
+
+
+// Filter type select callback
+function onFilterSel(obj)
+{
+	var filter_type;
+
+	if (!obj)
+		return;
+	filter_type = ge('filter_type');
+	if (!filter_type)
+		return;
+
+	selectByValue(filter_type, obj.id);
+
+	this.setText(obj.str);
+
+	onFilterChange(filter_type);
+}
+
+
+// Account select callback
+function onAccountSel(obj)
+{
+	var acc_id;
+
+	if (!obj)
+		return;
+	acc_id = ge('acc_id');
+	if (!acc_id)
+		return;
+
+	selectByValue(acc_id, obj.id);
+
+	this.setText(obj.str);
+
+	onAccountChange(acc_id);
+}
+
+
+// Currency select callback
+function onCurrencySel(obj)
+{
+	var curr_id;
+
+	if (!obj)
+		return;
+	curr_id = ge('curr_id');
+	if (!curr_id)
+		return;
+
+	selectByValue(curr_id, obj.id);
+
+	this.setText(obj.str);
+
+	onCurrChange(curr_id);
+}
+
+
+// Group select callback
+function onGroupSel(obj)
+{
+	var groupsel;
+
+	if (!obj)
+		return;
+	groupsel = ge('groupsel');
+	if (!groupsel)
+		return;
+
+	selectByValue(groupsel, obj.id);
+
+	this.setText(obj.str);
+
+	onGroupChange();
+}
+
+
+// Initialization of page controls
+function initControls()
+{
+	var isMobile;
+	var filterDD, accCurrDD, groupDD;
+
+	isMobile = (document.documentElement.clientWidth < 700);
+
+	filterDD = new DDList();
+	if (!filterDD.create({ input_id : 'filter_type', itemPrefix : 'filter', selCB : onFilterSel, editable : false, mobile : isMobile }))
+		filterDD = null;
+
+	accCurrDD = new DDList();
+	if (filterByCurr)
+	{
+		if (!accCurrDD.create({ input_id : 'curr_id', itemPrefix : 'curr', selCB : onCurrencySel, editable : false, mobile : isMobile }))
+			accCurrDD = null;
+	}
+	else
+	{
+		if (!accCurrDD.create({ input_id : 'acc_id', itemPrefix : 'acc', selCB : onAccountSel, editable : false, mobile : isMobile }))
+			accCurrDD = null;
+	}
+
+	groupDD = new DDList();
+	if (!groupDD.create({ input_id : 'groupsel', itemPrefix : 'filter', selCB : onGroupSel, editable : false, mobile : isMobile }))
+		groupDD = null;
+
+}

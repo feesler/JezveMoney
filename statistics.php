@@ -101,6 +101,7 @@
 	html("<title>".$titleString."</title>");
 	html(getCSS("common.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("ddlist.css"));
 	html(getCSS("popup.css"));
 	html(getCSS("calendar.css"));
 	html(getCSS("statistics.css"));
@@ -108,6 +109,7 @@
 	html(getJS("currency.js"));
 	html(getJS("ready.js"));
 	html(getJS("calendar.js"));
+	html(getJS("ddlist.js"));
 	html(getJS("raphael.js"));
 	html(getJS("statistics.js"));
 
@@ -120,8 +122,10 @@
 		html("var groupType = ".json_encode($groupType).";");
 		html("var curAccId = ".json_encode($acc_id).";");
 		html("var chartData = ".json_encode(getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id)).";");
+		html("var filterByCurr = ".(($byCurrency) ? "true" : "false").";");
 		html();
 		html("onReady(initBarChart);");
+		html("onReady(initControls);");
 	html_cl("</script>");
 
 	html("</head>");
