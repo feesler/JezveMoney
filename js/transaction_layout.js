@@ -298,32 +298,32 @@ function initControls()
 	}
 	else
 	{
-	srcDDList = new DDList();
-	if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
-	{
-		accounts.forEach(function(acc)
+		srcDDList = new DDList();
+		if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
 		{
-			accId = acc[0];
-			accName = acc[4];
+			accounts.forEach(function(acc)
+			{
+				accId = acc[0];
+				accName = acc[4];
 
-			srcDDList.addItem(accId, accName);
-		});
-	}
-	else
-		srcDDList = null;
+				srcDDList.addItem(accId, accName);
+			});
+		}
+		else
+			srcDDList = null;
 
-	destDDList = new DDList();
-	if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : isMobile }))
-	{
-		accounts.forEach(function(acc)
+		destDDList = new DDList();
+		if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : isMobile }))
 		{
-			accId = acc[0];
-			accName = acc[4];
+			accounts.forEach(function(acc)
+			{
+				accId = acc[0];
+				accName = acc[4];
 
-			destDDList.addItem(accId, accName);
-		});
-	}
-	else
-		destDDList = null;
+				destDDList.addItem(accId, accName);
+			});
+		}
+		else
+			destDDList = null;
 	}
 }
