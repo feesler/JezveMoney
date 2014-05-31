@@ -185,7 +185,7 @@ function onIconSel(obj)
 // Currency select callback
 function onCurrencySel(obj)
 {
-	var currSel, idval;
+	var currSel;
 
 	if (!obj)
 		return;

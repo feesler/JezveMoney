@@ -35,14 +35,6 @@ function onSelectDate(date, month, year)
 // Show calendar block
 function showCalendar()
 {
-/*
-	var calendar;
-
-	calendar = ge('calendar');
-	if (!calendar)
-		return;
-*/
-
 	if (!calendarObj)
 	{
 		calendarObj = ge('calendar');
@@ -350,13 +342,13 @@ function initControls()
 		transCurrDDList = new DDList();
 		if (transCurrDDList.create({ input_id : 'amountsign', itemPrefix : 'curr', listAttach : true, selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		{
-				currency.forEach(function(curr)
-				{
-					curr_id = curr[0];
-					currName = curr[1];
+			currency.forEach(function(curr)
+			{
+				curr_id = curr[0];
+				currName = curr[1];
 
-					transCurrDDList.addItem(curr_id, currName);
-				});
+				transCurrDDList.addItem(curr_id, currName);
+			});
 		}
 		else
 			transCurrDDList = null;

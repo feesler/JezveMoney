@@ -85,9 +85,6 @@ function f1()
 		var traccid = income ? transaction.destAcc : transaction.srcAcc;
 
 		if (accid && (traccid == parseInt(accid.value)))
-/*
-		if (accid && (traccid == parseInt(selectedValue(accid))))
-*/
 			S2 += income ? -transaction.charge : transaction.charge;
 	}
 
@@ -350,21 +347,11 @@ function onChangeAcc()
 
 	target_id = isIncome() ? destid : (isDebt() ? accid : srcid);
 	new_acc_id = parseInt(target_id.value);
-/*
-	new_acc_id = selectedValue(target_id);
-*/
-
 	trans_acc_curr = getCurrencyOfAccount(new_acc_id);
 	if (sync)
 		transcurr.value = trans_acc_curr;	// update currency of transaction
 
 	trans_curr = parseInt(transcurr.value);
-/*
-	if (sync)
-		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
-
-	trans_curr = selectedValue(transcurr);
-*/
 
 	// hide charge and exchange rate if new currencies is the same
 	if (trans_curr == trans_acc_curr)
@@ -385,17 +372,10 @@ function onChangeAcc()
 
 	if (isDebt())
 	{
-		var person_tile, person_id /*personsel*/, personname, pbalance;
+		var person_tile, person_id, personname, pbalance;
 
 		person_tile = ge('person_tile');
 		person_id = ge('person_id');
-/*
-		personsel = ge('personsel');
-		if (!person_tile || !personsel)
-			return;
-
-		personname = selectedText(personsel);
-*/
 		if (!person_tile || !person_id)
 			return;
 
@@ -409,26 +389,7 @@ function onChangeAcc()
 }
 
 
-// Show list of currencies
-function showCurrList()
-{
-	var transcurr, ancurrbtn;
-
-	if (isTransfer())
-		return;
-
-	curr_block = ge('curr_block');
-	ancurrbtn = ge('ancurrbtn');
-	if (!curr_block || !ancurrbtn)
-		return;
-
-	show(curr_block, true);
-	show(ancurrbtn, false);
-}
-
-
 // Check selected currencies is different
-// TODO : remove this function
 function isDiffCurr()
 {
 	var src, dest;
@@ -440,9 +401,6 @@ function isDiffCurr()
 		return false;
 
 	return (getCurrencyOfAccount(src.value) != getCurrencyOfAccount(dest.value));
-/*
-	return (getCurrencyOfAccount(selectedValue(src)) != getCurrencyOfAccount(selectedValue(dest)));
-*/
 }
 
 
@@ -523,11 +481,7 @@ function updControls()
 		src_acc = parseInt(src.value);
 		dest_acc = parseInt(dest.value);
 	}
-/*
-	src_acc = parseInt(selectedValue(src));
-	dest_acc = parseInt(selectedValue(dest));
-	debt_acc = parseInt(selectedValue(acc));
-*/
+
 	selCurrVal = getCurrencyOfAccount(isDebt() ? debt_acc : src_acc);
 
 	if (isTransfer())
@@ -540,9 +494,6 @@ function updControls()
 	else if (isDebt())
 	{
 		trans_curr = parseInt(transcurr.value);
-/*
-		trans_curr = parseInt(selectedValue(transcurr));
-*/
 		amountCurr = trans_curr;
 		chargeCurr = getCurrencyOfAccount(debt_acc);
 	}
@@ -650,17 +601,10 @@ function updControls()
 
 	if (isDebt())
 	{
-		var person_tile, person_id /*personsel*/, personname, pbalance;
+		var person_tile, person_id, personname, pbalance;
 
 		person_tile = ge('person_tile');
 		person_id = ge('person_id');
-/*
-		personsel = ge('personsel');
-		if (!person_tile || !personsel)
-			return;
-
-		personname = selectedText(personsel);
-*/
 		if (!person_tile || !person_id)
 			return;
 
@@ -669,9 +613,6 @@ function updControls()
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
 
 		setTileAccount('acc_tile', parseInt(acc.value));
-/*
-		setTileAccount('acc_tile', parseInt(selectedValue(acc)));
-*/
 	}
 	else
 	{
@@ -711,15 +652,6 @@ function onChangeSource()
 		else
 			dest.value = accounts[pos - 1][0];
 	}
-/*
-	if (src.selectedIndex == dest.selectedIndex)
-	{
-		if (dest.selectedIndex == 0)
-			dest.selectedIndex = accounts.length - 1;
-		else
-			dest.selectedIndex--;
-	}
-*/
 
 	updControls();
 }
@@ -748,15 +680,6 @@ function onChangeDest()
 		else
 			src.value = accounts[pos - 1][0];
 	}
-/*
-	if (src.selectedIndex == dest.selectedIndex)
-	{
-		if (src.selectedIndex == accounts.length - 1)
-			src.selectedIndex = 0;
-		else
-			src.selectedIndex++;
-	}
-*/
 
 	updControls();
 }
@@ -784,39 +707,18 @@ function setExchangeComment()
 		chargeSign = getCurrencySign(getCurrencyOfAccount(accid.value));
 		if (isTransfer())
 			amountSign = getCurrencySign(getCurrencyOfAccount(taccid.value));
-/*
-		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
-		if (isTransfer())
-			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
-*/
 		else
 			amountSign = getCurrencySign(parseInt(transcurr.value));
-/*
-			amountSign = getCurrencySign(selectedValue(transcurr));
-*/
 
 		exchcomm.innerHTML = chargeSign + '/' + amountSign;
 	}
 	else
 	{
-/*
-		if ((transcurr && transcurr.selectedIndex == -1) || (taccid && taccid.selectedIndex == -1) || accid.selectedIndex == -1)
-			return;
-*/
-
 		chargeSign = getCurrencySign(getCurrencyOfAccount(accid.value));
 		if (isTransfer())
 			amountSign = getCurrencySign(getCurrencyOfAccount(taccid.value));
-/*
-		chargeSign = getCurrencySign(getCurrencyOfAccount(selectedValue(accid)));
-		if (isTransfer())
-			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
-*/
 		else
 			amountSign = getCurrencySign(parseInt(transcurr.value));
-/*
-			amountSign = getCurrencySign(selectedValue(transcurr));
-*/
 
 		invExch = parseFloat((1 / fe).toFixed(5));
 
@@ -867,30 +769,18 @@ function getValues()
 	if (isExpense())
 	{
 		S1 = getBalanceOfAccount(accid.value);
-/*
-		S1 = getBalanceOfAccount(selectedValue(accid));
-*/
 		S2 = resbal.value;
 	}
 	else if (isIncome())
 	{
 		S1_d = getBalanceOfAccount(accid.value);
-/*
-		S1_d = getBalanceOfAccount(selectedValue(accid));
-*/
 		S2_d = resbal_d.value;
 	}
 	else if (isTransfer())
 	{
 		S1 = getBalanceOfAccount(accid.value);
-/*
-		S1 = getBalanceOfAccount(selectedValue(accid));
-*/
 		S2 = resbal.value;
 		S1_d = getBalanceOfAccount(ge('dest_id').value);
-/*
-		S1_d = getBalanceOfAccount(selectedValue(ge('dest_id')));		// TODO: fix here
-*/
 		S2_d = resbal_d.value;
 	}
 	else if (isDebt())
@@ -900,17 +790,11 @@ function getValues()
 			S1 = getCurPersonBalance(trans_curr);
 			S2 = resbal.value;
 			S1_d = getBalanceOfAccount(accid.value);
-/*
-			S1_d = getBalanceOfAccount(selectedValue(accid));
-*/
 			S2_d = resbal_d.value;
 		}
 		else			// person take from us; person account is destination
 		{
 			S1 = getBalanceOfAccount(accid.value);
-/*
-			S1 = getBalanceOfAccount(selectedValue(accid));
-*/
 			S2 = resbal_d.value;
 			S1_d = getCurPersonBalance(trans_curr);
 			S2_d = resbal.value;
@@ -969,9 +853,6 @@ function setValues()
 
 
 	selCurrVal = getCurrencyOfAccount((ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')).value);
-/*
-	selCurrVal = getCurrencyOfAccount(selectedValue(ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')));
-*/
 
 	charge.value = d;
 	charge_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(d) ? d : 0), selCurrVal);
@@ -1035,23 +916,14 @@ function isDiff()
 	if (isExpense() || isIncome() || isDebt())
 	{
 		amountCurr = parseInt(transcurr.value);
-/*
-		amountCurr = parseInt(selectedValue(transcurr));
-*/
 	}
 	else if (isTransfer())
 	{
 		destid = ge('dest_id');
 		amountCurr = getCurrencyOfAccount(destid.value);
-/*
-		amountCurr = getCurrencyOfAccount(selectedValue(destid));
-*/
 	}
 
 	chargeCurr = getCurrencyOfAccount(accid.value);
-/*
-	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
-*/
 
 	return (amountCurr != chargeCurr);
 }
@@ -1241,19 +1113,9 @@ function onChangeTransCurr()
 	charge = ge('charge');
 	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge)
 		return;
-/*
-	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
-		return
-*/
 
 	amountCurr = parseInt(transcurr.value);
-/*
-	amountCurr = parseInt(selectedValue(transcurr));
-*/
 	chargeCurr = getCurrencyOfAccount(accid.value);
-/*
-	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
-*/
 
 	isDiff = (amountCurr != chargeCurr);
 	if (isDiff)
@@ -1288,23 +1150,14 @@ function onChangeTransCurr()
 
 	if (isDebt())
 	{
-		var person_tile, person_id /* personsel */, personname, pbalance, resbal_b;
+		var person_tile, person_id, personname, pbalance, resbal_b;
 
 		person_tile = ge('person_tile');
 		person_id = ge('person_id');
-/*
-		personsel = ge('personsel');
-*/
 		resbal_b = ge('resbal_b');
-/*
-		if (!person_tile || !personsel || !resbal_b)
-*/
 		if (!person_tile || !person_id || !resbal_b)
 			return;
 
-/*
-		personname = selectedText(personsel);
-*/
 		personname = getPersonName(person_id.value);
 		pbalance = getCurPersonBalance(trans_curr);
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
@@ -1415,17 +1268,6 @@ function getCurPersonBalance(curr_id)
 // Person select event handler
 function onPersonSel(obj)
 {
-/*
-	var personsel, personid;
-
-	personsel = ge('personsel');
-	personid = ge('person_id');
-	if (!personsel || !personid)
-		return;
-
-	personid.value = selectedValue(personsel);
-*/
-
 	updControls();
 }
 

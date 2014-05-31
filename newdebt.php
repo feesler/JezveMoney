@@ -77,10 +77,6 @@
 	$fperson_balance = $fperson_acc ? $acc->getBalance($fperson_acc, TRUE) : 0.0;
 	$acc = new Account($user_id);
 
-	wlog("fperson_id = ".$fperson_id);
-	wlog("fperson_acc = ".$fperson_acc);
-	wlog("fperson_balance = ".$fperson_balance);
-
 	if ($give)
 		$accLbl = "Destination account";
 	else
@@ -183,15 +179,6 @@
 							html(getTile(STATIC_TILE, "person_tile", $fperson_name,
 												Currency::format($fperson_balance, $debtAcc["curr"]),
 												NULL));
-/*
-							html_op("<div class=\"acc_sel\">");
-								html_op("<div>");
-									html_op("<select id=\"personsel\" onchange=\"onPersonSel(this);\">");
-										echo($person->getList());
-									html_cl("</select>");
-								html_cl("</div>");
-							html_cl("</div>");
-*/
 						html_cl("</div>");
 					}
 
@@ -219,15 +206,6 @@
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
 				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$acc_id."\">");
-/*
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onChangeAcc();\">");
-							echo($acc->getList($acc_id));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html();
@@ -257,15 +235,6 @@
 			html_op("<div class=\"curr_container\">");
 				html("<div class=\"btn rcurr_btn\"><div id=\"amountsign\">".$debtAcc["sign"]."</div></div>");
 				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$debtAcc["curr"]."\">");
-/*
-				html_op("<div class=\"rcurr_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-							echo(Currency::getList($debtAcc["curr"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html_op("<div class=\"stretch_input rbtn_input\">");

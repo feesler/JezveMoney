@@ -220,15 +220,6 @@
 							html(getTile(STATIC_TILE, "person_tile", $person_name,
 												Currency::format($person_balance, $debtAcc["curr"]),
 												NULL));
-/*
-							html_op("<div class=\"acc_sel\">");
-								html_op("<div>");
-									html_op("<select id=\"personsel\" onchange=\"onPersonSel(this);\">");
-										echo($person->getList($person_id));
-									html_cl("</select>");
-								html_cl("</div>");
-							html_cl("</div>");
-*/
 						html_cl("</div>");
 					}
 
@@ -255,15 +246,6 @@
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["amount"], "acc_tile"));
 				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$debtAcc["id"]."\">");
-/*
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onChangeAcc();\">");
-							echo($acc->getList($debtAcc["id"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html();
@@ -293,15 +275,6 @@
 			html_op("<div class=\"curr_container\">");
 				html("<div class=\"btn rcurr_btn\"><div id=\"amountsign\">".$amount_sign."</div></div>");
 				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$debtAcc["curr"]."\">");
-/*
-				html_op("<div class=\"rcurr_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-							echo(Currency::getList($debtAcc["curr"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html_op("<div class=\"stretch_input rbtn_input\">");

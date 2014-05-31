@@ -177,15 +177,6 @@ else
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $src_id, "source_tile"));
 				html("<input id=\"src_id\" name=\"src_id\" type=\"hidden\" value=\"".$src_id."\">");
-/*
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
-							echo($acc->getList($src_id));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html();
@@ -221,15 +212,6 @@ else
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $dest_id, "dest_tile"));
 				html("<input id=\"dest_id\" name=\"dest_id\" type=\"hidden\" value=\"".$dest_id."\">");
-/*
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
-							echo($acc->getList($dest_id));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html();
@@ -258,16 +240,6 @@ else
 				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
 				html("<div class=\"".$currBtnClass."\"><div id=\"amountsign\">".(($trans_type == 1) ? $src["sign"] : $dest["sign"])."</div></div>");
 				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".(($trans_type == 2) ? $dest["curr"] : $src["curr"])."\">");
-/*
-				$disp = ($trans_type == 3) ? " style=\"display: none;\"" : "";
-				html_op("<div class=\"rcurr_sel\"".$disp.">");
-					html_op("<div>");
-						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-							echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			$inputType = ($trans_type == 3) ? "trans_input" : "rbtn_input";

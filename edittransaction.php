@@ -195,15 +195,6 @@
 				$balDiff = $tr["charge"];
 				html($acc->getTileEx(STATIC_TILE, $tr["src_id"], $balDiff, "source_tile"));
 				html("<input id=\"src_id\" name=\"src_id\" type=\"hidden\" value=\"".$tr["src_id"]."\">");
-/*
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"src_id\" name=\"src_id\" onchange=\"".(($trans_type == 3) ? "onChangeSource" : "onChangeAcc")."();\">");
-							echo($acc->getList($tr["src_id"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html();
@@ -244,15 +235,6 @@
 					$balDiff = -$tr["amount"];
 				html($acc->getTileEx(STATIC_TILE, $tr["dest_id"], $balDiff, "dest_tile"));
 				html("<input id=\"dest_id\" name=\"dest_id\" type=\"hidden\" value=\"".$tr["dest_id"]."\">");
-/*
-				html_op("<div class=\"acc_sel\">");
-					html_op("<div>");
-						html_op("<select id=\"dest_id\" name=\"dest_id\" onchange=\"".(($trans_type == 3) ? "onChangeDest" : "onChangeAcc")."();\">");
-							echo($acc->getList($tr["dest_id"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			html();
@@ -282,16 +264,6 @@
 				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
 				html("<div class=\"".$currBtnClass."\"><div id=\"amountsign\">".$amount_sign."</div></div>");
 				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".(($trans_type == 2) ? $dest["curr"] : $src["curr"])."\">");
-/*
-				$disp = ($trans_type == 3) ? " style=\"display: none;\"" : "";
-				html_op("<div class=\"rcurr_sel\"".$disp.">");
-					html_op("<div>");
-						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
-							echo(Currency::getList(($trans_type == 2) ? $dest["curr"] : $src["curr"]));
-						html_cl("</select>");
-					html_cl("</div>");
-				html_cl("</div>");
-*/
 			html_cl("</div>");
 
 			$inputType = ($trans_type == 3) ? "trans_input" : "rbtn_input";
