@@ -627,7 +627,7 @@ function DDList()
 			this.addItem(obj.options[i].value, obj.options[i].textContent);
 			if (obj.selectedIndex == i)
 			{
-				this.select(obj.options[i].value);
+				this.setText(obj.options[i].textContent);
 			}
 		}
 
