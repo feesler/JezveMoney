@@ -221,7 +221,7 @@ function DDList()
 		// create elements of drop down button
 		if (!this.listAttach)
 		{
-				btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'idle' } ) ]);
+				btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'dditem_idle' } ) ]);
 				if (!btnObj)
 					return false;
 				if (!this.isMobile)
@@ -657,7 +657,7 @@ function DDList()
 			return false;
 
 		idval = ((this.itemPrefix) ? this.itemPrefix : '') + item_id;
-		divobj = ce('div', { id : idval, innerHTML : str, className : 'idle' } );
+		divobj = ce('div', { id : idval, innerHTML : str, className : 'dditem_idle' } );
 		if (!divobj)
 			return false;
 		divobj.onmouseover = bind(this.setActive, this, divobj);
