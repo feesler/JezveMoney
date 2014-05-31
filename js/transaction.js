@@ -1307,6 +1307,19 @@ function getPersonObject(person_id)
 }
 
 
+// Return name of person
+function getPersonName(p_id)
+{
+	var person;
+
+	person = getPersonObject(p_id);
+	if (!person || !isArray(person) || person.length < 3)
+		return null;
+
+	return person[1];
+}
+
+
 // Return array of balance
 function getPersonBalance(p_id)
 {
