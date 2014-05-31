@@ -1291,7 +1291,7 @@ function onChangeTransCurr()
 		var person_tile, person_id /* personsel */, personname, pbalance, resbal_b;
 
 		person_tile = ge('person_tile');
-		person_id
+		person_id = ge('person_id');
 /*
 		personsel = ge('personsel');
 */
