@@ -256,6 +256,8 @@
 		html_op("<div>");
 			html_op("<div class=\"curr_container\">");
 				html("<div class=\"btn rcurr_btn\"><div id=\"amountsign\">".$debtAcc["sign"]."</div></div>");
+				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$debtAcc["curr"]."\">");
+/*
 				html_op("<div class=\"rcurr_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"transcurr\" name=\"transcurr\" onchange=\"onChangeTransCurr(this);\">");
@@ -263,6 +265,7 @@
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+*/
 			html_cl("</div>");
 
 			html_op("<div class=\"stretch_input rbtn_input\">");

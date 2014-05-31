@@ -256,6 +256,23 @@ function onPersAccSel(obj)
 }
 
 
+// Currency select callback
+function onCurrencySel(obj)
+{
+	var transcurr;
+
+	if (!obj)
+		return;
+	transcurr = ge('transcurr');
+	if (!transcurr)
+		return;
+
+	transcurr.value = obj.id;
+
+	onChangeTransCurr();
+}
+
+
 // Initialization of page controls
 function initControls()
 {
@@ -325,5 +342,23 @@ function initControls()
 		}
 		else
 			destDDList = null;
+	}
+
+
+	if (!isTransfer())
+	{
+		transCurrDDList = new DDList();
+		if (transCurrDDList.create({ input_id : 'amountsign', itemPrefix : 'curr', listAttach : true, selCB : onCurrencySel, editable : false, mobile : isMobile }))
+		{
+				currency.forEach(function(curr)
+				{
+					curr_id = curr[0];
+					currName = curr[1];
+
+					transCurrDDList.addItem(curr_id, currName);
+				});
+		}
+		else
+			transCurrDDList = null;
 	}
 }

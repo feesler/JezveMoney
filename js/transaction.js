@@ -356,9 +356,15 @@ function onChangeAcc()
 
 	trans_acc_curr = getCurrencyOfAccount(new_acc_id);
 	if (sync)
+		transcurr.value = trans_acc_curr;	// update currency of transaction
+
+	trans_curr = parseInt(transcurr.value);
+/*
+	if (sync)
 		selectByValue(transcurr, trans_acc_curr);	// update currency of transaction
 
 	trans_curr = selectedValue(transcurr);
+*/
 
 	// hide charge and exchange rate if new currencies is the same
 	if (trans_curr == trans_acc_curr)
@@ -533,7 +539,10 @@ function updControls()
 	}
 	else if (isDebt())
 	{
+		trans_curr = parseInt(transcurr.value);
+/*
 		trans_curr = parseInt(selectedValue(transcurr));
+*/
 		amountCurr = trans_curr;
 		chargeCurr = getCurrencyOfAccount(debt_acc);
 	}
@@ -781,14 +790,19 @@ function setExchangeComment()
 			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
 */
 		else
+			amountSign = getCurrencySign(parseInt(transcurr.value));
+/*
 			amountSign = getCurrencySign(selectedValue(transcurr));
+*/
 
 		exchcomm.innerHTML = chargeSign + '/' + amountSign;
 	}
 	else
 	{
+/*
 		if ((transcurr && transcurr.selectedIndex == -1) || (taccid && taccid.selectedIndex == -1) || accid.selectedIndex == -1)
 			return;
+*/
 
 		chargeSign = getCurrencySign(getCurrencyOfAccount(accid.value));
 		if (isTransfer())
@@ -799,7 +813,10 @@ function setExchangeComment()
 			amountSign = getCurrencySign(getCurrencyOfAccount(selectedValue(taccid)));
 */
 		else
+			amountSign = getCurrencySign(parseInt(transcurr.value));
+/*
 			amountSign = getCurrencySign(selectedValue(transcurr));
+*/
 
 		invExch = parseFloat((1 / fe).toFixed(5));
 
@@ -1017,7 +1034,10 @@ function isDiff()
 
 	if (isExpense() || isIncome() || isDebt())
 	{
+		amountCurr = parseInt(transcurr.value);
+/*
 		amountCurr = parseInt(selectedValue(transcurr));
+*/
 	}
 	else if (isTransfer())
 	{
@@ -1221,10 +1241,15 @@ function onChangeTransCurr()
 	charge = ge('charge');
 	if (!accid || !amount || !transcurr || !chargeoff || !exchange || !exchrate || !exchrate_b || !charge)
 		return;
+/*
 	if (transcurr.selectedIndex == -1 || accid.selectedIndex == -1)
 		return
+*/
 
+	amountCurr = parseInt(transcurr.value);
+/*
 	amountCurr = parseInt(selectedValue(transcurr));
+*/
 	chargeCurr = getCurrencyOfAccount(accid.value);
 /*
 	chargeCurr = getCurrencyOfAccount(selectedValue(accid));
