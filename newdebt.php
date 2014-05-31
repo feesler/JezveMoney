@@ -98,6 +98,7 @@
 	html(getCSS("transaction.css"));
 	html(getCSS("tiles.css"));
 	html(getCSS("iconlink.css"));
+	html(getCSS("ddlist.css"));
 	html(getCSS("calendar.css"));
 
 	html(getJS("common.js"));
@@ -106,6 +107,7 @@
 	html(getJS("account.js"));
 	html(getJS("main.js"));
 	html(getJS("calendar.js"));
+	html(getJS("ddlist.js"));
 	html(getJS("transaction.js"));
 	html(getJS("transaction_layout.js"));
 
@@ -123,6 +125,7 @@
 
 	if (isMessageSet())
 		html("onReady(initMessage);");
+	html("onReady(initControls);");
 	html("</script>");
 
 	html("</head>");
@@ -180,6 +183,7 @@
 							html(getTile(STATIC_TILE, "person_tile", $fperson_name,
 												Currency::format($fperson_balance, $debtAcc["curr"]),
 												NULL));
+/*
 							html_op("<div class=\"acc_sel\">");
 								html_op("<div>");
 									html_op("<select id=\"personsel\" onchange=\"onPersonSel(this);\">");
@@ -187,6 +191,7 @@
 									html_cl("</select>");
 								html_cl("</div>");
 							html_cl("</div>");
+*/
 						html_cl("</div>");
 					}
 
@@ -213,6 +218,8 @@
 			html("<div><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label></div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
+				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$acc_id."\">");
+/*
 				html_op("<div class=\"acc_sel\">");
 					html_op("<div>");
 						html_op("<select id=\"acc_id\" name=\"acc_id\" onchange=\"onChangeAcc();\">");
@@ -220,6 +227,7 @@
 						html_cl("</select>");
 					html_cl("</div>");
 				html_cl("</div>");
+*/
 			html_cl("</div>");
 
 			html();

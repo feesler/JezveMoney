@@ -379,14 +379,22 @@ function onChangeAcc()
 
 	if (isDebt())
 	{
-		var person_tile, personsel, personname, pbalance;
+		var person_tile, person_id /*personsel*/, personname, pbalance;
 
 		person_tile = ge('person_tile');
+		person_id = ge('person_id');
+/*
 		personsel = ge('personsel');
 		if (!person_tile || !personsel)
 			return;
 
 		personname = selectedText(personsel);
+*/
+		if (!person_tile || !person_id)
+			return;
+
+		personname = getPersonName(person_id.value);
+
 		pbalance = getCurPersonBalance(trans_curr);
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
 	}
@@ -633,14 +641,21 @@ function updControls()
 
 	if (isDebt())
 	{
-		var person_tile, personsel, personname, pbalance;
+		var person_tile, person_id /*personsel*/, personname, pbalance;
 
 		person_tile = ge('person_tile');
+		person_id = ge('person_id');
+/*
 		personsel = ge('personsel');
 		if (!person_tile || !personsel)
 			return;
 
 		personname = selectedText(personsel);
+*/
+		if (!person_tile || !person_id)
+			return;
+
+		personname = getPersonName(person_id.value);
 		pbalance = getCurPersonBalance(trans_curr);
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
 
@@ -1248,15 +1263,24 @@ function onChangeTransCurr()
 
 	if (isDebt())
 	{
-		var person_tile, personsel, personname, pbalance, resbal_b;
+		var person_tile, person_id /* personsel */, personname, pbalance, resbal_b;
 
 		person_tile = ge('person_tile');
+		person_id
+/*
 		personsel = ge('personsel');
+*/
 		resbal_b = ge('resbal_b');
+/*
 		if (!person_tile || !personsel || !resbal_b)
+*/
+		if (!person_tile || !person_id || !resbal_b)
 			return;
 
+/*
 		personname = selectedText(personsel);
+*/
+		personname = getPersonName(person_id.value);
 		pbalance = getCurPersonBalance(trans_curr);
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
 
@@ -1366,6 +1390,7 @@ function getCurPersonBalance(curr_id)
 // Person select event handler
 function onPersonSel(obj)
 {
+/*
 	var personsel, personid;
 
 	personsel = ge('personsel');
@@ -1374,6 +1399,7 @@ function onPersonSel(obj)
 		return;
 
 	personid.value = selectedValue(personsel);
+*/
 
 	updControls();
 }

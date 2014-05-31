@@ -221,6 +221,41 @@ function onDestAccSel(obj)
 }
 
 
+// Debt account select callback
+function onDebtAccSel(obj)
+{
+	var acc_id;
+
+	if (!obj)
+		return;
+	acc_id = ge('acc_id');
+	if (!acc_id)
+		return;
+
+	acc_id.value = obj.id;
+
+	onChangeAcc();
+}
+
+
+// Person select callback
+function onPersAccSel(obj)
+{
+	var personid;
+
+	if (!obj)
+		return;
+
+	personid = ge('person_id');
+	if (!personid)
+		return;
+
+	personid.value = obj.id;
+
+	onPersonSel();
+}
+
+
 // Initialization of page controls
 function initControls()
 {
@@ -229,6 +264,40 @@ function initControls()
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
+	if (isDebt())
+	{
+		var persDDList, accDDList;
+
+		persDDList = new DDList();
+		if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : isMobile }))
+		{
+			persons.forEach(function(person)
+			{
+				persId = person[0];
+				persName = person[1];
+	
+				persDDList.addItem(persId, persName);
+			});
+		}
+		else
+			persDDList = null;
+
+		accDDList = new DDList();
+		if (accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : isMobile }))
+		{
+			accounts.forEach(function(acc)
+			{
+				accId = acc[0];
+				accName = acc[4];
+	
+				accDDList.addItem(accId, accName);
+			});
+		}
+		else
+			accDDList = null;
+	}
+	else
+	{
 	srcDDList = new DDList();
 	if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
 	{
@@ -256,4 +325,5 @@ function initControls()
 	}
 	else
 		destDDList = null;
+	}
 }
