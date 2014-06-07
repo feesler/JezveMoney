@@ -143,3 +143,25 @@ function setTileAccount(tile_id, acc_id)
 
 	setTileInfo(tile_id, name, formatBalance, icon);
 }
+
+
+// Return current position of account in accounts array
+// Return -1 in case account can't be found
+function getAccountPos(acc_id)
+{
+	var i, pos = -1;
+
+	if (!isArray(accounts) || !acc_id)
+		return -1;
+
+	for(i = 0; i < accounts.length; i++)
+	{
+		if (acc_id == accounts[i][0])
+		{
+			pos = i;
+			break;
+		}
+	}
+
+	return pos;
+}
