@@ -4,8 +4,8 @@
 
 	if (isset($_POST["clean"]) && $_POST["clean"] == "1")
 	{
-		if (file_exists($filename))
-			unlink($filename);
+		if (file_exists($logfname))
+			unlink($logfname);
 	}
 
 
