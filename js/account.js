@@ -165,3 +165,40 @@ function getAccountPos(acc_id)
 
 	return pos;
 }
+
+// Return another account id if possible
+// Return zero if no account can't be found
+function getPrevAccount(acc_id)
+{
+	var pos;
+
+	if (!isArray(accounts) || accounts.length < 2 || !acc_id)
+		return -1;
+
+	pos = getAccountPos(acc_id);
+	if (pos == -1)
+		return 0;
+
+	pos = ((pos == 0) ? accounts.length - 1 : pos - 1);
+
+	return accounts[pos][0];
+}
+
+// Return another account id if possible
+// Return zero if no account can't be found
+function getNextAccount(acc_id)
+{
+	var pos;
+
+	if (!isArray(accounts) || accounts.length < 2 || !acc_id)
+		return -1;
+
+	pos = getAccountPos(acc_id);
+	if (pos == -1)
+		return 0;
+
+	pos = ((pos == accounts.length - 1) ? 0 : pos + 1);
+
+	return accounts[pos][0];
+}
+
