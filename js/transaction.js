@@ -761,9 +761,13 @@ function getValues()
 	}
 	else if (isTransfer())
 	{
+		var dest_id = ge('dest_id');
+		if (!dest_id)
+			return;
+
 		S1 = getBalanceOfAccount(accid.value);
 		S2 = resbal.value;
-		S1_d = getBalanceOfAccount(ge('dest_id').value);
+		S1_d = getBalanceOfAccount(dest_id.value);
 		S2_d = resbal_d.value;
 	}
 	else if (isDebt())

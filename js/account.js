@@ -166,6 +166,7 @@ function getAccountPos(acc_id)
 	return pos;
 }
 
+
 // Return another account id if possible
 // Return zero if no account can't be found
 function getPrevAccount(acc_id)
@@ -183,6 +184,7 @@ function getPrevAccount(acc_id)
 
 	return accounts[pos][0];
 }
+
 
 // Return another account id if possible
 // Return zero if no account can't be found
