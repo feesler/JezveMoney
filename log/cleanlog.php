@@ -1,5 +1,6 @@
 <?php
-	$filename = "./log.txt";
+	$docroot = $_SERVER["DOCUMENT_ROOT"];
+	$logfname = $docroot."/money/log/log.txt";
 
 	if (isset($_POST["clean"]) && $_POST["clean"] == "1")
 	{

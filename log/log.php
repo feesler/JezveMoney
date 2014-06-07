@@ -1,5 +1,6 @@
 <?php
-	$filename = "./log.txt";
+	$docroot = $_SERVER["DOCUMENT_ROOT"];
+	$filename = $docroot."/money/log/log.txt";
 
 	$titleString = "jezveMoney - Log";
 ?>

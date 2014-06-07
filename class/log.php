@@ -1,8 +1,6 @@
 <?php
-	global $docroot;
-	global $rootdir;
-
-	$logfname = $docroot.$rootdir."log/log.txt";
+	$docroot = $_SERVER["DOCUMENT_ROOT"];
+	$logfname = $docroot."/money/log/log.txt";
 
 
 	// Write string to log file
