@@ -881,10 +881,34 @@ class Transaction extends CachedTable
 		if ($showPaginator == TRUE)
 		{
 			html("<div class=\"mode_selector\">");
+
+			$linkStr = "./transactions.php?";
+			$linkStr .= "type=".$this->getTypeString($trans_type);
+			$linkStr .= "&mode=".(($details) ? "classic" : "details");
+			if ($acc_id != 0)
+				$linkStr .= "&acc_id=".$acc_id;
+			if ($page_num != 0)
+				$linkStr .= "&page=".($page_num + 1);
+			if (!is_empty($searchStr))
+				$linkStr .= "&search=".(urlencode($searchStr));
+			if (!is_empty($startDate) && !is_empty($endDate))
+				$linkStr .= "&stdate=".$startDate."&enddate=".$endDate;
+
+			$linkStr = htmlentities($linkStr);
+
+			$resStr = "";
+			// Classic mode button
 			if ($details)
-				html("<a class=\"list_mode\" href=\"./transactions.php?mode=classic\"><div></div><span>Classic</span></a><b class=\"details_mode\"><div></div><span>Details</span></b>");
+				$resStr .= "<a class=\"list_mode\" href=\"".$linkStr."\"><div></div><span>Classic</span></a>";
 			else
-				html("<b class=\"list_mode\"><div></div><span>Classic</span></b><a class=\"details_mode\" href=\"./transactions.php?mode=details\"><div></div><span>Details</span></a>");
+				$resStr .= "<b class=\"list_mode\"><div></div><span>Classic</span></b>";
+
+			// Details mode button
+			if ($details)
+				$resStr .= "<b class=\"details_mode\"><div></div><span>Details</span></b>";
+			else
+				$resStr .= "<a class=\"details_mode\" href=\"".$linkStr."\"><div></div><span>Details</span></a>";
+			html($resStr);
 			html("</div>");
 		}
 
