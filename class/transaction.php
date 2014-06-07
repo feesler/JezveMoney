@@ -587,9 +587,9 @@ class Transaction extends CachedTable
 				($src_id != 0 && $dest_id == 0 && $src_curr != $curr_id))
 			{
 				if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))
-					$acc_curr = $acc->getCurrency($dest_id);
+					$acc_curr = $dest_curr;
 				else
-					$acc_curr = $acc->getCurrency($src_id);
+					$acc_curr = $src_curr;
 
 				$fcharge = "";
 				if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
