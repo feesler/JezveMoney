@@ -156,13 +156,11 @@ function getAccountPos(acc_id)
 
 	accounts.some(function(acc, ind)
 	{
-		if (acc_id == acc[0])
-		{
+		var cond = (acc_id == acc[0]);
+		if (cond)
 			pos = ind;
-			break;
-		}
 
-		return (acc_id == acc[0]);
+		return cond;
 	});
 
 	return pos;
