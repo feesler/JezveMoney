@@ -566,6 +566,9 @@ class Transaction extends CachedTable
 			$fdate = date("d.m.Y", strtotime($row["date"]));
 			$trans_pos = intval($row["pos"]);
 
+			$src_curr = ($src_id != 0) ? $acc->getCurrency($src_id) : 0;
+			$dest_curr = ($dest_id != 0) ? $acc->getCurrency($dest_id) : 0;
+
 			if ($cur_trans_type == 4)
 			{
 				$src_owner_id = $acc->getOwner($src_id);
@@ -578,7 +581,10 @@ class Transaction extends CachedTable
 			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
 				$famount .= "+ ";
 			$famount .= Currency::format($amount, $curr_id);
-			if ($charge != $amount)
+
+			if (($src_id != 0 && $dest_id != 0 && $src_curr != $dest_curr) ||
+				($src_id == 0 && $dest_id != 0 && $dest_curr != $curr_id) ||
+				($src_id != 0 && $dest_id == 0 && $src_curr != $curr_id))
 			{
 				if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))
 					$acc_curr = $acc->getCurrency($dest_id);
