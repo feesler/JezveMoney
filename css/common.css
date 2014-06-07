@@ -195,6 +195,7 @@ button::-moz-focus-inner
 .content_wrap
 {
 	padding: 50px 12px;
+	overflow: auto;
 }
 
 
