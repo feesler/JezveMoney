@@ -838,12 +838,12 @@ class Transaction extends CachedTable
 		global $db;
 
 		if (!self::$user_id)
-			return $resStr;
+			return;
 
 		$u = new User();
 		$owner_id = $u->getOwner(self::$user_id);
 		if (!$owner_id)
-			return $resStr;
+			return;
 
 		$pers = new Person(self::$user_id);
 
