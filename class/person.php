@@ -259,8 +259,9 @@ class Person extends CachedTable
 									"a.id" => "aid",
 									"a.curr_id" => "curr_id",
 									"a.balance" => "balance"),
-							array("persons" => "p", "accounts" => "a"),
-							"p.user_id=".self::$user_id." AND p.id<>".self::$owner_id." AND a.owner_id=p.id");
+							array("persons AS p LEFT JOIN accounts AS a ON a.owner_id=p.id"),
+							"p.user_id=".self::$user_id." AND p.id<>".self::$owner_id);
+
 		$pArr = array();
 		foreach($resArr as $row)
 		{
@@ -290,7 +291,8 @@ class Person extends CachedTable
 			$pArr[$ind][1] = $p_name;
 			if (!isset($pArr[$ind][2]))
 				$pArr[$ind][2] = array();
-			$pArr[$ind][2][] = array($acc_id, $curr_id, $balance);
+			if (!is_null($row["aid"]))
+				$pArr[$ind][2][] = array($acc_id, $curr_id, $balance);
 
 		}
 
