@@ -31,6 +31,13 @@ div.act_tr
 }
 
 
+.trlist_item > div
+{
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+
 .trlist_item > div > span,
 .act_tr > div > span,
 .details_table span
@@ -44,6 +51,12 @@ div.act_tr
 {
 	font-size: 14px;
 	clear: both;
+}
+
+
+.trlist_item .tritem_acc_name
+{
+	white-space: nowrap;
 }
 
 
