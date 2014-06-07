@@ -628,7 +628,7 @@ function updControls()
 // Source account change event handler
 function onChangeSource()
 {
-	var src, dest, pos;
+	var src, dest, newAcc;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -638,19 +638,9 @@ function onChangeSource()
 
 	if (src.value == dest.value)
 	{
-		for(var i = 0; i < accounts.length; i++)
-		{
-			if (dest.value == accounts[i][0])
-			{
-				pos = i;
-				break;
-			}
-		}
-
-		if (pos == 0)
-			dest.value = accounts[accounts.length - 1][0];
-		else
-			dest.value = accounts[pos - 1][0];
+		newAcc = getNextAccount(dest.value);
+		if (newAcc != 0)
+			dest.value = newAcc;
 	}
 
 	updControls();
@@ -660,7 +650,7 @@ function onChangeSource()
 // Destination account change event handler
 function onChangeDest()
 {
-	var src, dest, pos;
+	var src, dest, newAcc;
 
 	src = ge('src_id');
 	dest = ge('dest_id');
@@ -669,16 +659,9 @@ function onChangeDest()
 
 	if (src.value == dest.value)
 	{
-		for(var i = 0; i < accounts.length; i++)
-		{
-			if (src.value == accounts[i][0])
-				pos = i;
-		}
-
-		if (pos == 0)
-			src.value = accounts[accounts.length - 1][0];
-		else
-			src.value = accounts[pos - 1][0];
+		newAcc = getNextAccount(src.value);
+		if (newAcc != 0)
+			src.value = newAcc;
 	}
 
 	updControls();
