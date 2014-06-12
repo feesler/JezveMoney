@@ -684,20 +684,6 @@ class Transaction extends CachedTable
 			$linkStr = urlJoin("./transactions.php", $params);
 
 			$resStr .= "<a href=\"".$linkStr."\">";
-/*
-			$resStr .= "<a href=\"./transactions.php?";
-			$resStr .= "type=".$this->getTypeString($trans_type);
-			if ($acc_id != 0)
-				$resStr .= "&amp;acc_id=".$acc_id;
-			$resStr .= "&amp;page=".$page_num;
-			if ($details == TRUE)
-				$resStr .= "&amp;mode=details";
-			if (!is_empty($searchStr))
-				$resStr .= "&amp;search=".(urlencode($searchStr));
-			if (!is_empty($startDate) && !is_empty($endDate))
-				$resStr .= "&amp;stdate=".$startDate."&amp;enddate=".$endDate;
-			$resStr .= "\">";
-*/
 		}
 		$resStr .= $page_num;
 		$resStr .= ($is_active) ? "</b>" : "</a>";
@@ -918,21 +904,6 @@ class Transaction extends CachedTable
 				$params["enddate"] = $endDate;
 			}
 			$linkStr = urlJoin("./transactions.php", $params);
-/*
-			$linkStr = "./transactions.php?";
-			$linkStr .= "type=".$this->getTypeString($trans_type);
-			$linkStr .= "&mode=".(($details) ? "classic" : "details");
-			if ($acc_id != 0)
-				$linkStr .= "&acc_id=".$acc_id;
-			if ($page_num != 0)
-				$linkStr .= "&page=".($page_num + 1);
-			if (!is_empty($searchStr))
-				$linkStr .= "&search=".(urlencode($searchStr));
-			if (!is_empty($startDate) && !is_empty($endDate))
-				$linkStr .= "&stdate=".$startDate."&enddate=".$endDate;
-
-			$linkStr = htmlentities($linkStr);
-*/
 
 			$resStr = "";
 			// Classic mode button
