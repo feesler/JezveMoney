@@ -658,7 +658,7 @@ class Transaction extends CachedTable
 
 
 	// Return link to specified page
-	private function getPageLink($trans_type, $acc_id, $page_num, $is_active, $details)
+	private function getPageLink($trans_type, $acc_id, $page_num, $is_active, $searchStr, $startDate, $endDate, $details)
 	{
 		$resStr = "<span>";
 
@@ -675,6 +675,10 @@ class Transaction extends CachedTable
 			$resStr .= "&amp;page=".$page_num;
 			if ($details == TRUE)
 				$resStr .= "&amp;mode=details";
+			if (!is_empty($searchStr))
+				$resStr .= "&amp;search=".(urlencode($searchStr));
+			if (!is_empty($startDate) && !is_empty($endDate))
+				$resStr .= "&amp;stdate=".$startDate."&amp;enddate=".$endDate;
 			$resStr .= "\">";
 		}
 		$resStr .= $page_num;
@@ -686,7 +690,7 @@ class Transaction extends CachedTable
 
 
 	// Return paginator for transaction table
-	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count, $details)
+	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count, $searchStr, $startDate, $endDate, $details)
 	{
 		$resStr = "";
 
@@ -699,25 +703,25 @@ class Transaction extends CachedTable
 			{
 				for($i = 0; $i < $breakLimit; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
 				}
-				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $details);
+				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $searchStr, $startDate, $endDate, $details);
 			}
 			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
 			{
-				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE, $details)."<span>...</span>";
+				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE, $searchStr, $startDate, $endDate, $details)."<span>...</span>";
 				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
 				}
-				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $details);
+				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $searchStr, $startDate, $endDate, $details);
 			}
 			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE, $details)."<span>...</span>";
+				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE, $searchStr, $startDate, $endDate, $details)."<span>...</span>";
 				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
+					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
 				}
 			}
 		}
@@ -725,7 +729,7 @@ class Transaction extends CachedTable
 		{
 			for($i = 0; $i < $pages_count; $i++)
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $details);
+				$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
 			}
 		}
 
@@ -919,7 +923,7 @@ class Transaction extends CachedTable
 			html_op("<div class=\"paginator\">");
 
 			if ($transCount > $tr_on_page)
-				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $details));
+				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $searchStr, $startDate, $endDate, $details));
 
 			html_cl("</div>");
 		}
@@ -1058,7 +1062,7 @@ class Transaction extends CachedTable
 		{
 			html_op("<div class=\"paginator\">");
 			if ($transCount > $tr_on_page)
-				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $details));
+				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $searchStr, $startDate, $endDate, $details));
 			html_cl("</div>");
 		}
 
