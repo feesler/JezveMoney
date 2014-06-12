@@ -886,6 +886,21 @@ class Transaction extends CachedTable
 		{
 			html("<div class=\"mode_selector\">");
 
+			$params = array("type" => $this->getTypeString($trans_type),
+							"mode" => (($details) ? "classic" : "details"));
+			if ($acc_id != 0)
+				$params["acc_id"] = $acc_id;
+			if ($page_num != 0)
+				$params["page"] = ($page_num + 1);
+			if (!is_empty($searchStr))
+				$params["search"] = $searchStr;
+			if (!is_empty($startDate) && !is_empty($endDate))
+			{
+				$params["stdate"] = $startDate;
+				$params["enddate"] = $endDate;
+			}
+			$linkStr = urlJoin("./transactions.php", $params);
+/*
 			$linkStr = "./transactions.php?";
 			$linkStr .= "type=".$this->getTypeString($trans_type);
 			$linkStr .= "&mode=".(($details) ? "classic" : "details");
@@ -899,6 +914,7 @@ class Transaction extends CachedTable
 				$linkStr .= "&stdate=".$startDate."&enddate=".$endDate;
 
 			$linkStr = htmlentities($linkStr);
+*/
 
 			$resStr = "";
 			// Classic mode button
