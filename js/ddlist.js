@@ -411,7 +411,7 @@ function DDList()
 		if (!selectedOption)
 			return;
 
-		resObj.id = this.prepareId(selectedOption.id);
+		resObj.id = this.prepareId(selectedOption.value);
 		resObj.str = selectedOption.innerHTML;
 
 		this.selcb.call(this, resObj);
@@ -664,7 +664,7 @@ function DDList()
 
 		if (this.isMobile)
 		{
-			liobj = ce('option', { id : item_id, innerHTML : str });
+			liobj = ce('option', { value : idval, innerHTML : str });
 		}
 		else
 		{
