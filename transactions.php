@@ -105,6 +105,21 @@
 			html_cl("</div>");
 
 			html_op("<div>");
+
+				$trTypes = array("All", "Expense", "Income", "Transfer", "Debt");
+				$transMenu = array();
+				$baseUrl = "./transactions.php";
+				foreach($trTypes as $ind => $trTypeName)
+				{
+					$params = array("type" => strtolower($trTypeName));
+					if ($acc_id != 0)
+						$params["acc_id"] = $acc_id;
+					if ($showDetails)
+						$params["mode"] = "details";
+					
+					$transMenu[] = array($ind, $trTypeName, urlJoin($baseUrl, $params));
+				}
+/*
 				$acc_par = (($acc_id != 0) ? "&amp;acc_id=".$acc_id : "");
 				$mode_par = (($showDetails) ? "&amp;mode=details" : "");
 				$transMenu = array(array(0, "All", "./transactions.php?type=all".$acc_par.$mode_par),
@@ -112,6 +127,7 @@
 										array(2, "Income", "./transactions.php?type=income".$acc_par.$mode_par),
 										array(3, "Transfer", "./transactions.php?type=transfer".$acc_par.$mode_par),
 										array(4, "Debt", "./transactions.php?type=debt".$acc_par.$mode_par));
+*/
 				showSubMenu($trans_type, $transMenu);
 
 				html("<form method=\"get\" action=\"./transactions.php\" onsubmit=\"return onSearchSubmit(this);\">");
