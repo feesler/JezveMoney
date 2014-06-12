@@ -504,4 +504,33 @@
 	{
 		return preg_replace_callback('/((\\\u[01-9a-fA-F]{4})+)/', 'prepareUTF8', json_encode($obj));
 	}
+
+
+	// Build URL from base and array of parameters
+	function urlJoin($base, $params = NULL)
+	{
+		$resStr = "";
+
+		if (is_empty($base))
+			return $resStr;
+
+		$resStr = $base;
+
+		if (!is_array($params))
+			return $resStr;
+
+		$pairs = array();
+		foreach($params as $pkey => $pval)
+		{
+			$pairs[] = urlencode($pkey)."=".urlencode($pval);
+		}
+		if (count($pairs))
+			$resStr .= "?";
+		$resStr .= implode("&", $pairs);
+
+		$resStr = htmlentities($resStr);
+
+		return $resStr;
+	}
+
 ?>
