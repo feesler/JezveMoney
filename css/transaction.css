@@ -38,6 +38,29 @@
 }
 
 
+.tile_header
+{
+	float: none;
+	clear: both;
+	height: 20px;
+	line-height: 20px;
+	overflow: hidden;
+}
+
+
+.tile_header > label
+{
+	display: inline-block;
+	float: left;
+	width: auto;
+}
+
+.tile_header .iconlink
+{
+	margin: 2px 0px 2px 5px;
+}
+
+
 .tile_container
 {
 	width: 100px;

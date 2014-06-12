@@ -202,7 +202,8 @@
 
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			html("<div><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label></div>");
+			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, TRUE, "onAccountOff();", "small_icon");
+			html("<div class=\"tile_header\"><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label>".$closeIcon."</div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
 				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$acc_id."\">");
