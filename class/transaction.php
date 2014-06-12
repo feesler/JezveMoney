@@ -668,6 +668,23 @@ class Transaction extends CachedTable
 		}
 		else
 		{
+			$params = array("type" => $this->getTypeString($trans_type),
+							"page" => $page_num);
+			if ($acc_id != 0)
+				$params["acc_id"] = $acc_id;
+			if ($details == TRUE)
+				$params["mode"] = "details";
+			if (!is_empty($searchStr))
+				$params["search"] = $searchStr;
+			if (!is_empty($startDate) && !is_empty($endDate))
+			{
+				$params["stdate"] = $startDate;
+				$params["enddate"] = $endDate;
+			}
+			$linkStr = urlJoin("./transactions.php", $params);
+
+			$resStr .= "<a href=\"".$linkStr."\">";
+/*
 			$resStr .= "<a href=\"./transactions.php?";
 			$resStr .= "type=".$this->getTypeString($trans_type);
 			if ($acc_id != 0)
@@ -680,6 +697,7 @@ class Transaction extends CachedTable
 			if (!is_empty($startDate) && !is_empty($endDate))
 				$resStr .= "&amp;stdate=".$startDate."&amp;enddate=".$endDate;
 			$resStr .= "\">";
+*/
 		}
 		$resStr .= $page_num;
 		$resStr .= ($is_active) ? "</b>" : "</a>";
