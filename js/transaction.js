@@ -1170,7 +1170,8 @@ function onChangeDebtOp()
 
 	debtType = debtgive.checked;
 
-	acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+	if (!noAccount)
+		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
 
 	updateExchAndRes();
 }
