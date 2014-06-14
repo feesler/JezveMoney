@@ -220,7 +220,7 @@
 										Currency::format($debtAcc["balance"], $debtAcc["curr"]));
 			html_cl("</div>");
 
-			html_op("<div id=\"selaccount\" style=\"display: none;\">");
+			html_op("<div id=\"selaccount\" class=\"selacc_container\" style=\"display: none;\">");
 				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"toggleEnableAccount();\"><span>Select account</span></div>");
 			html_cl("</div>");
 		html_cl("</div>");
