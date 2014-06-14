@@ -270,11 +270,11 @@
 {
 	width: 16px;
 	height: 16px;
-	background-position: -240px -48px;
+	background-position: -240px -46px;
 }
 
 
 .iconlink > *:hover > div.close_gray
 {
-	background-position: -224px -48px;
+	background-position: -224px -46px;
 }
