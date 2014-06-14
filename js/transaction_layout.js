@@ -376,6 +376,7 @@ function toggleEnableAccount()
 		acclbl.innerHTML = 'No account';
 	}
 
+	show('noacc_btn', noAccount);
 	show(source.firstElementChild.nextElementSibling, noAccount);
 	show(source.firstElementChild.nextElementSibling.nextElementSibling, noAccount);
 	show(selaccount, !noAccount);
