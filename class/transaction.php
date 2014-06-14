@@ -571,14 +571,14 @@ class Transaction extends CachedTable
 
 			if ($cur_trans_type == 4)
 			{
-				$src_owner_id = $acc->getOwner($src_id);
-				$dest_owner_id = $acc->getOwner($dest_id);
+				$src_owner_id = ($src_id != 0) ? $acc->getOwner($src_id) : 0;
+				$dest_owner_id = ($dest_id != 0) ? $acc->getOwner($dest_id) : 0;
 			}
 
 			$famount = "";
-			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
+			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && ($dest_owner_id == 0 || $src_owner_id == $owner_id)))			// expense
 				$famount .= "- ";
-			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
+			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
 				$famount .= "+ ";
 			$famount .= Currency::format($amount, $curr_id);
 
