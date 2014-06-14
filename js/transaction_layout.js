@@ -359,12 +359,11 @@ function initControls()
 // Account disable button click event handler
 function toggleEnableAccount()
 {
-	var acclbl, source, selaccount;
+	var acclbl, source;
 
 	acclbl = ge('acclbl');
 	source = ge('source');
-	selaccount = ge('selaccount');
-	if (!acclbl || !source || !selaccount)
+	if (!acclbl || !source)
 		return;
 
 	if (noAccount)
@@ -379,7 +378,7 @@ function toggleEnableAccount()
 	show('noacc_btn', noAccount);
 	show(source.firstElementChild.nextElementSibling, noAccount);
 	show(source.firstElementChild.nextElementSibling.nextElementSibling, noAccount);
-	show(selaccount, !noAccount);
+	show('selaccount', !noAccount);
 
 	noAccount = !noAccount;
 }
