@@ -345,7 +345,7 @@
 	html_op("<div id=\"result_balance_dest\" class=\"non_float\" style=\"display: none;\">");
 		html("<div><label for=\"resbal_d\">Result balance (Account)</label></div>");
 		html_op("<div>");
-			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><span id=\"res_currsign\">".$debtAcc["sign"]."</div></div></div>");
+			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"res_currsign\">".$debtAcc["sign"]."</div></div></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
 					html("<input id=\"resbal_d\" class=\"summ_text\" type=\"text\" value=\"\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\">");
