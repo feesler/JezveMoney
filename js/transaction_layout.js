@@ -380,5 +380,11 @@ function toggleEnableAccount()
 	show(source.firstElementChild.nextElementSibling.nextElementSibling, noAccount);
 	show('selaccount', !noAccount);
 
+	amountSwitch(true);
+	resBalanceSwitch(false);
+	resBalanceDestSwitch(false);
+
 	noAccount = !noAccount;
+
+	onChangeAcc();
 }
