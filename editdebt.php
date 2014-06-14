@@ -97,7 +97,7 @@
 	$dest = getAccountProperties($tr["dest_id"]);
 
 	$user_owner = $u->getOwner($user_id);
-	$give = ($src["owner"] != $user_owner);
+	$give = (!is_null($src) && $src["owner"] != $user_owner);
 
 	$person_id = ($give) ? $src["owner"] : $dest["owner"];
 	$person_name = $person->getName($person_id);
@@ -114,11 +114,19 @@
 	$acc_count = $acc->getCount($trans_id);
 
 	$debtAcc = $give ? $dest : $src;
+	$noAccount = is_null($debtAcc);
 
-	if ($give)
-		$accLbl = "Destination account";
+	if ($noAccount)
+	{
+		$accLbl = "No account";
+	}
 	else
-		$accLbl = "Source account";
+	{
+		if ($give)
+			$accLbl = "Destination account";
+		else
+			$accLbl = "Source account";
+	}
 
 	$titleString = "Jezve Money | Edit debt";
 
@@ -171,6 +179,8 @@
 
 	html("var trans_type = ".$tr["type"].";");
 	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");
+	html("var noAccount = ".($noAccount ? "true" : "false").";");
+
 	if (isMessageSet())
 		html("onReady(initMessage);");
 	html("onReady(initControls);");
@@ -243,19 +253,25 @@
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
 			html("<div><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label></div>");
-			html_op("<div class=\"tile_container\">");
+			$disp = $noAccount ? " style=\"display: none;\"" : "";
+			html_op("<div class=\"tile_container\"".$disp.">");
 				html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["amount"], "acc_tile"));
 				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$debtAcc["id"]."\">");
 			html_cl("</div>");
 
 			html();
-			html_op("<div class=\"tile_right_block\">");
+			html_op("<div class=\"tile_right_block\"".$disp.">");
 				getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
 										Currency::format(0, $debtAcc["curr"]));
 
 				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b",
 										"onResBalanceDestSelect();",
 										Currency::format($debtAcc["balance"], $debtAcc["curr"]));
+			html_cl("</div>");
+
+			$disp = $noAccount ? "" : " style=\"display: none;\"";
+			html_op("<div id=\"selaccount\" class=\"selacc_container\"".$disp.">");
+				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"toggleEnableAccount();\"><span>Select account</span></div>");
 			html_cl("</div>");
 		html_cl("</div>");
 
