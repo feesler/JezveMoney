@@ -104,7 +104,7 @@
 
 	$person_acc = $person->getAccount($person_id, $tr["curr"]);
 	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
-	$person_balance = $person_acc ? $acc->getBalance($person_acc, TRUE) : 0.0;
+	$person_balance = $person_acc ? $acc->getBalance($person_acc) : 0.0;
 
 	
 	$person_balance += ($give) ? $tr["amount"] : -$tr["amount"];

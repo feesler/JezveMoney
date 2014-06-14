@@ -74,7 +74,7 @@
 
 	$fperson_acc = $person->getAccount($fperson_id, $debtAcc["curr"]);
 	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
-	$fperson_balance = $fperson_acc ? $acc->getBalance($fperson_acc, TRUE) : 0.0;
+	$fperson_balance = $fperson_acc ? $acc->getBalance($fperson_acc) : 0.0;
 	$acc = new Account($user_id);
 
 	if ($give)
