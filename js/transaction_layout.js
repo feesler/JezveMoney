@@ -359,20 +359,23 @@ function initControls()
 // Account disable button click event handler
 function toggleEnableAccount()
 {
-	var acclbl, source;
+	var acclbl, source, charge_left;
 
 	acclbl = ge('acclbl');
 	source = ge('source');
-	if (!acclbl || !source)
+	charge_left = re('charge_left');
+	if (!acclbl || !source || !charge_left)
 		return;
 
 	if (noAccount)
 	{
 		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+		insertBefore(charge_left, ge('dest_res_balance_left'));
 	}
 	else
 	{
 		acclbl.innerHTML = 'No account';
+		insertBefore(charge_left, ge('amount_left'));
 	}
 
 	show('noacc_btn', noAccount);
