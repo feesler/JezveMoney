@@ -354,3 +354,45 @@ function initControls()
 			transCurrDDList = null;
 	}
 }
+
+
+// Account disable button click event handler
+function onDisableAccount()
+{
+	var acclbl, source, selaccount;
+
+	acclbl = ge('acclbl');
+	source = ge('source');
+	selaccount = ge('selaccount');
+	if (!acclbl || !source || !selaccount)
+		return;
+
+	acclbl.innerHTML = 'No account';
+
+	show(source.firstElementChild.nextElementSibling, false);
+	show(source.firstElementChild.nextElementSibling.nextElementSibling, false);
+	show(selaccount, true);
+
+	noAccount = true;
+}
+
+
+// Select account button click event handler
+function onEnableAccount()
+{
+	var acclbl, source, selaccount;
+
+	acclbl = ge('acclbl');
+	source = ge('source');
+	selaccount = ge('selaccount');
+	if (!acclbl || !source || !selaccount)
+		return;
+
+	acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+
+	show(source.firstElementChild.nextElementSibling, true);
+	show(source.firstElementChild.nextElementSibling.nextElementSibling, true);
+	show(selaccount, false);
+
+	noAccount = false;
+}

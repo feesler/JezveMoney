@@ -112,6 +112,7 @@
 	echo(Currency::getArray(TRUE));
 	html("var trans_curr = ".$debtAcc["curr"].";");
 	html("var trans_acc_curr = ".$debtAcc["curr"].";");
+	html("var noAccount = false;");
 
 	$person->getArray();
 
@@ -202,7 +203,7 @@
 
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, TRUE, "onAccountOff();", "small_icon");
+			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, TRUE, "onDisableAccount();", "small_icon");
 			html("<div class=\"tile_header\"><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label>".$closeIcon."</div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
@@ -217,6 +218,10 @@
 				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b",
 										"onResBalanceDestSelect();",
 										Currency::format($debtAcc["balance"], $debtAcc["curr"]));
+			html_cl("</div>");
+
+			html_op("<div id=\"selaccount\" style=\"display: none;\">");
+				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onEnableAccount();\"><span>Select account</span></div>");
 			html_cl("</div>");
 		html_cl("</div>");
 
