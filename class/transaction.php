@@ -114,7 +114,7 @@ class Transaction extends CachedTable
 		$trans_id = $db->insertId();
 
 		// update balance of source account
-		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
+		if ($src_id != 0 && ($trans_type == 1 || $trans_type == 3 || $trans_type == 4))
 		{
 			if ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id)))		// person give to us
 				$srcBalance -= $amount;
@@ -125,7 +125,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of destination account
-		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)
+		if ($dest_id != 0 && ($trans_type == 2 || $trans_type == 3 || $trans_type == 4))
 		{
 			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id))))		// income or person give to us
 				$destBalance += $charge;
@@ -204,7 +204,7 @@ class Transaction extends CachedTable
 			return FALSE;
 
 		// update balance of source account
-		if ($transType == 1 || $transType == 3 || $transType == 4)		// spend, transfer or debt
+		if ($src_id != 0 && ($transType == 1 || $transType == 3 || $transType == 4))		// spend, transfer or debt
 		{
 			if ($transType == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id)))		// person give to us
 				$srcBalance += $transAmount;
@@ -216,7 +216,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of destination account
-		if ($transType == 2 || $transType == 3 || $transType == 4)		// income, transfer or debt
+		if ($dest_id != 0 && ($transType == 2 || $transType == 3 || $transType == 4))		// income, transfer or debt
 		{
 			if (($transType == 2) || ($transType == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id))))		// income or person give to us
 				$destBalance -= $transCharge;
@@ -297,7 +297,7 @@ class Transaction extends CachedTable
 			return FALSE;
 
 		// update balance of source account
-		if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)				// spend, transfer or debt
+		if ($src_id != 0 && ($trans_type == 1 || $trans_type == 3 || $trans_type == 4))				// spend, transfer or debt
 		{
 			if ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id)))		// person give to us
 				$srcBalance -= $amount;
@@ -309,7 +309,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of destination account
-		if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)		// income, transfer or debt
+		if ($dest_id != 0 && ($trans_type == 2 || $trans_type == 3 || $trans_type == 4))		// income, transfer or debt
 		{
 			if (($trans_type == 2) || ($trans_type == 4 && ($acc->getOwner($src_id) != $u->getOwner(self::$user_id))))		// income or person give to us
 				$destBalance += $charge;
