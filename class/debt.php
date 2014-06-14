@@ -28,14 +28,14 @@ Class Debt
 	// Create new debt operation
 	public function create($op, $acc_id, $p_id, $amount, $charge, $curr_id, $tr_date, $comment)
 	{
-		if (!is_numeric($acc_id) || !is_numeric($p_id) || !is_numeric($curr_id))
+		if (!is_numeric($p_id) || !is_numeric($curr_id))
 			return FALSE;
 
 		$account_id = intval($acc_id);
 		$person_id = intval($p_id);
 		$curr_id = intval($curr_id);
 
-		if (!$account_id || !$person_id || !$curr_id)
+		if (!$person_id || !$curr_id)
 			return FALSE;
 
 		$person = new Person($this->user_id);
@@ -70,7 +70,7 @@ Class Debt
 	// Update debt operation
 	public function edit($trans_id, $op, $acc_id, $p_id, $amount, $charge, $curr_id, $tr_date, $comment)
 	{
-		if (!is_numeric($trans_id) || !is_numeric($acc_id) || !is_numeric($p_id) || !is_numeric($curr_id))
+		if (!is_numeric($trans_id) || !is_numeric($p_id) || !is_numeric($curr_id))
 			return FALSE;
 
 		$tr_id = intval($trans_id);
@@ -78,7 +78,7 @@ Class Debt
 		$person_id = intval($p_id);
 		$curr_id = intval($curr_id);
 
-		if (!$tr_id || !$account_id || !$person_id || !$curr_id)
+		if (!$tr_id || !$person_id || !$curr_id)
 			return FALSE;
 
 		$person = new Person($this->user_id);
