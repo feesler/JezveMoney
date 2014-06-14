@@ -203,7 +203,7 @@
 
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, TRUE, "onDisableAccount();", "small_icon");
+			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, TRUE, "toggleEnableAccount();", "small_icon");
 			html("<div class=\"tile_header\"><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label>".$closeIcon."</div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
@@ -221,7 +221,7 @@
 			html_cl("</div>");
 
 			html_op("<div id=\"selaccount\" style=\"display: none;\">");
-				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"onEnableAccount();\"><span>Select account</span></div>");
+				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"toggleEnableAccount();\"><span>Select account</span></div>");
 			html_cl("</div>");
 		html_cl("</div>");
 
