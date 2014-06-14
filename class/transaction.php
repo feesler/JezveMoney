@@ -971,18 +971,24 @@ class Transaction extends CachedTable
 
 			// Make accounts string
 			$accStr = "";
-			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-				$accStr .= $acc->getName($src_id);
-			else if ($cur_trans_type == 4)
-				$accStr .= $acc->getNameOrPerson($src_id);
+			if ($src_id != 0)
+			{
+				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
+					$accStr .= $acc->getName($src_id);
+				else if ($cur_trans_type == 4)
+					$accStr .= $acc->getNameOrPerson($src_id);
+			}
 
-			if ($cur_trans_type == 3 || $cur_trans_type == 4)
+			if ($src_id != 0 && $dest_id != 0 && ($cur_trans_type == 3 || $cur_trans_type == 4))
 				$accStr .= " → ";
 
-			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
-				$accStr .= $acc->getName($dest_id);
-			else if ($cur_trans_type == 4)
-				$accStr .= $acc->getNameOrPerson($dest_id);
+			if ($dest_id != 0)
+			{
+				if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
+					$accStr .= $acc->getName($dest_id);
+				else if ($cur_trans_type == 4)
+					$accStr .= $acc->getNameOrPerson($dest_id);
+			}
 
 			$resStr = "";
 			$titleStr = ($details) ? " title=\"".$accStr."\"" : "";
