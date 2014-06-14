@@ -1280,6 +1280,9 @@ function onDebtSubmit(frm)
 	if (!frm || !accid || !amount || !charge || !trdate)
 		return false;
 
+	if (noAccount)
+		accid.value = 0;
+
 	if (!amount.value || !amount.value.length || !isNum(fixFloat(amount.value)))
 	{
 		alert('Please input correct amount.');
