@@ -252,7 +252,8 @@
 
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			html("<div><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label></div>");
+			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, !$noAccount, "toggleEnableAccount();", "small_icon");
+			html("<div class=\"tile_header\"><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label>".$closeIcon."</div>");
 			$disp = $noAccount ? " style=\"display: none;\"" : "";
 			html_op("<div class=\"tile_container\"".$disp.">");
 				html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["amount"], "acc_tile"));
