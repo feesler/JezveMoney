@@ -1027,11 +1027,17 @@ class Transaction extends CachedTable
 				}
 				else if ($cur_trans_type == 3 || $cur_trans_type == 4)
 				{
-					$acc_curr = $acc->getCurrency($src_id);
-					html("<span>".Currency::format($src_balance, $acc_curr)."</span>");
+					if ($src_id != 0)
+					{
+						$acc_curr = $acc->getCurrency($src_id);
+						html("<span>".Currency::format($src_balance, $acc_curr)."</span>");
+					}
 
-					$acc_curr = $acc->getCurrency($dest_id);
-					html("<span>".Currency::format($dest_balance, $acc_curr)."</span>");
+					if ($dest_id != 0)
+					{
+						$acc_curr = $acc->getCurrency($dest_id);
+						html("<span>".Currency::format($dest_balance, $acc_curr)."</span>");
+					}
 				}
 				html_cl("</div></td>");
 			}
