@@ -102,10 +102,11 @@
 	$person_id = ($give) ? $src["owner"] : $dest["owner"];
 	$person_name = $person->getName($person_id);
 
-	$person_acc = $person->getAccount($person_id, $tr["curr"]);
+	$person_acc_id = $person->getAccount($person_id, $tr["curr"]);
 	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
 	$person_balance = $person_acc ? $acc->getBalance($person_acc) : 0.0;
 
+	$person_acc = getAccountProperties($person_acc_id);
 	
 	$person_balance += ($give) ? $tr["amount"] : -$tr["amount"];
 	$person_res_balance += ($give) ? -$tr["amount"] : $tr["amount"];
@@ -119,7 +120,7 @@
 	$amountCurr = $tr["curr"];
 	if ($noAccount)
 	{
-		$chargeCurr = $acc->getCurrency($person_acc);
+		$chargeCurr = $person_acc["curr"];
 		$acc_id = $acc->getIdByPos(0);
 		$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
 	}
@@ -240,7 +241,7 @@
 					{
 						html_op("<div class=\"tile_container\">");
 							html(getTile(STATIC_TILE, "person_tile", $person_name,
-												Currency::format($person_balance, $debtAcc["curr"]),
+												Currency::format($person_balance, $chargeCurr),
 												NULL));
 						html_cl("</div>");
 					}
@@ -256,7 +257,7 @@
 
 						getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b",
 													"onResBalanceSelect();",
-													Currency::format($person_res_balance, $debtAcc["curr"]));
+													Currency::format($person_res_balance, $chargeCurr));
 
 						if ($noAccount)
 						{
