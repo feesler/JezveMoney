@@ -104,9 +104,8 @@
 
 	$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
 	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
-	$person_balance = $person_acc ? $acc->getBalance($person_acc) : 0.0;
-
 	$person_acc = getAccountProperties($person_acc_id);
+	$person_balance = $person_acc["balance"];
 	
 	$person_balance += ($give) ? $tr["amount"] : -$tr["amount"];
 	$person_res_balance += ($give) ? -$tr["amount"] : $tr["amount"];
