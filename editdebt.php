@@ -102,7 +102,7 @@
 	$person_id = ($give) ? $src["owner"] : $dest["owner"];
 	$person_name = $person->getName($person_id);
 
-	$person_acc_id = $person->getAccount($person_id, $tr["curr"]);
+	$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
 	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
 	$person_balance = $person_acc ? $acc->getBalance($person_acc) : 0.0;
 
