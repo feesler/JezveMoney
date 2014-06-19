@@ -229,22 +229,11 @@
 				html("<input id=\"person_id\" name=\"person_id\" type=\"hidden\" value=\"".$person_id."\">");
 				html("<div><label for=\"personsel\">Person name</label></div>");
 				html_op("<div>");
-					if (!$person->getCount())
-					{
-						html_op("<div class=\"tile_container\">");
-							html(getTile(STATIC_TILE, "person_tile", "New person",
-													Currency::format(0, $debtAcc["curr"]),
-													NULL, "inact"));
-						html_cl("</div>");
-					}
-					else
-					{
-						html_op("<div class=\"tile_container\">");
-							html(getTile(STATIC_TILE, "person_tile", $person_name,
-												Currency::format($person_balance, $chargeCurr),
-												NULL));
-						html_cl("</div>");
-					}
+					html_op("<div class=\"tile_container\">");
+						html(getTile(STATIC_TILE, "person_tile", $person_name,
+											Currency::format($person_balance, $chargeCurr),
+											NULL));
+					html_cl("</div>");
 
 					html();
 					html_op("<div class=\"tile_right_block\">");		// tile_right_block person_trb
