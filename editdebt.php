@@ -116,6 +116,16 @@
 	$debtAcc = $give ? $dest : $src;
 	$noAccount = is_null($debtAcc);
 
+	$amountCurr = $tr["curr"];
+	if ($noAccount)
+	{
+		$chargeCurr = $acc->getCurrency($person_acc);
+	}
+	else
+	{
+		$chargeCurr = $debtAcc["curr"];
+	}
+
 	if ($noAccount)
 	{
 		$accLbl = "No account";
@@ -237,7 +247,7 @@
 					html_op("<div class=\"tile_right_block\">");		// tile_right_block person_trb
 						getRightTileBlock("amount_left", FALSE, "Amount", "amount_b",
 													"onAmountSelect();",
-													Currency::format($tr["amount"], $debtAcc["curr"]));
+													Currency::format($tr["amount"], $amountCurr));
 
 						getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
 													round($tr["amount"] / $tr["charge"], 5)." ".$charge_sign."/".$amount_sign);
@@ -263,7 +273,7 @@
 			html();
 			html_op("<div class=\"tile_right_block\"".$disp.">");
 				getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
-										Currency::format(0, $debtAcc["curr"]));
+										Currency::format(0, $chargeCurr));
 
 				getRightTileBlock("dest_res_balance_left", TRUE, "Result balance", "resbal_d_b",
 										"onResBalanceDestSelect();",
@@ -291,7 +301,7 @@
 		html_op("<div>");
 			html_op("<div class=\"curr_container\">");
 				html("<div class=\"btn rcurr_btn\"><div id=\"amountsign\">".$amount_sign."</div></div>");
-				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$debtAcc["curr"]."\">");
+				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$amountCurr."\">");
 			html_cl("</div>");
 
 			html_op("<div class=\"stretch_input rbtn_input\">");
