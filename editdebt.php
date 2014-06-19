@@ -120,6 +120,8 @@
 	if ($noAccount)
 	{
 		$chargeCurr = $acc->getCurrency($person_acc);
+		$acc_id = $acc->getIdByPos(0);
+		$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
 	}
 	else
 	{
@@ -272,8 +274,16 @@
 			html("<div class=\"tile_header\"><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label>".$closeIcon."</div>");
 			$disp = $noAccount ? " style=\"display: none;\"" : "";
 			html_op("<div class=\"tile_container\"".$disp.">");
-				html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["amount"], "acc_tile"));
-				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$debtAcc["id"]."\">");
+				if ($noAccount)
+				{
+					html($acc->getTileEx(STATIC_TILE, $acc_id, $acc_balance, "acc_tile"));
+					html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$acc_id."\">");
+				}
+				else
+				{
+					html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["amount"], "acc_tile"));
+					html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$debtAcc["id"]."\">");
+				}
 			html_cl("</div>");
 
 			html();
