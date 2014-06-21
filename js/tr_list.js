@@ -224,10 +224,10 @@ var transactions =
 
 				if (src_id && initBalArr[src_id] === undefined)
 				{
-					if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[11] == 1))	// expense, transfer or debt
+					if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[11] == 2))	// expense, transfer or debt
 						initBalArr[src_id] = trans[9] + trans[13];		// src_bal + charge
-					else if (tr_type == 4 && trans[11] == 2)
-						initBalArr[src_id] = trans[9] - trans[12];		// src_bal + amount
+					else if (tr_type == 4 && trans[11] == 1)
+						initBalArr[src_id] = trans[9] + trans[12];		// src_bal + amount
 				}
 
 				if (dest_id && initBalArr[dest_id] === undefined)
