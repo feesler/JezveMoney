@@ -109,15 +109,21 @@ var transactions =
 				if (src_bal === null)
 					src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
 				trans[9] = src_bal - charge;
-				if (dest_bal === null)
-					dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.amount
-				trans[10] = dest_bal + amount;
+				if (trans[2] != 0)		// trans.dest_id != 0
+				{
+					if (dest_bal === null)
+						dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.amount
+					trans[10] = dest_bal + amount;
+				}
 			}
 			else if (trans[11] == 2)	// person take from us
 			{
-				if (src_bal === null)
-					src_bal = trans[9] + trans[12];		// trans.src_bal + trans.amount
-				trans[9] = src_bal - amount;
+				if (trans[1] != 0)	// trans.src_id != 0
+				{
+					if (src_bal === null)
+						src_bal = trans[9] + trans[12];		// trans.src_bal + trans.amount
+					trans[9] = src_bal - amount;
+				}
 				if (dest_bal === null)
 					dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.charge
 				trans[10] = dest_bal + charge;
@@ -144,14 +150,14 @@ var transactions =
 
 		var balSpan;
 
-		if (tr_type == 1 || tr_type == 3 || tr_type == 4)
+		if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[1] != 0))
 		{
 			balSpan = ce('span');
 			balSpan.innerHTML = formatCurrency(trans[9], getCurrencyOfAccount(src_id));
 			trBalanceItem.appendChild(balSpan);
 		}
 
-		if (tr_type == 2 || tr_type == 3 || tr_type == 4)
+		if (tr_type == 2 || tr_type == 3 || (tr_type == 4 && trans[2] != 0))
 		{
 			balSpan = ce('span');
 			balSpan.innerHTML = formatCurrency(trans[10], getCurrencyOfAccount(dest_id));
