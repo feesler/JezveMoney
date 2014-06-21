@@ -107,26 +107,26 @@ var transactions =
 			if (trans[11] == 1)		// person give to us
 			{
 				if (src_bal === null)
-					src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
-				trans[9] = src_bal - charge;
-				if (trans[2] != 0)		// trans.dest_id != 0
+					src_bal = trans[9] + amount;		// trans.src_bal + trans.amount
+				trans[9] = src_bal - amount;
+				if (trans[2] != 0)	// trans.dest_id != 0
 				{
 					if (dest_bal === null)
-						dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.amount
-					trans[10] = dest_bal + amount;
+						dest_bal = trans[10] - charge;		// trans.dest_bal - trans.charge
+					trans[10] = dest_bal + charge;
 				}
 			}
-			else if (trans[11] == 2)	// person take from us
+			else if (trans[11] == 2)		// person take from us
 			{
-				if (trans[1] != 0)	// trans.src_id != 0
+				if (trans[1] != 0)		// trans.src_id != 0
 				{
 					if (src_bal === null)
-						src_bal = trans[9] + trans[12];		// trans.src_bal + trans.amount
-					trans[9] = src_bal - amount;
+						src_bal = trans[9] + charge;		// trans.src_bal + trans.charge
+					trans[9] = src_bal - charge;
 				}
 				if (dest_bal === null)
-					dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.charge
-				trans[10] = dest_bal + charge;
+					dest_bal = trans[10] - amount;		// trans.dest_bal - trans.amount
+				trans[10] = dest_bal + amount;
 			}
 		}
 
