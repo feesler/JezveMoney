@@ -804,7 +804,7 @@ class Transaction extends CachedTable
 				}
 				else if ($tr_type == 4)			// debt
 				{
-					if ($acc->getOwner($acc_id) != $u->getOwner(self::$user_id))		// person give to us
+					if ($acc->getOwner($acc_id) != $u->getOwner(self::$user_id))		// acc_id is account of person
 						$balArr[$acc_id] = round($balArr[$acc_id] - $tr_amount, 2);
 					else
 						$balArr[$acc_id] = round($balArr[$acc_id] - $tr_charge, 2);
@@ -825,10 +825,10 @@ class Transaction extends CachedTable
 				}
 				else if ($tr_type == 4)			// debt
 				{
-					if ($acc->getOwner($acc_id) != $u->getOwner(self::$user_id))		// person give to us
-						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_charge, 2);
-					else
+					if ($acc->getOwner($acc_id) != $u->getOwner(self::$user_id))		// acc_id is account of person
 						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_amount, 2);
+					else
+						$balArr[$acc_id] = round($balArr[$acc_id] + $tr_charge, 2);
 				}
 			}
 
