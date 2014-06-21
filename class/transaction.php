@@ -609,7 +609,7 @@ class Transaction extends CachedTable
 				$trArr[] = (($src_id != 0 && isset($balArr[$src_id])) ? $balArr[$src_id] : 0.0);
 				$trArr[] = (($dest_id != 0 && isset($balArr[$dest_id])) ? $balArr[$dest_id] : 0.0);
 			}
-			$trArr[] = ($cur_trans_type == 4) ? (($src_owner_id == $owner_id) ? 1 : 2) : 0;
+			$trArr[] = ($cur_trans_type == 4) ? (($src_owner_id != $owner_id) ? 1 : 2) : 0;
 			$trArr[] = $amount;
 			$trArr[] = $charge;
 			$trArr[] = $curr_id;
