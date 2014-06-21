@@ -153,14 +153,20 @@ var transactions =
 		if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[1] != 0))
 		{
 			balSpan = ce('span');
-			balSpan.innerHTML = formatCurrency(trans[9], getCurrencyOfAccount(src_id));
+			if (tr_type == 4 && trans[11] == 1)
+				balSpan.innerHTML = formatCurrency(trans[9], trans[14]);
+			else
+				balSpan.innerHTML = formatCurrency(trans[9], getCurrencyOfAccount(src_id));
 			trBalanceItem.appendChild(balSpan);
 		}
 
 		if (tr_type == 2 || tr_type == 3 || (tr_type == 4 && trans[2] != 0))
 		{
 			balSpan = ce('span');
-			balSpan.innerHTML = formatCurrency(trans[10], getCurrencyOfAccount(dest_id));
+			if (tr_type == 4 && trans[11] == 2)
+				balSpan.innerHTML = formatCurrency(trans[10], trans[14]);
+			else
+				balSpan.innerHTML = formatCurrency(trans[10], getCurrencyOfAccount(dest_id));
 			trBalanceItem.appendChild(balSpan);
 		}
 	},
