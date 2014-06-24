@@ -346,8 +346,11 @@ function onChangeAcc()
 		sync = true;
 
 	target_id = isIncome() ? destid : (isDebt() ? accid : srcid);
-	new_acc_id = parseInt(target_id.value);
-	trans_acc_curr = getCurrencyOfAccount(new_acc_id);
+	if (!(isDebt() && noAccount))
+	{
+		new_acc_id = parseInt(target_id.value);
+		trans_acc_curr = getCurrencyOfAccount(new_acc_id);
+	}
 	if (sync)
 		transcurr.value = trans_acc_curr;	// update currency of transaction
 
@@ -362,7 +365,18 @@ function onChangeAcc()
 		exchrate_b.firstElementChild.innerHTML = '1';
 		charge.value = amount.value;
 
-		resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - charge.value, getCurrencyOfAccount(new_acc_id));
+		if (isDebt() && noAccount)
+		{
+		}
+		else
+		{
+			resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - charge.value, getCurrencyOfAccount(new_acc_id));
+		}
+	}
+	else
+	{
+		chargeSwitch(true);
+		exchRateSwitch(false);
 	}
 
 	updateExchAndRes();
@@ -776,15 +790,21 @@ function getValues()
 		{
 			S1 = getCurPersonBalance(trans_curr);
 			S2 = resbal.value;
-			S1_d = getBalanceOfAccount(accid.value);
-			S2_d = resbal_d.value;
+			if (!noAccount)
+			{
+				S1_d = getBalanceOfAccount(accid.value);
+				S2_d = resbal_d.value;
+			}
 		}
 		else			// person take from us; person account is destination
 		{
 			S1 = getBalanceOfAccount(accid.value);
 			S2 = resbal_d.value;
-			S1_d = getCurPersonBalance(trans_curr);
-			S2_d = resbal.value;
+			if (!noAccount)
+			{
+				S1_d = getCurPersonBalance(trans_curr);
+				S2_d = resbal.value;
+			}
 		}
 	}
 	a = amount.value;
@@ -1102,7 +1122,10 @@ function onChangeTransCurr()
 		return;
 
 	amountCurr = parseInt(transcurr.value);
-	chargeCurr = getCurrencyOfAccount(accid.value);
+	if (isDebt() && noAccount)
+		chargeCurr = amountCurr;
+	else
+		chargeCurr = getCurrencyOfAccount(accid.value);
 
 	isDiff = (amountCurr != chargeCurr);
 	if (isDiff)

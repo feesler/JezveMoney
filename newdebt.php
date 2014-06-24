@@ -108,6 +108,7 @@
 	html(getJS("transaction_layout.js"));
 
 	html("<script>");
+	html("var lastAcc_id = ".$acc_id.";");
 	html("var accounts = ".f_json_encode($acc->getArray()).";");
 	echo(Currency::getArray(TRUE));
 	html("var trans_curr = ".$debtAcc["curr"].";");

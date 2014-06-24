@@ -189,6 +189,7 @@
 
 	html("var trans_type = ".$tr["type"].";");
 	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");
+	html("var lastAcc_id = ".$acc_id.";");
 	html("var noAccount = ".($noAccount ? "true" : "false").";");
 
 	if (isMessageSet())

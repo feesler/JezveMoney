@@ -359,12 +359,13 @@ function initControls()
 // Account disable button click event handler
 function toggleEnableAccount()
 {
-	var acclbl, source, charge_left;
+	var acclbl, source, charge_left, acc_id;
 
 	acclbl = ge('acclbl');
 	source = ge('source');
 	charge_left = re('charge_left');
-	if (!acclbl || !source || !charge_left)
+	acc_id = ge('acc_id');
+	if (!acclbl || !source || !charge_left || !acc_id)
 		return;
 
 	if (noAccount)
@@ -388,6 +389,18 @@ function toggleEnableAccount()
 	resBalanceDestSwitch(false);
 
 	noAccount = !noAccount;
+
+	if (noAccount)
+	{
+		lastAcc_id = parseInt(acc_id.value);
+		acc_id.value = 0;
+		trans_acc_curr = parseInt(transcurr.value);
+	}
+	else
+	{
+		acc_id.value = lastAcc_id;
+		trans_acc_curr = getCurrencyOfAccount(lastAcc_id);
+	}
 
 	onChangeAcc();
 }
