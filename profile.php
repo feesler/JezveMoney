@@ -133,7 +133,7 @@
 			html("<h2>Change name</h2>");
 			html_op("<div>");
 				html_op("<div class=\"non_float\">");
-					html("<label for=\"newpwd\">New name</label>");
+					html("<label for=\"newname\">New name</label>");
 					html("<div class=\"stretch_input std_input\"><div><input id=\"newname\" name=\"newname\" type=\"text\"></div></div>");
 				html_cl("</div>");
 
