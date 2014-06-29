@@ -263,7 +263,7 @@
 			html_op("<div class=\"curr_container\">");
 				$currBtnClass = "btn rcurr_btn".(($trans_type == 3) ? " inact_rbtn" : "");
 				html("<div class=\"".$currBtnClass."\"><div id=\"amountsign\">".$amount_sign."</div></div>");
-				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".(($trans_type == 2) ? $dest["curr"] : $src["curr"])."\">");
+				html("<input id=\"transcurr\" name=\"transcurr\" type=\"hidden\" value=\"".$tr["curr"]."\">");
 			html_cl("</div>");
 
 			$inputType = ($trans_type == 3) ? "trans_input" : "rbtn_input";
