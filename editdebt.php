@@ -289,7 +289,7 @@
 
 			$disp = $noAccount ? "" : " style=\"display: none;\"";
 			html_op("<div id=\"selaccount\" class=\"selacc_container\"".$disp.">");
-				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"toggleEnableAccount();\"><span>Select account</span></div>");
+				html("<button class=\"dashed_btn resbal_btn\" type=\"button\" onclick=\"toggleEnableAccount();\"><span>Select account</span></button>");
 			html_cl("</div>");
 		html_cl("</div>");
 
