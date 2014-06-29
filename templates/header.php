@@ -10,7 +10,7 @@
 		$owner_name = $pers->getName($owner_id);
 
 		html_op("<div class=\"userblock\">");
-			html("<button id=\"userbtn\" class=\"user_button\" type=\"button\" onclick=\"onUserClick()\"><div class=\"user_icon\"></div><span>".$owner_name."</span></button>");
+			html("<button id=\"userbtn\" class=\"user_button\" type=\"button\" onclick=\"onUserClick()\"><span class=\"user_icon\"></span><span class=\"user_title\">".$owner_name."</span></button>");
 			html_op("<div id=\"menupopup\" class=\"usermenu\" style=\"display: none;\">");
 				html_op("<ul>");
 					html("<li><a href=\"./profile.php\">profile</a></li>");

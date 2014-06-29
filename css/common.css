@@ -284,7 +284,7 @@ button::-moz-focus-inner
 }
 
 
-.user_button > span
+.user_button .user_title
 {
 	height: 16px;
 	font-size: 16px;
@@ -294,7 +294,7 @@ button::-moz-focus-inner
 }
 
 
-.user_icon
+.user_button .user_icon
 {
 	width: 32px;
 	height: 32px;
