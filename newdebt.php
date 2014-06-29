@@ -165,7 +165,7 @@
 		{
 			html_op("<div id=\"person\" class=\"acc_float\">");
 				html("<input id=\"person_id\" name=\"person_id\" type=\"hidden\" value=\"".$fperson_id."\">");
-				html("<div><label for=\"personsel\">Person name</label></div>");
+				html("<div><label>Person name</label></div>");
 				html_op("<div>");
 					if (!$person->getCount())
 					{
@@ -205,7 +205,7 @@
 
 		html_op("<div id=\"source\" class=\"acc_float\">");
 			$closeIcon = getIconLink(ICON_BUTTON, "noacc_btn", "close_gray", NULL, TRUE, "toggleEnableAccount();", "small_icon");
-			html("<div class=\"tile_header\"><label id=\"acclbl\" for=\"acc_id\">".$accLbl."</label>".$closeIcon."</div>");
+			html("<div class=\"tile_header\"><label id=\"acclbl\">".$accLbl."</label>".$closeIcon."</div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $acc_id, "acc_tile"));
 				html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$acc_id."\">");
@@ -227,7 +227,7 @@
 		html_cl("</div>");
 
 	html_op("<div id=\"operation\" class=\"non_float\">");
-		html("<div><label for=\"debtop\">Operation</label></div>");
+		html("<div><label>Operation</label></div>");
 		html_op("<div class=\"op_sel\">");
 			html("<input id=\"debtgive\" name=\"debtop\" type=\"radio\" value=\"1\" onchange=\"onChangeDebtOp();\" checked><span>give</span>");
 			html("<input id=\"debttake\" name=\"debtop\" type=\"radio\" value=\"2\" onchange=\"onChangeDebtOp();\"><span>take</span>");

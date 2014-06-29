@@ -190,7 +190,7 @@
 	if ($trans_type == 1 || $trans_type == 3)
 	{
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			html("<div><label for=\"src_id\">Source account</label></div>");
+			html("<div><label>Source account</label></div>");
 			html_op("<div class=\"tile_container\">");
 				$balDiff = $tr["charge"];
 				html($acc->getTileEx(STATIC_TILE, $tr["src_id"], $balDiff, "source_tile"));
@@ -227,7 +227,7 @@
 	{
 		html();
 		html_op("<div id=\"destination\" class=\"acc_float\">");
-			html("<div><label for=\"dest_id\">Destination account</label></div>");
+			html("<div><label>Destination account</label></div>");
 			html_op("<div class=\"tile_container\">");
 				if ($trans_type == 2)		// income or person give to us
 					$balDiff = -$tr["charge"];

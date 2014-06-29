@@ -173,7 +173,7 @@ else
 	if ($trans_type == 1 || $trans_type == 3)
 	{
 		html_op("<div id=\"source\" class=\"acc_float\">");
-			html("<div><label for=\"src_id\">Source account</label></div>");
+			html("<div><label>Source account</label></div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $src_id, "source_tile"));
 				html("<input id=\"src_id\" name=\"src_id\" type=\"hidden\" value=\"".$src_id."\">");
@@ -208,7 +208,7 @@ else
 	{
 		html();
 		html_op("<div id=\"destination\" class=\"acc_float\">");
-			html("<div><label for=\"dest_id\">Destination account</label></div>");
+			html("<div><label>Destination account</label></div>");
 			html_op("<div class=\"tile_container\">");
 				html($acc->getTile(STATIC_TILE, $dest_id, "dest_tile"));
 				html("<input id=\"dest_id\" name=\"dest_id\" type=\"hidden\" value=\"".$dest_id."\">");
