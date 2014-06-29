@@ -229,7 +229,7 @@
 				html_op("<div>");
 					html_op("<div class=\"tile_container\">");
 						html(getTile(STATIC_TILE, "person_tile", $person_name,
-											Currency::format($person_balance, $chargeCurr),
+											Currency::format($person_balance, $amountCurr),
 											NULL));
 					html_cl("</div>");
 
@@ -244,7 +244,7 @@
 
 						getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b",
 													"onResBalanceSelect();",
-													Currency::format($person_res_balance, $chargeCurr));
+													Currency::format($person_res_balance, $amountCurr));
 
 						if ($noAccount)
 						{
@@ -269,7 +269,7 @@
 				}
 				else
 				{
-					html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["amount"], "acc_tile"));
+					html($acc->getTileEx(STATIC_TILE, $debtAcc["id"], $tr["charge"], "acc_tile"));
 					html("<input id=\"acc_id\" name=\"acc_id\" type=\"hidden\" value=\"".$debtAcc["id"]."\">");
 				}
 			html_cl("</div>");
@@ -321,7 +321,8 @@
 
 
 	html();
-	html_op("<div id=\"chargeoff\" class=\"non_float\" style=\"display: none;\">");
+	$disp = (($amountCurr == $chargeCurr) ? " style=\"display: none;\"" : "");
+	html_op("<div id=\"chargeoff\" class=\"non_float\"".$disp.">");
 		html("<div><label for=\"charge\">Charge</label></div>");
 		html_op("<div>");
 			html("<div class=\"curr_container\"><div class=\"btn rcurr_btn inact_rbtn\"><div id=\"chargesign\">".$charge_sign."</div></div></div>");
