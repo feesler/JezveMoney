@@ -908,15 +908,15 @@ class Transaction extends CachedTable
 			$resStr = "";
 			// Classic mode button
 			if ($details)
-				$resStr .= "<a class=\"list_mode\" href=\"".$linkStr."\"><div></div><span>Classic</span></a>";
+				$resStr .= "<a class=\"list_mode\" href=\"".$linkStr."\"><span class=\"icon\"></span><span>Classic</span></a>";
 			else
-				$resStr .= "<b class=\"list_mode\"><div></div><span>Classic</span></b>";
+				$resStr .= "<b class=\"list_mode\"><span class=\"icon\"></span><span>Classic</span></b>";
 
 			// Details mode button
 			if ($details)
-				$resStr .= "<b class=\"details_mode\"><div></div><span>Details</span></b>";
+				$resStr .= "<b class=\"details_mode\"><span class=\"icon\"></span><span>Details</span></b>";
 			else
-				$resStr .= "<a class=\"details_mode\" href=\"".$linkStr."\"><div></div><span>Details</span></a>";
+				$resStr .= "<a class=\"details_mode\" href=\"".$linkStr."\"><span class=\"icon\"></span><span>Details</span></a>";
 			html($resStr);
 			html("</div>");
 		}

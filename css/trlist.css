@@ -239,22 +239,23 @@ div.act_tr
 }
 
 
-.mode_selector div
+.mode_selector .icon
 {
 	width: 22px;
 	height: 22px;
 	background-image: url('../img/icons.png');
 	float: left;
+	padding: 0;
 }
 
 
-.mode_selector .list_mode > div
+.mode_selector .list_mode .icon
 {
 	background-position: -261px -5px;
 }
 
 
-.mode_selector .details_mode > div
+.mode_selector .details_mode .icon
 {
 	background-position: -261px -37px;
 }
