@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
 <?php	include("./templates/commonhdr.tpl");	?>
-<title><?=$titleString?></title>
-<?php	foreach($cssArr as $cssFile) {	?>
-<link rel="stylesheet" type="text/css" href="./css/<?=$cssFile?>">
-<?php	}	?>
-<?php	foreach($jsArr as $jsFile) {	?>
-<script type="text/javascript" src="./js/<?=$jsFile?>"></script>
-<?php	}	?>
 <?php	if (isMessageSet()) {	?>
 <script>
 	onReady(initMessage);
