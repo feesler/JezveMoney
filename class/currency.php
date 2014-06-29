@@ -259,7 +259,7 @@ class Currency
 				$resArr[] = array($curr_id, $row["name"], $row["sign"]);
 		}
 
-		return "var currency = ".json_encode($resArr).";\r\n";
+		return "var currency = ".f_json_encode($resArr).";\r\n";
 	}
 }
 
