@@ -162,7 +162,6 @@
 			html_cl("</div>");
 		html_cl("</div>");
 	html_cl("</div>");
-	html_cl("</div>");
 
 			html_cl("</div>");
 		html_cl("</div>");
