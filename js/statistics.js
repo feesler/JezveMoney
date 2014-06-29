@@ -588,7 +588,7 @@ function initControls()
 	}
 
 	groupDD = new DDList();
-	if (!groupDD.create({ input_id : 'groupsel', itemPrefix : 'filter', selCB : onGroupSel, editable : false, mobile : isMobile }))
+	if (!groupDD.create({ input_id : 'groupsel', itemPrefix : 'group', selCB : onGroupSel, editable : false, mobile : isMobile }))
 		groupDD = null;
 
 }
