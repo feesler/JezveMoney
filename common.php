@@ -229,12 +229,12 @@
 			$resStr .= "<button class=\"tilelink\"".$t_click." type=\"button\">";
 		}
 
-		$resStr .= "<div>";
+		$resStr .= "<span>";
 
 		$resStr .= "<span class=\"acc_bal\">".$tile_subtitle."</span>";
 		$resStr .= "<span class=\"acc_name\">".$tile_title."</span>";
 
-		$resStr .= "</div>";
+		$resStr .= "</span>";
 		if ($tile_type == STATIC_TILE)
 			$resStr .= "</div>";
 		else if ($tile_type == LINK_TILE)
