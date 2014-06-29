@@ -127,7 +127,7 @@
 				html_op("<div class=\"search_input std_input\">");
 					html_op("<div>");
 						html("<input id=\"search\" name=\"search\" type=\"text\" value=\"".(is_null($searchReq) ? "" : $searchReq)."\">");
-						html("<button class=\"btn icon_btn search_btn\" type=\"submit\"><div></div></button>");
+						html("<button class=\"btn icon_btn search_btn\" type=\"submit\"><span></span></button>");
 					html_cl("</div>");
 				html_cl("</div>");
 				html("</form>");
@@ -146,7 +146,7 @@
 					html_op("<div id=\"date_block\" style=\"display: none;\">");
 						html_op("<div>");
 							html_op("<div class=\"right_float\">");
-								html("<button id=\"cal_rbtn\" class=\"btn icon_btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><div></div></button>");
+								html("<button id=\"cal_rbtn\" class=\"btn icon_btn cal_btn\" type=\"button\" onclick=\"showCalendar();\"><span></span></button>");
 							html_cl("</div>");
 							html_op("<div class=\"stretch_input rbtn_input\">");
 								html_op("<div>");

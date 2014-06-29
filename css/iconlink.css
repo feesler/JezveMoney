@@ -148,7 +148,7 @@
 }
 
 
-.icon_btn > div
+.icon_btn > span
 {
 	width: 34px;
 	height: 34px;
@@ -164,14 +164,14 @@
 }
 
 
-.cal_btn > div
+.cal_btn > span
 {
 	background-position: -192px -32px;
 }
 
 
 /* search button */
-.search_btn > div
+.search_btn > span
 {
 	background-position: -192px 0px;
 }
