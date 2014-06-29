@@ -240,7 +240,7 @@
 													"onAmountSelect();",
 													Currency::format($tr["amount"], $amountCurr));
 
-						getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
+						getRightTileBlock("exch_left", ($amountCurr != $chargeCurr), "Exchange rate", "exchrate_b", "onExchRateSelect();",
 													round($tr["amount"] / $tr["charge"], 5)." ".$charge_sign."/".$amount_sign);
 
 						getRightTileBlock("src_res_balance_left", TRUE, "Result balance", "resbal_b",
