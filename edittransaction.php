@@ -4,7 +4,8 @@
 
 	function fail()
 	{
-		setLocation("./index.php?edittrans=fail");
+		setMessage(ERR_TRANS_UPDATE);
+		setLocation("./index.php");
 	}
 
 
@@ -83,6 +84,9 @@
 
 	$acc = new Account($user_id);
 	$trans = new Transaction($user_id);
+
+	if (!$trans->is_exist($trans_id))
+		fail();
 
 	$tr = getTransProperties($trans_id);
 	$trans_type = $tr["type"];			// TODO : temporarily

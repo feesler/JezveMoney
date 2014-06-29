@@ -2,6 +2,13 @@
 	require_once("./setup.php");
 
 
+	function fail()
+	{
+		setMessage(ERR_ACCOUNT_UPDATE);
+		setLocation("./accounts.php");
+	}
+
+
 	$u = new User();
 	$user_id = $u->check();
 	if (!$user_id)

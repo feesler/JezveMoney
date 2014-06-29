@@ -1,6 +1,12 @@
 ﻿<?php
 	require_once("./setup.php");
 
+	function fail()
+	{
+		setMessage(ERR_PERSON_UPDATE);
+		setLocation("./persons.php");
+	}
+
 
 	$u = new User();
 	$user_id = $u->check();
@@ -13,7 +19,7 @@
 	$p_id = intval($_GET["id"]);
 
 	$person = new Person($user_id);
-	if (!$person->is_exist($p_id) && $person->getUser($p_id) == $user_id)
+	if (!$person->is_exist($p_id))
 		fail();
 
 	$pName = $person->getName($p_id);

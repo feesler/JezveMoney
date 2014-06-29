@@ -4,7 +4,8 @@
 
 	function fail()
 	{
-		setLocation("./index.php?editdebt=fail");
+		setMessage(ERR_DEBT_UPDATE);
+		setLocation("./index.php");
 	}
 
 
@@ -88,6 +89,9 @@
 	$trans = new Transaction($user_id);
 	$debt = new Debt($user_id);
 	$person = new Person($user_id);
+
+	if (!$trans->is_exist($trans_id))
+		fail();
 
 	$tr = getTransProperties($trans_id);
 	$trans_type = $tr["type"];			// TODO : temporarily
