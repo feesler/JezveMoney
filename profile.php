@@ -95,15 +95,15 @@
 			html_op("<div>");
 				html("<h2>Reset data</h2>");
 				html_op("<div>");
-					html("<span>You also may reset all your accounts data.<br>");
 					html("<form id=\"resetacc_form\" method=\"post\" action=\"./modules/resetaccounts.php\">");
 					html("</form>");
+					html("<span>You also may reset all your accounts data.<br>");
 					html("<input class=\"btn ok_btn\" type=\"button\" onclick=\"showResetAccountsPopup();\" value=\"Reset\"></span>");
 				html_cl("</div>");
 				html_op("<div style=\"margin-top: 15px;\">");
-					html("<span>You may also reset all your data and start from the scratch.<br>");
 					html("<form id=\"resetall_form\" method=\"post\" action=\"./modules/resetall.php\">");
 					html("</form>");
+					html("<span>You may also reset all your data and start from the scratch.<br>");
 					html("<input class=\"btn ok_btn\" type=\"button\" onclick=\"showResetAllPopup();\" value=\"Reset all\"></span>");
 				html_cl("</div>");
 			html_cl("</div>");
