@@ -342,7 +342,7 @@
 			html("<div class=\"right_float\"><span id=\"exchcomm\" class=\"exchrate_comm\">".$debtAcc["sign"]."/".$debtAcc["sign"]."</span></div>");
 			html_op("<div class=\"stretch_input trans_input\">");
 				html_op("<div>");
-					html("<input id=\"exchrate\" class=\"summ_text\" type=\"text\" value=\"1\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\" value=\"".round($tr["amount"] / $tr["charge"], 5)."\">");
+					html("<input id=\"exchrate\" class=\"summ_text\" type=\"text\" oninput=\"return onFInput(this);\" onkeypress=\"return onFieldKey(event, this);\" value=\"".round($tr["amount"] / $tr["charge"], 5)."\">");
 				html_cl("</div>");
 			html_cl("</div>");
 		html_cl("</div>");
