@@ -154,6 +154,7 @@
 	height: 34px;
 	background-image: url('../img/icons.png');
 	background-repeat: no-repeat;
+	display: block;
 }
 
 
