@@ -85,6 +85,7 @@
 		html("var detailsMode = ".(($showDetails) ? "true" : "false").";");
 		html();
 		html("onReady(initTransListDrag);");
+		html("onReady(initToolbar);");
 	popTab();
 	html("</script>");
 
