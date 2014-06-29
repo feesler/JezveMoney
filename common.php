@@ -295,21 +295,21 @@
 		}
 
 		$il_icon = ($iconClass && $iconClass != "") ? " class=\"icon ".$iconClass."\"" : "";
-		$resStr .= "<div".$il_icon."></div>";
+		$resStr .= "<span".$il_icon."></span>";
 
 		if ($text && $text != "")
 		{
-			$resStr .= "<div class=\"icontitle\">";
+			$resStr .= "<span class=\"icontitle\">";
 			if ($addText && $addText != "")
 			{
-				$resStr .= "<span class=\"maintitle\">".$text."</span><br>";
+				$resStr .= "<span class=\"maintitle\">".$text."</span>";
 				$resStr .= "<span class=\"addtitle\">".$addText."</span>";
 			}
 			else
 			{
 				$resStr .= "<span>".$text."</span>";
 			}
-			$resStr .= "</div>";
+			$resStr .= "</span>";
 		}
 
 		$resStr .= ($il_type == ICON_BUTTON) ? "</button>" : "</a>";

@@ -30,7 +30,7 @@
 }
 
 
-.iconlink span
+.iconlink span.icontitle
 {
 	height: 32px;
 	color: #000000;
@@ -57,7 +57,6 @@
 {
 	height: 20px;
 	line-height: 20px;
-	padding: 0px 0px 0px 5px;
 	float: left;
 	white-space: nowrap;
 	font-size: 16px;
@@ -75,7 +74,6 @@
 	line-height: 12px;
 	clear: both;
 	float : left;
-	padding: 0px 0px 0px 5px;
 	color: #20A0FF;
 	font-size: 10px;
 	font-weight: bold;
@@ -180,79 +178,79 @@
 
 
 /* iconlink icons */
-.iconlink div.add
+.iconlink .add
 {
 	background-position: 0px 0px;
 }
 
 
-.iconlink > *:hover > div.add
+.iconlink > *:hover > .add
 {
 	background-position: 0px -32px;
 }
 
 
-.iconlink div.edit
+.iconlink .edit
 {
 	background-position: -32px 0px;
 }
 
 
-.iconlink > *:hover > div.edit
+.iconlink > *:hover > .edit
 {
 	background-position: -32px -32px;
 }
 
 
-.iconlink div.del
+.iconlink .del
 {
 	background-position: -64px 0px;
 }
 
 
-.iconlink > *:hover > div.del
+.iconlink > *:hover > .del
 {
 	background-position: -64px -32px;
 }
 
 
-.iconlink div.calendar
+.iconlink .calendar
 {
 	background-position: -96px 0px;
 }
 
 
-.iconlink > *:hover > div.calendar
+.iconlink > *:hover > .calendar
 {
 	background-position: -96px -32px;
 }
 
 
-.iconlink div.search
+.iconlink .search
 {
 	background-position: -128px 0px;
 }
 
 
-.iconlink > *:hover > div.search
+.iconlink > *:hover > .search
 {
 	background-position: -128px -32px;
 }
 
 
-.iconlink div.export
+.iconlink .export
 {
 	background-position: -160px 0px;
 }
 
 
-.iconlink > *:hover > div.export
+.iconlink > *:hover > .export
 {
 	background-position: -160px -32px;
 }
 
 
-.iconlink div.close
+.iconlink .close
 {
 	width: 16px;
 	height: 16px;
@@ -260,13 +258,13 @@
 }
 
 
-.iconlink > *:hover > div.close
+.iconlink > *:hover > .close
 {
 	background-position: -224px -48px;
 }
 
 
-.iconlink div.close_gray
+.iconlink .close_gray
 {
 	width: 16px;
 	height: 16px;
@@ -274,7 +272,7 @@
 }
 
 
-.iconlink > *:hover > div.close_gray
+.iconlink > *:hover > .close_gray
 {
 	background-position: -224px -46px;
 }
