@@ -246,7 +246,7 @@
 				{
 					getRightTileBlock("charge_left", FALSE, "Charge", "charge_b", "onChargeSelect();",
 											Currency::format($tr["charge"], ($trans_type == 1) ? $src["curr"] : $dest["curr"]));
-					getRightTileBlock("exch_left", FALSE, "Exchange rate", "exchrate_b", "onExchRateSelect();",
+					getRightTileBlock("exch_left", ($tr["curr"] != $transAccCur), "Exchange rate", "exchrate_b", "onExchRateSelect();",
 											round($tr["amount"] / $tr["charge"], 5)." ".$charge_sign."/".$amount_sign);
 				}
 
