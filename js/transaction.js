@@ -1000,9 +1000,9 @@ function onChargeInput()
 	if (!avalid)
 		fa = fd;
 
-	if (isIncome() || (isDebt() && debtType))
+	if (isIncome() || isTransfer() || (isDebt() && debtType))
 		f1_d();		// calculate S2_d
-	else if (isExpense() || isTransfer() || (isDebt() && !debtType))
+	if (isExpense() || isTransfer() || (isDebt() && !debtType))
 		f1();			// calculate S2
 
 	if (!avalid)
