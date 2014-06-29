@@ -81,11 +81,11 @@ function f1()
 	if (edit_mode)
 	{
 		var income = isIncome();
-		var accid = ge(income ? 'dest_id' : 'src_id');
+		var accid = ge(income ? 'dest_id' : (isDebt() ? 'acc_id' : 'src_id'));
 		var traccid = income ? transaction.destAcc : transaction.srcAcc;
 
 		if (accid && (traccid == parseInt(accid.value)))
-			S2 += income ? -transaction.charge : transaction.charge;
+			S2 += income ? -transaction.charge : ((isDebt() && debtType) ? -transaction.amount : transaction.charge);
 	}
 
 	if (isExpense() || isTransfer() || isDebt())
@@ -103,6 +103,16 @@ function f1_d()
 		S2_d = fS1_d + fa;
 	else if (isDebt())
 		S2_d = fS1_d + ((debtType) ? fd : fa);
+
+	if (edit_mode)
+	{
+		var income = isIncome();
+		var accid = ge(income ? 'dest_id' : (isDebt() ? 'acc_id' : 'src_id'));
+		var traccid = income ? transaction.destAcc : transaction.srcAcc;
+
+		if (accid && (traccid == parseInt(accid.value)))
+			S2_d += income ? -transaction.charge : ((isDebt() && debtType) ? transaction.charge : -transaction.amount);
+	}
 
 	if (isIncome() || isTransfer() || isDebt())
 		fS2_d = S2_d = correct(S2_d);
