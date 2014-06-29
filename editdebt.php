@@ -123,6 +123,7 @@
 	}
 	else
 	{
+		$acc_id = 0;
 		$chargeCurr = $debtAcc["curr"];
 	}
 
