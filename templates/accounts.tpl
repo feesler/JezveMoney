@@ -19,8 +19,13 @@
 						<div id="add_btn" class="iconlink"><a href="./newaccount.php"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 					<div class="tiles"><?php
-	foreach($tilesArr as $acc_id => $tile) {
+	if (count($tilesArr)) {
+		foreach($tilesArr as $acc_id => $tile) {
 ?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><button class="tilelink" onclick="onTileClick(<?=$acc_id?>);" type="button"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></button></div><?php
+		}
+	} else {	?>
+						<span>You have no one account. Please create one.</span>
+<?php
 	}
 ?></div>
 				</div>
