@@ -404,6 +404,13 @@ class Account extends CachedTable
 	}
 
 
+	// Return array of icons
+	public function getIconsArray()
+	{
+		return self::$icons;
+	}
+
+
 	// Return HTML string of icons for select control
 	public function getIconsList($selected_id = 0)
 	{
