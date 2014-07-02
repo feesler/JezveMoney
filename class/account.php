@@ -7,6 +7,7 @@ class Account extends CachedTable
 	static private $owner_id = 0;
 	static private $full_list = FALSE;
 	static private $icons = array("No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash");
+	static private $iconClass = array("", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon");
 
 
 	// Class constructor
@@ -436,6 +437,32 @@ class Account extends CachedTable
 		}
 
 		return $resArr;
+	}
+
+
+	// Return array of accounts for template
+	public function getTilesArray()
+	{
+		$res = array();
+
+		if (!$this->checkCache())
+			return $res;
+
+		$accounts = count(self::$dcache);
+
+		foreach(self::$dcache as $acc_id => $row)
+		{
+			$acc_balance = $this->getBalance($acc_id);
+			$icon_id = $row["icon"];
+			$acc_icon = ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " ".self::$iconClass[$icon_id] : "";
+			$balance_fmt = Currency::format($row["balance"], $row["curr_id"]);
+
+			$res[$acc_id] = array("name" => $row["name"],
+								"balance" => $balance_fmt,
+								"icon" => $acc_icon);
+		}
+
+		return $res;
 	}
 
 
