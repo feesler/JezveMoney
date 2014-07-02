@@ -246,20 +246,20 @@ class Currency
 	// Return Javascript array of currencies
 	public static function getArray($ext = FALSE)
 	{
-		if (!self::checkCache())
-			return "";
+		$res = array();
 
-		$resArr = array();
+		if (!self::checkCache())
+			return $res;
 
 		foreach(self::$cache as $curr_id => $row)
 		{
 			if ($ext)
-				$resArr[] = array($curr_id, $row["name"], $row["sign"], intval($row["format"]));
+				$res[] = array($curr_id, $row["name"], $row["sign"], intval($row["format"]));
 			else
-				$resArr[] = array($curr_id, $row["name"], $row["sign"]);
+				$res[] = array($curr_id, $row["name"], $row["sign"]);
 		}
 
-		return "var currency = ".f_json_encode($resArr).";\r\n";
+		return $res;
 	}
 }
 
