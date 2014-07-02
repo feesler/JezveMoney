@@ -506,7 +506,10 @@ function updControls()
 		dest_acc = parseInt(dest.value);
 	}
 
-	selCurrVal = getCurrencyOfAccount(isDebt() ? debt_acc : src_acc);
+	if (isDebt())
+		selCurrVal = noAccount ? parseInt(transcurr.value) : getCurrencyOfAccount(debt_acc);
+	else
+		selCurrVal = getCurrencyOfAccount(src_acc);
 
 	if (isTransfer())
 	{
@@ -519,7 +522,7 @@ function updControls()
 	{
 		trans_curr = parseInt(transcurr.value);
 		amountCurr = trans_curr;
-		chargeCurr = getCurrencyOfAccount(debt_acc);
+		chargeCurr = noAccount ? selCurrVal : getCurrencyOfAccount(debt_acc);
 	}
 
 	exchange.value = '';
@@ -911,7 +914,7 @@ function setValues()
 	{
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, trans_curr);
 	}
-	else if (isDebt())
+	else if (isDebt() && !noAccount)
 	{
 		if (debtType)		// person give
 			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
