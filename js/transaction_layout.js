@@ -359,13 +359,14 @@ function initControls()
 // Account disable button click event handler
 function toggleEnableAccount()
 {
-	var acclbl, source, charge_left, acc_id;
+	var acclbl, source, charge_left, acc_id, transcurr;
 
 	acclbl = ge('acclbl');
 	source = ge('source');
 	charge_left = re('charge_left');
 	acc_id = ge('acc_id');
-	if (!acclbl || !source || !charge_left || !acc_id)
+	transcurr = ge('transcurr');
+	if (!acclbl || !source || !charge_left || !acc_id || !transcurr)
 		return;
 
 	if (noAccount)
