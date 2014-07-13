@@ -44,10 +44,7 @@
 	}
 
 
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id)
-		setLocation("./login.php");
+	checkUser();
 
 	$trans_type = 4;
 	$give = TRUE;

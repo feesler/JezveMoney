@@ -1,11 +1,7 @@
 ﻿<?php
 	require_once("./setup.php");
 
-
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id)
-		setLocation("./login.php");
+	checkUser();
 
 	$action = "";
 	if (isset($_GET["act"]))

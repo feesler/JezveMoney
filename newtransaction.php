@@ -44,10 +44,7 @@
 	}
 
 
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id)
-		setLocation("./login.php");
+	checkUser();
 
 	// check predefined type of transaction
 	$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";

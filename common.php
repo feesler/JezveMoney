@@ -533,4 +533,39 @@
 		return $resStr;
 	}
 
+
+	$u = NULL;
+	$user_id = 0;
+	$user_name = NULL;
+
+	// Check user status required for page access
+	function checkUser($loggedIn = TRUE, $adminOnly = FALSE)
+	{
+		global $u, $user_id, $user_name;
+
+		$u = new User();
+		// Check session and cookies
+		$user_id = $u->check();
+
+		// Get name of user person
+		if ($user_id)
+		{
+			$owner_id = $u->getOwner($user_id);
+			$pers = new Person($user_id);
+			$user_name = $pers->getName($owner_id);
+		}
+
+		if ($loggedIn)		// user should be logged in to access
+		{
+			if (!$user_id)
+				setLocation("./login.php");
+			else if ($adminOnly && !$u->isAdmin($user_id))
+				setLocation("./index.php");
+		}
+		else				// user should be logged out ot access
+		{
+			if ($user_id != 0)
+				setLocation("./index.php");
+		}
+	}
 ?>

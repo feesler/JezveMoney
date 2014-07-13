@@ -8,11 +8,7 @@
 		exit();
 	}
 
-
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id)
-		setLocation("./login.php");
+	checkUser();
 
 	if (!isset($_GET["id"]))
 		fail();

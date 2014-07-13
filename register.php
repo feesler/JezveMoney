@@ -1,11 +1,7 @@
 ﻿<?php
 	require_once("./setup.php");
 
-
-	$u = new User();
-	$user_id = $u->check();
-	if ($user_id != 0)
-		setLocation("./index.php");
+	checkUser(FALSE);
 
 	$titleString = "Jezve Money | Registration";
 
