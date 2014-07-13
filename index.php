@@ -56,7 +56,7 @@
 	html_op("<div class=\"page\">");
 		html_op("<div class=\"page_wrapper\">");
 
-	require_once("./templates/header.php");
+	require_once("./templates/header.tpl");
 
 		html_op("<div class=\"container centered\">");
 	html_op("<div class=\"content\">");

@@ -6,7 +6,7 @@
 <?php	}	?>
 </head>
 <body>
-<?php	require_once("./templates/header.php");		?>
+<?php	require_once("./templates/header.tpl");		?>
 <form action="./modules/login.php" method="post" onsubmit="return onLoginSubmit(this);">
 <div class="layer login_layer">
 	<div class="cont">

@@ -16,7 +16,7 @@
 <input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
 <div class="page">
 	<div class="page_wrapper">
-<?php	require_once("./templates/header.php");		?>
+<?php	require_once("./templates/header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">
