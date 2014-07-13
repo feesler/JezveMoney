@@ -187,7 +187,8 @@
 	html("var trans_curr = ".$tr["curr"].";");
 	html("var trans_acc_curr = ".$tr["curr"].";");
 
-	$person->getArray();
+	$persArr = $person->getArray();
+	html("var persons = ".f_json_encode($persArr).";");
 
 	html("var trans_type = ".$tr["type"].";");
 	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");

@@ -112,7 +112,8 @@
 	html("var trans_acc_curr = ".$debtAcc["curr"].";");
 	html("var noAccount = false;");
 
-	$person->getArray();
+	$persArr = $person->getArray();
+	html("var persons = ".f_json_encode($persArr).";");
 
 	html("var trans_type = ".$trans_type.";");
 	html("var debtType = ".($give ? "true" : "false").";	// true - give, false - take");

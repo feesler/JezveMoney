@@ -296,7 +296,7 @@ class Person extends CachedTable
 
 		}
 
-		html("var persons = ".f_json_encode($pArr).";");
+		return $pArr;
 	}
 
 
