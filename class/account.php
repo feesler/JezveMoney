@@ -461,7 +461,7 @@ class Account extends CachedTable
 		{
 			$acc_balance = $this->getBalance($acc_id);
 			$icon_id = $row["icon"];
-			$acc_icon = ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " ".self::$iconClass[$icon_id] : "";
+			$acc_icon = $this->getIconClass($icon_id);
 			$balance_fmt = Currency::format($row["balance"], $row["curr_id"]);
 
 			$res[$acc_id] = array("name" => $row["name"],
