@@ -473,6 +473,15 @@ class Account extends CachedTable
 	}
 
 
+	// Return class for specified icon
+	public function getIconClass($icon_id)
+	{
+		$icon_id = intval($icon_id);
+
+		return ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " ".self::$iconClass[$icon_id] : "";
+	}
+
+
 	// Return HTML for account tile
 	public function getTileEx($tile_type, $acc_id, $bal_corr, $tile_id = "")
 	{
