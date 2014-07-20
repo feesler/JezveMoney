@@ -93,6 +93,99 @@
 		}
 	}
 
+	// Prepare data of transaction list items
+	$trListData = array();
+	foreach($transArr as $trans)
+	{
+		$trans_id = $trans[0];
+		$src_id = $trans[1];
+		$dest_id = $trans[2];
+		$famount = $trans[3];
+		$fcharge = $trans[4];
+		$cur_trans_type = $trans[5];
+		$fdate = $trans[6];
+		$comment = $trans[7];
+
+		if ($details)
+		{
+			$src_balance = $trans[9];
+			$dest_balance = $trans[10];
+		}
+
+		if ($cur_trans_type == 4)
+		{
+			$src_owner_id = $acc->getOwner($src_id);
+			$dest_owner_id = $acc->getOwner($dest_id);
+		}
+
+		$itemData = array("id" => $trans_id);
+
+		// Build accounts string
+		$accStr = "";
+		if ($src_id != 0)
+		{
+			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
+				$accStr .= $acc->getName($src_id);
+			else if ($cur_trans_type == 4)
+				$accStr .= $acc->getNameOrPerson($src_id);
+		}
+
+		if ($src_id != 0 && $dest_id != 0 && ($cur_trans_type == 3 || $cur_trans_type == 4))
+			$accStr .= " → ";
+
+		if ($dest_id != 0)
+		{
+			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
+				$accStr .= $acc->getName($dest_id);
+			else if ($cur_trans_type == 4)
+				$accStr .= $acc->getNameOrPerson($dest_id);
+		}
+
+		$itemData["acc"] = $accStr;
+
+		// Build amount string
+		$amStr = $famount;
+		if ($famount != $fcharge)
+			$amStr .= " (".$fcharge.")";
+		$itemData["amount"] = $amStr;
+
+		$itemData["date"] = $fdate;
+		$itemData["comm"] = $comment;
+
+		if ($details)
+		{
+			$itemData["balance"] = array();
+
+			if ($cur_trans_type == 1 || $cur_trans_type == 2)
+			{
+				$tr_acc_id = ($cur_trans_type == 1) ? $src_id : $dest_id;
+
+				$balance = ($cur_trans_type == 1) ? $src_balance : $dest_balance;
+				$acc_curr = $acc->getCurrency($tr_acc_id);
+
+				$itemData["balance"][] = Currency::format($balance, $acc_curr);
+			}
+			else if ($cur_trans_type == 3 || $cur_trans_type == 4)
+			{
+				if ($src_id != 0)
+				{
+					$acc_curr = $acc->getCurrency($src_id);
+
+					$itemData["balance"][] = Currency::format($src_balance, $acc_curr);
+				}
+
+				if ($dest_id != 0)
+				{
+					$acc_curr = $acc->getCurrency($dest_id);
+
+					$itemData["balance"][] = Currency::format($dest_balance, $acc_curr);
+				}
+			}
+		}
+
+
+		$trListData[] = $itemData;
+	}
 
 	$titleString = "Jezve Money | Transactions";
 
