@@ -58,18 +58,18 @@
 								<div id="tr_<?=$trItem["id"]?>" class="trlist_item">
 									<div class="tritem_acc_name"><span><?=$trItem["acc"]?></span></div>
 									<div class="tritem_sum"><span><?=$trItem["amount"]?></span></div>
-										<div class="tritem_date_comm">
-											<span><?=$trItem["date"]?></span>
+									<div class="tritem_date_comm">
+										<span><?=$trItem["date"]?></span>
 <?php		if ($trItem["comm"] != "") {		?>
-											<span class="tritem_comm"><?=$trItem["comm"]?></span>
+										<span class="tritem_comm"><?=$trItem["comm"]?></span>
 <?php		}	?>
-										</div>
+									</div>
 								</div>
 							</div>
 <?php	}	?>
 <?php	}	?>
 <?php	if ($details) {		?>
-					</table>
+						</table>
 <?php	}	?>
 <?php	if ($tr_on_page > 0 && $showPaginator == TRUE) {		?>
 							<div class="paginator"><?php
@@ -84,4 +84,4 @@
 			}	?></div>
 <?php	}	?>
 <?php	}	?>
-				</div>
+						</div>
