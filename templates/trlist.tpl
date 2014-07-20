@@ -23,7 +23,7 @@
 <?php			} else if ($pageItem["active"]) {		?>
 								<span><b><?=$pageItem["text"]?></b></span>
 <?php			} else {		?>
-								<span><a><?=$pageItem["text"]?></a></span>
+								<span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span>
 <?php			}	?>
 <?php		}	?>
 							</div>
@@ -80,7 +80,7 @@
 <?php			} else if ($pageItem["active"]) {		?>
 								<span><b><?=$pageItem["text"]?></b></span>
 <?php			} else {		?>
-								<span><a><?=$pageItem["text"]?></a></span>
+								<span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span>
 <?php			}	?>
 <?php		}	?>
 							</div>

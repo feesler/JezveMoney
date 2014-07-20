@@ -85,11 +85,19 @@
 		}
 		$linkStr = urlJoin("./transactions.php", $params);
 
+		// Build data for paginator
 		if ($tr_on_page > 0)
 		{
 			$pageCount = ceil($transCount / $tr_on_page);
-			if ($transCount > $tr_on_page)
-				$pagesArr = $trans->getPaginatorArray($page_num, $pageCount);
+			$pagesArr = ($transCount > $tr_on_page) ? $trans->getPaginatorArray($page_num, $pageCount) : array();
+			foreach($pagesArr as $ind => $pageItem)
+			{
+				if (is_numeric($pageItem["text"]) && !$pageItem["active"])
+				{
+					$pNum = intval($pageItem["text"]);
+					$pagesArr[$ind]["link"] = $trans->getPageLink($trans_type, $acc_id, $pNum, $searchStr, $startDate, $endDate, $details);
+				}
+			}
 		}
 	}
 
