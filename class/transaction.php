@@ -658,38 +658,24 @@ class Transaction extends CachedTable
 
 
 	// Return link to specified page
-	private function getPageLink($trans_type, $acc_id, $page_num, $is_active, $searchStr, $startDate, $endDate, $details)
+	public function getPageLink($trans_type, $acc_id, $page_num, $searchStr, $startDate, $endDate, $details)
 	{
-		$resStr = "<span>";
-
-		if ($is_active)
+		$params = array("type" => $this->getTypeString($trans_type),
+						"page" => $page_num);
+		if ($acc_id != 0)
+			$params["acc_id"] = $acc_id;
+		if ($details == TRUE)
+			$params["mode"] = "details";
+		if (!is_empty($searchStr))
+			$params["search"] = $searchStr;
+		if (!is_empty($startDate) && !is_empty($endDate))
 		{
-			$resStr .= "<b>";
+			$params["stdate"] = $startDate;
+			$params["enddate"] = $endDate;
 		}
-		else
-		{
-			$params = array("type" => $this->getTypeString($trans_type),
-							"page" => $page_num);
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
-			if ($details == TRUE)
-				$params["mode"] = "details";
-			if (!is_empty($searchStr))
-				$params["search"] = $searchStr;
-			if (!is_empty($startDate) && !is_empty($endDate))
-			{
-				$params["stdate"] = $startDate;
-				$params["enddate"] = $endDate;
-			}
-			$linkStr = urlJoin("./transactions.php", $params);
+		$linkStr = urlJoin("./transactions.php", $params);
 
-			$resStr .= "<a href=\"".$linkStr."\">";
-		}
-		$resStr .= $page_num;
-		$resStr .= ($is_active) ? "</b>" : "</a>";
-		$resStr .= "</span>";
-
-		return $resStr;
+		return $linkStr;
 	}
 
 
