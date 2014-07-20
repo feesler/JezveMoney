@@ -693,6 +693,58 @@ class Transaction extends CachedTable
 	}
 
 
+	// Return array of paginetor items
+	public function getPaginatorArray($page_num, $pages_count)
+	{
+		$res = array();
+
+		$breakLimit = 5;
+		$groupLimit = 3;
+
+		if ($pages_count > $breakLimit)
+		{
+			if ($page_num < $groupLimit)		// 1 2 3 4 5 ... 18
+			{
+				for($i = 0; $i < $breakLimit; $i++)
+				{
+					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+				}
+				$res[] = array("text" => "...");
+				$res[] = array("text" => $pages_count, "active" => FALSE);
+			}
+			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
+			{
+				$res[] = array("text" => 1, "active" => FALSE);
+				$res[] = array("text" => "...");
+				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
+				{
+					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+				}
+				$res[] = array("text" => "...");
+				$res[] = array("text" => $pages_count, "active" => FALSE);
+			}
+			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
+			{
+				$res[] = array("text" => 1, "active" => FALSE);
+				$res[] = array("text" => "...");
+				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
+				{
+					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+				}
+			}
+		}
+		else		// 1 2 3 4 5
+		{
+			for($i = 0; $i < $pages_count; $i++)
+			{
+				$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+			}
+		}
+
+		return $res;
+	}
+
+
 	// Return paginator for transaction table
 	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count, $searchStr, $startDate, $endDate, $details)
 	{
