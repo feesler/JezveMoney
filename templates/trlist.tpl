@@ -16,17 +16,16 @@
 							</div>
 <?php	}	?>
 <?php	if ($tr_on_page > 0 && $showPaginator == TRUE) {		?>
-							<div class="paginator">
-<?php		foreach($pagesArr as $pageItem) {		?>
-<?php			if (!is_numeric($pageItem["text"])) {		?>
-								<span><?=$pageItem["text"]?></span>
-<?php			} else if ($pageItem["active"]) {		?>
-								<span><b><?=$pageItem["text"]?></b></span>
-<?php			} else {		?>
-								<span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span>
-<?php			}	?>
-<?php		}	?>
-							</div>
+							<div class="paginator"><?php
+			foreach($pagesArr as $pageItem) {
+				if (!is_numeric($pageItem["text"])) {
+					?><span><?=$pageItem["text"]?></span><?php
+				} else if ($pageItem["active"]) {
+					?><span><b><?=$pageItem["text"]?></b></span><?php
+				} else {
+					?><span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span><?php
+				}
+			}	?></div>
 <?php	}	?>
 <?php	if ($details) {	?>
 							<table class="details_table">
@@ -73,17 +72,16 @@
 					</table>
 <?php	}	?>
 <?php	if ($tr_on_page > 0 && $showPaginator == TRUE) {		?>
-							<div class="paginator">
-<?php		foreach($pagesArr as $pageItem) {		?>
-<?php			if (!is_numeric($pageItem["text"])) {		?>
-								<span><?=$pageItem["text"]?></span>
-<?php			} else if ($pageItem["active"]) {		?>
-								<span><b><?=$pageItem["text"]?></b></span>
-<?php			} else {		?>
-								<span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span>
-<?php			}	?>
-<?php		}	?>
-							</div>
+							<div class="paginator"><?php
+			foreach($pagesArr as $pageItem) {
+				if (!is_numeric($pageItem["text"])) {
+					?><span><?=$pageItem["text"]?></span><?php
+				} else if ($pageItem["active"]) {
+					?><span><b><?=$pageItem["text"]?></b></span><?php
+				} else {
+					?><span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span><?php
+				}
+			}	?></div>
 <?php	}	?>
 <?php	}	?>
 				</div>
