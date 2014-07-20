@@ -31,54 +31,40 @@
 <?php	if ($details) {	?>
 							<table class="details_table">
 <?php	}	?>
-
 <?php	foreach($trListData as $trItem) {	?>
 <?php	if ($details) {		?>
 								<tbody><tr id="tr_<?=$trItem["id"]?>">
-<?php	} else {		?>
-							<div class="trlist_item_wrap">
-								<div id="tr_<?=$trItem["id"]?>" class="trlist_item">
-<?php	}		?>
-<?php	if ($details) {	?>
 									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=$trItem["acc"]?>"><span><?=$trItem["acc"]?></span></div></div></td>
-<?php	} else {	?>
-									<div class="tritem_acc_name"><span><?=$trItem["acc"]?></span></div>
-<?php	}	?>
-<?php	if ($details) {	?>
 									<td><div class="tritem_sum"><span><?=$trItem["amount"]?></span></div></td>
-<?php	} else {	?>
-									<div class="tritem_sum"><span><?=$trItem["amount"]?></span></div>
-<?php	}	?>
-<?php	if ($details) {		?>
 									<td><div class="tritem_balance">
 <?php		foreach($trItem["balance"] as $balStr) {	?>
 										<span><?=$balStr?></span>
 <?php		}	?>
 									</div></td>
-<?php	}	?>
-<?php	if ($details) {		?>
 									<td>
-<?php	}	?>
 										<div class="tritem_date_comm">
 											<span><?=$trItem["date"]?></span>
-<?php	if ($details) {		?>
 										</div>
 									</td>
 									<td><div class="ellipsis_cell">
 <?php		if ($trItem["comm"] != "") {		?>
-										<div title="<?=$trItem["comm"]?>">
+										<div title="<?=$trItem["comm"]?>"><span class="tritem_comm"><?=$trItem["comm"]?></span></div>
 <?php		} else {		?>
-										<div>
+										<div></div>
 <?php		}	?>
-<?php	}	?>
-<?php	if ($trItem["comm"] != "") {		?>
-											<span class="tritem_comm"><?=$trItem["comm"]?></span>
-<?php	}	?>
-										</div>
-<?php	if ($details) {		?>
 									</div></td>
 								</tr></tbody>
 <?php	} else {		?>
+							<div class="trlist_item_wrap">
+								<div id="tr_<?=$trItem["id"]?>" class="trlist_item">
+									<div class="tritem_acc_name"><span><?=$trItem["acc"]?></span></div>
+									<div class="tritem_sum"><span><?=$trItem["amount"]?></span></div>
+										<div class="tritem_date_comm">
+											<span><?=$trItem["date"]?></span>
+<?php		if ($trItem["comm"] != "") {		?>
+											<span class="tritem_comm"><?=$trItem["comm"]?></span>
+<?php		}	?>
+										</div>
 								</div>
 							</div>
 <?php	}	?>
