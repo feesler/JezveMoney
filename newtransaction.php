@@ -25,6 +25,7 @@
 		$resArr["curr"] = $acc->getCurrency($acc_id);
 		$resArr["sign"] = Currency::getSign($resArr["curr"]);
 		$resArr["icon"] = $acc->getIcon($acc_id);
+		$resArr["iconclass"] = $acc->getIconClass($resArr["icon"]);
 
 		return $resArr;
 	}
@@ -118,7 +119,6 @@
 		$srcBalTitle = "Result balance";
 		if ($trans_type == 3)
 			$srcBalTitle .= " (Source)";
-		$src["iconclass"] = $acc->getIconClass($src["icon"]);
 		$src["balfmt"] = Currency::format($src["balance"], $src["curr"]);
 	}
 
@@ -127,7 +127,6 @@
 		$destBalTitle = "Result balance";
 		if ($trans_type == 3)
 			$destBalTitle .= " (Destination)";
-		$dest["iconclass"] = $acc->getIconClass($dest["icon"]);
 		$dest["balfmt"] = Currency::format($dest["balance"], $dest["curr"]);
 	}
 
