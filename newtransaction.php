@@ -98,7 +98,7 @@
 	$dest = getAccountProperties($dest_id);
 
 	// Prepare transaction types menu
-	$trTypes = array("Expense", "Income", "Transfer", "Debt");
+	$trTypes = array("Expense", "Income", "Transfer");
 	$transMenu = array();
 	$baseUrl = "./newtransaction.php";
 	foreach($trTypes as $ind => $trTypeName)
@@ -109,6 +109,10 @@
 
 		$transMenu[] = array(($ind + 1), $trTypeName, urlJoin($baseUrl, $params));
 	}
+	$params = array();
+	if ($acc_id != 0)
+		$params["acc_id"] = $acc_id;
+	$transMenu[] = array(($ind + 2), "Debt", urlJoin("./newdebt.php", $params));
 
 	$currArr = Currency::getArray(TRUE);
 
