@@ -22,26 +22,28 @@
 					<div class="widget">
 						<div class="widget_title"><a href="./accounts.php">Accounts &gt;</a></div>
 						<div class="tiles"><?php
-	if (count($tilesArr)) {
-		foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><a href="./newtransaction.php?acc_id=<?=$acc_id?>" class="tilelink"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></a></div><?php
-		}
-	} else {	?>
+		if (!count($tilesArr)) {	?>
 						<span>You have no one account. Please create one.</span>
-<?php
-	}
-?></div>
+<?php	} else {
+			foreach($tilesArr as $acc_id => $tile) {
+?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><a href="./newtransaction.php?acc_id=<?=$acc_id?>" class="tilelink"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></a></div><?php
+			}
+		}	?></div>
 					</div>
 
 					<div class="widget">
 						<div class="widget_title">Total &gt;</div>
 						<div class="info_tiles">
 							<div>
-<?php	foreach($totalsArr as $curr_id => $currData) {	?>
+<?php	if (!count($tilesArr)) {	?>
+								<span>You have no one account. Please create one.</span>
+<?php	} else {	?>
+<?php		foreach($totalsArr as $curr_id => $currData) {	?>
 								<div class="info_tile">
 									<span class="info_title"><?=$currData["name"]?></span>
 									<span class="info_subtitle"><?=$currData["balfmt"]?></span>
 								</div>
+<?php		}	?>
 <?php	}	?>
 							</div>
 						</div>
@@ -50,7 +52,12 @@
 					<div class="widget break_widget latest_widget">
 						<div class="widget_title"><a href="./transactions.php">Latest &gt;</a></div>
 						<div id="trlist" class="trans_list">
-<?php	foreach($trListData as $trItem) {	?>
+<?php	if (!count($trListData)) {	?>
+							<span>You have no one transaction yet.</span>
+<?php	} else if (!count($tilesArr)) {	?>
+							<span>You have no one account. Please create one.</span>
+<?php	} else {	?>
+<?php		foreach($trListData as $trItem) {	?>
 							<div class="trlist_item_wrap">
 								<div id="tr_<?=$trItem["id"]?>" class="trlist_item">
 									<div class="tritem_acc_name"><span><?=$trItem["acc"]?></span></div>
@@ -64,6 +71,7 @@
 								</div>
 							</div>
 <?php		}	?>
+<?php	}	?>
 						</div>
 					</div>
 
@@ -71,15 +79,19 @@
 						<div class="widget_title"><a href="./persons.php">Persons &gt;</a></div>
 						<div class="info_tiles">
 							<div>
-<?php	foreach($persArr as $pData) {	?>
+<?php	if (!count($persArr)) {		?>
+								<span>No persons here.</span>
+<?php	} else {	?>
+<?php		foreach($persArr as $pData) {	?>
 								<div class="info_tile">
 									<span class="info_title"><?=$pData[1]?></span>
-<?php		if ($pData["nodebts"]) {		?>
+<?php			if ($pData["nodebts"]) {		?>
 									<span class="info_subtitle">No debts</span>
-<?php		} else {	?>
+<?php			} else {	?>
 									<span class="info_subtitle"><?=implode("<br>", $pData["balfmt"])?></span>
-<?php		}	?>
+<?php			}	?>
 								</div>
+<?php		}	?>
 <?php	}	?>
 							</div>
 						</div>
