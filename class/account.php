@@ -561,6 +561,28 @@ class Account extends CachedTable
 	}
 
 
+	// Return array of total sums per each currency
+	public function getTotalsArray()
+	{
+		$res = array();
+
+		if (!$this->checkCache())
+			return $res;
+
+		foreach(self::$dcache as $acc_id => $row)
+		{
+			$currname = Currency::getName($row["curr_id"]);
+
+			if ($currname != "" && !isset($res[$row["curr_id"]]))
+				$res[$row["curr_id"]] = 0;
+
+			$res[$row["curr_id"]] += $row["balance"];
+		}
+
+		return $res;
+	}
+
+
 	// Return HTML for total sums per each currency
 	public function getTotals()
 	{
