@@ -108,49 +108,6 @@ Class Debt
 
 		return TRUE;
 	}
-
-
-	// Return table of current debts
-	public function getTable()
-	{
-		global $db;
-
-		$resStr = "";
-		$resStr .= "\t<tr>\r\n\t<td>\r\n\t<table class=\"infotable\">\r\n";
-
-		$resArr = $db->selectQ("p.name AS name, a.curr_id AS curr_id, a.balance AS balance",
-							"persons AS p, accounts AS a",
-								"p.user_id=".$this->user_id." AND p.id<>".$this->owner_id.
-								" AND a.owner_id=p.id AND a.balance<>0");
-		if (count($resArr) <= 0)
-		{
-			$resStr .= "\t\t<tr><td><span>";
-			$resStr .= "You have no debts now.";
-			$resStr .= "</span></td></tr>\r\n";
-		}
-		else
-		{
-			$resStr .= "\t\t<tr><td><b>Person</b></td><td><b>Relation</b></td><td><b>Balance</b></td></tr>\r\n";
-
-			foreach($resArr as $row)
-			{
-				$acc_bal = floatval($row["balance"]);
-				$lend = ($acc_bal < 0);
-				$acc_bal = abs($acc_bal);
-				$curr_id = intval($row["curr_id"]);
-				$balfmt = Currency::format($acc_bal, $curr_id);
-
-				$resStr .= "\t\t<tr><td>".$row["name"]."</td><td>";
-				$resStr .= $lend ? "lent" : "borrowed";
-				$resStr .= "</td><td>".$balfmt."</td></tr>\r\n";
-			}
-		}
-
-		$resStr .= "\t</table>\r\n\t</td>\r\n\t</tr>\r\n";
-
-		return $resStr;
-	}
-
 }
 
 ?>
