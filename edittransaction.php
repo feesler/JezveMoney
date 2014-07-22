@@ -124,7 +124,6 @@
 		$srcBalTitle = "Result balance";
 		if ($trans_type == 3)
 			$srcBalTitle .= " (Source)";
-		$src["iconclass"] = $acc->getIconClass($src["icon"]);
 		$balDiff = $tr["charge"];
 		$src["balfmt"] = Currency::format($src["balance"] + $balDiff, $src["curr"]);
 	}
@@ -134,7 +133,6 @@
 		$destBalTitle = "Result balance";
 		if ($trans_type == 3)
 			$destBalTitle .= " (Destination)";
-		$dest["iconclass"] = $acc->getIconClass($dest["icon"]);
 
 		if ($trans_type == 2)		// income or person give to us
 			$balDiff = $tr["charge"];
