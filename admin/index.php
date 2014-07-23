@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	require_once("../setup.php");
 
 
@@ -6,15 +6,14 @@
 	$user_id = $u->check();
 	if (!$user_id || !$u->isAdmin($user_id))
 		setLocation("../login.php");
-
-	html("<!DOCTYPE html>");
-	html("<html>");
-	html("<head>");
-	html("<title>Admin panel</title>");
-	html("</head>");
-	html("<body>");
-	html("<b>Admin</b><br>");
-	html("<a href=\"./currency.php\">Currencies</a> <a href=\"./query.php\">Queries</a>");
-	html("</body>");
-	html("</html>");
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin panel</title>
+</head>
+<body>
+<b>Admin</b><br>
+<a href="./currency.php">Currencies</a> <a href="./query.php">Queries</a>
+</body>
+</html>

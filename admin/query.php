@@ -1,46 +1,45 @@
-﻿<?php
+<?php
 	require_once("../setup.php");
-
 
 	$u = new User();
 	$user_id = $u->check();
 	if (!$user_id || !$u->isAdmin($user_id))
 		setLocation("../login.php");
-
-	html("<!DOCTYPE html>");
-	html("<html>");
-	html("<head>");
-	html("<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">");
-	html("<title>Admin panel | DB queries</title>");
-	html("<script type=\"text/javascript\" src=\"../js/common.js\"></script>");
-	html("<script>");
-	html("</script>");
-	html("</head>");
-	html("<body>");
-	html("<a href=\"./undex.php\">Admin</a><br>");
-	html("<a href=\"./currency.php\">Currencies</a>  <b>Queries</b>");
-
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Admin panel | DB queries</title>
+<script type="text/javascript" src="../js/common.js"></script>
+<script>
+</script>
+</head>
+<body>
+<a href="./undex.php">Admin</a><br>
+<a href="./currency.php">Currencies</a>  <b>Queries</b>
+<?php
 /*
 	if (isset($_GET["add"]))
 	{
 		if ($_GET["add"] == "ok")
-			html("<span style=\"color: green;\">Currency was succussfully created</span><br>");
+			<span style=\"color: green;\">Currency was succussfully created</span><br>
 		else if ($_GET["add"] == "fail")
-			html("<span style=\"color: red;\">Fail to create new currency</span><br>");
+			<span style=\"color: red;\">Fail to create new currency</span><br>
 	}
 	else 	if (isset($_GET["edit"]))
 	{
 		if ($_GET["edit"] == "ok")
-			html("<span style=\"color: green;\">Currency was succussfully updated</span><br>");
+			<span style=\"color: green;\">Currency was succussfully updated</span><br>
 		else if ($_GET["edit"] == "fail")
-			html("<span style=\"color: red;\">Fail to update new currency</span><br>");
+			<span style=\"color: red;\">Fail to update new currency</span><br>
 	}
 	else 	if (isset($_GET["del"]))
 	{
 		if ($_GET["del"] == "ok")
-			html("<span style=\"color: green;\">Currency was succussfully deleted</span><br>");
+			<span style=\"color: green;\">Currency was succussfully deleted</span><br>
 		else if ($_GET["del"] == "fail")
-			html("<span style=\"color: red;\">Fail to delete new currency</span><br>");
+			<span style=\"color: red;\">Fail to delete new currency</span><br>
 	}
 */
 
@@ -55,56 +54,42 @@
 			$result = $db->rawQ($query);
 			$qerr_num = mysql_errno();
 			$qerror = mysql_error();
-			if ($result && !$qerr_num && mysql_num_rows($result) > 0)
-			{
+			if ($result && !$qerr_num && mysql_num_rows($result) > 0) {
 				while($row = mysql_fetch_array($result, MYSQL_ASSOC))
 					$resArr[] = $row;
+?>
 
-				html("<table border=\"1\">");
-
-				// header
-				$resStr = "<tr>";
-				foreach($resArr[0] as $ind => $val)
-				{
-					$resStr .= "<th>".$ind."</th>";
-				}
-				$resStr .= "</tr>";
-				html($resStr);
-
-				// content
-				foreach($resArr as $row)
-				{
-					$resStr = "<tr>";
-					foreach($row as $val)
-					{
-						$resStr .= "<td>".$val."</td>";
-					}
-					$resStr .= "</tr>";
-					html($resStr);
-				}
+				<table border="1">
+				<tr>
+<?php	foreach($resArr[0] as $ind => $val) {		?>
+					<th><?=$ind?></th>
+<?php	}	?>
+				</tr>
+<?php	foreach($resArr as $row) {		?>
+				<tr>
+<?php		foreach($row as $val) {	?>
+					<td><?=$val?></td>
+<?php		}	?>
+				</tr>
+<?php	}
 				$rows = count($resArr);
 				$cols = $rows ? count($row) : 0;
-				html("<tr><td colspan=\"".$cols."\">Rows: ".$rows."</td></tr>");
-
-				html("</table>");
-			}
-			else
-			{
-				html("<div style=\"color: red;\">Error: ".$qerr_num."<br>".$qerror."</div><br>");
-			}
-		}
-	}
-
-	html("<form method=\"post\" action=\"./query.php\">");
-	html("<label>Query type</label><br>");
-	html("<input name=\"qtype\" type=\"radio\" value=\"1\" checked> Select");
-	html("");
-	html("<label>Query</label><br>");
-	html("<textarea id=\"query\" name=\"query\" rows=\"5\" cols=\"80\">".$query."</textarea><br>");
-	html("<input type=\"submit\" value=\"Query\">");
-	html("</form>");
-
-	html("</body>");
-	html("</html>");
-	
 ?>
+				<tr><td colspan="<?=$cols?>">Rows: <?=$rows?></td></tr>
+				</table>
+<?php			} else {	?>
+				<div style="color: red;">Error: <?=$qerr_num?><br><?=$qerror?></div><br>
+<?php			}	?>
+<?php		}	?>
+<?php	}	?>
+<form method="post" action="./query.php">
+<label>Query type</label><br>
+<input name="qtype" type="radio" value="1" checked> Select
+
+<label>Query</label><br>
+<textarea id="query" name="query" rows="5" cols="80"><?=$query?></textarea><br>
+<input type="submit" value="Query">
+</form>
+
+</body>
+</html>

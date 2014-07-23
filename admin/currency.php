@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	require_once("../setup.php");
 
 
@@ -7,16 +7,16 @@
 	if (!$user_id || !$u->isAdmin($user_id))
 		setLocation("../login.php");
 
-	html("<!DOCTYPE html>");
-	html("<html>");
-	html("<head>");
-	html("<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">");
-	html("<title>Admin panel | Currency</title>");
-	html("<script type=\"text/javascript\" src=\"../js/common.js\"></script>");
-	html("<script>");
-
-	html(Currency::getArray(TRUE));
+	$currArr = Currency::getArray(TRUE);
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Admin panel | Currency</title>
+<script type="text/javascript" src="../js/common.js"></script>
+<script>
+	var currency = <?=f_json_encode($currArr)?>;
 
 function findCurrency(id)
 {
@@ -128,70 +128,64 @@ function onDeleteSubmit(frm)
 {
 	return confirm('Are you sure want to delete selected currency?');
 }
+</script>
+</head>
+<body>
+<a href="./index.php">Admin</a><br>
+<b>Currencies</b> <a href="./query.php">Queries</a>
+<?php	if (isset($_GET["add"])) {		?>
+<?php		if ($_GET["add"] == "ok") {		?>
+		<span style="color: green;">Currency was succussfully created</span><br>
+<?php		} else if ($_GET["add"] == "fail") {		?>
+			<span style="color: red;">Fail to create new currency</span><br>
+<?php		}	?>
+<?php	} else if (isset($_GET["edit"])) {		?>
+<?php		if ($_GET["edit"] == "ok") {	?>
+			<span style="color: green;">Currency was succussfully updated</span><br>
+<?php		} else if ($_GET["edit"] == "fail") {		?>
+			<span style="color: red;">Fail to update new currency</span><br>
+<?php		}	?>
+<?php	} else if (isset($_GET["del"])) {		?>
+<?php		if ($_GET["del"] == "ok") {		?>
+			<span style="color: green;">Currency was succussfully deleted</span><br>
+<?php		} else if ($_GET["del"] == "fail") {		?>
+			<span style="color: red;">Fail to delete new currency</span><br>
+<?php		}	?>
+<?php	}	?>
+<table>
+<thead>
+<tr><td>id</td><td>name</td><td>sign</td><td>format</td><td></td></tr>
+</thead>
+<tbody>
 <?php
-	html("</script>");
-	html("</head>");
-	html("<body>");
-	html("<a href=\"./index.php\">Admin</a><br>");
-	html("<b>Currencies</b> <a href=\"./query.php\">Queries</a>");
-
-	if (isset($_GET["add"]))
-	{
-		if ($_GET["add"] == "ok")
-			html("<span style=\"color: green;\">Currency was succussfully created</span><br>");
-		else if ($_GET["add"] == "fail")
-			html("<span style=\"color: red;\">Fail to create new currency</span><br>");
-	}
-	else 	if (isset($_GET["edit"]))
-	{
-		if ($_GET["edit"] == "ok")
-			html("<span style=\"color: green;\">Currency was succussfully updated</span><br>");
-		else if ($_GET["edit"] == "fail")
-			html("<span style=\"color: red;\">Fail to update new currency</span><br>");
-	}
-	else 	if (isset($_GET["del"]))
-	{
-		if ($_GET["del"] == "ok")
-			html("<span style=\"color: green;\">Currency was succussfully deleted</span><br>");
-		else if ($_GET["del"] == "fail")
-			html("<span style=\"color: red;\">Fail to delete new currency</span><br>");
-	}
-
-	html("<table>");
-	html("<thead>");
-	html("<tr><td>id</td><td>name</td><td>sign</td><td>format</td><td></td></tr>");
-	html("</thead>");
-
-	html("<tbody>");
 	$resArr = $db->selectQ("*", "currency");
-	forEach($resArr as $row)
-	{
-		html("<tr><td>".$row["id"]."</td><td>".$row["name"]."</td><td>".$row["sign"]."</td><td>".$row["format"]."</td><td><input type=\"button\" value=\"select\" onclick=\"onSelectCurrency(".$row["id"].");\"></td></tr>");
-	}
-	html("</tbody>");
-	html("</table>");
+	forEach($resArr as $row) {		?>
+		<tr><td><?=$row["id"]?></td><td><?=$row["name"]?></td><td><?=$row["sign"]?></td><td><?=$row["format"]?></td><td><input type="button" value="select" onclick="onSelectCurrency(<?=$row["id"]?>);"></td></tr>
+<?php	}	?>
+	</tbody>
+	</table>
 
-	html("<select id=\"curr_sel\" onchange=\"onCurrSel()\">");
-	html("<option value=\"0\"></option>");
-	echo(Currency::getList());
-	html("</select>");
+	<select id="curr_sel" onchange="onCurrSel()">
+	<option value="0"></option>
+<?php	foreach($currArr as $currInfo) {		?>
+	<option value="<?=$currInfo[0]?>"><?=$currInfo[1]?></option>
+<?php	}	?>
+</select>
 
-	html("<input type=\"button\" value=\"new\" onclick=\"newCurr()\">");
+<input type="button" value="new" onclick="newCurr()">
 
-	html("<form method=\"post\" action=\"../modules/delcurrency.php\" onsubmit=\"return onDeleteSubmit(this);\">");
-	html("<input id=\"del_curr_id\" name=\"curr_id\" type=\"hidden\">");
-	html("<div id=\"del_btn\" style=\"display: none;\"><input type=\"submit\" value=\"delete\"></div>");
-	html("</form>");
+<form method="post" action="../modules/delcurrency.php" onsubmit="return onDeleteSubmit(this);">
+<input id="del_curr_id" name="curr_id" type="hidden">
+<div id="del_btn" style="display: none;"><input type="submit" value="delete"></div>
+</form>
 
-	html("<form id=\"curr_frm\" method=\"post\" action=\"../modules/createcurrency.php\">");
-	html("<input id=\"curr_id\" name=\"curr_id\" type=\"hidden\"><br>");
-	html("<label for=\"curr_name\">name</label><br><input id=\"curr_name\" name=\"curr_name\" type=\"text\"><br>");
-	html("<label for=\"curr_sign\">sign</label><br><input id=\"curr_sign\" name=\"curr_sign\" type=\"text\"><br>");
-	html("<input id=\"curr_format\" name=\"curr_format\" type=\"checkbox\"><label for=\"curr_format\">sign before value</label><br>");
-	html("<input type=\"submit\" value=\"ok\">");
-	html("</form>");
+<form id="curr_frm" method="post" action="../modules/createcurrency.php">
+<input id="curr_id" name="curr_id" type="hidden"><br>
+<label for="curr_name">name</label><br><input id="curr_name" name="curr_name" type="text"><br>
+<label for="curr_sign">sign</label><br><input id="curr_sign" name="curr_sign" type="text"><br>
+<input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label><br>
+<input type="submit" value="ok">
+</form>
 
-	html("</body>");
-	html("</html>");
-	
-?>
+</body>
+</html>
