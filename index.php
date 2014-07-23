@@ -1,114 +1,155 @@
 ﻿<?php
 	require_once("./setup.php");
 
-
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id)
-		setLocation("./login.php");
+	checkUser();
 
 	$acc = new Account($user_id);
 	$trans = new Transaction($user_id);
 	$pers = new Person($user_id);
 
+	$currArr = Currency::getArray(TRUE);
+
+	$tilesArr = $acc->getTilesArray();
+	$totalsArr = $acc->getTotalsArray();
+	foreach($totalsArr as $curr_id => $balance)
+	{
+		$balfmt = Currency::format($balance, $curr_id);
+		$currName = Currency::getName($curr_id);
+
+		$totalsArr[$curr_id] = array("bal" => $balance, "balfmt" => $balfmt, "name" => $currName);
+	}
+
+	// Prepare data of transaction list items
+	$tr_count = 5;
+	$latestArr = $trans->getArray(0, 0, TRUE, $tr_count);
+	$trListData = array();
+	foreach($latestArr as $trans)
+	{
+		$trans_id = $trans[0];
+		$src_id = $trans[1];
+		$dest_id = $trans[2];
+		$famount = $trans[3];
+		$fcharge = $trans[4];
+		$cur_trans_type = $trans[5];
+		$fdate = $trans[6];
+		$comment = $trans[7];
+
+		if ($details)
+		{
+			$src_balance = $trans[9];
+			$dest_balance = $trans[10];
+		}
+
+		if ($cur_trans_type == 4)
+		{
+			$src_owner_id = $acc->getOwner($src_id);
+			$dest_owner_id = $acc->getOwner($dest_id);
+		}
+
+		$itemData = array("id" => $trans_id);
+
+		// Build accounts string
+		$accStr = "";
+		if ($src_id != 0)
+		{
+			if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
+				$accStr .= $acc->getName($src_id);
+			else if ($cur_trans_type == 4)
+				$accStr .= $acc->getNameOrPerson($src_id);
+		}
+
+		if ($src_id != 0 && $dest_id != 0 && ($cur_trans_type == 3 || $cur_trans_type == 4))
+			$accStr .= " → ";
+
+		if ($dest_id != 0)
+		{
+			if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
+				$accStr .= $acc->getName($dest_id);
+			else if ($cur_trans_type == 4)
+				$accStr .= $acc->getNameOrPerson($dest_id);
+		}
+
+		$itemData["acc"] = $accStr;
+
+		// Build amount string
+		$amStr = $famount;
+		if ($famount != $fcharge)
+			$amStr .= " (".$fcharge.")";
+		$itemData["amount"] = $amStr;
+
+		$itemData["date"] = $fdate;
+		$itemData["comm"] = $comment;
+
+		if ($details)
+		{
+			$itemData["balance"] = array();
+
+			if ($cur_trans_type == 1 || $cur_trans_type == 2)
+			{
+				$tr_acc_id = ($cur_trans_type == 1) ? $src_id : $dest_id;
+
+				$balance = ($cur_trans_type == 1) ? $src_balance : $dest_balance;
+				$acc_curr = $acc->getCurrency($tr_acc_id);
+
+				$itemData["balance"][] = Currency::format($balance, $acc_curr);
+			}
+			else if ($cur_trans_type == 3 || $cur_trans_type == 4)
+			{
+				if ($src_id != 0)
+				{
+					$acc_curr = $acc->getCurrency($src_id);
+
+					$itemData["balance"][] = Currency::format($src_balance, $acc_curr);
+				}
+
+				if ($dest_id != 0)
+				{
+					$acc_curr = $acc->getCurrency($dest_id);
+
+					$itemData["balance"][] = Currency::format($dest_balance, $acc_curr);
+				}
+			}
+		}
+
+
+		$trListData[] = $itemData;
+	}
+
+	$persArr = $pers->getArray();
+	foreach($persArr as $ind => $pData)
+	{
+		$noDebts = TRUE;
+		$pBalance = array();
+		if (isset($pData[2]) && is_array($pData[2]))
+		{
+			foreach($pData[2] as $pAcc)
+			{
+				if ($pAcc[2] != 0.0)
+				{
+					$noDebts = FALSE;
+					$pBalance[] = Currency::format($pAcc[2], $pAcc[1]);
+				}
+			}
+		}
+
+		$persArr[$ind]["nodebts"] = $noDebts;
+		$persArr[$ind]["balfmt"] = $pBalance;
+	}
+
+
+	$byCurrency = TRUE;
+	$curr_acc_id = Currency::getIdByPos(0);
+	if (!$curr_acc_id)
+		fail();
+	$trans_type = 1;		// expense
+	$groupType_id = 2;		// group by week
+
+	$statArr = getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id, 5);
+
 	$titleString = "Jezve Money";
 
+	$cssArr = array("common.css", "iconlink.css", "tiles.css", "trlist.css", "statistics.css");
+	$jsArr = array("common.js", "ready.js", "main.js", "raphael.js", "statistics.js");
 
-	html("<!DOCTYPE html>");
-	html("<html>");
-	html("<head>");
-	html(getCommonHeaders());
-
-	html("<title>".$titleString."</title>");
-	html(getCSS("common.css"));
-	html(getCSS("iconlink.css"));
-	html(getCSS("tiles.css"));
-	html(getCSS("trlist.css"));
-	html(getCSS("statistics.css"));
-	html(getJS("common.js"));
-	html(getJS("ready.js"));
-	html(getJS("main.js"));
-	html(getJS("raphael.js"));
-	html(getJS("statistics.js"));
-
-	html_op("<script>");
-
-		$byCurrency = TRUE;
-		$curr_acc_id = Currency::getIdByPos(0);
-		if (!$curr_acc_id)
-			fail();
-		$trans_type = 1;		// expense
-		$groupType_id = 2;		// group by week
-
-		echo(Currency::getArray(TRUE));
-		html("var accCurr = ".$curr_acc_id.";");
-		html("var transType = ".json_encode($type_str).";");
-		html("var groupType = ".json_encode($groupType).";");
-		html("var chartData = ".json_encode(getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id, 5)).";");
-		html();
-		if (isMessageSet())
-			html("onReady(initMessage);");
-		html("onReady(initStatWidget);");
-	html_cl("</script>");
-	html("</head>");
-	html("<body>");
-
-	html_op("<div class=\"page\">");
-		html_op("<div class=\"page_wrapper\">");
-
-	require_once("./templates/header.php");
-
-		html_op("<div class=\"container centered\">");
-	html_op("<div class=\"content\">");
-		html_op("<div class=\"content_wrap\">");
-			html_op("<div class=\"widget\">");
-				html("<div class=\"widget_title\"><a href=\"./accounts.php\">Accounts &gt;</a></div>");
-				html("<div class=\"tiles\">".$acc->getTiles()."</div>");
-			html_cl("</div>");
-
-			html();
-			html_op("<div class=\"widget\">");
-				html("<div class=\"widget_title\">Total &gt;</div>");
-				html_op("<div class=\"info_tiles\">");
-					$acc->getTotals();
-				html_cl("</div>");
-			html_cl("</div>");
-
-			html();
-			html_op("<div class=\"widget break_widget latest_widget\">");
-				html("<div class=\"widget_title\"><a href=\"./transactions.php\">Latest &gt;</a></div>");
-				$trans->getLatest(5);
-			html_cl("</div>");
-
-			html();
-			html_op("<div class=\"widget\">");
-				html("<div class=\"widget_title\"><a href=\"./persons.php\">Persons &gt;</a></div>");
-				html_op("<div class=\"info_tiles\">");
-					$pers->getTable();
-				html_cl("</div>");
-			html_cl("</div>");
-
-			html();
-			html_op("<div class=\"widget\">");
-				html("<div class=\"widget_title\"><a href=\"./statistics.php\">Statistics &gt;</a></div>");
-				html_op("<div class=\"charts widget_charts\">");
-					html_op("<div class=\"right_float\">");
-						html("<div id=\"vert_labels\"></div>");
-					html_cl("</div>");
-					html_op("<div class=\"chart_wrap\">");
-						html_op("<div class=\"chart_content\">");
-							html("<div id=\"chart\"></div>");
-						html_cl("</div>");
-					html_cl("</div>");
-					html("<div id=\"chpopup\" class=\"chart_popup\" style=\"display: none;\"></div>");
-				html_cl("</div>");
-			html_cl("</div>");
-		html_cl("</div>");
-	html_cl("</div>");
-
-			html_cl("</div>");
-		html_cl("</div>");
-	html_cl("</div>");
-	html("</body>");
-	html("</html>");
+	include("./templates/index.tpl");
 ?>

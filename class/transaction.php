@@ -658,45 +658,31 @@ class Transaction extends CachedTable
 
 
 	// Return link to specified page
-	private function getPageLink($trans_type, $acc_id, $page_num, $is_active, $searchStr, $startDate, $endDate, $details)
+	public function getPageLink($trans_type, $acc_id, $page_num, $searchStr, $startDate, $endDate, $details)
 	{
-		$resStr = "<span>";
-
-		if ($is_active)
+		$params = array("type" => $this->getTypeString($trans_type),
+						"page" => $page_num);
+		if ($acc_id != 0)
+			$params["acc_id"] = $acc_id;
+		if ($details == TRUE)
+			$params["mode"] = "details";
+		if (!is_empty($searchStr))
+			$params["search"] = $searchStr;
+		if (!is_empty($startDate) && !is_empty($endDate))
 		{
-			$resStr .= "<b>";
+			$params["stdate"] = $startDate;
+			$params["enddate"] = $endDate;
 		}
-		else
-		{
-			$params = array("type" => $this->getTypeString($trans_type),
-							"page" => $page_num);
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
-			if ($details == TRUE)
-				$params["mode"] = "details";
-			if (!is_empty($searchStr))
-				$params["search"] = $searchStr;
-			if (!is_empty($startDate) && !is_empty($endDate))
-			{
-				$params["stdate"] = $startDate;
-				$params["enddate"] = $endDate;
-			}
-			$linkStr = urlJoin("./transactions.php", $params);
+		$linkStr = urlJoin("./transactions.php", $params);
 
-			$resStr .= "<a href=\"".$linkStr."\">";
-		}
-		$resStr .= $page_num;
-		$resStr .= ($is_active) ? "</b>" : "</a>";
-		$resStr .= "</span>";
-
-		return $resStr;
+		return $linkStr;
 	}
 
 
-	// Return paginator for transaction table
-	private function getPaginator($trans_type, $acc_id, $page_num, $pages_count, $searchStr, $startDate, $endDate, $details)
+	// Return array of paginetor items
+	public function getPaginatorArray($page_num, $pages_count)
 	{
-		$resStr = "";
+		$res = array();
 
 		$breakLimit = 5;
 		$groupLimit = 3;
@@ -707,25 +693,29 @@ class Transaction extends CachedTable
 			{
 				for($i = 0; $i < $breakLimit; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
+					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
 				}
-				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $searchStr, $startDate, $endDate, $details);
+				$res[] = array("text" => "...");
+				$res[] = array("text" => $pages_count, "active" => FALSE);
 			}
 			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
 			{
-				$resStr = $this->getPageLink($trans_type, $acc_id, 1, FALSE, $searchStr, $startDate, $endDate, $details)."<span>...</span>";
+				$res[] = array("text" => 1, "active" => FALSE);
+				$res[] = array("text" => "...");
 				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
+					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
 				}
-				$resStr .= "<span>...</span>".$this->getPageLink($trans_type, $acc_id, $pages_count, FALSE, $searchStr, $startDate, $endDate, $details);
+				$res[] = array("text" => "...");
+				$res[] = array("text" => $pages_count, "active" => FALSE);
 			}
 			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, 1, FALSE, $searchStr, $startDate, $endDate, $details)."<span>...</span>";
+				$res[] = array("text" => 1, "active" => FALSE);
+				$res[] = array("text" => "...");
 				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
 				{
-					$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
+					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
 				}
 			}
 		}
@@ -733,11 +723,11 @@ class Transaction extends CachedTable
 		{
 			for($i = 0; $i < $pages_count; $i++)
 			{
-				$resStr .= $this->getPageLink($trans_type, $acc_id, $i + 1, ($i == $page_num), $searchStr, $startDate, $endDate, $details);
+				$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
 			}
 		}
 
-		return $resStr;
+		return $res;
 	}
 
 
@@ -837,261 +827,6 @@ class Transaction extends CachedTable
 		}
 
 		return $balArr;
-	}
-
-
-	// Return table of transactions
-	public function getTable($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $showPaginator = TRUE, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
-	{
-		global $db;
-
-		if (!self::$user_id)
-			return;
-
-		$u = new User();
-		$owner_id = $u->getOwner(self::$user_id);
-		if (!$owner_id)
-			return;
-
-		$pers = new Person(self::$user_id);
-
-		html_op("<div id=\"trlist\" class=\"trans_list\">");
-
-		$acc_id = intval($account_id);
-
-		$acc = new Account(self::$user_id, TRUE);
-		$accounts = $acc->getCount();
-		if (!$accounts)
-		{
-			html("<span>You have no one account. Please create one.</span>");
-			html_cl("</div>");
-			return;
-		}
-
-		if (!$db->countQ("transactions", "user_id=".self::$user_id))
-		{
-			html("<span>You have no one transaction yet.</span>");
-			html_cl("</div>");
-			return;
-		}
-
-		$transArr = $this->getArray($trans_type, $acc_id, $isDesc, $tr_on_page, $page_num, $searchStr, $startDate, $endDate, $details);
-		if (!count($transArr))
-		{
-			html("<span>No transactions found.</span>");
-			html_cl("</div>");
-
-			return;
-		}
-
-		$transCount = $this->getTransCount($trans_type, $acc_id, $searchStr, $startDate, $endDate);
-
-		if ($showPaginator == TRUE)
-		{
-			html("<div class=\"mode_selector\">");
-
-			$params = array("type" => $this->getTypeString($trans_type),
-							"mode" => (($details) ? "classic" : "details"));
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
-			if ($page_num != 0)
-				$params["page"] = ($page_num + 1);
-			if (!is_empty($searchStr))
-				$params["search"] = $searchStr;
-			if (!is_empty($startDate) && !is_empty($endDate))
-			{
-				$params["stdate"] = $startDate;
-				$params["enddate"] = $endDate;
-			}
-			$linkStr = urlJoin("./transactions.php", $params);
-
-			$resStr = "";
-			// Classic mode button
-			if ($details)
-				$resStr .= "<a class=\"list_mode\" href=\"".$linkStr."\"><span class=\"icon\"></span><span>Classic</span></a>";
-			else
-				$resStr .= "<b class=\"list_mode\"><span class=\"icon\"></span><span>Classic</span></b>";
-
-			// Details mode button
-			if ($details)
-				$resStr .= "<b class=\"details_mode\"><span class=\"icon\"></span><span>Details</span></b>";
-			else
-				$resStr .= "<a class=\"details_mode\" href=\"".$linkStr."\"><span class=\"icon\"></span><span>Details</span></a>";
-			html($resStr);
-			html("</div>");
-		}
-
-		if ($tr_on_page > 0 && $showPaginator == TRUE)
-		{
-			$pageCount = ceil($transCount / $tr_on_page);
-
-			html_op("<div class=\"paginator\">");
-
-			if ($transCount > $tr_on_page)
-				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $searchStr, $startDate, $endDate, $details));
-
-			html_cl("</div>");
-		}
-
-		if ($details)
-			html_op("<table class=\"details_table\">");
-
-		foreach($transArr as $trans)
-		{
-			$trans_id = $trans[0];
-			$src_id = $trans[1];
-			$dest_id = $trans[2];
-			$famount = $trans[3];
-			$fcharge = $trans[4];
-			$cur_trans_type = $trans[5];
-			$fdate = $trans[6];
-			$comment = $trans[7];
-
-			if ($details)
-			{
-				$src_balance = $trans[9];
-				$dest_balance = $trans[10];
-			}
-
-			if ($cur_trans_type == 4)
-			{
-				$src_owner_id = $acc->getOwner($src_id);
-				$dest_owner_id = $acc->getOwner($dest_id);
-			}
-
-			if ($details)
-			{
-				html_op("<tbody><tr id=\"tr_".$trans_id."\">");
-			}
-			else
-			{
-				html_op("<div class=\"trlist_item_wrap\">");
-				html_op("<div id=\"tr_".$trans_id."\" class=\"trlist_item\">");
-			}
-
-			// Make accounts string
-			$accStr = "";
-			if ($src_id != 0)
-			{
-				if ($cur_trans_type == 1 || $cur_trans_type == 3)		// expense or transfer
-					$accStr .= $acc->getName($src_id);
-				else if ($cur_trans_type == 4)
-					$accStr .= $acc->getNameOrPerson($src_id);
-			}
-
-			if ($src_id != 0 && $dest_id != 0 && ($cur_trans_type == 3 || $cur_trans_type == 4))
-				$accStr .= " → ";
-
-			if ($dest_id != 0)
-			{
-				if ($cur_trans_type == 2 || $cur_trans_type == 3)		// income or transfer
-					$accStr .= $acc->getName($dest_id);
-				else if ($cur_trans_type == 4)
-					$accStr .= $acc->getNameOrPerson($dest_id);
-			}
-
-			$resStr = "";
-			$titleStr = ($details) ? " title=\"".$accStr."\"" : "";
-			if ($details)
-				$resStr .= "<td><div class=\"ellipsis_cell\">";
-			$resStr .= "<div class=\"tritem_acc_name\"".$titleStr."><span>";
-			$resStr .= $accStr;
-			$resStr .= "</span></div>";
-			if ($details)
-				$resStr .= "</div></td>";
-			html($resStr);
-
-			$resStr = "";
-			if ($details)
-				$resStr .= "<td>";
-			$resStr .= "<div class=\"tritem_sum\"><span>";
-			$resStr .= $famount;
-			if ($famount != $fcharge)
-				$resStr .= " (".$fcharge.")";
-			$resStr .= "</span></div>";
-			if ($details)
-				$resStr .= "</td>";
-			html($resStr);
-
-			if ($details)
-			{
-				html_op("<td><div class=\"tritem_balance\">");
-
-				if ($cur_trans_type == 1 || $cur_trans_type == 2)
-				{
-					$tr_acc_id = ($cur_trans_type == 1) ? $src_id : $dest_id;
-
-					$balance = ($cur_trans_type == 1) ? $src_balance : $dest_balance;
-					$acc_curr = $acc->getCurrency($tr_acc_id);
-					html("<span>".Currency::format($balance, $acc_curr)."</span>");
-				}
-				else if ($cur_trans_type == 3 || $cur_trans_type == 4)
-				{
-					if ($src_id != 0)
-					{
-						$acc_curr = $acc->getCurrency($src_id);
-						html("<span>".Currency::format($src_balance, $acc_curr)."</span>");
-					}
-
-					if ($dest_id != 0)
-					{
-						$acc_curr = $acc->getCurrency($dest_id);
-						html("<span>".Currency::format($dest_balance, $acc_curr)."</span>");
-					}
-				}
-				html_cl("</div></td>");
-			}
-
-
-			if ($details)
-				html_op("<td>");
-			html_op("<div class=\"tritem_date_comm\">");
-				html("<span>".$fdate."</span>");
-
-			if ($details)
-			{
-					html_cl("</div>");
-				html_cl("</td>");
-				html_op("<td><div class=\"ellipsis_cell\">");
-
-				$titleStr = ($comment != "") ? " title=\"".$comment."\"" : "";
-					html_op("<div".$titleStr.">");
-			}
-				if ($comment != "")
-					html("<span class=\"tritem_comm\">".$comment."</span>");
-			html_cl("</div>");
-			if ($details)
-			{
-				html_cl("</div></td>");
-				html_cl("</tr></tbody>");
-			}
-			else
-			{
-				html_cl("</div>");
-				html_cl("</div>");
-			}
-		}
-
-		if ($details)
-			html_cl("</table>");
-
-		if ($tr_on_page > 0 && $showPaginator == TRUE)
-		{
-			html_op("<div class=\"paginator\">");
-			if ($transCount > $tr_on_page)
-				html($this->getPaginator($trans_type, $acc_id, $page_num, $pageCount, $searchStr, $startDate, $endDate, $details));
-			html_cl("</div>");
-		}
-
-		html_cl("</div>");
-		html();
-	}
-
-
-	// Return table of latest transactions
-	public function getLatest($tr_count)
-	{
-		return $this->getTable(0, 0, TRUE, $tr_count, 0, FALSE);
 	}
 
 

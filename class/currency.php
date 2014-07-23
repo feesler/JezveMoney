@@ -221,45 +221,23 @@ class Currency
 	}
 
 
-	// Return HTML string of currencies for select control
-	public static function getList($selected_id = 0)
-	{
-		global $tabStr;
-
-		$resStr = "";
-
-		if (!self::checkCache())
-			return $resStr;
-
-		foreach(self::$cache as $curr_id => $row)
-		{
-			$resStr .= $tabStr."<option value=\"".$curr_id."\"";
-			if ($curr_id == $selected_id)
-				$resStr .= " selected";
-			$resStr .= ">".$row["name"]."</option>\r\n";
-		}
-
-		return $resStr;
-	}
-
-
 	// Return Javascript array of currencies
 	public static function getArray($ext = FALSE)
 	{
-		if (!self::checkCache())
-			return "";
+		$res = array();
 
-		$resArr = array();
+		if (!self::checkCache())
+			return $res;
 
 		foreach(self::$cache as $curr_id => $row)
 		{
 			if ($ext)
-				$resArr[] = array($curr_id, $row["name"], $row["sign"], intval($row["format"]));
+				$res[] = array($curr_id, $row["name"], $row["sign"], intval($row["format"]));
 			else
-				$resArr[] = array($curr_id, $row["name"], $row["sign"]);
+				$res[] = array($curr_id, $row["name"], $row["sign"]);
 		}
 
-		return "var currency = ".f_json_encode($resArr).";\r\n";
+		return $res;
 	}
 }
 

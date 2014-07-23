@@ -7,6 +7,7 @@ class Account extends CachedTable
 	static private $owner_id = 0;
 	static private $full_list = FALSE;
 	static private $icons = array("No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash");
+	static private $iconClass = array("", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon");
 
 
 	// Class constructor
@@ -381,44 +382,10 @@ class Account extends CachedTable
 	}
 
 
-	// Return HTML string of accounts for select control
-	public function getList($selected_id = 0)
+	// Return array of icons
+	public function getIconsArray()
 	{
-		global $tabStr;
-
-		$resStr = "";
-
-		if (!$this->checkCache())
-			return $resStr;
-
-		foreach(self::$dcache as $acc_id => $row)
-		{
-			$resStr .= $tabStr."<option value=\"".$acc_id."\"";
-			if ($acc_id == $selected_id)
-				$resStr .= " selected";
-			$resStr .= ">".$row["name"]."</option>\r\n";
-		}
-
-		return $resStr;
-	}
-
-
-	// Return HTML string of icons for select control
-	public function getIconsList($selected_id = 0)
-	{
-		global $tabStr;
-
-		$resStr = "";
-
-		foreach(self::$icons as $icon_id => $icon_name)
-		{
-			$resStr .= $tabStr."<option value=\"".$icon_id."\"";
-			if ($icon_id == $selected_id)
-				$resStr .= " selected";
-			$resStr .= ">".$icon_name."</option>\r\n";
-		}
-
-		return $resStr;
+		return self::$icons;
 	}
 
 
@@ -439,127 +406,60 @@ class Account extends CachedTable
 	}
 
 
-	// Return HTML for account tile
-	public function getTileEx($tile_type, $acc_id, $bal_corr, $tile_id = "")
+	// Return array of accounts for template
+	public function getTilesArray()
 	{
-		if (!$this->is_exist($acc_id))
-			return "";
-
-		if ($tile_id == "")
-			$tile_id = "acc_".$acc_id;
-
-		$b_corr = floatVal($bal_corr);
-
-		$acc_name = $this->getName($acc_id);
-		$acc_curr = $this->getCurrency($acc_id);
-		$acc_balance = $this->getBalance($acc_id);
-		$acc_icon = $this->getIcon($acc_id);
-		$balance_fmt = Currency::format($acc_balance + $b_corr, $acc_curr);
-
-		$tile_act = NULL;
-		if ($tile_type == LINK_TILE)
-			$tile_act = "./newtransaction.php?acc_id=".$acc_id;
-		else if ($tile_type == BUTTON_TILE)
-			$tile_act = "onTileClick(".$acc_id.");";
-
-		$addClass = NULL;
-		if ($acc_icon != 0)
-		{
-			if ($acc_icon == 1)
-				$addClass = "purse_icon";
-			else if ($acc_icon == 2)
-				$addClass = "safe_icon";
-			else if ($acc_icon == 3)
-				$addClass = "card_icon";
-			else if ($acc_icon == 4)
-				$addClass = "percent_icon";
-			else if ($acc_icon == 5)
-				$addClass = "bank_icon";
-			else if ($acc_icon == 6)
-				$addClass = "cash_icon";
-		}
-
-		return getTile($tile_type, $tile_id, $acc_name, $balance_fmt, $tile_act, $addClass);
-	}
-
-
-	// Return HTML for account tile
-	public function getTile($tile_type, $acc_id, $tile_id = "")
-	{
-		return $this->getTileEx($tile_type, $acc_id, 0.0, $tile_id);
-	}
-
-
-	// Return HTML for accounts of user
-	public function getTiles($buttons = FALSE)
-	{
-		$resStr = "";
+		$res = array();
 
 		if (!$this->checkCache())
-			return $resStr;
+			return $res;
 
 		$accounts = count(self::$dcache);
-		if (!$accounts)
+
+		foreach(self::$dcache as $acc_id => $row)
 		{
-			$resStr .= "<span>You have no one account. Please create one.</span>";
-		}
-		else
-		{
-			foreach(self::$dcache as $acc_id => $row)
-			{
-				if ($buttons)
-					$resStr .= $this->getTile(BUTTON_TILE, $acc_id);
-				else
-					$resStr .= $this->getTile(LINK_TILE, $acc_id);
-			}
+			$acc_balance = $this->getBalance($acc_id);
+			$icon_id = $row["icon"];
+			$acc_icon = $this->getIconClass($icon_id);
+			$balance_fmt = Currency::format($row["balance"], $row["curr_id"]);
+
+			$res[$acc_id] = array("name" => $row["name"],
+								"balance" => $balance_fmt,
+								"icon" => $acc_icon);
 		}
 
-		return $resStr;
+		return $res;
 	}
 
 
-	// Return HTML for total sums per each currency
-	public function getTotals()
+	// Return class for specified icon
+	public function getIconClass($icon_id)
 	{
+		$icon_id = intval($icon_id);
+
+		return ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " ".self::$iconClass[$icon_id] : "";
+	}
+
+
+	// Return array of total sums per each currency
+	public function getTotalsArray()
+	{
+		$res = array();
+
 		if (!$this->checkCache())
-			return $resStr;
+			return $res;
 
-		html_op("<div>");
-
-		$accounts = count(self::$dcache);
-		if (!$accounts)
+		foreach(self::$dcache as $acc_id => $row)
 		{
-			html("<span>You have no one account. Please create one.</span>");
-		}
-		else
-		{
-			$totalArr = array();
-			foreach(self::$dcache as $acc_id => $row)
-			{
-				$currname = Currency::getName($row["curr_id"]);
+			$currname = Currency::getName($row["curr_id"]);
 
-				if ($currname != "" && !$totalArr[$row["curr_id"]])
-					$totalArr[$row["curr_id"]] = 0;
+			if ($currname != "" && !isset($res[$row["curr_id"]]))
+				$res[$row["curr_id"]] = 0;
 
-				$totalArr[$row["curr_id"]] += $row["balance"];
-			}
-
-			$i = 0;
-			foreach($totalArr as $key => $value)
-			{
-				$i++;
-
-				html_op("<div class=\"info_tile\">");
-					$valfmt = Currency::format($value, $key);
-					$currName = Currency::getName($key);
-
-					html("<span class=\"info_title\">".$currName."</span>");
-					html("<span class=\"info_subtitle\">".$valfmt."</span>");
-				html_cl("</div>");
-			}
+			$res[$row["curr_id"]] += $row["balance"];
 		}
 
-		html_cl("</div>");
+		return $res;
 	}
 }
 
