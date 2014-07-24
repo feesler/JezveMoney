@@ -461,6 +461,26 @@ class Account extends CachedTable
 
 		return $res;
 	}
+
+
+	// Build array with properties of account
+	public function getProperties($acc_id)
+	{
+		$acc_id = intval($acc_id);
+		if (!$this->is_exist($acc_id))
+			return NULL;
+
+		$res = array("id" => $acc_id,
+					"owner" => self::$dcache[$acc_id]["owner_id"],
+					"name" => self::$dcache[$acc_id]["name"],
+					"balance" => self::$dcache[$acc_id]["balance"],
+					"curr" => self::$dcache[$acc_id]["curr_id"],
+					"sign" => Currency::getSign(self::$dcache[$acc_id]["curr_id"]),
+					"icon" => self::$dcache[$acc_id]["icon"],
+					"iconclass" => $this->getIconClass(self::$dcache[$acc_id]["icon"]));
+
+		return $res;
+	}
 }
 
 ?>
