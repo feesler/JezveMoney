@@ -934,6 +934,29 @@ class Transaction extends CachedTable
 	{
 		return $this->getCache($trans_id, "pos");
 	}
+
+
+
+	// Build array with properties of account
+	public function getProperties($trans_id)
+	{
+		$trans_id = intval($trans_id);
+		if (!$this->is_exist($trans_id))
+			return NULL;
+
+		$row = self::$dcache[$trans_id];
+		$res = array("id" => $trans_id,
+					"src_id" => $row["src_id"],
+					"dest_id" => $row["dest_id"],
+					"type" => $row["type"],
+					"curr" => $row["curr_id"],
+					"amount" => $row["amount"],
+					"charge" => $row["charge"],
+					"date" => $row["date"],
+					"comment" => $row["comment"]);
+
+		return $res;
+	}
 }
 
 ?>
