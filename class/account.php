@@ -481,6 +481,20 @@ class Account extends CachedTable
 
 		return $res;
 	}
+
+
+	// Try to find account different from specified
+	public function getAnother($acc_id)
+	{
+		if ($acc_id != 0 && $acc->getCount() < 2)
+			return 0;
+
+		$newacc_id = $this->getIdByPos(0);
+		if ($newacc_id == $acc_id)
+			$newacc_id = $acc->getIdByPos(1);
+
+		return $newacc_id;
+	}
 }
 
 ?>
