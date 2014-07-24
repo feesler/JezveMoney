@@ -9,33 +9,6 @@
 	}
 
 
-	// Build array with properties of transaction
-	function getTransProperties($trans_id)
-	{
-		global $db, $user_id;
-
-		$resArr = array();
-
-		$qRes = $db->selectQ("*", "transactions", "id=".$trans_id." AND user_id=".$user_id);
-
-		if (count($qRes) != 1)
-			return $resArr;
-
-		$row = $qRes[0];
-		$resArr["id"] = $trans_id;
-		$resArr["src_id"] = intval($row["src_id"]);
-		$resArr["dest_id"] = intval($row["dest_id"]);
-		$resArr["type"] = intval($row["type"]);
-		$resArr["curr"] = intval($row["curr_id"]);
-		$resArr["amount"] = floatval($row["amount"]);
-		$resArr["charge"] = floatval($row["charge"]);
-		$resArr["date"] = $row["date"];
-		$resArr["comment"] = $row["comment"];
-
-		return $resArr;
-	}
-
-
 	checkUser();
 
 	if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
@@ -53,7 +26,7 @@
 	if (!$trans->is_exist($trans_id))
 		fail();
 
-	$tr = getTransProperties($trans_id);
+	$tr = $trans->getProperties($trans_id);
 	$trans_type = $tr["type"];			// TODO : temporarily
 
 	// Prepare transaction types menu
