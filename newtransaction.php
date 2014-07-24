@@ -8,29 +8,6 @@
 	}
 
 
-	// Build array with some account properties
-	function getAccountProperties($acc_id)
-	{
-		global $acc;
-
-		if (!$acc_id || !is_numeric($acc_id))
-			return NULL;
-
-		$acc_id = intval($acc_id);
-
-		$resArr = array();
-		$resArr["id"] = $acc_id;
-		$resArr["name"] = $acc->getName($acc_id);
-		$resArr["balance"] = $acc->getBalance($acc_id);
-		$resArr["curr"] = $acc->getCurrency($acc_id);
-		$resArr["sign"] = Currency::getSign($resArr["curr"]);
-		$resArr["icon"] = $acc->getIcon($acc_id);
-		$resArr["iconclass"] = $acc->getIconClass($resArr["icon"]);
-
-		return $resArr;
-	}
-
-
 	// Try to find account different from specified
 	function getAnotherAccount($acc_id)
 	{
@@ -94,8 +71,8 @@
 	if ($trans_type == 3)
 		$dest_id = getAnotherAccount($src_id);
 
-	$src = getAccountProperties($src_id);
-	$dest = getAccountProperties($dest_id);
+	$src = $acc->getProperties($src_id);
+	$dest = $acc->getProperties($dest_id);
 
 	// Prepare transaction types menu
 	$trTypes = array("Expense", "Income", "Transfer");

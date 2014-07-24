@@ -8,29 +8,6 @@
 	}
 
 
-	// Build array with some account properties
-	function getAccountProperties($acc_id)
-	{
-		global $acc;
-
-		if (!$acc_id || !is_numeric($acc_id))
-			return NULL;
-
-		$acc_id = intval($acc_id);
-
-		$resArr = array();
-		$resArr["id"] = $acc_id;
-		$resArr["name"] = $acc->getName($acc_id);
-		$resArr["balance"] = $acc->getBalance($acc_id);
-		$resArr["curr"] = $acc->getCurrency($acc_id);
-		$resArr["sign"] = Currency::getSign($resArr["curr"]);
-		$resArr["icon"] = $acc->getIcon($acc_id);
-		$resArr["iconclass"] = $acc->getIconClass($resArr["icon"]);
-
-		return $resArr;
-	}
-
-
 	// Try to find account different from specified
 	function getAnotherAccount($acc_id)
 	{
@@ -65,7 +42,7 @@
 		$acc_id = $acc->getIdByPos(0);
 	if (!$acc_id)
 		fail();
-	$debtAcc = getAccountProperties($acc_id);
+	$debtAcc = $acc->getProperties($acc_id);
 	$acc_count = $acc->getCount();
 
 

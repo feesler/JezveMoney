@@ -36,30 +36,6 @@
 	}
 
 
-	// Build array with some account properties
-	function getAccountProperties($acc_id)
-	{
-		global $acc;
-
-		if (!$acc_id || !is_numeric($acc_id))
-			return NULL;
-
-		$acc_id = intval($acc_id);
-
-		$resArr = array();
-		$resArr["id"] = $acc_id;
-		$resArr["name"] = $acc->getName($acc_id);
-		$resArr["balance"] = $acc->getBalance($acc_id);
-		$resArr["curr"] = $acc->getCurrency($acc_id);
-		$resArr["owner"] = $acc->getOwner($acc_id);
-		$resArr["sign"] = Currency::getSign($resArr["curr"]);
-		$resArr["icon"] = $acc->getIcon($acc_id);
-		$resArr["iconclass"] = $acc->getIconClass($resArr["icon"]);
-
-		return $resArr;
-	}
-
-
 	// Try to find account different from specified
 	function getAnotherAccount($acc_id)
 	{
@@ -119,8 +95,8 @@
 	$persArr = $person->getArray();
 
 	// get information about source and destination accounts
-	$src = getAccountProperties($tr["src_id"]);
-	$dest = getAccountProperties($tr["dest_id"]);
+	$src = $acc->getProperties($tr["src_id"]);
+	$dest = $acc->getProperties($tr["dest_id"]);
 
 	$user_owner = $u->getOwner($user_id);
 	$give = (!is_null($src) && $src["owner"] != $user_owner);
@@ -130,7 +106,7 @@
 
 	$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
 	$acc = new Account($user_id, TRUE);		// TODO : think how to improve this
-	$person_acc = getAccountProperties($person_acc_id);
+	$person_acc = $acc->getProperties($person_acc_id);
 	$person_res_balance = $person_acc["balance"];
 	$person_balance = $person_res_balance + (($give) ? $tr["amount"] : -$tr["amount"]);
 
