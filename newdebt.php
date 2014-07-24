@@ -8,22 +8,6 @@
 	}
 
 
-	// Try to find account different from specified
-	function getAnotherAccount($acc_id)
-	{
-		global $acc;
-
-		if ($acc_id != 0 && $acc->getCount() < 2)
-			return 0;
-
-		$newacc_id = $acc->getIdByPos(0);
-		if ($newacc_id == $acc_id)
-			$newacc_id = $acc->getIdByPos(1);
-
-		return $newacc_id;
-	}
-
-
 	checkUser();
 
 	$trans_type = 4;
