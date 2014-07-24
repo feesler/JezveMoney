@@ -421,11 +421,9 @@ function onSelectStartDate(date, month, year)
 		hideCalendar();
 		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
 
-		newLocation = './transactions.php?type=' + transType;
+		newLocation = './statistics.php?type=' + transType;
 		if (acc_id != 0)
 			newLocation += '&acc_id=' + curAccId;
-		if (searchRequest)
-			newLocation += '&search=' + encodeURI(searchRequest);
 		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
 
 		window.location = newLocation;
@@ -449,11 +447,9 @@ function onSelectEndDate(date, month, year)
 		hideCalendar();
 		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
 
-		newLocation = './transactions.php?type=' + transType;
+		newLocation = './statistics.php?type=' + transType;
 		if (acc_id != 0)
 			newLocation += '&acc_id=' + curAccId;
-		if (searchRequest)
-			newLocation += '&search=' + encodeURI(searchRequest);
 		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
 
 		window.location = newLocation;
