@@ -2,9 +2,9 @@
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
 	var account_id = <?=$acc_id?>;
-	var acc_name = <?=f_json_encode($acc_name)?>;
-	var acc_currency = <?=$acc_curr?>;
-	var acc_balance = <?=$acc_initbal?>;
+	var acc_name = <?=f_json_encode($accInfo["name"])?>;
+	var acc_currency = <?=$accInfo["curr"]?>;
+	var acc_balance = <?=$accInfo["initbalance"]?>;
 
 	onReady(initControls);
 </script>
@@ -25,7 +25,7 @@
 
 					<div>
 						<div class="non_float std_margin">
-							<div id="acc_tile" class="tile<?=$acc_icon?>"><button class="tilelink" type="button" onclick="onTileClick(<?=$acc_id?>);"><span><span class="acc_bal"><?=$balance_fmt?></span><span class="acc_name"><?=$acc_name?></span></span></button></div>
+							<div id="acc_tile" class="tile<?=$accInfo["iconclass"]?>"><button class="tilelink" type="button" onclick="onTileClick(<?=$acc_id?>);"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name"><?=$accInfo["name"]?></span></span></button></div>
 						</div>
 
 						<div class="non_float std_margin">
@@ -34,7 +34,7 @@
 								<div>
 									<select id="icon" name="icon" onchange="onChangeIcon(this);">
 <?php	foreach($icons as $icon_id => $icon_name) {
-			if ($icon_id == $acc_icon_id) {		?>
+			if ($icon_id == $accInfo["icon"]) {		?>
 										<option value="<?=$icon_id?>" selected><?=$icon_name?></option>
 <?php		} else {	?>
 										<option value="<?=$icon_id?>"><?=$icon_name?></option>
@@ -47,7 +47,7 @@
 
 						<div class="non_float std_margin">
 							<label for="accname">Account name</label>
-							<div class="stretch_input std_input"><div><input id="accname" name="accname" type="text" value="<?=$acc_name?>" oninput="return onAccNameInput(this);"></div></div>
+							<div class="stretch_input std_input"><div><input id="accname" name="accname" type="text" value="<?=$accInfo["name"]?>" oninput="return onAccNameInput(this);"></div></div>
 						</div>
 
 						<div class="non_float std_margin">
@@ -56,7 +56,7 @@
 								<div>
 									<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
 <?php	foreach($currArr as $currInfo) {
-			if ($currInfo[0] == $acc_curr) {	?>
+			if ($currInfo[0] == $accInfo["curr"]) {	?>
 										<option value="<?=$currInfo[0]?>" selected><?=$currInfo[1]?></option>
 <?php		} else {	?>
 										<option value="<?=$currInfo[0]?>"><?=$currInfo[1]?></option>
@@ -70,10 +70,10 @@
 						<div class="non_float std_margin">
 							<label for="balance">Initial balance</label>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=$curr_sign?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=$accInfo["sign"]?></div></div></div>
 								<div class="stretch_input std_input">
 									<div>
-										<input class="summ_text" id="balance" name="balance" type="text" value="<?=$acc_initbal?>" oninput="return onAccBalanceInput(this);">
+										<input class="summ_text" id="balance" name="balance" type="text" value="<?=$accInfo["initbalance"]?>" oninput="return onAccBalanceInput(this);">
 									</div>
 								</div>
 							</div>
