@@ -5,7 +5,6 @@
 	{
 		if (!is_null($msg))
 			setMessage($msg);
-		setMessage(ERR_ACCOUNT_UPDATE);
 		setLocation("./accounts.php");
 	}
 
