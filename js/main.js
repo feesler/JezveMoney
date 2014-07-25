@@ -259,7 +259,7 @@ function onTileClick(acc_id)
 	if (accounts.selectedCount() == 1)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = './editaccount.php?id=' + accounts.selectedArr[0];
+			edit_btn.firstElementChild.href = './account.php?act=edit&id=' + accounts.selectedArr[0];
 		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
 			export_btn.firstElementChild.href = './csvexport.php?id=' + accounts.selectedArr[0];
 	}

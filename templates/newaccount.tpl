@@ -2,8 +2,8 @@
 <script>
 var currency = <?=f_json_encode($currArr)?>;
 var acc_name = <?=json_encode($acc_name)?>;
-var acc_currency = <?=$curr_id?>;
-var acc_balance = <?=$acc_bal?>;
+var acc_currency = <?=$accInfo["curr"]?>;
+var acc_balance = <?=$accInfo["balance"]?>;
 
 onReady(initControls);
 </script>
@@ -16,10 +16,10 @@ onReady(initControls);
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">
-					<h2>Create new account</h2>
+					<h2><?=$headString?></h2>
 					<div>
 						<div class="non_float std_margin">
-							<div id="acc_tile" class="tile"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$balance_fmt?></span><span class="acc_name">New account</span></span></button></div>
+							<div id="acc_tile" class="tile"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name">New account</span></span></button></div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="icon">Icon</label>
@@ -43,7 +43,7 @@ onReady(initControls);
 								<div>
 									<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
 <?php	foreach($currArr as $currInfo) {
-			if ($currInfo[0] == $curr_id) {	?>
+			if ($currInfo[0] == $accInfo["curr"]) {	?>
 										<option value="<?=$currInfo[0]?>" selected><?=$currInfo[1]?></option>
 <?php		} else {	?>
 										<option value="<?=$currInfo[0]?>"><?=$currInfo[1]?></option>
@@ -56,7 +56,7 @@ onReady(initControls);
 						<div class="non_float std_margin">
 							<label for="balance">Initial balance</label>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=$curr_sign?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=$accInfo["sign"]?></div></div></div>
 								<div class="stretch_input std_input">
 									<div>
 										<input class="summ_text" id="balance" name="balance" type="text" value="0" oninput="return onAccBalanceInput(this);">
