@@ -474,6 +474,7 @@ class Account extends CachedTable
 					"owner" => self::$dcache[$acc_id]["owner_id"],
 					"name" => self::$dcache[$acc_id]["name"],
 					"balance" => self::$dcache[$acc_id]["balance"],
+					"initbalance" => self::$dcache[$acc_id]["initbalance"],
 					"curr" => self::$dcache[$acc_id]["curr_id"],
 					"sign" => Currency::getSign(self::$dcache[$acc_id]["curr_id"]),
 					"icon" => self::$dcache[$acc_id]["icon"],
