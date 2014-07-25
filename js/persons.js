@@ -85,7 +85,7 @@ function onTileClick(p_id)
 	if (persons.selectedCount() == 1)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = './editperson.php?id=' + persons.selectedArr[0];
+			edit_btn.firstElementChild.href = './person.php?act=edit&id=' + persons.selectedArr[0];
 	}
 
 	show('toolbar', (persons.selectedCount() > 0));

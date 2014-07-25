@@ -10,7 +10,7 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1>Persons</h1>
-						<div id="add_btn" class="iconlink"><a href="./newperson.php"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
+						<div id="add_btn" class="iconlink"><a href="./person.php?act=new"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 					<div class="tiles"><?php
 		if (count($persArr)) {
