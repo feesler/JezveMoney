@@ -2,9 +2,6 @@
 <script>
 	var person_id = <?=$p_id?>;
 	var personName = <?=f_json_encode($pName)?>;
-<?php	if (isMessageSet()) {	?>
-	onReady(initMessage);
-<?php	}	?>
 </script>
 </head>
 <body>

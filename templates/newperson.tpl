@@ -1,9 +1,4 @@
 <?php	include("./templates/commonhdr.tpl");	?>
-<?php	if (isMessageSet()) {		?>
-<script>
-	onReady(initMessage);
-</script>
-<?php	}	?>
 </head>
 <body>
 <form method="post" action="./modules/createperson.php" onsubmit="return onNewPersonSubmit(this);">

@@ -5,9 +5,7 @@
 	var acc_name = <?=f_json_encode($acc_name)?>;
 	var acc_currency = <?=$acc_curr?>;
 	var acc_balance = <?=$acc_initbal?>;
-<?php	if (isMessageSet()) {	?>
-	onReady(initMessage);
-<?php	}	?>
+
 	onReady(initControls);
 </script>
 </head>

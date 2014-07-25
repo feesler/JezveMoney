@@ -1,10 +1,5 @@
 <?php	include("./templates/commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="./css/screen.css" />
-<?php	if (isMessageSet()) {		?>
-<script>
-	onReady(initMessage);
-</script>
-<?php	}	?>
 </head>
 <body>
 <div class="page">

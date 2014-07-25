@@ -16,9 +16,7 @@
 	var trans_curr = <?=$tr["curr"]?>;
 	var trans_acc_curr = <?=$tr["curr"]?>;
 	var trans_type = <?=$tr["type"]?>;
-<?php	if (isMessageSet()) {	?>
-	onReady(initMessage);
-<?php	}	?>
+
 	onReady(initControls);
 </script>
 </head>

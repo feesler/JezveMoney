@@ -21,9 +21,7 @@
 	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
 	var lastAcc_id = <?=$acc_id?>;
 	var noAccount = <?=($noAccount ? "true" : "false")?>;
-<?php	if (isMessageSet()) {	?>
-	onReady(initMessage);
-<?php	}	?>
+
 	onReady(initControls);
 </script>
 </head>

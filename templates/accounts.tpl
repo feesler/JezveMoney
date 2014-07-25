@@ -1,9 +1,6 @@
 <?php	include("./templates/commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="./css/screen.css" />
 <script>
-<?php	if (isMessageSet()) {	?>
-	onReady(initMessage);
-<?php	}	?>
 	onReady(initToolbar);
 </script>
 </head>

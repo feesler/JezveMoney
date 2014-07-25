@@ -1,9 +1,6 @@
 <?php	include("./templates/commonhdr.tpl");	?>
 <script>
 	var p_name = <?=json_encode($person_name)?>;
-<?php	if (isMessageSet()) {	?>
-	onReady(initMessage);
-<?php	}	?>
 </script>
 </head>
 <body>

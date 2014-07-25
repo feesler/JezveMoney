@@ -6,9 +6,6 @@
 	var groupType = <?=f_json_encode($groupType)?>;
 	var chartData = <?=f_json_encode($statArr)?>;
 
-<?php	if (isMessageSet()) {		?>
-	onReady(initMessage);
-<?php	}	?>
 	onReady(initStatWidget);
 </script>
 </head>

@@ -7,4 +7,5 @@
 					<span><?=$msgMessage?></span>
 				</div>
 			</div>
+			<script>onReady(initMessage);</script>
 		</div>

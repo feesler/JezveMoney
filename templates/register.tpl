@@ -1,9 +1,4 @@
 <?php	include("./templates/commonhdr.tpl");	?>
-<?php	if (isMessageSet()) {	?>
-<script>
-	onReady(initMessage);
-</script>
-<?php	}	?>
 </head>
 <body>
 <?php	require_once("./templates/header.tpl");		?>

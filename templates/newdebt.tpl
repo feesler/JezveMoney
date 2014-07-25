@@ -10,9 +10,7 @@
 	var trans_type = <?=$trans_type?>;
 	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
 	var edit_mode = false;
-<?php	if (isMessageSet()) {		?>
-	onReady(initMessage);
-<?php	}	?>
+
 	onReady(initControls);
 </script>
 </head>
