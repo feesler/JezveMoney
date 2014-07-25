@@ -1,7 +1,9 @@
 <?php	include("./templates/commonhdr.tpl");	?>
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
+<?php	if ($action == "edit") {	?>
 	var account_id = <?=$acc_id?>;
+<?php	}	?>
 	var acc_name = <?=f_json_encode($accInfo["name"])?>;
 	var acc_currency = <?=$accInfo["curr"]?>;
 	var acc_balance = <?=$accInfo["initbalance"]?>;
@@ -10,8 +12,12 @@
 </script>
 </head>
 <body>
+<?php	if ($action == "new") {		?>
+<form method="post" action="./modules/createaccount.php" onsubmit="return onNewAccountSubmit(this);">
+<?php	} else if ($action == "edit") {		?>
 <form method="post" action="./modules/editaccount.php" onsubmit="return onNewAccountSubmit(this);">
 <input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
+<?php	}	?>
 <div class="page">
 	<div class="page_wrapper">
 <?php	require_once("./templates/header.tpl");		?>
@@ -20,14 +26,15 @@
 				<div class="content_wrap">
 					<div class="heading h2_heading">
 						<h2><?=$headString?></h2>
+<?php	if ($action == "edit") {	?>
 						<div id="del_btn" class="iconlink"><button onclick="onDelete();" type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+<?php	}	?>
 					</div>
 
 					<div>
 						<div class="non_float std_margin">
-							<div id="acc_tile" class="tile<?=$accInfo["iconclass"]?>"><button class="tilelink" type="button" onclick="onTileClick(<?=$acc_id?>);"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name"><?=$accInfo["name"]?></span></span></button></div>
+							<div id="acc_tile" class="tile<?=$accInfo["iconclass"]?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name">New account</span></span></button></div>
 						</div>
-
 						<div class="non_float std_margin">
 							<label for="icon">Icon</label>
 							<div class="std_input">
@@ -44,12 +51,10 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="non_float std_margin">
 							<label for="accname">Account name</label>
 							<div class="stretch_input std_input"><div><input id="accname" name="accname" type="text" value="<?=$accInfo["name"]?>" oninput="return onAccNameInput(this);"></div></div>
 						</div>
-
 						<div class="non_float std_margin">
 							<label for="currency">Currency</label>
 							<div class="std_input">
@@ -66,7 +71,6 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="non_float std_margin">
 							<label for="balance">Initial balance</label>
 							<div>
@@ -78,7 +82,6 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
 					</div>
 				</div>
@@ -87,9 +90,10 @@
 	</div>
 </div>
 </form>
-
+<?php	if ($action == "edit") {	?>
 <form id="delform" method="post" action="./modules/delaccount.php">
 <input name="accounts" type="hidden" value="<?=$acc_id?>">
 </form>
+<?php	}	?>
 </body>
 </html>

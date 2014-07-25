@@ -31,10 +31,13 @@
 	}
 	else
 	{
-		$accInfo = array("name" => "");
-		$accInfo["curr"] = Currency::getIdByPos(0);
+		$accInfo = array("name" => "",
+						"curr" => Currency::getIdByPos(0),
+						"balance" => 0,
+						"initbalance" => 0,
+						"icon" => 0,
+						"iconclass" => "");
 		$accInfo["sign"] = Currency::getSign($accInfo["curr"]);
-		$accInfo["balance"] = 0.0;
 	}
 	$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
 
@@ -53,8 +56,5 @@
 		$jsArr[] = "popup.js";
 	}
 
-	if ($action == "edit")
-		include("./templates/editaccount.tpl");
-	else
-		include("./templates/newaccount.tpl");
+	include("./templates/account.tpl");
 ?>
