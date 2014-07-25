@@ -1,7 +1,7 @@
 <?php	include("./templates/commonhdr.tpl");	?>
 <script>
 var currency = <?=f_json_encode($currArr)?>;
-var acc_name = <?=json_encode($acc_name)?>;
+var acc_name = <?=json_encode($accInfo["name"])?>;
 var acc_currency = <?=$accInfo["curr"]?>;
 var acc_balance = <?=$accInfo["balance"]?>;
 

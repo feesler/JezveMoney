@@ -31,7 +31,7 @@
 	}
 	else
 	{
-		$accInfo = array("name" => "New account");
+		$accInfo = array("name" => "");
 		$accInfo["curr"] = Currency::getIdByPos(0);
 		$accInfo["sign"] = Currency::getSign($accInfo["curr"]);
 		$accInfo["balance"] = 0.0;
