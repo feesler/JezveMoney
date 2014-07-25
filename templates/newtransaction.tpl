@@ -196,7 +196,7 @@
 						</div>
 <?php	}	?>
 						<div class="non_float">
-							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$today?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
@@ -205,7 +205,7 @@
 									</div>
 									<div class="stretch_input rbtn_input">
 										<div>
-											<input id="date" name="date" type="text" value="<?=$today?>">
+											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 										</div>
 									</div>
 									<div id="calendar" class="calWrap" style="display: none;"></div>

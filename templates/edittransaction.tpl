@@ -70,7 +70,7 @@
 									</div>
 								</div>
 <?php	}	?>
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $tr["curr"])) {		?>
+<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCurr == $tr["curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
 								<div id="exch_left">
@@ -134,9 +134,9 @@
 							<div>
 								<div class="curr_container">
 <?php	if ($trans_type == 3) {		?>
-									<div class="btn rcurr_btn inact_rbtn"><div id="amountsign"><?=$amount_sign?></div></div>
+									<div class="btn rcurr_btn inact_rbtn"><div id="amountsign"><?=$amountSign?></div></div>
 <?php	} else {	?>
-									<div class="btn rcurr_btn"><div id="amountsign"><?=$amount_sign?></div></div>
+									<div class="btn rcurr_btn"><div id="amountsign"><?=$amountSign?></div></div>
 <?php	}	?>
 									<input id="transcurr" name="transcurr" type="hidden" value="<?=$tr["curr"]?>">
 								</div>
@@ -153,14 +153,14 @@
 							</div>
 						</div>
 
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCur == $tr["curr"])) {		?>
+<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCurr == $tr["curr"])) {		?>
 						<div id="chargeoff" class="non_float" style="display: none;">
 <?php	} else {	?>
 						<div id="chargeoff" class="non_float">
 <?php	}	?>
 							<div><label for="charge">Charge</label></div>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="chargesign"><?=$charge_sign?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="chargesign"><?=$chargeSign?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
 										<input id="charge" name="charge" class="summ_text" type="text" value="<?=$tr["charge"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">

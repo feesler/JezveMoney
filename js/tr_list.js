@@ -357,7 +357,7 @@ function onTransClick(tr_id)
 	if (transactions.selectedCount() == 1)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = './edittransaction.php?id=' + transactions.selectedArr[0];
+			edit_btn.firstElementChild.href = './transaction.php?act=edit&id=' + transactions.selectedArr[0];
 	}
 
 	show('toolbar', (transactions.selectedCount() > 0));
