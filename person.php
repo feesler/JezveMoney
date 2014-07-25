@@ -19,6 +19,7 @@
 	if ($action != "new" && $action != "edit")
 		fail();
 
+	$pName = "";
 	if ($action == "edit")
 	{
 		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
@@ -32,7 +33,8 @@
 	}
 	
 	$titleString = "Jezve Money | ";
-	$titleString .= ($action == "new") ? "New person" : "Edit person";
+	$headString = ($action == "new") ? "New person" : "Edit person";
+	$titleString .= $headString;
 
 	$cssArr = array("common.css", "iconlink.css", "tiles.css");
 	$jsArr = array("common.js", "ready.js", "persons.js");
@@ -42,8 +44,5 @@
 		$jsArr[] = "popup.js";
 	}
 
-	if ($action == "new")
-		include("./templates/newperson.tpl");
-	else if ($action == "edit")
-		include("./templates/editperson.tpl");
+	include("./templates/person.tpl");
 ?>
