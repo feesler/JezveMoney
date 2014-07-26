@@ -2,6 +2,7 @@
 <script>
 	var accounts = <?=f_json_encode($accArr)?>;
 	var currency = <?=f_json_encode($currArr)?>;
+<?php	if ($action == "edit") {	?>
 	var transaction =
 	{
 		srcAcc : <?=$tr["src_id"]?>,
@@ -12,18 +13,27 @@
 		type : <?=$tr["type"]?>
 
 	};
-	var edit_mode = true;
 	var trans_curr = <?=$tr["curr"]?>;
 	var trans_acc_curr = <?=$tr["curr"]?>;
 	var trans_type = <?=$tr["type"]?>;
+<?php	} else {	?>
+	var trans_curr = <?=$transCurr?>;
+	var trans_acc_curr = <?=$transAccCurr?>;
+	var trans_type = <?=$trans_type?>;
+<?php	}	?>
+	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
 
 	onReady(initControls);
 </script>
 </head>
 <body>
+<?php	if ($action == "new") {	?>
+<form method="post" action="./modules/transaction.php?type=<?=$type_str?>" onsubmit="<?=$onFormSubmit?>">
+<?php	} else if ($action == "edit") {	?>
 <form method="post" action="./modules/edittransaction.php" onsubmit="return onEditTransSubmit(this);">
 <input name="transid" type="hidden" value="<?=$tr["id"]?>">
 <input name="transtype" type="hidden" value="<?=$tr["type"]?>">
+<?php	}	?>
 <div class="page">
 	<div class="page_wrapper">
 <?php	require_once("./templates/header.tpl");	?>
@@ -31,8 +41,10 @@
 			<div class="content">
 				<div class="content_wrap">
 					<div class="heading h2_heading">
-						<h2>Edit transaction</h2>
+						<h2><?=$headString?></h2>
+<?php	if ($action == "edit") {	?>
 						<div id="del_btn" class="iconlink"><button onclick="onDelete();" type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+<?php	}	?>
 					</div>
 					<div>
 						<div id="trtype_menu" class="subHeader">
@@ -45,6 +57,11 @@
 		}	?>
 						</div>
 
+<?php	if ($action == "new" && $acc_count < 2 && $trans_type == 3) {	?>
+						<div class="align_block"><span>You need at lease two accounts for transfer.</span></div>
+<?php	} else if ($action == "new" && !$acc_count && $trans_type != 3) {		?>
+						<div class="align_block"><span>You have no one account. Please create one.</span></div>
+<?php	} else {		?>
 <?php	if ($trans_type == 1 || $trans_type == 3) {		?>
 						<div id="source" class="acc_float">
 							<div><label>Source account</label></div>
@@ -89,6 +106,7 @@
 							</div>
 						</div>
 <?php	}	?>
+
 <?php	if ($trans_type == 2 || $trans_type == 3) {		?>
 						<div id="destination" class="acc_float">
 							<div><label>Destination account</label></div>
@@ -104,7 +122,7 @@
 										<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtAmount?></span></button>
 									</div>
 								</div>
-<?php	if ($trans_type == 2) {	?>
+<?php	if ($trans_type == 2) {		?>
 								<div id="charge_left" style="display: none;">
 									<span>Charge</span>
 									<div>
@@ -118,7 +136,6 @@
 									</div>
 								</div>
 <?php	}	?>
-
 								<div id="dest_res_balance_left">
 									<span>Result balance</span>
 									<div>
@@ -128,7 +145,6 @@
 							</div>
 						</div>
 <?php	}	?>
-
 						<div id="amount_row" class="non_float">
 							<div><label for="amount">Amount</label></div>
 							<div>
@@ -138,16 +154,19 @@
 <?php	} else {	?>
 									<div class="btn rcurr_btn"><div id="amountsign"><?=$amountSign?></div></div>
 <?php	}	?>
-									<input id="transcurr" name="transcurr" type="hidden" value="<?=$tr["curr"]?>">
+									<input id="transcurr" name="transcurr" type="hidden" value="<?=$amountCurr?>">
 								</div>
-
 <?php	if ($trans_type == 3) {		?>
 								<div class="stretch_input trans_input">
 <?php	} else {	?>
 								<div class="stretch_input rbtn_input">
 <?php	}	?>
 									<div>
+<?php	if ($action == "edit") {	?>
 										<input id="amount" name="amount" class="summ_text" type="text" value="<?=$tr["amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+<?php	} else {	?>
+										<input id="amount" name="amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+<?php	}	?>
 									</div>
 								</div>
 							</div>
@@ -163,7 +182,11 @@
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="chargesign"><?=$chargeSign?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
+<?php	if ($action == "edit") {	?>
 										<input id="charge" name="charge" class="summ_text" type="text" value="<?=$tr["charge"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+<?php	} else {	?>
+										<input id="charge" name="charge" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+<?php	}	?>
 									</div>
 								</div>
 							</div>
@@ -194,6 +217,7 @@
 							</div>
 						</div>
 <?php	}	?>
+
 <?php	if ($trans_type == 2 || $trans_type == 3) {		?>
 						<div id="result_balance_dest" class="non_float" style="display: none;">
 							<div><label for="resbal_d"><?=$destBalTitle?></label></div>
@@ -207,7 +231,6 @@
 							</div>
 						</div>
 <?php	}	?>
-
 						<div class="non_float">
 							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
 							<div id="date_block" style="display: none;">
@@ -246,6 +269,7 @@
 						</div>
 
 						<div class="acc_controls"><input id="submitbtn" class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
+<?php	}	?>
 					</div>
 				</div>
 			</div>
@@ -253,8 +277,10 @@
 	</div>
 </div>
 </form>
+<?php	if ($action == "edit") {	?>
 <form id="delform" method="post" action="./modules/deltransaction.php">
 <input name="transactions" type="hidden" value="<?=$tr["id"]?>">
 </form>
+<?php	}	?>
 </body>
 </html>

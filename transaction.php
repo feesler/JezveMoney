@@ -66,7 +66,13 @@ if ($action == "new")
 	if ($trans_type == 3)
 		$dest_id = $acc->getAnother($src_id);
 
-	$tr = array("src_id" => $src_id, "dest_id" => $dest_id, "amount" => 0, "charge" => 0, "type" => $trans_type);
+	$tr = array("src_id" => $src_id,
+				"dest_id" => $dest_id,
+				"amount" => 0,
+				"charge" => 0,
+				"curr" => $acc->getCurrency($acc_id),
+				"type" => $trans_type,
+				"comment" => "");
 
 }
 else
@@ -157,6 +163,7 @@ else
 	$transAccCurr = $acc->getCurrency($transAcc_id);
 
 	$amountSign = Currency::getSign($tr["curr"]);
+	$amountCurr = $tr["curr"];
 	$chargeSign = Currency::getSign($transAccCurr);
 }
 
@@ -183,8 +190,5 @@ else
 		$jsArr[] = "popup.js";
 	}
 
-	if ($action == "edit")
-		include("./templates/edittransaction.tpl");
-	else
-		include("./templates/newtransaction.tpl");
+	include("./templates/transaction.tpl");
 ?>
