@@ -147,7 +147,7 @@
 							<div><label for="amount">Amount</label></div>
 							<div>
 								<div class="curr_container">
-									<div class="btn rcurr_btn"><div id="amountsign"><?=$amount_sign?></div></div>
+									<div class="btn rcurr_btn"><div id="amountsign"><?=$amountSign?></div></div>
 									<input id="transcurr" name="transcurr" type="hidden" value="<?=$amountCurr?>">
 								</div>
 
@@ -166,7 +166,7 @@
 <?php	}	?>
 							<div><label for="charge">Charge</label></div>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="chargesign"><?=$charge_sign?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="chargesign"><?=$chargeSign?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
 										<input id="charge" name="charge" class="summ_text" type="text" value="<?=$tr["charge"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
@@ -190,7 +190,7 @@
 						<div id="result_balance" class="non_float" style="display: none;">
 							<div><label for="resbal">Result balance (Person)</label></div>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$amount_sign?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$amountSign?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
 										<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">

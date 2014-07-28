@@ -43,9 +43,7 @@ if ($action == "new")
 
 	if ($trans_type == 4)
 	{
-		$newDebtLocation = "./newdebt.php";
-		if (!$acc_id || !$acc->is_exist($acc_id))
-			$newDebtLocation .= "?acc_id=".$acc_id;
+		$newDebtLocation = "./debt.php?act=new".(is_empty($_SERVER["QUERY_STRING"]) ? "" : "&".$_SERVER["QUERY_STRING"]);
 		setLocation($newDebtLocation);
 	}
 
@@ -89,7 +87,10 @@ else
 	$trans_type = $tr["type"];			// TODO : temporarily
 
 	if ($trans_type == 4)
-		setLocation("./editdebt.php?id=".$trans_id);
+	{
+		$editDebtLocation = "./debt.php?act=edit".(is_empty($_SERVER["QUERY_STRING"]) ? "" : "&".$_SERVER["QUERY_STRING"]);
+		setLocation($editDebtLocation);
+	}
 }
 
 	$acc_count = $acc->getCount();
@@ -110,10 +111,10 @@ else
 
 		$transMenu[] = array(($ind + 1), $trTypeName, urlJoin($baseUrl, $params));
 	}
-	$params = array();
+	$params = array("act" => "new");
 	if ($acc_id != 0)
 		$params["acc_id"] = $acc_id;
-	$transMenu[] = array(($ind + 2), "Debt", urlJoin("./newdebt.php", $params));
+	$transMenu[] = array(($ind + 2), "Debt", urlJoin("./debt.php", $params));
 
 	$currArr = Currency::getArray(TRUE);
 	$accArr = $acc->getArray();

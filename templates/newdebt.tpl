@@ -37,14 +37,14 @@
 						<div class="align_block"><span>You have no one account. Please create one.</span></div>
 <?php	} else {		?>
 						<div id="person" class="acc_float">
-							<input id="person_id" name="person_id" type="hidden" value="<?=$fperson_id?>">
+							<input id="person_id" name="person_id" type="hidden" value="<?=$person_id?>">
 							<div><label>Person name</label></div>
 							<div>
 								<div class="tile_container">
 <?php	if (!$person->getCount()) {		?>
-									<div id="person_tile inact" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$fp_balfmt?></span><span class="acc_name"></span></span></div></div>
+									<div id="person_tile inact" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"></span></span></div></div>
 <?php	} else {	?>
-									<div id="person_tile" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$fp_balfmt?></span><span class="acc_name"><?=$fperson_name?></span></span></div></div>
+									<div id="person_tile" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"><?=$person_name?></span></span></div></div>
 <?php	}		?>
 								</div>
 
@@ -171,7 +171,7 @@
 						</div>
 
 						<div class="non_float">
-							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$today?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
@@ -180,7 +180,7 @@
 									</div>
 									<div class="stretch_input rbtn_input">
 										<div>
-											<input id="date" name="date" type="text" value="<?=$today?>">
+											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 										</div>
 									</div>
 									<div id="calendar" class="calWrap" style="display: none;"></div>
