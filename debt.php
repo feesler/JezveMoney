@@ -46,7 +46,7 @@ if ($action == "new")
 	$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
 	$person_balance = $person_res_balance;
 
-	$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "type" => 4);
+	$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "curr" => $debtAcc["curr"], "type" => 4, "comment" => "");
 	$trans_type = 4;
 	$give = TRUE;
 }
@@ -163,7 +163,8 @@ else
 	$dateFmt = ($action == "new") ? date("d.m.Y") : date("d.m.Y", strtotime($tr["date"]));
 
 	$titleString = "Jezve Money | ";
-	$titleString .= ($action == "new") ? "New debt" : "Edit debt";
+	$headString = ($action == "new") ? "New debt" : "Edit debt";
+	$titleString .= $headString;
 
 	$cssArr = array("common.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 	$jsArr = array("common.js", "currency.js", "account.js", "ready.js", "calendar.js", "ddlist.js", "transaction.js", "transaction_layout.js");
@@ -173,8 +174,5 @@ else
 		$jsArr[] = "popup.js";
 	}
 
-	if ($action == "new")
-		include("./templates/newdebt.tpl");
-	else
-		include("./templates/editdebt.tpl");
+	include("./templates/debt.tpl");
 ?>
