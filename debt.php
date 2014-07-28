@@ -24,44 +24,44 @@
 	if ($action != "new" && $action != "edit")
 		fail();
 
-if ($action == "new")
-{
-	// check predefined account
-	$acc_id = 0;
-	if (isset($_GET["acc_id"]))
-		$acc_id = intval($_GET["acc_id"]);
-	if (!$acc_id || !$acc->is_exist($acc_id))		// TODO : think about redirect or warning message
-		$acc_id = $acc->getIdByPos(0);
-	if (!$acc_id)
-		fail();
+	if ($action == "new")
+	{
+		// check predefined account
+		$acc_id = 0;
+		if (isset($_GET["acc_id"]))
+			$acc_id = intval($_GET["acc_id"]);
+		if (!$acc_id || !$acc->is_exist($acc_id))		// TODO : think about redirect or warning message
+			$acc_id = $acc->getIdByPos(0);
+		if (!$acc_id)
+			fail();
 
-	$debtAcc = $acc->getProperties($acc_id);
+		$debtAcc = $acc->getProperties($acc_id);
 
-	// Prepare person account
-	$person_id = $person->getIdByPos(0);
-	$person_name = $person->getName($person_id);
+		// Prepare person account
+		$person_id = $person->getIdByPos(0);
+		$person_name = $person->getName($person_id);
 
-	$person_acc_id = $person->getAccount($person_id, $debtAcc["curr"]);
-	$person_acc = $acc->getProperties($person_acc_id);
-	$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
-	$person_balance = $person_res_balance;
+		$person_acc_id = $person->getAccount($person_id, $debtAcc["curr"]);
+		$person_acc = $acc->getProperties($person_acc_id);
+		$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
+		$person_balance = $person_res_balance;
 
-	$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "curr" => $debtAcc["curr"], "type" => 4, "comment" => "");
-	$trans_type = 4;
-	$give = TRUE;
-}
-else
-{
-	if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
-		fail(ERR_DEBT_UPDATE);
+		$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "curr" => $debtAcc["curr"], "type" => 4, "comment" => "");
+		$trans_type = 4;
+		$give = TRUE;
+	}
+	else
+	{
+		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
+			fail(ERR_DEBT_UPDATE);
 
-	$trans_id = intval($_GET["id"]);
-	if (!$trans->is_exist($trans_id))
-		fail(ERR_DEBT_UPDATE);
+		$trans_id = intval($_GET["id"]);
+		if (!$trans->is_exist($trans_id))
+			fail(ERR_DEBT_UPDATE);
 
-	$tr = $trans->getProperties($trans_id);
-	$trans_type = $tr["type"];			// TODO : temporarily
-}
+		$tr = $trans->getProperties($trans_id);
+		$trans_type = $tr["type"];			// TODO : temporarily
+	}
 
 	// Prepare transaction types menu
 	$trTypes = array("Expense", "Income", "Transfer");
@@ -85,50 +85,50 @@ else
 	$accArr = $acc->getArray();
 	$persArr = $person->getArray();
 
-if ($action == "new")
-{
-	$tr["src_id"] = $person_acc_id;
-
-	$noAccount = FALSE;
-
-	$amountCurr = $debtAcc["curr"];
-	$chargeCurr = $debtAcc["curr"];
-}
-else
-{
-	// get information about source and destination accounts
-	$src = $acc->getProperties($tr["src_id"]);
-	$dest = $acc->getProperties($tr["dest_id"]);
-
-	$user_owner = $u->getOwner($user_id);
-	$give = (!is_null($src) && $src["owner"] != $user_owner);
-
-	$person_id = ($give) ? $src["owner"] : $dest["owner"];
-	$person_name = $person->getName($person_id);
-
-	$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
-	$person_acc = $acc->getProperties($person_acc_id);
-	$person_res_balance = $person_acc["balance"];
-	$person_balance = $person_res_balance + (($give) ? $tr["amount"] : -$tr["amount"]);
-
-	$debtAcc = $give ? $dest : $src;
-	$noAccount = is_null($debtAcc);
-
-	$amountCurr = $tr["curr"];
-	if ($noAccount)
+	if ($action == "new")
 	{
-		$chargeCurr = $person_acc["curr"];
-		$acc_id = $acc->getIdByPos(0);
-		$acc_name = $acc->getName($acc_id);
-		$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
-		$acc_ic = $acc->getIconClass($acc->getIcon($acc_id));
+		$tr["src_id"] = $person_acc_id;
+
+		$noAccount = FALSE;
+
+		$amountCurr = $debtAcc["curr"];
+		$chargeCurr = $debtAcc["curr"];
 	}
 	else
 	{
-		$acc_id = 0;
-		$chargeCurr = $debtAcc["curr"];
+		// get information about source and destination accounts
+		$src = $acc->getProperties($tr["src_id"]);
+		$dest = $acc->getProperties($tr["dest_id"]);
+
+		$user_owner = $u->getOwner($user_id);
+		$give = (!is_null($src) && $src["owner"] != $user_owner);
+
+		$person_id = ($give) ? $src["owner"] : $dest["owner"];
+		$person_name = $person->getName($person_id);
+
+		$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
+		$person_acc = $acc->getProperties($person_acc_id);
+		$person_res_balance = $person_acc["balance"];
+		$person_balance = $person_res_balance + (($give) ? $tr["amount"] : -$tr["amount"]);
+
+		$debtAcc = $give ? $dest : $src;
+		$noAccount = is_null($debtAcc);
+
+		$amountCurr = $tr["curr"];
+		if ($noAccount)
+		{
+			$chargeCurr = $person_acc["curr"];
+			$acc_id = $acc->getIdByPos(0);
+			$acc_name = $acc->getName($acc_id);
+			$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
+			$acc_ic = $acc->getIconClass($acc->getIcon($acc_id));
+		}
+		else
+		{
+			$acc_id = 0;
+			$chargeCurr = $debtAcc["curr"];
+		}
 	}
-}
 
 	$acc = new Account($user_id);
 	$acc_count = $acc->getCount();
