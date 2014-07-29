@@ -27,10 +27,8 @@
 </script>
 </head>
 <body>
-<?php	if ($action == "new") {		?>
-<form method="post" action="./modules/debt.php" onsubmit="return onDebtSubmit(this);">
-<?php	} else {	?>
-<form method="post" action="./modules/editdebt.php" onsubmit="return onDebtSubmit(this);">
+<form method="post" action="./modules/debt.php?act=<?=$action?>" onsubmit="return onDebtSubmit(this);">
+<?php	if ($action == "edit") {		?>
 <input name="transid" type="hidden" value="<?=$tr["id"]?>">
 <input name="transtype" type="hidden" value="<?=$tr["type"]?>">
 <?php	}	?>
