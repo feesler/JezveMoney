@@ -79,7 +79,7 @@ function selectCurrency(id)
 	currObj = findCurrency(id);
 	if (currObj)
 	{
-		curr_frm.action = '../modules/editcurrency.php';
+		curr_frm.action = '../modules/currency.php?act=edit';
 		setCurrencyValues(currObj);
 		show('del_btn', true);
 	}
@@ -117,7 +117,7 @@ function newCurr()
 	if (!curr_frm)
 		return;
 
-	curr_frm.action = '../modules/createcurrency.php';
+	curr_frm.action = '../modules/currency.php?act=new';
 	setCurrencyValues(null);
 
 	show('del_btn', false);
@@ -174,12 +174,12 @@ function onDeleteSubmit(frm)
 
 <input type="button" value="new" onclick="newCurr()">
 
-<form method="post" action="../modules/delcurrency.php" onsubmit="return onDeleteSubmit(this);">
+<form method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
 <input id="del_curr_id" name="curr_id" type="hidden">
 <div id="del_btn" style="display: none;"><input type="submit" value="delete"></div>
 </form>
 
-<form id="curr_frm" method="post" action="../modules/createcurrency.php">
+<form id="curr_frm" method="post" action="../modules/currency.php?act=new">
 <input id="curr_id" name="curr_id" type="hidden"><br>
 <label for="curr_name">name</label><br><input id="curr_name" name="curr_name" type="text"><br>
 <label for="curr_sign">sign</label><br><input id="curr_sign" name="curr_sign" type="text"><br>
