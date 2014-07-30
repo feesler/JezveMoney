@@ -20,10 +20,18 @@
 	if ($action != "new" && $action != "edit")
 		fail();
 
-	$defMsg = ($action == "edit") ? ERR_ACCOUNT_UPDATE : ERR_ACCOUNT_CREATE;
+	if ($action == "new")
+		$defMsg = ERR_ACCOUNT_CREATE;
+	else if ($action == "edit")
+		$defMsg = ERR_ACCOUNT_UPDATE;
+	else if ($action == "del")
+		$defMsg = ERR_ACCOUNT_DELETE;
 
-	if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
-		fail($defMsg);
+	if ($action == "new" || $action == "edit")
+	{
+		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
+			fail($defMsg);
+	}
 
 	$acc = new Account($user_id);
 	if ($action == "new")
@@ -43,6 +51,22 @@
 			fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_UPDATE);
+	}
+	else if ($action == "del")
+	{
+		if (!isset($_POST["accounts"]))
+			fail($defMsg);
+
+		$acc_list = $db->escape($_POST["accounts"]);
+		$acc_arr = explode(",", $acc_list);
+		foreach($acc_arr as $acc_id)
+		{
+			$acc_id = intval($acc_id);
+			if (!$acc->del($acc_id))
+				fail($defMsg);
+		}
+
+		setMessage(MSG_ACCOUNT_DELETE);
 	}
 
 	setLocation("../accounts.php");
