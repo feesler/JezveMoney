@@ -35,7 +35,7 @@
 		</div>
 	</div>
 </div>
-<form id="delform" method="post" action="./modules/delperson.php">
+<form id="delform" method="post" action="./modules/person.php?act=del">
 <input id="delpersons" name="persons" type="hidden" value="">
 </form>
 </body>

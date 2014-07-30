@@ -7,10 +7,8 @@
 <?php	}	?>
 </head>
 <body>
-<?php	if ($action == "new") {		?>
-<form method="post" action="./modules/createperson.php" onsubmit="return onNewPersonSubmit(this);">
-<?php	} else if ($action == "edit") {		?>
-<form method="post" action="./modules/editperson.php" onsubmit="return onEditPersonSubmit(this);">
+<form method="post" action="./modules/person.php?act=<?=$action?>" onsubmit="<?=$submitHandler?>">
+<?php	if ($action == "edit") {		?>
 <input id="pid" name="pid" type="hidden" value="<?=$p_id?>">
 <?php	}	?>
 <div class="page">
@@ -42,7 +40,7 @@
 </div>
 </form>
 <?php	if ($action == "edit") {		?>
-<form id="delform" method="post" action="./modules/delperson.php">
+<form id="delform" method="post" action="./modules/person.php?act=del">
 <input name="persons" type="hidden" value="<?=$p_id?>">
 </form>
 <?php	}	?>

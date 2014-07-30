@@ -36,6 +36,8 @@
 	$headString = ($action == "new") ? "New person" : "Edit person";
 	$titleString .= $headString;
 
+	$submitHandler = ($action == "new") ? "return onNewPersonSubmit(this);" : "return onEditPersonSubmit(this);";
+
 	$cssArr = array("common.css", "iconlink.css", "tiles.css");
 	$jsArr = array("common.js", "ready.js", "persons.js");
 	if ($action == "edit")
