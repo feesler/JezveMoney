@@ -276,7 +276,7 @@
 </div>
 </form>
 <?php	if ($action == "edit") {	?>
-<form id="delform" method="post" action="./modules/deltransaction.php">
+<form id="delform" method="post" action="./modules/transaction.php?act=del">
 <input name="transactions" type="hidden" value="<?=$tr["id"]?>">
 </form>
 <?php	}	?>
