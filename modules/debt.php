@@ -6,7 +6,6 @@
 	{
 		if (!is_null($msg))
 			setMessage($msg);
-		setMessage(ERR_DEBT_CREATE);
 		setLocation("../transactions.php?type=debt");
 	}
 
