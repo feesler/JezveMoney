@@ -117,7 +117,16 @@
 	$currArr = Currency::getArray(TRUE);
 	$accArr = $acc->getArray();
 
-	$onFormSubmit = "return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);";
+	$formAction = "./modules/transaction.php?act=".$action;
+	if ($action == "new")
+	{
+		$formAction .= "&type=".$type_str;
+		$onFormSubmit = "return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);";
+	}
+	else if ($action == "edit")
+	{
+		$onFormSubmit = "return onEditTransSubmit(this);";
+	}
 
 	if ($trans_type == 1 || $trans_type == 3)
 	{

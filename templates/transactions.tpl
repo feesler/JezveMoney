@@ -100,7 +100,7 @@
 		</div>
 	</div>
 </div>
-<form id="delform" method="post" action="./modules/deltransaction.php">
+<form id="delform" method="post" action="./modules/transaction.php?act=del">
 <input id="deltrans" name="transactions" type="hidden" value="">
 </form>
 </body>

@@ -27,10 +27,8 @@
 </script>
 </head>
 <body>
-<?php	if ($action == "new") {	?>
-<form method="post" action="./modules/transaction.php?type=<?=$type_str?>" onsubmit="<?=$onFormSubmit?>">
-<?php	} else if ($action == "edit") {	?>
-<form method="post" action="./modules/edittransaction.php" onsubmit="return onEditTransSubmit(this);">
+<form method="post" action="<?=$formAction?>" onsubmit="<?=$onFormSubmit?>">
+<?php	if ($action == "edit") {	?>
 <input name="transid" type="hidden" value="<?=$tr["id"]?>">
 <input name="transtype" type="hidden" value="<?=$tr["type"]?>">
 <?php	}	?>
