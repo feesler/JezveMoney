@@ -17,7 +17,7 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "new" && $action != "edit")
+	if ($action != "new" && $action != "edit" && $action != "del")
 		fail();
 
 	if ($action == "new")
