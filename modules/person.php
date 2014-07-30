@@ -2,9 +2,10 @@
 	require_once("../setup.php");
 
 
-	function fail($msg = ERR_PERSON_CREATE)
+	function fail($msg = NULL)
 	{
-		setMessage(ERR_PERSON_CREATE);
+		if (!is_null($msg))
+			setMessage($msg);
 		setLocation("../persons.php");
 	}
 
