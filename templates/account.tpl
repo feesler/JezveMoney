@@ -12,10 +12,8 @@
 </script>
 </head>
 <body>
-<?php	if ($action == "new") {		?>
-<form method="post" action="./modules/createaccount.php" onsubmit="return onNewAccountSubmit(this);">
-<?php	} else if ($action == "edit") {		?>
-<form method="post" action="./modules/editaccount.php" onsubmit="return onNewAccountSubmit(this);">
+<form method="post" action="./modules/account.php?act=<?=$action?>" onsubmit="return onNewAccountSubmit(this);">
+<?php	if ($action == "edit") {		?>
 <input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
 <?php	}	?>
 <div class="page">
