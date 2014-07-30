@@ -40,7 +40,7 @@
 		</div>
 	</div>
 </div>
-<form id="delform" method="post" action="./modules/delaccount.php">
+<form id="delform" method="post" action="./modules/account.php?act=del">
 <input id="delaccounts" name="accounts" type="hidden" value="">
 </form>
 </body>
