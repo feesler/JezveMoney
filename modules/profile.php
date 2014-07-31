@@ -53,12 +53,7 @@
 		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
 			fail($defMsg);
 
-wlog("user_id: ".$user_id);
-
 		$login = $u->getLogin($user_id);
-
-wlog("login: ".$login);
-
 		if (!$u->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
 			fail($defMsg);
 
