@@ -174,7 +174,7 @@ class User extends CachedTable
 	// Return login of user
 	public function getLogin($id)
 	{
-		return $this->getCache($id, "name");
+		return $this->getCache($id, "login");
 	}
 
 
