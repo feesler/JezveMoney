@@ -4,9 +4,14 @@
 
 	function fail($msg = NULL)
 	{
+		global $action;
+
 		if (!is_null($msg))
 			setMessage($msg);
-		setLocation("../accounts.php");
+		if ($action == "reset")
+			setLocation("../profile.php");
+		else
+			setLocation("../accounts.php");
 	}
 
 
@@ -17,7 +22,7 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "new" && $action != "edit" && $action != "del")
+	if ($action != "new" && $action != "edit" && $action != "del" && $action != "reset")
 		fail();
 
 	if ($action == "new")
@@ -26,6 +31,8 @@
 		$defMsg = ERR_ACCOUNT_UPDATE;
 	else if ($action == "del")
 		$defMsg = ERR_ACCOUNT_DELETE;
+	else if ($action == "del")
+		$defMsg = ERR_ACCOUNTS_RESET;
 
 	if ($action == "new" || $action == "edit")
 	{
@@ -67,6 +74,12 @@
 		}
 
 		setMessage(MSG_ACCOUNT_DELETE);
+	}
+	else if ($action == "reset")
+	{
+		if (!$acc->reset())
+			fail($defMsg);
+		setMessage(MSG_ACCOUNTS_RESET);
 	}
 
 	setLocation("../accounts.php");
