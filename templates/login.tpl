@@ -2,7 +2,7 @@
 </head>
 <body>
 <?php	require_once("./templates/header.tpl");		?>
-<form action="./modules/login.php" method="post" onsubmit="return onLoginSubmit(this);">
+<form action="./modules/user.php?act=login" method="post" onsubmit="return onLoginSubmit(this);">
 <div class="layer login_layer">
 	<div class="cont">
 		<div class="box">
