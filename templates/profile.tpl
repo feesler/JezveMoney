@@ -40,14 +40,14 @@
 							<input class="btn ok_btn" type="button" onclick="showResetAccountsPopup();" value="Reset"></span>
 						</div>
 						<div style="margin-top: 15px;">
-							<form id="resetall_form" method="post" action="./modules/resetall.php">
+							<form id="resetall_form" method="post" action="./modules/profile.php?act=resetall">
 							</form>
 							<span>You may also reset all your data and start from the scratch.<br>
 							<input class="btn ok_btn" type="button" onclick="showResetAllPopup();" value="Reset all"></span>
 						</div>
 					</div>
 <?php	if ($action == "changepassword") {		?>
-					<form method="post" action="./modules/changepassword.php" onsubmit="return onChangePassSubmit(this);">
+					<form method="post" action="./modules/profile.php?act=changepass" onsubmit="return onChangePassSubmit(this);">
 						<h2>Change password</h2>
 						<div>
 							<div class="non_float">
@@ -64,7 +64,7 @@
 						</div>
 					</form>
 <?php	} else if ($action == "changename") {		?>
-					<form method="post" action="./modules/changename.php" onsubmit="return onChangeNameSubmit(this);">
+					<form method="post" action="./modules/profile.php?act=changename" onsubmit="return onChangeNameSubmit(this);">
 					<h2>Change name</h2>
 					<div>
 						<div class="non_float">
