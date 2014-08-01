@@ -51,46 +51,46 @@
 		if (!$acc_id)
 			fail($defMsg);
 
-if ($trans_type == 4)
-{
-		$debt = new Debt($user_id);
-		$person = new Person($user_id);
+		if ($trans_type == 4)
+		{
+			$debt = new Debt($user_id);
+			$person = new Person($user_id);
 
-		$debtAcc = $acc->getProperties($acc_id);
+			$debtAcc = $acc->getProperties($acc_id);
 
-		// Prepare person account
-		$person_id = $person->getIdByPos(0);
-		$person_name = $person->getName($person_id);
+			// Prepare person account
+			$person_id = $person->getIdByPos(0);
+			$person_name = $person->getName($person_id);
 
-		$person_acc_id = $person->getAccount($person_id, $debtAcc["curr"]);
-		$person_acc = $acc->getProperties($person_acc_id);
-		$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
-		$person_balance = $person_res_balance;
+			$person_acc_id = $person->getAccount($person_id, $debtAcc["curr"]);
+			$person_acc = $acc->getProperties($person_acc_id);
+			$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
+			$person_balance = $person_res_balance;
 
-		$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => "");
-		$give = TRUE;
-}
-else
-{
-		// set source and destination accounts
-		$src_id = 0;
-		$dest_id = 0;
-		if ($trans_type == 1 || $trans_type == 3)			// expense or transfer
-			$src_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
-		else if ($trans_type == 2)		// income
-			$dest_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
+			$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => "");
+			$give = TRUE;
+		}
+		else
+		{
+			// set source and destination accounts
+			$src_id = 0;
+			$dest_id = 0;
+			if ($trans_type == 1 || $trans_type == 3)			// expense or transfer
+				$src_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
+			else if ($trans_type == 2)		// income
+				$dest_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
 
-		if ($trans_type == 3)
-			$dest_id = $acc->getAnother($src_id);
+			if ($trans_type == 3)
+				$dest_id = $acc->getAnother($src_id);
 
-		$tr = array("src_id" => $src_id,
-					"dest_id" => $dest_id,
-					"amount" => 0,
-					"charge" => 0,
-					"curr" => $acc->getCurrency($acc_id),
-					"type" => $trans_type,
-					"comment" => "");
-}
+			$tr = array("src_id" => $src_id,
+						"dest_id" => $dest_id,
+						"amount" => 0,
+						"charge" => 0,
+						"curr" => $acc->getCurrency($acc_id),
+						"type" => $trans_type,
+						"comment" => "");
+		}
 	}
 	else
 	{
@@ -115,12 +115,12 @@ else
 
 	$acc_count = $acc->getCount();
 
-if ($trans_type != 4)
-{
-	// get information about source and destination accounts
-	$src = $acc->getProperties($tr["src_id"]);
-	$dest = $acc->getProperties($tr["dest_id"]);
-}
+	if ($trans_type != 4)
+	{
+		// get information about source and destination accounts
+		$src = $acc->getProperties($tr["src_id"]);
+		$dest = $acc->getProperties($tr["dest_id"]);
+	}
 
 	// Prepare transaction types menu
 	$trTypes = array("Expense", "Income", "Transfer", "Debt");
@@ -138,8 +138,8 @@ if ($trans_type != 4)
 	// Common arrays
 	$currArr = Currency::getArray(TRUE);
 	$accArr = $acc->getArray();
-if ($trans_type == 4)
-	$persArr = $person->getArray();
+	if ($trans_type == 4)
+		$persArr = $person->getArray();
 
 	$formAction = "./modules/transaction.php?act=".$action;
 	if ($action == "new")
@@ -178,94 +178,94 @@ if ($trans_type == 4)
 	$transAccCurr = 0;		// currency of transaction account
 	if ($action == "new")
 	{
-if ($trans_type != 4)
-{
-		$transCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
-		$transAccCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
-
-		$amountCurr = $transCurr;
-		$chargeCurr = $transAccCurr;
-}
-else
-{
-		$tr["src_id"] = $person_acc_id;
-
-		$noAccount = FALSE;
-
-		$amountCurr = $debtAcc["curr"];
-		$chargeCurr = $debtAcc["curr"];
-}
-	}
-	else
-	{
-if ($trans_type != 4)
-{
-		if ((($trans_type == 1 && $tr["dest_id"] == 0) || ($trans_type == 3 && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
-			$transAcc_id = $tr["src_id"];
-		else if ($trans_type == 2 && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
-			$transAcc_id = $tr["dest_id"];
-
-		$transAccCurr = $acc->getCurrency($transAcc_id);
-
-		$amountCurr = $tr["curr"];
-		$chargeCurr = $transAccCurr;
-}
-else
-{
-		// get information about source and destination accounts
-		$src = $acc->getProperties($tr["src_id"]);
-		$dest = $acc->getProperties($tr["dest_id"]);
-
-		$user_owner = $u->getOwner($user_id);
-		$give = (!is_null($src) && $src["owner"] != $user_owner);
-
-		$person_id = ($give) ? $src["owner"] : $dest["owner"];
-		$person_name = $person->getName($person_id);
-
-		$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
-		$person_acc = $acc->getProperties($person_acc_id);
-		$person_res_balance = $person_acc["balance"];
-		$person_balance = $person_res_balance + (($give) ? $tr["amount"] : -$tr["amount"]);
-
-		$debtAcc = $give ? $dest : $src;
-		$noAccount = is_null($debtAcc);
-
-		$amountCurr = $tr["curr"];
-		if ($noAccount)
+		if ($trans_type != 4)
 		{
-			$chargeCurr = $person_acc["curr"];
-			$acc_id = $acc->getIdByPos(0);
-			$acc_name = $acc->getName($acc_id);
-			$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
-			$acc_ic = $acc->getIconClass($acc->getIcon($acc_id));
+			$transCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
+			$transAccCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
+
+			$amountCurr = $transCurr;
+			$chargeCurr = $transAccCurr;
 		}
 		else
 		{
-			$acc_id = 0;
+			$tr["src_id"] = $person_acc_id;
+
+			$noAccount = FALSE;
+
+			$amountCurr = $debtAcc["curr"];
 			$chargeCurr = $debtAcc["curr"];
 		}
-}
-	}
-
-
-if ($trans_type == 4)
-{
-	if ($noAccount)
-	{
-		$accLbl = "No account";
 	}
 	else
 	{
-		if ($give)
-			$accLbl = "Destination account";
+		if ($trans_type != 4)
+		{
+			if ((($trans_type == 1 && $tr["dest_id"] == 0) || ($trans_type == 3 && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
+				$transAcc_id = $tr["src_id"];
+			else if ($trans_type == 2 && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
+				$transAcc_id = $tr["dest_id"];
+
+			$transAccCurr = $acc->getCurrency($transAcc_id);
+
+			$amountCurr = $tr["curr"];
+			$chargeCurr = $transAccCurr;
+		}
 		else
-			$accLbl = "Source account";
+		{
+			// get information about source and destination accounts
+			$src = $acc->getProperties($tr["src_id"]);
+			$dest = $acc->getProperties($tr["dest_id"]);
+
+			$user_owner = $u->getOwner($user_id);
+			$give = (!is_null($src) && $src["owner"] != $user_owner);
+
+			$person_id = ($give) ? $src["owner"] : $dest["owner"];
+			$person_name = $person->getName($person_id);
+
+			$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
+			$person_acc = $acc->getProperties($person_acc_id);
+			$person_res_balance = $person_acc["balance"];
+			$person_balance = $person_res_balance + (($give) ? $tr["amount"] : -$tr["amount"]);
+
+			$debtAcc = $give ? $dest : $src;
+			$noAccount = is_null($debtAcc);
+
+			$amountCurr = $tr["curr"];
+			if ($noAccount)
+			{
+				$chargeCurr = $person_acc["curr"];
+				$acc_id = $acc->getIdByPos(0);
+				$acc_name = $acc->getName($acc_id);
+				$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
+				$acc_ic = $acc->getIconClass($acc->getIcon($acc_id));
+			}
+			else
+			{
+				$acc_id = 0;
+				$chargeCurr = $debtAcc["curr"];
+			}
+		}
 	}
 
-	$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] + $tr["charge"], $debtAcc["curr"]);
 
-	$p_balfmt = Currency::format($person_balance, $amountCurr);
-}
+	if ($trans_type == 4)
+	{
+		if ($noAccount)
+		{
+			$accLbl = "No account";
+		}
+		else
+		{
+			if ($give)
+				$accLbl = "Destination account";
+			else
+				$accLbl = "Source account";
+		}
+
+		$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] + $tr["charge"], $debtAcc["curr"]);
+
+		$p_balfmt = Currency::format($person_balance, $amountCurr);
+	}
 
 	$amountSign = Currency::getSign($amountCurr);
 	$chargeSign = Currency::getSign($chargeCurr);
@@ -275,16 +275,16 @@ if ($trans_type == 4)
 	$rtAmount = Currency::format($tr["amount"], $amountCurr);
 	$rtCharge = Currency::format($tr["charge"], $chargeCurr);
 	$rtExchange = $exchValue." ".$exchSign;
-if ($trans_type != 4)
-{
-	$rtSrcResBal = Currency::format($src["balance"], $src["curr"]);
-	$rtDestResBal = Currency::format($dest["balance"], $dest["curr"]);
-}
-else
-{
-	$rtSrcResBal = Currency::format($person_res_balance, $amountCurr);
-	$rtDestResBal = Currency::format($debtAcc["balance"], $debtAcc["curr"]);
-}
+	if ($trans_type != 4)
+	{
+		$rtSrcResBal = Currency::format($src["balance"], $src["curr"]);
+		$rtDestResBal = Currency::format($dest["balance"], $dest["curr"]);
+	}
+	else
+	{
+		$rtSrcResBal = Currency::format($person_res_balance, $amountCurr);
+		$rtDestResBal = Currency::format($debtAcc["balance"], $debtAcc["curr"]);
+	}
 
 	$dateFmt = ($action == "edit") ? date("d.m.Y", strtotime($tr["date"])) : date("d.m.Y");
 
