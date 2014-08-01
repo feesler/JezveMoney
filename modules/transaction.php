@@ -10,10 +10,7 @@
 	}
 
 
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id)
-		setLocation("../login.php");
+	checkUser();
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];

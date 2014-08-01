@@ -15,9 +15,6 @@
 	}
 
 
-	$u = new User();
-	$user_id = $u->check();
-
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
 	if ($action != "login" && $action != "logout" && $action != "register")
@@ -30,11 +27,7 @@
 	else if ($action == "register")
 		$defMsg = ERR_REGISTER_FAIL;
 
-	if ($action == "login" || $action == "register")
-	{
-		if ($user_id != 0)
-			setLocation("../index.php");
-	}
+	checkUser(($action == "logout"));
 
 	if ($action == "login")
 	{
