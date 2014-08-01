@@ -15,14 +15,10 @@
 	if (!$user_id)
 		setLocation("../login.php");
 
-wlog("1");
-
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
 	if ($action != "new" && $action != "edit" && $action != "del")
 		fail();
-
-wlog("2");
 
 	if ($action == "new")
 		$defMsg = ERR_CURRENCY_CREATE;
@@ -39,15 +35,11 @@ wlog("2");
 		$curr_format = (isset($_POST["curr_format"]) && $_POST["curr_format"] == "on") ? 1 : 0;
 	}
 
-wlog("3");
-
 	if ($action == "edit" || $action == "del")
 	{
 		if (!isset($_POST["curr_id"]))
 			fail($defMsg);
 	}
-
-wlog("4");
 
 	if ($action == "new")
 	{
