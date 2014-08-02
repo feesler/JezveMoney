@@ -1,6 +1,6 @@
 <?php
 	$docroot = $_SERVER["DOCUMENT_ROOT"];
-	$logfname = $docroot."/money/log/log.txt";
+	$logfname = $docroot."/money/admin/log.txt";
 
 
 	// Write string to log file
