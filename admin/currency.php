@@ -132,7 +132,7 @@ function onDeleteSubmit(frm)
 </head>
 <body>
 <a href="./index.php">Admin</a><br>
-<b>Currencies</b> <a href="./query.php">Queries</a>
+<b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a>
 <?php	if (isset($_GET["add"])) {		?>
 <?php		if ($_GET["add"] == "ok") {		?>
 		<span style="color: green;">Currency was succussfully created</span><br>

@@ -17,7 +17,7 @@
 </head>
 <body>
 <a href="./undex.php">Admin</a><br>
-<a href="./currency.php">Currencies</a>  <b>Queries</b>
+<a href="./currency.php">Currencies</a>  <b>Queries</b> <a href="./log.php">Logs</a>
 <?php
 /*
 	if (isset($_GET["add"]))

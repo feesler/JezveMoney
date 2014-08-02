@@ -14,6 +14,6 @@
 </head>
 <body>
 <b>Admin</b><br>
-<a href="./currency.php">Currencies</a> <a href="./query.php">Queries</a>
+<a href="./currency.php">Currencies</a> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a>
 </body>
 </html>
