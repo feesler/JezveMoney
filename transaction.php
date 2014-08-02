@@ -141,31 +141,50 @@
 	if ($trans_type == 4)
 		$persArr = $person->getArray();
 
-	$formAction = "./modules/transaction.php?act=".$action;
-	if ($action == "new")
+	if ($trans_type == 4)
 	{
-		$formAction .= "&type=".$type_str;
-		$onFormSubmit = "return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);";
+		$formAction = "./modules/debt.php?act=".$action;
 	}
-	else if ($action == "edit")
+	else
 	{
-		$onFormSubmit = "return onEditTransSubmit(this);";
+		$formAction = "./modules/transaction.php?act=".$action;
+		if ($action == "new")
+			$formAction .= "&type=".$type_str;
+	}
+	if ($trans_type == 4)
+	{
+		$onFormSubmit = "return onDebtSubmit(this);";
+	}
+	else
+	{
+		if ($action == "new")
+		{
+			$onFormSubmit = "return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);";
+		}
+		else if ($action == "edit")
+		{
+			$onFormSubmit = "return onEditTransSubmit(this);";
+		}
 	}
 
-	if ($trans_type == 1 || $trans_type == 3)
+	if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
 	{
 		$srcBalTitle = "Result balance";
 		if ($trans_type == 3)
 			$srcBalTitle .= " (Source)";
+		else if ($trans_type == 4)
+			$srcBalTitle .= " (Person)";
 		$balDiff = $tr["charge"];
 		$src["balfmt"] = Currency::format($src["balance"] + $balDiff, $src["curr"]);
 	}
 
-	if ($trans_type == 2 || $trans_type == 3)
+	if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)
 	{
 		$destBalTitle = "Result balance";
 		if ($trans_type == 3)
 			$destBalTitle .= " (Destination)";
+		else if ($trans_type == 4)
+			$destBalTitle .= " (Account)";
 
 		if ($trans_type == 2)		// income or person give to us
 			$balDiff = $tr["charge"];
@@ -303,8 +322,5 @@
 		$jsArr[] = "popup.js";
 	}
 
-	if ($trans_type == 4)
-		include("./templates/debt.tpl");
-	else
-		include("./templates/transaction.tpl");
+	include("./templates/transaction.tpl");
 ?>

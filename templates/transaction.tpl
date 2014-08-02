@@ -13,15 +13,22 @@
 		type : <?=$tr["type"]?>
 
 	};
+<?php	}	?>
+	var trans_type = <?=$tr["type"]?>;
+<?php	if ($action == "edit" || $trans_type == 4) {	?>
 	var trans_curr = <?=$tr["curr"]?>;
 	var trans_acc_curr = <?=$tr["curr"]?>;
-	var trans_type = <?=$tr["type"]?>;
 <?php	} else {	?>
 	var trans_curr = <?=$transCurr?>;
 	var trans_acc_curr = <?=$transAccCurr?>;
-	var trans_type = <?=$trans_type?>;
 <?php	}	?>
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
+<?php	if ($trans_type == 4) {		?>
+	var persons = <?=f_json_encode($persArr)?>;
+	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
+	var lastAcc_id = <?=$acc_id?>;
+	var noAccount = <?=($noAccount ? "true" : "false")?>;
+<?php	}	?>
 
 	onReady(initControls);
 </script>
@@ -60,6 +67,96 @@
 <?php	} else if ($action == "new" && !$acc_count && $trans_type != 3) {		?>
 						<div class="align_block"><span>You have no one account. Please create one.</span></div>
 <?php	} else {		?>
+<?php	if ($trans_type == 4) {		?>
+						<div id="person" class="acc_float">
+							<input id="person_id" name="person_id" type="hidden" value="<?=$person_id?>">
+							<div><label>Person name</label></div>
+							<div>
+								<div class="tile_container">
+<?php	if (!$person->getCount()) {		?>
+									<div id="person_tile inact" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"></span></span></div></div>
+<?php	} else {	?>
+									<div id="person_tile" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"><?=$person_name?></span></span></div></div>
+<?php	}		?>
+								</div>
+
+								<div class="tile_right_block">
+									<div id="amount_left" style="display: none;">
+										<span>Amount</span>
+										<div>
+											<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtAmount?></span></button>
+										</div>
+									</div>
+<?php	if ($amountCurr != $chargeCurr) {		?>
+									<div id="exch_left">
+<?php	} else {	?>
+									<div id="exch_left" style="display: none;">
+<?php	}	?>
+										<span>Exchange rate</span>
+										<div>
+											<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?=$rtExchange?></span></button>
+										</div>
+									</div>
+									<div id="src_res_balance_left">
+										<span>Result balance</span>
+										<div>
+											<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?=$rtSrcResBal?></span></button>
+										</div>
+									</div>
+<?php	if ($noAccount) {		?>
+									<div id="charge_left" style="display: none;">
+										<span>Charge</span>
+										<div>
+											<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?=$rtCharge?></span></button>
+										</div>
+									</div>
+<?php	}	?>
+								</div>
+							</div>
+						</div>
+
+						<div id="source" class="acc_float">
+<?php	if ($noAccount) {		?>
+							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon" style="display: none;"><button onclick="toggleEnableAccount();" type="button"><span class="icon close_gray"></span></button></div></div>
+							<div class="tile_container" style="display: none;">
+								<div id="acc_tile" class="tile<?=$acc_ic?>"><div class="tilelink"><span><span class="acc_bal"><?=$acc_balance?></span><span class="acc_name"><?=$acc_name?></span></span></div></div>
+								<input id="acc_id" name="acc_id" type="hidden" value="<?=$acc_id?>">
+<?php	} else {	?>
+							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon"><button onclick="toggleEnableAccount();" type="button"><span class="icon close_gray"></span></button></div></div>
+							<div class="tile_container">
+								<div id="acc_tile" class="tile<?=$debtAcc["iconclass"]?>"><div class="tilelink"><span><span class="acc_bal"><?=$debtAcc["balfmt"]?></span><span class="acc_name"><?=$debtAcc["name"]?></span></span></div></div>
+								<input id="acc_id" name="acc_id" type="hidden" value="<?=$debtAcc["id"]?>">
+<?php	}	?>
+							</div>
+
+<?php	if (!$noAccount) {		?>
+							<div class="tile_right_block">
+								<div id="charge_left" style="display: none;">
+									<span>Charge</span>
+									<div>
+										<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?=$rtCharge?></span></button>
+									</div>
+								</div>
+<?php	} else {	?>
+							<div class="tile_right_block" style="display: none;">
+<?php	}	?>
+								<div id="dest_res_balance_left">
+									<span>Result balance</span>
+									<div>
+										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?=$rtDestResBal?></span></button>
+									</div>
+								</div>
+							</div>
+
+<?php	if ($noAccount) {		?>
+							<div id="selaccount" class="selacc_container">
+<?php	} else {	?>
+							<div id="selaccount" class="selacc_container" style="display: none;">
+<?php	}	?>
+								<button class="dashed_btn resbal_btn" type="button" onclick="toggleEnableAccount();"><span>Select account</span></button>
+							</div>
+						</div>
+<?php	}	?>
 <?php	if ($trans_type == 1 || $trans_type == 3) {		?>
 						<div id="source" class="acc_float">
 							<div><label>Source account</label></div>
@@ -143,6 +240,15 @@
 							</div>
 						</div>
 <?php	}	?>
+<?php	if ($trans_type == 4) {		?>
+						<div id="operation" class="non_float">
+							<div><label>Operation</label></div>
+							<div class="op_sel">
+								<input id="debtgive" name="debtop" type="radio" value="1" onchange="onChangeDebtOp();"<?=($give ? " checked" : "")?>><span>give</span>
+								<input id="debttake" name="debtop" type="radio" value="2" onchange="onChangeDebtOp();"<?=($give ? "" : " checked")?>><span>take</span>
+							</div>
+						</div>
+<?php	}	?>
 						<div id="amount_row" class="non_float">
 							<div><label for="amount">Amount</label></div>
 							<div>
@@ -170,7 +276,7 @@
 							</div>
 						</div>
 
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCurr == $tr["curr"])) {		?>
+<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCurr == $tr["curr"]) || ($trans_type == 4 && $amountCurr == $chargeCurr)) {		?>
 						<div id="chargeoff" class="non_float" style="display: none;">
 <?php	} else {	?>
 						<div id="chargeoff" class="non_float">
@@ -196,31 +302,39 @@
 								<div class="right_float"><span id="exchcomm" class="exchrate_comm"><?=$exchSign?></span></div>
 								<div class="stretch_input trans_input">
 									<div>
-										<input id="exchrate" class="summ_text" type="text" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);" value="<?=$exchValue?>">
+										<input id="exchrate" class="summ_text" type="text" value="<?=$exchValue?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 									</div>
 								</div>
 							</div>
 						</div>
 
-<?php	if ($trans_type == 1 || $trans_type == 3) {		?>
+<?php	if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4) {		?>
 						<div id="result_balance" class="non_float" style="display: none;">
 							<div><label for="resbal"><?=$srcBalTitle?></label></div>
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$src["sign"]?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
+<?php	if ($trans_type == 4) {		?>
+										<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+<?php	} else {	?>
 										<input id="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+<?php	}	?>
 									</div>
 								</div>
 							</div>
 						</div>
 <?php	}	?>
 
-<?php	if ($trans_type == 2 || $trans_type == 3) {		?>
+<?php	if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4) {		?>
 						<div id="result_balance_dest" class="non_float" style="display: none;">
 							<div><label for="resbal_d"><?=$destBalTitle?></label></div>
 							<div>
+<?php	if ($trans_type == 4) {		?>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$debtAcc["sign"]?></div></div></div>
+<?php	} else {	?>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$dest["sign"]?></div></div></div>
+<?php	}	?>
 								<div class="stretch_input trans_input">
 									<div>
 										<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
