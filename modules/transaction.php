@@ -18,29 +18,47 @@
 		fail();
 
 	if ($action == "new")
-		$defMsg = ERR_TRANS_CREATE;
-	else if ($action == "edit")
-		$defMsg = ERR_TRANS_UPDATE;
-	else if ($action == "del")
-		$defMsg = ERR_TRANS_DELETE;
-
-	if ($action == "new")
 	{
 		if (!isset($_GET["type"]))
-			fail($defMsg);
+			fail();
 		$trans_type = Transaction::getStringType($_GET["type"]);
 		if (!$trans_type)
-			fail($defMsg);
+			fail();
 	}
 	else if ($action == "edit")
 	{
 		$trans_type = intval($_POST["transtype"]);
 	}
 
+	if ($action == "new")
+		$defMsg = ($trans_type == 4) ? ERR_DEBT_CREATE : ERR_TRANS_CREATE;
+	else if ($action == "edit")
+		$defMsg = ($trans_type == 4) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
+	else if ($action == "del")
+		$defMsg = ERR_TRANS_DELETE;
+
 	if ($action == "new" || $action == "edit")
 	{
+if ($trans_type == 4)
+{
+	$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
+	$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
+	$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
+
+	if (($debt_op != 1 && $debt_op != 2) || !$person_id)
+		fail($defMsg);
+
+	$pers = new Person($user_id);
+	if (!$pers->is_exist($person_id))		// person should exist
+		fail($defMsg);
+
+	$debt = new Debt($user_id);
+}
+else
+{
 		$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
 		$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
+}
 		$amount = floatval($_POST["amount"]);
 		$charge = floatval($_POST["charge"]);
 		$transcurr = (isset($_POST["transcurr"])) ? intval($_POST["transcurr"]) : 0;
@@ -49,37 +67,57 @@
 		$comment = $db->escape($_POST["comm"]);
 	}
 
+	if ($amount == 0.0 || $charge == 0.0 || $trdate == -1)
+		fail($defMsg);
+
 	$trans = new Transaction($user_id);
 	if ($action == "new")
 	{
+if ($trans_type == 4)
+{
+		if (!$debt->create($debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))
+			fail($defMsg);
+		setMessage(MSG_DEBT_CREATE);
+		setLocation("../transactions.php?type=debt");
+}
+else
+{
 		if ($trans_type == 1 && (!$src_id || !$transcurr))
 			fail($defMsg);
 		if ($trans_type == 2 && (!$dest_id || !$transcurr))
 			fail($defMsg);
 		if ($trans_type == 3 && (!$src_id || !$dest_id))
 			fail($defMsg);
-		if ($amount == 0.0 || $charge == 0.0 || $trdate == -1)
-			fail($defMsg);
 
 		if (!$trans->create($trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 			fail($defMsg);
 		setMessage(MSG_TRANS_CREATE);
 		setLocation("../index.php");
+}
 	}
 	else if ($action == "edit")
 	{
 		if (!isset($_POST["transid"]))
 			fail($defMsg);
 		$trans_id = intval($_POST["transid"]);
+if ($trans_type == 4)
+{
+		if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $amount, $charge, $transcurr, $fdate, $comment))
+			fail($defMsg);
+		setMessage(MSG_DEBT_UPDATE);
+}
+else
+{
 		if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $amount, $charge, $transcurr, $fdate, $comment))
 			fail($defMsg);
-
+}
 		$ttStr = Transaction::getTypeString($trans_type);
 		if (is_null($ttStr))
 			fail($defMsg);
 
 		setMessage(MSG_TRANS_UPDATE);
 		setLocation("../transactions.php?type=".$ttStr);
+
 	}
 	else if ($action == "del")
 	{

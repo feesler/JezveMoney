@@ -141,16 +141,9 @@
 	if ($trans_type == 4)
 		$persArr = $person->getArray();
 
-	if ($trans_type == 4)
-	{
-		$formAction = "./modules/debt.php?act=".$action;
-	}
-	else
-	{
-		$formAction = "./modules/transaction.php?act=".$action;
-		if ($action == "new")
-			$formAction .= "&type=".$type_str;
-	}
+	$formAction = "./modules/transaction.php?act=".$action;
+	if ($action == "new")
+		$formAction .= "&type=".$type_str;
 	if ($trans_type == 4)
 	{
 		$onFormSubmit = "return onDebtSubmit(this);";
