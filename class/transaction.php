@@ -4,6 +4,7 @@ class Transaction extends CachedTable
 {
 	static private $dcache = NULL;
 	static private $user_id = 0;
+	static private $tbl_name = "transactions";
 
 
 	// Class constructor
@@ -34,7 +35,7 @@ class Transaction extends CachedTable
 		if ($trans_id == 0 || is_null(self::$dcache))
 			self::$dcache = array();
 
-		$resArr = $db->selectQ("*", "transactions", $cond);
+		$resArr = $db->selectQ("*", self::$tbl_name, $cond);
 		if (!count($resArr))		// delete transaction from cache if can't find it
 		{
 			unset(self::$dcache[$trans_id]);
@@ -107,7 +108,7 @@ class Transaction extends CachedTable
 			$tr_pos++;
 		}
 
-		if (!$db->insertQ("transactions", array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
+		if (!$db->insertQ(self::$tbl_name, array("id", "user_id", "src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos"),
 									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment, $tr_pos)))
 			return FALSE;
 
@@ -293,7 +294,7 @@ class Transaction extends CachedTable
 		$fieldsArr = array("src_id", "dest_id", "type", "amount", "charge", "curr_id", "date", "comment", "pos");
 		$valuesArr = array($src_id, $dest_id, $trans_type, $amount, $charge, $trans_curr_id, $trans_date, $comment, $tr_pos);
 
-		if (!$db->updateQ("transactions", $fieldsArr, $valuesArr, "id=".$trans_id))
+		if (!$db->updateQ(self::$tbl_name, $fieldsArr, $valuesArr, "id=".$trans_id))
 			return FALSE;
 
 		// update balance of source account
@@ -393,13 +394,13 @@ class Transaction extends CachedTable
 				$assignment = "pos=pos-1";
 			}
 
-			$query = "UPDATE `transactions` SET ".$assignment." WHERE ".$condition.";";
+			$query = "UPDATE `".self::$tbl_name."` SET ".$assignment." WHERE ".$condition.";";
 			$db->rawQ($query);
 			if (mysql_errno() != 0)
 				return FALSE;
 		}
 
-		if (!$db->updateQ("transactions", array("pos"), array($new_pos), "id=".$trans_id))
+		if (!$db->updateQ(self::$tbl_name, array("pos"), array($new_pos), "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -422,7 +423,7 @@ class Transaction extends CachedTable
 			return FALSE;
 
 		// delete transaction record
-		if (!$db->deleteQ("transactions", "id=".$trans_id))
+		if (!$db->deleteQ(self::$tbl_name, "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -443,7 +444,7 @@ class Transaction extends CachedTable
 		if ($trans_date != -1)
 			$condition .= " AND date <= ".qnull($trans_date);
 
-		$resArr = $db->selectQ("pos", "transactions", $condition, NULL, "pos DESC LIMIT 1");
+		$resArr = $db->selectQ("pos", self::$tbl_name, $condition, NULL, "pos DESC LIMIT 1");
 		if (count($resArr) != 1)
 			return 0;
 
@@ -462,24 +463,24 @@ class Transaction extends CachedTable
 		$condition = "user_id=".self::$user_id;
 
 		// delete expenses and incomes
-		if (!$db->deleteQ("transactions", $condition." AND ((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))"))
+		if (!$db->deleteQ(self::$tbl_name, $condition." AND ((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))"))
 			return FALSE;
 
 		$this->cleanCache();
 
 /*
 		// delete debts
-		if (!$db->deleteQ("transactions", $condition." AND (src_id=".$acc_id." OR dest_id=".$acc_id.") AND type=4"))
+		if (!$db->deleteQ(self::$tbl_name, $condition." AND (src_id=".$acc_id." OR dest_id=".$acc_id.") AND type=4"))
 			return FALSE;
 */
 
 		// set transfer from or outgoing debt as income to destination account
-		if (!$db->updateQ("transactions", array("src_id", "type"), array(0, 2),
+		if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
 						$condition." AND src_id=".$acc_id." AND (type=3 OR type=4)"))
 			return FALSE;
 
 		// set transfer to as expense from source account
-		if (!$db->updateQ("transactions", array("dest_id", "type"), array(0, 1),
+		if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
 						$condition." AND dest_id=".$acc_id." AND (type=3 OR type=4)"))
 			return FALSE;
 
@@ -509,7 +510,7 @@ class Transaction extends CachedTable
 		if (!$accounts)
 			return $res;
 
-		if (!$db->countQ("transactions", "user_id=".self::$user_id))
+		if (!$db->countQ(self::$tbl_name, "user_id=".self::$user_id))
 			return $res;
 
 		$tr_type = intval($trans_type);
@@ -540,7 +541,7 @@ class Transaction extends CachedTable
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
 		if ($tr_on_page > 0)
 		{
-			$transCount = $db->countQ("transactions", $condition);
+			$transCount = $db->countQ(self::$tbl_name, $condition);
 
 			$limitOffset = ($tr_on_page * $page_num);
 			$limitRows = min($transCount - $limitOffset, $tr_on_page);
@@ -548,7 +549,7 @@ class Transaction extends CachedTable
 			$orderAndLimit .= " LIMIT ".$limitOffset.", ".$limitRows;
 		}
 
-		$resArr = $db->selectQ("*", "transactions", $condition, NULL, $orderAndLimit);
+		$resArr = $db->selectQ("*", self::$tbl_name, $condition, NULL, $orderAndLimit);
 		$rowCount = count($resArr);
 		if (!$rowCount)
 			return $res;
@@ -653,7 +654,7 @@ class Transaction extends CachedTable
 			}
 		}
 
-		return $db->countQ("transactions", $condition);
+		return $db->countQ(self::$tbl_name, $condition);
 	}
 
 
@@ -769,7 +770,7 @@ class Transaction extends CachedTable
 		if (count($orCond) > 0)
 			$condition .= " AND (".implode(" OR ", $orCond).")";
 
-		$resArr = $db->selectQ("*", "transactions", $condition, NULL, "pos ASC");
+		$resArr = $db->selectQ("*", self::$tbl_name, $condition, NULL, "pos ASC");
 		foreach($resArr as $row)
 		{
 			$tr_id = intval($row["id"]);
