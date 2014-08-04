@@ -108,8 +108,8 @@
 		$trans_id = $trans[0];
 		$src_id = $trans[1];
 		$dest_id = $trans[2];
-		$famount = $trans[3];
-		$fcharge = $trans[4];
+		$fSrcAmount = $trans[3];
+		$fDestAmount = $trans[4];
 		$cur_trans_type = $trans[5];
 		$fdate = $trans[6];
 		$comment = $trans[7];
@@ -152,9 +152,9 @@
 		$itemData["acc"] = $accStr;
 
 		// Build amount string
-		$amStr = $famount;
-		if ($famount != $fcharge)
-			$amStr .= " (".$fcharge.")";
+		$amStr = $fSrcAmount;
+		if ($fSrcAmount != $fDestAmount)
+			$amStr .= " (".$fDestAmount.")";
 		$itemData["amount"] = $amStr;
 
 		$itemData["date"] = $fdate;
