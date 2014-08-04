@@ -933,6 +933,9 @@ function isDiff()
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	transcurr = ge('transcurr');
 
+	if (isDebt() && noAccount)
+		return false;
+
 	if (isExpense() || isIncome() || isDebt())
 	{
 		amountCurr = parseInt(transcurr.value);
