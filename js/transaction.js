@@ -811,12 +811,12 @@ function getValues()
 		}
 		else			// person take from us; person account is destination
 		{
-			S1 = getBalanceOfAccount(accid.value);
-			S2 = resbal_d.value;
+			S1_d = getCurPersonBalance(trans_curr);
+			S2_d = resbal.value;
 			if (!noAccount)
 			{
-				S1_d = getCurPersonBalance(trans_curr);
-				S2_d = resbal.value;
+				S1 = getBalanceOfAccount(accid.value);
+				S2 = resbal_d.value;
 			}
 		}
 	}
@@ -932,6 +932,9 @@ function isDiff()
 
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	transcurr = ge('transcurr');
+
+	if (isDebt() && noAccount)
+		return false;
 
 	if (isExpense() || isIncome() || isDebt())
 	{
