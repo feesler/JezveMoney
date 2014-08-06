@@ -67,7 +67,7 @@
 			$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
 			$person_balance = $person_res_balance;
 
-			$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "amount" => 0, "charge" => 0, "curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => "");
+			$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "src_amount" => 0, "dest_amount" => 0, "src_curr" => $debtAcc["curr"], "dest_curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => "");
 			$give = TRUE;
 		}
 		else
@@ -85,11 +85,17 @@
 
 			$tr = array("src_id" => $src_id,
 						"dest_id" => $dest_id,
-						"amount" => 0,
-						"charge" => 0,
-						"curr" => $acc->getCurrency($acc_id),
+						"src_amount" => 0,
+						"dest_amount" => 0,
+						"src_curr" => ($src_id != 0) ? $acc->getCurrency($src_id) : 0,
+						"dest_curr" => ($dest_id != 0) ? $acc->getCurrency($dest_id) : 0,
 						"type" => $trans_type,
 						"comment" => "");
+
+			if ($trans_type == 1)
+				$tr["dest_curr"] = $tr["src_curr"];
+			else if ($trans_type == 2)
+				$tr["src_curr"] = $tr["dest_curr"];
 		}
 	}
 	else
@@ -167,7 +173,7 @@
 			$srcBalTitle .= " (Source)";
 		else if ($trans_type == 4)
 			$srcBalTitle .= " (Person)";
-		$balDiff = $tr["charge"];
+		$balDiff = $tr["dest_amount"];
 		$src["balfmt"] = Currency::format($src["balance"] + $balDiff, $src["curr"]);
 	}
 
@@ -180,9 +186,9 @@
 			$destBalTitle .= " (Account)";
 
 		if ($trans_type == 2)		// income or person give to us
-			$balDiff = $tr["charge"];
+			$balDiff = $tr["dest_amount"];
 		else
-			$balDiff = $tr["amount"];
+			$balDiff = $tr["src_amount"];
 		$dest["balfmt"] = Currency::format($dest["balance"] - $balDiff, $dest["curr"]);
 	}
 
@@ -195,8 +201,8 @@
 			$transCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
 			$transAccCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
 
-			$amountCurr = $transCurr;
-			$chargeCurr = $transAccCurr;
+			$srcAmountCurr = $transCurr;
+			$destAmountCurr = $transAccCurr;
 		}
 		else
 		{
@@ -204,8 +210,8 @@
 
 			$noAccount = FALSE;
 
-			$amountCurr = $debtAcc["curr"];
-			$chargeCurr = $debtAcc["curr"];
+			$srcAmountCurr = $debtAcc["curr"];
+			$destAmountCurr = $debtAcc["curr"];
 		}
 	}
 	else
@@ -219,8 +225,8 @@
 
 			$transAccCurr = $acc->getCurrency($transAcc_id);
 
-			$amountCurr = $tr["curr"];
-			$chargeCurr = $transAccCurr;
+			$srcAmountCurr = $tr["src_curr"];
+			$destAmountCurr = $tr["dest_curr"];
 		}
 		else
 		{
@@ -242,10 +248,10 @@
 			$debtAcc = $give ? $dest : $src;
 			$noAccount = is_null($debtAcc);
 
-			$amountCurr = $tr["curr"];
+			$srcAmountCurr = $tr["curr"];
 			if ($noAccount)
 			{
-				$chargeCurr = $person_acc["curr"];
+				$destAmountCurr = $person_acc["curr"];
 				$acc_id = $acc->getIdByPos(0);
 				$acc_name = $acc->getName($acc_id);
 				$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
@@ -254,7 +260,7 @@
 			else
 			{
 				$acc_id = 0;
-				$chargeCurr = $debtAcc["curr"];
+				$destAmountCurr = $debtAcc["curr"];
 			}
 		}
 	}
@@ -274,18 +280,18 @@
 				$accLbl = "Source account";
 		}
 
-		$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] + $tr["charge"], $debtAcc["curr"]);
+		$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] + $tr["dest_amount"], $debtAcc["curr"]);
 
-		$p_balfmt = Currency::format($person_balance, $amountCurr);
+		$p_balfmt = Currency::format($person_balance, $srcAmountCurr);
 	}
 
-	$amountSign = Currency::getSign($amountCurr);
-	$chargeSign = Currency::getSign($chargeCurr);
-	$exchSign = $chargeSign."/".$amountSign;
-	$exchValue = ($action == "edit") ? round($tr["amount"] / $tr["charge"], 5) : 1;
+	$srcAmountSign = Currency::getSign($srcAmountCurr);
+	$destAmountSign = Currency::getSign($destAmountCurr);
+	$exchSign = $destAmountSign."/".$srcAmountSign;
+	$exchValue = ($action == "edit") ? round($tr["src_amount"] / $tr["dest_amount"], 5) : 1;
 
-	$rtAmount = Currency::format($tr["amount"], $amountCurr);
-	$rtCharge = Currency::format($tr["charge"], $chargeCurr);
+	$rtSrcAmount = Currency::format($tr["src_amount"], $srcAmountCurr);
+	$rtDestAmount = Currency::format($tr["dest_amount"], $destAmountCurr);
 	$rtExchange = $exchValue." ".$exchSign;
 	if ($trans_type != 4)
 	{
@@ -294,7 +300,7 @@
 	}
 	else
 	{
-		$rtSrcResBal = Currency::format($person_res_balance, $amountCurr);
+		$rtSrcResBal = Currency::format($person_res_balance, $srcAmountCurr);
 		$rtDestResBal = Currency::format($debtAcc["balance"], $debtAcc["curr"]);
 	}
 

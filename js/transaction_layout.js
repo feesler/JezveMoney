@@ -83,17 +83,17 @@ function commonSwitch(input_block_id, static_block_id, input_id, showInput)
 }
 
 
-// Show input control or static block for amount value
-function amountSwitch(showInput)
+// Show input control or static block for source amount value
+function srcAmountSwitch(showInput)
 {
-	commonSwitch('amount_row', 'amount_left', 'amount', showInput);
+	commonSwitch('src_amount_row', 'src_amount_left', 'src_amount', showInput);
 }
 
 
-// Show input control or static block for charge value
-function chargeSwitch(showInput)
+// Show input control or static block for destination amount value
+function destAmountSwitch(showInput)
 {
-	commonSwitch('chargeoff', 'charge_left', 'charge', showInput);
+	commonSwitch('dest_amount_row', 'dest_amount_left', 'dest_amount', showInput);
 }
 
 
@@ -118,19 +118,19 @@ function exchRateSwitch(showInput)
 }
 
 
-// Amount static click event handler
-function onAmountSelect()
+// Source amount static click event handler
+function onSrcAmountSelect()
 {
-	amountSwitch(true);
+	srcAmountSwitch(true);
 	resBalanceSwitch(false);
 	resBalanceDestSwitch(false);
 }
 
 
-// Charge static click event handler
-function onChargeSelect()
+// Destination amount static click event handler
+function onDestAmountSelect()
 {
-	chargeSwitch(true);
+	destAmountSwitch(true);
 	exchRateSwitch(false);
 }
 
@@ -140,7 +140,7 @@ function onResBalanceSelect()
 {
 	resBalanceSwitch(true);
 	resBalanceDestSwitch(false);
-	amountSwitch(false);
+	srcAmountSwitch(false);
 }
 
 
@@ -149,7 +149,7 @@ function onResBalanceDestSelect()
 {
 	resBalanceSwitch(false);
 	resBalanceDestSwitch(true);
-	amountSwitch(false);
+	srcAmountSwitch(false);
 }
 
 
@@ -157,15 +157,15 @@ function onResBalanceDestSelect()
 function onExchRateSelect()
 {
 	exchRateSwitch(true);
-	chargeSwitch(false);
+	destAmountSwitch(false);
 }
 
 
-// Hide both charge and exchange rate controls
-function hideChargeAndExchange()
+// Hide both destination amount and exchange rate controls
+function hideDestAmountAndExchange()
 {
-	show('chargeoff', false);
-	show('charge_left',  false);
+	show('dest_amount_row', false);
+	show('dest_amount_left',  false);
 
 	show('exchange', false);
 	show('exch_left', false);
@@ -340,7 +340,7 @@ function initControls()
 	if (!isTransfer())
 	{
 		transCurrDDList = new DDList();
-		if (transCurrDDList.create({ input_id : 'amountsign', itemPrefix : 'curr', listAttach : true, selCB : onCurrencySel, editable : false, mobile : isMobile }))
+		if (transCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'curr', listAttach : true, selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		{
 			currency.forEach(function(curr)
 			{
@@ -359,25 +359,25 @@ function initControls()
 // Account disable button click event handler
 function toggleEnableAccount()
 {
-	var acclbl, source, charge_left, acc_id, transcurr;
+	var acclbl, source, dest_amount_left, acc_id, transcurr;
 
 	acclbl = ge('acclbl');
 	source = ge('source');
-	charge_left = re('charge_left');
+	dest_amount_left = re('dest_amount_left');
 	acc_id = ge('acc_id');
 	transcurr = ge('transcurr');
-	if (!acclbl || !source || !charge_left || !acc_id || !transcurr)
+	if (!acclbl || !source || !dest_amount_left || !acc_id || !transcurr)
 		return;
 
 	if (noAccount)
 	{
 		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
-		insertBefore(charge_left, ge('dest_res_balance_left'));
+		insertBefore(dest_amount_left, ge('dest_res_balance_left'));
 	}
 	else
 	{
 		acclbl.innerHTML = 'No account';
-		insertBefore(charge_left, ge('amount_left'));
+		insertBefore(dest_amount_left, ge('src_amount_left'));
 	}
 
 	show('noacc_btn', noAccount);
@@ -385,7 +385,7 @@ function toggleEnableAccount()
 	show(source.firstElementChild.nextElementSibling.nextElementSibling, noAccount);
 	show('selaccount', !noAccount);
 
-	amountSwitch(true);
+	srcAmountSwitch(true);
 	resBalanceSwitch(false);
 	resBalanceDestSwitch(false);
 

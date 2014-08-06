@@ -7,17 +7,18 @@
 	{
 		srcAcc : <?=$tr["src_id"]?>,
 		destAcc : <?=$tr["dest_id"]?>,
-		amount : <?=$tr["amount"]?>,
-		charge : <?=$tr["charge"]?>,
-		curr_id : <?=$tr["curr"]?>,
+		srcAmount : <?=$tr["src_amount"]?>,
+		destAmount : <?=$tr["dest_amount"]?>,
+		srcCurr : <?=$tr["src_curr"]?>,
+		destCurr : <?=$tr["dest_curr"]?>,
 		type : <?=$tr["type"]?>
 
 	};
 <?php	}	?>
 	var trans_type = <?=$tr["type"]?>;
 <?php	if ($action == "edit" || $trans_type == 4) {	?>
-	var trans_curr = <?=$tr["curr"]?>;
-	var trans_acc_curr = <?=$tr["curr"]?>;
+	var trans_curr = <?=$tr["src_curr"]?>;
+	var trans_acc_curr = <?=$tr["src_curr"]?>;
 <?php	} else {	?>
 	var trans_curr = <?=$transCurr?>;
 	var trans_acc_curr = <?=$transAccCurr?>;
@@ -81,13 +82,13 @@
 								</div>
 
 								<div class="tile_right_block">
-									<div id="amount_left" style="display: none;">
-										<span>Amount</span>
+									<div id="src_amount_left" style="display: none;">
+										<span>Source amount</span>
 										<div>
-											<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtAmount?></span></button>
+											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 										</div>
 									</div>
-<?php	if ($amountCurr != $chargeCurr) {		?>
+<?php	if ($srcAmountCurr != $destAmountCurr) {		?>
 									<div id="exch_left">
 <?php	} else {	?>
 									<div id="exch_left" style="display: none;">
@@ -104,10 +105,10 @@
 										</div>
 									</div>
 <?php	if ($noAccount) {		?>
-									<div id="charge_left" style="display: none;">
-										<span>Charge</span>
+									<div id="dest_amount_left" style="display: none;">
+										<span>Destination amount</span>
 										<div>
-											<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?=$rtCharge?></span></button>
+											<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 										</div>
 									</div>
 <?php	}	?>
@@ -131,10 +132,10 @@
 
 <?php	if (!$noAccount) {		?>
 							<div class="tile_right_block">
-								<div id="charge_left" style="display: none;">
-									<span>Charge</span>
+								<div id="dest_amount_left" style="display: none;">
+									<span>Destination amount</span>
 									<div>
-										<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?=$rtCharge?></span></button>
+										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
 <?php	} else {	?>
@@ -167,22 +168,22 @@
 
 							<div class="tile_right_block">
 <?php	if ($trans_type == 1) {		?>
-								<div id="amount_left" style="display: none;">
-									<span>Amount</span>
+								<div id="src_amount_left" style="display: none;">
+									<span>Source amount</span>
 									<div>
-										<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtAmount?></span></button>
+										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
 <?php	}	?>
 <?php	if ($trans_type == 1 || $trans_type == 3) {		?>
-								<div id="charge_left" style="display: none;">
-									<span>Charge</span>
+								<div id="dest_amount_left" style="display: none;">
+									<span>Destination amount</span>
 									<div>
-										<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?=$rtCharge?></span></button>
+										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
 <?php	}	?>
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCurr == $tr["curr"])) {		?>
+<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
 								<div id="exch_left">
@@ -211,17 +212,17 @@
 							</div>
 
 							<div class="tile_right_block">
-								<div id="amount_left" style="display: none;">
-									<span>Amount</span>
+								<div id="src_amount_left" style="display: none;">
+									<span>Source amount</span>
 									<div>
-										<button id="amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtAmount?></span></button>
+										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
 <?php	if ($trans_type == 2) {		?>
-								<div id="charge_left" style="display: none;">
-									<span>Charge</span>
+								<div id="dest_amount_left" style="display: none;">
+									<span>Destination amount</span>
 									<div>
-										<button id="charge_b" class="dashed_btn resbal_btn" type="button" onclick="onChargeSelect();"><span><?=$rtCharge?></span></button>
+										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
 								<div id="exch_left" style="display: none;">
@@ -249,16 +250,16 @@
 							</div>
 						</div>
 <?php	}	?>
-						<div id="amount_row" class="non_float">
-							<div><label for="amount">Amount</label></div>
+						<div id="src_amount_row" class="non_float">
+							<div><label for="src_amount">Source amount</label></div>
 							<div>
 								<div class="curr_container">
 <?php	if ($trans_type == 3) {		?>
-									<div class="btn rcurr_btn inact_rbtn"><div id="amountsign"><?=$amountSign?></div></div>
+									<div class="btn rcurr_btn inact_rbtn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	} else {	?>
-									<div class="btn rcurr_btn"><div id="amountsign"><?=$amountSign?></div></div>
+									<div class="btn rcurr_btn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	}	?>
-									<input id="transcurr" name="transcurr" type="hidden" value="<?=$amountCurr?>">
+									<input id="transcurr" name="transcurr" type="hidden" value="<?=$srcAmountCurr?>">
 								</div>
 <?php	if ($trans_type == 3) {		?>
 								<div class="stretch_input trans_input">
@@ -267,29 +268,29 @@
 <?php	}	?>
 									<div>
 <?php	if ($action == "edit") {	?>
-										<input id="amount" name="amount" class="summ_text" type="text" value="<?=$tr["amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="<?=$tr["src_amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 <?php	} else {	?>
-										<input id="amount" name="amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 <?php	}	?>
 									</div>
 								</div>
 							</div>
 						</div>
 
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $transAccCurr == $tr["curr"]) || ($trans_type == 4 && $amountCurr == $chargeCurr)) {		?>
-						<div id="chargeoff" class="non_float" style="display: none;">
+<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $tr["src_curr"] == $tr["dest_curr"]) || ($trans_type == 4 && $srcAmountCurr == $destAmountCurr)) {		?>
+						<div id="dest_amount_row" class="non_float" style="display: none;">
 <?php	} else {	?>
-						<div id="chargeoff" class="non_float">
+						<div id="dest_amount_row" class="non_float">
 <?php	}	?>
-							<div><label for="charge">Charge</label></div>
+							<div><label for="dest_amount">Destination amount</label></div>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="chargesign"><?=$chargeSign?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="destamountsign"><?=$destAmountSign?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
 <?php	if ($action == "edit") {	?>
-										<input id="charge" name="charge" class="summ_text" type="text" value="<?=$tr["charge"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="<?=$tr["dest_amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 <?php	} else {	?>
-										<input id="charge" name="charge" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 <?php	}	?>
 									</div>
 								</div>
