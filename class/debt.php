@@ -26,25 +26,28 @@ Class Debt
 
 
 	// Create new debt operation
-	public function create($op, $acc_id, $p_id, $amount, $charge, $curr_id, $tr_date, $comment)
+	public function create($op, $acc_id, $p_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment)
 	{
-		if (!is_numeric($p_id) || !is_numeric($curr_id))
+		if (!is_numeric($p_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
 			return FALSE;
 
 		$account_id = intval($acc_id);
 		$person_id = intval($p_id);
-		$curr_id = intval($curr_id);
+		$src_curr = intval($src_curr);
+		$dest_curr = intval($dest_curr);
+		if (!$person_id || !$src_curr || !$dest_curr)
+			return FALSE;
 
-		if (!$person_id || !$curr_id)
+		if ($op != 1 && $op != 2)
 			return FALSE;
 
 		$person = new Person($this->user_id);
 		if (!$person->is_exist($person_id))
 			return FALSE;
 
-		$p_acc = $person->getAccount($person_id, $curr_id);
+		$p_acc = $person->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
-			$p_acc = $person->createAccount($person_id, $curr_id);
+			$p_acc = $person->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
 			return FALSE;
 
@@ -60,7 +63,7 @@ Class Debt
 		}
 
 		$trans = new Transaction($this->user_id);
-		if (!$trans->create(4, $src_id, $dest_id, $amount, $charge, $curr_id, $tr_date, $comment))
+		if (!$trans->create(4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
 			return FALSE;
 
 		return TRUE;
@@ -68,26 +71,30 @@ Class Debt
 
 
 	// Update debt operation
-	public function edit($trans_id, $op, $acc_id, $p_id, $amount, $charge, $curr_id, $tr_date, $comment)
+	public function edit($trans_id, $op, $acc_id, $p_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment)
 	{
-		if (!is_numeric($trans_id) || !is_numeric($p_id) || !is_numeric($curr_id))
+		if (!is_numeric($trans_id) || !is_numeric($p_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
 			return FALSE;
 
 		$tr_id = intval($trans_id);
 		$account_id = intval($acc_id);
 		$person_id = intval($p_id);
-		$curr_id = intval($curr_id);
+		$src_curr = intval($src_curr);
+		$dest_curr = intval($dest_curr);
 
-		if (!$tr_id || !$person_id || !$curr_id)
+		if (!$tr_id || !$person_id || !$src_curr || !$dest_curr)
+			return FALSE;
+
+		if ($op != 1 && $op != 2)
 			return FALSE;
 
 		$person = new Person($this->user_id);
 		if (!$person->is_exist($person_id))
 			return FALSE;
 
-		$p_acc = $person->getAccount($person_id, $curr_id);
+		$p_acc = $person->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
-			$p_acc = $person->createAccount($person_id, $curr_id);
+			$p_acc = $person->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
 			return FALSE;
 
@@ -103,7 +110,7 @@ Class Debt
 		}
 
 		$trans = new Transaction($this->user_id);
-		if (!$trans->edit($tr_id, 4, $src_id, $dest_id, $amount, $charge, $curr_id, $tr_date, $comment))
+		if (!$trans->edit($tr_id, 4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
 			return FALSE;
 
 		return TRUE;
