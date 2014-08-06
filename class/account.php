@@ -223,7 +223,7 @@ class Account extends CachedTable
 		global $db;
 
 		// delete all transactions of user
-		if (!$db->deleteQ("transactions", "user_id=".self::$user_id))
+		if (!$db->deleteQ("transactions_dev", "user_id=".self::$user_id))
 			return FALSE;
 
 		// delete all accounts of user
