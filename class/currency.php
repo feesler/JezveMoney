@@ -145,7 +145,7 @@ class Currency
 		if (count($resArr) > 0)
 			return TRUE;
 
-		$resArr = $db->selectQ("id", "transactions", "curr_id=".$curr_id);
+		$resArr = $db->selectQ("id", "transactions_dev", "curr_id=".$curr_id);
 		if (count($resArr) > 0)
 			return TRUE;
 
