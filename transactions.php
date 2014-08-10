@@ -43,7 +43,7 @@
 
 	$tr_on_page = 10;
 
-	$totalTrCount = $db->countQ("transactions", "user_id=".$user_id);
+	$totalTrCount = $db->countQ("transactions_dev", "user_id=".$user_id);
 	$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
 	$transCount = $trans->getTransCount($trans_type, $acc_id, $searchStr, $startDate, $endDate);
 
