@@ -950,7 +950,7 @@ function onSrcAmountInput()
 	{
 		var tfda = fda;
 
-		if (!dvalid)
+		if (!davalid)
 			fda = fsa;
 
 		if (isIncome() || isTransfer() || (isDebt() && !debtType))
@@ -958,9 +958,9 @@ function onSrcAmountInput()
 		else if (isExpense() || (isDebt() && debtType))
 			f1();				// calculate S2
 
-		if (!dvalid)
+		if (!davalid)
 			fda = tfda;
-		if (dvalid)
+		if (davalid)
 			f5();		// calculate e
 	}
 	else
@@ -991,7 +991,7 @@ function onDestAmountInput()
 
 	var tfsa = fsa;
 
-	if (!avalid)
+	if (!savalid)
 		fsa = fda;
 
 	if (isIncome() || isTransfer() || (isDebt() && debtType))
@@ -1014,12 +1014,12 @@ function onExchangeInput()
 	if (!s1valid && !s1dvalid)
 		return;
 
-	if (avalid)
+	if (savalid)
 	{
 		f2();		// calculate da
 		f1();		// calculate S2
 	}
-	else if (dvalid)
+	else if (davalid)
 		f4();		// calculate sa
 
 	setExchangeComment();
@@ -1051,7 +1051,7 @@ function onResBalanceInput()
 		f3();		// calculate d
 		if (evalid)
 			f4();				// calculate sa
-		else if (avalid)
+		else if (savalid)
 			f5();				// calculate e
 	}
 }
