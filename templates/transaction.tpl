@@ -250,7 +250,11 @@
 							</div>
 						</div>
 <?php	}	?>
+<?php	if ($showSrcAmount) {		?>
 						<div id="src_amount_row" class="non_float">
+<?php	} else {	?>
+						<div id="src_amount_row" class="non_float" style="display: none;">
+<?php	}	?>
 							<div><label for="src_amount">Source amount</label></div>
 							<div>
 								<div class="curr_container">
@@ -277,10 +281,10 @@
 							</div>
 						</div>
 
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $tr["src_curr"] == $tr["dest_curr"]) || ($trans_type == 4 && $srcAmountCurr == $destAmountCurr)) {		?>
-						<div id="dest_amount_row" class="non_float" style="display: none;">
-<?php	} else {	?>
+<?php	if ($showDestAmount) {		?>
 						<div id="dest_amount_row" class="non_float">
+<?php	} else {	?>
+						<div id="dest_amount_row" class="non_float" style="display: none;">
 <?php	}	?>
 							<div><label for="dest_amount">Destination amount</label></div>
 							<div>

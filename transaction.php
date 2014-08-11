@@ -203,6 +203,9 @@
 
 			$srcAmountCurr = (!is_null($src)) ? $src["curr"] : $dest["curr"];
 			$destAmountCurr = (!is_null($dest)) ? $dest["curr"] : $src["curr"];
+
+			$showSrcAmount = ($trans_type != 2);
+			$showDestAmount = ($trans_type != 1);
 		}
 		else
 		{
@@ -212,6 +215,9 @@
 
 			$srcAmountCurr = $debtAcc["curr"];
 			$destAmountCurr = $debtAcc["curr"];
+
+			$showSrcAmount = TRUE;
+			$showDestAmount = FALSE;
 		}
 	}
 	else
@@ -227,6 +233,9 @@
 
 			$srcAmountCurr = $tr["src_curr"];
 			$destAmountCurr = $tr["dest_curr"];
+
+			$showSrcAmount = ($trans_type != 2) ? TRUE : ($srcAmountCurr != $destAmountCurr);
+			$showDestAmount = ($trans_type != 1) ? TRUE : ($srcAmountCurr != $destAmountCurr);
 		}
 		else
 		{
