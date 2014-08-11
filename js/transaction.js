@@ -189,10 +189,21 @@ function onSubmit(frm)
 	if (!frm || (!srcid && !destid) || !src_amount || !dest_amount || !trdate || !submitbtn)
 		return false;
 
-	if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
+	if (isExpense())
 	{
-		alert('Please input correct source amount.');
-		return false;
+		if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
+		{
+			alert('Please input correct source amount.');
+			return false;
+		}
+	}
+	else if (isIncome())
+	{
+		if (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value)))
+		{
+			alert('Please input correct destination amount.');
+			return false;
+		}
 	}
 
 	src_amount.value = fixFloat(src_amount.value);
