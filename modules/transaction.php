@@ -65,10 +65,10 @@
 		$trdate = strtotime($_POST["date"]);
 		$fdate = date("Y-m-d H:i:s", $trdate);
 		$comment = $db->escape($_POST["comm"]);
-	}
 
-	if ($amount == 0.0 || $charge == 0.0 || $trdate == -1)
-		fail($defMsg);
+		if ($amount == 0.0 || $charge == 0.0 || $trdate == -1)
+			fail($defMsg);
+	}
 
 	$trans = new Transaction($user_id);
 	if ($action == "new")
