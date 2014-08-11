@@ -201,8 +201,8 @@
 			$transCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
 			$transAccCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
 
-			$srcAmountCurr = $transCurr;
-			$destAmountCurr = $transAccCurr;
+			$srcAmountCurr = (!is_null($src)) ? $src["curr"] : $dest["curr"];
+			$destAmountCurr = (!is_null($dest)) ? $dest["curr"] : $src["curr"];
 		}
 		else
 		{
