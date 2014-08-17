@@ -797,7 +797,7 @@ function getValues()
 	{
 		if (debtType)	// person give to us; person account is source
 		{
-			S1 = getCurPersonBalance(trans_curr);
+			S1 = getCurPersonBalance(srcCurr);
 			S2 = resbal.value;
 			if (!noAccount)
 			{
@@ -807,7 +807,7 @@ function getValues()
 		}
 		else			// person take from us; person account is destination
 		{
-			S1_d = getCurPersonBalance(trans_curr);
+			S1_d = getCurPersonBalance(destCurr);
 			S2_d = resbal.value;
 			if (!noAccount)
 			{
