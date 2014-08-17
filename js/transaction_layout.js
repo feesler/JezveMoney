@@ -450,3 +450,36 @@ function toggleEnableAccount()
 
 	onChangeAcc();
 }
+
+
+// Set currency button active/inactive
+function setCurrActive(src, act)
+{
+	var amountRow, currContainer, currBtn, inputContainer;
+
+	amountRow = ge((src) ? 'src_amount_row' : 'dest_amount_row');
+	if (!amountRow || !amountRow.firstElementChild || !amountRow.firstElementChild.nextElementSibling)
+		return;
+
+	currContainer = amountRow.firstElementChild.nextElementSibling.firstElementChild;
+	if (!currContainer)
+		return;
+
+	currBtn = currContainer.firstElementChild;
+	inputContainer = currContainer.nextElementSibling;
+	if (!currBtn || !inputContainer)
+		return;
+
+	if (act)
+	{
+		removeClass(currBtn, 'inact_rbtn');
+		removeClass(inputContainer, 'trans_input');
+		addClass(inputContainer, 'rbtn_input');
+	}
+	else
+	{
+		addClass(currBtn, 'inact_rbtn');
+		addClass(inputContainer, 'trans_input');
+		removeClass(inputContainer, 'rbtn_input');
+	}
+}
