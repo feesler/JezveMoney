@@ -248,18 +248,35 @@ function onPersAccSel(obj)
 }
 
 
-// Currency select callback
-function onCurrencySel(obj)
+// Source currency select callback
+function onSrcCurrencySel(obj)
 {
-	var transcurr;
+	var src_curr;
 
 	if (!obj)
 		return;
-	transcurr = ge('transcurr');
-	if (!transcurr)
+	src_curr = ge('src_curr');
+	if (!src_curr)
 		return;
 
-	transcurr.value = obj.id;
+	src_curr.value = obj.id;
+
+	onChangeTransCurr();
+}
+
+
+// Destination currency select callback
+function onDestCurrencySel(obj)
+{
+	var dest_curr;
+
+	if (!obj)
+		return;
+	dest_curr = ge('dest_curr');
+	if (!dest_curr)
+		return;
+
+	dest_curr.value = obj.id;
 
 	onChangeTransCurr();
 }
