@@ -948,7 +948,7 @@ function isDiff()
 
 	if (isExpense() || isIncome() || isDebt())
 	{
-		srcAmountCurr = parseInt(src_curr);
+		srcAmountCurr = parseInt(src_curr.value);
 	}
 	else if (isTransfer())
 	{
