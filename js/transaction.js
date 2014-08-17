@@ -397,7 +397,10 @@ function onChangeAcc()
 
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
-		dest_amount.value = src_amount.value;
+		if (isExpense())
+			src_amount.value = dest_amount.value;
+		if (isIncome())
+			dest_amount.value = src_amount.value;
 
 		if (isDebt() && noAccount)
 		{
@@ -594,9 +597,9 @@ function updControls()
 		trdest_amount = trsrc_amount;
 
 		if (isExpense() || isTransfer())
-			dest_amount.value = src_amount.value;
-		else if (isIncome())
 			src_amount.value = dest_amount.value;
+		else if (isIncome())
+			dest_amount.value = src_amount.value;
 
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
