@@ -414,6 +414,7 @@ function onChangeAcc()
 	}
 
 	updateExchAndRes();
+	setExchangeComment();
 
 	setSign('destamountsign', destCurr);
 	setSign('srcamountsign', srcCurr);
