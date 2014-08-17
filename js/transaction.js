@@ -392,8 +392,8 @@ function onChangeAcc()
 
 	updateExchAndRes();
 
-	setSign('destamountsign', trans_acc_curr);
-	setSign('srcamountsign', trans_curr);
+	setSign('destamountsign', destCurr);
+	setSign('srcamountsign', srcCurr);
 
 	if (isDebt())
 	{
@@ -406,8 +406,8 @@ function onChangeAcc()
 
 		personname = getPersonName(person_id.value);
 
-		pbalance = getCurPersonBalance(trans_curr);
-		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+		pbalance = getCurPersonBalance(debtType ? srcCurr : destCurr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, debtType ? srcCurr : destCurr));
 	}
 
 	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
@@ -585,7 +585,7 @@ function updControls()
 		{
 			if (isDebt())
 			{
-				resbal.value = normalize(getCurPersonBalance(trans_curr) + normalize((debtType) ? -trsrc_amount : trdest_amount));
+				resbal.value = normalize(getCurPersonBalance((debtType) ? srcCurr : destCurr) + normalize((debtType) ? -trsrc_amount : trdest_amount));
 			}
 			else
 			{
@@ -593,7 +593,7 @@ function updControls()
 			}
 		}
 
-		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, trans_curr);
+		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, srcCurr);
 
 		if (isTransfer() || isDebt())
 		{
@@ -641,8 +641,8 @@ function updControls()
 			return;
 
 		personname = getPersonName(person_id.value);
-		pbalance = getCurPersonBalance(trans_curr);
-		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+		pbalance = getCurPersonBalance((debtType) ? srcCurr : destCurr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, (debtType) ? srcCurr : destCurr));
 
 		setTileAccount('acc_tile', parseInt(acc.value));
 	}
@@ -1189,13 +1189,13 @@ function onChangeSrcCurr()
 			return;
 
 		personname = getPersonName(person_id.value);
-		pbalance = getCurPersonBalance(trans_curr);
-		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+		pbalance = getCurPersonBalance(debtType ? srcCurr : destCurr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, debtType ? srcCurr : destCurr));
 
 		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	}
 }
 
@@ -1273,13 +1273,13 @@ function onChangeDestCurr()
 			return;
 
 		personname = getPersonName(person_id.value);
-		pbalance = getCurPersonBalance(trans_curr);
-		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+		pbalance = getCurPersonBalance(debtType ? srcCurr : destCurr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, debtType ? srcCurr : destCurr));
 
 		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	}
 }
 
