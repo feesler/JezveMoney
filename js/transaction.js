@@ -1000,7 +1000,7 @@ function onSrcAmountInput()
 	}
 	else
 	{
-		f2();		// calculate d
+		f2();		// calculate da
 		if (isIncome())
 		{
 			f1_d();			// calculate S2_d
