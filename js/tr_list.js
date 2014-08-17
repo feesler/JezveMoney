@@ -78,56 +78,26 @@ var transactions =
 		src_amount = trans[12];
 		dest_amount = trans[13];
 
-		if (tr_type == 1)		// expense
+		if (trans[1] != 0)
 		{
 			if (src_bal === null)
-				src_bal = trans[9] + dest_amount;		// trans.src_bal + trans.dest_amount
-			trans[9] = src_bal - dest_amount;
-			trans[10] = 0;
+				src_bal = trans[9] + src_amount;		// trans.src_bal - trans.src_amount
+			trans[9] = src_bal - src_amount;
 		}
-		else if (tr_type == 2)	// income
+		else
+		{
+			trans[9] = 0;
+		}
+
+		if (trans[2] != 0)
 		{
 			if (dest_bal === null)
-				dest_bal = trans[10] - dest_amount;		// trans.dest_bal - trans.dest_amount
-			trans[9] = 0;
+				dest_bal = trans[10] - dest_amount;		// trans.dest_bal + trans.dest_amount
 			trans[10] = dest_bal + dest_amount;
 		}
-		else if (tr_type == 3)
+		else
 		{
-			if (src_bal === null)
-				src_bal = trans[9] + dest_amount;		// trans.src_bal + trans.dest_amount
-			trans[9] = src_bal - dest_amount;
-
-			if (dest_bal === null)
-				dest_bal = trans[10] - src_amount;		// trans.dest_bal - trans.src_amount
-			trans[10] = dest_bal + src_amount;
-		}
-		else if (tr_type == 4)
-		{
-			if (trans[11] == 1)		// person give to us
-			{
-				if (src_bal === null)
-					src_bal = trans[9] + src_amount;		// trans.src_bal + trans.src_amount
-				trans[9] = src_bal - src_amount;
-				if (trans[2] != 0)	// trans.dest_id != 0
-				{
-					if (dest_bal === null)
-						dest_bal = trans[10] - dest_amount;		// trans.dest_bal - trans.dest_amount
-					trans[10] = dest_bal + dest_amount;
-				}
-			}
-			else if (trans[11] == 2)		// person take from us
-			{
-				if (trans[1] != 0)		// trans.src_id != 0
-				{
-					if (src_bal === null)
-						src_bal = trans[9] + dest_amount;		// trans.src_bal + trans.dest_amount
-					trans[9] = src_bal - dest_amount;
-				}
-				if (dest_bal === null)
-					dest_bal = trans[10] - src_amount;		// trans.dest_bal - trans.src_amount
-				trans[10] = dest_bal + src_amount;
-			}
+			trans[10] = 0;
 		}
 
 		trRow = ge('tr_' + tr_id);
