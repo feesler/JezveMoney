@@ -81,7 +81,7 @@ function f1()
 		var accid = ge(isDebt() ? 'acc_id' : 'src_id');
 
 		if (accid && (transaction.srcAcc == parseInt(accid.value)))
-			S2 += transaction.src_amount;
+			S2 += transaction.srcAmount;
 	}
 
 	if (isExpense() || isTransfer() || isDebt())
@@ -102,7 +102,7 @@ function f1_d()
 		var accid = ge(isDebt() ? 'acc_id' : 'src_id');
 
 		if (accid && (transaction.destAcc == parseInt(accid.value)))
-			S2_d -= transaction.dest_amount;
+			S2_d -= transaction.destAmount;
 	}
 
 	if (isIncome() || isTransfer() || isDebt())
@@ -125,7 +125,7 @@ function f3()
 	sa = correct(sa);
 
 	if (edit_mode)
-		sa += transaction.src_amount;
+		sa += transaction.srcAmount;
 
 	fsa = sa;
 }
@@ -578,7 +578,7 @@ function updControls()
 		exchrate_b.firstElementChild.innerHTML = '1';
 		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
 		{
-			var fixedBalance = getBalanceOfAccount(src_acc) + ((src_acc == transaction.srcAcc) ? transaction.dest_amount : -transaction.src_amount);
+			var fixedBalance = getBalanceOfAccount(src_acc) + ((src_acc == transaction.srcAcc) ? transaction.destAmount : -transaction.srcAmount);
 			resbal.value = normalize(fixedBalance - normalize(trdest_amount));
 		}
 		else
@@ -605,7 +605,7 @@ function updControls()
 
 			if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
 			{
-				var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.dest_amount : -transaction.src_amount);
+				var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.destAmount : -transaction.srcAmount);
 				resbal_d.value = normalize(fixedBalance + normalize(trsrc_amount));
 			}
 			else
