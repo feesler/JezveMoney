@@ -67,7 +67,7 @@
 		$fdate = date("Y-m-d H:i:s", $trdate);
 		$comment = $db->escape($_POST["comm"]);
 
-		if ($amount == 0.0 || $charge == 0.0 || $trdate == -1)
+		if ($src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
 			fail($defMsg);
 	}
 
