@@ -67,7 +67,7 @@ var transactions =
 
 	updateBalance : function(trans, src_bal, dest_bal)
 	{
-		var tr_id, tr_type, charge;
+		var tr_id, tr_type, src_amount, dest_amount;
 		var trRow, trBalanceItem;
 
 		if (!trans)
@@ -75,45 +75,45 @@ var transactions =
 
 		tr_id = trans[0];
 		tr_type = trans[5];
-		amount = trans[12];
-		charge = trans[13];
+		src_amount = trans[12];
+		dest_amount = trans[13];
 
 		if (tr_type == 1)		// expense
 		{
 			if (src_bal === null)
-				src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
-			trans[9] = src_bal - charge;
+				src_bal = trans[9] + dest_amount;		// trans.src_bal + trans.dest_amount
+			trans[9] = src_bal - dest_amount;
 			trans[10] = 0;
 		}
 		else if (tr_type == 2)	// income
 		{
 			if (dest_bal === null)
-				dest_bal = trans[10] - trans[13];		// trans.dest_bal - trans.charge
+				dest_bal = trans[10] - dest_amount;		// trans.dest_bal - trans.dest_amount
 			trans[9] = 0;
-			trans[10] = dest_bal + charge;
+			trans[10] = dest_bal + dest_amount;
 		}
 		else if (tr_type == 3)
 		{
 			if (src_bal === null)
-				src_bal = trans[9] + trans[13];		// trans.src_bal + trans.charge
-			trans[9] = src_bal - charge;
+				src_bal = trans[9] + dest_amount;		// trans.src_bal + trans.dest_amount
+			trans[9] = src_bal - dest_amount;
 
 			if (dest_bal === null)
-				dest_bal = trans[10] - trans[12];		// trans.dest_bal - trans.amount
-			trans[10] = dest_bal + amount;
+				dest_bal = trans[10] - src_amount;		// trans.dest_bal - trans.src_amount
+			trans[10] = dest_bal + src_amount;
 		}
 		else if (tr_type == 4)
 		{
 			if (trans[11] == 1)		// person give to us
 			{
 				if (src_bal === null)
-					src_bal = trans[9] + amount;		// trans.src_bal + trans.amount
-				trans[9] = src_bal - amount;
+					src_bal = trans[9] + src_amount;		// trans.src_bal + trans.src_amount
+				trans[9] = src_bal - src_amount;
 				if (trans[2] != 0)	// trans.dest_id != 0
 				{
 					if (dest_bal === null)
-						dest_bal = trans[10] - charge;		// trans.dest_bal - trans.charge
-					trans[10] = dest_bal + charge;
+						dest_bal = trans[10] - dest_amount;		// trans.dest_bal - trans.dest_amount
+					trans[10] = dest_bal + dest_amount;
 				}
 			}
 			else if (trans[11] == 2)		// person take from us
@@ -121,12 +121,12 @@ var transactions =
 				if (trans[1] != 0)		// trans.src_id != 0
 				{
 					if (src_bal === null)
-						src_bal = trans[9] + charge;		// trans.src_bal + trans.charge
-					trans[9] = src_bal - charge;
+						src_bal = trans[9] + dest_amount;		// trans.src_bal + trans.dest_amount
+					trans[9] = src_bal - dest_amount;
 				}
 				if (dest_bal === null)
-					dest_bal = trans[10] - amount;		// trans.dest_bal - trans.amount
-				trans[10] = dest_bal + amount;
+					dest_bal = trans[10] - src_amount;		// trans.dest_bal - trans.src_amount
+				trans[10] = dest_bal + src_amount;
 			}
 		}
 
