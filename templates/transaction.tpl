@@ -253,14 +253,14 @@
 							<div><label for="src_amount"><?=$srcAmountLbl?></label></div>
 							<div>
 								<div class="curr_container">
-<?php	if ($trans_type == 3) {		?>
+<?php	if ($trans_type != 2) {		?>
 									<div class="btn rcurr_btn inact_rbtn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	} else {	?>
 									<div class="btn rcurr_btn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	}	?>
 									<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
 								</div>
-<?php	if ($trans_type == 3) {		?>
+<?php	if ($trans_type != 2) {		?>
 								<div class="stretch_input trans_input">
 <?php	} else {	?>
 								<div class="stretch_input rbtn_input">
@@ -284,14 +284,14 @@
 							<div><label for="dest_amount"><?=$destAmountLbl?></label></div>
 							<div>
 								<div class="curr_container">
-<?php	if ($trans_type == 2) {		?>
+<?php	if ($trans_type == 1) {		?>
 									<div class="btn rcurr_btn"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	} else {	?>
 									<div class="btn rcurr_btn inact_rbtn"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	}	?>
 									<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
 								</div>
-<?php	if ($trans_type == 2) {		?>
+<?php	if ($trans_type == 1) {		?>
 								<div class="stretch_input rbtn_input">
 <?php	} else {	?>
 								<div class="stretch_input trans_input">
