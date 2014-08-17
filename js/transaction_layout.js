@@ -354,7 +354,7 @@ function initControls()
 	}
 
 
-	if (isExpense() || (isDebt() && debtType))
+	if (isIncome() || (isDebt() && !debtType))
 	{
 		srcCurrDDList = new DDList();
 		if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
@@ -371,7 +371,7 @@ function initControls()
 			srcCurrDDList = null;
 	}
 
-	if (isIncome() || (isDebt() && !debtType))
+	if (isExpense() || (isDebt() && debtType))
 	{
 		destCurrDDList = new DDList();
 		if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
