@@ -390,9 +390,9 @@ function onChangeAcc()
 	// hide destination amount and exchange rate if new currencies is the same
 	if (srcCurr == destCurr)
 	{
-		if (isExpense() || (isDebt() && debtType))
+		if (isExpense())
 			hideSrcAmountAndExchange();
-		if (isIncome() || (isDebt() && !debtType))
+		if (isIncome())
 			hideDestAmountAndExchange();
 
 		exchrate.value = 1;
