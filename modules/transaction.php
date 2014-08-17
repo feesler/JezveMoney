@@ -61,7 +61,8 @@
 		}
 		$src_amount = floatval($_POST["src_amount"]);
 		$dest_amount = floatval($_POST["dest_amount"]);
-		$transcurr = (isset($_POST["transcurr"])) ? intval($_POST["transcurr"]) : 0;
+		$src_curr = (isset($_POST["src_curr"])) ? intval($_POST["src_curr"]) : 0;
+		$dest_curr = (isset($_POST["dest_curr"])) ? intval($_POST["dest_curr"]) : 0;
 		$trdate = strtotime($_POST["date"]);
 		$fdate = date("Y-m-d H:i:s", $trdate);
 		$comment = $db->escape($_POST["comm"]);
@@ -75,21 +76,21 @@
 	{
 		if ($trans_type == 4)
 		{
-			if (!$debt->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $transcurr, $transcurr, $fdate, $comment))
+			if (!$debt->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				fail($defMsg);
 			setMessage(MSG_DEBT_CREATE);
 			setLocation("../transactions.php?type=debt");
 		}
 		else
 		{
-			if ($trans_type == 1 && (!$src_id || !$transcurr))
+			if ($trans_type == 1 && (!$src_id || !$src_curr || !$dest_curr))
 				fail($defMsg);
-			if ($trans_type == 2 && (!$dest_id || !$transcurr))
+			if ($trans_type == 2 && (!$dest_id || !$src_curr || !$dest_curr))
 				fail($defMsg);
-			if ($trans_type == 3 && (!$src_id || !$dest_id))
+			if ($trans_type == 3 && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				fail($defMsg);
 
-			if (!$trans->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $transcurr, $transcurr, $fdate, $comment))
+			if (!$trans->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				fail($defMsg);
 			setMessage(MSG_TRANS_CREATE);
 			setLocation("../index.php");
@@ -102,13 +103,13 @@
 		$trans_id = intval($_POST["transid"]);
 		if ($trans_type == 4)
 		{
-			if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $transcurr, $fdate, $comment))
+			if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				fail($defMsg);
 			setMessage(MSG_DEBT_UPDATE);
 		}
 		else
 		{
-			if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $transcurr, $fdate, $comment))
+			if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				fail($defMsg);
 		}
 		$ttStr = Transaction::getTypeString($trans_type);
