@@ -535,7 +535,7 @@ function updControls()
 	}
 
 	if (isDebt())
-		selCurrVal = noAccount ? parseInt(transcurr.value) : getCurrencyOfAccount(debt_acc);
+		selCurrVal = noAccount ? parseInt(src_curr.value) : getCurrencyOfAccount(debt_acc);
 	else
 		selCurrVal = getCurrencyOfAccount(src_acc);
 
@@ -545,6 +545,8 @@ function updControls()
 		destAmountCurr = getCurrencyOfAccount(src_acc);
 		src_curr.value = srcAmountCurr;
 		srcCurr = srcAmountCurr;
+		dest_curr.value = destAmountCurr;
+		destCurr = destAmountCurr;
 	}
 	else if (isDebt())
 	{
