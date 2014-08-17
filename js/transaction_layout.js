@@ -272,7 +272,7 @@ function onSrcCurrencySel(obj)
 
 	src_curr.value = obj.id;
 
-	onChangeTransCurr();
+	onChangeSrcCurr();
 }
 
 
@@ -289,7 +289,7 @@ function onDestCurrencySel(obj)
 
 	dest_curr.value = obj.id;
 
-	onChangeTransCurr();
+	onChangeDestCurr();
 }
 
 

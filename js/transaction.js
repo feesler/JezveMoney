@@ -1129,8 +1129,8 @@ function onFInput(obj)
 }
 
 
-// Currency of transaction change event handler
-function onChangeTransCurr()
+// Source currency change event handler
+function onChangeSrcCurr()
 {
 	var accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
 	var srcAmountCurr, destAmountCurr, isDiff;
@@ -1146,6 +1146,9 @@ function onChangeTransCurr()
 	if (!accid || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount)
 		return;
 
+	if (isExpense() || isTransfer() || (isDebt() && debtType))
+		return;
+
 	srcAmountCurr = parseInt(src_curr.value);
 	if (isDebt() && noAccount)
 		destAmountCurr = srcAmountCurr;
@@ -1156,6 +1159,10 @@ function onChangeTransCurr()
 	if (isDiff)
 	{
 		destAmountSwitch(true);
+		setAmountInputLabel(true, true);
+		setAmountInputLabel(false, true);
+		setCurrActive(true, true);		// set source active
+		setCurrActive(false, false);		// set destination inactive
 		exchRateSwitch(false);
 	}
 	else
@@ -1166,10 +1173,95 @@ function onChangeTransCurr()
 
 		updateExchAndRes();
 
+		setAmountInputLabel(true, false);
 		hideDestAmountAndExchange();
 	}
 
 	srcCurr = srcAmountCurr;
+
+	setSign('destamountsign', destAmountCurr);
+	setSign('srcamountsign', srcAmountCurr);
+	if (isDebt())
+	{
+		setSign('res_currsign', srcAmountCurr);
+		setSign('res_currsign_d', destAmountCurr);
+	}
+
+	getValues();
+	updateExchAndRes();
+	setExchangeComment();
+
+	if (isDebt())
+	{
+		var person_tile, person_id, personname, pbalance, resbal_b;
+
+		person_tile = ge('person_tile');
+		person_id = ge('person_id');
+		resbal_b = ge('resbal_b');
+		if (!person_tile || !person_id || !resbal_b)
+			return;
+
+		personname = getPersonName(person_id.value);
+		pbalance = getCurPersonBalance(trans_curr);
+		setTileInfo(person_tile, personname, formatCurrency(pbalance, trans_curr));
+
+		if (debtType)
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+		else
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+	}
+}
+
+
+// Destination currency change event handler
+function onChangeDestCurr()
+{
+	var accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
+	var srcAmountCurr, destAmountCurr, isDiff;
+
+	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
+	src_amount = ge('src_amount');
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
+	exchange = ge('exchange');
+	exchrate = ge('exchrate');
+	exchrate_b = ge('exchrate_b');
+	dest_amount = ge('dest_amount');
+	if (!accid || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount)
+		return;
+
+	if (isIncome() || isTransfer() || (isDebt() && !debtType))
+		return;
+
+	destAmountCurr = parseInt(dest_curr.value);
+	if (isDebt() && noAccount)
+		srcAmountCurr = destAmountCurr;
+	else
+		srcAmountCurr = getCurrencyOfAccount(accid.value);
+
+	isDiff = (srcAmountCurr != destAmountCurr);
+	if (isDiff)
+	{
+		srcAmountSwitch(true);
+		setAmountInputLabel(true, true);
+		setAmountInputLabel(false, true);
+		setCurrActive(true, false);		// set source inactive
+		setCurrActive(false, true);		// set destination active
+		exchRateSwitch(false);
+	}
+	else
+	{
+		exchrate.value = 1;
+		exchrate_b.firstElementChild.innerHTML = '1';
+		dest_amount.value = src_amount.value;
+
+		updateExchAndRes();
+
+		setAmountInputLabel(false, false);
+		hideSrcAmountAndExchange();
+	}
+
+	destCurr = destAmountCurr;
 
 	setSign('destamountsign', destAmountCurr);
 	setSign('srcamountsign', srcAmountCurr);
