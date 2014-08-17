@@ -1143,7 +1143,7 @@ function onChangeTransCurr()
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	dest_amount = ge('dest_amount');
-	if (!accid || !src_amount || !src_curr, !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount)
+	if (!accid || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount)
 		return;
 
 	srcAmountCurr = parseInt(src_curr.value);
