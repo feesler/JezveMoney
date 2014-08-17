@@ -703,42 +703,29 @@ function onChangeDest()
 // Set exchange rate comment
 function setExchangeComment()
 {
-	var exchcomm, exchrate_b, src_curr, dest_curr, accid, taccid;
+	var exchcomm, exchrate_b, src_curr, dest_curr;
 	var destAmountSign, srcAmountSign;
 	var invExch;
 
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
-	if (isExpense() || isTransfer() || isDebt())
-		src_curr = ge('src_curr');
-	if (isIncome() || isTransfer() || isDebt())
-		src_curr = ge('dest_curr');
-	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
-	if (isTransfer())
-		taccid = ge('dest_id');
-	if (!exchcomm || !exchrate_b || !accid || (!src_curr && !taccid))
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
+	if (!exchcomm || !exchrate_b || !src_curr || !dest_curr)
 		return;
 
 	srcCurr = parseInt(src_curr.value);
+	destCurr = parseInt(dest_curr.value);
+
+	destAmountSign = getCurrencySign(destCurr);
+	srcAmountSign = getCurrencySign(srcCurr);
 
 	if (fe == 1.0 || fe == 0.0 || e == '')
 	{
-		destAmountSign = getCurrencySign(getCurrencyOfAccount(accid.value));
-		if (isTransfer())
-			srcAmountSign = getCurrencySign(getCurrencyOfAccount(taccid.value));
-		else
-			srcAmountSign = getCurrencySign(srcCurr);
-
 		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign;
 	}
 	else
 	{
-		destAmountSign = getCurrencySign(getCurrencyOfAccount(accid.value));
-		if (isTransfer())
-			srcAmountSign = getCurrencySign(getCurrencyOfAccount(taccid.value));
-		else
-			srcAmountSign = getCurrencySign(srcCurr);
-
 		invExch = parseFloat((1 / fe).toFixed(5));
 
 		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign + ' ('  + invExch + ' ' + srcAmountSign + '/' + destAmountSign + ')';
