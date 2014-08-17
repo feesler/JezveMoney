@@ -1021,18 +1021,16 @@ function onDestAmountInput()
 	if (!s1valid && !s1dvalid)
 		return;
 
-	var tfsa = fsa;
-
-	if (!savalid)
-		fsa = fda;
+	if (!isDiff())
+	{
+		f4();		// calculate sa
+	}
 
 	if (isIncome() || isTransfer() || (isDebt() && debtType))
 		f1_d();		// calculate S2_d
 	if (isExpense() || isTransfer() || (isDebt() && !debtType))
 		f1();			// calculate S2
 
-	if (!savalid)
-		fsa = tfsa;
 	if (savalid)
 		f5();		// calculate e
 
