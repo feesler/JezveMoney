@@ -336,38 +336,39 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
-	var srcid, destid, accid, src_amount, transcurr, exchange, exchrate, exchrate_b, dest_amount;
+	var srcid, destid, accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
 	var sync = false, target_id, new_acc_id;
 
 	srcid = ge('src_id');
 	destid = ge('dest_id');
 	accid = ge('acc_id');
 	src_amount = ge('src_amount');
-	transcurr = ge('transcurr');
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	dest_amount = ge('dest_amount');
 	resbal_b = ge(((isDebt() && !debtType) || isIncome()) ? 'resbal_d_b' : 'resbal_b');
-	if ((!srcid && !destid && !accid) || !src_amount || !transcurr || !exchange || !exchrate || !exchrate_b || !dest_amount || !resbal_b)
+	if ((!srcid && !destid && !accid) || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount || !resbal_b)
 		return false;
 
-	if (trans_curr == trans_acc_curr)				// currency of transaction is the same as currency of account
+	if (srcCurr == destCurr)				// currency of transaction is the same as currency of account
 		sync = true;
 
 	target_id = isIncome() ? destid : (isDebt() ? accid : srcid);
 	if (!(isDebt() && noAccount))
 	{
 		new_acc_id = parseInt(target_id.value);
-		trans_acc_curr = getCurrencyOfAccount(new_acc_id);
+		destCurr = getCurrencyOfAccount(new_acc_id);
 	}
 	if (sync)
-		transcurr.value = trans_acc_curr;	// update currency of transaction
+		dest_curr.value = destCurr;		// update currency of transaction
 
-	trans_curr = parseInt(transcurr.value);
+	srcCurr = parseInt(src_curr.value);
 
 	// hide destination amount and exchange rate if new currencies is the same
-	if (trans_curr == trans_acc_curr)
+	if (srcCurr == destCurr)
 	{
 		hideDestAmountAndExchange();
 
@@ -478,7 +479,7 @@ function onTransferSubmit(frm)
 /* TODO : don't calculate values here; we have getValues(), f1-5() */
 function updControls()
 {
-	var src, dest, acc, src_amount, dest_amount, exchrate, exchrate_b, exchange, resbal, transcurr;
+	var src, dest, acc, src_amount, dest_amount, exchrate, exchrate_b, exchange, resbal, src_curr, dest_curr;
 	var src_acc, dest_acc, debt_acc, trsrc_amount, trdest_amount, selCurrVal;
 
 	src = ge('src_id');
@@ -491,8 +492,9 @@ function updControls()
 	exchange = ge('exchange');
 	resbal = ge('resbal');
 	resbal_b = ge('resbal_b');
-	transcurr = ge('transcurr');
-	if ((!src && !dest && !acc) || !src_amount || !dest_amount || !exchrate || !exchange || !resbal || !resbal_b || !transcurr)
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
+	if ((!src && !dest && !acc) || !src_amount || !dest_amount || !exchrate || !exchange || !resbal || !resbal_b || !src_curr || !dest_curr)
 		return;
 
 	if (isDebt())
@@ -514,13 +516,13 @@ function updControls()
 	{
 		srcAmountCurr = getCurrencyOfAccount(dest_acc);
 		destAmountCurr = getCurrencyOfAccount(src_acc);
-		transcurr.value = srcAmountCurr;
-		trans_curr = srcAmountCurr;
+		src_curr.value = srcAmountCurr;
+		srcCurr = srcAmountCurr;
 	}
 	else if (isDebt())
 	{
-		trans_curr = parseInt(transcurr.value);
-		srcAmountCurr = trans_curr;
+		srcCurr = parseInt(src_curr.value);
+		srcAmountCurr = srcCurr;
 		destAmountCurr = noAccount ? selCurrVal : getCurrencyOfAccount(debt_acc);
 	}
 
@@ -567,7 +569,11 @@ function updControls()
 		trsrc_amount = (src_amount.value != '') ? src_amount.value : 0;
 		trdest_amount = trsrc_amount;
 
-		dest_amount.value = src_amount.value;
+		if (isExpense() || isTransfer())
+			dest_amount.value = src_amount.value;
+		else if (isIncome())
+			src_amount.value = dest_amount.value;
+
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
 		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
@@ -697,19 +703,23 @@ function onChangeDest()
 // Set exchange rate comment
 function setExchangeComment()
 {
-	var exchcomm, exchrate_b, transcurr, accid, taccid;
+	var exchcomm, exchrate_b, src_curr, dest_curr, accid, taccid;
 	var destAmountSign, srcAmountSign;
 	var invExch;
 
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
-	if (isExpense() || isIncome() || isDebt())
-		transcurr = ge('transcurr');
+	if (isExpense() || isTransfer() || isDebt())
+		src_curr = ge('src_curr');
+	if (isIncome() || isTransfer() || isDebt())
+		src_curr = ge('dest_curr');
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	if (isTransfer())
 		taccid = ge('dest_id');
-	if (!exchcomm || !exchrate_b || !accid || (!transcurr && !taccid))
+	if (!exchcomm || !exchrate_b || !accid || (!src_curr && !taccid))
 		return;
+
+	srcCurr = parseInt(src_curr.value);
 
 	if (fe == 1.0 || fe == 0.0 || e == '')
 	{
@@ -717,7 +727,7 @@ function setExchangeComment()
 		if (isTransfer())
 			srcAmountSign = getCurrencySign(getCurrencyOfAccount(taccid.value));
 		else
-			srcAmountSign = getCurrencySign(parseInt(transcurr.value));
+			srcAmountSign = getCurrencySign(srcCurr);
 
 		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign;
 	}
@@ -727,7 +737,7 @@ function setExchangeComment()
 		if (isTransfer())
 			srcAmountSign = getCurrencySign(getCurrencyOfAccount(taccid.value));
 		else
-			srcAmountSign = getCurrencySign(parseInt(transcurr.value));
+			srcAmountSign = getCurrencySign(srcCurr);
 
 		invExch = parseFloat((1 / fe).toFixed(5));
 
@@ -868,7 +878,7 @@ function setValues()
 		return;
 
 	src_amount.value = sa;
-	src_amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(sa) ? sa : 0), trans_curr);
+	src_amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(sa) ? sa : 0), srcCurr);
 
 
 	selCurrVal = getCurrencyOfAccount((ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')).value);
@@ -900,9 +910,9 @@ function setValues()
 	if (isDebt())
 	{
 		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), trans_curr);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), trans_curr);
+			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), srcCurr);
 	}
 	else if (isIncome())
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
@@ -911,7 +921,7 @@ function setValues()
 
 	if (isTransfer())
 	{
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, trans_curr);
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
 	}
 	else if (isDebt() && !noAccount)
 	{
@@ -926,18 +936,19 @@ function setValues()
 // Check currency of source amount and destination amount is different
 function isDiff()
 {
-	var srcAmountCurr, destAmountCurr;
+	var srcAmountCurr, destAmountCurr, src_curr, dest_curr;
 	var accid, destid;
 
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
-	transcurr = ge('transcurr');
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
 
 	if (isDebt() && noAccount)
 		return false;
 
 	if (isExpense() || isIncome() || isDebt())
 	{
-		srcAmountCurr = parseInt(transcurr.value);
+		srcAmountCurr = parseInt(src_curr);
 	}
 	else if (isTransfer())
 	{
@@ -1122,20 +1133,21 @@ function onFInput(obj)
 // Currency of transaction change event handler
 function onChangeTransCurr()
 {
-	var accid, src_amount, transcurr, exchange, exchrate, exchrate_b, dest_amount;
+	var accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
 	var srcAmountCurr, destAmountCurr, isDiff;
 
 	accid = ge(isIncome() ? 'dest_id' : (isDebt()) ? 'acc_id' : 'src_id');
 	src_amount = ge('src_amount');
-	transcurr = ge('transcurr');
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
 	exchange = ge('exchange');
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	dest_amount = ge('dest_amount');
-	if (!accid || !src_amount || !transcurr || !exchange || !exchrate || !exchrate_b || !dest_amount)
+	if (!accid || !src_amount || !src_curr, !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount)
 		return;
 
-	srcAmountCurr = parseInt(transcurr.value);
+	srcAmountCurr = parseInt(src_curr.value);
 	if (isDebt() && noAccount)
 		destAmountCurr = srcAmountCurr;
 	else
@@ -1158,7 +1170,7 @@ function onChangeTransCurr()
 		hideDestAmountAndExchange();
 	}
 
-	trans_curr = srcAmountCurr;
+	srcCurr = srcAmountCurr;
 
 	setSign('destamountsign', destAmountCurr);
 	setSign('srcamountsign', srcAmountCurr);

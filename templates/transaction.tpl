@@ -16,13 +16,8 @@
 	};
 <?php	}	?>
 	var trans_type = <?=$tr["type"]?>;
-<?php	if ($action == "edit" || $trans_type == 4) {	?>
-	var trans_curr = <?=$tr["src_curr"]?>;
-	var trans_acc_curr = <?=$tr["src_curr"]?>;
-<?php	} else {	?>
-	var trans_curr = <?=$transCurr?>;
-	var trans_acc_curr = <?=$transAccCurr?>;
-<?php	}	?>
+	var srcCurr = <?=$tr["src_curr"]?>;
+	var destCurr = <?=$tr["dest_curr"]?>;
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
 <?php	if ($trans_type == 4) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
@@ -263,7 +258,7 @@
 <?php	} else {	?>
 									<div class="btn rcurr_btn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	}	?>
-									<input id="transcurr" name="transcurr" type="hidden" value="<?=$srcAmountCurr?>">
+									<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
 								</div>
 <?php	if ($trans_type == 3) {		?>
 								<div class="stretch_input trans_input">
@@ -288,7 +283,12 @@
 <?php	}	?>
 							<div><label for="dest_amount">Destination amount</label></div>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="destamountsign"><?=$destAmountSign?></div></div></div>
+								<div class="curr_container">
+									<div class="btn rcurr_btn inact_rbtn">
+										<div id="destamountsign"><?=$destAmountSign?></div>
+									</div>
+									<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
+								</div>
 								<div class="stretch_input trans_input">
 									<div>
 <?php	if ($action == "edit") {	?>
