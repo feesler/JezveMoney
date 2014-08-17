@@ -269,7 +269,7 @@ function onCurrencySel(obj)
 function initControls()
 {
 	var isMobile;
-	var srcDDList, destDDList, transCurrDDList;
+	var srcDDList, destDDList, srcCurrDDList, destCurrDDList;
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
@@ -337,21 +337,38 @@ function initControls()
 	}
 
 
-	if (!isTransfer())
+	if (isExpense() || (isDebt() && debtType))
 	{
-		transCurrDDList = new DDList();
-		if (transCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'curr', listAttach : true, selCB : onCurrencySel, editable : false, mobile : isMobile }))
+		srcCurrDDList = new DDList();
+		if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
 		{
 			currency.forEach(function(curr)
 			{
 				curr_id = curr[0];
 				currName = curr[1];
 
-				transCurrDDList.addItem(curr_id, currName);
+				srcCurrDDList.addItem(curr_id, currName);
 			});
 		}
 		else
-			transCurrDDList = null;
+			srcCurrDDList = null;
+	}
+
+	if (isIncome() || (isDebt() && !debtType))
+	{
+		destCurrDDList = new DDList();
+		if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
+		{
+			currency.forEach(function(curr)
+			{
+				curr_id = curr[0];
+				currName = curr[1];
+
+				destCurrDDList.addItem(curr_id, currName);
+			});
+		}
+		else
+			destCurrDDList = null;
 	}
 }
 
