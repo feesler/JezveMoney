@@ -970,18 +970,17 @@ function onSrcAmountInput()
 
 	if (isDiff())
 	{
-		var tfda = fda;
+		if (davalid)
+		{
+			if (isIncome() || isTransfer() || (isDebt() && !debtType))
+				f1_d();			// calculate S2_d
+		}
+		if (savalid)
+		{
+			if (isExpense() || isTransfer() || (isDebt() && debtType))
+				f1();				// calculate S2
+		}
 
-		if (!davalid)
-			fda = fsa;
-
-		if (isIncome() || isTransfer() || (isDebt() && !debtType))
-			f1_d();			// calculate S2_d
-		else if (isExpense() || (isDebt() && debtType))
-			f1();				// calculate S2
-
-		if (!davalid)
-			fda = tfda;
 		if (davalid)
 			f5();		// calculate e
 	}
