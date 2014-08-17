@@ -353,24 +353,47 @@ function onChangeAcc()
 	if ((!srcid && !destid && !accid) || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount || !resbal_b)
 		return false;
 
-	if (srcCurr == destCurr)				// currency of transaction is the same as currency of account
+	if (srcCurr == destCurr)				// source currency is the same as destination currency
 		sync = true;
 
 	target_id = isIncome() ? destid : (isDebt() ? accid : srcid);
 	if (!(isDebt() && noAccount))
 	{
 		new_acc_id = parseInt(target_id.value);
-		destCurr = getCurrencyOfAccount(new_acc_id);
+		if (isExpense() || (isDebt() && debtType))
+			srcCurr = getCurrencyOfAccount(new_acc_id);
+		if (isIncome() || (isDebt() && !debtType))
+			destCurr = getCurrencyOfAccount(new_acc_id);
 	}
 	if (sync)
+	{
+		if (isExpense() || (isDebt() && debtType))
+			dest_curr.value = srcCurr;
+		if (isIncome() || (isDebt() && !debtType))
+			src_curr.value = destCurr;		// update currency of transaction
+	}
+
+	if (isExpense() || (isDebt() && debtType))
+		src_curr.value = srcCurr;
+	if (isIncome() || (isDebt() && !debtType))
 		dest_curr.value = destCurr;		// update currency of transaction
 
-	srcCurr = parseInt(src_curr.value);
+	if (isExpense())
+		destCurr = parseInt(dest_curr.value);
+	else if (isDebt() && debtType)
+		destCurr = srcCurr;
+	else if (isIncome())
+		srcCurr = parseInt(src_curr.value);
+	else if (isDebt() && !debtType)
+		srcCurr = destCurr;
 
 	// hide destination amount and exchange rate if new currencies is the same
 	if (srcCurr == destCurr)
 	{
-		hideDestAmountAndExchange();
+		if (isExpense() || (isDebt() && debtType))
+			hideSrcAmountAndExchange();
+		if (isIncome() || (isDebt() && !debtType))
+			hideDestAmountAndExchange();
 
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
