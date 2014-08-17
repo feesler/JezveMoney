@@ -161,6 +161,17 @@ function onExchRateSelect()
 }
 
 
+// Hide both source amount and exchange rate controls
+function hideSrcAmountAndExchange()
+{
+	show('src_amount_row', false);
+	show('src_amount_left',  false);
+
+	show('exchange', false);
+	show('exch_left', false);
+}
+
+
 // Hide both destination amount and exchange rate controls
 function hideDestAmountAndExchange()
 {
