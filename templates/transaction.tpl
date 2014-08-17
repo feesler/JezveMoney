@@ -250,7 +250,7 @@
 <?php	} else {	?>
 						<div id="src_amount_row" class="non_float" style="display: none;">
 <?php	}	?>
-							<div><label for="src_amount">Source amount</label></div>
+							<div><label for="src_amount"><?=$srcAmountLbl?></label></div>
 							<div>
 								<div class="curr_container">
 <?php	if ($trans_type == 3) {		?>
@@ -281,7 +281,7 @@
 <?php	} else {	?>
 						<div id="dest_amount_row" class="non_float" style="display: none;">
 <?php	}	?>
-							<div><label for="dest_amount">Destination amount</label></div>
+							<div><label for="dest_amount"><?=$destAmountLbl?></label></div>
 							<div>
 								<div class="curr_container">
 <?php	if ($trans_type == 2) {		?>

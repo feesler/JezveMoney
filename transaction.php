@@ -274,6 +274,8 @@
 		}
 	}
 
+	$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
+	$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
 
 	if ($trans_type == 4)
 	{
