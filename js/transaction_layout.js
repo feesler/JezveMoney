@@ -483,3 +483,23 @@ function setCurrActive(src, act)
 		removeClass(inputContainer, 'rbtn_input');
 	}
 }
+
+
+// Set full/short text for source or destination input label
+function setAmountInputLabel(src, full)
+{
+	var amountRow, lblObj;
+
+	amountRow = ge((src) ? 'src_amount_row' : 'dest_amount_row');
+	if (!amountRow || !amountRow.firstElementChild)
+		return;
+
+	lblObj = amountRow.firstElementChild.firstElementChild;
+	if (!lblObj)
+		return;
+
+	if (full)
+		lblObj.innerHTML = (src) ? 'Source amount' : 'Destination amount';
+	else
+		lblObj.innerHTML = 'Amount';
+}
