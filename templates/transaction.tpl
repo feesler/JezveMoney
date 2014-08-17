@@ -284,12 +284,18 @@
 							<div><label for="dest_amount">Destination amount</label></div>
 							<div>
 								<div class="curr_container">
-									<div class="btn rcurr_btn inact_rbtn">
-										<div id="destamountsign"><?=$destAmountSign?></div>
-									</div>
+<?php	if ($trans_type == 2) {		?>
+									<div class="btn rcurr_btn"><div id="destamountsign"><?=$destAmountSign?></div></div>
+<?php	} else {	?>
+									<div class="btn rcurr_btn inact_rbtn"><div id="destamountsign"><?=$destAmountSign?></div></div>
+<?php	}	?>
 									<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
 								</div>
+<?php	if ($trans_type == 2) {		?>
+								<div class="stretch_input rbtn_input">
+<?php	} else {	?>
 								<div class="stretch_input trans_input">
+<?php	}	?>
 									<div>
 <?php	if ($action == "edit") {	?>
 										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="<?=$tr["dest_amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
