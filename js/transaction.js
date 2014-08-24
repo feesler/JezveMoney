@@ -892,7 +892,6 @@ function getValues()
 function setValues()
 {
 	var src_amount, src_amount_b, dest_amount, dest_amount_b, exchrate, exchcomm, exchrate_b, resbal, resbal_d, resbal_b, resbal_d_b;
-	var selCurrVal;
 
 	src_amount = ge('src_amount');
 	src_amount_b = ge('src_amount_b');
@@ -911,11 +910,8 @@ function setValues()
 	src_amount.value = sa;
 	src_amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(sa) ? sa : 0), srcCurr);
 
-
-	selCurrVal = getCurrencyOfAccount((ge(isIncome() ? 'dest_id' : isDebt() ? 'acc_id' : 'src_id')).value);
-
 	dest_amount.value = da;
-	dest_amount_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(da) ? da : 0), selCurrVal);
+	dest_amount_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(da) ? da : 0), destCurr);
 
 	exchrate.value = e;
 	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
@@ -943,9 +939,9 @@ function setValues()
 		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 	}
 	else if (isIncome())
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	else
-		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), selCurrVal);
+		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 
 	if (isTransfer())
 	{
@@ -953,7 +949,7 @@ function setValues()
 	}
 	else if (isDebt() && !noAccount)
 	{
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
 	}
 }
 
