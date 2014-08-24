@@ -4,7 +4,7 @@ class Transaction extends CachedTable
 {
 	static private $dcache = NULL;
 	static private $user_id = 0;
-	static private $tbl_name = "transactions_dev";
+	static private $tbl_name = "transactions";
 
 
 	// Class constructor
