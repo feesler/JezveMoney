@@ -82,7 +82,7 @@
 		$itemsInGroup = 0;
 		$trans_time = 0;
 
-		$fields = "tr.date AS date, tr.charge AS charge";
+		$fields = "tr.date AS date, tr.src_amount AS src_amount, tr.dest_amount AS dest_amount";
 		$tables = "transactions AS tr";
 		$cond =  "tr.user_id=".$user_id." AND tr.type=".$trans_type;
 
@@ -112,7 +112,7 @@
 
 			if ($group_type == 0)		// no grouping
 			{
-				$chargeArr[] = floatval($row["charge"]);
+				$chargeArr[] = floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
 
 				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
 				{
@@ -150,7 +150,7 @@
 				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
 
-			$curSum += floatval($row["charge"]);
+			$curSum += floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
 		}
 
 		// save remain value
