@@ -337,6 +337,7 @@ function updateExchAndRes()
 function onChangeAcc()
 {
 	var srcid, destid, accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
+	var resbal, resbal_d, resbal_b, resbal_d_b;
 	var sync = false, target_id, new_acc_id;
 
 	srcid = ge('src_id');
@@ -349,8 +350,11 @@ function onChangeAcc()
 	exchrate = ge('exchrate');
 	exchrate_b = ge('exchrate_b');
 	dest_amount = ge('dest_amount');
-	resbal_b = ge(((isDebt() && !debtType) || isIncome()) ? 'resbal_d_b' : 'resbal_b');
-	if ((!srcid && !destid && !accid) || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount || !resbal_b)
+	resbal = ge('resbal');
+	resbal_d = ge('resbal_d');
+	resbal_b = ge('resbal_b');
+	resbal_d_b = ge('resbal_d_b');
+	if ((!srcid && !destid && !accid) || !src_amount || !src_curr || !dest_curr || !exchange || !exchrate || !exchrate_b || !dest_amount || (!resbal && !resbal_d) || (!resbal_b && !resbal_d_b))
 		return false;
 
 	if (srcCurr == destCurr)				// source currency is the same as destination currency
@@ -407,7 +411,18 @@ function onChangeAcc()
 		}
 		else
 		{
-			resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
+			if (isDebt())
+			{
+				if (debtType)
+					resbal.value = getCurPersonBalance(srcCurr);
+				else
+					resbal_d.value = getCurPersonBalance(srcCurr);
+			}
+
+			if ((isDebt() && debtType) || isIncome())
+				resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
+			else if ((isDebt && !debtType) || isExpense())
+				resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
 		}
 	}
 	else
@@ -925,10 +940,7 @@ function setValues()
 
 	if (isDebt())
 	{
-		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
-		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), srcCurr);
+		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 	}
 	else if (isIncome())
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), selCurrVal);
@@ -941,10 +953,7 @@ function setValues()
 	}
 	else if (isDebt() && !noAccount)
 	{
-		if (debtType)		// person give
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
-		else				// person take
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2) ? S2 : S1, selCurrVal);
+		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, selCurrVal);
 	}
 }
 
