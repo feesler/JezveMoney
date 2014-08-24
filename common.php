@@ -73,7 +73,7 @@
 		if (!$user_id || !$curr_acc_id || !$trans_type)
 			return NULL;
 
-		$chargeArr = array();
+		$amountArr = array();
 		$groupArr = array();
 		$sumDate = NULL;
 		$curDate = NULL;
@@ -112,7 +112,7 @@
 
 			if ($group_type == 0)		// no grouping
 			{
-				$chargeArr[] = floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
+				$amountArr[] = floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
 
 				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
 				{
@@ -145,7 +145,7 @@
 			else if ($sumDate != NULL && $sumDate != $curDate)
 			{
 				$sumDate = $curDate;
-				$chargeArr[] = $curSum;
+				$amountArr[] = $curSum;
 				$curSum = 0.0;
 				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
@@ -158,15 +158,15 @@
 		{
 			if ($sumDate != NULL && $sumDate != $curDate)
 			{
-				$chargeArr[] = $curSum;
+				$amountArr[] = $curSum;
 				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 			}
 			else
 			{
-				if (!count($chargeArr))
-					$chargeArr[] = $curSum;
+				if (!count($amountArr))
+					$amountArr[] = $curSum;
 				else
-					$chargeArr[count($chargeArr) - 1] += $curSum;
+					$amountArr[count($amountArr) - 1] += $curSum;
 				if (!count($groupArr))
 					$groupArr[] = array(date("d.m.Y", $trans_time), 1);
 				else if ($group_type == 0)
@@ -176,9 +176,9 @@
 
 		if ($limit > 0)
 		{
-			$chargeCount = count($chargeArr);
-			$limitCount = min($chargeCount, $limit);
-			$chargeArr = array_slice($chargeArr, -$limitCount);
+			$amountCount = count($amountArr);
+			$limitCount = min($amountCount, $limit);
+			$amountArr = array_slice($amountArr, -$limitCount);
 
 			$groupCount = count($groupArr);
 
@@ -196,7 +196,7 @@
 			$groupArr = array_slice($groupArr, -$newGroupsCount);
 		}
 
-		return array($chargeArr, $groupArr);
+		return array($amountArr, $groupArr);
 	}
 
 
