@@ -1324,17 +1324,35 @@ function onChangeDestCurr()
 function onChangeDebtOp()
 {
 	var acclbl, debtgive, debttake;
+	var src_res_balance_left, dest_res_balance_left, dest_amount_left, exch_left;
 
 	acclbl = ge('acclbl');
 	debtgive = ge('debtgive');
 	debttake = ge('debttake');
-	if (!acclbl || !debtgive || !debttake)
+	src_res_balance_left = re('src_res_balance_left');
+	dest_res_balance_left = re('dest_res_balance_left');
+	dest_amount_left = ge('dest_amount_left');
+	exch_left = ge('exch_left');
+	if (!acclbl || !debtgive || !debttake || !dest_res_balance_left || !src_res_balance_left)
 		return;
 
 	debtType = debtgive.checked;
 
 	if (!noAccount)
+	{
 		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+
+		if (debtType)
+		{
+			insertAfter(src_res_balance_left, exch_left);
+			insertAfter(dest_res_balance_left, dest_amount_left);
+		}
+		else
+		{
+			insertAfter(dest_res_balance_left, exch_left);
+			insertAfter(src_res_balance_left, dest_amount_left);
+		}
+	}
 
 	updateExchAndRes();
 }
