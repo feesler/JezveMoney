@@ -556,8 +556,8 @@ function updControls()
 
 	if (isTransfer())
 	{
-		srcAmountCurr = getCurrencyOfAccount(dest_acc);
-		destAmountCurr = getCurrencyOfAccount(src_acc);
+		srcAmountCurr = getCurrencyOfAccount(src_acc);
+		destAmountCurr = getCurrencyOfAccount(dest_acc);
 		src_curr.value = srcAmountCurr;
 		srcCurr = srcAmountCurr;
 		dest_curr.value = destAmountCurr;
