@@ -430,6 +430,14 @@ class Transaction extends CachedTable
 		if (!self::$user_id)
 			return FALSE;
 
+		$u = new User();
+		$acc = new Account(self::$user_id, TRUE);
+		if (!$acc->is_exist($acc_id))
+			return FALSE;
+
+		$acc_owner = $acc->getOwner($acc_id);
+		$u_owner = $u->getOwner(self::$user_id);
+
 		$condition = "user_id=".self::$user_id;
 
 		// delete expenses and incomes
@@ -438,20 +446,39 @@ class Transaction extends CachedTable
 
 		$this->cleanCache();
 
-/*
-		// delete debts
-		if (!$db->deleteQ(self::$tbl_name, $condition." AND (src_id=".$acc_id." OR dest_id=".$acc_id.") AND type=4"))
-			return FALSE;
-*/
+		if ($acc_owner != $u_owner)	// specified account is account of person
+		{
+			// set outgoing debt(person take) as income to destination account
+			if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
+							$condition." AND src_id=".$acc_id." AND type=4"))
+				return FALSE;
 
-		// set transfer from or outgoing debt as income to destination account
+			// set incoming debt(person give) as expense from source account
+			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
+							$condition." AND dest_id=".$acc_id." AND type=4"))
+				return FALSE;
+		}
+		else							// specified account is account of user
+		{
+			// set outgoing debt(person take) as debt without acc
+			if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 4),
+							$condition." AND src_id=".$acc_id." AND type=4"))
+				return FALSE;
+
+			// set incoming debt(person give) as debt without acc
+			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 4),
+							$condition." AND dest_id=".$acc_id." AND type=4"))
+				return FALSE;
+		}
+
+		// set transfer from account as income to destination account
 		if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
-						$condition." AND src_id=".$acc_id." AND (type=3 OR type=4)"))
+						$condition." AND src_id=".$acc_id." AND type=3"))
 			return FALSE;
 
-		// set transfer to as expense from source account
+		// set transfer to account as expense from source account
 		if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
-						$condition." AND dest_id=".$acc_id." AND (type=3 OR type=4)"))
+						$condition." AND dest_id=".$acc_id." AND type=3"))
 			return FALSE;
 
 		return TRUE;
