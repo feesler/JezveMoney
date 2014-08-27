@@ -183,6 +183,7 @@
 	border: 0 none;
 	height: 100%;
 	width: 100%;
+	min-width: 0;
 }
 
 
