@@ -14,6 +14,9 @@ var dragMaster = (function()
 		if (e.which != 1)
 			return;
 
+		if (typeof MSGesture !== 'undefined')
+			return;
+
  		mouseDownAt = { x: e.pageX, y: e.pageY, element: this };
 
 		addDocumentEventHandlers();
