@@ -4,8 +4,8 @@
 	var accounts = <?=f_json_encode($accArr)?>;
 	var currency = <?=f_json_encode($currArr)?>;
 	var transArr = <?=f_json_encode($transArr)?>;
-	var transType = <?=json_encode($type_str)?>;
-	var curAccId = <?=json_encode($acc_id)?>;
+	var transType = <?=f_json_encode($type_str)?>;
+	var curAccId = <?=f_json_encode($acc_id)?>;
 	var searchRequest = <?=f_json_encode($searchReq)?>;
 	var detailsMode = <?=(($showDetails) ? "true" : "false")?>;
 

@@ -3,10 +3,10 @@
 	var currency = <?=f_json_encode($currArr)?>;
 	var accCurr = <?=$accCurr?>;
 	var transArr = <?=f_json_encode($transArr)?>;
-	var transType = <?=json_encode($type_str)?>;
-	var groupType = <?=json_encode($groupType)?>;
-	var curAccId = <?=json_encode($acc_id)?>;
-	var chartData = <?=json_encode($statArr)?>;
+	var transType = <?=f_json_encode($type_str)?>;
+	var groupType = <?=f_json_encode($groupType)?>;
+	var curAccId = <?=f_json_encode($acc_id)?>;
+	var chartData = <?=f_json_encode($statArr)?>;
 	var filterByCurr = <?=(($byCurrency) ? "true" : "false")?>;
 
 	onReady(initBarChart);

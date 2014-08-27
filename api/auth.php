@@ -8,7 +8,7 @@
 
 		public function render()
 		{
-			return json_encode($this);
+			return f_json_encode($this);
 		}
 	}
 
