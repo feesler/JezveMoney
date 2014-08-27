@@ -141,12 +141,6 @@
 		$transMenu[] = array(($ind + 1), $trTypeName, urlJoin($baseUrl, $params));
 	}
 
-	// Common arrays
-	$currArr = Currency::getArray(TRUE);
-	$accArr = $acc->getArray();
-	if ($trans_type == 4)
-		$persArr = $person->getArray();
-
 	$formAction = "./modules/transaction.php?act=".$action;
 	if ($action == "new")
 		$formAction .= "&type=".$type_str;
@@ -273,6 +267,14 @@
 			}
 		}
 	}
+
+
+	// Common arrays
+	$currArr = Currency::getArray(TRUE);
+	$acc = new Account($user_id);
+	$accArr = $acc->getArray();
+	if ($trans_type == 4)
+		$persArr = $person->getArray();
 
 	$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 	$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
