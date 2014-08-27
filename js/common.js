@@ -711,5 +711,5 @@ function initMessage()
 // Return string for value in pixels
 function px(val)
 {
-	return val + 'px';
+	return parseInt(val) + 'px';
 }
