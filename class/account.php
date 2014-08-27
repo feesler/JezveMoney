@@ -392,10 +392,10 @@ class Account extends CachedTable
 	// Return Javascript array of accounts
 	public function getArray()
 	{
-		if (!$this->checkCache())
-			return "";
-
 		$resArr = array();
+
+		if (!$this->checkCache())
+			return $resArr;
 
 		foreach(self::$dcache as $acc_id => $row)
 		{
