@@ -129,6 +129,33 @@ var dragMaster = (function()
 	}
 
 
+	// Check pointer is mouse
+	function checkPointerType(e)
+	{
+		var pointerType;
+
+		e = fixEvent(e);
+
+		if (e.pointerType === undefined)
+			return true;
+
+		if (typeof e.pointerType == 'string')
+		{
+			pointerType = e.pointerType;
+		}
+		else		// IE 10
+		{
+			if (e.pointerType == 2)			/*	MSPOINTER_TYPE_TOUCH	*/
+				pointerType = 'touch';
+			else if (e.pointerType == 3)		/*	MSPOINTER_TYPE_PEN	*/
+				pointerType = 'pen';
+			else if (e.pointerType == 4)		/*	MSPOINTER_TYPE_MOUSE	*/
+				pointerType = 'mouse';
+		}
+
+		return (pointerType == 'mouse');
+	}
+
 	return {
 		makeDraggable: function(element) {
 			element.onmousedown = mouseDown;
