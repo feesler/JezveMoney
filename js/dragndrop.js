@@ -14,9 +14,6 @@ var dragMaster = (function()
 		if (e.which != 1)
 			return;
 
-		if (typeof MSGesture !== 'undefined')
-			return;
-
  		mouseDownAt = { x: e.pageX, y: e.pageY, element: this };
 
 		addDocumentEventHandlers();
@@ -159,6 +156,11 @@ var dragMaster = (function()
 	return {
 		makeDraggable: function(element) {
 			element.onmousedown = mouseDown;
+
+			if (element.onpointerdown !== undefined)
+				element.onpointerdown = checkPointerType;
+			else
+				element.onmspointerdown = checkPointerType;
 		}
 	}
 }());
