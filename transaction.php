@@ -40,7 +40,7 @@
 		if (!$trans_type)
 			fail($defMsg);
 
-		$acc = new Account($user_id, ($trans_type == 4));
+		$acc = new Account($user_id, ($trans_type == DEBT));
 
 		// check predefined account
 		$acc_id = 0;
@@ -51,7 +51,7 @@
 		if (!$acc_id)
 			fail($defMsg);
 
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			$debt = new Debt($user_id);
 			$person = new Person($user_id);
@@ -75,12 +75,12 @@
 			// set source and destination accounts
 			$src_id = 0;
 			$dest_id = 0;
-			if ($trans_type == 1 || $trans_type == 3)			// expense or transfer
+			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
 				$src_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
-			else if ($trans_type == 2)		// income
+			else if ($trans_type == INCOME)		// income
 				$dest_id = ($acc_id ? $acc_id : $acc->getIdByPos(0));
 
-			if ($trans_type == 3)
+			if ($trans_type == TRANSFER)
 				$dest_id = $acc->getAnother($src_id);
 
 			$tr = array("src_id" => $src_id,
@@ -92,9 +92,9 @@
 						"type" => $trans_type,
 						"comment" => "");
 
-			if ($trans_type == 1)
+			if ($trans_type == EXPENSE)
 				$tr["dest_curr"] = $tr["src_curr"];
-			else if ($trans_type == 2)
+			else if ($trans_type == INCOME)
 				$tr["src_curr"] = $tr["dest_curr"];
 		}
 	}
@@ -111,8 +111,8 @@
 		$tr = $trans->getProperties($trans_id);
 		$trans_type = $tr["type"];			// TODO : temporarily
 
-		$acc = new Account($user_id, ($trans_type == 4));
-		if ($trans_type == 4)
+		$acc = new Account($user_id, ($trans_type == DEBT));
+		if ($trans_type == DEBT)
 		{
 			$debt = new Debt($user_id);
 			$person = new Person($user_id);
@@ -121,7 +121,7 @@
 
 	$acc_count = $acc->getCount();
 
-	if ($trans_type != 4)
+	if ($trans_type != DEBT)
 	{
 		// get information about source and destination accounts
 		$src = $acc->getProperties($tr["src_id"]);
@@ -144,7 +144,7 @@
 	$formAction = "./modules/transaction.php?act=".$action;
 	if ($action == "new")
 		$formAction .= "&type=".$type_str;
-	if ($trans_type == 4)
+	if ($trans_type == DEBT)
 	{
 		$onFormSubmit = "return onDebtSubmit(this);";
 	}
@@ -152,7 +152,7 @@
 	{
 		if ($action == "new")
 		{
-			$onFormSubmit = "return ".(($trans_type == 3) ? "onTransferSubmit" : "onSubmit")."(this);";
+			$onFormSubmit = "return ".(($trans_type == TRANSFER) ? "onTransferSubmit" : "onSubmit")."(this);";
 		}
 		else if ($action == "edit")
 		{
@@ -160,26 +160,26 @@
 		}
 	}
 
-	if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4)
+	if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)
 	{
 		$srcBalTitle = "Result balance";
-		if ($trans_type == 3)
+		if ($trans_type == TRANSFER)
 			$srcBalTitle .= " (Source)";
-		else if ($trans_type == 4)
+		else if ($trans_type == DEBT)
 			$srcBalTitle .= " (Person)";
 		$balDiff = $tr["dest_amount"];
 		$src["balfmt"] = Currency::format($src["balance"] + $balDiff, $src["curr"]);
 	}
 
-	if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4)
+	if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
 	{
 		$destBalTitle = "Result balance";
-		if ($trans_type == 3)
+		if ($trans_type == TRANSFER)
 			$destBalTitle .= " (Destination)";
-		else if ($trans_type == 4)
+		else if ($trans_type == DEBT)
 			$destBalTitle .= " (Account)";
 
-		if ($trans_type == 2)		// income or person give to us
+		if ($trans_type == INCOME)		// income or person give to us
 			$balDiff = $tr["dest_amount"];
 		else
 			$balDiff = $tr["src_amount"];
@@ -190,16 +190,16 @@
 	$transAccCurr = 0;		// currency of transaction account
 	if ($action == "new")
 	{
-		if ($trans_type != 4)
+		if ($trans_type != DEBT)
 		{
-			$transCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
-			$transAccCurr = (($trans_type == 1) ? $src["curr"] : $dest["curr"]);
+			$transCurr = (($trans_type == EXPENSE) ? $src["curr"] : $dest["curr"]);
+			$transAccCurr = (($trans_type == EXPENSE) ? $src["curr"] : $dest["curr"]);
 
 			$srcAmountCurr = (!is_null($src)) ? $src["curr"] : $dest["curr"];
 			$destAmountCurr = (!is_null($dest)) ? $dest["curr"] : $src["curr"];
 
-			$showSrcAmount = ($trans_type != 1);
-			$showDestAmount = ($trans_type != 2);
+			$showSrcAmount = ($trans_type != EXPENSE);
+			$showDestAmount = ($trans_type != INCOME);
 		}
 		else
 		{
@@ -216,11 +216,11 @@
 	}
 	else
 	{
-		if ($trans_type != 4)
+		if ($trans_type != DEBT)
 		{
-			if ((($trans_type == 1 && $tr["dest_id"] == 0) || ($trans_type == 3 && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
+			if ((($trans_type == EXPENSE && $tr["dest_id"] == 0) || ($trans_type == TRANSFER && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
 				$transAcc_id = $tr["src_id"];
-			else if ($trans_type == 2 && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
+			else if ($trans_type == INCOME && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
 				$transAcc_id = $tr["dest_id"];
 
 			$transAccCurr = $acc->getCurrency($transAcc_id);
@@ -228,8 +228,8 @@
 			$srcAmountCurr = $tr["src_curr"];
 			$destAmountCurr = $tr["dest_curr"];
 
-			$showSrcAmount = ($trans_type != 1) ? TRUE : ($srcAmountCurr != $destAmountCurr);
-			$showDestAmount = ($trans_type != 2) ? TRUE : ($srcAmountCurr != $destAmountCurr);
+			$showSrcAmount = ($trans_type != EXPENSE) ? TRUE : ($srcAmountCurr != $destAmountCurr);
+			$showDestAmount = ($trans_type != INCOME) ? TRUE : ($srcAmountCurr != $destAmountCurr);
 		}
 		else
 		{
@@ -273,13 +273,13 @@
 	$currArr = Currency::getArray(TRUE);
 	$acc = new Account($user_id);
 	$accArr = $acc->getArray();
-	if ($trans_type == 4)
+	if ($trans_type == DEBT)
 		$persArr = $person->getArray();
 
 	$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 	$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
 
-	if ($trans_type == 4)
+	if ($trans_type == DEBT)
 	{
 		if ($noAccount)
 		{
@@ -306,7 +306,7 @@
 	$rtSrcAmount = Currency::format($tr["src_amount"], $srcAmountCurr);
 	$rtDestAmount = Currency::format($tr["dest_amount"], $destAmountCurr);
 	$rtExchange = $exchValue." ".$exchSign;
-	if ($trans_type != 4)
+	if ($trans_type != DEBT)
 	{
 		$rtSrcResBal = Currency::format($src["balance"], $src["curr"]);
 		$rtDestResBal = Currency::format($dest["balance"], $dest["curr"]);
@@ -320,7 +320,7 @@
 	$dateFmt = ($action == "edit") ? date("d.m.Y", strtotime($tr["date"])) : date("d.m.Y");
 
 	$titleString = "Jezve Money | ";
-	if ($trans_type == 4)
+	if ($trans_type == DEBT)
 		$headString = ($action == "new") ? "New debt" : "Edit debt";
 	else
 		$headString = ($action == "new") ? "New transaction" : "Edit transaction";

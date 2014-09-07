@@ -19,7 +19,7 @@
 	var srcCurr = <?=$tr["src_curr"]?>;
 	var destCurr = <?=$tr["dest_curr"]?>;
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
-<?php	if ($trans_type == 4) {		?>
+<?php	if ($trans_type == DEBT) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
 	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
 	var lastAcc_id = <?=$acc_id?>;
@@ -58,12 +58,12 @@
 		}	?>
 						</div>
 
-<?php	if ($action == "new" && $acc_count < 2 && $trans_type == 3) {	?>
+<?php	if ($action == "new" && $acc_count < 2 && $trans_type == TRANSFER) {	?>
 						<div class="align_block"><span>You need at lease two accounts for transfer.</span></div>
-<?php	} else if ($action == "new" && !$acc_count && $trans_type != 3) {		?>
+<?php	} else if ($action == "new" && !$acc_count && $trans_type != TRANSFER) {		?>
 						<div class="align_block"><span>You have no one account. Please create one.</span></div>
 <?php	} else {		?>
-<?php	if ($trans_type == 4) {		?>
+<?php	if ($trans_type == DEBT) {		?>
 						<div id="person" class="acc_float">
 							<input id="person_id" name="person_id" type="hidden" value="<?=$person_id?>">
 							<div><label>Person name</label></div>
@@ -153,7 +153,7 @@
 							</div>
 						</div>
 <?php	}	?>
-<?php	if ($trans_type == 1 || $trans_type == 3) {		?>
+<?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER) {		?>
 						<div id="source" class="acc_float">
 							<div><label>Source account</label></div>
 							<div class="tile_container">
@@ -162,7 +162,7 @@
 							</div>
 
 							<div class="tile_right_block">
-<?php	if ($trans_type == 1) {		?>
+<?php	if ($trans_type == EXPENSE) {		?>
 								<div id="src_amount_left" style="display: none;">
 									<span>Source amount</span>
 									<div>
@@ -170,7 +170,7 @@
 									</div>
 								</div>
 <?php	}	?>
-<?php	if ($trans_type == 1 || $trans_type == 3) {		?>
+<?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER) {		?>
 								<div id="dest_amount_left" style="display: none;">
 									<span>Destination amount</span>
 									<div>
@@ -178,7 +178,7 @@
 									</div>
 								</div>
 <?php	}	?>
-<?php	if (($trans_type == 3 && $src["curr"] == $dest["curr"]) || (($trans_type == 1 || $trans_type == 2) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
+<?php	if (($trans_type == TRANSFER && $src["curr"] == $dest["curr"]) || (($trans_type == EXPENSE || $trans_type == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
 								<div id="exch_left">
@@ -198,7 +198,7 @@
 						</div>
 <?php	}	?>
 
-<?php	if ($trans_type == 2 || $trans_type == 3) {		?>
+<?php	if ($trans_type == INCOME || $trans_type == TRANSFER) {		?>
 						<div id="destination" class="acc_float">
 							<div><label>Destination account</label></div>
 							<div class="tile_container">
@@ -213,7 +213,7 @@
 										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
-<?php	if ($trans_type == 2) {		?>
+<?php	if ($trans_type == INCOME) {		?>
 								<div id="dest_amount_left" style="display: none;">
 									<span>Destination amount</span>
 									<div>
@@ -236,7 +236,7 @@
 							</div>
 						</div>
 <?php	}	?>
-<?php	if ($trans_type == 4) {		?>
+<?php	if ($trans_type == DEBT) {		?>
 						<div id="operation" class="non_float">
 							<div><label>Operation</label></div>
 							<div class="op_sel">
@@ -253,14 +253,14 @@
 							<div><label for="src_amount"><?=$srcAmountLbl?></label></div>
 							<div>
 								<div class="curr_container">
-<?php	if ($trans_type != 2) {		?>
+<?php	if ($trans_type != INCOME) {		?>
 									<div class="btn rcurr_btn inact_rbtn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	} else {	?>
 									<div class="btn rcurr_btn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	}	?>
 									<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
 								</div>
-<?php	if ($trans_type != 2) {		?>
+<?php	if ($trans_type != INCOME) {		?>
 								<div class="stretch_input trans_input">
 <?php	} else {	?>
 								<div class="stretch_input rbtn_input">
@@ -284,14 +284,14 @@
 							<div><label for="dest_amount"><?=$destAmountLbl?></label></div>
 							<div>
 								<div class="curr_container">
-<?php	if ($trans_type == 1) {		?>
+<?php	if ($trans_type == EXPENSE) {		?>
 									<div class="btn rcurr_btn"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	} else {	?>
 									<div class="btn rcurr_btn inact_rbtn"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	}	?>
 									<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
 								</div>
-<?php	if ($trans_type == 1) {		?>
+<?php	if ($trans_type == EXPENSE) {		?>
 								<div class="stretch_input rbtn_input">
 <?php	} else {	?>
 								<div class="stretch_input trans_input">
@@ -319,14 +319,14 @@
 							</div>
 						</div>
 
-<?php	if ($trans_type == 1 || $trans_type == 3 || $trans_type == 4) {		?>
+<?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT) {		?>
 						<div id="result_balance" class="non_float" style="display: none;">
 							<div><label for="resbal"><?=$srcBalTitle?></label></div>
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$src["sign"]?></div></div></div>
 								<div class="stretch_input trans_input">
 									<div>
-<?php	if ($trans_type == 4) {		?>
+<?php	if ($trans_type == DEBT) {		?>
 										<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
 <?php	} else {	?>
 										<input id="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
@@ -337,11 +337,11 @@
 						</div>
 <?php	}	?>
 
-<?php	if ($trans_type == 2 || $trans_type == 3 || $trans_type == 4) {		?>
+<?php	if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT) {		?>
 						<div id="result_balance_dest" class="non_float" style="display: none;">
 							<div><label for="resbal_d"><?=$destBalTitle?></label></div>
 							<div>
-<?php	if ($trans_type == 4) {		?>
+<?php	if ($trans_type == DEBT) {		?>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$debtAcc["sign"]?></div></div></div>
 <?php	} else {	?>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$dest["sign"]?></div></div></div>
