@@ -109,17 +109,17 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 	iconType = iconType | 0;
 	tileClass = "tile";
 	if (iconType == 1)
-		tileClass += " purse_icon";
+		tileClass += " tile_icon purse_icon";
 	else if (iconType == 2)
-		tileClass += " safe_icon";
+		tileClass += " tile_icon safe_icon";
 	else if (iconType == 3)
-		tileClass += " card_icon";
+		tileClass += " tile_icon card_icon";
 	else if (iconType == 4)
-		tileClass += " percent_icon";
+		tileClass += " tile_icon percent_icon";
 	else if (iconType == 5)
-		tileClass += " bank_icon";
+		tileClass += " tile_icon bank_icon";
 	else if (iconType == 6)
-		tileClass += " cash_icon";
+		tileClass += " tile_icon cash_icon";
 	tileObj.className = tileClass;
 }
 
