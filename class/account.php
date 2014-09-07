@@ -437,7 +437,7 @@ class Account extends CachedTable
 	{
 		$icon_id = intval($icon_id);
 
-		return ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " ".self::$iconClass[$icon_id] : "";
+		return ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " tile_icon ".self::$iconClass[$icon_id] : "";
 	}
 
 

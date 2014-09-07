@@ -103,49 +103,44 @@ button.tilelink
 
 
 /* tile icons */
-.purse_icon
+.tile_icon
 {
 	background-image: url('../img/tileicons2x.png');
-	background-position: 0px 0px;
 	background-size: 100px 600px;
+}
+
+
+.purse_icon
+{
+	background-position: 0px 0px;
 }
 
 
 .safe_icon
 {
-	background-image: url('../img/tileicons2x.png');
 	background-position: 0px -100px;
-	background-size: 100px 600px;
 }
 
 
 .card_icon
 {
-	background-image: url('../img/tileicons2x.png');
 	background-position: 0px -200px;
-	background-size: 100px 600px;
 }
 
 
 .percent_icon
 {
-	background-image: url('../img/tileicons2x.png');
 	background-position: 0px -300px;
-	background-size: 100px 600px;
 }
 
 
 .bank_icon
 {
-	background-image: url('../img/tileicons2x.png');
 	background-position: 0px -400px;
-	background-size: 100px 600px;
 }
 
 
 .cash_icon
 {
-	background-image: url('../img/tileicons2x.png');
 	background-position: 0px -500px;
-	background-size: 100px 600px;
 }

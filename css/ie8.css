@@ -24,37 +24,7 @@
 
 
 /* tile icons */
-.purse_icon
-{
-	background-image: url('../img/tileicons.png');
-}
-
-
-.safe_icon
-{
-	background-image: url('../img/tileicons.png');
-}
-
-
-.card_icon
-{
-	background-image: url('../img/tileicons.png');
-}
-
-
-.percent_icon
-{
-	background-image: url('../img/tileicons.png');
-}
-
-
-.bank_icon
-{
-	background-image: url('../img/tileicons.png');
-}
-
-
-.cash_icon
+.tile_icon
 {
 	background-image: url('../img/tileicons.png');
 }
