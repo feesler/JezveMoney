@@ -8,6 +8,9 @@
 <?php	foreach($cssArr as $cssFile) {	?>
 <link rel="stylesheet" type="text/css" href="./css/<?=$cssFile?>">
 <?php	}	?>
+<!--[if lte IE 8]>
+<link rel="stylesheet" type="text/css" href="./css/ie8.css">
+<![endif]-->
 <?php	foreach($jsArr as $jsFile) {	?>
 <script type="text/javascript" src="./js/<?=$jsFile?>"></script>
 <?php	}	?>
