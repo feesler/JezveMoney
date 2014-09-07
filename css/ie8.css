@@ -28,3 +28,10 @@
 {
 	background-image: url('../img/tileicons.png');
 }
+
+
+/* sidebar ellipsis */
+.sidebar_ellipsis
+{
+	background: url('../img/sbellipsis.png') no-repeat;
+}
