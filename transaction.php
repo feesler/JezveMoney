@@ -198,8 +198,13 @@
 			$srcAmountCurr = (!is_null($src)) ? $src["curr"] : $dest["curr"];
 			$destAmountCurr = (!is_null($dest)) ? $dest["curr"] : $src["curr"];
 
+			// Show destination amount for expense and source amount for income by default because it's amount with changing currency.
+			// Meanwhile source amount for expense and destination amount for income always have the same currency as account.
 			$showSrcAmount = ($trans_type != EXPENSE);
-			$showDestAmount = ($trans_type != INCOME);
+			if ($trans_type == TRANSFER)
+				$showDestAmount = ($srcAmountCurr != $destAmountCurr);
+			else
+				$showDestAmount = ($trans_type != INCOME);
 		}
 		else
 		{
