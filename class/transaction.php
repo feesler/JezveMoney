@@ -76,7 +76,7 @@ class Transaction extends CachedTable
 		if (!is_numeric($trans_type) || !is_numeric($src_id) || !is_numeric($dest_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
 			return FALSE;
 
-		if (($trans_type != 1 && $trans_type != 2 && $trans_type != 3 && $trans_type != 4) ||
+		if (($trans_type != EXPENSE && $trans_type != INCOME && $trans_type != TRANSFER && $trans_type != DEBT) ||
 			(!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
 			return FALSE;
 
@@ -96,7 +96,7 @@ class Transaction extends CachedTable
 			if (!$acc->is_exist($dest_id))
 				return FALSE;
 			$destBalance = $acc->getBalance($dest_id);
-			if ($trans_type == 3 || ($trans_type == 4 && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
+			if ($trans_type == TRANSFER || ($trans_type == DEBT && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
 				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
@@ -122,7 +122,7 @@ class Transaction extends CachedTable
 		$trans_id = $db->insertId();
 
 		// update balance of source account
-		if ($src_id != 0 && ($trans_type == 1 || $trans_type == 3 || $trans_type == 4))
+		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
 			$srcBalance -= $src_amount;
 			if (!$acc->setBalance($src_id, $srcBalance))
@@ -130,7 +130,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of destination account
-		if ($dest_id != 0 && ($trans_type == 2 || $trans_type == 3 || $trans_type == 4))
+		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
 			$destBalance += $dest_amount;
 			if (!$acc->setBalance($dest_id, $destBalance))
@@ -170,7 +170,7 @@ class Transaction extends CachedTable
 		$destCurr = $this->getDestCurrency($trans_id);
 
 		// check type of transaction
-		if ($transType != 1 && $transType != 2 && $transType != 3 && $transType != 4)
+		if ($transType != EXPENSE && $transType != INCOME && $transType != TRANSFER && $transType != DEBT)
 			return FALSE;
 
 		// check user is the same
@@ -201,7 +201,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of source account
-		if ($src_id != 0 && ($transType == 1 || $transType == 3 || $transType == 4))		// spend, transfer or debt
+		if ($src_id != 0 && ($transType == EXPENSE || $transType == TRANSFER || $transType == DEBT))
 		{
 			$srcBalance += $transSrcAmount;
 			if (!$acc->setBalance($src_id, $srcBalance))
@@ -209,7 +209,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of destination account
-		if ($dest_id != 0 && ($transType == 2 || $transType == 3 || $transType == 4))		// income, transfer or debt
+		if ($dest_id != 0 && ($transType == INCOME || $transType == TRANSFER || $transType == DEBT))
 		{
 			$destBalance -= $transDestAmount;
 			if (!$acc->setBalance($dest_id, $destBalance))
@@ -227,7 +227,7 @@ class Transaction extends CachedTable
 	{
 		global $db;
 
-		if (!$trans_id || ($trans_type != 1 && $trans_type != 2 && $trans_type != 3 && $trans_type != 4) || (!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trans_date == -1)
+		if (!$trans_id || ($trans_type != EXPENSE && $trans_type != INCOME && $trans_type != TRANSFER && $trans_type != DEBT) || (!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trans_date == -1)
 			return FALSE;
 
 		// cancel transaction
@@ -280,7 +280,7 @@ class Transaction extends CachedTable
 			return FALSE;
 
 		// update balance of source account
-		if ($src_id != 0 && ($trans_type == 1 || $trans_type == 3 || $trans_type == 4))				// spend, transfer or debt
+		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
 			$srcBalance -= $src_amount;
 
@@ -289,7 +289,7 @@ class Transaction extends CachedTable
 		}
 
 		// update balance of destination account
-		if ($dest_id != 0 && ($trans_type == 2 || $trans_type == 3 || $trans_type == 4))		// income, transfer or debt
+		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
 			$destBalance += $dest_amount;
 
@@ -571,25 +571,25 @@ class Transaction extends CachedTable
 			$fdate = date("d.m.Y", strtotime($row["date"]));
 			$trans_pos = intval($row["pos"]);
 
-			if ($cur_trans_type == 4)
+			if ($cur_trans_type == DEBT)
 			{
 				$src_owner_id = ($src_id != 0) ? $acc->getOwner($src_id) : 0;
 				$dest_owner_id = ($dest_id != 0) ? $acc->getOwner($dest_id) : 0;
 			}
 
 			$fsrcamount = "";
-			if ($cur_trans_type == 1 || ($cur_trans_type == 4 && ($dest_owner_id == 0 || $src_owner_id == $owner_id)))			// expense
+			if ($cur_trans_type == EXPENSE || ($cur_trans_type == DEBT && ($dest_owner_id == 0 || $src_owner_id == $owner_id)))			// expense
 				$fsrcamount .= "- ";
-			else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
+			else if ($cur_trans_type == INCOME || ($cur_trans_type == DEBT && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
 				$fsrcamount .= "+ ";
 			$fsrcamount .= Currency::format($src_amount, $src_curr);
 
 			if ($src_curr != $dest_curr)
 			{
 				$fdestamount = "";
-				if ($cur_trans_type == 1 || ($cur_trans_type == 4 && $src_owner_id == $owner_id))			// expense
+				if ($cur_trans_type == EXPENSE || ($cur_trans_type == DEBT && $src_owner_id == $owner_id))			// expense
 					$fdestamount .= "- ";
-				else if ($cur_trans_type == 2 || ($cur_trans_type == 4 && $dest_owner_id == $owner_id))			// income
+				else if ($cur_trans_type == INCOME || ($cur_trans_type == DEBT && $dest_owner_id == $owner_id))			// income
 					$fdestamount .= "+ ";
 				$fdestamount .= Currency::format($dest_amount, $dest_curr);
 			}
@@ -604,7 +604,7 @@ class Transaction extends CachedTable
 				$trArr[] = (($src_id != 0 && isset($balArr[$src_id])) ? $balArr[$src_id] : 0.0);
 				$trArr[] = (($dest_id != 0 && isset($balArr[$dest_id])) ? $balArr[$dest_id] : 0.0);
 			}
-			$trArr[] = ($cur_trans_type == 4) ? (($dest_owner_id == 0 || $dest_owner_id == $owner_id) ? 1 : 2) : 0;
+			$trArr[] = ($cur_trans_type == DEBT) ? (($dest_owner_id == 0 || $dest_owner_id == $owner_id) ? 1 : 2) : 0;
 			$trArr[] = $src_amount;
 			$trArr[] = $dest_amount;
 			$trArr[] = $src_curr;
@@ -781,7 +781,7 @@ class Transaction extends CachedTable
 			{
 				$acc_id = ($tr_src_id == $src_id) ? $src_id : $dest_id;
 
-				if ($tr_type == 1 || $tr_type == 3 || $tr_type == 4)	// expense, transfer or debt
+				if ($tr_type == EXPENSE || $tr_type == TRANSFER || $tr_type == DEBT)
 				{
 					$balArr[$acc_id] = round($balArr[$acc_id] - $tr_src_amount, 2);
 				}
@@ -792,7 +792,7 @@ class Transaction extends CachedTable
 			{
 				$acc_id = ($tr_dest_id == $src_id) ? $src_id : $dest_id;
 
-				if ($tr_type == 2 || $tr_type == 3 || $tr_type == 4)	// income, transfer or debt
+				if ($tr_type == INCOME || $tr_type == TRANSFER || $tr_type == DEBT)
 				{
 					$balArr[$acc_id] = round($balArr[$acc_id] + $tr_dest_amount, 2);
 				}
@@ -812,13 +812,13 @@ class Transaction extends CachedTable
 		if ($trans_type == "all")
 			return 0;
 		else if ($trans_type == "expense")
-			return 1;
+			return EXPENSE;
 		else if ($trans_type == "income")
-			return 2;
+			return INCOME;
 		else if ($trans_type == "transfer")
-			return 3;
+			return TRANSFER;
 		else if ($trans_type == "debt")
-			return 4;
+			return DEBT;
 		else
 			return 0;
 	}
@@ -829,13 +829,13 @@ class Transaction extends CachedTable
 	{
 		if ($trans_type == 0)
 			return "all";
-		else if ($trans_type == 1)
+		else if ($trans_type == EXPENSE)
 			return "expense";
-		else if ($trans_type == 2)
+		else if ($trans_type == INCOME)
 			return "income";
-		else if ($trans_type == 3)
+		else if ($trans_type == TRANSFER)
 			return "transfer";
-		else if ($trans_type == 4)
+		else if ($trans_type == DEBT)
 			return "debt";
 		else
 			return NULL;
