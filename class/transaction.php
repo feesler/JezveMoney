@@ -11,6 +11,7 @@ class Transaction extends CachedTable
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $tbl_name = "transactions";
+	static private $typeStrArr = array(0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt");
 
 
 	// Class constructor
@@ -809,36 +810,21 @@ class Transaction extends CachedTable
 	// Return string for specified transaction type
 	public static function getStringType($trans_type)
 	{
-		if ($trans_type == "all")
+		$keys = array_keys(self::$typeStrArr, $trans_type);
+		if (!count($keys))
 			return 0;
-		else if ($trans_type == "expense")
-			return EXPENSE;
-		else if ($trans_type == "income")
-			return INCOME;
-		else if ($trans_type == "transfer")
-			return TRANSFER;
-		else if ($trans_type == "debt")
-			return DEBT;
-		else
-			return 0;
+
+		return $keys[0];
 	}
 
 
 	// Return string for specified transaction type
 	public static function getTypeString($trans_type)
 	{
-		if ($trans_type == 0)
-			return "all";
-		else if ($trans_type == EXPENSE)
-			return "expense";
-		else if ($trans_type == INCOME)
-			return "income";
-		else if ($trans_type == TRANSFER)
-			return "transfer";
-		else if ($trans_type == DEBT)
-			return "debt";
-		else
+		if (!array_key_exists($trans_type, self::$typeStrArr))
 			return NULL;
+
+		return self::$typeStrArr[$trans_type];
 	}
 
 
