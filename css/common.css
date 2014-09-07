@@ -301,8 +301,9 @@ button::-moz-focus-inner
 	overflow: hidden;
 	float: left;
 	margin: 9px 0px;
-	background-image: url('../img/icons.png');
+	background-image: url('../img/icons2x.png');
 	background-position: -224px 0px;
+	background-size: 288px 64px;
 }
 
 

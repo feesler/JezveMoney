@@ -12,7 +12,8 @@
 {
 	width: 32px;
 	height: 32px;
-	background: url('../img/icons.png') no-repeat;
+	background: url('../img/icons2x.png') no-repeat;
+	background-size: 288px 64px;
 	overflow: hidden;
 	display: inline-block;
 	float: left;
@@ -23,7 +24,8 @@
 {
 	width: 32px;
 	height: 32px;
-	background: url('../img/icons_white.png') no-repeat;
+	background: url('../img/icons2x_white.png') no-repeat;
+	background-size: 288px 64px;
 	overflow: hidden;
 	display: inline-block;
 	float: left;
@@ -152,7 +154,8 @@
 {
 	width: 34px;
 	height: 34px;
-	background-image: url('../img/icons.png');
+	background-image: url('../img/icons2x.png');
+	background-size: 288px 64px;
 	background-repeat: no-repeat;
 	display: block;
 }
