@@ -28,7 +28,7 @@
 		$defMsg = ERR_ACCOUNT_UPDATE;
 	else if ($action == "del")
 		$defMsg = ERR_ACCOUNT_DELETE;
-	else if ($action == "del")
+	else if ($action == "reset")
 		$defMsg = ERR_ACCOUNTS_RESET;
 
 	if ($action == "new" || $action == "edit")
