@@ -44,7 +44,7 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "new" && $action != "edit" && $action != "del")
+	if ($action != "read" && $action != "new" && $action != "edit" && $action != "del")
 		fail();
 
 	if ($action == "new" || $action == "edit")
@@ -83,8 +83,25 @@
 			fail();
 	}
 
+	if ($action == "read" || $action == "edit")
+	{
+		if (!isset($_POST["transid"]))
+			fail();
+		$trans_id = intval($_POST["transid"]);
+		if (!$trans_id)
+			fail();
+	}
+
 	$trans = new Transaction($user_id);
-	if ($action == "new")
+	if ($action == "read")
+	{
+		$props = $trans->getProperties($trans_id);
+		if (is_null($props))
+			fail();
+
+		$respObj->data = $props;
+	}
+	else if ($action == "new")
 	{
 		if ($trans_type == 4)
 		{
@@ -109,11 +126,6 @@
 	}
 	else if ($action == "edit")
 	{
-		if (!isset($_POST["transid"]))
-			fail();
-		$trans_id = intval($_POST["transid"]);
-		if (!$trans_id)
-			fail();
 		if ($trans_type == 4)
 		{
 			if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
