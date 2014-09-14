@@ -190,6 +190,156 @@ h2
 	</form>
 	</div>
 
+	<div class="test_container">
+	Read transaction
+	<form action="../api/transaction.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="transid">Id</label>
+		<input name="transid" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Create transaction
+	<form action="../api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="transtype">Type (1-3)</label>
+		<input name="transtype" type="text"><br>
+
+		<label for="src_id">Source account</label>
+		<input name="src_id" type="text"><br>
+		<label for="dest_id">Destination account</label>
+		<input name="dest_id" type="text"><br>
+
+		<label for="src_amount">Source amount</label>
+		<input name="src_amount" type="text"><br>
+		<label for="dest_amount">Destination amount</label>
+		<input name="dest_amount" type="text"><br>
+
+		<label for="src_curr">Source currency</label>
+		<input name="src_curr" type="text"><br>
+		<label for="dest_curr">Destination currency</label>
+		<input name="dest_curr" type="text"><br>
+
+		<label for="date">Date</label>
+		<input name="date" type="text"><br>
+
+		<label for="comm">Comment</label>
+		<input name="comm" type="text"><br>
+
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Create debt
+	<form action="../api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+		<input name="transtype" type="hidden" value="4">
+		<label for="person_id">Person id</label>
+		<input name="person_id" type="text"><br>
+		<label for="acc_id">Account id</label>
+		<input name="acc_id" type="text"><br>
+		<label for="debtop">Debt operation (1 or 2)</label>
+		<input name="debtop" type="text"><br>
+
+		<label for="src_amount">Source amount</label>
+		<input name="src_amount" type="text"><br>
+		<label for="dest_amount">Destination amount</label>
+		<input name="dest_amount" type="text"><br>
+
+		<label for="src_curr">Source currency</label>
+		<input name="src_curr" type="text"><br>
+		<label for="dest_curr">Destination currency</label>
+		<input name="dest_curr" type="text"><br>
+
+		<label for="date">Date</label>
+		<input name="date" type="text"><br>
+
+		<label for="comm">Comment</label>
+		<input name="comm" type="text"><br>
+
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Edit transaction
+	<form action="../api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="transid">Transaction id</label>
+		<input name="transid" type="text"><br>
+
+		<label for="transtype">Type (1-3)</label>
+		<input name="transtype" type="text"><br>
+
+		<label for="src_id">Source account</label>
+		<input name="src_id" type="text"><br>
+		<label for="dest_id">Destination account</label>
+		<input name="dest_id" type="text"><br>
+
+		<label for="src_amount">Source amount</label>
+		<input name="src_amount" type="text"><br>
+		<label for="dest_amount">Destination amount</label>
+		<input name="dest_amount" type="text"><br>
+
+		<label for="src_curr">Source currency</label>
+		<input name="src_curr" type="text"><br>
+		<label for="dest_curr">Destination currency</label>
+		<input name="dest_curr" type="text"><br>
+
+		<label for="date">Date</label>
+		<input name="date" type="text"><br>
+
+		<label for="comm">Comment</label>
+		<input name="comm" type="text"><br>
+
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+
+	<div class="test_container">
+	Edit debt
+	<form action="../api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="transid">Transaction id</label>
+		<input name="transid" type="text"><br>
+
+		<input name="transtype" type="hidden" value="4">
+
+		<label for="person_id">Person id</label>
+		<input name="person_id" type="text"><br>
+		<label for="acc_id">Account id</label>
+		<input name="acc_id" type="text"><br>
+		<label for="debtop">Debt operation (1 or 2)</label>
+		<input name="debtop" type="text"><br>
+
+		<label for="src_amount">Source amount</label>
+		<input name="src_amount" type="text"><br>
+		<label for="dest_amount">Destination amount</label>
+		<input name="dest_amount" type="text"><br>
+
+		<label for="src_curr">Source currency</label>
+		<input name="src_curr" type="text"><br>
+		<label for="dest_curr">Destination currency</label>
+		<input name="dest_curr" type="text"><br>
+
+		<label for="date">Date</label>
+		<input name="date" type="text"><br>
+
+		<label for="comm">Comment</label>
+		<input name="comm" type="text"><br>
+
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Delete account
+	<form action="../api/transaction.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="transactions">Transactions (comma separated ids)</label>
+		<input name="transactions" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
 	<div id="results" class="test_result">
 	</div>
 </div>
