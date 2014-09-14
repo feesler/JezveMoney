@@ -12,7 +12,7 @@
 </head>
 <body>
 <a href="./index.php">Admin</a><br>
-<a href="./currency.php">Currencies</a>  <a href="./query.php">Queries</a> <b>Logs</b>
+<a href="./currency.php">Currencies</a>  <a href="./query.php">Queries</a> <b>Logs</b> <a href="./apitest.php">API test</a>
 <form method="post" action="./cleanlog.php">
 <input name="clean" type="hidden" value="1">
 <input type="submit" value="Clean log">
