@@ -54,6 +54,22 @@ function ajaxCallback(text)
 
 	results.innerHTML = text;
 }
+
+
+function onCheck(obj, elName)
+{
+	var frm, el;
+
+	if (!obj || !obj.form || !elName)
+		return;
+
+	frm = obj.form;
+	if (frm.elements[elName])
+	{
+		el = frm.elements[elName];
+		el.disabled = !obj.checked;
+	}
+}
 </script>
 <style>
 .test_container
