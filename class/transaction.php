@@ -75,11 +75,11 @@ class Transaction extends CachedTable
 		global $db;
 
 		if (!is_numeric($trans_type) || !is_numeric($src_id) || !is_numeric($dest_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
-			return FALSE;
+			return 0;
 
 		if (($trans_type != EXPENSE && $trans_type != INCOME && $trans_type != TRANSFER && $trans_type != DEBT) ||
 			(!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
-			return FALSE;
+			return 0;
 
 		$acc = new Account(self::$user_id, TRUE);
 		$u = new User();
@@ -87,7 +87,7 @@ class Transaction extends CachedTable
 		if ($src_id != 0)
 		{
 			if (!$acc->is_exist($src_id))
-				return FALSE;
+				return 0;
 			$srcBalance = $acc->getBalance($src_id);
 		}
 
@@ -95,7 +95,7 @@ class Transaction extends CachedTable
 		if ($dest_id != 0)
 		{
 			if (!$acc->is_exist($dest_id))
-				return FALSE;
+				return 0;
 			$destBalance = $acc->getBalance($dest_id);
 			if ($trans_type == TRANSFER || ($trans_type == DEBT && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
 				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
@@ -118,7 +118,7 @@ class Transaction extends CachedTable
 
 		if (!$db->insertQ(self::$tbl_name, array("id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos"),
 									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $comment, $tr_pos)))
-			return FALSE;
+			return 0;
 
 		$trans_id = $db->insertId();
 
@@ -127,7 +127,7 @@ class Transaction extends CachedTable
 		{
 			$srcBalance -= $src_amount;
 			if (!$acc->setBalance($src_id, $srcBalance))
-				return FALSE;
+				return 0;
 		}
 
 		// update balance of destination account
@@ -135,7 +135,7 @@ class Transaction extends CachedTable
 		{
 			$destBalance += $dest_amount;
 			if (!$acc->setBalance($dest_id, $destBalance))
-				return FALSE;
+				return 0;
 		}
 
 		// update position of transaction if target date is not today
@@ -148,7 +148,7 @@ class Transaction extends CachedTable
 
 		$this->cleanCache();
 
-		return TRUE;
+		return $trans_id;
 	}
 
 
