@@ -94,6 +94,8 @@ function onCheck(obj, elName)
 <b>Admin</b><br>
 <a href="./currency.php">Currencies</a> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <b> API test</b>
 <div>
+	<h2>Accounts</h2>
+
 	<div class="test_container">
 	Get accounts
 	<form action="../api/getAccounts.php" method="get" onsubmit="return onFormSubmit(this);">
@@ -154,6 +156,27 @@ function onCheck(obj, elName)
 	<div class="test_container">
 	Reset accounts
 	<form action="../api/account.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<h2>Transactions</h2>
+
+	<div class="test_container">
+	Get transactions
+	<form action="../api/getTransactions.php" method="get" onsubmit="return onFormSubmit(this);">
+		<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
+		<input name="count" type="text" value="10" disabled><br>
+		<input type="checkbox" onchange="onCheck(this, 'page');"><label for="page">Page number</label>
+		<input name="page" type="text" value="0" disabled><br>
+		<input type="checkbox" onchange="onCheck(this, 'acc_id');"><label for="acc_id">Account id (0 for all accounts)</label>
+		<input name="acc_id" type="text" value="0" disabled><br>
+		<input type="checkbox" onchange="onCheck(this, 'stdate');"><label for="stdate">Start date</label>
+		<input name="stdate" type="text" value="" disabled><br>
+		<input type="checkbox" onchange="onCheck(this, 'enddate');"><label for="enddate">End date</label>
+		<input name="enddate" type="text" value="" disabled><br>
+		<input type="checkbox" onchange="onCheck(this, 'search');"><label for="search">Search request</label>
+		<input name="search" type="text" value="" disabled><br>
 		<input type="submit" value="submit">
 	</form>
 	</div>
