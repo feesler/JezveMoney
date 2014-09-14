@@ -88,6 +88,15 @@ function onCheck(obj, elName)
 	float: none;
 	display: block;
 }
+
+
+h2
+{
+	font-family: "Segoe UI", Arial, sanf-serif;
+	font-size: 22px;
+	font-weight: normal;
+	clear: both;
+}
 </style>
 </head>
 <body>
