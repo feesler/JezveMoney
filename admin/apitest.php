@@ -23,7 +23,8 @@ function onFormSubmit(obj)
 
 	for(i = 0; i < obj.elements.length; i++)
 	{
-		els[obj.elements[i].name] = obj.elements[i].value;
+		if (!obj.elements[i].disabled)
+			els[obj.elements[i].name] = obj.elements[i].value;
 	}
 
 	if (obj.method == 'get')
