@@ -378,10 +378,9 @@
 		ebr("</form>");
 	}
 
-	ebr("<form id=\"trposfrm\" method=\"post\" action=\"./modules/setpos.php\">");
-	ebr("<input id=\"trans_id\" name=\"trans_id\" type=\"hidden\" value=\"0\">");
-	ebr("<input id=\"trans_pos\" name=\"trans_pos\" type=\"hidden\" value=\"0\">");
-	ebr("<input name=\"trans_acc\" type=\"hidden\" value=\"".$checkAccount_id."\">");
+	ebr("<form id=\"trposfrm\" method=\"get\" action=\"./modules/setpos.php\">");
+	ebr("<input id=\"trans_id\" name=\"id\" type=\"hidden\" value=\"0\">");
+	ebr("<input id=\"trans_pos\" name=\"pos\" type=\"hidden\" value=\"0\">");
 	ebr("</form>");
 
 	ebr("</body>");
