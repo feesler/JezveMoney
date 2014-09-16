@@ -166,7 +166,7 @@ class Transaction extends CachedTable
 		$dest_id = $this->getDest($trans_id);
 		$transType = $this->getType($trans_id);
 		$transSrcAmount = $this->getSrcAmount($trans_id);
-		$transDestAmout = $this->getDestAmount($trans_id);
+		$transDestAmount = $this->getDestAmount($trans_id);
 		$srcCurr = $this->getSrcCurrency($trans_id);
 		$destCurr = $this->getDestCurrency($trans_id);
 
