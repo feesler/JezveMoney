@@ -2,7 +2,7 @@
 	require_once("../setup.php");
 
 
-	function fail($acc_id)
+	function fail()
 	{
 		echo("fail");
 		exit();
