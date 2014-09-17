@@ -89,7 +89,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 	<tr><td>ID</td><td>Type</td><td>Source amount</td><td>Destination amount</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
 <?php	foreach($transArr as $tr_id => $tr) {	?>
 	<tr>
-<?php	if ($checkAccount_id == 0 && $tr["type"] == 3) {	?>
+<?php	if ($checkAccount_id == 0 && ($tr["type"] == 3 || ($tr["type"] == 4 && $tr["src_id"] && $tr["dest_id"]))) {	?>
 		<td rowspan="2" class="id_cell">
 <?php	} else {	?>
 		<td class="id_cell">
@@ -140,10 +140,10 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		<td rowspan="2" class="sum_cell">-<?=$tr["src_amount"]?></td><td rowspan="2" class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 		<td rowspan="2"><?=$tr["comment"]?></td>
-<?php		if ($tr["realbal"][0] < 0.0) {		?>
-		<td class="sum_cell bad_val"><?=$tr["realbal"][0]?></td>
+<?php		if ($tr["realbal"][$tr["src_id"]] < 0.0) {		?>
+		<td class="sum_cell bad_val"><?=$tr["realbal"][$tr["src_id"]]?></td>
 <?php		} else {	?>
-		<td class="sum_cell"><?=$tr["realbal"][0]?></td>
+		<td class="sum_cell"><?=$tr["realbal"][$tr["src_id"]]?></td>
 <?php		}	?>
 <?php		if (!$tr["correctdate"]) {		?>
 		<td rowspan="2" class="bad_val"><?=$tr["datefmt"]?></td>
@@ -152,21 +152,50 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		}		?>
 		<td rowspan="2" id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
 	</tr>
-<?php		if ($tr["realbal"][1] < 0.0) {		?>
-	<tr><td class="sum_cell bad_val"><?=$tr["realbal"][1]?></td></tr>
+<?php		if ($tr["realbal"][$tr["dest_id"]] < 0.0) {		?>
+	<tr><td class="sum_cell bad_val"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
 <?php		} else {		?>
-	<tr><td class="sum_cell"><?=$tr["realbal"][1]?></td></tr>
+	<tr><td class="sum_cell"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
 <?php		}	?>
 <?php	} else if ($tr["type"] == 4) {		?>
-	<td>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
+<?php	$rowspan = ($tr["src_id"] && $tr["dest_id"]) ? " rowspan=\"2\"" : "";		?>
+		<td<?=$rowspan?>>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td<?=$rowspan?> class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {		?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
+		<td<?=$rowspan?> class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
-<?php
-	}
-?>
+		<td<?=$rowspan?>><?=$tr["comment"]?></td>
+<?php	$resBal = $tr["realbal"][$tr[($tr["src_id"] != 0) ? "src_id" : "dest_id"]];	?>
+<?php		if ($tr["src_id"] && $tr["dest_id"]) {		?>
+<?php			if ($resBal < 0.0) {	?>
+		<td class="sum_cell bad_val"><?=$resBal?></td>
+<?php			} else {		?>
+		<td class="sum_cell"><?=$resBal?></td>
+<?php			}	?>
+<?php		} else {		?>
+<?php			if ($resBal < 0.0) {	?>
+		<td<?=$rowspan?> class="sum_cell bad_val"><?=$resBal?></td>
+<?php			} else {		?>
+		<td<?=$rowspan?> class="sum_cell"><?=$resBal?></td>
+<?php			}	?>
+<?php		}	?>
+<?php		if (!$tr["correctdate"]) {		?>
+		<td<?=$rowspan?> class="bad_val"><?=$tr["datefmt"]?></td>
+<?php		} else {	?>
+		<td<?=$rowspan?>><?=$tr["datefmt"]?></td>
+<?php		}		?>
+		<td id="tr_<?=$tr_id?>"<?=$rowspan?>><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
+	</tr>
+<?php		if ($tr["src_id"] && $tr["dest_id"]) {		?>
+<?php			if ($tr["realbal"][$tr["dest_id"]] < 0.0) {		?>
+	<tr><td class="sum_cell bad_val"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
+<?php			} else {		?>
+	<tr><td class="sum_cell"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
+<?php			}	?>
+<?php		}	?>
+<?php	}	?>
+
 <?php	if ($checkAccount_id != 0) {		?>
 		<td><?=$tr["comment"]?></td>
 <?php		if ($tr["realbal"][$checkAccount_id] < 0.0) {	?>
@@ -182,12 +211,14 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 
 		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
 	</tr>
-<?php	} else if ($tr["type"] != 3) {	?>
+<?php	} else if ($tr["type"] != 3 && $tr["type"] != 4) {	?>
 		<td><?=$tr["comment"]?></td>
-<?php		if ($tr["realbal"][0] < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$tr["realbal"][0]?></td>
+<?php	$resBal = $tr["realbal"][$tr[($tr["type"] == 1) ? "src_id" : "dest_id"]];	?>
+
+<?php		if ($resBal < 0.0) {	?>
+		<td class="sum_cell bad_val"><?=$resBal?></td>
 <?php		} else {		?>
-		<td class="sum_cell"><?=$tr["realbal"][0]?></td>
+		<td class="sum_cell"><?=$resBal?></td>
 <?php		}	?>
 <?php		if (!$tr["correctdate"]) {		?>
 		<td class="bad_val"><?=$tr["datefmt"]?></td>
