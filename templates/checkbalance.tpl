@@ -243,12 +243,14 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 			<table>
 				<tr><td>ID</td><td>Account</td><td>realBalance</td><td>diference</td></tr>
 <?php	foreach($balanceDiff as $acc_id => $bdiff) {	?>
+<?php		if ($checkAccount_id == 0 || ($checkAccount_id != 0 && $checkAccount_id == $acc_id)) {		?>
 				<tr>
 					<td><?=$acc_id?></td>
 					<td><?=$accName[$acc_id]?></td>
 					<td><?=$realBalance[$acc_id]?></td>
 					<td><?=$bdiff?></td>
 				</tr>
+<?php		}	?>
 <?php	}	?>
 			</table>
 		</td>
