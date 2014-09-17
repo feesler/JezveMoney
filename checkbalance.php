@@ -131,8 +131,10 @@
 		}
 		else if ($tr["type"] == 4)
 		{
-			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
-			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
+			if ($tr["src_id"] != 0)
+				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+			if ($tr["dest_id"] != 0)
+				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 			$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]);
 		}
 
