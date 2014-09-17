@@ -94,8 +94,8 @@
 		$tr = array("type"=> intval($row["type"]),
 					"src_id"=> intval($row["src_id"]),
 					"dest_id"=> intval($row["dest_id"]),
-					"amount"=> floatval($row["amount"]),
-					"charge"=> floatval($row["charge"]),
+					"src_amount"=> floatval($row["src_amount"]),
+					"dest_amount"=> floatval($row["dest_amount"]),
 					"comment"=> $row["comment"],
 					"date"=> strtotime($row["date"]),
 					"pos" => intval($row["pos"]));
@@ -110,29 +110,29 @@
 		}
 		else if ($tr_type == 2)
 		{
-			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["charge"], 2);
+			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 			$tr["realbal"] = array($realBalance[$tr["dest_id"]]);
 		}
 		else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
 		{
-			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["amount"], 2);
+			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["dest_amount"], 2);
 			$tr["realbal"] = array($realBalance[$checkAccount_id]);
 		}
 		else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["src_id"] == $checkAccount_id)		/* transfer from */
 		{
-			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["charge"], 2);
+			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["src_amount"], 2);
 			$tr["realbal"] = array($realBalance[$checkAccount_id]);
 		}
 		else if ($checkAccount_id == 0 && $tr["type"] == 3)		/* Transfer between two accounts */
 		{
-			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["charge"], 2);
-			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["amount"], 2);
+			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 			$tr["realbal"] = array($realBalance[$tr["src_id"]], $realBalance[$tr["dest_id"]]);
 		}
 		else if ($tr_type == 4)
 		{
-			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["charge"], 2);
-			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["amount"], 2);
+			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 			$tr["realbal"] = array($realBalance[$tr["src_id"]], $realBalance[$tr["dest_id"]]);
 		}
 

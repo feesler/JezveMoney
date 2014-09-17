@@ -86,7 +86,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php	}	?>
 	</table></td></tr>
 
-	<tr><td>ID</td><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
+	<tr><td>ID</td><td>Type</td><td>Source amount</td><td>Destination amount</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
 <?php	foreach($transArr as $tr_id => $tr) {	?>
 	<tr>
 <?php	if ($checkAccount_id == 0 && $tr["type"] == 3) {	?>
@@ -102,10 +102,10 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		} else {	?>
 		<td>Expense</td>
 <?php		}	?>
-<?php		if ($tr["amount"] == $tr["charge"]) {	?>
-		<td class="sum_cell" colspan="2">-<?=$tr["charge"]?></td>
+<?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
+		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["amount"]?></td><td class="sum_cell act_sum">-<?=$tr["charge"]?></td>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($tr["type"] == 2) {	?>
 <?php		if ($checkAccount_id == 0) {	?>
@@ -113,31 +113,31 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		} else {	?>
 		<td>Income</td>
 <?php		}	?>
-<?php		if ($tr["amount"] == $tr["charge"]) {	?>
-		<td class="sum_cell" colspan="2">+<?=$tr["charge"]?></td>
+<?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
+		<td class="sum_cell" colspan="2">+<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell">+<?=$tr["amount"]?></td><td class="sum_cell act_sum">+<?=$tr["charge"]?></td>
+		<td class="sum_cell">+<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["dest_id"] == $checkAccount_id) {	/* transfer to */	?>
 		<td>Transfer from <?=$tr["src_name"]?></td>
-<?php		if ($tr["amount"] == $tr["charge"]) {		?>
-		<td class="sum_cell" colspan="2">+<?=$tr["charge"]?></td>
+<?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
+		<td class="sum_cell" colspan="2">+<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell act_sum">+<?=$tr["amount"]?></td><td class="sum_cell">+<?=$tr["charge"]?></td>
+		<td class="sum_cell act_sum">+<?=$tr["src_amount"]?></td><td class="sum_cell">+<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["src_id"] == $checkAccount_id) {		/* transfer from */	?>
 		<td>Transfer to <?=$tr["dest_name"]?></td>
-<?php		if ($tr["amount"] == $tr["charge"]) {		?>
-		<td class="sum_cell" colspan="2">-<?=$tr["charge"]?></td>
+<?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
+		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["amount"]?></td><td class="sum_cell act_sum">-<?=$tr["charge"]?></td>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id == 0 && $tr["type"] == 3) {		/* Transfer between two accounts */		?>
 		<td rowspan="2">Transfer from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
-<?php		if ($tr["amount"] == $tr["charge"]) {		?>
-		<td rowspan="2" class="sum_cell" colspan="2">-<?=$tr["charge"]?></td>
+<?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
+		<td rowspan="2" class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td rowspan="2" class="sum_cell">-<?=$tr["amount"]?></td><td rowspan="2" class="sum_cell act_sum">-<?=$tr["charge"]?></td>
+		<td rowspan="2" class="sum_cell">-<?=$tr["src_amount"]?></td><td rowspan="2" class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 		<td rowspan="2"><?=$tr["comment"]?></td>
 <?php		if ($tr["realbal"][0] < 0.0) {		?>
@@ -159,10 +159,10 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		}	?>
 <?php	} else if ($tr["type"] == 4) {		?>
 	<td>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
-<?php		if ($tr["amount"] == $tr["charge"]) {	?>
-		<td class="sum_cell" colspan="2">-<?=$tr["charge"]?></td>
+<?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
+		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {		?>
-		<td class="sum_cell">-<?=$tr["amount"]?></td><td class="sum_cell act_sum">-<?=$tr["charge"]?></td>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php
 	}
