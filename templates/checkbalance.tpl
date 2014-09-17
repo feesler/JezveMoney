@@ -169,10 +169,10 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 ?>
 <?php	if ($checkAccount_id != 0) {		?>
 		<td><?=$tr["comment"]?></td>
-<?php		if ($tr["realbal"][0] < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$tr["realbal"][0]?></td>
+<?php		if ($tr["realbal"][$checkAccount_id] < 0.0) {	?>
+		<td class="sum_cell bad_val"><?=$tr["realbal"][$checkAccount_id]?></td>
 <?php		} else {		?>
-		<td class="sum_cell"><?=$tr["realbal"][0]?></td>
+		<td class="sum_cell"><?=$tr["realbal"][$checkAccount_id]?></td>
 <?php		}	?>
 <?php		if (!$tr["correctdate"]) {		?>
 		<td class="bad_val"><?=$tr["datefmt"]?></td>
