@@ -48,108 +48,16 @@
 			$posUpd = FALSE;
 	}
 
-	$titleString = "jezve Money - Check balance";
 
-	header("Content-type: text/html; charset=utf-8");
-?>
-<!DOCTYPE HTML>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title><?=$titleString?></title>
-<style>
-table{border-collapse:collapse;}
-td{ padding: 2px 5px; border:1px solid #000000; }
-.id_cell{ background-color: #D0D0D0; }
-.id_cell > a{ text-decoration: none; }
-input[type="button"]{ border: 0 none; padding: 2px 5px; }
-.sum_cell{ text-align: right; }
-.act_sum{ background-color: #B0FFB0; }
-.bad_val{ background-color: #FFB0B0; }
-</style>
-<script type="text/javascript" src="./js/common.js"></script>
-<script>
-	var chPosObj = null;
-
-	function onSubmitNewPos()
-	{
-		var frm, trans_pos, posField;
-
-		frm = ge('trposfrm');
-		trans_pos = ge('trans_pos');
-		if (!frm || !trans_pos)
-			return;
-
-		if (!chPosObj || !chPosObj.firstElementChild)
-			return;
-
-		posField = chPosObj.firstElementChild;
-		if (posField.tagName.toLowerCase() != 'input' || !posField.value || posField.value == '' || !isNum(posField.value))
-			return;
-
-		trans_pos.value = parseInt(posField.value);
-
-		frm.submit();
-	}
-
-
-	function showChangePos(tr_id, curPos)
-	{
-		var tr_cell, trans_id;
-
-		tr_cell = ge('tr_' + tr_id);
-		trans_id = ge('trans_id');
-		if (!tr_cell || !trans_id)
-			return;
-
-		if (chPosObj != null)
-		{
-			chPosObj.parentNode.removeChild(chPosObj);
-			chPosObj = null;
-		}
-
-		posObj = ce('div', { style : { display : 'inline-block', marginLeft : '5px' } },
-							[ ce('input', { type : 'text', value : curPos, style : { width : '60px' } }),
-							ce('input', { type : 'button', value : 'ok', onclick : onSubmitNewPos })]);
-		if (posObj)
-		{
-			tr_cell.appendChild(posObj);
-			chPosObj = posObj;
-			trans_id.value = parseInt(tr_id);
-		}
-	}
-
-</script>
-</head>
-<body>
-<?php	if ($fixed) {	?>
-	<span style="color: #80FF80;">Balance value was fixed</span><br>
-<?php	}	?>
-<?php	if (isset($posUpd)) {		?>
-<?php		if ($posUpd == TRUE) {	?>
-	<span style="color: #80FF80;">Position was updated</span><br>
-<?php		} else if ($posUpd == TRUE) {	?>
-	<span style="color: #FF8080;">Fail to update position</span><br>
-<?php		}	?>
-<?php	}	?>
-<?php
 	$acc = new Account($user_id, TRUE);
-?>
-<table>
-<?php	if ($checkAccount_id == 0) {	?>
-	<tr><td colspan="8">All accounts</td></tr>
-<?php	}	?>
-<?php
+
 	$condition = "user_id=".$user_id;
 	if ($checkAccount_id != 0)
 		$condition .= " AND id=".$checkAccount_id;
 	$resArr = $db->selectQ("*", "accounts", $condition);
 	if (count($resArr) == 0)
 		fail();
-?>
-	<tr><td colspan="8"><table>
-	<tr><td>Account</td><td>initBalance</td><td>curBalance</td></tr>
-<?php
+
 	$initBalance = array();
 	$curBalance = array();
 	$realBalance = array();
@@ -160,18 +68,11 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		$initBalance[$acc_id] = floatval($row["initbalance"]);
 		$curBalance[$acc_id] = floatval($row["balance"]);
 		$accName[$acc_id] = $acc->getNameOrPerson($acc_id);
-?>
-	<tr><td><?=$accName[$acc_id]?></td>
-	<td><?=$initBalance[$acc_id]?></td>
-	<td><?=$curBalance[$acc_id]?></td></tr>
-<?php
+
 		$realBalance[$acc_id] = $initBalance[$acc_id];
-	}	?>
+	}
 
-	</table></td></tr>
 
-	<tr><td>ID</td><td>Type</td><td>Amount</td><td>Charge</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
-<?php
 	$accNameCache = array();
 
 	$prev_date = 0;
@@ -186,181 +87,77 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 	}
 
 	$resArr = $db->selectQ("*", "transactions", $condition, NULL, "pos");
+	$transArr = array();
 	foreach($resArr as $row)
 	{
 		$tr_id = intval($row["id"]);
-		$tr_type = intval($row["type"]);
-		$tr_src_id = intval($row["src_id"]);
-		$tr_dest_id = intval($row["dest_id"]);
-		$amount = floatval($row["amount"]);
-		$charge = floatval($row["charge"]);
-		$comment = $row["comment"];
-		$trdate = $row["date"];
-		$tr_pos = intval($row["pos"]);
+		$tr = array("type"=> intval($row["type"]),
+					"src_id"=> intval($row["src_id"]),
+					"dest_id"=> intval($row["dest_id"]),
+					"amount"=> floatval($row["amount"]),
+					"charge"=> floatval($row["charge"]),
+					"comment"=> $row["comment"],
+					"date"=> strtotime($row["date"]),
+					"pos" => intval($row["pos"]));
 
-		$src_name = $acc->getNameOrPerson($tr_src_id);
-		$dest_name = $acc->getNameOrPerson($tr_dest_id);
+		$tr["src_name"] = $acc->getNameOrPerson($tr["src_id"]);
+		$tr["dest_name"] = $acc->getNameOrPerson($tr["dest_id"]);
 
-?>
-	<tr>
-<?php	if ($checkAccount_id == 0 && $tr_type == 3) {	?>
-		<td rowspan="2" class="id_cell">
-<?php	} else {	?>
-		<td class="id_cell">
-<?php	}	?>
-			<a href="./edittransaction.php?id=<?=$tr_id?>" target="_blank"><?=$tr_id?></a>
-		</td>
-<?php	if ($tr_type == 1) {		?>
-<?php		if ($checkAccount_id == 0) {	?>
-		<td>Expense from <?=$src_name?></td>
-<?php		} else {	?>
-		<td>Expense</td>
-<?php		}	?>
-<?php		if ($amount == $charge) {	?>
-		<td class="sum_cell" colspan="2">-<?=$charge?></td>
-<?php		} else {	?>
-		<td class="sum_cell">-<?=$amount?></td><td class="sum_cell act_sum">-<?=$charge?></td>
-<?php		}	?>
-<?php
-			$realBalance[$tr_src_id] = round($realBalance[$tr_src_id] - $charge, 2);
-		} else if ($tr_type == 2) {	?>
-<?php		if ($checkAccount_id == 0) {	?>
-		<td>Income to <?=$dest_name?></td>
-<?php		} else {	?>
-		<td>Income</td>
-<?php		}	?>
-<?php		if ($amount == $charge) {	?>
-		<td class="sum_cell" colspan="2">+<?=$charge?></td>
-<?php		} else {	?>
-		<td class="sum_cell">+<?=$amount?></td><td class="sum_cell act_sum">+<?=$charge?></td>
-<?php		}	?>
-<?php		$realBalance[$tr_dest_id] = round($realBalance[$tr_dest_id] + $charge, 2);
-		} else if ($checkAccount_id != 0 && $tr_type == 3 && $tr_dest_id == $checkAccount_id) {		/* transfer to */		?>
-		<td>Transfer from <?=$src_name?></td>
-<?php		if ($amount == $charge) {		?>
-		<td class="sum_cell" colspan="2">+<?=$charge?></td>
-<?php		} else {	?>
-		<td class="sum_cell act_sum">+<?=$amount?></td><td class="sum_cell">+<?=$charge?></td>
-<?php		}	?>
-<?php			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $amount, 2);
-		} else if ($checkAccount_id != 0 && $tr_type == 3 && $tr_src_id == $checkAccount_id) {			/* transfer from */		?>
-		<td>Transfer to <?=$dest_name?></td>
-<?php		if ($amount == $charge) {		?>
-		<td class="sum_cell" colspan="2">-<?=$charge?></td>
-<?php		} else {	?>
-		<td class="sum_cell">-<?=$amount?></td><td class="sum_cell act_sum">-<?=$charge?></td>
-<?php		}	?>
-<?php
-			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $charge, 2);
-		} else if ($checkAccount_id == 0 && $tr_type == 3) {		/* Transfer between two accounts */		?>
-		<td rowspan="2">Transfer from <?=$src_name?> to <?=$dest_name?></td>
-<?php		if ($amount == $charge) {		?>
-		<td rowspan="2" class="sum_cell" colspan="2">-<?=$charge?></td>
-<?php		} else {	?>
-		<td rowspan="2" class="sum_cell">-<?=$amount?></td><td rowspan="2" class="sum_cell act_sum">-<?=$charge?></td>
-<?php		}	?>
-		<td rowspan="2"><?=$comment?></td>
-<?php
-			$realBalance[$tr_src_id] = round($realBalance[$tr_src_id] - $charge, 2);
-			$realBalance[$tr_dest_id] = round($realBalance[$tr_dest_id] + $amount, 2);
-?>
-<?php		if ($realBalance[$tr_src_id] < 0.0) {		?>
-		<td class="sum_cell bad_val"><?=$realBalance[$tr_src_id]?></td>
-<?php		} else {	?>
-		<td class="sum_cell"><?=$realBalance[$tr_src_id]?></td>
-<?php		}	?>
-<?php	$trans_date = strtotime($trdate);
-			if ($trans_date < $prev_date) {		?>
-		<td rowspan="2" class="bad_val"><?=date("d.m.Y", $trans_date)?></td>
-<?php		} else {
-				$prev_date = $trans_date;
-?>
-		<td rowspan="2"><?=date("d.m.Y", $trans_date)?></td>
-<?php		}		?>
-		<td rowspan="2" id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr_pos?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr_pos?>);"></td>
-	</tr>
-<?php		if ($realBalance[$tr_dest_id] < 0.0) {		?>
-	<tr><td class="sum_cell bad_val"><?=$realBalance[$tr_dest_id]?></td></tr>
-<?php		} else {		?>
-	<tr><td class="sum_cell"><?=$realBalance[$tr_dest_id]?></td></tr>
-<?php		}	?>
-<?php	} else if ($tr_type == 4) {		?>
-	<td>Debt from <?=$src_name?> to <?=$dest_name?></td>
-<?php		if ($amount == $charge) {	?>
-		<td class="sum_cell" colspan="2">-<?=$charge?></td>
-<?php		} else {		?>
-		<td class="sum_cell">-<?=$amount?></td><td class="sum_cell act_sum">-<?=$charge?></td>
-<?php		}	?>
-<?php
-			$realBalance[$tr_src_id] = round($realBalance[$tr_src_id] - $charge, 2);
-			$realBalance[$tr_dest_id] = round($realBalance[$tr_dest_id] + $amount, 2);
-	}
-?>
-<?php	if ($checkAccount_id != 0) {		?>
-		<td><?=$comment?></td>
-<?php		if ($realBalance[$checkAccount_id] < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$realBalance[$checkAccount_id]?></td>
-<?php		} else {		?>
-		<td class="sum_cell"><?=$realBalance[$checkAccount_id]?></td>
-<?php		}	?>
-<?php	$trans_date = strtotime($trdate);
-			if ($trans_date < $prev_date) {		?>
-		<td class="bad_val"><?=date("d.m.Y", $trans_date)?></td>
-<?php		} else {
-				$prev_date = $trans_date;
-?>
-		<td><?=date("d.m.Y", $trans_date)?></td>
-<?php		}		?>
+		if ($tr_type == 1)
+		{
+			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["charge"], 2);
+			$tr["realbal"] = array($realBalance[$tr["src_id"]]);
+		}
+		else if ($tr_type == 2)
+		{
+			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["charge"], 2);
+			$tr["realbal"] = array($realBalance[$tr["dest_id"]]);
+		}
+		else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
+		{
+			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["amount"], 2);
+			$tr["realbal"] = array($realBalance[$checkAccount_id]);
+		}
+		else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["src_id"] == $checkAccount_id)		/* transfer from */
+		{
+			$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["charge"], 2);
+			$tr["realbal"] = array($realBalance[$checkAccount_id]);
+		}
+		else if ($checkAccount_id == 0 && $tr["type"] == 3)		/* Transfer between two accounts */
+		{
+			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["charge"], 2);
+			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["amount"], 2);
+			$tr["realbal"] = array($realBalance[$tr["src_id"]], $realBalance[$tr["dest_id"]]);
+		}
+		else if ($tr_type == 4)
+		{
+			$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["charge"], 2);
+			$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["amount"], 2);
+			$tr["realbal"] = array($realBalance[$tr["src_id"]], $realBalance[$tr["dest_id"]]);
+		}
 
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr_pos?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr_pos?>);"></td>
-	</tr>
-<?php	} else if ($tr_type != 3) {	?>
-		<td><?=$comment?></td>
-<?php		$tacc_id = ($tr_type == 1) ? $tr_src_id : $tr_dest_id;		?>
-<?php		if ($realBalance[$tacc_id] < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$realBalance[$tacc_id]?></td>
-<?php		} else {		?>
-		<td class="sum_cell"><?=$realBalance[$tacc_id]?></td>
-<?php		}	?>
-<?php	$trans_date = strtotime($trdate);
-			if ($trans_date < $prev_date) {		?>
-		<td class="bad_val"><?=date("d.m.Y", $trans_date)?></td>
-<?php		} else {
-				$prev_date = $trans_date;
-?>
-		<td><?=date("d.m.Y", $trans_date)?></td>
-<?php		}		?>
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr_pos?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr_pos?>);"></td>
-	</tr>
-<?php
+		$tr["correctdate"] = ($tr["date"] >= $prev_date);
+		if ($tr["correctdate"])
+			$prev_date = $tr["date"];
+		$tr["datefmt"] = date("d.m.Y", $tr["date"]);
+
+		$transArr[$tr_id] = $tr;
 	}
-	}
+
 
 	$balanceDiff = array();
-?>
-	<tr><td colspan="8"><table>
-	<tr><td>Account</td><td>realBalance</td><td>diference</td></tr>
-<?php	foreach($realBalance as $acc_id => $rbrow) {
+	foreach($realBalance as $acc_id => $rbrow)
+	{
 		$balanceDiff[$acc_id] = round($rbrow - $curBalance[$acc_id], 2);
+	}
+
+
+	$titleString = "jezve Money - Check balance";
+
+	$cssArr = array();
+	$jsArr = array("common.js");
+
+	header("Content-type: text/html; charset=utf-8");
+
+	include("./templates/checkbalance.tpl");
 ?>
-		<tr><td><?=$accName[$acc_id]?></td>
-		<td><?=$rbrow?></td>
-		<td><?=$balanceDiff[$acc_id]?></td></tr>
-<?php	}	?>
-
-	</table></td></tr>
-</table>
-
-<?php	if ($checkAccount_id != 0 && $balanceDiff[$checkAccount_id] != 0) {	?>
-<form method="post" action="./checkbalance.php?id=<?=$checkAccount_id?>&act=fix">
-<input name="fixbal" type="hidden" value="<?=$realBalance[$checkAccount_id]?>">
-<input type="submit" value="Fix balance">
-</form>
-<?php	}	?>
-
-<form id="trposfrm" method="get" action="./modules/setpos.php">
-<input id="trans_id" name="id" type="hidden" value="0">
-<input id="trans_pos" name="pos" type="hidden" value="0">
-</form>
-</body>
-</html>
