@@ -77,14 +77,21 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php	if ($checkAccount_id == 0) {	?>
 	<tr><td colspan="8">All accounts</td></tr>
 <?php	}	?>
-	<tr><td colspan="8"><table>
-	<tr><td>Account</td><td>initBalance</td><td>curBalance</td></tr>
+	<tr>
+		<td colspan="8">
+			<table>
+				<tr><td>ID</td><td>Account</td><td>initBalance</td><td>curBalance</td></tr>
 <?php	foreach($accName as $acc_id => $acc_name) {		?>
-	<tr><td><?=$acc_name?></td>
-	<td><?=$initBalance[$acc_id]?></td>
-	<td><?=$curBalance[$acc_id]?></td></tr>
+				<tr>
+					<td><?=$acc_id?></td>
+					<td><?=$acc_name?></td>
+					<td><?=$initBalance[$acc_id]?></td>
+					<td><?=$curBalance[$acc_id]?></td>
+				</tr>
 <?php	}	?>
-	</table></td></tr>
+			</table>
+		</td>
+	</tr>
 
 	<tr><td>ID</td><td>Type</td><td>Source amount</td><td>Destination amount</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
 <?php	foreach($transArr as $tr_id => $tr) {	?>
@@ -231,14 +238,21 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		}
 	}
 ?>
-	<tr><td colspan="8"><table>
-	<tr><td>Account</td><td>realBalance</td><td>diference</td></tr>
+	<tr>
+		<td colspan="8">
+			<table>
+				<tr><td>ID</td><td>Account</td><td>realBalance</td><td>diference</td></tr>
 <?php	foreach($balanceDiff as $acc_id => $bdiff) {	?>
-		<tr><td><?=$accName[$acc_id]?></td>
-		<td><?=$realBalance[$acc_id]?></td>
-		<td><?=$bdiff?></td></tr>
+				<tr>
+					<td><?=$acc_id?></td>
+					<td><?=$accName[$acc_id]?></td>
+					<td><?=$realBalance[$acc_id]?></td>
+					<td><?=$bdiff?></td>
+				</tr>
 <?php	}	?>
-	</table></td></tr>
+			</table>
+		</td>
+	</tr>
 </table>
 
 <?php	if ($checkAccount_id != 0 && $balanceDiff[$checkAccount_id] != 0) {	?>
