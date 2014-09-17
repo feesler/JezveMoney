@@ -96,7 +96,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 	<tr><td>ID</td><td>Type</td><td>Source amount</td><td>Destination amount</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
 <?php	foreach($transArr as $tr_id => $tr) {	?>
 	<tr>
-<?php	if ($checkAccount_id == 0 && ($tr["type"] == 3 || ($tr["type"] == 4 && $tr["src_id"] && $tr["dest_id"]))) {	?>
+<?php	if (($checkAccount_id == 0 && $tr["type"] == 3) || ($tr["type"] == 4 && $tr["src_id"] && $tr["dest_id"])) {	?>
 		<td rowspan="2" class="id_cell">
 <?php	} else {	?>
 		<td class="id_cell">
@@ -203,7 +203,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		}	?>
 <?php	}	?>
 
-<?php	if ($checkAccount_id != 0) {		?>
+<?php	if ($checkAccount_id != 0 && $tr["type"] != 4) {		?>
 		<td><?=$tr["comment"]?></td>
 <?php		if ($tr["realbal"][$checkAccount_id] < 0.0) {	?>
 		<td class="sum_cell bad_val"><?=$tr["realbal"][$checkAccount_id]?></td>
