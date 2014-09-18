@@ -389,6 +389,24 @@ h2
 	</form>
 	</div>
 
+	<h2>Currency</h2>
+
+	<div class="test_container">
+	Get currencies
+	<form action="../api/currency.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Read currency
+	<form action="../api/currency.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="curr_id">Id</label>
+		<input name="curr_id" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
 	<div id="results" class="test_result">
 	</div>
 </div>
