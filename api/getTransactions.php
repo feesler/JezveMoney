@@ -1,45 +1,13 @@
 ﻿<?php
 	require_once("../setup.php");
 
-	class apiResponse
-	{
-		public $result;
-
-
-		public function render()
-		{
-			return f_json_encode($this);
-		}
-	}
-
-
-	function fail()
-	{
-		global $respObj;
-
-		$respObj->result = "fail";
-
-		echo($respObj->render());
-		exit();
-	}
-
-
-	function ok()
-	{
-		global $respObj;
-
-		$respObj->result = "ok";
-
-		echo($respObj->render());
-		exit();
-	}
 
 	$respObj = new apiResponse();
 
 	$u = new User();
 	$user_id = $u->check();
 	if ($user_id == 0)
-		fail();
+		$respObj->fail();
 
 	$trans = new Transaction($user_id);
 	$acc = new Account($user_id);
@@ -48,7 +16,7 @@
 
 	$trans_type = Transaction::getStringType($type_str);
 	if (is_null($trans_type))
-		fail();
+		$respObj->fail();
 
 	$tr_on_page = (isset($_GET["count"]) && is_numeric($_GET["count"])) ? intval($_GET["count"]) : 10;
 
@@ -65,5 +33,5 @@
 
 	$respObj->data = $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
 
-	ok();
+	$respObj->ok();
 ?>

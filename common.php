@@ -16,7 +16,8 @@
 					"mysqlDB" => "class/mysql.php",
 					"Person" => "class/person.php",
 					"Transaction" => "class/transaction.php",
-					"User" => "class/user.php");
+					"User" => "class/user.php",
+					"apiResponse" => "api/apiResponse.php");
 
 	// Check class name and try to load file
 	function autoLoadClass($className)
