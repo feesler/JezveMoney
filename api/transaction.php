@@ -11,7 +11,7 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "list" && $action != "read" && $action != "new" && $action != "edit" && $action != "del")
+	if ($action != "list" && $action != "read" && $action != "new" && $action != "edit" && $action != "del" && $action != "setpos")
 		$respObj->fail();
 
 	if ($action == "new" || $action == "edit")
@@ -147,6 +147,21 @@
 				$respObj->fail();
 		}
 
+	}
+	else if ($action == "setpos")
+	{
+		if (!isset($_POST["id"]) || !is_numeric($_POST["id"]) ||
+			!isset($_POST["pos"]) || !is_numeric($_POST["pos"]))
+			$respObj->fail();
+
+		$tr_id = intval($_POST["id"]);
+		$to_pos = intval($_POST["pos"]);
+		if (!$tr_id || !$to_pos)
+			$respObj->fail();
+
+		$trans = new Transaction($user_id);
+		if (!$trans->updatePos($tr_id, $to_pos))
+			$respObj->fail();
 	}
 
 	$respObj->ok();
