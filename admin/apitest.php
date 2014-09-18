@@ -407,6 +407,20 @@ h2
 	</form>
 	</div>
 
+	<h2>User</h2>
+	<div class="test_container">
+	Register
+	<form action="../api/register.php" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="login">Login</label>
+		<input name="login" type="text"><br>
+		<label for="password">Password</label>
+		<input name="password" type="text"><br>
+		<label for="name">Name</label>
+		<input name="name" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
 	<div id="results" class="test_result">
 	</div>
 </div>
