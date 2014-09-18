@@ -30,10 +30,9 @@ function onFormSubmit(obj)
 	if (obj.method == 'get')
 	{
 		params = urlJoin(els);
-		if (obj.action.indexOf('?') != -1)
-			link = obj.action + (params != '' ? ('&' + params) : '');
-		else
-			link = obj.action + (params != '' ? ('?' + params) : '');
+		link = obj.action;
+		if (params != '')
+			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
 		getData(link, ajaxCallback);
 	}
 	else if (obj.method == 'post')
