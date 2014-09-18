@@ -23,14 +23,17 @@ function onFormSubmit(obj)
 
 	for(i = 0; i < obj.elements.length; i++)
 	{
-		if (!obj.elements[i].disabled)
+		if (!obj.elements[i].disabled && obj.elements[i].name != '')
 			els[obj.elements[i].name] = obj.elements[i].value;
 	}
 
 	if (obj.method == 'get')
 	{
 		params = urlJoin(els);
-		link = obj.action + (params != '' ? ('?' + params) : '');
+		if (obj.action.indexOf('?') != -1)
+			link = obj.action + (params != '' ? ('&' + params) : '');
+		else
+			link = obj.action + (params != '' ? ('?' + params) : '');
 		getData(link, ajaxCallback);
 	}
 	else if (obj.method == 'post')
