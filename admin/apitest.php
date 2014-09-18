@@ -109,7 +109,7 @@ h2
 
 	<div class="test_container">
 	Get accounts
-	<form action="../api/getAccounts.php" method="get" onsubmit="return onFormSubmit(this);">
+	<form action="../api/account.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
 		<input type="submit" value="submit">
 	</form>
 	</div>
@@ -334,7 +334,7 @@ h2
 	</div>
 
 	<div class="test_container">
-	Delete account
+	Delete transactions
 	<form action="../api/transaction.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
 		<label for="transactions">Transactions (comma separated ids)</label>
 		<input name="transactions" type="text"><br>
