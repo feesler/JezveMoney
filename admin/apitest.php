@@ -175,7 +175,7 @@ h2
 
 	<div class="test_container">
 	Get transactions
-	<form action="../api/getTransactions.php" method="get" onsubmit="return onFormSubmit(this);">
+	<form action="../api/transaction.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
 		<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
 		<input name="count" type="text" value="10" disabled><br>
 		<input type="checkbox" onchange="onCheck(this, 'page');"><label for="page">Page number</label>
@@ -338,6 +338,18 @@ h2
 	<form action="../api/transaction.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
 		<label for="transactions">Transactions (comma separated ids)</label>
 		<input name="transactions" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+
+	<div class="test_container">
+	Set position of transacction
+	<form action="../api/transaction.php?act=setpos" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="id">Id</label>
+		<input name="id" type="text"><br>
+		<label for="pos">Position</label>
+		<input name="pos" type="text"><br>
 		<input type="submit" value="submit">
 	</form>
 	</div>
