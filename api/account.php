@@ -11,7 +11,7 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "read" && $action != "new" && $action != "edit" && $action != "del" && $action != "reset")
+	if ($action != "list" && $action != "read" && $action != "new" && $action != "edit" && $action != "del" && $action != "reset")
 		$respObj->fail();
 
 	if ($action == "new" || $action == "edit")
@@ -30,7 +30,11 @@
 	}
 
 	$acc = new Account($user_id);
-	if ($action == "read")
+	if ($action == "list")
+	{
+		$respObj->data = $acc->getArray();
+	}
+	else if ($action == "read")
 	{
 		$props = $acc->getProperties($acc_id);
 		if (is_null($props))
