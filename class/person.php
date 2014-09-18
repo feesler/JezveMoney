@@ -154,7 +154,7 @@ class Person extends CachedTable
 	}
 
 
-	// Return account with specified currency or create new
+	// Return account with specified currency if exist
 	public function getAccount($person_id, $curr_id)
 	{
 		global $db;
