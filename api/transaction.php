@@ -11,7 +11,7 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "read" && $action != "new" && $action != "edit" && $action != "del")
+	if ($action != "list" && $action != "read" && $action != "new" && $action != "edit" && $action != "del")
 		$respObj->fail();
 
 	if ($action == "new" || $action == "edit")
@@ -60,7 +60,32 @@
 	}
 
 	$trans = new Transaction($user_id);
-	if ($action == "read")
+	if ($action == "list")
+	{
+		$acc = new Account($user_id);
+
+		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
+
+		$trans_type = Transaction::getStringType($type_str);
+		if (is_null($trans_type))
+			$respObj->fail();
+
+		$tr_on_page = (isset($_GET["count"]) && is_numeric($_GET["count"])) ? intval($_GET["count"]) : 10;
+
+		$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
+
+		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
+		if ($acc_id && !$acc->is_exist($acc_id))
+			$acc_id = 0;
+
+		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
+
+		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
+		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
+
+		$respObj->data = $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
+	}
+	else if ($action == "read")
 	{
 		$props = $trans->getProperties($trans_id);
 		if (is_null($props))
