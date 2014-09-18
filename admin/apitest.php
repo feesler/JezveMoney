@@ -342,6 +342,53 @@ h2
 	</form>
 	</div>
 
+	<h2>Persons</h2>
+
+	<div class="test_container">
+	Get persons
+	<form action="../api/person.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Read person
+	<form action="../api/person.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="pid">Id</label>
+		<input name="pid" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Create person
+	<form action="../api/person.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="pname">Name</label>
+		<input name="pname" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Edit person
+	<form action="../api/person.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="pid">Id</label>
+		<input name="pid" type="text"><br>
+		<label for="pname">Name</label>
+		<input name="pname" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
+	<div class="test_container">
+	Delete persons
+	<form action="../api/person.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
+		<label for="persons">Persons (comma separated ids)</label>
+		<input name="persons" type="text"><br>
+		<input type="submit" value="submit">
+	</form>
+	</div>
+
 	<div id="results" class="test_result">
 	</div>
 </div>
