@@ -30,11 +30,6 @@
 </script>
 </head>
 <body>
-<form method="post" action="<?=$formAction?>" onsubmit="<?=$onFormSubmit?>">
-<?php	if ($action == "edit") {	?>
-<input name="transid" type="hidden" value="<?=$tr["id"]?>">
-<input name="transtype" type="hidden" value="<?=$tr["type"]?>">
-<?php	}	?>
 <div class="page">
 	<div class="page_wrapper">
 <?php	require_once("./templates/header.tpl");	?>
@@ -48,6 +43,11 @@
 <?php	}	?>
 					</div>
 					<div>
+						<form method="post" action="<?=$formAction?>" onsubmit="<?=$onFormSubmit?>">
+<?php	if ($action == "edit") {	?>
+						<input name="transid" type="hidden" value="<?=$tr["id"]?>">
+						<input name="transtype" type="hidden" value="<?=$tr["type"]?>">
+<?php	}	?>
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {	
 			if ($menuItem[0] == $trans_type) {		?>
@@ -393,13 +393,13 @@
 
 						<div class="acc_controls"><input id="submitbtn" class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
 <?php	}	?>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-</form>
 <?php	if ($action == "edit") {	?>
 <form id="delform" method="post" action="./modules/transaction.php?act=del">
 <input name="transactions" type="hidden" value="<?=$tr["id"]?>">

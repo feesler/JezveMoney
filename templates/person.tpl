@@ -7,10 +7,6 @@
 <?php	}	?>
 </head>
 <body>
-<form method="post" action="./modules/person.php?act=<?=$action?>" onsubmit="<?=$submitHandler?>">
-<?php	if ($action == "edit") {		?>
-<input id="pid" name="pid" type="hidden" value="<?=$p_id?>">
-<?php	}	?>
 <div class="page">
 	<div class="page_wrapper">
 <?php	require_once("./templates/header.tpl");	?>
@@ -24,6 +20,10 @@
 <?php	}	?>
 					</div>
 					<div>
+						<form method="post" action="./modules/person.php?act=<?=$action?>" onsubmit="<?=$submitHandler?>">
+<?php	if ($action == "edit") {		?>
+						<input id="pid" name="pid" type="hidden" value="<?=$p_id?>">
+<?php	}	?>
 						<div class="non_float std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
@@ -32,13 +32,13 @@
 						</div>
 
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./person.php">cancel</a></div>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-</form>
 <?php	if ($action == "edit") {		?>
 <form id="delform" method="post" action="./modules/person.php?act=del">
 <input name="persons" type="hidden" value="<?=$p_id?>">

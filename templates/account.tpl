@@ -12,10 +12,6 @@
 </script>
 </head>
 <body>
-<form method="post" action="./modules/account.php?act=<?=$action?>" onsubmit="return onNewAccountSubmit(this);">
-<?php	if ($action == "edit") {		?>
-<input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
-<?php	}	?>
 <div class="page">
 	<div class="page_wrapper">
 <?php	require_once("./templates/header.tpl");		?>
@@ -30,6 +26,10 @@
 					</div>
 
 					<div>
+						<form method="post" action="./modules/account.php?act=<?=$action?>" onsubmit="return onNewAccountSubmit(this);">
+<?php	if ($action == "edit") {		?>
+						<input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
+<?php	}	?>
 						<div class="non_float std_margin">
 							<div id="acc_tile" class="tile<?=$accInfo["iconclass"]?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name">New account</span></span></button></div>
 						</div>
@@ -81,13 +81,13 @@
 							</div>
 						</div>
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-</form>
 <?php	if ($action == "edit") {	?>
 <form id="delform" method="post" action="./modules/account.php?act=del">
 <input name="accounts" type="hidden" value="<?=$acc_id?>">
