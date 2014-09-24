@@ -158,7 +158,10 @@ function f4()
 // Calculate exchange rate by destination and source amount
 function f5()
 {
-	fe = e = correctExch(fda / fsa);
+	if (fsa == 0)
+		fe = e = (fda == 0) ? 1 : 0;
+	else
+		fe = e = correctExch(fda / fsa);
 }
 
 
