@@ -17,6 +17,7 @@
 					"Person" => "class/person.php",
 					"Transaction" => "class/transaction.php",
 					"User" => "class/user.php",
+					"apiObject" => "api/apiObject.php",
 					"apiResponse" => "api/apiResponse.php");
 
 	// Check class name and try to load file
