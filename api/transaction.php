@@ -83,7 +83,24 @@
 		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
 
-		$respObj->data = $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
+		$trArr = $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
+		$respObj->data = array();
+		foreach($trArr as $trans)
+		{
+			$tr = new apiObject;
+			$tr->id = $trans[0];
+			$tr->src_id = $trans[1];
+			$tr->dest_id = $trans[2];
+			$tr->src_amount = $trans[10];
+			$tr->dest_amount = $trans[11];
+			$tr->src_curr = $trans[12];
+			$tr->dest_curr = $trans[13];
+			$tr->date = $trans[6];
+			$tr->comment = $trans[7];
+			$tr->pos = $trans[8];
+
+			$respObj->data[] = $tr;
+		}
 	}
 	else if ($action == "read")
 	{
