@@ -32,7 +32,19 @@
 	$acc = new Account($user_id);
 	if ($action == "list")
 	{
-		$respObj->data = $acc->getArray();
+		$accArr = $acc->getArray();
+		$respObj->data = array();
+		foreach($accArr as $account)
+		{
+			$accObj = new apiObject;
+			$accObj->id = $account[0];
+			$accObj->curr_id = $account[1];
+			$accObj->balance = $account[3];
+			$accObj->name = $account[4];
+			$accObj->icon = $account[5];
+
+			$respObj->data[] = $accObj;
+		}
 	}
 	else if ($action == "read")
 	{
