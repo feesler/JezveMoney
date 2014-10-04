@@ -39,8 +39,25 @@
 	if ($action == "list")
 	{
 		$pArr = $person->getArray();
+		$respObj->data = array();
+		foreach($pArr as $pers)
+		{
+			$pObj = new apiObject;
+			$pObj->id = $pers[0];
+			$pObj->name = $pers[1];
+			$pObj->accounts = array();
+			foreach($pers[2] as $pAcc)
+			{
+				$pAccObj = new apiObject;
+				$pAccObj->id = $pAcc[0];
+				$pAccObj->curr_id = $pAcc[1];
+				$pAccObj->balance = $pAcc[2];
 
-		$respObj->data = $pArr;
+				$pObj->accounts[] = $pAccObj;
+			}
+
+			$respObj->data[] = $pObj;
+		}
 	}
 	else if ($action == "read")
 	{
