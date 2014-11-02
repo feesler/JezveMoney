@@ -39,6 +39,7 @@
 			$accObj = new apiObject;
 			$accObj->id = $account[0];
 			$accObj->curr_id = $account[1];
+			$accObj->initbalance = $account[6];
 			$accObj->balance = $account[3];
 			$accObj->name = $account[4];
 			$accObj->icon = $account[5];
