@@ -51,10 +51,10 @@
 
 	$acc = new Account($user_id, TRUE);
 
-	$condition = "user_id=".$user_id;
+	$condArr = array("user_id=".$user_id)
 	if ($checkAccount_id != 0)
-		$condition .= " AND id=".$checkAccount_id;
-	$resArr = $db->selectQ("*", "accounts", $condition);
+		$condArr[] = "id=".$checkAccount_id;
+	$resArr = $db->selectQ("*", "accounts", andJoin($condition));
 	if (count($resArr) == 0)
 		fail();
 
@@ -77,16 +77,16 @@
 
 	$prev_date = 0;
 
-	$condition = "user_id=".$user_id;
+	$condArr = array("user_id=".$user_id);
 	if ($checkAccount_id != 0)
 	{
-		$condition .= " AND (";
-		$condition .= "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
-		$condition .= " OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))";	// destination
-		$condition .= ")";
+		$accCond = array("(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))",
+						"(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))");
+
+		$condArr[] = "(".orJoin($accCond).")";
 	}
 
-	$resArr = $db->selectQ("*", "transactions", $condition, NULL, "pos");
+	$resArr = $db->selectQ("*", "transactions", andJoin($condition), NULL, "pos");
 	$transArr = array();
 	foreach($resArr as $row)
 	{

@@ -59,8 +59,8 @@
 	$initBalance = array();
 	$accName = array();
 
-	$condition = "user_id=".$user_id." AND id=".$checkAccount_id;
-	$resArr = $db->selectQ("*", "accounts", $condition);
+	$condArr = array("user_id=".$user_id, "id=".$checkAccount_id);
+	$resArr = $db->selectQ("*", "accounts", andJoin($condArr));
 	foreach($resArr as $row)
 	{
 		$realBalance[$checkAccount_id] = floatval($row["initbalance"]);
@@ -71,16 +71,16 @@
 	$resStr = "";
 	$resStr .= "id".$delim."type".$delim."amount".$delim."charge".$delim."comment".$delim."balance".$delim."date\r\n";
 
-	$condition = "user_id=".$user_id;
+	$condArr = array("user_id=".$user_id);
 	if ($checkAccount_id != 0)
 	{
-		$condition .= " AND (";
-		$condition .= "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
-		$condition .= " OR (dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))";	// destination
-		$condition .= ")";
+		$accCond = array();
+		$accCond[] = "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
+		$accCond[] = "(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))";	// destination
+		$condArr[] = "(".orJoin($accCond).")";
 	}
 
-	$resArr = $db->selectQ("*", "transactions", $condition, NULL, "pos");
+	$resArr = $db->selectQ("*", "transactions", andJoin($condArr), NULL, "pos");
 	foreach($resArr as $row)
 	{
 		$tr_id = intval($row["id"]);

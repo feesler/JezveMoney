@@ -84,28 +84,28 @@
 		$itemsInGroup = 0;
 		$trans_time = 0;
 
-		$fields = "tr.date AS date, tr.src_amount AS src_amount, tr.dest_amount AS dest_amount";
-		$tables = "transactions AS tr";
-		$cond =  "tr.user_id=".$user_id." AND tr.type=".$trans_type;
+		$fields = array("tr.date" => "date", "tr.src_amount" => "src_amount", "tr.dest_amount" => "dest_amount");
+		$tables = array("transactions" => "tr");
+		$condArr =  array("tr.user_id=".$user_id, "tr.type=".$trans_type);
 
 		if ($byCurrency)
 		{
-			$tables .= ", accounts AS a";
-			$cond .= " AND a.curr_id=".$curr_acc_id;
+			$tables["accounts"] = "a";
+			$condArr[] = "a.curr_id=".$curr_acc_id;
 			if ($trans_type == 1)			// expense or transfer
-				$cond .= " AND tr.src_id=a.id";
+				$condArr[] = "tr.src_id=a.id";
 			else if ($trans_type == 2)		// income
-				$cond .= " AND tr.dest_id=a.id";
+				$condArr[] = "tr.dest_id=a.id";
 		}
 		else
 		{
 			if ($trans_type == 1)			// expense or transfer
-				$cond .= " AND tr.src_id=".$curr_acc_id;
+				$condArr[] = "tr.src_id=".$curr_acc_id;
 			else if ($trans_type == 2)		// income
-				$cond .= " AND tr.dest_id=".$curr_acc_id;
+				$condArr[] = "tr.dest_id=".$curr_acc_id;
 		}
 
-		$resArr = $db->selectQ($fields, $tables, $cond, NULL, "pos ASC");
+		$resArr = $db->selectQ($fields, $tables, andJoin($condArr), NULL, "pos ASC");
 		foreach($resArr as $row)
 		{
 			$trans_time = strtotime($row["date"]);
