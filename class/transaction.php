@@ -526,7 +526,12 @@ class Transaction extends CachedTable
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
 		if ($acc_id != 0)
-			$condArr[] = "(src_id=".$acc_id." OR dest_id=".$acc_id.")";
+		{
+			$accCond = array();
+			$accCond[] = "src_id=".$acc_id;
+			$accCond[] = "dest_id=".$acc_id;
+			$condArr[] = "(".orJoin($accCond).")";
+		}
 		if (!is_empty($sReq))
 			$condArr[] = "comment LIKE '%".$sReq."%'";
 
