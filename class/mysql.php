@@ -50,6 +50,30 @@ function asJoin($pieces)
 }
 
 
+// Join array of condition with AND operator
+function andJoin($condition)
+{
+	if (is_array($condition))
+		return implode(" AND ", $condition);
+	else if (is_string($condition))
+		return $condition;
+
+	return NULL;
+}
+
+
+// Join array of condition with OR operator
+function orJoin($condition)
+{
+	if (is_array($condition))
+		return implode(" OR ", $condition);
+	else if (is_string($condition))
+		return $condition;
+
+	return NULL;
+}
+
+
 class mysqlDB
 {
 	private $conn;			// connection
