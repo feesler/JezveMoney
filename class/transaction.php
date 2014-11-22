@@ -521,13 +521,14 @@ class Transaction extends CachedTable
 		$acc_id = intval($account_id);
 		$sReq = $db->escape($searchStr);
 
-		$condition = "user_id=".self::$user_id;
+		$condArr = array();
+		$condArr[] = "user_id=".self::$user_id;
 		if ($tr_type != 0)
-			$condition .= " AND type=".$tr_type;
+			$condArr[] = "type=".$tr_type;
 		if ($acc_id != 0)
-			$condition .= " AND (src_id=".$acc_id." OR dest_id=".$acc_id.")";
+			$condArr[] = "(src_id=".$acc_id." OR dest_id=".$acc_id.")";
 		if (!is_empty($sReq))
-			$condition .= " AND comment LIKE '%".$sReq."%'";
+			$condArr[] = "comment LIKE '%".$sReq."%'";
 
 		if (!is_null($startDate) && !is_null($endDate))
 		{
@@ -538,10 +539,12 @@ class Transaction extends CachedTable
 				$fstdate = date("Y-m-d H:i:s", $stdate);
 				$fenddate = date("Y-m-d H:i:s", $enddate);
 
-				$condition .= " AND date >= ".qnull($fstdate)." AND date <= ".qnull($fenddate);
+				$condArr[] = "date >= ".qnull($fstdate);
+				$condArr[] = "date <= ".qnull($fenddate);
 			}
 		}
 
+		$condition = andJoin($condArr);
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
 		if ($tr_on_page > 0)
 		{
