@@ -138,6 +138,12 @@
 }
 
 
+.ddlist > ul > li input[type="checkbox"]
+{
+	margin: 0px 5px 0px 0px;
+}
+
+
 .ddmobile
 {
 	float: none;
@@ -159,6 +165,24 @@
 	width: 100%;
 }
 
+
+/* Forced display of select control for mobile */
+.ddmobile.forced
+{
+	left: -2px;
+	top: 32px;
+	height: 70px;
+	border-bottom: 2px solid #000000;
+	border-right: 2px solid #000000;
+	border-left: 2px solid #000000;
+}
+
+
+.ddmobile.forced > select
+{
+	opacity: 1;
+	height: 70px;
+}
 
 
 /* Attached drop down list */

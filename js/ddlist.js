@@ -38,6 +38,47 @@ Methods:
 */
 
 
+// Selection class constructor
+function Selection()
+{
+	this.selected = {},
+
+
+	this.isSelected = function(id)
+	{
+		return (id in this.selected);
+	}
+
+
+	this.select = function(id, obj)
+	{
+		if (!id || this.isSelected(id))
+			return false;
+
+		this.selected[id] = obj;
+
+		return true;
+	}
+
+
+	this.deselect = function(id)
+	{
+		if (!id || !this.isSelected(id))
+			return false;
+
+		delete this.selected[id];
+
+		return true;
+	}
+
+
+	this.clear = function()
+	{
+		this.selected = {};
+	}
+}
+
+
 
 // Drop Down List constructor
 function DDList()
@@ -61,10 +102,12 @@ function DDList()
 	this.skipKeyPress = false;
 	this.maxHeight = 4;
 	this.itemHeight = 37;
+	this.multi = false;
 	this.listAttach = false;
 	this.isMobile = false;
 	this.itemPrefix = null;
-
+	this.selection = null;
+	this.forceSelect = false;
 
 
 	this.showSelMsg = function(val)
@@ -98,6 +141,8 @@ function DDList()
 		if (!params.input_id || !params.selCB)
 			return false;
 
+		this.multi = params.multi || false;
+		this.forceSelect = params.forceSelect || false;
 		this.listAttach = params.listAttach || false;
 		this.itemPrefix = params.itemPrefix || null;
 
@@ -107,58 +152,60 @@ function DDList()
 
 		if (!this.listAttach)
 		{
-				if (inpObj.tagName == 'SELECT')
-				{
-					selectMode = true;
-					selObj = inpObj;
-					inpObj = null;
-				}
+			if (inpObj.tagName == 'SELECT')
+			{
+				selectMode = true;
+				selObj = inpObj;
+				inpObj = null;
+				if (selObj.multi)
+					this.multi = true;
+			}
 
-				// Create container
-				inpCont = ce('div');
-				contObj = ce('div', { className : 'dd_container' },
-							[ ce('div', { className : 'dd_input_cont' },
-								[ inpCont ]) ]);
-				if (!contObj)
+			// Create container
+			inpCont = ce('div');
+			contObj = ce('div', { className : 'dd_container' },
+						[ ce('div', { className : 'dd_input_cont' },
+							[ inpCont ]) ]);
+			if (!contObj)
+				return false;
+			if (params.extClass)
+				addClass(contObj, params.extClass);
+
+			if (selectMode)
+			{
+				insertAfter(contObj, selObj);
+				selObj = re(selObj);
+				inpObj = ce('input');
+				if (!inpObj)
 					return false;
-				if (params.extClass)
-					addClass(contObj, params.extClass);
+				inpCont.appendChild(inpObj);
+			}
+			else
+			{
+				insertAfter(contObj, inpObj);
+				inpObj = re(inpObj);
+				if (!inpObj)
+					return false;
+				inpCont.appendChild(inpObj);
+			}
 
-				if (selectMode)
-				{
-					insertAfter(contObj, selObj);
-					selObj = re(selObj);
-					inpObj = ce('input');
-					if (!inpObj)
-						return false;
-					inpCont.appendChild(inpObj);
-				}
-				else
-				{
-					insertAfter(contObj, inpObj);
-					inpObj = re(inpObj);
-					if (!inpObj)
-						return false;
-					inpCont.appendChild(inpObj);
-				}
+			// create static element
+			statObj = ce('span', { className : 'statsel',
+								style : {
+									width : px(inpObj.offsetWidth),
+									display : (params.editable == false) ? '' : 'none' } });
 
-				// create static element
-				statObj = ce('span', { className : 'statsel',
-									style : {
-										width : px(inpObj.offsetWidth),
-										display : (params.editable == false) ? '' : 'none' } });
+			insertBefore(statObj, inpObj);
 
-				insertBefore(statObj, inpObj);
-
-				if (params.editable == false)
-				{
-					this.editable = false;
-					inpObj.style.display = 'none';
-				}
-				else
-				{
-					inpObj.className = 'ddinp';
-				}
+			if (params.editable == false)
+			{
+				this.editable = false;
+				inpObj.style.display = 'none';
+			}
+			else
+			{
+				inpObj.className = 'ddinp';
+			}
 		}
 		else
 		{
@@ -192,6 +239,16 @@ function DDList()
 				ulObj = selObj;
 			else
 				ulObj = ce('select');
+			if (this.multi)
+			{
+				ulObj.multiple = true;
+				if (this.forceSelect)
+				{
+					ulObj.size = 10;
+					show(ulObj, false);
+				}
+			}
+
 			ulObj.onchange = bind(this.onChange, this);
 		}
 		else
@@ -216,19 +273,24 @@ function DDList()
 			addClass(divObj, 'ddmobile');
 		else
 			setParam(divObj, { style : { display : 'none', height :  '10px' } });
+		if (this.multi && this.forceSelect)
+		{
+			addClass(divObj, 'forced');
+			show(divObj, false);
+		}
 		contObj.appendChild(divObj);
 
 		// create elements of drop down button
 		if (!this.listAttach)
 		{
-				btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'dditem_idle' } ) ]);
-				if (!btnObj)
-					return false;
-				if (!this.isMobile)
-					btnObj.onclick = bind(this.dropDown, this);
+			btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'dditem_idle' } ) ]);
+			if (!btnObj)
+				return false;
+			if (!this.isMobile || (this.isMobile && this.multi && this.forceSelect))
+				btnObj.onclick = bind(this.dropDown, this);
 
-				if (!insertBefore(btnObj, contObj.firstElementChild))
-					return false;
+			if (!insertBefore(btnObj, contObj.firstElementChild))
+				return false;
 		}
 		else
 		{
@@ -302,8 +364,11 @@ function DDList()
 			inpObj.autocomplete = "off";
 		}
 
-		if (selectMode && !this.isMobile)
+		if (selectMode)
 			this.parseSelect(selObj);
+
+		if (this.multi)
+			this.selection = new Selection();
 
 		return true;
 	}
@@ -335,7 +400,22 @@ function DDList()
 			return;
 
 		if (this.isMobile)
+		{
+			if (this.multi && this.forceSelect)
+			{
+				show(this.list, val);
+				show(this.ulobj, val);
+
+				if (val)
+				{
+					this.ulobj.focus();
+					setEmptyClick(bind(this.show, this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
+				}
+				else
+					setEmptyClick();
+			}
 			return;
+		}
 
 		this.visible = val;
 		if (val)
@@ -407,14 +487,33 @@ function DDList()
 		if (!this.selcb)
 			return;
 
-		selectedOption = this.ulobj.options[this.ulobj.selectedIndex];
-		if (!selectedOption)
-			return;
+		if (this.multi && this.ulobj.multiple)
+		{
+			var option;
 
-		resObj.id = this.prepareId(selectedOption.value);
-		resObj.str = selectedOption.innerHTML;
+			this.selection.clear();
+			for(var i = 0; i < this.ulobj.options.length; i++)
+			{
+				option = this.ulobj.options[i];
+				if (option.selected)
+				{
+					this.selection.select(this.prepareId(option.value), option.innerHTML);
+				}
+			}
 
-		this.selcb.call(this, resObj);
+			this.selcb.call(this, this.selection.selected);
+		}
+		else
+		{
+			selectedOption = this.ulobj.options[this.ulobj.selectedIndex];
+			if (!selectedOption)
+				return;
+
+			resObj.id = this.prepareId(selectedOption.value);
+			resObj.str = selectedOption.innerHTML;
+
+			this.selcb.call(this, resObj);
+		}
 	}
 
 
@@ -451,12 +550,46 @@ function DDList()
 		if (obj.firstElementChild)
 		{
 			resObj.id = this.prepareId(obj.firstElementChild.id);
-			resObj.str = obj.firstElementChild.innerHTML;
+			if (this.multi)
+				resObj.str = obj.firstElementChild.firstElementChild.nextElementSibling.innerHTML;
+			else
+				resObj.str = obj.firstElementChild.innerHTML;
 
-			this.selcb.call(this, resObj);
+			if (this.multi)
+			{
+				if (this.selection.isSelected(resObj.id))
+					this.selection.deselect(resObj.id);
+				else
+					this.selection.select(resObj.id, resObj.str);
+
+				this.selcb.call(this, this.selection.selected);
+			}
+			else
+			{
+				this.selcb.call(this, resObj);
+			}
 		}
 
 		this.show(false);
+	}
+
+
+	this.onCheck = function(obj)
+	{
+		var resObj = {};
+
+		if (!this.multi || !this.selcb || !obj || !obj.parentNode)
+			return;
+
+		resObj.id = this.prepareId(obj.parentNode.parentNode.id);
+		resObj.str = obj.nextElementSibling.innerHTML;
+
+		if (this.selection.isSelected(resObj.id))
+			this.selection.deselect(resObj.id);
+		else
+			this.selection.select(resObj.id, resObj.str);
+
+		this.selcb.call(this, this.selection.selected);
 	}
 
 
@@ -624,7 +757,8 @@ function DDList()
 
 		for(i = 0, l = obj.options.length; i < l; i++)
 		{
-			this.addItem(obj.options[i].value, obj.options[i].textContent);
+			if (!this.isMobile)
+				this.addItem(obj.options[i].value, obj.options[i].textContent);
 			if (obj.selectedIndex == i)
 			{
 				this.setText(obj.options[i].textContent);
@@ -657,10 +791,6 @@ function DDList()
 			return false;
 
 		idval = ((this.itemPrefix) ? this.itemPrefix : '') + item_id;
-		divobj = ce('div', { id : idval, innerHTML : str, className : 'dditem_idle' } );
-		if (!divobj)
-			return false;
-		divobj.onmouseover = bind(this.setActive, this, divobj);
 
 		if (this.isMobile)
 		{
@@ -668,11 +798,40 @@ function DDList()
 		}
 		else
 		{
+			if (this.multi)
+			{
+				var lblel, chkel;
+
+				divobj = ce('div', { id : idval, className : 'dditem_idle' });
+				if (!divobj)
+					return false;
+
+				lblel = ce('label');
+
+				chkel = ce('input', { type : 'checkbox' });
+				chkel.onchange = bind(this.onCheck, this, chkel);
+
+				lblel.appendChild(chkel);
+				lblel.appendChild(ce('span', { innerHTML : str }));
+
+				divobj.appendChild(lblel);
+			}
+			else
+			{
+				divobj = ce('div', { id : idval, className : 'dditem_idle', innerHTML : str });
+				if (!divobj)
+					return false;
+			}
+
+			divobj.onmouseover = bind(this.setActive, this, divobj);
+
 			liobj = ce('li', {}, [divobj]);
+
+			if (!this.multi)	
+				liobj.onclick = bind(this.onSelItem, this, liobj);
 		}
 		if (!liobj)
 			return false;
-		liobj.onclick = bind(this.onSelItem, this, liobj);
 
 		this.ulobj.appendChild(liobj);
 
