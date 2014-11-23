@@ -537,7 +537,7 @@ class Transaction extends CachedTable
 
 
 	// Return array of transactions
-	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
+	public function getArray($trans_type, $accounts = NULL, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
 	{
 		global $db;
 
@@ -553,27 +553,24 @@ class Transaction extends CachedTable
 
 		$pers = new Person(self::$user_id);
 		$acc = new Account(self::$user_id, TRUE);
-		$accounts = $acc->getCount();
-		if (!$accounts)
+		if (!$acc->getCount())
 			return $res;
 
 		if (!$db->countQ(self::$tbl_name, "user_id=".self::$user_id))
 			return $res;
 
 		$tr_type = intval($trans_type);
-		$acc_id = intval($account_id);
 		$sReq = $db->escape($searchStr);
 
 		$condArr = array();
 		$condArr[] = "user_id=".self::$user_id;
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
-		if ($acc_id != 0)
+		if ($accounts != NULL)
 		{
-			$accCond = array();
-			$accCond[] = "src_id=".$acc_id;
-			$accCond[] = "dest_id=".$acc_id;
-			$condArr[] = "(".orJoin($accCond).")";
+			$accCond = $this->getAccCondition($accounts);
+			if (!is_empty($accCond))
+				$condArr[] = "(".$accCond.")";
 		}
 		if (!is_empty($sReq))
 			$condArr[] = "comment LIKE '%".$sReq."%'";
@@ -669,7 +666,7 @@ class Transaction extends CachedTable
 
 
 	// Return total count of transactions for specified condition
-	public function getTransCount($trans_type, $account_id = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	public function getTransCount($trans_type, $accounts = NULL, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
 	{
 		global $db;
 
@@ -683,8 +680,14 @@ class Transaction extends CachedTable
 		$condArr = array("user_id=".self::$user_id);
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
-		if ($acc_id != 0)
-			$condArr[] = "(src_id=".$acc_id." OR dest_id=".$acc_id.")";
+
+		if ($accounts != NULL)
+		{
+			$accCond = $this->getAccCondition($accounts);
+			if (!is_empty($accCond))
+				$condArr[] = "(".$accCond.")";
+		}
+
 		if (!is_empty($sReq))
 			$condArr[] = "comment LIKE '%".$sReq."%'";
 
