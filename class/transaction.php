@@ -503,6 +503,38 @@ class Transaction extends CachedTable
 	}
 
 
+	// Return condition string for list of accounts
+	private function getAccCondition($accounts = NULL)
+	{
+		if (is_null($accounts))
+			return "";
+
+		$accCond = array();
+		if (is_array($accounts))
+		{
+			foreach($accounts as $acc_id)
+			{
+				$acc_id = intval($acc_id);
+				if ($acc_id)
+				{
+					$accCond[] = "src_id=".$acc_id;
+					$accCond[] = "dest_id=".$acc_id;
+				}
+			}
+		}
+		else
+		{
+			$acc_id = intval($accounts);
+			if ($acc_id)
+			{
+				$accCond[] = "src_id=".$acc_id;
+				$accCond[] = "dest_id=".$acc_id;
+			}
+		}
+
+		return orJoin($accCond);
+	}
+
 
 	// Return array of transactions
 	public function getArray($trans_type, $account_id = 0, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
