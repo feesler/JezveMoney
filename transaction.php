@@ -270,6 +270,9 @@
 				$acc_id = 0;
 				$destAmountCurr = $debtAcc["curr"];
 			}
+
+			$showSrcAmount = TRUE;
+			$showDestAmount = FALSE;
 		}
 	}
 
