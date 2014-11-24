@@ -271,6 +271,9 @@
 				$destAmountCurr = $debtAcc["curr"];
 			}
 
+			$srcAmountCurr = $debtAcc["curr"];
+			$destAmountCurr = $debtAcc["curr"];
+
 			$showSrcAmount = TRUE;
 			$showDestAmount = FALSE;
 		}
