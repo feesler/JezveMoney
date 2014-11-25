@@ -149,7 +149,7 @@
 	$titleString = "Jezve Money";
 
 	$cssArr = array("common.css", "iconlink.css", "tiles.css", "trlist.css", "statistics.css");
-	$jsArr = array("common.js", "ready.js", "main.js", "raphael.js", "statistics.js");
+	$jsArr = array("common.js", "ready.js", "main.js", "raphael.min.js", "statistics.js");
 
 	include("./templates/index.tpl");
 ?>
