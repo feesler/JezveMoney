@@ -90,9 +90,21 @@ function setParam(obj, params)
 	{
 		val = params[par];
 		if (typeof val === 'object')
+		{
 			setParam(obj[par], val);
+		}
 		else
-			obj[par] = val;
+		{
+			try
+			{
+				obj[par] = val;
+			}
+			catch(e)
+			{
+				if (obj.setAttribute)
+					obj.setAttribute(par, val);
+			}
+		}
 	}
 }
 
@@ -359,7 +371,7 @@ function selectedValue(selectObj)
 
 
 // Select item with specified value if exist
-function selectByValue(selectObj, selValue)
+function selectByValue(selectObj, selValue, selBool)
 {
 	var i;
 
@@ -370,7 +382,7 @@ function selectByValue(selectObj, selValue)
 	{
 		if (selectObj.options[i] && selectObj.options[i].value == selValue)
 		{
-			selectObj.selectedIndex = i;
+			selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
 			return true;
 		}
 	}
@@ -414,6 +426,100 @@ function insertAfter(elem, refElem)
 		return parent.insertBefore(elem, next);
 	else
 		return parent.appendChild(elem);
+}
+
+
+// Wrapper for childElementCount Node property for IE8 and less
+function childElementCount(el)
+{
+	var res = 0;
+
+	if (!el || el === undefined)
+		return 0;
+
+	el = el.firstChild;
+	while(el)
+	{
+		if (el.nodeType == 1)
+			res++;
+		el = el.nextSibling;
+	}
+
+	return res;
+}
+
+
+// Wrapper for firstElementChild Node property for IE8 and less
+function firstElementChild(el)
+{
+	if (!el || el === undefined)
+		return null;
+
+	if (el.firstElementChild)
+		return el.firstElementChild;
+
+	el = el.firstChild;
+	while(el && el.nodeType !== 1)
+	{
+		el = el.nextSibling;
+	}
+
+	return el;
+}
+
+
+// Wrapper for lastElementChild Node property for IE8 and less
+function lastElementChild(el)
+{
+	if (!el || el === undefined)
+		return null;
+
+	if (el.lastElementChild)
+		return el.lastElementChild;
+
+	el = el.firstChild;
+	while(el && el.nodeType !== 1)
+	{
+		el = el.nextSibling;
+	}
+
+	return el;
+}
+
+
+// Wrapper for nextElementSibling Node property for IE8 and less
+function nextElementSibling(el)
+{
+	if (!el || el === undefined)
+		return null;
+
+	if (el.nextElementSibling)
+		return el.nextElementSibling;
+	do
+	{
+		el = el.nextSibling;
+	}
+	while(el && el.nodeType !== 1);
+
+	return el;
+}
+
+
+// Wrapper for previousElementSibling Node property for IE8 and less
+function previousElementSibling(el)
+{
+	if (!el || el === undefined)
+		return null;
+
+	if (el.previousElementSibling)
+		return el.previousElementSibling;
+	do
+	{
+		el = el.previousSibling;
+	}
+	while(el && el.nodeType !== 1);
+
+	return el;
 }
 
 
@@ -708,8 +814,55 @@ function initMessage()
 }
 
 
+// Check object is empty
+function isEmpty(obj)
+{
+	if (typeof obj === 'object')
+	{
+		for(var par in obj)
+			return false;
+	}
+
+	return true;
+}
+
+
+// Return count of children of object
+function childCount(obj)
+{
+	var res = 0;
+
+	if (typeof obj === 'object')
+	{
+		for(var par in obj)
+			res++;
+	}
+
+	return res;
+}
+
+
 // Return string for value in pixels
 function px(val)
 {
 	return parseInt(val) + 'px';
+}
+
+
+// Join parameters and values of object to URL
+function urlJoin(obj)
+{
+	var arr = [], par;
+
+	if (typeof obj !== 'object')
+		return '';
+
+	for(par in obj)
+	{
+		val = obj[par];
+		if (typeof val !== 'object')
+			arr.push(par + '=' + val.toString());
+	}
+
+	return arr.join('&');
 }
