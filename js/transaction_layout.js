@@ -408,21 +408,18 @@ function toggleEnableAccount()
 
 	acclbl = ge('acclbl');
 	source = ge('source');
-	dest_amount_left = re('dest_amount_left');
 	acc_id = ge('acc_id');
 	src_curr = ge('src_curr');
-	if (!acclbl || !source || !dest_amount_left || !acc_id || !src_curr)
+	if (!acclbl || !source || !acc_id || !src_curr)
 		return;
 
 	if (noAccount)
 	{
 		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
-		insertBefore(dest_amount_left, ge('dest_res_balance_left'));
 	}
 	else
 	{
 		acclbl.innerHTML = 'No account';
-		insertBefore(dest_amount_left, ge('src_amount_left'));
 	}
 
 	show('noacc_btn', noAccount);

@@ -1340,10 +1340,9 @@ function onChangeDebtOp()
 	if (!noAccount)
 	{
 		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
-
-		insertAfter(src_res_balance_left, (debtType) ? exch_left : dest_amount_left);
-		insertAfter(dest_res_balance_left, (debtType) ? dest_amount_left : exch_left);
 	}
+	insertAfter(src_res_balance_left, (debtType) ? exch_left : dest_amount_left);
+	insertAfter(dest_res_balance_left, (debtType) ? dest_amount_left : exch_left);
 
 	updateExchAndRes();
 }
