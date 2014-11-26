@@ -950,7 +950,7 @@ function setValues()
 	{
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
 	}
-	else if (isDebt() && !noAccount)
+	else if (isDebt())
 	{
 		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
 	}
