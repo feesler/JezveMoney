@@ -87,6 +87,7 @@ function DDList()
 	this.statObj = null;
 	this.list = null;
 	this.ulobj = null;
+	this.selobj = null;
 	this.selbtn = null;
 	this.selcb = null;
 	this.inpcb = null;
@@ -157,7 +158,7 @@ function DDList()
 				selectMode = true;
 				selObj = inpObj;
 				inpObj = null;
-				if (selObj.multi)
+				if (selObj.multiple)
 					this.multi = true;
 			}
 
@@ -289,7 +290,7 @@ function DDList()
 			if (!this.isMobile || (this.isMobile && this.multi && this.forceSelect))
 				btnObj.onclick = bind(this.dropDown, this);
 
-			if (!insertBefore(btnObj, contObj.firstElementChild))
+			if (!insertBefore(btnObj, firstElementChild(contObj)))
 				return false;
 		}
 		else
@@ -311,6 +312,7 @@ function DDList()
 		this.statObj = statObj;
 		this.list = divObj;
 		this.ulobj = ulObj;
+		this.selobj = selObj;
 		this.selbtn = btnObj;
 
 		if (params.selCB)
@@ -364,11 +366,11 @@ function DDList()
 			inpObj.autocomplete = "off";
 		}
 
-		if (selectMode)
-			this.parseSelect(selObj);
-
 		if (this.multi)
 			this.selection = new Selection();
+
+		if (selectMode)
+			this.parseSelect(selObj);
 
 		return true;
 	}
@@ -429,8 +431,8 @@ function DDList()
 			setEmptyClick();
 		}
 
-		if (this.selbtn && this.selbtn.firstElementChild)
-			this.selbtn.firstElementChild.className = ((val) ? 'dditem_act' : 'dditem_idle');
+		if (this.selbtn && firstElementChild(this.selbtn))
+			firstElementChild(this.selbtn).className = ((val) ? 'dditem_act' : 'dditem_idle');
 
 		this.list.style.display = ((val) ? 'block' : 'none');
 
@@ -530,7 +532,7 @@ function DDList()
 		{
 			if (chnodes[i].nodeType == 1)		// ELEMENT_NODE
 			{
-				if (chnodes[i].firstElementChild.id == idval)
+				if (firstElementChild(chnodes[i]).id == idval)
 				{
 					this.onSelItem(chnodes[i]);
 					break;
@@ -547,13 +549,14 @@ function DDList()
 		if (!this.selcb || !obj)
 			return;
 
-		if (obj.firstElementChild)
+		if (firstElementChild(obj))
 		{
-			resObj.id = this.prepareId(obj.firstElementChild.id);
+			var item_id = firstElementChild(obj).id
+			resObj.id = this.prepareId(item_id);
 			if (this.multi)
-				resObj.str = obj.firstElementChild.firstElementChild.nextElementSibling.innerHTML;
+				resObj.str = nextElementSibling(firstElementChild(firstElementChild(firstElementChild(obj)))).innerHTML;
 			else
-				resObj.str = obj.firstElementChild.innerHTML;
+				resObj.str = firstElementChild(obj).innerHTML;
 
 			if (this.multi)
 			{
@@ -562,15 +565,22 @@ function DDList()
 				else
 					this.selection.select(resObj.id, resObj.str);
 
+				selectByValue(this.selobj, resObj.id, this.selection.isSelected(resObj.id));
+
+				this.check(resObj.id, this.selection.isSelected(resObj.id));
+
 				this.selcb.call(this, this.selection.selected);
 			}
 			else
 			{
+				selectByValue(this.selobj, resObj.id);
+
 				this.selcb.call(this, resObj);
 			}
 		}
 
-		this.show(false);
+		if (!this.multi)
+			this.show(false);
 	}
 
 
@@ -582,12 +592,14 @@ function DDList()
 			return;
 
 		resObj.id = this.prepareId(obj.parentNode.parentNode.id);
-		resObj.str = obj.nextElementSibling.innerHTML;
+		resObj.str = nextElementSibling(obj).innerHTML;
 
 		if (this.selection.isSelected(resObj.id))
 			this.selection.deselect(resObj.id);
 		else
 			this.selection.select(resObj.id, resObj.str);
+
+		selectByValue(this.selobj, resObj.id, this.selection.isSelected(resObj.id));
 
 		this.selcb.call(this, this.selection.selected);
 	}
@@ -607,7 +619,7 @@ function DDList()
 		if (!obj)
 			return null;
 
-		return (next !== false) ? obj.nextSibling : obj.previousSibling;
+		return (next !== false) ? nextElementSibling(obj) : previousElementSibling(obj);
 	}
 
 
@@ -640,14 +652,14 @@ function DDList()
 			if (!this.visible && this.actItem == null)
 			{
 				this.show(true);
-				newItem = this.ulobj.firstElementChild;
+				newItem = firstElementChild(this.ulobj);
 			}
 			else if (this.visible)
 			{
 				if (this.actItem != null)
 					newItem = this.getSibling(ge(this.actItem).parentNode);
 				else
-					newItem = this.ulobj.firstElementChild;
+					newItem = firstElementChild(this.ulobj);
 			}
 		}
 		else if (keyCode == 38)				// up arrow
@@ -671,7 +683,7 @@ function DDList()
 
 		if (newItem != null)
 		{
-			this.setActive(newItem.firstElementChild);
+			this.setActive(firstElementChild(newItem));
 			e.preventDefault ? e.preventDefault() : (e.returnValue = false);
 		}
 
@@ -731,7 +743,7 @@ function DDList()
 		{
 			if (chnodes[i].nodeType == 1)		// ELEMENT_NODE
 			{
-				ival = chnodes[i].firstElementChild.innerHTML.toLowerCase();
+				ival = firstElementChild(chnodes[i]).innerHTML.toLowerCase();
 				match = (ival.indexOf(fstr.toLowerCase(), 0) != -1);
 				if (match)
 					this.filteredCount++;
@@ -748,22 +760,58 @@ function DDList()
 	}
 
 
+	this.check = function(item_id, checkval)
+	{
+		var idval, item, checkbox;
+
+		if (!item_id || !this.multi)
+			return false;
+
+		idval = ((this.itemPrefix) ? this.itemPrefix : '') + item_id;
+
+		item = ge(idval);
+		if (!item || !firstElementChild(item))
+			return false;
+
+		checkbox = firstElementChild(firstElementChild(item));
+		if (!checkbox)
+			return false;
+
+		checkbox.checked = checkval;
+
+		return true;
+	}
+
+
 	this.parseSelect = function(obj)
 	{
-		var i;
+		var i, option, resText = [];
+		var val, text;
 
 		if (!obj || obj.tagName === undefined || obj.tagName != 'SELECT' || obj.options === undefined)
 			return false;
 
 		for(i = 0, l = obj.options.length; i < l; i++)
 		{
+			option = obj.options[i];
+			val = option.value;
+			text = (option.textContent) ? option.textContent : option.innerText;
+
 			if (!this.isMobile)
-				this.addItem(obj.options[i].value, obj.options[i].textContent);
-			if (obj.selectedIndex == i)
+				this.addItem(val, text);
+
+			if (option.selected)
 			{
-				this.setText(obj.options[i].textContent);
+				if (this.multi)
+				{
+					this.check(val, true);
+					this.selection.select(val, option.innerHTML);
+				}
+				resText.push(text);
 			}
 		}
+
+		this.setText(resText.join(', '));
 
 		return true;
 	}
@@ -786,6 +834,7 @@ function DDList()
 	this.addItem = function(item_id, str)
 	{
 		var liobj, divobj, idval;
+		var _this = this;
 
 		if (!item_id || !this.list || !this.ulobj)
 			return false;
@@ -809,7 +858,18 @@ function DDList()
 				lblel = ce('label');
 
 				chkel = ce('input', { type : 'checkbox' });
-				chkel.onchange = bind(this.onCheck, this, chkel);
+				if ('onpropertychange' in chkel)
+				{
+					chkel.onpropertychange = function()
+					{
+						if (event.propertyName == 'checked')
+							_this.onCheck(this);
+					}
+				}
+				else
+				{
+					chkel.onchange = bind(this.onCheck, this, chkel);
+				}
 
 				lblel.appendChild(chkel);
 				lblel.appendChild(ce('span', { innerHTML : str }));
@@ -826,9 +886,12 @@ function DDList()
 			divobj.onmouseover = bind(this.setActive, this, divobj);
 
 			liobj = ce('li', {}, [divobj]);
-
-			if (!this.multi)	
-				liobj.onclick = bind(this.onSelItem, this, liobj);
+			liobj.onclick = function(e)
+			{
+				e = fixEvent(e);
+				if (e.target.tagName == 'DIV')
+					_this.onSelItem(this);
+			};
 		}
 		if (!liobj)
 			return false;
@@ -846,6 +909,7 @@ function DDList()
 		var oldAct;
 		var scrollTo, itemTop = 0;
 		var curListTop, curListHeight, curListBottom;
+		var curLi;
 
 		// flush current active item
 		if (this.actItem != null)
@@ -867,12 +931,12 @@ function DDList()
 		this.actItem = obj.id;
 
 		// scroll list to show new active item if needed
-		curLi = this.ulobj.firstElementChild;
-		while(curLi != obj.parentNode)
+		curLi = firstElementChild(this.ulobj);
+		while(curLi && curLi != obj.parentNode)
 		{
 			if (curLi != obj.parentNode && curLi.style.display != 'none')
 				itemTop += this.itemHeight;
-			curLi = curLi.nextSibling;
+			curLi = nextElementSibling(curLi);
 		}
 
 		curListTop = this.list.scrollTop;
