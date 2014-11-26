@@ -251,7 +251,7 @@
 			$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
 			$person_acc = $acc->getProperties($person_acc_id);
 			$person_res_balance = $person_acc["balance"];
-			$person_balance = $person_res_balance + (($give) ? $tr["amount"] : -$tr["amount"]);
+			$person_balance = $person_res_balance + (($give) ? $tr["src_amount"] : -$tr["dest_amount"]);
 
 			$debtAcc = $give ? $dest : $src;
 			$noAccount = is_null($debtAcc);
