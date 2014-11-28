@@ -652,8 +652,10 @@ function updControls()
 	exchange.value = '';
 	if (srcAmountCurr != destAmountCurr)
 	{
+/*
 		if (!edit_mode)
 		{
+*/
 			trsrc_amount = (src_amount.value != '') ? src_amount.value : 0;
 			trdest_amount = 0;
 
@@ -683,21 +685,23 @@ function updControls()
 
 				resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
 			}
-
+/*
 		}
+*/
 
 		destAmountSwitch(true);
 		exchRateSwitch(false);
 	}
 	else
 	{
-		trsrc_amount = (src_amount.value != '') ? src_amount.value : 0;
-		trdest_amount = trsrc_amount;
-
 		if (isExpense() || isTransfer())
 			src_amount.value = dest_amount.value;
 		else if (isIncome())
 			dest_amount.value = src_amount.value;
+
+		trsrc_amount = (src_amount.value != '') ? src_amount.value : 0;
+		trdest_amount = (dest_amount.value != '') ? dest_amount.value : 0;
+
 
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
