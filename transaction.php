@@ -167,7 +167,8 @@
 			$srcBalTitle .= " (Source)";
 		else if ($trans_type == DEBT)
 			$srcBalTitle .= " (Person)";
-		$balDiff = $tr["dest_amount"];
+
+		$balDiff = $tr["src_amount"];
 		$src["balfmt"] = Currency::format($src["balance"] + $balDiff, $src["curr"]);
 	}
 
@@ -179,10 +180,7 @@
 		else if ($trans_type == DEBT)
 			$destBalTitle .= " (Account)";
 
-		if ($trans_type == INCOME)		// income or person give to us
-			$balDiff = $tr["dest_amount"];
-		else
-			$balDiff = $tr["src_amount"];
+		$balDiff = $tr["dest_amount"];
 		$dest["balfmt"] = Currency::format($dest["balance"] - $balDiff, $dest["curr"]);
 	}
 
