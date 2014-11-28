@@ -19,6 +19,7 @@
 	var srcCurr = <?=$tr["src_curr"]?>;
 	var destCurr = <?=$tr["dest_curr"]?>;
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
+	var canceled = false;
 <?php	if ($trans_type == DEBT) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
 	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
@@ -26,6 +27,8 @@
 	var noAccount = <?=($noAccount ? "true" : "false")?>;
 <?php	}	?>
 
+	if (edit_mode)
+		onReady(calcelTransaction);
 	onReady(initControls);
 </script>
 </head>

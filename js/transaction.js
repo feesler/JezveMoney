@@ -146,6 +146,7 @@ function f1()
 
 	S2 = fS1 - fsa;
 
+/*
 	if (edit_mode)
 	{
 		var accid = ge(isDebt() ? 'acc_id' : 'src_id');
@@ -153,6 +154,7 @@ function f1()
 		if (accid && (transaction.srcAcc == parseInt(accid.value)))
 			S2 += transaction.srcAmount;
 	}
+*/
 
 	if (isExpense() || isTransfer() || isDebt())
 		fS2 = S2 = correct(S2);
@@ -167,6 +169,7 @@ function f1_d()
 
 	S2_d = fS1_d + fda;
 
+/*
 	if (edit_mode)
 	{
 		var accid = ge(isDebt() ? 'acc_id' : 'src_id');
@@ -174,6 +177,7 @@ function f1_d()
 		if (accid && (transaction.destAcc == parseInt(accid.value)))
 			S2_d -= transaction.destAmount;
 	}
+*/
 
 	if (isIncome() || isTransfer() || isDebt())
 		fS2_d = S2_d = correct(S2_d);
@@ -194,8 +198,10 @@ function f3()
 
 	sa = correct(sa);
 
+/*
 	if (edit_mode)
 		sa += transaction.srcAmount;
+*/
 
 	fsa = sa;
 }
@@ -665,12 +671,14 @@ function updControls()
 				if (!resbal_d || !resbal_d_b)
 					return;
 
+/*
 				if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
 				{
 					var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.dest_amount : -transaction.src_amount);
 					resbal_d.value = normalize(fixedBalance + normalize(trsrc_amount));
 				}
 				else
+*/
 					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(trsrc_amount));
 
 				resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
@@ -693,6 +701,7 @@ function updControls()
 
 		exchrate.value = 1;
 		exchrate_b.firstElementChild.innerHTML = '1';
+/*
 		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
 		{
 			var fixedBalance = getBalanceOfAccount(src_acc) + ((src_acc == transaction.srcAcc) ? transaction.destAmount : -transaction.srcAmount);
@@ -700,6 +709,7 @@ function updControls()
 		}
 		else
 		{
+*/
 			if (isDebt())
 			{
 				resbal.value = normalize(getCurPersonBalance((debtType) ? srcCurr : destCurr) + normalize((debtType) ? -trsrc_amount : trdest_amount));
@@ -708,7 +718,9 @@ function updControls()
 			{
 				resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trdest_amount));
 			}
+/*
 		}
+*/
 
 		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, srcCurr);
 
@@ -720,6 +732,7 @@ function updControls()
 			if (!resbal_d || !resbal_d_b)
 				return;
 
+/*
 			if (edit_mode && (dest_acc == transaction.srcAcc || dest_acc == transaction.destAcc))
 			{
 				var fixedBalance = getBalanceOfAccount(dest_acc) + ((dest_acc == transaction.srcAcc) ? transaction.destAmount : -transaction.srcAmount);
@@ -727,6 +740,7 @@ function updControls()
 			}
 			else
 			{
+*/
 				if (isDebt())
 				{
 					resbal_d.value = normalize(getBalanceOfAccount(debt_acc) + normalize(trsrc_amount));
@@ -735,7 +749,9 @@ function updControls()
 				{
 					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(trsrc_amount));
 				}
+/*
 			}
+*/
 
 			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, selCurrVal);
 		}
