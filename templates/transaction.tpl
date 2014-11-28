@@ -72,11 +72,11 @@
 							<div><label>Person name</label></div>
 							<div>
 								<div class="tile_container">
-<?php	if (!$person->getCount()) {		?>
+<?php		if (!$person->getCount()) {		?>
 									<div id="person_tile inact" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"></span></span></div></div>
-<?php	} else {	?>
+<?php		} else {	?>
 									<div id="person_tile" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"><?=$person_name?></span></span></div></div>
-<?php	}		?>
+<?php		}		?>
 								</div>
 
 								<div class="tile_right_block">
@@ -86,11 +86,11 @@
 											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 										</div>
 									</div>
-<?php	if ($srcAmountCurr != $destAmountCurr) {		?>
+<?php		if ($srcAmountCurr != $destAmountCurr) {		?>
 									<div id="exch_left">
-<?php	} else {	?>
+<?php		} else {	?>
 									<div id="exch_left" style="display: none;">
-<?php	}	?>
+<?php		}	?>
 										<span>Exchange rate</span>
 										<div>
 											<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?=$rtExchange?></span></button>
@@ -102,33 +102,33 @@
 											<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?=$rtSrcResBal?></span></button>
 										</div>
 									</div>
-<?php	if ($noAccount) {		?>
+<?php		if ($noAccount) {		?>
 									<div id="dest_amount_left" style="display: none;">
 										<span>Destination amount</span>
 										<div>
 											<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 										</div>
 									</div>
-<?php	}	?>
+<?php		}	?>
 								</div>
 							</div>
 						</div>
 
 						<div id="source" class="acc_float">
-<?php	if ($noAccount) {		?>
+<?php		if ($noAccount) {		?>
 							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon" style="display: none;"><button onclick="toggleEnableAccount();" type="button"><span class="icon close_gray"></span></button></div></div>
 							<div class="tile_container" style="display: none;">
 								<div id="acc_tile" class="tile<?=$acc_ic?>"><div class="tilelink"><span><span class="acc_bal"><?=$acc_balance?></span><span class="acc_name"><?=$acc_name?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=$acc_id?>">
-<?php	} else {	?>
+<?php		} else {	?>
 							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon"><button onclick="toggleEnableAccount();" type="button"><span class="icon close_gray"></span></button></div></div>
 							<div class="tile_container">
 								<div id="acc_tile" class="tile<?=$debtAcc["iconclass"]?>"><div class="tilelink"><span><span class="acc_bal"><?=$debtAcc["balfmt"]?></span><span class="acc_name"><?=$debtAcc["name"]?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=$debtAcc["id"]?>">
-<?php	}	?>
+<?php		}	?>
 							</div>
 
-<?php	if (!$noAccount) {		?>
+<?php		if (!$noAccount) {		?>
 							<div class="tile_right_block">
 								<div id="dest_amount_left" style="display: none;">
 									<span>Destination amount</span>
@@ -136,9 +136,9 @@
 										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
-<?php	} else {	?>
+<?php		} else {	?>
 							<div class="tile_right_block" style="display: none;">
-<?php	}	?>
+<?php		}	?>
 								<div id="dest_res_balance_left">
 									<span>Result balance</span>
 									<div>
@@ -147,11 +147,11 @@
 								</div>
 							</div>
 
-<?php	if ($noAccount) {		?>
+<?php		if ($noAccount) {		?>
 							<div id="selaccount" class="selacc_container">
-<?php	} else {	?>
+<?php		} else {	?>
 							<div id="selaccount" class="selacc_container" style="display: none;">
-<?php	}	?>
+<?php		}	?>
 								<button class="dashed_btn resbal_btn" type="button" onclick="toggleEnableAccount();"><span>Select account</span></button>
 							</div>
 						</div>
