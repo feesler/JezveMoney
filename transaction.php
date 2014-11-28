@@ -217,7 +217,7 @@
 			$showDestAmount = FALSE;
 		}
 	}
-	else
+	else if ($action == "edit")
 	{
 		if ($trans_type != DEBT)
 		{
