@@ -757,6 +757,8 @@ function updControls()
 		}
 
 		hideDestAmountAndExchange();
+
+		setAmountInputLabel(true, false);
 	}
 
 	setSign('destamountsign', destAmountCurr);
