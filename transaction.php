@@ -233,8 +233,24 @@
 			$srcAmountCurr = $tr["src_curr"];
 			$destAmountCurr = $tr["dest_curr"];
 
-			$showSrcAmount = ($trans_type != EXPENSE) ? TRUE : ($srcAmountCurr != $destAmountCurr);
-			$showDestAmount = ($trans_type != INCOME) ? TRUE : ($srcAmountCurr != $destAmountCurr);
+			if ($srcAmountCurr == $destAmountCurr)
+			{
+				if ($trans_type == EXPENSE)
+				{
+					$showSrcAmount = FALSE;
+					$showDestAmount = TRUE;
+				}
+				else if ($trans_type == INCOME || $trans_type == TRANSFER)
+				{
+					$showSrcAmount = TRUE;
+					$showDestAmount = FALSE;
+				}
+			}
+			else
+			{
+				$showSrcAmount = TRUE;
+				$showDestAmount = TRUE;
+			}
 		}
 		else
 		{
