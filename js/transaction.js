@@ -68,6 +68,76 @@ function correctExch(val)
 }
 
 
+// Localy cancel actions of current transaction
+function calcelTransaction()
+{
+	var srcAcc, destAcc;
+
+	if (!edit_mode || canceled || !transaction)
+		return;
+
+	srcAcc = getAccount(transaction.srcAcc);
+	destAcc = getAccount(transaction.destAcc);
+
+	if (transaction.type == 1)		// Expense
+	{
+		if (!srcAcc)
+			throw new Error('Invalid transaction: Account not found');
+		if (srcAcc[1] != transaction.srcCurr)
+			throw new Error('Invalid transaction');
+
+		srcAcc[3] += transaction.srcAmount;
+	}
+	else if (transaction.type == 2)		// Income
+	{
+		if (!destAcc || destAcc[1] != transaction.destCurr)
+			throw new Error('Invalid transaction');
+
+		destAcc[3] -= transaction.destAmount;
+	}
+	else if (transaction.type == 3)		// Transfer
+	{
+		if (!srcAcc || !destAcc || srcAcc[1] != transaction.srcCurr || destAcc[1] != transaction.destCurr)
+			throw new Error('Invalid transaction');
+
+		srcAcc[3] += transaction.srcAmount;
+		destAcc[3] -= transaction.destAmount;
+	}
+	else if (transaction.type == 4)		// Debt
+	{
+		if (debtType)		// person give
+		{
+			if (srcAcc)
+				throw new Error('Invalid transaction');
+
+			srcAcc = getPersonAccount(transaction.srcAcc);
+			if (!srcAcc)
+				throw new Error('Invalid transaction');
+
+			srcAcc[2] += transaction.srcAmount;
+			if (destAcc)
+				destAcc[3] -= transaction.destAmount;
+		}
+		else				// person take
+		{
+			if (destAcc)		// we should not find acount
+				throw new Error('Invalid transaction');
+
+			destAcc = getPersonAccount(transaction.destAcc);
+			if (!destAcc)
+				throw new Error('Invalid transaction');
+
+			if (srcAcc)
+				srcAcc[3] += transaction.srcAmount;
+			destAcc[2] -= transaction.destAmount;
+		}
+	}
+
+
+	canceled = true;
+}
+
+
 // Calculate result balance of source by initial balance and source amount
 function f1()
 {
