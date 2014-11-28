@@ -1,3 +1,51 @@
+// Return account object by id
+function getAccount(account_id)
+{
+	var res = null;
+
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return res;
+
+	accounts.some(function(acc)
+	{
+		if (acc[0] == account_id)
+			res = acc;
+
+		return (acc[0] == account_id);
+	});
+
+	return res;
+}
+
+
+// Return person account object by id
+function getPersonAccount(account_id)
+{
+	var res = null;
+
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return res;
+
+	persons.some(function(p)
+	{
+		if (!p || p.length < 3)
+			return false;
+
+		return p[2].some(function(acc)
+		{
+			if (acc[0] == account_id)
+				res = acc;
+
+			return (acc[0] == account_id);
+		});
+	});
+
+	return res;
+}
+
+
 // Return currency id of specified account
 function getCurrencyOfAccount(account_id)
 {
