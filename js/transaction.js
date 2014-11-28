@@ -659,7 +659,7 @@ function updControls()
 			trsrc_amount = (src_amount.value != '') ? src_amount.value : 0;
 			trdest_amount = 0;
 
-			dest_amount.value = '';
+			//dest_amount.value = '';
 			//resbal.value = '';
 
 			resbal.value = normalize(getBalanceOfAccount(src_acc));
@@ -691,6 +691,9 @@ function updControls()
 
 		destAmountSwitch(true);
 		exchRateSwitch(false);
+
+		setAmountInputLabel(true, true);
+		setAmountInputLabel(false, true);
 	}
 	else
 	{
