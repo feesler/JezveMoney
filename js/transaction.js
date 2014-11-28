@@ -500,7 +500,7 @@ function onChangeAcc()
 
 			if ((isDebt() && debtType) || isIncome())
 				resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
-			else if ((isDebt && !debtType) || isExpense())
+			else if ((isDebt() && !debtType) || isExpense())
 				resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
 		}
 	}
