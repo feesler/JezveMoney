@@ -293,18 +293,41 @@ function onDestCurrencySel(obj)
 }
 
 
+var isMobile;
+var persDDList = null, accDDList = null;
+
+
+// Initialization of DDList control for account tile
+function initAccList()
+{
+	if (accDDList)
+		return;
+
+	accDDList = new DDList();
+	if (accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : isMobile }))
+	{
+		accounts.forEach(function(acc)
+		{
+			accId = acc[0];
+			accName = acc[4];
+	
+			accDDList.addItem(accId, accName);
+		});
+	}
+	else
+		accDDList = null;
+}
+
+
 // Initialization of page controls
 function initControls()
 {
-	var isMobile;
 	var srcDDList, destDDList, srcCurrDDList, destCurrDDList;
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
 	if (isDebt())
 	{
-		var persDDList, accDDList;
-
 		persDDList = new DDList();
 		if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : isMobile }))
 		{
@@ -319,19 +342,8 @@ function initControls()
 		else
 			persDDList = null;
 
-		accDDList = new DDList();
-		if (accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : isMobile }))
-		{
-			accounts.forEach(function(acc)
-			{
-				accId = acc[0];
-				accName = acc[4];
-	
-				accDDList.addItem(accId, accName);
-			});
-		}
-		else
-			accDDList = null;
+		if (!noAccount)
+			initAccList();
 	}
 	else
 	{
@@ -446,6 +458,11 @@ function toggleEnableAccount()
 	}
 
 	onChangeAcc();
+
+	if (!noAccount && !accDDList)
+	{
+		initAccList();
+	}
 }
 
 
