@@ -98,7 +98,7 @@
 				$tr["src_curr"] = $tr["dest_curr"];
 		}
 	}
-	else
+	else if ($action == "edit")
 	{
 		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
 			fail($defMsg);
