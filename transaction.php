@@ -40,7 +40,7 @@
 		if (!$trans_type)
 			fail($defMsg);
 
-		$acc = new Account($user_id, ($trans_type == DEBT));
+		$acc = new Account($user_id);
 
 		// check predefined account
 		$acc_id = 0;
@@ -62,6 +62,7 @@
 			$person_id = $person->getIdByPos(0);
 			$person_name = $person->getName($person_id);
 
+			$acc = new Account($user_id, TRUE);
 			$person_acc_id = $person->getAccount($person_id, $debtAcc["curr"]);
 			$person_acc = $acc->getProperties($person_acc_id);
 			$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
