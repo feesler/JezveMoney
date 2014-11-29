@@ -275,6 +275,8 @@
 			if ($noAccount)
 			{
 				$destAmountCurr = $person_acc["curr"];
+
+				$acc = new Account($user_id);
 				$acc_id = $acc->getIdByPos(0);
 				$acc_name = $acc->getName($acc_id);
 				$acc_balance = Currency::format($acc->getBalance($acc_id), $acc->getCurrency($acc_id));
