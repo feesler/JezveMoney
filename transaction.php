@@ -270,7 +270,8 @@
 			$debtAcc = $give ? $dest : $src;
 			$noAccount = is_null($debtAcc);
 
-			$srcAmountCurr = $tr["curr"];
+			$srcAmountCurr = $tr["src_curr"];
+			$destAmountCurr = $tr["dest_curr"];
 			if ($noAccount)
 			{
 				$destAmountCurr = $person_acc["curr"];
@@ -282,11 +283,7 @@
 			else
 			{
 				$acc_id = 0;
-				$destAmountCurr = $debtAcc["curr"];
 			}
-
-			$srcAmountCurr = $debtAcc["curr"];
-			$destAmountCurr = $debtAcc["curr"];
 
 			$showSrcAmount = TRUE;
 			$showDestAmount = FALSE;
