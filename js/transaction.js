@@ -662,7 +662,17 @@ function updControls()
 			//dest_amount.value = '';
 			//resbal.value = '';
 
+/*
 			resbal.value = normalize(getBalanceOfAccount(src_acc));
+*/
+			if (isDebt())
+			{
+				resbal.value = normalize(getCurPersonBalance((debtType) ? srcCurr : destCurr) + normalize((debtType) ? -trsrc_amount : trdest_amount));
+			}
+			else
+			{
+				resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trsrc_amount));
+			}
 			resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
 
 			if (isTransfer() || isDebt())
