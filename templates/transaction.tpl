@@ -102,14 +102,6 @@
 											<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?=$rtSrcResBal?></span></button>
 										</div>
 									</div>
-<?php		if ($noAccount) {		?>
-									<div id="dest_amount_left" style="display: none;">
-										<span>Destination amount</span>
-										<div>
-											<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
-										</div>
-									</div>
-<?php		}	?>
 								</div>
 							</div>
 						</div>
@@ -130,15 +122,15 @@
 
 <?php		if (!$noAccount) {		?>
 							<div class="tile_right_block">
+<?php		} else {	?>
+							<div class="tile_right_block" style="display: none;">
+<?php		}	?>
 								<div id="dest_amount_left" style="display: none;">
 									<span>Destination amount</span>
 									<div>
 										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
-<?php		} else {	?>
-							<div class="tile_right_block" style="display: none;">
-<?php		}	?>
 								<div id="dest_res_balance_left">
 									<span>Result balance</span>
 									<div>
