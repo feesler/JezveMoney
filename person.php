@@ -39,7 +39,7 @@
 	$submitHandler = ($action == "new") ? "return onNewPersonSubmit(this);" : "return onEditPersonSubmit(this);";
 
 	$cssArr = array("common.css", "iconlink.css", "tiles.css");
-	$jsArr = array("common.js", "ready.js", "persons.js");
+	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ready.js", "persons.js");
 	if ($action == "edit")
 	{
 		$cssArr[] = "popup.css";
