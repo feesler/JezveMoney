@@ -174,13 +174,7 @@ function setTileAccount(tile_id, acc_id)
 
 	name = getNameOfAccount(acc_id);
 	balance = getBalanceOfAccount(acc_id);
-
-/*
-	if (edit_mode && (acc_id == transaction.srcAcc || acc_id == transaction.destAcc))
-		balance += ((acc_id == transaction.srcAcc) ? transaction.charge : -transaction.amount);
-*/
 	formatBalance = formatCurrency(balance, getCurrencyOfAccount(acc_id));
-
 	icon = getIconOfAccount(acc_id);
 
 	setTileInfo(tile_id, name, formatBalance, icon);

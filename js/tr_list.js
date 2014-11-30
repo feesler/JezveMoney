@@ -235,8 +235,8 @@ var transactions =
 					src_id = trans[1];
 					dest_id = trans[2];
 
-					src_bal = (src_id != 0 && tBalanceArr[src_id] !== undefined) ? tBalanceArr[src_id] : initBalArr[src_id] /*null*/;
-					dest_bal = (dest_id != 0 && tBalanceArr[dest_id] !== undefined) ? tBalanceArr[dest_id] : initBalArr[dest_id] /*null*/;
+					src_bal = (src_id != 0 && tBalanceArr[src_id] !== undefined) ? tBalanceArr[src_id] : initBalArr[src_id];
+					dest_bal = (dest_id != 0 && tBalanceArr[dest_id] !== undefined) ? tBalanceArr[dest_id] : initBalArr[dest_id];
 
 					if (oldPos == 0)			// insert with specified position
 					{
