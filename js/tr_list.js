@@ -319,6 +319,7 @@ function onTransClick(tr_id)
 function onAccountSel(obj)
 {
 	var accSel;
+	var sArr = [], str = '';
 
 	if (!obj)
 		return;
@@ -326,11 +327,14 @@ function onAccountSel(obj)
 	if (!accSel)
 		return;
 
-	selectByValue(accSel, obj.id);
+	for(acc_id in obj)
+	{
+		sArr.push(obj[acc_id]);
+	}
 
-	this.setText(obj.str);
+	str = sArr.join(', ');
 
-	onAccountChange();
+	this.setText(str);
 }
 
 
@@ -343,7 +347,12 @@ function initControls()
 	isMobile = (document.documentElement.clientWidth < 700);
 
 	accDDList = new DDList();
-	if (!accDDList.create({ input_id : 'acc_id', selCB : onAccountSel, editable : false, mobile : isMobile }))
+	if (!accDDList.create({ input_id : 'acc_id',
+						selCB : onAccountSel,
+						selmsg : 'Select account',
+						changecb : onAccountChange,
+						editable : false,
+						mobile : isMobile }))
 		accDDList = null;
 }
 
@@ -457,23 +466,44 @@ function onTransPosChanged(trans_id, retrans_id)
 
 
 // Account change event handler
-function onAccountChange()
+function onAccountChange(obj)
 {
-	var acc_id, accsel;
+	var acc_id;
 	var newLocation;
+	var reloadNeeded = false;
+	var accArr = [], str = '';
 
-	accsel = ge('acc_id');
-	if (!accsel)
+	// Check all accounts from the new selection present in current selection
+	for(acc_id in obj)
+	{
+		if (!inArray(curAccId, acc_id))
+		{
+			reloadNeeded = true;
+			break;
+		}
+	}
+
+	// Check all currenlty selected accounts present in the new selection
+	if (!reloadNeeded)
+	{
+		if (curAccId.some(function(acc_id){ return !(acc_id in obj); }))
+			reloadNeeded = true;
+	}
+
+	if (!reloadNeeded)
 		return;
 
-	acc_id = parseInt(selectedValue(accsel));
+	// Prepare parameters
+	for(acc_id in obj)
+	{
+		accArr.push(acc_id);
+	}
 
-	if (curAccId == acc_id)
-		return;
+	str = accArr.join(',');
 
 	newLocation = './transactions.php?type=' + transType;
-	if (acc_id != 0)
-		newLocation += '&acc_id=' + acc_id;
+	if (str != '')
+		newLocation += '&acc_id=' + str;
 	if (searchRequest)
 		newLocation += '&search=' + encodeURI(searchRequest);
 	if (detailsMode)

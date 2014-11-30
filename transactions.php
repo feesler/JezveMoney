@@ -14,9 +14,24 @@
 
 	$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
+	// Prepare array of accounts
+	$accFilter = array();
+	if (isset($_GET["acc_id"]))
+	{
+		$accExpl = explode(",", $_GET["acc_id"]);
+		foreach($accExpl as $acc_id)
+		{
+			$acc_id = intval(trim($acc_id));
+			if ($acc_id && $acc->is_exist($acc_id))
+				$accFilter[] = $acc_id;
+		}
+	}
+
+/*
 	$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
 	if ($acc_id && !$acc->is_exist($acc_id))
 		$acc_id = 0;
+*/
 
 	$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
 
@@ -44,8 +59,8 @@
 	$tr_on_page = 10;
 
 	$totalTrCount = $db->countQ("transactions", "user_id=".$user_id);
-	$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
-	$transCount = $trans->getTransCount($trans_type, $acc_id, $searchStr, $startDate, $endDate);
+	$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
+	$transCount = $trans->getTransCount($trans_type, $accFilter, $searchStr, $startDate, $endDate);
 
 	$currArr = Currency::getArray(TRUE);
 

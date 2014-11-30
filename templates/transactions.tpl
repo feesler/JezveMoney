@@ -5,7 +5,7 @@
 	var currency = <?=f_json_encode($currArr)?>;
 	var transArr = <?=f_json_encode($transArr)?>;
 	var transType = <?=f_json_encode($type_str)?>;
-	var curAccId = <?=f_json_encode($acc_id)?>;
+	var curAccId = <?=f_json_encode($accFilter)?>;
 	var searchRequest = <?=f_json_encode($searchReq)?>;
 	var detailsMode = <?=(($showDetails) ? "true" : "false")?>;
 
@@ -47,10 +47,10 @@
 
 						<div class="tr_filter std_input">
 							<div>
-								<select id="acc_id" name="acc_id" onchange="onAccountChange(this);">
+								<select id="acc_id" name="acc_id" multiple onchange="onAccountChange(this);">
 									<option value="0">All</option>
 <?php	foreach($accArr as $accData) {
-			if ($accData[0] == $acc_id) {		?>
+			if (in_array($accData[0], $accFilter)) {		?>
 									<option value="<?=$accData[0]?>" selected><?=$accData[4]?></option>
 <?php		} else {		?>
 									<option value="<?=$accData[0]?>"><?=$accData[4]?></option>
