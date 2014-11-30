@@ -140,7 +140,8 @@ function formatAccoutBalance(acc_id)
 // Update tile information
 function setTileInfo(tile_id, title, subTitle, iconType)
 {
-	var tileObj, titleObj, subTitleObj, tileClass;
+	var tileObj, titleObj, subTitleObj;
+	var tileIcons = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
 
 	tileObj = ge(tile_id);
 	if (!tileObj)
@@ -155,20 +156,11 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 		titleObj.innerHTML = title;
 
 	iconType = iconType | 0;
-	tileClass = "tile";
-	if (iconType == 1)
-		tileClass += " tile_icon purse_icon";
-	else if (iconType == 2)
-		tileClass += " tile_icon safe_icon";
-	else if (iconType == 3)
-		tileClass += " tile_icon card_icon";
-	else if (iconType == 4)
-		tileClass += " tile_icon percent_icon";
-	else if (iconType == 5)
-		tileClass += " tile_icon bank_icon";
-	else if (iconType == 6)
-		tileClass += " tile_icon cash_icon";
-	tileObj.className = tileClass;
+	tileObj.className = 'tile';
+	if (iconType <= tileIcons.length && tileIcons[iconType])
+	{
+		addClass(tileObj, ['tile_icon', tileIcons[iconType]]);
+	}
 }
 
 
