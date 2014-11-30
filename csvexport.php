@@ -151,5 +151,3 @@
 	header("Content-Disposition: attachment; filename=\"file.csv\"");
 
 	echo($resStr);
-
-?>

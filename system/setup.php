@@ -45,4 +45,3 @@
 	require_once($docroot.$rootdir."system/message.php");
 
 	spl_autoload_register("autoLoadClass");
-?>

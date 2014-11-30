@@ -288,4 +288,3 @@
 				setLocation("./index.php");
 		}
 	}
-?>

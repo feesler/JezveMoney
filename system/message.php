@@ -146,4 +146,3 @@
 
 		$_SESSION["msg"] = MSG_NONE;
 	}
-?>
