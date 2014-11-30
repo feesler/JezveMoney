@@ -413,26 +413,6 @@ function previousElementSibling(el)
 }
 
 
-// Check element is child of specified
-function isChild(elem, refElem)
-{
-	var curParent = null;
-
-	if (!elem || !refElem)
-		return false;
-
-	curParent = elem.parentNode;
-	while(curParent)
-	{
-		if (curParent == refElem)
-			break;
-		curParent = curParent.parentNode;
-	}
-
-	return (curParent == refElem);
-}
-
-
 // Remove all child nodes of specified element
 function removeChilds(obj)
 {
@@ -509,7 +489,7 @@ function onEmptyClick(e, callback, elem)
 	if (elem.every(function(el){
 		el = ge(el) || null;
 
-		return ((el && !isChild(e.target, el) && el != e.target) || !el);
+		return ((el && !el.contains(e.target) && el != e.target) || !el);
 	}))
 		callback();
 }
