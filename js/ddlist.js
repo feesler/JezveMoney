@@ -571,6 +571,14 @@ function DDList()
 		}
 
 		this.changed = true;
+
+		if (this.isMobile)
+		{
+			if (this.multi && this.ulobj.multiple)
+				this.changecb.call(this, this.selection.selected);
+			else
+				this.changecb.call(this, resObj);
+		}
 	}
 
 
