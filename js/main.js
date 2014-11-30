@@ -245,7 +245,7 @@ function onTileClick(acc_id)
 	{
 		accounts.selectAccount(acc_id);
 
-		actDiv = ce('div', { id : 'act_' + acc_id, className : 'act', onclick : bind(onTileClick, null, acc_id) });
+		actDiv = ce('div', { id : 'act_' + acc_id, className : 'act', onclick : onTileClick.bind(null, acc_id) });
 
 		tile.appendChild(actDiv);
 	}
@@ -431,8 +431,8 @@ function showDeletePopup()
 	if (!dwPopup.create({ id : 'delete_warning',
 						title : (multi) ? multiAccDeleteTitle : singleAccDeleteTitle,
 						msg : (multi) ? multiAccDeleteMsg : singleAccDeleteMsg,
-						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
-								cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
+								cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 						}))
 	{
 		dwPopup = null;
@@ -477,8 +477,8 @@ function showResetAccountsPopup()
 	if (!dwPopup.create({ id : 'reset_warning',
 						title : 'Reset accounts',
 						msg : resetAccMsg,
-						btn : { okBtn : { onclick : bind(onAccResetPopup, null, true) },
-								cancelBtn : { onclick : bind(onAccResetPopup, null, false) } }
+						btn : { okBtn : { onclick : onAccResetPopup.bind(null, true) },
+								cancelBtn : { onclick : onAccResetPopup.bind(null, false) } }
 						}))
 	{
 		dwPopup = null;
@@ -523,8 +523,8 @@ function showResetAllPopup()
 	if (!dwPopup.create({ id : 'reset_warning',
 						title : 'Reset all data',
 						msg : resetAllMsg,
-						btn : { okBtn : { onclick : bind(onResetAllPopup, null, true) },
-								cancelBtn : { onclick : bind(onResetAllPopup, null, false) } }
+						btn : { okBtn : { onclick : onResetAllPopup.bind(null, true) },
+								cancelBtn : { onclick : onResetAllPopup.bind(null, false) } }
 						}))
 	{
 		dwPopup = null;

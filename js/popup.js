@@ -82,7 +82,7 @@ function Popup()
 			if (!cancelBtn)
 				return false;
 
-			this.mergeDef(params.btn.cancelBtn, { type : 'button', value : 'cancel', onclick : bind(this.close, this) });
+			this.mergeDef(params.btn.cancelBtn, { type : 'button', value : 'cancel', onclick : this.close.bind(this) });
 			setParam(cancelBtn, params.btn.cancelBtn);
 			this.cancelBtn = cancelBtn;
 		}

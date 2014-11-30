@@ -385,8 +385,8 @@ function showDeletePopup()
 	if (!dwPopup.create({ id : 'delete_warning',
 						title : singleTransDeleteTitle,
 						msg : singleTransDeleteMsg,
-						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
-						cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
+						cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 						}))
 	{
 		dwPopup = null;

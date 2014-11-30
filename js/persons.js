@@ -72,7 +72,7 @@ function onTileClick(p_id)
 	{
 		persons.selectPerson(p_id);
 
-		actDiv = ce('div', { id : 'act_' + p_id, className : 'act', onclick : bind(onTileClick, null, p_id) });
+		actDiv = ce('div', { id : 'act_' + p_id, className : 'act', onclick : onTileClick.bind(null, p_id) });
 
 		tile.appendChild(actDiv);
 	}
@@ -198,8 +198,8 @@ function showDeletePopup()
 	if (!dwPopup.create({ id : 'delete_warning',
 						title : (multi) ? multiPersonsDeleteTitle : singlePersonDeleteTitle,
 						msg : (multi) ? multiPersonsDeleteMsg : singlePersonDeleteMsg,
-						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
-						cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
+						cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 						}))
 	{
 		dwPopup = null;

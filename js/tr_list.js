@@ -383,7 +383,7 @@ function initTransListDrag()
 				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
 				if (trans_id)
 				{
-					listItem.onclick = bind(onTransClick, null, trans_id);
+					listItem.onclick = onTransClick.bind(null, trans_id);
 					listItem.firstElementChild.style.cursor = 'pointer';
 				}
 
@@ -399,7 +399,7 @@ function initTransListDrag()
 				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
 				if (trans_id)
 				{
-					listItem.onclick = bind(onTransClick, null, trans_id);
+					listItem.onclick = onTransClick.bind(null, trans_id);
 					listItem.firstElementChild.style.cursor = 'pointer';
 				}
 
@@ -476,7 +476,7 @@ function onAccountChange(obj)
 	// Check all accounts from the new selection present in current selection
 	for(acc_id in obj)
 	{
-		if (!inArray(curAccId, acc_id))
+		if (curAccId.indexOf(acc_id) == -1)
 		{
 			reloadNeeded = true;
 			break;
@@ -574,8 +574,8 @@ function showDeletePopup()
 	if (!dwPopup.create({ id : 'delete_warning',
 						title : (transactions.selectedCount() > 1) ? multiTransDeleteTitle : singleTransDeleteTitle,
 						msg : (transactions.selectedCount() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
-						btn : { okBtn : { onclick : bind(onDeletePopup, null, true) },
-						cancelBtn : { onclick : bind(onDeletePopup, null, false) } }
+						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
+						cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 						}))
 	{
 		dwPopup = null;

@@ -302,7 +302,7 @@ function initBarChart(fitToWidth, heightSet)
 			this.attr({ fill : '#00bfff' });
 		});
 
-		barRect.click(bind(onBarClick, barRect, val));
+		barRect.click(onBarClick.bind(barRect, val));
 
 		leftPos += barWidth + barMargin;
 	});
