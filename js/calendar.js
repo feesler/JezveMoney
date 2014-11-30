@@ -35,7 +35,7 @@ function getDayCell(date, month, year, callback)
 
 	btn = ce('button', { type : 'button',
 					innerHTML : date,
-					onclick : bind(callback, null, date, month, year) });
+					onclick : callback.bind(null, date, month, year) });
 	if (!btn)
 		return null;
 
@@ -65,7 +65,8 @@ function getMonthBtn(obj, month, year, callback, isPrev)
 {
 	return ce('button', { className : 'pnMonthBtn',
 					type : 'button',
-					onclick  : schedule(bind(updateCalendar, null, obj, month, year, callback)) }, [ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+					onclick  : schedule(updateCalendar.bind(null, obj, month, year, callback)) },
+					[ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
 }
 
 

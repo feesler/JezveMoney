@@ -15,7 +15,7 @@ function isArray(obj)
 // Check object is date
 function isDate(obj)
 {
-	return (typeof obj === 'object' && obj.constructor.toString().indexOf('Date') != -1);
+	return (obj instanceof Date && !isNaN(obj.valueOf()));
 }
 
 
@@ -24,57 +24,6 @@ function isFunction(obj)
 {
 	var getType = {};
 	return obj && getType.toString.call(obj) === '[object Function]';
-}
-
-
-// Check item is in array
-function inArray(arr, val)
-{
-	if (!isArray(arr))
-		return false;
-
-	if (Array.prototype.indexOf)
-	{
-		return (arr.indexOf(val) != -1);
-	}
-	else
-	{
-		var i = arr.length;
-
-		while(i--)
-		{
-			if (arr[i] === val)
-				return true;
-		}
-
-		return false;
-	}
-}
-
-
-// Wrapper for Array.prototype.every
-function every(arr, func)
-{
-	if (!isArray(arr))
-		throw new TypeError();
-
-	if (!isFunction(func))
-		throw new TypeError();
-
-	if (Array.prototype.every)
-	{
-		return arr.every(func);
-	}
-	else
-	{
-		for(var i = 0; i < arr.length; i++)
-		{
-			if (!func(arr[i], i, arr))
-				return false;
-		}
-
-		return true;
-	}
 }
 
 
@@ -164,6 +113,18 @@ function isNum(val)
 		return true;
 	else
 		return res = (val / val) ? true : false;
+}
+
+
+// Check parameter is integer
+function isInt(x)
+{
+	var y = parseInt(x);
+
+	if (isNaN(y))
+		return false;
+
+	return x == y && x.toString() == y.toString();
 }
 
 
@@ -333,22 +294,6 @@ function selectByValue(selectObj, selValue, selBool)
 	}
 
 	return false;
-}
-
-
-// Return closure for function within specified context and arguments
-function bind(func, context)
-{
-	var bindArgs = [].slice.call(arguments, 2);
-
-	function wrapper()
-	{
-		var args = [].slice.call(arguments); 
-		var unshiftArgs = bindArgs.concat(args);
-		return func.apply(context, unshiftArgs);
-	}
-
-	return wrapper;
 }
 
 
@@ -541,7 +486,10 @@ function fixEvent(e, _this)
 // Return wrapper to schedule specified function for execution after current script
 function schedule(func)
 {
-	return bind(setTimeout, null, func, 0);
+	return function()
+	{
+		setTimeout(func, 0);
+	}
 }
 
 
@@ -646,7 +594,7 @@ function addClass(elem, clName)
 	arr = isArray(clName);
 	for(i = 0; i < clArr.length; i++)
 	{
-		if ((arr && inArray(clName, clArr[i])) || (!arr && clArr[i] == clName))
+		if ((arr && clName.indexOf(clArr[i]) != -1) || (!arr && clArr[i] == clName))
 		{
 			clArr.splice(i--, 1);
 		}
@@ -668,7 +616,7 @@ function removeClass(elem, clName)
 	arr = isArray(clName);
 	for (i = 0; i < clArr.length; i++)
 	{
-		if ((arr && inArray(clName, clArr[i])) || (!arr && clArr[i] == clName))
+		if ((arr && clName.indexOf(clArr[i]) != -1) || (!arr && clArr[i] == clName))
 		{
 			clArr.splice(i--, 1);
 		}
@@ -688,9 +636,9 @@ function hasClass(elem, clName)
 
 	clArr = (elem.className != '') ? elem.className.split(' ') : [];
 	clName = isArray(clName) ? clName : [clName];
-	return every(clName, function(cls)
+	return clName.every(function(cls)
 	{
-		return inArray(clArr, cls);
+		return clArr.indexOf(cls) != -1;
 	});
 }
 

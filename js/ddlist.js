@@ -227,7 +227,7 @@ function DDList()
 				return false;
 			contObj.appendChild(inpObj);
 
-			inpObj.onclick = bind(this.dropDown, this);
+			inpObj.onclick = this.dropDown.bind(this);
 		}
 
 		if (params.mobile)
@@ -252,7 +252,7 @@ function DDList()
 				}
 			}
 
-			ulObj.onchange = bind(this.onChange, this);
+			ulObj.onchange = this.onChange.bind(this);
 		}
 		else
 		{
@@ -267,8 +267,8 @@ function DDList()
 			return false;
 
 		divObj = ce('div', { className : 'ddlist',
-						onkeydown : bind(this.onKey, this),
-						onscroll : bind(this.onScroll, this) },
+						onkeydown : this.onKey.bind(this),
+						onscroll : this.onScroll.bind(this) },
 					[ulObj]);
 		if (!divObj)
 			return false;
@@ -290,7 +290,7 @@ function DDList()
 			if (!btnObj)
 				return false;
 			if (!this.isMobile || (this.isMobile && this.multi && this.forceSelect))
-				btnObj.onclick = bind(this.dropDown, this);
+				btnObj.onclick = this.dropDown.bind(this);
 
 			if (!insertBefore(btnObj, firstElementChild(contObj)))
 				return false;
@@ -333,7 +333,7 @@ function DDList()
 		if (params.inpCB)
 		{
 			this.inpcb = params.inpCB;
-			inpObj.oninput = bind(this.onInput, this);
+			inpObj.oninput = this.onInput.bind(this);
 		}
 
 		if (params.selmsg)
@@ -341,8 +341,8 @@ function DDList()
 			this.selMsg = params.selmsg;
 			if (this.editable)
 			{
-				inpObj.onfocus = bind(this.onFocus, this);
-				inpObj.onblur = bind(this.onBlur, this);
+				inpObj.onfocus = this.onFocus.bind(this);
+				inpObj.onblur = this.onBlur.bind(this);
 
 				if (this.hostObj.value == '')
 				{
@@ -361,12 +361,12 @@ function DDList()
 
 		if (!this.editable)
 		{
-			statObj.onclick = bind(this.dropDown, this);
+			statObj.onclick = this.dropDown.bind(this);
 		}
 		else
 		{
-			inpObj.onkeydown = bind(this.onKey, this);
-			inpObj.onkeypress = bind(this.onKey, this);
+			inpObj.onkeydown = this.onKey.bind(this);
+			inpObj.onkeypress = this.onKey.bind(this);
 			inpObj.autocomplete = "off";
 		}
 
@@ -392,7 +392,7 @@ function DDList()
 		{
 			if (chnodes[i].nodeType == 1) 	// ELEMENT_NODE
 			{
-				chnodes[i].onclick = bind(this.onSelItem, this, chnodes[i]);
+				chnodes[i].onclick = this.onSelItem.bind(this, chnodes[i]);
 			}
 		}
 
@@ -415,7 +415,7 @@ function DDList()
 				if (val)
 				{
 					this.ulobj.focus();
-					setEmptyClick(bind(this.show, this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
+					setEmptyClick(this.show.bind(this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
 				}
 				else
 					setEmptyClick();
@@ -428,7 +428,7 @@ function DDList()
 		{
 			this.list.style.height = px(Math.min(this.maxHeight, (this.filtered ? this.filteredCount : this.itemCount)) * this.itemHeight);
 
-			setEmptyClick(bind(this.show, this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
+			setEmptyClick(this.show.bind(this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
 		}
 		else
 		{
@@ -944,7 +944,7 @@ function DDList()
 				}
 				else
 				{
-					chkel.onchange = bind(this.onCheck, this, chkel);
+					chkel.onchange = this.onCheck.bind(this, chkel);
 				}
 
 				lblel.appendChild(chkel);
@@ -959,7 +959,7 @@ function DDList()
 					return false;
 			}
 
-			divobj.onmouseover = bind(this.setActive, this, divobj);
+			divobj.onmouseover = this.setActive.bind(this, divobj);
 
 			liobj = ce('li', {}, [divobj]);
 			liobj.onclick = function(e)
