@@ -270,29 +270,6 @@ var transactions =
 
 
 
-// Account change event handler
-function onAccountChange()
-{
-	var acc_id, accsel;
-	var newLocation;
-
-	accsel = ge('accsel');
-	if (!accsel)
-		return;
-
-	acc_id = parseInt(selectedValue(accsel));
-
-	if (curAccId == acc_id)
-		return;
-
-	newLocation = './transactions.php?type=' + transType;
-	if (acc_id != 0)
-		newLocation += '&acc_id=' + acc_id;
-
-	window.location = newLocation;
-}
-
-
 // Transaction block click event handler
 function onTransClick(tr_id)
 {
