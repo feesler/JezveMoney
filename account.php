@@ -1,5 +1,5 @@
 <?php
-	require_once("./setup.php");
+	require_once("./system/setup.php");
 
 	function fail($msg = NULL)
 	{
