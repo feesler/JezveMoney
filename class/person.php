@@ -283,5 +283,3 @@ class Person extends CachedTable
 		return $pArr;
 	}
 }
-
-?>

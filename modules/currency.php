@@ -61,4 +61,3 @@
 	}
 
 	setLocation("../admin/currency.php");
-?>

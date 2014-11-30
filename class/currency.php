@@ -240,5 +240,3 @@ class Currency
 		return $res;
 	}
 }
-
-?>

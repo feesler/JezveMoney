@@ -73,4 +73,3 @@
 	}
 
 	setLocation("../persons.php");
-?>

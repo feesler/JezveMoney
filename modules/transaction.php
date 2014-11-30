@@ -138,4 +138,3 @@
 		setMessage(MSG_TRANS_DELETE);
 		setLocation("../transactions.php");
 	}
-?>

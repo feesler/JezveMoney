@@ -81,5 +81,3 @@ abstract class CachedTable
 		return isset($this->cache[$obj_id]);
 	}
 }
-
-?>

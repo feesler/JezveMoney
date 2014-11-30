@@ -982,5 +982,3 @@ class Transaction extends CachedTable
 		return $res;
 	}
 }
-
-?>

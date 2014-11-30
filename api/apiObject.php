@@ -7,5 +7,3 @@
 			return f_json_encode($this);
 		}
 	}
-
-?>

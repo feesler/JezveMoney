@@ -70,5 +70,3 @@
 	}
 
 	setLocation("../profile.php");
-
-?>

@@ -338,5 +338,3 @@ class User extends CachedTable
 		return TRUE;
 	}
 }
-
-?>

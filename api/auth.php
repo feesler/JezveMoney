@@ -16,4 +16,3 @@
 		$respObj->fail();
 
 	$respObj->ok();
-?>

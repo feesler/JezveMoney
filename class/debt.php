@@ -109,5 +109,3 @@ Class Debt
 		return TRUE;
 	}
 }
-
-?>

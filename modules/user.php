@@ -58,4 +58,3 @@
 	}
 
 	setLocation("../index.php");
-?>

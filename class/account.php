@@ -499,5 +499,3 @@ class Account extends CachedTable
 		return $newacc_id;
 	}
 }
-
-?>
