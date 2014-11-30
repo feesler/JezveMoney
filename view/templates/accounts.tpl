@@ -1,4 +1,4 @@
-<?php	include("./templates/commonhdr.tpl");	?>
+<?php	include("./view/templates/commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="./css/screen.css" />
 <script>
 	onReady(initToolbar);
@@ -7,7 +7,7 @@
 <body>
 <div class="page">
 	<div class="page_wrapper">
-<?php	require_once("./templates/header.tpl");		?>
+<?php	require_once("./view/templates/header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">

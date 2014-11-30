@@ -359,5 +359,5 @@
 		$jsArr[] = "popup.js";
 	}
 
-	include("./templates/transaction.tpl");
+	include("./view/templates/transaction.tpl");
 ?>

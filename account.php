@@ -55,5 +55,5 @@
 		$jsArr[] = "popup.js";
 	}
 
-	include("./templates/account.tpl");
+	include("./view/templates/account.tpl");
 ?>

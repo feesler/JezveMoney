@@ -12,5 +12,5 @@
 	$cssArr = array("common.css", "tiles.css", "popup.css", "iconlink.css", "toolbar.css");
 	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ready.js", "popup.js", "toolbar.js", "persons.js");
 
-	include("./templates/persons.tpl");
+	include("./view/templates/persons.tpl");
 ?>

@@ -8,5 +8,5 @@
 	$cssArr = array("common.css", "user.css", "iconlink.css");
 	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ready.js", "main.js");
 
-	include("./templates/register.tpl");
+	include("./view/templates/register.tpl");
 ?>

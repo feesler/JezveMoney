@@ -46,5 +46,5 @@
 		$jsArr[] = "popup.js";
 	}
 
-	include("./templates/person.tpl");
+	include("./view/templates/person.tpl");
 ?>

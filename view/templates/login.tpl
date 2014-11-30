@@ -1,7 +1,7 @@
-<?php	include("./templates/commonhdr.tpl");	?>
+<?php	include("./view/templates/commonhdr.tpl");	?>
 </head>
 <body>
-<?php	require_once("./templates/header.tpl");		?>
+<?php	require_once("./view/templates/header.tpl");		?>
 <form action="./modules/user.php?act=login" method="post" onsubmit="return onLoginSubmit(this);">
 <div class="layer login_layer">
 	<div class="cont">

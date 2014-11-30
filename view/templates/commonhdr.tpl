@@ -6,11 +6,11 @@
 <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
 <title><?=$titleString?></title>
 <?php	foreach($cssArr as $cssFile) {	?>
-<link rel="stylesheet" type="text/css" href="./css/<?=$cssFile?>">
+<link rel="stylesheet" type="text/css" href="./view/css/<?=$cssFile?>">
 <?php	}	?>
 <!--[if lte IE 8]>
-<link rel="stylesheet" type="text/css" href="./css/ie8.css">
+<link rel="stylesheet" type="text/css" href="./view/css/ie8.css">
 <![endif]-->
 <?php	foreach($jsArr as $jsFile) {	?>
-<script type="text/javascript" src="./js/<?=$jsFile?>"></script>
+<script type="text/javascript" src="./view/js/<?=$jsFile?>"></script>
 <?php	}	?>

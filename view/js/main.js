@@ -1,4 +1,4 @@
-﻿var dwPopup;		// delete warning popup
+var dwPopup;		// delete warning popup
 
 
 // Log in form submit event handler

@@ -117,5 +117,5 @@
 	$cssArr = array("common.css", "iconlink.css", "ddlist.css", "popup.css", "calendar.css", "statistics.css");
 	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "ready.js", "calendar.js", "ddlist.js", "raphael.min.js", "statistics.js");
 
-	include("./templates/statistics.tpl");
+	include("./view/templates/statistics.tpl");
 ?>

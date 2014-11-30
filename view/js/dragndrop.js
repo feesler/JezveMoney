@@ -1,4 +1,4 @@
-﻿// Main drag and drop class
+// Main drag and drop class
 var dragMaster = (function()
 {
 	var dragObject;

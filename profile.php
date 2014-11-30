@@ -30,5 +30,5 @@
 	$cssArr = array("common.css", "popup.css", "user.css", "iconlink.css");
 	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ready.js", "popup.js", "main.js");
 
-	include("./templates/profile.tpl");
+	include("./view/templates/profile.tpl");
 ?>

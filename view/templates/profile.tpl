@@ -1,4 +1,4 @@
-<?php	include("./templates/commonhdr.tpl");	?>
+<?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
 	var p_name = <?=f_json_encode($person_name)?>;
 </script>
@@ -6,7 +6,7 @@
 <body>
 <div class="page">
 	<div class="page_wrapper">
-<?php	require_once("./templates/header.tpl");		?>
+<?php	require_once("./view/templates/header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap profile_summary">

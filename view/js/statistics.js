@@ -1,4 +1,4 @@
-﻿var calendarObj = null;
+var calendarObj = null;
 var startDate = null, endDate = null;
 
 

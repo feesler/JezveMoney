@@ -151,5 +151,5 @@
 	$cssArr = array("common.css", "iconlink.css", "tiles.css", "trlist.css", "statistics.css");
 	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ready.js", "main.js", "raphael.min.js", "statistics.js");
 
-	include("./templates/index.tpl");
+	include("./view/templates/index.tpl");
 ?>

@@ -161,5 +161,5 @@
 
 	header("Content-type: text/html; charset=utf-8");
 
-	include("./templates/checkbalance.tpl");
+	include("./view/templates/checkbalance.tpl");
 ?>
