@@ -41,8 +41,8 @@
 	$db->rawQ("SET NAMES 'utf8';");
 	date_default_timezone_set("Europe/Moscow");
 
-	require_once($docroot.$rootdir."common.php");
-	require_once($docroot.$rootdir."message.php");
+	require_once($docroot.$rootdir."system/common.php");
+	require_once($docroot.$rootdir."system/message.php");
 
 	spl_autoload_register("autoLoadClass");
 ?>
