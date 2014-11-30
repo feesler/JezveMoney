@@ -193,7 +193,7 @@ function DragObject(element, isTable)
 			rememberPosition.width = [];
 
 			// Save width of all cells
-			cellEl = element.firstElementChild;
+			cellEl = firstElementChild(element);
 			while(cellEl)
 			{
 				rememberPosition.width[rememberPosition.width.length] = cellEl.offsetWidth;
@@ -247,11 +247,11 @@ function DragObject(element, isTable)
 		if (isTable)
 		{
 			// Reset width of all cells
-			var cellEl = element.firstElementChild;
+			var cellEl = firstElementChild(element);
 			while(cellEl)
 			{
 				cellEl.style.width = '';
-				cellEl = cellEl.nextElementSibling;
+				cellEl = nextElementSibling(cellEl);
 			}
 		}
 		else
@@ -276,7 +276,7 @@ function DragObject(element, isTable)
 		{
 			if (element.parentNode && element.parentNode.tagName == 'TBODY')
 			{
-				var tr = element.parentNode.firstElementChild;
+				var tr = firstElementChild(element.parentNode);
 				while(tr)
 				{
 					if (tr.className.indexOf('drag_spacer') != -1)
@@ -391,7 +391,7 @@ function DropTarget(element)
 			else
 				element.parentNode.insertBefore(cutSource, element);
 
-			dragObject.onInsertAt(element.firstElementChild);
+			dragObject.onInsertAt(firstElementChild(element));
 		}
 	}
 

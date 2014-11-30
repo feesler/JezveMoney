@@ -103,16 +103,16 @@ var transactions =
 		trRow = ge('tr_' + tr_id);
 		if (!trRow)	// tr
 			return;
-		trBalanceItem = trRow.firstElementChild;		// td
+		trBalanceItem = firstElementChild(trRow);		// td
 		if (!trBalanceItem)
 			return;
-		trBalanceItem = trBalanceItem.nextElementSibling;
+		trBalanceItem = nextElementSibling(trBalanceItem);
 		if (!trBalanceItem)
 			return;
-		trBalanceItem = trBalanceItem.nextElementSibling;
+		trBalanceItem = nextElementSibling(trBalanceItem);
 		if (!trBalanceItem)
 			return;
-		trBalanceItem = trBalanceItem.firstElementChild;		// div tritem_balance
+		trBalanceItem = firstElementChild(trBalanceItem);		// div tritem_balance
 		if (!trBalanceItem)
 			return;
 
@@ -303,8 +303,8 @@ function onTransClick(tr_id)
 
 	if (transactions.selectedCount() == 1)
 	{
-		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = './transaction.php?act=edit&id=' + transactions.selectedArr[0];
+		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
+			firstElementChild(edit_btn).href = './transaction.php?act=edit&id=' + transactions.selectedArr[0];
 	}
 
 	show('toolbar', (transactions.selectedCount() > 0));
@@ -368,23 +368,23 @@ function initTransListDrag()
 	if (!trlist)
 		return;
 
-	listItem_wr = trlist.firstElementChild;
+	listItem_wr = firstElementChild(trlist);
 	listItem = null;
 	while(listItem_wr)
 	{
 		if (detailsMode)
 		{
 			if (listItem_wr.className.indexOf('details_table') != -1)
-				listItem_wr = listItem_wr.firstElementChild;
+				listItem_wr = firstElementChild(listItem_wr);
 
 			if (listItem_wr.tagName && listItem_wr.tagName == 'TBODY')
 			{
-				listItem = listItem_wr.firstElementChild;		// get tr element
+				listItem = firstElementChild(listItem_wr);		// get tr element
 				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
 				if (trans_id)
 				{
 					listItem.onclick = onTransClick.bind(null, trans_id);
-					listItem.firstElementChild.style.cursor = 'pointer';
+					firstElementChild(listItem).style.cursor = 'pointer';
 				}
 
 				new DropTarget(listItem_wr);
@@ -395,12 +395,12 @@ function initTransListDrag()
 		{
 			if (!detailsMode && listItem_wr.className.indexOf('trlist_item_wrap') != -1)
 			{
-				listItem = listItem_wr.firstElementChild;
+				listItem = firstElementChild(listItem_wr);
 				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
 				if (trans_id)
 				{
 					listItem.onclick = onTransClick.bind(null, trans_id);
-					listItem.firstElementChild.style.cursor = 'pointer';
+					firstElementChild(listItem).style.cursor = 'pointer';
 				}
 
 				new DropTarget(listItem_wr);
@@ -408,7 +408,7 @@ function initTransListDrag()
 			}
 		}
 
-		listItem_wr = listItem_wr.nextElementSibling;
+		listItem_wr = nextElementSibling(listItem_wr);
 	}
 }
 

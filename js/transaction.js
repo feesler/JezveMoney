@@ -479,7 +479,7 @@ function onChangeAcc()
 			hideDestAmountAndExchange();
 
 		exchrate.value = 1;
-		exchrate_b.firstElementChild.innerHTML = '1';
+		firstElementChild(exchrate_b).innerHTML = '1';
 		if (isExpense())
 			src_amount.value = dest_amount.value;
 		if (isIncome())
@@ -499,9 +499,9 @@ function onChangeAcc()
 			}
 
 			if ((isDebt() && debtType) || isIncome())
-				resbal_d_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
+				firstElementChild(resbal_d_b).innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
 			else if ((isDebt() && !debtType) || isExpense())
-				resbal_b.firstElementChild.innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
+				firstElementChild(resbal_b).innerHTML = formatCurrency(getBalanceOfAccount(new_acc_id) - dest_amount.value, getCurrencyOfAccount(new_acc_id));
 		}
 	}
 	else
@@ -673,7 +673,7 @@ function updControls()
 			{
 				resbal.value = normalize(getBalanceOfAccount(src_acc) - normalize(trsrc_amount));
 			}
-			resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
+			firstElementChild(resbal_b).innerHTML = formatCurrency(resbal.value, getCurrencyOfAccount(src_acc));
 
 			if (isTransfer() || isDebt())
 			{
@@ -693,7 +693,7 @@ function updControls()
 */
 					resbal_d.value = normalize(getBalanceOfAccount(dest_acc) + normalize(trsrc_amount));
 
-				resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
+				firstElementChild(resbal_d_b).innerHTML = formatCurrency(resbal_d.value, getCurrencyOfAccount(dest_acc));
 			}
 /*
 		}
@@ -717,7 +717,7 @@ function updControls()
 
 
 		exchrate.value = 1;
-		exchrate_b.firstElementChild.innerHTML = '1';
+		firstElementChild(exchrate_b).innerHTML = '1';
 /*
 		if (edit_mode && (src_acc == transaction.srcAcc || src_acc == transaction.destAcc))
 		{
@@ -739,7 +739,7 @@ function updControls()
 		}
 */
 
-		resbal_b.firstElementChild.innerHTML = formatCurrency(resbal.value, srcCurr);
+		firstElementChild(resbal_b).innerHTML = formatCurrency(resbal.value, srcCurr);
 
 		if (isTransfer() || isDebt())
 		{
@@ -770,7 +770,7 @@ function updControls()
 			}
 */
 
-			resbal_d_b.firstElementChild.innerHTML = formatCurrency(resbal_d.value, selCurrVal);
+			firstElementChild(resbal_d_b).innerHTML = formatCurrency(resbal_d.value, selCurrVal);
 		}
 
 		hideDestAmountAndExchange();
@@ -883,7 +883,7 @@ function setExchangeComment()
 		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign + ' ('  + invExch + ' ' + srcAmountSign + '/' + destAmountSign + ')';
 	}
 
-	exchrate_b.firstElementChild.innerHTML = fe + ' ' + exchcomm.innerHTML;
+	firstElementChild(exchrate_b).innerHTML = fe + ' ' + exchcomm.innerHTML;
 }
 
 
@@ -1016,13 +1016,13 @@ function setValues()
 		return;
 
 	src_amount.value = sa;
-	src_amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(sa) ? sa : 0), srcCurr);
+	firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(sa) ? sa : 0), srcCurr);
 
 	dest_amount.value = da;
-	dest_amount_b.firstElementChild.innerHTML =  formatCurrency((isValidValue(da) ? da : 0), destCurr);
+	firstElementChild(dest_amount_b).innerHTML =  formatCurrency((isValidValue(da) ? da : 0), destCurr);
 
 	exchrate.value = e;
-	exchrate_b.firstElementChild.innerHTML = e + ' ' + exchcomm.innerHTML;
+	firstElementChild(exchrate_b).innerHTML = e + ' ' + exchcomm.innerHTML;
 
 	if (isDebt())
 	{
@@ -1044,20 +1044,20 @@ function setValues()
 
 	if (isDebt())
 	{
-		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
+		firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 	}
 	else if (isIncome())
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
+		firstElementChild(resbal_d_b).innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	else
-		resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
+		firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 
 	if (isTransfer())
 	{
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
+		firstElementChild(resbal_d_b).innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
 	}
 	else if (isDebt())
 	{
-		resbal_d_b.firstElementChild.innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
+		firstElementChild(resbal_d_b).innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
 	}
 }
 
@@ -1295,7 +1295,7 @@ function onChangeSrcCurr()
 	else
 	{
 		exchrate.value = 1;
-		exchrate_b.firstElementChild.innerHTML = '1';
+		firstElementChild(exchrate_b).innerHTML = '1';
 		dest_amount.value = src_amount.value;
 
 		updateExchAndRes();
@@ -1333,9 +1333,9 @@ function onChangeSrcCurr()
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, debtType ? srcCurr : destCurr));
 
 		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
+			firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
+			firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	}
 }
 
@@ -1379,7 +1379,7 @@ function onChangeDestCurr()
 	else
 	{
 		exchrate.value = 1;
-		exchrate_b.firstElementChild.innerHTML = '1';
+		firstElementChild(exchrate_b).innerHTML = '1';
 		dest_amount.value = src_amount.value;
 
 		updateExchAndRes();
@@ -1417,9 +1417,9 @@ function onChangeDestCurr()
 		setTileInfo(person_tile, personname, formatCurrency(pbalance, debtType ? srcCurr : destCurr));
 
 		if (debtType)
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
+			firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
 		else
-			resbal_b.firstElementChild.innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
+			firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	}
 }
 

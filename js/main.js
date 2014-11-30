@@ -258,10 +258,10 @@ function onTileClick(acc_id)
 
 	if (accounts.selectedCount() == 1)
 	{
-		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = './account.php?act=edit&id=' + accounts.selectedArr[0];
-		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			export_btn.firstElementChild.href = './csvexport.php?id=' + accounts.selectedArr[0];
+		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
+			firstElementChild(edit_btn).href = './account.php?act=edit&id=' + accounts.selectedArr[0];
+		if (firstElementChild(export_btn) && firstElementChild(export_btn).tagName.toLowerCase() == 'a')
+			firstElementChild(export_btn).href = './csvexport.php?id=' + accounts.selectedArr[0];
 	}
 
 	show('toolbar', (accounts.selectedCount() > 0));

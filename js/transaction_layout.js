@@ -435,8 +435,8 @@ function toggleEnableAccount()
 	}
 
 	show('noacc_btn', noAccount);
-	show(source.firstElementChild.nextElementSibling, noAccount);
-	show(source.firstElementChild.nextElementSibling.nextElementSibling, noAccount);
+	show(nextElementSibling(firstElementChild(source)), noAccount);
+	show(nextElementSibling(nextElementSibling(firstElementChild(source))), noAccount);
 	show('selaccount', !noAccount);
 
 	srcAmountSwitch(true);
@@ -472,15 +472,15 @@ function setCurrActive(src, act)
 	var amountRow, currContainer, currBtn, inputContainer;
 
 	amountRow = ge((src) ? 'src_amount_row' : 'dest_amount_row');
-	if (!amountRow || !amountRow.firstElementChild || !amountRow.firstElementChild.nextElementSibling)
+	if (!amountRow || !firstElementChild(amountRow) || !nextElementSibling(firstElementChild(amountRow)))
 		return;
 
-	currContainer = amountRow.firstElementChild.nextElementSibling.firstElementChild;
+	currContainer = firstElementChild(nextElementSibling(firstElementChild(amountRow)));
 	if (!currContainer)
 		return;
 
-	currBtn = currContainer.firstElementChild;
-	inputContainer = currContainer.nextElementSibling;
+	currBtn = firstElementChild(currContainer);
+	inputContainer = nextElementSibling(currContainer);
 	if (!currBtn || !inputContainer)
 		return;
 
@@ -505,10 +505,10 @@ function setAmountInputLabel(src, full)
 	var amountRow, lblObj;
 
 	amountRow = ge((src) ? 'src_amount_row' : 'dest_amount_row');
-	if (!amountRow || !amountRow.firstElementChild)
+	if (!amountRow || !firstElementChild(amountRow))
 		return;
 
-	lblObj = amountRow.firstElementChild.firstElementChild;
+	lblObj = firstElementChild(firstElementChild(amountRow));
 	if (!lblObj)
 		return;
 

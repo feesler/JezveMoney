@@ -146,11 +146,11 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 	if (!tileObj)
 		return;
 
-	subTitleObj = tileObj.firstElementChild.firstElementChild.firstElementChild;
+	subTitleObj = firstElementChild(firstElementChild(firstElementChild(tileObj)));
 	if (subTitleObj)
 		subTitleObj.innerHTML = subTitle;
 
-	titleObj = subTitleObj.nextElementSibling;
+	titleObj = nextElementSibling(subTitleObj);
 	if (titleObj)
 		titleObj.innerHTML = title;
 
