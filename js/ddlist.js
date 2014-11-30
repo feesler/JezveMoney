@@ -91,6 +91,8 @@ function DDList()
 	this.selbtn = null;
 	this.selcb = null;
 	this.inpcb = null;
+	this.changecb = null;
+	this.changed = false;
 	this.visible = false;
 	this.filtered = false;
 	this.filteredCount = 0;
@@ -320,6 +322,8 @@ function DDList()
 			this.selcb = params.selCB;
 		}
 
+		this.changecb = params.changecb || null;
+
 		if (params.maxHeight)
 		{
 			if (params.maxHeight > 0)
@@ -429,6 +433,26 @@ function DDList()
 		else
 		{
 			setEmptyClick();
+
+			if (this.changecb && this.changed)
+			{
+				if (this.multi && this.selobj.multiple)
+				{
+					this.changecb.call(this, this.selection.selected);
+				}
+				else
+				{
+					selectedOption = this.selobj.options[this.selobj.selectedIndex];
+					if (!selectedOption)
+						return;
+
+					resObj.id = this.prepareId(selectedOption.value);
+					resObj.str = selectedOption.innerHTML;
+
+					this.changecb.call(this, resObj);
+				}
+			}
+			this.changed = false;
 		}
 
 		if (this.selbtn && firstElementChild(this.selbtn))
@@ -480,6 +504,35 @@ function DDList()
 	}
 
 
+	this.updateItemPrefix = function(newPrefix)
+	{
+		var listItem, elem, newidval;
+
+		newPrefix = newPrefix || null;
+		newidval = (newPrefix) ? newPrefix : '';
+
+		listItem = firstElementChild(this.ulobj);
+		while(listItem)
+		{
+			if (this.isMobile)
+			{
+				elem = listItem;
+				elem.value = newidval + this.prepareId(elem.value);
+			}
+			else
+			{
+				elem = firstElementChild(listItem);
+				if (elem)
+					elem.id = newidval + this.prepareId(elem.id);
+			}
+
+			listItem = nextElementSibling(listItem);
+		}
+
+		this.itemPrefix = newPrefix;
+	}
+
+
 	this.onChange = function()
 	{
 		var selectedOption, resObj = {};
@@ -516,6 +569,8 @@ function DDList()
 
 			this.selcb.call(this, resObj);
 		}
+
+		this.changed = true;
 	}
 
 
@@ -579,6 +634,8 @@ function DDList()
 			}
 		}
 
+		this.changed = true;
+
 		if (!this.multi)
 			this.show(false);
 	}
@@ -600,6 +657,8 @@ function DDList()
 			this.selection.select(resObj.id, resObj.str);
 
 		selectByValue(this.selobj, resObj.id, this.selection.isSelected(resObj.id));
+
+		this.changed = true;
 
 		this.selcb.call(this, this.selection.selected);
 	}
@@ -669,6 +728,14 @@ function DDList()
 				newItem = this.getSibling(ge(this.actItem).parentNode, false);
 			}
 		}
+		else if (keyCode == 13)				// enter
+		{
+			var item = ge(this.actItem);
+
+			if (item && item.parentNode)
+				this.onSelItem(item.parentNode);
+			e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+		}
 		else
 			return true;
 
@@ -732,28 +799,29 @@ function DDList()
 
 	this.filter = function(fstr)
 	{
-		var i, ival, match, found = false;
+		var ival, match, found = false;
+		var list_item;
 
 		if (!fstr)
 			return false;
 
-		chnodes = this.ulobj.childNodes;
 		this.filteredCount = 0;
-		for(i = 0; i < chnodes.length; i++)
+
+		list_item = firstElementChild(this.ulobj);
+		while(list_item)
 		{
-			if (chnodes[i].nodeType == 1)		// ELEMENT_NODE
-			{
-				ival = firstElementChild(chnodes[i]).innerHTML.toLowerCase();
-				match = (ival.indexOf(fstr.toLowerCase(), 0) != -1);
-				if (match)
-					this.filteredCount++;
+			ival = firstElementChild(list_item).innerHTML.toLowerCase();
+			match = (ival.indexOf(fstr.toLowerCase(), 0) != -1);
+			if (match)
+				this.filteredCount++;
 
-				chnodes[i].style.display = (match ? '' : 'none');
-				found = (found || match);
+			show(list_item, match);
+			found = (found || match);
 
-				if (found)
-					this.filtered = true;
-			}
+			if (found)
+				this.filtered = true;
+
+			list_item = nextElementSibling(list_item);
 		}
 
 		return found;
@@ -872,13 +940,13 @@ function DDList()
 				}
 
 				lblel.appendChild(chkel);
-				lblel.appendChild(ce('span', { innerHTML : str }));
+				lblel.appendChild(ce('span', { innerHTML : str, title : str }));
 
 				divobj.appendChild(lblel);
 			}
 			else
 			{
-				divobj = ce('div', { id : idval, className : 'dditem_idle', innerHTML : str });
+				divobj = ce('div', { id : idval, className : 'dditem_idle', innerHTML : str, title : str });
 				if (!divobj)
 					return false;
 			}
