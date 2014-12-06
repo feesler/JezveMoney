@@ -14,7 +14,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Admin panel | Currency</title>
-<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../view/js/common.js"></script>
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
 
