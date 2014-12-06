@@ -19,30 +19,6 @@
 <a href="./undex.php">Admin</a><br>
 <a href="./currency.php">Currencies</a>  <b>Queries</b> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
 <?php
-/*
-	if (isset($_GET["add"]))
-	{
-		if ($_GET["add"] == "ok")
-			<span style=\"color: green;\">Currency was succussfully created</span><br>
-		else if ($_GET["add"] == "fail")
-			<span style=\"color: red;\">Fail to create new currency</span><br>
-	}
-	else 	if (isset($_GET["edit"]))
-	{
-		if ($_GET["edit"] == "ok")
-			<span style=\"color: green;\">Currency was succussfully updated</span><br>
-		else if ($_GET["edit"] == "fail")
-			<span style=\"color: red;\">Fail to update new currency</span><br>
-	}
-	else 	if (isset($_GET["del"]))
-	{
-		if ($_GET["del"] == "ok")
-			<span style=\"color: green;\">Currency was succussfully deleted</span><br>
-		else if ($_GET["del"] == "fail")
-			<span style=\"color: red;\">Fail to delete new currency</span><br>
-	}
-*/
-
 	$query = "";
 	if (isset($_POST["query"]))
 	{
