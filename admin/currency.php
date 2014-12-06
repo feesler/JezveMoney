@@ -14,7 +14,11 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Admin panel | Currency</title>
+<link rel="stylesheet" type="text/css" href="../view/css/common.css">
+<link rel="stylesheet" type="text/css" href="../view/css/iconlink.css">
+<script type="text/javascript" src="../view/js/es5-shim.min.js"></script>
 <script type="text/javascript" src="../view/js/common.js"></script>
+<script type="text/javascript" src="../view/js/app.js"></script>
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
 
@@ -133,25 +137,7 @@ function onDeleteSubmit(frm)
 <body>
 <a href="./index.php">Admin</a><br>
 <b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
-<?php	if (isset($_GET["add"])) {		?>
-<?php		if ($_GET["add"] == "ok") {		?>
-		<span style="color: green;">Currency was succussfully created</span><br>
-<?php		} else if ($_GET["add"] == "fail") {		?>
-			<span style="color: red;">Fail to create new currency</span><br>
-<?php		}	?>
-<?php	} else if (isset($_GET["edit"])) {		?>
-<?php		if ($_GET["edit"] == "ok") {	?>
-			<span style="color: green;">Currency was succussfully updated</span><br>
-<?php		} else if ($_GET["edit"] == "fail") {		?>
-			<span style="color: red;">Fail to update new currency</span><br>
-<?php		}	?>
-<?php	} else if (isset($_GET["del"])) {		?>
-<?php		if ($_GET["del"] == "ok") {		?>
-			<span style="color: green;">Currency was succussfully deleted</span><br>
-<?php		} else if ($_GET["del"] == "fail") {		?>
-			<span style="color: red;">Fail to delete new currency</span><br>
-<?php		}	?>
-<?php	}	?>
+<?php	checkMessage();		?>
 <table>
 <thead>
 <tr><td>id</td><td>name</td><td>sign</td><td>format</td><td></td></tr>
