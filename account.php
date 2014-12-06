@@ -48,7 +48,7 @@
 	$titleString .= $headString;
 
 	$cssArr = array("common.css", "iconlink.css", "ddlist.css", "tiles.css");
-	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ready.js", "currency.js", "account.js", "ddlist.js", "main.js");
+	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "ddlist.js", "main.js");
 	if ($action == "edit")
 	{
 		$cssArr[] = "popup.css";

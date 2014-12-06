@@ -115,7 +115,7 @@
 	$titleString = "Jezve Money | Statistics";
 
 	$cssArr = array("common.css", "iconlink.css", "ddlist.css", "popup.css", "calendar.css", "statistics.css");
-	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "ready.js", "calendar.js", "ddlist.js", "raphael.min.js", "statistics.js");
+	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "calendar.js", "ddlist.js", "raphael.min.js", "statistics.js");
 
 	include("./view/templates/statistics.tpl");
 ?>
