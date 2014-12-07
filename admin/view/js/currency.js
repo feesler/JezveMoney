@@ -22,7 +22,7 @@ function setCurrencyValues(currObj)
 	else			// clean
 	{
 		curr_id.value = '';
-		curr_id.value = '';
+		del_curr_id.value = '';
 		curr_name.value = '';
 		curr_sign.value = '';
 		curr_format.checked = false;
