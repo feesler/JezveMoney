@@ -38,7 +38,7 @@ function Popup()
 	{
 		var popupObj, backObj, contentObj, boxObj, titleObj, messageObj, controlsObj, okBtn, cancelBtn;
 
-		if (!params || !params.id || !params.title || !params.msg || !params.btn)
+		if (!params || !params.id)
 			return false;
 
 		popupObj = ce('div', { id : params.id, className : 'popup', style : { display : 'none' } });
@@ -46,50 +46,66 @@ function Popup()
 			return false;
 
 		backObj = ce('div', { className : 'popup_back' });
-		contentObj = ce('div', { className : 'popup_content' });
-		boxObj = ce('div', { className : 'box' });
-		if (!backObj || !contentObj || !boxObj)
+		if (!backObj)
 			return false;
 
-		titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
-		messageObj = ce('div', { className : 'popup_message' }, [ ce('div', { innerHTML : params.msg }) ]);
-		controlsObj = ce('div', { className : 'popup_controls' });
-		if (!titleObj || !messageObj || !controlsObj)
-			return false;
+		params.content = params.content || null;
+		if (params.content)
+		{
+			contentObj = ge(params.content);
+			if (!contentObj)
+				return false;
+		}
+		else
+		{
+			contentObj = ce('div', { className : 'popup_content' });
+			boxObj = ce('div', { className : 'box' });
+			if (!contentObj || !boxObj)
+				return false;
+
+			titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
+			messageObj = ce('div', { className : 'popup_message' }, [ ce('div', { innerHTML : params.msg }) ]);
+			controlsObj = ce('div', { className : 'popup_controls' });
+			if (!titleObj || !messageObj || !controlsObj)
+				return false;
+		}
 
 		this.popupObj = popupObj;
 		this.backObj = backObj;
 		this.contentObj = contentObj;
-		this.boxObj = boxObj;
-		this.titleObj = titleObj;
-		this.messageObj = messageObj;
-		this.controlsObj = controlsObj;
-
-		if (params.btn.okBtn)
+		if (!params.content)
 		{
-			okBtn = ce('input', { className : 'btn ok_btn' });
-			if (!okBtn)
-				return false;
+			this.boxObj = boxObj;
+			this.titleObj = titleObj;
+			this.messageObj = messageObj;
+			this.controlsObj = controlsObj;
 
-			this.mergeDef(params.btn.okBtn, { type : 'button', value : 'ok' });
-			setParam(okBtn, params.btn.okBtn);
-			this.okBtn = okBtn;
+			if (params.btn.okBtn)
+			{
+				okBtn = ce('input', { className : 'btn ok_btn' });
+				if (!okBtn)
+					return false;
+
+				this.mergeDef(params.btn.okBtn, { type : 'button', value : 'ok' });
+				setParam(okBtn, params.btn.okBtn);
+				this.okBtn = okBtn;
+			}
+
+			if (params.btn.cancelBtn)
+			{
+				cancelBtn = ce('input', { className : 'btn cancel_btn' });
+				if (!cancelBtn)
+					return false;
+
+				this.mergeDef(params.btn.cancelBtn, { type : 'button', value : 'cancel', onclick : this.close.bind(this) });
+				setParam(cancelBtn, params.btn.cancelBtn);
+				this.cancelBtn = cancelBtn;
+			}
+
+			addChilds(this.controlsObj, [this.okBtn, this.cancelBtn]);
+			addChilds(this.boxObj, [this.titleObj, this.messageObj, this.controlsObj]);
+			addChilds(this.contentObj, [this.boxObj]);
 		}
-
-		if (params.btn.cancelBtn)
-		{
-			cancelBtn = ce('input', { className : 'btn cancel_btn' });
-			if (!cancelBtn)
-				return false;
-
-			this.mergeDef(params.btn.cancelBtn, { type : 'button', value : 'cancel', onclick : this.close.bind(this) });
-			setParam(cancelBtn, params.btn.cancelBtn);
-			this.cancelBtn = cancelBtn;
-		}
-
-		addChilds(this.controlsObj, [this.okBtn, this.cancelBtn]);
-		addChilds(this.boxObj, [this.titleObj, this.messageObj, this.controlsObj]);
-		addChilds(this.contentObj, [this.boxObj]);
 		addChilds(this.popupObj, [this.backObj, this.contentObj]);
 
 		return true;
