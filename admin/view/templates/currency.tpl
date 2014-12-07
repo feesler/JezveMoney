@@ -20,7 +20,7 @@
 			<td><?=$currInfo[1]?></td>
 			<td><?=$currInfo[2]?></td>
 			<td><?=$currInfo[3]?></td>
-			<td><input type="button" value="select" onclick="onSelectCurrency(<?=$currInfo[0]?>);"></td></tr>
+			<td><input class="curr_act_btn" type="button" value="select" onclick="onSelectCurrency(<?=$currInfo[0]?>);"></td></tr>
 <?php	}	?>
 	</tbody>
 	</table>
@@ -32,11 +32,11 @@
 <?php	}	?>
 </select>
 
-<input type="button" value="new" onclick="newCurr()">
+<input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
 
 <form method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
 <input id="del_curr_id" name="curr_id" type="hidden">
-<div id="del_btn" style="display: none;"><input type="submit" value="delete"></div>
+<div id="del_btn" style="display: none;"><input class="curr_act_btn" type="submit" value="delete"></div>
 </form>
 
 <div id="curr_content" class="curr_content" style="display: none;">
@@ -48,7 +48,7 @@
 		<label for="curr_sign">sign</label>
 		<div class="s_inp"><input id="curr_sign" name="curr_sign" type="text"></div>
 		<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
-		<input type="submit" value="ok">
+		<input class="curr_act_btn" type="submit" value="ok">
 		</form>
 
 		<div class="close_btn">
