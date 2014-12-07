@@ -33,6 +33,7 @@
 </select>
 
 <input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
+<input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
 
 <form method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
 <input id="del_curr_id" name="curr_id" type="hidden">

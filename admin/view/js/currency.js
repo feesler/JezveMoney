@@ -45,6 +45,7 @@ function selectCurrency(id)
 		curr_frm.action = '../modules/currency.php?act=edit';
 		setCurrencyValues(currObj);
 		show('del_btn', true);
+		show('updbtn', true);
 	}
 	else			// clean
 	{
@@ -89,6 +90,14 @@ function newCurr()
 	show('del_btn', false);
 
 	dwPopup.show();
+}
+
+
+// Update currency button click handler
+function updateCurr()
+{
+	if (dwPopup)
+		dwPopup.show();
 }
 
 
