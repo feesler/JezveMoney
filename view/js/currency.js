@@ -5,6 +5,26 @@ function formatValue(val)
 }
 
 
+// Return currency object for specified id
+function getCurrencyObject(curr_id)
+{
+	var currObj = null;
+
+	if (curr_id != 0 && currency)
+	{
+		currency.some(function(curr)
+		{
+			if (curr[0] == curr_id)
+				currObj = curr;
+
+			return (curr[0] == curr_id);
+		});
+	}
+
+	return currObj;
+}
+
+
 // Return sign of specified currency
 function getCurrencySign(curr_id)
 {
