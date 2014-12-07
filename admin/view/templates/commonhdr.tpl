@@ -15,7 +15,7 @@
 <link rel="stylesheet" type="text/css" href="../view/css/ie8.css">
 <![endif]-->
 <?php	foreach($jsMainArr as $jsFile) {	?>
-<script type="text/javascript" src="./view/js/<?=$jsFile?>"></script>
+<script type="text/javascript" src="../view/js/<?=$jsFile?>"></script>
 <?php	}	?>
 <?php	foreach($jsLocalArr as $jsFile) {	?>
 <script type="text/javascript" src="./view/js/<?=$jsFile?>"></script>
