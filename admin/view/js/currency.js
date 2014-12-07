@@ -87,6 +87,8 @@ function newCurr()
 	setCurrencyValues(null);
 
 	show('del_btn', false);
+
+	dwPopup.show();
 }
 
 
@@ -94,4 +96,32 @@ function newCurr()
 function onDeleteSubmit(frm)
 {
 	return confirm('Are you sure want to delete selected currency?');
+}
+
+
+var dwPopup = null;
+
+// Controls initialization
+function initControls()
+{
+	dwPopup = new Popup();
+
+	if (!dwPopup.create({ id : 'currency_popup', content : 'curr_content' }))
+	{
+		dwPopup = null;
+		return;
+	}
+
+	dwPopup.show();
+	dwPopup.hide();		// TODO: fix appending popup to DOM on create
+
+	show('curr_content', true);
+}
+
+
+// Hide popup
+function onClosePopup()
+{
+	if (dwPopup)
+		dwPopup.hide();
 }

@@ -11,9 +11,9 @@
 
 	$titleString = "Admin panel | Currency";
 
-	$cssMainArr = array("common.css", "iconlink.css");
+	$cssMainArr = array("common.css", "iconlink.css", "popup.css");
 	$cssLocalArr = array("currency.css");
-	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js");
+	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "popup.js");
 	$jsLocalArr = array("currency.js");
 
 	include("./view/templates/currency.tpl");

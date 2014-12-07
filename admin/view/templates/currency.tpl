@@ -1,6 +1,8 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
+
+	onReady(initControls);
 </script>
 </head>
 <body>
@@ -37,13 +39,22 @@
 <div id="del_btn" style="display: none;"><input type="submit" value="delete"></div>
 </form>
 
-<form id="curr_frm" method="post" action="../modules/currency.php?act=new">
-<input id="curr_id" name="curr_id" type="hidden"><br>
-<label for="curr_name">name</label><br><input id="curr_name" name="curr_name" type="text"><br>
-<label for="curr_sign">sign</label><br><input id="curr_sign" name="curr_sign" type="text"><br>
-<input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label><br>
-<input type="submit" value="ok">
-</form>
+<div id="curr_content" class="curr_content" style="display: none;">
+	<div class="box">
+		<form id="curr_frm" method="post" action="../modules/currency.php?act=new">
+		<input id="curr_id" name="curr_id" type="hidden">
+		<label for="curr_name">name</label>
+		<div class="s_inp"><input id="curr_name" name="curr_name" type="text"></div>
+		<label for="curr_sign">sign</label>
+		<div class="s_inp"><input id="curr_sign" name="curr_sign" type="text"></div>
+		<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
+		<input type="submit" value="ok">
+		</form>
 
+		<div class="close_btn">
+			<div class="iconlink small_icon"><button onclick="onClosePopup();" type="button"><span class="icon close_gray"></span></button></div>
+		</div>
+	</div>
+</div>
 </body>
 </html>
