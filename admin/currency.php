@@ -9,5 +9,12 @@
 
 	$currArr = Currency::getArray(TRUE);
 
+	$titleString = "Admin panel | Currency";
+
+	$cssMainArr = array("common.css", "iconlink.css");
+	$cssLocalArr = array();
+	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js");
+	$jsLocalArr = array();
+
 	include("./view/templates/currency.tpl");
 ?>

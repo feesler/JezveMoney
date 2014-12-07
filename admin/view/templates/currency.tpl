@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Admin panel | Currency</title>
-<link rel="stylesheet" type="text/css" href="../view/css/common.css">
-<link rel="stylesheet" type="text/css" href="../view/css/iconlink.css">
-<script type="text/javascript" src="../view/js/es5-shim.min.js"></script>
-<script type="text/javascript" src="../view/js/common.js"></script>
-<script type="text/javascript" src="../view/js/app.js"></script>
+<?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
 
