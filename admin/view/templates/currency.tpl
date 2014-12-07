@@ -9,24 +9,25 @@
 <a href="./index.php">Admin</a><br>
 <b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
 <?php	checkMessage();		?>
-<table class="curr_tbl">
-<thead>
-<tr><td>id</td><td>name</td><td>sign</td><td>format</td><td></td></tr>
-</thead>
-<tbody>
+	<table class="curr_tbl">
+		<thead>
+			<tr><th>id</th><th>name</th><th>sign</th><th>format</th><th></th></tr>
+		</thead>
+		<tbody>
 <?php	foreach($currArr as $currInfo) {		?>
-		<tr>
-			<td><?=$currInfo[0]?></td>
-			<td><?=$currInfo[1]?></td>
-			<td><?=$currInfo[2]?></td>
-			<td><?=$currInfo[3]?></td>
-			<td><input class="curr_act_btn" type="button" value="select" onclick="onSelectCurrency(<?=$currInfo[0]?>);"></td></tr>
+			<tr>
+				<td><?=$currInfo[0]?></td>
+				<td><?=$currInfo[1]?></td>
+				<td><?=$currInfo[2]?></td>
+				<td><?=$currInfo[3]?></td>
+				<td><input class="curr_act_btn" type="button" value="select" onclick="onSelectCurrency(<?=$currInfo[0]?>);"></td>
+			</tr>
 <?php	}	?>
-	</tbody>
+		</tbody>
 	</table>
 
-<input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
-<input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
+	<input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
+	<input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
 
 <form method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
 <input id="del_curr_id" name="curr_id" type="hidden">
