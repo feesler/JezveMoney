@@ -87,8 +87,6 @@ function newCurr()
 	curr_frm.action = '../modules/currency.php?act=new';
 	setCurrencyValues(null);
 
-	show('del_btn', false);
-
 	dwPopup.show();
 }
 
