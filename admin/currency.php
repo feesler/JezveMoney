@@ -13,8 +13,8 @@
 
 	$cssMainArr = array("common.css", "iconlink.css");
 	$cssLocalArr = array();
-	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js");
-	$jsLocalArr = array();
+	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js");
+	$jsLocalArr = array("currency.js");
 
 	include("./view/templates/currency.tpl");
 ?>
