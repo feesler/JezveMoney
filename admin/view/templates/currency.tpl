@@ -7,7 +7,7 @@
 <a href="./index.php">Admin</a><br>
 <b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
 <?php	checkMessage();		?>
-<table>
+<table class="curr_tbl">
 <thead>
 <tr><td>id</td><td>name</td><td>sign</td><td>format</td><td></td></tr>
 </thead>
