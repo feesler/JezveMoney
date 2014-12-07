@@ -25,13 +25,6 @@
 	</tbody>
 	</table>
 
-	<select id="curr_sel" onchange="onCurrSel()">
-	<option value="0"></option>
-<?php	foreach($currArr as $currInfo) {		?>
-	<option value="<?=$currInfo[0]?>"><?=$currInfo[1]?></option>
-<?php	}	?>
-</select>
-
 <input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
 <input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
 

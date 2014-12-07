@@ -62,19 +62,6 @@ function onSelectCurrency(id)
 }
 
 
-// Currency list change handler
-function onCurrSel()
-{
-	var curr_sel;
-
-	curr_sel = ge('curr_sel');
-	if (!curr_sel)
-		return;
-
-	selectCurrency(selectedValue(curr_sel))
-}
-
-
 // New currency button click handler
 function newCurr()
 {
