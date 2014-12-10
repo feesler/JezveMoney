@@ -25,13 +25,15 @@
 		</tbody>
 	</table>
 
-	<input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
-	<input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
+	<div class="acc_controls">
+		<input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
+		<input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
+		<input id="del_btn" class="curr_act_btn" type="button" value="delete" onclick="deleteCurr()" style="display: none;">
+	</div>
 
-<form method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
-<input id="del_curr_id" name="curr_id" type="hidden">
-<div id="del_btn" style="display: none;"><input class="curr_act_btn" type="submit" value="delete"></div>
-</form>
+	<form id="delfrm" method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
+		<input id="del_curr_id" name="curr_id" type="hidden">
+	</form>
 
 <div id="curr_content" class="curr_content" style="display: none;">
 	<div class="box">

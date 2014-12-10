@@ -78,10 +78,18 @@ function updateCurr()
 }
 
 
-// Show confirm delete currency dialog
-function onDeleteSubmit(frm)
+// Delete currency button click handler
+function deleteCurr()
 {
-	return confirm('Are you sure want to delete selected currency?');
+	var delfrm = ge('delfrm');
+
+	if (!delfrm)
+		return;
+
+	if (confirm('Are you sure want to delete selected currency?'))
+	{
+		delfrm.submit();
+	}
 }
 
 
