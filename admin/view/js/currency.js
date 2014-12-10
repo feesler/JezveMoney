@@ -94,10 +94,29 @@ function onDeleteSubmit(frm)
 
 
 var dwPopup = null;
+var activeRow = null;
 
 // Controls initialization
 function initControls()
 {
+	// table initialization
+	var tbl, tbody, row;
+
+	tbl = ge('currencies_tbl')
+	if (!tbl)
+		return;
+	tbody = nextElementSibling(firstElementChild(tbl));
+	if (!tbody)
+		return;
+	row = firstElementChild(tbody);
+	while(row)
+	{
+		row.onclick = onRowClick.bind(row);
+
+		row = nextElementSibling(row);
+	}
+
+	// popup initialization
 	dwPopup = new Popup();
 
 	if (!dwPopup.create({ id : 'currency_popup', content : 'curr_content' }))
@@ -118,4 +137,18 @@ function onClosePopup()
 {
 	if (dwPopup)
 		dwPopup.hide();
+}
+
+
+// Table row click handler
+function onRowClick()
+{
+	if (!this)
+		return;
+
+	if (activeRow)
+		removeClass(activeRow, 'act');
+
+	addClass(this, 'act');
+	activeRow = this;
 }

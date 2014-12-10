@@ -12,6 +12,24 @@
 }
 
 
+.curr_tbl tr
+{
+	cursor: pointer;
+}
+
+.curr_tbl tr:hover
+{
+	background-color: #BBBBBB;
+}
+
+
+.curr_tbl tr.act
+{
+	background-color: #0088DD;
+	color: #FFFFFF;
+}
+
+
 /* Create/update currency popup */
 .popup > .curr_content
 {

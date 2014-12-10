@@ -9,7 +9,7 @@
 <a href="./index.php">Admin</a><br>
 <b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
 <?php	checkMessage();		?>
-	<table class="curr_tbl">
+	<table id="currencies_tbl" class="curr_tbl">
 		<thead>
 			<tr><th>id</th><th>name</th><th>sign</th><th>format</th><th></th></tr>
 		</thead>
