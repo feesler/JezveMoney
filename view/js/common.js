@@ -259,10 +259,13 @@ function checkDate(str)
 // Return text of selected option of select object
 function selectedText(selectObj)
 {
+	var option;
+
 	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
 		return -1;
+	option = selectObj.options[selectObj.selectedIndex]
 
-	return selectObj.options[selectObj.selectedIndex].textContent;
+	return (option.textContent) ? option.textContent : option.innerText;
 }
 
 
@@ -367,10 +370,10 @@ function lastElementChild(el)
 	if (el.lastElementChild)
 		return el.lastElementChild;
 
-	el = el.firstChild;
+	el = el.lastChild;
 	while(el && el.nodeType !== 1)
 	{
-		el = el.nextSibling;
+		el = el.previousSibling;
 	}
 
 	return el;
