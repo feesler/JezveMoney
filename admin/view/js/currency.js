@@ -54,14 +54,6 @@ function selectCurrency(id)
 }
 
 
-// Currency select button click handler
-function onSelectCurrency(id)
-{
-	selectCurrency(id);
-	selectByValue(ge('curr_sel'), id);
-}
-
-
 // New currency button click handler
 function newCurr()
 {
@@ -143,6 +135,8 @@ function onClosePopup()
 // Table row click handler
 function onRowClick()
 {
+	var idcell, curr_id;
+
 	if (!this)
 		return;
 
@@ -151,4 +145,11 @@ function onRowClick()
 
 	addClass(this, 'act');
 	activeRow = this;
+
+	idcell = firstElementChild(this);
+	if (!idcell)
+		return;
+	curr_id = parseInt(idcell.innerHTML);
+
+	selectCurrency(curr_id);
 }

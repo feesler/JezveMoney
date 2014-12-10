@@ -11,7 +11,7 @@
 <?php	checkMessage();		?>
 	<table id="currencies_tbl" class="curr_tbl">
 		<thead>
-			<tr><th>id</th><th>name</th><th>sign</th><th>format</th><th></th></tr>
+			<tr><th>id</th><th>name</th><th>sign</th><th>format</th></tr>
 		</thead>
 		<tbody>
 <?php	foreach($currArr as $currInfo) {		?>
@@ -20,7 +20,6 @@
 				<td><?=$currInfo[1]?></td>
 				<td><?=$currInfo[2]?></td>
 				<td><?=$currInfo[3]?></td>
-				<td><input class="curr_act_btn" type="button" value="select" onclick="onSelectCurrency(<?=$currInfo[0]?>);"></td>
 			</tr>
 <?php	}	?>
 		</tbody>
