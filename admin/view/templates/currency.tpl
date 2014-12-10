@@ -6,9 +6,19 @@
 </script>
 </head>
 <body>
-<a href="./index.php">Admin</a><br>
-<b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
+<div class="page">
+	<div class="page_wrapper">
+		<div class="admin_header">
+			<a href="./index.php">Admin</a><br>
+			<b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
 <?php	checkMessage();		?>
+		</div>
+
+		<div class="container">
+			<div class="content">
+				<div class="content_wrap admin_cont_wrap">
+				<h2>Currencies</h2>
+
 	<table id="currencies_tbl" class="curr_tbl">
 		<thead>
 			<tr><th>id</th><th>name</th><th>sign</th><th>format</th></tr>
@@ -34,6 +44,10 @@
 	<form id="delfrm" method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
 		<input id="del_curr_id" name="curr_id" type="hidden">
 	</form>
+</div>
+</div>
+</div>
+</div>
 
 <div id="curr_content" class="curr_content" style="display: none;">
 	<div class="box">
