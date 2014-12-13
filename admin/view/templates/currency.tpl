@@ -8,11 +8,7 @@
 <body>
 <div class="page">
 	<div class="page_wrapper">
-		<div class="admin_header">
-			<a href="./index.php">Admin</a><br>
-			<b>Currencies</b> <a href="./query.php">Queries</a> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
-<?php	checkMessage();		?>
-		</div>
+<?php	include("./view/templates/header.tpl");	?>
 
 		<div class="container">
 			<div class="content">

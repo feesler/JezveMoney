@@ -9,6 +9,13 @@
 
 	$currArr = Currency::getArray(TRUE);
 
+	$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
+					"query" => array("title" => "Queries", "link" => "./query.php"),
+					"log" => array("title" => "Logs", "link" => "./log.php"),
+					"apitest" => array("title" => "API test", "link" => "./apitest.php"));
+
+	$menuItems["curr"]["active"] = TRUE;
+
 	$titleString = "Admin panel | Currency";
 
 	$cssMainArr = array("common.css", "iconlink.css", "popup.css");
