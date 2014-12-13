@@ -12,7 +12,7 @@
 	$titleString = "Admin panel | Currency";
 
 	$cssMainArr = array("common.css", "iconlink.css", "popup.css");
-	$cssLocalArr = array("currency.css");
+	$cssLocalArr = array("admin.css", "currency.css");
 	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "popup.js");
 	$jsLocalArr = array("currency.js");
 
