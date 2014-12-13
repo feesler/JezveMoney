@@ -8,7 +8,7 @@
 
 	require_once($docroot.$rootdir."class/mysql.php");
 
-	if ($dev)
+	if (!isset($noLogs))
 	{
 		require_once($docroot.$rootdir."class/log.php");
 
@@ -24,6 +24,10 @@
 		{
 			wlog($cKey."=".$cVal);
 		}
+	}
+	else
+	{
+		function wlog(){}
 	}
 
 
