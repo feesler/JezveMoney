@@ -5,22 +5,10 @@
 	$user_id = $u->check();
 	if (!$user_id || !$u->isAdmin($user_id))
 		setLocation("../login.php");
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Admin panel | DB queries</title>
-<script type="text/javascript" src="../js/common.js"></script>
-<script>
-</script>
-</head>
-<body>
-<a href="./undex.php">Admin</a><br>
-<a href="./currency.php">Currencies</a>  <b>Queries</b> <a href="./log.php">Logs</a> <a href="./apitest.php">API test</a>
-<?php
-	$query = "";
-	if (isset($_POST["query"]))
+
+
+	$query = NULL;
+	if (isset($_POST["query"]) && $_POST["query"] != "")
 	{
 		$query = $_POST["query"];
 
@@ -30,42 +18,31 @@
 			$result = $db->rawQ($query);
 			$qerr_num = mysql_errno();
 			$qerror = mysql_error();
-			if ($result && !$qerr_num && mysql_num_rows($result) > 0) {
+			if ($result && !$qerr_num && mysql_num_rows($result) > 0)
+			{
 				while($row = mysql_fetch_array($result, MYSQL_ASSOC))
 					$resArr[] = $row;
-?>
 
-				<table border="1">
-				<tr>
-<?php	foreach($resArr[0] as $ind => $val) {		?>
-					<th><?=$ind?></th>
-<?php	}	?>
-				</tr>
-<?php	foreach($resArr as $row) {		?>
-				<tr>
-<?php		foreach($row as $val) {	?>
-					<td><?=$val?></td>
-<?php		}	?>
-				</tr>
-<?php	}
 				$rows = count($resArr);
-				$cols = $rows ? count($row) : 0;
+				$cols = isset($resArr[0]) ? count($resArr[0]) : 0;
+			}
+		}
+	}
+
+
+	$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
+					"query" => array("title" => "Queries", "link" => "./query.php"),
+					"log" => array("title" => "Logs", "link" => "./log.php"),
+					"apitest" => array("title" => "API test", "link" => "./apitest.php"));
+
+	$menuItems["query"]["active"] = TRUE;
+
+	$titleString = "Admin panel | DB queries";
+
+	$cssMainArr = array("common.css", "iconlink.css");
+	$cssLocalArr = array("admin.css", "query.css");
+	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js");
+	$jsLocalArr = array();
+
+	include("./view/templates/query.tpl");
 ?>
-				<tr><td colspan="<?=$cols?>">Rows: <?=$rows?></td></tr>
-				</table>
-<?php			} else {	?>
-				<div style="color: red;">Error: <?=$qerr_num?><br><?=$qerror?></div><br>
-<?php			}	?>
-<?php		}	?>
-<?php	}	?>
-<form method="post" action="./query.php">
-<label>Query type</label><br>
-<input name="qtype" type="radio" value="1" checked> Select
-
-<label>Query</label><br>
-<textarea id="query" name="query" rows="5" cols="80"><?=$query?></textarea><br>
-<input type="submit" value="Query">
-</form>
-
-</body>
-</html>
