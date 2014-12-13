@@ -27,6 +27,15 @@
 }
 
 
+/* Admin action button */
+.adm_act_btn
+{
+	padding: 3px 10px;
+	background-color: #44AAFF;
+	color: #FFFFFF;
+}
+
+
 /* Admin table */
 .adm_tbl
 {

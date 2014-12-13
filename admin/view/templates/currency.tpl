@@ -32,9 +32,9 @@
 				</table>
 
 				<div class="acc_controls">
-					<input class="curr_act_btn" type="button" value="new" onclick="newCurr()">
-					<input id="updbtn" class="curr_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
-					<input id="del_btn" class="curr_act_btn" type="button" value="delete" onclick="deleteCurr()" style="display: none;">
+					<input class="adm_act_btn" type="button" value="new" onclick="newCurr()">
+					<input id="updbtn" class="adm_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
+					<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteCurr()" style="display: none;">
 				</div>
 
 				<form id="delfrm" method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
@@ -54,7 +54,7 @@
 		<label for="curr_sign">sign</label>
 		<div class="s_inp"><input id="curr_sign" name="curr_sign" type="text"></div>
 		<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
-		<input class="curr_act_btn" type="submit" value="ok">
+		<input class="adm_act_btn" type="submit" value="ok">
 		</form>
 
 		<div class="close_btn">
