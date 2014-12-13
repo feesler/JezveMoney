@@ -1,11 +1,13 @@
 		<div class="admin_header">
-			<a href="./index.php">Admin</a><br>
+			<div class="title"><a href="./index.php">Admin</a></div>
+			<div class="menu">
 <?php	foreach($menuItems as $item_id => $m_item) {	?>
 <?php		if (isset($m_item["active"]) && $m_item["active"]) {		?>
-			<b><?=$m_item["title"]?></b>
+				<span><b><?=$m_item["title"]?></b></span>
 <?php		} else {		?>
-			<a href="<?=$m_item["link"]?>"><?=$m_item["title"]?></a>
+				<span><a href="<?=$m_item["link"]?>"><?=$m_item["title"]?></a></span>
 <?php		}		?>
 <?php	}	?>
+			</div>
 <?php	checkMessage();		?>
 		</div>

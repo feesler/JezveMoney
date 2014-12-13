@@ -6,6 +6,21 @@
 }
 
 
+.admin_header > .title,
+.admin_header > .menu
+{
+	height: 20px;
+}
+
+
+.admin_header > .menu > span
+{
+	display: inline-block;
+	float: left;
+	padding: 0px 10px 0px 0px;
+}
+
+
 .admin_cont_wrap
 {
 	padding: 12px;
