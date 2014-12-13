@@ -69,3 +69,11 @@
 	background-color: #0088DD;
 	color: #FFFFFF;
 }
+
+
+/* Common style for textarea */
+textarea
+{
+	border: 1px solid #000000;
+	padding: 5px;
+}

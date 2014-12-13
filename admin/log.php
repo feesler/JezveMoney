@@ -1,35 +1,33 @@
 <?php
-	$docroot = $_SERVER["DOCUMENT_ROOT"];
+	$noLogs = TRUE;
+	require_once("../system/setup.php");
+
 	$filename = $docroot."/money/admin/log.txt";
 
-	$titleString = "jezveMoney - Log";
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title><?php echo($titleString); ?></title>
-</head>
-<body>
-<a href="./index.php">Admin</a><br>
-<a href="./currency.php">Currencies</a>  <a href="./query.php">Queries</a> <b>Logs</b> <a href="./apitest.php">API test</a>
-<form method="post" action="./cleanlog.php">
-<input name="clean" type="hidden" value="1">
-<input type="submit" value="Clean log">
-</form>
-<textarea rows="50" cols="150">
-<?php
+	$contents = "";
 	if (file_exists($filename))
 	{
 		$fp = fopen($filename, "r");
 		if ($fp)
 		{
 			$contents = fread($fp, filesize($filename));
-			echo($contents);
 			fclose($fp);
 		}
 	}
+
+	$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
+					"query" => array("title" => "Queries", "link" => "./query.php"),
+					"log" => array("title" => "Logs", "link" => "./log.php"),
+					"apitest" => array("title" => "API test", "link" => "./apitest.php"));
+
+	$menuItems["log"]["active"] = TRUE;
+
+	$titleString = "Admin panel | Log";
+
+	$cssMainArr = array("common.css", "iconlink.css");
+	$cssLocalArr = array("admin.css");
+	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js");
+	$jsLocalArr = array();
+
+	include("./view/templates/log.tpl");
 ?>
-</textarea>
-</body>
-</html>
