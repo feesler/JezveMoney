@@ -15,7 +15,7 @@
 				<div class="content_wrap admin_cont_wrap">
 				<h2>Currencies</h2>
 
-				<table id="currencies_tbl" class="curr_tbl">
+				<table id="currencies_tbl" class="adm_tbl">
 					<thead>
 						<tr><th>id</th><th>name</th><th>sign</th><th>format</th></tr>
 					</thead>
