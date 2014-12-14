@@ -1,6 +1,6 @@
 .test_container
 {
-	background-color: #DDDDFF;
+	background-color: #E0F0FF;
 	max-width: 400px;
 	display: inline-block;
 	float: left;
@@ -19,8 +19,17 @@
 
 h2
 {
-	font-family: "Segoe UI", Arial, sanf-serif;
+	font-family: "Segoe UI Light", "Segoe UI", Arial, sanf-serif;
 	font-size: 22px;
+	font-weight: normal;
+	clear: both;
+}
+
+
+h3
+{
+	font-family: "Segoe UI", Arial, sanf-serif;
+	font-size: 18px;
 	font-weight: normal;
 	clear: both;
 }
