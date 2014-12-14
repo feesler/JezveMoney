@@ -24,6 +24,7 @@ div
 /* headings */
 h1
 {
+	font-family: "Segoe UI Light", "Segoe UI Semilight", "Segoe UI";
 	font-size: 32px;
 	font-weight: normal;
 	margin: 0px 0px 10px 0px;
