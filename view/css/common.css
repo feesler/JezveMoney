@@ -391,7 +391,10 @@ button::-moz-focus-inner
 /* title of main page widget */
 .widget_title
 {
-	font-size: 20px;
+	display: block;
+	float: none;
+	clear: both;
+	height: 32px;
 	margin: 10px 0px;
 }
 
@@ -399,8 +402,32 @@ button::-moz-focus-inner
 .widget_title > a,
 .widget_title > a:hover
 {
+	height: 32px;
 	color: #000000;
 	text-decoration: none;
+}
+
+
+.widget_title span
+{
+	font-family: "Segoe UI Light", "Segoe UI";
+	font-size: 26px;
+	line-height: 32px;
+	float: left;
+	display: inline-block;
+}
+
+
+.widget_title .glyph
+{
+	width: 32px;
+	height: 32px;
+	background-image: url('../img/icons2x.png');
+	background-size: 320px 64px;
+	background-repeat: no-repeat;
+	float: left;
+	display: inline-block;
+	background-position: -288px 3px;
 }
 
 

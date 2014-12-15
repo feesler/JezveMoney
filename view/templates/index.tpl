@@ -17,7 +17,7 @@
 			<div class="content">
 				<div class="content_wrap">
 					<div class="widget">
-						<div class="widget_title"><a href="./accounts.php">Accounts &gt;</a></div>
+						<div class="widget_title"><a href="./accounts.php"><span>Accounts</span><div class="glyph"></div></a></div>
 						<div class="tiles"><?php
 		if (!count($tilesArr)) {	?>
 						<span>You have no one account. Please create one.</span>
@@ -29,7 +29,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title">Total &gt;</div>
+						<div class="widget_title"><span>Total</span></div>
 						<div class="info_tiles">
 							<div>
 <?php	if (!count($tilesArr)) {	?>
@@ -47,7 +47,7 @@
 					</div>
 
 					<div class="widget break_widget latest_widget">
-						<div class="widget_title"><a href="./transactions.php">Latest &gt;</a></div>
+						<div class="widget_title"><a href="./transactions.php"><span>Latest</span><div class="glyph"></div></a></div>
 						<div id="trlist" class="trans_list">
 <?php	if (!count($trListData)) {	?>
 							<span>You have no one transaction yet.</span>
@@ -73,7 +73,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title"><a href="./persons.php">Persons &gt;</a></div>
+						<div class="widget_title"><a href="./persons.php"><span>Persons</span><div class="glyph"></div></a></div>
 						<div class="info_tiles">
 							<div>
 <?php	if (!count($persArr)) {		?>
@@ -95,7 +95,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title"><a href="./statistics.php">Statistics &gt;</a></div>
+						<div class="widget_title"><a href="./statistics.php"><span>Statistics</span><div class="glyph"></div></a></div>
 						<div class="charts widget_charts">
 							<div class="right_float">
 								<div id="vert_labels"></div>
