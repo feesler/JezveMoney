@@ -1,16 +1,24 @@
 <?php
 	$dev = TRUE;
 
-	$docroot = $_SERVER["DOCUMENT_ROOT"];
+	// Prepare root directories
+	$pparts = pathinfo(__FILE__);
+	$path_length = strrpos($pparts["dirname"], "/");
+	$approot = substr(__FILE__, 0, $path_length);
+
+	$path_length = strrpos($approot, "/");
+	$docroot = substr(__FILE__, 0, $path_length + 1);
+
+	$approot .= "/";
+
 	$ruri = $_SERVER["REQUEST_URI"];
 	$userAgent = $_SERVER["HTTP_USER_AGENT"];
-	$rootdir = "/money/";
 
-	require_once($docroot.$rootdir."class/mysql.php");
+	require_once($approot."class/mysql.php");
 
 	if (!isset($noLogs))
 	{
-		require_once($docroot.$rootdir."class/log.php");
+		require_once($approot."class/log.php");
 
 		wlog("\r\nBEGIN");
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
@@ -33,7 +41,7 @@
 
 	$sitetheme = 1;
 
-	require_once($docroot.$rootdir."system/dbsetup.php");
+	require_once($approot."system/dbsetup.php");
 
 	$db = new mysqlDB();
 	if (!$db->connect($db_location, $db_user, $db_password))
@@ -45,7 +53,7 @@
 	$db->rawQ("SET NAMES 'utf8';");
 	date_default_timezone_set("Europe/Moscow");
 
-	require_once($docroot.$rootdir."system/common.php");
-	require_once($docroot.$rootdir."system/message.php");
+	require_once($approot."system/common.php");
+	require_once($approot."system/message.php");
 
 	spl_autoload_register("autoLoadClass");

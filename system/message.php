@@ -115,7 +115,7 @@
 	// Check message and show it if available
 	function checkMessage()
 	{
-		global $docroot, $rootdir;
+		global $approot;
 		global $msgArray;
 
 		sessionStart();
@@ -143,7 +143,7 @@
 		else if ($msgType == MSG_TYPE_ERROR)
 			$msgClass .= " msg_error";
 
-		include($docroot.$rootdir."view/templates/message.tpl");
+		include($approot."view/templates/message.tpl");
 
 		$_SESSION["msg"] = MSG_NONE;
 	}

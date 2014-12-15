@@ -23,13 +23,13 @@
 	// Check class name and try to load file
 	function autoLoadClass($className)
 	{
-		global $docroot, $rootdir, $classes;
+		global $approot, $classes;
 
 		foreach($classes as $clName => $clPath)
 		{
 			if ($clName == $className)
 			{
-				require($docroot.$rootdir.$clPath);
+				require($approot.$clPath);
 				break;
 			}
 		}
