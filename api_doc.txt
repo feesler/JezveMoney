@@ -1,0 +1,129 @@
+Call method
+[Base address] + [Interface] + [Action]
+
+Parameters are send via POST.
+
+Base address:
+http://jezve.net/money/api/
+
+
+Response
+JSON
+No data returned
+{ "result" : "<result type>" }
+Data returned
+{ "result" : "<result type>", "data" : <result data> }
+
+
+Interfaces:
+	User
+	Currency
+	Account
+	Person
+	Transaction
+
+User
+auth.php
+Request
+	auth.php
+	GET parameters
+		*login: login
+		*pwd: password
+Response
+	No data returned
+
+register.php
+Request
+	register.php
+	POST parameters
+		*login: login
+		*password: password
+		*name: user name
+Response
+	No data returned
+
+
+Currency
+
+
+Account
+
+
+Person
+
+
+Transaction
+Method
+	list
+Request
+	transaction.php?act=list
+	GET parameters
+		type : transaction type
+		count : transactions on page
+		page : page number
+		acc_id : specific account id
+		search : search string
+		stdate : start date
+		enddate : end date
+Response
+	Array of transaction items
+
+Transaction item:
+{
+	"id" : transaction id,
+	"src_id" : source account id,
+	"dest_id" : destination account id,
+	"src_amount" : amount taken from source,
+	"dest_amount" : amount given to destination,
+	"src_curr" : currency of source,
+	"dest_curr" : currency of destination,
+	"date" : transaction date,
+	"comment" : comment,
+	"pos" : position of transaction
+}
+
+
+Method
+	new
+Request
+	transaction.php?act=list
+	POST parameters
+		transtype : transaction type
+		src_id : source account id
+		dest_id : destination account id
+		src_amount : amount taken from source
+		dest_amount : amount given to destination
+		src_curr : currency of source
+		dest_curr : currency of destination
+		date : transaction date
+		comm : comment
+Response
+{
+	"id" : id of created transaction
+}
+
+
+Method
+	new
+Request
+	transaction.php?act=list
+	POST parameters
+		transid : transaction id
+		transtype : transaction type
+		src_id : source account id
+		dest_id : destination account id
+		src_amount : amount taken from source
+		dest_amount : amount given to destination
+		src_curr : currency of source
+		dest_curr : currency of destination
+		date : transaction date
+		comm : comment
+Response
+	No data returned
+
+Method
+	del
+Request
+	transaction.php?act=del
+	POST parameters
+		transactions : comma separated list of transaction ids
