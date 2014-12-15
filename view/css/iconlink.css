@@ -13,7 +13,7 @@
 	width: 32px;
 	height: 32px;
 	background: url('../img/icons2x.png') no-repeat;
-	background-size: 288px 64px;
+	background-size: 320px 64px;
 	overflow: hidden;
 	display: inline-block;
 	float: left;
@@ -25,7 +25,7 @@
 	width: 32px;
 	height: 32px;
 	background: url('../img/icons2x_white.png') no-repeat;
-	background-size: 288px 64px;
+	background-size: 320px 64px;
 	overflow: hidden;
 	display: inline-block;
 	float: left;
@@ -155,7 +155,7 @@
 	width: 32px;
 	height: 32px;
 	background-image: url('../img/icons2x.png');
-	background-size: 288px 64px;
+	background-size: 320px 64px;
 	background-repeat: no-repeat;
 	display: block;
 }
@@ -279,4 +279,11 @@
 .iconlink > *:hover > .close_gray
 {
 	background-position: -224px -46px;
+}
+
+
+
+.iconlink .glyph
+{
+	background-position: -288px 0px;
 }
