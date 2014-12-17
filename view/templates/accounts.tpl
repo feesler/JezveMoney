@@ -13,7 +13,7 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1>Accounts</h1>
-						<div id="add_btn" class="iconlink"><a href="./account.php?act=new"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
+						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>accounts/new/"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 					<div class="tiles"><?php
 	if (count($tilesArr)) {

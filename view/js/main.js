@@ -224,6 +224,7 @@ function onTileClick(acc_id)
 {
 	var tile, edit_btn, del_btn, delaccounts, export_btn;
 	var actDiv;
+	var baseURL = 'http://jezve.net/money_dev/';
 
 	tile = ge('acc_' + acc_id);
 	edit_btn = ge('edit_btn');
@@ -259,7 +260,7 @@ function onTileClick(acc_id)
 	if (accounts.selectedCount() == 1)
 	{
 		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = './account.php?act=edit&id=' + accounts.selectedArr[0];
+			firstElementChild(edit_btn).href = baseURL + 'accounts/edit/' + accounts.selectedArr[0];
 		if (firstElementChild(export_btn) && firstElementChild(export_btn).tagName.toLowerCase() == 'a')
 			firstElementChild(export_btn).href = './csvexport.php?id=' + accounts.selectedArr[0];
 	}
