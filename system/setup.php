@@ -40,6 +40,8 @@
 		function wlog(){}
 	}
 
+	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
+
 
 	$sitetheme = 1;
 
