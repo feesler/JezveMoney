@@ -1,5 +1,5 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
-<link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="./view/css/screen.css" />
+<link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
 <script>
 	var accounts = <?=f_json_encode($accArr)?>;
 	var currency = <?=f_json_encode($currArr)?>;
