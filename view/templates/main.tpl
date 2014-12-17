@@ -17,7 +17,7 @@
 			<div class="content">
 				<div class="content_wrap">
 					<div class="widget">
-						<div class="widget_title"><a href="./accounts.php"><span>Accounts</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>accounts/"><span>Accounts</span><div class="glyph"></div></a></div>
 						<div class="tiles"><?php
 		if (!count($tilesArr)) {	?>
 						<span>You have no one account. Please create one.</span>
