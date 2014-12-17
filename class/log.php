@@ -1,5 +1,4 @@
 <?php
-	$docroot = $_SERVER["DOCUMENT_ROOT"];
 	$logfname = $docroot."/money/admin/log.txt";
 
 
