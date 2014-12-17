@@ -9,6 +9,7 @@
 
 
 	$classes = array("CachedTable" => "class/cachedTable.php",
+					"Controller" => "system/controller.php",
 					"Account" => "class/account.php",
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",
