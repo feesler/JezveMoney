@@ -16,32 +16,34 @@ wlog("route: ".$route);
 foreach($routeParts as $ind => $rpart)
 	wlog($ind." => ".$rpart);
 
-	if (count($routeParts) > 1)
+	if (count($routeParts) > 0)
 	{
 		if ($routeParts[0] == "accounts")
 		{
 			$controller = new AccountsController();
 
-			if (isset($routeParts[1]) && $routeParts[1] != "")
+			if (count($routeParts) > 1 && isset($routeParts[1]) && $routeParts[1] != "")
+			{
 				$action = $routeParts[1];
 
-			if ($action == "new")
-				$controller->create();
-			else if ($action == "edit")
-			{
-				$_GET["id"] = $routeParts[2];
-				$controller->update();
+				if ($action == "new")
+					$controller->create();
+				else if ($action == "edit")
+				{
+					$_GET["id"] = $routeParts[2];
+					$controller->update();
+				}
+				else if ($action == "del")
+				{
+					$controller->del();
+				}
+				else if ($action == "reset")
+				{
+					$controller->reset();
+				}
+				else
+					setLocation(BASEURL."accounts/");
 			}
-			else if ($action == "del")
-			{
-				$controller->del();
-			}
-			else if ($action == "reset")
-			{
-				$controller->reset();
-			}
-			else
-				$action = NULL;
 		}
 	}
 
