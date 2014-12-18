@@ -70,6 +70,14 @@ class AccountsController extends Controller
 	{
 		global $u, $user_id, $user_name;
 
+		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		{
+			$this->updateAccount();
+			return;
+		}
+
+		$action = "edit";
+
 		$acc = new Account($user_id);
 		$trans = new Transaction($user_id);
 
@@ -112,6 +120,27 @@ class AccountsController extends Controller
 			$this->fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_CREATE);
+
+		setLocation(BASEURL."accounts/");
+	}
+
+
+	public function updateAccount()
+	{
+		global $user_id;
+
+		$defMsg = ERR_ACCOUNT_UPDATE;
+
+		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
+			$this->fail($defMsg);
+		if (!isset($_POST["accid"]))
+			$this->fail($defMsg);
+
+		$acc = new Account($user_id);
+		if (!$acc->edit($_POST["accid"], $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+			$this->fail($defMsg);
+
+		setMessage(MSG_ACCOUNT_UPDATE);
 
 		setLocation(BASEURL."accounts/");
 	}
