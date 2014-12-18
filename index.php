@@ -36,6 +36,8 @@ foreach($routeParts as $ind => $rpart)
 			{
 				$controller->del();
 			}
+			else
+				$action = NULL;
 		}
 	}
 
