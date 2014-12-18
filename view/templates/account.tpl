@@ -26,7 +26,7 @@
 					</div>
 
 					<div>
-						<form method="post" action="./modules/account.php?act=<?=$action?>" onsubmit="return onNewAccountSubmit(this);">
+						<form method="post" action="<?=BASEURL?>accounts/<?=$action?>/" onsubmit="return onNewAccountSubmit(this);">
 <?php	if ($action == "edit") {		?>
 						<input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
 <?php	}	?>

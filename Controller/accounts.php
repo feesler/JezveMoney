@@ -24,6 +24,14 @@ class AccountsController extends Controller
 	{
 		global $u, $user_id, $user_name;
 
+		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		{
+			$this->createAccount();
+			return;
+		}
+
+		$action = "new";
+
 		$acc = new Account($user_id);
 		$trans = new Transaction($user_id);
 
@@ -86,6 +94,26 @@ class AccountsController extends Controller
 		$jsArr[] = "popup.js";
 
 		include("./view/templates/account.tpl");
+	}
+
+
+	public function createAccount()
+	{
+		global $u, $user_id;
+
+		$defMsg = ERR_ACCOUNT_CREATE;
+
+		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
+			fail($defMsg);
+
+		$acc = new Account($user_id);
+		$owner_id = $u->getOwner($user_id);
+		if (!$acc->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+			fail($defMsg);
+
+		setMessage(MSG_ACCOUNT_CREATE);
+
+		setLocation(BASEURL."accounts/");
 	}
 
 
