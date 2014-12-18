@@ -36,6 +36,10 @@ foreach($routeParts as $ind => $rpart)
 			{
 				$controller->del();
 			}
+			else if ($action == "reset")
+			{
+				$controller->reset();
+			}
 			else
 				$action = NULL;
 		}

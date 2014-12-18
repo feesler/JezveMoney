@@ -34,7 +34,7 @@
 					<div>
 						<h2>Reset data</h2>
 						<div>
-							<form id="resetacc_form" method="post" action="./modules/account.php?act=reset">
+							<form id="resetacc_form" method="post" action="<?=BASEURL?>accounts/reset/">
 							</form>
 							<span>You also may reset all your accounts data.<br>
 							<input class="btn ok_btn" type="button" onclick="showResetAccountsPopup();" value="Reset"></span>

@@ -173,4 +173,22 @@ class AccountsController extends Controller
 		setLocation(BASEURL."accounts/");
 	}
 
+
+	public function reset()
+	{
+		global $user_id;
+
+		if ($_SERVER["REQUEST_METHOD"] != "POST")
+			setLocation(BASEURL."accounts/");
+
+		$defMsg = ERR_ACCOUNTS_RESET;
+
+		$acc = new Account($user_id);
+
+		if (!$acc->reset())
+			fail($defMsg);
+		setMessage(MSG_ACCOUNTS_RESET);
+
+		setLocation(BASEURL."accounts/");
+	}
 }
