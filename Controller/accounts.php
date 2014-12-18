@@ -148,7 +148,29 @@ class AccountsController extends Controller
 
 	public function del()
 	{
+		global $user_id;
 
+		if ($_SERVER["REQUEST_METHOD"] != "POST")
+			setLocation(BASEURL."accounts/");
+
+		$defMsg = ERR_ACCOUNT_DELETE;
+
+		if (!isset($_POST["accounts"]))
+			fail($defMsg);
+
+		$acc = new Account($user_id);
+
+		$acc_arr = explode(",", $_POST["accounts"]);
+		foreach($acc_arr as $acc_id)
+		{
+			$acc_id = intval($acc_id);
+			if (!$acc->del($acc_id))
+				$this->fail($defMsg);
+		}
+
+		setMessage(MSG_ACCOUNT_DELETE);
+
+		setLocation(BASEURL."accounts/");
 	}
 
 }

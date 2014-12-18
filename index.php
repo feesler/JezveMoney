@@ -32,6 +32,10 @@ foreach($routeParts as $ind => $rpart)
 				$_GET["id"] = $routeParts[2];
 				$controller->update();
 			}
+			else if ($action == "del")
+			{
+				$controller->del();
+			}
 		}
 	}
 
