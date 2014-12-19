@@ -10,7 +10,7 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1>Persons</h1>
-						<div id="add_btn" class="iconlink"><a href="./person.php?act=new"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
+						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>persons/new/"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 					<div class="tiles"><?php
 		if (count($persArr)) {
@@ -35,7 +35,7 @@
 		</div>
 	</div>
 </div>
-<form id="delform" method="post" action="./modules/person.php?act=del">
+<form id="delform" method="post" action="<?=BASEURL?>persons/del/">
 <input id="delpersons" name="persons" type="hidden" value="">
 </form>
 </body>

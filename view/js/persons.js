@@ -52,6 +52,7 @@ function onTileClick(p_id)
 {
 	var tile, edit_btn, del_btn, delpersons;
 	var actDiv;
+	var baseURL = 'http://jezve.net/money_dev/';
 
 	tile = ge('p_' + p_id);
 	edit_btn = ge('edit_btn');
@@ -85,7 +86,7 @@ function onTileClick(p_id)
 	if (persons.selectedCount() == 1)
 	{
 		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = './person.php?act=edit&id=' + persons.selectedArr[0];
+			firstElementChild(edit_btn).href = baseURL + 'persons/edit/' + persons.selectedArr[0];
 	}
 
 	show('toolbar', (persons.selectedCount() > 0));

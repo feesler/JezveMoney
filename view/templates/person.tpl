@@ -20,7 +20,7 @@
 <?php	}	?>
 					</div>
 					<div>
-						<form method="post" action="./modules/person.php?act=<?=$action?>" onsubmit="<?=$submitHandler?>">
+						<form method="post" action="<?=BASEURL?>persons/<?=$action?>/" onsubmit="<?=$submitHandler?>">
 <?php	if ($action == "edit") {		?>
 						<input id="pid" name="pid" type="hidden" value="<?=$p_id?>">
 <?php	}	?>
@@ -40,7 +40,7 @@
 	</div>
 </div>
 <?php	if ($action == "edit") {		?>
-<form id="delform" method="post" action="./modules/person.php?act=del">
+<form id="delform" method="post" action="<?=BASEURL?>persons/del/">
 <input name="persons" type="hidden" value="<?=$p_id?>">
 </form>
 <?php	}	?>
