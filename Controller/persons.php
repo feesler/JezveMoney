@@ -1,0 +1,20 @@
+<?php
+
+class PersonsController extends Controller
+{
+	public function index()
+	{
+		global $u, $user_id, $user_name;
+
+		$pers = new Person($user_id);
+
+		$persArr = $pers->getArray();
+
+		$titleString = "Jezve Money | Persons";
+
+		$cssArr = array("common.css", "tiles.css", "popup.css", "iconlink.css", "toolbar.css");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "popup.js", "toolbar.js", "persons.js");
+
+		include("./view/templates/persons.tpl");
+	}
+}

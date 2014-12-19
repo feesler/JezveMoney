@@ -45,6 +45,10 @@ foreach($routeParts as $ind => $rpart)
 					setLocation(BASEURL."accounts/");
 			}
 		}
+		else if ($routeParts[0] == "persons")
+		{
+			$controller = new PersonsController();
+		}
 	}
 
 	if (is_null($controller))

@@ -12,6 +12,7 @@
 					"Controller" => "system/controller.php",
 					"MainController" => "Controller/main.php",
 					"AccountsController" => "Controller/accounts.php",
+					"PersonsController" => "Controller/persons.php",
 					"Account" => "class/account.php",
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",
