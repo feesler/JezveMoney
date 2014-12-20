@@ -283,13 +283,13 @@
 		if ($loggedIn)		// user should be logged in to access
 		{
 			if (!$user_id)
-				setLocation("./login.php");
+				setLocation(BASEURL."login.php");
 			else if ($adminOnly && !$u->isAdmin($user_id))
-				setLocation("./index.php");
+				setLocation(BASEURL);
 		}
 		else				// user should be logged out ot access
 		{
 			if ($user_id != 0)
-				setLocation("./index.php");
+				setLocation(BASEURL);
 		}
 	}
