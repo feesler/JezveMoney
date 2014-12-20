@@ -73,7 +73,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title"><a href="./persons.php"><span>Persons</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>persons/"><span>Persons</span><div class="glyph"></div></a></div>
 						<div class="info_tiles">
 							<div>
 <?php	if (!count($persArr)) {		?>
