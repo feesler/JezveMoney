@@ -22,7 +22,7 @@
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",
 					"Currency" => "class/currency.php",
-					"mysqlDB" => "class/mysql.php",
+					"mysqlDB" => "system/mysql.php",
 					"Person" => "class/person.php",
 					"Transaction" => "class/transaction.php",
 					"User" => "class/user.php",

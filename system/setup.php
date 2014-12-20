@@ -16,8 +16,6 @@
 	$ruri = $_SERVER["REQUEST_URI"];
 	$userAgent = $_SERVER["HTTP_USER_AGENT"];
 
-	require_once($approot."class/mysql.php");
-
 	if (!isset($noLogs))
 	{
 		require_once($approot."class/log.php");
@@ -45,6 +43,9 @@
 
 	$sitetheme = 1;
 
+	require_once($approot."system/common.php");
+	spl_autoload_register("autoLoadClass");
+
 	require_once($approot."system/dbsetup.php");
 
 	$db = new mysqlDB();
@@ -57,7 +58,5 @@
 	$db->rawQ("SET NAMES 'utf8';");
 	date_default_timezone_set("Europe/Moscow");
 
-	require_once($approot."system/common.php");
 	require_once($approot."system/message.php");
 
-	spl_autoload_register("autoLoadClass");
