@@ -340,14 +340,7 @@ class TransactionsController extends Controller
 		}
 		else
 		{
-			if ($action == "new")
-			{
-				$onFormSubmit = "return ".(($trans_type == TRANSFER) ? "onTransferSubmit" : "onSubmit")."(this);";
-			}
-			else if ($action == "edit")
-			{
-				$onFormSubmit = "return onEditTransSubmit(this);";
-			}
+			$onFormSubmit = "return ".(($trans_type == TRANSFER) ? "onTransferSubmit" : "onSubmit")."(this);";
 		}
 
 		if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)
@@ -438,7 +431,7 @@ class TransactionsController extends Controller
 		$srcAmountSign = Currency::getSign($srcAmountCurr);
 		$destAmountSign = Currency::getSign($destAmountCurr);
 		$exchSign = $destAmountSign."/".$srcAmountSign;
-		$exchValue = ($action == "edit") ? round($tr["src_amount"] / $tr["dest_amount"], 5) : 1;
+		$exchValue = 1;
 
 		$rtSrcAmount = Currency::format($tr["src_amount"], $srcAmountCurr);
 		$rtDestAmount = Currency::format($tr["dest_amount"], $destAmountCurr);
@@ -454,22 +447,17 @@ class TransactionsController extends Controller
 			$rtDestResBal = Currency::format($debtAcc["balance"], $debtAcc["curr"]);
 		}
 
-		$dateFmt = ($action == "edit") ? date("d.m.Y", strtotime($tr["date"])) : date("d.m.Y");
+		$dateFmt = date("d.m.Y");
 
 		$titleString = "Jezve Money | ";
 		if ($trans_type == DEBT)
-			$headString = ($action == "new") ? "New debt" : "Edit debt";
+			$headString = "New debt";
 		else
-			$headString = ($action == "new") ? "New transaction" : "Edit transaction";
+			$headString = "New transaction";
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "calendar.js", "ddlist.js", "transaction.js", "transaction_layout.js");
-		if ($action == "edit")
-		{
-			$cssArr[] = "popup.css";
-			$jsArr[] = "popup.js";
-		}
 
 		include("./view/templates/transaction.tpl");
 	}
