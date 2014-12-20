@@ -275,6 +275,7 @@ function onTransClick(tr_id)
 {
 	var transObj, edit_btn, del_btn, deltrans;
 	var actDiv;
+	var baseURL = 'http://jezve.net/money_dev/';
 
 	transObj = ge('tr_' + tr_id);
 	edit_btn = ge('edit_btn');
@@ -304,7 +305,7 @@ function onTransClick(tr_id)
 	if (transactions.selectedCount() == 1)
 	{
 		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = './transaction.php?act=edit&id=' + transactions.selectedArr[0];
+			firstElementChild(edit_btn).href = baseURL + 'transactions/edit/' + transactions.selectedArr[0];
 	}
 
 	show('toolbar', (transactions.selectedCount() > 0));

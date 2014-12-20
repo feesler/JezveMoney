@@ -68,6 +68,29 @@ foreach($routeParts as $ind => $rpart)
 					setLocation(BASEURL."persons/");
 			}
 		}
+		else if ($routeParts[0] == "transactions")
+		{
+			$controller = new TransactionsController();
+
+			if (count($routeParts) > 1 && isset($routeParts[1]) && $routeParts[1] != "")
+			{
+				$action = $routeParts[1];
+
+				if ($action == "new")
+					$controller->create();
+				else if ($action == "edit")
+				{
+					$_GET["id"] = $routeParts[2];
+					$controller->update();
+				}
+				else if ($action == "del")
+				{
+					$controller->del();
+				}
+				else
+					setLocation(BASEURL."transactions/");
+			}
+		}
 	}
 
 	if (is_null($controller))

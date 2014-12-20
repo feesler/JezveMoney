@@ -13,6 +13,7 @@
 					"MainController" => "Controller/main.php",
 					"AccountsController" => "Controller/accounts.php",
 					"PersonsController" => "Controller/persons.php",
+					"TransactionsController" => "Controller/transactions.php",
 					"Account" => "class/account.php",
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",

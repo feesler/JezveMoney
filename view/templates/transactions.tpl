@@ -22,7 +22,7 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1>Transactions</h1>
-						<div id="add_btn" class="iconlink"><a href="./transaction.php?act=new"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
+						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>transactions/new/"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 
 					<div>
@@ -100,7 +100,7 @@
 		</div>
 	</div>
 </div>
-<form id="delform" method="post" action="./modules/transaction.php?act=del">
+<form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
 <input id="deltrans" name="transactions" type="hidden" value="">
 </form>
 </body>
