@@ -11,14 +11,14 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 </style>
 <script>
 	var chPosObj = null;
+	var baseURL = 'http://jezve.net/money_dev/';
 
-	function onSubmitNewPos()
+	function onSubmitNewPos(tr_id)
 	{
-		var frm, trans_pos, posField;
+		var trans_pos, posField;
 
-		frm = ge('trposfrm');
 		trans_pos = ge('trans_pos');
-		if (!frm || !trans_pos)
+		if (!trans_pos)
 			return;
 
 		if (!chPosObj || !chPosObj.firstElementChild)
@@ -30,17 +30,37 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 
 		trans_pos.value = parseInt(posField.value);
 
-		frm.submit();
+		sendChangePosRequest(tr_id, trans_pos.value);
+	}
+
+
+	// Sent AJAX request to server to change position of transaction
+	function sendChangePosRequest(trans_id, newPos)
+	{
+		var params = { 'id' : trans_id, 'pos' : newPos };
+
+		postData(baseURL + 'api/transaction.php?act=setpos', urlJoin(params), onChangePosCallback);
+	}
+
+
+	// Callback function for position change request
+	function onChangePosCallback(result)
+	{
+		var resObj = eval('(' + result + ')');
+
+		if (resObj && resObj.result == 'ok')
+		{
+			window.location.reload();
+		}
 	}
 
 
 	function showChangePos(tr_id, curPos)
 	{
-		var tr_cell, trans_id;
+		var tr_cell;
 
 		tr_cell = ge('tr_' + tr_id);
-		trans_id = ge('trans_id');
-		if (!tr_cell || !trans_id)
+		if (!tr_cell)
 			return;
 
 		if (chPosObj != null)
@@ -51,12 +71,11 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 
 		posObj = ce('div', { style : { display : 'inline-block', marginLeft : '5px' } },
 							[ ce('input', { type : 'text', value : curPos, style : { width : '60px' } }),
-							ce('input', { type : 'button', value : 'ok', onclick : onSubmitNewPos })]);
+							ce('input', { type : 'button', value : 'ok', onclick : onSubmitNewPos.bind(null, tr_id) })]);
 		if (posObj)
 		{
 			tr_cell.appendChild(posObj);
 			chPosObj = posObj;
-			trans_id.value = parseInt(tr_id);
 		}
 	}
 
@@ -263,10 +282,5 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <input type="submit" value="Fix balance">
 </form>
 <?php	}	?>
-
-<form id="trposfrm" method="get" action="./modules/setpos.php">
-<input id="trans_id" name="id" type="hidden" value="0">
-<input id="trans_pos" name="pos" type="hidden" value="0">
-</form>
 </body>
 </html>
