@@ -1,5 +1,6 @@
 var calendarObj = null;
 var startDate = null, endDate = null;
+var baseURL = 'http://jezve.net/money_dev/';
 
 
 // Return group parameter for specified type
@@ -48,7 +49,7 @@ function onFilterChange(obj)
 	show('acc_block', (filter_id == 0));
 	show('curr_block', (filter_id == 1));
 
-	window.location = './statistics.php?' + getFilterParam(filter_id) + '&type=' + transType + getGroupParam(group_id);
+	window.location = baseURL + 'statistics/?' + getFilterParam(filter_id) + '&type=' + transType + getGroupParam(group_id);
 }
 
 
@@ -72,7 +73,7 @@ function onGroupChange(obj)
 	curr_id = parseInt(selectedValue(currsel));
 	group_id = parseInt(selectedValue(groupsel))
 
-	newLocation = './statistics.php?' + getFilterParam(filter_id);
+	newLocation = baseURL + 'statistics/?' + getFilterParam(filter_id);
 	if (filter_id == 1)
 		newLocation += '&curr_id=' + curr_id;
 	else
@@ -97,7 +98,7 @@ function onAccountChange()
 	acc_id = parseInt(selectedValue(accsel));
 	group_id = parseInt(selectedValue(groupsel));
 
-	window.location = './statistics.php?acc_id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
+	window.location = baseURL + 'statistics/?acc_id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
 }
 
 
@@ -118,7 +119,7 @@ function onCurrChange()
 	curr_id = parseInt(selectedValue(currsel));
 	group_id = parseInt(selectedValue(groupsel));
 
-	window.location = './statistics.php?' + getFilterParam(filter_id) + '&curr_id=' + curr_id + '&type=' + transType + getGroupParam(group_id);
+	window.location = baseURL + 'statistics/?' + getFilterParam(filter_id) + '&curr_id=' + curr_id + '&type=' + transType + getGroupParam(group_id);
 }
 
 
@@ -421,7 +422,7 @@ function onSelectStartDate(date, month, year)
 		hideCalendar();
 		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
 
-		newLocation = './statistics.php?type=' + transType;
+		newLocation = baseURL + 'statistics/?type=' + transType;
 		if (acc_id != 0)
 			newLocation += '&acc_id=' + curAccId;
 		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
@@ -447,7 +448,7 @@ function onSelectEndDate(date, month, year)
 		hideCalendar();
 		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
 
-		newLocation = './statistics.php?type=' + transType;
+		newLocation = baseURL + 'statistics/?type=' + transType;
 		if (acc_id != 0)
 			newLocation += '&acc_id=' + curAccId;
 		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);

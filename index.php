@@ -100,6 +100,13 @@ foreach($routeParts as $ind => $rpart)
 		else if (!is_null($action))
 			setLocation(BASEURL.$contrStr."/");
 	}
+	else if ($contrStr == "statistics")
+	{
+		$controller = new StatisticsController();
+
+		if (!is_null($action))
+			setLocation(BASEURL.$contrStr."/");
+	}
 	else if ($contrStr == "login" || $contrStr == "logout" || $contrStr == "register")
 	{
 		$controller = new UserController();

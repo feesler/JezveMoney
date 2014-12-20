@@ -16,6 +16,7 @@
 					"TransactionsController" => "Controller/transactions.php",
 					"UserController" => "Controller/user.php",
 					"ProfileController" => "Controller/profile.php",
+					"StatisticsController" => "Controller/statistics.php",
 					"Account" => "class/account.php",
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",

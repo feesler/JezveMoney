@@ -95,7 +95,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title"><a href="./statistics.php"><span>Statistics</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>statistics/"><span>Statistics</span><div class="glyph"></div></a></div>
 						<div class="charts widget_charts">
 							<div class="right_float">
 								<div id="vert_labels"></div>
