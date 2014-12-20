@@ -51,10 +51,10 @@
 
 	$acc = new Account($user_id, TRUE);
 
-	$condArr = array("user_id=".$user_id)
+	$condArr = array("user_id=".$user_id);
 	if ($checkAccount_id != 0)
 		$condArr[] = "id=".$checkAccount_id;
-	$resArr = $db->selectQ("*", "accounts", andJoin($condition));
+	$resArr = $db->selectQ("*", "accounts", andJoin($condArr));
 	if (count($resArr) == 0)
 		fail();
 
@@ -86,7 +86,7 @@
 		$condArr[] = "(".orJoin($accCond).")";
 	}
 
-	$resArr = $db->selectQ("*", "transactions", andJoin($condition), NULL, "pos");
+	$resArr = $db->selectQ("*", "transactions", andJoin($condArr), NULL, "pos");
 	$transArr = array();
 	foreach($resArr as $row)
 	{
