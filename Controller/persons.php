@@ -19,6 +19,14 @@ class PersonsController extends Controller
 	}
 
 
+	private function fail($msg = NULL)
+	{
+		if (!is_null($msg))
+			setMessage($msg);
+		setLocation(BASEURL."persons/");
+	}
+
+
 	public function create()
 	{
 		global $u, $user_id, $user_name;
@@ -61,13 +69,13 @@ class PersonsController extends Controller
 		$pName = "";
 
 		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
-			fail(ERR_PERSON_UPDATE);
+			$this->fail(ERR_PERSON_UPDATE);
 
 		$person = new Person($user_id);
 
 		$p_id = intval($_GET["id"]);
 		if (!$person->is_exist($p_id))
-			fail(ERR_PERSON_UPDATE);
+			$this->fail(ERR_PERSON_UPDATE);
 
 		$pName = $person->getName($p_id);
 
@@ -95,16 +103,16 @@ class PersonsController extends Controller
 
 		$person = new Person($user_id);
 		if (!isset($_POST["pname"]))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		$person_name = $_POST["pname"];
 
 		$check_id = $person->findByName($person_name);
 		if ($check_id != 0)
-			fail(ERR_PERSON_UPDATE_EXIST);
+			$this->fail(ERR_PERSON_UPDATE_EXIST);
 
 		if (!$person->create($person_name))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_CREATE);
 
@@ -121,20 +129,20 @@ class PersonsController extends Controller
 		$person = new Person($user_id);
 
 		if (!isset($_POST["pname"]))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		$person_name = $_POST["pname"];
 
 		$check_id = $person->findByName($person_name);
 		if ($check_id != 0)
-			fail(ERR_PERSON_UPDATE_EXIST);
+			$this->fail(ERR_PERSON_UPDATE_EXIST);
 
 		if (!isset($_POST["pid"]))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		$person_id = intval($_POST["pid"]);
 		if (!$person->edit($person_id, $person_name))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_UPDATE);
 
@@ -154,14 +162,14 @@ class PersonsController extends Controller
 		$person = new Person($user_id);
 
 		if (!isset($_POST["persons"]))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		$p_arr = explode(",", $_POST["persons"]);
 		foreach($p_arr as $p_id)
 		{
 			$p_id = intval($p_id);
 			if (!$person->del($p_id))
-				fail($defMsg);
+				$this->fail($defMsg);
 		}
 
 		setMessage(MSG_PERSON_DELETE);
