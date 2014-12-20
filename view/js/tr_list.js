@@ -1,6 +1,7 @@
 ﻿var dwPopup;
 var calendarObj = null;
 var startDate = null, endDate = null;
+var baseURL = 'http://jezve.net/money_dev/';
 
 
 var transactions =
@@ -275,7 +276,6 @@ function onTransClick(tr_id)
 {
 	var transObj, edit_btn, del_btn, deltrans;
 	var actDiv;
-	var baseURL = 'http://jezve.net/money_dev/';
 
 	transObj = ge('tr_' + tr_id);
 	edit_btn = ge('edit_btn');
@@ -417,7 +417,9 @@ function initTransListDrag()
 // Sent AJAX request to server to change position of transaction
 function sendChangePosRequest(trans_id, newPos)
 {
-	getData('./modules/setpos.php?id=' + trans_id + '&pos=' + newPos, onChangePosCallback(trans_id, newPos));
+	var params = { 'id' : trans_id, 'pos' : newPos };
+
+	postData(baseURL + 'api/transaction.php?act=setpos', urlJoin(params), onChangePosCallback(trans_id, newPos));
 }
 
 
