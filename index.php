@@ -1,28 +1,75 @@
 <?php
 	require_once("./system/setup.php");
 
-	if (isset($_GET["route"]))
-		$route = $_GET["route"];
-
 wlog("route: ".$route);
 
+	$route = trim($route, "/\\");
 	$routeParts = explode("/", $route);
-
-	$controller = NULL;
-	$action = NULL;
 
 foreach($routeParts as $ind => $rpart)
 	wlog($ind." => ".$rpart);
 
+
+	$controller = NULL;
+	$action = NULL;
+
+	$userCont = "UserController";
+	$controllersMap = array("index" => "MainController",
+							"accounts" => "AccountsController",
+							"persons" => "PersonsController",
+							"transactions" => "TransactionsController",
+							"profile" => "ProfileController",
+							"statistics" => "StatisticsController",
+							"login" => $userCont,
+							"logout" => $userCont,
+							"register" => $userCont);
+
+	$actionsMap = array("new" => "create",
+						"edit" => "update");
+
+	// Prepare controller
+	$contrStr = array_shift($routeParts);
+	if (!$contrStr)
+		$contrStr = "index";
+
+wlog("contrStr: ".$contrStr);
+
+	if (!isset($controllersMap[$contrStr]))
+		setLocation(BASEURL);
+
+	// Check correct user authentication for controller
 	$loggedOutControllers = array("login", "register");
-
-	$contrStr = (count($routeParts) > 0 && $routeParts[0] != "") ? $routeParts[0] : NULL;
-	$action = (count($routeParts) > 1 && $routeParts[1] != "") ? $routeParts[1] : NULL;
-
 	$isLogOutCont = in_array($contrStr, $loggedOutControllers);
 
 	checkUser(!$isLogOutCont);
 
+
+	$contClass = $controllersMap[$contrStr];
+
+	$controller = new $contClass();
+
+	// Prepare action
+	if ($contClass == "UserController")
+		$action = $contrStr;
+	else
+		$action = array_shift($routeParts);
+	if (!$action)
+		$action = "index";
+
+	// Rewrite action if needed
+	if (isset($actionsMap[$action]))
+		$action = $actionsMap[$action];
+
+	$controller->action = $action;
+
+	$actionParam = array_shift($routeParts);
+	$controller->actionParam = $actionParam;
+
+	if (method_exists($controller, $action))
+		$controller->$action();
+
+
+/*
 	if ($contrStr == "accounts")
 	{
 		$controller = new AccountsController();
@@ -121,3 +168,4 @@ wlog("action: ".(is_null($action) ? "NULL" : $action));
 
 	if (is_null($action))
 		$controller->index();
+*/
