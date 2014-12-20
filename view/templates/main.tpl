@@ -23,7 +23,7 @@
 						<span>You have no one account. Please create one.</span>
 <?php	} else {
 			foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><a href="./transaction.php?act=new&amp;acc_id=<?=$acc_id?>" class="tilelink"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></a></div><?php
+?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=$acc_id?>" class="tilelink"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></a></div><?php
 			}
 		}	?></div>
 					</div>
