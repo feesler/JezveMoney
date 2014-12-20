@@ -7,7 +7,7 @@
 					<div id="menupopup" class="usermenu" style="display: none;">
 						<ul>
 							<li><a href="./profile.php">profile</a></li>
-							<li><a href="./modules/user.php?act=logout">logout</a></li>
+							<li><a href="<?=BASEURL?>logout/">logout</a></li>
 						</ul>
 					</div>
 				</div>

@@ -81,6 +81,12 @@ foreach($routeParts as $ind => $rpart)
 		else if (!is_null($action))
 			setLocation(BASEURL."transactions/");
 	}
+	else if ($contrStr == "login" || $contrStr == "logout" || $contrStr == "register")
+	{
+		$controller = new UserController();
+
+		$controller->$contrStr();
+	}
 
 	if (is_null($controller))
 		$controller = new MainController();

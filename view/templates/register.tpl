@@ -2,7 +2,7 @@
 </head>
 <body>
 <?php	require_once("./view/templates/header.tpl");		?>
-<form action="./modules/user.php?act=register" method="post" onsubmit="return onLoginSubmit(this);">
+<form action="<?=BASEURL?>register/" method="post" onsubmit="return onLoginSubmit(this);">
 <div class="layer register_layer">
 	<div class="cont">
 		<div class="box">
@@ -13,7 +13,7 @@
 			<div class="stretch_input std_input"><div><input id="name" name="name" type="text"></div></div>
 			<label for="password">Password</label>
 			<div class="stretch_input std_input"><div><input id="password" name="password" type="password"></div></div>
-			<div class="login_controls"><input class="btn ok_btn" type="submit" value="ok"><span class="alter_link"><a href="./login.php">Log in</a></span></div>
+			<div class="login_controls"><input class="btn ok_btn" type="submit" value="ok"><span class="alter_link"><a href="<?=BASEURL?>login/">Log in</a></span></div>
 		</div>
 	</div>
 </div>

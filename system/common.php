@@ -14,6 +14,7 @@
 					"AccountsController" => "Controller/accounts.php",
 					"PersonsController" => "Controller/persons.php",
 					"TransactionsController" => "Controller/transactions.php",
+					"UserController" => "Controller/user.php",
 					"Account" => "class/account.php",
 					"Currency" => "class/currency.php",
 					"Debt" => "class/debt.php",
@@ -283,7 +284,7 @@
 		if ($loggedIn)		// user should be logged in to access
 		{
 			if (!$user_id)
-				setLocation(BASEURL."login.php");
+				setLocation(BASEURL."login/");
 			else if ($adminOnly && !$u->isAdmin($user_id))
 				setLocation(BASEURL);
 		}
