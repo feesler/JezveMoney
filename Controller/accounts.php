@@ -81,10 +81,10 @@ class AccountsController extends Controller
 		$acc = new Account($user_id);
 		$trans = new Transaction($user_id);
 
-		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
+		$acc_id = intval($this->actionParam);
+		if (!$acc_id)
 			$this->fail();
 
-		$acc_id = intval($_GET["id"]);
 		$accInfo = $acc->getProperties($acc_id);
 
 		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);

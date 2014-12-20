@@ -479,10 +479,9 @@ class TransactionsController extends Controller
 
 		$trans = new Transaction($user_id);
 
-		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
+		$trans_id = intval($this->actionParam);
+		if (!$trans_id)
 			$this->fail($defMsg);
-
-		$trans_id = intval($_GET["id"]);
 
 		if (!$trans->is_exist($trans_id))
 			$this->fail($defMsg);

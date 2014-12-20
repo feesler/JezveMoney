@@ -68,12 +68,12 @@ class PersonsController extends Controller
 
 		$pName = "";
 
-		if (!isset($_GET["id"]) || !is_numeric($_GET["id"]))
+		$p_id = intval($this->actionParam);
+		if (!$p_id)
 			$this->fail(ERR_PERSON_UPDATE);
 
 		$person = new Person($user_id);
 
-		$p_id = intval($_GET["id"]);
 		if (!$person->is_exist($p_id))
 			$this->fail(ERR_PERSON_UPDATE);
 
