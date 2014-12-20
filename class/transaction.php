@@ -77,6 +77,8 @@ class Transaction extends CachedTable
 		if (!is_numeric($trans_type) || !is_numeric($src_id) || !is_numeric($dest_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
 			return 0;
 
+		$e_comm = $db->escape($comment);
+
 		if (($trans_type != EXPENSE && $trans_type != INCOME && $trans_type != TRANSFER && $trans_type != DEBT) ||
 			(!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
 			return 0;
@@ -117,7 +119,7 @@ class Transaction extends CachedTable
 		}
 
 		if (!$db->insertQ(self::$tbl_name, array("id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos"),
-									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $comment, $tr_pos)))
+									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos)))
 			return 0;
 
 		$trans_id = $db->insertId();
@@ -231,6 +233,8 @@ class Transaction extends CachedTable
 		if (!$trans_id || ($trans_type != EXPENSE && $trans_type != INCOME && $trans_type != TRANSFER && $trans_type != DEBT) || (!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trans_date == -1)
 			return FALSE;
 
+		$e_comm = $db->escape($comment);
+
 		// cancel transaction
 		if (!$this->cancel($trans_id))
 			return FALSE;
@@ -275,7 +279,7 @@ class Transaction extends CachedTable
 		}
 
 		$fieldsArr = array("src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos");
-		$valuesArr = array($src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $comment, $tr_pos);
+		$valuesArr = array($src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos);
 
 		if (!$db->updateQ(self::$tbl_name, $fieldsArr, $valuesArr, "id=".$trans_id))
 			return FALSE;
