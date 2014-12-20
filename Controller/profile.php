@@ -2,9 +2,6 @@
 
 class ProfileController extends Controller
 {
-	public $action = NULL;
-
-
 	public function index()
 	{
 		global $u, $user_id, $user_name;
