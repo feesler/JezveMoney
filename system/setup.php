@@ -18,7 +18,7 @@
 
 	if (!isset($noLogs))
 	{
-		require_once($approot."class/log.php");
+		require_once($approot."system/log.php");
 
 		wlog("\r\nBEGIN");
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
