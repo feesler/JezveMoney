@@ -37,7 +37,7 @@
 						<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteCurr()" style="display: none;">
 					</div>
 
-					<form id="delfrm" method="post" action="../modules/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
+					<form id="delfrm" method="post" action="<?=BASEURL?>admin/currency.php?act=del" onsubmit="return onDeleteSubmit(this);">
 						<input id="del_curr_id" name="curr_id" type="hidden">
 					</form>
 				</div>
@@ -48,7 +48,7 @@
 
 <div id="curr_content" class="curr_content" style="display: none;">
 	<div class="box">
-		<form id="curr_frm" method="post" action="../modules/currency.php?act=new">
+		<form id="curr_frm" method="post" action="<?=BASEURL?>admin/currency.php?act=new">
 		<input id="curr_id" name="curr_id" type="hidden">
 		<label for="curr_name">name</label>
 		<div class="s_inp"><input id="curr_name" name="curr_name" type="text"></div>

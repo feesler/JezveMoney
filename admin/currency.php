@@ -2,26 +2,24 @@
 	require_once("../system/setup.php");
 
 
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id || !$u->isAdmin($user_id))
-		setLocation("../login.php");
+	checkUser(TRUE, TRUE);
 
-	$currArr = Currency::getArray(TRUE);
+	$controller = new CurrencyController();
 
-	$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
-					"query" => array("title" => "Queries", "link" => "./query.php"),
-					"log" => array("title" => "Logs", "link" => "./log.php"),
-					"apitest" => array("title" => "API test", "link" => "./apitest.php"));
+	$actionsMap = array("new" => "create", "edit" => "update", "del" => "del");
 
-	$menuItems["curr"]["active"] = TRUE;
+	$action = NULL;
+	if (isset($_GET["act"]))
+	{
+		$actStr = $_GET["act"];
 
-	$titleString = "Admin panel | Currency";
+		if (isset($actionsMap[$actStr]))
+			$action = $actionsMap[$_GET["act"]];
+		else
+			setLocation(BASEURL."admin/currency.php");
+	}
 
-	$cssMainArr = array("common.css", "iconlink.css", "popup.css");
-	$cssLocalArr = array("admin.css", "currency.css");
-	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "popup.js");
-	$jsLocalArr = array("currency.js");
-
-	include("./view/templates/currency.tpl");
-?>
+	if (is_null($action))
+		$controller->index();
+	else
+		$controller->$action();

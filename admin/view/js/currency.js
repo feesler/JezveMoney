@@ -1,3 +1,6 @@
+var baseURL = 'http://jezve.net/money_dev/';
+
+
 // Update fields with specified currency
 function setCurrencyValues(currObj)
 {
@@ -42,7 +45,7 @@ function selectCurrency(id)
 	currObj = getCurrencyObject(id);
 	if (currObj)
 	{
-		curr_frm.action = '../modules/currency.php?act=edit';
+		curr_frm.action = baseURL + 'admin/currency.php?act=edit';
 		setCurrencyValues(currObj);
 		show('del_btn', true);
 		show('updbtn', true);
@@ -63,7 +66,7 @@ function newCurr()
 	if (!curr_frm)
 		return;
 
-	curr_frm.action = '../modules/currency.php?act=new';
+	curr_frm.action = baseURL + 'admin/currency.php?act=new';
 	setCurrencyValues(null);
 
 	dwPopup.show();
