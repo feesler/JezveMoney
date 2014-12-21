@@ -504,7 +504,7 @@ function onAccountChange(obj)
 
 	str = accArr.join(',');
 
-	newLocation = './transactions.php?type=' + transType;
+	newLocation = baseURL + 'transactions/?type=' + transType;
 	if (str != '')
 		newLocation += '&acc_id=' + str;
 	if (searchRequest)
@@ -522,13 +522,11 @@ function onSearchSubmit(frm)
 	if (!frm)
 		return false;
 
-	frm.action = './transactions.php?type=' + transType;
+	frm.action = baseURL + 'transactions/?type=' + transType;
 	if (curAccId != 0)
-		newLocation += '&acc_id=' + curAccId;
+		frm.action += '&acc_id=' + curAccId;
 	if (detailsMode)
-		newLocation += '&mode=details';
-
-	frm.action = './transactions.php';
+		frm.action += '&mode=details';
 
 	return true;
 }
@@ -609,6 +607,7 @@ function hideCalendar()
 function onSelectStartDate(date, month, year)
 {
 	var datefield;
+	var newLocation;
 
 	datefield = ge('date');
 	if (!datefield)
@@ -621,7 +620,7 @@ function onSelectStartDate(date, month, year)
 		hideCalendar();
 		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
 
-		newLocation = './transactions.php?type=' + transType;
+		newLocation = baseURL + 'transactions/?type=' + transType;
 		if (acc_id != 0)
 			newLocation += '&acc_id=' + curAccId;
 		if (searchRequest)
@@ -639,6 +638,7 @@ function onSelectStartDate(date, month, year)
 function onSelectEndDate(date, month, year)
 {
 	var datefield;
+	var newLocation;
 
 	datefield = ge('date');
 	if (!datefield)
@@ -651,7 +651,7 @@ function onSelectEndDate(date, month, year)
 		hideCalendar();
 		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
 
-		newLocation = './transactions.php?type=' + transType;
+		newLocation = baseURL + 'transactions/?type=' + transType;
 		if (acc_id != 0)
 			newLocation += '&acc_id=' + curAccId;
 		if (searchRequest)

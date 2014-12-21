@@ -36,7 +36,7 @@
 		}	?>
 						</div>
 
-						<form method="get" action="./transactions.php" onsubmit="return onSearchSubmit(this);">
+						<form method="get" action="<?=BASEURL?>transactions/" onsubmit="return onSearchSubmit(this);">
 						<div class="search_input std_input">
 							<div>
 								<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : $searchReq)?>">
