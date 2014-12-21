@@ -224,7 +224,7 @@ function onTileClick(acc_id)
 {
 	var tile, edit_btn, del_btn, delaccounts, export_btn;
 	var actDiv;
-	var baseURL = 'http://jezve.net/money_dev/';
+	var baseURL = 'http://jezve.net/money/';
 
 	tile = ge('acc_' + acc_id);
 	edit_btn = ge('edit_btn');

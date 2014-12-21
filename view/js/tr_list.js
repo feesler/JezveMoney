@@ -1,7 +1,7 @@
 ﻿var dwPopup;
 var calendarObj = null;
 var startDate = null, endDate = null;
-var baseURL = 'http://jezve.net/money_dev/';
+var baseURL = 'http://jezve.net/money/';
 
 
 var transactions =

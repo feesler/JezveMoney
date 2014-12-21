@@ -11,7 +11,7 @@
 
 	$approot .= "/";
 
-	define("BASEURL", "http://jezve.net/money_dev/");
+	define("BASEURL", "http://jezve.net/money/");
 
 	$ruri = $_SERVER["REQUEST_URI"];
 	$userAgent = $_SERVER["HTTP_USER_AGENT"];

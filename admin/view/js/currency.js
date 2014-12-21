@@ -1,4 +1,4 @@
-var baseURL = 'http://jezve.net/money_dev/';
+var baseURL = 'http://jezve.net/money/';
 
 
 // Update fields with specified currency
