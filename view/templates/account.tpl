@@ -31,7 +31,7 @@
 						<input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
 <?php	}	?>
 						<div class="non_float std_margin">
-							<div id="acc_tile" class="tile<?=$accInfo["iconclass"]?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name">New account</span></span></button></div>
+							<div id="acc_tile" class="tile<?=$accInfo["iconclass"]?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$accInfo["balfmt"]?></span><span class="acc_name"><?=$tileAccName?></span></span></button></div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="icon">Icon</label>

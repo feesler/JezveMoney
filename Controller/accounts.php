@@ -43,6 +43,7 @@ class AccountsController extends Controller
 						"iconclass" => "");
 		$accInfo["sign"] = Currency::getSign($accInfo["curr"]);
 		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
+		$tileAccName = "New account";
 
 		$currArr = Currency::getArray(TRUE);
 		$icons = $acc->getIconsArray();
@@ -88,6 +89,7 @@ class AccountsController extends Controller
 		$accInfo = $acc->getProperties($acc_id);
 
 		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
+		$tileAccName = $accInfo["name"];
 
 		$currArr = Currency::getArray(TRUE);
 		$icons = $acc->getIconsArray();
