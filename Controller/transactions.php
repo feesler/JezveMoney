@@ -55,7 +55,6 @@ class TransactionsController extends Controller
 
 		$tr_on_page = 10;
 
-//		$totalTrCount = $db->countQ("transactions", "user_id=".$user_id);
 		$totalTrCount = $trans->getCount();
 		$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
 		$transCount = $trans->getTransCount($trans_type, $accFilter, $searchStr, $startDate, $endDate);
