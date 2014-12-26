@@ -730,7 +730,7 @@ class Transaction extends CachedTable
 			$params["stdate"] = $startDate;
 			$params["enddate"] = $endDate;
 		}
-		$linkStr = urlJoin("./transactions.php", $params);
+		$linkStr = urlJoin(BASEURL."transactions/", $params);
 
 		return $linkStr;
 	}
