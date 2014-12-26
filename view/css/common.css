@@ -455,6 +455,23 @@ button::-moz-focus-inner
 }
 
 
+.h2_heading
+{
+	padding: 10px 0px;
+	height: 32px;
+}
+
+
+.h2_heading > h2
+{
+	font-size: 26px;
+	font-family: "Segoe UI Light", "Segoe UI";
+	line-height: 32px;
+	height: 32px;
+	padding: 0;
+}
+
+
 .h2_heading > .iconlink
 {
 	margin: 0px 0px 0px 30px;
