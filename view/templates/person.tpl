@@ -13,8 +13,8 @@
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">
-					<div class="heading h2_heading">
-						<h2><?=$headString?></h2>
+					<div class="heading">
+						<h1><?=$headString?></h1>
 <?php	if ($action == "edit") {		?>
 						<div id="del_btn" class="iconlink"><button onclick="onDelete();" type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
