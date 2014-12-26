@@ -817,12 +817,9 @@ class TransactionsController extends Controller
 			if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
 		}
-		$ttStr = Transaction::getTypeString($trans_type);
-		if (is_null($ttStr))
-			$this->fail($defMsg);
 
 		setMessage(MSG_TRANS_UPDATE);
-		setLocation("../transactions.php?type=".$ttStr);
+		setLocation(BASEURL."transactions/");
 	}
 
 
