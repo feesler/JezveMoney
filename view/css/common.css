@@ -435,12 +435,20 @@ button::-moz-focus-inner
 .heading
 {
 	clear: both;
+	padding: 10px 0px;
+	height: 32px;
 }
 
 
 .heading > h1,
 .heading > h2
 {
+	font-size: 26px;
+	font-family: "Segoe UI Light", "Segoe UI";
+	line-height: 32px;
+	height: 32px;
+	padding: 0;
+	margin: 0;
 	display: inline-block;
 	float: left;
 }
@@ -451,29 +459,6 @@ button::-moz-focus-inner
 	display: inline-block;
 	float: left;
 	clear: right;
-	margin: 9px 0px 0px 30px;
-}
-
-
-.h2_heading
-{
-	padding: 10px 0px;
-	height: 32px;
-}
-
-
-.h2_heading > h2
-{
-	font-size: 26px;
-	font-family: "Segoe UI Light", "Segoe UI";
-	line-height: 32px;
-	height: 32px;
-	padding: 0;
-}
-
-
-.h2_heading > .iconlink
-{
 	margin: 0px 0px 0px 30px;
 }
 
