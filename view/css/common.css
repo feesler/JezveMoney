@@ -440,8 +440,7 @@ button::-moz-focus-inner
 }
 
 
-.heading > h1,
-.heading > h2
+.heading > h1
 {
 	font-size: 26px;
 	font-family: "Segoe UI Light", "Segoe UI";
