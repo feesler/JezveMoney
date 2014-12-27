@@ -524,7 +524,7 @@ class TransactionsController extends Controller
 		}
 		else
 		{
-			$onFormSubmit = "return onEditTransSubmit(this);";
+			$onFormSubmit = "return onSubmit(this);";
 		}
 
 		if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)

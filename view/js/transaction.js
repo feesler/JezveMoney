@@ -233,58 +233,19 @@ function onSubmit(frm)
 
 	if (isExpense())
 	{
-		if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
+		if (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value)))
 		{
-			alert('Please input correct source amount.');
+			alert('Please input correct amount.');
 			return false;
 		}
 	}
 	else if (isIncome())
 	{
-		if (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value)))
+		if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
 		{
-			alert('Please input correct destination amount.');
+			alert('Please input correct amount.');
 			return false;
 		}
-	}
-
-	src_amount.value = fixFloat(src_amount.value);
-	dest_amount.value = fixFloat(dest_amount.value);
-
-	if (!checkDate(trdate.value))
-	{
-		alert('Please input correct date.');
-		return false;
-	}
-
-	submitStarted = true;
-	enable(submitbtn, false);
-
-	return true;
-}
-
-
-// Edit transaction submit event handler
-function onEditTransSubmit(frm)
-{
-	var srcid, destid, src_amount, dest_amount, trdate, submitbtn;
-
-	if (submitStarted)
-		return false;
-
-	srcid = ge('src_id');
-	destid = ge('dest_id');
-	src_amount = ge('src_amount');
-	dest_amount = ge('dest_amount');
-	trdate = ge('date');
-	submitbtn = ge('submitbtn');
-	if (!frm || (!srcid && !destid) || !src_amount || !dest_amount || !trdate || !submitbtn)
-		return false;
-
-	if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
-	{
-		alert('Please input correct amount.');
-		return false;
 	}
 
 	src_amount.value = fixFloat(src_amount.value);
