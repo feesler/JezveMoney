@@ -1,3 +1,62 @@
+/* Fonts */
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 200;
+	src: local("Segoe UI Light");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 300;
+	src: local("Segoe UI Semilight");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 400;
+	src: local("Segoe UI");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 600;
+	src: local("Segoe UI Semibold");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 700;
+	src: local("Segoe UI Bold");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-style: italic;
+	font-weight: 400;
+	src: local("Segoe UI Italic");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-style: italic;
+	font-weight: 700;
+	src: local("Segoe UI Bold Italic");
+}
+
+
 /* Common */
 *, body
 {
@@ -24,7 +83,7 @@ div
 /* headings */
 h1
 {
-	font-family: "Segoe UI Light", "Segoe UI Semilight", "Segoe UI";
+	font-weight: 200;
 	font-size: 32px;
 	font-weight: normal;
 	margin: 0px 0px 10px 0px;
@@ -410,7 +469,7 @@ button::-moz-focus-inner
 
 .widget_title span
 {
-	font-family: "Segoe UI Light", "Segoe UI";
+	font-weight: 200;
 	font-size: 26px;
 	line-height: 32px;
 	float: left;
@@ -443,7 +502,7 @@ button::-moz-focus-inner
 .heading > h1
 {
 	font-size: 26px;
-	font-family: "Segoe UI Light", "Segoe UI";
+	font-weight: 200;
 	line-height: 32px;
 	height: 32px;
 	padding: 0;
