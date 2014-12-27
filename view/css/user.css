@@ -80,13 +80,13 @@
 
 
 /* profile */
-.profile_summary > div
+.profile_block
 {
 	margin: 10px 0px 20px 0px;
 }
 
 
-.profile_summary > div > h2
+.profile_block > h2
 {
 	font-size: 18px;
 	font-weight: normal;
@@ -94,7 +94,7 @@
 }
 
 
-.profile_summary > div > span
+.profile_block > span
 {
 	font-size: 16px;
 }

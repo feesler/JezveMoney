@@ -9,14 +9,17 @@
 <?php	require_once("./view/templates/header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
-				<div class="content_wrap profile_summary">
-					<h1>User profile</h1>
-					<div>
+				<div class="content_wrap">
+					<div class="heading">
+						<h1>User profile</h1>
+					</div>
+
+					<div class="profile_block">
 						<h2>Account name</h2>
 						<span><?=$user_login;?></span>
 					</div>
 
-					<div>
+					<div class="profile_block">
 						<h2>User name</h2>
 						<span><?=$person_name?></span>
 <?php	if ($action != "changename") {	?>
@@ -25,13 +28,13 @@
 					</div>
 
 <?php	if ($action != "changepassword") {	?>
-					<div>
+					<div class="profile_block">
 						<h2>Security</h2>
 						<div><a href="<?=BASEURL?>profile/changepass/">Change password</a></div>
 					</div>
 <?php	}	?>
 
-					<div>
+					<div class="profile_block">
 						<h2>Reset data</h2>
 						<div>
 							<form id="resetacc_form" method="post" action="<?=BASEURL?>accounts/reset/">
