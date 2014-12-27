@@ -645,7 +645,9 @@ function updControls()
 		exchRateSwitch(false);
 
 		setAmountInputLabel(true, true);
+		setAmountTileBlockLabel(true, true);
 		setAmountInputLabel(false, true);
+		setAmountTileBlockLabel(false, true);
 	}
 	else		// currencies is the same
 	{
@@ -695,6 +697,7 @@ function updControls()
 		hideDestAmountAndExchange();
 
 		setAmountInputLabel(true, false);
+		setAmountTileBlockLabel(true, false);
 	}
 
 	setSign('destamountsign', destAmountCurr);
@@ -1206,7 +1209,9 @@ function onChangeSrcCurr()
 	{
 		destAmountSwitch(true);
 		setAmountInputLabel(true, true);
+		setAmountTileBlockLabel(true, true);
 		setAmountInputLabel(false, true);
+		setAmountTileBlockLabel(false, true);
 		setCurrActive(true, true);		// set source active
 		setCurrActive(false, false);		// set destination inactive
 		exchRateSwitch(false);
@@ -1220,6 +1225,7 @@ function onChangeSrcCurr()
 		updateExchAndRes();
 
 		setAmountInputLabel(true, false);
+		setAmountTileBlockLabel(true, false);
 		hideDestAmountAndExchange();
 	}
 
@@ -1290,7 +1296,9 @@ function onChangeDestCurr()
 	{
 		srcAmountSwitch(true);
 		setAmountInputLabel(true, true);
+		setAmountTileBlockLabel(true, true);
 		setAmountInputLabel(false, true);
+		setAmountTileBlockLabel(false, true);
 		setCurrActive(true, false);		// set source inactive
 		setCurrActive(false, true);		// set destination active
 		exchRateSwitch(false);
@@ -1304,6 +1312,7 @@ function onChangeDestCurr()
 		updateExchAndRes();
 
 		setAmountInputLabel(false, false);
+		setAmountTileBlockLabel(false, false);
 		hideSrcAmountAndExchange();
 	}
 

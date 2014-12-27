@@ -517,3 +517,23 @@ function setAmountInputLabel(src, full)
 	else
 		lblObj.innerHTML = 'Amount';
 }
+
+
+// Set full/short text for source or destination amount tile block label
+function setAmountTileBlockLabel(src, full)
+{
+	var amountBlock, lblObj;
+
+	amountBlock = ge((src) ? 'src_amount_left' : 'dest_amount_left');
+	if (!amountBlock)
+		return;
+
+	lblObj = firstElementChild(amountBlock);
+	if (!lblObj)
+		return;
+
+	if (full)
+		lblObj.innerHTML = (src) ? 'Source amount' : 'Destination amount';
+	else
+		lblObj.innerHTML = 'Amount';
+}
