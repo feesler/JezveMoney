@@ -157,9 +157,9 @@
 							</div>
 
 							<div class="tile_right_block">
-<?php	if ($trans_type == EXPENSE) {		?>
+<?php	if ($trans_type == TRANSFER) {		?>
 								<div id="src_amount_left" style="display: none;">
-									<span>Source amount</span>
+									<span><?=$srcAmountLbl?></span>
 									<div>
 										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 									</div>
@@ -167,7 +167,7 @@
 <?php	}	?>
 <?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER) {		?>
 								<div id="dest_amount_left" style="display: none;">
-									<span>Destination amount</span>
+									<span><?=$destAmountLbl?></span>
 									<div>
 										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
@@ -203,14 +203,14 @@
 
 							<div class="tile_right_block">
 								<div id="src_amount_left" style="display: none;">
-									<span>Source amount</span>
+									<span><?=$srcAmountLbl?></span>
 									<div>
 										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
 <?php	if ($trans_type == INCOME) {		?>
 								<div id="dest_amount_left" style="display: none;">
-									<span>Destination amount</span>
+									<span><?=$destAmountLbl?></span>
 									<div>
 										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
 									</div>
