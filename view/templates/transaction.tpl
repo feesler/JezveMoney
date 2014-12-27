@@ -386,7 +386,7 @@
 							</div>
 						</div>
 
-						<div class="acc_controls"><input id="submitbtn" class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="./accounts.php">cancel</a></div>
+						<div class="acc_controls"><input id="submitbtn" class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>">cancel</a></div>
 <?php	}	?>
 						</form>
 					</div>
