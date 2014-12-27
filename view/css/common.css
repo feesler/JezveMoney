@@ -448,7 +448,8 @@ button::-moz-focus-inner
 	height: 32px;
 	padding: 0;
 	margin: 0;
-	display: inline-block;
+	display: table-cell;
+	vertical-align: middle;
 	float: left;
 }
 
