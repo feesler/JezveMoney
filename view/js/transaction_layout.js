@@ -131,7 +131,8 @@ function onSrcAmountSelect()
 function onDestAmountSelect()
 {
 	destAmountSwitch(true);
-	exchRateSwitch(false);
+	resBalanceSwitch(false);
+	resBalanceDestSwitch(false);
 }
 
 
@@ -140,7 +141,7 @@ function onResBalanceSelect()
 {
 	resBalanceSwitch(true);
 	resBalanceDestSwitch(false);
-	srcAmountSwitch(false);
+	destAmountSwitch(false);
 }
 
 
