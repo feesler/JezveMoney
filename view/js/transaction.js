@@ -882,66 +882,11 @@ function getValues()
 // Set value of input fields
 function setValues()
 {
-	var src_amount, src_amount_b, dest_amount, dest_amount_b, exchrate, exchcomm, exchrate_b, resbal, resbal_d, resbal_b, resbal_d_b;
-
-	src_amount = ge('src_amount');
-	src_amount_b = ge('src_amount_b');
-	dest_amount = ge('dest_amount');
-	dest_amount_b = ge('dest_amount_b');
-	exchrate = ge('exchrate');
-	exchcomm = ge('exchcomm');
-	exchrate_b = ge('exchrate_b');
-	resbal = ge('resbal');
-	resbal_d = ge('resbal_d');
-	resbal_b = ge('resbal_b');
-	resbal_d_b = ge('resbal_d_b');
-	if (!src_amount || !src_amount_b || !dest_amount || !dest_amount_b || !exchrate || !exchrate_b || (!resbal && !resbal_d) || (!resbal_b && !resbal_d_b))
-		return;
-
-	src_amount.value = sa;
-	firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(sa) ? sa : 0), srcCurr);
-
-	dest_amount.value = da;
-	firstElementChild(dest_amount_b).innerHTML =  formatCurrency((isValidValue(da) ? da : 0), destCurr);
-
-	exchrate.value = e;
-	firstElementChild(exchrate_b).innerHTML = e + ' ' + exchcomm.innerHTML;
-
-	if (isDebt())
-	{
-		if (debtType)		// person give to us
-		{
-			resbal.value = S2;
-			resbal_d.value = S2_d;
-		}
-		else				// person take from us
-		{
-			resbal_d.value = S2;
-			resbal.value = S2_d;
-		}
-	}
-	else if (isIncome())
-		resbal_d.value = S2_d;
-	else
-		resbal.value = S2;
-
-	if (isDebt())
-	{
-		firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
-	}
-	else if (isIncome())
-		firstElementChild(resbal_d_b).innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
-	else
-		firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2) ? S2 : S1), srcCurr);
-
-	if (isTransfer())
-	{
-		firstElementChild(resbal_d_b).innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
-	}
-	else if (isDebt())
-	{
-		firstElementChild(resbal_d_b).innerHTML = formatCurrency(isValidValue(S2_d) ? S2_d : S1_d, destCurr);
-	}
+	setSrcAmount(sa);
+	setDestAmount(da);
+	setExchRate(e);
+	setSrcResultBalance(S2, S1);
+	setDestResultBalance(S2_d, S1_d);
 }
 
 

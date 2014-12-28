@@ -538,3 +538,115 @@ function setAmountTileBlockLabel(src, full)
 	else
 		lblObj.innerHTML = 'Amount';
 }
+
+
+// Set source amount value at View
+function setSrcAmount(val)
+{
+	var src_amount, src_amount_b;
+
+	if (val === undefined)
+		return;
+
+	src_amount = ge('src_amount');
+	src_amount_b = ge('src_amount_b');
+
+	if (src_amount)
+		src_amount.value = val;
+	if (src_amount_b)
+		firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), srcCurr);
+}
+
+
+// Set destination amount value at View
+function setDestAmount(val)
+{
+	var dest_amount, dest_amount_b;
+
+	if (val === undefined)
+		return;
+
+	dest_amount = ge('dest_amount');
+	dest_amount_b = ge('dest_amount_b');
+
+	if (dest_amount)
+		dest_amount.value = val;
+	if (dest_amount_b)
+		firstElementChild(dest_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), destCurr);
+}
+
+
+// Set exchange rate value at View
+function setExchRate(val)
+{
+	var exchrate, exchcomm, exchrate_b;
+
+	if (val === undefined)
+		return;
+
+	exchrate = ge('exchrate');
+	exchcomm = ge('exchcomm');
+	exchrate_b = ge('exchrate_b');
+
+	if (exchrate)
+		exchrate.value = val;
+	if (exchrate_b && exchcomm)
+		firstElementChild(exchrate_b).innerHTML = val + ' ' + exchcomm.innerHTML;
+}
+
+
+// Set result balance of source value at View
+function setSrcResultBalance(val, valid)
+{
+	var resbal, resbal_d, resbal_b;
+
+	if (val === undefined && valid === undefined)
+		return;
+
+	resbal = ge('resbal');
+	resbal_d = ge('resbal_d');
+	resbal_b = ge('resbal_b');
+
+	if (isDebt())
+	{
+		if (debtType)		// person give to us
+			resbal.value = val;
+		else				// person take from us
+			resbal_d.value = val;
+	}
+	else
+		resbal.value = val;
+
+	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), srcCurr);
+
+	firstElementChild(resbal_b).innerHTML = fmtBal;
+}
+
+
+// Set result balance of destination value at View
+function setDestResultBalance(val, valid)
+{
+	var resbal, resbal_d, resbal_d_b;
+
+	if (val === undefined && valid === undefined)
+		return;
+
+	resbal = ge('resbal');
+	resbal_d = ge('resbal_d');
+	resbal_d_b = ge('resbal_d_b');
+
+	if (isDebt())
+	{
+		if (debtType)		// person give to us
+			resbal_d.value = S2_d;
+		else				// person take from us
+			resbal.value = S2_d;
+	}
+	else if (isIncome())
+		resbal_d.value = S2_d;
+
+	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), destCurr);
+
+	if (isIncome() || isTransfer() || isDebt())
+		firstElementChild(resbal_d_b).innerHTML = fmtBal;
+}
