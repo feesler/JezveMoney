@@ -3,7 +3,7 @@
 	var accounts = <?=f_json_encode($accArr)?>;
 	var currency = <?=f_json_encode($currArr)?>;
 <?php	if ($action == "edit") {	?>
-	var transaction =
+	var edit_transaction =
 	{
 		srcAcc : <?=$tr["src_id"]?>,
 		destAcc : <?=$tr["dest_id"]?>,

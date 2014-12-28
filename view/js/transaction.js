@@ -73,63 +73,63 @@ function calcelTransaction()
 {
 	var srcAcc, destAcc;
 
-	if (!edit_mode || canceled || !transaction)
+	if (!edit_mode || canceled || !edit_transaction)
 		return;
 
-	srcAcc = getAccount(transaction.srcAcc);
-	destAcc = getAccount(transaction.destAcc);
+	srcAcc = getAccount(edit_transaction.srcAcc);
+	destAcc = getAccount(edit_transaction.destAcc);
 
-	if (transaction.type == 1)		// Expense
+	if (edit_transaction.type == 1)		// Expense
 	{
 		if (!srcAcc)
 			throw new Error('Invalid transaction: Account not found');
-		if (srcAcc[1] != transaction.srcCurr)
+		if (srcAcc[1] != edit_transaction.srcCurr)
 			throw new Error('Invalid transaction');
 
-		srcAcc[3] += transaction.srcAmount;
+		srcAcc[3] += edit_transaction.srcAmount;
 	}
-	else if (transaction.type == 2)		// Income
+	else if (edit_transaction.type == 2)		// Income
 	{
-		if (!destAcc || destAcc[1] != transaction.destCurr)
+		if (!destAcc || destAcc[1] != edit_transaction.destCurr)
 			throw new Error('Invalid transaction');
 
-		destAcc[3] -= transaction.destAmount;
+		destAcc[3] -= edit_transaction.destAmount;
 	}
-	else if (transaction.type == 3)		// Transfer
+	else if (edit_transaction.type == 3)		// Transfer
 	{
-		if (!srcAcc || !destAcc || srcAcc[1] != transaction.srcCurr || destAcc[1] != transaction.destCurr)
+		if (!srcAcc || !destAcc || srcAcc[1] != edit_transaction.srcCurr || destAcc[1] != edit_transaction.destCurr)
 			throw new Error('Invalid transaction');
 
-		srcAcc[3] += transaction.srcAmount;
-		destAcc[3] -= transaction.destAmount;
+		srcAcc[3] += edit_transaction.srcAmount;
+		destAcc[3] -= edit_transaction.destAmount;
 	}
-	else if (transaction.type == 4)		// Debt
+	else if (edit_transaction.type == 4)		// Debt
 	{
 		if (debtType)		// person give
 		{
 			if (srcAcc)
 				throw new Error('Invalid transaction');
 
-			srcAcc = getPersonAccount(transaction.srcAcc);
+			srcAcc = getPersonAccount(edit_transaction.srcAcc);
 			if (!srcAcc)
 				throw new Error('Invalid transaction');
 
-			srcAcc[2] += transaction.srcAmount;
+			srcAcc[2] += edit_transaction.srcAmount;
 			if (destAcc)
-				destAcc[3] -= transaction.destAmount;
+				destAcc[3] -= edit_transaction.destAmount;
 		}
 		else				// person take
 		{
 			if (destAcc)		// we should not find acount
 				throw new Error('Invalid transaction');
 
-			destAcc = getPersonAccount(transaction.destAcc);
+			destAcc = getPersonAccount(edit_transaction.destAcc);
 			if (!destAcc)
 				throw new Error('Invalid transaction');
 
 			if (srcAcc)
-				srcAcc[3] += transaction.srcAmount;
-			destAcc[2] -= transaction.destAmount;
+				srcAcc[3] += edit_transaction.srcAmount;
+			destAcc[2] -= edit_transaction.destAmount;
 		}
 	}
 
