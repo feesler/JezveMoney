@@ -456,7 +456,7 @@ class TransactionsController extends Controller
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "calendar.js", "ddlist.js", "transaction.js", "transaction_layout.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "calendar.js", "ddlist.js", "transaction_model.js", "transaction.js", "transaction_layout.js");
 
 		include("./view/templates/transaction.tpl");
 	}
@@ -685,7 +685,7 @@ class TransactionsController extends Controller
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "calendar.js", "ddlist.js", "transaction.js", "transaction_layout.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "calendar.js", "ddlist.js", "transaction_model.js", "transaction.js", "transaction_layout.js");
 		$cssArr[] = "popup.css";
 		$jsArr[] = "popup.js";
 
