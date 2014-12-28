@@ -638,12 +638,12 @@ function setDestResultBalance(val, valid)
 	if (isDebt())
 	{
 		if (debtType)		// person give to us
-			resbal_d.value = S2_d;
+			resbal_d.value = val;
 		else				// person take from us
-			resbal.value = S2_d;
+			resbal.value = val;
 	}
 	else if (isIncome())
-		resbal_d.value = S2_d;
+		resbal_d.value = val;
 
 	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), destCurr);
 
