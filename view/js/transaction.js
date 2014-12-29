@@ -1,4 +1,5 @@
-﻿var S1;		// balance before transaction
+﻿/*
+var S1;		// balance before transaction
 var sa;		// source amount
 var da;		// destination amount
 var e;		// exchange rate
@@ -13,6 +14,7 @@ var S2_d;		// balance of destintation account after transaction
 
 var fS1_d, fS2_d;
 var s1dvalid, s2dvalid;
+*/
 
 // Main formula
 // S2 = S1 - sa			source account
@@ -24,6 +26,7 @@ var dwPopup = null;		// delete warning popup
 var submitStarted = false;
 
 
+/*
 // Check current transaction is expense
 function isExpense()
 {
@@ -50,6 +53,7 @@ function isDebt()
 {
 	return (trans_type == 4);
 }
+*/
 
 
 // Correct calculated value
@@ -138,6 +142,7 @@ function calcelTransaction()
 }
 
 
+/*
 // Calculate result balance of source by initial balance and source amount
 function f1()
 {
@@ -202,6 +207,7 @@ function f5()
 	else
 		fe = e = correctExch(fda / fsa);
 }
+*/
 
 
 // Set currency sign for specified field
@@ -459,6 +465,7 @@ function onChangeAcc()
 }
 
 
+/*
 // Check selected currencies is different
 function isDiffCurr()
 {
@@ -472,6 +479,7 @@ function isDiffCurr()
 
 	return (getCurrencyOfAccount(src.value) != getCurrencyOfAccount(dest.value));
 }
+*/
 
 
 // Transfer transaction submit event handler
@@ -890,6 +898,7 @@ function setValues()
 }
 
 
+/*
 // Check currency of source amount and destination amount is different
 function isDiff()
 {
@@ -917,8 +926,10 @@ function isDiff()
 
 	return (srcAmountCurr != destAmountCurr);
 }
+*/
 
 
+/*
 // Source amount field input event handler
 function onSrcAmountInput()
 {
@@ -1060,11 +1071,13 @@ function onResBalanceDestInput()
 		}
 	}
 }
+*/
 
 
 // Field input event handler
 function onFInput(obj)
 {
+/*
 	getValues();
 
 	if (obj.id == 'src_amount')
@@ -1079,8 +1092,35 @@ function onFInput(obj)
 		onResBalanceDestInput();
 
 	setValues();
+*/
+	if (obj.id == 'src_amount')
+		Transaction.update('src_amount', obj.value);
+	else if (obj.id == 'dest_amount')
+		Transaction.update('dest_amount', obj.value);
+	else if (obj.id == 'exchrate')
+		Transaction.update('exchrate', obj.value);
+	else if (obj.id == 'resbal')
+		Transaction.update('src_resbal', obj.value);
+	else if (obj.id == 'resbal_d')
+		Transaction.update('dest_resbal', obj.value);
 
 	return true;
+}
+
+
+// Transaction model value changed notification callback
+function onValueChanged(item, value)
+{
+	if (item == 'src_amount')
+		setSrcAmount(value);
+	else if (item == 'dest_amount')
+		setDestAmount(value);
+	else if (item == 'exchrate')
+		setExchRate(value);
+	else if (item == 'src_resbal')
+		setSrcResultBalance(value, 0);
+	else if (item == 'dest_resbal')
+		setDestResultBalance(value, 0);
 }
 
 

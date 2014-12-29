@@ -15,9 +15,11 @@
 
 	};
 <?php	}	?>
+/*
 	var trans_type = <?=$tr["type"]?>;
 	var srcCurr = <?=$tr["src_curr"]?>;
 	var destCurr = <?=$tr["dest_curr"]?>;
+*/
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
 	var canceled = false;
 <?php	if ($trans_type == DEBT) {		?>
@@ -26,6 +28,8 @@
 	var lastAcc_id = <?=$acc_id?>;
 	var noAccount = <?=($noAccount ? "true" : "false")?>;
 <?php	}	?>
+
+	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
 
 	if (edit_mode)
 		onReady(calcelTransaction);

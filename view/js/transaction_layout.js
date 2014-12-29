@@ -359,8 +359,27 @@ function initControls()
 
 	setParam(firstElementChild(ge('comm_btn')), { onclick : showComment });
 
+	Transaction.set('exchrate', ge('exchrate').value);
+	if (Transaction.isExpense())
+		Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
+	else if (Transaction.isIncome())
+		Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
+	else if (Transaction.isTransfer())
+	{
+		Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
+		Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
+	}
+	else if (Transaction.isDebt())
+	{
+	}
 
-	if (isDebt())
+	Transaction.subscribe('src_amount', onValueChanged.bind(null, 'src_amount'));
+	Transaction.subscribe('dest_amount', onValueChanged.bind(null, 'dest_amount'));
+	Transaction.subscribe('exchrate', onValueChanged.bind(null, 'exchrate'));
+	Transaction.subscribe('src_resbal', onValueChanged.bind(null, 'src_resbal'));
+	Transaction.subscribe('dest_resbal', onValueChanged.bind(null, 'dest_resbal'));
+
+	if (Transaction.isDebt())
 	{
 		elem = firstElementChild(ge('noacc_btn'));
 		if (elem)
@@ -426,7 +445,7 @@ function initControls()
 	}
 
 
-	if (isIncome() || (isDebt() && !debtType))
+	if (Transaction.isIncome() || (Transaction.isDebt() && !debtType))
 	{
 		srcCurrDDList = new DDList();
 		if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
@@ -443,7 +462,7 @@ function initControls()
 			srcCurrDDList = null;
 	}
 
-	if (isExpense() || (isDebt() && debtType))
+	if (Transaction.isExpense() || (Transaction.isDebt() && debtType))
 	{
 		destCurrDDList = new DDList();
 		if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
@@ -602,7 +621,7 @@ function setSrcAmount(val)
 	if (src_amount)
 		src_amount.value = val;
 	if (src_amount_b)
-		firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), srcCurr);
+		firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
 }
 
 
@@ -620,7 +639,7 @@ function setDestAmount(val)
 	if (dest_amount)
 		dest_amount.value = val;
 	if (dest_amount_b)
-		firstElementChild(dest_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), destCurr);
+		firstElementChild(dest_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
 }
 
 
@@ -655,7 +674,7 @@ function setSrcResultBalance(val, valid)
 	resbal_d = ge('resbal_d');
 	resbal_b = ge('resbal_b');
 
-	if (isDebt())
+	if (Transaction.isDebt())
 	{
 		if (debtType)		// person give to us
 			resbal.value = val;
@@ -665,7 +684,7 @@ function setSrcResultBalance(val, valid)
 	else
 		resbal.value = val;
 
-	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), srcCurr);
+	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
 
 	firstElementChild(resbal_b).innerHTML = fmtBal;
 }
@@ -683,18 +702,18 @@ function setDestResultBalance(val, valid)
 	resbal_d = ge('resbal_d');
 	resbal_d_b = ge('resbal_d_b');
 
-	if (isDebt())
+	if (Transaction.isDebt())
 	{
 		if (debtType)		// person give to us
 			resbal_d.value = val;
 		else				// person take from us
 			resbal.value = val;
 	}
-	else if (isIncome())
+	else if (Transaction.isIncome())
 		resbal_d.value = val;
 
-	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), destCurr);
+	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.destCurr());
 
-	if (isIncome() || isTransfer() || isDebt())
+	if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 		firstElementChild(resbal_d_b).innerHTML = fmtBal;
 }
