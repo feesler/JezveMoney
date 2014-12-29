@@ -323,12 +323,60 @@ function initAccList()
 // Initialization of page controls
 function initControls()
 {
-	var srcDDList, destDDList, srcCurrDDList, destCurrDDList;
+	var elem, srcDDList, destDDList, srcCurrDDList, destCurrDDList;
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
+	if (edit_mode)
+	{
+		elem = firstElementChild(ge('del_btn'))
+		if (elem)
+			elem.onclick = onDelete;
+	}
+
+	setParam(ge('src_amount_b'), { onclick : onSrcAmountSelect });
+	setParam(ge('dest_amount_b'), { onclick : onDestAmountSelect });
+	setParam(ge('exchrate_b'), { onclick : onExchRateSelect });
+	setParam(ge('resbal_b'), { onclick : onResBalanceSelect });
+	setParam(ge('resbal_d_b'), { onclick : onResBalanceDestSelect });
+
+	var finpFunc = function(e){ return onFInput(this); };
+	var fkeyFunc = function(e){ return onFieldKey(e, this); };
+
+	elem = ge('src_amount');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+	elem = ge('dest_amount');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+	elem = ge('exchrate');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+	elem = ge('resbal');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+	elem = ge('resbal_d');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+
+	setParam(firstElementChild(ge('calendar_btn')), { onclick : showCalendar });
+	setParam(ge('cal_rbtn'), { onclick : showCalendar });
+
+	setParam(firstElementChild(ge('comm_btn')), { onclick : showComment });
+
+
 	if (isDebt())
 	{
+		elem = firstElementChild(ge('noacc_btn'));
+		if (elem)
+			elem.onclick = toggleEnableAccount;
+		elem = firstElementChild(ge('selaccount'));
+		if (elem)
+			elem.onclick = toggleEnableAccount;
+
+		elem = ge('debtgive');
+		if (elem)
+			elem.onclick = onChangeDebtOp;
+		elem = ge('debttake');
+		if (elem)
+			elem.onclick = onChangeDebtOp;
+
+
 		persDDList = new DDList();
 		if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : isMobile }))
 		{

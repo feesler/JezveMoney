@@ -42,7 +42,7 @@
 					<div class="heading">
 						<h1><?=$headString?></h1>
 <?php	if ($action == "edit") {	?>
-						<div id="del_btn" class="iconlink"><button onclick="onDelete();" type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 					<div>
@@ -83,7 +83,7 @@
 									<div id="src_amount_left" style="display: none;">
 										<span>Source amount</span>
 										<div>
-											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onAmountSelect();"><span><?=$rtSrcAmount?></span></button>
+											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcAmount?></span></button>
 										</div>
 									</div>
 <?php		if ($srcAmountCurr != $destAmountCurr) {		?>
@@ -93,13 +93,13 @@
 <?php		}	?>
 										<span>Exchange rate</span>
 										<div>
-											<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?=$rtExchange?></span></button>
+											<button id="exchrate_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtExchange?></span></button>
 										</div>
 									</div>
 									<div id="src_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?=$rtSrcResBal?></span></button>
+											<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
 										</div>
 									</div>
 								</div>
@@ -108,12 +108,12 @@
 
 						<div id="source" class="acc_float">
 <?php		if ($noAccount) {		?>
-							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon" style="display: none;"><button onclick="toggleEnableAccount();" type="button"><span class="icon close_gray"></span></button></div></div>
+							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon" style="display: none;"><button type="button"><span class="icon close_gray"></span></button></div></div>
 							<div class="tile_container" style="display: none;">
 								<div id="acc_tile" class="tile<?=$acc_ic?>"><div class="tilelink"><span><span class="acc_bal"><?=$acc_balance?></span><span class="acc_name"><?=$acc_name?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=$acc_id?>">
 <?php		} else {	?>
-							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon"><button onclick="toggleEnableAccount();" type="button"><span class="icon close_gray"></span></button></div></div>
+							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon"><button type="button"><span class="icon close_gray"></span></button></div></div>
 							<div class="tile_container">
 								<div id="acc_tile" class="tile<?=$debtAcc["iconclass"]?>"><div class="tilelink"><span><span class="acc_bal"><?=$debtAcc["balfmt"]?></span><span class="acc_name"><?=$debtAcc["name"]?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=$debtAcc["id"]?>">
@@ -128,13 +128,13 @@
 								<div id="dest_amount_left" style="display: none;">
 									<span>Destination amount</span>
 									<div>
-										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
+										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
 								<div id="dest_res_balance_left">
 									<span>Result balance</span>
 									<div>
-										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?=$rtDestResBal?></span></button>
+										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestResBal?></span></button>
 									</div>
 								</div>
 							</div>
@@ -144,7 +144,7 @@
 <?php		} else {	?>
 							<div id="selaccount" class="selacc_container" style="display: none;">
 <?php		}	?>
-								<button class="dashed_btn resbal_btn" type="button" onclick="toggleEnableAccount();"><span>Select account</span></button>
+								<button class="dashed_btn resbal_btn" type="button"><span>Select account</span></button>
 							</div>
 						</div>
 <?php	}	?>
@@ -161,7 +161,7 @@
 								<div id="src_amount_left" style="display: none;">
 									<span><?=$srcAmountLbl?></span>
 									<div>
-										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
+										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
 <?php	}	?>
@@ -169,7 +169,7 @@
 								<div id="dest_amount_left" style="display: none;">
 									<span><?=$destAmountLbl?></span>
 									<div>
-										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
+										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
 <?php	}	?>
@@ -180,13 +180,13 @@
 <?php	}	?>
 									<span>Exchange rate</span>
 									<div>
-										<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?=$rtExchange?></span></button>
+										<button id="exchrate_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtExchange?></span></button>
 									</div>
 								</div>
 								<div id="src_res_balance_left">
 									<span>Result balance</span>
 									<div>
-										<button id="resbal_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceSelect();"><span><?=$rtSrcResBal?></span></button>
+										<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
 									</div>
 								</div>
 							</div>
@@ -205,27 +205,27 @@
 								<div id="src_amount_left" style="display: none;">
 									<span><?=$srcAmountLbl?></span>
 									<div>
-										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onSrcAmountSelect();"><span><?=$rtSrcAmount?></span></button>
+										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
 <?php	if ($trans_type == INCOME) {		?>
 								<div id="dest_amount_left" style="display: none;">
 									<span><?=$destAmountLbl?></span>
 									<div>
-										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button" onclick="onDestAmountSelect();"><span><?=$rtDestAmount?></span></button>
+										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
 								<div id="exch_left" style="display: none;">
 									<span>Exchange rate</span>
 									<div>
-										<button id="exchrate_b" class="dashed_btn resbal_btn" type="button" onclick="onExchRateSelect();"><span><?=$rtExchange?></span></button>
+										<button id="exchrate_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtExchange?></span></button>
 									</div>
 								</div>
 <?php	}	?>
 								<div id="dest_res_balance_left">
 									<span>Result balance</span>
 									<div>
-										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button" onclick="onResBalanceDestSelect();"><span><?=$rtDestResBal?></span></button>
+										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestResBal?></span></button>
 									</div>
 								</div>
 							</div>
@@ -235,8 +235,8 @@
 						<div id="operation" class="non_float">
 							<div><label>Operation</label></div>
 							<div class="op_sel">
-								<input id="debtgive" name="debtop" type="radio" value="1" onchange="onChangeDebtOp();"<?=($give ? " checked" : "")?>><span>give</span>
-								<input id="debttake" name="debtop" type="radio" value="2" onchange="onChangeDebtOp();"<?=($give ? "" : " checked")?>><span>take</span>
+								<input id="debtgive" name="debtop" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span>
+								<input id="debttake" name="debtop" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span>
 							</div>
 						</div>
 <?php	}	?>
@@ -262,9 +262,9 @@
 <?php	}	?>
 									<div>
 <?php	if ($action == "edit") {	?>
-										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="<?=$tr["src_amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="<?=$tr["src_amount"]?>">
 <?php	} else {	?>
-										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="">
 <?php	}	?>
 									</div>
 								</div>
@@ -293,9 +293,9 @@
 <?php	}	?>
 									<div>
 <?php	if ($action == "edit") {	?>
-										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="<?=$tr["dest_amount"]?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="<?=$tr["dest_amount"]?>">
 <?php	} else {	?>
-										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="">
 <?php	}	?>
 									</div>
 								</div>
@@ -308,7 +308,7 @@
 								<div class="right_float"><span id="exchcomm" class="exchrate_comm"><?=$exchSign?></span></div>
 								<div class="stretch_input trans_input">
 									<div>
-										<input id="exchrate" class="summ_text" type="text" value="<?=$exchValue?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="exchrate" class="summ_text" type="text" value="<?=$exchValue?>">
 									</div>
 								</div>
 							</div>
@@ -322,9 +322,9 @@
 								<div class="stretch_input trans_input">
 									<div>
 <?php	if ($trans_type == DEBT) {		?>
-										<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>">
 <?php	} else {	?>
-										<input id="resbal" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="resbal" class="summ_text" type="text" value="">
 <?php	}	?>
 									</div>
 								</div>
@@ -343,19 +343,19 @@
 <?php	}	?>
 								<div class="stretch_input trans_input">
 									<div>
-										<input id="resbal_d" class="summ_text" type="text" value="" oninput="return onFInput(this);" onkeypress="return onFieldKey(event, this);">
+										<input id="resbal_d" class="summ_text" type="text" value="">
 									</div>
 								</div>
 							</div>
 						</div>
 <?php	}	?>
 						<div class="non_float">
-							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
 									<div class="right_float">
-										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button" onclick="showCalendar();"><span></span></button>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button"><span></span></button>
 									</div>
 									<div class="stretch_input rbtn_input">
 										<div>
@@ -369,10 +369,10 @@
 
 						<div class="non_float">
 <?php	if (is_empty($tr["comment"])) {		?>
-							<div id="comm_btn" class="iconlink std_margin"><button onclick="showComment();" type="button"><span class="icon add"></span><span class="icontitle"><span>Add comment</span></span></button></div>
+							<div id="comm_btn" class="iconlink std_margin"><button type="button"><span class="icon add"></span><span class="icontitle"><span>Add comment</span></span></button></div>
 							<div id="comment_block" style="display: none;">
 <?php	} else {	?>
-							<div id="comm_btn" class="iconlink std_margin" style="display: none;"><button onclick="showComment();" type="button"><span class="icon add"></span><span class="icontitle"><span>Add comment</span></span></button></div>
+							<div id="comm_btn" class="iconlink std_margin" style="display: none;"><button type="button"><span class="icon add"></span><span class="icontitle"><span>Add comment</span></span></button></div>
 							<div id="comment_block">
 <?php	}	?>
 								<div><label for="comm">Comment</label></div>
