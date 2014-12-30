@@ -15,6 +15,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	var src_curr = srcCurr;
 	var dest_curr = destCurr;
 
+	var src_id, dest_id;
+
 	var changedCallback = [];
 
 
@@ -189,6 +191,36 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	}
 
 
+	//
+	function onInitBalanceUpdate(value)
+	{
+		if (savalid)
+		{
+			f1();		// calculate S2
+		}
+		else
+		{
+			setValue('src_resbal', fS1);
+			notifyChanged('src_resbal', fS1);
+		}
+	}
+
+
+	//
+	function onInitBalanceDestUpdate(value)
+	{
+		if (savalid)
+		{
+			f1_d();		// calculate S2_d
+		}
+		else
+		{
+			setValue('dest_resbal', fS1_d);
+			notifyChanged('dest_resbal', fS1_d);
+		}
+	}
+
+
 	// Result balance field input event handler
 	function onResBalanceUpdate(value)
 	{
@@ -246,6 +278,36 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 				f4();			// calculate sa and S2_d
 			}
 		}
+	}
+
+
+	function onSrcAccUpdate(value)
+	{
+		var acc = getAccount(value);
+
+		if (!acc)
+			return;
+
+		updateValue('src_curr', acc[1]);
+		notifyChanged('src_curr', acc[1]);
+
+		updateValue('src_initbal', acc[3]);
+		notifyChanged('src_initbal', acc[3]);
+	}
+
+
+	function onDestAccUpdate(value)
+	{
+		var acc = getAccount(value);
+
+		if (!acc)
+			return;
+
+		updateValue('dest_curr', acc[1]);
+		notifyChanged('dest_curr', acc[1]);
+
+		updateValue('dest_initbal', acc[3]);
+		notifyChanged('dest_initbal', acc[3]);
 	}
 
 
@@ -336,6 +398,14 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 			s2dvalid = isValidValue(S2_d);
 			fS2_d = (s2dvalid) ? normalize(S2_d) : S2_d;
 		}
+		else if (item == 'src_id')
+		{
+			src_id = parseInt(value);
+		}
+		else if (item == 'dest_id')
+		{
+			dest_id = parseInt(value);
+		}
 		else if (item == 'src_curr')
 		{
 			src_curr = parseInt(value);
@@ -357,10 +427,18 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 			onDestAmountUpdate(value);
 		else if (item == 'exchrate')
 			onExchangeUpdate(value);
+		else if (item == 'src_initbal')
+			onInitBalanceUpdate(value);
+		else if (item == 'dest_initbal')
+			onInitBalanceDestUpdate(value);
 		else if (item == 'src_resbal')
 			onResBalanceUpdate(value);
 		else if (item == 'dest_resbal')
 			onResBalanceDestUpdate(value);
+		else if (item == 'src_id')
+			onSrcAccUpdate(value);
+		else if (item == 'dest_id')
+			onDestAccUpdate(value);
 		else if (item == 'src_curr')
 			onSrcCurrUpdate(value);
 		else if (item == 'dest_curr')
@@ -403,6 +481,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 		isTransfer : function(){ return transfer(); },
 		isDebt : function(){ return debt(); },
 
+		srcAcc : function(){ return src_id; },
+		destAcc : function(){ return dest_id; },
 		srcCurr : function(){ return src_curr; },
 		destCurr : function(){ return dest_curr; },
 		exchRate : function(){ return fe; },

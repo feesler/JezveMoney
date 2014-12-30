@@ -198,7 +198,7 @@ function onSrcAccSel(obj)
 	src_id.value = obj.id;
 
 
-	if (trans_type == 3)
+	if (Transaction.isTransfer())
 		onChangeSource();
 	else
 		onChangeAcc();
@@ -218,7 +218,7 @@ function onDestAccSel(obj)
 
 	dest_id.value = obj.id;
 
-	if (trans_type == 3)
+	if (Transaction.isTransfer())
 		onChangeDest();
 	else
 		onChangeAcc();

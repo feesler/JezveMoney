@@ -530,6 +530,7 @@ function onTransferSubmit(frm)
 
 // Update controls of transfer transaction form
 /* TODO : don't calculate values here; we have getValues(), f1-5() */
+/*
 function updControls()
 {
 	var src, dest, acc, src_amount, dest_amount, exchrate, exchrate_b, exchange, resbal, src_curr, dest_curr;
@@ -698,6 +699,7 @@ function updControls()
 	getValues();
 	setExchangeComment();
 }
+*/
 
 
 // Source account change event handler
@@ -711,14 +713,33 @@ function onChangeSource()
 	if (!src || !dest)
 		return;
 
+	Transaction.update('src_id', src.value);
+	onSrcCurrChanged();
+
 	if (src.value == dest.value)
 	{
 		newAcc = getNextAccount(dest.value);
 		if (newAcc != 0)
+		{
 			dest.value = newAcc;
+			Transaction.update('dest_id', newAcc);
+			onDestCurrChanged();
+		}
 	}
 
+	if (Transaction.isDebt())
+	{
+		updatePersonTile();
+	}
+	else
+	{
+		setTileAccount('source_tile', Transaction.srcAcc());
+		setTileAccount('dest_tile', Transaction.destAcc());
+	}
+
+/*
 	updControls();
+*/
 }
 
 
@@ -732,14 +753,33 @@ function onChangeDest()
 	if (!src || !dest)
 		return;
 
+	Transaction.update('dest_id', dest.value);
+	onDestCurrChanged();
+
 	if (src.value == dest.value)
 	{
 		newAcc = getNextAccount(src.value);
 		if (newAcc != 0)
+		{
 			src.value = newAcc;
+			Transaction.update('src_id', newAcc);
+			onSrcCurrChanged();
+		}
 	}
 
+	if (Transaction.isDebt())
+	{
+		updatePersonTile();
+	}
+	else
+	{
+		setTileAccount('source_tile', Transaction.srcAcc());
+		setTileAccount('dest_tile', Transaction.destAcc());
+	}
+
+/*
 	updControls();
+*/
 }
 
 
@@ -766,6 +806,7 @@ function isValidValue(val)
 }
 
 
+/*
 // Get values of transaction from input fields
 function getValues()
 {
@@ -861,6 +902,7 @@ function setValues()
 	setSrcResultBalance(S2, S1);
 	setDestResultBalance(S2_d, S1_d);
 }
+*/
 
 
 /*
@@ -1184,6 +1226,13 @@ function onChangeSrcCurr()
 	srcCurr = parseInt(src_curr.value);
 	Transaction.update('src_curr', srcCurr);
 
+	onSrcCurrChanged();
+}
+
+
+// Update layout on source curency changed
+function onSrcCurrChanged()
+{
 	if (Transaction.isDiff())
 	{
 		destAmountSwitch(true);
@@ -1304,15 +1353,28 @@ function onChangeDestCurr()
 	destCurr = parseInt(dest_curr.value);
 	Transaction.update('dest_curr', destCurr);
 
+	onDestCurrChanged();
+}
+
+
+// Update layout on destination curency changed
+function onDestCurrChanged()
+{
 	if (Transaction.isDiff())
 	{
+		if (Transaction.isTransfer())
+			destAmountSwitch(true);
+
 		srcAmountSwitch(true);
 		setAmountInputLabel(true, true);
 		setAmountTileBlockLabel(true, true);
 		setAmountInputLabel(false, true);
 		setAmountTileBlockLabel(false, true);
 		setCurrActive(true, false);		// set source inactive
-		setCurrActive(false, true);		// set destination active
+		if (Transaction.isTransfer())
+			setCurrActive(false, false);		// set destination inactive
+		else
+			setCurrActive(false, true);		// set destination active
 		exchRateSwitch(false);
 
 		setExchRate(Transaction.exchRate());
@@ -1321,7 +1383,8 @@ function onChangeDestCurr()
 	{
 		setAmountInputLabel(false, false);
 		setAmountTileBlockLabel(false, false);
-		hideSrcAmountAndExchange();
+		if (!Transaction.isTransfer())
+			hideSrcAmountAndExchange();
 	}
 
 	updateCurrSigns();
