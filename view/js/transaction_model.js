@@ -251,10 +251,7 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 
 	function onSrcCurrUpdate(value)
 	{
-		if (isDiffCurr())
-		{
-		}
-		else
+		if (!isDiffCurr())
 		{
 			fe = e = 1;
 			evalid = true;
@@ -271,10 +268,7 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 
 	function onDestCurrUpdate(value)
 	{
-		if (isDiffCurr())
-		{
-		}
-		else
+		if (!isDiffCurr())
 		{
 			fe = e = 1;
 			evalid = true;

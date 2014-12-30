@@ -755,6 +755,7 @@ function updatePersonTile()
 	setTileInfo(person_tile, personname, formatCurrency(pbalance, curr));
 }
 
+
 // Update currency signs near to input fields
 function updateCurrSigns()
 {
