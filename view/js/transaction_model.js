@@ -290,6 +290,24 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 		}
 	}
 
+
+	function updateValue(item, value)
+	{
+		setValue(item, value);
+
+		if (item == 'src_amount')
+			onSrcAmountUpdate(value);
+		else if (item == 'dest_amount')
+			onDestAmountUpdate(value);
+		else if (item == 'exchrate')
+			onExchangeUpdate(value);
+		else if (item == 'src_resbal')
+			onResBalanceUpdate(value);
+		else if (item == 'dest_resbal')
+			onResBalanceDestUpdate(value);
+	}
+
+
 	function isDiffCurr()
 	{
 		return (src_curr != dest_curr);
@@ -341,27 +359,17 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 		},
 
 
-		// Set value without update
+		// Set value without update notification
 		set : function(item, value)
 		{
 			setValue(item, value);
 		},
 
 
+		// Set value with update notification
 		update : function(item, value)
 		{
-			this.set(item, value);
-
-			if (item == 'src_amount')
-				onSrcAmountUpdate(value);
-			else if (item == 'dest_amount')
-				onDestAmountUpdate(value);
-			else if (item == 'exchrate')
-				onExchangeUpdate(value);
-			else if (item == 'src_resbal')
-				onResBalanceUpdate(value);
-			else if (item == 'dest_resbal')
-				onResBalanceDestUpdate(value);
+			updateValue(item, value);
 		},
 	};
 }
