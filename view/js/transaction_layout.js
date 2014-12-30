@@ -647,6 +647,7 @@ function setDestAmount(val)
 function setExchRate(val)
 {
 	var exchrate, exchcomm, exchrate_b;
+	var exchText;
 
 	if (val === undefined)
 		return;
@@ -655,45 +656,23 @@ function setExchRate(val)
 	exchcomm = ge('exchcomm');
 	exchrate_b = ge('exchrate_b');
 
+	srcAmountSign = getCurrencySign(Transaction.srcCurr());
+	destAmountSign = getCurrencySign(Transaction.destCurr());
+
 	if (exchrate)
 		exchrate.value = val;
-	if (exchrate_b && exchcomm)
-		firstElementChild(exchrate_b).innerHTML = val + ' ' + exchcomm.innerHTML;
-}
 
+	exchText = destAmountSign + '/' + srcAmountSign;
 
-// Set exchange rate comment
-function setExchangeComment()
-{
-	var exchcomm, exchrate_b, src_curr, dest_curr;
-	var destAmountSign, srcAmountSign;
-	var invExch;
-
-	exchcomm = ge('exchcomm');
-	exchrate_b = ge('exchrate_b');
-	src_curr = ge('src_curr');
-	dest_curr = ge('dest_curr');
-	if (!exchcomm || !exchrate_b || !src_curr || !dest_curr)
-		return;
-
-	srcCurr = parseInt(src_curr.value);
-	destCurr = parseInt(dest_curr.value);
-
-	destAmountSign = getCurrencySign(destCurr);
-	srcAmountSign = getCurrencySign(srcCurr);
-
-	if (fe == 1.0 || fe == 0.0 || e == '')
+	if (isValidValue(val) && val != 1 && val != 0)
 	{
-		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign;
-	}
-	else
-	{
-		invExch = parseFloat((1 / fe).toFixed(5));
+		invExch = parseFloat((1 / val).toFixed(5));
 
-		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign + ' ('  + invExch + ' ' + srcAmountSign + '/' + destAmountSign + ')';
+		exchText = destAmountSign + '/' + srcAmountSign + ' ('  + invExch + ' ' + srcAmountSign + '/' + destAmountSign + ')';
 	}
 
-	firstElementChild(exchrate_b).innerHTML = fe + ' ' + exchcomm.innerHTML;
+	if (exchrate_b)
+		firstElementChild(exchrate_b).innerHTML = val + ' ' + exchText;
 }
 
 
