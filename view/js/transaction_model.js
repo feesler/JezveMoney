@@ -94,7 +94,7 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 		else
 			fe = e = correctExch(fda / fsa);
 
-		notifyChanged('exchrate', fsa);
+		notifyChanged('exchrate', fe);
 	}
 
 
