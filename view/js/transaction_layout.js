@@ -662,6 +662,41 @@ function setExchRate(val)
 }
 
 
+// Set exchange rate comment
+function setExchangeComment()
+{
+	var exchcomm, exchrate_b, src_curr, dest_curr;
+	var destAmountSign, srcAmountSign;
+	var invExch;
+
+	exchcomm = ge('exchcomm');
+	exchrate_b = ge('exchrate_b');
+	src_curr = ge('src_curr');
+	dest_curr = ge('dest_curr');
+	if (!exchcomm || !exchrate_b || !src_curr || !dest_curr)
+		return;
+
+	srcCurr = parseInt(src_curr.value);
+	destCurr = parseInt(dest_curr.value);
+
+	destAmountSign = getCurrencySign(destCurr);
+	srcAmountSign = getCurrencySign(srcCurr);
+
+	if (fe == 1.0 || fe == 0.0 || e == '')
+	{
+		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign;
+	}
+	else
+	{
+		invExch = parseFloat((1 / fe).toFixed(5));
+
+		exchcomm.innerHTML = destAmountSign + '/' + srcAmountSign + ' ('  + invExch + ' ' + srcAmountSign + '/' + destAmountSign + ')';
+	}
+
+	firstElementChild(exchrate_b).innerHTML = fe + ' ' + exchcomm.innerHTML;
+}
+
+
 // Set result balance of source value at View
 function setSrcResultBalance(val, valid)
 {
