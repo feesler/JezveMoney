@@ -1204,14 +1204,7 @@ function onChangeSrcCurr()
 		hideDestAmountAndExchange();
 	}
 
-	setSign('destamountsign', Transaction.destCurr());
-	setSign('srcamountsign', Transaction.srcCurr());
-	if (Transaction.isDebt())
-	{
-		setSign('res_currsign', Transaction.srcCurr());
-		setSign('res_currsign_d', Transaction.destCurr());
-	}
-
+	updateCurrSigns();
 	updatePersonTile();
 }
 
@@ -1331,14 +1324,7 @@ function onChangeDestCurr()
 		hideSrcAmountAndExchange();
 	}
 
-	setSign('destamountsign', Transaction.destCurr());
-	setSign('srcamountsign', Transaction.srcCurr());
-	if (Transaction.isDebt())
-	{
-		setSign('res_currsign', Transaction.srcCurr());
-		setSign('res_currsign_d', Transaction.destCurr());
-	}
-
+	updateCurrSigns();
 	updatePersonTile();
 }
 

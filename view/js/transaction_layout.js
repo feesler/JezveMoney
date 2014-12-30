@@ -754,3 +754,15 @@ function updatePersonTile()
 	pbalance = getCurPersonBalance(curr);
 	setTileInfo(person_tile, personname, formatCurrency(pbalance, curr));
 }
+
+// Update currency signs near to input fields
+function updateCurrSigns()
+{
+	setSign('destamountsign', Transaction.destCurr());
+	setSign('srcamountsign', Transaction.srcCurr());
+	if (Transaction.isDebt())
+	{
+		setSign('res_currsign', Transaction.srcCurr());
+		setSign('res_currsign_d', Transaction.destCurr());
+	}
+}
