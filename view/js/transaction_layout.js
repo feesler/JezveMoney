@@ -761,9 +761,6 @@ function updateCurrSigns()
 {
 	setSign('destamountsign', Transaction.destCurr());
 	setSign('srcamountsign', Transaction.srcCurr());
-	if (Transaction.isDebt())
-	{
-		setSign('res_currsign', Transaction.srcCurr());
-		setSign('res_currsign_d', Transaction.destCurr());
-	}
+	setSign('res_currsign', Transaction.srcCurr());
+	setSign('res_currsign_d', Transaction.destCurr());
 }
