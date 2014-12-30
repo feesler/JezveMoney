@@ -249,6 +249,46 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	}
 
 
+	function onSrcCurrUpdate(value)
+	{
+		if (isDiffCurr())
+		{
+		}
+		else
+		{
+			fe = e = 1;
+			evalid = true;
+			notifyChanged('exchrate', fsa);
+
+			if (savalid)
+			{
+				f2();				// calculate da
+				f1_d();			// calculate S2_d
+			}
+		}
+	}
+
+
+	function onDestCurrUpdate(value)
+	{
+		if (isDiffCurr())
+		{
+		}
+		else
+		{
+			fe = e = 1;
+			evalid = true;
+			notifyChanged('exchrate', fsa);
+
+			if (davalid)
+			{
+				f4();				// calculate sa
+				f1();				// calculate S2
+			}
+		}
+	}
+
+
 	function notifyChanged(item, value)
 	{
 		var callback = changedCallback[item];
@@ -302,6 +342,14 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 			s2dvalid = isValidValue(S2_d);
 			fS2_d = (s2dvalid) ? normalize(S2_d) : S2_d;
 		}
+		else if (item == 'src_curr')
+		{
+			src_curr = parseInt(value);
+		}
+		else if (item == 'dest_curr')
+		{
+			dest_curr = parseInt(value);
+		}
 	}
 
 
@@ -319,6 +367,10 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 			onResBalanceUpdate(value);
 		else if (item == 'dest_resbal')
 			onResBalanceDestUpdate(value);
+		else if (item == 'src_curr')
+			onSrcCurrUpdate(value);
+		else if (item == 'dest_curr')
+			onDestCurrUpdate(value);
 	}
 
 
@@ -359,6 +411,7 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 
 		srcCurr : function(){ return src_curr; },
 		destCurr : function(){ return dest_curr; },
+		exchRate : function(){ return fe; },
 
 		// Check source and destination currencies is different
 		isDiff : function()

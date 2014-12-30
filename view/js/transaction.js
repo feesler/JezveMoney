@@ -1092,6 +1092,7 @@ function onValueChanged(item, value)
 // Source currency change event handler
 function onChangeSrcCurr()
 {
+/*
 	var accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
 	var srcAmountCurr, destAmountCurr, isDiff;
 
@@ -1173,12 +1174,52 @@ function onChangeSrcCurr()
 		else
 			firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	}
+*/
+	var src_curr, srcCurr;
+
+	src_curr = ge('src_curr');
+	if (!src_curr)
+		return;
+
+	srcCurr = parseInt(src_curr.value);
+	Transaction.update('src_curr', srcCurr);
+
+	if (Transaction.isDiff())
+	{
+		destAmountSwitch(true);
+		setAmountInputLabel(true, true);
+		setAmountTileBlockLabel(true, true);
+		setAmountInputLabel(false, true);
+		setAmountTileBlockLabel(false, true);
+		setCurrActive(true, true);		// set source active
+		setCurrActive(false, false);		// set destination inactive
+		exchRateSwitch(false);
+
+		setExchRate(Transaction.exchRate());
+	}
+	else
+	{
+		setAmountInputLabel(true, false);
+		setAmountTileBlockLabel(true, false);
+		hideDestAmountAndExchange();
+	}
+
+	setSign('destamountsign', Transaction.destCurr());
+	setSign('srcamountsign', Transaction.srcCurr());
+	if (Transaction.isDebt())
+	{
+		setSign('res_currsign', Transaction.srcCurr());
+		setSign('res_currsign_d', Transaction.destCurr());
+	}
+
+	updatePersonTile();
 }
 
 
 // Destination currency change event handler
 function onChangeDestCurr()
 {
+/*
 	var accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
 	var srcAmountCurr, destAmountCurr, isDiff;
 
@@ -1260,6 +1301,45 @@ function onChangeDestCurr()
 		else
 			firstElementChild(resbal_b).innerHTML = formatCurrency((isValidValue(S2_d) ? S2_d : S1_d), destCurr);
 	}
+*/
+	var dest_curr, destCurr;
+
+	dest_curr = ge('dest_curr');
+	if (!dest_curr)
+		return;
+
+	destCurr = parseInt(dest_curr.value);
+	Transaction.update('dest_curr', destCurr);
+
+	if (Transaction.isDiff())
+	{
+		srcAmountSwitch(true);
+		setAmountInputLabel(true, true);
+		setAmountTileBlockLabel(true, true);
+		setAmountInputLabel(false, true);
+		setAmountTileBlockLabel(false, true);
+		setCurrActive(true, false);		// set source inactive
+		setCurrActive(false, true);		// set destination active
+		exchRateSwitch(false);
+
+		setExchRate(Transaction.exchRate());
+	}
+	else
+	{
+		setAmountInputLabel(false, false);
+		setAmountTileBlockLabel(false, false);
+		hideSrcAmountAndExchange();
+	}
+
+	setSign('destamountsign', Transaction.destCurr());
+	setSign('srcamountsign', Transaction.srcCurr());
+	if (Transaction.isDebt())
+	{
+		setSign('res_currsign', Transaction.srcCurr());
+		setSign('res_currsign_d', Transaction.destCurr());
+	}
+
+	updatePersonTile();
 }
 
 
