@@ -9,7 +9,7 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	var S2_d;		// balance of destintation account after transaction
 
 	var fS1, fsa, fda, fe, fS2, fS1_d, fS2_d;	// parsed float values
-	var s1valid, s2valid, davalid, evalid, savalid, s1dvalid, s2dvalid;
+	var s1valid = false, s2valid = false, davalid = false, evalid = false, savalid = false, s1dvalid = false, s2dvalid = false;
 
 	var type = trans_type;
 	var src_curr = srcCurr;
@@ -28,6 +28,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 
 		fS2 = S2 = correct(S2);
 
+		s2valid = isValidValue(S2);
+
 		notifyChanged('src_resbal', fS2);
 	}
 
@@ -42,6 +44,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 
 		fS2_d = S2_d = correct(S2_d);
 
+		s2dvalid = isValidValue(S2_d);
+
 		notifyChanged('dest_resbal', fS2_d);
 	}
 
@@ -50,6 +54,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	function f2()
 	{
 		fda = da = correct(fsa * fe);
+
+		davalid = isValidValue(da);
 
 		notifyChanged('dest_amount', fda);
 	}
@@ -64,6 +70,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 
 		fsa = sa;
 
+		savalid = isValidValue(sa);
+
 		notifyChanged('src_amount', fsa);
 	}
 
@@ -73,6 +81,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	{
 		fda = da = correct(fS2_d - fS1_d);
 
+		davalid = isValidValue(da);
+
 		notifyChanged('dest_amount', fda);
 	}
 
@@ -81,6 +91,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	function f4()
 	{
 		fsa = sa = correct(fda / fe);
+
+		savalid = isValidValue(sa);
 
 		notifyChanged('src_amount', fsa);
 	}
@@ -93,6 +105,8 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 			fe = e = (fda == 0) ? 1 : 0;
 		else
 			fe = e = correctExch(fda / fsa);
+
+		evalid = isValidValue(e);
 
 		notifyChanged('exchrate', fe);
 	}
