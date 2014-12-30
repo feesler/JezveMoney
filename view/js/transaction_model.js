@@ -1,5 +1,10 @@
 function TransactionModel(trans_type, srcCurr, destCurr)
 {
+// Main formula
+// S2 = S1 - sa			source account
+// da = sa * e
+// S2_d = S1_d + da		destination account
+
 	var S1;			// balance before transaction
 	var sa;			// source amount
 	var da;			// destination amount
