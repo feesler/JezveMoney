@@ -752,3 +752,26 @@ function setDestResultBalance(val, valid)
 	if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 		firstElementChild(resbal_d_b).innerHTML = fmtBal;
 }
+
+
+// Update information on person tile on currency change
+function updatePersonTile()
+{
+	var person_tile, person_id, personname, pbalance, resbal_b;
+	var curr;
+
+	if (!Transaction.isDebt())
+		return;
+
+	person_tile = ge('person_tile');
+	person_id = ge('person_id');
+	resbal_b = ge('resbal_b');
+	if (!person_tile || !person_id || !resbal_b)
+		return;
+
+	personname = getPersonName(person_id.value);
+	curr = debtType ? Transaction.srcCurr() : Transaction.destCurr();
+
+	pbalance = getCurPersonBalance(curr);
+	setTileInfo(person_tile, personname, formatCurrency(pbalance, curr));
+}
