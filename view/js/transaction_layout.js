@@ -3,6 +3,8 @@ function TransactionViewModel()
 	var self = this;
 
 	var calendarObj = null;
+	var isMobile;
+	var persDDList = null, accDDList = null;
 
 
 	// Create calendar for select date of transaction
@@ -298,210 +300,6 @@ function TransactionViewModel()
 	}
 
 
-	var isMobile;
-	var persDDList = null, accDDList = null;
-
-
-	// Initialization of DDList control for account tile
-	function initAccList()
-	{
-		if (accDDList)
-			return;
-
-		accDDList = new DDList();
-		if (accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : isMobile }))
-		{
-			accounts.forEach(function(acc)
-			{
-				accId = acc[0];
-				accName = acc[4];
-	
-				accDDList.addItem(accId, accName);
-			});
-		}
-		else
-			accDDList = null;
-	}
-
-
-	// Initialization of page controls
-	this.initControls = function()
-	{
-		var elem, srcDDList, destDDList, srcCurrDDList, destCurrDDList;
-
-		isMobile = (document.documentElement.clientWidth < 700);
-
-		if (edit_mode)
-		{
-			elem = firstElementChild(ge('del_btn'))
-			if (elem)
-				elem.onclick = onDelete;
-		}
-
-		setParam(ge('src_amount_b'), { onclick : onSrcAmountSelect });
-		setParam(ge('dest_amount_b'), { onclick : onDestAmountSelect });
-		setParam(ge('exchrate_b'), { onclick : onExchRateSelect });
-		setParam(ge('resbal_b'), { onclick : onResBalanceSelect });
-		setParam(ge('resbal_d_b'), { onclick : onResBalanceDestSelect });
-
-		var finpFunc = function(e){ return onFInput(this); };
-		var fkeyFunc = function(e){ return onFieldKey(e, this); };
-
-		elem = ge('src_amount');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('dest_amount');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('exchrate');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('resbal');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('resbal_d');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-
-		setParam(firstElementChild(ge('calendar_btn')), { onclick : showCalendar });
-		setParam(ge('cal_rbtn'), { onclick : showCalendar });
-
-		setParam(firstElementChild(ge('comm_btn')), { onclick : showComment });
-
-		Transaction.set('exchrate', ge('exchrate').value);
-		if (Transaction.isExpense())
-			Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
-		else if (Transaction.isIncome())
-			Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
-		else if (Transaction.isTransfer())
-		{
-			Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
-			Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
-		}
-		else if (Transaction.isDebt())
-		{
-			var p_bal = getCurPersonBalance(Transaction.srcCurr());
-			var acc_bal;
-
-			if (Transaction.debtType())
-				Transaction.set('src_initbal', p_bal);
-			else
-				updateValue('dest_initbal', p_bal);
-
-			if (!Transaction.noAccount())
-			{
-				acc_bal = getBalanceOfAccount(ge('acc_id').value);
-
-				if (Transaction.debtType())
-					Transaction.set('dest_initbal', acc_bal);
-				else
-					updateValue('src_initbal', acc_bal);
-			}
-		}
-
-		Transaction.subscribe('src_amount', onValueChanged.bind(null, 'src_amount'));
-		Transaction.subscribe('dest_amount', onValueChanged.bind(null, 'dest_amount'));
-		Transaction.subscribe('exchrate', onValueChanged.bind(null, 'exchrate'));
-		Transaction.subscribe('src_resbal', onValueChanged.bind(null, 'src_resbal'));
-		Transaction.subscribe('dest_resbal', onValueChanged.bind(null, 'dest_resbal'));
-
-		if (Transaction.isDebt())
-		{
-			elem = firstElementChild(ge('noacc_btn'));
-			if (elem)
-				elem.onclick = toggleEnableAccount;
-			elem = firstElementChild(ge('selaccount'));
-			if (elem)
-				elem.onclick = toggleEnableAccount;
-
-			elem = ge('debtgive');
-			if (elem)
-				elem.onclick = onChangeDebtOp;
-			elem = ge('debttake');
-			if (elem)
-				elem.onclick = onChangeDebtOp;
-
-
-			persDDList = new DDList();
-			if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : isMobile }))
-			{
-				persons.forEach(function(person)
-				{
-					persId = person[0];
-					persName = person[1];
-	
-					persDDList.addItem(persId, persName);
-				});
-			}
-			else
-				persDDList = null;
-
-			if (!Transaction.noAccount())
-				initAccList();
-		}
-		else
-		{
-			srcDDList = new DDList();
-			if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
-			{
-				accounts.forEach(function(acc)
-				{
-					accId = acc[0];
-					accName = acc[4];
-
-					srcDDList.addItem(accId, accName);
-				});
-			}
-			else
-				srcDDList = null;
-
-			destDDList = new DDList();
-			if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : isMobile }))
-			{
-				accounts.forEach(function(acc)
-				{
-					accId = acc[0];
-					accName = acc[4];
-
-					destDDList.addItem(accId, accName);
-				});
-			}
-			else
-				destDDList = null;
-		}
-
-
-		if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
-		{
-			srcCurrDDList = new DDList();
-			if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
-			{
-				currency.forEach(function(curr)
-				{
-					curr_id = curr[0];
-					currName = curr[1];
-
-					srcCurrDDList.addItem(curr_id, currName);
-				});
-			}
-			else
-				srcCurrDDList = null;
-		}
-
-		if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
-		{
-			destCurrDDList = new DDList();
-			if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
-			{
-				currency.forEach(function(curr)
-				{
-					curr_id = curr[0];
-					currName = curr[1];
-
-					destCurrDDList.addItem(curr_id, currName);
-				});
-			}
-			else
-				destCurrDDList = null;
-		}
-	}
-
-
 	// Account disable button click event handler
 	function toggleEnableAccount()
 	{
@@ -773,4 +571,205 @@ function TransactionViewModel()
 		setSign('res_currsign_d', Transaction.destCurr());
 	}
 
+
+	// Initialization of DDList control for account tile
+	function initAccList()
+	{
+		if (accDDList)
+			return;
+
+		accDDList = new DDList();
+		if (accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : isMobile }))
+		{
+			accounts.forEach(function(acc)
+			{
+				accId = acc[0];
+				accName = acc[4];
+
+				accDDList.addItem(accId, accName);
+			});
+		}
+		else
+			accDDList = null;
+	}
+
+
+	// Public methods
+
+	// Initialization of page controls
+	this.initControls = function()
+	{
+		var elem, srcDDList, destDDList, srcCurrDDList, destCurrDDList;
+
+		isMobile = (document.documentElement.clientWidth < 700);
+
+		if (edit_mode)
+		{
+			elem = firstElementChild(ge('del_btn'))
+			if (elem)
+				elem.onclick = onDelete;
+		}
+
+		setParam(ge('src_amount_b'), { onclick : onSrcAmountSelect });
+		setParam(ge('dest_amount_b'), { onclick : onDestAmountSelect });
+		setParam(ge('exchrate_b'), { onclick : onExchRateSelect });
+		setParam(ge('resbal_b'), { onclick : onResBalanceSelect });
+		setParam(ge('resbal_d_b'), { onclick : onResBalanceDestSelect });
+
+		var finpFunc = function(e){ return onFInput(this); };
+		var fkeyFunc = function(e){ return onFieldKey(e, this); };
+
+		elem = ge('src_amount');
+		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+		elem = ge('dest_amount');
+		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+		elem = ge('exchrate');
+		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+		elem = ge('resbal');
+		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+		elem = ge('resbal_d');
+		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+
+		setParam(firstElementChild(ge('calendar_btn')), { onclick : showCalendar });
+		setParam(ge('cal_rbtn'), { onclick : showCalendar });
+
+		setParam(firstElementChild(ge('comm_btn')), { onclick : showComment });
+
+		Transaction.set('exchrate', ge('exchrate').value);
+		if (Transaction.isExpense())
+			Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
+		else if (Transaction.isIncome())
+			Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
+		else if (Transaction.isTransfer())
+		{
+			Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
+			Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
+		}
+		else if (Transaction.isDebt())
+		{
+			var p_bal = getCurPersonBalance(Transaction.srcCurr());
+			var acc_bal;
+
+			if (Transaction.debtType())
+				Transaction.set('src_initbal', p_bal);
+			else
+				updateValue('dest_initbal', p_bal);
+
+			if (!Transaction.noAccount())
+			{
+				acc_bal = getBalanceOfAccount(ge('acc_id').value);
+
+				if (Transaction.debtType())
+					Transaction.set('dest_initbal', acc_bal);
+				else
+					updateValue('src_initbal', acc_bal);
+			}
+		}
+
+		Transaction.subscribe('src_amount', onValueChanged.bind(null, 'src_amount'));
+		Transaction.subscribe('dest_amount', onValueChanged.bind(null, 'dest_amount'));
+		Transaction.subscribe('exchrate', onValueChanged.bind(null, 'exchrate'));
+		Transaction.subscribe('src_resbal', onValueChanged.bind(null, 'src_resbal'));
+		Transaction.subscribe('dest_resbal', onValueChanged.bind(null, 'dest_resbal'));
+
+		if (Transaction.isDebt())
+		{
+			elem = firstElementChild(ge('noacc_btn'));
+			if (elem)
+				elem.onclick = toggleEnableAccount;
+			elem = firstElementChild(ge('selaccount'));
+			if (elem)
+				elem.onclick = toggleEnableAccount;
+
+			elem = ge('debtgive');
+			if (elem)
+				elem.onclick = onChangeDebtOp;
+			elem = ge('debttake');
+			if (elem)
+				elem.onclick = onChangeDebtOp;
+
+
+			persDDList = new DDList();
+			if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : isMobile }))
+			{
+				persons.forEach(function(person)
+				{
+					persId = person[0];
+					persName = person[1];
+	
+					persDDList.addItem(persId, persName);
+				});
+			}
+			else
+				persDDList = null;
+
+			if (!Transaction.noAccount())
+				initAccList();
+		}
+		else
+		{
+			srcDDList = new DDList();
+			if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
+			{
+				accounts.forEach(function(acc)
+				{
+					accId = acc[0];
+					accName = acc[4];
+
+					srcDDList.addItem(accId, accName);
+				});
+			}
+			else
+				srcDDList = null;
+
+			destDDList = new DDList();
+			if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : isMobile }))
+			{
+				accounts.forEach(function(acc)
+				{
+					accId = acc[0];
+					accName = acc[4];
+
+					destDDList.addItem(accId, accName);
+				});
+			}
+			else
+				destDDList = null;
+		}
+
+
+		if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
+		{
+			srcCurrDDList = new DDList();
+			if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
+			{
+				currency.forEach(function(curr)
+				{
+					curr_id = curr[0];
+					currName = curr[1];
+
+					srcCurrDDList.addItem(curr_id, currName);
+				});
+			}
+			else
+				srcCurrDDList = null;
+		}
+
+		if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
+		{
+			destCurrDDList = new DDList();
+			if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
+			{
+				currency.forEach(function(curr)
+				{
+					curr_id = curr[0];
+					currName = curr[1];
+
+					destCurrDDList.addItem(curr_id, currName);
+				});
+			}
+			else
+				destCurrDDList = null;
+		}
+	}
 }
