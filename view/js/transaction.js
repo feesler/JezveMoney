@@ -584,8 +584,11 @@ function onSrcCurrChanged()
 		setAmountTileBlockLabel(true, true);
 		setAmountInputLabel(false, true);
 		setAmountTileBlockLabel(false, true);
-		setCurrActive(true, true);		// set source active
-		setCurrActive(false, false);		// set destination inactive
+		if (Transaction.isIncome())
+		{
+			setCurrActive(true, true);		// set source active
+			setCurrActive(false, false);		// set destination inactive
+		}
 		exchRateSwitch(false);
 
 		setExchRate(Transaction.exchRate());
@@ -594,7 +597,8 @@ function onSrcCurrChanged()
 	{
 		setAmountInputLabel(true, false);
 		setAmountTileBlockLabel(true, false);
-		hideDestAmountAndExchange();
+		if (Transaction.isIncome())
+			hideDestAmountAndExchange();
 	}
 
 	updateCurrSigns();
@@ -631,11 +635,16 @@ function onDestCurrChanged()
 		setAmountTileBlockLabel(true, true);
 		setAmountInputLabel(false, true);
 		setAmountTileBlockLabel(false, true);
-		setCurrActive(true, false);		// set source inactive
-		if (Transaction.isTransfer())
-			setCurrActive(false, false);		// set destination inactive
+		if (Transaction.isIncome())
+			setCurrActive(true, true);		// set source active
 		else
+			setCurrActive(true, false);		// set source inactive
+
+		if (Transaction.isExpense())
 			setCurrActive(false, true);		// set destination active
+		else
+			setCurrActive(false, false);		// set destination inactive
+
 		exchRateSwitch(false);
 
 		setExchRate(Transaction.exchRate());
@@ -644,7 +653,7 @@ function onDestCurrChanged()
 	{
 		setAmountInputLabel(false, false);
 		setAmountTileBlockLabel(false, false);
-		if (!Transaction.isTransfer())
+		if (Transaction.isExpense())
 			hideSrcAmountAndExchange();
 	}
 
