@@ -1,5 +1,6 @@
 function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc, noAcc)
 {
+	var self = this;
 // Main formula
 // S2 = S1 - sa			source account
 // da = sa * e
@@ -31,7 +32,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	// Calculate result balance of source by initial balance and source amount
 	function f1()
 	{
-		if (!expense() && !transfer() && !debt())
+		if (!self.isExpense() && !self.isTransfer() && !self.isDebt())
 			return;
 
 		S2 = fS1 - fsa;
@@ -47,7 +48,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	// Calculate result balance of destination by initial balance and destination amount
 	function f1_d()
 	{
-		if (!income() && !transfer() && !debt())
+		if (!self.isIncome() && !self.isTransfer() && !self.isDebt())
 			return;
 
 		S2_d = fS1_d + fda;
@@ -128,16 +129,16 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (!s1valid && !s1dvalid)
 			return;
 
-		if (isDiffCurr())
+		if (self.isDiff())
 		{
 			if (davalid)
 			{
-				if (income() || transfer() || (debt() && !debtType))
+				if (self.isIncome() || self.isTransfer() || (self.isDebt() && !debtType))
 					f1_d();			// calculate S2_d
 			}
 			if (savalid)
 			{
-				if (expense() || transfer() || (debt() && debtType))
+				if (self.isExpense() || self.isTransfer() || (self.isDebt() && debtType))
 					f1();				// calculate S2
 			}
 
@@ -147,11 +148,11 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		else
 		{
 			f2();		// calculate da
-			if (income())
+			if (self.isIncome())
 			{
 				f1_d();			// calculate S2_d
 			}
-			else if (transfer() || debt())
+			else if (self.isTransfer() || self.isDebt())
 			{
 				f1_d();			// calculate S2_d
 				f1();				// calculate S2
@@ -168,14 +169,14 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (!s1valid && !s1dvalid)
 			return;
 
-		if (!isDiffCurr())
+		if (!self.isDiff())
 		{
 			f4();		// calculate sa
 		}
 
-		if (income() || transfer() || (debt() && debtType))
+		if (self.isIncome() || self.isTransfer() || (self.isDebt() && debtType))
 			f1_d();		// calculate S2_d
-		if (expense() || transfer() || (debt() && !debtType))
+		if (self.isExpense() || self.isTransfer() || (self.isDebt() && !debtType))
 			f1();			// calculate S2
 
 		if (savalid)
@@ -235,7 +236,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (!s1valid && !s1dvalid)
 			return;
 
-		if (debt())
+		if (self.isDebt())
 		{
 			if (debtType)
 			{
@@ -266,13 +267,13 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (!s1dvalid)
 			return;
 	
-		if (transfer() || income())
+		if (self.isTransfer() || self.isIncome())
 		{
 			f3_d();		// calculate sa
 			f2();			// calculate da
 			f1();			// calculate S2
 		}
-		else if (debt())
+		else if (self.isDebt())
 		{
 			if (debtType)
 			{
@@ -321,7 +322,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 	function onSrcCurrUpdate(value)
 	{
-		if (!isDiffCurr())
+		if (!self.isDiff())
 		{
 			fe = e = 1;
 			evalid = true;
@@ -338,7 +339,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 	function onDestCurrUpdate(value)
 	{
-		if (!isDiffCurr())
+		if (!self.isDiff())
 		{
 			fe = e = 1;
 			evalid = true;
@@ -538,78 +539,115 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	}
 
 
-	function isDiffCurr()
-	{
-		return (src_curr != dest_curr);
-	}
+	// Public methods
 
-
-	function expense()
+	this.isExpense = function()
 	{
 		return (type == 1);
 	}
 
 
-	function income()
+	this.isIncome = function()
 	{
 		return (type == 2);
 	}
 
 
-	function transfer()
+	this.isTransfer = function()
 	{
 		return (type == 3);
 	}
 
 
-	function debt()
+	this.isDebt = function()
 	{
 		return (type == 4);
 	}
 
-	return {
-		isExpense : function(){ return expense(); },
-		isIncome : function(){ return income(); },
-		isTransfer : function(){ return transfer(); },
-		isDebt : function(){ return debt(); },
 
-		srcAcc : function(){ return src_id; },
-		destAcc : function(){ return dest_id; },
-		srcCurr : function(){ return src_curr; },
-		destCurr : function(){ return dest_curr; },
-		exchRate : function(){ return fe; },
-
-		resBal : function(){ return fS2; },
-		resBalDest : function(){ return fS2_d; },
-
-		debtType : function(){ return debtType; },
-		noAccount : function(){ return noAccount; },
-		lastAcc_id : function(){ return lastAcc_id; },
-
-		// Check source and destination currencies is different
-		isDiff : function()
-		{
-			return isDiffCurr();
-		},
+	this.srcAcc = function()
+	{
+		return src_id;
+	}
 
 
-		subscribe : function(item, callback)
-		{
-			changedCallback[item] = callback;
-		},
+	this.destAcc = function()
+	{
+		return dest_id;
+	}
 
 
-		// Set value without update notification
-		set : function(item, value)
-		{
-			setValue(item, value);
-		},
+	this.srcCurr = function()
+	{
+		return src_curr;
+	}
 
 
-		// Set value with update notification
-		update : function(item, value)
-		{
-			updateValue(item, value);
-		},
-	};
+	this.destCurr = function()
+	{
+		return dest_curr;
+	}
+
+
+	this.exchRate = function()
+	{
+		return fe;
+	}
+
+
+	this.resBal = function()
+	{
+		return fS2;
+	}
+
+
+	this.resBalDest = function()
+	{
+		return fS2_d;
+	}
+
+
+	this.debtType = function()
+	{
+		return debtType;
+	}
+
+
+	this.noAccount = function()
+	{
+		return noAccount;
+	}
+
+
+	this.lastAcc_id = function()
+	{
+		return lastAcc_id;
+	}
+
+
+	// Check source and destination currencies is different
+	this.isDiff = function()
+	{
+			return (src_curr != dest_curr);
+	}
+
+
+	this.subscribe = function(item, callback)
+	{
+		changedCallback[item] = callback;
+	},
+
+
+	// Set value without update notification
+	this.set = function(item, value)
+	{
+		setValue(item, value);
+	},
+
+
+	// Set value with update notification
+	this.update = function(item, value)
+	{
+		updateValue(item, value);
+	}
 }
