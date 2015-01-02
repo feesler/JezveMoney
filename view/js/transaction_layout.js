@@ -700,62 +700,40 @@ function setExchRate(val)
 // Set result balance of source value at View
 function setSrcResultBalance(val, valid)
 {
-	var resbal, resbal_d, resbal_b, resbal_d_b;
+	var resbal, resbal_b, fmtBal;
 
 	if (val === undefined && valid === undefined)
 		return;
 
 	resbal = ge('resbal');
-	resbal_d = ge('resbal_d');
-	resbal_b = ge('resbal_b');
-	resbal_d_b = ge('resbal_d_b');
+	resbal_b = firstElementChild(ge('resbal_b'));
 
-/*
-	if (Transaction.isDebt())
-	{
-		if (debtType)		// person give to us
-			resbal.value = val;
-		else				// person take from us
-			resbal_d.value = val;
-	}
-	else
-*/
+	if (resbal)
 		resbal.value = val;
 
-	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
-
-	firstElementChild(resbal_b).innerHTML = fmtBal;
+	fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
+	if (resbal_b)
+		resbal_b.innerHTML = fmtBal;
 }
 
 
 // Set result balance of destination value at View
 function setDestResultBalance(val, valid)
 {
-	var resbal, resbal_d, resbal_d_b;
+	var resbal_d, resbal_d_b, fmtBal;
 
-	if (val === undefined && valid === undefined)
+	if ((val === undefined && valid === undefined) || Transaction.isExpense())
 		return;
 
-	resbal = ge('resbal');
 	resbal_d = ge('resbal_d');
-	resbal_d_b = ge('resbal_d_b');
+	resbal_d_b = firstElementChild(ge('resbal_d_b'));
 
-/*
-	if (Transaction.isDebt())
-	{
-		if (debtType)		// person give to us
-			resbal_d.value = val;
-		else				// person take from us
-			resbal.value = val;
-	}
-	else if (Transaction.isIncome())
-*/
+	if (resbal_d)
 		resbal_d.value = val;
 
-	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.destCurr());
-
-	if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
-		firstElementChild(resbal_d_b).innerHTML = fmtBal;
+	fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.destCurr());
+	if (resbal_d_b)
+		resbal_d_b.innerHTML = fmtBal;
 }
 
 

@@ -15,20 +15,10 @@
 
 	};
 <?php	}	?>
-/*
-	var trans_type = <?=$tr["type"]?>;
-	var srcCurr = <?=$tr["src_curr"]?>;
-	var destCurr = <?=$tr["dest_curr"]?>;
-*/
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
 	var canceled = false;
 <?php	if ($trans_type == DEBT) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
-/*
-	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
-	var lastAcc_id = <?=$acc_id?>;
-	var noAccount = <?=($noAccount ? "true" : "false")?>;
-*/
 <?php	}	?>
 
 <?php	if ($trans_type == DEBT) {		?>
