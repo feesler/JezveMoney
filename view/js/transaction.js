@@ -223,6 +223,7 @@ function updateExchAndRes()
 // Change account event handler
 function onChangeAcc()
 {
+/*
 	var srcid, destid, accid, src_amount, src_curr, dest_curr, exchange, exchrate, exchrate_b, dest_amount;
 	var resbal, resbal_d, resbal_b, resbal_d_b;
 	var sync = false, target_id, new_acc_id;
@@ -340,6 +341,44 @@ function onChangeAcc()
 	}
 
 	setTileAccount(isIncome() ? 'dest_tile' : (isDebt() ? 'acc_tile' : 'source_tile'), new_acc_id);
+*/
+	var acc, acc_id, tile_id;
+
+	if (Transaction.isExpense())
+	{
+		acc = ge('src_id');
+		tile_id = 'source_tile';
+	}
+	else if (Transaction.isIncome())
+	{
+		acc = ge('dest_id');
+		tile_id = 'dest_tile';
+	}
+	else if (Transaction.isDebt())
+	{
+		acc = ge('acc_id');
+		tile_id = 'acc_tile';
+	}
+
+	acc_id = parseInt(acc.value);
+
+	if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
+	{
+		Transaction.update('src_id', acc_id);
+		onSrcCurrChanged();
+	}
+	else if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
+	{
+		Transaction.update('dest_id', acc_id);
+		onDestCurrChanged();
+	}
+
+	if (Transaction.isDebt())
+	{
+		updatePersonTile();
+	}
+
+	setTileAccount(tile_id, acc_id);
 }
 
 
