@@ -27,9 +27,11 @@
 	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
 <?php	}		?>
 
+	var ViewModel = new TransactionViewModel();
+
 	if (edit_mode)
 		onReady(calcelTransaction);
-	onReady(initControls);
+	onReady(ViewModel.initControls.bind(ViewModel));
 </script>
 </head>
 <body>
