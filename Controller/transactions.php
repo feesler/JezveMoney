@@ -333,14 +333,6 @@ class TransactionsController extends Controller
 		}
 
 		$formAction = BASEURL."transactions/".$action."/?type=".$type_str;
-		if ($trans_type == DEBT)
-		{
-			$onFormSubmit = "return onDebtSubmit(this);";
-		}
-		else
-		{
-			$onFormSubmit = "return ".(($trans_type == TRANSFER) ? "onTransferSubmit" : "onSubmit")."(this);";
-		}
 
 		if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)
 		{
@@ -518,14 +510,6 @@ class TransactionsController extends Controller
 		}
 
 		$formAction = BASEURL."transactions/".$action."/";
-		if ($trans_type == DEBT)
-		{
-			$onFormSubmit = "return onDebtSubmit(this);";
-		}
-		else
-		{
-			$onFormSubmit = "return onSubmit(this);";
-		}
 
 		if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)
 		{

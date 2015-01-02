@@ -1120,6 +1120,21 @@ function TransactionViewModel()
 
 		self.isMobile = (document.documentElement.clientWidth < 700);
 
+		// Init form submit event handler
+		elem = ge('mainfrm');
+		if (elem)
+		{
+			elem.onsubmit = function(e)
+			{
+				if (Transaction.isDebt())
+					return onDebtSubmit(this);
+				else if (Transaction.isTransfer() && !edit_mode)
+					return onTransferSubmit(this);
+				else
+					return onSubmit(this);
+			}
+		}
+
 		if (edit_mode)
 		{
 			elem = firstElementChild(ge('del_btn'))

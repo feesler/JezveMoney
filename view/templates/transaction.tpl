@@ -48,7 +48,7 @@
 <?php	}	?>
 					</div>
 					<div>
-						<form method="post" action="<?=$formAction?>" onsubmit="<?=$onFormSubmit?>">
+						<form id="mainfrm" method="post" action="<?=$formAction?>">
 <?php	if ($action == "edit") {	?>
 						<input name="transid" type="hidden" value="<?=$tr["id"]?>">
 						<input name="transtype" type="hidden" value="<?=$tr["type"]?>">
