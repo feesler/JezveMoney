@@ -591,7 +591,7 @@ function TransactionViewModel()
 		var srcid, destid, src_amount, dest_amount, trdate;
 		var submitbtn;
 
-		if (submitStarted)
+		if (self.submitStarted)
 			return false;
 
 		srcid = ge('src_id');
@@ -603,7 +603,7 @@ function TransactionViewModel()
 		if (!frm || (!srcid && !destid) || !src_amount || !dest_amount || !trdate || !submitbtn)
 			return false;
 
-		if (isExpense())
+		if (Transaction.isExpense())
 		{
 			if (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value)))
 			{
@@ -611,7 +611,7 @@ function TransactionViewModel()
 				return false;
 			}
 		}
-		else if (isIncome())
+		else if (Transaction.isIncome())
 		{
 			if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
 			{
@@ -629,7 +629,7 @@ function TransactionViewModel()
 			return false;
 		}
 
-		submitStarted = true;
+		self.submitStarted = true;
 		enable(submitbtn, false);
 
 		return true;
@@ -648,11 +648,11 @@ function TransactionViewModel()
 	{
 		var delform;
 
-		if (!dwPopup)
+		if (!self.dwPopup)
 			return;
 
-		dwPopup.close();
-		dwPopup = null;
+		self.dwPopup.close();
+		self.dwPopup = null;
 
 		if (res)
 		{
@@ -667,25 +667,25 @@ function TransactionViewModel()
 	function showDeletePopup()
 	{
 		// check popup already created
-		if (dwPopup)
+		if (self.dwPopup)
 			return;
 
-		dwPopup = new Popup();
-		if (!dwPopup)
+		self.dwPopup = new Popup();
+		if (!self.dwPopup)
 			return;
 
-		if (!dwPopup.create({ id : 'delete_warning',
+		if (!self.dwPopup.create({ id : 'delete_warning',
 							title : singleTransDeleteTitle,
 							msg : singleTransDeleteMsg,
 							btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 							cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 							}))
 		{
-			dwPopup = null;
+			self.dwPopup = null;
 			return;
 		}
 
-		dwPopup.show();
+		self.dwPopup.show();
 	}
 
 
@@ -738,7 +738,7 @@ function TransactionViewModel()
 		var src_amount, dest_amount, exchrate, trdate;
 		var submitbtn;
 
-		if (submitStarted)
+		if (self.submitStarted)
 			return false;
 
 		src_amount = ge('src_amount');
@@ -755,7 +755,7 @@ function TransactionViewModel()
 			return false;
 		}
 
-		if (isDiffCurr() && (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value))))
+		if (Transaction.isDiff() && (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value))))
 		{
 			alert('Please input correct destination amount.');
 			return false;
@@ -769,9 +769,8 @@ function TransactionViewModel()
 
 		src_amount.value = fixFloat(src_amount.value);
 		dest_amount.value = fixFloat(dest_amount.value);
-		exchrate.value = fixFloat(exchrate.value);
 
-		submitStarted = true;
+		self.submitStarted = true;
 		enable(submitbtn, false);
 
 		return true;
@@ -1038,7 +1037,7 @@ function TransactionViewModel()
 		var accid, src_amount, dest_amount, trdate;
 		var submitbtn;
 
-		if (submitStarted)
+		if (self.submitStarted)
 			return false;
 
 		submitbtn = ge('submitbtn');
@@ -1052,7 +1051,7 @@ function TransactionViewModel()
 		if (!frm || !accid || !src_amount || !dest_amount || !trdate)
 			return false;
 
-		if (noAccount)
+		if (Transaction.noAccount())
 			accid.value = 0;
 
 		if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
@@ -1082,7 +1081,7 @@ function TransactionViewModel()
 			return false;
 		}
 
-		submitStarted = true;
+		self.submitStarted = true;
 		enable(submitbtn, false);
 
 		return true;
