@@ -1,4 +1,4 @@
-function TransactionModel(trans_type, srcCurr, destCurr)
+function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc, noAcc)
 {
 // Main formula
 // S2 = S1 - sa			source account
@@ -21,6 +21,9 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	var dest_curr = destCurr;
 
 	var src_id, dest_id;
+
+	var person_id = person;
+	var debtType = dType, lastAcc_id = lastAcc, noAccount = noAcc;
 
 	var changedCallback = [];
 
@@ -350,6 +353,66 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 	}
 
 
+	function onPersonUpdate(value)
+	{
+		var balance = getCurPersonBalance((debtType) ? src_curr : dest_curr);
+
+		if (debtType)
+			updateValue('src_initbal', balance);
+		else
+			updateValue('dest_initbal', balance);
+	}
+
+
+	function onNoAccUpdate(value)
+	{
+	}
+
+
+	function onDebtTypeUpdate(value)
+	{
+		var tmp;
+
+		// Swap source and destination
+		tmp = src_id, src_id = dest_id, dest_id = tmp;
+
+		tmp = fS1;
+		setValue('src_initbal', fS1_d);
+		setValue('dest_initbal', tmp);
+
+		tmp = fS2;
+		setValue('src_resbal', fS2_d);
+		setValue('dest_resbal', tmp);
+
+		if (savalid)
+		{
+			f2();				// calculate da
+			f1_d();			// calculate S2_d
+		}
+		else
+		{
+			setValue('src_resbal', fS1);
+			notifyChanged('src_resbal', fS1);
+		}
+
+		if (davalid)
+		{
+			f4();				// calculate sa
+			f1();				// calculate S2
+		}
+		else
+		{
+			setValue('dest_resbal', fS1_d);
+			notifyChanged('dest_resbal', fS1_d);
+		}
+	}
+
+
+	function onLastAccUpdate(value)
+	{
+	}
+
+
 	function notifyChanged(item, value)
 	{
 		var callback = changedCallback[item];
@@ -419,6 +482,22 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 		{
 			dest_curr = parseInt(value);
 		}
+		else if (item == 'person_id')
+		{
+			person_id = parseInt(value);
+		}
+		else if (item == 'debt_type')
+		{
+			debtType = !!value;
+		}
+		else if (item == 'no_account')
+		{
+			noAccount = !!value;
+		}
+		else if (item == 'last_acc')
+		{
+			lastAcc_id = parseInt(value);
+		}
 	}
 
 
@@ -448,6 +527,14 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 			onSrcCurrUpdate(value);
 		else if (item == 'dest_curr')
 			onDestCurrUpdate(value);
+		else if (item == 'person_id')
+			onPersonUpdate(value);
+		else if (item == 'no_account')
+			onNoAccUpdate(value);
+		else if (item == 'debt_type')
+			onDebtTypeUpdate(value);
+		else if (item == 'last_acc')
+			onLastAccUpdate(value);
 	}
 
 
@@ -491,6 +578,13 @@ function TransactionModel(trans_type, srcCurr, destCurr)
 		srcCurr : function(){ return src_curr; },
 		destCurr : function(){ return dest_curr; },
 		exchRate : function(){ return fe; },
+
+		resBal : function(){ return fS2; },
+		resBalDest : function(){ return fS2_d; },
+
+		debtType : function(){ return debtType; },
+		noAccount : function(){ return noAccount; },
+		lastAcc_id : function(){ return lastAcc_id; },
 
 		// Check source and destination currencies is different
 		isDiff : function()

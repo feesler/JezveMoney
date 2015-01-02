@@ -24,12 +24,18 @@
 	var canceled = false;
 <?php	if ($trans_type == DEBT) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
+/*
 	var debtType = <?=($give ? "true" : "false")?>;		// true - give, false - take
 	var lastAcc_id = <?=$acc_id?>;
 	var noAccount = <?=($noAccount ? "true" : "false")?>;
+*/
 <?php	}	?>
 
+<?php	if ($trans_type == DEBT) {		?>
+	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>, <?=$person_id?>, <?=($give ? "true" : "false")?>, <?=$acc_id?>, <?=($noAccount ? "true" : "false")?>);
+<?php	} else {		?>
 	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
+<?php	}		?>
 
 	if (edit_mode)
 		onReady(calcelTransaction);

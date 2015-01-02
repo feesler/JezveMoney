@@ -371,6 +371,23 @@ function initControls()
 	}
 	else if (Transaction.isDebt())
 	{
+		var p_bal = getCurPersonBalance(Transaction.srcCurr());
+		var acc_bal;
+
+		if (Transaction.debtType())
+			Transaction.set('src_initbal', p_bal);
+		else
+			updateValue('dest_initbal', p_bal);
+
+		if (!Transaction.noAccount())
+		{
+			acc_bal = getBalanceOfAccount(ge('acc_id').value);
+
+			if (Transaction.debtType())
+				Transaction.set('dest_initbal', acc_bal);
+			else
+				updateValue('src_initbal', acc_bal);
+		}
 	}
 
 	Transaction.subscribe('src_amount', onValueChanged.bind(null, 'src_amount'));
@@ -410,7 +427,7 @@ function initControls()
 		else
 			persDDList = null;
 
-		if (!noAccount)
+		if (!Transaction.noAccount())
 			initAccList();
 	}
 	else
@@ -445,7 +462,7 @@ function initControls()
 	}
 
 
-	if (Transaction.isIncome() || (Transaction.isDebt() && !debtType))
+	if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
 	{
 		srcCurrDDList = new DDList();
 		if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
@@ -462,7 +479,7 @@ function initControls()
 			srcCurrDDList = null;
 	}
 
-	if (Transaction.isExpense() || (Transaction.isDebt() && debtType))
+	if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
 	{
 		destCurrDDList = new DDList();
 		if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
@@ -484,7 +501,7 @@ function initControls()
 // Account disable button click event handler
 function toggleEnableAccount()
 {
-	var acclbl, source, dest_amount_left, acc_id, src_curr;
+	var acclbl, source, dest_amount_left, acc_id, src_curr, curr;
 
 	acclbl = ge('acclbl');
 	source = ge('source');
@@ -493,41 +510,45 @@ function toggleEnableAccount()
 	if (!acclbl || !source || !acc_id || !src_curr)
 		return;
 
-	if (noAccount)
+	if (Transaction.noAccount())
 	{
-		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+		acclbl.innerHTML = (Transaction.debtType()) ? 'Destination account' : 'Source account';
 	}
 	else
 	{
 		acclbl.innerHTML = 'No account';
 	}
 
-	show('noacc_btn', noAccount);
-	show(nextElementSibling(firstElementChild(source)), noAccount);
-	show(nextElementSibling(nextElementSibling(firstElementChild(source))), noAccount);
-	show('selaccount', !noAccount);
+	show('noacc_btn', Transaction.noAccount());
+	show(nextElementSibling(firstElementChild(source)), Transaction.noAccount());
+	show(nextElementSibling(nextElementSibling(firstElementChild(source))), Transaction.noAccount());
+	show('selaccount', !Transaction.noAccount());
 
 	srcAmountSwitch(true);
 	resBalanceSwitch(false);
 	resBalanceDestSwitch(false);
 
-	noAccount = !noAccount;
+	Transaction.update('no_account', !Transaction.noAccount());
 
-	if (noAccount)
+	if (Transaction.noAccount())
 	{
-		lastAcc_id = parseInt(acc_id.value);
+		Transaction.update('last_acc', parseInt(acc_id.value));
 		acc_id.value = 0;
-		srcCurr = destCurr = parseInt(src_curr.value);
+
+		curr = parseInt(src_curr.value);
 	}
 	else
 	{
-		acc_id.value = lastAcc_id;
-		srcCurr = destCurr = getCurrencyOfAccount(lastAcc_id);
+		acc_id.value = Transaction.lastAcc_id();
+
+		curr = getCurrencyOfAccount(Transaction.lastAcc_id());
 	}
+	Transaction.update('src_curr', curr);
+	Transaction.update('dest_curr', curr);
 
 	onChangeAcc();
 
-	if (!noAccount && !accDDList)
+	if (!Transaction.noAccount() && !accDDList)
 	{
 		initAccList();
 	}
@@ -679,7 +700,7 @@ function setExchRate(val)
 // Set result balance of source value at View
 function setSrcResultBalance(val, valid)
 {
-	var resbal, resbal_d, resbal_b;
+	var resbal, resbal_d, resbal_b, resbal_d_b;
 
 	if (val === undefined && valid === undefined)
 		return;
@@ -687,7 +708,9 @@ function setSrcResultBalance(val, valid)
 	resbal = ge('resbal');
 	resbal_d = ge('resbal_d');
 	resbal_b = ge('resbal_b');
+	resbal_d_b = ge('resbal_d_b');
 
+/*
 	if (Transaction.isDebt())
 	{
 		if (debtType)		// person give to us
@@ -696,6 +719,7 @@ function setSrcResultBalance(val, valid)
 			resbal_d.value = val;
 	}
 	else
+*/
 		resbal.value = val;
 
 	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
@@ -716,6 +740,7 @@ function setDestResultBalance(val, valid)
 	resbal_d = ge('resbal_d');
 	resbal_d_b = ge('resbal_d_b');
 
+/*
 	if (Transaction.isDebt())
 	{
 		if (debtType)		// person give to us
@@ -724,6 +749,7 @@ function setDestResultBalance(val, valid)
 			resbal.value = val;
 	}
 	else if (Transaction.isIncome())
+*/
 		resbal_d.value = val;
 
 	var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.destCurr());
@@ -749,7 +775,7 @@ function updatePersonTile()
 		return;
 
 	personname = getPersonName(person_id.value);
-	curr = debtType ? Transaction.srcCurr() : Transaction.destCurr();
+	curr = Transaction.debtType() ? Transaction.srcCurr() : Transaction.destCurr();
 
 	pbalance = getCurPersonBalance(curr);
 	setTileInfo(person_tile, personname, formatCurrency(pbalance, curr));

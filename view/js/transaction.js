@@ -665,7 +665,7 @@ function onDestCurrChanged()
 // Debt operation type change event handler
 function onChangeDebtOp()
 {
-	var acclbl, debtgive, debttake;
+	var acclbl, debtgive, debttake, dType;
 	var src_res_balance_left, dest_res_balance_left, dest_amount_left, exch_left;
 
 	acclbl = ge('acclbl');
@@ -678,16 +678,17 @@ function onChangeDebtOp()
 	if (!acclbl || !debtgive || !debttake || !dest_res_balance_left || !src_res_balance_left)
 		return;
 
-	debtType = debtgive.checked;
+	dType = debtgive.checked;
 
-	if (!noAccount)
+	insertAfter(src_res_balance_left, (dType) ? exch_left : dest_amount_left);
+	insertAfter(dest_res_balance_left, (dType) ? dest_amount_left : exch_left);
+
+	Transaction.update('debt_type', dType);
+
+	if (!Transaction.noAccount())
 	{
-		acclbl.innerHTML = (debtType) ? 'Destination account' : 'Source account';
+		acclbl.innerHTML = (dType) ? 'Destination account' : 'Source account';
 	}
-	insertAfter(src_res_balance_left, (debtType) ? exch_left : dest_amount_left);
-	insertAfter(dest_res_balance_left, (debtType) ? dest_amount_left : exch_left);
-
-	updateExchAndRes();
 }
 
 
@@ -768,9 +769,15 @@ function getCurPersonBalance(curr_id)
 
 
 // Person select event handler
-function onPersonSel(obj)
+function onPersonSel()
 {
-	updControls();
+	var personid = ge('person_id');
+	if (!personid)
+		return;
+
+	Transaction.update('person_id', personid.value);
+
+	updatePersonTile();
 }
 
 
