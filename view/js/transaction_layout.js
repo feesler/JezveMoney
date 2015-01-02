@@ -4,7 +4,7 @@ function TransactionViewModel()
 
 	var calendarObj = null;
 	var isMobile;
-	var persDDList = null, accDDList = null;
+	var accDDList = null;
 
 
 	// Create calendar for select date of transaction
@@ -41,16 +41,16 @@ function TransactionViewModel()
 	// Show calendar block
 	function showCalendar()
 	{
-		if (!calendarObj)
+		if (!self.calendarObj)
 		{
-			calendarObj = ge('calendar');
-			if (!calendarObj)
+			self.calendarObj = ge('calendar');
+			if (!self.calendarObj)
 				return;
 
-			calendarObj.appendChild(buildCalendar());
+			self.calendarObj.appendChild(buildCalendar());
 		}
 
-		show(calendarObj, !isVisible(calendarObj));
+		show(self.calendarObj, !isVisible(self.calendarObj));
 		show('calendar_btn', false);
 		show('date_block', true);
 
@@ -350,7 +350,7 @@ function TransactionViewModel()
 
 		onChangeAcc();
 
-		if (!Transaction.noAccount() && !accDDList)
+		if (!Transaction.noAccount() && !self.accDDList)
 		{
 			initAccList();
 		}
@@ -575,22 +575,22 @@ function TransactionViewModel()
 	// Initialization of DDList control for account tile
 	function initAccList()
 	{
-		if (accDDList)
+		if (self.accDDList)
 			return;
 
-		accDDList = new DDList();
-		if (accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : isMobile }))
+		self.accDDList = new DDList();
+		if (self.accDDList.create({ input_id : 'acc_tile', itemPrefix : 'acc', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : self.isMobile }))
 		{
 			accounts.forEach(function(acc)
 			{
 				accId = acc[0];
 				accName = acc[4];
 
-				accDDList.addItem(accId, accName);
+				self.accDDList.addItem(accId, accName);
 			});
 		}
 		else
-			accDDList = null;
+			self.accDDList = null;
 	}
 
 
@@ -601,7 +601,7 @@ function TransactionViewModel()
 	{
 		var elem, srcDDList, destDDList, srcCurrDDList, destCurrDDList;
 
-		isMobile = (document.documentElement.clientWidth < 700);
+		self.isMobile = (document.documentElement.clientWidth < 700);
 
 		if (edit_mode)
 		{
@@ -674,6 +674,8 @@ function TransactionViewModel()
 
 		if (Transaction.isDebt())
 		{
+			var persDDList;
+
 			elem = firstElementChild(ge('noacc_btn'));
 			if (elem)
 				elem.onclick = toggleEnableAccount;
@@ -688,9 +690,8 @@ function TransactionViewModel()
 			if (elem)
 				elem.onclick = onChangeDebtOp;
 
-
 			persDDList = new DDList();
-			if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : isMobile }))
+			if (persDDList.create({ input_id : 'person_tile', itemPrefix : 'pers', listAttach : true, selCB : onPersAccSel, editable : false, mobile : self.isMobile }))
 			{
 				persons.forEach(function(person)
 				{
@@ -709,7 +710,7 @@ function TransactionViewModel()
 		else
 		{
 			srcDDList = new DDList();
-			if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : isMobile }))
+			if (srcDDList.create({ input_id : 'source_tile', itemPrefix : 'src', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : self.isMobile }))
 			{
 				accounts.forEach(function(acc)
 				{
@@ -723,7 +724,7 @@ function TransactionViewModel()
 				srcDDList = null;
 
 			destDDList = new DDList();
-			if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : isMobile }))
+			if (destDDList.create({ input_id : 'dest_tile', itemPrefix : 'dest', listAttach : true, selCB : onDestAccSel, editable : false, mobile : self.isMobile }))
 			{
 				accounts.forEach(function(acc)
 				{
@@ -741,7 +742,7 @@ function TransactionViewModel()
 		if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
 		{
 			srcCurrDDList = new DDList();
-			if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : isMobile }))
+			if (srcCurrDDList.create({ input_id : 'srcamountsign', itemPrefix : 'srccurr', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : self.isMobile }))
 			{
 				currency.forEach(function(curr)
 				{
@@ -758,7 +759,7 @@ function TransactionViewModel()
 		if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
 		{
 			destCurrDDList = new DDList();
-			if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : isMobile }))
+			if (destCurrDDList.create({ input_id : 'destamountsign', itemPrefix : 'destcurr', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : self.isMobile }))
 			{
 				currency.forEach(function(curr)
 				{
