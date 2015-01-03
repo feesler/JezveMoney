@@ -15,7 +15,7 @@ function correctExch(val)
 
 
 // Localy cancel actions of current transaction
-function calcelTransaction()
+function cancelTransaction()
 {
 	var srcAcc, destAcc;
 

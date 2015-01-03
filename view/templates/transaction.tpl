@@ -30,7 +30,7 @@
 	var ViewModel = new TransactionViewModel();
 
 	if (edit_mode)
-		onReady(calcelTransaction);
+		onReady(cancelTransaction);
 	onReady(ViewModel.initControls.bind(ViewModel));
 </script>
 </head>
