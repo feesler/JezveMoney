@@ -16,7 +16,6 @@
 	};
 <?php	}	?>
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
-	var canceled = false;
 <?php	if ($trans_type == DEBT) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
 <?php	}	?>
@@ -29,8 +28,7 @@
 
 	var ViewModel = new TransactionViewModel();
 
-	if (edit_mode)
-		onReady(cancelTransaction);
+	onReady(Transaction.initModel.bind(Transaction));
 	onReady(ViewModel.initControls.bind(ViewModel));
 </script>
 </head>

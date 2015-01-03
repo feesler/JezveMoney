@@ -26,6 +26,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	var person_id = person;
 	var debtType = dType, lastAcc_id = lastAcc, noAccount = noAcc;
 
+	var canceled = false;
+
 	var changedCallback = [];
 
 
@@ -539,7 +541,85 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	}
 
 
+	// Localy cancel actions of current transaction
+	function cancelTransaction()
+	{
+		var srcAcc, destAcc;
+
+		if (!edit_mode || self.canceled || !edit_transaction)
+			return;
+
+		srcAcc = getAccount(edit_transaction.srcAcc);
+		destAcc = getAccount(edit_transaction.destAcc);
+
+		if (edit_transaction.type == 1)		// Expense
+		{
+			if (!srcAcc)
+				throw new Error('Invalid transaction: Account not found');
+			if (srcAcc[1] != edit_transaction.srcCurr)
+				throw new Error('Invalid transaction');
+
+			srcAcc[3] += edit_transaction.srcAmount;
+		}
+		else if (edit_transaction.type == 2)		// Income
+		{
+			if (!destAcc || destAcc[1] != edit_transaction.destCurr)
+				throw new Error('Invalid transaction');
+
+			destAcc[3] -= edit_transaction.destAmount;
+		}
+		else if (edit_transaction.type == 3)		// Transfer
+		{
+			if (!srcAcc || !destAcc || srcAcc[1] != edit_transaction.srcCurr || destAcc[1] != edit_transaction.destCurr)
+				throw new Error('Invalid transaction');
+
+			srcAcc[3] += edit_transaction.srcAmount;
+			destAcc[3] -= edit_transaction.destAmount;
+		}
+		else if (edit_transaction.type == 4)		// Debt
+		{
+			if (debtType)		// person give
+			{
+				if (srcAcc)
+					throw new Error('Invalid transaction');
+
+				srcAcc = getPersonAccount(edit_transaction.srcAcc);
+				if (!srcAcc)
+					throw new Error('Invalid transaction');
+
+				srcAcc[2] += edit_transaction.srcAmount;
+				if (destAcc)
+					destAcc[3] -= edit_transaction.destAmount;
+			}
+			else				// person take
+			{
+				if (destAcc)		// we should not find acount
+					throw new Error('Invalid transaction');
+
+				destAcc = getPersonAccount(edit_transaction.destAcc);
+				if (!destAcc)
+					throw new Error('Invalid transaction');
+
+				if (srcAcc)
+					srcAcc[3] += edit_transaction.srcAmount;
+				destAcc[2] -= edit_transaction.destAmount;
+			}
+		}
+
+
+		canceled = true;
+	}
+
+
 	// Public methods
+
+	// Model initialization
+	this.initModel = function()
+	{
+		if (edit_mode)
+			cancelTransaction();
+	}
+
 
 	this.isExpense = function()
 	{
