@@ -40,6 +40,9 @@ function setParam(obj, params)
 		val = params[par];
 		if (typeof val === 'object')
 		{
+			if (obj[par] == null || obj[par] === undefined)
+				obj[par] = {};
+
 			setParam(obj[par], val);
 		}
 		else

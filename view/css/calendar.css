@@ -104,27 +104,28 @@
 .calTbl > tbody > tr > td
 {
 	margin: 0;
-	padding: 0px;
+	padding: 0;
 	border: 0px none;
 	text-align: center;
 	width: 34px;
-	height: 23px;
+	height: 22px;
 	color: #000000;
 }
 
 
 .calTbl > tbody > tr > td > button
 {
-	margin: 0px 3px;
-	padding: 0;
-	border: 0px none;
+	margin: 0;
+	padding: 3px 9px;
 	width: 34px;
-	height: 23px;
+	height: 22px;
+	line-height: 16px;
 	background-color: #FFFFFF;
 	color: #000000;
 	text-align: right;
 	border: 1px solid #FFFFFF;
-	font-weight: bold;
+	font-size: 12px;
+	font-weight: normal;
 	cursor: pointer;
 }
 
@@ -135,8 +136,7 @@
 }
 
 
-.calTbl > tbody > tr > td > button:focus,
-.calTbl > tbody > tr > td > button:active
+.calTbl > tbody > tr > td.act > button
 {
 	border: 1px solid #20D0FF;
 }
@@ -145,6 +145,15 @@
 .calTbl > tbody > tr > td.today > button
 {
 	border: 1px dashed #20D0FF;
+}
+
+
+.calTbl > tbody > tr > td.hl > button,
+.calTbl > tbody > tr > td.hl.omonth > button
+{
+	background-color: #80D0FF;
+	border: 1px solid #80D0FF;
+	color: #FFFFFF;
 }
 
 
