@@ -11,24 +11,8 @@ function TransactionViewModel()
 	var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 
 
-	// Create calendar for select date of transaction
-	function buildCalendar()
-	{
-		var today = new Date();
-
-		return createCalendar(today.getDate(), today.getMonth(), today.getFullYear(), onSelectDate);
-	}
-
-
-	// Hide calendar block
-	function hideCalendar()
-	{
-		show('calendar', false);
-	}
-
-
 	// Date select callback
-	function onSelectDate(date, month, year)
+	function onSelectDate(date)
 	{
 		var datefield;
 
@@ -36,9 +20,9 @@ function TransactionViewModel()
 		if (!datefield)
 			return;
 
-		datefield.value = formatDate(date, month, year);
+		datefield.value = Calendar.format(date);
 
-		hideCalendar();
+		self.calendarObj.hide();
 	}
 
 
@@ -47,18 +31,17 @@ function TransactionViewModel()
 	{
 		if (!self.calendarObj)
 		{
-			self.calendarObj = ge('calendar');
+			self.calendarObj = Calendar.create({ wrapper_id : 'calendar', ondateselect : onSelectDate });
 			if (!self.calendarObj)
 				return;
-
-			self.calendarObj.appendChild(buildCalendar());
 		}
 
-		show(self.calendarObj, !isVisible(self.calendarObj));
+		self.calendarObj.show(!self.calendarObj.visible());
+
 		show('calendar_btn', false);
 		show('date_block', true);
 
-		setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
+		setEmptyClick(self.calendarObj.hide.bind(self.calendarObj), ['calendar', 'calendar_btn', 'cal_rbtn']);
 	}
 
 
