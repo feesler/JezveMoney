@@ -1,5 +1,5 @@
 var calendarObj = null;
-var startDate = null, endDate = null;
+var selRange = null;
 var baseURL = 'http://jezve.net/money/';
 
 
@@ -389,72 +389,38 @@ function onBarClick(val)
 }
 
 
-// TODO : check duplication with tr_list.js
-// Create calendar object
-function buildCalendar(callback)
-{
-	var today = new Date();
-
-	return createCalendar(today.getDate(), today.getMonth(), today.getFullYear(), callback);
-}
-
-
-// Hide calendar block
-function hideCalendar()
-{
-	show('calendar', false);
-}
-
-
-// Start date select callback
-function onSelectStartDate(date, month, year)
+// Date range select calback
+function onRangeSelect(range)
 {
 	var datefield;
+
+	if (!range || !isDate(range.start) || !isDate(range.end))
+		return;
 
 	datefield = ge('date');
 	if (!datefield)
 		return;
 
-	startDate = new Date(year, month, date);
+	selRange = range;
 
-	if (startDate && endDate)
-	{
-		hideCalendar();
-		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
-
-		newLocation = baseURL + 'statistics/?type=' + transType;
-		if (acc_id != 0)
-			newLocation += '&acc_id=' + curAccId;
-		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
-
-		window.location = newLocation;
-	}
+	datefield.value = Calendar.format(range.start) + ' - ' + Calendar.format(range.end);
 }
 
 
-// End date select callback
-function onSelectEndDate(date, month, year)
+// Date picker hide callback
+function onDatePickerHide()
 {
-	var datefield;
+	var newLocation;
 
-	datefield = ge('date');
-	if (!datefield)
+	if (!selRange)
 		return;
 
-	endDate = new Date(year, month, date);
+	newLocation = baseURL + 'statistics/?type=' + transType;
+	if (acc_id != 0)
+		newLocation += '&acc_id=' + curAccId;
+	newLocation += '&stdate=' + Calendar.format(selRange.start) + '&enddate=' + Calendar.format(selRange.end);
 
-	if (startDate && endDate)
-	{
-		hideCalendar();
-		datefield.value = formatDate(startDate) + ' - ' + formatDate(endDate);
-
-		newLocation = baseURL + 'statistics/?type=' + transType;
-		if (acc_id != 0)
-			newLocation += '&acc_id=' + curAccId;
-		newLocation += '&stdate=' + formatDate(startDate) + '&enddate=' + formatDate(endDate);
-
-		window.location = newLocation;
-	}
+	window.location = newLocation;
 }
 
 
@@ -463,24 +429,20 @@ function showCalendar()
 {
 	if (!calendarObj)
 	{
-		calendarObj = ge('calendar');
+		calendarObj = Calendar.create({ wrapper_id : 'calendar',
+										range : true,
+										onrangeselect : onRangeSelect,
+										onhide : onDatePickerHide });
 		if (!calendarObj)
 			return;
-
-		var cal1, cal2;
-
-		cal1 = ce('div', {}, [ buildCalendar(onSelectStartDate) ]);
-		cal2 = ce('div', {}, [ buildCalendar(onSelectEndDate) ]);
-
-		calendarObj.appendChild(cal1);
-		calendarObj.appendChild(cal2);
 	}
 
-	show(calendarObj, !isVisible(calendarObj));
+	self.calendarObj.show(!self.calendarObj.visible());
+
 	show('calendar_btn', false);
 	show('date_block', true);
 
-	setEmptyClick(hideCalendar, ['calendar', 'calendar_btn', 'cal_rbtn']);
+	setEmptyClick(self.calendarObj.hide.bind(self.calendarObj), ['calendar', 'calendar_btn', 'cal_rbtn']);
 }
 
 
