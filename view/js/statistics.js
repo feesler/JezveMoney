@@ -530,6 +530,8 @@ function initControls()
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
+	initBarChart();
+
 	filterDD = new DDList();
 	if (!filterDD.create({ input_id : 'filter_type', itemPrefix : 'filter', selCB : onFilterSel, editable : false, mobile : isMobile }))
 		filterDD = null;

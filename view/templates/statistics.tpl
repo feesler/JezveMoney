@@ -9,7 +9,6 @@
 	var chartData = <?=f_json_encode($statArr)?>;
 	var filterByCurr = <?=(($byCurrency) ? "true" : "false")?>;
 
-	onReady(initBarChart);
 	onReady(initControls);
 </script>
 </head>
