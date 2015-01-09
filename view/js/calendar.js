@@ -1,5 +1,5 @@
 // Calendar constructor
-var Calendar = (function()
+var Calendar = new (function()
 {
 	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 	var weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -464,17 +464,15 @@ var Calendar = (function()
 	}
 
 
-	// Calendar global object
-	return {
-		create : function(params)
-		{
-			return new datePicker(params);
-		},
+	// Calendar global object public methods
+	this.create = function(params)
+	{
+		return new datePicker(params);
+	}
 
 
-		format : function(date, month, year)
-		{
-			return formatDate(date, month, year);
-		}
+	this.format = function(date, month, year)
+	{
+		return formatDate(date, month, year);
 	}
 })();
