@@ -539,5 +539,5 @@ function showResetAllPopup()
 // Init statistics widget
 function initStatWidget()
 {
-	initBarChart(false, 200);
+	Charts.createHistogram({ height : 200 });
 }
