@@ -111,6 +111,7 @@ function DDList()
 	this.itemPrefix = null;
 	this.selection = null;
 	this.forceSelect = false;
+	this.defSeparator = null;
 
 
 	this.showSelMsg = function(val)
@@ -316,6 +317,8 @@ function DDList()
 		this.ulobj = ulObj;
 		this.selobj = selObj;
 		this.selbtn = btnObj;
+
+		this.defSeparator = params.defSeparator || ',';
 
 		if (params.selCB)
 		{
@@ -887,7 +890,7 @@ function DDList()
 			}
 		}
 
-		this.setText(resText.join(', '));
+		this.setText(resText.join(this.defSeparator + ' '));
 
 		return true;
 	}
