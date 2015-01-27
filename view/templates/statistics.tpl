@@ -119,17 +119,7 @@
 							</div>
 						</div>
 
-						<div class="charts">
-							<div class="right_float">
-								<div id="vert_labels"></div>
-							</div>
-							<div class="chart_wrap">
-								<div class="chart_content">
-									<div id="chart"></div>
-								</div>
-							</div>
-							<div id="chpopup" class="chart_popup" style="display: none;"></div>
-						</div>
+						<div id="chart" class="charts"></div>
 					</div>
 				</div>
 			</div>

@@ -96,17 +96,7 @@
 
 					<div class="widget">
 						<div class="widget_title"><a href="<?=BASEURL?>statistics/"><span>Statistics</span><div class="glyph"></div></a></div>
-						<div class="charts widget_charts">
-							<div class="right_float">
-								<div id="vert_labels"></div>
-							</div>
-							<div class="chart_wrap">
-								<div class="chart_content">
-									<div id="chart"></div>
-								</div>
-							</div>
-							<div id="chpopup" class="chart_popup" style="display: none;"></div>
-						</div>
+						<div id="chart" class="charts widget_charts"></div>
 					</div>
 				</div>
 			</div>

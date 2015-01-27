@@ -256,6 +256,93 @@ function onGroupSel(obj)
 }
 
 
+
+// Hide chart popup
+function hideChartPopup()
+{
+	if (!this.popup)
+		return;
+
+	show(this.popup, false);
+	this.popup = null;
+
+	setEmptyClick();
+}
+
+
+// Histogram scroll callback
+function onChartsScroll()
+{
+	if (this.popup)
+		hideChartPopup.call(this);
+}
+
+
+// Histogram bar click callback
+function onBarClick(barRect, val)
+{
+	var isRelative = true;
+	var popupX, popupY;
+	var rectBBox, chartsBRect;
+	var chartContent, chartsWrapObj;
+
+	chartsWrapObj = this.getWrapObject();
+	chartContent = this.getContent();
+	if (!chartsWrapObj || !chartContent)
+		return;
+
+	if (!this.popup)
+	{
+		this.popup = ce('div', { className : 'chart_popup', style : { display : 'none' } });
+		chartsWrapObj.appendChild(this.popup);
+	}
+
+	if (isVisible(this.popup))
+	{
+		hideChartPopup.call(this);
+	}
+	else
+	{
+		show(this.popup, true);
+
+		e = fixEvent(event);
+
+		chartsWrapObj.style.position = (isRelative) ? 'relative' : '';
+
+		this.popup.innerHTML = formatCurrency(val, accCurr);
+
+		rectBBox = barRect.getBBox();
+		chartsBRect = chartsWrapObj.getBoundingClientRect();
+
+		popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
+		popupY = e.clientY - chartsBRect.top - 10;
+
+		if (this.popup.offsetWidth + popupX > chartsBRect.width)
+			popupX -= popup.offsetWidth + rectBBox.width + 20;
+
+		setParam(this.popup.style, { left : px(popupX), top : px(popupY) });
+
+		schedule(setEmptyClick.bind(this, hideChartPopup.bind(this), [barRect[0]]))();
+	}
+}
+
+
+// Histogram bar mouse over callback
+function onBarOver(bar)
+{
+	if (bar)
+		bar.attr({ fill : '#00ffbf' });
+}
+
+
+// Histogram bar mouse out callback
+function onBarOut(bar)
+{
+	if (bar)
+		bar.attr({ fill : '#00bfff' });
+}
+
+
 // Initialization of page controls
 function initControls()
 {
@@ -264,7 +351,9 @@ function initControls()
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
-	Charts.createHistogram();
+	Charts.createHistogram({ data : chartData, container : 'chart', autoScale : true,
+							onbarclick : onBarClick, onscroll : onChartsScroll,
+							onbarover : onBarOver, onbarout : onBarOut });
 
 	filterDD = new DDList();
 	if (!filterDD.create({ input_id : 'filter_type', itemPrefix : 'filter', selCB : onFilterSel, editable : false, mobile : isMobile }))

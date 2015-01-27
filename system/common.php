@@ -207,7 +207,11 @@
 			$groupArr = array_slice($groupArr, -$newGroupsCount);
 		}
 
-		return array($amountArr, $groupArr);
+		$resObj = new apiObject();
+		$resObj->values = $amountArr;
+		$resObj->series = $groupArr;
+
+		return $resObj;
 	}
 
 
