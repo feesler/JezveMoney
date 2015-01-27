@@ -64,10 +64,14 @@ function setParam(obj, params)
 // Append elements from array to object
 function addChilds(obj, childs)
 {
-	if (!obj || !childs || !isArray(childs))
+	if (!obj || !childs)
 		return;
 
-	childs.forEach(function(child){
+	if (!isArray(childs))
+		childs = [childs];
+
+	childs.forEach(function(child)
+	{
 		if (child)
 			obj.appendChild(child);
 	});
@@ -266,7 +270,7 @@ function selectedText(selectObj)
 
 	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
 		return -1;
-	option = selectObj.options[selectObj.selectedIndex]
+	option = selectObj.options[selectObj.selectedIndex];
 
 	return (option.textContent) ? option.textContent : option.innerText;
 }
