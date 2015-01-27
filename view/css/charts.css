@@ -5,9 +5,9 @@
 }
 
 
-.widget_charts
+.charts > .right_float
 {
-	max-width: 500px;
+	float: right;
 }
 
 
