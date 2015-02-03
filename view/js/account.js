@@ -1,3 +1,25 @@
+// Decompress array of accounts
+function decompressAccounts()
+{
+	var decAccounts = [];
+
+	accounts.forEach(function(acc)
+	{
+		decAccounts.push({
+			id : acc[0],
+			curr_id : acc[1],
+			sign : acc[2],
+			balance : acc[3],
+			name : acc[4],
+			icon : acc[5],
+			initbalance : acc[6]
+		});
+	});
+
+	accounts = decAccounts;
+}
+
+
 // Return account object by id
 function getAccount(account_id)
 {
@@ -9,10 +31,12 @@ function getAccount(account_id)
 
 	accounts.some(function(acc)
 	{
-		if (acc[0] == account_id)
+		var cond = (acc.id == account_id);
+
+		if (cond)
 			res = acc;
 
-		return (acc[0] == account_id);
+		return cond;
 	});
 
 	return res;
@@ -46,94 +70,15 @@ function getPersonAccount(account_id)
 }
 
 
-// Return currency id of specified account
-function getCurrencyOfAccount(account_id)
-{
-	var curr_id = 0;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return curr_id;
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			curr_id = acc[1];
-
-		return (acc[0] == account_id);
-	});
-
-	return curr_id;
-}
-
-
-// Return balance of specified account
-function getBalanceOfAccount(account_id)
-{
-	var balance = 0;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return balance;
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			balance = acc[3];
-
-		return (acc[0] == account_id);
-	});
-
-	return balance;
-}
-
-
-// Return name of specified account
-function getNameOfAccount(account_id)
-{
-	var name = '';
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return name;
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			name = acc[4];
-
-		return (acc[0] == account_id);
-	});
-
-	return name;
-}
-
-
-// Return icon type за specified account
-function getIconOfAccount(account_id)
-{
-	var iconType = 0;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return iconType;
-
-	accounts.some(function(acc)
-	{
-		if (acc[0] == account_id)
-			iconType = acc[5];
-
-		return (acc[0] == account_id);
-	});
-
-	return iconType;
-}
-
-
 // Format balance of account value with currency
 function formatAccoutBalance(acc_id)
 {
-	return formatCurrency(getBalanceOfAccount(acc_id), getCurrencyOfAccount(acc_id));
+	var acc = getAccount(acc_id);
+
+	if (!acc)
+		return null;
+
+	return formatCurrency(acc.balance, acc.curr_id);
 }
 
 
@@ -167,17 +112,11 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 // Set source tile to the specified account
 function setTileAccount(tile_id, acc_id)
 {
-	var name, formatBalance, balance, icon;
-
-	if (!tile_id || !acc_id)
+	var acc = getAccount(acc_id);
+	if (!acc)
 		return;
 
-	name = getNameOfAccount(acc_id);
-	balance = getBalanceOfAccount(acc_id);
-	formatBalance = formatCurrency(balance, getCurrencyOfAccount(acc_id));
-	icon = getIconOfAccount(acc_id);
-
-	setTileInfo(tile_id, name, formatBalance, icon);
+	setTileInfo(tile_id, acc.name, formatCurrency(acc.balance, acc.curr_id), acc.icon);
 }
 
 
@@ -192,7 +131,7 @@ function getAccountPos(acc_id)
 
 	accounts.some(function(acc, ind)
 	{
-		var cond = (acc_id == acc[0]);
+		var cond = (acc_id == acc.id);
 		if (cond)
 			pos = ind;
 
@@ -218,7 +157,7 @@ function getPrevAccount(acc_id)
 
 	pos = ((pos == 0) ? accounts.length - 1 : pos - 1);
 
-	return accounts[pos][0];
+	return accounts[pos].id;
 }
 
 
@@ -237,6 +176,6 @@ function getNextAccount(acc_id)
 
 	pos = ((pos == accounts.length - 1) ? 0 : pos + 1);
 
-	return accounts[pos][0];
+	return accounts[pos].id;
 }
 

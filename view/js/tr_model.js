@@ -299,11 +299,11 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (!acc)
 			return;
 
-		updateValue('src_curr', acc[1]);
-		notifyChanged('src_curr', acc[1]);
+		updateValue('src_curr', acc.curr_id);
+		notifyChanged('src_curr', acc.curr_id);
 
-		updateValue('src_initbal', acc[3]);
-		notifyChanged('src_initbal', acc[3]);
+		updateValue('src_initbal', acc.balance);
+		notifyChanged('src_initbal', acc.balance);
 	}
 
 
@@ -314,11 +314,11 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (!acc)
 			return;
 
-		updateValue('dest_curr', acc[1]);
-		notifyChanged('dest_curr', acc[1]);
+		updateValue('dest_curr', acc.curr_id);
+		notifyChanged('dest_curr', acc.curr_id);
 
-		updateValue('dest_initbal', acc[3]);
-		notifyChanged('dest_initbal', acc[3]);
+		updateValue('dest_initbal', acc.balance);
+		notifyChanged('dest_initbal', acc.balance);
 	}
 
 
@@ -556,25 +556,25 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		{
 			if (!srcAcc)
 				throw new Error('Invalid transaction: Account not found');
-			if (srcAcc[1] != edit_transaction.srcCurr)
+			if (srcAcc.curr_id != edit_transaction.srcCurr)
 				throw new Error('Invalid transaction');
 
-			srcAcc[3] += edit_transaction.srcAmount;
+			srcAcc.balance += edit_transaction.srcAmount;
 		}
 		else if (edit_transaction.type == 2)		// Income
 		{
-			if (!destAcc || destAcc[1] != edit_transaction.destCurr)
+			if (!destAcc || destAcc.curr_id != edit_transaction.destCurr)
 				throw new Error('Invalid transaction');
 
-			destAcc[3] -= edit_transaction.destAmount;
+			destAcc.balance -= edit_transaction.destAmount;
 		}
 		else if (edit_transaction.type == 3)		// Transfer
 		{
-			if (!srcAcc || !destAcc || srcAcc[1] != edit_transaction.srcCurr || destAcc[1] != edit_transaction.destCurr)
+			if (!srcAcc || !destAcc || srcAcc.curr_id != edit_transaction.srcCurr || destAcc.curr_id != edit_transaction.destCurr)
 				throw new Error('Invalid transaction');
 
-			srcAcc[3] += edit_transaction.srcAmount;
-			destAcc[3] -= edit_transaction.destAmount;
+			srcAcc.balance += edit_transaction.srcAmount;
+			destAcc.balance -= edit_transaction.destAmount;
 		}
 		else if (edit_transaction.type == 4)		// Debt
 		{
@@ -589,7 +589,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 				srcAcc[2] += edit_transaction.srcAmount;
 				if (destAcc)
-					destAcc[3] -= edit_transaction.destAmount;
+					destAcc.balance -= edit_transaction.destAmount;
 			}
 			else				// person take
 			{
@@ -601,7 +601,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 					throw new Error('Invalid transaction');
 
 				if (srcAcc)
-					srcAcc[3] += edit_transaction.srcAmount;
+					srcAcc.balance += edit_transaction.srcAmount;
 				destAcc[2] -= edit_transaction.destAmount;
 			}
 		}

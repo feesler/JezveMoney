@@ -328,9 +328,10 @@ function TransactionViewModel()
 		}
 		else
 		{
-			acc_id.value = Transaction.lastAcc_id();
+			var lastAcc = getAccount(Transaction.lastAcc_id());
+			acc_id.value = lastAcc.id;
 
-			curr = getCurrencyOfAccount(Transaction.lastAcc_id());
+			curr = lastAcc.curr_id;
 		}
 		Transaction.update('src_curr', curr);
 		Transaction.update('dest_curr', curr);
@@ -1082,10 +1083,7 @@ function TransactionViewModel()
 		{
 			accounts.forEach(function(acc)
 			{
-				accId = acc[0];
-				accName = acc[4];
-
-				self.accDDList.addItem(accId, accName);
+				self.accDDList.addItem(acc.id, acc.name);
 			});
 		}
 		else
@@ -1116,6 +1114,8 @@ function TransactionViewModel()
 					return onSubmit(this);
 			}
 		}
+
+		decompressAccounts();
 
 		if (edit_mode)
 		{
@@ -1149,15 +1149,22 @@ function TransactionViewModel()
 
 		setParam(firstElementChild(ge('comm_btn')), { onclick : showComment });
 
+		var srcAcc, destAcc;
+
+		if (Transaction.isExpense() || Transaction.isTransfer())
+			srcAcc = getAccount(ge('src_id').value);
+		if (Transaction.isIncome() || Transaction.isTransfer())
+			destAcc = getAccount(ge('dest_id').value);
+
 		Transaction.set('exchrate', ge('exchrate').value);
 		if (Transaction.isExpense())
-			Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
+			Transaction.set('src_initbal', srcAcc.balance);
 		else if (Transaction.isIncome())
-			Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
+			Transaction.set('dest_initbal', destAcc.balance);
 		else if (Transaction.isTransfer())
 		{
-			Transaction.set('src_initbal', getBalanceOfAccount(ge('src_id').value));
-			Transaction.set('dest_initbal', getBalanceOfAccount(ge('dest_id').value));
+			Transaction.set('src_initbal', srcAcc.balance);
+			Transaction.set('dest_initbal', destAcc.balance);
 		}
 		else if (Transaction.isDebt())
 		{
@@ -1171,12 +1178,12 @@ function TransactionViewModel()
 
 			if (!Transaction.noAccount())
 			{
-				acc_bal = getBalanceOfAccount(ge('acc_id').value);
+				var acc = getAccount(ge('acc_id').value);
 
 				if (Transaction.debtType())
-					Transaction.set('dest_initbal', acc_bal);
+					Transaction.set('dest_initbal', acc.balance);
 				else
-					updateValue('src_initbal', acc_bal);
+					updateValue('src_initbal', acc.balance);
 			}
 		}
 
@@ -1228,10 +1235,7 @@ function TransactionViewModel()
 			{
 				accounts.forEach(function(acc)
 				{
-					accId = acc[0];
-					accName = acc[4];
-
-					srcDDList.addItem(accId, accName);
+					srcDDList.addItem(acc.id, acc.name);
 				});
 			}
 			else
@@ -1242,10 +1246,7 @@ function TransactionViewModel()
 			{
 				accounts.forEach(function(acc)
 				{
-					accId = acc[0];
-					accName = acc[4];
-
-					destDDList.addItem(accId, accName);
+					destDDList.addItem(acc.id, acc.name);
 				});
 			}
 			else

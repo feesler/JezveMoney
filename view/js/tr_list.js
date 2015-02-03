@@ -69,6 +69,7 @@ var transactions =
 	updateBalance : function(trans, src_bal, dest_bal)
 	{
 		var tr_id, tr_type, src_amount, dest_amount;
+		var srcAcc, destAcc;
 		var trRow, trBalanceItem;
 
 		if (!trans)
@@ -76,6 +77,8 @@ var transactions =
 
 		tr_id = trans[0];
 		tr_type = trans[5];
+		srcAcc = getAccount(trans[1]);
+		destAcc = getAccount(trans[2]);
 		src_amount = trans[12];
 		dest_amount = trans[13];
 
@@ -127,7 +130,7 @@ var transactions =
 			if (tr_type == 4 && trans[11] == 1)
 				balSpan.innerHTML = formatCurrency(trans[9], trans[14]);
 			else
-				balSpan.innerHTML = formatCurrency(trans[9], getCurrencyOfAccount(src_id));
+				balSpan.innerHTML = formatCurrency(trans[9], srcAcc.curr_id);
 			trBalanceItem.appendChild(balSpan);
 		}
 
@@ -137,7 +140,7 @@ var transactions =
 			if (tr_type == 4 && trans[11] == 2)
 				balSpan.innerHTML = formatCurrency(trans[10], trans[14]);
 			else
-				balSpan.innerHTML = formatCurrency(trans[10], getCurrencyOfAccount(dest_id));
+				balSpan.innerHTML = formatCurrency(trans[10], destAcc.curr_id);
 			trBalanceItem.appendChild(balSpan);
 		}
 	},
