@@ -8,7 +8,7 @@ function ge(a)
 // Check object is array
 function isArray(obj)
 {
-	return (typeof obj === 'object' && obj.constructor.toString().indexOf('Array') != -1);
+	return (Object.prototype.toString.call(obj) === '[object Array]');
 }
 
 
