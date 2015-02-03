@@ -5,7 +5,8 @@
 }
 
 
-.trlist_item_wrap
+.trlist_item_wrap,
+.trlist_item_placeholder
 {
 	width: 100%;
 	float: left;
@@ -19,6 +20,12 @@
 	background-color: #F0F0F0;
 	padding: 8px;
 	border: 0px none;
+}
+
+
+.trlist_item_placeholder > .trlist_item
+{
+	opacity: 0;
 }
 
 
@@ -149,9 +156,10 @@ div.act_tr
 
 .details_table td > div
 {
-	height: 23px;
+	height: 39px;
 	padding: 8px;
 	background-color: #F0F0F0;
+	box-sizing: border-box;
 }
 
 
@@ -216,10 +224,22 @@ div.act_tr
 }
 
 
-/* Table drag&drop spacer row */
-.drag_spacer > td
+/* Table drag&drop placeholder row */
+.details_table .trlist_item_wrap
 {
-	height: 43px;
+	float: none;
+}
+
+
+.details_table .trlist_item_placeholder
+{
+	float: none;
+}
+
+
+.details_table .trlist_item_placeholder td > div
+{
+	opacity: 0;
 }
 
 

@@ -369,6 +369,13 @@ function initTransListDrag()
 	if (!trlist)
 		return;
 
+	var trListSortable = new Sortable({ oninsertat : onTransPosChanged,
+									group : 'transactions',
+									itemClass : 'trlist_item_wrap',
+									placeholderClass : 'trlist_item_placeholder',
+									copyWidth : true,
+									table : detailsMode });
+
 	listItem_wr = firstElementChild(trlist);
 	listItem = null;
 	while(listItem_wr)
@@ -388,8 +395,7 @@ function initTransListDrag()
 					firstElementChild(listItem).style.cursor = 'pointer';
 				}
 
-				new DropTarget(listItem_wr);
-				new DragObject(listItem, true);
+				trListSortable.add(listItem_wr);
 			}
 		}
 		else
@@ -404,8 +410,7 @@ function initTransListDrag()
 					firstElementChild(listItem).style.cursor = 'pointer';
 				}
 
-				new DropTarget(listItem_wr);
-				new DragObject(listItem);
+				trListSortable.add(listItem_wr);
 			}
 		}
 
@@ -453,17 +458,30 @@ function cancelPosChange()
 }
 
 
+// Return transaction id from transaction item element
+function transIdFromElem(elem)
+{
+	return (elem && elem.id.length > 3) ? parseInt(elem.id.substr(3)) : 0;
+}
+
+
 // Transaction item drop callback
 function onTransPosChanged(trans_id, retrans_id)
 {
 	var replacedItem, newPos;
+	var tr_id, retr_id;
 
-	replacedItem = transactions.findById(retrans_id);
+	tr_id = transIdFromElem(firstElementChild(trans_id));
+	retr_id = transIdFromElem(firstElementChild(retrans_id));
+	if (!tr_id || !retr_id)
+		return;
+
+	replacedItem = transactions.findById(retr_id);
 
 	if (replacedItem)
 	{
 		newPos = replacedItem[8];
-		sendChangePosRequest(trans_id, newPos);
+		sendChangePosRequest(tr_id, newPos);
 	}
 }
 
