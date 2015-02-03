@@ -572,6 +572,19 @@ function getOffsetSum(elem)
 }
 
 
+// Compare position of two node in the document
+function comparePosition(a, b)
+{
+	return a.compareDocumentPosition ?
+			a.compareDocumentPosition(b) :
+			(a != b && a.contains(b) && 16) +
+			(a != b && b.contains(a) && 8) +
+			(a.sourceIndex >= 0 && b.sourceIndex >= 0 ?
+			(a.sourceIndex < b.sourceIndex && 4) + (a.sourceIndex > b.sourceIndex && 2) :
+			1);
+}
+
+
 // Add CSS class to element
 function addClass(elem, clName)
 { 
@@ -739,7 +752,7 @@ function bindReady(handler)
 	}
 	else if (document.attachEvent)
 	{
-		if (document.documentElement.doScroll && window == window.top )
+		if (document.documentElement.doScroll && window == window.top)
 		{
 			function tryScroll()
 			{
@@ -795,4 +808,16 @@ function onReady(handler)
 	}
 
 	readyList.push(handler);
+}
+
+
+// Extend child prototype by parent
+function extend(Child, Parent)
+{
+	function F(){};
+
+	F.prototype = Parent.prototype;
+	Child.prototype = new F();
+	Child.prototype.constructor = Child;
+	Child.parent = Parent.prototype;
 }

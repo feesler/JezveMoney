@@ -1,9 +1,10 @@
 // Main drag and drop class
 var dragMaster = (function()
 {
-	var dragObject;
-	var mouseDownAt;
-	var currentDropTarget;
+	var dragZone, avatar, dropTarget;
+	var downX, downY;
+
+	var self = this;
 
 
 	// Mouse down on drag object element event handler
@@ -14,99 +15,126 @@ var dragMaster = (function()
 		if (e.which != 1)
 			return;
 
- 		mouseDownAt = { x: e.pageX, y: e.pageY, element: this };
+		dragZone = findDragZone(e);
+		if (!dragZone)
+			return;
+
+		downX = e.pageX;
+		downY = e.pageY;
 
 		addDocumentEventHandlers();
 
-		return false
+		return false;
 	}
 
 
 	// Document mouse move event handler
 	function mouseMove(e)
 	{
+		if (!dragZone)
+			return false;
+
 		e = fixEvent(e);
 
-		if (mouseDownAt)
+		if (!avatar)
 		{
-			if (Math.abs(mouseDownAt.x - e.pageX) < 5 && Math.abs(mouseDownAt.y - e.pageY) < 5)
+			if (Math.abs(downX - e.pageX) < 5 && Math.abs(downY - e.pageY) < 5)
 				return false;
 
-			var elem  = mouseDownAt.element;
-			dragObject = elem.dragObject;
-
-			var mouseOffset = getMouseOffset(elem, mouseDownAt.x, mouseDownAt.y);
-			mouseDownAt = null;
-
-			dragObject.onDragStart(mouseOffset);
+			avatar = dragZone.onDragStart(downX, downY, e);
+			if (!avatar)
+			{
+				cleanUp();
+				return false;
+			}
 		}
 
-		dragObject.onDragMove(e.pageX, e.pageY);
+		avatar.onDragMove(e);
 
-		var newTarget = getCurrentTarget(e);
-
-		if (currentDropTarget != newTarget)
+		var newDropTarget = findDropTarget(e);
+		if (dropTarget != newDropTarget)
 		{
-			if (currentDropTarget)
-				currentDropTarget.onLeave(dragObject);
-			if (newTarget)
-				newTarget.onEnter(dragObject);
-			currentDropTarget = newTarget;
+			if (dropTarget)
+				dropTarget.onDragLeave(newDropTarget, avatar, e);
+			if (newDropTarget)
+				newDropTarget.onDragEnter(dropTarget, avatar, e);
 		}
+
+		dropTarget = newDropTarget;
+		if (dropTarget)
+			dropTarget.onDragMove(avatar, e);
 
 		return false;
 	}
 	
 
 	// Document mouse up event handler
-	function mouseUp()
+	function mouseUp(e)
 	{
-		if (!dragObject)
+		e = fixEvent(e);
+
+		if (e.which != 1)
+			return false;
+
+		if (avatar)
 		{
-			mouseDownAt = null;
-		}
-		else
-		{
-			if (currentDropTarget)
+			if (dropTarget)
 			{
-				currentDropTarget.accept(dragObject);
-				dragObject.onDragSuccess(currentDropTarget);
+				dropTarget.onDragEnd(avatar, e);
 			}
 			else
 			{
-				dragObject.onDragFail();
+				avatar.onDragCancel();
 			}
-
-			dragObject = null;
 		}
 
+		cleanUp();
 		removeDocumentEventHandlers();
 	}
 
 
-	function getMouseOffset(target, x, y)
+	// Clean up drag objects
+	function cleanUp()
 	{
-		var docPos = getOffset(target);
-		return {x:x - docPos.left, y:y - docPos.top};
+		dragZone = avatar = dropTarget = null;
+	}
+
+
+	// Search for drag zone object
+	function findDragZone(e)
+	{
+		var elem = e.target;
+
+		while(elem != document && !elem.dragZone)
+		{
+			elem = elem.parentNode;
+		}
+
+		return elem.dragZone;
 	}
 
 
 	// Try to find drop target under mouse cursor
-	function getCurrentTarget(e)
+	function findDropTarget(e)
 	{
-		dragObject.hide();
-		var elem = document.elementFromPoint(e.clientX, e.clientY);
-		dragObject.show();
+		var elem = avatar.getTargetElem();
 
-		// look for deepest dropTarget
-		while(elem)
+		while(elem != document && !elem.dropTarget)
 		{
-			if (elem.dropTarget && elem.dropTarget.canAccept(dragObject))
-				return elem.dropTarget;
 			elem = elem.parentNode;
 		}
 
-		return null;
+		if (!elem.dropTarget)
+			return null;
+
+		return elem.dropTarget;
+	}
+
+
+	// Empty function return false
+	function emptyFalse()
+	{
+		return false;
 	}
 
 
@@ -115,7 +143,7 @@ var dragMaster = (function()
 	{
 		document.onmousemove = mouseMove;
 		document.onmouseup = mouseUp;
-		document.ondragstart = document.body.onselectstart = function(){ return false };
+		document.ondragstart = document.body.onselectstart = emptyFalse;
 	}
 
 
@@ -127,7 +155,7 @@ var dragMaster = (function()
 
 
 	// Check pointer is mouse
-	function checkPointerType(e)
+	function isMousePointer(e)
 	{
 		var pointerType;
 
@@ -153,251 +181,195 @@ var dragMaster = (function()
 		return (pointerType == 'mouse');
 	}
 
+
 	return {
-		makeDraggable: function(element) {
+		makeDraggable : function(element)
+		{
 			element.onmousedown = mouseDown;
 
 			if (element.onpointerdown !== undefined)
-				element.onpointerdown = checkPointerType;
+				element.onpointerdown = isMousePointer;
 			else
-				element.onmspointerdown = checkPointerType;
+				element.onmspointerdown = isMousePointer;
+		},
+
+		getElementUnderClientXY : function(elem, clientX, clientY)
+		{
+			var display = elem.style.display || '';
+			elem.style.display = 'none';
+
+			var target = document.elementFromPoint(clientX, clientY);
+
+			elem.style.display = display;
+
+			if (!target || target == document)
+				target = document.body;
+
+			return target;
 		}
 	}
 }());
 
 
-// Drag object class
-function DragObject(element, isTable)
+// Drag start zone class
+// Handle drag start event and make avatar 
+function DragZone(elem, params)
 {
-	element.dragObject = this;
+	elem.dragZone = this;
+	this._elem = elem;
+	this._params = params;
 
-	dragMaster.makeDraggable(element);
-
-	isTable = isTable || false;
-
-	var rememberPosition;
-	var mouseOffset;
-	var ins_id = 0;
-
-
-	this.onDragStart = function(offset)
-	{
-		var s = element.style;
-		var origWidth = element.offsetWidth;
-
-		if (isTable)
-		{
-			var cellEl;
-
-			rememberPosition = { top: s.top, left: s.left, position: s.position };
-			rememberPosition.width = [];
-
-			// Save width of all cells
-			cellEl = firstElementChild(element);
-			while(cellEl)
-			{
-				rememberPosition.width[rememberPosition.width.length] = cellEl.offsetWidth;
-				cellEl.style.width = px(cellEl.offsetWidth);
-
-				cellEl = cellEl.nextElementSibling;
-			}
-		}
-		else
-		{
-			var padding;
-			var computedStyle = window.getComputedStyle ? getComputedStyle(element, '') : element.currentStyle;
-
-			rememberPosition = { top: s.top, left: s.left, position: s.position, width: s.width };
-
-			padding = parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
-			s.width = px(origWidth - padding);
-		}
-		s.position = 'absolute';
-
-		if (isTable)
-		{
-			if (element.parentNode && element.parentNode.tagName == 'TBODY')
-			{
-				element.parentNode.appendChild(ce('tr', { className : 'drag_spacer' }, [ ce('td', { colSpan : 5 }) ]));
-			}
-		}
-
-		mouseOffset = offset;
-	}
-
-
-	this.hide = function()
-	{
-		show(element, false);
-	}
-
-
-	this.show = function()
-	{
-		show(element, true);
-	}
-
-
-	this.resetDrag = function()
-	{
-		var s = element.style;
-		s.top = rememberPosition.top;
-		s.left = rememberPosition.left;
-		s.position = rememberPosition.position;
-		if (isTable)
-		{
-			// Reset width of all cells
-			var cellEl = firstElementChild(element);
-			while(cellEl)
-			{
-				cellEl.style.width = '';
-				cellEl = nextElementSibling(cellEl);
-			}
-		}
-		else
-		{
-			s.width = rememberPosition.width;
-		}
-	}
-
-
-	this.onDragMove = function(x, y)
-	{
-		element.style.top =  px(y - mouseOffset.y);
-		element.style.left = px(x - mouseOffset.x);
-	}
-
-
-	this.onDragSuccess = function(dropTarget)
-	{
-		var tr_id =  (element && element.id.length > 3) ? parseInt(element.id.substr(3)) : 0;
-
-		if (isTable)
-		{
-			if (element.parentNode && element.parentNode.tagName == 'TBODY')
-			{
-				var tr = firstElementChild(element.parentNode);
-				while(tr)
-				{
-					if (tr.className.indexOf('drag_spacer') != -1)
-					{
-						re(tr);
-						break;
-					}
-
-					tr = tr.nextElementSibling;
-				}
-			}
-		}
-
-		onTransPosChanged(tr_id, ins_id);
-	}
-
-
-	this.onDragFail = function()
-	{
-		this.resetDrag();
-	}
-
-
-	this.toString = function()
-	{
-		return element.id;
-	}
-
-
-	this.getElement = function()
-	{
-		return element;
-	}
-
-
-	this.onInsertAt = function(obj)
-	{
-		ins_id = (obj && obj.id.length > 3) ? parseInt(obj.id.substr(3)) : 0;
-	}
+	dragMaster.makeDraggable(elem);
 }
+
+
+// Return element of drag zone
+DragZone.prototype.getElement = function()
+{
+	return this._elem;
+}
+
+
+// Return avatar specific for zone
+DragZone.prototype._makeAvatar = function()
+{
+};
+
+
+// Drag start handler
+// Return avatar object or false
+DragZone.prototype.onDragStart = function(downX, downY, event)
+{
+	var avatar = this._makeAvatar();
+
+	if (!avatar.initFromEvent(downX, downY, event))
+		return false;
+
+	return avatar;
+};
+
+
+// Drag object class
+function DragAvatar(dragZone, dragElem)
+{
+	this._dragZone = dragZone;			// parent DragZone of avatar
+	this._dragZoneElem = dragElem;		// original element related to avatar
+	this._elem = dragElem;				// element of avatar
+}
+
+
+// Initialize drag element and set up position
+DragAvatar.prototype.initFromEvent = function(downX, downY, event)
+{
+};
+
+
+// Return drag information object for DropTarget
+DragAvatar.prototype.getDragInfo = function(event)
+{
+	return {
+		elem : this._elem,
+		dragZoneElem : this._dragZoneElem,
+		dragZone : this._dragZone,
+		mouseShift : { x : this._shiftX, y : this._shiftY }
+	};
+};
+
+
+// Return current deepest element under avatar
+DragAvatar.prototype.getTargetElem = function()
+{
+	return this._currentTargetElem;
+};
+
+
+// Move avatag element on mouse move
+// Also save current element under avatar
+DragAvatar.prototype.onDragMove = function(event)
+{
+	this._elem.style.left = px(event.pageX - this._shiftX);
+	this._elem.style.top = px(event.pageY - this._shiftY);
+
+	this._currentTargetElem = dragMaster.getElementUnderClientXY(this._elem, event.clientX, event.clientY);
+};
+
+
+// Drop fail handler
+DragAvatar.prototype.onDragCancel = function()
+{
+};
+
+
+// Success drop handler
+DragAvatar.prototype.onDragEnd = function()
+{
+};
 
 
 // Drop target class
-function DropTarget(element)
+function DropTarget(elem, params)
 {
-	element.dropTarget = this;
-
-
-	this.canAccept = function(dragObject)
-	{
-		return true;
-	}
-
-
-	this.accept = function(dragObject)
-	{
-		this.onLeave();
-
-		dragObject.resetDrag();
-	}
-
-
-	this.onLeave = function(dragObject)
-	{
-	}
-
-
-	//
-	this.onEnter = function(dragObject)
-	{
-		var dragSource = dragObject.getElement().parentNode;
-
-		if (element == dragSource)
-			return;
-
-		var isPrev = true, found = false, telem;
-
-		// Move from drop object upward
-		telem = element.previousElementSibling;
-		while(telem)
-		{
-			if (telem == dragSource)
-			{
-				found = true;
-				break;
-			}
-			telem = telem.previousElementSibling;
-		}
-
-		// Move from drop object downward
-		if (!found)
-		{
-			isPrev = false;
-			telem = element.nextElementSibling;
-			while(telem)
-			{
-				if (telem == dragSource)
-				{
-					found = true;
-					break;
-				}
-				telem = telem.nextElementSibling;
-			}
-		}
-
-		if (found)
-		{
-			var cutSource = re(dragSource);
-
-			if (isPrev)
-				insertAfter(cutSource, element);
-			else
-				element.parentNode.insertBefore(cutSource, element);
-
-			dragObject.onInsertAt(firstElementChild(element));
-		}
-	}
-
-
-	this.toString = function()
-	{
-		return element.id;
-	}
+	elem.dropTarget = this;
+	this._elem = elem;
+	this._targetElem = null;		// target element under avatar
+	this._params = params;
 }
+
+
+// Return target element under avatar
+DropTarget.prototype._getTargetElem = function(avatar, event)
+{
+	return this._elem;
+};
+
+
+
+// Hide hover indication of current drop target
+DropTarget.prototype._hideHoverIndication = function(avatar)
+{
+};
+
+
+// Show hover indication of current drop target
+DropTarget.prototype._showHoverIndication = function(avatar)
+{
+};
+
+
+// Avatar move event handler
+DropTarget.prototype.onDragMove = function(avatar, event)
+{
+	var newTargetElem = this._getTargetElem(avatar, event);
+
+	if (this._targetElem != newTargetElem)
+	{
+		this._hideHoverIndication(avatar);
+		this._targetElem = newTargetElem;
+		this._showHoverIndication(avatar);
+	}
+};
+
+
+// Drag end event handler
+// Should get avatar.getDragInfo() and check possibility of drop
+// Call avatar.onDragEnd() or avatar.onDragCancel()
+// After all process this._targetElem must be nulled
+DropTarget.prototype.onDragEnd = function(avatar, event)
+{
+	this._hideHoverIndication(avatar);
+	this._targetElem = null;
+};
+
+
+// Avatar enter to target event handler
+DropTarget.prototype.onDragEnter = function(fromDropTarget, avatar, event)
+{
+};
+
+
+// Avatar leave form target event handler
+DropTarget.prototype.onDragLeave = function(toDropTarget, avatar, event)
+{
+	this._hideHoverIndication();
+	this._targetElem = null;
+};
