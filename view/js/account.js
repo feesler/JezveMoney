@@ -3,6 +3,9 @@ function decompressAccounts()
 {
 	var decAccounts = [];
 
+	if (!isArray(accounts))
+		return;
+
 	accounts.forEach(function(acc)
 	{
 		decAccounts.push({
