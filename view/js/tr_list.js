@@ -394,7 +394,7 @@ function initTransListDrag()
 			if (listItem_wr.tagName && listItem_wr.tagName == 'TBODY')
 			{
 				listItem = firstElementChild(listItem_wr);		// get tr element
-				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
+				trans_id = transIdFromElem(listItem);
 				if (trans_id)
 				{
 					listItem.onclick = onTransClick.bind(null, trans_id);
@@ -409,7 +409,7 @@ function initTransListDrag()
 			if (!detailsMode && listItem_wr.className.indexOf('trlist_item_wrap') != -1)
 			{
 				listItem = firstElementChild(listItem_wr);
-				trans_id = (listItem.id.length > 3) ? parseInt(listItem.id.substr(3)) : 0;		// cut leading 'tr_' from identifier
+				trans_id = transIdFromElem(listItem);
 				if (trans_id)
 				{
 					listItem.onclick = onTransClick.bind(null, trans_id);
