@@ -43,33 +43,6 @@ function getAccount(account_id)
 }
 
 
-// Return person account object by id
-function getPersonAccount(account_id)
-{
-	var res = null;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return res;
-
-	persons.some(function(p)
-	{
-		if (!p || p.length < 3)
-			return false;
-
-		return p[2].some(function(acc)
-		{
-			if (acc[0] == account_id)
-				res = acc;
-
-			return (acc[0] == account_id);
-		});
-	});
-
-	return res;
-}
-
-
 // Format balance of account value with currency
 function formatAccoutBalance(acc_id)
 {

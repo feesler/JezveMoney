@@ -358,12 +358,15 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 	function onPersonUpdate(value)
 	{
-		var balance = getCurPersonBalance((debtType) ? src_curr : dest_curr);
+		var acc = getPersonAccount(value, (debtType) ? src_curr : dest_curr);
+
+		if (!acc)
+			return;
 
 		if (debtType)
-			updateValue('src_initbal', balance);
+			updateValue('src_initbal', acc.balance);
 		else
-			updateValue('dest_initbal', balance);
+			updateValue('dest_initbal', acc.balance);
 	}
 
 
@@ -583,11 +586,11 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 				if (srcAcc)
 					throw new Error('Invalid transaction');
 
-				srcAcc = getPersonAccount(edit_transaction.srcAcc);
+				srcAcc = findPersonAccountById(edit_transaction.srcAcc);
 				if (!srcAcc)
 					throw new Error('Invalid transaction');
 
-				srcAcc[2] += edit_transaction.srcAmount;
+				srcAcc.balance += edit_transaction.srcAmount;
 				if (destAcc)
 					destAcc.balance -= edit_transaction.destAmount;
 			}
@@ -596,13 +599,13 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 				if (destAcc)		// we should not find acount
 					throw new Error('Invalid transaction');
 
-				destAcc = getPersonAccount(edit_transaction.destAcc);
+				destAcc = findPersonAccountById(edit_transaction.destAcc);
 				if (!destAcc)
 					throw new Error('Invalid transaction');
 
 				if (srcAcc)
 					srcAcc.balance += edit_transaction.srcAmount;
-				destAcc[2] -= edit_transaction.destAmount;
+				destAcc.balance -= edit_transaction.destAmount;
 			}
 		}
 

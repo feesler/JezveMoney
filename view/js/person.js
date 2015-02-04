@@ -1,5 +1,37 @@
+// Decompress array of persons
+function decompressPersons()
+{
+	var decPersons = [];
+
+	if (!persons)
+		return;
+
+	persons.forEach(function(person)
+	{
+		var decAcc = [];
+
+		person[2].forEach(function(pAcc)
+		{
+			decAcc.push({
+				id : pAcc[0],
+				curr_id : pAcc[1],
+				balance : pAcc[2]
+			});
+		});
+
+		decPersons.push({
+			id : person[0],
+			name : person[1],
+			accounts : decAcc
+		});
+	});
+
+	persons = decPersons;
+}
+
+
 // Return object for specified person
-function getPersonObject(person_id)
+function getPerson(person_id)
 {
 	var pObj = null, p_id;
 
@@ -9,66 +41,63 @@ function getPersonObject(person_id)
 
 	persons.some(function(person)
 	{
-		if (person[0] == p_id)
+		var cond = (person.id == p_id);
+
+		if (cond)
 			pObj = person;
-		return (person[0] == p_id);
+
+		return cond;
 	});
 
 	return pObj;
 }
 
 
-// Return name of person
-function getPersonName(p_id)
+// Return person account object by id
+function findPersonAccountById()
 {
-	var person;
+	var resAcc = null;
 
-	person = getPersonObject(p_id);
-	if (!person || !isArray(person) || person.length < 3)
-		return null;
+	account_id = parseInt(account_id);
+	if (!account_id)
+		return resAcc;
 
-	return person[1];
-}
-
-
-// Return array of balance
-function getPersonBalance(p_id)
-{
-	var person, resArr = [];
-
-	person = getPersonObject(p_id);
-	if (!person || !isArray(person) || person.length < 3 || !isArray(person[2]))
-		return null;
-
-	person[2].forEach(function(acc)
+	persons.some(function(p)
 	{
-		resArr.push(formatCurrency(acc[2], acc[1]));
+		return p.accounts.some(function(acc)
+		{
+			var cond = (acc.id == account_id);
+
+			if (cond)
+				resAcc = acc;
+
+			return cond;
+		});
 	});
 
-	return resArr;
+	return resAcc;
 }
 
 
 // Return balance of current person in specified currency
-function getCurPersonBalance(curr_id)
+function getPersonAccount(person_id, curr_id)
 {
-	var personid, p_id, person, resBal = 0.0;
+	var person, resAcc = null;
 
-	personid = ge('person_id');
-	if (!personid || !curr_id)
-		return resBal;
-	person = getPersonObject(personid.value);
-	if (!person || !isArray(person) || person.length < 3 || !isArray(person[2]))
-		return resBal;
+	person = getPerson(person_id);
+	if (!person || !person.accounts || !curr_id)
+		return resAcc;
 
 	// check person have account in specified currency
-	person[2].some(function(acc)
+	person.accounts.some(function(acc)
 	{
-		if (acc[1] == curr_id)
-			resBal = acc[2];
+		var cond = (acc.curr_id == curr_id);
 
-		return (acc[1] == curr_id);
+		if (cond)
+			resAcc = acc;
+
+		return cond;
 	});
 
-	return resBal;
+	return resAcc;
 }

@@ -530,8 +530,8 @@ function TransactionViewModel()
 	// Update information on person tile on currency change
 	function updatePersonTile()
 	{
-		var person_tile, person_id, personname, pbalance, resbal_b;
-		var curr;
+		var person_tile, person_id, person, resbal_b;
+		var curr, acc;
 
 		if (!Transaction.isDebt())
 			return;
@@ -542,11 +542,15 @@ function TransactionViewModel()
 		if (!person_tile || !person_id || !resbal_b)
 			return;
 
-		personname = getPersonName(person_id.value);
+		person = getPerson(person_id.value);
+		if (!person)
+			return;
 		curr = Transaction.debtType() ? Transaction.srcCurr() : Transaction.destCurr();
 
-		pbalance = getCurPersonBalance(curr);
-		setTileInfo(person_tile, personname, formatCurrency(pbalance, curr));
+		acc = getPersonAccount(person_id.value, curr);
+		pbalance = (acc) ? acc.balance : 0;
+
+		setTileInfo(person_tile, person.name, formatCurrency(pbalance, curr));
 	}
 
 
@@ -1116,6 +1120,7 @@ function TransactionViewModel()
 		}
 
 		decompressAccounts();
+		decompressPersons();
 
 		if (edit_mode)
 		{
@@ -1168,8 +1173,10 @@ function TransactionViewModel()
 		}
 		else if (Transaction.isDebt())
 		{
-			var p_bal = getCurPersonBalance(Transaction.srcCurr());
-			var acc_bal;
+			var acc, p_bal;
+
+			acc = getPersonAccount(ge('person_id').value, Transaction.srcCurr());
+			p_bal = (acc) ? acc.balance : 0;
 
 			if (Transaction.debtType())
 				Transaction.set('src_initbal', p_bal);
@@ -1178,7 +1185,7 @@ function TransactionViewModel()
 
 			if (!Transaction.noAccount())
 			{
-				var acc = getAccount(ge('acc_id').value);
+				acc = getAccount(ge('acc_id').value);
 
 				if (Transaction.debtType())
 					Transaction.set('dest_initbal', acc.balance);
@@ -1216,10 +1223,7 @@ function TransactionViewModel()
 			{
 				persons.forEach(function(person)
 				{
-					persId = person[0];
-					persName = person[1];
-	
-					persDDList.addItem(persId, persName);
+					persDDList.addItem(person.id, person.name);
 				});
 			}
 			else
