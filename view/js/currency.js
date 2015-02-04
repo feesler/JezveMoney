@@ -3,6 +3,9 @@ function decompressCurrencies()
 {
 	var decCurrencies = [];
 
+	if (!isArray(currency))
+		return;
+
 	currency.forEach(function(curr)
 	{
 		decCurrencies.push({

@@ -3,7 +3,7 @@ function decompressPersons()
 {
 	var decPersons = [];
 
-	if (!persons)
+	if (!isArray(persons))
 		return;
 
 	persons.forEach(function(person)
