@@ -209,6 +209,8 @@ function initControls()
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
+	decompressCurrencies();
+
 	iconDDList = new DDList();
 	if (!iconDDList.create({ input_id : 'icon', itemPrefix : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
 		iconDDList = null;
@@ -276,10 +278,16 @@ function onTileClick(acc_id)
 // Set currency sign
 function setSign(signobj, curr_id)
 {
+	var curr;
+
 	if (!signobj)
 		return;
 
-	signobj.innerHTML = getCurrencySign(curr_id);
+	curr = getCurrency(curr_id);
+	if (!curr)
+		return;
+
+	signobj.innerHTML = curr.sign;
 }
 
 

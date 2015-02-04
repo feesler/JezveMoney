@@ -366,6 +366,8 @@ function initTransListDrag()
 {
 	var trlist, listItem_wr, listItem, trans_id;
 
+	decompressCurrencies();
+
 	initControls();
 
 	trlist = ge('trlist');

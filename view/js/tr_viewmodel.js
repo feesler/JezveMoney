@@ -458,7 +458,7 @@ function TransactionViewModel()
 	function setExchRate(val)
 	{
 		var exchrate, exchcomm, exchrate_b;
-		var exchText;
+		var exchText, srcCurr, destCurr;
 
 		if (val === undefined)
 			return;
@@ -467,19 +467,19 @@ function TransactionViewModel()
 		exchcomm = ge('exchcomm');
 		exchrate_b = ge('exchrate_b');
 
-		srcAmountSign = getCurrencySign(Transaction.srcCurr());
-		destAmountSign = getCurrencySign(Transaction.destCurr());
+		srcCurr = getCurrency(Transaction.srcCurr());
+		destCurr = getCurrency(Transaction.destCurr());
 
 		if (exchrate)
 			exchrate.value = val;
 
-		exchText = destAmountSign + '/' + srcAmountSign;
+		exchText = destCurr.sign + '/' + srcCurr.sign;
 
 		if (isValidValue(val) && val != 1 && val != 0)
 		{
 			invExch = parseFloat((1 / val).toFixed(5));
 
-			exchText = destAmountSign + '/' + srcAmountSign + ' ('  + invExch + ' ' + srcAmountSign + '/' + destAmountSign + ')';
+			exchText = destCurr.sign + '/' + srcCurr.sign + ' ('  + invExch + ' ' + srcCurr.sign + '/' + destCurr.sign + ')';
 		}
 
 		if (exchrate_b)
@@ -567,9 +567,17 @@ function TransactionViewModel()
 	// Set currency sign for specified field
 	function setSign(obj, curr_id)
 	{
-		var signobj = ge(obj);
-		if (signobj)
-			signobj.innerHTML = getCurrencySign(curr_id);
+		var signobj, curr;
+
+		signobj = ge(obj);
+		if (!signobj)
+			return;
+
+		curr = getCurrency(curr_id);
+		if (!curr)
+			return;
+
+		signobj.innerHTML = curr.sign;
 	}
 
 
@@ -1119,6 +1127,7 @@ function TransactionViewModel()
 			}
 		}
 
+		decompressCurrencies();
 		decompressAccounts();
 		decompressPersons();
 

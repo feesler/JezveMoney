@@ -16,11 +16,11 @@ function setCurrencyValues(currObj)
 
 	if (currObj)
 	{
-		curr_id.value = currObj[0];
-		del_curr_id.value = currObj[0];
-		curr_name.value = currObj[1];
-		curr_sign.value = currObj[2];
-		curr_format.checked = (currObj[3] == 1);
+		curr_id.value = currObj.id;
+		del_curr_id.value = currObj.id;
+		curr_name.value = currObj.name;
+		curr_sign.value = currObj.sign;
+		curr_format.checked = (currObj.format == 1);
 	}
 	else			// clean
 	{
@@ -42,7 +42,7 @@ function selectCurrency(id)
 	if (!curr_frm)
 		return;
 
-	currObj = getCurrencyObject(id);
+	currObj = getCurrency(id);
 	if (currObj)
 	{
 		curr_frm.action = baseURL + 'admin/currency.php?act=edit';

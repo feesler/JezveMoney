@@ -1,3 +1,22 @@
+// Decompress array of accounts
+function decompressCurrencies()
+{
+	var decCurrencies = [];
+
+	currency.forEach(function(curr)
+	{
+		decCurrencies.push({
+			id : curr[0],
+			name : curr[1],
+			sign : curr[2],
+			format : curr[3]
+		});
+	});
+
+	currency = decCurrencies;
+}
+
+
 // Format specified value
 function formatValue(val)
 {
@@ -6,7 +25,7 @@ function formatValue(val)
 
 
 // Return currency object for specified id
-function getCurrencyObject(curr_id)
+function getCurrency(curr_id)
 {
 	var currObj = null;
 
@@ -14,10 +33,12 @@ function getCurrencyObject(curr_id)
 	{
 		currency.some(function(curr)
 		{
-			if (curr[0] == curr_id)
+			var cond = (curr.id == curr_id);
+
+			if (cond)
 				currObj = curr;
 
-			return (curr[0] == curr_id);
+			return cond;
 		});
 	}
 
@@ -25,48 +46,16 @@ function getCurrencyObject(curr_id)
 }
 
 
-// Return sign of specified currency
-function getCurrencySign(curr_id)
-{
-	var currSign = '';
-
-	currency.some(function(curr)
-	{
-		if (curr[0] == curr_id)
-			currSign = curr[2];
-
-		return (curr[0] == curr_id);
-	});
-
-	return currSign;
-}
-
-
-// Return sign format of specified currency(before or after value)
-function getCurrencyFormat(curr_id)
-{
-	var currFmt = false;
-
-	currency.some(function(curr)
-	{
-		if (curr[0] == curr_id)
-			currFmt = curr[3];
-
-		return (curr[0] == curr_id);
-	});
-
-	return currFmt;
-}
-
-
 // Format value with rules of specified currency
 function formatCurrency(val, curr_id)
 {
-	var isBefore = getCurrencyFormat(curr_id);
-	var sign = getCurrencySign(curr_id);
+	var curr = getCurrency(curr_id);
 
-	if (isBefore)
-		return sign + ' ' + formatValue(val);
+	if (!curr)
+		return null;
+
+	if (curr.format)
+		return curr.sign + ' ' + formatValue(val);
 	else
-		return formatValue(val) + ' ' + sign;
+		return formatValue(val) + ' ' + curr.sign;
 }
