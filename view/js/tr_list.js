@@ -3,6 +3,11 @@ var calendarObj = null;
 var selRange = null;
 var baseURL = 'http://jezve.net/money/';
 
+var EXPENSE = 1;
+var INCOME = 2;
+var TRANSFER = 3;
+var DEBT = 4;
+
 
 var transactions =
 {
