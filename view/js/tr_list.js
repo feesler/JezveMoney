@@ -367,6 +367,7 @@ function initTransListDrag()
 	var trlist, listItem_wr, listItem, trans_id;
 
 	decompressCurrencies();
+	decompressAccounts();
 
 	initControls();
 
