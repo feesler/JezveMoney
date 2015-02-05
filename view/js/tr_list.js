@@ -9,6 +9,56 @@ var TRANSFER = 3;
 var DEBT = 4;
 
 
+// Decompress array of transactions
+function decompressTransactions()
+{
+	var decTransArr = [];
+
+	if (!isArray(transArr))
+		return;
+
+	transArr.forEach(function(trans)
+	{
+		var decTr = {
+			id : trans[0],
+			src_id : trans[1],
+			dest_id : trans[2],
+			fsrcAmount : trans[3],
+			fdestAmount : trans[4],
+			type : trans[5],
+			date : trans[6],
+			comment : trans[7],
+			pos : trans[8]
+		};
+
+		if (detailsMode)
+		{
+			decTr.src_balance = trans[9];
+			decTr.dest_balance = trans[10];
+
+			decTr.debtType = trans[11];
+			decTr.src_amount = trans[12];
+			decTr.dest_amount = trans[13];
+			decTr.src_curr = trans[14];
+			decTr.dest_curr = trans[15];
+		}
+		else
+		{
+			decTr.debtType = trans[9];
+			decTr.src_amount = trans[10];
+			decTr.dest_amount = trans[11];
+			decTr.src_curr = trans[12];
+			decTr.dest_curr = trans[13];
+		}
+
+		decTransArr.push(decTr);
+	});
+
+	transArr = decTransArr;
+}
+
+
+
 var transactions =
 {
 	selectedArr : [],
@@ -62,7 +112,7 @@ var transactions =
 		{
 			transArr.some(function(trans)
 			{
-				if (trans[0] == tr_id)
+				if (trans.id == tr_id)
 					tr_info = trans; 
 			});
 		}
@@ -73,43 +123,34 @@ var transactions =
 
 	updateBalance : function(trans, src_bal, dest_bal)
 	{
-		var tr_id, tr_type, src_amount, dest_amount;
-		var srcAcc, destAcc;
 		var trRow, trBalanceItem;
 
 		if (!trans)
 			return;
 
-		tr_id = trans[0];
-		tr_type = trans[5];
-		srcAcc = getAccount(trans[1]);
-		destAcc = getAccount(trans[2]);
-		src_amount = trans[12];
-		dest_amount = trans[13];
-
-		if (trans[1] != 0)
+		if (trans.src_id != 0)
 		{
 			if (src_bal === null)
-				src_bal = trans[9] + src_amount;		// trans.src_bal - trans.src_amount
-			trans[9] = src_bal - src_amount;
+				src_bal = trans.src_balance + trans.src_amount;		// trans.src_bal - trans.src_amount
+			trans.src_balance = src_bal - trans.src_amount;
 		}
 		else
 		{
-			trans[9] = 0;
+			trans.src_balance = 0;
 		}
 
-		if (trans[2] != 0)
+		if (trans.dest_id != 0)
 		{
 			if (dest_bal === null)
-				dest_bal = trans[10] - dest_amount;		// trans.dest_bal + trans.dest_amount
-			trans[10] = dest_bal + dest_amount;
+				dest_bal = trans.dest_balance - trans.dest_amount;		// trans.dest_bal + trans.dest_amount
+			trans.dest_balance = dest_bal + trans.dest_amount;
 		}
 		else
 		{
-			trans[10] = 0;
+			trans.dest_balance = 0;
 		}
 
-		trRow = ge('tr_' + tr_id);
+		trRow = ge('tr_' + trans.id);
 		if (!trRow)	// tr
 			return;
 		trBalanceItem = firstElementChild(trRow);		// td
@@ -129,23 +170,17 @@ var transactions =
 
 		var balSpan;
 
-		if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[1] != 0))
+		if (trans.type == EXPENSE || trans.type == TRANSFER || (trans.type == DEBT && trans.src_id != 0))
 		{
 			balSpan = ce('span');
-			if (tr_type == 4 && trans[11] == 1)
-				balSpan.innerHTML = formatCurrency(trans[9], trans[14]);
-			else
-				balSpan.innerHTML = formatCurrency(trans[9], srcAcc.curr_id);
+			balSpan.innerHTML = formatCurrency(trans.src_balance, trans.src_curr);
 			trBalanceItem.appendChild(balSpan);
 		}
 
-		if (tr_type == 2 || tr_type == 3 || (tr_type == 4 && trans[2] != 0))
+		if (trans.type == INCOME || trans.type == TRANSFER || (trans.type == DEBT && trans.dest_id != 0))
 		{
 			balSpan = ce('span');
-			if (tr_type == 4 && trans[11] == 2)
-				balSpan.innerHTML = formatCurrency(trans[10], trans[14]);
-			else
-				balSpan.innerHTML = formatCurrency(trans[10], destAcc.curr_id);
+			balSpan.innerHTML = formatCurrency(trans.dest_balance, trans.dest_curr);
 			trBalanceItem.appendChild(balSpan);
 		}
 	},
@@ -159,7 +194,7 @@ var transactions =
 		if (!tr_info)
 			return false;
 
-		oldPos = tr_info[8];
+		oldPos = tr_info.pos;
 		if (oldPos == pos)
 		{
 			return true;
@@ -170,9 +205,9 @@ var transactions =
 
 			transArr.sort(function(tr1, tr2)
 			{
-				if (tr1[8] < tr2[8])
+				if (tr1.pos < tr2.pos)
 					return -1;
-				else if (tr1[8] > tr2[8])
+				else if (tr1.pos > tr2.pos)
 					return 1;
 
 				return 0;
@@ -180,56 +215,46 @@ var transactions =
 
 			transArr.forEach(function(trans)
 			{
-				src_id = trans[1];
-				dest_id = trans[2];
-				tr_type = trans[5];
-
-				if (trans[0] == tr_id)
+				if (trans.id == tr_id)
 				{
-					trans[8] = pos;
+					trans.pos = pos;
 				}
 				else
 				{
 					if (oldPos == 0)			// insert with specified position
 					{
-						if (trans[8] >= pos)
-							trans[8] += 1;
+						if (trans.pos >= pos)
+							trans.pos += 1;
 					}
 					else if (pos < oldPos)		// moving up
 					{
-						if (trans[8] >= pos && trans[8] < oldPos)
-							trans[8] += 1;
+						if (trans.pos >= pos && trans.pos < oldPos)
+							trans.pos += 1;
 					}
 					else if (pos > oldPos)		// moving down
 					{
-						if (trans[8] > oldPos && trans[8] <= pos)
-							trans[8] -= 1;
+						if (trans.pos > oldPos && trans.pos <= pos)
+							trans.pos -= 1;
 					}
 				}
 
-				if (src_id && initBalArr[src_id] === undefined)
+				if (trans.src_id && initBalArr[trans.src_id] === undefined)
 				{
-					if (tr_type == 1 || tr_type == 3 || (tr_type == 4 && trans[11] == 2))	// expense, transfer or debt
-						initBalArr[src_id] = trans[9] + trans[13];		// src_bal + charge
-					else if (tr_type == 4 && trans[11] == 1)
-						initBalArr[src_id] = trans[9] + trans[12];		// src_bal + amount
+					initBalArr[trans.src_id] = trans.src_balance + trans.src_amount;
 				}
 
-				if (dest_id && initBalArr[dest_id] === undefined)
+				if (trans.dest_id && initBalArr[trans.dest_id] === undefined)
 				{
-					if (tr_type == 2 || tr_type == 3 || (tr_type == 4 && trans[11] == 1))				// income, transfer or debt
-						initBalArr[dest_id] = trans[10] - trans[13];		// dest_bal - charge
-					else if (tr_type == 4 && trans[11] == 2)
-						initBalArr[dest_id] = trans[10] - trans[12];	// dest_bal - amount
+					initBalArr[trans.dest_id] = trans.dest_balance - trans.dest_amount;
 				}
 			});
 
 			// Sort array of  transaction by position again
 			transArr.sort(function(tr1, tr2)
 			{
-				if (tr1[8] < tr2[8])
+				if (tr1.pos < tr2.pos)
 					return -1;
-				else if (tr1[8] > tr2[8])
+				else if (tr1.pos > tr2.pos)
 					return 1;
 
 				return 0;
@@ -241,34 +266,31 @@ var transactions =
 
 				transArr.forEach(function(trans)
 				{
-					src_id = trans[1];
-					dest_id = trans[2];
-
-					src_bal = (src_id != 0 && tBalanceArr[src_id] !== undefined) ? tBalanceArr[src_id] : initBalArr[src_id];
-					dest_bal = (dest_id != 0 && tBalanceArr[dest_id] !== undefined) ? tBalanceArr[dest_id] : initBalArr[dest_id];
+					src_bal = (trans.src_id != 0 && tBalanceArr[trans.src_id] !== undefined) ? tBalanceArr[trans.src_id] : initBalArr[trans.src_id];
+					dest_bal = (trans.dest_id != 0 && tBalanceArr[trans.dest_id] !== undefined) ? tBalanceArr[trans.dest_id] : initBalArr[trans.dest_id];
 
 					if (oldPos == 0)			// insert with specified position
 					{
-						if (trans[8] >= pos)
+						if (trans.pos >= pos)
 						{
 							this.updateBalance(trans, src_bal, dest_bal);
 						}
 					}
 					else if (pos < oldPos)		// moving up
 					{
-						if (trans[8] >= pos && trans[8] <= oldPos)
+						if (trans.pos >= pos && trans.pos <= oldPos)
 						{
 							this.updateBalance(trans, src_bal, dest_bal);
 						}
 					}
 					else if (pos > oldPos)		// moving down
 					{
-						if (trans[8] >= oldPos && trans[8] <= pos)
+						if (trans.pos >= oldPos && trans.pos <= pos)
 							this.updateBalance(trans, src_bal, dest_bal);
 					}
 
-					tBalanceArr[src_id] = trans[9];
-					tBalanceArr[dest_id] = trans[10];
+					tBalanceArr[trans.src_id] = trans.src_balance;
+					tBalanceArr[trans.dest_id] = trans.dest_balance;
 				}, this);
 			}
 		}
@@ -373,6 +395,7 @@ function initTransListDrag()
 
 	decompressCurrencies();
 	decompressAccounts();
+	decompressTransactions();
 
 	initControls();
 
@@ -491,7 +514,7 @@ function onTransPosChanged(trans_id, retrans_id)
 
 	if (replacedItem)
 	{
-		newPos = replacedItem[8];
+		newPos = replacedItem.pos;
 		sendChangePosRequest(tr_id, newPos);
 	}
 }
