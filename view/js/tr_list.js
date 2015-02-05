@@ -9,56 +9,6 @@ var TRANSFER = 3;
 var DEBT = 4;
 
 
-// Decompress array of transactions
-function decompressTransactions()
-{
-	var decTransArr = [];
-
-	if (!isArray(transArr))
-		return;
-
-	transArr.forEach(function(trans)
-	{
-		var decTr = {
-			id : trans[0],
-			src_id : trans[1],
-			dest_id : trans[2],
-			fsrcAmount : trans[3],
-			fdestAmount : trans[4],
-			type : trans[5],
-			date : trans[6],
-			comment : trans[7],
-			pos : trans[8]
-		};
-
-		if (detailsMode)
-		{
-			decTr.src_balance = trans[9];
-			decTr.dest_balance = trans[10];
-
-			decTr.debtType = trans[11];
-			decTr.src_amount = trans[12];
-			decTr.dest_amount = trans[13];
-			decTr.src_curr = trans[14];
-			decTr.dest_curr = trans[15];
-		}
-		else
-		{
-			decTr.debtType = trans[9];
-			decTr.src_amount = trans[10];
-			decTr.dest_amount = trans[11];
-			decTr.src_curr = trans[12];
-			decTr.dest_curr = trans[13];
-		}
-
-		decTransArr.push(decTr);
-	});
-
-	transArr = decTransArr;
-}
-
-
-
 var transactions =
 {
 	selectedArr : [],
@@ -395,7 +345,6 @@ function initTransListDrag()
 
 	decompressCurrencies();
 	decompressAccounts();
-	decompressTransactions();
 
 	initControls();
 

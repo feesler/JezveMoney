@@ -612,58 +612,56 @@ class Transaction extends CachedTable
 
 		foreach($resArr as $row)
 		{
-			$trans_id = intval($row["id"]);
-			$cur_trans_type = intval($row["type"]);
-			$src_id = intval($row["src_id"]);
-			$dest_id = intval($row["dest_id"]);
-			$src_amount = floatval($row["src_amount"]);
-			$dest_amount = floatval($row["dest_amount"]);
-			$src_curr = intval($row["src_curr"]);
-			$dest_curr = intval($row["dest_curr"]);
-			$comment = $row["comment"];
-			$fdate = date("d.m.Y", strtotime($row["date"]));
-			$trans_pos = intval($row["pos"]);
+			$trans = new apiObject();
 
-			if ($cur_trans_type == DEBT)
+			$trans->id = intval($row["id"]);
+			$trans->type = intval($row["type"]);
+			$trans->src_id = intval($row["src_id"]);
+			$trans->dest_id = intval($row["dest_id"]);
+			$trans->src_amount = floatval($row["src_amount"]);
+			$trans->dest_amount = floatval($row["dest_amount"]);
+			$trans->src_curr = intval($row["src_curr"]);
+			$trans->dest_curr = intval($row["dest_curr"]);
+			$trans->comment = $row["comment"];
+			$trans->date = date("d.m.Y", strtotime($row["date"]));
+			$trans->pos = intval($row["pos"]);
+
+			if ($details)
+			{
+				$balArr = $this->getBalance($trans->id);
+
+				$trans->src_balance = (($trans->src_id != 0 && isset($balArr[$trans->src_id])) ? $balArr[$trans->src_id] : 0.0);
+				$trans->dest_balance = (($trans->dest_id != 0 && isset($balArr[$trans->dest_id])) ? $balArr[$trans->dest_id] : 0.0);
+			}
+
+			if ($trans->type == DEBT)
 			{
 				$src_owner_id = ($src_id != 0) ? $acc->getOwner($src_id) : 0;
 				$dest_owner_id = ($dest_id != 0) ? $acc->getOwner($dest_id) : 0;
 			}
 
-			$fsrcamount = "";
-			if ($cur_trans_type == EXPENSE || ($cur_trans_type == DEBT && ($dest_owner_id == 0 || $src_owner_id == $owner_id)))			// expense
-				$fsrcamount .= "- ";
-			else if ($cur_trans_type == INCOME || ($cur_trans_type == DEBT && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
-				$fsrcamount .= "+ ";
-			$fsrcamount .= Currency::format($src_amount, $src_curr);
+			$trans->fsrcAmount = "";
+			if ($trans->type == EXPENSE || ($trans->type == DEBT && ($dest_owner_id == 0 || $src_owner_id == $owner_id)))			// expense
+				$trans->fsrcAmount .= "- ";
+			else if ($trans->type == INCOME || ($trans->type == DEBT && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
+				$trans->fsrcAmount .= "+ ";
+			$trans->fsrcAmount .= Currency::format($trans->src_amount, $trans->src_curr);
 
-			if ($src_curr != $dest_curr)
+			if ($trans->src_curr != $trans->dest_curr)
 			{
-				$fdestamount = "";
+				$trans->fdestAmount = "";
 				if ($cur_trans_type == EXPENSE || ($cur_trans_type == DEBT && $src_owner_id == $owner_id))			// expense
-					$fdestamount .= "- ";
+					$trans->fdestAmount .= "- ";
 				else if ($cur_trans_type == INCOME || ($cur_trans_type == DEBT && $dest_owner_id == $owner_id))			// income
-					$fdestamount .= "+ ";
-				$fdestamount .= Currency::format($dest_amount, $dest_curr);
+					$trans->fdestAmount .= "+ ";
+				$trans->fdestAmount .= Currency::format($trans->dest_amount, $trans->dest_curr);
 			}
 			else
-				$fdestamount = $fsrcamount;
+				$trans->fdestAmount = $trans->fsrcAmount;
 
-			$trArr = array($trans_id, $src_id, $dest_id, $fsrcamount, $fdestamount, $cur_trans_type, $fdate, $comment, $trans_pos);
-			if ($details)
-			{
-				$balArr = $this->getBalance($trans_id);
+			$trans->debtType = ($trans->type == DEBT) ? (($dest_owner_id == 0 || $dest_owner_id == $owner_id) ? 1 : 2) : 0;
 
-				$trArr[] = (($src_id != 0 && isset($balArr[$src_id])) ? $balArr[$src_id] : 0.0);
-				$trArr[] = (($dest_id != 0 && isset($balArr[$dest_id])) ? $balArr[$dest_id] : 0.0);
-			}
-			// #9 or #11 in details mode
-			$trArr[] = ($cur_trans_type == DEBT) ? (($dest_owner_id == 0 || $dest_owner_id == $owner_id) ? 1 : 2) : 0;
-			$trArr[] = $src_amount;
-			$trArr[] = $dest_amount;
-			$trArr[] = $src_curr;
-			$trArr[] = $dest_curr;
-			$res[] = $trArr;
+			$res[] = $trans;
 		}
 
 		return $res;
