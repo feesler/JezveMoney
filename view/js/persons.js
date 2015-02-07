@@ -1,50 +1,5 @@
+var persons = new Selection();
 var dwPopup;		// delete warning popup
-
-
-var persons =
-{
-	selectedArr : [],
-
-	// Return position of person in selectedArr
-	getPos : function(p_id)
-	{
-		return this.selectedArr.indexOf(p_id);
-	},
-
-
-	isSelected : function(p_id)
-	{
-		return this.selectedArr.some(function(person_id){ return person_id == p_id; });
-	},
-
-
-	selectPerson : function(p_id)
-	{
-		if (!p_id || this.isSelected(p_id))
-			return false;
-
-		this.selectedArr.push(p_id);
-		return true;
-	},
-
-
-	deselectPerson : function(p_id)
-	{
-		var p_pos = this.getPos(p_id);
-
-		if (p_pos == -1)
-			return false;
-
-		this.selectedArr.splice(p_pos, 1);
-		return true;
-	},
-
-
-	selectedCount : function()
-	{
-		return this.selectedArr.length;
-	}
-};
 
 
 // Tile click event handler
@@ -52,6 +7,7 @@ function onTileClick(p_id)
 {
 	var tile, edit_btn, del_btn, delpersons;
 	var actDiv;
+	var selArr;
 	var baseURL = 'http://jezve.net/money/';
 
 	tile = ge('p_' + p_id);
@@ -63,7 +19,7 @@ function onTileClick(p_id)
 
 	if (persons.isSelected(p_id))
 	{
-		persons.deselectPerson(p_id);
+		persons.deselect(p_id);
 
 		actDiv = ge('act_' + p_id);
 		if (actDiv)
@@ -71,26 +27,27 @@ function onTileClick(p_id)
 	}
 	else
 	{
-		persons.selectPerson(p_id);
+		persons.select(p_id);
 
 		actDiv = ce('div', { id : 'act_' + p_id, className : 'act', onclick : onTileClick.bind(null, p_id) });
 
 		tile.appendChild(actDiv);
 	}
 
-	show(edit_btn, (persons.selectedCount() == 1));
-	show(del_btn, (persons.selectedCount() > 0));
+	show(edit_btn, (persons.count() == 1));
+	show(del_btn, (persons.count() > 0));
 
-	delpersons.value = persons.selectedArr.join();
+	selArr = persons.getIdArray();
+	delpersons.value = selArr.join();
 
-	if (persons.selectedCount() == 1)
+	if (persons.count() == 1)
 	{
 		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = baseURL + 'persons/edit/' + persons.selectedArr[0];
+			firstElementChild(edit_btn).href = baseURL + 'persons/edit/' + selArr[0];
 	}
 
-	show('toolbar', (persons.selectedCount() > 0));
-	if (persons.selectedCount() > 0)
+	show('toolbar', (persons.count() > 0));
+	if (persons.count() > 0)
 	{
 		onScroll();
 	}
@@ -153,7 +110,7 @@ var singlePersonDeleteMsg = 'Are you sure want to delete selected person?<br>Deb
 // Delete person iconlink click event handler
 function onDelete()
 {
-	persons.selectPerson(person_id);
+	persons.select(person_id);
 
 	showDeletePopup();
 }
@@ -184,7 +141,7 @@ function showDeletePopup()
 {
 	var multi;
 
-	if (persons.selectedCount() == 0)
+	if (persons.count() == 0)
 		return;
 
 	// check popup already created
@@ -195,7 +152,7 @@ function showDeletePopup()
 	if (!dwPopup)
 		return;
 
-	multi = (persons.selectedCount() > 1);
+	multi = (persons.count() > 1);
 	if (!dwPopup.create({ id : 'delete_warning',
 						title : (multi) ? multiPersonsDeleteTitle : singlePersonDeleteTitle,
 						msg : (multi) ? multiPersonsDeleteMsg : singlePersonDeleteMsg,
