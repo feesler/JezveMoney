@@ -4,10 +4,7 @@
 	var accounts = <?=f_json_encode($accArr)?>;
 	var currency = <?=f_json_encode($currArr)?>;
 	var transArr = <?=f_json_encode($transArr)?>;
-	var transType = <?=f_json_encode($type_str)?>;
-	var curAccId = <?=f_json_encode($accFilter)?>;
-	var searchRequest = <?=f_json_encode($searchReq)?>;
-	var detailsMode = <?=(($showDetails) ? "true" : "false")?>;
+	var filterObj = <?=f_json_encode($filterObj)?>;
 
 	onReady(initTransListDrag);
 	onReady(initToolbar);

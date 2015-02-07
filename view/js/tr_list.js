@@ -156,7 +156,7 @@ var transactions = (function()
 				return 0;
 			});
 
-			if (detailsMode)
+			if (filterObj.mode == 'details')
 			{
 				var tBalanceArr = [];
 
@@ -231,7 +231,7 @@ function onTransClick(tr_id)
 	{
 		trSelection.deselect(tr_id);
 
-		transObj.className = (detailsMode) ? '' : 'trlist_item';
+		transObj.className = (filterObj.mode == 'details') ? '' : 'trlist_item';
 	}
 	else
 	{
@@ -318,13 +318,13 @@ function initTransListDrag()
 									itemClass : 'trlist_item_wrap',
 									placeholderClass : 'trlist_item_placeholder',
 									copyWidth : true,
-									table : detailsMode });
+									table : (filterObj.mode == 'details') });
 
 	listItem_wr = firstElementChild(trlist);
 	listItem = null;
 	while(listItem_wr)
 	{
-		if (detailsMode)
+		if (filterObj.mode == 'details')
 		{
 			if (listItem_wr.className.indexOf('details_table') != -1)
 				listItem_wr = firstElementChild(listItem_wr);
@@ -344,7 +344,7 @@ function initTransListDrag()
 		}
 		else
 		{
-			if (!detailsMode && listItem_wr.className.indexOf('trlist_item_wrap') != -1)
+			if (filterObj.mode != 'details' && listItem_wr.className.indexOf('trlist_item_wrap') != -1)
 			{
 				listItem = firstElementChild(listItem_wr);
 				trans_id = transIdFromElem(listItem);
@@ -430,18 +430,42 @@ function onTransPosChanged(trans_id, retrans_id)
 }
 
 
+// Build new location address from current filterObj
+function buildAddress()
+{
+	var newLocation = baseURL + 'transactions/';
+	var locFilter = {};
+
+	setParam(locFilter, filterObj);
+
+	if (locFilter.acc_id.length)
+		locFilter.acc_id = locFilter.acc_id.join();
+	else if ('acc_id' in filterObj)
+		delete filterObj['acc_id'];
+
+	for(var name in locFilter)
+	{
+		if (typeof locFilter[name] == 'string')
+			locFilter[name] = encodeURIComponent(locFilter[name]);
+	}
+
+	if (!isEmpty(locFilter))
+		newLocation += '?' + urlJoin(locFilter);
+
+	return newLocation;
+}
+
+
 // Account change event handler
 function onAccountChange(obj)
 {
-	var acc_id;
-	var newLocation;
+	var acc;
 	var reloadNeeded = false;
-	var accArr = [], str = '';
 
 	// Check all accounts from the new selection present in current selection
-	for(acc_id in obj)
+	for(acc in obj)
 	{
-		if (curAccId.indexOf(acc_id) == -1)
+		if (filterObj.acc_id.indexOf(parseInt(acc)) == -1)
 		{
 			reloadNeeded = true;
 			break;
@@ -451,7 +475,7 @@ function onAccountChange(obj)
 	// Check all currenlty selected accounts present in the new selection
 	if (!reloadNeeded)
 	{
-		if (curAccId.some(function(acc_id){ return !(acc_id in obj); }))
+		if (filterObj.acc_id.some(function(acc_id){ return !(acc_id in obj); }))
 			reloadNeeded = true;
 	}
 
@@ -459,22 +483,13 @@ function onAccountChange(obj)
 		return;
 
 	// Prepare parameters
-	for(acc_id in obj)
+	filterObj.acc_id = [];
+	for(acc in obj)
 	{
-		accArr.push(acc_id);
+		filterObj.acc_id.push(parseInt(acc));
 	}
 
-	str = accArr.join();
-
-	newLocation = baseURL + 'transactions/?type=' + transType;
-	if (str != '')
-		newLocation += '&acc_id=' + str;
-	if (searchRequest)
-		newLocation += '&search=' + encodeURI(searchRequest);
-	if (detailsMode)
-		newLocation += '&mode=details';
-
-	window.location = newLocation;
+	window.location = buildAddress();
 }
 
 
@@ -485,9 +500,9 @@ function onSearchSubmit(frm)
 		return false;
 
 	frm.action = baseURL + 'transactions/?type=' + transType;
-	if (curAccId != 0)
-		frm.action += '&acc_id=' + curAccId;
-	if (detailsMode)
+	if ('acc_id' in filterObj)
+		frm.action += '&acc_id=' + encodeURIComponent(filterObj.acc_id.join());
+	if (filterObj.mode == 'details')
 		frm.action += '&mode=details';
 
 	return true;
@@ -572,21 +587,13 @@ function onRangeSelect(range)
 // Date picker hide callback
 function onDatePickerHide()
 {
-	var newLocation;
-
 	if (!selRange)
 		return;
 
-	newLocation = baseURL + 'transactions/?type=' + transType;
-	if (acc_id != 0)
-		newLocation += '&acc_id=' + curAccId;
-	if (searchRequest)
-		newLocation += '&search=' + encodeURI(searchRequest);
-	if (detailsMode)
-		newLocation += '&mode=details';
-	newLocation += '&stdate=' + Calendar.format(selRange.start) + '&enddate=' + Calendar.format(selRange.end);
+	filterObj.stdata = Calendar.format(selRange.start);
+	filterObj.enddate = Calendar.format(selRange.end);
 
-	window.location = newLocation;
+	window.location = buildAddress();
 }
 
 

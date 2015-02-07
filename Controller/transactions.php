@@ -8,6 +8,8 @@ class TransactionsController extends Controller
 
 		$trans = new Transaction($user_id);
 		$acc = new Account($user_id);
+		$filterObj = new stdClass;
+
 
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
 
@@ -30,7 +32,11 @@ class TransactionsController extends Controller
 			}
 		}
 
+		$filterObj->acc_id = $accFilter;
+
 		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
+		if (!is_null($searchReq))
+			$filterObj->search = $searchReq;
 
 		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
@@ -42,11 +48,17 @@ class TransactionsController extends Controller
 			$edate = strtotime($endDate);
 			if ($sdate != -1 && $edate != -1)
 				$dateFmt = date("d.m.Y", $sdate)." - ".date("d.m.Y", $edate);
+
+			$filterObj->stdate = $stDate;
+			$filterObj->enddate = $endDate;
 		}
 
 		$showDetails = FALSE;
 		if (isset($_GET["mode"]) && $_GET["mode"] == "details")
+		{
 			$showDetails = TRUE;
+			$filterObj->mode = "details";
+		}
 
 		$accArr = $acc->getArray();
 
