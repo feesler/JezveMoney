@@ -18,7 +18,7 @@
 	{
 		$trans_type = intval($_POST["transtype"]);
 
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
 			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
@@ -112,18 +112,18 @@
 	}
 	else if ($action == "new")
 	{
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			if (!$debt->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$respObj->fail();
 		}
 		else
 		{
-			if ($trans_type == 1 && (!$src_id || !$src_curr || !$dest_curr))
+			if ($trans_type == EXPENSE && (!$src_id || !$src_curr || !$dest_curr))
 				$respObj->fail();
-			if ($trans_type == 2 && (!$dest_id || !$src_curr || !$dest_curr))
+			if ($trans_type == INCOME && (!$dest_id || !$src_curr || !$dest_curr))
 				$respObj->fail();
-			if ($trans_type == 3 && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
+			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				$respObj->fail();
 
 			$trans_id = $trans->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment);
@@ -135,7 +135,7 @@
 	}
 	else if ($action == "edit")
 	{
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$respObj->fail();
