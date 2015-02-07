@@ -56,10 +56,10 @@
 							<div>
 								<select id="acc_id" onchange="onAccountChange(this);">
 <?php	foreach($accArr as $accInfo) {
-			if ($accInfo[0] == $acc_id) {	?>
-									<option value="<?=$accInfo[0]?>" selected><?=$accInfo[4]?></option>
+			if ($accInfo->id == $acc_id) {	?>
+									<option value="<?=$accInfo->id?>" selected><?=$accInfo->name?></option>
 <?php		} else {	?>
-									<option value="<?=$accInfo[0]?>"><?=$accInfo[4]?></option>
+									<option value="<?=$accInfo->id?>"><?=$accInfo->name?></option>
 <?php		}
 		}		?>
 								</select>
