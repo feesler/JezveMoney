@@ -154,8 +154,6 @@ function onFilterSel(obj)
 	if (!filter_type)
 		return;
 
-	selectByValue(filter_type, obj.id);
-
 	this.setText(obj.str);
 
 	onFilterChange(filter_type);
@@ -172,8 +170,6 @@ function onAccountSel(obj)
 	acc_id = ge('acc_id');
 	if (!acc_id)
 		return;
-
-	selectByValue(acc_id, obj.id);
 
 	this.setText(obj.str);
 
@@ -192,8 +188,6 @@ function onCurrencySel(obj)
 	if (!curr_id)
 		return;
 
-	selectByValue(curr_id, obj.id);
-
 	this.setText(obj.str);
 
 	onCurrChange(curr_id);
@@ -210,8 +204,6 @@ function onGroupSel(obj)
 	groupsel = ge('groupsel');
 	if (!groupsel)
 		return;
-
-	selectByValue(groupsel, obj.id);
 
 	this.setText(obj.str);
 
