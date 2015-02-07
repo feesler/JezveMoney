@@ -656,9 +656,9 @@ class TransactionsController extends Controller
 		if (!$trans_type)
 			$this->fail();
 
-		$defMsg = ($trans_type == 4) ? ERR_DEBT_CREATE : ERR_TRANS_CREATE;
+		$defMsg = ($trans_type == DEBT) ? ERR_DEBT_CREATE : ERR_TRANS_CREATE;
 
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
 			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
@@ -691,7 +691,7 @@ class TransactionsController extends Controller
 
 		$trans = new Transaction($user_id);
 
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			if (!$debt->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
@@ -700,11 +700,11 @@ class TransactionsController extends Controller
 		}
 		else
 		{
-			if ($trans_type == 1 && (!$src_id || !$src_curr || !$dest_curr))
+			if ($trans_type == EXPENSE && (!$src_id || !$src_curr || !$dest_curr))
 				fail($defMsg);
-			if ($trans_type == 2 && (!$dest_id || !$src_curr || !$dest_curr))
+			if ($trans_type == INCOME && (!$dest_id || !$src_curr || !$dest_curr))
 				fail($defMsg);
-			if ($trans_type == 3 && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
+			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				fail($defMsg);
 
 			if (!$trans->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
@@ -721,9 +721,9 @@ class TransactionsController extends Controller
 
 		$trans_type = intval($_POST["transtype"]);
 
-		$defMsg = ($trans_type == 4) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
+		$defMsg = ($trans_type == DEBT) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
 
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
 			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
@@ -759,7 +759,7 @@ class TransactionsController extends Controller
 		if (!isset($_POST["transid"]))
 			$this->fail($defMsg);
 		$trans_id = intval($_POST["transid"]);
-		if ($trans_type == 4)
+		if ($trans_type == DEBT)
 		{
 			if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
