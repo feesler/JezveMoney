@@ -40,14 +40,7 @@ function Selection()
 
 	this.getIdArray = function()
 	{
-		var res = [];
-
-		for(var id in this.selected)
-		{
-			res.push(id);
-		}
-
-		return res;
+		return Object.keys(this.selected);
 	}
 
 
