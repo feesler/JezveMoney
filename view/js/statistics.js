@@ -24,72 +24,6 @@ function buildAddress()
 }
 
 
-// Return group parameter for specified type
-function getGroupParam(id)
-{
-	var groupTypes = [null, 'day', 'week', 'month', 'year'];
-
-	id = parseInt(id);
-
-	return (id < groupTypes.length) ? groupTypes[id] : null;
-}
-
-
-// Return filter parameter for specified type
-function getFilterParam(id)
-{
-	return (parseInt(id) == 1) ? 'currency' : null;
-}
-
-
-// Filter type change event handler
-function onFilterChange(obj)
-{
-	var filter;
-
-	filter = getFilterParam(selectedValue(obj));
-	if (filter)
-		filterObj.filter = filter;
-	else if ('filter' in filterObj)
-		delete filterObj['filter'];
-
-	window.location = buildAddress();
-}
-
-
-// Group change event handler
-function onGroupChange(obj)
-{
-	var group;
-
-	group = getGroupParam(selectedValue(obj));
-	if (group)
-		filterObj.group = group;
-	else if ('group' in filterObj)
-		delete filterObj['group'];
-
-	window.location = buildAddress();
-}
-
-
-// Account change event handler
-function onAccountChange(obj)
-{
-	filterObj.acc_id = parseInt(selectedValue(obj));
-
-	window.location = buildAddress();
-}
-
-
-// Currency change event handler
-function onCurrChange(obj)
-{
-	filterObj.curr_id = parseInt(selectedValue(obj));
-
-	window.location = buildAddress();
-}
-
-
 // Date range select calback
 function onRangeSelect(range)
 {
@@ -146,68 +80,68 @@ function showCalendar()
 // Filter type select callback
 function onFilterSel(obj)
 {
-	var filter_type;
+	var filter;
 
 	if (!obj)
-		return;
-	filter_type = ge('filter_type');
-	if (!filter_type)
 		return;
 
 	this.setText(obj.str);
 
-	onFilterChange(filter_type);
+	filter = (parseInt(obj.id) == 1) ? 'currency' : null;
+	if (filter)
+		filterObj.filter = filter;
+	else if ('filter' in filterObj)
+		delete filterObj['filter'];
+
+	window.location = buildAddress();
 }
 
 
 // Account select callback
 function onAccountSel(obj)
 {
-	var acc_id;
-
 	if (!obj)
-		return;
-	acc_id = ge('acc_id');
-	if (!acc_id)
 		return;
 
 	this.setText(obj.str);
 
-	onAccountChange(acc_id);
+	filterObj.acc_id = obj.id;
+	window.location = buildAddress();
 }
 
 
 // Currency select callback
 function onCurrencySel(obj)
 {
-	var curr_id;
-
 	if (!obj)
-		return;
-	curr_id = ge('curr_id');
-	if (!curr_id)
 		return;
 
 	this.setText(obj.str);
 
-	onCurrChange(curr_id);
+	filterObj.curr_id = obj.id;
+	window.location = buildAddress();
 }
 
 
 // Group select callback
 function onGroupSel(obj)
 {
-	var groupsel;
+	var groupTypes = [null, 'day', 'week', 'month', 'year'];
+	var group;
 
 	if (!obj)
-		return;
-	groupsel = ge('groupsel');
-	if (!groupsel)
 		return;
 
 	this.setText(obj.str);
 
-	onGroupChange(groupsel);
+	obj.id = parseInt(obj.id);
+	group = (obj.id < groupTypes.length) ? groupTypes[obj.id] : null;
+	if (group)
+		filterObj.group = group;
+	else if ('group' in filterObj)
+		delete filterObj['group'];
+
+	window.location = buildAddress();
 }
 
 
