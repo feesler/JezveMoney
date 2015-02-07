@@ -32,18 +32,6 @@ function getGroupParam(id)
 	id = parseInt(id);
 
 	return (id < groupTypes.length) ? groupTypes[id] : null;
-/*
-	if (id == 1)
-		return '&group=day';
-	else if (id == 2)
-		return '&group=week';
-	else if (id == 3)
-		return '&group=month';
-	else if (id == 4)
-		return '&group=year';
-	else
-		return '';
-*/
 }
 
 
@@ -51,38 +39,12 @@ function getGroupParam(id)
 function getFilterParam(id)
 {
 	return (parseInt(id) == 1) ? 'currency' : null;
-/*
-	if (id == 1)
-		return 'filter=currency';
-	else
-		return '';
-*/
 }
 
 
 // Filter type change event handler
 function onFilterChange(obj)
 {
-/*
-	var filter_id, acc_id, group_id;
-	var accsel, groupsel;
-	var filter_type;
-
-	accsel = ge('acc_id');
-	groupsel = ge('groupsel');
-	filter_type = ge('filter_type');
-	if (!accsel || !groupsel || !filter_type)
-		return;
-
-	filter_id = parseInt(selectedValue(filter_type));
-	acc_id = parseInt(selectedValue(accsel));
-	group_id = parseInt(selectedValue(groupsel))
-
-	show('acc_block', (filter_id == 0));
-	show('curr_block', (filter_id == 1));
-
-	window.location = baseURL + 'statistics/?' + getFilterParam(filter_id) + '&type=' + transType + getGroupParam(group_id);
-*/
 	var filter;
 
 	filter = getFilterParam(selectedValue(obj));
@@ -98,33 +60,6 @@ function onFilterChange(obj)
 // Group change event handler
 function onGroupChange(obj)
 {
-/*
-	var newLocation;
-	var filter_id, acc_id, curr_id, group_id;
-	var accsel, currsel, groupsel;
-	var filter_type;
-
-	accsel = ge('acc_id');
-	currsel = ge('curr_id');
-	groupsel = ge('groupsel');
-	filter_type = ge('filter_type');
-	if (!accsel || !groupsel || !filter_type)
-		return;
-
-	filter_id = parseInt(selectedValue(filter_type));
-	acc_id = parseInt(selectedValue(accsel));
-	curr_id = parseInt(selectedValue(currsel));
-	group_id = parseInt(selectedValue(groupsel))
-
-	newLocation = baseURL + 'statistics/?' + getFilterParam(filter_id);
-	if (filter_id == 1)
-		newLocation += '&curr_id=' + curr_id;
-	else
-		newLocation += '&acc_id=' + acc_id;
-	newLocation += '&type=' + transType + getGroupParam(group_id);
-
-	window.location = newLocation;
-*/
 	var group;
 
 	group = getGroupParam(selectedValue(obj));
@@ -140,21 +75,6 @@ function onGroupChange(obj)
 // Account change event handler
 function onAccountChange(obj)
 {
-/*
-	var acc_id, group_id;
-	var accsel, groupsel;
-
-	accsel = ge('acc_id');
-	groupsel = ge('groupsel');
-	if (!accsel || !groupsel)
-		return;
-
-	acc_id = parseInt(selectedValue(accsel));
-	group_id = parseInt(selectedValue(groupsel));
-
-	window.location = baseURL + 'statistics/?acc_id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
-*/
-
 	filterObj.acc_id = parseInt(selectedValue(obj));
 
 	window.location = buildAddress();
@@ -164,24 +84,6 @@ function onAccountChange(obj)
 // Currency change event handler
 function onCurrChange(obj)
 {
-/*
-	var filter_id, curr_id, group_id;
-	var currsel, groupsel;
-	var filter_type;
-
-	currsel = ge('curr_id');
-	groupsel = ge('groupsel');
-	filter_type = ge('filter_type');
-	if (!currsel || !groupsel || !filter_type)
-		return;
-
-	filter_id = parseInt(selectedValue(filter_type));
-	curr_id = parseInt(selectedValue(currsel));
-	group_id = parseInt(selectedValue(groupsel));
-
-	window.location = baseURL + 'statistics/?' + getFilterParam(filter_id) + '&curr_id=' + curr_id + '&type=' + transType + getGroupParam(group_id);
-*/
-
 	filterObj.curr_id = parseInt(selectedValue(obj));
 
 	window.location = buildAddress();
@@ -209,18 +111,6 @@ function onRangeSelect(range)
 // Date picker hide callback
 function onDatePickerHide()
 {
-/*
-	var newLocation;
-
-	if (!selRange)
-		return;
-
-	newLocation = baseURL + 'statistics/?type=' + transType;
-	if (acc_id != 0)
-		newLocation += '&acc_id=' + curAccId;
-	newLocation += '&stdate=' + Calendar.format(selRange.start) + '&enddate=' + Calendar.format(selRange.end);
-*/
-
 	if (!selRange)
 		return;
 

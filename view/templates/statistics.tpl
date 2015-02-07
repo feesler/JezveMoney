@@ -19,7 +19,7 @@
 					<div class="heading">
 						<h1>Statistics</h1>
 					</div>
-		
+
 					<div>
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {	
@@ -44,7 +44,7 @@
 								</select>
 							</div>
 						</div>
-		
+
 <?php	if ($byCurrency) {		?>
 						<div id="acc_block" class="tr_filter std_input" style="display: none;">
 <?php	} else {	?>
