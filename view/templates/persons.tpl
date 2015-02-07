@@ -15,7 +15,7 @@
 					<div class="tiles"><?php
 		if (count($persArr)) {
 			foreach($persArr as $pData) {
-?><div id="p_<?=$pData[0]?>" class="tile"><button class="tilelink" onclick="onTileClick(<?=$pData[0]?>);" type="button"><span><span class="acc_bal"></span><span class="acc_name"><?=$pData[1]?></span></span></button></div><?php
+?><div id="p_<?=$pData->id?>" class="tile"><button class="tilelink" onclick="onTileClick(<?=$pData->id?>);" type="button"><span><span class="acc_bal"></span><span class="acc_name"><?=$pData->name?></span></span></button></div><?php
 			}
 		} else {	?>
 						<span>You have no one person. Please create one.</span>

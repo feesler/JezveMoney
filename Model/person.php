@@ -250,15 +250,11 @@ class Person extends CachedTable
 		foreach($resArr as $row)
 		{
 			$p_id = intval($row["pid"]);
-			$p_name = $row["name"];
-			$acc_id = intval($row["aid"]);
-			$curr_id = intval($row["curr_id"]);
-			$balance = floatval($row["balance"]);
 
 			$ind = NULL;
 			foreach($pArr as $pInd => $pVal)
 			{
-				if ($pVal[0] == $p_id)
+				if ($pVal->id == $p_id)
 				{
 					$ind = $pInd;
 					break;
@@ -266,18 +262,26 @@ class Person extends CachedTable
 			}
 
 			if (is_null($ind))
-			{
-				$pArr[] = array();
 				$ind = count($pArr) - 1;
+
+			if (!isset($pArr[$ind]))
+			{
+				$pArr[$ind] = new apiObject; 
+
+				$pArr[$ind]->id = $p_id;
+				$pArr[$ind]->name = $row["name"];
+				$pArr[$ind]->accounts = array();
 			}
-
-			$pArr[$ind][0] = $p_id;
-			$pArr[$ind][1] = $p_name;
-			if (!isset($pArr[$ind][2]))
-				$pArr[$ind][2] = array();
 			if (!is_null($row["aid"]))
-				$pArr[$ind][2][] = array($acc_id, $curr_id, $balance);
+			{
+				$pAccObj = new apiObject;
 
+				$pAccObj->id = intval($row["aid"]);
+				$pAccObj->curr_id = intval($row["curr_id"]);
+				$pAccObj->balance = floatval($row["balance"]);
+
+				$pArr[$ind]->accounts[] = $pAccObj;
+			}
 		}
 
 		return $pArr;

@@ -81,11 +81,11 @@
 <?php	} else {	?>
 <?php		foreach($persArr as $pData) {	?>
 								<div class="info_tile">
-									<span class="info_title"><?=$pData[1]?></span>
-<?php			if ($pData["nodebts"]) {		?>
+									<span class="info_title"><?=$pData->name?></span>
+<?php			if ($pData->nodebts) {		?>
 									<span class="info_subtitle">No debts</span>
 <?php			} else {	?>
-									<span class="info_subtitle"><?=implode("<br>", $pData["balfmt"])?></span>
+									<span class="info_subtitle"><?=implode("<br>", $pData->balfmt)?></span>
 <?php			}	?>
 								</div>
 <?php		}	?>

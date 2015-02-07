@@ -1128,7 +1128,6 @@ function TransactionViewModel()
 		}
 
 		decompressAccounts();
-		decompressPersons();
 
 		if (edit_mode)
 		{

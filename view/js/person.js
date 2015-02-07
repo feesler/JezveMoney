@@ -1,35 +1,3 @@
-// Decompress array of persons
-function decompressPersons()
-{
-	var decPersons = [];
-
-	if (!isArray(persons))
-		return;
-
-	persons.forEach(function(person)
-	{
-		var decAcc = [];
-
-		person[2].forEach(function(pAcc)
-		{
-			decAcc.push({
-				id : pAcc[0],
-				curr_id : pAcc[1],
-				balance : pAcc[2]
-			});
-		});
-
-		decPersons.push({
-			id : person[0],
-			name : person[1],
-			accounts : decAcc
-		});
-	});
-
-	persons = decPersons;
-}
-
-
 // Return object for specified person
 function getPerson(person_id)
 {

@@ -70,20 +70,20 @@ class MainController extends Controller
 		{
 			$noDebts = TRUE;
 			$pBalance = array();
-			if (isset($pData[2]) && is_array($pData[2]))
+			if (isset($pData->accounts) && is_array($pData->accounts))
 			{
-				foreach($pData[2] as $pAcc)
+				foreach($pData->accounts as $pAcc)
 				{
-					if ($pAcc[2] != 0.0)
+					if ($pAcc->balance != 0.0)
 					{
 						$noDebts = FALSE;
-						$pBalance[] = Currency::format($pAcc[2], $pAcc[1]);
+						$pBalance[] = Currency::format($pAcc->balance, $pAcc->curr_id);
 					}
 				}
 			}
 
-			$persArr[$ind]["nodebts"] = $noDebts;
-			$persArr[$ind]["balfmt"] = $pBalance;
+			$persArr[$ind]->nodebts = $noDebts;
+			$persArr[$ind]->balfmt = $pBalance;
 		}
 
 
