@@ -28,12 +28,6 @@ class MainController extends Controller
 		$trListData = array();
 		foreach($latestArr as $trans)
 		{
-			if ($trans->type == DEBT)
-			{
-				$src_owner_id = $acc->getOwner($trans->src_id);
-				$dest_owner_id = $acc->getOwner($trans->dest_id);
-			}
-
 			$itemData = array("id" => $trans->id);
 
 			// Build accounts string
@@ -67,38 +61,6 @@ class MainController extends Controller
 
 			$itemData["date"] = $trans->date;
 			$itemData["comm"] = $trans->comment;
-
-			if ($details)
-			{
-				$itemData["balance"] = array();
-
-				if ($trans->type == EXPENSE || $trans->type == INCOME)
-				{
-					$tr_acc_id = ($trans->type == EXPENSE) ? $trans->src_id : $trans->dest_id;
-
-					$balance = ($trans->type == EXPENSE) ? $trans->src_balance : $trans->dest_balance;
-					$acc_curr = $acc->getCurrency($tr_acc_id);
-
-					$itemData["balance"][] = Currency::format($balance, $acc_curr);
-				}
-				else if ($trans->type == TRANSFER || $trans->type == DEBT)
-				{
-					if ($trans->src_id != 0)
-					{
-						$acc_curr = $acc->getCurrency($trans->src_id);
-
-						$itemData["balance"][] = Currency::format($trans->src_balance, $acc_curr);
-					}
-
-					if ($trans->dest_id != 0)
-					{
-						$acc_curr = $acc->getCurrency($trans->dest_id);
-
-						$itemData["balance"][] = Currency::format($trans->dest_balance, $acc_curr);
-					}
-				}
-			}
-
 
 			$trListData[] = $itemData;
 		}
