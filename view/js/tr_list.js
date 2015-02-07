@@ -11,52 +11,6 @@ var DEBT = 4;
 
 var transactions = (function()
 {
-	var selection =
-	{
-		selectedArr : [],
-
-		// Return position of transaction in selectedArr
-		getPos : function(acc_id)
-		{
-			return this.selectedArr.indexOf(acc_id);
-		},
-
-
-		isSelected : function(tr_id)
-		{
-			return this.selectedArr.some(function(trans_id){ return trans_id == tr_id; });
-		},
-
-
-		select : function(tr_id)
-		{
-			if (!tr_id || this.isSelected(tr_id))
-				return false;
-
-			this.selectedArr.push(tr_id);
-			return true;
-		},
-
-
-		deselect : function(tr_id)
-		{
-			var tr_pos = this.getPos(tr_id);
-
-			if (tr_pos == -1)
-				return false;
-
-			this.selectedArr.splice(tr_pos, 1);
-			return true;
-		},
-
-
-		selectedCount : function()
-		{
-			return this.selectedArr.length;
-		},
-	};
-
-
 	function find(tr_id)
 	{
 		return idSearch(transArr, tr_id);
@@ -242,29 +196,6 @@ var transactions = (function()
 
 
 	return {
-		isSelected : function(tr_id)
-		{
-			return selection.isSelected(tr_id);
-		},
-
-		select : function(tr_id)
-		{
-			return selection.select(tr_id);
-		},
-
-
-		deselect : function(tr_id)
-		{
-			return selection.deselect(tr_id);
-		},
-
-
-		selectedCount : function()
-		{
-			return selection.selectedCount();
-		},
-
-
 		findById: function(tr_id)
 		{
 			return find(tr_id);
@@ -279,12 +210,15 @@ var transactions = (function()
 })();
 
 
+var trSelection = new Selection();
+
 
 // Transaction block click event handler
 function onTransClick(tr_id)
 {
 	var transObj, edit_btn, del_btn, deltrans;
 	var actDiv;
+	var selArr;
 
 	transObj = ge('tr_' + tr_id);
 	edit_btn = ge('edit_btn');
@@ -293,32 +227,33 @@ function onTransClick(tr_id)
 	if (!transObj || !edit_btn || !deltrans)
 		return;
 
-	if (transactions.isSelected(tr_id))
+	if (trSelection.isSelected(tr_id))
 	{
-		transactions.deselect(tr_id);
+		trSelection.deselect(tr_id);
 
 		transObj.className = (detailsMode) ? '' : 'trlist_item';
 	}
 	else
 	{
-		transactions.select(tr_id);
+		trSelection.select(tr_id);
 
 		transObj.className = 'act_tr';
 	}
 
-	show(edit_btn, (transactions.selectedCount() == 1));
-	show(del_btn, (transactions.selectedCount() > 0));
+	show(edit_btn, (trSelection.count() == 1));
+	show(del_btn, (trSelection.count() > 0));
 
-	deltrans.value = transactions.selectedArr.join();
+	selArr = trSelection.getIdArray();
+	deltrans.value = selArr.join();
 
-	if (transactions.selectedCount() == 1)
+	if (trSelection.count() == 1)
 	{
 		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = baseURL + 'transactions/edit/' + transactions.selectedArr[0];
+			firstElementChild(edit_btn).href = baseURL + 'transactions/edit/' + selArr[0];
 	}
 
-	show('toolbar', (transactions.selectedCount() > 0));
-	if (transactions.selectedCount() > 0)
+	show('toolbar', (trSelection.count() > 0));
+	if (trSelection.count() > 0)
 	{
 		onScroll();
 	}
@@ -588,7 +523,7 @@ function onDeletePopup(res)
 // Create and show transaction delete warning popup
 function showDeletePopup()
 {
-	if (transactions.selectedCount() == 0)
+	if (trSelection.count() == 0)
 		return;
 
 	// check popup already created
@@ -600,8 +535,8 @@ function showDeletePopup()
 		return;
 
 	if (!dwPopup.create({ id : 'delete_warning',
-						title : (transactions.selectedCount() > 1) ? multiTransDeleteTitle : singleTransDeleteTitle,
-						msg : (transactions.selectedCount() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
+						title : (trSelection.count() > 1) ? multiTransDeleteTitle : singleTransDeleteTitle,
+						msg : (trSelection.count() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
 						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 						cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 						}))
