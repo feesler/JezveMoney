@@ -1127,8 +1127,6 @@ function TransactionViewModel()
 			}
 		}
 
-		decompressAccounts();
-
 		if (edit_mode)
 		{
 			elem = firstElementChild(ge('del_btn'))

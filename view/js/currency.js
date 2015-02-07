@@ -8,22 +8,7 @@ function formatValue(val)
 // Return currency object for specified id
 function getCurrency(curr_id)
 {
-	var currObj = null;
-
-	if (curr_id != 0 && currency)
-	{
-		currency.some(function(curr)
-		{
-			var cond = (curr.id == curr_id);
-
-			if (cond)
-				currObj = curr;
-
-			return cond;
-		});
-	}
-
-	return currObj;
+	return idSearch(currency, curr_id);
 }
 
 

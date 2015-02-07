@@ -400,7 +400,16 @@ class Account extends CachedTable
 
 		foreach(self::$dcache as $acc_id => $row)
 		{
-			$resArr[] = array($acc_id, $row["curr_id"], Currency::getSign($row["curr_id"]), $row["balance"], $row["name"], $row["icon"], $row["initbalance"]);
+			$accObj = new stdClass;
+
+			$accObj->id = $acc_id;
+			$accObj->curr_id = $row["curr_id"];
+			$accObj->balance = $row["balance"];
+			$accObj->name = $row["name"];
+			$accObj->icon = $row["icon"];
+			$accObj->initbalance = $row["initbalance"];
+
+			$resArr[] = $accObj;
 		}
 
 		return $resArr;

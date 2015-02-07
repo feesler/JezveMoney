@@ -1,48 +1,7 @@
-// Decompress array of accounts
-function decompressAccounts()
-{
-	var decAccounts = [];
-
-	if (!isArray(accounts))
-		return;
-
-	accounts.forEach(function(acc)
-	{
-		decAccounts.push({
-			id : acc[0],
-			curr_id : acc[1],
-			sign : acc[2],
-			balance : acc[3],
-			name : acc[4],
-			icon : acc[5],
-			initbalance : acc[6]
-		});
-	});
-
-	accounts = decAccounts;
-}
-
-
 // Return account object by id
 function getAccount(account_id)
 {
-	var res = null;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return res;
-
-	accounts.some(function(acc)
-	{
-		var cond = (acc.id == account_id);
-
-		if (cond)
-			res = acc;
-
-		return cond;
-	});
-
-	return res;
+	return idSearch(accounts, account_id);
 }
 
 

@@ -56,18 +56,7 @@ var transactions =
 
 	findById : function(tr_id)
 	{
-		var tr_info = null;
-
-		if (transArr)
-		{
-			transArr.some(function(trans)
-			{
-				if (trans.id == tr_id)
-					tr_info = trans; 
-			});
-		}
-
-		return tr_info;
+		return idSearch(transArr, tr_id);
 	},
 
 
@@ -342,8 +331,6 @@ function initControls()
 function initTransListDrag()
 {
 	var trlist, listItem_wr, listItem, trans_id;
-
-	decompressAccounts();
 
 	initControls();
 

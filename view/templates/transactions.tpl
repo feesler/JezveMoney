@@ -50,10 +50,10 @@
 								<select id="acc_id" name="acc_id" multiple onchange="onAccountChange(this);">
 									<option value="0">All</option>
 <?php	foreach($accArr as $accData) {
-			if (in_array($accData[0], $accFilter)) {		?>
-									<option value="<?=$accData[0]?>" selected><?=$accData[4]?></option>
+			if (in_array($accData->id, $accFilter)) {		?>
+									<option value="<?=$accData->id?>" selected><?=$accData->name?></option>
 <?php		} else {		?>
-									<option value="<?=$accData[0]?>"><?=$accData[4]?></option>
+									<option value="<?=$accData->id?>"><?=$accData->name?></option>
 <?php		}
 		}	?>
 								</select>

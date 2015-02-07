@@ -128,3 +128,25 @@ function isValidValue(val)
 {
 	return (val != undefined && val != null && val !== '');
 }
+
+
+// Search for array of objects by id key
+function idSearch(arr, id)
+{
+	var res = null;
+
+	if (!isArray(arr))
+		return res;
+
+	arr.some(function(obj)
+	{
+		var cond = (obj && obj.id == id);
+
+		if (cond)
+			res = obj;
+
+		return cond;
+	});
+
+	return res;
+}

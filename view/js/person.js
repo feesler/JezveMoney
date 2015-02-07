@@ -1,23 +1,7 @@
 // Return object for specified person
 function getPerson(person_id)
 {
-	var pObj = null, p_id;
-
-	p_id = parseInt(person_id);
-	if (!persons || !p_id)
-		return null;
-
-	persons.some(function(person)
-	{
-		var cond = (person.id == p_id);
-
-		if (cond)
-			pObj = person;
-
-		return cond;
-	});
-
-	return pObj;
+	return idSearch(persons, person_id);
 }
 
 
