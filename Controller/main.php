@@ -129,10 +129,9 @@ class MainController extends Controller
 		$curr_acc_id = Currency::getIdByPos(0);
 		if (!$curr_acc_id)
 			fail();
-		$trans_type = 1;		// expense
 		$groupType_id = 2;		// group by week
 
-		$statArr = getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id, 5);
+		$statArr = getStatArray($user_id, $byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
 		$titleString = "Jezve Money";
 
