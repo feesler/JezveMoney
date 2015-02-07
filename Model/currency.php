@@ -221,8 +221,8 @@ class Currency
 	}
 
 
-	// Return Javascript array of currencies
-	public static function getArray($ext = FALSE)
+	// Return array of currencies
+	public static function getArray()
 	{
 		$res = array();
 
@@ -231,10 +231,14 @@ class Currency
 
 		foreach(self::$cache as $curr_id => $row)
 		{
-			if ($ext)
-				$res[] = array($curr_id, $row["name"], $row["sign"], intval($row["format"]));
-			else
-				$res[] = array($curr_id, $row["name"], $row["sign"]);
+			$currObj = new apiObject;
+
+			$currObj->id = $curr_id;
+			$currObj->name = $row["name"];
+			$currObj->sign = $row["sign"];
+			$currObj->format = intval($row["format"]);
+
+			$res[] = $currObj;
 		}
 
 		return $res;

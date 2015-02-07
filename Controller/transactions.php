@@ -59,7 +59,7 @@ class TransactionsController extends Controller
 		$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
 		$transCount = $trans->getTransCount($trans_type, $accFilter, $searchStr, $startDate, $endDate);
 
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 
 		// Prepare transaction types menu
 		$trTypes = array("All", "Expense", "Income", "Transfer", "Debt");
@@ -360,7 +360,7 @@ class TransactionsController extends Controller
 		}
 
 		// Common arrays
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 		$acc = new Account($user_id);
 		$accArr = $acc->getArray();
 		if ($trans_type == DEBT)
@@ -581,7 +581,7 @@ class TransactionsController extends Controller
 
 
 		// Common arrays
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 		$acc = new Account($user_id);
 		$accArr = $acc->getArray();
 		if ($trans_type == DEBT)

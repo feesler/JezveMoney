@@ -1,25 +1,3 @@
-// Decompress array of accounts
-function decompressCurrencies()
-{
-	var decCurrencies = [];
-
-	if (!isArray(currency))
-		return;
-
-	currency.forEach(function(curr)
-	{
-		decCurrencies.push({
-			id : curr[0],
-			name : curr[1],
-			sign : curr[2],
-			format : curr[3]
-		});
-	});
-
-	currency = decCurrencies;
-}
-
-
 // Format specified value
 function formatValue(val)
 {

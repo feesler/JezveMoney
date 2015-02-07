@@ -59,10 +59,10 @@
 								<div>
 									<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
 <?php	foreach($currArr as $currInfo) {
-			if ($currInfo[0] == $accInfo["curr"]) {	?>
-										<option value="<?=$currInfo[0]?>" selected><?=$currInfo[1]?></option>
+			if ($currInfo->id == $accInfo["curr"]) {	?>
+										<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
 <?php		} else {	?>
-										<option value="<?=$currInfo[0]?>"><?=$currInfo[1]?></option>
+										<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>
 <?php		}
 		}		?>
 									</select>

@@ -45,7 +45,7 @@ class AccountsController extends Controller
 		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = "New account";
 
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 		$icons = $acc->getIconsArray();
 
 		$titleString = "Jezve Money | ";
@@ -91,7 +91,7 @@ class AccountsController extends Controller
 		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = $accInfo["name"];
 
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 		$icons = $acc->getIconsArray();
 
 		$titleString = "Jezve Money | ";

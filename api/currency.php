@@ -26,20 +26,7 @@
 
 	if ($action == "list")
 	{
-		$currArr = Currency::getArray(TRUE);
-		$resArr = array();
-		foreach($currArr as $curr)
-		{
-			$currObj = new apiObject;
-			$currObj->id = $curr[0];
-			$currObj->name = $curr[1];
-			$currObj->sign = $curr[2];
-			$currObj->format = $curr[3];
-
-			$resArr[] = $currObj;
-		}
-
-		$respObj->data = $resArr;
+		$respObj->data = Currency::getArray();
 	}
 	else if ($action == "read")
 	{

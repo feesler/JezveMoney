@@ -10,7 +10,7 @@ class MainController extends Controller
 		$trans = new Transaction($user_id);
 		$pers = new Person($user_id);
 
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 
 		$tilesArr = $acc->getTilesArray();
 		$totalsArr = $acc->getTotalsArray();

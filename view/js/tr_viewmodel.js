@@ -1127,7 +1127,6 @@ function TransactionViewModel()
 			}
 		}
 
-		decompressCurrencies();
 		decompressAccounts();
 		decompressPersons();
 

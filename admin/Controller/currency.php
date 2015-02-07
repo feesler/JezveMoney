@@ -11,7 +11,7 @@ class CurrencyController extends Controller
 		if (!$user_id || !$u->isAdmin($user_id))
 			setLocation("../login.php");
 
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 
 		$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
 						"query" => array("title" => "Queries", "link" => "./query.php"),

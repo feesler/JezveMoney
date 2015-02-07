@@ -209,8 +209,6 @@ function initControls()
 
 	isMobile = (document.documentElement.clientWidth < 700);
 
-	decompressCurrencies();
-
 	iconDDList = new DDList();
 	if (!iconDDList.create({ input_id : 'icon', itemPrefix : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
 		iconDDList = null;

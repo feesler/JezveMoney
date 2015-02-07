@@ -100,7 +100,7 @@ class StatisticsController extends Controller
 
 		$accArr = $acc->getArray();
 
-		$currArr = Currency::getArray(TRUE);
+		$currArr = Currency::getArray();
 		$accCurr = (($byCurrency) ? $curr_id : $acc->getCurrency($acc_id));
 		$transArr = $trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate);
 
