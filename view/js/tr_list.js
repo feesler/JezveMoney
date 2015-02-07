@@ -464,7 +464,7 @@ function onAccountChange(obj)
 		accArr.push(acc_id);
 	}
 
-	str = accArr.join(',');
+	str = accArr.join();
 
 	newLocation = baseURL + 'transactions/?type=' + transType;
 	if (str != '')
