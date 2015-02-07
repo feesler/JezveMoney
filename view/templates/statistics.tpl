@@ -3,11 +3,8 @@
 	var currency = <?=f_json_encode($currArr)?>;
 	var accCurr = <?=$accCurr?>;
 	var transArr = <?=f_json_encode($transArr)?>;
-	var transType = <?=f_json_encode($type_str)?>;
-	var groupType = <?=f_json_encode($groupType)?>;
-	var curAccId = <?=f_json_encode($acc_id)?>;
+	var filterObj = <?=f_json_encode($filterObj)?>;
 	var chartData = <?=f_json_encode($statArr)?>;
-	var filterByCurr = <?=(($byCurrency) ? "true" : "false")?>;
 
 	onReady(initControls);
 </script>

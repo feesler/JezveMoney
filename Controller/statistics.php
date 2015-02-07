@@ -9,14 +9,18 @@ class StatisticsController extends Controller
 		$trans = new Transaction($user_id);
 		$acc = new Account($user_id);
 		$curr = new Currency();
+		$filterObj = new stdClass;
 
 		$byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
+		$filterObj->filter = $byCurrency ? "currency" : "account";
 
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
 
 		$trans_type = Transaction::getStringType($type_str);
 		if (is_null($trans_type))
 			$this->fail();
+
+		$filterObj->type = $type_str;
 
 		if ($byCurrency)
 		{
@@ -32,7 +36,7 @@ class StatisticsController extends Controller
 				if (!$curr_id)
 					$this->fail();
 			}
-			$curr_acc_id = $curr_id;
+			$filterObj->curr_id = $curr_id;
 		}
 		else
 		{
@@ -48,7 +52,7 @@ class StatisticsController extends Controller
 				if (!$acc_id)
 					$this->fail();
 			}
-			$curr_acc_id = $acc_id;
+			$filterObj->acc_id = $acc_id;
 		}
 
 		// Prepare transaction types menu
@@ -77,6 +81,9 @@ class StatisticsController extends Controller
 			$edate = strtotime($endDate);
 			if ($sdate != -1 && $edate != -1)
 				$dateFmt = date("d.m.Y", $sdate)." - ".date("d.m.Y", $edate);
+
+			$filterObj->stdate = $stDate;
+			$filterObj->enddate = $endDate;
 		}
 
 		$groupTypes = array("None", "Day", "Week", "Month", "Year");
@@ -95,7 +102,11 @@ class StatisticsController extends Controller
 			}
 
 			if ($groupType_id != 0)
+			{
 				$groupType = strtolower($groupTypes[$groupType_id]);
+
+				$filterObj->group = $groupType;
+			}
 		}
 
 		$accArr = $acc->getArray();
@@ -104,7 +115,7 @@ class StatisticsController extends Controller
 		$accCurr = (($byCurrency) ? $curr_id : $acc->getCurrency($acc_id));
 		$transArr = $trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate);
 
-		$statArr = getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $groupType_id);
+		$statArr = getStatArray($user_id, $byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
 
 		$titleString = "Jezve Money | Statistics";
 

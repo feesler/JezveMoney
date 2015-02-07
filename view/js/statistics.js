@@ -3,9 +3,36 @@ var selRange = null;
 var baseURL = 'http://jezve.net/money/';
 
 
+// Build new location address from current filterObj
+function buildAddress()
+{
+	var newLocation = baseURL + 'statistics/';
+	var locFilter = {};
+
+	setParam(locFilter, filterObj);
+
+	for(var name in locFilter)
+	{
+		if (typeof locFilter[name] == 'string')
+			locFilter[name] = encodeURIComponent(locFilter[name]);
+	}
+
+	if (!isEmpty(locFilter))
+		newLocation += '?' + urlJoin(locFilter);
+
+	return newLocation;
+}
+
+
 // Return group parameter for specified type
 function getGroupParam(id)
 {
+	var groupTypes = [null, 'day', 'week', 'month', 'year'];
+
+	id = parseInt(id);
+
+	return (id < groupTypes.length) ? groupTypes[id] : null;
+/*
 	if (id == 1)
 		return '&group=day';
 	else if (id == 2)
@@ -16,22 +43,27 @@ function getGroupParam(id)
 		return '&group=year';
 	else
 		return '';
+*/
 }
 
 
 // Return filter parameter for specified type
 function getFilterParam(id)
 {
+	return (parseInt(id) == 1) ? 'currency' : null;
+/*
 	if (id == 1)
 		return 'filter=currency';
 	else
 		return '';
+*/
 }
 
 
 // Filter type change event handler
 function onFilterChange(obj)
 {
+/*
 	var filter_id, acc_id, group_id;
 	var accsel, groupsel;
 	var filter_type;
@@ -50,12 +82,23 @@ function onFilterChange(obj)
 	show('curr_block', (filter_id == 1));
 
 	window.location = baseURL + 'statistics/?' + getFilterParam(filter_id) + '&type=' + transType + getGroupParam(group_id);
+*/
+	var filter;
+
+	filter = getFilterParam(selectedValue(obj));
+	if (filter)
+		filterObj.filter = filter;
+	else if ('filter' in filterObj)
+		delete filterObj['filter'];
+
+	window.location = buildAddress();
 }
 
 
 // Group change event handler
 function onGroupChange(obj)
 {
+/*
 	var newLocation;
 	var filter_id, acc_id, curr_id, group_id;
 	var accsel, currsel, groupsel;
@@ -81,12 +124,23 @@ function onGroupChange(obj)
 	newLocation += '&type=' + transType + getGroupParam(group_id);
 
 	window.location = newLocation;
+*/
+	var group;
+
+	group = getGroupParam(selectedValue(obj));
+	if (group)
+		filterObj.group = group;
+	else if ('group' in filterObj)
+		delete filterObj['group'];
+
+	window.location = buildAddress();
 }
 
 
 // Account change event handler
-function onAccountChange()
+function onAccountChange(obj)
 {
+/*
 	var acc_id, group_id;
 	var accsel, groupsel;
 
@@ -99,12 +153,18 @@ function onAccountChange()
 	group_id = parseInt(selectedValue(groupsel));
 
 	window.location = baseURL + 'statistics/?acc_id=' + acc_id + '&type=' + transType + getGroupParam(group_id);
+*/
+
+	filterObj.acc_id = parseInt(selectedValue(obj));
+
+	window.location = buildAddress();
 }
 
 
 // Currency change event handler
-function onCurrChange()
+function onCurrChange(obj)
 {
+/*
 	var filter_id, curr_id, group_id;
 	var currsel, groupsel;
 	var filter_type;
@@ -120,6 +180,11 @@ function onCurrChange()
 	group_id = parseInt(selectedValue(groupsel));
 
 	window.location = baseURL + 'statistics/?' + getFilterParam(filter_id) + '&curr_id=' + curr_id + '&type=' + transType + getGroupParam(group_id);
+*/
+
+	filterObj.curr_id = parseInt(selectedValue(obj));
+
+	window.location = buildAddress();
 }
 
 
@@ -144,6 +209,7 @@ function onRangeSelect(range)
 // Date picker hide callback
 function onDatePickerHide()
 {
+/*
 	var newLocation;
 
 	if (!selRange)
@@ -153,8 +219,15 @@ function onDatePickerHide()
 	if (acc_id != 0)
 		newLocation += '&acc_id=' + curAccId;
 	newLocation += '&stdate=' + Calendar.format(selRange.start) + '&enddate=' + Calendar.format(selRange.end);
+*/
 
-	window.location = newLocation;
+	if (!selRange)
+		return;
+
+	filterObj.stdate = Calendar.format(selRange.start);
+	filterObj.enddate = Calendar.format(selRange.end);
+
+	window.location = buildAddress();
 }
 
 
@@ -252,7 +325,7 @@ function onGroupSel(obj)
 
 	this.setText(obj.str);
 
-	onGroupChange();
+	onGroupChange(groupsel);
 }
 
 
@@ -360,7 +433,7 @@ function initControls()
 		filterDD = null;
 
 	accCurrDD = new DDList();
-	if (filterByCurr)
+	if (filterObj.filter == 'currency')
 	{
 		if (!accCurrDD.create({ input_id : 'curr_id', itemPrefix : 'curr', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 			accCurrDD = null;
