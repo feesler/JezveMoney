@@ -1270,10 +1270,7 @@ function TransactionViewModel()
 			{
 				currency.forEach(function(curr)
 				{
-					curr_id = curr[0];
-					currName = curr[1];
-
-					srcCurrDDList.addItem(curr_id, currName);
+					srcCurrDDList.addItem(curr.id, curr.name);
 				});
 			}
 			else
@@ -1287,10 +1284,7 @@ function TransactionViewModel()
 			{
 				currency.forEach(function(curr)
 				{
-					curr_id = curr[0];
-					currName = curr[1];
-
-					destCurrDDList.addItem(curr_id, currName);
+					destCurrDDList.addItem(curr.id, curr.name);
 				});
 			}
 			else
