@@ -9,58 +9,61 @@ var TRANSFER = 3;
 var DEBT = 4;
 
 
-var transactions =
+var transactions = (function()
 {
-	selectedArr : [],
-
-	// Return position of transaction in selectedArr
-	getPos : function(acc_id)
+	var selection =
 	{
-		return this.selectedArr.indexOf(acc_id);
-	},
+		selectedArr : [],
+
+		// Return position of transaction in selectedArr
+		getPos : function(acc_id)
+		{
+			return this.selectedArr.indexOf(acc_id);
+		},
 
 
-	isSelected : function(tr_id)
-	{
-		return this.selectedArr.some(function(trans_id){ return trans_id == tr_id; });
-	},
+		isSelected : function(tr_id)
+		{
+			return this.selectedArr.some(function(trans_id){ return trans_id == tr_id; });
+		},
 
 
-	select : function(tr_id)
-	{
-		if (!tr_id || this.isSelected(tr_id))
-			return false;
+		select : function(tr_id)
+		{
+			if (!tr_id || this.isSelected(tr_id))
+				return false;
 
-		this.selectedArr.push(tr_id);
-		return true;
-	},
-
-
-	deselect : function(tr_id)
-	{
-		var tr_pos = this.getPos(tr_id);
-
-		if (tr_pos == -1)
-			return false;
-
-		this.selectedArr.splice(tr_pos, 1);
-		return true;
-	},
+			this.selectedArr.push(tr_id);
+			return true;
+		},
 
 
-	selectedCount : function()
-	{
-		return this.selectedArr.length;
-	},
+		deselect : function(tr_id)
+		{
+			var tr_pos = this.getPos(tr_id);
+
+			if (tr_pos == -1)
+				return false;
+
+			this.selectedArr.splice(tr_pos, 1);
+			return true;
+		},
 
 
-	findById : function(tr_id)
+		selectedCount : function()
+		{
+			return this.selectedArr.length;
+		},
+	};
+
+
+	function find(tr_id)
 	{
 		return idSearch(transArr, tr_id);
-	},
+	}
 
 
-	updateBalance : function(trans, src_bal, dest_bal)
+	function updateBalance(trans, src_bal, dest_bal)
 	{
 		var trRow, trBalanceItem;
 
@@ -122,14 +125,14 @@ var transactions =
 			balSpan.innerHTML = formatCurrency(trans.dest_balance, trans.dest_curr);
 			trBalanceItem.appendChild(balSpan);
 		}
-	},
+	}
 
 
-	setPos : function(tr_id, pos)
+	function setPosition(tr_id, pos)
 	{
 		var tr_info, oldPos;
 
-		tr_info = this.findById(tr_id);
+		tr_info = find(tr_id);
 		if (!tr_info)
 			return false;
 
@@ -212,20 +215,20 @@ var transactions =
 					{
 						if (trans.pos >= pos)
 						{
-							this.updateBalance(trans, src_bal, dest_bal);
+							updateBalance(trans, src_bal, dest_bal);
 						}
 					}
 					else if (pos < oldPos)		// moving up
 					{
 						if (trans.pos >= pos && trans.pos <= oldPos)
 						{
-							this.updateBalance(trans, src_bal, dest_bal);
+							updateBalance(trans, src_bal, dest_bal);
 						}
 					}
 					else if (pos > oldPos)		// moving down
 					{
 						if (trans.pos >= oldPos && trans.pos <= pos)
-							this.updateBalance(trans, src_bal, dest_bal);
+							updateBalance(trans, src_bal, dest_bal);
 					}
 
 					tBalanceArr[trans.src_id] = trans.src_balance;
@@ -236,7 +239,44 @@ var transactions =
 
 		return true;
 	}
-};
+
+
+	return {
+		isSelected : function(tr_id)
+		{
+			return selection.isSelected(tr_id);
+		},
+
+		select : function(tr_id)
+		{
+			return selection.select(tr_id);
+		},
+
+
+		deselect : function(tr_id)
+		{
+			return selection.deselect(tr_id);
+		},
+
+
+		selectedCount : function()
+		{
+			return selection.selectedCount();
+		},
+
+
+		findById: function(tr_id)
+		{
+			return find(tr_id);
+		},
+
+
+		setPos : function(tr_id, pos)
+		{
+			return setPosition(tr_id, pos);
+		}
+	};
+})();
 
 
 
