@@ -179,7 +179,7 @@ class TransactionsController extends Controller
 		$titleString = "Jezve Money | Transactions";
 
 		$cssArr = array("common.css", "tiles.css", "iconlink.css", "popup.css", "calendar.css", "ddlist.css", "transaction.css", "trlist.css", "toolbar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "ajax.js", "calendar.js", "popup.js", "dragndrop.js", "sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ajax.js", "calendar.js", "popup.js", "dragndrop.js", "sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
 
 		include("./view/templates/transactions.tpl");
 	}
@@ -417,7 +417,7 @@ class TransactionsController extends Controller
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
 
 		include("./view/templates/transaction.tpl");
 	}
@@ -638,7 +638,7 @@ class TransactionsController extends Controller
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
 		$cssArr[] = "popup.css";
 		$jsArr[] = "popup.js";
 

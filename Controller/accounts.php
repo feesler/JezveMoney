@@ -14,7 +14,7 @@ class AccountsController extends Controller
 		$titleString = "Jezve Money | Accounts";
 
 		$cssArr = array("common.css", "tiles.css", "popup.css", "iconlink.css", "toolbar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "popup.js", "currency.js", "toolbar.js", "main.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "popup.js", "currency.js", "toolbar.js", "main.js");
 
 		include("./view/templates/accounts.tpl");
 	}
@@ -53,7 +53,7 @@ class AccountsController extends Controller
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "iconlink.css", "ddlist.css", "tiles.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "ddlist.js", "main.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ddlist.js", "main.js");
 
 		include("./view/templates/account.tpl");
 	}
@@ -99,7 +99,7 @@ class AccountsController extends Controller
 		$titleString .= $headString;
 
 		$cssArr = array("common.css", "iconlink.css", "ddlist.css", "tiles.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "account.js", "ddlist.js", "main.js");
+		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ddlist.js", "main.js");
 		$cssArr[] = "popup.css";
 		$jsArr[] = "popup.js";
 

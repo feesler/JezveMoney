@@ -38,48 +38,6 @@ Methods:
 */
 
 
-// Selection class constructor
-function Selection()
-{
-	this.selected = {},
-
-
-	this.isSelected = function(id)
-	{
-		return (id in this.selected);
-	}
-
-
-	this.select = function(id, obj)
-	{
-		if (!id || this.isSelected(id))
-			return false;
-
-		this.selected[id] = obj;
-
-		return true;
-	}
-
-
-	this.deselect = function(id)
-	{
-		if (!id || !this.isSelected(id))
-			return false;
-
-		delete this.selected[id];
-
-		return true;
-	}
-
-
-	this.clear = function()
-	{
-		this.selected = {};
-	}
-}
-
-
-
 // Drop Down List constructor
 function DDList()
 {
