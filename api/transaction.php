@@ -88,16 +88,16 @@
 		foreach($trArr as $trans)
 		{
 			$tr = new apiObject;
-			$tr->id = $trans[0];
-			$tr->src_id = $trans[1];
-			$tr->dest_id = $trans[2];
-			$tr->src_amount = $trans[10];
-			$tr->dest_amount = $trans[11];
-			$tr->src_curr = $trans[12];
-			$tr->dest_curr = $trans[13];
-			$tr->date = $trans[6];
-			$tr->comment = $trans[7];
-			$tr->pos = $trans[8];
+			$tr->id = $trans->id;
+			$tr->src_id = $trans->src_id;
+			$tr->dest_id = $trans->dest_id;
+			$tr->src_amount = $trans->src_amount;
+			$tr->dest_amount = $trans->dest_amount;
+			$tr->src_curr = $trans->src_curr;
+			$tr->dest_curr = $trans->dest_curr;
+			$tr->date = $trans->date;
+			$tr->comment = $trans->comment;
+			$tr->pos = $trans->pos;
 
 			$respObj->data[] = $tr;
 		}
