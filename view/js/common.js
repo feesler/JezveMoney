@@ -38,7 +38,11 @@ function setParam(obj, params)
 	for(par in params)
 	{
 		val = params[par];
-		if (typeof val === 'object')
+		if (isArray(val))
+		{
+			obj[par] = val.map(function(item){ return item; });
+		}
+		else if (typeof val === 'object')
 		{
 			if (obj[par] == null || obj[par] === undefined)
 				obj[par] = {};
