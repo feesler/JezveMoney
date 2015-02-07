@@ -272,9 +272,9 @@ function onAccountSel(obj)
 	if (!accSel)
 		return;
 
-	for(acc_id in obj)
+	for(var id in obj)
 	{
-		sArr.push(obj[acc_id]);
+		sArr.push(obj[id]);
 	}
 
 	str = sArr.join(', ');
