@@ -262,7 +262,7 @@ class Person extends CachedTable
 			}
 
 			if (is_null($ind))
-				$ind = count($pArr) - 1;
+				$ind = count($pArr);
 
 			if (!isset($pArr[$ind]))
 			{
