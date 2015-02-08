@@ -636,8 +636,8 @@ class Transaction extends CachedTable
 
 			if ($trans->type == DEBT)
 			{
-				$src_owner_id = ($src_id != 0) ? $acc->getOwner($src_id) : 0;
-				$dest_owner_id = ($dest_id != 0) ? $acc->getOwner($dest_id) : 0;
+				$src_owner_id = ($trans->src_id != 0) ? $acc->getOwner($trans->src_id) : 0;
+				$dest_owner_id = ($trans->dest_id != 0) ? $acc->getOwner($trans->dest_id) : 0;
 			}
 
 			$trans->fsrcAmount = "";
@@ -650,9 +650,9 @@ class Transaction extends CachedTable
 			if ($trans->src_curr != $trans->dest_curr)
 			{
 				$trans->fdestAmount = "";
-				if ($cur_trans_type == EXPENSE || ($cur_trans_type == DEBT && $src_owner_id == $owner_id))			// expense
+				if ($trans->type == EXPENSE || ($trans->type == DEBT && $src_owner_id == $owner_id))			// expense
 					$trans->fdestAmount .= "- ";
-				else if ($cur_trans_type == INCOME || ($cur_trans_type == DEBT && $dest_owner_id == $owner_id))			// income
+				else if ($trans->type == INCOME || ($trans->type == DEBT && $dest_owner_id == $owner_id))			// income
 					$trans->fdestAmount .= "+ ";
 				$trans->fdestAmount .= Currency::format($trans->dest_amount, $trans->dest_curr);
 			}
