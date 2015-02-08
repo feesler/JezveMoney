@@ -1,3 +1,10 @@
+// Types of transactions
+var EXPENSE = 1;
+var INCOME = 2;
+var TRANSFER = 3;
+var DEBT = 4;
+
+
 // Hide usem menu popup
 function hidePopup()
 {

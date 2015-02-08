@@ -555,7 +555,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		srcAcc = getAccount(edit_transaction.srcAcc);
 		destAcc = getAccount(edit_transaction.destAcc);
 
-		if (edit_transaction.type == 1)		// Expense
+		if (edit_transaction.type == EXPENSE)
 		{
 			if (!srcAcc)
 				throw new Error('Invalid transaction: Account not found');
@@ -564,14 +564,14 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 			srcAcc.balance += edit_transaction.srcAmount;
 		}
-		else if (edit_transaction.type == 2)		// Income
+		else if (edit_transaction.type == INCOME)
 		{
 			if (!destAcc || destAcc.curr_id != edit_transaction.destCurr)
 				throw new Error('Invalid transaction');
 
 			destAcc.balance -= edit_transaction.destAmount;
 		}
-		else if (edit_transaction.type == 3)		// Transfer
+		else if (edit_transaction.type == TRANSFER)
 		{
 			if (!srcAcc || !destAcc || srcAcc.curr_id != edit_transaction.srcCurr || destAcc.curr_id != edit_transaction.destCurr)
 				throw new Error('Invalid transaction');
@@ -579,7 +579,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			srcAcc.balance += edit_transaction.srcAmount;
 			destAcc.balance -= edit_transaction.destAmount;
 		}
-		else if (edit_transaction.type == 4)		// Debt
+		else if (edit_transaction.type == DEBT)
 		{
 			if (debtType)		// person give
 			{
@@ -626,25 +626,25 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 	this.isExpense = function()
 	{
-		return (type == 1);
+		return (type == EXPENSE);
 	}
 
 
 	this.isIncome = function()
 	{
-		return (type == 2);
+		return (type == INCOME);
 	}
 
 
 	this.isTransfer = function()
 	{
-		return (type == 3);
+		return (type == TRANSFER);
 	}
 
 
 	this.isDebt = function()
 	{
-		return (type == 4);
+		return (type == DEBT);
 	}
 
 
