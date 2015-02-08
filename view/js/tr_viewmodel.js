@@ -1190,7 +1190,7 @@ function TransactionViewModel()
 			if (Transaction.debtType())
 				Transaction.set('src_initbal', p_bal);
 			else
-				updateValue('dest_initbal', p_bal);
+				Transaction.set('dest_initbal', p_bal);
 
 			if (!Transaction.noAccount())
 			{
@@ -1199,7 +1199,7 @@ function TransactionViewModel()
 				if (Transaction.debtType())
 					Transaction.set('dest_initbal', acc.balance);
 				else
-					updateValue('src_initbal', acc.balance);
+					Transaction.set('src_initbal', acc.balance);
 			}
 		}
 
