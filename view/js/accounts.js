@@ -10,38 +10,25 @@ var singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All i
 // Icon select callback
 function onIconSel(obj)
 {
-	var iconSel;
-
 	if (!obj)
 		return;
-	iconSel = ge('icon');
-	if (!iconSel)
-		return;
-
-	selectByValue(iconSel, obj.id);
 
 	this.setText(obj.str);
 
-	onChangeIcon(iconSel);
+	updateAccountTile();
 }
 
 
 // Currency select callback
 function onCurrencySel(obj)
 {
-	var currSel;
-
 	if (!obj)
 		return;
-	currSel = ge('currency');
-	if (!currSel)
-		return;
-
-	selectByValue(currSel, obj.id);
 
 	this.setText(obj.str);
 
-	onChangeAccountCurrency(currSel);
+	setSign('currsign', obi.id);
+	updateAccountTile();
 }
 
 
@@ -120,10 +107,11 @@ function onTileClick(acc_id)
 
 
 // Set currency sign
-function setSign(signobj, curr_id)
+function setSign(obj, curr_id)
 {
-	var curr;
+	var signobj, curr;
 
+	signobj = ge(obj);
 	if (!signobj)
 		return;
 
@@ -186,16 +174,6 @@ function onAccBalanceInput(obj)
 		return;
 
 	acc_balance = obj.value;
-
-	updateAccountTile();
-}
-
-
-// Icon change event handler
-function onChangeIcon(obj)
-{
-	if (!obj)
-		return;
 
 	updateAccountTile();
 }
