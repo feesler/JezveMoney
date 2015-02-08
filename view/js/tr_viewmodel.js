@@ -919,7 +919,9 @@ function TransactionViewModel()
 		{
 			setAmountInputLabel(true, false);
 			setAmountTileBlockLabel(true, false);
-			if (Transaction.isIncome())
+			if (Transaction.isExpense())
+				hideSrcAmountAndExchange();
+			else if (Transaction.isIncome())
 				hideDestAmountAndExchange();
 		}
 
@@ -977,6 +979,8 @@ function TransactionViewModel()
 			setAmountTileBlockLabel(false, false);
 			if (Transaction.isExpense())
 				hideSrcAmountAndExchange();
+			else if (Transaction.isIncome())
+				hideDestAmountAndExchange();
 		}
 
 		updateCurrSigns();
