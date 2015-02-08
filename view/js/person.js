@@ -6,7 +6,7 @@ function getPerson(person_id)
 
 
 // Return person account object by id
-function findPersonAccountById()
+function findPersonAccountById(account_id)
 {
 	var resAcc = null;
 
