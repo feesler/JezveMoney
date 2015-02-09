@@ -708,12 +708,12 @@ function TransactionViewModel()
 
 		acc_id = parseInt(acc.value);
 
-		if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
+		if (Transaction.isExpense() || (Transaction.isDebt() && !Transaction.debtType()))
 		{
 			Transaction.update('src_id', acc_id);
 			onSrcCurrChanged();
 		}
-		else if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
+		else if (Transaction.isIncome() || (Transaction.isDebt() && Transaction.debtType()))
 		{
 			Transaction.update('dest_id', acc_id);
 			onDestCurrChanged();
@@ -977,7 +977,7 @@ function TransactionViewModel()
 		{
 			setAmountInputLabel(false, false);
 			setAmountTileBlockLabel(false, false);
-			if (Transaction.isIncome())
+			if (Transaction.isIncome() || Transaction.isDebt())
 				hideDestAmountAndExchange();
 			else
 				hideSrcAmountAndExchange();
