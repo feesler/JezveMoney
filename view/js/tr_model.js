@@ -400,13 +400,10 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	{
 		var acc = getPersonAccount(value, (debtType) ? src_curr : dest_curr);
 
-		if (!acc)
-			return;
-
 		if (debtType)
-			updateValue('src_initbal', acc.balance);
+			updateValue('src_initbal', (acc) ? acc.balance : 0);
 		else
-			updateValue('dest_initbal', acc.balance);
+			updateValue('dest_initbal', (acc) ? acc.balance : 0);
 	}
 
 
