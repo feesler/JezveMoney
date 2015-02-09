@@ -146,16 +146,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		}
 
 		p_acc = getPersonAccount(person_id, new_curr);
-		if (p_acc)
-		{
-			updateValue('src_id', p_acc.id);
-			updateValue('src_initbal', p_acc.balance);
-		}
-		else
-		{
-			updateValue('src_id', 0);
-			updateValue('src_initbal', 0);
-		}
+		updateValue((debtType) ? 'src_initbal' : 'dest_initbal', p_acc ? p_acc.balance : 0);
 	}
 
 
