@@ -977,7 +977,7 @@ function TransactionViewModel()
 		{
 			setAmountInputLabel(false, false);
 			setAmountTileBlockLabel(false, false);
-			if (Transaction.isIncome() || Transaction.isDebt())
+			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				hideDestAmountAndExchange();
 			else
 				hideSrcAmountAndExchange();
