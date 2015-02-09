@@ -125,6 +125,40 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	}
 
 
+	// Sync currency of person account with currency of user account
+	function syncDebtCurrency()
+	{
+		var p_acc, new_curr;
+
+		if (!self.isDebt())
+			return;
+
+		new_curr = (debtType) ? dest_curr : src_curr;
+		if (debtType)
+		{
+			updateValue('src_curr', new_curr);
+			notifyChanged('src_curr', new_curr);
+		}
+		else
+		{
+			updateValue('dest_curr', new_curr);
+			notifyChanged('dest_curr', new_curr);
+		}
+
+		p_acc = getPersonAccount(person_id, new_curr);
+		if (p_acc)
+		{
+			updateValue('src_id', p_acc.id);
+			updateValue('src_initbal', p_acc.balance);
+		}
+		else
+		{
+			updateValue('src_id', 0);
+			updateValue('src_initbal', 0);
+		}
+	}
+
+
 	// Source amount field input event handler
 	function onSrcAmountUpdate(value)
 	{
@@ -296,14 +330,17 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	{
 		var acc = getAccount(value);
 
-		if (!acc)
-			return;
+		if (acc)
+		{
+			updateValue('src_curr', acc.curr_id);
+			notifyChanged('src_curr', acc.curr_id);
 
-		updateValue('src_curr', acc.curr_id);
-		notifyChanged('src_curr', acc.curr_id);
+			updateValue('src_initbal', acc.balance);
+			notifyChanged('src_initbal', acc.balance);
+		}
 
-		updateValue('src_initbal', acc.balance);
-		notifyChanged('src_initbal', acc.balance);
+		if (self.isDebt() && !debtType)
+			syncDebtCurrency();
 	}
 
 
@@ -311,14 +348,17 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	{
 		var acc = getAccount(value);
 
-		if (!acc)
-			return;
+		if (acc)
+		{
+			updateValue('dest_curr', acc.curr_id);
+			notifyChanged('dest_curr', acc.curr_id);
 
-		updateValue('dest_curr', acc.curr_id);
-		notifyChanged('dest_curr', acc.curr_id);
+			updateValue('dest_initbal', acc.balance);
+			notifyChanged('dest_initbal', acc.balance);
+		}
 
-		updateValue('dest_initbal', acc.balance);
-		notifyChanged('dest_initbal', acc.balance);
+		if (self.isDebt() && debtType)
+			syncDebtCurrency();
 	}
 
 
