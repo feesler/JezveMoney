@@ -648,7 +648,15 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	this.initModel = function()
 	{
 		if (edit_mode)
+		{
 			cancelTransaction();
+
+			setValue('src_id', edit_transaction.srcAcc);
+			setValue('dest_id', edit_transaction.destAcc);
+
+			setValue('src_amount', edit_transaction.srcAmount);
+			setValue('dest_amount', edit_transaction.destAmount);
+		}
 	}
 
 
