@@ -147,7 +147,7 @@
 								<button class="dashed_btn resbal_btn" type="button"><span>Select account</span></button>
 							</div>
 						</div>
-<?php	}	?>
+<?php	}	/* if ($trans_type == DEBT) */	?>
 <?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER) {		?>
 						<div id="source" class="acc_float">
 							<div><label>Source account</label></div>
