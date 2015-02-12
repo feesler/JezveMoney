@@ -35,3 +35,10 @@
 {
 	background: url('../img/sbellipsis.png') no-repeat;
 }
+
+
+/* Widget title glyph arrow */
+.widget_title .glyph
+{
+	background-image: url('../img/icons.png');
+}
