@@ -616,7 +616,10 @@ class TransactionsController extends Controller
 					$accLbl = "Source account";
 			}
 
-			$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] + $tr["dest_amount"], $debtAcc["curr"]);
+			if ($give)
+				$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] - $tr["dest_amount"], $debtAcc["curr"]);
+			else
+				$debtAcc["balfmt"] = Currency::format($debtAcc["balance"] + $tr["src_amount"], $debtAcc["curr"]);
 
 			$p_balfmt = Currency::format($person_balance, $srcAmountCurr);
 		}
