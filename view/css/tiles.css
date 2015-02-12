@@ -66,6 +66,12 @@ button.tilelink
 }
 
 
+a.tilelink
+{
+	text-decoration: none;
+}
+
+
 .tilelink > span
 {
 	height: 100px;
