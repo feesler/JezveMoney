@@ -415,8 +415,8 @@ class TransactionsController extends Controller
 		}
 		else
 		{
-			$rtSrcResBal = Currency::format($person_res_balance, $srcAmountCurr);
-			$rtDestResBal = Currency::format($debtAcc["balance"], $debtAcc["curr"]);
+			$rtSrcResBal = Currency::format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
+			$rtDestResBal = Currency::format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
 		}
 
 		$dateFmt = date("d.m.Y");
@@ -639,8 +639,8 @@ class TransactionsController extends Controller
 		}
 		else
 		{
-			$rtSrcResBal = Currency::format($person_res_balance, $srcAmountCurr);
-			$rtDestResBal = Currency::format($debtAcc["balance"], $debtAcc["curr"]);
+			$rtSrcResBal = Currency::format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
+			$rtDestResBal = Currency::format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
 		}
 
 		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
