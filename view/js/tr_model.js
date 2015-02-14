@@ -279,11 +279,17 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		}
 		else
 		{
-			f3();					// calculate da
-			if (evalid)
-				f4();				// calculate sa
-			else if (savalid)
-				f5();				// calculate e
+			f3();					// calculate sa
+			if (self.isDiff())
+			{
+				if (savalid)
+					f5();			// calculate e
+			}
+			else
+			{
+				if (evalid)
+					f2();			// calculate sa
+			}
 		}
 	}
 
