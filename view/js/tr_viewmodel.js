@@ -918,7 +918,9 @@ function TransactionViewModel()
 		else
 		{
 			setAmountInputLabel(true, false);
+			setAmountInputLabel(false, false);
 			setAmountTileBlockLabel(true, false);
+			setAmountTileBlockLabel(false, false);
 			if (Transaction.isExpense())
 				hideSrcAmountAndExchange();
 			else if (Transaction.isIncome())
@@ -975,7 +977,9 @@ function TransactionViewModel()
 		}
 		else
 		{
+			setAmountInputLabel(true, false);
 			setAmountInputLabel(false, false);
+			setAmountTileBlockLabel(true, false);
 			setAmountTileBlockLabel(false, false);
 			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				hideDestAmountAndExchange();
