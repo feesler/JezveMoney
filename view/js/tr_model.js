@@ -287,6 +287,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			{
 				if (evalid)
 					f2();			// calculate destination amount
+				f1_d();			// calculate result balance of destination
 			}
 		}
 	}
@@ -310,6 +311,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			{
 				if (evalid)
 					f4();			// calculate source amount
+				f1();				// calculate result balance of source
 			}
 		}
 		else if (self.isDebt())
