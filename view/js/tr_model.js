@@ -302,9 +302,17 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	
 		if (self.isTransfer() || self.isIncome())
 		{
-			f3_d();		// calculate sa
-			f2();			// calculate da
-			f1();			// calculate S2
+			f3_d();		// calculate destination amount
+			if (self.isDiff())
+			{
+				if (savalid)
+					f5();			// calculate exchange rate
+			}
+			else
+			{
+				if (evalid)
+					f4();			// calculate source amount
+			}
 		}
 		else if (self.isDebt())
 		{
