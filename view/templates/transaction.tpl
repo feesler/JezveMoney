@@ -183,7 +183,7 @@
 									</div>
 								</div>
 <?php	}	?>
-<?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER) {		?>
+<?php	if ($trans_type == EXPENSE) {		?>
 								<div id="dest_amount_left" style="display: none;">
 									<span><?=$destAmountLbl?></span>
 									<div>
@@ -226,13 +226,13 @@
 										<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcAmount?></span></button>
 									</div>
 								</div>
-<?php	if ($trans_type == INCOME) {		?>
 								<div id="dest_amount_left" style="display: none;">
 									<span><?=$destAmountLbl?></span>
 									<div>
 										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
+<?php	if ($trans_type == INCOME) {		?>
 								<div id="exch_left" style="display: none;">
 									<span>Exchange rate</span>
 									<div>
