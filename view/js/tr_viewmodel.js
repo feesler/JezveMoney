@@ -116,7 +116,8 @@ function TransactionViewModel()
 	{
 		srcAmountSwitch(true);
 		resBalanceSwitch(false);
-		resBalanceDestSwitch(false);
+		if (!Transaction.isDiff())
+			resBalanceDestSwitch(false);
 	}
 
 
@@ -124,7 +125,8 @@ function TransactionViewModel()
 	function onDestAmountSelect()
 	{
 		destAmountSwitch(true);
-		resBalanceSwitch(false);
+		if (!Transaction.isDiff() || Transaction.isExpense())
+			resBalanceSwitch(false);
 		resBalanceDestSwitch(false);
 		if (Transaction.isDiff())
 			exchRateSwitch(false);
@@ -135,17 +137,31 @@ function TransactionViewModel()
 	function onResBalanceSelect()
 	{
 		resBalanceSwitch(true);
-		resBalanceDestSwitch(false);
-		destAmountSwitch(false);
+		if (!Transaction.isDiff())
+			resBalanceDestSwitch(false);
+		if (Transaction.isTransfer() || Transaction.isDebt())
+			srcAmountSwitch(false);
+		else
+			destAmountSwitch(false);
+		if (Transaction.isExpense() && Transaction.isDiff())
+			exchRateSwitch(false);
 	}
 
 
 	// Destination result balance static click event handler
 	function onResBalanceDestSelect()
 	{
-		resBalanceSwitch(false);
 		resBalanceDestSwitch(true);
-		srcAmountSwitch(false);
+		if (Transaction.isDiff())
+		{
+			destAmountSwitch(false);
+			exchRateSwitch(false);
+		}
+		else
+		{
+			resBalanceSwitch(false);
+			srcAmountSwitch(false);
+		}
 	}
 
 
@@ -154,6 +170,13 @@ function TransactionViewModel()
 	{
 		exchRateSwitch(true);
 		destAmountSwitch(false);
+		if (Transaction.isDiff())
+		{
+			if (Transaction.isExpense())
+				resBalanceSwitch(false);
+			else if (Transaction.isIncome() || Transaction.isTransfer())
+				resBalanceDestSwitch(false);
+		}
 	}
 
 
