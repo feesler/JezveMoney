@@ -191,6 +191,12 @@
 									</div>
 								</div>
 <?php	}	?>
+								<div id="src_res_balance_left">
+									<span>Result balance</span>
+									<div>
+										<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
+									</div>
+								</div>
 <?php	if (($trans_type == TRANSFER && $src["curr"] == $dest["curr"]) || (($trans_type == EXPENSE || $trans_type == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
@@ -199,12 +205,6 @@
 									<span>Exchange rate</span>
 									<div>
 										<button id="exchrate_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtExchange?></span></button>
-									</div>
-								</div>
-								<div id="src_res_balance_left">
-									<span>Result balance</span>
-									<div>
-										<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
 									</div>
 								</div>
 							</div>
@@ -232,6 +232,12 @@
 										<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestAmount?></span></button>
 									</div>
 								</div>
+								<div id="dest_res_balance_left">
+									<span>Result balance</span>
+									<div>
+										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestResBal?></span></button>
+									</div>
+								</div>
 <?php	if ($trans_type == INCOME) {		?>
 								<div id="exch_left" style="display: none;">
 									<span>Exchange rate</span>
@@ -240,12 +246,6 @@
 									</div>
 								</div>
 <?php	}	?>
-								<div id="dest_res_balance_left">
-									<span>Result balance</span>
-									<div>
-										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestResBal?></span></button>
-									</div>
-								</div>
 							</div>
 						</div>
 <?php	}	?>
