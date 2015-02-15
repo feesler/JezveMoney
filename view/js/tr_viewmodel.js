@@ -126,6 +126,8 @@ function TransactionViewModel()
 		destAmountSwitch(true);
 		resBalanceSwitch(false);
 		resBalanceDestSwitch(false);
+		if (Transaction.isDiff())
+			exchRateSwitch(false);
 	}
 
 
