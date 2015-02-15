@@ -268,12 +268,10 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			if (debtType)
 			{
 				f3();			// calculate source amount
-				f4();			// calculate source amount
 			}
 			else
 			{
 				f3_d();		// calculate destination amount
-				f2();			// calculate destination amount
 				f1();			// calculate S2
 			}
 		}
@@ -319,13 +317,11 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			if (debtType)
 			{
 				f3_d();		// calculate destination amount
-				f2();			// calculate destination amount
 				f1();			// calculate S2
 			}
 			else
 			{
 				f3();			// calculate source amount
-				f4();			// calculate source amount
 			}
 		}
 	}
