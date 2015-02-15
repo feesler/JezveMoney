@@ -280,7 +280,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			f3();					// calculate source amount
 			if (self.isDiff())
 			{
-				if (savalid)
+				if (savalid && davalid)
 					f5();			// calculate exchange
 			}
 			else
@@ -303,7 +303,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			f3_d();		// calculate destination amount
 			if (self.isDiff())
 			{
-				if (savalid)
+				if (savalid && davalid)
 					f5();			// calculate exchange rate
 			}
 			else
