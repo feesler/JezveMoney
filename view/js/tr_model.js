@@ -267,28 +267,28 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		{
 			if (debtType)
 			{
-				f3();			// calculate da
-				f4();			// calculate sa and S2_d
+				f3();			// calculate source amount
+				f4();			// calculate source amount
 			}
 			else
 			{
-				f3_d();		// calculate sa
-				f2();			// calculate da
+				f3_d();		// calculate destination amount
+				f2();			// calculate destination amount
 				f1();			// calculate S2
 			}
 		}
 		else
 		{
-			f3();					// calculate sa
+			f3();					// calculate source amount
 			if (self.isDiff())
 			{
 				if (savalid)
-					f5();			// calculate e
+					f5();			// calculate exchange
 			}
 			else
 			{
 				if (evalid)
-					f2();			// calculate sa
+					f2();			// calculate destination amount
 			}
 		}
 	}
@@ -318,14 +318,14 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		{
 			if (debtType)
 			{
-				f3_d();		// calculate sa
-				f2();			// calculate da
+				f3_d();		// calculate destination amount
+				f2();			// calculate destination amount
 				f1();			// calculate S2
 			}
 			else
 			{
-				f3();			// calculate da
-				f4();			// calculate sa and S2_d
+				f3();			// calculate source amount
+				f4();			// calculate source amount
 			}
 		}
 	}

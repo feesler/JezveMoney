@@ -129,7 +129,7 @@ function TransactionViewModel()
 	}
 
 
-	// Result balance static click event handler
+	// Source result balance static click event handler
 	function onResBalanceSelect()
 	{
 		resBalanceSwitch(true);
@@ -138,7 +138,7 @@ function TransactionViewModel()
 	}
 
 
-	// Result balance static click event handler
+	// Destination result balance static click event handler
 	function onResBalanceDestSelect()
 	{
 		resBalanceSwitch(false);
