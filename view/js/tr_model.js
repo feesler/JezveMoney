@@ -204,7 +204,10 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (self.isIncome() || self.isTransfer() || (self.isDebt() && debtType))
 			f1_d();		// calculate S2_d
 		if (self.isExpense() || self.isTransfer() || (self.isDebt() && !debtType))
-			f1();			// calculate S2
+		{
+			if (savalid)
+				f1();			// calculate S2
+		}
 
 		if (savalid)
 			f5();		// calculate e
