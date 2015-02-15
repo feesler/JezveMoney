@@ -723,6 +723,18 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	}
 
 
+	this.srcAmount = function()
+	{
+		return fsa;
+	}
+
+
+	this.destAmount = function()
+	{
+		return fda;
+	}
+
+
 	this.exchRate = function()
 	{
 		return fe;
