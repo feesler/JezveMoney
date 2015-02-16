@@ -1025,6 +1025,7 @@ function TransactionViewModel()
 	{
 		var acclbl, debtgive, debttake, dType;
 		var src_res_balance_left, dest_res_balance_left, dest_amount_left, exch_left;
+		var resballbl;
 
 		acclbl = ge('acclbl');
 		debtgive = ge('debtgive');
@@ -1047,6 +1048,15 @@ function TransactionViewModel()
 		{
 			acclbl.innerHTML = (dType) ? 'Destination account' : 'Source account';
 		}
+
+		resballbl = firstElementChild(firstElementChild(ge('result_balance')));
+		if (resballbl)
+			resballbl.innerHTML = (dType) ? 'Result balance (Person)' : 'Result balance (Account)';
+
+		resballbl = firstElementChild(firstElementChild(ge('result_balance_dest')));
+		if (resballbl)
+			resballbl.innerHTML = (dType) ? 'Result balance (Account)' : 'Result balance (Person)';
+
 	}
 
 

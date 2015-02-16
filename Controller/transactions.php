@@ -321,7 +321,7 @@ class TransactionsController extends Controller
 			if ($trans_type == TRANSFER)
 				$srcBalTitle .= " (Source)";
 			else if ($trans_type == DEBT)
-				$srcBalTitle .= " (Person)";
+				$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 
 			$balDiff = $tr["src_amount"];
 			$src["balfmt"] = Currency::format($src["balance"] + $balDiff, $src["curr"]);
@@ -333,7 +333,7 @@ class TransactionsController extends Controller
 			if ($trans_type == TRANSFER)
 				$destBalTitle .= " (Destination)";
 			else if ($trans_type == DEBT)
-				$destBalTitle .= " (Account)";
+				$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$balDiff = $tr["dest_amount"];
 			$dest["balfmt"] = Currency::format($dest["balance"] - $balDiff, $dest["curr"]);
