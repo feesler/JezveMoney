@@ -747,6 +747,9 @@ function TransactionViewModel()
 		if (Transaction.isDebt())
 		{
 			updatePersonTile();
+
+			var sa = Transaction.srcAmount();
+			setSrcAmount(isValidValue(sa) ? sa : '');
 		}
 
 		setTileAccount(tile_id, acc_id);
