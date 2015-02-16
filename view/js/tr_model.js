@@ -268,15 +268,9 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 		if (self.isDebt())
 		{
-			if (debtType)
-			{
-				f3();			// calculate source amount
-			}
-			else
-			{
-				f3_d();		// calculate destination amount
-				f1();			// calculate S2
-			}
+			f3();			// calculate source amount
+			f2();			// calculate destination amount
+			f1_d();		// calculate destination result balance
 		}
 		else
 		{
@@ -319,15 +313,9 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		}
 		else if (self.isDebt())
 		{
-			if (debtType)
-			{
-				f3_d();		// calculate destination amount
-				f1();			// calculate S2
-			}
-			else
-			{
-				f3();			// calculate source amount
-			}
+			f3_d();		// calculate destination amount
+			f4();			// calculate source amount
+			f1();			// calculate result balance of source
 		}
 	}
 
