@@ -89,10 +89,14 @@
 
 	<div id="toolbar" class="sidebar" style="display: none;">
 		<div>
-			<div id="tb_content" class="siderbar_content">
-				<div id="sbEllipsis" class="sidebar_ellipsis"></div>
-				<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white edit"></span><span class="icontitle"><span>Edit</span></span></a></div>
-				<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showDeletePopup();" type="button"><span class="icon icon_white del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+			<div class="siderbar_content">
+				<div id="tb_content">
+					<div id="sbEllipsis" class="sidebar_ellipsis"></div>
+					<div id="sbButtons" class="sidebar_buttons">
+						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white edit"></span><span class="icontitle"><span>Edit</span></span></a></div>
+						<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showDeletePopup();" type="button"><span class="icon icon_white del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

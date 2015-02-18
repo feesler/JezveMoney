@@ -14,33 +14,30 @@
 	top: 0;
 	right: 0;
 	bottom: 0;
-	width: 15px;
-
 	background-color: #404040;
-}
-
-
-.sidebar.active > div
-{
-	width: auto;
 }
 
 
 .sidebar > div > .siderbar_content
 {
 	overflow: hidden;
-	min-height: 1px;
-	position: relative;
+	min-width: 15px;
+	height: 100%;
 }
 
 
 .sidebar.active > div > .siderbar_content
 {
 	display: block;
-	padding: 5px;
 	color: #FFFFFF;
 	background-color: #404040;
+}
+
+
+.siderbar_content > div
+{
 	position: relative;
+	min-height: 64px;
 }
 
 
@@ -57,7 +54,21 @@
 }
 
 
-.siderbar_content > .iconlink
+.sidebar_buttons
+{
+	display: none;
+	overflow: hidden;
+	padding: 5px;
+}
+
+
+.sidebar.active .sidebar_buttons
+{
+	display: block;
+}
+
+
+.siderbar_content .iconlink
 {
 	display: block;
 	clear: both;
@@ -67,7 +78,7 @@
 
 
 
-.siderbar_content > .iconlink span
+.siderbar_content .iconlink span
 {
 	color: #FFFFFF;
 }

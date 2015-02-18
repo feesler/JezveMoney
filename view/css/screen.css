@@ -42,7 +42,14 @@
 }
 
 
-.siderbar_content > .iconlink
+.sidebar_buttons
+{
+	display: block;
+	padding: 0;
+}
+
+
+.siderbar_content .iconlink
 {
 	clear: none;
 	float: left;
