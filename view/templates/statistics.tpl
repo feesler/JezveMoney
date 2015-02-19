@@ -116,7 +116,11 @@
 							</div>
 						</div>
 
-						<div id="chart" class="charts"></div>
+						<div id="chart" class="charts">
+<?php	if (!$resObj || !is_array($resObj->values) || !count($resObj->values)) {	?>
+						<span>No results found.</span>
+<?php	}		?>
+						</div>
 					</div>
 				</div>
 			</div>
