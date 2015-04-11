@@ -1,4 +1,10 @@
 /* Fix IE8 don't support background-size */
+/* logo */
+.logo > a > .logo_img
+{
+	background-image: url('../img/logo.png');
+}
+
 /* user button */
 .user_button .user_icon
 {

@@ -282,7 +282,7 @@ button::-moz-focus-inner
 {
 	display: inline-block;
 	height: 50px;
-	padding: 0px 12px;
+	padding: 0px 12px 0px 0px;
 }
 
 
@@ -311,6 +311,17 @@ button::-moz-focus-inner
 .logo > a:hover
 {
 	background-color: #606060;
+}
+
+
+.logo > a > .logo_img
+{
+	background: url('../img/logo2x.png') no-repeat;
+	background-size: 50px 50px;
+	width: 50px;
+	height: 50px;
+	display: inline-block;
+	float: left;
 }
 
 
