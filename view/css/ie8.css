@@ -5,6 +5,13 @@
 	background-image: url('../img/logo.png');
 }
 
+
+.login_logo > .logo
+{
+	background-image: url('../img/logo_u.png');
+}
+
+
 /* user button */
 .user_button .user_icon
 {
