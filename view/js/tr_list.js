@@ -585,7 +585,7 @@ function onDatePickerHide()
 	if (!selRange)
 		return;
 
-	filterObj.stdata = Calendar.format(selRange.start);
+	filterObj.stdate = Calendar.format(selRange.start);
 	filterObj.enddate = Calendar.format(selRange.end);
 
 	window.location = buildAddress();
