@@ -1,5 +1,11 @@
 <?php
-	
+
+	define("EXPENSE", 1, TRUE);
+	define("INCOME", 2, TRUE);
+	define("TRANSFER", 3, TRUE);
+	define("DEBT", 4, TRUE);
+
+
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)
 	{

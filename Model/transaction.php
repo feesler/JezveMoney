@@ -1,11 +1,5 @@
 <?php
 
-define("EXPENSE", 1, TRUE);
-define("INCOME", 2, TRUE);
-define("TRANSFER", 3, TRUE);
-define("DEBT", 4, TRUE);
-
-
 class Transaction extends CachedTable
 {
 	static private $dcache = NULL;
