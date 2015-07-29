@@ -2,7 +2,7 @@
 	$noLogs = TRUE;
 	require_once("../system/setup.php");
 
-	$filename = $docroot."/money/admin/log.txt";
+	$filename = $approot."admin/log.txt";
 
 	$contents = "";
 	if (file_exists($filename))

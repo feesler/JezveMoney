@@ -4,12 +4,7 @@
 	// Prepare root directories
 	$pparts = pathinfo(__FILE__);
 	$path_length = strrpos($pparts["dirname"], "/");
-	$approot = substr(__FILE__, 0, $path_length);
-
-	$path_length = strrpos($approot, "/");
-	$docroot = substr(__FILE__, 0, $path_length + 1);
-
-	$approot .= "/";
+	$approot = substr(__FILE__, 0, $path_length + 1);
 
 	define("BASEURL", "http://jezve.net/money/");
 
@@ -21,6 +16,7 @@
 		require_once($approot."system/log.php");
 
 		wlog("\r\nBEGIN");
+		wlog("approot: ".$approot);
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
 		wlog("User agent: ".$userAgent);

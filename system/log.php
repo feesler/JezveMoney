@@ -1,5 +1,5 @@
 <?php
-	$logfname = $docroot."/money/admin/log.txt";
+	$logfname = $approot."admin/log.txt";
 
 
 	// Write string to log file

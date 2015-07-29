@@ -2,7 +2,7 @@
 	$noLogs = TRUE;
 	require_once("../system/setup.php");
 
-	$logfname = $docroot."/money/admin/log.txt";
+	$logfname = $approot."admin/log.txt";
 
 	if (isset($_POST["clean"]) && $_POST["clean"] == "1")
 	{
