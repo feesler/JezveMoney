@@ -27,7 +27,7 @@ function onCurrencySel(obj)
 
 	this.setText(obj.str);
 
-	setSign('currsign', obi.id);
+	setSign('currsign', obj.id);
 	updateAccountTile();
 }
 
