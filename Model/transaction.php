@@ -278,6 +278,8 @@ class Transaction extends CachedTable
 		if (!$db->updateQ(self::$tbl_name, $fieldsArr, $valuesArr, "id=".$trans_id))
 			return FALSE;
 
+		$this->cleanCache();
+
 		// update balance of source account
 		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
