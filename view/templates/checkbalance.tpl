@@ -17,10 +17,6 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 	{
 		var trans_pos, posField;
 
-		trans_pos = ge('trans_pos');
-		if (!trans_pos)
-			return;
-
 		if (!chPosObj || !chPosObj.firstElementChild)
 			return;
 
@@ -28,9 +24,9 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		if (posField.tagName.toLowerCase() != 'input' || !posField.value || posField.value == '' || !isNum(posField.value))
 			return;
 
-		trans_pos.value = parseInt(posField.value);
+		trans_pos = parseInt(posField.value);
 
-		sendChangePosRequest(tr_id, trans_pos.value);
+		sendChangePosRequest(tr_id, trans_pos);
 	}
 
 
