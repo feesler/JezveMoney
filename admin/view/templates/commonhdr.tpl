@@ -20,3 +20,6 @@
 <?php	foreach($jsLocalArr as $jsFile) {	?>
 <script type="text/javascript" src="./view/js/<?=$jsFile?>"></script>
 <?php	}	?>
+<script>
+var baseURL = '<?=BASEURL?>';
+</script>

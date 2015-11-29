@@ -11,7 +11,6 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 </style>
 <script>
 	var chPosObj = null;
-	var baseURL = 'http://jezve.net/money/';
 
 	function onSubmitNewPos(tr_id)
 	{

@@ -1,6 +1,3 @@
-var baseURL = 'http://jezve.net/money/';
-
-
 // Update fields with specified currency
 function setCurrencyValues(currObj)
 {

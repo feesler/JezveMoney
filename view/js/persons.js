@@ -8,7 +8,6 @@ function onTileClick(p_id)
 	var tile, edit_btn, del_btn, delpersons;
 	var actDiv;
 	var selArr;
-	var baseURL = 'http://jezve.net/money/';
 
 	tile = ge('p_' + p_id);
 	edit_btn = ge('edit_btn');

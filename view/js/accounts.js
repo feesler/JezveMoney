@@ -56,7 +56,6 @@ function onTileClick(acc_id)
 	var tile, edit_btn, del_btn, delaccounts, export_btn;
 	var actDiv;
 	var selArr;
-	var baseURL = 'http://jezve.net/money/';
 
 	tile = ge('acc_' + acc_id);
 	edit_btn = ge('edit_btn');

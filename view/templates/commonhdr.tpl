@@ -14,3 +14,6 @@
 <?php	foreach($jsArr as $jsFile) {	?>
 <script type="text/javascript" src="<?=BASEURL?>view/js/<?=$jsFile?>"></script>
 <?php	}	?>
+<script>
+var baseURL = '<?=BASEURL?>';
+</script>

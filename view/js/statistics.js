@@ -1,6 +1,5 @@
 var calendarObj = null;
 var selRange = null;
-var baseURL = 'http://jezve.net/money/';
 
 
 // Build new location address from current filterObj
