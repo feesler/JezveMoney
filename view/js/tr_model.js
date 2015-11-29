@@ -762,7 +762,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	// Check source and destination currencies is different
 	this.isDiff = function()
 	{
-			return (src_curr != dest_curr);
+		return (src_curr != dest_curr);
 	}
 
 
