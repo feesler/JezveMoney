@@ -905,6 +905,10 @@ function TransactionViewModel()
 			setSrcResultBalance(value, 0);
 		else if (item == 'dest_resbal')
 			setDestResultBalance(value, 0);
+		else if (item == 'src_curr')
+			onSrcCurrChanged(value);
+		else if (item == 'dest_curr')
+			onDestCurrChanged(value);
 	}
 
 
@@ -925,8 +929,16 @@ function TransactionViewModel()
 
 
 	// Update layout on source curency changed
-	function onSrcCurrChanged()
+	function onSrcCurrChanged(value)
 	{
+		if (value !== undefined)
+		{
+			var src_curr = ge('src_curr');
+
+			if (src_curr)
+				src_curr.value = value;
+		}
+
 		if (Transaction.isDiff())
 		{
 			destAmountSwitch(true);
@@ -977,8 +989,16 @@ function TransactionViewModel()
 
 
 	// Update layout on destination curency changed
-	function onDestCurrChanged()
+	function onDestCurrChanged(value)
 	{
+		if (value !== undefined)
+		{
+			var dest_curr = ge('dest_curr');
+
+			if (dest_curr)
+				dest_curr.value = value;
+		}
+
 		if (Transaction.isDiff())
 		{
 			if (Transaction.isTransfer())
@@ -1250,6 +1270,8 @@ function TransactionViewModel()
 		Transaction.subscribe('exchrate', onValueChanged.bind(null, 'exchrate'));
 		Transaction.subscribe('src_resbal', onValueChanged.bind(null, 'src_resbal'));
 		Transaction.subscribe('dest_resbal', onValueChanged.bind(null, 'dest_resbal'));
+		Transaction.subscribe('src_curr', onValueChanged.bind(null, 'src_curr'));
+		Transaction.subscribe('dest_curr', onValueChanged.bind(null, 'dest_curr'));
 
 		if (Transaction.isDebt())
 		{
