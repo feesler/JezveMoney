@@ -722,6 +722,22 @@ class TransactionsController extends Controller
 			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				fail($defMsg);
 
+			// Check currency of account is the same as specified in transaction
+			$acc = new Account($user_id);
+			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
+			{
+				$src_acc_curr = $acc->getCurrency($src_id);
+				if ($src_acc_curr != $src_curr)
+					fail($defMsg);
+			}
+
+			if ($trans_type == INCOME || $trans_type == TRANSFER)
+			{
+				$dest_acc_curr = $acc->getCurrency($dest_id);
+				if ($dest_acc_curr != $dest_curr)
+					fail($defMsg);
+			}
+
 			if (!$trans->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
 			setMessage(MSG_TRANS_CREATE);
@@ -782,6 +798,22 @@ class TransactionsController extends Controller
 		}
 		else
 		{
+			// Check currency of account is the same as specified in transaction
+			$acc = new Account($user_id);
+			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
+			{
+				$src_acc_curr = $acc->getCurrency($src_id);
+				if ($src_acc_curr != $src_curr)
+					fail($defMsg);
+			}
+
+			if ($trans_type == INCOME || $trans_type == TRANSFER)
+			{
+				$dest_acc_curr = $acc->getCurrency($dest_id);
+				if ($dest_acc_curr != $dest_curr)
+					fail($defMsg);
+			}
+
 			if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
 		}
