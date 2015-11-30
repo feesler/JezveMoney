@@ -704,7 +704,7 @@ class Transaction extends CachedTable
 			}
 		}
 
-		return $db->countQ(self::$tbl_name, andJoin($condArr));
+		return $db->countQ(self::$tbl_name, $condArr);
 	}
 
 
