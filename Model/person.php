@@ -109,7 +109,7 @@ class Person extends CachedTable
 		}
 
 		// delete person
-		if (!$db->deleteQ("persons", andJoin(array("user_id=".self::$user_id, "id=".$p_id))))
+		if (!$db->deleteQ("persons", array("user_id=".self::$user_id, "id=".$p_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -169,7 +169,7 @@ class Person extends CachedTable
 						"owner_id=".$p_id,
 						"curr_id=".$c_id);
 
-		$resArr = $db->selectQ("id", "accounts", andJoin($condArr));
+		$resArr = $db->selectQ("id", "accounts", $condArr);
 		if (count($resArr) != 1)
 			return 0;
 
@@ -223,7 +223,7 @@ class Person extends CachedTable
 			return FALSE;
 
 		$condArr = array("user_id=".self::$user_id, "id<>".self::$owner_id);
-		if (!$db->deleteQ("persons", andJoin($condArr)))
+		if (!$db->deleteQ("persons", $condArr))
 			return FALSE;
 
 		$this->cleanCache();
@@ -244,7 +244,7 @@ class Person extends CachedTable
 									"a.curr_id" => "curr_id",
 									"a.balance" => "balance"),
 							array("persons AS p LEFT JOIN accounts AS a ON a.owner_id=p.id"),
-							andJoin($condArr));
+							$condArr);
 
 		$pArr = array();
 		foreach($resArr as $row)

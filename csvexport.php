@@ -60,7 +60,7 @@
 	$accName = array();
 
 	$condArr = array("user_id=".$user_id, "id=".$checkAccount_id);
-	$resArr = $db->selectQ("*", "accounts", andJoin($condArr));
+	$resArr = $db->selectQ("*", "accounts", $condArr);
 	foreach($resArr as $row)
 	{
 		$realBalance[$checkAccount_id] = floatval($row["initbalance"]);
@@ -80,7 +80,7 @@
 		$condArr[] = "(".orJoin($accCond).")";
 	}
 
-	$resArr = $db->selectQ("*", "transactions", andJoin($condArr), NULL, "pos");
+	$resArr = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
 	foreach($resArr as $row)
 	{
 		$tr_id = intval($row["id"]);

@@ -119,7 +119,7 @@
 				$condArr[] = "tr.dest_id=".$curr_acc_id;
 		}
 
-		$resArr = $db->selectQ($fields, $tables, andJoin($condArr), NULL, "pos ASC");
+		$resArr = $db->selectQ($fields, $tables, $condArr, NULL, "pos ASC");
 		foreach($resArr as $row)
 		{
 			$trans_time = strtotime($row["date"]);

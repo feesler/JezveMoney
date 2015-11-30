@@ -36,7 +36,7 @@ class Transaction extends CachedTable
 		if ($trans_id == 0 || is_null(self::$dcache))
 			self::$dcache = array();
 
-		$resArr = $db->selectQ("*", self::$tbl_name, andJoin($condArr));
+		$resArr = $db->selectQ("*", self::$tbl_name, $condArr);
 		if (!count($resArr))		// delete transaction from cache if can't find it
 		{
 			unset(self::$dcache[$trans_id]);
@@ -424,7 +424,7 @@ class Transaction extends CachedTable
 		if ($trans_date != -1)
 			$condArr[] = "date <= ".qnull($trans_date);
 
-		$resArr = $db->selectQ("pos", self::$tbl_name, andJoin($condArr), NULL, "pos DESC LIMIT 1");
+		$resArr = $db->selectQ("pos", self::$tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
 		if (count($resArr) != 1)
 			return 0;
 
@@ -453,7 +453,7 @@ class Transaction extends CachedTable
 		// delete expenses and incomes
 		$condArr = array($userCond);
 		$condArr[] = "((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))";
-		if (!$db->deleteQ(self::$tbl_name, andJoin($condArr)))
+		if (!$db->deleteQ(self::$tbl_name, $condArr))
 			return FALSE;
 
 		$this->cleanCache();
@@ -463,13 +463,13 @@ class Transaction extends CachedTable
 			// set outgoing debt(person take) as income to destination account
 			$condArr = array($userCond, "src_id=".$acc_id, "type=4");
 			if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
-							andJoin($condArr)))
+							$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as expense from source account
 			$condArr = array($userCond, "dest_id=".$acc_id, "type=4");
 			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
-							andJoin($condArr)))
+							$condArr))
 				return FALSE;
 		}
 		else							// specified account is account of user
@@ -477,26 +477,26 @@ class Transaction extends CachedTable
 			// set outgoing debt(person take) as debt without acc
 			$condArr = array($userCond, "src_id=".$acc_id, "type=4");
 			if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 4),
-							andJoin($condArr)))
+							$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as debt without acc
 			$condArr = array($userCond, "dest_id=".$acc_id, "type=4");
 			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 4),
-							andJoin($condArr)))
+							$condArr))
 				return FALSE;
 		}
 
 		// set transfer from account as income to destination account
 		$condArr = array($userCond, "src_id=".$acc_id, "type=3");
 		if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
-						andJoin($condArr)))
+						$condArr))
 			return FALSE;
 
 		// set transfer to account as expense from source account
 		$condArr = array($userCond, "dest_id=".$acc_id, "type=3");
 		if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
-						andJoin($condArr)))
+						$condArr))
 			return FALSE;
 
 		return TRUE;
@@ -589,11 +589,10 @@ class Transaction extends CachedTable
 			}
 		}
 
-		$condition = andJoin($condArr);
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
 		if ($tr_on_page > 0)
 		{
-			$transCount = $db->countQ(self::$tbl_name, $condition);
+			$transCount = $db->countQ(self::$tbl_name, $condArr);
 
 			$limitOffset = ($tr_on_page * $page_num);
 			$limitRows = min($transCount - $limitOffset, $tr_on_page);
@@ -601,7 +600,7 @@ class Transaction extends CachedTable
 			$orderAndLimit .= " LIMIT ".$limitOffset.", ".$limitRows;
 		}
 
-		$resArr = $db->selectQ("*", self::$tbl_name, $condition, NULL, $orderAndLimit);
+		$resArr = $db->selectQ("*", self::$tbl_name, $condArr, NULL, $orderAndLimit);
 		$rowCount = count($resArr);
 		if (!$rowCount)
 			return $res;
@@ -821,7 +820,7 @@ class Transaction extends CachedTable
 		if (count($orCond) > 0)
 			$condArr[] = "(".orJoin($orCond).")";
 
-		$resArr = $db->selectQ("*", self::$tbl_name, andJoin($condArr), NULL, "pos ASC");
+		$resArr = $db->selectQ("*", self::$tbl_name, $condArr, NULL, "pos ASC");
 		foreach($resArr as $row)
 		{
 			$tr_id = intval($row["id"]);

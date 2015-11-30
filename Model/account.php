@@ -43,7 +43,7 @@ class Account extends CachedTable
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
-		$resArr = $db->selectQ("*", "accounts", andJoin($condArr));
+		$resArr = $db->selectQ("*", "accounts", $condArr);
 		foreach($resArr as $row)
 		{
 			$acc_id = $row["id"];
@@ -168,7 +168,7 @@ class Account extends CachedTable
 
 		// delete account
 		$condArr = array("user_id=".self::$user_id, "id=".$acc_id);
-		if (!$db->deleteQ("accounts", andJoin($condArr)))
+		if (!$db->deleteQ("accounts", $condArr))
 			return FALSE;
 
 		$this->cleanCache();
