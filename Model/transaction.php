@@ -608,7 +608,7 @@ class Transaction extends CachedTable
 
 		foreach($resArr as $row)
 		{
-			$trans = new apiObject();
+			$trans = new stdClass;
 
 			$trans->id = intval($row["id"]);
 			$trans->type = intval($row["type"]);

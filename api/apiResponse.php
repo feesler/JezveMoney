@@ -1,8 +1,11 @@
 <?php
 
-	class apiResponse extends apiObject
+	class apiResponse
 	{
-		public $result;
+		public function render()
+		{
+			return f_json_encode($this);
+		}
 
 
 		public function fail()

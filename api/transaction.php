@@ -87,7 +87,7 @@
 		$respObj->data = array();
 		foreach($trArr as $trans)
 		{
-			$tr = new apiObject;
+			$tr = new stdClass;
 			$tr->id = $trans->id;
 			$tr->src_id = $trans->src_id;
 			$tr->dest_id = $trans->dest_id;

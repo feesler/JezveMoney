@@ -231,7 +231,7 @@ class Currency
 
 		foreach(self::$cache as $curr_id => $row)
 		{
-			$currObj = new apiObject;
+			$currObj = new stdClass;
 
 			$currObj->id = $curr_id;
 			$currObj->name = $row["name"];

@@ -266,7 +266,7 @@ class Person extends CachedTable
 
 			if (!isset($pArr[$ind]))
 			{
-				$pArr[$ind] = new apiObject; 
+				$pArr[$ind] = new stdClass; 
 
 				$pArr[$ind]->id = $p_id;
 				$pArr[$ind]->name = $row["name"];
@@ -274,7 +274,7 @@ class Person extends CachedTable
 			}
 			if (!is_null($row["aid"]))
 			{
-				$pAccObj = new apiObject;
+				$pAccObj = new stdClass;
 
 				$pAccObj->id = intval($row["aid"]);
 				$pAccObj->curr_id = intval($row["curr_id"]);

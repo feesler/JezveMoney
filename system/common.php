@@ -32,7 +32,6 @@
 					"Person" => "Model/person.php",
 					"Transaction" => "Model/transaction.php",
 					"User" => "Model/user.php",
-					"apiObject" => "api/apiObject.php",
 					"apiResponse" => "api/apiResponse.php");
 
 	// Check class name and try to load file
@@ -213,7 +212,7 @@
 			$groupArr = array_slice($groupArr, -$newGroupsCount);
 		}
 
-		$resObj = new apiObject();
+		$resObj = new stdClass;
 		$resObj->values = $amountArr;
 		$resObj->series = $groupArr;
 
