@@ -65,7 +65,7 @@ class TransactionsController extends Controller
 		$acc = new Account($user_id, TRUE);
 		$accounts = $acc->getCount();
 
-		$tr_on_page = 10;
+		$tr_on_page = 20;
 
 		$totalTrCount = $trans->getCount();
 		$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
