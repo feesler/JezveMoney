@@ -50,42 +50,52 @@ function asJoin($pieces)
 }
 
 
-// Join array of condition with AND operator
-function andJoin($condition)
+// Prepare string of AND joined conditions for query
+function andJoin($pieces)
 {
-	if (is_array($condition))
-		return implode(" AND ", $condition);
-	else if (is_string($condition))
-		return $condition;
+	$fstr = NULL;
 
-	return NULL;
+	if (is_array($pieces))
+	{
+		$fstr = implode(" AND ", $pieces);
+	}
+	else if (is_string($pieces))
+	{
+		$fstr = $pieces;
+	}
+
+	return $fstr;
 }
 
 
-// Join array of condition with OR operator
-function orJoin($condition)
+// Prepare string of OR joined conditions for query
+function orJoin($pieces)
 {
-	if (is_array($condition))
-		return implode(" OR ", $condition);
-	else if (is_string($condition))
-		return $condition;
+	$fstr = NULL;
 
-	return NULL;
+	if (is_array($pieces))
+	{
+		$fstr = implode(" OR ", $pieces);
+	}
+	else if (is_string($pieces))
+	{
+		$fstr = $pieces;
+	}
+
+	return $fstr;
 }
+
 
 
 class mysqlDB
 {
-	private $conn;			// connection
-	private $dbname;		// current database name
+	private static $conn = NULL;		// connection
+	private static $dbname = NULL;		// current database name
 
 
 	// Constructor
 	public function __construct()
 	{
-		$this->conn = NULL;
-		$this->dbname = NULL;
-
 		wlog("");
 	}
 
@@ -93,20 +103,25 @@ class mysqlDB
 	// Connect to database server
 	public function connect($dblocation, $dbuser, $dbpasswd)
 	{
-		$dbcnx = mysql_connect($dblocation, $dbuser, $dbpasswd);
+		$dbcnx = @mysql_connect($dblocation, $dbuser, $dbpasswd);
 		if ($dbcnx)
-			$this->conn = $dbcnx;
+			self::$conn = $dbcnx;
 
-		return ($this->conn != NULL);
+		return (self::$conn != NULL);
 	}
 
 
 	// Select database
 	public function selectDB($name)
 	{
-		$res = mysql_select_db($name, $this->conn);
+		wlog("USE ".$name.";");
+
+		$res = @mysql_select_db($name, self::$conn);
 		if ($res)
-			$this->dbname = $name;
+			self::$dbname = $name;
+
+		$errno = mysql_errno();
+		wlog("Result: ".($errno ? ($errno." - ".mysql_error()) : "ok"));
 
 		return $res;
 	}
@@ -124,7 +139,7 @@ class mysqlDB
 	{
 		wlog("Query: ".$query);
 
-		$res = mysql_query($query, $this->conn);
+		$res = mysql_query($query, self::$conn);
 
 		$errno = mysql_errno();
 		wlog("Result: ".($errno ? ($errno." - ".mysql_error()) : "ok"));
@@ -145,7 +160,7 @@ class mysqlDB
 
 		$query = "SELECT ".$fstr." FROM ".$tstr;
 		if ($condition)
-			$query .= " WHERE ".$condition;
+			$query .= " WHERE ".andJoin($condition);
 		if ($group)
 			$query .= " GROUP BY ".$group;
 		if ($order)
@@ -155,11 +170,9 @@ class mysqlDB
 		$result = $this->rawQ($query);
 		if ($result && !mysql_errno() && mysql_num_rows($result) > 0)
 		{
-			$i = 0;
 			while($row = mysql_fetch_array($result))
 			{
-				$resArr[$i] = $row;
-				$i++;
+				$resArr[] = $row;
 			}
 		}
 
@@ -209,8 +222,8 @@ class mysqlDB
 				$query .= ", ";
 		}
 
-		if ($condition)
-			$query .= " WHERE ".$condition;
+		if (!is_null($condition))
+			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";
 
 		$this->rawQ($query);
@@ -238,10 +251,10 @@ class mysqlDB
 		if (!$table || $table == "")
 			return FALSE;
 
-		if (!$condition)
+		if (is_null($condition))
 			return $this->truncateQ($table);
 
-		$query = "DELETE FROM `".$table."` WHERE ".$condition.";";
+		$query = "DELETE FROM `".$table."` WHERE ".andJoin($condition).";";
 		$this->rawQ($query);
 
 		return (mysql_errno() == 0);
@@ -254,8 +267,8 @@ class mysqlDB
 		$res = 0;
 
 		$query = "SELECT COUNT(*) FROM ".$table;
-		if ($condition)
-			$query .= " WHERE ".$condition;
+		if (!is_null($condition))
+			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";
 
 		$result = 	$this->rawQ($query);
