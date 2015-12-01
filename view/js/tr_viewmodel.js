@@ -1047,16 +1047,21 @@ function TransactionViewModel()
 		var src_res_balance_left, dest_res_balance_left, dest_amount_left, exch_left;
 		var resballbl;
 
-		acclbl = ge('acclbl');
 		debtgive = ge('debtgive');
+		if (!debtgive)
+			return;
+
+		dType = debtgive.checked;
+		if (dType == Transaction.debtType())
+			return;
+
+		acclbl = ge('acclbl');
 		src_res_balance_left = re('src_res_balance_left');
 		dest_res_balance_left = re('dest_res_balance_left');
 		dest_amount_left = ge('dest_amount_left');
 		exch_left = ge('exch_left');
-		if (!acclbl || !debtgive || !dest_res_balance_left || !src_res_balance_left)
+		if (!acclbl || !dest_res_balance_left || !src_res_balance_left)
 			return;
-
-		dType = debtgive.checked;
 
 		insertAfter(src_res_balance_left, (dType) ? exch_left : dest_amount_left);
 		insertAfter(dest_res_balance_left, (dType) ? dest_amount_left : exch_left);
