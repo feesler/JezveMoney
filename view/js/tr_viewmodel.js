@@ -1043,18 +1043,17 @@ function TransactionViewModel()
 	// Debt operation type change event handler
 	function onChangeDebtOp()
 	{
-		var acclbl, debtgive, debttake, dType;
+		var acclbl, debtgive, dType;
 		var src_res_balance_left, dest_res_balance_left, dest_amount_left, exch_left;
 		var resballbl;
 
 		acclbl = ge('acclbl');
 		debtgive = ge('debtgive');
-		debttake = ge('debttake');
 		src_res_balance_left = re('src_res_balance_left');
 		dest_res_balance_left = re('dest_res_balance_left');
 		dest_amount_left = ge('dest_amount_left');
 		exch_left = ge('exch_left');
-		if (!acclbl || !debtgive || !debttake || !dest_res_balance_left || !src_res_balance_left)
+		if (!acclbl || !debtgive || !dest_res_balance_left || !src_res_balance_left)
 			return;
 
 		dType = debtgive.checked;
