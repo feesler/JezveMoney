@@ -1043,7 +1043,7 @@ function TransactionViewModel()
 	// Debt operation type change event handler
 	function onChangeDebtOp()
 	{
-		var acclbl, debtgive, dType;
+		var acclbl, debtgive, dType, rbv;
 		var src_res_balance_left, dest_res_balance_left, dest_amount_left, exch_left;
 		var resballbl;
 
@@ -1065,6 +1065,13 @@ function TransactionViewModel()
 
 		insertAfter(src_res_balance_left, (dType) ? exch_left : dest_amount_left);
 		insertAfter(dest_res_balance_left, (dType) ? dest_amount_left : exch_left);
+
+		rbv = isVisible('result_balance');
+		if (rbv || isVisible('result_balance_dest'))
+		{
+			resBalanceSwitch(!rbv);
+			resBalanceDestSwitch(rbv);
+		}
 
 		Transaction.update('debt_type', dType);
 
