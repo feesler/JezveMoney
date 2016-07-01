@@ -204,6 +204,13 @@ button::-moz-focus-inner
 }
 
 
+/* iOS Safari styling issue fix */
+input[type="button"], input[type="submit"], button
+{
+	-webkit-appearance: button;
+}
+
+
 /* Centered block */
 .centered
 {
@@ -612,7 +619,6 @@ label
 	margin-right: 15px;
 	vertical-align: middle;
 	overflow: visible;
-	-webkit-appearance: button;
 	border-radius: 0;
 }
 
