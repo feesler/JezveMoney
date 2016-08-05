@@ -397,7 +397,7 @@
 								<div>
 									<div class="stretch_input trans_input">
 										<div>
-											<input id="comm" name="comm" type="text" value="<?=$tr["comment"]?>">
+											<input id="comm" name="comm" type="text" value="<?=e($tr["comment"])?>">
 										</div>
 									</div>
 								</div>
