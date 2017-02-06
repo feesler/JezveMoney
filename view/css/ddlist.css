@@ -48,6 +48,13 @@
 }
 
 
+.ddinp.inactive,
+.statsel.inactive
+{
+	color: #808080;
+}
+
+
 /* Select Drop Down button */
 .selectBtn
 {
@@ -118,7 +125,7 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	cursor: default;
+	cursor: pointer;
 	height: 17px;
 	line-height: 17px;
 }
@@ -214,4 +221,23 @@
 .dd_attached .ddmobile > select
 {
 	height: 100%;
+}
+
+
+/* Disabled drop down */
+.dd_container.dd_disabled
+{
+	border: 2px solid #CCCCCC;
+}
+
+
+.dd_container.dd_disabled > .selectBtn:hover > div
+{
+	background-position: -6px -6px;
+}
+
+
+.dd_container.dd_disabled .statsel
+{
+	color: #CCCCCC;
 }

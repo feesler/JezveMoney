@@ -1,57 +1,63 @@
-// Create AJAX object
-function createRequestObject()
+var ajax = new (function()
 {
-	try { return new XMLHttpRequest() }
-	catch(e)
+	// Create AJAX object
+	function createRequestObject()
 	{
-		try { return new ActiveXObject('Msxml2.XMLHTTP') }
+		try { return new XMLHttpRequest() }
 		catch(e)
 		{
-			try { return new ActiveXObject('Microsoft.XMLHTTP') }
-			catch(e) { return null; }
-		}
-	}
-}
-
-
-// Make asinchronous GET request by specified link and call callback function on ready
-function getData(link, callback)
-{
-	var http = createRequestObject();
-	if (http)
-	{
-		http.open('get', link, true);
-		http.onreadystatechange = function()
-		{
-			if (http.readyState == 4)
+			try { return new ActiveXObject('Msxml2.XMLHTTP') }
+			catch(e)
 			{
-				if (callback)
-					callback(http.responseText);
+				try { return new ActiveXObject('Microsoft.XMLHTTP') }
+				catch(e) { return null; }
 			}
 		}
-		http.send(null);
 	}
-}
 
 
-// Make asinchronous POST request by specified link with parameters and call callback function on ready
-// Params should be specified as string param1=value1&param2=value2&...&paramN=valueN
-function postData(link, params, callback)
-{
-	var http = createRequestObject();
-	if (http)
+	// Request ready status change event handler
+	function onStateChange(callback)
 	{
-		http.open('post', link, true);
-		http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-		http.onreadystatechange = function()
+		if (this.readyState == 4)
 		{
-			if (http.readyState == 4)
-			{
-				if (callback)
-					callback(http.responseText);
-			}
+			if (callback)
+				callback(this.responseText);
 		}
+	}
+
+
+	// Make asynchronous request
+	function sendRequest(method, link, params, callback)
+	{
+		var supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
+		var http = createRequestObject();
+
+		if (!http)
+			return false;
+
+		method = method.toLowerCase();
+		if (supportedMethods.indexOf(method) == -1)
+			return false;
+
+		http.open(method, link, true);
+		if (method == 'post')
+			http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+		http.onreadystatechange = onStateChange.bind(http, callback);
+
 		http.send(params);
 	}
-}
 
+
+// ajax global object public methods
+	this.get = function(link, callback)
+	{
+		return sendRequest('get', link, null, callback);
+	}
+
+	this.post = function(link, params, callback)
+	{
+		return sendRequest('post', link, params, callback);
+	}
+})();

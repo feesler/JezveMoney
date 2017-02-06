@@ -333,6 +333,22 @@ function insertAfter(elem, refElem)
 }
 
 
+// Insert element as first child
+function prependChild(parent, elem)
+{
+	var fe;
+
+	if (!elem)
+		return;
+
+	fe = firstElementChild(parent);
+	if (fe)
+		insertBefore(fe, elem);
+	else
+		parent.appendChild(elem);
+}
+
+
 // Wrapper for childElementCount Node property for IE8 and less
 function childElementCount(el)
 {

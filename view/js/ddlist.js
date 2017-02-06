@@ -37,11 +37,16 @@ Methods:
 
 */
 
+var DDList_instances = 0;
 
 // Drop Down List constructor
 function DDList()
 {
+	DDList_instances++;
+
+	this.container = null;
 	this.hostObj = null;
+	this.inpCont = null;
 	this.statObj = null;
 	this.list = null;
 	this.ulobj = null;
@@ -54,8 +59,10 @@ function DDList()
 	this.visible = false;
 	this.filtered = false;
 	this.filteredCount = 0;
+	this.manFilter = false;
 	this.itemCount = 0;
 	this.editable = true;
+	this.disabled = false;
 	this.selMsg = null;
 	this.smShown = false;
 	this.actItem = null;
@@ -71,6 +78,8 @@ function DDList()
 	this.forceSelect = false;
 	this.defSeparator = null;
 
+	this.createParams = null;
+
 
 	this.showSelMsg = function(val)
 	{
@@ -79,12 +88,23 @@ function DDList()
 
 		if (this.editable)
 		{
-			this.hostObj.style.color = ((val) ? '#808080' : '#000000');
+			if (val)
+				addClass(this.hostObj, 'inactive');
+			else
+				removeClass(this.hostObj, 'inactive');
+
 			this.hostObj.value = ((val) ? this.selMsg : '');
 		}
 		else
 		{
-			this.statObj.style.color = ((val) ? '#808080' : '#000000');
+			if (!this.disabled)
+			{
+				if (val)
+					addClass(this.statObj, 'inactive');
+				else
+					removeClass(this.statObj, 'inactive');
+			}
+
 			this.statObj.innerHTML = ((val) ? this.selMsg : '');
 		}
 
@@ -94,11 +114,12 @@ function DDList()
 
 	this.create = function(params)
 	{
-		var inpObj, statObj, divObj, ulObj, btnObj, btnDivObj, contObj, inpCont;
-		var selObj, selectMode = false;
+		var inpObj = null, selObj = null, selectMode = false;
 
 		if (!params)
 			return false;
+
+		this.createParams = params;
 
 		if (!params.input_id || !params.selCB)
 			return false;
@@ -106,7 +127,20 @@ function DDList()
 		this.multi = params.multi || false;
 		this.forceSelect = params.forceSelect || false;
 		this.listAttach = params.listAttach || false;
-		this.itemPrefix = params.itemPrefix || null;
+		this.itemPrefix = 'ddlist' + DDList_instances + '_';
+		this.editable = (params.editable !== undefined) ? params.editable : true;
+		this.disabled = (params.disabled !== undefined) ? params.disabled : false;
+		this.isMobile = (params.mobile !== undefined) ? params.mobile : false;
+		this.defSeparator = params.defSeparator || ',';
+		this.selcb = params.selCB || null;
+		this.changecb = params.changecb || null;
+		if (params.maxHeight !== undefined && params.maxHeight > 0)
+			this.maxHeight = params.maxHeight;
+		this.inpcb = params.inpCB || null;
+		this.selMsg = params.selmsg || null;
+
+		if (this.disabled)
+			this.editable = false;
 
 		inpObj = ge(params.input_id);
 		if (!inpObj || !inpObj.parentNode)
@@ -121,199 +155,182 @@ function DDList()
 				inpObj = null;
 				if (selObj.multiple)
 					this.multi = true;
+
+				if (selObj.disabled)
+				{
+					this.disabled = true;
+					this.editable = false;
+				}
 			}
 
 			// Create container
-			inpCont = ce('div');
-			contObj = ce('div', { className : 'dd_container' },
+			this.inpCont = ce('div');
+			this.container = ce('div', { className : 'dd_container' },
 						[ ce('div', { className : 'dd_input_cont' },
-							[ inpCont ]) ]);
-			if (!contObj)
+							[ this.inpCont ]) ]);
+			if (!this.container)
 				return false;
 			if (params.extClass)
-				addClass(contObj, params.extClass);
+				addClass(this.container, params.extClass);
+
+			if (this.disabled)
+				addClass(this.container, 'dd_disabled');
 
 			if (selectMode)
 			{
-				insertAfter(contObj, selObj);
+				insertAfter(this.container, selObj);
 				selObj = re(selObj);
-				inpObj = ce('input');
+				inpObj = ce('input', { type : 'text' });
 				if (!inpObj)
 					return false;
-				inpCont.appendChild(inpObj);
+				this.inpCont.appendChild(inpObj);
 			}
 			else
 			{
-				insertAfter(contObj, inpObj);
+				insertAfter(this.container, inpObj);
 				inpObj = re(inpObj);
 				if (!inpObj)
 					return false;
-				inpCont.appendChild(inpObj);
+				this.inpCont.appendChild(inpObj);
 			}
 
 			// create static element
-			statObj = ce('span', { className : 'statsel',
-								style : {
-									width : px(inpObj.offsetWidth),
-									display : (params.editable == false) ? '' : 'none' } });
+			this.statObj = ce('span', { className : 'statsel',
+								style : { minWidth : px(inpObj.offsetWidth) } });
+			show(this.statObj, !this.editable);
 
-			insertBefore(statObj, inpObj);
+			insertBefore(this.statObj, inpObj);
 
-			if (params.editable == false)
-			{
-				this.editable = false;
-				inpObj.style.display = 'none';
-			}
-			else
-			{
+			if (this.editable)
 				inpObj.className = 'ddinp';
-			}
+			else
+				show(inpObj, false);
 		}
 		else
 		{
-			contObj = ce('div', { className : 'dd_attached' });
-			if (!contObj)
+			this.container = ce('div', { className : 'dd_attached' });
+			if (!this.container)
 				return false;
 			if (params.extClass)
-				addClass(contObj, params.extClass);
+				addClass(this.container, params.extClass);
 
-			insertAfter(contObj, inpObj);
-			contObj.style.width = px(inpObj.offsetWidth);
-			contObj.style.height = px(inpObj.offsetHeight);
+			insertAfter(this.container, inpObj);
+			this.container.style.width = px(inpObj.offsetWidth);
+			this.container.style.height = px(inpObj.offsetHeight);
 
 			inpObj = re(inpObj);
 			if (!inpObj)
 				return false;
-			contObj.appendChild(inpObj);
+			this.container.appendChild(inpObj);
 
 			inpObj.onclick = this.dropDown.bind(this);
-		}
-
-		if (params.mobile)
-		{
-			this.isMobile = params.mobile;
 		}
 
 		// create elements of list
 		if (this.isMobile)
 		{
 			if (selectMode)
-				ulObj = selObj;
+				this.ulobj = selObj;
 			else
-				ulObj = ce('select');
+				this.ulobj = ce('select');
 			if (this.multi)
 			{
-				ulObj.multiple = true;
+				this.ulobj.multiple = true;
 				if (this.forceSelect)
 				{
-					ulObj.size = 10;
-					show(ulObj, false);
+					this.ulobj.size = 10;
+					show(this.ulobj, false);
 				}
 			}
 
-			ulObj.onchange = this.onChange.bind(this);
+			this.ulobj.onchange = this.onChange.bind(this);
 		}
 		else
 		{
 			if (selectMode)
 			{
 				show(selObj, false);
-				contObj.appendChild(selObj);
+				this.container.appendChild(selObj);
 			}
-			ulObj = ce('ul');
+			this.ulobj = ce('ul');
 		}
-		if (!ulObj)
+		if (!this.ulobj)
 			return false;
 
-		divObj = ce('div', { className : 'ddlist',
+		this.list = ce('div', { className : 'ddlist',
 						onkeydown : this.onKey.bind(this),
 						onscroll : this.onScroll.bind(this) },
-					[ulObj]);
-		if (!divObj)
+					[this.ulobj]);
+		if (!this.list)
 			return false;
 		if (this.isMobile)
-			addClass(divObj, 'ddmobile');
+			addClass(this.list, 'ddmobile');
 		else
-			setParam(divObj, { style : { display : 'none', height :  '10px' } });
+			setParam(this.list, { style : { display : 'none', height :  '10px' } });
 		if (this.multi && this.forceSelect)
 		{
-			addClass(divObj, 'forced');
-			show(divObj, false);
+			addClass(this.list, 'forced');
+			show(this.list, false);
 		}
-		contObj.appendChild(divObj);
+		this.container.appendChild(this.list);
 
 		// create elements of drop down button
 		if (!this.listAttach)
 		{
-			btnObj = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'dditem_idle' } ) ]);
-			if (!btnObj)
+			this.selbtn = ce('button', { type : 'button', className : 'selectBtn' }, [ ce('div', { className : 'dditem_idle' } ) ]);
+			if (!this.selbtn)
 				return false;
-			if (!this.isMobile || (this.isMobile && this.multi && this.forceSelect))
-				btnObj.onclick = this.dropDown.bind(this);
 
-			if (!insertBefore(btnObj, firstElementChild(contObj)))
+			if (this.disabled)
+				this.selbtn.disabled = true;
+
+			if (!this.isMobile || (this.isMobile && this.multi && this.forceSelect))
+				this.selbtn.onclick = this.dropDown.bind(this);
+
+			if (!insertBefore(this.selbtn, firstElementChild(this.container)))
 				return false;
 		}
 		else
 		{
 			if (this.isMobile)
 			{
-				divObj.style.top = 0;
+				this.list.style.top = 0;
 
-				divObj.style.height = px(contObj.offsetHeight);
-				divObj.style.width = px(contObj.offsetWidth);
+				this.list.style.height = px(this.container.offsetHeight);
+				this.list.style.width = px(this.container.offsetWidth);
 			}
 			else
 			{
-				divObj.style.top = px(contObj.offsetHeight);
+				this.list.style.top = px(this.container.offsetHeight);
 			}
 		}
 
 		this.hostObj = inpObj;
-		this.statObj = statObj;
-		this.list = divObj;
-		this.ulobj = ulObj;
 		this.selobj = selObj;
-		this.selbtn = btnObj;
 
-		this.defSeparator = params.defSeparator || ',';
+		if (this.disabled)
+			this.selobj.disabled = true;
 
-		if (params.selCB)
+		if (this.inpcb)
+			this.hostObj.oninput = this.onInput.bind(this);
+
+		if (this.selMsg)
 		{
-			this.selcb = params.selCB;
-		}
-
-		this.changecb = params.changecb || null;
-
-		if (params.maxHeight)
-		{
-			if (params.maxHeight > 0)
-				this.maxHeight = params.maxHeight;
-		}
-
-		if (params.inpCB)
-		{
-			this.inpcb = params.inpCB;
-			inpObj.oninput = this.onInput.bind(this);
-		}
-
-		if (params.selmsg)
-		{
-			this.selMsg = params.selmsg;
 			if (this.editable)
 			{
-				inpObj.onfocus = this.onFocus.bind(this);
-				inpObj.onblur = this.onBlur.bind(this);
+				this.hostObj.onfocus = this.onFocus.bind(this);
+				this.hostObj.onblur = this.onBlur.bind(this);
 
 				if (this.hostObj.value == '')
 				{
-					this.hostObj.style.color = '#808080';
+					addClass(this.hostObj, 'inactive');
 					this.hostObj.value = this.selMsg;
 				}
 			}
 			else
 			{
-				this.statObj.style.color = '#808080';
+				if (!this.disabled)
+					addClass(this.statObj, 'inactive');
 				this.statObj.innerHTML = this.selMsg;
 			}
 
@@ -322,20 +339,20 @@ function DDList()
 
 		if (!this.editable)
 		{
-			statObj.onclick = this.dropDown.bind(this);
+			if (!this.disabled)
+				this.inpCont.onclick = this.dropDown.bind(this);
 		}
 		else
 		{
-			inpObj.onkeydown = this.onKey.bind(this);
-			inpObj.onkeypress = this.onKey.bind(this);
-			inpObj.autocomplete = "off";
+			this.hostObj.onkeydown = this.onKey.bind(this);
+			this.hostObj.onkeypress = this.onKey.bind(this);
+			this.hostObj.autocomplete = "off";
 		}
 
-		if (this.multi)
-			this.selection = new Selection();
+		this.selection = new Selection();
 
 		if (selectMode)
-			this.parseSelect(selObj);
+			this.parseSelect(this.selobj);
 
 		return true;
 	}
@@ -363,6 +380,8 @@ function DDList()
 
 	this.show = function(val)
 	{
+		var resObj = {};
+
 		if (!this.list)
 			return;
 
@@ -376,7 +395,7 @@ function DDList()
 				if (val)
 				{
 					this.ulobj.focus();
-					setEmptyClick(this.show.bind(this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
+					setEmptyClick(this.show.bind(this, false), [this.hostObj, this.inpCont, this.statObj, this.list, this.selbtn]);
 				}
 				else
 					setEmptyClick();
@@ -389,7 +408,7 @@ function DDList()
 		{
 			this.list.style.height = px(Math.min(this.maxHeight, (this.filtered ? this.filteredCount : this.itemCount)) * this.itemHeight);
 
-			setEmptyClick(this.show.bind(this, false), [this.hostObj, this.statObj, this.list, this.selbtn]);
+			setEmptyClick(this.show.bind(this, false), [this.hostObj, this.inpCont, this.statObj, this.list, this.selbtn]);
 		}
 		else
 		{
@@ -397,21 +416,7 @@ function DDList()
 
 			if (this.changecb && this.changed)
 			{
-				if (this.multi && this.selobj.multiple)
-				{
-					this.changecb.call(this, this.selection.selected);
-				}
-				else
-				{
-					selectedOption = this.selobj.options[this.selobj.selectedIndex];
-					if (!selectedOption)
-						return;
-
-					resObj.id = this.prepareId(selectedOption.value);
-					resObj.str = selectedOption.innerHTML;
-
-					this.changecb.call(this, resObj);
-				}
+				this.changecb.call(this, this.selection.selected);
 			}
 			this.changed = false;
 		}
@@ -419,12 +424,67 @@ function DDList()
 		if (this.selbtn && firstElementChild(this.selbtn))
 			firstElementChild(this.selbtn).className = ((val) ? 'dditem_act' : 'dditem_idle');
 
-		this.list.style.display = ((val) ? 'block' : 'none');
+		show(this.list, val);
 
 		if (!val)
 			this.setActive(null);
 		else
 			this.list.scrollTop = 0;
+	}
+
+
+	this.makeEditable = function(val)
+	{
+		val = (val !== undefined) ? val : true;
+		if ((val && this.disabled) || val == this.editable)
+			return;
+
+		this.editable = val;
+
+		show(this.statObj, !this.editable);
+		show(this.hostObj, this.editable);
+
+		if (this.editable)
+		{
+			addClass(this.hostObj, 'ddinp');
+			this.hostObj.value = this.statObj.innerHTML;
+			this.hostObj.onkeydown = this.onKey.bind(this);
+			this.hostObj.onkeypress = this.onKey.bind(this);
+			this.hostObj.autocomplete = 'off';
+		}
+		else
+		{
+			removeClass(this.hostObj, 'ddinp');
+			this.statObj.innerHTML = this.hostObj.value;
+			if (!this.disabled)
+				this.inpCont.onclick = this.dropDown.bind(this);
+		}
+	}
+
+
+	this.enable = function(val)
+	{
+		val = (val !== undefined) ? val : true;
+		if (val != this.disabled)
+			return;
+
+		this.disabled = !val;
+
+		if (this.disabled)
+		{
+			addClass(this.container, 'dd_disabled');
+			this.makeEditable(false);
+		}
+		else
+		{
+			removeClass(this.container, 'dd_disabled');
+			if (this.createParams.editable !== false)
+				this.makeEditable();
+		}
+
+
+		this.selobj.disabled = this.disabled;
+		this.selbtn.disabled = this.disabled;
 	}
 
 
@@ -435,7 +495,7 @@ function DDList()
 		if (!this.list || !this.ulobj)
 			return;
 
-		if (!this.visible && this.filtered)
+		if (!this.visible && this.filtered && !this.manFilter)
 		{
 			chnodes = this.ulobj.childNodes;
 			for(i = 0; i < chnodes.length; i++)
@@ -453,6 +513,7 @@ function DDList()
 	}
 
 
+	// Cut item prefix if enabled and return original value
 	this.prepareId = function(id)
 	{
 		var idval;
@@ -494,51 +555,58 @@ function DDList()
 	}
 
 
+	this.getOptionData = function(option)
+	{
+		var resObj = {};
+
+		if (!option || !option.selected)
+			return null;
+
+		resObj.id = this.prepareId(option.value);
+		resObj.str = option.innerHTML;
+
+		return resObj;
+	}
+
+
+	// Mobile onchange event handler
 	this.onChange = function()
 	{
-		var selectedOption, resObj = {};
+		var option, resObj;
 
 		if (!this.ulobj || !this.ulobj.options || this.ulobj.selectedIndex == -1)
 			return;
 		if (!this.selcb)
 			return;
 
+		this.selection.clear();
 		if (this.multi && this.ulobj.multiple)
 		{
-			var option;
-
-			this.selection.clear();
 			for(var i = 0; i < this.ulobj.options.length; i++)
 			{
-				option = this.ulobj.options[i];
-				if (option.selected)
+				resObj = this.getOptionData(this.ulobj.options[i]);
+				if (resObj)
 				{
-					this.selection.select(this.prepareId(option.value), option.innerHTML);
+					this.selection.select(resObj.id, resObj.str);
 				}
 			}
-
 			this.selcb.call(this, this.selection.selected);
 		}
 		else
 		{
-			selectedOption = this.ulobj.options[this.ulobj.selectedIndex];
-			if (!selectedOption)
-				return;
-
-			resObj.id = this.prepareId(selectedOption.value);
-			resObj.str = selectedOption.innerHTML;
-
-			this.selcb.call(this, resObj);
+			resObj = this.getOptionData(this.ulobj.options[this.ulobj.selectedIndex]);
+			if (resObj)
+			{
+				this.selection.select(resObj.id, resObj.str);
+				this.selcb.call(this, resObj);
+			}
 		}
 
 		this.changed = true;
 
-		if (this.isMobile)
+		if (this.changecb)
 		{
-			if (this.multi && this.ulobj.multiple)
-				this.changecb.call(this, this.selection.selected);
-			else
-				this.changecb.call(this, resObj);
+			this.changecb.call(this, this.selection.selected);
 		}
 	}
 
@@ -568,19 +636,20 @@ function DDList()
 
 	this.onSelItem = function(obj)
 	{
+		var fe
 		var resObj = {};
 
 		if (!this.selcb || !obj)
 			return;
 
-		if (firstElementChild(obj))
+		fe = firstElementChild(obj);
+		if (fe)
 		{
-			var item_id = firstElementChild(obj).id
-			resObj.id = this.prepareId(item_id);
+			resObj.id = this.prepareId(fe.id);
 			if (this.multi)
-				resObj.str = nextElementSibling(firstElementChild(firstElementChild(firstElementChild(obj)))).innerHTML;
+				resObj.str = nextElementSibling(firstElementChild(firstElementChild(fe))).innerHTML;
 			else
-				resObj.str = firstElementChild(obj).innerHTML;
+				resObj.str = fe.innerHTML;
 
 			if (this.multi)
 			{
@@ -589,7 +658,8 @@ function DDList()
 				else
 					this.selection.select(resObj.id, resObj.str);
 
-				selectByValue(this.selobj, resObj.id, this.selection.isSelected(resObj.id));
+				if (this.selobj)
+					selectByValue(this.selobj, resObj.id, this.selection.isSelected(resObj.id));
 
 				this.check(resObj.id, this.selection.isSelected(resObj.id));
 
@@ -597,7 +667,11 @@ function DDList()
 			}
 			else
 			{
-				selectByValue(this.selobj, resObj.id);
+				this.selection.clear();
+				this.selection.select(resObj.id, resObj.str);
+
+				if (this.selobj)
+					selectByValue(this.selobj, resObj.id);
 
 				this.selcb.call(this, resObj);
 			}
@@ -607,6 +681,28 @@ function DDList()
 
 		if (!this.multi)
 			this.show(false);
+	}
+
+
+	this.deselect = function()
+	{
+		if (this.multi)
+		{
+			var selArr = this.selection.getIdArray();
+
+			selArr.forEach(function(id)
+			{
+				this.selection.deselect(id);
+				selectByValue(this.selobj, id, false);
+				this.check(id, false);
+			}, this);
+		}
+		else
+		{
+			selectByValue(this.selobj, 0);
+		}
+
+		this.setText('');
 	}
 
 
@@ -820,6 +916,23 @@ function DDList()
 	}
 
 
+	this.fixIOS = function(selectObj)
+	{
+		var fe;
+
+		if (!this.isMobile || !this.multi)
+			return;
+
+		fe = firstElementChild(selectObj);
+
+		if (!fe || !(fe.tagName == 'OPTGROUP' && fe.hidden && fe.disabled))
+		{
+			var og = ce('optgroup', { hidden : true, disabled : true });
+			prependChild(selectObj, og);
+		}
+	}
+
+
 	this.parseSelect = function(obj)
 	{
 		var i, option, resText = [];
@@ -827,6 +940,11 @@ function DDList()
 
 		if (!obj || obj.tagName === undefined || obj.tagName != 'SELECT' || obj.options === undefined)
 			return false;
+
+		if (this.isMobile)
+		{
+			this.fixIOS(obj);
+		}
 
 		for(i = 0, l = obj.options.length; i < l; i++)
 		{
@@ -837,13 +955,19 @@ function DDList()
 			if (!this.isMobile)
 				this.addItem(val, text);
 
+			if (this.isMobile)
+			{
+				option.value = ((this.itemPrefix) ? this.itemPrefix : '') + val;
+			}
+
 			if (option.selected)
 			{
 				if (this.multi)
 				{
 					this.check(val, true);
-					this.selection.select(val, option.innerHTML);
 				}
+
+				this.selection.select(val, option.innerHTML);
 				resText.push(text);
 			}
 		}
@@ -880,7 +1004,14 @@ function DDList()
 
 		if (this.isMobile)
 		{
+			this.fixIOS(this.ulobj);
+
 			liobj = ce('option', { value : idval, innerHTML : str });
+
+			if (!this.selobj && !this.multi && isEmpty(this.selection.selected) && !this.itemCount)
+			{
+				this.ulobj.appendChild(ce('option', { disabled : true, value : this.itemPrefix + 0, selected : true }));
+			}
 		}
 		else
 		{
@@ -1011,12 +1142,17 @@ function DDList()
 
 		this.showSelMsg((str == ''));
 
-		if (str != '')
+		if (str == '')
+			return;
+
+		if (this.editable && this.hostObj)
 		{
-			if (this.editable && this.hostObj)
-				this.hostObj.value = str;
-			else if (!this.editable && this.statObj)
-				this.statObj.innerHTML = str;
+			this.hostObj.value = str;
+		}
+		else if (!this.editable && this.statObj)
+		{
+			this.statObj.innerHTML = str;
+			this.statObj.title = str;
 		}
 	}
 }

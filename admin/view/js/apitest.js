@@ -17,13 +17,13 @@ function onFormSubmit(obj)
 		link = obj.action;
 		if (params != '')
 			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
-		getData(link, ajaxCallback);
+		ajax.get(link, ajaxCallback);
 	}
 	else if (obj.method == 'post')
 	{
 		params = urlJoin(els);
 		link = obj.action;
-		postData(link, params, ajaxCallback);
+		ajax.post(link, params, ajaxCallback);
 	}
 
 	return false;

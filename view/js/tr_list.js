@@ -362,7 +362,7 @@ function sendChangePosRequest(trans_id, newPos)
 {
 	var params = { 'id' : trans_id, 'pos' : newPos };
 
-	postData(baseURL + 'api/transaction.php?act=setpos', urlJoin(params), onChangePosCallback(trans_id, newPos));
+	ajax.post(baseURL + 'api/transaction.php?act=setpos', urlJoin(params), onChangePosCallback(trans_id, newPos));
 }
 
 

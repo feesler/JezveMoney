@@ -34,7 +34,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 	{
 		var params = { 'id' : trans_id, 'pos' : newPos };
 
-		postData(baseURL + 'api/transaction.php?act=setpos', urlJoin(params), onChangePosCallback);
+		ajax.post(baseURL + 'api/transaction.php?act=setpos', urlJoin(params), onChangePosCallback);
 	}
 
 
