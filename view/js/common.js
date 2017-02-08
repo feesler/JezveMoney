@@ -343,7 +343,7 @@ function prependChild(parent, elem)
 
 	fe = firstElementChild(parent);
 	if (fe)
-		insertBefore(fe, elem);
+		insertBefore(elem, fe);
 	else
 		parent.appendChild(elem);
 }
@@ -449,7 +449,7 @@ function removeChilds(obj)
 	if (!obj)
 		return;
 
-	while(obj.childNodes.length > 0) 
+	while(obj.childNodes.length > 0)
 		 obj.removeChild(obj.childNodes[0]);
 }
 
@@ -525,7 +525,7 @@ function onEmptyClick(e, callback, elem)
 }
 
 
-// Set or unset event handler for 
+// Set or unset event handler for
 function setEmptyClick(callback, elem)
 {
 	var onClickHandler;
@@ -607,7 +607,7 @@ function comparePosition(a, b)
 
 // Add CSS class to element
 function addClass(elem, clName)
-{ 
+{
 	var clArr, i;
 
 	if (!elem || elem.className === undefined || !clName)
