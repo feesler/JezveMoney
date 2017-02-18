@@ -24,12 +24,12 @@
 
 					<div>
 						<div id="trtype_menu" class="subHeader">
-<?php	forEach($transMenu as $menuItem) {	
+<?php	forEach($transMenu as $menuItem) {
 			if ($menuItem[0] == $trans_type) {		?>
 							<span><b><?=$menuItem[1]?></b></span>
 <?php		} else {		?>
 							<span><a href="<?=$menuItem[2]?>"><?=$menuItem[1]?></a></span>
-<?php		}	
+<?php		}
 		}	?>
 						</div>
 
@@ -44,7 +44,7 @@
 
 						<div class="tr_filter std_input">
 							<div>
-								<select id="acc_id" name="acc_id" multiple onchange="onAccountChange(this);">
+								<select id="acc_id" name="acc_id" multiple>
 									<option value="0">All</option>
 <?php	foreach($accArr as $accData) {
 			if (in_array($accData->id, $accFilter)) {		?>
