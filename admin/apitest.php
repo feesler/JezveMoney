@@ -22,4 +22,3 @@
 	$jsLocalArr = array("apitest.js");
 
 	include("./view/templates/apitest.tpl");
-?>

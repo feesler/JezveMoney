@@ -30,4 +30,3 @@
 	$jsLocalArr = array();
 
 	include("./view/templates/log.tpl");
-?>

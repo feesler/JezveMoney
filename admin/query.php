@@ -45,4 +45,3 @@
 	$jsLocalArr = array();
 
 	include("./view/templates/query.tpl");
-?>

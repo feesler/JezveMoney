@@ -12,4 +12,3 @@
 
 
 	header("Location: ./log.php");
-?>
