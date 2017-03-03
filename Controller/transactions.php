@@ -69,7 +69,7 @@ class TransactionsController extends Controller
 
 		$totalTrCount = $trans->getCount();
 		$transArr = ($totalTrCount) ? $trans->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
-		$transCount = $trans->getTransCount($trans_type, $accFilter, $searchReq, $startDate, $endDate);
+		$transCount = $trans->getTransCount($trans_type, $accFilter, $searchReq, $stDate, $endDate);
 
 		$currArr = Currency::getArray();
 
@@ -102,9 +102,9 @@ class TransactionsController extends Controller
 				$params["page"] = ($page_num + 1);
 			if (!is_empty($searchReq))
 				$params["search"] = $searchReq;
-			if (!is_empty($startDate) && !is_empty($endDate))
+			if (!is_empty($stDate) && !is_empty($endDate))
 			{
-				$params["stdate"] = $startDate;
+				$params["stdate"] = $stDate;
 				$params["enddate"] = $endDate;
 			}
 			$linkStr = urlJoin(BASEURL."transactions/", $params);
@@ -119,7 +119,7 @@ class TransactionsController extends Controller
 					if (is_numeric($pageItem["text"]) && !$pageItem["active"])
 					{
 						$pNum = intval($pageItem["text"]);
-						$pagesArr[$ind]["link"] = $trans->getPageLink($trans_type, $acc_id, $pNum, $searchReq, $startDate, $endDate, $details);
+						$pagesArr[$ind]["link"] = $trans->getPageLink($trans_type, $acc_id, $pNum, $searchReq, $stDate, $endDate, $details);
 					}
 				}
 			}
