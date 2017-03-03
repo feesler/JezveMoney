@@ -8,7 +8,7 @@
 		<div class="container">
 			<div class="content">
 				<div class="content_wrap admin_cont_wrap">
-					<h2>API test</h2>
+					<h2>Log</h2>
 
 					<form method="post" action="./cleanlog.php">
 					<input name="clean" type="hidden" value="1">
