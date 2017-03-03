@@ -311,42 +311,45 @@ function DDList()
 		if (this.disabled)
 			this.selobj.disabled = true;
 
-		if (this.inpcb)
-			this.hostObj.oninput = this.onInput.bind(this);
-
-		if (this.selMsg)
+		if (!this.listAttach)
 		{
-			if (this.editable)
-			{
-				this.hostObj.onfocus = this.onFocus.bind(this);
-				this.hostObj.onblur = this.onBlur.bind(this);
+			if (this.inpcb)
+				this.hostObj.oninput = this.onInput.bind(this);
 
-				if (this.hostObj.value == '')
+			if (this.selMsg)
+			{
+				if (this.editable)
 				{
-					addClass(this.hostObj, 'inactive');
-					this.hostObj.value = this.selMsg;
+					this.hostObj.onfocus = this.onFocus.bind(this);
+					this.hostObj.onblur = this.onBlur.bind(this);
+
+					if (this.hostObj.value == '')
+					{
+						addClass(this.hostObj, 'inactive');
+						this.hostObj.value = this.selMsg;
+					}
 				}
+				else
+				{
+					if (!this.disabled)
+						addClass(this.statObj, 'inactive');
+					this.statObj.innerHTML = this.selMsg;
+				}
+
+				this.smShown = true;
+			}
+
+			if (!this.editable)
+			{
+				if (!this.disabled)
+					this.inpCont.onclick = this.dropDown.bind(this);
 			}
 			else
 			{
-				if (!this.disabled)
-					addClass(this.statObj, 'inactive');
-				this.statObj.innerHTML = this.selMsg;
+				this.hostObj.onkeydown = this.onKey.bind(this);
+				this.hostObj.onkeypress = this.onKey.bind(this);
+				this.hostObj.autocomplete = "off";
 			}
-
-			this.smShown = true;
-		}
-
-		if (!this.editable)
-		{
-			if (!this.disabled)
-				this.inpCont.onclick = this.dropDown.bind(this);
-		}
-		else
-		{
-			this.hostObj.onkeydown = this.onKey.bind(this);
-			this.hostObj.onkeypress = this.onKey.bind(this);
-			this.hostObj.autocomplete = "off";
 		}
 
 		this.selection = new Selection();
