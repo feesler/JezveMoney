@@ -84,6 +84,13 @@ class TransactionsController extends Controller
 				$params["acc_id"] = $acc_id;
 			if ($showDetails)
 				$params["mode"] = "details";
+			if (!is_empty($searchReq))
+				$params["search"] = $searchReq;
+			if (!is_empty($stDate) && !is_empty($endDate))
+			{
+				$params["stdate"] = $stDate;
+				$params["enddate"] = $endDate;
+			}
 
 			$transMenu[] = array($ind, $trTypeName, urlJoin($baseUrl, $params));
 		}
