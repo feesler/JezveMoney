@@ -87,14 +87,11 @@ class Transaction extends CachedTable
 			$srcBalance = $acc->getBalance($src_id);
 		}
 
-		$trans_curr_id = $transcurr;
 		if ($dest_id != 0)
 		{
 			if (!$acc->is_exist($dest_id))
 				return 0;
 			$destBalance = $acc->getBalance($dest_id);
-			if ($trans_type == TRANSFER || ($trans_type == DEBT && $acc->getOwner($dest_id) != $u->getOwner(self::$user_id)))
-				$trans_curr_id = $acc->getCurrency($dest_id);		// currency of destination account is currency of transfer transaction
 		}
 
 
@@ -332,7 +329,7 @@ class Transaction extends CachedTable
 	}
 
 
-	// Update position of specified transaction and fix position of 
+	// Update position of specified transaction and fix position of
 	public function updatePos($trans_id, $new_pos)
 	{
 		global $db;
@@ -729,7 +726,7 @@ class Transaction extends CachedTable
 	}
 
 
-	// Return array of paginetor items
+	// Return array of paginator items
 	public function getPaginatorArray($page_num, $pages_count)
 	{
 		$res = array();

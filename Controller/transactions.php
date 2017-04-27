@@ -136,7 +136,7 @@ class TransactionsController extends Controller
 		$trListData = array();
 		foreach($transArr as $trans)
 		{
-			if ($trans->type == 4)
+			if ($trans->type == DEBT)
 			{
 				$src_owner_id = $acc->getOwner($trans->src_id);
 				$dest_owner_id = $acc->getOwner($trans->dest_id);
@@ -148,7 +148,7 @@ class TransactionsController extends Controller
 			$accStr = "";
 			if ($trans->src_id != 0)
 			{
-				if ($trans->type == 1 || $trans->type == 3)		// expense or transfer
+				if ($trans->type == EXPENSE || $trans->type == TRANSFER)		// expense or transfer
 					$accStr .= $acc->getName($trans->src_id);
 				else if ($trans->type == 4)
 					$accStr .= $acc->getNameOrPerson($trans->src_id);
@@ -159,7 +159,7 @@ class TransactionsController extends Controller
 
 			if ($trans->dest_id != 0)
 			{
-				if ($trans->type == 2 || $trans->type == 3)		// income or transfer
+				if ($trans->type == INCOME || $trans->type == TRANSFER)		// income or transfer
 					$accStr .= $acc->getName($trans->dest_id);
 				else if ($trans->type == 4)
 					$accStr .= $acc->getNameOrPerson($trans->dest_id);
