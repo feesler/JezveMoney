@@ -17,7 +17,7 @@
 </style>
 <script>
 var accounts = <?=f_json_encode($accArr)?>;
-var curTrRows = 1;
+var curTrRows = 0;
 
 function getMainAccId()
 {
@@ -177,6 +177,11 @@ function onMainAccChange()
 		rowEl = nextElementSibling(rowEl);
 	}
 }
+
+onReady(function()
+{
+	createRow();
+});
 </script>
 </head>
 <body>
@@ -186,26 +191,7 @@ function onMainAccChange()
 		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
 <?php }	?>
 	</select>
-	<div id="rowsContainer">
-		<div id="tr_1" class="tr_row">
-			<select name="tr_type[]" onchange="onTrTypeChange(1)">
-				<option value="expense">-</option>
-				<option value="income">+</option>
-				<option value="transfer">&gt;</option>
-			</select><!--
-			--><select name="dest_acc_id[]" disabled>
-					<option value="0" selected></option>
-			<?php foreach($accArr as $accObj) {	?>
-					<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
-			<?php }	?>
-			</select><!--
-			--><input name="amount[]" type="text" value="" placeholder="Amount"><!--
-			--><input name="dest_amount[]" type="text" value="" disabled placeholder="Destination amount"><!--
-			--><input name="date[]" type="text" value="" placeholder="Date"><!--
-			--><input name="comment[]" type="text" value="" placeholder="Comment"><!--
-			--><input id="del_1" type="button" onclick="delRow(1)" value="-">
-		</div>
-	</div>
+	<div id="rowsContainer"></div>
 	<div>
 		<input type="button" onclick="createRow()" value="+">
 	</div>
