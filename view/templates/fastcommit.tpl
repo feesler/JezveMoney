@@ -62,16 +62,30 @@ function delRow(row_id)
 function createRow()
 {
 	var rowsContainer, rowEl;
+	var destAccSel, acc_id;
 
 	rowsContainer = ge('rowsContainer');
 	if (!rowsContainer)
 		return;
+
+	acc_id = getMainAccId();
+
+	destAccSel = ce('select', { name : 'dest_acc_id[]', disabled : true }, ce('option', { value : 0 }));
+	accounts.forEach(function(account)
+	{
+		var option = ce('option', { value : account.id, innerHTML : account.name });
+		if (account.id == acc_id)
+			enable(option, false);
+
+		destAccSel.appendChild(option);
+	});
 
 	rowEl = ce('div', { id : 'tr_' + (curTrRows + 1), className : 'tr_row' },
 		[ ce('select', { name : 'tr_type[]', onchange : onTrTypeChange.bind(null, curTrRows + 1) },
 				[ ce('option', { value : 'expense', innerHTML : '-' }),
 					ce('option', { value : 'income', innerHTML : '+' }),
 					ce('option', { value : 'transfer', innerHTML : '>' })	]),
+			destAccSel,
 			ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' }),
 			ce('input', { type : 'text', name : 'dest_amount[]', placeholder : 'Destination amount' }),
 			ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' }),
