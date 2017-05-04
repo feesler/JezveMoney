@@ -19,6 +19,12 @@
 var accounts = <?=f_json_encode($accArr)?>;
 var curTrRows = 1;
 
+function getMainAccId()
+{
+	return parseInt(selectedValue(ge('acc_id')));
+}
+
+
 function delRow(row_id)
 {
 	var rowEl, delBtn;
@@ -105,11 +111,9 @@ function onTrTypeChange(row_id)
 	if (!rowEl)
 		return;
 
-	acc_id = selectedValue(ge('acc_id'));
+	acc_id = getMainAccId();
 	if (acc_id == -1)
 		return;
-
-	acc_id = parseInt(acc_id);
 
 	el = firstElementChild(rowEl);
 	if (!el)
@@ -138,11 +142,9 @@ function onMainAccChange()
 {
 	var acc_id, rowEl, trTypeSel, destAccSel;
 
-	acc_id = selectedValue(ge('acc_id'));
+	acc_id = getMainAccId();
 	if (acc_id == -1)
 		return;
-
-	acc_id = parseInt(acc_id);
 
 	rowEl = ge('tr_1');
 	while(rowEl)
