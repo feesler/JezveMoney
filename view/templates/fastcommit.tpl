@@ -16,6 +16,7 @@
 }
 </style>
 <script>
+var accounts = <?=f_json_encode($accArr)?>;
 var curTrRows = 1;
 
 function delRow(row_id)
@@ -35,6 +36,11 @@ function delRow(row_id)
 			break;
 
 		rowEl.id = rowEl('tr_' + (row_id - 1));
+		trTypeSel = firstElementChild(rowEl);
+		if (trTypeSel)
+		{
+			trTypeSel.onchange = onTrTypeChange.bind(null, row_id - 1);
+		}
 		delBtn = ge('del_' + row_id);
 		if (delBtn)
 		{
@@ -56,39 +62,132 @@ function createRow()
 		return;
 
 	rowEl = ce('div', { id : 'tr_' + (curTrRows + 1), className : 'tr_row' },
-		[ce('select', { name : 'tr_type[]' },
+		[ ce('select', { name : 'tr_type[]', onchange : onTrTypeChange.bind(null, curTrRows + 1) },
 				[ ce('option', { value : 'expense', innerHTML : '-' }),
-					ce('option', { value : 'income', innerHTML : '+' })	]),
-					ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' }),
-					ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' }),
-					ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' }),
-					ce('input', { type : 'button',
-									onclick : delRow.bind(null, curTrRows + 1),
-									value : '-' })
+					ce('option', { value : 'income', innerHTML : '+' }),
+					ce('option', { value : 'transfer', innerHTML : '>' })	]),
+			ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' }),
+			ce('input', { type : 'text', name : 'dest_amount[]', placeholder : 'Destination amount' }),
+			ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' }),
+			ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' }),
+			ce('input', { id : 'del_' + (curTrRows + 1), type : 'button',
+							onclick : delRow.bind(null, curTrRows + 1),
+							value : '-' })
 				]);
 
 	rowsContainer.appendChild(rowEl);
 	curTrRows++;
 }
+
+// Disable account option if it's the same as main account
+function syncAccountOption(opt, acc_id)
+{
+	if (!opt)
+		return;
+
+	if (parseInt(opt.value) == acc_id)
+	{
+		opt.selected = false;
+		opt.disabled = true;
+	}
+	else
+	{
+		opt.disabled = false;
+	}
+}
+
+function onTrTypeChange(row_id)
+{
+	var rowEl, el;
+	var acc_id, tr_type, i, l;
+
+	rowEl = ge('tr_' + row_id);
+	if (!rowEl)
+		return;
+
+	acc_id = selectedValue(ge('acc_id'));
+	if (acc_id == -1)
+		return;
+
+	acc_id = parseInt(acc_id);
+
+	el = firstElementChild(rowEl);
+	if (!el)
+		return;
+	tr_type = selectedValue(el);
+	el = nextElementSibling(el);
+	if (!el || !el.options)
+		return;
+
+	if (tr_type == 'transfer')
+	{
+		enable(el, true);
+		for(i = 0, l = el.options.length; i < l; i++)
+		{
+			syncAccountOption(el.options[i], acc_id);
+		}
+	}
+	else
+	{
+		enable(el, false);
+	}
+}
+
+
+function onMainAccChange()
+{
+	var acc_id, rowEl, trTypeSel, destAccSel;
+
+	acc_id = selectedValue(ge('acc_id'));
+	if (acc_id == -1)
+		return;
+
+	acc_id = parseInt(acc_id);
+
+	rowEl = ge('tr_1');
+	while(rowEl)
+	{
+		trTypeSel = firstElementChild(rowEl);
+		tr_type = selectedValue(trTypeSel);
+		if (tr_type == 'transfer')
+		{
+			destAccSel = nextElementSibling(trTypeSel);
+			for(i = 0, l = destAccSel.options.length; i < l; i++)
+			{
+				syncAccountOption(destAccSel.options[i], acc_id);
+			}
+		}
+
+		rowEl = nextElementSibling(rowEl);
+	}
+}
 </script>
 </head>
 <body>
 <form method="post" action="fastcommit.php">
-	<select name="acc_id">
+	<select id="acc_id" name="acc_id" onchange="onMainAccChange()">
 <?php foreach($accArr as $accObj) {	?>
 		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
 <?php }	?>
 	</select>
 	<div id="rowsContainer">
 		<div id="tr_1" class="tr_row">
-			<select name="tr_type[]">
+			<select name="tr_type[]" onchange="onTrTypeChange(1)">
 				<option value="expense">-</option>
 				<option value="income">+</option>
+				<option value="transfer">&gt;</option>
+			</select><!--
+			--><select name="dest_acc_id[]" disabled>
+					<option value="0" selected></option>
+			<?php foreach($accArr as $accObj) {	?>
+					<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
+			<?php }	?>
 			</select><!--
 			--><input name="amount[]" type="text" value="" placeholder="Amount"><!--
+			--><input name="dest_amount[]" type="text" value="" disabled placeholder="Destination amount"><!--
 			--><input name="date[]" type="text" value="" placeholder="Date"><!--
 			--><input name="comment[]" type="text" value="" placeholder="Comment"><!--
-			--><input type="button" onclick="delRow(1)" value="-">
+			--><input id="del_1" type="button" onclick="delRow(1)" value="-">
 		</div>
 	</div>
 	<div>
