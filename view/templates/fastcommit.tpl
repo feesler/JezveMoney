@@ -87,7 +87,7 @@ function createRow()
 					ce('option', { value : 'transfer', innerHTML : '>' })	]),
 			destAccSel,
 			ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' }),
-			ce('input', { type : 'text', name : 'dest_amount[]', placeholder : 'Destination amount' }),
+			ce('input', { type : 'text', name : 'dest_amount[]', disabled : true, placeholder : 'Destination amount' }),
 			ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' }),
 			ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' }),
 			ce('input', { id : 'del_' + (curTrRows + 1), type : 'button',
