@@ -27,7 +27,7 @@ function getMainAccId()
 
 function delRow(row_id)
 {
-	var rowEl, delBtn;
+	var rowEl, delBtn, destAccSel, destAmountInp;
 
 	rowEl = ge('tr_' + row_id);
 	if (!rowEl)
@@ -46,6 +46,16 @@ function delRow(row_id)
 		if (trTypeSel)
 		{
 			trTypeSel.onchange = onTrTypeChange.bind(null, row_id - 1);
+		}
+		destAccSel = ge('ds_' + row_id);
+		if (destAccSel)
+		{
+			destAccSel.onchange = onDestChange.bind(null, row_id - 1);
+		}
+		destAmountInp = ge('da_' + row_id);
+		if (destAmountInp)
+		{
+			destAmountInp.id = 'da_' + (row_id - 1);
 		}
 		delBtn = ge('del_' + row_id);
 		if (delBtn)
@@ -70,7 +80,7 @@ function createRow()
 
 	acc_id = getMainAccId();
 
-	destAccSel = ce('select', { name : 'dest_acc_id[]', disabled : true }, ce('option', { value : 0 }));
+	destAccSel = ce('select', { id : 'ds_', name : 'dest_acc_id[]', disabled : true }, ce('option', { value : 0 }));
 	accounts.forEach(function(account)
 	{
 		var option = ce('option', { value : account.id, innerHTML : account.name });
@@ -87,7 +97,7 @@ function createRow()
 					ce('option', { value : 'transfer', innerHTML : '>' })	]),
 			destAccSel,
 			ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' }),
-			ce('input', { type : 'text', name : 'dest_amount[]', disabled : true, placeholder : 'Destination amount' }),
+			ce('input', { id : 'da_' + (curTrRows + 1), type : 'text', name : 'dest_amount[]', disabled : true, placeholder : 'Destination amount' }),
 			ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' }),
 			ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' }),
 			ce('input', { id : 'del_' + (curTrRows + 1), type : 'button',
