@@ -25,6 +25,12 @@ function getMainAccId()
 }
 
 
+function getMainAccObj()
+{
+	return idSearch(accounts, getMainAccId());
+}
+
+
 function delRow(row_id)
 {
 	var rowEl, delBtn, destAccSel, destAmountInp;
@@ -129,14 +135,14 @@ function syncAccountOption(opt, acc_id)
 function onTrTypeChange(row_id)
 {
 	var rowEl, el;
-	var acc_id, tr_type, i, l;
+	var mainAccObj, tr_type, i, l;
 
 	rowEl = ge('tr_' + row_id);
 	if (!rowEl)
 		return;
 
-	acc_id = getMainAccId();
-	if (acc_id == -1)
+	mainAccObj = getMainAccObj();
+	if (!mainAccObj)
 		return;
 
 	el = firstElementChild(rowEl);
@@ -152,7 +158,7 @@ function onTrTypeChange(row_id)
 		enable(el, true);
 		for(i = 0, l = el.options.length; i < l; i++)
 		{
-			syncAccountOption(el.options[i], acc_id);
+			syncAccountOption(el.options[i], mainAccObj.id);
 		}
 	}
 	else
@@ -164,10 +170,10 @@ function onTrTypeChange(row_id)
 
 function onMainAccChange()
 {
-	var acc_id, rowEl, trTypeSel, destAccSel;
+	var accObj, rowEl, trTypeSel, destAccSel;
 
-	acc_id = getMainAccId();
-	if (acc_id == -1)
+	accObj = getMainAccObj();
+	if (!accObj)
 		return;
 
 	rowEl = ge('tr_1');
@@ -180,7 +186,7 @@ function onMainAccChange()
 			destAccSel = nextElementSibling(trTypeSel);
 			for(i = 0, l = destAccSel.options.length; i < l; i++)
 			{
-				syncAccountOption(destAccSel.options[i], acc_id);
+				syncAccountOption(destAccSel.options[i], accObj.id);
 			}
 		}
 
