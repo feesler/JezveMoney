@@ -88,7 +88,8 @@ function createRow()
 	if (!mainAcc)
 		return;
 
-	destAccSel = ce('select', { id : 'ds_' + (curTrRows + 1), name : 'dest_acc_id[]', disabled : true }, ce('option', { value : 0 }));
+	destAccSel = ce('select', { id : 'ds_' + (curTrRows + 1), name : 'dest_acc_id[]', disabled : true },
+								ce('option', { value : 0, innerHTML : 'Destination account', selected : true, disabled : true }));
 	accounts.forEach(function(account)
 	{
 		var option = ce('option', { value : account.id, innerHTML : account.name });
@@ -121,10 +122,14 @@ function createRow()
 // Disable account option if it's the same as main account
 function syncAccountOption(opt, acc_id)
 {
+	var optVal;
+
 	if (!opt)
 		return;
 
-	if (parseInt(opt.value) == acc_id)
+	optVal = parseInt(opt.value);
+
+	if (optVal == 0 || optVal == acc_id)
 	{
 		opt.selected = false;
 		opt.disabled = true;
