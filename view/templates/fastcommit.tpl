@@ -222,10 +222,17 @@ function onDestChange(row_id)
 
 function onSubmit()
 {
+	var srcAmount, destAmount;
+
 	for(i = 1; i <= curTrRows; i++)
 	{
+		destAmount = ge('da_' + i);
+		srcAmount = previousElementSibling(destAmount);
+		srcAmount.value = fixFloat(srcAmount.value);
+		destAmount.value = fixFloat(destAmount.value);
+
 		enable('ds_' + i, true);
-		enable('da_' + i, true);
+		enable(destAmount, true);
 	}
 
 	return true;
