@@ -222,7 +222,7 @@ function onDestChange(row_id)
 
 function onSubmit()
 {
-	for(i = 1; i < curTrRows; i++)
+	for(i = 1; i <= curTrRows; i++)
 	{
 		enable('ds_' + i, true);
 		enable('da_' + i, true);
