@@ -35,6 +35,24 @@
 			{
 				$trans_id = $trMod->create(INCOME, 0, $acc_id, $tr_amount, $tr_amount, $curr_id, $curr_id, $tr_date, $tr_comment);
 			}
+			else if ($tr_type == "transfer")
+			{
+				$tr_dest_acc_id = intval($_POST["dest_acc_id"][$tr_key]);
+				echo("Destination account: ".$tr_dest_acc_id."<br>");
+				$dest_curr_id = $accMod->getCurrency($tr_dest_acc_id);
+				echo("Currency: ".$dest_curr_id." ".Currency::getName($dest_curr_id)."<br>");
+				if ($dest_curr_id != $curr_id)
+				{
+					$tr_dest_amount = floatval($_POST["dest_amount"][$tr_key]);
+				}
+				else
+				{
+					$tr_dest_amount = $tr_amount;
+				}
+				echo("Destination amount: ".$tr_dest_amount."<br>");
+
+				$trans_id = $trMod->create(TRANSFER, $acc_id, $tr_dest_acc_id, $tr_amount, $tr_dest_amount, $curr_id, $dest_curr_id, $tr_date, $tr_comment);
+			}
 			else
 			{
 				die("Wrong transaction type");
@@ -55,6 +73,6 @@
 
 
 	$cssArr = array();
-	$jsArr = array("es5-shim.min.js", "common.js");
+	$jsArr = array("es5-shim.min.js", "common.js", "app.js");
 
 	include("./view/templates/fastcommit.tpl");

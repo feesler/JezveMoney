@@ -19,15 +19,15 @@
 var accounts = <?=f_json_encode($accArr)?>;
 var curTrRows = 0;
 
-function getMainAccId()
+function accFromSelect(selectObj)
 {
-	return parseInt(selectedValue(ge('acc_id')));
+	return idSearch(accounts, parseInt(selectedValue(selectObj)));
 }
 
 
 function getMainAccObj()
 {
-	return idSearch(accounts, getMainAccId());
+	return accFromSelect(ge('acc_id'));
 }
 
 
@@ -78,23 +78,26 @@ function delRow(row_id)
 function createRow()
 {
 	var rowsContainer, rowEl;
-	var destAccSel, acc_id;
+	var destAccSel, mainAcc;
 
 	rowsContainer = ge('rowsContainer');
 	if (!rowsContainer)
 		return;
 
-	acc_id = getMainAccId();
+	mainAcc = getMainAccObj();
+	if (!mainAcc)
+		return;
 
-	destAccSel = ce('select', { id : 'ds_', name : 'dest_acc_id[]', disabled : true }, ce('option', { value : 0 }));
+	destAccSel = ce('select', { id : 'ds_' + (curTrRows + 1), name : 'dest_acc_id[]', disabled : true }, ce('option', { value : 0 }));
 	accounts.forEach(function(account)
 	{
 		var option = ce('option', { value : account.id, innerHTML : account.name });
-		if (account.id == acc_id)
+		if (account.id == mainAcc.id)
 			enable(option, false);
 
 		destAccSel.appendChild(option);
 	});
+	destAccSel.onchange = onDestChange.bind(null, curTrRows + 1);
 
 	rowEl = ce('div', { id : 'tr_' + (curTrRows + 1), className : 'tr_row' },
 		[ ce('select', { name : 'tr_type[]', onchange : onTrTypeChange.bind(null, curTrRows + 1) },
@@ -135,7 +138,7 @@ function syncAccountOption(opt, acc_id)
 function onTrTypeChange(row_id)
 {
 	var rowEl, el;
-	var mainAccObj, tr_type, i, l;
+	var mainAccObj, tr_type, destAccObj, i, l;
 
 	rowEl = ge('tr_' + row_id);
 	if (!rowEl)
@@ -149,28 +152,31 @@ function onTrTypeChange(row_id)
 	if (!el)
 		return;
 	tr_type = selectedValue(el);
-	el = nextElementSibling(el);
-	if (!el || !el.options)
+	destAccSel = nextElementSibling(el);
+	if (!destAccSel || !destAccSel.options)
 		return;
 
 	if (tr_type == 'transfer')
 	{
-		enable(el, true);
-		for(i = 0, l = el.options.length; i < l; i++)
+		enable(destAccSel, true);
+		for(i = 0, l = destAccSel.options.length; i < l; i++)
 		{
-			syncAccountOption(el.options[i], mainAccObj.id);
+			syncAccountOption(destAccSel.options[i], mainAccObj.id);
 		}
+
+		destAccObj = accFromSelect(destAccSel);
+		enable('da_' + row_id, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
 	}
 	else
 	{
-		enable(el, false);
+		enable(destAccSel, false);
 	}
 }
 
 
 function onMainAccChange()
 {
-	var accObj, rowEl, trTypeSel, destAccSel;
+	var accObj, rowEl, trTypeSel, destAccSel, destAmountInp, destAccObj;
 
 	accObj = getMainAccObj();
 	if (!accObj)
@@ -188,10 +194,41 @@ function onMainAccChange()
 			{
 				syncAccountOption(destAccSel.options[i], accObj.id);
 			}
+
+			destAccObj = accFromSelect(destAccSel);
+			destAmountInp = nextElementSibling(nextElementSibling(destAccSel));
+			enable(destAmountInp, destAccObj != null && accObj.curr_id != destAccObj.curr_id);
 		}
 
 		rowEl = nextElementSibling(rowEl);
 	}
+}
+
+
+function onDestChange(row_id)
+{
+	var mainAccObj, destAccObj, destAmountInp;
+
+	mainAccObj = getMainAccObj();
+	if (!mainAccObj)
+		return;
+
+	destAccObj = accFromSelect(ge('ds_' + row_id));
+	destAmountInp = ge('da_' + row_id);
+
+	enable(destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+}
+
+
+function onSubmit()
+{
+	for(i = 1; i < curTrRows; i++)
+	{
+		enable('ds_' + i, true);
+		enable('da_' + i, true);
+	}
+
+	return true;
 }
 
 onReady(function()
@@ -201,7 +238,7 @@ onReady(function()
 </script>
 </head>
 <body>
-<form method="post" action="fastcommit.php">
+<form method="post" action="fastcommit.php" onsubmit="onSubmit()">
 	<select id="acc_id" name="acc_id" onchange="onMainAccChange()">
 <?php foreach($accArr as $accObj) {	?>
 		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
