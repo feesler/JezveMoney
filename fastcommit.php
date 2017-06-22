@@ -62,6 +62,7 @@
 				die("Fail to create transaction<br>");
 			else
 				echo("New transaction id: ".$trans_id."<br>");
+			echo("<br>");
 		}
 
 		echo("<a href=\"./fastcommit.php\">Ok</a><br>");

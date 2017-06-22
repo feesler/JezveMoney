@@ -14,6 +14,11 @@
 	width: 100px;
 	margin: 0px 5px 0px 0px;
 }
+
+.tr_row input[type=button]
+{
+	width: 30px;
+}
 </style>
 <script>
 var accounts = <?=f_json_encode($accArr)?>;
