@@ -38,13 +38,9 @@
 	{
 		global $approot, $classes;
 
-		foreach($classes as $clName => $clPath)
+		if (isset($classes[$className]))
 		{
-			if ($clName == $className)
-			{
-				require($approot.$clPath);
-				break;
-			}
+			require($approot.$classes[$className]);
 		}
 	}
 
