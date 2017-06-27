@@ -27,7 +27,6 @@
 					"Account" => "Model/account.php",
 					"Currency" => "Model/currency.php",
 					"Debt" => "Model/debt.php",
-					"Currency" => "Model/currency.php",
 					"mysqlDB" => "system/mysql.php",
 					"Person" => "Model/person.php",
 					"Transaction" => "Model/transaction.php",
