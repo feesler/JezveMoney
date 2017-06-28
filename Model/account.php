@@ -1,6 +1,6 @@
 <?php
 
-class Account extends CachedTable
+class AccountModel extends CachedTable
 {
 	static private $dcache = NULL;
 	static private $user_id = 0;
@@ -36,8 +36,8 @@ class Account extends CachedTable
 		self::$dcache = array();
 
 		// find owner person
-		$u = new User();
-		self::$owner_id = $u->getOwner(self::$user_id);
+		$uMod = new UserModel();
+		self::$owner_id = $uMod->getOwner(self::$user_id);
 
 		$condArr = array("user_id=".self::$user_id);
 		if (!self::$full_list && self::$owner_id != 0)
@@ -111,7 +111,7 @@ class Account extends CachedTable
 			return FALSE;
 
 		// check is currency exist
-		if (!Currency::is_exist($curr_id))
+		if (!CurrencyModel::is_exist($curr_id))
 			return FALSE;
 
 		// get initial balance to calc difference
@@ -159,8 +159,8 @@ class Account extends CachedTable
 		if ($this->getUser($acc_id) != self::$user_id)
 			return FALSE;
 
-		$trans = new Transaction(self::$user_id);
-		if (!$trans->onAccountDelete($acc_id))
+		$transMod = new TransactionModel(self::$user_id);
+		if (!$transMod->onAccountDelete($acc_id))
 		{
 			wlog("trans->onAccountDelete(".$acc_id.") return FALSE");
 			return FALSE;
@@ -377,8 +377,8 @@ class Account extends CachedTable
 		}
 		else
 		{
-			$pers = new Person(self::$user_id);
-			return $pers->getName($acc_onwer);
+			$persMod = new PersonModel(self::$user_id);
+			return $persMod->getName($acc_onwer);
 		}
 	}
 
@@ -431,7 +431,7 @@ class Account extends CachedTable
 			$acc_balance = $this->getBalance($acc_id);
 			$icon_id = $row["icon"];
 			$acc_icon = $this->getIconClass($icon_id);
-			$balance_fmt = Currency::format($row["balance"], $row["curr_id"]);
+			$balance_fmt = CurrencyModel::format($row["balance"], $row["curr_id"]);
 
 			$res[$acc_id] = array("name" => $row["name"],
 								"balance" => $balance_fmt,
@@ -461,7 +461,7 @@ class Account extends CachedTable
 
 		foreach(self::$dcache as $acc_id => $row)
 		{
-			$currname = Currency::getName($row["curr_id"]);
+			$currname = CurrencyModel::getName($row["curr_id"]);
 
 			if ($currname != "" && !isset($res[$row["curr_id"]]))
 				$res[$row["curr_id"]] = 0;
@@ -486,7 +486,7 @@ class Account extends CachedTable
 					"balance" => self::$dcache[$acc_id]["balance"],
 					"initbalance" => self::$dcache[$acc_id]["initbalance"],
 					"curr" => self::$dcache[$acc_id]["curr_id"],
-					"sign" => Currency::getSign(self::$dcache[$acc_id]["curr_id"]),
+					"sign" => CurrencyModel::getSign(self::$dcache[$acc_id]["curr_id"]),
 					"icon" => self::$dcache[$acc_id]["icon"],
 					"iconclass" => $this->getIconClass(self::$dcache[$acc_id]["icon"]));
 

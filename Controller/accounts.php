@@ -6,10 +6,10 @@ class AccountsController extends Controller
 	{
 		global $u, $user_id, $user_name;
 
-		$acc = new Account($user_id);
-		$trans = new Transaction($user_id);
+		$accMod = new AccountModel($user_id);
+		$transMod = new TransactionModel($user_id);
 
-		$tilesArr = $acc->getTilesArray();
+		$tilesArr = $accMod->getTilesArray();
 
 		$titleString = "Jezve Money | Accounts";
 
@@ -32,21 +32,21 @@ class AccountsController extends Controller
 
 		$action = "new";
 
-		$acc = new Account($user_id);
-		$trans = new Transaction($user_id);
+		$accMod = new AccountModel($user_id);
+		$transMod = new TransactionModel($user_id);
 
 		$accInfo = array("name" => "",
-						"curr" => Currency::getIdByPos(0),
+						"curr" => CurrencyModel::getIdByPos(0),
 						"balance" => 0,
 						"initbalance" => 0,
 						"icon" => 0,
 						"iconclass" => "");
-		$accInfo["sign"] = Currency::getSign($accInfo["curr"]);
-		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
+		$accInfo["sign"] = CurrencyModel::getSign($accInfo["curr"]);
+		$accInfo["balfmt"] = CurrencyModel::format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = "New account";
 
-		$currArr = Currency::getArray();
-		$icons = $acc->getIconsArray();
+		$currArr = CurrencyModel::getArray();
+		$icons = $accMod->getIconsArray();
 
 		$titleString = "Jezve Money | ";
 		$headString = "New account";
@@ -79,20 +79,20 @@ class AccountsController extends Controller
 
 		$action = "edit";
 
-		$acc = new Account($user_id);
-		$trans = new Transaction($user_id);
+		$accMod = new AccountModel($user_id);
+		$transMod = new TransactionModel($user_id);
 
 		$acc_id = intval($this->actionParam);
 		if (!$acc_id)
 			$this->fail();
 
-		$accInfo = $acc->getProperties($acc_id);
+		$accInfo = $accMod->getProperties($acc_id);
 
-		$accInfo["balfmt"] = Currency::format($accInfo["balance"], $accInfo["curr"]);
+		$accInfo["balfmt"] = CurrencyModel::format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = $accInfo["name"];
 
-		$currArr = Currency::getArray();
-		$icons = $acc->getIconsArray();
+		$currArr = CurrencyModel::getArray();
+		$icons = $accMod->getIconsArray();
 
 		$titleString = "Jezve Money | ";
 		$headString = ($action == "new") ? "New account" : "Edit account";
@@ -109,16 +109,16 @@ class AccountsController extends Controller
 
 	public function createAccount()
 	{
-		global $u, $user_id;
+		global $uMod, $user_id;
 
 		$defMsg = ERR_ACCOUNT_CREATE;
 
 		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
 			$this->fail($defMsg);
 
-		$acc = new Account($user_id);
-		$owner_id = $u->getOwner($user_id);
-		if (!$acc->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+		$accMod = new AccountModel($user_id);
+		$owner_id = $uMod->getOwner($user_id);
+		if (!$accMod->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_CREATE);
@@ -138,8 +138,8 @@ class AccountsController extends Controller
 		if (!isset($_POST["accid"]))
 			$this->fail($defMsg);
 
-		$acc = new Account($user_id);
-		if (!$acc->edit($_POST["accid"], $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+		$accMod = new AccountModel($user_id);
+		if (!$accMod->edit($_POST["accid"], $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_UPDATE);
@@ -160,13 +160,13 @@ class AccountsController extends Controller
 		if (!isset($_POST["accounts"]))
 			fail($defMsg);
 
-		$acc = new Account($user_id);
+		$accMod = new AccountModel($user_id);
 
 		$acc_arr = explode(",", $_POST["accounts"]);
 		foreach($acc_arr as $acc_id)
 		{
 			$acc_id = intval($acc_id);
-			if (!$acc->del($acc_id))
+			if (!$accMod->del($acc_id))
 				$this->fail($defMsg);
 		}
 
@@ -185,9 +185,9 @@ class AccountsController extends Controller
 
 		$defMsg = ERR_ACCOUNTS_RESET;
 
-		$acc = new Account($user_id);
+		$accMod = new AccountModel($user_id);
 
-		if (!$acc->reset())
+		if (!$accMod->reset())
 			fail($defMsg);
 		setMessage(MSG_ACCOUNTS_RESET);
 

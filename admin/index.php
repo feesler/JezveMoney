@@ -1,9 +1,9 @@
 <?php
 	require_once("../system/setup.php");
 
-	$u = new User();
-	$user_id = $u->check();
-	if (!$user_id || !$u->isAdmin($user_id))
+	$uMod = new UserModel();
+	$user_id = $uMod->check();
+	if (!$user_id || !$uMod->isAdmin($user_id))
 		setLocation("../login.php");
 
 	$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),

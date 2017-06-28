@@ -1,6 +1,6 @@
 <?php
 
-class User extends CachedTable
+class UserModel extends CachedTable
 {
 	static private $dcache = NULL;
 	static private $path = "/money/";
@@ -265,8 +265,8 @@ class User extends CachedTable
 
 		$user_id = $db->insertId();
 
-		$p = new Person($user_id);
-		$p_id = $p->create($p_name);
+		$pMod = new PersonModel($user_id);
+		$p_id = $pMod->create($p_name);
 
 		$this->setOwner($user_id, $p_id);
 

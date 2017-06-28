@@ -4,14 +4,14 @@ class CurrencyController extends Controller
 {
 	public function index()
 	{
-		global $u, $user_name, $user_id;
+		global $uMod, $user_name, $user_id;
 
-		$u = new User();
-		$user_id = $u->check();
-		if (!$user_id || !$u->isAdmin($user_id))
+		$uMod = new UserModel();
+		$user_id = $uMod->check();
+		if (!$user_id || !$uMod->isAdmin($user_id))
 			setLocation("../login.php");
 
-		$currArr = Currency::getArray();
+		$currArr = CurrencyModel::getArray();
 
 		$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
 						"query" => array("title" => "Queries", "link" => "./query.php"),
@@ -48,7 +48,7 @@ class CurrencyController extends Controller
 
 		$curr_format = (isset($_POST["curr_format"]) && $_POST["curr_format"] == "on") ? 1 : 0;
 
-		if (!Currency::create($_POST["curr_name"], $_POST["curr_sign"], $curr_format))
+		if (!CurrencyModel::create($_POST["curr_name"], $_POST["curr_sign"], $curr_format))
 			$this->fail($defMsg);
 
 		setMessage(MSG_CURRENCY_CREATE);
@@ -69,7 +69,7 @@ class CurrencyController extends Controller
 		if (!isset($_POST["curr_id"]))
 			$this->fail($defMsg);
 
-		if (!Currency::edit($_POST["curr_id"], $_POST["curr_name"], $_POST["curr_sign"], $curr_format))
+		if (!CurrencyModel::edit($_POST["curr_id"], $_POST["curr_name"], $_POST["curr_sign"], $curr_format))
 			$this->fail($defMsg);
 
 		setMessage(MSG_CURRENCY_UPDATE);
@@ -85,7 +85,7 @@ class CurrencyController extends Controller
 		if (!isset($_POST["curr_id"]))
 			fail($defMsg);
 
-		if (!Currency::del($_POST["curr_id"]))
+		if (!CurrencyModel::del($_POST["curr_id"]))
 			fail($defMsg);
 
 		setMessage(MSG_CURRENCY_DELETE);

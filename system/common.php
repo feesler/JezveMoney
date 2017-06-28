@@ -24,13 +24,13 @@
 					"ProfileController" => "Controller/profile.php",
 					"StatisticsController" => "Controller/statistics.php",
 					"CurrencyController" => "admin/Controller/currency.php",
-					"Account" => "Model/account.php",
-					"Currency" => "Model/currency.php",
-					"Debt" => "Model/debt.php",
+					"AccountModel" => "Model/account.php",
+					"CurrencyModel" => "Model/currency.php",
+					"DebtModel" => "Model/debt.php",
 					"mysqlDB" => "system/mysql.php",
-					"Person" => "Model/person.php",
-					"Transaction" => "Model/transaction.php",
-					"User" => "Model/user.php",
+					"PersonModel" => "Model/person.php",
+					"TransactionModel" => "Model/transaction.php",
+					"UserModel" => "Model/user.php",
 					"apiResponse" => "api/apiResponse.php");
 
 	// Check class name and try to load file
@@ -285,32 +285,32 @@
 	}
 
 
-	$u = NULL;
+	$uMod = NULL;
 	$user_id = 0;
 	$user_name = NULL;
 
 	// Check user status required for page access
 	function checkUser($loggedIn = TRUE, $adminOnly = FALSE)
 	{
-		global $u, $user_id, $user_name;
+		global $uMod, $user_id, $user_name;
 
-		$u = new User();
+		$uMod = new UserModel();
 		// Check session and cookies
-		$user_id = $u->check();
+		$user_id = $uMod->check();
 
 		// Get name of user person
 		if ($user_id)
 		{
-			$owner_id = $u->getOwner($user_id);
-			$pers = new Person($user_id);
-			$user_name = $pers->getName($owner_id);
+			$owner_id = $uMod->getOwner($user_id);
+			$persMod = new PersonModel($user_id);
+			$user_name = $persMod->getName($owner_id);
 		}
 
 		if ($loggedIn)		// user should be logged in to access
 		{
 			if (!$user_id)
 				setLocation(BASEURL."login/");
-			else if ($adminOnly && !$u->isAdmin($user_id))
+			else if ($adminOnly && !$uMod->isAdmin($user_id))
 				setLocation(BASEURL);
 		}
 		else				// user should be logged out ot access

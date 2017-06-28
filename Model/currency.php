@@ -1,6 +1,6 @@
 <?php
 
-class Currency
+class CurrencyModel
 {
 	static private $cache = NULL;
 

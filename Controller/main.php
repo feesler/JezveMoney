@@ -6,25 +6,25 @@ class MainController extends Controller
 	{
 		global $u, $user_name, $user_id;
 
-		$acc = new Account($user_id);
-		$trans = new Transaction($user_id);
-		$pers = new Person($user_id);
+		$accMod = new AccountModel($user_id);
+		$transMod = new TransactionModel($user_id);
+		$persMod = new PersonModel($user_id);
 
-		$currArr = Currency::getArray();
+		$currArr = CurrencyModel::getArray();
 
-		$tilesArr = $acc->getTilesArray();
-		$totalsArr = $acc->getTotalsArray();
+		$tilesArr = $accMod->getTilesArray();
+		$totalsArr = $accMod->getTotalsArray();
 		foreach($totalsArr as $curr_id => $balance)
 		{
-			$balfmt = Currency::format($balance, $curr_id);
-			$currName = Currency::getName($curr_id);
+			$balfmt = CurrencyModel::format($balance, $curr_id);
+			$currName = CurrencyModel::getName($curr_id);
 
 			$totalsArr[$curr_id] = array("bal" => $balance, "balfmt" => $balfmt, "name" => $currName);
 		}
 
 		// Prepare data of transaction list items
 		$tr_count = 5;
-		$latestArr = $trans->getArray(0, 0, TRUE, $tr_count);
+		$latestArr = $transMod->getArray(0, 0, TRUE, $tr_count);
 		$trListData = array();
 		foreach($latestArr as $trans)
 		{
@@ -35,9 +35,9 @@ class MainController extends Controller
 			if ($trans->src_id != 0)
 			{
 				if ($trans->type == EXPENSE || $trans->type == TRANSFER)
-					$accStr .= $acc->getName($trans->src_id);
+					$accStr .= $accMod->getName($trans->src_id);
 				else if ($trans->type == DEBT)
-					$accStr .= $acc->getNameOrPerson($trans->src_id);
+					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 			}
 
 			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == TRANSFER || $trans->type == DEBT))
@@ -46,9 +46,9 @@ class MainController extends Controller
 			if ($trans->dest_id != 0)
 			{
 				if ($trans->type == INCOME || $trans->type == TRANSFER)
-					$accStr .= $acc->getName($trans->dest_id);
+					$accStr .= $accMod->getName($trans->dest_id);
 				else if ($trans->type == DEBT)
-					$accStr .= $acc->getNameOrPerson($trans->dest_id);
+					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
 			}
 
 			$itemData["acc"] = $accStr;
@@ -65,7 +65,7 @@ class MainController extends Controller
 			$trListData[] = $itemData;
 		}
 
-		$persArr = $pers->getArray();
+		$persArr = $persMod->getArray();
 		foreach($persArr as $ind => $pData)
 		{
 			$noDebts = TRUE;
@@ -77,7 +77,7 @@ class MainController extends Controller
 					if ($pAcc->balance != 0.0)
 					{
 						$noDebts = FALSE;
-						$pBalance[] = Currency::format($pAcc->balance, $pAcc->curr_id);
+						$pBalance[] = CurrencyModel::format($pAcc->balance, $pAcc->curr_id);
 					}
 				}
 			}
@@ -88,7 +88,7 @@ class MainController extends Controller
 
 
 		$byCurrency = TRUE;
-		$curr_acc_id = Currency::getIdByPos(0);
+		$curr_acc_id = CurrencyModel::getIdByPos(0);
 		if (!$curr_acc_id)
 			fail();
 		$groupType_id = 2;		// group by week

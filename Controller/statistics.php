@@ -4,11 +4,11 @@ class StatisticsController extends Controller
 {
 	public function index()
 	{
-		global $u, $user_name, $user_id;
+		global $uMod, $user_name, $user_id;
 
-		$trans = new Transaction($user_id);
-		$acc = new Account($user_id);
-		$curr = new Currency();
+		$transMod = new TransactionModel($user_id);
+		$accMod = new AccountModel($user_id);
+		$currMod = new CurrencyModel();
 		$filterObj = new stdClass;
 
 		$byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
@@ -16,7 +16,7 @@ class StatisticsController extends Controller
 
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
 
-		$trans_type = Transaction::getStringType($type_str);
+		$trans_type = TransactionModel::getStringType($type_str);
 		if (is_null($trans_type))
 			$this->fail();
 
@@ -32,7 +32,7 @@ class StatisticsController extends Controller
 			}
 			else		// try to get first currency
 			{
-				$curr_id = Currency::getIdByPos(0);
+				$curr_id = CurrencyModel::getIdByPos(0);
 				if (!$curr_id)
 					$this->fail();
 			}
@@ -43,12 +43,12 @@ class StatisticsController extends Controller
 			if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"]))
 			{
 				$acc_id = intval($_GET["acc_id"]);
-				if (!$acc->is_exist($acc_id))
+				if (!$accMod->is_exist($acc_id))
 					$this->fail();
 			}
 			else		// try to get first account of user
 			{
-				$acc_id = $acc->getIdByPos(0);
+				$acc_id = $accMod->getIdByPos(0);
 				if (!$acc_id)
 					$this->fail();
 			}
@@ -109,10 +109,10 @@ class StatisticsController extends Controller
 			}
 		}
 
-		$accArr = $acc->getArray();
+		$accArr = $accMod->getArray();
 
-		$currArr = Currency::getArray();
-		$accCurr = (($byCurrency) ? $curr_id : $acc->getCurrency($acc_id));
+		$currArr = CurrencyModel::getArray();
+		$accCurr = (($byCurrency) ? $curr_id : $accMod->getCurrency($acc_id));
 		$transArr = $trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate);
 
 		$statArr = getStatArray($user_id, $byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);

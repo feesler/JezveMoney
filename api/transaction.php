@@ -4,8 +4,8 @@
 
 	$respObj = new apiResponse();
 
-	$u = new User();
-	$user_id = $u->check();
+	$uMod = new UserModel();
+	$user_id = $uMod->check();
 	if ($user_id == 0)
 		$respObj->fail();
 
@@ -27,11 +27,11 @@
 			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
 				$respObj->fail();
 
-			$pers = new Person($user_id);
+			$pers = new PersonModel($user_id);
 			if (!$pers->is_exist($person_id))		// person should exist
 				$respObj->fail();
 
-			$debt = new Debt($user_id);
+			$debtMod = new DebtModel($user_id);
 		}
 		else
 		{
@@ -59,14 +59,14 @@
 			$respObj->fail();
 	}
 
-	$trans = new Transaction($user_id);
+	$transMod = new TransactionModel($user_id);
 	if ($action == "list")
 	{
-		$acc = new Account($user_id);
+		$accMod = new AccountModel($user_id);
 
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
 
-		$trans_type = Transaction::getStringType($type_str);
+		$trans_type = TransactionModel::getStringType($type_str);
 		if (is_null($trans_type))
 			$respObj->fail();
 
@@ -75,7 +75,7 @@
 		$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
 		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
-		if ($acc_id && !$acc->is_exist($acc_id))
+		if ($acc_id && !$accMod->is_exist($acc_id))
 			$acc_id = 0;
 
 		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
@@ -83,7 +83,7 @@
 		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
 
-		$trArr = $trans->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
+		$trArr = $transMod->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
 		$respObj->data = array();
 		foreach($trArr as $trans)
 		{
@@ -104,7 +104,7 @@
 	}
 	else if ($action == "read")
 	{
-		$props = $trans->getProperties($trans_id);
+		$props = $transMod->getProperties($trans_id);
 		if (is_null($props))
 			$respObj->fail();
 
@@ -114,7 +114,7 @@
 	{
 		if ($trans_type == DEBT)
 		{
-			if (!$debt->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$debtMod->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$respObj->fail();
 		}
 		else
@@ -126,7 +126,7 @@
 			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				$respObj->fail();
 
-			$trans_id = $trans->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment);
+			$trans_id = $transMod->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment);
 			if (!$trans_id)
 				$respObj->fail();
 
@@ -137,15 +137,15 @@
 	{
 		if ($trans_type == DEBT)
 		{
-			if (!$debt->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$debtMod->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$respObj->fail();
 		}
 		else
 		{
-			if (!$trans->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$transMod->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$respObj->fail();
 		}
-		$ttStr = Transaction::getTypeString($trans_type);
+		$ttStr = TransactionModel::getTypeString($trans_type);
 		if (is_null($ttStr))
 			$respObj->fail();
 	}
@@ -160,7 +160,7 @@
 		foreach($trans_arr as $trans_id)
 		{
 			$trans_id = intval($trans_id);
-			if (!$trans->del($trans_id))
+			if (!$transMod->del($trans_id))
 				$respObj->fail();
 		}
 
@@ -176,8 +176,8 @@
 		if (!$tr_id || !$to_pos)
 			$respObj->fail();
 
-		$trans = new Transaction($user_id);
-		if (!$trans->updatePos($tr_id, $to_pos))
+		$transMod = new TransactionModel($user_id);
+		if (!$transMod->updatePos($tr_id, $to_pos))
 			$respObj->fail();
 	}
 

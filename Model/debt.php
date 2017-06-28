@@ -1,6 +1,6 @@
 <?php
 
-Class Debt
+Class DebtModel
 {
 	private $user_id = 0;
 	private $owner_id = 0;		// person of user
@@ -13,8 +13,8 @@ Class Debt
 
 		$this->user_id = intval($user_id);
 
-		$u = new User();
-		$this->owner_id = $u->getOwner($this->user_id);
+		$uMod = new UserModel();
+		$this->owner_id = $uMod->getOwner($this->user_id);
 	}
 
 
@@ -34,13 +34,13 @@ Class Debt
 		if ($op != 1 && $op != 2)
 			return FALSE;
 
-		$person = new Person($this->user_id);
-		if (!$person->is_exist($person_id))
+		$pMod = new PersonModel($this->user_id);
+		if (!$pMod->is_exist($person_id))
 			return FALSE;
 
-		$p_acc = $person->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+		$p_acc = $pMod->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
-			$p_acc = $person->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+			$p_acc = $pMod->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
 			return FALSE;
 
@@ -55,8 +55,8 @@ Class Debt
 			$dest_id = $p_acc;
 		}
 
-		$trans = new Transaction($this->user_id);
-		if (!$trans->create(4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
+		$transMod = new TransactionModel($this->user_id);
+		if (!$transMod->create(4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
 			return FALSE;
 
 		return TRUE;
@@ -81,13 +81,13 @@ Class Debt
 		if ($op != 1 && $op != 2)
 			return FALSE;
 
-		$person = new Person($this->user_id);
-		if (!$person->is_exist($person_id))
+		$pMod = new PersonModel($this->user_id);
+		if (!$pMod->is_exist($person_id))
 			return FALSE;
 
-		$p_acc = $person->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+		$p_acc = $pMod->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
-			$p_acc = $person->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+			$p_acc = $pMod->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
 			return FALSE;
 
@@ -102,8 +102,8 @@ Class Debt
 			$dest_id = $p_acc;
 		}
 
-		$trans = new Transaction($this->user_id);
-		if (!$trans->edit($tr_id, 4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
+		$transMod = new TransactionModel($this->user_id);
+		if (!$transMod->edit($tr_id, 4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
 			return FALSE;
 
 		return TRUE;

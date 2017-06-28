@@ -1,6 +1,6 @@
 <?php
 
-class Transaction extends CachedTable
+class TransactionModel extends CachedTable
 {
 	static private $dcache = NULL;
 	static private $user_id = 0;
@@ -77,21 +77,21 @@ class Transaction extends CachedTable
 			(!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
 			return 0;
 
-		$acc = new Account(self::$user_id, TRUE);
-		$u = new User();
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		$uMod = new UserModel();
 
 		if ($src_id != 0)
 		{
-			if (!$acc->is_exist($src_id))
+			if (!$accMod->is_exist($src_id))
 				return 0;
-			$srcBalance = $acc->getBalance($src_id);
+			$srcBalance = $accMod->getBalance($src_id);
 		}
 
 		if ($dest_id != 0)
 		{
-			if (!$acc->is_exist($dest_id))
+			if (!$accMod->is_exist($dest_id))
 				return 0;
-			$destBalance = $acc->getBalance($dest_id);
+			$destBalance = $accMod->getBalance($dest_id);
 		}
 
 
@@ -119,7 +119,7 @@ class Transaction extends CachedTable
 		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
 			$srcBalance -= $src_amount;
-			if (!$acc->setBalance($src_id, $srcBalance))
+			if (!$accMod->setBalance($src_id, $srcBalance))
 				return 0;
 		}
 
@@ -127,7 +127,7 @@ class Transaction extends CachedTable
 		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
 		{
 			$destBalance += $dest_amount;
-			if (!$acc->setBalance($dest_id, $destBalance))
+			if (!$accMod->setBalance($dest_id, $destBalance))
 				return 0;
 		}
 
@@ -171,34 +171,34 @@ class Transaction extends CachedTable
 		if ($transUser != self::$user_id)
 			return FALSE;
 
-		$acc = new Account(self::$user_id, TRUE);
-		$u = new User();
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		$uMod = new UserModel();
 
 		// check source account is exist
 		$srcBalance = 0;
 		if ($src_id != 0)
 		{
-			if (!$acc->is_exist($src_id))
+			if (!$accMod->is_exist($src_id))
 				return FALSE;
 
-			$srcBalance = $acc->getBalance($src_id);
+			$srcBalance = $accMod->getBalance($src_id);
 		}
 
 		// check destination account is exist
 		$destBalance = 0;
 		if ($dest_id != 0)
 		{
-			if (!$acc->is_exist($dest_id))
+			if (!$accMod->is_exist($dest_id))
 				return FALSE;
 
-			$destBalance = $acc->getBalance($dest_id);
+			$destBalance = $accMod->getBalance($dest_id);
 		}
 
 		// update balance of source account
 		if ($src_id != 0 && ($transType == EXPENSE || $transType == TRANSFER || $transType == DEBT))
 		{
 			$srcBalance += $transSrcAmount;
-			if (!$acc->setBalance($src_id, $srcBalance))
+			if (!$accMod->setBalance($src_id, $srcBalance))
 				return FALSE;
 		}
 
@@ -206,7 +206,7 @@ class Transaction extends CachedTable
 		if ($dest_id != 0 && ($transType == INCOME || $transType == TRANSFER || $transType == DEBT))
 		{
 			$destBalance -= $transDestAmount;
-			if (!$acc->setBalance($dest_id, $destBalance))
+			if (!$accMod->setBalance($dest_id, $destBalance))
 				return FALSE;
 		}
 
@@ -230,27 +230,27 @@ class Transaction extends CachedTable
 		if (!$this->cancel($trans_id))
 			return FALSE;
 
-		$acc = new Account(self::$user_id, TRUE);
-		$u = new User();
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		$uMod = new UserModel();
 
 		// check source account is exist
 		$srcBalance = 0;
 		if ($src_id != 0)
 		{
-			if (!$acc->is_exist($src_id))
+			if (!$accMod->is_exist($src_id))
 				return FALSE;
 
-			$srcBalance = $acc->getBalance($src_id);
+			$srcBalance = $accMod->getBalance($src_id);
 		}
 
 		// check destination account is exist
 		$destBalance = 0;
 		if ($dest_id != 0)
 		{
-			if (!$acc->is_exist($dest_id))
+			if (!$accMod->is_exist($dest_id))
 				return FALSE;
 
-			$destBalance = $acc->getBalance($dest_id);
+			$destBalance = $accMod->getBalance($dest_id);
 		}
 
 		// check date is changed
@@ -282,7 +282,7 @@ class Transaction extends CachedTable
 		{
 			$srcBalance -= $src_amount;
 
-			if (!$acc->setBalance($src_id, $srcBalance))
+			if (!$accMod->setBalance($src_id, $srcBalance))
 				return FALSE;
 		}
 
@@ -291,7 +291,7 @@ class Transaction extends CachedTable
 		{
 			$destBalance += $dest_amount;
 
-			if (!$acc->setBalance($dest_id, $destBalance))
+			if (!$accMod->setBalance($dest_id, $destBalance))
 				return FALSE;
 		}
 
@@ -437,13 +437,13 @@ class Transaction extends CachedTable
 		if (!self::$user_id)
 			return FALSE;
 
-		$u = new User();
-		$acc = new Account(self::$user_id, TRUE);
-		if (!$acc->is_exist($acc_id))
+		$uMod = new UserModel();
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		if (!$accMod->is_exist($acc_id))
 			return FALSE;
 
-		$acc_owner = $acc->getOwner($acc_id);
-		$u_owner = $u->getOwner(self::$user_id);
+		$acc_owner = $accMod->getOwner($acc_id);
+		$u_owner = $uMod->getOwner(self::$user_id);
 
 		$userCond = "user_id=".self::$user_id;
 
@@ -543,14 +543,14 @@ class Transaction extends CachedTable
 		if (!self::$user_id)
 			return $res;
 
-		$u = new User();
-		$owner_id = $u->getOwner(self::$user_id);
+		$uMod = new UserModel();
+		$owner_id = $uMod->getOwner(self::$user_id);
 		if (!$owner_id)
 			return $res;
 
-		$pers = new Person(self::$user_id);
-		$acc = new Account(self::$user_id, TRUE);
-		if (!$acc->getCount())
+		$persMod = new PersonModel(self::$user_id);
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		if (!$accMod->getCount())
 			return $res;
 
 		if (!$db->countQ(self::$tbl_name, "user_id=".self::$user_id))
@@ -628,8 +628,8 @@ class Transaction extends CachedTable
 
 			if ($trans->type == DEBT)
 			{
-				$src_owner_id = ($trans->src_id != 0) ? $acc->getOwner($trans->src_id) : 0;
-				$dest_owner_id = ($trans->dest_id != 0) ? $acc->getOwner($trans->dest_id) : 0;
+				$src_owner_id = ($trans->src_id != 0) ? $accMod->getOwner($trans->src_id) : 0;
+				$dest_owner_id = ($trans->dest_id != 0) ? $accMod->getOwner($trans->dest_id) : 0;
 			}
 
 			$trans->fsrcAmount = "";
@@ -637,7 +637,7 @@ class Transaction extends CachedTable
 				$trans->fsrcAmount .= "- ";
 			else if ($trans->type == INCOME || ($trans->type == DEBT && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
 				$trans->fsrcAmount .= "+ ";
-			$trans->fsrcAmount .= Currency::format($trans->src_amount, $trans->src_curr);
+			$trans->fsrcAmount .= CurrencyModel::format($trans->src_amount, $trans->src_curr);
 
 			if ($trans->src_curr != $trans->dest_curr)
 			{
@@ -646,7 +646,7 @@ class Transaction extends CachedTable
 					$trans->fdestAmount .= "- ";
 				else if ($trans->type == INCOME || ($trans->type == DEBT && $dest_owner_id == $owner_id))			// income
 					$trans->fdestAmount .= "+ ";
-				$trans->fdestAmount .= Currency::format($trans->dest_amount, $trans->dest_curr);
+				$trans->fdestAmount .= CurrencyModel::format($trans->dest_amount, $trans->dest_curr);
 			}
 			else
 				$trans->fdestAmount = $trans->fsrcAmount;
@@ -795,12 +795,12 @@ class Transaction extends CachedTable
 		if (!$src_id && !$dest_id)
 			return NULL;
 
-		$acc = new Account(self::$user_id, TRUE);
-		$u = new User();
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		$uMod = new UserModel();
 
 		$balArr = array($src_id => 0, $dest_id => 0);
-		$balArr[$src_id] = ($src_id != 0) ? $acc->getInitBalance($src_id) : 0;
-		$balArr[$dest_id] = ($dest_id != 0) ? $acc->getInitBalance($dest_id) : 0;
+		$balArr[$src_id] = ($src_id != 0) ? $accMod->getInitBalance($src_id) : 0;
+		$balArr[$dest_id] = ($dest_id != 0) ? $accMod->getInitBalance($dest_id) : 0;
 
 		$condArr = array("user_id=".self::$user_id);
 		$orCond = array();

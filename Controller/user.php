@@ -20,7 +20,7 @@ class UserController extends Controller
 
 	public function login()
 	{
-		global $u, $user_name, $user_id;
+		global $uMod, $user_name, $user_id;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
@@ -39,14 +39,14 @@ class UserController extends Controller
 
 	public function loginUser()
 	{
-		global $u;
+		global $uMod;
 
 		$defMsg = ERR_LOGIN_FAIL;
 
 		if (!isset($_POST["login"]) || !isset($_POST["password"]))
 			$this->fail($defMsg);
 
-		if (!$u->login($_POST["login"], $_POST["password"]))
+		if (!$uMod->login($_POST["login"], $_POST["password"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_LOGIN);
@@ -57,11 +57,11 @@ class UserController extends Controller
 
 	public function logout()
 	{
-		global $u;
+		global $uMod;
 
-wlog("UwserController::logout()");
+wlog("UserController::logout()");
 
-		$u->logout();
+		$uMod->logout();
 
 		setLocation(BASEURL."login/");
 	}
@@ -69,7 +69,7 @@ wlog("UwserController::logout()");
 
 	public function register()
 	{
-		global $u, $user_name, $user_id;
+		global $uMod, $user_name, $user_id;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
@@ -88,14 +88,14 @@ wlog("UwserController::logout()");
 
 	public function registerUser()
 	{
-		global $u;
+		global $uMod;
 
 		$defMsg = ERR_REGISTER_FAIL;
 
 		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
 			$this->fail($defMsg, "register");
 
-		if (!$u->register($_POST["login"], $_POST["password"], $_POST["name"]))
+		if (!$uMod->register($_POST["login"], $_POST["password"], $_POST["name"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_REGISTER);

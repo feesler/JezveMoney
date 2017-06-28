@@ -1,6 +1,6 @@
 <?php
 
-class Person extends CachedTable
+class PersonModel extends CachedTable
 {
 	static private $dcache = NULL;
 	static private $user_id = 0;
@@ -12,8 +12,8 @@ class Person extends CachedTable
 	{
 		self::$user_id = intval($user_id);
 		// find owner person
-		$u = new User();
-		self::$owner_id = $u->getOwner(self::$user_id);
+		$uMod = new UserModel();
+		self::$owner_id = $uMod->getOwner(self::$user_id);
 	}
 
 
@@ -101,10 +101,10 @@ class Person extends CachedTable
 		if (!$this->is_exist($p_id))
 			return FALSE;
 
-		$acc = new Account(self::$user_id, TRUE);
-		if (!$acc->onPersonDelete($p_id))
+		$accMod = new AccountModel(self::$user_id, TRUE);
+		if (!$accMod->onPersonDelete($p_id))
 		{
-			wlog("acc->onPersonDelete(".$p_id.") return FALSE");
+			wlog("accMod->onPersonDelete(".$p_id.") return FALSE");
 			return FALSE;
 		}
 
@@ -191,7 +191,7 @@ class Person extends CachedTable
 		if (!$this->is_exist($p_id))
 			return FALSE;
 
-		$acc = new Account(self::$user_id);
+		$accMod = new AccountModel(self::$user_id);
 		return $acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id, 0);
 	}
 

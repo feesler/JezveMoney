@@ -4,8 +4,8 @@
 
 	$respObj = new apiResponse();
 
-	$u = new User();
-	$user_id = $u->check();
+	$uMod = new UserModel();
+	$user_id = $uMod->check();
 	if ($user_id == 0)
 		$respObj->fail();
 
@@ -14,7 +14,7 @@
 	if ($action != "list" && $action != "read")
 		$respObj->fail();
 
-	$person = new Person($user_id);
+	$pMod = new PersonModel($user_id);
 	if ($action == "read")
 	{
 		if (!isset($_POST["curr_id"]))
@@ -26,16 +26,16 @@
 
 	if ($action == "list")
 	{
-		$respObj->data = Currency::getArray();
+		$respObj->data = CurrencyModel::getArray();
 	}
 	else if ($action == "read")
 	{
-		if (!Currency::is_exist($curr_id))
+		if (!CurrencyModel::is_exist($curr_id))
 			$respObj->fail();
 
-		$currName = Currency::getName($curr_id);
-		$currSign = Currency::getSign($curr_id);
-		$currFormat = Currency::getFormat($curr_id);
+		$currName = CurrencyModel::getName($curr_id);
+		$currSign = CurrencyModel::getSign($curr_id);
+		$currFormat = CurrencyModel::getFormat($curr_id);
 
 		$respObj->data = array("id" => $curr_id, "name" => $currName, "sign" => $currSign, "format" => $currFormat);
 	}

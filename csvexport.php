@@ -51,7 +51,7 @@
 		fail();
 
 
-	$acc = new Account($user_id, TRUE);
+	$accMod = new AccountModel($user_id, TRUE);
 
 
 	$realBalance = array();
@@ -93,8 +93,8 @@
 		$trdate = $row["date"];
 		$tr_pos = intval($row["pos"]);
 
-		$src_name = $acc->getName($tr_src_id);
-		$dest_name = $acc->getName($tr_dest_id);
+		$src_name = $accMod->getName($tr_src_id);
+		$dest_name = $accMod->getName($tr_dest_id);
 
 
 		$resStr .= $tr_id.$delim;

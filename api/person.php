@@ -4,8 +4,8 @@
 
 	$respObj = new apiResponse();
 
-	$u = new User();
-	$user_id = $u->check();
+	$uMod = new UserModel();
+	$user_id = $uMod->check();
 	if ($user_id == 0)
 		$respObj->fail();
 
@@ -14,7 +14,7 @@
 	if ($action != "list" && $action != "read" && $action != "new" && $action != "edit" && $action != "del")
 		$respObj->fail();
 
-	$person = new Person($user_id);
+	$personMod = new PersonModel($user_id);
 	if ($action == "new" || $action == "edit")
 	{
 		if (!isset($_POST["pname"]))
@@ -22,7 +22,7 @@
 
 		$person_name = $_POST["pname"];
 
-		$check_id = $person->findByName($person_name);
+		$check_id = $personMod->findByName($person_name);
 		if ($check_id != 0)
 			$respObj->fail();
 	}
@@ -38,17 +38,17 @@
 
 	if ($action == "list")
 	{
-		$respObj->data = $person->getArray();
+		$respObj->data = $personMod->getArray();
 	}
 	else if ($action == "read")
 	{
-		$pName = $person->getName($p_id);
+		$pName = $personMod->getName($p_id);
 
 		$respObj->data = array("id" => $p_id, "name" => $pName);
 	}
 	else if ($action == "new")
 	{
-		$p_id = $person->create($person_name);
+		$p_id = $personMod->create($person_name);
 		if (!$p_id)
 			$respObj->fail();
 
@@ -60,7 +60,7 @@
 			$respObj->fail();
 
 		$person_id = intval($_POST["pid"]);
-		if (!$person->edit($person_id, $person_name))
+		if (!$personMod->edit($person_id, $person_name))
 			$respObj->fail();
 	}
 	else if ($action == "del")
@@ -73,7 +73,7 @@
 		foreach($p_arr as $p_id)
 		{
 			$p_id = intval($p_id);
-			if (!$person->del($p_id))
+			if (!$personMod->del($p_id))
 				$respObj->fail();
 		}
 	}

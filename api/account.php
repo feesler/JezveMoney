@@ -4,8 +4,8 @@
 
 	$respObj = new apiResponse();
 
-	$u = new User();
-	$user_id = $u->check();
+	$uMod = new UserModel();
+	$user_id = $uMod->check();
 	if ($user_id == 0)
 		$respObj->fail();
 
@@ -29,14 +29,14 @@
 			$respObj->fail();
 	}
 
-	$acc = new Account($user_id);
+	$accMod = new AccountModel($user_id);
 	if ($action == "list")
 	{
-		$respObj->data = $acc->getArray();
+		$respObj->data = $accMod->getArray();
 	}
 	else if ($action == "read")
 	{
-		$props = $acc->getProperties($acc_id);
+		$props = $accMod->getProperties($acc_id);
 		if (is_null($props))
 			$respObj->fail();
 
@@ -44,8 +44,8 @@
 	}
 	else if ($action == "new")
 	{
-		$owner_id = $u->getOwner($user_id);
-		$acc_id = $acc->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]);
+		$owner_id = $uMod->getOwner($user_id);
+		$acc_id = $accMod->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]);
 		if (!$acc_id)
 			$respObj->fail();
 
@@ -53,7 +53,7 @@
 	}
 	else if ($action == "edit")
 	{
-		if (!$acc->edit($acc_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+		if (!$accMod->edit($acc_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
 			$respObj->fail();
 	}
 	else if ($action == "del")
@@ -66,13 +66,13 @@
 		foreach($acc_arr as $acc_id)
 		{
 			$acc_id = intval($acc_id);
-			if (!$acc->del($acc_id))
+			if (!$accMod->del($acc_id))
 				$respObj->fail();
 		}
 	}
 	else if ($action == "reset")
 	{
-		if (!$acc->reset())
+		if (!$accMod->reset())
 			$respObj->fail();
 	}
 

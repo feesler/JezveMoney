@@ -4,18 +4,18 @@ class ProfileController extends Controller
 {
 	public function index()
 	{
-		global $u, $user_id, $user_name;
+		global $uMod, $user_id, $user_name;
 
-		$user_login = $u->getLogin($user_id);
+		$user_login = $uMod->getLogin($user_id);
 
 		$action = $this->action;
 
 		$person_name = "";
-		$owner_id = $u->getOwner($user_id);
+		$owner_id = $uMod->getOwner($user_id);
 
-		$person = new Person($user_id);
+		$pMod = new PersonModel($user_id);
 
-		$person_name = $person->getName($owner_id);
+		$person_name = $pMod->getName($owner_id);
 
 		$titleString = "Jezve Money | Profile";
 		if ($action == "changename")
@@ -40,7 +40,7 @@ class ProfileController extends Controller
 
 	public function changeName()
 	{
-		global $u, $user_id, $db;
+		global $uMod, $user_id, $db;
 
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 		{
@@ -57,9 +57,9 @@ class ProfileController extends Controller
 		if (is_null($new_name) || $new_name == "")
 			$this->fail($defMsg);
 
-		$owner_id = $u->getOwner($user_id);
-		$person = new Person($user_id);
-		$old_name = $person->getName($owner_id);
+		$owner_id = $uMod->getOwner($user_id);
+		$pMod = new PersonModel($user_id);
+		$old_name = $pMod->getName($owner_id);
 
 		if ($old_name == $db->escape($new_name))
 			$this->fail($defMsg);
@@ -75,7 +75,7 @@ class ProfileController extends Controller
 
 	public function changePass()
 	{
-		global $u, $user_id;
+		global $uMod, $user_id;
 
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 		{
@@ -88,8 +88,8 @@ class ProfileController extends Controller
 		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
 			$this->fail($defMsg);
 
-		$login = $u->getLogin($user_id);
-		if (!$u->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
+		$login = $uMod->getLogin($user_id);
+		if (!$uMod->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_PASSWORD);
@@ -107,12 +107,12 @@ class ProfileController extends Controller
 
 		$defMsg = ERR_PROFILE_RESETALL;
 
-		$acc = new Account($user_id);
-		if (!$acc->reset())
+		$accMod = new AccountModel($user_id);
+		if (!$accMod->reset())
 			$this->fail($defMsg);
 
-		$pers = new Person($user_id);
-		if (!$pers->reset())
+		$pMod = new PersonModel($user_id);
+		if (!$pMod->reset())
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_RESETALL);

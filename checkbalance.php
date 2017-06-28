@@ -49,7 +49,7 @@
 	}
 
 
-	$acc = new Account($user_id, TRUE);
+	$accMod = new AccountModel($user_id, TRUE);
 
 	$condArr = array("user_id=".$user_id);
 	if ($checkAccount_id != 0)
@@ -67,7 +67,7 @@
 		$acc_id = intval($row["id"]);
 		$initBalance[$acc_id] = floatval($row["initbalance"]);
 		$curBalance[$acc_id] = floatval($row["balance"]);
-		$accName[$acc_id] = $acc->getNameOrPerson($acc_id);
+		$accName[$acc_id] = $accMod->getNameOrPerson($acc_id);
 
 		$realBalance[$acc_id] = $initBalance[$acc_id];
 	}
@@ -100,8 +100,8 @@
 					"date"=> strtotime($row["date"]),
 					"pos" => intval($row["pos"]));
 
-		$tr["src_name"] = $acc->getNameOrPerson($tr["src_id"]);
-		$tr["dest_name"] = $acc->getNameOrPerson($tr["dest_id"]);
+		$tr["src_name"] = $accMod->getNameOrPerson($tr["src_id"]);
+		$tr["dest_name"] = $accMod->getNameOrPerson($tr["dest_id"]);
 
 		if ($tr["type"] == 1)
 		{
