@@ -72,7 +72,7 @@
 							<div><label>Person name</label></div>
 							<div>
 								<div class="tile_container">
-<?php		if (!$person->getCount()) {		?>
+<?php		if (!$pMod->getCount()) {		?>
 									<div id="person_tile inact" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"></span></span></div></div>
 <?php		} else {	?>
 									<div id="person_tile" class="tile"><div class="tilelink"><span><span class="acc_bal"><?=$p_balfmt?></span><span class="acc_name"><?=$person_name?></span></span></div></div>

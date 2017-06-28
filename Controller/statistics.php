@@ -113,7 +113,7 @@ class StatisticsController extends Controller
 
 		$currArr = CurrencyModel::getArray();
 		$accCurr = (($byCurrency) ? $curr_id : $accMod->getCurrency($acc_id));
-		$transArr = $trans->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate);
+		$transArr = $transMod->getArray($trans_type, $acc_id, TRUE, 10, $page_num, $searchReq, $stDate, $endDate);
 
 		$statArr = getStatArray($user_id, $byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
 
