@@ -872,7 +872,7 @@ class TransactionModel extends CachedTable
 	// Return string for specified transaction type
 	public static function getTypeString($trans_type)
 	{
-		if (!array_key_exists($trans_type, self::$typeStrArr))
+		if (!isset(self::$typeStrArr[$trans_type]))
 			return NULL;
 
 		return self::$typeStrArr[$trans_type];
