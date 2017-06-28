@@ -11,7 +11,9 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "list" && $action != "read")
+
+	$availActions = array("list", "read");
+	if (!in_array($action, $availActions))
 		$respObj->fail();
 
 	if ($action == "read")

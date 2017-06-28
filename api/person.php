@@ -11,7 +11,9 @@
 
 	if (isset($_GET["act"]))
 		$action = $_GET["act"];
-	if ($action != "list" && $action != "read" && $action != "new" && $action != "edit" && $action != "del")
+
+	$availActions = array("list", "read", "new", "edit", "del");
+	if (!in_array($action, $availActions))
 		$respObj->fail();
 
 	$personMod = new PersonModel($user_id);
