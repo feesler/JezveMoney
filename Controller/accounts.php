@@ -4,7 +4,7 @@ class AccountsController extends Controller
 {
 	public function index()
 	{
-		global $u, $user_id, $user_name;
+		global $user_id, $user_name;
 
 		$accMod = new AccountModel($user_id);
 		$transMod = new TransactionModel($user_id);
@@ -22,7 +22,7 @@ class AccountsController extends Controller
 
 	public function create()
 	{
-		global $u, $user_id, $user_name;
+		global $user_id, $user_name;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
@@ -33,7 +33,6 @@ class AccountsController extends Controller
 		$action = "new";
 
 		$accMod = new AccountModel($user_id);
-		$transMod = new TransactionModel($user_id);
 
 		$accInfo = array("name" => "",
 						"curr" => CurrencyModel::getIdByPos(0),
@@ -69,7 +68,7 @@ class AccountsController extends Controller
 
 	public function update()
 	{
-		global $u, $user_id, $user_name;
+		global $user_id, $user_name;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
@@ -80,7 +79,6 @@ class AccountsController extends Controller
 		$action = "edit";
 
 		$accMod = new AccountModel($user_id);
-		$transMod = new TransactionModel($user_id);
 
 		$acc_id = intval($this->actionParam);
 		if (!$acc_id)

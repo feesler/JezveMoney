@@ -14,7 +14,6 @@
 	if ($action != "list" && $action != "read")
 		$respObj->fail();
 
-	$pMod = new PersonModel($user_id);
 	if ($action == "read")
 	{
 		if (!isset($_POST["curr_id"]))

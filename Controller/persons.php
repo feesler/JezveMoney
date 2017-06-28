@@ -4,7 +4,7 @@ class PersonsController extends Controller
 {
 	public function index()
 	{
-		global $uMod, $user_id, $user_name;
+		global $user_id, $user_name;
 
 		$pMod = new PersonModel($user_id);
 
@@ -29,7 +29,7 @@ class PersonsController extends Controller
 
 	public function create()
 	{
-		global $uMod, $user_id, $user_name;
+		global $user_id, $user_name;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
@@ -56,7 +56,7 @@ class PersonsController extends Controller
 
 	public function update()
 	{
-		global $uMod, $user_id, $user_name;
+		global $user_id, $user_name;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
