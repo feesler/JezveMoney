@@ -490,16 +490,20 @@ function onAccountChange(obj)
 // Transaction search form submit event handler
 function onSearchSubmit(frm)
 {
-	if (!frm)
+	var searchInp;
+
+	searchInp = ge('search');
+	if (!searchInp)
 		return false;
 
-	frm.action = baseURL + 'transactions/?type=' + transType;
-	if ('acc_id' in filterObj)
-		frm.action += '&acc_id=' + encodeURIComponent(filterObj.acc_id.join());
-	if (filterObj.mode == 'details')
-		frm.action += '&mode=details';
+	if (searchInp.value.length)
+		filterObj.search = searchInp.value;
+	else if ('search' in filterObj)
+		delete filterObj['search'];
 
-	return true;
+	window.location = buildAddress();
+
+	return false;
 }
 
 

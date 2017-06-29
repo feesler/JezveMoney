@@ -33,6 +33,7 @@ class TransactionsController extends Controller
 		}
 
 		$filterObj->acc_id = $accFilter;
+		$filterObj->type = $type_str;
 
 		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
 		if (!is_null($searchReq))
