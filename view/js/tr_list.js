@@ -257,13 +257,9 @@ function onTransClick(tr_id)
 // Account select callback
 function onAccountSel(obj)
 {
-	var accSel;
 	var sArr = [], str = '';
 
 	if (!obj)
-		return;
-	accSel = ge('acc_id');
-	if (!accSel)
 		return;
 
 	for(var id in obj)

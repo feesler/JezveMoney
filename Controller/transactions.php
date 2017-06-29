@@ -151,7 +151,7 @@ class TransactionsController extends Controller
 			{
 				if ($trans->type == EXPENSE || $trans->type == TRANSFER)		// expense or transfer
 					$accStr .= $accMod->getName($trans->src_id);
-				else if ($trans->type == 4)
+				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 			}
 
