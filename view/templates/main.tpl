@@ -47,7 +47,7 @@
 					</div>
 
 					<div class="widget break_widget latest_widget">
-						<div class="widget_title"><a href="<?=BASEURL?>transactions/"><span>Latest</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>transactions/"><span>Transactions</span><div class="glyph"></div></a></div>
 						<div id="trlist" class="trans_list">
 <?php	if (!count($trListData)) {	?>
 							<span>You have no one transaction yet.</span>
