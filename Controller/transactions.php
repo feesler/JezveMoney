@@ -463,10 +463,10 @@ class TransactionsController extends Controller
 		if (!$trans_id)
 			$this->fail($defMsg);
 
-		if (!$trans->is_exist($trans_id))
+		if (!$transMod->is_exist($trans_id))
 			$this->fail($defMsg);
 
-		$tr = $trans->getProperties($trans_id);
+		$tr = $transMod->getProperties($trans_id);
 		$trans_type = $tr["type"];			// TODO : temporarily
 
 		$accMod = new AccountModel($user_id, ($trans_type == DEBT));
