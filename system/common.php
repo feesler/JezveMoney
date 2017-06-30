@@ -319,3 +319,16 @@
 				setLocation(BASEURL);
 		}
 	}
+
+
+	// Append to file name unique string to fix cache issues
+	function auto_version($file)
+	{
+		global $approot;
+
+		if (!file_exists($approot.$file))
+			return $file;
+
+		$mtime = filemtime($approot.$file);
+		return $file."?".$mtime;
+	}
