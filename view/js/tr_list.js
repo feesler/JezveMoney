@@ -365,9 +365,10 @@ function sendChangePosRequest(trans_id, newPos)
 // Return callback function for position change request
 function onChangePosCallback(trans_id, newPos)
 {
-	return function(result)
+	return function(response)
 	{
-		if (result && result == 'ok')
+		var res = JSON.parse(response);
+		if (res && res.result == 'ok')
 		{
 			updateTransArrPos(trans_id, newPos);
 		}

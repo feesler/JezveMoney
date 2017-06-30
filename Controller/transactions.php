@@ -199,7 +199,7 @@ class TransactionsController extends Controller
 		$titleString = "Jezve Money | Transactions";
 
 		$cssArr = array("common.css", "tiles.css", "iconlink.css", "popup.css", "calendar.css", "ddlist.css", "transaction.css", "trlist.css", "toolbar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ajax.js", "calendar.js", "popup.js", "dragndrop.js", "sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
+		$jsArr = array("es5-shim.min.js", "json2.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ajax.js", "calendar.js", "popup.js", "dragndrop.js", "sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
 
 		include("./view/templates/transactions.tpl");
 	}
