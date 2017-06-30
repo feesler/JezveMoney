@@ -76,6 +76,17 @@ var transactions = (function()
 	}
 
 
+	function posCompare(tr1, tr2)
+	{
+		if (tr1.pos < tr2.pos)
+			return -1;
+		else if (tr1.pos > tr2.pos)
+			return 1;
+
+		return 0;
+	}
+
+
 	function setPosition(tr_id, pos)
 	{
 		var tr_info, oldPos;
@@ -93,15 +104,7 @@ var transactions = (function()
 		{
 			var initBalArr = [];
 
-			transArr.sort(function(tr1, tr2)
-			{
-				if (tr1.pos < tr2.pos)
-					return -1;
-				else if (tr1.pos > tr2.pos)
-					return 1;
-
-				return 0;
-			});
+			transArr.sort(posCompare);
 
 			transArr.forEach(function(trans)
 			{
@@ -140,15 +143,7 @@ var transactions = (function()
 			});
 
 			// Sort array of  transaction by position again
-			transArr.sort(function(tr1, tr2)
-			{
-				if (tr1.pos < tr2.pos)
-					return -1;
-				else if (tr1.pos > tr2.pos)
-					return 1;
-
-				return 0;
-			});
+			transArr.sort(posCompare);
 
 			if (filterObj.mode == 'details')
 			{
