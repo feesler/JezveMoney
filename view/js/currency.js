@@ -15,13 +15,15 @@ function getCurrency(curr_id)
 // Format value with rules of specified currency
 function formatCurrency(val, curr_id)
 {
-	var curr = getCurrency(curr_id);
+	var curr, fmtVal;
 
+	curr = getCurrency(curr_id);
 	if (!curr)
 		return null;
 
+	fmtVal = formatValue(normalize(val).toFixed(2));
 	if (curr.format)
-		return curr.sign + ' ' + formatValue(val);
+		return curr.sign + ' ' + fmtVal;
 	else
-		return formatValue(val) + ' ' + curr.sign;
+		return fmtVal + ' ' + curr.sign;
 }
