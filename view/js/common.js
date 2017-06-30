@@ -746,6 +746,34 @@ function urlJoin(obj)
 }
 
 
+// Cross-browser find head element
+function head()
+{
+	if (document)
+	{
+		if (document.head)
+			return document.head;
+		else if (document.documentElement && document.documentElement.firstChild)
+			return document.documentElement.firstChild;
+	}
+
+	return null;
+}
+
+
+// Return fixed DPI value
+function getRealDPI()
+{
+	if (window.devicePixelRatio)
+		return window.devicePixelRatio;
+
+	if (screen.deviceXDPI && screen.logicalXDPI)
+		return screen.deviceXDPI / screen.logicalXDPI
+
+	return screen.availWidth / document.documentElement.clientWidth;
+}
+
+
 // List of DOM ready handlers
 var readyList = [];
 
