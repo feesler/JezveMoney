@@ -157,3 +157,19 @@ function idSearch(arr, id)
 
 	return res;
 }
+
+
+// Check real DPI value and load required stylesheet
+function fixDPI()
+{
+	var headEl, img_css;
+
+	if (getRealDPI() > 1)
+		return;
+
+	img_css = baseURL + 'view/css/ie8.css';
+	headEl = head();
+
+	if (headEl)
+		headEl.appendChild(ce('link', { rel : 'stylesheet', href : img_css }));
+}
