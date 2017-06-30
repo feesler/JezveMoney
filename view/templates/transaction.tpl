@@ -252,9 +252,9 @@
 <?php	if ($trans_type == DEBT) {		?>
 						<div id="operation" class="non_float">
 							<div><label>Operation</label></div>
-							<div class="op_sel">
-								<input id="debtgive" name="debtop" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span>
-								<input id="debttake" name="debtop" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span>
+							<div class="op_sel clearfix">
+								<label><input id="debtgive" name="debtop" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span></label>
+								<label><input id="debttake" name="debtop" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span></label>
 							</div>
 						</div>
 <?php	}	?>

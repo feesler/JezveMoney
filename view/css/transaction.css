@@ -143,9 +143,24 @@
 	margin: 2px 0px 10px 0px;
 }
 
-
-.op_sel  > span
+.op_sel > label
 {
+	float: left;
+	width: auto;
+	height: auto;
+}
+
+.op_sel input
+{
+	float: left;
+	line-height: 22px;
+	height: 22px;
+}
+
+.op_sel span
+{
+	float: left;
+	line-height: 22px;
 	margin: 0px 10px 0px 5px;
 }
 
