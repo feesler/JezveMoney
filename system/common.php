@@ -81,7 +81,7 @@
 		if (floor($val) == $val)
 			$nf = number_format($val, 0, "", " ");
 		else
-			$nf = number_format($val, 2, ",", " ");
+			$nf = number_format($val, 2, ".", " ");
 
 		if ($format && $format != "")
 			return sprintf($format, $nf);
