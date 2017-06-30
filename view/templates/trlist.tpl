@@ -36,9 +36,7 @@
 									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=$trItem["acc"]?>"><span><?=$trItem["acc"]?></span></div></div></td>
 									<td><div class="tritem_sum"><span><?=$trItem["amount"]?></span></div></td>
 									<td><div class="tritem_balance">
-<?php		foreach($trItem["balance"] as $balStr) {	?>
-										<span><?=$balStr?></span>
-<?php		}	?>
+										<span><?=implode("</span><span>", $trItem["balance"])?></span>
 									</div></td>
 									<td>
 										<div class="tritem_date_comm">
