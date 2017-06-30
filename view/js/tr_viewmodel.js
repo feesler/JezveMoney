@@ -483,7 +483,7 @@ function TransactionViewModel()
 	function setExchRate(val)
 	{
 		var exchrate, exchcomm, exchrate_b;
-		var exchText, srcCurr, destCurr;
+		var exchSigns, exchText, srcCurr, destCurr;
 
 		if (val === undefined)
 			return;
@@ -498,13 +498,15 @@ function TransactionViewModel()
 		if (exchrate)
 			exchrate.value = val;
 
-		exchText = destCurr.sign + '/' + srcCurr.sign;
+		exchSigns = destCurr.sign + '/' + srcCurr.sign;
+		exchcomm.innerHTML = exchSigns;
 
+		exchText = exchSigns;
 		if (isValidValue(val) && val != 1 && val != 0)
 		{
 			invExch = parseFloat((1 / val).toFixed(5));
 
-			exchText = destCurr.sign + '/' + srcCurr.sign + ' ('  + invExch + ' ' + srcCurr.sign + '/' + destCurr.sign + ')';
+			exchText += ' ('  + invExch + ' ' + srcCurr.sign + '/' + destCurr.sign + ')';
 		}
 
 		if (exchrate_b)
