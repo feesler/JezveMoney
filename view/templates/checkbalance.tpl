@@ -41,7 +41,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 	// Callback function for position change request
 	function onChangePosCallback(result)
 	{
-		var resObj = eval('(' + result + ')');
+		var resObj = JSON.parse(result);
 
 		if (resObj && resObj.result == 'ok')
 		{

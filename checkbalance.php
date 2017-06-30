@@ -157,7 +157,7 @@
 	$titleString = "jezve Money - Check balance";
 
 	$cssArr = array();
-	$jsArr = array("es5-shim.min.js", "common.js", "app.js", "ajax.js");
+	$jsArr = array("es5-shim.min.js", "json2.js", "common.js", "app.js", "ajax.js");
 
 	header("Content-type: text/html; charset=utf-8");
 
