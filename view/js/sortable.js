@@ -17,6 +17,22 @@ SortableDragZone.prototype._makeAvatar = function()
 }
 
 
+// Drag start handler
+// Return avatar object or false
+SortableDragZone.prototype.onDragStart = function(downX, downY, event)
+{
+	var avatar = SortableDragZone.parent.onDragStart.apply(this, arguments);
+
+	if (!avatar)
+		return false;
+
+	if (this._params && isFunction(this._params.ondragstart))
+		this._params.ondragstart(this._elem);
+
+	return avatar;
+};
+
+
 // Return group of sortable
 SortableDragZone.prototype.getGroup = function()
 {
@@ -246,6 +262,8 @@ function Sortable(params)
 		groupName = params.group;
 
 		dragZoneParam.group = groupName;
+		if (params.ondragstart)
+			dragZoneParam.ondragstart = params.ondragstart;
 		if (params.oninsertat)
 			dragZoneParam.oninsertat = params.oninsertat;
 		if (params.table)

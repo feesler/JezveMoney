@@ -244,6 +244,7 @@ function DDList()
 			}
 
 			this.ulobj.onchange = this.onChange.bind(this);
+			this.ulobj.onblur = this.onSelectBlur.bind(this);
 		}
 		else
 		{
@@ -606,11 +607,16 @@ function DDList()
 		}
 
 		this.changed = true;
+	}
 
-		if (this.changecb)
+
+	this.onSelectBlur = function()
 		{
+		if (!this.isMobile || !this.changecb || !this.changed)
+			return;
+
 			this.changecb.call(this, this.selection.selected);
-		}
+		this.changed = false;
 	}
 
 

@@ -338,10 +338,10 @@ function prependChild(parent, elem)
 {
 	var fe;
 
-	if (!elem)
+	if (!elem || !parent)
 		return;
 
-	fe = firstElementChild(parent);
+	fe = parent.firstChild;
 	if (fe)
 		insertBefore(elem, fe);
 	else
