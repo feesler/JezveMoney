@@ -43,6 +43,31 @@ function initMessage()
 }
 
 
+// Create message
+function createMessage(message, msgClass)
+{
+	var messageBox, page, pageWrapper, header;
+
+	messageBox = ce('div', { id : 'action_msg', className : 'msg ' + msgClass },
+					ce('div', {},
+						ce('div', {},
+							[ ce('div', { className : 'close_btn' },
+								ce('div', { className : 'iconlink small_icon' },
+									ce('button', { type : 'button', onclick : onCloseMessage.bind(null) },
+										ce('span', { className : 'icon close' })))),
+							ce('span', { innerHTML : message })
+							])));
+
+	page = firstElementChild(document.body);
+	pageWrapper = firstElementChild(page);
+	header = firstElementChild(pageWrapper);
+	if (header)
+		insertAfter(messageBox, header);
+
+	initMessage();
+}
+
+
 // Fix string to correct float number format
 function fixFloat(str)
 {
