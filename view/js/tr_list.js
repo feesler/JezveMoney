@@ -200,6 +200,7 @@ var transactions = (function()
 
 
 var trSelection = new Selection();
+var trListSortable = null;
 
 
 // Transaction block click event handler
@@ -298,12 +299,17 @@ function initTransListDrag()
 	if (!trlist)
 		return;
 
-	var trListSortable = new Sortable({ oninsertat : onTransPosChanged,
+	trListSortable = new Sortable({ ondragstart : onTransDragStart,
+		 							oninsertat : onTransPosChanged,
 									group : 'transactions',
 									itemClass : 'trlist_item_wrap',
 									placeholderClass : 'trlist_item_placeholder',
 									copyWidth : true,
 									table : (filterObj.mode == 'details') });
+
+// dragFrom is transaction id before transaction started to drag
+// 0 if drag first transaction, -1 if no draggin currently
+	trListSortable.dragFrom = -1;
 
 	listItem_wr = firstElementChild(trlist);
 	listItem = null;
@@ -369,7 +375,7 @@ function onChangePosCallback(trans_id, newPos)
 		}
 		else
 		{
-			cancelPosChange();
+			cancelPosChange(trans_id);
 		}
 	}
 }
@@ -383,8 +389,34 @@ function updateTransArrPos(trans_id, newPos)
 
 
 // Cancel local changes on transaction position update fail
-function cancelPosChange()
+function cancelPosChange(trans_id)
 {
+	var origTr, origWrap, trBefore, trBeforeWrap;
+
+	if (!trListSortable || trListSortable.dragFrom == -1)
+		return;
+
+	origTr = ge('tr_' + trans_id);
+	if (!origTr || !origTr.parentNode)
+		return;
+
+	origWrap = origTr.parentNode;
+	if (trListSortable.dragFrom == 0)
+{
+		prependChild(origWrap.parentNode, origWrap);
+	}
+	else
+	{
+		trBefore = ge('tr_' + trListSortable.dragFrom);
+		if (!trBefore || !trBefore.parentNode)
+			return;
+
+		trBeforeWrap = trBefore.parentNode;
+
+		insertAfter(origWrap, trBeforeWrap);
+	}
+
+	createMessage('Fail to change position of transaction.', 'msg_error');
 }
 
 
@@ -392,6 +424,16 @@ function cancelPosChange()
 function transIdFromElem(elem)
 {
 	return (elem && elem.id.length > 3) ? parseInt(elem.id.substr(3)) : 0;
+}
+
+
+// Transaction drag start callback
+function onTransDragStart(trans_id)
+{
+	if (!trListSortable)
+		return;
+
+	trListSortable.dragFrom = transIdFromElem(firstElementChild(previousElementSibling(trans_id)));
 }
 
 
