@@ -295,12 +295,13 @@ function initTransListDrag()
 
 	initControls();
 
-	trlist = ge('trlist');
+	trlist = ge('tritems');
 	if (!trlist)
 		return;
 
 	trListSortable = new Sortable({ ondragstart : onTransDragStart,
 		 							oninsertat : onTransPosChanged,
+									container : 'tritems',
 									group : 'transactions',
 									itemClass : 'trlist_item_wrap',
 									placeholderClass : 'trlist_item_placeholder',
@@ -329,8 +330,6 @@ function initTransListDrag()
 					listItem.onclick = onTransClick.bind(null, trans_id);
 					firstElementChild(listItem).style.cursor = 'pointer';
 				}
-
-				trListSortable.add(listItem_wr);
 			}
 		}
 		else
@@ -344,8 +343,6 @@ function initTransListDrag()
 					listItem.onclick = onTransClick.bind(null, trans_id);
 					firstElementChild(listItem).style.cursor = 'pointer';
 				}
-
-				trListSortable.add(listItem_wr);
 			}
 		}
 

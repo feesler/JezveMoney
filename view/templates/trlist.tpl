@@ -28,7 +28,9 @@
 			}	?></div>
 <?php	}	?>
 <?php	if ($details) {	?>
-							<table class="details_table">
+							<table id="tritems" class="details_table">
+<?php	} else {	?>
+							<div id="tritems">
 <?php	}	?>
 <?php	foreach($trListData as $trItem) {	?>
 <?php	if ($details) {		?>
@@ -68,6 +70,8 @@
 <?php	}	?>
 <?php	if ($details) {		?>
 						</table>
+<?php	} else {	?>
+						</div>
 <?php	}	?>
 <?php	if ($tr_on_page > 0 && $showPaginator == TRUE) {		?>
 							<div class="paginator"><?php
