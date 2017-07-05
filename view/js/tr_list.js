@@ -316,33 +316,15 @@ function initTransListDrag()
 	listItem = null;
 	while(listItem_wr)
 	{
-		if (filterObj.mode == 'details')
-		{
-			if (listItem_wr.className.indexOf('details_table') != -1)
-				listItem_wr = firstElementChild(listItem_wr);
-
-			if (listItem_wr.tagName && listItem_wr.tagName == 'TBODY')
-			{
-				listItem = firstElementChild(listItem_wr);		// get tr element
-				trans_id = transIdFromElem(listItem);
-				if (trans_id)
-				{
-					listItem.onclick = onTransClick.bind(null, trans_id);
-					firstElementChild(listItem).style.cursor = 'pointer';
-				}
-			}
-		}
-		else
-		{
-			if (filterObj.mode != 'details' && listItem_wr.className.indexOf('trlist_item_wrap') != -1)
+		if ((filterObj.mode == 'details' && listItem_wr.tagName == 'TBODY') ||
+			(filterObj.mode != 'details' && hasClass(listItem_wr, 'trlist_item_wrap')))
 			{
 				listItem = firstElementChild(listItem_wr);
 				trans_id = transIdFromElem(listItem);
 				if (trans_id)
 				{
 					listItem.onclick = onTransClick.bind(null, trans_id);
-					firstElementChild(listItem).style.cursor = 'pointer';
-				}
+				listItem.style.cursor = 'pointer';
 			}
 		}
 
