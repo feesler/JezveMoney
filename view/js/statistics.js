@@ -244,23 +244,23 @@ function initControls()
 							onbarover : onBarOver, onbarout : onBarOut });
 
 	filterDD = new DDList();
-	if (!filterDD.create({ input_id : 'filter_type', itemPrefix : 'filter', selCB : onFilterSel, editable : false, mobile : isMobile }))
+	if (!filterDD.create({ input_id : 'filter_type', selCB : onFilterSel, editable : false, mobile : isMobile }))
 		filterDD = null;
 
 	accCurrDD = new DDList();
 	if (filterObj.filter == 'currency')
 	{
-		if (!accCurrDD.create({ input_id : 'curr_id', itemPrefix : 'curr', selCB : onCurrencySel, editable : false, mobile : isMobile }))
+		if (!accCurrDD.create({ input_id : 'curr_id', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 			accCurrDD = null;
 	}
 	else
 	{
-		if (!accCurrDD.create({ input_id : 'acc_id', itemPrefix : 'acc', selCB : onAccountSel, editable : false, mobile : isMobile }))
+		if (!accCurrDD.create({ input_id : 'acc_id', selCB : onAccountSel, editable : false, mobile : isMobile }))
 			accCurrDD = null;
 	}
 
 	groupDD = new DDList();
-	if (!groupDD.create({ input_id : 'groupsel', itemPrefix : 'group', selCB : onGroupSel, editable : false, mobile : isMobile }))
+	if (!groupDD.create({ input_id : 'groupsel', selCB : onGroupSel, editable : false, mobile : isMobile }))
 		groupDD = null;
 
 }

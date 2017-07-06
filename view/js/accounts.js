@@ -41,11 +41,11 @@ function initControls()
 	isMobile = (document.documentElement.clientWidth < 700);
 
 	iconDDList = new DDList();
-	if (!iconDDList.create({ input_id : 'icon', itemPrefix : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
+	if (!iconDDList.create({ input_id : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
 		iconDDList = null;
 
 	currDDList = new DDList();
-	if (!currDDList.create({ input_id : 'currency', itemPrefix : 'curr', selCB : onCurrencySel, editable : false, mobile : isMobile }))
+	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		currDDList = null;
 }
 
