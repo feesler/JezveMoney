@@ -55,12 +55,12 @@
 						<div>
 							<div class="non_float">
 								<label for="oldpwd">Current password</label>
-								<div class="stretch_input std_input"><div><input id="oldpwd" name="oldpwd" type="password"></div></div>
+								<div class="stretch_input std_input"><input id="oldpwd" name="oldpwd" type="password"></div>
 							</div>
 
 							<div class="non_float">
 								<label for="newpwd">New password</label>
-								<div class="stretch_input std_input"><div><input id="newpwd" name="newpwd" type="password"></div></div>
+								<div class="stretch_input std_input"><input id="newpwd" name="newpwd" type="password"></div>
 							</div>
 
 							<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>profile/">cancel</a></div>
@@ -72,7 +72,7 @@
 					<div>
 						<div class="non_float">
 							<label for="newname">New name</label>
-							<div class="stretch_input std_input"><div><input id="newname" name="newname" type="text"></div></div>
+							<div class="stretch_input std_input"><input id="newname" name="newname" type="text"></div>
 						</div>
 
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>profile/">cancel</a></div>

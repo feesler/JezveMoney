@@ -7,13 +7,13 @@
 
 .group_filter
 {
-	margin: 0px 0px 0px 15px;
+	margin-left: 15px;
 }
 
 
 .date_filter
 {
-	margin: 0px 0px 0px 15px;
+	margin-left: 15px;
 }
 
 
@@ -30,43 +30,8 @@
 }
 
 
-.search_input
-{
-	float: right;
-	margin: 0px 0px 0px 15px;
-}
-
-
-.search_input > div > input[type="text"]
-{
-	height: 26px;
-	border-width: 2px 0px 2px 2px;
-}
-
-
-/* text input controls with button on the right */
-.rbtn_input
-{
-	padding: 8px 0px;
-}
-
-
-.rbtn_input > div
-{
-	padding: 0px 16px 2px 0px;
-	margin: 0px -2px 0px 0px;
-}
-
-
-.rbtn_input > div > input
-{
-	border-width: 2px 0px 2px 2px;
-	padding: 2px 7px 2px 5px;
-}
-
-
 /* Filter select */
 .filter_sel
 {
-	margin: 0px 15px 0px 0px;
+	margin-right: 15px;
 }

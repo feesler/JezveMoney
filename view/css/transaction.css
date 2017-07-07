@@ -100,40 +100,12 @@
 }
 
 
-/* text input controls */
-.trans_input
-{
-	padding: 8px 0px;
-}
-
-
-/* text input controls with button on the right */
-.rbtn_input
-{
-	padding: 8px 0px;
-}
-
-
-.rbtn_input > div
-{
-	padding: 0px 16px 2px 0px;
-	margin: 0px -2px 0px 0px;
-}
-
-
-.rbtn_input > div > input
-{
-	border-width: 2px 0px 2px 2px;
-	padding: 2px 7px 2px 5px;
-}
-
-
 /* exchange rate comment */
 .exchrate_comm
 {
 	margin: 0px 5px;
-	height: 50px;
-	line-height: 50px;
+	height: 34px;
+	line-height: 34px;
 }
 
 

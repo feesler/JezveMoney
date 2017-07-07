@@ -274,17 +274,15 @@
 									<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
 								</div>
 <?php	if ($trans_type != INCOME) {		?>
-								<div class="stretch_input trans_input">
+								<div class="stretch_input std_input">
 <?php	} else {	?>
-								<div class="stretch_input rbtn_input">
+								<div class="stretch_input std_input rbtn_input">
 <?php	}	?>
-									<div>
 <?php	if ($action == "edit") {	?>
-										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="<?=$tr["src_amount"]?>">
+									<input id="src_amount" name="src_amount" class="summ_text" type="text" value="<?=$tr["src_amount"]?>">
 <?php	} else {	?>
-										<input id="src_amount" name="src_amount" class="summ_text" type="text" value="">
+									<input id="src_amount" name="src_amount" class="summ_text" type="text" value="">
 <?php	}	?>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -305,17 +303,15 @@
 									<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
 								</div>
 <?php	if ($trans_type == EXPENSE) {		?>
-								<div class="stretch_input rbtn_input">
+								<div class="stretch_input std_input rbtn_input">
 <?php	} else {	?>
-								<div class="stretch_input trans_input">
+								<div class="stretch_input std_input">
 <?php	}	?>
-									<div>
 <?php	if ($action == "edit") {	?>
-										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="<?=$tr["dest_amount"]?>">
+									<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="<?=$tr["dest_amount"]?>">
 <?php	} else {	?>
-										<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="">
+									<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="">
 <?php	}	?>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -324,10 +320,8 @@
 							<div><label for="exchrate">Exchange rate</label></div>
 							<div>
 								<div class="right_float"><span id="exchcomm" class="exchrate_comm"><?=$exchSign?></span></div>
-								<div class="stretch_input trans_input">
-									<div>
-										<input id="exchrate" class="summ_text" type="text" value="<?=$exchValue?>">
-									</div>
+								<div class="stretch_input std_input">
+									<input id="exchrate" class="summ_text" type="text" value="<?=$exchValue?>">
 								</div>
 							</div>
 						</div>
@@ -337,14 +331,12 @@
 							<div><label for="resbal"><?=$srcBalTitle?></label></div>
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$src["sign"]?></div></div></div>
-								<div class="stretch_input trans_input">
-									<div>
+								<div class="stretch_input std_input">
 <?php	if ($trans_type == DEBT) {		?>
-										<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>">
+									<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>">
 <?php	} else {	?>
-										<input id="resbal" class="summ_text" type="text" value="">
+									<input id="resbal" class="summ_text" type="text" value="">
 <?php	}	?>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -359,10 +351,8 @@
 <?php	} else {	?>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$dest["sign"]?></div></div></div>
 <?php	}	?>
-								<div class="stretch_input trans_input">
-									<div>
-										<input id="resbal_d" class="summ_text" type="text" value="">
-									</div>
+								<div class="stretch_input std_input">
+									<input id="resbal_d" class="summ_text" type="text" value="">
 								</div>
 							</div>
 						</div>
@@ -375,10 +365,8 @@
 									<div class="right_float">
 										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button"><span></span></button>
 									</div>
-									<div class="stretch_input rbtn_input">
-										<div>
-											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
-										</div>
+									<div class="stretch_input std_input rbtn_input">
+										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 									</div>
 									<div id="calendar" class="calWrap" style="display: none;"></div>
 								</div>
@@ -395,10 +383,8 @@
 <?php	}	?>
 								<div><label for="comm">Comment</label></div>
 								<div>
-									<div class="stretch_input trans_input">
-										<div>
-											<input id="comm" name="comm" type="text" value="<?=e($tr["comment"])?>">
-										</div>
+									<div class="stretch_input std_input">
+										<input id="comm" name="comm" type="text" value="<?=e($tr["comment"])?>">
 									</div>
 								</div>
 							</div>

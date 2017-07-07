@@ -162,12 +162,6 @@
 
 
 /* calendar button */
-.cal_btn
-{
-	margin: 8px 0px;
-}
-
-
 .cal_btn > span
 {
 	background-position: -192px -32px;

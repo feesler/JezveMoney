@@ -31,71 +31,66 @@
 		}	?>
 						</div>
 
-						<div class="tr_filter std_input filter_sel">
-							<div>
-								<select id="filter_type" onchange="onFilterChange(this);">
+						<div class="std_margin clearfix">
+						<div class="tr_filter filter_sel">
+							<select id="filter_type" onchange="onFilterChange(this);">
 <?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
 <?php		if ($byCurrItem["selected"]) {		?>
-									<option value="<?=$ind?>" selected><?=$byCurrItem["title"]?></option>
+								<option value="<?=$ind?>" selected><?=$byCurrItem["title"]?></option>
 <?php		} else {	?>
-									<option value="<?=$ind?>"><?=$byCurrItem["title"]?></option>
+								<option value="<?=$ind?>"><?=$byCurrItem["title"]?></option>
 <?php		}	?>
 <?php	}	?>
-								</select>
-							</div>
+							</select>
 						</div>
 
 <?php	if ($byCurrency) {		?>
-						<div id="acc_block" class="tr_filter std_input" style="display: none;">
+						<div id="acc_block" class="tr_filter filter_sel" style="display: none;">
 <?php	} else {	?>
-						<div id="acc_block" class="tr_filter std_input">
+						<div id="acc_block" class="tr_filter filter_sel">
 <?php	}	?>
-							<div>
-								<select id="acc_id" onchange="onAccountChange(this);">
+							<select id="acc_id" onchange="onAccountChange(this);">
 <?php	foreach($accArr as $accInfo) {
 			if ($accInfo->id == $acc_id) {	?>
-									<option value="<?=$accInfo->id?>" selected><?=$accInfo->name?></option>
+								<option value="<?=$accInfo->id?>" selected><?=$accInfo->name?></option>
 <?php		} else {	?>
-									<option value="<?=$accInfo->id?>"><?=$accInfo->name?></option>
+								<option value="<?=$accInfo->id?>"><?=$accInfo->name?></option>
 <?php		}
 		}		?>
-								</select>
-							</div>
+							</select>
 						</div>
 
 <?php	if ($byCurrency) {		?>
-						<div id="curr_block" class="tr_filter std_input">
+						<div id="curr_block" class="tr_filter filter_sel">
 <?php	} else {	?>
-						<div id="curr_block" class="tr_filter std_input" style="display: none;">
+						<div id="curr_block" class="tr_filter filter_sel" style="display: none;">
 <?php	}	?>
-							<div>
-								<select id="curr_id" onchange="onCurrChange(this);">
+							<select id="curr_id" onchange="onCurrChange(this);">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $curr_id) {	?>
-									<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
+								<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
 <?php		} else {	?>
-									<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>
+								<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>
 <?php		}
 		}		?>
-								</select>
-							</div>
+							</select>
 						</div>
 
-						<div class="tr_filter std_input group_filter">
-							<div>
-								<select id="groupsel" onchange="onGroupChange();">
+						<div class="tr_filter filter_sel">
+							<select id="groupsel" onchange="onGroupChange();">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
-									<option value="<?=$val?>" selected><?=$grtype?></option>
+								<option value="<?=$val?>" selected><?=$grtype?></option>
 <?php		} else { ?>
-									<option value="<?=$val?>"><?=$grtype?></option>
+								<option value="<?=$val?>"><?=$grtype?></option>
 <?php		} ?>
 <?php	}	?>
-								</select>
-							</div>
+							</select>
+						</div>
 						</div>
 
-						<div class="tr_filter date_filter">
+						<div class="std_margin clearfix">
+						<div class="tr_filter">
 <?php	if (is_empty($dateFmt)) {		?>
 							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php	} else { 	?>
@@ -107,13 +102,12 @@
 										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button" onclick="showCalendar();"><span></span></button>
 									</div>
 									<div class="stretch_input rbtn_input">
-										<div>
-											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
-										</div>
+										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 									</div>
 									<div id="calendar" class="calWrap transCalWrap" style="display: none;"></div>
 								</div>
 							</div>
+						</div>
 						</div>
 
 						<div id="chart" class="charts">

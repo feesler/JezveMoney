@@ -36,37 +36,33 @@
 						<div class="non_float std_margin">
 							<label for="icon">Icon</label>
 							<div class="std_input">
-								<div>
-									<select id="icon" name="icon" onchange="onChangeIcon(this);">
+								<select id="icon" name="icon" onchange="onChangeIcon(this);">
 <?php	foreach($icons as $icon_id => $icon_name) {
 			if ($icon_id == $accInfo["icon"]) {		?>
-										<option value="<?=$icon_id?>" selected><?=$icon_name?></option>
+									<option value="<?=$icon_id?>" selected><?=$icon_name?></option>
 <?php		} else {	?>
-										<option value="<?=$icon_id?>"><?=$icon_name?></option>
-<?php		}	
+									<option value="<?=$icon_id?>"><?=$icon_name?></option>
+<?php		}
 		}		?>
-									</select>
-								</div>
+								</select>
 							</div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="accname">Account name</label>
-							<div class="stretch_input std_input"><div><input id="accname" name="accname" type="text" value="<?=$accInfo["name"]?>" oninput="return onAccNameInput(this);"></div></div>
+							<div class="stretch_input std_input"><input id="accname" name="accname" type="text" value="<?=$accInfo["name"]?>" oninput="return onAccNameInput(this);"></div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="currency">Currency</label>
 							<div class="std_input">
-								<div>
-									<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
+								<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $accInfo["curr"]) {	?>
-										<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
+									<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
 <?php		} else {	?>
-										<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>
+									<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>
 <?php		}
 		}		?>
-									</select>
-								</div>
+								</select>
 							</div>
 						</div>
 						<div class="non_float std_margin">
@@ -74,9 +70,7 @@
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=$accInfo["sign"]?></div></div></div>
 								<div class="stretch_input std_input">
-									<div>
-										<input class="summ_text" id="balance" name="balance" type="text" value="<?=$accInfo["initbalance"]?>" oninput="return onAccBalanceInput(this);">
-									</div>
+									<input class="summ_text" id="balance" name="balance" type="text" value="<?=$accInfo["initbalance"]?>" oninput="return onAccBalanceInput(this);">
 								</div>
 							</div>
 						</div>

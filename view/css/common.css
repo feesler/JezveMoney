@@ -145,38 +145,42 @@ select
 /* wrap for input with 100% width of parent */
 .stretch_input
 {
-	height: 34px;
+	padding: 2px 5px;
 	overflow: hidden;
+	border: 2px solid #000000;
 }
 
 
-.stretch_input > div
-{
-	height: 34px;
-	padding: 0px 14px 2px 0px;		/* compensation for borders and inner paddings of input */
-}
-
-
-.stretch_input > div > input
+.stretch_input > input[type="text"],
+.stretch_input > input[type="password"]
 {
 	width: 100%;
 	height: 26px;
 	line-height: 26px;
 	margin: 0;
+	padding: 0;
+	border: 0 none;
 }
 
 
-.stretch_input > div > select
+.stretch_input > select
 {
 	width: 100%;
 	margin: 0;
+}
+
+
+/* text input controls with button on the right */
+.stretch_input.rbtn_input
+{
+	border-width: 2px 0px 2px 2px;
 }
 
 
 /* standard for text input controls */
 .std_input
 {
-	padding: 8px 0px;
+	margin: 8px 0px;
 }
 
 
@@ -757,7 +761,7 @@ label
 .curr_container
 {
 	width: 34px;
-	height: 50px;
+	height: 34px;
 	float: right;
 	position: relative;
 }
@@ -768,7 +772,6 @@ label
 	width: 30px;
 	height: 30px;
 	padding: 2px;
-	margin: 8px 0px;
 	color: #FFFFFF;
 	background-color: #0072C6;
 	cursor: pointer;

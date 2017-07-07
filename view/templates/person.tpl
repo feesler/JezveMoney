@@ -27,7 +27,7 @@
 						<div class="non_float std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
-								<div><input id="pname" name="pname" type="text" value="<?=$pName?>"></div>
+								<input id="pname" name="pname" type="text" value="<?=$pName?>">
 							</div>
 						</div>
 

@@ -33,8 +33,9 @@
 		}	?>
 						</div>
 
+						<div class="std_margin clearfix">
 						<form method="get" action="<?=BASEURL?>transactions/" onsubmit="return onSearchSubmit(this);">
-						<div class="search_input std_input">
+						<div class="search_input">
 							<div>
 								<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : $searchReq)?>">
 								<button class="btn icon_btn search_btn" type="submit"><span></span></button>
@@ -42,7 +43,7 @@
 						</div>
 						</form>
 
-						<div class="tr_filter std_input">
+						<div class="tr_filter">
 							<div>
 								<select id="acc_id" name="acc_id" multiple>
 									<option value="0">All</option>
@@ -59,9 +60,9 @@
 
 						<div class="tr_filter date_filter">
 <?php if (is_empty($dateFmt)) {		?>
-							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
+							<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php } else {	?>
-							<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
 <?php }		?>
 							<div id="date_block" style="display: none;">
 								<div>
@@ -69,13 +70,12 @@
 										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button" onclick="showCalendar();"><span></span></button>
 									</div>
 									<div class="stretch_input rbtn_input">
-										<div>
-											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
-										</div>
+										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 									</div>
 									<div id="calendar" class="calWrap transCalWrap" style="display: none;"></div>
 								</div>
 							</div>
+						</div>
 						</div>
 
 <?php
