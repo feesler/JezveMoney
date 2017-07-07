@@ -35,10 +35,10 @@
 
 						<div class="std_margin clearfix">
 						<form method="get" action="<?=BASEURL?>transactions/" onsubmit="return onSearchSubmit(this);">
-						<div class="search_input">
-							<div>
+						<div class="right_float">
+							<button class="btn icon_btn search_btn right_float" type="submit"><span></span></button>
+							<div class="stretch_input rbtn_input">
 								<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : $searchReq)?>">
-								<button class="btn icon_btn search_btn" type="submit"><span></span></button>
 							</div>
 						</div>
 						</form>
@@ -66,9 +66,7 @@
 <?php }		?>
 							<div id="date_block" style="display: none;">
 								<div>
-									<div class="right_float">
-										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button" onclick="showCalendar();"><span></span></button>
-									</div>
+									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button" onclick="showCalendar();"><span></span></button>
 									<div class="stretch_input rbtn_input">
 										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 									</div>

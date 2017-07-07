@@ -265,14 +265,12 @@
 <?php	}	?>
 							<div><label for="src_amount"><?=$srcAmountLbl?></label></div>
 							<div>
-								<div class="curr_container">
 <?php	if ($trans_type != INCOME) {		?>
-									<div class="btn rcurr_btn inact_rbtn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
+								<div class="btn rcurr_btn inact_rbtn right_float"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	} else {	?>
-									<div class="btn rcurr_btn"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
+								<div class="btn rcurr_btn right_float"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	}	?>
-									<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
-								</div>
+								<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
 <?php	if ($trans_type != INCOME) {		?>
 								<div class="stretch_input std_input">
 <?php	} else {	?>
@@ -294,14 +292,12 @@
 <?php	}	?>
 							<div><label for="dest_amount"><?=$destAmountLbl?></label></div>
 							<div>
-								<div class="curr_container">
 <?php	if ($trans_type == EXPENSE) {		?>
-									<div class="btn rcurr_btn"><div id="destamountsign"><?=$destAmountSign?></div></div>
+								<div class="btn rcurr_btn right_float"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	} else {	?>
-									<div class="btn rcurr_btn inact_rbtn"><div id="destamountsign"><?=$destAmountSign?></div></div>
+								<div class="btn rcurr_btn inact_rbtn right_float"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	}	?>
-									<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
-								</div>
+								<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
 <?php	if ($trans_type == EXPENSE) {		?>
 								<div class="stretch_input std_input rbtn_input">
 <?php	} else {	?>
@@ -319,7 +315,7 @@
 						<div id="exchange" class="non_float" style="display: none;">
 							<div><label for="exchrate">Exchange rate</label></div>
 							<div>
-								<div class="right_float"><span id="exchcomm" class="exchrate_comm"><?=$exchSign?></span></div>
+								<span id="exchcomm" class="exchrate_comm right_float"><?=$exchSign?></span>
 								<div class="stretch_input std_input">
 									<input id="exchrate" class="summ_text" type="text" value="<?=$exchValue?>">
 								</div>
@@ -362,9 +358,7 @@
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
-									<div class="right_float">
-										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button"><span></span></button>
-									</div>
+									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
 									<div class="stretch_input std_input rbtn_input">
 										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 									</div>

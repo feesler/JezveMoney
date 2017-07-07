@@ -98,9 +98,7 @@
 <?php	} 	?>
 							<div id="date_block" style="display: none;">
 								<div>
-									<div class="right_float">
-										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button" onclick="showCalendar();"><span></span></button>
-									</div>
+									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button" onclick="showCalendar();"><span></span></button>
 									<div class="stretch_input rbtn_input">
 										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 									</div>
