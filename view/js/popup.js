@@ -15,7 +15,7 @@ function Popup()
 	this.mergeDef = function(obj, mergeObj)
 	{
 		var par, val;
-	
+
 		if (!obj || typeof obj !== 'object' || !mergeObj || typeof mergeObj !== 'object')
 			return;
 
@@ -40,6 +40,8 @@ function Popup()
 
 		if (!params || !params.id)
 			return false;
+
+		this.params = params;
 
 		popupObj = ce('div', { id : params.id, className : 'popup', style : { display : 'none' } });
 		if (!popupObj)
@@ -106,7 +108,13 @@ function Popup()
 			addChilds(this.boxObj, [this.titleObj, this.messageObj, this.controlsObj]);
 			addChilds(this.contentObj, [this.boxObj]);
 		}
+		else
+		{
+			show(this.contentObj, true);
+		}
 		addChilds(this.popupObj, [this.backObj, this.contentObj]);
+
+		document.body.appendChild(this.popupObj);
 
 		return true;
 	},
@@ -117,7 +125,6 @@ function Popup()
 		if (!this.popupObj)
 			return;
 
-		document.body.appendChild(this.popupObj);
 		document.body.style.overflow = 'hidden';
 		document.documentElement.scrollTop = 0;
 		show(this.popupObj, true);
