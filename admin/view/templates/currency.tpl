@@ -51,9 +51,9 @@
 		<form id="curr_frm" method="post" action="<?=BASEURL?>admin/currency.php?act=new">
 		<input id="curr_id" name="curr_id" type="hidden">
 		<label for="curr_name">name</label>
-		<div class="s_inp"><input id="curr_name" name="curr_name" type="text"></div>
+		<div class="stretch_input"><input id="curr_name" name="curr_name" type="text"></div>
 		<label for="curr_sign">sign</label>
-		<div class="s_inp"><input id="curr_sign" name="curr_sign" type="text"></div>
+		<div class="stretch_input"><input id="curr_sign" name="curr_sign" type="text"></div>
 		<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
 		<input class="adm_act_btn" type="submit" value="ok">
 		</form>
