@@ -266,7 +266,7 @@ class PersonModel extends CachedTable
 
 			if (!isset($pArr[$ind]))
 			{
-				$pArr[$ind] = new stdClass; 
+				$pArr[$ind] = new stdClass;
 
 				$pArr[$ind]->id = $p_id;
 				$pArr[$ind]->name = $row["name"];

@@ -318,12 +318,12 @@ function initTransListDrag()
 	{
 		if ((filterObj.mode == 'details' && listItem_wr.tagName == 'TBODY') ||
 			(filterObj.mode != 'details' && hasClass(listItem_wr, 'trlist_item_wrap')))
+		{
+			listItem = firstElementChild(listItem_wr);
+			trans_id = transIdFromElem(listItem);
+			if (trans_id)
 			{
-				listItem = firstElementChild(listItem_wr);
-				trans_id = transIdFromElem(listItem);
-				if (trans_id)
-				{
-					listItem.onclick = onTransClick.bind(null, trans_id);
+				listItem.onclick = onTransClick.bind(null, trans_id);
 				listItem.style.cursor = 'pointer';
 			}
 		}
@@ -381,7 +381,7 @@ function cancelPosChange(trans_id)
 
 	origWrap = origTr.parentNode;
 	if (trListSortable.dragFrom == 0)
-{
+	{
 		prependChild(origWrap.parentNode, origWrap);
 	}
 	else

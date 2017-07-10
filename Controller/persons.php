@@ -40,7 +40,7 @@ class PersonsController extends Controller
 		$action = "new";
 
 		$pName = "";
-	
+
 		$titleString = "Jezve Money | ";
 		$headString = "New person";
 		$titleString .= $headString;

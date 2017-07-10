@@ -34,46 +34,46 @@
 						</div>
 
 						<div class="std_margin clearfix">
-						<form method="get" action="<?=BASEURL?>transactions/" onsubmit="return onSearchSubmit(this);">
-						<div class="right_float">
-							<button class="btn icon_btn search_btn right_float" type="submit"><span></span></button>
-							<div class="stretch_input rbtn_input">
-								<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : $searchReq)?>">
-							</div>
-						</div>
-						</form>
-
-						<div class="tr_filter">
-							<div>
-								<select id="acc_id" name="acc_id" multiple>
-									<option value="0">All</option>
-<?php	foreach($accArr as $accData) {
-			if (in_array($accData->id, $accFilter)) {		?>
-									<option value="<?=$accData->id?>" selected><?=$accData->name?></option>
-<?php		} else {		?>
-									<option value="<?=$accData->id?>"><?=$accData->name?></option>
-<?php		}
-		}	?>
-								</select>
-							</div>
-						</div>
-
-						<div class="tr_filter date_filter">
-<?php if (is_empty($dateFmt)) {		?>
-							<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
-<?php } else {	?>
-							<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
-<?php }		?>
-							<div id="date_block" style="display: none;">
-								<div>
-									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button" onclick="showCalendar();"><span></span></button>
-									<div class="stretch_input rbtn_input">
-										<input id="date" name="date" type="text" value="<?=$dateFmt?>">
-									</div>
-									<div id="calendar" class="calWrap transCalWrap" style="display: none;"></div>
+							<form method="get" action="<?=BASEURL?>transactions/" onsubmit="return onSearchSubmit(this);">
+							<div class="right_float">
+								<button class="btn icon_btn search_btn right_float" type="submit"><span></span></button>
+								<div class="stretch_input rbtn_input">
+									<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : $searchReq)?>">
 								</div>
 							</div>
-						</div>
+							</form>
+
+							<div class="tr_filter">
+								<div>
+									<select id="acc_id" name="acc_id" multiple>
+										<option value="0">All</option>
+<?php	foreach($accArr as $accData) {
+			if (in_array($accData->id, $accFilter)) {		?>
+										<option value="<?=$accData->id?>" selected><?=$accData->name?></option>
+<?php		} else {		?>
+										<option value="<?=$accData->id?>"><?=$accData->name?></option>
+<?php		}
+		}	?>
+									</select>
+								</div>
+							</div>
+
+							<div class="tr_filter date_filter">
+<?php if (is_empty($dateFmt)) {		?>
+								<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
+<?php } else {	?>
+								<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
+<?php }		?>
+								<div id="date_block" style="display: none;">
+									<div>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button" onclick="showCalendar();"><span></span></button>
+										<div class="stretch_input rbtn_input">
+											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
+										</div>
+										<div id="calendar" class="calWrap transCalWrap" style="display: none;"></div>
+									</div>
+								</div>
+							</div>
 						</div>
 
 <?php
