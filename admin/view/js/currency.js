@@ -124,11 +124,6 @@ function initControls()
 		dwPopup = null;
 		return;
 	}
-
-	dwPopup.show();
-	dwPopup.hide();		// TODO: fix appending popup to DOM on create
-
-	show('curr_content', true);
 }
 
 
