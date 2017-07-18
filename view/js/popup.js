@@ -1,154 +1,283 @@
 // Popup constructor
-function Popup()
+var Popup = new (function()
 {
-	this.popupObj = null;
-	this.backObj = null;
-	this.contentObj = null;
-	this.boxObj = null;
-	this.titleObj = null;
-	this.messageObj = null;
-	this.controlsObj = null;
-	this.okBtn = null;
-	this.cancelBtn = null;
-
-
-	this.mergeDef = function(obj, mergeObj)
+	// Modal instance constructor
+	function Modal(params)
 	{
-		var par, val;
+		var popupObj = null;
+		var backObj = null;
+		var contentObj = null;
+		var boxObj = null;
+		var titleObj = null;
+		var messageObj = null;
+		var controlsObj = null;
+		var okBtn = null;
+		var cancelBtn = null;
+		var closeBtn = null;
+		var onCloseHandler = null;
+		var _params = null;
+		var self = this;
 
-		if (!obj || typeof obj !== 'object' || !mergeObj || typeof mergeObj !== 'object')
-			return;
 
-		for(par in mergeObj)
+		// Set click handler for close button
+		function setOnClose(elem)
 		{
-			val = mergeObj[par];
-			if (typeof val === 'object')
-			{
-				if (!(par in obj))
-					obj[par] = {};
-				this.mergeDef(obj[par], val);
-			}
-			else if (!(par in obj))
-				obj[par] = val;
+			btn = firstElementChild(elem);
+			if (btn)
+				btn.onclick = closeModal.bind(self);
 		}
-	}
 
 
-	this.create = function(params)
-	{
-		var popupObj, backObj, contentObj, boxObj, titleObj, messageObj, controlsObj, okBtn, cancelBtn;
-
-		if (!params || !params.id)
-			return false;
-
-		this.params = params;
-
-		popupObj = ce('div', { id : params.id, className : 'popup', style : { display : 'none' } });
-		if (!popupObj)
-			return false;
-
-		backObj = ce('div', { className : 'popup_back' });
-		if (!backObj)
-			return false;
-
-		params.content = params.content || null;
-		if (params.content)
+		// Add close button to the popup
+		function addCloseButton()
 		{
-			contentObj = ge(params.content);
-			if (!contentObj)
+			if (!boxObj || closeBtn)
+				return;
+
+			closeBtn = ce('div', { className : 'close_btn' },
+						ce('button', { type : 'button' },
+							ce('span')));
+			boxObj.appendChild(closeBtn);
+
+			setOnClose(closeBtn);
+		}
+
+
+		// Remove close button
+		function removeCloseButton()
+		{
+			re(closeBtn);
+			closeBtn = null;
+		}
+
+
+		function create(params)
+		{
+			if (!params || !params.id)
 				return false;
-		}
-		else
-		{
+
+			_params = params;
+
+			// check popup with same id is already exist
+			popupObj = ge(params.id);
+			if (popupObj)
+				return false;
+
+			popupObj = ce('div', { id : params.id, className : 'popup', style : { display : 'none' } });
+			if (!popupObj)
+				return false;
+
+			backObj = ce('div', { className : 'popup_back' });
+			if (!backObj)
+				return false;
+
+			if (params.nodim === true)
+				show(backObj, false);
+
+			if (isFunction(params.onclose))
+				this.onCloseHandler = params.onclose;
+			params.content = params.content || null;
+			if (params.content)
+			{
+				messageObj = ge(params.content);
+			}
+			else
+			{
+				messageObj = ce('div', { className : 'popup_message' }, [ ce('div', { innerHTML : params.msg }) ]);
+			}
+
+			if (!messageObj)
+				return false;
+
 			contentObj = ce('div', { className : 'popup_content' });
 			boxObj = ce('div', { className : 'box' });
 			if (!contentObj || !boxObj)
 				return false;
 
-			titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
-			messageObj = ce('div', { className : 'popup_message' }, [ ce('div', { innerHTML : params.msg }) ]);
-			controlsObj = ce('div', { className : 'popup_controls' });
-			if (!titleObj || !messageObj || !controlsObj)
+			if (params.additional !== undefined)
+				addClass(contentObj, params.additional);
+
+			prependChild(boxObj, messageObj);
+			if (params.title)
+			{
+				titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
+				prependChild(boxObj, titleObj);
+			}
+
+			setModalControls(params.btn);
+
+			contentObj.appendChild(boxObj);
+
+			if (params.content)
+			{
+				show(messageObj, true);
+			}
+
+			addChilds(popupObj, [backObj, contentObj]);
+
+			document.body.appendChild(popupObj);
+
+			return true;
+		}
+
+
+		function setModalControls(params)
+		{
+			var hasControls, newHasControls;
+
+			if (!params)
 				return false;
-		}
 
-		this.popupObj = popupObj;
-		this.backObj = backObj;
-		this.contentObj = contentObj;
-		if (!params.content)
-		{
-			this.boxObj = boxObj;
-			this.titleObj = titleObj;
-			this.messageObj = messageObj;
-			this.controlsObj = controlsObj;
-
-			if (params.btn.okBtn)
+			hasControls = (okBtn || cancelBtn);
+			newHasControls = (params.okBtn !== false || params.cancelBtn !== false);
+			if (newHasControls)
 			{
-				okBtn = ce('input', { className : 'btn ok_btn' });
-				if (!okBtn)
-					return false;
-
-				this.mergeDef(params.btn.okBtn, { type : 'button', value : 'ok' });
-				setParam(okBtn, params.btn.okBtn);
-				this.okBtn = okBtn;
+				if (!controlsObj)
+					controlsObj = ce('div', { className : 'popup_controls' });
+			}
+			else
+			{
+				re(controlsObj);
+				controlsObj = null;
 			}
 
-			if (params.btn.cancelBtn)
+			if (params.okBtn !== undefined)
 			{
-				cancelBtn = ce('input', { className : 'btn cancel_btn' });
-				if (!cancelBtn)
-					return false;
+				if (params.okBtn === false && okBtn)
+				{
+					re(okBtn);
+					okBtn = null;
+				}
+				else
+				{
+					if (!okBtn)
+						okBtn = ce('input', { className : 'btn ok_btn',
+												type : 'button', value : 'ok' });
 
-				this.mergeDef(params.btn.cancelBtn, { type : 'button', value : 'cancel', onclick : this.close.bind(this) });
-				setParam(cancelBtn, params.btn.cancelBtn);
-				this.cancelBtn = cancelBtn;
+					setParam(okBtn, params.okBtn);
+				}
 			}
 
-			addChilds(this.controlsObj, [this.okBtn, this.cancelBtn]);
-			addChilds(this.boxObj, [this.titleObj, this.messageObj, this.controlsObj]);
-			addChilds(this.contentObj, [this.boxObj]);
+			if (params.cancelBtn !== undefined)
+			{
+				if (params.cancelBtn === false && cancelBtn)
+				{
+					re(cancelBtn);
+					cancelBtn = null;
+				}
+				else
+				{
+					if (!cancelBtn)
+						cancelBtn = ce('input', { className : 'btn cancel_btn',
+													type : 'button', value : 'cancel',
+													onclick : closeModal.bind(self) });
+
+					setParam(cancelBtn, params.cancelBtn);
+				}
+			}
+
+			if (newHasControls)
+			{
+				addChilds(controlsObj, [okBtn, cancelBtn]);
+				insertAfter(controlsObj, messageObj);
+			}
+
+			if (params.closeBtn !== undefined)
+			{
+				if (params.closeBtn === true)
+					addCloseButton();
+				else if (params.closeBtn === false)
+					removeCloseButton();
+			}
+
+			return true;
 		}
-		else
+
+
+		function showModal()
 		{
-			show(this.contentObj, true);
+			if (!popupObj)
+				return;
+
+			document.body.style.overflow = 'hidden';
+			document.documentElement.scrollTop = 0;
+			show(popupObj, true);
+
+			if (_params.closeOnEmptyClick === true)
+			{
+				schedule(function()
+				{
+					setEmptyClick(closeModal.bind(self), [boxObj]);
+				})();
+			}
 		}
-		addChilds(this.popupObj, [this.backObj, this.contentObj]);
-
-		document.body.appendChild(this.popupObj);
-
-		return true;
-	},
 
 
-	this.show = function()
-	{
-		if (!this.popupObj)
-			return;
+		function hideModal()
+		{
+			if (!popupObj)
+				return;
 
-		document.body.style.overflow = 'hidden';
-		document.documentElement.scrollTop = 0;
-		show(this.popupObj, true);
-	},
+			show(popupObj, false);
+			document.body.style.overflow = '';
 
-
-	this.hide = function()
-	{
-		if (!this.popupObj)
-			return;
-
-		show(this.popupObj, false);
-		document.body.style.overflow = '';
-	},
+			if (_params.closeOnEmptyClick === true)
+				setEmptyClick();
+		}
 
 
-	this.close = function()
-	{
-		if (!this.popupObj)
-			return;
+		function closeModal()
+		{
+			hideModal();
 
-		this.hide();
+			if (isFunction(onCloseHandler))
+				onCloseHandler();
+		}
 
-		this.popupObj.parentNode.removeChild(this.popupObj);
-		this.popupObj = null;
+
+		function destroyModal()
+		{
+			if (popupObj && popupObj.parentNode)
+				popupObj.parentNode.removeChild(popupObj);
+			popupObj = null;
+		}
+
+		create(params);
+
+		// Modal public methods
+		this.show = function()
+		{
+			showModal();
+		}
+
+
+		this.hide = function()
+		{
+			hideModal();
+		}
+
+
+		this.close = function()
+		{
+			closeModal();
+		}
+
+
+		this.destroy = function()
+		{
+			destroyModal();
+		}
+
+
+		this.setControls = function(params)
+		{
+			return setModalControls(params);
+		}
 	}
-}
+
+// Popup global object public methods
+	this.create = function(params)
+	{
+		return new Modal(params);
+	}
+})();
