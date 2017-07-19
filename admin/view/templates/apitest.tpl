@@ -514,6 +514,48 @@
 						</form>
 						</div>
 
+						<h2>Profile</h2>
+						<div class="test_container">
+						<h3>Read profile</h3>
+						<form action="../api/profile.php?act=read" method="get" onsubmit="return onFormSubmit(this);">
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
+						<div class="test_container">
+						<h3>Change name</h3>
+						<form action="../api/profile.php?act=changename" method="post" onsubmit="return onFormSubmit(this);">
+							<div class="std_margin">
+								<label for="chname">Name</label>
+								<input id="chname" name="name" type="text"><br>
+							</div>
+
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
+						<div class="test_container">
+						<h3>Change password</h3>
+						<form action="../api/profile.php?act=changepass" method="post" onsubmit="return onFormSubmit(this);">
+							<div class="std_margin">
+								<label for="oldpwd">Old password</label>
+								<input id="oldpwd" name="oldpwd" type="text"><br>
+							</div>
+							<div class="std_margin">
+								<label for="newpwd">New password</label>
+								<input id="newpwd" name="newpwd" type="text"><br>
+							</div>
+
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
 						<div id="results" class="test_result">
 						</div>
 					</div>
