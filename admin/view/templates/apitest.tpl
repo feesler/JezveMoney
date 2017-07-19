@@ -556,6 +556,15 @@
 						</form>
 						</div>
 
+						<div class="test_container">
+						<h3>Reset all data</h3>
+						<form action="../api/profile.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
 						<div id="results" class="test_result">
 						</div>
 					</div>
