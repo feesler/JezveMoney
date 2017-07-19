@@ -64,7 +64,7 @@ class ProfileController extends Controller
 		if ($old_name == $db->escape($new_name))
 			$this->fail($defMsg);
 
-		if (!$person->edit($owner_id, $new_name))
+		if (!$pMod->edit($owner_id, $new_name))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_NAME);
