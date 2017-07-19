@@ -100,7 +100,7 @@
 						</div>
 
 						<div class="test_container">
-						<h3>Reset accounts
+						<h3>Reset accounts</h3>
 						<form action="../api/account.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
