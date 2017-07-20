@@ -89,6 +89,21 @@
 	}
 
 
+	// Return message string by id
+	function getMessage($msg_id)
+	{
+		global $msgArray;
+
+		if (!isset($msgArray[$msg_id]))
+			return NULL;
+
+		$msgParam = $msgArray[$msg_id];
+		$msgMessage = $msgParam[1];
+
+		return $msgMessage;
+	}
+
+
 	// Check message is set
 	function isMessageSet()
 	{
