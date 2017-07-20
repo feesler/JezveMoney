@@ -30,7 +30,7 @@
 <?php	if ($action != "changepassword") {	?>
 					<div class="profile_block">
 						<h2>Security</h2>
-						<div><a href="<?=BASEURL?>profile/changepass/">Change password</a></div>
+						<div><a href="<?=BASEURL?>profile/changepass/" onclick="return showChangePasswordPopup();">Change password</a></div>
 					</div>
 <?php	}	?>
 
@@ -90,6 +90,20 @@
 	<div class="non_float">
 		<label for="newname">New name</label>
 		<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=$person_name?>"></div>
+	</div>
+</form>
+</div>
+
+<div id="changepass" style="display: none;">
+<form method="post" action="<?=BASEURL?>profile/changepass/" onsubmit="return onChangePassSubmit(this);">
+	<div class="non_float">
+		<label for="oldpwd">Current password</label>
+		<div class="stretch_input std_input"><input id="oldpwd" name="oldpwd" type="password"></div>
+	</div>
+
+	<div class="non_float">
+		<label for="newpwd">New password</label>
+		<div class="stretch_input std_input"><input id="newpwd" name="newpwd" type="password"></div>
 	</div>
 </form>
 </div>

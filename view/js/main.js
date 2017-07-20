@@ -1,5 +1,6 @@
 var dwPopup = null;		// delete warning popup
 var cnPopup = null;		// change name popup
+var cpPopup = null;		// change password popup
 var rAccPopup = null;	// reset account popup
 var rAllPopup = null;	// reset all popup
 
@@ -86,6 +87,31 @@ function showChangeNamePopup()
 }
 
 
+// Change password request callback
+function onChangePasswordResult(response)
+{
+	var userbtn, nameEl;
+
+	var res = JSON.parse(response);
+
+	if (!res)
+		return;
+
+	if (res.result == 'ok')
+	{
+		cpPopup.close();
+
+		if (res.msg)
+			createMessage(res.msg, 'msg_success');
+	}
+	else
+	{
+		if (res.msg)
+			createMessage(res.msg, 'msg_error');
+	}
+}
+
+
 // Change password submit event handler
 function onChangePassSubmit(frm)
 {
@@ -114,7 +140,34 @@ function onChangePassSubmit(frm)
 		return false;
 	}
 
-	return true;
+	ajax.post(baseURL + 'api/profile.php?act=changepass',
+				urlJoin({ 'oldpwd' : oldpwd.value, 'newpwd' : newpwd.value }),
+				onChangePasswordResult);
+
+	return false;
+}
+
+
+// Create and show change password popup
+function showChangePasswordPopup()
+{
+	var frm;
+
+	if (!cpPopup)
+	{
+		cpPopup = Popup.create({ id : 'chname_popup',
+								title : 'Change name',
+								content : 'changepass',
+								additional : 'center_only' });
+		frm = firstElementChild(ge('changepass'));
+
+		cpPopup.setControls({ okBtn : { onclick : onChangePassSubmit.bind(null, frm) },
+								closeBtn : true });
+	}
+
+	cpPopup.show();
+
+	return false;
 }
 
 
