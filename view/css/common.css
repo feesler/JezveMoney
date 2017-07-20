@@ -820,54 +820,54 @@ label
 
 
 /* Messages */
-.msg
+.popup > .popup_content.msg
 {
-	position: absolute;
+	background: none;
 	top: 55px;
-	width: 100%;
-	z-index: 10;
+	margin: 0;
 }
 
 
-.msg > div
+.popup > .popup_content.msg > .box
 {
-	margin: 0 auto;
+	padding: 0;
 	max-width: 824px;
-	min-width: 200px;
-	position: relative;
+	background: none;
 }
 
 
-.msg > div > div
+.popup .msg .close_btn > button > span
+{
+	background-position: -224px -32px;
+}
+
+
+.popup .msg .close_btn > button:hover > span
+{
+	background-position: -224px -48px;
+}
+
+
+.msg > .box > .popup_message
 {
 	max-width: 300px;
 	min-width: 200px;
-	border: 1px solid #000000;
 	color: #FFFFFF;
-	background-color: #FFFFFF;
-	padding: 12px;
 	position: absolute;
-	right: 0px;
+	right: 0;
+	padding: 15px 30px 15px 20px;
 }
 
 
-.msg_success > div > div
+.msg.msg_success > .box > .popup_message
 {
 	border-color: #20D040;
 	background-color: #40D060;
 }
 
 
-.msg_error > div > div
+.msg.msg_error > .box > .popup_message
 {
 	border-color: #F02020;
 	background-color: #F02020;
 }
-
-
-.msg .close_btn
-{
-	float: right;
-	margin: 4px 0px 0px 10px;
-}
-

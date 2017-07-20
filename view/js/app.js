@@ -28,43 +28,20 @@ function onUserClick()
 }
 
 
-// Close message box
-function onCloseMessage()
-{
-	re('action_msg');
-	setEmptyClick();
-}
-
-
-// Initialization of message hiding
-function initMessage()
-{
-	setEmptyClick(onCloseMessage, ['action_msg']);
-}
-
-
 // Create message
 function createMessage(message, msgClass)
 {
-	var messageBox, page, pageWrapper, header;
+	var messageBox;
 
-	messageBox = ce('div', { id : 'action_msg', className : 'msg ' + msgClass },
-					ce('div', {},
-						ce('div', {},
-							[ ce('div', { className : 'close_btn' },
-								ce('div', { className : 'iconlink small_icon' },
-									ce('button', { type : 'button', onclick : onCloseMessage.bind(null) },
-										ce('span', { className : 'icon close' })))),
-							ce('span', { innerHTML : message })
-							])));
+	messageBox = Popup.create({ id : 'popup7',
+						msg : message,
+						btn : { closeBtn : true },
+						additional : 'msg ' + msgClass,
+						nodim : true,
+						closeOnEmptyClick : true
+					});
 
-	page = firstElementChild(document.body);
-	pageWrapper = firstElementChild(page);
-	header = firstElementChild(pageWrapper);
-	if (header)
-		insertAfter(messageBox, header);
-
-	initMessage();
+	messageBox.show();
 }
 
 
