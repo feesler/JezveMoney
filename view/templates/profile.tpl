@@ -22,17 +22,13 @@
 					<div class="profile_block">
 						<h2>User name</h2>
 						<span id="namestatic"><?=$person_name?></span>
-<?php	if ($action != "changename") {	?>
 						<div><a href="<?=BASEURL?>profile/changename/" onclick="return showChangeNamePopup();">Change</a></div>
-<?php	}	?>
 					</div>
 
-<?php	if ($action != "changepassword") {	?>
 					<div class="profile_block">
 						<h2>Security</h2>
 						<div><a href="<?=BASEURL?>profile/changepass/" onclick="return showChangePasswordPopup();">Change password</a></div>
 					</div>
-<?php	}	?>
 
 					<div class="profile_block">
 						<h2>Reset data</h2>
@@ -50,34 +46,9 @@
 						</div>
 					</div>
 <?php	if ($action == "changepass") {		?>
-					<form method="post" action="<?=BASEURL?>profile/changepass/" onsubmit="return onChangePassSubmit(this);">
-						<h2>Change password</h2>
-						<div>
-							<div class="non_float">
-								<label for="oldpwd">Current password</label>
-								<div class="stretch_input std_input"><input id="oldpwd" name="oldpwd" type="password"></div>
-							</div>
-
-							<div class="non_float">
-								<label for="newpwd">New password</label>
-								<div class="stretch_input std_input"><input id="newpwd" name="newpwd" type="password"></div>
-							</div>
-
-							<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>profile/">cancel</a></div>
-						</div>
-					</form>
+<script>onReady(showChangePasswordPopup);</script>
 <?php	} else if ($action == "changename") {		?>
-					<form method="post" action="<?=BASEURL?>profile/changename/" onsubmit="return onChangeNameSubmit(this);">
-					<h2>Change name</h2>
-					<div>
-						<div class="non_float">
-							<label for="newname">New name</label>
-							<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=$person_name?>"></div>
-						</div>
-
-						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>profile/">cancel</a></div>
-					</div>
-					</form>
+<script>onReady(showChangeNamePopup);</script>
 <?php	}	?>
 				</div>
 			</div>
