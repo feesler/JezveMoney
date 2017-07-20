@@ -1,4 +1,6 @@
-var dwPopup;		// delete warning popup
+var dwPopup = null;		// delete warning popup
+var rAccPopup = null;	// reset account popup
+var rAllPopup = null;	// reset all popup
 
 
 // Log in form submit event handler
@@ -127,11 +129,10 @@ function onAccResetPopup(res)
 {
 	var resetacc_form;
 
-	if (!dwPopup)
+	if (!rAccPopup)
 		return;
 
-	dwPopup.close();
-	dwPopup = null;
+	rAccPopup.close();
 
 	if (res)
 	{
@@ -145,26 +146,17 @@ function onAccResetPopup(res)
 // Create and show accounts reset warning popup
 function showResetAccountsPopup()
 {
-	// check popup already created
-	if (dwPopup)
-		return;
-
-	dwPopup = new Popup();
-	if (!dwPopup)
-		return;
-
-	if (!dwPopup.create({ id : 'reset_warning',
+	if (!rAccPopup)
+	{
+		rAccPopup = Popup.create({ id : 'reset_warning',
 						title : 'Reset accounts',
 						msg : resetAccMsg,
 						btn : { okBtn : { onclick : onAccResetPopup.bind(null, true) },
 								cancelBtn : { onclick : onAccResetPopup.bind(null, false) } }
-						}))
-	{
-		dwPopup = null;
-		return;
+						});
 	}
 
-	dwPopup.show();
+	rAccPopup.show();
 }
 
 
@@ -173,11 +165,10 @@ function onResetAllPopup(res)
 {
 	var resetall_form;
 
-	if (!dwPopup)
+	if (!rAllPopup)
 		return;
 
-	dwPopup.close();
-	dwPopup = null;
+	rAllPopup.close();
 
 	if (res)
 	{
@@ -191,26 +182,17 @@ function onResetAllPopup(res)
 // Create and show reset data all warning popup
 function showResetAllPopup()
 {
-	// check popup already created
-	if (dwPopup)
-		return;
-
-	dwPopup = new Popup();
-	if (!dwPopup)
-		return;
-
-	if (!dwPopup.create({ id : 'reset_warning',
+	if (!rAllPopup)
+	{
+		rAllPopup = Popup.create({ id : 'reset_warning',
 						title : 'Reset all data',
 						msg : resetAllMsg,
 						btn : { okBtn : { onclick : onResetAllPopup.bind(null, true) },
 								cancelBtn : { onclick : onResetAllPopup.bind(null, false) } }
-						}))
-	{
-		dwPopup = null;
-		return;
+						});
 	}
 
-	dwPopup.show();
+	rAllPopup.show();
 }
 
 
