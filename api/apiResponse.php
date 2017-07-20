@@ -8,9 +8,11 @@
 		}
 
 
-		public function fail()
+		public function fail($msg = NULL)
 		{
 			$this->result = "fail";
+			if (!is_null() && is_string($msg))
+				$this->msg = $msg;
 
 			echo($this->render());
 			exit();
