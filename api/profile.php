@@ -30,28 +30,35 @@
 		$new_name = $_POST["name"];
 
 		if ($old_name == $db->escape($new_name))
-			$respObj->fail();
+			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
 		if (!$pMod->edit($owner_id, $new_name))
-			$respObj->fail();
+			$respObj->fail(getMessage(ERR_PROFILE_NAME));
+
+		$respObj->msg = getMessage(MSG_PROFILE_NAME);
+		$respObj->data = array("name" => $new_name);
 	}
 	else if ($action == "changepass")
 	{
 		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
-			$respObj->fail();
+			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
 
 		$login = $uMod->getLogin($user_id);
 		if (!$uMod->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
-			$respObj->fail();
+			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
+
+		$respObj->msg = getMessage(MSG_PROFILE_PASSWORD);
 	}
 	else if ($action == "reset")
 	{
 		$accMod = new AccountModel($user_id);
 		if (!$accMod->reset())
-			$this->fail();
+			$this->fail(getMessage(ERR_PROFILE_RESETALL));
 
 		if (!$pMod->reset())
-			$this->fail();
+			$this->fail(getMessage(ERR_PROFILE_RESETALL));
+
+		$respObj->msg = getMessage(MSG_PROFILE_RESETALL);
 	}
 
 	$respObj->ok();
