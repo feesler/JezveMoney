@@ -21,9 +21,9 @@
 
 					<div class="profile_block">
 						<h2>User name</h2>
-						<span><?=$person_name?></span>
+						<span id="namestatic"><?=$person_name?></span>
 <?php	if ($action != "changename") {	?>
-						<div><a href="<?=BASEURL?>profile/changename/">Change</a></div>
+						<div><a href="<?=BASEURL?>profile/changename/" onclick="return showChangeNamePopup();">Change</a></div>
 <?php	}	?>
 					</div>
 
@@ -72,7 +72,7 @@
 					<div>
 						<div class="non_float">
 							<label for="newname">New name</label>
-							<div class="stretch_input std_input"><input id="newname" name="newname" type="text"></div>
+							<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=$person_name?>"></div>
 						</div>
 
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>profile/">cancel</a></div>
@@ -83,6 +83,15 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<div id="changename" style="display: none;">
+<form method="post" action="<?=BASEURL?>profile/changename/" onsubmit="return onChangeNameSubmit(this);">
+	<div class="non_float">
+		<label for="newname">New name</label>
+		<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=$person_name?>"></div>
+	</div>
+</form>
 </div>
 </body>
 </html>

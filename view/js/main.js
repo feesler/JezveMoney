@@ -1,4 +1,5 @@
 var dwPopup = null;		// delete warning popup
+var cnPopup = null;		// change name popup
 var rAccPopup = null;	// reset account popup
 var rAllPopup = null;	// reset all popup
 
@@ -62,6 +63,29 @@ function onRegisterSubmit(frm)
 }
 
 
+// Create and show change name popup
+function showChangeNamePopup()
+{
+	var frm;
+
+	if (!cnPopup)
+	{
+		cnPopup = Popup.create({ id : 'chname_popup',
+								title : 'Change name',
+								content : 'changename',
+								additional : 'center_only' });
+		frm = firstElementChild(ge('changename'));
+
+		cnPopup.setControls({ okBtn : { onclick : onChangeNameSubmit.bind(null, frm) },
+								closeBtn : true });
+	}
+
+	cnPopup.show();
+
+	return false;
+}
+
+
 // Change password submit event handler
 function onChangePassSubmit(frm)
 {
@@ -94,6 +118,43 @@ function onChangePassSubmit(frm)
 }
 
 
+// Change name request callback
+function onChangeNameResult(response)
+{
+	var userbtn, nameEl;
+
+	var res = JSON.parse(response);
+
+	if (!res)
+		return;
+
+	if (res.result == 'ok')
+	{
+		cnPopup.close();
+
+		if (res.msg)
+			createMessage(res.msg, 'msg_success');
+
+		p_name = res.data.name;
+
+		nameEl = ge('namestatic');
+		if (nameEl)
+			nameEl.innerHTML = p_name;
+
+		var userbtn = ge('userbtn');
+		var nameEl = nextElementSibling(firstElementChild(userbtn));
+
+		if (nameEl)
+			nameEl.innerHTML = p_name;
+	}
+	else
+	{
+		if (res.msg)
+			createMessage(res.msg, 'msg_error');
+	}
+}
+
+
 // Change name submit event handler
 function onChangeNameSubmit(frm)
 {
@@ -115,7 +176,11 @@ function onChangeNameSubmit(frm)
 		return false;
 	}
 
-	return true;
+	ajax.post(baseURL + 'api/profile.php?act=changename',
+				urlJoin({ 'name' : newname.value }),
+				onChangeNameResult);
+
+	return false;
 }
 
 

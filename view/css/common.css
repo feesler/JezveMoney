@@ -148,6 +148,7 @@ select
 	padding: 2px 5px;
 	overflow: hidden;
 	border: 2px solid #000000;
+	background-color: #FFFFFF;
 }
 
 
@@ -870,4 +871,26 @@ label
 {
 	border-color: #F02020;
 	background-color: #F02020;
+}
+
+
+/* Custom popup styles */
+.popup > .popup_content.center_only
+{
+	background: none;
+}
+
+
+.popup .close_btn > button > span,
+.box.dragging .close_btn > button > span
+{
+	background-image: url('../img/icons2x.png');
+	background-position: -224px -32px;
+}
+
+
+.popup .close_btn > button:hover > span,
+.box.dragging .close_btn > button:hover > span
+{
+	background-position: -224px -48px;
 }

@@ -1,0 +1,32 @@
+/* Custom popup styles */
+.popup .popup_title
+{
+	font-weight: lighter;
+}
+
+
+.popup > .popup_content.center_only
+{
+	background: none;
+}
+
+
+.popup .close_btn > button,
+.box.dragging .close_btn > button
+{
+	display: block;
+}
+
+.popup .close_btn > button > span,
+.box.dragging .close_btn > button > span
+{
+	background-image: url('../img/icons.png');
+	background-position: -241px -48px;
+}
+
+
+.popup .close_btn > button:hover > span,
+.box.dragging .close_btn > button:hover > span
+{
+	background-position: -224px -48px;
+}
