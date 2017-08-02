@@ -1,5 +1,5 @@
 var accounts = new Selection();
-var dwPopup;		// delete warning popup
+var dwPopup = null;		// delete warning popup
 
 var singleAccDeleteTitle = 'Delete account';
 var multiAccDeleteTitle = 'Delete accounts';
@@ -218,11 +218,8 @@ function onDeletePopup(res)
 {
 	var delform;
 
-	if (!dwPopup)
-		return;
-
-	dwPopup.close();
-	dwPopup = null;
+	if (dwPopup)
+		dwPopup.close();
 
 	if (res)
 	{
@@ -241,25 +238,20 @@ function showDeletePopup()
 	if (accounts.count() == 0)
 		return;
 
-	// check popup already created
-	if (dwPopup)
-		return;
-
-	dwPopup = new Popup();
-	if (!dwPopup)
-		return;
-
 	multi = (accounts.count() > 1);
-	if (!dwPopup.create({ id : 'delete_warning',
-						title : (multi) ? multiAccDeleteTitle : singleAccDeleteTitle,
-						msg : (multi) ? multiAccDeleteMsg : singleAccDeleteMsg,
+
+	// check popup already created
+	if (!dwPopup)
+	{
+		dwPopup = Popup.create({ id : 'delete_warning',
+						content : (multi) ? multiAccDeleteMsg : singleAccDeleteMsg,
 						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 								cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
-						}))
-	{
-		dwPopup = null;
-		return;
+						});
 	}
+
+	dwPopup.setTitle((multi) ? multiAccDeleteTitle : singleAccDeleteTitle);
+	dwPopup.setContent((multi) ? multiAccDeleteMsg : singleAccDeleteMsg);
 
 	dwPopup.show();
 }

@@ -1,4 +1,4 @@
-﻿var dwPopup;
+﻿var dwPopup = null;
 var calendarObj = null;
 var selRange = null;
 
@@ -531,11 +531,8 @@ function onDeletePopup(res)
 {
 	var delform;
 
-	if (!dwPopup)
-		return;
-
-	dwPopup.close();
-	dwPopup = null;
+	if (dwPopup)
+		dwPopup.close();
 
 	if (res)
 	{
@@ -549,27 +546,24 @@ function onDeletePopup(res)
 // Create and show transaction delete warning popup
 function showDeletePopup()
 {
+	var multi;
+
 	if (trSelection.count() == 0)
 		return;
 
-	// check popup already created
-	if (dwPopup)
-		return;
+	multi = (trSelection.count() > 1);
 
-	dwPopup = new Popup();
 	if (!dwPopup)
-		return;
-
-	if (!dwPopup.create({ id : 'delete_warning',
-						title : (trSelection.count() > 1) ? multiTransDeleteTitle : singleTransDeleteTitle,
-						msg : (trSelection.count() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
+	{
+		dwPopup = Popup.create({ id : 'delete_warning',
+						content : (trSelection.count() > 1) ? multiTransDeleteMsg : singleTransDeleteMsg,
 						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 						cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
-						}))
-	{
-		dwPopup = null;
-		return;
+					});
 	}
+
+	dwPopup.setTitle((multi) ? multiTransDeleteTitle : singleTransDeleteTitle);
+	dwPopup.setContent((multi) ? multiTransDeleteMsg : singleTransDeleteMsg);
 
 	dwPopup.show();
 }
