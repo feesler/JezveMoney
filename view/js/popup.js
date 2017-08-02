@@ -76,17 +76,8 @@ var Popup = new (function()
 
 			if (isFunction(params.onclose))
 				this.onCloseHandler = params.onclose;
-			params.content = params.content || null;
-			if (params.content)
-			{
-				messageObj = ge(params.content);
-			}
-			else
-			{
-				messageObj = ce('div', { className : 'popup_message' }, [ ce('div', { innerHTML : params.msg }) ]);
-			}
 
-			if (!messageObj)
+			if (!setModalContent(params.content))
 				return false;
 
 			contentObj = ce('div', { className : 'popup_content' });
@@ -98,26 +89,66 @@ var Popup = new (function()
 				addClass(contentObj, params.additional);
 
 			prependChild(boxObj, messageObj);
-			if (params.title)
-			{
-				titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
-				prependChild(boxObj, titleObj);
-			}
+
+			setModalTitle(params.title);
 
 			setModalControls(params.btn);
 
 			contentObj.appendChild(boxObj);
 
-			if (params.content)
-			{
-				show(messageObj, true);
-			}
+			show(messageObj, true);
 
 			addChilds(popupObj, [backObj, contentObj]);
 
 			document.body.appendChild(popupObj);
 
 			return true;
+		}
+
+
+		function setModalContent(content)
+		{
+			var newMessageObj;
+
+			if (!content)
+				return false;
+
+			if (typeof content == 'string')
+				newMessageObj = ce('div', { className : 'popup_message' }, ce('div', { innerHTML : content }) );
+			else
+				newMessageObj = content;
+
+			if (messageObj)
+			{
+				insertBefore(newMessageObj, messageObj);
+				re(messageObj);
+			}
+
+			messageObj = newMessageObj;
+
+			return true;
+		}
+
+
+		function setModalTitle(titleStr)
+		{
+			if (!titleStr)
+				return;
+
+			if (!titleObj)
+			{
+				titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
+				prependChild(boxObj, titleObj);
+			}
+
+			titleObj.innerHTML = titleStr;
+		}
+
+
+		function removeModalTitle()
+		{
+			re(titleObj);
+			titleObj = null;
 		}
 
 
@@ -266,6 +297,24 @@ var Popup = new (function()
 		this.destroy = function()
 		{
 			destroyModal();
+		}
+
+
+		this.setTitle = function(titleStr)
+		{
+			setModalTitle(titleStr);
+		}
+
+
+		this.removeTitle = function()
+		{
+			removeModalTitle();
+		}
+
+
+		this.setContent = function(content)
+		{
+			return setModalContent(content);
 		}
 
 
