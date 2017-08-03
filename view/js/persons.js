@@ -1,5 +1,5 @@
 var persons = new Selection();
-var dwPopup;		// delete warning popup
+var dwPopup = null;		// delete warning popup
 
 
 // Tile click event handler
@@ -120,11 +120,8 @@ function onDeletePopup(res)
 {
 	var delform;
 
-	if (!dwPopup)
-		return;
-
-	dwPopup.close();
-	dwPopup = null;
+	if (dwPopup)
+		dwPopup.close();
 
 	if (res)
 	{
@@ -143,25 +140,20 @@ function showDeletePopup()
 	if (persons.count() == 0)
 		return;
 
-	// check popup already created
-	if (dwPopup)
-		return;
-
-	dwPopup = new Popup();
-	if (!dwPopup)
-		return;
-
 	multi = (persons.count() > 1);
-	if (!dwPopup.create({ id : 'delete_warning',
-						title : (multi) ? multiPersonsDeleteTitle : singlePersonDeleteTitle,
-						msg : (multi) ? multiPersonsDeleteMsg : singlePersonDeleteMsg,
+
+	// check popup already created
+	if (!dwPopup)
+	{
+		dwPopup = Popup.create({ id : 'delete_warning',
+						content : (multi) ? multiPersonsDeleteMsg : singlePersonDeleteMsg,
 						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 						cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
-						}))
-	{
-		dwPopup = null;
-		return;
+					});
 	}
+
+	dwPopup.setTitle((multi) ? multiPersonsDeleteTitle : singlePersonDeleteTitle);
+	dwPopup.setContent((multi) ? multiPersonsDeleteMsg : singlePersonDeleteMsg);
 
 	dwPopup.show();
 }
