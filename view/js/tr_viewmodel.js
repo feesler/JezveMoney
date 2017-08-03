@@ -671,11 +671,8 @@ function TransactionViewModel()
 	{
 		var delform;
 
-		if (!self.dwPopup)
-			return;
-
-		self.dwPopup.close();
-		self.dwPopup = null;
+		if (self.dwPopup)
+			self.dwPopup.close();
 
 		if (res)
 		{
@@ -689,23 +686,14 @@ function TransactionViewModel()
 	// Create and show transaction delete warning popup
 	function showDeletePopup()
 	{
-		// check popup already created
-		if (self.dwPopup)
-			return;
-
-		self.dwPopup = new Popup();
 		if (!self.dwPopup)
-			return;
-
-		if (!self.dwPopup.create({ id : 'delete_warning',
+		{
+			self.dwPopup = Popup.create({ id : 'delete_warning',
 							title : singleTransDeleteTitle,
 							msg : singleTransDeleteMsg,
 							btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 							cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
-							}))
-		{
-			self.dwPopup = null;
-			return;
+						});
 		}
 
 		self.dwPopup.show();
