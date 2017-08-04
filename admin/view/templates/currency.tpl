@@ -53,7 +53,6 @@
 <label for="curr_sign">sign</label>
 <div class="stretch_input"><input id="curr_sign" name="curr_sign" type="text"></div>
 <div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
-<input class="adm_act_btn" type="submit" value="ok">
 </form>
 </body>
 </html>

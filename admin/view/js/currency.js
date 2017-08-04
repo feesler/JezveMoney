@@ -117,10 +117,11 @@ function initControls()
 	}
 
 	// popup initialization
+	var frm = ge('curr_frm');
 	dwPopup = Popup.create({ id : 'currency_popup',
-							content : ge('curr_frm'),
+							content : frm,
 							additional : 'center_only',
-						 	btn : { closeBtn : true }});
+						 	btn : { okBtn : { onclick : frm.submit.bind(frm) }, closeBtn : true }});
 }
 
 
