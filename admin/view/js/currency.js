@@ -117,21 +117,10 @@ function initControls()
 	}
 
 	// popup initialization
-	dwPopup = new Popup();
-
-	if (!dwPopup.create({ id : 'currency_popup', content : 'curr_content' }))
-	{
-		dwPopup = null;
-		return;
-	}
-}
-
-
-// Hide popup
-function onClosePopup()
-{
-	if (dwPopup)
-		dwPopup.hide();
+	dwPopup = Popup.create({ id : 'currency_popup',
+							content : ge('curr_frm'),
+							additional : 'center_only',
+						 	btn : { closeBtn : true }});
 }
 
 

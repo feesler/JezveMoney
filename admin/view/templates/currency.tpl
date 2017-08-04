@@ -46,22 +46,14 @@
 	</div>
 </div>
 
-<div id="curr_content" class="curr_content" style="display: none;">
-	<div class="box">
-		<form id="curr_frm" method="post" action="<?=BASEURL?>admin/currency.php?act=new">
-		<input id="curr_id" name="curr_id" type="hidden">
-		<label for="curr_name">name</label>
-		<div class="stretch_input"><input id="curr_name" name="curr_name" type="text"></div>
-		<label for="curr_sign">sign</label>
-		<div class="stretch_input"><input id="curr_sign" name="curr_sign" type="text"></div>
-		<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
-		<input class="adm_act_btn" type="submit" value="ok">
-		</form>
-
-		<div class="close_btn">
-			<div class="iconlink small_icon"><button onclick="onClosePopup();" type="button"><span class="icon close_gray"></span></button></div>
-		</div>
-	</div>
-</div>
+<form id="curr_frm" method="post" action="<?=BASEURL?>admin/currency.php?act=new" style="display: none;">
+<input id="curr_id" name="curr_id" type="hidden">
+<label for="curr_name">name</label>
+<div class="stretch_input"><input id="curr_name" name="curr_name" type="text"></div>
+<label for="curr_sign">sign</label>
+<div class="stretch_input"><input id="curr_sign" name="curr_sign" type="text"></div>
+<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">sign before value</label></div>
+<input class="adm_act_btn" type="submit" value="ok">
+</form>
 </body>
 </html>
