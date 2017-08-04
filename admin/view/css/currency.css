@@ -1,22 +1,14 @@
 /* Create/update currency popup */
 .popup > .curr_content
 {
-	position: fixed;
-	width: 100%;
-	top: 50%;
 	margin-top: -120px;
-	color: #000000;
 }
 
 
 .popup > .curr_content > .box
 {
-	background-color: #FFFFFF;
-	margin: 0px auto;
 	max-width: 300px;
 	min-width: 130px;
-	padding: 15px 20px;
-	position: relative;
 }
 
 
@@ -28,10 +20,12 @@
 	padding: 5px 0px;
 }
 
+
 .curr_content .stretch_input
 {
 	border-width: 1px;
 }
+
 
 /* Checkbox wrapper */
 .check_wr
@@ -61,13 +55,4 @@
 	font-size: 16px;
 	height: 20px;
 	line-height: 20px;
-}
-
-
-/* Close popup button */
-.curr_content .close_btn
-{
-	position: absolute;
-	top: 15px;
-	right: 20px;
 }
