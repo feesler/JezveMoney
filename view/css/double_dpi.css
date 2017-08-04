@@ -1,0 +1,71 @@
+/* logo */
+.logo > a > .logo_img
+{
+	background-image: url('../img/logo2x.png');
+}
+
+
+.login_logo > .logo
+{
+	background-image: url('../img/logo_u2x.png');
+}
+
+
+/* user button */
+.user_button .user_icon
+{
+	background-image: url('../img/icons2x.png');
+}
+
+/* icon links */
+.iconlink .icon
+{
+	background-image: url('../img/icons2x.png');
+}
+
+
+.iconlink .icon_white
+{
+	background-image: url('../img/icons2x_white.png');
+}
+
+.icon_btn > span
+{
+	background-image: url('../img/icons2x.png');
+}
+
+
+/* tile icons */
+.tile_icon
+{
+	background-image: url('../img/tileicons2x.png');
+}
+
+
+/* sidebar ellipsis */
+.sidebar_ellipsis
+{
+	background: url('../img/sbellipsis2x.png') no-repeat;
+}
+
+
+/* Widget title glyph arrow */
+.widget_title .glyph
+{
+	background-image: url('../img/icons2x.png');
+}
+
+
+/* Transactions list mode icons */
+.mode_selector .icon
+{
+	background-image: url('../img/icons2x.png');
+}
+
+
+/* Popup close button */
+.popup .close_btn > button > span,
+.box.dragging .close_btn > button > span
+{
+	background-image: url('../img/icons2x.png');
+}

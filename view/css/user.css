@@ -97,7 +97,7 @@
 .login_logo > .logo
 {
 	width: 62px;
-	background: url('../img/logo_u2x.png') no-repeat;
+	background-repeat: no-repeat;
 	background-size: 62px 62px;
 }
 

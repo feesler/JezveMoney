@@ -111,8 +111,8 @@ a.tilelink
 /* tile icons */
 .tile_icon
 {
-	background-image: url('../img/tileicons2x.png');
 	background-size: 100px 600px;
+	background-repeat: no-repeat;
 }
 
 

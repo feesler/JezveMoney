@@ -17,10 +17,10 @@
 	display: block;
 }
 
+
 .popup .close_btn > button > span,
 .box.dragging .close_btn > button > span
 {
-	background-image: url('../img/icons.png');
 	background-position: -241px -48px;
 }
 

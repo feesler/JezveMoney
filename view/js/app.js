@@ -166,10 +166,8 @@ function fixDPI()
 {
 	var headEl, img_css;
 
-	if (getRealDPI() > 1)
-		return;
-
-	img_css = baseURL + 'view/css/single_dpi.css';
+	img_css = baseURL + 'view/css/';
+	img_css += (getRealDPI() > 1) ? 'double_dpi.css' : 'single_dpi.css';
 	headEl = head();
 
 	if (headEl)

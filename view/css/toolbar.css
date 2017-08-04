@@ -45,7 +45,7 @@
 {
 	width: 15px;
 	height: 32px;
-	background: url('../img/sbellipsis2x.png') no-repeat;
+	background-repeat: no-repeat;
 	background-size: 15px 32px;
 	position: absolute;
 	left: 0;
