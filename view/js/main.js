@@ -73,7 +73,7 @@ function showChangeNamePopup()
 	{
 		cnPopup = Popup.create({ id : 'chname_popup',
 								title : 'Change name',
-								content : 'changename',
+								content : ge('changename'),
 								additional : 'center_only' });
 		frm = firstElementChild(ge('changename'));
 
@@ -157,7 +157,7 @@ function showChangePasswordPopup()
 	{
 		cpPopup = Popup.create({ id : 'chname_popup',
 								title : 'Change name',
-								content : 'changepass',
+								content : ge('changepass'),
 								additional : 'center_only' });
 		frm = firstElementChild(ge('changepass'));
 
