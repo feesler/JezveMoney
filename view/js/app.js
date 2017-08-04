@@ -169,7 +169,7 @@ function fixDPI()
 	if (getRealDPI() > 1)
 		return;
 
-	img_css = baseURL + 'view/css/ie8.css';
+	img_css = baseURL + 'view/css/single_dpi.css';
 	headEl = head();
 
 	if (headEl)
