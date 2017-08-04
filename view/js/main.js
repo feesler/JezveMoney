@@ -74,7 +74,7 @@ function showChangeNamePopup()
 		cnPopup = Popup.create({ id : 'chname_popup',
 								title : 'Change name',
 								content : ge('changename'),
-								additional : 'center_only' });
+								additional : 'center_only chname_popup' });
 		frm = firstElementChild(ge('changename'));
 
 		cnPopup.setControls({ okBtn : { onclick : onChangeNameSubmit.bind(null, frm) },
@@ -155,10 +155,10 @@ function showChangePasswordPopup()
 
 	if (!cpPopup)
 	{
-		cpPopup = Popup.create({ id : 'chname_popup',
-								title : 'Change name',
+		cpPopup = Popup.create({ id : 'chpass_popup',
+								title : 'Change password',
 								content : ge('changepass'),
-								additional : 'center_only' });
+								additional : 'center_only chpass_popup' });
 		frm = firstElementChild(ge('changepass'));
 
 		cpPopup.setControls({ okBtn : { onclick : onChangePassSubmit.bind(null, frm) },
