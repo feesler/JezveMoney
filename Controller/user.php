@@ -30,7 +30,7 @@ class UserController extends Controller
 
 		$titleString = "Jezve Money | Log in";
 
-		$cssArr = array("common.css", "user.css", "iconlink.css");
+		$cssArr = array("common.css", "app.css", "user.css", "iconlink.css");
 		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "main.js");
 
 		include("./view/templates/login.tpl");
@@ -79,7 +79,7 @@ wlog("UserController::logout()");
 
 		$titleString = "Jezve Money | Registration";
 
-		$cssArr = array("common.css", "user.css", "iconlink.css");
+		$cssArr = array("common.css", "app.css", "user.css", "iconlink.css");
 		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "main.js");
 
 		include("./view/templates/register.tpl");
