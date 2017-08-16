@@ -268,7 +268,7 @@ function showResetAccountsPopup()
 	{
 		rAccPopup = Popup.create({ id : 'reset_warning',
 						title : 'Reset accounts',
-						msg : resetAccMsg,
+						content : resetAccMsg,
 						btn : { okBtn : { onclick : onAccResetPopup.bind(null, true) },
 								cancelBtn : { onclick : onAccResetPopup.bind(null, false) } }
 						});
@@ -304,7 +304,7 @@ function showResetAllPopup()
 	{
 		rAllPopup = Popup.create({ id : 'reset_warning',
 						title : 'Reset all data',
-						msg : resetAllMsg,
+						content : resetAllMsg,
 						btn : { okBtn : { onclick : onResetAllPopup.bind(null, true) },
 								cancelBtn : { onclick : onResetAllPopup.bind(null, false) } }
 						});
