@@ -12,6 +12,9 @@
 	if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
 		$respObj->fail();
 
+	if ($uMod->getId($_POST["login"]) != 0)
+		$respObj->fail("Username already exist. Please select another one.");
+
 	if (!$uMod->register($_POST["login"], $_POST["password"], $_POST["name"]))
 		$respObj->fail();
 
