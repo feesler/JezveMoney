@@ -690,7 +690,7 @@ function TransactionViewModel()
 		{
 			self.dwPopup = Popup.create({ id : 'delete_warning',
 							title : singleTransDeleteTitle,
-							msg : singleTransDeleteMsg,
+							content : singleTransDeleteMsg,
 							btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
 							cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
 						});
