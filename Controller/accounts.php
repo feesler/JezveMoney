@@ -13,8 +13,9 @@ class AccountsController extends Controller
 
 		$titleString = "Jezve Money | Accounts";
 
-		$cssArr = array("common.css", "app.css", "tiles.css", "popup.css", "iconlink.css", "toolbar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "popup.js", "currency.js", "toolbar.js", "accounts.js");
+		$this->css->libs = array("tiles.css", "popup.css", "iconlink.css", "toolbar.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "popup.js", "currency.js", "toolbar.js", "accounts.js");
 
 		include("./view/templates/accounts.tpl");
 	}
@@ -51,8 +52,9 @@ class AccountsController extends Controller
 		$headString = "New account";
 		$titleString .= $headString;
 
-		$cssArr = array("common.css", "app.css", "iconlink.css", "ddlist.css", "tiles.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
+		$this->css->libs = array("iconlink.css", "ddlist.css", "tiles.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
 
 		include("./view/templates/account.tpl");
 	}
@@ -96,10 +98,9 @@ class AccountsController extends Controller
 		$headString = ($action == "new") ? "New account" : "Edit account";
 		$titleString .= $headString;
 
-		$cssArr = array("common.css", "app.css", "iconlink.css", "ddlist.css", "tiles.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
-		$cssArr[] = "popup.css";
-		$jsArr[] = "popup.js";
+		$this->css->libs = array("iconlink.css", "ddlist.css", "tiles.css", "popup.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "popup.js", "accounts.js");
 
 		include("./view/templates/account.tpl");
 	}

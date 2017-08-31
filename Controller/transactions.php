@@ -198,8 +198,11 @@ class TransactionsController extends Controller
 
 		$titleString = "Jezve Money | Transactions";
 
-		$cssArr = array("common.css", "app.css", "tiles.css", "iconlink.css", "popup.css", "calendar.css", "ddlist.css", "transaction.css", "trlist.css", "toolbar.css");
-		$jsArr = array("es5-shim.min.js", "json2.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "ajax.js", "calendar.js", "popup.js", "dragndrop.js", "sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
+		$this->css->libs = array("tiles.css", "iconlink.css", "popup.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
+		$this->css->page[] = "transaction.css";
+		$this->buildCSS();
+		array_push($this->jsArr, "json2.js", "selection.js", "currency.js", "account.js", "calendar.js", "popup.js", "dragndrop.js",
+									"sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
 
 		include("./view/templates/transactions.tpl");
 	}
@@ -436,8 +439,10 @@ class TransactionsController extends Controller
 			$headString = "New transaction";
 		$titleString .= $headString;
 
-		$cssArr = array("common.css", "app.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
+		$this->css->libs = array("tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
+		$this->css->page[] = "transaction.css";
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
 
 		include("./view/templates/transaction.tpl");
 	}
@@ -660,10 +665,10 @@ class TransactionsController extends Controller
 			$headString = "Edit transaction";
 		$titleString .= $headString;
 
-		$cssArr = array("common.css", "app.css", "transaction.css", "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
-		$cssArr[] = "popup.css";
-		$jsArr[] = "popup.js";
+		$this->css->libs = array("tiles.css", "iconlink.css", "ddlist.css", "calendar.css", "popup.css");
+		$this->css->page[] = "transaction.css";
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "popup.js", "tr_model.js", "tr_viewmodel.js");
 
 		include("./view/templates/transaction.tpl");
 	}

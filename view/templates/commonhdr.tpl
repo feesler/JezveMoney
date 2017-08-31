@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0">
 <link rel="shortcut icon" href="<?=BASEURL?>favicon.ico" type="image/x-icon">
 <title><?=$titleString?></title>
-<?php	foreach($cssArr as $cssFile) {	?>
+<?php	foreach($this->cssArr as $cssFile) {	?>
 <link rel="stylesheet" type="text/css" href="<?=BASEURL?><?=auto_version("view/css/".$cssFile)?>">
 <?php	}	?>
-<?php	foreach($jsArr as $jsFile) {	?>
+<?php	foreach($this->jsArr as $jsFile) {	?>
 <script type="text/javascript" src="<?=BASEURL?><?=auto_version("view/js/".$jsFile)?>"></script>
 <?php	}	?>
 <script>

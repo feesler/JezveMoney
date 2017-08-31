@@ -97,8 +97,9 @@ class MainController extends Controller
 
 		$titleString = "Jezve Money";
 
-		$cssArr = array("common.css", "app.css", "iconlink.css", "tiles.css", "trlist.css", "charts.css", "statistics.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "main.js", "raphael.min.js", "charts.js");
+		$this->css->libs = array("iconlink.css", "tiles.css", "trlist.css", "charts.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "main.js", "raphael.min.js", "charts.js");
 
 		include("./view/templates/main.tpl");
 	}

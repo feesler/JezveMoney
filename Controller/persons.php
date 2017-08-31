@@ -12,8 +12,9 @@ class PersonsController extends Controller
 
 		$titleString = "Jezve Money | Persons";
 
-		$cssArr = array("common.css", "app.css", "tiles.css", "popup.css", "iconlink.css", "toolbar.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "popup.js", "toolbar.js", "persons.js");
+		$this->css->libs = array("tiles.css", "popup.css", "iconlink.css", "toolbar.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "popup.js", "toolbar.js", "persons.js");
 
 		include("./view/templates/persons.tpl");
 	}
@@ -47,8 +48,9 @@ class PersonsController extends Controller
 
 		$submitHandler = "return onNewPersonSubmit(this);";
 
-		$cssArr = array("common.css", "app.css", "iconlink.css", "tiles.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "persons.js");
+		$this->css->libs = array("iconlink.css", "tiles.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "persons.js");
 
 		include("./view/templates/person.tpl");
 	}
@@ -85,11 +87,9 @@ class PersonsController extends Controller
 
 		$submitHandler = "return onEditPersonSubmit(this);";
 
-		$cssArr = array("common.css", "app.css", "iconlink.css", "tiles.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "persons.js");
-
-		$cssArr[] = "popup.css";
-		$jsArr[] = "popup.js";
+		$this->css->libs = array("iconlink.css", "tiles.css", "popup.css");
+		$this->buildCSS();
+		array_push($this->jsArr, "popup.js", "persons.js");
 
 		include("./view/templates/person.tpl");
 	}

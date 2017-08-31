@@ -119,8 +119,10 @@ class StatisticsController extends Controller
 
 		$titleString = "Jezve Money | Statistics";
 
-		$cssArr = array("common.css", "app.css", "iconlink.css", "ddlist.css", "popup.css", "calendar.css", "charts.css", "statistics.css");
-		$jsArr = array("es5-shim.min.js", "common.js", "app.js", "selection.js", "currency.js", "calendar.js", "ddlist.js", "raphael.min.js", "charts.js", "statistics.js");
+		$this->css->libs = array("iconlink.css", "ddlist.css", "popup.css", "calendar.css", "charts.css");
+		$this->css->page[] = "statistics.css";
+		$this->buildCSS();
+		array_push($this->jsArr, "selection.js", "currency.js", "calendar.js", "ddlist.js", "raphael.min.js", "charts.js", "statistics.js");
 
 		include("./view/templates/statistics.tpl");
 	}

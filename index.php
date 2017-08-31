@@ -58,5 +58,7 @@
 	$actionParam = array_shift($routeParts);
 	$controller->actionParam = $actionParam;
 
+	$controller->initDefResources();
+
 	if (method_exists($controller, $action))
 		$controller->$action();
