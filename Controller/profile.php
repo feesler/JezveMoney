@@ -56,7 +56,7 @@ class ProfileController extends Controller
 			$this->fail($defMsg);
 
 		$new_name = $_POST["newname"];
-		if (is_null($new_name) || $new_name == "")
+		if (is_empty($new_name))
 			$this->fail($defMsg);
 
 		$owner_id = $uMod->getOwner($user_id);
