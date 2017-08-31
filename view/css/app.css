@@ -70,12 +70,6 @@ html, body
 }
 
 
-div
-{
-	border: 0px none;
-}
-
-
 /* headings */
 h1
 {
@@ -526,12 +520,6 @@ input[type="text"], input[type="password"], select
 }
 
 
-.stretch_input > .currency_block
-{
-	padding: 0;
-}
-
-
 h2
 {
 	font-size: 20px;
@@ -570,18 +558,6 @@ label
 
 
 /* buttons */
-.std_btn
-{
-	height: 34px;
-	font-size: 16px;
-	font-weight: normal;
-	padding: 2px 5px;
-	background-color: #FFFFFF;
-	color: #000000;
-	border: 2px solid #000000;
-}
-
-
 .btn,
 .btn:visited
 {
@@ -743,22 +719,6 @@ label
 	text-align: center;
 	height: 30px;
 	line-height: 30px;
-}
-
-
-.rcurr_sel
-{
-	position: absolute;
-	opacity: 0;
-	top: 0px;
-	margin: 8px 0px;
-}
-
-
-.rcurr_sel > div > select
-{
-	width: 34px;
-	height: 34px;
 }
 
 

@@ -1,40 +1,7 @@
-/* select currency button */
-.curr_btn
-{
-	padding: 0px 5px;
-}
-
-
-.curr_btn > span
-{
-	font-size: 12px;
-}
-
-
 /* result balance button */
 .resbal_btn
 {
 	font-size: 16px;
-}
-
-
-.inv_result
-{
-	color: red;
-}
-
-
-.acc_sel
-{
-	position: absolute;
-	opacity: 0;
-}
-
-
-.acc_sel > div > select
-{
-	width: 100px;
-	height: 100px;
 }
 
 
@@ -137,34 +104,6 @@
 }
 
 
-/* person name input control */
-.debt_input
-{
-	padding: 8px 5px;
-	overflow: hidden;
-}
-
-
-.person_tile
-{
-	clear: both;
-	height: 118px;
-}
-
-
-.person_icon
-{
-	height: 50px;
-	clear: both;
-}
-
-
-.person_input
-{
-	clear: both;
-}
-
-
 /* transactions page filer */
 .tr_filter
 {
@@ -189,18 +128,3 @@
 {
 	float : left;
 }
-
-
-.search_input
-{
-	float: right;
-	margin: 0px 0px 0px 15px;
-}
-
-
-.search_input > div > input[type="text"]
-{
-	height: 26px;
-	border-width: 2px 0px 2px 2px;
-}
-
