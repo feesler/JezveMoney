@@ -138,7 +138,8 @@
 
 
 /* flat square button with icon */
-.icon_btn
+.icon_btn,
+.btn.icon_btn
 {
 	width: 34px;
 	height: 34px;
@@ -150,7 +151,8 @@
 }
 
 
-.icon_btn > span
+.icon_btn > span,
+.btn.icon_btn > span
 {
 	width: 32px;
 	height: 32px;
