@@ -478,7 +478,7 @@ class TransactionsController extends Controller
 		if ($trans_type == DEBT)
 		{
 			$debtMod = new DebtModel($user_id);
-			$personMod = new PersonModel($user_id);
+			$pMod = new PersonModel($user_id);
 		}
 
 		$acc_count = $accMod->getCount();
@@ -573,7 +573,7 @@ class TransactionsController extends Controller
 			$give = (!is_null($src) && $src["owner"] != $user_owner);
 
 			$person_id = ($give) ? $src["owner"] : $dest["owner"];
-			$person_name = $person->getName($person_id);
+			$person_name = $pMod->getName($person_id);
 
 			$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
 			$person_acc = $accMod->getProperties($person_acc_id);
@@ -610,7 +610,7 @@ class TransactionsController extends Controller
 		$accMod = new AccountModel($user_id);
 		$accArr = $accMod->getArray();
 		if ($trans_type == DEBT)
-			$persArr = $person->getArray();
+			$persArr = $pMod->getArray();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
