@@ -204,7 +204,17 @@ class UserModel extends CachedTable
 		if (!$u_id || !$o_id)
 			return FALSE;
 
-		if (!$db->updateQ("users", array("owner_id"), array($owner_id), "id=".qnull($u_id)))
+		// check owner is already the same
+		$cur_owner = $this->getOwner($u_id);
+		if ($cur_owner == $o_id)
+			return TRUE;
+
+		// check specified person not own another user
+		$resArr = $db->selectQ("id", "users", "owner_id=".$o_id);
+		if (count($resArr) > 0)
+			return FALSE;
+
+		if (!$db->updateQ("users", array("owner_id"), array($o_id), "id=".qnull($u_id)))
 			return FALSE;
 
 		$this->cleanCache();
