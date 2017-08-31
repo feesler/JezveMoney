@@ -63,6 +63,12 @@
 }
 
 
+.login_layer > .cont > .box > .right_side
+{
+	height: 276px;
+}
+
+
 .login_layer > .cont > .box > .left_side
 {
 	width: 48%;
