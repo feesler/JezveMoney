@@ -16,7 +16,7 @@
 
 	$titleString = "Admin panel | API test";
 
-	$cssMainArr = array("common.css", "iconlink.css");
+	$cssMainArr = array("common.css", "iconlink.css", "app.css");
 	$cssLocalArr = array("admin.css", "apitest.css");
 	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "ajax.js");
 	$jsLocalArr = array("apitest.js");

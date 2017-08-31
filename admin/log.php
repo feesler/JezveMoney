@@ -24,7 +24,7 @@
 
 	$titleString = "Admin panel | Log";
 
-	$cssMainArr = array("common.css", "iconlink.css");
+	$cssMainArr = array("common.css", "iconlink.css", "app.css");
 	$cssLocalArr = array("admin.css");
 	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js");
 	$jsLocalArr = array();

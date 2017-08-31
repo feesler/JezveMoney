@@ -13,7 +13,7 @@
 
 	$titleString = "Admin panel";
 
-	$cssMainArr = array("common.css");
+	$cssMainArr = array("common.css", "app.css");
 	$cssLocalArr = array("admin.css");
 	$jsMainArr = array();
 	$jsLocalArr = array();
