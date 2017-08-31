@@ -1,3 +1,849 @@
+/* Fonts */
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 200;
+	src: local("Segoe UI Light");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 300;
+	src: local("Segoe UI Semilight");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 400;
+	src: local("Segoe UI");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 600;
+	src: local("Segoe UI Semibold");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-weight: 700;
+	src: local("Segoe UI Bold");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-style: italic;
+	font-weight: 400;
+	src: local("Segoe UI Italic");
+}
+
+
+@font-face
+{
+	font-family: "Segoe UI";
+	font-style: italic;
+	font-weight: 700;
+	src: local("Segoe UI Bold Italic");
+}
+
+
+*, body
+{
+	font-family: "SF Pro Display", "SF Pro Icons", "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
+}
+
+
+html, body
+{
+	width: 100%;
+	height: 100%;
+}
+
+
+div
+{
+	border: 0px none;
+}
+
+
+/* headings */
+h1
+{
+	font-weight: 200;
+	font-size: 32px;
+	font-weight: normal;
+	margin: 0px 0px 10px 0px;
+}
+
+
+/* link style */
+a, a:visited
+{
+	color: #0072C6;
+}
+
+
+a:hover
+{
+	color: #1E82CC;
+}
+
+
+/* single line block */
+.non_float
+{
+	clear: both;
+	max-width: 300px;
+}
+
+
+/* right float block */
+.right_float
+{
+	float: right;
+}
+
+
+/* Input controls */
+input[type="text"], input[type="password"]
+{
+	font-size: 16px;
+	font-weight: normal;
+	padding: 2px 5px;
+	height: 22px;
+	display: inline-block;
+	float: left;
+	border: 2px solid;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+
+select
+{
+	padding: 2px 5px;
+	height: 34px;
+	margin: 0;
+	border: 2px solid;
+}
+
+
+/* wrap for input with 100% width of parent */
+.stretch_input
+{
+	padding: 2px 5px;
+	overflow: hidden;
+	border: 2px solid #000000;
+	background-color: #FFFFFF;
+}
+
+
+.stretch_input > input[type="text"],
+.stretch_input > input[type="password"]
+{
+	width: 100%;
+	height: 26px;
+	line-height: 26px;
+	margin: 0;
+	padding: 0;
+	border: 0 none;
+}
+
+
+.stretch_input > select
+{
+	width: 100%;
+	margin: 0;
+}
+
+
+/* text input controls with button on the right */
+.stretch_input.rbtn_input
+{
+	border-width: 2px 0px 2px 2px;
+}
+
+
+/* standard for text input controls */
+.std_input
+{
+	margin: 8px 0px;
+}
+
+
+/* Input controls color */
+input[type="text"], input[type="password"], select
+{
+	border-color: #000000;
+	background-color: #FFFFFF;
+	color: #000000;
+}
+
+
+/* Centered block */
+.centered
+{
+	margin: 0 auto;
+	max-width: 824px;
+	min-width: 200px;
+}
+
+
+/* Main layout */
+.page
+{
+	display: table;
+	border-collapse: collapse;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	min-height: 100%;
+}
+
+
+.page_wrapper
+{
+	display: table-cell;
+	width: 100%;
+	min-height: 100%;
+	height: 100%;
+	position: static;
+}
+
+
+/* Main content */
+.container
+{
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	min-height: 100%;
+	height: 100%;
+}
+
+
+.content
+{
+	display: table-cell;
+	min-height: 100%;
+	height: 100%;
+}
+
+
+.content_wrap
+{
+	padding: 50px 12px;
+}
+
+
+
+/* header */
+.header
+{
+	height: 50px;
+	background-color: #404040;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 10;
+}
+
+
+.header > div > div
+{
+	height: 50px;
+}
+
+
+.header > div > div > a
+{
+	display: inline-block;
+	height: 50px;
+	padding: 0px 12px 0px 0px;
+}
+
+
+.header > div > div > a > span,
+.header > div > div > button > span
+{
+	line-height: 50px;
+	color: #FFFFFF;
+	white-space: nowrap;
+}
+
+
+/* logo block */
+.logo
+{
+	float: left;
+}
+
+
+.logo > a
+{
+	text-decoration: none;
+}
+
+
+.logo > a:hover
+{
+	background-color: #606060;
+}
+
+
+.logo > a > .logo_img
+{
+	background-repeat: no-repeat;
+	background-size: 50px 50px;
+	width: 50px;
+	height: 50px;
+	display: inline-block;
+	float: left;
+}
+
+
+.logo > a > span
+{
+	height: 20px;
+	font-size: 20px;
+	font-weight: normal;
+}
+
+
+/* user block */
+.userblock
+{
+	float: right;
+	position: relative;
+}
+
+
+.user_button
+{
+	border: 0 none;
+	background-color: #404040;
+	padding: 0px 12px 0px 3px;
+}
+
+
+.user_button:hover
+{
+	background-color: #606060;
+}
+
+
+.user_button .user_title
+{
+	height: 16px;
+	font-size: 16px;
+	font-weight: normal;
+	color: #FFFFFF;
+	text-transform: none;
+}
+
+
+.user_button .user_icon
+{
+	width: 32px;
+	height: 32px;
+	overflow: hidden;
+	float: left;
+	margin: 9px 0px;
+	background-position: -224px 0px;
+	background-size: 320px 64px;
+}
+
+
+/* drop down user menu */
+.usermenu
+{
+	float: right;
+	display: inline-block;
+	position: absolute;
+	top: 50px;
+	right: 0px;
+	z-index: 10;
+}
+
+
+.usermenu > ul
+{
+	list-style-image: none;
+	list-style-type: none;
+	background-color: #404040;
+	margin: 0;
+	padding: 0;
+}
+
+
+.usermenu > ul > li
+{
+	color: #FFFFFF;
+	list-style-image: none;
+	border: 0 none;
+	padding: 10px 30px;
+}
+
+
+.usermenu > ul > li:hover
+{
+	background-color: #808080;
+}
+
+
+.usermenu > ul > li > a,
+.usermenu > ul > li > a:hover
+{
+	text-decoration: none;
+	color: #FFFFFF;
+}
+
+
+.widget
+{
+	display: inline-block;
+	float: left;
+	min-width: 200px;
+	margin: 0px 20px 20px 0px;
+}
+
+
+@media screen and (max-width: 500px)
+{
+
+.widget
+{
+	float: none;
+	display: block;
+	margin: 0px;
+	padding: 0px 0px 20px 0px;
+	overflow: hidden;
+}
+
+
+.widget_title
+{
+	clear: both;
+}
+
+}
+
+
+.break_widget
+{
+	clear: left;
+}
+
+
+/* title of main page widget */
+.widget_title
+{
+	display: block;
+	float: none;
+	clear: both;
+	height: 32px;
+	margin: 10px 0px;
+}
+
+
+.widget_title > a,
+.widget_title > a:hover
+{
+	height: 32px;
+	color: #000000;
+	text-decoration: none;
+}
+
+
+.widget_title span
+{
+	font-weight: 200;
+	font-size: 26px;
+	line-height: 32px;
+	float: left;
+	display: inline-block;
+}
+
+
+.widget_title .glyph
+{
+	width: 32px;
+	height: 32px;
+	background-size: 320px 64px;
+	background-repeat: no-repeat;
+	float: left;
+	display: inline-block;
+	background-position: -288px 3px;
+}
+
+
+/* accounts page*/
+.heading
+{
+	clear: both;
+	padding: 10px 0px;
+	height: 32px;
+}
+
+
+.heading > h1
+{
+	font-size: 26px;
+	font-weight: 200;
+	line-height: 32px;
+	height: 32px;
+	padding: 0;
+	margin: 0;
+	display: table-cell;
+	vertical-align: middle;
+	float: left;
+}
+
+
+.heading > .iconlink
+{
+	display: inline-block;
+	float: left;
+	clear: right;
+	margin: 0px 0px 0px 30px;
+}
+
+
+.summ_text
+{
+	text-align: right;
+}
+
+
+.stretch_input > .currency_block
+{
+	padding: 0;
+}
+
+
+h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	padding: 2px 0px;
+}
+
+
+label
+{
+	width: 150px;
+	height: 20px;
+	line-height: 20px;
+	font-size: 16px;
+}
+
+
+.std_margin
+{
+	margin: 9px 0px;
+}
+
+
+.acc_controls
+{
+	padding: 5px 0px;
+	clear: both;
+}
+
+
+/* block aligned to the left rule by margins */
+.align_block
+{
+	margin: 0px 5px;
+}
+
+
+/* buttons */
+.std_btn
+{
+	height: 34px;
+	font-size: 16px;
+	font-weight: normal;
+	padding: 2px 5px;
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 2px solid #000000;
+}
+
+
+.btn,
+.btn:visited
+{
+	font-family: "SF Pro Display", "SF Pro Icons", "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
+	font-weight: normal;
+	font-size: 16px;
+	display: inline-block;
+	color: #FFFFFF;
+	text-decoration: none;
+	border: 0 none;
+	padding: 4px 22px;
+	margin-right: 15px;
+	vertical-align: middle;
+	overflow: visible;
+	border-radius: 0;
+}
+
+
+.ok_btn,
+.ok_btn:visited
+{
+	background-color: #0072C6;
+}
+
+
+.ok_btn:hover
+{
+	background-color: #1E82CC;
+}
+
+
+.cancel_btn,
+.cancel_btn:visited
+{
+	background-color: #B0B0B0;
+}
+
+
+.cancel_btn:hover
+{
+	background-color: #C0C0C0;
+}
+
+
+/* sub menu header */
+.subHeader
+{
+	padding: 10px 0px;
+	font-size: 16px;
+	clear: both;
+}
+
+
+.subHeader > span
+{
+	padding: 0 20px 0 0;
+}
+
+
+/* dashed underline button */
+.dashed_btn
+{
+	border: 0 none;
+	clear: both;
+	cursor: pointer;
+	background-color: #FFFFFF;
+}
+
+
+.dashed_btn > span
+{
+	color: #0072C6;
+	padding: 0;
+	margin-top: -10px;
+	border-top: 0 none;
+	border-right: 0 none;
+	border-left: 0 none;
+	border-bottom: 1px dashed #0072C6;	/* TODO : try png background */
+}
+
+
+.dashed_btn:hover > span
+{
+	border-bottom: 1px solid #0072C6;
+}
+
+
+/* Information tiles */
+.info_tiles
+{
+	min-width: 220px;
+	max-width: 300px;
+}
+
+
+.info_tile
+{
+	float: left;
+	width: 80px;
+	height: 80px;
+	margin: 0px 10px 10px 0px;
+	padding: 5px;
+	background-color: #D0D0D0;
+	position: relative;
+	overflow: hidden;
+}
+
+
+.info_title
+{
+	font-size: 16px;
+	bottom: 5px;
+	position: absolute;
+}
+
+
+.info_subtitle
+{
+	font-size: 12px;
+	top: 5px;
+	right: 5px;
+	position: absolute;
+}
+
+
+/* currency button */
+.curr_container
+{
+	width: 34px;
+	height: 34px;
+	float: right;
+	position: relative;
+}
+
+
+.rcurr_btn
+{
+	width: 30px;
+	height: 30px;
+	margin: 0;
+	padding: 2px;
+	color: #FFFFFF;
+	background-color: #0072C6;
+	cursor: pointer;
+	position: relative;
+}
+
+
+.inact_rbtn
+{
+	color: #000000;
+	background-color: #FFFFFF;
+	cursor: default;
+}
+
+
+.rcurr_btn > div
+{
+	text-align: center;
+	height: 30px;
+	line-height: 30px;
+}
+
+
+.rcurr_sel
+{
+	position: absolute;
+	opacity: 0;
+	top: 0px;
+	margin: 8px 0px;
+}
+
+
+.rcurr_sel > div > select
+{
+	width: 34px;
+	height: 34px;
+}
+
+
+/* main page latest transactions widget */
+.latest_widget
+{
+	max-width: 350px;
+}
+
+
+/* Messages */
+.popup > .popup_content.msg
+{
+	background: none;
+	top: 55px;
+	margin: 0;
+}
+
+
+.popup > .popup_content.msg > .box
+{
+	padding: 0;
+	max-width: 824px;
+	background: none;
+}
+
+
+.popup .msg .close_btn > button > span
+{
+	background-position: -224px -32px;
+}
+
+
+.popup .msg .close_btn > button:hover > span
+{
+	background-position: -224px -48px;
+}
+
+
+.msg > .box > .popup_message
+{
+	max-width: 300px;
+	min-width: 200px;
+	color: #FFFFFF;
+	position: absolute;
+	right: 0;
+	padding: 15px 30px 15px 20px;
+}
+
+
+.msg.msg_success > .box > .popup_message
+{
+	border-color: #20D040;
+	background-color: #40D060;
+}
+
+
+.msg.msg_error > .box > .popup_message
+{
+	border-color: #F02020;
+	background-color: #F02020;
+}
+
+
+/* Custom popup styles */
+.popup > .popup_content.center_only
+{
+	background: none;
+}
+
+
+.popup .close_btn > button > span,
+.box.dragging .close_btn > button > span
+{
+	background-position: -224px -32px;
+}
+
+
+.popup .close_btn > button:hover > span,
+.box.dragging .close_btn > button:hover > span
+{
+	background-position: -224px -48px;
+}
+
+
 /* Custom popup styles */
 .popup .popup_title
 {
