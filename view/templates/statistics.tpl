@@ -109,7 +109,7 @@
 						</div>
 
 						<div id="chart" class="charts">
-<?php	if (!$resObj || !is_array($resObj->values) || !count($resObj->values)) {	?>
+<?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
 						<span>No results found.</span>
 <?php	}		?>
 						</div>
