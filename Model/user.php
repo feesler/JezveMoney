@@ -3,8 +3,6 @@
 class UserModel extends CachedTable
 {
 	static private $dcache = NULL;
-	static private $path = "/money/";
-	static private $domain = "jezve.net";
 
 
 	// Class constructor
@@ -109,8 +107,8 @@ class UserModel extends CachedTable
 	{
 		$expTime = time() + 31536000;	// year after now
 
-		setcookie("login", $login, $expTime, self::$path, self::$domain);
-		setcookie("passhash", $passhash, $expTime, self::$path, self::$domain);
+		setcookie("login", $login, $expTime, APPPATH, APPHOST);
+		setcookie("passhash", $passhash, $expTime, APPPATH, APPHOST);
 	}
 
 
@@ -119,8 +117,8 @@ class UserModel extends CachedTable
 	{
 		$expTime = time() - 3600;	// hour before now
 
-		setcookie("login", "", $expTime, self::$path, self::$domain);
-		setcookie("passhash", "", $expTime, self::$path, self::$domain);
+		setcookie("login", "", $expTime, APPPATH, APPHOST);
+		setcookie("passhash", "", $expTime, APPPATH, APPHOST);
 	}
 
 
