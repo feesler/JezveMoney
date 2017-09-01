@@ -107,8 +107,8 @@ class UserModel extends CachedTable
 	{
 		$expTime = time() + 31536000;	// year after now
 
-		setcookie("login", $login, $expTime, APPPATH, APPHOST);
-		setcookie("passhash", $passhash, $expTime, APPPATH, APPHOST);
+		setcookie("login", $login, $expTime, APPPATH, APPHOST, isSecure() ? 1 : 0);
+		setcookie("passhash", $passhash, $expTime, APPPATH, APPHOST, isSecure() ? 1 : 0);
 	}
 
 
@@ -117,8 +117,8 @@ class UserModel extends CachedTable
 	{
 		$expTime = time() - 3600;	// hour before now
 
-		setcookie("login", "", $expTime, APPPATH, APPHOST);
-		setcookie("passhash", "", $expTime, APPPATH, APPHOST);
+		setcookie("login", "", $expTime, APPPATH, APPHOST, isSecure() ? 1 : 0);
+		setcookie("passhash", "", $expTime, APPPATH, APPHOST, isSecure() ? 1 : 0);
 	}
 
 
