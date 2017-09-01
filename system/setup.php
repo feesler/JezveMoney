@@ -1,6 +1,4 @@
 <?php
-	$dev = TRUE;
-
 	// Prepare root directories
 	$pparts = pathinfo(__FILE__);
 	$path_length = strrpos($pparts["dirname"], "/");
@@ -12,6 +10,9 @@
 	{
 		return (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || $_SERVER["SERVER_PORT"] == 443;
 	}
+
+	$ruri = $_SERVER["REQUEST_URI"];
+	$userAgent = $_SERVER["HTTP_USER_AGENT"];
 
 	// Check development or release environment
 	$productionHost = "jezvemoney.ru";
@@ -27,8 +28,15 @@
  	define("APPHOST", $_SERVER["HTTP_HOST"], TRUE);
 	if (strcmp(APPHOST, $productionHost) == 0)
 	{
-		define("APPPROT", isSecure() ? "https://" : "http://", TRUE);
+		define("APPPROT", "https://", TRUE);
 		define("APPPATH", "/", TRUE);
+
+		if (!isSecure())
+		{
+			header("HTTP/1.1 302 Found", TRUE, 302);
+			header("Location: ".APPPROT.APPHOST.$ruri);
+			exit;
+		}
 	}
 	else if (strcmp(APPHOST, $devHost) == 0)
 	{
@@ -37,9 +45,6 @@
 	}
 
 	define("BASEURL", APPPROT.APPHOST.APPPATH, TRUE);
-
-	$ruri = $_SERVER["REQUEST_URI"];
-	$userAgent = $_SERVER["HTTP_USER_AGENT"];
 
 	if (!isset($noLogs))
 	{
