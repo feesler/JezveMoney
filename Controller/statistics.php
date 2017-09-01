@@ -27,7 +27,7 @@ class StatisticsController extends Controller
 			if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"]))
 			{
 				$curr_id = intval($_GET["curr_id"]);
-				if (!$curr->is_exist($curr_id))
+				if (!$currMod->is_exist($curr_id))
 					$this->fail();
 			}
 			else		// try to get first currency
