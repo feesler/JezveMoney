@@ -92,7 +92,7 @@ function createRow()
 			ce('input', { id : 'da_' + (curTrRows + 1), type : 'text', name : 'dest_amount[]', disabled : true, placeholder : 'Destination amount' }),
 			ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' }),
 			ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' }),
-			ce('input', { id : 'del_' + (curTrRows + 1), type : 'button',
+			ce('input', { id : 'del_' + (curTrRows + 1), className : 'btn ok_btn', type : 'button',
 							onclick : delRow.bind(null, curTrRows + 1),
 							value : '-' })
 				]);

@@ -5,6 +5,12 @@
 	padding: 10px;
 }
 
+#acc_id,
+.controls
+{
+	margin: 10px;
+}
+
 .tr_row > select,
 .tr_row input
 {
@@ -15,9 +21,16 @@
 	margin: 0px 5px 0px 0px;
 }
 
+.tr_row > select[disabled],
+.tr_row input[disabled]
+{
+	border-color: #BBBBBB;
+}
+
 .tr_row input[type=button]
 {
 	width: 30px;
+	border: 0 none;
 }
 </style>
 <script>
@@ -37,11 +50,9 @@ onReady(function()
 <?php }	?>
 	</select>
 	<div id="rowsContainer"></div>
-	<div>
-		<input type="button" onclick="createRow()" value="+">
-	</div>
-	<div>
-		<input type="submit" value="Commit">
+	<div class="controls">
+		<div class="std_margin"><input class="btn ok_btn" type="button" onclick="createRow()" value="+"></div>
+		<div><input class="btn ok_btn" type="submit" value="Commit"></div>
 	</div>
 </form>
 </body>
