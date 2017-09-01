@@ -611,11 +611,11 @@ function DDList()
 
 
 	this.onSelectBlur = function()
-		{
+	{
 		if (!this.isMobile || !this.changecb || !this.changed)
 			return;
 
-			this.changecb.call(this, this.selection.selected);
+		this.changecb.call(this, this.selection.selected);
 		this.changed = false;
 	}
 
