@@ -13,7 +13,8 @@
 							"statistics" => "StatisticsController",
 							"login" => $userCont,
 							"logout" => $userCont,
-							"register" => $userCont);
+							"register" => $userCont,
+							"fastcommit" => "FastCommitController",);
 
 	$actionsMap = array("new" => "create",
 						"edit" => "update");

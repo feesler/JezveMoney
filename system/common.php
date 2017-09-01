@@ -23,6 +23,7 @@
 					"UserController" => "Controller/user.php",
 					"ProfileController" => "Controller/profile.php",
 					"StatisticsController" => "Controller/statistics.php",
+					"FastCommitController" => "Controller/fastcommit.php",
 					"CurrencyController" => "admin/Controller/currency.php",
 					"AccountModel" => "Model/account.php",
 					"CurrencyModel" => "Model/currency.php",

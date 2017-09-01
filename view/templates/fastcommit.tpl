@@ -279,7 +279,7 @@ onReady(function()
 </script>
 </head>
 <body>
-<form method="post" action="fastcommit.php" onsubmit="onSubmit()">
+<form method="post" action="<?=BASEURL?>fastcommit/" onsubmit="onSubmit()">
 	<select id="acc_id" name="acc_id" onchange="onMainAccChange()">
 <?php foreach($accArr as $accObj) {	?>
 		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>

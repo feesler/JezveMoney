@@ -1,14 +1,36 @@
 <?php
-	require_once("./system/setup.php");
 
-	checkUser();
-
-	header("Content-type: text/html; charset=utf-8");
-
-	$accMod = new AccountModel($user_id, FALSE);
-
-	if ($_SERVER["REQUEST_METHOD"] == "POST")
+class FastCommitController extends Controller
+{
+	public function index()
 	{
+		global $user_id;
+
+		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		{
+			$this->commit();
+			return;
+		}
+
+		$accMod = new AccountModel($user_id, FALSE);
+		$accArr = $accMod->getArray();
+
+		$this->buildCSS();
+
+		include("./view/templates/fastcommit.tpl");
+	}
+
+
+	public function commit()
+	{
+		global $user_id;
+
+		if ($_SERVER["REQUEST_METHOD"] != "POST")
+			return;
+
+		header("Content-type: text/html; charset=utf-8");
+
+		$accMod = new AccountModel($user_id, FALSE);
 		$trMod = new TransactionModel($user_id);
 
 		$acc_id = intval($_POST["acc_id"]);
@@ -21,7 +43,10 @@
 
 			$tr_time = strtotime($_POST["date"][$tr_key]);
 			if ($tr_time == -1)
-				die("Wrong date format: ".$_POST["date"][$tr_key]);
+			{
+				echo("Wrong date format: ".$_POST["date"][$tr_key]);
+				break;
+			}
 
 			$tr_date =  date("Y-m-d H:i:s", $tr_time);
 			$tr_comment = $_POST["comment"][$tr_key];
@@ -55,25 +80,20 @@
 			}
 			else
 			{
-				die("Wrong transaction type");
+				echo("Wrong transaction type");
+				break;
 			}
 
 			if ($trans_id == 0)
-				die("Fail to create transaction<br>");
+			{
+				echo("Fail to create transaction<br>");
+				break;
+			}
 			else
 				echo("New transaction id: ".$trans_id."<br>");
 			echo("<br>");
 		}
 
-		echo("<a href=\"./fastcommit.php\">Ok</a><br>");
-
-		exit;
+		echo("<a href=\"".BASEURL."fastcommit/\">Ok</a><br>");
 	}
-
-	$accArr = $accMod->getArray();
-
-
-	$cssArr = array();
-	$jsArr = array("es5-shim.min.js", "common.js", "app.js");
-
-	include("./view/templates/fastcommit.tpl");
+}
