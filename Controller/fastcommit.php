@@ -16,6 +16,7 @@ class FastCommitController extends Controller
 		$accArr = $accMod->getArray();
 
 		$this->buildCSS();
+		$this->jsArr[] = "fastcommit.js";
 
 		include("./view/templates/fastcommit.tpl");
 	}
