@@ -12,9 +12,45 @@ function getMainAccObj()
 }
 
 
+function changeTrRowId(row_id, new_id)
+{
+	var rowEl, trTypeSel, delBtn, destAccSel, destAmountInp;
+
+	if (row_id == new_id)
+		return;
+
+	rowEl = ge('tr_' + row_id);
+	if (!rowEl)
+		return;
+
+	rowEl.id = 'tr_' + new_id;
+	trTypeSel = firstElementChild(rowEl);
+	if (trTypeSel)
+	{
+		trTypeSel.onchange = onTrTypeChange.bind(null, new_id);
+	}
+	destAccSel = ge('ds_' + row_id);
+	if (destAccSel)
+	{
+		destAccSel.onchange = onDestChange.bind(destAccSel, new_id);
+	}
+	destAmountInp = ge('da_' + row_id);
+	if (destAmountInp)
+	{
+		destAmountInp.id = 'da_' + new_id;
+	}
+	delBtn = ge('del_' + row_id);
+	if (delBtn)
+	{
+		delBtn.id = 'del_' + new_id;
+		delBtn.onclick = delRow.bind(null, new_id);
+	}
+}
+
+
 function delRow(row_id)
 {
-	var rowEl, delBtn, destAccSel, destAmountInp;
+	var rowEl;
 
 	rowEl = ge('tr_' + row_id);
 	if (!rowEl)
@@ -27,29 +63,7 @@ function delRow(row_id)
 		rowEl = ge('tr_' + row_id);
 		if (!rowEl)
 			break;
-
-		rowEl.id = 'tr_' + (row_id - 1);
-		trTypeSel = firstElementChild(rowEl);
-		if (trTypeSel)
-		{
-			trTypeSel.onchange = onTrTypeChange.bind(null, row_id - 1);
-		}
-		destAccSel = ge('ds_' + row_id);
-		if (destAccSel)
-		{
-			destAccSel.onchange = onDestChange.bind(destAccSel, row_id - 1);
-		}
-		destAmountInp = ge('da_' + row_id);
-		if (destAmountInp)
-		{
-			destAmountInp.id = 'da_' + (row_id - 1);
-		}
-		delBtn = ge('del_' + row_id);
-		if (delBtn)
-		{
-			delBtn.id = 'del_' + (row_id - 1);
-			delBtn.onclick = delRow.bind(null, row_id - 1);
-		}
+		changeTrRowId(row_id, row_id - 1);
 	}
 	while(rowEl);
 
