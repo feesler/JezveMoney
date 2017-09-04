@@ -33,6 +33,7 @@ function changeTrRowId(row_id, new_id)
 	destAccSel = ge('ds_' + row_id);
 	if (destAccSel)
 	{
+		destAccSel.id = 'ds_' + new_id;
 		destAccSel.onchange = onDestChange.bind(destAccSel, new_id);
 	}
 	destAmountInp = ge('da_' + row_id);
@@ -131,8 +132,8 @@ function syncAccountOption(opt, acc_id)
 
 	if (optVal == 0 || optVal == acc_id)
 	{
-		opt.selected = false;
 		opt.disabled = true;
+		opt.selected = false;
 	}
 	else
 	{
