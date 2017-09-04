@@ -24,11 +24,11 @@ function delRow(row_id)
 	do
 	{
 		row_id++;
-		rowEl = 'tr_' + row_id;
+		rowEl = ge('tr_' + row_id);
 		if (!rowEl)
 			break;
 
-		rowEl.id = rowEl('tr_' + (row_id - 1));
+		rowEl.id = 'tr_' + (row_id - 1);
 		trTypeSel = firstElementChild(rowEl);
 		if (trTypeSel)
 		{
