@@ -79,6 +79,7 @@ extend(SortableDragAvatar, DragAvatar);
 SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 {
 	this._dragZoneElem = this._dragZone.getElement();
+	this._initialPos = this.getSortPosition();
 	var elem = this._elem = this._dragZoneElem.cloneNode(true);
 
 	var offset = getOffset(this._dragZoneElem);
@@ -126,6 +127,18 @@ SortableDragAvatar.prototype.saveSortTarget = function(dropTarget)
 };
 
 
+SortableDragAvatar.prototype.getSortPosition = function()
+{
+	var prevElem = previousElementSibling(this._dragZoneElem);
+	var nextElem = nextElementSibling(this._dragZoneElem);
+
+	return {
+		prev : prevElem,
+		next : nextElem
+	};
+};
+
+
 // Return drag information object for DropTarget
 SortableDragAvatar.prototype.getDragInfo = function(event)
 {
@@ -134,7 +147,8 @@ SortableDragAvatar.prototype.getDragInfo = function(event)
 		dragZoneElem : this._dragZoneElem,
 		dragZone : this._dragZone,
 		mouseShift : { x : this._shiftX, y : this._shiftY },
-		sortTarget : this._sortTarget
+		sortTarget : this._sortTarget,
+		initialPos : this._initialPos
 	};
 };
 
@@ -240,7 +254,16 @@ SortableDropTarget.prototype.onDragEnd = function(avatar, e)
 
 	avatar.onDragEnd();
 
-	avatarInfo.dragZone.onInsertAt(avatarInfo.sortTarget);
+	if (avatarInfo.sortTarget)
+	{
+		var newPos = avatar.getSortPosition();
+
+		if (avatarInfo.initialPos.prev != newPos.prev &&
+			avatarInfo.initialPos.next != newPos.next)
+		{
+			avatarInfo.dragZone.onInsertAt(avatarInfo.sortTarget);
+		}
+	}
 
 	this._targetElem = null;
 };
