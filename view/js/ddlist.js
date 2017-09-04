@@ -349,7 +349,7 @@ function DDList()
 			{
 				this.hostObj.onkeydown = this.onKey.bind(this);
 				this.hostObj.onkeypress = this.onKey.bind(this);
-				this.hostObj.autocomplete = "off";
+				this.hostObj.autocomplete = 'off';
 			}
 		}
 

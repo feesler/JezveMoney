@@ -196,7 +196,7 @@ var Calendar = new (function()
 
 				daysSet.push({ date : d, cell : dayCell });
 			}
-	
+
 			tbody.appendChild(tr);
 		}
 
@@ -303,6 +303,19 @@ var Calendar = new (function()
 		}
 
 
+		// Activate cell by specified date
+		function deactivateCell(date)
+		{
+			var cell;
+
+			cell = findCell(date);
+			if (cell)
+			{
+				removeClass(cell, 'act');
+			}
+		}
+
+
 		// Find cell element by date
 		function findCell(date)
 		{
@@ -327,6 +340,9 @@ var Calendar = new (function()
 		// Day cell click inner callback
 		function onDayClick(date)
 		{
+			if (actDate != null)
+				deactivateCell(actDate);
+
 			actDate = date;
 			activateCell(actDate);
 

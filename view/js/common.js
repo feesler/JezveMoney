@@ -27,6 +27,13 @@ function isFunction(obj)
 }
 
 
+// Check object is {}
+function isObject(o)
+{
+	return null != o && typeof o === 'object' && Object.prototype.toString.call(o) === '[object Object]';
+}
+
+
 // Set parameters of object
 function setParam(obj, params)
 {
@@ -528,23 +535,25 @@ function onEmptyClick(e, callback, elem)
 // Set or unset event handler for
 function setEmptyClick(callback, elem)
 {
-	var onClickHandler;
+	var onClickHandler, evName;
 
 	callback = callback || null;
 	elem = elem || null;
 
-	if (document.documentElement)
-	{
-		onClickHandler = ((callback) ? function(event)
-		{
-			event = event || window.event;
-			onEmptyClick(event, callback, elem);
-		} : null);
+	if (!document.documentElement)
+		return;
 
-		if (onClickHandler && document.documentElement.onclick)
-			document.documentElement.onclick();			// run previously set callback
-		document.documentElement.onclick = onClickHandler;
-	}
+	onClickHandler = ((callback) ? function(event)
+	{
+		event = event || window.event;
+		onEmptyClick(event, callback, elem);
+	} : null);
+
+	evName = ('ontouchstart' in window) ? 'touchend' : 'click';
+
+	if (onClickHandler && document.documentElement['on' + evName])
+		document.documentElement['on' + evName]();			// run previously set callback
+	document.documentElement['on' + evName] = onClickHandler;
 }
 
 

@@ -19,6 +19,9 @@ var dragMaster = (function()
 		if (!dragZone)
 			return;
 
+		if (!dragZone.isValidDragHandle(e.target))
+			return;
+
 		downX = e.pageX;
 		downY = e.pageY;
 
@@ -66,7 +69,7 @@ var dragMaster = (function()
 
 		return false;
 	}
-	
+
 
 	// Document mouse up event handler
 	function mouseUp(e)
@@ -212,7 +215,7 @@ var dragMaster = (function()
 
 
 // Drag start zone class
-// Handle drag start event and make avatar 
+// Handle drag start event and make avatar
 function DragZone(elem, params)
 {
 	elem.dragZone = this;
@@ -247,6 +250,32 @@ DragZone.prototype.onDragStart = function(downX, downY, event)
 
 	return avatar;
 };
+
+
+// Check specified targer element is valid
+DragZone.prototype.isValidDragHandle = function(target)
+{
+	var handles;
+
+	if (!target)
+		return false;
+
+	// allow to drag using whole drag zone in case no handles is set
+	if (this._params === undefined || this._params.handles === undefined)
+		return true;
+
+	handles = this._params.handles;
+	if (!isArray(handles))
+		handles = [handles];
+
+	return handles.some(function(hnd)
+	{
+		var elem = (isObject(hnd) && hnd.elem) ? hnd.elem : hnd;
+		elem = ge(elem);
+
+		return elem && (elem == target || (isObject(hnd) && hnd.includeChilds && elem.contains(target)));
+	});
+}
 
 
 // Drag object class
