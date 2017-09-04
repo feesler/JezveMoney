@@ -3,6 +3,8 @@
 .tr_row
 {
 	padding: 10px;
+	background-color: #DDDDDD;
+	margin: 3px 0;
 }
 
 #acc_id,
@@ -32,14 +34,23 @@
 	width: 30px;
 	border: 0 none;
 }
+
+.tr_row_placeholder
+{
+	border: 1px dashed #888888;
+	height: 54px;
+}
+
+.tr_row_placeholder > input,
+.tr_row_placeholder > select
+{
+	display: none;
+}
 </style>
 <script>
 var accounts = <?=f_json_encode($accArr)?>;
 
-onReady(function()
-{
-	createRow();
-});
+onReady(initPage);
 </script>
 </head>
 <body>

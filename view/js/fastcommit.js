@@ -1,4 +1,5 @@
 var curTrRows = 0;
+var trListSortable = null;
 
 function accFromSelect(selectObj)
 {
@@ -113,6 +114,9 @@ function createRow()
 
 	rowsContainer.appendChild(rowEl);
 	curTrRows++;
+
+	if (trListSortable)
+		trListSortable.add(rowEl);
 }
 
 // Disable account option if it's the same as main account
@@ -260,4 +264,49 @@ function onSubmit()
 	}
 
 	return true;
+}
+
+
+function onTransPosChanged(origRow, replacedRow)
+{
+	var row_id, rowEl, lastRow_id;
+	var trans_id, retrans_id;
+	var movingUp;
+
+	trans_id = parseInt(origRow.id.substr(3));
+	retrans_id = parseInt(replacedRow.id.substr(3));
+
+	changeTrRowId(trans_id, curTrRows + 1);
+
+	movingUp = (trans_id > retrans_id);
+	if (movingUp)	// moving up
+	{
+		for(row_id = trans_id - 1; row_id >= retrans_id; row_id--)
+		{
+			changeTrRowId(row_id, row_id + 1);
+		}
+	}
+	else						// moving down
+	{
+		for(row_id = trans_id + 1; row_id <= retrans_id; row_id++)
+		{
+			changeTrRowId(row_id, row_id - 1);
+		}
+	}
+
+	changeTrRowId(curTrRows + 1, retrans_id);
+}
+
+
+function initPage()
+{
+	createRow();
+
+	trListSortable = new Sortable({ oninsertat : onTransPosChanged,
+									container : 'rowsContainer',
+									group : 'transactions',
+									itemClass : 'tr_row',
+									placeholderClass : 'tr_row_placeholder',
+									copyWidth : true,
+									onlyRootHandle : true });
 }
