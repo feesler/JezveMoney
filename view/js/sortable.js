@@ -261,7 +261,7 @@ function Sortable(params)
 
 		groupName = params.group;
 
-		dragZoneParam.group = groupName;
+		dragZoneParam.group = dropTargetParam.group = groupName;
 		if (params.ondragstart)
 			dragZoneParam.ondragstart = params.ondragstart;
 		if (params.oninsertat)
@@ -274,8 +274,8 @@ function Sortable(params)
 			dragZoneParam.itemClass = params.itemClass;
 		if (params.placeholderClass)
 			dragZoneParam.placeholderClass = params.placeholderClass;
-
-		dropTargetParam.group = groupName;
+		if (params.onlyRootHandle === true)
+			dragZoneParam.onlyRootHandle = true;
 
 		containerElem = ge(params.container);
 		if (!containerElem)
@@ -284,8 +284,8 @@ function Sortable(params)
 		var child = firstElementChild(containerElem);
 		while(child)
 		{
-			new SortableDragZone(child, dragZoneParam);
-			new SortableDropTarget(child, dropTargetParam);
+			if (!addItem(child))
+				break;
 
 			child = nextElementSibling(child);
 		}
@@ -297,9 +297,11 @@ function Sortable(params)
 		if (!elem)
 			return false;
 
-		params = params || {};
-
-		new SortableDragZone(elem, dragZoneParam);
+		var zoneParam = {};
+		setParam(zoneParam, dragZoneParam);
+		if (dragZoneParam.onlyRootHandle === true)
+			zoneParam.handles = elem;
+		new SortableDragZone(elem, zoneParam);
 		new SortableDropTarget(elem, dropTargetParam);
 
 		return true;
