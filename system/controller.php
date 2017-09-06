@@ -29,6 +29,9 @@ abstract class Controller
 		if (is_null($this->css))
 			return;
 
-		$this->cssArr = array_merge($this->css->clear, $this->css->libs, $this->css->app, $this->css->page);
+		$this->cssArr = array_merge((array)$this->css->clear,
+									(array)$this->css->libs,
+									(array)$this->css->app,
+									(array)$this->css->page);
 	}
 }

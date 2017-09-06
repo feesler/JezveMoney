@@ -15,6 +15,7 @@ class FastCommitController extends Controller
 		$accMod = new AccountModel($user_id, FALSE);
 		$accArr = $accMod->getArray();
 
+		$this->css->page = "fastcommit.css";
 		$this->buildCSS();
 		array_push($this->jsArr, "dragndrop.js", "sortable.js", "fastcommit.js");
 
