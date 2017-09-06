@@ -123,6 +123,17 @@ function syncAccountOption(opt)
 }
 
 
+function syncDestAccountSelect(rowObj)
+{
+	var i, l;
+
+	for(i = 0, l = rowObj.destAccSel.options.length; i < l; i++)
+	{
+		syncAccountOption(rowObj.destAccSel.options[i]);
+	}
+}
+
+
 function syncDestAmountAvail(rowObj)
 {
 	var destAccObj = accFromSelect(rowObj.destAccSel);
@@ -141,7 +152,7 @@ function copyDestAcc(rowObj)
 
 function onTrTypeChange(rowObj)
 {
-	var tr_type, i, l;
+	var tr_type;
 
 	if (!rowObj)
 		return;
@@ -153,10 +164,7 @@ function onTrTypeChange(rowObj)
 	if (tr_type == 'transfer')
 	{
 		enable(rowObj.destAccSel, true);
-		for(i = 0, l = rowObj.destAccSel.options.length; i < l; i++)
-		{
-			syncAccountOption(rowObj.destAccSel.options[i]);
-		}
+		syncDestAccountSelect(rowObj);
 
 		copyDestAcc(rowObj);
 
@@ -180,10 +188,7 @@ function onMainAccChange()
 		tr_type = selectedValue(rowObj.trTypeSel);
 		if (tr_type == 'transfer')
 		{
-			for(i = 0, l = rowObj.destAccSel.options.length; i < l; i++)
-			{
-				syncAccountOption(rowObj.destAccSel.options[i]);
-			}
+			syncDestAccountSelect(rowObj);
 
 			copyDestAcc(rowObj);
 
