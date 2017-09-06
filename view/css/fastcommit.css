@@ -25,7 +25,8 @@
 .tr_row > select[disabled],
 .tr_row input[disabled]
 {
-	border-color: #BBBBBB;
+	border-color: #DDDDDD;
+	background-color: #EEEEEE;
 }
 
 .tr_row input[type=button]
