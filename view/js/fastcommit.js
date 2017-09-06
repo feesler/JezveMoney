@@ -123,6 +123,13 @@ function syncAccountOption(opt)
 }
 
 
+function syncDestAmountAvail(rowObj)
+{
+	var destAccObj = accFromSelect(rowObj.destAccSel);
+	enable(rowObj.destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+}
+
+
 function copyDestAcc(rowObj)
 {
 	if (!rowObj || !rowObj.destAccIdInp || !rowObj.destAccSel)
@@ -134,7 +141,7 @@ function copyDestAcc(rowObj)
 
 function onTrTypeChange(rowObj)
 {
-	var tr_type, destAccObj, i, l;
+	var tr_type, i, l;
 
 	if (!rowObj)
 		return;
@@ -153,8 +160,7 @@ function onTrTypeChange(rowObj)
 
 		copyDestAcc(rowObj);
 
-		destAccObj = accFromSelect(rowObj.destAccSel);
-		enable(rowObj.destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+		syncDestAmountAvail(rowObj);
 	}
 	else
 	{
@@ -181,8 +187,7 @@ function onMainAccChange()
 
 			copyDestAcc(rowObj);
 
-			destAccObj = accFromSelect(rowObj.destAccSel);
-			enable(rowObj.destAmountInp, destAccObj != null && accObj.curr_id != destAccObj.curr_id);
+			syncDestAmountAvail(rowObj);
 		}
 	});
 }
@@ -190,13 +195,8 @@ function onMainAccChange()
 
 function onDestChange(rowObj)
 {
-	var destAccObj;
-
 	copyDestAcc(rowObj);
-
-	destAccObj = accFromSelect(this);
-
-	enable(rowObj.destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+	syncDestAmountAvail(rowObj);
 }
 
 
