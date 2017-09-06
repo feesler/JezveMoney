@@ -1,5 +1,6 @@
 var trRows = [];
 var trListSortable = null;
+var mainAccObj = null;
 
 function accFromSelect(selectObj)
 {
@@ -7,9 +8,9 @@ function accFromSelect(selectObj)
 }
 
 
-function getMainAccObj()
+function updMainAccObj()
 {
-	return accFromSelect(ge('acc_id'));
+	mainAccObj = accFromSelect(ge('acc_id'));
 }
 
 
@@ -38,15 +39,15 @@ function delRow(rowObj)
 
 function createRow()
 {
-	var rowsContainer, mainAcc;
+	var rowsContainer;
 	var rowObj = {};
 
 	rowsContainer = ge('rowsContainer');
 	if (!rowsContainer)
 		return;
 
-	mainAcc = getMainAccObj();
-	if (!mainAcc)
+	updMainAccObj();
+	if (!mainAccObj)
 		return;
 
 	rowObj.trTypeSel = ce('select', { name : 'tr_type[]' },
@@ -62,7 +63,7 @@ function createRow()
 	accounts.forEach(function(account)
 	{
 		var option = ce('option', { value : account.id, innerHTML : account.name });
-		if (account.id == mainAcc.id)
+		if (account.id == mainAccObj.id)
 			enable(option, false);
 
 		rowObj.destAccSel.appendChild(option);
@@ -101,7 +102,7 @@ function createRow()
 }
 
 // Disable account option if it's the same as main account
-function syncAccountOption(opt, acc_id)
+function syncAccountOption(opt)
 {
 	var optVal;
 
@@ -110,7 +111,7 @@ function syncAccountOption(opt, acc_id)
 
 	optVal = parseInt(opt.value);
 
-	if (optVal == 0 || optVal == acc_id)
+	if (optVal == 0 || optVal == mainAccObj.id)
 	{
 		opt.disabled = true;
 		opt.selected = false;
@@ -133,13 +134,9 @@ function copyDestAcc(rowObj)
 
 function onTrTypeChange(rowObj)
 {
-	var mainAccObj, tr_type, destAccObj, i, l;
+	var tr_type, destAccObj, i, l;
 
 	if (!rowObj)
-		return;
-
-	mainAccObj = getMainAccObj();
-	if (!mainAccObj)
 		return;
 
 	tr_type = selectedValue(rowObj.trTypeSel);
@@ -151,7 +148,7 @@ function onTrTypeChange(rowObj)
 		enable(rowObj.destAccSel, true);
 		for(i = 0, l = rowObj.destAccSel.options.length; i < l; i++)
 		{
-			syncAccountOption(rowObj.destAccSel.options[i], mainAccObj.id);
+			syncAccountOption(rowObj.destAccSel.options[i]);
 		}
 
 		copyDestAcc(rowObj);
@@ -168,10 +165,8 @@ function onTrTypeChange(rowObj)
 
 function onMainAccChange()
 {
-	var accObj;
-
-	accObj = getMainAccObj();
-	if (!accObj)
+	updMainAccObj();
+	if (!mainAccObj)
 		return;
 
 	trRows.forEach(function(rowObj)
@@ -181,7 +176,7 @@ function onMainAccChange()
 		{
 			for(i = 0, l = rowObj.destAccSel.options.length; i < l; i++)
 			{
-				syncAccountOption(rowObj.destAccSel.options[i], accObj.id);
+				syncAccountOption(rowObj.destAccSel.options[i]);
 			}
 
 			copyDestAcc(rowObj);
@@ -195,11 +190,7 @@ function onMainAccChange()
 
 function onDestChange(rowObj)
 {
-	var mainAccObj, destAccObj;
-
-	mainAccObj = getMainAccObj();
-	if (!mainAccObj)
-		return;
+	var destAccObj;
 
 	copyDestAcc(rowObj);
 
