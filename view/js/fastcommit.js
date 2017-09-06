@@ -71,7 +71,9 @@ function createRow()
 			[ ce('option', { value : 'expense', innerHTML : '-' }),
 				ce('option', { value : 'income', innerHTML : '+' }),
 				ce('option', { value : 'transferfrom', innerHTML : '>' }),
-				ce('option', { value : 'transferto', innerHTML : '<' })	]);
+				ce('option', { value : 'transferto', innerHTML : '<' }),
+				ce('option', { value : 'debtfrom', innerHTML : 'D>' }),
+				ce('option', { value : 'debtto', innerHTML : 'D<' }) ]);
 	rowObj.trTypeSel.onchange = onTrTypeChange.bind(rowObj.trTypeSel, rowObj);
 
 	rowObj.destAccIdInp = ce('input', { type : 'hidden', name : 'dest_acc_id[]', value : '' });
@@ -87,6 +89,20 @@ function createRow()
 		rowObj.destAccSel.appendChild(option);
 	});
 	rowObj.destAccSel.onchange = onDestChange.bind(rowObj.destAccSel, rowObj);
+
+// Persons
+	rowObj.personIdInp = ce('input', { type : 'hidden', name : 'person_id[]', value : '' });
+
+	rowObj.personSel = ce('select');
+	persons.forEach(function(person)
+	{
+		var option = ce('option', { value : person.id, innerHTML : person.name });
+
+		rowObj.personSel.appendChild(option);
+	});
+	show(rowObj.personSel, false);
+	rowObj.personSel.onchange = onPersonChange.bind(rowObj.personSel, rowObj);
+
 
 	rowObj.amountInp = ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' });
 
@@ -106,6 +122,8 @@ function createRow()
 			rowObj.currSel,
 			rowObj.destAccIdInp,
 			rowObj.destAccSel,
+			rowObj.personIdInp,
+			rowObj.personSel,
 			rowObj.destAmountInp,
 			rowObj.dateInp,
 			rowObj.commInp,
@@ -156,15 +174,20 @@ function syncDestAccountSelect(rowObj)
 
 function syncDestAmountAvail(rowObj)
 {
-	if (rowObj.destAccSel.disabled === true)
+	var tr_type = selectedValue(rowObj.trTypeSel);
+	if (tr_type == 'expense' || tr_type == 'income')
 	{
 		var currObj = currFromSelect(rowObj.currSel);
 		enable(rowObj.destAmountInp, currObj != null && mainAccObj.curr_id != currObj.id);
 	}
-	else
+	else if (tr_type == 'transferfrom' || tr_type == 'transferto')
 	{
 		var destAccObj = accFromSelect(rowObj.destAccSel);
 		enable(rowObj.destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+	}
+	else	// debt
+	{
+		enable(rowObj.destAmountInp, false);
 	}
 }
 
@@ -192,13 +215,24 @@ function onTrTypeChange(rowObj)
 	syncCurrAvail(rowObj);
 	if (tr_type == 'transferfrom' || tr_type == 'transferto')
 	{
+		show(rowObj.personSel, false);
+		show(rowObj.destAccSel, true);
 		enable(rowObj.destAccSel, true);
 		syncDestAccountSelect(rowObj);
 
 		copyDestAcc(rowObj);
 	}
+	else if (tr_type == 'debtfrom' || tr_type == 'debtto')
+	{
+		copyPerson(rowObj);
+		show(rowObj.personSel, true);
+		show(rowObj.destAccSel, false);
+		enable(rowObj.destAccSel, false);
+	}
 	else
 	{
+		show(rowObj.personSel, false);
+		show(rowObj.destAccSel, true);
 		enable(rowObj.destAccSel, false);
 	}
 
@@ -209,7 +243,8 @@ function onTrTypeChange(rowObj)
 function syncCurrAvail(rowObj)
 {
 	var tr_type = selectedValue(rowObj.trTypeSel);
-	if (tr_type == 'transferfrom' || tr_type == 'transferto')		// transfer expect currencies will be the same as source and destination account
+	if (tr_type == 'transferfrom' || tr_type == 'transferto' ||		// transfer expect currencies will be the same as source and destination account
+		tr_type == 'debtfrom' || tr_type == 'debtto')				// debt curently expect only the same currency as account
 	{
 		enable(rowObj.currSel, false);
 		selectByValue(rowObj.currSel, mainAccObj.curr_id);
@@ -264,6 +299,21 @@ function onDestChange(rowObj)
 {
 	copyDestAcc(rowObj);
 	syncDestAmountAvail(rowObj);
+}
+
+
+function copyPerson(rowObj)
+{
+	if (!rowObj || !rowObj.personIdInp || !rowObj.personSel)
+		return;
+
+	rowObj.personIdInp.value = selectedValue(rowObj.personSel);
+}
+
+
+function onPersonChange(rowObj)
+{
+	copyPerson(rowObj);
 }
 
 

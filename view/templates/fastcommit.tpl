@@ -2,6 +2,7 @@
 <script>
 var accounts = <?=f_json_encode($accArr)?>;
 var currencies = <?=f_json_encode($currArr)?>;
+var persons = <?=f_json_encode($persArr)?>;
 
 onReady(initPage);
 </script>

@@ -15,6 +15,8 @@ class FastCommitController extends Controller
 		$accMod = new AccountModel($user_id, FALSE);
 		$accArr = $accMod->getArray();
 		$currArr = CurrencyModel::getArray();
+		$pMod = new PersonModel($user_id);
+		$persArr = $pMod->getArray();
 
 		$this->css->page = "fastcommit.css";
 		$this->buildCSS();
@@ -35,6 +37,8 @@ class FastCommitController extends Controller
 
 		$accMod = new AccountModel($user_id, FALSE);
 		$trMod = new TransactionModel($user_id);
+		$debtMod = new DebtModel($user_id);
+		$pMod = new PersonModel($user_id);
 
 		$acc_id = intval($_POST["acc_id"]);
 		echo("Account: ".$acc_id." ".$accMod->getName($acc_id)."<br>");
@@ -121,6 +125,20 @@ class FastCommitController extends Controller
 											$tr_src_amount, $tr_dest_amount,
 											$tr_src_curr_id, $tr_dest_curr_id,
 											$tr_date, $tr_comment);
+			}
+			else if ($tr_type == "debtfrom" || $tr_type == "debtto")
+			{
+				$op = ($tr_type == "debtfrom") ? 2 : 1;
+				$person_id = intval($_POST["person_id"][$tr_key]);
+				$tr_src_amount = $tr_dest_amount = $tr_amount;
+				$tr_src_curr_id = $tr_dest_curr_id = $curr_id;
+
+				echo(($op ? "give" : "take")."; person: ".$person_id." ".$pMod->getName($person_id)."<br>");
+
+				$trans_id = $debtMod->create($op, $acc_id, $person_id,
+									$tr_src_amount, $tr_dest_amount,
+									$tr_src_curr_id, $tr_dest_curr_id,
+									$tr_date, $tr_comment);
 			}
 			else
 			{
