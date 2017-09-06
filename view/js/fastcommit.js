@@ -80,11 +80,11 @@ function createRow()
 					onclick : delRow.bind(null, rowObj),
 					value : '-' });
 
-	rowObj.rowEl = ce('div', { className : 'tr_row' },
+	rowObj.rowEl = ce('div', { className : 'tr_row clearfix' },
 		[ rowObj.trTypeSel,
+			rowObj.amountInp,
 			rowObj.destAccIdInp,
 			rowObj.destAccSel,
-			rowObj.amountInp,
 			rowObj.destAmountInp,
 			rowObj.dateInp,
 			rowObj.commInp,

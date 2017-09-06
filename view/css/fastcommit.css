@@ -15,6 +15,7 @@
 .tr_row input
 {
 	display: inline;
+	float: left;
 	border: 1px solid #000;
 	padding: 5px;
 	width: 100px;
