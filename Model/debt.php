@@ -22,27 +22,27 @@ Class DebtModel
 	public function create($op, $acc_id, $p_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment)
 	{
 		if (!is_numeric($p_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
-			return FALSE;
+			return 0;
 
 		$account_id = intval($acc_id);
 		$person_id = intval($p_id);
 		$src_curr = intval($src_curr);
 		$dest_curr = intval($dest_curr);
 		if (!$person_id || !$src_curr || !$dest_curr)
-			return FALSE;
+			return 0;
 
 		if ($op != 1 && $op != 2)
-			return FALSE;
+			return 0;
 
 		$pMod = new PersonModel($this->user_id);
 		if (!$pMod->is_exist($person_id))
-			return FALSE;
+			return 0;
 
 		$p_acc = $pMod->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
 			$p_acc = $pMod->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
 		if (!$p_acc)
-			return FALSE;
+			return 0;
 
 		if ($op == 1)		// give
 		{
@@ -56,10 +56,9 @@ Class DebtModel
 		}
 
 		$transMod = new TransactionModel($this->user_id);
-		if (!$transMod->create(4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
-			return FALSE;
+		$trans_id = $transMod->create(4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment);
 
-		return TRUE;
+		return $trans_id;
 	}
 
 
