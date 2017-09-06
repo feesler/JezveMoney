@@ -70,7 +70,8 @@ function createRow()
 	rowObj.trTypeSel = ce('select', { name : 'tr_type[]' },
 			[ ce('option', { value : 'expense', innerHTML : '-' }),
 				ce('option', { value : 'income', innerHTML : '+' }),
-				ce('option', { value : 'transfer', innerHTML : '>' })	]);
+				ce('option', { value : 'transferfrom', innerHTML : '>' }),
+				ce('option', { value : 'transferto', innerHTML : '<' })	]);
 	rowObj.trTypeSel.onchange = onTrTypeChange.bind(rowObj.trTypeSel, rowObj);
 
 	rowObj.destAccIdInp = ce('input', { type : 'hidden', name : 'dest_acc_id[]', value : '' });
@@ -189,7 +190,7 @@ function onTrTypeChange(rowObj)
 		return;
 
 	syncCurrAvail(rowObj);
-	if (tr_type == 'transfer')
+	if (tr_type == 'transferfrom' || tr_type == 'transferto')
 	{
 		enable(rowObj.destAccSel, true);
 		syncDestAccountSelect(rowObj);
@@ -208,7 +209,7 @@ function onTrTypeChange(rowObj)
 function syncCurrAvail(rowObj)
 {
 	var tr_type = selectedValue(rowObj.trTypeSel);
-	if (tr_type == 'transfer')		// transfer expect currencies will be the same as source and destination account
+	if (tr_type == 'transferfrom' || tr_type == 'transferto')		// transfer expect currencies will be the same as source and destination account
 	{
 		enable(rowObj.currSel, false);
 		selectByValue(rowObj.currSel, mainAccObj.curr_id);
@@ -247,7 +248,7 @@ function onMainAccChange()
 	trRows.forEach(function(rowObj)
 	{
 		tr_type = selectedValue(rowObj.trTypeSel);
-		if (tr_type == 'transfer')
+		if (tr_type == 'transferfrom' || tr_type == 'transferto')
 		{
 			syncDestAccountSelect(rowObj);
 

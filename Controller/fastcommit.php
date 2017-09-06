@@ -68,6 +68,7 @@ class FastCommitController extends Controller
 				}
 
 				echo("src_amount: ".$tr_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$curr_id."; dest_curr ".$tr_dest_curr_id);
+				echo("; ".$tr_date." ".$tr_comment."<br>");
 
 				$trans_id = $trMod->create(EXPENSE, $acc_id, 0, $tr_amount, $tr_dest_amount, $curr_id, $tr_dest_curr_id, $tr_date, $tr_comment);
 			}
@@ -83,34 +84,49 @@ class FastCommitController extends Controller
 					$tr_src_amount = $tr_amount;
 				}
 				echo("src_amount: ".$tr_src_amount."; dest_amount: ".$tr_amount."; src_curr: ".$tr_src_curr_id."; dest_curr ".$curr_id);
+				echo("; ".$tr_date." ".$tr_comment."<br>");
 
 				$trans_id = $trMod->create(INCOME, 0, $acc_id, $tr_src_amount, $tr_amount, $tr_src_curr_id, $curr_id, $tr_date, $tr_comment);
 			}
-			else if ($tr_type == "transfer")
+			else if ($tr_type == "transferfrom" || $tr_type == "transferto")
 			{
-				$tr_dest_acc_id = intval($_POST["dest_acc_id"][$tr_key]);
-				echo("Destination account: ".$tr_dest_acc_id."<br>");
-				$dest_curr_id = $accMod->getCurrency($tr_dest_acc_id);
-				echo("Currency: ".$dest_curr_id." ".CurrencyModel::getName($dest_curr_id)."<br>");
-				if ($dest_curr_id != $curr_id)
+				if ($tr_type == "transferfrom")
 				{
-					$tr_dest_amount = floatval($_POST["dest_amount"][$tr_key]);
+					$tr_src_acc_id = $acc_id;
+					$tr_src_curr_id = $curr_id;
+					$tr_dest_acc_id = intval($_POST["dest_acc_id"][$tr_key]);
+					$tr_dest_curr_id = $accMod->getCurrency($tr_dest_acc_id);
+					$tr_src_amount = $tr_amount;
+					$tr_dest_amount = ($tr_dest_curr_id != $tr_src_curr_id) ? floatval($_POST["dest_amount"][$tr_key]) : $tr_amount;
+
+					echo("Dest account: ".$tr_dest_acc_id." ".$accMod->getName($tr_dest_acc_id)."<br>");
 				}
 				else
 				{
+					$tr_src_acc_id = intval($_POST["dest_acc_id"][$tr_key]);
+					$tr_src_curr_id = $accMod->getCurrency($tr_src_acc_id);
+					$tr_dest_acc_id = $acc_id;
+					$tr_dest_curr_id = $curr_id;
+					$tr_src_amount = ($tr_dest_curr_id != $tr_src_curr_id) ? floatval($_POST["dest_amount"][$tr_key]) : $tr_amount;
 					$tr_dest_amount = $tr_amount;
-				}
-				echo("src_amount: ".$tr_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$curr_id."; dest_curr ".$dest_curr_id);
 
-				$trans_id = $trMod->create(TRANSFER, $acc_id, $tr_dest_acc_id, $tr_amount, $tr_dest_amount, $curr_id, $dest_curr_id, $tr_date, $tr_comment);
+					echo("Source account: ".$tr_src_acc_id." ".$accMod->getName($tr_src_acc_id)."<br>");
+				}
+
+				echo("src_amount: ".$tr_src_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$tr_src_curr_id."; dest_curr ".$tr_dest_curr_id);
+				echo("; ".$tr_date." ".$tr_comment."<br>");
+
+				$trans_id = $trMod->create(TRANSFER,
+											$tr_src_acc_id, $tr_dest_acc_id,
+											$tr_src_amount, $tr_dest_amount,
+											$tr_src_curr_id, $tr_dest_curr_id,
+											$tr_date, $tr_comment);
 			}
 			else
 			{
 				echo("Wrong transaction type<br>");
 				break;
 			}
-
-			echo("; ".$tr_date." ".$tr_comment."<br>");
 
 			if ($trans_id == 0)
 			{
