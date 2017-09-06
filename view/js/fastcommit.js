@@ -209,18 +209,22 @@ function onDestChange(rowObj)
 }
 
 
-function onSubmit()
+function onSubmitClick()
 {
+	var fastcommitfrm = ge('fastcommitfrm');
+	if (!fastcommitfrm)
+		return;
+
 	trRows.forEach(function(rowObj)
 	{
-		rowObj.srcAmount.value = fixFloat(rowObj.srcAmount.value);
+		rowObj.amountInp.value = fixFloat(rowObj.amountInp.value);
 		rowObj.destAmountInp.value = fixFloat(rowObj.destAmountInp.value);
 
 		enable(rowObj.destAccSel, true);
 		enable(rowObj.destAmountInp, true);
 	});
 
-	return true;
+	fastcommitfrm.submit();
 }
 
 
@@ -254,6 +258,12 @@ function onTransPosChanged(origRow, replacedRow)
 
 function initPage()
 {
+	var submitbtn = ge('submitbtn');
+	if (!submitbtn)
+		return;
+
+	submitbtn.onclick = onSubmitClick;
+
 	createRow();
 
 	trListSortable = new Sortable({ oninsertat : onTransPosChanged,

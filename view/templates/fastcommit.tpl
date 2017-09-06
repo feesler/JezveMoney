@@ -54,7 +54,7 @@ onReady(initPage);
 </script>
 </head>
 <body>
-<form method="post" action="<?=BASEURL?>fastcommit/" onsubmit="onSubmit()">
+<form id="fastcommitfrm" method="post" action="<?=BASEURL?>fastcommit/">
 	<select id="acc_id" name="acc_id" onchange="onMainAccChange()">
 <?php foreach($accArr as $accObj) {	?>
 		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
@@ -63,7 +63,7 @@ onReady(initPage);
 	<div id="rowsContainer"></div>
 	<div class="controls">
 		<div class="std_margin"><input class="btn ok_btn" type="button" onclick="createRow()" value="+"></div>
-		<div><input class="btn ok_btn" type="submit" value="Commit"></div>
+		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit"></div>
 	</div>
 </form>
 </body>
