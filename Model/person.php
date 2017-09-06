@@ -192,7 +192,7 @@ class PersonModel extends CachedTable
 			return FALSE;
 
 		$accMod = new AccountModel(self::$user_id);
-		return $acc->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id, 0);
+		return $accMod->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id, 0);
 	}
 
 
