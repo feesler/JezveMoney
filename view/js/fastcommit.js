@@ -8,6 +8,12 @@ function accFromSelect(selectObj)
 }
 
 
+function currFromSelect(selectObj)
+{
+	return idSearch(currencies, parseInt(selectedValue(selectObj)));
+}
+
+
 function updMainAccObj()
 {
 	mainAccObj = accFromSelect(ge('acc_id'));
@@ -50,6 +56,17 @@ function createRow()
 	if (!mainAccObj)
 		return;
 
+	rowObj.currIdInp = ce('input', { type : 'hidden', name : 'curr_id[]', value : mainAccObj.curr_id });
+	rowObj.currSel = ce('select');
+	currencies.forEach(function(currency)
+	{
+		var option = ce('option', { value : currency.id, innerHTML : currency.name,
+									selected : (currency.id == mainAccObj.id) });
+
+		rowObj.currSel.appendChild(option);
+	});
+	rowObj.currSel.onchange = onCurrChange.bind(rowObj.currSel, rowObj);
+
 	rowObj.trTypeSel = ce('select', { name : 'tr_type[]' },
 			[ ce('option', { value : 'expense', innerHTML : '-' }),
 				ce('option', { value : 'income', innerHTML : '+' }),
@@ -84,6 +101,8 @@ function createRow()
 	rowObj.rowEl = ce('div', { className : 'tr_row clearfix' },
 		[ rowObj.trTypeSel,
 			rowObj.amountInp,
+			rowObj.currIdInp,
+			rowObj.currSel,
 			rowObj.destAccIdInp,
 			rowObj.destAccSel,
 			rowObj.destAmountInp,
@@ -136,8 +155,16 @@ function syncDestAccountSelect(rowObj)
 
 function syncDestAmountAvail(rowObj)
 {
-	var destAccObj = accFromSelect(rowObj.destAccSel);
-	enable(rowObj.destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+	if (rowObj.destAccSel.disabled === true)
+	{
+		var currObj = currFromSelect(rowObj.currSel);
+		enable(rowObj.destAmountInp, currObj != null && mainAccObj.curr_id != currObj.id);
+	}
+	else
+	{
+		var destAccObj = accFromSelect(rowObj.destAccSel);
+		enable(rowObj.destAmountInp, destAccObj != null && mainAccObj.curr_id != destAccObj.curr_id);
+	}
 }
 
 
@@ -161,19 +188,53 @@ function onTrTypeChange(rowObj)
 	if (!rowObj.destAccSel || !rowObj.destAccSel.options)
 		return;
 
+	syncCurrAvail(rowObj);
 	if (tr_type == 'transfer')
 	{
 		enable(rowObj.destAccSel, true);
 		syncDestAccountSelect(rowObj);
 
 		copyDestAcc(rowObj);
-
-		syncDestAmountAvail(rowObj);
 	}
 	else
 	{
 		enable(rowObj.destAccSel, false);
 	}
+
+	syncDestAmountAvail(rowObj);
+}
+
+
+function syncCurrAvail(rowObj)
+{
+	var tr_type = selectedValue(rowObj.trTypeSel);
+	if (tr_type == 'transfer')		// transfer expect currencies will be the same as source and destination account
+	{
+		enable(rowObj.currSel, false);
+		selectByValue(rowObj.currSel, mainAccObj.curr_id);
+		copyCurr(rowObj);
+	}
+	else
+	{
+		enable(rowObj.currSel, true);
+	}
+}
+
+
+function copyCurr(rowObj)
+{
+	if (!rowObj || !rowObj.currIdInp || !rowObj.currSel)
+		return;
+
+	rowObj.currIdInp.value = selectedValue(rowObj.currSel);
+}
+
+
+function onCurrChange(rowObj)
+{
+	copyCurr(rowObj);
+
+	syncDestAmountAvail(rowObj);
 }
 
 
@@ -191,9 +252,9 @@ function onMainAccChange()
 			syncDestAccountSelect(rowObj);
 
 			copyDestAcc(rowObj);
-
-			syncDestAmountAvail(rowObj);
 		}
+		syncCurrAvail(rowObj);
+		syncDestAmountAvail(rowObj);
 	});
 }
 

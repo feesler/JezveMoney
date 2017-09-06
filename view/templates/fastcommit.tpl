@@ -1,6 +1,7 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
 var accounts = <?=f_json_encode($accArr)?>;
+var currencies = <?=f_json_encode($currArr)?>;
 
 onReady(initPage);
 </script>
