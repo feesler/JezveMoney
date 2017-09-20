@@ -1,3 +1,4 @@
+var impRows = [];
 var trRows = [];
 var trListSortable = null;
 var mainAccObj = null;
@@ -130,9 +131,6 @@ function createRow()
 			rowObj.delBtn ]);
 
 	rowsContainer.appendChild(rowObj.rowEl);
-
-	if (trListSortable)
-		trListSortable.add(rowObj.rowEl);
 
 	rowObj.pos = trRows.length;
 
@@ -364,12 +362,102 @@ function onTransPosChanged(origRow, replacedRow)
 }
 
 
-function initPage()
+function addPlaceholder()
 {
-	var submitbtn = ge('submitbtn');
-	if (!submitbtn)
+	var rowsContainer;
+	var phElem;
+
+	rowsContainer = ge('rowsContainer');
+	if (!rowsContainer)
 		return;
 
+	phElem = ce('div', { className : 'tr_row_placeholder' });
+
+	rowsContainer.appendChild(phElem);
+}
+
+
+// Import button click handler
+function onImportClick()
+{
+	ajax.get(baseURL + 'xlsimport.php', importLoadCallback);
+}
+
+
+// Import data request callback
+function importLoadCallback(response)
+{
+	var data, importRows, rowsContainer;
+
+	if (!response)
+		return;
+
+	importRows = ge('importRows');
+	rowsContainer = ge('rowsContainer');
+	if (!importRows || !rowsContainer)
+		return;
+
+	addClass(importRows.parentNode, 'column');
+	addClass(rowsContainer, 'column');
+
+	data = JSON.parse(response);
+	if (!isArray(data))
+		return;
+
+	trRows.forEach(function(rowObj)
+	{
+		delRow(rowObj);
+	});
+
+
+	data.forEach(function(dataObj)
+	{
+		var impRowObj = {};
+
+		impRowObj.data = dataObj;
+
+		impRowObj.mapBtn = ce('input', { className : 'btn ok_btn', type : 'button',
+						onclick : mapImportRow.bind(null, impRowObj),
+						value : '->' });
+
+		impRowObj.rowEl = ce('tr', { className : 'improw' }, [ ce('td', { innerHTML : dataObj.date }),
+									ce('td', { innerHTML : dataObj.trAmountVal }),
+									ce('td', { innerHTML : dataObj.trCurrVal }),
+									ce('td', { innerHTML : dataObj.accAmountVal }),
+									ce('td', { innerHTML : dataObj.accCurrVal }),
+									ce('td', {},
+										ce('div', { className : 'ellipsis_cell' },
+											ce('div', { title : dataObj.descr },
+												ce('span', { innerHTML : dataObj.descr })))),
+									ce('td', {}, impRowObj.mapBtn)
+	 								]);
+
+		importRows.appendChild(impRowObj.rowEl);
+
+		impRowObj.pos = impRows.length;
+
+		impRows.push(impRowObj);
+
+		addPlaceholder();
+	});
+}
+
+
+// Map import row to new transaction
+function mapImportRow(impRowObj)
+{
+
+}
+
+
+function initPage()
+{
+	var importbtn = ge('importbtn');
+	var submitbtn = ge('submitbtn');
+	if (!importbtn || !submitbtn)
+		return;
+
+	importbtn.onclick = onImportClick;
 	submitbtn.onclick = onSubmitClick;
 
 	createRow();
