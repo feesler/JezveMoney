@@ -44,18 +44,10 @@ function delRow(rowObj)
 	updateRowsPos();
 }
 
-function createRow()
+
+function createRowObject()
 {
-	var rowsContainer;
 	var rowObj = {};
-
-	rowsContainer = ge('rowsContainer');
-	if (!rowsContainer)
-		return;
-
-	updMainAccObj();
-	if (!mainAccObj)
-		return;
 
 	rowObj.currIdInp = ce('input', { type : 'hidden', name : 'curr_id[]', value : mainAccObj.curr_id });
 	rowObj.currSel = ce('select');
@@ -130,12 +122,32 @@ function createRow()
 			rowObj.commInp,
 			rowObj.delBtn ]);
 
+	return rowObj;
+}
+
+
+function createRow()
+{
+	var rowsContainer;
+	var rowObj;
+
+	rowsContainer = ge('rowsContainer');
+	if (!rowsContainer)
+		return;
+
+	updMainAccObj();
+	if (!mainAccObj)
+		return;
+
+	rowObj = createRowObject();
+
 	rowsContainer.appendChild(rowObj.rowEl);
 
 	rowObj.pos = trRows.length;
 
 	trRows.push(rowObj);
 }
+
 
 // Disable account option if it's the same as main account
 function syncAccountOption(opt)
