@@ -31,7 +31,7 @@ function TransactionViewModel()
 	{
 		if (!self.calendarObj)
 		{
-			self.calendarObj = Calendar.create({ wrapper_id : 'calendar', ondateselect : onSelectDate });
+			self.calendarObj = Calendar.create({ wrapper_id : 'calendar', relparent : ge('calendar').parentNode, ondateselect : onSelectDate });
 			if (!self.calendarObj)
 				return;
 		}

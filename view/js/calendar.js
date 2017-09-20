@@ -3,6 +3,14 @@ var Calendar = new (function()
 {
 	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 	var weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+	var MONTH_VIEW = 1, YEAR_VIEW = 2, YEARRANGE_VIEW = 3;
+
+
+	// Fix value for CSS transform
+	function toFix(val)
+	{
+		return +val.toFixed(4);
+	}
 
 
 	// Check specified year is leap
@@ -34,104 +42,138 @@ var Calendar = new (function()
 	}
 
 
-	// Return cell object for specified date
-	function getDayCell(date, callback)
+	// Create month picker table
+	function createYearRangeView(date)
 	{
-		var td, btn;
+		var yearsPerRow = 4, rangeLength = 10;
+		var setObj;
 
-		if (!isDate(date) || !callback)
+		if (!isDate(date))
 			return null;
 
-		td = ce('td');
-		if (!td)
-			return null;
+		var res = { type : YEARRANGE_VIEW, set : [], viewDate : date };
 
-		btn = ce('button', { type : 'button',
-						innerHTML : date.getDate(),
-						onclick : callback.bind(null, date) });
-		if (!btn)
-			return null;
+		// get real date from specified
+		var rYear = date.getFullYear();
+		var startYear = rYear - (rYear % 10) - 1;
 
-		td.appendChild(btn);
+		res.title = (startYear + 1) + '-' + (startYear + rangeLength);
+		res.cellsTable = ce('table');
 
-		return td;
+		// Create header table
+		res.nav = { prev : new Date(rYear - rangeLength, 1, 1),
+					next : new Date(rYear + rangeLength, 1, 1) };
+
+		// Main table start
+		var tbody = ce('tbody');
+
+		// years of current range
+		var tr = ce('tr');
+		for(var i = 0; i < rangeLength + 2; i++)
+		{
+			setObj = { date : new Date(startYear + i, 0, 1) };
+			setObj.cell = ce('td', { className : 'yearCell', innerHTML : setObj.date.getFullYear() });
+			if (i == 0 || i == rangeLength + 1)
+				addClass(setObj.cell, 'omonth');
+
+			res.set.push(setObj);
+			tr.appendChild(setObj.cell);
+			if ((i + 1) % yearsPerRow == 0)		// check new row
+			{
+				tbody.appendChild(tr);
+				if (i == rangeLength + 1)
+					break;
+				tr = ce('tr');
+			}
+		}
+
+		res.cellsTable.appendChild(tbody);
+
+		return res;
 	}
 
 
-	// Create button for previous / next month navigation
-	function getMonthBtn(obj, date, callback, monthCallback, isPrev)
+	// Create month picker table
+	function createYearView(date)
 	{
-		if (!obj || !isDate(date))
+		var monthsPerRow = 4;
+		var setObj;
+
+		if (!isDate(date))
 			return null;
 
-		return ce('button', { className : 'pnMonthBtn',
-						type : 'button',
-						onclick  : schedule(monthCallback.bind(null, obj, date, callback)) },
-						[ ce('div', { className : isPrev ? 'prev' : 'next' }) ]);
+		var res = { type : YEAR_VIEW, set : [], viewDate : date };
+
+		// get real date from specified
+		var rYear = date.getFullYear();
+
+		res.title = rYear;
+		res.cellsTable = ce('table');
+
+		// Create header table
+		res.nav = { prev : new Date(rYear - 1, 1, 1),
+					next : new Date(rYear + 1, 1, 1) };
+
+		// Main table start
+		var tbody = ce('tbody');
+
+		// months of current year
+		var tr = ce('tr');
+		for(var i = 0; i < months.length; i++)
+		{
+			setObj = { date : new Date(rYear, i, 1) };
+			setObj.cell = ce('td', { className : 'monthCell', innerHTML : months[setObj.date.getMonth()].substr(0, 3) });
+
+			res.set.push(setObj);
+			tr.appendChild(setObj.cell);
+			if ((i + 1) % monthsPerRow == 0)		// check new row
+			{
+				tbody.appendChild(tr);
+				if (i == months.length - 1)
+					break;
+				tr = ce('tr');
+			}
+		}
+
+		res.cellsTable.appendChild(tbody);
+
+		return res;
 	}
 
 
 	// Create date picker table
-	function createCalendar(date, dayCallback, monthCallback)
+	function createMonthView(date)
 	{
-		var mainTable, headTbl, tbody, tr, td;
-		var i, daysInRow;
+		var setObj;
 		var daysInWeek = 7;
-		var daysInMonth;
-		var rMonth, rYear, rDate;
-		var dayOfWeek;
 
-		var prevMonth, nextMonth;
-		var prevMonthBtn, nextMonthBtn;
-		var pMonthDays;
-		var dayCell;
-
-		var d, today = new Date();
-		today.setHours(0, 0, 0, 0);
-
-		var daysSet = [];
-
-
-		if (!isDate(date) || !dayCallback)
+		if (!isDate(date))
 			return null;
 
+		var res = { type : MONTH_VIEW, set : [], viewDate : date };
+
+		var today = new Date();
+		today.setHours(0, 0, 0, 0);
+
 		// get real date from specified
-		rMonth = date.getMonth();
-		rYear = date.getFullYear();
-		rDate = date.getDate();
+		var rMonth = date.getMonth();
+		var rYear = date.getFullYear();
 
-		daysInMonth = getDaysInMonth(date);
+		var daysInMonth = getDaysInMonth(date);
 
-		// week day of first day in month
-		dayOfWeek = getDayOfWeek(new Date(rYear, rMonth, 1));
+		res.title = months[rMonth] + ' ' + rYear;
+		res.cellsTable = ce('table');
 
-		mainTable = ce('table', { className : 'calTbl' });
-
-
-		prevMonth = new Date(rYear, rMonth - 1, 1);
-		nextMonth = new Date(rYear, rMonth + 1, 1);
-
-		// Create header table
-		prevMonthBtn = getMonthBtn(mainTable, prevMonth, dayCallback, monthCallback, true);
-		nextMonthBtn = getMonthBtn(mainTable, nextMonth, dayCallback, monthCallback, false);
-
-		headTbl = ce('table', { className : 'calHeadTbl' });
-		tbody = ce('tbody', {}, [ ce('tr', {}, [ ce('td', { className : 'pnMonth' }, [ prevMonthBtn ]),
-										ce('td', { className : 'hMonth', innerHTML : months[rMonth] + ' ' + rYear }),
-										ce('td', {}, [ nextMonthBtn ]) ]) ]);
-		headTbl.appendChild(tbody);
+		res.nav = { prev : new Date(rYear, rMonth - 1, 1),
+					next : new Date(rYear, rMonth + 1, 1) };
 
 		// Main table start
-		tbody = ce('tbody');
-
-		// Header
-		tr = ce('tr', {}, [ ce('td', { colSpan : daysInWeek }, [ headTbl ]) ]);
-		tbody.appendChild(tr);
+		var tbody = ce('tbody');
 
 		// week days
-		tr = ce('tr');
+		var tr = ce('tr');
 		weekdays.forEach(function(wd){
-			tr.appendChild(ce('td', { innerHTML : wd }));
+			tr.appendChild(ce('th', { innerHTML : wd }));
 		});
 		tbody.appendChild(tr);
 
@@ -139,70 +181,52 @@ var Calendar = new (function()
 		tr = ce('tr');
 
 		// days of previous month
-		daysInRow = 0;
-		pMonthDays = getDaysInMonth(prevMonth);
+		var pMonthDays = getDaysInMonth(res.nav.prev);
+		var dayOfWeek = getDayOfWeek(new Date(rYear, rMonth, 1));		// week day of first day in month
+		var i, daysInRow = dayOfWeek;
 		for(i = 1; i <= dayOfWeek; i++)
 		{
-			d = new Date(prevMonth.getFullYear(), prevMonth.getMonth(), pMonthDays - (dayOfWeek - i));
-			dayCell = getDayCell(d, dayCallback);
-			if (!dayCell)
-				return;
-			dayCell.className = 'omonth';
-			tr.appendChild(dayCell);
-			daysInRow++;
+			setObj = { date : new Date(res.nav.prev.getFullYear(), res.nav.prev.getMonth(), pMonthDays - (dayOfWeek - i)) };
+			setObj.cell = ce('td', { innerHTML : setObj.date.getDate() });
+			setObj.cell.className = 'omonth';
 
-			daysSet.push({ date : d, cell : dayCell });
+			res.set.push(setObj);
+			tr.appendChild(setObj.cell);
 		}
 
 		// days of current month
 		for(i = 1; i < daysInMonth + 1; i++)
 		{
-			d = new Date(rYear, rMonth, i);
-			dayCell = getDayCell(d, dayCallback);
-			if (!dayCell)
-				return;
+			setObj = { date : new Date(rYear, rMonth, i) };
+			setObj.cell = ce('td', { innerHTML : setObj.date.getDate() });
+			if (setObj.date - today == 0)
+				setObj.cell.className = 'today';
 
-			if (d - today == 0)
-				dayCell.className = 'today';
-
-			daysSet.push({ date : d, cell : dayCell });
-
-			tr.appendChild(dayCell);
-			daysInRow++;
-			if (daysInRow == daysInWeek)		// check new week
+			res.set.push(setObj);
+			tr.appendChild(setObj.cell);
+			if (++daysInRow == daysInWeek)		// check new week
 			{
-				if (tr != null)
-				{
-					tbody.appendChild(tr);
-					tr = null;
-				}
-
+				tbody.appendChild(tr);
 				tr = ce('tr');
 				daysInRow = 0;
 			}
 		}
 
-		if (tr != null)
+		// append days of next month
+		for(i = daysInRow; i < daysInWeek; i++)
 		{
-			// append days of next month
-			for(i = daysInRow; i < daysInWeek; i++)
-			{
-				d = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), i - daysInRow + 1);
-				dayCell = getDayCell(d, dayCallback);
-				if (!dayCell)
-					return;
-				dayCell.className = 'omonth';
-				tr.appendChild(dayCell);
+			setObj = { date : new Date(res.nav.next.getFullYear(), res.nav.next.getMonth(), i - daysInRow + 1) };
+			setObj.cell = ce('td', { innerHTML : setObj.date.getDate() });
+			setObj.cell.className = 'omonth';
 
-				daysSet.push({ date : d, cell : dayCell });
-			}
-
-			tbody.appendChild(tr);
+			res.set.push(setObj);
+			tr.appendChild(setObj.cell);
 		}
 
-		mainTable.appendChild(tbody);
+		tbody.appendChild(tr);
+		res.cellsTable.appendChild(tbody);
 
-		return { table : mainTable, set : daysSet };
+		return res;
 	}
 
 
@@ -233,53 +257,181 @@ var Calendar = new (function()
 	// Date picker instance constructor
 	function datePicker(params)
 	{
-		var datePickerObj = null;
+		var baseObj = null;
 		var wrapperObj = null;
+		var isStatic = false;
+		var relativeParent = null;
 		var dateCallback = null;
 		var rangeCallback = null;
 		var showCallback = null;
 		var hideCallback = null;
-		var dateSet = null;
+		var currView = null;
+		var nextView = null;
+		var nextCallbacks = null;
 		var actDate = null;
 		var rangeMode = false;
 		var curRange = { start : null, end : null };
 		var selRange = { start : null, end : null };
+		var titleEl = null;
+		var cellsContainer = null;
+		var isAnimated = true;
+		var animation = false;
 		var self = this;
+
+
+		function renderHead()
+		{
+			titleEl = ce('span', { className : 'title' });
+
+			var headTbl = ce('div', { className : 'calHeadTbl' }, [
+								ce('div', { className : 'nav next' }, ce('div')),
+								ce('div', { className : 'nav prev' }, ce('div')),
+								ce('div', {}, titleEl) ]);
+
+			return headTbl;
+		}
+
+
+		function setTitle(title)
+		{
+			if (title && titleEl)
+				titleEl.innerHTML = title;
+		}
+
+
+		// Mouse whell event handler
+		function onWheel(e)
+		{
+			var dir;
+
+			if (!currView || !currView.callback || animation)
+				return;
+
+			e = fixEvent(e);
+
+			if (!e.wheelDelta)	// Firefox
+				e.wheelDelta = -40*e.detail;
+
+			if (e.wheelDelta == 0)
+				return;
+
+			dir = (e.wheelDelta > 0);
+
+			if (!isFunction(currView.callback.nav) || !currView.nav)
+				return;
+
+			schedule(currView.callback.nav.bind(null, dir ? currView.nav.prev : currView.nav.next))();
+
+			e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+		}
+
+
+		// Wheel support initialization
+		function initWheel(elem, handler)
+		{
+			if (!elem)
+				return;
+
+			if (elem.addEventListener)
+			{
+				elem.addEventListener("mousewheel", handler, false);			// IE9+, Opera, Chrome/Safari
+				elem.addEventListener("DOMMouseScroll", handler, false);		// Firefox
+			}
+			else		// IE<9
+				elem.attachEvent("onmousewheel", handler);
+		}
+
+
+		// Table click event delegate
+		function onTableClick(e)
+		{
+			if (!currView || !currView.callback || animation)
+				return;
+
+			e = fixEvent(e);
+
+			if (hasClass(e.target, 'title') || hasClass(e.target.parentNode, 'title'))
+			{
+				if (!isFunction(currView.callback.hdr))
+					return;
+
+				schedule(currView.callback.hdr.bind(null, currView.viewDate))();
+			}
+			else if (hasClass(e.target, 'nav') || hasClass(e.target.parentNode, 'nav'))
+			{
+				if (!isFunction(currView.callback.nav) || !currView.nav)
+					return;
+
+				var el = hasClass(e.target, 'nav') ? e.target : e.target.parentNode;
+				schedule(currView.callback.nav.bind(null, hasClass(el, 'prev') ? currView.nav.prev : currView.nav.next))();
+			}
+			else
+			{
+				// check main cells
+				if (!isFunction(currView.callback.cell))
+					return;
+
+				currView.set.some(function(setObj)
+				{
+					var cond = (setObj.cell == e.target);
+
+					if (cond)
+						schedule(currView.callback.cell.bind(null, setObj.date))();
+
+					return cond;
+				});
+			}
+		}
+
+
+		function createLayout()
+		{
+			if (!wrapperObj)
+				return;
+
+			currView = { callback : { cell : null, nav : null, hdr : null } };
+
+			wrapperObj.onclick = onTableClick;
+			initWheel(wrapperObj, onWheel);
+
+			cellsContainer = ce('div', { className : 'calTbl' });
+			addChilds(wrapperObj, [ renderHead(), cellsContainer ]);
+		}
 
 
 		// Remove highlight from all cells
 		function cleanHL()
 		{
-			if (dateSet)
+			if (!currView || !isArray(currView.set))
+				return;
+
+			currView.set.forEach(function(dateObj)
 			{
-				dateSet.forEach(function(dateObj)
-				{
-					removeClass(dateObj.cell, 'hl');
-				});
-			}
+				removeClass(dateObj.cell, 'hl');
+			});
 		}
 
 
 		// Remove all markers from all cells
 		function cleanAll()
 		{
-			if (dateSet)
+			if (!currView || !isArray(currView.set))
+				return;
+
+			currView.set.forEach(function(dateObj)
 			{
-				dateSet.forEach(function(dateObj)
-				{
-					removeClass(dateObj.cell, ['hl', 'act']);
-				});
-			}
+				removeClass(dateObj.cell, ['hl', 'act']);
+			});
 		}
 
 
 		// Highlight specified range of cells
 		function highLightRange(range)
 		{
-			if (!range || !range.start || !range.end)
+			if (!range || !range.start || !range.end || !currView || !isArray(currView.set))
 				return;
 
-			dateSet.forEach(function(dateObj)
+			currView.set.forEach(function(dateObj)
 			{
 				if (inRange(dateObj.date, range))
 				{
@@ -292,27 +444,14 @@ var Calendar = new (function()
 		// Activate cell by specified date
 		function activateCell(date)
 		{
-			var cell;
-
-			cell = findCell(date);
-			if (cell)
-			{
-				if (!hasClass(cell, 'act'))
-					addClass(cell, 'act');
-			}
+			addClass(findCell(date), 'act');
 		}
 
 
 		// Activate cell by specified date
 		function deactivateCell(date)
 		{
-			var cell;
-
-			cell = findCell(date);
-			if (cell)
-			{
-				removeClass(cell, 'act');
-			}
+			removeClass(findCell(date), 'act');
 		}
 
 
@@ -321,10 +460,10 @@ var Calendar = new (function()
 		{
 			var cell = null;
 
-			if (!isDate(date) || !dateSet)
+			if (!isDate(date) || !currView || !isArray(currView.set))
 				return null;
 
-			dateSet.some(function(dateObj)
+			currView.set.some(function(dateObj)
 			{
 				var cond = (dateObj.date - date == 0)
 				if (cond)
@@ -346,7 +485,7 @@ var Calendar = new (function()
 			actDate = date;
 			activateCell(actDate);
 
-			if (dateCallback)
+			if (isFunction(dateCallback))
 				dateCallback(date);
 
 			if (rangeMode)
@@ -359,7 +498,7 @@ var Calendar = new (function()
 		{
 			cleanHL();
 
-			curRange = { start : null, end : null }
+			curRange = { start : null, end : null };
 			if (!selRange.start)
 				selRange.start = date;
 			else
@@ -373,7 +512,7 @@ var Calendar = new (function()
 				selRange.start = tdate;
 			}
 
-			if (rangeCallback && selRange.start && selRange.end)
+			if (isFunction(rangeCallback) && selRange.start && selRange.end)
 			{
 				curRange = { start : selRange.start, end : selRange.end };
 				selRange = { start : null, end : null };
@@ -386,22 +525,147 @@ var Calendar = new (function()
 		}
 
 
-		// Month change callback
-		function update(tblObj, date, callback)
+		// Handle animation end event
+		function onTransitionEnd(e)
 		{
-			var calObj;
-
-			if (!tblObj || !isDate(date))
+			if (e.target != currView.cellsTable || e.propertyName != 'transform')
 				return;
 
-			calObj = createCalendar(date, callback, update);
-			if (!calObj)
+			removeClass(cellsContainer, 'animated');
+			removeClass(nextView.cellsTable, ['layered', 'bottom_to', 'top_to']);
+			nextView.cellsTable.style.left = '';
+			transform(nextView.cellsTable, '');
+			cellsContainer.style.width = '';
+			cellsContainer.style.height = '';
+			re(currView.cellsTable);
+			applyView(nextView, nextCallbacks);
+
+			animation = false;
+			cellsContainer.removeEventListener('transitionend', onTransitionEnd);
+		}
+
+
+		// Set new view
+		function applyView(newView, callbacks)
+		{
+			currView = newView;
+			setTitle(currView.title);
+			currView.callback = callbacks;
+		}
+
+
+		// Set new view or replace current view with specified
+		function setView(newView, callbacks)
+		{
+			if (!cellsContainer || !newView || !callbacks)
 				return;
 
-			insertAfter(calObj.table, tblObj);
-			re(tblObj);
+			if (!currView.cellsTable || !isAnimated)
+			{
+				cellsContainer.appendChild(newView.cellsTable);
+				if (currView.cellsTable && !isAnimated)
+					re(currView.cellsTable);
+				applyView(newView, callbacks);
+				return;
+			}
 
-			dateSet = calObj.set;
+			animation = true;
+
+			var currTblWidth = cellsContainer.offsetWidth;
+			var currTblHeight = cellsContainer.offsetHeight;
+
+			cellsContainer.appendChild(newView.cellsTable);
+
+			cellsContainer.style.width = px(currTblWidth);
+			cellsContainer.style.height = px(currTblHeight);
+
+			if (currView.type == newView.type)
+			{
+				var leftToRight = currView.viewDate < newView.viewDate;
+
+				addClass(currView.cellsTable, 'layered');
+				addClass(newView.cellsTable, 'layered');
+
+				newView.cellsTable.style.left = px(leftToRight? currTblWidth : -currTblWidth);
+
+				addClass(cellsContainer, 'animated');
+
+				cellsContainer.style.height = px(newView.cellsTable.offsetHeight);
+				var trMatrix = [1, 0, 0, 1, (leftToRight? -currTblWidth : currTblWidth), 0];
+				transform(currView.cellsTable, 'matrix(' + trMatrix.join() + ')');
+				transform(newView.cellsTable, 'matrix(' + trMatrix.join() + ')');
+
+				nextView = newView;
+				nextCallbacks = callbacks;
+
+				cellsContainer.addEventListener('transitionend', onTransitionEnd);
+			}
+			else
+			{
+				var goUp = (currView.type < newView.type);
+				var cellElement = null;
+				var cellView = (goUp) ? newView : currView;
+				var relView = (goUp) ? currView : newView;
+				var relYear = relView.viewDate.getFullYear();
+				var relMonth = relView.viewDate.getMonth();
+
+				cellView.set.some(function(cellObj)
+				{
+					var cond = false;
+
+					if (relView.type == MONTH_VIEW)			// navigate from month view to year view
+						cond = (cellObj.date.getFullYear() == relYear &&
+								cellObj.date.getMonth() == relMonth);
+					else if (relView.type == YEAR_VIEW)		// navigate from year view to years range
+						cond = (cellObj.date.getFullYear() == relYear);
+
+					if (cond)
+						cellElement = cellObj.cell;
+
+					return cond;
+				});
+
+				if (!cellElement)
+					return;
+
+				var cellX = cellElement.offsetLeft;
+				var cellY = cellElement.offsetTop;
+
+				addClass(newView.cellsTable, ['layered', (goUp) ? 'bottom_to' : 'top_to']);
+
+				var scaleX = cellElement.offsetWidth / currTblWidth;
+				var scaleY = cellElement.offsetHeight / currTblHeight;
+
+				var cellTrans = [scaleX, 0, 0, scaleY, cellX, cellY].map(toFix);
+				var viewTrans = [1 / scaleX, 0, 0, 1 / scaleY, -cellX / scaleX, -cellY / scaleY].map(toFix);
+
+				transform(newView.cellsTable, 'matrix(' + (goUp ? viewTrans : cellTrans).join() + ')');
+
+				addClass(currView.cellsTable, ['layered', (goUp) ? 'top_from' : 'bottom_from']);
+
+				setTimeout(function()
+				{
+					addClass(cellsContainer, 'animated');
+					cellsContainer.style.height = px(newView.cellsTable.offsetHeight);
+					newView.cellsTable.style.opacity = 1;
+					currView.cellsTable.style.opacity = 0;
+					transform(newView.cellsTable, '');
+					transform(currView.cellsTable, 'matrix(' + (goUp ? cellTrans : viewTrans).join() + ')');
+
+					nextView = newView;
+					nextCallbacks = callbacks;
+
+					cellsContainer.addEventListener('transitionend', onTransitionEnd);
+				}, 100);
+			}
+		}
+
+
+		// Month change callback
+		function showMonth(date)
+		{
+			var viewObj = createMonthView(date);
+			setView(viewObj, { cell : onDayClick, nav : showMonth, hdr : showYear});
 
 			activateCell(actDate);
 
@@ -410,19 +674,76 @@ var Calendar = new (function()
 		}
 
 
+		// Show year view to select month
+		function showYear(date)
+		{
+			var viewObj = createYearView(date);
+			setView(viewObj, { cell : showMonth, nav : showYear, hdr : showYearRange});
+		}
+
+
+		// Show year range view to select year
+		function showYearRange(date)
+		{
+			var viewObj = createYearRangeView(date);
+			setView(viewObj, { cell : showYear, nav : showYearRange, hdr : null});
+		}
+
+
+		// Show/hide date picker contol
+		function showView(val)
+		{
+			if (val === undefined)
+				val = true;
+
+			show(wrapperObj, val);
+
+			// check position of control in window and place it to be visible
+			if (val && !isStatic)
+			{
+				if (getOffset(wrapperObj).top + wrapperObj.offsetHeight > document.documentElement.clientHeight)
+				{
+					wrapperObj.style.bottom = px((relativeParent) ? relativeParent.offsetHeight : 0);
+				}
+			}
+
+			// set automatic hide on empty click
+			if (!isStatic)
+			{
+				if (val)
+					setEmptyClick(showView.bind(self, false), [wrapperObj, relativeParent]);
+				else
+					setEmptyClick();
+			}
+
+			if (val && isFunction(showCallback))
+				showCallback();
+			if (!val && isFunction(hideCallback))
+				hideCallback();
+		}
+
+
 		// Date picker instance
 		function create(params)
 		{
-			var date;
+			if (!params.wrapper_id)
+				return;
 
-			if (params.wrapper_id)
-			{
-				wrapperObj = ge(params.wrapper_id);
-				if (!wrapperObj)
-					return;
-			}
+			baseObj = ge(params.wrapper_id);
+			if (!baseObj)
+				return;
+			removeChilds(baseObj);
+			addClass(baseObj, 'calBase');
 
-			if (params.range == true && params.onrangeselect)
+			wrapperObj = ce('div', { className : 'calWrap' });
+			isStatic = params.static === true;
+			if (isStatic)
+				addClass(wrapperObj, 'staticCal');
+			else
+				show(wrapperObj, false);
+			baseObj.appendChild(wrapperObj);
+
+			if (params.range == true && isFunction(params.onrangeselect))
 			{
 				rangeMode = true;
 				rangeCallback = params.onrangeselect;
@@ -431,18 +752,19 @@ var Calendar = new (function()
 
 			showCallback = params.onshow || null;
 			hideCallback = params.onhide || null;
+			isAnimated = (document.addEventListener && params.animated) || false;
+
+			if (params.relparent)
+			{
+				relativeParent = ge(params.relparent);
+			}
 
 			// Prepare date
-			date = isDate(params.date) ? params.date : new Date();
+			var date = isDate(params.date) ? params.date : new Date();
 
-			datePickerObj = createCalendar(date, onDayClick, update);
-			if (!datePickerObj)
-				return;
+			createLayout();
 
-			if (wrapperObj)
-				wrapperObj.appendChild(datePickerObj.table);
-
-			dateSet = datePickerObj.set;
+			showMonth(date);
 		}
 
 		create(params);
@@ -453,15 +775,7 @@ var Calendar = new (function()
 		// Show/hide date picker
 		this.show = function(val)
 		{
-			if (val === undefined)
-				val = true;
-
-			show(wrapperObj, val);
-
-			if (val && showCallback)
-				showCallback();
-			if (!val && hideCallback)
-				hideCallback();
+			showView(val);
 		}
 
 

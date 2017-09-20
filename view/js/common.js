@@ -49,7 +49,7 @@ function setParam(obj, params)
 		{
 			obj[par] = val.map(function(item){ return item; });
 		}
-		else if (typeof val === 'object')
+		else if (isObject(val))
 		{
 			if (obj[par] == null || obj[par] === undefined)
 				obj[par] = {};
@@ -505,7 +505,7 @@ function schedule(func)
 {
 	return function()
 	{
-		setTimeout(func, 0);
+		setTimeout(func, 1);
 	}
 }
 
@@ -553,7 +553,11 @@ function setEmptyClick(callback, elem)
 
 	if (onClickHandler && document.documentElement['on' + evName])
 		document.documentElement['on' + evName]();			// run previously set callback
-	document.documentElement['on' + evName] = onClickHandler;
+	document.documentElement['on' + evName] = null;
+	schedule(function()
+	{
+		document.documentElement['on' + evName] = onClickHandler;
+	})();
 }
 
 
@@ -767,6 +771,23 @@ function head()
 	}
 
 	return null;
+}
+
+
+// Set cross-browser transform value
+function transform(elem, value)
+{
+	if (!elem || !elem.style)
+		return;
+
+	if (elem.style.webkitTransform !== undefined)
+		elem.style.webkitTransform = value;
+	else if (elem.style.MozTransform !== undefined)
+		elem.style.MozTransform = value;
+	else if (elem.style.msTransform !== undefined)
+		elem.style.msTransform = value;
+	else if (elem.style.transform !== undefined)
+		elem.style.transform = value;
 }
 
 

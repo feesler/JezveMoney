@@ -115,16 +115,3 @@
 {
 	margin: 0px 0px 0px 15px;
 }
-
-
-.transCalWrap
-{
-	z-index: 10;
-	margin: 0;
-}
-
-
-.transCalWrap > div
-{
-	float : left;
-}

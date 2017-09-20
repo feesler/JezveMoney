@@ -34,7 +34,7 @@
 <?php	}	?>
 <?php	foreach($trListData as $trItem) {	?>
 <?php	if ($details) {		?>
-								<tbody><tr id="tr_<?=$trItem["id"]?>">
+								<tbody class="trlist_item_wrap"><tr id="tr_<?=$trItem["id"]?>">
 									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=$trItem["acc"]?>"><span><?=$trItem["acc"]?></span></div></div></td>
 									<td><div class="tritem_sum"><span><?=$trItem["amount"]?></span></div></td>
 									<td><div class="tritem_balance">

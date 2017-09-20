@@ -70,7 +70,7 @@
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 										</div>
-										<div id="calendar" class="calWrap transCalWrap" style="display: none;"></div>
+										<div id="calendar"></div>
 									</div>
 								</div>
 							</div>

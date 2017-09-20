@@ -608,6 +608,7 @@ function showCalendar()
 	if (!calendarObj)
 	{
 		calendarObj = Calendar.create({ wrapper_id : 'calendar',
+										relparent : ge('calendar').parentNode,
 										range : true,
 										onrangeselect : onRangeSelect,
 										onhide : onDatePickerHide });

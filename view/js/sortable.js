@@ -61,10 +61,10 @@ SortableDragZone.prototype.getItemClass = function()
 
 
 // Insert event handler
-SortableDragZone.prototype.onInsertAt = function(elem)
+SortableDragZone.prototype.onInsertAt = function(srcElem, elem)
 {
 	if (this._params && isFunction(this._params.oninsertat))
-		this._params.oninsertat(this._elem, elem);
+		this._params.oninsertat(srcElem, elem);
 }
 
 
@@ -76,9 +76,31 @@ function SortableDragAvatar(dragZone, dragElem)
 
 extend(SortableDragAvatar, DragAvatar);
 
+
+// Find specific drag zone element
+SortableDragAvatar.prototype.findDragZoneItem = function(target)
+{
+	var itemClass = this._dragZone.getItemClass();
+	var root = this._dragZone.getElement();
+	var el = target;
+
+	while(el && el != root)
+	{
+		if (hasClass(el, itemClass))
+			return el;
+		el = el.parentNode;
+	}
+
+	return null;
+}
+
+
 SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 {
-	this._dragZoneElem = this._dragZone.getElement();
+	this._dragZoneElem = this.findDragZoneItem(e.target);
+	if (!this._dragZoneElem)
+		return false;
+
 	this._initialPos = this.getSortPosition();
 	var elem = this._elem = this._dragZoneElem.cloneNode(true);
 
@@ -166,8 +188,11 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 {
 	var elem;
 
-	this._dragZoneElem = this._dragZone.getElement();
+	this._dragZoneElem = this.findDragZoneItem(e.target);
+	if (!this._dragZoneElem)
+		return false;
 
+	this._initialPos = this.getSortPosition();
 	var tbl = this._dragZoneElem.parentNode.cloneNode(false);
 	tbl.appendChild(this._dragZoneElem.cloneNode(true));
 
@@ -215,28 +240,79 @@ function SortableDropTarget(elem)
 extend(SortableDropTarget, DropTarget);
 
 
+SortableDropTarget.prototype._getTargetElem = function(avatar, event)
+{
+	var el = avatar.getTargetElem();
+	var dragInfo = avatar.getDragInfo();
+	var itemClass = dragInfo.dragZone.getItemClass();
+	var phItemClass = dragInfo.dragZone.getPlaceholderClass();
+	var root = dragInfo.dragZone.getElement();
 
-SortableDropTarget.prototype.onDragEnter = function(fromDropTarget, avatar, event)
+	while(el && el != root)
+	{
+		if (hasClass(el, itemClass) || hasClass(el, phItemClass))
+			return el;
+		el = el.parentNode;
+	}
+
+	return null;
+}
+
+
+SortableDropTarget.prototype.onDragMove = function(avatar, event)
 {
 	var newTargetElem = this._getTargetElem(avatar, event);
+	if (this._targetElem == newTargetElem)
+		return;
 
+	this._hideHoverIndication(avatar);
 	this._targetElem = newTargetElem;
+	this._showHoverIndication(avatar);
+
 	var dragInfo = avatar.getDragInfo();
 
 	if (!this._targetElem || !(avatar instanceof SortableDragAvatar) || (dragInfo.dragZone.getGroup() != this._params.group))
 		return;
 
-	var nodeCmp = comparePosition(this._elem, dragInfo.dragZoneElem);
+	var nodeCmp = comparePosition(this._targetElem, dragInfo.dragZoneElem);
+	if (!nodeCmp)
+		return;
 
-	if (nodeCmp)
+	// check drop target is already a placeholder
+	if (hasClass(this._targetElem, dragInfo.dragZone.getPlaceholderClass()))
 	{
-		if (nodeCmp & 2)			// drag zone element is after current drop target
-			insertAfter(dragInfo.dragZoneElem, this._elem);
-		else if (nodeCmp & 4)		// drag zone element is before current drop target
-			insertBefore(dragInfo.dragZoneElem, this._elem);
+		var pos = avatar.getSortPosition();
 
-		avatar.saveSortTarget(this._elem);
+		// swap drag zone with drop target
+		if (nodeCmp & 2)
+			insertAfter(dragInfo.dragZoneElem, this._targetElem);
+		else if (nodeCmp & 4)
+			insertBefore(dragInfo.dragZoneElem, this._targetElem);
+		if (this._targetElem != pos.prev && this._targetElem != pos.next)
+		{
+			if (pos.prev)
+				insertAfter(this._targetElem, pos.prev);
+			else
+				insertBefore(this._targetElem, pos.next);
+		}
 	}
+	else
+	{
+		// check moving between two different zones
+		if (dragInfo.dragZoneElem.parentNode != this._targetElem.parentNode)
+		{
+			insertBefore(dragInfo.dragZoneElem, this._targetElem);
+		}
+		else
+		{
+			if (nodeCmp & 2)			// drag zone element is after current drop target
+				insertAfter(dragInfo.dragZoneElem, this._targetElem);
+			else if (nodeCmp & 4)		// drag zone element is before current drop target
+				insertBefore(dragInfo.dragZoneElem, this._targetElem);
+		}
+	}
+
+	avatar.saveSortTarget(this._targetElem);
 }
 
 
@@ -261,7 +337,7 @@ SortableDropTarget.prototype.onDragEnd = function(avatar, e)
 		if (avatarInfo.initialPos.prev != newPos.prev &&
 			avatarInfo.initialPos.next != newPos.next)
 		{
-			avatarInfo.dragZone.onInsertAt(avatarInfo.sortTarget);
+			avatarInfo.dragZone.onInsertAt(avatarInfo.dragZoneElem, avatarInfo.sortTarget);
 		}
 	}
 
@@ -304,39 +380,9 @@ function Sortable(params)
 		if (!containerElem)
 			return;
 
-		var child = firstElementChild(containerElem);
-		while(child)
-		{
-			if (!addItem(child))
-				break;
-
-			child = nextElementSibling(child);
-		}
-	}
-
-
-	function addItem(elem)
-	{
-		if (!elem)
-			return false;
-
-		var zoneParam = {};
-		setParam(zoneParam, dragZoneParam);
-		if (dragZoneParam.onlyRootHandle === true)
-			zoneParam.handles = elem;
-		new SortableDragZone(elem, zoneParam);
-		new SortableDropTarget(elem, dropTargetParam);
-
-		return true;
+		new SortableDragZone(containerElem, dragZoneParam);
+		new SortableDropTarget(containerElem, dropTargetParam);
 	}
 
 	create(params);
-
-
-	return {
-		add : function(elem)
-		{
-			return addItem(elem)
-		}
-	}
 }

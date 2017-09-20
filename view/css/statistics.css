@@ -17,19 +17,6 @@
 }
 
 
-.transCalWrap
-{
-	z-index: 10;
-	margin: 0;
-}
-
-
-.transCalWrap > div
-{
-	float : left;
-}
-
-
 /* Filter select */
 .filter_sel
 {
