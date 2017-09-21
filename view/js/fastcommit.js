@@ -126,6 +126,36 @@ function createRowObject()
 }
 
 
+// Find first sibling of item with specified class
+function findFirstSiblingByClass(item, className)
+{
+	while(item)
+	{
+		item = nextElementSibling(item);
+
+		if (hasClass(item, className))
+			return item;
+	}
+
+	return null;
+}
+
+
+// Find first placeholder in the list
+function findPlaceholder()
+{
+	return findFirstSiblingByClass(firstElementChild(ge('rowsContainer')), 'tr_row_placeholder');
+}
+
+
+// Find first transaction item after specified
+function findNextItem(item)
+{
+	return findFirstSiblingByClass(item, 'tr_row');
+}
+
+
+// Add new transaction row and insert it into list
 function createRow()
 {
 	var rowsContainer;
@@ -141,11 +171,38 @@ function createRow()
 
 	rowObj = createRowObject();
 
-	rowsContainer.appendChild(rowObj.rowEl);
+	var nextTrRow = null;
+	var firstPlaceholder = findPlaceholder();
 
-	rowObj.pos = trRows.length;
+	if (firstPlaceholder)
+	{
+		nextTrRow = findNextItem(firstPlaceholder);
 
-	trRows.push(rowObj);
+		insertAfter(rowObj.rowEl, firstPlaceholder);
+		if (nextTrRow)
+		{
+			var nextTrRowObj = getRowByElem(nextTrRow);
+
+			trRows.splice(nextTrRowObj.pos, 0, rowObj);
+
+			updateRowsPos();
+		}
+		else
+		{
+			rowObj.pos = trRows.length;
+			trRows.push(rowObj);
+		}
+
+		re(firstPlaceholder);
+	}
+	else
+	{
+		rowsContainer.appendChild(rowObj.rowEl);
+
+		rowObj.pos = trRows.length;
+
+		trRows.push(rowObj);
+	}
 }
 
 
