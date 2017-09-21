@@ -597,14 +597,14 @@ function mapImportRow(impRowObj)
 		tr_type = 'expense';
 
 	selectByValue(rowObj.trTypeSel, tr_type);
-	onTrTypeChange.call(rowObj.trTypeSel, rowObj);
+	rowObj.trTypeSel.onchange(rowObj);
 
 	rowObj.amountInp.value = Math.abs(impRowObj.data.accAmountVal);
 
 	if (trCurr.id != accCurr.id)
 	{
 		selectByValue(rowObj.currSel, trCurr.id);
-		onCurrChange.call(rowObj.currSel, rowObj);
+		rowObj.currSel.onchange(rowObj);
 		rowObj.destAmountInp.value = impRowObj.data.trAmountVal;
 	}
 
