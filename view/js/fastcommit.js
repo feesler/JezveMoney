@@ -605,7 +605,7 @@ function mapImportRow(impRowObj)
 	{
 		selectByValue(rowObj.currSel, trCurr.id);
 		rowObj.currSel.onchange(rowObj);
-		rowObj.destAmountInp.value = impRowObj.data.trAmountVal;
+		rowObj.destAmountInp.value = Math.abs(impRowObj.data.trAmountVal);
 	}
 
 	rowObj.dateInp.value = impRowObj.data.date;
