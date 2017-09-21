@@ -15,6 +15,24 @@ function currFromSelect(selectObj)
 }
 
 
+function findCurrencyByName(currName)
+{
+	var res = null;
+
+	currencies.some(function(currency)
+	{
+		var cond = (currency.name == currName);
+
+		if (cond)
+			res = currency;
+
+		return cond;
+	});
+
+	return res;
+}
+
+
 function updMainAccObj()
 {
 	mainAccObj = accFromSelect(ge('acc_id'));
@@ -141,6 +159,21 @@ function findFirstSiblingByClass(item, className)
 }
 
 
+// Find last sigling of item with specified class
+function findLastSiblingByClass(item, className)
+{
+	while(item)
+	{
+		item = previousElementSibling(item);
+
+		if (hasClass(item, className))
+			return item;
+	}
+
+	return null;
+}
+
+
 // Find first placeholder in the list
 function findPlaceholder()
 {
@@ -152,6 +185,32 @@ function findPlaceholder()
 function findNextItem(item)
 {
 	return findFirstSiblingByClass(item, 'tr_row');
+}
+
+
+// Find first transaction item before specified
+function findPrevItem(item)
+{
+	return findLastSiblingByClass(item, 'tr_row');
+}
+
+
+
+// Return nth child of element if exist
+function findNthItem(parent, n)
+{
+	if (!parent || !n)
+		return null;
+
+	var item = firstElementChild(parent);
+	for(var i = 1; i < n; i++)
+	{
+		item = nextElementSibling(item);
+		if (!item)
+			return null;
+	}
+
+	return item;
 }
 
 
@@ -515,7 +574,80 @@ function importLoadCallback(response)
 // Map import row to new transaction
 function mapImportRow(impRowObj)
 {
+	var rowObj;
+	var tr_type, accCurr, trCurr;
 
+	if (!impRowObj || !impRowObj.data)
+		return;
+
+
+	accCurr = findCurrencyByName(impRowObj.data.accCurrVal);
+	trCurr = findCurrencyByName(impRowObj.data.trCurrVal);
+	if (!accCurr || !trCurr)	// unknown currency
+		return;
+
+	if (accCurr.id != mainAccObj.curr_id)	// currency should be same as main account
+		return;
+
+	rowObj = createRowObject();
+
+	if (impRowObj.data.accAmountVal > 0)
+		tr_type = 'income';
+	else
+		tr_type = 'expense';
+
+	selectByValue(rowObj.trTypeSel, tr_type);
+
+	rowObj.amountInp.value = impRowObj.data.accAmountVal;
+
+	if (trCurr.id != accCurr.id)
+	{
+		selectByValue(rowObj.currSel, trCurr.id);
+		rowObj.destAmountInp.value = impRowObj.data.trAmountVal;
+	}
+
+	rowObj.dateInp.value = impRowObj.data.date;
+	rowObj.commInp.value = impRowObj.data.descr;
+
+	var item = findNthItem(ge('rowsContainer'), impRowObj.pos + 1);
+	if (!item)
+		return;
+
+	var replacedRow, replacedRowObj;
+	if (hasClass(item, 'tr_row'))	// insert at filled transaction
+	{
+		replacedRow = getRowByElem(item);
+
+		trRows[replacedRow.pos] = rowObj;
+	}
+	else if (!trRows.length)	// insert at empty list
+	{
+		trRows.push(rowObj);
+	}
+	else	// insert at placeholder
+	{
+		replacedRow = findNextItem(item);
+		if (replacedRow)
+		{
+			replacedRowObj = getRowByElem(replacedRow);
+			if (!replacedRowObj)
+				return;
+			trRows.splice(replacedRowObj.pos - 1, 0, rowObj);
+		}
+		else
+		{
+			replacedRow = findPrevItem(item);
+			replacedRowObj = getRowByElem(replacedRow);
+			if (!replacedRowObj)
+				return;
+			trRows.splice(replacedRowObj.pos, 0, rowObj);
+		}
+	}
+
+	insertAfter(rowObj.rowEl, item);
+	re(item);
+
+	updateRowsPos();
 }
 
 
