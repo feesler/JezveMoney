@@ -33,6 +33,43 @@ SortableDragZone.prototype.onDragStart = function(downX, downY, event)
 };
 
 
+// Find specific drag zone element
+SortableDragZone.prototype.findDragZoneItem = function(target)
+{
+	if (!this._params || !this._params.itemClass)
+		return null;
+
+	var el = target;
+
+	while(el && el != this._elem)
+	{
+		if (hasClass(el, this._params.itemClass))
+			return el;
+		el = el.parentNode;
+	}
+
+	return null;
+};
+
+
+// Check specified targer element is valid
+SortableDragZone.prototype.isValidDragHandle = function(target)
+{
+	var handles;
+
+	if (!target)
+		return false;
+
+	// allow to drag using whole drag zone in case no handles is set
+	if (this._params === undefined || this._params.onlyRootHandle === undefined)
+		return true;
+
+	var item = this.findDragZoneItem(target);
+
+	return this._params.onlyRootHandle && target == item;
+}
+
+
 // Return group of sortable
 SortableDragZone.prototype.getGroup = function()
 {
@@ -77,27 +114,9 @@ function SortableDragAvatar(dragZone, dragElem)
 extend(SortableDragAvatar, DragAvatar);
 
 
-// Find specific drag zone element
-SortableDragAvatar.prototype.findDragZoneItem = function(target)
-{
-	var itemClass = this._dragZone.getItemClass();
-	var root = this._dragZone.getElement();
-	var el = target;
-
-	while(el && el != root)
-	{
-		if (hasClass(el, itemClass))
-			return el;
-		el = el.parentNode;
-	}
-
-	return null;
-}
-
-
 SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 {
-	this._dragZoneElem = this.findDragZoneItem(e.target);
+	this._dragZoneElem = this._dragZone.findDragZoneItem(e.target);
 	if (!this._dragZoneElem)
 		return false;
 
@@ -188,7 +207,7 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 {
 	var elem;
 
-	this._dragZoneElem = this.findDragZoneItem(e.target);
+	this._dragZoneElem = this._dragZone.findDragZoneItem(e.target);
 	if (!this._dragZoneElem)
 		return false;
 
