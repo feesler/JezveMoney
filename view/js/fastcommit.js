@@ -611,6 +611,9 @@ function mapImportRow(impRowObj)
 	rowObj.dateInp.value = impRowObj.data.date;
 	rowObj.commInp.value = impRowObj.data.descr;
 
+	if (window.convertHint !== undefined && isFunction(window.convertHint))
+		convertHint(impRowObj.data, rowObj);
+
 	var item = findNthItem(ge('rowsContainer'), impRowObj.pos + 1);
 	if (!item)
 		return;
