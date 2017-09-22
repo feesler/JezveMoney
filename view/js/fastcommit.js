@@ -180,7 +180,12 @@ function findLastSiblingByClass(item, className)
 // Find first placeholder in the list
 function findPlaceholder()
 {
-	return findFirstSiblingByClass(firstElementChild(ge('rowsContainer')), 'tr_row_placeholder');
+	var item = firstElementChild(ge('rowsContainer'));
+
+	if (hasClass(item, 'tr_row_placeholder'))
+		return item;
+	else
+		return findFirstSiblingByClass(item, 'tr_row_placeholder');
 }
 
 
