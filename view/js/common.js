@@ -364,6 +364,9 @@ function childElementCount(el)
 	if (!el || el === undefined)
 		return 0;
 
+	if (el.childElementCount !== undefined)
+		return el.childElementCount;
+
 	el = el.firstChild;
 	while(el)
 	{
@@ -382,7 +385,7 @@ function firstElementChild(el)
 	if (!el || el === undefined)
 		return null;
 
-	if (el.firstElementChild)
+	if (el.firstElementChild !== undefined)
 		return el.firstElementChild;
 
 	el = el.firstChild;
@@ -401,7 +404,7 @@ function lastElementChild(el)
 	if (!el || el === undefined)
 		return null;
 
-	if (el.lastElementChild)
+	if (el.lastElementChild !== undefined)
 		return el.lastElementChild;
 
 	el = el.lastChild;
@@ -420,7 +423,7 @@ function nextElementSibling(el)
 	if (!el || el === undefined)
 		return null;
 
-	if (el.nextElementSibling)
+	if (el.nextElementSibling !== undefined)
 		return el.nextElementSibling;
 	do
 	{
@@ -438,7 +441,7 @@ function previousElementSibling(el)
 	if (!el || el === undefined)
 		return null;
 
-	if (el.previousElementSibling)
+	if (el.previousElementSibling !== undefined)
 		return el.previousElementSibling;
 	do
 	{
