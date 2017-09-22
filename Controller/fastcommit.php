@@ -22,6 +22,8 @@ class FastCommitController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "json2.js", "dragndrop.js", "sortable.js", "fastcommit.js", "convhint.js");
 
+		$titleString = "Jezve Money | Fast Commit";
+
 		include("./view/templates/fastcommit.tpl");
 	}
 
