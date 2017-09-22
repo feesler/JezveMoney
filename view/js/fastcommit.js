@@ -48,6 +48,15 @@ function updateRowsPos()
 }
 
 
+// Remove all transaction rows
+function cleanTrRows()
+{
+	trRows = [];
+
+	removeChilds(rowsContainer);
+}
+
+
 function delRow(rowObj)
 {
 	var delPos;
@@ -543,11 +552,7 @@ function importLoadCallback(response)
 	if (!isArray(data))
 		return;
 
-	trRows.forEach(function(rowObj)
-	{
-		delRow(rowObj);
-	});
-
+	cleanTrRows();
 
 	data.forEach(function(dataObj)
 	{
