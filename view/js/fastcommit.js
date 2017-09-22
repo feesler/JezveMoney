@@ -54,6 +54,9 @@ function delRow(rowObj)
 
 	if (!rowObj)
 		return;
+
+	if (impRows.length)
+		addPlaceholder(rowObj.rowEl);
 	re(rowObj.rowEl);
 
 	delPos = rowObj.pos;
@@ -490,7 +493,7 @@ function onTransPosChanged(origRow, replacedRow)
 }
 
 
-function addPlaceholder()
+function addPlaceholder(refItem)
 {
 	var rowsContainer;
 	var phElem;
@@ -501,7 +504,10 @@ function addPlaceholder()
 
 	phElem = ce('div', { className : 'tr_row_placeholder' });
 
-	rowsContainer.appendChild(phElem);
+	if (refItem === undefined)
+		rowsContainer.appendChild(phElem);
+	else
+		insertAfter(phElem, refItem);
 }
 
 
