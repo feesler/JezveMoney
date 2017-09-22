@@ -496,12 +496,37 @@ function getRowByElem(rowEl)
 
 function onTransPosChanged(origRow, replacedRow)
 {
-	var origRowObj = getRowByElem(origRow);
-	var replacedRowObj = getRowByElem(replacedRow);
-	if (!origRowObj || !replacedRowObj)
+	if (trRows.length < 2)
 		return;
 
-	trRows.splice(replacedRowObj.pos, 0, trRows.splice(origRowObj.pos, 1)[0]);
+	var origRowObj = getRowByElem(origRow);
+	if (!origRowObj)
+		return;
+
+	if (!replacedRow)
+		return;
+
+	if (!hasClass(replacedRow, 'tr_row'))	// put transaction on placeholder
+	{
+		var prevItemObj = getRowByElem(findPrevItem(origRow));
+		var nextItemObj = getRowByElem(findNextItem(origRow));
+
+		if (!prevItemObj)	// insert at the beginning of list
+			trRows.splice(0, 0, trRows.splice(origRowObj.pos, 1)[0]);
+		else if (prevItemObj && prevItemObj.pos > origRowObj.pos)
+			trRows.splice(prevItemObj.pos, 0, trRows.splice(origRowObj.pos, 1)[0]);
+		else if (nextItemObj && nextItemObj.pos < origRowObj.pos)
+			trRows.splice(nextItemObj.pos, 0, trRows.splice(origRowObj.pos, 1)[0]);
+		else		// nothing changed
+			return;
+	}
+	else
+	{
+		var replacedRowObj = getRowByElem(replacedRow);
+		if (!replacedRowObj)
+			return;
+		trRows.splice(replacedRowObj.pos, 0, trRows.splice(origRowObj.pos, 1)[0]);
+	}
 
 	updateRowsPos();
 }
