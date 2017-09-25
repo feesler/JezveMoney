@@ -1,6 +1,7 @@
 <?php
 	$noLogs = TRUE;
 	require_once("../system/setup.php");
+	require_once("../system/admin.php");
 
 	$filename = $approot."admin/log.txt";
 
@@ -14,11 +15,6 @@
 			fclose($fp);
 		}
 	}
-
-	$menuItems = array("curr" => array("title" => "Currencies", "link" => "./currency.php"),
-					"query" => array("title" => "Queries", "link" => "./query.php"),
-					"log" => array("title" => "Logs", "link" => "./log.php"),
-					"apitest" => array("title" => "API test", "link" => "./apitest.php"));
 
 	$menuItems["log"]["active"] = TRUE;
 
