@@ -2,8 +2,6 @@
 	require_once("../system/setup.php");
 	require_once("../system/admin.php");
 
-	checkUser(TRUE, TRUE);
-
 	$controller = new CurrencyController();
 
 	$actionsMap = array("new" => "create", "edit" => "update", "del" => "del");

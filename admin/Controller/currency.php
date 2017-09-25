@@ -7,11 +7,6 @@ class CurrencyController extends Controller
 		global $uMod, $user_name, $user_id;
 		global $menuItems;
 
-		$uMod = new UserModel();
-		$user_id = $uMod->check();
-		if (!$user_id || !$uMod->isAdmin($user_id))
-			setLocation("../login.php");
-
 		$currArr = CurrencyModel::getArray();
 
 		$menuItems["curr"]["active"] = TRUE;

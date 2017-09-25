@@ -2,12 +2,6 @@
 	require_once("../system/setup.php");
 	require_once("../system/admin.php");
 
-	$uMod = new UserModel();
-	$user_id = $uMod->check();
-	if (!$user_id || !$uMod->isAdmin($user_id))
-		setLocation("../login.php");
-
-
 	$query = NULL;
 	if (isset($_POST["query"]) && $_POST["query"] != "")
 	{
