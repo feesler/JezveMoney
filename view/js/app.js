@@ -34,7 +34,7 @@ function createMessage(message, msgClass)
 	var messageBox;
 
 	messageBox = Popup.create({ id : 'popup7',
-						msg : message,
+						content : message,
 						btn : { closeBtn : true },
 						additional : 'msg ' + msgClass,
 						nodim : true,
