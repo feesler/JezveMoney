@@ -420,6 +420,27 @@ class UserModel extends CachedTable
 		if (!$this->checkCache())
 			return $res;
 
+		$trCountArr = array();
+		$resArr = $db->selectQ("user_id, COUNT(*)", "transactions", NULL, "user_id");
+		foreach ($resArr as $row)
+		{
+			$u_id = intval($row["user_id"]);
+			$tr_cnt = intval($row["COUNT(*)"]);
+
+			$trCountArr[$u_id] = $tr_cnt;
+		}
+
+		$accCountArr = array();
+		$resArr = $db->selectQ("user_id, owner_id, COUNT(*)", "accounts", NULL, "owner_id");
+		foreach ($resArr as $row)
+		{
+			$u_id = intval($row["user_id"]);
+			$o_id = intval($row["owner_id"]);
+			$acc_cnt = intval($row["COUNT(*)"]);
+
+			$accCountArr[$o_id] = $acc_cnt;
+		}
+
 		foreach($this->cache as $u_id => $row)
 		{
 			$userObj = new stdClass;
@@ -430,15 +451,9 @@ class UserModel extends CachedTable
 
 			$pMod = new PersonModel($u_id);
 			$userObj->owner = $pMod->getName($row["owner_id"]);
-
-			$accMod = new AccountModel($u_id);
-			$userObj->accCount = $accMod->getCount();
-
-			$resArr = $db->countQ("transactions", "user_id=".$u_id);
-			$userObj->trCount = $resArr;
-
-			$resArr = $db->countQ("persons", "user_id=".$u_id);
-			$userObj->pCount = $resArr;
+			$userObj->accCount = isset($accCountArr[$row["owner_id"]]) ? $accCountArr[$row["owner_id"]] : 0;
+			$userObj->trCount = isset($trCountArr[$u_id]) ? $trCountArr[$u_id] : 0;
+			$userObj->pCount = $pMod->getCount();
 
 			$res[] = $userObj;
 		}
