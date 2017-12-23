@@ -345,4 +345,127 @@ class UserModel extends CachedTable
 
 		return TRUE;
 	}
+
+
+	// Set up new login for user
+	public function setLogin($user_id, $login)
+	{
+		global $db;
+
+		$user_id = intval($user_id);
+		if (!$user_id || is_empty($login))
+			return FALSE;
+
+		// check user is exist
+		$curLogin = $this->getLogin($user_id);
+		if (is_null($curLogin))
+			return FALSE;
+
+		// check current login is not the same
+		if ($curLogin == $login)
+			return TRUE;
+
+		// check no user exist with the same login
+		$luser_id = $this->getId($login);
+		if ($luser_id != 0 && $luser_id != $user_id)
+			return FALSE;
+
+		$passhash = $this->createHash($login, $newpass);
+		$elogin = $db->escape($login);
+
+		if (!$db->updateQ("users", array("login", "passhash"), array($elogin, $passhash), "id=".$user_id))
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	// Set up new login for user
+	public function setAccess($user_id, $access)
+	{
+		global $db;
+
+		$user_id = intval($user_id);
+		$access = intval($access);
+		if (!$user_id)
+			return FALSE;
+
+		// check user is exist
+		$curAccess = $this->getAccess($user_id);
+		if (is_null($curAccess))
+			return FALSE;
+
+		// check current access level is not the same
+		if ($curAccess == $access)
+			return TRUE;
+
+		if (!$db->updateQ("users", array("access"), array($access), "id=".$user_id))
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	// Return array of users
+	public function getArray()
+	{
+		global $db;
+
+		$res = array();
+
+		if (!$this->checkCache())
+			return $res;
+
+		foreach($this->cache as $u_id => $row)
+		{
+			$userObj = new stdClass;
+
+			$userObj->id = $u_id;
+			$userObj->login = $row["login"];
+			$userObj->access = $row["access"];
+
+			$pMod = new PersonModel($u_id);
+			$userObj->owner = $pMod->getName($row["owner_id"]);
+
+			$accMod = new AccountModel($u_id);
+			$userObj->accCount = $accMod->getCount();
+
+			$resArr = $db->countQ("transactions", "user_id=".$u_id);
+			$userObj->trCount = $resArr;
+
+			$resArr = $db->countQ("persons", "user_id=".$u_id);
+			$userObj->pCount = $resArr;
+
+			$res[] = $userObj;
+		}
+
+		return $res;
+	}
+
+
+	// Delete user and all related data
+	public function del($user_id)
+	{
+		global $db;
+
+		$u_id = intval($user_id);
+		if (!$u_id)
+			return FALSE;
+
+		$accMod = new AccountModel($u_id);
+		if (!$accMod->reset())
+			return FALSE;
+
+		if (!$db->deleteQ("persons", "user_id=".$u_id))
+			return FALSE;
+
+		if (!$db->deleteQ("users", "id=".$u_id))
+			return FALSE;
+
+		return TRUE;
+	}
 }

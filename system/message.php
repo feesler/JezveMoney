@@ -35,6 +35,13 @@
 	addMessage("MSG_PROFILE_RESETALL", MSG_TYPE_SUCCESS, "All data successfully reseted.");
 	addMessage("ERR_PROFILE_RESETALL", MSG_TYPE_ERROR, "Fail to reset.");
 
+	addMessage("MSG_USER_CREATE", MSG_TYPE_SUCCESS, "User successfully created.");
+	addMessage("ERR_USER_CREATE", MSG_TYPE_ERROR, "Fail to create user.");
+	addMessage("MSG_USER_UPDATE", MSG_TYPE_SUCCESS, "User successfully updated.");
+	addMessage("ERR_USER_UPDATE", MSG_TYPE_ERROR, "Fail to update user.");
+	addMessage("MSG_USER_DELETE", MSG_TYPE_SUCCESS, "User successfully deleted.");
+	addMessage("ERR_USER_DELETE", MSG_TYPE_ERROR, "Fail to delete user.");
+
 	addMessage("MSG_ACCOUNT_CREATE");
 	addMessage("ERR_ACCOUNT_CREATE", MSG_TYPE_ERROR, "Fail to create new account.");
 	addMessage("MSG_ACCOUNT_UPDATE");

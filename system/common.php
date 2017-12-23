@@ -25,6 +25,7 @@
 					"StatisticsController" => "Controller/statistics.php",
 					"FastCommitController" => "Controller/fastcommit.php",
 					"CurrencyController" => "admin/Controller/currency.php",
+					"UserAdminController" => "admin/Controller/user.php",
 					"AccountModel" => "Model/account.php",
 					"CurrencyModel" => "Model/currency.php",
 					"DebtModel" => "Model/debt.php",

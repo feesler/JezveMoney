@@ -10,6 +10,8 @@ class PersonModel extends CachedTable
 	// Class constructor
 	public function __construct($user_id)
 	{
+		if ($user_id != self::$user_id)
+			self::$dcache = NULL;
 		self::$user_id = intval($user_id);
 		// find owner person
 		$uMod = new UserModel();
