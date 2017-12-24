@@ -15,7 +15,7 @@ class CurrencyController extends Controller
 
 		$this->css->libs[] = "iconlink.css";
 		$this->buildCSS();
-		$this->cssAdmin = array("admin.css", "currency.css");
+		$this->cssAdmin[] = "currency.css";
 
 		$this->jsArr[] = "currency.js";
 		$this->jsAdmin[] = "currency.js";

@@ -12,7 +12,7 @@ class LogsAdminController extends Controller
 
 		$titleString = "Admin panel | API test";
 
-		$this->cssAdmin = array("admin.css", "apitest.css");
+		$this->cssAdmin[] = "apitest.css";
 		$this->buildCSS();
 		$this->jsAdmin[] = "apitest.js";
 

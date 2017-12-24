@@ -13,7 +13,7 @@ class UserAdminController extends Controller
 
 		$titleString = "Admin panel | Users";
 
-		$this->cssAdmin = array("admin.css", "currency.css");
+		$this->cssAdmin[] = "currency.css";
 		$this->buildCSS();
 		$this->jsArr[] = "currency.js";
 		$this->jsAdmin[] = "user.js";

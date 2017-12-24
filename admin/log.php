@@ -26,7 +26,6 @@ class LogsAdminController extends Controller
 
 		$titleString = "Admin panel | Log";
 
-		$this->cssAdmin[] = "admin.css";
 		$this->buildCSS();
 
 		include("./view/templates/log.tpl");
