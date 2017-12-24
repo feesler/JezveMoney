@@ -12,9 +12,9 @@ class PersonsController extends Controller
 
 		$titleString = "Jezve Money | Persons";
 
-		$this->css->libs = array("tiles.css", "popup.css", "iconlink.css", "toolbar.css");
+		$this->css->libs = array("tiles.css", "iconlink.css", "toolbar.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "popup.js", "toolbar.js", "persons.js");
+		array_push($this->jsArr, "selection.js", "toolbar.js", "persons.js");
 
 		include("./view/templates/persons.tpl");
 	}
@@ -87,9 +87,9 @@ class PersonsController extends Controller
 
 		$submitHandler = "return onEditPersonSubmit(this);";
 
-		$this->css->libs = array("iconlink.css", "tiles.css", "popup.css");
+		$this->css->libs = array("iconlink.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "popup.js", "persons.js");
+		array_push($this->jsArr, "persons.js");
 
 		include("./view/templates/person.tpl");
 	}

@@ -119,7 +119,7 @@ class StatisticsController extends Controller
 
 		$titleString = "Jezve Money | Statistics";
 
-		$this->css->libs = array("iconlink.css", "ddlist.css", "popup.css", "calendar.css", "charts.css");
+		$this->css->libs = array("iconlink.css", "ddlist.css", "calendar.css", "charts.css");
 		$this->css->page[] = "statistics.css";
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "calendar.js", "ddlist.js", "raphael.min.js", "charts.js", "statistics.js");

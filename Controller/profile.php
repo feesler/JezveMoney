@@ -23,10 +23,10 @@ class ProfileController extends Controller
 		else if ($action == "changepassword")
 			$titleString .= " | Change password";
 
-		$this->css->libs = array("iconlink.css", "popup.css");
+		$this->css->libs = array("iconlink.css");
 		$this->css->page[] = "user.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "popup.js", "main.js");
+		array_push($this->jsArr, "main.js");
 
 		include("./view/templates/profile.tpl");
 	}

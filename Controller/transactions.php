@@ -198,10 +198,10 @@ class TransactionsController extends Controller
 
 		$titleString = "Jezve Money | Transactions";
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "popup.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
+		$this->css->libs = array("tiles.css", "iconlink.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "json2.js", "selection.js", "currency.js", "account.js", "calendar.js", "popup.js", "dragndrop.js",
+		array_push($this->jsArr, "json2.js", "selection.js", "currency.js", "account.js", "calendar.js", "dragndrop.js",
 									"sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
 
 		include("./view/templates/transactions.tpl");
@@ -665,10 +665,10 @@ class TransactionsController extends Controller
 			$headString = "Edit transaction";
 		$titleString .= $headString;
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "ddlist.css", "calendar.css", "popup.css");
+		$this->css->libs = array("tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "popup.js", "tr_model.js", "tr_viewmodel.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
 
 		include("./view/templates/transaction.tpl");
 	}
