@@ -56,6 +56,7 @@ function selectUser(id)
 		setUserValues(currObj);
 		show('del_btn', true);
 		show('updbtn', true);
+		show('passbtn', true);
 	}
 	else			// clean
 	{
@@ -70,15 +71,22 @@ function newUser()
 	var frm;
 
 	frm = ge('user_frm');
-	if (!frm)
+	if (!dwPopup || !frm)
 		return;
 
+	show('login_block', true);
+	enable('user_login', true);
+	show('name_block', true);
+	enable('user_name', true);
 	show('pwd_block', true);
 	enable('user_pass', true);
+	show('admin_block', true);
+	enable('isadmin', true);
 
 	frm.action = baseURL + 'admin/user.php?act=new';
 	setUserValues(null);
 
+	dwPopup.setTitle('Create user');
 	dwPopup.show();
 }
 
@@ -86,11 +94,45 @@ function newUser()
 // Update user button click handler
 function updateUser()
 {
+	if (!dwPopup)
+		return;
+
+	show('login_block', true);
+	enable('user_login', true);
+	show('name_block', true);
+	enable('user_name', true);
 	show('pwd_block', false);
 	enable('user_pass', false);
+	show('admin_block', true);
+	enable('isadmin', true);
 
-	if (dwPopup)
-		dwPopup.show();
+	dwPopup.setTitle('Update user');
+	dwPopup.show();
+}
+
+
+// Change password button click handler
+function setUserPass()
+{
+	var frm;
+
+	frm = ge('user_frm');
+	if (!frm || !dwPopup)
+		return;
+
+	show('login_block', false);
+	enable('user_login', false);
+	show('name_block', false);
+	enable('user_name', false);
+	show('pwd_block', true);
+	enable('user_pass', true);
+	show('admin_block', false);
+	enable('isadmin', false);
+
+	frm.action = baseURL + 'admin/user.php?act=chpwd';
+
+	dwPopup.setTitle('Set password');
+	dwPopup.show();
 }
 
 

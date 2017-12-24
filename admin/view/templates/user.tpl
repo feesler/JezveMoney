@@ -37,7 +37,7 @@
 					<div class="acc_controls">
 						<input class="adm_act_btn" type="button" value="new" onclick="newUser()">
 						<input id="updbtn" class="adm_act_btn" type="button" value="update" onclick="updateUser()" style="display: none;">
-						<input id="updbtn" class="adm_act_btn" type="button" value="set password" onclick="setUserPass()" style="display: none;">
+						<input id="passbtn" class="adm_act_btn" type="button" value="set password" onclick="setUserPass()" style="display: none;">
 						<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteUser()" style="display: none;">
 					</div>
 
@@ -52,11 +52,11 @@
 
 <form id="user_frm" method="post" action="<?=BASEURL?>admin/user.php?act=new" style="display: none;">
 <input id="user_id" name="user_id" type="hidden">
-<div class="non_float">
+<div id="login_block" class="non_float">
 	<label for="user_login">Login</label>
 	<div class="stretch_input"><input id="user_login" name="user_login" type="text"></div>
 </div>
-<div class="non_float">
+<div id="name_block" class="non_float">
 	<label for="user_name">Name</label>
 	<div class="stretch_input"><input id="user_name" name="user_name" type="text"></div>
 </div>
@@ -64,7 +64,7 @@
 	<label for="user_pass">Password</label>
 	<div class="stretch_input"><input id="user_pass" name="user_pass" type="password"></div>
 </div>
-<div class="check_wr"><input id="isadmin" name="isadmin" type="checkbox"><label for="isadmin">Admin access level</label></div>
+<div id="admin_block" class="check_wr"><input id="isadmin" name="isadmin" type="checkbox"><label for="isadmin">Admin access level</label></div>
 </form>
 
 <form>

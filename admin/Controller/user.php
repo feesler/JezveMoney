@@ -88,6 +88,25 @@ wlog("New user name: ".$_POST["user_name"]);
 	}
 
 
+	public function changePassword()
+	{
+		global $uMod;
+
+		$defMsg = ERR_PROFILE_PASSWORD;
+
+		if (!isset($_POST["user_id"]) || !isset($_POST["user_pass"]))
+			$this->fail($defMsg);
+
+		$login = $uMod->getLogin($_POST["user_id"]);
+		if (!$uMod->setPassword($login, $_POST["user_pass"]))
+			$this->fail($defMsg);
+
+		setMessage(MSG_PROFILE_PASSWORD);
+
+		setLocation(BASEURL."admin/user.php");
+	}
+
+
 	public function del()
 	{
 		global $uMod;

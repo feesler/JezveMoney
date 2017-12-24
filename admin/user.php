@@ -6,7 +6,7 @@
 
 	$controller = new UserAdminController();
 
-	$actionsMap = array("new" => "create", "edit" => "update", "del" => "del");
+	$actionsMap = array("new" => "create", "edit" => "update", "chpwd" => "changePassword", "del" => "del");
 
 	$action = NULL;
 	if (isset($_GET["act"]))
