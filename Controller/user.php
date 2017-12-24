@@ -30,9 +30,10 @@ class UserController extends Controller
 
 		$titleString = "Jezve Money | Log in";
 
+		$this->css->libs[] = "popup.css";
 		$this->css->page[] = "user.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "main.js");
+		array_push($this->jsArr, "popup.js", "main.js");
 
 		include("./view/templates/login.tpl");
 	}
@@ -80,9 +81,10 @@ wlog("UserController::logout()");
 
 		$titleString = "Jezve Money | Registration";
 
+		$this->css->libs[] = "popup.css";
 		$this->css->page[] = "user.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "main.js");
+		array_push($this->jsArr, "popup.js", "main.js");
 
 		include("./view/templates/register.tpl");
 	}
