@@ -19,8 +19,10 @@ abstract class Controller
 		$this->css->libs = array("popup.css");
 		$this->css->app = array("app.css");
 		$this->css->page = array();
+		$this->cssAdmin = array();
 
 		$this->jsArr = array("es5-shim.min.js", "common.js", "ajax.js", "popup.js", "app.js");
+		$this->jsAdmin = array();
 	}
 
 

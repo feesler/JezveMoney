@@ -13,10 +13,10 @@ class UserAdminController extends Controller
 
 		$titleString = "Admin panel | Users";
 
-		$cssMainArr = array("common.css", "iconlink.css", "popup.css", "app.css");
-		$cssLocalArr = array("admin.css", "currency.css");
-		$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "currency.js", "popup.js");
-		$jsLocalArr = array("user.js");
+		$this->cssAdmin = array("admin.css", "currency.css");
+		$this->buildCSS();
+		$this->jsArr[] = "currency.js";
+		$this->jsAdmin[] = "user.js";
 
 		include("./view/templates/user.tpl");
 	}

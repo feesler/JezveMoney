@@ -21,6 +21,8 @@ wlog("actStr: ".$actStr);
 
 wlog("action: ".$action);
 
+	$controller->initDefResources();
+
 	if (!is_null($action) && method_exists($controller, $action))
 		$controller->$action();
 	else

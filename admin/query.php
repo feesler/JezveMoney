@@ -2,36 +2,50 @@
 	require_once("../system/setup.php");
 	require_once("../system/admin.php");
 
-	$query = NULL;
-	if (isset($_POST["query"]) && $_POST["query"] != "")
+class QueryAdminController extends Controller
+{
+	public function index()
 	{
-		$query = $_POST["query"];
+		global $menuItems, $db;
 
-		if (isset($_POST["qtype"]) && $_POST["qtype"] == "1")		// select query
+		$query = NULL;
+		if (isset($_POST["query"]) && $_POST["query"] != "")
 		{
-			$resArr = array();
-			$result = $db->rawQ($query);
-			$qerr_num = mysql_errno();
-			$qerror = mysql_error();
-			if ($result && !$qerr_num && mysql_num_rows($result) > 0)
-			{
-				while($row = mysql_fetch_array($result, MYSQL_ASSOC))
-					$resArr[] = $row;
+			$query = $_POST["query"];
 
-				$rows = count($resArr);
-				$cols = isset($resArr[0]) ? count($resArr[0]) : 0;
+			if (isset($_POST["qtype"]) && $_POST["qtype"] == "1")		// select query
+			{
+				$resArr = array();
+				$result = $db->rawQ($query);
+				$qerr_num = mysql_errno();
+				$qerror = mysql_error();
+				if ($result && !$qerr_num && mysql_num_rows($result) > 0)
+				{
+					while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+						$resArr[] = $row;
+
+					$rows = count($resArr);
+					$cols = isset($resArr[0]) ? count($resArr[0]) : 0;
+				}
 			}
 		}
+
+		$menuItems["query"]["active"] = TRUE;
+
+		$titleString = "Admin panel | DB queries";
+
+		$this->cssAdmin[] = "admin.css";
+		$this->buildCSS();
+
+		include("./view/templates/query.tpl");
 	}
+}
 
 
-	$menuItems["query"]["active"] = TRUE;
+checkUser(TRUE, TRUE);
 
-	$titleString = "Admin panel | DB queries";
+$controller = new QueryAdminController();
 
-	$cssMainArr = array("common.css", "iconlink.css", "app.css");
-	$cssLocalArr = array("admin.css", "query.css");
-	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js");
-	$jsLocalArr = array();
+$controller->initDefResources();
 
-	include("./view/templates/query.tpl");
+$controller->index();

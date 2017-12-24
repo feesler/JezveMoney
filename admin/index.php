@@ -2,16 +2,25 @@
 	require_once("../system/setup.php");
 	require_once("../system/admin.php");
 
-	$uMod = new UserModel();
-	$user_id = $uMod->check();
-	if (!$user_id || !$uMod->isAdmin($user_id))
-		setLocation("../login.php");
+class MainAdminController extends Controller
+{
+	public function index()
+	{
+		global $menuItems;
 
-	$titleString = "Admin panel";
+		$titleString = "Admin panel";
 
-	$cssMainArr = array("common.css", "app.css");
-	$cssLocalArr = array("admin.css");
-	$jsMainArr = array();
-	$jsLocalArr = array();
+		$this->cssAdmin[] = "admin.css";
+		$this->buildCSS();
 
-	include("./view/templates/index.tpl");
+		include("./view/templates/index.tpl");
+	}
+}
+
+	checkUser(TRUE, TRUE);
+
+	$controller = new MainAdminController();
+
+	$controller->initDefResources();
+
+	$controller->index();

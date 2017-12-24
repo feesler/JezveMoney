@@ -2,13 +2,26 @@
 	require_once("../system/setup.php");
 	require_once("../system/admin.php");
 
-	$menuItems["apitest"]["active"] = TRUE;
+class LogsAdminController extends Controller
+{
+	public function index()
+	{
+		global $menuItems;
 
-	$titleString = "Admin panel | API test";
+		$menuItems["apitest"]["active"] = TRUE;
 
-	$cssMainArr = array("common.css", "iconlink.css", "app.css");
-	$cssLocalArr = array("admin.css", "apitest.css");
-	$jsMainArr = array("es5-shim.min.js", "common.js", "app.js", "ajax.js");
-	$jsLocalArr = array("apitest.js");
+		$titleString = "Admin panel | API test";
 
-	include("./view/templates/apitest.tpl");
+		$this->cssAdmin = array("admin.css", "apitest.css");
+		$this->buildCSS();
+		$this->jsAdmin[] = "apitest.js";
+
+		include("./view/templates/apitest.tpl");
+	}
+}
+
+	checkUser(TRUE, TRUE);
+
+	$controller = new LogsAdminController();
+	$controller->initDefResources();
+	$controller->index();

@@ -17,6 +17,8 @@
 			setLocation(BASEURL."admin/currency.php");
 	}
 
+	$controller->initDefResources();
+
 	if (is_null($action))
 		$controller->index();
 	else
