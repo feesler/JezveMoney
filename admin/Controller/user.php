@@ -54,25 +54,19 @@ class UserAdminController extends Controller
 		global $uMod;
 
 		$defMsg = ERR_USER_UPDATE;
-wlog("UserAdminController::update()");
+
 		if (!isset($_POST["user_id"]))
 			$this->fail($defMsg);
-wlog("UserAdminController::update() : 1");
+
 		if (isset($_POST["user_login"]))
 		{
-wlog("UserAdminController::update() : 1.1");
 			if (!$uMod->setLogin($_POST["user_id"], $_POST["user_login"]))
 				$this->fail($defMsg);
 		}
 
-wlog("UserAdminController::update() : 2");
-
 		if (isset($_POST["user_name"]))
 		{
-wlog("UserAdminController::update() : 2.1");
 			$owner_id = $uMod->getOwner($_POST["user_id"]);
-wlog("Owner id: ".$owner_id);
-wlog("New user name: ".$_POST["user_name"]);
 
 			$pMod = new PersonModel($_POST["user_id"]);
 			if (!$pMod->edit($owner_id, $_POST["user_name"]))

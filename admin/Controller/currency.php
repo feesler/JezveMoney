@@ -13,7 +13,6 @@ class CurrencyAdminController extends Controller
 
 		$titleString = "Admin panel | Currency";
 
-		$this->css->libs[] = "iconlink.css";
 		$this->buildCSS();
 		$this->cssAdmin[] = "currency.css";
 
