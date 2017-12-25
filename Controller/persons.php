@@ -12,7 +12,7 @@ class PersonsController extends Controller
 
 		$titleString = "Jezve Money | Persons";
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "toolbar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "toolbar.js", "persons.js");
 
@@ -48,7 +48,7 @@ class PersonsController extends Controller
 
 		$submitHandler = "return onNewPersonSubmit(this);";
 
-		$this->css->libs = array("iconlink.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "tiles.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "persons.js");
 
@@ -87,7 +87,7 @@ class PersonsController extends Controller
 
 		$submitHandler = "return onEditPersonSubmit(this);";
 
-		$this->css->libs = array("iconlink.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "tiles.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "persons.js");
 

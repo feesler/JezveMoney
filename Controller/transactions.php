@@ -198,7 +198,7 @@ class TransactionsController extends Controller
 
 		$titleString = "Jezve Money | Transactions";
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
 		array_push($this->jsArr, "json2.js", "selection.js", "currency.js", "account.js", "calendar.js", "dragndrop.js",
@@ -439,7 +439,7 @@ class TransactionsController extends Controller
 			$headString = "New transaction";
 		$titleString .= $headString;
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
@@ -665,7 +665,7 @@ class TransactionsController extends Controller
 			$headString = "Edit transaction";
 		$titleString .= $headString;
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");

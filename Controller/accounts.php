@@ -13,7 +13,7 @@ class AccountsController extends Controller
 
 		$titleString = "Jezve Money | Accounts";
 
-		$this->css->libs = array("tiles.css", "iconlink.css", "toolbar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "toolbar.js", "accounts.js");
 
@@ -52,7 +52,7 @@ class AccountsController extends Controller
 		$headString = "New account";
 		$titleString .= $headString;
 
-		$this->css->libs = array("iconlink.css", "ddlist.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
 
@@ -98,7 +98,7 @@ class AccountsController extends Controller
 		$headString = ($action == "new") ? "New account" : "Edit account";
 		$titleString .= $headString;
 
-		$this->css->libs = array("iconlink.css", "ddlist.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
 

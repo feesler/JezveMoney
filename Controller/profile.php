@@ -23,7 +23,7 @@ class ProfileController extends Controller
 		else if ($action == "changepassword")
 			$titleString .= " | Change password";
 
-		$this->css->libs = array("iconlink.css");
+		$this->css->libs[] = "iconlink.css";
 		$this->css->page[] = "user.css";
 		$this->buildCSS();
 		array_push($this->jsArr, "main.js");

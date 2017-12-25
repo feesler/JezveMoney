@@ -97,7 +97,7 @@ class MainController extends Controller
 
 		$titleString = "Jezve Money";
 
-		$this->css->libs = array("iconlink.css", "tiles.css", "trlist.css", "charts.css");
+		array_push($this->css->libs, "iconlink.css", "tiles.css", "trlist.css", "charts.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "main.js", "raphael.min.js", "charts.js");
 
