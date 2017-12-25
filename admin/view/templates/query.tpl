@@ -31,7 +31,7 @@
 					<div style="color: red;">Error: <?=$qerr_num?><br><?=$qerror?></div><br>
 <?php		}	?>
 <?php	}	?>
-					<form method="post" action="./query.php">
+					<form method="post" action="<?=BASEURL?>admin/query/">
 					<label>Query type</label><br>
 					<input name="qtype" type="radio" value="1" checked> Select
 					<label>Query</label><br>
