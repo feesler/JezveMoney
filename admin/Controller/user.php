@@ -27,7 +27,7 @@ class UserAdminController extends Controller
 		if (!is_null($msg))
 			setMessage($msg);
 
-		setLocation(BASEURL."admin/user.php");
+		setLocation(BASEURL."admin/user/");
 	}
 
 
@@ -45,7 +45,7 @@ class UserAdminController extends Controller
 
 		setMessage(MSG_USER_CREATE);
 
-		setLocation(BASEURL."admin/user.php");
+		setLocation(BASEURL."admin/user/");
 	}
 
 
@@ -84,7 +84,7 @@ wlog("New user name: ".$_POST["user_name"]);
 
 		setMessage(MSG_USER_UPDATE);
 
-		setLocation(BASEURL."admin/user.php");
+		setLocation(BASEURL."admin/user/");
 	}
 
 
@@ -103,7 +103,7 @@ wlog("New user name: ".$_POST["user_name"]);
 
 		setMessage(MSG_PROFILE_PASSWORD);
 
-		setLocation(BASEURL."admin/user.php");
+		setLocation(BASEURL."admin/user/");
 	}
 
 
@@ -121,6 +121,6 @@ wlog("New user name: ".$_POST["user_name"]);
 
 		setMessage(MSG_USER_DELETE);
 
-		setLocation(BASEURL."admin/user.php");
+		setLocation(BASEURL."admin/user/");
 	}
 }

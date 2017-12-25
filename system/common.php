@@ -16,6 +16,7 @@
 
 	$classes = array("CachedTable" => "system/cachedTable.php",
 					"Controller" => "system/controller.php",
+				// Controllers
 					"MainController" => "Controller/main.php",
 					"AccountsController" => "Controller/accounts.php",
 					"PersonsController" => "Controller/persons.php",
@@ -24,8 +25,14 @@
 					"ProfileController" => "Controller/profile.php",
 					"StatisticsController" => "Controller/statistics.php",
 					"FastCommitController" => "Controller/fastcommit.php",
-					"CurrencyController" => "admin/Controller/currency.php",
+				// Admin controllers
+					"CurrencyAdminController" => "admin/Controller/currency.php",
 					"UserAdminController" => "admin/Controller/user.php",
+					"MainAdminController" => "admin/Controller/main.php",
+					"QueryAdminController" => "admin/Controller/query.php",
+					"LogsAdminController" => "admin/Controller/log.php",
+					"APITestAdminController" => "admin/Controller/apitest.php",
+				// Models
 					"AccountModel" => "Model/account.php",
 					"CurrencyModel" => "Model/currency.php",
 					"DebtModel" => "Model/debt.php",

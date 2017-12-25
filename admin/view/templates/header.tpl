@@ -5,7 +5,7 @@
 <?php		if (isset($m_item["active"]) && $m_item["active"]) {		?>
 				<span><b><?=$m_item["title"]?></b></span>
 <?php		} else {		?>
-				<span><a href="<?=$m_item["link"]?>"><?=$m_item["title"]?></a></span>
+				<span><a href="<?=BASEURL?>admin/<?=$m_item["link"]?>"><?=$m_item["title"]?></a></span>
 <?php		}		?>
 <?php	}	?>
 			</div>

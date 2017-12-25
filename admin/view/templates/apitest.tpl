@@ -15,7 +15,7 @@
 
 						<div class="test_container">
 						<h3>Get accounts</h3>
-						<form action="../api/account.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -24,7 +24,7 @@
 
 						<div class="test_container">
 						<h3>Read account</h3>
-						<form action="../api/account.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin"><label for="accid">Id</label><input name="accid" type="text"></div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
@@ -34,7 +34,7 @@
 
 						<div class="test_container">
 						<h3>Create account</h3>
-						<form action="../api/account.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="accname">Name</label>
 								<input name="accname" type="text">
@@ -59,7 +59,7 @@
 
 						<div class="test_container">
 						<h3>Edit account</h3>
-						<form action="../api/account.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="accid">Id</label>
 								<input name="accid" type="text">
@@ -88,7 +88,7 @@
 
 						<div class="test_container">
 						<h3>Delete account</h3>
-						<form action="../api/account.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="accounts">Accounts (comma separated ids)</label>
 								<input name="accounts" type="text">
@@ -101,7 +101,7 @@
 
 						<div class="test_container">
 						<h3>Reset accounts</h3>
-						<form action="../api/account.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -112,7 +112,7 @@
 
 						<div class="test_container">
 						<h3>Get transactions</h3>
-						<form action="../api/transaction.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
 								<input name="count" type="text" value="10" disabled>
@@ -145,7 +145,7 @@
 
 						<div class="test_container">
 						<h3>Read transaction</h3>
-						<form action="../api/transaction.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="transid">Id</label>
 								<input name="transid" type="text">
@@ -158,7 +158,7 @@
 
 						<div class="test_container">
 						<h3>Create transaction</h3>
-						<form action="../api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="transtype">Type (1-3)</label>
 								<input name="transtype" type="text">
@@ -207,7 +207,7 @@
 
 						<div class="test_container">
 						<h3>Create debt</h3>
-						<form action="../api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
 							<input name="transtype" type="hidden" value="4">
 							<div class="std_margin">
 								<label for="person_id">Person id</label>
@@ -258,7 +258,7 @@
 
 						<div class="test_container">
 						<h3>Edit transaction</h3>
-						<form action="../api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="transid">Transaction id</label>
 								<input name="transid" type="text">
@@ -314,7 +314,7 @@
 
 						<div class="test_container">
 						<h3>Edit debt</h3>
-						<form action="../api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
 							<input name="transtype" type="hidden" value="4">
 							<div class="std_margin">
 								<label for="transid">Transaction id</label>
@@ -370,7 +370,7 @@
 
 						<div class="test_container">
 						<h3>Delete transactions</h3>
-						<form action="../api/transaction.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="transactions">Transactions (comma separated ids)</label>
 								<input name="transactions" type="text">
@@ -385,7 +385,7 @@
 
 						<div class="test_container">
 						<h3>Set position of transacction</h3>
-						<form action="../api/transaction.php?act=setpos" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction.php?act=setpos" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="id">Id</label>
 								<input name="id" type="text">
@@ -404,7 +404,7 @@
 
 						<div class="test_container">
 						<h3>Get persons</h3>
-						<form action="../api/person.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -413,7 +413,7 @@
 
 						<div class="test_container">
 						<h3>Read person</h3>
-						<form action="../api/person.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="pid">Id</label>
 								<input name="pid" type="text">
@@ -426,7 +426,7 @@
 
 						<div class="test_container">
 						<h3>Create person</h3>
-						<form action="../api/person.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="pname">Name</label>
 								<input name="pname" type="text">
@@ -439,7 +439,7 @@
 
 						<div class="test_container">
 						<h3>Edit person</h3>
-						<form action="../api/person.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="pid">Id</label>
 								<input name="pid" type="text">
@@ -456,7 +456,7 @@
 
 						<div class="test_container">
 						<h3>Delete persons</h3>
-						<form action="../api/person.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="persons">Persons (comma separated ids)</label>
 								<input name="persons" type="text">
@@ -471,7 +471,7 @@
 
 						<div class="test_container">
 						<h3>Get currencies</h3>
-						<form action="../api/currency.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/currency.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -480,7 +480,7 @@
 
 						<div class="test_container">
 						<h3>Read currency</h3>
-						<form action="../api/currency.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/currency.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="curr_id">Id</label>
 								<input name="curr_id" type="text">
@@ -494,7 +494,7 @@
 						<h2>User</h2>
 						<div class="test_container">
 						<h3>Register</h3>
-						<form action="../api/register.php" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/register.php" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="login">Login</label>
 								<input name="login" type="text"><br>
@@ -517,7 +517,7 @@
 						<h2>Profile</h2>
 						<div class="test_container">
 						<h3>Read profile</h3>
-						<form action="../api/profile.php?act=read" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile.php?act=read" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -526,7 +526,7 @@
 
 						<div class="test_container">
 						<h3>Change name</h3>
-						<form action="../api/profile.php?act=changename" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile.php?act=changename" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="chname">Name</label>
 								<input id="chname" name="name" type="text"><br>
@@ -540,7 +540,7 @@
 
 						<div class="test_container">
 						<h3>Change password</h3>
-						<form action="../api/profile.php?act=changepass" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile.php?act=changepass" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="oldpwd">Old password</label>
 								<input id="oldpwd" name="oldpwd" type="text"><br>
@@ -558,7 +558,7 @@
 
 						<div class="test_container">
 						<h3>Reset all data</h3>
-						<form action="../api/profile.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>

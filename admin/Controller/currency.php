@@ -1,6 +1,6 @@
 <?php
 
-class CurrencyController extends Controller
+class CurrencyAdminController extends Controller
 {
 	public function index()
 	{
@@ -28,7 +28,7 @@ class CurrencyController extends Controller
 	{
 		if (!is_null($msg))
 			setMessage($msg);
-		setLocation("../admin/currency.php");
+		setLocation(BASEURL."admin/currency/");
 	}
 
 
@@ -46,7 +46,7 @@ class CurrencyController extends Controller
 
 		setMessage(MSG_CURRENCY_CREATE);
 
-		setLocation(BASEURL."admin/currency.php");
+		setLocation(BASEURL."admin/currency/");
 	}
 
 
@@ -67,7 +67,7 @@ class CurrencyController extends Controller
 
 		setMessage(MSG_CURRENCY_UPDATE);
 
-		setLocation(BASEURL."admin/currency.php");
+		setLocation(BASEURL."admin/currency/");
 	}
 
 
@@ -83,6 +83,6 @@ class CurrencyController extends Controller
 
 		setMessage(MSG_CURRENCY_DELETE);
 
-		setLocation(BASEURL."admin/currency.php");
+		setLocation(BASEURL."admin/currency/");
 	}
 }

@@ -52,7 +52,7 @@ function selectUser(id)
 	currObj = getUser(id);
 	if (currObj)
 	{
-		user_frm.action = baseURL + 'admin/user.php?act=edit';
+		user_frm.action = baseURL + 'admin/user/edit';
 		setUserValues(currObj);
 		show('del_btn', true);
 		show('updbtn', true);
@@ -83,7 +83,7 @@ function newUser()
 	show('admin_block', true);
 	enable('isadmin', true);
 
-	frm.action = baseURL + 'admin/user.php?act=new';
+	frm.action = baseURL + 'admin/user/new';
 	setUserValues(null);
 
 	dwPopup.setTitle('Create user');
@@ -129,7 +129,7 @@ function setUserPass()
 	show('admin_block', false);
 	enable('isadmin', false);
 
-	frm.action = baseURL + 'admin/user.php?act=chpwd';
+	frm.action = baseURL + 'admin/user/chpwd';
 
 	dwPopup.setTitle('Set password');
 	dwPopup.show();

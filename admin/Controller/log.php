@@ -1,7 +1,4 @@
 <?php
-	$noLogs = TRUE;
-	require_once("../system/setup.php");
-	require_once("../system/admin.php");
 
 class LogsAdminController extends Controller
 {
@@ -30,10 +27,20 @@ class LogsAdminController extends Controller
 
 		include("./view/templates/log.tpl");
 	}
+
+
+	public function clean()
+	{
+		global $approot;
+
+		$logfname = $approot."admin/log.txt";
+
+		if (isset($_POST["clean"]) && $_POST["clean"] == "1")
+		{
+			if (file_exists($logfname))
+				unlink($logfname);
+		}
+
+		setLocation(BASEURL."admin/log/");
+	}
 }
-
-	checkUser(TRUE, TRUE);
-
-	$controller = new LogsAdminController();
-	$controller->initDefResources();
-	$controller->index();

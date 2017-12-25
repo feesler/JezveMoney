@@ -41,7 +41,7 @@
 						<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteUser()" style="display: none;">
 					</div>
 
-					<form id="delfrm" method="post" action="<?=BASEURL?>admin/user.php?act=del" onsubmit="return onDeleteSubmit(this);">
+					<form id="delfrm" method="post" action="<?=BASEURL?>admin/user/del" onsubmit="return onDeleteSubmit(this);">
 						<input id="del_user_id" name="user_id" type="hidden">
 					</form>
 				</div>
@@ -50,7 +50,7 @@
 	</div>
 </div>
 
-<form id="user_frm" method="post" action="<?=BASEURL?>admin/user.php?act=new" style="display: none;">
+<form id="user_frm" method="post" action="<?=BASEURL?>admin/user/new" style="display: none;">
 <input id="user_id" name="user_id" type="hidden">
 <div id="login_block" class="non_float">
 	<label for="user_login">Login</label>

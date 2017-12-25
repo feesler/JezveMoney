@@ -42,7 +42,7 @@ function selectCurrency(id)
 	currObj = getCurrency(id);
 	if (currObj)
 	{
-		curr_frm.action = baseURL + 'admin/currency.php?act=edit';
+		curr_frm.action = baseURL + 'admin/currency/edit';
 		setCurrencyValues(currObj);
 		show('del_btn', true);
 		show('updbtn', true);
@@ -63,7 +63,7 @@ function newCurr()
 	if (!curr_frm)
 		return;
 
-	curr_frm.action = baseURL + 'admin/currency.php?act=new';
+	curr_frm.action = baseURL + 'admin/currency/new';
 	setCurrencyValues(null);
 
 	dwPopup.show();

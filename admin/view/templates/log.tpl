@@ -10,7 +10,7 @@
 				<div class="content_wrap admin_cont_wrap">
 					<h2>Log</h2>
 
-					<form method="post" action="./cleanlog.php">
+					<form method="post" action="./clean/">
 					<input name="clean" type="hidden" value="1">
 					<div class="acc_controls">
 						<input class="adm_act_btn" type="submit" value="Clean log">

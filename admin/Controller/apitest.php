@@ -1,8 +1,6 @@
 <?php
-	require_once("../system/setup.php");
-	require_once("../system/admin.php");
 
-class LogsAdminController extends Controller
+class APITestAdminController extends Controller
 {
 	public function index()
 	{
@@ -19,9 +17,3 @@ class LogsAdminController extends Controller
 		include("./view/templates/apitest.tpl");
 	}
 }
-
-	checkUser(TRUE, TRUE);
-
-	$controller = new LogsAdminController();
-	$controller->initDefResources();
-	$controller->index();

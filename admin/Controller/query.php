@@ -1,6 +1,4 @@
 <?php
-	require_once("../system/setup.php");
-	require_once("../system/admin.php");
 
 class QueryAdminController extends Controller
 {
@@ -39,12 +37,3 @@ class QueryAdminController extends Controller
 		include("./view/templates/query.tpl");
 	}
 }
-
-
-checkUser(TRUE, TRUE);
-
-$controller = new QueryAdminController();
-
-$controller->initDefResources();
-
-$controller->index();
