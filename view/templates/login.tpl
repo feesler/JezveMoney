@@ -1,4 +1,5 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	checkMessage();		?>
 </head>
 <body>
 <form action="<?=BASEURL?>login/" method="post" onsubmit="return onLoginSubmit(this);">
