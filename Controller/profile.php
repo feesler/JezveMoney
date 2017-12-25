@@ -121,4 +121,21 @@ class ProfileController extends Controller
 
 		setLocation(BASEURL."profile/");
 	}
+
+
+	public function del()
+	{
+		global $uMod, $user_id;
+
+		$defMsg = ERR_PROFILE_DELETE;
+
+		$uMod->logout();
+
+		if (!$uMod->del($user_id))
+			$this->fail($defMsg);
+
+		setMessage(MSG_PROFILE_DELETE);
+
+		setLocation(BASEURL."login/");
+	}
 }

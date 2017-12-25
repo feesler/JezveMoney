@@ -34,6 +34,8 @@
 	addMessage("ERR_PROFILE_PASSWORD", MSG_TYPE_ERROR, "Fail to update password.");
 	addMessage("MSG_PROFILE_RESETALL", MSG_TYPE_SUCCESS, "All data successfully reseted.");
 	addMessage("ERR_PROFILE_RESETALL", MSG_TYPE_ERROR, "Fail to reset.");
+	addMessage("MSG_PROFILE_DELETE", MSG_TYPE_SUCCESS, "Your profile is successfully deleted.");
+	addMessage("ERR_PROFILE_DELETE", MSG_TYPE_ERROR, "Fail to delete profile.");
 
 	addMessage("MSG_USER_CREATE", MSG_TYPE_SUCCESS, "User successfully created.");
 	addMessage("ERR_USER_CREATE", MSG_TYPE_ERROR, "Fail to create user.");

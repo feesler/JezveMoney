@@ -3,6 +3,7 @@ var cnPopup = null;		// change name popup
 var cpPopup = null;		// change password popup
 var rAccPopup = null;	// reset account popup
 var rAllPopup = null;	// reset all popup
+var delPopup = null;	// delete profile popup
 
 
 // Log in form submit event handler
@@ -240,6 +241,7 @@ function onChangeNameSubmit(frm)
 
 var resetAccMsg = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
 var resetAllMsg = 'Are you sure to reset all your data?<br>Everything will be lost.';
+var deleteMsg = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
 
 
 // Reset accounts popup callback
@@ -311,6 +313,42 @@ function showResetAllPopup()
 	}
 
 	rAllPopup.show();
+}
+
+
+// Reset accounts popup callback
+function onDeletePopup(res)
+{
+	var delete_form;
+
+	if (!delPopup)
+		return;
+
+	delPopup.close();
+
+	if (res)
+	{
+		delete_form = ge('delete_form');
+		if (delete_form)
+			delete_form.submit();
+	}
+}
+
+
+// Create and show delete profile warning popup
+function showDeletePopup()
+{
+	if (!delPopup)
+	{
+		delPopup = Popup.create({ id : 'delete_warning',
+						title : 'Delete profile',
+						content : deleteMsg,
+						btn : { okBtn : { onclick : onDeletePopup.bind(null, true) },
+								cancelBtn : { onclick : onDeletePopup.bind(null, false) } }
+						});
+	}
+
+	delPopup.show();
 }
 
 

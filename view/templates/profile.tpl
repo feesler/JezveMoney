@@ -44,6 +44,12 @@
 							<span>You may also reset all your data and start from the scratch.<br>
 							<input class="btn ok_btn" type="button" onclick="showResetAllPopup();" value="Reset all"></span>
 						</div>
+						<div style="margin-top: 15px;">
+							<form id="delete_form" method="post" action="<?=BASEURL?>profile/del/">
+							</form>
+							<span>Completely delete profile and all related data.<br>
+							<input class="btn ok_btn" type="button" onclick="showDeletePopup();" value="Delete profile"></span>
+						</div>
 					</div>
 <?php	if ($action == "changepass") {		?>
 <script>onReady(showChangePasswordPopup);</script>
