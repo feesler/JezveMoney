@@ -55,14 +55,19 @@
 		wlog("approot: ".$approot);
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
-		wlog("User agent: ".$userAgent);
 		wlog("Referer: ".$_SERVER["HTTP_REFERER"]);
 		wlog("Request: ".$ruri);
 
 		wlog("Headers: ");
 		foreach(getallheaders() as $cKey => $cVal)
 		{
-			wlog($cKey."=".$cVal);
+			wlog($cKey.": ".$cVal);
+		}
+
+		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		{
+			wlog("POST data:");
+			wlog(file_get_contents('php://input'));
 		}
 	}
 	else
