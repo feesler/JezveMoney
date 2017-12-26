@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Jezve Money | Tests</title>
+<style>
+*
+{
+	margin: 0;
+	padding: 0;
+	border: 0 none;
+}
+
+/* Main layout */
+html, body
+{
+	width: 100%;
+	height: 100%;
+}
+
+
+/* Clearfix */
+.clearfix
+{
+	float: none;
+	clear: both;
+	display: table;
+	zoom: 1;
+}
+
+
+.clearfix:after
+{
+	content: '. .';
+	display: block;
+	word-spacing: 99in;
+	height: 0;
+	overflow: hidden;
+/* Opera fix */
+	font-size: 0.13em;
+	line-height: 0;
+}
+
+
+.page
+{
+	display: table;
+	border-collapse: collapse;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	min-height: 100%;
+}
+
+
+.page_wrapper
+{
+	display: table-cell;
+	width: 100%;
+	min-height: 100%;
+	height: 100%;
+	position: static;
+}
+
+
+/* Main content */
+.container
+{
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	min-height: 100%;
+	height: 100%;
+}
+
+
+.content
+{
+	display: table-cell;
+	min-height: 100%;
+	height: 100%;
+}
+
+
+.content_wrap
+{
+	padding: 50px 12px;
+	height: 100%;
+}
+
+
+.results,
+.testview
+{
+	display: inline-block;
+	float: left;
+	width: 50%;
+	height: 100%;
+}
+
+
+.results > table
+{
+	border-collapse: collapse;
+}
+
+
+.results > table td
+{
+	border: 1px solid #000000;
+	padding: 5px;
+}
+
+
+.testview > iframe
+{
+	width: 100%;
+	height: 100%;
+}
+</style>
+<script type="text/javascript" src="http://jezve.net/money/view/js/es5-shim.min.js"></script>
+<script type="text/javascript" src="http://jezve.net/money/view/js/common.js"></script>
+<script>
+var viewframe = null;
+var vdoc = null;
+var restbl = null;
+
+
+function vge(a)
+{
+	return (typeof a == 'string') ? vdoc.getElementById(a) : a;
+}
+
+
+function clickEmul(elemObj)
+{
+	if (elemObj.click)
+	{
+		elemObj.click()
+	}
+	else if (document.createEvent)
+	{
+		var evt = document.createEvent("MouseEvents");
+		evt.initMouseEvent("click", true, true, viewframe.contentWindow,
+		0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		var allowDefault = elemObj.dispatchEvent(evt);
+	}
+}
+
+
+function continueWith(callback)
+{
+	viewframe.onload = function()
+	{
+		vdoc = viewframe.contentWindow.document;
+		if (!vdoc)
+			throw 'View document not found';
+
+		callback();
+	};
+}
+
+
+function initTests()
+{
+	viewframe = ge('viewframe');
+
+	if (!viewframe)
+		throw 'View frame not found';
+
+	restbl = ge('restbl');
+	if (!restbl)
+		throw 'Results table not found';
+
+	addResult('Test initialization', 'OK');
+
+	continueWith(mainPageStart/*startTests*/);
+}
+
+
+function startTests()
+{
+// Check user and logout if needed
+	if (isUserLoggedIn())
+		logoutUser();
+	else
+		loginAsTester();
+}
+
+
+function isUserLoggedIn()
+{
+	var userbtn = vge('userbtn');
+
+	return (userbtn != null);
+}
+
+
+function logoutUser()
+{
+	var userbtn = vge('userbtn');
+
+	clickEmul(userbtn);
+
+	setTimeout(function()
+	{
+		var menupopup = vge('menupopup');
+
+		continueWith(loginAsTester);
+
+		var el = menupopup.firstElementChild.lastElementChild.firstElementChild;
+		clickEmul(el);
+	}, 300);
+}
+
+
+function loginAsTester()
+{
+	var login, password;
+
+	login = vge('login');
+	password = vge('password');
+
+	login.value = 'test';
+	password.value = 'test';
+
+	continueWith(goToProfile);
+
+	var el = password.parentNode.nextElementSibling.firstElementChild;
+
+	clickEmul(el);
+}
+
+
+function goToProfile()
+{
+	var userbtn = vge('userbtn');
+
+	clickEmul(userbtn);
+
+	setTimeout(function()
+	{
+		var menupopup = vge('menupopup');
+
+		continueWith(loginAsTester);
+
+		var el = menupopup.firstElementChild.firstElementChild.firstElementChild;
+		clickEmul(el);
+	}, 300);
+}
+
+
+function resetAll()
+{
+	var resetall_from = vge('resetall_form');
+
+	clickEmul(resetall_from.nextElementSibling.firstElementChild);
+}
+
+
+function goToMainPage()
+{
+
+}
+
+
+function mainPageStart()
+{
+	var accTile = vge('acc_386');
+
+	continueWith(expenseTransactionStart);
+
+	clickEmul(accTile.firstElementChild);
+}
+
+
+function expenseTransactionStart()
+{
+	var destAmountInp = vge('dest_amount');
+
+	destAmountInp.value = '1';
+	destAmountInp.oninput();
+}
+
+
+function addResult(descr, res)
+{
+	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
+										ce('td', { innerHTML : res }) ]));
+}
+
+
+onReady(initTests);
+</script>
+</head>
+<body>
+<div class="page">
+	<div class="page_wrapper">
+		<div class="container">
+			<div class="content">
+				<div class="content_wrap">
+					<div class="results">
+						<table><tbody id="restbl"></tbody></table>
+						<input id="wtf" type="text">
+					</div>
+					<div class="testview"><iframe id="viewframe" src="http://jezve.net/money/"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
