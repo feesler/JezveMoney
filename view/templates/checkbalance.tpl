@@ -115,7 +115,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php	} else {	?>
 		<td class="id_cell">
 <?php	}	?>
-			<a href="./edittransaction.php?id=<?=$tr_id?>" target="_blank"><?=$tr_id?></a>
+			<a href="<?=BASEURL?>transactions/edit/<?=$tr_id?>" target="_blank"><?=$tr_id?></a>
 		</td>
 <?php	if ($tr["type"] == 1) {		?>
 <?php		if ($checkAccount_id == 0) {	?>
