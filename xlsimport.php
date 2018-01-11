@@ -27,19 +27,36 @@ function floatFix($str)
 header("Content-type: text/html; charset=UTF-8");
 
 $filePath = "/home/users/f/feesler/domains/jezve.net/";
-$srcFile = $filePath."account_statement_01.06.16-21.06.17.xlsx";
+
+$isCardStatement = TRUE;
+
+if ($isCardStatement)
+	$srcFile = $filePath."card_statement_24.02.16-11.01.18.xlsx";
+else
+	$srcFile = $filePath."account_statement_01.06.16-21.06.17.xlsx";
 
 
 $srcPHPExcel = PHPExcel_IOFactory::load($srcFile);
 $src = $srcPHPExcel->getActiveSheet();
 
-
-$date_col = columnStr(0);
-$desc_col = columnStr(1);
-$trCurr_col = columnStr(2);
-$trAmount_col = columnStr(3);
-$accCurr_col = columnStr(4);
-$accAmount_col = columnStr(5);
+if ($isCardStatement)
+{
+	$date_col = columnStr(0);
+	$desc_col = columnStr(2);
+	$trCurr_col = columnStr(6);
+	$trAmount_col = columnStr(7);
+	$accCurr_col = columnStr(8);
+	$accAmount_col = columnStr(9);
+}
+else	// account statement
+{
+	$date_col = columnStr(0);
+	$desc_col = columnStr(1);
+	$trCurr_col = columnStr(2);
+	$trAmount_col = columnStr(3);
+	$accCurr_col = columnStr(4);
+	$accAmount_col = columnStr(5);
+}
 $row_ind = 2;
 
 $data = array();
