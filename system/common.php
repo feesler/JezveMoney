@@ -25,6 +25,7 @@
 					"ProfileController" => "Controller/profile.php",
 					"StatisticsController" => "Controller/statistics.php",
 					"FastCommitController" => "Controller/fastcommit.php",
+					"CheckBalanceController" => "Controller/checkbalance.php",
 				// Admin controllers
 					"CurrencyAdminController" => "admin/Controller/currency.php",
 					"UserAdminController" => "admin/Controller/user.php",

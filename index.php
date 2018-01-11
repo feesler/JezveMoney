@@ -14,7 +14,8 @@
 							"login" => $userCont,
 							"logout" => $userCont,
 							"register" => $userCont,
-							"fastcommit" => "FastCommitController",);
+							"fastcommit" => "FastCommitController",
+							"checkbalance" => "CheckBalanceController");
 
 	$actionsMap = array("new" => "create",
 						"edit" => "update");
