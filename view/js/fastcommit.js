@@ -84,7 +84,7 @@ function createRowObject()
 	currencies.forEach(function(currency)
 	{
 		var option = ce('option', { value : currency.id, innerHTML : currency.name,
-									selected : (currency.id == mainAccObj.id) });
+									selected : (currency.id == mainAccObj.curr_id) });
 
 		rowObj.currSel.appendChild(option);
 	});
