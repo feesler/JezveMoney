@@ -13,13 +13,13 @@ class CheckBalanceController extends Controller
 	{
 		global $db, $user_id;
 
-		if (!isset($_GET["id"]) || $_GET["id"] == "all")
+		if (is_null($this->actionParam) || $this->actionParam == "all")
 		{
 			$checkAccount_id = 0;
 		}
 		else
 		{
-			$checkAccount_id = intval($_GET["id"]);
+			$checkAccount_id = intval($this->actionParam);
 			if (!$checkAccount_id)
 				fail();
 		}
