@@ -108,3 +108,65 @@
 {
 	display: none;
 }
+
+#submitbtn
+{
+	margin-left: 10px;
+}
+
+
+/* Checkbox or radiobutton wrapper */
+.checkwrap
+{
+	display: inline-block;
+	float: left;
+	white-space: nowrap;
+	height: 20px;
+	line-height: 20px;
+}
+
+.checkwrap.inputwrap
+{
+	height: 30px;
+	line-height: 30px;
+}
+
+.checkwrap.inputwrap input[type="text"]
+{
+	float: none;
+}
+
+
+.checkwrap input[type="checkbox"],
+.checkwrap input[type="radio"],
+.checkwrap > label,
+.checkwrap > label > span
+{
+	height: 20px;
+	line-height: 20px;
+	float: left;
+}
+
+
+.checkwrap > label > input[type="checkbox"],
+.checkwrap > label > input[type="radio"],
+.checkwrap > label > span
+{
+	height: 20px;
+	line-height: 20px;
+	float: left;
+	padding: 0 5px;
+}
+
+
+.checkwrap > input[type="checkbox"],
+.checkwrap > input[type="radio"]
+{
+	margin: 0px 5px 0px 0px;
+}
+
+
+.checkwrap > label
+{
+	font-size: 14px;
+}

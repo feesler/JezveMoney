@@ -550,13 +550,6 @@ function addPlaceholder(refItem)
 }
 
 
-// Import button click handler
-function onImportClick()
-{
-	ajax.get(baseURL + 'xlsimport.php', importLoadCallback);
-}
-
-
 // Import data request callback
 function importLoadCallback(response)
 {
@@ -697,14 +690,186 @@ function mapImportRow(impRowObj)
 }
 
 
+function Uploader(file, isCardStat, onSuccess, onFail, onProgress)
+{
+	// fileId is unique file identificator
+	var fileId = file.name + '-' + file.size + '-' + +file.lastModifiedDate;
+
+	var fileType = file.name.substr(file.name.lastIndexOf('.') + 1);
+
+	// make integer from file id to send in header
+	// only ASCII symbols is available in headers
+	fileId = hashCode(fileId);
+
+	var errorCount = 0;
+
+	var MAX_ERROR_COUNT = 6;
+
+	var startByte = 0;
+
+	var xhrUpload;
+	var xhrStatus;
+
+	function upload()
+	{
+		console.log("upload: check status");
+		xhrStatus = new XMLHttpRequest();
+
+		xhrStatus.onload = xhrStatus.onerror = function()
+		{
+			if (this.status == 200) {
+				startByte = +this.responseText || 0;
+				console.log("upload: startByte=" + startByte);
+				send();
+				return;
+			}
+
+			// something wrong
+			if (errorCount++ < MAX_ERROR_COUNT)
+				setTimeout(upload, 1000 * errorCount);		// try again after 1 second
+			else
+				onError(this.statusText);
+
+		};
+
+		xhrStatus.open("GET", "uploadstatus", true);
+		xhrStatus.setRequestHeader('X-File-Id', fileId);
+		xhrStatus.setRequestHeader('X-File-Type', fileType);
+		xhrStatus.send();
+	}
+
+
+	function send()
+	{
+		xhrUpload = new XMLHttpRequest();
+		xhrUpload.onload = xhrUpload.onerror = function()
+		{
+			console.log("upload end status:" + this.status + " text:" + this.statusText);
+
+			if (this.status == 200)
+			{
+				onSuccess(this.response);
+				return;
+			}
+
+			if (errorCount++ < MAX_ERROR_COUNT)
+				setTimeout(resume, 1000 * errorCount);	// try again
+			else
+				onError(this.statusText);
+		};
+
+		xhrUpload.open('POST', 'upload', true);
+		// which file upload
+		xhrUpload.setRequestHeader('X-File-Id', fileId);
+		xhrUpload.setRequestHeader('X-File-Type', fileType);
+		xhrUpload.setRequestHeader('X-File-Stat-Type', isCardStat ? 'card' : 'account');
+
+		xhrUpload.upload.onprogress = function(e)
+		{
+			errorCount = 0;
+			onProgress(startByte + e.loaded, startByte + e.total);
+		}
+
+		// send from startByte
+		xhrUpload.send(file.slice(startByte));
+	}
+
+
+	function pause()
+	{
+		xhrStatus && xhrStatus.abort();
+		xhrUpload && xhrUpload.abort();
+	}
+
+
+	this.upload = upload;
+	this.pause = pause;
+}
+
+
+// obtain 32-bit integer from string
+function hashCode(str)
+{
+	if (str.length == 0)
+		return 0;
+
+	var hash = 0,
+	i, chr, len;
+
+	for (i = 0; i < str.length; i++)
+	{
+		chr = str.charCodeAt(i);
+		hash = ((hash << 5) - hash) + chr;
+		hash |= 0; // Convert to 32bit integer
+	}
+
+	return Math.abs(hash);
+}
+
+
+function onImportSuccess(response)
+{
+	importLoadCallback(response);
+}
+
+
+function onImportError()
+{
+	console.log('error');
+}
+
+
+function onImportProgress(loaded, total)
+{
+	console.log("progress " + loaded + ' / ' + total);
+}
+
+
+function onFileImport()
+{
+	var fileUploadRadio = ge('fileUploadRadio');
+	var isCardCheck = ge('isCardCheck');
+	var isCard = isCardCheck.checked;
+
+	if (fileUploadRadio.checked)
+	{
+		var el = ge('fileInp')
+		if (!el)
+			return false;
+
+		var file = el.files[0];
+		if (!file)
+			return false;
+
+		uploader = new Uploader(file, isCard, onImportSuccess, onImportError, onImportProgress);
+		uploader.upload();
+	}
+	else
+	{
+		var el;
+		var reqObj = {};
+
+		el = ge('srvFilePath');
+		if (!el)
+			return false;
+
+		reqObj.fileName = el.value;
+		reqObj.isCard = isCard;
+
+		ajax.post(baseURL + 'fastcommit/upload/', urlJoin(reqObj), onImportSuccess);
+	}
+
+	return false;
+}
+
+
 function initPage()
 {
-	var importbtn = ge('importbtn');
 	var submitbtn = ge('submitbtn');
-	if (!importbtn || !submitbtn)
+	var fileimportfrm = ge('fileimportfrm');
+	if (!fileimportfrm || !importbtn || !submitbtn)
 		return;
 
-	importbtn.onclick = onImportClick;
 	submitbtn.onclick = onSubmitClick;
 
 	createRow();
@@ -716,4 +881,6 @@ function initPage()
 									placeholderClass : 'tr_row_placeholder',
 									copyWidth : true,
 									onlyRootHandle : true });
+
+	fileimportfrm.onsubmit = onFileImport;
 }
