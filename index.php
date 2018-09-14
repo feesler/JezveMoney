@@ -55,9 +55,17 @@
 	if (isset($actionsMap[$action]))
 		$action = $actionsMap[$action];
 
+	$actionParam = NULL;
+	if (!method_exists($controller, $action))
+	{
+		$actionParam = $action;
+		$action = "index";
+	}
+
 	$controller->action = $action;
 
-	$actionParam = array_shift($routeParts);
+	if (is_null($actionParam))
+		$actionParam = array_shift($routeParts);
 	$controller->actionParam = $actionParam;
 
 	$controller->initDefResources();
