@@ -81,8 +81,8 @@ class TransactionsController extends Controller
 		foreach($trTypes as $ind => $trTypeName)
 		{
 			$params = array("type" => strtolower($trTypeName));
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
+			if (count($filterObj->acc_id) > 0)
+				$params["acc_id"] = implode(",", $filterObj->acc_id);
 			if ($showDetails)
 				$params["mode"] = "details";
 			if (!is_empty($searchReq))
@@ -102,10 +102,11 @@ class TransactionsController extends Controller
 		// Prepare mode selector and paginator
 		if ($showPaginator == TRUE)
 		{
+			// Prepare classic/details mode link
 			$params = array("type" => $transMod->getTypeString($trans_type),
 							"mode" => (($details) ? "classic" : "details"));
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
+			if (count($filterObj->acc_id) > 0)
+				$params["acc_id"] = implode(",", $filterObj->acc_id);
 			if ($page_num != 0)
 				$params["page"] = ($page_num + 1);
 			if (!is_empty($searchReq))
@@ -127,7 +128,7 @@ class TransactionsController extends Controller
 					if (is_numeric($pageItem["text"]) && !$pageItem["active"])
 					{
 						$pNum = intval($pageItem["text"]);
-						$pagesArr[$ind]["link"] = $transMod->getPageLink($trans_type, $acc_id, $pNum, $searchReq, $stDate, $endDate, $details);
+						$pagesArr[$ind]["link"] = $transMod->getPageLink($trans_type, $filterObj->acc_id, $pNum, $searchReq, $stDate, $endDate, $details);
 					}
 				}
 			}

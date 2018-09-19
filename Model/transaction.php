@@ -709,8 +709,8 @@ class TransactionModel extends CachedTable
 	{
 		$params = array("type" => $this->getTypeString($trans_type),
 						"page" => $page_num);
-		if ($acc_id != 0)
-			$params["acc_id"] = $acc_id;
+		if (count($acc_id) > 0)
+			$params["acc_id"] = implode(",", $acc_id);
 		if ($details == TRUE)
 			$params["mode"] = "details";
 		if (!is_empty($searchStr))
