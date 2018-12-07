@@ -641,11 +641,13 @@ class TransactionsController extends Controller
 		$srcAmountSign = CurrencyModel::getSign($srcAmountCurr);
 		$destAmountSign = CurrencyModel::getSign($destAmountCurr);
 		$exchSign = $destAmountSign."/".$srcAmountSign;
-		$exchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
+		$exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
+		$backExchSign = $srcAmountSign."/".$destAmountSign;
+		$backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
 
 		$rtSrcAmount = CurrencyModel::format($tr["src_amount"], $srcAmountCurr);
 		$rtDestAmount = CurrencyModel::format($tr["dest_amount"], $destAmountCurr);
-		$rtExchange = $exchValue." ".$exchSign;
+		$rtExchange = $exchValue." ".$exchSign." (".$backExchValue." ".$backExchSign.")";
 		if ($trans_type != DEBT)
 		{
 			$rtSrcResBal = CurrencyModel::format($src["balance"], $src["curr"]);
