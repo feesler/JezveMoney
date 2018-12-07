@@ -55,6 +55,8 @@ class AccountModel extends CachedTable
 			self::$dcache[$acc_id]["balance"] = floatval($row["balance"]);
 			self::$dcache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
 			self::$dcache[$acc_id]["icon"] = intval($row["icon"]);
+			self::$dcache[$acc_id]["createdate"] = strtotime($row["createdate"]);
+			self::$dcache[$acc_id]["updatedate"] = strtotime($row["updatedate"]);
 		}
 	}
 
@@ -76,8 +78,10 @@ class AccountModel extends CachedTable
 		if (!$accname || $accname == "" || !$curr_id)
 			return 0;
 
-		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon"),
-								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type)))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"),
+								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate)))
 			return 0;
 
 		$acc_id = $db->insertId();
@@ -119,8 +123,10 @@ class AccountModel extends CachedTable
 		$initbalance = $this->getInitBalance($acc_id);
 		$diff = $balance - $initbalance;
 
-		$fields = array("name", "curr_id", "icon");
-		$values = array($accname, $curr_id, $icon_type);
+		$curDate = date("Y-m-d H:i:s");
+
+		$fields = array("name", "curr_id", "icon", "updatedate");
+		$values = array($accname, $curr_id, $icon_type, $curDate);
 
 		if (abs($diff) > 0.01)
 		{
@@ -209,7 +215,7 @@ class AccountModel extends CachedTable
 		if (!$acc_id || is_null($field) || $field == "")
 			return FALSE;
 
-		if (!$db->updateQ("accounts", array($field), array($newValue), "id=".$acc_id))
+		if (!$db->updateQ("accounts", array($field, "updatedate"), array($newValue, date("Y-m-d H:i:s")), "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();

@@ -58,6 +58,8 @@ class TransactionModel extends CachedTable
 				self::$dcache[$trans_id]["date"] = $row["date"];
 				self::$dcache[$trans_id]["comment"] = $row["comment"];
 				self::$dcache[$trans_id]["pos"] = intval($row["pos"]);
+				self::$dcache[$trans_id]["createdate"] = strtotime($row["createdate"]);
+				self::$dcache[$trans_id]["updatedate"] = strtotime($row["updatedate"]);
 			}
 		}
 	}
@@ -109,8 +111,10 @@ class TransactionModel extends CachedTable
 			$tr_pos++;
 		}
 
-		if (!$db->insertQ(self::$tbl_name, array("id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos"),
-									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos)))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->insertQ(self::$tbl_name, array("id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "createdate", "updatedate"),
+									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate, $curDate)))
 			return 0;
 
 		$trans_id = $db->insertId();
@@ -269,8 +273,10 @@ class TransactionModel extends CachedTable
 			$tr_pos = $this->getPos($trans_id);
 		}
 
-		$fieldsArr = array("src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos");
-		$valuesArr = array($src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos);
+		$curDate = date("Y-m-d H:i:s");
+
+		$fieldsArr = array("src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "updatedate");
+		$valuesArr = array($src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate);
 
 		if (!$db->updateQ(self::$tbl_name, $fieldsArr, $valuesArr, "id=".$trans_id))
 			return FALSE;
@@ -371,13 +377,16 @@ class TransactionModel extends CachedTable
 				$assignment = "pos=pos-1";
 			}
 
+			$curDate = date("Y-m-d H:i:s");
+			$assignment .= ", updatedate=".qnull($curDate);
+
 			$query = "UPDATE `".self::$tbl_name."` SET ".$assignment." WHERE ".andJoin($condArr).";";
 			$db->rawQ($query);
 			if (mysql_errno() != 0)
 				return FALSE;
 		}
 
-		if (!$db->updateQ(self::$tbl_name, array("pos"), array($new_pos), "id=".$trans_id))
+		if (!$db->updateQ(self::$tbl_name, array("pos", "updatedate"), array($new_pos, $curDate), "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -455,17 +464,19 @@ class TransactionModel extends CachedTable
 
 		$this->cleanCache();
 
+		$curDate = date("Y-m-d H:i:s");
+
 		if ($acc_owner != $u_owner)	// specified account is account of person
 		{
 			// set outgoing debt(person take) as income to destination account
 			$condArr = array($userCond, "src_id=".$acc_id, "type=4");
-			if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
+			if (!$db->updateQ(self::$tbl_name, array("src_id", "type", "updatedate"), array(0, 2, $curDate),
 							$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as expense from source account
 			$condArr = array($userCond, "dest_id=".$acc_id, "type=4");
-			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
+			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type", "updatedate"), array(0, 1, $curDate),
 							$condArr))
 				return FALSE;
 		}
@@ -473,26 +484,26 @@ class TransactionModel extends CachedTable
 		{
 			// set outgoing debt(person take) as debt without acc
 			$condArr = array($userCond, "src_id=".$acc_id, "type=4");
-			if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 4),
+			if (!$db->updateQ(self::$tbl_name, array("src_id", "type", "updatedate"), array(0, 4, $curDate),
 							$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as debt without acc
 			$condArr = array($userCond, "dest_id=".$acc_id, "type=4");
-			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 4),
+			if (!$db->updateQ(self::$tbl_name, array("dest_id", "type", "updatedate"), array(0, 4, $curDate),
 							$condArr))
 				return FALSE;
 		}
 
 		// set transfer from account as income to destination account
 		$condArr = array($userCond, "src_id=".$acc_id, "type=3");
-		if (!$db->updateQ(self::$tbl_name, array("src_id", "type"), array(0, 2),
+		if (!$db->updateQ(self::$tbl_name, array("src_id", "type", "updatedate"), array(0, 2, $curDate),
 						$condArr))
 			return FALSE;
 
 		// set transfer to account as expense from source account
 		$condArr = array($userCond, "dest_id=".$acc_id, "type=3");
-		if (!$db->updateQ(self::$tbl_name, array("dest_id", "type"), array(0, 1),
+		if (!$db->updateQ(self::$tbl_name, array("dest_id", "type", "updatedate"), array(0, 1, $curDate),
 						$condArr))
 			return FALSE;
 

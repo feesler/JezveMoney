@@ -20,6 +20,8 @@ class CurrencyModel
 			self::$cache[$curr_id]["name"] = $row["name"];
 			self::$cache[$curr_id]["sign"] = $row["sign"];
 			self::$cache[$curr_id]["format"] = $row["format"];
+			self::$cache[$curr_id]["createdate"] = strtotime($row["createdate"]);
+			self::$cache[$curr_id]["updatedate"] = strtotime($row["updatedate"]);
 		}
 	}
 
@@ -95,8 +97,10 @@ class CurrencyModel
 		if (!$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
 			return 0;
 
-		if (!$db->insertQ("currency", array("id", "name", "sign", "format"),
-							array(NULL, $curr_name, $curr_sign, $curr_format)))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->insertQ("currency", array("id", "name", "sign", "format", "createdate", "updatedate"),
+							array(NULL, $curr_name, $curr_sign, $curr_format, $curDate, $curDate)))
 			return 0;
 
 		self::cleanCache();
@@ -121,8 +125,10 @@ class CurrencyModel
 		if (!self::is_exist($curr_id))
 			return FALSE;
 
-		if (!$db->updateQ("currency", array("name", "sign", "format"),
-								array($curr_name, $curr_sign, $curr_format),
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->updateQ("currency", array("name", "sign", "format", "updatedate"),
+								array($curr_name, $curr_sign, $curr_format, $curDate),
 								"id=".$curr_id))
 			return FALSE;
 

@@ -34,6 +34,8 @@ class UserModel extends CachedTable
 			self::$dcache[$user_id]["passhash"] = $row["passhash"];
 			self::$dcache[$user_id]["owner_id"] = intval($row["owner_id"]);
 			self::$dcache[$user_id]["access"] = intval($row["access"]);
+			self::$dcache[$user_id]["createdate"] = strtotime($row["createdate"]);
+			self::$dcache[$user_id]["updatedate"] = strtotime($row["updatedate"]);
 		}
 	}
 
@@ -212,7 +214,9 @@ class UserModel extends CachedTable
 		if (count($resArr) > 0)
 			return FALSE;
 
-		if (!$db->updateQ("users", array("owner_id"), array($o_id), "id=".qnull($u_id)))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->updateQ("users", array("owner_id", "updatedate"), array($o_id, $curDate), "id=".qnull($u_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -234,8 +238,9 @@ class UserModel extends CachedTable
 		global $db;
 
 		$elogin = $db->escape($login);
+		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("users", array("passhash"), array($passhash), "login=".qnull($elogin)))
+		if (!$db->updateQ("users", array("passhash", "updatedate"), array($passhash, $curDate), "login=".qnull($elogin)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -267,8 +272,9 @@ class UserModel extends CachedTable
 
 		$passhash = $this->createHash($login, $password);
 		$elogin = $db->escape($login);
+		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->insertQ("users", array("id", "login", "passhash"), array(NULL, $elogin, $passhash)))
+		if (!$db->insertQ("users", array("id", "login", "passhash", "createdate", "updatedate"), array(NULL, $elogin, $passhash, $curDate, $curDate)))
 			return FALSE;
 
 		$user_id = $db->insertId();
@@ -372,8 +378,9 @@ class UserModel extends CachedTable
 
 		$passhash = $this->createHash($login, $newpass);
 		$elogin = $db->escape($login);
+		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("users", array("login", "passhash"), array($elogin, $passhash), "id=".$user_id))
+		if (!$db->updateQ("users", array("login", "passhash", "updatedate"), array($elogin, $passhash, $curDate), "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -401,7 +408,9 @@ class UserModel extends CachedTable
 		if ($curAccess == $access)
 			return TRUE;
 
-		if (!$db->updateQ("users", array("access"), array($access), "id=".$user_id))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->updateQ("users", array("access", "updatedate"), array($access, $curDate), "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();

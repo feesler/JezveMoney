@@ -40,6 +40,8 @@ class PersonModel extends CachedTable
 
 			self::$dcache[$person_id]["name"] = $row["name"];
 			self::$dcache[$person_id]["user_id"] = intval($row["user_id"]);
+			self::$dcache[$person_id]["createdate"] = strtotime($row["createdate"]);
+			self::$dcache[$person_id]["updatedate"] = strtotime($row["updatedate"]);
 		}
 	}
 
@@ -54,8 +56,10 @@ class PersonModel extends CachedTable
 
 		$person_name = $db->escape($pname);
 
-		if (!$db->insertQ("persons", array("id", "name", "user_id"),
-								array(NULL, $person_name, self::$user_id)))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->insertQ("persons", array("id", "name", "user_id", "createdate", "updatedate"),
+								array(NULL, $person_name, self::$user_id, $curDate, $curDate)))
 			return 0;
 
 		$p_id = $db->insertId();
@@ -81,7 +85,9 @@ class PersonModel extends CachedTable
 		if (!$this->is_exist($person_id))
 			return FALSE;
 
-		if (!$db->updateQ("persons", array("name"), array($person_name), "id=".$person_id))
+		$curDate = date("Y-m-d H:i:s");
+
+		if (!$db->updateQ("persons", array("name", "updatedate"), array($person_name, $curDate), "id=".$person_id))
 			return FALSE;
 
 		$this->cleanCache();
