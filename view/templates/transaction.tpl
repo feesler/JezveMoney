@@ -354,7 +354,7 @@
 						</div>
 <?php	}	?>
 						<div class="non_float">
-							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="addtitle"><?=$dateFmt?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
