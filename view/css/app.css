@@ -677,6 +677,7 @@ label
 .info_subtitle
 {
 	font-size: 12px;
+	text-align: right;
 	top: 5px;
 	right: 5px;
 	position: absolute;
