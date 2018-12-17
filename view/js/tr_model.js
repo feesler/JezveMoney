@@ -295,7 +295,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	{
 		if (!s1dvalid)
 			return;
-	
+
 		if (self.isTransfer() || self.isIncome())
 		{
 			f3_d();		// calculate destination amount
@@ -362,7 +362,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		{
 			fe = e = 1;
 			evalid = true;
-			notifyChanged('exchrate', fsa);
+			notifyChanged('exchrate', fe);
 
 			if (savalid)
 			{
@@ -379,7 +379,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		{
 			fe = e = 1;
 			evalid = true;
-			notifyChanged('exchrate', fsa);
+			notifyChanged('exchrate', fe);
 
 			if (davalid)
 			{
