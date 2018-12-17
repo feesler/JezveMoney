@@ -703,7 +703,8 @@ function TransactionViewModel()
 	// Change account event handler
 	function onChangeAcc()
 	{
-		var acc, acc_id, tile_id;
+		var acc, acc_id, tile_id, copy_curr;
+		var isDiff = Transaction.isDiff();
 
 		if (Transaction.isExpense())
 		{
@@ -727,11 +728,23 @@ function TransactionViewModel()
 		{
 			Transaction.update('src_id', acc_id);
 			onSrcCurrChanged();
+			if (!isDiff)
+			{
+				copy_curr = Transaction.srcCurr();
+				Transaction.update('dest_curr', copy_curr);
+				onDestCurrChanged(copy_curr);
+			}
 		}
 		else if (Transaction.isIncome() || (Transaction.isDebt() && Transaction.debtType()))
 		{
 			Transaction.update('dest_id', acc_id);
 			onDestCurrChanged();
+			if (!isDiff)
+			{
+				copy_curr = Transaction.destCurr();
+				Transaction.update('src_curr', copy_curr);
+				onSrcCurrChanged(copy_curr);
+			}
 		}
 
 		if (Transaction.isDebt())
