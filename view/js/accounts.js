@@ -22,12 +22,16 @@ function onIconSel(obj)
 // Currency select callback
 function onCurrencySel(obj)
 {
-	if (!obj)
+	var currsign;
+
+	currsign = ge('currsign');
+	if (!obj || !currsign)
 		return;
 
 	this.setText(obj.str);
 
-	setSign('currsign', obj.id);
+	acc_currency = obj.id;
+	setSign('currsign', acc_currency);
 	updateAccountTile();
 }
 
