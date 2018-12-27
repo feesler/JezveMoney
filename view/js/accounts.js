@@ -138,22 +138,6 @@ function updateAccountTile()
 }
 
 
-// Currency change event handler
-function onChangeAccountCurrency(obj)
-{
-	var currsign;
-
-	currsign = ge('currsign');
-	if (!obj || !currsign)
-		return;
-
-	acc_currency = selectedValue(obj);
-	setSign(currsign, acc_currency);
-
-	updateAccountTile();
-}
-
-
 // Account name input event handler
 function onAccNameInput(obj)
 {
