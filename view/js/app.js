@@ -49,7 +49,12 @@ function createMessage(message, msgClass)
 function fixFloat(str)
 {
 	if (typeof(str) == "string")
-		return str.replace(/,/g, '.');
+	{
+		str = str.replace(/,/g, '.');
+		if (str.indexOf('.') === 0 || !str.length)
+			str = '0' + str;
+		return str;
+	}
 	else if (typeof(str) == "number")
 		return str;
 	else

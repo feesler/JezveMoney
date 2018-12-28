@@ -36,7 +36,7 @@
 						<div class="non_float std_margin">
 							<label for="icon">Icon</label>
 							<div class="std_input">
-								<select id="icon" name="icon" onchange="onChangeIcon(this);">
+								<select id="icon" name="icon">
 <?php	foreach($icons as $icon_id => $icon_name) {
 			if ($icon_id == $accInfo["icon"]) {		?>
 									<option value="<?=$icon_id?>" selected><?=$icon_name?></option>
@@ -54,7 +54,7 @@
 						<div class="non_float std_margin">
 							<label for="currency">Currency</label>
 							<div class="std_input">
-								<select id="currency" name="currency" onchange="onChangeAccountCurrency(this);">
+								<select id="currency" name="currency">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $accInfo["curr"]) {	?>
 									<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>

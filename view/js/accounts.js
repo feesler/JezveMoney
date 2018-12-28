@@ -22,12 +22,16 @@ function onIconSel(obj)
 // Currency select callback
 function onCurrencySel(obj)
 {
-	if (!obj)
+	var currsign;
+
+	currsign = ge('currsign');
+	if (!obj || !currsign)
 		return;
 
 	this.setText(obj.str);
 
-	setSign('currsign', obj.id);
+	acc_currency = obj.id;
+	setSign('currsign', acc_currency);
 	updateAccountTile();
 }
 
@@ -47,6 +51,12 @@ function initControls()
 	currDDList = new DDList();
 	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		currDDList = null;
+
+	var finpFunc = function(e){ return onAccBalanceInput(this); };
+	var fkeyFunc = function(e){ return onFieldKey(e, this); };
+
+	elem = ge('balance');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
 }
 
 
@@ -138,22 +148,6 @@ function updateAccountTile()
 }
 
 
-// Currency change event handler
-function onChangeAccountCurrency(obj)
-{
-	var currsign;
-
-	currsign = ge('currsign');
-	if (!obj || !currsign)
-		return;
-
-	acc_currency = selectedValue(obj);
-	setSign(currsign, acc_currency);
-
-	updateAccountTile();
-}
-
-
 // Account name input event handler
 function onAccNameInput(obj)
 {
@@ -172,7 +166,7 @@ function onAccBalanceInput(obj)
 	if (!obj)
 		return;
 
-	acc_balance = obj.value;
+	acc_balance = normalize(obj.value);
 
 	updateAccountTile();
 }
