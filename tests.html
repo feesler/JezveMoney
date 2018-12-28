@@ -483,14 +483,61 @@ function afterSubmitAccount2()
 						tileName && tileName.innerHTML == 'acc_2')
 
 	addResult('Second account create result', (submitRes) ? 'OK' : 'FAIL');
-/*
-	var addBtn = vdoc.querySelector('#add_btn > a');
 
-	continueWith(createNewAccount2);
-	clickEmul(addBtn);
-*/
+	var accTileBtn = tiles.firstElementChild.firstElementChild;
+
+	clickEmul(accTileBtn);
+
+	var edit_btn = vge('edit_btn');
+
+	continueWith(editAccount1);
+	clickEmul(edit_btn.firstElementChild);
 }
 
+
+
+function editAccount1()
+{
+	var accname = vge('accname');
+	var balance = vge('balance');
+	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
+	var tileName = vdoc.querySelector('#acc_tile .acc_name');
+
+	if (!accname)
+		throw 'Account name field not found';
+	if (!balance)
+		throw 'Initial balance field not found';
+	if (!tileBal)
+		throw 'On-tile balance element not found';
+	if (!tileName)
+		throw 'On-tile name element not found';
+
+	addResult('Edit account page loaded', 'OK');
+
+	addResult('Edit account name on tile', (tileName.innerHTML == 'acc_1') ? 'OK' : 'FAIL');
+	addResult('Edit account balance on tile', (tileBal.innerHTML == '1 000.01 ₽') ? 'OK' : 'FAIL');
+
+
+// Change currency
+	var currElem = vge('currency');
+	var ddCurrInpCont = currElem.previousElementSibling;
+
+	clickEmul(ddCurrInpCont.previousElementSibling);
+	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
+	clickEmul(vge('ddlist2_2'));	// select USD currency
+
+
+// Change icon
+	var iconElem = vge('icon');
+	var ddIconInpCont = iconElem.previousElementSibling;
+
+	clickEmul(ddIconInpCont.previousElementSibling);
+	var ddIconText = ddIconInpCont.querySelector('.statsel');
+	clickEmul(vge('ddlist1_1'));	// select purse icon
+
+	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Purse') ? 'OK' : 'FAIL');
+	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'purse_icon')) ? 'OK' : 'FAIL');
+}
 
 
 function expenseTransactionStart()
