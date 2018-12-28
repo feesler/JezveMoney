@@ -51,6 +51,12 @@ function initControls()
 	currDDList = new DDList();
 	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		currDDList = null;
+
+	var finpFunc = function(e){ return onAccBalanceInput(this); };
+	var fkeyFunc = function(e){ return onFieldKey(e, this); };
+
+	elem = ge('balance');
+	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
 }
 
 
@@ -160,7 +166,7 @@ function onAccBalanceInput(obj)
 	if (!obj)
 		return;
 
-	acc_balance = obj.value;
+	acc_balance = normalize(obj.value);
 
 	updateAccountTile();
 }
