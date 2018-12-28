@@ -455,7 +455,7 @@ function createNewAccount2()
 	clickEmul(vge('ddlist2_3'));	// select EUR currency
 
 	addResult('EUR currency select result', (ddCurrText.innerHTML == 'EUR') ? 'OK' : 'FAIL');
-	addResult('Tile balance format update result', (tileBal.innerHTML == ' 0') ? 'OK' : 'FAIL');
+	addResult('Tile balance format update result', (tileBal.innerHTML == '€ 0') ? 'OK' : 'FAIL');
 
 	balance.value = '1000.01';
 	balance.oninput();
