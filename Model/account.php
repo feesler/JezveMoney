@@ -43,7 +43,7 @@ class AccountModel extends CachedTable
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
-		$resArr = $db->selectQ("*", "accounts", $condArr);
+		$resArr = $db->selectQ("*", "accounts", $condArr, "id");
 		foreach($resArr as $row)
 		{
 			$acc_id = $row["id"];
