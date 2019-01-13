@@ -91,6 +91,7 @@ class mysqlDB
 {
 	private static $conn = NULL;		// connection
 	private static $dbname = NULL;		// current database name
+	private static $tblCache = NULL;	// cache of exist tables
 
 
 	// Constructor
@@ -100,10 +101,16 @@ class mysqlDB
 	}
 
 
+	public function getConnection()
+	{
+		return self::$conn;
+	}
+
+
 	// Connect to database server
 	public function connect($dblocation, $dbuser, $dbpasswd)
 	{
-		$dbcnx = @mysql_connect($dblocation, $dbuser, $dbpasswd);
+		$dbcnx = @mysqli_connect($dblocation, $dbuser, $dbpasswd);
 		if ($dbcnx)
 			self::$conn = $dbcnx;
 
@@ -116,12 +123,12 @@ class mysqlDB
 	{
 		wlog("USE ".$name.";");
 
-		$res = @mysql_select_db($name, self::$conn);
+		$res = @mysqli_select_db(self::$conn, $name);
 		if ($res)
 			self::$dbname = $name;
 
-		$errno = mysql_errno();
-		wlog("Result: ".($errno ? ($errno." - ".mysql_error()) : "ok"));
+		$errno = mysqli_errno(self::$conn);
+		wlog("Result: ".($errno ? ($errno." - ".mysql_error(self::$conn)) : "ok"));
 
 		return $res;
 	}
@@ -130,7 +137,7 @@ class mysqlDB
 	// Return escaped string
 	public function escape($str)
 	{
-		return mysql_real_escape_string($str);
+		return mysqli_real_escape_string(self::$conn, $str);
 	}
 
 
@@ -139,10 +146,10 @@ class mysqlDB
 	{
 		wlog("Query: ".$query);
 
-		$res = mysql_query($query, self::$conn);
+		$res = mysqli_query(self::$conn, $query);
 
-		$errno = mysql_errno();
-		wlog("Result: ".($errno ? ($errno." - ".mysql_error()) : "ok"));
+		$errno = mysqli_errno(self::$conn);
+		wlog("Result: ".($errno ? ($errno." - ".mysqli_error(self::$conn)) : "ok"));
 
 		return ($res != FALSE) ? $res : NULL;
 	}
@@ -168,9 +175,9 @@ class mysqlDB
 		$query .= ";";
 
 		$result = $this->rawQ($query);
-		if ($result && !mysql_errno() && mysql_num_rows($result) > 0)
+		if ($result && !mysqli_errno(self::$conn) && mysqli_num_rows($result) > 0)
 		{
-			while($row = mysql_fetch_array($result))
+			while($row = mysqli_fetch_array($result))
 			{
 				$resArr[] = $row;
 			}
@@ -188,7 +195,7 @@ class mysqlDB
 
 		$query = "INSERT INTO `".$table."` (`".join("`, `", $fields)."`) VALUES (".qjoin(", ", $values).");";
 		$this->rawQ($query);
-		$errno = mysql_errno();
+		$errno = mysqli_errno(self::$conn);
 
 		return ($errno == 0);
 	}
@@ -197,7 +204,7 @@ class mysqlDB
 	// Return last insert id
 	public function insertId()
 	{
-		return mysql_insert_id();
+		return mysqli_insert_id(self::$conn);
 	}
 
 
@@ -227,7 +234,7 @@ class mysqlDB
 		$query .= ";";
 
 		$this->rawQ($query);
-		$errno = mysql_errno();
+		$errno = mysqli_errno(self::$conn);
 
 		return ($errno == 0);
 	}
@@ -241,7 +248,7 @@ class mysqlDB
 
 		$query = "TRUNCATE TABLE `".$table."`;";
 		$this->rawQ($query);
-		return (mysql_errno() == 0);
+		return (mysqli_errno(self::$conn) == 0);
 	}
 
 
@@ -257,7 +264,7 @@ class mysqlDB
 		$query = "DELETE FROM `".$table."` WHERE ".andJoin($condition).";";
 		$this->rawQ($query);
 
-		return (mysql_errno() == 0);
+		return (mysqli_errno(self::$conn) == 0);
 	}
 
 
@@ -271,20 +278,46 @@ class mysqlDB
 			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";
 
-		$result = 	$this->rawQ($query);
-		$errno = mysql_errno();
-		$rows = mysql_num_rows($result);
+		$result = $this->rawQ($query);
+		$errno = mysqli_errno(self::$conn);
+		$rows = mysqli_num_rows($result);
 		if (!$errno && $rows == 1)
 		{
-			$row = mysql_fetch_array($result);
+			$row = mysqli_fetch_array($result);
 			if ($row)
 				$res = $row["COUNT(*)"];
 		}
 
 		return $res;
 	}
-	
-	
+
+
+	// Check table is exist
+	public function isTableExist($table)
+	{
+		if (is_null(self::$tblCache))
+		{
+			$query = "SHOW TABLES;";
+
+			$result = $this->rawQ($query);
+			$errno = mysqli_errno(self::$conn);
+			$rows = mysqli_num_rows($result);
+
+			self::$tblCache = array();
+			if ($result && !$errno && $rows > 0)
+			{
+				while($row = mysqli_fetch_array($result))
+				{
+					$tblName = $row[0];
+					self::$tblCache[$tblName] = TRUE;
+				}
+			}
+		}
+
+		return (isset(self::$tblCache[$table]));
+	}
+
+
 	// Create table if not exist query
 	public function createTableQ($table, $defs, $options)
 	{
@@ -294,8 +327,11 @@ class mysqlDB
 		$query = "CREATE TABLE IF NOT EXISTS `".$table."` (".$defs.") ".$options.";";
 
 		$this->rawQ($query);
+		$errno = mysqli_errno(self::$conn);
+		if ($errno == 0)
+			self::$tblCache[$table] = TRUE;
 
-		return (mysql_errno() == 0);
+		return ($errno == 0);
 	}
 
 
@@ -307,8 +343,11 @@ class mysqlDB
 
 		$query = "DROP TABLE IF EXISTS `".$table."`;";
 		$this->rawQ($query);
+		$errno = mysqli_errno(self::$conn);
+		if ($errno == 0)
+			unset(self::$tblCache[$table]);
 
-		return (mysql_errno() == 0);
+		return ($errno == 0);
 	}
 
 }
