@@ -16,6 +16,7 @@
 
 	$classes = array("CachedTable" => "system/cachedTable.php",
 					"Controller" => "system/controller.php",
+					"ApiController" => "system/apicontroller.php",
 				// Controllers
 					"MainController" => "Controller/main.php",
 					"AccountsController" => "Controller/accounts.php",
