@@ -127,7 +127,7 @@ class UserModel extends CachedTable
 	// Check is user logged in and return id
 	public function check()
 	{
-		session_start();
+		sessionStart();
 
 		$user_id = 0;
 
@@ -299,7 +299,7 @@ class UserModel extends CachedTable
 		if (!$this->checkLoginData($login, $password))
 			return FALSE;
 
-		session_start();
+		sessionStart();
 		$_SESSION["userid"] = $this->getId($login);
 
 		$preHash = $this->createPreHash($login, $password);
@@ -313,7 +313,7 @@ class UserModel extends CachedTable
 	// Loggin out user
 	public function logout()
 	{
-		session_start();
+		sessionStart();
 		session_unset();
 		session_destroy();
 
