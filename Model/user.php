@@ -43,7 +43,7 @@ class UserModel extends CachedTable
 	// Return salt for specified string
 	private function getSalt($str)
 	{
-		$bfPrefix = "\$2a\$10\$";
+		$bfPrefix = "\$2y\$10\$";
 
 		return $bfPrefix.substr(md5($str), 0, 21)."\$";
 	}
