@@ -36,4 +36,54 @@ abstract class Controller
 									(array)$this->css->app,
 									(array)$this->css->page);
 	}
+
+
+	// Check current request is POST
+	protected function isPOST()
+	{
+		return ($_SERVER["REQUEST_METHOD"] == "POST");
+	}
+
+
+	// Check request is AJAX
+	protected function isAJAX()
+	{
+		$hdrs = getallheaders();
+		return (isset($hdrs["X-Requested-With"]) && $hdrs["X-Requested-With"] == "XMLHttpRequest");
+	}
+
+
+	// Obtain requested ids from actionParam of from GET id parameter and return array of integers
+	protected function getRequestedIds()
+	{
+		if (is_null($this->actionParam) && !isset($_GET["id"]))
+			return NULL;
+
+		$res = array();
+
+		if (isset($_GET["id"]))
+		{
+			if (is_array($_GET["id"]))
+			{
+				foreach($_GET["id"] as $val)
+				{
+					$val = intval($val);
+					if ($val)
+						$res[] = $val;
+				}
+			}
+			else
+			{
+				$val = intval($_GET["id"]);
+				if ($val)
+					$res[] = $val;
+			}
+		}
+		else
+		{
+			$res[] = intval($this->actionParam);
+		}
+
+		return $res;
+	}
 }
