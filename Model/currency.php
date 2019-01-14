@@ -69,7 +69,7 @@ class CurrencyModel
 
 
 	// Check is specified currency is exist
-	public function is_exist($curr_id)
+	public static function is_exist($curr_id)
 	{
 		if (!is_numeric($curr_id))
 			return FALSE;
