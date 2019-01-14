@@ -45,7 +45,7 @@ class UserModel extends CachedTable
 	{
 		$bfPrefix = "\$2a\$10\$";
 
-		return substr($bfPrefix.md5($str), 0, 28);
+		return $bfPrefix.substr(md5($str), 0, 21)."\$";
 	}
 
 
@@ -59,7 +59,7 @@ class UserModel extends CachedTable
 	// Check correctness of hash
 	private function checkHash($str, $salt, $hash)
 	{
-		$full_hash = $salt.$hash;
+		$full_hash = substr($salt, 0, 28).$hash;
 
 		return (crypt($str, $salt) == $full_hash);
 	}
