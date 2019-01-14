@@ -471,7 +471,7 @@
 
 						<div class="test_container">
 						<h3>Get currencies</h3>
-						<form action="<?=BASEURL?>api/currency.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/currency/list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -480,7 +480,7 @@
 
 						<div class="test_container">
 						<h3>Read currency</h3>
-						<form action="<?=BASEURL?>api/currency.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/currency" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="curr_id">Id</label>
 								<input name="curr_id" type="text">

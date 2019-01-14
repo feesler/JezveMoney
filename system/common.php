@@ -27,6 +27,8 @@
 					"StatisticsController" => "Controller/statistics.php",
 					"FastCommitController" => "Controller/fastcommit.php",
 					"CheckBalanceController" => "Controller/checkbalance.php",
+				// API controllers
+					"CurrencyApiController" => "api/Controller/currency.php",
 				// Admin controllers
 					"CurrencyAdminController" => "admin/Controller/currency.php",
 					"UserAdminController" => "admin/Controller/user.php",
