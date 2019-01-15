@@ -6,21 +6,26 @@ class CurrencyApiController extends ApiController
 	{
 		$respObj = new apiResponse;
 
-		if (!isset($_POST["curr_id"]))
-			$respObj->fail();
-		$curr_id = intval($_POST["curr_id"]);
-		if (!$curr_id)
-			$respObj->fail();
+		$ids = $this->getRequestedIds();
+		if (is_null($ids) || !is_array($ids) || !count($ids))
+			$respObj->fail("No currency specified");
 
+		$currArr = [];
+		foreach($ids as $curr_id)
+		{
+			if (!CurrencyModel::is_exist($curr_id))
+				$respObj->fail();
 
-		if (!CurrencyModel::is_exist($curr_id))
-			$respObj->fail();
+			$currObj = new stdClass;
+			$currObj->id = $curr_id;
+			$currObj->name = CurrencyModel::getName($curr_id);
+			$currObj->sign = CurrencyModel::getSign($curr_id);
+			$currObj->format = CurrencyModel::getFormat($curr_id);
 
-		$currName = CurrencyModel::getName($curr_id);
-		$currSign = CurrencyModel::getSign($curr_id);
-		$currFormat = CurrencyModel::getFormat($curr_id);
+			$currArr[] = $currObj;
+		}
 
-		$respObj->data = array("id" => $curr_id, "name" => $currName, "sign" => $currSign, "format" => $currFormat);
+		$respObj->data = $currArr;
 
 		$respObj->ok();
 	}

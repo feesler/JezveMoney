@@ -56,3 +56,34 @@ function onCheck(obj, elName)
 		el.disabled = !obj.checked;
 	}
 }
+
+
+function csToIds(values)
+{
+	if (!values || !values.length)
+		return null;
+
+	var ids = values.split(',');
+	if (!isArray(ids))
+		return null;
+
+	return { id : ids };
+}
+
+
+function onCurrencyReadSubmit()
+{
+	var params = {};
+	var curr_id_inp = ge('curr_id');
+
+	if (!curr_id_inp)
+		return;
+
+	var link = baseURL + 'api/currency/';
+
+	var idsPar = csToIds(curr_id_inp.value);
+	if (idsPar)
+		link += '?' + urlJoin(idsPar);
+
+	ajax.get(link, ajaxCallback);
+}
