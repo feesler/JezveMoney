@@ -54,18 +54,19 @@ abstract class Controller
 
 
 	// Obtain requested ids from actionParam of from GET id parameter and return array of integers
-	protected function getRequestedIds()
+	protected function getRequestedIds($isPOST = FALSE)
 	{
-		if (is_null($this->actionParam) && !isset($_GET["id"]))
+		$httpSrc = $isPOST ? $_POST : $_GET;
+		if (is_null($this->actionParam) && !isset($httpSrc["id"]))
 			return NULL;
 
 		$res = array();
 
-		if (isset($_GET["id"]))
+		if (isset($httpSrc["id"]))
 		{
-			if (is_array($_GET["id"]))
+			if (is_array($httpSrc["id"]))
 			{
-				foreach($_GET["id"] as $val)
+				foreach($httpSrc["id"] as $val)
 				{
 					$val = intval($val);
 					if ($val)
@@ -74,7 +75,7 @@ abstract class Controller
 			}
 			else
 			{
-				$val = intval($_GET["id"]);
+				$val = intval($httpSrc["id"]);
 				if ($val)
 					$res[] = $val;
 			}
