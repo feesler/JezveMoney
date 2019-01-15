@@ -74,9 +74,11 @@
 		$actionParam = array_shift($routeParts);
 	$controller->actionParam = $actionParam;
 
-	if (!$isLogOutCont && $controller instanceof ApiController)
+	$controller->authRequired = !$isLogOutCont;
+
+	if ($controller instanceof ApiController)
 	{
-		$controller->checkAuth();
+		$controller->initAPI();
 	}
 
 	wlog("Controller class: ".$contClass);

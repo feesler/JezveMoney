@@ -7,11 +7,11 @@ class ApiController extends Controller
 
 
 	// Common API initialization
-	public function checkAuth()
+	public function initAPI()
 	{
 		$this->uMod = new UserModel();
-		$user_id = $this->uMod->check();
-		if ($user_id == 0)
+		$this->user_id = $this->uMod->check();
+		if ($this->authRequired && $this->user_id == 0)
 		{
 			header("HTTP/1.1 401 Unauthorized", TRUE, 401);
 			$res = new apiResponse;
