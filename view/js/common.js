@@ -754,7 +754,15 @@ function urlJoin(obj)
 	for(par in obj)
 	{
 		val = obj[par];
-		if (typeof val !== 'object')
+		if (isArray(val))
+		{
+			val.forEach(function(arrItem)
+			{
+				if (typeof arrItem !== 'object')
+					arr.push(par + '[]=' + arrItem.toString());
+			});
+		}
+		else if (typeof val !== 'object')
 			arr.push(par + '=' + val.toString());
 	}
 
