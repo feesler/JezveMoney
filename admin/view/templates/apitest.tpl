@@ -1,4 +1,7 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
+<script>
+onReady(initControls);
+</script>
 </head>
 <body>
 <div class="page">
@@ -15,7 +18,7 @@
 
 						<div class="test_container">
 						<h3>Get accounts</h3>
-						<form action="<?=BASEURL?>api/account.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account/list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -24,84 +27,76 @@
 
 						<div class="test_container">
 						<h3>Read account</h3>
-						<form action="<?=BASEURL?>api/account.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin"><label for="accid">Id</label><input name="accid" type="text"></div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin"><label for="readaccid">Id</label><input id="readaccid" type="text"></div>
+						<div class="acc_controls">
+							<input id="readaccbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
 						</div>
 
 						<div class="test_container">
 						<h3>Create account</h3>
-						<form action="<?=BASEURL?>api/account.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="accname">Name</label>
-								<input name="accname" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="balance">Balance</label>
-								<input name="balance" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="currency">Currency (1-5, 10-22)</label>
-								<input name="currency" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="icon">Icon (1-6; 0 - no icon)</label>
-								<input name="icon" type="text">
-							</div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="accname">Name</label>
+							<input id="accname" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="accbalance">Balance</label>
+							<input id="accbalance" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="acccurrency">Currency (1-5, 10-22)</label>
+							<input id="acccurrency" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="accicon">Icon (1-6; 0 - no icon)</label>
+							<input id="accicon" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="accbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
 						</div>
 
 						<div class="test_container">
 						<h3>Edit account</h3>
-						<form action="<?=BASEURL?>api/account.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="accid">Id</label>
-								<input name="accid" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="accname">Name</label>
-								<input name="accname" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="balance">Balance</label>
-								<input name="balance" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="currency">Currency (1-5, 10-22)</label>
-								<input name="currency" type="text">
-							</div>
-							<div class="std_margin">
-								<label for="icon">Icon (1-6; 0 - no icon)</label>
-								<input name="icon" type="text">
-							</div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="updaccid">Id</label>
+							<input id="updaccid" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="accname">Name</label>
+							<input id="updaccname" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="balance">Balance</label>
+							<input id="updaccbalance" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="currency">Currency (1-5, 10-22)</label>
+							<input id="updacccurrency" type="text">
+						</div>
+						<div class="std_margin">
+							<label for="icon">Icon (1-6; 0 - no icon)</label>
+							<input id="updaccicon" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="updaccbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
 						</div>
 
 						<div class="test_container">
 						<h3>Delete account</h3>
-						<form action="<?=BASEURL?>api/account.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="accounts">Accounts (comma separated ids)</label>
-								<input name="accounts" type="text">
-							</div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="delaccounts">Accounts (comma separated ids)</label>
+							<input id="delaccounts" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="delaccbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
 						</div>
 
 						<div class="test_container">
 						<h3>Reset accounts</h3>
-						<form action="<?=BASEURL?>api/account.php?act=reset" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account/reset" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
