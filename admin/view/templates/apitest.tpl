@@ -399,7 +399,7 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Get persons</h3>
-						<form action="<?=BASEURL?>api/person.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person/list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -408,23 +408,21 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Read person</h3>
-						<form action="<?=BASEURL?>api/person.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="pid">Id</label>
-								<input name="pid" type="text">
-							</div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="readpid">Id</label>
+							<input id="readpid" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="readpersonbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
 						</div>
 
 						<div class="test_container">
 						<h3>Create person</h3>
-						<form action="<?=BASEURL?>api/person.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person/create" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="pname">Name</label>
-								<input name="pname" type="text">
+								<input id="pname" name="name" type="text">
 							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
@@ -434,14 +432,14 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Edit person</h3>
-						<form action="<?=BASEURL?>api/person.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person/update" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
-								<label for="pid">Id</label>
-								<input name="pid" type="text">
+								<label for="updpid">Id</label>
+								<input id="updpid" name="id" type="text">
 							</div>
 							<div class="std_margin">
-								<label for="pname">Name</label>
-								<input name="pname" type="text">
+								<label for="updpname">Name</label>
+								<input id="updpname" name="name" type="text">
 							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
@@ -451,15 +449,13 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Delete persons</h3>
-						<form action="<?=BASEURL?>api/person.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="persons">Persons (comma separated ids)</label>
-								<input name="persons" type="text">
-							</div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="delpersons">Persons (comma separated ids)</label>
+							<input id="delpersons" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="delpersonbtn" class="adm_act_btn" type="submit" value="submit">
+						</div>
 						</div>
 
 						<h2>Currency</h2>

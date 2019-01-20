@@ -173,6 +173,39 @@ function onCurrencyReadSubmit()
 }
 
 
+function onReadPersonSubmit()
+{
+	var id_inp = ge('readpid');
+
+	if (!id_inp)
+		return;
+
+	var link = baseURL + 'api/person/';
+
+	var idsPar = csToIds(id_inp.value);
+	if (idsPar)
+		link += '?' + urlJoin(idsPar);
+
+	ajax.get(link, ajaxCallback);
+}
+
+
+function onDeletePersonSubmit()
+{
+	var persondInp = ge('delpersons');
+
+	if (!persondInp)
+		return;
+
+	var link = baseURL + 'api/person/delete';
+
+	var idsPar = csToIds(persondInp.value);
+	data = urlJoin(idsPar);
+
+	ajax.post(link, data, ajaxCallback);
+}
+
+
 function initControls()
 {
 	var readaccbtn = ge('readaccbtn');
@@ -194,4 +227,12 @@ function initControls()
 	var delaccbtn = ge('delaccbtn');
 	if (delaccbtn)
 		delaccbtn.onclick = onDeleteAccountSubmit;
+
+	var readpersonbtn = ge('readpersonbtn');
+	if (readpersonbtn)
+		readpersonbtn.onclick = onReadPersonSubmit;
+
+	var delpersonbtn = ge('delpersonbtn');
+	if (delpersonbtn)
+		delpersonbtn.onclick = onDeletePersonSubmit;
 }

@@ -6,7 +6,8 @@
 	$action = NULL;
 
 	$controllersMap = array("currency" => "CurrencyApiController",
-							"account" => "AccountApiController"
+							"account" => "AccountApiController",
+							"person" => "PersonApiController"
 							);
 
 	$actionsMap = array("new" => "create",
