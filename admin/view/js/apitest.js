@@ -206,6 +206,39 @@ function onDeletePersonSubmit()
 }
 
 
+function onReadTransactionSubmit()
+{
+	var transInp = ge('readtransid');
+
+	if (!transInp)
+		return;
+
+	var link = baseURL + 'api/transaction/';
+
+	var idsPar = csToIds(transInp.value);
+	if (idsPar)
+		link += '?' + urlJoin(idsPar);
+
+	ajax.get(link, ajaxCallback);
+}
+
+
+function onDeleteTransactionSubmit()
+{
+	var transInp = ge('deltransactions');
+
+	if (!transInp)
+		return;
+
+	var link = baseURL + 'api/transaction/delete';
+
+	var idsPar = csToIds(transInp.value);
+	data = urlJoin(idsPar);
+
+	ajax.post(link, data, ajaxCallback);
+}
+
+
 function initControls()
 {
 	var readaccbtn = ge('readaccbtn');
@@ -235,4 +268,12 @@ function initControls()
 	var delpersonbtn = ge('delpersonbtn');
 	if (delpersonbtn)
 		delpersonbtn.onclick = onDeletePersonSubmit;
+
+	var readtransbtn = ge('readtransbtn');
+	if (readtransbtn)
+		readtransbtn.onclick = onReadTransactionSubmit;
+
+	var deltransbtn = ge('deltransbtn');
+	if (deltransbtn)
+		deltransbtn.onclick = onDeleteTransactionSubmit;
 }

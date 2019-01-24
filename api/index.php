@@ -7,7 +7,8 @@
 
 	$controllersMap = array("currency" => "CurrencyApiController",
 							"account" => "AccountApiController",
-							"person" => "PersonApiController"
+							"person" => "PersonApiController",
+							"transaction" => "TransactionApiController"
 							);
 
 	$actionsMap = array("new" => "create",

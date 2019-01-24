@@ -107,7 +107,7 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Get transactions</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/list" method="get" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
 								<input name="count" type="text" value="10" disabled>
@@ -140,20 +140,18 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Read transaction</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=read" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="transid">Id</label>
-								<input name="transid" type="text">
-							</div>
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="readtransid">Id</label>
+							<input id="readtransid" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="readtransbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
 						</div>
 
 						<div class="test_container">
 						<h3>Create transaction</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/create" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="transtype">Type (1-3)</label>
 								<input name="transtype" type="text">
@@ -202,7 +200,7 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Create debt</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=new" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/create" method="post" onsubmit="return onFormSubmit(this);">
 							<input name="transtype" type="hidden" value="4">
 							<div class="std_margin">
 								<label for="person_id">Person id</label>
@@ -253,7 +251,7 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Edit transaction</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/update" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="transid">Transaction id</label>
 								<input name="transid" type="text">
@@ -309,7 +307,7 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Edit debt</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=edit" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/update" method="post" onsubmit="return onFormSubmit(this);">
 							<input name="transtype" type="hidden" value="4">
 							<div class="std_margin">
 								<label for="transid">Transaction id</label>
@@ -365,22 +363,19 @@ onReady(initControls);
 
 						<div class="test_container">
 						<h3>Delete transactions</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=del" method="post" onsubmit="return onFormSubmit(this);">
-							<div class="std_margin">
-								<label for="transactions">Transactions (comma separated ids)</label>
-								<input name="transactions" type="text">
-							</div>
-
-							<div class="acc_controls">
-								<input class="adm_act_btn" type="submit" value="submit">
-							</div>
-						</form>
+						<div class="std_margin">
+							<label for="deltransactions">Transactions (comma separated ids)</label>
+							<input id="deltransactions" type="text">
 						</div>
 
+						<div class="acc_controls">
+							<input id="deltransbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
+						</div>
 
 						<div class="test_container">
 						<h3>Set position of transacction</h3>
-						<form action="<?=BASEURL?>api/transaction.php?act=setpos" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/setpos" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="id">Id</label>
 								<input name="id" type="text">
