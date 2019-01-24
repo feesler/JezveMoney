@@ -76,7 +76,7 @@ class TransactionModel extends CachedTable
 		$e_comm = $db->escape($comment);
 
 		if (($trans_type != EXPENSE && $trans_type != INCOME && $trans_type != TRANSFER && $trans_type != DEBT) ||
-			(!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
+			(!$src_id && !$dest_id) || $src_amount == 0.0 || $dest_amount == 0.0 || $trans_date == -1)
 			return 0;
 
 		$accMod = new AccountModel(self::$user_id, TRUE);
@@ -350,6 +350,8 @@ class TransactionModel extends CachedTable
 
 		$condArr = array("user_id=".$user_id);
 
+		$curDate = date("Y-m-d H:i:s");
+
 		if ($old_pos == $new_pos)
 		{
 			return TRUE;
@@ -377,7 +379,6 @@ class TransactionModel extends CachedTable
 				$assignment = "pos=pos-1";
 			}
 
-			$curDate = date("Y-m-d H:i:s");
 			$assignment .= ", updatedate=".qnull($curDate);
 
 			$query = "UPDATE `".self::$tbl_name."` SET ".$assignment." WHERE ".andJoin($condArr).";";

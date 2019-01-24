@@ -44,7 +44,7 @@ class CurrencyModel
 		if (!self::checkCache())
 			return NULL;
 
-		if (is_null(self::$cache) || is_null(self::$cache[$curr_id]))
+		if (is_null(self::$cache) || !isset(self::$cache[$curr_id]))
 			return NULL;
 
 		return self::$cache[$curr_id][$val];
