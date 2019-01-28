@@ -476,9 +476,28 @@ onReady(initControls);
 						</div>
 
 						<h2>User</h2>
+
+						<div class="test_container">
+						<h3>Login</h3>
+						<form action="<?=BASEURL?>api/login/" method="post" onsubmit="return onFormSubmit(this);">
+							<div class="std_margin">
+								<label for="login">Login</label>
+								<input name="login" type="text"><br>
+							</div>
+							<div class="std_margin">
+								<label for="password">Password</label>
+								<input name="pwd" type="text"><br>
+							</div>
+
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
 						<div class="test_container">
 						<h3>Register</h3>
-						<form action="<?=BASEURL?>api/register.php" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/register/" method="post" onsubmit="return onFormSubmit(this);">
 							<div class="std_margin">
 								<label for="login">Login</label>
 								<input name="login" type="text"><br>

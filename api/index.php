@@ -5,10 +5,14 @@
 	$controller = NULL;
 	$action = NULL;
 
+	$aliasMap = array("login" => "user/login",
+						"register" => "user/register");
+
 	$controllersMap = array("currency" => "CurrencyApiController",
 							"account" => "AccountApiController",
 							"person" => "PersonApiController",
-							"transaction" => "TransactionApiController"
+							"transaction" => "TransactionApiController",
+							"user" => "UserApiController"
 							);
 
 	$actionsMap = array("new" => "create",
@@ -47,8 +51,8 @@
 		setLocation(BASEURL);
 
 	// Check correct user authentication for controller
-	$loggedOutControllers = array();
-	$isLogOutCont = (isset($loggedOutControllers[$contrStr]) && $routeParts[0] == $loggedOutControllers[$contrStr]);
+	$loggedOutControllers = array("user/login", "user/register");
+	$isLogOutCont = in_array($contrStr."/".$routeParts[0], $loggedOutControllers);
 
 
 	$contClass = $controllersMap[$contrStr];
