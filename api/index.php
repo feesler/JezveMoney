@@ -12,7 +12,8 @@
 							"account" => "AccountApiController",
 							"person" => "PersonApiController",
 							"transaction" => "TransactionApiController",
-							"user" => "UserApiController"
+							"user" => "UserApiController",
+							"profile" => "ProfileApiController"
 							);
 
 	$actionsMap = array("new" => "create",

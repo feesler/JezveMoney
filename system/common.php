@@ -33,6 +33,7 @@
 					"PersonApiController" => "api/Controller/person.php",
 					"TransactionApiController" => "api/Controller/transaction.php",
 					"UserApiController" => "api/Controller/user.php",
+					"ProfileApiController" => "api/Controller/profile.php",
 				// Admin controllers
 					"CurrencyAdminController" => "admin/Controller/currency.php",
 					"UserAdminController" => "admin/Controller/user.php",
