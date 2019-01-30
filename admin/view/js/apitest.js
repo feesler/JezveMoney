@@ -1,3 +1,63 @@
+var actilveController = null;
+var activeFormLink = null;
+var activeForm = null;
+
+var clearResultsBtn = null;
+
+function onContrClick(e)
+{
+	e = fixEvent(e);
+
+	if (e.target.tagName == 'BUTTON')
+	{
+		if (actilveController)
+			removeClass(actilveController, 'active');
+		addClass(e.target.parentNode, 'active');
+		actilveController = e.target.parentNode;
+	}
+	else if (e.target.tagName == 'LI' && hasClass(e.target.parentNode, 'sub_list'))
+	{
+		if (activeFormLink)
+			removeClass(activeFormLink, 'active');
+		activeFormLink = e.target;
+		addClass(activeFormLink, 'active');
+
+		var formTarget = e.target.dataset.target;
+
+		var newForm = ge(formTarget);
+		if (newForm)
+		{
+			show(activeForm, false);
+			show(newForm, true);
+			activeForm = newForm;
+		}
+	}
+}
+
+
+function clearResults()
+{
+	removeChilds(results);
+	show(clearResultsBtn, false);
+}
+
+
+function addResult(text)
+{
+	var results = ge('results');
+	if (!results)
+		return;
+
+	var resCont = ce('div', { className : 'res_container' });
+
+	resCont.innerHTML = text;
+
+	results.appendChild(resCont);
+
+	show(clearResultsBtn, true);
+}
+
+
 function onFormSubmit(obj)
 {
 	var link, els = {}, params;
@@ -32,13 +92,7 @@ function onFormSubmit(obj)
 
 function ajaxCallback(text)
 {
-	var results;
-
-	results = ge('results');
-	if (!results)
-		return;
-
-	results.innerHTML = text;
+	addResult(text);
 }
 
 
@@ -241,6 +295,14 @@ function onDeleteTransactionSubmit()
 
 function initControls()
 {
+	var controllersList = ge('controllersList');
+	if (controllersList)
+		controllersList.onclick = onContrClick;
+
+	clearResultsBtn = ge('clearResultsBtn');
+	if (clearResultsBtn)
+		clearResultsBtn.onclick = clearResults;
+
 	var readaccbtn = ge('readaccbtn');
 	if (readaccbtn)
 		readaccbtn.onclick = onReadAccountSubmit;
