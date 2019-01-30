@@ -49,7 +49,7 @@
 					"PersonModel" => "Model/person.php",
 					"TransactionModel" => "Model/transaction.php",
 					"UserModel" => "Model/user.php",
-					"apiResponse" => "api/apiResponse.php");
+					"apiResponse" => "system/apiResponse.php");
 
 	// Check class name and try to load file
 	function autoLoadClass($className)
