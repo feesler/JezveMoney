@@ -681,7 +681,6 @@ class TransactionModel extends CachedTable
 			return 0;
 
 		$tr_type = intval($trans_type);
-		$acc_id = intval($account_id);
 		$sReq = $db->escape($searchStr);
 
 		$condArr = array("user_id=".self::$user_id);
