@@ -45,7 +45,7 @@
 /* sidebar ellipsis */
 .sidebar_ellipsis
 {
-	background: url('../img/sbellipsis.png') no-repeat;
+	background-image: url('../img/sbellipsis.png');
 }
 
 

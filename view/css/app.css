@@ -747,18 +747,6 @@ label
 }
 
 
-.popup .msg .close_btn > button > span
-{
-	background-position: -224px -32px;
-}
-
-
-.popup .msg .close_btn > button:hover > span
-{
-	background-position: -224px -48px;
-}
-
-
 .msg > .box > .popup_message
 {
 	max-width: 300px;
@@ -792,14 +780,32 @@ label
 
 
 .popup .close_btn > button > span,
-.box.dragging .close_btn > button > span
+.box.dragging .close_btn > button > span,
+.popup .msg .close_btn > button > span
+{
+	background-size: 320px 64px;
+}
+
+
+/* White cross */
+.popup .msg .close_btn > button > span
 {
 	background-position: -224px -32px;
 }
 
 
+/* Gray cross */
+.popup .close_btn > button > span,
+.box.dragging .close_btn > button > span
+{
+	background-position: -241px -48px;
+}
+
+
+/* Black cross on hover */
 .popup .close_btn > button:hover > span,
-.box.dragging .close_btn > button:hover > span
+.box.dragging .close_btn > button:hover > span,
+.popup .msg .close_btn > button:hover > span
 {
 	background-position: -224px -48px;
 }
@@ -822,20 +828,6 @@ label
 .box.dragging .close_btn > button
 {
 	display: block;
-}
-
-
-.popup .close_btn > button > span,
-.box.dragging .close_btn > button > span
-{
-	background-position: -241px -48px;
-}
-
-
-.popup .close_btn > button:hover > span,
-.box.dragging .close_btn > button:hover > span
-{
-	background-position: -224px -48px;
 }
 
 

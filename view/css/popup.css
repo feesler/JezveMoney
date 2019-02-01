@@ -73,7 +73,8 @@
 {
 	width: 14px;
 	height: 14px;
-	background: url('../img/close.png') no-repeat;
+	background-image: url('../img/close.png');
+	background-repeat: no-repeat;
 	overflow: hidden;
 	background-position: -14px 0px;
 	display: inline-block;

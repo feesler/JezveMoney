@@ -173,6 +173,7 @@ function fixDPI()
 
 	img_css = baseURL + 'view/css/';
 	img_css += (getRealDPI() > 1) ? 'double_dpi.css' : 'single_dpi.css';
+	img_css += '?' + Date.now();
 	headEl = head();
 
 	if (headEl)
