@@ -91,13 +91,36 @@ class mysqlDB
 {
 	private static $conn = NULL;		// connection
 	private static $dbname = NULL;		// current database name
+	private static $inst = NULL;
 	private static $tblCache = NULL;	// cache of exist tables
+	private static $settings = NULL;	// saved connection settings
+
+
+	public static function setup($dblocation, $dbuser, $dbpasswd, $dbname)
+	{
+		if (is_null(self::$settings))
+			self::$settings = new stdClass;
+
+		self::$settings->location = $dblocation;
+		self::$settings->user = $dbuser;
+		self::$settings->passwd = $dbpasswd;
+		self::$settings->database = $dbname;
+	}
 
 
 	// Constructor
-	public function __construct()
+	protected function __construct()
 	{
 		wlog("");
+	}
+
+
+	public static function getInstance()
+	{
+		if (is_null(self::$inst))
+			self::$inst = new mysqlDB;
+
+		return self::$inst;
 	}
 
 
@@ -108,9 +131,9 @@ class mysqlDB
 
 
 	// Connect to database server
-	public function connect($dblocation, $dbuser, $dbpasswd)
+	public function connect()
 	{
-		$dbcnx = @mysqli_connect($dblocation, $dbuser, $dbpasswd);
+		$dbcnx = mysqli_connect(self::$settings->location, self::$settings->user, self::$settings->passwd);
 		if ($dbcnx)
 			self::$conn = $dbcnx;
 
@@ -123,7 +146,7 @@ class mysqlDB
 	{
 		wlog("USE ".$name.";");
 
-		$res = @mysqli_select_db(self::$conn, $name);
+		$res = mysqli_select_db(self::$conn, $name);
 		if ($res)
 			self::$dbname = $name;
 
@@ -144,6 +167,13 @@ class mysqlDB
 	// Raw query to database
 	public function rawQ($query)
 	{
+		if (is_null(self::$conn))
+		{
+			$this->connect();
+			$this->selectDB(self::$settings->database);
+			$this->rawQ("SET NAMES 'utf8';");
+		}
+
 		wlog("Query: ".$query);
 
 		$res = mysqli_query(self::$conn, $query);

@@ -8,7 +8,7 @@ class CurrencyModel
 	// Update cache
 	private static function updateCache()
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		self::$cache = array();
 
@@ -88,7 +88,7 @@ class CurrencyModel
 	// Create new currency and return id if successfully
 	public static function create($curr_name, $curr_sign, $curr_format)
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$curr_name = $db->escape($curr_name);
 		$curr_sign = $db->escape($curr_sign);
@@ -112,7 +112,7 @@ class CurrencyModel
 	// Edit specified currency
 	public static function edit($curr_id, $curr_name, $curr_sign, $curr_format)
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$curr_id = intval($curr_id);
 		$curr_name = $db->escape($curr_name);
@@ -141,7 +141,7 @@ class CurrencyModel
 	// Check currency is in use
 	public static function isInUse($curr_id)
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$curr_id = intval($curr_id);
 		if (!$curr_id)
@@ -162,7 +162,7 @@ class CurrencyModel
 	// Delete specified currency
 	public static function del($curr_id)
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$curr_id = intval($curr_id);
 		if (!$curr_id)

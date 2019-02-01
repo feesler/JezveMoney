@@ -18,6 +18,8 @@ class AccountModel extends CachedTable
 
 		self::$full_list = $full;
 		self::$user_id = intval($user_id);
+
+		$this->dbObj = mysqlDB::getInstance();
 	}
 
 
@@ -31,8 +33,6 @@ class AccountModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		global $db;
-
 		self::$dcache = array();
 
 		// find owner person
@@ -43,7 +43,7 @@ class AccountModel extends CachedTable
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
-		$resArr = $db->selectQ("*", "accounts", $condArr, "id");
+		$resArr = $this->dbObj->selectQ("*", "accounts", $condArr, "id");
 		foreach($resArr as $row)
 		{
 			$acc_id = $row["id"];
@@ -64,13 +64,11 @@ class AccountModel extends CachedTable
 	// Create new account for current user
 	public function create($owner_id, $accname, $balance, $curr_id, $icon_type)
 	{
-		global $db;
-
 		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
 			return 0;
 
 		$owner_id = intval($owner_id);
-		$accname = $db->escape($accname);
+		$accname = $this->dbObj->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
 		$icon_type = intval($icon_type);
@@ -80,11 +78,11 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"),
+		if (!$this->dbObj->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"),
 								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate)))
 			return 0;
 
-		$acc_id = $db->insertId();
+		$acc_id = $this->dbObj->insertId();
 
 		$this->cleanCache();
 
@@ -95,13 +93,11 @@ class AccountModel extends CachedTable
 	// Update account information
 	public function edit($acc_id, $accname, $balance, $curr_id, $icon_type)
 	{
-		global $db;
-
 		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
 			return FALSE;
 
 		$acc_id = intval($acc_id);
-		$accname = $db->escape($accname);
+		$accname = $this->dbObj->escape($accname);
 		$balance = floatval($balance);
 		$curr_id = intval($curr_id);
 		$icon_type = intval($icon_type);
@@ -138,7 +134,7 @@ class AccountModel extends CachedTable
 			$values[] = $balance;
 		}
 
-		if (!$db->updateQ("accounts", $fields, $values, "id=".$acc_id))
+		if (!$this->dbObj->updateQ("accounts", $fields, $values, "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -150,8 +146,6 @@ class AccountModel extends CachedTable
 	// Delete account
 	public function del($acc_id)
 	{
-		global $db;
-
 		if (!$acc_id || !is_numeric($acc_id))
 			return FALSE;
 
@@ -174,7 +168,7 @@ class AccountModel extends CachedTable
 
 		// delete account
 		$condArr = array("user_id=".self::$user_id, "id=".$acc_id);
-		if (!$db->deleteQ("accounts", $condArr))
+		if (!$this->dbObj->deleteQ("accounts", $condArr))
 			return FALSE;
 
 		$this->cleanCache();
@@ -186,8 +180,6 @@ class AccountModel extends CachedTable
 	// Remove accounts of specified person
 	public function onPersonDelete($p_id)
 	{
-		global $db;
-
 		if (!self::$full_list)
 			return FALSE;
 
@@ -210,12 +202,10 @@ class AccountModel extends CachedTable
 	// Set new value of account
 	private function setValue($acc_id, $field, $newValue)
 	{
-		global $db;
-
 		if (!$acc_id || is_null($field) || $field == "")
 			return FALSE;
 
-		if (!$db->updateQ("accounts", array($field, "updatedate"), array($newValue, date("Y-m-d H:i:s")), "id=".$acc_id))
+		if (!$this->dbObj->updateQ("accounts", array($field, "updatedate"), array($newValue, date("Y-m-d H:i:s")), "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -227,14 +217,12 @@ class AccountModel extends CachedTable
 	// Delete all accounts of user
 	public function reset()
 	{
-		global $db;
-
 		// delete all transactions of user
-		if (!$db->deleteQ("transactions", "user_id=".self::$user_id))
+		if (!$this->dbObj->deleteQ("transactions", "user_id=".self::$user_id))
 			return FALSE;
 
 		// delete all accounts of user
-		if (!$db->deleteQ("accounts", "user_id=".self::$user_id))
+		if (!$this->dbObj->deleteQ("accounts", "user_id=".self::$user_id))
 			return FALSE;
 
 		$this->cleanCache();

@@ -9,8 +9,6 @@ Class DebtModel
 	// Class constructor
 	public function __construct($user_id)
 	{
-		global $db;
-
 		$this->user_id = intval($user_id);
 
 		$uMod = new UserModel();

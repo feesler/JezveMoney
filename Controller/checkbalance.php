@@ -11,7 +11,10 @@ class CheckBalanceController extends Controller
 
 	public function index()
 	{
-		global $db, $user_id;
+		global $user_id;
+
+
+		$db = mysqlDB::getInstance();
 
 		if (is_null($this->actionParam) || $this->actionParam == "all")
 		{

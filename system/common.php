@@ -111,7 +111,7 @@
 	// Return javascript array of amounts of specified transactions for statistics use
 	function getStatArray($user_id, $byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$user_id = intval($user_id);
 		$curr_acc_id = intval($curr_acc_id);

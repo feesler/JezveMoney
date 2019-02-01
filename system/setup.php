@@ -85,14 +85,8 @@
 
 	require_once($approot."system/dbsetup.php");
 
-	$db = new mysqlDB();
-	if (!$db->connect($db_location, $db_user, $db_password))
-		exit();
+	mysqlDB::setup($db_location, $db_user, $db_password, $db_name);
 
-	if (!$db->selectDB($db_name))
-		exit();
-
-	$db->rawQ("SET NAMES 'utf8';");
 	date_default_timezone_set("Europe/Moscow");
 
 	require_once($approot."system/message.php");

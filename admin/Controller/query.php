@@ -4,7 +4,9 @@ class QueryAdminController extends Controller
 {
 	public function index()
 	{
-		global $menuItems, $db;
+		global $menuItems;
+
+		$db = mysqlDB::getInstance();
 
 		$query = NULL;
 		if (isset($_POST["query"]) && $_POST["query"] != "")

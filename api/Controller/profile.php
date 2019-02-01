@@ -26,8 +26,6 @@ class ProfileApiController extends ApiController
 
 	public function changename()
 	{
-		global $db;
-
 		wlog("ProfileApiController::changename()");
 
 		$respObj = new apiResponse();
@@ -38,7 +36,7 @@ class ProfileApiController extends ApiController
 		$old_name = $this->pMod->getName($this->owner_id);
 		$new_name = $_POST["name"];
 
-		if ($old_name == $db->escape($new_name))
+		if ($old_name == $new_name)
 			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
 		if (!$this->pMod->edit($this->owner_id, $new_name))

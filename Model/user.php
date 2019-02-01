@@ -8,6 +8,7 @@ class UserModel extends CachedTable
 	// Class constructor
 	public function __construct()
 	{
+		$this->dbObj = mysqlDB::getInstance();
 	}
 
 
@@ -21,11 +22,9 @@ class UserModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		global $db;
-
 		self::$dcache = array();
 
-		$resArr = $db->selectQ("*", "users");
+		$resArr = $this->dbObj->selectQ("*", "users");
 		foreach($resArr as $row)
 		{
 			$user_id = $row["id"];
@@ -197,8 +196,6 @@ class UserModel extends CachedTable
 	// Set owner person for specified user
 	public function setOwner($user_id, $owner_id)
 	{
-		global $db;
-
 		$u_id = intval($user_id);
 		$o_id = intval($owner_id);
 		if (!$u_id || !$o_id)
@@ -210,13 +207,13 @@ class UserModel extends CachedTable
 			return TRUE;
 
 		// check specified person not own another user
-		$resArr = $db->selectQ("id", "users", "owner_id=".$o_id);
+		$resArr = $this->dbObj->selectQ("id", "users", "owner_id=".$o_id);
 		if (count($resArr) > 0)
 			return FALSE;
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("users", array("owner_id", "updatedate"), array($o_id, $curDate), "id=".qnull($u_id)))
+		if (!$this->dbObj->updateQ("users", array("owner_id", "updatedate"), array($o_id, $curDate), "id=".qnull($u_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -235,12 +232,10 @@ class UserModel extends CachedTable
 	// Set password hash for specified user
 	public function setPassHash($login, $passhash)
 	{
-		global $db;
-
-		$elogin = $db->escape($login);
+		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("users", array("passhash", "updatedate"), array($passhash, $curDate), "login=".qnull($elogin)))
+		if (!$this->dbObj->updateQ("users", array("passhash", "updatedate"), array($passhash, $curDate), "login=".qnull($elogin)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -261,8 +256,6 @@ class UserModel extends CachedTable
 	// Register new user
 	public function register($login, $password, $p_name)
 	{
-		global $db;
-
 		if (!$login || $login == "" || !$password || $password == "" || !$p_name || $p_name == "")
 			return FALSE;
 
@@ -271,13 +264,13 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		$passhash = $this->createHash($login, $password);
-		$elogin = $db->escape($login);
+		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->insertQ("users", array("id", "login", "passhash", "createdate", "updatedate"), array(NULL, $elogin, $passhash, $curDate, $curDate)))
+		if (!$this->dbObj->insertQ("users", array("id", "login", "passhash", "createdate", "updatedate"), array(NULL, $elogin, $passhash, $curDate, $curDate)))
 			return FALSE;
 
-		$user_id = $db->insertId();
+		$user_id = $this->dbObj->insertId();
 
 		$pMod = new PersonModel($user_id);
 		$p_id = $pMod->create($p_name);
@@ -356,8 +349,6 @@ class UserModel extends CachedTable
 	// Set up new login for user
 	public function setLogin($user_id, $login)
 	{
-		global $db;
-
 		$user_id = intval($user_id);
 		if (!$user_id || is_empty($login))
 			return FALSE;
@@ -377,10 +368,10 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		$passhash = $this->createHash($login, $newpass);
-		$elogin = $db->escape($login);
+		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("users", array("login", "passhash", "updatedate"), array($elogin, $passhash, $curDate), "id=".$user_id))
+		if (!$this->dbObj->updateQ("users", array("login", "passhash", "updatedate"), array($elogin, $passhash, $curDate), "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -392,8 +383,6 @@ class UserModel extends CachedTable
 	// Set up new login for user
 	public function setAccess($user_id, $access)
 	{
-		global $db;
-
 		$user_id = intval($user_id);
 		$access = intval($access);
 		if (!$user_id)
@@ -410,7 +399,7 @@ class UserModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("users", array("access", "updatedate"), array($access, $curDate), "id=".$user_id))
+		if (!$this->dbObj->updateQ("users", array("access", "updatedate"), array($access, $curDate), "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -422,15 +411,13 @@ class UserModel extends CachedTable
 	// Return array of users
 	public function getArray()
 	{
-		global $db;
-
 		$res = array();
 
 		if (!$this->checkCache())
 			return $res;
 
 		$trCountArr = array();
-		$resArr = $db->selectQ("user_id, COUNT(*)", "transactions", NULL, "user_id");
+		$resArr = $this->dbObj->selectQ("user_id, COUNT(*)", "transactions", NULL, "user_id");
 		foreach ($resArr as $row)
 		{
 			$u_id = intval($row["user_id"]);
@@ -440,7 +427,7 @@ class UserModel extends CachedTable
 		}
 
 		$accCountArr = array();
-		$resArr = $db->selectQ("user_id, owner_id, COUNT(*)", "accounts", NULL, "owner_id");
+		$resArr = $this->dbObj->selectQ("user_id, owner_id, COUNT(*)", "accounts", NULL, "owner_id");
 		foreach ($resArr as $row)
 		{
 			$u_id = intval($row["user_id"]);
@@ -474,8 +461,6 @@ class UserModel extends CachedTable
 	// Delete user and all related data
 	public function del($user_id)
 	{
-		global $db;
-
 		$u_id = intval($user_id);
 		if (!$u_id)
 			return FALSE;
@@ -484,10 +469,10 @@ class UserModel extends CachedTable
 		if (!$accMod->reset())
 			return FALSE;
 
-		if (!$db->deleteQ("persons", "user_id=".$u_id))
+		if (!$this->dbObj->deleteQ("persons", "user_id=".$u_id))
 			return FALSE;
 
-		if (!$db->deleteQ("users", "id=".$u_id))
+		if (!$this->dbObj->deleteQ("users", "id=".$u_id))
 			return FALSE;
 
 		return TRUE;

@@ -16,6 +16,8 @@ class PersonModel extends CachedTable
 		// find owner person
 		$uMod = new UserModel();
 		self::$owner_id = $uMod->getOwner(self::$user_id);
+
+		$this->dbObj = mysqlDB::getInstance();
 	}
 
 
@@ -29,11 +31,9 @@ class PersonModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		global $db;
-
 		self::$dcache = array();
 
-		$resArr = $db->selectQ("*", "persons", "user_id=".self::$user_id);
+		$resArr = $this->dbObj->selectQ("*", "persons", "user_id=".self::$user_id);
 		foreach($resArr as $row)
 		{
 			$person_id = $row["id"];
@@ -49,20 +49,18 @@ class PersonModel extends CachedTable
 	// Create new person
 	public function create($pname)
 	{
-		global $db;
-
 		if (is_null($pname) || $pname == "")
 			return 0;
 
-		$person_name = $db->escape($pname);
+		$person_name = $this->dbObj->escape($pname);
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->insertQ("persons", array("id", "name", "user_id", "createdate", "updatedate"),
+		if (!$this->dbObj->insertQ("persons", array("id", "name", "user_id", "createdate", "updatedate"),
 								array(NULL, $person_name, self::$user_id, $curDate, $curDate)))
 			return 0;
 
-		$p_id = $db->insertId();
+		$p_id = $this->dbObj->insertId();
 
 		$this->cleanCache();
 
@@ -73,13 +71,11 @@ class PersonModel extends CachedTable
 	// Update person information
 	public function edit($p_id, $pname)
 	{
-		global $db;
-
 		if (!$p_id || !is_numeric($p_id) || !$pname || $pname == "")
 			return FALSE;
 
 		$person_id = intval($p_id);
-		$person_name = $db->escape($pname);
+		$person_name = $this->dbObj->escape($pname);
 
 		// check person is exist
 		if (!$this->is_exist($person_id))
@@ -87,7 +83,7 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("persons", array("name", "updatedate"), array($person_name, $curDate), "id=".$person_id))
+		if (!$this->dbObj->updateQ("persons", array("name", "updatedate"), array($person_name, $curDate), "id=".$person_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -99,8 +95,6 @@ class PersonModel extends CachedTable
 	// Delete person
 	public function del($p_id)
 	{
-		global $db;
-
 		if (!$p_id || !is_numeric($p_id))
 			return FALSE;
 		$p_id = intval($p_id);
@@ -117,7 +111,7 @@ class PersonModel extends CachedTable
 		}
 
 		// delete person
-		if (!$db->deleteQ("persons", array("user_id=".self::$user_id, "id=".$p_id)))
+		if (!$this->dbObj->deleteQ("persons", array("user_id=".self::$user_id, "id=".$p_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -165,8 +159,6 @@ class PersonModel extends CachedTable
 	// Return account with specified currency if exist
 	public function getAccount($person_id, $curr_id)
 	{
-		global $db;
-
 		if (!is_numeric($person_id) || !is_numeric($curr_id))
 			return 0;
 
@@ -177,7 +169,7 @@ class PersonModel extends CachedTable
 						"owner_id=".$p_id,
 						"curr_id=".$c_id);
 
-		$resArr = $db->selectQ("id", "accounts", $condArr);
+		$resArr = $this->dbObj->selectQ("id", "accounts", $condArr);
 		if (count($resArr) != 1)
 			return 0;
 
@@ -225,13 +217,11 @@ class PersonModel extends CachedTable
 	// Delete all persons except owner of user
 	public function reset()
 	{
-		global $db;
-
 		if (!self::$user_id || !self::$owner_id)
 			return FALSE;
 
 		$condArr = array("user_id=".self::$user_id, "id<>".self::$owner_id);
-		if (!$db->deleteQ("persons", $condArr))
+		if (!$this->dbObj->deleteQ("persons", $condArr))
 			return FALSE;
 
 		$this->cleanCache();
@@ -243,10 +233,8 @@ class PersonModel extends CachedTable
 	// Return javascript array of persons
 	public function getArray()
 	{
-		global $db;
-
 		$condArr = array("p.user_id=".self::$user_id, "p.id<>".self::$owner_id);
-		$resArr = $db->selectQ(array("p.name" => "name",
+		$resArr = $this->dbObj->selectQ(array("p.name" => "name",
 									"p.id" => "pid",
 									"a.id" => "aid",
 									"a.curr_id" => "curr_id",
