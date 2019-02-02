@@ -2,6 +2,14 @@
 
 class CurrencyApiController extends ApiController
 {
+	public function initAPI()
+	{
+		parent::initAPI();
+
+		$this->model = new CurrencyModel();
+	}
+
+
 	public function index()
 	{
 		$respObj = new apiResponse;
@@ -13,14 +21,14 @@ class CurrencyApiController extends ApiController
 		$currArr = [];
 		foreach($ids as $curr_id)
 		{
-			if (!CurrencyModel::is_exist($curr_id))
+			if (!$this->model->is_exist($curr_id))
 				$respObj->fail();
 
 			$currObj = new stdClass;
 			$currObj->id = $curr_id;
-			$currObj->name = CurrencyModel::getName($curr_id);
-			$currObj->sign = CurrencyModel::getSign($curr_id);
-			$currObj->format = CurrencyModel::getFormat($curr_id);
+			$currObj->name = $this->model->getName($curr_id);
+			$currObj->sign = $this->model->getSign($curr_id);
+			$currObj->format = $this->model->getFormat($curr_id);
 
 			$currArr[] = $currObj;
 		}
@@ -35,7 +43,7 @@ class CurrencyApiController extends ApiController
 	{
 		$respObj = new apiResponse;
 
-		$respObj->data = CurrencyModel::getArray();
+		$respObj->data = $this->model->getArray();
 		$respObj->ok();
 	}
 

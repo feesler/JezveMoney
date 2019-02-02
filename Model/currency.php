@@ -1,97 +1,48 @@
 <?php
 
-class CurrencyModel
+class CurrencyModel extends CachedTable
 {
-	static private $cache = NULL;
+	static private $dcache = NULL;
+
+
+	// Class constructor
+	public function __construct()
+	{
+		$this->dbObj = mysqlDB::getInstance();
+	}
+
+
+	// Return link to cache of derived class
+	protected function &getDerivedCache()
+	{
+		return self::$dcache;
+	}
 
 
 	// Update cache
-	private static function updateCache()
+	protected function updateCache()
 	{
-		$db = mysqlDB::getInstance();
+		self::$dcache = array();
 
-		self::$cache = array();
-
-		$resArr = $db->selectQ("*", "currency");
+		$resArr = $this->dbObj->selectQ("*", "currency");
 		foreach($resArr as $row)
 		{
 			$curr_id = $row["id"];
 
-			self::$cache[$curr_id]["name"] = $row["name"];
-			self::$cache[$curr_id]["sign"] = $row["sign"];
-			self::$cache[$curr_id]["format"] = $row["format"];
-			self::$cache[$curr_id]["createdate"] = strtotime($row["createdate"]);
-			self::$cache[$curr_id]["updatedate"] = strtotime($row["updatedate"]);
+			self::$dcache[$curr_id]["name"] = $row["name"];
+			self::$dcache[$curr_id]["sign"] = $row["sign"];
+			self::$dcache[$curr_id]["format"] = $row["format"];
+			self::$dcache[$curr_id]["createdate"] = strtotime($row["createdate"]);
+			self::$dcache[$curr_id]["updatedate"] = strtotime($row["updatedate"]);
 		}
 	}
 
 
-	// Check state of cache and update if needed
-	private static function checkCache()
-	{
-		if (is_null(self::$cache))
-			self::updateCache();
-		return (!is_null(self::$cache));
-	}
-
-
-	// Return value of specified currency from cache
-	private static function getCache($curr_id, $val)
-	{
-		if (!$curr_id || !$val)
-			return NULL;
-
-		if (!self::checkCache())
-			return NULL;
-
-		if (is_null(self::$cache) || !isset(self::$cache[$curr_id]))
-			return NULL;
-
-		return self::$cache[$curr_id][$val];
-	}
-
-
-	// Clean cached data. Next getCache() request will update cache
-	protected static function cleanCache()
-	{
-		self::$cache = NULL;
-	}
-
-
-	// Return count of currencies
-	public static function getCount()
-	{
-		if (!self::checkCache())
-			return 0;
-
-		return count(self::$cache);
-	}
-
-
-	// Check is specified currency is exist
-	public static function is_exist($curr_id)
-	{
-		if (!is_numeric($curr_id))
-			return FALSE;
-
-		$curr_id = intval($curr_id);
-		if (!$curr_id)
-			return FALSE;
-
-		if (!self::checkCache())
-			return FALSE;
-
-		return isset(self::$cache[$curr_id]);
-	}
-
-
 	// Create new currency and return id if successfully
-	public static function create($curr_name, $curr_sign, $curr_format)
+	public function create($curr_name, $curr_sign, $curr_format)
 	{
-		$db = mysqlDB::getInstance();
-
-		$curr_name = $db->escape($curr_name);
-		$curr_sign = $db->escape($curr_sign);
+		$curr_name = $this->dbObj->escape($curr_name);
+		$curr_sign = $this->dbObj->escape($curr_sign);
 		$curr_format = intval($curr_format);
 
 		if (!$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
@@ -99,59 +50,55 @@ class CurrencyModel
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->insertQ("currency", array("id", "name", "sign", "format", "createdate", "updatedate"),
+		if (!$this->dbObj->insertQ("currency", array("id", "name", "sign", "format", "createdate", "updatedate"),
 							array(NULL, $curr_name, $curr_sign, $curr_format, $curDate, $curDate)))
 			return 0;
 
-		self::cleanCache();
+		$this->cleanCache();
 
-		return $db->insertId();
+		return $this->dbObj->insertId();
 	}
 
 
 	// Edit specified currency
-	public static function edit($curr_id, $curr_name, $curr_sign, $curr_format)
+	public function edit($curr_id, $curr_name, $curr_sign, $curr_format)
 	{
-		$db = mysqlDB::getInstance();
-
 		$curr_id = intval($curr_id);
-		$curr_name = $db->escape($curr_name);
-		$curr_sign = $db->escape($curr_sign);
+		$curr_name = $this->dbObj->escape($curr_name);
+		$curr_sign = $this->dbObj->escape($curr_sign);
 		$curr_format = intval($curr_format);
 
 		if (!$curr_id || !$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
 			return FALSE;
 
-		if (!self::is_exist($curr_id))
+		if (!$this->is_exist($curr_id))
 			return FALSE;
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$db->updateQ("currency", array("name", "sign", "format", "updatedate"),
+		if (!$this->dbObj->updateQ("currency", array("name", "sign", "format", "updatedate"),
 								array($curr_name, $curr_sign, $curr_format, $curDate),
 								"id=".$curr_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
 
 
 	// Check currency is in use
-	public static function isInUse($curr_id)
+	public function isInUse($curr_id)
 	{
-		$db = mysqlDB::getInstance();
-
 		$curr_id = intval($curr_id);
 		if (!$curr_id)
 			return FALSE;
 
-		$resArr = $db->selectQ("id", "account", "curr_id=".$curr_id);
+		$resArr = $this->dbObj->selectQ("id", "account", "curr_id=".$curr_id);
 		if (count($resArr) > 0)
 			return TRUE;
 
-		$resArr = $db->selectQ("id", "transactions", "curr_id=".$curr_id);
+		$resArr = $this->dbObj->selectQ("id", "transactions", "curr_id=".$curr_id);
 		if (count($resArr) > 0)
 			return TRUE;
 
@@ -160,53 +107,51 @@ class CurrencyModel
 
 
 	// Delete specified currency
-	public static function del($curr_id)
+	public function del($curr_id)
 	{
-		$db = mysqlDB::getInstance();
-
 		$curr_id = intval($curr_id);
 		if (!$curr_id)
 			return FALSE;
 
 		// don't delete currencies in use
-		if (self::isInUse($curr_id))
+		if ($this->isInUse($curr_id))
 			return FALSE;
 
-		if (!$db->deleteQ("currency", "id=".$curr_id))
+		if (!$this->dbObj->deleteQ("currency", "id=".$curr_id))
 			return FALSE;
 
-		self::cleanCache();
+		$this->cleanCache();
 
 		return TRUE;
 	}
 
 
 	// Return name of specified currency
-	public static function getName($curr_id)
+	public function getName($curr_id)
 	{
-		return self::getCache($curr_id, "name");
+		return $this->getCache($curr_id, "name");
 	}
 
 
 	// Return sign of specified currency
-	public static function getSign($curr_id)
+	public function getSign($curr_id)
 	{
-		return self::getCache($curr_id, "sign");
+		return $this->getCache($curr_id, "sign");
 	}
 
 
 	// Return format of specified currency
-	public static function getFormat($curr_id)
+	public function getFormat($curr_id)
 	{
-		return self::getCache($curr_id, "format");
+		return $this->getCache($curr_id, "format");
 	}
 
 
 	// Format value in specified currency
-	public static function format($value, $curr_id)
+	public function format($value, $curr_id)
 	{
-		$fmt = self::getFormat($curr_id);
-		$sign = self::getSign($curr_id);
+		$fmt = $this->getFormat($curr_id);
+		$sign = $this->getSign($curr_id);
 
 		$sfmt = (($fmt) ? ($sign." %s") : ("%s ".$sign));
 		return valFormat($sfmt, $value);
@@ -214,12 +159,12 @@ class CurrencyModel
 
 
 	// Return id of account by specified position
-	public static function getIdByPos($position)
+	public function getIdByPos($position)
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return 0;
 
-		$keys = array_keys(self::$cache);
+		$keys = array_keys(self::$dcache);
 		if (isset($keys[$position]))
 			return $keys[$position];
 
@@ -228,14 +173,14 @@ class CurrencyModel
 
 
 	// Return array of currencies
-	public static function getArray()
+	public function getArray()
 	{
 		$res = array();
 
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return $res;
 
-		foreach(self::$cache as $curr_id => $row)
+		foreach(self::$dcache as $curr_id => $row)
 		{
 			$currObj = new stdClass;
 

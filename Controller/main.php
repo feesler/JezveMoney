@@ -9,15 +9,16 @@ class MainController extends Controller
 		$accMod = new AccountModel($user_id);
 		$transMod = new TransactionModel($user_id);
 		$persMod = new PersonModel($user_id);
+		$currMod = new CurrencyModel();
 
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 
 		$tilesArr = $accMod->getTilesArray();
 		$totalsArr = $accMod->getTotalsArray();
 		foreach($totalsArr as $curr_id => $balance)
 		{
-			$balfmt = CurrencyModel::format($balance, $curr_id);
-			$currName = CurrencyModel::getName($curr_id);
+			$balfmt = $currMod->format($balance, $curr_id);
+			$currName = $currMod->getName($curr_id);
 
 			$totalsArr[$curr_id] = array("bal" => $balance, "balfmt" => $balfmt, "name" => $currName);
 		}
@@ -77,7 +78,7 @@ class MainController extends Controller
 					if ($pAcc->balance != 0.0)
 					{
 						$noDebts = FALSE;
-						$pBalance[] = CurrencyModel::format($pAcc->balance, $pAcc->curr_id);
+						$pBalance[] = $currMod->format($pAcc->balance, $pAcc->curr_id);
 					}
 				}
 			}
@@ -88,7 +89,7 @@ class MainController extends Controller
 
 
 		$byCurrency = TRUE;
-		$curr_acc_id = CurrencyModel::getIdByPos(0);
+		$curr_acc_id = $currMod->getIdByPos(0);
 		if (!$curr_acc_id)
 			fail();
 		$groupType_id = 2;		// group by week

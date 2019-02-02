@@ -32,7 +32,7 @@ class StatisticsController extends Controller
 			}
 			else		// try to get first currency
 			{
-				$curr_id = CurrencyModel::getIdByPos(0);
+				$curr_id = $currMod->getIdByPos(0);
 				if (!$curr_id)
 					$this->fail();
 			}
@@ -111,7 +111,7 @@ class StatisticsController extends Controller
 
 		$accArr = $accMod->getArray();
 
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 		$accCurr = (($byCurrency) ? $curr_id : $accMod->getCurrency($acc_id));
 		$transArr = $transMod->getArray($trans_type, $acc_id, TRUE, 10, 0, NULL, $stDate, $endDate);
 

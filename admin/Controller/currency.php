@@ -2,12 +2,18 @@
 
 class CurrencyAdminController extends Controller
 {
+	public function __construct()
+	{
+		$this->model = new CurrencyModel();
+	}
+
+
 	public function index()
 	{
 		global $uMod, $user_name, $user_id;
 		global $menuItems;
 
-		$currArr = CurrencyModel::getArray();
+		$currArr = $this->model->getArray();
 
 		$menuItems["curr"]["active"] = TRUE;
 
@@ -40,7 +46,7 @@ class CurrencyAdminController extends Controller
 
 		$curr_format = (isset($_POST["curr_format"]) && $_POST["curr_format"] == "on") ? 1 : 0;
 
-		if (!CurrencyModel::create($_POST["curr_name"], $_POST["curr_sign"], $curr_format))
+		if (!$this->model->create($_POST["curr_name"], $_POST["curr_sign"], $curr_format))
 			$this->fail($defMsg);
 
 		setMessage(MSG_CURRENCY_CREATE);
@@ -61,7 +67,7 @@ class CurrencyAdminController extends Controller
 		if (!isset($_POST["curr_id"]))
 			$this->fail($defMsg);
 
-		if (!CurrencyModel::edit($_POST["curr_id"], $_POST["curr_name"], $_POST["curr_sign"], $curr_format))
+		if (!$this->model->edit($_POST["curr_id"], $_POST["curr_name"], $_POST["curr_sign"], $curr_format))
 			$this->fail($defMsg);
 
 		setMessage(MSG_CURRENCY_UPDATE);
@@ -77,7 +83,7 @@ class CurrencyAdminController extends Controller
 		if (!isset($_POST["curr_id"]))
 			fail($defMsg);
 
-		if (!CurrencyModel::del($_POST["curr_id"]))
+		if (!$this->model->del($_POST["curr_id"]))
 			fail($defMsg);
 
 		setMessage(MSG_CURRENCY_DELETE);

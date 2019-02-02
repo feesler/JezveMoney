@@ -8,6 +8,7 @@ class TransactionsController extends Controller
 
 		$transMod = new TransactionModel($user_id);
 		$accMod = new AccountModel($user_id);
+		$currMod = new CurrencyModel();
 		$filterObj = new stdClass;
 
 
@@ -72,7 +73,7 @@ class TransactionsController extends Controller
 		$transArr = ($totalTrCount) ? $transMod->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
 		$transCount = $transMod->getTransCount($trans_type, $accFilter, $searchReq, $stDate, $endDate);
 
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 
 		// Prepare transaction types menu
 		$trTypes = array("All", "Expense", "Income", "Transfer", "Debt");
@@ -184,12 +185,12 @@ class TransactionsController extends Controller
 
 				if ($trans->src_id != 0)
 				{
-					$itemData["balance"][] = CurrencyModel::format($trans->src_balance, $trans->src_curr);
+					$itemData["balance"][] = $currMod->format($trans->src_balance, $trans->src_curr);
 				}
 
 				if ($trans->dest_id != 0)
 				{
-					$itemData["balance"][] = CurrencyModel::format($trans->dest_balance, $trans->dest_curr);
+					$itemData["balance"][] = $currMod->format($trans->dest_balance, $trans->dest_curr);
 				}
 			}
 
@@ -232,6 +233,7 @@ class TransactionsController extends Controller
 		$defMsg = ERR_TRANS_CREATE;
 
 		$transMod = new TransactionModel($user_id);
+		$currMod = new CurrencyModel();
 
 		// check predefined type of transaction
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
@@ -336,7 +338,7 @@ class TransactionsController extends Controller
 				$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 
 			$balDiff = $tr["src_amount"];
-			$src["balfmt"] = CurrencyModel::format($src["balance"] + $balDiff, $src["curr"]);
+			$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
 		}
 
 		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
@@ -348,7 +350,7 @@ class TransactionsController extends Controller
 				$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$balDiff = $tr["dest_amount"];
-			$dest["balfmt"] = CurrencyModel::format($dest["balance"] - $balDiff, $dest["curr"]);
+			$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -384,7 +386,7 @@ class TransactionsController extends Controller
 		}
 
 		// Common arrays
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 		$accMod = new AccountModel($user_id);
 		$accArr = $accMod->getArray();
 		if ($trans_type == DEBT)
@@ -407,28 +409,28 @@ class TransactionsController extends Controller
 					$accLbl = "Source account";
 			}
 
-			$debtAcc["balfmt"] = CurrencyModel::format($debtAcc["balance"] + $tr["dest_amount"], $debtAcc["curr"]);
+			$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] + $tr["dest_amount"], $debtAcc["curr"]);
 
-			$p_balfmt = CurrencyModel::format($person_balance, $srcAmountCurr);
+			$p_balfmt = $currMod->format($person_balance, $srcAmountCurr);
 		}
 
-		$srcAmountSign = CurrencyModel::getSign($srcAmountCurr);
-		$destAmountSign = CurrencyModel::getSign($destAmountCurr);
+		$srcAmountSign = $currMod->getSign($srcAmountCurr);
+		$destAmountSign = $currMod->getSign($destAmountCurr);
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = 1;
 
-		$rtSrcAmount = CurrencyModel::format($tr["src_amount"], $srcAmountCurr);
-		$rtDestAmount = CurrencyModel::format($tr["dest_amount"], $destAmountCurr);
+		$rtSrcAmount = $currMod->format($tr["src_amount"], $srcAmountCurr);
+		$rtDestAmount = $currMod->format($tr["dest_amount"], $destAmountCurr);
 		$rtExchange = $exchValue." ".$exchSign;
 		if ($trans_type != DEBT)
 		{
-			$rtSrcResBal = CurrencyModel::format($src["balance"], $src["curr"]);
-			$rtDestResBal = CurrencyModel::format($dest["balance"], $dest["curr"]);
+			$rtSrcResBal = $currMod->format($src["balance"], $src["curr"]);
+			$rtDestResBal = $currMod->format($dest["balance"], $dest["curr"]);
 		}
 		else
 		{
-			$rtSrcResBal = CurrencyModel::format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
-			$rtDestResBal = CurrencyModel::format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
+			$rtSrcResBal = $currMod->format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
+			$rtDestResBal = $currMod->format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
 		}
 
 		$dateFmt = date("d.m.Y");
@@ -464,6 +466,7 @@ class TransactionsController extends Controller
 		$defMsg = ERR_TRANS_UPDATE;
 
 		$transMod = new TransactionModel($user_id);
+		$currMod = new CurrencyModel();
 
 		$trans_id = intval($this->actionParam);
 		if (!$trans_id)
@@ -515,7 +518,7 @@ class TransactionsController extends Controller
 				$srcBalTitle .= " (Person)";
 
 			$balDiff = $tr["src_amount"];
-			$src["balfmt"] = CurrencyModel::format($src["balance"] + $balDiff, $src["curr"]);
+			$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
 		}
 
 		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
@@ -527,7 +530,7 @@ class TransactionsController extends Controller
 				$destBalTitle .= " (Account)";
 
 			$balDiff = $tr["dest_amount"];
-			$dest["balfmt"] = CurrencyModel::format($dest["balance"] - $balDiff, $dest["curr"]);
+			$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -593,7 +596,7 @@ class TransactionsController extends Controller
 				$accMod = new AccountModel($user_id);
 				$acc_id = $accMod->getIdByPos(0);
 				$acc_name = $accMod->getName($acc_id);
-				$acc_balance = CurrencyModel::format($accMod->getBalance($acc_id), $accMod->getCurrency($acc_id));
+				$acc_balance = $currMod->format($accMod->getBalance($acc_id), $accMod->getCurrency($acc_id));
 				$acc_ic = $accMod->getIconClass($accMod->getIcon($acc_id));
 			}
 			else
@@ -607,7 +610,7 @@ class TransactionsController extends Controller
 
 
 		// Common arrays
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 		$accMod = new AccountModel($user_id);
 		$accArr = $accMod->getArray();
 		if ($trans_type == DEBT)
@@ -631,32 +634,32 @@ class TransactionsController extends Controller
 			}
 
 			if ($give)
-				$debtAcc["balfmt"] = CurrencyModel::format($debtAcc["balance"] - $tr["dest_amount"], $debtAcc["curr"]);
+				$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] - $tr["dest_amount"], $debtAcc["curr"]);
 			else
-				$debtAcc["balfmt"] = CurrencyModel::format($debtAcc["balance"] + $tr["src_amount"], $debtAcc["curr"]);
+				$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] + $tr["src_amount"], $debtAcc["curr"]);
 
-			$p_balfmt = CurrencyModel::format($person_balance, $srcAmountCurr);
+			$p_balfmt = $currMod->format($person_balance, $srcAmountCurr);
 		}
 
-		$srcAmountSign = CurrencyModel::getSign($srcAmountCurr);
-		$destAmountSign = CurrencyModel::getSign($destAmountCurr);
+		$srcAmountSign = $currMod->getSign($srcAmountCurr);
+		$destAmountSign = $currMod->getSign($destAmountCurr);
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
 		$backExchSign = $srcAmountSign."/".$destAmountSign;
 		$backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
 
-		$rtSrcAmount = CurrencyModel::format($tr["src_amount"], $srcAmountCurr);
-		$rtDestAmount = CurrencyModel::format($tr["dest_amount"], $destAmountCurr);
+		$rtSrcAmount = $currMod->format($tr["src_amount"], $srcAmountCurr);
+		$rtDestAmount = $currMod->format($tr["dest_amount"], $destAmountCurr);
 		$rtExchange = $exchValue." ".$exchSign." (".$backExchValue." ".$backExchSign.")";
 		if ($trans_type != DEBT)
 		{
-			$rtSrcResBal = CurrencyModel::format($src["balance"], $src["curr"]);
-			$rtDestResBal = CurrencyModel::format($dest["balance"], $dest["curr"]);
+			$rtSrcResBal = $currMod->format($src["balance"], $src["curr"]);
+			$rtDestResBal = $currMod->format($dest["balance"], $dest["curr"]);
 		}
 		else
 		{
-			$rtSrcResBal = CurrencyModel::format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
-			$rtDestResBal = CurrencyModel::format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
+			$rtSrcResBal = $currMod->format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
+			$rtDestResBal = $currMod->format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
 		}
 
 		$dateFmt = date("d.m.Y", strtotime($tr["date"]));

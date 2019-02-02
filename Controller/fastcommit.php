@@ -16,7 +16,8 @@ class FastCommitController extends Controller
 
 		$accMod = new AccountModel($user_id, FALSE);
 		$accArr = $accMod->getArray();
-		$currArr = CurrencyModel::getArray();
+		$currMod = new CurrencyModel();
+		$currArr = $currMod->getArray();
 		$pMod = new PersonModel($user_id);
 		$persArr = $pMod->getArray();
 
@@ -203,11 +204,12 @@ class FastCommitController extends Controller
 		$trMod = new TransactionModel($user_id);
 		$debtMod = new DebtModel($user_id);
 		$pMod = new PersonModel($user_id);
+		$currMod = new CurrencyModel();
 
 		$acc_id = intval($_POST["acc_id"]);
 		echo("Account: ".$acc_id." ".$accMod->getName($acc_id)."<br>");
 		$curr_id = $accMod->getCurrency($acc_id);
-		echo("Currency: ".$curr_id." ".CurrencyModel::getName($curr_id)."<br><br>");
+		echo("Currency: ".$curr_id." ".$currMod->getName($curr_id)."<br><br>");
 		foreach($_POST["tr_type"] AS $tr_key => $tr_type)
 		{
 			$tr_amount = floatval($_POST["amount"][$tr_key]);

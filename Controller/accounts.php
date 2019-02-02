@@ -34,18 +34,19 @@ class AccountsController extends Controller
 		$action = "new";
 
 		$accMod = new AccountModel($user_id);
+		$currMod = new CurrencyModel();
 
 		$accInfo = array("name" => "",
-						"curr" => CurrencyModel::getIdByPos(0),
+						"curr" => $currMod->getIdByPos(0),
 						"balance" => 0,
 						"initbalance" => 0,
 						"icon" => 0,
 						"iconclass" => "");
-		$accInfo["sign"] = CurrencyModel::getSign($accInfo["curr"]);
-		$accInfo["balfmt"] = CurrencyModel::format($accInfo["balance"], $accInfo["curr"]);
+		$accInfo["sign"] = $currMod->getSign($accInfo["curr"]);
+		$accInfo["balfmt"] = $currMod->format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = "New account";
 
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 		$icons = $accMod->getIconsArray();
 
 		$titleString = "Jezve Money | ";
@@ -81,6 +82,7 @@ class AccountsController extends Controller
 		$action = "edit";
 
 		$accMod = new AccountModel($user_id);
+		$currMod = new CurrencyModel();
 
 		$acc_id = intval($this->actionParam);
 		if (!$acc_id)
@@ -88,10 +90,10 @@ class AccountsController extends Controller
 
 		$accInfo = $accMod->getProperties($acc_id);
 
-		$accInfo["balfmt"] = CurrencyModel::format($accInfo["balance"], $accInfo["curr"]);
+		$accInfo["balfmt"] = $currMod->format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = $accInfo["name"];
 
-		$currArr = CurrencyModel::getArray();
+		$currArr = $currMod->getArray();
 		$icons = $accMod->getIconsArray();
 
 		$titleString = "Jezve Money | ";

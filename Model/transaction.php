@@ -16,6 +16,7 @@ class TransactionModel extends CachedTable
 		self::$user_id = intval($user_id);
 
 		$this->dbObj = mysqlDB::getInstance();
+		$this->currMod = new CurrencyModel();
 	}
 
 
@@ -631,7 +632,7 @@ class TransactionModel extends CachedTable
 				$trans->fsrcAmount .= "- ";
 			else if ($trans->type == INCOME || ($trans->type == DEBT && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
 				$trans->fsrcAmount .= "+ ";
-			$trans->fsrcAmount .= CurrencyModel::format($trans->src_amount, $trans->src_curr);
+			$trans->fsrcAmount .= $this->currMod->format($trans->src_amount, $trans->src_curr);
 
 			if ($trans->src_curr != $trans->dest_curr)
 			{
@@ -640,7 +641,7 @@ class TransactionModel extends CachedTable
 					$trans->fdestAmount .= "- ";
 				else if ($trans->type == INCOME || ($trans->type == DEBT && $dest_owner_id == $owner_id))			// income
 					$trans->fdestAmount .= "+ ";
-				$trans->fdestAmount .= CurrencyModel::format($trans->dest_amount, $trans->dest_curr);
+				$trans->fdestAmount .= $this->currMod->format($trans->dest_amount, $trans->dest_curr);
 			}
 			else
 				$trans->fdestAmount = $trans->fsrcAmount;

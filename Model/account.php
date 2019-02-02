@@ -20,6 +20,7 @@ class AccountModel extends CachedTable
 		self::$user_id = intval($user_id);
 
 		$this->dbObj = mysqlDB::getInstance();
+		$this->currMod = new CurrencyModel();
 	}
 
 
@@ -111,7 +112,7 @@ class AccountModel extends CachedTable
 			return FALSE;
 
 		// check is currency exist
-		if (!CurrencyModel::is_exist($curr_id))
+		if (!$this->currMod->is_exist($curr_id))
 			return FALSE;
 
 		// get initial balance to calc difference
@@ -425,7 +426,7 @@ class AccountModel extends CachedTable
 			$acc_balance = $this->getBalance($acc_id);
 			$icon_id = $row["icon"];
 			$acc_icon = $this->getIconClass($icon_id);
-			$balance_fmt = CurrencyModel::format($row["balance"], $row["curr_id"]);
+			$balance_fmt = $this->currMod->format($row["balance"], $row["curr_id"]);
 
 			$res[$acc_id] = array("name" => $row["name"],
 								"balance" => $balance_fmt,
@@ -455,7 +456,7 @@ class AccountModel extends CachedTable
 
 		foreach(self::$dcache as $acc_id => $row)
 		{
-			$currname = CurrencyModel::getName($row["curr_id"]);
+			$currname = $this->currMod->getName($row["curr_id"]);
 
 			if ($currname != "" && !isset($res[$row["curr_id"]]))
 				$res[$row["curr_id"]] = 0;
@@ -480,7 +481,7 @@ class AccountModel extends CachedTable
 					"balance" => self::$dcache[$acc_id]["balance"],
 					"initbalance" => self::$dcache[$acc_id]["initbalance"],
 					"curr" => self::$dcache[$acc_id]["curr_id"],
-					"sign" => CurrencyModel::getSign(self::$dcache[$acc_id]["curr_id"]),
+					"sign" => $this->currMod->getSign(self::$dcache[$acc_id]["curr_id"]),
 					"icon" => self::$dcache[$acc_id]["icon"],
 					"iconclass" => $this->getIconClass(self::$dcache[$acc_id]["icon"]));
 
