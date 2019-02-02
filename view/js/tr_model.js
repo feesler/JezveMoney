@@ -211,6 +211,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 
 		if (savalid)
 			f5();		// calculate e
+
+		notifyChanged('dest_amount', fda);
 	}
 
 
@@ -389,6 +391,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 				f1();				// calculate S2
 			}
 		}
+
+		notifyChanged('dest_amount', fda);
 	}
 
 

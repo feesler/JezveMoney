@@ -466,16 +466,23 @@ function TransactionViewModel()
 	{
 		var dest_amount, dest_amount_b;
 
+		dest_amount_b = ge('dest_amount_b');
+		if (dest_amount_b)
+			firstElementChild(dest_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
+
 		if (val === undefined)
 			return;
 
 		dest_amount = ge('dest_amount');
-		dest_amount_b = ge('dest_amount_b');
-
 		if (dest_amount)
-			dest_amount.value = val;
-		if (dest_amount_b)
-			firstElementChild(dest_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
+		{
+			var da = dest_amount.value;
+			var davalid = isValidValue(da);
+			var fda = (davalid) ? normalizeExch(da) : da;
+
+			if (da != val)
+				dest_amount.value = val;
+		}
 	}
 
 
