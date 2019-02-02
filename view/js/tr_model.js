@@ -227,6 +227,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		}
 		else if (davalid)
 			f4();		// calculate sa
+
+		notifyChanged('exchrate', fe);
 	}
 
 

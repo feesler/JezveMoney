@@ -496,7 +496,14 @@ function TransactionViewModel()
 		destCurr = getCurrency(Transaction.destCurr());
 
 		if (exchrate)
-			exchrate.value = val;
+		{
+			var e = exchrate.value;
+			var evalid = isValidValue(e);
+			var fe = (evalid) ? normalizeExch(e) : e;
+
+			if (e != val)
+				exchrate.value = val;
+		}
 
 		exchSigns = destCurr.sign + '/' + srcCurr.sign;
 		exchcomm.innerHTML = exchSigns;
