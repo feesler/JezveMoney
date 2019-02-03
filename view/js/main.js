@@ -141,7 +141,7 @@ function onChangePassSubmit(frm)
 		return false;
 	}
 
-	ajax.post(baseURL + 'api/profile.php?act=changepass',
+	ajax.post(baseURL + 'api/profile/changepass',
 				urlJoin({ 'oldpwd' : oldpwd.value, 'newpwd' : newpwd.value }),
 				onChangePasswordResult);
 
@@ -230,7 +230,7 @@ function onChangeNameSubmit(frm)
 		return false;
 	}
 
-	ajax.post(baseURL + 'api/profile.php?act=changename',
+	ajax.post(baseURL + 'api/profile/changename',
 				urlJoin({ 'name' : newname.value }),
 				onChangeNameResult);
 
