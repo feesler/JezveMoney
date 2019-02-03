@@ -2,8 +2,6 @@
 <script>
 	var currency = <?=f_json_encode($currArr)?>;
 	var accCurr = <?=$curr_acc_id?>;
-	var transType = <?=f_json_encode($type_str)?>;
-	var groupType = <?=f_json_encode($groupType)?>;
 	var chartData = <?=f_json_encode($statArr)?>;
 
 	onReady(initStatWidget);
