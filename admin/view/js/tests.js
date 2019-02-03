@@ -1,126 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Jezve Money | Tests</title>
-<style>
-*
-{
-	margin: 0;
-	padding: 0;
-	border: 0 none;
-}
-
-/* Main layout */
-html, body
-{
-	width: 100%;
-	height: 100%;
-}
-
-
-/* Clearfix */
-.clearfix
-{
-	float: none;
-	clear: both;
-	display: table;
-	zoom: 1;
-}
-
-
-.clearfix:after
-{
-	content: '. .';
-	display: block;
-	word-spacing: 99in;
-	height: 0;
-	overflow: hidden;
-/* Opera fix */
-	font-size: 0.13em;
-	line-height: 0;
-}
-
-
-.page
-{
-	display: table;
-	border-collapse: collapse;
-	position: relative;
-	width: 100%;
-	height: 100%;
-	min-height: 100%;
-}
-
-
-.page_wrapper
-{
-	display: table-cell;
-	width: 100%;
-	min-height: 100%;
-	height: 100%;
-	position: static;
-}
-
-
-/* Main content */
-.container
-{
-	display: table;
-	table-layout: fixed;
-	width: 100%;
-	min-height: 100%;
-	height: 100%;
-}
-
-
-.content
-{
-	display: table-cell;
-	min-height: 100%;
-	height: 100%;
-}
-
-
-.content_wrap
-{
-	padding: 50px 12px;
-	height: 100%;
-}
-
-
-.results,
-.testview
-{
-	display: inline-block;
-	float: left;
-	width: 50%;
-	height: 100%;
-}
-
-
-.results > table
-{
-	border-collapse: collapse;
-}
-
-
-.results > table td
-{
-	border: 1px solid #000000;
-	padding: 5px;
-}
-
-
-.testview > iframe
-{
-	width: 100%;
-	height: 100%;
-}
-</style>
-<script type="text/javascript" src="http://jezve.net/money/view/js/es5-shim.min.js"></script>
-<script type="text/javascript" src="http://jezve.net/money/view/js/common.js"></script>
-<script>
 var viewframe = null;
 var vdoc = null;
 var restbl = null;
@@ -174,7 +51,14 @@ function initTests()
 
 	addResult('Test initialization', 'OK');
 
-continueWith(startTests);
+	viewframe.src = 'http://jezve.net/money/accounts/new/';
+
+//	continueWith(createNewAccount1);
+
+
+	continueWith(startTests);
+//	continueWith(goToAccountsAndCreateNew);
+
 }
 
 
@@ -554,25 +438,3 @@ function addResult(descr, res)
 	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
 										ce('td', { innerHTML : res }) ]));
 }
-
-
-onReady(initTests);
-</script>
-</head>
-<body>
-<div class="page">
-	<div class="page_wrapper">
-		<div class="container">
-			<div class="content">
-				<div class="content_wrap">
-					<div class="results">
-						<table><tbody id="restbl"></tbody></table>
-					</div>
-					<div class="testview"><iframe id="viewframe" src="http://jezve.net/money/"></div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-</body>
-</html>

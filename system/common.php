@@ -40,6 +40,7 @@
 					"MainAdminController" => "admin/Controller/main.php",
 					"QueryAdminController" => "admin/Controller/query.php",
 					"LogsAdminController" => "admin/Controller/log.php",
+					"TestsAdminController" => "admin/Controller/tests.php",
 					"APITestAdminController" => "admin/Controller/apitest.php",
 				// Models
 					"AccountModel" => "Model/account.php",

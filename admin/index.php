@@ -6,6 +6,7 @@
 							"currency" => "CurrencyAdminController",
 							"query" => "QueryAdminController",
 							"log" => "LogsAdminController",
+							"tests" => "TestsAdminController",
 							"apitest" => "APITestAdminController",
 							"user" => "UserAdminController");
 
