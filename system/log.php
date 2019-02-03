@@ -1,5 +1,5 @@
 <?php
-	$logfname = $approot."admin/log.txt";
+	$logfname = APPROOT."admin/log.txt";
 
 
 	// Write string to log file
@@ -16,8 +16,8 @@
 			fclose($fp);
 		}
 	}
-	
-	
+
+
 	// Clean log file
 	function clog()
 	{

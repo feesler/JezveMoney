@@ -4,9 +4,9 @@ class LogsAdminController extends Controller
 {
 	public function index()
 	{
-		global $menuItems, $approot;
+		global $menuItems;
 
-		$filename = $approot."admin/log.txt";
+		$filename = APPROOT."admin/log.txt";
 
 		$contents = "";
 		if (file_exists($filename))
@@ -31,9 +31,7 @@ class LogsAdminController extends Controller
 
 	public function clean()
 	{
-		global $approot;
-
-		$logfname = $approot."admin/log.txt";
+		$logfname = APPROOT."admin/log.txt";
 
 		if (isset($_POST["clean"]) && $_POST["clean"] == "1")
 		{

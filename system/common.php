@@ -54,11 +54,11 @@
 	// Check class name and try to load file
 	function autoLoadClass($className)
 	{
-		global $approot, $classes;
+		global $classes;
 
 		if (isset($classes[$className]))
 		{
-			require($approot.$classes[$className]);
+			require(APPROOT.$classes[$className]);
 		}
 	}
 
@@ -342,11 +342,9 @@
 	// Append to file name unique string to fix cache issues
 	function auto_version($file)
 	{
-		global $approot;
-
-		if (!file_exists($approot.$file))
+		if (!file_exists(APPROOT.$file))
 			return $file;
 
-		$mtime = filemtime($approot.$file);
+		$mtime = filemtime(APPROOT.$file);
 		return $file."?".$mtime;
 	}

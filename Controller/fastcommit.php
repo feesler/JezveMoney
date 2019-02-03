@@ -1,6 +1,6 @@
 <?php
 
-require_once($approot."system/library/phpexcel/PHPExcel.php");
+require_once(APPROOT."system/library/phpexcel/PHPExcel.php");
 
 class FastCommitController extends Controller
 {

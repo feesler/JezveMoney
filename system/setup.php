@@ -49,11 +49,11 @@
 
 	if (!isset($noLogs))
 	{
-		require_once($approot."system/log.php");
+		require_once(APPROOT."system/log.php");
 
 		wlog("\r\nBEGIN");
 		wlog("BASEURL: ".BASEURL);
-		wlog("approot: ".$approot);
+		wlog("approot: ".APPROOT);
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
 		wlog("Referer: ".$_SERVER["HTTP_REFERER"]);
@@ -81,14 +81,13 @@
 
 	$sitetheme = 1;
 
-	require_once($approot."system/common.php");
+	require_once(APPROOT."system/common.php");
 	spl_autoload_register("autoLoadClass");
 
-	require_once($approot."system/dbsetup.php");
+	require_once(APPROOT."system/dbsetup.php");
 
 	mysqlDB::setup($db_location, $db_user, $db_password, $db_name);
 
 	date_default_timezone_set("Europe/Moscow");
 
-	require_once($approot."system/message.php");
-
+	require_once(APPROOT."system/message.php");
