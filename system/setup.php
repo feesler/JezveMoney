@@ -3,6 +3,7 @@
 	$pparts = pathinfo(__FILE__);
 	$path_length = strrpos($pparts["dirname"], "/");
 	$approot = substr(__FILE__, 0, $path_length + 1);
+	define("APPROOT", $approot, TRUE);
 
 
 	// Check request is HTTPS
