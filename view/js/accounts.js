@@ -55,7 +55,7 @@ function initControls()
 	var finpFunc = function(e){ return onAccBalanceInput(this); };
 	var fkeyFunc = function(e){ return onFieldKey(e, this); };
 
-	elem = ge('balance');
+	var elem = ge('balance');
 	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
 }
 

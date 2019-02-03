@@ -70,7 +70,7 @@
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=$accInfo["sign"]?></div></div></div>
 								<div class="stretch_input std_input">
-									<input class="summ_text" id="balance" name="balance" type="text" value="<?=$accInfo["initbalance"]?>" oninput="return onAccBalanceInput(this);">
+									<input class="summ_text" id="balance" name="balance" type="text" value="<?=$accInfo["initbalance"]?>">
 								</div>
 							</div>
 						</div>
