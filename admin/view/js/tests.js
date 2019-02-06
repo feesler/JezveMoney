@@ -425,6 +425,7 @@ function editAccount1()
 	var balance = vge('balance');
 	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
 	var tileName = vdoc.querySelector('#acc_tile .acc_name');
+	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
 
 	if (!accname)
 		throw 'Account name field not found';
@@ -434,6 +435,8 @@ function editAccount1()
 		throw 'On-tile balance element not found';
 	if (!tileName)
 		throw 'On-tile name element not found';
+	if (!submitBtn)
+		throw 'Submit button not found';
 
 	addResult('Edit account page loaded', 'OK');
 
@@ -460,6 +463,47 @@ function editAccount1()
 
 	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Purse') ? 'OK' : 'FAIL');
 	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'purse_icon')) ? 'OK' : 'FAIL');
+
+// Submit
+	continueWith(checkEditAccount1);
+	clickEmul(submitBtn);
+}
+
+
+function checkEditAccount1()
+{
+	var tiles = vdoc.querySelector('.tiles');
+	if (!tiles)
+		throw 'Tiles not found';
+
+	var tilesArr = parseTiles(tiles);
+
+	if (!tilesArr || tilesArr.length != 2)
+		throw 'Tile not found';
+
+	var firstTile, secondTile;
+	if (tilesArr[0].id == firstAccount_id)
+	{
+		firstTile = tilesArr[0];
+		secondTile = tilesArr[1];
+	}
+	else
+	{
+		firstTile = tilesArr[1];
+		secondTile = tilesArr[0];
+	}
+
+	var submitRes = (firstTile.balance == '$ 1 000.01' &&
+						firstTile.name == 'acc_1' &&
+						hasClass(firstTile.elem, ['tile_icon', 'purse_icon']))
+
+	addResult('First account update result', (submitRes) ? 'OK' : 'FAIL');
+
+	var accTileBtn = secondTile.firstElementChild;
+
+	clickEmul(accTileBtn);
+
+	var edit_btn = vge('edit_btn');
 }
 
 
