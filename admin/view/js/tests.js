@@ -53,14 +53,10 @@ function initTests()
 
 	addResult('Test initialization', 'OK');
 
-	viewframe.src = 'http://jezve.net/money/accounts/new/';
-
-//	continueWith(createNewAccount1);
+	viewframe.src = 'http://jezve.net/money/';
 
 
 	continueWith(startTests);
-//	continueWith(goToAccountsAndCreateNew);
-
 }
 
 
@@ -227,13 +223,13 @@ function goToCreateAccount()
 	if (!elem)
 		throw 'Link to new account page not found';
 
-	continueWith(createNewAccount1);
+	continueWith(createAccount1);
 
 	clickEmul(elem);
 }
 
 
-function createNewAccount1()
+function createAccount1()
 {
 	var accname = vge('accname');
 	var balance = vge('balance');
@@ -313,13 +309,13 @@ function createNewAccount1()
 	addResult('Account tile balance on RUB 1 000.01 balance input field', (tileBal.innerHTML == '1 000.01 ₽') ? 'OK' : 'FAIL');
 
 	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
-	continueWith(afterSubmitAccount1);
+	continueWith(checkCreateAccount1);
 	clickEmul(submitBtn);
 
 }
 
 
-function afterSubmitAccount1()
+function checkCreateAccount1()
 {
 	var tiles = vdoc.querySelector('.tiles');
 	if (!tiles)
@@ -337,12 +333,12 @@ function afterSubmitAccount1()
 
 	var addBtn = vdoc.querySelector('#add_btn > a');
 
-	continueWith(createNewAccount2);
+	continueWith(createAccount2);
 	clickEmul(addBtn);
 }
 
 
-function createNewAccount2()
+function createAccount2()
 {
 	var accname = vge('accname');
 	var balance = vge('balance');
@@ -379,12 +375,12 @@ function createNewAccount2()
 	addResult('Account tile balance on EUR 1 000.01 balance input field', (tileBal.innerHTML == '€ 1 000.01') ? 'OK' : 'FAIL');
 
 	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
-	continueWith(afterSubmitAccount2);
+	continueWith(checkCreateAccount2);
 	clickEmul(submitBtn);
 }
 
 
-function afterSubmitAccount2()
+function checkCreateAccount2()
 {
 	var tiles = vdoc.querySelector('.tiles');
 	if (!tiles)
