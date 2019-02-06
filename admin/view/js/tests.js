@@ -1,6 +1,8 @@
 var viewframe = null;
 var vdoc = null;
 var restbl = null;
+var firstAccount_id = null;
+var secondAccount_id = null;
 
 
 function vge(a)
@@ -173,6 +175,36 @@ function goToMainPage()
 }
 
 
+function parseTiles(tilesEl)
+{
+	var res = [];
+
+	if (!tilesEl)
+		return res;
+
+	for(var i = 0; i < tilesEl.childNodes.length; i++)
+	{
+		var tileObj = {};
+		var tileEl = tilesEl.childNodes[i];
+
+		tileObj.elem = tileEl;
+		tileObj.id = parseInt(tileEl.id.substr(4));
+		if (!tileEl.firstElementChild || !tileEl.firstElementChild.firstElementChild || !tileEl.firstElementChild.firstElementChild.firstElementChild)
+			throw 'Wrong tile structure';
+		tileObj.balanceEL = tileEl.firstElementChild.firstElementChild.firstElementChild;
+		tileObj.balance = tileObj.balanceEL.innerHTML;
+		if (!tileObj.balanceEL.nextElementSibling)
+			throw 'Wrong tile structure';
+		tileObj.nameEL = tileObj.balanceEL.nextElementSibling;
+		tileObj.name = tileObj.nameEL.innerHTML;
+
+		res.push(tileObj);
+	}
+
+	return res;
+}
+
+
 function goToAccountsAndCreateNew()
 {
 	var elem;
@@ -292,15 +324,16 @@ function afterSubmitAccount1()
 	var tiles = vdoc.querySelector('.tiles');
 	if (!tiles)
 		throw 'Tiles not found';
-	var tile = tiles.firstElementChild;
 
-	var tileBal = tile.querySelector('.acc_bal');
-	var tileName = tile.querySelector('.acc_name');
+	var tilesArr = parseTiles(tiles);
 
-	var submitRes = (tileBal && tileBal.innerHTML == '1 000.01 ₽' &&
-						tileName && tileName.innerHTML == 'acc_1')
+	var submitRes = (tilesArr && tilesArr.length == 1 &&
+						tilesArr[0].balance == '1 000.01 ₽' &&
+						tilesArr[0].name == 'acc_1')
 
 	addResult('First account create result', (submitRes) ? 'OK' : 'FAIL');
+
+	firstAccount_id = tilesArr[0].id;
 
 	var addBtn = vdoc.querySelector('#add_btn > a');
 
@@ -356,15 +389,21 @@ function afterSubmitAccount2()
 	var tiles = vdoc.querySelector('.tiles');
 	if (!tiles)
 		throw 'Tiles not found';
-	var tile = tiles.firstElementChild.nextElementSibling;
-	if (!tile)
+
+	var tilesArr = parseTiles(tiles);
+
+	if (!tilesArr || tilesArr.length != 2)
 		throw 'Tile not found';
 
-	var tileBal = tile.querySelector('.acc_bal');
-	var tileName = tile.querySelector('.acc_name');
+	if (tilesArr[0].id == firstAccount_id)
+		tile = tilesArr[1];
+	else
+		tile = tilesArr[0];
 
-	var submitRes = (tileBal && tileBal.innerHTML == '€ 1 000.01' &&
-						tileName && tileName.innerHTML == 'acc_2')
+	secondAccount_id = tile.id;
+
+	var submitRes = (tile.balance == '€ 1 000.01' &&
+						tile.name == 'acc_2')
 
 	addResult('Second account create result', (submitRes) ? 'OK' : 'FAIL');
 
