@@ -448,6 +448,9 @@ function editAccount1()
 	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist2_2'));	// select USD currency
 
+	var fmtBal = formatCurrency(1000.01, 2);
+	addResult('USD currency select result', (ddCurrText.innerHTML == 'USD') ? 'OK' : 'FAIL');
+	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal) ? 'OK' : 'FAIL');
 
 // Change icon
 	var iconElem = vge('icon');
