@@ -615,6 +615,64 @@ function checkCreateAccount3()
 						hasClass(thirdTile.elem, ['tile_icon', 'safe_icon']))
 
 	addResult('Third account create result', (submitRes) ? 'OK' : 'FAIL');
+
+	deleteFirstAndSecondAccounts();
+}
+
+
+function deleteFirstAndSecondAccounts()
+{
+	var firstTile = vge('acc_' + firstAccount_id);
+	if (!firstTile)
+		throw 'First tile not found';
+
+	var thirdTile = vge('acc_' + thirdAccount_id);
+	if (!thirdTile)
+		throw 'Third tile not found';
+
+	clickEmul(firstTile.firstElementChild);
+	var edit_btn = vge('edit_btn');
+	if (!edit_btn)
+		throw 'Edit button not found';
+	var del_btn = vge('del_btn');
+	if (!del_btn)
+		throw 'Edit button not found';
+
+	addResult('Edit button visibility on select one account', (edit_btn.style.display != 'none') ? 'OK' : 'FAIL');
+	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none') ? 'OK' : 'FAIL');
+
+	clickEmul(thirdTile.firstElementChild);
+
+	addResult('Edit button visibility on select one account', (edit_btn.style.display == 'none') ? 'OK' : 'FAIL');
+	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none') ? 'OK' : 'FAIL');
+
+	clickEmul(del_btn.firstElementChild);
+
+	var delete_warning = vge('delete_warning');
+	if (!delete_warning)
+		throw 'Delete warning not found';
+
+	addResult('Delete account warning popup appear', (delete_warning.style.display != 'none') ? 'OK' : 'FAIL');
+
+	var okBtn = delete_warning.querySelector('.ok_btn');
+	if (!okBtn)
+		throw 'OK button not found';
+
+	continueWith(checkDeleteAccounts);
+	clickEmul(okBtn);
+}
+
+
+function checkDeleteAccounts()
+{
+	var tiles = vquery('.tiles');
+	if (!tiles)
+		throw 'Tiles list not found';
+
+	var tilesArr = parseTiles(tiles);
+
+	addResult('Accounts delete result', (tilesArr && tilesArr.length == 1) ? 'OK' : 'FAIL');
+
 }
 
 
