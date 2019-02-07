@@ -4,12 +4,20 @@ class TestsAdminController extends Controller
 {
 	public function index()
 	{
-		global $menuItems;
+		global $menuItems, $user_id;
 
 		$titleString = "Admin panel | Tests";
 
+		$currMod = new CurrencyModel();
+		$currArr = $currMod->getArray();
+
+		$accMod = new AccountModel($user_id);
+		$icons = $accMod->getIconsArray();
+
+
 		$this->cssAdmin[] = "tests.css";
 		$this->buildCSS();
+		$this->jsArr[] = "currency.js";
 		$this->jsAdmin[] = "tests.js";
 
 		include("./view/templates/tests.tpl");

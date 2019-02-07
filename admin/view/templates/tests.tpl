@@ -1,5 +1,7 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
+var currency = <?=f_json_encode($currArr)?>;
+var icons = <?=f_json_encode($icons)?>;
 onReady(initTests);
 </script>
 </head>

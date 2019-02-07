@@ -3,6 +3,8 @@ var vdoc = null;
 var restbl = null;
 var firstAccount_id = null;
 var secondAccount_id = null;
+var thirdAccount_id = null;
+var tileIconClass = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
 
 
 function vge(a)
@@ -498,11 +500,115 @@ function checkEditAccount1()
 
 	addResult('First account update result', (submitRes) ? 'OK' : 'FAIL');
 
-	var accTileBtn = secondTile.firstElementChild;
+	var addBtn = vdoc.querySelector('#add_btn > a');
 
-	clickEmul(accTileBtn);
+	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount3));
+	clickEmul(addBtn);
+}
 
-	var edit_btn = vge('edit_btn');
+
+function createAccountWithParam(params, callback)
+{
+	if (!params)
+		throw 'No params specified';
+	if (!params.name || !params.name.length)
+		throw 'Name not specified';
+	var currObj = getCurrency(params.curr_id);
+	if (!currObj)
+		throw 'Wrong currency specified';
+	var normBalance = normalize(params.balance);
+	if (isNaN(normBalance))
+		throw 'Balance not specified';
+	if (!isFunction(callback))
+		throw 'Callback not specified';
+
+	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
+	var accname = vge('accname');
+	var balance = vge('balance');
+
+// Input account name
+	accname.value = params.name;
+	accname.oninput();
+	addResult('Account tile name update', (accname.value == params.name) ? 'OK' : 'FAIL');
+
+// Change currency
+	var currElem = vge('currency');
+	var ddCurrInpCont = currElem.previousElementSibling;
+
+	clickEmul(ddCurrInpCont.previousElementSibling);
+	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
+	clickEmul(vge('ddlist2_' + currObj.id));
+
+	addResult(currObj.name + ' currency select result', (ddCurrText.innerHTML == currObj.name) ? 'OK' : 'FAIL');
+	var fmtBal = formatCurrency(0, currObj.id);
+	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal) ? 'OK' : 'FAIL');
+
+// Input balance
+	balance.value = params.balance;
+	balance.oninput();
+	fmtBal = formatCurrency(normBalance, currObj.id);
+	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal) ? 'OK' : 'FAIL');
+
+// Change icon
+	if (params.icon)
+	{
+		if (params.icon < 0 || params.icon > icons.length)
+			throw 'Icon not found';
+		var iconElem = vge('icon');
+		var ddIconInpCont = iconElem.previousElementSibling;
+
+		clickEmul(ddIconInpCont.previousElementSibling);
+		var ddIconText = ddIconInpCont.querySelector('.statsel');
+		clickEmul(vge('ddlist1_' + params.icon));	// select purse icon
+
+		addResult('Icon drop down value select', (ddIconText.innerHTML == icons[params.icon]) ? 'OK' : 'FAIL');
+		var iconClass = tileIconClass[params.icon];
+		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)) ? 'OK' : 'FAIL');
+	}
+
+
+	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
+	continueWith(callback);
+	clickEmul(submitBtn);
+}
+
+
+function checkCreateAccount3()
+{
+	var tiles = vdoc.querySelector('.tiles');
+	if (!tiles)
+		throw 'Tiles list not found';
+
+	var tilesArr = parseTiles(tiles);
+
+	if (!tilesArr || tilesArr.length != 3)
+		throw 'Wrong structure of tiles list';
+
+	var firstTile = null;
+	var secondTile = null;
+	var thirdTile = null;
+
+	firstTile = idSearch(tilesArr, firstAccount_id);
+	secondTile = idSearch(tilesArr, secondAccount_id);
+
+	for(var i = 0; i < tilesArr.length; i++)
+	{
+		var tile = tilesArr[i];
+		if (tile.id != firstAccount_id && tile.id != secondAccount_id)
+		{
+			thirdTile = tile;
+			thirdAccount_id = tile.id;
+			break;
+		}
+	}
+	if (!thirdTile)
+		throw 'Third tile not found';
+
+	var submitRes = (thirdTile.balance == '500.99 ₽' &&
+						thirdTile.name == 'acc_3' &&
+						hasClass(thirdTile.elem, ['tile_icon', 'safe_icon']))
+
+	addResult('Third account create result', (submitRes) ? 'OK' : 'FAIL');
 }
 
 
