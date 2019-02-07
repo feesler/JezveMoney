@@ -13,6 +13,12 @@ function vge(a)
 }
 
 
+function vquery(a)
+{
+	return (typeof a == 'string') ? vdoc.querySelector(a) : a;
+}
+
+
 function clickEmul(elemObj)
 {
 	if (elemObj.click)
@@ -149,7 +155,7 @@ function resetAll()
 
 	clickEmul(elem);
 
-	elem = vdoc.querySelector('#reset_warning .btn.ok_btn');
+	elem = vquery('#reset_warning .btn.ok_btn');
 	if (!elem)
 		throw 'Confirm button not found';
 
@@ -163,7 +169,7 @@ function goToMainPage()
 {
 	var elem;
 
-	elem = vdoc.querySelector('.page .header .logo > a');
+	elem = vquery('.page .header .logo > a');
 	if (!elem)
 		throw 'Link to main page not found';
 
@@ -207,7 +213,7 @@ function goToAccountsAndCreateNew()
 {
 	var elem;
 
-	elem = vdoc.querySelector('.content_wrap .widget .widget_title > a');
+	elem = vquery('.content_wrap .widget .widget_title > a');
 	if (!elem)
 		throw 'Link to accounts page not found';
 
@@ -221,7 +227,7 @@ function goToCreateAccount()
 {
 	var elem;
 
-	elem = vdoc.querySelector('#add_btn > a');
+	elem = vquery('#add_btn > a');
 	if (!elem)
 		throw 'Link to new account page not found';
 
@@ -235,8 +241,8 @@ function createAccount1()
 {
 	var accname = vge('accname');
 	var balance = vge('balance');
-	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
-	var tileName = vdoc.querySelector('#acc_tile .acc_name');
+	var tileBal = vquery('#acc_tile .acc_bal');
+	var tileName = vquery('#acc_tile .acc_name');
 
 	if (!accname)
 		throw 'Account name field not found';
@@ -310,7 +316,7 @@ function createAccount1()
 	balance.oninput();
 	addResult('Account tile balance on RUB 1 000.01 balance input field', (tileBal.innerHTML == '1 000.01 ₽') ? 'OK' : 'FAIL');
 
-	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
+	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(checkCreateAccount1);
 	clickEmul(submitBtn);
 
@@ -319,7 +325,7 @@ function createAccount1()
 
 function checkCreateAccount1()
 {
-	var tiles = vdoc.querySelector('.tiles');
+	var tiles = vquery('.tiles');
 	if (!tiles)
 		throw 'Tiles not found';
 
@@ -333,7 +339,7 @@ function checkCreateAccount1()
 
 	firstAccount_id = tilesArr[0].id;
 
-	var addBtn = vdoc.querySelector('#add_btn > a');
+	var addBtn = vquery('#add_btn > a');
 
 	continueWith(createAccount2);
 	clickEmul(addBtn);
@@ -344,8 +350,8 @@ function createAccount2()
 {
 	var accname = vge('accname');
 	var balance = vge('balance');
-	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
-	var tileName = vdoc.querySelector('#acc_tile .acc_name');
+	var tileBal = vquery('#acc_tile .acc_bal');
+	var tileName = vquery('#acc_tile .acc_name');
 
 	if (!accname)
 		throw 'Account name field not found';
@@ -376,7 +382,7 @@ function createAccount2()
 	balance.oninput();
 	addResult('Account tile balance on EUR 1 000.01 balance input field', (tileBal.innerHTML == '€ 1 000.01') ? 'OK' : 'FAIL');
 
-	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
+	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(checkCreateAccount2);
 	clickEmul(submitBtn);
 }
@@ -384,7 +390,7 @@ function createAccount2()
 
 function checkCreateAccount2()
 {
-	var tiles = vdoc.querySelector('.tiles');
+	var tiles = vquery('.tiles');
 	if (!tiles)
 		throw 'Tiles not found';
 
@@ -421,9 +427,9 @@ function editAccount1()
 {
 	var accname = vge('accname');
 	var balance = vge('balance');
-	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
-	var tileName = vdoc.querySelector('#acc_tile .acc_name');
-	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
+	var tileBal = vquery('#acc_tile .acc_bal');
+	var tileName = vquery('#acc_tile .acc_name');
+	var submitBtn = vquery('.acc_controls .ok_btn');
 
 	if (!accname)
 		throw 'Account name field not found';
@@ -473,7 +479,7 @@ function editAccount1()
 
 function checkEditAccount1()
 {
-	var tiles = vdoc.querySelector('.tiles');
+	var tiles = vquery('.tiles');
 	if (!tiles)
 		throw 'Tiles not found';
 
@@ -500,7 +506,7 @@ function checkEditAccount1()
 
 	addResult('First account update result', (submitRes) ? 'OK' : 'FAIL');
 
-	var addBtn = vdoc.querySelector('#add_btn > a');
+	var addBtn = vquery('#add_btn > a');
 
 	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount3));
 	clickEmul(addBtn);
@@ -522,7 +528,7 @@ function createAccountWithParam(params, callback)
 	if (!isFunction(callback))
 		throw 'Callback not specified';
 
-	var tileBal = vdoc.querySelector('#acc_tile .acc_bal');
+	var tileBal = vquery('#acc_tile .acc_bal');
 	var accname = vge('accname');
 	var balance = vge('balance');
 
@@ -567,7 +573,7 @@ function createAccountWithParam(params, callback)
 	}
 
 
-	var submitBtn = vdoc.querySelector('.acc_controls .ok_btn');
+	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(callback);
 	clickEmul(submitBtn);
 }
@@ -575,7 +581,7 @@ function createAccountWithParam(params, callback)
 
 function checkCreateAccount3()
 {
-	var tiles = vdoc.querySelector('.tiles');
+	var tiles = vquery('.tiles');
 	if (!tiles)
 		throw 'Tiles list not found';
 
