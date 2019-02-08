@@ -692,6 +692,74 @@ function checkCreateAccount1_2()
 
 function checkCreateAccount3_2()
 {
+	var elem = vquery('.page .header .logo > a');
+	if (!elem)
+		throw 'Link to main page not found';
+
+	continueWith(goToPersonsAndCreateNew);
+
+	clickEmul(elem);
+}
+
+
+function goToPersonsAndCreateNew()
+{
+	var widgets = vqueryall('.content_wrap .widget');
+
+	if (!widgets || widgets.length != 5)
+		throw 'Fail to parse main page widgets';
+
+	var personsWidget = widgets[3];
+
+	continueWith(goToCreatePerson1);
+	clickEmul(personsWidget.firstElementChild.firstElementChild);
+}
+
+
+function goToCreatePerson1()
+{
+	var add_btn = vge('add_btn');
+	if (!add_btn)
+		throw 'New person button not found';
+
+	var tilesArr = vqueryall('.tiles .tile');
+
+	addResult('Initial persons structure', (tilesArr && tilesArr.length == 0) ? 'OK' : 'FAIL');
+
+	continueWith(createPerson1);
+	clickEmul(add_btn.firstElementChild);
+}
+
+
+function createPerson1()
+{
+	var pname = vge('pname');
+
+	addResult('Person name input found', (pname) ? 'OK' : 'FAIL');
+
+	pname.value = 'Alex';
+	if (pname.oninput)
+		pname.oninput();
+
+	var ok_btn = vquery('.ok_btn');
+	addResult('Submit person button found', (ok_btn) ? 'OK' : 'FAIL');
+
+	continueWith(checkCreatePerson1);
+	clickEmul(ok_btn);
+}
+
+
+function checkCreatePerson1()
+{
+	var tilesArr = vqueryall('.tiles .tile');
+
+	addResult('Person tiles structure', (tilesArr && tilesArr.length == 1) ? 'OK' : 'FAIL');
+
+	var tile = tilesArr[0];
+
+	var personName = tile.querySelector('.acc_name');
+
+	addResult('Person create result', (personName && personName.innerHTML == 'Alex') ? 'OK' : 'FAIL');
 }
 
 
