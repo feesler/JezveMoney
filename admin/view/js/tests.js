@@ -673,6 +673,25 @@ function checkDeleteAccounts()
 
 	addResult('Accounts delete result', (tilesArr && tilesArr.length == 1) ? 'OK' : 'FAIL');
 
+
+	var addBtn = vquery('#add_btn > a');
+
+	continueWith(createAccountWithParam.bind(null, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount1_2));
+	clickEmul(addBtn);
+}
+
+
+function checkCreateAccount1_2()
+{
+	var addBtn = vquery('#add_btn > a');
+
+	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }, checkCreateAccount3_2));
+	clickEmul(addBtn);
+}
+
+
+function checkCreateAccount3_2()
+{
 }
 
 
