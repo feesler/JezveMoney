@@ -222,11 +222,11 @@ function parseTile(tileEl)
 	if (!tileEl.firstElementChild || !tileEl.firstElementChild.firstElementChild || !tileEl.firstElementChild.firstElementChild.firstElementChild)
 		throw 'Wrong tile structure';
 	tileObj.balanceEL = tileEl.firstElementChild.firstElementChild.firstElementChild;
-	tileObj.balance = tileObj.balanceEL.innerHTML;
+	tileObj.balance = tileObj.balanceEL.innerText;
 	if (!tileObj.balanceEL.nextElementSibling)
 		throw 'Wrong tile structure';
 	tileObj.nameEL = tileObj.balanceEL.nextElementSibling;
-	tileObj.name = tileObj.nameEL.innerHTML;
+	tileObj.name = tileObj.nameEL.innerText;
 
 	return tileObj;
 }
@@ -739,9 +739,59 @@ function createPerson3()
 
 function createPerson4()
 {
-	createPersonAndCheck('Иван');
+	createPersonAndCheck('Иван', updatePerson3);
 }
 
+
+function updatePersonAndCheck(num, personName, callback)
+{
+	var initLength = personTiles.length;
+
+	if (num < 0 || num >= personTiles.length)
+		throw 'Wrong person number';
+
+	clickEmul(personTiles[num].elem.firstElementChild);
+
+	var edit_btn = vge('edit_btn');
+	var del_btn = vge('del_btn')
+
+	addResult('Edit button visibility on select one person', (edit_btn && edit_btn.style.display != 'none'));
+	addResult('Delete button visibility on select one person', (del_btn && del_btn.style.display != 'none'));
+
+	continueWith(function()
+	{
+		var pname = vge('pname');
+
+		addResult('Person name input found', pname);
+
+		pname.value = personName;
+		if (pname.oninput)
+			pname.oninput();
+
+		var ok_btn = vquery('.ok_btn');
+		addResult('Submit person button found', ok_btn);
+
+		continueWith(function()
+		{
+			personTiles = parseTiles(vquery('.tiles'));
+
+			addResult('Person update result', (personTiles && personTiles.length == initLength &&
+												personTiles[num] &&
+												personTiles[num].name == personName));
+
+			if (isFunction(callback))
+				callback();
+		});
+		clickEmul(ok_btn);
+	});
+	clickEmul(edit_btn.firstElementChild);
+}
+
+
+function updatePerson3()
+{
+	updatePersonAndCheck(3, 'Ivan<');
+}
 
 
 function expenseTransactionStart()
