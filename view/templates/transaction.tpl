@@ -326,7 +326,7 @@
 						<div id="result_balance" class="non_float" style="display: none;">
 							<div><label for="resbal"><?=$srcBalTitle?></label></div>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$src["sign"]?></div></div></div>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$srcAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
 <?php	if ($trans_type == DEBT) {		?>
 									<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>">
@@ -342,11 +342,7 @@
 						<div id="result_balance_dest" class="non_float" style="display: none;">
 							<div><label for="resbal_d"><?=$destBalTitle?></label></div>
 							<div>
-<?php	if ($trans_type == DEBT) {		?>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$debtAcc["sign"]?></div></div></div>
-<?php	} else {	?>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$dest["sign"]?></div></div></div>
-<?php	}	?>
+								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$destAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
 									<input id="resbal_d" class="summ_text" type="text" value="">
 								</div>

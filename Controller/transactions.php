@@ -338,7 +338,8 @@ class TransactionsController extends Controller
 				$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 
 			$balDiff = $tr["src_amount"];
-			$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
+			if ($trans_type != DEBT)
+				$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
 		}
 
 		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
@@ -350,7 +351,8 @@ class TransactionsController extends Controller
 				$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$balDiff = $tr["dest_amount"];
-			$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
+			if ($trans_type != DEBT)
+				$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
