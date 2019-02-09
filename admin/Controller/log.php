@@ -2,21 +2,20 @@
 
 class LogsAdminController extends Controller
 {
+	public function __construct()
+	{
+		$this->filename = APPROOT."system/logs/log.txt";
+	}
+
+
 	public function index()
 	{
 		global $menuItems;
 
-		$filename = APPROOT."admin/log.txt";
-
 		$contents = "";
-		if (file_exists($filename))
+		if (file_exists($this->filename) && is_readable($this->filename))
 		{
-			$fp = fopen($filename, "r");
-			if ($fp)
-			{
-				$contents = fread($fp, filesize($filename));
-				fclose($fp);
-			}
+			$contents = file_get_contents($this->filename);
 		}
 
 		$menuItems["log"]["active"] = TRUE;
@@ -31,12 +30,10 @@ class LogsAdminController extends Controller
 
 	public function clean()
 	{
-		$logfname = APPROOT."admin/log.txt";
-
 		if (isset($_POST["clean"]) && $_POST["clean"] == "1")
 		{
-			if (file_exists($logfname))
-				unlink($logfname);
+			if (file_exists($this->filename))
+				unlink($this->filename);
 		}
 
 		setLocation(BASEURL."admin/log/");

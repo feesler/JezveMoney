@@ -1,5 +1,5 @@
 <?php
-	$logfname = APPROOT."admin/log.txt";
+	$logfname = APPROOT."system/logs/log.txt";
 
 
 	// Write string to log file
