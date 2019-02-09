@@ -1,9 +1,8 @@
 var viewframe = null;
 var vdoc = null;
 var restbl = null;
-var firstAccount_id = null;
-var secondAccount_id = null;
-var thirdAccount_id = null;
+var accTiles = [];
+var personTiles = [];
 var tileIconClass = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
 
 
@@ -198,43 +197,61 @@ function resetAll()
 
 function goToMainPage()
 {
-	var elem;
-
-	elem = vquery('.page .header .logo > a');
-	if (!elem)
-		throw 'Link to main page not found';
-
 	continueWith(goToAccountsAndCreateNew);
+	clickEmul(vquery('.page .header .logo > a'));
+}
 
-	clickEmul(elem);
+
+function parseTile(tileEl)
+{
+	if (!tileEl)
+		return null;
+
+	var tileObj = {};
+
+	if (!hasClass(tileEl, 'tile'))
+		throw 'Wrong tile structure';
+
+	tileObj.elem = tileEl;
+
+	var pos = tileEl.id.indexOf('_');
+	if (pos == -1)
+		tileObj.id == tileEl.id;
+	else
+		tileObj.id = parseInt(tileEl.id.substr(pos + 1));
+	if (!tileEl.firstElementChild || !tileEl.firstElementChild.firstElementChild || !tileEl.firstElementChild.firstElementChild.firstElementChild)
+		throw 'Wrong tile structure';
+	tileObj.balanceEL = tileEl.firstElementChild.firstElementChild.firstElementChild;
+	tileObj.balance = tileObj.balanceEL.innerHTML;
+	if (!tileObj.balanceEL.nextElementSibling)
+		throw 'Wrong tile structure';
+	tileObj.nameEL = tileObj.balanceEL.nextElementSibling;
+	tileObj.name = tileObj.nameEL.innerHTML;
+
+	return tileObj;
 }
 
 
 function parseTiles(tilesEl)
 {
-	var res = [];
+	var res = [], tileObj;
 
-	if (!tilesEl)
+	if (!tilesEl || (tilesEl.children.length == 1 && tilesEl.children[0].tagName == 'SPAN'))
 		return res;
 
-	for(var i = 0; i < tilesEl.childNodes.length; i++)
+	for(var i = 0; i < tilesEl.children.length; i++)
 	{
-		var tileObj = {};
-		var tileEl = tilesEl.childNodes[i];
-
-		tileObj.elem = tileEl;
-		tileObj.id = parseInt(tileEl.id.substr(4));
-		if (!tileEl.firstElementChild || !tileEl.firstElementChild.firstElementChild || !tileEl.firstElementChild.firstElementChild.firstElementChild)
-			throw 'Wrong tile structure';
-		tileObj.balanceEL = tileEl.firstElementChild.firstElementChild.firstElementChild;
-		tileObj.balance = tileObj.balanceEL.innerHTML;
-		if (!tileObj.balanceEL.nextElementSibling)
-			throw 'Wrong tile structure';
-		tileObj.nameEL = tileObj.balanceEL.nextElementSibling;
-		tileObj.name = tileObj.nameEL.innerHTML;
+		tileObj = parseTile(tilesEl.children[i]);
+		if (!tileObj)
+			throw 'Fail to parse tile';
 
 		res.push(tileObj);
 	}
+
+	res.sort(function(a, b)
+	{
+		return (a.id == b.id) ? 0 : ((a.id < b.id) ? -1 : 1);
+	});
 
 	return res;
 }
@@ -256,15 +273,8 @@ function goToAccountsAndCreateNew()
 
 function goToCreateAccount()
 {
-	var elem;
-
-	elem = vquery('#add_btn > a');
-	if (!elem)
-		throw 'Link to new account page not found';
-
 	continueWith(createAccount1);
-
-	clickEmul(elem);
+	clickEmul(vquery('#add_btn > a'));
 }
 
 
@@ -356,24 +366,16 @@ function createAccount1()
 
 function checkCreateAccount1()
 {
-	var tiles = vquery('.tiles');
-	if (!tiles)
-		throw 'Tiles not found';
+	accTiles = parseTiles(vquery('.tiles'));
 
-	var tilesArr = parseTiles(tiles);
-
-	var submitRes = (tilesArr && tilesArr.length == 1 &&
-						tilesArr[0].balance == '1 000.01 ₽' &&
-						tilesArr[0].name == 'acc_1')
+	var submitRes = (accTiles && accTiles.length == 1 &&
+						accTiles[0].balance == '1 000.01 ₽' &&
+						accTiles[0].name == 'acc_1')
 
 	addResult('First account create result', submitRes);
 
-	firstAccount_id = tilesArr[0].id;
-
-	var addBtn = vquery('#add_btn > a');
-
 	continueWith(createAccount2);
-	clickEmul(addBtn);
+	clickEmul(vquery('#add_btn > a'));
 }
 
 
@@ -421,35 +423,20 @@ function createAccount2()
 
 function checkCreateAccount2()
 {
-	var tiles = vquery('.tiles');
-	if (!tiles)
-		throw 'Tiles not found';
+	accTiles = parseTiles(vquery('.tiles'));
 
-	var tilesArr = parseTiles(tiles);
-
-	if (!tilesArr || tilesArr.length != 2)
-		throw 'Tile not found';
-
-	if (tilesArr[0].id == firstAccount_id)
-		tile = tilesArr[1];
-	else
-		tile = tilesArr[0];
-
-	secondAccount_id = tile.id;
-
-	var submitRes = (tile.balance == '€ 1 000.01' &&
-						tile.name == 'acc_2')
+	var submitRes = (accTiles && accTiles.length == 2 &&
+		 				accTiles[1].balance == '€ 1 000.01' &&
+						accTiles[1].name == 'acc_2')
 
 	addResult('Second account create result', submitRes);
 
-	var accTileBtn = tiles.firstElementChild.firstElementChild;
+	var accTileBtn = accTiles[0].elem.firstElementChild.firstElementChild;
 
 	clickEmul(accTileBtn);
 
-	var edit_btn = vge('edit_btn');
-
 	continueWith(editAccount1);
-	clickEmul(edit_btn.firstElementChild);
+	clickEmul(vquery('#edit_btn > a'));
 }
 
 
@@ -510,37 +497,17 @@ function editAccount1()
 
 function checkEditAccount1()
 {
-	var tiles = vquery('.tiles');
-	if (!tiles)
-		throw 'Tiles not found';
+	accTiles = parseTiles(vquery('.tiles'));
 
-	var tilesArr = parseTiles(tiles);
-
-	if (!tilesArr || tilesArr.length != 2)
-		throw 'Tile not found';
-
-	var firstTile, secondTile;
-	if (tilesArr[0].id == firstAccount_id)
-	{
-		firstTile = tilesArr[0];
-		secondTile = tilesArr[1];
-	}
-	else
-	{
-		firstTile = tilesArr[1];
-		secondTile = tilesArr[0];
-	}
-
-	var submitRes = (firstTile.balance == '$ 1 000.01' &&
-						firstTile.name == 'acc_1' &&
-						hasClass(firstTile.elem, ['tile_icon', 'purse_icon']))
+	var submitRes = (accTiles && accTiles.length == 2 &&
+						accTiles[0].balance == '$ 1 000.01' &&
+						accTiles[0].name == 'acc_1' &&
+						hasClass(accTiles[0].elem, ['tile_icon', 'purse_icon']))
 
 	addResult('First account update result', submitRes);
 
-	var addBtn = vquery('#add_btn > a');
-
 	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount3));
-	clickEmul(addBtn);
+	clickEmul(vquery('#add_btn > a'));
 }
 
 
@@ -612,38 +579,12 @@ function createAccountWithParam(params, callback)
 
 function checkCreateAccount3()
 {
-	var tiles = vquery('.tiles');
-	if (!tiles)
-		throw 'Tiles list not found';
+	accTiles = parseTiles(vquery('.tiles'));
 
-	var tilesArr = parseTiles(tiles);
-
-	if (!tilesArr || tilesArr.length != 3)
-		throw 'Wrong structure of tiles list';
-
-	var firstTile = null;
-	var secondTile = null;
-	var thirdTile = null;
-
-	firstTile = idSearch(tilesArr, firstAccount_id);
-	secondTile = idSearch(tilesArr, secondAccount_id);
-
-	for(var i = 0; i < tilesArr.length; i++)
-	{
-		var tile = tilesArr[i];
-		if (tile.id != firstAccount_id && tile.id != secondAccount_id)
-		{
-			thirdTile = tile;
-			thirdAccount_id = tile.id;
-			break;
-		}
-	}
-	if (!thirdTile)
-		throw 'Third tile not found';
-
-	var submitRes = (thirdTile.balance == '500.99 ₽' &&
-						thirdTile.name == 'acc_3' &&
-						hasClass(thirdTile.elem, ['tile_icon', 'safe_icon']))
+	var submitRes = (accTiles && accTiles.length == 3 &&
+						accTiles[2].balance == '500.99 ₽' &&
+						accTiles[2].name == 'acc_3' &&
+						hasClass(accTiles[2].elem, ['tile_icon', 'safe_icon']))
 
 	addResult('Third account create result', submitRes);
 
@@ -653,29 +594,18 @@ function checkCreateAccount3()
 
 function deleteFirstAndSecondAccounts()
 {
-	var firstTile = vge('acc_' + firstAccount_id);
-	if (!firstTile)
-		throw 'First tile not found';
+	clickEmul(accTiles[0].elem.firstElementChild);
 
-	var thirdTile = vge('acc_' + thirdAccount_id);
-	if (!thirdTile)
-		throw 'Third tile not found';
-
-	clickEmul(firstTile.firstElementChild);
 	var edit_btn = vge('edit_btn');
-	if (!edit_btn)
-		throw 'Edit button not found';
-	var del_btn = vge('del_btn');
-	if (!del_btn)
-		throw 'Edit button not found';
+	var del_btn = vge('del_btn')
 
-	addResult('Edit button visibility on select one account', (edit_btn.style.display != 'none'));
-	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select one account', (edit_btn && edit_btn.style.display != 'none'));
+	addResult('Delete button visibility on select one account', (del_btn && del_btn.style.display != 'none'));
 
-	clickEmul(thirdTile.firstElementChild);
+	clickEmul(accTiles[2].elem.firstElementChild);
 
-	addResult('Edit button visibility on select one account', (edit_btn.style.display == 'none'));
-	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select one account', (edit_btn && edit_btn.style.display == 'none'));
+	addResult('Delete button visibility on select one account', (del_btn && del_btn.style.display != 'none'));
 
 	clickEmul(del_btn.firstElementChild);
 
@@ -696,40 +626,24 @@ function deleteFirstAndSecondAccounts()
 
 function checkDeleteAccounts()
 {
-	var tiles = vquery('.tiles');
-	if (!tiles)
-		throw 'Tiles list not found';
+	accTiles = parseTiles(vquery('.tiles'));
 
-	var tilesArr = parseTiles(tiles);
-
-	addResult('Accounts delete result', (tilesArr && tilesArr.length == 1));
-
-
-	var addBtn = vquery('#add_btn > a');
+	addResult('Accounts delete result', (accTiles && accTiles.length == 1));
 
 	continueWith(createAccountWithParam.bind(null, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount1_2));
-	clickEmul(addBtn);
+	clickEmul(vquery('#add_btn > a'));
 }
 
 
 function checkCreateAccount1_2()
 {
-	var addBtn = vquery('#add_btn > a');
-
-	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }, checkCreateAccount3_2));
-	clickEmul(addBtn);
-}
-
-
-function checkCreateAccount3_2()
-{
-	var elem = vquery('.page .header .logo > a');
-	if (!elem)
-		throw 'Link to main page not found';
-
-	continueWith(goToPersonsAndCreateNew);
-
-	clickEmul(elem);
+	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 },
+					function()
+					{
+						continueWith(goToPersonsAndCreateNew);
+						clickEmul(vquery('.page .header .logo > a'));
+					}));
+	clickEmul(vquery('#add_btn > a'));
 }
 
 
@@ -753,9 +667,9 @@ function goToCreatePerson1()
 	if (!add_btn)
 		throw 'New person button not found';
 
-	var tilesArr = vqueryall('.tiles .tile');
+	personTiles = parseTiles(vquery('.tiles'));
 
-	addResult('Initial persons structure', (tilesArr && tilesArr.length == 0));
+	addResult('Initial persons structure', (personTiles && personTiles.length == 0));
 
 	continueWith(createPerson1);
 	clickEmul(add_btn.firstElementChild);
