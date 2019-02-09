@@ -604,8 +604,8 @@ function deleteFirstAndSecondAccounts()
 
 	clickEmul(accTiles[2].elem.firstElementChild);
 
-	addResult('Edit button visibility on select one account', (edit_btn && edit_btn.style.display == 'none'));
-	addResult('Delete button visibility on select one account', (del_btn && del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select two accounts', (edit_btn && edit_btn.style.display == 'none'));
+	addResult('Delete button visibility on select two accounts', (del_btn && del_btn.style.display != 'none'));
 
 	clickEmul(del_btn.firstElementChild);
 
@@ -790,7 +790,47 @@ function updatePersonAndCheck(num, personName, callback)
 
 function updatePerson3()
 {
-	updatePersonAndCheck(3, 'Ivan<');
+	updatePersonAndCheck(3, 'Ivan<', deletePersons1and3);
+}
+
+
+function deletePersons1and3()
+{
+	if (personTiles.length != 4)
+		throw 'Wrong person number';
+
+	clickEmul(personTiles[0].elem.firstElementChild);
+
+	var edit_btn = vge('edit_btn');
+	var del_btn = vge('del_btn')
+
+	addResult('Edit button visibility on select one person', (edit_btn && edit_btn.style.display != 'none'));
+	addResult('Delete button visibility on select one person', (del_btn && del_btn.style.display != 'none'));
+
+	clickEmul(personTiles[2].elem.firstElementChild);
+
+	addResult('Edit button visibility on select two persons', (edit_btn && edit_btn.style.display == 'none'));
+	addResult('Delete button visibility on select two persons', (del_btn && del_btn.style.display != 'none'));
+
+	clickEmul(del_btn.firstElementChild);
+
+	var delete_warning = vge('delete_warning');
+	if (!delete_warning)
+		throw 'Delete warning not found';
+
+	addResult('Delete persons warning popup appear', (delete_warning.style.display != 'none'));
+
+	var okBtn = delete_warning.querySelector('.ok_btn');
+	if (!okBtn)
+		throw 'OK button not found';
+
+	continueWith(function()
+	{
+		personTiles = parseTiles(vquery('.tiles'));
+
+		addResult('Accounts delete result', (personTiles && personTiles.length == 2));
+	});
+	clickEmul(okBtn);
 }
 
 
