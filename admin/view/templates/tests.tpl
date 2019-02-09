@@ -12,6 +12,7 @@ onReady(initTests);
 			<div class="content">
 				<div class="content_wrap tests_content">
 					<div class="results">
+						<input id="startbtn" class="adm_act_btn" type="button" value="start">
 						<table><tbody id="restbl"></tbody></table>
 					</div>
 					<div class="testview"><iframe id="viewframe" src="http://jezve.net/money/"></div>

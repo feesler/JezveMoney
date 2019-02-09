@@ -65,12 +65,19 @@ function initTests()
 	if (!restbl)
 		throw 'Results table not found';
 
+	var startbtn = ge('startbtn');
+	if (!startbtn)
+		throw 'Start button not found';
+	startbtn.onclick = onStartClick;
+}
+
+
+function onStartClick()
+{
 	addResult('Test initialization', 'OK');
 
-	viewframe.src = 'http://jezve.net/money/';
-
-
 	continueWith(startTests);
+	viewframe.src = 'http://jezve.net/money/';
 }
 
 
