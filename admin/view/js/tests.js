@@ -49,6 +49,7 @@ function continueWith(callback)
 		if (!vdoc)
 			throw 'View document not found';
 
+		checkPHPerrors();
 		callback();
 	};
 }
@@ -69,6 +70,23 @@ function initTests()
 	if (!startbtn)
 		throw 'Start button not found';
 	startbtn.onclick = onStartClick;
+}
+
+
+function checkPHPerrors()
+{
+	var errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>'];
+
+	if (!vdoc || !vdoc.body)
+		return true;
+
+	var found = errSignatures.some(function(lookupStr)
+	{
+		return (vdoc.body.innerHTML.indexOf(lookupStr) !== -1);
+	});
+
+	if (found)
+		addResult('PHP error signature found', false);
 }
 
 
