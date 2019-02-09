@@ -19,6 +19,12 @@ function vquery(a)
 }
 
 
+function vqueryall(a)
+{
+	return (typeof a == 'string') ? vdoc.querySelectorAll(a) : a;
+}
+
+
 function clickEmul(elemObj)
 {
 	if (elemObj.click)
