@@ -676,88 +676,72 @@ function goToCreatePerson1()
 }
 
 
-function createPerson1()
+// From persons list page go to new person page, input name and submit
+// Next check name result and callback
+function createPersonAndCheck(personName, callback)
 {
+	var initLength = personTiles.length;
 	var pname = vge('pname');
 
 	addResult('Person name input found', pname);
 
-	pname.value = 'Alex';
+	pname.value = personName;
 	if (pname.oninput)
 		pname.oninput();
 
 	var ok_btn = vquery('.ok_btn');
 	addResult('Submit person button found', ok_btn);
 
-	continueWith(checkCreatePerson1);
+	continueWith(function()
+	{
+		personTiles = parseTiles(vquery('.tiles'));
+
+		addResult('Person create result', (personTiles && personTiles.length == initLength + 1 &&
+											personTiles[initLength] &&
+											personTiles[initLength].name == personName));
+
+		if (isFunction(callback))
+			callback();
+	});
 	clickEmul(ok_btn);
 }
 
 
-function checkCreatePerson1()
+function createPerson1()
 {
-	personTiles = parseTiles(vquery('.tiles'));
-
-	addResult('Person create result', (personTiles && personTiles.length == 1 &&
-										personTiles[0] &&
-										personTiles[0].name == 'Alex'));
-
-	continueWith(createPerson2);
-	clickEmul(vquery('#add_btn > a'));
+	createPersonAndCheck('Alex', function()
+	{
+		continueWith(createPerson2);
+		clickEmul(vquery('#add_btn > a'));
+	});
 }
 
 
 function createPerson2()
 {
-	var pname = vge('pname');
-
-	addResult('Person name input found', pname);
-
-	pname.value = 'Maria';
-	if (pname.oninput)
-		pname.oninput();
-
-	var ok_btn = vquery('.ok_btn');
-	addResult('Submit person button found', ok_btn);
-
-	continueWith(function()
+	createPersonAndCheck('Maria', function()
 	{
-		personTiles = parseTiles(vquery('.tiles'));
-
-		addResult('Person create result', (personTiles && personTiles.length == 2 &&
-											personTiles[1] &&
-											personTiles[1].name == 'Maria'));
-
 		continueWith(createPerson3);
 		clickEmul(vquery('#add_btn > a'));
 	});
-	clickEmul(ok_btn);
 }
 
 
 function createPerson3()
 {
-	var pname = vge('pname');
-
-	addResult('Person name input found', pname);
-
-	pname.value = 'Johnny';
-	if (pname.oninput)
-		pname.oninput();
-
-	var ok_btn = vquery('.ok_btn');
-	addResult('Submit person button found', ok_btn);
-
-	continueWith(function()
+	createPersonAndCheck('Johnny', function()
 	{
-		personTiles = parseTiles(vquery('.tiles'));
-
-		addResult('Person create result', (personTiles && personTiles.length == 3 &&
-											personTiles[2] &&
-											personTiles[2].name == 'Johnny'));
+		continueWith(createPerson4);
+		clickEmul(vquery('#add_btn > a'));
 	});
-	clickEmul(ok_btn);
 }
+
+
+function createPerson4()
+{
+	createPersonAndCheck('Иван');
+}
+
 
 
 function expenseTransactionStart()
