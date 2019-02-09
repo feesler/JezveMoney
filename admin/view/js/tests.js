@@ -266,14 +266,14 @@ function createAccount1()
 	if (!tileName)
 		throw 'On-tile name element not found';
 
-	addResult('New account page loaded', 'OK');
+	addResult('New account page loaded', true);
 
-	addResult('Initial account name on tile', (tileName.innerHTML == 'New account') ? 'OK' : 'FAIL');
-	addResult('Initial account balance on tile', (tileBal.innerHTML == '0 ₽') ? 'OK' : 'FAIL');
+	addResult('Initial account name on tile', (tileName.innerHTML == 'New account'));
+	addResult('Initial account balance on tile', (tileBal.innerHTML == '0 ₽'));
 
 	accname.value = 'acc_1';
 	accname.oninput();
-	addResult('Account tile name update', (accname.value == 'acc_1') ? 'OK' : 'FAIL');
+	addResult('Account tile name update', (accname.value == 'acc_1'));
 
 // Change currency
 	var currElem = vge('currency');
@@ -283,36 +283,36 @@ function createAccount1()
 	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist2_2'));	// select USD currency
 
-	addResult('Currency drop down value select', (ddCurrText.innerHTML == 'USD') ? 'OK' : 'FAIL');
-	addResult('Tile balance format update result', (tileBal.innerHTML == '$ 0') ? 'OK' : 'FAIL');
+	addResult('Currency drop down value select', (ddCurrText.innerHTML == 'USD'));
+	addResult('Tile balance format update result', (tileBal.innerHTML == '$ 0'));
 
 	balance.value = '100000.01';
 	balance.oninput();
-	addResult('Account tile balance on USD 100 000.01 balance input field', (tileBal.innerHTML == '$ 100 000.01') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on USD 100 000.01 balance input field', (tileBal.innerHTML == '$ 100 000.01'));
 
 // Change currency back
 	clickEmul(ddCurrInpCont.previousElementSibling);
 	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist2_1'));	// select RUB currency
 
-	addResult('Currency drop down value select back', (ddCurrText.innerHTML == 'RUB') ? 'OK' : 'FAIL');
-	addResult('Tile balance format after change currency back update result', (tileBal.innerHTML == '100 000.01 ₽') ? 'OK' : 'FAIL');
+	addResult('Currency drop down value select back', (ddCurrText.innerHTML == 'RUB'));
+	addResult('Tile balance format after change currency back update result', (tileBal.innerHTML == '100 000.01 ₽'));
 
 	balance.value = '';
 	balance.oninput();
-	addResult('Account tile balance on empty input field', (tileBal.innerHTML == '0 ₽') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on empty input field', (tileBal.innerHTML == '0 ₽'));
 
 	balance.value = '.';
 	balance.oninput();
-	addResult('Account tile balance on dot(.) input field', (tileBal.innerHTML == '0 ₽') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on dot(.) input field', (tileBal.innerHTML == '0 ₽'));
 
 	balance.value = '.01';
 	balance.oninput();
-	addResult('Account tile balance on RUB .01 balance input field', (tileBal.innerHTML == '0.01 ₽') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on RUB .01 balance input field', (tileBal.innerHTML == '0.01 ₽'));
 
 	balance.value = '10000000.01';
 	balance.oninput();
-	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (tileBal.innerHTML == '10 000 000.01 ₽') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (tileBal.innerHTML == '10 000 000.01 ₽'));
 
 // Change icon
 	var iconElem = vge('icon');
@@ -322,12 +322,12 @@ function createAccount1()
 	var ddIconText = ddIconInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist1_2'));	// select safe icon
 
-	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Safe') ? 'OK' : 'FAIL');
-	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'safe_icon')) ? 'OK' : 'FAIL');
+	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Safe'));
+	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'safe_icon')));
 
 	balance.value = '1000.01';
 	balance.oninput();
-	addResult('Account tile balance on RUB 1 000.01 balance input field', (tileBal.innerHTML == '1 000.01 ₽') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on RUB 1 000.01 balance input field', (tileBal.innerHTML == '1 000.01 ₽'));
 
 	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(checkCreateAccount1);
@@ -348,7 +348,7 @@ function checkCreateAccount1()
 						tilesArr[0].balance == '1 000.01 ₽' &&
 						tilesArr[0].name == 'acc_1')
 
-	addResult('First account create result', (submitRes) ? 'OK' : 'FAIL');
+	addResult('First account create result', submitRes);
 
 	firstAccount_id = tilesArr[0].id;
 
@@ -378,7 +378,7 @@ function createAccount2()
 // Input account name
 	accname.value = 'acc_2';
 	accname.oninput();
-	addResult('Account tile name update', (accname.value == 'acc_2') ? 'OK' : 'FAIL');
+	addResult('Account tile name update', (accname.value == 'acc_2'));
 
 // Change currency
 	var currElem = vge('currency');
@@ -388,12 +388,12 @@ function createAccount2()
 	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist2_3'));	// select EUR currency
 
-	addResult('EUR currency select result', (ddCurrText.innerHTML == 'EUR') ? 'OK' : 'FAIL');
-	addResult('Tile balance format update result', (tileBal.innerHTML == '€ 0') ? 'OK' : 'FAIL');
+	addResult('EUR currency select result', (ddCurrText.innerHTML == 'EUR'));
+	addResult('Tile balance format update result', (tileBal.innerHTML == '€ 0'));
 
 	balance.value = '1000.01';
 	balance.oninput();
-	addResult('Account tile balance on EUR 1 000.01 balance input field', (tileBal.innerHTML == '€ 1 000.01') ? 'OK' : 'FAIL');
+	addResult('Account tile balance on EUR 1 000.01 balance input field', (tileBal.innerHTML == '€ 1 000.01'));
 
 	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(checkCreateAccount2);
@@ -422,7 +422,7 @@ function checkCreateAccount2()
 	var submitRes = (tile.balance == '€ 1 000.01' &&
 						tile.name == 'acc_2')
 
-	addResult('Second account create result', (submitRes) ? 'OK' : 'FAIL');
+	addResult('Second account create result', submitRes);
 
 	var accTileBtn = tiles.firstElementChild.firstElementChild;
 
@@ -457,8 +457,8 @@ function editAccount1()
 
 	addResult('Edit account page loaded', 'OK');
 
-	addResult('Edit account name on tile', (tileName.innerHTML == 'acc_1') ? 'OK' : 'FAIL');
-	addResult('Edit account balance on tile', (tileBal.innerHTML == '1 000.01 ₽') ? 'OK' : 'FAIL');
+	addResult('Edit account name on tile', (tileName.innerHTML == 'acc_1'));
+	addResult('Edit account balance on tile', (tileBal.innerHTML == '1 000.01 ₽'));
 
 
 // Change currency
@@ -470,8 +470,8 @@ function editAccount1()
 	clickEmul(vge('ddlist2_2'));	// select USD currency
 
 	var fmtBal = formatCurrency(1000.01, 2);
-	addResult('USD currency select result', (ddCurrText.innerHTML == 'USD') ? 'OK' : 'FAIL');
-	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal) ? 'OK' : 'FAIL');
+	addResult('USD currency select result', (ddCurrText.innerHTML == 'USD'));
+	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
 
 // Change icon
 	var iconElem = vge('icon');
@@ -481,8 +481,8 @@ function editAccount1()
 	var ddIconText = ddIconInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist1_1'));	// select purse icon
 
-	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Purse') ? 'OK' : 'FAIL');
-	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'purse_icon')) ? 'OK' : 'FAIL');
+	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Purse'));
+	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'purse_icon')));
 
 // Submit
 	continueWith(checkEditAccount1);
@@ -517,7 +517,7 @@ function checkEditAccount1()
 						firstTile.name == 'acc_1' &&
 						hasClass(firstTile.elem, ['tile_icon', 'purse_icon']))
 
-	addResult('First account update result', (submitRes) ? 'OK' : 'FAIL');
+	addResult('First account update result', submitRes);
 
 	var addBtn = vquery('#add_btn > a');
 
@@ -548,7 +548,7 @@ function createAccountWithParam(params, callback)
 // Input account name
 	accname.value = params.name;
 	accname.oninput();
-	addResult('Account tile name update', (accname.value == params.name) ? 'OK' : 'FAIL');
+	addResult('Account tile name update', (accname.value == params.name));
 
 // Change currency
 	var currElem = vge('currency');
@@ -558,15 +558,15 @@ function createAccountWithParam(params, callback)
 	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
 	clickEmul(vge('ddlist2_' + currObj.id));
 
-	addResult(currObj.name + ' currency select result', (ddCurrText.innerHTML == currObj.name) ? 'OK' : 'FAIL');
+	addResult(currObj.name + ' currency select result', (ddCurrText.innerHTML == currObj.name));
 	var fmtBal = formatCurrency(0, currObj.id);
-	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal) ? 'OK' : 'FAIL');
+	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
 
 // Input balance
 	balance.value = params.balance;
 	balance.oninput();
 	fmtBal = formatCurrency(normBalance, currObj.id);
-	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal) ? 'OK' : 'FAIL');
+	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
 
 // Change icon
 	if (params.icon)
@@ -578,11 +578,11 @@ function createAccountWithParam(params, callback)
 
 		clickEmul(ddIconInpCont.previousElementSibling);
 		var ddIconText = ddIconInpCont.querySelector('.statsel');
-		clickEmul(vge('ddlist1_' + params.icon));	// select purse icon
+		clickEmul(vge('ddlist1_' + params.icon));
 
-		addResult('Icon drop down value select', (ddIconText.innerHTML == icons[params.icon]) ? 'OK' : 'FAIL');
+		addResult('Icon drop down value select', (ddIconText.innerHTML == icons[params.icon]));
 		var iconClass = tileIconClass[params.icon];
-		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)) ? 'OK' : 'FAIL');
+		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)));
 	}
 
 
@@ -627,7 +627,7 @@ function checkCreateAccount3()
 						thirdTile.name == 'acc_3' &&
 						hasClass(thirdTile.elem, ['tile_icon', 'safe_icon']))
 
-	addResult('Third account create result', (submitRes) ? 'OK' : 'FAIL');
+	addResult('Third account create result', submitRes);
 
 	deleteFirstAndSecondAccounts();
 }
@@ -651,13 +651,13 @@ function deleteFirstAndSecondAccounts()
 	if (!del_btn)
 		throw 'Edit button not found';
 
-	addResult('Edit button visibility on select one account', (edit_btn.style.display != 'none') ? 'OK' : 'FAIL');
-	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none') ? 'OK' : 'FAIL');
+	addResult('Edit button visibility on select one account', (edit_btn.style.display != 'none'));
+	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none'));
 
 	clickEmul(thirdTile.firstElementChild);
 
-	addResult('Edit button visibility on select one account', (edit_btn.style.display == 'none') ? 'OK' : 'FAIL');
-	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none') ? 'OK' : 'FAIL');
+	addResult('Edit button visibility on select one account', (edit_btn.style.display == 'none'));
+	addResult('Delete button visibility on select one account', (del_btn.style.display != 'none'));
 
 	clickEmul(del_btn.firstElementChild);
 
@@ -665,7 +665,7 @@ function deleteFirstAndSecondAccounts()
 	if (!delete_warning)
 		throw 'Delete warning not found';
 
-	addResult('Delete account warning popup appear', (delete_warning.style.display != 'none') ? 'OK' : 'FAIL');
+	addResult('Delete account warning popup appear', (delete_warning.style.display != 'none'));
 
 	var okBtn = delete_warning.querySelector('.ok_btn');
 	if (!okBtn)
@@ -684,7 +684,7 @@ function checkDeleteAccounts()
 
 	var tilesArr = parseTiles(tiles);
 
-	addResult('Accounts delete result', (tilesArr && tilesArr.length == 1) ? 'OK' : 'FAIL');
+	addResult('Accounts delete result', (tilesArr && tilesArr.length == 1));
 
 
 	var addBtn = vquery('#add_btn > a');
@@ -737,7 +737,7 @@ function goToCreatePerson1()
 
 	var tilesArr = vqueryall('.tiles .tile');
 
-	addResult('Initial persons structure', (tilesArr && tilesArr.length == 0) ? 'OK' : 'FAIL');
+	addResult('Initial persons structure', (tilesArr && tilesArr.length == 0));
 
 	continueWith(createPerson1);
 	clickEmul(add_btn.firstElementChild);
@@ -748,14 +748,14 @@ function createPerson1()
 {
 	var pname = vge('pname');
 
-	addResult('Person name input found', (pname) ? 'OK' : 'FAIL');
+	addResult('Person name input found', pname);
 
 	pname.value = 'Alex';
 	if (pname.oninput)
 		pname.oninput();
 
 	var ok_btn = vquery('.ok_btn');
-	addResult('Submit person button found', (ok_btn) ? 'OK' : 'FAIL');
+	addResult('Submit person button found', ok_btn);
 
 	continueWith(checkCreatePerson1);
 	clickEmul(ok_btn);
@@ -766,13 +766,12 @@ function checkCreatePerson1()
 {
 	var tilesArr = vqueryall('.tiles .tile');
 
-	addResult('Person tiles structure', (tilesArr && tilesArr.length == 1) ? 'OK' : 'FAIL');
+	addResult('Person tiles structure', (tilesArr && tilesArr.length == 1));
 
 	var tile = tilesArr[0];
-
 	var personName = tile.querySelector('.acc_name');
 
-	addResult('Person create result', (personName && personName.innerHTML == 'Alex') ? 'OK' : 'FAIL');
+	addResult('Person create result', (personName && personName.innerHTML == 'Alex'));
 }
 
 
