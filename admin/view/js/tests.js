@@ -696,14 +696,67 @@ function createPerson1()
 
 function checkCreatePerson1()
 {
-	var tilesArr = vqueryall('.tiles .tile');
+	personTiles = parseTiles(vquery('.tiles'));
 
-	addResult('Person tiles structure', (tilesArr && tilesArr.length == 1));
+	addResult('Person create result', (personTiles && personTiles.length == 1 &&
+										personTiles[0] &&
+										personTiles[0].name == 'Alex'));
 
-	var tile = tilesArr[0];
-	var personName = tile.querySelector('.acc_name');
+	continueWith(createPerson2);
+	clickEmul(vquery('#add_btn > a'));
+}
 
-	addResult('Person create result', (personName && personName.innerHTML == 'Alex'));
+
+function createPerson2()
+{
+	var pname = vge('pname');
+
+	addResult('Person name input found', pname);
+
+	pname.value = 'Maria';
+	if (pname.oninput)
+		pname.oninput();
+
+	var ok_btn = vquery('.ok_btn');
+	addResult('Submit person button found', ok_btn);
+
+	continueWith(function()
+	{
+		personTiles = parseTiles(vquery('.tiles'));
+
+		addResult('Person create result', (personTiles && personTiles.length == 2 &&
+											personTiles[1] &&
+											personTiles[1].name == 'Maria'));
+
+		continueWith(createPerson3);
+		clickEmul(vquery('#add_btn > a'));
+	});
+	clickEmul(ok_btn);
+}
+
+
+function createPerson3()
+{
+	var pname = vge('pname');
+
+	addResult('Person name input found', pname);
+
+	pname.value = 'Johnny';
+	if (pname.oninput)
+		pname.oninput();
+
+	var ok_btn = vquery('.ok_btn');
+	addResult('Submit person button found', ok_btn);
+
+	continueWith(function()
+	{
+		personTiles = parseTiles(vquery('.tiles'));
+
+		addResult('Person create result', (personTiles && personTiles.length == 3 &&
+											personTiles[2] &&
+											personTiles[2].name == 'Johnny'));
+	});
+	clickEmul(ok_btn);
 }
 
 
