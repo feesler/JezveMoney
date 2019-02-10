@@ -189,15 +189,19 @@ function resetAll()
 	if (!elem)
 		throw 'Confirm button not found';
 
-	continueWith(goToMainPage);
+	continueWith(goToMainPage.bind(null, goToAccountsAndCreateNew));
 
 	clickEmul(elem);
 }
 
 
-function goToMainPage()
+function goToMainPage(callback)
 {
-	continueWith(goToAccountsAndCreateNew);
+	continueWith(function()
+	{
+		mainPageWidgets = parseMainPageWidgets();
+		callback();
+	});
 	clickEmul(vquery('.page .header .logo > a'));
 }
 
