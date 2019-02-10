@@ -29,18 +29,16 @@
 					<div class="widget">
 						<div class="widget_title"><span>Total</span></div>
 						<div class="info_tiles">
-							<div>
 <?php	if (!count($tilesArr)) {	?>
-								<span>You have no one account. Please create one.</span>
+							<span>You have no one account. Please create one.</span>
 <?php	} else {	?>
 <?php		foreach($totalsArr as $curr_id => $currData) {	?>
-								<div class="info_tile">
-									<span class="info_title"><?=$currData["name"]?></span>
-									<span class="info_subtitle"><?=$currData["balfmt"]?></span>
-								</div>
+							<div class="info_tile">
+								<span class="info_title"><?=$currData["name"]?></span>
+								<span class="info_subtitle"><?=$currData["balfmt"]?></span>
+							</div>
 <?php		}	?>
 <?php	}	?>
-							</div>
 						</div>
 					</div>
 
@@ -73,22 +71,20 @@
 					<div class="widget">
 						<div class="widget_title"><a href="<?=BASEURL?>persons/"><span>Persons</span><div class="glyph"></div></a></div>
 						<div class="info_tiles">
-							<div>
 <?php	if (!count($persArr)) {		?>
-								<span>No persons here.</span>
+							<span>No persons here.</span>
 <?php	} else {	?>
 <?php		foreach($persArr as $pData) {	?>
-								<div class="info_tile">
-									<span class="info_title"><?=$pData->name?></span>
+							<div class="info_tile">
+								<span class="info_title"><?=$pData->name?></span>
 <?php			if ($pData->nodebts) {		?>
-									<span class="info_subtitle">No debts</span>
+								<span class="info_subtitle">No debts</span>
 <?php			} else {	?>
-									<span class="info_subtitle"><?=implode("<br>", $pData->balfmt)?></span>
+								<span class="info_subtitle"><?=implode("<br>", $pData->balfmt)?></span>
 <?php			}	?>
-								</div>
+							</div>
 <?php		}	?>
 <?php	}	?>
-							</div>
 						</div>
 					</div>
 
