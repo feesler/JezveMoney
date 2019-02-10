@@ -280,6 +280,40 @@ function parseInfoTiles(tilesEl)
 }
 
 
+function parseMainPageWidgets()
+{
+	var widgetsElem = vqueryall('.content_wrap .widget');
+	if (!widgetsElem)
+		throw 'Fail to parse main page widgets';
+
+	var res = [];
+	for(var i = 0; i < widgetsElem.length; i++)
+	{
+		var widget = { elem : widgetsElem[i],
+						titleElem : widgetsElem[i].querySelector('.widget_title'),
+						linkElem : widgetsElem[i].querySelector('.widget_title > a'),
+						textElem : widgetsElem[i].querySelector('.widget_title span') };
+
+		if (widget.linkElem)
+			widget.link = widget.linkElem.href;
+		if (widget.textElem)
+			widget.title = widget.textElem.innerHTML;
+
+		var tiles = parseTiles(widget.elem.querySelector('.tiles'));
+		if (tiles)
+			widget.tiles = tiles;
+		tiles = parseInfoTiles(widget.elem.querySelector('.info_tiles'));
+		if (tiles)
+			widget.infoTiles = tiles;
+
+		res.push(widget);
+	}
+
+	return res;
+}
+
+
+
 function goToAccountsAndCreateNew()
 {
 	var elem;
