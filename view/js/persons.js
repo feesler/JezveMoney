@@ -1,4 +1,4 @@
-var persons = new Selection();
+var persons = null;
 var dwPopup = null;		// delete warning popup
 
 
@@ -53,40 +53,11 @@ function onTileClick(p_id)
 }
 
 
-// New person form submit event handler
-function onNewPersonSubmit(frm)
+// Person form submit event handler
+function onPersonSubmit(frm)
 {
-	var p_name;
-
-	if (!frm)
-		return false;
-
-	p_name = ge('pname');
+	var p_name = ge('pname');
 	if (!p_name)
-		return false;
-
-	if (!p_name.value || p_name.value == '')
-	{
-		alert('Please input person name.');
-		p_name.focus();
-		return false;
-	}
-
-	return true;
-}
-
-
-// Edit person form submit event handler
-function onEditPersonSubmit(frm)
-{
-	var pid, p_name;
-
-	if (!frm)
-		return false;
-
-	pid = ge('pid');
-	p_name = ge('pname');
-	if (!pid || !p_name)
 		return false;
 
 	if (!p_name.value || p_name.value == '')
@@ -156,4 +127,21 @@ function showDeletePopup()
 	dwPopup.setContent((multi) ? multiPersonsDeleteMsg : singlePersonDeleteMsg);
 
 	dwPopup.show();
+}
+
+
+function initControls()
+{
+	var personForm = ge('personForm');
+	if (!personForm)
+		return;
+
+	personForm.onsubmit = onPersonSubmit;
+}
+
+
+function initPersonsList()
+{
+	initToolbar();
+	persons = new Selection();
 }

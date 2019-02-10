@@ -3,6 +3,8 @@
 <script>
 	var person_id = <?=$p_id?>;
 	var personName = <?=f_json_encode($pName)?>;
+
+	onReady(initControls);
 </script>
 <?php	}	?>
 </head>
@@ -20,7 +22,7 @@
 <?php	}	?>
 					</div>
 					<div>
-						<form method="post" action="<?=BASEURL?>persons/<?=$action?>/" onsubmit="<?=$submitHandler?>">
+						<form id="personForm" method="post" action="<?=BASEURL?>persons/<?=$action?>/">
 <?php	if ($action == "edit") {		?>
 						<input id="pid" name="pid" type="hidden" value="<?=$p_id?>">
 <?php	}	?>

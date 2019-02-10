@@ -46,8 +46,6 @@ class PersonsController extends Controller
 		$headString = "New person";
 		$titleString .= $headString;
 
-		$submitHandler = "return onNewPersonSubmit(this);";
-
 		array_push($this->css->libs, "iconlink.css", "tiles.css");
 		$this->buildCSS();
 		array_push($this->jsArr, "persons.js");
@@ -84,8 +82,6 @@ class PersonsController extends Controller
 		$titleString = "Jezve Money | ";
 		$headString = "Edit person";
 		$titleString .= $headString;
-
-		$submitHandler = "return onEditPersonSubmit(this);";
 
 		array_push($this->css->libs, "iconlink.css", "tiles.css");
 		$this->buildCSS();
