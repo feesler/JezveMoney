@@ -487,7 +487,7 @@ function editAccount1()
 	clickEmul(vge('ddlist1_1'));	// select purse icon
 
 	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Purse'));
-	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'purse_icon')));
+	addResult('Tile icon update result', hasClass(vge('acc_tile'), 'purse_icon'));
 
 // Submit
 	continueWith(checkEditAccount1);
@@ -599,21 +599,18 @@ function deleteFirstAndSecondAccounts()
 	var edit_btn = vge('edit_btn');
 	var del_btn = vge('del_btn')
 
-	addResult('Edit button visibility on select one account', (edit_btn && edit_btn.style.display != 'none'));
-	addResult('Delete button visibility on select one account', (del_btn && del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select one account', isVisible(edit_btn));
+	addResult('Delete button visibility on select one account', isVisible(del_btn));
 
 	clickEmul(accTiles[2].elem.firstElementChild);
 
-	addResult('Edit button visibility on select two accounts', (edit_btn && edit_btn.style.display == 'none'));
-	addResult('Delete button visibility on select two accounts', (del_btn && del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select two accounts', isVisible(edit_btn));
+	addResult('Delete button visibility on select two accounts', isVisible(del_btn));
 
 	clickEmul(del_btn.firstElementChild);
 
 	var delete_warning = vge('delete_warning');
-	if (!delete_warning)
-		throw 'Delete warning not found';
-
-	addResult('Delete account warning popup appear', (delete_warning.style.display != 'none'));
+	addResult('Delete account warning popup appear', isVisible(delete_warning));
 
 	var okBtn = delete_warning.querySelector('.ok_btn');
 	if (!okBtn)
@@ -755,8 +752,8 @@ function updatePersonAndCheck(num, personName, callback)
 	var edit_btn = vge('edit_btn');
 	var del_btn = vge('del_btn')
 
-	addResult('Edit button visibility on select one person', (edit_btn && edit_btn.style.display != 'none'));
-	addResult('Delete button visibility on select one person', (del_btn && del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select one person', isVisible(edit_btn));
+	addResult('Delete button visibility on select one person', isVisible(del_btn));
 
 	continueWith(function()
 	{
@@ -804,13 +801,13 @@ function deletePersons1and3()
 	var edit_btn = vge('edit_btn');
 	var del_btn = vge('del_btn')
 
-	addResult('Edit button visibility on select one person', (edit_btn && edit_btn.style.display != 'none'));
-	addResult('Delete button visibility on select one person', (del_btn && del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select one person', isVisible(edit_btn));
+	addResult('Delete button visibility on select one person', isVisible(del_btn));
 
 	clickEmul(personTiles[2].elem.firstElementChild);
 
-	addResult('Edit button visibility on select two persons', (edit_btn && edit_btn.style.display == 'none'));
-	addResult('Delete button visibility on select two persons', (del_btn && del_btn.style.display != 'none'));
+	addResult('Edit button visibility on select two persons', !isVisible(edit_btn));
+	addResult('Delete button visibility on select two persons', isVisible(del_btn));
 
 	clickEmul(del_btn.firstElementChild);
 
@@ -818,7 +815,7 @@ function deletePersons1and3()
 	if (!delete_warning)
 		throw 'Delete warning not found';
 
-	addResult('Delete persons warning popup appear', (delete_warning.style.display != 'none'));
+	addResult('Delete persons warning popup appear', isVisible(delete_warning));
 
 	var okBtn = delete_warning.querySelector('.ok_btn');
 	if (!okBtn)
