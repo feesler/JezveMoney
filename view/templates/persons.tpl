@@ -1,7 +1,7 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
 <script>
-	onReady(initToolbar);
+	onReady(initPersonsList);
 </script>
 </head>
 <body>
