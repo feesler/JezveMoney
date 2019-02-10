@@ -202,46 +202,63 @@ function goToMainPage()
 }
 
 
+function parseId(id)
+{
+	if (typeof id !== 'string')
+		return id;
+
+	var pos = id.indexOf('_');
+	return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
+}
+
+
 function parseTile(tileEl)
 {
-	if (!tileEl)
-		return null;
-
-	var tileObj = {};
-
-	if (!hasClass(tileEl, 'tile'))
+	if (!tileEl || !hasClass(tileEl, 'tile'))
 		throw 'Wrong tile structure';
 
-	tileObj.elem = tileEl;
+	var tileObj = { elem : tileEl, linkElem : tileEl.firstElementChild,
+					balanceEL : tileEl.querySelector('.acc_bal'),
+					nameEL : tileEl.querySelector('.acc_name') };
 
-	var pos = tileEl.id.indexOf('_');
-	if (pos == -1)
-		tileObj.id == tileEl.id;
-	else
-		tileObj.id = parseInt(tileEl.id.substr(pos + 1));
-	if (!tileEl.firstElementChild || !tileEl.firstElementChild.firstElementChild || !tileEl.firstElementChild.firstElementChild.firstElementChild)
-		throw 'Wrong tile structure';
-	tileObj.balanceEL = tileEl.firstElementChild.firstElementChild.firstElementChild;
+	tileObj.id = parseId(tileEl.id);
 	tileObj.balance = tileObj.balanceEL.innerText;
-	if (!tileObj.balanceEL.nextElementSibling)
-		throw 'Wrong tile structure';
-	tileObj.nameEL = tileObj.balanceEL.nextElementSibling;
 	tileObj.name = tileObj.nameEL.innerText;
 
 	return tileObj;
 }
 
 
-function parseTiles(tilesEl)
+function parseInfoTile(tileEl)
 {
-	var res = [], tileObj;
+	if (!tileEl || !hasClass(tileEl, 'info_tile'))
+		throw 'Wrong info tile structure';
 
+	var tileObj = { elem : tileEl,
+					titleEl : tileEl.querySelector('.info_title'),
+					subtitleEl : tileEl.querySelector('.info_subtitle') };
+
+	tileObj.id = parseId(tileEl.id);
+	tileObj.title = tileObj.titleEl.innerHTML;
+	tileObj.subtitle = tileObj.subtitleEl.innerHTML;
+
+	return tileObj;
+}
+
+
+function parseTiles(tilesEl, parseCallback)
+{
+	if (!tilesEl)
+		return null;
+
+	var res = [];
 	if (!tilesEl || (tilesEl.children.length == 1 && tilesEl.children[0].tagName == 'SPAN'))
 		return res;
 
+	var callback = parseCallback || parseTile;
 	for(var i = 0; i < tilesEl.children.length; i++)
 	{
-		tileObj = parseTile(tilesEl.children[i]);
+		var tileObj = callback(tilesEl.children[i]);
 		if (!tileObj)
 			throw 'Fail to parse tile';
 
@@ -254,6 +271,12 @@ function parseTiles(tilesEl)
 	});
 
 	return res;
+}
+
+
+function parseInfoTiles(tilesEl)
+{
+	return parseTiles(tilesEl, parseInfoTile);
 }
 
 
