@@ -1,6 +1,7 @@
 var viewframe = null;
 var vdoc = null;
 var restbl = null;
+var mainPageWidgets = null;
 var accTiles = [];
 var personTiles = [];
 var tileIconClass = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
