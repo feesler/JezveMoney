@@ -905,5 +905,5 @@ function expenseTransactionStart()
 function addResult(descr, res)
 {
 	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
-										ce('td', { innerHTML : res }) ]));
+										ce('td', { innerHTML : (res ? 'OK' : 'FAIL' ) }) ]));
 }
