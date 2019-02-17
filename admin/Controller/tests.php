@@ -8,6 +8,8 @@ class TestsAdminController extends Controller
 
 		$titleString = "Admin panel | Tests";
 
+		$menuItems["tests"]["active"] = TRUE;
+
 		$currMod = new CurrencyModel();
 		$currArr = $currMod->getArray();
 

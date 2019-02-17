@@ -5,25 +5,55 @@
 
 
 .results,
-.testview
+.testview,
+.ph
 {
 	display: inline-block;
 	float: left;
-	width: 50%;
 	height: 100%;
 }
 
 
-.results > table
+.controls
+{
+	padding: 0px 0px 10px 0px;
+}
+
+
+.results
+{
+	width: 40%;
+}
+
+
+.tbl_container
+{
+	max-height: 700px;
+	overflow-y: auto;
+}
+
+.results table
 {
 	border-collapse: collapse;
 }
 
 
-.results > table td
+.results td
 {
 	border: 1px solid #000000;
 	padding: 5px;
+}
+
+
+.ph
+{
+	width: 10%;
+}
+
+
+.testview
+{
+	width: 50%;
 }
 
 
