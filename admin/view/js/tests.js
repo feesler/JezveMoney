@@ -666,7 +666,7 @@ function deleteFirstAndSecondAccounts()
 
 	clickEmul(accTiles[2].elem.firstElementChild);
 
-	addResult('Edit button visibility on select two accounts', isVisible(edit_btn));
+	addResult('Edit button visibility on select two accounts', !isVisible(edit_btn));
 	addResult('Delete button visibility on select two accounts', isVisible(del_btn));
 
 	clickEmul(del_btn.firstElementChild);
