@@ -931,7 +931,7 @@ function parseTileRightItem(elem)
 	if (!elem || !elem.firstElementChild || !elem.firstElementChild.nextElementSibling || !elem.firstElementChild.nextElementSibling.firstElementChild)
 		return null;
 
-	var res = {};
+	var res = { elem : elem };
 	res.titleElem = elem.firstElementChild;
 	res.title = res.titleElem.innerHTML;
 	res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
@@ -1051,6 +1051,29 @@ function expenseTransactionStart()
 	addResult('Source tile account balance', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	addResult('Destination tile block is invisible', (!trPage.destination || !isVisible(trPage.destination.elem)));
+
+	addResult('Right to the tile source result balance block is visible',
+				(trPage.src_res_balance_left && trPage.src_res_balance_left.elem && isVisible(trPage.src_res_balance_left.elem)));
+	addResult('Right to the tile source result balance value', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '500.99 ₽'));
+
+
+	addResult('Source amount input is invisible', (trPage.src_amount_row && trPage.src_amount_row.elem && !isVisible(trPage.src_amount_row.elem)));
+	addResult('Destination amount input is visible', (trPage.dest_amount_row && trPage.dest_amount_row.elem && isVisible(trPage.dest_amount_row.elem)));
+	addResult('Destination amount currency select is active', (trPage.dest_amount_row && trPage.dest_amount_row.isCurrActive));
+	addResult('Destination amount currency sign', (trPage.dest_amount_row && trPage.dest_amount_row.currSign == '₽'));
+
+	addResult('Exchange rate input is invisible', (trPage.exchanget_row && trPage.exchanget_row.elem && !isVisible(trPage.exchanget_row.elem)));
+	addResult('Source result balance input is invisible', (trPage.result_balance_row && trPage.result_balance_row.elem && !isVisible(trPage.result_balance_row.elem)));
+	addResult('Destination result balance input is invisible', (!trPage.result_balance_dest_row || !isVisible(trPage.result_balance_dest_row.elem)));
+
+	trPage.dest_amount_row.valueInput.value = '1';
+	trPage.dest_amount_row.valueInput.oninput();
+
+	trPage = parseTransactionPage();
+
+	addResult('Destination amount (1) input result', (trPage.dest_amount_row.value == '1'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
+	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 }
 
 
