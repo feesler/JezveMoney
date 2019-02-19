@@ -41,6 +41,14 @@ function clickEmul(elemObj)
 }
 
 
+function inputEmul(elemObj, val)
+{
+	elemObj.value = val;
+	if (elemObj.oninput)
+		elemObj.oninput();
+}
+
+
 function continueWith(callback)
 {
 	viewframe.onload = function()
@@ -361,8 +369,7 @@ function createAccount1()
 	addResult('Initial account name on tile', (tileName.innerHTML == 'New account'));
 	addResult('Initial account balance on tile', (tileBal.innerHTML == '0 ₽'));
 
-	accname.value = 'acc_1';
-	accname.oninput();
+	inputEmul(accname, 'acc_1');
 	addResult('Account tile name update', (accname.value == 'acc_1'));
 
 // Change currency
@@ -376,8 +383,7 @@ function createAccount1()
 	addResult('Currency drop down value select', (ddCurrText.innerHTML == 'USD'));
 	addResult('Tile balance format update result', (tileBal.innerHTML == '$ 0'));
 
-	balance.value = '100000.01';
-	balance.oninput();
+	inputEmul(balance, '100000.01');
 	addResult('Account tile balance on USD 100 000.01 balance input field', (tileBal.innerHTML == '$ 100 000.01'));
 
 // Change currency back
@@ -388,20 +394,16 @@ function createAccount1()
 	addResult('Currency drop down value select back', (ddCurrText.innerHTML == 'RUB'));
 	addResult('Tile balance format after change currency back update result', (tileBal.innerHTML == '100 000.01 ₽'));
 
-	balance.value = '';
-	balance.oninput();
+	inputEmul(balance, '');
 	addResult('Account tile balance on empty input field', (tileBal.innerHTML == '0 ₽'));
 
-	balance.value = '.';
-	balance.oninput();
+	inputEmul(balance, '.');
 	addResult('Account tile balance on dot(.) input field', (tileBal.innerHTML == '0 ₽'));
 
-	balance.value = '.01';
-	balance.oninput();
+	inputEmul(balance, '.01');
 	addResult('Account tile balance on RUB .01 balance input field', (tileBal.innerHTML == '0.01 ₽'));
 
-	balance.value = '10000000.01';
-	balance.oninput();
+	inputEmul(balance, '10000000.01');
 	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (tileBal.innerHTML == '10 000 000.01 ₽'));
 
 // Change icon
@@ -415,8 +417,7 @@ function createAccount1()
 	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Safe'));
 	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'safe_icon')));
 
-	balance.value = '1000.01';
-	balance.oninput();
+	inputEmul(balance, '1000.01');
 	addResult('Account tile balance on RUB 1 000.01 balance input field', (tileBal.innerHTML == '1 000.01 ₽'));
 
 	var submitBtn = vquery('.acc_controls .ok_btn');
@@ -458,8 +459,7 @@ function createAccount2()
 		throw 'On-tile name element not found';
 
 // Input account name
-	accname.value = 'acc_2';
-	accname.oninput();
+	inputEmul(accname, 'acc_2');
 	addResult('Account tile name update', (accname.value == 'acc_2'));
 
 // Change currency
@@ -473,8 +473,7 @@ function createAccount2()
 	addResult('EUR currency select result', (ddCurrText.innerHTML == 'EUR'));
 	addResult('Tile balance format update result', (tileBal.innerHTML == '€ 0'));
 
-	balance.value = '1000.01';
-	balance.oninput();
+	inputEmul(balance, '1000.01');
 	addResult('Account tile balance on EUR 1 000.01 balance input field', (tileBal.innerHTML == '€ 1 000.01'));
 
 	var submitBtn = vquery('.acc_controls .ok_btn');
@@ -593,8 +592,7 @@ function createAccountWithParam(params, callback)
 	var balance = vge('balance');
 
 // Input account name
-	accname.value = params.name;
-	accname.oninput();
+	inputEmul(accname, params.name);
 	addResult('Account tile name update', (accname.value == params.name));
 
 // Change currency
@@ -610,8 +608,7 @@ function createAccountWithParam(params, callback)
 	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
 
 // Input balance
-	balance.value = params.balance;
-	balance.oninput();
+	inputEmul(balance, params.balance);
 	fmtBal = formatCurrency(normBalance, currObj.id);
 	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
 
@@ -744,9 +741,7 @@ function createPersonAndCheck(personName, callback)
 
 	addResult('Person name input found', pname);
 
-	pname.value = personName;
-	if (pname.oninput)
-		pname.oninput();
+	inputEmul(pname, personName);
 
 	var ok_btn = vquery('.ok_btn');
 	addResult('Submit person button found', ok_btn);
@@ -823,9 +818,7 @@ function updatePersonAndCheck(num, personName, callback)
 
 		addResult('Person name input found', pname);
 
-		pname.value = personName;
-		if (pname.oninput)
-			pname.oninput();
+		inputEmul(pname, personName);
 
 		var ok_btn = vquery('.ok_btn');
 		addResult('Submit person button found', ok_btn);
@@ -1066,8 +1059,7 @@ function expenseTransactionStart()
 	addResult('Source result balance input is invisible', (trPage.result_balance_row && trPage.result_balance_row.elem && !isVisible(trPage.result_balance_row.elem)));
 	addResult('Destination result balance input is invisible', (!trPage.result_balance_dest_row || !isVisible(trPage.result_balance_dest_row.elem)));
 
-	trPage.dest_amount_row.valueInput.value = '1';
-	trPage.dest_amount_row.valueInput.oninput();
+	inputEmul(trPage.dest_amount_row.valueInput, '1');
 
 	trPage = parseTransactionPage();
 
