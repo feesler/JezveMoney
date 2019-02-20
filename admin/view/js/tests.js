@@ -326,6 +326,103 @@ function parseMainPageWidgets()
 }
 
 
+function parseDropDown(elem)
+{
+	var res = { elem : elem };
+	if (!res.elem || (!hasClass(res.elem, 'dd_container') && !hasClass(res.elem, 'dd_attached')))
+		throw 'Wrong drop down element';
+
+	res.isAttached = hasClass(res.elem, 'dd_attached');
+	if (res.isAttached)
+		res.selectBtn = res.elem.firstElementChild;
+	else
+		res.selectBtn = res.elem.querySelector('button.selectBtn');
+	if (!res.selectBtn)
+		throw 'Select button not found';
+
+	if (!res.isAttached)
+	{
+		res.statSel = res.elem.querySelector('.dd_input_cont span.statsel');
+		if (!res.statSel)
+			throw 'Static select element not found';
+		res.input = res.elem.querySelector('.dd_input_cont input');
+		if (!res.input)
+			throw 'Input element not found';
+
+		res.editable = isVisible(res.input);
+		res.textValue = (res.editable) ? res.input.value : res.statSel.innerHTML;
+	}
+
+	res.selectElem = res.elem.querySelector('select');
+
+	res.listContainer = res.elem.querySelector('.ddlist');
+	if (res.listContainer)
+	{
+		var listItems = res.elem.querySelectorAll('.ddlist li > div');
+		res.items = [];
+		for(var i = 0; i < listItems.length; i++)
+		{
+			var li = listItems[i];
+			var itemObj = { id : parseId(li.id), text : li.innerHTML, elem : li };
+
+			res.items.push(itemObj);
+		}
+	}
+
+	res.selectByValue = function(val)
+	{
+		clickEmul(this.selectBtn);
+		var li = idSearch(this.items, val);
+		if (!li)
+			throw 'List item not found';
+		clickEmul(li.elem);
+	};
+
+	return res;
+}
+
+
+function parseAccountPage()
+{
+	var res = {};
+
+	res.headingElem = vquery('.heading > h1');
+	if (!res.headingElem)
+		throw 'Heading element not found';
+	res.heading = res.headingElem.innerHTML;
+
+	res.tile = parseTile(vge('acc_tile'));
+
+	res.formElem = vquery('form');
+	if (!res.formElem)
+		throw 'Form element not found';
+
+	res.isEdit = (res.formElem.firstElementChild.id == 'accid');
+
+	var elem = res.formElem.firstElementChild.nextElementSibling;
+	if (res.isEdit)
+		elem = elem.nextElementSibling;
+	res.iconDropDown = parseDropDown(elem.querySelector('.dd_container'));
+
+	res.nameInp = vge('accname');
+	if (!res.nameInp)
+		throw 'Account name input not found';
+	res.name = res.nameInp.value;
+
+	elem = elem.nextElementSibling.nextElementSibling;
+	res.currDropDown = parseDropDown(elem.querySelector('.dd_container'));
+
+	elem = elem.nextElementSibling;
+
+	res.balance = parseInputRow(elem);
+
+	res.submitBtn = vquery('.acc_controls .ok_btn');
+	if (!res.submitBtn)
+		throw 'Submit button not found';
+
+	return res;
+}
+
 
 function goToAccountsAndCreateNew()
 {
@@ -350,80 +447,70 @@ function goToCreateAccount()
 
 function createAccount1()
 {
-	var accname = vge('accname');
-	var balance = vge('balance');
-	var tileBal = vquery('#acc_tile .acc_bal');
-	var tileName = vquery('#acc_tile .acc_name');
-
-	if (!accname)
-		throw 'Account name field not found';
-	if (!balance)
-		throw 'Initial balance field not found';
-	if (!tileBal)
-		throw 'On-tile balance element not found';
-	if (!tileName)
-		throw 'On-tile name element not found';
+	var page = parseAccountPage();
 
 	addResult('New account page loaded', true);
 
-	addResult('Initial account name on tile', (tileName.innerHTML == 'New account'));
-	addResult('Initial account balance on tile', (tileBal.innerHTML == '0 ₽'));
+	addResult('Initial account name on tile', (page.tile.name == 'New account'));
+	addResult('Initial account balance on tile', (page.tile.balance == '0 ₽'));
 
-	inputEmul(accname, 'acc_1');
-	addResult('Account tile name update', (accname.value == 'acc_1'));
+	addResult('Initial balance input value', (page.balance.value == '0'))
+
+	inputEmul(page.nameInp, 'acc_1');
+	page = parseAccountPage();
+
+	addResult('Account tile name update', (page.tile.name == 'acc_1'));
+	addResult('Account name value input correct', (page.name == 'acc_1'));
 
 // Change currency
-	var currElem = vge('currency');
-	var ddCurrInpCont = currElem.previousElementSibling;
+	page.currDropDown.selectByValue(2);		// select USD currency
+	page = parseAccountPage();
 
-	clickEmul(ddCurrInpCont.previousElementSibling);
-	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist2_2'));	// select USD currency
+	addResult('Currency drop down value select', (page.currDropDown.textValue == 'USD'));
+	addResult('Tile balance format update result', (page.tile.balance == '$ 0'));
 
-	addResult('Currency drop down value select', (ddCurrText.innerHTML == 'USD'));
-	addResult('Tile balance format update result', (tileBal.innerHTML == '$ 0'));
+	inputEmul(page.balance.valueInput, '100000.01');
+	page = parseAccountPage();
 
-	inputEmul(balance, '100000.01');
-	addResult('Account tile balance on USD 100 000.01 balance input field', (tileBal.innerHTML == '$ 100 000.01'));
+	addResult('Account tile balance on USD 100 000.01 balance input field', (page.tile.balance == '$ 100 000.01'));
 
 // Change currency back
-	clickEmul(ddCurrInpCont.previousElementSibling);
-	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist2_1'));	// select RUB currency
+	page.currDropDown.selectByValue(1);		// select RUB currency
+	page = parseAccountPage();
 
-	addResult('Currency drop down value select back', (ddCurrText.innerHTML == 'RUB'));
-	addResult('Tile balance format after change currency back update result', (tileBal.innerHTML == '100 000.01 ₽'));
+	addResult('Currency drop down value select back', (page.currDropDown.textValue == 'RUB'));
+	addResult('Tile balance format after change currency back update result', (page.tile.balance == '100 000.01 ₽'));
 
-	inputEmul(balance, '');
-	addResult('Account tile balance on empty input field', (tileBal.innerHTML == '0 ₽'));
+// Input empty value for initial balance
+	inputEmul(page.balance.valueInput, '');
+	page = parseAccountPage();
+	addResult('Account tile balance on empty input field', (page.tile.balance == '0 ₽'));
 
-	inputEmul(balance, '.');
-	addResult('Account tile balance on dot(.) input field', (tileBal.innerHTML == '0 ₽'));
+	inputEmul(page.balance.valueInput, '.');
+	page = parseAccountPage();
+	addResult('Account tile balance on dot(.) input field', (page.tile.balance == '0 ₽'));
 
-	inputEmul(balance, '.01');
-	addResult('Account tile balance on RUB .01 balance input field', (tileBal.innerHTML == '0.01 ₽'));
+	inputEmul(page.balance.valueInput, '.01');
+	page = parseAccountPage();
+	addResult('Account tile balance on RUB .01 balance input field', (page.tile.balance == '0.01 ₽'));
 
-	inputEmul(balance, '10000000.01');
-	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (tileBal.innerHTML == '10 000 000.01 ₽'));
+	inputEmul(page.balance.valueInput, '10000000.01');
+	page = parseAccountPage();
+	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (page.tile.balance == '10 000 000.01 ₽'));
 
 // Change icon
-	var iconElem = vge('icon');
-	var ddIconInpCont = iconElem.previousElementSibling;
+	page.iconDropDown.selectByValue(2);	// select safe icon
+	page = parseAccountPage();
 
-	clickEmul(ddIconInpCont.previousElementSibling);
-	var ddIconText = ddIconInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist1_2'));	// select safe icon
-
-	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Safe'));
+	addResult('Icon drop down value select', (page.iconDropDown.textValue == 'Safe'));
 	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'safe_icon')));
 
-	inputEmul(balance, '1000.01');
-	addResult('Account tile balance on RUB 1 000.01 balance input field', (tileBal.innerHTML == '1 000.01 ₽'));
+	inputEmul(page.balance.valueInput, '1000.01');
+	page = parseAccountPage();
+	addResult('Account tile balance on RUB 1 000.01 balance input field', (page.tile.balance == '1 000.01 ₽'));
 
-	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(checkCreateAccount1);
-	clickEmul(submitBtn);
-
+	clickEmul(page.submitBtn);
 }
 
 
@@ -444,41 +531,26 @@ function checkCreateAccount1()
 
 function createAccount2()
 {
-	var accname = vge('accname');
-	var balance = vge('balance');
-	var tileBal = vquery('#acc_tile .acc_bal');
-	var tileName = vquery('#acc_tile .acc_name');
-
-	if (!accname)
-		throw 'Account name field not found';
-	if (!balance)
-		throw 'Initial balance field not found';
-	if (!tileBal)
-		throw 'On-tile balance element not found';
-	if (!tileName)
-		throw 'On-tile name element not found';
+	var page = parseAccountPage();
 
 // Input account name
-	inputEmul(accname, 'acc_2');
-	addResult('Account tile name update', (accname.value == 'acc_2'));
+	inputEmul(page.nameInp, 'acc_2');
+	page = parseAccountPage();
+	addResult('Account tile name update', (page.tile.name == 'acc_2'));
 
 // Change currency
-	var currElem = vge('currency');
-	var ddCurrInpCont = currElem.previousElementSibling;
+	page.currDropDown.selectByValue(3);		// select EUR currency
+	page = parseAccountPage();
 
-	clickEmul(ddCurrInpCont.previousElementSibling);
-	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist2_3'));	// select EUR currency
+	addResult('EUR currency select result', (page.currDropDown.textValue == 'EUR'));
+	addResult('Tile balance format update result', (page.tile.balance == '€ 0'));
 
-	addResult('EUR currency select result', (ddCurrText.innerHTML == 'EUR'));
-	addResult('Tile balance format update result', (tileBal.innerHTML == '€ 0'));
+	inputEmul(page.balance.valueInput, '1000.01')
+	page = parseAccountPage();
+	addResult('Account tile balance on EUR 1 000.01 balance input field', (page.tile.balance == '€ 1 000.01'));
 
-	inputEmul(balance, '1000.01');
-	addResult('Account tile balance on EUR 1 000.01 balance input field', (tileBal.innerHTML == '€ 1 000.01'));
-
-	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(checkCreateAccount2);
-	clickEmul(submitBtn);
+	clickEmul(page.submitBtn);
 }
 
 
@@ -504,55 +576,32 @@ function checkCreateAccount2()
 
 function editAccount1()
 {
-	var accname = vge('accname');
-	var balance = vge('balance');
-	var tileBal = vquery('#acc_tile .acc_bal');
-	var tileName = vquery('#acc_tile .acc_name');
-	var submitBtn = vquery('.acc_controls .ok_btn');
-
-	if (!accname)
-		throw 'Account name field not found';
-	if (!balance)
-		throw 'Initial balance field not found';
-	if (!tileBal)
-		throw 'On-tile balance element not found';
-	if (!tileName)
-		throw 'On-tile name element not found';
-	if (!submitBtn)
-		throw 'Submit button not found';
+	var page = parseAccountPage();
 
 	addResult('Edit account page loaded', 'OK');
 
-	addResult('Edit account name on tile', (tileName.innerHTML == 'acc_1'));
-	addResult('Edit account balance on tile', (tileBal.innerHTML == '1 000.01 ₽'));
+	addResult('Edit account name on tile', (page.tile.name == 'acc_1'));
+	addResult('Edit account balance on tile', (page.tile.balance == '1 000.01 ₽'));
 
 
 // Change currency
-	var currElem = vge('currency');
-	var ddCurrInpCont = currElem.previousElementSibling;
-
-	clickEmul(ddCurrInpCont.previousElementSibling);
-	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist2_2'));	// select USD currency
+	page.currDropDown.selectByValue(2);		// select USD currency
+	page = parseAccountPage();
 
 	var fmtBal = formatCurrency(1000.01, 2);
-	addResult('USD currency select result', (ddCurrText.innerHTML == 'USD'));
-	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
+	addResult('USD currency select result', (page.currDropDown.textValue == 'USD'));
+	addResult('Tile balance format update result', (page.tile.balance == fmtBal));
 
 // Change icon
-	var iconElem = vge('icon');
-	var ddIconInpCont = iconElem.previousElementSibling;
+	page.iconDropDown.selectByValue(1);			// select purse icon
+	page = parseAccountPage();
 
-	clickEmul(ddIconInpCont.previousElementSibling);
-	var ddIconText = ddIconInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist1_1'));	// select purse icon
-
-	addResult('Icon drop down value select', (ddIconText.innerHTML == 'Purse'));
-	addResult('Tile icon update result', hasClass(vge('acc_tile'), 'purse_icon'));
+	addResult('Icon drop down value select', (page.iconDropDown.textValue == 'Purse'));
+	addResult('Tile icon update result', hasClass(page.tile.elem, 'purse_icon'));
 
 // Submit
 	continueWith(checkEditAccount1);
-	clickEmul(submitBtn);
+	clickEmul(page.submitBtn);
 }
 
 
@@ -587,52 +636,45 @@ function createAccountWithParam(params, callback)
 	if (!isFunction(callback))
 		throw 'Callback not specified';
 
-	var tileBal = vquery('#acc_tile .acc_bal');
-	var accname = vge('accname');
-	var balance = vge('balance');
+
+	var page = parseAccountPage();
 
 // Input account name
-	inputEmul(accname, params.name);
-	addResult('Account tile name update', (accname.value == params.name));
+	inputEmul(page.nameInp, params.name);
+	page = parseAccountPage();
+	addResult('Account tile name update', (page.name == params.name));
 
 // Change currency
-	var currElem = vge('currency');
-	var ddCurrInpCont = currElem.previousElementSibling;
+	page.currDropDown.selectByValue(currObj.id);
+	page = parseAccountPage();
 
-	clickEmul(ddCurrInpCont.previousElementSibling);
-	var ddCurrText = ddCurrInpCont.querySelector('.statsel');
-	clickEmul(vge('ddlist2_' + currObj.id));
-
-	addResult(currObj.name + ' currency select result', (ddCurrText.innerHTML == currObj.name));
+	addResult(currObj.name + ' currency select result', (page.currDropDown.textValue == currObj.name));
 	var fmtBal = formatCurrency(0, currObj.id);
-	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
+	addResult('Tile balance format update result', (page.tile.balance == fmtBal));
 
 // Input balance
-	inputEmul(balance, params.balance);
+	inputEmul(page.balance.valueInput, params.balance);
+	page = parseAccountPage();
+
 	fmtBal = formatCurrency(normBalance, currObj.id);
-	addResult('Tile balance format update result', (tileBal.innerHTML == fmtBal));
+	addResult('Tile balance format update result', (page.tile.balance == fmtBal));
 
 // Change icon
 	if (params.icon)
 	{
 		if (params.icon < 0 || params.icon > icons.length)
 			throw 'Icon not found';
-		var iconElem = vge('icon');
-		var ddIconInpCont = iconElem.previousElementSibling;
 
-		clickEmul(ddIconInpCont.previousElementSibling);
-		var ddIconText = ddIconInpCont.querySelector('.statsel');
-		clickEmul(vge('ddlist1_' + params.icon));
+		page.iconDropDown.selectByValue(params.icon);
+		page = parseAccountPage();
 
-		addResult('Icon drop down value select', (ddIconText.innerHTML == icons[params.icon]));
+		addResult('Icon drop down value select', (page.iconDropDown.textValue == icons[params.icon]));
 		var iconClass = tileIconClass[params.icon];
 		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)));
 	}
 
-
-	var submitBtn = vquery('.acc_controls .ok_btn');
 	continueWith(callback);
-	clickEmul(submitBtn);
+	clickEmul(page.submitBtn);
 }
 
 
