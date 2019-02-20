@@ -992,20 +992,24 @@ function parseTileBlock(elem)
 
 function parseInputRow(elem)
 {
-	if (!elem || !elem.firstElementChild || !elem.firstElementChild.firstElementChild || !elem.firstElementChild.nextElementSibling ||
-		!elem.firstElementChild.nextElementSibling.firstElementChild)
+	if (!elem)
 		return null;
 
 	var res = { elem : elem };
 
-	res.label = elem.firstElementChild.firstElementChild.innerHTML;
-	res.currElem = elem.firstElementChild.nextElementSibling.firstElementChild;
+	res.labelEl = elem.querySelector('label');
+	if (!res.labelEl)
+		throw 'Label element not found';
+
+	res.label = res.labelEl.innerHTML;
+	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
 	res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
 	if (res.isCurrActive)
 	{
-		res.currBtn = res.currElem.firstElementChild.firstElementChild;
-		res.currSign = res.currBtn.innerHTML;
-		res.currDropDown = res.currBtn.nextElementSibling;
+		res.currDropDown = parseDropDown(res.currElem.firstElementChild);
+		if (!res.currDropDown.isAttached)
+			throw 'Currency drop down is not attached';
+		res.currSign = res.currDropDown.selectBtn.innerHTML;
 	}
 	else if (hasClass(res.currElem, 'exchrate_comm'))
 	{
@@ -1017,7 +1021,7 @@ function parseInputRow(elem)
 	}
 
 	var t = res.currElem.nextElementSibling;
-	if (t.tagName == 'INPUT' && t.type.toUpperCase() == 'HIDDEN')
+	if (t && t.tagName == 'INPUT' && t.type.toUpperCase() == 'HIDDEN')
 	{
 		res.hiddenValue = t.value;
 	}
