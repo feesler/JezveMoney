@@ -1,6 +1,7 @@
 var viewframe = null;
 var vdoc = null;
 var restbl = null;
+var header = null;
 var mainPageWidgets = null;
 var accTiles = [];
 var personTiles = [];
@@ -58,6 +59,7 @@ function continueWith(callback)
 			throw 'View document not found';
 
 		checkPHPerrors();
+		header = parseHeader();
 		callback();
 	};
 }
@@ -117,28 +119,67 @@ function startTests()
 }
 
 
+function parseHeader()
+{
+	var el;
+	var res = {};
+
+	res.elem = vquery('.page > .page_wrapper > .header');
+	if (!res.elem)
+		return res;		// no header is ok for login page
+
+	res.logo = {};
+	res.logo.elem = res.elem.querySelector('.logo');
+	if (!res.logo.elem)
+		throw 'Logo element not found';
+
+	res.logo.linkElem = res.logo.elem.querySelector('a');
+	if (!res.logo.linkElem)
+		throw 'Logo link element not found';
+
+	res.user = {};
+	res.user.elem = res.elem.querySelector('.userblock');
+	if (res.user.elem)
+	{
+		res.user.menuBtn = res.elem.querySelector('button.user_button');
+		if (!res.user.menuBtn)
+			throw 'User button not found';
+		el = res.user.menuBtn.querySelector('.user_title');
+		if (!el)
+			throw 'User title element not found';
+		res.user.name = el.innerHTML;
+
+		res.user.menuEl = res.elem.querySelector('.usermenu');
+		if (!res.user.menuEl)
+			throw 'Menu element not found';
+
+		res.user.menuItems = [];
+		var menuLinks = res.user.menuEl.querySelectorAll('ul > li > a');
+		for(var i = 0; i < menuLinks.length; i++)
+		{
+			el = menuLinks[i];
+			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerHTML });
+		}
+	}
+
+	return res;
+}
+
+
 function isUserLoggedIn()
 {
-	var userbtn = vge('userbtn');
-
-	return (userbtn != null);
+	return (header && header.user && header.user.menuBtn);
 }
 
 
 function logoutUser()
 {
-	var userbtn = vge('userbtn');
-
-	clickEmul(userbtn);
+	clickEmul(header.user.menuBtn);
 
 	setTimeout(function()
 	{
-		var menupopup = vge('menupopup');
-
 		continueWith(loginAsTester);
-
-		var el = menupopup.firstElementChild.lastElementChild.firstElementChild;
-		clickEmul(el);
+		clickEmul(header.user.menuItems[1].elem);
 	}, 300);
 }
 
@@ -163,18 +204,12 @@ function loginAsTester()
 
 function goToProfileAndReset()
 {
-	var userbtn = vge('userbtn');
-
-	clickEmul(userbtn);
+	clickEmul(header.user.menuBtn);
 
 	setTimeout(function()
 	{
-		var menupopup = vge('menupopup');
-
 		continueWith(resetAll);
-
-		var el = menupopup.firstElementChild.firstElementChild.firstElementChild;
-		clickEmul(el);
+		clickEmul(header.user.menuItems[0].elem);
 	}, 300);
 }
 
@@ -211,7 +246,7 @@ function goToMainPage(callback)
 		mainPageWidgets = parseMainPageWidgets();
 		callback();
 	});
-	clickEmul(vquery('.page .header .logo > a'));
+	clickEmul(header.logo.linkElem);
 }
 
 
