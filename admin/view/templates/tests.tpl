@@ -17,7 +17,7 @@ onReady(initTests);
 						<div class="tbl_container"><table><tbody id="restbl"></tbody></table></div>
 					</div>
 					<div class="ph"></div>
-					<div class="testview"><iframe id="viewframe" src="http://jezve.net/money/"></div>
+					<div class="testview"><iframe id="viewframe" src="http://jezve.net/money/"></iframe></div>
 				</div>
 			</div>
 		</div>
