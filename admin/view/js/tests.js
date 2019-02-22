@@ -194,7 +194,7 @@ function loginAsTester()
 	login.value = 'test';
 	password.value = 'test';
 
-	continueWith(goToProfileAndReset);
+	continueWith(goToProfilePage.bind(null, resetAll));
 
 	var el = password.parentNode.nextElementSibling.firstElementChild;
 
@@ -202,13 +202,16 @@ function loginAsTester()
 }
 
 
-function goToProfileAndReset()
+function goToProfilePage(callback)
 {
+	if (!isUserLoggedIn())
+		throw 'User is not logged in';
+
 	clickEmul(header.user.menuBtn);
 
 	setTimeout(function()
 	{
-		continueWith(resetAll);
+		continueWith(callback);
 		clickEmul(header.user.menuItems[0].elem);
 	}, 300);
 }
