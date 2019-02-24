@@ -158,48 +158,6 @@ function parseMainPageWidgets()
 }
 
 
-function parseAccountPage()
-{
-	var res = {};
-
-	res.headingElem = vquery('.heading > h1');
-	if (!res.headingElem)
-		throw 'Heading element not found';
-	res.heading = res.headingElem.innerHTML;
-
-	res.tile = parseTile(vge('acc_tile'));
-
-	res.formElem = vquery('form');
-	if (!res.formElem)
-		throw 'Form element not found';
-
-	res.isEdit = (res.formElem.firstElementChild.id == 'accid');
-
-	var elem = res.formElem.firstElementChild.nextElementSibling;
-	if (res.isEdit)
-		elem = elem.nextElementSibling;
-	res.iconDropDown = parseDropDown(elem.querySelector('.dd_container'));
-
-	res.nameInp = vge('accname');
-	if (!res.nameInp)
-		throw 'Account name input not found';
-	res.name = res.nameInp.value;
-
-	elem = elem.nextElementSibling.nextElementSibling;
-	res.currDropDown = parseDropDown(elem.querySelector('.dd_container'));
-
-	elem = elem.nextElementSibling;
-
-	res.balance = parseInputRow(elem);
-
-	res.submitBtn = vquery('.acc_controls .ok_btn');
-	if (!res.submitBtn)
-		throw 'Submit button not found';
-
-	return res;
-}
-
-
 function goToAccountsAndCreateNew()
 {
 	var elem;
@@ -223,7 +181,7 @@ function goToCreateAccount()
 
 function createAccount1()
 {
-	var page = parseAccountPage();
+	var page = AccountPage.parse();
 
 	addResult('New account page loaded', true);
 
@@ -232,57 +190,47 @@ function createAccount1()
 
 	addResult('Initial balance input value', (page.balance.value == '0'))
 
-	inputEmul(page.nameInp, 'acc_1');
-	page = parseAccountPage();
+	page = AccountPage.inputName('acc_1');
 
 	addResult('Account tile name update', (page.tile.name == 'acc_1'));
 	addResult('Account name value input correct', (page.name == 'acc_1'));
 
 // Change currency
-	page.currDropDown.selectByValue(2);		// select USD currency
-	page = parseAccountPage();
+	page = AccountPage.changeCurrency(2);		// select USD currency
 
 	addResult('Currency drop down value select', (page.currDropDown.textValue == 'USD'));
 	addResult('Tile balance format update result', (page.tile.balance == '$ 0'));
 
-	inputEmul(page.balance.valueInput, '100000.01');
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('100000.01');
 
 	addResult('Account tile balance on USD 100 000.01 balance input field', (page.tile.balance == '$ 100 000.01'));
 
 // Change currency back
-	page.currDropDown.selectByValue(1);		// select RUB currency
-	page = parseAccountPage();
+	page = AccountPage.changeCurrency(1);		// select RUB currency
 
 	addResult('Currency drop down value select back', (page.currDropDown.textValue == 'RUB'));
 	addResult('Tile balance format after change currency back update result', (page.tile.balance == '100 000.01 ₽'));
 
 // Input empty value for initial balance
-	inputEmul(page.balance.valueInput, '');
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('');
 	addResult('Account tile balance on empty input field', (page.tile.balance == '0 ₽'));
 
-	inputEmul(page.balance.valueInput, '.');
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('.');
 	addResult('Account tile balance on dot(.) input field', (page.tile.balance == '0 ₽'));
 
-	inputEmul(page.balance.valueInput, '.01');
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('.01');
 	addResult('Account tile balance on RUB .01 balance input field', (page.tile.balance == '0.01 ₽'));
 
-	inputEmul(page.balance.valueInput, '10000000.01');
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('10000000.01');
 	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (page.tile.balance == '10 000 000.01 ₽'));
 
 // Change icon
-	page.iconDropDown.selectByValue(2);	// select safe icon
-	page = parseAccountPage();
+	page = AccountPage.changeIcon(2);	// select safe icon
 
 	addResult('Icon drop down value select', (page.iconDropDown.textValue == 'Safe'));
 	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'safe_icon')));
 
-	inputEmul(page.balance.valueInput, '1000.01');
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('1000.01');
 	addResult('Account tile balance on RUB 1 000.01 balance input field', (page.tile.balance == '1 000.01 ₽'));
 
 	continueWith(checkCreateAccount1);
@@ -307,22 +255,19 @@ function checkCreateAccount1()
 
 function createAccount2()
 {
-	var page = parseAccountPage();
+	var page = AccountPage.parse();
 
 // Input account name
-	inputEmul(page.nameInp, 'acc_2');
-	page = parseAccountPage();
+	page = AccountPage.inputName('acc_2');
 	addResult('Account tile name update', (page.tile.name == 'acc_2'));
 
 // Change currency
-	page.currDropDown.selectByValue(3);		// select EUR currency
-	page = parseAccountPage();
+	page = AccountPage.changeCurrency(3);		// select EUR currency
 
 	addResult('EUR currency select result', (page.currDropDown.textValue == 'EUR'));
 	addResult('Tile balance format update result', (page.tile.balance == '€ 0'));
 
-	inputEmul(page.balance.valueInput, '1000.01')
-	page = parseAccountPage();
+	page = AccountPage.inputBalance('1000.01')
 	addResult('Account tile balance on EUR 1 000.01 balance input field', (page.tile.balance == '€ 1 000.01'));
 
 	continueWith(checkCreateAccount2);
@@ -352,7 +297,7 @@ function checkCreateAccount2()
 
 function editAccount1()
 {
-	var page = parseAccountPage();
+	var page = AccountPage.parse();
 
 	addResult('Edit account page loaded', 'OK');
 
@@ -361,17 +306,13 @@ function editAccount1()
 
 
 // Change currency
-	page.currDropDown.selectByValue(2);		// select USD currency
-	page = parseAccountPage();
-
+	page = AccountPage.changeCurrency(2);		// select USD currency
 	var fmtBal = formatCurrency(1000.01, 2);
 	addResult('USD currency select result', (page.currDropDown.textValue == 'USD'));
 	addResult('Tile balance format update result', (page.tile.balance == fmtBal));
 
 // Change icon
-	page.iconDropDown.selectByValue(1);			// select purse icon
-	page = parseAccountPage();
-
+	page = AccountPage.changeIcon(1);			// select purse icon
 	addResult('Icon drop down value select', (page.iconDropDown.textValue == 'Purse'));
 	addResult('Tile icon update result', hasClass(page.tile.elem, 'purse_icon'));
 
@@ -413,24 +354,21 @@ function createAccountWithParam(params, callback)
 		throw 'Callback not specified';
 
 
-	var page = parseAccountPage();
+	var page = AccountPage.parse();
 
 // Input account name
-	inputEmul(page.nameInp, params.name);
-	page = parseAccountPage();
+	page = AccountPage.inputName(params.name);
 	addResult('Account tile name update', (page.name == params.name));
 
 // Change currency
-	page.currDropDown.selectByValue(currObj.id);
-	page = parseAccountPage();
+	page = AccountPage.changeCurrency(currObj.id);
 
 	addResult(currObj.name + ' currency select result', (page.currDropDown.textValue == currObj.name));
 	var fmtBal = formatCurrency(0, currObj.id);
 	addResult('Tile balance format update result', (page.tile.balance == fmtBal));
 
 // Input balance
-	inputEmul(page.balance.valueInput, params.balance);
-	page = parseAccountPage();
+	page = AccountPage.inputBalance(params.balance);
 
 	fmtBal = formatCurrency(normBalance, currObj.id);
 	addResult('Tile balance format update result', (page.tile.balance == fmtBal));
@@ -441,8 +379,7 @@ function createAccountWithParam(params, callback)
 		if (params.icon < 0 || params.icon > icons.length)
 			throw 'Icon not found';
 
-		page.iconDropDown.selectByValue(params.icon);
-		page = parseAccountPage();
+		page = AccountPage.changeIcon(params.icon);
 
 		addResult('Icon drop down value select', (page.iconDropDown.textValue == icons[params.icon]));
 		var iconClass = tileIconClass[params.icon];
