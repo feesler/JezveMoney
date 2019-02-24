@@ -20,7 +20,7 @@ class TestsAdminController extends Controller
 		$this->cssAdmin[] = "tests.css";
 		$this->buildCSS();
 		$this->jsArr[] = "currency.js";
-		$this->jsAdmin[] = "tests.js";
+		$this->jsAdmin[] = "tests/main.js";
 
 		include("./view/templates/tests.tpl");
 	}

@@ -59,8 +59,15 @@ function continueWith(callback)
 			throw 'View document not found';
 
 		checkPHPerrors();
-		header = parseHeader();
-		callback();
+		//try
+		//{
+			header = parseHeader();
+			callback();
+		//}
+		//catch(e)
+		//{
+		//	addResult(e.message, false);
+		//}
 	};
 }
 
@@ -111,11 +118,16 @@ function onStartClick()
 
 function startTests()
 {
+	goToMainPage(goToNewTransactionByAccount.bind(null, 1, expenseTransactionStart));
+
+
 // Check user and logout if needed
+/*
 	if (isUserLoggedIn())
 		logoutUser();
 	else
 		loginAsTester();
+ */
 }
 
 
@@ -1191,4 +1203,10 @@ function addResult(descr, res)
 {
 	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
 										ce('td', { innerHTML : (res ? 'OK' : 'FAIL' ) }) ]));
+}
+
+
+function addBlock(descr, res)
+{
+	restbl.appendChild(ce('tr', {}, ce('td', { innerHTML : descr }) ));
 }
