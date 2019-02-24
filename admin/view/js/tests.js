@@ -1170,6 +1170,20 @@ function expenseTransactionStart()
 	addResult('Destination amount (1.01) input result', (trPage.dest_amount_row.value == '1.01'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+
+	inputEmul(trPage.dest_amount_row.valueInput, '1.010');
+	trPage = parseTransactionPage();
+
+	addResult('Destination amount (1.010) input result', (trPage.dest_amount_row.value == '1.010'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
+	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+
+	inputEmul(trPage.dest_amount_row.valueInput, '1.0101');
+	trPage = parseTransactionPage();
+
+	addResult('Destination amount (1.0101) input result', (trPage.dest_amount_row.value == '1.0101'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
+	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 }
 
 
