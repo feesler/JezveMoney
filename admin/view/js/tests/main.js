@@ -667,26 +667,16 @@ function expenseTransactionStart()
 	var trPage = TransactionPage.parse();
 
 	addResult('Parse expense transaction result', trPage != null);
+	addResult('Controls visibility', TransactionPage.checkVisibility({ source : true, destination : false, src_amount_left : false, dest_amount_left : false,
+	 																	src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
+																		src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
+																		result_balance_dest_row : false }));
 
-	addResult('Source tile block is visible', trPage.source && isVisible(trPage.source.elem));
 	addResult('Source tile account name', trPage.source.tile && trPage.source.tile.name == 'acc_1');
 	addResult('Source tile account balance', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
-
-	addResult('Destination tile block is invisible', (!trPage.destination || !isVisible(trPage.destination.elem)));
-
-	addResult('Right to the tile source result balance block is visible',
-				(trPage.src_res_balance_left && trPage.src_res_balance_left.elem && isVisible(trPage.src_res_balance_left.elem)));
 	addResult('Right to the tile source result balance value', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '500.99 ₽'));
-
-
-	addResult('Source amount input is invisible', (trPage.src_amount_row && trPage.src_amount_row.elem && !isVisible(trPage.src_amount_row.elem)));
-	addResult('Destination amount input is visible', (trPage.dest_amount_row && trPage.dest_amount_row.elem && isVisible(trPage.dest_amount_row.elem)));
 	addResult('Destination amount currency select is active', (trPage.dest_amount_row && trPage.dest_amount_row.isCurrActive));
 	addResult('Destination amount currency sign', (trPage.dest_amount_row && trPage.dest_amount_row.currSign == '₽'));
-
-	addResult('Exchange rate input is invisible', (trPage.exchange_row && trPage.exchange_row.elem && !isVisible(trPage.exchange_row.elem)));
-	addResult('Source result balance input is invisible', (trPage.result_balance_row && trPage.result_balance_row.elem && !isVisible(trPage.result_balance_row.elem)));
-	addResult('Destination result balance input is invisible', (!trPage.result_balance_dest_row || !isVisible(trPage.result_balance_dest_row.elem)));
 
 	trPage = TransactionPage.inputDestAmount('1');
 
@@ -725,21 +715,13 @@ function expenseTransactionStart()
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.clickSrcResultBalance();
+	addResult('Controls visibility', TransactionPage.checkVisibility({ source : true, destination : false, src_amount_left : false, dest_amount_left : true,
+	 																	src_res_balance_left : false, dest_res_balance_left : false, exch_left : false,
+																		src_amount_row : false, dest_amount_row : false, exchange_row : false, result_balance_row : true,
+																		result_balance_dest_row : false }));
 
-	addResult('Right to the tile destination amount block is visible',
-				(trPage.dest_amount_left && trPage.dest_amount_left.elem && isVisible(trPage.dest_amount_left.elem)));
 	addResult('Right to the tile destination amount block value', (trPage.dest_amount_left && trPage.dest_amount_left.buttonValue == '1.01 ₽'));
-	addResult('Right to the tile source amount block is invisible', (!trPage.src_amount_left || !trPage.src_amount_left.elem || !isVisible(trPage.src_amount_left.elem)));
-
-	addResult('Source amount input is invisible', (trPage.src_amount_row && trPage.src_amount_row.elem && !isVisible(trPage.src_amount_row.elem)));
-	addResult('Destination amount input is invisible', (trPage.dest_amount_row && trPage.dest_amount_row.elem && !isVisible(trPage.dest_amount_row.elem)));
-	addResult('Exchange rate input is invisible', (trPage.exchange_row && trPage.exchange_row.elem && !isVisible(trPage.exchange_row.elem)));
-	addResult('Right to the tile exchange rate block is invisible', (!trPage.exch_left || !trPage.exch_left.elem || !isVisible(trPage.exch_left.elem)));
-
-	addResult('Source result balance input is visible', (trPage.result_balance_row && trPage.result_balance_row.elem && isVisible(trPage.result_balance_row.elem)));
 	addResult('Source result balance currency select is inactive', (trPage.result_balance_row && !trPage.result_balance_row.isCurrActive));
-
-	addResult('Destination result balance input is invisible', (!trPage.result_balance_dest_row || !trPage.result_balance_dest_row.elem || !isVisible(trPage.result_balance_dest_row.elem)));
 }
 
 

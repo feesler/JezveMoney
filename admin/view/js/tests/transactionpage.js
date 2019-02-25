@@ -102,6 +102,27 @@ var TransactionPage = new (function()
 	}
 
 
+	this.checkVisibility = function(controls)
+	{
+		var control, expected, fact;
+
+		for(var countrolName in controls)
+		{
+			expected = controls[countrolName];
+
+			control = page[countrolName];
+			fact = !(!control || !control.elem || !isVisible(control.elem));
+			if (expected != fact)
+			{
+				console.error('Not expected visibility of ' + countrolName + ' control');
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
 	this.inputDestAmount = function(val)
 	{
 		return performAction(function()
