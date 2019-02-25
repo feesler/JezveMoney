@@ -109,4 +109,13 @@ var TransactionPage = new (function()
 			inputEmul(page.dest_amount_row.valueInput, val);
 		});
 	}
+
+
+	this.clickSrcResultBalance = function()
+	{
+		return performAction(function()
+		{
+			clickEmul(page.src_res_balance_left.buttonElem);
+		});
+	}
 })();

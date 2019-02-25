@@ -723,6 +723,23 @@ function expenseTransactionStart()
 	addResult('Destination amount (1.0101) input result', (trPage.dest_amount_row.value == '1.0101'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+
+	trPage = TransactionPage.clickSrcResultBalance();
+
+	addResult('Right to the tile destination amount block is visible',
+				(trPage.dest_amount_left && trPage.dest_amount_left.elem && isVisible(trPage.dest_amount_left.elem)));
+	addResult('Right to the tile destination amount block value', (trPage.dest_amount_left && trPage.dest_amount_left.buttonValue == '1.01 ₽'));
+	addResult('Right to the tile source amount block is invisible', (!trPage.src_amount_left || !trPage.src_amount_left.elem || !isVisible(trPage.src_amount_left.elem)));
+
+	addResult('Source amount input is invisible', (trPage.src_amount_row && trPage.src_amount_row.elem && !isVisible(trPage.src_amount_row.elem)));
+	addResult('Destination amount input is invisible', (trPage.dest_amount_row && trPage.dest_amount_row.elem && !isVisible(trPage.dest_amount_row.elem)));
+	addResult('Exchange rate input is invisible', (trPage.exchange_row && trPage.exchange_row.elem && !isVisible(trPage.exchange_row.elem)));
+	addResult('Right to the tile exchange rate block is invisible', (!trPage.exch_left || !trPage.exch_left.elem || !isVisible(trPage.exch_left.elem)));
+
+	addResult('Source result balance input is visible', (trPage.result_balance_row && trPage.result_balance_row.elem && isVisible(trPage.result_balance_row.elem)));
+	addResult('Source result balance currency select is inactive', (trPage.result_balance_row && !trPage.result_balance_row.isCurrActive));
+
+	addResult('Destination result balance input is invisible', (!trPage.result_balance_dest_row || !trPage.result_balance_dest_row.elem || !isVisible(trPage.result_balance_dest_row.elem)));
 }
 
 
