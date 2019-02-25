@@ -703,49 +703,6 @@ function parseTileBlock(elem)
 }
 
 
-function parseInputRow(elem)
-{
-	if (!elem)
-		return null;
-
-	var res = { elem : elem };
-
-	res.labelEl = elem.querySelector('label');
-	if (!res.labelEl)
-		throw 'Label element not found';
-
-	res.label = res.labelEl.innerHTML;
-	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
-	res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
-	if (res.isCurrActive)
-	{
-		res.currDropDown = parseDropDown(res.currElem.firstElementChild);
-		if (!res.currDropDown.isAttached)
-			throw 'Currency drop down is not attached';
-		res.currSign = res.currDropDown.selectBtn.innerHTML;
-	}
-	else if (hasClass(res.currElem, 'exchrate_comm'))
-	{
-		res.currSign = res.currElem.innerHTML;
-	}
-	else
-	{
-		res.currSign = res.currElem.firstElementChild.innerHTML;
-	}
-
-	var t = res.currElem.nextElementSibling;
-	if (t && t.tagName == 'INPUT' && t.type.toUpperCase() == 'HIDDEN')
-	{
-		res.hiddenValue = t.value;
-	}
-
-	res.valueInput = elem.querySelector('.stretch_input > input');
-	res.value = res.valueInput.value;
-
-	return res;
-}
-
-
 function parseTransactionPage()
 {
 	var res = {};
