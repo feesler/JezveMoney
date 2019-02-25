@@ -262,6 +262,18 @@ function parseDropDown(elem)
 }
 
 
+function getTransactionType(str)
+{
+	var strToType = { 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
+
+	if (!str)
+		return null;
+
+	var key = str.toUpperCase();
+	return (strToType[key] !== undefined) ? strToType[key] : null;
+}
+
+
 function parseInputRow(elem)
 {
 	if (!elem)

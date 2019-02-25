@@ -662,96 +662,9 @@ function goToNewTransactionByAccount(accNum, callback)
 }
 
 
-function getTransactionType(str)
-{
-	var strToType = { 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
-
-	if (!str)
-		return null;
-
-	var key = str.toUpperCase();
-	return (strToType[key] !== undefined) ? strToType[key] : null;
-}
-
-
-function parseTileRightItem(elem)
-{
-	if (!elem || !elem.firstElementChild || !elem.firstElementChild.nextElementSibling || !elem.firstElementChild.nextElementSibling.firstElementChild)
-		return null;
-
-	var res = { elem : elem };
-	res.titleElem = elem.firstElementChild;
-	res.title = res.titleElem.innerHTML;
-	res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
-	res.buttonValue = res.buttonElem.firstElementChild.innerHTML;
-
-	return res;
-}
-
-
-function parseTileBlock(elem)
-{
-	if (!elem || !elem.firstElementChild || !elem.firstElementChild.firstElementChild || !elem.firstElementChild.nextElementSibling)
-		return null;
-
-	var res = { elem : elem };
-
-	res.label = elem.firstElementChild.firstElementChild.innerHTML;
-	res.tile = parseTile(elem.querySelector('.tile'));
-
-	return res;
-}
-
-
-function parseTransactionPage()
-{
-	var res = {};
-
-	var menuItems = vqueryall('#trtype_menu > span');
-	res.typeMenu = [];
-	for(var i = 0; i < menuItems.length; i++)
-	{
-		var menuItem = menuItems[i].firstElementChild;
-
-		res.type = getTransactionType(menuItem.innerHTML);
-
-		var menuItemObj = { text : menuItem.innerHTML, type : getTransactionType(menuItem.innerHTML) };
-
-		if (menuItem.tagName == 'B')
-		{
-			res.activeType = menuItemObj.type;
-			menuItemObj.isActive = true;
-		}
-		else if (menuItem.tagName == 'A')
-		{
-			menuItemObj.link = menuItem.href;
-			menuItemObj.isActive = false;
-		}
-		res.typeMenu.push(menuItemObj);
-	}
-
-	res.source = parseTileBlock(vge('source'));
-	res.destination = parseTileBlock(vge('destination'));
-
-	res.src_amount_left = parseTileRightItem(vge('src_amount_left'));
-	res.dest_amount_left = parseTileRightItem(vge('dest_amount_left'));
-	res.src_res_balance_left = parseTileRightItem(vge('src_res_balance_left'));
-	res.dest_res_balance_left = parseTileRightItem(vge('dest_res_balance_left'));
-	res.exch_left = parseTileRightItem(vge('exch_left'));
-
-	res.src_amount_row = parseInputRow(vge('src_amount_row'));
-	res.dest_amount_row = parseInputRow(vge('dest_amount_row'));
-	res.exchanget_row = parseInputRow(vge('exchange'));
-	res.result_balance_row = parseInputRow(vge('result_balance'));
-	res.result_balance_dest_row = parseInputRow(vge('result_balance_dest'));
-
-	return res;
-}
-
-
 function expenseTransactionStart()
 {
-	var trPage = parseTransactionPage();
+	var trPage = TransactionPage.parse();
 
 	addResult('Parse expense transaction result', trPage != null);
 
@@ -771,47 +684,41 @@ function expenseTransactionStart()
 	addResult('Destination amount currency select is active', (trPage.dest_amount_row && trPage.dest_amount_row.isCurrActive));
 	addResult('Destination amount currency sign', (trPage.dest_amount_row && trPage.dest_amount_row.currSign == '₽'));
 
-	addResult('Exchange rate input is invisible', (trPage.exchanget_row && trPage.exchanget_row.elem && !isVisible(trPage.exchanget_row.elem)));
+	addResult('Exchange rate input is invisible', (trPage.exchange_row && trPage.exchange_row.elem && !isVisible(trPage.exchange_row.elem)));
 	addResult('Source result balance input is invisible', (trPage.result_balance_row && trPage.result_balance_row.elem && !isVisible(trPage.result_balance_row.elem)));
 	addResult('Destination result balance input is invisible', (!trPage.result_balance_dest_row || !isVisible(trPage.result_balance_dest_row.elem)));
 
-	inputEmul(trPage.dest_amount_row.valueInput, '1');
-	trPage = parseTransactionPage();
+	trPage = TransactionPage.inputDestAmount('1');
 
 	addResult('Destination amount (1) input result', (trPage.dest_amount_row.value == '1'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
-	inputEmul(trPage.dest_amount_row.valueInput, '1.');
-	trPage = parseTransactionPage();
+	trPage = TransactionPage.inputDestAmount('1.');
 
 	addResult('Destination amount (1.) input result', (trPage.dest_amount_row.value == '1.'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
-	inputEmul(trPage.dest_amount_row.valueInput, '1.0');
-	trPage = parseTransactionPage();
+	trPage = TransactionPage.inputDestAmount('1.0');
 
 	addResult('Destination amount (1.0) input result', (trPage.dest_amount_row.value == '1.0'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
-	inputEmul(trPage.dest_amount_row.valueInput, '1.01');
-	trPage = parseTransactionPage();
+	trPage = TransactionPage.inputDestAmount('1.01');
 
 	addResult('Destination amount (1.01) input result', (trPage.dest_amount_row.value == '1.01'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
-	inputEmul(trPage.dest_amount_row.valueInput, '1.010');
-	trPage = parseTransactionPage();
+	trPage = TransactionPage.inputDestAmount('1.010');
 
 	addResult('Destination amount (1.010) input result', (trPage.dest_amount_row.value == '1.010'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
-	inputEmul(trPage.dest_amount_row.valueInput, '1.0101');
-	trPage = parseTransactionPage();
+	trPage = TransactionPage.inputDestAmount('1.0101');
 
 	addResult('Destination amount (1.0101) input result', (trPage.dest_amount_row.value == '1.0101'));
 	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
