@@ -1,7 +1,9 @@
 // Create or update account page tests
 var AccountPage = new (function()
 {
+	var self = this;
 	var page = null;
+
 
 	function parsePage()
 	{
@@ -45,17 +47,17 @@ var AccountPage = new (function()
 	}
 
 
-	function performAction(action, content)
+	function performAction(action)
 	{
 		if (!isFunction(action))
 			throw 'Wrong action specified';
 
 		if (!page)
-			content.parse();
+			self.parse();
 
-		action.call(content);
+		action.call(self);
 
-		return content.parse();
+		return self.parse();
 	}
 
 
@@ -72,7 +74,7 @@ var AccountPage = new (function()
 		return performAction(function()
 		{
 			inputEmul(page.nameInp, val);
-		}, this);
+		});
 	}
 
 
@@ -81,7 +83,7 @@ var AccountPage = new (function()
 		return performAction(function()
 		{
 			inputEmul(page.balance.valueInput, val);
-		}, this);
+		});
 	}
 
 
@@ -90,7 +92,7 @@ var AccountPage = new (function()
 		return performAction(function()
 		{
 			page.currDropDown.selectByValue(val);
-		}, this);
+		});
 	}
 
 
@@ -99,7 +101,7 @@ var AccountPage = new (function()
 		return performAction(function()
 		{
 			page.iconDropDown.selectByValue(val);
-		}, this);
+		});
 	}
 
 })();
