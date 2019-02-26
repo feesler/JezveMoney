@@ -674,44 +674,44 @@ function expenseTransactionStart()
 
 	addResult('Source tile account name', trPage.source.tile && trPage.source.tile.name == 'acc_1');
 	addResult('Source tile account balance', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
-	addResult('Right to the tile source result balance value', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '500.99 ₽'));
+	addResult('Right to the tile source result balance value', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '500.99 ₽'));
 	addResult('Destination amount currency select is active', (trPage.dest_amount_row && trPage.dest_amount_row.isCurrActive));
 	addResult('Destination amount currency sign', (trPage.dest_amount_row && trPage.dest_amount_row.currSign == '₽'));
 
 	trPage = TransactionPage.inputDestAmount('1');
 
 	addResult('Destination amount (1) input result', (trPage.dest_amount_row.value == '1'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.99 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.inputDestAmount('1.');
 
 	addResult('Destination amount (1.) input result', (trPage.dest_amount_row.value == '1.'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.99 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.inputDestAmount('1.0');
 
 	addResult('Destination amount (1.0) input result', (trPage.dest_amount_row.value == '1.0'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.99 ₽'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.99 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.inputDestAmount('1.01');
 
 	addResult('Destination amount (1.01) input result', (trPage.dest_amount_row.value == '1.01'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.inputDestAmount('1.010');
 
 	addResult('Destination amount (1.010) input result', (trPage.dest_amount_row.value == '1.010'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.inputDestAmount('1.0101');
 
 	addResult('Destination amount (1.0101) input result', (trPage.dest_amount_row.value == '1.0101'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.buttonValue == '499.98 ₽'));
+	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.98 ₽'));
 	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
 
 	trPage = TransactionPage.clickSrcResultBalance();
@@ -720,7 +720,7 @@ function expenseTransactionStart()
 																		src_amount_row : false, dest_amount_row : false, exchange_row : false, result_balance_row : true,
 																		result_balance_dest_row : false }));
 
-	addResult('Right to the tile destination amount block value', (trPage.dest_amount_left && trPage.dest_amount_left.buttonValue == '1.01 ₽'));
+	addResult('Right to the tile destination amount block value', (trPage.dest_amount_left && trPage.dest_amount_left.value == '1.01 ₽'));
 	addResult('Source result balance currency select is inactive', (trPage.result_balance_row && !trPage.result_balance_row.isCurrActive));
 }
 

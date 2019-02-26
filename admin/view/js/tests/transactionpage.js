@@ -26,7 +26,7 @@ var TransactionPage = new (function()
 		res.titleElem = elem.firstElementChild;
 		res.title = res.titleElem.innerHTML;
 		res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
-		res.buttonValue = res.buttonElem.firstElementChild.innerHTML;
+		res.value = res.buttonElem.firstElementChild.innerHTML;
 
 		return res;
 	}
