@@ -3,6 +3,18 @@ var TransactionPage = new (function()
 {
 	var self = this;
 	var page = null;
+	var availableControls = ['source',
+					'destination',
+					'src_amount_left',
+					'dest_amount_left',
+					'src_res_balance_left',
+					'dest_res_balance_left',
+					'exch_left',
+					'src_amount_row',
+					'dest_amount_row',
+					'exchange_row',
+					'result_balance_row',
+					'result_balance_dest_row'];
 
 
 	function parseTileRightItem(elem)
@@ -108,6 +120,9 @@ var TransactionPage = new (function()
 
 		for(var countrolName in controls)
 		{
+			if (availableControls.indexOf[countrolName] === -1)
+				throw 'Unknown control ' + countrolName;
+
 			expected = controls[countrolName];
 
 			control = page[countrolName];
