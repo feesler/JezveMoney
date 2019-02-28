@@ -186,6 +186,12 @@ var TransactionPage = new (function()
 	}
 
 
+	this.checkState = function(stateObj)
+	{
+		return stateObj && this.checkVisibility(stateObj.visibility) && this.checkValues(stateObj.values);
+	}
+
+
 	this.inputDestAmount = function(val)
 	{
 		return performAction(function()

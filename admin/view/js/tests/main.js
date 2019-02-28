@@ -664,64 +664,52 @@ function goToNewTransactionByAccount(accNum, callback)
 
 function expenseTransactionStart()
 {
-	var trPage = TransactionPage.parse();
+	addResult('Parse expense transaction result', TransactionPage.parse());
 
-	addResult('Parse expense transaction result', trPage != null);
-	addResult('Controls visibility', TransactionPage.checkVisibility({ source : true, destination : false, src_amount_left : false, dest_amount_left : false,
-	 																	src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
-																		src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
-																		result_balance_dest_row : false }));
+	var state = { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : false,
+								src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
+								src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
+								result_balance_dest_row : false },
+				values : { source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
+							dest_amount_row : { currSign : '₽', isCurrActive : true },
+							src_res_balance_left : '500.99 ₽' } };
 
-	addResult('Source tile account name', trPage.source.tile && trPage.source.tile.name == 'acc_1');
-	addResult('Source tile account balance', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
-	addResult('Right to the tile source result balance value', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '500.99 ₽'));
-	addResult('Destination amount currency select is active', (trPage.dest_amount_row && trPage.dest_amount_row.isCurrActive));
-	addResult('Destination amount currency sign', (trPage.dest_amount_row && trPage.dest_amount_row.currSign == '₽'));
+	addResult('Initial state', TransactionPage.checkState(state));
 
-	trPage = TransactionPage.inputDestAmount('1');
 
-	addResult('Destination amount (1) input result', (trPage.dest_amount_row.value == '1'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.99 ₽'));
-	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+	setParam(state.values, { dest_amount_row : { value : '1' },
+								src_res_balance_left : '499.99 ₽' });
+	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1) input result', TransactionPage.checkState(state));
 
-	trPage = TransactionPage.inputDestAmount('1.');
 
-	addResult('Destination amount (1.) input result', (trPage.dest_amount_row.value == '1.'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.99 ₽'));
-	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+	state.values.dest_amount_row.value = '1.';
+	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.) input result', TransactionPage.checkState(state));
 
-	trPage = TransactionPage.inputDestAmount('1.0');
+	state.values.dest_amount_row.value = '1.0';
+	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.0) input result', TransactionPage.checkState(state));
 
-	addResult('Destination amount (1.0) input result', (trPage.dest_amount_row.value == '1.0'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.99 ₽'));
-	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+	setParam(state.values, { dest_amount_row : { value : '1.01' },
+								src_res_balance_left : '499.98 ₽' });
+	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.01) input result', TransactionPage.checkState(state));
 
-	trPage = TransactionPage.inputDestAmount('1.01');
+	state.values.dest_amount_row.value = '1.010';
+	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.010) input result', TransactionPage.checkState(state));
 
-	addResult('Destination amount (1.01) input result', (trPage.dest_amount_row.value == '1.01'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.98 ₽'));
-	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
+	state.values.dest_amount_row.value = '1.0101';
+	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.0101) input result', TransactionPage.checkState(state));
 
-	trPage = TransactionPage.inputDestAmount('1.010');
 
-	addResult('Destination amount (1.010) input result', (trPage.dest_amount_row.value == '1.010'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.98 ₽'));
-	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
-
-	trPage = TransactionPage.inputDestAmount('1.0101');
-
-	addResult('Destination amount (1.0101) input result', (trPage.dest_amount_row.value == '1.0101'));
-	addResult('Result balance value update result', (trPage.src_res_balance_left && trPage.src_res_balance_left.value == '499.98 ₽'));
-	addResult('Source tile balance not changed', trPage.source.tile && trPage.source.tile.balance == '500.99 ₽');
-
-	trPage = TransactionPage.clickSrcResultBalance();
-	addResult('Controls visibility', TransactionPage.checkVisibility({ source : true, destination : false, src_amount_left : false, dest_amount_left : true,
-	 																	src_res_balance_left : false, dest_res_balance_left : false, exch_left : false,
-																		src_amount_row : false, dest_amount_row : false, exchange_row : false, result_balance_row : true,
-																		result_balance_dest_row : false }));
-
-	addResult('Right to the tile destination amount block value', (trPage.dest_amount_left && trPage.dest_amount_left.value == '1.01 ₽'));
-	addResult('Source result balance currency select is inactive', (trPage.result_balance_row && !trPage.result_balance_row.isCurrActive));
+	setParam(state.visibility, { dest_amount_left : true, src_res_balance_left : false, dest_amount_row : false, result_balance_row : true });
+	setParam(state.value, { dest_amount_left : '1.01 ₽',
+							result_balance_row : { value : '499.98', isCurrActive : false } });
+	TransactionPage.clickSrcResultBalance();
+	addResult('Click on source result balance result', TransactionPage.checkState(state));
 }
 
 
