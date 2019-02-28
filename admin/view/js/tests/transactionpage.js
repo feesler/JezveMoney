@@ -138,6 +138,54 @@ var TransactionPage = new (function()
 	}
 
 
+	function checkObjValue(obj, expectedObj)
+	{
+		if (obj === expectedObj)
+			return true;
+
+		var value, expected;
+		for(var vKey in expectedObj)
+		{
+			if (!(vKey in obj))
+			{
+				console.error('Key ' + vKey + ' not found');
+				return false;
+			}
+
+			expected = expectedObj[vKey];
+			value = obj[vKey];
+			if (isObject(expected))
+				return checkObjValue(value, expected);
+			else if (value !== expected)
+				return false;
+		}
+
+		return true;
+	}
+
+
+	this.checkValues = function(controls)
+	{
+		var control, expected, fact;
+
+		for(var countrolName in controls)
+		{
+			if (availableControls.indexOf[countrolName] === -1)
+				throw 'Unknown control ' + countrolName;
+
+			expected = controls[countrolName];
+			control = page[countrolName];
+			if (!control || (isObject(expected) && !checkObjValue(control, expected)) || (!isObject(expected) && control.value !== expected))
+			{
+				console.error('Not expected values of ' + countrolName + ' control');
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
 	this.inputDestAmount = function(val)
 	{
 		return performAction(function()
