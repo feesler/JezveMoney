@@ -710,6 +710,13 @@ function expenseTransactionStart()
 							result_balance_row : { value : '499.98', isCurrActive : false } });
 	TransactionPage.clickSrcResultBalance();
 	addResult('Click on source result balance result', TransactionPage.checkState(state));
+
+	state.values.result_balance_row.value = '499.9';
+	state.values.dest_amount_left = '1.09 ₽';
+	state.values.dest_amount_row.value = '1.09';
+	TransactionPage.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (499.9) input result', TransactionPage.checkState(state));
+
 }
 
 
