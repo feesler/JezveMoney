@@ -188,7 +188,7 @@ function createAccount1()
 	addResult('Initial account name on tile', (page.tile.name == 'New account'));
 	addResult('Initial account balance on tile', (page.tile.balance == '0 ₽'));
 
-	addResult('Initial balance input value', (page.balance.value == '0'))
+	addResult('Initial balance input value', (page.balance.value == '0'));
 
 	page = AccountPage.inputName('acc_1');
 
@@ -706,7 +706,7 @@ function expenseTransactionStart()
 
 
 	setParam(state.visibility, { dest_amount_left : true, src_res_balance_left : false, dest_amount_row : false, result_balance_row : true });
-	setParam(state.value, { dest_amount_left : '1.01 ₽',
+	setParam(state.values, { dest_amount_left : '1.01 ₽',
 							result_balance_row : { value : '499.98', isCurrActive : false } });
 	TransactionPage.clickSrcResultBalance();
 	addResult('Click on source result balance result', TransactionPage.checkState(state));
@@ -729,5 +729,5 @@ function addResult(descr, res)
 
 function addBlock(descr, res)
 {
-	restbl.appendChild(ce('tr', {}, ce('td', { innerHTML : descr }) ));
+	restbl.appendChild(ce('tr', {}, ce('td', { colSpan : 2, innerHTML : descr }) ));
 }
