@@ -157,7 +157,10 @@ var TransactionPage = new (function()
 			if (isObject(expected))
 				return checkObjValue(value, expected);
 			else if (value !== expected)
+			{
+				console.error('Not expected value ' + value + ' for ' + vKey + '. ' + expected  + ' is expected');
 				return false;
+			}
 		}
 
 		return true;
