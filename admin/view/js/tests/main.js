@@ -711,11 +711,18 @@ function expenseTransactionStart()
 	TransactionPage.clickSrcResultBalance();
 	addResult('Click on source result balance result', TransactionPage.checkState(state));
 
-	state.values.result_balance_row.value = '499.9';
-	state.values.dest_amount_left = '1.09 ₽';
-	state.values.dest_amount_row.value = '1.09';
+	setParam(state.values, { result_balance_row : { value : '499.9' }, src_res_balance_left : '499.90 ₽',
+								dest_amount_left : '1.09 ₽', dest_amount_row : { value : '1.09' } });
 	TransactionPage.inputResBalance(state.values.result_balance_row.value);
 	addResult('Result balance (499.9) input result', TransactionPage.checkState(state));
+
+	setParam(state.values, { result_balance_row : { value : '499.90' }, src_res_balance_left : '499.90 ₽' });
+	TransactionPage.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (499.90) input result', TransactionPage.checkState(state));
+
+	setParam(state.values, { result_balance_row : { value : '499.901' }, src_res_balance_left : '499.90 ₽' });
+	TransactionPage.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (499.901) input result', TransactionPage.checkState(state));
 
 }
 
