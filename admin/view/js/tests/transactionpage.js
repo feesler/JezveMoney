@@ -213,6 +213,15 @@ var TransactionPage = new (function()
 	}
 
 
+	this.clickDestAmount = function()
+	{
+		return performAction(function()
+		{
+			clickEmul(page.dest_amount_left.buttonElem);
+		});
+	}
+
+
 	this.inputResBalance = function(val)
 	{
 		return performAction(function()

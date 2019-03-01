@@ -676,12 +676,10 @@ function expenseTransactionStart()
 
 	addResult('Initial state', TransactionPage.checkState(state));
 
-
 	setParam(state.values, { dest_amount_row : { value : '1' },
 								src_res_balance_left : '499.99 ₽' });
 	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
 	addResult('Destination amount (1) input result', TransactionPage.checkState(state));
-
 
 	state.values.dest_amount_row.value = '1.';
 	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
@@ -704,7 +702,6 @@ function expenseTransactionStart()
 	TransactionPage.inputDestAmount(state.values.dest_amount_row.value);
 	addResult('Destination amount (1.0101) input result', TransactionPage.checkState(state));
 
-
 	setParam(state.visibility, { dest_amount_left : true, src_res_balance_left : false, dest_amount_row : false, result_balance_row : true });
 	setParam(state.values, { dest_amount_left : '1.01 ₽',
 							result_balance_row : { value : '499.98', isCurrActive : false } });
@@ -724,6 +721,9 @@ function expenseTransactionStart()
 	TransactionPage.inputResBalance(state.values.result_balance_row.value);
 	addResult('Result balance (499.901) input result', TransactionPage.checkState(state));
 
+	setParam(state.visibility, { dest_amount_left : false, src_res_balance_left : true, dest_amount_row : true, result_balance_row : false });
+	TransactionPage.clickDestAmount();
+	addResult('Click on destination amount result', TransactionPage.checkState(state));
 }
 
 
