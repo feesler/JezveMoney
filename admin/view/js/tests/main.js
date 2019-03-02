@@ -29,30 +29,82 @@ function onStartClick()
 {
 	addResult('Test initialization', 'OK');
 
-	continueWith(startTests);
-	viewframe.src = 'http://jezve.net/money/';
+	navigation(function()
+	{
+		viewframe.src = 'http://jezve.net/money/';
+	})
+	.then(startTests);
 }
 
 
 function startTests()
 {
 // Check user and logout if needed
-	if (isUserLoggedIn())
-		logoutUser();
-	else
-		loginAsTester();
+/* */
+	var startPromise = reloginAsTester()
+	.then(goToProfilePage)
+	.then(resetAll)
+	.then(goToMainPage)
+	.then(goToAccounts)
+	.then(goToCreateAccount)
+	.then(createAccount1)
+	.then(checkCreateAccount1)
+	.then(goToCreateAccount)
+	.then(createAccount2)
+	.then(checkCreateAccount2)
+	.then(goToUpdateAccount.bind(null, 0))
+	.then(editAccount1)
+	.then(checkEditAccount1)
+	.then(goToCreateAccount)
+	.then(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
+	.then(checkCreateAccount3)
+	.then(deleteFirstAndSecondAccounts)
+	.then(checkDeleteAccounts)
+	.then(goToCreateAccount)
+	.then(createAccountWithParam.bind(null, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }))
+	.then(goToCreateAccount)
+	.then(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }))
+	.then(goToMainPage)
+
+	.then(goToPersons)
+	.then(goToCreatePerson)
+	.then(createPerson.bind(null, 'Alex'))
+	.then(goToCreatePerson)
+	.then(createPerson.bind(null, 'Maria'))
+	.then(goToCreatePerson)
+	.then(createPerson.bind(null, 'Johnny'))
+	.then(goToCreatePerson)
+	.then(createPerson.bind(null, 'Иван'))
+	.then(goToUpdatePerson.bind(null, 3))
+	.then(updatePerson.bind(null, 3, 'Ivan<'))
+	.then(deletePersons1and3)
+
+	.then(goToMainPage)
+	.then(goToNewTransactionByAccount.bind(null, 1))
+	.then(expenseTransactionStart);
+
 }
 
 
+function reloginAsTester()
+{
+	if (isUserLoggedIn())
+		return logoutUser().then(loginAsTester)
+	else
+		return loginAsTester();
+}
+
+
+
+// Click on logout link from user menu and return navigation promise
 function logoutUser()
 {
 	clickEmul(header.user.menuBtn);
 
-	setTimeout(function()
+	return navigation(function()
 	{
-		continueWith(loginAsTester);
 		clickEmul(header.user.menuItems[1].elem);
-	}, 300);
+	});
 }
 
 
@@ -66,26 +118,25 @@ function loginAsTester()
 	login.value = 'test';
 	password.value = 'test';
 
-	continueWith(goToProfilePage.bind(null, resetAll));
-
 	var el = password.parentNode.nextElementSibling.firstElementChild;
-
-	clickEmul(el);
+	return navigation(function()
+	{
+		clickEmul(el)
+	});
 }
 
 
-function goToProfilePage(callback)
+function goToProfilePage()
 {
 	if (!isUserLoggedIn())
 		throw 'User is not logged in';
 
-	clickEmul(header.user.menuBtn);
+	clickEmul(header.user.menuBtn);		// open user menu
 
-	setTimeout(function()
+	return navigation(function()
 	{
-		continueWith(callback);
 		clickEmul(header.user.menuItems[0].elem);
-	}, 300);
+	});
 }
 
 
@@ -108,20 +159,25 @@ function resetAll()
 	if (!elem)
 		throw 'Confirm button not found';
 
-	continueWith(goToMainPage.bind(null, goToAccountsAndCreateNew));
-
-	clickEmul(elem);
+	return navigation(function()
+	{
+		clickEmul(elem);
+	});
 }
 
 
-function goToMainPage(callback)
+function goToMainPage()
 {
-	continueWith(function()
+	return navigation(function()
+	{
+		clickEmul(header.logo.linkElem);
+	})
+	.then(function()
 	{
 		mainPageWidgets = parseMainPageWidgets();
-		callback();
+
+		return Promise.resolve();
 	});
-	clickEmul(header.logo.linkElem);
 }
 
 
@@ -158,7 +214,7 @@ function parseMainPageWidgets()
 }
 
 
-function goToAccountsAndCreateNew()
+function goToAccounts()
 {
 	var elem;
 
@@ -166,16 +222,19 @@ function goToAccountsAndCreateNew()
 	if (!elem)
 		throw 'Link to accounts page not found';
 
-	continueWith(goToCreateAccount);
-
-	clickEmul(elem);
+	return navigation(function()
+	{
+		clickEmul(elem);
+	});
 }
 
 
 function goToCreateAccount()
 {
-	continueWith(createAccount1);
-	clickEmul(vquery('#add_btn > a'));
+	return navigation(function()
+	{
+		clickEmul(vquery('#add_btn > a'));
+	});
 }
 
 
@@ -233,8 +292,10 @@ function createAccount1()
 	page = AccountPage.inputBalance('1000.01');
 	addResult('Account tile balance on RUB 1 000.01 balance input field', (page.tile.balance == '1 000.01 ₽'));
 
-	continueWith(checkCreateAccount1);
-	clickEmul(page.submitBtn);
+	return navigation(function()
+	{
+		clickEmul(page.submitBtn);
+	});
 }
 
 
@@ -248,8 +309,7 @@ function checkCreateAccount1()
 
 	addResult('First account create result', submitRes);
 
-	continueWith(createAccount2);
-	clickEmul(vquery('#add_btn > a'));
+	return Promise.resolve();
 }
 
 
@@ -270,8 +330,10 @@ function createAccount2()
 	page = AccountPage.inputBalance('1000.01')
 	addResult('Account tile balance on EUR 1 000.01 balance input field', (page.tile.balance == '€ 1 000.01'));
 
-	continueWith(checkCreateAccount2);
-	clickEmul(page.submitBtn);
+	return navigation(function()
+	{
+		clickEmul(page.submitBtn);
+	});
 }
 
 
@@ -289,10 +351,21 @@ function checkCreateAccount2()
 
 	clickEmul(accTileBtn);
 
-	continueWith(editAccount1);
-	clickEmul(vquery('#edit_btn > a'));
+	return Promise.resolve()
 }
 
+
+function goToUpdateAccount(num)
+{
+	var accTileBtn = accTiles[num].elem.firstElementChild.firstElementChild;
+
+	clickEmul(accTileBtn);
+
+	return navigation(function()
+	{
+		clickEmul(vquery('#edit_btn > a'));
+	});
+}
 
 
 function editAccount1()
@@ -317,8 +390,10 @@ function editAccount1()
 	addResult('Tile icon update result', hasClass(page.tile.elem, 'purse_icon'));
 
 // Submit
-	continueWith(checkEditAccount1);
-	clickEmul(page.submitBtn);
+	return navigation(function()
+	{
+		clickEmul(page.submitBtn);
+	});
 }
 
 
@@ -333,12 +408,11 @@ function checkEditAccount1()
 
 	addResult('First account update result', submitRes);
 
-	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount3));
-	clickEmul(vquery('#add_btn > a'));
+	return Promise.resolve();
 }
 
 
-function createAccountWithParam(params, callback)
+function createAccountWithParam(params)
 {
 	if (!params)
 		throw 'No params specified';
@@ -350,8 +424,6 @@ function createAccountWithParam(params, callback)
 	var normBalance = normalize(params.balance);
 	if (isNaN(normBalance))
 		throw 'Balance not specified';
-	if (!isFunction(callback))
-		throw 'Callback not specified';
 
 
 	var page = AccountPage.parse();
@@ -386,8 +458,10 @@ function createAccountWithParam(params, callback)
 		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)));
 	}
 
-	continueWith(callback);
-	clickEmul(page.submitBtn);
+	return navigation(function()
+	{
+		clickEmul(page.submitBtn);
+	});
 }
 
 
@@ -402,7 +476,7 @@ function checkCreateAccount3()
 
 	addResult('Third account create result', submitRes);
 
-	deleteFirstAndSecondAccounts();
+ 	return Promise.resolve();
 }
 
 
@@ -430,8 +504,10 @@ function deleteFirstAndSecondAccounts()
 	if (!okBtn)
 		throw 'OK button not found';
 
-	continueWith(checkDeleteAccounts);
-	clickEmul(okBtn);
+	return navigation(function()
+	{
+		clickEmul(okBtn);
+	});
 }
 
 
@@ -441,24 +517,11 @@ function checkDeleteAccounts()
 
 	addResult('Accounts delete result', (accTiles && accTiles.length == 1));
 
-	continueWith(createAccountWithParam.bind(null, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }, checkCreateAccount1_2));
-	clickEmul(vquery('#add_btn > a'));
+	return Promise.resolve();
 }
 
 
-function checkCreateAccount1_2()
-{
-	continueWith(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 },
-					function()
-					{
-						continueWith(goToPersonsAndCreateNew);
-						clickEmul(vquery('.page .header .logo > a'));
-					}));
-	clickEmul(vquery('#add_btn > a'));
-}
-
-
-function goToPersonsAndCreateNew()
+function goToPersons()
 {
 	var widgets = vqueryall('.content_wrap .widget');
 
@@ -467,12 +530,14 @@ function goToPersonsAndCreateNew()
 
 	var personsWidget = widgets[3];
 
-	continueWith(goToCreatePerson1);
-	clickEmul(personsWidget.firstElementChild.firstElementChild);
+	return navigation(function()
+	{
+		clickEmul(personsWidget.firstElementChild.firstElementChild);
+	});
 }
 
 
-function goToCreatePerson1()
+function goToCreatePerson()
 {
 	var add_btn = vge('add_btn');
 	if (!add_btn)
@@ -482,14 +547,16 @@ function goToCreatePerson1()
 
 	addResult('Initial persons structure', (personTiles && personTiles.length == 0));
 
-	continueWith(createPerson1);
-	clickEmul(add_btn.firstElementChild);
+	return navigation(function()
+	{
+		clickEmul(add_btn.firstElementChild);
+	});
 }
 
 
 // From persons list page go to new person page, input name and submit
 // Next check name result and callback
-function createPersonAndCheck(personName, callback)
+function createPerson(personName)
 {
 	var initLength = personTiles.length;
 	var pname = vge('pname');
@@ -501,7 +568,11 @@ function createPersonAndCheck(personName, callback)
 	var ok_btn = vquery('.ok_btn');
 	addResult('Submit person button found', ok_btn);
 
-	continueWith(function()
+	return navigation(function()
+	{
+		clickEmul(ok_btn);
+	})
+	.then(function()
 	{
 		personTiles = parseTiles(vquery('.tiles'));
 
@@ -509,53 +580,13 @@ function createPersonAndCheck(personName, callback)
 											personTiles[initLength] &&
 											personTiles[initLength].name == personName));
 
-		if (isFunction(callback))
-			callback();
-	});
-	clickEmul(ok_btn);
-}
-
-
-function createPerson1()
-{
-	createPersonAndCheck('Alex', function()
-	{
-		continueWith(createPerson2);
-		clickEmul(vquery('#add_btn > a'));
+		return Promise.resolve();
 	});
 }
 
 
-function createPerson2()
+function goToUpdatePerson(num)
 {
-	createPersonAndCheck('Maria', function()
-	{
-		continueWith(createPerson3);
-		clickEmul(vquery('#add_btn > a'));
-	});
-}
-
-
-function createPerson3()
-{
-	createPersonAndCheck('Johnny', function()
-	{
-		continueWith(createPerson4);
-		clickEmul(vquery('#add_btn > a'));
-	});
-}
-
-
-function createPerson4()
-{
-	createPersonAndCheck('Иван', updatePerson3);
-}
-
-
-function updatePersonAndCheck(num, personName, callback)
-{
-	var initLength = personTiles.length;
-
 	if (num < 0 || num >= personTiles.length)
 		throw 'Wrong person number';
 
@@ -567,37 +598,39 @@ function updatePersonAndCheck(num, personName, callback)
 	addResult('Edit button visibility on select one person', isVisible(edit_btn));
 	addResult('Delete button visibility on select one person', isVisible(del_btn));
 
-	continueWith(function()
+	return navigation(function()
 	{
-		var pname = vge('pname');
-
-		addResult('Person name input found', pname);
-
-		inputEmul(pname, personName);
-
-		var ok_btn = vquery('.ok_btn');
-		addResult('Submit person button found', ok_btn);
-
-		continueWith(function()
-		{
-			personTiles = parseTiles(vquery('.tiles'));
-
-			addResult('Person update result', (personTiles && personTiles.length == initLength &&
-												personTiles[num] &&
-												personTiles[num].name == personName));
-
-			if (isFunction(callback))
-				callback();
-		});
-		clickEmul(ok_btn);
+		clickEmul(edit_btn.firstElementChild);
 	});
-	clickEmul(edit_btn.firstElementChild);
 }
 
 
-function updatePerson3()
+function updatePerson(num, personName)
 {
-	updatePersonAndCheck(3, 'Ivan<', deletePersons1and3);
+	var initLength = personTiles.length;
+	var pname = vge('pname');
+
+	addResult('Person name input found', pname);
+
+	inputEmul(pname, personName);
+
+	var ok_btn = vquery('.ok_btn');
+	addResult('Submit person button found', ok_btn);
+
+	return navigation(function()
+	{
+		clickEmul(ok_btn);
+	})
+	.then(function()
+	{
+		personTiles = parseTiles(vquery('.tiles'));
+
+		addResult('Person update result', (personTiles && personTiles.length == initLength &&
+											personTiles[num] &&
+											personTiles[num].name == personName));
+
+		return Promise.resolve();
+	});
 }
 
 
@@ -631,19 +664,22 @@ function deletePersons1and3()
 	if (!okBtn)
 		throw 'OK button not found';
 
-	continueWith(function()
+	return navigation(function()
+	{
+		clickEmul(okBtn);
+	})
+	.then(function()
 	{
 		personTiles = parseTiles(vquery('.tiles'));
 
 		addResult('Accounts delete result', (personTiles && personTiles.length == 2));
 
-		goToMainPage(goToNewTransactionByAccount.bind(null, 1, expenseTransactionStart));
+		return Promise.resolve();
 	});
-	clickEmul(okBtn);
 }
 
 
-function goToNewTransactionByAccount(accNum, callback)
+function goToNewTransactionByAccount(accNum)
 {
 	if (!mainPageWidgets || !mainPageWidgets[0])
 		throw 'Wrong state of main page';
@@ -657,8 +693,10 @@ function goToNewTransactionByAccount(accNum, callback)
 
 	var tile = accWidget.tiles[accNum];
 
-	continueWith(callback);
-	clickEmul(tile.linkElem);
+	return navigation(function()
+	{
+		clickEmul(tile.linkElem);
+	});
 }
 
 

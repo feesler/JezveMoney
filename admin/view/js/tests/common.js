@@ -44,18 +44,34 @@ function inputEmul(elemObj, val)
 }
 
 
-function continueWith(callback)
+function navigation(action)
 {
-	viewframe.onload = function()
+	var navPromise =  new Promise(function(resolve, reject)
 	{
-		vdoc = viewframe.contentWindow.document;
-		if (!vdoc)
-			throw 'View document not found';
 
-		checkPHPerrors();
-		header = parseHeader();
-		callback();
-	};
+		viewframe.onload = function()
+		{
+			vdoc = viewframe.contentWindow.document;
+			if (!vdoc)
+				throw 'View document not found';
+
+			checkPHPerrors();
+			try
+			{
+				header = parseHeader();
+				resolve();
+			}
+			catch(e)
+			{
+				reject(e.message, false);
+			}
+		};
+	});
+
+	if (isFunction(action))
+		action();
+
+	return navPromise;
 }
 
 function checkPHPerrors()
