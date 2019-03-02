@@ -54,6 +54,8 @@
 .testview
 {
 	width: 50%;
+	max-height: 730px;
+	overflow: auto;
 }
 
 
