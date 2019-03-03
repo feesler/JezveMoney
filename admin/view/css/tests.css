@@ -45,6 +45,26 @@
 }
 
 
+.res-block-1
+{
+	background-color: #005588;
+	color: #FFFFFF;
+}
+
+
+.res-block-2
+{
+	background-color: #0099BB;
+}
+
+
+.res-block-3
+{
+	background-color: #22CCFF;
+}
+
+
+/* Placeholder */
 .ph
 {
 	width: 10%;

@@ -39,50 +39,75 @@ function onStartClick()
 
 function startTests()
 {
-// Check user and logout if needed
-/* */
-	var startPromise = reloginAsTester()
+	reloginAsTester()
 	.then(goToProfilePage)
 	.then(resetAll)
-	.then(goToMainPage)
-	.then(goToAccounts)
-	.then(goToCreateAccount)
-	.then(createAccount1)
-	.then(checkCreateAccount1)
-	.then(goToCreateAccount)
-	.then(createAccount2)
-	.then(checkCreateAccount2)
-	.then(goToUpdateAccount.bind(null, 0))
-	.then(editAccount1)
-	.then(checkEditAccount1)
-	.then(goToCreateAccount)
-	.then(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
-	.then(checkCreateAccount3)
-	.then(deleteFirstAndSecondAccounts)
-	.then(checkDeleteAccounts)
-	.then(goToCreateAccount)
-	.then(createAccountWithParam.bind(null, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }))
-	.then(goToCreateAccount)
-	.then(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }))
-	.then(goToMainPage)
 
-	.then(goToPersons)
-	.then(goToCreatePerson)
-	.then(createPerson.bind(null, 'Alex'))
-	.then(goToCreatePerson)
-	.then(createPerson.bind(null, 'Maria'))
-	.then(goToCreatePerson)
-	.then(createPerson.bind(null, 'Johnny'))
-	.then(goToCreatePerson)
-	.then(createPerson.bind(null, 'Иван'))
-	.then(goToUpdatePerson.bind(null, 3))
-	.then(updatePerson.bind(null, 3, 'Ivan<'))
-	.then(deletePersons1and3)
+	.then(accountTests)
+	.then(personTests)
+	.then(transactionTests);
+}
 
-	.then(goToMainPage)
-	.then(goToNewTransactionByAccount.bind(null, 1))
-	.then(expenseTransactionStart);
 
+function setBlock(title, category)
+{
+	addBlock(title, category);
+
+	return Promise.resolve();
+}
+
+
+function accountTests()
+{
+	return setBlock('Accounts', 1)
+			.then(goToMainPage)
+			.then(goToAccounts)
+			.then(goToCreateAccount)
+			.then(createAccount1)
+			.then(checkCreateAccount1)
+			.then(goToCreateAccount)
+			.then(createAccount2)
+			.then(checkCreateAccount2)
+			.then(goToUpdateAccount.bind(null, 0))
+			.then(editAccount1)
+			.then(checkEditAccount1)
+			.then(goToCreateAccount)
+			.then(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
+			.then(checkCreateAccount3)
+			.then(deleteFirstAndSecondAccounts)
+			.then(checkDeleteAccounts)
+			.then(goToCreateAccount)
+			.then(createAccountWithParam.bind(null, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }))
+			.then(goToCreateAccount)
+			.then(createAccountWithParam.bind(null, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }));
+}
+
+
+function personTests()
+{
+	return setBlock('Persons', 1)
+			.then(goToMainPage)
+			.then(goToPersons)
+			.then(goToCreatePerson)
+			.then(createPerson.bind(null, 'Alex'))
+			.then(goToCreatePerson)
+			.then(createPerson.bind(null, 'Maria'))
+			.then(goToCreatePerson)
+			.then(createPerson.bind(null, 'Johnny'))
+			.then(goToCreatePerson)
+			.then(createPerson.bind(null, 'Иван'))
+			.then(goToUpdatePerson.bind(null, 3))
+			.then(updatePerson.bind(null, 3, 'Ivan<'))
+			.then(deletePersons1and3);
+}
+
+
+function transactionTests()
+{
+	return setBlock('Transactions', 1)
+			.then(goToMainPage)
+			.then(goToNewTransactionByAccount.bind(null, 1))
+			.then(expenseTransactionStart);
 }
 
 
@@ -772,7 +797,7 @@ function addResult(descr, res)
 }
 
 
-function addBlock(descr, res)
+function addBlock(descr, category)
 {
-	restbl.appendChild(ce('tr', {}, ce('td', { colSpan : 2, innerHTML : descr }) ));
+	restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 2, innerHTML : descr }) ));
 }
