@@ -212,7 +212,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (savalid)
 			f5();		// calculate e
 
-		notifyChanged('dest_amount', fda);
+		notifyChanged('dest_amount', da);
 	}
 
 
@@ -291,6 +291,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 				f1_d();			// calculate result balance of destination
 			}
 		}
+
+		notifyChanged('src_resbal', S2);
 	}
 
 
@@ -321,6 +323,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			f4();			// calculate source amount
 			f1();			// calculate result balance of source
 		}
+
+		notifyChanged('dest_resbal', S2_d);
 	}
 
 
