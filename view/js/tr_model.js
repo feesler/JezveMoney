@@ -212,7 +212,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		if (savalid)
 			f5();		// calculate e
 
-		notifyChanged('dest_amount', fda);
+		notifyChanged('dest_amount', da);
 	}
 
 
