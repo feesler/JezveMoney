@@ -229,4 +229,13 @@ var TransactionPage = new (function()
 			inputEmul(page.result_balance_row.valueInput, val);
 		});
 	}
+
+
+	this.changeDestCurrency = function(val)
+	{
+		return performAction(function()
+		{
+			page.dest_amount_row.currDropDown.selectByValue(val);
+		});
+	}
 })();

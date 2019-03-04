@@ -787,6 +787,11 @@ function expenseTransactionStart()
 	setParam(state.visibility, { dest_amount_left : false, src_res_balance_left : true, dest_amount_row : true, result_balance_row : false });
 	TransactionPage.clickDestAmount();
 	addResult('Click on destination amount result', TransactionPage.checkState(state));
+
+	setParam(state.visibility, { exch_left : true, src_amount_row : true });
+	setParam(state.values, { exch_left : '1 $/₽', src_amount_row : { currSign : '₽' }, dest_amount_left : '$ 1.09', dest_amount_row : { currSign : '$' } });
+	TransactionPage.changeDestCurrency(2);
+	addResult('Change destination curency result', TransactionPage.checkState(state));
 }
 
 
