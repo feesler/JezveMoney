@@ -38,7 +38,7 @@ function startTests(page)
 {
 	reloginAsTester(page)
 	.then(page => page.goToProfilePage())
-	.then(resetAll)
+	.then(page => page.resetAll())
 
 	.then(accountTests)
 	.then(personTests)
@@ -134,32 +134,6 @@ function loginAsTester(page)
 	{
 		clickEmul(el)
 	}, MainPage);
-}
-
-
-function resetAll()
-{
-	var elem;
-
-	elem = vge('resetall_form');
-	if (!elem)
-		throw 'Reset all button not found';
-
-	elem = elem.nextElementSibling;
-	elem = elem.querySelector('input');
-	if (!elem)
-		throw 'Reset all button not found';
-
-	clickEmul(elem);
-
-	elem = vquery('#reset_warning .btn.ok_btn');
-	if (!elem)
-		throw 'Confirm button not found';
-
-	return navigation(function()
-	{
-		clickEmul(elem);
-	});
 }
 
 

@@ -248,6 +248,25 @@ TestPage.prototype.parseInputRow = function(elem)
 };
 
 
+
+TestPage.prototype.parseWarningPopup = function(elem)
+{
+	if (!elem)
+		return null;
+
+	var res = { elem : elem };
+
+	res.titleElem = elem.querySelector('.popup_title');
+	res.title = res.titleElem.innerHTML;
+	res.messageElem = elem.querySelector('.popup_message > div');
+	res.message = res.messageElem.innerHTML;
+	res.okBtn = elem.querySelector('.popup_controls > .btn.ok_btn');
+	res.cancelBtn = elem.querySelector('.popup_title > .btn.cancel_btn');
+
+	return res;
+};
+
+
 TestPage.prototype.parseContent = function()
 {
 };
@@ -353,6 +372,18 @@ TestPage.prototype.checkState = function(stateObj)
 {
 	return stateObj && this.checkVisibility(stateObj.visibility) && this.checkValues(stateObj.values);
 };
+
+
+// Click on profile menu item and return navigation promise
+TestPage.prototype.goToProfilePage = function()
+{
+	if (!this.isUserLoggedIn())
+		throw 'User is not logged in';
+
+	clickEmul(this.header.user.menuBtn);		// open user menu
+
+	return navigation(() => clickEmul(this.header.user.menuItems[0].elem), ProfilePage);
+}
 
 
 // Click on logout link from user menu and return navigation promise

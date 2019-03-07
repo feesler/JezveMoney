@@ -42,17 +42,6 @@ MainPage.prototype.parseContent = function()
 };
 
 
-MainPage.prototype.goToProfilePage = function()
-{
-	if (!this.isUserLoggedIn())
-		throw 'User is not logged in';
-
-	clickEmul(this.header.user.menuBtn);		// open user menu
-
-	return navigation(() => clickEmul(this.header.user.menuItems[0].elem));
-}
-
-
 MainPage.prototype.goToAccounts = function()
 {
 	var elem;
