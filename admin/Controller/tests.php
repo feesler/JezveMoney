@@ -21,6 +21,8 @@ class TestsAdminController extends Controller
 		$this->buildCSS();
 		$this->jsArr[] = "currency.js";
 		$this->jsAdmin[] = "tests/common.js";
+		$this->jsAdmin[] = "tests/page.js";
+		$this->jsAdmin[] = "tests/mainpage.js";
 		$this->jsAdmin[] = "tests/accountpage.js";
 		$this->jsAdmin[] = "tests/transactionpage.js";
 		$this->jsAdmin[] = "tests/main.js";

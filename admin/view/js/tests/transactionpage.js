@@ -1,9 +1,9 @@
 // Create or update transaction page tests
-var TransactionPage = new (function()
+function TransactionPage()
 {
-	var self = this;
-	var page = null;
-	var availableControls = ['source',
+	TransactionPage.parent.constructor.apply(this, arguments);
+
+	this.availableControls = ['source',
 					'destination',
 					'src_amount_left',
 					'dest_amount_left',
@@ -15,227 +15,112 @@ var TransactionPage = new (function()
 					'exchange_row',
 					'result_balance_row',
 					'result_balance_dest_row'];
+}
 
 
-	function parseTileRightItem(elem)
+extend(TransactionPage, TestPage);
+
+
+TransactionPage.prototype.parseTileRightItem = function(elem)
+{
+	if (!elem || !elem.firstElementChild || !elem.firstElementChild.nextElementSibling || !elem.firstElementChild.nextElementSibling.firstElementChild)
+		return null;
+
+	var res = { elem : elem };
+	res.titleElem = elem.firstElementChild;
+	res.title = res.titleElem.innerHTML;
+	res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
+	res.value = res.buttonElem.firstElementChild.innerHTML;
+
+	return res;
+};
+
+
+TransactionPage.prototype.parseTileBlock = function(elem)
+{
+	if (!elem || !elem.firstElementChild || !elem.firstElementChild.firstElementChild || !elem.firstElementChild.nextElementSibling)
+		return null;
+
+	var res = { elem : elem };
+
+	res.label = elem.firstElementChild.firstElementChild.innerHTML;
+	res.tile = this.parseTile(elem.querySelector('.tile'));
+
+	return res;
+}
+
+
+TransactionPage.prototype.parseContent = function()
+{
+	var res = {};
+
+	var menuItems = vqueryall('#trtype_menu > span');
+	res.typeMenu = [];
+	for(var i = 0; i < menuItems.length; i++)
 	{
-		if (!elem || !elem.firstElementChild || !elem.firstElementChild.nextElementSibling || !elem.firstElementChild.nextElementSibling.firstElementChild)
-			return null;
+		var menuItem = menuItems[i].firstElementChild;
 
-		var res = { elem : elem };
-		res.titleElem = elem.firstElementChild;
-		res.title = res.titleElem.innerHTML;
-		res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
-		res.value = res.buttonElem.firstElementChild.innerHTML;
+		res.type = this.getTransactionType(menuItem.innerHTML);
 
-		return res;
-	}
+		var menuItemObj = { text : menuItem.innerHTML, type : this.getTransactionType(menuItem.innerHTML) };
 
-
-	function parseTileBlock(elem)
-	{
-		if (!elem || !elem.firstElementChild || !elem.firstElementChild.firstElementChild || !elem.firstElementChild.nextElementSibling)
-			return null;
-
-		var res = { elem : elem };
-
-		res.label = elem.firstElementChild.firstElementChild.innerHTML;
-		res.tile = parseTile(elem.querySelector('.tile'));
-
-		return res;
-	}
-
-
-	function parsePage()
-	{
-		var res = {};
-
-		var menuItems = vqueryall('#trtype_menu > span');
-		res.typeMenu = [];
-		for(var i = 0; i < menuItems.length; i++)
+		if (menuItem.tagName == 'B')
 		{
-			var menuItem = menuItems[i].firstElementChild;
-
-			res.type = getTransactionType(menuItem.innerHTML);
-
-			var menuItemObj = { text : menuItem.innerHTML, type : getTransactionType(menuItem.innerHTML) };
-
-			if (menuItem.tagName == 'B')
-			{
-				res.activeType = menuItemObj.type;
-				menuItemObj.isActive = true;
-			}
-			else if (menuItem.tagName == 'A')
-			{
-				menuItemObj.link = menuItem.href;
-				menuItemObj.isActive = false;
-			}
-			res.typeMenu.push(menuItemObj);
+			res.activeType = menuItemObj.type;
+			menuItemObj.isActive = true;
 		}
-
-		res.source = parseTileBlock(vge('source'));
-		res.destination = parseTileBlock(vge('destination'));
-
-		res.src_amount_left = parseTileRightItem(vge('src_amount_left'));
-		res.dest_amount_left = parseTileRightItem(vge('dest_amount_left'));
-		res.src_res_balance_left = parseTileRightItem(vge('src_res_balance_left'));
-		res.dest_res_balance_left = parseTileRightItem(vge('dest_res_balance_left'));
-		res.exch_left = parseTileRightItem(vge('exch_left'));
-
-		res.src_amount_row = parseInputRow(vge('src_amount_row'));
-		res.dest_amount_row = parseInputRow(vge('dest_amount_row'));
-		res.exchange_row = parseInputRow(vge('exchange'));
-		res.result_balance_row = parseInputRow(vge('result_balance'));
-		res.result_balance_dest_row = parseInputRow(vge('result_balance_dest'));
-
-		return res;
-	}
-
-
-	function performAction(action)
-	{
-		if (!isFunction(action))
-			throw 'Wrong action specified';
-
-		if (!page)
-			self.parse();
-
-		action.call(self);
-
-		return self.parse();
-	}
-
-
-	this.parse = function()
-	{
-		page = parsePage();
-
-		return page;
-	}
-
-
-	this.checkVisibility = function(controls)
-	{
-		var control, expected, fact;
-
-		for(var countrolName in controls)
+		else if (menuItem.tagName == 'A')
 		{
-			if (availableControls.indexOf[countrolName] === -1)
-				throw 'Unknown control ' + countrolName;
-
-			expected = controls[countrolName];
-
-			control = page[countrolName];
-			fact = !(!control || !control.elem || !isVisible(control.elem));
-			if (expected != fact)
-			{
-				console.error('Not expected visibility of ' + countrolName + ' control');
-				return false;
-			}
+			menuItemObj.link = menuItem.href;
+			menuItemObj.isActive = false;
 		}
-
-		return true;
+		res.typeMenu.push(menuItemObj);
 	}
 
+	res.source = this.parseTileBlock(vge('source'));
+	res.destination = this.parseTileBlock(vge('destination'));
 
-	function checkObjValue(obj, expectedObj)
-	{
-		if (obj === expectedObj)
-			return true;
+	res.src_amount_left = this.parseTileRightItem(vge('src_amount_left'));
+	res.dest_amount_left = this.parseTileRightItem(vge('dest_amount_left'));
+	res.src_res_balance_left = this.parseTileRightItem(vge('src_res_balance_left'));
+	res.dest_res_balance_left = this.parseTileRightItem(vge('dest_res_balance_left'));
+	res.exch_left = this.parseTileRightItem(vge('exch_left'));
 
-		var value, expected;
-		for(var vKey in expectedObj)
-		{
-			if (!(vKey in obj))
-			{
-				console.error('Key ' + vKey + ' not found');
-				return false;
-			}
+	res.src_amount_row = this.parseInputRow(vge('src_amount_row'));
+	res.dest_amount_row = this.parseInputRow(vge('dest_amount_row'));
+	res.exchange_row = this.parseInputRow(vge('exchange'));
+	res.result_balance_row = this.parseInputRow(vge('result_balance'));
+	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
 
-			expected = expectedObj[vKey];
-			value = obj[vKey];
-			if (isObject(expected))
-				return checkObjValue(value, expected);
-			else if (value !== expected)
-			{
-				console.error('Not expected value ' + value + ' for ' + vKey + '. ' + expected  + ' is expected');
-				return false;
-			}
-		}
-
-		return true;
-	}
+	return res;
+}
 
 
-	this.checkValues = function(controls)
-	{
-		var control, expected, fact;
-
-		for(var countrolName in controls)
-		{
-			if (availableControls.indexOf[countrolName] === -1)
-				throw 'Unknown control ' + countrolName;
-
-			expected = controls[countrolName];
-			control = page[countrolName];
-			if (!control || (isObject(expected) && !checkObjValue(control, expected)) || (!isObject(expected) && control.value !== expected))
-			{
-				console.error('Not expected values of ' + countrolName + ' control');
-				return false;
-			}
-		}
-
-		return true;
-	}
+TransactionPage.prototype.inputDestAmount = function(val)
+{
+	this.performAction(() => inputEmul(this.content.dest_amount_row.valueInput, val));
+}
 
 
-	this.checkState = function(stateObj)
-	{
-		return stateObj && this.checkVisibility(stateObj.visibility) && this.checkValues(stateObj.values);
-	}
+TransactionPage.prototype.clickSrcResultBalance = function()
+{
+	this.performAction(() => clickEmul(this.content.src_res_balance_left.buttonElem));
+}
 
 
-	this.inputDestAmount = function(val)
-	{
-		return performAction(function()
-		{
-			inputEmul(page.dest_amount_row.valueInput, val);
-		});
-	}
+TransactionPage.prototype.clickDestAmount = function()
+{
+	this.performAction(() => clickEmul(this.content.dest_amount_left.buttonElem));
+}
 
 
-	this.clickSrcResultBalance = function()
-	{
-		return performAction(function()
-		{
-			clickEmul(page.src_res_balance_left.buttonElem);
-		});
-	}
+TransactionPage.prototype.inputResBalance = function(val)
+{
+	this.performAction(() => inputEmul(this.content.result_balance_row.valueInput, val))
+}
 
 
-	this.clickDestAmount = function()
-	{
-		return performAction(function()
-		{
-			clickEmul(page.dest_amount_left.buttonElem);
-		});
-	}
-
-
-	this.inputResBalance = function(val)
-	{
-		return performAction(function()
-		{
-			inputEmul(page.result_balance_row.valueInput, val);
-		});
-	}
-
-
-	this.changeDestCurrency = function(val)
-	{
-		return performAction(function()
-		{
-			page.dest_amount_row.currDropDown.selectByValue(val);
-		});
-	}
-})();
+TransactionPage.prototype.changeDestCurrency = function(val)
+{
+	this.performAction(() => this.content.dest_amount_row.currDropDown.selectByValue(val));
+}

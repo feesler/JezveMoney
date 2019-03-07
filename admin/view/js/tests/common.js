@@ -24,7 +24,7 @@ function clickEmul(elemObj)
 {
 	if (elemObj.click)
 	{
-		elemObj.click()
+		elemObj.click();
 	}
 	else if (document.createEvent)
 	{
@@ -44,11 +44,10 @@ function inputEmul(elemObj, val)
 }
 
 
-function navigation(action)
+function navigation(action, pageClass)
 {
-	var navPromise =  new Promise(function(resolve, reject)
+	var navPromise = new Promise(function(resolve, reject)
 	{
-
 		viewframe.onload = function()
 		{
 			vdoc = viewframe.contentWindow.document;
@@ -58,8 +57,10 @@ function navigation(action)
 			checkPHPerrors();
 			try
 			{
-				header = parseHeader();
-				resolve();
+				if (pageClass === undefined)
+					pageClass = TestPage;
+
+				resolve(new pageClass());
 			}
 			catch(e)
 			{
@@ -73,6 +74,7 @@ function navigation(action)
 
 	return navPromise;
 }
+
 
 function checkPHPerrors()
 {
@@ -88,246 +90,4 @@ function checkPHPerrors()
 
 	if (found)
 		addResult('PHP error signature found', false);
-}
-
-
-function isUserLoggedIn()
-{
-	return (header && header.user && header.user.menuBtn);
-}
-
-
-function parseHeader()
-{
-	var el;
-	var res = {};
-
-	res.elem = vquery('.page > .page_wrapper > .header');
-	if (!res.elem)
-		return res;		// no header is ok for login page
-
-	res.logo = {};
-	res.logo.elem = res.elem.querySelector('.logo');
-	if (!res.logo.elem)
-		throw 'Logo element not found';
-
-	res.logo.linkElem = res.logo.elem.querySelector('a');
-	if (!res.logo.linkElem)
-		throw 'Logo link element not found';
-
-	res.user = {};
-	res.user.elem = res.elem.querySelector('.userblock');
-	if (res.user.elem)
-	{
-		res.user.menuBtn = res.elem.querySelector('button.user_button');
-		if (!res.user.menuBtn)
-			throw 'User button not found';
-		el = res.user.menuBtn.querySelector('.user_title');
-		if (!el)
-			throw 'User title element not found';
-		res.user.name = el.innerHTML;
-
-		res.user.menuEl = res.elem.querySelector('.usermenu');
-		if (!res.user.menuEl)
-			throw 'Menu element not found';
-
-		res.user.menuItems = [];
-		var menuLinks = res.user.menuEl.querySelectorAll('ul > li > a');
-		for(var i = 0; i < menuLinks.length; i++)
-		{
-			el = menuLinks[i];
-			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerHTML });
-		}
-	}
-
-	return res;
-}
-
-
-function parseId(id)
-{
-	if (typeof id !== 'string')
-		return id;
-
-	var pos = id.indexOf('_');
-	return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
-}
-
-
-function parseTile(tileEl)
-{
-	if (!tileEl || !hasClass(tileEl, 'tile'))
-		throw 'Wrong tile structure';
-
-	var tileObj = { elem : tileEl, linkElem : tileEl.firstElementChild,
-					balanceEL : tileEl.querySelector('.acc_bal'),
-					nameEL : tileEl.querySelector('.acc_name') };
-
-	tileObj.id = parseId(tileEl.id);
-	tileObj.balance = tileObj.balanceEL.innerText;
-	tileObj.name = tileObj.nameEL.innerText;
-
-	return tileObj;
-}
-
-
-function parseInfoTile(tileEl)
-{
-	if (!tileEl || !hasClass(tileEl, 'info_tile'))
-		throw 'Wrong info tile structure';
-
-	var tileObj = { elem : tileEl,
-					titleEl : tileEl.querySelector('.info_title'),
-					subtitleEl : tileEl.querySelector('.info_subtitle') };
-
-	tileObj.id = parseId(tileEl.id);
-	tileObj.title = tileObj.titleEl.innerHTML;
-	tileObj.subtitle = tileObj.subtitleEl.innerHTML;
-
-	return tileObj;
-}
-
-
-function parseTiles(tilesEl, parseCallback)
-{
-	if (!tilesEl)
-		return null;
-
-	var res = [];
-	if (!tilesEl || (tilesEl.children.length == 1 && tilesEl.children[0].tagName == 'SPAN'))
-		return res;
-
-	var callback = parseCallback || parseTile;
-	for(var i = 0; i < tilesEl.children.length; i++)
-	{
-		var tileObj = callback(tilesEl.children[i]);
-		if (!tileObj)
-			throw 'Fail to parse tile';
-
-		res.push(tileObj);
-	}
-
-	res.sort(function(a, b)
-	{
-		return (a.id == b.id) ? 0 : ((a.id < b.id) ? -1 : 1);
-	});
-
-	return res;
-}
-
-
-function parseInfoTiles(tilesEl)
-{
-	return parseTiles(tilesEl, parseInfoTile);
-}
-
-
-function parseDropDown(elem)
-{
-	var res = { elem : elem };
-	if (!res.elem || (!hasClass(res.elem, 'dd_container') && !hasClass(res.elem, 'dd_attached')))
-		throw 'Wrong drop down element';
-
-	res.isAttached = hasClass(res.elem, 'dd_attached');
-	if (res.isAttached)
-		res.selectBtn = res.elem.firstElementChild;
-	else
-		res.selectBtn = res.elem.querySelector('button.selectBtn');
-	if (!res.selectBtn)
-		throw 'Select button not found';
-
-	if (!res.isAttached)
-	{
-		res.statSel = res.elem.querySelector('.dd_input_cont span.statsel');
-		if (!res.statSel)
-			throw 'Static select element not found';
-		res.input = res.elem.querySelector('.dd_input_cont input');
-		if (!res.input)
-			throw 'Input element not found';
-
-		res.editable = isVisible(res.input);
-		res.textValue = (res.editable) ? res.input.value : res.statSel.innerHTML;
-	}
-
-	res.selectElem = res.elem.querySelector('select');
-
-	res.listContainer = res.elem.querySelector('.ddlist');
-	if (res.listContainer)
-	{
-		var listItems = res.elem.querySelectorAll('.ddlist li > div');
-		res.items = [];
-		for(var i = 0; i < listItems.length; i++)
-		{
-			var li = listItems[i];
-			var itemObj = { id : parseId(li.id), text : li.innerHTML, elem : li };
-
-			res.items.push(itemObj);
-		}
-	}
-
-	res.selectByValue = function(val)
-	{
-		clickEmul(this.selectBtn);
-		var li = idSearch(this.items, val);
-		if (!li)
-			throw 'List item not found';
-		clickEmul(li.elem);
-	};
-
-	return res;
-}
-
-
-function getTransactionType(str)
-{
-	var strToType = { 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
-
-	if (!str)
-		return null;
-
-	var key = str.toUpperCase();
-	return (strToType[key] !== undefined) ? strToType[key] : null;
-}
-
-
-function parseInputRow(elem)
-{
-	if (!elem)
-		return null;
-
-	var res = { elem : elem };
-
-	res.labelEl = elem.querySelector('label');
-	if (!res.labelEl)
-		throw 'Label element not found';
-
-	res.label = res.labelEl.innerHTML;
-	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
-	res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
-	if (res.isCurrActive)
-	{
-		res.currDropDown = parseDropDown(res.currElem.firstElementChild);
-		if (!res.currDropDown.isAttached)
-			throw 'Currency drop down is not attached';
-		res.currSign = res.currDropDown.selectBtn.innerHTML;
-	}
-	else if (hasClass(res.currElem, 'exchrate_comm'))
-	{
-		res.currSign = res.currElem.innerHTML;
-	}
-	else
-	{
-		res.currSign = res.currElem.firstElementChild.innerHTML;
-	}
-
-	var t = res.currElem.nextElementSibling;
-	if (t && t.tagName == 'INPUT' && t.type.toUpperCase() == 'HIDDEN')
-	{
-		res.hiddenValue = t.value;
-	}
-
-	res.valueInput = elem.querySelector('.stretch_input > input');
-	res.value = res.valueInput.value;
-
-	return res;
 }

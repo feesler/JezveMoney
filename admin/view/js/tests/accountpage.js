@@ -1,107 +1,74 @@
 // Create or update account page tests
-var AccountPage = new (function()
+function AccountPage()
 {
-	var self = this;
-	var page = null;
+	TransactionPage.parent.constructor.apply(this, arguments);
+}
 
 
-	function parsePage()
-	{
-		var res = {};
+extend(AccountPage, TestPage);
 
-		res.headingElem = vquery('.heading > h1');
-		if (!res.headingElem)
-			throw 'Heading element not found';
-		res.heading = res.headingElem.innerHTML;
 
-		res.tile = parseTile(vge('acc_tile'));
+AccountPage.prototype.parseContent = function()
+{
+	var res = {};
 
-		res.formElem = vquery('form');
-		if (!res.formElem)
-			throw 'Form element not found';
+	res.headingElem = vquery('.heading > h1');
+	if (!res.headingElem)
+		throw 'Heading element not found';
+	res.heading = res.headingElem.innerHTML;
 
-		res.isEdit = (res.formElem.firstElementChild.id == 'accid');
+	res.tile = this.parseTile(vge('acc_tile'));
 
-		var elem = res.formElem.firstElementChild.nextElementSibling;
-		if (res.isEdit)
-			elem = elem.nextElementSibling;
-		res.iconDropDown = parseDropDown(elem.querySelector('.dd_container'));
+	res.formElem = vquery('form');
+	if (!res.formElem)
+		throw 'Form element not found';
 
-		res.nameInp = vge('accname');
-		if (!res.nameInp)
-			throw 'Account name input not found';
-		res.name = res.nameInp.value;
+	res.isEdit = (res.formElem.firstElementChild.id == 'accid');
 
-		elem = elem.nextElementSibling.nextElementSibling;
-		res.currDropDown = parseDropDown(elem.querySelector('.dd_container'));
-
+	var elem = res.formElem.firstElementChild.nextElementSibling;
+	if (res.isEdit)
 		elem = elem.nextElementSibling;
+	res.iconDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
 
-		res.balance = parseInputRow(elem);
+	res.nameInp = vge('accname');
+	if (!res.nameInp)
+		throw 'Account name input not found';
+	res.name = res.nameInp.value;
 
-		res.submitBtn = vquery('.acc_controls .ok_btn');
-		if (!res.submitBtn)
-			throw 'Submit button not found';
+	elem = elem.nextElementSibling.nextElementSibling;
+	res.currDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
 
-		return res;
-	}
+	elem = elem.nextElementSibling;
 
+	res.balance = this.parseInputRow(elem);
 
-	function performAction(action)
-	{
-		if (!isFunction(action))
-			throw 'Wrong action specified';
+	res.submitBtn = vquery('.acc_controls .ok_btn');
+	if (!res.submitBtn)
+		throw 'Submit button not found';
 
-		if (!page)
-			self.parse();
-
-		action.call(self);
-
-		return self.parse();
-	}
+	return res;
+};
 
 
-	this.parse = function()
-	{
-		page = parsePage();
-
-		return page;
-	}
+AccountPage.prototype.inputName = function(val)
+{
+	this.performAction(() => inputEmul(this.content.nameInp, val));
+};
 
 
-	this.inputName = function(val)
-	{
-		return performAction(function()
-		{
-			inputEmul(page.nameInp, val);
-		});
-	}
+AccountPage.prototype.inputBalance = function(val)
+{
+	this.performAction(() => inputEmul(this.content.balance.valueInput, val));
+};
 
 
-	this.inputBalance = function(val)
-	{
-		return performAction(function()
-		{
-			inputEmul(page.balance.valueInput, val);
-		});
-	}
+AccountPage.prototype.changeCurrency = function(val)
+{
+	this.performAction(() => this.content.currDropDown.selectByValue(val));
+};
 
 
-	this.changeCurrency = function(val)
-	{
-		return performAction(function()
-		{
-			page.currDropDown.selectByValue(val);
-		});
-	}
-
-
-	this.changeIcon = function(val)
-	{
-		return performAction(function()
-		{
-			page.iconDropDown.selectByValue(val);
-		});
-	}
-
-})();
+AccountPage.prototype.changeIcon = function(val)
+{
+	this.performAction(() => this.content.iconDropDown.selectByValue(val));
+};
