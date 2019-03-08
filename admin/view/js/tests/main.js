@@ -1,4 +1,6 @@
 var restbl = null;
+var totalRes = null, okRes = null, failRes = null;
+var results = {};
 var initPersonsLength;
 var tileIconClass = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
 
@@ -6,24 +8,22 @@ var tileIconClass = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon
 
 function initTests()
 {
-	viewframe = ge('viewframe');
-
-	if (!viewframe)
-		throw 'View frame not found';
-
-	restbl = ge('restbl');
-	if (!restbl)
-		throw 'Results table not found';
-
 	var startbtn = ge('startbtn');
-	if (!startbtn)
-		throw 'Start button not found';
+	totalRes = ge('totalRes');
+	okRes = ge('okRes');
+	failRes = ge('failRes');
+	viewframe = ge('viewframe');
+	restbl = ge('restbl');
+	if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
+		throw 'Fail to init tests';
+
 	startbtn.onclick = onStartClick;
 }
 
 
 function onStartClick()
 {
+	results = { total : 0, ok : 0, fail : 0 };
 	addResult('Test initialization', 'OK');
 
 	navigation(function()
@@ -540,6 +540,10 @@ function expenseTransactionStart(page)
 
 function addResult(descr, res)
 {
+	totalRes.innerHTML = ++results.total;
+	okRes.innerHTML = (res) ? ++results.ok : results.ok;
+	failRes.innerHTML = (res) ? results.fail : ++results.fail;
+
 	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
 										ce('td', { innerHTML : (res ? 'OK' : 'FAIL' ) }) ]));
 }

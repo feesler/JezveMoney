@@ -13,7 +13,12 @@ onReady(initTests);
 			<div class="content">
 				<div class="content_wrap tests_content">
 					<div class="results">
-						<div class="controls"><input id="startbtn" class="adm_act_btn" type="button" value="start"></div>
+						<div class="controls">
+							<input id="startbtn" class="adm_act_btn" type="button" value="start">
+							<table>
+								<tr><td>Total: <span id="totalRes"></span></td><td>Ok: <span id="okRes"></span></td><td>Fail: <span id="failRes"></span></td></tr>
+							</table>
+						</div>
 						<div class="tbl_container"><table><tbody id="restbl"></tbody></table></div>
 					</div>
 					<div class="ph"></div>
