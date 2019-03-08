@@ -1,7 +1,7 @@
 // Create or update account page tests
 function AccountPage()
 {
-	TransactionPage.parent.constructor.apply(this, arguments);
+	AccountPage.parent.constructor.apply(this, arguments);
 }
 
 
