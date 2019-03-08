@@ -71,4 +71,15 @@ MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 	var link = tile.linkElem;
 
 	return navigation(() => clickEmul(link), TransactionPage);
+};
+
+
+MainPage.prototype.goToPersons = function(page)
+{
+	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+		throw 'Fail to parse main page widgets';
+
+	var personsWidget = this.content.widgets[3];
+
+	return navigation(() => clickEmul(personsWidget.linkElem), PersonsPage);
 }

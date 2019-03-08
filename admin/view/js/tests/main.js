@@ -84,17 +84,21 @@ function personTests(page)
 	setBlock('Persons', 1);
 
 	return page.goToMainPage()
-			.then(goToPersons)
+			.then(page => page.goToPersons())
 			.then(checkInitialPersons)
-			.then(goToCreatePerson)
-			.then(page => createPerson(page, 'Alex'))
-			.then(goToCreatePerson)
-			.then(page => createPerson(page, 'Maria'))
-			.then(goToCreatePerson)
-			.then(page => createPerson(page, 'Johnny'))
-			.then(goToCreatePerson)
-			.then(page => createPerson(page, 'Иван'))
-			.then(page => goToUpdatePerson(page, 3))
+			.then(page => page.goToCreatePerson())
+			.then(page => page.createPerson('Alex'))
+			.then(page => checkCreatePerson(page, 'Alex'))
+			.then(page => page.goToCreatePerson())
+			.then(page => page.createPerson('Maria'))
+			.then(page => checkCreatePerson(page, 'Maria'))
+			.then(page => page.goToCreatePerson())
+			.then(page => page.createPerson('Johnny'))
+			.then(page => checkCreatePerson(page, 'Johnny'))
+			.then(page => page.goToCreatePerson())
+			.then(page => page.createPerson('Иван'))
+			.then(page => checkCreatePerson(page, 'Иван'))
+			.then(page => page.goToUpdatePerson(3))
 			.then(page => updatePerson(page, 3, 'Ivan<'))
 			.then(deletePersons1and3);
 }
@@ -370,125 +374,49 @@ function checkDeleteAccounts(page)
 }
 
 
-function goToPersons(page)
-{
-	var widgets = vqueryall('.content_wrap .widget');
-
-	if (!widgets || widgets.length != 5)
-		throw 'Fail to parse main page widgets';
-
-	var personsWidget = widgets[3];
-
-	return navigation(function()
-	{
-		clickEmul(personsWidget.firstElementChild.firstElementChild);
-	});
-}
-
-
 function checkInitialPersons(page)
 {
 	var personTiles = page.parseTiles(vquery('.tiles'));
 
 	addResult('Initial persons structure', (personTiles && personTiles.length == 0));
 
-	return Promise.resolve(page);
-}
-
-
-function goToCreatePerson(page)
-{
-	var add_btn = vge('add_btn');
-	if (!add_btn)
-		throw 'New person button not found';
-
-	var personTiles = page.parseTiles(vquery('.tiles'));
-
 	initPersonsLength = personTiles.length;
 
-	return navigation(function()
-	{
-		clickEmul(add_btn.firstElementChild);
-	});
+	return Promise.resolve(page);
 }
 
 
 // From persons list page go to new person page, input name and submit
 // Next check name result and callback
-function createPerson(page, personName)
+function checkCreatePerson(page, personName)
 {
-	var pname = vge('pname');
+	addResult('Person create result', (page.content.tiles && page.content.tiles.length == (initPersonsLength + 1) &&
+										page.content.tiles[initPersonsLength] &&
+										page.content.tiles[initPersonsLength].name == personName));
 
-	addResult('Person name input found', pname);
+	initPersonsLength = page.content.tiles.length;
 
-	inputEmul(pname, personName);
-
-	var ok_btn = vquery('.ok_btn');
-	addResult('Submit person button found', ok_btn);
-
-	return navigation(function()
-	{
-		clickEmul(ok_btn);
-	})
-	.then(function(page)
-	{
-		var personTiles = page.parseTiles(vquery('.tiles'));
-
-		addResult('Person create result', (personTiles && personTiles.length == initPersonsLength + 1 &&
-											personTiles[initPersonsLength] &&
-											personTiles[initPersonsLength].name == personName));
-
-		return Promise.resolve(page);
-	});
-}
-
-
-function goToUpdatePerson(page, num)
-{
-	var personTiles = page.parseTiles(vquery('.tiles'));
-
-	if (num < 0 || num >= personTiles.length)
-		throw 'Wrong person number';
-
-	initPersonsLength = personTiles.length;
-
-	clickEmul(personTiles[num].elem.firstElementChild);
-
-	var edit_btn = vge('edit_btn');
-	var del_btn = vge('del_btn')
-
-	addResult('Edit button visibility on select one person', isVisible(edit_btn));
-	addResult('Delete button visibility on select one person', isVisible(del_btn));
-
-	return navigation(function()
-	{
-		clickEmul(edit_btn.firstElementChild);
-	});
+	return Promise.resolve(page);
 }
 
 
 function updatePerson(page, num, personName)
 {
-	var pname = vge('pname');
+	addResult('Person name input found', page.content.nameInp);
 
-	addResult('Person name input found', pname);
+	page.inputName(personName);
 
-	inputEmul(pname, personName);
-
-	var ok_btn = vquery('.ok_btn');
-	addResult('Submit person button found', ok_btn);
+	addResult('Submit person button found', page.content.submitBtn);
 
 	return navigation(function()
 	{
-		clickEmul(ok_btn);
-	})
-	.then(function(pageClass)
+		clickEmul(page.content.submitBtn);
+	}, PersonsPage)
+	.then(function(page)
 	{
-		var personTiles = page.parseTiles(vquery('.tiles'));
-
-		addResult('Person update result', (personTiles && personTiles.length == initPersonsLength &&
-											personTiles[num] &&
-											personTiles[num].name == personName));
+		addResult('Person update result', (page.content.tiles && page.content.tiles.length == initPersonsLength &&
+											page.content.tiles[num] &&
+											page.content.tiles[num].name == personName));
 
 		return Promise.resolve(page);
 	});
