@@ -44,16 +44,14 @@ MainPage.prototype.parseContent = function()
 
 MainPage.prototype.goToAccounts = function()
 {
-	var elem;
+ 	if (!this.content.widgets || !this.content.widgets[0])
+		throw 'Accounts widget not found';
 
-	elem = vquery('.content_wrap .widget .widget_title > a');
-	if (!elem)
-		throw 'Link to accounts page not found';
+	var widget = this.content.widgets[0];
+	if (widget.title != 'Accounts')
+		throw 'Wrong widget';
 
-	return navigation(function()
-	{
-		clickEmul(elem);
-	});
+	return navigation(() => clickEmul(widget.linkElem), AccountsPage);
 };
 
 

@@ -58,23 +58,23 @@ function accountTests(page)
 
 	return page.goToMainPage()
 			.then(page => page.goToAccounts())
-			.then(goToCreateAccount)
+			.then(page => page.goToCreateAccount())
 			.then(createAccount1)
 			.then(checkCreateAccount1)
-			.then(goToCreateAccount)
+			.then(page => page.goToCreateAccount())
 			.then(createAccount2)
 			.then(checkCreateAccount2)
-			.then(page => goToUpdateAccount(page, 0))
+			.then(page => page.goToUpdateAccount(0))
 			.then(editAccount1)
 			.then(checkEditAccount1)
-			.then(goToCreateAccount)
+			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
 			.then(checkCreateAccount3)
 			.then(deleteFirstAndSecondAccounts)
 			.then(checkDeleteAccounts)
-			.then(goToCreateAccount)
+			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }))
-			.then(goToCreateAccount)
+			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }));
 }
 
@@ -137,12 +137,6 @@ function loginAsTester(page)
 }
 
 
-function goToCreateAccount()
-{
-	return navigation(() => clickEmul(vquery('#add_btn > a')), AccountPage);
-}
-
-
 function createAccount1(page)
 {
 	addResult('New account page loaded', true);
@@ -195,10 +189,7 @@ function createAccount1(page)
 	page.inputBalance('1000.01');
 	addResult('Account tile balance on RUB 1 000.01 balance input field', (page.content.tile.balance == '1 000.01 ₽'));
 
-	return navigation(function()
-	{
-		clickEmul(page.content.submitBtn);
-	});
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
 }
 
 
@@ -231,40 +222,19 @@ function createAccount2(page)
 	page.inputBalance('1000.01')
 	addResult('Account tile balance on EUR 1 000.01 balance input field', (page.content.tile.balance == '€ 1 000.01'));
 
-	return navigation(function()
-	{
-		clickEmul(page.content.submitBtn);
-	});
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
 }
 
 
 function checkCreateAccount2(page)
 {
-	var accTiles = page.parseTiles(vquery('.tiles'));
-
-	var submitRes = (accTiles && accTiles.length == 2 &&
-		 				accTiles[1].balance == '€ 1 000.01' &&
-						accTiles[1].name == 'acc_2')
+	var submitRes = (page.content.tiles && page.content.tiles.length == 2 &&
+		 				page.content.tiles[1].balance == '€ 1 000.01' &&
+						page.content.tiles[1].name == 'acc_2')
 
 	addResult('Second account create result', submitRes);
 
-	var accTileBtn = accTiles[0].elem.firstElementChild.firstElementChild;
-
-	clickEmul(accTileBtn);
-
 	return Promise.resolve(page);
-}
-
-
-function goToUpdateAccount(page, num)
-{
-	var accTiles = page.parseTiles(vquery('.tiles'));
-
-	var accTileBtn = accTiles[num].elem.firstElementChild.firstElementChild;
-
-	clickEmul(accTileBtn);
-
-	return navigation(() => clickEmul(vquery('#edit_btn > a')), AccountPage);
 }
 
 
@@ -288,10 +258,7 @@ function editAccount1(page)
 	addResult('Tile icon update result', hasClass(page.content.tile.elem, 'purse_icon'));
 
 // Submit
-	return navigation(function()
-	{
-		clickEmul(page.content.submitBtn);
-	});
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
 }
 
 
@@ -353,21 +320,16 @@ function createAccountWithParam(page, params)
 		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)));
 	}
 
-	return navigation(function()
-	{
-		clickEmul(page.content.submitBtn);
-	});
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
 }
 
 
 function checkCreateAccount3(page)
 {
-	var accTiles = page.parseTiles(vquery('.tiles'));
-
-	var submitRes = (accTiles && accTiles.length == 3 &&
-						accTiles[2].balance == '500.99 ₽' &&
-						accTiles[2].name == 'acc_3' &&
-						hasClass(accTiles[2].elem, ['tile_icon', 'safe_icon']))
+	var submitRes = (page.content.tiles && page.content.tiles.length == 3 &&
+						page.content.tiles[2].balance == '500.99 ₽' &&
+						page.content.tiles[2].name == 'acc_3' &&
+						hasClass(page.content.tiles[2].elem, ['tile_icon', 'safe_icon']))
 
 	addResult('Third account create result', submitRes);
 
@@ -377,42 +339,32 @@ function checkCreateAccount3(page)
 
 function deleteFirstAndSecondAccounts(page)
 {
-	var accTiles = page.parseTiles(vquery('.tiles'));
+	clickEmul(page.content.tiles[0].elem.firstElementChild);
 
-	clickEmul(accTiles[0].elem.firstElementChild);
+	addResult('Edit button visibility on select one account', isVisible(page.content.toolbar.editBtnElem));
+	addResult('Delete button visibility on select one account', isVisible(page.content.toolbar.delBtnElem));
 
-	var edit_btn = vge('edit_btn');
-	var del_btn = vge('del_btn')
+	clickEmul(page.content.tiles[2].elem.firstElementChild);
+	page.parse();
 
-	addResult('Edit button visibility on select one account', isVisible(edit_btn));
-	addResult('Delete button visibility on select one account', isVisible(del_btn));
+	addResult('Edit button visibility on select two accounts', !isVisible(page.content.toolbar.editBtnElem));
+	addResult('Delete button visibility on select two accounts', isVisible(page.content.toolbar.delBtnElem));
 
-	clickEmul(accTiles[2].elem.firstElementChild);
+	clickEmul(page.content.delBtn);
+	page.parse();
 
-	addResult('Edit button visibility on select two accounts', !isVisible(edit_btn));
-	addResult('Delete button visibility on select two accounts', isVisible(del_btn));
+	addResult('Delete account warning popup appear', isVisible(page.content.delete_warning.elem));
 
-	clickEmul(del_btn.firstElementChild);
-
-	var delete_warning = vge('delete_warning');
-	addResult('Delete account warning popup appear', isVisible(delete_warning));
-
-	var okBtn = delete_warning.querySelector('.ok_btn');
-	if (!okBtn)
+	if (!page.content.delete_warning.okBtn)
 		throw 'OK button not found';
 
-	return navigation(function()
-	{
-		clickEmul(okBtn);
-	});
+	return navigation(() => clickEmul(page.content.delete_warning.okBtn), AccountsPage);
 }
 
 
 function checkDeleteAccounts(page)
 {
-	var accTiles = page.parseTiles(vquery('.tiles'));
-
-	addResult('Accounts delete result', (accTiles && accTiles.length == 1));
+	addResult('Accounts delete result', (page.content.tiles && page.content.tiles.length == 1));
 
 	return Promise.resolve(page);
 }
