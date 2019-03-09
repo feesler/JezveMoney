@@ -8,7 +8,9 @@ function TestPage()
 
 TestPage.prototype.isUserLoggedIn = function()
 {
-	return (this.header && this.header.user && this.header.user.menuBtn);
+	var loggedOutLocations = ['login', 'register'];
+
+	return loggedOutLocations.every((item) => this.location.indexOf('/' + item) === -1);
 };
 
 
@@ -274,6 +276,7 @@ TestPage.prototype.parseContent = function()
 
 TestPage.prototype.parse = function()
 {
+	this.location = viewframe.contentWindow.location.href;
 	this.header = this.parseHeader();
 	this.content = this.parseContent();
 };
@@ -382,8 +385,10 @@ TestPage.prototype.goToProfilePage = function()
 
 	clickEmul(this.header.user.menuBtn);		// open user menu
 
-	return navigation(() => clickEmul(this.header.user.menuItems[0].elem), ProfilePage);
-}
+	return navigation(() => {
+		setTimeout(() => clickEmul(this.header.user.menuItems[0].elem), 500);
+	}, ProfilePage);
+};
 
 
 // Click on logout link from user menu and return navigation promise
@@ -391,8 +396,10 @@ TestPage.prototype.logoutUser = function()
 {
 	clickEmul(this.header.user.menuBtn);
 
-	return navigation(() => clickEmul(this.header.user.menuItems[1].elem));
-}
+	return navigation(() => {
+		setTimeout(() => clickEmul(this.header.user.menuItems[1].elem), 500);
+	}, LoginPage);
+};
 
 
 TestPage.prototype.goToMainPage = function()
@@ -401,4 +408,4 @@ TestPage.prototype.goToMainPage = function()
 		throw 'User not logged in';
 
 	return navigation(() => clickEmul(this.header.logo.linkElem), MainPage);
-}
+};

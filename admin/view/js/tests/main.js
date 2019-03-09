@@ -116,28 +116,9 @@ function transactionTests(page)
 
 function reloginAsTester(page)
 {
-	if (page.isUserLoggedIn())
-		return page.logoutUser().then(loginAsTester)
-	else
-		return loginAsTester(page);
-}
+	var loginPagePromise = (page.isUserLoggedIn()) ? page.logoutUser() : Promise.resolve(new LoginPage());
 
-
-function loginAsTester(page)
-{
-	var login, password;
-
-	login = vge('login');
-	password = vge('password');
-
-	login.value = 'test';
-	password.value = 'test';
-
-	var el = password.parentNode.nextElementSibling.firstElementChild;
-	return navigation(function()
-	{
-		clickEmul(el)
-	}, MainPage);
+	return loginPagePromise.then(page => page.loginAs('test', 'test'));
 }
 
 
