@@ -15,8 +15,12 @@ onReady(initTests);
 					<div class="results">
 						<div class="controls">
 							<input id="startbtn" class="adm_act_btn" type="button" value="start">
-							<table>
-								<tr><td>Total: <span id="totalRes"></span></td><td>Ok: <span id="okRes"></span></td><td>Fail: <span id="failRes"></span></td></tr>
+							<table class="adm_tbl counter_tbl">
+								<tr>
+									<td class="title">Total</td><td id="totalRes"></td>
+									<td class="title">Ok</td><td id="okRes"></td>
+									<td class="title">Fail</td><td id="failRes"></td>
+								</tr>
 							</table>
 						</div>
 						<div class="tbl_container"><table><tbody id="restbl"></tbody></table></div>

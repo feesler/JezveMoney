@@ -20,6 +20,26 @@
 }
 
 
+.adm_tbl.counter_tbl
+{
+	display: inline;
+	border: 0 none;
+}
+
+
+.counter_tbl td.title
+{
+	border-right: 0 none;
+}
+
+
+.counter_tbl td.title + td
+{
+	border-left: 0 none;
+}
+
+
+
 .results
 {
 	width: 40%;
@@ -32,13 +52,13 @@
 	overflow-y: auto;
 }
 
-.results table
+.tbl_container table
 {
 	border-collapse: collapse;
 }
 
 
-.results td
+.tbl_container td
 {
 	border: 1px solid #000000;
 	padding: 5px;
