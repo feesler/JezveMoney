@@ -124,55 +124,57 @@ function reloginAsTester(page)
 
 function createAccount1(page)
 {
-	addResult('New account page loaded', true);
+	var state = { values : { tile : { name : 'New account', balance : '0 ₽' },
+							nameInp : '', balance : '0' } };
 
-	addResult('Initial account name on tile', (page.content.tile.name == 'New account'));
-	addResult('Initial account balance on tile', (page.content.tile.balance == '0 ₽'));
+	addResult('Initial state of new account page', page.checkState(state));
 
-	addResult('Initial balance input value', (page.content.balance.value == '0'));
-
+	setParam(state.values, { tile : { name : 'acc_1' }, nameInp : 'acc_1' });
 	page.inputName('acc_1');
-
-	addResult('Account tile name update', (page.content.tile.name == 'acc_1'));
-	addResult('Account name value input correct', (page.content.name == 'acc_1'));
+	addResult('Account name input result', page.checkState(state));
 
 // Change currency
+	setParam(state.values, { currDropDown : { textValue : 'USD' }, tile : { balance : '$ 0' } });
 	page.changeCurrency(2);		// select USD currency
+	addResult('Change currency result', page.checkState(state));
 
-	addResult('Currency drop down value select', (page.content.currDropDown.textValue == 'USD'));
-	addResult('Tile balance format update result', (page.content.tile.balance == '$ 0'));
 
+	setParam(state.values, { tile : { balance : '$ 100 000.01' }, balance : '100000.01' });
 	page.inputBalance('100000.01');
-
-	addResult('Account tile balance on USD 100 000.01 balance input field', (page.content.tile.balance == '$ 100 000.01'));
+	addResult('Input balance (100 000.01) result', page.checkState(state));
 
 // Change currency back
+	setParam(state.values, { currDropDown : { textValue : 'RUB' }, tile : { balance : '100 000.01 ₽' } });
 	page.changeCurrency(1);		// select RUB currency
-
-	addResult('Currency drop down value select back', (page.content.currDropDown.textValue == 'RUB'));
-	addResult('Tile balance format after change currency back update result', (page.content.tile.balance == '100 000.01 ₽'));
+	addResult('Change currency back result', page.checkState(state));
 
 // Input empty value for initial balance
+	setParam(state.values, { tile : { balance : '0 ₽' }, balance : '' });
 	page.inputBalance('');
-	addResult('Account tile balance on empty input field', (page.content.tile.balance == '0 ₽'));
+	addResult('Input empty balance result', page.checkState(state));
 
+	state.values.balance = '.';
 	page.inputBalance('.');
-	addResult('Account tile balance on dot(.) input field', (page.content.tile.balance == '0 ₽'));
+	addResult('Input dot (.) balance result', page.checkState(state));
 
+	setParam(state.values, { tile : { balance : '0.01 ₽' }, balance : '.01' });
 	page.inputBalance('.01');
-	addResult('Account tile balance on RUB .01 balance input field', (page.content.tile.balance == '0.01 ₽'));
+	addResult('Input (.01) balance result', page.checkState(state));
 
+	setParam(state.values, { tile : { balance : '10 000 000.01 ₽' }, balance : '10000000.01' });
 	page.inputBalance('10000000.01');
-	addResult('Account tile balance on RUB 10 000 000.01 balance input field', (page.content.tile.balance == '10 000 000.01 ₽'));
+	addResult('Input (10000000.01) balance result', page.checkState(state));
 
 // Change icon
+	setParam(state.values,  { iconDropDown : { textValue : 'Safe' },
+							tile : { elem : { className : 'tile tile_icon safe_icon' } } });
 	page.changeIcon(2);	// select safe icon
+	addResult('Change icon result', page.checkState(state));
 
-	addResult('Icon drop down value select', (page.content.iconDropDown.textValue == 'Safe'));
-	addResult('Tile icon update result', (hasClass(vge('acc_tile'), 'safe_icon')));
-
+	setParam(state.values, { tile : { balance : '1 000.01 ₽' }, balance : '1000.01' });
 	page.inputBalance('1000.01');
-	addResult('Account tile balance on RUB 1 000.01 balance input field', (page.content.tile.balance == '1 000.01 ₽'));
+	addResult('Input (1000.01) balance result', page.checkState(state));
+
 
 	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
 }
@@ -180,13 +182,9 @@ function createAccount1(page)
 
 function checkCreateAccount1(page)
 {
-	var accTiles = page.parseTiles(vquery('.tiles'));
+	var state = { tiles : { length : 1, 0 : { balance : '1 000.01 ₽', name : 'acc_1' } } };
 
-	var submitRes = (accTiles && accTiles.length == 1 &&
-						accTiles[0].balance == '1 000.01 ₽' &&
-						accTiles[0].name == 'acc_1')
-
-	addResult('First account create result', submitRes);
+	addResult('First account create result', page.checkState(state));
 
 	return Promise.resolve(page);
 }
