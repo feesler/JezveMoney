@@ -302,9 +302,6 @@ TestPage.prototype.checkVisibility = function(controls)
 
 	for(var countrolName in controls)
 	{
-		if (this.availableControls.indexOf[countrolName] === -1)
-			throw 'Unknown control ' + countrolName;
-
 		expected = controls[countrolName];
 
 		control = this.content[countrolName];
@@ -355,9 +352,6 @@ TestPage.prototype.checkValues = function(controls)
 
 	for(var countrolName in controls)
 	{
-		if (this.availableControls.indexOf[countrolName] === -1)
-			throw 'Unknown control ' + countrolName;
-
 		expected = controls[countrolName];
 		control = this.content[countrolName];
 		if (!control || (isObject(expected) && !this.checkObjValue(control, expected)) || (!isObject(expected) && control.value !== expected))

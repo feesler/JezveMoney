@@ -2,19 +2,6 @@
 function TransactionPage()
 {
 	TransactionPage.parent.constructor.apply(this, arguments);
-
-	this.availableControls = ['source',
-					'destination',
-					'src_amount_left',
-					'dest_amount_left',
-					'src_res_balance_left',
-					'dest_res_balance_left',
-					'exch_left',
-					'src_amount_row',
-					'dest_amount_row',
-					'exchange_row',
-					'result_balance_row',
-					'result_balance_dest_row'];
 }
 
 
