@@ -57,3 +57,43 @@ AccountsPage.prototype.goToUpdateAccount = function(num)
 
 	return navigation(() => clickEmul(this.content.editBtn), AccountPage);
 }
+
+
+// Delete secified accounts and return navigation promise
+AccountsPage.prototype.deleteAccounts = function(acc)
+{
+	if (!acc)
+		throw 'No accounts specified';
+
+	if (!isArray(acc))
+		acc = [acc];
+
+	acc.forEach(function(acc_num, ind)
+	{
+		if (acc_num >= this.content.tiles.length)
+			throw 'Wrong account number';
+
+		clickEmul(this.content.tiles[acc_num].elem.firstElementChild);
+		this.parse();
+
+		var editIsVisible = isVisible(this.content.toolbar.editBtnElem);
+		if (ind == 0 && !editIsVisible)
+			throw 'Edit button is not visible';
+		else if (ind > 0 && editIsVisible)
+			throw 'Edit button is visible while more than one accounts is selected';
+
+		if (!isVisible(this.content.toolbar.delBtnElem))
+			throw 'Delete button is not visible';
+	}, this);
+
+	clickEmul(this.content.delBtn);
+	this.parse();
+
+	if (!isVisible(this.content.delete_warning.elem))
+		throw 'Delete account warning popup not appear';
+
+	if (!this.content.delete_warning.okBtn)
+		throw 'OK button not found';
+
+	return navigation(() => clickEmul(this.content.delete_warning.okBtn), AccountsPage);
+}

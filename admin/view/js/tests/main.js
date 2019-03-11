@@ -70,7 +70,7 @@ function accountTests(page)
 			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
 			.then(checkCreateAccount3)
-			.then(deleteFirstAndSecondAccounts)
+			.then(page => page.deleteAccounts([0, 1]))
 			.then(checkDeleteAccounts)
 			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }))
@@ -317,31 +317,6 @@ function checkCreateAccount3(page)
 	addResult('Third account create result', submitRes);
 
  	return Promise.resolve(page);
-}
-
-
-function deleteFirstAndSecondAccounts(page)
-{
-	clickEmul(page.content.tiles[0].elem.firstElementChild);
-
-	addResult('Edit button visibility on select one account', isVisible(page.content.toolbar.editBtnElem));
-	addResult('Delete button visibility on select one account', isVisible(page.content.toolbar.delBtnElem));
-
-	clickEmul(page.content.tiles[2].elem.firstElementChild);
-	page.parse();
-
-	addResult('Edit button visibility on select two accounts', !isVisible(page.content.toolbar.editBtnElem));
-	addResult('Delete button visibility on select two accounts', isVisible(page.content.toolbar.delBtnElem));
-
-	clickEmul(page.content.delBtn);
-	page.parse();
-
-	addResult('Delete account warning popup appear', isVisible(page.content.delete_warning.elem));
-
-	if (!page.content.delete_warning.okBtn)
-		throw 'OK button not found';
-
-	return navigation(() => clickEmul(page.content.delete_warning.okBtn), AccountsPage);
 }
 
 
