@@ -23,10 +23,9 @@ PersonPage.prototype.parseContent = function()
 
 	res.isEdit = (res.formElem.firstElementChild.id == 'pid');
 
-	res.nameInp = vge('pname');
-	if (!res.nameInp)
+	res.name = this.parseInputRow(res.formElem.querySelector('div.non_float'));
+	if (!res.name)
 		throw 'Person name input not found';
-	res.name = res.nameInp.value;
 
 	res.submitBtn = vquery('.acc_controls .ok_btn');
 	if (!res.submitBtn)
@@ -38,7 +37,7 @@ PersonPage.prototype.parseContent = function()
 
 PersonPage.prototype.inputName = function(val)
 {
-	this.performAction(() => inputEmul(this.content.nameInp, val));
+	this.performAction(() => this.content.name.input(val));
 };
 
 

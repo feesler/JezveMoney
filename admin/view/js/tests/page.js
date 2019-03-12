@@ -260,31 +260,39 @@ TestPage.prototype.parseInputRow = function(elem)
 
 	res.label = res.labelEl.innerHTML;
 	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
-	res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
-	if (res.isCurrActive)
+	if (res.currElem)
 	{
-		res.currDropDown = this.parseDropDown(res.currElem.firstElementChild);
-		if (!res.currDropDown.isAttached)
-			throw 'Currency drop down is not attached';
-		res.currSign = res.currDropDown.selectBtn.innerHTML;
-	}
-	else if (hasClass(res.currElem, 'exchrate_comm'))
-	{
-		res.currSign = res.currElem.innerHTML;
-	}
-	else
-	{
-		res.currSign = res.currElem.firstElementChild.innerHTML;
+		res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
+		if (res.isCurrActive)
+		{
+			res.currDropDown = this.parseDropDown(res.currElem.firstElementChild);
+			if (!res.currDropDown.isAttached)
+				throw 'Currency drop down is not attached';
+			res.currSign = res.currDropDown.selectBtn.innerHTML;
+		}
+		else if (hasClass(res.currElem, 'exchrate_comm'))
+		{
+			res.currSign = res.currElem.innerHTML;
+		}
+		else
+		{
+			res.currSign = res.currElem.firstElementChild.innerHTML;
+		}
 	}
 
-	var t = res.currElem.nextElementSibling;
-	if (t && t.tagName == 'INPUT' && t.type.toUpperCase() == 'HIDDEN')
+	var t = elem.querySelector('input[type="hidden"]');
+	if (t)
 	{
 		res.hiddenValue = t.value;
 	}
 
 	res.valueInput = elem.querySelector('.stretch_input > input');
 	res.value = res.valueInput.value;
+
+	res.input = function(val)
+	{
+		inputEmul(res.valueInput, val);
+	};
 
 	return res;
 };

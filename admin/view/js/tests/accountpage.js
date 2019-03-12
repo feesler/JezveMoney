@@ -30,12 +30,12 @@ AccountPage.prototype.parseContent = function()
 		elem = elem.nextElementSibling;
 	res.iconDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
 
-	res.nameInp = vge('accname');
-	if (!res.nameInp)
+	elem = elem.nextElementSibling;
+	res.name = this.parseInputRow(elem);
+	if (!res.name)
 		throw 'Account name input not found';
-	res.name = res.nameInp.value;
 
-	elem = elem.nextElementSibling.nextElementSibling;
+	elem = elem.nextElementSibling;
 	res.currDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
 
 	elem = elem.nextElementSibling;
@@ -52,13 +52,13 @@ AccountPage.prototype.parseContent = function()
 
 AccountPage.prototype.inputName = function(val)
 {
-	this.performAction(() => inputEmul(this.content.nameInp, val));
+	this.performAction(() => this.content.name.input(val));
 };
 
 
 AccountPage.prototype.inputBalance = function(val)
 {
-	this.performAction(() => inputEmul(this.content.balance.valueInput, val));
+	this.performAction(() => this.content.balance.input(val));
 };
 
 
