@@ -207,6 +207,41 @@ TestPage.prototype.getTransactionType = function(str)
 };
 
 
+TestPage.prototype.parseIconLink = function(elem)
+{
+	if (!elem)
+		return null;
+
+	var res = { elem : elem };
+
+	if (!hasClass(elem, 'iconlink'))
+		throw 'Wrong icon link';
+
+	res.linkElem = elem.firstElementChild;
+	if (!res.linkElem)
+		throw 'Link element not found';
+
+	res.titleElem = res.linkElem.querySelector('.icontitle');
+	if (!res.titleElem || !res.titleElem.firstElementChild)
+		throw 'Title element not found';
+	res.title = res.titleElem.firstElementChild.innerHTML;
+
+// Subtitle is optional
+	res.subTitleElem = res.titleElem.querySelector('.subtitle');
+	if (res.subTitleElem)
+	{
+		res.subtitle = res.subTitleElem.innerHTML;
+	}
+
+	res.click = function()
+	{
+		clickEmul(res.linkElem);
+	};
+
+	return res;
+};
+
+
 TestPage.prototype.parseInputRow = function(elem)
 {
 	if (!elem)

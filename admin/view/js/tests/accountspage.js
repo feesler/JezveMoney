@@ -11,20 +11,16 @@ extend(AccountsPage, TestPage);
 AccountsPage.prototype.parseContent = function()
 {
 	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : vquery('#add_btn > a'),
+ 				addBtn : this.parseIconLink(vge('add_btn')),
 				toolbar : {
 					elem : vge('toolbar'),
-					editBtnElem : vquery('#edit_btn'),
-					exportBtnElem : vquery('#export_btn'),
-					delBtnElem : vquery('#del_btn')
+					editBtn : this.parseIconLink(vge('edit_btn')),
+					exportBtn : this.parseIconLink(vge('export_btn')),
+					delBtn : this.parseIconLink(vge('del_btn'))
 				}
 			};
-	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtnElem || !res.toolbar.exportBtnElem || !res.toolbar.delBtnElem)
+	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 		throw 'Wrong accounts page structure';
-
-	res.editBtn = res.toolbar.editBtnElem.firstElementChild;
-	res.exportBtn = res.toolbar.exportBtnElem.firstElementChild;
-	res.delBtn = res.toolbar.delBtnElem.firstElementChild;
 
 	res.title = res.titleEl.innerHTML;
 	res.tiles = this.parseTiles(vquery('.tiles'));
@@ -38,7 +34,7 @@ AccountsPage.prototype.parseContent = function()
 // Click on add button and return navigation promise
 AccountsPage.prototype.goToCreateAccount = function()
 {
-	return navigation(() => clickEmul(this.content.addBtn), AccountPage);
+	return navigation(() => this.content.addBtn.click(), AccountPage);
 };
 
 
@@ -52,10 +48,10 @@ AccountsPage.prototype.goToUpdateAccount = function(num)
 
 	clickEmul(tile.linkElem);
 
-	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.editBtn || !isVisible(this.content.toolbar.editBtnElem))
+	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update account button not visible';
 
-	return navigation(() => clickEmul(this.content.editBtn), AccountPage);
+	return navigation(() => this.content.toolbar.editBtn.click(), AccountPage);
 }
 
 
@@ -76,17 +72,17 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 		clickEmul(this.content.tiles[acc_num].elem.firstElementChild);
 		this.parse();
 
-		var editIsVisible = isVisible(this.content.toolbar.editBtnElem);
+		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
 		if (ind == 0 && !editIsVisible)
 			throw 'Edit button is not visible';
 		else if (ind > 0 && editIsVisible)
 			throw 'Edit button is visible while more than one accounts is selected';
 
-		if (!isVisible(this.content.toolbar.delBtnElem))
+		if (!isVisible(this.content.toolbar.delBtn.elem))
 			throw 'Delete button is not visible';
 	}, this);
 
-	clickEmul(this.content.delBtn);
+	this.content.toolbar.delBtn.click();
 	this.parse();
 
 	if (!isVisible(this.content.delete_warning.elem))

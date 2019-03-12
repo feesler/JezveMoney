@@ -11,18 +11,15 @@ extend(PersonsPage, TestPage);
 PersonsPage.prototype.parseContent = function()
 {
 	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : vquery('#add_btn > a'),
+ 				addBtn : this.parseIconLink(vge('add_btn')),
 				toolbar : {
 					elem : vge('toolbar'),
-					editBtnElem : vquery('#edit_btn'),
-					delBtnElem : vquery('#del_btn')
+					editBtn : this.parseIconLink(vge('edit_btn')),
+					delBtn : this.parseIconLink(vge('del_btn'))
 				}
 			};
-	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtnElem || !res.toolbar.delBtnElem)
+	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 		throw 'Wrong persons page structure';
-
-	res.editBtn = res.toolbar.editBtnElem.firstElementChild;
-	res.delBtn = res.toolbar.delBtnElem.firstElementChild;
 
 	res.title = res.titleEl.innerHTML;
 	res.tiles = this.parseTiles(vquery('.tiles'));
@@ -36,7 +33,7 @@ PersonsPage.prototype.parseContent = function()
 // Click on add button and return navigation promise
 PersonsPage.prototype.goToCreatePerson = function()
 {
-	return navigation(() => clickEmul(this.content.addBtn), PersonPage);
+	return navigation(() => this.content.addBtn.click(), PersonPage);
 };
 
 
@@ -50,8 +47,8 @@ PersonsPage.prototype.goToUpdatePerson = function(num)
 
 	clickEmul(tile.linkElem);
 
-	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.editBtn || !isVisible(this.content.toolbar.editBtnElem))
+	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update person button not visible';
 
-	return navigation(() => clickEmul(this.content.editBtn), PersonPage);
+	return navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
 }
