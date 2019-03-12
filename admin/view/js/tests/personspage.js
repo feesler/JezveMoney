@@ -49,4 +49,50 @@ PersonsPage.prototype.goToUpdatePerson = function(num)
 		throw 'Update person button not visible';
 
 	return navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
-}
+};
+
+
+PersonsPage.prototype.deletePersons = function(persons)
+{
+	if (!persons)
+		throw 'No persons specified';
+
+	if (!isArray(persons))
+		persons = [persons];
+
+	var expectedPersonsLength = this.content.tiles.length - persons.length;
+
+	persons.forEach(function(person_num, ind)
+	{
+		if (person_num >= this.content.tiles.length)
+			throw 'Wrong account number';
+
+		this.content.tiles[person_num].click();
+		this.parse();
+
+		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
+		if (ind == 0 && !editIsVisible)
+			throw 'Edit button is not visible';
+		else if (ind > 0 && editIsVisible)
+			throw 'Edit button is visible while more than one person is selected';
+
+		if (!isVisible(this.content.toolbar.delBtn.elem))
+			throw 'Delete button is not visible';
+	}, this);
+
+	this.content.toolbar.delBtn.click();
+	this.parse();
+
+	if (!isVisible(this.content.delete_warning.elem))
+		throw 'Delete account warning popup not appear';
+
+	return navigation(() => clickEmul(this.content.delete_warning.okBtn), PersonsPage)
+	.then(function(page)
+	{
+		var state = { values : { tiles : { length : expectedPersonsLength } } };
+
+		addResult('Persons delete result', page.checkState(state));
+
+		return Promise.resolve(page);
+	});
+};

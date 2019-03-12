@@ -100,7 +100,7 @@ function personTests(page)
 			.then(page => checkCreatePerson(page, 'Иван'))
 			.then(page => page.goToUpdatePerson(3))
 			.then(page => updatePerson(page, 3, 'Ivan<'))
-			.then(deletePersons1and3);
+			.then(page=> page.deletePersons([0, 2]));
 }
 
 
@@ -372,53 +372,6 @@ function updatePerson(page, num, personName)
 		addResult('Person update result', (page.content.tiles && page.content.tiles.length == initPersonsLength &&
 											page.content.tiles[num] &&
 											page.content.tiles[num].name == personName));
-
-		return Promise.resolve(page);
-	});
-}
-
-
-function deletePersons1and3(page)
-{
-	var personTiles = page.parseTiles(vquery('.tiles'));
-
-	if (personTiles.length != 4)
-		throw 'Wrong person number';
-
-	clickEmul(personTiles[0].elem.firstElementChild);
-
-	var edit_btn = vge('edit_btn');
-	var del_btn = vge('del_btn')
-
-	addResult('Edit button visibility on select one person', isVisible(edit_btn));
-	addResult('Delete button visibility on select one person', isVisible(del_btn));
-
-	clickEmul(personTiles[2].elem.firstElementChild);
-
-	addResult('Edit button visibility on select two persons', !isVisible(edit_btn));
-	addResult('Delete button visibility on select two persons', isVisible(del_btn));
-
-	clickEmul(del_btn.firstElementChild);
-
-	var delete_warning = vge('delete_warning');
-	if (!delete_warning)
-		throw 'Delete warning not found';
-
-	addResult('Delete persons warning popup appear', isVisible(delete_warning));
-
-	var okBtn = delete_warning.querySelector('.ok_btn');
-	if (!okBtn)
-		throw 'OK button not found';
-
-	return navigation(function()
-	{
-		clickEmul(okBtn);
-	})
-	.then(function(page)
-	{
-		var personTiles = page.parseTiles(vquery('.tiles'));
-
-		addResult('Accounts delete result', (personTiles && personTiles.length == 2));
 
 		return Promise.resolve(page);
 	});
