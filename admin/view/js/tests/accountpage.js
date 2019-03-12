@@ -12,10 +12,10 @@ AccountPage.prototype.parseContent = function()
 {
 	var res = {};
 
-	res.headingElem = vquery('.heading > h1');
-	if (!res.headingElem)
+	res.heading = { elem : vquery('.heading > h1') };
+	if (!res.heading.elem)
 		throw 'Heading element not found';
-	res.heading = res.headingElem.innerHTML;
+	res.heading.text = res.heading.elem.innerHTML;
 
 	res.tile = this.parseTile(vge('acc_tile'));
 

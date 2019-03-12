@@ -124,12 +124,13 @@ function reloginAsTester(page)
 
 function createAccount1(page)
 {
-	var state = { values : { tile : { name : 'New account', balance : '0 ₽' },
-							nameInp : '', balance : '0' } };
+	var state = { visibility : { heading : true, iconDropDown : true, name : true, currDropDown : true },
+					values : { tile : { name : 'New account', balance : '0 ₽' },
+							name : '', balance : '0' } };
 
 	addResult('Initial state of new account page', page.checkState(state));
 
-	setParam(state.values, { tile : { name : 'acc_1' }, nameInp : 'acc_1' });
+	setParam(state.values, { tile : { name : 'acc_1' }, name : 'acc_1' });
 	page.inputName('acc_1');
 	addResult('Account name input result', page.checkState(state));
 
@@ -275,7 +276,7 @@ function createAccountWithParam(page, params)
 
 // Input account name
 	page.inputName(params.name);
-	addResult('Account tile name update', (page.content.name == params.name));
+	addResult('Account tile name update', (page.content.tile.name == params.name && page.content.name.value == params.name));
 
 // Change currency
 	page.changeCurrency(currObj.id);
