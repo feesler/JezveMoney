@@ -99,7 +99,7 @@ function personTests(page)
 			.then(page => page.createPerson('Иван'))
 			.then(page => checkCreatePerson(page, 'Иван'))
 			.then(page => page.goToUpdatePerson(3))
-			.then(page => updatePerson(page, 3, 'Ivan<'))
+			.then(page => updatePerson(page, 3, 'Иван', 'Ivan<'))
 			.then(page=> page.deletePersons([0, 2]));
 }
 
@@ -355,23 +355,22 @@ function checkCreatePerson(page, personName)
 }
 
 
-function updatePerson(page, num, personName)
+function updatePerson(page, num, currentName, personName)
 {
-	addResult('Person name input found', page.content.nameInp);
+	var state = { visibility : { name : true },
+ 					values : { name : currentName } };
+
+	addResult('Update person page state', page.checkState(state));
 
 	page.inputName(personName);
 
-	addResult('Submit person button found', page.content.submitBtn);
-
-	return navigation(function()
-	{
-		clickEmul(page.content.submitBtn);
-	}, PersonsPage)
+	return navigation(() => clickEmul(page.content.submitBtn), PersonsPage)
 	.then(function(page)
 	{
-		addResult('Person update result', (page.content.tiles && page.content.tiles.length == initPersonsLength &&
-											page.content.tiles[num] &&
-											page.content.tiles[num].name == personName));
+		var state = { values : { tiles : { length : initPersonsLength } }};
+		state.values.tiles[num] = { name : personName };
+
+		addResult('Person update result', page.checkState(state));
 
 		return Promise.resolve(page);
 	});
