@@ -311,7 +311,7 @@ TestPage.prototype.parseWarningPopup = function(elem)
 	res.messageElem = elem.querySelector('.popup_message > div');
 	res.message = res.messageElem.innerHTML;
 	res.okBtn = elem.querySelector('.popup_controls > .btn.ok_btn');
-	res.cancelBtn = elem.querySelector('.popup_title > .btn.cancel_btn');
+	res.cancelBtn = elem.querySelector('.popup_controls > .btn.cancel_btn');
 
 	return res;
 };
