@@ -43,9 +43,7 @@ PersonsPage.prototype.goToUpdatePerson = function(num)
 	if (!this.content.tiles || this.content.tiles.length <= num)
 		throw 'Wrong person number specified';
 
-	var tile = this.content.tiles[num];
-
-	clickEmul(tile.linkElem);
+	this.content.tiles[num].click();
 
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update person button not visible';

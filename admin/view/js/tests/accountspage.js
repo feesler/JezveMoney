@@ -44,9 +44,7 @@ AccountsPage.prototype.goToUpdateAccount = function(num)
 	if (!this.content.tiles || this.content.tiles.length <= num)
 		throw 'Wrong account number specified';
 
-	var tile = this.content.tiles[num];
-
-	clickEmul(tile.linkElem);
+	this.content.tiles[num].click();
 
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update account button not visible';
@@ -69,7 +67,7 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 		if (acc_num >= this.content.tiles.length)
 			throw 'Wrong account number';
 
-		clickEmul(this.content.tiles[acc_num].elem.firstElementChild);
+		this.content.tiles[acc_num].click();
 		this.parse();
 
 		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);

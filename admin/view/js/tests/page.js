@@ -84,6 +84,11 @@ TestPage.prototype.parseTile = function(tileEl)
 	tileObj.balance = tileObj.balanceEL.innerText;
 	tileObj.name = tileObj.nameEL.innerText;
 
+	tileObj.click = function()
+	{
+		clickEmul(tileObj.linkElem);
+	};
+
 	return tileObj;
 }
 
