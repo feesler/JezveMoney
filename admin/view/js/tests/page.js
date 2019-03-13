@@ -71,6 +71,14 @@ TestPage.prototype.parseId = function(id)
 }
 
 
+var tileIcons = [{ className : null, title : 'No icon' },
+					{ className : 'purse_icon', title : 'Purse' },
+					{ className : 'safe_icon', title : 'Safe' },
+					{ className : 'card_icon', title : 'Card' },
+					{ className : 'percent_icon', title : 'Percent' },
+					{ className : 'bank_icon', title : 'Bank' },
+					{ className : 'cash_icon', title : 'Cash' }];
+
 TestPage.prototype.parseTile = function(tileEl)
 {
 	if (!tileEl || !hasClass(tileEl, 'tile'))
@@ -83,6 +91,18 @@ TestPage.prototype.parseTile = function(tileEl)
 	tileObj.id = this.parseId(tileEl.id);
 	tileObj.balance = tileObj.balanceEL.innerText;
 	tileObj.name = tileObj.nameEL.innerText;
+	tileObj.icon = null;
+
+	if (hasClass(tileObj.elem, 'tile_icon'))
+	{
+		tileIcons.some(function(item)
+		{
+			if (hasClass(tileObj.elem, item.className))
+				tileObj.icon = item;
+
+			return (tileObj.icon != null);
+		});
+	}
 
 	tileObj.click = function()
 	{

@@ -2,7 +2,6 @@ var restbl = null;
 var totalRes = null, okRes = null, failRes = null;
 var results = {};
 var initPersonsLength;
-var tileIconClass = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
 
 
 
@@ -168,7 +167,7 @@ function createAccount1(page)
 
 // Change icon
 	setParam(state.values,  { iconDropDown : { textValue : 'Safe' },
-							tile : { elem : { className : 'tile tile_icon safe_icon' } } });
+							tile : { icon : tileIcons[2] } });
 	page.changeIcon(2);	// select safe icon
 	addResult('Change icon result', page.checkState(state));
 
