@@ -183,7 +183,7 @@ function createAccount1(page)
 
 function checkCreateAccount1(page)
 {
-	var state = { tiles : { length : 1, 0 : { balance : '1 000.01 ₽', name : 'acc_1' } } };
+	var state = { values : { tiles : { length : 1, 0 : { balance : '1 000.01 ₽', name : 'acc_1' } } } };
 
 	addResult('First account create result', page.checkState(state));
 
