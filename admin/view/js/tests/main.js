@@ -192,18 +192,21 @@ function checkCreateAccount1(page)
 
 function createAccount2(page)
 {
+	var state = { values : { tile : { name : 'acc_2', balance : '0 ₽' }, currDropDown : { textValue : 'RUB' } } };
+
 // Input account name
 	page.inputName('acc_2');
-	addResult('Account tile name update', (page.content.tile.name == 'acc_2'));
+	addResult('Account tile name update', page.checkState(state));
 
 // Change currency
 	page.changeCurrency(3);		// select EUR currency
 
-	addResult('EUR currency select result', (page.content.currDropDown.textValue == 'EUR'));
-	addResult('Tile balance format update result', (page.content.tile.balance == '€ 0'));
+	setParam(state.values, { tile : { balance : '€ 0' }, currDropDown : { textValue : 'EUR' } });
+	addResult('EUR currency select result', page.checkState(state));
 
+	state.values.tile.balance = '€ 1 000.01';
 	page.inputBalance('1000.01')
-	addResult('Account tile balance on EUR 1 000.01 balance input field', (page.content.tile.balance == '€ 1 000.01'));
+	addResult('Account tile balance on EUR 1 000.01 balance input field', page.checkState(state));
 
 	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
 }
@@ -211,11 +214,8 @@ function createAccount2(page)
 
 function checkCreateAccount2(page)
 {
-	var submitRes = (page.content.tiles && page.content.tiles.length == 2 &&
-		 				page.content.tiles[1].balance == '€ 1 000.01' &&
-						page.content.tiles[1].name == 'acc_2')
-
-	addResult('Second account create result', submitRes);
+	var state = { value : { tiles : { length : 2, 1 : { balance : '€ 1 000.01', name : 'acc_2' } } } };
+	addResult('Second account create result', page.checkState(state));
 
 	return Promise.resolve(page);
 }
@@ -223,22 +223,20 @@ function checkCreateAccount2(page)
 
 function editAccount1(page)
 {
-	addResult('Edit account page loaded', 'OK');
+	var state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
 
-	addResult('Edit account name on tile', (page.content.tile.name == 'acc_1'));
-	addResult('Edit account balance on tile', (page.content.tile.balance == '1 000.01 ₽'));
-
+	addResult('Initial state of edit account page', page.checkState(state));
 
 // Change currency
-	page.changeCurrency(2);		// select USD currency
 	var fmtBal = formatCurrency(1000.01, 2);
-	addResult('USD currency select result', (page.content.currDropDown.textValue == 'USD'));
-	addResult('Tile balance format update result', (page.content.tile.balance == fmtBal));
+	setParam(state.values, { tile : { balance : fmtBal }, currDropDown : { textValue : 'USD' } });
+	page.changeCurrency(2);		// select USD currency
+	addResult('USD currency select result', page.checkState(state));
 
 // Change icon
+	state.values.tile.icon = tileIcons[1];
 	page.changeIcon(1);			// select purse icon
-	addResult('Icon drop down value select', (page.content.iconDropDown.textValue == 'Purse'));
-	addResult('Tile icon update result', hasClass(page.content.tile.elem, 'purse_icon'));
+	addResult('Icon change result', page.checkState(state));
 
 // Submit
 	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
@@ -247,14 +245,8 @@ function editAccount1(page)
 
 function checkEditAccount1(page)
 {
-	var accTiles = page.parseTiles(vquery('.tiles'));
-
-	var submitRes = (accTiles && accTiles.length == 2 &&
-						accTiles[0].balance == '$ 1 000.01' &&
-						accTiles[0].name == 'acc_1' &&
-						hasClass(accTiles[0].elem, ['tile_icon', 'purse_icon']))
-
-	addResult('First account update result', submitRes);
+	var state = { value : { tiles : { length : 2, 1 : { balance : '$ 1 000.01', name : 'acc_1', icon : tileIcons[1] } } } };
+	addResult('First account update result', page.checkState(state));
 
 	return Promise.resolve(page);
 }
@@ -273,34 +265,36 @@ function createAccountWithParam(page, params)
 	if (isNaN(normBalance))
 		throw 'Balance not specified';
 
+	var state = { values : { tile : { name : params.name }, name : params.name } };
+
 // Input account name
 	page.inputName(params.name);
-	addResult('Account tile name update', (page.content.tile.name == params.name && page.content.name.value == params.name));
+	addResult('Account tile name update', page.checkState(state));
 
 // Change currency
+	var fmtBal = formatCurrency(0, currObj.id);
+	setParam(state.values, { currDropDown : { textValue : currObj.name }, tile : { balance : fmtBal } });
 	page.changeCurrency(currObj.id);
 
-	addResult(currObj.name + ' currency select result', (page.content.currDropDown.textValue == currObj.name));
-	var fmtBal = formatCurrency(0, currObj.id);
-	addResult('Tile balance format update result', (page.content.tile.balance == fmtBal));
+	addResult(currObj.name + ' currency select result', page.checkState(state));
 
 // Input balance
+	fmtBal = formatCurrency(normBalance, currObj.id);
+	setParam(state.values, { tile : { balance : fmtBal } });
 	page.inputBalance(params.balance);
 
-	fmtBal = formatCurrency(normBalance, currObj.id);
-	addResult('Tile balance format update result', (page.content.tile.balance == fmtBal));
+	addResult('Tile balance format update result', page.checkState(state));
 
 // Change icon
 	if (params.icon)
 	{
-		if (params.icon < 0 || params.icon > icons.length)
+		if (params.icon < 0 || params.icon > tileIcons.length)
 			throw 'Icon not found';
 
+		setParam(state.values, { iconDropDown : { textValue : tileIcons[params.icon].title }, tile : { icon : tileIcons[params.icon] } });
 		page.changeIcon(params.icon);
 
-		addResult('Icon drop down value select', (page.content.iconDropDown.textValue == icons[params.icon]));
-		var iconClass = tileIconClass[params.icon];
-		addResult('Tile icon update result', (hasClass(vge('acc_tile'), iconClass)));
+		addResult('Tile icon update result', page.checkState(state));
 	}
 
 	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
@@ -309,12 +303,8 @@ function createAccountWithParam(page, params)
 
 function checkCreateAccount3(page)
 {
-	var submitRes = (page.content.tiles && page.content.tiles.length == 3 &&
-						page.content.tiles[2].balance == '500.99 ₽' &&
-						page.content.tiles[2].name == 'acc_3' &&
-						hasClass(page.content.tiles[2].elem, ['tile_icon', 'safe_icon']))
-
-	addResult('Third account create result', submitRes);
+	var state = { value : { tiles : { length : 3, 2 : { balance : '500.99 ₽', name : 'acc_3', icon : tileIcons[2] } } } };
+	addResult('Third account create result', page.checkState(state));
 
  	return Promise.resolve(page);
 }
@@ -322,7 +312,8 @@ function checkCreateAccount3(page)
 
 function checkDeleteAccounts(page)
 {
-	addResult('Accounts delete result', (page.content.tiles && page.content.tiles.length == 1));
+	var state = { values : { tiles : { length : 1 } } };
+	addResult('Accounts delete result', page.checkState(state));
 
 	return Promise.resolve(page);
 }
@@ -330,11 +321,10 @@ function checkDeleteAccounts(page)
 
 function checkInitialPersons(page)
 {
-	var personTiles = page.parseTiles(vquery('.tiles'));
+	var state = { value : { tiles : { length : initPersonsLength + 1 } } };
+	addResult('Initial persons structure', page.checkState(state));
 
-	addResult('Initial persons structure', (personTiles && personTiles.length == 0));
-
-	initPersonsLength = personTiles.length;
+	initPersonsLength = page.content.tiles.length;
 
 	return Promise.resolve(page);
 }
@@ -344,9 +334,10 @@ function checkInitialPersons(page)
 // Next check name result and callback
 function checkCreatePerson(page, personName)
 {
-	addResult('Person create result', (page.content.tiles && page.content.tiles.length == (initPersonsLength + 1) &&
-										page.content.tiles[initPersonsLength] &&
-										page.content.tiles[initPersonsLength].name == personName));
+	var state = { value : { tiles : { length : initPersonsLength + 1 } } };
+	state.value.tiles[initPersonsLength] = { name : personName };
+
+	addResult('Person create result', page.checkState(state));
 
 	initPersonsLength = page.content.tiles.length;
 
