@@ -373,7 +373,7 @@ TestPage.prototype.checkVisibility = function(controls)
 		expected = controls[countrolName];
 
 		control = this.content[countrolName];
-		fact = !(!control || !control.elem || !isVisible(control.elem));
+		fact = !!(control && isVisible(control.elem));
 		if (expected != fact)
 		{
 			console.error('Not expected visibility of ' + countrolName + ' control');
@@ -422,7 +422,9 @@ TestPage.prototype.checkValues = function(controls)
 	{
 		expected = controls[countrolName];
 		control = this.content[countrolName];
-		if (!control || (isObject(expected) && !this.checkObjValue(control, expected)) || (!isObject(expected) && control.value !== expected))
+		if (!control ||
+			(control && isObject(expected) && !this.checkObjValue(control, expected)) ||
+		 	(control && !isObject(expected) && control.value !== expected))
 		{
 			console.error('Not expected values of ' + countrolName + ' control');
 			return false;
