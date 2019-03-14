@@ -462,6 +462,10 @@ function expenseTransactionStart(page)
 							result_balance_row : { value : '499.98' }, src_res_balance_left : '499.98 ₽', exch_left : '1.07921 $/₽ (0.9266 ₽/$)' });
 	page.inputSrcAmount(state.values.src_amount_row.value);
 	addResult('Source amount (1.010) input result', page.checkState(state));
+
+	setParam(state.visibility, { exchange_row : true, exch_left : false, dest_amount_row: false, dest_amount_left : true });
+	page.clickExchRate();
+	addResult('Click on exchange rate result', page.checkState(state));
 }
 
 

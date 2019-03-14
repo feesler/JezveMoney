@@ -121,3 +121,9 @@ TransactionPage.prototype.changeDestCurrency = function(val)
 {
 	this.performAction(() => this.content.dest_amount_row.selectCurr(val));
 };
+
+
+TransactionPage.prototype.clickExchRate = function()
+{
+	this.performAction(() => this.content.exch_left.click());
+};
