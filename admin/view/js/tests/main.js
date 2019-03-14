@@ -429,9 +429,39 @@ function expenseTransactionStart(page)
 	addResult('Click on destination amount result', page.checkState(state));
 
 	setParam(state.visibility, { exch_left : true, src_amount_row : true });
-	setParam(state.values, { exch_left : '1 $/₽', src_amount_row : { currSign : '₽' }, dest_amount_left : '$ 1.09', dest_amount_row : { currSign : '$' } });
+	setParam(state.values, { exch_left : '1 $/₽', src_amount_row : { value : '1.09', currSign : '₽' },
+								dest_amount_left : '$ 1.09', dest_amount_row : { currSign : '$' } });
 	page.changeDestCurrency(2);
 	addResult('Change destination curency result', page.checkState(state));
+
+	setParam(state.values, { exch_left : '0 $/₽' });
+	page.inputSrcAmount('');
+	addResult('Empty source amount input result', page.checkState(state));
+
+	page.inputSrcAmount('.');
+	addResult('Source amount (.) input result', page.checkState(state));
+
+	page.inputSrcAmount('0.');
+	addResult('Source amount (0.) input result', page.checkState(state));
+
+	page.inputSrcAmount('.0');
+	addResult('Source amount (.0) input result', page.checkState(state));
+
+	setParam(state.values, { src_amount_row : { value : '.01' },
+							result_balance_row : { value : '500.98' }, src_res_balance_left : '500.98 ₽', exch_left : '109 $/₽ (0.00917 ₽/$)' });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (.01) input result', page.checkState(state));
+
+	setParam(state.values, { src_amount_row : { value : '1.01' },
+							result_balance_row : { value : '499.98' }, src_res_balance_left : '499.98 ₽', exch_left : '1.07921 $/₽ (0.9266 ₽/$)' });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.01) input result', page.checkState(state));
+
+
+	setParam(state.values, { src_amount_row : { value : '1.010' },
+							result_balance_row : { value : '499.98' }, src_res_balance_left : '499.98 ₽', exch_left : '1.07921 $/₽ (0.9266 ₽/$)' });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.010) input result', page.checkState(state));
 }
 
 

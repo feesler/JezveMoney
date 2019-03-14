@@ -87,6 +87,12 @@ TransactionPage.prototype.parseContent = function()
 };
 
 
+TransactionPage.prototype.inputSrcAmount = function(val)
+{
+	this.performAction(() => this.content.src_amount_row.input(val));
+};
+
+
 TransactionPage.prototype.inputDestAmount = function(val)
 {
 	this.performAction(() => this.content.dest_amount_row.input(val));
