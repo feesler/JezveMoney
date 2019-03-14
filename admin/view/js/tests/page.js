@@ -280,6 +280,7 @@ TestPage.prototype.parseInputRow = function(elem)
 
 	res.label = res.labelEl.innerHTML;
 	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
+	res.isCurrActive = false;
 	if (res.currElem)
 	{
 		res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
@@ -312,6 +313,12 @@ TestPage.prototype.parseInputRow = function(elem)
 	res.input = function(val)
 	{
 		inputEmul(res.valueInput, val);
+	};
+
+	res.selectCurr = function(val)
+	{
+		if (res.isCurrActive && res.currDropDown)
+			res.currDropDown.selectByValue(val);
 	};
 
 	return res;

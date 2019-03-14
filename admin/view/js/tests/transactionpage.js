@@ -103,11 +103,11 @@ TransactionPage.prototype.clickDestAmount = function()
 
 TransactionPage.prototype.inputResBalance = function(val)
 {
-	this.performAction(() => inputEmul(this.content.result_balance_row.valueInput, val))
+	this.performAction(() => this.content.result_balance_row.input(val))
 }
 
 
 TransactionPage.prototype.changeDestCurrency = function(val)
 {
-	this.performAction(() => this.content.dest_amount_row.currDropDown.selectByValue(val));
+	this.performAction(() => this.content.dest_amount_row.selectCurr(val));
 }
