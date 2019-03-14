@@ -18,6 +18,10 @@ TransactionPage.prototype.parseTileRightItem = function(elem)
 	res.title = res.titleElem.innerHTML;
 	res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
 	res.value = res.buttonElem.firstElementChild.innerHTML;
+	res.click = function()
+	{
+		clickEmul(res.buttonElem);
+	}
 
 	return res;
 };
@@ -91,13 +95,13 @@ TransactionPage.prototype.inputDestAmount = function(val)
 
 TransactionPage.prototype.clickSrcResultBalance = function()
 {
-	this.performAction(() => clickEmul(this.content.src_res_balance_left.buttonElem));
+	this.performAction(() => this.content.src_res_balance_left.click());
 }
 
 
 TransactionPage.prototype.clickDestAmount = function()
 {
-	this.performAction(() => clickEmul(this.content.dest_amount_left.buttonElem));
+	this.performAction(() => this.content.dest_amount_left.click());
 }
 
 
