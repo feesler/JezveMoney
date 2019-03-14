@@ -38,7 +38,7 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 	res.tile = this.parseTile(elem.querySelector('.tile'));
 
 	return res;
-}
+};
 
 
 TransactionPage.prototype.parseContent = function()
@@ -84,34 +84,34 @@ TransactionPage.prototype.parseContent = function()
 	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
 
 	return res;
-}
+};
 
 
 TransactionPage.prototype.inputDestAmount = function(val)
 {
-	this.performAction(() => inputEmul(this.content.dest_amount_row.valueInput, val));
-}
+	this.performAction(() => this.content.dest_amount_row.input(val));
+};
 
 
 TransactionPage.prototype.clickSrcResultBalance = function()
 {
 	this.performAction(() => this.content.src_res_balance_left.click());
-}
+};
 
 
 TransactionPage.prototype.clickDestAmount = function()
 {
 	this.performAction(() => this.content.dest_amount_left.click());
-}
+};
 
 
 TransactionPage.prototype.inputResBalance = function(val)
 {
 	this.performAction(() => this.content.result_balance_row.input(val))
-}
+};
 
 
 TransactionPage.prototype.changeDestCurrency = function(val)
 {
 	this.performAction(() => this.content.dest_amount_row.selectCurr(val));
-}
+};

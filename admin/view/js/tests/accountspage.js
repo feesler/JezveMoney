@@ -50,7 +50,7 @@ AccountsPage.prototype.goToUpdateAccount = function(num)
 		throw 'Update account button not visible';
 
 	return navigation(() => this.content.toolbar.editBtn.click(), AccountPage);
-}
+};
 
 
 // Delete secified accounts and return navigation promise
@@ -90,4 +90,4 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 		throw 'OK button not found';
 
 	return navigation(() => clickEmul(this.content.delete_warning.okBtn), AccountsPage);
-}
+};

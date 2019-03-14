@@ -68,7 +68,7 @@ TestPage.prototype.parseId = function(id)
 
 	var pos = id.indexOf('_');
 	return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
-}
+};
 
 
 var tileIcons = [{ className : null, title : 'No icon' },
@@ -110,7 +110,7 @@ TestPage.prototype.parseTile = function(tileEl)
 	};
 
 	return tileObj;
-}
+};
 
 
 TestPage.prototype.parseInfoTile = function(tileEl)
@@ -127,7 +127,7 @@ TestPage.prototype.parseInfoTile = function(tileEl)
 	tileObj.subtitle = tileObj.subtitleEl.innerHTML;
 
 	return tileObj;
-}
+};
 
 
 TestPage.prototype.parseTiles = function(tilesEl, parseCallback)
@@ -155,13 +155,13 @@ TestPage.prototype.parseTiles = function(tilesEl, parseCallback)
 	});
 
 	return res;
-}
+};
 
 
 TestPage.prototype.parseInfoTiles = function(tilesEl)
 {
 	return this.parseTiles(tilesEl, this.parseInfoTile);
-}
+};
 
 
 TestPage.prototype.parseDropDown = function(elem)

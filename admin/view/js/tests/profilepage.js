@@ -77,4 +77,4 @@ ProfilePage.prototype.resetAll = function()
 		throw 'Confirm button not found';
 
 	return navigation(() => clickEmul(this.content.reset_warning.okBtn), ProfilePage);
-}
+};

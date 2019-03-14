@@ -82,4 +82,4 @@ MainPage.prototype.goToPersons = function(page)
 	var personsWidget = this.content.widgets[3];
 
 	return navigation(() => clickEmul(personsWidget.linkElem), PersonsPage);
-}
+};
