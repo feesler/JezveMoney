@@ -374,7 +374,7 @@ function expenseTransactionStart(page)
 								src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
 								result_balance_dest_row : false },
 				values : { source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
-							dest_amount_row : { currSign : '₽', isCurrActive : true },
+							dest_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
 							src_res_balance_left : '500.99 ₽' } };
 
 	addResult('Initial state', page.checkState(state));
@@ -431,11 +431,11 @@ function expenseTransactionStart(page)
 	addResult('Click on destination amount result', page.checkState(state));
 
 	setParam(state.visibility, { exch_left : true, src_amount_row : true });
-	setParam(state.values, { exch_left : '1 $/₽', src_amount_row : { value : '1.09', currSign : '₽' },
+	setParam(state.values, { exch_left : '1 $/₽', src_amount_row : { label : 'Source amount', value : '1.09', currSign : '₽' },
 								exchange_row : { value : '1', currSign : '$/₽' },
-								dest_amount_left : '$ 1.09', dest_amount_row : { currSign : '$' } });
+								dest_amount_left : '$ 1.09', dest_amount_row : { label : 'Destination amount', currSign : '$' } });
 	page.changeDestCurrency(2);
-	addResult('Change destination curency result', page.checkState(state));
+	addResult('Change destination curency to USD result', page.checkState(state));
 
 // Input source amount
 	setParam(state.values, { exch_left : '0 $/₽' });
@@ -491,6 +491,22 @@ function expenseTransactionStart(page)
 								dest_amount_left : '$ 0.09', dest_amount_row : { value : '0.09' } });
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (.090101) result', page.checkState(state));
+
+
+	setParam(state.visibility, { dest_amount_left : false, dest_amount_row : true, exch_left : true, exchange_row : false });
+	page.clickDestAmount();
+	addResult('Click on destination amount result', page.checkState(state));
+
+	setParam(state.values, { exch_left : '0.0901 €/₽ (11.09878 €/$)', exchange_row : { currSign : '€/₽' },
+								dest_amount_left : '€ 0.09', dest_amount_row : { currSign : '€' } });
+	page.changeDestCurrency(3);
+	addResult('Change destination curency to EUR result', page.checkState(state));
+
+	setParam(state.visibility, { exch_left : false, src_amount_row : false });
+	setParam(state.values, { exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
+								dest_amount_left : '1.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' } });
+	page.changeDestCurrency(1);
+	addResult('Change destination curency to RUB result', page.checkState(state));
 }
 
 
