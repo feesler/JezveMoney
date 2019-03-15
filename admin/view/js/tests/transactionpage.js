@@ -51,9 +51,7 @@ TransactionPage.prototype.parseContent = function()
 	{
 		var menuItem = menuItems[i].firstElementChild;
 
-		res.type = this.getTransactionType(menuItem.innerHTML);
-
-		var menuItemObj = { text : menuItem.innerHTML, type : this.getTransactionType(menuItem.innerHTML) };
+		var menuItemObj = { elem : menuItem, text : menuItem.innerHTML, type : this.getTransactionType(menuItem.innerHTML) };
 
 		if (menuItem.tagName == 'B')
 		{
@@ -65,7 +63,14 @@ TransactionPage.prototype.parseContent = function()
 			menuItemObj.link = menuItem.href;
 			menuItemObj.isActive = false;
 		}
-		res.typeMenu.push(menuItemObj);
+
+		menuItemObj.click = function()
+		{
+			if (!this.isActive)
+				clickEmul(this.elem);
+		};
+
+		res.typeMenu[menuItemObj.type] = menuItemObj;
 	}
 
 	res.source = this.parseTileBlock(vge('source'));
@@ -84,6 +89,15 @@ TransactionPage.prototype.parseContent = function()
 	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
 
 	return res;
+};
+
+
+TransactionPage.prototype.changeTransactionType = function(type)
+{
+	if (this.content.activeType == type || !this.content.typeMenu[type])
+		return;
+
+	return navigation(() => this.content.typeMenu[type].click(), TransactionPage);
 };
 
 

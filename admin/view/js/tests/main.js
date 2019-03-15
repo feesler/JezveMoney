@@ -109,7 +109,8 @@ function transactionTests(page)
 
 	return page.goToMainPage()
 			.then(page => page.goToNewTransactionByAccount(1))
-			.then(expenseTransactionStart);
+			.then(expenseTransactionStart)
+			.then(incomeTransactionStart);
 }
 
 
@@ -373,11 +374,12 @@ function expenseTransactionStart(page)
 								src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
 								src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
 								result_balance_dest_row : false },
-				values : { source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
+				values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
+							source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
 							dest_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
 							src_res_balance_left : '500.99 ₽' } };
 
-	addResult('Initial state', page.checkState(state));
+	addResult('Initial state of new expense page', page.checkState(state));
 
 // Input destination amount
 	setParam(state.values, { dest_amount_row : { value : '1' },
@@ -507,7 +509,26 @@ function expenseTransactionStart(page)
 								dest_amount_left : '1.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' } });
 	page.changeDestCurrency(1);
 	addResult('Change destination curency to RUB result', page.checkState(state));
+
+
+	return page.changeTransactionType(INCOME);
 }
+
+
+function incomeTransactionStart(page)
+{
+	var state = { visibility : { source : false, destination : true, src_amount_left : false, dest_amount_left : false,
+								src_res_balance_left : false, dest_res_balance_left : true, exch_left : false,
+								src_amount_row : true, dest_amount_row : false, exchange_row : false, result_balance_row : false,
+								result_balance_dest_row : false },
+				values : { typeMenu : { 2 : { isActive : true } }, /* INCOME */
+							destination : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
+							src_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
+							dest_res_balance_left : '500.99 ₽' } };
+
+	addResult('Initial state of new income page', page.checkState(state));
+}
+
 
 
 function addResult(descr, res)
