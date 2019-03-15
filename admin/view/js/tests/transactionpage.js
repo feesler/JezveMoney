@@ -127,3 +127,9 @@ TransactionPage.prototype.clickExchRate = function()
 {
 	this.performAction(() => this.content.exch_left.click());
 };
+
+
+TransactionPage.prototype.inputExchRate = function(val)
+{
+	this.performAction(() => this.content.exchange_row.input(val));
+};
