@@ -440,17 +440,21 @@ function expenseTransactionStart(page)
 	addResult('Change destination curency to USD result', page.checkState(state));
 
 // Input source amount
-	setParam(state.values, { exch_left : '0 $/₽' });
-	page.inputSrcAmount('');
+	setParam(state.values, { src_amount_row : { value : '' }, exch_left : '0 $/₽', exchange_row : { value : '0' },
+								result_balance_row : { value : '500.99' }, src_res_balance_left : '500.99 ₽' });
+	page.inputSrcAmount(state.values.src_amount_row.value);
 	addResult('Empty source amount input result', page.checkState(state));
 
-	page.inputSrcAmount('.');
+	state.values.src_amount_row.value = '.';
+	page.inputSrcAmount(state.values.src_amount_row.value);
 	addResult('Source amount (.) input result', page.checkState(state));
 
-	page.inputSrcAmount('0.');
+	state.values.src_amount_row.value = '0.';
+	page.inputSrcAmount(state.values.src_amount_row.value);
 	addResult('Source amount (0.) input result', page.checkState(state));
 
-	page.inputSrcAmount('.0');
+	state.values.src_amount_row.value = '.0';
+	page.inputSrcAmount(state.values.src_amount_row.value);
 	addResult('Source amount (.0) input result', page.checkState(state));
 
 	setParam(state.values, { src_amount_row : { value : '.01' }, exchange_row : { value : '109' },
