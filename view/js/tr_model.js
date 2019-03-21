@@ -187,6 +187,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			else
 				f1();				// calculate S2
 		}
+
+		notifyChanged('src_amount', sa);
 	}
 
 
