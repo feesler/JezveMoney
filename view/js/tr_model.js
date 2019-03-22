@@ -187,6 +187,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			else
 				f1();				// calculate S2
 		}
+
+		notifyChanged('src_amount', sa);
 	}
 
 
@@ -378,6 +380,8 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 				f1_d();			// calculate S2_d
 			}
 		}
+
+		notifyChanged('src_curr', value);
 	}
 
 
