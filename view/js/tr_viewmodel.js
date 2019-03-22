@@ -940,8 +940,6 @@ function TransactionViewModel()
 
 		srcCurr = parseInt(src_curr.value);
 		Transaction.update('src_curr', srcCurr);
-
-		onSrcCurrChanged();
 	}
 
 
@@ -958,7 +956,6 @@ function TransactionViewModel()
 
 		if (Transaction.isDiff())
 		{
-			destAmountSwitch(true);
 			setAmountInputLabel(true, true);
 			setAmountTileBlockLabel(true, true);
 			setAmountInputLabel(false, true);
@@ -968,9 +965,14 @@ function TransactionViewModel()
 				setCurrActive(true, true);		// set source active
 				setCurrActive(false, false);		// set destination inactive
 			}
-			exchRateSwitch(false);
 
 			setExchRate(Transaction.exchRate());
+			if (!isVisible('dest_amount_row') && !isVisible('dest_amount_left'))	// currency already different
+			{
+				destAmountSwitch(true);
+				exchRateSwitch(false);
+				resBalanceDestSwitch(false);
+			}
 		}
 		else
 		{
@@ -982,6 +984,7 @@ function TransactionViewModel()
 				hideSrcAmountAndExchange();
 			else if (Transaction.isIncome() || Transaction.isTransfer())
 				hideDestAmountAndExchange();
+			resBalanceDestSwitch(false);
 		}
 
 		updateCurrSigns();
