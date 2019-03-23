@@ -1003,8 +1003,6 @@ function TransactionViewModel()
 
 		destCurr = parseInt(dest_curr.value);
 		Transaction.update('dest_curr', destCurr);
-
-		onDestCurrChanged();
 	}
 
 
