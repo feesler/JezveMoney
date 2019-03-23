@@ -382,6 +382,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 		}
 
 		notifyChanged('src_curr', value);
+		notifyChanged('src_amount', fsa);
 	}
 
 
@@ -400,6 +401,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			}
 		}
 
+		notifyChanged('dest_curr', value);
 		notifyChanged('dest_amount', fda);
 	}
 
