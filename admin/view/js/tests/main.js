@@ -659,24 +659,25 @@ function incomeTransactionStart(page)
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (.09) result', page.checkState(state));
 
-	setParam(state.values, { exchange_row : { value : '.090101' }, exch_left : '0.0901 ₽/$ (11.09878 $/₽)',
-								dest_amount_left : '0.09 ₽', dest_amount_row : { value : '0.09' } });
+	setParam(state.values, { exchange_row : { value : '.090101' }, exch_left : '0.0901 ₽/$ (11.09878 $/₽)' });
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (.090101) result', page.checkState(state));
 
 
-	setParam(state.visibility, { src_amount_left : false, src_amount_row : true, exch_left : true, exchange_row : false });
-	page.clickSrcAmount();
-	addResult('Click on source amount result', page.checkState(state));
+	setParam(state.visibility, { dest_amount_left : false, dest_amount_row : true, exch_left : true, exchange_row : false });
+	page.clickDestAmount();
+	addResult('Click on destination amount result', page.checkState(state));
 
-	setParam(state.values, { exch_left : '0.0901 €/₽ (11.09878 €/$)', exchange_row : { currSign : '₽/€' },
-								src_amount_left : '€ 0.09', src_amount_row : { currSign : '€' } });
+	setParam(state.values, { exch_left : '0.0901 ₽/€ (11.09878 €/₽)', exchange_row : { currSign : '₽/€' },
+								src_amount_left : '€ 1.09', src_amount_row : { currSign : '€' } });
 	page.changeSourceCurrency(3);
 	addResult('Change source curency to EUR result', page.checkState(state));
 
 	setParam(state.visibility, { exch_left : false, dest_amount_row : false });
 	setParam(state.values, { exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
-								src_amount_left : '1.09 ₽', src_amount_row : { label : 'Amount', currSign : '₽' } });
+								src_amount_left : '1.09 ₽', src_amount_row : { label : 'Amount', currSign : '₽' },
+								dest_amount_left : '1.09 ₽', dest_amount_row : { label : 'Amount', value : '1.09' },
+								result_balance_dest_row : { value : '502.08' }, dest_res_balance_left : '502.08 ₽' });
 	page.changeSourceCurrency(1);
 	addResult('Change source curency to RUB result', page.checkState(state));
 
