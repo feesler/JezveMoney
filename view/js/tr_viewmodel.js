@@ -508,9 +508,11 @@ function TransactionViewModel()
 			var evalid = isValidValue(e);
 			var fe = (evalid) ? normalizeExch(e) : e;
 
-			if (e != val)
+			if (fe != val)
 				exchrate.value = val;
 		}
+
+		val = normalizeExch(val);
 
 		exchSigns = destCurr.sign + '/' + srcCurr.sign;
 		exchcomm.innerHTML = exchSigns;

@@ -92,10 +92,6 @@ function onFieldKey(event, obj)
 
 	if (!isDel)
 	{
-	// exclude ',' or '.' at start
-		if ((obj.value == '' || (obj.value != '' && getCaretPos(obj) == 0)) && isDot(code))
-			return false;
-
 	// exclude ',' or '.' in one string
 		if (obj.value != '' && isDot(code) && haveDot(obj.value))
 			return false;
@@ -140,7 +136,7 @@ function normalizeExch(val)
 // Check value is valid
 function isValidValue(val)
 {
-	return (val != undefined && val != null && val !== '');
+	return (val != undefined && val != null && !isNaN(parseFloat(fixFloat(val))));
 }
 
 
