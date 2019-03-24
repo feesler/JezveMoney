@@ -107,6 +107,12 @@ TransactionPage.prototype.inputSrcAmount = function(val)
 };
 
 
+TransactionPage.prototype.clickSrcAmount = function()
+{
+	this.performAction(() => this.content.src_amount_left.click());
+};
+
+
 TransactionPage.prototype.inputDestAmount = function(val)
 {
 	this.performAction(() => this.content.dest_amount_row.input(val));
@@ -119,6 +125,12 @@ TransactionPage.prototype.clickSrcResultBalance = function()
 };
 
 
+TransactionPage.prototype.clickDestResultBalance = function()
+{
+	this.performAction(() => this.content.dest_res_balance_left.click());
+};
+
+
 TransactionPage.prototype.clickDestAmount = function()
 {
 	this.performAction(() => this.content.dest_amount_left.click());
@@ -128,6 +140,18 @@ TransactionPage.prototype.clickDestAmount = function()
 TransactionPage.prototype.inputResBalance = function(val)
 {
 	this.performAction(() => this.content.result_balance_row.input(val))
+};
+
+
+TransactionPage.prototype.inputDestResBalance = function(val)
+{
+	this.performAction(() => this.content.result_balance_dest_row.input(val))
+};
+
+
+TransactionPage.prototype.changeSourceCurrency = function(val)
+{
+	this.performAction(() => this.content.src_amount_row.selectCurr(val));
 };
 
 

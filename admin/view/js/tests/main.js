@@ -530,7 +530,148 @@ function incomeTransactionStart(page)
 							src_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
 							dest_res_balance_left : '500.99 ₽' } };
 
+	setBlock('Income', 2);
 	addResult('Initial state of new income page', page.checkState(state));
+
+// Input source amount
+	setParam(state.values, { src_amount_row : { value : '1' }, src_amount_left : '1 ₽',
+								dest_res_balance_left : '501.99 ₽' });
+	page.inputDestAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.0';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.0) input result', page.checkState(state));
+
+	setParam(state.values, { src_amount_row : { value : '1.01' }, src_amount_left : '1.01 ₽',
+								dest_res_balance_left : '502 ₽' });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.01) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.010';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.010) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.0101';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.0101) input result', page.checkState(state));
+
+	setParam(state.visibility, { src_amount_left : true, dest_res_balance_left : false, src_amount_row : false, result_balance_dest_row : true });
+	page.clickDestResultBalance();
+	addResult('Click on destination result balance result', page.checkState(state));
+
+// Input result balance
+	setParam(state.values, { result_balance_dest_row : { value : '502.08' }, dest_res_balance_left : '502.08 ₽',
+								src_amount_left : '1.09 ₽', src_amount_row : { value : '1.09' } });
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (502.08) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '502.080';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (502.080) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '502.0801';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (502.0801) input result', page.checkState(state));
+
+	setParam(state.visibility, { src_amount_left : false, dest_res_balance_left : true, src_amount_row : true, result_balance_dest_row : false });
+	page.clickSrcAmount();
+	addResult('Click on source amount result', page.checkState(state));
+
+	setParam(state.visibility, { exch_left : true, dest_amount_row : true });
+	setParam(state.values, { exch_left : '1 ₽/$', exchange_row : { value : '1', currSign : '₽/$' },
+								dest_amount_left : '1.09 ₽', dest_amount_row : { label : 'Destination amount', value : '1.09', currSign : '₽' },
+								src_amount_left : '$ 1.09', src_amount_row : { label : 'Source amount', currSign : '$' } });
+	page.changeSourceCurrency(2);
+	addResult('Change source curency to USD result', page.checkState(state));
+
+// Input destination amount
+	setParam(state.values, { dest_amount_row : { value : '' }, dest_amount_left : '0 ₽',
+								exch_left : '0 ₽/$', exchange_row : { value : '0' },
+								result_balance_dest_row : { value : '500.99' }, dest_res_balance_left : '500.99 ₽' });
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Empty destination amount input result', page.checkState(state));
+
+	state.values.dest_amount_row.value = '.';
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (.) input result', page.checkState(state));
+
+	state.values.dest_amount_row.value = '0.';
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (0.) input result', page.checkState(state));
+
+	state.values.dest_amount_row.value = '.0';
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (.0) input result', page.checkState(state));
+
+	setParam(state.values, { dest_amount_row : { value : '.01' }, dest_amount_left : '0.01 ₽',
+							exchange_row : { value : '0.00917' }, exch_left : '0.00917 ₽/$ (109.05125 $/₽)',
+							result_balance_dest_row : { value : '501' }, dest_res_balance_left : '501 ₽' });
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (.01) input result', page.checkState(state));
+
+	setParam(state.values, { dest_amount_row : { value : '1.01' }, dest_amount_left : '1.01 ₽',
+							exchange_row : { value : '0.92661' }, exch_left : '0.92661 ₽/$ (1.0792 $/₽)',
+							result_balance_dest_row : { value : '502' }, dest_res_balance_left : '502 ₽' });
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.01) input result', page.checkState(state));
+
+	state.values.dest_amount_row.value = '1.010';
+	page.inputDestAmount(state.values.dest_amount_row.value);
+	addResult('Destination amount (1.010) input result', page.checkState(state));
+
+	setParam(state.visibility, { exchange_row : true, exch_left : false, dest_amount_row: false, dest_amount_left : true });
+	page.clickExchRate();
+	addResult('Click on exchange rate result', page.checkState(state));
+
+// Input exchange rate
+	setParam(state.values, { exchange_row : { value : '1.09' }, exch_left : '1.09 ₽/$ (0.91743 $/₽)',
+							dest_amount_row : { value : '1.19' }, dest_amount_left : '1.19 ₽',
+							result_balance_dest_row : { value : '502.18' }, dest_res_balance_left : '502.18 ₽' });
+	test('Input exchange rate (1.09) result', () => page.inputExchRate(state.values.exchange_row.value), page, state)
+/*
+	page.inputExchRate(state.values.exchange_row.value);
+	addResult('Input exchange rate (1.09) result', page.checkState(state));
+*/
+	setParam(state.values, { exchange_row : { value : '3.09' }, exch_left : '3.09 ₽/$ (0.32362 $/₽)',
+								dest_amount_left : '3.37 ₽', dest_amount_row : { value : '3.37' },
+								result_balance_dest_row : { value : '504.36' }, dest_res_balance_left : '504.36 ₽' });
+	page.inputExchRate(state.values.exchange_row.value);
+	addResult('Input exchange rate (3.09) result', page.checkState(state));
+
+	setParam(state.values, { exchange_row : { value : '.09' }, exch_left : '0.09 ₽/$ (11.11111 $/₽)',
+								dest_amount_left : '0.10 ₽', dest_amount_row : { value : '0.1' },
+								result_balance_dest_row : { value : '501.09' }, dest_res_balance_left : '501.09 ₽' });
+	page.inputExchRate(state.values.exchange_row.value);
+	addResult('Input exchange rate (.09) result', page.checkState(state));
+
+	setParam(state.values, { exchange_row : { value : '.090101' }, exch_left : '0.0901 ₽/$ (11.09878 $/₽)',
+								dest_amount_left : '0.09 ₽', dest_amount_row : { value : '0.09' } });
+	page.inputExchRate(state.values.exchange_row.value);
+	addResult('Input exchange rate (.090101) result', page.checkState(state));
+
+
+	setParam(state.visibility, { src_amount_left : false, src_amount_row : true, exch_left : true, exchange_row : false });
+	page.clickSrcAmount();
+	addResult('Click on source amount result', page.checkState(state));
+
+	setParam(state.values, { exch_left : '0.0901 €/₽ (11.09878 €/$)', exchange_row : { currSign : '₽/€' },
+								src_amount_left : '€ 0.09', src_amount_row : { currSign : '€' } });
+	page.changeSourceCurrency(3);
+	addResult('Change source curency to EUR result', page.checkState(state));
+
+	setParam(state.visibility, { exch_left : false, dest_amount_row : false });
+	setParam(state.values, { exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
+								src_amount_left : '1.09 ₽', src_amount_row : { label : 'Amount', currSign : '₽' } });
+	page.changeSourceCurrency(1);
+	addResult('Change source curency to RUB result', page.checkState(state));
+
+
+	return page.changeTransactionType(INCOME);
 }
 
 
