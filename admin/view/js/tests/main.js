@@ -546,7 +546,7 @@ function incomeTransactionStart(page)
 // Input source amount
 	setParam(state.values, { src_amount_row : { value : '1' }, src_amount_left : '1 ₽',
 								dest_res_balance_left : '501.99 ₽' });
-	page.inputDestAmount(state.values.src_amount_row.value);
+	page.inputSrcAmount(state.values.src_amount_row.value);
 	addResult('Source amount (1) input result', page.checkState(state));
 
 	state.values.src_amount_row.value = '1.';
