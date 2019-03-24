@@ -480,7 +480,7 @@ function TransactionViewModel()
 			var davalid = isValidValue(da);
 			var fda = (davalid) ? normalizeExch(da) : da;
 
-			if (da != val)
+			if (fda != val)
 				dest_amount.value = val;
 		}
 	}
