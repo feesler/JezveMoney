@@ -488,6 +488,16 @@ function expenseTransactionStart(page)
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (3.09) result', page.checkState(state));
 
+	setParam(state.values, { exchange_row : { value : '.' }, exch_left : '0 $/₽',
+								dest_amount_left : '$ 0.09', dest_amount_row : { value : '0.09' } });
+	page.inputExchRate(state.values.exchange_row.value);
+	addResult('Input exchange rate (.) result', page.checkState(state));
+
+	setParam(state.values, { exchange_row : { value : '.0' }, exch_left : '0 $/₽',
+								dest_amount_left : '$ 0.09', dest_amount_row : { value : '0.09' } });
+	page.inputExchRate(state.values.exchange_row.value);
+	addResult('Input exchange rate (.0) result', page.checkState(state));
+
 	setParam(state.values, { exchange_row : { value : '.09' }, exch_left : '0.09 $/₽ (11.11111 ₽/$)',
 								dest_amount_left : '$ 0.09', dest_amount_row : { value : '0.09' } });
 	page.inputExchRate(state.values.exchange_row.value);
