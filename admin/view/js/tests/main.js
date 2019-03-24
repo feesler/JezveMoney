@@ -502,8 +502,7 @@ function expenseTransactionStart(page)
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (.09) result', page.checkState(state));
 
-	setParam(state.values, { exchange_row : { value : '.090101' }, exch_left : '0.0901 $/₽ (11.09878 ₽/$)',
-								dest_amount_left : '$ 0.09', dest_amount_row : { value : '0.09' } });
+	setParam(state.values, { exchange_row : { value : '.090101' }, exch_left : '0.0901 $/₽ (11.09878 ₽/$)' });
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (.090101) result', page.checkState(state));
 
@@ -519,7 +518,9 @@ function expenseTransactionStart(page)
 
 	setParam(state.visibility, { exch_left : false, src_amount_row : false });
 	setParam(state.values, { exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
-								dest_amount_left : '1.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' } });
+								dest_amount_left : '0.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' },
+								src_amount_row : { value : '0.09', label : 'Amount' },
+								result_balance_row : { value : '500.9' }, src_res_balance_left : '500.90 ₽' });
 	page.changeDestCurrency(1);
 	addResult('Change destination curency to RUB result', page.checkState(state));
 
