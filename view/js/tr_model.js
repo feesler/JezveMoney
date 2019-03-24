@@ -225,12 +225,14 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			return;
 
 		if (savalid)
-		{
 			f2();		// calculate da
-			f1();		// calculate S2
-		}
 		else if (davalid)
 			f4();		// calculate sa
+
+		if (self.isIncome())
+			f1_d();		// calculate S2_d
+		else
+			f1();		// calculate S2
 
 		notifyChanged('exchrate', fe);
 	}
