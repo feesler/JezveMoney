@@ -402,7 +402,7 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 	{
 		if (!(vKey in obj))
 		{
-			console.error('Key ' + vKey + ' not found');
+			console.error('Key (' + vKey + ') not found');
 			return false;
 		}
 
@@ -433,7 +433,10 @@ TestPage.prototype.checkValues = function(controls)
 			(control && isObject(expected) && !this.checkObjValue(control, expected)) ||
 		 	(control && !isObject(expected) && control.value !== expected))
 		{
-			console.error('Not expected values of ' + countrolName + ' control');
+			if (control && !isObject(expected))
+				console.error('Not expected value ' + control.value + ' for (' + countrolName + ') ' + expected  + ' is expected');
+			else
+				console.error('Not expected values of ' + countrolName + ' control');
 			return false;
 		}
 	}
