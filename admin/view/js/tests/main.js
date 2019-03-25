@@ -110,6 +110,7 @@ function transactionTests(page)
 	return page.goToMainPage()
 			.then(page => page.goToNewTransactionByAccount(1))
 			.then(expenseTransactionStart)
+			.then(page => page.changeTransactionType(INCOME))
 			.then(incomeTransactionStart);
 }
 
@@ -524,8 +525,7 @@ function expenseTransactionStart(page)
 	page.changeDestCurrency(1);
 	addResult('Change destination curency to RUB result', page.checkState(state));
 
-
-	return page.changeTransactionType(INCOME);
+	return Promise.resolve(page);
 }
 
 
@@ -681,8 +681,7 @@ function incomeTransactionStart(page)
 	page.changeSourceCurrency(1);
 	addResult('Change source curency to RUB result', page.checkState(state));
 
-
-	return page.changeTransactionType(INCOME);
+	return Promise.resolve(page);
 }
 
 
