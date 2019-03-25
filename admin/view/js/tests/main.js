@@ -111,7 +111,9 @@ function transactionTests(page)
 			.then(page => page.goToNewTransactionByAccount(1))
 			.then(expenseTransactionStart)
 			.then(page => page.changeTransactionType(INCOME))
-			.then(incomeTransactionStart);
+			.then(incomeTransactionStart)
+			.then(page => page.changeTransactionType(TRANSFER))
+			.then(transferTransactionStart)
 }
 
 
@@ -684,6 +686,184 @@ function incomeTransactionStart(page)
 	return Promise.resolve(page);
 }
 
+
+function transferTransactionStart(page)
+{
+	var state = { visibility : { source : true, destination : true, src_amount_left : false, dest_amount_left : false,
+								src_res_balance_left : true, dest_res_balance_left : true, exch_left : false,
+								src_amount_row : true, dest_amount_row : false, exchange_row : false, result_balance_row : false,
+								result_balance_dest_row : false },
+				values : { typeMenu : { 3 : { isActive : true } }, /* TRANSFER */
+							source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
+							destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
+							src_amount_row : { label : 'Amount', value : '', currSign : '₽', isCurrActive : false },
+							src_res_balance_left : '500.99 ₽',
+							result_balance_row : { value : '500.9', value : '', currSign : '₽', isCurrActive : false },
+							dest_res_balance_left : '500.99 ₽',
+							result_balance_dest_row : { value : '500.09', value : '', currSign : '₽', isCurrActive : false }, } };
+
+	setBlock('Transfer', 2);
+	addResult('Initial state of new transfer page', page.checkState(state));
+
+// Input source amount
+	setParam(state.values, { src_amount_row : { value : '1' }, src_amount_left : '1 ₽',
+								src_res_balance_left : '499.99 ₽', result_balance_row : { value : '499.99' },
+								dest_res_balance_left : '501.99 ₽', result_balance_dest_row : { value : '501.99' } });
+	page.inputDestAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.0';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.0) input result', page.checkState(state));
+
+	setParam(state.values, { src_amount_row : { value : '1.01' }, src_amount_left : '1.01 ₽',
+								src_res_balance_left : '499.98 ₽', result_balance_row : { value : '499.98' },
+								dest_res_balance_left : '502 ₽', result_balance_dest_row : { value : '502' } });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.01) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.010';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.010) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '1.0101';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (1.0101) input result', page.checkState(state));
+
+	setParam(state.values, { src_amount_row : { value : '' }, src_amount_left : '0 ₽',
+								src_res_balance_left : '500.99 ₽', result_balance_row : { value : '500.99' },
+								dest_res_balance_left : '500.99 ₽', result_balance_dest_row : { value : '500.99' } });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Emptry source amount input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '.';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (.) input result', page.checkState(state));
+
+	state.values.src_amount_row.value = '.0';
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (.0) input result', page.checkState(state));
+
+	setParam(state.values, { src_amount_row : { value : '.09' }, src_amount_left : '0.09 ₽',
+								src_res_balance_left : '500.90 ₽', result_balance_row : { value : '500.9' },
+								dest_res_balance_left : '501.08 ₽', result_balance_dest_row : { value : '501.08' } });
+	page.inputSrcAmount(state.values.src_amount_row.value);
+	addResult('Source amount (.09) input result', page.checkState(state));
+
+// Click by source balance
+	setParam(state.visibility, { src_res_balance_left : false, result_balance_row : true, src_amount_left : true, src_amount_row : false });
+	page.clickSrcResultBalance();
+	addResult('Click on destination result balance result', page.checkState(state));
+
+// Input source result balance
+	setParam(state.values, { result_balance_row : { value : '400' }, src_res_balance_left : '400 ₽',
+								result_balance_dest_row : { value : '601.98' }, dest_res_balance_left : '601.98 ₽',
+								src_amount_left : '100.99 ₽', src_amount_row : { value : '100.99' } });
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (400) input result', page.checkState(state));
+
+	state.values.result_balance_row.value = '400.';
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (400.) input result', page.checkState(state));
+
+	setParam(state.values, { result_balance_row : { value : '400.9' }, src_res_balance_left : '400.90 ₽',
+								result_balance_dest_row : { value : '601.08' }, dest_res_balance_left : '601.08 ₽',
+								src_amount_left : '100.09 ₽', src_amount_row : { value : '100.09' } });
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (400.9) input result', page.checkState(state));
+
+	setParam(state.values, { result_balance_row : { value : '400.99' }, src_res_balance_left : '400.99 ₽',
+								result_balance_dest_row : { value : '600.99' }, dest_res_balance_left : '600.99 ₽',
+								src_amount_left : '100 ₽', src_amount_row : { value : '100' } });
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (400.99) input result', page.checkState(state));
+
+	state.values.result_balance_row.value = '400.990';
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (400.990) input result', page.checkState(state));
+
+	state.values.result_balance_row.value = '400.9901';
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (400.9901) input result', page.checkState(state));
+
+	setParam(state.values, { result_balance_row : { value : '' }, src_res_balance_left : '0 ₽',
+								result_balance_dest_row : { value : '1001.98' }, dest_res_balance_left : '1 001.98 ₽',
+								src_amount_left : '500.99 ₽', src_amount_row : { value : '500.99' } });
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Empty result balance input result', page.checkState(state));
+
+	state.values.result_balance_row.value = '.';
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (.) input result', page.checkState(state));
+
+	state.values.result_balance_row.value = '.0';
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (.0) input result', page.checkState(state));
+
+	setParam(state.values, { result_balance_row : { value : '.01' }, src_res_balance_left : '0.01 ₽',
+								result_balance_dest_row : { value : '1001.97' }, dest_res_balance_left : '1 001.97 ₽',
+								src_amount_left : '500.98 ₽', src_amount_row : { value : '500.98' } });
+	page.inputResBalance(state.values.result_balance_row.value);
+	addResult('Result balance (.01) input result', page.checkState(state));
+
+// CLick on destination amount
+	setParam(state.visibility, { dest_res_balance_left : false, result_balance_dest_row : true, src_res_balance_left : true, result_balance_row : false });
+	page.clickDestResultBalance();
+	addResult('Click on destination result balance result', page.checkState(state));
+
+// Input destination result balance
+	setParam(state.values, { result_balance_dest_row : { value : '600' }, dest_res_balance_left : '600 ₽',
+								result_balance_row : { value : '401.98' }, src_res_balance_left : '401.98 ₽',
+								src_amount_left : '99.01 ₽', src_amount_row : { value : '99.01' } });
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '600.';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600.) input result', page.checkState(state));
+
+	setParam(state.values, { result_balance_dest_row : { value : '600.9' }, dest_res_balance_left : '600.90 ₽',
+								result_balance_row : { value : '401.08' }, src_res_balance_left : '401.08 ₽',
+								src_amount_left : '99.91 ₽', src_amount_row : { value : '99.91' } });
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600.9) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '600.90';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600.90) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '600.901';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600.901) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '600.9010';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600.9010) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '600.90101';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (600.90101) input result', page.checkState(state));
+
+	setParam(state.values, { result_balance_dest_row : { value : '' }, dest_res_balance_left : '0 ₽',
+								result_balance_row : { value : '1001.98' }, src_res_balance_left : '1 001.98 ₽',
+								src_amount_left : '-500.99 ₽', src_amount_row : { value : '-500.99' } });
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Empty destination result balance input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '.';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (.) input result', page.checkState(state));
+
+	state.values.result_balance_dest_row.value = '.0';
+	page.inputDestResBalance(state.values.result_balance_dest_row.value);
+	addResult('Result balance (.0) input result', page.checkState(state));
+
+	return Promise.resolve(page);
+}
 
 
 function addResult(descr, res)
