@@ -503,8 +503,6 @@ class TransactionsController extends Controller
 		foreach($trTypes as $ind => $trTypeName)
 		{
 			$params = array("type" => strtolower($trTypeName));
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
 
 			$transMenu[] = array(($ind + 1), $trTypeName, urlJoin($baseUrl, $params));
 		}
