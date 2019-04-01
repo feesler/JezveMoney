@@ -106,38 +106,54 @@ class CheckBalanceController extends Controller
 			$tr["src_name"] = $accMod->getNameOrPerson($tr["src_id"]);
 			$tr["dest_name"] = $accMod->getNameOrPerson($tr["dest_id"]);
 
-			if ($tr["type"] == 1)
+			if ($tr["type"] == EXPENSE)
 			{
+				if (!isset($realBalance[$tr["src_id"]]))
+					$realBalance[$tr["src_id"]] = 0;
+
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
 				$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]]);
 			}
-			else if ($tr["type"] == 2)
+			else if ($tr["type"] == INCOME)
 			{
+				if (!isset($realBalance[$tr["dest_id"]]))
+					$realBalance[$tr["dest_id"]] = 0;
+
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 				$tr["realbal"] = array($tr["dest_id"] => $realBalance[$tr["dest_id"]]);
 			}
-			else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
+			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
 			{
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["dest_amount"], 2);
 				$tr["realbal"] = array($checkAccount_id => $realBalance[$checkAccount_id]);
 			}
-			else if ($checkAccount_id != 0 && $tr["type"] == 3 && $tr["src_id"] == $checkAccount_id)		/* transfer from */
+			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["src_id"] == $checkAccount_id)		/* transfer from */
 			{
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["src_amount"], 2);
 				$tr["realbal"] = array($checkAccount_id => $realBalance[$checkAccount_id]);
 			}
-			else if ($checkAccount_id == 0 && $tr["type"] == 3)		/* Transfer between two accounts */
+			else if ($checkAccount_id == 0 && $tr["type"] == TRANSFER)		/* Transfer between two accounts */
 			{
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 				$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]);
 			}
-			else if ($tr["type"] == 4)
+			else if ($tr["type"] == DEBT)
 			{
 				if ($tr["src_id"] != 0)
+				{
+					if (!isset($realBalance[$tr["src_id"]]))
+						$realBalance[$tr["src_id"]] = 0;
+
 					$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+				}
 				if ($tr["dest_id"] != 0)
+				{
+					if (!isset($realBalance[$tr["dest_id"]]))
+						$realBalance[$tr["dest_id"]] = 0;
+
 					$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
+				}
 				$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]);
 			}
 
@@ -153,6 +169,9 @@ class CheckBalanceController extends Controller
 		$balanceDiff = array();
 		foreach($realBalance as $acc_id => $rbrow)
 		{
+			if (!isset($curBalance[$acc_id]))
+				$curBalance[$acc_id] = 0;
+
 			$balanceDiff[$acc_id] = round($rbrow - $curBalance[$acc_id], 2);
 		}
 
