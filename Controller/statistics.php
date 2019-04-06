@@ -4,7 +4,7 @@ class StatisticsController extends Controller
 {
 	public function index()
 	{
-		global $user_name, $user_id;
+		global $user_name, $user_id, $uMod;
 
 		$transMod = new TransactionModel($user_id);
 		$accMod = new AccountModel($user_id);

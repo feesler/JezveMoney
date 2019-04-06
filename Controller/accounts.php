@@ -4,7 +4,7 @@ class AccountsController extends Controller
 {
 	public function index()
 	{
-		global $user_id, $user_name;
+		global $user_id, $user_name, $uMod;
 
 		$accMod = new AccountModel($user_id);
 		$transMod = new TransactionModel($user_id);
@@ -23,7 +23,7 @@ class AccountsController extends Controller
 
 	public function create()
 	{
-		global $user_id, $user_name;
+		global $user_id, $user_name, $uMod;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
@@ -71,7 +71,7 @@ class AccountsController extends Controller
 
 	public function update()
 	{
-		global $user_id, $user_name;
+		global $user_id, $user_name, $uMod;
 
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{

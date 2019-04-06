@@ -387,6 +387,8 @@ input[type="text"], input[type="password"], select
 	list-style-image: none;
 	border: 0 none;
 	padding: 10px 30px;
+	white-space: nowrap;
+	text-align: center;
 }
 
 
@@ -404,6 +406,17 @@ input[type="text"], input[type="password"], select
 }
 
 
+.usermenu > ul > li.separator
+{
+	height: 0;
+	border: 0 none;
+	border-bottom: 1px solid #808080;
+	padding: 0;
+}
+
+
+
+/* Main page widgets */
 .widget
 {
 	display: inline-block;
