@@ -4,7 +4,7 @@ class MainController extends Controller
 {
 	public function index()
 	{
-		global $user_name, $user_id;
+		global $user_name, $user_id, $uMod;
 
 		$accMod = new AccountModel($user_id);
 		$transMod = new TransactionModel($user_id);
