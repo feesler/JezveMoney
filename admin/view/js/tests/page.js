@@ -55,6 +55,11 @@ TestPage.prototype.parseHeader = function()
 			el = menuLinks[i];
 			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerHTML });
 		}
+
+		var itemShift = (res.user.menuItem.length > 2) : 1 : 0;
+
+		res.user.profileBtn = res.user.menuItems[itemShift].elem;
+		res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
 	}
 
 	return res;
@@ -460,7 +465,7 @@ TestPage.prototype.goToProfilePage = function()
 	clickEmul(this.header.user.menuBtn);		// open user menu
 
 	return navigation(() => {
-		setTimeout(() => clickEmul(this.header.user.menuItems[0].elem), 500);
+		setTimeout(() => clickEmul(this.header.user.profileBtn), 500);
 	}, ProfilePage);
 };
 
@@ -471,7 +476,7 @@ TestPage.prototype.logoutUser = function()
 	clickEmul(this.header.user.menuBtn);
 
 	return navigation(() => {
-		setTimeout(() => clickEmul(this.header.user.menuItems[1].elem), 500);
+		setTimeout(() => clickEmul(this.header.user.logoutBtn), 500);
 	}, LoginPage);
 };
 
