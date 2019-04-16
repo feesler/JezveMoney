@@ -36,7 +36,7 @@ onReady(initPage);
 	</div>
 	<div class="controls">
 		<div class="std_margin"><input class="btn ok_btn" type="button" onclick="createRow()" value="+"><input class="btn ok_btn" type="button" onclick="addPlaceholder()" value="+"></div>
-		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit"></div>
+		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span></div>
 	</div>
 </form>
 </body>
