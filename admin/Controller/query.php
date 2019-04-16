@@ -17,11 +17,11 @@ class QueryAdminController extends Controller
 			{
 				$resArr = array();
 				$result = $db->rawQ($query);
-				$qerr_num = mysql_errno();
-				$qerror = mysql_error();
-				if ($result && !$qerr_num && mysql_num_rows($result) > 0)
+				$qerr_num = mysqli_errno($db->getConnection());
+				$qerror = mysqli_error($db->getConnection());
+				if ($result && !$qerr_num && mysqli_num_rows($result) > 0)
 				{
-					while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+					while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
 						$resArr[] = $row;
 
 					$rows = count($resArr);
