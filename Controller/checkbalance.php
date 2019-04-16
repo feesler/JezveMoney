@@ -140,12 +140,15 @@ class CheckBalanceController extends Controller
 			}
 			else if ($tr["type"] == DEBT)
 			{
+				$tr["realbal"] = array();
+
 				if ($tr["src_id"] != 0)
 				{
 					if (!isset($realBalance[$tr["src_id"]]))
 						$realBalance[$tr["src_id"]] = 0;
 
 					$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+					$tr["realbal"][$tr["src_id"]] = $realBalance[$tr["src_id"]];
 				}
 				if ($tr["dest_id"] != 0)
 				{
@@ -153,8 +156,8 @@ class CheckBalanceController extends Controller
 						$realBalance[$tr["dest_id"]] = 0;
 
 					$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
+					$tr["realbal"][$tr["dest_id"]] = $realBalance[$tr["dest_id"]];
 				}
-				$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]);
 			}
 
 			$tr["correctdate"] = ($tr["date"] >= $prev_date);
