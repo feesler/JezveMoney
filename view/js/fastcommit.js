@@ -2,6 +2,8 @@ var impRows = [];
 var trRows = [];
 var trListSortable = null;
 var mainAccObj = null;
+var trcount = null;
+
 
 function accFromSelect(selectObj)
 {
@@ -54,6 +56,8 @@ function cleanTrRows()
 	trRows = [];
 
 	removeChilds(rowsContainer);
+
+	trcount.innerHTML = trRows.length;
 }
 
 
@@ -72,6 +76,8 @@ function delRow(rowObj)
 
 	trRows.splice(delPos, 1);
 	updateRowsPos();
+
+	trcount.innerHTML = trRows.length;
 }
 
 
@@ -279,6 +285,8 @@ function createRow()
 
 		trRows.push(rowObj);
 	}
+
+	trcount.innerHTML = trRows.length;
 }
 
 
@@ -686,6 +694,8 @@ function mapImportRow(impRowObj)
 	insertAfter(rowObj.rowEl, item);
 	re(item);
 
+	trcount.innerHTML = trRows.length;
+
 	updateRowsPos();
 }
 
@@ -867,7 +877,8 @@ function initPage()
 {
 	var submitbtn = ge('submitbtn');
 	var fileimportfrm = ge('fileimportfrm');
-	if (!fileimportfrm || !importbtn || !submitbtn)
+	trcount = ge('trcount');
+	if (!fileimportfrm || !submitbtn || !trcount)
 		return;
 
 	submitbtn.onclick = onSubmitClick;
