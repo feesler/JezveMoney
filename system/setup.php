@@ -31,18 +31,18 @@
 	{
 		define("APPPROT", "https://", TRUE);
 		define("APPPATH", "/", TRUE);
-
-		if (!isSecure())
-		{
-			header("HTTP/1.1 302 Found", TRUE, 302);
-			header("Location: ".APPPROT.APPHOST.$ruri);
-			exit;
-		}
 	}
 	else if (strcmp(APPHOST, $devHost) == 0)
 	{
-		define("APPPROT", "http://", TRUE);
+		define("APPPROT", "https://", TRUE);
 		define("APPPATH", "/money/", TRUE);
+	}
+
+	if (!isSecure())
+	{
+		header("HTTP/1.1 302 Found", TRUE, 302);
+		header("Location: ".APPPROT.APPHOST.$ruri);
+		exit;
 	}
 
 	define("BASEURL", APPPROT.APPHOST.APPPATH, TRUE);
