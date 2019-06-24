@@ -56,8 +56,7 @@
 		wlog("approot: ".APPROOT);
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
-		wlog("Referer: ".$_SERVER["HTTP_REFERER"]);
-		wlog("Request: ".$ruri);
+		wlog("Request: ".$_SERVER["REQUEST_METHOD"]." ".$ruri);
 
 		wlog("Headers: ");
 		foreach(getallheaders() as $cKey => $cVal)
