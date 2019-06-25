@@ -83,12 +83,17 @@ class FastCommitController extends Controller
 			return;
 
 		$file_cont = file_get_contents('php://input');
-		$hdrs = getallheaders();
-		if (isset($hdrs["X-File-Id"]))
+		$hdrs = array();
+		foreach(getallheaders() as $hdrName => $value)
 		{
-			$fileId = $hdrs["X-File-Id"];
-			$fileType = $hdrs["X-File-Type"];
-			$fileStatType = $hdrs["X-File-Stat-Type"];
+			$hdrs[strtolower($hdrName)] = $value;
+		}
+
+		if (isset($hdrs["x-file-id"]))
+		{
+			$fileId = $hdrs["x-file-id"];
+			$fileType = $hdrs["x-file-type"];
+			$fileStatType = $hdrs["x-file-stat-type"];
 
 			$fname = APPROOT."system/uploads/".$fileId.".".$fileType;
 			$fhnd = fopen($fname, "a");
@@ -184,7 +189,7 @@ class FastCommitController extends Controller
 		}
 		while(!is_empty($edesc));
 
-		if (isset($hdrs["X-File-Id"]))
+		if (isset($hdrs["x-file-id"]))
 			unlink($fname);
 
 		echo(f_json_encode($data));
