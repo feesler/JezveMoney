@@ -66,7 +66,7 @@ class AccountApiController extends ApiController
 		if (!$acc_id)
 			$respObj->fail();
 
-		$respObj->data = array("id" => $acc_id);
+		$respObj->data = ["id" => $acc_id];
 		$respObj->ok();
 	}
 

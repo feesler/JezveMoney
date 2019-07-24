@@ -6,8 +6,8 @@ class AccountModel extends CachedTable
 	static private $user_id = 0;
 	static private $owner_id = 0;
 	static private $full_list = FALSE;
-	static private $icons = array("No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash");
-	static private $iconClass = array("", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon");
+	static private $icons = ["No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash"];
+	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
 
 
 	// Class constructor
@@ -34,13 +34,13 @@ class AccountModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		self::$dcache = array();
+		self::$dcache = [];
 
 		// find owner person
 		$uMod = new UserModel();
 		self::$owner_id = $uMod->getOwner(self::$user_id);
 
-		$condArr = array("user_id=".self::$user_id);
+		$condArr = ["user_id=".self::$user_id];
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
@@ -79,8 +79,8 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("accounts", array("id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"),
-								array(NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate)))
+		if (!$this->dbObj->insertQ("accounts", ["id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"],
+								[NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate]))
 			return 0;
 
 		$acc_id = $this->dbObj->insertId();
@@ -122,8 +122,8 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		$fields = array("name", "curr_id", "icon", "updatedate");
-		$values = array($accname, $curr_id, $icon_type, $curDate);
+		$fields = ["name", "curr_id", "icon", "updatedate"];
+		$values = [$accname, $curr_id, $icon_type, $curDate];
 
 		if (abs($diff) > 0.01)
 		{
@@ -168,7 +168,7 @@ class AccountModel extends CachedTable
 		}
 
 		// delete account
-		$condArr = array("user_id=".self::$user_id, "id=".$acc_id);
+		$condArr = ["user_id=".self::$user_id, "id=".$acc_id];
 		if (!$this->dbObj->deleteQ("accounts", $condArr))
 			return FALSE;
 
@@ -206,7 +206,7 @@ class AccountModel extends CachedTable
 		if (!$acc_id || is_null($field) || $field == "")
 			return FALSE;
 
-		if (!$this->dbObj->updateQ("accounts", array($field, "updatedate"), array($newValue, date("Y-m-d H:i:s")), "id=".$acc_id))
+		if (!$this->dbObj->updateQ("accounts", [$field, "updatedate"], [$newValue, date("Y-m-d H:i:s")], "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -388,7 +388,7 @@ class AccountModel extends CachedTable
 	// Return Javascript array of accounts
 	public function getArray()
 	{
-		$resArr = array();
+		$resArr = [];
 
 		if (!$this->checkCache())
 			return $resArr;
@@ -414,7 +414,7 @@ class AccountModel extends CachedTable
 	// Return array of accounts for template
 	public function getTilesArray()
 	{
-		$res = array();
+		$res = [];
 
 		if (!$this->checkCache())
 			return $res;
@@ -428,9 +428,9 @@ class AccountModel extends CachedTable
 			$acc_icon = $this->getIconClass($icon_id);
 			$balance_fmt = $this->currMod->format($row["balance"], $row["curr_id"]);
 
-			$res[$acc_id] = array("name" => $row["name"],
+			$res[$acc_id] = ["name" => $row["name"],
 								"balance" => $balance_fmt,
-								"icon" => $acc_icon);
+								"icon" => $acc_icon];
 		}
 
 		return $res;
@@ -449,7 +449,7 @@ class AccountModel extends CachedTable
 	// Return array of total sums per each currency
 	public function getTotalsArray()
 	{
-		$res = array();
+		$res = [];
 
 		if (!$this->checkCache())
 			return $res;
@@ -475,7 +475,7 @@ class AccountModel extends CachedTable
 		if (!$this->is_exist($acc_id))
 			return NULL;
 
-		$res = array("id" => $acc_id,
+		$res = ["id" => $acc_id,
 					"owner" => self::$dcache[$acc_id]["owner_id"],
 					"name" => self::$dcache[$acc_id]["name"],
 					"balance" => self::$dcache[$acc_id]["balance"],
@@ -483,7 +483,7 @@ class AccountModel extends CachedTable
 					"curr" => self::$dcache[$acc_id]["curr_id"],
 					"sign" => $this->currMod->getSign(self::$dcache[$acc_id]["curr_id"]),
 					"icon" => self::$dcache[$acc_id]["icon"],
-					"iconclass" => $this->getIconClass(self::$dcache[$acc_id]["icon"]));
+					"iconclass" => $this->getIconClass(self::$dcache[$acc_id]["icon"])];
 
 		return $res;
 	}

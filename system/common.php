@@ -14,7 +14,7 @@
 	}
 
 
-	$classes = array("CachedTable" => "system/cachedTable.php",
+	$classes = ["CachedTable" => "system/cachedTable.php",
 					"Controller" => "system/controller.php",
 					"ApiController" => "system/apicontroller.php",
 				// Controllers
@@ -49,7 +49,7 @@
 					"PersonModel" => "Model/person.php",
 					"TransactionModel" => "Model/transaction.php",
 					"UserModel" => "Model/user.php",
-					"apiResponse" => "system/apiResponse.php");
+					"apiResponse" => "system/apiResponse.php"];
 
 	// Check class name and try to load file
 	function autoLoadClass($className)
@@ -75,7 +75,7 @@
 	{
 		$str = htmlentities($str, ENT_QUOTES, "UTF-8");
 		if ($lineEnd)
-			$str = str_replace(array("\r\n", "\r", "\n"), "<br>", $str);
+			$str = str_replace(["\r\n", "\r", "\n"], "<br>", $str);
 
 		return $str;
 	}
@@ -120,8 +120,8 @@
 		if (!$user_id || !$curr_acc_id || !$trans_type)
 			return NULL;
 
-		$amountArr = array();
-		$groupArr = array();
+		$amountArr = [];
+		$groupArr = [];
 		$sumDate = NULL;
 		$curDate = NULL;
 		$prevDate = NULL;
@@ -129,9 +129,9 @@
 		$itemsInGroup = 0;
 		$trans_time = 0;
 
-		$fields = array("tr.date" => "date", "tr.src_amount" => "src_amount", "tr.dest_amount" => "dest_amount");
-		$tables = array("transactions" => "tr");
-		$condArr =  array("tr.user_id=".$user_id, "tr.type=".$trans_type);
+		$fields = ["tr.date" => "date", "tr.src_amount" => "src_amount", "tr.dest_amount" => "dest_amount"];
+		$tables = ["transactions" => "tr"];
+		$condArr =  ["tr.user_id=".$user_id, "tr.type=".$trans_type];
 
 		if ($byCurrency)
 		{
@@ -163,7 +163,7 @@
 
 				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
 				{
-					$groupArr[] = array(date("d.m.Y", $trans_time), $itemsInGroup);
+					$groupArr[] = [date("d.m.Y", $trans_time), $itemsInGroup];
 					$itemsInGroup = 0;
 				}
 				$prevDate = $dateInfo["mday"];
@@ -194,7 +194,7 @@
 				$sumDate = $curDate;
 				$amountArr[] = $curSum;
 				$curSum = 0.0;
-				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+				$groupArr[] = [date("d.m.Y", $trans_time), 1];
 			}
 
 			$curSum += floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
@@ -206,7 +206,7 @@
 			if ($sumDate != NULL && $sumDate != $curDate)
 			{
 				$amountArr[] = $curSum;
-				$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+				$groupArr[] = [date("d.m.Y", $trans_time), 1];
 			}
 			else
 			{
@@ -215,7 +215,7 @@
 				else
 					$amountArr[count($amountArr) - 1] += $curSum;
 				if (!count($groupArr))
-					$groupArr[] = array(date("d.m.Y", $trans_time), 1);
+					$groupArr[] = [date("d.m.Y", $trans_time), 1];
 				else if ($group_type == 0)
 					$groupArr[count($groupArr) - 1][1]++;
 			}
@@ -288,7 +288,7 @@
 		if (!is_array($params))
 			return $resStr;
 
-		$pairs = array();
+		$pairs = [];
 		foreach($params as $pkey => $pval)
 		{
 			$pairs[] = urlencode($pkey)."=".urlencode($pval);

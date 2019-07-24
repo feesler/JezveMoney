@@ -4,7 +4,7 @@
 	define("MSG_TYPE_SUCCESS", 1);
 	define("MSG_TYPE_ERROR", 2);
 
-	$msgArray = array();
+	$msgArray = [];
 
 
 	// Define new message constant
@@ -16,9 +16,9 @@
 		define($constName, $msgCounter);
 
 		if ($msgType != MSG_TYPE_NONE && !is_null($message))
-			$msgArray[$msgCounter] = array($msgType, $message);
+			$msgArray[$msgCounter] = [$msgType, $message];
 		else
-			$msgArray[$msgCounter] = array(MSG_TYPE_NONE);
+			$msgArray[$msgCounter] = [MSG_TYPE_NONE];
 	}
 
 

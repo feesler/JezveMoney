@@ -5,21 +5,21 @@
 	$controller = NULL;
 	$action = NULL;
 
-	$aliasMap = array("login" => "user/login",
-						"register" => "user/register");
+	$aliasMap = ["login" => "user/login",
+						"register" => "user/register"];
 
-	$controllersMap = array("currency" => "CurrencyApiController",
+	$controllersMap = ["currency" => "CurrencyApiController",
 							"account" => "AccountApiController",
 							"person" => "PersonApiController",
 							"transaction" => "TransactionApiController",
 							"user" => "UserApiController",
 							"profile" => "ProfileApiController"
-							);
+							];
 
-	$actionsMap = array("new" => "create",
+	$actionsMap = ["new" => "create",
 						"edit" => "update",
 						"delete" => "del",
-						"list" => "getList");
+						"list" => "getList"];
 
 	// Parse route
 	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
@@ -52,7 +52,7 @@
 		setLocation(BASEURL);
 
 	// Check correct user authentication for controller
-	$loggedOutControllers = array("user/login", "user/register");
+	$loggedOutControllers = ["user/login", "user/register"];
 	$rebuildRoute = $contrStr.(count($routeParts) ? $routeParts[0] : "");
 	$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
 

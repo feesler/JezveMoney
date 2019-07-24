@@ -26,8 +26,8 @@
 	// Encode string value to CSV format
 	function csv_encode($str)
 	{
-		$search = array("';'", "'\"'");
-		$replacement = array("\\;", "\"\"");
+		$search = ["';'", "'\"'"];
+		$replacement = ["\\;", "\"\""];
 
 		$conv_str = cp1251($str);
 
@@ -54,12 +54,12 @@
 	$accMod = new AccountModel($user_id, TRUE);
 
 
-	$realBalance = array();
-	$curBalance = array();
-	$initBalance = array();
-	$accName = array();
+	$realBalance = [];
+	$curBalance = [];
+	$initBalance = [];
+	$accName = [];
 
-	$condArr = array("user_id=".$user_id, "id=".$checkAccount_id);
+	$condArr = ["user_id=".$user_id, "id=".$checkAccount_id];
 	$resArr = $db->selectQ("*", "accounts", $condArr);
 	foreach($resArr as $row)
 	{
@@ -71,10 +71,10 @@
 	$resStr = "";
 	$resStr .= "id".$delim."type".$delim."amount".$delim."charge".$delim."comment".$delim."balance".$delim."date\r\n";
 
-	$condArr = array("user_id=".$user_id);
+	$condArr = ["user_id=".$user_id];
 	if ($checkAccount_id != 0)
 	{
-		$accCond = array();
+		$accCond = [];
 		$accCond[] = "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
 		$accCond[] = "(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))";	// destination
 		$condArr[] = "(".orJoin($accCond).")";

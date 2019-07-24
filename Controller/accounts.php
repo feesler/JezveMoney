@@ -36,12 +36,12 @@ class AccountsController extends Controller
 		$accMod = new AccountModel($user_id);
 		$currMod = new CurrencyModel();
 
-		$accInfo = array("name" => "",
+		$accInfo = ["name" => "",
 						"curr" => $currMod->getIdByPos(0),
 						"balance" => 0,
 						"initbalance" => 0,
 						"icon" => 0,
-						"iconclass" => "");
+						"iconclass" => ""];
 		$accInfo["sign"] = $currMod->getSign($accInfo["curr"]);
 		$accInfo["balfmt"] = $currMod->format($accInfo["balance"], $accInfo["curr"]);
 		$tileAccName = "New account";

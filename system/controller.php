@@ -15,14 +15,14 @@ abstract class Controller
 	public function initDefResources()
 	{
 		$this->css = new stdClass;
-		$this->css->clear = array("common.css");
-		$this->css->libs = array("popup.css");
-		$this->css->app = array("app.css");
-		$this->css->page = array();
-		$this->cssAdmin = array("admin.css");
+		$this->css->clear = ["common.css"];
+		$this->css->libs = ["popup.css"];
+		$this->css->app = ["app.css"];
+		$this->css->page = [];
+		$this->cssAdmin = ["admin.css"];
 
-		$this->jsArr = array("es5-shim.min.js", "common.js", "ajax.js", "popup.js", "app.js");
-		$this->jsAdmin = array();
+		$this->jsArr = ["es5-shim.min.js", "common.js", "ajax.js", "popup.js", "app.js"];
+		$this->jsAdmin = [];
 	}
 
 
@@ -60,7 +60,7 @@ abstract class Controller
 		if (is_null($this->actionParam) && !isset($httpSrc["id"]))
 			return NULL;
 
-		$res = array();
+		$res = [];
 
 		if (isset($httpSrc["id"]))
 		{

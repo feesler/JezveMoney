@@ -83,7 +83,7 @@ class FastCommitController extends Controller
 			return;
 
 		$file_cont = file_get_contents('php://input');
-		$hdrs = array();
+		$hdrs = [];
 		foreach(getallheaders() as $hdrName => $value)
 		{
 			$hdrs[strtolower($hdrName)] = $value;
@@ -156,7 +156,7 @@ class FastCommitController extends Controller
 		}
 		$row_ind = 2;
 
-		$data = array();
+		$data = [];
 		do
 		{
 			$descVal = $src->getCell($desc_col.$row_ind)->getValue();
