@@ -1,8 +1,8 @@
 <?php
 	// Type of messages
-	define("MSG_TYPE_NONE", 0, TRUE);
-	define("MSG_TYPE_SUCCESS", 1, TRUE);
-	define("MSG_TYPE_ERROR", 2, TRUE);
+	define("MSG_TYPE_NONE", 0);
+	define("MSG_TYPE_SUCCESS", 1);
+	define("MSG_TYPE_ERROR", 2);
 
 	$msgArray = array();
 
@@ -13,7 +13,7 @@
 		global $msgArray;
 
 		$msgCounter = count($msgArray);
-		define($constName, $msgCounter, TRUE);
+		define($constName, $msgCounter);
 
 		if ($msgType != MSG_TYPE_NONE && !is_null($message))
 			$msgArray[$msgCounter] = array($msgType, $message);

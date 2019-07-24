@@ -742,7 +742,7 @@ function Uploader(file, isCardStat, onSuccess, onFail, onProgress)
 
 		};
 
-		xhrStatus.open("GET", "uploadstatus", true);
+		xhrStatus.open("GET", "fastcommit/uploadstatus", true);
 		xhrStatus.setRequestHeader('X-File-Id', fileId);
 		xhrStatus.setRequestHeader('X-File-Type', fileType);
 		xhrStatus.send();
@@ -768,7 +768,7 @@ function Uploader(file, isCardStat, onSuccess, onFail, onProgress)
 				onError(this.statusText);
 		};
 
-		xhrUpload.open('POST', 'upload', true);
+		xhrUpload.open('POST', 'fastcommit/upload', true);
 		// which file upload
 		xhrUpload.setRequestHeader('X-File-Id', fileId);
 		xhrUpload.setRequestHeader('X-File-Type', fileType);

@@ -1,9 +1,9 @@
 <?php
 
-	define("EXPENSE", 1, TRUE);
-	define("INCOME", 2, TRUE);
-	define("TRANSFER", 3, TRUE);
-	define("DEBT", 4, TRUE);
+	define("EXPENSE", 1);
+	define("INCOME", 2);
+	define("TRANSFER", 3);
+	define("DEBT", 4);
 
 
 	// Set location header to redirect page and exit from script

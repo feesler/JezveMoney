@@ -3,7 +3,7 @@
 	$pparts = pathinfo(__FILE__);
 	$path_length = strrpos($pparts["dirname"], "/");
 	$approot = substr(__FILE__, 0, $path_length + 1);
-	define("APPROOT", $approot, TRUE);
+	define("APPROOT", $approot);
 
 
 	// Check request is HTTPS
@@ -26,16 +26,16 @@
 		exit;
 	}
 
- 	define("APPHOST", $_SERVER["HTTP_HOST"], TRUE);
+ 	define("APPHOST", $_SERVER["HTTP_HOST"]);
 	if (strcmp(APPHOST, $productionHost) == 0)
 	{
-		define("APPPROT", "https://", TRUE);
-		define("APPPATH", "/", TRUE);
+		define("APPPROT", "https://");
+		define("APPPATH", "/");
 	}
 	else if (strcmp(APPHOST, $devHost) == 0)
 	{
-		define("APPPROT", "https://", TRUE);
-		define("APPPATH", "/money/", TRUE);
+		define("APPPROT", "https://");
+		define("APPPATH", "/money/");
 	}
 
 	if (!isSecure())
@@ -45,7 +45,7 @@
 		exit;
 	}
 
-	define("BASEURL", APPPROT.APPHOST.APPPATH, TRUE);
+	define("BASEURL", APPPROT.APPHOST.APPPATH);
 
 	if (!isset($noLogs))
 	{
