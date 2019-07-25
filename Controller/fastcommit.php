@@ -54,14 +54,18 @@ class FastCommitController extends Controller
 
 	public function uploadstatus()
 	{
-		$hdrs = getallheaders();
-		if (!isset($hdrs["X-File-Id"]))
+		$hdrs = [];
+		foreach(getallheaders() as $hdrName => $value)
+		{
+			$hdrs[strtolower($hdrName)] = $value;
+		}
+		if (!isset($hdrs["x-file-id"]))
 		{
 			wlog("No file id specified");
 			exit;
 		}
 
-		$fileId = $hdrs["X-File-Id"];
+		$fileId = $hdrs["x-file-id"];
 		$fname = APPPATH."system/upload/".$fileId;
 
 		$totalSize = 0;
