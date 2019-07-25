@@ -22,7 +22,7 @@ class UserModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		self::$dcache = array();
+		self::$dcache = [];
 
 		$resArr = $this->dbObj->selectQ("*", "users");
 		foreach($resArr as $row)
@@ -213,7 +213,7 @@ class UserModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", array("owner_id", "updatedate"), array($o_id, $curDate), "id=".qnull($u_id)))
+		if (!$this->dbObj->updateQ("users", ["owner_id", "updatedate"], [$o_id, $curDate], "id=".qnull($u_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -235,7 +235,7 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", array("passhash", "updatedate"), array($passhash, $curDate), "login=".qnull($elogin)))
+		if (!$this->dbObj->updateQ("users", ["passhash", "updatedate"], [$passhash, $curDate], "login=".qnull($elogin)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -267,7 +267,7 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("users", array("id", "login", "passhash", "createdate", "updatedate"), array(NULL, $elogin, $passhash, $curDate, $curDate)))
+		if (!$this->dbObj->insertQ("users", ["id", "login", "passhash", "createdate", "updatedate"], [NULL, $elogin, $passhash, $curDate, $curDate]))
 			return FALSE;
 
 		$user_id = $this->dbObj->insertId();
@@ -371,7 +371,7 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", array("login", "passhash", "updatedate"), array($elogin, $passhash, $curDate), "id=".$user_id))
+		if (!$this->dbObj->updateQ("users", ["login", "passhash", "updatedate"], [$elogin, $passhash, $curDate], "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -399,7 +399,7 @@ class UserModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", array("access", "updatedate"), array($access, $curDate), "id=".$user_id))
+		if (!$this->dbObj->updateQ("users", ["access", "updatedate"], [$access, $curDate], "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -411,12 +411,12 @@ class UserModel extends CachedTable
 	// Return array of users
 	public function getArray()
 	{
-		$res = array();
+		$res = [];
 
 		if (!$this->checkCache())
 			return $res;
 
-		$trCountArr = array();
+		$trCountArr = [];
 		$resArr = $this->dbObj->selectQ("user_id, COUNT(*)", "transactions", NULL, "user_id");
 		foreach ($resArr as $row)
 		{
@@ -426,7 +426,7 @@ class UserModel extends CachedTable
 			$trCountArr[$u_id] = $tr_cnt;
 		}
 
-		$accCountArr = array();
+		$accCountArr = [];
 		$resArr = $this->dbObj->selectQ("user_id, owner_id, COUNT(*)", "accounts", NULL, "owner_id");
 		foreach ($resArr as $row)
 		{

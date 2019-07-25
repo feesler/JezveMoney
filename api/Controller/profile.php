@@ -19,7 +19,7 @@ class ProfileApiController extends ApiController
 
 		$pName = $this->pMod->getName($this->owner_id);
 
-		$respObj->data = array("name" => $pName);
+		$respObj->data = ["name" => $pName];
 		$respObj->ok();
 	}
 
@@ -43,7 +43,7 @@ class ProfileApiController extends ApiController
 			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
 		$respObj->msg = getMessage(MSG_PROFILE_NAME);
-		$respObj->data = array("name" => $new_name);
+		$respObj->data = ["name" => $new_name];
 
 		$respObj->ok();
 	}

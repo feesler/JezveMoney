@@ -62,7 +62,7 @@ class PersonApiController extends ApiController
 		if (!$p_id)
 			$respObj->fail();
 
-		$respObj->data = array("id" => $p_id);
+		$respObj->data = ["id" => $p_id];
 		$respObj->ok();
 	}
 

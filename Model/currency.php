@@ -22,7 +22,7 @@ class CurrencyModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		self::$dcache = array();
+		self::$dcache = [];
 
 		$resArr = $this->dbObj->selectQ("*", "currency");
 		foreach($resArr as $row)
@@ -50,8 +50,8 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("currency", array("id", "name", "sign", "format", "createdate", "updatedate"),
-							array(NULL, $curr_name, $curr_sign, $curr_format, $curDate, $curDate)))
+		if (!$this->dbObj->insertQ("currency", ["id", "name", "sign", "format", "createdate", "updatedate"],
+							[NULL, $curr_name, $curr_sign, $curr_format, $curDate, $curDate]))
 			return 0;
 
 		$this->cleanCache();
@@ -76,8 +76,8 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("currency", array("name", "sign", "format", "updatedate"),
-								array($curr_name, $curr_sign, $curr_format, $curDate),
+		if (!$this->dbObj->updateQ("currency", ["name", "sign", "format", "updatedate"],
+								[$curr_name, $curr_sign, $curr_format, $curDate],
 								"id=".$curr_id))
 			return FALSE;
 
@@ -175,7 +175,7 @@ class CurrencyModel extends CachedTable
 	// Return array of currencies
 	public function getArray()
 	{
-		$res = array();
+		$res = [];
 
 		if (!$this->checkCache())
 			return $res;

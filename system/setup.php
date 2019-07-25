@@ -3,7 +3,7 @@
 	$pparts = pathinfo(__FILE__);
 	$path_length = strrpos($pparts["dirname"], "/");
 	$approot = substr(__FILE__, 0, $path_length + 1);
-	define("APPROOT", $approot, TRUE);
+	define("APPROOT", $approot);
 
 
 	// Check request is HTTPS
@@ -18,7 +18,7 @@
 	// Check development or release environment
 	$productionHost = "jezvemoney.ru";
 	$devHost = "jezve.net";
-	$avHosts = array($productionHost, $devHost);
+	$avHosts = [$productionHost, $devHost];
 
 	if (!isset($_SERVER["HTTP_HOST"]) || !in_array($_SERVER["HTTP_HOST"], $avHosts))
 	{
@@ -26,26 +26,26 @@
 		exit;
 	}
 
- 	define("APPHOST", $_SERVER["HTTP_HOST"], TRUE);
+ 	define("APPHOST", $_SERVER["HTTP_HOST"]);
 	if (strcmp(APPHOST, $productionHost) == 0)
 	{
-		define("APPPROT", "https://", TRUE);
-		define("APPPATH", "/", TRUE);
-
-		if (!isSecure())
-		{
-			header("HTTP/1.1 302 Found", TRUE, 302);
-			header("Location: ".APPPROT.APPHOST.$ruri);
-			exit;
-		}
+		define("APPPROT", "https://");
+		define("APPPATH", "/");
 	}
 	else if (strcmp(APPHOST, $devHost) == 0)
 	{
-		define("APPPROT", "http://", TRUE);
-		define("APPPATH", "/money/", TRUE);
+		define("APPPROT", "https://");
+		define("APPPATH", "/money/");
 	}
 
-	define("BASEURL", APPPROT.APPHOST.APPPATH, TRUE);
+	if (!isSecure())
+	{
+		header("HTTP/1.1 302 Found", TRUE, 302);
+		header("Location: ".APPPROT.APPHOST.$ruri);
+		exit;
+	}
+
+	define("BASEURL", APPPROT.APPHOST.APPPATH);
 
 	if (!isset($noLogs))
 	{
@@ -56,8 +56,7 @@
 		wlog("approot: ".APPROOT);
 		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
-		wlog("Referer: ".$_SERVER["HTTP_REFERER"]);
-		wlog("Request: ".$ruri);
+		wlog("Request: ".$_SERVER["REQUEST_METHOD"]." ".$ruri);
 
 		wlog("Headers: ");
 		foreach(getallheaders() as $cKey => $cVal)

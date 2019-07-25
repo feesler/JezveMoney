@@ -2,17 +2,17 @@
 	$controller = NULL;
 	$action = NULL;
 
-	$controllersMap = array("index" => "MainAdminController",
+	$controllersMap = ["index" => "MainAdminController",
 							"currency" => "CurrencyAdminController",
 							"query" => "QueryAdminController",
 							"log" => "LogsAdminController",
 							"tests" => "TestsAdminController",
 							"apitest" => "APITestAdminController",
-							"user" => "UserAdminController");
+							"user" => "UserAdminController"];
 
-	$actionsMap = array("new" => "create",
+	$actionsMap = ["new" => "create",
 						"edit" => "update",
-						"chpwd" => "changePassword");
+						"chpwd" => "changePassword"];
 
 	// Parse route
 	$route = (isset($_GET["route"])) ? $_GET["route"] : "";

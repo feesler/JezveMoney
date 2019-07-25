@@ -20,16 +20,16 @@ class MainController extends Controller
 			$balfmt = $currMod->format($balance, $curr_id);
 			$currName = $currMod->getName($curr_id);
 
-			$totalsArr[$curr_id] = array("bal" => $balance, "balfmt" => $balfmt, "name" => $currName);
+			$totalsArr[$curr_id] = ["bal" => $balance, "balfmt" => $balfmt, "name" => $currName];
 		}
 
 		// Prepare data of transaction list items
 		$tr_count = 5;
 		$latestArr = $transMod->getArray(0, 0, TRUE, $tr_count);
-		$trListData = array();
+		$trListData = [];
 		foreach($latestArr as $trans)
 		{
-			$itemData = array("id" => $trans->id);
+			$itemData = ["id" => $trans->id];
 
 			// Build accounts string
 			$accStr = "";
@@ -70,7 +70,7 @@ class MainController extends Controller
 		foreach($persArr as $ind => $pData)
 		{
 			$noDebts = TRUE;
-			$pBalance = array();
+			$pBalance = [];
 			if (isset($pData->accounts) && is_array($pData->accounts))
 			{
 				foreach($pData->accounts as $pAcc)

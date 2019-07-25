@@ -35,7 +35,7 @@ class CheckBalanceController extends Controller
 			{
 				$fixbal = floatval($_POST["fixbal"]);
 
-				if (!$db->updateQ("accounts", array("balance"), array($fixbal), "id=".$checkAccount_id))
+				if (!$db->updateQ("accounts", ["balance"], [$fixbal], "id=".$checkAccount_id))
 					fail();
 
 				$fixed = TRUE;
@@ -54,17 +54,17 @@ class CheckBalanceController extends Controller
 
 		$accMod = new AccountModel($user_id, TRUE);
 
-		$condArr = array("user_id=".$user_id);
+		$condArr = ["user_id=".$user_id];
 		if ($checkAccount_id != 0)
 			$condArr[] = "id=".$checkAccount_id;
 		$resArr = $db->selectQ("*", "accounts", $condArr);
 		if (count($resArr) == 0)
 			fail();
 
-		$initBalance = array();
-		$curBalance = array();
-		$realBalance = array();
-		$accName = array();
+		$initBalance = [];
+		$curBalance = [];
+		$realBalance = [];
+		$accName = [];
 		foreach($resArr as $row)
 		{
 			$acc_id = intval($row["id"]);
@@ -76,32 +76,32 @@ class CheckBalanceController extends Controller
 		}
 
 
-		$accNameCache = array();
+		$accNameCache = [];
 
 		$prev_date = 0;
 
-		$condArr = array("user_id=".$user_id);
+		$condArr = ["user_id=".$user_id];
 		if ($checkAccount_id != 0)
 		{
-			$accCond = array("(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))",
-							"(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))");
+			$accCond = ["(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))",
+							"(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))"];
 
 			$condArr[] = "(".orJoin($accCond).")";
 		}
 
 		$resArr = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
-		$transArr = array();
+		$transArr = [];
 		foreach($resArr as $row)
 		{
 			$tr_id = intval($row["id"]);
-			$tr = array("type"=> intval($row["type"]),
+			$tr = ["type"=> intval($row["type"]),
 						"src_id"=> intval($row["src_id"]),
 						"dest_id"=> intval($row["dest_id"]),
 						"src_amount"=> floatval($row["src_amount"]),
 						"dest_amount"=> floatval($row["dest_amount"]),
 						"comment"=> $row["comment"],
 						"date"=> strtotime($row["date"]),
-						"pos" => intval($row["pos"]));
+						"pos" => intval($row["pos"])];
 
 			$tr["src_name"] = $accMod->getNameOrPerson($tr["src_id"]);
 			$tr["dest_name"] = $accMod->getNameOrPerson($tr["dest_id"]);
@@ -112,7 +112,7 @@ class CheckBalanceController extends Controller
 					$realBalance[$tr["src_id"]] = 0;
 
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
-				$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]]);
+				$tr["realbal"] = [$tr["src_id"] => $realBalance[$tr["src_id"]]];
 			}
 			else if ($tr["type"] == INCOME)
 			{
@@ -120,27 +120,27 @@ class CheckBalanceController extends Controller
 					$realBalance[$tr["dest_id"]] = 0;
 
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
-				$tr["realbal"] = array($tr["dest_id"] => $realBalance[$tr["dest_id"]]);
+				$tr["realbal"] = [$tr["dest_id"] => $realBalance[$tr["dest_id"]]];
 			}
 			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
 			{
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["dest_amount"], 2);
-				$tr["realbal"] = array($checkAccount_id => $realBalance[$checkAccount_id]);
+				$tr["realbal"] = [$checkAccount_id => $realBalance[$checkAccount_id]];
 			}
 			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["src_id"] == $checkAccount_id)		/* transfer from */
 			{
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["src_amount"], 2);
-				$tr["realbal"] = array($checkAccount_id => $realBalance[$checkAccount_id]);
+				$tr["realbal"] = [$checkAccount_id => $realBalance[$checkAccount_id]];
 			}
 			else if ($checkAccount_id == 0 && $tr["type"] == TRANSFER)		/* Transfer between two accounts */
 			{
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
-				$tr["realbal"] = array($tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]);
+				$tr["realbal"] = [$tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]];
 			}
 			else if ($tr["type"] == DEBT)
 			{
-				$tr["realbal"] = array();
+				$tr["realbal"] = [];
 
 				if ($tr["src_id"] != 0)
 				{
@@ -169,7 +169,7 @@ class CheckBalanceController extends Controller
 		}
 
 
-		$balanceDiff = array();
+		$balanceDiff = [];
 		foreach($realBalance as $acc_id => $rbrow)
 		{
 			if (!isset($curBalance[$acc_id]))

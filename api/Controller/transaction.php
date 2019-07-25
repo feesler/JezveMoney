@@ -67,7 +67,7 @@ class TransactionApiController extends ApiController
 
 		wlog("trArr: ".var_export($trArr, TRUE));
 
-		$respObj->data = array();
+		$respObj->data = [];
 		foreach($trArr as $trans)
 		{
 			$tr = new stdClass;
@@ -152,7 +152,7 @@ class TransactionApiController extends ApiController
 			if (!$trans_id)
 				$respObj->fail();
 
-			$respObj->data = array("id" => $trans_id);
+			$respObj->data = ["id" => $trans_id];
 		}
 
 		$respObj->ok();

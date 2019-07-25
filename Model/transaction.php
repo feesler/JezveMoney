@@ -5,7 +5,7 @@ class TransactionModel extends CachedTable
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $tbl_name = "transactions";
-	static private $typeStrArr = array(0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt");
+	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
 
 
 	// Class constructor
@@ -30,12 +30,12 @@ class TransactionModel extends CachedTable
 	// Update cache
 	protected function updateCache($trans_id = 0)
 	{
-		$condArr = array("user_id=".self::$user_id);
+		$condArr = ["user_id=".self::$user_id];
 		if ($trans_id != 0)
 			$condArr[] = "id=".$trans_id;
 		// create empty cache array if needed
 		if ($trans_id == 0 || is_null(self::$dcache))
-			self::$dcache = array();
+			self::$dcache = [];
 
 		$resArr = $this->dbObj->selectQ("*", self::$tbl_name, $condArr);
 		if (!count($resArr))		// delete transaction from cache if can't find it
@@ -112,8 +112,8 @@ class TransactionModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ(self::$tbl_name, array("id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "createdate", "updatedate"),
-									array(NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate, $curDate)))
+		if (!$this->dbObj->insertQ(self::$tbl_name, ["id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "createdate", "updatedate"],
+									[NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate, $curDate]))
 			return 0;
 
 		$trans_id = $this->dbObj->insertId();
@@ -270,8 +270,8 @@ class TransactionModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		$fieldsArr = array("src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "updatedate");
-		$valuesArr = array($src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate);
+		$fieldsArr = ["src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "updatedate"];
+		$valuesArr = [$src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate];
 
 		if (!$this->dbObj->updateQ(self::$tbl_name, $fieldsArr, $valuesArr, "id=".$trans_id))
 			return FALSE;
@@ -339,7 +339,7 @@ class TransactionModel extends CachedTable
 		$old_pos = $this->getPos($trans_id);
 		$user_id = $this->getUser($trans_id);
 
-		$condArr = array("user_id=".$user_id);
+		$condArr = ["user_id=".$user_id];
 
 		$curDate = date("Y-m-d H:i:s");
 
@@ -378,7 +378,7 @@ class TransactionModel extends CachedTable
 				return FALSE;
 		}
 
-		if (!$this->dbObj->updateQ(self::$tbl_name, array("pos", "updatedate"), array($new_pos, $curDate), "id=".$trans_id))
+		if (!$this->dbObj->updateQ(self::$tbl_name, ["pos", "updatedate"], [$new_pos, $curDate], "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -414,7 +414,7 @@ class TransactionModel extends CachedTable
 		if (!self::$user_id)
 			return 0;
 
-		$condArr = array("user_id=".self::$user_id);
+		$condArr = ["user_id=".self::$user_id];
 		if ($trans_date != -1)
 			$condArr[] = "date <= ".qnull($trans_date);
 
@@ -443,7 +443,7 @@ class TransactionModel extends CachedTable
 		$userCond = "user_id=".self::$user_id;
 
 		// delete expenses and incomes
-		$condArr = array($userCond);
+		$condArr = [$userCond];
 		$condArr[] = "((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))";
 		if (!$this->dbObj->deleteQ(self::$tbl_name, $condArr))
 			return FALSE;
@@ -455,41 +455,41 @@ class TransactionModel extends CachedTable
 		if ($acc_owner != $u_owner)	// specified account is account of person
 		{
 			// set outgoing debt(person take) as income to destination account
-			$condArr = array($userCond, "src_id=".$acc_id, "type=4");
-			if (!$this->dbObj->updateQ(self::$tbl_name, array("src_id", "type", "updatedate"), array(0, 2, $curDate),
+			$condArr = [$userCond, "src_id=".$acc_id, "type=4"];
+			if (!$this->dbObj->updateQ(self::$tbl_name, ["src_id", "type", "updatedate"], [0, 2, $curDate],
 							$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as expense from source account
-			$condArr = array($userCond, "dest_id=".$acc_id, "type=4");
-			if (!$this->dbObj->updateQ(self::$tbl_name, array("dest_id", "type", "updatedate"), array(0, 1, $curDate),
+			$condArr = [$userCond, "dest_id=".$acc_id, "type=4"];
+			if (!$this->dbObj->updateQ(self::$tbl_name, ["dest_id", "type", "updatedate"], [0, 1, $curDate],
 							$condArr))
 				return FALSE;
 		}
 		else							// specified account is account of user
 		{
 			// set outgoing debt(person take) as debt without acc
-			$condArr = array($userCond, "src_id=".$acc_id, "type=4");
-			if (!$this->dbObj->updateQ(self::$tbl_name, array("src_id", "type", "updatedate"), array(0, 4, $curDate),
+			$condArr = [$userCond, "src_id=".$acc_id, "type=4"];
+			if (!$this->dbObj->updateQ(self::$tbl_name, ["src_id", "type", "updatedate"], [0, 4, $curDate],
 							$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as debt without acc
-			$condArr = array($userCond, "dest_id=".$acc_id, "type=4");
-			if (!$this->dbObj->updateQ(self::$tbl_name, array("dest_id", "type", "updatedate"), array(0, 4, $curDate),
+			$condArr = [$userCond, "dest_id=".$acc_id, "type=4"];
+			if (!$this->dbObj->updateQ(self::$tbl_name, ["dest_id", "type", "updatedate"], [0, 4, $curDate],
 							$condArr))
 				return FALSE;
 		}
 
 		// set transfer from account as income to destination account
-		$condArr = array($userCond, "src_id=".$acc_id, "type=3");
-		if (!$this->dbObj->updateQ(self::$tbl_name, array("src_id", "type", "updatedate"), array(0, 2, $curDate),
+		$condArr = [$userCond, "src_id=".$acc_id, "type=3"];
+		if (!$this->dbObj->updateQ(self::$tbl_name, ["src_id", "type", "updatedate"], [0, 2, $curDate],
 						$condArr))
 			return FALSE;
 
 		// set transfer to account as expense from source account
-		$condArr = array($userCond, "dest_id=".$acc_id, "type=3");
-		if (!$this->dbObj->updateQ(self::$tbl_name, array("dest_id", "type", "updatedate"), array(0, 1, $curDate),
+		$condArr = [$userCond, "dest_id=".$acc_id, "type=3"];
+		if (!$this->dbObj->updateQ(self::$tbl_name, ["dest_id", "type", "updatedate"], [0, 1, $curDate],
 						$condArr))
 			return FALSE;
 
@@ -503,7 +503,7 @@ class TransactionModel extends CachedTable
 		if (is_null($accounts))
 			return "";
 
-		$accCond = array();
+		$accCond = [];
 		if (is_array($accounts))
 		{
 			foreach($accounts as $acc_id)
@@ -533,7 +533,7 @@ class TransactionModel extends CachedTable
 	// Return array of transactions
 	public function getArray($trans_type, $accounts = NULL, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
 	{
-		$res = array();
+		$res = [];
 
 		if (!self::$user_id)
 			return $res;
@@ -554,7 +554,7 @@ class TransactionModel extends CachedTable
 		$tr_type = intval($trans_type);
 		$sReq = $this->dbObj->escape($searchStr);
 
-		$condArr = array();
+		$condArr = [];
 		$condArr[] = "user_id=".self::$user_id;
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
@@ -664,7 +664,7 @@ class TransactionModel extends CachedTable
 		$tr_type = intval($trans_type);
 		$sReq = $this->dbObj->escape($searchStr);
 
-		$condArr = array("user_id=".self::$user_id);
+		$condArr = ["user_id=".self::$user_id];
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
 
@@ -699,8 +699,8 @@ class TransactionModel extends CachedTable
 	// Return link to specified page
 	public function getPageLink($trans_type, $acc_id, $page_num, $searchStr, $startDate, $endDate, $details)
 	{
-		$params = array("type" => $this->getTypeString($trans_type),
-						"page" => $page_num);
+		$params = ["type" => $this->getTypeString($trans_type),
+						"page" => $page_num];
 		if (count($acc_id) > 0)
 			$params["acc_id"] = implode(",", $acc_id);
 		if ($details == TRUE)
@@ -721,7 +721,7 @@ class TransactionModel extends CachedTable
 	// Return array of paginator items
 	public function getPaginatorArray($page_num, $pages_count)
 	{
-		$res = array();
+		$res = [];
 
 		$breakLimit = 5;
 		$groupLimit = 3;
@@ -732,29 +732,29 @@ class TransactionModel extends CachedTable
 			{
 				for($i = 0; $i < $breakLimit; $i++)
 				{
-					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+					$res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
 				}
-				$res[] = array("text" => "...");
-				$res[] = array("text" => $pages_count, "active" => FALSE);
+				$res[] = ["text" => "..."];
+				$res[] = ["text" => $pages_count, "active" => FALSE];
 			}
 			else if ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit)		// 1 ... 14 15 16 ... 18
 			{
-				$res[] = array("text" => 1, "active" => FALSE);
-				$res[] = array("text" => "...");
+				$res[] = ["text" => 1, "active" => FALSE];
+				$res[] = ["text" => "..."];
 				for($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++)
 				{
-					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+					$res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
 				}
-				$res[] = array("text" => "...");
-				$res[] = array("text" => $pages_count, "active" => FALSE);
+				$res[] = ["text" => "..."];
+				$res[] = ["text" => $pages_count, "active" => FALSE];
 			}
 			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
 			{
-				$res[] = array("text" => 1, "active" => FALSE);
-				$res[] = array("text" => "...");
+				$res[] = ["text" => 1, "active" => FALSE];
+				$res[] = ["text" => "..."];
 				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
 				{
-					$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+					$res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
 				}
 			}
 		}
@@ -762,7 +762,7 @@ class TransactionModel extends CachedTable
 		{
 			for($i = 0; $i < $pages_count; $i++)
 			{
-				$res[] = array("text" => ($i + 1), "active" => ($i == $page_num));
+				$res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
 			}
 		}
 
@@ -788,12 +788,12 @@ class TransactionModel extends CachedTable
 		$accMod = new AccountModel(self::$user_id, TRUE);
 		$uMod = new UserModel();
 
-		$balArr = array($src_id => 0, $dest_id => 0);
+		$balArr = [$src_id => 0, $dest_id => 0];
 		$balArr[$src_id] = ($src_id != 0) ? $accMod->getInitBalance($src_id) : 0;
 		$balArr[$dest_id] = ($dest_id != 0) ? $accMod->getInitBalance($dest_id) : 0;
 
-		$condArr = array("user_id=".self::$user_id);
-		$orCond = array();
+		$condArr = ["user_id=".self::$user_id];
+		$orCond = [];
 		if ($src_id != 0)
 		{
 			$orCond[] = "src_id=".$src_id;
@@ -954,7 +954,7 @@ class TransactionModel extends CachedTable
 			return NULL;
 
 		$row = self::$dcache[$trans_id];
-		$res = array("id" => $trans_id,
+		$res = ["id" => $trans_id,
 					"src_id" => $row["src_id"],
 					"dest_id" => $row["dest_id"],
 					"type" => $row["type"],
@@ -963,7 +963,7 @@ class TransactionModel extends CachedTable
 					"src_amount" => $row["src_amount"],
 					"dest_amount" => $row["dest_amount"],
 					"date" => $row["date"],
-					"comment" => $row["comment"]);
+					"comment" => $row["comment"]];
 
 		return $res;
 	}

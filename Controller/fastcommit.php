@@ -54,14 +54,18 @@ class FastCommitController extends Controller
 
 	public function uploadstatus()
 	{
-		$hdrs = getallheaders();
-		if (!isset($hdrs["X-File-Id"]))
+		$hdrs = [];
+		foreach(getallheaders() as $hdrName => $value)
+		{
+			$hdrs[strtolower($hdrName)] = $value;
+		}
+		if (!isset($hdrs["x-file-id"]))
 		{
 			wlog("No file id specified");
 			exit;
 		}
 
-		$fileId = $hdrs["X-File-Id"];
+		$fileId = $hdrs["x-file-id"];
 		$fname = APPPATH."system/upload/".$fileId;
 
 		$totalSize = 0;
@@ -83,12 +87,17 @@ class FastCommitController extends Controller
 			return;
 
 		$file_cont = file_get_contents('php://input');
-		$hdrs = getallheaders();
-		if (isset($hdrs["X-File-Id"]))
+		$hdrs = [];
+		foreach(getallheaders() as $hdrName => $value)
 		{
-			$fileId = $hdrs["X-File-Id"];
-			$fileType = $hdrs["X-File-Type"];
-			$fileStatType = $hdrs["X-File-Stat-Type"];
+			$hdrs[strtolower($hdrName)] = $value;
+		}
+
+		if (isset($hdrs["x-file-id"]))
+		{
+			$fileId = $hdrs["x-file-id"];
+			$fileType = $hdrs["x-file-type"];
+			$fileStatType = $hdrs["x-file-stat-type"];
 
 			$fname = APPROOT."system/uploads/".$fileId.".".$fileType;
 			$fhnd = fopen($fname, "a");
@@ -151,7 +160,7 @@ class FastCommitController extends Controller
 		}
 		$row_ind = 2;
 
-		$data = array();
+		$data = [];
 		do
 		{
 			$descVal = $src->getCell($desc_col.$row_ind)->getValue();
@@ -184,7 +193,7 @@ class FastCommitController extends Controller
 		}
 		while(!is_empty($edesc));
 
-		if (isset($hdrs["X-File-Id"]))
+		if (isset($hdrs["x-file-id"]))
 			unlink($fname);
 
 		echo(f_json_encode($data));

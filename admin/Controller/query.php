@@ -15,7 +15,7 @@ class QueryAdminController extends Controller
 
 			if (isset($_POST["qtype"]) && $_POST["qtype"] == "1")		// select query
 			{
-				$resArr = array();
+				$resArr = [];
 				$result = $db->rawQ($query);
 				$qerr_num = mysqli_errno($db->getConnection());
 				$qerror = mysqli_error($db->getConnection());

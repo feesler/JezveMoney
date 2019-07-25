@@ -5,7 +5,7 @@
 	$action = NULL;
 
 	$userCont = "UserController";
-	$controllersMap = array("index" => "MainController",
+	$controllersMap = ["index" => "MainController",
 							"accounts" => "AccountsController",
 							"persons" => "PersonsController",
 							"transactions" => "TransactionsController",
@@ -15,10 +15,10 @@
 							"logout" => $userCont,
 							"register" => $userCont,
 							"fastcommit" => "FastCommitController",
-							"checkbalance" => "CheckBalanceController");
+							"checkbalance" => "CheckBalanceController"];
 
-	$actionsMap = array("new" => "create",
-						"edit" => "update");
+	$actionsMap = ["new" => "create",
+						"edit" => "update"];
 
 	// Parse route
 	$route = trim($route, "/\\");
@@ -33,7 +33,7 @@
 		setLocation(BASEURL);
 
 	// Check correct user authentication for controller
-	$loggedOutControllers = array("login", "register");
+	$loggedOutControllers = ["login", "register"];
 	$isLogOutCont = in_array($contrStr, $loggedOutControllers);
 
 	checkUser(!$isLogOutCont);

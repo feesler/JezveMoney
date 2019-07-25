@@ -21,7 +21,7 @@ class TransactionsController extends Controller
 		$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
 		// Prepare array of accounts
-		$accFilter = array();
+		$accFilter = [];
 		if (isset($_GET["acc_id"]))
 		{
 			$accExpl = explode(",", $_GET["acc_id"]);
@@ -70,18 +70,18 @@ class TransactionsController extends Controller
 		$tr_on_page = 20;
 
 		$totalTrCount = $transMod->getCount();
-		$transArr = ($totalTrCount) ? $transMod->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : array();
+		$transArr = ($totalTrCount) ? $transMod->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : [];
 		$transCount = $transMod->getTransCount($trans_type, $accFilter, $searchReq, $stDate, $endDate);
 
 		$currArr = $currMod->getArray();
 
 		// Prepare transaction types menu
-		$trTypes = array("All", "Expense", "Income", "Transfer", "Debt");
-		$transMenu = array();
+		$trTypes = ["All", "Expense", "Income", "Transfer", "Debt"];
+		$transMenu = [];
 		$baseUrl = BASEURL."transactions/";
 		foreach($trTypes as $ind => $trTypeName)
 		{
-			$params = array("type" => strtolower($trTypeName));
+			$params = ["type" => strtolower($trTypeName)];
 			if (count($filterObj->acc_id) > 0)
 				$params["acc_id"] = implode(",", $filterObj->acc_id);
 			if ($showDetails)
@@ -94,7 +94,7 @@ class TransactionsController extends Controller
 				$params["enddate"] = $endDate;
 			}
 
-			$transMenu[] = array($ind, $trTypeName, urlJoin($baseUrl, $params));
+			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $params)];
 		}
 
 		$showPaginator = TRUE;
@@ -104,8 +104,8 @@ class TransactionsController extends Controller
 		if ($showPaginator == TRUE)
 		{
 			// Prepare classic/details mode link
-			$params = array("type" => $transMod->getTypeString($trans_type),
-							"mode" => (($details) ? "classic" : "details"));
+			$params = ["type" => $transMod->getTypeString($trans_type),
+							"mode" => (($details) ? "classic" : "details")];
 			if (count($filterObj->acc_id) > 0)
 				$params["acc_id"] = implode(",", $filterObj->acc_id);
 			if ($page_num != 0)
@@ -123,7 +123,7 @@ class TransactionsController extends Controller
 			if ($tr_on_page > 0)
 			{
 				$pageCount = ceil($transCount / $tr_on_page);
-				$pagesArr = ($transCount > $tr_on_page) ? $transMod->getPaginatorArray($page_num, $pageCount) : array();
+				$pagesArr = ($transCount > $tr_on_page) ? $transMod->getPaginatorArray($page_num, $pageCount) : [];
 				foreach($pagesArr as $ind => $pageItem)
 				{
 					if (is_numeric($pageItem["text"]) && !$pageItem["active"])
@@ -136,7 +136,7 @@ class TransactionsController extends Controller
 		}
 
 		// Prepare data of transaction list items
-		$trListData = array();
+		$trListData = [];
 		foreach($transArr as $trans)
 		{
 			if ($trans->type == DEBT)
@@ -145,7 +145,7 @@ class TransactionsController extends Controller
 				$dest_owner_id = $accMod->getOwner($trans->dest_id);
 			}
 
-			$itemData = array("id" => $trans->id);
+			$itemData = ["id" => $trans->id];
 
 			// Build accounts string
 			$accStr = "";
@@ -181,7 +181,7 @@ class TransactionsController extends Controller
 
 			if ($details)
 			{
-				$itemData["balance"] = array();
+				$itemData["balance"] = [];
 
 				if ($trans->src_id != 0)
 				{
@@ -274,7 +274,7 @@ class TransactionsController extends Controller
 			$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
 			$person_balance = $person_res_balance;
 
-			$tr = array("src_id" => $person_acc_id, "dest_id" => $acc_id, "src_amount" => 0, "dest_amount" => 0, "src_curr" => $debtAcc["curr"], "dest_curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => "");
+			$tr = ["src_id" => $person_acc_id, "dest_id" => $acc_id, "src_amount" => 0, "dest_amount" => 0, "src_curr" => $debtAcc["curr"], "dest_curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => ""];
 			$give = TRUE;
 		}
 		else
@@ -290,14 +290,14 @@ class TransactionsController extends Controller
 			if ($trans_type == TRANSFER)
 				$dest_id = $accMod->getAnother($src_id);
 
-			$tr = array("src_id" => $src_id,
+			$tr = ["src_id" => $src_id,
 						"dest_id" => $dest_id,
 						"src_amount" => 0,
 						"dest_amount" => 0,
 						"src_curr" => ($src_id != 0) ? $accMod->getCurrency($src_id) : 0,
 						"dest_curr" => ($dest_id != 0) ? $accMod->getCurrency($dest_id) : 0,
 						"type" => $trans_type,
-						"comment" => "");
+						"comment" => ""];
 
 			if ($trans_type == EXPENSE)
 				$tr["dest_curr"] = $tr["src_curr"];
@@ -315,16 +315,16 @@ class TransactionsController extends Controller
 		}
 
 		// Prepare transaction types menu
-		$trTypes = array("Expense", "Income", "Transfer", "Debt");
-		$transMenu = array();
+		$trTypes = ["Expense", "Income", "Transfer", "Debt"];
+		$transMenu = [];
 		$baseUrl = BASEURL."transactions/new/";
 		foreach($trTypes as $ind => $trTypeName)
 		{
-			$params = array("type" => strtolower($trTypeName));
+			$params = ["type" => strtolower($trTypeName)];
 			if ($acc_id != 0)
 				$params["acc_id"] = $acc_id;
 
-			$transMenu[] = array(($ind + 1), $trTypeName, urlJoin($baseUrl, $params));
+			$transMenu[] = [($ind + 1), $trTypeName, urlJoin($baseUrl, $params)];
 		}
 
 		$formAction = BASEURL."transactions/".$action."/?type=".$type_str;
@@ -497,14 +497,14 @@ class TransactionsController extends Controller
 		}
 
 		// Prepare transaction types menu
-		$trTypes = array("Expense", "Income", "Transfer", "Debt");
-		$transMenu = array();
+		$trTypes = ["Expense", "Income", "Transfer", "Debt"];
+		$transMenu = [];
 		$baseUrl = BASEURL."transactions/new/";
 		foreach($trTypes as $ind => $trTypeName)
 		{
-			$params = array("type" => strtolower($trTypeName));
+			$params = ["type" => strtolower($trTypeName)];
 
-			$transMenu[] = array(($ind + 1), $trTypeName, urlJoin($baseUrl, $params));
+			$transMenu[] = [($ind + 1), $trTypeName, urlJoin($baseUrl, $params)];
 		}
 
 		$formAction = BASEURL."transactions/".$action."/";

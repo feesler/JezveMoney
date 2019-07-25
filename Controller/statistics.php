@@ -56,20 +56,20 @@ class StatisticsController extends Controller
 		}
 
 		// Prepare transaction types menu
-		$trTypes = array("All", "Expense", "Income", "Transfer", "Debt");
-		$transMenu = array();
+		$trTypes = ["All", "Expense", "Income", "Transfer", "Debt"];
+		$transMenu = [];
 		$baseUrl = BASEURL."statistics/";
 		foreach($trTypes as $ind => $trTypeName)
 		{
-			$params = array("type" => strtolower($trTypeName));
+			$params = ["type" => strtolower($trTypeName)];
 			if ($acc_id != 0)
 				$params["acc_id"] = $acc_id;
 
-			$transMenu[] = array($ind, $trTypeName, urlJoin($baseUrl, $params));
+			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $params)];
 		}
 
-		$byCurrArr = array(array("title" => "Accounts", "selected" => ($byCurrency == FALSE)),
-							array("title" => "Currencies", "selected" => ($byCurrency == TRUE)));
+		$byCurrArr = [["title" => "Accounts", "selected" => ($byCurrency == FALSE)],
+							["title" => "Currencies", "selected" => ($byCurrency == TRUE)]];
 
 		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
@@ -86,7 +86,7 @@ class StatisticsController extends Controller
 			$filterObj->enddate = $endDate;
 		}
 
-		$groupTypes = array("None", "Day", "Week", "Month", "Year");
+		$groupTypes = ["None", "Day", "Week", "Month", "Year"];
 
 		$groupType = NULL;
 		$groupType_id = 0;

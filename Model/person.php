@@ -31,7 +31,7 @@ class PersonModel extends CachedTable
 	// Update cache
 	protected function updateCache()
 	{
-		self::$dcache = array();
+		self::$dcache = [];
 
 		$resArr = $this->dbObj->selectQ("*", "persons", "user_id=".self::$user_id);
 		foreach($resArr as $row)
@@ -56,8 +56,8 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("persons", array("id", "name", "user_id", "createdate", "updatedate"),
-								array(NULL, $person_name, self::$user_id, $curDate, $curDate)))
+		if (!$this->dbObj->insertQ("persons", ["id", "name", "user_id", "createdate", "updatedate"],
+								[NULL, $person_name, self::$user_id, $curDate, $curDate]))
 			return 0;
 
 		$p_id = $this->dbObj->insertId();
@@ -83,7 +83,7 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("persons", array("name", "updatedate"), array($person_name, $curDate), "id=".$person_id))
+		if (!$this->dbObj->updateQ("persons", ["name", "updatedate"], [$person_name, $curDate], "id=".$person_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -111,7 +111,7 @@ class PersonModel extends CachedTable
 		}
 
 		// delete person
-		if (!$this->dbObj->deleteQ("persons", array("user_id=".self::$user_id, "id=".$p_id)))
+		if (!$this->dbObj->deleteQ("persons", ["user_id=".self::$user_id, "id=".$p_id]))
 			return FALSE;
 
 		$this->cleanCache();
@@ -165,9 +165,9 @@ class PersonModel extends CachedTable
 		$p_id = intval($person_id);
 		$c_id = intval($curr_id);
 
-		$condArr = array("user_id=".self::$user_id,
+		$condArr = ["user_id=".self::$user_id,
 						"owner_id=".$p_id,
-						"curr_id=".$c_id);
+						"curr_id=".$c_id];
 
 		$resArr = $this->dbObj->selectQ("id", "accounts", $condArr);
 		if (count($resArr) != 1)
@@ -220,7 +220,7 @@ class PersonModel extends CachedTable
 		if (!self::$user_id || !self::$owner_id)
 			return FALSE;
 
-		$condArr = array("user_id=".self::$user_id, "id<>".self::$owner_id);
+		$condArr = ["user_id=".self::$user_id, "id<>".self::$owner_id];
 		if (!$this->dbObj->deleteQ("persons", $condArr))
 			return FALSE;
 
@@ -233,16 +233,16 @@ class PersonModel extends CachedTable
 	// Return javascript array of persons
 	public function getArray()
 	{
-		$condArr = array("p.user_id=".self::$user_id, "p.id<>".self::$owner_id);
-		$resArr = $this->dbObj->selectQ(array("p.name" => "name",
+		$condArr = ["p.user_id=".self::$user_id, "p.id<>".self::$owner_id];
+		$resArr = $this->dbObj->selectQ(["p.name" => "name",
 									"p.id" => "pid",
 									"a.id" => "aid",
 									"a.curr_id" => "curr_id",
-									"a.balance" => "balance"),
-							array("persons AS p LEFT JOIN accounts AS a ON a.owner_id=p.id"),
+									"a.balance" => "balance"],
+							["persons AS p LEFT JOIN accounts AS a ON a.owner_id=p.id"],
 							$condArr);
 
-		$pArr = array();
+		$pArr = [];
 		foreach($resArr as $row)
 		{
 			$p_id = intval($row["pid"]);
@@ -266,7 +266,7 @@ class PersonModel extends CachedTable
 
 				$pArr[$ind]->id = $p_id;
 				$pArr[$ind]->name = $row["name"];
-				$pArr[$ind]->accounts = array();
+				$pArr[$ind]->accounts = [];
 			}
 			if (!is_null($row["aid"]))
 			{
