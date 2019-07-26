@@ -56,7 +56,7 @@ TestPage.prototype.parseHeader = function()
 			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerHTML });
 		}
 
-		var itemShift = (res.user.menuItem.length > 2) : 1 : 0;
+		var itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
 
 		res.user.profileBtn = res.user.menuItems[itemShift].elem;
 		res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
