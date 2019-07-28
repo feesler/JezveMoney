@@ -27,7 +27,7 @@ function onStartClick()
 
 	navigation(function()
 	{
-		viewframe.src = 'http://jezve.net/money/';
+		viewframe.src = 'https://jezve.net/money/';
 	}, MainPage)
 	.then(startTests);
 }
