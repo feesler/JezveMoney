@@ -646,11 +646,9 @@ function incomeTransactionStart(page)
 	setParam(state.values, { exchange_row : { value : '1.09' }, exch_left : '1.09 ₽/$ (0.91743 $/₽)',
 							dest_amount_row : { value : '1.19' }, dest_amount_left : '1.19 ₽',
 							result_balance_dest_row : { value : '502.18' }, dest_res_balance_left : '502.18 ₽' });
-	test('Input exchange rate (1.09) result', () => page.inputExchRate(state.values.exchange_row.value), page, state)
-/*
 	page.inputExchRate(state.values.exchange_row.value);
 	addResult('Input exchange rate (1.09) result', page.checkState(state));
-*/
+
 	setParam(state.values, { exchange_row : { value : '3.09' }, exch_left : '3.09 ₽/$ (0.32362 $/₽)',
 								dest_amount_left : '3.37 ₽', dest_amount_row : { value : '3.37' },
 								result_balance_dest_row : { value : '504.36' }, dest_res_balance_left : '504.36 ₽' });
