@@ -36,6 +36,13 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 
 	res.label = elem.firstElementChild.firstElementChild.innerHTML;
 	res.tile = this.parseTile(elem.querySelector('.tile'));
+	res.dropDown = this.parseDropDown(elem.querySelector('.dd_attached'));
+
+	res.selectAccount = function(val)
+	{
+		if (res.dropDown)
+			res.dropDown.selectByValue(val);
+	};
 
 	return res;
 };
@@ -98,6 +105,18 @@ TransactionPage.prototype.changeTransactionType = function(type)
 		return;
 
 	return navigation(() => this.content.typeMenu[type].click(), TransactionPage);
+};
+
+
+TransactionPage.prototype.changeSrcAccount = function(val)
+{
+	this.performAction(() => this.content.source.selectAccount(val));
+};
+
+
+TransactionPage.prototype.changeDestAccount = function(val)
+{
+	this.performAction(() => this.content.destination.selectAccount(val));
 };
 
 
