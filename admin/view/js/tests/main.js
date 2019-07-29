@@ -72,9 +72,11 @@ function accountTests(page)
 			.then(page => page.deleteAccounts([0, 1]))
 			.then(checkDeleteAccounts)
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc_1', curr_id : 1, balance : '500.99', icon : 2 }))
+			.then(page => createAccountWithParam(page, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 }))
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '10000.99', icon : 3 }));
+			.then(page => createAccountWithParam(page, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 }))
+			.then(page => page.goToCreateAccount())
+			.then(page => createAccountWithParam(page, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }));
 }
 
 
@@ -108,7 +110,7 @@ function transactionTests(page)
 	setBlock('Transactions', 1);
 
 	return page.goToMainPage()
-			.then(page => page.goToNewTransactionByAccount(1))
+			.then(page => page.goToNewTransactionByAccount(0))
 			.then(expenseTransactionStart)
 			.then(page => page.changeTransactionType(INCOME))
 			.then(incomeTransactionStart)
@@ -378,7 +380,7 @@ function expenseTransactionStart(page)
 								src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
 								result_balance_dest_row : false },
 				values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-							source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
+							source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
 							dest_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
 							src_res_balance_left : '500.99 ₽' } };
 
@@ -538,7 +540,7 @@ function incomeTransactionStart(page)
 								src_amount_row : true, dest_amount_row : false, exchange_row : false, result_balance_row : false,
 								result_balance_dest_row : false },
 				values : { typeMenu : { 2 : { isActive : true } }, /* INCOME */
-							destination : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
+							destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
 							src_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
 							dest_res_balance_left : '500.99 ₽' } };
 
@@ -694,8 +696,8 @@ function transferTransactionStart(page)
 								src_amount_row : true, dest_amount_row : false, exchange_row : false, result_balance_row : false,
 								result_balance_dest_row : false },
 				values : { typeMenu : { 3 : { isActive : true } }, /* TRANSFER */
-							source : { tile : { name : 'acc_1', balance : '500.99 ₽' } },
-							destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
+							source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
+							destination : { tile : { name : 'acc RUB', balance : '500.99 ₽' } },
 							src_amount_row : { label : 'Amount', value : '', currSign : '₽', isCurrActive : false },
 							src_res_balance_left : '500.99 ₽',
 							result_balance_row : { value : '500.9', value : '', currSign : '₽', isCurrActive : false },
