@@ -956,6 +956,10 @@ function TransactionViewModel()
 				src_curr.value = value;
 		}
 
+		var rbv_s = isVisible('result_balance');
+		var rbv_d = isVisible('result_balance_dest');
+		var exch = isVisible('exchange');
+
 		if (Transaction.isDiff())
 		{
 			setAmountInputLabel(true, true);
@@ -968,13 +972,13 @@ function TransactionViewModel()
 				setCurrActive(false, false);		// set destination inactive
 			}
 
-			setExchRate(Transaction.exchRate());
-			if (!isVisible('dest_amount_row') && !isVisible('dest_amount_left'))	// currency already different
-			{
-				destAmountSwitch(true);
+			destAmountSwitch(!rbv_s && !rbv_d && !exch);
+			if (Transaction.isTransfer())
+				srcAmountSwitch(!rbv_s);
+
+			if (!isVisible('exchange'))
 				exchRateSwitch(false);
-				resBalanceDestSwitch(false);
-			}
+			setExchRate(Transaction.exchRate());
 		}
 		else
 		{
@@ -986,7 +990,11 @@ function TransactionViewModel()
 				hideSrcAmountAndExchange();
 			else if (Transaction.isIncome() || Transaction.isTransfer())
 				hideDestAmountAndExchange();
-			resBalanceDestSwitch(false);
+
+			if (Transaction.isIncome() || Transaction.isTransfer())
+				srcAmountSwitch(!rbv_d && !rbv_s);
+			if (Transaction.isExpense())
+				destAmountSwitch(!rbv_s);
 		}
 
 		updateCurrSigns();
@@ -1019,12 +1027,14 @@ function TransactionViewModel()
 				dest_curr.value = value;
 		}
 
+		var am_s = isVisible('src_amount_row')
+		var am_d = isVisible('dest_amount_row')
+		var rbv_s = isVisible('result_balance');
+		var rbv_d = isVisible('result_balance_dest');
+		var exch = isVisible('exchange');
+
 		if (Transaction.isDiff())
 		{
-			if (Transaction.isTransfer())
-				destAmountSwitch(true);
-
-			srcAmountSwitch(true);
 			setAmountInputLabel(true, true);
 			setAmountTileBlockLabel(true, true);
 			setAmountInputLabel(false, true);
@@ -1039,8 +1049,17 @@ function TransactionViewModel()
 			else
 				setCurrActive(false, false);		// set destination inactive
 
-			exchRateSwitch(false);
+			var toShowSrcAmount = false;
+			if (Transaction.isIncome())
+				toShowSrcAmount = (am_s && am_d) || (am_s && rbv_d) || (am_s && exch);
+			else if (Transaction.isExpense())
+				toShowSrcAmount = true;
+			srcAmountSwitch(toShowSrcAmount);
+			if (Transaction.isTransfer())
+				destAmountSwitch(!rbv_d);
 
+			if (!isVisible('exchange'))
+				exchRateSwitch(false);
 			setExchRate(Transaction.exchRate());
 		}
 		else
@@ -1049,9 +1068,15 @@ function TransactionViewModel()
 			setAmountInputLabel(false, false);
 			setAmountTileBlockLabel(true, false);
 			setAmountTileBlockLabel(false, false);
+
+			if (Transaction.isIncome() || Transaction.isTransfer())
+				srcAmountSwitch(!rbv_d && !rbv_s);
+			if (Transaction.isExpense())
+				destAmountSwitch(!rbv_s);
+
 			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				hideDestAmountAndExchange();
-			else
+			else		// Expense
 				hideSrcAmountAndExchange();
 		}
 
