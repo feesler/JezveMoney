@@ -448,16 +448,23 @@ function TransactionViewModel()
 	{
 		var src_amount, src_amount_b;
 
+		src_amount_b = ge('src_amount_b');
+		if (src_amount_b)
+			firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
+
 		if (val === undefined)
 			return;
 
 		src_amount = ge('src_amount');
-		src_amount_b = ge('src_amount_b');
-
 		if (src_amount)
-			src_amount.value = val;
-		if (src_amount_b)
-			firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
+		{
+			var sa = src_amount.value;
+			var savalid = isValidValue(sa);
+			var fsa = (savalid) ? normalize(sa) : sa;
+
+			if (fsa != val)
+				src_amount.value = val;
+		}
 	}
 
 
@@ -478,7 +485,7 @@ function TransactionViewModel()
 		{
 			var da = dest_amount.value;
 			var davalid = isValidValue(da);
-			var fda = (davalid) ? normalizeExch(da) : da;
+			var fda = (davalid) ? normalize(da) : da;
 
 			if (fda != val)
 				dest_amount.value = val;
