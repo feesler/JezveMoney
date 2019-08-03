@@ -963,6 +963,8 @@ function TransactionViewModel()
 				src_curr.value = value;
 		}
 
+		var am_s = isVisible('src_amount_row');
+		var am_d = isVisible('dest_amount_row');
 		var rbv_s = isVisible('result_balance');
 		var rbv_d = isVisible('result_balance_dest');
 		var exch = isVisible('exchange');
@@ -979,7 +981,13 @@ function TransactionViewModel()
 				setCurrActive(false, false);		// set destination inactive
 			}
 
-			destAmountSwitch(!rbv_s && !rbv_d && !exch);
+			var toShowDestAmount = false;
+			if (Transaction.isTransfer())
+				toShowDestAmount = !rbv_d && !(rbv_s && exch) && !(am_s && exch);
+			else
+				toShowDestAmount = !rbv_s && !rbv_d && !exch;
+			destAmountSwitch(toShowDestAmount);
+
 			if (Transaction.isTransfer())
 				srcAmountSwitch(!rbv_s);
 
@@ -1002,6 +1010,12 @@ function TransactionViewModel()
 				srcAmountSwitch(!rbv_d && !rbv_s);
 			if (Transaction.isExpense())
 				destAmountSwitch(!rbv_s);
+
+			if (Transaction.isTransfer())
+			{
+				if (rbv_s && rbv_d)
+					resBalanceDestSwitch(false);
+			}
 		}
 
 		updateCurrSigns();
@@ -1034,8 +1048,8 @@ function TransactionViewModel()
 				dest_curr.value = value;
 		}
 
-		var am_s = isVisible('src_amount_row')
-		var am_d = isVisible('dest_amount_row')
+		var am_s = isVisible('src_amount_row');
+		var am_d = isVisible('dest_amount_row');
 		var rbv_s = isVisible('result_balance');
 		var rbv_d = isVisible('result_balance_dest');
 		var exch = isVisible('exchange');
@@ -1061,9 +1075,12 @@ function TransactionViewModel()
 				toShowSrcAmount = (am_s && am_d) || (am_s && rbv_d) || (am_s && exch);
 			else if (Transaction.isExpense())
 				toShowSrcAmount = true;
+			else if (Transaction.isTransfer())
+				toShowSrcAmount = !rbv_s;
 			srcAmountSwitch(toShowSrcAmount);
+
 			if (Transaction.isTransfer())
-				destAmountSwitch(!rbv_d);
+				destAmountSwitch(!rbv_d && !(rbv_s && exch) && !(am_s && exch));
 
 			if (!isVisible('exchange'))
 				exchRateSwitch(false);
@@ -1085,6 +1102,12 @@ function TransactionViewModel()
 				hideDestAmountAndExchange();
 			else		// Expense
 				hideSrcAmountAndExchange();
+
+			if (Transaction.isTransfer())
+			{
+				if (rbv_s && rbv_d)
+					resBalanceSwitch(false);
+			}
 		}
 
 		updateCurrSigns();
