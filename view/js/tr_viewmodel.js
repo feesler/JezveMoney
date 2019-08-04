@@ -338,10 +338,6 @@ function TransactionViewModel()
 		show(nextElementSibling(nextElementSibling(firstElementChild(source))), Transaction.noAccount());
 		show('selaccount', !Transaction.noAccount());
 
-		srcAmountSwitch(true);
-		resBalanceSwitch(false);
-		resBalanceDestSwitch(false);
-
 		Transaction.update('no_account', !Transaction.noAccount());
 
 		if (Transaction.noAccount())
@@ -448,16 +444,23 @@ function TransactionViewModel()
 	{
 		var src_amount, src_amount_b;
 
+		src_amount_b = ge('src_amount_b');
+		if (src_amount_b)
+			firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
+
 		if (val === undefined)
 			return;
 
 		src_amount = ge('src_amount');
-		src_amount_b = ge('src_amount_b');
-
 		if (src_amount)
-			src_amount.value = val;
-		if (src_amount_b)
-			firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
+		{
+			var sa = src_amount.value;
+			var savalid = isValidValue(sa);
+			var fsa = (savalid) ? normalize(sa) : sa;
+
+			if (fsa != val)
+				src_amount.value = val;
+		}
 	}
 
 
@@ -478,7 +481,7 @@ function TransactionViewModel()
 		{
 			var da = dest_amount.value;
 			var davalid = isValidValue(da);
-			var fda = (davalid) ? normalizeExch(da) : da;
+			var fda = (davalid) ? normalize(da) : da;
 
 			if (fda != val)
 				dest_amount.value = val;
@@ -956,6 +959,12 @@ function TransactionViewModel()
 				src_curr.value = value;
 		}
 
+		var am_s = isVisible('src_amount_row');
+		var am_d = isVisible('dest_amount_row');
+		var rbv_s = isVisible('result_balance');
+		var rbv_d = isVisible('result_balance_dest');
+		var exch = isVisible('exchange');
+
 		if (Transaction.isDiff())
 		{
 			setAmountInputLabel(true, true);
@@ -968,13 +977,19 @@ function TransactionViewModel()
 				setCurrActive(false, false);		// set destination inactive
 			}
 
-			setExchRate(Transaction.exchRate());
-			if (!isVisible('dest_amount_row') && !isVisible('dest_amount_left'))	// currency already different
-			{
-				destAmountSwitch(true);
+			var toShowDestAmount = false;
+			if (Transaction.isTransfer())
+				toShowDestAmount = !rbv_d && !(rbv_s && exch) && !(am_s && exch);
+			else
+				toShowDestAmount = !rbv_s && !rbv_d && !exch;
+			destAmountSwitch(toShowDestAmount);
+
+			if (Transaction.isTransfer())
+				srcAmountSwitch(!rbv_s);
+
+			if (!isVisible('exchange'))
 				exchRateSwitch(false);
-				resBalanceDestSwitch(false);
-			}
+			setExchRate(Transaction.exchRate());
 		}
 		else
 		{
@@ -984,9 +999,29 @@ function TransactionViewModel()
 			setAmountTileBlockLabel(false, false);
 			if (Transaction.isExpense())
 				hideSrcAmountAndExchange();
-			else if (Transaction.isIncome() || Transaction.isTransfer())
+			else if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				hideDestAmountAndExchange();
-			resBalanceDestSwitch(false);
+
+			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
+				srcAmountSwitch(!rbv_d && !rbv_s);
+			if (Transaction.isExpense())
+				destAmountSwitch(!rbv_s);
+
+			if (Transaction.isTransfer())
+			{
+				if (rbv_s && rbv_d)
+					resBalanceDestSwitch(false);
+			}
+			else if (Transaction.isDebt())
+			{
+				if (Transaction.noAccount())
+				{
+					if (Transaction.debtType())
+						resBalanceDestSwitch(false);
+					else
+						resBalanceSwitch(false);
+				}
+			}
 		}
 
 		updateCurrSigns();
@@ -1019,12 +1054,14 @@ function TransactionViewModel()
 				dest_curr.value = value;
 		}
 
+		var am_s = isVisible('src_amount_row');
+		var am_d = isVisible('dest_amount_row');
+		var rbv_s = isVisible('result_balance');
+		var rbv_d = isVisible('result_balance_dest');
+		var exch = isVisible('exchange');
+
 		if (Transaction.isDiff())
 		{
-			if (Transaction.isTransfer())
-				destAmountSwitch(true);
-
-			srcAmountSwitch(true);
 			setAmountInputLabel(true, true);
 			setAmountTileBlockLabel(true, true);
 			setAmountInputLabel(false, true);
@@ -1039,8 +1076,20 @@ function TransactionViewModel()
 			else
 				setCurrActive(false, false);		// set destination inactive
 
-			exchRateSwitch(false);
+			var toShowSrcAmount = false;
+			if (Transaction.isIncome())
+				toShowSrcAmount = (am_s && am_d) || (am_s && rbv_d) || (am_s && exch);
+			else if (Transaction.isExpense())
+				toShowSrcAmount = true;
+			else if (Transaction.isTransfer())
+				toShowSrcAmount = !rbv_s;
+			srcAmountSwitch(toShowSrcAmount);
 
+			if (Transaction.isTransfer())
+				destAmountSwitch(!rbv_d && !(rbv_s && exch) && !(am_s && exch));
+
+			if (!isVisible('exchange'))
+				exchRateSwitch(false);
 			setExchRate(Transaction.exchRate());
 		}
 		else
@@ -1049,10 +1098,32 @@ function TransactionViewModel()
 			setAmountInputLabel(false, false);
 			setAmountTileBlockLabel(true, false);
 			setAmountTileBlockLabel(false, false);
+
+			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
+				srcAmountSwitch(!rbv_d && !rbv_s);
+			if (Transaction.isExpense())
+				destAmountSwitch(!rbv_s);
+
 			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				hideDestAmountAndExchange();
-			else
+			else		// Expense
 				hideSrcAmountAndExchange();
+
+			if (Transaction.isTransfer())
+			{
+				if (rbv_s && rbv_d)
+					resBalanceSwitch(false);
+			}
+			else if (Transaction.isDebt())
+			{
+				if (Transaction.noAccount())
+				{
+					if (Transaction.debtType())
+						resBalanceDestSwitch(false);
+					else
+						resBalanceSwitch(false);
+				}
+			}
 		}
 
 		updateCurrSigns();
