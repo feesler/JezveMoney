@@ -338,10 +338,6 @@ function TransactionViewModel()
 		show(nextElementSibling(nextElementSibling(firstElementChild(source))), Transaction.noAccount());
 		show('selaccount', !Transaction.noAccount());
 
-		srcAmountSwitch(true);
-		resBalanceSwitch(false);
-		resBalanceDestSwitch(false);
-
 		Transaction.update('no_account', !Transaction.noAccount());
 
 		if (Transaction.noAccount())
@@ -1003,10 +999,10 @@ function TransactionViewModel()
 			setAmountTileBlockLabel(false, false);
 			if (Transaction.isExpense())
 				hideSrcAmountAndExchange();
-			else if (Transaction.isIncome() || Transaction.isTransfer())
+			else if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				hideDestAmountAndExchange();
 
-			if (Transaction.isIncome() || Transaction.isTransfer())
+			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				srcAmountSwitch(!rbv_d && !rbv_s);
 			if (Transaction.isExpense())
 				destAmountSwitch(!rbv_s);
@@ -1015,6 +1011,16 @@ function TransactionViewModel()
 			{
 				if (rbv_s && rbv_d)
 					resBalanceDestSwitch(false);
+			}
+			else if (Transaction.isDebt())
+			{
+				if (Transaction.noAccount())
+				{
+					if (Transaction.debtType())
+						resBalanceDestSwitch(false);
+					else
+						resBalanceSwitch(false);
+				}
 			}
 		}
 
@@ -1093,7 +1099,7 @@ function TransactionViewModel()
 			setAmountTileBlockLabel(true, false);
 			setAmountTileBlockLabel(false, false);
 
-			if (Transaction.isIncome() || Transaction.isTransfer())
+			if (Transaction.isIncome() || Transaction.isTransfer() || Transaction.isDebt())
 				srcAmountSwitch(!rbv_d && !rbv_s);
 			if (Transaction.isExpense())
 				destAmountSwitch(!rbv_s);
@@ -1107,6 +1113,16 @@ function TransactionViewModel()
 			{
 				if (rbv_s && rbv_d)
 					resBalanceSwitch(false);
+			}
+			else if (Transaction.isDebt())
+			{
+				if (Transaction.noAccount())
+				{
+					if (Transaction.debtType())
+						resBalanceDestSwitch(false);
+					else
+						resBalanceSwitch(false);
+				}
 			}
 		}
 
