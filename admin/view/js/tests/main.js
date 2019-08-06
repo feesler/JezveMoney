@@ -862,6 +862,17 @@ function transferTransactionStart(page)
 	page.inputDestResBalance(state.values.result_balance_dest_row.value);
 	addResult('Result balance (.0) input result', page.checkState(state));
 
+// Change source account to another one with different currency (USD)
+	setParam(state.visibility, { src_amount_row : true, src_amount_left : false, exch_left : true,
+								dest_amount_left : true });
+	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
+								result_balance_row : { currSign : '$', value : '1001.98' }, src_res_balance_left : '$ 1 001.98',
+								src_amount_left : '$ -500.99', src_amount_row : { currSign : '$', label : 'Source amount', value : '-500.99' },
+								dest_amount_left : '-500.99 ₽', dest_amount_row : { label : 'Destination amount', value : '-500.99' } });
+
+	page.changeSrcAccount(page.content.source.dropDown.items[2].id);
+	addResult('Change source account', page.checkState(state));
+
 	return Promise.resolve(page);
 }
 
