@@ -26,11 +26,11 @@ TestPage.prototype.parseHeader = function()
 	res.logo = {};
 	res.logo.elem = res.elem.querySelector('.logo');
 	if (!res.logo.elem)
-		throw 'Logo element not found';
+		throw new Error('Logo element not found');
 
 	res.logo.linkElem = res.logo.elem.querySelector('a');
 	if (!res.logo.linkElem)
-		throw 'Logo link element not found';
+		throw new Error('Logo link element not found');
 
 	res.user = {};
 	res.user.elem = res.elem.querySelector('.userblock');
@@ -38,15 +38,15 @@ TestPage.prototype.parseHeader = function()
 	{
 		res.user.menuBtn = res.elem.querySelector('button.user_button');
 		if (!res.user.menuBtn)
-			throw 'User button not found';
+			throw new Error('User button not found');
 		el = res.user.menuBtn.querySelector('.user_title');
 		if (!el)
-			throw 'User title element not found';
+			throw new Error('User title element not found');
 		res.user.name = el.innerHTML;
 
 		res.user.menuEl = res.elem.querySelector('.usermenu');
 		if (!res.user.menuEl)
-			throw 'Menu element not found';
+			throw new Error('Menu element not found');
 
 		res.user.menuItems = [];
 		var menuLinks = res.user.menuEl.querySelectorAll('ul > li > a');
@@ -87,7 +87,7 @@ var tileIcons = [{ className : null, title : 'No icon' },
 TestPage.prototype.parseTile = function(tileEl)
 {
 	if (!tileEl || !hasClass(tileEl, 'tile'))
-		throw 'Wrong tile structure';
+		throw new Error('Wrong tile structure');
 
 	var tileObj = { elem : tileEl, linkElem : tileEl.firstElementChild,
 					balanceEL : tileEl.querySelector('.acc_bal'),
@@ -121,7 +121,7 @@ TestPage.prototype.parseTile = function(tileEl)
 TestPage.prototype.parseInfoTile = function(tileEl)
 {
 	if (!tileEl || !hasClass(tileEl, 'info_tile'))
-		throw 'Wrong info tile structure';
+		throw new Error('Wrong info tile structure');
 
 	var tileObj = { elem : tileEl,
 					titleEl : tileEl.querySelector('.info_title'),
@@ -149,7 +149,7 @@ TestPage.prototype.parseTiles = function(tilesEl, parseCallback)
 	{
 		var tileObj = callback.call(this, tilesEl.children[i]);
 		if (!tileObj)
-			throw 'Fail to parse tile';
+			throw new Error('Fail to parse tile');
 
 		res.push(tileObj);
 	}
@@ -173,7 +173,7 @@ TestPage.prototype.parseDropDown = function(elem)
 {
 	var res = { elem : elem };
 	if (!res.elem || (!hasClass(res.elem, 'dd_container') && !hasClass(res.elem, 'dd_attached')))
-		throw 'Wrong drop down element';
+		throw new Error('Wrong drop down element');
 
 	res.isAttached = hasClass(res.elem, 'dd_attached');
 	if (res.isAttached)
@@ -181,16 +181,16 @@ TestPage.prototype.parseDropDown = function(elem)
 	else
 		res.selectBtn = res.elem.querySelector('button.selectBtn');
 	if (!res.selectBtn)
-		throw 'Select button not found';
+		throw new Error('Select button not found');
 
 	if (!res.isAttached)
 	{
 		res.statSel = res.elem.querySelector('.dd_input_cont span.statsel');
 		if (!res.statSel)
-			throw 'Static select element not found';
+			throw new Error('Static select element not found');
 		res.input = res.elem.querySelector('.dd_input_cont input');
 		if (!res.input)
-			throw 'Input element not found';
+			throw new Error('Input element not found');
 
 		res.editable = isVisible(res.input);
 		res.textValue = (res.editable) ? res.input.value : res.statSel.innerHTML;
@@ -217,7 +217,7 @@ TestPage.prototype.parseDropDown = function(elem)
 		clickEmul(this.selectBtn);
 		var li = idSearch(this.items, val);
 		if (!li)
-			throw 'List item not found';
+			throw new Error('List item not found');
 		clickEmul(li.elem);
 	};
 
@@ -245,15 +245,15 @@ TestPage.prototype.parseIconLink = function(elem)
 	var res = { elem : elem };
 
 	if (!hasClass(elem, 'iconlink'))
-		throw 'Wrong icon link';
+		throw new Error('Wrong icon link');
 
 	res.linkElem = elem.firstElementChild;
 	if (!res.linkElem)
-		throw 'Link element not found';
+		throw new Error('Link element not found');
 
 	res.titleElem = res.linkElem.querySelector('.icontitle');
 	if (!res.titleElem || !res.titleElem.firstElementChild)
-		throw 'Title element not found';
+		throw new Error('Title element not found');
 	res.title = res.titleElem.firstElementChild.innerHTML;
 
 // Subtitle is optional
@@ -281,7 +281,7 @@ TestPage.prototype.parseInputRow = function(elem)
 
 	res.labelEl = elem.querySelector('label');
 	if (!res.labelEl)
-		throw 'Label element not found';
+		throw new Error('Label element not found');
 
 	res.label = res.labelEl.innerHTML;
 	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
@@ -293,7 +293,7 @@ TestPage.prototype.parseInputRow = function(elem)
 		{
 			res.currDropDown = this.parseDropDown(res.currElem.firstElementChild);
 			if (!res.currDropDown.isAttached)
-				throw 'Currency drop down is not attached';
+				throw new Error('Currency drop down is not attached');
 			res.currSign = res.currDropDown.selectBtn.innerHTML;
 		}
 		else if (hasClass(res.currElem, 'exchrate_comm'))
@@ -365,7 +365,7 @@ TestPage.prototype.parse = function()
 TestPage.prototype.performAction = function(action)
 {
 	if (!isFunction(action))
-		throw 'Wrong action specified';
+		throw new Error('Wrong action specified');
 
 	if (!this.content && !this.header)
 		this.content = this.parse();
@@ -387,10 +387,7 @@ TestPage.prototype.checkVisibility = function(controls)
 		control = this.content[countrolName];
 		fact = !!(control && isVisible(control.elem));
 		if (expected != fact)
-		{
-			console.error('Not expected visibility of ' + countrolName + ' control');
-			return false;
-		}
+			throw new Error('Not expected visibility(' + fact + ') of ' + countrolName + ' control');
 	}
 
 	return true;
@@ -406,20 +403,14 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 	for(var vKey in expectedObj)
 	{
 		if (!(vKey in obj))
-		{
-			console.error('Key (' + vKey + ') not found');
-			return false;
-		}
+			throw new Error('Key (' + vKey + ') not found');
 
 		expected = expectedObj[vKey];
 		value = obj[vKey];
 		if (isObject(expected))
 			return this.checkObjValue(value, expected);
 		else if (value !== expected)
-		{
-			console.error('Not expected value ' + value + ' for ' + vKey + '. ' + expected  + ' is expected');
-			return false;
-		}
+			throw new Error('Not expected value ' + value + ' for ' + vKey + '. ' + expected  + ' is expected');
 	}
 
 	return true;
@@ -439,10 +430,9 @@ TestPage.prototype.checkValues = function(controls)
 		 	(control && !isObject(expected) && control.value !== expected))
 		{
 			if (control && !isObject(expected))
-				console.error('Not expected value ' + control.value + ' for (' + countrolName + ') ' + expected  + ' is expected');
+				throw new Error('Not expected value ' + control.value + ' for (' + countrolName + ') ' + expected  + ' is expected');
 			else
-				console.error('Not expected values of ' + countrolName + ' control');
-			return false;
+				throw new Error('Not expected values of ' + countrolName + ' control');
 		}
 	}
 
@@ -460,7 +450,7 @@ TestPage.prototype.checkState = function(stateObj)
 TestPage.prototype.goToProfilePage = function()
 {
 	if (!this.isUserLoggedIn())
-		throw 'User is not logged in';
+		throw new Error('User is not logged in');
 
 	clickEmul(this.header.user.menuBtn);		// open user menu
 
@@ -484,7 +474,7 @@ TestPage.prototype.logoutUser = function()
 TestPage.prototype.goToMainPage = function()
 {
 	if (!this.isUserLoggedIn())
-		throw 'User not logged in';
+		throw new Error('User not logged in');
 
 	return navigation(() => clickEmul(this.header.logo.linkElem), MainPage);
 };
