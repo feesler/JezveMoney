@@ -545,7 +545,14 @@ function TransactionViewModel()
 		resbal_b = firstElementChild(ge('resbal_b'));
 
 		if (resbal)
-			resbal.value = val;
+		{
+			var s2_src = resbal.value;
+			var s2valid = isValidValue(s2_src);
+			var fs2_src = (s2valid) ? normalize(s2_src) : s2_src;
+
+			if (fs2_src != val)
+				resbal.value = val;
+		}
 
 		fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
 		if (resbal_b)
@@ -565,7 +572,14 @@ function TransactionViewModel()
 		resbal_d_b = firstElementChild(ge('resbal_d_b'));
 
 		if (resbal_d)
-			resbal_d.value = val;
+		{
+			var s2_dest = resbal_d.value;
+			var s2valid = isValidValue(s2_dest);
+			var fs2_dest = (s2valid) ? normalize(s2_dest) : s2_dest;
+
+			if (fs2_dest != val)
+				resbal_d.value = val;
+		}
 
 		fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.destCurr());
 		if (resbal_d_b)
