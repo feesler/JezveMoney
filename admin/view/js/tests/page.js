@@ -410,7 +410,7 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 		if (isObject(expected))
 			return this.checkObjValue(value, expected);
 		else if (value !== expected)
-			throw new Error('Not expected value ' + value + ' for ' + vKey + '. ' + expected  + ' is expected');
+			throw new Error('Not expected value (' + value + ') for ' + vKey + '. (' + expected  + ') is expected');
 	}
 
 	return true;
@@ -430,7 +430,7 @@ TestPage.prototype.checkValues = function(controls)
 		 	(control && !isObject(expected) && control.value !== expected))
 		{
 			if (control && !isObject(expected))
-				throw new Error('Not expected value ' + control.value + ' for (' + countrolName + ') ' + expected  + ' is expected');
+				throw new Error('Not expected value (' + control.value + ') for ' + countrolName + '. (' + expected  + ') is expected');
 			else
 				throw new Error('Not expected values of ' + countrolName + ' control');
 		}
