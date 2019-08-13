@@ -403,14 +403,25 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 	for(var vKey in expectedObj)
 	{
 		if (!(vKey in obj))
-			throw new Error('Key (' + vKey + ') not found');
+			return { key : vKey };
 
 		expected = expectedObj[vKey];
 		value = obj[vKey];
 		if (isObject(expected))
-			return this.checkObjValue(value, expected);
+		{
+			var res = this.checkObjValue(value, expected);
+			if (res !== true)
+			{
+				res.key = vKey + '.' + res.key;
+				return res;
+			}
+		}
 		else if (value !== expected)
-			throw new Error('Not expected value (' + value + ') for ' + vKey + '. (' + expected  + ') is expected');
+		{
+			return { key : vKey,
+						value : value,
+						expected : expected };
+		}
 	}
 
 	return true;
@@ -419,24 +430,43 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 
 TestPage.prototype.checkValues = function(controls)
 {
+	var res = true;
 	var control, expected, fact;
 
 	for(var countrolName in controls)
 	{
 		expected = controls[countrolName];
 		control = this.content[countrolName];
-		if (!control ||
-			(control && isObject(expected) && !this.checkObjValue(control, expected)) ||
-		 	(control && !isObject(expected) && control.value !== expected))
+		if (!control)
+			throw new Error('Control (' + countrolName + ') not found');
+
+		if (isObject(expected))
 		{
-			if (control && !isObject(expected))
-				throw new Error('Not expected value (' + control.value + ') for ' + countrolName + '. (' + expected  + ') is expected');
-			else
-				throw new Error('Not expected values of ' + countrolName + ' control');
+			res = this.checkObjValue(control, expected);
+			if (res !== true)
+			{
+				res.key = countrolName + '.' + res.key;
+				break;
+			}
+		}
+		else if (control.value !== expected)
+		{
+			res = { key : countrolName,
+							value : control.value,
+							expected : expected };
+			break;
 		}
 	}
 
-	return true;
+	if (res !== true)
+	{
+		if (res.expected)
+			throw new Error('Not expected value "' + res.value + '" for (' + res.key + ') "' + res.expected  + '" is expected');
+		else
+			throw new Error('Path (' + res.key + ') not found');
+	}
+
+	return res;
 };
 
 
