@@ -114,9 +114,21 @@ TransactionPage.prototype.changeSrcAccount = function(val)
 };
 
 
+TransactionPage.prototype.changeSrcAccountByPos = function(pos)
+{
+	this.performAction(() => this.content.source.selectAccount(this.content.source.dropDown.items[pos].id));
+};
+
+
 TransactionPage.prototype.changeDestAccount = function(val)
 {
 	this.performAction(() => this.content.destination.selectAccount(val));
+};
+
+
+TransactionPage.prototype.changeDestAccountByPos = function(pos)
+{
+	this.performAction(() => this.content.destination.selectAccount(this.content.destination.dropDown.items[pos].id));
 };
 
 

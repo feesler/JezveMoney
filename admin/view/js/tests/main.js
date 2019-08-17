@@ -408,7 +408,7 @@ function expenseTransactionStart(page)
 								dest_amount_left : '$ 1.09', dest_amount_row : { currSign : '$' },
 								src_res_balance_left : '$ 499.90' });
 	test('(10) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[2].id), page, state);
+			() => page.changeSrcAccountByPos(2), page, state);
 
 // Change account back
 	setParam(state.values, { source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
@@ -416,7 +416,7 @@ function expenseTransactionStart(page)
 								dest_amount_left : '1.09 ₽', dest_amount_row : { currSign : '₽' },
 								src_res_balance_left : '499.90 ₽' });
 	test('(10) Change account back',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[0].id), page, state);
+			() => page.changeSrcAccountByPos(0), page, state);
 
 // Transition 3: click on destination amount block and move from State 1 to State 0
 	setParam(state.visibility, { dest_amount_left : false, src_res_balance_left : true, dest_amount_row : true, result_balance_row : false });
@@ -505,7 +505,7 @@ function expenseTransactionStart(page)
 								exch_left : '1 $/$', exchange_row : { value : '1', currSign : '$/$' },
 								dest_amount_left : '$ 0.09', dest_amount_row : { currSign : '$' },
 								src_res_balance_left : '$ 500.90' });
-	test('(1) Change account to another one with different currency', () => page.changeSrcAccount(page.content.source.dropDown.items[2].id), page, state);
+	test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page, state);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
 	setParam(state.visibility, { exch_left : true, src_amount_row : true });
@@ -520,7 +520,7 @@ function expenseTransactionStart(page)
 								src_amount_row : { currSign : '₽' },
 								src_res_balance_left : '500.90 ₽' });
 	test('(5) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[0].id), page, state);
+			() => page.changeSrcAccountByPos(0), page, state);
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
 	setParam(state.visibility, { src_res_balance_left : false, result_balance_row : true,
@@ -533,7 +533,7 @@ function expenseTransactionStart(page)
 								src_amount_row : { currSign : '$' },
 								src_res_balance_left : '$ 500.90' });
 	test('(10) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[2].id), page, state);
+			() => page.changeSrcAccountByPos(2), page, state);
 
 // Transition 7: click on destination amount block and move from State 4 to State 2
 	setParam(state.visibility, { src_res_balance_left : true, result_balance_row : false,
@@ -550,7 +550,7 @@ function expenseTransactionStart(page)
 								src_res_balance_left : '€ 10 000.90',
 								result_balance_row : { value : '10000.9' } });
 	test('(14) Change account to another one with the same currency as current destination currency',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[3].id), page, state);
+			() => page.changeSrcAccountByPos(3), page, state);
 
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
@@ -570,7 +570,7 @@ function expenseTransactionStart(page)
 								src_amount_row : { currSign : '$' }, src_res_balance_left : '$ 500.90',
 								result_balance_row : { value : '500.9' } });
 	test('(17) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[2].id), page, state);
+			() => page.changeSrcAccountByPos(2), page, state);
 
 // Transition 15: select source account with the same currency as destination and move from State 2 to State 0
 	setParam(state.visibility, { src_res_balance_left : true, src_amount_row : false,
@@ -582,7 +582,7 @@ function expenseTransactionStart(page)
 								exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
 								result_balance_row : { value : '500.9' }, src_res_balance_left : '500.90 ₽' });
 	test('(15) Change account to another one with the same currency as destination',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[1].id), page, state);
+			() => page.changeSrcAccountByPos(1), page, state);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
 	setParam(state.visibility, { exch_left : true, src_amount_row : true });
@@ -615,7 +615,7 @@ function expenseTransactionStart(page)
 								exch_left : '1 $/$', exchange_row : { value : '1', currSign : '$/$' },
 								result_balance_row : { value : '500.9' }, src_res_balance_left : '$ 500.90' });
 	test('(11) Change account to another one with the same currency as destination',
-			() => page.changeSrcAccount(page.content.source.dropDown.items[2].id), page, state);
+			() => page.changeSrcAccountByPos(2), page, state);
 
 
 	return Promise.resolve(page);
@@ -667,13 +667,13 @@ function incomeTransactionStart(page)
 								src_amount_left : '€ 1.01', src_amount_row : { currSign : '€' },
 								result_balance_dest_row : { value : '10002' }, dest_res_balance_left : '€ 10 002',
 								exch_left : '1 €/€', exchange_row : { currSign : '€/€' } });
-	test('(23) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[3].id), page, state);
+	test('(23) Change destination account', () => page.changeDestAccountByPos(3), page, state);
 
 	setParam(state.values, { destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
 								src_amount_left : '1.01 ₽', src_amount_row : { currSign : '₽' },
 								result_balance_dest_row : { value : '502' }, dest_res_balance_left : '502 ₽',
 								exch_left : '1 ₽/₽', exchange_row : { currSign : '₽/₽' } });
-	test('(23) Change destination account back', () => page.changeDestAccount(page.content.destination.dropDown.items[0].id), page, state);
+	test('(23) Change destination account back', () => page.changeDestAccountByPos(0), page, state);
 
 // Input result balance
 	setParam(state.values, { result_balance_dest_row : { value : '502.08' }, dest_res_balance_left : '502.08 ₽',
@@ -702,13 +702,13 @@ function incomeTransactionStart(page)
 								dest_amount_left : '€ 1.09', dest_amount_row : { currSign : '€' },
 								result_balance_dest_row : { value : '10002.08' }, dest_res_balance_left : '€ 10 002.08',
 								exch_left : '1 €/$', exchange_row : { currSign : '€/$' } });
-	test('(5) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[3].id), page, state);
+	test('(5) Change destination account', () => page.changeDestAccountByPos(3), page, state);
 
 	setParam(state.values, { destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
 								dest_amount_left : '1.09 ₽', dest_amount_row : { currSign : '₽' },
 								result_balance_dest_row : { value : '502.08' }, dest_res_balance_left : '502.08 ₽',
 								exch_left : '1 ₽/$', exchange_row : { currSign : '₽/$' } });
-	test('(5) Change destination account back', () => page.changeDestAccount(page.content.destination.dropDown.items[0].id), page, state);
+	test('(5) Change destination account back', () => page.changeDestAccountByPos(0), page, state);
 
 // Input destination amount
 	setParam(state.values, { dest_amount_row : { value : '' }, dest_amount_left : '0 ₽',
@@ -748,13 +748,13 @@ function incomeTransactionStart(page)
 								dest_amount_left : '€ 1.01', dest_amount_row : { currSign : '€' },
 								result_balance_dest_row : { value : '10002' }, dest_res_balance_left : '€ 10 002',
 								exch_left : '0.92661 €/$ (1.0792 $/€)', exchange_row : { currSign : '€/$' } });
-	test('(17) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[3].id), page, state);
+	test('(17) Change destination account', () => page.changeDestAccountByPos(3), page, state);
 
 	setParam(state.values, { destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
 								dest_amount_left : '1.01 ₽', dest_amount_row : { currSign : '₽' },
 								result_balance_dest_row : { value : '502' }, dest_res_balance_left : '502 ₽',
 								exch_left : '0.92661 ₽/$ (1.0792 $/₽)', exchange_row : { currSign : '₽/$' } });
-	test('(17) Change destination account back', () => page.changeDestAccount(page.content.destination.dropDown.items[0].id), page, state);
+	test('(17) Change destination account back', () => page.changeDestAccountByPos(0), page, state);
 
 // Transition 21: Change source currency to different than currency of account and stay on State 4
 	setParam(state.values, { exch_left : '0.92661 ₽/€ (1.0792 €/₽)', exchange_row : { currSign : '₽/€' },
@@ -834,7 +834,7 @@ function incomeTransactionStart(page)
 								dest_amount_left : '€ 1.09', dest_amount_row : { currSign : '€' },
 								result_balance_dest_row : { value : '10002.08' }, dest_res_balance_left : '€ 10 002.08',
 								exch_left : '1 €/$', exchange_row : { currSign : '€/$' } });
-	test('(11) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[3].id), page, state);
+	test('(11) Change destination account', () => page.changeDestAccountByPos(3), page, state);
 
 // Transition 12: Change destination account to another one with same currency as currest source currency
 	setParam(state.visibility, { exchange_row : false, exch_left : false, dest_amount_row: false, dest_amount_left : false });
@@ -843,7 +843,7 @@ function incomeTransactionStart(page)
 								dest_amount_left : '$ 1.09', dest_amount_row : { label : 'Amount', currSign : '$' },
 								result_balance_dest_row : { value : '502.08' }, dest_res_balance_left : '$ 502.08',
 								exch_left : '1 $/$', exchange_row : { currSign : '$/$' } });
-	test('(12) Change destination account back', () => page.changeDestAccount(page.content.destination.dropDown.items[2].id), page, state);
+	test('(12) Change destination account back', () => page.changeDestAccountByPos(2), page, state);
 
 // Transition 3: Change source currency to different than currency of account and move from State 0 to State 2
 	setParam(state.visibility, { exch_left : true, dest_amount_row : true });
@@ -888,7 +888,7 @@ function incomeTransactionStart(page)
 								dest_amount_left : '1.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' },
 								dest_res_balance_left : '502.08 ₽',
 								exch_left : '1 ₽/₽', exchange_row : { currSign : '₽/₽' } });
-	test('(18) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[1].id), page, state);
+	test('(18) Change destination account', () => page.changeDestAccountByPos(1), page, state);
 
 // Transition 4: Click on source amount block and move from State 1 to State 0
 	setParam(state.visibility, { src_amount_left : false, dest_res_balance_left : true, src_amount_row : true, result_balance_dest_row : false });
@@ -908,7 +908,7 @@ function incomeTransactionStart(page)
 								dest_amount_left : '$ 1.09', dest_amount_row : { label : 'Amount', currSign : '$' },
 								dest_res_balance_left : '$ 502.08',
 								exch_left : '1 $/$', exchange_row : { currSign : '$/$' } });
-	test('(6) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[2].id), page, state);
+	test('(6) Change destination account', () => page.changeDestAccountByPos(2), page, state);
 
 // Transition 1: Change destination account to another one with same currency as currest source currency
 	setParam(state.values, { destination : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
@@ -916,7 +916,7 @@ function incomeTransactionStart(page)
 								dest_amount_left : '1.09 ₽', dest_amount_row : { currSign : '₽' },
 								dest_res_balance_left : '502.08 ₽',
 								exch_left : '1 ₽/₽', exchange_row : { currSign : '₽/₽' } });
-	test('(1) Change destination account', () => page.changeDestAccount(page.content.destination.dropDown.items[0].id), page, state);
+	test('(1) Change destination account', () => page.changeDestAccountByPos(0), page, state);
 
 // Transition 3: Change source currency to different than currency of account and move from State 0 to State 2
 	setParam(state.visibility, { exch_left : true, dest_amount_row : true });
@@ -1092,7 +1092,7 @@ function transferTransactionStart(page)
 								result_balance_row : { currSign : '$', value : '1001.98' }, src_res_balance_left : '$ 1 001.98',
 								src_amount_left : '$ -500.99', src_amount_row : { currSign : '$', label : 'Source amount', value : '-500.99' },
 								dest_amount_left : '-500.99 ₽', dest_amount_row : { label : 'Destination amount', value : '-500.99' } });
-	test('Change source account', () => page.changeSrcAccount(page.content.source.dropDown.items[2].id), page, state);
+	test('Change source account', () => page.changeSrcAccountByPos(2), page, state);
 
 	return Promise.resolve(page);
 }
