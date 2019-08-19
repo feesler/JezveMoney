@@ -16,11 +16,40 @@ class AccountModel extends CachedTable
 		if ($user_id != self::$user_id || $full != self::$full_list)
 			self::$dcache = NULL;
 
+		$this->tbl_name = "accounts";
+
 		self::$full_list = $full;
 		self::$user_id = intval($user_id);
 
 		$this->dbObj = mysqlDB::getInstance();
+		if (!$this->dbObj->isTableExist($this->tbl_name))
+			$this->createTable();
+
 		$this->currMod = new CurrencyModel();
+	}
+
+
+	// Create DB table if not exist
+	private function createTable()
+	{
+		wlog("AccountModel::createTable()");
+
+		$res = $this->dbObj->createTableQ($this->tbl_name,
+						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
+						"`owner_id` INT(11) NOT NULL, ".
+						"`user_id` INT(11) NOT NULL, ".
+						"`curr_id` INT(11) NOT NULL, ".
+						"`balance` DECIMAL(15,2) NOT NULL, ".
+						"`initbalance` DECIMAL(15,2) NOT NULL, ".
+						"`name` VARCHAR(255) NOT NULL, ".
+						"`icon` INT(11) NOT NULL DEFAULT '0', ".
+						"`createdate` DATETIME NOT NULL, ".
+						"`updatedate` DATETIME NOT NULL, ".
+						"PRIMARY KEY (`id`), ".
+						"KEY `user_id` (`user_id`)",
+						"DEFAULT CHARACTER SET = utf8 COLLATE utf8_general_ci");
+
+		return $res;
 	}
 
 
@@ -44,7 +73,7 @@ class AccountModel extends CachedTable
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
-		$resArr = $this->dbObj->selectQ("*", "accounts", $condArr, "id");
+		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, "id");
 		foreach($resArr as $row)
 		{
 			$acc_id = $row["id"];
@@ -79,7 +108,7 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("accounts", ["id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"],
+		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"],
 								[NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate]))
 			return 0;
 
@@ -135,7 +164,7 @@ class AccountModel extends CachedTable
 			$values[] = $balance;
 		}
 
-		if (!$this->dbObj->updateQ("accounts", $fields, $values, "id=".$acc_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, $fields, $values, "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -169,7 +198,7 @@ class AccountModel extends CachedTable
 
 		// delete account
 		$condArr = ["user_id=".self::$user_id, "id=".$acc_id];
-		if (!$this->dbObj->deleteQ("accounts", $condArr))
+		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
 			return FALSE;
 
 		$this->cleanCache();
@@ -206,7 +235,7 @@ class AccountModel extends CachedTable
 		if (!$acc_id || is_null($field) || $field == "")
 			return FALSE;
 
-		if (!$this->dbObj->updateQ("accounts", [$field, "updatedate"], [$newValue, date("Y-m-d H:i:s")], "id=".$acc_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, [$field, "updatedate"], [$newValue, date("Y-m-d H:i:s")], "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -223,7 +252,7 @@ class AccountModel extends CachedTable
 			return FALSE;
 
 		// delete all accounts of user
-		if (!$this->dbObj->deleteQ("accounts", "user_id=".self::$user_id))
+		if (!$this->dbObj->deleteQ($this->tbl_name, "user_id=".self::$user_id))
 			return FALSE;
 
 		$this->cleanCache();

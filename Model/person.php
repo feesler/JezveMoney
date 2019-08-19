@@ -17,7 +17,29 @@ class PersonModel extends CachedTable
 		$uMod = new UserModel();
 		self::$owner_id = $uMod->getOwner(self::$user_id);
 
+		$this->tbl_name = "persons";
+
 		$this->dbObj = mysqlDB::getInstance();
+		if (!$this->dbObj->isTableExist($this->tbl_name))
+			$this->createTable();
+	}
+
+
+	// Create DB table if not exist
+	private function createTable()
+	{
+		wlog("PersonModel::createTable()");
+
+		$res = $this->dbObj->createTableQ($this->tbl_name,
+						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
+						"`name` VARCHAR(255) NOT NULL, ".
+						"`user_id` INT(11) NOT NULL, ".
+						"`createdate` DATETIME NOT NULL, ".
+						"`updatedate` DATETIME NOT NULL, ".
+						"PRIMARY KEY (`id`)",
+						"DEFAULT CHARACTER SET = utf8 COLLATE utf8_general_ci");
+
+		return $res;
 	}
 
 
@@ -33,7 +55,7 @@ class PersonModel extends CachedTable
 	{
 		self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", "persons", "user_id=".self::$user_id);
+		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id);
 		foreach($resArr as $row)
 		{
 			$person_id = $row["id"];
@@ -56,7 +78,7 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("persons", ["id", "name", "user_id", "createdate", "updatedate"],
+		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "name", "user_id", "createdate", "updatedate"],
 								[NULL, $person_name, self::$user_id, $curDate, $curDate]))
 			return 0;
 
@@ -83,7 +105,7 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("persons", ["name", "updatedate"], [$person_name, $curDate], "id=".$person_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, ["name", "updatedate"], [$person_name, $curDate], "id=".$person_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -111,7 +133,7 @@ class PersonModel extends CachedTable
 		}
 
 		// delete person
-		if (!$this->dbObj->deleteQ("persons", ["user_id=".self::$user_id, "id=".$p_id]))
+		if (!$this->dbObj->deleteQ($this->tbl_name, ["user_id=".self::$user_id, "id=".$p_id]))
 			return FALSE;
 
 		$this->cleanCache();
@@ -221,7 +243,7 @@ class PersonModel extends CachedTable
 			return FALSE;
 
 		$condArr = ["user_id=".self::$user_id, "id<>".self::$owner_id];
-		if (!$this->dbObj->deleteQ("persons", $condArr))
+		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
 			return FALSE;
 
 		$this->cleanCache();
