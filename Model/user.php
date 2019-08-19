@@ -8,7 +8,30 @@ class UserModel extends CachedTable
 	// Class constructor
 	public function __construct()
 	{
+		$this->tbl_name = "users";
 		$this->dbObj = mysqlDB::getInstance();
+		if (!$this->dbObj->isTableExist($this->tbl_name))
+			$this->createTable();
+	}
+
+
+	// Create DB table if not exist
+	private function createTable()
+	{
+		wlog("UserModel::createTable()");
+
+		$res = $this->dbObj->createTableQ($this->tbl_name,
+						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
+						"`login` VARCHAR(255) NOT NULL, ".
+						"`passhash` VARCHAR(64) NOT NULL, ".
+						"`owner_id` INT(11) NOT NULL, ".
+						"`access` INT(11) NOT NULL DEFAULT '0', ".
+						"`createdate` DATETIME NOT NULL, ".
+						"`updatedate` DATETIME NOT NULL, ".
+						"PRIMARY KEY (`id`)",
+						"DEFAULT CHARACTER SET = utf8 COLLATE utf8_general_ci");
+
+		return $res;
 	}
 
 
@@ -24,7 +47,7 @@ class UserModel extends CachedTable
 	{
 		self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", "users");
+		$resArr = $this->dbObj->selectQ("*", $this->tbl_name);
 		foreach($resArr as $row)
 		{
 			$user_id = $row["id"];
@@ -207,13 +230,13 @@ class UserModel extends CachedTable
 			return TRUE;
 
 		// check specified person not own another user
-		$resArr = $this->dbObj->selectQ("id", "users", "owner_id=".$o_id);
+		$resArr = $this->dbObj->selectQ("id", $this->tbl_name, "owner_id=".$o_id);
 		if (count($resArr) > 0)
 			return FALSE;
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", ["owner_id", "updatedate"], [$o_id, $curDate], "id=".qnull($u_id)))
+		if (!$this->dbObj->updateQ($this->tbl_name, ["owner_id", "updatedate"], [$o_id, $curDate], "id=".qnull($u_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -235,7 +258,7 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", ["passhash", "updatedate"], [$passhash, $curDate], "login=".qnull($elogin)))
+		if (!$this->dbObj->updateQ($this->tbl_name, ["passhash", "updatedate"], [$passhash, $curDate], "login=".qnull($elogin)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -267,7 +290,7 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("users", ["id", "login", "passhash", "createdate", "updatedate"], [NULL, $elogin, $passhash, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "login", "passhash", "createdate", "updatedate"], [NULL, $elogin, $passhash, $curDate, $curDate]))
 			return FALSE;
 
 		$user_id = $this->dbObj->insertId();
@@ -371,7 +394,7 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", ["login", "passhash", "updatedate"], [$elogin, $passhash, $curDate], "id=".$user_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, ["login", "passhash", "updatedate"], [$elogin, $passhash, $curDate], "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -399,7 +422,7 @@ class UserModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("users", ["access", "updatedate"], [$access, $curDate], "id=".$user_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, ["access", "updatedate"], [$access, $curDate], "id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -472,7 +495,7 @@ class UserModel extends CachedTable
 		if (!$this->dbObj->deleteQ("persons", "user_id=".$u_id))
 			return FALSE;
 
-		if (!$this->dbObj->deleteQ("users", "id=".$u_id))
+		if (!$this->dbObj->deleteQ($this->tbl_name, "id=".$u_id))
 			return FALSE;
 
 		return TRUE;

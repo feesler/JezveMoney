@@ -8,7 +8,29 @@ class CurrencyModel extends CachedTable
 	// Class constructor
 	public function __construct()
 	{
+		$this->tbl_name = "currency";
 		$this->dbObj = mysqlDB::getInstance();
+		if (!$this->dbObj->isTableExist($this->tbl_name))
+			$this->createTable();
+	}
+
+
+	// Create DB table if not exist
+	private function createTable()
+	{
+		wlog("CurrencyModel::createTable()");
+
+		$res = $this->dbObj->createTableQ($this->tbl_name,
+						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
+						"`name` VARCHAR(128) NOT NULL, ".
+						"`sign` VARCHAR(64) NOT NULL, ".
+						"`format` INT(11) NOT NULL DEFAULT '0', ".
+						"`createdate` DATETIME NOT NULL, ".
+						"`updatedate` DATETIME NOT NULL, ".
+						"PRIMARY KEY (`id`)",
+						"DEFAULT CHARACTER SET = utf8 COLLATE utf8_general_ci");
+
+		return $res;
 	}
 
 
@@ -24,7 +46,7 @@ class CurrencyModel extends CachedTable
 	{
 		self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", "currency");
+		$resArr = $this->dbObj->selectQ("*", $this->tbl_name);
 		foreach($resArr as $row)
 		{
 			$curr_id = $row["id"];
@@ -50,7 +72,7 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ("currency", ["id", "name", "sign", "format", "createdate", "updatedate"],
+		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "name", "sign", "format", "createdate", "updatedate"],
 							[NULL, $curr_name, $curr_sign, $curr_format, $curDate, $curDate]))
 			return 0;
 
@@ -76,7 +98,7 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ("currency", ["name", "sign", "format", "updatedate"],
+		if (!$this->dbObj->updateQ($this->tbl_name, ["name", "sign", "format", "updatedate"],
 								[$curr_name, $curr_sign, $curr_format, $curDate],
 								"id=".$curr_id))
 			return FALSE;
@@ -117,7 +139,7 @@ class CurrencyModel extends CachedTable
 		if ($this->isInUse($curr_id))
 			return FALSE;
 
-		if (!$this->dbObj->deleteQ("currency", "id=".$curr_id))
+		if (!$this->dbObj->deleteQ($this->tbl_name, "id=".$curr_id))
 			return FALSE;
 
 		$this->cleanCache();
