@@ -199,26 +199,58 @@ TestPage.prototype.parseDropDown = function(elem)
 	res.selectElem = res.elem.querySelector('select');
 
 	res.listContainer = res.elem.querySelector('.ddlist');
-	if (res.listContainer)
+	res.isMobile = hasClass(res.listContainer, 'ddmobile');
+	if (res.isMobile)
 	{
-		var listItems = res.elem.querySelectorAll('.ddlist li > div');
-		res.items = [];
-		for(var i = 0; i < listItems.length; i++)
-		{
-			var li = listItems[i];
-			var itemObj = { id : this.parseId(li.id), text : li.innerHTML, elem : li };
+			res.items = [];
 
-			res.items.push(itemObj);
+			for(var i = 0; i < res.selectElem.options.length; i++)
+			{
+				var option = res.selectElem.options[i];
+				if (option.disabled)
+					continue;
+
+				var itemObj = { id : this.parseId(option.value), text : option.innerHTML, elem : option };
+
+				res.items.push(itemObj);
+			}
+	}
+	else
+	{
+
+		if (res.listContainer)
+		{
+			var listItems = res.elem.querySelectorAll('.ddlist li > div');
+			res.items = [];
+			for(var i = 0; i < listItems.length; i++)
+			{
+				var li = listItems[i];
+				var itemObj = { id : this.parseId(li.id), text : li.innerHTML, elem : li };
+
+				res.items.push(itemObj);
+			}
 		}
 	}
 
 	res.selectByValue = function(val)
 	{
-		clickEmul(this.selectBtn);
-		var li = idSearch(this.items, val);
-		if (!li)
-			throw new Error('List item not found');
-		clickEmul(li.elem);
+		if (this.isMobile)
+		{
+			var option = idSearch(this.items, val);
+			if (!option)
+				throw new Error('Option item not found');
+
+			selectByValue(res.selectElem, option.elem.value);
+			res.selectElem.onchange();
+		}
+		else
+		{
+			clickEmul(this.selectBtn);
+			var li = idSearch(this.items, val);
+			if (!li)
+				throw new Error('List item not found');
+			clickEmul(li.elem);
+		}
 	};
 
 	return res;
