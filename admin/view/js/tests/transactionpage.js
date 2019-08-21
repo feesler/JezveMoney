@@ -81,7 +81,11 @@ TransactionPage.prototype.parseContent = function()
 	}
 
 	res.source = this.parseTileBlock(vge('source'));
+	if (res.source)
+		res.source.id = parseInt(vge('src_id').value);
 	res.destination = this.parseTileBlock(vge('destination'));
+	if (res.destination)
+		res.destination.id = parseInt(vge('dest_id').value);
 
 	res.src_amount_left = this.parseTileRightItem(vge('src_amount_left'));
 	res.dest_amount_left = this.parseTileRightItem(vge('dest_amount_left'));
@@ -94,6 +98,9 @@ TransactionPage.prototype.parseContent = function()
 	res.exchange_row = this.parseInputRow(vge('exchange'));
 	res.result_balance_row = this.parseInputRow(vge('result_balance'));
 	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
+
+	res.src_curr_id = res.src_amount_row ? res.src_amount_row.hiddenValue : 0;
+	res.dest_curr_id = res.dest_amount_row ? res.dest_amount_row.hiddenValue : 0;
 
 	return res;
 };
