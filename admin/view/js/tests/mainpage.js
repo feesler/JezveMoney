@@ -70,7 +70,7 @@ MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 	var tile = accWidget.tiles[accNum];
 	var link = tile.linkElem;
 
-	return navigation(() => clickEmul(link), TransactionPage);
+	return navigation(() => clickEmul(link), ExpenseTransactionPage);
 };
 
 

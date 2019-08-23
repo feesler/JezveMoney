@@ -353,269 +353,123 @@ function updatePerson(page, num, currentName, personName)
 function expenseTransactionStart(page)
 {
 // State 0
-	var state = { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : false,
-								src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
-								src_amount_row : false, dest_amount_row : true, exchange_row : false, result_balance_row : false,
-								result_balance_dest_row : false },
-				values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-							source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
-							dest_amount_row : { label : 'Amount', currSign : '₽', isCurrActive : true },
-							src_res_balance_left : '500.99 ₽' } };
-
 	setBlock('Expense', 2);
-	test('Initial state of new expense page', () => {}, page, state);
+	test('Initial state of new expense page', () => page.setExpectedState(0), page, page.expectedState);
+
 
 // Input destination amount
-	setParam(state.values, { dest_amount_row : { value : '1' }, dest_amount_left : '1 ₽',
-								src_res_balance_left : '499.99 ₽' });
-	test('Destination amount (1) input', () => page.inputDestAmount(state.values.dest_amount_row.value), page, state);
-
-	state.values.dest_amount_row.value = '1.';
-	test('Destination amount (1.) input', () => page.inputDestAmount(state.values.dest_amount_row.value), page, state);
-
-	state.values.dest_amount_row.value = '1.0';
-	test('Destination amount (1.0) input', () => page.inputDestAmount(state.values.dest_amount_row.value), page, state);
-
-	setParam(state.values, { dest_amount_row : { value : '1.01' }, dest_amount_left : '1.01 ₽',
-								src_res_balance_left : '499.98 ₽' });
-	test('Destination amount (1.01) input', () => page.inputDestAmount(state.values.dest_amount_row.value), page, state);
-
-	state.values.dest_amount_row.value = '1.010';
-	test('Destination amount (1.010) input', () => page.inputDestAmount(state.values.dest_amount_row.value), page, state);
-
-	state.values.dest_amount_row.value = '1.0101';
-	test('Destination amount (1.0101) input', () => page.inputDestAmount(state.values.dest_amount_row.value), page, state);
+	test('Destination amount (1) input', () => page.inputDestAmount('1'), page, page.expectedState);
+	test('Destination amount (1.) input', () => page.inputDestAmount('1.'), page, page.expectedState);
+	test('Destination amount (1.0) input', () => page.inputDestAmount('1.0'), page, page.expectedState);
+	test('Destination amount (1.01) input', () => page.inputDestAmount('1.01'), page, page.expectedState);
+	test('Destination amount (1.010) input', () => page.inputDestAmount('1.010'), page, page.expectedState);
+	test('Destination amount (1.0101) input', () => page.inputDestAmount('1.0101'), page, page.expectedState);
 
 // Transition 2: click on result balance block and move from State 0 to State 1
-	setParam(state.visibility, { dest_amount_left : true, src_res_balance_left : false, dest_amount_row : false, result_balance_row : true });
-	setParam(state.values, { result_balance_row : { value : '499.98', isCurrActive : false } });
-	test('Click on source result balance', () => page.clickSrcResultBalance(), page, state);
+	test('(2) Click on source result balance', () => page.clickSrcResultBalance(), page, page.expectedState);
 
 // Input result balance
-	setParam(state.values, { result_balance_row : { value : '499.9' }, src_res_balance_left : '499.90 ₽',
-								dest_amount_left : '1.09 ₽', dest_amount_row : { value : '1.09' } });
-	test('Result balance (499.9) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	setParam(state.values, { result_balance_row : { value : '499.90' }, src_res_balance_left : '499.90 ₽' });
-	test('Result balance (499.90) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	setParam(state.values, { result_balance_row : { value : '499.901' }, src_res_balance_left : '499.90 ₽' });
-	test('Result balance (499.901) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
+	test('Result balance (499.9) input', () => page.inputResBalance('499.9'), page, page.expectedState);
+	test('Result balance (499.90) input', () => page.inputResBalance('499.90'), page, page.expectedState);
+	test('Result balance (499.901) input', () => page.inputResBalance('499.901'), page, page.expectedState);
 
 // Transition 12: change account to another one with different currency and stay on State 1
-	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
-								exch_left : '1 $/$', exchange_row : { currSign : '$/$' },
-								dest_amount_left : '$ 1.09', dest_amount_row : { currSign : '$' },
-								src_res_balance_left : '$ 499.90' });
-	test('(10) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(2), page, state);
+	test('(12) Change account to another one with currency different than current destination currency',
+			() => page.changeSrcAccountByPos(2), page, page.expectedState);
 
 // Change account back
-	setParam(state.values, { source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
-								exch_left : '1 ₽/₽', exchange_row : { currSign : '₽/₽' },
-								dest_amount_left : '1.09 ₽', dest_amount_row : { currSign : '₽' },
-								src_res_balance_left : '499.90 ₽' });
-	test('(10) Change account back',
-			() => page.changeSrcAccountByPos(0), page, state);
+	test('(12) Change account back',
+			() => page.changeSrcAccountByPos(0), page, page.expectedState);
 
 // Transition 3: click on destination amount block and move from State 1 to State 0
-	setParam(state.visibility, { dest_amount_left : false, src_res_balance_left : true, dest_amount_row : true, result_balance_row : false });
-	test('(3) Click on destination amount', () => page.clickDestAmount(), page, state);
+	test('(3) Click on destination amount', () => page.clickDestAmount(), page, page.expectedState);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	setParam(state.visibility, { exch_left : true, src_amount_row : true });
-	setParam(state.values, { exch_left : '1 $/₽', src_amount_row : { label : 'Source amount', value : '1.09', currSign : '₽' },
-								exchange_row : { value : '1', currSign : '$/₽' },
-								dest_amount_left : '$ 1.09', dest_amount_row : { label : 'Destination amount', currSign : '$' } });
-	test('(4) Change destination curency to USD', () => page.changeDestCurrency(2), page, state);
+	test('(4) Change destination curency to USD', () => page.changeDestCurrency(2), page, page.expectedState);
 
 // Input source amount
-	setParam(state.values, { src_amount_row : { value : '' }, exch_left : '0 $/₽', exchange_row : { value : '0' },
-								result_balance_row : { value : '500.99' }, src_res_balance_left : '500.99 ₽' });
-	test('Empty source amount input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '.';
-	test('Source amount (.) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '0.';
-	test('Source amount (0.) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '.0';
-	test('Source amount (.0) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	setParam(state.values, { src_amount_row : { value : '.01' }, exchange_row : { value : '109' },
-							result_balance_row : { value : '500.98' }, src_res_balance_left : '500.98 ₽', exch_left : '109 $/₽ (0.00917 ₽/$)' });
-	test('Source amount (.01) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	setParam(state.values, { src_amount_row : { value : '1.01' }, exchange_row : { value : '1.07921' },
-							result_balance_row : { value : '499.98' }, src_res_balance_left : '499.98 ₽', exch_left : '1.07921 $/₽ (0.9266 ₽/$)' });
-	test('Source amount (1.01) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	setParam(state.values, { src_amount_row : { value : '1.010' },
-							result_balance_row : { value : '499.98' }, src_res_balance_left : '499.98 ₽', exch_left : '1.07921 $/₽ (0.9266 ₽/$)' });
-	test('Source amount (1.010) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
+	test('Empty source amount input', () => page.inputSrcAmount(''), page, page.expectedState);
+	test('Source amount (.) input', () => page.inputSrcAmount('.'), page, page.expectedState);
+	test('Source amount (0.) input', () => page.inputSrcAmount('0.'), page, page.expectedState);
+	test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page, page.expectedState);
+	test('Source amount (.01) input', () => page.inputSrcAmount('.01'), page, page.expectedState);
+	test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page, page.expectedState);
+	test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page, page.expectedState);
 
 // Transition 8: click on exchange rate block and move from State 2 to State 3
-	setParam(state.visibility, { exchange_row : true, exch_left : false, dest_amount_row: false, dest_amount_left : true });
-	test('(8) Click on exchange rate', () => page.clickExchRate(), page, state);
+	test('(8) Click on exchange rate', () => page.clickExchRate(), page, page.expectedState);
 
 // Input exchange rate
-	setParam(state.values, { exchange_row : { value : '1.09' }, exch_left : '1.09 $/₽ (0.91743 ₽/$)',
-								dest_amount_left : '$ 1.10', dest_amount_row : { value : '1.1' } });
-	test('Input exchange rate (1.09)', () => page.inputExchRate(state.values.exchange_row.value), page, state);
-
-	setParam(state.values, { exchange_row : { value : '3.09' }, exch_left : '3.09 $/₽ (0.32362 ₽/$)',
-								dest_amount_left : '$ 3.12', dest_amount_row : { value : '3.12' } });
-	test('Input exchange rate (3.09)', () => page.inputExchRate(state.values.exchange_row.value), page, state);
-
-	setParam(state.values, { exchange_row : { value : '.' }, exch_left : '0 $/₽',
-								dest_amount_left : '$ 0', dest_amount_row : { value : '0' } });
-	test('Input exchange rate (.)', () => page.inputExchRate(state.values.exchange_row.value), page, state);
-
-	state.values.exchange_row.value = '.0';
-	test('Input exchange rate (.0)', () => page.inputExchRate(state.values.exchange_row.value), page, state);
-
-	setParam(state.values, { exchange_row : { value : '.09' }, exch_left : '0.09 $/₽ (11.11111 ₽/$)',
-								dest_amount_left : '$ 0.09', dest_amount_row : { value : '0.09' } });
-	test('Input exchange rate (.09)', () => page.inputExchRate(state.values.exchange_row.value), page, state);
-
-	setParam(state.values, { exchange_row : { value : '.090101' }, exch_left : '0.0901 $/₽ (11.09878 ₽/$)' });
-	test('Input exchange rate (.090101)', () => page.inputExchRate(state.values.exchange_row.value), page, state);
+	test('Input exchange rate (1.09)', () => page.inputExchRate('1.09'), page, page.expectedState);
+	test('Input exchange rate (3.09)', () => page.inputExchRate('3.09'), page, page.expectedState);
+	test('Input exchange rate (.)', () => page.inputExchRate('.'), page, page.expectedState);
+	test('Input exchange rate (.0)', () => page.inputExchRate('.0'), page, page.expectedState);
+	test('Input exchange rate (.09)', () => page.inputExchRate('.09'), page, page.expectedState);
+	test('Input exchange rate (.090101)', () => page.inputExchRate('.090101'), page, page.expectedState);
 
 // Transition 16: click on destination amount block and move from State 3 to State 2
-	setParam(state.visibility, { dest_amount_left : false, dest_amount_row : true, exch_left : true, exchange_row : false });
-	test('(16) Click on destination amount', () => page.clickDestAmount(), page, state);
+	test('(16) Click on destination amount', () => page.clickDestAmount(), page, page.expectedState);
 
 // Transition 13: select another currency different from currency of source account and stay on state
-	setParam(state.values, { exch_left : '0.0901 €/₽ (11.09878 ₽/€)', exchange_row : { currSign : '€/₽' },
-								dest_amount_left : '€ 0.09', dest_amount_row : { currSign : '€' } });
-	test('(13) Change destination curency to EUR', () => page.changeDestCurrency(3), page, state);
+	test('(13) Change destination curency to EUR', () => page.changeDestCurrency(3), page, page.expectedState);
 
 // Transition 9: select same currency as source account and move from State 2 to State 0
-	setParam(state.visibility, { exch_left : false, src_amount_row : false });
-	setParam(state.values, { exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
-								dest_amount_left : '0.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' },
-								src_amount_row : { value : '0.09', label : 'Amount' },
-								result_balance_row : { value : '500.9' }, src_res_balance_left : '500.90 ₽' });
-	test('(9) Change destination curency to RUB', () => page.changeDestCurrency(1), page, state);
+	test('(9) Change destination curency to RUB', () => page.changeDestCurrency(1), page, page.expectedState);
 
 // Transition 1: change account to another one with different currency and stay on State 0
-	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
-								src_amount_row : { currSign : '$' },
-								exch_left : '1 $/$', exchange_row : { value : '1', currSign : '$/$' },
-								dest_amount_left : '$ 0.09', dest_amount_row : { currSign : '$' },
-								src_res_balance_left : '$ 500.90' });
-	test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page, state);
+	test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page, page.expectedState);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	setParam(state.visibility, { exch_left : true, src_amount_row : true });
-	setParam(state.values, { src_amount_row : { label : 'Source amount' },
-								exch_left : '1 €/$', exchange_row : { value : '1', currSign : '€/$' },
-								dest_amount_left : '€ 0.09', dest_amount_row : { label : 'Destination amount', currSign : '€' } });
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(3), page, state);
+	test('(4) Select different currency for destination', () => page.changeDestCurrency(3), page, page.expectedState);
 
 // Transition 5: change account to another one with currency different than current destination currency and stay on State 2
-	setParam(state.values, { source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
-								exch_left : '1 €/₽', exchange_row : { currSign : '€/₽' },
-								src_amount_row : { currSign : '₽' },
-								src_res_balance_left : '500.90 ₽' });
 	test('(5) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(0), page, state);
+			() => page.changeSrcAccountByPos(0), page, page.expectedState);
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
-	setParam(state.visibility, { src_res_balance_left : false, result_balance_row : true,
-									dest_amount_left : true, dest_amount_row : false });
-	test('(6) Click on source result block', () => page.clickSrcResultBalance(), page, state);
+	test('(6) Click on source result block', () => page.clickSrcResultBalance(), page, page.expectedState);
 
 // Transition 10: change account to another one with currency different than current destination currency and stay on State 4
-	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
-								exch_left : '1 €/$', exchange_row : { currSign : '€/$' },
-								src_amount_row : { currSign : '$' },
-								src_res_balance_left : '$ 500.90' });
 	test('(10) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(2), page, state);
+			() => page.changeSrcAccountByPos(2), page, page.expectedState);
 
 // Transition 7: click on destination amount block and move from State 4 to State 2
-	setParam(state.visibility, { src_res_balance_left : true, result_balance_row : false,
-									dest_amount_left : false, dest_amount_row : true });
-	test('(7) Click on source amount block', () => page.clickDestAmount(), page, state);
+	test('(7) Click on source amount block', () => page.clickDestAmount(), page, page.expectedState);
 
 // Transition 14: select source account with the same currency as destination and move from State 2 to State 0
-	setParam(state.visibility, { src_res_balance_left : true, src_amount_row : false,
-									exch_left : false });
-	setParam(state.values, { source : { tile : { name : 'acc EUR', balance : '€ 10 000.99' } },
-								exch_left : '1 €/€', exchange_row : { currSign : '€/€' },
-								src_amount_row : { currSign : '€', label : 'Amount' },
-								dest_amount_left : '€ 0.09', dest_amount_row : { label : 'Amount' },
-								src_res_balance_left : '€ 10 000.90',
-								result_balance_row : { value : '10000.9' } });
 	test('(14) Change account to another one with the same currency as current destination currency',
-			() => page.changeSrcAccountByPos(3), page, state);
+			() => page.changeSrcAccountByPos(3), page, page.expectedState);
 
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	setParam(state.visibility, { exch_left : true, src_amount_row : true });
-	setParam(state.values, { src_amount_row : { label : 'Source amount' },
-								exch_left : '1 ₽/€', exchange_row : { value : '1', currSign : '₽/€' },
-								dest_amount_left : '0.09 ₽', dest_amount_row : { label : 'Destination amount', currSign : '₽' } });
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(1), page, state);
+	test('(4) Select different currency for destination', () => page.changeDestCurrency(1), page, page.expectedState);
 
 // Transition 8: click on exchange rate block and move from State 2 to State 3
-	setParam(state.visibility, { exchange_row : true, exch_left : false, dest_amount_row: false, dest_amount_left : true });
-	test('(8) Click on exchange rate', () => page.clickExchRate(), page, state);
+	test('(8) Click on exchange rate', () => page.clickExchRate(), page, page.expectedState);
 
 // Transition 17: change account to another one with currency different than current destination currency and stay on State 3
-	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
-								exch_left : '1 ₽/$', exchange_row : { currSign : '₽/$' },
-								src_amount_row : { currSign : '$' }, src_res_balance_left : '$ 500.90',
-								result_balance_row : { value : '500.9' } });
 	test('(17) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(2), page, state);
+			() => page.changeSrcAccountByPos(2), page, page.expectedState);
 
 // Transition 15: select source account with the same currency as destination and move from State 2 to State 0
-	setParam(state.visibility, { src_res_balance_left : true, src_amount_row : false,
-									dest_amount_left : false, dest_amount_row : true,
-									exchange_row : false, exch_left : false });
-	setParam(state.values, { source : { tile : { name : 'acc RUB', balance : '500.99 ₽' } },
-								src_amount_row : { label : 'Amount', currSign : '₽' },
-								dest_amount_left : '0.09 ₽', dest_amount_row : { label : 'Amount', currSign : '₽' },
-								exch_left : '1 ₽/₽', exchange_row : { value : '1', currSign : '₽/₽' },
-								result_balance_row : { value : '500.9' }, src_res_balance_left : '500.90 ₽' });
 	test('(15) Change account to another one with the same currency as destination',
-			() => page.changeSrcAccountByPos(1), page, state);
+			() => page.changeSrcAccountByPos(1), page, page.expectedState);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	setParam(state.visibility, { exch_left : true, src_amount_row : true });
-	setParam(state.values, { src_amount_row : { label : 'Source amount' },
-								exch_left : '1 $/₽', exchange_row : { value : '1', currSign : '$/₽' },
-								dest_amount_left : '$ 0.09', dest_amount_row : { label : 'Destination amount', currSign : '$' } });
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(2), page, state);
+	test('(4) Select different currency for destination', () => page.changeDestCurrency(2), page, page.expectedState);
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
-	setParam(state.visibility, { src_res_balance_left : false, result_balance_row : true,
-									dest_amount_left : true, dest_amount_row : false });
-	test('(6) Click on source result balance block', () => page.clickSrcResultBalance(), page, state);
+	test('(6) Click on source result balance block', () => page.clickSrcResultBalance(), page, page.expectedState);
 
 // Transition 19: click on exchange rate block and move from State 4 to State 3
-	setParam(state.visibility, { exchange_row : true, exch_left : false,
-									src_res_balance_left : true, result_balance_row : false });
-	test('(19) Click on exchange rate block', () => page.clickExchRate(), page, state);
+	test('(19) Click on exchange rate block', () => page.clickExchRate(), page, page.expectedState);
 
 // Transition 18: click on source result balance and move from State 3 to State 4
-	setParam(state.visibility, { exchange_row : false, exch_left : true,
-									src_res_balance_left : false, result_balance_row : true });
-	test('(18) Click on source result balance rate block', () => page.clickSrcResultBalance(), page, state);
-
+	test('(18) Click on source result balance rate block', () => page.clickSrcResultBalance(), page, page.expectedState);
 
 // Transition 11: select source account with the same currency as destination and move from State 4 to State 1
-	setParam(state.visibility, { src_amount_row : false, exch_left : false });
-	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
-								src_amount_row : { label : 'Amount', currSign : '$' },
-								dest_amount_left : '$ 0.09', dest_amount_row : { label : 'Amount', currSign : '$' },
-								exch_left : '1 $/$', exchange_row : { value : '1', currSign : '$/$' },
-								result_balance_row : { value : '500.9' }, src_res_balance_left : '$ 500.90' });
 	test('(11) Change account to another one with the same currency as destination',
-			() => page.changeSrcAccountByPos(2), page, state);
+			() => page.changeSrcAccountByPos(2), page, page.expectedState);
 
 
 	return Promise.resolve(page);
