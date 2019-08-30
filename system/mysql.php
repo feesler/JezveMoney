@@ -137,6 +137,9 @@ class mysqlDB
 		if ($dbcnx)
 			self::$conn = $dbcnx;
 
+		if (is_null(self::$conn))
+			wlog("Fail to connect");
+
 		return (self::$conn != NULL);
 	}
 
@@ -169,7 +172,8 @@ class mysqlDB
 	{
 		if (is_null(self::$conn))
 		{
-			$this->connect();
+			if (!$this->connect())
+				return NULL;
 			$this->selectDB(self::$settings->database);
 			$this->rawQ("SET NAMES 'utf8';");
 		}
