@@ -99,9 +99,6 @@ TransactionPage.prototype.parseContent = function()
 	res.result_balance_row = this.parseInputRow(vge('result_balance'));
 	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
 
-	res.src_curr_id = res.src_amount_row ? res.src_amount_row.hiddenValue : 0;
-	res.dest_curr_id = res.dest_amount_row ? res.dest_amount_row.hiddenValue : 0;
-
 	return res;
 };
 
@@ -123,7 +120,7 @@ TransactionPage.prototype.changeSrcAccount = function(val)
 
 TransactionPage.prototype.changeSrcAccountByPos = function(pos)
 {
-	this.performAction(() => this.content.source.selectAccount(this.content.source.dropDown.items[pos].id));
+	this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
 };
 
 

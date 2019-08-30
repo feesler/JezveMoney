@@ -354,122 +354,122 @@ function expenseTransactionStart(page)
 {
 // State 0
 	setBlock('Expense', 2);
-	test('Initial state of new expense page', () => page.setExpectedState(0), page, page.expectedState);
+	test('Initial state of new expense page', () => page.setExpectedState(0), page);
 
 
 // Input destination amount
-	test('Destination amount (1) input', () => page.inputDestAmount('1'), page, page.expectedState);
-	test('Destination amount (1.) input', () => page.inputDestAmount('1.'), page, page.expectedState);
-	test('Destination amount (1.0) input', () => page.inputDestAmount('1.0'), page, page.expectedState);
-	test('Destination amount (1.01) input', () => page.inputDestAmount('1.01'), page, page.expectedState);
-	test('Destination amount (1.010) input', () => page.inputDestAmount('1.010'), page, page.expectedState);
-	test('Destination amount (1.0101) input', () => page.inputDestAmount('1.0101'), page, page.expectedState);
+	test('Destination amount (1) input', () => page.inputDestAmount('1'), page);
+	test('Destination amount (1.) input', () => page.inputDestAmount('1.'), page);
+	test('Destination amount (1.0) input', () => page.inputDestAmount('1.0'), page);
+	test('Destination amount (1.01) input', () => page.inputDestAmount('1.01'), page);
+	test('Destination amount (1.010) input', () => page.inputDestAmount('1.010'), page);
+	test('Destination amount (1.0101) input', () => page.inputDestAmount('1.0101'), page);
 
 // Transition 2: click on result balance block and move from State 0 to State 1
-	test('(2) Click on source result balance', () => page.clickSrcResultBalance(), page, page.expectedState);
+	test('(2) Click on source result balance', () => page.clickSrcResultBalance(), page);
 
 // Input result balance
-	test('Result balance (499.9) input', () => page.inputResBalance('499.9'), page, page.expectedState);
-	test('Result balance (499.90) input', () => page.inputResBalance('499.90'), page, page.expectedState);
-	test('Result balance (499.901) input', () => page.inputResBalance('499.901'), page, page.expectedState);
+	test('Result balance (499.9) input', () => page.inputResBalance('499.9'), page);
+	test('Result balance (499.90) input', () => page.inputResBalance('499.90'), page);
+	test('Result balance (499.901) input', () => page.inputResBalance('499.901'), page);
 
 // Transition 12: change account to another one with different currency and stay on State 1
 	test('(12) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(2), page, page.expectedState);
+			() => page.changeSrcAccountByPos(2), page);
 
 // Change account back
 	test('(12) Change account back',
-			() => page.changeSrcAccountByPos(0), page, page.expectedState);
+			() => page.changeSrcAccountByPos(0), page);
 
 // Transition 3: click on destination amount block and move from State 1 to State 0
-	test('(3) Click on destination amount', () => page.clickDestAmount(), page, page.expectedState);
+	test('(3) Click on destination amount', () => page.clickDestAmount(), page);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Change destination curency to USD', () => page.changeDestCurrency(2), page, page.expectedState);
+	test('(4) Change destination curency to USD', () => page.changeDestCurrency(2), page);
 
 // Input source amount
-	test('Empty source amount input', () => page.inputSrcAmount(''), page, page.expectedState);
-	test('Source amount (.) input', () => page.inputSrcAmount('.'), page, page.expectedState);
-	test('Source amount (0.) input', () => page.inputSrcAmount('0.'), page, page.expectedState);
-	test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page, page.expectedState);
-	test('Source amount (.01) input', () => page.inputSrcAmount('.01'), page, page.expectedState);
-	test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page, page.expectedState);
-	test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page, page.expectedState);
+	test('Empty source amount input', () => page.inputSrcAmount(''), page);
+	test('Source amount (.) input', () => page.inputSrcAmount('.'), page);
+	test('Source amount (0.) input', () => page.inputSrcAmount('0.'), page);
+	test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page);
+	test('Source amount (.01) input', () => page.inputSrcAmount('.01'), page);
+	test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page);
+	test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page);
 
 // Transition 8: click on exchange rate block and move from State 2 to State 3
-	test('(8) Click on exchange rate', () => page.clickExchRate(), page, page.expectedState);
+	test('(8) Click on exchange rate', () => page.clickExchRate(), page);
 
 // Input exchange rate
-	test('Input exchange rate (1.09)', () => page.inputExchRate('1.09'), page, page.expectedState);
-	test('Input exchange rate (3.09)', () => page.inputExchRate('3.09'), page, page.expectedState);
-	test('Input exchange rate (.)', () => page.inputExchRate('.'), page, page.expectedState);
-	test('Input exchange rate (.0)', () => page.inputExchRate('.0'), page, page.expectedState);
-	test('Input exchange rate (.09)', () => page.inputExchRate('.09'), page, page.expectedState);
-	test('Input exchange rate (.090101)', () => page.inputExchRate('.090101'), page, page.expectedState);
+	test('Input exchange rate (1.09)', () => page.inputExchRate('1.09'), page);
+	test('Input exchange rate (3.09)', () => page.inputExchRate('3.09'), page);
+	test('Input exchange rate (.)', () => page.inputExchRate('.'), page);
+	test('Input exchange rate (.0)', () => page.inputExchRate('.0'), page);
+	test('Input exchange rate (.09)', () => page.inputExchRate('.09'), page);
+	test('Input exchange rate (.090101)', () => page.inputExchRate('.090101'), page);
 
 // Transition 16: click on destination amount block and move from State 3 to State 2
-	test('(16) Click on destination amount', () => page.clickDestAmount(), page, page.expectedState);
+	test('(16) Click on destination amount', () => page.clickDestAmount(), page);
 
 // Transition 13: select another currency different from currency of source account and stay on state
-	test('(13) Change destination curency to EUR', () => page.changeDestCurrency(3), page, page.expectedState);
+	test('(13) Change destination curency to EUR', () => page.changeDestCurrency(3), page);
 
 // Transition 9: select same currency as source account and move from State 2 to State 0
-	test('(9) Change destination curency to RUB', () => page.changeDestCurrency(1), page, page.expectedState);
+	test('(9) Change destination curency to RUB', () => page.changeDestCurrency(1), page);
 
 // Transition 1: change account to another one with different currency and stay on State 0
-	test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page, page.expectedState);
+	test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(3), page, page.expectedState);
+	test('(4) Select different currency for destination', () => page.changeDestCurrency(3), page);
 
 // Transition 5: change account to another one with currency different than current destination currency and stay on State 2
 	test('(5) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(0), page, page.expectedState);
+			() => page.changeSrcAccountByPos(0), page);
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
-	test('(6) Click on source result block', () => page.clickSrcResultBalance(), page, page.expectedState);
+	test('(6) Click on source result block', () => page.clickSrcResultBalance(), page);
 
 // Transition 10: change account to another one with currency different than current destination currency and stay on State 4
 	test('(10) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(2), page, page.expectedState);
+			() => page.changeSrcAccountByPos(2), page);
 
 // Transition 7: click on destination amount block and move from State 4 to State 2
-	test('(7) Click on source amount block', () => page.clickDestAmount(), page, page.expectedState);
+	test('(7) Click on source amount block', () => page.clickDestAmount(), page);
 
 // Transition 14: select source account with the same currency as destination and move from State 2 to State 0
 	test('(14) Change account to another one with the same currency as current destination currency',
-			() => page.changeSrcAccountByPos(3), page, page.expectedState);
+			() => page.changeSrcAccountByPos(3), page);
 
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(1), page, page.expectedState);
+	test('(4) Select different currency for destination', () => page.changeDestCurrency(1), page);
 
 // Transition 8: click on exchange rate block and move from State 2 to State 3
-	test('(8) Click on exchange rate', () => page.clickExchRate(), page, page.expectedState);
+	test('(8) Click on exchange rate', () => page.clickExchRate(), page);
 
 // Transition 17: change account to another one with currency different than current destination currency and stay on State 3
 	test('(17) Change account to another one with currency different than current destination currency',
-			() => page.changeSrcAccountByPos(2), page, page.expectedState);
+			() => page.changeSrcAccountByPos(2), page);
 
 // Transition 15: select source account with the same currency as destination and move from State 2 to State 0
 	test('(15) Change account to another one with the same currency as destination',
-			() => page.changeSrcAccountByPos(1), page, page.expectedState);
+			() => page.changeSrcAccountByPos(1), page);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(2), page, page.expectedState);
+	test('(4) Select different currency for destination', () => page.changeDestCurrency(2), page);
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
-	test('(6) Click on source result balance block', () => page.clickSrcResultBalance(), page, page.expectedState);
+	test('(6) Click on source result balance block', () => page.clickSrcResultBalance(), page);
 
 // Transition 19: click on exchange rate block and move from State 4 to State 3
-	test('(19) Click on exchange rate block', () => page.clickExchRate(), page, page.expectedState);
+	test('(19) Click on exchange rate block', () => page.clickExchRate(), page);
 
 // Transition 18: click on source result balance and move from State 3 to State 4
-	test('(18) Click on source result balance rate block', () => page.clickSrcResultBalance(), page, page.expectedState);
+	test('(18) Click on source result balance rate block', () => page.clickSrcResultBalance(), page);
 
 // Transition 11: select source account with the same currency as destination and move from State 4 to State 1
 	test('(11) Change account to another one with the same currency as destination',
-			() => page.changeSrcAccountByPos(2), page, page.expectedState);
+			() => page.changeSrcAccountByPos(2), page);
 
 
 	return Promise.resolve(page);
@@ -957,12 +957,14 @@ function test(descr, action, page, state)
 {
 	var res = false;
 	var errorMessage = '';
+	var expState;
 
 	try
 	{
 		console.log('Test: ' + descr);
 		action();
-		res = page.checkState(state)
+		expState = (typeof state === 'undefined') ? page.expectedState : state;
+		res = page.checkState(expState)
 	}
 	catch(e)
 	{

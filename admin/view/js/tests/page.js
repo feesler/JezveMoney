@@ -383,6 +383,13 @@ TestPage.prototype.parseWarningPopup = function(elem)
 
 TestPage.prototype.parseContent = function()
 {
+	return {};
+};
+
+
+TestPage.prototype.buildModel = function()
+{
+	return {};
 };
 
 
@@ -391,6 +398,7 @@ TestPage.prototype.parse = function()
 	this.location = viewframe.contentWindow.location.href;
 	this.header = this.parseHeader();
 	this.content = this.parseContent();
+	this.model = this.buildModel(this.content);
 };
 
 
@@ -400,7 +408,7 @@ TestPage.prototype.performAction = function(action)
 		throw new Error('Wrong action specified');
 
 	if (!this.content && !this.header)
-		this.content = this.parse();
+		this.parse();
 
 	action.call(this);
 

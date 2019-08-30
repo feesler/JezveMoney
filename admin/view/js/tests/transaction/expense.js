@@ -10,189 +10,226 @@ function ExpenseTransactionPage()
 extend(ExpenseTransactionPage, TransactionPage);
 
 
-ExpenseTransactionPage.prototype.setExpectedState = function(state_id, extra)
+ExpenseTransactionPage.prototype.buildModel = function(cont)
 {
-	var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
-	var fmtBal = formatCurrency(selectedAcc.balance, selectedAcc.curr_id);
-	var currObj = getCurrency(selectedAcc.curr_id);
+	var res = {};
 
-	// Check if not first transition and moved to State 0 or State 1 (source and destination currencies are the same) from
-	// any other state (where currencies are different)
-	var copyAmount = (this.expectedState.extra && this.expectedState.extra.id != 0 && this.expectedState.extra.id != 1 &&
-						(state_id == 0 || state_id == 1));
+	res.srcAccount = idSearch(viewframe.contentWindow.accounts, cont.source.id);
+	if (!res.srcAccount)
+		throw new Error('Source account not found');
 
-	var destAmount = this.content.dest_amount_row.value;
-	var fDestAmount = (isValidValue(destAmount)) ? normalize(destAmount) : destAmount;
+	res.src_curr_id = cont.src_amount_row ? cont.src_amount_row.hiddenValue : 0;
+	res.dest_curr_id = cont.dest_amount_row ? cont.dest_amount_row.hiddenValue : 0;
 
-	var srcAmount = (copyAmount) ? destAmount : this.content.src_amount_row.value;
-	var fSrcAmount = (isValidValue(srcAmount)) ? normalize(srcAmount) : srcAmount;
+	if (res.srcAccount.curr_id != res.src_curr_id)
+		throw new Error('Unexpected source currency ' + res.src_curr_id + '(' + res.srcAccount.curr_id + ' is expected)');
 
-	var resBal = normalize(selectedAcc.balance - fSrcAmount);
-	var fmtResBal = formatCurrency(resBal, selectedAcc.curr_id);
+	res.srcCurr = getCurrency(res.src_curr_id);
+	if (!res.srcCurr)
+		throw new Error('Source currency not found');
+	res.destCurr = getCurrency(res.dest_curr_id);
+	if (!res.destCurr)
+		throw new Error('Destination currency not found');
 
-	if (state_id === 0)
+	res.srcAccount.fmtBalance = res.srcCurr.formatValue(res.srcAccount.balance);
+
+	res.srcAmount = cont.src_amount_row.value;
+	res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
+
+	res.destAmount = cont.dest_amount_row.value;
+	res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
+
+	res.srcResBal = cont.result_balance_row.value;
+	res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
+	res.fmtSrcResBal = res.srcCurr.formatValue(res.fSrcResBal);
+
+	res.exchRate = cont.exchange_row.value;
+	this.updateExch(res);
+
+	var isResBalRowVisible = !!(cont.result_balance_row && isVisible(cont.result_balance_row.elem));
+	var isExchRowVisible = !!(cont.exchange_row && isVisible(cont.exchange_row.elem));
+
+	res.isDiffCurr = (res.src_curr_id != res.dest_curr_id);
+
+	if (res.isDiffCurr)
 	{
-		setParam(this.expectedState, { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : false,
-									src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
-									src_amount_row : false, dest_amount_row : true, exchange_row : false,
-									result_balance_row : false, result_balance_dest_row : false },
-					values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-								source : { tile : { name : selectedAcc.name, balance : fmtBal } },
-								src_amount_row : { label : 'Amount', currSign : currObj.sign, isCurrActive : false  },
-								dest_amount_row : { label : 'Amount', currSign : currObj.sign, isCurrActive : true },
-								dest_amount_left : formatCurrency(fDestAmount, currObj.id),
-								result_balance_row : { label : 'Result balance', isCurrActive : false }, src_res_balance_left : fmtResBal,
-								exchange_row : { value : '1', currSign : currObj.sign + '/' + currObj.sign }, exch_left : '1 ' + currObj.sign + '/' + currObj.sign },
-					extra : { id : state_id } });
+		if (isExchRowVisible)
+			res.state = 3;
+		else
+			res.state = (isResBalRowVisible) ? 4 : 2;
 	}
-	else if (state_id === 1)
+	else
 	{
-		setParam(this.expectedState, { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : true,
-									src_res_balance_left : false, dest_res_balance_left : false, exch_left : false,
+		res.state = (isResBalRowVisible) ? 1 : 0;
+	}
+
+	return res;
+};
+
+
+// Set source amount value
+// State 0 or 1: source and destination currencies are the same
+ExpenseTransactionPage.prototype.setSrcAmount = function(model, val)
+{
+	model.srcAmount = val;
+
+	var newValue = isValidValue(val) ? normalize(val) : val;
+	if (model.fSrcAmount != newValue)
+	{
+		model.fSrcAmount = newValue;
+
+		model.srcResBal = normalize(model.srcAccount.balance - model.fSrcAmount);
+		model.fmtSrcResBal = model.srcCurr.formatValue(model.srcResBal);
+	}
+
+	return model;
+};
+
+
+// Set destination amount value
+// State 0 or 1: source and destination currencies are the same
+ExpenseTransactionPage.prototype.setDestAmount = function(model, val)
+{
+	model.destAmount = val;
+
+	var newValue = isValidValue(model.destAmount) ? normalize(model.destAmount) : model.destAmount;
+	if (model.fDestAmount != newValue)
+	{
+		model.fDestAmount = newValue;
+	}
+
+	return model;
+};
+
+
+ExpenseTransactionPage.prototype.calcExchByAmounts = function(model)
+{
+	if (model.fSrcAmount == 0)
+		model.exchRate = (model.fDestAmount == 0) ? 1 : 0;
+	else
+		model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
+
+	return model
+};
+
+
+ExpenseTransactionPage.prototype.updateExch = function(model)
+{
+	model.fExchRate = isValidValue(model.exchRate) ? normalizeExch(model.exchRate) : model.exchRate;
+
+	model.exchSign = model.destCurr.sign + '/' + model.srcCurr.sign;
+	model.backExchSign = model.srcCurr.sign + '/' + model.destCurr.sign;
+
+	var exchText = model.exchSign;
+
+	if (isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
+	{
+		model.invExchRate = parseFloat((1 / model.fExchRate).toFixed(5));
+
+		exchText += ' ('  + model.invExchRate + ' ' + model.backExchSign + ')';
+	}
+
+	model.fmtExch = model.fExchRate + ' ' + exchText;
+
+	return model;
+};
+
+
+
+ExpenseTransactionPage.prototype.setExpectedState = function(state_id)
+{
+	var res = {};
+
+	var newState = parseInt(state_id);
+
+	if (isNaN(newState) || newState < 0 || newState > 4)
+		throw new Error('Wrong state specified');
+
+	var res = { model : { state : newState },
+				visibility : { source : true, destination : false, src_amount_left : false,
+								dest_res_balance_left : false, result_balance_dest_row : false },
+				values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
+							source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
+							src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
+							dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },
+							dest_amount_left : this.model.destCurr.formatValue(this.model.fDestAmount),
+							result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance', isCurrActive : false },
+							src_res_balance_left : this.model.fmtSrcResBal,
+							exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
+							exch_left : this.model.fmtExch }
+				};
+
+	if (newState === 0)
+	{
+		setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : false,
+									src_amount_row : false, dest_amount_row : true, exchange_row : false,
+									result_balance_row : false },
+					values : { src_amount_row : { label : 'Amount' },
+								dest_amount_row : { label : 'Amount' },
+								exchange_row : { value : '1' }, exch_left : '1 ' + this.model.exchSign }
+							});
+	}
+	else if (newState === 1)
+	{
+		setParam(res, { visibility : { dest_amount_left : true, src_res_balance_left : false, exch_left : false,
 									src_amount_row : false, dest_amount_row : false, exchange_row : false,
-									result_balance_row : true, result_balance_dest_row : false },
-					values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-								source : { tile : { name : selectedAcc.name, balance : fmtBal } },
-								src_amount_row : { label : 'Amount', currSign : currObj.sign, isCurrActive : false  },
-								dest_amount_row : { label : 'Amount', currSign : currObj.sign, isCurrActive : true },
-								dest_amount_left : formatCurrency(fDestAmount, currObj.id),
-								result_balance_row : { label : 'Result balance', isCurrActive : false }, src_res_balance_left : fmtResBal,
-								exch_left : '1 ' + currObj.sign + '/' + currObj.sign, exchange_row : { value : '1', currSign : currObj.sign + '/' + currObj.sign } },
+									result_balance_row : true },
+					values : { src_amount_row : { label : 'Amount' },
+								dest_amount_row : { label : 'Amount' },
+								exch_left : '1 ' + this.model.exchSign, exchange_row : { value : '1' } },
 						 	});
 	}
-	else if (state_id === 2)
+	else if (newState === 2)
 	{
-		var destCurrObj = getCurrency((extra === undefined) ? this.content.dest_curr_id : extra);
-
-
-		setParam(this.expectedState, { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : false,
-									src_res_balance_left : true, dest_res_balance_left : false, exch_left : true,
+		setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : true,
 									src_amount_row : true, dest_amount_row : true, exchange_row : false,
-									result_balance_row : false, result_balance_dest_row : false },
-					values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-								source : { tile : { name : selectedAcc.name, balance : fmtBal } },
-								src_amount_row : { label : 'Source amount', currSign : currObj.sign, isCurrActive : false  },
-								dest_amount_row : { label : 'Destination amount', currSign : destCurrObj.sign, isCurrActive : true },
-								result_balance_row : { label : 'Result balance', isCurrActive : false }, src_res_balance_left : fmtResBal }
+									result_balance_row : false },
+					values : { src_amount_row : { label : 'Source amount' },
+								dest_amount_row : { label : 'Destination amount' } }
 					 		});
-		if (extra !== undefined)
-		{
-			setParam(this.expectedState.values, { dest_amount_left : formatCurrency(this.content.dest_amount_row.value, destCurrObj.id),
-							exch_left : '1 ' + destCurrObj.sign + '/' + currObj.sign,
-							exchange_row : { value : '1', currSign : destCurrObj.sign + '/' + currObj.sign } });
-		}
 	}
-	else if (state_id === 3)
+	else if (newState === 3)
 	{
-		var destCurrObj = getCurrency((extra === undefined) ? this.content.dest_curr_id : extra);
-
-		setParam(this.expectedState, { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : true,
-									src_res_balance_left : true, dest_res_balance_left : false, exch_left : false,
+		setParam(res, { visibility : { dest_amount_left : true,	src_res_balance_left : true, exch_left : false,
 									src_amount_row : true, dest_amount_row : false, exchange_row : true,
-									result_balance_row : false, result_balance_dest_row : false },
-					values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-								source : { tile : { name : selectedAcc.name, balance : fmtBal } },
-								src_amount_row : { label : 'Source amount', currSign : currObj.sign, isCurrActive : false  },
-								dest_amount_row : { label : 'Destination amount', currSign : destCurrObj.sign, isCurrActive : true },
-								result_balance_row : { label : 'Result balance', isCurrActive : false }, src_res_balance_left : fmtResBal }
+									result_balance_row : false },
+					values : { src_amount_row : { label : 'Source amount' }, dest_amount_row : { label : 'Destination amount' } }
 					 		});
-		if (extra !== undefined)
-		{
-			setParam(this.expectedState.values, { dest_amount_left : formatCurrency(this.content.dest_amount_row.value, destCurrObj.id),
-							exch_left : '1 ' + destCurrObj.sign + '/' + currObj.sign,
-							exchange_row : { value : '1', currSign : destCurrObj.sign + '/' + currObj.sign } });
-		}
 	}
-	else if (state_id === 4)
+	else if (newState === 4)
 	{
-		var destCurrObj = getCurrency((extra === undefined) ? this.content.dest_curr_id : extra);
-
-
-		setParam(this.expectedState, { visibility : { source : true, destination : false, src_amount_left : false, dest_amount_left : true,
-									src_res_balance_left : false, dest_res_balance_left : false, exch_left : true,
+		setParam(res, { visibility : { dest_amount_left : true,
+									src_res_balance_left : false, exch_left : true,
 									src_amount_row : true, dest_amount_row : false, exchange_row : false,
-									result_balance_row : true, result_balance_dest_row : false },
-					values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
-								source : { tile : { name : selectedAcc.name, balance : fmtBal } },
-								src_amount_row : { label : 'Source amount', currSign : currObj.sign, isCurrActive : false  },
-								dest_amount_row : { label : 'Destination amount', currSign : destCurrObj.sign, isCurrActive : true },
-								result_balance_row : { label : 'Result balance', isCurrActive : false }, src_res_balance_left : fmtResBal }
+									result_balance_row : true },
+					values : { src_amount_row : { label : 'Source amount' },
+								dest_amount_row : { label : 'Destination amount' } }
 					 		});
-		if (extra !== undefined)
-		{
-			setParam(this.expectedState.values, { dest_amount_left : formatCurrency(this.content.dest_amount_row.value, destCurrObj.id),
-							exch_left : '1 ' + destCurrObj.sign + '/' + currObj.sign,
-							exchange_row : { value : '1', currSign : destCurrObj.sign + '/' + currObj.sign } });
-		}
 	}
 
-	// If source amount was copied then these values also must be updated
-	if ((state_id === 0 || state_id === 1) && copyAmount)
-	{
-		this.expectedState.values.src_amount_row.value = fSrcAmount.toString();
-		this.expectedState.values.result_balance_row.value = resBal.toString();
-	}
+	this.expectedState = res;
 
-	this.expectedState.extra = { id : state_id };
-
-	return this.expectedState;
+	return res;
 };
 
 
 ExpenseTransactionPage.prototype.inputSrcAmount = function(val)
 {
-	var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
+	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
-	var accCurrObj = getCurrency(selectedAcc.curr_id);
-	var destCurrObj = getCurrency(this.content.dest_curr_id);
-	var isDiffCurr = (accCurrObj.id != destCurrObj.id);
+	this.setSrcAmount(this.model, val);
 
-	var valueBefore = this.content.src_amount_row.value;
-	var isValid = isValidValue(valueBefore);
-	var fValue = (isValid) ? normalize(valueBefore) : valueBefore;
-
-	var isNewValid = isValidValue(val);
-	var fNewValue = (isNewValid) ? normalize(val) : val;
-	var fSrcAmountValue = fNewValue;
-
-	this.expectedState.values.src_amount_row.value = val;
-
-	if (fValue !== fNewValue)
+	if (this.model.isDiffCurr)
 	{
-		var newResBal = normalize(selectedAcc.balance - fNewValue);
-		this.expectedState.values.result_balance_row.value = newResBal.toString();
-		this.expectedState.values.src_res_balance_left = formatCurrency(newResBal, this.content.src_curr_id);
-
-		if (isDiffCurr)
-		{
-			var exchRate;
-			var destAmountValue = this.content.dest_amount_row.value;
-			var fDestAmountValue = isValidValue(destAmountValue) ? normalize(destAmountValue) : destAmountValue;
-
-			// Calculate exchange rate
-			if (fSrcAmountValue == 0)
-				exchRate = (fDestAmountValue == 0) ? 1 : 0;
-			else
-				exchRate = correctExch(fDestAmountValue / fSrcAmountValue);
-
-			var exchSign = destCurrObj.sign + '/' + accCurrObj.sign;
-			var backExchSign = accCurrObj.sign + '/' + destCurrObj.sign;
-
-			var exchText = exchSign;
-
-			if (isValidValue(exchRate) && exchRate != 0 && exchRate != 1)
-			{
-				var invExch = parseFloat((1 / exchRate).toFixed(5));
-
-				exchText += ' ('  + invExch + ' ' + backExchSign + ')';
-			}
-
-			setParam(this.expectedState.values,
-					{ exchange_row : { value : exchRate.toString(), currSign : exchSign }, exch_left : exchRate + ' ' + exchText });
-
-		}
+		this.calcExchByAmounts(this.model);
+		this.updateExch(this.model);
+	}
+	else
+	{
+		this.setDestAmount(this.model, this.model.srcAmount);
 	}
 
+	this.setExpectedState(this.model.state);
 
 	ExpenseTransactionPage.parent.inputSrcAmount.apply(this, arguments);
 };
@@ -200,114 +237,85 @@ ExpenseTransactionPage.prototype.inputSrcAmount = function(val)
 
 ExpenseTransactionPage.prototype.inputDestAmount = function(val)
 {
-	var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
+	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
-	var valueBefore = this.content.dest_amount_row.value;
-	var isValid = isValidValue(valueBefore);
-	var fValue = (isValid) ? normalize(valueBefore) : valueBefore;
+	this.model.destAmount = val;
 
-	var isNewValid = isValidValue(val);
-	var fNewValue = (isNewValid) ? normalize(val) : val;
-
-	this.expectedState.values.dest_amount_row.value = val;
-	this.expectedState.values.src_amount_row.value = normalize(val).toString();
-	this.expectedState.values.dest_amount_left = formatCurrency(fNewValue, this.content.dest_curr_id);
-
-	if (fValue !== fNewValue)
+	if (this.model.fDestAmount !== fNewValue)
 	{
-		var newResBal = normalize(selectedAcc.balance - fNewValue);
-		this.expectedState.values.src_res_balance_left = formatCurrency(newResBal, this.content.src_curr_id);
+		this.model.fDestAmount = fNewValue;
+
+		if (this.model.isDiffCurr)
+		{
+			this.calcExchByAmounts(this.model);
+			this.updateExch(this.model);
+		}
+		else
+			this.setSrcAmount(this.model, this.model.destAmount);
 	}
+
+	this.setExpectedState(this.model.state);
 
 	ExpenseTransactionPage.parent.inputDestAmount.apply(this, arguments);
 };
 
 
-
 ExpenseTransactionPage.prototype.inputResBalance = function(val)
 {
-	var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
-
-	var valueBefore = this.content.result_balance_row.value;
-	var isValid = isValidValue(valueBefore);
-	var fValue = (isValid) ? normalize(valueBefore) : valueBefore;
-
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
-	this.expectedState.values.result_balance_row.value = val;
+	this.model.srcResBal = val;
 
-	this.expectedState.values.src_res_balance_left = formatCurrency(fNewValue, this.content.dest_curr_id);
-
-	if (fValue !== fNewValue)
+	if (this.model.fSrcResBal !== fNewValue)
 	{
-		var newSrcAmount = normalize(selectedAcc.balance - fNewValue);
-		var fmtSrcAmount = formatCurrency(newSrcAmount, this.content.src_curr_id);
+		this.model.fSrcResBal = fNewValue;
+		this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
 
-		this.expectedState.values.src_amount_row.value = newSrcAmount.toString();
-		// Copy value to the destination amount
-		this.expectedState.values.dest_amount_left = fmtSrcAmount;
-		this.expectedState.values.dest_amount_row.value = newSrcAmount.toString();
+		var newSrcAmount = normalize(this.model.srcAccount.balance - fNewValue);
+
+		this.model.srcAmount = newSrcAmount;
+		this.model.fSrcAmount = isValidValue(newSrcAmount) ? normalize(newSrcAmount) : newSrcAmount;
+
+		if (this.model.isDiffCurr)
+		{
+			this.calcExchByAmounts(this.model);
+			this.updateExch(this.model);
+		}
+		else
+			this.setDestAmount(this.model, this.model.srcAmount);
 	}
+
+	this.setExpectedState(this.model.state);
 
 	ExpenseTransactionPage.parent.inputResBalance.apply(this, arguments);
 };
 
 
-
 ExpenseTransactionPage.prototype.inputExchRate = function(val)
 {
-	var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
+	if (this.model.state !== 3)
+		throw new Error('Unexpected state ' + this.model.state + ' to input exchange rate');
 
-	var accCurrObj = getCurrency(selectedAcc.curr_id);
-	var destCurrObj = getCurrency(this.content.dest_curr_id);
-	var isDiffCurr = (accCurrObj.id != destCurrObj.id);
-
-	var valueBefore = this.content.exchange_row.value;
-	var fValue = (isValidValue(valueBefore)) ? normalizeExch(valueBefore) : valueBefore;
+	this.model.exchRate = val;
 
 	var fNewValue = (isValidValue(val)) ? normalizeExch(val) : val;
-	var exchRate = fNewValue;
-
-	this.expectedState.values.exchange_row.value = val.toString();
-
-	if (fValue !== fNewValue)
+	if (this.model.fExchRate != fNewValue)
 	{
-		var exchSign = destCurrObj.sign + '/' + accCurrObj.sign;
-		var backExchSign = accCurrObj.sign + '/' + destCurrObj.sign;
-		var exchText = exchSign;
+		this.updateExch(this.model);
 
-		if (isValidValue(exchRate) && exchRate != 0 && exchRate != 1)
+		if (isValidValue(this.model.srcAmount))
 		{
-			var invExch = parseFloat((1 / exchRate).toFixed(5));
-			exchText += ' ('  + invExch + ' ' + backExchSign + ')';
+			var newDestAmount = correct(this.model.fSrcAmount * fNewValue);
+			this.setDestAmount(this.model, newDestAmount);
 		}
-
-		this.expectedState.values.exch_left = exchRate + ' ' + exchText;
-
-		var srcAmountValue = this.content.src_amount_row.value;
-		var isSrcAmountValid = isValidValue(srcAmountValue);
-		var fSrcAmountValue = (isSrcAmountValid) ? normalize(srcAmountValue) : srcAmountValue;
-
-		var destAmountValue = this.content.dest_amount_row.value;
-		var isDestAmountValid = isValidValue(destAmountValue);
-		var fDestAmountValue = (isDestAmountValid) ? normalize(destAmountValue) : destAmountValue;
-
-		if (isSrcAmountValid)
+		else if (isValidValue(this.model.destAmount))
 		{
-			var newDestAmount = correct(fSrcAmountValue * exchRate);
-			this.expectedState.values.dest_amount_row.value = newDestAmount.toString();
-			this.expectedState.values.dest_amount_left = formatCurrency(newDestAmount, destCurrObj.id);
+			var newSrcAmount = correct(this.model.fDestAmount / fNewValue);
+			this.setSrcAmount(this.model, newSrcAmount);
 		}
-		else if (isDestAmountValid)
-		{
-			var newSrcAmount = correct(fDestAmountValue / exchRate);
-			this.expectedState.values.src_amount_row.value = newSrcAmount.toString();
-		}
-
-		var newResBal = normalize(selectedAcc.balance - fSrcAmountValue);
-		this.expectedState.values.result_balance_row.value = newResBal.toString();
-		this.expectedState.values.src_res_balance_left = formatCurrency(newResBal, this.content.src_curr_id);
 	}
+
+	this.setExpectedState(3);
 
 	ExpenseTransactionPage.parent.inputExchRate.apply(this, arguments);
 };
@@ -315,132 +323,83 @@ ExpenseTransactionPage.prototype.inputExchRate = function(val)
 
 ExpenseTransactionPage.prototype.clickSrcResultBalance = function()
 {
-	var currState = (this.expectedState && this.expectedState.extra) ? parseInt(this.expectedState.extra.id) : 0;
-
-	if (currState === 0)
+	if (this.model.state === 0)
 		this.setExpectedState(1);
-	else if (currState === 2 || currState === 3)
+	else if (this.model.state === 2 || this.model.state === 3)
 		this.setExpectedState(4);
 
 	ExpenseTransactionPage.parent.clickSrcResultBalance.apply(this, arguments);
 };
 
 
-ExpenseTransactionPage.prototype.checkChangeSrcAccount = function(account_id)
+ExpenseTransactionPage.prototype.changeSrcAccount = function(account_id)
 {
-	var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
 	var newAcc = idSearch(viewframe.contentWindow.accounts, account_id);
-	var fmtBal = formatCurrency(newAcc.balance, newAcc.curr_id);
 
-	if (!selectedAcc || !newAcc || newAcc.id == selectedAcc.id)
+	if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 		return;
 
-	var accCurrObj = getCurrency(newAcc.curr_id);
-	var destCurrObj = getCurrency(this.content.dest_curr_id);
-	var isDiffCurr = (accCurrObj.id != destCurrObj.id);
+	this.model.srcAccount = newAcc;
+	this.model.src_curr_id = this.model.srcAccount.curr_id;
+	this.model.srcCurr = getCurrency(this.model.src_curr_id);
+	this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
 
-	if (!isDiffCurr && (this.expectedState.extra.id === 2 ||			// Transition 14
-						this.expectedState.extra.id === 3))				// Transition 15
+	// Copy source currency to destination currency if needed
+	if (this.model.state === 0 || this.model.state === 1)		// Transition 1 or 12
 	{
-		this.setExpectedState(0);
-	}
-	else if (this.expectedState.extra.id === 4 && !isDiffCurr)			// Transition 11
-	{
-		this.setExpectedState(1);
+		this.model.dest_curr_id = this.model.src_curr_id;
+		this.model.destCurr = this.model.srcCurr;
 	}
 
-	var destAmountValue = this.content.dest_amount_row.value;
-	var fDestAmountValue = isValidValue(destAmountValue) ? normalize(destAmountValue) : destAmountValue;
-
-	var fSrcAmountValue, fmtSrcAmount;
-
-	var srcResBalBefore = this.content.result_balance_row.value;
-	var isValid = isValidValue(srcResBalBefore);
-	var fResBalBefore = isValidValue(srcResBalBefore) ? normalize(srcResBalBefore) : srcResBalBefore;
-
-	var newResBal = normalize(newAcc.balance - fDestAmountValue);
-	var fmtResBal = formatCurrency(newResBal, newAcc.curr_id);
-
-	if (newResBal == fResBalBefore)
-		newResBal = srcResBalBefore;
-
-	var exchSign;
-
-	if (isDiffCurr && (this.expectedState.extra.id !== 0 && this.expectedState.extra.id !== 1))
+	// Update source result balance of source
+	var newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+	if (this.model.fSrcResBal != newSrcResBal)
 	{
-		var exchRate;
-		var srcAmountValue = this.content.src_amount_row.value;
-		fSrcAmountValue = isValidValue(srcAmountValue) ? normalize(srcAmountValue) : srcAmountValue;
+		this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;
+	}
+	this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.fSrcResBal);
 
-		fmtSrcAmount = formatCurrency(fSrcAmountValue, accCurrObj.id);
-		fmtDestAmount = formatCurrency(fDestAmountValue, destCurrObj.id);
+	// Update exchange rate
+	this.calcExchByAmounts(this.model);
+	this.updateExch(this.model);
 
-		if (fSrcAmountValue == 0)
-			exchRate = (fDestAmountValue == 0) ? 1 : 0;
+	this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
+	if (this.model.isDiffCurr)
+	{
+		if (this.model.state === 2 || this.model.state === 3 || this.model.state === 4)			// Transition 5, 17 or 10
+			this.setExpectedState(this.model.state);
 		else
-			exchRate = correctExch(fDestAmountValue / fSrcAmountValue);
-
-		exchSign = destCurrObj.sign + '/' + accCurrObj.sign;
-		var backExchSign = accCurrObj.sign + '/' + destCurrObj.sign;
-
-		var exchText = exchSign;
-
-		if (isValidValue(exchRate) && exchRate != 0 && exchRate != 1)
-		{
-			var invExch = parseFloat((1 / exchRate).toFixed(5));
-
-			exchText += ' ('  + invExch + ' ' + backExchSign + ')';
-		}
-
-		setParam(this.expectedState.values,
-					{ source : { tile : { name : newAcc.name, balance : fmtBal } },
-								src_amount_row : { label : 'Source amount', currSign : accCurrObj.sign  },
-								dest_amount_row : { label : 'Destination amount', currSign : destCurrObj.sign },
-								dest_amount_left : fmtDestAmount,
-								result_balance_row : { value : newResBal.toString() }, src_res_balance_left : fmtResBal,
-								exchange_row : { value : exchRate.toString(), currSign : exchSign }, exch_left : exchRate + ' ' + exchText });
+			throw new Error('Unexpected state ' + this.model.state + ' with different currencies');
 	}
 	else
 	{
-// Currency must be duplicated from source account
-		exchSign = accCurrObj.sign + '/' + accCurrObj.sign;
-
-		fSrcAmountValue = fDestAmountValue;
-		fmtSrcAmount = formatCurrency(fSrcAmountValue, accCurrObj.id);
-
-		setParam(this.expectedState.values,
-					{ source : { tile : { name : newAcc.name, balance : fmtBal } },
-								src_amount_row : { value : fSrcAmountValue.toString(), label : 'Amount', currSign : accCurrObj.sign  },
-								dest_amount_row : { value : fDestAmountValue.toString(), label : 'Amount', currSign : accCurrObj.sign },
-								dest_amount_left : fmtSrcAmount,
-								result_balance_row : { value : newResBal.toString() }, src_res_balance_left : fmtResBal,
-								exchange_row : { value : '1', currSign : exchSign }, exch_left : '1 ' + exchSign });
+		if (this.model.state === 2 ||			// Transition 14
+			this.model.state === 3)				// Transition 15
+		{
+			this.setDestAmount(this.model, this.model.srcAmount);
+			this.setExpectedState(0);
+		}
+		else if (this.model.state === 4)		// Transition 11
+		{
+			this.setDestAmount(this.model, this.model.srcAmount);
+			this.setExpectedState(1);
+		}
+		else									// Transition 1 or 12
+		{
+			this.setExpectedState(this.model.state);
+		}
 	}
-};
 
-
-ExpenseTransactionPage.prototype.changeSrcAccount = function(val)
-{
-	this.checkChangeSrcAccount(val);
 
 	ExpenseTransactionPage.parent.changeSrcAccount.apply(this, arguments);
 };
 
 
-ExpenseTransactionPage.prototype.changeSrcAccountByPos = function(pos)
-{
-	this.checkChangeSrcAccount(this.content.source.dropDown.items[pos].id);
-
-	ExpenseTransactionPage.parent.changeSrcAccountByPos.apply(this, arguments);
-};
-
-
 ExpenseTransactionPage.prototype.clickDestAmount = function()
 {
-	if (this.expectedState.extra.id === 1)		// Transition 3
+	if (this.model.state === 1)		// Transition 3
 		this.setExpectedState(0);
-	else if (this.expectedState.extra.id === 3 ||		// Transition 16
-				this.expectedState.extra.id === 4)		// Transition 7
+	else if (this.model.state === 3 || this.model.state === 4)		// Transition 16 or 7
 		this.setExpectedState(2);
 
 	ExpenseTransactionPage.parent.clickDestAmount.apply(this, arguments);
@@ -457,47 +416,36 @@ ExpenseTransactionPage.prototype.clickExchRate = function()
 
 ExpenseTransactionPage.prototype.changeDestCurrency = function(val)
 {
-	if (this.content.dest_curr_id != val)
+	if (this.model.dest_curr_id == val)
+		ExpenseTransactionPage.parent.changeDestCurrency.apply(this, arguments);
+
+	this.model.dest_curr_id = parseInt(val);
+	this.model.destCurr = getCurrency(this.model.dest_curr_id);
+
+	this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
+
+	if (this.model.isDiffCurr && this.model.state === 0)			// Transition 4
 	{
-		var selectedAcc = idSearch(viewframe.contentWindow.accounts, this.content.source.id);
-
-		if (this.expectedState.extra.id === 0)	// Transition 4
+		this.updateExch(this.model);
+		this.setExpectedState(2);
+	}
+	else if (this.model.state === 2)
+	{
+		if (this.model.isDiffCurr)			// Transition 13
 		{
-			this.setExpectedState(2, val);
+			this.updateExch(this.model);
+			this.setExpectedState(2);
 		}
-		else if (this.expectedState.extra.id === 2)
+		else								// Transition 9
 		{
-			var currObj = getCurrency(val);
-			var srcCurrObj = getCurrency(selectedAcc.curr_id);
-			var destAmountValue = this.content.dest_amount_row.value;
-			var fDestAmountValue = isValidValue(destAmountValue) ? normalize(destAmountValue) : destAmountValue;
-
-			if (val == selectedAcc.curr_id)				// Transition 9
-			{
-				this.setExpectedState(0, val);
-			}
-			else
-			{
-				var exchSign = currObj.sign + '/' + srcCurrObj.sign;
-				var backExchSign = srcCurrObj.sign + '/' + currObj.sign;
-				var exchText = exchSign;
-
-				var exchValue = this.content.exchange_row.value;
-				var exchRate = (isValidValue(exchValue)) ? normalizeExch(exchValue) : exchValue;
-
-				if (isValidValue(exchRate) && exchRate != 0 && exchRate != 1)
-				{
-					var invExch = parseFloat((1 / exchRate).toFixed(5));
-
-					exchText += ' ('  + invExch + ' ' + backExchSign + ')';
-				}
-
-				setParam(this.expectedState.values,
-				{ dest_amount_row : { currSign : currObj.sign }, dest_amount_left : formatCurrency(fDestAmountValue, currObj.id),
-			 		exchange_row : { currSign : exchSign }, exch_left : exchRate + ' ' + exchText });
-			}
+			this.setSrcAmount(this.model, this.model.destAmount);
+			this.calcExchByAmounts(this.model);
+			this.updateExch(this.model);
+			this.setExpectedState(0);
 		}
 	}
+	else
+		throw new Error('Unexpected transition');
 
 	ExpenseTransactionPage.parent.changeDestCurrency.apply(this, arguments);
 };
