@@ -5,10 +5,40 @@ function formatValue(val)
 }
 
 
+// Currency object constructor
+function Currency(props)
+{
+	this.id = props.id;
+	this.format = props.format;
+	this.sign = props.sign;
+}
+
+
+// Format specified value using rules of currency
+Currency.prototype.formatValue = function(val)
+{
+	var nval = normalize(val);
+
+	if (Math.floor(nval) != nval)
+		nval = nval.toFixed(2);
+
+	var fmtVal = formatValue(nval);
+
+	if (this.format)
+		return this.sign + ' ' + fmtVal;
+	else
+		return fmtVal + ' ' + this.sign;
+};
+
+
 // Return currency object for specified id
 function getCurrency(curr_id)
 {
-	return idSearch(currency, curr_id);
+	var currObj = idSearch(currency, curr_id);
+	if (!currObj)
+		return null;
+
+	return new Currency(currObj);
 }
 
 
