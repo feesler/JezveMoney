@@ -48,6 +48,19 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 };
 
 
+TransactionPage.prototype.getPageClass = function(str)
+{
+	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
+						'INCOME' : IncomeTransactionPage };
+
+	if (!str)
+		return null;
+
+	var key = str.toUpperCase();
+	return (strToClass[key] !== undefined) ? strToClass[key] : TransactionPage;
+};
+
+
 TransactionPage.prototype.parseContent = function()
 {
 	var res = {};
@@ -70,6 +83,8 @@ TransactionPage.prototype.parseContent = function()
 			menuItemObj.link = menuItem.href;
 			menuItemObj.isActive = false;
 		}
+
+		menuItemObj.pageClass = this.getPageClass(menuItemObj.text);
 
 		menuItemObj.click = function()
 		{
@@ -103,12 +118,45 @@ TransactionPage.prototype.parseContent = function()
 };
 
 
+TransactionPage.prototype.calcExchByAmounts = function(model)
+{
+	if (model.fSrcAmount == 0)
+		model.exchRate = (model.fDestAmount == 0) ? 1 : 0;
+	else
+		model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
+
+	return model
+};
+
+
+TransactionPage.prototype.updateExch = function(model)
+{
+	model.fExchRate = isValidValue(model.exchRate) ? normalizeExch(model.exchRate) : model.exchRate;
+
+	model.exchSign = model.destCurr.sign + '/' + model.srcCurr.sign;
+	model.backExchSign = model.srcCurr.sign + '/' + model.destCurr.sign;
+
+	var exchText = model.exchSign;
+
+	if (isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
+	{
+		model.invExchRate = parseFloat((1 / model.fExchRate).toFixed(5));
+
+		exchText += ' ('  + model.invExchRate + ' ' + model.backExchSign + ')';
+	}
+
+	model.fmtExch = model.fExchRate + ' ' + exchText;
+
+	return model;
+};
+
+
 TransactionPage.prototype.changeTransactionType = function(type)
 {
 	if (this.content.activeType == type || !this.content.typeMenu[type])
 		return;
 
-	return navigation(() => this.content.typeMenu[type].click(), TransactionPage);
+	return navigation(() => this.content.typeMenu[type].click(), this.content.typeMenu[type].pageClass);
 };
 
 
@@ -132,7 +180,7 @@ TransactionPage.prototype.changeDestAccount = function(val)
 
 TransactionPage.prototype.changeDestAccountByPos = function(pos)
 {
-	this.performAction(() => this.content.destination.selectAccount(this.content.destination.dropDown.items[pos].id));
+	this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
 };
 
 

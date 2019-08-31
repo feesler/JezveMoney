@@ -102,40 +102,6 @@ ExpenseTransactionPage.prototype.setDestAmount = function(model, val)
 };
 
 
-ExpenseTransactionPage.prototype.calcExchByAmounts = function(model)
-{
-	if (model.fSrcAmount == 0)
-		model.exchRate = (model.fDestAmount == 0) ? 1 : 0;
-	else
-		model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
-
-	return model
-};
-
-
-ExpenseTransactionPage.prototype.updateExch = function(model)
-{
-	model.fExchRate = isValidValue(model.exchRate) ? normalizeExch(model.exchRate) : model.exchRate;
-
-	model.exchSign = model.destCurr.sign + '/' + model.srcCurr.sign;
-	model.backExchSign = model.srcCurr.sign + '/' + model.destCurr.sign;
-
-	var exchText = model.exchSign;
-
-	if (isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
-	{
-		model.invExchRate = parseFloat((1 / model.fExchRate).toFixed(5));
-
-		exchText += ' ('  + model.invExchRate + ' ' + model.backExchSign + ')';
-	}
-
-	model.fmtExch = model.fExchRate + ' ' + exchText;
-
-	return model;
-};
-
-
-
 ExpenseTransactionPage.prototype.setExpectedState = function(state_id)
 {
 	var res = {};
@@ -351,7 +317,7 @@ ExpenseTransactionPage.prototype.changeSrcAccount = function(account_id)
 		this.model.destCurr = this.model.srcCurr;
 	}
 
-	// Update source result balance of source
+	// Update result balance of source
 	var newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 	if (this.model.fSrcResBal != newSrcResBal)
 	{
