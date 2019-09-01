@@ -18,8 +18,8 @@ ExpenseTransactionPage.prototype.buildModel = function(cont)
 	if (!res.srcAccount)
 		throw new Error('Source account not found');
 
-	res.src_curr_id = cont.src_amount_row ? cont.src_amount_row.hiddenValue : 0;
-	res.dest_curr_id = cont.dest_amount_row ? cont.dest_amount_row.hiddenValue : 0;
+	res.src_curr_id = cont.src_amount_row ? parseInt(cont.src_amount_row.hiddenValue) : 0;
+	res.dest_curr_id = cont.dest_amount_row ? parseInt(cont.dest_amount_row.hiddenValue) : 0;
 
 	if (res.srcAccount.curr_id != res.src_curr_id)
 		throw new Error('Unexpected source currency ' + res.src_curr_id + '(' + res.srcAccount.curr_id + ' is expected)');

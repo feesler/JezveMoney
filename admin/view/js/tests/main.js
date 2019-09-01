@@ -639,7 +639,7 @@ function transferTransactionStart(page)
 	setParam(state.values, { src_amount_row : { value : '1' }, src_amount_left : '1 ₽',
 								src_res_balance_left : '499.99 ₽', result_balance_row : { value : '499.99' },
 								dest_res_balance_left : '501.99 ₽', result_balance_dest_row : { value : '501.99' } });
-	test('Source amount (1) input', () => page.inputDestAmount(state.values.src_amount_row.value), page, state);
+	test('Source amount (1) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
 
 	state.values.src_amount_row.value = '1.';
 	test('Source amount (1.) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
