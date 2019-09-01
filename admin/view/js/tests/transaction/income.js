@@ -16,7 +16,7 @@ IncomeTransactionPage.prototype.buildModel = function(cont)
 
 	res.destAccount = idSearch(viewframe.contentWindow.accounts, cont.destination.id);
 	if (!res.destAccount)
-		throw new Error('Source account not found');
+		throw new Error('Destination account not found');
 
 	res.src_curr_id = cont.src_amount_row ? parseInt(cont.src_amount_row.hiddenValue) : 0;
 	res.dest_curr_id = cont.dest_amount_row ? parseInt(cont.dest_amount_row.hiddenValue) : 0;
@@ -125,50 +125,46 @@ IncomeTransactionPage.prototype.setExpectedState = function(state_id)
 							exch_left : this.model.fmtExch }
 				};
 
+	if (newState === 0 || newState === 1)
+	{
+		setParam(res.values, { src_amount_row : { label : 'Amount' },
+								dest_amount_row : { label : 'Amount' } });
+	}
+	else
+	{
+		setParam(res.values, { src_amount_row : { label : 'Source amount' },
+								dest_amount_row : { label : 'Destination amount' } });
+	}
+
 	if (newState === 0)
 	{
 		setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false, dest_res_balance_left : true, exch_left : false,
 									src_amount_row : true, dest_amount_row : false,
-									result_balance_dest_row : false, exchange_row : false },
-					values : { src_amount_row : { label : 'Amount' },
-								dest_amount_row : { label : 'Amount' } }
-							});
+									result_balance_dest_row : false, exchange_row : false } });
 	}
 	else if (newState === 1)
 	{
 		setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false, dest_res_balance_left : false, exch_left : false,
 									src_amount_row : false, dest_amount_row : false,
-									result_balance_dest_row : true, exchange_row : false },
-					values : { src_amount_row : { label : 'Amount' },
-								dest_amount_row : { label : 'Amount' } }
-							});
+									result_balance_dest_row : true, exchange_row : false } });
 	}
 	else if (newState === 2)
 	{
 		setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false, dest_res_balance_left : true, exch_left : true,
 									src_amount_row : true, dest_amount_row : true, exchange_row : false,
-									result_balance_dest_row : false },
-					values : { src_amount_row : { label : 'Source amount' },
-								dest_amount_row : { label : 'Destination amount' } }
-					 		});
+									result_balance_dest_row : false } });
 	}
 	else if (newState === 3)
 	{
 		setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true, dest_res_balance_left : true, exch_left : false,
 									src_amount_row : true, dest_amount_row : false, exchange_row : true,
-									result_balance_dest_row : false },
-					values : { src_amount_row : { label : 'Source amount' },
-								dest_amount_row : { label : 'Destination amount' } }
-					 		});
+									result_balance_dest_row : false } });
 	}
 	else if (newState === 4)
 	{
 		setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true, dest_res_balance_left : false, exch_left : true,
 									src_amount_row : true, dest_amount_row : false, exchange_row : false,
-									result_balance_dest_row : true },
-					values : { src_amount_row : { label : 'Source amount' },
-								dest_amount_row : { label : 'Destination amount' } }
-					 		});
+									result_balance_dest_row : true } });
 	}
 
 	this.expectedState = res;

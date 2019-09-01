@@ -122,55 +122,49 @@ ExpenseTransactionPage.prototype.setExpectedState = function(state_id)
 							result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance', isCurrActive : false },
 							src_res_balance_left : this.model.fmtSrcResBal,
 							exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
-							exch_left : this.model.fmtExch }
-				};
+							exch_left : this.model.fmtExch } };
+
+	if (newState === 0 || newState === 1)
+	{
+		setParam(res.values, { src_amount_row : { label : 'Amount' },
+								dest_amount_row : { label : 'Amount' } });
+	}
+	else
+	{
+		setParam(res.values, { src_amount_row : { label : 'Source amount' },
+								dest_amount_row : { label : 'Destination amount' } });
+	}
 
 	if (newState === 0)
 	{
 		setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : false,
 									src_amount_row : false, dest_amount_row : true, exchange_row : false,
-									result_balance_row : false },
-					values : { src_amount_row : { label : 'Amount' },
-								dest_amount_row : { label : 'Amount' },
-								exchange_row : { value : '1' }, exch_left : '1 ' + this.model.exchSign }
-							});
+									result_balance_row : false } });
 	}
 	else if (newState === 1)
 	{
 		setParam(res, { visibility : { dest_amount_left : true, src_res_balance_left : false, exch_left : false,
 									src_amount_row : false, dest_amount_row : false, exchange_row : false,
-									result_balance_row : true },
-					values : { src_amount_row : { label : 'Amount' },
-								dest_amount_row : { label : 'Amount' },
-								exch_left : '1 ' + this.model.exchSign, exchange_row : { value : '1' } },
-						 	});
+									result_balance_row : true } });
 	}
 	else if (newState === 2)
 	{
 		setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : true,
 									src_amount_row : true, dest_amount_row : true, exchange_row : false,
-									result_balance_row : false },
-					values : { src_amount_row : { label : 'Source amount' },
-								dest_amount_row : { label : 'Destination amount' } }
-					 		});
+									result_balance_row : false } });
 	}
 	else if (newState === 3)
 	{
 		setParam(res, { visibility : { dest_amount_left : true,	src_res_balance_left : true, exch_left : false,
 									src_amount_row : true, dest_amount_row : false, exchange_row : true,
-									result_balance_row : false },
-					values : { src_amount_row : { label : 'Source amount' }, dest_amount_row : { label : 'Destination amount' } }
-					 		});
+									result_balance_row : false } });
 	}
 	else if (newState === 4)
 	{
 		setParam(res, { visibility : { dest_amount_left : true,
 									src_res_balance_left : false, exch_left : true,
 									src_amount_row : true, dest_amount_row : false, exchange_row : false,
-									result_balance_row : true },
-					values : { src_amount_row : { label : 'Source amount' },
-								dest_amount_row : { label : 'Destination amount' } }
-					 		});
+									result_balance_row : true } });
 	}
 
 	this.expectedState = res;
