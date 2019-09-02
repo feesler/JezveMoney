@@ -51,7 +51,8 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 TransactionPage.prototype.getPageClass = function(str)
 {
 	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
-						'INCOME' : IncomeTransactionPage };
+						'INCOME' : IncomeTransactionPage,
+					 	'TRANSFER' : TransferTransactionPage };
 
 	if (!str)
 		return null;
@@ -115,6 +116,56 @@ TransactionPage.prototype.parseContent = function()
 	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
 
 	return res;
+};
+
+
+// Return zero if no account can't be found
+TransactionPage.prototype.getAccount = function(acc_id)
+{
+	return idSearch(viewframe.contentWindow.accounts, acc_id);
+};
+
+
+// Return current position of account in accounts array
+// Return -1 in case account can't be found
+TransactionPage.prototype.getAccountPos = function(acc_id)
+{
+	var data = viewframe.contentWindow.accounts;
+	var pos = -1;
+
+	if (!isArray(data) || !acc_id)
+		return -1;
+
+	data.some(function(acc, ind)
+	{
+		var cond = (acc_id == acc.id);
+		if (cond)
+			pos = ind;
+
+		return cond;
+	});
+
+	return pos;
+};
+
+
+// Return another account id if possible
+// Return zero if no account can't be found
+TransactionPage.prototype.getNextAccount = function(acc_id)
+{
+	var data = viewframe.contentWindow.accounts;
+	var pos;
+
+	if (!isArray(data) || data.length < 2 || !acc_id)
+		return -1;
+
+	pos = this.getAccountPos(acc_id);
+	if (pos == -1)
+		return 0;
+
+	pos = ((pos == data.length - 1) ? 0 : pos + 1);
+
+	return data[pos].id;
 };
 
 

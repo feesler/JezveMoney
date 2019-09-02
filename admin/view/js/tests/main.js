@@ -76,7 +76,9 @@ function accountTests(page)
 			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 }))
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }));
+			.then(page => createAccountWithParam(page, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }))
+			.then(page => page.goToCreateAccount())
+			.then(page => createAccountWithParam(page, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 }))
 }
 
 
@@ -619,155 +621,212 @@ function incomeTransactionStart(page)
 
 function transferTransactionStart(page)
 {
-	var state = { visibility : { source : true, destination : true, src_amount_left : false, dest_amount_left : false,
-								src_res_balance_left : true, dest_res_balance_left : true, exch_left : false,
-								src_amount_row : true, dest_amount_row : false, exchange_row : false, result_balance_row : false,
-								result_balance_dest_row : false },
-				values : { typeMenu : { 3 : { isActive : true } }, /* TRANSFER */
-							source : { tile : { name : 'acc_3', balance : '500.99 ₽' } },
-							destination : { tile : { name : 'acc RUB', balance : '500.99 ₽' } },
-							src_amount_row : { label : 'Amount', value : '', currSign : '₽', isCurrActive : false },
-							src_res_balance_left : '500.99 ₽',
-							result_balance_row : { value : '500.9', value : '', currSign : '₽', isCurrActive : false },
-							dest_res_balance_left : '500.99 ₽',
-							result_balance_dest_row : { value : '500.09', value : '', currSign : '₽', isCurrActive : false }, } };
-
 	setBlock('Transfer', 2);
-	test('Initial state of new transfer page', () => {}, page, state);
+	test('Initial state of new transfer page', () => page.setExpectedState(0), page);
 
 // Input source amount
-	setParam(state.values, { src_amount_row : { value : '1' }, src_amount_left : '1 ₽',
-								src_res_balance_left : '499.99 ₽', result_balance_row : { value : '499.99' },
-								dest_res_balance_left : '501.99 ₽', result_balance_dest_row : { value : '501.99' } });
-	test('Source amount (1) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
+	test('Source amount (1) input', () => page.inputSrcAmount('1'), page);
+	test('Source amount (1.) input', () => page.inputSrcAmount('1.'), page);
+	test('Source amount (1.0) input', () => page.inputSrcAmount('1.0'), page);
+	test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page);
+	test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page);
+	test('Source amount (1.0101) input', () => page.inputSrcAmount('1.0101'), page);
+	test('Emptry source amount input', () => page.inputSrcAmount(''), page);
+	test('Source amount (.) input', () => page.inputSrcAmount('.'), page);
+	test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page);
+	test('Source amount (.09) input', () => page.inputSrcAmount('.09'), page);
 
-	state.values.src_amount_row.value = '1.';
-	test('Source amount (1.) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
+// Transition 7: Change destination account to another one with same currency as source (EUR)
+	test('(7) Change destination account', () => page.changeDestAccountByPos(0), page);
+// Transition 5: Change source account to another one with same currency as destination (USD)
+	test('(5) Change source account', () => page.changeSrcAccountByPos(0), page);
 
-	state.values.src_amount_row.value = '1.0';
-	test('Source amount (1.0) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	setParam(state.values, { src_amount_row : { value : '1.01' }, src_amount_left : '1.01 ₽',
-								src_res_balance_left : '499.98 ₽', result_balance_row : { value : '499.98' },
-								dest_res_balance_left : '502 ₽', result_balance_dest_row : { value : '502' } });
-	test('Source amount (1.01) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '1.010';
-	test('Source amount (1.010) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '1.0101';
-	test('Source amount (1.0101) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	setParam(state.values, { src_amount_row : { value : '' }, src_amount_left : '0 ₽',
-								src_res_balance_left : '500.99 ₽', result_balance_row : { value : '500.99' },
-								dest_res_balance_left : '500.99 ₽', result_balance_dest_row : { value : '500.99' } });
-	test('Emptry source amount input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '.';
-	test('Source amount (.) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	state.values.src_amount_row.value = '.0';
-	test('Source amount (.0) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-	setParam(state.values, { src_amount_row : { value : '.09' }, src_amount_left : '0.09 ₽',
-								src_res_balance_left : '500.90 ₽', result_balance_row : { value : '500.9' },
-								dest_res_balance_left : '501.08 ₽', result_balance_dest_row : { value : '501.08' } });
-	test('Source amount (.09) input', () => page.inputSrcAmount(state.values.src_amount_row.value), page, state);
-
-// Click by source balance
-	setParam(state.visibility, { src_res_balance_left : false, result_balance_row : true, src_amount_left : true, src_amount_row : false });
-	test('Click on destination result balance', () => page.clickSrcResultBalance(), page, state);
+// Transition 1: Click by source balance and move from State 0 to State 1
+	test('(1) Click on source result balance', () => page.clickSrcResultBalance(), page);
 
 // Input source result balance
-	setParam(state.values, { result_balance_row : { value : '400' }, src_res_balance_left : '400 ₽',
-								result_balance_dest_row : { value : '601.98' }, dest_res_balance_left : '601.98 ₽',
-								src_amount_left : '100.99 ₽', src_amount_row : { value : '100.99' } });
-	test('Result balance (400) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
+	test('Source result balance (400) input', () => page.inputResBalance('400'), page);
+	test('Source result balance (400.) input', () => page.inputResBalance('400.'), page);
+	test('Source result balance (400.9) input', () => page.inputResBalance('400.9'), page);
+	test('Source result balance (400.99) input', () => page.inputResBalance('400.99'), page);
+	test('Source result balance (400.990) input', () => page.inputResBalance('400.990'), page);
+	test('Source result balance (400.9901) input', () => page.inputResBalance('400.9901'), page);
+	test('Empty result balance input', () => page.inputResBalance(''), page);
+	test('Source result balance (.) input', () => page.inputResBalance('.'), page);
+	test('Source result balance (.0) input', () => page.inputResBalance('.0'), page);
+	test('Source result balance (.01) input', () => page.inputResBalance('.01'), page);
 
-	state.values.result_balance_row.value = '400.';
-	test('Result balance (400.) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	setParam(state.values, { result_balance_row : { value : '400.9' }, src_res_balance_left : '400.90 ₽',
-								result_balance_dest_row : { value : '601.08' }, dest_res_balance_left : '601.08 ₽',
-								src_amount_left : '100.09 ₽', src_amount_row : { value : '100.09' } });
-	test('Result balance (400.9) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	setParam(state.values, { result_balance_row : { value : '400.99' }, src_res_balance_left : '400.99 ₽',
-								result_balance_dest_row : { value : '600.99' }, dest_res_balance_left : '600.99 ₽',
-								src_amount_left : '100 ₽', src_amount_row : { value : '100' } });
-	test('Result balance (400.99) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	state.values.result_balance_row.value = '400.990';
-	test('Result balance (400.990) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	state.values.result_balance_row.value = '400.9901';
-	test('Result balance (400.9901) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	setParam(state.values, { result_balance_row : { value : '' }, src_res_balance_left : '0 ₽',
-								result_balance_dest_row : { value : '1001.98' }, dest_res_balance_left : '1 001.98 ₽',
-								src_amount_left : '500.99 ₽', src_amount_row : { value : '500.99' } });
-	test('Empty result balance input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	state.values.result_balance_row.value = '.';
-	test('Result balance (.) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	state.values.result_balance_row.value = '.0';
-	test('Result balance (.0) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-	setParam(state.values, { result_balance_row : { value : '.01' }, src_res_balance_left : '0.01 ₽',
-								result_balance_dest_row : { value : '1001.97' }, dest_res_balance_left : '1 001.97 ₽',
-								src_amount_left : '500.98 ₽', src_amount_row : { value : '500.98' } });
-	test('Result balance (.01) input', () => page.inputResBalance(state.values.result_balance_row.value), page, state);
-
-// CLick on destination amount
-	setParam(state.visibility, { dest_res_balance_left : false, result_balance_dest_row : true, src_res_balance_left : true, result_balance_row : false });
-	test('Click on destination result balance', () => page.clickDestResultBalance(), page, state);
+// Transition 11: Change source account to another one with same currency as destination
+	test('(11) Change source account', () => page.changeSrcAccountByPos(4), page);
+// Transition 13: Change destination account to another one with same currency as source
+	test('(13) Change destination account', () => page.changeDestAccountByPos(4), page);
+// Transition 9: Click by destination balance and move from State 1 to State 2
+	test('(9) Click on destination result balance', () => page.clickDestResultBalance(), page);
 
 // Input destination result balance
-	setParam(state.values, { result_balance_dest_row : { value : '600' }, dest_res_balance_left : '600 ₽',
-								result_balance_row : { value : '401.98' }, src_res_balance_left : '401.98 ₽',
-								src_amount_left : '99.01 ₽', src_amount_row : { value : '99.01' } });
-	test('Result balance (600) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
+	test('Destination result balance (600) input', () => page.inputDestResBalance('600'), page);
+	test('Destination result balance (600.) input', () => page.inputDestResBalance('600.'), page);
+	test('Destination result balance (600.9) input', () => page.inputDestResBalance('600.9'), page);
+	test('Destination result balance (600.90) input', () => page.inputDestResBalance('600.90'), page);
+	test('Destination result balance (600.901) input', () => page.inputDestResBalance('600.901'), page);
+	test('Destination result balance (600.9010) input', () => page.inputDestResBalance('600.9010'), page);
+	test('Destination result balance (600.90101) input', () => page.inputDestResBalance('600.90101'), page);
+	test('Empty destination result balance input', () => page.inputDestResBalance(''), page);
+	test('Destination result balance (.) input', () => page.inputDestResBalance('.'), page);
+	test('Destination result balance (.0) input', () => page.inputDestResBalance('.0'), page);
 
-	state.values.result_balance_dest_row.value = '600.';
-	test('Result balance (600.) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
+// Transition 15: Change source account to another one with same currency and stay on State 2
+	test('(15) Change source account', () => page.changeSrcAccountByPos(4), page);
+// Transition 17: Change destination account to another one with same currency and stay on State 2
+	test('(17) Change destination account', () => page.changeDestAccount(4), page);
+// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
+	test('(16) Change source account', () => page.changeSrcAccountByPos(2), page);
+// Transition 26: Change source account to another one with different currency (EUR) and stay on State 5
+	test('(26) Change source account', () => page.changeSrcAccountByPos(3), page);
+// Transition 28: Change destination account to another one with different currency and stay on State 5
+	test('(28) Change destination account', () => page.changeDestAccountByPos(0), page);
+// Transition 27: Change source account to another one with same currency as destination (RUB) and move from State 5 to State 2
+	test('(27) Change source account', () => page.changeSrcAccountByPos(1), page);
+// Transition 18: Change destination account to another one with different currency than source (USD) and move from State 2 to State 5
+	test('(18) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 29: Change destination account to another one with same currency as source and move from State 5 to State 2
+	test('(29) Change destination account', () => page.changeDestAccountByPos(0), page);
+// Transition 10: Click by source balance and move from State 1 to State 2
+	test('(10) Click on source result balance', () => page.clickSrcResultBalance(), page);
+// Transition 2: Click by source amount and move from State 1 to State 0
+	test('(2) Click on source amount', () => page.clickSrcAmount(), page);
+// Transition 6: Change source account to another one with different currency than destination (USD) and move from State 0 to State 3
+	test('(6) Change source account', () => page.changeSrcAccountByPos(2), page);
+// Transition 43: Change source account to another one with different currency than destination (RUB) and stay on State 3
+	test('(43) Change source account', () => page.changeSrcAccountByPos(1), page);
+// Transition 41: Change destination account to another one with same currency as source (EUR) and stay on State 3
+	test('(41) Change destination account', () => page.changeDestAccountByPos(3), page);
+// Transition 44: Change source account to another one with same currency as destination (EUR > RUB) and move from State 3 to State 0
+	test('(44) Change source account', () => {
+		page.changeSrcAccountByPos(3);
+		page.changeSrcAccountByPos(0);
+	}, page);
 
-	setParam(state.values, { result_balance_dest_row : { value : '600.9' }, dest_res_balance_left : '600.90 ₽',
-								result_balance_row : { value : '401.08' }, src_res_balance_left : '401.08 ₽',
-								src_amount_left : '99.91 ₽', src_amount_row : { value : '99.91' } });
-	test('Result balance (600.9) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
+// Transition 8: Change destination account to another one with different currency than source (USD) and move from State 0 to State 3
+	test('(8) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 42: Change destination account to another one with same currency as source (RUB) and move from State 3 to State 0
+	test('(42) Change destination account', () => page.changeDestAccountByPos(1), page);
+// Transition 1: Click by source balance and move from State 0 to State 1
+	test('(1) Click on source result balance', () => page.clickSrcResultBalance(), page);
+// Transition 12: Change source account to another one with different currency than destination (EUR) and move from State 1 to State 4
+	test('(12) Change source account', () => page.changeSrcAccountByPos(3), page);
+// Transition 36: Change source account to another one with different currency than destination (USD) and stay on State 4
+	test('(36) Change source account', () => page.changeSrcAccountByPos(1), page);
+// Transition 38: Change destination account to another one with different currency than source (RUB) and stay on State 4
+	test('(38) Change destination account', () => page.changeDestAccountByPos(3), page);
+// Transition 39: Change destination account to another one with same currency as source (RUB) and move from State 4 to State 1
+	test('(39) Change destination account', () => page.changeDestAccountByPos(3), page);
+// Transition 14: Change destination account to another one with different currency than source (USD) and move from State 1 to State 4
+	test('(14) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 32: Click by destination result balance and move from State 4 to State 6
+	test('(32) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 49: Change source account to another one with different currency than destination (EUR) and stay on State 6
+	test('(49) Change source account', () => page.changeSrcAccountByPos(3), page);
+// Transition 47: Change destination account to another one with different currency than source (RUB) and stay on State 6
+	test('(47) Change destination account', () => page.changeDestAccountByPos(0), page);
+// Transition 20: Click by source amount and move from State 6 to State 5
+	test('(20) Click on source amount', () => page.clickSrcAmount(), page);
+// Transition 19: Click by source result balance and move from State 5 to State 6
+	test('(19) Click on source result balance', () => page.clickSrcResultBalance(), page);
+// Transition 45: Click by exchange rate and move from State 6 to State 8
+	test('(45) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 51: Change source account to another one with different currency than destination (USD) and stay on State 6
+	test('(51) Change source account', () => page.changeSrcAccountByPos(2), page);
+// Transition 53: Change destination account to another one with different currency than source (EUR) and stay on State 6
+	test('(53) Change destination account', () => page.changeDestAccountByPos(3), page);
+// Transition 23: Click by source amount and move from State 8 to State 7
+	test('(23) Click on source amount', () => page.clickSrcAmount(), page);
+// Transition 57: Change source account to another one with different currency than destination (RUB) and stay on State 7
+	test('(57) Change source account', () => page.changeSrcAccountByPos(0), page);
+// Transition 59: Change destination account to another one with different currency than source (USD) and stay on State 7
+	test('(59) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 22: Click by source result balance and move from State 7 to State 8
+	test('(22) Click on source result balance', () => page.clickSrcResultBalance(), page);
+// Transition 46: Click by destination result balance and move from State 8 to State 6
+	test('(46) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 33: Click by destination amount and move from State 6 to State 4
+	test('(33) Click on destination amount', () => page.clickDestAmount(), page);
+// Transition 37: Change source account to another one with same currency as destination (RUB) and from State 4 to State 1
+	test('(37) Change source account', () => {
+		page.changeSrcAccountByPos(3);		// change source to EUR first
+		page.changeDestAccountByPos(4)		// change destination to RUB
+		page.changeSrcAccountByPos(0);		// change source to RUB
+	}, page);
 
-	state.values.result_balance_dest_row.value = '600.90';
-	test('Result balance (600.90) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
+// Transition 2: Click by source amount and move from State 1 to State 0
+	test('(2) Click on source amount', () => page.clickSrcAmount(), page);
+// Transition 3: Click by destination result balance and move from State 0 to State 2
+	test('(3) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 4: Click by source amount and move from State 2 to State 0
+	test('(4) Click on source amount', () => page.clickSrcAmount(), page);
+// Transition 3: Click by destination result balance and move from State 0 to State 2
+	test('(3) Click on destination result balance', () => page.clickDestResultBalance(), page);
 
-	state.values.result_balance_dest_row.value = '600.901';
-	test('Result balance (600.901) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
-
-	state.values.result_balance_dest_row.value = '600.9010';
-	test('Result balance (600.9010) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
-
-	state.values.result_balance_dest_row.value = '600.90101';
-	test('Result balance (600.90101) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
-
-	setParam(state.values, { result_balance_dest_row : { value : '' }, dest_res_balance_left : '0 ₽',
-								result_balance_row : { value : '1001.98' }, src_res_balance_left : '1 001.98 ₽',
-								src_amount_left : '-500.99 ₽', src_amount_row : { value : '-500.99' } });
-	test('Empty destination result balance input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
-
-	state.values.result_balance_dest_row.value = '.';
-	test('Result balance (.) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
-
-	state.values.result_balance_dest_row.value = '.0';
-	test('Result balance (.0) input', () => page.inputDestResBalance(state.values.result_balance_dest_row.value), page, state);
-
-// Change source account to another one with different currency (USD)
-	setParam(state.visibility, { src_amount_row : true, src_amount_left : false, exch_left : true,
-								dest_amount_left : true });
-	setParam(state.values, { source : { tile : { name : 'acc USD', balance : '$ 500.99' } },
-								result_balance_row : { currSign : '$', value : '1001.98' }, src_res_balance_left : '$ 1 001.98',
-								src_amount_left : '$ -500.99', src_amount_row : { currSign : '$', label : 'Source amount', value : '-500.99' },
-								dest_amount_left : '-500.99 ₽', dest_amount_row : { label : 'Destination amount', value : '-500.99' } });
-	test('Change source account', () => page.changeSrcAccountByPos(2), page, state);
+// Transition 18: Change destination account to another one with different currency than source (USD) and move from State 2 to State 5
+	test('(18) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 21: Click by exchange rate and move from State 5 to State 7
+	test('(21) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 55: Click by destination amount and move from State 7 to State 3
+	test('(55) Click on destination amount', () => page.clickDestAmount(), page);
+// Transition 25: Click by destination result balance and move from State 3 to State 5
+	test('(25) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 21: Click by exchange rate and move from State 5 to State 7
+	test('(21) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 56: Click by destination result balance and move from State 7 to State 5
+	test('(56) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 24: Click by destination amount and move from State 5 to State 3
+	test('(24) Click on destination amount', () => page.clickDestAmount(), page);
+// Transition 40: Click by exchange rate and move from State 3 to State 7
+	test('(40) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 60: Change destination account to another one with same currency as source (RUB) and move from State 7 to State 0
+	test('(60) Change destination account', () => page.changeDestAccountByPos(1), page);
+// Transition 3: Click by destination result balance and move from State 0 to State 2
+	test('(3) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
+	test('(16) Change source account', () => page.changeSrcAccountByPos(2), page);
+// Transition 21: Click by exchange rate and move from State 5 to State 7
+	test('(21) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 58: Change source account to another one with same currency as destination (RUB) and from State 7 to State 0
+	test('(58) Change source account', () => page.changeSrcAccountByPos(0), page);
+// Transition 1: Click by source result balance and move from State 7 to State 8
+	test('(1) Click on source result balance', () => page.clickSrcResultBalance(), page);
+// Transition 12: Change source account to another one with different currency than destination (EUR) and move from State 1 to State 4
+	test('(12) Change source account', () => page.changeSrcAccountByPos(3), page);
+// Transition 30: Click by source amount and move from State 4 to State 3
+	test('(30) Click on source amount', () => page.clickSrcAmount(), page);
+// Transition 31: Click by source result balance and move from State 3 to State 4
+	test('(31) Click on source result balance', () => page.clickSrcResultBalance(), page);
+// Transition 34: Click by exchange rate and move from State 4 to State 8
+	test('(34) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 35: Click by destination amount and move from State 8 to State 4
+	test('(35) Click on destination amount', () => page.clickDestAmount(), page);
+// Transition 34: Click by exchange rate and move from State 4 to State 8
+	test('(34) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 52: Change source account to another one with same currency as destination (RUB) and from State 8 to State 1
+	test('(52) Change source account', () => page.changeSrcAccountByPos(0), page);
+// Transition 14: Change destination account to another one with different currency than source (USD) and move from State 1 to State 4
+	test('(14) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 34: Click by exchange rate and move from State 4 to State 8
+	test('(34) Click on exchange rate', () => page.clickExchRate(), page);
+// Transition 54: Change destination account to another one with same currency as source (RUB) and move from State 8 to State 1
+	test('(54) Change destination account', () => page.changeDestAccountByPos(1), page);
+// Transition 12: Change source account to another one with different currency than source (USD) and move from State 1 to State 4
+	test('(12) Change source account', () => page.changeSrcAccountByPos(2), page);
+// Transition 32: Click by destination result balance and move from State 4 to State 6
+	test('(32) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 50: Change source account to another one with same currency as destination (RUB) and from State 6 to State 1
+	test('(50) Change source account', () => page.changeSrcAccountByPos(0), page);
+// Transition 14: Change destination account to another one with different currency than source (USD) and move from State 1 to State 4
+	test('(14) Change destination account', () => page.changeDestAccountByPos(2), page);
+// Transition 32: Click by destination result balance and move from State 4 to State 6
+	test('(32) Click on destination result balance', () => page.clickDestResultBalance(), page);
+// Transition 48: Change destination account to another one with same currency as source (RUB) and move from State 1 to State 2
+	test('(48) Change destination account', () => page.changeDestAccountByPos(1), page);
 
 	return Promise.resolve(page);
 }
