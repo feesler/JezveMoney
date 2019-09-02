@@ -500,7 +500,7 @@ TestPage.prototype.checkValues = function(controls)
 
 	if (res !== true)
 	{
-		if (res.expected)
+		if ('expected' in res)
 			throw new Error('Not expected value "' + res.value + '" for (' + res.key + ') "' + res.expected  + '" is expected');
 		else
 			throw new Error('Path (' + res.key + ') not found');
