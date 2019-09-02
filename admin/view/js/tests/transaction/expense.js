@@ -14,7 +14,7 @@ ExpenseTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
-	res.srcAccount = idSearch(viewframe.contentWindow.accounts, cont.source.id);
+	res.srcAccount = this.getAccount(cont.source.id);
 	if (!res.srcAccount)
 		throw new Error('Source account not found');
 
@@ -294,7 +294,7 @@ ExpenseTransactionPage.prototype.clickSrcResultBalance = function()
 
 ExpenseTransactionPage.prototype.changeSrcAccount = function(account_id)
 {
-	var newAcc = idSearch(viewframe.contentWindow.accounts, account_id);
+	var newAcc = this.getAccount(account_id);
 
 	if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 		return;

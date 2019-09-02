@@ -14,11 +14,11 @@ TransferTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
-	res.srcAccount = idSearch(viewframe.contentWindow.accounts, cont.source.id);
+	res.srcAccount = this.getAccount(cont.source.id);
 	if (!res.srcAccount)
 		throw new Error('Source account not found');
 
-	res.destAccount = idSearch(viewframe.contentWindow.accounts, cont.destination.id);
+	res.destAccount = this.getAccount(cont.destination.id);
 	if (!res.destAccount)
 		throw new Error('Destination account not found');
 
@@ -432,7 +432,7 @@ TransferTransactionPage.prototype.clickDestResultBalance = function()
 
 TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
 {
-	var newAcc = idSearch(viewframe.contentWindow.accounts, account_id);
+	var newAcc = this.getAccount(account_id);
 
 	if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 		return;
@@ -519,7 +519,7 @@ TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
 
 TransferTransactionPage.prototype.changeDestAccount = function(account_id)
 {
-	var newAcc = idSearch(viewframe.contentWindow.accounts, account_id);
+	var newAcc = this.getAccount(account_id);
 
 	if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 		return;
@@ -540,7 +540,7 @@ TransferTransactionPage.prototype.changeDestAccount = function(account_id)
 	if (newAcc.id == this.model.srcAccount.id)
 	{
 		var nextAcc_id = this.getNextAccount(newAcc.id);
-		var newSrcAcc = idSearch(viewframe.contentWindow.accounts, nextAcc_id);
+		var newSrcAcc = this.getAccount(nextAcc_id);
 		if (!newSrcAcc)
 			throw new Error('Next account not found');
 		this.model.srcAccount = newSrcAcc;

@@ -14,7 +14,7 @@ IncomeTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
-	res.destAccount = idSearch(viewframe.contentWindow.accounts, cont.destination.id);
+	res.destAccount = this.getAccount(cont.destination.id);
 	if (!res.destAccount)
 		throw new Error('Destination account not found');
 
@@ -294,7 +294,7 @@ IncomeTransactionPage.prototype.clickDestResultBalance = function()
 
 IncomeTransactionPage.prototype.changeDestAccount = function(account_id)
 {
-	var newAcc = idSearch(viewframe.contentWindow.accounts, account_id);
+	var newAcc = this.getAccount(account_id);
 
 	if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 		return;
