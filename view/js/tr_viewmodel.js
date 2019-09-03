@@ -1447,7 +1447,7 @@ function TransactionViewModel()
 		}
 
 
-		if (Transaction.isIncome() || (Transaction.isDebt() && !Transaction.debtType()))
+		if (Transaction.isIncome())
 		{
 			srcCurrDDList = new DDList();
 			if (srcCurrDDList.create({ input_id : 'srcamountsign', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : self.isMobile }))
@@ -1461,7 +1461,7 @@ function TransactionViewModel()
 				srcCurrDDList = null;
 		}
 
-		if (Transaction.isExpense() || (Transaction.isDebt() && Transaction.debtType()))
+		if (Transaction.isExpense())
 		{
 			destCurrDDList = new DDList();
 			if (destCurrDDList.create({ input_id : 'destamountsign', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : self.isMobile }))
