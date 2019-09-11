@@ -362,7 +362,6 @@ TestPage.prototype.parseInputRow = function(elem)
 };
 
 
-
 TestPage.prototype.parseWarningPopup = function(elem)
 {
 	if (!elem)
@@ -416,18 +415,38 @@ TestPage.prototype.performAction = function(action)
 };
 
 
-TestPage.prototype.checkVisibility = function(controls)
+// Compare visibiliy of specified controls with expected mask
+// In the controls object each value must be an object with 'elem' property containing pointer to DOM element
+// In the expected object each value must be a boolean value
+// For false expected control may be null or invisible
+// Both controls and expected object may contain nested objects
+// Example:
+//     controls : { control_1 : { elem : Element }, control_2 : { childControl : { elem : Element } } }
+//     expected : { control_1 : true, control_2 : { childControl : true, invControl : false }, control_3 : false }
+TestPage.prototype.checkVisibility = function(controls, expected)
 {
-	var control, expected, fact;
+	var control, expVisible, factVisible, res;
 
-	for(var countrolName in controls)
+	if (!controls || !expected)
+		throw new Error('Wrong parameters');
+
+	for(var countrolName in expected)
 	{
-		expected = controls[countrolName];
+		expVisible = expected[countrolName];
+		control = controls[countrolName];
 
-		control = this.content[countrolName];
-		fact = !!(control && isVisible(control.elem));
-		if (expected != fact)
-			throw new Error('Not expected visibility(' + fact + ') of ' + countrolName + ' control');
+		if (isObject(expVisible))
+		{
+			res = this.checkVisibility(control, expVisible);
+		}
+		else
+		{
+			factVisible = !!(control && isVisible(control.elem, true));
+			res = (expVisible == factVisible);
+		}
+
+		if (!res)
+			throw new Error('Not expected visibility(' + factVisible + ') of "' + countrolName + '" control');
 	}
 
 	return true;
@@ -512,7 +531,7 @@ TestPage.prototype.checkValues = function(controls)
 
 TestPage.prototype.checkState = function(stateObj)
 {
-	return stateObj && this.checkVisibility(stateObj.visibility) && this.checkValues(stateObj.values);
+	return stateObj && this.checkVisibility(this.content, stateObj.visibility) && this.checkValues(stateObj.values);
 };
 
 
