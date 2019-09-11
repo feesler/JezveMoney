@@ -29,12 +29,16 @@ TransactionPage.prototype.parseTileRightItem = function(elem)
 
 TransactionPage.prototype.parseTileBlock = function(elem)
 {
-	if (!elem || !elem.firstElementChild || !elem.firstElementChild.firstElementChild || !elem.firstElementChild.nextElementSibling)
+	if (!elem)
 		return null;
 
 	var res = { elem : elem };
 
-	res.label = elem.firstElementChild.firstElementChild.innerHTML;
+	var lbl = elem.querySelector('div > label');
+	if (!lbl)
+		throw new Error('Tile block label not found');
+
+	res.label = lbl.innerHTML;
 	res.tile = this.parseTile(elem.querySelector('.tile'));
 	res.dropDown = this.parseDropDown(elem.querySelector('.dd_attached'));
 
