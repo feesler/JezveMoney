@@ -56,7 +56,8 @@ TransactionPage.prototype.getPageClass = function(str)
 {
 	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
 						'INCOME' : IncomeTransactionPage,
-					 	'TRANSFER' : TransferTransactionPage };
+					 	'TRANSFER' : TransferTransactionPage,
+					 	'DEBT' : DebtTransactionPage };
 
 	if (!str)
 		return null;
@@ -100,12 +101,33 @@ TransactionPage.prototype.parseContent = function()
 		res.typeMenu[menuItemObj.type] = menuItemObj;
 	}
 
-	res.source = this.parseTileBlock(vge('source'));
-	if (res.source)
-		res.source.id = parseInt(vge('src_id').value);
-	res.destination = this.parseTileBlock(vge('destination'));
-	if (res.destination)
-		res.destination.id = parseInt(vge('dest_id').value);
+	if (res.activeType == 4)	/* DEBT */
+	{
+		res.person = this.parseTileBlock(vge('person'));
+		if (res.person)
+			res.person.id = parseInt(vge('person_id').value);
+
+		res.account = this.parseTileBlock(vge('source'));
+		if (res.account)
+		{
+			res.account.id = parseInt(vge('acc_id').value);
+			res.accTileContainer = { elem : vge('source').querySelector('.tile_container') };
+		}
+
+		res.operation = this.parseOperation(vge('operation'));
+
+		res.selaccount = { elem : vge('selaccount') };
+		res.noacc_btn = { elem : vge('noacc_btn') };
+	}
+	else
+	{
+		res.source = this.parseTileBlock(vge('source'));
+		if (res.source)
+			res.source.id = parseInt(vge('src_id').value);
+		res.destination = this.parseTileBlock(vge('destination'));
+		if (res.destination)
+			res.destination.id = parseInt(vge('dest_id').value);
+	}
 
 	res.src_amount_left = this.parseTileRightItem(vge('src_amount_left'));
 	res.dest_amount_left = this.parseTileRightItem(vge('dest_amount_left'));
@@ -170,6 +192,37 @@ TransactionPage.prototype.getNextAccount = function(acc_id)
 	pos = ((pos == data.length - 1) ? 0 : pos + 1);
 
 	return data[pos].id;
+};
+
+
+// Return zero if no person can't be found
+TransactionPage.prototype.getPerson = function(person_id)
+{
+	return idSearch(viewframe.contentWindow.persons, person_id);
+};
+
+
+// Return account of person in specified currency
+TransactionPage.prototype.getPersonAccount = function(person_id, curr_id)
+{
+	var person, resAcc = null;
+
+	person = this.getPerson(person_id);
+	if (!person || !person.accounts || !curr_id)
+		return resAcc;
+
+	// check person have account in specified currency
+	person.accounts.some(function(acc)
+	{
+		var cond = (acc.curr_id == curr_id);
+
+		if (cond)
+			resAcc = acc;
+
+		return cond;
+	});
+
+	return resAcc;
 };
 
 
