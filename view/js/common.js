@@ -147,11 +147,22 @@ function isInt(x)
 
 
 // Return object visibility
-function isVisible(obj)
+function isVisible(obj, recursive)
 {
 	var robj = ge(obj);
 
-	return (robj && robj.style && robj.style.display != 'none');
+	while(robj && robj.nodeType && robj.nodeType != 9)
+	{
+		if (!robj.style || robj.style.display == 'none')
+			return false;
+
+		if (recursive !== true)
+			break;
+
+		robj = robj.parentNode;
+	}
+
+	return !!robj;
 }
 
 
