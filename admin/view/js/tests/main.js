@@ -41,7 +41,8 @@ function startTests(page)
 
 	.then(accountTests)
 	.then(personTests)
-	.then(transactionTests);
+	.then(transactionTests)
+	.catch(msg => addResult(msg, false));
 }
 
 
