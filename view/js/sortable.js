@@ -36,14 +36,14 @@ SortableDragZone.prototype.onDragStart = function(downX, downY, event)
 // Find specific drag zone element
 SortableDragZone.prototype.findDragZoneItem = function(target)
 {
-	if (!this._params || !this._params.itemClass)
+	if (!this._params || !this._params.selector)
 		return null;
 
 	var el = target;
 
 	while(el && el != this._elem)
 	{
-		if (hasClass(el, this._params.itemClass))
+		if (el.matches(this._params.selector))
 			return el;
 		el = el.parentNode;
 	}
@@ -62,7 +62,7 @@ SortableDragZone.prototype.isValidDragHandle = function(target)
 
 	// allow to drag using whole drag zone in case no handles is set
 	if (this._params === undefined || this._params.onlyRootHandle === undefined)
-		return true;
+		return SortableDragZone.parent.isValidDragHandle.apply(this, arguments);
 
 	var item = this.findDragZoneItem(target);
 
@@ -80,7 +80,7 @@ SortableDragZone.prototype.getGroup = function()
 
 
 // Return class for placeholder element
-SortableDragZone.prototype.getPlaceholderClass = function()
+SortableDragZone.prototype.getPlaceholder = function()
 {
 	if (this._params && this._params.placeholderClass)
 		return this._params.placeholderClass;
@@ -89,10 +89,10 @@ SortableDragZone.prototype.getPlaceholderClass = function()
 
 
 // Return class for item element
-SortableDragZone.prototype.getItemClass = function()
+SortableDragZone.prototype.getItemSelector = function()
 {
-	if (this._params && this._params.itemClass)
-		return this._params.itemClass;
+	if (this._params && this._params.selector)
+		return this._params.selector;
 	return null;
 }
 
@@ -127,8 +127,7 @@ SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 	this._shiftX = downX - offset.left;
 	this._shiftY = downY - offset.top;
 
-	removeClass(this._dragZoneElem, this._dragZone.getItemClass());
-	addClass(this._dragZoneElem, this._dragZone.getPlaceholderClass());
+	addClass(this._dragZoneElem, this._dragZone.getPlaceholder());
 
 	if (this._dragZone._params.copyWidth)
 		elem.style.width = px(this._dragZoneElem.offsetWidth);
@@ -145,8 +144,7 @@ SortableDragAvatar.prototype._destroy = function()
 {
 	re(this._elem);
 
-	removeClass(this._dragZoneElem, this._dragZone.getPlaceholderClass());
-	addClass(this._dragZoneElem, this._dragZone.getItemClass());
+	removeClass(this._dragZoneElem, this._dragZone.getPlaceholder());
 };
 
 
@@ -212,7 +210,7 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 		return false;
 
 	this._initialPos = this.getSortPosition();
-	var tbl = this._dragZoneElem.parentNode.cloneNode(false);
+	var tbl = this._dragZoneElem.closest('table').cloneNode(false);
 	tbl.appendChild(this._dragZoneElem.cloneNode(true));
 
 	elem = this._elem = tbl;
@@ -225,8 +223,8 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 	{
 		var srcCell, destCell, tmp;
 
-		srcCell = firstElementChild(firstElementChild(this._dragZoneElem));
-		destCell = firstElementChild(firstElementChild(firstElementChild(tbl)));
+		srcCell = this._dragZoneElem.querySelector('td');
+		destCell = tbl.querySelector('td');
 		while(srcCell && destCell)
 		{
 			tmp = firstElementChild(destCell);
@@ -240,8 +238,7 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 		elem.style.width = px(this._dragZoneElem.offsetWidth);
 	}
 
-	removeClass(this._dragZoneElem, this._dragZone.getItemClass());
-	addClass(this._dragZoneElem, this._dragZone.getPlaceholderClass());
+	addClass(this._dragZoneElem, this._dragZone.getPlaceholder());
 
 	document.body.appendChild(elem);
 	elem.style.zIndex = 9999;
@@ -263,13 +260,13 @@ SortableDropTarget.prototype._getTargetElem = function(avatar, event)
 {
 	var el = avatar.getTargetElem();
 	var dragInfo = avatar.getDragInfo();
-	var itemClass = dragInfo.dragZone.getItemClass();
-	var phItemClass = dragInfo.dragZone.getPlaceholderClass();
+	var itemSelector = dragInfo.dragZone.getItemSelector();
+	var phItemClass = dragInfo.dragZone.getPlaceholder();
 	var root = dragInfo.dragZone.getElement();
 
 	while(el && el != root)
 	{
-		if (hasClass(el, itemClass) || hasClass(el, phItemClass))
+		if (el.matches(itemSelector) || hasClass(el, phItemClass))
 			return el;
 		el = el.parentNode;
 	}
@@ -298,7 +295,7 @@ SortableDropTarget.prototype.onDragMove = function(avatar, event)
 		return;
 
 	// check drop target is already a placeholder
-	if (hasClass(this._targetElem, dragInfo.dragZone.getPlaceholderClass()))
+	if (hasClass(this._targetElem, dragInfo.dragZone.getPlaceholder()))
 	{
 		var pos = avatar.getSortPosition();
 
@@ -388,12 +385,14 @@ function Sortable(params)
 			dragZoneParam.table = params.table;
 		if (params.copyWidth)
 			dragZoneParam.copyWidth = params.copyWidth;
-		if (params.itemClass)
-			dragZoneParam.itemClass = params.itemClass;
+		if (params.selector)
+			dragZoneParam.selector = params.selector;
 		if (params.placeholderClass)
 			dragZoneParam.placeholderClass = params.placeholderClass;
 		if (params.onlyRootHandle === true)
 			dragZoneParam.onlyRootHandle = true;
+		if (params.handles)
+			dragZoneParam.handles = params.handles;
 
 		containerElem = ge(params.container);
 		if (!containerElem)

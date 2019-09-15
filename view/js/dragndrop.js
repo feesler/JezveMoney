@@ -198,12 +198,26 @@ var dragMaster = (function()
 
 		getElementUnderClientXY : function(elem, clientX, clientY)
 		{
-			var display = elem.style.display || '';
-			elem.style.display = 'none';
+			var display, priority;
+			var quirks = !elem.style.getPropertyValue;		// IE < 9
+			if (quirks)
+			{
+				display = elem.style.cssText;
+				elem.style.cssText += 'display: none!important';
+			}
+			else
+			{
+				display = elem.style.getPropertyValue('display');
+				priority = elem.style.getPropertyPriority('display');
+				elem.style.setProperty('display', 'none', 'important');
+			}
 
 			var target = document.elementFromPoint(clientX, clientY);
 
-			elem.style.display = display;
+			if (quirks)
+				elem.style.cssText = display;
+			else
+				elem.style.setProperty('display', display, priority);
 
 			if (!target || target == document)
 				target = document.body;
@@ -270,11 +284,27 @@ DragZone.prototype.isValidDragHandle = function(target)
 
 	return handles.some(function(hnd)
 	{
-		var elem = (isObject(hnd) && hnd.elem) ? hnd.elem : hnd;
-		elem = ge(elem);
+		if (isObject(hnd) && (hnd.elem || hnd.query))
+		{
+			if (hnd.query)
+			{
+				elem = this._elem.querySelectorAll(hnd.query);
+				elem = Array.prototype.slice.call(elem);
+			}
+			else
+				elem = ge(hnd.elem);
+		}
+		else
+			elem = ge(hnd);
 
-		return elem && (elem == target || (isObject(hnd) && hnd.includeChilds && elem.contains(target)));
-	});
+		if (!isArray(elem))
+			elem = [elem];
+
+		return elem.some(function(el)
+		{
+			return el && (el == target || (isObject(hnd) && hnd.includeChilds && el.contains(target)));
+		});
+	}, this);
 }
 
 
