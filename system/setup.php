@@ -31,12 +31,31 @@
 	{
 		define("APPPROT", "https://");
 		define("APPPATH", "/");
+		define("PRODUCTION", TRUE);
 	}
 	else if (strcmp(APPHOST, $devHost) == 0)
 	{
 		define("APPPROT", "https://");
 		define("APPPATH", "/money/");
+		define("PRODUCTION", FALSE);
 	}
+
+	// Error settings
+	if (PRODUCTION)
+	{
+		ini_set("display_errors","0");
+		ini_set("display_startup_errors","0");
+		ini_set("error_reporting", 0);
+		error_reporting(0);
+	}
+	else
+	{
+		ini_set("display_errors","1");
+		ini_set("display_startup_errors","1");
+		ini_set('error_reporting', E_ALL & ~E_STRICT);
+		error_reporting(E_ALL & ~E_STRICT);
+	}
+
 
 	if (!isSecure())
 	{
