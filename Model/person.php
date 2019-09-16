@@ -105,7 +105,9 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["name", "updatedate"], [$person_name, $curDate], "id=".$person_id))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "name" => $person_name, "updatedate" => $curDate ],
+									"id=".$person_id))
 			return FALSE;
 
 		$this->cleanCache();

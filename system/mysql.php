@@ -86,6 +86,29 @@ function orJoin($pieces)
 }
 
 
+function assignJoin($assignments)
+{
+	if (!is_array($assignments))
+		$assignments = [ $assignments ];
+
+	$res = [];
+	foreach($assignments as $key => $value)
+	{
+		if (is_string($key))
+		{
+			$res[] = $key."=".qnull($value);
+		}
+		else if (is_numeric($key))
+		{
+			$res[] = $value;
+		}
+		else
+			throw "Incorrect syntax";
+	}
+
+	return implode(", ", $res);
+}
+
 
 class mysqlDB
 {
@@ -244,26 +267,12 @@ class mysqlDB
 
 
 	// Update query
-	public function updateQ($table, $fields, $values, $condition = NULL)
+	public function updateQ($table, $assArray, $condition = NULL)
 	{
-		if (!$table || $table == "" || !$fields || $fields == "" || !$values || $values == "")
+		if (empty($table) || empty($assArray))
 			return FALSE;
 
-		$fcount = count($fields);
-		$vcount = count($values);
-
-		if ($fcount != $vcount)
-			return FALSE;
-
-		$query = "UPDATE `".$table."` SET ";
-
-		for($i = 0; $i < $fcount; $i++)
-		{
-			$query .= $fields[$i]." = ".qnull($values[$i]);
-			if ($i < $fcount - 1)
-				$query .= ", ";
-		}
-
+		$query = "UPDATE `".$table."` SET ".assignJoin($assArray);
 		if (!is_null($condition))
 			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";

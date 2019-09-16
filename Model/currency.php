@@ -98,9 +98,9 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["name", "sign", "format", "updatedate"],
-								[$curr_name, $curr_sign, $curr_format, $curDate],
-								"id=".$curr_id))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "name" => $curr_name, "sign" => $curr_sign, "format" => $curr_format, "updatedate" => $curDate],
+									"id=".$curr_id))
 			return FALSE;
 
 		$this->cleanCache();

@@ -301,10 +301,12 @@ class TransactionModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		$fieldsArr = ["src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "updatedate"];
-		$valuesArr = [$src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate];
+		$assingArr = [ "src_id" => $src_id, "dest_id" => $dest_id, "type" => $trans_type,
+						"src_amount" => $src_amount, "dest_amount" => $dest_amount,
+						"src_curr" => $src_curr, "dest_curr" => $dest_curr,
+						"date" => $trans_date, "comment" => $e_comm, "pos" => $tr_pos, "updatedate" => $curDate ];
 
-		if (!$this->dbObj->updateQ($this->tbl_name, $fieldsArr, $valuesArr, "id=".$trans_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, $assingArr, "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -374,6 +376,7 @@ class TransactionModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
+		$assignArr = [];
 		if ($old_pos == $new_pos)
 		{
 			return TRUE;
@@ -386,30 +389,28 @@ class TransactionModel extends CachedTable
 
 				$condArr[] = "pos >= ".$new_pos;
 				$condArr[] = "pos <= ".$latest;
-				$assignment = "pos=pos+1";
+				$assignArr[] = "pos=pos+1";
 			}
 			else if ($new_pos < $old_pos)		// moving up
 			{
 				$condArr[] = "pos >= ".$new_pos;
 				$condArr[] = "pos < ".$old_pos;
-				$assignment = "pos=pos+1";
+				$assignArr[] = "pos=pos+1";
 			}
 			else if ($new_pos > $old_pos)		// moving down
 			{
 				$condArr[] = "pos > ".$old_pos;
 				$condArr[] = "pos <= ".$new_pos;
-				$assignment = "pos=pos-1";
+				$assignArr[] = "pos=pos-1";
 			}
 
-			$assignment .= ", updatedate=".qnull($curDate);
+			$assignArr["updatedate"] = $curDate;
 
-			$query = "UPDATE `".$this->tbl_name."` SET ".$assignment." WHERE ".andJoin($condArr).";";
-			$this->dbObj->rawQ($query);
-			if (mysql_errno() != 0)
+			if (!$this->dbObj->updateQ($this->tbl_name, $assignArr, $condArr))
 				return FALSE;
 		}
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["pos", "updatedate"], [$new_pos, $curDate], "id=".$trans_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, [ "pos" => $new_pos, "updatedate" => $curDate ], "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -487,41 +488,47 @@ class TransactionModel extends CachedTable
 		{
 			// set outgoing debt(person take) as income to destination account
 			$condArr = [$userCond, "src_id=".$acc_id, "type=4"];
-			if (!$this->dbObj->updateQ($this->tbl_name, ["src_id", "type", "updatedate"], [0, 2, $curDate],
-							$condArr))
+			if (!$this->dbObj->updateQ($this->tbl_name,
+										[ "src_id" => 0, "type" => 2, "updatedate" => $curDate],
+										$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as expense from source account
 			$condArr = [$userCond, "dest_id=".$acc_id, "type=4"];
-			if (!$this->dbObj->updateQ($this->tbl_name, ["dest_id", "type", "updatedate"], [0, 1, $curDate],
-							$condArr))
+			if (!$this->dbObj->updateQ($this->tbl_name,
+										[ "dest_id" => 0, "type" => 1, "updatedate" => $curDate],
+										$condArr))
 				return FALSE;
 		}
 		else							// specified account is account of user
 		{
 			// set outgoing debt(person take) as debt without acc
 			$condArr = [$userCond, "src_id=".$acc_id, "type=4"];
-			if (!$this->dbObj->updateQ($this->tbl_name, ["src_id", "type", "updatedate"], [0, 4, $curDate],
-							$condArr))
+			if (!$this->dbObj->updateQ($this->tbl_name,
+										[ "src_id" => 0, "type" => 4, "updatedate" => $curDate],
+										$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as debt without acc
 			$condArr = [$userCond, "dest_id=".$acc_id, "type=4"];
-			if (!$this->dbObj->updateQ($this->tbl_name, ["dest_id", "type", "updatedate"], [0, 4, $curDate],
-							$condArr))
+			if (!$this->dbObj->updateQ($this->tbl_name,
+										[ "dest_id" => 0, "type" => 4, "updatedate" => $curDate],
+										$condArr))
 				return FALSE;
 		}
 
 		// set transfer from account as income to destination account
 		$condArr = [$userCond, "src_id=".$acc_id, "type=3"];
-		if (!$this->dbObj->updateQ($this->tbl_name, ["src_id", "type", "updatedate"], [0, 2, $curDate],
-						$condArr))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "src_id" => 0, "type" => 2, "updatedate" => $curDate],
+									$condArr))
 			return FALSE;
 
 		// set transfer to account as expense from source account
 		$condArr = [$userCond, "dest_id=".$acc_id, "type=3"];
-		if (!$this->dbObj->updateQ($this->tbl_name, ["dest_id", "type", "updatedate"], [0, 1, $curDate],
-						$condArr))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "dest_id" => 0, "type" => 1, "updatedate" => $curDate],
+									$condArr))
 			return FALSE;
 
 		return TRUE;
