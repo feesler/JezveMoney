@@ -154,7 +154,7 @@ class mysqlDB
 			self::$dbname = $name;
 
 		$errno = mysqli_errno(self::$conn);
-		wlog("Result: ".($errno ? ($errno." - ".mysql_error(self::$conn)) : "ok"));
+		wlog("Result: ".($errno ? ($errno." - ".mysqli_error(self::$conn)) : "ok"));
 
 		return $res;
 	}
@@ -174,7 +174,8 @@ class mysqlDB
 		{
 			if (!$this->connect())
 				return NULL;
-			$this->selectDB(self::$settings->database);
+			if (!$this->selectDB(self::$settings->database))
+				return NULL;
 			$this->rawQ("SET NAMES 'utf8';");
 		}
 
