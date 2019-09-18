@@ -108,8 +108,16 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"],
-								[NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"user_id" => self::$user_id,
+														"owner_id" => $owner_id,
+														"curr_id" => $curr_id,
+														"balance" => $balance,
+														"initbalance" => $balance,
+														"name" => $accname,
+														"icon" => $icon_type,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return 0;
 
 		$acc_id = $this->dbObj->insertId();

@@ -246,12 +246,23 @@ class mysqlDB
 
 
 	// Insert query
-	public function insertQ($table, $fields, $values)
+	public function insertQ($table, $data)
 	{
-		if (!$table || $table == "" || !$fields || $fields == "" || !$values || $values == "")
+		if (empty($table) || !is_array($data) || !count($data))
 			return FALSE;
 
-		$query = "INSERT INTO `".$table."` (`".join("`, `", $fields)."`) VALUES (".qjoin(", ", $values).");";
+		$fields = [];
+		$values = [];
+		foreach($data as $key => $value)
+		{
+			if (!is_string($key))
+				continue;
+
+			$fields[] = "`".$key."`";
+			$values[] = qnull($value);
+		}
+
+		$query = "INSERT INTO `".$table."` (".implode(", ", $fields).") VALUES (".implode(", ", $values).");";
 		$this->rawQ($query);
 		$errno = mysqli_errno(self::$conn);
 
@@ -267,12 +278,12 @@ class mysqlDB
 
 
 	// Update query
-	public function updateQ($table, $assArray, $condition = NULL)
+	public function updateQ($table, $data, $condition = NULL)
 	{
-		if (empty($table) || empty($assArray))
+		if (empty($table) || empty($data))
 			return FALSE;
 
-		$query = "UPDATE `".$table."` SET ".assignJoin($assArray);
+		$query = "UPDATE `".$table."` SET ".assignJoin($data);
 		if (!is_null($condition))
 			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";

@@ -143,8 +143,20 @@ class TransactionModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "user_id", "src_id", "dest_id", "type", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment", "pos", "createdate", "updatedate"],
-									[NULL, self::$user_id, $src_id, $dest_id, $trans_type, $src_amount, $dest_amount, $src_curr, $dest_curr, $trans_date, $e_comm, $tr_pos, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"user_id" => self::$user_id,
+														"src_id" => $src_id,
+														"dest_id" => $dest_id,
+														"type" => $trans_type,
+														"src_amount" => $src_amount,
+														"dest_amount" => $dest_amount,
+														"src_curr" => $src_curr,
+														"dest_curr" => $dest_curr,
+														"date" => $trans_date,
+														"comment" => $e_comm,
+														"pos" => $tr_pos,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return 0;
 
 		$trans_id = $this->dbObj->insertId();

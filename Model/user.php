@@ -294,7 +294,11 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "login", "passhash", "createdate", "updatedate"], [NULL, $elogin, $passhash, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"login" => $elogin,
+														"passhash" => $passhash,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return FALSE;
 
 		$user_id = $this->dbObj->insertId();
