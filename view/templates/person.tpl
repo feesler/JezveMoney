@@ -18,7 +18,7 @@
 					<div class="heading">
 						<h1><?=$headString?></h1>
 <?php	if ($action == "edit") {		?>
-						<div id="del_btn" class="iconlink"><button onclick="onDelete();" type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 					<div>

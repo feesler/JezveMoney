@@ -330,6 +330,32 @@ function initTransListDrag()
 
 		listItem_wr = nextElementSibling(listItem_wr);
 	}
+
+
+	var searchFrm = ge('searchFrm');
+	if (searchFrm)
+		searchFrm.onsubmit = onSearchSubmit.bind(null, searchFrm);
+
+	var btn;
+	var calendar_btn = ge('calendar_btn');
+	if (calendar_btn)
+	{
+		btn = firstElementChild(calendar_btn);
+		if (btn)
+			btn.onclick = showCalendar;
+	}
+
+	btn = ge('cal_rbtn');
+	if (btn)
+		btn.onclick = showCalendar;
+
+	var del_btn = ge('del_btn');
+	if (del_btn)
+	{
+		btn = firstElementChild(del_btn);
+		if (btn)
+			btn.onclick = showDeletePopup;
+	}
 }
 
 

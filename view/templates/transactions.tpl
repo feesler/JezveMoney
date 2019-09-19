@@ -34,7 +34,7 @@
 						</div>
 
 						<div class="std_margin clearfix">
-							<form method="get" action="<?=BASEURL?>transactions/" onsubmit="return onSearchSubmit(this);">
+							<form id="searchFrm" method="get" action="<?=BASEURL?>transactions/">
 							<div class="right_float">
 								<button class="btn icon_btn search_btn right_float" type="submit"><span></span></button>
 								<div class="stretch_input rbtn_input">
@@ -60,13 +60,13 @@
 
 							<div class="tr_filter date_filter">
 <?php if (is_empty($dateFmt)) {		?>
-								<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
+								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php } else {	?>
-								<div id="calendar_btn" class="iconlink"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
+								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
 <?php }		?>
 								<div id="date_block" style="display: none;">
 									<div>
-										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button" onclick="showCalendar();"><span></span></button>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 										</div>
@@ -92,7 +92,7 @@
 					<div id="sbEllipsis" class="sidebar_ellipsis"></div>
 					<div id="sbButtons" class="sidebar_buttons">
 						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white edit"></span><span class="icontitle"><span>Edit</span></span></a></div>
-						<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showDeletePopup();" type="button"><span class="icon icon_white del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white del"></span><span class="icontitle"><span>Delete</span></span></button></div>
 					</div>
 				</div>
 			</div>

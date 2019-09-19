@@ -57,6 +57,21 @@ function initControls()
 
 	var elem = ge('balance');
 	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+
+	if (account_id)
+	{
+		var del_btn = ge('del_btn');
+		if (del_btn && firstElementChild(del_btn))
+			firstElementChild(del_btn).onclick = onDelete();
+	}
+
+	var accForm = ge('accForm');
+	if (accForm)
+		accForm.onsubmit = onNewAccountSubmit;
+
+	var accnameInp = ge('accname');
+	if (accnameInp)
+		accnameInp.oninput = onAccNameInput.bind(null, accnameInp);
 }
 
 
@@ -112,6 +127,41 @@ function onTileClick(acc_id)
 	{
 		onScroll();
 	}
+}
+
+
+// Initialization of page controls
+function initAccListControls()
+{
+	var tilesContainer, tileEl, btnEl, del_btn;
+	var pos, tile_id;
+
+	tilesContainer = ge('tilesContainer');
+	del_btn = ge('del_btn');
+	if (!tilesContainer || !del_btn)
+		return;
+
+	tileEl = firstElementChild(tilesContainer);
+	while(tileEl)
+	{
+		pos = tileEl.id.indexOf('_');
+		if (pos !== -1)
+		{
+			tile_id = parseInt(tileEl.id.substr(pos + 1));
+			if (!isNaN(tile_id))
+			{
+				btnEl = firstElementChild(tileEl);
+				if (btnEl)
+					btnEl.onclick = onTileClick.bind(null, tile_id);
+			}
+		}
+
+		tileEl = nextElementSibling(tileEl);
+	}
+
+	btnEl = firstElementChild(del_btn);
+	if (btnEl)
+		btnEl.onclick = showDeletePopup;
 }
 
 

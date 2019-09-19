@@ -1,6 +1,8 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
 	var p_name = <?=f_json_encode($person_name)?>;
+
+	onReady(initProfilePage);
 </script>
 </head>
 <body>
@@ -22,12 +24,12 @@
 					<div class="profile_block">
 						<h2>User name</h2>
 						<span id="namestatic"><?=$person_name?></span>
-						<div><a href="<?=BASEURL?>profile/changename/" onclick="return showChangeNamePopup();">Change</a></div>
+						<div><a id="changeNameBtn" href="<?=BASEURL?>profile/changename/">Change</a></div>
 					</div>
 
 					<div class="profile_block">
 						<h2>Security</h2>
-						<div><a href="<?=BASEURL?>profile/changepass/" onclick="return showChangePasswordPopup();">Change password</a></div>
+						<div><a id="changePassBtn" href="<?=BASEURL?>profile/changepass/">Change password</a></div>
 					</div>
 
 					<div class="profile_block">
@@ -36,19 +38,19 @@
 							<form id="resetacc_form" method="post" action="<?=BASEURL?>accounts/reset/">
 							</form>
 							<span>You also may reset all your accounts data.<br>
-							<input class="btn ok_btn" type="button" onclick="showResetAccountsPopup();" value="Reset"></span>
+							<input id="resetAccBtn" class="btn ok_btn" type="button" value="Reset"></span>
 						</div>
 						<div style="margin-top: 15px;">
 							<form id="resetall_form" method="post" action="<?=BASEURL?>profile/resetall/">
 							</form>
 							<span>You may also reset all your data and start from the scratch.<br>
-							<input class="btn ok_btn" type="button" onclick="showResetAllPopup();" value="Reset all"></span>
+							<input id="resetAllBtn" class="btn ok_btn" type="button" value="Reset all"></span>
 						</div>
 						<div style="margin-top: 15px;">
 							<form id="delete_form" method="post" action="<?=BASEURL?>profile/del/">
 							</form>
 							<span>Completely delete profile and all related data.<br>
-							<input class="btn ok_btn" type="button" onclick="showDeletePopup();" value="Delete profile"></span>
+							<input id="delProfileBtn" class="btn ok_btn" type="button" value="Delete profile"></span>
 						</div>
 					</div>
 <?php	if ($action == "changepass") {		?>
@@ -63,7 +65,7 @@
 </div>
 
 <div id="changename" style="display: none;">
-<form method="post" action="<?=BASEURL?>profile/changename/" onsubmit="return onChangeNameSubmit(this);">
+<form method="post" action="<?=BASEURL?>profile/changename/">
 	<div class="non_float">
 		<label for="newname">New name</label>
 		<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=$person_name?>"></div>
@@ -72,7 +74,7 @@
 </div>
 
 <div id="changepass" style="display: none;">
-<form method="post" action="<?=BASEURL?>profile/changepass/" onsubmit="return onChangePassSubmit(this);">
+<form method="post" action="<?=BASEURL?>profile/changepass/">
 	<div class="non_float">
 		<label for="oldpwd">Current password</label>
 		<div class="stretch_input std_input"><input id="oldpwd" name="oldpwd" type="password"></div>

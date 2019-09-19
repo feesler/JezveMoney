@@ -551,7 +551,7 @@ function addPlaceholder(refItem)
 
 	phElem = ce('div', { className : 'tr_row_placeholder' });
 
-	if (refItem === undefined)
+	if (!refItem)
 		rowsContainer.appendChild(phElem);
 	else
 		insertAfter(phElem, refItem);
@@ -875,11 +875,19 @@ function onFileImport()
 
 function initPage()
 {
+	var newRowBtn = ge('newRowBtn');
+	var newPhBtn = ge('newPhBtn');
 	var submitbtn = ge('submitbtn');
 	var fileimportfrm = ge('fileimportfrm');
 	trcount = ge('trcount');
-	if (!fileimportfrm || !submitbtn || !trcount)
+	var acc_id = ge('acc_id');
+	if (!newRowBtn || !newPhBtn || !fileimportfrm || !submitbtn || !trcount || !acc_id)
 		return;
+
+	newRowBtn.onclick = createRow;
+	newPhBtn.onclick = addPlaceholder.bind(null, null);
+
+	acc_id.onchange = onMainAccChange;
 
 	submitbtn.onclick = onSubmitClick;
 

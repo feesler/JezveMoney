@@ -1,8 +1,9 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <?php	checkMessage();		?>
+<script>onReady(initLoginPage)</script>
 </head>
 <body>
-<form action="<?=BASEURL?>login/" method="post" onsubmit="return onLoginSubmit(this);">
+<form id="loginfrm" action="<?=BASEURL?>login/" method="post">
 <div class="layer login_layer">
 	<div class="cont">
 		<div class="box">

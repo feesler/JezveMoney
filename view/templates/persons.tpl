@@ -15,10 +15,10 @@
 						<h1>Persons</h1>
 						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>persons/new/"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
-					<div class="tiles"><?php
+					<div id="tilesContainer" class="tiles"><?php
 		if (count($persArr)) {
 			foreach($persArr as $pData) {
-?><div id="p_<?=$pData->id?>" class="tile"><button class="tilelink" onclick="onTileClick(<?=$pData->id?>);" type="button"><span><span class="acc_bal"></span><span class="acc_name"><?=$pData->name?></span></span></button></div><?php
+?><div id="p_<?=$pData->id?>" class="tile"><button class="tilelink" type="button"><span><span class="acc_bal"></span><span class="acc_name"><?=$pData->name?></span></span></button></div><?php
 			}
 		} else {	?>
 						<span>You have no one person. Please create one.</span>

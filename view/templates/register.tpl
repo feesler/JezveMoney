@@ -1,8 +1,9 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 </head>
+<script>onReady(initRegisterPage)</script>
 <body>
 <?php	require_once("./view/templates/header.tpl");		?>
-<form action="<?=BASEURL?>register/" method="post" onsubmit="return onLoginSubmit(this);">
+<form id="regfrm" action="<?=BASEURL?>register/" method="post">
 <div class="layer register_layer">
 	<div class="cont">
 		<div class="box">

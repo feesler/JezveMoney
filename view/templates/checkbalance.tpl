@@ -10,6 +10,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 .bad_val{ background-color: #FFB0B0; }
 </style>
 <script>
+	var transactions = <?=f_json_encode($transArr)?>;
 	var chPosObj = null;
 
 	function onSubmitNewPos(tr_id)
@@ -73,6 +74,30 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 			chPosObj = posObj;
 		}
 	}
+
+
+
+	onReady(function()
+	{
+		if (!transactions)
+			return;
+
+		var trCell, btn, trObj;
+		for(var tr_id in transactions)
+		{
+			trCell = ge('tr_' + tr_id);
+			if (!trCell)
+				continue;
+
+			btn = firstElementChild(trCell);
+			if (!btn)
+				continue;
+
+			trObj = transactions[tr_id];
+
+			btn.onclick = showChangePos.bind(null, tr_id, trObj.pos);
+		}
+	});
 
 </script>
 </head>
@@ -171,7 +196,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		} else {	?>
 		<td rowspan="2"><?=$tr["datefmt"]?></td>
 <?php		}		?>
-		<td rowspan="2" id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
+		<td rowspan="2" id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
 	</tr>
 <?php		if ($tr["realbal"][$tr["dest_id"]] < 0.0) {		?>
 	<tr><td class="sum_cell bad_val"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
@@ -206,7 +231,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		} else {	?>
 		<td<?=$rowspan?>><?=$tr["datefmt"]?></td>
 <?php		}		?>
-		<td id="tr_<?=$tr_id?>"<?=$rowspan?>><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
+		<td id="tr_<?=$tr_id?>"<?=$rowspan?>><input type="button" value="<?=$tr["pos"]?>"></td>
 	</tr>
 <?php		if ($tr["src_id"] && $tr["dest_id"]) {		?>
 <?php			if ($tr["realbal"][$tr["dest_id"]] < 0.0) {		?>
@@ -230,7 +255,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		<td><?=$tr["datefmt"]?></td>
 <?php		}		?>
 
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
+		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
 	</tr>
 <?php	} else if ($tr["type"] != TRANSFER && $tr["type"] != DEBT) {	?>
 		<td><?=$tr["comment"]?></td>
@@ -246,7 +271,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php		} else {	?>
 		<td><?=$tr["datefmt"]?></td>
 <?php		}		?>
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>" onclick="showChangePos(<?=$tr_id?>, <?=$tr["pos"]?>);"></td>
+		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
 	</tr>
 <?php
 		}
