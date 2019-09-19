@@ -14,7 +14,7 @@ function initTests()
 	viewframe = ge('viewframe');
 	restbl = ge('restbl');
 	if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
-		throw 'Fail to init tests';
+		throw new Error('Fail to init tests');
 
 	startbtn.onclick = onStartClick;
 }
@@ -250,15 +250,15 @@ function checkEditAccount1(page)
 function createAccountWithParam(page, params)
 {
 	if (!params)
-		throw 'No params specified';
+		throw new Error('No params specified');
 	if (!params.name || !params.name.length)
-		throw 'Name not specified';
+		throw new Error('Name not specified');
 	var currObj = getCurrency(params.curr_id);
 	if (!currObj)
-		throw 'Wrong currency specified';
+		throw new Error('Wrong currency specified');
 	var normBalance = normalize(params.balance);
 	if (isNaN(normBalance))
-		throw 'Balance not specified';
+		throw new Error('Balance not specified');
 
 	var state = { values : { tile : { name : params.name }, name : params.name } };
 
@@ -279,7 +279,7 @@ function createAccountWithParam(page, params)
 	if (params.icon)
 	{
 		if (params.icon < 0 || params.icon > tileIcons.length)
-			throw 'Icon not found';
+			throw new Error('Icon not found');
 
 		setParam(state.values, { iconDropDown : { textValue : tileIcons[params.icon].title }, tile : { icon : tileIcons[params.icon] } });
 		test('Tile icon update', () => page.changeIcon(params.icon), page, state);

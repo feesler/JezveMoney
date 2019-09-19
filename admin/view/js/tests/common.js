@@ -52,7 +52,7 @@ function navigation(action, pageClass)
 		{
 			vdoc = viewframe.contentWindow.document;
 			if (!vdoc)
-				throw 'View document not found';
+				throw new Error('View document not found');
 
 			checkPHPerrors();
 			try

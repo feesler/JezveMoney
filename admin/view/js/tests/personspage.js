@@ -19,7 +19,7 @@ PersonsPage.prototype.parseContent = function()
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
-		throw 'Wrong persons page structure';
+		throw new Error('Wrong persons page structure');
 
 	res.title = res.titleEl.innerHTML;
 	res.tiles = this.parseTiles(vquery('.tiles'));
@@ -41,12 +41,12 @@ PersonsPage.prototype.goToCreatePerson = function()
 PersonsPage.prototype.goToUpdatePerson = function(num)
 {
 	if (!this.content.tiles || this.content.tiles.length <= num)
-		throw 'Wrong person number specified';
+		throw new Error('Wrong person number specified');
 
 	this.content.tiles[num].click();
 
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
-		throw 'Update person button not visible';
+		throw new Error('Update person button not visible');
 
 	return navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
 };
@@ -55,7 +55,7 @@ PersonsPage.prototype.goToUpdatePerson = function(num)
 PersonsPage.prototype.deletePersons = function(persons)
 {
 	if (!persons)
-		throw 'No persons specified';
+		throw new Error('No persons specified');
 
 	if (!isArray(persons))
 		persons = [persons];
@@ -65,26 +65,26 @@ PersonsPage.prototype.deletePersons = function(persons)
 	persons.forEach(function(person_num, ind)
 	{
 		if (person_num >= this.content.tiles.length)
-			throw 'Wrong account number';
+			throw new Error('Wrong account number');
 
 		this.content.tiles[person_num].click();
 		this.parse();
 
 		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
 		if (ind == 0 && !editIsVisible)
-			throw 'Edit button is not visible';
+			throw new Error('Edit button is not visible');
 		else if (ind > 0 && editIsVisible)
-			throw 'Edit button is visible while more than one person is selected';
+			throw new Error('Edit button is visible while more than one person is selected');
 
 		if (!isVisible(this.content.toolbar.delBtn.elem))
-			throw 'Delete button is not visible';
+			throw new Error('Delete button is not visible');
 	}, this);
 
 	this.content.toolbar.delBtn.click();
 	this.parse();
 
 	if (!isVisible(this.content.delete_warning.elem))
-		throw 'Delete account warning popup not appear';
+		throw new Error('Delete account warning popup not appear');
 
 	return navigation(() => clickEmul(this.content.delete_warning.okBtn), PersonsPage)
 	.then(function(page)

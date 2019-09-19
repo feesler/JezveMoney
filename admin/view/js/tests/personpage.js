@@ -14,22 +14,22 @@ PersonPage.prototype.parseContent = function()
 
 	res.headingElem = vquery('.heading > h1');
 	if (!res.headingElem)
-		throw 'Heading element not found';
+		throw new Error('Heading element not found');
 	res.heading = res.headingElem.innerHTML;
 
 	res.formElem = vquery('form');
 	if (!res.formElem)
-		throw 'Form element not found';
+		throw new Error('Form element not found');
 
 	res.isEdit = (res.formElem.firstElementChild.id == 'pid');
 
 	res.name = this.parseInputRow(res.formElem.querySelector('div.non_float'));
 	if (!res.name)
-		throw 'Person name input not found';
+		throw new Error('Person name input not found');
 
 	res.submitBtn = vquery('.acc_controls .ok_btn');
 	if (!res.submitBtn)
-		throw 'Submit button not found';
+		throw new Error('Submit button not found');
 
 	return res;
 };

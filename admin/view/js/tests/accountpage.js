@@ -14,14 +14,14 @@ AccountPage.prototype.parseContent = function()
 
 	res.heading = { elem : vquery('.heading > h1') };
 	if (!res.heading.elem)
-		throw 'Heading element not found';
+		throw new Error('Heading element not found');
 	res.heading.text = res.heading.elem.innerHTML;
 
 	res.tile = this.parseTile(vge('acc_tile'));
 
 	res.formElem = vquery('form');
 	if (!res.formElem)
-		throw 'Form element not found';
+		throw new Error('Form element not found');
 
 	res.isEdit = (res.formElem.firstElementChild.id == 'accid');
 
@@ -33,7 +33,7 @@ AccountPage.prototype.parseContent = function()
 	elem = elem.nextElementSibling;
 	res.name = this.parseInputRow(elem);
 	if (!res.name)
-		throw 'Account name input not found';
+		throw new Error('Account name input not found');
 
 	elem = elem.nextElementSibling;
 	res.currDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
@@ -44,7 +44,7 @@ AccountPage.prototype.parseContent = function()
 
 	res.submitBtn = vquery('.acc_controls .ok_btn');
 	if (!res.submitBtn)
-		throw 'Submit button not found';
+		throw new Error('Submit button not found');
 
 	return res;
 };

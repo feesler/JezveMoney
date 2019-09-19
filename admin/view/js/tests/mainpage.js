@@ -12,7 +12,7 @@ MainPage.prototype.parseContent = function()
 {
 	var widgetsElem = vqueryall('.content_wrap .widget');
 	if (!widgetsElem)
-		throw 'Fail to parse main page widgets';
+		throw new Error('Fail to parse main page widgets');
 
 	var res = {};
 	res.widgets = [];
@@ -45,11 +45,11 @@ MainPage.prototype.parseContent = function()
 MainPage.prototype.goToAccounts = function()
 {
  	if (!this.content.widgets || !this.content.widgets[0])
-		throw 'Accounts widget not found';
+		throw new Error('Accounts widget not found');
 
 	var widget = this.content.widgets[0];
 	if (widget.title != 'Accounts')
-		throw 'Wrong widget';
+		throw new Error('Wrong widget');
 
 	return navigation(() => clickEmul(widget.linkElem), AccountsPage);
 };
@@ -58,14 +58,14 @@ MainPage.prototype.goToAccounts = function()
 MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 {
 	if (!this.content.widgets || !this.content.widgets[0])
-		throw 'Wrong state of main page';
+		throw new Error('Wrong state of main page');
 
 	var accWidget = this.content.widgets[0];
 	if (accWidget.title != 'Accounts')
-		throw 'Wrong state of accounts widget';
+		throw new Error('Wrong state of accounts widget');
 
 	 if (!accWidget.tiles || accWidget.tiles.length <= accNum)
-		throw 'Tile ' + accNum + ' not found';
+		throw new Error('Tile ' + accNum + ' not found');
 
 	var tile = accWidget.tiles[accNum];
 	var link = tile.linkElem;
@@ -77,7 +77,7 @@ MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 MainPage.prototype.goToPersons = function(page)
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw 'Fail to parse main page widgets';
+		throw new Error('Fail to parse main page widgets');
 
 	var personsWidget = this.content.widgets[3];
 

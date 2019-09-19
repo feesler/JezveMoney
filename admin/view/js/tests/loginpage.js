@@ -15,7 +15,7 @@ LoginPage.prototype.parseContent = function()
 				submitBtn : vquery('.login_controls .btn.ok_btn'),
 				registerLink : vquery('.login_controls .alter_link > a') };
 	if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink)
-		throw 'Wrong login page structure';
+		throw new Error('Wrong login page structure');
 
 	return res;
 };

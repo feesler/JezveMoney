@@ -14,21 +14,21 @@ ProfilePage.prototype.parseContent = function()
 
 	var blocks = vqueryall('.content_wrap > .profile_block');
 	if (blocks.length != 4)
-		throw 'Wrong profile page structure';
+		throw new Error('Wrong profile page structure');
 
 	res.loginElem = blocks[0].querySelector('span');
 	res.nameElem = vge('namestatic');
 	res.nameLinkElem = blocks[1].querySelector('div > a');
 	res.changePassLinkElem = blocks[2].querySelector('div > a');
 	if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
-		throw 'Wrong profile page structure';
+		throw new Error('Wrong profile page structure');
 
 	res.login = res.loginElem.innerHTML;
 	res.name = res.nameElem.innerHTML;
 
 	var buttons = blocks[3].querySelectorAll('input[type="button"]');
 	if (!buttons || buttons.length != 3)
-		throw 'Wrong profile page structure';
+		throw new Error('Wrong profile page structure');
 	res.resetBtn = buttons[0];
 	res.resetAllBtn = buttons[1];
 	res.deleteProfileBtn = buttons[2];
@@ -65,16 +65,16 @@ ProfilePage.prototype.parseContent = function()
 ProfilePage.prototype.resetAll = function()
 {
 	if (!this.content.resetAllBtn)
-		throw 'Reset all button not found';
+		throw new Error('Reset all button not found');
 
 	clickEmul(this.content.resetAllBtn);
 
 	this.parse();
 
 	if (!this.content.reset_warning || !this.content.reset_warning.elem || !isVisible(this.content.reset_warning.elem))
-		throw 'Warning popup not appear';
+		throw new Error('Warning popup not appear');
 	if (!this.content.reset_warning.okBtn)
-		throw 'Confirm button not found';
+		throw new Error('Confirm button not found');
 
 	return navigation(() => clickEmul(this.content.reset_warning.okBtn), ProfilePage);
 };

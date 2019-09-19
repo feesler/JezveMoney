@@ -20,7 +20,7 @@ AccountsPage.prototype.parseContent = function()
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
-		throw 'Wrong accounts page structure';
+		throw new Error('Wrong accounts page structure');
 
 	res.title = res.titleEl.innerHTML;
 	res.tiles = this.parseTiles(vquery('.tiles'));
@@ -42,12 +42,12 @@ AccountsPage.prototype.goToCreateAccount = function()
 AccountsPage.prototype.goToUpdateAccount = function(num)
 {
 	if (!this.content.tiles || this.content.tiles.length <= num)
-		throw 'Wrong account number specified';
+		throw new Error('Wrong account number specified');
 
 	this.content.tiles[num].click();
 
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
-		throw 'Update account button not visible';
+		throw new Error('Update account button not visible');
 
 	return navigation(() => this.content.toolbar.editBtn.click(), AccountPage);
 };
@@ -57,7 +57,7 @@ AccountsPage.prototype.goToUpdateAccount = function(num)
 AccountsPage.prototype.deleteAccounts = function(acc)
 {
 	if (!acc)
-		throw 'No accounts specified';
+		throw new Error('No accounts specified');
 
 	if (!isArray(acc))
 		acc = [acc];
@@ -65,29 +65,29 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 	acc.forEach(function(acc_num, ind)
 	{
 		if (acc_num >= this.content.tiles.length)
-			throw 'Wrong account number';
+			throw new Error('Wrong account number');
 
 		this.content.tiles[acc_num].click();
 		this.parse();
 
 		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
 		if (ind == 0 && !editIsVisible)
-			throw 'Edit button is not visible';
+			throw new Error('Edit button is not visible');
 		else if (ind > 0 && editIsVisible)
-			throw 'Edit button is visible while more than one accounts is selected';
+			throw new Error('Edit button is visible while more than one accounts is selected');
 
 		if (!isVisible(this.content.toolbar.delBtn.elem))
-			throw 'Delete button is not visible';
+			throw new Error('Delete button is not visible');
 	}, this);
 
 	this.content.toolbar.delBtn.click();
 	this.parse();
 
 	if (!isVisible(this.content.delete_warning.elem))
-		throw 'Delete account warning popup not appear';
+		throw new Error('Delete account warning popup not appear');
 
 	if (!this.content.delete_warning.okBtn)
-		throw 'OK button not found';
+		throw new Error('OK button not found');
 
 	return navigation(() => clickEmul(this.content.delete_warning.okBtn), AccountsPage);
 };
