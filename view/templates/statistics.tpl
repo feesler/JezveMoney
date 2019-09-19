@@ -33,7 +33,7 @@
 
 						<div class="std_margin clearfix">
 							<div class="tr_filter filter_sel">
-								<select id="filter_type" onchange="onFilterChange(this);">
+								<select id="filter_type">
 <?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
 <?php		if ($byCurrItem["selected"]) {		?>
 									<option value="<?=$ind?>" selected><?=$byCurrItem["title"]?></option>
@@ -49,7 +49,7 @@
 <?php	} else {	?>
 							<div id="acc_block" class="tr_filter filter_sel">
 <?php	}	?>
-								<select id="acc_id" onchange="onAccountChange(this);">
+								<select id="acc_id">
 <?php	foreach($accArr as $accInfo) {
 			if ($accInfo->id == $acc_id) {	?>
 									<option value="<?=$accInfo->id?>" selected><?=$accInfo->name?></option>
@@ -65,7 +65,7 @@
 <?php	} else {	?>
 							<div id="curr_block" class="tr_filter filter_sel" style="display: none;">
 <?php	}	?>
-								<select id="curr_id" onchange="onCurrChange(this);">
+								<select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $curr_id) {	?>
 									<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
@@ -77,7 +77,7 @@
 							</div>
 
 							<div class="tr_filter filter_sel">
-								<select id="groupsel" onchange="onGroupChange();">
+								<select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
 									<option value="<?=$val?>" selected><?=$grtype?></option>
@@ -92,13 +92,13 @@
 						<div class="std_margin clearfix">
 							<div class="tr_filter">
 <?php	if (is_empty($dateFmt)) {		?>
-								<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php	} else { 	?>
-								<div id="calendar_btn" class="iconlink std_margin"><button onclick="showCalendar();" type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
 <?php	} 	?>
 								<div id="date_block" style="display: none;">
 									<div>
-										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button" onclick="showCalendar();"><span></span></button>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
 										</div>

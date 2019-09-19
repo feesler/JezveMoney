@@ -108,8 +108,16 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "user_id", "owner_id", "curr_id", "balance", "initbalance", "name", "icon", "createdate", "updatedate"],
-								[NULL, self::$user_id, $owner_id, $curr_id, $balance, $balance, $accname, $icon_type, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"user_id" => self::$user_id,
+														"owner_id" => $owner_id,
+														"curr_id" => $curr_id,
+														"balance" => $balance,
+														"initbalance" => $balance,
+														"name" => $accname,
+														"icon" => $icon_type,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return 0;
 
 		$acc_id = $this->dbObj->insertId();
@@ -151,20 +159,17 @@ class AccountModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		$fields = ["name", "curr_id", "icon", "updatedate"];
-		$values = [$accname, $curr_id, $icon_type, $curDate];
+		$assingArr = [ "name" => $accname, "curr_id" => $curr_id, "icon" => $icon_type, "updatedate" => $curDate];
 
 		if (abs($diff) > 0.01)
 		{
 			$newbalance = $this->getBalance($acc_id) + $diff;
 
-			$fields[] = "balance";
-			$values[] = $newbalance;
-			$fields[] = "initbalance";
-			$values[] = $balance;
+			$assingArr["balance"] = $newbalance;
+			$assingArr["initbalance"] = $balance;
 		}
 
-		if (!$this->dbObj->updateQ($this->tbl_name, $fields, $values, "id=".$acc_id))
+		if (!$this->dbObj->updateQ($this->tbl_name, $assingArr, "id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -235,7 +240,11 @@ class AccountModel extends CachedTable
 		if (!$acc_id || is_null($field) || $field == "")
 			return FALSE;
 
-		if (!$this->dbObj->updateQ($this->tbl_name, [$field, "updatedate"], [$newValue, date("Y-m-d H:i:s")], "id=".$acc_id))
+		$newValue = $this->dbObj->escape($newValue);
+
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ $field => $newValue, "updatedate" => date("Y-m-d H:i:s") ],
+									"id=".$acc_id))
 			return FALSE;
 
 		$this->cleanCache();

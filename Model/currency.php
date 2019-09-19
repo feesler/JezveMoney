@@ -72,8 +72,12 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "name", "sign", "format", "createdate", "updatedate"],
-							[NULL, $curr_name, $curr_sign, $curr_format, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"name" => $curr_name,
+														"sign" => $curr_sign,
+														"format" => $curr_format,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return 0;
 
 		$this->cleanCache();
@@ -98,9 +102,9 @@ class CurrencyModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["name", "sign", "format", "updatedate"],
-								[$curr_name, $curr_sign, $curr_format, $curDate],
-								"id=".$curr_id))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "name" => $curr_name, "sign" => $curr_sign, "format" => $curr_format, "updatedate" => $curDate],
+									"id=".$curr_id))
 			return FALSE;
 
 		$this->cleanCache();

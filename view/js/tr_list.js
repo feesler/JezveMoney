@@ -1,4 +1,4 @@
-﻿var dwPopup = null;
+var dwPopup = null;
 var calendarObj = null;
 var selRange = null;
 
@@ -303,7 +303,7 @@ function initTransListDrag()
 		 							oninsertat : onTransPosChanged,
 									container : 'tritems',
 									group : 'transactions',
-									itemClass : 'trlist_item_wrap',
+									selector : '.trlist_item_wrap',
 									placeholderClass : 'trlist_item_placeholder',
 									copyWidth : true,
 									table : (filterObj.mode == 'details') });
@@ -329,6 +329,32 @@ function initTransListDrag()
 		}
 
 		listItem_wr = nextElementSibling(listItem_wr);
+	}
+
+
+	var searchFrm = ge('searchFrm');
+	if (searchFrm)
+		searchFrm.onsubmit = onSearchSubmit.bind(null, searchFrm);
+
+	var btn;
+	var calendar_btn = ge('calendar_btn');
+	if (calendar_btn)
+	{
+		btn = firstElementChild(calendar_btn);
+		if (btn)
+			btn.onclick = showCalendar;
+	}
+
+	btn = ge('cal_rbtn');
+	if (btn)
+		btn.onclick = showCalendar;
+
+	var del_btn = ge('del_btn');
+	if (del_btn)
+	{
+		btn = firstElementChild(del_btn);
+		if (btn)
+			btn.onclick = showDeletePopup;
 	}
 }
 

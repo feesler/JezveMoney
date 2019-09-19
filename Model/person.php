@@ -78,8 +78,11 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "name", "user_id", "createdate", "updatedate"],
-								[NULL, $person_name, self::$user_id, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"name" => $person_name,
+														"user_id" => self::$user_id,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return 0;
 
 		$p_id = $this->dbObj->insertId();
@@ -105,7 +108,9 @@ class PersonModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["name", "updatedate"], [$person_name, $curDate], "id=".$person_id))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "name" => $person_name, "updatedate" => $curDate ],
+									"id=".$person_id))
 			return FALSE;
 
 		$this->cleanCache();

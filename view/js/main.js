@@ -304,7 +304,7 @@ function showResetAllPopup()
 {
 	if (!rAllPopup)
 	{
-		rAllPopup = Popup.create({ id : 'reset_warning',
+		rAllPopup = Popup.create({ id : 'reset_all_warning',
 						title : 'Reset all data',
 						content : resetAllMsg,
 						btn : { okBtn : { onclick : onResetAllPopup.bind(null, true) },
@@ -356,4 +356,63 @@ function showDeletePopup()
 function initStatWidget()
 {
 	Charts.createHistogram({ data : chartData, container : 'chart', height : 200 });
+}
+
+
+function initLoginPage()
+{
+	var loginfrm = ge('loginfrm');
+
+	if (loginfrm)
+		loginfrm.onsubmit = onLoginSubmit.bind(null, loginfrm);
+}
+
+
+function initRegisterPage()
+{
+	var regfrm = ge('regfrm');
+
+	if (regfrm)
+		regfrm.onsubmit = onRegisterSubmit.bind(null, regfrm);
+}
+
+
+function initProfilePage()
+{
+	var changeNameBtn = ge('changeNameBtn');
+	if (changeNameBtn)
+		changeNameBtn.onclick = showChangeNamePopup;
+
+	var changePassBtn = ge('changePassBtn');
+	if (changePassBtn)
+		changePassBtn.onclick = showChangePasswordPopup;
+
+	var resetAccBtn = ge('resetAccBtn');
+	if (resetAccBtn)
+		resetAccBtn.onclick = showResetAccountsPopup;
+
+	var resetAllBtn = ge('resetAllBtn');
+	if (resetAllBtn)
+		resetAllBtn.onclick = showResetAllPopup;
+
+	var delProfileBtn = ge('delProfileBtn');
+	if (delProfileBtn)
+		delProfileBtn.onclick = showDeletePopup;
+
+	var frm;
+	var changename = ge('changename');
+	if (changename)
+	{
+		frm = firstElementChild(changename);
+		if (frm)
+			frm.onsubmit = onChangeNameSubmit.bind(null, frm);
+	}
+
+	var changepass = ge('changepass');
+	if (changepass)
+	{
+		frm = firstElementChild(changepass);
+		if (frm)
+			frm.onsubmit = onChangePassSubmit.bind(null, frm);
+	}
 }

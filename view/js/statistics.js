@@ -264,4 +264,17 @@ function initControls()
 	if (!groupDD.create({ input_id : 'groupsel', selCB : onGroupSel, editable : false, mobile : isMobile }))
 		groupDD = null;
 
+
+	var btn;
+	var calendar_btn = ge('calendar_btn');
+	if (calendar_btn)
+	{
+		btn = firstElementChild(calendar_btn);
+		if (btn)
+			btn.onclick = showCalendar;
+	}
+
+	btn = ge('cal_rbtn');
+	if (btn)
+		btn.onclick = showCalendar;
 }

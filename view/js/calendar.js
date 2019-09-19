@@ -705,6 +705,10 @@ var Calendar = new (function()
 				{
 					wrapperObj.style.bottom = px((relativeParent) ? relativeParent.offsetHeight : 0);
 				}
+				else
+				{
+					wrapperObj.style.bottom = '';
+				}
 			}
 
 			// set automatic hide on empty click

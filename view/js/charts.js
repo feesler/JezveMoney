@@ -1,32 +1,135 @@
 // Global Charts object
 var Charts = new (function()
 {
+	// Return minimum value from array
+	function getMin(arrObj)
+	{
+		if (!isArray(arrObj))
+			return null;
+
+		return Math.min.apply(null, arrObj);
+	}
+
 
 	// Return maximum value from array
 	function getMax(arrObj)
 	{
-		var res;
-
-		if (!arrObj || !arrObj.length)
+		if (!isArray(arrObj))
 			return null;
 
-		res = arrObj[0];
-		arrObj.forEach(function(val)
-		{
-			res = Math.max(res, val);
-		});
-
-		return res;
+		return Math.max.apply(null, arrObj);
 	}
 
 
 	// Return function to convert relative value to absolute
-	function convertRelToAbs(maxVal, absMaxVal)
+	function convertRelToAbs(minVal, maxVal, absMaxVal)
 	{
+		var dVal = Math.abs(maxVal - minVal);
+
 		return function(val)
 		{
-			return absMaxVal * (val / maxVal);
+			return absMaxVal * ((val - minVal) / dVal);
 		}
+	}
+
+
+	// Calculate grid
+	function calculateGrid(minValue, maxValue, height, margin)
+	{
+		var gridStepRatio, getHeight;
+		var dVal;
+		var grid = {};
+
+		getHeight = convertRelToAbs(minValue, maxValue, height);
+
+		dVal = Math.abs(maxValue - minValue);
+
+		// calculate vertical grid step
+		grid.valueStep = 5;
+		while((dVal / grid.valueStep) > 1)
+		{
+			grid.valueStep *= 10;
+		}
+
+		gridStepRatio = Math.floor(height / 50);
+
+		while((dVal / grid.valueStep) < gridStepRatio)
+		{
+			grid.valueStep /= 2;
+		}
+
+		// calculate first label value
+		if (maxValue > 0)
+			grid.valueFirst = maxValue - (maxValue % grid.valueStep);
+		else
+			grid.valueFirst = 0;
+
+		// calculate y of first grid line
+		grid.yFirst = height - getHeight(grid.valueFirst) + margin;
+
+		// calculate absolute grid step
+		grid.steps = Math.floor(dVal / grid.valueStep);
+		grid.yStep = (height - grid.yFirst + margin) / grid.steps;
+
+		return grid;
+	}
+
+
+	// Remove elements
+	function removeElements(elems)
+	{
+		if (!isArray(elems))
+			elems = [elems];
+
+		elems.forEach(function(el)
+		{
+			el.remove();
+		});
+	}
+
+
+	// Draw grid and return array of grid lines
+	function drawGrid(paper, grid, width)
+	{
+		var dashed = { fill : 'none', stroke : '#808080', 'stroke-dasharray' : '- '};
+		var i, curY, el;
+		var lines = [];
+
+		curY = grid.yFirst;
+		for(i = 0; i <= grid.steps; i++)
+		{
+			el = paper.path('M0,' + Math.round(curY) + '.5L' + width + ',' + Math.round(curY) + '.5');
+			el.attr(dashed).toBack();
+
+			lines.push(el);
+
+			curY += grid.yStep;
+		}
+
+		return lines;
+	}
+
+
+	// Save total width of chart block with labels
+	function getChartOffset(chartElem)
+	{
+		if (!chartElem || !chartElem.parentNode || !chartElem.parentNode.parentNode || !chartElem.parentNode.parentNode.parentNode)
+			return null;
+
+		return chartElem.parentNode.parentNode.parentNode.offsetWidth;
+	}
+
+
+	// Return array of values
+	function mapValues(items)
+	{
+		if (!items || !isArray(items))
+			return null;
+
+		return items.map(function(item)
+		{
+			return item.value;
+		});
 	}
 
 
@@ -46,7 +149,6 @@ var Charts = new (function()
 		var chartMarginTop = 10;
 		var barMargin = 10;
 		var barWidth = 0;
-		var chartOffset = 0;
 		var chartWidth = 0;
 		var chartHeight = 0;
 		var chartContentWidth;
@@ -65,25 +167,15 @@ var Charts = new (function()
 		var self = this;
 
 
-		// Save total width of chart block with labels
-		function getChartOffset()
-		{
-			if (!chart || !chart.parentNode || !chart.parentNode.parentNode || !chart.parentNode.parentNode.parentNode)
-				return;
-
-			chartOffset = chart.parentNode.parentNode.parentNode.offsetWidth;
-		}
-
-
 		// Update width of chart block
 		function updateChartWidth()
 		{
-			var paperWidth;
+			var paperWidth, chartOffset;
 
 			if (!r)
 				return;
 
-			getChartOffset();
+			chartOffset = getChartOffset(chart);
 			paperWidth = Math.max(chartOffset - vLabelsWidth, chartContentWidth);
 
 			r.setSize(paperWidth, paperHeight);
@@ -106,42 +198,6 @@ var Charts = new (function()
 			vLabelsWidth = width;
 
 			updateChartWidth();
-		}
-
-
-		// Calculate grid
-		function calculateGrid(maxValue, height)
-		{
-			var gridStepRatio, getHeight;
-			var grid = {};
-
-			getHeight = convertRelToAbs(maxValue, height);
-
-			// calculate vertical grid step
-			grid.valueStep = 5;
-			while((maxValue / grid.valueStep) > 1)
-			{
-				grid.valueStep *= 10;
-			}
-
-			gridStepRatio = Math.floor(height / 50);
-
-			while((maxValue / grid.valueStep) < gridStepRatio)
-			{
-				grid.valueStep /= 2;
-			}
-
-			// calculate y of first grid line
-			grid.yFirst = getHeight(maxValue % grid.valueStep) + chartMarginTop;
-
-			// calculate absolute grid step
-			grid.steps = Math.floor(maxValue / grid.valueStep);
-			grid.yStep = (height - grid.yFirst + chartMarginTop) / grid.steps;
-
-			// calculate first label value
-			grid.valueFirst = maxValue - (maxValue % grid.valueStep);
-
-			return grid;
 		}
 
 
@@ -171,21 +227,8 @@ var Charts = new (function()
 		}
 
 
-		// Return array of bars values
-		function getBarsValues(bars)
-		{
-			if (!bars || !isArray(bars))
-				return null;
-
-			return bars.map(function(bar)
-			{
-				return bar.value;
-			});
-		}
-
-
 		// Draw vertical labels
-		function drawVLabels(grid)
+		function drawVLabels(paper, grid, textAttr)
 		{
 			var curY, val, el, i;
 
@@ -199,7 +242,7 @@ var Charts = new (function()
 			vertLabels = [];
 			for(i = 0; i <= grid.steps; i++)
 			{
-				el = lr.text(5, Math.round(curY), val).attr(textStyle);
+				el = paper.text(5, Math.round(curY), val).attr(textAttr);
 
 				vertLabels.push(el);
 
@@ -208,29 +251,6 @@ var Charts = new (function()
 					setVertLabelsWidth(bbObj.width + 10);
 
 				val -= grid.valueStep;
-
-				curY += grid.yStep;
-			}
-		}
-
-
-		// Draw grid
-		function drawGrid(grid)
-		{
-			var dashed = { fill : 'none', stroke : '#808080', 'stroke-dasharray' : '- '};
-			var i, curY, el;
-
-			curY = grid.yFirst;
-			gridLines.forEach(function(el)
-			{
-				el.remove();
-			});
-			gridLines = [];
-			for(i = 0; i <= grid.steps; i++)
-			{
-				el = r.path('M0,' + Math.round(curY) + '.5L' + chartWidth + ',' + Math.round(curY) + '.5').attr(dashed).toBack();
-
-				gridLines.push(el);
 
 				curY += grid.yStep;
 			}
@@ -265,7 +285,7 @@ var Charts = new (function()
 		function onScroll(e)
 		{
 			var vBars, values, el;
-			var maxVal, getHeight;
+			var minVal, maxVal, getHeight;
 			var grid, curY, val;
 			var i;
 
@@ -273,14 +293,17 @@ var Charts = new (function()
 				return;
 
 			vBars = getVisibleBars();
-			values = getBarsValues(vBars);
+			values = mapValues(vBars);
 
-			maxVal = getMax(values);
-			getHeight = convertRelToAbs(maxVal, chartHeight);
+			var zeroBaseValues = values.concat(0);
+			minVal = getMin(zeroBaseValues);
+			maxVal = getMax(zeroBaseValues);
+			getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
 
-			grid = calculateGrid(maxVal, chartHeight);
-			drawVLabels(grid);
-			drawGrid(grid);
+			grid = calculateGrid(minVal, maxVal, chartHeight, chartMarginTop);
+			drawVLabels(lr, grid, textStyle);
+			removeElements(gridLines);
+			gridLines = drawGrid(r, grid, chartWidth);
 
 			updateBarHeight(vBars, getHeight);
 
@@ -293,20 +316,33 @@ var Charts = new (function()
 		function createBars()
 		{
 			var leftPos = 0;
-			var maxVal, getHeight;
+			var minVal, maxVal, getHeight;
 
-			maxVal = getMax(data.values);
-			getHeight = convertRelToAbs(maxVal, chartHeight);
+			var zeroBaseValues = data.values.concat(0);
+			minVal = getMin(zeroBaseValues);
+			maxVal = getMax(zeroBaseValues);
+			getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
+
+			var zeroOffset;
+			if (minVal < 0 && maxVal > 0)			// both positive and negative values
+				zeroOffset = getHeight(0);
+			else if (minVal >= 0 && maxVal > 0)		// only positive values
+				zeroOffset = getHeight(minVal);
+			else if (minVal < 0 && maxVal <= 0)		// only negative values
+				zeroOffset = getHeight(maxVal);
+
 
 			bars = [];
 			data.values.forEach(function(val)
 			{
-				var barHeight = getHeight(val);
+				var barAbsVal = getHeight(val);
+				var barHeight = Math.abs(barAbsVal - zeroOffset);
+				var y = chartHeight + chartMarginTop - Math.max(barAbsVal, zeroOffset);
 
 				var bgRect = r.rect(leftPos, chartMarginTop, barWidth, chartHeight);
 				bgRect.attr({ fill : "#00bfff", 'fill-opacity' : 0, stroke : 'none' });
 
-				var barRect = r.rect(leftPos, chartHeight - barHeight + chartMarginTop, barWidth, barHeight);
+				var barRect = r.rect(leftPos, y, barWidth, barHeight);
 				barRect.attr({ fill : "#00bfff", 'fill-opacity' : 1, stroke : 'none' });
 
 				bgRect.mouseover(onBarOver.bind(this, barRect));
@@ -330,14 +366,28 @@ var Charts = new (function()
 			if (!isArray(barsArr) || !isFunction(getHeight))
 				return;
 
+			var barValues = mapValues(barsArr);
+
+			var zeroBaseValues = barValues.concat(0);
+			var minVal = getMin(zeroBaseValues);
+			var maxVal = getMax(zeroBaseValues);
+
+			var zeroOffset;
+			if (minVal < 0 && maxVal > 0)			// both positive and negative values
+				zeroOffset = getHeight(0);
+			else if (minVal >= 0 && maxVal > 0)		// only positive values
+				zeroOffset = getHeight(minVal);
+			else if (minVal < 0 && maxVal <= 0)		// only negative values
+				zeroOffset = getHeight(maxVal);
+
 			// update height of bars
 			barsArr.forEach(function(bar)
 			{
-				var barHeight;
+				var barAbsVal = getHeight(bar.value);
+				var barHeight = Math.abs(barAbsVal - zeroOffset);
+				var newY = chartHeight + chartMarginTop - Math.max(barAbsVal, zeroOffset);
 
-				barHeight = getHeight(bar.value);
-
-				bar.rect.attr({ y :  chartHeight - barHeight + chartMarginTop, height : barHeight });
+				bar.rect.attr({ y : newY, height : barHeight });
 			});
 		}
 
@@ -369,7 +419,7 @@ var Charts = new (function()
 		function create(params)
 		{
 			var barRect;
-			var maxVal;
+			var minVal, maxVal;
 			var leftPos = 0, relHeight, barHeight;
 			var grid, curY, val;
 			var getHeight;
@@ -412,17 +462,19 @@ var Charts = new (function()
 
 			barWidth = 38;
 
-			maxVal = getMax(data.values);
-			getHeight = convertRelToAbs(maxVal, chartHeight);
+			var zeroBaseValues = data.values.concat(0);
+			minVal = getMin(zeroBaseValues);
+			maxVal = getMax(zeroBaseValues);
+			getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
 
 			lr = Raphael(vert_labels, vLabelsWidth, paperHeight + 20);
 
 			// create grid
 			textStyle = { 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' };
 
-			grid = calculateGrid(maxVal, chartHeight);
+			grid = calculateGrid(minVal, maxVal, chartHeight, chartMarginTop);
 
-			drawVLabels(grid);
+			drawVLabels(lr, grid, textStyle);
 
 			if (fitToWidth)
 			{
@@ -443,7 +495,8 @@ var Charts = new (function()
 
 			r = Raphael(chart, chartWidth, paperHeight);
 
-			drawGrid(grid);
+			removeElements(gridLines);
+			gridLines = drawGrid(r, grid, chartWidth);
 
 			// create bars
 			createBars();
@@ -451,15 +504,20 @@ var Charts = new (function()
 			if (autoScale)
 			{
 				vBars = getVisibleBars();
-				values = getBarsValues(vBars);
-				maxVal = getMax(values);
-				getHeight = convertRelToAbs(maxVal, chartHeight);
+				values = mapValues(vBars);
+
+				var zeroBaseValues = values.concat(0);
+				minVal = getMin(zeroBaseValues);
+				maxVal = getMax(zeroBaseValues);
+				getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
+
+				grid = calculateGrid(minVal, maxVal, chartHeight, chartMarginTop);
+
+				drawVLabels(lr, grid, textStyle);
+				removeElements(gridLines);
+				gridLines = drawGrid(r, grid, chartWidth);
+
 				updateBarHeight(vBars, getHeight);
-
-				grid = calculateGrid(maxVal, chartHeight);
-
-				drawVLabels(grid);
-				drawGrid(grid);
 			}
 
 			// create horizontal labels
@@ -468,7 +526,430 @@ var Charts = new (function()
 
 		create(params);
 
-		// Histogram instance public methods
+		// Public methods of instance
+
+		// Return charts content elemtnt
+		this.getContent = function()
+		{
+			return chartContent;
+		}
+
+
+		// Return charts wrap element
+		this.getWrapObject = function()
+		{
+			return chartsWrapObj;
+		}
+	}
+
+
+	// Linechart constructor
+	function Linechart(params)
+	{
+		var containerObj = null;
+		var chartsWrapObj = null;
+		var chart = null;
+		var chartContent = null;
+		var vert_labels = null;
+		var r = null;
+		var lr = null;
+		var paperHeight = 300;
+		var hLabelsHeight = 20;
+		var vLabelsWidth = 10;
+		var chartMarginTop = 10;
+		var barMargin = 10;
+		var barWidth = 0;
+		var chartWidth = 0;
+		var chartHeight = 0;
+		var chartContentWidth;
+		var data = {};
+		var nodes = [];
+		var line = null;
+		var gridLines = [];
+		var vertLabels = [];
+		var textStyle;
+		var fitToWidth;
+		var autoScale;
+		var onNodeClickCallback = null;
+		var onScrollCallback = null;
+		var onNodeOverCallback = null;
+		var onNodeOutCallback = null;
+
+		var self = this;
+
+
+		// Update width of chart block
+		function updateChartWidth()
+		{
+			var paperWidth, chartOffset;
+
+			if (!r)
+				return;
+
+			chartOffset = getChartOffset(chart);
+			paperWidth = Math.max(chartOffset - vLabelsWidth, chartContentWidth);
+
+			r.setSize(paperWidth, paperHeight);
+
+			chartWidth = Math.max(paperWidth, chartContentWidth);
+		}
+
+
+		// Set new width for vertical labels block and SVG object
+		function setVertLabelsWidth(width)
+		{
+			var dw;
+
+			if (!lr || !chart)
+				return;
+
+			dw = vLabelsWidth - width;
+
+			lr.setSize(width, paperHeight + 20);
+			vLabelsWidth = width;
+
+			updateChartWidth();
+		}
+
+
+		// Return array of currently visible nodes
+		function getVisibleNodes()
+		{
+			var vNodes = [];
+			var nOutWidth, nodesOnWidth, firstNode;
+			var i, offs = 2;
+
+			if (!chartContent)
+				return;
+
+			nOutWidth = barWidth + barMargin;
+			nodesOnWidth = Math.round(chartContent.offsetWidth / nOutWidth);
+			nodesOnWidth = Math.min(nodes.length, nodesOnWidth + 2*offs);
+
+			firstNode = Math.floor(chartContent.scrollLeft / nOutWidth);
+			firstNode = Math.max(0, firstNode - offs);
+
+			if (firstNode + nodesOnWidth >= nodes.length)
+				nodesOnWidth = nodes.length - firstNode;
+
+			for(i = 0; i < nodesOnWidth; i++)
+			{
+				vNodes.push(nodes[firstNode + i]);
+			}
+
+			return vNodes;
+		}
+
+
+		// Draw vertical labels
+		function drawVLabels(paper, grid, textAttr)
+		{
+			var curY, val, el, i;
+
+			curY = grid.yFirst;
+			val = grid.valueFirst;
+
+			vertLabels.forEach(function(el)
+			{
+				el.remove();
+			});
+			vertLabels = [];
+			for(i = 0; i <= grid.steps; i++)
+			{
+				el = paper.text(5, Math.round(curY), val).attr(textAttr);
+
+				vertLabels.push(el);
+
+				bbObj = el.getBBox();
+				if (bbObj.width + 10 > vLabelsWidth)
+					setVertLabelsWidth(bbObj.width + 10);
+
+				val -= grid.valueStep;
+
+				curY += grid.yStep;
+			}
+		}
+
+
+		// Node click event handler
+		function onNodeClick(node, val)
+		{
+			if (onNodeClickCallback)
+				onNodeClickCallback.call(self, node, val);
+		}
+
+
+		// Mouse over node event handler
+		function onNodeOver(node)
+		{
+			if (onNodeOverCallback)
+				onNodeOverCallback(node);
+		}
+
+
+		// Mouse out from node event handler
+		function onNodeOut(node)
+		{
+			if (onNodeOutCallback)
+				onNodeOutCallback(node);
+		}
+
+
+		// Chart content scroll event handler
+		function onScroll(e)
+		{
+			var vNodes, values, el;
+			var minVal, maxVal, getHeight;
+			var grid, curY, val;
+			var i;
+
+			if (!autoScale)
+				return;
+
+			vNodes = getVisibleNodes();
+			values = mapValues(vNodes);
+			var zeroBaseValues = (values.length == 1) ? values.concat(0) : values;
+			minVal = getMin(zeroBaseValues);
+			maxVal = getMax(zeroBaseValues);
+			getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
+
+			grid = calculateGrid(minVal, maxVal, chartHeight, chartMarginTop);
+			drawVLabels(lr, grid, textStyle);
+			removeElements(gridLines);
+			gridLines = drawGrid(r, grid, chartWidth);
+
+			updatePathScale(vNodes, getHeight);
+
+			if (onScrollCallback)
+				onScrollCallback.call(self);
+		}
+
+
+		// Draw path currently saved at nodes
+		function drawPath()
+		{
+			var p = '';
+
+			if (line)
+				line.remove();
+
+			for(var i = 0, l = nodes.length - 1; i < l; i++)
+			{
+				var dot = nodes[i].dot;
+				var ndot = nodes[i + 1].dot;
+
+				if (!i)
+					p += 'M' + dot.x + ',' + dot.y;
+				p += 'L' + ndot.x + ',' + ndot.y;
+			}
+
+			line = r.path();
+			line.attr({ path: p, 'stroke-width' : 3, stroke : '#00bfff' });
+			if (nodes.length && nodes[0].node)
+				line.insertBefore(nodes[0].node);
+		}
+
+
+		// Create chart path with default height
+		function createPath()
+		{
+			var leftPos = 0;
+			var minVal, maxVal, getHeight;
+
+			var zeroBaseValues = (data.values.length == 1) ? data.values.concat(0) : data.values;
+			minVal = getMin(zeroBaseValues);
+			maxVal = getMax(zeroBaseValues);
+			getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
+
+			nodes = [];
+			var dw = (barWidth + barMargin) / 2;
+			var dotObj;
+
+			data.values.forEach(function(val)
+			{
+				var barHeight = getHeight(val);
+
+				dotObj = { x : leftPos + dw, y : (chartHeight - barHeight + chartMarginTop) };
+
+				var bgRect = r.rect(leftPos, chartMarginTop, barWidth, chartHeight);
+				bgRect.attr({ fill : '#00bfff', 'fill-opacity' : 0, stroke : 'none' });
+
+				var nodeCircle = r.circle(leftPos + dw, (chartHeight - barHeight + chartMarginTop), 4);
+				nodeCircle.attr({ fill : '#ffffff', stroke : '#00bfff', 'stroke-width' : 1.5 }).toFront();
+
+				bgRect.mouseover(onNodeOver.bind(this, nodeCircle));
+				bgRect.mouseout(onNodeOut.bind(this, nodeCircle));
+				bgRect.click(onNodeClick.bind(this, nodeCircle, val));
+
+				nodeCircle.mouseover(onNodeOver.bind(this, nodeCircle));
+				nodeCircle.mouseout(onNodeOut.bind(this, nodeCircle));
+				nodeCircle.click(onNodeClick.bind(this, nodeCircle, val));
+
+				nodes.push({ node : nodeCircle, value : val, dot : dotObj });
+
+				leftPos += barWidth + barMargin;
+			});
+
+
+			drawPath();
+		}
+
+
+		// Update scale of path
+		function updatePathScale(nodesArr, getHeight)
+		{
+			if (!isArray(nodesArr) || !isFunction(getHeight))
+				return;
+
+			// update height of bars
+			nodesArr.forEach(function(node)
+			{
+				var absY;
+
+				absY = getHeight(node.value);
+
+				node.node.attr({ cy :  chartHeight - absY + chartMarginTop });
+				node.dot.y = chartHeight - absY + chartMarginTop;
+			});
+
+			drawPath();
+		}
+
+
+		// Create horizontal labels
+		function createHLabels()
+		{
+			var labelShift = 0, lastOffset = 0;
+			var lblMarginLeft = 10;
+
+			data.series.forEach(function(val, itemNum)
+			{
+				var itemDate = val[0];
+				var itemsCount = val[1];
+
+				if (lastOffset == 0 || labelShift > lastOffset + lblMarginLeft)
+				{
+					txtEl = r.text(labelShift, paperHeight - (hLabelsHeight / 2), itemDate).attr(textStyle);
+
+					bbObj = txtEl.getBBox();
+					lastOffset = labelShift + bbObj.width;
+				}
+				labelShift += itemsCount * (barWidth + barMargin);
+			});
+		}
+
+
+		// Create bar chart
+		function create(params)
+		{
+			var barRect;
+			var minVal, maxVal;
+			var leftPos = 0, relHeight, barHeight;
+			var grid, curY, val;
+			var getHeight;
+			var el, bbObj;
+
+			if (!params || !params.data || !params.data.values || !params.data.series)
+				return;
+
+			data = params.data;
+
+			fitToWidth = params.widthFit || false;
+			autoScale = params.autoScale || false;
+			paperHeight = params.height || 300;
+			onScrollCallback = isFunction(params.onscroll) ? params.onscroll : null;
+			onNodeClickCallback = isFunction(params.onnodeclick) ? params.onnodeclick : null;
+			onNodeOverCallback = isFunction(params.onnodeover) ? params.onnodeover : null;
+			onNodeOutCallback = isFunction(params.onnodeout) ? params.onnodeout : null;
+
+			if (!params.container)
+				return;
+			containerObj = ge(params.container);
+			if (!containerObj)
+				return;
+
+			// Vertical labels
+			vert_labels = ce('div');
+
+			// Histogram
+			chart = ce('div');
+			chartContent = ce('div', { className : 'chart_content' }, chart);
+
+			chartsWrapObj = ce('div', { className : 'charts' }, [
+									ce('div', { className : 'right_float' }, vert_labels),
+									ce('div', { className : 'chart_wrap' }, chartContent) ]);
+			containerObj.appendChild(chartsWrapObj);
+
+			chartContent.onscroll = function(e){ onScroll.call(this, e); };
+
+			chartHeight = paperHeight - hLabelsHeight - chartMarginTop;
+
+			barWidth = 38;
+
+			var zeroBaseValues = (data.values.length == 1) ? data.values.concat(0) : data.values;
+			minVal = getMin(zeroBaseValues);
+			maxVal = getMax(zeroBaseValues);
+			getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
+
+			lr = Raphael(vert_labels, vLabelsWidth, paperHeight + 20);
+
+			// create grid
+			textStyle = { 'font-family' : 'Segoe UI', 'font-size' : 14, 'text-anchor' : 'start' };
+
+			grid = calculateGrid(minVal, maxVal, chartHeight, chartMarginTop);
+
+			drawVLabels(lr, grid, textStyle);
+
+			if (fitToWidth)
+			{
+				barWidth = (chart.parentNode.offsetWidth / (data.values.length + 1));
+				if (barWidth > 10)
+				{
+					barMargin = barWidth / 5;
+					barWidth -= barMargin * 4;
+				}
+				else
+				{
+					barMargin = 0;
+				}
+			}
+
+			chartContentWidth = (data.values.length) * (barWidth + barMargin);
+			chartWidth = Math.max(chart.offsetWidth, chartContentWidth);
+
+			r = Raphael(chart, chartWidth, paperHeight);
+
+			removeElements(gridLines);
+			gridLines = drawGrid(r, grid, chartWidth);
+
+			// create linechart path
+			createPath();
+
+			if (autoScale)
+			{
+				vNodes = getVisibleNodes();
+				values = mapValues(vNodes);
+
+				zeroBaseValues = (values.length == 1) ? values.concat(0) : values;
+				minVal = getMin(zeroBaseValues);
+				maxVal = getMax(zeroBaseValues);
+				getHeight = convertRelToAbs(minVal, maxVal, chartHeight);
+				updatePathScale(vNodes, getHeight);
+
+				grid = calculateGrid(minVal, maxVal, chartHeight, chartMarginTop);
+
+				drawVLabels(lr, grid, textStyle);
+				removeElements(gridLines);
+				gridLines = drawGrid(r, grid, chartWidth);
+			}
+
+			// create horizontal labels
+			createHLabels();
+		}
+
+		create(params);
+
+		// Public methods of instance
 
 		// Return charts content elemtnt
 		this.getContent = function()
@@ -489,5 +970,11 @@ var Charts = new (function()
 	this.createHistogram = function(params)
 	{
 		return new Histogram(params);
+	}
+
+
+	this.createLinechart = function(params)
+	{
+		return new Linechart(params);
 	}
 })();

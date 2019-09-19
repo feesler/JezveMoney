@@ -236,7 +236,9 @@ class UserModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["owner_id", "updatedate"], [$o_id, $curDate], "id=".qnull($u_id)))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "owner_id" => $o_id, "updatedate" => $curDate ],
+									"id=".qnull($u_id)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -258,7 +260,9 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["passhash", "updatedate"], [$passhash, $curDate], "login=".qnull($elogin)))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "passhash" => $passhash, "updatedate" => $curDate],
+									"login=".qnull($elogin)))
 			return FALSE;
 
 		$this->cleanCache();
@@ -290,7 +294,11 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, ["id", "login", "passhash", "createdate", "updatedate"], [NULL, $elogin, $passhash, $curDate, $curDate]))
+		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
+														"login" => $elogin,
+														"passhash" => $passhash,
+														"createdate" => $curDate,
+														"updatedate" => $curDate ]))
 			return FALSE;
 
 		$user_id = $this->dbObj->insertId();
@@ -394,7 +402,9 @@ class UserModel extends CachedTable
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["login", "passhash", "updatedate"], [$elogin, $passhash, $curDate], "id=".$user_id))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "login" => $elogin, "passhash" => $passhash, "updatedate" => $curDate],
+									"id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();
@@ -422,7 +432,9 @@ class UserModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->updateQ($this->tbl_name, ["access", "updatedate"], [$access, $curDate], "id=".$user_id))
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "access" => $access, "updatedate" => $curDate ],
+									"id=".$user_id))
 			return FALSE;
 
 		$this->cleanCache();

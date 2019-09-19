@@ -175,3 +175,15 @@ function fixDPI()
 	if (headEl)
 		headEl.appendChild(ce('link', { rel : 'stylesheet', href : img_css }));
 }
+
+
+
+function initHeader()
+{
+	var userbtn = ge('userbtn');
+	if (userbtn)
+		userbtn.onclick = onUserClick;
+}
+
+
+onReady(initHeader);

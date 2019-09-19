@@ -21,12 +21,12 @@
 					<div class="heading">
 						<h1><?=$headString?></h1>
 <?php	if ($action == "edit") {	?>
-						<div id="del_btn" class="iconlink"><button onclick="onDelete();" type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 
 					<div>
-						<form method="post" action="<?=BASEURL?>accounts/<?=$action?>/" onsubmit="return onNewAccountSubmit(this);">
+						<form id="accForm" method="post" action="<?=BASEURL?>accounts/<?=$action?>/">
 <?php	if ($action == "edit") {		?>
 						<input id="accid" name="accid" type="hidden" value="<?=$acc_id?>">
 <?php	}	?>
@@ -49,7 +49,7 @@
 						</div>
 						<div class="non_float std_margin">
 							<label for="accname">Account name</label>
-							<div class="stretch_input std_input"><input id="accname" name="accname" type="text" value="<?=$accInfo["name"]?>" oninput="return onAccNameInput(this);"></div>
+							<div class="stretch_input std_input"><input id="accname" name="accname" type="text" value="<?=$accInfo["name"]?>"></div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="currency">Currency</label>

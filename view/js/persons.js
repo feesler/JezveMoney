@@ -137,11 +137,45 @@ function initControls()
 		return;
 
 	personForm.onsubmit = onPersonSubmit;
+
+	var del_btn = ge('del_btn');
+	if (del_btn)
+		del_btn.onclick = onDelete;
 }
 
 
 function initPersonsList()
 {
+	var tilesContainer, tileEl, btnEl, del_btn;
+	var pos, tile_id;
+
+	tilesContainer = ge('tilesContainer');
+	del_btn = ge('del_btn');
+	if (!tilesContainer || !del_btn)
+		return;
+
 	initToolbar();
 	persons = new Selection();
+
+	tileEl = firstElementChild(tilesContainer);
+	while(tileEl)
+	{
+		pos = tileEl.id.indexOf('_');
+		if (pos !== -1)
+		{
+			tile_id = parseInt(tileEl.id.substr(pos + 1));
+			if (!isNaN(tile_id))
+			{
+				btnEl = firstElementChild(tileEl);
+				if (btnEl)
+					btnEl.onclick = onTileClick.bind(null, tile_id);
+			}
+		}
+
+		tileEl = nextElementSibling(tileEl);
+	}
+
+	btnEl = firstElementChild(del_btn);
+	if (btnEl)
+		btnEl.onclick = showDeletePopup;
 }

@@ -86,6 +86,29 @@ function orJoin($pieces)
 }
 
 
+function assignJoin($assignments)
+{
+	if (!is_array($assignments))
+		$assignments = [ $assignments ];
+
+	$res = [];
+	foreach($assignments as $key => $value)
+	{
+		if (is_string($key))
+		{
+			$res[] = $key."=".qnull($value);
+		}
+		else if (is_numeric($key))
+		{
+			$res[] = $value;
+		}
+		else
+			throw "Incorrect syntax";
+	}
+
+	return implode(", ", $res);
+}
+
 
 class mysqlDB
 {
@@ -154,7 +177,7 @@ class mysqlDB
 			self::$dbname = $name;
 
 		$errno = mysqli_errno(self::$conn);
-		wlog("Result: ".($errno ? ($errno." - ".mysql_error(self::$conn)) : "ok"));
+		wlog("Result: ".($errno ? ($errno." - ".mysqli_error(self::$conn)) : "ok"));
 
 		return $res;
 	}
@@ -174,7 +197,8 @@ class mysqlDB
 		{
 			if (!$this->connect())
 				return NULL;
-			$this->selectDB(self::$settings->database);
+			if (!$this->selectDB(self::$settings->database))
+				return NULL;
 			$this->rawQ("SET NAMES 'utf8';");
 		}
 
@@ -222,12 +246,23 @@ class mysqlDB
 
 
 	// Insert query
-	public function insertQ($table, $fields, $values)
+	public function insertQ($table, $data)
 	{
-		if (!$table || $table == "" || !$fields || $fields == "" || !$values || $values == "")
+		if (empty($table) || !is_array($data) || !count($data))
 			return FALSE;
 
-		$query = "INSERT INTO `".$table."` (`".join("`, `", $fields)."`) VALUES (".qjoin(", ", $values).");";
+		$fields = [];
+		$values = [];
+		foreach($data as $key => $value)
+		{
+			if (!is_string($key))
+				continue;
+
+			$fields[] = "`".$key."`";
+			$values[] = qnull($value);
+		}
+
+		$query = "INSERT INTO `".$table."` (".implode(", ", $fields).") VALUES (".implode(", ", $values).");";
 		$this->rawQ($query);
 		$errno = mysqli_errno(self::$conn);
 
@@ -243,26 +278,12 @@ class mysqlDB
 
 
 	// Update query
-	public function updateQ($table, $fields, $values, $condition = NULL)
+	public function updateQ($table, $data, $condition = NULL)
 	{
-		if (!$table || $table == "" || !$fields || $fields == "" || !$values || $values == "")
+		if (empty($table) || empty($data))
 			return FALSE;
 
-		$fcount = count($fields);
-		$vcount = count($values);
-
-		if ($fcount != $vcount)
-			return FALSE;
-
-		$query = "UPDATE `".$table."` SET ";
-
-		for($i = 0; $i < $fcount; $i++)
-		{
-			$query .= $fields[$i]." = ".qnull($values[$i]);
-			if ($i < $fcount - 1)
-				$query .= ", ";
-		}
-
+		$query = "UPDATE `".$table."` SET ".assignJoin($data);
 		if (!is_null($condition))
 			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";
