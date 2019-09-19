@@ -52,6 +52,28 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 };
 
 
+TestPage.prototype.parseCommentRow = function(elem)
+{
+	if (!elem)
+		return null;
+
+	var res = { elem : elem };
+
+	var iconLinkElem = elem.querySelector('.iconlink');
+
+	res.iconLink = this.parseIconLink(iconLinkElem);
+	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
+
+	res.input = function(val)
+	{
+		if (isVisible(this.iconLink))
+			this.iconLink.click()
+
+		this.inputRow.input(val);
+	};
+};
+
+
 TransactionPage.prototype.getPageClass = function(str)
 {
 	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
@@ -70,6 +92,13 @@ TransactionPage.prototype.getPageClass = function(str)
 TransactionPage.prototype.parseContent = function()
 {
 	var res = {};
+
+	res.heading = { elem : vquery('.heading > h1') };
+	if (res.heading.elem)
+		res.heading.title = res.heading.elem.innerHTML;
+
+	res.delBtn = vge('del_btn');
+	res.isUpdate = (res.delBtn != null);
 
 	var menuItems = vqueryall('#trtype_menu > span');
 	res.typeMenu = [];
@@ -140,6 +169,17 @@ TransactionPage.prototype.parseContent = function()
 	res.exchange_row = this.parseInputRow(vge('exchange'));
 	res.result_balance_row = this.parseInputRow(vge('result_balance'));
 	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
+
+	res.datePicker = this.parseDatePickerRow(vge('calendar_btn').parentNode);
+	res.comment_row = this.parseCommentRow(vge('comm_btn').parentNode);
+
+	res.submitBtn = vge('submitbtn');
+	res.submitBtn = res.submitBtn.nextElementSibling;
+
+	res.submit = function()
+	{
+		return navigation(clickEmul(this.submitBtn), MainPage);
+	};
 
 	return res;
 };

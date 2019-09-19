@@ -394,6 +394,10 @@ TestPage.prototype.parseInputRow = function(elem)
 			res.currSign = res.currElem.firstElementChild.innerHTML;
 		}
 	}
+	else
+	{
+		res.datePickerBtn = elem.querySelector('.btn.cal_btn');
+	}
 
 	var t = elem.querySelector('input[type="hidden"]');
 	if (t)
@@ -416,6 +420,31 @@ TestPage.prototype.parseInputRow = function(elem)
 	};
 
 	return res;
+};
+
+
+TestPage.prototype.parseDatePickerRow = function(elem)
+{
+	if (!elem)
+		return null;
+
+	var res = { elem : elem };
+
+	var iconLinkElem = elem.querySelector('.iconlink');
+
+	res.iconLink = this.parseIconLink(iconLinkElem);
+	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
+
+	res.inputDate = function(val)
+	{
+		if (isVisible(this.iconLink))
+		{
+			this.iconLink.click()
+			clickEmul(this.datePickerBtn);
+		}
+
+		this.inputRow.input(val);
+	};
 };
 
 
