@@ -169,6 +169,63 @@ TestPage.prototype.parseInfoTiles = function(tilesEl)
 };
 
 
+TestPage.prototype.parseTransactionsList = function(listEl)
+{
+	if (!listEl)
+		return null;
+
+	var res = [];
+
+	if (!listEl || (listEl.children.length == 1 && listEl.children[0].tagName == 'SPAN'))
+		return res;
+
+	var listItems;
+	if (listEl.tagName == 'TABLE')
+	{
+		listItems = listEl.querySelectorAll('tr');
+	}
+	else
+	{
+		listItems = listEl.querySelectorAll('.trlist_item');
+	}
+
+	for(var i = 0; i < listItems.length; i++)
+	{
+		var li = listItems[i];
+		var itemObj = { id : this.parseId(li.id), elem : li };
+
+		var elem = li.querySelector('.tritem_acc_name > span');
+		if (!elem)
+			throw new Error('Account title not found');
+		itemObj.accountTitle = elem.innerHTML;
+
+		elem = li.querySelector('.tritem_sum > span');
+		if (!elem)
+			throw new Error('Amount text not found');
+		itemObj.amountText = elem.innerHTML;
+
+		elem = li.querySelector('.tritem_date_comm');
+		if (!elem || !elem.firstElementChild || elem.firstElementChild.tagName != 'SPAN')
+			throw new Error('Date element not found');
+
+		itemObj.dateFmt = elem.firstElementChild.innerHTML;
+
+		elem = li.querySelector('.tritem_comm');
+		itemObj.comment = elem ? elem.innerHTML : '';
+
+		itemObj.click = function()
+		{
+			clickEmul(itemObj.elem);
+		};
+
+		res.push(itemObj);
+	}
+
+	return res;
+};
+
+
+
 TestPage.prototype.parseDropDown = function(elem)
 {
 	var res = { elem : elem };

@@ -35,6 +35,10 @@ MainPage.prototype.parseContent = function()
 		if (tiles)
 			widget.infoTiles = tiles;
 
+		var transactions = this.parseTransactionsList(widget.elem.querySelector('.trans_list'));
+		if (transactions)
+			widget.transList = transactions;
+
 		res.widgets.push(widget);
 	}
 
@@ -74,12 +78,27 @@ MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 };
 
 
-MainPage.prototype.goToPersons = function(page)
+MainPage.prototype.goToTransactions = function()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
 		throw new Error('Fail to parse main page widgets');
 
-	var personsWidget = this.content.widgets[3];
+	var widget = this.content.widgets[2];
+	if (widget.title != 'Transactions')
+		throw new Error('Wrong widget');
+
+	return navigation(() => clickEmul(widget.linkElem), TransactionsPage);
+};
+
+
+MainPage.prototype.goToPersons = function()
+{
+	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+		throw new Error('Fail to parse main page widgets');
+
+	var widget = this.content.widgets[3];
+	if (widget.title != 'Persons')
+		throw new Error('Wrong widget');
 
 	return navigation(() => clickEmul(personsWidget.linkElem), PersonsPage);
 };
