@@ -4,6 +4,42 @@ var results = {};
 var initPersonsLength;
 
 
+// Run action, check state and add result to the list
+function test(descr, action, page, state)
+{
+	var res = false;
+	var errorMessage = '';
+	var expState;
+
+	try
+	{
+		console.log('Test: ' + descr);
+		action();
+		expState = (typeof state === 'undefined') ? page.expectedState : state;
+		res = page.checkState(expState)
+	}
+	catch(e)
+	{
+		errorMessage = e.message;
+	}
+
+	addResult(descr, res, errorMessage);
+}
+
+
+function addResult(descr, res, message)
+{
+	message = message || '';
+
+	totalRes.innerHTML = ++results.total;
+	okRes.innerHTML = (res) ? ++results.ok : results.ok;
+	failRes.innerHTML = (res) ? results.fail : ++results.fail;
+
+	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
+										ce('td', { innerHTML : (res ? 'OK' : 'FAIL') }),
+									 	ce('td', { innerHTML : message }) ]));
+}
+
 
 function initTests()
 {
@@ -48,7 +84,7 @@ function startTests(page)
 
 function setBlock(title, category)
 {
-	addBlock(title, category);
+	restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : title }) ));
 }
 
 
@@ -1081,47 +1117,4 @@ function debtTransactionStart(page)
 	test('(50) Disable account', () => page.toggleAccount(), page);
 
 	return Promise.resolve(page);
-}
-
-
-// Run action, check state and add result to the list
-function test(descr, action, page, state)
-{
-	var res = false;
-	var errorMessage = '';
-	var expState;
-
-	try
-	{
-		console.log('Test: ' + descr);
-		action();
-		expState = (typeof state === 'undefined') ? page.expectedState : state;
-		res = page.checkState(expState)
-	}
-	catch(e)
-	{
-		errorMessage = e.message;
-	}
-
-	addResult(descr, res, errorMessage);
-}
-
-
-function addResult(descr, res, message)
-{
-	message = message || '';
-
-	totalRes.innerHTML = ++results.total;
-	okRes.innerHTML = (res) ? ++results.ok : results.ok;
-	failRes.innerHTML = (res) ? results.fail : ++results.fail;
-
-	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
-										ce('td', { innerHTML : (res ? 'OK' : 'FAIL') }),
-									 	ce('td', { innerHTML : message }) ]));
-}
-
-
-function addBlock(descr, category)
-{
-	restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : descr }) ));
 }
