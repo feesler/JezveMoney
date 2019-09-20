@@ -231,8 +231,7 @@ function createAccount2(page)
 	var state = { values : { tile : { name : 'acc_2', balance : '0 ₽' }, currDropDown : { textValue : 'RUB' } } };
 
 // Input account name
-	page.inputName('acc_2');
-	test('Account tile name update', () => {}, page, state);
+	test('Account tile name update', () => page.inputName('acc_2'), page, state);
 
 // Change currency to EUR
 	setParam(state.values, { tile : { balance : '€ 0' }, currDropDown : { textValue : 'EUR' } });
