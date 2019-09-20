@@ -174,12 +174,7 @@ TransactionPage.prototype.parseContent = function()
 	res.comment_row = this.parseCommentRow(vge('comm_btn').parentNode);
 
 	res.submitBtn = vge('submitbtn');
-	res.submitBtn = res.submitBtn.nextElementSibling;
-
-	res.submit = function()
-	{
-		return navigation(clickEmul(this.submitBtn), MainPage);
-	};
+	res.cancelBtn = res.submitBtn.nextElementSibling;
 
 	return res;
 };
@@ -305,6 +300,12 @@ TransactionPage.prototype.changeTransactionType = function(type)
 		return;
 
 	return navigation(() => this.content.typeMenu[type].click(), this.content.typeMenu[type].pageClass);
+};
+
+
+TransactionPage.prototype.submit = function()
+{
+	return navigation(() => clickEmul(this.content.submitBtn), MainPage);
 };
 
 
