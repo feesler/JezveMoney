@@ -62,7 +62,7 @@ function initControls()
 	{
 		var del_btn = ge('del_btn');
 		if (del_btn && firstElementChild(del_btn))
-			firstElementChild(del_btn).onclick = onDelete();
+			firstElementChild(del_btn).onclick = onDelete;
 	}
 
 	var accForm = ge('accForm');
