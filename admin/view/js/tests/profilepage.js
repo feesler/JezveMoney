@@ -55,6 +55,7 @@ ProfilePage.prototype.parseContent = function()
 	}
 
 	res.reset_warning = this.parseWarningPopup(vge('reset_warning'));
+	res.reset_all_warning = this.parseWarningPopup(vge('reset_all_warning'));
 	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));
 
 	return res;
@@ -71,10 +72,10 @@ ProfilePage.prototype.resetAll = function()
 
 	this.parse();
 
-	if (!this.content.reset_warning || !this.content.reset_warning.elem || !isVisible(this.content.reset_warning.elem))
+	if (!this.content.reset_all_warning || !this.content.reset_all_warning.elem || !isVisible(this.content.reset_all_warning.elem))
 		throw new Error('Warning popup not appear');
-	if (!this.content.reset_warning.okBtn)
+	if (!this.content.reset_all_warning.okBtn)
 		throw new Error('Confirm button not found');
 
-	return navigation(() => clickEmul(this.content.reset_warning.okBtn), ProfilePage);
+	return navigation(() => clickEmul(this.content.reset_all_warning.okBtn), ProfilePage);
 };
