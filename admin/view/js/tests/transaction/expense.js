@@ -175,18 +175,22 @@ ExpenseTransactionPage.prototype.setExpectedState = function(state_id)
 
 ExpenseTransactionPage.prototype.inputSrcAmount = function(val)
 {
+	if (!this.model.isDiffCurr)
+		throw new Error('Wrong state: can\'t input source amount on state ' + this.model.state);
+
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
-	this.setSrcAmount(this.model, val);
+	this.model.srcAmount = val;
 
-	if (this.model.isDiffCurr)
+	if (this.model.fSrcAmount != fNewValue)
 	{
+		this.model.fSrcAmount = fNewValue;
+
+		this.model.srcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+		this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+
 		this.calcExchByAmounts(this.model);
 		this.updateExch(this.model);
-	}
-	else
-	{
-		this.setDestAmount(this.model, this.model.srcAmount);
 	}
 
 	this.setExpectedState(this.model.state);
@@ -211,7 +215,7 @@ ExpenseTransactionPage.prototype.inputDestAmount = function(val)
 			this.updateExch(this.model);
 		}
 		else
-			this.setSrcAmount(this.model, this.model.destAmount);
+			this.setSrcAmount(this.model, this.model.fDestAmount);
 	}
 
 	this.setExpectedState(this.model.state);

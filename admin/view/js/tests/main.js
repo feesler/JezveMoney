@@ -190,7 +190,7 @@ function submitExpenseTests(page)
 
 			.then(page => expenseTransactionLoop(page, 0, page =>
 			{
-				test('Source amount (123.7801) input', () => page.inputSrcAmount('123.7801'), page);
+				test('Destination amount (123.7801) input', () => page.inputDestAmount('123.7801'), page);
 				return page.submit();
 			}))
 			.then(page =>
