@@ -100,5 +100,5 @@ MainPage.prototype.goToPersons = function()
 	if (widget.title != 'Persons')
 		throw new Error('Wrong widget');
 
-	return navigation(() => clickEmul(personsWidget.linkElem), PersonsPage);
+	return navigation(() => clickEmul(widget.linkElem), PersonsPage);
 };
