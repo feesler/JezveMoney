@@ -328,7 +328,7 @@ class mysqlDB
 	{
 		$res = 0;
 
-		$query = "SELECT COUNT(*) FROM ".$table;
+		$query = "SELECT COUNT(*) AS cnt FROM ".$table;
 		if (!is_null($condition))
 			$query .= " WHERE ".andJoin($condition);
 		$query .= ";";
@@ -340,7 +340,7 @@ class mysqlDB
 		{
 			$row = mysqli_fetch_array($result);
 			if ($row)
-				$res = $row["COUNT(*)"];
+				$res = $row["cnt"];
 		}
 
 		return $res;

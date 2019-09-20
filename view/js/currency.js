@@ -11,6 +11,7 @@ function Currency(props)
 	this.id = props.id;
 	this.format = props.format;
 	this.sign = props.sign;
+	this.name = props.name;
 }
 
 
