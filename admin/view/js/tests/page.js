@@ -513,8 +513,12 @@ TestPage.prototype.checkVisibility = function(controls, expected)
 {
 	var control, expVisible, factVisible, res;
 
-	if (!controls || !expected)
+	if (!controls)
 		throw new Error('Wrong parameters');
+
+	// Undefined expected value is equivalent to empty object
+	if (typeof expected === 'undefined')
+		return true;
 
 	for(var countrolName in expected)
 	{
