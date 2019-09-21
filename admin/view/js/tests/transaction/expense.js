@@ -211,8 +211,11 @@ ExpenseTransactionPage.prototype.inputDestAmount = function(val)
 
 		if (this.model.isDiffCurr)
 		{
-			this.calcExchByAmounts(this.model);
-			this.updateExch(this.model);
+			if (isValidValue(this.model.srcAmount))
+			{
+				this.calcExchByAmounts(this.model);
+				this.updateExch(this.model);
+			}
 		}
 		else
 			this.setSrcAmount(this.model, this.model.fDestAmount);
