@@ -92,7 +92,7 @@ function accountTests(page)
 {
 	setBlock('Accounts', 1);
 
-	return page.goToMainPage()
+	return goToMainPage(page)
 			.then(page => page.goToAccounts())
 			.then(page => page.goToCreateAccount())
 			.then(createAccount1)
@@ -118,7 +118,7 @@ function personTests(page)
 {
 	setBlock('Persons', 1);
 
-	return page.goToMainPage()
+	return goToMainPage(page)
 			.then(page => page.goToPersons())
 			.then(checkInitialPersons)
 			.then(page => createPerson(page, 'Alex'))
@@ -134,7 +134,7 @@ function transactionTests(page)
 {
 	setBlock('Transaction page states', 1);
 
-	return page.goToMainPage()
+	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(expenseTransactionLoop)
 			.then(page => page.changeTransactionType(INCOME))
@@ -161,37 +161,101 @@ function formatDate(date, month, year)
 }
 
 
+function goToMainPage(page)
+{
+	return page.goToMainPage()
+			.then(page =>
+			{
+				App.transactions = page.content.widgets[2].transList;
+				App.accounts = page.content.widgets[0].tiles;
+
+				return Promise.resolve(page);
+			});
+}
+
+
 function submitExpenseTests(page)
 {
 	setBlock('Submit transactions', 1);
 
 	var currentDateFmt = formatDate(new Date());
 
-	return page.goToMainPage()
+	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
-
 			.then(expenseTransactionLoop)
-			.then(page => page.goToMainPage())
-			.then(page => page.goToNewTransactionByAccount(0))
+			.then(page => createExpense(page, 0, 0, { destAmount : '123.7801' }))
+			.then(page => createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
+			.then(page => createExpense(page, 1, 0, { destAmount : '0.01' }))
 
-			.then(page => expenseTransactionLoop(page, 0, page =>
+}
+
+
+function createExpense(page, accNum, onState, params)
+{
+	var srcAcc = null;
+
+	return goToMainPage(page)
+			.then(page => page.goToNewTransactionByAccount(accNum))
+			.then(page => expenseTransactionLoop(page, onState, page =>
 			{
-				test('Destination amount (123.7801) input', () => page.inputDestAmount('123.7801'), page);
+				if ('srcAcc' in params)
+				{
+					test('Change source account to (' + page.getAccountByPos(params.srcAcc).name + ')',
+							() => page.changeSrcAccountByPos(params.srcAcc), page);
+				}
+
+				if ('destCurr' in params)
+				{
+					test('Change destination currency to ' + getCurrency(params.destCurr).name,
+							() => page.changeDestCurrency(params.destCurr), page);
+				}
+
+				if (!('destAmount' in params))
+					throw new Error('Destination amount value not specified');
+
+				test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
+
+				if ('destCurr' in params && 'srcAmount' in params)
+					test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+
+				if ('date' in params)
+					test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+
+				if ('comment' in params)
+					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+
+				srcAcc = page.model.srcAccount;
+
 				return page.submit();
 			}))
 			.then(page =>
 			{
-				var accWidget = { tiles : { length : 5, 0 : { balance : '377.21 ₽', name : 'acc_3' } } };
+				var expBalance = srcAcc.balance - normalize(('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount);
+				var fmtBal = formatCurrency(expBalance, srcAcc.curr_id);
+
+				// Accounts widget changes
+				var accWidget = { tiles : { length : App.accounts.length } };
+				accWidget.tiles[accNum] = { balance : fmtBal, name : srcAcc.name };
+
+				// Transactions widget changes
+				var fmtAmount = '- ' + formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
+				if ('destCurr' in params && 'srcAmount' in params)
+				{
+					fmtAmount += ' (- ' + formatCurrency(params.destAmount, params.destCurr) + ')';
+				}
 
 				var transWidget = { title : 'Transactions',
-									transList : { length : 1, 0 : { accountTitle : 'acc_3',
-																	amountText : '- 123.78 ₽',
-																 	dateFmt : currentDateFmt,
-																 	comment : '' } } };
+									transList : { length : Math.min(App.transactions.length + 1, 5) } };
+				transWidget.transList[0] = { accountTitle : srcAcc.name,
+												amountText : fmtAmount,
+											 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+											 	comment : ('comment' in params) ? params.comment : '' };
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
 
-				test('First expense transaction submit', () => {}, page, state);
+				test('Expense transaction submit', () => {}, page, state);
+
+				App.transactions = page.content.widgets[2].transList;
 
 				return Promise.resolve(page);
 			});
@@ -382,6 +446,7 @@ function deleteAccounts(page, accounts)
 				return Promise.resolve(page);
 			});
 }
+
 
 function checkInitialPersons(page)
 {

@@ -435,7 +435,7 @@ TestPage.prototype.parseDatePickerRow = function(elem)
 	res.iconLink = this.parseIconLink(iconLinkElem);
 	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
 
-	res.inputDate = function(val)
+	res.input = function(val)
 	{
 		if (isVisible(this.iconLink))
 		{

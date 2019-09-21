@@ -52,7 +52,7 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 };
 
 
-TestPage.prototype.parseCommentRow = function(elem)
+TransactionPage.prototype.parseCommentRow = function(elem)
 {
 	if (!elem)
 		return null;
@@ -180,10 +180,20 @@ TransactionPage.prototype.parseContent = function()
 };
 
 
-// Return zero if no account can't be found
+// Return null if no account can't be found
 TransactionPage.prototype.getAccount = function(acc_id)
 {
 	return idSearch(viewframe.contentWindow.accounts, acc_id);
+};
+
+
+// Return zero if no account can't be found
+TransactionPage.prototype.getAccountByPos = function(pos)
+{
+	if (pos >= 0 && pos < viewframe.contentWindow.accounts.length)
+		return viewframe.contentWindow.accounts[pos];
+	else
+		return null;
 };
 
 
@@ -405,4 +415,16 @@ TransactionPage.prototype.clickExchRate = function()
 TransactionPage.prototype.inputExchRate = function(val)
 {
 	this.performAction(() => this.content.exchange_row.input(val));
+};
+
+
+TransactionPage.prototype.changeDate = function(val)
+{
+	this.performAction(() => this.content.datePicker.inputDate(val));
+};
+
+
+TransactionPage.prototype.inputComment = function(val)
+{
+	this.performAction(() => this.content.comment_row.input(val));
 };
