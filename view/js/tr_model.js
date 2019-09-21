@@ -115,7 +115,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	function f5()
 	{
 		if (fsa == 0)
-			fe = e = (fda == 0) ? 1 : 0;
+			fe = e = 1;
 		else
 			fe = e = correctExch(fda / fsa);
 
