@@ -1,7 +1,7 @@
 var restbl = null;
 var totalRes = null, okRes = null, failRes = null;
 var results = {};
-var initPersonsLength;
+var App = { accounts : [], persons : [], transactions : []};
 
 
 // Run action, check state and add result to the list
@@ -96,18 +96,13 @@ function accountTests(page)
 			.then(page => page.goToAccounts())
 			.then(page => page.goToCreateAccount())
 			.then(createAccount1)
-			.then(checkCreateAccount1)
 			.then(page => page.goToCreateAccount())
 			.then(createAccount2)
-			.then(checkCreateAccount2)
 			.then(page => page.goToUpdateAccount(0))
 			.then(editAccount1)
-			.then(checkEditAccount1)
 			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
-			.then(checkCreateAccount3)
-			.then(page => page.deleteAccounts([0, 1]))
-			.then(checkDeleteAccounts)
+			.then(page => deleteAccounts(page, [0, 1]))
 			.then(page => page.goToCreateAccount())
 			.then(page => createAccountWithParam(page, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 }))
 			.then(page => page.goToCreateAccount())
@@ -126,21 +121,12 @@ function personTests(page)
 	return page.goToMainPage()
 			.then(page => page.goToPersons())
 			.then(checkInitialPersons)
-			.then(page => page.goToCreatePerson())
-			.then(page => page.createPerson('Alex'))
-			.then(page => checkCreatePerson(page, 'Alex'))
-			.then(page => page.goToCreatePerson())
-			.then(page => page.createPerson('Maria'))
-			.then(page => checkCreatePerson(page, 'Maria'))
-			.then(page => page.goToCreatePerson())
-			.then(page => page.createPerson('Johnny'))
-			.then(page => checkCreatePerson(page, 'Johnny'))
-			.then(page => page.goToCreatePerson())
-			.then(page => page.createPerson('Иван'))
-			.then(page => checkCreatePerson(page, 'Иван'))
-			.then(page => page.goToUpdatePerson(3))
-			.then(page => updatePerson(page, 3, 'Иван', 'Ivan<'))
-			.then(page=> page.deletePersons([0, 2]));
+			.then(page => createPerson(page, 'Alex'))
+			.then(page => createPerson(page, 'Maria'))
+			.then(page => createPerson(page, 'Johnny'))
+			.then(page => createPerson(page, 'Иван'))
+			.then(page => updatePerson(page, 3, 'Ivan<'))
+			.then(page => deletePersons(page, [0, 2]));
 }
 
 
@@ -264,15 +250,21 @@ function createAccount1(page)
 	test('Input (1000.01) balance', () => page.inputBalance('1000.01'), page, state);
 
 
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+			.then(page => checkCreateAccount(page, { name : 'acc_1', balance : 1000.01, curr_id : 1 }));
 }
 
 
-function checkCreateAccount1(page)
+function checkCreateAccount(page, params)
 {
-	var state = { values : { tiles : { length : 1, 0 : { balance : '1 000.01 ₽', name : 'acc_1' } } } };
+	var state = { value : { tiles : { length : App.accounts.length + 1 } } };
+	var fmtBal = formatCurrency(normalize(params.balance), params.curr_id);
 
-	test('First account create', () => {}, page, state);
+	state.value.tiles[App.accounts.length] = { balance : fmtBal, name : params.name, icon : params.icon };
+
+	test('Account create', () => {}, page, state);
+
+	App.accounts = page.content.tiles;
 
 	return Promise.resolve(page);
 }
@@ -292,16 +284,8 @@ function createAccount2(page)
 	state.values.tile.balance = '€ 1 000.01';
 	test('Account tile balance on EUR 1 000.01 balance input field', () => page.inputBalance('1000.01'), page, state);
 
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
-}
-
-
-function checkCreateAccount2(page)
-{
-	var state = { value : { tiles : { length : 2, 1 : { balance : '€ 1 000.01', name : 'acc_2' } } } };
-	test('Second account create', () => {}, page, state);
-
-	return Promise.resolve(page);
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+			.then(page => checkCreateAccount(page, { name : 'acc_2', balance : 1000.01, curr_id : 3 }));
 }
 
 
@@ -321,14 +305,21 @@ function editAccount1(page)
 	test('Icon change', () => page.changeIcon(1), page, state);
 
 // Submit
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+			.then(checkUpdateAccount.bind(null, { updatePos : 0, name : 'acc_1', balance : 1000.01, curr_id : 2, icon : tileIcons[1] }));
 }
 
 
-function checkEditAccount1(page)
+function checkUpdateAccount(params, page)
 {
-	var state = { value : { tiles : { length : 2, 1 : { balance : '$ 1 000.01', name : 'acc_1', icon : tileIcons[1] } } } };
-	test('First account update', () => {}, page, state);
+	var state = { value : { tiles : { length : App.accounts.length } } };
+	var fmtBal = formatCurrency(normalize(params.balance), params.curr_id);
+
+	state.value.tiles[params.updatePos] = { balance : fmtBal, name : params.name, icon : params.icon };
+
+	test('Account update', () => {}, page, state);
+
+	App.accounts = page.content.tiles;
 
 	return Promise.resolve(page);
 }
@@ -372,34 +363,30 @@ function createAccountWithParam(page, params)
 		test('Tile icon update', () => page.changeIcon(params.icon), page, state);
 	}
 
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage);
+	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+			.then(page => checkCreateAccount(page, params));
 }
 
 
-function checkCreateAccount3(page)
+function deleteAccounts(page, accounts)
 {
-	var state = { value : { tiles : { length : 3, 2 : { balance : '500.99 ₽', name : 'acc_3', icon : tileIcons[2] } } } };
-	test('Third account create', () => {}, page, state);
+	return page.deleteAccounts(accounts)
+			.then(page =>
+			{
+				var state = { value : { tiles : { length : App.accounts.length - accounts.length } } };
 
- 	return Promise.resolve(page);
+				test('Delete accounts [' + accounts.join() + ']', () => {}, page, state);
+
+				App.accounts = page.content.tiles;
+
+				return Promise.resolve(page);
+			});
 }
-
-
-function checkDeleteAccounts(page)
-{
-	var state = { values : { tiles : { length : 1 } } };
-	test('Accounts delete', () => {}, page, state);
-
-	return Promise.resolve(page);
-}
-
 
 function checkInitialPersons(page)
 {
-	var state = { value : { tiles : { length : initPersonsLength + 1 } } };
+	var state = { value : { tiles : { length : 0 } } };
 	test('Initial persons structure', () => {}, page, state);
-
-	initPersonsLength = page.content.tiles.length;
 
 	return Promise.resolve(page);
 }
@@ -407,38 +394,63 @@ function checkInitialPersons(page)
 
 // From persons list page go to new person page, input name and submit
 // Next check name result and callback
-function checkCreatePerson(page, personName)
+function createPerson(page, personName)
 {
-	var state = { value : { tiles : { length : initPersonsLength + 1 } } };
-	state.value.tiles[initPersonsLength] = { name : personName };
+	return page.goToCreatePerson()
+			.then(page => page.createPerson(personName))
+			.then(page =>
+			{
+				var state = { value : { tiles : { length : App.persons.length + 1 } } };
+				state.value.tiles[App.persons.length] = { name : personName };
 
-	test('Person create', () => {}, page, state);
+				test('Create person', () => {}, page, state);
 
-	initPersonsLength = page.content.tiles.length;
+				App.persons = page.content.tiles;
 
-	return Promise.resolve(page);
+				return Promise.resolve(page);
+			});
 }
 
 
-function updatePerson(page, num, currentName, personName)
+function updatePerson(page, num, personName)
 {
-	var state = { visibility : { name : true },
- 					values : { name : currentName } };
+	return page.goToUpdatePerson(num)
+			.then(page =>
+			{
+				var state = { visibility : { name : true },
+			 					values : { name : App.persons[num].name } };
 
-	test('Update person page state', () => {}, page, state);
+				test('Update person page state', () => {}, page, state);
 
-	page.inputName(personName);
+				page.inputName(personName);
 
-	return navigation(() => clickEmul(page.content.submitBtn), PersonsPage)
-	.then(function(page)
-	{
-		var state = { values : { tiles : { length : initPersonsLength } }};
-		state.values.tiles[num] = { name : personName };
+				return navigation(() => clickEmul(page.content.submitBtn), PersonsPage)
+			})
+			.then(page =>
+			{
+				var state = { values : { tiles : { length : App.persons.length } }};
+				state.values.tiles[num] = { name : personName };
 
-		test('Person update', () => {}, page, state);
+				test('Update person', () => {}, page, state);
 
-		return Promise.resolve(page);
-	});
+				App.persons = page.content.tiles;
+
+				return Promise.resolve(page);
+			});
+}
+
+
+function deletePersons(page, persons)
+{
+	return page.deletePersons(persons)
+			.then(function(page)
+			{
+				var state = { values : { tiles : { length : App.persons.length - persons.length } } };
+
+				test('Delete persons [' + persons.join() + ']', () => {}, page, state);
+
+				return Promise.resolve(page);
+			});
 }
 
 

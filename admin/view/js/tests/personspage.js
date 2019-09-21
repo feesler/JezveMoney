@@ -60,8 +60,6 @@ PersonsPage.prototype.deletePersons = function(persons)
 	if (!isArray(persons))
 		persons = [persons];
 
-	var expectedPersonsLength = this.content.tiles.length - persons.length;
-
 	persons.forEach(function(person_num, ind)
 	{
 		if (person_num >= this.content.tiles.length)
@@ -87,12 +85,4 @@ PersonsPage.prototype.deletePersons = function(persons)
 		throw new Error('Delete account warning popup not appear');
 
 	return navigation(() => clickEmul(this.content.delete_warning.okBtn), PersonsPage)
-	.then(function(page)
-	{
-		var state = { values : { tiles : { length : expectedPersonsLength } } };
-
-		addResult('Persons delete result', page.checkState(state));
-
-		return Promise.resolve(page);
-	});
 };
