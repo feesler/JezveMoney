@@ -14,7 +14,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	var S1_d;		// balance of destination account before transaction
 	var S2_d;		// balance of destintation account after transaction
 
-	var fS1, fsa, fda, fe, fS2, fS1_d, fS2_d;	// parsed float values
+	var fS1 = 0, fsa = 0, fda = 0, fe = 1, fS2 = 0, fS1_d = 0, fS2_d = 0;	// parsed float values
 	var s1valid = false, s2valid = false, davalid = false, evalid = false, savalid = false, s1dvalid = false, s2dvalid = false;
 
 	var type = trans_type;
@@ -114,7 +114,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 	// Calculate exchange rate by destination and source amount
 	function f5()
 	{
-		if (fsa == 0)
+		if (fsa == 0 || fda == 0)
 			fe = e = 1;
 		else
 			fe = e = correctExch(fda / fsa);
@@ -169,8 +169,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 					f1();				// calculate S2
 			}
 
-			if (davalid)
-				f5();		// calculate e
+			f5();		// calculate e
 		}
 		else
 		{
@@ -211,8 +210,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 				f1();			// calculate S2
 		}
 
-		if (savalid)
-			f5();		// calculate e
+		f5();		// calculate e
 
 		notifyChanged('dest_amount', da);
 	}
@@ -285,8 +283,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			f3();					// calculate source amount
 			if (self.isDiff())
 			{
-				if (savalid && davalid)
-					f5();			// calculate exchange
+				f5();			// calculate exchange
 			}
 			else
 			{
@@ -311,8 +308,7 @@ function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc,
 			f3_d();		// calculate destination amount
 			if (self.isDiff())
 			{
-				if (savalid && davalid)
-					f5();			// calculate exchange rate
+				f5();			// calculate exchange rate
 			}
 			else
 			{
