@@ -231,7 +231,11 @@ function createExpense(page, accNum, onState, params)
 			}))
 			.then(page =>
 			{
-				var expBalance = srcAcc.balance - normalize(('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount);
+				// Obtain real source amount from props:
+				// In case of expense with different currency use source amount value
+				// In case of expense with the same currency copy destination amount value
+				var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
+				var expBalance = srcAcc.balance - normalize(sa);
 				var fmtBal = formatCurrency(expBalance, srcAcc.curr_id);
 
 				// Accounts widget changes
@@ -303,7 +307,7 @@ function createIncome(page, accNum, onState, params)
 				test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
 
 				if ('srcCurr' in params && 'destAmount' in params)
-					test('Source amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
+					test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
 
 				if ('date' in params)
 					test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
@@ -318,7 +322,11 @@ function createIncome(page, accNum, onState, params)
 			}))
 			.then(page =>
 			{
-				var expBalance = destAcc.balance + normalize(('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount);
+				// Obtain real destination amount from props:
+				// In case of income with different currency use destination amount value
+				// In case of income with the same currency copy source amount value
+				var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
+				var expBalance = destAcc.balance + normalize(da);
 				var fmtBal = formatCurrency(expBalance, destAcc.curr_id);
 
 				// Accounts widget changes
