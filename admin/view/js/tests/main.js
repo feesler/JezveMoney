@@ -184,6 +184,7 @@ function submitExpenseTests(page)
 	return createExpense(page, 0, 0, { destAmount : '123.7801' })
 			.then(page => createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
 			.then(page => createExpense(page, 1, 0, { destAmount : '0.01' }))
+			.then(page => createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }))
 
 }
 
@@ -191,6 +192,7 @@ function submitExpenseTests(page)
 function createExpense(page, accNum, onState, params)
 {
 	var srcAcc = null;
+	var srcAccPos = accNum;
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
@@ -223,6 +225,7 @@ function createExpense(page, accNum, onState, params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 				srcAcc = page.model.srcAccount;
+				srcAccPos = page.getAccountPos(srcAcc.id);
 
 				return page.submit();
 			}))
@@ -233,7 +236,7 @@ function createExpense(page, accNum, onState, params)
 
 				// Accounts widget changes
 				var accWidget = { tiles : { length : App.accounts.length } };
-				accWidget.tiles[accNum] = { balance : fmtBal, name : srcAcc.name };
+				accWidget.tiles[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 				// Transactions widget changes
 				var fmtAmount = '- ' + formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
@@ -267,6 +270,7 @@ function submitIncomeTests(page)
 	return createIncome(page, 0, 0, { srcAmount : '10023.7801' })
 			.then(page => createIncome(page, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
 			.then(page => createIncome(page, 1, 0, { srcAmount : '0.01' }))
+			.then(page => createIncome(page, 1, 0, { destAcc : 4, srcAmount : '99.99' }))
 
 }
 
@@ -274,6 +278,7 @@ function submitIncomeTests(page)
 function createIncome(page, accNum, onState, params)
 {
 	var destAcc = null;
+	var destAccPos = accNum;
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
@@ -307,6 +312,7 @@ function createIncome(page, accNum, onState, params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 				destAcc = page.model.destAccount;
+				destAccPos = page.getAccountPos(destAcc.id)
 
 				return page.submit();
 			}))
@@ -317,7 +323,7 @@ function createIncome(page, accNum, onState, params)
 
 				// Accounts widget changes
 				var accWidget = { tiles : { length : App.accounts.length } };
-				accWidget.tiles[accNum] = { balance : fmtBal, name : destAcc.name };
+				accWidget.tiles[destAccPos] = { balance : fmtBal, name : destAcc.name };
 
 				// Transactions widget changes
 				var fmtAmount = '+ ' + formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id);
