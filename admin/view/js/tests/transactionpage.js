@@ -273,13 +273,10 @@ TransactionPage.prototype.getPersonAccount = function(person_id, curr_id)
 
 TransactionPage.prototype.calcExchByAmounts = function(model)
 {
-	if (this.content.activeType == 1)	/* EXPENSE */
-	{
-		if (model.fSrcAmount == 0)
-			model.exchRate = 1;
-		else
-			model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
-	}
+	if (model.fSrcAmount == 0 || model.fDestAmount == 0)
+		model.exchRate = 1;
+	else
+		model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
 
 	return model
 };

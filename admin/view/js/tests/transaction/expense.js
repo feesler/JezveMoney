@@ -405,7 +405,7 @@ ExpenseTransactionPage.prototype.changeDestCurrency = function(val)
 		}
 		else								// Transition 9
 		{
-			this.setSrcAmount(this.model, this.model.destAmount);
+			this.setSrcAmount(this.model, this.model.fDestAmount);
 			this.calcExchByAmounts(this.model);
 			this.updateExch(this.model);
 			this.setExpectedState(0);

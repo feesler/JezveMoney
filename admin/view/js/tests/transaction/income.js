@@ -185,12 +185,15 @@ IncomeTransactionPage.prototype.inputSrcAmount = function(val)
 
 		if (this.model.isDiffCurr)
 		{
-			this.calcExchByAmounts(this.model);
-			this.updateExch(this.model);
+			if (isValidValue(this.model.destAmount))
+			{
+				this.calcExchByAmounts(this.model);
+				this.updateExch(this.model);
+			}
 		}
 		else
 		{
-			this.setDestAmount(this.model, this.model.srcAmount);
+			this.setDestAmount(this.model, this.model.fSrcAmount);
 		}
 	}
 
@@ -242,7 +245,7 @@ IncomeTransactionPage.prototype.inputDestResBalance = function(val)
 			this.updateExch(this.model);
 		}
 		else
-			this.setDestAmount(this.model, this.model.srcAmount);
+			this.setDestAmount(this.model, this.model.fSrcAmount);
 	}
 
 	this.setExpectedState(this.model.state);
