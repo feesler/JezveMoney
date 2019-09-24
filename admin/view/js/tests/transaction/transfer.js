@@ -491,7 +491,8 @@ TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
 	}
 	else
 	{
-		this.setDestAmount(this.model, this.model.fSrcAmount);
+		if (this.model.fSrcAmount != this.model.fDestAmount)
+			this.setDestAmount(this.model, this.model.fSrcAmount);
 
 		if (this.model.state === 0 || this.model.state === 1 || this.model.state === 2)
 		{
@@ -578,7 +579,8 @@ TransferTransactionPage.prototype.changeDestAccount = function(account_id)
 	}
 	else
 	{
-		this.setDestAmount(this.model, this.model.fSrcAmount);
+		if (this.model.fSrcAmount != this.model.fDestAmount)
+			this.setDestAmount(this.model, this.model.fSrcAmount);
 
 		if (this.model.state === 0 || this.model.state === 1 || this.model.state === 2)				// Transition 7, 13 or 17
 		{
