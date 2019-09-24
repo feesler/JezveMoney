@@ -194,7 +194,7 @@ function submitExpenseTests(page)
 function createExpense(page, accNum, onState, params)
 {
 	var srcAcc = null;
-	var srcAccPos = accNum;
+	var srcAccPos;
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
@@ -263,6 +263,7 @@ function createExpense(page, accNum, onState, params)
 				test('Expense transaction submit', () => {}, page, state);
 
 				App.transactions = page.content.widgets[2].transList;
+				App.accounts = page.content.widgets[0].tiles;
 
 				return Promise.resolve(page);
 			});
@@ -284,7 +285,7 @@ function submitIncomeTests(page)
 function createIncome(page, accNum, onState, params)
 {
 	var destAcc = null;
-	var destAccPos = accNum;
+	var destAccPos;
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
@@ -354,6 +355,7 @@ function createIncome(page, accNum, onState, params)
 				test('Income transaction submit', () => {}, page, state);
 
 				App.transactions = page.content.widgets[2].transList;
+				App.accounts = page.content.widgets[0].tiles;
 
 				return Promise.resolve(page);
 			});
