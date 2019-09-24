@@ -262,6 +262,9 @@ TransferTransactionPage.prototype.setExpectedState = function(state_id)
 
 TransferTransactionPage.prototype.inputSrcAmount = function(val)
 {
+	if (this.model.state !== 0 && this.model.state !== 3 && this.model.state !== 5 && this.model.state !== 7)
+		throw new Error('Unexpected state ' + this.model.state + ' to input source amount');
+
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 	var valueChanged = (this.model.fSrcAmount != fNewValue);
 
@@ -288,6 +291,9 @@ TransferTransactionPage.prototype.inputSrcAmount = function(val)
 
 TransferTransactionPage.prototype.inputDestAmount = function(val)
 {
+	if (this.model.state !== 3 && this.model.state !== 4)
+		throw new Error('Unexpected state ' + this.model.state + ' to input destination amount');
+
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 	var valueChanged = (this.model.fDestAmount != fNewValue);
 
