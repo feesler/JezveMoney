@@ -147,7 +147,7 @@ function transactionTests(page)
 			.then(submitTransferTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
-			.then(debtTransactionLoop);
+			.then(debtTransactionLoop)
 			.then(submitDebtTests);
 }
 
