@@ -729,8 +729,8 @@ class TransactionsController extends Controller
 		{
 			if (!$debtMod->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
+
 			setMessage(MSG_DEBT_CREATE);
-			setLocation(BASEURL."transactions/?type=debt");
 		}
 		else
 		{
@@ -759,9 +759,11 @@ class TransactionsController extends Controller
 
 			if (!$transMod->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
 				$this->fail($defMsg);
+
 			setMessage(MSG_TRANS_CREATE);
-			setLocation(BASEURL);
 		}
+
+		setLocation(BASEURL);
 	}
 
 
