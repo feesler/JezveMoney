@@ -453,7 +453,7 @@ function createTransfer(page, onState, params)
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
 
-				test('Income transaction submit', () => {}, page, state);
+				test('Transfer transaction submit', () => {}, page, state);
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;

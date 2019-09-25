@@ -20,7 +20,7 @@ TransactionsPage.prototype.parseContent = function()
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
-		throw new Error('Wrong transaction page structure');
+		throw new Error('Wrong transactions page structure');
 
 	res.title = res.titleEl.innerText;
 	res.transactions = this.parseTransactionsList(vge('tritems'));
