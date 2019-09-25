@@ -21,7 +21,7 @@ PersonsPage.prototype.parseContent = function()
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 		throw new Error('Wrong persons page structure');
 
-	res.title = res.titleEl.innerHTML;
+	res.title = res.titleEl.innerText;
 	res.tiles = this.parseTiles(vquery('.tiles'));
 
 	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));

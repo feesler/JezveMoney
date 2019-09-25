@@ -23,8 +23,8 @@ ProfilePage.prototype.parseContent = function()
 	if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
 		throw new Error('Wrong profile page structure');
 
-	res.login = res.loginElem.innerHTML;
-	res.name = res.nameElem.innerHTML;
+	res.login = res.loginElem.innerText;
+	res.name = res.nameElem.innerText;
 
 	var buttons = blocks[3].querySelectorAll('input[type="button"]');
 	if (!buttons || buttons.length != 3)

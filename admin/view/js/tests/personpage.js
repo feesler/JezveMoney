@@ -15,7 +15,7 @@ PersonPage.prototype.parseContent = function()
 	res.headingElem = vquery('.heading > h1');
 	if (!res.headingElem)
 		throw new Error('Heading element not found');
-	res.heading = res.headingElem.innerHTML;
+	res.heading = res.headingElem.innerText;
 
 	res.formElem = vquery('form');
 	if (!res.formElem)

@@ -15,9 +15,9 @@ TransactionPage.prototype.parseTileRightItem = function(elem)
 
 	var res = { elem : elem };
 	res.titleElem = elem.firstElementChild;
-	res.title = res.titleElem.innerHTML;
+	res.title = res.titleElem.innerText;
 	res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
-	res.value = res.buttonElem.firstElementChild.innerHTML;
+	res.value = res.buttonElem.firstElementChild.innerText;
 	res.click = function()
 	{
 		clickEmul(res.buttonElem);
@@ -38,7 +38,7 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 	if (!lbl)
 		throw new Error('Tile block label not found');
 
-	res.label = lbl.innerHTML;
+	res.label = lbl.innerText;
 	res.tile = this.parseTile(elem.querySelector('.tile'));
 	res.dropDown = this.parseDropDown(elem.querySelector('.dd_attached'));
 
@@ -95,7 +95,7 @@ TransactionPage.prototype.parseContent = function()
 
 	res.heading = { elem : vquery('.heading > h1') };
 	if (res.heading.elem)
-		res.heading.title = res.heading.elem.innerHTML;
+		res.heading.title = res.heading.elem.innerText;
 
 	res.delBtn = vge('del_btn');
 	res.isUpdate = (res.delBtn != null);
@@ -106,7 +106,7 @@ TransactionPage.prototype.parseContent = function()
 	{
 		var menuItem = menuItems[i].firstElementChild;
 
-		var menuItemObj = { elem : menuItem, text : menuItem.innerHTML, type : this.getTransactionType(menuItem.innerHTML) };
+		var menuItemObj = { elem : menuItem, text : menuItem.innerText, type : this.getTransactionType(menuItem.innerText) };
 
 		if (menuItem.tagName == 'B')
 		{

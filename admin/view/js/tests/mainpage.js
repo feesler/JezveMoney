@@ -26,7 +26,7 @@ MainPage.prototype.parseContent = function()
 		if (widget.linkElem)
 			widget.link = widget.linkElem.href;
 		if (widget.textElem)
-			widget.title = widget.textElem.innerHTML;
+			widget.title = widget.textElem.innerText;
 
 		var tiles = this.parseTiles(widget.elem.querySelector('.tiles'));
 		if (tiles)

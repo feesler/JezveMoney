@@ -22,7 +22,7 @@ TransactionsPage.prototype.parseContent = function()
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong transaction page structure');
 
-	res.title = res.titleEl.innerHTML;
+	res.title = res.titleEl.innerText;
 	res.transactions = this.parseTransactionsList(vge('tritems'));
 
 	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));

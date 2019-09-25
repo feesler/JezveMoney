@@ -22,7 +22,7 @@ AccountsPage.prototype.parseContent = function()
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong accounts page structure');
 
-	res.title = res.titleEl.innerHTML;
+	res.title = res.titleEl.innerText;
 	res.tiles = this.parseTiles(vquery('.tiles'));
 
 	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));

@@ -15,7 +15,7 @@ AccountPage.prototype.parseContent = function()
 	res.heading = { elem : vquery('.heading > h1') };
 	if (!res.heading.elem)
 		throw new Error('Heading element not found');
-	res.heading.text = res.heading.elem.innerHTML;
+	res.heading.text = res.heading.elem.innerText;
 
 	res.tile = this.parseTile(vge('acc_tile'));
 

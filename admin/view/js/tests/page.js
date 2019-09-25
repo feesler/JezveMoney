@@ -42,7 +42,7 @@ TestPage.prototype.parseHeader = function()
 		el = res.user.menuBtn.querySelector('.user_title');
 		if (!el)
 			throw new Error('User title element not found');
-		res.user.name = el.innerHTML;
+		res.user.name = el.innerText;
 
 		res.user.menuEl = res.elem.querySelector('.usermenu');
 		if (!res.user.menuEl)
@@ -53,7 +53,7 @@ TestPage.prototype.parseHeader = function()
 		for(var i = 0; i < menuLinks.length; i++)
 		{
 			el = menuLinks[i];
-			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerHTML });
+			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerText });
 		}
 
 		var itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
@@ -128,8 +128,8 @@ TestPage.prototype.parseInfoTile = function(tileEl)
 					subtitleEl : tileEl.querySelector('.info_subtitle') };
 
 	tileObj.id = this.parseId(tileEl.id);
-	tileObj.title = tileObj.titleEl.innerHTML;
-	tileObj.subtitle = tileObj.subtitleEl.innerHTML;
+	tileObj.title = tileObj.titleEl.innerText;
+	tileObj.subtitle = tileObj.subtitleEl.innerText;
 
 	return tileObj;
 };
@@ -197,21 +197,21 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 		var elem = li.querySelector('.tritem_acc_name > span');
 		if (!elem)
 			throw new Error('Account title not found');
-		itemObj.accountTitle = elem.innerHTML;
+		itemObj.accountTitle = elem.innerText;
 
 		elem = li.querySelector('.tritem_sum > span');
 		if (!elem)
 			throw new Error('Amount text not found');
-		itemObj.amountText = elem.innerHTML;
+		itemObj.amountText = elem.innerText;
 
 		elem = li.querySelector('.tritem_date_comm');
 		if (!elem || !elem.firstElementChild || elem.firstElementChild.tagName != 'SPAN')
 			throw new Error('Date element not found');
 
-		itemObj.dateFmt = elem.firstElementChild.innerHTML;
+		itemObj.dateFmt = elem.firstElementChild.innerText;
 
 		elem = li.querySelector('.tritem_comm');
-		itemObj.comment = elem ? elem.innerHTML : '';
+		itemObj.comment = elem ? elem.innerText : '';
 
 		itemObj.click = function()
 		{
@@ -250,7 +250,7 @@ TestPage.prototype.parseDropDown = function(elem)
 			throw new Error('Input element not found');
 
 		res.editable = isVisible(res.input);
-		res.textValue = (res.editable) ? res.input.value : res.statSel.innerHTML;
+		res.textValue = (res.editable) ? res.input.value : res.statSel.innerText;
 	}
 
 	res.selectElem = res.elem.querySelector('select');
@@ -267,7 +267,7 @@ TestPage.prototype.parseDropDown = function(elem)
 				if (option.disabled)
 					continue;
 
-				var itemObj = { id : this.parseId(option.value), text : option.innerHTML, elem : option };
+				var itemObj = { id : this.parseId(option.value), text : option.innerText, elem : option };
 
 				res.items.push(itemObj);
 			}
@@ -282,7 +282,7 @@ TestPage.prototype.parseDropDown = function(elem)
 			for(var i = 0; i < listItems.length; i++)
 			{
 				var li = listItems[i];
-				var itemObj = { id : this.parseId(li.id), text : li.innerHTML, elem : li };
+				var itemObj = { id : this.parseId(li.id), text : li.innerText, elem : li };
 
 				res.items.push(itemObj);
 			}
@@ -343,13 +343,13 @@ TestPage.prototype.parseIconLink = function(elem)
 	res.titleElem = res.linkElem.querySelector('.icontitle');
 	if (!res.titleElem || !res.titleElem.firstElementChild)
 		throw new Error('Title element not found');
-	res.title = res.titleElem.firstElementChild.innerHTML;
+	res.title = res.titleElem.firstElementChild.innerText;
 
 // Subtitle is optional
 	res.subTitleElem = res.titleElem.querySelector('.subtitle');
 	if (res.subTitleElem)
 	{
-		res.subtitle = res.subTitleElem.innerHTML;
+		res.subtitle = res.subTitleElem.innerText;
 	}
 
 	res.click = function()
@@ -372,7 +372,7 @@ TestPage.prototype.parseInputRow = function(elem)
 	if (!res.labelEl)
 		throw new Error('Label element not found');
 
-	res.label = res.labelEl.innerHTML;
+	res.label = res.labelEl.innerText;
 	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
 	res.isCurrActive = false;
 	if (res.currElem)
@@ -383,15 +383,15 @@ TestPage.prototype.parseInputRow = function(elem)
 			res.currDropDown = this.parseDropDown(res.currElem.firstElementChild);
 			if (!res.currDropDown.isAttached)
 				throw new Error('Currency drop down is not attached');
-			res.currSign = res.currDropDown.selectBtn.innerHTML;
+			res.currSign = res.currDropDown.selectBtn.innerText;
 		}
 		else if (hasClass(res.currElem, 'exchrate_comm'))
 		{
-			res.currSign = res.currElem.innerHTML;
+			res.currSign = res.currElem.innerText;
 		}
 		else
 		{
-			res.currSign = res.currElem.firstElementChild.innerHTML;
+			res.currSign = res.currElem.firstElementChild.innerText;
 		}
 	}
 	else
@@ -456,9 +456,9 @@ TestPage.prototype.parseWarningPopup = function(elem)
 	var res = { elem : elem };
 
 	res.titleElem = elem.querySelector('.popup_title');
-	res.title = res.titleElem.innerHTML;
+	res.title = res.titleElem.innerText;
 	res.messageElem = elem.querySelector('.popup_message > div');
-	res.message = res.messageElem.innerHTML;
+	res.message = res.messageElem.innerText;
 	res.okBtn = elem.querySelector('.popup_controls > .btn.ok_btn');
 	res.cancelBtn = elem.querySelector('.popup_controls > .btn.cancel_btn');
 
