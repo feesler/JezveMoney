@@ -247,6 +247,38 @@ TransactionPage.prototype.getPerson = function(person_id)
 };
 
 
+// Return zero if no person found
+TransactionPage.prototype.getPersonByPos = function(pos)
+{
+	if (pos >= 0 && pos < viewframe.contentWindow.persons.length)
+		return viewframe.contentWindow.persons[pos];
+	else
+		return null;
+};
+
+
+// Return zero if no person found
+TransactionPage.prototype.getPersonPos = function(person_id)
+{
+	var data = viewframe.contentWindow.persons;
+	var pos = -1;
+
+	if (!isArray(data) || !person_id)
+		return -1;
+
+	data.some(function(item, ind)
+	{
+		var cond = (person_id == item.id);
+		if (cond)
+			pos = ind;
+
+		return cond;
+	});
+
+	return pos;
+};
+
+
 // Return account of person in specified currency
 TransactionPage.prototype.getPersonAccount = function(person_id, curr_id)
 {

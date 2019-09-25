@@ -148,6 +148,7 @@ function transactionTests(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
 			.then(debtTransactionLoop);
+			.then(submitDebtTests);
 }
 
 
@@ -173,6 +174,7 @@ function goToMainPage(page)
 			{
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
+				App.persons = page.content.widgets[3].infoTiles;
 
 				return Promise.resolve(page);
 			});
@@ -264,6 +266,7 @@ function createExpense(page, accNum, onState, params)
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
+				App.persons = page.content.widgets[3].infoTiles;
 
 				return Promise.resolve(page);
 			});
@@ -356,6 +359,7 @@ function createIncome(page, accNum, onState, params)
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
+				App.persons = page.content.widgets[3].infoTiles;
 
 				return Promise.resolve(page);
 			});
@@ -457,6 +461,179 @@ function createTransfer(page, onState, params)
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
+				App.persons = page.content.widgets[3].infoTiles;
+
+				return Promise.resolve(page);
+			});
+}
+
+
+function submitDebtTests(page)
+{
+	setBlock('Submit debt transactions', 1);
+
+	return createDebt(page, 0, { srcAmount : '1000' })
+			.then(page => createDebt(page, 0, { debtType : false, acc : 2, srcAmount : '200' }))
+			.then(page => createDebt(page, 0, { debtType : true, acc : 3, srcAmount : '100.0101' }))
+			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' }))
+			.then(page => createDebt(page, 0, { acc : null, srcAmount : '105' }))
+			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }))
+}
+
+
+function createDebt(page, onState, params)
+{
+	var person = null;
+	var personPos;
+	var personAccount = null;
+	var acc = null;
+	var accPos;
+	var debtType;
+
+	return goToMainPage(page)
+			.then(page => page.goToNewTransactionByAccount(0))
+			.then(page => page.changeTransactionType(DEBT))
+			.then(page => debtTransactionLoop(page, onState, page =>
+			{
+				if ('acc' in params)
+				{
+					if (params.acc === null)
+					{
+						test('Disable account', () =>
+						{
+							if (!page.model.noAccount)
+								page.toggleAccount();
+						}, page);
+					}
+					else
+					{
+						test('Change account to (' + page.getAccountByPos(params.acc).name + ')',
+								() => page.changeAccountByPos(params.acc), page);
+					}
+				}
+
+				if ('person' in params)
+				{
+					test('Change person to (' + page.getPersonByPos(params.person).name + ')',
+							() => page.changePersonByPos(params.person), page);
+				}
+
+				if ('debtType' in params)
+				{
+					if (!!params.debtType != page.model.debtType)
+					{
+						test('Change debt type (' + (params.debtType ? 'give' : 'take') + ')',
+								() => page.toggleDebtType(), page);
+					}
+				}
+
+				if (!('srcAmount' in params))
+					throw new Error('Source amount value not specified');
+
+				test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+
+				if ('date' in params)
+					test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+
+				if ('comment' in params)
+					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+
+				person = page.model.person;
+				personPos = page.getPersonPos(person.id);
+				personAccount = page.getPersonAccount(person.id, page.model.src_curr_id);
+				if (!personAccount)
+				{
+					personAccount = { curr_id : page.model.src_curr_id, balance : 0 };
+					person.accounts.push(personAccount);
+				}
+
+				acc = page.model.account;
+				if (acc)
+					accPos = page.getAccountPos(acc.id);
+				debtType = page.model.debtType;
+
+				return page.submit();
+			}))
+			.then(page =>
+			{
+				var state = { values : { widgets : { length : 5 } } };
+				var sa, da;
+
+				sa = da = normalize(params.srcAmount);
+
+				if (debtType)
+				{
+					personAccount.balance -= sa;
+					if (acc)
+						acc.balance += da;
+				}
+				else
+				{
+					personAccount.balance += da;
+					if (acc)
+						acc.balance -= sa;
+				}
+
+				var debtAccounts = person.accounts.reduce((val, pacc) =>
+				{
+					if (pacc.balance == 0)
+						return val;
+
+					let fmtBal = formatCurrency(pacc.balance, pacc.curr_id);
+					return val.concat(fmtBal);
+				}, []);
+
+				var debtSubtitle = debtAccounts.join('\n');
+
+				var personsWidget = { infoTiles : { length : App.persons.length } };
+				personsWidget.infoTiles[personPos] = { title : person.name, subtitle : debtSubtitle };
+
+				state.values.widgets[3] = personsWidget;
+
+				// Accounts widget changes
+				if (acc)
+				{
+					var fmtAccBal = formatCurrency(acc.balance, acc.curr_id);
+					var accWidget = { tiles : { length : App.accounts.length } };
+					accWidget.tiles[accPos] = { balance : fmtAccBal, name : acc.name };
+
+					state.values.widgets[0] = accWidget;
+				}
+
+				// Transactions widget changes
+				var transWidget = { title : 'Transactions',
+									transList : { length : Math.min(App.transactions.length + 1, 5) } };
+				var title = '';
+				var fmtAmount;
+
+				if (debtType)
+				{
+					title = person.name;
+					if (acc)
+						title += ' → ' + acc.name;
+					fmtAmount = (acc) ? '+ ' : '- ';
+				}
+				else
+				{
+					if (acc)
+						title = acc.name + ' → ';
+					title += person.name;
+					fmtAmount = (acc) ? '- ' : '+ ';
+				}
+				fmtAmount += formatCurrency(sa, personAccount.curr_id);
+
+				transWidget.transList[0] = { accountTitle : title,
+												amountText : fmtAmount,
+											 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+											 	comment : ('comment' in params) ? params.comment : '' };
+
+				state.values.widgets[2] = transWidget;
+
+				test('Debt transaction submit', () => {}, page, state);
+
+				App.transactions = page.content.widgets[2].transList;
+				App.accounts = page.content.widgets[0].tiles;
+				App.persons = page.content.widgets[3].infoTiles;
 
 				return Promise.resolve(page);
 			});
@@ -1288,10 +1465,15 @@ function transferTransactionLoop(page, actionState, action)
 }
 
 
-function debtTransactionLoop(page)
+function debtTransactionLoop(page, actionState, action)
 {
 	setBlock('Debt', 2);
 	test('Initial state of new debt page', () => page.setExpectedState(0), page);
+
+	actionState = parseInt(actionState);
+	var actionRequested = !isNaN(actionState);
+	if (actionState === 0)
+		return action(page);
 
 // Input source amount
 	test('Source amount (1) input', () => page.inputSrcAmount('1'), page);

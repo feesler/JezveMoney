@@ -51,7 +51,7 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 	var personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
 	res.personAccount = this.getPersonAccount(res.person.id, personAccountCurr);
 	if (!res.personAccount)
-		res.personAccount = { balance : 0, curr_id : personAccountCurr, owner_id : res.person.id };
+		res.personAccount = { balance : 0, curr_id : personAccountCurr };
 
 	var isSelectAccountVisible = !!(cont.selaccount && isVisible(cont.selaccount.elem));
 
@@ -148,7 +148,19 @@ DebtTransactionPage.prototype.setSrcAmount = function(model, val)
 	{
 		model.fSrcAmount = newValue;
 
-		model.srcResBal = normalize(model.srcAccount.balance - model.fSrcAmount);
+		if (model.srcAccount)
+		{
+			model.srcResBal = normalize(model.srcAccount.balance - model.fSrcAmount);
+		}
+		else if (!model.debtType && model.lastAccount_id)
+		{
+			var lastAcc = this.getAccount(model.lastAccount_id);
+			if (!lastAcc)
+				throw new Error('Last account not found');
+
+			model.srcResBal = normalize(lastAcc.balance - model.fSrcAmount);
+		}
+
 		model.fmtSrcResBal = model.srcCurr.formatValue(model.srcResBal);
 	}
 
@@ -167,7 +179,19 @@ DebtTransactionPage.prototype.setDestAmount = function(model, val)
 	{
 		model.fDestAmount = newValue;
 
-		model.destResBal = normalize(model.destAccount.balance + model.fDestAmount);
+		if (model.destAccount)
+		{
+			model.destResBal = normalize(model.destAccount.balance + model.fDestAmount);
+		}
+		else if (model.debtType && model.lastAccount_id)
+		{
+			var lastAcc = this.getAccount(model.lastAccount_id);
+			if (!lastAcc)
+				throw new Error('Last account not found');
+
+			model.destResBal = normalize(lastAcc.balance + model.fDestAmount);
+		}
+
 		model.fmtDestResBal = model.destCurr.formatValue(model.destResBal);
 	}
 
@@ -294,7 +318,7 @@ DebtTransactionPage.prototype.changePerson = function(val)
 	var personAccCurr_id = (this.model.debtType) ? this.model.srcCurr.id : this.model.destCurr.id;
 	this.model.personAccount = this.getPersonAccount(val, personAccCurr_id);
 	if (!this.model.personAccount)
-		this.model.personAccount = { balance : 0, curr_id : personAccCurr_id, owner_id : val };
+		this.model.personAccount = { balance : 0, curr_id : personAccCurr_id };
 
 	if (this.model.debtType)
 	{
@@ -571,10 +595,10 @@ DebtTransactionPage.prototype.changeAccount = function(account_id)
 
 	if (this.model.personAccount.curr_id != this.model.account.curr_id)
 	{
-		var person_id = this.model.personAccount.owner_id;
-		this.model.personAccount = this.getPersonAccount(person_id, this.model.account.curr_id);
+		var person_id = this.model.person.id;
+		this.model.personAccount = this.getPersonAccount(this.model.person.id, this.model.account.curr_id);
 		if (!this.model.personAccount)
-			this.model.personAccount = { balance : 0, curr_id : this.model.account.curr_id, owner_id : person_id  };
+			this.model.personAccount = { balance : 0, curr_id : this.model.account.curr_id };
 	}
 
 	this.model.src_curr_id = this.model.dest_curr_id = this.model.account.curr_id;
