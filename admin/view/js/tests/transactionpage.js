@@ -100,37 +100,9 @@ TransactionPage.prototype.parseContent = function()
 	res.delBtn = vge('del_btn');
 	res.isUpdate = (res.delBtn != null);
 
-	var menuItems = vqueryall('#trtype_menu > span');
-	res.typeMenu = [];
-	for(var i = 0; i < menuItems.length; i++)
-	{
-		var menuItem = menuItems[i].firstElementChild;
+	res.typeMenu = this.parseTransactionTypeMenu(vge('trtype_menu'));
 
-		var menuItemObj = { elem : menuItem, text : menuItem.innerText, type : this.getTransactionType(menuItem.innerText) };
-
-		if (menuItem.tagName == 'B')
-		{
-			res.activeType = menuItemObj.type;
-			menuItemObj.isActive = true;
-		}
-		else if (menuItem.tagName == 'A')
-		{
-			menuItemObj.link = menuItem.href;
-			menuItemObj.isActive = false;
-		}
-
-		menuItemObj.pageClass = this.getPageClass(menuItemObj.text);
-
-		menuItemObj.click = function()
-		{
-			if (!this.isActive)
-				clickEmul(this.elem);
-		};
-
-		res.typeMenu[menuItemObj.type] = menuItemObj;
-	}
-
-	if (res.activeType == 4)	/* DEBT */
+	if (res.typeMenu.activeType == 4)	/* DEBT */
 	{
 		res.person = this.parseTileBlock(vge('person'));
 		if (res.person)
@@ -338,10 +310,10 @@ TransactionPage.prototype.updateExch = function(model)
 
 TransactionPage.prototype.changeTransactionType = function(type)
 {
-	if (this.content.activeType == type || !this.content.typeMenu[type])
+	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	return navigation(() => this.content.typeMenu[type].click(), this.content.typeMenu[type].pageClass);
+	return navigation(() => this.content.typeMenu.items[type].click(), this.content.typeMenu.items[type].pageClass);
 };
 
 

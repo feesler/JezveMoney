@@ -30,7 +30,7 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
-	if (cont.activeType != 4)
+	if (cont.typeMenu.activeType != 4)
 		throw new Error('Wrong page');
 
 	res.person = this.getPerson(cont.person.id);
@@ -213,7 +213,7 @@ DebtTransactionPage.prototype.setExpectedState = function(state_id)
 								selaccount : this.model.noAccount, noacc_btn : !this.model.noAccount,
 								dest_amount_row : false, dest_amount_left : false,
 								exchange_row : false, exch_left : false },
-				values : { typeMenu : { 4 : { isActive : true } }, /* DEBT */
+				values : { typeMenu : { activeType : 4 }, /* DEBT */
 							src_amount_row : { value : this.model.srcAmount.toString(), label : 'Amount', currSign : this.model.srcCurr.sign, isCurrActive : false },
 							src_amount_left : this.model.srcCurr.formatValue(this.model.fSrcAmount),
 							dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },

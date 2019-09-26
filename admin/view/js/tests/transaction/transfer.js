@@ -147,7 +147,7 @@ TransferTransactionPage.prototype.setExpectedState = function(state_id)
 
 	var res = { model : { state : newState },
 				visibility : { source : true, destination : true },
-				values : { typeMenu : { 3 : { isActive : true } }, /* TRANSFER */
+				values : { typeMenu : { activeType : 3 }, /* TRANSFER */
 							source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 							destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
 							src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },

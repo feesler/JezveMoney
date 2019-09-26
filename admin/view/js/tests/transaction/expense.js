@@ -114,7 +114,7 @@ ExpenseTransactionPage.prototype.setExpectedState = function(state_id)
 	var res = { model : { state : newState },
 				visibility : { source : true, destination : false, src_amount_left : false,
 								dest_res_balance_left : false, result_balance_dest_row : false },
-				values : { typeMenu : { 1 : { isActive : true } }, /* EXPENSE */
+				values : { typeMenu : { activeType : 1 }, /* EXPENSE */
 							source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 							src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
 							dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },

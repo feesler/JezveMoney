@@ -225,7 +225,6 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 };
 
 
-
 TestPage.prototype.parseDropDown = function(elem)
 {
 	var res = { elem : elem };
@@ -316,7 +315,7 @@ TestPage.prototype.parseDropDown = function(elem)
 
 TestPage.prototype.getTransactionType = function(str)
 {
-	var strToType = { 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
+	var strToType = { 'ALL' : 0, 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
 
 	if (!str)
 		return null;
@@ -324,6 +323,44 @@ TestPage.prototype.getTransactionType = function(str)
 	var key = str.toUpperCase();
 	return (strToType[key] !== undefined) ? strToType[key] : null;
 };
+
+
+TestPage.prototype.parseTransactionTypeMenu = function(elem)
+{
+	var res = { elem : elem, items : [], activeType : null };
+
+	var menuItems = elem.querySelectorAll('span');
+	for(var i = 0; i < menuItems.length; i++)
+	{
+		var menuItem = menuItems[i].firstElementChild;
+
+		var menuItemObj = { elem : menuItem, text : menuItem.innerText, type : this.getTransactionType(menuItem.innerText) };
+
+		if (menuItem.tagName == 'B')
+		{
+			res.activeType = menuItemObj.type;
+			menuItemObj.isActive = true;
+		}
+		else if (menuItem.tagName == 'A')
+		{
+			menuItemObj.link = menuItem.href;
+			menuItemObj.isActive = false;
+		}
+
+		menuItemObj.pageClass = this.getPageClass(menuItemObj.text);
+
+		menuItemObj.click = function()
+		{
+			if (!this.isActive)
+				clickEmul(this.elem);
+		};
+
+		res.items[menuItemObj.type] = menuItemObj;
+	}
+
+	return res;
+};
+
 
 
 TestPage.prototype.parseIconLink = function(elem)
