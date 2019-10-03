@@ -74,21 +74,6 @@ TransactionPage.prototype.parseCommentRow = function(elem)
 };
 
 
-TransactionPage.prototype.getPageClass = function(str)
-{
-	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
-						'INCOME' : IncomeTransactionPage,
-					 	'TRANSFER' : TransferTransactionPage,
-					 	'DEBT' : DebtTransactionPage };
-
-	if (!str)
-		return null;
-
-	var key = str.toUpperCase();
-	return (strToClass[key] !== undefined) ? strToClass[key] : TransactionPage;
-};
-
-
 TransactionPage.prototype.parseContent = function()
 {
 	var res = {};
@@ -313,7 +298,9 @@ TransactionPage.prototype.changeTransactionType = function(type)
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	return navigation(() => this.content.typeMenu.items[type].click(), this.content.typeMenu.items[type].pageClass);
+	var newPageClass = this.getTransactionPageClass(this.content.typeMenu.items[type].text);
+
+	return navigation(() => this.content.typeMenu.items[type].click(), newPageClass);
 };
 
 

@@ -325,6 +325,32 @@ TestPage.prototype.getTransactionType = function(str)
 };
 
 
+TestPage.prototype.getTransactionTypeStr = function(type)
+{
+	var typeToStr = { 1 : 'EXPENSE', 2 : 'INCOME', 3 : 'TRANSFER', 4 : 'DEBT' };
+
+	if (!type)
+		return null;
+
+	return (typeToStr[type] !== undefined) ? typeToStr[type] : null;
+};
+
+
+TestPage.prototype.getTransactionPageClass = function(str)
+{
+	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
+						'INCOME' : IncomeTransactionPage,
+					 	'TRANSFER' : TransferTransactionPage,
+					 	'DEBT' : DebtTransactionPage };
+
+	if (!str)
+		return null;
+
+	var key = str.toUpperCase();
+	return (strToClass[key] !== undefined) ? strToClass[key] : TransactionPage;
+};
+
+
 TestPage.prototype.parseTransactionTypeMenu = function(elem)
 {
 	var res = { elem : elem, items : [], activeType : null };
@@ -346,8 +372,6 @@ TestPage.prototype.parseTransactionTypeMenu = function(elem)
 			menuItemObj.link = menuItem.href;
 			menuItemObj.isActive = false;
 		}
-
-		menuItemObj.pageClass = this.getPageClass(menuItemObj.text);
 
 		menuItemObj.click = function()
 		{
