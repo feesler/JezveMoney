@@ -8,6 +8,12 @@ function TransactionsPage()
 extend(TransactionsPage, TestPage);
 
 
+TransactionsPage.prototype.getTransactionObject = function(trans_id)
+{
+	return idSearch(viewframe.contentWindow.transArr, trans_id);
+};
+
+
 TransactionsPage.prototype.parseContent = function()
 {
 	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
@@ -22,12 +28,23 @@ TransactionsPage.prototype.parseContent = function()
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong transactions page structure');
 
+	res.typeMenu = this.parseTransactionTypeMenu(vge('trtype_menu'));
+
 	res.title = res.titleEl.innerText;
 	res.transactions = this.parseTransactionsList(vge('tritems'));
 
 	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));
 
 	return res;
+};
+
+
+TransactionsPage.prototype.filterByType = function(type)
+{
+	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
+		return;
+
+	return navigation(() => this.content.typeMenu.items[type].click(), TransactionsPage);
 };
 
 
@@ -49,7 +66,16 @@ TransactionsPage.prototype.goToUpdateTransaction = function(num)
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update transaction button not visible';
 
-	return navigation(() => this.content.toolbar.editBtn.click(), TransactionPage);
+	var transObj = this.getTransactionObject(this.content.transactions[num].id);
+	if (!transObj)
+		throw new Error('Transaction object not found');
+
+	var typeStr = this.getTransactionTypeStr(transObj.type);
+	var pageClass = this.getTransactionPageClass(typeStr);
+	if (!pageClass)
+		throw new Error('Wrong transaction type');
+
+	return navigation(() => this.content.toolbar.editBtn.click(), pageClass);
 };
 
 

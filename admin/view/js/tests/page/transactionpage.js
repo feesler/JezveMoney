@@ -78,6 +78,8 @@ TransactionPage.prototype.parseContent = function()
 {
 	var res = {};
 
+	res.isUpdate = viewframe.contentWindow.edit_mode;
+
 	res.heading = { elem : vquery('.heading > h1') };
 	if (res.heading.elem)
 		res.heading.title = res.heading.elem.innerText;
@@ -257,6 +259,13 @@ TransactionPage.prototype.getPersonAccount = function(person_id, curr_id)
 	});
 
 	return resAcc;
+};
+
+
+// Return null if no account can't be found
+TransactionPage.prototype.getUpdateTransactionObj = function()
+{
+	return viewframe.contentWindow.edit_transaction;
 };
 
 

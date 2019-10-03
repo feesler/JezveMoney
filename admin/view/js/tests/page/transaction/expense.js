@@ -14,6 +14,8 @@ ExpenseTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
+	res.isUpdate = cont.isUpdate;
+
 	res.srcAccount = this.getAccount(cont.source.id);
 	if (!res.srcAccount)
 		throw new Error('Source account not found');

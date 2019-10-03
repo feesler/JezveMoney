@@ -131,7 +131,14 @@ function personTests(page)
 
 function transactionTests(page)
 {
-	setBlock('Transaction page states', 1);
+	return createTransactionTests(page)
+			.then(updateTransactionTests);
+}
+
+
+function createTransactionTests(page)
+{
+	setBlock('Create transaction', 1);
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
@@ -151,6 +158,17 @@ function transactionTests(page)
 			.then(submitDebtTests);
 }
 
+
+function updateTransactionTests(page)
+{
+	setBlock('Update transaction', 1);
+
+	return goToMainPage(page)
+			.then(page => page.goToTransactions())
+			.then(page => page.filterByType(EXPENSE))
+			.then(page => page.goToUpdateTransaction(0))
+			.then(updateExpenseTransaction);
+}
 
 
 // Format date as DD.MM.YYYY
@@ -640,6 +658,17 @@ function createDebt(page, onState, params)
 }
 
 
+// Update transaction tests
+function updateExpenseTransaction(page)
+{
+// State 0
+	setBlock('Expense', 2);
+	test('Initial state of update expense page', () => page.setExpectedState(0), page);
+
+	return expenseTransactionLoop(page);
+}
+
+
 function reloginAsTester(page)
 {
 	var loginPagePromise = (page.isUserLoggedIn()) ? page.logoutUser() : Promise.resolve(new LoginPage());
@@ -901,7 +930,20 @@ function expenseTransactionLoop(page, actionState, action)
 {
 // State 0
 	setBlock('Expense', 2);
-	test('Initial state of new expense page', () => page.setExpectedState(0), page);
+	test('Initial state of new expense page', () =>
+	{
+		let trObj = page.getUpdateTransactionObj();
+
+		if (trObj)
+		{
+			let srcAcc = idSearch(App.accounts, page.model.srcAccount.id);
+
+			let initialBal = normalize(page.model.fSrcResBal + trObj.srcAmount);
+			page.model.srcAccount.fmtBalance = page.model.srcCurr.formatValue(initialBal);
+		}
+
+		page.setExpectedState(0);
+	}, page);
 
 	actionState = parseInt(actionState);
 	var actionRequested = !isNaN(actionState);
