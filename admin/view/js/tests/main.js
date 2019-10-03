@@ -213,9 +213,6 @@ function submitExpenseTests(page)
 
 function createExpense(page, accNum, onState, params)
 {
-	var srcAcc = null;
-	var srcAccPos;
-
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
 			.then(page => expenseTransactionLoop(page, onState, page =>
@@ -246,13 +243,16 @@ function createExpense(page, accNum, onState, params)
 				if ('comment' in params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
-				srcAcc = page.model.srcAccount;
-				srcAccPos = page.getAccountPos(srcAcc.id);
+				App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
+												srcAccPos : page.getAccountPos(page.model.srcAccount.id) };
 
 				return page.submit();
 			}))
 			.then(page =>
 			{
+			 	let srcAcc = App.beforeSubmitTransaction.srcAcc;
+				let srcAccPos = App.beforeSubmitTransaction.srcAccPos;
+
 				// Obtain real source amount from props:
 				// In case of expense with different currency use source amount value
 				// In case of expense with the same currency copy destination amount value
@@ -305,9 +305,6 @@ function submitIncomeTests(page)
 
 function createIncome(page, accNum, onState, params)
 {
-	var destAcc = null;
-	var destAccPos;
-
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
 			.then(page => page.changeTransactionType(INCOME))
@@ -339,13 +336,16 @@ function createIncome(page, accNum, onState, params)
 				if ('comment' in params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
-				destAcc = page.model.destAccount;
-				destAccPos = page.getAccountPos(destAcc.id)
+				App.beforeSubmitTransaction = { destAcc : page.model.destAccount,
+												destAccPos : page.getAccountPos(destAcc.id) };
 
 				return page.submit();
 			}))
 			.then(page =>
 			{
+				let destAcc = App.beforeSubmitTransaction.destAcc;
+				let destAccPos = App.beforeSubmitTransaction.destAccPos;
+
 				// Obtain real destination amount from props:
 				// In case of income with different currency use destination amount value
 				// In case of income with the same currency copy source amount value
@@ -398,11 +398,6 @@ function submitTransferTests(page)
 
 function createTransfer(page, onState, params)
 {
-	var srcAcc = null;
-	var srcAccPos;
-	var destAcc = null;
-	var destAccPos;
-
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(TRANSFER))
@@ -434,15 +429,20 @@ function createTransfer(page, onState, params)
 				if ('comment' in params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
-				srcAcc = page.model.srcAccount;
-				srcAccPos = page.getAccountPos(srcAcc.id);
-				destAcc = page.model.destAccount;
-				destAccPos = page.getAccountPos(destAcc.id);
+				App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
+												srcAccPos : page.getAccountPos(srcAcc.id),
+												destAcc : page.model.destAccount,
+												destAccPos : page.getAccountPos(destAcc.id) };
 
 				return page.submit();
 			}))
 			.then(page =>
 			{
+				let srcAcc = App.beforeSubmitTransaction.srcAcc;
+				let srcAccPos = App.beforeSubmitTransaction.srcAccPos;
+				let destAcc = App.beforeSubmitTransaction.destAcc;
+				let destAccPos = App.beforeSubmitTransaction.destAccPos;
+
 				// Obtain real source and destination amount from props:
 				// Source amount expected to be always set
 				// In case of transfer between accounts with different currency use destination amount value
@@ -501,13 +501,6 @@ function submitDebtTests(page)
 
 function createDebt(page, onState, params)
 {
-	var person = null;
-	var personPos;
-	var personAccount = null;
-	var acc = null;
-	var accPos;
-	var debtType;
-
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
@@ -556,24 +549,32 @@ function createDebt(page, onState, params)
 				if ('comment' in params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
-				person = page.model.person;
-				personPos = page.getPersonPos(person.id);
-				personAccount = page.getPersonAccount(person.id, page.model.src_curr_id);
-				if (!personAccount)
+				App.beforeSubmitTransaction = { person : page.model.person,
+				 								personPos : page.getPersonPos(page.model.person.id),
+												personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
+												acc : page.model.account,
+												debtType : page.model.debtType };
+
+				if (!App.beforeSubmitTransaction.personAccount)
 				{
-					personAccount = { curr_id : page.model.src_curr_id, balance : 0 };
-					person.accounts.push(personAccount);
+					App.beforeSubmitTransaction.personAccount = { curr_id : page.model.src_curr_id, balance : 0 };
+					App.beforeSubmitTransaction.person.accounts.push(App.beforeSubmitTransaction.personAccount);
 				}
 
-				acc = page.model.account;
-				if (acc)
-					accPos = page.getAccountPos(acc.id);
-				debtType = page.model.debtType;
+				if (App.beforeSubmitTransaction.acc)
+					App.beforeSubmitTransaction.accPos = page.getAccountPos(page.model.account.id);
 
 				return page.submit();
 			}))
 			.then(page =>
 			{
+				let person = App.beforeSubmitTransaction.person;
+				let personPos = App.beforeSubmitTransaction.personPos;
+				let personAccount = App.beforeSubmitTransaction.personAccount;
+				let acc = App.beforeSubmitTransaction.acc;
+				let accPos = App.beforeSubmitTransaction.accPos;
+				let debtType = App.beforeSubmitTransaction.debtType;
+
 				var state = { values : { widgets : { length : 5 } } };
 				var sa, da;
 
