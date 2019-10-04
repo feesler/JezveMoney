@@ -201,13 +201,47 @@ function goToMainPage(page)
 
 function submitExpenseTests(page)
 {
-	setBlock('Submit expense transactions', 1);
+	setBlock('Create expense transactions', 1);
 
 	return createExpense(page, 0, 0, { destAmount : '123.7801' })
 			.then(page => createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
 			.then(page => createExpense(page, 1, 0, { destAmount : '0.01' }))
 			.then(page => createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }))
+}
 
+
+function submitExpenseTransaction(page, params)
+{
+	if ('srcAcc' in params)
+	{
+		test('Change source account to (' + page.getAccountByPos(params.srcAcc).name + ')',
+				() => page.changeSrcAccountByPos(params.srcAcc), page);
+	}
+
+	if ('destCurr' in params)
+	{
+		test('Change destination currency to ' + getCurrency(params.destCurr).name,
+				() => page.changeDestCurrency(params.destCurr), page);
+	}
+
+	if (!('destAmount' in params))
+		throw new Error('Destination amount value not specified');
+
+	test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
+
+	if ('destCurr' in params && 'srcAmount' in params)
+		test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+
+	if ('date' in params)
+		test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+
+	if ('comment' in params)
+		test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+
+	App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
+									srcAccPos : page.getAccountPos(page.model.srcAccount.id) };
+
+	return page.submit();
 }
 
 
@@ -215,39 +249,7 @@ function createExpense(page, accNum, onState, params)
 {
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
-			.then(page => expenseTransactionLoop(page, onState, page =>
-			{
-				if ('srcAcc' in params)
-				{
-					test('Change source account to (' + page.getAccountByPos(params.srcAcc).name + ')',
-							() => page.changeSrcAccountByPos(params.srcAcc), page);
-				}
-
-				if ('destCurr' in params)
-				{
-					test('Change destination currency to ' + getCurrency(params.destCurr).name,
-							() => page.changeDestCurrency(params.destCurr), page);
-				}
-
-				if (!('destAmount' in params))
-					throw new Error('Destination amount value not specified');
-
-				test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
-
-				if ('destCurr' in params && 'srcAmount' in params)
-					test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
-
-				if ('date' in params)
-					test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
-
-				if ('comment' in params)
-					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
-
-				App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
-												srcAccPos : page.getAccountPos(page.model.srcAccount.id) };
-
-				return page.submit();
-			}))
+			.then(page => expenseTransactionLoop(page, onState, page => submitExpenseTransaction(page, params)))
 			.then(page =>
 			{
 			 	let srcAcc = App.beforeSubmitTransaction.srcAcc;
