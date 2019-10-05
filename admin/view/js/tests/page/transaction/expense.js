@@ -15,6 +15,8 @@ ExpenseTransactionPage.prototype.buildModel = function(cont)
 	var res = {};
 
 	res.isUpdate = cont.isUpdate;
+	if (res.isUpdate)
+		res.id = cont.id;
 
 	res.srcAccount = this.getAccount(cont.source.id);
 	if (!res.srcAccount)

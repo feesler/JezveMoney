@@ -85,12 +85,22 @@ TransactionPage.prototype.parseContent = function()
 
 	res.isUpdate = viewframe.contentWindow.edit_mode;
 
+	if (res.isUpdate)
+	{
+		let hiddenEl = vquery('input[name="transid"]');
+		if (!hiddenEl)
+			throw new Error('Transaction id field not found');
+
+		res.id = parseInt(hiddenEl.value);
+		if (!res.id)
+			throw new Error('Wrong transaction id');
+	}
+
 	res.heading = { elem : vquery('.heading > h1') };
 	if (res.heading.elem)
 		res.heading.title = res.heading.elem.innerText;
 
 	res.delBtn = vge('del_btn');
-	res.isUpdate = (res.delBtn != null);
 
 	res.typeMenu = this.parseTransactionTypeMenu(vge('trtype_menu'));
 
@@ -320,7 +330,9 @@ TransactionPage.prototype.changeTransactionType = function(type)
 
 TransactionPage.prototype.submit = function()
 {
-	return navigation(() => clickEmul(this.content.submitBtn), MainPage);
+	var navPageClass = (this.content.isUpdate) ? TransactionsPage : MainPage;
+
+	return navigation(() => clickEmul(this.content.submitBtn), navPageClass);
 };
 
 
