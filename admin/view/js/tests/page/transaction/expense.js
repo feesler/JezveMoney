@@ -65,6 +65,9 @@ ExpenseTransactionPage.prototype.buildModel = function(cont)
 		res.state = (isResBalRowVisible) ? 1 : 0;
 	}
 
+	res.date = cont.datePicker.date;
+	res.comment = cont.comment_row.value;
+
 	return res;
 };
 

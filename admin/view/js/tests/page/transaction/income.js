@@ -63,6 +63,9 @@ IncomeTransactionPage.prototype.buildModel = function(cont)
 		res.state = (isDestResBalRowVisible) ? 1 : 0;
 	}
 
+	res.date = cont.datePicker.date;
+	res.comment = cont.comment_row.value;
+
 	return res;
 };
 

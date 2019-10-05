@@ -495,6 +495,9 @@ TestPage.prototype.parseDatePickerRow = function(elem)
 
 	res.iconLink = this.parseIconLink(iconLinkElem);
 	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
+	if (!res.inputRow)
+		throw new Error('Input row of date picker not found');
+	res.date = res.inputRow.value;
 
 	res.input = function(val)
 	{
@@ -506,6 +509,8 @@ TestPage.prototype.parseDatePickerRow = function(elem)
 
 		this.inputRow.input(val);
 	};
+
+	return res;
 };
 
 

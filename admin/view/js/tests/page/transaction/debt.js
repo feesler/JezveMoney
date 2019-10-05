@@ -133,6 +133,9 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 			throw new Error('Unexpected state');
 	}
 
+	res.date = cont.datePicker.date;
+	res.comment = cont.comment_row.value;
+
 	return res;
 };
 

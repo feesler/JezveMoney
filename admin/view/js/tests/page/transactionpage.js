@@ -63,6 +63,9 @@ TransactionPage.prototype.parseCommentRow = function(elem)
 
 	res.iconLink = this.parseIconLink(iconLinkElem);
 	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
+	if (!res.inputRow)
+		throw new Error('Input row of comment not found');
+	res.value = res.inputRow.value;
 
 	res.input = function(val)
 	{
@@ -71,6 +74,8 @@ TransactionPage.prototype.parseCommentRow = function(elem)
 
 		this.inputRow.input(val);
 	};
+
+	return res;
 };
 
 
