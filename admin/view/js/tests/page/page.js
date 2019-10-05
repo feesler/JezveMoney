@@ -111,7 +111,7 @@ TestPage.prototype.parseTile = function(tileEl)
 
 	tileObj.click = function()
 	{
-		clickEmul(tileObj.linkElem);
+		clickEmul(this.linkElem);
 	};
 
 	return tileObj;
@@ -215,7 +215,7 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 
 		itemObj.click = function()
 		{
-			clickEmul(itemObj.elem);
+			clickEmul(this.elem);
 		};
 
 		res.push(itemObj);
@@ -415,7 +415,7 @@ TestPage.prototype.parseIconLink = function(elem)
 
 	res.click = function()
 	{
-		clickEmul(res.linkElem);
+		clickEmul(this.linkElem);
 	};
 
 	return res;
