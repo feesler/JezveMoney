@@ -670,20 +670,20 @@ function createDebt(page, onState, params)
 
 function runUpdateExpenseTests(page)
 {
-	setBlock('Update expense transactions', 1);
+	setBlock('Update expense transactions', 2);
 
 	return updateExpense(page, 3, { destAmount : '124.7701' })
 			.then(page => updateExpense(page, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 }))
 			.then(page => updateExpense(page, 1, { destAmount : '0.02' }))
-			.then(page => updateExpense(page, 0, { srcAcc : 3, destAmount : '99.9' }))
+			.then(page => updateExpense(page, 0, { srcAcc : 3, destAmount : '99.9' }));
 }
 
 
-// Update transaction tests
+// Update expense transaction and check results
 function updateExpense(page, pos, params)
 {
 	pos = parseInt(pos);
-	if (isNaN(pos))
+	if (isNaN(pos) || pos < 0)
 		throw new Error('Position of transaction not specified');
 
 	if (!isObject(params))
@@ -696,6 +696,9 @@ function updateExpense(page, pos, params)
 				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
 
 				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				if (!trObj)
+					throw new Error('Transaction not found');
+
 				App.beforeUpdateTransaction.trObj = trObj;
 
 				return page.goToUpdateTransaction(pos);
@@ -733,9 +736,6 @@ function updateExpense(page, pos, params)
 					fmtAmount += ' (- ' + formatCurrency(params.destAmount, params.destCurr) + ')';
 				}
 
-				var transWidget = { title : 'Transactions',
-									transList : { length : Math.min(App.transactions.length + 1, 5) } };
-
 				var state = { values : { transactions : { length : transCount } } };
 				state.values.transactions[pos] = { id : trans_id,
 													accountTitle : updSrcAcc.name,
@@ -763,6 +763,7 @@ function updateExpense(page, pos, params)
 				// Accounts widget changes
 				var accWidget = { tiles : { length : App.accounts.length } };
 				var expBalance, fmtBal;
+				// Chech if account was changed we need to update both
 				if ('srcAcc' in params && params.srcAcc != origSrcAccPos)
 				{
 					expBalance = origSrcBalance + origSrcAmount;
@@ -775,7 +776,7 @@ function updateExpense(page, pos, params)
 
 					accWidget.tiles[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 				}
-				else
+				else		// account not changed
 				{
 					var expBalance = origSrcBalance + origSrcAmount - normalize(sa);
 					var fmtBal = formatCurrency(expBalance, updSrcAcc.curr_id);
