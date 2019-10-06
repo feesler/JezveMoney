@@ -37,6 +37,8 @@ class StatisticsController extends Controller
 					$this->fail();
 			}
 			$filterObj->curr_id = $curr_id;
+
+			$acc_id = NULL;
 		}
 		else
 		{
@@ -53,6 +55,8 @@ class StatisticsController extends Controller
 					$this->fail();
 			}
 			$filterObj->acc_id = $acc_id;
+
+			$curr_id = NULL;
 		}
 
 		// Prepare transaction types menu
@@ -62,8 +66,16 @@ class StatisticsController extends Controller
 		foreach($trTypes as $ind => $trTypeName)
 		{
 			$params = ["type" => strtolower($trTypeName)];
-			if ($acc_id != 0)
-				$params["acc_id"] = $acc_id;
+			if ($byCurrency)
+			{
+				if ($curr_id)
+					$params["curr_id"] = $curr_id;
+			}
+			else
+			{
+				if ($acc_id)
+					$params["acc_id"] = $acc_id;
+			}
 
 			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $params)];
 		}

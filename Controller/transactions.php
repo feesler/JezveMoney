@@ -157,14 +157,14 @@ class TransactionsController extends Controller
 					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 			}
 
-			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == 3 || $trans->type == 4))
+			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == TRANSFER || $trans->type == DEBT))
 				$accStr .= " → ";
 
 			if ($trans->dest_id != 0)
 			{
 				if ($trans->type == INCOME || $trans->type == TRANSFER)		// income or transfer
 					$accStr .= $accMod->getName($trans->dest_id);
-				else if ($trans->type == 4)
+				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
 			}
 
@@ -646,11 +646,13 @@ class TransactionsController extends Controller
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
 		$backExchSign = $srcAmountSign."/".$destAmountSign;
-		$backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
+		$backExchValue = round(1 / $exchValue, 5);
 
 		$rtSrcAmount = $currMod->format($tr["src_amount"], $srcAmountCurr);
 		$rtDestAmount = $currMod->format($tr["dest_amount"], $destAmountCurr);
-		$rtExchange = $exchValue." ".$exchSign." (".$backExchValue." ".$backExchSign.")";
+		$rtExchange = $exchValue." ".$exchSign;
+		if ($exchValue != 1)
+			$rtExchange .= " (".$backExchValue." ".$backExchSign.")";
 		if ($trans_type != DEBT)
 		{
 			$rtSrcResBal = $currMod->format($src["balance"], $src["curr"]);

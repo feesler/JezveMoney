@@ -239,7 +239,11 @@
 									</div>
 								</div>
 <?php	if ($trans_type == INCOME) {		?>
+<?php		if ($tr["src_curr"] == $tr["dest_curr"]) {		?>
 								<div id="exch_left" style="display: none;">
+<?php		} else {		?>
+								<div id="exch_left">
+<?php		}				?>
 									<span>Exchange rate</span>
 									<div>
 										<button id="exchrate_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtExchange?></span></button>
