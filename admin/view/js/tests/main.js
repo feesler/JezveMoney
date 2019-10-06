@@ -163,7 +163,8 @@ function updateTransactionTests(page)
 {
 	setBlock('Update transaction', 1);
 
-	return runUpdateExpenseTests(page);
+	return runUpdateExpenseTests(page)
+			.then(page => runUpdateIncomeTests(page));
 }
 
 
@@ -795,6 +796,131 @@ function updateExpense(page, pos, params)
 					var fmtBal = formatCurrency(expBalance, updSrcAcc.curr_id);
 
 					accWidget.tiles[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
+				}
+
+				var state = { values : { widgets : { length : 5, 0 : accWidget } } };
+
+				test('Account balance update', () => {}, page, state);
+
+				return Promise.resolve(page);
+			});
+}
+
+
+function runUpdateIncomeTests(page)
+{
+	setBlock('Update income transactions', 2);
+
+	return updateIncome(page, 0, { srcAmount : '100.001' })
+			.then(page => updateIncome(page, 1, { srcAmount : '0.02' }))
+			.then(page => updateIncome(page, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 }))
+			.then(page => updateIncome(page, 3, { destAcc : 3, srcAmount : '99.9' }));
+}
+
+
+// Update income transaction and check results
+function updateIncome(page, pos, params)
+{
+	pos = parseInt(pos);
+	if (isNaN(pos) || pos < 0)
+		throw new Error('Position of transaction not specified');
+
+	if (!isObject(params))
+		throw new Error('Parameters not specified');
+
+	return goToMainPage(page)
+			.then(page => page.goToTransactions())
+			.then(page => page.filterByType(INCOME))
+			.then(page => {
+				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
+
+				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				if (!trObj)
+					throw new Error('Transaction not found');
+
+				App.beforeUpdateTransaction.trObj = trObj;
+
+				return page.goToUpdateTransaction(pos);
+			})
+			.then(page => {
+				let isDiff = (App.beforeUpdateTransaction.trObj.src_curr != App.beforeUpdateTransaction.trObj.dest_curr);
+
+				test('Initial state of update income page', () => page.setExpectedState(isDiff ? 2 : 0), page);
+
+				setParam(App.beforeUpdateTransaction,
+							{ id : page.model.id,
+								destAcc : page.model.destAccount,
+								destAccPos : page.getAccountPos(page.model.destAccount.id),
+								destBalance : page.model.fDestResBal,
+								srcAmount : page.model.fSrcAmount,
+								destAmount : page.model.fDestAmount,
+								date : page.model.date,
+								comment : page.model.comment});
+
+				return submitIncomeTransaction(page, params);
+			})
+			.then(page => page.filterByType(INCOME))
+			.then(page =>
+			{
+			 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
+				let trans_id = App.beforeUpdateTransaction.id;
+				let transCount = App.beforeUpdateTransaction.trCount;
+				let origDate = App.beforeUpdateTransaction.date;
+				let origComment = App.beforeUpdateTransaction.comment;
+
+				// Transactions widget changes
+				var fmtAmount = '+ ' + formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
+				if ('srcCurr' in params && 'destAmount' in params)
+				{
+					fmtAmount += ' (+ ' + formatCurrency(params.destAmount, updDestAcc.curr_id) + ')';
+				}
+
+				var state = { values : { transactions : { length : transCount } } };
+				state.values.transactions[pos] = { id : trans_id,
+													accountTitle : updDestAcc.name,
+													amountText : fmtAmount,
+												 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
+												 	comment : ('comment' in params) ? params.comment : origComment };
+
+				test('Transaction update', () => {}, page, state);
+
+				return goToMainPage(page);
+			})
+			.then(page => {
+			 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
+				let updDestAccPos = App.beforeSubmitTransaction.destAccPos;
+			 	let origDestAcc = App.beforeUpdateTransaction.destAcc;
+				let origDestAccPos = App.beforeUpdateTransaction.destAccPos;
+				let origDestBalance = App.beforeUpdateTransaction.destBalance;
+				let origDestAmount = App.beforeUpdateTransaction.destAmount;
+
+				// Obtain real source amount from props:
+				// In case of income with different currency use source amount value
+				// In case of expense with the same currency copy destination amount value
+				var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
+
+				// Accounts widget changes
+				var accWidget = { tiles : { length : App.accounts.length } };
+				var expBalance, fmtBal;
+				// Chech if account was changed we need to update both
+				if (origDestAccPos != updDestAccPos)
+				{
+					expBalance = origDestBalance - origDestAmount;
+					fmtBal = formatCurrency(expBalance, origDestAcc.curr_id);
+
+					accWidget.tiles[origDestAccPos] = { balance : fmtBal, name : origDestAcc.name };
+
+					expBalance = updDestAcc.balance + normalize(da);
+					fmtBal = formatCurrency(expBalance, updDestAcc.curr_id);
+
+					accWidget.tiles[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
+				}
+				else		// account not changed
+				{
+					var expBalance = origDestBalance - origDestAmount + normalize(da);
+					var fmtBal = formatCurrency(expBalance, updDestAcc.curr_id);
+
+					accWidget.tiles[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 				}
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget } } };
