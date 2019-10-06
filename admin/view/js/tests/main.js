@@ -312,44 +312,57 @@ function submitIncomeTests(page)
 }
 
 
+function submitIncomeTransaction(page, params)
+{
+	if ('destAcc' in params)
+	{
+		let acc = page.getAccountByPos(params.destAcc);
+		if (!acc)
+			throw new Error('Account (' + params.destAcc + ') not found');
+
+		test('Change destination account to (' + acc.name + ')',
+				() => page.changeDestAccountByPos(params.destAcc), page);
+	}
+
+	if ('srcCurr' in params)
+	{
+		let curr = page.getAccountByPos(params.srcCurr);
+		if (!curr)
+			throw new Error('Currency (' + params.srcCurr + ') not found');
+
+		test('Change source currency to ' + curr.name,
+				() => page.changeSourceCurrency(params.srcCurr), page);
+	}
+
+	if (!('srcAmount' in params))
+		throw new Error('Source amount value not specified');
+
+	test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+
+	if ('srcCurr' in params && 'destAmount' in params)
+		test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
+
+	if ('date' in params)
+		test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+
+	if ('comment' in params)
+		test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+
+	App.beforeSubmitTransaction = { destAcc : page.model.destAccount,
+									destAccPos : page.getAccountPos(page.model.destAccount.id) };
+	if (page.model.isUpdate)
+		App.beforeSubmitTransaction.id = page.model.id;
+
+	return page.submit();
+}
+
+
 function createIncome(page, accNum, onState, params)
 {
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
 			.then(page => page.changeTransactionType(INCOME))
-			.then(page => incomeTransactionLoop(page, onState, page =>
-			{
-				if ('destAcc' in params)
-				{
-					test('Change destination account to (' + page.getAccountByPos(params.destAcc).name + ')',
-							() => page.changeDestAccountByPos(params.destAcc), page);
-				}
-
-				if ('srcCurr' in params)
-				{
-					test('Change source currency to ' + getCurrency(params.srcCurr).name,
-							() => page.changeSourceCurrency(params.srcCurr), page);
-				}
-
-				if (!('srcAmount' in params))
-					throw new Error('Source amount value not specified');
-
-				test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
-
-				if ('srcCurr' in params && 'destAmount' in params)
-					test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
-
-				if ('date' in params)
-					test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
-
-				if ('comment' in params)
-					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
-
-				App.beforeSubmitTransaction = { destAcc : page.model.destAccount,
-												destAccPos : page.getAccountPos(destAcc.id) };
-
-				return page.submit();
-			}))
+			.then(page => incomeTransactionLoop(page, onState, page => submitIncomeTransaction(page, params)))
 			.then(page =>
 			{
 				let destAcc = App.beforeSubmitTransaction.destAcc;
