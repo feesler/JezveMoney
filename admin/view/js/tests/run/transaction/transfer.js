@@ -32,9 +32,9 @@ function createTransfer(page, onState, params)
 					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 				App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
-												srcAccPos : page.getAccountPos(srcAcc.id),
+												srcAccPos : page.getAccountPos(page.model.srcAccount.id),
 												destAcc : page.model.destAccount,
-												destAccPos : page.getAccountPos(destAcc.id) };
+												destAccPos : page.getAccountPos(page.model.destAccount.id) };
 
 				return page.submit();
 			}))
