@@ -35,6 +35,13 @@ class TestsAdminController extends Controller
 		$this->jsAdmin[] = "tests/page/transaction/transfer.js";
 		$this->jsAdmin[] = "tests/page/transaction/debt.js";
 		$this->jsAdmin[] = "tests/page/transactionspage.js";
+
+		$this->jsAdmin[] = "tests/run/account.js";
+		$this->jsAdmin[] = "tests/run/person.js";
+		$this->jsAdmin[] = "tests/run/transaction/expense.js";
+		$this->jsAdmin[] = "tests/run/transaction/income.js";
+		$this->jsAdmin[] = "tests/run/transaction/transfer.js";
+		$this->jsAdmin[] = "tests/run/transaction/debt.js";
 		$this->jsAdmin[] = "tests/main.js";
 
 		include("./view/templates/tests.tpl");
