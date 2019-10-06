@@ -37,7 +37,9 @@ function submitTransferTransaction(page, params)
 	App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
 									srcAccPos : page.getAccountPos(page.model.srcAccount.id),
 									destAcc : page.model.destAccount,
-									destAccPos : page.getAccountPos(page.model.destAccount.id) };
+									destAccPos : page.getAccountPos(page.model.destAccount.id),
+								 	srcAmount : page.model.fSrcAmount,
+								 	destAmount : page.model.fDestAmount };
 
 	return page.submit();
 }
@@ -93,6 +95,149 @@ function createTransfer(page, onState, params)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+
+				return Promise.resolve(page);
+			});
+}
+
+
+// Update transfer transaction and check results
+function updateTransfer(page, pos, params)
+{
+	pos = parseInt(pos);
+	if (isNaN(pos) || pos < 0)
+		throw new Error('Position of transaction not specified');
+
+	if (!isObject(params))
+		throw new Error('Parameters not specified');
+
+	setBlock('Update transfer transaction ' + pos, 3);
+
+	return goToMainPage(page)
+			.then(page => page.goToTransactions())
+			.then(page => page.filterByType(TRANSFER))
+			.then(page => {
+				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
+
+				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				if (!trObj)
+					throw new Error('Transaction not found');
+
+				App.beforeUpdateTransaction.trObj = trObj;
+
+				return page.goToUpdateTransaction(pos);
+			})
+			.then(page => {
+				let isDiff = (App.beforeUpdateTransaction.trObj.src_curr != App.beforeUpdateTransaction.trObj.dest_curr);
+
+				test('Initial state of update transfer page', () => page.setExpectedState(isDiff ? 3 : 0), page);
+
+				setParam(App.beforeUpdateTransaction,
+							{ id : page.model.id,
+								srcAcc : page.model.srcAccount,
+								srcAccPos : page.getAccountPos(page.model.srcAccount.id),
+								srcBalance : page.model.fSrcResBal,
+								destAcc : page.model.destAccount,
+								destAccPos : page.getAccountPos(page.model.destAccount.id),
+								destBalance : page.model.fDestResBal,
+								srcAmount : page.model.fSrcAmount,
+								destAmount : page.model.fDestAmount,
+								date : page.model.date,
+								comment : page.model.comment});
+
+				return submitTransferTransaction(page, params);
+			})
+			.then(page => page.filterByType(TRANSFER))
+			.then(page =>
+			{
+				let trans_id = App.beforeUpdateTransaction.id;
+			 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
+			 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
+				let updSrcAmount = App.beforeSubmitTransaction.srcAmount;
+				let updDestAmount = App.beforeSubmitTransaction.destAmount;
+				let transCount = App.beforeUpdateTransaction.trCount;
+				let origDate = App.beforeUpdateTransaction.date;
+				let origComment = App.beforeUpdateTransaction.comment;
+
+				// Transactions widget changes
+				var fmtAmount = formatCurrency(updSrcAmount, updSrcAcc.curr_id);
+				if (updSrcAcc.curr_id != updDestAcc.curr_id)
+				{
+					fmtAmount += ' (' + formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
+				}
+
+				var state = { values : { transactions : { length : transCount } } };
+				state.values.transactions[pos] = { id : trans_id,
+													accountTitle : updSrcAcc.name + ' → ' + updDestAcc.name,
+													amountText : fmtAmount,
+												 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
+												 	comment : ('comment' in params) ? params.comment : origComment };
+
+				test('Transaction update', () => {}, page, state);
+
+				return goToMainPage(page);
+			})
+			.then(page => {
+			 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
+				let updSrcAccPos = App.beforeSubmitTransaction.srcAccPos;
+			 	let origSrcAcc = App.beforeUpdateTransaction.srcAcc;
+				let origSrcAccPos = App.beforeUpdateTransaction.srcAccPos;
+				let origSrcBalance = App.beforeUpdateTransaction.srcBalance;
+
+			 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
+				let updDestAccPos = App.beforeSubmitTransaction.destAccPos;
+			 	let origDestAcc = App.beforeUpdateTransaction.destAcc;
+				let origDestAccPos = App.beforeUpdateTransaction.destAccPos;
+				let origDestBalance = App.beforeUpdateTransaction.destBalance;
+
+				let updSrcAmount = App.beforeSubmitTransaction.srcAmount;
+				let updDestAmount = App.beforeSubmitTransaction.destAmount;
+				let origSrcAmount = App.beforeUpdateTransaction.srcAmount;
+				let origDestAmount = App.beforeUpdateTransaction.destAmount;
+
+				// Obtain real source and destination amount from props:
+				// Source amount expected to be always set
+				// In case of transfer between accounts with different currency use destination amount value
+				// In case of transfer between accounts with the same currency copy source amount value
+				var sa = updSrcAmount;
+				var da = updDestAmount;
+
+				// Accounts widget changes
+				var accWidget = { tiles : { length : App.accounts.length } };
+				var expBalance = [], fmtBal;
+
+				// Cancel transaction
+				let affectedAccounts = [];
+				affectedAccounts[origSrcAccPos] = { balance : origSrcBalance + origSrcAmount, name : origSrcAcc.name, curr_id : origSrcAcc.curr_id };
+				affectedAccounts[origDestAccPos] = { balance : origDestBalance - origDestAmount, name : origDestAcc.name, curr_id : origDestAcc.curr_id };
+
+				// Chech if account was changed we need to update both
+				if (!(updSrcAccPos in affectedAccounts))
+				{
+					affectedAccounts[updSrcAccPos] = { balance : updSrcAcc.balance, name : updSrcAcc.name, curr_id : updSrcAcc.curr_id };
+				}
+
+				affectedAccounts[updSrcAccPos].balance -= normalize(sa);
+
+				// Chech if account was changed we need to update both
+				if (!(updDestAccPos in affectedAccounts))
+				{
+					affectedAccounts[updDestAccPos] = { balance : updDestAcc.balance, name : updDestAcc.name, curr_id : updDestAcc.curr_id };
+				}
+
+				affectedAccounts[updDestAccPos].balance += normalize(da);
+
+				for(let accPos in affectedAccounts)
+				{
+					let acc = affectedAccounts[accPos];
+					fmtBal = formatCurrency(acc.balance, acc.curr_id);
+
+					accWidget.tiles[accPos] = { balance : fmtBal, name : acc.name };
+				}
+
+				var state = { values : { widgets : { length : 5, 0 : accWidget } } };
+
+				test('Account balance update', () => {}, page, state);
 
 				return Promise.resolve(page);
 			});
