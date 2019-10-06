@@ -391,7 +391,10 @@ ExpenseTransactionPage.prototype.clickExchRate = function()
 ExpenseTransactionPage.prototype.changeDestCurrency = function(val)
 {
 	if (this.model.dest_curr_id == val)
+	{
 		ExpenseTransactionPage.parent.changeDestCurrency.apply(this, arguments);
+		return;
+	}
 
 	this.model.dest_curr_id = parseInt(val);
 	this.model.destCurr = getCurrency(this.model.dest_curr_id);

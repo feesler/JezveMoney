@@ -398,7 +398,10 @@ IncomeTransactionPage.prototype.clickExchRate = function()
 IncomeTransactionPage.prototype.changeSourceCurrency = function(val)
 {
 	if (this.model.src_curr_id == val)
+	{
 		IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
+		return;
+	}
 
 	this.model.src_curr_id = parseInt(val);
 	this.model.srcCurr = getCurrency(this.model.src_curr_id);
