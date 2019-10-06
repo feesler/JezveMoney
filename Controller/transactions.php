@@ -646,11 +646,13 @@ class TransactionsController extends Controller
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
 		$backExchSign = $srcAmountSign."/".$destAmountSign;
-		$backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
+		$backExchValue = round(1 / $exchValue, 5);
 
 		$rtSrcAmount = $currMod->format($tr["src_amount"], $srcAmountCurr);
 		$rtDestAmount = $currMod->format($tr["dest_amount"], $destAmountCurr);
-		$rtExchange = $exchValue." ".$exchSign." (".$backExchValue." ".$backExchSign.")";
+		$rtExchange = $exchValue." ".$exchSign;
+		if ($exchValue != 1)
+			$rtExchange .= " (".$backExchValue." ".$backExchSign.")";
 		if ($trans_type != DEBT)
 		{
 			$rtSrcResBal = $currMod->format($src["balance"], $src["curr"]);
