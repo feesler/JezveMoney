@@ -157,14 +157,14 @@ class TransactionsController extends Controller
 					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 			}
 
-			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == 3 || $trans->type == 4))
+			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == TRANSFER || $trans->type == DEBT))
 				$accStr .= " → ";
 
 			if ($trans->dest_id != 0)
 			{
 				if ($trans->type == INCOME || $trans->type == TRANSFER)		// income or transfer
 					$accStr .= $accMod->getName($trans->dest_id);
-				else if ($trans->type == 4)
+				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
 			}
 
