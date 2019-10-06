@@ -474,6 +474,13 @@ TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
 		this.model.destCurr = getCurrency(this.model.dest_curr_id);
 		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
 
+		// Copy source amount to destination amount
+		if (this.model.fDestAmount != this.model.fSrcAmount)
+		{
+			this.model.destAmount = this.model.srcAmount;
+		}
+		this.model.fDestAmount = this.model.fSrcAmount;
+
 		// Update result balance of destination
 		var newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
 		if (this.model.fDestResBal != newDestResBal)
@@ -561,6 +568,13 @@ TransferTransactionPage.prototype.changeDestAccount = function(account_id)
 		this.model.src_curr_id = this.model.srcAccount.curr_id;
 		this.model.srcCurr = getCurrency(this.model.src_curr_id);
 		this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
+
+		// Copy destination amount to source amount
+		if (this.model.fDestAmount != this.model.fSrcAmount)
+		{
+			this.model.srcAmount = this.model.destAmount;
+		}
+		this.model.fSrcAmount = this.model.fDestAmount;
 
 		// Update result balance of source
 		var newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
