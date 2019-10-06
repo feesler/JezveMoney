@@ -220,7 +220,7 @@ function submitExpenseTransaction(page, params)
 
 	if ('destCurr' in params)
 	{
-		let curr = page.getAccountByPos(params.destCurr);
+		let curr = getCurrency(params.destCurr);
 		if (!curr)
 			throw new Error('Currency (' + params.destCurr + ') not found');
 
@@ -326,7 +326,7 @@ function submitIncomeTransaction(page, params)
 
 	if ('srcCurr' in params)
 	{
-		let curr = page.getAccountByPos(params.srcCurr);
+		let curr = getCurrency(params.srcCurr);
 		if (!curr)
 			throw new Error('Currency (' + params.srcCurr + ') not found');
 
