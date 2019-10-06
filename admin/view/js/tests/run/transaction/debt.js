@@ -1,70 +1,73 @@
+function submitDebtTransaction(page, params)
+{
+	if ('acc' in params)
+	{
+		if (params.acc === null)
+		{
+			test('Disable account', () =>
+			{
+				if (!page.model.noAccount)
+					page.toggleAccount();
+			}, page);
+		}
+		else
+		{
+			test('Change account to (' + page.getAccountByPos(params.acc).name + ')',
+					() => page.changeAccountByPos(params.acc), page);
+		}
+	}
+
+	if ('person' in params)
+	{
+		test('Change person to (' + page.getPersonByPos(params.person).name + ')',
+				() => page.changePersonByPos(params.person), page);
+	}
+
+	if ('debtType' in params)
+	{
+		if (!!params.debtType != page.model.debtType)
+		{
+			test('Change debt type (' + (params.debtType ? 'give' : 'take') + ')',
+					() => page.toggleDebtType(), page);
+		}
+	}
+
+	if (!('srcAmount' in params))
+		throw new Error('Source amount value not specified');
+
+	test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+
+	if ('date' in params)
+		test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+
+	if ('comment' in params)
+		test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+
+	App.beforeSubmitTransaction = { person : page.model.person,
+	 								personPos : page.getPersonPos(page.model.person.id),
+									personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
+									acc : page.model.account,
+									debtType : page.model.debtType };
+
+	if (!App.beforeSubmitTransaction.personAccount)
+	{
+		App.beforeSubmitTransaction.personAccount = { curr_id : page.model.src_curr_id, balance : 0 };
+		App.beforeSubmitTransaction.person.accounts.push(App.beforeSubmitTransaction.personAccount);
+	}
+
+	if (App.beforeSubmitTransaction.acc)
+		App.beforeSubmitTransaction.accPos = page.getAccountPos(page.model.account.id);
+
+	return page.submit();
+}
+
+
 function createDebt(page, onState, params)
 {
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
-			.then(page => debtTransactionLoop(page, onState, page =>
-			{
-				if ('acc' in params)
-				{
-					if (params.acc === null)
-					{
-						test('Disable account', () =>
-						{
-							if (!page.model.noAccount)
-								page.toggleAccount();
-						}, page);
-					}
-					else
-					{
-						test('Change account to (' + page.getAccountByPos(params.acc).name + ')',
-								() => page.changeAccountByPos(params.acc), page);
-					}
-				}
-
-				if ('person' in params)
-				{
-					test('Change person to (' + page.getPersonByPos(params.person).name + ')',
-							() => page.changePersonByPos(params.person), page);
-				}
-
-				if ('debtType' in params)
-				{
-					if (!!params.debtType != page.model.debtType)
-					{
-						test('Change debt type (' + (params.debtType ? 'give' : 'take') + ')',
-								() => page.toggleDebtType(), page);
-					}
-				}
-
-				if (!('srcAmount' in params))
-					throw new Error('Source amount value not specified');
-
-				test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
-
-				if ('date' in params)
-					test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
-
-				if ('comment' in params)
-					test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
-
-				App.beforeSubmitTransaction = { person : page.model.person,
-				 								personPos : page.getPersonPos(page.model.person.id),
-												personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
-												acc : page.model.account,
-												debtType : page.model.debtType };
-
-				if (!App.beforeSubmitTransaction.personAccount)
-				{
-					App.beforeSubmitTransaction.personAccount = { curr_id : page.model.src_curr_id, balance : 0 };
-					App.beforeSubmitTransaction.person.accounts.push(App.beforeSubmitTransaction.personAccount);
-				}
-
-				if (App.beforeSubmitTransaction.acc)
-					App.beforeSubmitTransaction.accPos = page.getAccountPos(page.model.account.id);
-
-				return page.submit();
-			}))
+			.then(page => debtTransactionLoop(page, onState, page => submitDebtTransaction(page, params)))
 			.then(page =>
 			{
 				let person = App.beforeSubmitTransaction.person;
