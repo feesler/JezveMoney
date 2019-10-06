@@ -14,6 +14,10 @@ IncomeTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
+	res.isUpdate = cont.isUpdate;
+	if (res.isUpdate)
+		res.id = cont.id;
+
 	res.destAccount = this.getAccount(cont.destination.id);
 	if (!res.destAccount)
 		throw new Error('Destination account not found');

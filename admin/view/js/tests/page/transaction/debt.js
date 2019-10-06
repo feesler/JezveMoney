@@ -30,6 +30,10 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 {
 	var res = {};
 
+	res.isUpdate = cont.isUpdate;
+	if (res.isUpdate)
+		res.id = cont.id;
+
 	if (cont.typeMenu.activeType != 4)
 		throw new Error('Wrong page');
 
