@@ -518,7 +518,8 @@ class TransactionsController extends Controller
 				$srcBalTitle .= " (Person)";
 
 			$balDiff = $tr["src_amount"];
-			$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
+			if ($trans_type != DEBT)
+				$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
 		}
 
 		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
@@ -530,7 +531,8 @@ class TransactionsController extends Controller
 				$destBalTitle .= " (Account)";
 
 			$balDiff = $tr["dest_amount"];
-			$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
+			if ($trans_type != DEBT)
+				$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -631,12 +633,12 @@ class TransactionsController extends Controller
 					$accLbl = "Destination account";
 				else
 					$accLbl = "Source account";
-			}
 
-			if ($give)
-				$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] - $tr["dest_amount"], $debtAcc["curr"]);
-			else
-				$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] + $tr["src_amount"], $debtAcc["curr"]);
+				if ($give)
+					$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] - $tr["dest_amount"], $debtAcc["curr"]);
+				else
+					$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] + $tr["src_amount"], $debtAcc["curr"]);
+			}
 
 			$p_balfmt = $currMod->format($person_balance, $srcAmountCurr);
 		}
