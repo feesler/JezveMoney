@@ -509,30 +509,24 @@ class TransactionsController extends Controller
 
 		$formAction = BASEURL."transactions/".$action."/";
 
-		if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)
+		$srcBalTitle = "Result balance";
+		if ($trans_type == EXPENSE || $trans_type == TRANSFER)
 		{
-			$srcBalTitle = "Result balance";
 			if ($trans_type == TRANSFER)
 				$srcBalTitle .= " (Source)";
-			else if ($trans_type == DEBT)
-				$srcBalTitle .= " (Person)";
 
 			$balDiff = $tr["src_amount"];
-			if ($trans_type != DEBT)
-				$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
+			$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
 		}
 
-		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
+		$destBalTitle = "Result balance";
+		if ($trans_type == INCOME || $trans_type == TRANSFER)
 		{
-			$destBalTitle = "Result balance";
 			if ($trans_type == TRANSFER)
 				$destBalTitle .= " (Destination)";
-			else if ($trans_type == DEBT)
-				$destBalTitle .= " (Account)";
 
 			$balDiff = $tr["dest_amount"];
-			if ($trans_type != DEBT)
-				$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
+			$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -577,6 +571,9 @@ class TransactionsController extends Controller
 
 			$user_owner = $uMod->getOwner($user_id);
 			$give = (!is_null($src) && $src["owner"] != $user_owner);
+
+			$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
+			$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$person_id = ($give) ? $src["owner"] : $dest["owner"];
 			$person_name = $pMod->getName($person_id);
