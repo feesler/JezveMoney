@@ -227,6 +227,9 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 
 TestPage.prototype.parseDropDown = function(elem)
 {
+	if (!elem)
+		return null;
+
 	var res = { elem : elem };
 	if (!res.elem || (!hasClass(res.elem, 'dd_container') && !hasClass(res.elem, 'dd_attached')))
 		throw new Error('Wrong drop down element');
