@@ -333,7 +333,7 @@
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$srcAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
 <?php	if ($trans_type == DEBT) {		?>
-									<input id="resbal" class="summ_text" type="text" value="<?=$person_res_balance?>">
+									<input id="resbal" class="summ_text" type="text" value="<?=($give ? $person_res_balance : $debtAcc["balance"])?>">
 <?php	} else {	?>
 									<input id="resbal" class="summ_text" type="text" value="<?=$src["balance"]?>">
 <?php	}	?>
@@ -349,7 +349,7 @@
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$destAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
 <?php	if ($trans_type == DEBT) {		?>
-									<input id="resbal_d" class="summ_text" type="text" value="<?=$debtAcc["balance"]?>">
+									<input id="resbal_d" class="summ_text" type="text" value="<?=($give ? $debtAcc["balance"] : $person_res_balance )?>">
 <?php	} else {	?>
 									<input id="resbal_d" class="summ_text" type="text" value="<?=$dest["balance"]?>">
 <?php	}	?>
