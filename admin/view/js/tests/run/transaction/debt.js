@@ -12,6 +12,11 @@ function submitDebtTransaction(page, params)
 		}
 		else
 		{
+			if (page.model.noAccount)
+			{
+				test('Enable account', () => page.toggleAccount(), page);
+			}
+
 			test('Change account to (' + page.getAccountByPos(params.acc).name + ')',
 					() => page.changeAccountByPos(params.acc), page);
 		}
@@ -46,8 +51,11 @@ function submitDebtTransaction(page, params)
 	App.beforeSubmitTransaction = { person : page.model.person,
 	 								personPos : page.getPersonPos(page.model.person.id),
 									personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
+									noAccount : page.model.noAccount,
 									acc : page.model.account,
-									debtType : page.model.debtType };
+									debtType : page.model.debtType,
+									srcAmount : page.model.fSrcAmount,
+									destAmount : page.model.fDestAmount };
 
 	if (!App.beforeSubmitTransaction.personAccount)
 	{
@@ -151,6 +159,213 @@ function createDebt(page, onState, params)
 				state.values.widgets[2] = transWidget;
 
 				test('Debt transaction submit', () => {}, page, state);
+
+				App.transactions = page.content.widgets[2].transList;
+				App.accounts = page.content.widgets[0].tiles;
+				App.persons = page.content.widgets[3].infoTiles;
+
+				return Promise.resolve(page);
+			});
+}
+
+
+function updateDebt(page, pos, params)
+{
+	pos = parseInt(pos);
+	if (isNaN(pos) || pos < 0)
+		throw new Error('Position of transaction not specified');
+
+	if (!isObject(params))
+		throw new Error('Parameters not specified');
+
+	setBlock('Update debt transaction ' + pos, 3);
+
+	return goToMainPage(page)
+			.then(page => page.goToTransactions())
+			.then(page => page.filterByType(DEBT))
+			.then(page => {
+				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
+
+				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				if (!trObj)
+					throw new Error('Transaction not found');
+
+				App.beforeUpdateTransaction.trObj = trObj;
+
+				return page.goToUpdateTransaction(pos);
+			})
+			.then(page => {
+				let expState;
+				if (page.model.noAccount)
+					expState = (page.model.debtType) ? 6 : 7;
+				else
+					expState = (page.model.debtType) ? 0 : 3;
+
+				test('Initial state of update debt page', () => page.setExpectedState(expState), page);
+
+				setParam(App.beforeUpdateTransaction,
+							{ id : page.model.id,
+								person : page.model.person,
+ 								personPos : page.getPersonPos(page.model.person.id),
+								personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
+								noAccount : page.model.noAccount,
+								acc : page.model.noAccount ? page.model.account : null,
+								accPos : page.model.noAccount ? page.getAccountPos(page.model.account.id) : -1,
+								debtType : page.model.debtType,
+								srcBalance : page.model.fSrcResBal,
+								destBalance : page.model.fDestResBal,
+								srcAmount : page.model.fSrcAmount,
+								destAmount : page.model.fDestAmount,
+								date : page.model.date,
+								comment : page.model.comment});
+
+				return submitDebtTransaction(page, params);
+			})
+			.then(page => page.filterByType(DEBT))
+			.then(page =>
+			{
+				let trans_id = App.beforeUpdateTransaction.id;
+				let transCount = App.beforeUpdateTransaction.trCount;
+				let updPerson = App.beforeSubmitTransaction.person;
+				let updPersonAccount = App.beforeSubmitTransaction.personAccount;
+				let updAcc = App.beforeSubmitTransaction.acc;
+				let updNoAccount = App.beforeSubmitTransaction.noAccount;
+				let updDebtType = App.beforeSubmitTransaction.debtType;
+				let updSrcAmount = App.beforeSubmitTransaction.srcAmount;
+
+				// Transactions widget changes
+				var title = '';
+				var fmtAmount;
+
+				if (updDebtType)
+				{
+					title = updPerson.name;
+					if (updAcc && !updNoAccount)
+						title += ' → ' + updAcc.name;
+					fmtAmount = (updAcc && !updNoAccount) ? '+ ' : '- ';
+				}
+				else
+				{
+					if (updAcc && !updNoAccount)
+						title = updAcc.name + ' → ';
+					title += updPerson.name;
+					fmtAmount = (updAcc && !updNoAccount) ? '- ' : '+ ';
+				}
+				fmtAmount += formatCurrency(updSrcAmount, updPersonAccount.curr_id);
+
+				var state = { values : { transactions : { length : transCount } } };
+				state.values.transactions[pos] = { id : trans_id,
+													accountTitle : title,
+													amountText : fmtAmount,
+												 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+												 	comment : ('comment' in params) ? params.comment : '' };
+
+				test('Transaction update', () => {}, page, state);
+
+				return goToMainPage(page);
+			})
+			.then(page =>
+			{
+				let origPerson = App.beforeUpdateTransaction.person;
+				let origPersonPos = App.beforeUpdateTransaction.personPos;
+				let origPersonAccount = App.beforeUpdateTransaction.personAccount;
+				let origAcc = App.beforeUpdateTransaction.acc;
+				let origAccPos = App.beforeUpdateTransaction.accPos;
+				let origDebtType = App.beforeUpdateTransaction.debtType;
+				let origAmount = App.beforeUpdateTransaction.srcAmount;
+				let origNoAccount = App.beforeUpdateTransaction.noAccount;
+
+				let updPerson = App.beforeSubmitTransaction.person;
+				let updPersonPos = App.beforeSubmitTransaction.personPos;
+				let updPersonAccount = App.beforeSubmitTransaction.personAccount;
+				let updAcc = App.beforeSubmitTransaction.acc;
+				let updAccPos = App.beforeSubmitTransaction.accPos;
+				let updDebtType = App.beforeSubmitTransaction.debtType;
+				let updAmount = App.beforeSubmitTransaction.srcAmount;
+				let updNoAccount = App.beforeSubmitTransaction.noAccount;
+
+				var state = { values : { widgets : { length : 5 } } };
+				var sa, da;
+
+				sa = da = normalize(origAmount);
+
+				var personsWidget = { infoTiles : { length : App.persons.length } };
+
+				// Cancel transaction
+				if (origDebtType)
+				{
+					origPersonAccount.balance += sa;
+					if (origAcc)
+						origAcc.balance -= da;
+				}
+				else
+				{
+					origPersonAccount.balance -= da;
+					if (origAcc)
+						origAcc.balance += sa;
+				}
+
+				// Apply new transaction
+				sa = da = normalize(updAmount);
+				if (updDebtType)
+				{
+					updPersonAccount.balance -= sa;
+					if (updAcc)
+						updAcc.balance += da;
+				}
+				else
+				{
+					updPersonAccount.balance += da;
+					if (updAcc)
+						updAcc.balance -= sa;
+				}
+
+				if (origPersonPos != updPersonPos)
+				{
+					let debtAccounts = origPerson.accounts.reduce((val, pacc) =>
+					{
+						if (pacc.balance == 0)
+							return val;
+
+						let fmtBal = formatCurrency(pacc.balance, pacc.curr_id);
+						return val.concat(fmtBal);
+					}, []);
+
+					let debtSubtitle = debtAccounts.join('\n');
+					personsWidget.infoTiles[origPersonPos] = { title : origPerson.name, subtitle : debtSubtitle };
+				}
+
+				let debtAccounts = updPerson.accounts.reduce((val, pacc) =>
+				{
+					if (pacc.balance == 0)
+						return val;
+
+					let fmtBal = formatCurrency(pacc.balance, pacc.curr_id);
+					return val.concat(fmtBal);
+				}, []);
+
+				let debtSubtitle = debtAccounts.join('\n');
+
+				personsWidget.infoTiles[updPersonPos] = { title : updPerson.name, subtitle : debtSubtitle };
+
+				state.values.widgets[3] = personsWidget;
+
+				// Accounts widget changes
+				var accWidget = { tiles : { length : App.accounts.length } };
+				if (origAcc && !origNoAccount)
+				{
+					var fmtAccBal = formatCurrency(origAcc.balance, origAcc.curr_id);
+					accWidget.tiles[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
+				}
+				if (updAcc && !updNoAccount)
+				{
+					var fmtAccBal = formatCurrency(updAcc.balance, updAcc.curr_id);
+					accWidget.tiles[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
+				}
+
+				state.values.widgets[0] = accWidget;
+
+				test('Account and person balance update', () => {}, page, state);
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;

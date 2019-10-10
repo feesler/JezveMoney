@@ -165,7 +165,8 @@ function updateTransactionTests(page)
 
 	return runUpdateExpenseTests(page)
 			.then(page => runUpdateIncomeTests(page))
-			.then(page => runUpdateTransferTests(page));
+			.then(page => runUpdateTransferTests(page))
+			.then(page => runUpdateDebtTests(page));
 }
 
 
@@ -275,7 +276,20 @@ function runUpdateTransferTests(page)
 			.then(page => updateTransfer(page, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' }))
 			.then(page => updateTransfer(page, 2, { srcAcc : 3, srcAmount : '5.0301' }))
 			.then(page => updateTransfer(page, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' }))
-			.then(page => updateTransfer(page, 4, { srcAmount : '1050.01' }))
+			.then(page => updateTransfer(page, 4, { srcAmount : '1050.01' }));
+}
+
+
+function runUpdateDebtTests(page)
+{
+	setBlock('Update debt transactions', 1);
+
+	return updateDebt(page, 0, { person : 0, srcAmount : '105' })
+			.then(page => updateDebt(page, 1, { acc : 1, srcAmount : '105' }))
+			.then(page => updateDebt(page, 2, { debtType : true, srcAmount : '10' }))
+			.then(page => updateDebt(page, 3, { debtType : false, acc : 2, srcAmount : '200.0202' }))
+			.then(page => updateDebt(page, 4, { acc : null, srcAmount : '200' }))
+			.then(page => updateDebt(page, 5, { srcAmount : '1001' }));
 }
 
 
