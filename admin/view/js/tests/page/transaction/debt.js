@@ -151,21 +151,35 @@ DebtTransactionPage.prototype.setSrcAmount = function(model, val)
 	model.srcAmount = val;
 
 	var newValue = isValidValue(val) ? normalize(val) : val;
-	if (model.fSrcAmount != newValue)
+	if (model.fSrcAmount != newValue || model.srcResBal == '')
 	{
 		model.fSrcAmount = newValue;
 
-		if (model.srcAccount)
+		if (model.srcAccount && !model.noAccount)
 		{
 			model.srcResBal = normalize(model.srcAccount.balance - model.fSrcAmount);
 		}
-		else if (!model.debtType && model.lastAccount_id)
+		else if (model.noAccount)
 		{
-			var lastAcc = this.getAccount(model.lastAccount_id);
-			if (!lastAcc)
-				throw new Error('Last account not found');
+			if (model.debtType)
+			{
+				model.srcResBal = normalize(model.personAccount.balance - model.fSrcAmount);
+			}
+			else
+			{
+				let accBalance = 0;
 
-			model.srcResBal = normalize(lastAcc.balance - model.fSrcAmount);
+				if (model.lastAccount_id)
+				{
+					var lastAcc = this.getAccount(model.lastAccount_id);
+					if (!lastAcc)
+						throw new Error('Last account not found');
+
+					accBalance = lastAcc.balance;
+				}
+
+				model.srcResBal = normalize(accBalance - model.fSrcAmount);
+			}
 		}
 
 		model.fmtSrcResBal = model.srcCurr.formatValue(model.srcResBal);
@@ -182,21 +196,35 @@ DebtTransactionPage.prototype.setDestAmount = function(model, val)
 	model.destAmount = val;
 
 	var newValue = isValidValue(model.destAmount) ? normalize(model.destAmount) : model.destAmount;
-	if (model.fDestAmount != newValue)
+	if (model.fDestAmount != newValue || model.destResBal == '')
 	{
 		model.fDestAmount = newValue;
 
-		if (model.destAccount)
+		if (model.destAccount && !model.noAccount)
 		{
 			model.destResBal = normalize(model.destAccount.balance + model.fDestAmount);
 		}
-		else if (model.debtType && model.lastAccount_id)
+		else
 		{
-			var lastAcc = this.getAccount(model.lastAccount_id);
-			if (!lastAcc)
-				throw new Error('Last account not found');
+			if (model.debtType)
+			{
+				let accBalance = 0;
 
-			model.destResBal = normalize(lastAcc.balance + model.fDestAmount);
+				if (model.lastAccount_id)
+				{
+					var lastAcc = this.getAccount(model.lastAccount_id);
+					if (!lastAcc)
+						throw new Error('Last account not found');
+
+					accBalance = lastAcc.balance;
+				}
+
+				model.destResBal = normalize(accBalance + model.fDestAmount);
+			}
+			else
+			{
+				model.destResBal = normalize(model.personAccount.balance + model.fDestAmount);
+			}
 		}
 
 		model.fmtDestResBal = model.destCurr.formatValue(model.destResBal);
@@ -225,17 +253,23 @@ DebtTransactionPage.prototype.setExpectedState = function(state_id)
 							src_amount_left : this.model.srcCurr.formatValue(this.model.fSrcAmount),
 							dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
 							result_balance_row : { value : this.model.srcResBal.toString(), isCurrActive : false },
-							src_res_balance_left : this.model.fmtSrcResBal,
 							result_balance_dest_row : { value : this.model.destResBal.toString(), isCurrActive : false },
-							dest_res_balance_left : this.model.fmtDestResBal,
 							exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
 							exch_left : this.model.fmtExch } };
 
 	if (this.model.debtType)
 	{
 		setParam(res.values, { person : { tile : { name : this.model.person.name, balance : this.model.srcAccount.fmtBalance } },
+								src_res_balance_left : this.model.fmtSrcResBal,
 								result_balance_row : { label : 'Result balance (Person)' },
 								result_balance_dest_row : { label : 'Result balance (Account)' } });
+
+		// Check initial state
+		if (this.model.noAccount && !this.model.lastAccount_id && this.model.destResBal == '')
+			res.values.dest_res_balance_left = '';
+		else
+			res.values.dest_res_balance_left = this.model.fmtDestResBal;
+
 
 		if (!this.model.noAccount)
 			setParam(res.values.account, { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } });
@@ -243,8 +277,16 @@ DebtTransactionPage.prototype.setExpectedState = function(state_id)
 	else
 	{
 		setParam(res.values, { person : { tile : { name : this.model.person.name, balance : this.model.destAccount.fmtBalance } },
+								dest_res_balance_left : this.model.fmtDestResBal,
 								result_balance_row : { label : 'Result balance (Account)' },
 								result_balance_dest_row : { label : 'Result balance (Person)' } });
+
+		// Check initial state
+		if (this.model.noAccount && !this.model.lastAccount_id && this.model.srcResBal == '')
+			res.values.src_res_balance_left = '';
+		else
+			res.values.src_res_balance_left = this.model.fmtSrcResBal;
+
 
 		if (!this.model.noAccount)
 			setParam(res.values.account, { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } });
@@ -558,14 +600,25 @@ DebtTransactionPage.prototype.toggleAccount = function()
 	}
 	else
 	{
-		this.model.account = this.getAccount(this.model.lastAccount_id);
+		if (this.model.lastAccount_id)
+			this.model.account = this.getAccount(this.model.lastAccount_id);
 		if (!this.model.account)
 			throw new Error('Account not found');
 
 		if (this.model.debtType)
+		{
 			this.model.destAccount = this.model.account;
+
+			this.model.destResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
+			this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
+		}
 		else
+		{
 			this.model.srcAccount = this.model.account;
+
+			this.model.srcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+		}
 
 		if (this.model.srcAccount)
 			this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
