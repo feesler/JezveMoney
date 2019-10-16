@@ -112,7 +112,7 @@ function createDebt(page, onState, params)
 					return val.concat(fmtBal);
 				}, []);
 
-				var debtSubtitle = debtAccounts.join('\n');
+				let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 				var personsWidget = { infoTiles : { length : App.persons.length } };
 				personsWidget.infoTiles[personPos] = { title : person.name, subtitle : debtSubtitle };
@@ -331,7 +331,7 @@ function updateDebt(page, pos, params)
 						return val.concat(fmtBal);
 					}, []);
 
-					let debtSubtitle = debtAccounts.join('\n');
+					let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 					personsWidget.infoTiles[origPersonPos] = { title : origPerson.name, subtitle : debtSubtitle };
 				}
 
@@ -344,7 +344,7 @@ function updateDebt(page, pos, params)
 					return val.concat(fmtBal);
 				}, []);
 
-				let debtSubtitle = debtAccounts.join('\n');
+				let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 				personsWidget.infoTiles[updPersonPos] = { title : updPerson.name, subtitle : debtSubtitle };
 
