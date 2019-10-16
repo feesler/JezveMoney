@@ -175,22 +175,7 @@ TransactionPage.prototype.getAccountByPos = function(pos)
 // Return -1 in case account can't be found
 TransactionPage.prototype.getAccountPos = function(acc_id)
 {
-	var data = viewframe.contentWindow.accounts;
-	var pos = -1;
-
-	if (!isArray(data) || !acc_id)
-		return -1;
-
-	data.some(function(acc, ind)
-	{
-		var cond = (acc_id == acc.id);
-		if (cond)
-			pos = ind;
-
-		return cond;
-	});
-
-	return pos;
+	return getPosById(viewframe.contentWindow.accounts, acc_id);
 };
 
 
@@ -234,22 +219,7 @@ TransactionPage.prototype.getPersonByPos = function(pos)
 // Return zero if no person found
 TransactionPage.prototype.getPersonPos = function(person_id)
 {
-	var data = viewframe.contentWindow.persons;
-	var pos = -1;
-
-	if (!isArray(data) || !person_id)
-		return -1;
-
-	data.some(function(item, ind)
-	{
-		var cond = (person_id == item.id);
-		if (cond)
-			pos = ind;
-
-		return cond;
-	});
-
-	return pos;
+	return getPosById(viewframe.contentWindow.persons, person_id);
 };
 
 

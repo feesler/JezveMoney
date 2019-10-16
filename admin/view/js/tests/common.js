@@ -20,6 +20,26 @@ function vqueryall(a)
 }
 
 
+function getPosById(arr, id)
+{
+	var pos = -1;
+
+	if (!isArray(arr) || !id)
+		return -1;
+
+	arr.some(function(item, ind)
+	{
+		var cond = (id == item.id);
+		if (cond)
+			pos = ind;
+
+		return cond;
+	});
+
+	return pos;
+}
+
+
 function clickEmul(elemObj)
 {
 	if (elemObj.click)
