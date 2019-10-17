@@ -12,6 +12,7 @@ class MainController extends Controller
 		$currMod = new CurrencyModel();
 
 		$currArr = $currMod->getArray();
+		$accArr = $accMod->getArray();
 
 		$tilesArr = $accMod->getTilesArray();
 		$totalsArr = $accMod->getTotalsArray();
