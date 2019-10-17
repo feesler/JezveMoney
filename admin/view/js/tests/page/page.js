@@ -186,7 +186,7 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 	}
 	else
 	{
-		listItems = listEl.querySelectorAll('.trlist_item');
+		listItems = listEl.querySelectorAll('.trlist_item_wrap > div');
 	}
 
 	for(var i = 0; i < listItems.length; i++)
