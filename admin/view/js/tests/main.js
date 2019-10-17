@@ -77,6 +77,7 @@ function startTests(page)
 	.then(accountTests)
 	.then(personTests)
 	.then(transactionTests)
+	.then(statisticsTests)
 	.catch(msg => addResult(msg, false));
 }
 
@@ -131,9 +132,101 @@ function personTests(page)
 
 function transactionTests(page)
 {
+	setBlock('Transactions', 1);
+
 	return createTransactionTests(page)
 			.then(updateTransactionTests)
 			.then(deleteTransactionTests);
+}
+
+
+function statisticsTests(page)
+{
+	setBlock('Statistics', 1);
+
+	return goToMainPage(page)
+			.then(page => page.goToStatistics())
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 1 } } } };
+				test('Initial state of statistics page', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.filterByType(INCOME))
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 0 } } } };
+				test('Income statistics page', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.filterByType(TRANSFER))
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 2 } } } };
+				test('Transfer statistics page', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.filterByType(DEBT))
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 3 } } } };
+				test('Debt statistics page', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.filterByType(EXPENSE))
+			.then(page => page.selectAccountByPos(1))
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 0 } } } };
+				test('Filter statistics by account', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.filterByType(DEBT))
+			.then(page => page.groupByDay())
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 1 } } } };
+				test('Group statistics by day', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.groupByWeek())
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 1 } } } };
+				test('Group statistics by week', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.groupByMonth())
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 1 } } } };
+				test('Group statistics by month', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.groupByYear())
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 1 } } } };
+				test('Group statistics by year', () => {}, page, state);
+
+				return Promise.resolve(page);
+			})
+			.then(page => page.byCurrencies())
+			.then(page =>
+			{
+				var state = { value : { chart : { bars : { length : 1 } } } };
+				test('Filter by currencies', () => {}, page, state);
+
+				return Promise.resolve(page);
+			});
 }
 
 

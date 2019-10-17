@@ -102,3 +102,16 @@ MainPage.prototype.goToPersons = function()
 
 	return navigation(() => clickEmul(widget.linkElem), PersonsPage);
 };
+
+
+MainPage.prototype.goToStatistics = function()
+{
+	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+		throw new Error('Fail to parse main page widgets');
+
+	var widget = this.content.widgets[4];
+	if (widget.title != 'Statistics')
+		throw new Error('Wrong widget');
+
+	return navigation(() => clickEmul(widget.linkElem), StatisticsPage);
+};
