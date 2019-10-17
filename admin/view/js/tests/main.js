@@ -541,7 +541,7 @@ function deleteTransactions(page, type, transactions)
 						return val.concat(fmtBal);
 					}, []);
 
-					let debtSubtitle = debtAccounts.join('\n');
+					let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 					personsWidget.infoTiles[personPos] = { title : person.name, subtitle : debtSubtitle };
 				}
