@@ -142,7 +142,7 @@ function updateExpense(page, pos, params)
 				let origDate = App.beforeUpdateTransaction.date;
 				let origComment = App.beforeUpdateTransaction.comment;
 
-				// Transactions widget changes
+				// Transactions list changes
 				var fmtAmount = '- ' + formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id);
 				if ('destCurr' in params && 'srcAmount' in params)
 				{

@@ -142,7 +142,7 @@ function updateIncome(page, pos, params)
 				let origDate = App.beforeUpdateTransaction.date;
 				let origComment = App.beforeUpdateTransaction.comment;
 
-				// Transactions widget changes
+				// Transactions list changes
 				var fmtAmount = '+ ' + formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
 				if ('srcCurr' in params && 'destAmount' in params)
 				{

@@ -144,19 +144,19 @@ function createTransactionTests(page)
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(expenseTransactionLoop)
-			.then(submitExpenseTests)
+			.then(runCreateExpenseTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(INCOME))
 			.then(incomeTransactionLoop)
-			.then(submitIncomeTests)
+			.then(runCreateIncomeTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(TRANSFER))
 			.then(transferTransactionLoop)
-			.then(submitTransferTests)
+			.then(runCreateTransferTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
 			.then(debtTransactionLoop)
-			.then(submitDebtTests);
+			.then(runCreateDebtTests);
 }
 
 
@@ -210,42 +210,42 @@ function goToMainPage(page)
 }
 
 
-function submitExpenseTests(page)
+function runCreateExpenseTests(page)
 {
 	setBlock('Create expense transactions', 1);
 
 	return createExpense(page, 0, 0, { destAmount : '123.7801' })
 			.then(page => createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
 			.then(page => createExpense(page, 1, 0, { destAmount : '0.01' }))
-			.then(page => createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }))
+			.then(page => createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }));
 }
 
 
-function submitIncomeTests(page)
+function runCreateIncomeTests(page)
 {
-	setBlock('Submit income transactions', 1);
+	setBlock('Create income transactions', 1);
 
 	return createIncome(page, 0, 0, { srcAmount : '10023.7801' })
 			.then(page => createIncome(page, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
 			.then(page => createIncome(page, 1, 0, { srcAmount : '0.01' }))
-			.then(page => createIncome(page, 1, 0, { destAcc : 4, srcAmount : '99.99' }))
+			.then(page => createIncome(page, 1, 0, { destAcc : 4, srcAmount : '99.99' }));
 
 }
 
 
-function submitTransferTests(page)
+function runCreateTransferTests(page)
 {
-	setBlock('Submit transfer transactions', 1);
+	setBlock('Create transfer transactions', 1);
 
 	return createTransfer(page, 0, { srcAmount : '1000' })
 			.then(page => createTransfer(page, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' }))
 			.then(page => createTransfer(page, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' }))
 			.then(page => createTransfer(page, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' }))
-			.then(page => createTransfer(page, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' }))
+			.then(page => createTransfer(page, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' }));
 }
 
 
-function submitDebtTests(page)
+function runCreateDebtTests(page)
 {
 	setBlock('Submit debt transactions', 1);
 
@@ -254,7 +254,7 @@ function submitDebtTests(page)
 			.then(page => createDebt(page, 0, { debtType : true, acc : 3, srcAmount : '100.0101' }))
 			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' }))
 			.then(page => createDebt(page, 0, { acc : null, srcAmount : '105' }))
-			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }))
+			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }));
 }
 
 
@@ -294,7 +294,7 @@ function runUpdateTransferTests(page)
 
 function runUpdateDebtTests(page)
 {
-	setBlock('Update debt transactions', 1);
+	setBlock('Update debt transactions', 2);
 
 	return updateDebt(page, 0, { person : 0, srcAmount : '105' })
 			.then(page => updateDebt(page, 1, { acc : 1, srcAmount : '105' }))

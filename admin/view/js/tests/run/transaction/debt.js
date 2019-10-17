@@ -233,7 +233,7 @@ function updateDebt(page, pos, params)
 				let updDebtType = App.beforeSubmitTransaction.debtType;
 				let updSrcAmount = App.beforeSubmitTransaction.srcAmount;
 
-				// Transactions widget changes
+				// Transactions list changes
 				var title = '';
 				var fmtAmount;
 
