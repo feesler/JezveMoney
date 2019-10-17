@@ -40,6 +40,30 @@ function getPosById(arr, id)
 }
 
 
+// Return deep copy of object
+function copyObject(item)
+{
+	if (isArray(item))
+	{
+		return item.map(copyObject);
+	}
+	else if (isObject(item))
+	{
+		var res = {};
+		for(var key in item)
+		{
+			res[key] = copyObject(item[key]);
+		}
+
+		return res;
+	}
+	else
+	{
+		return item;
+	}
+}
+
+
 function clickEmul(elemObj)
 {
 	if (elemObj.click)
