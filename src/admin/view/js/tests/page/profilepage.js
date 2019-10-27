@@ -65,17 +65,20 @@ ProfilePage.prototype.parseContent = function()
 
 ProfilePage.prototype.resetAll = function()
 {
-	if (!this.content.resetAllBtn)
-		throw new Error('Reset all button not found');
+	return this.performAction(() =>
+	{
+		if (!this.content.resetAllBtn)
+			throw new Error('Reset all button not found');
 
-	clickEmul(this.content.resetAllBtn);
+		clickEmul(this.content.resetAllBtn);
+	})
+	.then(() =>
+	{
+		if (!this.content.reset_all_warning || !this.content.reset_all_warning.elem || !isVisible(this.content.reset_all_warning.elem))
+			throw new Error('Warning popup not appear');
+		if (!this.content.reset_all_warning.okBtn)
+			throw new Error('Confirm button not found');
 
-	this.parse();
-
-	if (!this.content.reset_all_warning || !this.content.reset_all_warning.elem || !isVisible(this.content.reset_all_warning.elem))
-		throw new Error('Warning popup not appear');
-	if (!this.content.reset_all_warning.okBtn)
-		throw new Error('Confirm button not found');
-
-	return navigation(() => clickEmul(this.content.reset_all_warning.okBtn), ProfilePage);
+		return navigation(() => clickEmul(this.content.reset_all_warning.okBtn), ProfilePage);
+	});
 };
