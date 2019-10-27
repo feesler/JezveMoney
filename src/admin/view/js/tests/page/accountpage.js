@@ -17,7 +17,7 @@ AccountPage.prototype.parseContent = function()
 		throw new Error('Heading element not found');
 	res.heading.text = res.heading.elem.innerText;
 
-	res.tile = this.parseTile(vge('acc_tile'));
+	res.tile = this.parseTile(vquery('#acc_tile'));
 
 	res.formElem = vquery('form');
 	if (!res.formElem)

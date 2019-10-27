@@ -17,8 +17,8 @@ DebtTransactionPage.prototype.parseOperation = function(el)
 	if (!res.elem)
 		return null;
 
-	res.debtgive = vge('debtgive');
-	res.debttake = vge('debttake');
+	res.debtgive = vquery('#debtgive');
+	res.debttake = vquery('#debttake');
 
 	res.type = res.debtgive.checked;
 

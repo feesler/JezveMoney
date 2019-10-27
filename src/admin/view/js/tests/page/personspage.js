@@ -11,11 +11,11 @@ extend(PersonsPage, TestPage);
 PersonsPage.prototype.parseContent = function()
 {
 	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : this.parseIconLink(vge('add_btn')),
+ 				addBtn : this.parseIconLink(vquery('#add_btn')),
 				toolbar : {
-					elem : vge('toolbar'),
-					editBtn : this.parseIconLink(vge('edit_btn')),
-					delBtn : this.parseIconLink(vge('del_btn'))
+					elem : vquery('#toolbar'),
+					editBtn : this.parseIconLink(vquery('#edit_btn')),
+					delBtn : this.parseIconLink(vquery('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
@@ -24,7 +24,7 @@ PersonsPage.prototype.parseContent = function()
 	res.title = res.titleEl.innerText;
 	res.tiles = this.parseTiles(vquery('.tiles'));
 
-	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));
+	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
 
 	return res;
 };

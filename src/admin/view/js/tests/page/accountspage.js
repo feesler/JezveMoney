@@ -11,12 +11,12 @@ extend(AccountsPage, TestPage);
 AccountsPage.prototype.parseContent = function()
 {
 	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : this.parseIconLink(vge('add_btn')),
+ 				addBtn : this.parseIconLink(vquery('#add_btn')),
 				toolbar : {
-					elem : vge('toolbar'),
-					editBtn : this.parseIconLink(vge('edit_btn')),
-					exportBtn : this.parseIconLink(vge('export_btn')),
-					delBtn : this.parseIconLink(vge('del_btn'))
+					elem : vquery('#toolbar'),
+					editBtn : this.parseIconLink(vquery('#edit_btn')),
+					exportBtn : this.parseIconLink(vquery('#export_btn')),
+					delBtn : this.parseIconLink(vquery('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
@@ -25,7 +25,7 @@ AccountsPage.prototype.parseContent = function()
 	res.title = res.titleEl.innerText;
 	res.tiles = this.parseTiles(vquery('.tiles'));
 
-	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));
+	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
 
 	return res;
 };

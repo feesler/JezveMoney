@@ -100,54 +100,54 @@ TransactionPage.prototype.parseContent = function()
 	if (res.heading.elem)
 		res.heading.title = res.heading.elem.innerText;
 
-	res.delBtn = vge('del_btn');
+	res.delBtn = vquery('#del_btn');
 
-	res.typeMenu = this.parseTransactionTypeMenu(vge('trtype_menu'));
+	res.typeMenu = this.parseTransactionTypeMenu(vquery('#trtype_menu'));
 
 	if (res.typeMenu.activeType == 4)	/* DEBT */
 	{
-		res.person = this.parseTileBlock(vge('person'));
+		res.person = this.parseTileBlock(vquery('#person'));
 		if (res.person)
-			res.person.id = parseInt(vge('person_id').value);
+			res.person.id = parseInt(vquery('#person_id').value);
 
-		res.account = this.parseTileBlock(vge('source'));
+		res.account = this.parseTileBlock(vquery('#source'));
 		if (res.account)
 		{
-			res.account.id = parseInt(vge('acc_id').value);
-			res.accTileContainer = { elem : vge('source').querySelector('.tile_container') };
+			res.account.id = parseInt(vquery('#acc_id').value);
+			res.accTileContainer = { elem : vquery('#source').querySelector('.tile_container') };
 		}
 
-		res.operation = this.parseOperation(vge('operation'));
+		res.operation = this.parseOperation(vquery('#operation'));
 
-		res.selaccount = { elem : vge('selaccount') };
-		res.noacc_btn = { elem : vge('noacc_btn') };
+		res.selaccount = { elem : vquery('#selaccount') };
+		res.noacc_btn = { elem : vquery('#noacc_btn') };
 	}
 	else
 	{
-		res.source = this.parseTileBlock(vge('source'));
+		res.source = this.parseTileBlock(vquery('#source'));
 		if (res.source)
-			res.source.id = parseInt(vge('src_id').value);
-		res.destination = this.parseTileBlock(vge('destination'));
+			res.source.id = parseInt(vquery('#src_id').value);
+		res.destination = this.parseTileBlock(vquery('#destination'));
 		if (res.destination)
-			res.destination.id = parseInt(vge('dest_id').value);
+			res.destination.id = parseInt(vquery('#dest_id').value);
 	}
 
-	res.src_amount_left = this.parseTileRightItem(vge('src_amount_left'));
-	res.dest_amount_left = this.parseTileRightItem(vge('dest_amount_left'));
-	res.src_res_balance_left = this.parseTileRightItem(vge('src_res_balance_left'));
-	res.dest_res_balance_left = this.parseTileRightItem(vge('dest_res_balance_left'));
-	res.exch_left = this.parseTileRightItem(vge('exch_left'));
+	res.src_amount_left = this.parseTileRightItem(vquery('#src_amount_left'));
+	res.dest_amount_left = this.parseTileRightItem(vquery('#dest_amount_left'));
+	res.src_res_balance_left = this.parseTileRightItem(vquery('#src_res_balance_left'));
+	res.dest_res_balance_left = this.parseTileRightItem(vquery('#dest_res_balance_left'));
+	res.exch_left = this.parseTileRightItem(vquery('#exch_left'));
 
-	res.src_amount_row = this.parseInputRow(vge('src_amount_row'));
-	res.dest_amount_row = this.parseInputRow(vge('dest_amount_row'));
-	res.exchange_row = this.parseInputRow(vge('exchange'));
-	res.result_balance_row = this.parseInputRow(vge('result_balance'));
-	res.result_balance_dest_row = this.parseInputRow(vge('result_balance_dest'));
+	res.src_amount_row = this.parseInputRow(vquery('#src_amount_row'));
+	res.dest_amount_row = this.parseInputRow(vquery('#dest_amount_row'));
+	res.exchange_row = this.parseInputRow(vquery('#exchange'));
+	res.result_balance_row = this.parseInputRow(vquery('#result_balance'));
+	res.result_balance_dest_row = this.parseInputRow(vquery('#result_balance_dest'));
 
-	res.datePicker = this.parseDatePickerRow(vge('calendar_btn').parentNode);
-	res.comment_row = this.parseCommentRow(vge('comm_btn').parentNode);
+	res.datePicker = this.parseDatePickerRow(vquery('#calendar_btn').parentNode);
+	res.comment_row = this.parseCommentRow(vquery('#comm_btn').parentNode);
 
-	res.submitBtn = vge('submitbtn');
+	res.submitBtn = vquery('#submitbtn');
 	res.cancelBtn = res.submitBtn.nextElementSibling;
 
 	return res;

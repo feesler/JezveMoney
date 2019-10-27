@@ -5,12 +5,6 @@ var totalRes = null, okRes = null, failRes = null;
 
 
 
-function vge(a)
-{
-	return (typeof a == 'string') ? vdoc.getElementById(a) : a;
-}
-
-
 function vquery(a)
 {
 	return (typeof a == 'string') ? vdoc.querySelector(a) : a;

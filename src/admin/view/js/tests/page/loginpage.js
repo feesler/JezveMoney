@@ -10,8 +10,8 @@ extend(LoginPage, TestPage);
 
 LoginPage.prototype.parseContent = function()
 {
-	var res = { loginInp : vge('login'),
- 				passwordInp : vge('password'),
+	var res = { loginInp : vquery('#login'),
+ 				passwordInp : vquery('#password'),
 				submitBtn : vquery('.login_controls .btn.ok_btn'),
 				registerLink : vquery('.login_controls .alter_link > a') };
 	if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink)

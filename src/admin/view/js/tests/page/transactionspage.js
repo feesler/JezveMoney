@@ -17,23 +17,23 @@ TransactionsPage.prototype.getTransactionObject = function(trans_id)
 TransactionsPage.prototype.parseContent = function()
 {
 	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : this.parseIconLink(vge('add_btn')),
+ 				addBtn : this.parseIconLink(vquery('#add_btn')),
 				toolbar : {
-					elem : vge('toolbar'),
-					editBtn : this.parseIconLink(vge('edit_btn')),
-					exportBtn : this.parseIconLink(vge('export_btn')),
-					delBtn : this.parseIconLink(vge('del_btn'))
+					elem : vquery('#toolbar'),
+					editBtn : this.parseIconLink(vquery('#edit_btn')),
+					exportBtn : this.parseIconLink(vquery('#export_btn')),
+					delBtn : this.parseIconLink(vquery('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong transactions page structure');
 
-	res.typeMenu = this.parseTransactionTypeMenu(vge('trtype_menu'));
+	res.typeMenu = this.parseTransactionTypeMenu(vquery('#trtype_menu'));
 
 	res.title = res.titleEl.innerText;
-	res.transactions = this.parseTransactionsList(vge('tritems'));
+	res.transactions = this.parseTransactionsList(vquery('#tritems'));
 
-	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));
+	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
 
 	return res;
 };

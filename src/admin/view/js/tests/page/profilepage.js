@@ -17,7 +17,7 @@ ProfilePage.prototype.parseContent = function()
 		throw new Error('Wrong profile page structure');
 
 	res.loginElem = blocks[0].querySelector('span');
-	res.nameElem = vge('namestatic');
+	res.nameElem = vquery('#namestatic');
 	res.nameLinkElem = blocks[1].querySelector('div > a');
 	res.changePassLinkElem = blocks[2].querySelector('div > a');
 	if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
@@ -34,9 +34,9 @@ ProfilePage.prototype.parseContent = function()
 	res.deleteProfileBtn = buttons[2];
 
 	res.changeNamePopup = {};
-	res.changeNamePopup.elem = vge('chname_popup');
-	res.changeNamePopup.content = vge('changename');
-	res.changeNamePopup.newNameInp = vge('newname');
+	res.changeNamePopup.elem = vquery('#chname_popup');
+	res.changeNamePopup.content = vquery('#changename');
+	res.changeNamePopup.newNameInp = vquery('#newname');
 	if (res.changeNamePopup.elem)
 	{
 		res.changeNamePopup.okBtn = res.changeNamePopup.elem.querySelector('popup_controls > input.btn.ok_btn');
@@ -44,19 +44,19 @@ ProfilePage.prototype.parseContent = function()
 	}
 
 	res.changePassPopup = {};
-	res.changePassPopup.elem = vge('chpass_popup');
-	res.changePassPopup.content = vge('changepass');
-	res.changePassPopup.oldPassInp = vge('oldpwd');
-	res.changePassPopup.newPassInp = vge('newpwd');
+	res.changePassPopup.elem = vquery('#chpass_popup');
+	res.changePassPopup.content = vquery('#changepass');
+	res.changePassPopup.oldPassInp = vquery('#oldpwd');
+	res.changePassPopup.newPassInp = vquery('#newpwd');
 	if (res.changePassPopup.elem)
 	{
 		res.changePassPopup.okBtn = res.changePassPopup.elem.querySelector('popup_controls > input.btn.ok_btn');
 		res.changePassPopup.closeBtn = res.changePassPopup.elem.querySelector('.close_btn > button');
 	}
 
-	res.reset_warning = this.parseWarningPopup(vge('reset_warning'));
-	res.reset_all_warning = this.parseWarningPopup(vge('reset_all_warning'));
-	res.delete_warning = this.parseWarningPopup(vge('delete_warning'));
+	res.reset_warning = this.parseWarningPopup(vquery('#reset_warning'));
+	res.reset_all_warning = this.parseWarningPopup(vquery('#reset_all_warning'));
+	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
 
 	return res;
 };

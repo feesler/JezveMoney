@@ -15,7 +15,7 @@ StatisticsPage.prototype.parseContent = function()
 	if (!res.titleEl)
 		throw new Error('Wrong statistics page structure');
 
-	res.typeMenu = this.parseTransactionTypeMenu(vge('trtype_menu'));
+	res.typeMenu = this.parseTransactionTypeMenu(vquery('#trtype_menu'));
 	res.title = res.titleEl.innerText;
 
 	let filtersList = vqueryall('.tr_filter.filter_sel');
@@ -27,7 +27,7 @@ StatisticsPage.prototype.parseContent = function()
 	res.currencyDropDown = isVisible(filtersList[2]) ? this.parseDropDown(filtersList[2].firstElementChild) : null;
 	res.groupDropDown = this.parseDropDown(filtersList[3].firstElementChild);
 
-	res.chart = { elem : vge('chart'), bars : [] };
+	res.chart = { elem : vquery('#chart'), bars : [] };
 	if (!res.chart)
 		throw new Error('Wrong statistics page structure');
 
