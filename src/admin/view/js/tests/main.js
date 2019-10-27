@@ -1,5 +1,3 @@
-var restbl = null;
-var totalRes = null, okRes = null, failRes = null;
 var results = {};
 var App = { accounts : [], persons : [], transactions : []};
 
@@ -27,48 +25,6 @@ function test(descr, action, page, state)
 }
 
 
-function addResult(descr, res, message)
-{
-	message = message || '';
-
-	totalRes.innerHTML = ++results.total;
-	okRes.innerHTML = (res) ? ++results.ok : results.ok;
-	failRes.innerHTML = (res) ? results.fail : ++results.fail;
-
-	restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
-										ce('td', { innerHTML : (res ? 'OK' : 'FAIL') }),
-									 	ce('td', { innerHTML : message }) ]));
-}
-
-
-function initTests()
-{
-	var startbtn = ge('startbtn');
-	totalRes = ge('totalRes');
-	okRes = ge('okRes');
-	failRes = ge('failRes');
-	viewframe = ge('viewframe');
-	restbl = ge('restbl');
-	if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
-		throw new Error('Fail to init tests');
-
-	startbtn.onclick = onStartClick;
-}
-
-
-function onStartClick()
-{
-	results = { total : 0, ok : 0, fail : 0 };
-	addResult('Test initialization', 'OK');
-
-	navigation(function()
-	{
-		viewframe.src = 'https://jezve.net/money/';
-	}, MainPage)
-	.then(startTests);
-}
-
-
 function startTests(page)
 {
 	reloginAsTester(page)
@@ -79,12 +35,6 @@ function startTests(page)
 	.then(transactionTests)
 	.then(statisticsTests)
 	.catch(msg => addResult(msg, false));
-}
-
-
-function setBlock(title, category)
-{
-	restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : title }) ));
 }
 
 
