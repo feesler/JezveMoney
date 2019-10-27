@@ -5,15 +5,29 @@ var totalRes = null, okRes = null, failRes = null;
 
 
 
-function vquery(a)
+function vquery()
 {
-	return (typeof a == 'string') ? vdoc.querySelector(a) : a;
+	if (!arguments.length)
+		return null;
+
+	let parentSpecified = (arguments.length > 1);
+	let query = parentSpecified ? arguments[1]: arguments[0];
+	let parent = parentSpecified ? arguments[0] : vdoc;
+
+	return (typeof query === 'string') ? parent.querySelector(query) : query;
 }
 
 
-function vqueryall(a)
+function vqueryall()
 {
-	return (typeof a == 'string') ? vdoc.querySelectorAll(a) : a;
+	if (!arguments.length)
+		return null;
+
+	let parentSpecified = (arguments.length > 1);
+	let query = parentSpecified ? arguments[1]: arguments[0];
+	let parent = parentSpecified ? arguments[0] : vdoc;
+
+	return (typeof query === 'string') ? parent.querySelectorAll(query) : query;
 }
 
 

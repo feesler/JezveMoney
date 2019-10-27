@@ -24,32 +24,32 @@ TestPage.prototype.parseHeader = function()
 		return res;		// no header is ok for login page
 
 	res.logo = {};
-	res.logo.elem = res.elem.querySelector('.logo');
+	res.logo.elem = vquery(res.elem, '.logo');
 	if (!res.logo.elem)
 		throw new Error('Logo element not found');
 
-	res.logo.linkElem = res.logo.elem.querySelector('a');
+	res.logo.linkElem = vquery(res.logo.elem, 'a');
 	if (!res.logo.linkElem)
 		throw new Error('Logo link element not found');
 
 	res.user = {};
-	res.user.elem = res.elem.querySelector('.userblock');
+	res.user.elem = vquery(res.elem, '.userblock');
 	if (res.user.elem)
 	{
-		res.user.menuBtn = res.elem.querySelector('button.user_button');
+		res.user.menuBtn = vquery(res.elem, 'button.user_button');
 		if (!res.user.menuBtn)
 			throw new Error('User button not found');
-		el = res.user.menuBtn.querySelector('.user_title');
+		el = vquery(res.user.menuBtn, '.user_title');
 		if (!el)
 			throw new Error('User title element not found');
 		res.user.name = el.innerText;
 
-		res.user.menuEl = res.elem.querySelector('.usermenu');
+		res.user.menuEl = vquery(res.elem, '.usermenu');
 		if (!res.user.menuEl)
 			throw new Error('Menu element not found');
 
 		res.user.menuItems = [];
-		var menuLinks = res.user.menuEl.querySelectorAll('ul > li > a');
+		var menuLinks = vqueryall(res.user.menuEl, 'ul > li > a');
 		for(var i = 0; i < menuLinks.length; i++)
 		{
 			el = menuLinks[i];
@@ -90,8 +90,8 @@ TestPage.prototype.parseTile = function(tileEl)
 		throw new Error('Wrong tile structure');
 
 	var tileObj = { elem : tileEl, linkElem : tileEl.firstElementChild,
-					balanceEL : tileEl.querySelector('.acc_bal'),
-					nameEL : tileEl.querySelector('.acc_name') };
+					balanceEL : vquery(tileEl, '.acc_bal'),
+					nameEL : vquery(tileEl, '.acc_name') };
 
 	tileObj.id = this.parseId(tileEl.id);
 	tileObj.balance = tileObj.balanceEL.innerText;
@@ -124,8 +124,8 @@ TestPage.prototype.parseInfoTile = function(tileEl)
 		throw new Error('Wrong info tile structure');
 
 	var tileObj = { elem : tileEl,
-					titleEl : tileEl.querySelector('.info_title'),
-					subtitleEl : tileEl.querySelector('.info_subtitle') };
+					titleEl : vquery(tileEl, '.info_title'),
+					subtitleEl : vquery(tileEl, '.info_subtitle') };
 
 	tileObj.id = this.parseId(tileEl.id);
 	tileObj.title = tileObj.titleEl.innerText;
@@ -182,11 +182,11 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 	var listItems;
 	if (listEl.tagName == 'TABLE')
 	{
-		listItems = listEl.querySelectorAll('tr');
+		listItems = vqueryall(listEl, 'tr');
 	}
 	else
 	{
-		listItems = listEl.querySelectorAll('.trlist_item_wrap > div');
+		listItems = vqueryall(listEl, '.trlist_item_wrap > div');
 	}
 
 	for(var i = 0; i < listItems.length; i++)
@@ -194,23 +194,23 @@ TestPage.prototype.parseTransactionsList = function(listEl)
 		var li = listItems[i];
 		var itemObj = { id : this.parseId(li.id), elem : li };
 
-		var elem = li.querySelector('.tritem_acc_name > span');
+		var elem = vquery(li, '.tritem_acc_name > span');
 		if (!elem)
 			throw new Error('Account title not found');
 		itemObj.accountTitle = elem.innerText;
 
-		elem = li.querySelector('.tritem_sum > span');
+		elem = vquery(li, '.tritem_sum > span');
 		if (!elem)
 			throw new Error('Amount text not found');
 		itemObj.amountText = elem.innerText;
 
-		elem = li.querySelector('.tritem_date_comm');
+		elem = vquery(li, '.tritem_date_comm');
 		if (!elem || !elem.firstElementChild || elem.firstElementChild.tagName != 'SPAN')
 			throw new Error('Date element not found');
 
 		itemObj.dateFmt = elem.firstElementChild.innerText;
 
-		elem = li.querySelector('.tritem_comm');
+		elem = vquery(li, '.tritem_comm');
 		itemObj.comment = elem ? elem.innerText : '';
 
 		itemObj.click = function()
@@ -238,16 +238,16 @@ TestPage.prototype.parseDropDown = function(elem)
 	if (res.isAttached)
 		res.selectBtn = res.elem.firstElementChild;
 	else
-		res.selectBtn = res.elem.querySelector('button.selectBtn');
+		res.selectBtn = vquery(res.elem, 'button.selectBtn');
 	if (!res.selectBtn)
 		throw new Error('Select button not found');
 
 	if (!res.isAttached)
 	{
-		res.statSel = res.elem.querySelector('.dd_input_cont span.statsel');
+		res.statSel = vquery(res.elem, '.dd_input_cont span.statsel');
 		if (!res.statSel)
 			throw new Error('Static select element not found');
-		res.input = res.elem.querySelector('.dd_input_cont input');
+		res.input = vquery(res.elem, '.dd_input_cont input');
 		if (!res.input)
 			throw new Error('Input element not found');
 
@@ -255,9 +255,9 @@ TestPage.prototype.parseDropDown = function(elem)
 		res.textValue = (res.editable) ? res.input.value : res.statSel.innerText;
 	}
 
-	res.selectElem = res.elem.querySelector('select');
+	res.selectElem = vquery(res.elem, 'select');
 
-	res.listContainer = res.elem.querySelector('.ddlist');
+	res.listContainer = vquery(res.elem, '.ddlist');
 	res.isMobile = hasClass(res.listContainer, 'ddmobile');
 	if (res.isMobile)
 	{
@@ -279,7 +279,7 @@ TestPage.prototype.parseDropDown = function(elem)
 
 		if (res.listContainer)
 		{
-			var listItems = res.elem.querySelectorAll('.ddlist li > div');
+			var listItems = vqueryall(res.elem, '.ddlist li > div');
 			res.items = [];
 			for(var i = 0; i < listItems.length; i++)
 			{
@@ -358,7 +358,7 @@ TestPage.prototype.parseTransactionTypeMenu = function(elem)
 {
 	var res = { elem : elem, items : [], activeType : null };
 
-	var menuItems = elem.querySelectorAll('span');
+	var menuItems = vqueryall(elem, 'span');
 	for(var i = 0; i < menuItems.length; i++)
 	{
 		var menuItem = menuItems[i].firstElementChild;
@@ -404,13 +404,13 @@ TestPage.prototype.parseIconLink = function(elem)
 	if (!res.linkElem)
 		throw new Error('Link element not found');
 
-	res.titleElem = res.linkElem.querySelector('.icontitle');
+	res.titleElem = vquery(res.linkElem, '.icontitle');
 	if (!res.titleElem || !res.titleElem.firstElementChild)
 		throw new Error('Title element not found');
 	res.title = res.titleElem.firstElementChild.innerText;
 
 // Subtitle is optional
-	res.subTitleElem = res.titleElem.querySelector('.subtitle');
+	res.subTitleElem = vquery(res.titleElem, '.subtitle');
 	if (res.subTitleElem)
 	{
 		res.subtitle = res.subTitleElem.innerText;
@@ -432,12 +432,12 @@ TestPage.prototype.parseInputRow = function(elem)
 
 	var res = { elem : elem };
 
-	res.labelEl = elem.querySelector('label');
+	res.labelEl = vquery(elem, 'label');
 	if (!res.labelEl)
 		throw new Error('Label element not found');
 
 	res.label = res.labelEl.innerText;
-	res.currElem = elem.querySelector('.btn.rcurr_btn') || elem.querySelector('.exchrate_comm');
+	res.currElem = vquery(elem, '.btn.rcurr_btn') || vquery(elem, '.exchrate_comm');
 	res.isCurrActive = false;
 	if (res.currElem)
 	{
@@ -460,16 +460,16 @@ TestPage.prototype.parseInputRow = function(elem)
 	}
 	else
 	{
-		res.datePickerBtn = elem.querySelector('.btn.cal_btn');
+		res.datePickerBtn = vquery(elem, '.btn.cal_btn');
 	}
 
-	var t = elem.querySelector('input[type="hidden"]');
+	var t = vquery(elem, 'input[type="hidden"]');
 	if (t)
 	{
 		res.hiddenValue = t.value;
 	}
 
-	res.valueInput = elem.querySelector('.stretch_input > input');
+	res.valueInput = vquery(elem, '.stretch_input > input');
 	res.value = res.valueInput.value;
 
 	res.input = function(val)
@@ -494,7 +494,7 @@ TestPage.prototype.parseDatePickerRow = function(elem)
 
 	var res = { elem : elem };
 
-	var iconLinkElem = elem.querySelector('.iconlink');
+	var iconLinkElem = vquery(elem, '.iconlink');
 
 	res.iconLink = this.parseIconLink(iconLinkElem);
 	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
@@ -524,12 +524,12 @@ TestPage.prototype.parseWarningPopup = function(elem)
 
 	var res = { elem : elem };
 
-	res.titleElem = elem.querySelector('.popup_title');
+	res.titleElem = vquery(elem, '.popup_title');
 	res.title = res.titleElem.innerText;
-	res.messageElem = elem.querySelector('.popup_message > div');
+	res.messageElem = vquery(elem, '.popup_message > div');
 	res.message = res.messageElem.innerText;
-	res.okBtn = elem.querySelector('.popup_controls > .btn.ok_btn');
-	res.cancelBtn = elem.querySelector('.popup_controls > .btn.cancel_btn');
+	res.okBtn = vquery(elem, '.popup_controls > .btn.ok_btn');
+	res.cancelBtn = vquery(elem, '.popup_controls > .btn.cancel_btn');
 
 	return res;
 };

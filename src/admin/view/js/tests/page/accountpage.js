@@ -28,7 +28,7 @@ AccountPage.prototype.parseContent = function()
 	var elem = res.formElem.firstElementChild.nextElementSibling;
 	if (res.isEdit)
 		elem = elem.nextElementSibling;
-	res.iconDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
+	res.iconDropDown = this.parseDropDown(vquery(elem, '.dd_container'));
 
 	elem = elem.nextElementSibling;
 	res.name = this.parseInputRow(elem);
@@ -36,7 +36,7 @@ AccountPage.prototype.parseContent = function()
 		throw new Error('Account name input not found');
 
 	elem = elem.nextElementSibling;
-	res.currDropDown = this.parseDropDown(elem.querySelector('.dd_container'));
+	res.currDropDown = this.parseDropDown(vquery(elem, '.dd_container'));
 
 	elem = elem.nextElementSibling;
 

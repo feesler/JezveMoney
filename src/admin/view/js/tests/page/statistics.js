@@ -31,7 +31,7 @@ StatisticsPage.prototype.parseContent = function()
 	if (!res.chart)
 		throw new Error('Wrong statistics page structure');
 
-	let bars = res.chart.elem.querySelectorAll('svg > rect');
+	let bars = vqueryall(res.chart.elem, 'svg > rect');
 	bars.forEach(bar =>
 	{
 		if (bar.attributes['fill-opacity'].nodeValue == '1')

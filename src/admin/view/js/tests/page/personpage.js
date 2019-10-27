@@ -23,7 +23,7 @@ PersonPage.prototype.parseContent = function()
 
 	res.isEdit = (res.formElem.firstElementChild.id == 'pid');
 
-	res.name = this.parseInputRow(res.formElem.querySelector('div.non_float'));
+	res.name = this.parseInputRow(vquery(res.formElem, 'div.non_float'));
 	if (!res.name)
 		throw new Error('Person name input not found');
 

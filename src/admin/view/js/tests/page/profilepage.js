@@ -16,17 +16,17 @@ ProfilePage.prototype.parseContent = function()
 	if (blocks.length != 4)
 		throw new Error('Wrong profile page structure');
 
-	res.loginElem = blocks[0].querySelector('span');
+	res.loginElem = vquery(blocks[0], 'span');
 	res.nameElem = vquery('#namestatic');
-	res.nameLinkElem = blocks[1].querySelector('div > a');
-	res.changePassLinkElem = blocks[2].querySelector('div > a');
+	res.nameLinkElem = vquery(blocks[1], 'div > a');
+	res.changePassLinkElem = vquery(blocks[2], 'div > a');
 	if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
 		throw new Error('Wrong profile page structure');
 
 	res.login = res.loginElem.innerText;
 	res.name = res.nameElem.innerText;
 
-	var buttons = blocks[3].querySelectorAll('input[type="button"]');
+	var buttons = vqueryall(blocks[3], 'input[type="button"]');
 	if (!buttons || buttons.length != 3)
 		throw new Error('Wrong profile page structure');
 	res.resetBtn = buttons[0];
@@ -39,8 +39,8 @@ ProfilePage.prototype.parseContent = function()
 	res.changeNamePopup.newNameInp = vquery('#newname');
 	if (res.changeNamePopup.elem)
 	{
-		res.changeNamePopup.okBtn = res.changeNamePopup.elem.querySelector('popup_controls > input.btn.ok_btn');
-		res.changeNamePopup.closeBtn = res.changeNamePopup.elem.querySelector('.close_btn > button');
+		res.changeNamePopup.okBtn = vquery(res.changeNamePopup.elem, 'popup_controls > input.btn.ok_btn');
+		res.changeNamePopup.closeBtn = vquery(res.changeNamePopup.elem, '.close_btn > button');
 	}
 
 	res.changePassPopup = {};
@@ -50,8 +50,8 @@ ProfilePage.prototype.parseContent = function()
 	res.changePassPopup.newPassInp = vquery('#newpwd');
 	if (res.changePassPopup.elem)
 	{
-		res.changePassPopup.okBtn = res.changePassPopup.elem.querySelector('popup_controls > input.btn.ok_btn');
-		res.changePassPopup.closeBtn = res.changePassPopup.elem.querySelector('.close_btn > button');
+		res.changePassPopup.okBtn = vquery(res.changePassPopup.elem, 'popup_controls > input.btn.ok_btn');
+		res.changePassPopup.closeBtn = vquery(res.changePassPopup.elem, '.close_btn > button');
 	}
 
 	res.reset_warning = this.parseWarningPopup(vquery('#reset_warning'));

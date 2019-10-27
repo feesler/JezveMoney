@@ -19,23 +19,23 @@ MainPage.prototype.parseContent = function()
 	for(var i = 0; i < widgetsElem.length; i++)
 	{
 		var widget = { elem : widgetsElem[i],
-						titleElem : widgetsElem[i].querySelector('.widget_title'),
-						linkElem : widgetsElem[i].querySelector('.widget_title > a'),
-						textElem : widgetsElem[i].querySelector('.widget_title span') };
+						titleElem : vquery(widgetsElem[i], '.widget_title'),
+						linkElem : vquery(widgetsElem[i], '.widget_title > a'),
+						textElem : vquery(widgetsElem[i], '.widget_title span') };
 
 		if (widget.linkElem)
 			widget.link = widget.linkElem.href;
 		if (widget.textElem)
 			widget.title = widget.textElem.innerText;
 
-		var tiles = this.parseTiles(widget.elem.querySelector('.tiles'));
+		var tiles = this.parseTiles(vquery(widget.elem, '.tiles'));
 		if (tiles)
 			widget.tiles = tiles;
-		tiles = this.parseInfoTiles(widget.elem.querySelector('.info_tiles'));
+		tiles = this.parseInfoTiles(vquery(widget.elem, '.info_tiles'));
 		if (tiles)
 			widget.infoTiles = tiles;
 
-		var transactions = this.parseTransactionsList(widget.elem.querySelector('.trans_list'));
+		var transactions = this.parseTransactionsList(vquery(widget.elem, '.trans_list'));
 		if (transactions)
 			widget.transList = transactions;
 

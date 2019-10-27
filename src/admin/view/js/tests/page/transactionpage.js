@@ -34,13 +34,13 @@ TransactionPage.prototype.parseTileBlock = function(elem)
 
 	var res = { elem : elem };
 
-	var lbl = elem.querySelector('div > label');
+	var lbl = vquery(elem, 'div > label');
 	if (!lbl)
 		throw new Error('Tile block label not found');
 
 	res.label = lbl.innerText;
-	res.tile = this.parseTile(elem.querySelector('.tile'));
-	res.dropDown = this.parseDropDown(elem.querySelector('.dd_attached'));
+	res.tile = this.parseTile(vquery(elem, '.tile'));
+	res.dropDown = this.parseDropDown(vquery(elem, '.dd_attached'));
 
 	res.selectAccount = function(val)
 	{
@@ -59,7 +59,7 @@ TransactionPage.prototype.parseCommentRow = function(elem)
 
 	var res = { elem : elem };
 
-	var iconLinkElem = elem.querySelector('.iconlink');
+	var iconLinkElem = vquery(elem, '.iconlink');
 
 	res.iconLink = this.parseIconLink(iconLinkElem);
 	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
@@ -114,7 +114,7 @@ TransactionPage.prototype.parseContent = function()
 		if (res.account)
 		{
 			res.account.id = parseInt(vquery('#acc_id').value);
-			res.accTileContainer = { elem : vquery('#source').querySelector('.tile_container') };
+			res.accTileContainer = { elem : vquery('#source .tile_container') };
 		}
 
 		res.operation = this.parseOperation(vquery('#operation'));
