@@ -60,29 +60,40 @@ PersonsPage.prototype.deletePersons = function(persons)
 	if (!isArray(persons))
 		persons = [persons];
 
-	persons.forEach(function(person_num, ind)
+	let selectPromise = persons.reduce((prev, person_num, ind) =>
 	{
-		if (person_num >= this.content.tiles.length)
-			throw new Error('Wrong account number');
+		return prev
+				.then(() => this.performAction(() =>
+				{
+					if (person_num >= this.content.tiles.length)
+						throw new Error('Wrong account number');
 
-		this.content.tiles[person_num].click();
-		this.parse();
+					this.content.tiles[person_num].click();
 
-		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
-		if (ind == 0 && !editIsVisible)
-			throw new Error('Edit button is not visible');
-		else if (ind > 0 && editIsVisible)
-			throw new Error('Edit button is visible while more than one person is selected');
+					return Promise.resolve();
+				}))
+				.then(() =>
+				{
+					var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
+					if (ind == 0 && !editIsVisible)
+						throw new Error('Edit button is not visible');
+					else if (ind > 0 && editIsVisible)
+						throw new Error('Edit button is visible while more than one person is selected');
 
-		if (!isVisible(this.content.toolbar.delBtn.elem))
-			throw new Error('Delete button is not visible');
-	}, this);
+					if (!isVisible(this.content.toolbar.delBtn.elem))
+						throw new Error('Delete button is not visible');
 
-	this.content.toolbar.delBtn.click();
-	this.parse();
+					return Promise.resolve();
+				});
+	}, Promise.resolve());
 
-	if (!isVisible(this.content.delete_warning.elem))
-		throw new Error('Delete account warning popup not appear');
+	return selectPromise
+			.then(() => this.performAction(() => this.content.toolbar.delBtn.click()))
+			.then(() =>
+			{
+				if (!isVisible(this.content.delete_warning.elem))
+					throw new Error('Delete account warning popup not appear');
 
-	return navigation(() => clickEmul(this.content.delete_warning.okBtn), PersonsPage)
+				return navigation(() => clickEmul(this.content.delete_warning.okBtn), PersonsPage);
+			});
 };

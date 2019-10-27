@@ -88,32 +88,43 @@ TransactionsPage.prototype.deleteTransactions = function(tr)
 	if (!isArray(tr))
 		tr = [tr];
 
-	tr.forEach(function(tr_num, ind)
+	let selectPromise = tr.reduce((prev, tr_num, ind) =>
 	{
-		if (tr_num >= this.content.transactions.length)
-			throw 'Wrong account number';
+		return prev
+				.then(() => this.performAction(() =>
+				{
+					if (tr_num >= this.content.transactions.length)
+						throw 'Wrong account number';
 
-		this.content.transactions[tr_num].click();
-		this.parse();
+					this.content.transactions[tr_num].click();
 
-		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
-		if (ind == 0 && !editIsVisible)
-			throw 'Edit button is not visible';
-		else if (ind > 0 && editIsVisible)
-			throw 'Edit button is visible while more than one transactions is selected';
+					return Promise.resolve();
+				}))
+				.then(() =>
+				{
+					var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
+					if (ind == 0 && !editIsVisible)
+						throw 'Edit button is not visible';
+					else if (ind > 0 && editIsVisible)
+						throw 'Edit button is visible while more than one transactions is selected';
 
-		if (!isVisible(this.content.toolbar.delBtn.elem))
-			throw 'Delete button is not visible';
-	}, this);
+					if (!isVisible(this.content.toolbar.delBtn.elem))
+						throw 'Delete button is not visible';
 
-	this.content.toolbar.delBtn.click();
-	this.parse();
+					return Promise.resolve();
+				});
+	}, Promise.resolve());
 
-	if (!isVisible(this.content.delete_warning.elem))
-		throw 'Delete transaction warning popup not appear';
+	return selectPromise
+			.then(() => this.performAction(() => this.content.toolbar.delBtn.click()))
+			.then(() =>
+			{
+				if (!isVisible(this.content.delete_warning.elem))
+					throw 'Delete transaction warning popup not appear';
 
-	if (!this.content.delete_warning.okBtn)
-		throw 'OK button not found';
+				if (!this.content.delete_warning.okBtn)
+					throw 'OK button not found';
 
-	return navigation(() => clickEmul(this.content.delete_warning.okBtn), TransactionsPage);
+				return navigation(() => clickEmul(this.content.delete_warning.okBtn), TransactionsPage);
+			});
 };

@@ -62,32 +62,43 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 	if (!isArray(acc))
 		acc = [acc];
 
-	acc.forEach(function(acc_num, ind)
+	let selectPromise = acc.reduce((prev, acc_num, ind) =>
 	{
-		if (acc_num >= this.content.tiles.length)
-			throw new Error('Wrong account number');
+		return prev
+				.then(() => this.performAction(() =>
+				{
+					if (acc_num >= this.content.tiles.length)
+						throw new Error('Wrong account number');
 
-		this.content.tiles[acc_num].click();
-		this.parse();
+					this.content.tiles[acc_num].click();
 
-		var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
-		if (ind == 0 && !editIsVisible)
-			throw new Error('Edit button is not visible');
-		else if (ind > 0 && editIsVisible)
-			throw new Error('Edit button is visible while more than one accounts is selected');
+					return Promise.resolve();
+				}))
+				.then(() =>
+				{
+					var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
+					if (ind == 0 && !editIsVisible)
+						throw new Error('Edit button is not visible');
+					else if (ind > 0 && editIsVisible)
+						throw new Error('Edit button is visible while more than one accounts is selected');
 
-		if (!isVisible(this.content.toolbar.delBtn.elem))
-			throw new Error('Delete button is not visible');
-	}, this);
+					if (!isVisible(this.content.toolbar.delBtn.elem))
+						throw new Error('Delete button is not visible');
 
-	this.content.toolbar.delBtn.click();
-	this.parse();
+					return Promise.resolve();
+				});
+	}, Promise.resolve());
 
-	if (!isVisible(this.content.delete_warning.elem))
-		throw new Error('Delete account warning popup not appear');
+	return selectPromise
+			.then(() =>	this.performAction(() => this.content.toolbar.delBtn.click()))
+			.then(() =>
+			{
+				if (!isVisible(this.content.delete_warning.elem))
+					throw new Error('Delete account warning popup not appear');
 
-	if (!this.content.delete_warning.okBtn)
-		throw new Error('OK button not found');
+				if (!this.content.delete_warning.okBtn)
+					throw new Error('OK button not found');
 
-	return navigation(() => clickEmul(this.content.delete_warning.okBtn), AccountsPage);
+				return navigation(() => clickEmul(this.content.delete_warning.okBtn), AccountsPage);
+			});
 };
