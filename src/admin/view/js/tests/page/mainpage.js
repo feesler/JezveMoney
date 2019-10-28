@@ -10,7 +10,7 @@ extend(MainPage, TestPage);
 
 MainPage.prototype.parseContent = async function()
 {
-	var widgetsElem = vqueryall('.content_wrap .widget');
+	var widgetsElem = await vqueryall('.content_wrap .widget');
 	if (!widgetsElem)
 		throw new Error('Fail to parse main page widgets');
 
@@ -19,23 +19,23 @@ MainPage.prototype.parseContent = async function()
 	for(var i = 0; i < widgetsElem.length; i++)
 	{
 		var widget = { elem : widgetsElem[i],
-						titleElem : vquery(widgetsElem[i], '.widget_title'),
-						linkElem : vquery(widgetsElem[i], '.widget_title > a'),
-						textElem : vquery(widgetsElem[i], '.widget_title span') };
+						titleElem : await vquery(widgetsElem[i], '.widget_title'),
+						linkElem : await vquery(widgetsElem[i], '.widget_title > a'),
+						textElem : await vquery(widgetsElem[i], '.widget_title span') };
 
 		if (widget.linkElem)
 			widget.link = widget.linkElem.href;
 		if (widget.textElem)
 			widget.title = widget.textElem.innerText;
 
-		var tiles = this.parseTiles(vquery(widget.elem, '.tiles'));
+		var tiles = await this.parseTiles(await vquery(widget.elem, '.tiles'));
 		if (tiles)
 			widget.tiles = tiles;
-		tiles = this.parseInfoTiles(vquery(widget.elem, '.info_tiles'));
+		tiles = await this.parseInfoTiles(await vquery(widget.elem, '.info_tiles'));
 		if (tiles)
 			widget.infoTiles = tiles;
 
-		var transactions = this.parseTransactionsList(vquery(widget.elem, '.trans_list'));
+		var transactions = await this.parseTransactionsList(await vquery(widget.elem, '.trans_list'));
 		if (transactions)
 			widget.transList = transactions;
 

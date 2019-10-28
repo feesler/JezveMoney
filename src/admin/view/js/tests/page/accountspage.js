@@ -8,24 +8,24 @@ function AccountsPage()
 extend(AccountsPage, TestPage);
 
 
-AccountsPage.prototype.parseContent = function()
+AccountsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : this.parseIconLink(vquery('#add_btn')),
+	var res = { titleEl : await vquery('.content_wrap > .heading > h1'),
+ 				addBtn : await this.parseIconLink(await vquery('#add_btn')),
 				toolbar : {
-					elem : vquery('#toolbar'),
-					editBtn : this.parseIconLink(vquery('#edit_btn')),
-					exportBtn : this.parseIconLink(vquery('#export_btn')),
-					delBtn : this.parseIconLink(vquery('#del_btn'))
+					elem : await vquery('#toolbar'),
+					editBtn : await this.parseIconLink(await vquery('#edit_btn')),
+					exportBtn : await this.parseIconLink(await vquery('#export_btn')),
+					delBtn : await this.parseIconLink(await vquery('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong accounts page structure');
 
 	res.title = res.titleEl.innerText;
-	res.tiles = this.parseTiles(vquery('.tiles'));
+	res.tiles = await this.parseTiles(await vquery('.tiles'));
 
-	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
+	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
 
 	return res;
 };
@@ -39,12 +39,12 @@ AccountsPage.prototype.goToCreateAccount = function()
 
 
 // Select specified account, click on edit button and return navigation promise
-AccountsPage.prototype.goToUpdateAccount = function(num)
+AccountsPage.prototype.goToUpdateAccount = async function(num)
 {
 	if (!this.content.tiles || this.content.tiles.length <= num)
 		throw new Error('Wrong account number specified');
 
-	this.content.tiles[num].click();
+	await this.content.tiles[num].click();
 
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update account button not visible');
@@ -70,9 +70,7 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 					if (acc_num >= this.content.tiles.length)
 						throw new Error('Wrong account number');
 
-					this.content.tiles[acc_num].click();
-
-					return Promise.resolve();
+					return this.content.tiles[acc_num].click();
 				}))
 				.then(() =>
 				{

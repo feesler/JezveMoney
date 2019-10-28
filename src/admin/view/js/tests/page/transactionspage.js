@@ -14,32 +14,32 @@ TransactionsPage.prototype.getTransactionObject = function(trans_id)
 };
 
 
-TransactionsPage.prototype.parseContent = function()
+TransactionsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : this.parseIconLink(vquery('#add_btn')),
+	var res = { titleEl : await vquery('.content_wrap > .heading > h1'),
+ 				addBtn : await this.parseIconLink(await vquery('#add_btn')),
 				toolbar : {
-					elem : vquery('#toolbar'),
-					editBtn : this.parseIconLink(vquery('#edit_btn')),
-					exportBtn : this.parseIconLink(vquery('#export_btn')),
-					delBtn : this.parseIconLink(vquery('#del_btn'))
+					elem : await vquery('#toolbar'),
+					editBtn : await this.parseIconLink(await vquery('#edit_btn')),
+					exportBtn : await this.parseIconLink(await vquery('#export_btn')),
+					delBtn : await this.parseIconLink(await vquery('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong transactions page structure');
 
-	res.typeMenu = this.parseTransactionTypeMenu(vquery('#trtype_menu'));
+	res.typeMenu = await this.parseTransactionTypeMenu(await vquery('#trtype_menu'));
 
 	res.title = res.titleEl.innerText;
-	res.transactions = this.parseTransactionsList(vquery('#tritems'));
+	res.transactions = await this.parseTransactionsList(await vquery('#tritems'));
 
-	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
+	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
 
 	return res;
 };
 
 
-TransactionsPage.prototype.filterByType = function(type)
+TransactionsPage.prototype.filterByType = async function(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;

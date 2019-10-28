@@ -8,26 +8,26 @@ function PersonPage()
 extend(PersonPage, TestPage);
 
 
-PersonPage.prototype.parseContent = function()
+PersonPage.prototype.parseContent = async function()
 {
 	var res = {};
 
-	res.headingElem = vquery('.heading > h1');
+	res.headingElem = await vquery('.heading > h1');
 	if (!res.headingElem)
 		throw new Error('Heading element not found');
 	res.heading = res.headingElem.innerText;
 
-	res.formElem = vquery('form');
+	res.formElem = await vquery('form');
 	if (!res.formElem)
 		throw new Error('Form element not found');
 
 	res.isEdit = (res.formElem.firstElementChild.id == 'pid');
 
-	res.name = this.parseInputRow(vquery(res.formElem, 'div.non_float'));
+	res.name = await this.parseInputRow(await vquery(res.formElem, 'div.non_float'));
 	if (!res.name)
 		throw new Error('Person name input not found');
 
-	res.submitBtn = vquery('.acc_controls .ok_btn');
+	res.submitBtn = await vquery('.acc_controls .ok_btn');
 	if (!res.submitBtn)
 		throw new Error('Submit button not found');
 
@@ -42,9 +42,9 @@ PersonPage.prototype.inputName = function(val)
 
 
 // Input name, submit and return navigation promise
-PersonPage.prototype.createPerson = function(personName)
+PersonPage.prototype.createPerson = async function(personName)
 {
-	this.inputName(personName);
+	await this.inputName(personName);
 
 	return navigation(() => clickEmul(this.content.submitBtn), PersonsPage);
 };

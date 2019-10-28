@@ -8,23 +8,23 @@ function PersonsPage()
 extend(PersonsPage, TestPage);
 
 
-PersonsPage.prototype.parseContent = function()
+PersonsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : vquery('.content_wrap > .heading > h1'),
- 				addBtn : this.parseIconLink(vquery('#add_btn')),
+	var res = { titleEl : await vquery('.content_wrap > .heading > h1'),
+ 				addBtn : await this.parseIconLink(await vquery('#add_btn')),
 				toolbar : {
-					elem : vquery('#toolbar'),
-					editBtn : this.parseIconLink(vquery('#edit_btn')),
-					delBtn : this.parseIconLink(vquery('#del_btn'))
+					elem : await vquery('#toolbar'),
+					editBtn : await this.parseIconLink(await vquery('#edit_btn')),
+					delBtn : await this.parseIconLink(await vquery('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 		throw new Error('Wrong persons page structure');
 
 	res.title = res.titleEl.innerText;
-	res.tiles = this.parseTiles(vquery('.tiles'));
+	res.tiles = await this.parseTiles(await vquery('.tiles'));
 
-	res.delete_warning = this.parseWarningPopup(vquery('#delete_warning'));
+	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
 
 	return res;
 };
@@ -38,12 +38,12 @@ PersonsPage.prototype.goToCreatePerson = function()
 
 
 // Select specified person, click on edit button and return navigation promise
-PersonsPage.prototype.goToUpdatePerson = function(num)
+PersonsPage.prototype.goToUpdatePerson = async function(num)
 {
 	if (!this.content.tiles || this.content.tiles.length <= num)
 		throw new Error('Wrong person number specified');
 
-	this.content.tiles[num].click();
+	await this.content.tiles[num].click();
 
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update person button not visible');
@@ -68,9 +68,7 @@ PersonsPage.prototype.deletePersons = function(persons)
 					if (person_num >= this.content.tiles.length)
 						throw new Error('Wrong account number');
 
-					this.content.tiles[person_num].click();
-
-					return Promise.resolve();
+					return this.content.tiles[person_num].click();
 				}))
 				.then(() =>
 				{

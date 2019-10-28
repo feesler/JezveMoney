@@ -10,15 +10,15 @@ function DebtTransactionPage()
 extend(DebtTransactionPage, TransactionPage);
 
 
-DebtTransactionPage.prototype.parseOperation = function(el)
+DebtTransactionPage.prototype.parseOperation = async function(el)
 {
 	var res = { elem : el };
 
 	if (!res.elem)
 		return null;
 
-	res.debtgive = vquery('#debtgive');
-	res.debttake = vquery('#debttake');
+	res.debtgive = await vquery('#debtgive');
+	res.debttake = await vquery('#debttake');
 
 	res.type = res.debtgive.checked;
 

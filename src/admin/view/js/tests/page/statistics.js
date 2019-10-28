@@ -8,30 +8,30 @@ function StatisticsPage()
 extend(StatisticsPage, TestPage);
 
 
-StatisticsPage.prototype.parseContent = function()
+StatisticsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : vquery('.content_wrap > .heading > h1') };
+	var res = { titleEl : await vquery('.content_wrap > .heading > h1') };
 
 	if (!res.titleEl)
 		throw new Error('Wrong statistics page structure');
 
-	res.typeMenu = this.parseTransactionTypeMenu(vquery('#trtype_menu'));
+	res.typeMenu = await this.parseTransactionTypeMenu(await vquery('#trtype_menu'));
 	res.title = res.titleEl.innerText;
 
-	let filtersList = vqueryall('.tr_filter.filter_sel');
+	let filtersList = await vqueryall('.tr_filter.filter_sel');
 	if (!filtersList || filtersList.length != 4)
 		throw new Error('Wrong statistics page structure');
 
-	res.filterByDropDown = this.parseDropDown(filtersList[0].firstElementChild);
-	res.accountsDropDown = isVisible(filtersList[1]) ? this.parseDropDown(filtersList[1].firstElementChild) : null;
-	res.currencyDropDown = isVisible(filtersList[2]) ? this.parseDropDown(filtersList[2].firstElementChild) : null;
-	res.groupDropDown = this.parseDropDown(filtersList[3].firstElementChild);
+	res.filterByDropDown = await this.parseDropDown(filtersList[0].firstElementChild);
+	res.accountsDropDown = isVisible(filtersList[1]) ? await this.parseDropDown(filtersList[1].firstElementChild) : null;
+	res.currencyDropDown = isVisible(filtersList[2]) ? await this.parseDropDown(filtersList[2].firstElementChild) : null;
+	res.groupDropDown = await this.parseDropDown(filtersList[3].firstElementChild);
 
-	res.chart = { elem : vquery('#chart'), bars : [] };
+	res.chart = { elem : await vquery('#chart'), bars : [] };
 	if (!res.chart)
 		throw new Error('Wrong statistics page structure');
 
-	let bars = vqueryall(res.chart.elem, 'svg > rect');
+	let bars = await vqueryall(res.chart.elem, 'svg > rect');
 	bars.forEach(bar =>
 	{
 		if (bar.attributes['fill-opacity'].nodeValue == '1')

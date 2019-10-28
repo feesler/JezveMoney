@@ -8,12 +8,12 @@ function LoginPage()
 extend(LoginPage, TestPage);
 
 
-LoginPage.prototype.parseContent = function()
+LoginPage.prototype.parseContent = async function()
 {
-	var res = { loginInp : vquery('#login'),
- 				passwordInp : vquery('#password'),
-				submitBtn : vquery('.login_controls .btn.ok_btn'),
-				registerLink : vquery('.login_controls .alter_link > a') };
+	var res = { loginInp : await vquery('#login'),
+ 				passwordInp : await vquery('#password'),
+				submitBtn : await vquery('.login_controls .btn.ok_btn'),
+				registerLink : await vquery('.login_controls .alter_link > a') };
 	if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink)
 		throw new Error('Wrong login page structure');
 
@@ -21,10 +21,9 @@ LoginPage.prototype.parseContent = function()
 };
 
 
-LoginPage.prototype.loginAs = function(login, password)
+LoginPage.prototype.loginAs = async function(login, password)
 {
-	inputEmul(this.content.loginInp, login);
-	inputEmul(this.content.passwordInp, password);
-
-	return navigation(() => clickEmul(this.content.submitBtn), MainPage);
+	await inputEmul(this.content.loginInp, login);
+ 	await inputEmul(this.content.passwordInp, password);
+	return this.navigation(() => clickEmul(this.content.submitBtn), MainPage);
 };

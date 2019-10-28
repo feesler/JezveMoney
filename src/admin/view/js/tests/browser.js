@@ -5,7 +5,7 @@ var totalRes = null, okRes = null, failRes = null;
 
 
 
-function vquery()
+async function vquery()
 {
 	if (!arguments.length)
 		return null;
@@ -18,7 +18,7 @@ function vquery()
 }
 
 
-function vqueryall()
+async function vqueryall()
 {
 	if (!arguments.length)
 		return null;
@@ -31,7 +31,7 @@ function vqueryall()
 }
 
 
-function inputEmul(elemObj, val)
+async function inputEmul(elemObj, val)
 {
 	elemObj.value = val;
 	if (elemObj.oninput)
@@ -39,7 +39,7 @@ function inputEmul(elemObj, val)
 }
 
 
-function clickEmul(elemObj)
+async function clickEmul(elemObj)
 {
 	if (elemObj.click)
 	{

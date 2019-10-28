@@ -8,18 +8,18 @@ function AccountPage()
 extend(AccountPage, TestPage);
 
 
-AccountPage.prototype.parseContent = function()
+AccountPage.prototype.parseContent = async function()
 {
 	var res = {};
 
-	res.heading = { elem : vquery('.heading > h1') };
+	res.heading = { elem : await vquery('.heading > h1') };
 	if (!res.heading.elem)
 		throw new Error('Heading element not found');
 	res.heading.text = res.heading.elem.innerText;
 
-	res.tile = this.parseTile(vquery('#acc_tile'));
+	res.tile = await this.parseTile(await vquery('#acc_tile'));
 
-	res.formElem = vquery('form');
+	res.formElem = await vquery('form');
 	if (!res.formElem)
 		throw new Error('Form element not found');
 
@@ -28,21 +28,21 @@ AccountPage.prototype.parseContent = function()
 	var elem = res.formElem.firstElementChild.nextElementSibling;
 	if (res.isEdit)
 		elem = elem.nextElementSibling;
-	res.iconDropDown = this.parseDropDown(vquery(elem, '.dd_container'));
+	res.iconDropDown = await this.parseDropDown(await vquery(elem, '.dd_container'));
 
 	elem = elem.nextElementSibling;
-	res.name = this.parseInputRow(elem);
+	res.name = await this.parseInputRow(elem);
 	if (!res.name)
 		throw new Error('Account name input not found');
 
 	elem = elem.nextElementSibling;
-	res.currDropDown = this.parseDropDown(vquery(elem, '.dd_container'));
+	res.currDropDown = await this.parseDropDown(await vquery(elem, '.dd_container'));
 
 	elem = elem.nextElementSibling;
 
-	res.balance = this.parseInputRow(elem);
+	res.balance = await this.parseInputRow(elem);
 
-	res.submitBtn = vquery('.acc_controls .ok_btn');
+	res.submitBtn = await vquery('.acc_controls .ok_btn');
 	if (!res.submitBtn)
 		throw new Error('Submit button not found');
 

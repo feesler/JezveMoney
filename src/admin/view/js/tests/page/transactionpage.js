@@ -27,59 +27,59 @@ TransactionPage.prototype.parseTileRightItem = function(elem)
 };
 
 
-TransactionPage.prototype.parseTileBlock = function(elem)
+TransactionPage.prototype.parseTileBlock = async function(elem)
 {
 	if (!elem)
 		return null;
 
 	var res = { elem : elem };
 
-	var lbl = vquery(elem, 'div > label');
+	var lbl = await vquery(elem, 'div > label');
 	if (!lbl)
 		throw new Error('Tile block label not found');
 
 	res.label = lbl.innerText;
-	res.tile = this.parseTile(vquery(elem, '.tile'));
-	res.dropDown = this.parseDropDown(vquery(elem, '.dd_attached'));
+	res.tile = await this.parseTile(await vquery(elem, '.tile'));
+	res.dropDown = await this.parseDropDown(await vquery(elem, '.dd_attached'));
 
 	res.selectAccount = function(val)
 	{
 		if (res.dropDown)
-			res.dropDown.selectByValue(val);
+			return res.dropDown.selectByValue(val);
 	};
 
 	return res;
 };
 
 
-TransactionPage.prototype.parseCommentRow = function(elem)
+TransactionPage.prototype.parseCommentRow = async function(elem)
 {
 	if (!elem)
 		return null;
 
 	var res = { elem : elem };
 
-	var iconLinkElem = vquery(elem, '.iconlink');
+	var iconLinkElem = await vquery(elem, '.iconlink');
 
-	res.iconLink = this.parseIconLink(iconLinkElem);
-	res.inputRow = this.parseInputRow(iconLinkElem.nextElementSibling);
+	res.iconLink = await this.parseIconLink(iconLinkElem);
+	res.inputRow = await this.parseInputRow(iconLinkElem.nextElementSibling);
 	if (!res.inputRow)
 		throw new Error('Input row of comment not found');
 	res.value = res.inputRow.value;
 
-	res.input = function(val)
+	res.input = async function(val)
 	{
 		if (isVisible(this.iconLink))
-			this.iconLink.click()
+			await this.iconLink.click()
 
-		this.inputRow.input(val);
+		return this.inputRow.input(val);
 	};
 
 	return res;
 };
 
 
-TransactionPage.prototype.parseContent = function()
+TransactionPage.prototype.parseContent = async function()
 {
 	var res = {};
 
@@ -87,7 +87,7 @@ TransactionPage.prototype.parseContent = function()
 
 	if (res.isUpdate)
 	{
-		let hiddenEl = vquery('input[name="transid"]');
+		let hiddenEl = await vquery('input[name="transid"]');
 		if (!hiddenEl)
 			throw new Error('Transaction id field not found');
 
@@ -96,58 +96,58 @@ TransactionPage.prototype.parseContent = function()
 			throw new Error('Wrong transaction id');
 	}
 
-	res.heading = { elem : vquery('.heading > h1') };
+	res.heading = { elem : await vquery('.heading > h1') };
 	if (res.heading.elem)
 		res.heading.title = res.heading.elem.innerText;
 
-	res.delBtn = vquery('#del_btn');
+	res.delBtn = await vquery('#del_btn');
 
-	res.typeMenu = this.parseTransactionTypeMenu(vquery('#trtype_menu'));
+	res.typeMenu = await this.parseTransactionTypeMenu(await vquery('#trtype_menu'));
 
 	if (res.typeMenu.activeType == 4)	/* DEBT */
 	{
-		res.person = this.parseTileBlock(vquery('#person'));
+		res.person = await this.parseTileBlock(await vquery('#person'));
 		if (res.person)
-			res.person.id = parseInt(vquery('#person_id').value);
+			res.person.id = parseInt((await vquery('#person_id')).value);
 
-		res.account = this.parseTileBlock(vquery('#source'));
+		res.account = await this.parseTileBlock(await vquery('#source'));
 		if (res.account)
 		{
-			res.account.id = parseInt(vquery('#acc_id').value);
-			res.accTileContainer = { elem : vquery('#source .tile_container') };
+			res.account.id = parseInt((await vquery('#acc_id')).value);
+			res.accTileContainer = { elem : await vquery('#source .tile_container') };
 		}
 
-		res.operation = this.parseOperation(vquery('#operation'));
+		res.operation = await this.parseOperation(await vquery('#operation'));
 
-		res.selaccount = { elem : vquery('#selaccount') };
-		res.noacc_btn = { elem : vquery('#noacc_btn') };
+		res.selaccount = { elem : await vquery('#selaccount') };
+		res.noacc_btn = { elem : await vquery('#noacc_btn') };
 	}
 	else
 	{
-		res.source = this.parseTileBlock(vquery('#source'));
+		res.source = await this.parseTileBlock(await vquery('#source'));
 		if (res.source)
-			res.source.id = parseInt(vquery('#src_id').value);
-		res.destination = this.parseTileBlock(vquery('#destination'));
+			res.source.id = parseInt((await vquery('#src_id')).value);
+		res.destination = await this.parseTileBlock(await vquery('#destination'));
 		if (res.destination)
-			res.destination.id = parseInt(vquery('#dest_id').value);
+			res.destination.id = parseInt((await vquery('#dest_id')).value);
 	}
 
-	res.src_amount_left = this.parseTileRightItem(vquery('#src_amount_left'));
-	res.dest_amount_left = this.parseTileRightItem(vquery('#dest_amount_left'));
-	res.src_res_balance_left = this.parseTileRightItem(vquery('#src_res_balance_left'));
-	res.dest_res_balance_left = this.parseTileRightItem(vquery('#dest_res_balance_left'));
-	res.exch_left = this.parseTileRightItem(vquery('#exch_left'));
+	res.src_amount_left = await this.parseTileRightItem(await vquery('#src_amount_left'));
+	res.dest_amount_left = await this.parseTileRightItem(await vquery('#dest_amount_left'));
+	res.src_res_balance_left = await this.parseTileRightItem(await vquery('#src_res_balance_left'));
+	res.dest_res_balance_left = await this.parseTileRightItem(await vquery('#dest_res_balance_left'));
+	res.exch_left = await this.parseTileRightItem(await vquery('#exch_left'));
 
-	res.src_amount_row = this.parseInputRow(vquery('#src_amount_row'));
-	res.dest_amount_row = this.parseInputRow(vquery('#dest_amount_row'));
-	res.exchange_row = this.parseInputRow(vquery('#exchange'));
-	res.result_balance_row = this.parseInputRow(vquery('#result_balance'));
-	res.result_balance_dest_row = this.parseInputRow(vquery('#result_balance_dest'));
+	res.src_amount_row = await this.parseInputRow(await vquery('#src_amount_row'));
+	res.dest_amount_row = await this.parseInputRow(await vquery('#dest_amount_row'));
+	res.exchange_row = await this.parseInputRow(await vquery('#exchange'));
+	res.result_balance_row = await this.parseInputRow(await vquery('#result_balance'));
+	res.result_balance_dest_row = await this.parseInputRow(await vquery('#result_balance_dest'));
 
-	res.datePicker = this.parseDatePickerRow(vquery('#calendar_btn').parentNode);
-	res.comment_row = this.parseCommentRow(vquery('#comm_btn').parentNode);
+	res.datePicker = await this.parseDatePickerRow((await vquery('#calendar_btn')).parentNode);
+	res.comment_row = await this.parseCommentRow((await vquery('#comm_btn')).parentNode);
 
-	res.submitBtn = vquery('#submitbtn');
+	res.submitBtn = await vquery('#submitbtn');
 	res.cancelBtn = res.submitBtn.nextElementSibling;
 
 	return res;
