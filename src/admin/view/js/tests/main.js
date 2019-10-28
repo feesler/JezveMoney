@@ -5,36 +5,35 @@ var App = { accounts : [], persons : [], transactions : []};
 // Run action, check state and add result to the list
 function test(descr, action, page, state)
 {
-	var res = false;
-	var errorMessage = '';
-	var expState;
+	console.log('Test: ' + descr);
+	let actPromise = action();
+	if (!actPromise)
+		throw new Error('Action should return promise');
 
-	try
-	{
-		console.log('Test: ' + descr);
-		action();
-		expState = (typeof state === 'undefined') ? page.expectedState : state;
-		res = page.checkState(expState)
-	}
-	catch(e)
-	{
-		errorMessage = e.message;
-	}
-
-	addResult(descr, res, errorMessage);
+	return actPromise
+			.then(() =>
+			{
+				let expState = (typeof state === 'undefined') ? page.expectedState : state;
+				let res = page.checkState(expState);
+				addResult(descr, res);
+			})
+			.catch(e => addResult(descr, res, e.message));
 }
 
 
-function startTests(page)
+async function startTests(page)
 {
-	reloginAsTester(page)
-	.then(page => page.goToProfilePage())
-	.then(page => page.resetAll())
-	.then(accountTests)
-	.then(personTests)
-	.then(transactionTests)
-	.then(statisticsTests)
-	.catch(msg => addResult(msg, false));
+	console.log('Starting tests');
+
+	page = await reloginAsTester(page);
+	page = await page.goToProfilePage();
+	page = await page.resetAll();
+	page = await accountTests(page);
+	page = await personTests(page);
+	page = await transactionTests(page);
+	page = await statisticsTests(page);
+
+	return page;
 }
 
 
@@ -96,86 +95,86 @@ function statisticsTests(page)
 
 	return goToMainPage(page)
 			.then(page => page.goToStatistics())
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				test('Initial state of statistics page', () => {}, page, state);
+				await test('Initial state of statistics page', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.filterByType(INCOME))
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 0 } } } };
-				test('Income statistics page', () => {}, page, state);
+				await test('Income statistics page', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.filterByType(TRANSFER))
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 2 } } } };
-				test('Transfer statistics page', () => {}, page, state);
+				await test('Transfer statistics page', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.filterByType(DEBT))
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 3 } } } };
-				test('Debt statistics page', () => {}, page, state);
+				await test('Debt statistics page', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.filterByType(EXPENSE))
 			.then(page => page.selectAccountByPos(1))
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 0 } } } };
-				test('Filter statistics by account', () => {}, page, state);
+				await test('Filter statistics by account', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.filterByType(DEBT))
 			.then(page => page.groupByDay())
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				test('Group statistics by day', () => {}, page, state);
+				await test('Group statistics by day', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.groupByWeek())
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				test('Group statistics by week', () => {}, page, state);
+				await test('Group statistics by week', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.groupByMonth())
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				test('Group statistics by month', () => {}, page, state);
+				await test('Group statistics by month', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.groupByYear())
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				test('Group statistics by year', () => {}, page, state);
+				await test('Group statistics by year', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(page => page.byCurrencies())
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				test('Filter by currencies', () => {}, page, state);
+				await test('Filter by currencies', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
@@ -242,13 +241,13 @@ function formatDate(date, month, year)
 function goToMainPage(page)
 {
 	return page.goToMainPage()
-			.then(page =>
+			.then(async page =>
 			{
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
@@ -425,18 +424,18 @@ function deleteTransactions(page, type, transactions)
 
 				return page.deleteTransactions(transactions);
 			})
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { transactions : { length : App.transactions.length - transactions.length } } };
 
-				test('Delete transactions [' + transactions.join() + ']', () => {}, page, state);
+				await test('Delete transactions [' + transactions.join() + ']', async () => {}, page, state);
 
 				App.transactions = page.content.transactions;
 
-				return Promise.resolve(page);
+				return page;
 			})
 			.then(goToMainPage)
-			.then(page =>
+			.then(async page =>
 			{
 				let origAccounts = App.beforeDeleteTransaction.accounts;
 				let origPersons = App.beforeDeleteTransaction.persons;
@@ -591,20 +590,28 @@ function deleteTransactions(page, type, transactions)
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
 
-				test('Delete transactions [' + transactions.join() + ']', () => {}, page, state);
+				await test('Delete transactions [' + transactions.join() + ']', async () => {}, page, state);
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
 
-function reloginAsTester(page)
+async function reloginAsTester(page)
 {
-	var loginPagePromise = (page.isUserLoggedIn()) ? page.logoutUser() : Promise.resolve(new LoginPage());
+	if (page.isUserLoggedIn())
+	{
+		page = await page.logoutUser();
+	}
+	else
+	{
+		page = new LoginPage(page.props);
+		await page.parse();
+	};
 
-	return loginPagePromise.then(page => page.loginAs('test', 'test'));
+	return page.loginAs('test', 'test');
 }

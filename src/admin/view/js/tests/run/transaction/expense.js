@@ -1,4 +1,4 @@
-function submitExpenseTransaction(page, params)
+async function submitExpenseTransaction(page, params)
 {
 	if ('srcAcc' in params)
 	{
@@ -6,7 +6,7 @@ function submitExpenseTransaction(page, params)
 		if (!acc)
 			throw new Error('Account (' + params.srcAcc + ') not found');
 
-		test('Change source account to (' + acc.name + ')',
+		await test('Change source account to (' + acc.name + ')',
 				() => page.changeSrcAccountByPos(params.srcAcc), page);
 	}
 
@@ -16,23 +16,23 @@ function submitExpenseTransaction(page, params)
 		if (!curr)
 			throw new Error('Currency (' + params.destCurr + ') not found');
 
-		test('Change destination currency to ' + curr.name,
+		await test('Change destination currency to ' + curr.name,
 				() => page.changeDestCurrency(params.destCurr), page);
 	}
 
 	if (!('destAmount' in params))
 		throw new Error('Destination amount value not specified');
 
-	test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
+	await test('Destination amount (' + params.destAmount + ') input', () => page.inputDestAmount(params.destAmount), page);
 
 	if ('destCurr' in params && 'srcAmount' in params)
-		test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+		await test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
 
 	if ('date' in params)
-		test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+		await test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
 
 	if ('comment' in params)
-		test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+		await test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 	App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
 									srcAccPos : page.getAccountPos(page.model.srcAccount.id) };
@@ -49,7 +49,7 @@ function createExpense(page, accNum, onState, params)
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
 			.then(page => expenseTransactionLoop(page, onState, page => submitExpenseTransaction(page, params)))
-			.then(page =>
+			.then(async page =>
 			{
 			 	let srcAcc = App.beforeSubmitTransaction.srcAcc;
 				let srcAccPos = App.beforeSubmitTransaction.srcAccPos;
@@ -81,13 +81,13 @@ function createExpense(page, accNum, onState, params)
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
 
-				test('Expense transaction submit', () => {}, page, state);
+				await test('Expense transaction submit', async () => {}, page, state);
 
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
@@ -105,7 +105,8 @@ function updateExpense(page, pos, params)
 	return goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(EXPENSE))
-			.then(page => {
+			.then(page =>
+			{
 				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
 
 				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
@@ -116,10 +117,11 @@ function updateExpense(page, pos, params)
 
 				return page.goToUpdateTransaction(pos);
 			})
-			.then(page => {
+			.then(async page =>
+			{
 				let isDiff = (App.beforeUpdateTransaction.trObj.src_curr != App.beforeUpdateTransaction.trObj.dest_curr);
 
-				test('Initial state of update expense page', () => page.setExpectedState(isDiff ? 2 : 0), page);
+				await test('Initial state of update expense page', async () => page.setExpectedState(isDiff ? 2 : 0), page);
 
 				setParam(App.beforeUpdateTransaction,
 							{ id : page.model.id,
@@ -134,7 +136,7 @@ function updateExpense(page, pos, params)
 				return submitExpenseTransaction(page, params);
 			})
 			.then(page => page.filterByType(EXPENSE))
-			.then(page =>
+			.then(async page =>
 			{
 			 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
 				let trans_id = App.beforeUpdateTransaction.id;
@@ -156,11 +158,12 @@ function updateExpense(page, pos, params)
 												 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
 												 	comment : ('comment' in params) ? params.comment : origComment };
 
-				test('Transaction update', () => {}, page, state);
+				await test('Transaction update', async () => {}, page, state);
 
 				return goToMainPage(page);
 			})
-			.then(page => {
+			.then(async page =>
+			{
 			 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
 				let updSrcAccPos = App.beforeSubmitTransaction.srcAccPos;
 			 	let origSrcAcc = App.beforeUpdateTransaction.srcAcc;
@@ -199,18 +202,18 @@ function updateExpense(page, pos, params)
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget } } };
 
-				test('Account balance update', () => {}, page, state);
+				await test('Account balance update', async () => {}, page, state);
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
 
-function expenseTransactionLoop(page, actionState, action)
+async function expenseTransactionLoop(page, actionState, action)
 {
 // State 0
 	setBlock('Expense', 2);
-	test('Initial state of new expense page', () =>
+	await test('Initial state of new expense page', async () =>
 	{
 		let trObj = page.getUpdateTransactionObj();
 
@@ -233,16 +236,16 @@ function expenseTransactionLoop(page, actionState, action)
 	if (!actionRequested)
 	{
 		// Input destination amount
-		test('Destination amount (1) input', () => page.inputDestAmount('1'), page);
-		test('Destination amount (1.) input', () => page.inputDestAmount('1.'), page);
-		test('Destination amount (1.0) input', () => page.inputDestAmount('1.0'), page);
-		test('Destination amount (1.01) input', () => page.inputDestAmount('1.01'), page);
-		test('Destination amount (1.010) input', () => page.inputDestAmount('1.010'), page);
-		test('Destination amount (1.0101) input', () => page.inputDestAmount('1.0101'), page);
+		await test('Destination amount (1) input', () => page.inputDestAmount('1'), page);
+		await test('Destination amount (1.) input', () => page.inputDestAmount('1.'), page);
+		await test('Destination amount (1.0) input', () => page.inputDestAmount('1.0'), page);
+		await test('Destination amount (1.01) input', () => page.inputDestAmount('1.01'), page);
+		await test('Destination amount (1.010) input', () => page.inputDestAmount('1.010'), page);
+		await test('Destination amount (1.0101) input', () => page.inputDestAmount('1.0101'), page);
 	}
 
 // Transition 2: click on result balance block and move from State 0 to State 1
-	test('(2) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(2) Click on source result balance', () => page.clickSrcResultBalance(), page);
 
 	if (actionState === 1)
 		return action(page);
@@ -250,26 +253,26 @@ function expenseTransactionLoop(page, actionState, action)
 	if (!actionRequested)
 	{
 		// Input result balance
-		test('Result balance (499.9) input', () => page.inputResBalance('499.9'), page);
-		test('Result balance (499.90) input', () => page.inputResBalance('499.90'), page);
-		test('Result balance (499.901) input', () => page.inputResBalance('499.901'), page);
+		await test('Result balance (499.9) input', () => page.inputResBalance('499.9'), page);
+		await test('Result balance (499.90) input', () => page.inputResBalance('499.90'), page);
+		await test('Result balance (499.901) input', () => page.inputResBalance('499.901'), page);
 	}
 
 	if (!actionRequested)
 	{
 		// Transition 12: change account to another one with different currency and stay on State 1
-		test('(12) Change account to another one with currency different than current destination currency',
+		await test('(12) Change account to another one with currency different than current destination currency',
 				() => page.changeSrcAccountByPos(2), page);
 
 		// Change account back
-		test('(12) Change account back', () => page.changeSrcAccountByPos(0), page);
+		await test('(12) Change account back', () => page.changeSrcAccountByPos(0), page);
 	}
 
 // Transition 3: click on destination amount block and move from State 1 to State 0
-	test('(3) Click on destination amount', () => page.clickDestAmount(), page);
+	await test('(3) Click on destination amount', () => page.clickDestAmount(), page);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Change destination curency to USD', () => page.changeDestCurrency(2), page);
+	await test('(4) Change destination curency to USD', () => page.changeDestCurrency(2), page);
 
 	if (actionState === 2)
 		return action(page);
@@ -277,17 +280,17 @@ function expenseTransactionLoop(page, actionState, action)
 	if (!actionRequested)
 	{
 		// Input source amount
-		test('Empty source amount input', () => page.inputSrcAmount(''), page);
-		test('Source amount (.) input', () => page.inputSrcAmount('.'), page);
-		test('Source amount (0.) input', () => page.inputSrcAmount('0.'), page);
-		test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page);
-		test('Source amount (.01) input', () => page.inputSrcAmount('.01'), page);
-		test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page);
-		test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page);
+		await test('Empty source amount input', () => page.inputSrcAmount(''), page);
+		await test('Source amount (.) input', () => page.inputSrcAmount('.'), page);
+		await test('Source amount (0.) input', () => page.inputSrcAmount('0.'), page);
+		await test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page);
+		await test('Source amount (.01) input', () => page.inputSrcAmount('.01'), page);
+		await test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page);
+		await test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page);
 	}
 
 // Transition 8: click on exchange rate block and move from State 2 to State 3
-	test('(8) Click on exchange rate', () => page.clickExchRate(), page);
+	await test('(8) Click on exchange rate', () => page.clickExchRate(), page);
 
 	if (actionState === 3)
 		return action(page);
@@ -295,83 +298,83 @@ function expenseTransactionLoop(page, actionState, action)
 	if (!actionRequested)
 	{
 		// Input exchange rate
-		test('Input exchange rate (1.09)', () => page.inputExchRate('1.09'), page);
-		test('Input exchange rate (3.09)', () => page.inputExchRate('3.09'), page);
-		test('Input exchange rate (.)', () => page.inputExchRate('.'), page);
-		test('Input exchange rate (.0)', () => page.inputExchRate('.0'), page);
-		test('Input exchange rate (.09)', () => page.inputExchRate('.09'), page);
-		test('Input exchange rate (.090101)', () => page.inputExchRate('.090101'), page);
+		await test('Input exchange rate (1.09)', () => page.inputExchRate('1.09'), page);
+		await test('Input exchange rate (3.09)', () => page.inputExchRate('3.09'), page);
+		await test('Input exchange rate (.)', () => page.inputExchRate('.'), page);
+		await test('Input exchange rate (.0)', () => page.inputExchRate('.0'), page);
+		await test('Input exchange rate (.09)', () => page.inputExchRate('.09'), page);
+		await test('Input exchange rate (.090101)', () => page.inputExchRate('.090101'), page);
 	}
 
 	// Transition 16: click on destination amount block and move from State 3 to State 2
-	test('(16) Click on destination amount', () => page.clickDestAmount(), page);
+	await test('(16) Click on destination amount', () => page.clickDestAmount(), page);
 
 	if (!actionRequested)
 	{
 		// Transition 13: select another currency different from currency of source account and stay on state
-		test('(13) Change destination curency to EUR', () => page.changeDestCurrency(3), page);
+		await test('(13) Change destination curency to EUR', () => page.changeDestCurrency(3), page);
 
 		// Transition 9: select same currency as source account and move from State 2 to State 0
-		test('(9) Change destination curency to RUB', () => page.changeDestCurrency(1), page);
+		await test('(9) Change destination curency to RUB', () => page.changeDestCurrency(1), page);
 
 		// Transition 1: change account to another one with different currency and stay on State 0
-		test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page);
+		await test('(1) Change account to another one with different currency', () => page.changeSrcAccountByPos(2), page);
 
 		// Transition 4: select different currency for destination and move from State 0 to State 2
-		test('(4) Select different currency for destination', () => page.changeDestCurrency(3), page);
+		await test('(4) Select different currency for destination', () => page.changeDestCurrency(3), page);
 
 		// Transition 5: change account to another one with currency different than current destination currency and stay on State 2
-		test('(5) Change account to another one with currency different than current destination currency',
+		await test('(5) Change account to another one with currency different than current destination currency',
 				() => page.changeSrcAccountByPos(0), page);
 	}
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
-	test('(6) Click on source result block', () => page.clickSrcResultBalance(), page);
+	await test('(6) Click on source result block', () => page.clickSrcResultBalance(), page);
 
 	if (actionState === 4)
 		return action(page);
 
 // Transition 10: change account to another one with currency different than current destination currency and stay on State 4
-	test('(10) Change account to another one with currency different than current destination currency',
+	await test('(10) Change account to another one with currency different than current destination currency',
 			() => page.changeSrcAccountByPos(2), page);
 
 // Transition 7: click on destination amount block and move from State 4 to State 2
-	test('(7) Click on source amount block', () => page.clickDestAmount(), page);
+	await test('(7) Click on source amount block', () => page.clickDestAmount(), page);
 
 // Transition 14: select source account with the same currency as destination and move from State 2 to State 0
-	test('(14) Change account to another one with the same currency as current destination currency',
+	await test('(14) Change account to another one with the same currency as current destination currency',
 			() => page.changeSrcAccountByPos(3), page);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(1), page);
+	await test('(4) Select different currency for destination', () => page.changeDestCurrency(1), page);
 
 // Transition 8: click on exchange rate block and move from State 2 to State 3
-	test('(8) Click on exchange rate', () => page.clickExchRate(), page);
+	await test('(8) Click on exchange rate', () => page.clickExchRate(), page);
 
 // Transition 17: change account to another one with currency different than current destination currency and stay on State 3
-	test('(17) Change account to another one with currency different than current destination currency',
+	await test('(17) Change account to another one with currency different than current destination currency',
 			() => page.changeSrcAccountByPos(2), page);
 
 // Transition 15: select source account with the same currency as destination and move from State 2 to State 0
-	test('(15) Change account to another one with the same currency as destination',
+	await test('(15) Change account to another one with the same currency as destination',
 			() => page.changeSrcAccountByPos(1), page);
 
 // Transition 4: select different currency for destination and move from State 0 to State 2
-	test('(4) Select different currency for destination', () => page.changeDestCurrency(2), page);
+	await test('(4) Select different currency for destination', () => page.changeDestCurrency(2), page);
 
 // Transition 6: click on source result balance block and move from State 2 to State 4
-	test('(6) Click on source result balance block', () => page.clickSrcResultBalance(), page);
+	await test('(6) Click on source result balance block', () => page.clickSrcResultBalance(), page);
 
 // Transition 19: click on exchange rate block and move from State 4 to State 3
-	test('(19) Click on exchange rate block', () => page.clickExchRate(), page);
+	await test('(19) Click on exchange rate block', () => page.clickExchRate(), page);
 
 // Transition 18: click on source result balance and move from State 3 to State 4
-	test('(18) Click on source result balance rate block', () => page.clickSrcResultBalance(), page);
+	await test('(18) Click on source result balance rate block', () => page.clickSrcResultBalance(), page);
 
 // Transition 11: select source account with the same currency as destination and move from State 4 to State 1
-	test('(11) Change account to another one with the same currency as destination',
+	await test('(11) Change account to another one with the same currency as destination',
 			() => page.changeSrcAccountByPos(2), page);
 
 
-	return Promise.resolve(page);
+	return page;
 }

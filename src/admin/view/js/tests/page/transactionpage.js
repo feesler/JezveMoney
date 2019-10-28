@@ -308,107 +308,107 @@ TransactionPage.prototype.submit = function()
 
 TransactionPage.prototype.changeSrcAccount = function(val)
 {
-	this.performAction(() => this.content.source.selectAccount(val));
+	return this.performAction(() => this.content.source.selectAccount(val));
 };
 
 
 TransactionPage.prototype.changeSrcAccountByPos = function(pos)
 {
-	this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
+	return this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
 };
 
 
 TransactionPage.prototype.changeDestAccount = function(val)
 {
-	this.performAction(() => this.content.destination.selectAccount(val));
+	return this.performAction(() => this.content.destination.selectAccount(val));
 };
 
 
 TransactionPage.prototype.changeDestAccountByPos = function(pos)
 {
-	this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
+	return this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
 };
 
 
 TransactionPage.prototype.inputSrcAmount = function(val)
 {
-	this.performAction(() => this.content.src_amount_row.input(val));
+	return this.performAction(() => this.content.src_amount_row.input(val));
 };
 
 
 TransactionPage.prototype.clickSrcAmount = function()
 {
-	this.performAction(() => this.content.src_amount_left.click());
+	return this.performAction(() => this.content.src_amount_left.click());
 };
 
 
 TransactionPage.prototype.inputDestAmount = function(val)
 {
-	this.performAction(() => this.content.dest_amount_row.input(val));
+	return this.performAction(() => this.content.dest_amount_row.input(val));
 };
 
 
 TransactionPage.prototype.clickSrcResultBalance = function()
 {
-	this.performAction(() => this.content.src_res_balance_left.click());
+	return this.performAction(() => this.content.src_res_balance_left.click());
 };
 
 
 TransactionPage.prototype.clickDestResultBalance = function()
 {
-	this.performAction(() => this.content.dest_res_balance_left.click());
+	return this.performAction(() => this.content.dest_res_balance_left.click());
 };
 
 
 TransactionPage.prototype.clickDestAmount = function()
 {
-	this.performAction(() => this.content.dest_amount_left.click());
+	return this.performAction(() => this.content.dest_amount_left.click());
 };
 
 
 TransactionPage.prototype.inputResBalance = function(val)
 {
-	this.performAction(() => this.content.result_balance_row.input(val))
+	return this.performAction(() => this.content.result_balance_row.input(val))
 };
 
 
 TransactionPage.prototype.inputDestResBalance = function(val)
 {
-	this.performAction(() => this.content.result_balance_dest_row.input(val))
+	return this.performAction(() => this.content.result_balance_dest_row.input(val))
 };
 
 
 TransactionPage.prototype.changeSourceCurrency = function(val)
 {
-	this.performAction(() => this.content.src_amount_row.selectCurr(val));
+	return this.performAction(() => this.content.src_amount_row.selectCurr(val));
 };
 
 
 TransactionPage.prototype.changeDestCurrency = function(val)
 {
-	this.performAction(() => this.content.dest_amount_row.selectCurr(val));
+	return this.performAction(() => this.content.dest_amount_row.selectCurr(val));
 };
 
 
 TransactionPage.prototype.clickExchRate = function()
 {
-	this.performAction(() => this.content.exch_left.click());
+	return this.performAction(() => this.content.exch_left.click());
 };
 
 
 TransactionPage.prototype.inputExchRate = function(val)
 {
-	this.performAction(() => this.content.exchange_row.input(val));
+	return this.performAction(() => this.content.exchange_row.input(val));
 };
 
 
 TransactionPage.prototype.changeDate = function(val)
 {
-	this.performAction(() => this.content.datePicker.inputDate(val));
+	return this.performAction(() => this.content.datePicker.inputDate(val));
 };
 
 
 TransactionPage.prototype.inputComment = function(val)
 {
-	this.performAction(() => this.content.comment_row.input(val));
+	return this.performAction(() => this.content.comment_row.input(val));
 };

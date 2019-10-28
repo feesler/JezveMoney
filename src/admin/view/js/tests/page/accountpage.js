@@ -52,23 +52,23 @@ AccountPage.prototype.parseContent = function()
 
 AccountPage.prototype.inputName = function(val)
 {
-	this.performAction(() => this.content.name.input(val));
+	return this.performAction(() => this.content.name.input(val));
 };
 
 
 AccountPage.prototype.inputBalance = function(val)
 {
-	this.performAction(() => this.content.balance.input(val));
+	return this.performAction(() => this.content.balance.input(val));
 };
 
 
 AccountPage.prototype.changeCurrency = function(val)
 {
-	this.performAction(() => this.content.currDropDown.selectByValue(val));
+	return this.performAction(() => this.content.currDropDown.selectByValue(val));
 };
 
 
 AccountPage.prototype.changeIcon = function(val)
 {
-	this.performAction(() => this.content.iconDropDown.selectByValue(val));
+	return this.performAction(() => this.content.iconDropDown.selectByValue(val));
 };

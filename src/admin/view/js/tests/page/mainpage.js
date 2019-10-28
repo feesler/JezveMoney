@@ -8,7 +8,7 @@ function MainPage()
 extend(MainPage, TestPage);
 
 
-MainPage.prototype.parseContent = function()
+MainPage.prototype.parseContent = async function()
 {
 	var widgetsElem = vqueryall('.content_wrap .widget');
 	if (!widgetsElem)

@@ -1,9 +1,9 @@
-function checkInitialPersons(page)
+async function checkInitialPersons(page)
 {
 	var state = { value : { tiles : { length : 0 } } };
-	test('Initial persons structure', () => {}, page, state);
+	await test('Initial persons structure', async () => {}, page, state);
 
-	return Promise.resolve(page);
+	return page;
 }
 
 
@@ -13,16 +13,16 @@ function createPerson(page, personName)
 {
 	return page.goToCreatePerson()
 			.then(page => page.createPerson(personName))
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { value : { tiles : { length : App.persons.length + 1 } } };
 				state.value.tiles[App.persons.length] = { name : personName };
 
-				test('Create person', () => {}, page, state);
+				await test('Create person', async () => {}, page, state);
 
 				App.persons = page.content.tiles;
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
@@ -30,27 +30,27 @@ function createPerson(page, personName)
 function updatePerson(page, num, personName)
 {
 	return page.goToUpdatePerson(num)
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { visibility : { name : true },
 			 					values : { name : App.persons[num].name } };
 
-				test('Update person page state', () => {}, page, state);
+				await test('Update person page state', async () => {}, page, state);
 
-				page.inputName(personName);
+				await page.inputName(personName);
 
 				return navigation(() => clickEmul(page.content.submitBtn), PersonsPage)
 			})
-			.then(page =>
+			.then(async page =>
 			{
 				var state = { values : { tiles : { length : App.persons.length } }};
 				state.values.tiles[num] = { name : personName };
 
-				test('Update person', () => {}, page, state);
+				await test('Update person', async () => {}, page, state);
 
 				App.persons = page.content.tiles;
 
-				return Promise.resolve(page);
+				return page;
 			});
 }
 
@@ -58,11 +58,11 @@ function updatePerson(page, num, personName)
 function deletePersons(page, persons)
 {
 	return page.deletePersons(persons)
-			.then(function(page)
+			.then(async (page) =>
 			{
 				var state = { values : { tiles : { length : App.persons.length - persons.length } } };
 
-				test('Delete persons [' + persons.join() + ']', () => {}, page, state);
+				await test('Delete persons [' + persons.join() + ']', async () => {}, page, state);
 
 				return Promise.resolve(page);
 			});

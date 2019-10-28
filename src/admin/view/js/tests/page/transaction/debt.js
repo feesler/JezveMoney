@@ -388,13 +388,13 @@ DebtTransactionPage.prototype.changePerson = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	this.performAction(() => this.content.person.selectAccount(val));
+	return this.performAction(() => this.content.person.selectAccount(val));
 };
 
 
 DebtTransactionPage.prototype.changePersonByPos = function(pos)
 {
-	this.changePerson(this.content.person.dropDown.items[pos].id);
+	return this.changePerson(this.content.person.dropDown.items[pos].id);
 };
 
 
@@ -477,7 +477,7 @@ DebtTransactionPage.prototype.toggleDebtType = function()
 	}
 
 
-	this.performAction(() => clickEmul(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
+	return this.performAction(() => clickEmul(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
 };
 
 
@@ -495,7 +495,7 @@ DebtTransactionPage.prototype.inputSrcAmount = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	DebtTransactionPage.parent.inputSrcAmount.apply(this, arguments);
+	return DebtTransactionPage.parent.inputSrcAmount.apply(this, arguments);
 };
 
 
@@ -520,7 +520,7 @@ DebtTransactionPage.prototype.inputResBalance = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	DebtTransactionPage.parent.inputResBalance.apply(this, arguments);
+	return DebtTransactionPage.parent.inputResBalance.apply(this, arguments);
 };
 
 
@@ -545,7 +545,7 @@ DebtTransactionPage.prototype.inputDestResBalance = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	DebtTransactionPage.parent.inputDestResBalance.apply(this, arguments);
+	return DebtTransactionPage.parent.inputDestResBalance.apply(this, arguments);
 };
 
 
@@ -560,7 +560,7 @@ DebtTransactionPage.prototype.clickSrcResultBalance = function()
 	else
 		throw new Error('Unexpected state');
 
-	DebtTransactionPage.parent.clickSrcResultBalance.apply(this, arguments);
+	return DebtTransactionPage.parent.clickSrcResultBalance.apply(this, arguments);
 };
 
 
@@ -575,7 +575,7 @@ DebtTransactionPage.prototype.clickDestResultBalance = function()
 	else
 		throw new Error('Unexpected state');
 
-	DebtTransactionPage.parent.clickDestResultBalance.apply(this, arguments);
+	return DebtTransactionPage.parent.clickDestResultBalance.apply(this, arguments);
 };
 
 
@@ -638,9 +638,9 @@ DebtTransactionPage.prototype.toggleAccount = function()
 	}
 
 	if (this.model.noAccount)
-		this.performAction(() => clickEmul(this.content.noacc_btn.elem.firstElementChild));
+		return this.performAction(() => clickEmul(this.content.noacc_btn.elem.firstElementChild));
 	else
-		this.performAction(() => clickEmul(this.content.selaccount.elem.firstElementChild));
+		return this.performAction(() => clickEmul(this.content.selaccount.elem.firstElementChild));
 };
 
 
@@ -649,7 +649,7 @@ DebtTransactionPage.prototype.changeAccount = function(account_id)
 	var newAcc = this.getAccount(account_id);
 
 	if (!this.model.account || !newAcc || newAcc.id == this.model.account.id)
-		return;
+		return Promise.resolve();
 
 	this.model.account = newAcc;
 
@@ -696,13 +696,13 @@ DebtTransactionPage.prototype.changeAccount = function(account_id)
 
 	this.setExpectedState(this.model.state);
 
-	this.performAction(() => this.content.account.selectAccount(account_id));
+	return this.performAction(() => this.content.account.selectAccount(account_id));
 };
 
 
 DebtTransactionPage.prototype.changeAccountByPos = function(pos)
 {
-	this.changeAccount(this.content.account.dropDown.items[pos].id);
+	return this.changeAccount(this.content.account.dropDown.items[pos].id);
 };
 
 
@@ -719,5 +719,5 @@ DebtTransactionPage.prototype.clickSrcAmount = function()
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
 
-	DebtTransactionPage.parent.clickSrcAmount.apply(this, arguments);
+	return DebtTransactionPage.parent.clickSrcAmount.apply(this, arguments);
 };

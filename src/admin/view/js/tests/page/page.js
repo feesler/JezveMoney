@@ -2,7 +2,6 @@
 function TestPage()
 {
 	this.availableControls = [];
-	this.parse();
 }
 
 
@@ -14,7 +13,7 @@ TestPage.prototype.isUserLoggedIn = function()
 };
 
 
-TestPage.prototype.parseHeader = function()
+TestPage.prototype.parseHeader = async function()
 {
 	var el;
 	var res = {};
@@ -547,26 +546,28 @@ TestPage.prototype.buildModel = function()
 };
 
 
-TestPage.prototype.parse = function()
+TestPage.prototype.parse = async function()
 {
 	this.location = viewframe.contentWindow.location.href;
-	this.header = this.parseHeader();
-	this.content = this.parseContent();
-	this.model = this.buildModel(this.content);
+	this.header = await this.parseHeader();
+	this.content = await this.parseContent();
+	this.model = await this.buildModel(this.content);
+
+	return this;
 };
 
 
-TestPage.prototype.performAction = function(action)
+TestPage.prototype.performAction = async function(action)
 {
 	if (!isFunction(action))
 		throw new Error('Wrong action specified');
 
 	if (!this.content && !this.header)
-		this.parse();
+		await this.parse();
 
-	action.call(this);
+	await action.call(this);
 
-	this.parse();
+	await this.parse();
 };
 
 
@@ -695,12 +696,12 @@ TestPage.prototype.checkState = function(stateObj)
 
 
 // Click on profile menu item and return navigation promise
-TestPage.prototype.goToProfilePage = function()
+TestPage.prototype.goToProfilePage = async function()
 {
 	if (!this.isUserLoggedIn())
 		throw new Error('User is not logged in');
 
-	clickEmul(this.header.user.menuBtn);		// open user menu
+	await clickEmul(this.header.user.menuBtn);		// open user menu
 
 	return navigation(() => {
 		setTimeout(() => clickEmul(this.header.user.profileBtn), 500);

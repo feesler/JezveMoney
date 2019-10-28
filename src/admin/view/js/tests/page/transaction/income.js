@@ -206,7 +206,7 @@ IncomeTransactionPage.prototype.inputSrcAmount = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	IncomeTransactionPage.parent.inputSrcAmount.apply(this, arguments);
+	return IncomeTransactionPage.parent.inputSrcAmount.apply(this, arguments);
 };
 
 
@@ -226,7 +226,7 @@ IncomeTransactionPage.prototype.inputDestAmount = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	IncomeTransactionPage.parent.inputDestAmount.apply(this, arguments);
+	return IncomeTransactionPage.parent.inputDestAmount.apply(this, arguments);
 };
 
 
@@ -257,7 +257,7 @@ IncomeTransactionPage.prototype.inputDestResBalance = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	IncomeTransactionPage.parent.inputDestResBalance.apply(this, arguments);
+	return IncomeTransactionPage.parent.inputDestResBalance.apply(this, arguments);
 };
 
 
@@ -287,7 +287,7 @@ IncomeTransactionPage.prototype.inputExchRate = function(val)
 
 	this.setExpectedState(3);
 
-	IncomeTransactionPage.parent.inputExchRate.apply(this, arguments);
+	return IncomeTransactionPage.parent.inputExchRate.apply(this, arguments);
 };
 
 
@@ -298,7 +298,7 @@ IncomeTransactionPage.prototype.clickDestResultBalance = function()
 	else if (this.model.state === 2 || this.model.state === 3)
 		this.setExpectedState(4);		// Transition 7 or 14
 
-	IncomeTransactionPage.parent.clickDestResultBalance.apply(this, arguments);
+	return IncomeTransactionPage.parent.clickDestResultBalance.apply(this, arguments);
 };
 
 
@@ -307,7 +307,7 @@ IncomeTransactionPage.prototype.changeDestAccount = function(account_id)
 	var newAcc = this.getAccount(account_id);
 
 	if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
-		return;
+		return Promise.resolve();
 
 	this.model.destAccount = newAcc;
 	this.model.dest_curr_id = this.model.destAccount.curr_id;
@@ -360,8 +360,7 @@ IncomeTransactionPage.prototype.changeDestAccount = function(account_id)
 		}
 	}
 
-
-	IncomeTransactionPage.parent.changeDestAccount.apply(this, arguments);
+	return IncomeTransactionPage.parent.changeDestAccount.apply(this, arguments);
 };
 
 
@@ -372,7 +371,7 @@ IncomeTransactionPage.prototype.clickSrcAmount = function()
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
 
-	IncomeTransactionPage.parent.clickSrcAmount.apply(this, arguments);
+	return IncomeTransactionPage.parent.clickSrcAmount.apply(this, arguments);
 };
 
 
@@ -383,7 +382,7 @@ IncomeTransactionPage.prototype.clickDestAmount = function()
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickDestAmount action');
 
-	IncomeTransactionPage.parent.clickDestAmount.apply(this, arguments);
+	return IncomeTransactionPage.parent.clickDestAmount.apply(this, arguments);
 };
 
 
@@ -391,17 +390,14 @@ IncomeTransactionPage.prototype.clickExchRate = function()
 {
 	this.setExpectedState(3);	// Transition 20
 
-	IncomeTransactionPage.parent.clickExchRate.apply(this, arguments);
+	return IncomeTransactionPage.parent.clickExchRate.apply(this, arguments);
 };
 
 
 IncomeTransactionPage.prototype.changeSourceCurrency = function(val)
 {
 	if (this.model.src_curr_id == val)
-	{
-		IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
-		return;
-	}
+		return IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
 
 	this.model.src_curr_id = parseInt(val);
 	this.model.srcCurr = getCurrency(this.model.src_curr_id);
@@ -434,5 +430,5 @@ IncomeTransactionPage.prototype.changeSourceCurrency = function(val)
 	else
 		throw new Error('Unexpected transition');
 
-	IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
+	return IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
 };
