@@ -17,7 +17,7 @@ function test(descr, action, page, state)
 				let res = page.checkState(expState);
 				addResult(descr, res);
 			})
-			.catch(e => addResult(descr, res, e.message));
+			.catch(e => addResult(descr, false, e.message));
 }
 
 

@@ -83,7 +83,7 @@ TransactionsPage.prototype.goToUpdateTransaction = function(num)
 TransactionsPage.prototype.deleteTransactions = function(tr)
 {
 	if (!tr)
-		throw 'No transactions specified';
+		throw new Error('No transactions specified');
 
 	if (!isArray(tr))
 		tr = [tr];
