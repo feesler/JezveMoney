@@ -55,5 +55,5 @@ function checkPHPerrors(content)
 	});
 
 	if (found)
-		addResult('PHP error signature found', false);
+		Environment.addResult('PHP error signature found', false);
 }

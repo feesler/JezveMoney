@@ -10,22 +10,22 @@ extend(AccountsPage, TestPage);
 
 AccountsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : await vquery('.content_wrap > .heading > h1'),
- 				addBtn : await this.parseIconLink(await vquery('#add_btn')),
+	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
+ 				addBtn : await this.parseIconLink(await this.query('#add_btn')),
 				toolbar : {
-					elem : await vquery('#toolbar'),
-					editBtn : await this.parseIconLink(await vquery('#edit_btn')),
-					exportBtn : await this.parseIconLink(await vquery('#export_btn')),
-					delBtn : await this.parseIconLink(await vquery('#del_btn'))
+					elem : await this.query('#toolbar'),
+					editBtn : await this.parseIconLink(await this.query('#edit_btn')),
+					exportBtn : await this.parseIconLink(await this.query('#export_btn')),
+					delBtn : await this.parseIconLink(await this.query('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong accounts page structure');
 
 	res.title = res.titleEl.innerText;
-	res.tiles = await this.parseTiles(await vquery('.tiles'));
+	res.tiles = await this.parseTiles(await this.query('.tiles'));
 
-	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
+	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
 };
@@ -34,7 +34,7 @@ AccountsPage.prototype.parseContent = async function()
 // Click on add button and return navigation promise
 AccountsPage.prototype.goToCreateAccount = function()
 {
-	return navigation(() => this.content.addBtn.click(), AccountPage);
+	return this.navigation(() => this.content.addBtn.click(), AccountPage);
 };
 
 
@@ -49,7 +49,7 @@ AccountsPage.prototype.goToUpdateAccount = async function(num)
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update account button not visible');
 
-	return navigation(() => this.content.toolbar.editBtn.click(), AccountPage);
+	return this.navigation(() => this.content.toolbar.editBtn.click(), AccountPage);
 };
 
 
@@ -97,6 +97,6 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 				if (!this.content.delete_warning.okBtn)
 					throw new Error('OK button not found');
 
-				return navigation(() => clickEmul(this.content.delete_warning.okBtn), AccountsPage);
+				return this.navigation(() => this.click(this.content.delete_warning.okBtn), AccountsPage);
 			});
 };

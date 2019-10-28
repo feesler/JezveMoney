@@ -10,21 +10,21 @@ extend(PersonsPage, TestPage);
 
 PersonsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : await vquery('.content_wrap > .heading > h1'),
- 				addBtn : await this.parseIconLink(await vquery('#add_btn')),
+	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
+ 				addBtn : await this.parseIconLink(await this.query('#add_btn')),
 				toolbar : {
-					elem : await vquery('#toolbar'),
-					editBtn : await this.parseIconLink(await vquery('#edit_btn')),
-					delBtn : await this.parseIconLink(await vquery('#del_btn'))
+					elem : await this.query('#toolbar'),
+					editBtn : await this.parseIconLink(await this.query('#edit_btn')),
+					delBtn : await this.parseIconLink(await this.query('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 		throw new Error('Wrong persons page structure');
 
 	res.title = res.titleEl.innerText;
-	res.tiles = await this.parseTiles(await vquery('.tiles'));
+	res.tiles = await this.parseTiles(await this.query('.tiles'));
 
-	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
+	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
 };
@@ -33,7 +33,7 @@ PersonsPage.prototype.parseContent = async function()
 // Click on add button and return navigation promise
 PersonsPage.prototype.goToCreatePerson = function()
 {
-	return navigation(() => this.content.addBtn.click(), PersonPage);
+	return this.navigation(() => this.content.addBtn.click(), PersonPage);
 };
 
 
@@ -48,7 +48,7 @@ PersonsPage.prototype.goToUpdatePerson = async function(num)
 	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update person button not visible');
 
-	return navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
+	return this.navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
 };
 
 
@@ -92,6 +92,6 @@ PersonsPage.prototype.deletePersons = function(persons)
 				if (!isVisible(this.content.delete_warning.elem))
 					throw new Error('Delete account warning popup not appear');
 
-				return navigation(() => clickEmul(this.content.delete_warning.okBtn), PersonsPage);
+				return this.navigation(() => this.click(this.content.delete_warning.okBtn), PersonsPage);
 			});
 };

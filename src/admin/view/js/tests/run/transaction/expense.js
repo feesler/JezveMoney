@@ -212,7 +212,7 @@ function updateExpense(page, pos, params)
 async function expenseTransactionLoop(page, actionState, action)
 {
 // State 0
-	setBlock('Expense', 2);
+	page.setBlock('Expense', 2);
 	await test('Initial state of new expense page', async () =>
 	{
 		let trObj = page.getUpdateTransactionObj();

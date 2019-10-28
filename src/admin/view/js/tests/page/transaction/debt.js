@@ -17,8 +17,8 @@ DebtTransactionPage.prototype.parseOperation = async function(el)
 	if (!res.elem)
 		return null;
 
-	res.debtgive = await vquery('#debtgive');
-	res.debttake = await vquery('#debttake');
+	res.debtgive = await this.query('#debtgive');
+	res.debttake = await this.query('#debttake');
 
 	res.type = res.debtgive.checked;
 
@@ -477,7 +477,7 @@ DebtTransactionPage.prototype.toggleDebtType = function()
 	}
 
 
-	return this.performAction(() => clickEmul(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
+	return this.performAction(() => this.click(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
 };
 
 
@@ -638,9 +638,9 @@ DebtTransactionPage.prototype.toggleAccount = function()
 	}
 
 	if (this.model.noAccount)
-		return this.performAction(() => clickEmul(this.content.noacc_btn.elem.firstElementChild));
+		return this.performAction(() => this.click(this.content.noacc_btn.elem.firstElementChild));
 	else
-		return this.performAction(() => clickEmul(this.content.selaccount.elem.firstElementChild));
+		return this.performAction(() => this.click(this.content.selaccount.elem.firstElementChild));
 };
 
 

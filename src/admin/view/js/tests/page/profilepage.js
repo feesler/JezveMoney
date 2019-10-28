@@ -12,21 +12,21 @@ ProfilePage.prototype.parseContent = async function()
 {
 	var res = {};
 
-	var blocks = await vqueryall('.content_wrap > .profile_block');
+	var blocks = await this.queryAll('.content_wrap > .profile_block');
 	if (blocks.length != 4)
 		throw new Error('Wrong profile page structure');
 
-	res.loginElem = await vquery(blocks[0], 'span');
-	res.nameElem = await vquery('#namestatic');
-	res.nameLinkElem = await vquery(blocks[1], 'div > a');
-	res.changePassLinkElem = await vquery(blocks[2], 'div > a');
+	res.loginElem = await this.query(blocks[0], 'span');
+	res.nameElem = await this.query('#namestatic');
+	res.nameLinkElem = await this.query(blocks[1], 'div > a');
+	res.changePassLinkElem = await this.query(blocks[2], 'div > a');
 	if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
 		throw new Error('Wrong profile page structure');
 
 	res.login = res.loginElem.innerText;
 	res.name = res.nameElem.innerText;
 
-	var buttons = await vqueryall(blocks[3], 'input[type="button"]');
+	var buttons = await this.queryAll(blocks[3], 'input[type="button"]');
 	if (!buttons || buttons.length != 3)
 		throw new Error('Wrong profile page structure');
 	res.resetBtn = buttons[0];
@@ -34,29 +34,29 @@ ProfilePage.prototype.parseContent = async function()
 	res.deleteProfileBtn = buttons[2];
 
 	res.changeNamePopup = {};
-	res.changeNamePopup.elem = await vquery('#chname_popup');
-	res.changeNamePopup.content = await vquery('#changename');
-	res.changeNamePopup.newNameInp = await vquery('#newname');
+	res.changeNamePopup.elem = await this.query('#chname_popup');
+	res.changeNamePopup.content = await this.query('#changename');
+	res.changeNamePopup.newNameInp = await this.query('#newname');
 	if (res.changeNamePopup.elem)
 	{
-		res.changeNamePopup.okBtn = await vquery(res.changeNamePopup.elem, 'popup_controls > input.btn.ok_btn');
-		res.changeNamePopup.closeBtn = await vquery(res.changeNamePopup.elem, '.close_btn > button');
+		res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, 'popup_controls > input.btn.ok_btn');
+		res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close_btn > button');
 	}
 
 	res.changePassPopup = {};
-	res.changePassPopup.elem = await vquery('#chpass_popup');
-	res.changePassPopup.content = await vquery('#changepass');
-	res.changePassPopup.oldPassInp = await vquery('#oldpwd');
-	res.changePassPopup.newPassInp = await vquery('#newpwd');
+	res.changePassPopup.elem = await this.query('#chpass_popup');
+	res.changePassPopup.content = await this.query('#changepass');
+	res.changePassPopup.oldPassInp = await this.query('#oldpwd');
+	res.changePassPopup.newPassInp = await this.query('#newpwd');
 	if (res.changePassPopup.elem)
 	{
-		res.changePassPopup.okBtn = await vquery(res.changePassPopup.elem, 'popup_controls > input.btn.ok_btn');
-		res.changePassPopup.closeBtn = await vquery(res.changePassPopup.elem, '.close_btn > button');
+		res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, 'popup_controls > input.btn.ok_btn');
+		res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close_btn > button');
 	}
 
-	res.reset_warning = await this.parseWarningPopup(await vquery('#reset_warning'));
-	res.reset_all_warning = await this.parseWarningPopup(await vquery('#reset_all_warning'));
-	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
+	res.reset_warning = await this.parseWarningPopup(await this.query('#reset_warning'));
+	res.reset_all_warning = await this.parseWarningPopup(await this.query('#reset_all_warning'));
+	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
 };
@@ -70,7 +70,7 @@ ProfilePage.prototype.resetAll = function()
 		if (!this.content.resetAllBtn)
 			throw new Error('Reset all button not found');
 
-		return clickEmul(this.content.resetAllBtn);
+		return this.click(this.content.resetAllBtn);
 	})
 	.then(() =>
 	{
@@ -79,6 +79,6 @@ ProfilePage.prototype.resetAll = function()
 		if (!this.content.reset_all_warning.okBtn)
 			throw new Error('Confirm button not found');
 
-		return navigation(() => clickEmul(this.content.reset_all_warning.okBtn), ProfilePage);
+		return this.navigation(() => this.click(this.content.reset_all_warning.okBtn), ProfilePage);
 	});
 };

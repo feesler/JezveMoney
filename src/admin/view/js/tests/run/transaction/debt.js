@@ -178,7 +178,7 @@ function updateDebt(page, pos, params)
 	if (!isObject(params))
 		throw new Error('Parameters not specified');
 
-	setBlock('Update debt transaction ' + pos, 3);
+	page.setBlock('Update debt transaction ' + pos, 3);
 
 	return goToMainPage(page)
 			.then(page => page.goToTransactions())
@@ -380,7 +380,7 @@ function updateDebt(page, pos, params)
 
 async function debtTransactionLoop(page, actionState, action)
 {
-	setBlock('Debt', 2);
+	page.setBlock('Debt', 2);
 	await test('Initial state of new debt page', async () => page.setExpectedState(0), page);
 
 	actionState = parseInt(actionState);

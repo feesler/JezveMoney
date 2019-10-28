@@ -39,7 +39,7 @@ function updatePerson(page, num, personName)
 
 				await page.inputName(personName);
 
-				return navigation(() => clickEmul(page.content.submitBtn), PersonsPage)
+				return page.navigation(() => page.click(page.content.submitBtn), PersonsPage)
 			})
 			.then(async page =>
 			{

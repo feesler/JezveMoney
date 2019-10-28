@@ -212,7 +212,7 @@ function updateIncome(page, pos, params)
 async function incomeTransactionLoop(page, actionState, action)
 {
 // State 0
-	setBlock('Income', 2);
+	page.setBlock('Income', 2);
 	await test('Initial state of new income page', async () => page.setExpectedState(0), page);
 
 	actionState = parseInt(actionState);

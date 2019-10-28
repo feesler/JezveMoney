@@ -1,7 +1,15 @@
 // Common test page class constructor
-function TestPage()
+function TestPage(props)
 {
-	this.availableControls = [];
+	this.props = props || {};
+
+	if (this.props.environment)
+	{
+		for(let key in this.props.environment)
+		{
+			this[key] = this.props.environment[key];
+		}
+	}
 }
 
 
@@ -18,37 +26,37 @@ TestPage.prototype.parseHeader = async function()
 	var el;
 	var res = {};
 
-	res.elem = await vquery('.page > .page_wrapper > .header');
+	res.elem = await this.query('.page > .page_wrapper > .header');
 	if (!res.elem)
 		return res;		// no header is ok for login page
 
 	res.logo = {};
-	res.logo.elem = await vquery(res.elem, '.logo');
+	res.logo.elem = await this.query(res.elem, '.logo');
 	if (!res.logo.elem)
 		throw new Error('Logo element not found');
 
-	res.logo.linkElem = await vquery(res.logo.elem, 'a');
+	res.logo.linkElem = await this.query(res.logo.elem, 'a');
 	if (!res.logo.linkElem)
 		throw new Error('Logo link element not found');
 
 	res.user = {};
-	res.user.elem = await vquery(res.elem, '.userblock');
+	res.user.elem = await this.query(res.elem, '.userblock');
 	if (res.user.elem)
 	{
-		res.user.menuBtn = await vquery(res.elem, 'button.user_button');
+		res.user.menuBtn = await this.query(res.elem, 'button.user_button');
 		if (!res.user.menuBtn)
 			throw new Error('User button not found');
-		el = await vquery(res.user.menuBtn, '.user_title');
+		el = await this.query(res.user.menuBtn, '.user_title');
 		if (!el)
 			throw new Error('User title element not found');
 		res.user.name = el.innerText;
 
-		res.user.menuEl = await vquery(res.elem, '.usermenu');
+		res.user.menuEl = await this.query(res.elem, '.usermenu');
 		if (!res.user.menuEl)
 			throw new Error('Menu element not found');
 
 		res.user.menuItems = [];
-		var menuLinks = await vqueryall(res.user.menuEl, 'ul > li > a');
+		var menuLinks = await this.queryAll(res.user.menuEl, 'ul > li > a');
 		for(var i = 0; i < menuLinks.length; i++)
 		{
 			el = menuLinks[i];
@@ -88,9 +96,10 @@ TestPage.prototype.parseTile = async function(tileEl)
 	if (!tileEl || !hasClass(tileEl, 'tile'))
 		throw new Error('Wrong tile structure');
 
+	var self = this;
 	var tileObj = { elem : tileEl, linkElem : tileEl.firstElementChild,
-					balanceEL : await vquery(tileEl, '.acc_bal'),
-					nameEL : await vquery(tileEl, '.acc_name') };
+					balanceEL : await this.query(tileEl, '.acc_bal'),
+					nameEL : await this.query(tileEl, '.acc_name') };
 
 	tileObj.id = this.parseId(tileEl.id);
 	tileObj.balance = tileObj.balanceEL.innerText;
@@ -110,7 +119,7 @@ TestPage.prototype.parseTile = async function(tileEl)
 
 	tileObj.click = function()
 	{
-		return clickEmul(this.linkElem);
+		return self.click(this.linkElem);
 	};
 
 	return tileObj;
@@ -123,8 +132,8 @@ TestPage.prototype.parseInfoTile = async function(tileEl)
 		throw new Error('Wrong info tile structure');
 
 	var tileObj = { elem : tileEl,
-					titleEl : await vquery(tileEl, '.info_title'),
-					subtitleEl : await vquery(tileEl, '.info_subtitle') };
+					titleEl : await this.query(tileEl, '.info_title'),
+					subtitleEl : await this.query(tileEl, '.info_subtitle') };
 
 	tileObj.id = this.parseId(tileEl.id);
 	tileObj.title = tileObj.titleEl.innerText;
@@ -173,6 +182,7 @@ TestPage.prototype.parseTransactionsList = async function(listEl)
 	if (!listEl)
 		return null;
 
+	var self = this;
 	var res = [];
 
 	if (!listEl || (listEl.children.length == 1 && listEl.children[0].tagName == 'SPAN'))
@@ -181,11 +191,11 @@ TestPage.prototype.parseTransactionsList = async function(listEl)
 	var listItems;
 	if (listEl.tagName == 'TABLE')
 	{
-		listItems = await vqueryall(listEl, 'tr');
+		listItems = await this.queryAll(listEl, 'tr');
 	}
 	else
 	{
-		listItems = await vqueryall(listEl, '.trlist_item_wrap > div');
+		listItems = await this.queryAll(listEl, '.trlist_item_wrap > div');
 	}
 
 	for(var i = 0; i < listItems.length; i++)
@@ -193,28 +203,28 @@ TestPage.prototype.parseTransactionsList = async function(listEl)
 		var li = listItems[i];
 		var itemObj = { id : this.parseId(li.id), elem : li };
 
-		var elem = await vquery(li, '.tritem_acc_name > span');
+		var elem = await this.query(li, '.tritem_acc_name > span');
 		if (!elem)
 			throw new Error('Account title not found');
 		itemObj.accountTitle = elem.innerText;
 
-		elem = await vquery(li, '.tritem_sum > span');
+		elem = await this.query(li, '.tritem_sum > span');
 		if (!elem)
 			throw new Error('Amount text not found');
 		itemObj.amountText = elem.innerText;
 
-		elem = await vquery(li, '.tritem_date_comm');
+		elem = await this.query(li, '.tritem_date_comm');
 		if (!elem || !elem.firstElementChild || elem.firstElementChild.tagName != 'SPAN')
 			throw new Error('Date element not found');
 
 		itemObj.dateFmt = elem.firstElementChild.innerText;
 
-		elem = await vquery(li, '.tritem_comm');
+		elem = await this.query(li, '.tritem_comm');
 		itemObj.comment = elem ? elem.innerText : '';
 
 		itemObj.click = function()
 		{
-			return clickEmul(this.elem);
+			return self.click(this.elem);
 		};
 
 		res.push(itemObj);
@@ -229,6 +239,7 @@ TestPage.prototype.parseDropDown = async function(elem)
 	if (!elem)
 		return null;
 
+	var self = this;
 	var res = { elem : elem };
 	if (!res.elem || (!hasClass(res.elem, 'dd_container') && !hasClass(res.elem, 'dd_attached')))
 		throw new Error('Wrong drop down element');
@@ -237,16 +248,16 @@ TestPage.prototype.parseDropDown = async function(elem)
 	if (res.isAttached)
 		res.selectBtn = res.elem.firstElementChild;
 	else
-		res.selectBtn = await vquery(res.elem, 'button.selectBtn');
+		res.selectBtn = await this.query(res.elem, 'button.selectBtn');
 	if (!res.selectBtn)
 		throw new Error('Select button not found');
 
 	if (!res.isAttached)
 	{
-		res.statSel = await vquery(res.elem, '.dd_input_cont span.statsel');
+		res.statSel = await this.query(res.elem, '.dd_input_cont span.statsel');
 		if (!res.statSel)
 			throw new Error('Static select element not found');
-		res.input = await vquery(res.elem, '.dd_input_cont input');
+		res.input = await this.query(res.elem, '.dd_input_cont input');
 		if (!res.input)
 			throw new Error('Input element not found');
 
@@ -254,9 +265,9 @@ TestPage.prototype.parseDropDown = async function(elem)
 		res.textValue = (res.editable) ? res.input.value : res.statSel.innerText;
 	}
 
-	res.selectElem = await vquery(res.elem, 'select');
+	res.selectElem = await this.query(res.elem, 'select');
 
-	res.listContainer = await vquery(res.elem, '.ddlist');
+	res.listContainer = await this.query(res.elem, '.ddlist');
 	res.isMobile = hasClass(res.listContainer, 'ddmobile');
 	if (res.isMobile)
 	{
@@ -278,7 +289,7 @@ TestPage.prototype.parseDropDown = async function(elem)
 
 		if (res.listContainer)
 		{
-			var listItems = await vqueryall(res.elem, '.ddlist li > div');
+			var listItems = await this.queryAll(res.elem, '.ddlist li > div');
 			res.items = [];
 			for(var i = 0; i < listItems.length; i++)
 			{
@@ -303,11 +314,11 @@ TestPage.prototype.parseDropDown = async function(elem)
 		}
 		else
 		{
-			clickEmul(this.selectBtn);
+			self.click(this.selectBtn);
 			var li = idSearch(this.items, val);
 			if (!li)
 				throw new Error('List item not found');
-			return clickEmul(li.elem);
+			return self.click(li.elem);
 		}
 	};
 
@@ -355,9 +366,10 @@ TestPage.prototype.getTransactionPageClass = function(str)
 
 TestPage.prototype.parseTransactionTypeMenu = async function(elem)
 {
+	var self = this;
 	var res = { elem : elem, items : [], activeType : null };
 
-	var menuItems = await vqueryall(elem, 'span');
+	var menuItems = await this.queryAll(elem, 'span');
 	for(var i = 0; i < menuItems.length; i++)
 	{
 		var menuItem = menuItems[i].firstElementChild;
@@ -378,7 +390,7 @@ TestPage.prototype.parseTransactionTypeMenu = async function(elem)
 		menuItemObj.click = function()
 		{
 			if (!this.isActive)
-				return clickEmul(this.elem);
+				return self.click(this.elem);
 		};
 
 		res.items[menuItemObj.type] = menuItemObj;
@@ -394,6 +406,7 @@ TestPage.prototype.parseIconLink = async function(elem)
 	if (!elem)
 		return null;
 
+	var self = this;
 	var res = { elem : elem };
 
 	if (!hasClass(elem, 'iconlink'))
@@ -403,13 +416,13 @@ TestPage.prototype.parseIconLink = async function(elem)
 	if (!res.linkElem)
 		throw new Error('Link element not found');
 
-	res.titleElem = await vquery(res.linkElem, '.icontitle');
+	res.titleElem = await this.query(res.linkElem, '.icontitle');
 	if (!res.titleElem || !res.titleElem.firstElementChild)
 		throw new Error('Title element not found');
 	res.title = res.titleElem.firstElementChild.innerText;
 
 // Subtitle is optional
-	res.subTitleElem = await vquery(res.titleElem, '.subtitle');
+	res.subTitleElem = await this.query(res.titleElem, '.subtitle');
 	if (res.subTitleElem)
 	{
 		res.subtitle = res.subTitleElem.innerText;
@@ -417,7 +430,7 @@ TestPage.prototype.parseIconLink = async function(elem)
 
 	res.click = function()
 	{
-		return clickEmul(this.linkElem);
+		return self.click(this.linkElem);
 	};
 
 	return res;
@@ -429,14 +442,15 @@ TestPage.prototype.parseInputRow = async function(elem)
 	if (!elem)
 		return null;
 
+	var self = this;
 	var res = { elem : elem };
 
-	res.labelEl = await vquery(elem, 'label');
+	res.labelEl = await this.query(elem, 'label');
 	if (!res.labelEl)
 		throw new Error('Label element not found');
 
 	res.label = res.labelEl.innerText;
-	res.currElem = await vquery(elem, '.btn.rcurr_btn') || await vquery(elem, '.exchrate_comm');
+	res.currElem = await this.query(elem, '.btn.rcurr_btn') || await this.query(elem, '.exchrate_comm');
 	res.isCurrActive = false;
 	if (res.currElem)
 	{
@@ -459,27 +473,27 @@ TestPage.prototype.parseInputRow = async function(elem)
 	}
 	else
 	{
-		res.datePickerBtn = await vquery(elem, '.btn.cal_btn');
+		res.datePickerBtn = await this.query(elem, '.btn.cal_btn');
 	}
 
-	var t = await vquery(elem, 'input[type="hidden"]');
+	var t = await this.query(elem, 'input[type="hidden"]');
 	if (t)
 	{
 		res.hiddenValue = t.value;
 	}
 
-	res.valueInput = await vquery(elem, '.stretch_input > input');
+	res.valueInput = await this.query(elem, '.stretch_input > input');
 	res.value = res.valueInput.value;
 
 	res.input = function(val)
 	{
-		return inputEmul(res.valueInput, val);
+		return self.input(this.valueInput, val);
 	};
 
 	res.selectCurr = function(val)
 	{
-		if (res.isCurrActive && res.currDropDown)
-			return res.currDropDown.selectByValue(val);
+		if (this.isCurrActive && this.currDropDown)
+			return this.currDropDown.selectByValue(val);
 	};
 
 	return res;
@@ -491,9 +505,10 @@ TestPage.prototype.parseDatePickerRow = async function(elem)
 	if (!elem)
 		return null;
 
+	var self = this;
 	var res = { elem : elem };
 
-	var iconLinkElem = await vquery(elem, '.iconlink');
+	var iconLinkElem = await this.query(elem, '.iconlink');
 
 	res.iconLink = await this.parseIconLink(iconLinkElem);
 	res.inputRow = await this.parseInputRow(iconLinkElem.nextElementSibling);
@@ -506,7 +521,7 @@ TestPage.prototype.parseDatePickerRow = async function(elem)
 		if (isVisible(this.iconLink))
 		{
 			await this.iconLink.click()
-			await clickEmul(this.datePickerBtn);
+			await self.click(this.datePickerBtn);
 		}
 
 		return this.inputRow.input(val);
@@ -523,12 +538,12 @@ TestPage.prototype.parseWarningPopup = async function(elem)
 
 	var res = { elem : elem };
 
-	res.titleElem = await vquery(elem, '.popup_title');
+	res.titleElem = await this.query(elem, '.popup_title');
 	res.title = res.titleElem.innerText;
-	res.messageElem = await vquery(elem, '.popup_message > div');
+	res.messageElem = await this.query(elem, '.popup_message > div');
 	res.message = res.messageElem.innerText;
-	res.okBtn = await vquery(elem, '.popup_controls > .btn.ok_btn');
-	res.cancelBtn = await vquery(elem, '.popup_controls > .btn.cancel_btn');
+	res.okBtn = await this.query(elem, '.popup_controls > .btn.ok_btn');
+	res.cancelBtn = await this.query(elem, '.popup_controls > .btn.cancel_btn');
 
 	return res;
 };
@@ -701,10 +716,10 @@ TestPage.prototype.goToProfilePage = async function()
 	if (!this.isUserLoggedIn())
 		throw new Error('User is not logged in');
 
-	await clickEmul(this.header.user.menuBtn);		// open user menu
+	await this.click(this.header.user.menuBtn);		// open user menu
 
-	return navigation(() => {
-		setTimeout(() => clickEmul(this.header.user.profileBtn), 500);
+	return this.navigation(() => {
+		setTimeout(() => this.click(this.header.user.profileBtn), 500);
 	}, ProfilePage);
 };
 
@@ -712,10 +727,10 @@ TestPage.prototype.goToProfilePage = async function()
 // Click on logout link from user menu and return navigation promise
 TestPage.prototype.logoutUser = async function()
 {
-	await clickEmul(this.header.user.menuBtn);
+	await this.click(this.header.user.menuBtn);
 
-	return navigation(() => {
-		setTimeout(() => clickEmul(this.header.user.logoutBtn), 500);
+	return this.navigation(() => {
+		setTimeout(() => this.click(this.header.user.logoutBtn), 500);
 	}, LoginPage);
 };
 
@@ -725,5 +740,5 @@ TestPage.prototype.goToMainPage = function()
 	if (!this.isUserLoggedIn())
 		throw new Error('User not logged in');
 
-	return navigation(() => clickEmul(this.header.logo.linkElem), MainPage);
+	return this.navigation(() => this.click(this.header.logo.linkElem), MainPage);
 };

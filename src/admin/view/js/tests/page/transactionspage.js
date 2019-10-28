@@ -16,24 +16,24 @@ TransactionsPage.prototype.getTransactionObject = function(trans_id)
 
 TransactionsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : await vquery('.content_wrap > .heading > h1'),
- 				addBtn : await this.parseIconLink(await vquery('#add_btn')),
+	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
+ 				addBtn : await this.parseIconLink(await this.query('#add_btn')),
 				toolbar : {
-					elem : await vquery('#toolbar'),
-					editBtn : await this.parseIconLink(await vquery('#edit_btn')),
-					exportBtn : await this.parseIconLink(await vquery('#export_btn')),
-					delBtn : await this.parseIconLink(await vquery('#del_btn'))
+					elem : await this.query('#toolbar'),
+					editBtn : await this.parseIconLink(await this.query('#edit_btn')),
+					exportBtn : await this.parseIconLink(await this.query('#export_btn')),
+					delBtn : await this.parseIconLink(await this.query('#del_btn'))
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
 		throw new Error('Wrong transactions page structure');
 
-	res.typeMenu = await this.parseTransactionTypeMenu(await vquery('#trtype_menu'));
+	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 
 	res.title = res.titleEl.innerText;
-	res.transactions = await this.parseTransactionsList(await vquery('#tritems'));
+	res.transactions = await this.parseTransactionsList(await this.query('#tritems'));
 
-	res.delete_warning = await this.parseWarningPopup(await vquery('#delete_warning'));
+	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
 };
@@ -44,14 +44,14 @@ TransactionsPage.prototype.filterByType = async function(type)
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	return navigation(() => this.content.typeMenu.items[type].click(), TransactionsPage);
+	return this.navigation(() => this.content.typeMenu.items[type].click(), TransactionsPage);
 };
 
 
 // Click on add button and return navigation promise
 TransactionsPage.prototype.goToCreateTransaction = function()
 {
-	return navigation(() => this.content.addBtn.click(), ExpenseTransactionPage);
+	return this.navigation(() => this.content.addBtn.click(), ExpenseTransactionPage);
 };
 
 
@@ -75,7 +75,7 @@ TransactionsPage.prototype.goToUpdateTransaction = function(num)
 	if (!pageClass)
 		throw new Error('Wrong transaction type');
 
-	return navigation(() => this.content.toolbar.editBtn.click(), pageClass);
+	return this.navigation(() => this.content.toolbar.editBtn.click(), pageClass);
 };
 
 
@@ -125,6 +125,6 @@ TransactionsPage.prototype.deleteTransactions = function(tr)
 				if (!this.content.delete_warning.okBtn)
 					throw 'OK button not found';
 
-				return navigation(() => clickEmul(this.content.delete_warning.okBtn), TransactionsPage);
+				return this.navigation(() => this.click(this.content.delete_warning.okBtn), TransactionsPage);
 			});
 };

@@ -12,22 +12,22 @@ PersonPage.prototype.parseContent = async function()
 {
 	var res = {};
 
-	res.headingElem = await vquery('.heading > h1');
+	res.headingElem = await this.query('.heading > h1');
 	if (!res.headingElem)
 		throw new Error('Heading element not found');
 	res.heading = res.headingElem.innerText;
 
-	res.formElem = await vquery('form');
+	res.formElem = await this.query('form');
 	if (!res.formElem)
 		throw new Error('Form element not found');
 
 	res.isEdit = (res.formElem.firstElementChild.id == 'pid');
 
-	res.name = await this.parseInputRow(await vquery(res.formElem, 'div.non_float'));
+	res.name = await this.parseInputRow(await this.query(res.formElem, 'div.non_float'));
 	if (!res.name)
 		throw new Error('Person name input not found');
 
-	res.submitBtn = await vquery('.acc_controls .ok_btn');
+	res.submitBtn = await this.query('.acc_controls .ok_btn');
 	if (!res.submitBtn)
 		throw new Error('Submit button not found');
 
@@ -46,5 +46,5 @@ PersonPage.prototype.createPerson = async function(personName)
 {
 	await this.inputName(personName);
 
-	return navigation(() => clickEmul(this.content.submitBtn), PersonsPage);
+	return this.navigation(() => this.click(this.content.submitBtn), PersonsPage);
 };

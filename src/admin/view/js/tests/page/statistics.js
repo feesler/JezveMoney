@@ -10,15 +10,15 @@ extend(StatisticsPage, TestPage);
 
 StatisticsPage.prototype.parseContent = async function()
 {
-	var res = { titleEl : await vquery('.content_wrap > .heading > h1') };
+	var res = { titleEl : await this.query('.content_wrap > .heading > h1') };
 
 	if (!res.titleEl)
 		throw new Error('Wrong statistics page structure');
 
-	res.typeMenu = await this.parseTransactionTypeMenu(await vquery('#trtype_menu'));
+	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 	res.title = res.titleEl.innerText;
 
-	let filtersList = await vqueryall('.tr_filter.filter_sel');
+	let filtersList = await this.queryAll('.tr_filter.filter_sel');
 	if (!filtersList || filtersList.length != 4)
 		throw new Error('Wrong statistics page structure');
 
@@ -27,11 +27,11 @@ StatisticsPage.prototype.parseContent = async function()
 	res.currencyDropDown = isVisible(filtersList[2]) ? await this.parseDropDown(filtersList[2].firstElementChild) : null;
 	res.groupDropDown = await this.parseDropDown(filtersList[3].firstElementChild);
 
-	res.chart = { elem : await vquery('#chart'), bars : [] };
+	res.chart = { elem : await this.query('#chart'), bars : [] };
 	if (!res.chart)
 		throw new Error('Wrong statistics page structure');
 
-	let bars = await vqueryall(res.chart.elem, 'svg > rect');
+	let bars = await this.queryAll(res.chart.elem, 'svg > rect');
 	bars.forEach(bar =>
 	{
 		if (bar.attributes['fill-opacity'].nodeValue == '1')
@@ -47,25 +47,25 @@ StatisticsPage.prototype.filterByType = function(type)
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	return navigation(() => this.content.typeMenu.items[type].click(), StatisticsPage);
+	return this.navigation(() => this.content.typeMenu.items[type].click(), StatisticsPage);
 };
 
 
 StatisticsPage.prototype.byAccounts = function()
 {
-	return navigation(() => this.content.filterByDropDown.selectByValue(0), StatisticsPage);
+	return this.navigation(() => this.content.filterByDropDown.selectByValue(0), StatisticsPage);
 };
 
 
 StatisticsPage.prototype.byCurrencies = function()
 {
-	return navigation(() => this.content.filterByDropDown.selectByValue(1), StatisticsPage);
+	return this.navigation(() => this.content.filterByDropDown.selectByValue(1), StatisticsPage);
 };
 
 
 StatisticsPage.prototype.selectAccount = function(acc_id)
 {
-	return navigation(() => this.content.accountsDropDown && this.content.accountsDropDown.selectByValue(acc_id), StatisticsPage);
+	return this.navigation(() => this.content.accountsDropDown && this.content.accountsDropDown.selectByValue(acc_id), StatisticsPage);
 };
 
 
@@ -78,7 +78,7 @@ StatisticsPage.prototype.selectAccountByPos = function(pos)
 
 StatisticsPage.prototype.selectCurrency = function(curr_id)
 {
-	return navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1), StatisticsPage);
+	return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1), StatisticsPage);
 };
 
 
@@ -91,7 +91,7 @@ StatisticsPage.prototype.selectCurrencyByPos = function(pos)
 
 StatisticsPage.prototype.groupBy = function(group)
 {
-	return navigation(() => this.content.groupDropDown.selectByValue(group), StatisticsPage);
+	return this.navigation(() => this.content.groupDropDown.selectByValue(group), StatisticsPage);
 };
 
 

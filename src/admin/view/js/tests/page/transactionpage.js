@@ -13,6 +13,7 @@ TransactionPage.prototype.parseTileRightItem = function(elem)
 	if (!elem || !elem.firstElementChild || !elem.firstElementChild.nextElementSibling || !elem.firstElementChild.nextElementSibling.firstElementChild)
 		return null;
 
+	var self = this;
 	var res = { elem : elem };
 	res.titleElem = elem.firstElementChild;
 	res.title = res.titleElem.innerText;
@@ -20,8 +21,8 @@ TransactionPage.prototype.parseTileRightItem = function(elem)
 	res.value = res.buttonElem.firstElementChild.innerText;
 	res.click = function()
 	{
-		clickEmul(res.buttonElem);
-	}
+		self.click(this.buttonElem);
+	};
 
 	return res;
 };
@@ -34,13 +35,13 @@ TransactionPage.prototype.parseTileBlock = async function(elem)
 
 	var res = { elem : elem };
 
-	var lbl = await vquery(elem, 'div > label');
+	var lbl = await this.query(elem, 'div > label');
 	if (!lbl)
 		throw new Error('Tile block label not found');
 
 	res.label = lbl.innerText;
-	res.tile = await this.parseTile(await vquery(elem, '.tile'));
-	res.dropDown = await this.parseDropDown(await vquery(elem, '.dd_attached'));
+	res.tile = await this.parseTile(await this.query(elem, '.tile'));
+	res.dropDown = await this.parseDropDown(await this.query(elem, '.dd_attached'));
 
 	res.selectAccount = function(val)
 	{
@@ -59,7 +60,7 @@ TransactionPage.prototype.parseCommentRow = async function(elem)
 
 	var res = { elem : elem };
 
-	var iconLinkElem = await vquery(elem, '.iconlink');
+	var iconLinkElem = await this.query(elem, '.iconlink');
 
 	res.iconLink = await this.parseIconLink(iconLinkElem);
 	res.inputRow = await this.parseInputRow(iconLinkElem.nextElementSibling);
@@ -87,7 +88,7 @@ TransactionPage.prototype.parseContent = async function()
 
 	if (res.isUpdate)
 	{
-		let hiddenEl = await vquery('input[name="transid"]');
+		let hiddenEl = await this.query('input[name="transid"]');
 		if (!hiddenEl)
 			throw new Error('Transaction id field not found');
 
@@ -96,58 +97,58 @@ TransactionPage.prototype.parseContent = async function()
 			throw new Error('Wrong transaction id');
 	}
 
-	res.heading = { elem : await vquery('.heading > h1') };
+	res.heading = { elem : await this.query('.heading > h1') };
 	if (res.heading.elem)
 		res.heading.title = res.heading.elem.innerText;
 
-	res.delBtn = await vquery('#del_btn');
+	res.delBtn = await this.query('#del_btn');
 
-	res.typeMenu = await this.parseTransactionTypeMenu(await vquery('#trtype_menu'));
+	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 
 	if (res.typeMenu.activeType == 4)	/* DEBT */
 	{
-		res.person = await this.parseTileBlock(await vquery('#person'));
+		res.person = await this.parseTileBlock(await this.query('#person'));
 		if (res.person)
-			res.person.id = parseInt((await vquery('#person_id')).value);
+			res.person.id = parseInt((await this.query('#person_id')).value);
 
-		res.account = await this.parseTileBlock(await vquery('#source'));
+		res.account = await this.parseTileBlock(await this.query('#source'));
 		if (res.account)
 		{
-			res.account.id = parseInt((await vquery('#acc_id')).value);
-			res.accTileContainer = { elem : await vquery('#source .tile_container') };
+			res.account.id = parseInt((await this.query('#acc_id')).value);
+			res.accTileContainer = { elem : await this.query('#source .tile_container') };
 		}
 
-		res.operation = await this.parseOperation(await vquery('#operation'));
+		res.operation = await this.parseOperation(await this.query('#operation'));
 
-		res.selaccount = { elem : await vquery('#selaccount') };
-		res.noacc_btn = { elem : await vquery('#noacc_btn') };
+		res.selaccount = { elem : await this.query('#selaccount') };
+		res.noacc_btn = { elem : await this.query('#noacc_btn') };
 	}
 	else
 	{
-		res.source = await this.parseTileBlock(await vquery('#source'));
+		res.source = await this.parseTileBlock(await this.query('#source'));
 		if (res.source)
-			res.source.id = parseInt((await vquery('#src_id')).value);
-		res.destination = await this.parseTileBlock(await vquery('#destination'));
+			res.source.id = parseInt((await this.query('#src_id')).value);
+		res.destination = await this.parseTileBlock(await this.query('#destination'));
 		if (res.destination)
-			res.destination.id = parseInt((await vquery('#dest_id')).value);
+			res.destination.id = parseInt((await this.query('#dest_id')).value);
 	}
 
-	res.src_amount_left = await this.parseTileRightItem(await vquery('#src_amount_left'));
-	res.dest_amount_left = await this.parseTileRightItem(await vquery('#dest_amount_left'));
-	res.src_res_balance_left = await this.parseTileRightItem(await vquery('#src_res_balance_left'));
-	res.dest_res_balance_left = await this.parseTileRightItem(await vquery('#dest_res_balance_left'));
-	res.exch_left = await this.parseTileRightItem(await vquery('#exch_left'));
+	res.src_amount_left = await this.parseTileRightItem(await this.query('#src_amount_left'));
+	res.dest_amount_left = await this.parseTileRightItem(await this.query('#dest_amount_left'));
+	res.src_res_balance_left = await this.parseTileRightItem(await this.query('#src_res_balance_left'));
+	res.dest_res_balance_left = await this.parseTileRightItem(await this.query('#dest_res_balance_left'));
+	res.exch_left = await this.parseTileRightItem(await this.query('#exch_left'));
 
-	res.src_amount_row = await this.parseInputRow(await vquery('#src_amount_row'));
-	res.dest_amount_row = await this.parseInputRow(await vquery('#dest_amount_row'));
-	res.exchange_row = await this.parseInputRow(await vquery('#exchange'));
-	res.result_balance_row = await this.parseInputRow(await vquery('#result_balance'));
-	res.result_balance_dest_row = await this.parseInputRow(await vquery('#result_balance_dest'));
+	res.src_amount_row = await this.parseInputRow(await this.query('#src_amount_row'));
+	res.dest_amount_row = await this.parseInputRow(await this.query('#dest_amount_row'));
+	res.exchange_row = await this.parseInputRow(await this.query('#exchange'));
+	res.result_balance_row = await this.parseInputRow(await this.query('#result_balance'));
+	res.result_balance_dest_row = await this.parseInputRow(await this.query('#result_balance_dest'));
 
-	res.datePicker = await this.parseDatePickerRow((await vquery('#calendar_btn')).parentNode);
-	res.comment_row = await this.parseCommentRow((await vquery('#comm_btn')).parentNode);
+	res.datePicker = await this.parseDatePickerRow((await this.query('#calendar_btn')).parentNode);
+	res.comment_row = await this.parseCommentRow((await this.query('#comm_btn')).parentNode);
 
-	res.submitBtn = await vquery('#submitbtn');
+	res.submitBtn = await this.query('#submitbtn');
 	res.cancelBtn = res.submitBtn.nextElementSibling;
 
 	return res;
@@ -294,7 +295,7 @@ TransactionPage.prototype.changeTransactionType = function(type)
 
 	var newPageClass = this.getTransactionPageClass(this.content.typeMenu.items[type].text);
 
-	return navigation(() => this.content.typeMenu.items[type].click(), newPageClass);
+	return this.navigation(() => this.content.typeMenu.items[type].click(), newPageClass);
 };
 
 
@@ -302,7 +303,7 @@ TransactionPage.prototype.submit = function()
 {
 	var navPageClass = (this.content.isUpdate) ? TransactionsPage : MainPage;
 
-	return navigation(() => clickEmul(this.content.submitBtn), navPageClass);
+	return this.navigation(() => this.click(this.content.submitBtn), navPageClass);
 };
 
 

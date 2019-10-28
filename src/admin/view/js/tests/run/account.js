@@ -42,7 +42,7 @@ async function createAccount1(page)
 	await test('Input (1000.01) balance', () => page.inputBalance('1000.01'), page, state);
 
 
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
 			.then(page => checkCreateAccount(page, { name : 'acc_1', balance : 1000.01, curr_id : 1 }));
 }
 
@@ -76,7 +76,7 @@ async function createAccount2(page)
 	state.values.tile.balance = '€ 1 000.01';
 	await test('Account tile balance on EUR 1 000.01 balance input field', () => page.inputBalance('1000.01'), page, state);
 
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
 			.then(page => checkCreateAccount(page, { name : 'acc_2', balance : 1000.01, curr_id : 3 }));
 }
 
@@ -97,7 +97,7 @@ async function editAccount1(page)
 	await test('Icon change', () => page.changeIcon(1), page, state);
 
 // Submit
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
 			.then(checkUpdateAccount.bind(null, { updatePos : 0, name : 'acc_1', balance : 1000.01, curr_id : 2, icon : tileIcons[1] }));
 }
 
@@ -155,7 +155,7 @@ async function createAccountWithParam(page, params)
 		await test('Tile icon update', () => page.changeIcon(params.icon), page, state);
 	}
 
-	return navigation(() => clickEmul(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
 			.then(page => checkCreateAccount(page, params));
 }
 

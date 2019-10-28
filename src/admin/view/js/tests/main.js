@@ -15,9 +15,9 @@ function test(descr, action, page, state)
 			{
 				let expState = (typeof state === 'undefined') ? page.expectedState : state;
 				let res = page.checkState(expState);
-				addResult(descr, res);
+				page.addResult(descr, res);
 			})
-			.catch(e => addResult(descr, false, e.message));
+			.catch(e => page.addResult(descr, false, e.message));
 }
 
 
@@ -39,7 +39,7 @@ async function startTests(page)
 
 function accountTests(page)
 {
-	setBlock('Accounts', 1);
+	page.setBlock('Accounts', 1);
 
 	return goToMainPage(page)
 			.then(page => page.goToAccounts())
@@ -65,7 +65,7 @@ function accountTests(page)
 
 function personTests(page)
 {
-	setBlock('Persons', 1);
+	page.setBlock('Persons', 1);
 
 	return goToMainPage(page)
 			.then(page => page.goToPersons())
@@ -81,7 +81,7 @@ function personTests(page)
 
 function transactionTests(page)
 {
-	setBlock('Transactions', 1);
+	page.setBlock('Transactions', 1);
 
 	return createTransactionTests(page)
 			.then(updateTransactionTests)
@@ -91,7 +91,7 @@ function transactionTests(page)
 
 function statisticsTests(page)
 {
-	setBlock('Statistics', 1);
+	page.setBlock('Statistics', 1);
 
 	return goToMainPage(page)
 			.then(page => page.goToStatistics())
@@ -181,7 +181,7 @@ function statisticsTests(page)
 
 function createTransactionTests(page)
 {
-	setBlock('Create transaction', 1);
+	page.setBlock('Create transaction', 1);
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
@@ -204,7 +204,7 @@ function createTransactionTests(page)
 
 function updateTransactionTests(page)
 {
-	setBlock('Update transaction', 1);
+	page.setBlock('Update transaction', 1);
 
 	return runUpdateExpenseTests(page)
 			.then(page => runUpdateIncomeTests(page))
@@ -215,7 +215,7 @@ function updateTransactionTests(page)
 
 function deleteTransactionTests(page)
 {
-	setBlock('Delete transaction', 1);
+	page.setBlock('Delete transaction', 1);
 
 	return runDeleteExpenseTests(page)
 			.then(page => runDeleteIncomeTests(page))
@@ -254,7 +254,7 @@ function goToMainPage(page)
 
 function runCreateExpenseTests(page)
 {
-	setBlock('Create expense transactions', 1);
+	page.setBlock('Create expense transactions', 1);
 
 	return createExpense(page, 0, 0, { destAmount : '123.7801' })
 			.then(page => createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
@@ -265,7 +265,7 @@ function runCreateExpenseTests(page)
 
 function runCreateIncomeTests(page)
 {
-	setBlock('Create income transactions', 1);
+	page.setBlock('Create income transactions', 1);
 
 	return createIncome(page, 0, 0, { srcAmount : '10023.7801' })
 			.then(page => createIncome(page, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
@@ -277,7 +277,7 @@ function runCreateIncomeTests(page)
 
 function runCreateTransferTests(page)
 {
-	setBlock('Create transfer transactions', 1);
+	page.setBlock('Create transfer transactions', 1);
 
 	return createTransfer(page, 0, { srcAmount : '1000' })
 			.then(page => createTransfer(page, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' }))
@@ -289,7 +289,7 @@ function runCreateTransferTests(page)
 
 function runCreateDebtTests(page)
 {
-	setBlock('Submit debt transactions', 1);
+	page.setBlock('Submit debt transactions', 1);
 
 	return createDebt(page, 0, { srcAmount : '1000' })
 			.then(page => createDebt(page, 0, { debtType : false, acc : 2, srcAmount : '200' }))
@@ -302,7 +302,7 @@ function runCreateDebtTests(page)
 
 function runUpdateExpenseTests(page)
 {
-	setBlock('Update expense transactions', 2);
+	page.setBlock('Update expense transactions', 2);
 
 	return updateExpense(page, 3, { destAmount : '124.7701' })
 			.then(page => updateExpense(page, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 }))
@@ -313,7 +313,7 @@ function runUpdateExpenseTests(page)
 
 function runUpdateIncomeTests(page)
 {
-	setBlock('Update income transactions', 2);
+	page.setBlock('Update income transactions', 2);
 
 	return updateIncome(page, 0, { srcAmount : '100.001' })
 			.then(page => updateIncome(page, 1, { srcAmount : '0.02' }))
@@ -324,7 +324,7 @@ function runUpdateIncomeTests(page)
 
 function runUpdateTransferTests(page)
 {
-	setBlock('Update transfer transactions', 2);
+	page.setBlock('Update transfer transactions', 2);
 
 	return updateTransfer(page, 0, { destAcc : 0, srcAmount : '11' })
 			.then(page => updateTransfer(page, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' }))
@@ -336,7 +336,7 @@ function runUpdateTransferTests(page)
 
 function runUpdateDebtTests(page)
 {
-	setBlock('Update debt transactions', 2);
+	page.setBlock('Update debt transactions', 2);
 
 	return updateDebt(page, 0, { person : 0, srcAmount : '105' })
 			.then(page => updateDebt(page, 1, { acc : 1, srcAmount : '105' }))
@@ -349,7 +349,7 @@ function runUpdateDebtTests(page)
 
 function runDeleteExpenseTests(page)
 {
-	setBlock('Delete expense transactions', 2);
+	page.setBlock('Delete expense transactions', 2);
 
 	return deleteTransactions(page, EXPENSE, [0])
 			.then(page => deleteTransactions(page, EXPENSE, [0, 1]));
@@ -358,7 +358,7 @@ function runDeleteExpenseTests(page)
 
 function runDeleteIncomeTests(page)
 {
-	setBlock('Delete income transactions', 2);
+	page.setBlock('Delete income transactions', 2);
 
 	return deleteTransactions(page, INCOME, [0])
 			.then(page => deleteTransactions(page, INCOME, [0, 1, 2]));
@@ -367,7 +367,7 @@ function runDeleteIncomeTests(page)
 
 function runDeleteTransferTests(page)
 {
-	setBlock('Delete transfer transactions', 2);
+	page.setBlock('Delete transfer transactions', 2);
 
 	return deleteTransactions(page, TRANSFER, [1])
 			.then(page => deleteTransactions(page, TRANSFER, [0, 2]));
@@ -376,7 +376,7 @@ function runDeleteTransferTests(page)
 
 function runDeleteDebtTests(page)
 {
-	setBlock('Delete debt transactions', 2);
+	page.setBlock('Delete debt transactions', 2);
 
 	return deleteTransactions(page, DEBT, [0])
 			.then(page => deleteTransactions(page, DEBT, [0, 1]));
@@ -609,7 +609,7 @@ async function reloginAsTester(page)
 	}
 	else
 	{
-		page = new LoginPage(page.props);
+		page = new LoginPage(page.props.environment);
 		await page.parse();
 	};
 

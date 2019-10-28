@@ -2,7 +2,11 @@
 <script>
 var currency = <?=f_json_encode($currArr)?>;
 var icons = <?=f_json_encode($icons)?>;
-onReady(initTests);
+onReady(function()
+{
+	if (Environment && isFunction(Environment.init))
+		Environment.init(startTests);
+});
 </script>
 </head>
 <body>

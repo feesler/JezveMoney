@@ -111,7 +111,7 @@ function updateTransfer(page, pos, params)
 	if (!isObject(params))
 		throw new Error('Parameters not specified');
 
-	setBlock('Update transfer transaction ' + pos, 3);
+	page.setBlock('Update transfer transaction ' + pos, 3);
 
 	return goToMainPage(page)
 			.then(page => page.goToTransactions())
@@ -249,7 +249,7 @@ function updateTransfer(page, pos, params)
 
 async function transferTransactionLoop(page, actionState, action)
 {
-	setBlock('Transfer', 2);
+	page.setBlock('Transfer', 2);
 	await test('Initial state of new transfer page', async () => page.setExpectedState(0), page);
 
 	actionState = parseInt(actionState);
