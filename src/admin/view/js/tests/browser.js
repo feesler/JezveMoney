@@ -191,7 +191,7 @@ var Environment = (function()
 				if (!vdoc)
 					throw new Error('View document not found');
 
-				checkPHPerrors(vdoc.body.innerHTML);
+				checkPHPerrors(env, vdoc.documentElement.innerHTML);
 				try
 				{
 					let pageClass = await route(env, await getUrl());

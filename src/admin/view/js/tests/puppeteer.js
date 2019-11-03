@@ -200,7 +200,7 @@ async function navigation(action)
 		{
 			let content = await browserPage.content();
 
-			common.checkPHPerrors(content);
+			common.checkPHPerrors(Environment, content);
 
 			let pageClass = await route(Environment, await getUrl());
 

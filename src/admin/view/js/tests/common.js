@@ -71,10 +71,12 @@ function copyObject(item)
 }
 
 
-function checkPHPerrors(content)
+function checkPHPerrors(env, content)
 {
 	var errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>'];
 
+	if (!env)
+		return false;
 	if (!content)
 		return true;
 
@@ -84,7 +86,7 @@ function checkPHPerrors(content)
 	});
 
 	if (found)
-		Environment.addResult('PHP error signature found', false);
+		env.addResult('PHP error signature found', false);
 }
 
 
