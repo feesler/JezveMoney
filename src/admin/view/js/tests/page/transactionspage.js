@@ -71,7 +71,7 @@ TransactionsPage.prototype.goToCreateTransaction = function()
 // Select specified account, click on edit button and return navigation promise
 TransactionsPage.prototype.goToUpdateTransaction = async function(num)
 {
-	if (!this.content.transactions || this.content.transactions.length <= num)
+	if (!this.content.transactions || this.content.transactions.length <= num || num < 0)
 		throw new Error('Wrong transaction number specified');
 
 	await this.content.transactions[num].click();
@@ -98,7 +98,7 @@ TransactionsPage.prototype.deleteTransactions = function(tr)
 		return prev
 				.then(() => this.performAction(() =>
 				{
-					if (tr_num >= this.content.transactions.length)
+					if (tr_num < 0 || tr_num >= this.content.transactions.length)
 						throw 'Wrong account number';
 
 					return this.content.transactions[tr_num].click();
