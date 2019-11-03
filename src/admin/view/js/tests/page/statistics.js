@@ -1,3 +1,12 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Statistics page class
 function StatisticsPage()
 {
@@ -48,19 +57,19 @@ StatisticsPage.prototype.filterByType = async function(type)
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	return this.navigation(() => this.content.typeMenu.items[type].click(), StatisticsPage);
+	return this.navigation(() => this.content.typeMenu.items[type].click());
 };
 
 
 StatisticsPage.prototype.byAccounts = function()
 {
-	return this.navigation(() => this.content.filterByDropDown.selectByValue(0), StatisticsPage);
+	return this.navigation(() => this.content.filterByDropDown.selectByValue(0));
 };
 
 
 StatisticsPage.prototype.byCurrencies = function()
 {
-	return this.navigation(() => this.content.filterByDropDown.selectByValue(1), StatisticsPage);
+	return this.navigation(() => this.content.filterByDropDown.selectByValue(1));
 };
 
 
@@ -84,7 +93,7 @@ StatisticsPage.prototype.selectAccountByPos = async function(pos)
 
 StatisticsPage.prototype.selectCurrency = function(curr_id)
 {
-	return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1), StatisticsPage);
+	return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1));
 };
 
 
@@ -97,7 +106,7 @@ StatisticsPage.prototype.selectCurrencyByPos = function(pos)
 
 StatisticsPage.prototype.groupBy = function(group)
 {
-	return this.navigation(() => this.content.groupDropDown.selectByValue(group), StatisticsPage);
+	return this.navigation(() => this.content.groupDropDown.selectByValue(group));
 };
 
 
@@ -129,3 +138,7 @@ StatisticsPage.prototype.groupByYear = function(group)
 {
 	return this.groupBy(4);
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = StatisticsPage;

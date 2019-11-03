@@ -1,3 +1,33 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const common = require('../common.js');
+	var test = common.test;
+
+	const _ = require('../../../../../view/js/common.js');
+	var setParam = _.setParam;
+	var isArray = _.isArray;
+
+	const a = require('../../../../../view/js/app.js');
+	var idSearch = a.idSearch;
+	var normalize = a.normalize;
+
+	var c = require('../../../../../view/js/currency.js');
+	var formatCurrency = c.formatCurrency;
+	var getCurrency = c.getCurrency;
+
+	var App = null;
+}
+
+
+function initAccounts(props)
+{
+	props = props || {};
+
+	if ('App' in props)
+		App = props.App;
+}
+
+
 async function createAccount1(page)
 {
 	var state = { visibility : { heading : true, iconDropDown : true, name : true, currDropDown : true },
@@ -34,15 +64,15 @@ async function createAccount1(page)
 	await test('Input (10000000.01) balance', () => page.inputBalance('10000000.01'), page, state);
 
 // Change icon to safe
-	setParam(state.values,  { iconDropDown : { textValue : 'Safe' },
-							tile : { icon : tileIcons[2] } });
+	setParam(state.values, { iconDropDown : { textValue : 'Safe' },
+							tile : { icon : page.tileIcons[2] } });
 	await test('Change icon', () => page.changeIcon(2), page, state);
 
 	setParam(state.values, { tile : { balance : '1 000.01 ₽' }, balance : '1000.01' });
 	await test('Input (1000.01) balance', () => page.inputBalance('1000.01'), page, state);
 
 
-	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn))
 			.then(page => checkCreateAccount(page, { name : 'acc_1', balance : 1000.01, curr_id : 1 }));
 }
 
@@ -57,6 +87,7 @@ async function checkCreateAccount(page, params)
 	await test('Account create', async () => {}, page, state);
 
 	App.accounts = page.content.tiles;
+	App.notify();
 
 	return page;
 }
@@ -76,14 +107,14 @@ async function createAccount2(page)
 	state.values.tile.balance = '€ 1 000.01';
 	await test('Account tile balance on EUR 1 000.01 balance input field', () => page.inputBalance('1000.01'), page, state);
 
-	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn))
 			.then(page => checkCreateAccount(page, { name : 'acc_2', balance : 1000.01, curr_id : 3 }));
 }
 
 
 async function editAccount1(page)
 {
-	var state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
+	var state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : page.tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
 
 	await test('Initial state of edit account page', async () => {}, page, state);
 
@@ -93,12 +124,12 @@ async function editAccount1(page)
 	await test('USD currency select', () => page.changeCurrency(2), page, state);
 
 // Change icon to purse
-	state.values.tile.icon = tileIcons[1];
+	state.values.tile.icon = page.tileIcons[1];
 	await test('Icon change', () => page.changeIcon(1), page, state);
 
 // Submit
-	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
-			.then(checkUpdateAccount.bind(null, { updatePos : 0, name : 'acc_1', balance : 1000.01, curr_id : 2, icon : tileIcons[1] }));
+	return page.navigation(() => page.click(page.content.submitBtn))
+			.then(checkUpdateAccount.bind(null, { updatePos : 0, name : 'acc_1', balance : 1000.01, curr_id : 2, icon : page.tileIcons[1] }));
 }
 
 
@@ -112,6 +143,7 @@ async function checkUpdateAccount(params, page)
 	await test('Account update', async () => {}, page, state);
 
 	App.accounts = page.content.tiles;
+	App.notify();
 
 	return page;
 }
@@ -148,14 +180,14 @@ async function createAccountWithParam(page, params)
 // Change icon
 	if (params.icon)
 	{
-		if (params.icon < 0 || params.icon > tileIcons.length)
+		if (params.icon < 0 || params.icon > page.tileIcons.length)
 			throw new Error('Icon not found');
 
-		setParam(state.values, { iconDropDown : { textValue : tileIcons[params.icon].title }, tile : { icon : tileIcons[params.icon] } });
+		setParam(state.values, { iconDropDown : { textValue : page.tileIcons[params.icon].title }, tile : { icon : page.tileIcons[params.icon] } });
 		await test('Tile icon update', () => page.changeIcon(params.icon), page, state);
 	}
 
-	return page.navigation(() => page.click(page.content.submitBtn), AccountsPage)
+	return page.navigation(() => page.click(page.content.submitBtn))
 			.then(page => checkCreateAccount(page, params));
 }
 
@@ -170,7 +202,24 @@ function deleteAccounts(page, accounts)
 				await test('Delete accounts [' + accounts.join() + ']', async () => {}, page, state);
 
 				App.accounts = page.content.tiles;
+				App.notify();
 
 				return page;
 			});
+}
+
+
+var runAccounts = { init : initAccounts,
+					createAccount1 : createAccount1,
+					checkCreateAccount : checkCreateAccount,
+					createAccount2 : createAccount2,
+					editAccount1 : editAccount1,
+					checkUpdateAccount : checkUpdateAccount,
+					createAccountWithParam : createAccountWithParam,
+					deleteAccounts : deleteAccounts };
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = runAccounts;
 }

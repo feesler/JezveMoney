@@ -1,3 +1,32 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../view/js/common.js');
+	var isArray = _.isArray;
+	var isObject = _.isObject;
+}
+
+
+// Check object is date
+function isDate(obj)
+{
+	return (obj instanceof Date && !isNaN(obj.valueOf()));
+}
+
+
+// Format date as DD.MM.YYYY
+function formatDate(date, month, year)
+{
+	if (isDate(date) && !month && !year)
+	{
+		month = date.getMonth();
+		year = date.getFullYear();
+		date = date.getDate();
+	}
+
+	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year;
+}
+
+
 function getPosById(arr, id)
 {
 	var pos = -1;
@@ -56,4 +85,32 @@ function checkPHPerrors(content)
 
 	if (found)
 		Environment.addResult('PHP error signature found', false);
+}
+
+
+// Run action, check state and add result to the list
+function test(descr, action, page, state)
+{
+	let actPromise = action();
+	if (!actPromise)
+		throw new Error('Action should return promise');
+
+	return actPromise
+			.then(async () =>
+			{
+				let expState = (typeof state === 'undefined') ? page.expectedState : state;
+				let res = await page.checkState(expState);
+				page.addResult(descr, res);
+			})
+			.catch(e => page.addResult(descr, false, e.message));
+}
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = { formatDate : formatDate,
+						getPosById : getPosById,
+						copyObject : copyObject,
+						checkPHPerrors : checkPHPerrors,
+					 	test : test };
 }

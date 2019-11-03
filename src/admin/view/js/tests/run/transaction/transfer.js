@@ -1,3 +1,34 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const common = require('../../common.js');
+	var test = common.test;
+	var formatDate = common.formatDate;
+
+	const _ = require('../../../../../../view/js/common.js');
+	var isObject = _.isObject;
+	var setParam = _.setParam;
+
+	const a = require('../../../../../../view/js/app.js');
+	var normalize = a.normalize;
+	var normalizeExch = a.normalizeExch;
+	var TRANSFER = a.TRANSFER;
+
+	var c = require('../../../../../../view/js/currency.js');
+	var formatCurrency = c.formatCurrency;
+
+	var App = null;
+}
+
+
+function initTransferTransaction(props)
+{
+	props = props || {};
+
+	if ('App' in props)
+		App = props.App;
+}
+
+
 async function submitTransferTransaction(page, params)
 {
 	if ('srcAcc' in params)
@@ -40,6 +71,7 @@ async function submitTransferTransaction(page, params)
 									destAccPos : await page.getAccountPos(page.model.destAccount.id),
 								 	srcAmount : page.model.fSrcAmount,
 								 	destAmount : page.model.fDestAmount };
+	App.notify();
 
 	return page.submit();
 }
@@ -47,7 +79,7 @@ async function submitTransferTransaction(page, params)
 
 function createTransfer(page, onState, params)
 {
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(TRANSFER))
 			.then(page => transferTransactionLoop(page, onState, page => submitTransferTransaction(page, params)))
@@ -95,6 +127,7 @@ function createTransfer(page, onState, params)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.notify();
 
 				return page;
 			});
@@ -113,7 +146,7 @@ function updateTransfer(page, pos, params)
 
 	page.setBlock('Update transfer transaction ' + pos, 3);
 
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(TRANSFER))
 			.then(async page =>
@@ -125,6 +158,7 @@ function updateTransfer(page, pos, params)
 					throw new Error('Transaction not found');
 
 				App.beforeUpdateTransaction.trObj = trObj;
+				App.notify();
 
 				return page.goToUpdateTransaction(pos);
 			})
@@ -177,7 +211,7 @@ function updateTransfer(page, pos, params)
 
 				await test('Transaction update', async () => {}, page, state);
 
-				return goToMainPage(page);
+				return App.goToMainPage(page);
 			})
 			.then(async page =>
 			{
@@ -484,4 +518,16 @@ async function transferTransactionLoop(page, actionState, action)
 	await test('(48) Change destination account', () => page.changeDestAccountByPos(1), page);
 
 	return page;
+}
+
+
+var runTransfer = { init : initTransferTransaction,
+					createTransfer : createTransfer,
+					updateTransfer : updateTransfer,
+					transferTransactionLoop : transferTransactionLoop };
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = runTransfer;
 }

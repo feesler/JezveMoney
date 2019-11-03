@@ -1,3 +1,36 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const common = require('../../common.js');
+	var test = common.test;
+	var formatDate = common.formatDate;
+
+	const _ = require('../../../../../../view/js/common.js');
+	var isObject = _.isObject;
+	var setParam = _.setParam;
+
+	const a = require('../../../../../../view/js/app.js');
+	var idSearch = a.idSearch;
+	var normalize = a.normalize;
+	var normalizeExch = a.normalizeExch;
+	var EXPENSE = a.EXPENSE;
+
+	var c = require('../../../../../../view/js/currency.js');
+	var getCurrency = c.getCurrency;
+	var formatCurrency = c.formatCurrency;
+
+	var App = null;
+}
+
+
+function initExpenseTransaction(props)
+{
+	props = props || {};
+
+	if ('App' in props)
+		App = props.App;
+}
+
+
 async function submitExpenseTransaction(page, params)
 {
 	if ('srcAcc' in params)
@@ -40,13 +73,15 @@ async function submitExpenseTransaction(page, params)
 	if (page.model.isUpdate)
 		App.beforeSubmitTransaction.id = page.model.id;
 
+	App.notify();
+
 	return page.submit();
 }
 
 
 function createExpense(page, accNum, onState, params)
 {
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
 			.then(page => expenseTransactionLoop(page, onState, page => submitExpenseTransaction(page, params)))
 			.then(async page =>
@@ -86,6 +121,7 @@ function createExpense(page, accNum, onState, params)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.notify();
 
 				return page;
 			});
@@ -102,7 +138,7 @@ function updateExpense(page, pos, params)
 	if (!isObject(params))
 		throw new Error('Parameters not specified');
 
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(EXPENSE))
 			.then(async page =>
@@ -114,6 +150,7 @@ function updateExpense(page, pos, params)
 					throw new Error('Transaction not found');
 
 				App.beforeUpdateTransaction.trObj = trObj;
+				App.notify();
 
 				return page.goToUpdateTransaction(pos);
 			})
@@ -132,6 +169,7 @@ function updateExpense(page, pos, params)
 								destAmount : page.model.fDestAmount,
 								date : page.model.date,
 								comment : page.model.comment});
+				App.notify();
 
 				return submitExpenseTransaction(page, params);
 			})
@@ -160,7 +198,7 @@ function updateExpense(page, pos, params)
 
 				await test('Transaction update', async () => {}, page, state);
 
-				return goToMainPage(page);
+				return App.goToMainPage(page);
 			})
 			.then(async page =>
 			{
@@ -377,4 +415,16 @@ async function expenseTransactionLoop(page, actionState, action)
 
 
 	return page;
+}
+
+
+var runExpense = { init : initExpenseTransaction,
+					createExpense : createExpense,
+					updateExpense : updateExpense,
+					expenseTransactionLoop : expenseTransactionLoop };
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = runExpense;
 }

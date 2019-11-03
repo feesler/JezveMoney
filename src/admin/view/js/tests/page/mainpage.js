@@ -1,3 +1,12 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Main page tests
 function MainPage()
 {
@@ -55,7 +64,7 @@ MainPage.prototype.goToAccounts = function()
 	if (widget.title != 'Accounts')
 		throw new Error('Wrong widget');
 
-	return this.navigation(() => this.click(widget.linkElem), AccountsPage);
+	return this.navigation(() => this.click(widget.linkElem));
 };
 
 
@@ -74,7 +83,7 @@ MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 	var tile = accWidget.tiles[accNum];
 	var link = tile.linkElem;
 
-	return this.navigation(() => this.click(link), ExpenseTransactionPage);
+	return this.navigation(() => this.click(link));
 };
 
 
@@ -87,7 +96,7 @@ MainPage.prototype.goToTransactions = function()
 	if (widget.title != 'Transactions')
 		throw new Error('Wrong widget');
 
-	return this.navigation(() => this.click(widget.linkElem), TransactionsPage);
+	return this.navigation(() => this.click(widget.linkElem));
 };
 
 
@@ -100,7 +109,7 @@ MainPage.prototype.goToPersons = function()
 	if (widget.title != 'Persons')
 		throw new Error('Wrong widget');
 
-	return this.navigation(() => this.click(widget.linkElem), PersonsPage);
+	return this.navigation(() => this.click(widget.linkElem));
 };
 
 
@@ -113,5 +122,9 @@ MainPage.prototype.goToStatistics = function()
 	if (widget.title != 'Statistics')
 		throw new Error('Wrong widget');
 
-	return this.navigation(() => this.click(widget.linkElem), StatisticsPage);
+	return this.navigation(() => this.click(widget.linkElem));
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = MainPage;

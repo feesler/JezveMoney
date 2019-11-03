@@ -1,3 +1,12 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Log in page class
 function LoginPage()
 {
@@ -25,5 +34,9 @@ LoginPage.prototype.loginAs = async function(login, password)
 {
 	await this.input(this.content.loginInp, login);
  	await this.input(this.content.passwordInp, password);
-	return this.navigation(() => this.click(this.content.submitBtn), MainPage);
+	return this.navigation(() => this.click(this.content.submitBtn));
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = LoginPage;

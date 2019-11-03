@@ -1,3 +1,16 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+	var isArray = _.isArray;
+
+	const a = require('../../../../../view/js/app.js');
+	var idSearch = a.idSearch;
+
+	var TestPage = require('./page.js');
+}
+
+
 // List of transactions page class
 function TransactionsPage()
 {
@@ -44,14 +57,14 @@ TransactionsPage.prototype.filterByType = async function(type)
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	return this.navigation(() => this.content.typeMenu.items[type].click(), TransactionsPage);
+	return this.navigation(() => this.content.typeMenu.items[type].click());
 };
 
 
 // Click on add button and return navigation promise
 TransactionsPage.prototype.goToCreateTransaction = function()
 {
-	return this.navigation(() => this.content.addBtn.click(), ExpenseTransactionPage);
+	return this.navigation(() => this.content.addBtn.click());
 };
 
 
@@ -61,22 +74,13 @@ TransactionsPage.prototype.goToUpdateTransaction = async function(num)
 	if (!this.content.transactions || this.content.transactions.length <= num)
 		throw new Error('Wrong transaction number specified');
 
-	this.content.transactions[num].click();
+	await this.content.transactions[num].click();
 
 	if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
 		!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update transaction button not visible';
 
-	var transObj = this.getTransactionObject(this.content.transactions[num].id);
-	if (!transObj)
-		throw new Error('Transaction object not found');
-
-	var typeStr = this.getTransactionTypeStr(transObj.type);
-	var pageClass = this.getTransactionPageClass(typeStr);
-	if (!pageClass)
-		throw new Error('Wrong transaction type');
-
-	return this.navigation(() => this.content.toolbar.editBtn.click(), pageClass);
+	return this.navigation(() => this.content.toolbar.editBtn.click());
 };
 
 
@@ -122,6 +126,10 @@ TransactionsPage.prototype.deleteTransactions = function(tr)
 				if (!this.content.delete_warning.okBtn)
 					throw 'OK button not found';
 
-				return this.navigation(() => this.click(this.content.delete_warning.okBtn), TransactionsPage);
+				return this.navigation(() => this.click(this.content.delete_warning.okBtn));
 			});
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = TransactionsPage;

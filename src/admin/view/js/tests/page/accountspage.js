@@ -1,3 +1,13 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+	var isArray = _.isArray;
+
+	var TestPage = require('./page.js');
+}
+
+
 // List of accounts page class
 function AccountsPage()
 {
@@ -34,7 +44,7 @@ AccountsPage.prototype.parseContent = async function()
 // Click on add button and return navigation promise
 AccountsPage.prototype.goToCreateAccount = function()
 {
-	return this.navigation(() => this.content.addBtn.click(), AccountPage);
+	return this.navigation(() => this.content.addBtn.click());
 };
 
 
@@ -50,7 +60,7 @@ AccountsPage.prototype.goToUpdateAccount = async function(num)
 		!this.content.toolbar.editBtn || !this.isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update account button not visible');
 
-	return this.navigation(() => this.content.toolbar.editBtn.click(), AccountPage);
+	return this.navigation(() => this.content.toolbar.editBtn.click());
 };
 
 
@@ -96,6 +106,10 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 				if (!this.content.delete_warning.okBtn)
 					throw new Error('OK button not found');
 
-				return this.navigation(() => this.click(this.content.delete_warning.okBtn), AccountsPage);
+				return this.navigation(() => this.click(this.content.delete_warning.okBtn));
 			});
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = AccountsPage;

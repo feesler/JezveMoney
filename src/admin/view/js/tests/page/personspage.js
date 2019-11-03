@@ -1,3 +1,13 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+	var isArray = _.isArray;
+
+	var TestPage = require('./page.js');
+}
+
+
 // List of persons page class
 function PersonsPage()
 {
@@ -33,7 +43,7 @@ PersonsPage.prototype.parseContent = async function()
 // Click on add button and return navigation promise
 PersonsPage.prototype.goToCreatePerson = function()
 {
-	return this.navigation(() => this.content.addBtn.click(), PersonPage);
+	return this.navigation(() => this.content.addBtn.click());
 };
 
 
@@ -49,7 +59,7 @@ PersonsPage.prototype.goToUpdatePerson = async function(num)
 		!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update person button not visible');
 
-	return this.navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
+	return this.navigation(() => this.content.toolbar.editBtn.click());
 };
 
 
@@ -91,6 +101,10 @@ PersonsPage.prototype.deletePersons = function(persons)
 				if (!await this.isVisible(this.content.delete_warning.elem))
 					throw new Error('Delete account warning popup not appear');
 
-				return this.navigation(() => this.click(this.content.delete_warning.okBtn), PersonsPage);
+				return this.navigation(() => this.click(this.content.delete_warning.okBtn));
 			});
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = PersonsPage;

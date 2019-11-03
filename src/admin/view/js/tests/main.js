@@ -1,28 +1,71 @@
-var results = {};
-var App = { accounts : [], persons : [], transactions : []};
+var transactions = {};
 
-
-// Run action, check state and add result to the list
-function test(descr, action, page, state)
+if (typeof module !== 'undefined' && module.exports)
 {
-	let actPromise = action();
-	if (!actPromise)
-		throw new Error('Action should return promise');
+	var LoginPage = require('./page/loginpage.js');
 
-	return actPromise
-			.then(async () =>
-			{
-				let expState = (typeof state === 'undefined') ? page.expectedState : state;
-				let res = await page.checkState(expState);
-				page.addResult(descr, res);
-			})
-			.catch(e => page.addResult(descr, false, e.message));
+	var accounts = require('./run/account.js');
+	var persons = require('./run/person.js');
+	transactions.expense = require('./run/transaction/expense.js');
+	transactions.income = require('./run/transaction/income.js');
+	transactions.transfer = require('./run/transaction/transfer.js');
+	transactions.debt = require('./run/transaction/debt.js');
+
+	let common = require('./common.js');
+	var copyObject = common.copyObject;
+	var test = common.test;
+	var getPosById = common.getPosById;
+
+	let a = require('../../../../view/js/app.js');
+	var EXPENSE = a.EXPENSE;
+	var INCOME = a.INCOME;
+	var TRANSFER = a.TRANSFER;
+	var DEBT = a.DEBT;
+
+	var c = require('../../../../view/js/currency.js');
+	var formatCurrency = c.formatCurrency;
 }
+else
+{
+	var accounts = runAccounts;
+	var persons = runPersons;
+	transactions.expense = runExpense;
+	transactions.income = runIncome;
+	transactions.transfer = runTransfer;
+	transactions.debt = runDebt;
+}
+
+var results = {};
+var App = {
+	accounts : [],
+	persons : [],
+	transactions : [],
+	currencies : [],
+
+	notify : function()
+	{
+		let notification = { App : this };
+
+		if (typeof module !== 'undefined' && module.exports)
+			c.init(App.currencies);
+
+		accounts.init(notification);
+		persons.init(notification);
+		transactions.expense.init(notification);
+		transactions.income.init(notification);
+		transactions.transfer.init(notification);
+		transactions.debt.init(notification);
+	},
+
+	goToMainPage : goToMainPage
+};
 
 
 async function startTests(page)
 {
 	console.log('Starting tests');
+
+	App.notify();
 
 	page = await reloginAsTester(page);
 	page = await page.goToProfilePage();
@@ -43,22 +86,22 @@ function accountTests(page)
 	return goToMainPage(page)
 			.then(page => page.goToAccounts())
 			.then(page => page.goToCreateAccount())
-			.then(createAccount1)
+			.then(accounts.createAccount1)
 			.then(page => page.goToCreateAccount())
-			.then(createAccount2)
+			.then(accounts.createAccount2)
 			.then(page => page.goToUpdateAccount(0))
-			.then(editAccount1)
+			.then(accounts.editAccount1)
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
-			.then(page => deleteAccounts(page, [0, 1]))
+			.then(page => accounts.createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
+			.then(page => accounts.deleteAccounts(page, [0, 1]))
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 }))
+			.then(page => accounts.createAccountWithParam(page, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 }))
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 }))
+			.then(page => accounts.createAccountWithParam(page, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 }))
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }))
+			.then(page => accounts.createAccountWithParam(page, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }))
 			.then(page => page.goToCreateAccount())
-			.then(page => createAccountWithParam(page, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 }))
+			.then(page => accounts.createAccountWithParam(page, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 }))
 }
 
 
@@ -68,13 +111,13 @@ function personTests(page)
 
 	return goToMainPage(page)
 			.then(page => page.goToPersons())
-			.then(checkInitialPersons)
-			.then(page => createPerson(page, 'Alex'))
-			.then(page => createPerson(page, 'Maria'))
-			.then(page => createPerson(page, 'Johnny'))
-			.then(page => createPerson(page, 'Иван'))
-			.then(page => updatePerson(page, 3, 'Ivan<'))
-			.then(page => deletePersons(page, [0, 2]));
+			.then(persons.checkInitialPersons)
+			.then(page => persons.createPerson(page, 'Alex'))
+			.then(page => persons.createPerson(page, 'Maria'))
+			.then(page => persons.createPerson(page, 'Johnny'))
+			.then(page => persons.createPerson(page, 'Иван'))
+			.then(page => persons.updatePerson(page, 3, 'Ivan<'))
+			.then(page => persons.deletePersons(page, [0, 2]));
 }
 
 
@@ -184,19 +227,19 @@ function createTransactionTests(page)
 
 	return goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
-			.then(expenseTransactionLoop)
+			.then(transactions.expense.expenseTransactionLoop)
 			.then(runCreateExpenseTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(INCOME))
-			.then(incomeTransactionLoop)
+			.then(transactions.income.incomeTransactionLoop)
 			.then(runCreateIncomeTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(TRANSFER))
-			.then(transferTransactionLoop)
+			.then(transactions.transfer.transferTransactionLoop)
 			.then(runCreateTransferTests)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
-			.then(debtTransactionLoop)
+			.then(transactions.debt.debtTransactionLoop)
 			.then(runCreateDebtTests);
 }
 
@@ -223,20 +266,6 @@ function deleteTransactionTests(page)
 }
 
 
-// Format date as DD.MM.YYYY
-function formatDate(date, month, year)
-{
-	if (isDate(date) && !month && !year)
-	{
-		month = date.getMonth();
-		year = date.getFullYear();
-		date = date.getDate();
-	}
-
-	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year;
-}
-
-
 function goToMainPage(page)
 {
 	return page.goToMainPage()
@@ -245,6 +274,9 @@ function goToMainPage(page)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.currencies = await page.global('currency');
+
+				App.notify();
 
 				return page;
 			});
@@ -255,10 +287,10 @@ function runCreateExpenseTests(page)
 {
 	page.setBlock('Create expense transactions', 1);
 
-	return createExpense(page, 0, 0, { destAmount : '123.7801' })
-			.then(page => createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
-			.then(page => createExpense(page, 1, 0, { destAmount : '0.01' }))
-			.then(page => createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }));
+	return transactions.expense.createExpense(page, 0, 0, { destAmount : '123.7801' })
+			.then(page => transactions.expense.createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
+			.then(page => transactions.expense.createExpense(page, 1, 0, { destAmount : '0.01' }))
+			.then(page => transactions.expense.createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }));
 }
 
 
@@ -266,10 +298,10 @@ function runCreateIncomeTests(page)
 {
 	page.setBlock('Create income transactions', 1);
 
-	return createIncome(page, 0, 0, { srcAmount : '10023.7801' })
-			.then(page => createIncome(page, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
-			.then(page => createIncome(page, 1, 0, { srcAmount : '0.01' }))
-			.then(page => createIncome(page, 1, 0, { destAcc : 4, srcAmount : '99.99' }));
+	return transactions.income.createIncome(page, 0, 0, { srcAmount : '10023.7801' })
+			.then(page => transactions.income.createIncome(page, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
+			.then(page => transactions.income.createIncome(page, 1, 0, { srcAmount : '0.01' }))
+			.then(page => transactions.income.createIncome(page, 1, 0, { destAcc : 4, srcAmount : '99.99' }));
 
 }
 
@@ -278,11 +310,11 @@ function runCreateTransferTests(page)
 {
 	page.setBlock('Create transfer transactions', 1);
 
-	return createTransfer(page, 0, { srcAmount : '1000' })
-			.then(page => createTransfer(page, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' }))
-			.then(page => createTransfer(page, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' }))
-			.then(page => createTransfer(page, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' }))
-			.then(page => createTransfer(page, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' }));
+	return transactions.transfer.createTransfer(page, 0, { srcAmount : '1000' })
+			.then(page => transactions.transfer.createTransfer(page, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' }))
+			.then(page => transactions.transfer.createTransfer(page, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' }))
+			.then(page => transactions.transfer.createTransfer(page, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' }))
+			.then(page => transactions.transfer.createTransfer(page, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' }));
 }
 
 
@@ -290,12 +322,12 @@ function runCreateDebtTests(page)
 {
 	page.setBlock('Submit debt transactions', 1);
 
-	return createDebt(page, 0, { srcAmount : '1000' })
-			.then(page => createDebt(page, 0, { debtType : false, acc : 2, srcAmount : '200' }))
-			.then(page => createDebt(page, 0, { debtType : true, acc : 3, srcAmount : '100.0101' }))
-			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' }))
-			.then(page => createDebt(page, 0, { acc : null, srcAmount : '105' }))
-			.then(page => createDebt(page, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }));
+	return transactions.debt.createDebt(page, 0, { srcAmount : '1000' })
+			.then(page => transactions.debt.createDebt(page, 0, { debtType : false, acc : 2, srcAmount : '200' }))
+			.then(page => transactions.debt.createDebt(page, 0, { debtType : true, acc : 3, srcAmount : '100.0101' }))
+			.then(page => transactions.debt.createDebt(page, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' }))
+			.then(page => transactions.debt.createDebt(page, 0, { acc : null, srcAmount : '105' }))
+			.then(page => transactions.debt.createDebt(page, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }));
 }
 
 
@@ -303,10 +335,10 @@ function runUpdateExpenseTests(page)
 {
 	page.setBlock('Update expense transactions', 2);
 
-	return updateExpense(page, 3, { destAmount : '124.7701' })
-			.then(page => updateExpense(page, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 }))
-			.then(page => updateExpense(page, 1, { destAmount : '0.02' }))
-			.then(page => updateExpense(page, 0, { srcAcc : 3, destAmount : '99.9' }));
+	return transactions.expense.updateExpense(page, 3, { destAmount : '124.7701' })
+			.then(page => transactions.expense.updateExpense(page, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 }))
+			.then(page => transactions.expense.updateExpense(page, 1, { destAmount : '0.02' }))
+			.then(page => transactions.expense.updateExpense(page, 0, { srcAcc : 3, destAmount : '99.9' }));
 }
 
 
@@ -314,10 +346,10 @@ function runUpdateIncomeTests(page)
 {
 	page.setBlock('Update income transactions', 2);
 
-	return updateIncome(page, 0, { srcAmount : '100.001' })
-			.then(page => updateIncome(page, 1, { srcAmount : '0.02' }))
-			.then(page => updateIncome(page, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 }))
-			.then(page => updateIncome(page, 3, { destAcc : 3, srcAmount : '99.9' }));
+	return transactions.income.updateIncome(page, 0, { srcAmount : '100.001' })
+			.then(page => transactions.income.updateIncome(page, 1, { srcAmount : '0.02' }))
+			.then(page => transactions.income.updateIncome(page, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 }))
+			.then(page => transactions.income.updateIncome(page, 3, { destAcc : 3, srcAmount : '99.9' }));
 }
 
 
@@ -325,11 +357,11 @@ function runUpdateTransferTests(page)
 {
 	page.setBlock('Update transfer transactions', 2);
 
-	return updateTransfer(page, 0, { destAcc : 0, srcAmount : '11' })
-			.then(page => updateTransfer(page, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' }))
-			.then(page => updateTransfer(page, 2, { srcAcc : 3, srcAmount : '5.0301' }))
-			.then(page => updateTransfer(page, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' }))
-			.then(page => updateTransfer(page, 4, { srcAmount : '1050.01' }));
+	return transactions.transfer.updateTransfer(page, 0, { destAcc : 0, srcAmount : '11' })
+			.then(page => transactions.transfer.updateTransfer(page, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' }))
+			.then(page => transactions.transfer.updateTransfer(page, 2, { srcAcc : 3, srcAmount : '5.0301' }))
+			.then(page => transactions.transfer.updateTransfer(page, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' }))
+			.then(page => transactions.transfer.updateTransfer(page, 4, { srcAmount : '1050.01' }));
 }
 
 
@@ -337,12 +369,12 @@ function runUpdateDebtTests(page)
 {
 	page.setBlock('Update debt transactions', 2);
 
-	return updateDebt(page, 0, { person : 0, srcAmount : '105' })
-			.then(page => updateDebt(page, 1, { acc : 1, srcAmount : '105' }))
-			.then(page => updateDebt(page, 2, { debtType : true, srcAmount : '10' }))
-			.then(page => updateDebt(page, 3, { debtType : false, acc : 2, srcAmount : '200.0202' }))
-			.then(page => updateDebt(page, 4, { acc : null, srcAmount : '200' }))
-			.then(page => updateDebt(page, 5, { srcAmount : '1001' }));
+	return transactions.debt.updateDebt(page, 0, { person : 0, srcAmount : '105' })
+			.then(page => transactions.debt.updateDebt(page, 1, { acc : 1, srcAmount : '105' }))
+			.then(page => transactions.debt.updateDebt(page, 2, { debtType : true, srcAmount : '10' }))
+			.then(page => transactions.debt.updateDebt(page, 3, { debtType : false, acc : 2, srcAmount : '200.0202' }))
+			.then(page => transactions.debt.updateDebt(page, 4, { acc : null, srcAmount : '200' }))
+			.then(page => transactions.debt.updateDebt(page, 5, { srcAmount : '1001' }));
 }
 
 
@@ -401,6 +433,7 @@ function deleteTransactions(page, type, transactions)
 
 				App.beforeDeleteTransaction.accounts = copyObject(await page.global('accounts'));
 				App.beforeDeleteTransaction.persons = copyObject(await page.global('persons'));
+				App.notify();
 
 				return page.goToTransactions();
 			})
@@ -422,6 +455,7 @@ function deleteTransactions(page, type, transactions)
 					if (!trObj)
 						throw new Error('Transaction not found');
 				});
+				App.notify();
 
 				return page.deleteTransactions(transactions);
 			})
@@ -432,6 +466,7 @@ function deleteTransactions(page, type, transactions)
 				await test('Delete transactions [' + transactions.join() + ']', async () => {}, page, state);
 
 				App.transactions = page.content.transactions;
+				App.notify();
 
 				return page;
 			})
@@ -596,6 +631,7 @@ function deleteTransactions(page, type, transactions)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.notify();
 
 				return page;
 			});
@@ -608,11 +644,13 @@ async function reloginAsTester(page)
 	{
 		page = await page.logoutUser();
 	}
-	else
-	{
-		page = new LoginPage(page.props.environment);
-		await page.parse();
-	};
+
+	if (!(page instanceof LoginPage))
+		throw new Error('Wrong page');
 
 	return page.loginAs('test', 'test');
 }
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = { startTests : startTests };

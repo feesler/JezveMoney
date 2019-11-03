@@ -1,3 +1,17 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	var _ = require('../../../../../view/js/common.js');
+	var hasClass = _.hasClass;
+	var isVisible = _.isVisible;
+	var idSearch = _.idSearch;
+	var isObject = _.isObject;
+	var isFunction = _.isFunction;
+	var extend = _.extend;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Profile page class
 function ProfilePage()
 {
@@ -79,7 +93,7 @@ ProfilePage.prototype.resetAll = function()
 		if (!this.content.reset_all_warning.okBtn)
 			throw new Error('Confirm button not found');
 
-		return this.navigation(() => this.click(this.content.reset_all_warning.okBtn), ProfilePage);
+		return this.navigation(() => this.click(this.content.reset_all_warning.okBtn));
 	})
 	// Use page here instead of this because the instance was changed after navigation
 	.then(page =>
@@ -93,3 +107,7 @@ ProfilePage.prototype.resetAll = function()
 		return page.performAction(() => page.msgPopup.close());
 	});
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = ProfilePage;

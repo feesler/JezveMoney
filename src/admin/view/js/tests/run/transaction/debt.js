@@ -1,3 +1,34 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const common = require('../../common.js');
+	var test = common.test;
+	var formatDate = common.formatDate;
+
+	const _ = require('../../../../../../view/js/common.js');
+	var isObject = _.isObject;
+	var setParam = _.setParam;
+
+	const a = require('../../../../../../view/js/app.js');
+	var normalize = a.normalize;
+	var normalizeExch = a.normalizeExch;
+	var DEBT = a.DEBT;
+
+	var c = require('../../../../../../view/js/currency.js');
+	var formatCurrency = c.formatCurrency;
+
+	var App = null;
+}
+
+
+function initDebtTransaction(props)
+{
+	props = props || {};
+
+	if ('App' in props)
+		App = props.App;
+}
+
+
 async function submitDebtTransaction(page, params)
 {
 	if ('acc' in params)
@@ -73,6 +104,7 @@ async function submitDebtTransaction(page, params)
 
 	if (App.beforeSubmitTransaction.acc)
 		App.beforeSubmitTransaction.accPos = await page.getAccountPos(page.model.account.id);
+	App.notify();
 
 	return page.submit();
 }
@@ -80,7 +112,7 @@ async function submitDebtTransaction(page, params)
 
 function createDebt(page, onState, params)
 {
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(0))
 			.then(page => page.changeTransactionType(DEBT))
 			.then(page => debtTransactionLoop(page, onState, page => submitDebtTransaction(page, params)))
@@ -171,6 +203,7 @@ function createDebt(page, onState, params)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.notify();
 
 				return page;
 			});
@@ -188,7 +221,7 @@ function updateDebt(page, pos, params)
 
 	page.setBlock('Update debt transaction ' + pos, 3);
 
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(DEBT))
 			.then(async page =>
@@ -200,6 +233,7 @@ function updateDebt(page, pos, params)
 					throw new Error('Transaction not found');
 
 				App.beforeUpdateTransaction.trObj = trObj;
+				App.notify();
 
 				return page.goToUpdateTransaction(pos);
 			})
@@ -228,6 +262,7 @@ function updateDebt(page, pos, params)
 								destAmount : page.model.fDestAmount,
 								date : page.model.date,
 								comment : page.model.comment});
+				App.notify();
 
 				return submitDebtTransaction(page, params);
 			})
@@ -272,7 +307,7 @@ function updateDebt(page, pos, params)
 
 				await test('Transaction update', async () => {}, page, state);
 
-				return goToMainPage(page);
+				return App.goToMainPage(page);
 			})
 			.then(async page =>
 			{
@@ -380,6 +415,7 @@ function updateDebt(page, pos, params)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.notify();
 
 				return page;
 			});
@@ -637,4 +673,16 @@ async function debtTransactionLoop(page, actionState, action)
 	await test('(50) Disable account', () => page.toggleAccount(), page);
 
 	return page;
+}
+
+
+var runDebt = { init : initDebtTransaction,
+					createDebt : createDebt,
+					updateDebt : updateDebt,
+					debtTransactionLoop : debtTransactionLoop };
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = runDebt;
 }

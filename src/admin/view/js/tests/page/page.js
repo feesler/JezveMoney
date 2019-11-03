@@ -1,3 +1,25 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	let _ = require('../../../../../view/js/common.js');
+	var idSearch = _.idSearch;
+	var isObject = _.isObject;
+	var isFunction = _.isFunction;
+
+	let a = require('../../../../../view/js/app.js');
+	var idSearch = a.idSearch;
+	var fixFloat = a.fixFloat;
+	var correct = a.correct;
+	var correctExch = a.correctExch;
+	var normalize = a.normalize;
+	var normalizeExch = a.normalizeExch;
+	var isValidValue = a.isValidValue;
+	var EXPENSE = a.EXPENSE;
+	var INCOME = a.INCOME;
+	var TRANSFER = a.TRANSFER;
+	var DEBT = a.DEBT;
+}
+
+
 // Common test page class constructor
 function TestPage(props)
 {
@@ -10,6 +32,14 @@ function TestPage(props)
 			this[key] = this.props.environment[key];
 		}
 	}
+
+	this.tileIcons = [{ className : null, title : 'No icon' },
+						{ className : 'purse_icon', title : 'Purse' },
+						{ className : 'safe_icon', title : 'Safe' },
+						{ className : 'card_icon', title : 'Card' },
+						{ className : 'percent_icon', title : 'Percent' },
+						{ className : 'bank_icon', title : 'Bank' },
+						{ className : 'cash_icon', title : 'Cash' }];
 }
 
 
@@ -105,14 +135,6 @@ TestPage.prototype.parseId = function(id)
 };
 
 
-var tileIcons = [{ className : null, title : 'No icon' },
-					{ className : 'purse_icon', title : 'Purse' },
-					{ className : 'safe_icon', title : 'Safe' },
-					{ className : 'card_icon', title : 'Card' },
-					{ className : 'percent_icon', title : 'Percent' },
-					{ className : 'bank_icon', title : 'Bank' },
-					{ className : 'cash_icon', title : 'Cash' }];
-
 TestPage.prototype.parseTile = async function(tileEl)
 {
 	if (!tileEl || !await this.hasClass(tileEl, 'tile'))
@@ -131,7 +153,7 @@ TestPage.prototype.parseTile = async function(tileEl)
 	let isIcon = await this.hasClass(tileObj.elem, 'tile_icon');
 	if (isIcon)
 	{
-		for(let item of tileIcons)
+		for(let item of this.tileIcons)
 		{
 			let found = await this.hasClass(tileObj.elem, item.className);
 			if (found)
@@ -373,21 +395,6 @@ TestPage.prototype.getTransactionTypeStr = function(type)
 		return null;
 
 	return (typeToStr[type] !== undefined) ? typeToStr[type] : null;
-};
-
-
-TestPage.prototype.getTransactionPageClass = function(str)
-{
-	var strToClass = { 'EXPENSE' : ExpenseTransactionPage,
-						'INCOME' : IncomeTransactionPage,
-					 	'TRANSFER' : TransferTransactionPage,
-					 	'DEBT' : DebtTransactionPage };
-
-	if (!str)
-		return null;
-
-	var key = str.toUpperCase();
-	return (strToClass[key] !== undefined) ? strToClass[key] : TransactionPage;
 };
 
 
@@ -754,7 +761,7 @@ TestPage.prototype.goToProfilePage = async function()
 
 	return this.navigation(() => {
 		setTimeout(() => this.click(this.header.user.profileBtn), 500);
-	}, ProfilePage);
+	});
 };
 
 
@@ -765,7 +772,7 @@ TestPage.prototype.logoutUser = async function()
 
 	return this.navigation(() => {
 		setTimeout(() => this.click(this.header.user.logoutBtn), 500);
-	}, LoginPage);
+	});
 };
 
 
@@ -774,5 +781,9 @@ TestPage.prototype.goToMainPage = function()
 	if (!this.isUserLoggedIn())
 		throw new Error('User not logged in');
 
-	return this.navigation(() => this.click(this.header.logo.linkElem), MainPage);
+	return this.navigation(() => this.click(this.header.logo.linkElem));
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = TestPage;

@@ -1,3 +1,23 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	var URL = require('url').URL;
+
+	var MainPage = require('./page/mainpage.js');
+	var LoginPage = require('./page/loginpage.js');
+	var ProfilePage = require('./page/profilepage.js');
+	var AccountPage = require('./page/accountpage.js');
+	var AccountsPage = require('./page/accountspage.js');
+	var PersonPage = require('./page/personpage.js');
+	var PersonsPage = require('./page/personspage.js');
+	var TransactionsPage = require('./page/transactionspage.js');
+	var ExpenseTransactionPage = require('./page/transaction/expense.js');
+	var IncomeTransactionPage = require('./page/transaction/income.js');
+	var TransferTransactionPage = require('./page/transaction/transfer.js');
+	var DebtTransactionPage = require('./page/transaction/debt.js');
+	var StatisticsPage = require('./page/statistics.js');
+}
+
+
 const testHost = 'jezve.net';
 
 
@@ -96,3 +116,8 @@ async function route(env, url)
 		throw new Error('Unknown route: ' + reqUrl.pathname);
 }
 
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = route;
+}

@@ -1,3 +1,12 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Create or update account page tests
 function PersonPage()
 {
@@ -46,5 +55,9 @@ PersonPage.prototype.createPerson = async function(personName)
 {
 	await this.inputName(personName);
 
-	return this.navigation(() => this.click(this.content.submitBtn), PersonsPage);
+	return this.navigation(() => this.click(this.content.submitBtn));
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = PersonPage;

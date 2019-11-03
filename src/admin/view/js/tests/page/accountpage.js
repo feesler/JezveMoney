@@ -1,3 +1,12 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Create or update account page tests
 function AccountPage()
 {
@@ -76,3 +85,7 @@ AccountPage.prototype.changeIcon = async function(val)
 {
 	return this.performAction(() => this.content.iconDropDown.selectByValue(val));
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = AccountPage;

@@ -1,3 +1,34 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const common = require('../../common.js');
+	var test = common.test;
+	var formatDate = common.formatDate;
+
+	const _ = require('../../../../../../view/js/common.js');
+	var isObject = _.isObject;
+	var setParam = _.setParam;
+
+	const a = require('../../../../../../view/js/app.js');
+	var normalize = a.normalize;
+	var INCOME = a.INCOME;
+
+	var c = require('../../../../../../view/js/currency.js');
+	var getCurrency = c.getCurrency;
+	var formatCurrency = c.formatCurrency;
+
+	var App = null;
+}
+
+
+function initIncomeTransaction(props)
+{
+	props = props || {};
+
+	if ('App' in props)
+		App = props.App;
+}
+
+
 async function submitIncomeTransaction(page, params)
 {
 	if ('destAcc' in params)
@@ -45,7 +76,7 @@ async function submitIncomeTransaction(page, params)
 
 function createIncome(page, accNum, onState, params)
 {
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToNewTransactionByAccount(accNum))
 			.then(page => page.changeTransactionType(INCOME))
 			.then(page => incomeTransactionLoop(page, onState, page => submitIncomeTransaction(page, params)))
@@ -86,6 +117,7 @@ function createIncome(page, accNum, onState, params)
 				App.transactions = page.content.widgets[2].transList;
 				App.accounts = page.content.widgets[0].tiles;
 				App.persons = page.content.widgets[3].infoTiles;
+				App.notify();
 
 				return page;
 			});
@@ -102,7 +134,7 @@ function updateIncome(page, pos, params)
 	if (!isObject(params))
 		throw new Error('Parameters not specified');
 
-	return goToMainPage(page)
+	return App.goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(INCOME))
 			.then(async page =>
@@ -114,6 +146,7 @@ function updateIncome(page, pos, params)
 					throw new Error('Transaction not found');
 
 				App.beforeUpdateTransaction.trObj = trObj;
+				App.notify();
 
 				return page.goToUpdateTransaction(pos);
 			})
@@ -132,6 +165,7 @@ function updateIncome(page, pos, params)
 								destAmount : page.model.fDestAmount,
 								date : page.model.date,
 								comment : page.model.comment});
+				App.notify();
 
 				return submitIncomeTransaction(page, params);
 			})
@@ -160,7 +194,7 @@ function updateIncome(page, pos, params)
 
 				await test('Transaction update', async () => {}, page, state);
 
-				return goToMainPage(page);
+				return App.goToMainPage(page);
 			})
 			.then(async page =>
 			{
@@ -376,4 +410,16 @@ async function incomeTransactionLoop(page, actionState, action)
 	await test('(22) Change destination account', () => page.changeSourceCurrency(1), page);
 
 	return page;
+}
+
+
+var runIncome = { init : initIncomeTransaction,
+					createIncome : createIncome,
+					updateIncome : updateIncome,
+					incomeTransactionLoop : incomeTransactionLoop };
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = runIncome;
 }

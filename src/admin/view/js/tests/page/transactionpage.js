@@ -1,3 +1,24 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../view/js/common.js');
+	var extend = _.extend;
+	var isArray = _.isArray;
+
+	const a = require('../../../../../view/js/app.js');
+	var idSearch = a.idSearch;
+	var normalize = a.normalize;
+	var normalizeExch = a.normalizeExch;
+	var correct = a.correct;
+	var correctExch = a.correctExch;
+	var isValidValue = a.isValidValue;
+
+	const common = require('../common.js');
+	var getPosById = common.getPosById;
+
+	var TestPage = require('./page.js');
+}
+
+
 // Create or update transaction page tests
 function TransactionPage()
 {
@@ -327,17 +348,13 @@ TransactionPage.prototype.changeTransactionType = async function(type)
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
-	var newPageClass = this.getTransactionPageClass(this.content.typeMenu.items[type].text);
-
-	return this.navigation(() => this.content.typeMenu.items[type].click(), newPageClass);
+	return this.navigation(() => this.content.typeMenu.items[type].click());
 };
 
 
 TransactionPage.prototype.submit = function()
 {
-	var navPageClass = (this.content.isUpdate) ? TransactionsPage : MainPage;
-
-	return this.navigation(() => this.click(this.content.submitBtn), navPageClass);
+	return this.navigation(() => this.click(this.content.submitBtn));
 };
 
 
@@ -447,3 +464,7 @@ TransactionPage.prototype.inputComment = function(val)
 {
 	return this.performAction(() => this.content.comment_row.input(val));
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = TransactionPage;

@@ -1,3 +1,24 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('../../../../../../view/js/common.js');
+	var extend = _.extend;
+	var setParam = _.setParam;
+
+	const a = require('../../../../../../view/js/app.js');
+	var idSearch = a.idSearch;
+	var normalize = a.normalize;
+	var normalizeExch = a.normalizeExch;
+	var correct = a.correct;
+	var correctExch = a.correctExch;
+	var isValidValue = a.isValidValue;
+
+	const c = require('../../../../../../view/js/currency.js');
+	var getCurrency = c.getCurrency;
+
+	var TransactionPage = require('../transactionpage.js');
+}
+
+
 // Create or update transfer transaction page tests
 function DebtTransactionPage()
 {
@@ -721,3 +742,7 @@ DebtTransactionPage.prototype.clickSrcAmount = function()
 
 	return DebtTransactionPage.parent.clickSrcAmount.apply(this, arguments);
 };
+
+
+if (typeof module !== 'undefined' && module.exports)
+	module.exports = DebtTransactionPage;
