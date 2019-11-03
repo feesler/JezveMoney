@@ -1,3 +1,19 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const a = require('./app.js');
+	var idSearch = a.idSearch;
+	var normalize = a.normalize;
+
+	var currency = null;
+}
+
+
+function initCurrency(data)
+{
+	currency = data;
+}
+
+
 // Format specified value
 function formatValue(val)
 {
@@ -61,4 +77,13 @@ function formatCurrency(val, curr_id)
 		return curr.sign + ' ' + fmtVal;
 	else
 		return fmtVal + ' ' + curr.sign;
+}
+
+
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = { init : initCurrency,
+						formatValue : formatValue,
+						getCurrency : getCurrency,
+						formatCurrency : formatCurrency };
 }

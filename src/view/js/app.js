@@ -1,3 +1,10 @@
+if (typeof module !== 'undefined' && module.exports)
+{
+	const _ = require('./common.js');
+	var isArray = _.isArray;
+}
+
+
 // Types of transactions
 var EXPENSE = 1;
 var INCOME = 2;
@@ -186,4 +193,21 @@ function initHeader()
 }
 
 
-onReady(initHeader);
+if (typeof module !== 'undefined' && module.exports)
+{
+	module.exports = { EXPENSE : EXPENSE,
+						INCOME : INCOME,
+						TRANSFER : TRANSFER,
+						DEBT : DEBT,
+						idSearch : idSearch,
+	 					fixFloat : fixFloat,
+						correct : correct,
+						correctExch : correctExch,
+					 	normalize : normalize,
+					 	normalizeExch : normalizeExch,
+					 	isValidValue : isValidValue };
+}
+else
+{
+	onReady(initHeader);
+}
