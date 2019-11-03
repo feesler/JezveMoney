@@ -80,5 +80,16 @@ ProfilePage.prototype.resetAll = function()
 			throw new Error('Confirm button not found');
 
 		return this.navigation(() => this.click(this.content.reset_all_warning.okBtn), ProfilePage);
+	})
+	// Use page here instead of this because the instance was changed after navigation
+	.then(page =>
+	{
+		if (!page.msgPopup)
+			throw new Error('Message popup not found');
+
+		if (!page.msgPopup.success || page.msgPopup.message !== 'All data successfully reseted.')
+			throw new Error('Fail to reset all');
+
+		return page.performAction(() => page.msgPopup.close());
 	});
 };
