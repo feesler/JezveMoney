@@ -73,6 +73,28 @@ TestPage.prototype.parseHeader = async function()
 };
 
 
+TestPage.prototype.parseMessage = async function()
+{
+	let popupContent = await this.query('.popup_content.msg');
+	if (!popupContent)
+		return null;
+
+	var res = { contentElem : popupContent };
+
+	res.success = await this.hasClass(res.contentElem, 'msg_success');
+
+	res.messageElem = await this.query(res.contentElem, '.popup_message');
+	if (!res.messageElem)
+		throw new Error('Wrong structure of message popup');
+
+	res.message = await this.prop(res.messageElem, 'innerText');
+	res.closeBtn = await this.query(res.contentElem, '.close_btn > button');
+	res.close = () => this.click(res.closeBtn);
+
+	return res;
+};
+
+
 TestPage.prototype.parseId = function(id)
 {
 	if (typeof id !== 'string')
@@ -565,6 +587,7 @@ TestPage.prototype.parse = async function()
 {
 	this.location = viewframe.contentWindow.location.href;
 	this.header = await this.parseHeader();
+	this.msgPopup = await this.parseMessage();
 	this.content = await this.parseContent();
 	this.model = await this.buildModel(this.content);
 
