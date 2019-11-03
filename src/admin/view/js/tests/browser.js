@@ -185,7 +185,7 @@ var Environment = (function()
 
 		var navPromise = new Promise(function(resolve, reject)
 		{
-			viewframe.onload = function()
+			viewframe.onload = async function()
 			{
 				vdoc = viewframe.contentWindow.document;
 				if (!vdoc)
@@ -194,8 +194,7 @@ var Environment = (function()
 				checkPHPerrors(vdoc.body.innerHTML);
 				try
 				{
-					if (pageClass === undefined)
-						pageClass = TestPage;
+					let pageClass = await route(env, await getUrl());
 
 					let view = new pageClass({ environment : env });
 					resolve(view.parse());
@@ -233,7 +232,7 @@ var Environment = (function()
 			navigation(async () =>
 			{
 				viewframe.src = 'https://jezve.net/money/';
-			}, MainPage)
+			})
 			.then(navHandler);
 		};
 	}
