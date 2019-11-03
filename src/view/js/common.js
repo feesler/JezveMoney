@@ -23,7 +23,7 @@ function isDate(obj)
 function isFunction(obj)
 {
 	var getType = {};
-	return obj && getType.toString.call(obj) === '[object Function]';
+	return obj && (getType.toString.call(obj) === '[object Function]' || typeof obj === 'function');
 }
 
 
