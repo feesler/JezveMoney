@@ -53,7 +53,7 @@ DebtTransactionPage.prototype.buildModel = async function(cont)
 		throw new Error('Destination currency not found');
 
 	var personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
-	res.personAccount = this.getPersonAccount(res.person.id, personAccountCurr);
+	res.personAccount = this.getPersonAccount(res.person, personAccountCurr);
 	if (!res.personAccount)
 		res.personAccount = { balance : 0, curr_id : personAccountCurr };
 
@@ -365,7 +365,7 @@ DebtTransactionPage.prototype.changePerson = async function(val)
 	this.model.person = await this.getPerson(val);
 
 	var personAccCurr_id = (this.model.debtType) ? this.model.srcCurr.id : this.model.destCurr.id;
-	this.model.personAccount = this.getPersonAccount(val, personAccCurr_id);
+	this.model.personAccount = this.getPersonAccount(this.model.person, personAccCurr_id);
 	if (!this.model.personAccount)
 		this.model.personAccount = { balance : 0, curr_id : personAccCurr_id };
 
@@ -656,7 +656,7 @@ DebtTransactionPage.prototype.changeAccount = async function(account_id)
 	if (this.model.personAccount.curr_id != this.model.account.curr_id)
 	{
 		var person_id = this.model.person.id;
-		this.model.personAccount = this.getPersonAccount(this.model.person.id, this.model.account.curr_id);
+		this.model.personAccount = this.getPersonAccount(this.model.person, this.model.account.curr_id);
 		if (!this.model.personAccount)
 			this.model.personAccount = { balance : 0, curr_id : this.model.account.curr_id };
 	}

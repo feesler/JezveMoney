@@ -260,11 +260,10 @@ TransactionPage.prototype.getPersonPos = async function(person_id)
 
 
 // Return account of person in specified currency
-TransactionPage.prototype.getPersonAccount = async function(person_id, curr_id)
+TransactionPage.prototype.getPersonAccount = function(person, curr_id)
 {
-	var person, resAcc = null;
+	var resAcc = null;
 
-	person = await this.getPerson(person_id);
 	if (!person || !person.accounts || !curr_id)
 		return resAcc;
 
