@@ -653,4 +653,11 @@ async function reloginAsTester(page)
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = { startTests : startTests };
+{
+	module.exports = { testURL : 'https://jezve.net/money/',
+						startTests : startTests };
+}
+else
+{
+	var testURL = 'https://jezve.net/money/';
+}

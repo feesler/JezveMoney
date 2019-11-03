@@ -5,7 +5,7 @@ var icons = <?=f_json_encode($icons)?>;
 onReady(function()
 {
 	if (Environment && isFunction(Environment.init))
-		Environment.init(startTests);
+		Environment.init(testURL, startTests);
 });
 </script>
 </head>

@@ -213,7 +213,7 @@ var Environment = (function()
 	}
 
 
-	async function initTests(navHandler)
+	async function initTests(url, navHandler)
 	{
 		var startbtn = ge('startbtn');
 		totalRes = ge('totalRes');
@@ -229,11 +229,8 @@ var Environment = (function()
 			results = { total : 0, ok : 0, fail : 0 };
 			await addResult('Test initialization', 'OK');
 
-			navigation(async () =>
-			{
-				viewframe.src = 'https://jezve.net/money/';
-			})
-			.then(navHandler);
+			let page = await navigation(async () => viewframe.src = url );
+			page = await navHandler(page);
 		};
 	}
 
