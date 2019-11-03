@@ -6,6 +6,21 @@ var Environment = (function()
 	var totalRes = null, okRes = null, failRes = null;
 
 
+	async function getUrl()
+	{
+		return viewframe.contentWindow.location.href;
+	}
+
+
+	async function vparent(elem)
+	{
+		if (!elem)
+			return null;
+
+		return elem.parentNode;
+	}
+
+
 	async function vquery()
 	{
 		if (!arguments.length)
@@ -32,6 +47,94 @@ var Environment = (function()
 	}
 
 
+	async function vprop(elem, prop)
+	{
+		if (!elem || typeof prop !== 'string')
+			return null;
+
+		let res = elem;
+		let propPath = prop.split('.');
+
+		for(let propName of propPath)
+		{
+			if (!res)
+				return res;
+			res = res[propName];
+		}
+
+		return res;
+	}
+
+
+	async function getGlobal(prop)
+	{
+		let res = viewframe.contentWindow;
+		let propPath = prop.split('.');
+
+		for(let propName of propPath)
+		{
+			if (!res)
+				return res;
+			res = res[propName];
+		}
+
+		return res;
+	}
+
+
+	async function hasClass(elem, cl)
+	{
+		return elem.classList.contains(cl);
+	}
+
+
+	// elem could be an id string or element handle
+	async function isVisible(elem, recursive)
+	{
+		if (typeof elem === 'string')
+			elem = await vquery('#' + elem);
+
+		let robj = elem;
+		while(robj && robj.nodeType && robj.nodeType != 9)
+		{
+			if (!robj.style || robj.style.display == 'none')
+				return false;
+
+			if (recursive !== true)
+				break;
+
+			robj = robj.parentNode;
+		}
+
+		return !!robj;
+	}
+
+
+	async function selectByValue(selectObj, selValue, selBool)
+	{
+		var i;
+
+		if (!selectObj || !selectObj.options)
+			return -1;
+
+		for(i = 0, l = selectObj.options.length; i < l; i++)
+		{
+			if (selectObj.options[i] && selectObj.options[i].value == selValue)
+			{
+				selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	async function onChange(elem)
+	{
+		return elem.onchange();
+	}
+
 	async function inputEmul(elemObj, val)
 	{
 		elemObj.value = val;
@@ -56,7 +159,7 @@ var Environment = (function()
 	}
 
 
-	function addResult(descr, res, message)
+	async function addResult(descr, res, message)
 	{
 		message = message || '';
 
@@ -70,13 +173,13 @@ var Environment = (function()
 	}
 
 
-	function setBlock(title, category)
+	async function setBlock(title, category)
 	{
 		restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : title }) ));
 	}
 
 
-	function navigation(action, pageClass)
+	async function navigation(action, pageClass)
 	{
 		let env = window.Environment;
 
@@ -105,13 +208,13 @@ var Environment = (function()
 		});
 
 		if (isFunction(action))
-			action();
+			await action();
 
 		return navPromise;
 	}
 
 
-	function initTests(navHandler)
+	async function initTests(navHandler)
 	{
 		var startbtn = ge('startbtn');
 		totalRes = ge('totalRes');
@@ -122,12 +225,12 @@ var Environment = (function()
 		if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
 			throw new Error('Fail to init tests');
 
-		startbtn.onclick = function()
+		startbtn.onclick = async function()
 		{
 			results = { total : 0, ok : 0, fail : 0 };
-			addResult('Test initialization', 'OK');
+			await addResult('Test initialization', 'OK');
 
-			navigation(function()
+			navigation(async () =>
 			{
 				viewframe.src = 'https://jezve.net/money/';
 			}, MainPage)
@@ -138,11 +241,19 @@ var Environment = (function()
 
 	return {
 		init : initTests,
+		url : getUrl,
 		navigation : navigation,
+		parent : vparent,
 		query : vquery,
 		queryAll : vqueryall,
+		prop : vprop,
+		global : getGlobal,
+		hasClass : hasClass,
+		isVisible : isVisible,
+		selectByValue : selectByValue,
 		click : clickEmul,
 		input : inputEmul,
+		onChange : onChange,
 		addResult : addResult,
 	 	setBlock : setBlock
 	};

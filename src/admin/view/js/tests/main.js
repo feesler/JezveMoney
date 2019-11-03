@@ -5,16 +5,15 @@ var App = { accounts : [], persons : [], transactions : []};
 // Run action, check state and add result to the list
 function test(descr, action, page, state)
 {
-	console.log('Test: ' + descr);
 	let actPromise = action();
 	if (!actPromise)
 		throw new Error('Action should return promise');
 
 	return actPromise
-			.then(() =>
+			.then(async () =>
 			{
 				let expState = (typeof state === 'undefined') ? page.expectedState : state;
-				let res = page.checkState(expState);
+				let res = await page.checkState(expState);
 				page.addResult(descr, res);
 			})
 			.catch(e => page.addResult(descr, false, e.message));
@@ -396,30 +395,32 @@ function getPersonByAcc(persons, acc_id)
 function deleteTransactions(page, type, transactions)
 {
 	return goToMainPage(page)
-			.then(page =>
+			.then(async page =>
 			{
 				App.beforeDeleteTransaction = {};
 
-				App.beforeDeleteTransaction.accounts = copyObject(viewframe.contentWindow.accounts);
-				App.beforeDeleteTransaction.persons = copyObject(viewframe.contentWindow.persons);
+				App.beforeDeleteTransaction.accounts = copyObject(await page.global('accounts'));
+				App.beforeDeleteTransaction.persons = copyObject(await page.global('persons'));
 
 				return page.goToTransactions();
 			})
 			.then(page => page.filterByType(type))
-			.then(page =>
+			.then(async page =>
 			{
 				let trCount = page.content.transactions ? page.content.transactions.length : 0;
 				App.beforeDeleteTransaction.trCount = trCount;
-				App.beforeDeleteTransaction.deleteList = transactions.map(trPos =>
+				App.beforeDeleteTransaction.deleteList = await Promise.all(transactions.map(trPos =>
 				{
 					if (trPos < 0 || trPos >= trCount)
 						throw new Error('Wrong transaction position: ' + trPos);
 
-					let trObj = page.getTransactionObject(page.content.transactions[trPos].id);
+					return page.getTransactionObject(page.content.transactions[trPos].id);
+				}));
+
+				App.beforeDeleteTransaction.deleteList.forEach(trObj =>
+				{
 					if (!trObj)
 						throw new Error('Transaction not found');
-
-					return trObj;
 				});
 
 				return page.deleteTransactions(transactions);

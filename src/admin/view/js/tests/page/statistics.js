@@ -16,33 +16,34 @@ StatisticsPage.prototype.parseContent = async function()
 		throw new Error('Wrong statistics page structure');
 
 	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
-	res.title = res.titleEl.innerText;
+	res.title = await this.prop(res.titleEl, 'innerText');
 
 	let filtersList = await this.queryAll('.tr_filter.filter_sel');
 	if (!filtersList || filtersList.length != 4)
 		throw new Error('Wrong statistics page structure');
 
-	res.filterByDropDown = await this.parseDropDown(filtersList[0].firstElementChild);
-	res.accountsDropDown = isVisible(filtersList[1]) ? await this.parseDropDown(filtersList[1].firstElementChild) : null;
-	res.currencyDropDown = isVisible(filtersList[2]) ? await this.parseDropDown(filtersList[2].firstElementChild) : null;
-	res.groupDropDown = await this.parseDropDown(filtersList[3].firstElementChild);
+	res.filterByDropDown = await this.parseDropDown(await this.query(filtersList[0], ':scope > *'));
+	res.accountsDropDown = (await this.isVisible(filtersList[1])) ? await this.parseDropDown(await this.query(filtersList[1], ':scope > *')) : null;
+	res.currencyDropDown = (await this.isVisible(filtersList[2])) ? await this.parseDropDown(await this.query(filtersList[2], ':scope > *')) : null;
+	res.groupDropDown = await this.parseDropDown(await this.query(filtersList[3], ':scope > *'));
 
 	res.chart = { elem : await this.query('#chart'), bars : [] };
 	if (!res.chart)
 		throw new Error('Wrong statistics page structure');
 
 	let bars = await this.queryAll(res.chart.elem, 'svg > rect');
-	bars.forEach(bar =>
+	for(const bar of bars)
 	{
-		if (bar.attributes['fill-opacity'].nodeValue == '1')
-			res.chart.bars.push({ elem : bar, height : bar.attributes['height'].nodeValue });
-	});
+		let nodeOpacity = await this.prop(bar, 'attributes.fill-opacity.nodeValue');
+		if (nodeOpacity == '1')
+			res.chart.bars.push({ elem : bar, height : await this.prop(bar, 'attributes.height.nodeValue') });
+	}
 
 	return res;
 };
 
 
-StatisticsPage.prototype.filterByType = function(type)
+StatisticsPage.prototype.filterByType = async function(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
@@ -63,16 +64,21 @@ StatisticsPage.prototype.byCurrencies = function()
 };
 
 
-StatisticsPage.prototype.selectAccount = function(acc_id)
+StatisticsPage.prototype.selectAccount = async function(acc_id)
 {
-	return this.navigation(() => this.content.accountsDropDown && this.content.accountsDropDown.selectByValue(acc_id), StatisticsPage);
+	if (!this.content.accountsDropDown)
+		throw new Error('Account drop down control not found');
+
+	return this.navigation(() => this.content.accountsDropDown.selectByValue(acc_id));
 };
 
 
-StatisticsPage.prototype.selectAccountByPos = function(pos)
+StatisticsPage.prototype.selectAccountByPos = async function(pos)
 {
-	if (this.content.accountsDropDown)
-		return this.selectAccount(this.content.accountsDropDown.items[pos].id);
+	if (!this.content.accountsDropDown)
+		throw new Error('Account drop down control not found');
+
+	return this.selectAccount(this.content.accountsDropDown.items[pos].id);
 };
 
 

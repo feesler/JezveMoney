@@ -8,9 +8,9 @@ function TransactionsPage()
 extend(TransactionsPage, TestPage);
 
 
-TransactionsPage.prototype.getTransactionObject = function(trans_id)
+TransactionsPage.prototype.getTransactionObject = async function(trans_id)
 {
-	return idSearch(viewframe.contentWindow.transArr, trans_id);
+	return idSearch(await this.global('transArr'), trans_id);
 };
 
 
@@ -30,7 +30,7 @@ TransactionsPage.prototype.parseContent = async function()
 
 	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 
-	res.title = res.titleEl.innerText;
+	res.title = await this.prop(res.titleEl, 'innerText');
 	res.transactions = await this.parseTransactionsList(await this.query('#tritems'));
 
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
@@ -56,14 +56,15 @@ TransactionsPage.prototype.goToCreateTransaction = function()
 
 
 // Select specified account, click on edit button and return navigation promise
-TransactionsPage.prototype.goToUpdateTransaction = function(num)
+TransactionsPage.prototype.goToUpdateTransaction = async function(num)
 {
 	if (!this.content.transactions || this.content.transactions.length <= num)
 		throw new Error('Wrong transaction number specified');
 
 	this.content.transactions[num].click();
 
-	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
+	if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
+		!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
 		throw 'Update transaction button not visible';
 
 	var transObj = this.getTransactionObject(this.content.transactions[num].id);
@@ -96,30 +97,26 @@ TransactionsPage.prototype.deleteTransactions = function(tr)
 					if (tr_num >= this.content.transactions.length)
 						throw 'Wrong account number';
 
-					this.content.transactions[tr_num].click();
-
-					return Promise.resolve();
+					return this.content.transactions[tr_num].click();
 				}))
-				.then(() =>
+				.then(async () =>
 				{
-					var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
+					var editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
 					if (ind == 0 && !editIsVisible)
 						throw 'Edit button is not visible';
 					else if (ind > 0 && editIsVisible)
 						throw 'Edit button is visible while more than one transactions is selected';
 
-					if (!isVisible(this.content.toolbar.delBtn.elem))
+					if (!await this.isVisible(this.content.toolbar.delBtn.elem))
 						throw 'Delete button is not visible';
-
-					return Promise.resolve();
 				});
 	}, Promise.resolve());
 
 	return selectPromise
 			.then(() => this.performAction(() => this.content.toolbar.delBtn.click()))
-			.then(() =>
+			.then(async () =>
 			{
-				if (!isVisible(this.content.delete_warning.elem))
+				if (!await this.isVisible(this.content.delete_warning.elem))
 					throw 'Delete transaction warning popup not appear';
 
 				if (!this.content.delete_warning.okBtn)

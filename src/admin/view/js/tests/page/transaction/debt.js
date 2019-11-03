@@ -20,13 +20,13 @@ DebtTransactionPage.prototype.parseOperation = async function(el)
 	res.debtgive = await this.query('#debtgive');
 	res.debttake = await this.query('#debttake');
 
-	res.type = res.debtgive.checked;
+	res.type = await this.prop(res.debtgive, 'checked');
 
 	return res;
 };
 
 
-DebtTransactionPage.prototype.buildModel = function(cont)
+DebtTransactionPage.prototype.buildModel = async function(cont)
 {
 	var res = {};
 
@@ -37,7 +37,7 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 	if (cont.typeMenu.activeType != 4)
 		throw new Error('Wrong page');
 
-	res.person = this.getPerson(cont.person.id);
+	res.person = await this.getPerson(cont.person.id);
 	res.debtType = cont.operation.type;
 
 	res.src_curr_id = parseInt(cont.src_amount_row.hiddenValue);
@@ -57,11 +57,11 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 	if (!res.personAccount)
 		res.personAccount = { balance : 0, curr_id : personAccountCurr };
 
-	var isSelectAccountVisible = !!(cont.selaccount && isVisible(cont.selaccount.elem));
+	var isSelectAccountVisible = !!(cont.selaccount && await this.isVisible(cont.selaccount.elem));
 
 	res.noAccount = isSelectAccountVisible;
 
-	res.account = this.getAccount(cont.account.id);
+	res.account = await this.getAccount(cont.account.id);
 	if (!res.account && !res.noAccount)
 		throw new Error('Account not found');
 
@@ -107,10 +107,10 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 	res.exchRate = cont.exchange_row.value;
 	this.updateExch(res);
 
-	var isSrcAmountRowVisible = !!(cont.src_amount_row && isVisible(cont.src_amount_row.elem));
-	var isSrcResBalRowVisible = !!(cont.result_balance_row && isVisible(cont.result_balance_row.elem));
-	var isDestResBalRowVisible = !!(cont.result_balance_dest_row && isVisible(cont.result_balance_dest_row.elem));
-	var isExchRowVisible = !!(cont.exchange_row && isVisible(cont.exchange_row.elem));
+	var isSrcAmountRowVisible = !!(cont.src_amount_row && await this.isVisible(cont.src_amount_row.elem));
+	var isSrcResBalRowVisible = !!(cont.result_balance_row && await this.isVisible(cont.result_balance_row.elem));
+	var isDestResBalRowVisible = !!(cont.result_balance_dest_row && await this.isVisible(cont.result_balance_dest_row.elem));
+	var isExchRowVisible = !!(cont.exchange_row && await this.isVisible(cont.exchange_row.elem));
 
 	res.isDiffCurr = false;
 
@@ -146,7 +146,7 @@ DebtTransactionPage.prototype.buildModel = function(cont)
 
 // Set source amount value
 // State 0, 1 or 2: source and destination currencies are the same
-DebtTransactionPage.prototype.setSrcAmount = function(model, val)
+DebtTransactionPage.prototype.setSrcAmount = async function(model, val)
 {
 	model.srcAmount = val;
 
@@ -171,7 +171,7 @@ DebtTransactionPage.prototype.setSrcAmount = function(model, val)
 
 				if (model.lastAccount_id)
 				{
-					var lastAcc = this.getAccount(model.lastAccount_id);
+					var lastAcc = await this.getAccount(model.lastAccount_id);
 					if (!lastAcc)
 						throw new Error('Last account not found');
 
@@ -191,7 +191,7 @@ DebtTransactionPage.prototype.setSrcAmount = function(model, val)
 
 // Set destination amount value
 // State 0, 1 or 2: source and destination currencies are the same
-DebtTransactionPage.prototype.setDestAmount = function(model, val)
+DebtTransactionPage.prototype.setDestAmount = async function(model, val)
 {
 	model.destAmount = val;
 
@@ -212,7 +212,7 @@ DebtTransactionPage.prototype.setDestAmount = function(model, val)
 
 				if (model.lastAccount_id)
 				{
-					var lastAcc = this.getAccount(model.lastAccount_id);
+					var lastAcc = await this.getAccount(model.lastAccount_id);
 					if (!lastAcc)
 						throw new Error('Last account not found');
 
@@ -360,9 +360,9 @@ DebtTransactionPage.prototype.setExpectedState = function(state_id)
 };
 
 
-DebtTransactionPage.prototype.changePerson = function(val)
+DebtTransactionPage.prototype.changePerson = async function(val)
 {
-	this.model.person = this.getPerson(val);
+	this.model.person = await this.getPerson(val);
 
 	var personAccCurr_id = (this.model.debtType) ? this.model.srcCurr.id : this.model.destCurr.id;
 	this.model.personAccount = this.getPersonAccount(val, personAccCurr_id);
@@ -392,13 +392,13 @@ DebtTransactionPage.prototype.changePerson = function(val)
 };
 
 
-DebtTransactionPage.prototype.changePersonByPos = function(pos)
+DebtTransactionPage.prototype.changePersonByPos = async function(pos)
 {
 	return this.changePerson(this.content.person.dropDown.items[pos].id);
 };
 
 
-DebtTransactionPage.prototype.toggleDebtType = function()
+DebtTransactionPage.prototype.toggleDebtType = async function()
 {
 	var newValue = !this.model.debtType;
 
@@ -419,7 +419,7 @@ DebtTransactionPage.prototype.toggleDebtType = function()
 	}
 	else if (this.model.noAccount && !newValue)
 	{
-		var lastAcc = this.getAccount(this.model.lastAccount_id);
+		var lastAcc = await this.getAccount(this.model.lastAccount_id);
 		if (!lastAcc)
 			throw new Error('Last account not found');
 
@@ -433,7 +433,7 @@ DebtTransactionPage.prototype.toggleDebtType = function()
 	}
 	else if (this.model.noAccount && newValue)
 	{
-		var lastAcc = this.getAccount(this.model.lastAccount_id);
+		var lastAcc = await this.getAccount(this.model.lastAccount_id);
 		if (!lastAcc)
 			throw new Error('Last account not found');
 
@@ -481,16 +481,16 @@ DebtTransactionPage.prototype.toggleDebtType = function()
 };
 
 
-DebtTransactionPage.prototype.inputSrcAmount = function(val)
+DebtTransactionPage.prototype.inputSrcAmount = async function(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 	var valueChanged = (this.model.fSrcAmount != fNewValue);
 
-	this.setSrcAmount(this.model, val);
+	await this.setSrcAmount(this.model, val);
 
 	if (valueChanged)
 	{
-		this.setDestAmount(this.model, this.model.fSrcAmount);
+		await this.setDestAmount(this.model, this.model.fSrcAmount);
 	}
 
 	this.setExpectedState(this.model.state);
@@ -499,7 +499,7 @@ DebtTransactionPage.prototype.inputSrcAmount = function(val)
 };
 
 
-DebtTransactionPage.prototype.inputResBalance = function(val)
+DebtTransactionPage.prototype.inputResBalance = async function(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -515,7 +515,7 @@ DebtTransactionPage.prototype.inputResBalance = function(val)
 		this.model.srcAmount = newSrcAmount;
 		this.model.fSrcAmount = isValidValue(newSrcAmount) ? normalize(newSrcAmount) : newSrcAmount;
 
-		this.setDestAmount(this.model, this.model.srcAmount);
+		await this.setDestAmount(this.model, this.model.srcAmount);
 	}
 
 	this.setExpectedState(this.model.state);
@@ -524,7 +524,7 @@ DebtTransactionPage.prototype.inputResBalance = function(val)
 };
 
 
-DebtTransactionPage.prototype.inputDestResBalance = function(val)
+DebtTransactionPage.prototype.inputDestResBalance = async function(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -540,7 +540,7 @@ DebtTransactionPage.prototype.inputDestResBalance = function(val)
 		this.model.destAmount = newDestAmount;
 		this.model.fDestAmount = isValidValue(newDestAmount) ? normalize(newDestAmount) : newDestAmount;
 
-		this.setSrcAmount(this.model, this.model.destAmount);
+		await this.setSrcAmount(this.model, this.model.destAmount);
 	}
 
 	this.setExpectedState(this.model.state);
@@ -579,7 +579,7 @@ DebtTransactionPage.prototype.clickDestResultBalance = function()
 };
 
 
-DebtTransactionPage.prototype.toggleAccount = function()
+DebtTransactionPage.prototype.toggleAccount = async function()
 {
 	this.model.noAccount = !this.model.noAccount;
 
@@ -601,7 +601,7 @@ DebtTransactionPage.prototype.toggleAccount = function()
 	else
 	{
 		if (this.model.lastAccount_id)
-			this.model.account = this.getAccount(this.model.lastAccount_id);
+			this.model.account = await this.getAccount(this.model.lastAccount_id);
 		if (!this.model.account)
 			throw new Error('Account not found');
 
@@ -638,18 +638,18 @@ DebtTransactionPage.prototype.toggleAccount = function()
 	}
 
 	if (this.model.noAccount)
-		return this.performAction(() => this.click(this.content.noacc_btn.elem.firstElementChild));
+		return this.performAction(() => this.content.noacc_btn.click());
 	else
-		return this.performAction(() => this.click(this.content.selaccount.elem.firstElementChild));
+		return this.performAction(() => this.content.selaccount.click());
 };
 
 
-DebtTransactionPage.prototype.changeAccount = function(account_id)
+DebtTransactionPage.prototype.changeAccount = async function(account_id)
 {
-	var newAcc = this.getAccount(account_id);
+	var newAcc = await this.getAccount(account_id);
 
 	if (!this.model.account || !newAcc || newAcc.id == this.model.account.id)
-		return Promise.resolve();
+		return;
 
 	this.model.account = newAcc;
 

@@ -24,9 +24,9 @@ MainPage.prototype.parseContent = async function()
 						textElem : await this.query(widgetsElem[i], '.widget_title span') };
 
 		if (widget.linkElem)
-			widget.link = widget.linkElem.href;
+			widget.link = await this.prop(widget.linkElem, 'href');
 		if (widget.textElem)
-			widget.title = widget.textElem.innerText;
+			widget.title = await this.prop(widget.textElem, 'innerText');
 
 		var tiles = await this.parseTiles(await this.query(widget.elem, '.tiles'));
 		if (tiles)

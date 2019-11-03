@@ -49,7 +49,7 @@ TestPage.prototype.parseHeader = async function()
 		el = await this.query(res.user.menuBtn, '.user_title');
 		if (!el)
 			throw new Error('User title element not found');
-		res.user.name = el.innerText;
+		res.user.name = await this.prop(el, 'innerText');
 
 		res.user.menuEl = await this.query(res.elem, '.usermenu');
 		if (!res.user.menuEl)
@@ -60,7 +60,7 @@ TestPage.prototype.parseHeader = async function()
 		for(var i = 0; i < menuLinks.length; i++)
 		{
 			el = menuLinks[i];
-			res.user.menuItems.push({ elem : el, link : el.href, text : el.innerText });
+			res.user.menuItems.push({ elem : el, link : await this.prop(el, 'href'), text : await this.prop(el, 'innerText') });
 		}
 
 		var itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
@@ -115,31 +115,34 @@ var tileIcons = [{ className : null, title : 'No icon' },
 
 TestPage.prototype.parseTile = async function(tileEl)
 {
-	if (!tileEl || !hasClass(tileEl, 'tile'))
+	if (!tileEl || !await this.hasClass(tileEl, 'tile'))
 		throw new Error('Wrong tile structure');
 
 	var self = this;
-	var tileObj = { elem : tileEl, linkElem : tileEl.firstElementChild,
+	var tileObj = { elem : tileEl, linkElem : await this.query(tileEl, ':scope > *'),
 					balanceEL : await this.query(tileEl, '.acc_bal'),
 					nameEL : await this.query(tileEl, '.acc_name') };
 
-	tileObj.id = this.parseId(tileEl.id);
-	tileObj.balance = tileObj.balanceEL.innerText;
-	tileObj.name = tileObj.nameEL.innerText;
+	tileObj.id = this.parseId(await this.prop(tileEl, 'id'));
+	tileObj.balance = await this.prop(tileObj.balanceEL, 'innerText');
+	tileObj.name = await this.prop(tileObj.nameEL, 'innerText');
 	tileObj.icon = null;
 
-	if (hasClass(tileObj.elem, 'tile_icon'))
+	let isIcon = await this.hasClass(tileObj.elem, 'tile_icon');
+	if (isIcon)
 	{
-		tileIcons.some(function(item)
+		for(let item of tileIcons)
 		{
-			if (hasClass(tileObj.elem, item.className))
+			let found = await this.hasClass(tileObj.elem, item.className);
+			if (found)
+			{
 				tileObj.icon = item;
-
-			return (tileObj.icon != null);
-		});
+				break;
+			}
+		}
 	}
 
-	tileObj.click = function()
+	tileObj.click = async function()
 	{
 		return self.click(this.linkElem);
 	};
@@ -150,16 +153,16 @@ TestPage.prototype.parseTile = async function(tileEl)
 
 TestPage.prototype.parseInfoTile = async function(tileEl)
 {
-	if (!tileEl || !hasClass(tileEl, 'info_tile'))
+	if (!tileEl || !await this.hasClass(tileEl, 'info_tile'))
 		throw new Error('Wrong info tile structure');
 
 	var tileObj = { elem : tileEl,
 					titleEl : await this.query(tileEl, '.info_title'),
 					subtitleEl : await this.query(tileEl, '.info_subtitle') };
 
-	tileObj.id = this.parseId(tileEl.id);
-	tileObj.title = tileObj.titleEl.innerText;
-	tileObj.subtitle = tileObj.subtitleEl.innerText;
+	tileObj.id = this.parseId(await this.prop(tileEl, 'id'));
+	tileObj.title = await this.prop(tileObj.titleEl, 'innerText');
+	tileObj.subtitle = await this.prop(tileObj.subtitleEl, 'innerText');
 
 	return tileObj;
 };
@@ -171,13 +174,14 @@ TestPage.prototype.parseTiles = async function(tilesEl, parseCallback)
 		return null;
 
 	var res = [];
-	if (!tilesEl || (tilesEl.children.length == 1 && tilesEl.children[0].tagName == 'SPAN'))
+	let children = await this.queryAll(tilesEl, ':scope > *');
+	if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
 		return res;
 
 	var callback = parseCallback || this.parseTile;
-	for(var i = 0; i < tilesEl.children.length; i++)
+	for(var i = 0; i < children.length; i++)
 	{
-		var tileObj = await callback.call(this, tilesEl.children[i]);
+		var tileObj = await callback.call(this, children[i]);
 		if (!tileObj)
 			throw new Error('Fail to parse tile');
 
@@ -207,11 +211,12 @@ TestPage.prototype.parseTransactionsList = async function(listEl)
 	var self = this;
 	var res = [];
 
-	if (!listEl || (listEl.children.length == 1 && listEl.children[0].tagName == 'SPAN'))
+	let children = await this.queryAll(listEl, ':scope > *');
+	if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
 		return res;
 
 	var listItems;
-	if (listEl.tagName == 'TABLE')
+	if (await this.prop(listEl, 'tagName') == 'TABLE')
 	{
 		listItems = await this.queryAll(listEl, 'tr');
 	}
@@ -223,26 +228,26 @@ TestPage.prototype.parseTransactionsList = async function(listEl)
 	for(var i = 0; i < listItems.length; i++)
 	{
 		var li = listItems[i];
-		var itemObj = { id : this.parseId(li.id), elem : li };
+		var itemObj = { id : this.parseId(await this.prop(li, 'id')), elem : li };
 
 		var elem = await this.query(li, '.tritem_acc_name > span');
 		if (!elem)
 			throw new Error('Account title not found');
-		itemObj.accountTitle = elem.innerText;
+		itemObj.accountTitle = await this.prop(elem, 'innerText');
 
 		elem = await this.query(li, '.tritem_sum > span');
 		if (!elem)
 			throw new Error('Amount text not found');
-		itemObj.amountText = elem.innerText;
+		itemObj.amountText = await this.prop(elem, 'innerText');
 
-		elem = await this.query(li, '.tritem_date_comm');
-		if (!elem || !elem.firstElementChild || elem.firstElementChild.tagName != 'SPAN')
+		elem = await this.query(li, '.tritem_date_comm > *');
+		if (!elem || await this.prop(elem, 'tagName') != 'SPAN')
 			throw new Error('Date element not found');
 
-		itemObj.dateFmt = elem.firstElementChild.innerText;
+		itemObj.dateFmt = await this.prop(elem, 'innerText');
 
 		elem = await this.query(li, '.tritem_comm');
-		itemObj.comment = elem ? elem.innerText : '';
+		itemObj.comment = elem ? await this.prop(elem, 'innerText') : '';
 
 		itemObj.click = function()
 		{
@@ -263,12 +268,12 @@ TestPage.prototype.parseDropDown = async function(elem)
 
 	var self = this;
 	var res = { elem : elem };
-	if (!res.elem || (!hasClass(res.elem, 'dd_container') && !hasClass(res.elem, 'dd_attached')))
+	if (!res.elem || (!await this.hasClass(res.elem, 'dd_container') && !await this.hasClass(res.elem, 'dd_attached')))
 		throw new Error('Wrong drop down element');
 
-	res.isAttached = hasClass(res.elem, 'dd_attached');
+	res.isAttached = await this.hasClass(res.elem, 'dd_attached');
 	if (res.isAttached)
-		res.selectBtn = res.elem.firstElementChild;
+		res.selectBtn = await this.query(res.elem, ':scope > *');
 	else
 		res.selectBtn = await this.query(res.elem, 'button.selectBtn');
 	if (!res.selectBtn)
@@ -283,25 +288,25 @@ TestPage.prototype.parseDropDown = async function(elem)
 		if (!res.input)
 			throw new Error('Input element not found');
 
-		res.editable = isVisible(res.input);
-		res.textValue = (res.editable) ? res.input.value : res.statSel.innerText;
+		res.editable = await this.isVisible(res.input);
+		res.textValue = await ((res.editable) ? this.prop(res.input, 'value') : this.prop(res.statSel, 'innerText'));
 	}
 
 	res.selectElem = await this.query(res.elem, 'select');
 
 	res.listContainer = await this.query(res.elem, '.ddlist');
-	res.isMobile = hasClass(res.listContainer, 'ddmobile');
+	res.isMobile = await this.hasClass(res.listContainer, 'ddmobile');
 	if (res.isMobile)
 	{
 			res.items = [];
 
-			for(var i = 0; i < res.selectElem.options.length; i++)
+			let options = await this.prop(res.selectElem, 'options');
+			for(let option of options)
 			{
-				var option = res.selectElem.options[i];
-				if (option.disabled)
+				if (await this.prop(option, 'disabled'))
 					continue;
 
-				var itemObj = { id : this.parseId(option.value), text : option.innerText, elem : option };
+				var itemObj = { id : this.parseId(await this.prop(option, 'value')), text : await this.prop(option, 'innerText'), elem : option };
 
 				res.items.push(itemObj);
 			}
@@ -316,14 +321,14 @@ TestPage.prototype.parseDropDown = async function(elem)
 			for(var i = 0; i < listItems.length; i++)
 			{
 				var li = listItems[i];
-				var itemObj = { id : this.parseId(li.id), text : li.innerText, elem : li };
+				var itemObj = { id : this.parseId(await this.prop(li, 'id')), text : await this.prop(li, 'innerText'), elem : li };
 
 				res.items.push(itemObj);
 			}
 		}
 	}
 
-	res.selectByValue = function(val)
+	res.selectByValue = async function(val)
 	{
 		if (this.isMobile)
 		{
@@ -331,12 +336,12 @@ TestPage.prototype.parseDropDown = async function(elem)
 			if (!option)
 				throw new Error('Option item not found');
 
-			selectByValue(res.selectElem, option.elem.value);
-			return res.selectElem.onchange();
+			await self.selectByValue(res.selectElem, option.elem.value);
+			return self.onChange(res.selectElem);
 		}
 		else
 		{
-			self.click(this.selectBtn);
+			await self.click(this.selectBtn);
 			var li = idSearch(this.items, val);
 			if (!li)
 				throw new Error('List item not found');
@@ -394,18 +399,22 @@ TestPage.prototype.parseTransactionTypeMenu = async function(elem)
 	var menuItems = await this.queryAll(elem, 'span');
 	for(var i = 0; i < menuItems.length; i++)
 	{
-		var menuItem = menuItems[i].firstElementChild;
+		let menuItem = await this.query(menuItems[i], ':scope > *');
+		if (!menuItem)
+			throw new Error('Wrong structure of menu item');
+		let tagName = await this.prop(menuItem, 'tagName');
+		let itemTitle = await this.prop(menuItem, 'innerText');
 
-		var menuItemObj = { elem : menuItem, text : menuItem.innerText, type : this.getTransactionType(menuItem.innerText) };
+		var menuItemObj = { elem : menuItem, text : itemTitle, type : this.getTransactionType(itemTitle) };
 
-		if (menuItem.tagName == 'B')
+		if (tagName == 'B')
 		{
 			res.activeType = menuItemObj.type;
 			menuItemObj.isActive = true;
 		}
-		else if (menuItem.tagName == 'A')
+		else if (tagName == 'A')
 		{
-			menuItemObj.link = menuItem.href;
+			menuItemObj.link = await this.prop(menuItem, 'href');
 			menuItemObj.isActive = false;
 		}
 
@@ -431,23 +440,24 @@ TestPage.prototype.parseIconLink = async function(elem)
 	var self = this;
 	var res = { elem : elem };
 
-	if (!hasClass(elem, 'iconlink'))
+	if (!await this.hasClass(elem, 'iconlink'))
 		throw new Error('Wrong icon link');
 
-	res.linkElem = elem.firstElementChild;
+	res.linkElem = await this.query(elem, ':scope > *');
 	if (!res.linkElem)
 		throw new Error('Link element not found');
 
 	res.titleElem = await this.query(res.linkElem, '.icontitle');
-	if (!res.titleElem || !res.titleElem.firstElementChild)
+	let titleInner = await this.query(res.titleElem, ':scope > *');
+	if (!titleInner)
 		throw new Error('Title element not found');
-	res.title = res.titleElem.firstElementChild.innerText;
+	res.title = await this.prop(titleInner, 'innerText');
 
 // Subtitle is optional
 	res.subTitleElem = await this.query(res.titleElem, '.subtitle');
 	if (res.subTitleElem)
 	{
-		res.subtitle = res.subTitleElem.innerText;
+		res.subtitle = await this.prop(res.subTitleElem, 'innerText');
 	}
 
 	res.click = function()
@@ -470,27 +480,27 @@ TestPage.prototype.parseInputRow = async function(elem)
 	res.labelEl = await this.query(elem, 'label');
 	if (!res.labelEl)
 		throw new Error('Label element not found');
+	res.label = await this.prop(res.labelEl, 'innerText');
 
-	res.label = res.labelEl.innerText;
 	res.currElem = await this.query(elem, '.btn.rcurr_btn') || await this.query(elem, '.exchrate_comm');
 	res.isCurrActive = false;
 	if (res.currElem)
 	{
-		res.isCurrActive = !hasClass(res.currElem, 'inact_rbtn') && !hasClass(res.currElem, 'exchrate_comm');
+		res.isCurrActive = !await this.hasClass(res.currElem, 'inact_rbtn') && !await this.hasClass(res.currElem, 'exchrate_comm');
 		if (res.isCurrActive)
 		{
-			res.currDropDown = await this.parseDropDown(res.currElem.firstElementChild);
+			res.currDropDown = await this.parseDropDown(await this.query(res.currElem, ':scope > *'));
 			if (!res.currDropDown.isAttached)
 				throw new Error('Currency drop down is not attached');
-			res.currSign = res.currDropDown.selectBtn.innerText;
+			res.currSign = await this.prop(res.currDropDown.selectBtn, 'innerText');
 		}
-		else if (hasClass(res.currElem, 'exchrate_comm'))
+		else if (await this.hasClass(res.currElem, 'exchrate_comm'))
 		{
-			res.currSign = res.currElem.innerText;
+			res.currSign = await this.prop(res.currElem, 'innerText');
 		}
 		else
 		{
-			res.currSign = res.currElem.firstElementChild.innerText;
+			res.currSign = await this.prop(await this.query(res.currElem, ':scope > *'), 'innerText');
 		}
 	}
 	else
@@ -498,21 +508,21 @@ TestPage.prototype.parseInputRow = async function(elem)
 		res.datePickerBtn = await this.query(elem, '.btn.cal_btn');
 	}
 
-	var t = await this.query(elem, 'input[type="hidden"]');
+	let t = await this.query(elem, 'input[type="hidden"]');
 	if (t)
 	{
-		res.hiddenValue = t.value;
+		res.hiddenValue = await this.prop(t, 'value');
 	}
 
 	res.valueInput = await this.query(elem, '.stretch_input > input');
-	res.value = res.valueInput.value;
+	res.value = await this.prop(res.valueInput, 'value');
 
-	res.input = function(val)
+	res.input = async function(val)
 	{
 		return self.input(this.valueInput, val);
 	};
 
-	res.selectCurr = function(val)
+	res.selectCurr = async function(val)
 	{
 		if (this.isCurrActive && this.currDropDown)
 			return this.currDropDown.selectByValue(val);
@@ -533,16 +543,16 @@ TestPage.prototype.parseDatePickerRow = async function(elem)
 	var iconLinkElem = await this.query(elem, '.iconlink');
 
 	res.iconLink = await this.parseIconLink(iconLinkElem);
-	res.inputRow = await this.parseInputRow(iconLinkElem.nextElementSibling);
+	res.inputRow = await this.parseInputRow(await this.query(elem, '.iconlink + *'));
 	if (!res.inputRow)
 		throw new Error('Input row of date picker not found');
 	res.date = res.inputRow.value;
 
 	res.input = async function(val)
 	{
-		if (isVisible(this.iconLink))
+		if (self.isVisible(this.iconLink))
 		{
-			await this.iconLink.click()
+			await this.iconLink.click();
 			await self.click(this.datePickerBtn);
 		}
 
@@ -561,9 +571,9 @@ TestPage.prototype.parseWarningPopup = async function(elem)
 	var res = { elem : elem };
 
 	res.titleElem = await this.query(elem, '.popup_title');
-	res.title = res.titleElem.innerText;
+	res.title = await this.prop(res.titleElem, 'innerText');
 	res.messageElem = await this.query(elem, '.popup_message > div');
-	res.message = res.messageElem.innerText;
+	res.message = await this.prop(res.messageElem, 'innerText');
 	res.okBtn = await this.query(elem, '.popup_controls > .btn.ok_btn');
 	res.cancelBtn = await this.query(elem, '.popup_controls > .btn.cancel_btn');
 
@@ -585,7 +595,8 @@ TestPage.prototype.buildModel = function()
 
 TestPage.prototype.parse = async function()
 {
-	this.location = viewframe.contentWindow.location.href;
+	this.location = await this.url();
+
 	this.header = await this.parseHeader();
 	this.msgPopup = await this.parseMessage();
 	this.content = await this.parseContent();
@@ -605,7 +616,7 @@ TestPage.prototype.performAction = async function(action)
 
 	await action.call(this);
 
-	await this.parse();
+	return this.parse();
 };
 
 
@@ -617,7 +628,7 @@ TestPage.prototype.performAction = async function(action)
 // Example:
 //     controls : { control_1 : { elem : Element }, control_2 : { childControl : { elem : Element } } }
 //     expected : { control_1 : true, control_2 : { childControl : true, invControl : false }, control_3 : false }
-TestPage.prototype.checkVisibility = function(controls, expected)
+TestPage.prototype.checkVisibility = async function(controls, expected)
 {
 	var control, expVisible, factVisible, res;
 
@@ -635,11 +646,11 @@ TestPage.prototype.checkVisibility = function(controls, expected)
 
 		if (isObject(expVisible))
 		{
-			res = this.checkVisibility(control, expVisible);
+			res = await this.checkVisibility(control, expVisible);
 		}
 		else
 		{
-			factVisible = !!(control && isVisible(control.elem, true));
+			factVisible = !!(control && await this.isVisible(control.elem, true));
 			res = (expVisible == factVisible);
 		}
 
@@ -651,7 +662,7 @@ TestPage.prototype.checkVisibility = function(controls, expected)
 };
 
 
-TestPage.prototype.checkObjValue = function(obj, expectedObj)
+TestPage.prototype.checkObjValue = async function(obj, expectedObj)
 {
 	if (obj === expectedObj)
 		return true;
@@ -666,7 +677,7 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 		value = obj[vKey];
 		if (isObject(expected))
 		{
-			var res = this.checkObjValue(value, expected);
+			var res = await this.checkObjValue(value, expected);
 			if (res !== true)
 			{
 				res.key = vKey + '.' + res.key;
@@ -685,7 +696,7 @@ TestPage.prototype.checkObjValue = function(obj, expectedObj)
 };
 
 
-TestPage.prototype.checkValues = function(controls)
+TestPage.prototype.checkValues = async function(controls)
 {
 	var res = true;
 	var control, expected, fact;
@@ -699,7 +710,7 @@ TestPage.prototype.checkValues = function(controls)
 
 		if (isObject(expected))
 		{
-			res = this.checkObjValue(control, expected);
+			res = await this.checkObjValue(control, expected);
 			if (res !== true)
 			{
 				res.key = countrolName + '.' + res.key;
@@ -727,9 +738,9 @@ TestPage.prototype.checkValues = function(controls)
 };
 
 
-TestPage.prototype.checkState = function(stateObj)
+TestPage.prototype.checkState = async function(stateObj)
 {
-	return stateObj && this.checkVisibility(this.content, stateObj.visibility) && this.checkValues(stateObj.values);
+	return stateObj && await this.checkVisibility(this.content, stateObj.visibility) && await this.checkValues(stateObj.values);
 };
 
 

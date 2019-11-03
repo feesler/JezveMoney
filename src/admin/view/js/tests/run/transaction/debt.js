@@ -17,14 +17,22 @@ async function submitDebtTransaction(page, params)
 				await test('Enable account', () => page.toggleAccount(), page);
 			}
 
-			await test('Change account to (' + page.getAccountByPos(params.acc).name + ')',
+			let acc = await page.getAccountByPos(params.acc);
+			if (!acc)
+				throw new Error('Account (' + params.destAcc + ') not found');
+
+			await test('Change account to (' + acc.name + ')',
 						() => page.changeAccountByPos(params.acc), page);
 		}
 	}
 
 	if ('person' in params)
 	{
-		await test('Change person to (' + page.getPersonByPos(params.person).name + ')',
+		let person = await page.getPersonByPos(params.person);
+		if (!person)
+			throw new Error('Person (' + params.person + ') not found');
+
+		await test('Change person to (' + person.name + ')',
 					() => page.changePersonByPos(params.person), page);
 	}
 
@@ -49,8 +57,8 @@ async function submitDebtTransaction(page, params)
 		await test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 	App.beforeSubmitTransaction = { person : page.model.person,
-	 								personPos : page.getPersonPos(page.model.person.id),
-									personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
+	 								personPos : await page.getPersonPos(page.model.person.id),
+									personAccount : page.getPersonAccount(page.model.person, page.model.src_curr_id),
 									noAccount : page.model.noAccount,
 									acc : page.model.account,
 									debtType : page.model.debtType,
@@ -64,7 +72,7 @@ async function submitDebtTransaction(page, params)
 	}
 
 	if (App.beforeSubmitTransaction.acc)
-		App.beforeSubmitTransaction.accPos = page.getAccountPos(page.model.account.id);
+		App.beforeSubmitTransaction.accPos = await page.getAccountPos(page.model.account.id);
 
 	return page.submit();
 }
@@ -183,11 +191,11 @@ function updateDebt(page, pos, params)
 	return goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(DEBT))
-			.then(page =>
+			.then(async page =>
 			{
 				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
 
-				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				let trObj = await page.getTransactionObject(page.content.transactions[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
@@ -208,11 +216,11 @@ function updateDebt(page, pos, params)
 				setParam(App.beforeUpdateTransaction,
 							{ id : page.model.id,
 								person : page.model.person,
- 								personPos : page.getPersonPos(page.model.person.id),
-								personAccount : page.getPersonAccount(page.model.person.id, page.model.src_curr_id),
+ 								personPos : await page.getPersonPos(page.model.person.id),
+								personAccount : page.getPersonAccount(page.model.person, page.model.src_curr_id),
 								noAccount : page.model.noAccount,
 								acc : page.model.noAccount ? page.model.account : null,
-								accPos : page.model.noAccount ? page.getAccountPos(page.model.account.id) : -1,
+								accPos : page.model.noAccount ? await page.getAccountPos(page.model.account.id) : -1,
 								debtType : page.model.debtType,
 								srcBalance : page.model.fSrcResBal,
 								destBalance : page.model.fDestResBal,

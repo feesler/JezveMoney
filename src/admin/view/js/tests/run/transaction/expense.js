@@ -2,7 +2,7 @@ async function submitExpenseTransaction(page, params)
 {
 	if ('srcAcc' in params)
 	{
-		let acc = page.getAccountByPos(params.srcAcc);
+		let acc = await page.getAccountByPos(params.srcAcc);
 		if (!acc)
 			throw new Error('Account (' + params.srcAcc + ') not found');
 
@@ -35,7 +35,7 @@ async function submitExpenseTransaction(page, params)
 		await test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 	App.beforeSubmitTransaction = { srcAcc : page.model.srcAccount,
-									srcAccPos : page.getAccountPos(page.model.srcAccount.id) };
+									srcAccPos : await page.getAccountPos(page.model.srcAccount.id) };
 
 	if (page.model.isUpdate)
 		App.beforeSubmitTransaction.id = page.model.id;
@@ -105,11 +105,11 @@ function updateExpense(page, pos, params)
 	return goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(EXPENSE))
-			.then(page =>
+			.then(async page =>
 			{
 				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
 
-				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				let trObj = await page.getTransactionObject(page.content.transactions[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
@@ -126,7 +126,7 @@ function updateExpense(page, pos, params)
 				setParam(App.beforeUpdateTransaction,
 							{ id : page.model.id,
 								srcAcc : page.model.srcAccount,
-								srcAccPos : page.getAccountPos(page.model.srcAccount.id),
+								srcAccPos : await page.getAccountPos(page.model.srcAccount.id),
 								srcBalance : page.model.fSrcResBal,
 								srcAmount : page.model.fSrcAmount,
 								destAmount : page.model.fDestAmount,
@@ -215,7 +215,7 @@ async function expenseTransactionLoop(page, actionState, action)
 	page.setBlock('Expense', 2);
 	await test('Initial state of new expense page', async () =>
 	{
-		let trObj = page.getUpdateTransactionObj();
+		let trObj = await page.getUpdateTransactionObj();
 
 		if (trObj)
 		{

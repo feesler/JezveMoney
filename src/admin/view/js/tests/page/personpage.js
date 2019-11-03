@@ -15,13 +15,13 @@ PersonPage.prototype.parseContent = async function()
 	res.headingElem = await this.query('.heading > h1');
 	if (!res.headingElem)
 		throw new Error('Heading element not found');
-	res.heading = res.headingElem.innerText;
+	res.heading = await this.prop(res.headingElem, 'innerText');
 
 	res.formElem = await this.query('form');
 	if (!res.formElem)
 		throw new Error('Form element not found');
 
-	res.isEdit = (res.formElem.firstElementChild.id == 'pid');
+	res.isEdit = (!!await this.query('#pid'));
 
 	res.name = await this.parseInputRow(await this.query(res.formElem, 'div.non_float'));
 	if (!res.name)
@@ -35,9 +35,9 @@ PersonPage.prototype.parseContent = async function()
 };
 
 
-PersonPage.prototype.inputName = function(val)
+PersonPage.prototype.inputName = async function(val)
 {
-	this.performAction(() => this.content.name.input(val));
+	return this.performAction(() => this.content.name.input(val));
 };
 
 

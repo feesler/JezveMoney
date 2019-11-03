@@ -2,7 +2,7 @@ async function submitIncomeTransaction(page, params)
 {
 	if ('destAcc' in params)
 	{
-		let acc = page.getAccountByPos(params.destAcc);
+		let acc = await page.getAccountByPos(params.destAcc);
 		if (!acc)
 			throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -35,7 +35,7 @@ async function submitIncomeTransaction(page, params)
 		await test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
 
 	App.beforeSubmitTransaction = { destAcc : page.model.destAccount,
-									destAccPos : page.getAccountPos(page.model.destAccount.id) };
+									destAccPos : await page.getAccountPos(page.model.destAccount.id) };
 	if (page.model.isUpdate)
 		App.beforeSubmitTransaction.id = page.model.id;
 
@@ -105,11 +105,11 @@ function updateIncome(page, pos, params)
 	return goToMainPage(page)
 			.then(page => page.goToTransactions())
 			.then(page => page.filterByType(INCOME))
-			.then(page =>
+			.then(async page =>
 			{
 				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
 
-				let trObj = page.getTransactionObject(page.content.transactions[pos].id);
+				let trObj = await page.getTransactionObject(page.content.transactions[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
@@ -126,7 +126,7 @@ function updateIncome(page, pos, params)
 				setParam(App.beforeUpdateTransaction,
 							{ id : page.model.id,
 								destAcc : page.model.destAccount,
-								destAccPos : page.getAccountPos(page.model.destAccount.id),
+								destAccPos : await page.getAccountPos(page.model.destAccount.id),
 								destBalance : page.model.fDestResBal,
 								srcAmount : page.model.fSrcAmount,
 								destAmount : page.model.fDestAmount,

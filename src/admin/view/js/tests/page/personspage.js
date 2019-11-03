@@ -21,7 +21,7 @@ PersonsPage.prototype.parseContent = async function()
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 		throw new Error('Wrong persons page structure');
 
-	res.title = res.titleEl.innerText;
+	res.title = this.prop(res.titleEl, 'innerText');
 	res.tiles = await this.parseTiles(await this.query('.tiles'));
 
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
@@ -45,7 +45,8 @@ PersonsPage.prototype.goToUpdatePerson = async function(num)
 
 	await this.content.tiles[num].click();
 
-	if (!this.content.toolbar.elem || !isVisible(this.content.toolbar.elem) || !this.content.toolbar.editBtn || !isVisible(this.content.toolbar.editBtn.elem))
+	if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
+		!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
 		throw new Error('Update person button not visible');
 
 	return this.navigation(() => this.content.toolbar.editBtn.click(), PersonPage);
@@ -70,26 +71,24 @@ PersonsPage.prototype.deletePersons = function(persons)
 
 					return this.content.tiles[person_num].click();
 				}))
-				.then(() =>
+				.then(async () =>
 				{
-					var editIsVisible = isVisible(this.content.toolbar.editBtn.elem);
+					let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
 					if (ind == 0 && !editIsVisible)
 						throw new Error('Edit button is not visible');
 					else if (ind > 0 && editIsVisible)
 						throw new Error('Edit button is visible while more than one person is selected');
 
-					if (!isVisible(this.content.toolbar.delBtn.elem))
+					if (!await this.isVisible(this.content.toolbar.delBtn.elem))
 						throw new Error('Delete button is not visible');
-
-					return Promise.resolve();
 				});
 	}, Promise.resolve());
 
 	return selectPromise
 			.then(() => this.performAction(() => this.content.toolbar.delBtn.click()))
-			.then(() =>
+			.then(async () =>
 			{
-				if (!isVisible(this.content.delete_warning.elem))
+				if (!await this.isVisible(this.content.delete_warning.elem))
 					throw new Error('Delete account warning popup not appear');
 
 				return this.navigation(() => this.click(this.content.delete_warning.okBtn), PersonsPage);

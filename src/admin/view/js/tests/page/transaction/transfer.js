@@ -10,7 +10,7 @@ function TransferTransactionPage()
 extend(TransferTransactionPage, TransactionPage);
 
 
-TransferTransactionPage.prototype.buildModel = function(cont)
+TransferTransactionPage.prototype.buildModel = async function(cont)
 {
 	var res = {};
 
@@ -18,11 +18,11 @@ TransferTransactionPage.prototype.buildModel = function(cont)
 	if (res.isUpdate)
 		res.id = cont.id;
 
-	res.srcAccount = this.getAccount(cont.source.id);
+	res.srcAccount = await this.getAccount(cont.source.id);
 	if (!res.srcAccount)
 		throw new Error('Source account not found');
 
-	res.destAccount = this.getAccount(cont.destination.id);
+	res.destAccount = await this.getAccount(cont.destination.id);
 	if (!res.destAccount)
 		throw new Error('Destination account not found');
 
@@ -61,11 +61,11 @@ TransferTransactionPage.prototype.buildModel = function(cont)
 	res.exchRate = cont.exchange_row.value;
 	this.updateExch(res);
 
-	var isSrcAmountRowVisible = !!(cont.src_amount_row && isVisible(cont.src_amount_row.elem));
-	var isDestAmountRowVisible = !!(cont.dest_amount_row && isVisible(cont.dest_amount_row.elem));
-	var isSrcResBalRowVisible = !!(cont.result_balance_row && isVisible(cont.result_balance_row.elem));
-	var isDestResBalRowVisible = !!(cont.result_balance_dest_row && isVisible(cont.result_balance_dest_row.elem));
-	var isExchRowVisible = !!(cont.exchange_row && isVisible(cont.exchange_row.elem));
+	var isSrcAmountRowVisible = !!(cont.src_amount_row && await this.isVisible(cont.src_amount_row.elem));
+	var isDestAmountRowVisible = !!(cont.dest_amount_row && await this.isVisible(cont.dest_amount_row.elem));
+	var isSrcResBalRowVisible = !!(cont.result_balance_row && await this.isVisible(cont.result_balance_row.elem));
+	var isDestResBalRowVisible = !!(cont.result_balance_dest_row && await this.isVisible(cont.result_balance_dest_row.elem));
+	var isExchRowVisible = !!(cont.exchange_row && await this.isVisible(cont.exchange_row.elem));
 
 	res.isDiffCurr = (res.src_curr_id != res.dest_curr_id);
 
@@ -443,12 +443,12 @@ TransferTransactionPage.prototype.clickDestResultBalance = function()
 };
 
 
-TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
+TransferTransactionPage.prototype.changeSrcAccount = async function(account_id)
 {
-	var newAcc = this.getAccount(account_id);
+	var newAcc = await this.getAccount(account_id);
 
 	if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
-		return Promise.resolve();
+		return;
 
 	this.model.srcAccount = newAcc;
 	this.model.src_curr_id = this.model.srcAccount.curr_id;
@@ -465,11 +465,11 @@ TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
 
 	if (newAcc.id == this.model.destAccount.id)
 	{
-		var nextAcc_id = this.getNextAccount(newAcc.id);
+		var nextAcc_id = await this.getNextAccount(newAcc.id);
 		if (!nextAcc_id)
 			throw new Error('Next account not found');
 
-		this.model.destAccount = this.getAccount(nextAcc_id);
+		this.model.destAccount = await this.getAccount(nextAcc_id);
 		this.model.dest_curr_id = this.model.destAccount.curr_id;
 		this.model.destCurr = getCurrency(this.model.dest_curr_id);
 		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
@@ -538,12 +538,12 @@ TransferTransactionPage.prototype.changeSrcAccount = function(account_id)
 };
 
 
-TransferTransactionPage.prototype.changeDestAccount = function(account_id)
+TransferTransactionPage.prototype.changeDestAccount = async function(account_id)
 {
-	var newAcc = this.getAccount(account_id);
+	var newAcc = await this.getAccount(account_id);
 
 	if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
-		return Promise.resolve();
+		return;
 
 	this.model.destAccount = newAcc;
 	this.model.dest_curr_id = this.model.destAccount.curr_id;
@@ -560,8 +560,8 @@ TransferTransactionPage.prototype.changeDestAccount = function(account_id)
 
 	if (newAcc.id == this.model.srcAccount.id)
 	{
-		var nextAcc_id = this.getNextAccount(newAcc.id);
-		var newSrcAcc = this.getAccount(nextAcc_id);
+		var nextAcc_id = await this.getNextAccount(newAcc.id);
+		var newSrcAcc = await this.getAccount(nextAcc_id);
 		if (!newSrcAcc)
 			throw new Error('Next account not found');
 		this.model.srcAccount = newSrcAcc;

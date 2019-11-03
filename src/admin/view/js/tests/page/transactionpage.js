@@ -8,20 +8,29 @@ function TransactionPage()
 extend(TransactionPage, TestPage);
 
 
-TransactionPage.prototype.parseTileRightItem = function(elem)
+TransactionPage.prototype.parseTileRightItem = async function(elem)
 {
-	if (!elem || !elem.firstElementChild || !elem.firstElementChild.nextElementSibling || !elem.firstElementChild.nextElementSibling.firstElementChild)
+	if (!elem)
 		return null;
 
 	var self = this;
 	var res = { elem : elem };
-	res.titleElem = elem.firstElementChild;
-	res.title = res.titleElem.innerText;
-	res.buttonElem = res.titleElem.nextElementSibling.firstElementChild;
-	res.value = res.buttonElem.firstElementChild.innerText;
-	res.click = function()
+	res.titleElem = await this.query(elem, ':scope > *');
+	if (!res.titleElem)
+		throw new Error('Title element not found');
+	res.title = await this.prop(res.titleElem, 'innerText');
+
+	res.buttonElem = await this.query(elem, 'button');
+	if (!res.buttonElem)
+		throw new Error('Button element not found');
+	let buttonInner = await this.query(res.buttonElem, 'span');
+	if (!buttonInner)
+		throw new Error('Wrong structure of tile info block');
+	res.value = await this.prop(buttonInner, 'innerText');
+
+	res.click = async function()
 	{
-		self.click(this.buttonElem);
+		return self.click(this.buttonElem);
 	};
 
 	return res;
@@ -35,15 +44,18 @@ TransactionPage.prototype.parseTileBlock = async function(elem)
 
 	var res = { elem : elem };
 
-	var lbl = await this.query(elem, 'div > label');
+	let lbl = await this.query(elem, 'div > label');
 	if (!lbl)
 		throw new Error('Tile block label not found');
+	res.label = await this.prop(lbl, 'innerText');
 
-	res.label = lbl.innerText;
 	res.tile = await this.parseTile(await this.query(elem, '.tile'));
+	if (!res.tile)
+		throw new Error('Tile not found');
+
 	res.dropDown = await this.parseDropDown(await this.query(elem, '.dd_attached'));
 
-	res.selectAccount = function(val)
+	res.selectAccount = async function(val)
 	{
 		if (res.dropDown)
 			return res.dropDown.selectByValue(val);
@@ -58,20 +70,21 @@ TransactionPage.prototype.parseCommentRow = async function(elem)
 	if (!elem)
 		return null;
 
+	var self = this;
 	var res = { elem : elem };
 
 	var iconLinkElem = await this.query(elem, '.iconlink');
 
 	res.iconLink = await this.parseIconLink(iconLinkElem);
-	res.inputRow = await this.parseInputRow(iconLinkElem.nextElementSibling);
+	res.inputRow = await this.parseInputRow(await this.query('#comment_block'));
 	if (!res.inputRow)
 		throw new Error('Input row of comment not found');
 	res.value = res.inputRow.value;
 
 	res.input = async function(val)
 	{
-		if (isVisible(this.iconLink))
-			await this.iconLink.click()
+		if (await self.isVisible(this.iconLink))
+			await this.iconLink.click();
 
 		return this.inputRow.input(val);
 	};
@@ -84,7 +97,7 @@ TransactionPage.prototype.parseContent = async function()
 {
 	var res = {};
 
-	res.isUpdate = viewframe.contentWindow.edit_mode;
+	res.isUpdate = await this.global('edit_mode');
 
 	if (res.isUpdate)
 	{
@@ -92,14 +105,14 @@ TransactionPage.prototype.parseContent = async function()
 		if (!hiddenEl)
 			throw new Error('Transaction id field not found');
 
-		res.id = parseInt(hiddenEl.value);
+		res.id = parseInt(await this.prop(hiddenEl, 'value'));
 		if (!res.id)
 			throw new Error('Wrong transaction id');
 	}
 
 	res.heading = { elem : await this.query('.heading > h1') };
 	if (res.heading.elem)
-		res.heading.title = res.heading.elem.innerText;
+		res.heading.title = await this.prop(res.heading.elem, 'innerText');
 
 	res.delBtn = await this.query('#del_btn');
 
@@ -109,28 +122,45 @@ TransactionPage.prototype.parseContent = async function()
 	{
 		res.person = await this.parseTileBlock(await this.query('#person'));
 		if (res.person)
-			res.person.id = parseInt((await this.query('#person_id')).value);
+		{
+			let personIdInp = await this.query('#person_id');
+			res.person.id = parseInt(await this.prop(personIdInp, 'value'));
+		}
 
 		res.account = await this.parseTileBlock(await this.query('#source'));
 		if (res.account)
 		{
-			res.account.id = parseInt((await this.query('#acc_id')).value);
+			let accountIdInp = await this.query('#acc_id');
+			res.account.id = parseInt(await this.prop(accountIdInp, 'value'));
 			res.accTileContainer = { elem : await this.query('#source .tile_container') };
 		}
 
 		res.operation = await this.parseOperation(await this.query('#operation'));
 
-		res.selaccount = { elem : await this.query('#selaccount') };
-		res.noacc_btn = { elem : await this.query('#noacc_btn') };
+		res.selaccount = { elem : await this.query('#selaccount'), btn : await this.query('#selaccount > *') };
+		if (!res.selaccount.elem || !res.selaccount.btn)
+			throw new Error('Select account button not found');
+		res.selaccount.click = () => this.click(res.selaccount.btn);
+
+		res.noacc_btn = { elem : await this.query('#noacc_btn'), btn : await this.query('#noacc_btn > *') };
+		if (!res.noacc_btn.elem || !res.noacc_btn.btn)
+			throw new Error('Disable account button not found');
+		res.noacc_btn.click = () => this.click(res.noacc_btn.btn);
 	}
 	else
 	{
 		res.source = await this.parseTileBlock(await this.query('#source'));
 		if (res.source)
-			res.source.id = parseInt((await this.query('#src_id')).value);
+		{
+			let srcIdInp = await this.query('#src_id');
+			res.source.id = parseInt(await this.prop(srcIdInp, 'value'));
+		}
 		res.destination = await this.parseTileBlock(await this.query('#destination'));
 		if (res.destination)
-			res.destination.id = parseInt((await this.query('#dest_id')).value);
+		{
+			let destIdInp = await this.query('#dest_id');
+			res.destination.id = parseInt(await this.prop(destIdInp, 'value'));
+		}
 	}
 
 	res.src_amount_left = await this.parseTileRightItem(await this.query('#src_amount_left'));
@@ -145,28 +175,31 @@ TransactionPage.prototype.parseContent = async function()
 	res.result_balance_row = await this.parseInputRow(await this.query('#result_balance'));
 	res.result_balance_dest_row = await this.parseInputRow(await this.query('#result_balance_dest'));
 
-	res.datePicker = await this.parseDatePickerRow((await this.query('#calendar_btn')).parentNode);
-	res.comment_row = await this.parseCommentRow((await this.query('#comm_btn')).parentNode);
+	let calendarBtn = await this.query('#calendar_btn');
+	res.datePicker = await this.parseDatePickerRow(await this.parent(calendarBtn));
+	let commentBtn = await this.query('#comm_btn');
+	res.comment_row = await this.parseCommentRow(await this.parent(commentBtn));
 
 	res.submitBtn = await this.query('#submitbtn');
-	res.cancelBtn = res.submitBtn.nextElementSibling;
+	res.cancelBtn = await this.query('#submitbtn + *');
 
 	return res;
 };
 
 
 // Return null if no account can't be found
-TransactionPage.prototype.getAccount = function(acc_id)
+TransactionPage.prototype.getAccount = async function(acc_id)
 {
-	return idSearch(viewframe.contentWindow.accounts, acc_id);
+	return idSearch(await this.global('accounts'), acc_id);
 };
 
 
 // Return zero if no account can't be found
-TransactionPage.prototype.getAccountByPos = function(pos)
+TransactionPage.prototype.getAccountByPos = async function(pos)
 {
-	if (pos >= 0 && pos < viewframe.contentWindow.accounts.length)
-		return viewframe.contentWindow.accounts[pos];
+	let accounts = await this.global('accounts');
+	if (pos >= 0 && pos < accounts.length)
+		return accounts[pos];
 	else
 		return null;
 };
@@ -174,23 +207,23 @@ TransactionPage.prototype.getAccountByPos = function(pos)
 
 // Return current position of account in accounts array
 // Return -1 in case account can't be found
-TransactionPage.prototype.getAccountPos = function(acc_id)
+TransactionPage.prototype.getAccountPos = async function(acc_id)
 {
-	return getPosById(viewframe.contentWindow.accounts, acc_id);
+	return getPosById(await this.global('accounts'), acc_id);
 };
 
 
 // Return another account id if possible
-// Return zero if no account can't be found
-TransactionPage.prototype.getNextAccount = function(acc_id)
+// Return zero if no account found
+TransactionPage.prototype.getNextAccount = async function(acc_id)
 {
-	var data = viewframe.contentWindow.accounts;
+	let data = await this.global('accounts');
 	var pos;
 
 	if (!isArray(data) || data.length < 2 || !acc_id)
 		return -1;
 
-	pos = this.getAccountPos(acc_id);
+	pos = await this.getAccountPos(acc_id);
 	if (pos == -1)
 		return 0;
 
@@ -200,36 +233,38 @@ TransactionPage.prototype.getNextAccount = function(acc_id)
 };
 
 
-// Return zero if no person can't be found
-TransactionPage.prototype.getPerson = function(person_id)
+// Return zero if no person found
+TransactionPage.prototype.getPerson = async function(person_id)
 {
-	return idSearch(viewframe.contentWindow.persons, person_id);
+	return idSearch(await this.global('persons'), person_id);
 };
 
 
 // Return zero if no person found
-TransactionPage.prototype.getPersonByPos = function(pos)
+TransactionPage.prototype.getPersonByPos = async function(pos)
 {
-	if (pos >= 0 && pos < viewframe.contentWindow.persons.length)
-		return viewframe.contentWindow.persons[pos];
+	let persons = await this.global('persons');
+
+	if (pos >= 0 && pos < persons.length)
+		return persons[pos];
 	else
 		return null;
 };
 
 
 // Return zero if no person found
-TransactionPage.prototype.getPersonPos = function(person_id)
+TransactionPage.prototype.getPersonPos = async function(person_id)
 {
-	return getPosById(viewframe.contentWindow.persons, person_id);
+	return getPosById(await this.global('persons'), person_id);
 };
 
 
 // Return account of person in specified currency
-TransactionPage.prototype.getPersonAccount = function(person_id, curr_id)
+TransactionPage.prototype.getPersonAccount = async function(person_id, curr_id)
 {
 	var person, resAcc = null;
 
-	person = this.getPerson(person_id);
+	person = await this.getPerson(person_id);
 	if (!person || !person.accounts || !curr_id)
 		return resAcc;
 
@@ -249,9 +284,9 @@ TransactionPage.prototype.getPersonAccount = function(person_id, curr_id)
 
 
 // Return null if no account can't be found
-TransactionPage.prototype.getUpdateTransactionObj = function()
+TransactionPage.prototype.getUpdateTransactionObj = async function()
 {
-	return viewframe.contentWindow.edit_transaction;
+	return this.global('edit_transaction');
 };
 
 
@@ -288,7 +323,7 @@ TransactionPage.prototype.updateExch = function(model)
 };
 
 
-TransactionPage.prototype.changeTransactionType = function(type)
+TransactionPage.prototype.changeTransactionType = async function(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
