@@ -1,9 +1,10 @@
 const process = require('process');
 const puppeteer = require('puppeteer');
+const chalk = require('chalk');
 const common = require('./common.js');
 const route = require('./router.js');
-
 const main = require('./main.js');
+
 
 var Environment = (function()
 {
@@ -181,12 +182,19 @@ var Environment = (function()
 
 	function addResult(descr, res, message)
 	{
-		console.log(descr + ': ' + (res ? 'OK' : 'FAIL') + (message ? ' ' + message : ''));
+		console.log(descr + ': ' + (res ? chalk.green('OK') : chalk.red('FAIL')) + (message ? ' ' + message : ''));
 	}
 
 
 	function setBlock(title, category)
 	{
+		if (category == 1)
+			title = chalk.whiteBright.bgBlue(' ' + title + ' ');
+		else if (category == 2)
+			title = chalk.whiteBright.bgBlueBright(' ' + title + ' ');
+		else if (category == 3)
+			title = chalk.whiteBright(' ' + title + ' ');
+
 		console.log(title);
 	}
 
