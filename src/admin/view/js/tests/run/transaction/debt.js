@@ -3,18 +3,12 @@ if (typeof module !== 'undefined' && module.exports)
 	const common = require('../../common.js');
 	var test = common.test;
 	var formatDate = common.formatDate;
-
-	const _ = require('../../../../../../view/js/common.js');
-	var isObject = _.isObject;
-	var setParam = _.setParam;
-
-	const a = require('../../../../../../view/js/app.js');
-	var normalize = a.normalize;
-	var normalizeExch = a.normalizeExch;
-	var DEBT = a.DEBT;
-
-	var c = require('../../../../../../view/js/currency.js');
-	var formatCurrency = c.formatCurrency;
+	var isObject = common.isObject;
+	var setParam = common.setParam;
+	var normalize = common.normalize;
+	var normalizeExch = common.normalizeExch;
+	var formatCurrency = common.formatCurrency;
+	var DEBT = common.DEBT;
 
 	var App = null;
 }

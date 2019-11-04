@@ -1,7 +1,7 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	const _ = require('../../../../../view/js/common.js');
-	var extend = _.extend;
+	const common = require('../common.js');
+	var extend = common.extend;
 
 	var TestPage = require('./page.js');
 }

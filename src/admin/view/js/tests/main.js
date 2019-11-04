@@ -11,22 +11,21 @@ if (typeof module !== 'undefined' && module.exports)
 	transactions.transfer = require('./run/transaction/transfer.js');
 	transactions.debt = require('./run/transaction/debt.js');
 
-	let common = require('./common.js');
+	var common = require('./common.js');
 	var copyObject = common.copyObject;
 	var test = common.test;
 	var getPosById = common.getPosById;
 
-	let a = require('../../../../view/js/app.js');
-	var EXPENSE = a.EXPENSE;
-	var INCOME = a.INCOME;
-	var TRANSFER = a.TRANSFER;
-	var DEBT = a.DEBT;
+	var EXPENSE = common.EXPENSE;
+	var INCOME = common.INCOME;
+	var TRANSFER = common.TRANSFER;
+	var DEBT = common.DEBT;
 
-	var c = require('../../../../view/js/currency.js');
-	var formatCurrency = c.formatCurrency;
+	var formatCurrency = common.formatCurrency;
 }
 else
 {
+	var common = commonModule;
 	var accounts = runAccounts;
 	var persons = runPersons;
 	transactions.expense = runExpense;
@@ -46,8 +45,7 @@ var App = {
 	{
 		let notification = { App : this };
 
-		if (typeof module !== 'undefined' && module.exports)
-			c.onAppUpdate(App.currencies);
+		common.onAppUpdate(notification);
 
 		accounts.onAppUpdate(notification);
 		persons.onAppUpdate(notification);

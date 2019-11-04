@@ -135,6 +135,7 @@ var Environment = (function()
 		return elem.onchange();
 	}
 
+
 	async function inputEmul(elemObj, val)
 	{
 		elemObj.value = val;

@@ -1,6 +1,5 @@
 const process = require('process');
 const puppeteer = require('puppeteer');
-const _ = require('../../../../view/js/common.js');
 const common = require('./common.js');
 const route = require('./router.js');
 
@@ -194,7 +193,7 @@ var Environment = (function()
 
 	async function navigation(action)
 	{
-		if (!_.isFunction(action))
+		if (!common.isFunction(action))
 			throw new Error('Wrong action specified');
 
 		let navPromise = new Promise((resolve, reject) =>

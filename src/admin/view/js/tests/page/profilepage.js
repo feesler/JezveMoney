@@ -1,12 +1,11 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	var _ = require('../../../../../view/js/common.js');
-	var hasClass = _.hasClass;
-	var isVisible = _.isVisible;
-	var idSearch = _.idSearch;
-	var isObject = _.isObject;
-	var isFunction = _.isFunction;
-	var extend = _.extend;
+	const common = require('../common.js');
+	var hasClass = common.hasClass;
+	var idSearch = common.idSearch;
+	var isObject = common.isObject;
+	var isFunction = common.isFunction;
+	var extend = common.extend;
 
 	var TestPage = require('./page.js');
 }
@@ -86,9 +85,9 @@ ProfilePage.prototype.resetAll = function()
 
 		return this.click(this.content.resetAllBtn);
 	})
-	.then(() =>
+	.then(async () =>
 	{
-		if (!this.content.reset_all_warning || !this.content.reset_all_warning.elem || !isVisible(this.content.reset_all_warning.elem))
+		if (!this.content.reset_all_warning || !this.content.reset_all_warning.elem || !await this.isVisible(this.content.reset_all_warning.elem))
 			throw new Error('Warning popup not appear');
 		if (!this.content.reset_all_warning.okBtn)
 			throw new Error('Confirm button not found');

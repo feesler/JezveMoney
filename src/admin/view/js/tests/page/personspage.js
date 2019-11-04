@@ -1,8 +1,8 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	const _ = require('../../../../../view/js/common.js');
-	var extend = _.extend;
-	var isArray = _.isArray;
+	const common = require('../common.js');
+	var extend = common.extend;
+	var isArray = common.isArray;
 
 	var TestPage = require('./page.js');
 }

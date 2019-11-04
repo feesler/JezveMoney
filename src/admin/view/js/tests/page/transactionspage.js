@@ -1,11 +1,9 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	const _ = require('../../../../../view/js/common.js');
-	var extend = _.extend;
-	var isArray = _.isArray;
-
-	const a = require('../../../../../view/js/app.js');
-	var idSearch = a.idSearch;
+	const common = require('../common.js');
+	var extend = common.extend;
+	var isArray = common.isArray;
+	var idSearch = common.idSearch;
 
 	var TestPage = require('./page.js');
 }

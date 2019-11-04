@@ -2,18 +2,12 @@ if (typeof module !== 'undefined' && module.exports)
 {
 	const common = require('../common.js');
 	var test = common.test;
-
-	const _ = require('../../../../../view/js/common.js');
-	var setParam = _.setParam;
-	var isArray = _.isArray;
-
-	const a = require('../../../../../view/js/app.js');
-	var idSearch = a.idSearch;
-	var normalize = a.normalize;
-
-	var c = require('../../../../../view/js/currency.js');
-	var formatCurrency = c.formatCurrency;
-	var getCurrency = c.getCurrency;
+	var setParam = common.setParam;
+	var isArray = common.isArray;
+	var idSearch = common.idSearch;
+	var normalize = common.normalize;
+	var formatCurrency = common.formatCurrency;
+	var getCurrency = common.getCurrency;
 
 	var App = null;
 }

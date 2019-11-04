@@ -1,9 +1,9 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-const common = require('../common.js');
-var test = common.test;
+	const common = require('../common.js');
+	var test = common.test;
 
-var App = null;
+	var App = null;
 }
 
 

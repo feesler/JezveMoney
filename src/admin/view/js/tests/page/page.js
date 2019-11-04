@@ -1,22 +1,20 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	let _ = require('../../../../../view/js/common.js');
-	var idSearch = _.idSearch;
-	var isObject = _.isObject;
-	var isFunction = _.isFunction;
-
-	let a = require('../../../../../view/js/app.js');
-	var idSearch = a.idSearch;
-	var fixFloat = a.fixFloat;
-	var correct = a.correct;
-	var correctExch = a.correctExch;
-	var normalize = a.normalize;
-	var normalizeExch = a.normalizeExch;
-	var isValidValue = a.isValidValue;
-	var EXPENSE = a.EXPENSE;
-	var INCOME = a.INCOME;
-	var TRANSFER = a.TRANSFER;
-	var DEBT = a.DEBT;
+	const common = require('../common.js');
+	var idSearch = common.idSearch;
+	var isObject = common.isObject;
+	var isFunction = common.isFunction;
+	var idSearch = common.idSearch;
+	var fixFloat = common.fixFloat;
+	var correct = common.correct;
+	var correctExch = common.correctExch;
+	var normalize = common.normalize;
+	var normalizeExch = common.normalizeExch;
+	var isValidValue = common.isValidValue;
+	var EXPENSE = common.EXPENSE;
+	var INCOME = common.INCOME;
+	var TRANSFER = common.TRANSFER;
+	var DEBT = common.DEBT;
 }
 
 
