@@ -20,7 +20,7 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function initDebtTransaction(props)
+function onAppUpdateDebt(props)
 {
 	props = props || {};
 
@@ -676,10 +676,10 @@ async function debtTransactionLoop(page, actionState, action)
 }
 
 
-var runDebt = { init : initDebtTransaction,
-					createDebt : createDebt,
-					updateDebt : updateDebt,
-					debtTransactionLoop : debtTransactionLoop };
+var runDebt = { onAppUpdate : onAppUpdateDebt,
+				createDebt : createDebt,
+				updateDebt : updateDebt,
+				debtTransactionLoop : debtTransactionLoop };
 
 
 if (typeof module !== 'undefined' && module.exports)

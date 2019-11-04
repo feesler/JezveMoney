@@ -20,7 +20,7 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function initTransferTransaction(props)
+function onAppUpdateTransfer(props)
 {
 	props = props || {};
 
@@ -521,7 +521,7 @@ async function transferTransactionLoop(page, actionState, action)
 }
 
 
-var runTransfer = { init : initTransferTransaction,
+var runTransfer = { onAppUpdate : onAppUpdateTransfer,
 					createTransfer : createTransfer,
 					updateTransfer : updateTransfer,
 					transferTransactionLoop : transferTransactionLoop };

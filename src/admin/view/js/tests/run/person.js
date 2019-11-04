@@ -7,7 +7,7 @@ var App = null;
 }
 
 
-function initPersons(props)
+function onAppUpdatePersons(props)
 {
 	props = props || {};
 
@@ -89,7 +89,7 @@ function deletePersons(page, persons)
 }
 
 
-var runPersons = { init : initPersons,
+var runPersons = { onAppUpdate : onAppUpdatePersons,
 					checkInitialPersons : checkInitialPersons,
 					createPerson : createPerson,
 					updatePerson : updatePerson,

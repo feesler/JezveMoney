@@ -19,7 +19,7 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function initAccounts(props)
+function onAppUpdateAccounts(props)
 {
 	props = props || {};
 
@@ -209,7 +209,7 @@ function deleteAccounts(page, accounts)
 }
 
 
-var runAccounts = { init : initAccounts,
+var runAccounts = { onAppUpdate : onAppUpdateAccounts,
 					createAccount1 : createAccount1,
 					checkCreateAccount : checkCreateAccount,
 					createAccount2 : createAccount2,

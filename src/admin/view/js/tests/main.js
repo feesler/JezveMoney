@@ -47,14 +47,14 @@ var App = {
 		let notification = { App : this };
 
 		if (typeof module !== 'undefined' && module.exports)
-			c.init(App.currencies);
+			c.onAppUpdate(App.currencies);
 
-		accounts.init(notification);
-		persons.init(notification);
-		transactions.expense.init(notification);
-		transactions.income.init(notification);
-		transactions.transfer.init(notification);
-		transactions.debt.init(notification);
+		accounts.onAppUpdate(notification);
+		persons.onAppUpdate(notification);
+		transactions.expense.onAppUpdate(notification);
+		transactions.income.onAppUpdate(notification);
+		transactions.transfer.onAppUpdate(notification);
+		transactions.debt.onAppUpdate(notification);
 	},
 
 	goToMainPage : goToMainPage

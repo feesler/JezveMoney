@@ -20,7 +20,7 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function initIncomeTransaction(props)
+function onAppUpdateIncome(props)
 {
 	props = props || {};
 
@@ -413,7 +413,7 @@ async function incomeTransactionLoop(page, actionState, action)
 }
 
 
-var runIncome = { init : initIncomeTransaction,
+var runIncome = { onAppUpdate : onAppUpdateIncome,
 					createIncome : createIncome,
 					updateIncome : updateIncome,
 					incomeTransactionLoop : incomeTransactionLoop };

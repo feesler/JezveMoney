@@ -22,7 +22,7 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function initExpenseTransaction(props)
+function onAppUpdateExpense(props)
 {
 	props = props || {};
 
@@ -418,7 +418,7 @@ async function expenseTransactionLoop(page, actionState, action)
 }
 
 
-var runExpense = { init : initExpenseTransaction,
+var runExpense = { onAppUpdate : onAppUpdateExpense,
 					createExpense : createExpense,
 					updateExpense : updateExpense,
 					expenseTransactionLoop : expenseTransactionLoop };
