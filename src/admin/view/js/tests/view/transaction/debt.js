@@ -11,23 +11,23 @@ if (typeof module !== 'undefined' && module.exports)
 	var isValidValue = common.isValidValue;
 	var getCurrency = common.getCurrency;
 
-	var TransactionPage = require('../transactionpage.js');
+	var TransactionView = require('../transaction.js');
 }
 
 
-// Create or update transfer transaction page tests
-function DebtTransactionPage()
+// Create or update transfer transaction view tests
+function DebtTransactionView()
 {
-	DebtTransactionPage.parent.constructor.apply(this, arguments);
+	DebtTransactionView.parent.constructor.apply(this, arguments);
 
 	this.expectedState = {};
 }
 
 
-extend(DebtTransactionPage, TransactionPage);
+extend(DebtTransactionView, TransactionView);
 
 
-DebtTransactionPage.prototype.parseOperation = async function(el)
+DebtTransactionView.prototype.parseOperation = async function(el)
 {
 	var res = { elem : el };
 
@@ -43,7 +43,7 @@ DebtTransactionPage.prototype.parseOperation = async function(el)
 };
 
 
-DebtTransactionPage.prototype.buildModel = async function(cont)
+DebtTransactionView.prototype.buildModel = async function(cont)
 {
 	var res = {};
 
@@ -163,7 +163,7 @@ DebtTransactionPage.prototype.buildModel = async function(cont)
 
 // Set source amount value
 // State 0, 1 or 2: source and destination currencies are the same
-DebtTransactionPage.prototype.setSrcAmount = async function(model, val)
+DebtTransactionView.prototype.setSrcAmount = async function(model, val)
 {
 	model.srcAmount = val;
 
@@ -208,7 +208,7 @@ DebtTransactionPage.prototype.setSrcAmount = async function(model, val)
 
 // Set destination amount value
 // State 0, 1 or 2: source and destination currencies are the same
-DebtTransactionPage.prototype.setDestAmount = async function(model, val)
+DebtTransactionView.prototype.setDestAmount = async function(model, val)
 {
 	model.destAmount = val;
 
@@ -251,7 +251,7 @@ DebtTransactionPage.prototype.setDestAmount = async function(model, val)
 };
 
 
-DebtTransactionPage.prototype.setExpectedState = function(state_id)
+DebtTransactionView.prototype.setExpectedState = function(state_id)
 {
 	var res = {};
 
@@ -377,7 +377,7 @@ DebtTransactionPage.prototype.setExpectedState = function(state_id)
 };
 
 
-DebtTransactionPage.prototype.changePerson = async function(val)
+DebtTransactionView.prototype.changePerson = async function(val)
 {
 	this.model.person = await this.getPerson(val);
 
@@ -409,13 +409,13 @@ DebtTransactionPage.prototype.changePerson = async function(val)
 };
 
 
-DebtTransactionPage.prototype.changePersonByPos = async function(pos)
+DebtTransactionView.prototype.changePersonByPos = async function(pos)
 {
 	return this.changePerson(this.content.person.dropDown.items[pos].id);
 };
 
 
-DebtTransactionPage.prototype.toggleDebtType = async function()
+DebtTransactionView.prototype.toggleDebtType = async function()
 {
 	var newValue = !this.model.debtType;
 
@@ -498,7 +498,7 @@ DebtTransactionPage.prototype.toggleDebtType = async function()
 };
 
 
-DebtTransactionPage.prototype.inputSrcAmount = async function(val)
+DebtTransactionView.prototype.inputSrcAmount = async function(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 	var valueChanged = (this.model.fSrcAmount != fNewValue);
@@ -512,11 +512,11 @@ DebtTransactionPage.prototype.inputSrcAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return DebtTransactionPage.parent.inputSrcAmount.apply(this, arguments);
+	return DebtTransactionView.parent.inputSrcAmount.apply(this, arguments);
 };
 
 
-DebtTransactionPage.prototype.inputResBalance = async function(val)
+DebtTransactionView.prototype.inputResBalance = async function(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -537,11 +537,11 @@ DebtTransactionPage.prototype.inputResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return DebtTransactionPage.parent.inputResBalance.apply(this, arguments);
+	return DebtTransactionView.parent.inputResBalance.apply(this, arguments);
 };
 
 
-DebtTransactionPage.prototype.inputDestResBalance = async function(val)
+DebtTransactionView.prototype.inputDestResBalance = async function(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -562,11 +562,11 @@ DebtTransactionPage.prototype.inputDestResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return DebtTransactionPage.parent.inputDestResBalance.apply(this, arguments);
+	return DebtTransactionView.parent.inputDestResBalance.apply(this, arguments);
 };
 
 
-DebtTransactionPage.prototype.clickSrcResultBalance = function()
+DebtTransactionView.prototype.clickSrcResultBalance = function()
 {
 	if (this.model.state === 0 || this.model.state === 2)			// Transition 1 or 4
 		this.setExpectedState(1);
@@ -577,11 +577,11 @@ DebtTransactionPage.prototype.clickSrcResultBalance = function()
 	else
 		throw new Error('Unexpected state');
 
-	return DebtTransactionPage.parent.clickSrcResultBalance.apply(this, arguments);
+	return DebtTransactionView.parent.clickSrcResultBalance.apply(this, arguments);
 };
 
 
-DebtTransactionPage.prototype.clickDestResultBalance = function()
+DebtTransactionView.prototype.clickDestResultBalance = function()
 {
 	if (this.model.state === 0 || this.model.state === 1)				// Transition 3 or 5
 		this.setExpectedState(2);
@@ -592,11 +592,11 @@ DebtTransactionPage.prototype.clickDestResultBalance = function()
 	else
 		throw new Error('Unexpected state');
 
-	return DebtTransactionPage.parent.clickDestResultBalance.apply(this, arguments);
+	return DebtTransactionView.parent.clickDestResultBalance.apply(this, arguments);
 };
 
 
-DebtTransactionPage.prototype.toggleAccount = async function()
+DebtTransactionView.prototype.toggleAccount = async function()
 {
 	this.model.noAccount = !this.model.noAccount;
 
@@ -661,7 +661,7 @@ DebtTransactionPage.prototype.toggleAccount = async function()
 };
 
 
-DebtTransactionPage.prototype.changeAccount = async function(account_id)
+DebtTransactionView.prototype.changeAccount = async function(account_id)
 {
 	var newAcc = await this.getAccount(account_id);
 
@@ -717,13 +717,13 @@ DebtTransactionPage.prototype.changeAccount = async function(account_id)
 };
 
 
-DebtTransactionPage.prototype.changeAccountByPos = function(pos)
+DebtTransactionView.prototype.changeAccountByPos = function(pos)
 {
 	return this.changeAccount(this.content.account.dropDown.items[pos].id);
 };
 
 
-DebtTransactionPage.prototype.clickSrcAmount = function()
+DebtTransactionView.prototype.clickSrcAmount = function()
 {
 	if (this.model.state === 1 || this.model.state === 2)			// Transition 2 or 4
 		this.setExpectedState(0);
@@ -736,9 +736,9 @@ DebtTransactionPage.prototype.clickSrcAmount = function()
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
 
-	return DebtTransactionPage.parent.clickSrcAmount.apply(this, arguments);
+	return DebtTransactionView.parent.clickSrcAmount.apply(this, arguments);
 };
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = DebtTransactionPage;
+	module.exports = DebtTransactionView;

@@ -4,21 +4,21 @@ if (typeof module !== 'undefined' && module.exports)
 	var extend = common.extend;
 	var isArray = common.isArray;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// List of persons page class
-function PersonsPage()
+// List of persons view class
+function PersonsView()
 {
-	PersonsPage.parent.constructor.apply(this, arguments);
+	PersonsView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(PersonsPage, TestPage);
+extend(PersonsView, TestView);
 
 
-PersonsPage.prototype.parseContent = async function()
+PersonsView.prototype.parseContent = async function()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
  				addBtn : await this.parseIconLink(await this.query('#add_btn')),
@@ -29,7 +29,7 @@ PersonsPage.prototype.parseContent = async function()
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
-		throw new Error('Wrong persons page structure');
+		throw new Error('Wrong persons view structure');
 
 	res.title = this.prop(res.titleEl, 'innerText');
 	res.tiles = await this.parseTiles(await this.query('.tiles'));
@@ -41,14 +41,14 @@ PersonsPage.prototype.parseContent = async function()
 
 
 // Click on add button and return navigation promise
-PersonsPage.prototype.goToCreatePerson = function()
+PersonsView.prototype.goToCreatePerson = function()
 {
 	return this.navigation(() => this.content.addBtn.click());
 };
 
 
 // Select specified person, click on edit button and return navigation promise
-PersonsPage.prototype.goToUpdatePerson = async function(num)
+PersonsView.prototype.goToUpdatePerson = async function(num)
 {
 	if (!this.content.tiles || this.content.tiles.length <= num || num < 0)
 		throw new Error('Wrong person number specified');
@@ -63,7 +63,7 @@ PersonsPage.prototype.goToUpdatePerson = async function(num)
 };
 
 
-PersonsPage.prototype.deletePersons = function(persons)
+PersonsView.prototype.deletePersons = function(persons)
 {
 	if (!persons)
 		throw new Error('No persons specified');
@@ -107,4 +107,4 @@ PersonsPage.prototype.deletePersons = function(persons)
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = PersonsPage;
+	module.exports = PersonsView;

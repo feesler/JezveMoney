@@ -11,21 +11,21 @@ if (typeof module !== 'undefined' && module.exports)
 	var isValidValue = common.isValidValue;
 	var getPosById = common.getPosById;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Create or update transaction page tests
-function TransactionPage()
+// Create or update transaction view tests
+function TransactionView()
 {
-	TransactionPage.parent.constructor.apply(this, arguments);
+	TransactionView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(TransactionPage, TestPage);
+extend(TransactionView, TestView);
 
 
-TransactionPage.prototype.parseTileRightItem = async function(elem)
+TransactionView.prototype.parseTileRightItem = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -54,7 +54,7 @@ TransactionPage.prototype.parseTileRightItem = async function(elem)
 };
 
 
-TransactionPage.prototype.parseTileBlock = async function(elem)
+TransactionView.prototype.parseTileBlock = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -82,7 +82,7 @@ TransactionPage.prototype.parseTileBlock = async function(elem)
 };
 
 
-TransactionPage.prototype.parseCommentRow = async function(elem)
+TransactionView.prototype.parseCommentRow = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -110,7 +110,7 @@ TransactionPage.prototype.parseCommentRow = async function(elem)
 };
 
 
-TransactionPage.prototype.parseContent = async function()
+TransactionView.prototype.parseContent = async function()
 {
 	var res = {};
 
@@ -205,14 +205,14 @@ TransactionPage.prototype.parseContent = async function()
 
 
 // Return null if no account can't be found
-TransactionPage.prototype.getAccount = async function(acc_id)
+TransactionView.prototype.getAccount = async function(acc_id)
 {
 	return idSearch(await this.global('accounts'), acc_id);
 };
 
 
 // Return zero if no account can't be found
-TransactionPage.prototype.getAccountByPos = async function(pos)
+TransactionView.prototype.getAccountByPos = async function(pos)
 {
 	let accounts = await this.global('accounts');
 	if (pos >= 0 && pos < accounts.length)
@@ -224,7 +224,7 @@ TransactionPage.prototype.getAccountByPos = async function(pos)
 
 // Return current position of account in accounts array
 // Return -1 in case account can't be found
-TransactionPage.prototype.getAccountPos = async function(acc_id)
+TransactionView.prototype.getAccountPos = async function(acc_id)
 {
 	return getPosById(await this.global('accounts'), acc_id);
 };
@@ -232,7 +232,7 @@ TransactionPage.prototype.getAccountPos = async function(acc_id)
 
 // Return another account id if possible
 // Return zero if no account found
-TransactionPage.prototype.getNextAccount = async function(acc_id)
+TransactionView.prototype.getNextAccount = async function(acc_id)
 {
 	let data = await this.global('accounts');
 	var pos;
@@ -251,14 +251,14 @@ TransactionPage.prototype.getNextAccount = async function(acc_id)
 
 
 // Return zero if no person found
-TransactionPage.prototype.getPerson = async function(person_id)
+TransactionView.prototype.getPerson = async function(person_id)
 {
 	return idSearch(await this.global('persons'), person_id);
 };
 
 
 // Return zero if no person found
-TransactionPage.prototype.getPersonByPos = async function(pos)
+TransactionView.prototype.getPersonByPos = async function(pos)
 {
 	let persons = await this.global('persons');
 
@@ -270,14 +270,14 @@ TransactionPage.prototype.getPersonByPos = async function(pos)
 
 
 // Return zero if no person found
-TransactionPage.prototype.getPersonPos = async function(person_id)
+TransactionView.prototype.getPersonPos = async function(person_id)
 {
 	return getPosById(await this.global('persons'), person_id);
 };
 
 
 // Return account of person in specified currency
-TransactionPage.prototype.getPersonAccount = function(person, curr_id)
+TransactionView.prototype.getPersonAccount = function(person, curr_id)
 {
 	var resAcc = null;
 
@@ -300,13 +300,13 @@ TransactionPage.prototype.getPersonAccount = function(person, curr_id)
 
 
 // Return null if no account can't be found
-TransactionPage.prototype.getUpdateTransactionObj = async function()
+TransactionView.prototype.getUpdateTransactionObj = async function()
 {
 	return this.global('edit_transaction');
 };
 
 
-TransactionPage.prototype.calcExchByAmounts = function(model)
+TransactionView.prototype.calcExchByAmounts = function(model)
 {
 	if (model.fSrcAmount == 0 || model.fDestAmount == 0)
 		model.exchRate = 1;
@@ -317,7 +317,7 @@ TransactionPage.prototype.calcExchByAmounts = function(model)
 };
 
 
-TransactionPage.prototype.updateExch = function(model)
+TransactionView.prototype.updateExch = function(model)
 {
 	model.fExchRate = isValidValue(model.exchRate) ? normalizeExch(model.exchRate) : model.exchRate;
 
@@ -339,7 +339,7 @@ TransactionPage.prototype.updateExch = function(model)
 };
 
 
-TransactionPage.prototype.changeTransactionType = async function(type)
+TransactionView.prototype.changeTransactionType = async function(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
@@ -348,119 +348,119 @@ TransactionPage.prototype.changeTransactionType = async function(type)
 };
 
 
-TransactionPage.prototype.submit = function()
+TransactionView.prototype.submit = function()
 {
 	return this.navigation(() => this.click(this.content.submitBtn));
 };
 
 
-TransactionPage.prototype.changeSrcAccount = function(val)
+TransactionView.prototype.changeSrcAccount = function(val)
 {
 	return this.performAction(() => this.content.source.selectAccount(val));
 };
 
 
-TransactionPage.prototype.changeSrcAccountByPos = function(pos)
+TransactionView.prototype.changeSrcAccountByPos = function(pos)
 {
 	return this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
 };
 
 
-TransactionPage.prototype.changeDestAccount = function(val)
+TransactionView.prototype.changeDestAccount = function(val)
 {
 	return this.performAction(() => this.content.destination.selectAccount(val));
 };
 
 
-TransactionPage.prototype.changeDestAccountByPos = function(pos)
+TransactionView.prototype.changeDestAccountByPos = function(pos)
 {
 	return this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
 };
 
 
-TransactionPage.prototype.inputSrcAmount = function(val)
+TransactionView.prototype.inputSrcAmount = function(val)
 {
 	return this.performAction(() => this.content.src_amount_row.input(val));
 };
 
 
-TransactionPage.prototype.clickSrcAmount = function()
+TransactionView.prototype.clickSrcAmount = function()
 {
 	return this.performAction(() => this.content.src_amount_left.click());
 };
 
 
-TransactionPage.prototype.inputDestAmount = function(val)
+TransactionView.prototype.inputDestAmount = function(val)
 {
 	return this.performAction(() => this.content.dest_amount_row.input(val));
 };
 
 
-TransactionPage.prototype.clickSrcResultBalance = function()
+TransactionView.prototype.clickSrcResultBalance = function()
 {
 	return this.performAction(() => this.content.src_res_balance_left.click());
 };
 
 
-TransactionPage.prototype.clickDestResultBalance = function()
+TransactionView.prototype.clickDestResultBalance = function()
 {
 	return this.performAction(() => this.content.dest_res_balance_left.click());
 };
 
 
-TransactionPage.prototype.clickDestAmount = function()
+TransactionView.prototype.clickDestAmount = function()
 {
 	return this.performAction(() => this.content.dest_amount_left.click());
 };
 
 
-TransactionPage.prototype.inputResBalance = function(val)
+TransactionView.prototype.inputResBalance = function(val)
 {
 	return this.performAction(() => this.content.result_balance_row.input(val))
 };
 
 
-TransactionPage.prototype.inputDestResBalance = function(val)
+TransactionView.prototype.inputDestResBalance = function(val)
 {
 	return this.performAction(() => this.content.result_balance_dest_row.input(val))
 };
 
 
-TransactionPage.prototype.changeSourceCurrency = function(val)
+TransactionView.prototype.changeSourceCurrency = function(val)
 {
 	return this.performAction(() => this.content.src_amount_row.selectCurr(val));
 };
 
 
-TransactionPage.prototype.changeDestCurrency = function(val)
+TransactionView.prototype.changeDestCurrency = function(val)
 {
 	return this.performAction(() => this.content.dest_amount_row.selectCurr(val));
 };
 
 
-TransactionPage.prototype.clickExchRate = function()
+TransactionView.prototype.clickExchRate = function()
 {
 	return this.performAction(() => this.content.exch_left.click());
 };
 
 
-TransactionPage.prototype.inputExchRate = function(val)
+TransactionView.prototype.inputExchRate = function(val)
 {
 	return this.performAction(() => this.content.exchange_row.input(val));
 };
 
 
-TransactionPage.prototype.changeDate = function(val)
+TransactionView.prototype.changeDate = function(val)
 {
 	return this.performAction(() => this.content.datePicker.inputDate(val));
 };
 
 
-TransactionPage.prototype.inputComment = function(val)
+TransactionView.prototype.inputComment = function(val)
 {
 	return this.performAction(() => this.content.comment_row.input(val));
 };
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = TransactionPage;
+	module.exports = TransactionView;

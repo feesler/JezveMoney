@@ -4,21 +4,21 @@ if (typeof module !== 'undefined' && module.exports)
 	var extend = common.extend;
 	var isArray = common.isArray;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// List of accounts page class
-function AccountsPage()
+// List of accounts view class
+function AccountsView()
 {
-	AccountsPage.parent.constructor.apply(this, arguments);
+	AccountsView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(AccountsPage, TestPage);
+extend(AccountsView, TestView);
 
 
-AccountsPage.prototype.parseContent = async function()
+AccountsView.prototype.parseContent = async function()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
  				addBtn : await this.parseIconLink(await this.query('#add_btn')),
@@ -30,7 +30,7 @@ AccountsPage.prototype.parseContent = async function()
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
-		throw new Error('Wrong accounts page structure');
+		throw new Error('Wrong accounts view structure');
 
 	res.title = this.prop(res.titleEl, 'innerText');
 	res.tiles = await this.parseTiles(await this.query('.tiles'));
@@ -42,14 +42,14 @@ AccountsPage.prototype.parseContent = async function()
 
 
 // Click on add button and return navigation promise
-AccountsPage.prototype.goToCreateAccount = function()
+AccountsView.prototype.goToCreateAccount = function()
 {
 	return this.navigation(() => this.content.addBtn.click());
 };
 
 
 // Select specified account, click on edit button and return navigation promise
-AccountsPage.prototype.goToUpdateAccount = async function(num)
+AccountsView.prototype.goToUpdateAccount = async function(num)
 {
 	if (!this.content.tiles || this.content.tiles.length <= num)
 		throw new Error('Wrong account number specified');
@@ -65,7 +65,7 @@ AccountsPage.prototype.goToUpdateAccount = async function(num)
 
 
 // Delete secified accounts and return navigation promise
-AccountsPage.prototype.deleteAccounts = function(acc)
+AccountsView.prototype.deleteAccounts = function(acc)
 {
 	if (!acc)
 		throw new Error('No accounts specified');
@@ -112,4 +112,4 @@ AccountsPage.prototype.deleteAccounts = function(acc)
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = AccountsPage;
+	module.exports = AccountsView;

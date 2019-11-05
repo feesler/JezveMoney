@@ -3,25 +3,25 @@ if (typeof module !== 'undefined' && module.exports)
 	const common = require('../common.js');
 	var extend = common.extend;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Main page tests
-function MainPage()
+// Main view tests
+function MainView()
 {
-	MainPage.parent.constructor.apply(this, arguments);
+	MainView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(MainPage, TestPage);
+extend(MainView, TestView);
 
 
-MainPage.prototype.parseContent = async function()
+MainView.prototype.parseContent = async function()
 {
 	var widgetsElem = await this.queryAll('.content_wrap .widget');
 	if (!widgetsElem)
-		throw new Error('Fail to parse main page widgets');
+		throw new Error('Fail to parse main view widgets');
 
 	var res = {};
 	res.widgets = [];
@@ -55,7 +55,7 @@ MainPage.prototype.parseContent = async function()
 };
 
 
-MainPage.prototype.goToAccounts = function()
+MainView.prototype.goToAccounts = function()
 {
  	if (!this.content.widgets || !this.content.widgets[0])
 		throw new Error('Accounts widget not found');
@@ -68,10 +68,10 @@ MainPage.prototype.goToAccounts = function()
 };
 
 
-MainPage.prototype.goToNewTransactionByAccount = function(accNum)
+MainView.prototype.goToNewTransactionByAccount = function(accNum)
 {
 	if (!this.content.widgets || !this.content.widgets[0])
-		throw new Error('Wrong state of main page');
+		throw new Error('Wrong state of main view');
 
 	var accWidget = this.content.widgets[0];
 	if (accWidget.title != 'Accounts')
@@ -87,10 +87,10 @@ MainPage.prototype.goToNewTransactionByAccount = function(accNum)
 };
 
 
-MainPage.prototype.goToTransactions = function()
+MainView.prototype.goToTransactions = function()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw new Error('Fail to parse main page widgets');
+		throw new Error('Fail to parse main view widgets');
 
 	var widget = this.content.widgets[2];
 	if (widget.title != 'Transactions')
@@ -100,10 +100,10 @@ MainPage.prototype.goToTransactions = function()
 };
 
 
-MainPage.prototype.goToPersons = function()
+MainView.prototype.goToPersons = function()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw new Error('Fail to parse main page widgets');
+		throw new Error('Fail to parse main view widgets');
 
 	var widget = this.content.widgets[3];
 	if (widget.title != 'Persons')
@@ -113,10 +113,10 @@ MainPage.prototype.goToPersons = function()
 };
 
 
-MainPage.prototype.goToStatistics = function()
+MainView.prototype.goToStatistics = function()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw new Error('Fail to parse main page widgets');
+		throw new Error('Fail to parse main view widgets');
 
 	var widget = this.content.widgets[4];
 	if (widget.title != 'Statistics')
@@ -127,4 +127,4 @@ MainPage.prototype.goToStatistics = function()
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = MainPage;
+	module.exports = MainView;

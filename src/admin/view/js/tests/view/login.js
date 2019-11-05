@@ -3,34 +3,34 @@ if (typeof module !== 'undefined' && module.exports)
 	const common = require('../common.js');
 	var extend = common.extend;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Log in page class
-function LoginPage()
+// Log in view class
+function LoginView()
 {
-	LoginPage.parent.constructor.apply(this, arguments);
+	LoginView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(LoginPage, TestPage);
+extend(LoginView, TestView);
 
 
-LoginPage.prototype.parseContent = async function()
+LoginView.prototype.parseContent = async function()
 {
 	var res = { loginInp : await this.query('#login'),
  				passwordInp : await this.query('#password'),
 				submitBtn : await this.query('.login_controls .btn.ok_btn'),
 				registerLink : await this.query('.login_controls .alter_link > a') };
 	if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink)
-		throw new Error('Wrong login page structure');
+		throw new Error('Wrong login view structure');
 
 	return res;
 };
 
 
-LoginPage.prototype.loginAs = async function(login, password)
+LoginView.prototype.loginAs = async function(login, password)
 {
 	await this.input(this.content.loginInp, login);
  	await this.input(this.content.passwordInp, password);
@@ -39,4 +39,4 @@ LoginPage.prototype.loginAs = async function(login, password)
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = LoginPage;
+	module.exports = LoginView;

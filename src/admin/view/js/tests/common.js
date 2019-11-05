@@ -336,7 +336,7 @@ function checkPHPerrors(env, content)
 
 
 // Run action, check state and add result to the list
-function test(descr, action, page, state)
+function test(descr, action, view, state)
 {
 	let actPromise = action();
 	if (!actPromise)
@@ -345,11 +345,11 @@ function test(descr, action, page, state)
 	return actPromise
 			.then(async () =>
 			{
-				let expState = (typeof state === 'undefined') ? page.expectedState : state;
-				let res = await page.checkState(expState);
-				page.addResult(descr, res);
+				let expState = (typeof state === 'undefined') ? view.expectedState : state;
+				let res = await view.checkState(expState);
+				view.addResult(descr, res);
 			})
-			.catch(e => page.addResult(descr, false, e.message));
+			.catch(e => view.addResult(descr, false, e.message));
 }
 
 

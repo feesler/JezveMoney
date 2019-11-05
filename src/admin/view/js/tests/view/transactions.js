@@ -5,27 +5,27 @@ if (typeof module !== 'undefined' && module.exports)
 	var isArray = common.isArray;
 	var idSearch = common.idSearch;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// List of transactions page class
-function TransactionsPage()
+// List of transactions view class
+function TransactionsView()
 {
-	TransactionsPage.parent.constructor.apply(this, arguments);
+	TransactionsView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(TransactionsPage, TestPage);
+extend(TransactionsView, TestView);
 
 
-TransactionsPage.prototype.getTransactionObject = async function(trans_id)
+TransactionsView.prototype.getTransactionObject = async function(trans_id)
 {
 	return idSearch(await this.global('transArr'), trans_id);
 };
 
 
-TransactionsPage.prototype.parseContent = async function()
+TransactionsView.prototype.parseContent = async function()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
  				addBtn : await this.parseIconLink(await this.query('#add_btn')),
@@ -37,7 +37,7 @@ TransactionsPage.prototype.parseContent = async function()
 				}
 			};
 	if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
-		throw new Error('Wrong transactions page structure');
+		throw new Error('Wrong transactions view structure');
 
 	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 
@@ -50,7 +50,7 @@ TransactionsPage.prototype.parseContent = async function()
 };
 
 
-TransactionsPage.prototype.filterByType = async function(type)
+TransactionsView.prototype.filterByType = async function(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
@@ -60,14 +60,14 @@ TransactionsPage.prototype.filterByType = async function(type)
 
 
 // Click on add button and return navigation promise
-TransactionsPage.prototype.goToCreateTransaction = function()
+TransactionsView.prototype.goToCreateTransaction = function()
 {
 	return this.navigation(() => this.content.addBtn.click());
 };
 
 
 // Select specified account, click on edit button and return navigation promise
-TransactionsPage.prototype.goToUpdateTransaction = async function(num)
+TransactionsView.prototype.goToUpdateTransaction = async function(num)
 {
 	if (!this.content.transactions || this.content.transactions.length <= num || num < 0)
 		throw new Error('Wrong transaction number specified');
@@ -83,7 +83,7 @@ TransactionsPage.prototype.goToUpdateTransaction = async function(num)
 
 
 // Delete secified transactions and return navigation promise
-TransactionsPage.prototype.deleteTransactions = function(tr)
+TransactionsView.prototype.deleteTransactions = function(tr)
 {
 	if (!tr)
 		throw new Error('No transactions specified');
@@ -130,4 +130,4 @@ TransactionsPage.prototype.deleteTransactions = function(tr)
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = TransactionsPage;
+	module.exports = TransactionsView;

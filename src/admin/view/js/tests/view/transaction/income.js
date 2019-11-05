@@ -11,23 +11,23 @@ if (typeof module !== 'undefined' && module.exports)
 	var isValidValue = common.isValidValue;
 	var getCurrency = common.getCurrency;
 
-	var TransactionPage = require('../transactionpage.js');
+	var TransactionView = require('../transaction.js');
 }
 
 
-// Create or update income transaction page tests
-function IncomeTransactionPage()
+// Create or update income transaction view tests
+function IncomeTransactionView()
 {
-	IncomeTransactionPage.parent.constructor.apply(this, arguments);
+	IncomeTransactionView.parent.constructor.apply(this, arguments);
 
 	this.expectedState = {};
 }
 
 
-extend(IncomeTransactionPage, TransactionPage);
+extend(IncomeTransactionView, TransactionView);
 
 
-IncomeTransactionPage.prototype.buildModel = async function(cont)
+IncomeTransactionView.prototype.buildModel = async function(cont)
 {
 	var res = {};
 
@@ -93,7 +93,7 @@ IncomeTransactionPage.prototype.buildModel = async function(cont)
 
 // Set source amount value
 // State 0 or 1: source and destination currencies are the same
-IncomeTransactionPage.prototype.setSrcAmount = function(model, val)
+IncomeTransactionView.prototype.setSrcAmount = function(model, val)
 {
 	model.srcAmount = val;
 
@@ -109,7 +109,7 @@ IncomeTransactionPage.prototype.setSrcAmount = function(model, val)
 
 // Set destination amount value
 // State 0 or 1: source and destination currencies are the same
-IncomeTransactionPage.prototype.setDestAmount = function(model, val)
+IncomeTransactionView.prototype.setDestAmount = function(model, val)
 {
 	model.destAmount = val;
 
@@ -126,7 +126,7 @@ IncomeTransactionPage.prototype.setDestAmount = function(model, val)
 };
 
 
-IncomeTransactionPage.prototype.setExpectedState = function(state_id)
+IncomeTransactionView.prototype.setExpectedState = function(state_id)
 {
 	var res = {};
 
@@ -197,7 +197,7 @@ IncomeTransactionPage.prototype.setExpectedState = function(state_id)
 };
 
 
-IncomeTransactionPage.prototype.inputSrcAmount = async function(val)
+IncomeTransactionView.prototype.inputSrcAmount = async function(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
@@ -223,11 +223,11 @@ IncomeTransactionPage.prototype.inputSrcAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return IncomeTransactionPage.parent.inputSrcAmount.apply(this, arguments);
+	return IncomeTransactionView.parent.inputSrcAmount.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.inputDestAmount = async function(val)
+IncomeTransactionView.prototype.inputDestAmount = async function(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
@@ -243,11 +243,11 @@ IncomeTransactionPage.prototype.inputDestAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return IncomeTransactionPage.parent.inputDestAmount.apply(this, arguments);
+	return IncomeTransactionView.parent.inputDestAmount.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.inputDestResBalance = async function(val)
+IncomeTransactionView.prototype.inputDestResBalance = async function(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -274,11 +274,11 @@ IncomeTransactionPage.prototype.inputDestResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return IncomeTransactionPage.parent.inputDestResBalance.apply(this, arguments);
+	return IncomeTransactionView.parent.inputDestResBalance.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.inputExchRate = async function(val)
+IncomeTransactionView.prototype.inputExchRate = async function(val)
 {
 	if (this.model.state !== 3)
 		throw new Error('Unexpected state ' + this.model.state + ' to input exchange rate');
@@ -304,22 +304,22 @@ IncomeTransactionPage.prototype.inputExchRate = async function(val)
 
 	this.setExpectedState(3);
 
-	return IncomeTransactionPage.parent.inputExchRate.apply(this, arguments);
+	return IncomeTransactionView.parent.inputExchRate.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.clickDestResultBalance = async function()
+IncomeTransactionView.prototype.clickDestResultBalance = async function()
 {
 	if (this.model.state === 0)
 		this.setExpectedState(1);		// Transition 2
 	else if (this.model.state === 2 || this.model.state === 3)
 		this.setExpectedState(4);		// Transition 7 or 14
 
-	return IncomeTransactionPage.parent.clickDestResultBalance.apply(this, arguments);
+	return IncomeTransactionView.parent.clickDestResultBalance.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.changeDestAccount = async function(account_id)
+IncomeTransactionView.prototype.changeDestAccount = async function(account_id)
 {
 	var newAcc = await this.getAccount(account_id);
 
@@ -377,44 +377,44 @@ IncomeTransactionPage.prototype.changeDestAccount = async function(account_id)
 		}
 	}
 
-	return IncomeTransactionPage.parent.changeDestAccount.apply(this, arguments);
+	return IncomeTransactionView.parent.changeDestAccount.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.clickSrcAmount = async function()
+IncomeTransactionView.prototype.clickSrcAmount = async function()
 {
 	if (this.model.state === 1)		// Transition 4
 		this.setExpectedState(0);
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
 
-	return IncomeTransactionPage.parent.clickSrcAmount.apply(this, arguments);
+	return IncomeTransactionView.parent.clickSrcAmount.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.clickDestAmount = async function()
+IncomeTransactionView.prototype.clickDestAmount = async function()
 {
 	if (this.model.state === 3 || this.model.state === 4)		// Transition 13 or 19
 		this.setExpectedState(2);
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickDestAmount action');
 
-	return IncomeTransactionPage.parent.clickDestAmount.apply(this, arguments);
+	return IncomeTransactionView.parent.clickDestAmount.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.clickExchRate = async function()
+IncomeTransactionView.prototype.clickExchRate = async function()
 {
 	this.setExpectedState(3);	// Transition 20
 
-	return IncomeTransactionPage.parent.clickExchRate.apply(this, arguments);
+	return IncomeTransactionView.parent.clickExchRate.apply(this, arguments);
 };
 
 
-IncomeTransactionPage.prototype.changeSourceCurrency = async function(val)
+IncomeTransactionView.prototype.changeSourceCurrency = async function(val)
 {
 	if (this.model.src_curr_id == val)
-		return IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
+		return IncomeTransactionView.parent.changeSourceCurrency.apply(this, arguments);
 
 	this.model.src_curr_id = parseInt(val);
 	this.model.srcCurr = getCurrency(this.model.src_curr_id);
@@ -447,9 +447,9 @@ IncomeTransactionPage.prototype.changeSourceCurrency = async function(val)
 	else
 		throw new Error('Unexpected transition');
 
-	return IncomeTransactionPage.parent.changeSourceCurrency.apply(this, arguments);
+	return IncomeTransactionView.parent.changeSourceCurrency.apply(this, arguments);
 };
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = IncomeTransactionPage;
+	module.exports = IncomeTransactionView;

@@ -23,7 +23,7 @@ function onAppUpdateDebt(props)
 }
 
 
-async function submitDebtTransaction(page, params)
+async function submitDebtTransaction(view, params)
 {
 	if ('acc' in params)
 	{
@@ -31,86 +31,86 @@ async function submitDebtTransaction(page, params)
 		{
 			await test('Disable account', async () =>
 			{
-				if (!page.model.noAccount)
-					return page.toggleAccount();
-			}, page);
+				if (!view.model.noAccount)
+					return view.toggleAccount();
+			}, view);
 		}
 		else
 		{
-			if (page.model.noAccount)
+			if (view.model.noAccount)
 			{
-				await test('Enable account', () => page.toggleAccount(), page);
+				await test('Enable account', () => view.toggleAccount(), view);
 			}
 
-			let acc = await page.getAccountByPos(params.acc);
+			let acc = await view.getAccountByPos(params.acc);
 			if (!acc)
 				throw new Error('Account (' + params.destAcc + ') not found');
 
 			await test('Change account to (' + acc.name + ')',
-						() => page.changeAccountByPos(params.acc), page);
+						() => view.changeAccountByPos(params.acc), view);
 		}
 	}
 
 	if ('person' in params)
 	{
-		let person = await page.getPersonByPos(params.person);
+		let person = await view.getPersonByPos(params.person);
 		if (!person)
 			throw new Error('Person (' + params.person + ') not found');
 
 		await test('Change person to (' + person.name + ')',
-					() => page.changePersonByPos(params.person), page);
+					() => view.changePersonByPos(params.person), view);
 	}
 
 	if ('debtType' in params)
 	{
-		if (!!params.debtType != page.model.debtType)
+		if (!!params.debtType != view.model.debtType)
 		{
 			await test('Change debt type (' + (params.debtType ? 'give' : 'take') + ')',
-						() => page.toggleDebtType(), page);
+						() => view.toggleDebtType(), view);
 		}
 	}
 
 	if (!('srcAmount' in params))
 		throw new Error('Source amount value not specified');
 
-	await test('Source amount (' + params.srcAmount + ') input', () => page.inputSrcAmount(params.srcAmount), page);
+	await test('Source amount (' + params.srcAmount + ') input', () => view.inputSrcAmount(params.srcAmount), view);
 
 	if ('date' in params)
-		await test('Date (' + params.date + ') input', () => page.inputDate(params.date), page);
+		await test('Date (' + params.date + ') input', () => view.inputDate(params.date), view);
 
 	if ('comment' in params)
-		await test('Comment (' + params.comment + ') input', () => page.inputComment(params.comment), page);
+		await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
-	App.beforeSubmitTransaction = { person : page.model.person,
-	 								personPos : await page.getPersonPos(page.model.person.id),
-									personAccount : page.getPersonAccount(page.model.person, page.model.src_curr_id),
-									noAccount : page.model.noAccount,
-									acc : page.model.account,
-									debtType : page.model.debtType,
-									srcAmount : page.model.fSrcAmount,
-									destAmount : page.model.fDestAmount };
+	App.beforeSubmitTransaction = { person : view.model.person,
+	 								personPos : await view.getPersonPos(view.model.person.id),
+									personAccount : view.getPersonAccount(view.model.person, view.model.src_curr_id),
+									noAccount : view.model.noAccount,
+									acc : view.model.account,
+									debtType : view.model.debtType,
+									srcAmount : view.model.fSrcAmount,
+									destAmount : view.model.fDestAmount };
 
 	if (!App.beforeSubmitTransaction.personAccount)
 	{
-		App.beforeSubmitTransaction.personAccount = { curr_id : page.model.src_curr_id, balance : 0 };
+		App.beforeSubmitTransaction.personAccount = { curr_id : view.model.src_curr_id, balance : 0 };
 		App.beforeSubmitTransaction.person.accounts.push(App.beforeSubmitTransaction.personAccount);
 	}
 
 	if (App.beforeSubmitTransaction.acc)
-		App.beforeSubmitTransaction.accPos = await page.getAccountPos(page.model.account.id);
+		App.beforeSubmitTransaction.accPos = await view.getAccountPos(view.model.account.id);
 	App.notify();
 
-	return page.submit();
+	return view.submit();
 }
 
 
-function createDebt(page, onState, params)
+function createDebt(view, onState, params)
 {
-	return App.goToMainPage(page)
-			.then(page => page.goToNewTransactionByAccount(0))
-			.then(page => page.changeTransactionType(DEBT))
-			.then(page => debtTransactionLoop(page, onState, page => submitDebtTransaction(page, params)))
-			.then(async page =>
+	return App.goToMainView(view)
+			.then(view => view.goToNewTransactionByAccount(0))
+			.then(view => view.changeTransactionType(DEBT))
+			.then(view => debtTransactionLoop(view, onState, view => submitDebtTransaction(view, params)))
+			.then(async view =>
 			{
 				let person = App.beforeSubmitTransaction.person;
 				let personPos = App.beforeSubmitTransaction.personPos;
@@ -192,19 +192,19 @@ function createDebt(page, onState, params)
 
 				state.values.widgets[2] = transWidget;
 
-				await test('Debt transaction submit', async () => {}, page, state);
+				await test('Debt transaction submit', async () => {}, view, state);
 
-				App.transactions = page.content.widgets[2].transList;
-				App.accounts = page.content.widgets[0].tiles;
-				App.persons = page.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList;
+				App.accounts = view.content.widgets[0].tiles;
+				App.persons = view.content.widgets[3].infoTiles;
 				App.notify();
 
-				return page;
+				return view;
 			});
 }
 
 
-function updateDebt(page, pos, params)
+function updateDebt(view, pos, params)
 {
 	pos = parseInt(pos);
 	if (isNaN(pos) || pos < 0)
@@ -213,55 +213,55 @@ function updateDebt(page, pos, params)
 	if (!isObject(params))
 		throw new Error('Parameters not specified');
 
-	page.setBlock('Update debt transaction ' + pos, 3);
+	view.setBlock('Update debt transaction ' + pos, 3);
 
-	return App.goToMainPage(page)
-			.then(page => page.goToTransactions())
-			.then(page => page.filterByType(DEBT))
-			.then(async page =>
+	return App.goToMainView(view)
+			.then(view => view.goToTransactions())
+			.then(view => view.filterByType(DEBT))
+			.then(async view =>
 			{
-				App.beforeUpdateTransaction = { trCount : page.content.transactions.length };
+				App.beforeUpdateTransaction = { trCount : view.content.transactions.length };
 
-				let trObj = await page.getTransactionObject(page.content.transactions[pos].id);
+				let trObj = await view.getTransactionObject(view.content.transactions[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
 				App.beforeUpdateTransaction.trObj = trObj;
 				App.notify();
 
-				return page.goToUpdateTransaction(pos);
+				return view.goToUpdateTransaction(pos);
 			})
-			.then(async page =>
+			.then(async view =>
 			{
 				let expState;
-				if (page.model.noAccount)
-					expState = (page.model.debtType) ? 6 : 7;
+				if (view.model.noAccount)
+					expState = (view.model.debtType) ? 6 : 7;
 				else
-					expState = (page.model.debtType) ? 0 : 3;
+					expState = (view.model.debtType) ? 0 : 3;
 
-				await test('Initial state of update debt page', async () => page.setExpectedState(expState), page);
+				await test('Initial state of update debt view', async () => view.setExpectedState(expState), view);
 
 				setParam(App.beforeUpdateTransaction,
-							{ id : page.model.id,
-								person : page.model.person,
- 								personPos : await page.getPersonPos(page.model.person.id),
-								personAccount : page.getPersonAccount(page.model.person, page.model.src_curr_id),
-								noAccount : page.model.noAccount,
-								acc : page.model.noAccount ? page.model.account : null,
-								accPos : page.model.noAccount ? await page.getAccountPos(page.model.account.id) : -1,
-								debtType : page.model.debtType,
-								srcBalance : page.model.fSrcResBal,
-								destBalance : page.model.fDestResBal,
-								srcAmount : page.model.fSrcAmount,
-								destAmount : page.model.fDestAmount,
-								date : page.model.date,
-								comment : page.model.comment});
+							{ id : view.model.id,
+								person : view.model.person,
+ 								personPos : await view.getPersonPos(view.model.person.id),
+								personAccount : view.getPersonAccount(view.model.person, view.model.src_curr_id),
+								noAccount : view.model.noAccount,
+								acc : view.model.noAccount ? view.model.account : null,
+								accPos : view.model.noAccount ? await view.getAccountPos(view.model.account.id) : -1,
+								debtType : view.model.debtType,
+								srcBalance : view.model.fSrcResBal,
+								destBalance : view.model.fDestResBal,
+								srcAmount : view.model.fSrcAmount,
+								destAmount : view.model.fDestAmount,
+								date : view.model.date,
+								comment : view.model.comment});
 				App.notify();
 
-				return submitDebtTransaction(page, params);
+				return submitDebtTransaction(view, params);
 			})
-			.then(page => page.filterByType(DEBT))
-			.then(async page =>
+			.then(view => view.filterByType(DEBT))
+			.then(async view =>
 			{
 				let trans_id = App.beforeUpdateTransaction.id;
 				let transCount = App.beforeUpdateTransaction.trCount;
@@ -299,11 +299,11 @@ function updateDebt(page, pos, params)
 												 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
 												 	comment : ('comment' in params) ? params.comment : '' };
 
-				await test('Transaction update', async () => {}, page, state);
+				await test('Transaction update', async () => {}, view, state);
 
-				return App.goToMainPage(page);
+				return App.goToMainView(view);
 			})
-			.then(async page =>
+			.then(async view =>
 			{
 				let origPerson = App.beforeUpdateTransaction.person;
 				let origPersonPos = App.beforeUpdateTransaction.personPos;
@@ -404,269 +404,269 @@ function updateDebt(page, pos, params)
 
 				state.values.widgets[0] = accWidget;
 
-				await test('Account and person balance update', async () => {}, page, state);
+				await test('Account and person balance update', async () => {}, view, state);
 
-				App.transactions = page.content.widgets[2].transList;
-				App.accounts = page.content.widgets[0].tiles;
-				App.persons = page.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList;
+				App.accounts = view.content.widgets[0].tiles;
+				App.persons = view.content.widgets[3].infoTiles;
 				App.notify();
 
-				return page;
+				return view;
 			});
 }
 
 
-async function debtTransactionLoop(page, actionState, action)
+async function debtTransactionLoop(view, actionState, action)
 {
-	page.setBlock('Debt', 2);
-	await test('Initial state of new debt page', async () => page.setExpectedState(0), page);
+	view.setBlock('Debt', 2);
+	await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
 
 	actionState = parseInt(actionState);
 	var actionRequested = !isNaN(actionState);
 	if (actionState === 0)
-		return action(page);
+		return action(view);
 
 // Input source amount
-	await test('Source amount (1) input', () => page.inputSrcAmount('1'), page);
-	await test('Source amount (1.) input', () => page.inputSrcAmount('1.'), page);
-	await test('Source amount (1.0) input', () => page.inputSrcAmount('1.0'), page);
-	await test('Source amount (1.01) input', () => page.inputSrcAmount('1.01'), page);
-	await test('Source amount (1.010) input', () => page.inputSrcAmount('1.010'), page);
-	await test('Source amount (1.0101) input', () => page.inputSrcAmount('1.0101'), page);
-	await test('Emptry source amount input', () => page.inputSrcAmount(''), page);
-	await test('Source amount (.) input', () => page.inputSrcAmount('.'), page);
-	await test('Source amount (.0) input', () => page.inputSrcAmount('.0'), page);
-	await test('Source amount (.09) input', () => page.inputSrcAmount('.09'), page);
+	await test('Source amount (1) input', () => view.inputSrcAmount('1'), view);
+	await test('Source amount (1.) input', () => view.inputSrcAmount('1.'), view);
+	await test('Source amount (1.0) input', () => view.inputSrcAmount('1.0'), view);
+	await test('Source amount (1.01) input', () => view.inputSrcAmount('1.01'), view);
+	await test('Source amount (1.010) input', () => view.inputSrcAmount('1.010'), view);
+	await test('Source amount (1.0101) input', () => view.inputSrcAmount('1.0101'), view);
+	await test('Emptry source amount input', () => view.inputSrcAmount(''), view);
+	await test('Source amount (.) input', () => view.inputSrcAmount('.'), view);
+	await test('Source amount (.0) input', () => view.inputSrcAmount('.0'), view);
+	await test('Source amount (.09) input', () => view.inputSrcAmount('.09'), view);
 
 // Transition 1: Click by source result balance and move from State 0 to State 1
-	await test('(1) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(1) Click on source result balance', () => view.clickSrcResultBalance(), view);
 
 // Transition 47: Change to another one and stay on State 1
-	await test('(47) Change account', () => page.changeAccountByPos(1), page);
+	await test('(47) Change account', () => view.changeAccountByPos(1), view);
 
 // Input source result balance
-	await test('Source result balance (400) input', () => page.inputResBalance('400'), page);
-	await test('Source result balance (400.) input', () => page.inputResBalance('400.'), page);
-	await test('Source result balance (400.9) input', () => page.inputResBalance('400.9'), page);
-	await test('Source result balance (400.99) input', () => page.inputResBalance('400.99'), page);
-	await test('Source result balance (400.990) input', () => page.inputResBalance('400.990'), page);
-	await test('Source result balance (400.9901) input', () => page.inputResBalance('400.9901'), page);
-	await test('Empty result balance input', () => page.inputResBalance(''), page);
-	await test('Source result balance (.) input', () => page.inputResBalance('.'), page);
-	await test('Source result balance (.0) input', () => page.inputResBalance('.0'), page);
-	await test('Source result balance (.01) input', () => page.inputResBalance('.01'), page);
+	await test('Source result balance (400) input', () => view.inputResBalance('400'), view);
+	await test('Source result balance (400.) input', () => view.inputResBalance('400.'), view);
+	await test('Source result balance (400.9) input', () => view.inputResBalance('400.9'), view);
+	await test('Source result balance (400.99) input', () => view.inputResBalance('400.99'), view);
+	await test('Source result balance (400.990) input', () => view.inputResBalance('400.990'), view);
+	await test('Source result balance (400.9901) input', () => view.inputResBalance('400.9901'), view);
+	await test('Empty result balance input', () => view.inputResBalance(''), view);
+	await test('Source result balance (.) input', () => view.inputResBalance('.'), view);
+	await test('Source result balance (.0) input', () => view.inputResBalance('.0'), view);
+	await test('Source result balance (.01) input', () => view.inputResBalance('.01'), view);
 
 // Transition 2: Click by source amount and move from State 1 to State 0
-	await test('(2) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(2) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 3: Click by destination result balance and move from State 0 to State 2
-	await test('(3) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(3) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 // Transition 42: Change to another one and stay on State 2
-	await test('(42) Change account', () => page.changeAccountByPos(2), page);
+	await test('(42) Change account', () => view.changeAccountByPos(2), view);
 
 // Input destination result balance
-	await test('Destination result balance (600) input', () => page.inputDestResBalance('600'), page);
-	await test('Destination result balance (600.) input', () => page.inputDestResBalance('600.'), page);
-	await test('Destination result balance (600.9) input', () => page.inputDestResBalance('600.9'), page);
-	await test('Destination result balance (600.90) input', () => page.inputDestResBalance('600.90'), page);
-	await test('Destination result balance (600.901) input', () => page.inputDestResBalance('600.901'), page);
-	await test('Destination result balance (600.9010) input', () => page.inputDestResBalance('600.9010'), page);
-	await test('Destination result balance (600.90101) input', () => page.inputDestResBalance('600.90101'), page);
-	await test('Empty destination result balance input', () => page.inputDestResBalance(''), page);
-	await test('Destination result balance (.) input', () => page.inputDestResBalance('.'), page);
-	await test('Destination result balance (.0) input', () => page.inputDestResBalance('.0'), page);
+	await test('Destination result balance (600) input', () => view.inputDestResBalance('600'), view);
+	await test('Destination result balance (600.) input', () => view.inputDestResBalance('600.'), view);
+	await test('Destination result balance (600.9) input', () => view.inputDestResBalance('600.9'), view);
+	await test('Destination result balance (600.90) input', () => view.inputDestResBalance('600.90'), view);
+	await test('Destination result balance (600.901) input', () => view.inputDestResBalance('600.901'), view);
+	await test('Destination result balance (600.9010) input', () => view.inputDestResBalance('600.9010'), view);
+	await test('Destination result balance (600.90101) input', () => view.inputDestResBalance('600.90101'), view);
+	await test('Empty destination result balance input', () => view.inputDestResBalance(''), view);
+	await test('Destination result balance (.) input', () => view.inputDestResBalance('.'), view);
+	await test('Destination result balance (.0) input', () => view.inputDestResBalance('.0'), view);
 
 // Transition 4: Click by source result balance and move from State 2 to State 1
-	await test('(4) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(4) Click on source result balance', () => view.clickSrcResultBalance(), view);
 // Transition 5: Click by destination result balance and move from State 1 to State 2
-	await test('(5) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(5) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 6: Click by source amount and move from State 2 to State 0
-	await test('(6) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(6) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 7: Change debt type to "take" and move from State 0 to State 3
-	await test('(7) Change debt type', () => page.toggleDebtType(), page);
+	await test('(7) Change debt type', () => view.toggleDebtType(), view);
 // Transition 8: Change debt type back to "give" and move from State 3 to State 0
-	await test('(8) Change debt type', () => page.toggleDebtType(), page);
+	await test('(8) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 7: Change debt type to "take" and move from State 0 to State 3
-	await test('(7) Change debt type', () => page.toggleDebtType(), page);
+	await test('(7) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 49: Change to another one and stay on State 3
-	await test('(49) Change account', () => page.changeAccountByPos(3), page);
+	await test('(49) Change account', () => view.changeAccountByPos(3), view);
 
 // Transition 9: Click by destination result balance and move from State 3 to State 4
-	await test('(9) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(9) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 // Transition 51: Change to another one and stay on State 4
-	await test('(51) Change account', () => page.changeAccountByPos(4), page);
+	await test('(51) Change account', () => view.changeAccountByPos(4), view);
 
 // Transition 10: Click by source amount and move from State 4 to State 3
-	await test('(10) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(10) Click on source amount', () => view.clickSrcAmount(), view);
 
 // Transition 9: Click by destination result balance and move from State 3 to State 4
-	await test('(9) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(9) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 11: Click by source result balance and move from State 4 to State 5
-	await test('(11) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(11) Click on source result balance', () => view.clickSrcResultBalance(), view);
 
 // Transition 48: Change to another one and stay on State 5
-	await test('(48) Change account', () => page.changeAccountByPos(0), page);
+	await test('(48) Change account', () => view.changeAccountByPos(0), view);
 
 // Transition 12: Click by source amount and move from State 5 to State 3
-	await test('(12) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(12) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 13: Click by source result balance and move from State 3 to State 5
-	await test('(13) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(13) Click on source result balance', () => view.clickSrcResultBalance(), view);
 // Transition 14: Click by destination result balance and move from State 5 to State 4
-	await test('(14) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(14) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 15: Change debt type to "give" and move from State 4 to State 1
-	await test('(15) Change debt type', () => page.toggleDebtType(), page);
+	await test('(15) Change debt type', () => view.toggleDebtType(), view);
 // Transition 16: Change debt type to "take" and move from State 1 to State 4
-	await test('(16) Change debt type', () => page.toggleDebtType(), page);
+	await test('(16) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 11: Click by source result balance and move from State 4 to State 5
-	await test('(11) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(11) Click on source result balance', () => view.clickSrcResultBalance(), view);
 // Transition 17: Change debt type to "give" and move from State 5 to State 2
-	await test('(17) Change debt type', () => page.toggleDebtType(), page);
+	await test('(17) Change debt type', () => view.toggleDebtType(), view);
 // Transition 18: Change debt type to "take" and move from State 2 to State 5
-	await test('(18) Change debt type', () => page.toggleDebtType(), page);
+	await test('(18) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 12: Click by source amount and move from State 5 to State 3
-	await test('(12) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(12) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 8: Change debt type back to "give" and move from State 3 to State 0
-	await test('(8) Change debt type', () => page.toggleDebtType(), page);
+	await test('(8) Change debt type', () => view.toggleDebtType(), view);
 // Transition 19: Change person to another one and stay on State 0
-	await test('(19) Change person', () => page.changePersonByPos(1), page);
+	await test('(19) Change person', () => view.changePersonByPos(1), view);
 
 // Transition 1: Click by source result balance and move from State 0 to State 1
-	await test('(1) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(1) Click on source result balance', () => view.clickSrcResultBalance(), view);
 // Transition 20: Change person to another one and stay on State 1
-	await test('(20) Change person', () => page.changePersonByPos(0), page);
+	await test('(20) Change person', () => view.changePersonByPos(0), view);
 
 // Transition 5: Click by destination result balance and move from State 1 to State 2
-	await test('(5) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(5) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 21: Change person to another one and stay on State 2
-	await test('(21) Change person', () => page.changePersonByPos(1), page);
+	await test('(21) Change person', () => view.changePersonByPos(1), view);
 
 // Transition 18: Change debt type to "take" and move from State 2 to State 5
-	await test('(18) Change debt type', () => page.toggleDebtType(), page);
+	await test('(18) Change debt type', () => view.toggleDebtType(), view);
 // Transition 22: Change person to another one and stay on State 5
-	await test('(22) Change person', () => page.changePersonByPos(0), page);
+	await test('(22) Change person', () => view.changePersonByPos(0), view);
 
 // Transition 14: Click by destination result balance and move from State 5 to State 4
-	await test('(14) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(14) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 23: Change person to another one and stay on State 4
-	await test('(23) Change person', () => page.changePersonByPos(1), page);
+	await test('(23) Change person', () => view.changePersonByPos(1), view);
 
 // Transition 10: Click by source amount and move from State 4 to State 3
-	await test('(10) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(10) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 24: Change person to another one and stay on State 3
-	await test('(24) Change person', () => page.changePersonByPos(0), page);
+	await test('(24) Change person', () => view.changePersonByPos(0), view);
 
 // Transition 8: Change debt type back to "give" and move from State 3 to State 0
-	await test('(8) Change debt type', () => page.toggleDebtType(), page);
+	await test('(8) Change debt type', () => view.toggleDebtType(), view);
 // Transition 25: Disable account and move from State 0 to State 6
-	await test('(25) Disable account', () => page.toggleAccount(), page);
+	await test('(25) Disable account', () => view.toggleAccount(), view);
 
 // Transition 43: Change person to another one and stay on State 6
-	await test('(43) Change person', () => page.changePersonByPos(1), page);
+	await test('(43) Change person', () => view.changePersonByPos(1), view);
 
 // Transition 26: Enable account and move from State 6 to State 0
-	await test('(26) Enable account', () => page.toggleAccount(), page);
+	await test('(26) Enable account', () => view.toggleAccount(), view);
 
 // Transition 25: Disable account and move from State 0 to State 6
-	await test('(25) Disable account', () => page.toggleAccount(), page);
+	await test('(25) Disable account', () => view.toggleAccount(), view);
 // Transition 27: Change debt type to "take" and move from State 6 to State 7
-	await test('(27) Change debt type', () => page.toggleDebtType(), page);
+	await test('(27) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 44: Change person to another one and stay on State 7
-	await test('(44) Change person', () => page.changePersonByPos(0), page);
+	await test('(44) Change person', () => view.changePersonByPos(0), view);
 
 // Transition 28: Change debt type to "give" and move from State 7 to State 6
-	await test('(28) Change debt type', () => page.toggleDebtType(), page);
+	await test('(28) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 27: Change debt type to "take" and move from State 6 to State 7
-	await test('(27) Change debt type', () => page.toggleDebtType(), page);
+	await test('(27) Change debt type', () => view.toggleDebtType(), view);
 // Transition 29: Enable account and move from State 7 to State 3
-	await test('(29) Enable account', () => page.toggleAccount(), page);
+	await test('(29) Enable account', () => view.toggleAccount(), view);
 
 // Transition 8: Change debt type back to "give" and move from State 3 to State 0
-	await test('(8) Change debt type', () => page.toggleDebtType(), page);
+	await test('(8) Change debt type', () => view.toggleDebtType(), view);
 // Transition 25: Disable account and move from State 0 to State 6
-	await test('(25) Disable account', () => page.toggleAccount(), page);
+	await test('(25) Disable account', () => view.toggleAccount(), view);
 
 // Transition 27: Change debt type to "take" and move from State 6 to State 7
-	await test('(27) Change debt type', () => page.toggleDebtType(), page);
+	await test('(27) Change debt type', () => view.toggleDebtType(), view);
 // Transition 30: Click by destination result balance and move from State 7 to State 8
-	await test('(30) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(30) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 // Transition 45: Change person to another one and stay on State 8
-	await test('(45) Change person', () => page.changePersonByPos(1), page);
+	await test('(45) Change person', () => view.changePersonByPos(1), view);
 
 // Transition 31: Click by source amount and move from State 8 to State 7
-	await test('(31) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(31) Click on source amount', () => view.clickSrcAmount(), view);
 
 // Transition 30: Click by destination result balance and move from State 7 to State 8
-	await test('(30) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(30) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 // Transition 32: Enable account and move from State 8 to State 4
-	await test('(32) Enable account', () => page.toggleAccount(), page);
+	await test('(32) Enable account', () => view.toggleAccount(), view);
 
 // Transition 39: Disable account and move from State 4 to State 8
-	await test('(39) Disable account', () => page.toggleAccount(), page);
+	await test('(39) Disable account', () => view.toggleAccount(), view);
 // Transition 33: Change debt type to "give" and move from State 8 to State 9
-	await test('(33) Change debt type', () => page.toggleDebtType(), page);
+	await test('(33) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 46: Change person to another one and stay on State 9
-	await test('(46) Change person', () => page.changePersonByPos(0), page);
+	await test('(46) Change person', () => view.changePersonByPos(0), view);
 
 // Transition 34: Change debt type to "take" and move from State 9 to State 8
-	await test('(34) Change debt type', () => page.toggleDebtType(), page);
+	await test('(34) Change debt type', () => view.toggleDebtType(), view);
 
 // Transition 44: Change person to another one and stay on State 8
-	await test('(44) Change person', () => page.changePersonByPos(1), page);
+	await test('(44) Change person', () => view.changePersonByPos(1), view);
 
 // Transition 33: Change debt type to "give" and move from State 8 to State 9
-	await test('(33) Change debt type', () => page.toggleDebtType(), page);
+	await test('(33) Change debt type', () => view.toggleDebtType(), view);
 // Transition 35: Click by source amount and move from State 9 to State 6
-	await test('(35) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(35) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 36: Click by source result balance and move from State 6 to State 9
-	await test('(36) Click on source result balance', () => page.clickSrcResultBalance(), page);
+	await test('(36) Click on source result balance', () => view.clickSrcResultBalance(), view);
 // Transition 37: Enable account and move from State 9 to State 1
-	await test('(37) Enable account', () => page.toggleAccount(), page);
+	await test('(37) Enable account', () => view.toggleAccount(), view);
 // Transition 38: Disable account and move from State 1 to State 9
-	await test('(38) Disable account', () => page.toggleAccount(), page);
+	await test('(38) Disable account', () => view.toggleAccount(), view);
 
 // Transition 35: Click by source amount and move from State 9 to State 6
-	await test('(35) Click on source amount', () => page.clickSrcAmount(), page);
+	await test('(35) Click on source amount', () => view.clickSrcAmount(), view);
 // Transition 26: Enable account and move from State 6 to State 0
-	await test('(26) Enable account', () => page.toggleAccount(), page);
+	await test('(26) Enable account', () => view.toggleAccount(), view);
 // Transition 7: Change debt type to "take" and move from State 0 to State 3
-	await test('(7) Change debt type', () => page.toggleDebtType(), page);
+	await test('(7) Change debt type', () => view.toggleDebtType(), view);
 // Transition 40: Disable account and move from State 3 to State 7
-	await test('(40) Disable account', () => page.toggleAccount(), page);
+	await test('(40) Disable account', () => view.toggleAccount(), view);
 
 
 // Transition 28: Change debt type to "give" and move from State 7 to State 6
-	await test('(28) Change debt type', () => page.toggleDebtType(), page);
+	await test('(28) Change debt type', () => view.toggleDebtType(), view);
 // Transition 26: Enable account and move from State 6 to State 0
-	await test('(26) Enable account', () => page.toggleAccount(), page);
+	await test('(26) Enable account', () => view.toggleAccount(), view);
 // Transition 3: Click by destination result balance and move from State 0 to State 2
-	await test('(3) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(3) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 41: Disable account and move from State 2 to State 6
-	await test('(41) Disable account', () => page.toggleAccount(), page);
+	await test('(41) Disable account', () => view.toggleAccount(), view);
 
 // Transition 26: Enable account and move from State 6 to State 0
-	await test('(26) Enable account', () => page.toggleAccount(), page);
+	await test('(26) Enable account', () => view.toggleAccount(), view);
 
 // Transition 52: Change to another one and stay on State 0
-	await test('(52) Change account', () => page.changeAccountByPos(2), page);
+	await test('(52) Change account', () => view.changeAccountByPos(2), view);
 
 // Transition 3: Click by destination result balance and move from State 0 to State 2
-	await test('(3) Click on destination result balance', () => page.clickDestResultBalance(), page);
+	await test('(3) Click on destination result balance', () => view.clickDestResultBalance(), view);
 // Transition 18: Change debt type to "take" and move from State 2 to State 5
-	await test('(18) Change debt type', () => page.toggleDebtType(), page);
+	await test('(18) Change debt type', () => view.toggleDebtType(), view);
 // Transition 50: Disable account and move from State 5 to State 7
-	await test('(50) Disable account', () => page.toggleAccount(), page);
+	await test('(50) Disable account', () => view.toggleAccount(), view);
 
-	return page;
+	return view;
 }
 
 

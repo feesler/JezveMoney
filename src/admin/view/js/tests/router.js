@@ -2,19 +2,19 @@ if (typeof module !== 'undefined' && module.exports)
 {
 	var URL = require('url').URL;
 
-	var MainPage = require('./page/mainpage.js');
-	var LoginPage = require('./page/loginpage.js');
-	var ProfilePage = require('./page/profilepage.js');
-	var AccountPage = require('./page/accountpage.js');
-	var AccountsPage = require('./page/accountspage.js');
-	var PersonPage = require('./page/personpage.js');
-	var PersonsPage = require('./page/personspage.js');
-	var TransactionsPage = require('./page/transactionspage.js');
-	var ExpenseTransactionPage = require('./page/transaction/expense.js');
-	var IncomeTransactionPage = require('./page/transaction/income.js');
-	var TransferTransactionPage = require('./page/transaction/transfer.js');
-	var DebtTransactionPage = require('./page/transaction/debt.js');
-	var StatisticsPage = require('./page/statistics.js');
+	var MainView = require('./view/main.js');
+	var LoginView = require('./view/login.js');
+	var ProfileView = require('./view/profile.js');
+	var AccountView = require('./view/account.js');
+	var AccountsView = require('./view/accounts.js');
+	var PersonView = require('./view/person.js');
+	var PersonsView = require('./view/persons.js');
+	var TransactionsView = require('./view/transactions.js');
+	var ExpenseTransactionView = require('./view/transaction/expense.js');
+	var IncomeTransactionView = require('./view/transaction/income.js');
+	var TransferTransactionView = require('./view/transaction/transfer.js');
+	var DebtTransactionView = require('./view/transaction/debt.js');
+	var StatisticsView = require('./view/statistics.js');
 }
 
 
@@ -43,23 +43,23 @@ async function route(env, url)
 	part = parts.shift();
 
 	if (!part)
-		return MainPage;
+		return MainView;
 
 	if (part === 'login')
 	{
-		return LoginPage;
+		return LoginView;
 	}
 	else if (part === 'profile')
 	{
-		return ProfilePage;
+		return ProfileView;
 	}
 	else if (part === 'accounts')
 	{
 		actPart = parts.shift();
 		if (!actPart)
-			return AccountsPage;
+			return AccountsView;
 		else if (actPart === 'new' || actPart === 'edit')
-			return AccountPage;
+			return AccountView;
 		else
 			throw new Error('Unknown route: ' + reqUrl.pathname);
 	}
@@ -67,9 +67,9 @@ async function route(env, url)
 	{
 		actPart = parts.shift();
 		if (!actPart)
-			return PersonsPage;
+			return PersonsView;
 		else if (actPart === 'new' || actPart === 'edit')
-			return PersonPage;
+			return PersonView;
 		else
 			throw new Error('Unknown route: ' + reqUrl.pathname);
 	}
@@ -77,18 +77,18 @@ async function route(env, url)
 	{
 		actPart = parts.shift();
 		if (!actPart)
-			return TransactionsPage;
+			return TransactionsView;
 		else if (actPart === 'new')
 		{
 			const trType = reqUrl.searchParams.get('type');
 			if (!trType || trType === 'expense')
-				return ExpenseTransactionPage;
+				return ExpenseTransactionView;
 			else if (trType === 'income')
-				return IncomeTransactionPage;
+				return IncomeTransactionView;
 			else if (trType === 'transfer')
-				return TransferTransactionPage;
+				return TransferTransactionView;
 			else if (trType === 'debt')
-				return DebtTransactionPage;
+				return DebtTransactionView;
 			else
 				throw new Error('Unknown transaction type: ' + trType);
 		}
@@ -97,13 +97,13 @@ async function route(env, url)
 			const trType = await env.global('edit_transaction.type');
 
 			if (trType === 1)
-				return ExpenseTransactionPage;
+				return ExpenseTransactionView;
 			else if (trType === 2)
-				return IncomeTransactionPage;
+				return IncomeTransactionView;
 			else if (trType === 3)
-				return TransferTransactionPage;
+				return TransferTransactionView;
 			else if (trType === 4)
-				return DebtTransactionPage;
+				return DebtTransactionView;
 			else
 				throw new Error('Unknown transaction type: ' + trType);
 		}
@@ -111,7 +111,7 @@ async function route(env, url)
 			throw new Error('Unknown route: ' + reqUrl.pathname);
 	}
 	else if (part === 'statistics')
-		return StatisticsPage;
+		return StatisticsView;
 	else
 		throw new Error('Unknown route: ' + reqUrl.pathname);
 }

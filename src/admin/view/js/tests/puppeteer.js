@@ -212,9 +212,9 @@ var Environment = (function()
 
 				common.checkPHPerrors(Environment, content);
 
-				let pageClass = await route(Environment, await getUrl());
+				let viewClass = await route(Environment, await getUrl());
 
-				let view = new pageClass({ environment : Environment });
+				let view = new viewClass({ environment : Environment });
 				resolve(view.parse());
 			});
 		});
@@ -228,7 +228,7 @@ var Environment = (function()
 	async function initTests(url, navHandler)
 	{
 		let res = 1;
-		let page;
+		let view;
 		let browser;
 
 		try
@@ -236,8 +236,8 @@ var Environment = (function()
 			browser = await puppeteer.launch();
 			browserPage = await browser.newPage();
 
-			page = await navigation(() => browserPage.goto(url));
-			page = await navHandler(page);
+			view = await navigation(() => browserPage.goto(url));
+			view = await navHandler(view);
 			res = 0;
 		}
 		catch(msg)

@@ -7,41 +7,41 @@ if (typeof module !== 'undefined' && module.exports)
 	var isFunction = common.isFunction;
 	var extend = common.extend;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Profile page class
-function ProfilePage()
+// Profile view class
+function ProfileView()
 {
-	ProfilePage.parent.constructor.apply(this, arguments);
+	ProfileView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(ProfilePage, TestPage);
+extend(ProfileView, TestView);
 
 
-ProfilePage.prototype.parseContent = async function()
+ProfileView.prototype.parseContent = async function()
 {
 	var res = {};
 
 	var blocks = await this.queryAll('.content_wrap > .profile_block');
 	if (blocks.length != 4)
-		throw new Error('Wrong profile page structure');
+		throw new Error('Wrong profile view structure');
 
 	res.loginElem = await this.query(blocks[0], 'span');
 	res.nameElem = await this.query('#namestatic');
 	res.nameLinkElem = await this.query(blocks[1], 'div > a');
 	res.changePassLinkElem = await this.query(blocks[2], 'div > a');
 	if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
-		throw new Error('Wrong profile page structure');
+		throw new Error('Wrong profile view structure');
 
 	res.login = res.loginElem.innerText;
 	res.name = res.nameElem.innerText;
 
 	var buttons = await this.queryAll(blocks[3], 'input[type="button"]');
 	if (!buttons || buttons.length != 3)
-		throw new Error('Wrong profile page structure');
+		throw new Error('Wrong profile view structure');
 	res.resetBtn = buttons[0];
 	res.resetAllBtn = buttons[1];
 	res.deleteProfileBtn = buttons[2];
@@ -76,7 +76,7 @@ ProfilePage.prototype.parseContent = async function()
 
 
 
-ProfilePage.prototype.resetAll = function()
+ProfileView.prototype.resetAll = function()
 {
 	return this.performAction(() =>
 	{
@@ -94,19 +94,19 @@ ProfilePage.prototype.resetAll = function()
 
 		return this.navigation(() => this.click(this.content.reset_all_warning.okBtn));
 	})
-	// Use page here instead of this because the instance was changed after navigation
-	.then(page =>
+	// Use view here instead of this because the instance was changed after navigation
+	.then(view =>
 	{
-		if (!page.msgPopup)
+		if (!view.msgPopup)
 			throw new Error('Message popup not found');
 
-		if (!page.msgPopup.success || page.msgPopup.message !== 'All data successfully reseted.')
+		if (!view.msgPopup.success || view.msgPopup.message !== 'All data successfully reseted.')
 			throw new Error('Fail to reset all');
 
-		return page.performAction(() => page.msgPopup.close());
+		return view.performAction(() => view.msgPopup.close());
 	});
 };
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = ProfilePage;
+	module.exports = ProfileView;

@@ -3,33 +3,33 @@ if (typeof module !== 'undefined' && module.exports)
 	const common = require('../common.js');
 	var extend = common.extend;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Statistics page class
-function StatisticsPage()
+// Statistics view class
+function StatisticsView()
 {
-	StatisticsPage.parent.constructor.apply(this, arguments);
+	StatisticsView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(StatisticsPage, TestPage);
+extend(StatisticsView, TestView);
 
 
-StatisticsPage.prototype.parseContent = async function()
+StatisticsView.prototype.parseContent = async function()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1') };
 
 	if (!res.titleEl)
-		throw new Error('Wrong statistics page structure');
+		throw new Error('Wrong statistics view structure');
 
 	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 	res.title = await this.prop(res.titleEl, 'innerText');
 
 	let filtersList = await this.queryAll('.tr_filter.filter_sel');
 	if (!filtersList || filtersList.length != 4)
-		throw new Error('Wrong statistics page structure');
+		throw new Error('Wrong statistics view structure');
 
 	res.filterByDropDown = await this.parseDropDown(await this.query(filtersList[0], ':scope > *'));
 	res.accountsDropDown = (await this.isVisible(filtersList[1])) ? await this.parseDropDown(await this.query(filtersList[1], ':scope > *')) : null;
@@ -38,7 +38,7 @@ StatisticsPage.prototype.parseContent = async function()
 
 	res.chart = { elem : await this.query('#chart'), bars : [] };
 	if (!res.chart)
-		throw new Error('Wrong statistics page structure');
+		throw new Error('Wrong statistics view structure');
 
 	let bars = await this.queryAll(res.chart.elem, 'svg > rect');
 	for(const bar of bars)
@@ -52,7 +52,7 @@ StatisticsPage.prototype.parseContent = async function()
 };
 
 
-StatisticsPage.prototype.filterByType = async function(type)
+StatisticsView.prototype.filterByType = async function(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
@@ -61,19 +61,19 @@ StatisticsPage.prototype.filterByType = async function(type)
 };
 
 
-StatisticsPage.prototype.byAccounts = function()
+StatisticsView.prototype.byAccounts = function()
 {
 	return this.navigation(() => this.content.filterByDropDown.selectByValue(0));
 };
 
 
-StatisticsPage.prototype.byCurrencies = function()
+StatisticsView.prototype.byCurrencies = function()
 {
 	return this.navigation(() => this.content.filterByDropDown.selectByValue(1));
 };
 
 
-StatisticsPage.prototype.selectAccount = async function(acc_id)
+StatisticsView.prototype.selectAccount = async function(acc_id)
 {
 	if (!this.content.accountsDropDown)
 		throw new Error('Account drop down control not found');
@@ -82,7 +82,7 @@ StatisticsPage.prototype.selectAccount = async function(acc_id)
 };
 
 
-StatisticsPage.prototype.selectAccountByPos = async function(pos)
+StatisticsView.prototype.selectAccountByPos = async function(pos)
 {
 	if (!this.content.accountsDropDown)
 		throw new Error('Account drop down control not found');
@@ -91,54 +91,54 @@ StatisticsPage.prototype.selectAccountByPos = async function(pos)
 };
 
 
-StatisticsPage.prototype.selectCurrency = function(curr_id)
+StatisticsView.prototype.selectCurrency = function(curr_id)
 {
 	return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1));
 };
 
 
-StatisticsPage.prototype.selectCurrencyByPos = function(pos)
+StatisticsView.prototype.selectCurrencyByPos = function(pos)
 {
 	if (this.content.currencyDropDown)
 		return this.selectCurrency(this.content.currencyDropDown.items[pos].id);
 };
 
 
-StatisticsPage.prototype.groupBy = function(group)
+StatisticsView.prototype.groupBy = function(group)
 {
 	return this.navigation(() => this.content.groupDropDown.selectByValue(group));
 };
 
 
-StatisticsPage.prototype.noGroup = function(group)
+StatisticsView.prototype.noGroup = function(group)
 {
 	return this.groupBy(0);
 };
 
 
-StatisticsPage.prototype.groupByDay = function(group)
+StatisticsView.prototype.groupByDay = function(group)
 {
 	return this.groupBy(1);
 };
 
 
-StatisticsPage.prototype.groupByWeek = function(group)
+StatisticsView.prototype.groupByWeek = function(group)
 {
 	return this.groupBy(2);
 };
 
 
-StatisticsPage.prototype.groupByMonth = function(group)
+StatisticsView.prototype.groupByMonth = function(group)
 {
 	return this.groupBy(3);
 };
 
 
-StatisticsPage.prototype.groupByYear = function(group)
+StatisticsView.prototype.groupByYear = function(group)
 {
 	return this.groupBy(4);
 };
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = StatisticsPage;
+	module.exports = StatisticsView;

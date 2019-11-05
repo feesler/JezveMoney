@@ -16,75 +16,75 @@ function onAppUpdatePersons(props)
 }
 
 
-async function checkInitialPersons(page)
+async function checkInitialPersons(view)
 {
 	var state = { value : { tiles : { length : 0 } } };
-	await test('Initial persons structure', async () => {}, page, state);
+	await test('Initial persons structure', async () => {}, view, state);
 
-	return page;
+	return view;
 }
 
 
-// From persons list page go to new person page, input name and submit
+// From persons list view go to new person view, input name and submit
 // Next check name result and callback
-function createPerson(page, personName)
+function createPerson(view, personName)
 {
-	return page.goToCreatePerson()
-			.then(page => page.createPerson(personName))
-			.then(async page =>
+	return view.goToCreatePerson()
+			.then(view => view.createPerson(personName))
+			.then(async view =>
 			{
 				var state = { value : { tiles : { length : App.persons.length + 1 } } };
 				state.value.tiles[App.persons.length] = { name : personName };
 
-				await test('Create person', async () => {}, page, state);
+				await test('Create person', async () => {}, view, state);
 
-				App.persons = page.content.tiles;
+				App.persons = view.content.tiles;
 				App.notify();
 
-				return page;
+				return view;
 			});
 }
 
 
-function updatePerson(page, num, personName)
+function updatePerson(view, num, personName)
 {
-	return page.goToUpdatePerson(num)
-			.then(async page =>
+	return view.goToUpdatePerson(num)
+			.then(async view =>
 			{
 				var state = { visibility : { name : true },
 			 					values : { name : App.persons[num].name } };
 
-				await test('Update person page state', async () => {}, page, state);
+				await test('Update person view state', async () => {}, view, state);
 
-				await page.inputName(personName);
+				await view.inputName(personName);
 
-				return page.navigation(() => page.click(page.content.submitBtn));
+				return view.navigation(() => view.click(view.content.submitBtn));
 			})
-			.then(async page =>
+			.then(async view =>
 			{
 				var state = { values : { tiles : { length : App.persons.length } }};
 				state.values.tiles[num] = { name : personName };
 
-				await test('Update person', async () => {}, page, state);
+				await test('Update person', async () => {}, view, state);
 
-				App.persons = page.content.tiles;
+				App.persons = view.content.tiles;
 				App.notify();
 
-				return page;
+				return view;
 			});
 }
 
 
-function deletePersons(page, persons)
+function deletePersons(view, persons)
 {
-	return page.deletePersons(persons)
-			.then(async (page) =>
+	return view.deletePersons(persons)
+			.then(async (view) =>
 			{
 				var state = { values : { tiles : { length : App.persons.length - persons.length } } };
 
-				await test('Delete persons [' + persons.join() + ']', async () => {}, page, state);
+				await test('Delete persons [' + persons.join() + ']', async () => {}, view, state);
 
-				return page;
+				return view;
 			});
 }
 

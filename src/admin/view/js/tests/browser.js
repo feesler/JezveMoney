@@ -180,7 +180,7 @@ var Environment = (function()
 	}
 
 
-	async function navigation(action, pageClass)
+	async function navigation(action)
 	{
 		let env = window.Environment;
 
@@ -195,9 +195,9 @@ var Environment = (function()
 				checkPHPerrors(env, vdoc.documentElement.innerHTML);
 				try
 				{
-					let pageClass = await route(env, await getUrl());
+					let viewClass = await route(env, await getUrl());
 
-					let view = new pageClass({ environment : env });
+					let view = new viewClass({ environment : env });
 					resolve(view.parse());
 				}
 				catch(e)
@@ -230,8 +230,8 @@ var Environment = (function()
 			results = { total : 0, ok : 0, fail : 0 };
 			await addResult('Test initialization', 'OK');
 
-			let page = await navigation(async () => viewframe.src = url );
-			page = await navHandler(page);
+			let view = await navigation(async () => viewframe.src = url );
+			view = await navHandler(view);
 		};
 	}
 

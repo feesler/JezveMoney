@@ -2,7 +2,7 @@ var transactions = {};
 
 if (typeof module !== 'undefined' && module.exports)
 {
-	var LoginPage = require('./page/loginpage.js');
+	var LoginView = require('./view/login.js');
 
 	var accounts = require('./run/account.js');
 	var persons = require('./run/person.js');
@@ -55,360 +55,360 @@ var App = {
 		transactions.debt.onAppUpdate(notification);
 	},
 
-	goToMainPage : goToMainPage
+	goToMainView : goToMainView
 };
 
 
-async function startTests(page)
+async function startTests(view)
 {
 	console.log('Starting tests');
 
 	App.notify();
 
-	page = await reloginAsTester(page);
-	page = await page.goToProfilePage();
-	page = await page.resetAll();
-	page = await accountTests(page);
-	page = await personTests(page);
-	page = await transactionTests(page);
-	page = await statisticsTests(page);
+	view = await reloginAsTester(view);
+	view = await view.goToProfile();
+	view = await view.resetAll();
+	view = await accountTests(view);
+	view = await personTests(view);
+	view = await transactionTests(view);
+	view = await statisticsTests(view);
 
-	return page;
+	return view;
 }
 
 
-function accountTests(page)
+function accountTests(view)
 {
-	page.setBlock('Accounts', 1);
+	view.setBlock('Accounts', 1);
 
-	return goToMainPage(page)
-			.then(page => page.goToAccounts())
-			.then(page => page.goToCreateAccount())
+	return goToMainView(view)
+			.then(view => view.goToAccounts())
+			.then(view => view.goToCreateAccount())
 			.then(accounts.createAccount1)
-			.then(page => page.goToCreateAccount())
+			.then(view => view.goToCreateAccount())
 			.then(accounts.createAccount2)
-			.then(page => page.goToUpdateAccount(0))
+			.then(view => view.goToUpdateAccount(0))
 			.then(accounts.editAccount1)
-			.then(page => page.goToCreateAccount())
-			.then(page => accounts.createAccountWithParam(page, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
-			.then(page => accounts.deleteAccounts(page, [0, 1]))
-			.then(page => page.goToCreateAccount())
-			.then(page => accounts.createAccountWithParam(page, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 }))
-			.then(page => page.goToCreateAccount())
-			.then(page => accounts.createAccountWithParam(page, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 }))
-			.then(page => page.goToCreateAccount())
-			.then(page => accounts.createAccountWithParam(page, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }))
-			.then(page => page.goToCreateAccount())
-			.then(page => accounts.createAccountWithParam(page, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 }))
+			.then(view => view.goToCreateAccount())
+			.then(view => accounts.createAccountWithParam(view, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 }))
+			.then(view => accounts.deleteAccounts(view, [0, 1]))
+			.then(view => view.goToCreateAccount())
+			.then(view => accounts.createAccountWithParam(view, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 }))
+			.then(view => view.goToCreateAccount())
+			.then(view => accounts.createAccountWithParam(view, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 }))
+			.then(view => view.goToCreateAccount())
+			.then(view => accounts.createAccountWithParam(view, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 }))
+			.then(view => view.goToCreateAccount())
+			.then(view => accounts.createAccountWithParam(view, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 }))
 }
 
 
-function personTests(page)
+function personTests(view)
 {
-	page.setBlock('Persons', 1);
+	view.setBlock('Persons', 1);
 
-	return goToMainPage(page)
-			.then(page => page.goToPersons())
+	return goToMainView(view)
+			.then(view => view.goToPersons())
 			.then(persons.checkInitialPersons)
-			.then(page => persons.createPerson(page, 'Alex'))
-			.then(page => persons.createPerson(page, 'Maria'))
-			.then(page => persons.createPerson(page, 'Johnny'))
-			.then(page => persons.createPerson(page, 'Иван'))
-			.then(page => persons.updatePerson(page, 3, 'Ivan<'))
-			.then(page => persons.deletePersons(page, [0, 2]));
+			.then(view => persons.createPerson(view, 'Alex'))
+			.then(view => persons.createPerson(view, 'Maria'))
+			.then(view => persons.createPerson(view, 'Johnny'))
+			.then(view => persons.createPerson(view, 'Иван'))
+			.then(view => persons.updatePerson(view, 3, 'Ivan<'))
+			.then(view => persons.deletePersons(view, [0, 2]));
 }
 
 
-function transactionTests(page)
+function transactionTests(view)
 {
-	page.setBlock('Transactions', 1);
+	view.setBlock('Transactions', 1);
 
-	return createTransactionTests(page)
+	return createTransactionTests(view)
 			.then(updateTransactionTests)
 			.then(deleteTransactionTests);
 }
 
 
-function statisticsTests(page)
+function statisticsTests(view)
 {
-	page.setBlock('Statistics', 1);
+	view.setBlock('Statistics', 1);
 
-	return goToMainPage(page)
-			.then(page => page.goToStatistics())
-			.then(async page =>
+	return goToMainView(view)
+			.then(view => view.goToStatistics())
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				await test('Initial state of statistics page', async () => {}, page, state);
+				await test('Initial state of statistics view', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.filterByType(INCOME))
-			.then(async page =>
+			.then(view => view.filterByType(INCOME))
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 0 } } } };
-				await test('Income statistics page', async () => {}, page, state);
+				await test('Income statistics view', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.filterByType(TRANSFER))
-			.then(async page =>
+			.then(view => view.filterByType(TRANSFER))
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 2 } } } };
-				await test('Transfer statistics page', async () => {}, page, state);
+				await test('Transfer statistics view', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.filterByType(DEBT))
-			.then(async page =>
+			.then(view => view.filterByType(DEBT))
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 3 } } } };
-				await test('Debt statistics page', async () => {}, page, state);
+				await test('Debt statistics view', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.filterByType(EXPENSE))
-			.then(page => page.selectAccountByPos(1))
-			.then(async page =>
+			.then(view => view.filterByType(EXPENSE))
+			.then(view => view.selectAccountByPos(1))
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 0 } } } };
-				await test('Filter statistics by account', async () => {}, page, state);
+				await test('Filter statistics by account', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.filterByType(DEBT))
-			.then(page => page.groupByDay())
-			.then(async page =>
+			.then(view => view.filterByType(DEBT))
+			.then(view => view.groupByDay())
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				await test('Group statistics by day', async () => {}, page, state);
+				await test('Group statistics by day', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.groupByWeek())
-			.then(async page =>
+			.then(view => view.groupByWeek())
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				await test('Group statistics by week', async () => {}, page, state);
+				await test('Group statistics by week', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.groupByMonth())
-			.then(async page =>
+			.then(view => view.groupByMonth())
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				await test('Group statistics by month', async () => {}, page, state);
+				await test('Group statistics by month', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.groupByYear())
-			.then(async page =>
+			.then(view => view.groupByYear())
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				await test('Group statistics by year', async () => {}, page, state);
+				await test('Group statistics by year', async () => {}, view, state);
 
-				return page;
+				return view;
 			})
-			.then(page => page.byCurrencies())
-			.then(async page =>
+			.then(view => view.byCurrencies())
+			.then(async view =>
 			{
 				var state = { value : { chart : { bars : { length : 1 } } } };
-				await test('Filter by currencies', async () => {}, page, state);
+				await test('Filter by currencies', async () => {}, view, state);
 
-				return page;
+				return view;
 			});
 }
 
 
-function createTransactionTests(page)
+function createTransactionTests(view)
 {
-	page.setBlock('Create transaction', 1);
+	view.setBlock('Create transaction', 1);
 
-	return goToMainPage(page)
-			.then(page => page.goToNewTransactionByAccount(0))
+	return goToMainView(view)
+			.then(view => view.goToNewTransactionByAccount(0))
 			.then(transactions.expense.expenseTransactionLoop)
 			.then(runCreateExpenseTests)
-			.then(page => page.goToNewTransactionByAccount(0))
-			.then(page => page.changeTransactionType(INCOME))
+			.then(view => view.goToNewTransactionByAccount(0))
+			.then(view => view.changeTransactionType(INCOME))
 			.then(transactions.income.incomeTransactionLoop)
 			.then(runCreateIncomeTests)
-			.then(page => page.goToNewTransactionByAccount(0))
-			.then(page => page.changeTransactionType(TRANSFER))
+			.then(view => view.goToNewTransactionByAccount(0))
+			.then(view => view.changeTransactionType(TRANSFER))
 			.then(transactions.transfer.transferTransactionLoop)
 			.then(runCreateTransferTests)
-			.then(page => page.goToNewTransactionByAccount(0))
-			.then(page => page.changeTransactionType(DEBT))
+			.then(view => view.goToNewTransactionByAccount(0))
+			.then(view => view.changeTransactionType(DEBT))
 			.then(transactions.debt.debtTransactionLoop)
 			.then(runCreateDebtTests);
 }
 
 
-function updateTransactionTests(page)
+function updateTransactionTests(view)
 {
-	page.setBlock('Update transaction', 1);
+	view.setBlock('Update transaction', 1);
 
-	return runUpdateExpenseTests(page)
-			.then(page => runUpdateIncomeTests(page))
-			.then(page => runUpdateTransferTests(page))
-			.then(page => runUpdateDebtTests(page));
+	return runUpdateExpenseTests(view)
+			.then(view => runUpdateIncomeTests(view))
+			.then(view => runUpdateTransferTests(view))
+			.then(view => runUpdateDebtTests(view));
 }
 
 
-function deleteTransactionTests(page)
+function deleteTransactionTests(view)
 {
-	page.setBlock('Delete transaction', 1);
+	view.setBlock('Delete transaction', 1);
 
-	return runDeleteExpenseTests(page)
-			.then(page => runDeleteIncomeTests(page))
-			.then(page => runDeleteTransferTests(page))
-			.then(page => runDeleteDebtTests(page));
+	return runDeleteExpenseTests(view)
+			.then(view => runDeleteIncomeTests(view))
+			.then(view => runDeleteTransferTests(view))
+			.then(view => runDeleteDebtTests(view));
 }
 
 
-function goToMainPage(page)
+function goToMainView(view)
 {
-	return page.goToMainPage()
-			.then(async page =>
+	return view.goToMainView()
+			.then(async view =>
 			{
-				App.transactions = page.content.widgets[2].transList;
-				App.accounts = page.content.widgets[0].tiles;
-				App.persons = page.content.widgets[3].infoTiles;
-				App.currencies = await page.global('currency');
+				App.transactions = view.content.widgets[2].transList;
+				App.accounts = view.content.widgets[0].tiles;
+				App.persons = view.content.widgets[3].infoTiles;
+				App.currencies = await view.global('currency');
 
 				App.notify();
 
-				return page;
+				return view;
 			});
 }
 
 
-function runCreateExpenseTests(page)
+function runCreateExpenseTests(view)
 {
-	page.setBlock('Create expense transactions', 1);
+	view.setBlock('Create expense transactions', 1);
 
-	return transactions.expense.createExpense(page, 0, 0, { destAmount : '123.7801' })
-			.then(page => transactions.expense.createExpense(page, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
-			.then(page => transactions.expense.createExpense(page, 1, 0, { destAmount : '0.01' }))
-			.then(page => transactions.expense.createExpense(page, 1, 0, { srcAcc : 4, destAmount : '99.99' }));
+	return transactions.expense.createExpense(view, 0, 0, { destAmount : '123.7801' })
+			.then(view => transactions.expense.createExpense(view, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 }))
+			.then(view => transactions.expense.createExpense(view, 1, 0, { destAmount : '0.01' }))
+			.then(view => transactions.expense.createExpense(view, 1, 0, { srcAcc : 4, destAmount : '99.99' }));
 }
 
 
-function runCreateIncomeTests(page)
+function runCreateIncomeTests(view)
 {
-	page.setBlock('Create income transactions', 1);
+	view.setBlock('Create income transactions', 1);
 
-	return transactions.income.createIncome(page, 0, 0, { srcAmount : '10023.7801' })
-			.then(page => transactions.income.createIncome(page, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
-			.then(page => transactions.income.createIncome(page, 1, 0, { srcAmount : '0.01' }))
-			.then(page => transactions.income.createIncome(page, 1, 0, { destAcc : 4, srcAmount : '99.99' }));
+	return transactions.income.createIncome(view, 0, 0, { srcAmount : '10023.7801' })
+			.then(view => transactions.income.createIncome(view, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 }))
+			.then(view => transactions.income.createIncome(view, 1, 0, { srcAmount : '0.01' }))
+			.then(view => transactions.income.createIncome(view, 1, 0, { destAcc : 4, srcAmount : '99.99' }));
 
 }
 
 
-function runCreateTransferTests(page)
+function runCreateTransferTests(view)
 {
-	page.setBlock('Create transfer transactions', 1);
+	view.setBlock('Create transfer transactions', 1);
 
-	return transactions.transfer.createTransfer(page, 0, { srcAmount : '1000' })
-			.then(page => transactions.transfer.createTransfer(page, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' }))
-			.then(page => transactions.transfer.createTransfer(page, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' }))
-			.then(page => transactions.transfer.createTransfer(page, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' }))
-			.then(page => transactions.transfer.createTransfer(page, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' }));
+	return transactions.transfer.createTransfer(view, 0, { srcAmount : '1000' })
+			.then(view => transactions.transfer.createTransfer(view, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' }))
+			.then(view => transactions.transfer.createTransfer(view, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' }))
+			.then(view => transactions.transfer.createTransfer(view, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' }))
+			.then(view => transactions.transfer.createTransfer(view, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' }));
 }
 
 
-function runCreateDebtTests(page)
+function runCreateDebtTests(view)
 {
-	page.setBlock('Submit debt transactions', 1);
+	view.setBlock('Submit debt transactions', 1);
 
-	return transactions.debt.createDebt(page, 0, { srcAmount : '1000' })
-			.then(page => transactions.debt.createDebt(page, 0, { debtType : false, acc : 2, srcAmount : '200' }))
-			.then(page => transactions.debt.createDebt(page, 0, { debtType : true, acc : 3, srcAmount : '100.0101' }))
-			.then(page => transactions.debt.createDebt(page, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' }))
-			.then(page => transactions.debt.createDebt(page, 0, { acc : null, srcAmount : '105' }))
-			.then(page => transactions.debt.createDebt(page, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }));
+	return transactions.debt.createDebt(view, 0, { srcAmount : '1000' })
+			.then(view => transactions.debt.createDebt(view, 0, { debtType : false, acc : 2, srcAmount : '200' }))
+			.then(view => transactions.debt.createDebt(view, 0, { debtType : true, acc : 3, srcAmount : '100.0101' }))
+			.then(view => transactions.debt.createDebt(view, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' }))
+			.then(view => transactions.debt.createDebt(view, 0, { acc : null, srcAmount : '105' }))
+			.then(view => transactions.debt.createDebt(view, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' }));
 }
 
 
-function runUpdateExpenseTests(page)
+function runUpdateExpenseTests(view)
 {
-	page.setBlock('Update expense transactions', 2);
+	view.setBlock('Update expense transactions', 2);
 
-	return transactions.expense.updateExpense(page, 3, { destAmount : '124.7701' })
-			.then(page => transactions.expense.updateExpense(page, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 }))
-			.then(page => transactions.expense.updateExpense(page, 1, { destAmount : '0.02' }))
-			.then(page => transactions.expense.updateExpense(page, 0, { srcAcc : 3, destAmount : '99.9' }));
+	return transactions.expense.updateExpense(view, 3, { destAmount : '124.7701' })
+			.then(view => transactions.expense.updateExpense(view, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 }))
+			.then(view => transactions.expense.updateExpense(view, 1, { destAmount : '0.02' }))
+			.then(view => transactions.expense.updateExpense(view, 0, { srcAcc : 3, destAmount : '99.9' }));
 }
 
 
-function runUpdateIncomeTests(page)
+function runUpdateIncomeTests(view)
 {
-	page.setBlock('Update income transactions', 2);
+	view.setBlock('Update income transactions', 2);
 
-	return transactions.income.updateIncome(page, 0, { srcAmount : '100.001' })
-			.then(page => transactions.income.updateIncome(page, 1, { srcAmount : '0.02' }))
-			.then(page => transactions.income.updateIncome(page, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 }))
-			.then(page => transactions.income.updateIncome(page, 3, { destAcc : 3, srcAmount : '99.9' }));
+	return transactions.income.updateIncome(view, 0, { srcAmount : '100.001' })
+			.then(view => transactions.income.updateIncome(view, 1, { srcAmount : '0.02' }))
+			.then(view => transactions.income.updateIncome(view, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 }))
+			.then(view => transactions.income.updateIncome(view, 3, { destAcc : 3, srcAmount : '99.9' }));
 }
 
 
-function runUpdateTransferTests(page)
+function runUpdateTransferTests(view)
 {
-	page.setBlock('Update transfer transactions', 2);
+	view.setBlock('Update transfer transactions', 2);
 
-	return transactions.transfer.updateTransfer(page, 0, { destAcc : 0, srcAmount : '11' })
-			.then(page => transactions.transfer.updateTransfer(page, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' }))
-			.then(page => transactions.transfer.updateTransfer(page, 2, { srcAcc : 3, srcAmount : '5.0301' }))
-			.then(page => transactions.transfer.updateTransfer(page, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' }))
-			.then(page => transactions.transfer.updateTransfer(page, 4, { srcAmount : '1050.01' }));
+	return transactions.transfer.updateTransfer(view, 0, { destAcc : 0, srcAmount : '11' })
+			.then(view => transactions.transfer.updateTransfer(view, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' }))
+			.then(view => transactions.transfer.updateTransfer(view, 2, { srcAcc : 3, srcAmount : '5.0301' }))
+			.then(view => transactions.transfer.updateTransfer(view, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' }))
+			.then(view => transactions.transfer.updateTransfer(view, 4, { srcAmount : '1050.01' }));
 }
 
 
-function runUpdateDebtTests(page)
+function runUpdateDebtTests(view)
 {
-	page.setBlock('Update debt transactions', 2);
+	view.setBlock('Update debt transactions', 2);
 
-	return transactions.debt.updateDebt(page, 0, { person : 0, srcAmount : '105' })
-			.then(page => transactions.debt.updateDebt(page, 1, { acc : 1, srcAmount : '105' }))
-			.then(page => transactions.debt.updateDebt(page, 2, { debtType : true, srcAmount : '10' }))
-			.then(page => transactions.debt.updateDebt(page, 3, { debtType : false, acc : 2, srcAmount : '200.0202' }))
-			.then(page => transactions.debt.updateDebt(page, 4, { acc : null, srcAmount : '200' }))
-			.then(page => transactions.debt.updateDebt(page, 5, { srcAmount : '1001' }));
+	return transactions.debt.updateDebt(view, 0, { person : 0, srcAmount : '105' })
+			.then(view => transactions.debt.updateDebt(view, 1, { acc : 1, srcAmount : '105' }))
+			.then(view => transactions.debt.updateDebt(view, 2, { debtType : true, srcAmount : '10' }))
+			.then(view => transactions.debt.updateDebt(view, 3, { debtType : false, acc : 2, srcAmount : '200.0202' }))
+			.then(view => transactions.debt.updateDebt(view, 4, { acc : null, srcAmount : '200' }))
+			.then(view => transactions.debt.updateDebt(view, 5, { srcAmount : '1001' }));
 }
 
 
-function runDeleteExpenseTests(page)
+function runDeleteExpenseTests(view)
 {
-	page.setBlock('Delete expense transactions', 2);
+	view.setBlock('Delete expense transactions', 2);
 
-	return deleteTransactions(page, EXPENSE, [0])
-			.then(page => deleteTransactions(page, EXPENSE, [0, 1]));
+	return deleteTransactions(view, EXPENSE, [0])
+			.then(view => deleteTransactions(view, EXPENSE, [0, 1]));
 }
 
 
-function runDeleteIncomeTests(page)
+function runDeleteIncomeTests(view)
 {
-	page.setBlock('Delete income transactions', 2);
+	view.setBlock('Delete income transactions', 2);
 
-	return deleteTransactions(page, INCOME, [0])
-			.then(page => deleteTransactions(page, INCOME, [0, 1, 2]));
+	return deleteTransactions(view, INCOME, [0])
+			.then(view => deleteTransactions(view, INCOME, [0, 1, 2]));
 }
 
 
-function runDeleteTransferTests(page)
+function runDeleteTransferTests(view)
 {
-	page.setBlock('Delete transfer transactions', 2);
+	view.setBlock('Delete transfer transactions', 2);
 
-	return deleteTransactions(page, TRANSFER, [1])
-			.then(page => deleteTransactions(page, TRANSFER, [0, 2]));
+	return deleteTransactions(view, TRANSFER, [1])
+			.then(view => deleteTransactions(view, TRANSFER, [0, 2]));
 }
 
 
-function runDeleteDebtTests(page)
+function runDeleteDebtTests(view)
 {
-	page.setBlock('Delete debt transactions', 2);
+	view.setBlock('Delete debt transactions', 2);
 
-	return deleteTransactions(page, DEBT, [0])
-			.then(page => deleteTransactions(page, DEBT, [0, 1]));
+	return deleteTransactions(view, DEBT, [0])
+			.then(view => deleteTransactions(view, DEBT, [0, 1]));
 }
 
 
@@ -422,30 +422,30 @@ function getPersonByAcc(persons, acc_id)
 }
 
 
-function deleteTransactions(page, type, transactions)
+function deleteTransactions(view, type, transactions)
 {
-	return goToMainPage(page)
-			.then(async page =>
+	return goToMainView(view)
+			.then(async view =>
 			{
 				App.beforeDeleteTransaction = {};
 
-				App.beforeDeleteTransaction.accounts = copyObject(await page.global('accounts'));
-				App.beforeDeleteTransaction.persons = copyObject(await page.global('persons'));
+				App.beforeDeleteTransaction.accounts = copyObject(await view.global('accounts'));
+				App.beforeDeleteTransaction.persons = copyObject(await view.global('persons'));
 				App.notify();
 
-				return page.goToTransactions();
+				return view.goToTransactions();
 			})
-			.then(page => page.filterByType(type))
-			.then(async page =>
+			.then(view => view.filterByType(type))
+			.then(async view =>
 			{
-				let trCount = page.content.transactions ? page.content.transactions.length : 0;
+				let trCount = view.content.transactions ? view.content.transactions.length : 0;
 				App.beforeDeleteTransaction.trCount = trCount;
 				App.beforeDeleteTransaction.deleteList = await Promise.all(transactions.map(trPos =>
 				{
 					if (trPos < 0 || trPos >= trCount)
 						throw new Error('Wrong transaction position: ' + trPos);
 
-					return page.getTransactionObject(page.content.transactions[trPos].id);
+					return view.getTransactionObject(view.content.transactions[trPos].id);
 				}));
 
 				App.beforeDeleteTransaction.deleteList.forEach(trObj =>
@@ -455,21 +455,21 @@ function deleteTransactions(page, type, transactions)
 				});
 				App.notify();
 
-				return page.deleteTransactions(transactions);
+				return view.deleteTransactions(transactions);
 			})
-			.then(async page =>
+			.then(async view =>
 			{
 				var state = { value : { transactions : { length : App.transactions.length - transactions.length } } };
 
-				await test('Delete transactions [' + transactions.join() + ']', async () => {}, page, state);
+				await test('Delete transactions [' + transactions.join() + ']', async () => {}, view, state);
 
-				App.transactions = page.content.transactions;
+				App.transactions = view.content.transactions;
 				App.notify();
 
-				return page;
+				return view;
 			})
-			.then(goToMainPage)
-			.then(async page =>
+			.then(goToMainView)
+			.then(async view =>
 			{
 				let origAccounts = App.beforeDeleteTransaction.accounts;
 				let origPersons = App.beforeDeleteTransaction.persons;
@@ -624,29 +624,29 @@ function deleteTransactions(page, type, transactions)
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
 
-				await test('Delete transactions [' + transactions.join() + ']', async () => {}, page, state);
+				await test('Delete transactions [' + transactions.join() + ']', async () => {}, view, state);
 
-				App.transactions = page.content.widgets[2].transList;
-				App.accounts = page.content.widgets[0].tiles;
-				App.persons = page.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList;
+				App.accounts = view.content.widgets[0].tiles;
+				App.persons = view.content.widgets[3].infoTiles;
 				App.notify();
 
-				return page;
+				return view;
 			});
 }
 
 
-async function reloginAsTester(page)
+async function reloginAsTester(view)
 {
-	if (page.isUserLoggedIn())
+	if (view.isUserLoggedIn())
 	{
-		page = await page.logoutUser();
+		view = await view.logoutUser();
 	}
 
-	if (!(page instanceof LoginPage))
+	if (!(view instanceof LoginView))
 		throw new Error('Wrong page');
 
-	return page.loginAs('test', 'test');
+	return view.loginAs('test', 'test');
 }
 
 

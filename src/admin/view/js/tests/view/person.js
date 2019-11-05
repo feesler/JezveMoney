@@ -3,21 +3,21 @@ if (typeof module !== 'undefined' && module.exports)
 	const common = require('../common.js');
 	var extend = common.extend;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Create or update account page tests
-function PersonPage()
+// Create or update account view tests
+function PersonView()
 {
-	PersonPage.parent.constructor.apply(this, arguments);
+	PersonView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(PersonPage, TestPage);
+extend(PersonView, TestView);
 
 
-PersonPage.prototype.parseContent = async function()
+PersonView.prototype.parseContent = async function()
 {
 	var res = {};
 
@@ -44,14 +44,14 @@ PersonPage.prototype.parseContent = async function()
 };
 
 
-PersonPage.prototype.inputName = async function(val)
+PersonView.prototype.inputName = async function(val)
 {
 	return this.performAction(() => this.content.name.input(val));
 };
 
 
 // Input name, submit and return navigation promise
-PersonPage.prototype.createPerson = async function(personName)
+PersonView.prototype.createPerson = async function(personName)
 {
 	await this.inputName(personName);
 
@@ -60,4 +60,4 @@ PersonPage.prototype.createPerson = async function(personName)
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = PersonPage;
+	module.exports = PersonView;

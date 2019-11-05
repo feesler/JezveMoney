@@ -18,8 +18,8 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Common test page class constructor
-function TestPage(props)
+// Common test view class constructor
+function TestView(props)
 {
 	this.props = props || {};
 
@@ -41,7 +41,7 @@ function TestPage(props)
 }
 
 
-TestPage.prototype.isUserLoggedIn = function()
+TestView.prototype.isUserLoggedIn = function()
 {
 	var loggedOutLocations = ['login', 'register'];
 
@@ -49,14 +49,14 @@ TestPage.prototype.isUserLoggedIn = function()
 };
 
 
-TestPage.prototype.parseHeader = async function()
+TestView.prototype.parseHeader = async function()
 {
 	var el;
 	var res = {};
 
 	res.elem = await this.query('.page > .page_wrapper > .header');
 	if (!res.elem)
-		return res;		// no header is ok for login page
+		return res;		// no header is ok for login view
 
 	res.logo = {};
 	res.logo.elem = await this.query(res.elem, '.logo');
@@ -101,7 +101,7 @@ TestPage.prototype.parseHeader = async function()
 };
 
 
-TestPage.prototype.parseMessage = async function()
+TestView.prototype.parseMessage = async function()
 {
 	let popupContent = await this.query('.popup_content.msg');
 	if (!popupContent)
@@ -123,7 +123,7 @@ TestPage.prototype.parseMessage = async function()
 };
 
 
-TestPage.prototype.parseId = function(id)
+TestView.prototype.parseId = function(id)
 {
 	if (typeof id !== 'string')
 		return id;
@@ -133,7 +133,7 @@ TestPage.prototype.parseId = function(id)
 };
 
 
-TestPage.prototype.parseTile = async function(tileEl)
+TestView.prototype.parseTile = async function(tileEl)
 {
 	if (!tileEl || !await this.hasClass(tileEl, 'tile'))
 		throw new Error('Wrong tile structure');
@@ -171,7 +171,7 @@ TestPage.prototype.parseTile = async function(tileEl)
 };
 
 
-TestPage.prototype.parseInfoTile = async function(tileEl)
+TestView.prototype.parseInfoTile = async function(tileEl)
 {
 	if (!tileEl || !await this.hasClass(tileEl, 'info_tile'))
 		throw new Error('Wrong info tile structure');
@@ -188,7 +188,7 @@ TestPage.prototype.parseInfoTile = async function(tileEl)
 };
 
 
-TestPage.prototype.parseTiles = async function(tilesEl, parseCallback)
+TestView.prototype.parseTiles = async function(tilesEl, parseCallback)
 {
 	if (!tilesEl)
 		return null;
@@ -217,13 +217,13 @@ TestPage.prototype.parseTiles = async function(tilesEl, parseCallback)
 };
 
 
-TestPage.prototype.parseInfoTiles = function(tilesEl)
+TestView.prototype.parseInfoTiles = function(tilesEl)
 {
 	return this.parseTiles(tilesEl, this.parseInfoTile);
 };
 
 
-TestPage.prototype.parseTransactionsList = async function(listEl)
+TestView.prototype.parseTransactionsList = async function(listEl)
 {
 	if (!listEl)
 		return null;
@@ -281,7 +281,7 @@ TestPage.prototype.parseTransactionsList = async function(listEl)
 };
 
 
-TestPage.prototype.parseDropDown = async function(elem)
+TestView.prototype.parseDropDown = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -373,7 +373,7 @@ TestPage.prototype.parseDropDown = async function(elem)
 };
 
 
-TestPage.prototype.getTransactionType = function(str)
+TestView.prototype.getTransactionType = function(str)
 {
 	var strToType = { 'ALL' : 0, 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
 
@@ -385,7 +385,7 @@ TestPage.prototype.getTransactionType = function(str)
 };
 
 
-TestPage.prototype.getTransactionTypeStr = function(type)
+TestView.prototype.getTransactionTypeStr = function(type)
 {
 	var typeToStr = { 1 : 'EXPENSE', 2 : 'INCOME', 3 : 'TRANSFER', 4 : 'DEBT' };
 
@@ -396,7 +396,7 @@ TestPage.prototype.getTransactionTypeStr = function(type)
 };
 
 
-TestPage.prototype.parseTransactionTypeMenu = async function(elem)
+TestView.prototype.parseTransactionTypeMenu = async function(elem)
 {
 	var self = this;
 	var res = { elem : elem, items : [], activeType : null };
@@ -437,7 +437,7 @@ TestPage.prototype.parseTransactionTypeMenu = async function(elem)
 
 
 
-TestPage.prototype.parseIconLink = async function(elem)
+TestView.prototype.parseIconLink = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -474,7 +474,7 @@ TestPage.prototype.parseIconLink = async function(elem)
 };
 
 
-TestPage.prototype.parseInputRow = async function(elem)
+TestView.prototype.parseInputRow = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -537,7 +537,7 @@ TestPage.prototype.parseInputRow = async function(elem)
 };
 
 
-TestPage.prototype.parseDatePickerRow = async function(elem)
+TestView.prototype.parseDatePickerRow = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -568,7 +568,7 @@ TestPage.prototype.parseDatePickerRow = async function(elem)
 };
 
 
-TestPage.prototype.parseWarningPopup = async function(elem)
+TestView.prototype.parseWarningPopup = async function(elem)
 {
 	if (!elem)
 		return null;
@@ -586,19 +586,19 @@ TestPage.prototype.parseWarningPopup = async function(elem)
 };
 
 
-TestPage.prototype.parseContent = function()
+TestView.prototype.parseContent = function()
 {
 	return {};
 };
 
 
-TestPage.prototype.buildModel = function()
+TestView.prototype.buildModel = function()
 {
 	return {};
 };
 
 
-TestPage.prototype.parse = async function()
+TestView.prototype.parse = async function()
 {
 	this.location = await this.url();
 
@@ -611,7 +611,7 @@ TestPage.prototype.parse = async function()
 };
 
 
-TestPage.prototype.performAction = async function(action)
+TestView.prototype.performAction = async function(action)
 {
 	if (!isFunction(action))
 		throw new Error('Wrong action specified');
@@ -633,7 +633,7 @@ TestPage.prototype.performAction = async function(action)
 // Example:
 //     controls : { control_1 : { elem : Element }, control_2 : { childControl : { elem : Element } } }
 //     expected : { control_1 : true, control_2 : { childControl : true, invControl : false }, control_3 : false }
-TestPage.prototype.checkVisibility = async function(controls, expected)
+TestView.prototype.checkVisibility = async function(controls, expected)
 {
 	var control, expVisible, factVisible, res;
 
@@ -667,7 +667,7 @@ TestPage.prototype.checkVisibility = async function(controls, expected)
 };
 
 
-TestPage.prototype.checkObjValue = async function(obj, expectedObj)
+TestView.prototype.checkObjValue = async function(obj, expectedObj)
 {
 	if (obj === expectedObj)
 		return true;
@@ -701,7 +701,7 @@ TestPage.prototype.checkObjValue = async function(obj, expectedObj)
 };
 
 
-TestPage.prototype.checkValues = async function(controls)
+TestView.prototype.checkValues = async function(controls)
 {
 	var res = true;
 	var control, expected, fact;
@@ -743,14 +743,14 @@ TestPage.prototype.checkValues = async function(controls)
 };
 
 
-TestPage.prototype.checkState = async function(stateObj)
+TestView.prototype.checkState = async function(stateObj)
 {
 	return stateObj && await this.checkVisibility(this.content, stateObj.visibility) && await this.checkValues(stateObj.values);
 };
 
 
 // Click on profile menu item and return navigation promise
-TestPage.prototype.goToProfilePage = async function()
+TestView.prototype.goToProfile = async function()
 {
 	if (!this.isUserLoggedIn())
 		throw new Error('User is not logged in');
@@ -764,7 +764,7 @@ TestPage.prototype.goToProfilePage = async function()
 
 
 // Click on logout link from user menu and return navigation promise
-TestPage.prototype.logoutUser = async function()
+TestView.prototype.logoutUser = async function()
 {
 	await this.click(this.header.user.menuBtn);
 
@@ -774,7 +774,7 @@ TestPage.prototype.logoutUser = async function()
 };
 
 
-TestPage.prototype.goToMainPage = function()
+TestView.prototype.goToMainView = function()
 {
 	if (!this.isUserLoggedIn())
 		throw new Error('User not logged in');
@@ -784,4 +784,4 @@ TestPage.prototype.goToMainPage = function()
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = TestPage;
+	module.exports = TestView;

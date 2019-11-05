@@ -3,21 +3,21 @@ if (typeof module !== 'undefined' && module.exports)
 	const common = require('../common.js');
 	var extend = common.extend;
 
-	var TestPage = require('./page.js');
+	var TestView = require('./testview.js');
 }
 
 
-// Create or update account page tests
-function AccountPage()
+// Create or update account view tests
+function AccountView()
 {
-	AccountPage.parent.constructor.apply(this, arguments);
+	AccountView.parent.constructor.apply(this, arguments);
 }
 
 
-extend(AccountPage, TestPage);
+extend(AccountView, TestView);
 
 
-AccountPage.prototype.parseContent = async function()
+AccountView.prototype.parseContent = async function()
 {
 	var res = {};
 
@@ -63,29 +63,29 @@ AccountPage.prototype.parseContent = async function()
 };
 
 
-AccountPage.prototype.inputName = async function(val)
+AccountView.prototype.inputName = async function(val)
 {
 	return this.performAction(() => this.content.name.input(val));
 };
 
 
-AccountPage.prototype.inputBalance = async function(val)
+AccountView.prototype.inputBalance = async function(val)
 {
 	return this.performAction(() => this.content.balance.input(val));
 };
 
 
-AccountPage.prototype.changeCurrency = async function(val)
+AccountView.prototype.changeCurrency = async function(val)
 {
 	return this.performAction(() => this.content.currDropDown.selectByValue(val));
 };
 
 
-AccountPage.prototype.changeIcon = async function(val)
+AccountView.prototype.changeIcon = async function(val)
 {
 	return this.performAction(() => this.content.iconDropDown.selectByValue(val));
 };
 
 
 if (typeof module !== 'undefined' && module.exports)
-	module.exports = AccountPage;
+	module.exports = AccountView;
