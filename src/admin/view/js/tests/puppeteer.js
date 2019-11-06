@@ -233,8 +233,12 @@ var Environment = (function()
 
 		try
 		{
-			browser = await puppeteer.launch();
-			browserPage = await browser.newPage();
+			browser = await puppeteer.launch({ headless : true,
+												args : [ '--proxy-server="direct://"',
+															'--proxy-bypass-list=*' ] });
+			let allPages = await browser.pages();
+			browserPage = (allPages.length) ? allPages[0] : await browser.newPage();
+			browserPage.setDefaultNavigationTimeout(0);
 
 			view = await navigation(() => browserPage.goto(url));
 			view = await navHandler(view);
