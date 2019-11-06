@@ -228,41 +228,22 @@ function isValidValue(val)
 // Search for object with specified id and return its position
 function getPosById(arr, id)
 {
-	var pos = -1;
-
 	if (!isArray(arr) || !id)
 		return -1;
 
-	arr.some(function(item, ind)
-	{
-		var cond = (id == item.id);
-		if (cond)
-			pos = ind;
-
-		return cond;
-	});
-
-	return pos;
+	return arr.findIndex(item => item && item.id == id);
 }
 
 
 // Search for array of objects by id key
 function idSearch(arr, id)
 {
-	var res = null;
-
 	if (!isArray(arr))
-		return res;
+		return null;
 
-	arr.some(function(obj)
-	{
-		var cond = (obj && obj.id == id);
-
-		if (cond)
-			res = obj;
-
-		return cond;
-	});
+	var res = arr.find(item => item && item.id == id);
+	if (typeof res === 'undefined')
+		return null;
 
 	return res;
 }
