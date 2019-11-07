@@ -101,7 +101,7 @@ class MainController extends Controller
 
 		array_push($this->css->libs, "iconlink.css", "tiles.css", "trlist.css", "charts.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "main.js", "raphael.min.js", "charts.js");
+		array_push($this->jsArr, "main.js", "lib/raphael.min.js", "charts.js");
 
 		include("./view/templates/main.tpl");
 	}
