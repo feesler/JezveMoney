@@ -488,7 +488,7 @@ class TransactionModel extends CachedTable
 
 		// delete expenses and incomes
 		$condArr = [$userCond];
-		$condArr[] = "((src_id=".$acc_id." AND type=1) OR (dest_id=".$acc_id." AND type=2))";
+		$condArr[] = "((src_id=".$acc_id." AND type=".EXPENSE.") OR (dest_id=".$acc_id." AND type=".INCOME."))";
 		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
 			return FALSE;
 
@@ -499,47 +499,47 @@ class TransactionModel extends CachedTable
 		if ($acc_owner != $u_owner)	// specified account is account of person
 		{
 			// set outgoing debt(person take) as income to destination account
-			$condArr = [$userCond, "src_id=".$acc_id, "type=4"];
+			$condArr = [$userCond, "src_id=".$acc_id, "type=".DEBT];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "src_id" => 0, "type" => 2, "updatedate" => $curDate],
+										[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate],
 										$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as expense from source account
-			$condArr = [$userCond, "dest_id=".$acc_id, "type=4"];
+			$condArr = [$userCond, "dest_id=".$acc_id, "type=".DEBT];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "dest_id" => 0, "type" => 1, "updatedate" => $curDate],
+										[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate],
 										$condArr))
 				return FALSE;
 		}
 		else							// specified account is account of user
 		{
 			// set outgoing debt(person take) as debt without acc
-			$condArr = [$userCond, "src_id=".$acc_id, "type=4"];
+			$condArr = [$userCond, "src_id=".$acc_id, "type=".DEBT];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "src_id" => 0, "type" => 4, "updatedate" => $curDate],
+										[ "src_id" => 0, "type" => DEBT, "updatedate" => $curDate],
 										$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as debt without acc
-			$condArr = [$userCond, "dest_id=".$acc_id, "type=4"];
+			$condArr = [$userCond, "dest_id=".$acc_id, "type=".DEBT];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "dest_id" => 0, "type" => 4, "updatedate" => $curDate],
+										[ "dest_id" => 0, "type" => DEBT, "updatedate" => $curDate],
 										$condArr))
 				return FALSE;
 		}
 
 		// set transfer from account as income to destination account
-		$condArr = [$userCond, "src_id=".$acc_id, "type=3"];
+		$condArr = [$userCond, "src_id=".$acc_id, "type=".TRANSFER];
 		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "src_id" => 0, "type" => 2, "updatedate" => $curDate],
+									[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate],
 									$condArr))
 			return FALSE;
 
 		// set transfer to account as expense from source account
-		$condArr = [$userCond, "dest_id=".$acc_id, "type=3"];
+		$condArr = [$userCond, "dest_id=".$acc_id, "type=".TRANSFER];
 		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "dest_id" => 0, "type" => 1, "updatedate" => $curDate],
+									[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate],
 									$condArr))
 			return FALSE;
 
