@@ -103,7 +103,7 @@ function assignJoin($assignments)
 			$res[] = $value;
 		}
 		else
-			throw "Incorrect syntax";
+			throw new Error("Incorrect syntax");
 	}
 
 	return implode(", ", $res);
