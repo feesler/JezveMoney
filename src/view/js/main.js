@@ -76,7 +76,9 @@ function showChangeNamePopup()
 								title : 'Change name',
 								content : ge('changename'),
 								additional : 'center_only chname_popup' });
-		frm = firstElementChild(ge('changename'));
+		frm = ge('changename');
+		if (frm)
+			frm = frm.firstElementChild;
 
 		cnPopup.setControls({ okBtn : { onclick : onChangeNameSubmit.bind(null, frm) },
 								closeBtn : true });
@@ -160,7 +162,9 @@ function showChangePasswordPopup()
 								title : 'Change password',
 								content : ge('changepass'),
 								additional : 'center_only chpass_popup' });
-		frm = firstElementChild(ge('changepass'));
+		frm = ge('changepass');
+		if (frm)
+			frm = frm.firstElementChild;
 
 		cpPopup.setControls({ okBtn : { onclick : onChangePassSubmit.bind(null, frm) },
 								closeBtn : true });
@@ -196,7 +200,10 @@ function onChangeNameResult(response)
 			nameEl.innerHTML = p_name;
 
 		var userbtn = ge('userbtn');
-		var nameEl = nextElementSibling(firstElementChild(userbtn));
+		var nameEl = null;
+
+		if (userbtn.firstElementChild);
+			nameEl = userbtn.firstElementChild.nextElementSibling;
 
 		if (nameEl)
 			nameEl.innerHTML = p_name;
@@ -403,7 +410,7 @@ function initProfilePage()
 	var changename = ge('changename');
 	if (changename)
 	{
-		frm = firstElementChild(changename);
+		frm = changename.firstElementChild;
 		if (frm)
 			frm.onsubmit = onChangeNameSubmit.bind(null, frm);
 	}
@@ -411,7 +418,7 @@ function initProfilePage()
 	var changepass = ge('changepass');
 	if (changepass)
 	{
-		frm = firstElementChild(changepass);
+		frm = changepass.firstElementChild;
 		if (frm)
 			frm.onsubmit = onChangePassSubmit.bind(null, frm);
 	}

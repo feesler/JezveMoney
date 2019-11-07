@@ -161,17 +161,17 @@ function initControls()
 	var tbl, tbody, row;
 
 	tbl = ge('users_tbl')
-	if (!tbl)
+	if (!tbl || !tbl.firstElementChild)
 		return;
-	tbody = nextElementSibling(firstElementChild(tbl));
+	tbody = tbl.firstElementChild.nextElementSibling;
 	if (!tbody)
 		return;
-	row = firstElementChild(tbody);
+	row = tbody.firstElementChild;
 	while(row)
 	{
 		row.onclick = onRowClick.bind(row);
 
-		row = nextElementSibling(row);
+		row = row.nextElementSibling;
 	}
 
 	// popup initialization
@@ -192,12 +192,12 @@ function onRowClick()
 		return;
 
 	if (activeRow)
-		removeClass(activeRow, 'act');
+		activeRow.classList.remove('act');
 
-	addClass(this, 'act');
+	this.classList.add('act');
 	activeRow = this;
 
-	idcell = firstElementChild(this);
+	idcell = this.firstElementChild;
 	if (!idcell)
 		return;
 	row_id = parseInt(idcell.innerHTML);

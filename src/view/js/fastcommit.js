@@ -167,9 +167,9 @@ function findFirstSiblingByClass(item, className)
 {
 	while(item)
 	{
-		item = nextElementSibling(item);
+		item = item.nextElementSibling;
 
-		if (hasClass(item, className))
+		if (item.classList.contains(className))
 			return item;
 	}
 
@@ -182,9 +182,9 @@ function findLastSiblingByClass(item, className)
 {
 	while(item)
 	{
-		item = previousElementSibling(item);
+		item = item.previousElementSibling;
 
-		if (hasClass(item, className))
+		if (item.classList.contains(className))
 			return item;
 	}
 
@@ -195,9 +195,13 @@ function findLastSiblingByClass(item, className)
 // Find first placeholder in the list
 function findPlaceholder()
 {
-	var item = firstElementChild(ge('rowsContainer'));
+	var item = ge('rowsContainer');
+	if (!item || !item.firstElementChild)
+		return null;
 
-	if (hasClass(item, 'tr_row_placeholder'))
+	item = item.firstElementChild;
+
+	if (item.classList.contains('tr_row_placeholder'))
 		return item;
 	else
 		return findFirstSiblingByClass(item, 'tr_row_placeholder');
@@ -225,10 +229,10 @@ function findNthItem(parent, n)
 	if (!parent || !n)
 		return null;
 
-	var item = firstElementChild(parent);
+	var item = parent.firstElementChild;
 	for(var i = 1; i < n; i++)
 	{
-		item = nextElementSibling(item);
+		item = item.nextElementSibling;
 		if (!item)
 			return null;
 	}
@@ -514,7 +518,7 @@ function onTransPosChanged(origRow, replacedRow)
 	if (!replacedRow)
 		return;
 
-	if (!hasClass(replacedRow, 'tr_row'))	// put transaction on placeholder
+	if (!replacedRow.classList.contains('tr_row'))	// put transaction on placeholder
 	{
 		var prevItemObj = getRowByElem(findPrevItem(origRow));
 		var nextItemObj = getRowByElem(findNextItem(origRow));
@@ -571,8 +575,8 @@ function importLoadCallback(response)
 	if (!importRows || !rowsContainer)
 		return;
 
-	addClass(importRows.parentNode, 'column');
-	addClass(rowsContainer, 'column');
+	importRows.parentNode.classList.add('column');
+	rowsContainer.classList.add('column');
 
 	data = JSON.parse(response);
 	if (!isArray(data))
@@ -661,7 +665,7 @@ function mapImportRow(impRowObj)
 		return;
 
 	var replacedRow, replacedRowObj;
-	if (hasClass(item, 'tr_row'))	// insert at filled transaction
+	if (item.classList.contains('tr_row'))	// insert at filled transaction
 	{
 		replacedRow = getRowByElem(item);
 
@@ -896,7 +900,7 @@ function initPage()
 	trListSortable = new Sortable({ oninsertat : onTransPosChanged,
 									container : 'rowsContainer',
 									group : 'transactions',
-									itemClass : 'tr_row',
+									selector : '.tr_row',
 									placeholderClass : 'tr_row_placeholder',
 									copyWidth : true,
 									onlyRootHandle : true });

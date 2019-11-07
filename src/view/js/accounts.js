@@ -62,8 +62,8 @@ function initControls()
 	if (typeof account_id !== 'undefined')
 	{
 		var del_btn = ge('del_btn');
-		if (del_btn && firstElementChild(del_btn))
-			firstElementChild(del_btn).onclick = onDelete;
+		if (del_btn && del_btn.firstElementChild)
+			del_btn.firstElementChild.onclick = onDelete;
 	}
 
 	var accForm = ge('accForm');
@@ -117,10 +117,10 @@ function onTileClick(acc_id)
 
 	if (accounts.count() == 1)
 	{
-		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = baseURL + 'accounts/edit/' + selArr[0];
-		if (firstElementChild(export_btn) && firstElementChild(export_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(export_btn).href = './csvexport.php?id=' + selArr[0];
+		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			edit_btn.firstElementChild.href = baseURL + 'accounts/edit/' + selArr[0];
+		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			export_btn.firstElementChild.href = './csvexport.php?id=' + selArr[0];
 	}
 
 	show('toolbar', (accounts.count() > 0));
@@ -142,7 +142,7 @@ function initAccListControls()
 	if (!tilesContainer || !del_btn)
 		return;
 
-	tileEl = firstElementChild(tilesContainer);
+	tileEl = tilesContainer.firstElementChild;
 	while(tileEl)
 	{
 		pos = tileEl.id.indexOf('_');
@@ -151,16 +151,16 @@ function initAccListControls()
 			tile_id = parseInt(tileEl.id.substr(pos + 1));
 			if (!isNaN(tile_id))
 			{
-				btnEl = firstElementChild(tileEl);
+				btnEl = tileEl.firstElementChild;
 				if (btnEl)
 					btnEl.onclick = onTileClick.bind(null, tile_id);
 			}
 		}
 
-		tileEl = nextElementSibling(tileEl);
+		tileEl = tileEl.nextElementSibling;
 	}
 
-	btnEl = firstElementChild(del_btn);
+	btnEl = del_btn.firstElementChild;
 	if (btnEl)
 		btnEl.onclick = showDeletePopup;
 }

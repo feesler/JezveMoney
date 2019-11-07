@@ -275,7 +275,7 @@ DragZone.prototype.isValidDragHandle = function(target)
 		return false;
 
 	// allow to drag using whole drag zone in case no handles is set
-	if (this._params === undefined || this._params.handles === undefined)
+	if (!this._params || !this._params.handles)
 		return true;
 
 	handles = this._params.handles;
@@ -284,12 +284,18 @@ DragZone.prototype.isValidDragHandle = function(target)
 
 	return handles.some(function(hnd)
 	{
+		var elem;
+
 		if (isObject(hnd) && (hnd.elem || hnd.query))
 		{
 			if (hnd.query)
 			{
-				elem = this._elem.querySelectorAll(hnd.query);
-				elem = Array.prototype.slice.call(elem);
+				var qres = this._elem.querySelectorAll(hnd.query);
+				elem = [];
+				for(var i = 0, l = qres.length; i < l; i++)
+				{
+					elem.push(qres[i]);
+				}
 			}
 			else
 				elem = ge(hnd.elem);

@@ -41,8 +41,8 @@ function onTileClick(p_id)
 
 	if (persons.count() == 1)
 	{
-		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = baseURL + 'persons/edit/' + selArr[0];
+		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			edit_btn.firstElementChild.href = baseURL + 'persons/edit/' + selArr[0];
 	}
 
 	show('toolbar', (persons.count() > 0));
@@ -157,7 +157,7 @@ function initPersonsList()
 	initToolbar();
 	persons = new Selection();
 
-	tileEl = firstElementChild(tilesContainer);
+	tileEl = tilesContainer.firstElementChild;
 	while(tileEl)
 	{
 		pos = tileEl.id.indexOf('_');
@@ -166,16 +166,16 @@ function initPersonsList()
 			tile_id = parseInt(tileEl.id.substr(pos + 1));
 			if (!isNaN(tile_id))
 			{
-				btnEl = firstElementChild(tileEl);
+				btnEl = tileEl.firstElementChild;
 				if (btnEl)
 					btnEl.onclick = onTileClick.bind(null, tile_id);
 			}
 		}
 
-		tileEl = nextElementSibling(tileEl);
+		tileEl = tileEl.nextElementSibling;
 	}
 
-	btnEl = firstElementChild(del_btn);
+	btnEl = del_btn.firstElementChild;
 	if (btnEl)
 		btnEl.onclick = showDeletePopup;
 }

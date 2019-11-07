@@ -22,7 +22,7 @@ var Popup = new (function()
 		// Set click handler for close button
 		function setOnClose(elem)
 		{
-			btn = firstElementChild(elem);
+			btn = (elem) ? elem.firstElementChild : null;
 			if (btn)
 				btn.onclick = closeModal.bind(self);
 		}
@@ -85,8 +85,12 @@ var Popup = new (function()
 			if (!contentObj || !boxObj)
 				return false;
 
-			if (params.additional !== undefined)
-				addClass(contentObj, params.additional);
+			if (isArray(params.additional) || typeof params.additional === 'string')
+			{
+				var addClassNames = (isArray(params.additional)) ? params.additional : params.additional.split(' ');
+
+				contentObj.classList.add.apply(contentObj.classList, addClassNames);
+			}
 
 			prependChild(boxObj, messageObj);
 

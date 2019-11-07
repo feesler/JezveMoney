@@ -11,16 +11,17 @@ function onContrClick(e)
 	if (e.target.tagName == 'BUTTON')
 	{
 		if (actilveController)
-			removeClass(actilveController, 'active');
-		addClass(e.target.parentNode, 'active');
+			actilveController.classList.remove('active');
+		if (e.target.parentNode)
+			e.target.parentNode.classList.add('active');
 		actilveController = e.target.parentNode;
 	}
-	else if (e.target.tagName == 'LI' && hasClass(e.target.parentNode, 'sub_list'))
+	else if (e.target.tagName == 'LI' && e.target.parentNode && e.target.parentNode.classList.contains('sub_list'))
 	{
 		if (activeFormLink)
-			removeClass(activeFormLink, 'active');
+			activeFormLink.classList.remove('active');
 		activeFormLink = e.target;
-		addClass(activeFormLink, 'active');
+		activeFormLink.classList.add('active');
 
 		var formTarget = e.target.dataset.target;
 

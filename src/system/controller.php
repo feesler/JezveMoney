@@ -21,7 +21,7 @@ abstract class Controller
 		$this->css->page = [];
 		$this->cssAdmin = ["admin.css"];
 
-		$this->jsArr = ["es5-shim.min.js", "common.js", "ajax.js", "popup.js", "app.js"];
+		$this->jsArr = ["lib/polyfill.min.js", "common.js", "ajax.js", "popup.js", "app.js"];
 		$this->jsAdmin = [];
 	}
 

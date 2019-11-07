@@ -74,7 +74,7 @@ var Calendar = new (function()
 			setObj = { date : new Date(startYear + i, 0, 1) };
 			setObj.cell = ce('td', { className : 'yearCell', innerHTML : setObj.date.getFullYear() });
 			if (i == 0 || i == rangeLength + 1)
-				addClass(setObj.cell, 'omonth');
+				setObj.cell.classList.add('omonth');
 
 			res.set.push(setObj);
 			tr.appendChild(setObj.cell);
@@ -350,20 +350,20 @@ var Calendar = new (function()
 
 			e = fixEvent(e);
 
-			if (hasClass(e.target, 'title') || hasClass(e.target.parentNode, 'title'))
+			if (e.target.classList.contains('title') || e.target.parentNode.classList.contains('title'))
 			{
 				if (!isFunction(currView.callback.hdr))
 					return;
 
 				schedule(currView.callback.hdr.bind(null, currView.viewDate))();
 			}
-			else if (hasClass(e.target, 'nav') || hasClass(e.target.parentNode, 'nav'))
+			else if (e.target.classList.contains('nav') || e.target.parentNode.classList.contains('nav'))
 			{
 				if (!isFunction(currView.callback.nav) || !currView.nav)
 					return;
 
-				var el = hasClass(e.target, 'nav') ? e.target : e.target.parentNode;
-				schedule(currView.callback.nav.bind(null, hasClass(el, 'prev') ? currView.nav.prev : currView.nav.next))();
+				var el = e.target.classList.contains('nav') ? e.target : e.target.parentNode;
+				schedule(currView.callback.nav.bind(null, el.classList.contains('prev') ? currView.nav.prev : currView.nav.next))();
 			}
 			else
 			{
@@ -407,7 +407,7 @@ var Calendar = new (function()
 
 			currView.set.forEach(function(dateObj)
 			{
-				removeClass(dateObj.cell, 'hl');
+				dateObj.cell.classList.remove('hl');
 			});
 		}
 
@@ -420,7 +420,7 @@ var Calendar = new (function()
 
 			currView.set.forEach(function(dateObj)
 			{
-				removeClass(dateObj.cell, ['hl', 'act']);
+				dateObj.cell.classList.remove('hl', 'act');
 			});
 		}
 
@@ -435,7 +435,7 @@ var Calendar = new (function()
 			{
 				if (inRange(dateObj.date, range))
 				{
-					addClass(dateObj.cell, 'hl');
+					dateObj.cell.classList.add('hl');
 				}
 			});
 		}
@@ -444,14 +444,18 @@ var Calendar = new (function()
 		// Activate cell by specified date
 		function activateCell(date)
 		{
-			addClass(findCell(date), 'act');
+			var cell = findCell(date);
+			if (cell)
+				cell.classList.add('act');
 		}
 
 
 		// Activate cell by specified date
 		function deactivateCell(date)
 		{
-			removeClass(findCell(date), 'act');
+			var cell = findCell(date);
+			if (cell)
+				cell.classList.remove('act');
 		}
 
 
@@ -531,8 +535,8 @@ var Calendar = new (function()
 			if (e.target != currView.cellsTable || e.propertyName != 'transform')
 				return;
 
-			removeClass(cellsContainer, 'animated');
-			removeClass(nextView.cellsTable, ['layered', 'bottom_to', 'top_to']);
+			cellsContainer.classList.remove('animated');
+			nextView.cellsTable.classList.remove('layered', 'bottom_to', 'top_to');
 			nextView.cellsTable.style.left = '';
 			transform(nextView.cellsTable, '');
 			cellsContainer.style.width = '';
@@ -583,12 +587,12 @@ var Calendar = new (function()
 			{
 				var leftToRight = currView.viewDate < newView.viewDate;
 
-				addClass(currView.cellsTable, 'layered');
-				addClass(newView.cellsTable, 'layered');
+				currView.cellsTable.classList.add('layered');
+				newView.cellsTable.classList.add('layered');
 
 				newView.cellsTable.style.left = px(leftToRight? currTblWidth : -currTblWidth);
 
-				addClass(cellsContainer, 'animated');
+				cellsContainer.classList.add('animated');
 
 				cellsContainer.style.height = px(newView.cellsTable.offsetHeight);
 				var trMatrix = [1, 0, 0, 1, (leftToRight? -currTblWidth : currTblWidth), 0];
@@ -631,7 +635,7 @@ var Calendar = new (function()
 				var cellX = cellElement.offsetLeft;
 				var cellY = cellElement.offsetTop;
 
-				addClass(newView.cellsTable, ['layered', (goUp) ? 'bottom_to' : 'top_to']);
+				newView.cellsTable.classList.add('layered', ((goUp) ? 'bottom_to' : 'top_to'));
 
 				var scaleX = cellElement.offsetWidth / currTblWidth;
 				var scaleY = cellElement.offsetHeight / currTblHeight;
@@ -641,11 +645,11 @@ var Calendar = new (function()
 
 				transform(newView.cellsTable, 'matrix(' + (goUp ? viewTrans : cellTrans).join() + ')');
 
-				addClass(currView.cellsTable, ['layered', (goUp) ? 'top_from' : 'bottom_from']);
+				currView.cellsTable.classList.add('layered', ((goUp) ? 'top_from' : 'bottom_from'));
 
 				setTimeout(function()
 				{
-					addClass(cellsContainer, 'animated');
+					cellsContainer.classList.add('animated');
 					cellsContainer.style.height = px(newView.cellsTable.offsetHeight);
 					newView.cellsTable.style.opacity = 1;
 					currView.cellsTable.style.opacity = 0;
@@ -737,12 +741,12 @@ var Calendar = new (function()
 			if (!baseObj)
 				return;
 			removeChilds(baseObj);
-			addClass(baseObj, 'calBase');
+			baseObj.classList.add('calBase');
 
 			wrapperObj = ce('div', { className : 'calWrap' });
 			isStatic = params.static === true;
 			if (isStatic)
-				addClass(wrapperObj, 'staticCal');
+				wrapperObj.classList.add('staticCal');
 			else
 				show(wrapperObj, false);
 			baseObj.appendChild(wrapperObj);

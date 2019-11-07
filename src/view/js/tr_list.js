@@ -43,16 +43,16 @@ var transactions = (function()
 		trRow = ge('tr_' + trans.id);
 		if (!trRow)	// tr
 			return;
-		trBalanceItem = firstElementChild(trRow);		// td
+		trBalanceItem = trRow.firstElementChild;		// td
 		if (!trBalanceItem)
 			return;
-		trBalanceItem = nextElementSibling(trBalanceItem);
+		trBalanceItem = trBalanceItem.nextElementSibling;
 		if (!trBalanceItem)
 			return;
-		trBalanceItem = nextElementSibling(trBalanceItem);
+		trBalanceItem = trBalanceItem.nextElementSibling;
 		if (!trBalanceItem)
 			return;
-		trBalanceItem = firstElementChild(trBalanceItem);		// div tritem_balance
+		trBalanceItem = trBalanceItem.firstElementChild;		// div tritem_balance
 		if (!trBalanceItem)
 			return;
 
@@ -238,8 +238,8 @@ function onTransClick(tr_id)
 
 	if (trSelection.count() == 1)
 	{
-		if (firstElementChild(edit_btn) && firstElementChild(edit_btn).tagName.toLowerCase() == 'a')
-			firstElementChild(edit_btn).href = baseURL + 'transactions/edit/' + selArr[0];
+		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
+			edit_btn.firstElementChild.href = baseURL + 'transactions/edit/' + selArr[0];
 	}
 
 	show('toolbar', (trSelection.count() > 0));
@@ -312,14 +312,14 @@ function initTransListDrag()
 // 0 if drag first transaction, -1 if no draggin currently
 	trListSortable.dragFrom = -1;
 
-	listItem_wr = firstElementChild(trlist);
+	listItem_wr = trlist.firstElementChild;
 	listItem = null;
 	while(listItem_wr)
 	{
 		if ((filterObj.mode == 'details' && listItem_wr.tagName == 'TBODY') ||
-			(filterObj.mode != 'details' && hasClass(listItem_wr, 'trlist_item_wrap')))
+			(filterObj.mode != 'details' && listItem_wr.classList.contains('trlist_item_wrap')))
 		{
-			listItem = firstElementChild(listItem_wr);
+			listItem = listItem_wr.firstElementChild;
 			trans_id = transIdFromElem(listItem);
 			if (trans_id)
 			{
@@ -328,7 +328,7 @@ function initTransListDrag()
 			}
 		}
 
-		listItem_wr = nextElementSibling(listItem_wr);
+		listItem_wr = listItem_wr.nextElementSibling;
 	}
 
 
@@ -340,7 +340,7 @@ function initTransListDrag()
 	var calendar_btn = ge('calendar_btn');
 	if (calendar_btn)
 	{
-		btn = firstElementChild(calendar_btn);
+		btn = calendar_btn.firstElementChild;
 		if (btn)
 			btn.onclick = showCalendar;
 	}
@@ -352,7 +352,7 @@ function initTransListDrag()
 	var del_btn = ge('del_btn');
 	if (del_btn)
 	{
-		btn = firstElementChild(del_btn);
+		btn = del_btn.firstElementChild;
 		if (btn)
 			btn.onclick = showDeletePopup;
 	}
@@ -435,10 +435,14 @@ function transIdFromElem(elem)
 // Transaction drag start callback
 function onTransDragStart(trans_id)
 {
-	if (!trListSortable)
+	if (!trListSortable || !trans_id)
 		return;
 
-	trListSortable.dragFrom = transIdFromElem(firstElementChild(previousElementSibling(trans_id)));
+	var elem = trans_id.previousElementSibling;
+	if (elem)
+		elem = elem.firstElementChild;
+
+	trListSortable.dragFrom = transIdFromElem(elem);
 }
 
 
@@ -448,8 +452,11 @@ function onTransPosChanged(trans_id, retrans_id)
 	var replacedItem, newPos;
 	var tr_id, retr_id;
 
-	tr_id = transIdFromElem(firstElementChild(trans_id));
-	retr_id = transIdFromElem(firstElementChild(retrans_id));
+	if (!trans_id || !retrans_id)
+		return;
+
+	tr_id = transIdFromElem(trans_id.firstElementChild);
+	retr_id = transIdFromElem(retrans_id.firstElementChild);
 	if (!tr_id || !retr_id)
 		return;
 

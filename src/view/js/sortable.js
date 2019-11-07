@@ -43,7 +43,7 @@ SortableDragZone.prototype.findDragZoneItem = function(target)
 
 	while(el && el != this._elem)
 	{
-		if (el.matches(this._params.selector))
+		if (isFunction(el.matches) && el.matches(this._params.selector))
 			return el;
 		el = el.parentNode;
 	}
@@ -55,13 +55,11 @@ SortableDragZone.prototype.findDragZoneItem = function(target)
 // Check specified targer element is valid
 SortableDragZone.prototype.isValidDragHandle = function(target)
 {
-	var handles;
-
 	if (!target)
 		return false;
 
 	// allow to drag using whole drag zone in case no handles is set
-	if (this._params === undefined || this._params.onlyRootHandle === undefined)
+	if (!this._params || !this._params.onlyRootHandle)
 		return SortableDragZone.parent.isValidDragHandle.apply(this, arguments);
 
 	var item = this.findDragZoneItem(target);
@@ -97,6 +95,18 @@ SortableDragZone.prototype.getItemSelector = function()
 }
 
 
+// Return class for drag avatar element
+SortableDragZone.prototype.getDragClass = function()
+{
+	if (this._params && this._params.dragClass)
+	{
+		return (this._params.dragClass === true) ? 'drag' : this._params.dragClass;
+	}
+
+	return null;
+}
+
+
 // Insert event handler
 SortableDragZone.prototype.onInsertAt = function(srcElem, elem)
 {
@@ -116,6 +126,7 @@ extend(SortableDragAvatar, DragAvatar);
 
 SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 {
+// Overwrite drag zone here to find exact item to manipulate
 	this._dragZoneElem = this._dragZone.findDragZoneItem(e.target);
 	if (!this._dragZoneElem)
 		return false;
@@ -127,14 +138,26 @@ SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 	this._shiftX = downX - offset.left;
 	this._shiftY = downY - offset.top;
 
-	addClass(this._dragZoneElem, this._dragZone.getPlaceholder());
+	this._dragZoneElem.classList.add(this._dragZone.getPlaceholder());
 
 	if (this._dragZone._params.copyWidth)
-		elem.style.width = px(this._dragZoneElem.offsetWidth);
+	{
+		var quirks = !elem.style.getPropertyValue;		// IE < 9
+		if (quirks)
+		{
+			elem.style.cssText += ';width: ' + px(this._dragZoneElem.offsetWidth) + '!important';
+		}
+		else
+		{
+			elem.style.setProperty('width', px(this._dragZoneElem.offsetWidth), 'important');
+		}
+	}
 
 	document.body.appendChild(elem);
 	elem.style.zIndex = 9999;
 	elem.style.position = 'absolute';
+
+	elem.classList.add(this._dragZone.getDragClass());
 
 	return true;
 }
@@ -144,7 +167,7 @@ SortableDragAvatar.prototype._destroy = function()
 {
 	re(this._elem);
 
-	removeClass(this._dragZoneElem, this._dragZone.getPlaceholder());
+	this._dragZoneElem.classList.remove(this._dragZone.getPlaceholder());
 };
 
 
@@ -168,12 +191,9 @@ SortableDragAvatar.prototype.saveSortTarget = function(dropTarget)
 
 SortableDragAvatar.prototype.getSortPosition = function()
 {
-	var prevElem = previousElementSibling(this._dragZoneElem);
-	var nextElem = nextElementSibling(this._dragZoneElem);
-
 	return {
-		prev : prevElem,
-		next : nextElem
+		prev : this._dragZoneElem.previousElementSibling,
+		next : this._dragZoneElem.nextElementSibling
 	};
 };
 
@@ -227,18 +247,18 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 		destCell = tbl.querySelector('td');
 		while(srcCell && destCell)
 		{
-			tmp = firstElementChild(destCell);
+			tmp = destCell.firstElementChild;
 
 			tmp.style.width = px(srcCell.offsetWidth);
 
-			srcCell = nextElementSibling(srcCell);
-			destCell = nextElementSibling(destCell);
+			srcCell = srcCell.nextElementSibling;
+			destCell = destCell.nextElementSibling;
 		}
 
 		elem.style.width = px(this._dragZoneElem.offsetWidth);
 	}
 
-	addClass(this._dragZoneElem, this._dragZone.getPlaceholder());
+	this._dragZoneElem.classList.add(this._dragZone.getPlaceholder());
 
 	document.body.appendChild(elem);
 	elem.style.zIndex = 9999;
@@ -246,6 +266,7 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
 
 	return true;
 }
+
 
 // Sortable drop target
 function SortableDropTarget(elem)
@@ -266,7 +287,7 @@ SortableDropTarget.prototype._getTargetElem = function(avatar, event)
 
 	while(el && el != root)
 	{
-		if (el.matches(itemSelector) || hasClass(el, phItemClass))
+		if ((isFunction(el.matches) && el.matches(itemSelector)) || el.classList.contains(phItemClass))
 			return el;
 		el = el.parentNode;
 	}
@@ -295,7 +316,7 @@ SortableDropTarget.prototype.onDragMove = function(avatar, event)
 		return;
 
 	// check drop target is already a placeholder
-	if (hasClass(this._targetElem, dragInfo.dragZone.getPlaceholder()))
+	if (this._targetElem.classList.contains(dragInfo.dragZone.getPlaceholder()))
 	{
 		var pos = avatar.getSortPosition();
 
@@ -365,34 +386,44 @@ SortableDropTarget.prototype.onDragEnd = function(avatar, e)
 function Sortable(params)
 {
 	var containerElem = null;
-	var groupName = null;
 	var dragZoneParam = {};
+	var dragZoneDefaults = {
+			group : null,
+			ondragstart : null,
+			oninsertat : null,
+			table : false,
+			copyWidth : false,
+			selector : null,
+			placeholderClass : false,
+			dragClass : 'drag',
+			onlyRootHandle : false,
+			handles : null
+		};
+
 	var dropTargetParam = {};
+	var dropTargetDefaults = {
+			group : null
+		};
 
 
 	function create(params)
 	{
 		params = params || {};
 
-		groupName = params.group;
+		var prop;
+		for(prop in dragZoneDefaults)
+		{
+			dragZoneParam[prop] = (params.hasOwnProperty(prop))
+									? params[prop]
+									: dragZoneDefaults[prop];
+		}
 
-		dragZoneParam.group = dropTargetParam.group = groupName;
-		if (params.ondragstart)
-			dragZoneParam.ondragstart = params.ondragstart;
-		if (params.oninsertat)
-			dragZoneParam.oninsertat = params.oninsertat;
-		if (params.table)
-			dragZoneParam.table = params.table;
-		if (params.copyWidth)
-			dragZoneParam.copyWidth = params.copyWidth;
-		if (params.selector)
-			dragZoneParam.selector = params.selector;
-		if (params.placeholderClass)
-			dragZoneParam.placeholderClass = params.placeholderClass;
-		if (params.onlyRootHandle === true)
-			dragZoneParam.onlyRootHandle = true;
-		if (params.handles)
-			dragZoneParam.handles = params.handles;
+		for(prop in dropTargetDefaults)
+		{
+			dropTargetParam[prop] = (params.hasOwnProperty(prop))
+									? params[prop]
+									: dropTargetDefaults[prop];
+		}
 
 		containerElem = ge(params.container);
 		if (!containerElem)

@@ -89,9 +89,9 @@ function DDList()
 		if (this.editable)
 		{
 			if (val)
-				addClass(this.hostObj, 'inactive');
+				this.hostObj.classList.add('inactive');
 			else
-				removeClass(this.hostObj, 'inactive');
+				this.hostObj.classList.remove('inactive');
 
 			this.hostObj.value = ((val) ? this.selMsg : '');
 		}
@@ -100,9 +100,9 @@ function DDList()
 			if (!this.disabled)
 			{
 				if (val)
-					addClass(this.statObj, 'inactive');
+					this.statObj.classList.add('inactive');
 				else
-					removeClass(this.statObj, 'inactive');
+					this.statObj.classList.remove('inactive');
 			}
 
 			this.statObj.innerHTML = ((val) ? this.selMsg : '');
@@ -171,10 +171,10 @@ function DDList()
 			if (!this.container)
 				return false;
 			if (params.extClass)
-				addClass(this.container, params.extClass);
+				this.container.classList.add(params.extClass);
 
 			if (this.disabled)
-				addClass(this.container, 'dd_disabled');
+				this.container.classList.add('dd_disabled');
 
 			if (selectMode)
 			{
@@ -212,7 +212,7 @@ function DDList()
 			if (!this.container)
 				return false;
 			if (params.extClass)
-				addClass(this.container, params.extClass);
+				this.container.classList.add(params.extClass);
 
 			insertAfter(this.container, inpObj);
 			this.container.style.width = px(inpObj.offsetWidth);
@@ -265,12 +265,12 @@ function DDList()
 		if (!this.list)
 			return false;
 		if (this.isMobile)
-			addClass(this.list, 'ddmobile');
+			this.list.classList.add('ddmobile');
 		else
 			setParam(this.list, { style : { display : 'none', height :  '10px' } });
 		if (this.multi && this.forceSelect)
 		{
-			addClass(this.list, 'forced');
+			this.list.classList.add('forced');
 			show(this.list, false);
 		}
 		this.container.appendChild(this.list);
@@ -288,7 +288,7 @@ function DDList()
 			if (!this.isMobile || (this.isMobile && this.multi && this.forceSelect))
 				this.selbtn.onclick = this.dropDown.bind(this);
 
-			if (!insertBefore(this.selbtn, firstElementChild(this.container)))
+			if (!insertBefore(this.selbtn, this.container.firstElementChild))
 				return false;
 		}
 		else
@@ -326,14 +326,14 @@ function DDList()
 
 					if (this.hostObj.value == '')
 					{
-						addClass(this.hostObj, 'inactive');
+						this.hostObj.classList.add('inactive');
 						this.hostObj.value = this.selMsg;
 					}
 				}
 				else
 				{
 					if (!this.disabled)
-						addClass(this.statObj, 'inactive');
+						this.statObj.classList.add('inactive');
 					this.statObj.innerHTML = this.selMsg;
 				}
 
@@ -425,8 +425,8 @@ function DDList()
 			this.changed = false;
 		}
 
-		if (this.selbtn && firstElementChild(this.selbtn))
-			firstElementChild(this.selbtn).className = ((val) ? 'dditem_act' : 'dditem_idle');
+		if (this.selbtn && this.selbtn.firstElementChild)
+			this.selbtn.firstElementChild.className = ((val) ? 'dditem_act' : 'dditem_idle');
 
 		show(this.list, val);
 
@@ -450,7 +450,7 @@ function DDList()
 
 		if (this.editable)
 		{
-			addClass(this.hostObj, 'ddinp');
+			this.hostObj.classList.add('ddinp');
 			this.hostObj.value = this.statObj.innerHTML;
 			this.hostObj.onkeydown = this.onKey.bind(this);
 			this.hostObj.onkeypress = this.onKey.bind(this);
@@ -458,7 +458,7 @@ function DDList()
 		}
 		else
 		{
-			removeClass(this.hostObj, 'ddinp');
+			this.hostObj.classList.remove('ddinp');
 			this.statObj.innerHTML = this.hostObj.value;
 			if (!this.disabled)
 				this.inpCont.onclick = this.dropDown.bind(this);
@@ -476,12 +476,12 @@ function DDList()
 
 		if (this.disabled)
 		{
-			addClass(this.container, 'dd_disabled');
+			this.container.classList.add('dd_disabled');
 			this.makeEditable(false);
 		}
 		else
 		{
-			removeClass(this.container, 'dd_disabled');
+			this.container.classList.remove('dd_disabled');
 			if (this.createParams.editable !== false)
 				this.makeEditable();
 		}
@@ -537,7 +537,7 @@ function DDList()
 		newPrefix = newPrefix || null;
 		newidval = (newPrefix) ? newPrefix : '';
 
-		listItem = firstElementChild(this.ulobj);
+		listItem = this.ulobj.firstElementChild;
 		while(listItem)
 		{
 			if (this.isMobile)
@@ -547,12 +547,12 @@ function DDList()
 			}
 			else
 			{
-				elem = firstElementChild(listItem);
+				elem = listItem.firstElementChild;
 				if (elem)
 					elem.id = newidval + this.prepareId(elem.id);
 			}
 
-			listItem = nextElementSibling(listItem);
+			listItem = listItem.nextElementSibling;
 		}
 
 		this.itemPrefix = newPrefix;
@@ -633,7 +633,7 @@ function DDList()
 		{
 			if (chnodes[i].nodeType == 1)		// ELEMENT_NODE
 			{
-				if (firstElementChild(chnodes[i]).id == idval)
+				if (chnodes[i].firstElementChild && chnodes[i].firstElementChild.id == idval)
 				{
 					this.onSelItem(chnodes[i]);
 					break;
@@ -651,12 +651,17 @@ function DDList()
 		if (!this.selcb || !obj)
 			return;
 
-		fe = firstElementChild(obj);
+		fe = obj.firstElementChild;
 		if (fe)
 		{
 			resObj.id = this.prepareId(fe.id);
 			if (this.multi)
-				resObj.str = nextElementSibling(firstElementChild(firstElementChild(fe))).innerHTML;
+			{
+				if (fe.firstElementChild && fe.firstElementChild.firstElementChild && fe.firstElementChild.firstElementChild.nextElementSibling)
+					resObj.str = fe.firstElementChild.firstElementChild.nextElementSibling.innerHTML;
+				else
+					resObj.str = null;
+			}
 			else
 				resObj.str = fe.innerHTML;
 
@@ -723,12 +728,12 @@ function DDList()
 			return;
 
 		resObj.id = this.prepareId(obj.parentNode.parentNode.id);
-		resObj.str = nextElementSibling(obj).innerHTML;
+		resObj.str = (obj.nextElementSibling) ? obj.nextElementSibling.innerHTML : null;
 
-		if (this.selection.isSelected(resObj.id))
-			this.selection.deselect(resObj.id);
-		else
+		if (obj.checked)
 			this.selection.select(resObj.id, resObj.str);
+		else
+			this.selection.deselect(resObj.id);
 
 		selectByValue(this.selobj, resObj.id, this.selection.isSelected(resObj.id));
 
@@ -752,7 +757,7 @@ function DDList()
 		if (!obj)
 			return null;
 
-		return (next !== false) ? nextElementSibling(obj) : previousElementSibling(obj);
+		return (next !== false) ? obj.nextElementSibling : obj.previousElementSibling;
 	}
 
 
@@ -785,14 +790,14 @@ function DDList()
 			if (!this.visible && this.actItem == null)
 			{
 				this.show(true);
-				newItem = firstElementChild(this.ulobj);
+				newItem = this.ulobj.firstElementChild;
 			}
 			else if (this.visible)
 			{
 				if (this.actItem != null)
 					newItem = this.getSibling(ge(this.actItem).parentNode);
 				else
-					newItem = firstElementChild(this.ulobj);
+					newItem = this.ulobj.firstElementChild;
 			}
 		}
 		else if (keyCode == 38)				// up arrow
@@ -824,7 +829,7 @@ function DDList()
 
 		if (newItem != null)
 		{
-			this.setActive(firstElementChild(newItem));
+			this.setActive(newItem.firstElementChild);
 			e.preventDefault ? e.preventDefault() : (e.returnValue = false);
 		}
 
@@ -881,10 +886,10 @@ function DDList()
 
 		this.filteredCount = 0;
 
-		list_item = firstElementChild(this.ulobj);
-		while(list_item)
+		list_item = this.ulobj.firstElementChild;
+		while(list_item && list_item.firstElementChild)
 		{
-			ival = firstElementChild(list_item).innerHTML.toLowerCase();
+			ival = list_item.firstElementChild.innerHTML.toLowerCase();
 			match = (ival.indexOf(fstr.toLowerCase(), 0) != -1);
 			if (match)
 				this.filteredCount++;
@@ -895,7 +900,7 @@ function DDList()
 			if (found)
 				this.filtered = true;
 
-			list_item = nextElementSibling(list_item);
+			list_item = list_item.nextElementSibling;
 		}
 
 		return found;
@@ -912,10 +917,10 @@ function DDList()
 		idval = ((this.itemPrefix) ? this.itemPrefix : '') + item_id;
 
 		item = ge(idval);
-		if (!item || !firstElementChild(item))
+		if (!item || !item.firstElementChild)
 			return false;
 
-		checkbox = firstElementChild(firstElementChild(item));
+		checkbox = item.firstElementChild.firstElementChild;
 		if (!checkbox)
 			return false;
 
@@ -932,7 +937,7 @@ function DDList()
 		if (!this.isMobile || !this.multi)
 			return;
 
-		fe = firstElementChild(selectObj);
+		fe = selectObj.firstElementChild;
 
 		if (!fe || !(fe.tagName == 'OPTGROUP' && fe.hidden && fe.disabled))
 		{
@@ -1108,12 +1113,12 @@ function DDList()
 		this.actItem = obj.id;
 
 		// scroll list to show new active item if needed
-		curLi = firstElementChild(this.ulobj);
+		curLi = this.ulobj.firstElementChild;
 		while(curLi && curLi != obj.parentNode)
 		{
 			if (curLi != obj.parentNode && curLi.style.display != 'none')
 				itemTop += this.itemHeight;
-			curLi = nextElementSibling(curLi);
+			curLi = curLi.nextElementSibling;
 		}
 
 		curListTop = this.list.scrollTop;

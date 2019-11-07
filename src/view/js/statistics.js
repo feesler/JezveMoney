@@ -269,7 +269,7 @@ function initControls()
 	var calendar_btn = ge('calendar_btn');
 	if (calendar_btn)
 	{
-		btn = firstElementChild(calendar_btn);
+		btn = calendar_btn.firstElementChild;
 		if (btn)
 			btn.onclick = showCalendar;
 	}

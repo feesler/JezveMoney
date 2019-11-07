@@ -334,8 +334,8 @@ function TransactionViewModel()
 		}
 
 		show('noacc_btn', Transaction.noAccount());
-		show(nextElementSibling(firstElementChild(source)), Transaction.noAccount());
-		show(nextElementSibling(nextElementSibling(firstElementChild(source))), Transaction.noAccount());
+		show(source.firstElementChild.nextElementSibling, Transaction.noAccount());
+		show(source.firstElementChild.nextElementSibling.nextElementSibling, Transaction.noAccount());
 		show('selaccount', !Transaction.noAccount());
 
 		Transaction.update('no_account', !Transaction.noAccount());
@@ -372,29 +372,29 @@ function TransactionViewModel()
 		var amountRow, currContainer, currBtn, inputContainer;
 
 		amountRow = ge((src) ? 'src_amount_row' : 'dest_amount_row');
-		if (!amountRow || !firstElementChild(amountRow) || !nextElementSibling(firstElementChild(amountRow)))
+		if (!amountRow || !amountRow.firstElementChild || !amountRow.firstElementChild.nextElementSibling)
 			return;
 
-		currContainer = firstElementChild(nextElementSibling(firstElementChild(amountRow)));
+		currContainer = amountRow.firstElementChild.nextElementSibling.firstElementChild;
 		if (!currContainer)
 			return;
 
-		currBtn = firstElementChild(currContainer);
-		inputContainer = nextElementSibling(currContainer);
+		currBtn = currContainer.firstElementChild;
+		inputContainer = currContainer.nextElementSibling;
 		if (!currBtn || !inputContainer)
 			return;
 
 		if (act)
 		{
-			removeClass(currBtn, 'inact_rbtn');
-			removeClass(inputContainer, 'trans_input');
-			addClass(inputContainer, 'rbtn_input');
+			currBtn.classList.remove('inact_rbtn');
+			inputContainer.classList.remove('trans_input');
+			inputContainer.classList.add('rbtn_input');
 		}
 		else
 		{
-			addClass(currBtn, 'inact_rbtn');
-			addClass(inputContainer, 'trans_input');
-			removeClass(inputContainer, 'rbtn_input');
+			currBtn.classList.add('inact_rbtn');
+			inputContainer.classList.add('trans_input');
+			inputContainer.classList.remove('rbtn_input');
 		}
 	}
 
@@ -405,10 +405,10 @@ function TransactionViewModel()
 		var amountRow, lblObj;
 
 		amountRow = ge((src) ? 'src_amount_row' : 'dest_amount_row');
-		if (!amountRow || !firstElementChild(amountRow))
+		if (!amountRow || !amountRow.firstElementChild)
 			return;
 
-		lblObj = firstElementChild(firstElementChild(amountRow));
+		lblObj = amountRow.firstElementChild.firstElementChild;
 		if (!lblObj)
 			return;
 
@@ -428,7 +428,7 @@ function TransactionViewModel()
 		if (!amountBlock)
 			return;
 
-		lblObj = firstElementChild(amountBlock);
+		lblObj = amountBlock.firstElementChild;
 		if (!lblObj)
 			return;
 
@@ -445,8 +445,8 @@ function TransactionViewModel()
 		var src_amount, src_amount_b;
 
 		src_amount_b = ge('src_amount_b');
-		if (src_amount_b)
-			firstElementChild(src_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
+		if (src_amount_b && src_amount_b.firstElementChild)
+			src_amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.srcCurr());
 
 		if (val === undefined)
 			return;
@@ -470,8 +470,8 @@ function TransactionViewModel()
 		var dest_amount, dest_amount_b;
 
 		dest_amount_b = ge('dest_amount_b');
-		if (dest_amount_b)
-			firstElementChild(dest_amount_b).innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
+		if (dest_amount_b && dest_amount_b.firstElementChild)
+			dest_amount_b.firstElementChild.innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
 
 		if (val === undefined)
 			return;
@@ -528,8 +528,8 @@ function TransactionViewModel()
 			exchText += ' ('  + invExch + ' ' + srcCurr.sign + '/' + destCurr.sign + ')';
 		}
 
-		if (exchrate_b)
-			firstElementChild(exchrate_b).innerHTML = val + ' ' + exchText;
+		if (exchrate_b && exchrate_b.firstElementChild)
+			exchrate_b.firstElementChild.innerHTML = val + ' ' + exchText;
 	}
 
 
@@ -542,7 +542,7 @@ function TransactionViewModel()
 			return;
 
 		resbal = ge('resbal');
-		resbal_b = firstElementChild(ge('resbal_b'));
+		resbal_b = ge('resbal_b');
 
 		if (resbal)
 		{
@@ -555,8 +555,8 @@ function TransactionViewModel()
 		}
 
 		fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
-		if (resbal_b)
-			resbal_b.innerHTML = fmtBal;
+		if (resbal_b && resbal_b.firstElementChild)
+			resbal_b.firstElementChild.innerHTML = fmtBal;
 	}
 
 
@@ -569,7 +569,7 @@ function TransactionViewModel()
 			return;
 
 		resbal_d = ge('resbal_d');
-		resbal_d_b = firstElementChild(ge('resbal_d_b'));
+		resbal_d_b = ge('resbal_d_b');
 
 		if (resbal_d)
 		{
@@ -582,8 +582,8 @@ function TransactionViewModel()
 		}
 
 		fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.destCurr());
-		if (resbal_d_b)
-			resbal_d_b.innerHTML = fmtBal;
+		if (resbal_d_b && resbal_d_b.firstElementChild)
+			resbal_d_b.firstElementChild.innerHTML = fmtBal;
 	}
 
 
@@ -1185,11 +1185,17 @@ function TransactionViewModel()
 			acclbl.innerHTML = (dType) ? 'Destination account' : 'Source account';
 		}
 
-		resballbl = firstElementChild(firstElementChild(ge('result_balance')));
+		var elem = ge('result_balance');
+		resballbl = null;
+		if (elem && elem.firstElementChild)
+			resballbl = elem.firstElementChild.firstElementChild;
 		if (resballbl)
 			resballbl.innerHTML = (dType) ? 'Result balance (Person)' : 'Result balance (Account)';
 
-		resballbl = firstElementChild(firstElementChild(ge('result_balance_dest')));
+		elem = ge('result_balance_dest');
+		resballbl = null;
+		if (elem && elem.firstElementChild)
+			resballbl = elem.firstElementChild.firstElementChild;
 		if (resballbl)
 			resballbl.innerHTML = (dType) ? 'Result balance (Account)' : 'Result balance (Person)';
 
@@ -1311,9 +1317,9 @@ function TransactionViewModel()
 
 		if (edit_mode)
 		{
-			elem = firstElementChild(ge('del_btn'))
-			if (elem)
-				elem.onclick = onDelete;
+			elem = ge('del_btn');
+			if (elem && elem.firstElementChild)
+				elem.firstElementChild.onclick = onDelete;
 		}
 
 		setParam(ge('src_amount_b'), { onclick : onSrcAmountSelect });
@@ -1336,10 +1342,14 @@ function TransactionViewModel()
 		elem = ge('resbal_d');
 		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
 
-		setParam(firstElementChild(ge('calendar_btn')), { onclick : showCalendar });
+		elem = ge('calendar_btn');
+		if (elem)
+			setParam(elem.firstElementChild, { onclick : showCalendar });
 		setParam(ge('cal_rbtn'), { onclick : showCalendar });
 
-		setParam(firstElementChild(ge('comm_btn')), { onclick : showComment });
+		elem = ge('comm_btn');
+		if (elem)
+			setParam(elem.firstElementChild, { onclick : showComment });
 
 		var srcAcc, destAcc;
 
@@ -1393,12 +1403,12 @@ function TransactionViewModel()
 		{
 			var persDDList;
 
-			elem = firstElementChild(ge('noacc_btn'));
-			if (elem)
-				elem.onclick = toggleEnableAccount;
-			elem = firstElementChild(ge('selaccount'));
-			if (elem)
-				elem.onclick = toggleEnableAccount;
+			elem = ge('noacc_btn');
+			if (elem && elem.firstElementChild)
+				elem.firstElementChild.onclick = toggleEnableAccount;
+			elem = ge('selaccount');
+			if (elem && elem.firstElementChild)
+				elem.firstElementChild.onclick = toggleEnableAccount;
 
 			elem = ge('debtgive');
 			if (elem)
