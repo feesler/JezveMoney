@@ -23,7 +23,7 @@ class FastCommitController extends Controller
 
 		$this->css->page = "fastcommit.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "json2.js", "ajax.js", "dragndrop.js", "sortable.js", "fastcommit.js", "convhint.js");
+		array_push($this->jsArr, "ajax.js", "dragndrop.js", "sortable.js", "fastcommit.js", "convhint.js");
 
 		$titleString = "Jezve Money | Fast Commit";
 

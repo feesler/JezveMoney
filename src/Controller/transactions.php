@@ -203,7 +203,7 @@ class TransactionsController extends Controller
 		array_push($this->css->libs, "tiles.css", "iconlink.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "json2.js", "selection.js", "currency.js", "account.js", "calendar.js", "dragndrop.js",
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "calendar.js", "dragndrop.js",
 									"sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
 
 		include("./view/templates/transactions.tpl");

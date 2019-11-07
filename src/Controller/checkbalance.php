@@ -182,7 +182,6 @@ class CheckBalanceController extends Controller
 		$titleString = "Jezve Money | Check balance";
 
 		$this->buildCSS();
-		$jsArr[] = "json2.js";
 
 		include("./view/templates/checkbalance.tpl");
 	}
