@@ -89,7 +89,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 			if (!trCell)
 				continue;
 
-			btn = firstElementChild(trCell);
+			btn = trCell.firstElementChild;
 			if (!btn)
 				continue;
 
