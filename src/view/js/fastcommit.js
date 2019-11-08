@@ -169,7 +169,7 @@ function findFirstSiblingByClass(item, className)
 	{
 		item = item.nextElementSibling;
 
-		if (item.classList.contains(className))
+		if (item && item.classList.contains(className))
 			return item;
 	}
 
@@ -184,7 +184,7 @@ function findLastSiblingByClass(item, className)
 	{
 		item = item.previousElementSibling;
 
-		if (item.classList.contains(className))
+		if (item && item.classList.contains(className))
 			return item;
 	}
 
@@ -572,7 +572,7 @@ function importLoadCallback(response)
 
 	importRows = ge('importRows');
 	rowsContainer = ge('rowsContainer');
-	if (!importRows || !rowsContainer)
+	if (!importRows || !importRows.parentNode || !rowsContainer)
 		return;
 
 	importRows.parentNode.classList.add('column');
