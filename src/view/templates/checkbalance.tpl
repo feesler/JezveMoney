@@ -108,7 +108,7 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php	if (isset($posUpd)) {		?>
 <?php		if ($posUpd == TRUE) {	?>
 	<span style="color: #80FF80;">Position was updated</span><br>
-<?php		} else if ($posUpd == TRUE) {	?>
+<?php		} else if ($posUpd == FALSE) {	?>
 	<span style="color: #FF8080;">Fail to update position</span><br>
 <?php		}	?>
 <?php	}	?>
