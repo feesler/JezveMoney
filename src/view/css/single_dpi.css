@@ -61,11 +61,3 @@
 {
 	background-image: url('../img/icons.png');
 }
-
-
-/* Popup close button */
-.popup .close_btn > button > span,
-.box.dragging .close_btn > button > span
-{
-	background-image: url('../img/icons.png');
-}
