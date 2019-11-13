@@ -114,10 +114,10 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 <?php	}	?>
 <table>
 <?php	if ($checkAccount_id == 0) {	?>
-	<tr><td colspan="8">All accounts</td></tr>
+	<tr><td colspan="9">All accounts</td></tr>
 <?php	}	?>
 	<tr>
-		<td colspan="8">
+		<td colspan="9">
 			<table>
 				<tr><td>ID</td><td>Account</td><td>initBalance</td><td>curBalance</td></tr>
 <?php	foreach($accName as $acc_id => $acc_name) {		?>
@@ -132,14 +132,10 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		</td>
 	</tr>
 
-	<tr><td>ID</td><td>Type</td><td>Source amount</td><td>Destination amount</td><td>Comment</td><td>Real balance</td><td>Date</td><td>Pos</td></tr>
+	<tr><td>ID</td><td>Type</td><td>Source amount</td><td>Destination amount</td><td>Comment</td><td>Source balance</td><td>Destination balance</td><td>Date</td><td>Pos</td></tr>
 <?php	foreach($transArr as $tr_id => $tr) {	?>
 	<tr>
-<?php	if (($checkAccount_id == 0 && $tr["type"] == TRANSFER) || ($tr["type"] == DEBT && $tr["src_id"] && $tr["dest_id"])) {	?>
-		<td rowspan="2" class="id_cell">
-<?php	} else {	?>
 		<td class="id_cell">
-<?php	}	?>
 			<a href="<?=BASEURL?>transactions/edit/<?=$tr_id?>" target="_blank"><?=$tr_id?></a>
 		</td>
 <?php	if ($tr["type"] == EXPENSE) {		?>
@@ -149,9 +145,9 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		<td>Expense</td>
 <?php		}	?>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">- <?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">- <?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($tr["type"] == INCOME) {	?>
 <?php		if ($checkAccount_id == 0) {	?>
@@ -160,9 +156,9 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		<td>Income</td>
 <?php		}	?>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td class="sum_cell" colspan="2">+<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">+ <?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell">+<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">+<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+ <?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id) {	/* transfer to */	?>
 		<td>Transfer from <?=$tr["src_name"]?></td>
@@ -179,106 +175,48 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id == 0 && $tr["type"] == TRANSFER) {		/* Transfer between two accounts */		?>
-		<td rowspan="2">Transfer from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
+		<td>Transfer from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
-		<td rowspan="2" class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td rowspan="2" class="sum_cell">-<?=$tr["src_amount"]?></td><td rowspan="2" class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
-<?php		}	?>
-		<td rowspan="2"><?=$tr["comment"]?></td>
-<?php		if ($tr["realbal"][$tr["src_id"]] < 0.0) {		?>
-		<td class="sum_cell bad_val"><?=$tr["realbal"][$tr["src_id"]]?></td>
-<?php		} else {	?>
-		<td class="sum_cell"><?=$tr["realbal"][$tr["src_id"]]?></td>
-<?php		}	?>
-<?php		if (!$tr["correctdate"]) {		?>
-		<td rowspan="2" class="bad_val"><?=$tr["datefmt"]?></td>
-<?php		} else {	?>
-		<td rowspan="2"><?=$tr["datefmt"]?></td>
-<?php		}		?>
-		<td rowspan="2" id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
-	</tr>
-<?php		if ($tr["realbal"][$tr["dest_id"]] < 0.0) {		?>
-	<tr><td class="sum_cell bad_val"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
-<?php		} else {		?>
-	<tr><td class="sum_cell"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($tr["type"] == DEBT) {		?>
-<?php	$rowspan = ($tr["src_id"] && $tr["dest_id"]) ? " rowspan=\"2\"" : "";		?>
-		<td<?=$rowspan?>>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
+		<td>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td<?=$rowspan?> class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {		?>
-		<td<?=$rowspan?> class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
-<?php		}	?>
-		<td<?=$rowspan?>><?=$tr["comment"]?></td>
-<?php	$resBal = $tr["realbal"][$tr[($tr["src_id"] != 0) ? "src_id" : "dest_id"]];	?>
-<?php		if ($tr["src_id"] && $tr["dest_id"]) {		?>
-<?php			if ($resBal < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$resBal?></td>
-<?php			} else {		?>
-		<td class="sum_cell"><?=$resBal?></td>
-<?php			}	?>
-<?php		} else {		?>
-<?php			if ($resBal < 0.0) {	?>
-		<td<?=$rowspan?> class="sum_cell bad_val"><?=$resBal?></td>
-<?php			} else {		?>
-		<td<?=$rowspan?> class="sum_cell"><?=$resBal?></td>
-<?php			}	?>
-<?php		}	?>
-<?php		if (!$tr["correctdate"]) {		?>
-		<td<?=$rowspan?> class="bad_val"><?=$tr["datefmt"]?></td>
-<?php		} else {	?>
-		<td<?=$rowspan?>><?=$tr["datefmt"]?></td>
-<?php		}		?>
-		<td id="tr_<?=$tr_id?>"<?=$rowspan?>><input type="button" value="<?=$tr["pos"]?>"></td>
-	</tr>
-<?php		if ($tr["src_id"] && $tr["dest_id"]) {		?>
-<?php			if ($tr["realbal"][$tr["dest_id"]] < 0.0) {		?>
-	<tr><td class="sum_cell bad_val"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
-<?php			} else {		?>
-	<tr><td class="sum_cell"><?=$tr["realbal"][$tr["dest_id"]]?></td></tr>
-<?php			}	?>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	}	?>
-
-<?php	if ($checkAccount_id != 0 && $tr["type"] != DEBT) {		?>
 		<td><?=$tr["comment"]?></td>
-<?php		if ($tr["realbal"][$checkAccount_id] < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$tr["realbal"][$checkAccount_id]?></td>
+<?php	$cspan = ($tr["src_id"] && $tr["dest_id"]) ? "" : " colspan=\"2\"";
+		if ($tr["src_id"]) {
+			if ($tr["realbal"][ $tr["src_id"] ] < 0.0) {	?>
+		<td class="sum_cell bad_val"<?=$cspan?>><?=$tr["realbal"][ $tr["src_id"] ]?></td>
 <?php		} else {		?>
-		<td class="sum_cell"><?=$tr["realbal"][$checkAccount_id]?></td>
-<?php		}	?>
-<?php		if (!$tr["correctdate"]) {		?>
-		<td class="bad_val"><?=$tr["datefmt"]?></td>
-<?php		} else {	?>
-		<td><?=$tr["datefmt"]?></td>
-<?php		}		?>
-
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
-	</tr>
-<?php	} else if ($tr["type"] != TRANSFER && $tr["type"] != DEBT) {	?>
-		<td><?=$tr["comment"]?></td>
-<?php	$resBal = $tr["realbal"][$tr[($tr["type"] == EXPENSE) ? "src_id" : "dest_id"]];	?>
-
-<?php		if ($resBal < 0.0) {	?>
-		<td class="sum_cell bad_val"><?=$resBal?></td>
-<?php		} else {		?>
-		<td class="sum_cell"><?=$resBal?></td>
-<?php		}	?>
-<?php		if (!$tr["correctdate"]) {		?>
-		<td class="bad_val"><?=$tr["datefmt"]?></td>
-<?php		} else {	?>
-		<td><?=$tr["datefmt"]?></td>
-<?php		}		?>
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
-	</tr>
-<?php
+		<td class="sum_cell"<?=$cspan?>><?=$tr["realbal"][ $tr["src_id"] ]?></td>
+<?php		}
 		}
-	}
-?>
+
+		if ($tr["dest_id"]) {
+			if ($tr["realbal"][ $tr["dest_id"] ] < 0.0) {	?>
+		<td class="sum_cell bad_val"<?=$cspan?>><?=$tr["realbal"][ $tr["dest_id"] ]?></td>
+<?php		} else {		?>
+		<td class="sum_cell"<?=$cspan?>><?=$tr["realbal"][ $tr["dest_id"] ]?></td>
+<?php		}
+		}
+
+		if (!$tr["correctdate"]) {		?>
+		<td class="bad_val"><?=$tr["datefmt"]?></td>
+<?php	} else {	?>
+		<td><?=$tr["datefmt"]?></td>
+<?php	}		?>
+		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
+	</tr>
+<?php	}		?>
 	<tr>
-		<td colspan="8">
+		<td colspan="9">
 			<table>
 				<tr><td>ID</td><td>Account</td><td>realBalance</td><td>diference</td></tr>
 <?php	foreach($balanceDiff as $acc_id => $bdiff) {	?>
