@@ -11,8 +11,9 @@ class CheckBalanceController extends Controller
 
 	public function index()
 	{
-		global $user_id;
+		global $user_id, $user_name, $uMod;
 
+ini_set('max_execution_time', '0');
 
 		$db = mysqlDB::getInstance();
 
@@ -52,6 +53,7 @@ class CheckBalanceController extends Controller
 		}
 
 
+		$trMod = new TransactionModel($user_id);
 		$accMod = new AccountModel($user_id, TRUE);
 
 		$condArr = ["user_id=".$user_id];
@@ -109,34 +111,41 @@ class CheckBalanceController extends Controller
 			if ($tr["type"] == EXPENSE)
 			{
 				if (!isset($realBalance[$tr["src_id"]]))
-					$realBalance[$tr["src_id"]] = 0;
+					$realBalance[$tr["src_id"]] = $trMod->getSrcResult($tr_id);
 
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
-				$tr["realbal"] = [$tr["src_id"] => $realBalance[$tr["src_id"]]];
+				$tr["realbal"] = [ $tr["src_id"] => $realBalance[$tr["src_id"]] ];
 			}
 			else if ($tr["type"] == INCOME)
 			{
-				if (!isset($realBalance[$tr["dest_id"]]))
-					$realBalance[$tr["dest_id"]] = 0;
+				if (!isset($realBalance[ $tr["dest_id"] ]))
+					$realBalance[ $tr["dest_id"] ] = $trMod->getDestResult($tr_id);
 
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
-				$tr["realbal"] = [$tr["dest_id"] => $realBalance[$tr["dest_id"]]];
+				$tr["realbal"] = [ $tr["dest_id"] => $realBalance[$tr["dest_id"]] ];
 			}
 			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
 			{
+				$realBalance[ $tr["src_id"] ] = $trMod->getSrcResult($tr_id);
+
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["dest_amount"], 2);
-				$tr["realbal"] = [$checkAccount_id => $realBalance[$checkAccount_id]];
+				$tr["realbal"] = [ $checkAccount_id => $realBalance[$checkAccount_id],
+									$tr["src_id"] => $realBalance[ $tr["src_id"] ] ];
 			}
 			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["src_id"] == $checkAccount_id)		/* transfer from */
 			{
+				$realBalance[ $tr["dest_id"] ] = $trMod->getDestResult($tr_id);
+
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["src_amount"], 2);
-				$tr["realbal"] = [$checkAccount_id => $realBalance[$checkAccount_id]];
+				$tr["realbal"] = [ $checkAccount_id => $realBalance[$checkAccount_id],
+									$tr["dest_id"] => $realBalance[ $tr["dest_id"] ] ];
 			}
 			else if ($checkAccount_id == 0 && $tr["type"] == TRANSFER)		/* Transfer between two accounts */
 			{
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
-				$tr["realbal"] = [$tr["src_id"] => $realBalance[$tr["src_id"]], $tr["dest_id"] => $realBalance[$tr["dest_id"]]];
+				$tr["realbal"] = [ $tr["src_id"] => $realBalance[$tr["src_id"]],
+									$tr["dest_id"] => $realBalance[$tr["dest_id"]] ];
 			}
 			else if ($tr["type"] == DEBT)
 			{
@@ -144,18 +153,28 @@ class CheckBalanceController extends Controller
 
 				if ($tr["src_id"] != 0)
 				{
-					if (!isset($realBalance[$tr["src_id"]]))
-						$realBalance[$tr["src_id"]] = 0;
+					if ($tr["src_id"] == $checkAccount_id || $checkAccount_id == 0)
+					{
+						$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+					}
+					else
+					{
+						$realBalance[$tr["src_id"]] = $trMod->getSrcResult($tr_id);
+					}
 
-					$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
 					$tr["realbal"][$tr["src_id"]] = $realBalance[$tr["src_id"]];
 				}
 				if ($tr["dest_id"] != 0)
 				{
-					if (!isset($realBalance[$tr["dest_id"]]))
-						$realBalance[$tr["dest_id"]] = 0;
+					if ($tr["dest_id"] == $checkAccount_id || $checkAccount_id == 0)
+					{
+						$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
+					}
+					else
+					{
+						$realBalance[$tr["dest_id"]] = $trMod->getDestResult($tr_id);
+					}
 
-					$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 					$tr["realbal"][$tr["dest_id"]] = $realBalance[$tr["dest_id"]];
 				}
 			}
@@ -181,8 +200,16 @@ class CheckBalanceController extends Controller
 
 		$titleString = "Jezve Money | Check balance";
 
+		array_push($this->css->libs, "charts.css");
 		$this->buildCSS();
+		array_push($this->jsArr, "lib/raphael.min.js", "charts.js");
 
-		include("./view/templates/checkbalance.tpl");
+		if (isset($_GET["tr"]))
+		{
+			echo("var transactions = ".f_json_encode($transArr).";");
+			exit;
+		}
+		else
+			include("./view/templates/checkbalance.tpl");
 	}
 }

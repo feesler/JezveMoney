@@ -44,6 +44,8 @@ class TransactionModel extends CachedTable
 						"`pos` INT(11) NOT NULL, ".
 						"`createdate` DATETIME NOT NULL, ".
 						"`updatedate` DATETIME NOT NULL, ".
+						"`src_result` DECIMAL(15,2) NOT NULL, ".
+						"`dest_result` DECIMAL(15,2) NOT NULL, ".
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARACTER SET = utf8 COLLATE utf8_general_ci");
 
@@ -92,6 +94,8 @@ class TransactionModel extends CachedTable
 				self::$dcache[$trans_id]["pos"] = intval($row["pos"]);
 				self::$dcache[$trans_id]["createdate"] = strtotime($row["createdate"]);
 				self::$dcache[$trans_id]["updatedate"] = strtotime($row["updatedate"]);
+				self::$dcache[$trans_id]["src_result"] = floatval($row["src_result"]);
+				self::$dcache[$trans_id]["dest_result"] = floatval($row["dest_result"]);
 			}
 		}
 	}
@@ -112,6 +116,7 @@ class TransactionModel extends CachedTable
 		$accMod = new AccountModel(self::$user_id, TRUE);
 		$uMod = new UserModel();
 
+		$srcBalance = 0;
 		if ($src_id != 0)
 		{
 			if (!$accMod->is_exist($src_id))
@@ -119,6 +124,15 @@ class TransactionModel extends CachedTable
 			$srcBalance = $accMod->getBalance($src_id);
 		}
 
+		// update balance of source account
+		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
+		{
+			$srcBalance -= $src_amount;
+			if (!$accMod->setBalance($src_id, $srcBalance))
+				return 0;
+		}
+
+		$destBalance = 0;
 		if ($dest_id != 0)
 		{
 			if (!$accMod->is_exist($dest_id))
@@ -126,6 +140,13 @@ class TransactionModel extends CachedTable
 			$destBalance = $accMod->getBalance($dest_id);
 		}
 
+		// update balance of destination account
+		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
+		{
+			$destBalance += $dest_amount;
+			if (!$accMod->setBalance($dest_id, $destBalance))
+				return 0;
+		}
 
 		// check target date is today
 		$today_date = getdate();
@@ -156,33 +177,20 @@ class TransactionModel extends CachedTable
 														"comment" => $e_comm,
 														"pos" => $tr_pos,
 														"createdate" => $curDate,
-														"updatedate" => $curDate ]))
+														"updatedate" => $curDate,
+													 	"src_result" => $srcBalance,
+														"dest_result" => $destBalance ]))
 			return 0;
 
 		$trans_id = $this->dbObj->insertId();
-
-		// update balance of source account
-		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
-		{
-			$srcBalance -= $src_amount;
-			if (!$accMod->setBalance($src_id, $srcBalance))
-				return 0;
-		}
-
-		// update balance of destination account
-		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
-		{
-			$destBalance += $dest_amount;
-			if (!$accMod->setBalance($dest_id, $destBalance))
-				return 0;
-		}
 
 		// update position of transaction if target date is not today
 		if ($tr_pos == 0)
 		{
 			$latest_pos = $this->getLatestPos($trans_date);
 
-			$this->updatePos($trans_id, $latest_pos + 1);
+			$tr_pos = $latest_pos + 1;
+			$this->updatePos($trans_id, $tr_pos);
 		}
 
 		$this->cleanCache();
@@ -206,6 +214,7 @@ class TransactionModel extends CachedTable
 		$transDestAmount = $this->getDestAmount($trans_id);
 		$srcCurr = $this->getSrcCurrency($trans_id);
 		$destCurr = $this->getDestCurrency($trans_id);
+		$trPos = $this->getPos($trans_id);
 
 		// check type of transaction
 		if ($transType != EXPENSE && $transType != INCOME && $transType != TRANSFER && $transType != DEBT)
@@ -254,6 +263,8 @@ class TransactionModel extends CachedTable
 				return FALSE;
 		}
 
+		$this->updateResults($src_id, $dest_id, $trans_id, $trPos + 1);
+
 		$this->cleanCache();
 
 		return TRUE;
@@ -285,6 +296,15 @@ class TransactionModel extends CachedTable
 			$srcBalance = $accMod->getBalance($src_id);
 		}
 
+		// update balance of source account
+		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
+		{
+			$srcBalance -= $src_amount;
+
+			if (!$accMod->setBalance($src_id, $srcBalance))
+				return FALSE;
+		}
+
 		// check destination account is exist
 		$destBalance = 0;
 		if ($dest_id != 0)
@@ -293,6 +313,15 @@ class TransactionModel extends CachedTable
 				return FALSE;
 
 			$destBalance = $accMod->getBalance($dest_id);
+		}
+
+		// update balance of destination account
+		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
+		{
+			$destBalance += $dest_amount;
+
+			if (!$accMod->setBalance($dest_id, $destBalance))
+				return FALSE;
 		}
 
 		// check date is changed
@@ -316,37 +345,25 @@ class TransactionModel extends CachedTable
 		$assingArr = [ "src_id" => $src_id, "dest_id" => $dest_id, "type" => $trans_type,
 						"src_amount" => $src_amount, "dest_amount" => $dest_amount,
 						"src_curr" => $src_curr, "dest_curr" => $dest_curr,
-						"date" => $trans_date, "comment" => $e_comm, "pos" => $tr_pos, "updatedate" => $curDate ];
+						"date" => $trans_date, "comment" => $e_comm, "pos" => $tr_pos, "updatedate" => $curDate,
+					 	"src_result" => $srcBalance, "dest_result" => $destBalance];
 
 		if (!$this->dbObj->updateQ($this->tbl_name, $assingArr, "id=".$trans_id))
 			return FALSE;
 
 		$this->cleanCache();
 
-		// update balance of source account
-		if ($src_id != 0 && ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT))
-		{
-			$srcBalance -= $src_amount;
-
-			if (!$accMod->setBalance($src_id, $srcBalance))
-				return FALSE;
-		}
-
-		// update balance of destination account
-		if ($dest_id != 0 && ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT))
-		{
-			$destBalance += $dest_amount;
-
-			if (!$accMod->setBalance($dest_id, $destBalance))
-				return FALSE;
-		}
-
 		// update position of transaction if target date is not today
 		if ($tr_pos == 0)
 		{
 			$latest_pos = $this->getLatestPos($trans_date);
 
-			$this->updatePos($trans_id, $latest_pos + 1);
+			$tr_pos = $latest_pos + 1;
+			$this->updatePos($trans_id, $tr_pos);
+		}
+		else
+		{
+			$this->updateResults($src_id, $dest_id, 0, $tr_pos);
 		}
 
 		$this->cleanCache();
@@ -381,6 +398,8 @@ class TransactionModel extends CachedTable
 		if (!$trans_id || !$new_pos)
 			return FALSE;
 
+		$src_id = $this->getSource($trans_id);
+		$dest_id = $this->getDest($trans_id);
 		$old_pos = $this->getPos($trans_id);
 		$user_id = $this->getUser($trans_id);
 
@@ -424,6 +443,103 @@ class TransactionModel extends CachedTable
 
 		if (!$this->dbObj->updateQ($this->tbl_name, [ "pos" => $new_pos, "updatedate" => $curDate ], "id=".$trans_id))
 			return FALSE;
+
+		$this->updateResults($src_id, $dest_id, 0, min($old_pos, $new_pos));
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	// Return result balance of account before transaction with specifiec position
+	public function getLatestResult($acc_id, $ignore_trans_id, $pos = -1)
+	{
+		$acc_id = intval($acc_id);
+		if (!$acc_id)
+			return NULL;
+
+		$accCond = $this->getAccCondition($acc_id);
+		if ($pos === -1)
+			$pos = $this->getLatestPos() + 1;
+
+		$condArr = [ "user_id=".self::$user_id, "pos < ".$pos, "(".$accCond.")" ];
+		$ignore_trans_id = intval($ignore_trans_id);
+		if ($ignore_trans_id)
+			$condArr[] = "id<>".$ignore_trans_id;
+
+		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
+		if (count($resArr) == 1)
+		{
+			$row = $resArr[0];
+			if ($acc_id == intval($row["src_id"]))
+				$res = floatval($row["src_result"]);
+			else
+				$res = floatval($row["dest_result"]);
+		}
+		else
+		{
+			$accMod = new AccountModel(self::$user_id, TRUE);
+
+			$res = $accMod->getInitBalance($acc_id);
+		}
+
+		return $res;
+	}
+
+
+	//
+	protected function updateResults($src_id, $dest_id, $ignore_trans_id, $pos)
+	{
+		if (!$src_id && !$dest_id)
+			return FALSE;
+
+		// Get previous results
+		$results = [];
+		if ($src_id != 0)
+			$results[$src_id] = $this->getLatestResult($src_id, $ignore_trans_id, $pos);
+		if ($dest_id != 0)
+			$results[$dest_id] = $this->getLatestResult($dest_id, $ignore_trans_id, $pos);
+
+		// Request affected transactions
+		$condArr = [ "user_id=".self::$user_id, "pos>=".$pos ];
+		$accCond = $this->getAccCondition([ $src_id, $dest_id ]);
+		if (!is_empty($accCond))
+			$condArr[] = "(".$accCond.")";
+
+		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
+		foreach($resArr as $row)
+		{
+			$tr = new stdClass;
+			$tr->id = intval($row["id"]);
+			$tr->type = intval($row["type"]);
+			$tr->src_id = intval($row["src_id"]);
+			$tr->dest_id = intval($row["dest_id"]);
+			$tr->srcAmount = floatval($row["src_amount"]);
+			$tr->destAmount = floatval($row["dest_amount"]);
+
+			$assingments = [];
+			if ($tr->type == EXPENSE || $tr->type == TRANSFER || $tr->type == DEBT)
+			{
+				if (isset($results[$tr->src_id]))
+				{
+					$results[$tr->src_id] = round($results[$tr->src_id] - $tr->srcAmount, 2);
+					$assingments["src_result"] = $results[$tr->src_id];
+				}
+			}
+
+			if ($tr->type == INCOME || $tr->type == TRANSFER || $tr->type == DEBT)
+			{
+				if (isset($results[$tr->dest_id]))
+				{
+					$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->destAmount, 2);
+					$assingments["dest_result"] = $results[$tr->dest_id];
+				}
+			}
+
+			if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id=".$tr->id))
+				return FALSE;
+		}
 
 		$this->cleanCache();
 
@@ -835,64 +951,8 @@ class TransactionModel extends CachedTable
 		if (!$src_id && !$dest_id)
 			return NULL;
 
-		$accMod = new AccountModel(self::$user_id, TRUE);
-		$uMod = new UserModel();
-
-		$balArr = [$src_id => 0, $dest_id => 0];
-		$balArr[$src_id] = ($src_id != 0) ? $accMod->getInitBalance($src_id) : 0;
-		$balArr[$dest_id] = ($dest_id != 0) ? $accMod->getInitBalance($dest_id) : 0;
-
-		$condArr = ["user_id=".self::$user_id];
-		$orCond = [];
-		if ($src_id != 0)
-		{
-			$orCond[] = "src_id=".$src_id;
-			$orCond[] = "dest_id=".$src_id;
-		}
-		if ($dest_id != 0)
-		{
-			$orCond[] = "src_id=".$dest_id;
-			$orCond[] = "dest_id=".$dest_id;
-		}
-		if (count($orCond) > 0)
-			$condArr[] = "(".orJoin($orCond).")";
-
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
-		foreach($resArr as $row)
-		{
-			$tr_id = intval($row["id"]);
-			$tr_src_id = intval($row["src_id"]);
-			$tr_dest_id = intval($row["dest_id"]);
-			$tr_src_amount = floatval($row["src_amount"]);
-			$tr_dest_amount = floatval($row["dest_amount"]);
-			$tr_type = intval($row["type"]);
-
-
-			// Check source account of current transaction
-			if (($src_id != 0 && $tr_src_id == $src_id) || ($dest_id != 0 && $tr_src_id == $dest_id))
-			{
-				$acc_id = ($tr_src_id == $src_id) ? $src_id : $dest_id;
-
-				if ($tr_type == EXPENSE || $tr_type == TRANSFER || $tr_type == DEBT)
-				{
-					$balArr[$acc_id] = round($balArr[$acc_id] - $tr_src_amount, 2);
-				}
-			}
-
-			// Check destination account of current transaction
-			if (($src_id != 0 && $tr_dest_id == $src_id) || ($dest_id != 0 && $tr_dest_id == $dest_id))
-			{
-				$acc_id = ($tr_dest_id == $src_id) ? $src_id : $dest_id;
-
-				if ($tr_type == INCOME || $tr_type == TRANSFER || $tr_type == DEBT)
-				{
-					$balArr[$acc_id] = round($balArr[$acc_id] + $tr_dest_amount, 2);
-				}
-			}
-
-			if ($trans_id == $tr_id)
-				break;
-		}
+		$balArr = [ $src_id => $this->getSrcResult($trans_id),
+					$dest_id => $this->getDestResult($trans_id) ];
 
 		return $balArr;
 	}
@@ -993,6 +1053,20 @@ class TransactionModel extends CachedTable
 	public function getPos($trans_id)
 	{
 		return $this->getCache($trans_id, "pos");
+	}
+
+
+	// Return result balance of source account after transaction
+	public function getSrcResult($trans_id)
+	{
+		return $this->getCache($trans_id, "src_result");
+	}
+
+
+	// Return result balance of destination account after transaction
+	public function getDestResult($trans_id)
+	{
+		return $this->getCache($trans_id, "dest_result");
 	}
 
 
