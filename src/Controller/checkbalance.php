@@ -202,7 +202,7 @@ ini_set('max_execution_time', '0');
 
 		array_push($this->css->libs, "charts.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "lib/raphael.min.js", "charts.js");
+		array_push($this->jsArr, "lib/raphael.min.js", "charts.js", "checkbalance.js");
 
 		if (isset($_GET["tr"]))
 		{
