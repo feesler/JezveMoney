@@ -650,12 +650,18 @@ async function reloginAsTester(view)
 }
 
 
+var config = {
+/*	url : 'https://jezve.net/money/'	*/
+	url : 'http://jezvemoney/'
+};
+
+
 if (typeof module !== 'undefined' && module.exports)
 {
-	module.exports = { testURL : 'https://jezve.net/money/',
+	module.exports = { testURL : config.url,
 						startTests : startTests };
 }
 else
 {
-	var testURL = 'https://jezve.net/money/';
+	var testURL = config.url;
 }

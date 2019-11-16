@@ -4,6 +4,13 @@ var Environment = (function()
 	var viewframe = null;
 	var restbl = null;
 	var totalRes = null, okRes = null, failRes = null;
+	var baseURL = null;
+
+
+	function getBaseUrl()
+	{
+		return baseURL;
+	}
 
 
 	async function getUrl()
@@ -225,6 +232,8 @@ var Environment = (function()
 		if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
 			throw new Error('Fail to init tests');
 
+		baseURL = url;
+
 		startbtn.onclick = async function()
 		{
 			results = { total : 0, ok : 0, fail : 0 };
@@ -238,6 +247,7 @@ var Environment = (function()
 
 	return {
 		init : initTests,
+		baseUrl : getBaseUrl,
 		url : getUrl,
 		navigation : navigation,
 		parent : vparent,

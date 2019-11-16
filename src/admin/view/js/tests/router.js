@@ -18,27 +18,29 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-const testHost = 'jezve.net';
-
-
 // Process request url and return view class if match
 async function route(env, url)
 {
 	if (typeof url !== 'string')
 		throw new Error('URL not specified');
 
+	let testUrl = new URL(env.baseUrl());
+
 	let reqUrl = new URL(url);
-	if (reqUrl.host !== testHost)
+	if (reqUrl.host !== testUrl.host)
 		throw new Error('Wrong URL specified: ' + url);
 
-	let path =  reqUrl.pathname.replace(/^\/+|\/+$/g, '');		// cut leading and trailing slashes
+	// Remove leading directory if needed
+	let reqPath = reqUrl.pathname;
+	if (reqPath.indexOf(testUrl.pathname) === 0)
+	{
+		reqPath = reqPath.substr(testUrl.pathname.length);
+	}
+
+	let path = reqPath.replace(/^\/+|\/+$/g, '');		// cut leading and trailing slashes
 	let parts = path.split('/');
 
 	let part, actPart;
-
-	part = parts.shift();
-	if (part !== 'money')
-		throw new Error('Wrong request path: ' + reqUrl.pathname);
 
 	part = parts.shift();
 

@@ -9,6 +9,13 @@ const main = require('./main.js');
 var Environment = (function()
 {
 	var browserPage = null;
+	var baseURL = null;
+
+
+	function getBaseUrl()
+	{
+		return baseURL;
+	}
 
 
 	async function getUrl()
@@ -231,6 +238,8 @@ var Environment = (function()
 		let view;
 		let browser;
 
+		baseURL = url;
+
 		try
 		{
 			browser = await puppeteer.launch({ headless : true,
@@ -257,6 +266,7 @@ var Environment = (function()
 
 
 	return { init : initTests,
+				baseUrl : getBaseUrl,
 				url : getUrl,
 				navigation : navigation,
 				parent : vparent,
