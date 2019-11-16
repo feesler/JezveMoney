@@ -47,8 +47,8 @@ class UserModel extends CachedTable
 	{
 		self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name);
-		foreach($resArr as $row)
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name);
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$user_id = $row["id"];
 
@@ -230,8 +230,8 @@ class UserModel extends CachedTable
 			return TRUE;
 
 		// check specified person not own another user
-		$resArr = $this->dbObj->selectQ("id", $this->tbl_name, "owner_id=".$o_id);
-		if (count($resArr) > 0)
+		$qResult = $this->dbObj->selectQ("id", $this->tbl_name, "owner_id=".$o_id);
+		if ($this->dbObj->rowsCount($qResult) > 0)
 			return FALSE;
 
 		$curDate = date("Y-m-d H:i:s");
@@ -452,8 +452,8 @@ class UserModel extends CachedTable
 			return $res;
 
 		$trCountArr = [];
-		$resArr = $this->dbObj->selectQ("user_id, COUNT(*)", "transactions", NULL, "user_id");
-		foreach ($resArr as $row)
+		$qResult = $this->dbObj->selectQ("user_id, COUNT(*)", "transactions", NULL, "user_id");
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$u_id = intval($row["user_id"]);
 			$tr_cnt = intval($row["COUNT(*)"]);
@@ -462,8 +462,8 @@ class UserModel extends CachedTable
 		}
 
 		$accCountArr = [];
-		$resArr = $this->dbObj->selectQ("user_id, owner_id, COUNT(*)", "accounts", NULL, "owner_id");
-		foreach ($resArr as $row)
+		$qResult = $this->dbObj->selectQ("user_id, owner_id, COUNT(*)", "accounts", NULL, "owner_id");
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$u_id = intval($row["user_id"]);
 			$o_id = intval($row["owner_id"]);

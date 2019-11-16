@@ -70,14 +70,14 @@ class TransactionModel extends CachedTable
 		if ($trans_id == 0 || is_null(self::$dcache))
 			self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr);
-		if (!count($resArr))		// delete transaction from cache if can't find it
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr);
+		if (!$this->dbObj->rowsCount($qResult))		// delete transaction from cache if can't find it
 		{
 			unset(self::$dcache[$trans_id]);
 		}
 		else
 		{
-			foreach($resArr as $row)
+			while($row = $this->dbObj->fetchRow($qResult))
 			{
 				$trans_id = intval($row["id"]);
 
@@ -468,10 +468,10 @@ class TransactionModel extends CachedTable
 		if ($ignore_trans_id)
 			$condArr[] = "id<>".$ignore_trans_id;
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
-		if (count($resArr) == 1)
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
+		if ($this->dbObj->rowsCount($qResult) == 1)
 		{
-			$row = $resArr[0];
+			$row = $this->dbObj->fetchRow($qResult);
 			if ($acc_id == intval($row["src_id"]))
 				$res = floatval($row["src_result"]);
 			else
@@ -507,8 +507,8 @@ class TransactionModel extends CachedTable
 		if (!is_empty($accCond))
 			$condArr[] = "(".$accCond.")";
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
-		foreach($resArr as $row)
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$tr = new stdClass;
 			$tr->id = intval($row["id"]);
@@ -578,11 +578,13 @@ class TransactionModel extends CachedTable
 		if ($trans_date != -1)
 			$condArr[] = "date <= ".qnull($trans_date);
 
-		$resArr = $this->dbObj->selectQ("pos", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
-		if (count($resArr) != 1)
+		$qResult = $this->dbObj->selectQ("pos", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
+		if ($this->dbObj->rowsCount($qResult) != 1)
 			return 0;
 
-		return intval($resArr[0]["pos"]);
+		$row = $this->dbObj->fetchRow($qResult);
+
+		return intval($row["pos"]);
 	}
 
 
@@ -758,12 +760,12 @@ class TransactionModel extends CachedTable
 			$orderAndLimit .= " LIMIT ".$limitOffset.", ".$limitRows;
 		}
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, $orderAndLimit);
-		$rowCount = count($resArr);
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, $orderAndLimit);
+		$rowCount = $this->dbObj->rowsCount($qResult);
 		if (!$rowCount)
 			return $res;
 
-		foreach($resArr as $row)
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$trans = new stdClass;
 

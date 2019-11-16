@@ -151,8 +151,8 @@
 				$condArr[] = "tr.dest_id=".$curr_acc_id;
 		}
 
-		$resArr = $db->selectQ($fields, $tables, $condArr, NULL, "pos ASC");
-		foreach($resArr as $row)
+		$qResult = $db->selectQ($fields, $tables, $condArr, NULL, "pos ASC");
+		while($row = $db->fetchRow($qResult))
 		{
 			$trans_time = strtotime($row["date"]);
 			$dateInfo = getdate($trans_time);

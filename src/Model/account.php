@@ -73,8 +73,8 @@ class AccountModel extends CachedTable
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, "id");
-		foreach($resArr as $row)
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "id");
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$acc_id = $row["id"];
 

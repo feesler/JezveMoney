@@ -59,15 +59,15 @@ ini_set('max_execution_time', '0');
 		$condArr = ["user_id=".$user_id];
 		if ($checkAccount_id != 0)
 			$condArr[] = "id=".$checkAccount_id;
-		$resArr = $db->selectQ("*", "accounts", $condArr);
-		if (count($resArr) == 0)
+		$qResult = $db->selectQ("*", "accounts", $condArr);
+		if ($db->rowsCount($qResult) == 0)
 			fail();
 
 		$initBalance = [];
 		$curBalance = [];
 		$realBalance = [];
 		$accName = [];
-		foreach($resArr as $row)
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$acc_id = intval($row["id"]);
 			$initBalance[$acc_id] = floatval($row["initbalance"]);
@@ -91,9 +91,9 @@ ini_set('max_execution_time', '0');
 			$condArr[] = "(".orJoin($accCond).")";
 		}
 
-		$resArr = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
+		$qResult = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
 		$transArr = [];
-		foreach($resArr as $row)
+		while($row = $db->fetchRow($qResult))
 		{
 			$tr_id = intval($row["id"]);
 			$tr = ["type"=> intval($row["type"]),

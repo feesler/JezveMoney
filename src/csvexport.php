@@ -60,8 +60,8 @@
 	$accName = [];
 
 	$condArr = ["user_id=".$user_id, "id=".$checkAccount_id];
-	$resArr = $db->selectQ("*", "accounts", $condArr);
-	foreach($resArr as $row)
+	$qResult = $db->selectQ("*", "accounts", $condArr);
+	while($row = $this->dbObj->fetchRow($qResult))
 	{
 		$realBalance[$checkAccount_id] = floatval($row["initbalance"]);
 	}
@@ -80,8 +80,8 @@
 		$condArr[] = "(".orJoin($accCond).")";
 	}
 
-	$resArr = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
-	foreach($resArr as $row)
+	$qResult = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
+	while($row = $this->dbObj->fetchRow($qResult))
 	{
 		$tr_id = intval($row["id"]);
 		$tr_type = intval($row["type"]);

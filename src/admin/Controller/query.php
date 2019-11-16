@@ -21,7 +21,7 @@ class QueryAdminController extends Controller
 				$qerror = mysqli_error($db->getConnection());
 				if ($result && !$qerr_num && mysqli_num_rows($result) > 0)
 				{
-					while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
+					while($row = $db->fetchRow($result))
 						$resArr[] = $row;
 
 					$rows = count($resArr);

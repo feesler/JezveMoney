@@ -209,15 +209,13 @@ class mysqlDB
 		$errno = mysqli_errno(self::$conn);
 		wlog("Result: ".($errno ? ($errno." - ".mysqli_error(self::$conn)) : "ok"));
 
-		return ($res != FALSE) ? $res : NULL;
+		return ($res !== FALSE) ? $res : NULL;
 	}
 
 
 	// Select query
 	public function selectQ($fields, $tables, $condition = NULL, $group = NULL, $order = NULL)
 	{
-		$resArr = array();
-
 		$fstr = asJoin($fields);
 		$tstr = asJoin($tables);
 		if (!$fstr || !$tstr)
@@ -233,15 +231,28 @@ class mysqlDB
 		$query .= ";";
 
 		$result = $this->rawQ($query);
-		if ($result && !mysqli_errno(self::$conn) && mysqli_num_rows($result) > 0)
-		{
-			while($row = mysqli_fetch_array($result))
-			{
-				$resArr[] = $row;
-			}
-		}
+		if ($result === FALSE || mysqli_errno(self::$conn) != 0)
+			return NULL;
 
-		return $resArr;
+		return $result;
+	}
+
+
+	public function rowsCount($result)
+	{
+		if (is_null($result))
+			return 0;
+
+		return mysqli_num_rows($result);
+	}
+
+
+	public function fetchRow($result)
+	{
+		if (is_null($result))
+			return NULL;
+
+		return mysqli_fetch_array($result);
 	}
 
 

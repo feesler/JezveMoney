@@ -55,8 +55,8 @@ class PersonModel extends CachedTable
 	{
 		self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id);
-		foreach($resArr as $row)
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id);
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$person_id = $row["id"];
 
@@ -196,11 +196,13 @@ class PersonModel extends CachedTable
 						"owner_id=".$p_id,
 						"curr_id=".$c_id];
 
-		$resArr = $this->dbObj->selectQ("id", "accounts", $condArr);
-		if (count($resArr) != 1)
+		$qResult = $this->dbObj->selectQ("id", "accounts", $condArr);
+		if ($this->dbObj->rowsCount($qResult) != 1)
 			return 0;
 
-		return intval($resArr[0]["id"]);
+		$row = $this->dbObj->fetchRow($qResult);
+
+		return intval($row["id"]);
 	}
 
 
@@ -261,7 +263,7 @@ class PersonModel extends CachedTable
 	public function getArray()
 	{
 		$condArr = ["p.user_id=".self::$user_id, "p.id<>".self::$owner_id];
-		$resArr = $this->dbObj->selectQ(["p.name" => "name",
+		$qResult = $this->dbObj->selectQ(["p.name" => "name",
 									"p.id" => "pid",
 									"a.id" => "aid",
 									"a.curr_id" => "curr_id",
@@ -270,7 +272,7 @@ class PersonModel extends CachedTable
 							$condArr);
 
 		$pArr = [];
-		foreach($resArr as $row)
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$p_id = intval($row["pid"]);
 

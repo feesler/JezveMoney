@@ -46,8 +46,8 @@ class CurrencyModel extends CachedTable
 	{
 		self::$dcache = [];
 
-		$resArr = $this->dbObj->selectQ("*", $this->tbl_name);
-		foreach($resArr as $row)
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name);
+		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$curr_id = $row["id"];
 
@@ -120,12 +120,12 @@ class CurrencyModel extends CachedTable
 		if (!$curr_id)
 			return FALSE;
 
-		$resArr = $this->dbObj->selectQ("id", "account", "curr_id=".$curr_id);
-		if (count($resArr) > 0)
+		$qResult = $this->dbObj->selectQ("id", "account", "curr_id=".$curr_id);
+		if ($this->dbObj->rowsCount($qResult) > 0)
 			return TRUE;
 
-		$resArr = $this->dbObj->selectQ("id", "transactions", "curr_id=".$curr_id);
-		if (count($resArr) > 0)
+		$qResult = $this->dbObj->selectQ("id", "transactions", "curr_id=".$curr_id);
+		if ($this->dbObj->rowsCount($qResult) > 0)
 			return TRUE;
 
 		return FALSE;
