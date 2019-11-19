@@ -299,7 +299,7 @@ function onAppUpdateCommon(props)
 
 function checkPHPerrors(env, content)
 {
-	var errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>'];
+	var errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
 
 	if (!env)
 		return false;
