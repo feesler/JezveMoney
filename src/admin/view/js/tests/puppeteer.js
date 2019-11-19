@@ -265,7 +265,6 @@ var Environment = (function()
 															'--proxy-bypass-list=*' ] });
 			let allPages = await browser.pages();
 			browserPage = (allPages.length) ? allPages[0] : await browser.newPage();
-			browserPage.setDefaultNavigationTimeout(0);
 
 			await addResult('Test initialization', true);
 

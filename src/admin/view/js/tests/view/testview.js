@@ -768,9 +768,7 @@ TestView.prototype.logoutUser = async function()
 {
 	await this.click(this.header.user.menuBtn);
 
-	return this.navigation(() => {
-		setTimeout(() => this.click(this.header.user.logoutBtn), 500);
-	});
+	return this.navigation(() => this.click(this.header.user.logoutBtn));
 };
 
 
