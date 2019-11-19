@@ -16,8 +16,6 @@ class ProfileApiController extends ApiController
 
 	public function read()
 	{
-		wlog("ProfileApiController::read()");
-
 		$respObj = new apiResponse();
 
 		$pObj = $this->pMod->getItem($this->owner_id);
@@ -31,8 +29,6 @@ class ProfileApiController extends ApiController
 
 	public function changename()
 	{
-		wlog("ProfileApiController::changename()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())
@@ -60,8 +56,6 @@ class ProfileApiController extends ApiController
 
 	public function changepass()
 	{
-		wlog("ProfileApiController::changepass()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())
@@ -70,8 +64,11 @@ class ProfileApiController extends ApiController
 		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
 			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
 
-		$login = $this->uMod->getLogin($this->user_id);
-		if (!$this->uMod->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
+		$uObj = $this->uMod->getItem($this->user_id);
+		if (!$uObj)
+			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
+
+		if (!$this->uMod->changePassword($uObj->login, $_POST["oldpwd"], $_POST["newpwd"]))
 			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
 
 		$respObj->msg = getMessage(MSG_PROFILE_PASSWORD);
@@ -82,8 +79,6 @@ class ProfileApiController extends ApiController
 
 	public function reset()
 	{
-		wlog("ProfileApiController::reset()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())

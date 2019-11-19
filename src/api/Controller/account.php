@@ -12,8 +12,6 @@ class AccountApiController extends ApiController
 
 	public function index()
 	{
-		wlog("AccountApiController::index()");
-
 		$respObj = new apiResponse();
 
 		$ids = $this->getRequestedIds();
@@ -37,8 +35,6 @@ class AccountApiController extends ApiController
 
 	public function getList()
 	{
-		wlog("AccountApiController::getList()");
-
 		$respObj = new apiResponse();
 
 		$respObj->data = $this->accMod->getArray();
@@ -48,8 +44,6 @@ class AccountApiController extends ApiController
 
 	public function create()
 	{
-		wlog("AccountApiController::create()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())
@@ -80,8 +74,6 @@ class AccountApiController extends ApiController
 
 	public function update()
 	{
-		wlog("AccountApiController::update()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())

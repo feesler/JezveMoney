@@ -92,18 +92,19 @@ var account_id = <?=f_json_encode($checkAccount_id)?>;
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
 		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+ <?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	} else if ($tr["type"] == DEBT) {		?>
 		<td>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
 		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
 <?php		} else {		?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">- <?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+ <?=$tr["dest_amount"]?></td>
 <?php		}	?>
 <?php	}	?>
 		<td><?=$tr["comment"]?></td>
 <?php	$cspan = ($tr["src_id"] && $tr["dest_id"]) ? "" : " colspan=\"2\"";
+
 		if ($tr["src_id"]) {
 			if ($tr["realbal"][ $tr["src_id"] ] < 0.0) {	?>
 		<td class="sum_cell bad_val"<?=$cspan?>><?=$tr["realbal"][ $tr["src_id"] ]?></td>

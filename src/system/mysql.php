@@ -31,7 +31,7 @@ function asJoin($pieces)
 
 	if (is_array($pieces))
 	{
-		$parr = array();
+		$parr = [];
 		foreach($pieces as $pkey => $pval)
 		{
 			if (is_string($pkey))
@@ -369,7 +369,7 @@ class mysqlDB
 			$errno = mysqli_errno(self::$conn);
 			$rows = mysqli_num_rows($result);
 
-			self::$tblCache = array();
+			self::$tblCache = [];
 			if ($result && !$errno && $rows > 0)
 			{
 				while($row = mysqli_fetch_array($result))

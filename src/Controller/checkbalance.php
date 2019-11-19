@@ -53,7 +53,6 @@ ini_set('max_execution_time', '0');
 		}
 
 
-		$trMod = new TransactionModel($user_id);
 		$accMod = new AccountModel($user_id);
 
 		$initBalance = [];
@@ -71,16 +70,13 @@ ini_set('max_execution_time', '0');
 			$realBalance[$item->id] = $initBalance[$item->id];
 		}
 
-
-		$accNameCache = [];
-
 		$prev_date = 0;
 
 		$condArr = ["user_id=".$user_id];
 		if ($checkAccount_id != 0)
 		{
-			$accCond = ["(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))",
-							"(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))"];
+			$accCond = ["(src_id=".$checkAccount_id." AND (type=".EXPENSE." OR type=".TRANSFER." OR type=".DEBT."))",
+							"(dest_id=".$checkAccount_id." AND (type=".INCOME." OR type=".TRANSFER." OR type=".DEBT."))"];
 
 			$condArr[] = "(".orJoin($accCond).")";
 		}
@@ -90,22 +86,26 @@ ini_set('max_execution_time', '0');
 		while($row = $db->fetchRow($qResult))
 		{
 			$tr_id = intval($row["id"]);
-			$tr = ["type"=> intval($row["type"]),
-						"src_id"=> intval($row["src_id"]),
-						"dest_id"=> intval($row["dest_id"]),
-						"src_amount"=> floatval($row["src_amount"]),
-						"dest_amount"=> floatval($row["dest_amount"]),
-						"comment"=> $row["comment"],
-						"date"=> strtotime($row["date"]),
+			$tr = ["type" => intval($row["type"]),
+						"src_id" => intval($row["src_id"]),
+						"dest_id" => intval($row["dest_id"]),
+						"src_amount" => floatval($row["src_amount"]),
+						"dest_amount" => floatval($row["dest_amount"]),
+						"src_result" => floatval($row["src_result"]),
+						"dest_result" => floatval($row["dest_result"]),
+						"comment" => $row["comment"],
+						"date" => strtotime($row["date"]),
 						"pos" => intval($row["pos"])];
 
-			$tr["src_name"] = $accMod->getNameOrPerson($tr["src_id"]);
-			$tr["dest_name"] = $accMod->getNameOrPerson($tr["dest_id"]);
+			unset($row);
+
+			$tr["src_name"] = $tr["src_id"] && isset($accName[$tr["src_id"]]) ? $accName[$tr["src_id"]] : NULL;
+			$tr["dest_name"] = $tr["dest_id"] && isset($accName[$tr["dest_id"]]) ? $accName[$tr["dest_id"]] : NULL;
 
 			if ($tr["type"] == EXPENSE)
 			{
 				if (!isset($realBalance[$tr["src_id"]]))
-					$realBalance[$tr["src_id"]] = $trMod->getSrcResult($tr_id);
+					$realBalance[$tr["src_id"]] = $tr["src_result"];
 
 				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
 				$tr["realbal"] = [ $tr["src_id"] => $realBalance[$tr["src_id"]] ];
@@ -113,14 +113,14 @@ ini_set('max_execution_time', '0');
 			else if ($tr["type"] == INCOME)
 			{
 				if (!isset($realBalance[ $tr["dest_id"] ]))
-					$realBalance[ $tr["dest_id"] ] = $trMod->getDestResult($tr_id);
+					$realBalance[ $tr["dest_id"] ] = $tr["dest_result"];
 
 				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
 				$tr["realbal"] = [ $tr["dest_id"] => $realBalance[$tr["dest_id"]] ];
 			}
 			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
 			{
-				$realBalance[ $tr["src_id"] ] = $trMod->getSrcResult($tr_id);
+				$realBalance[ $tr["src_id"] ] = $tr["src_result"];
 
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["dest_amount"], 2);
 				$tr["realbal"] = [ $checkAccount_id => $realBalance[$checkAccount_id],
@@ -128,7 +128,7 @@ ini_set('max_execution_time', '0');
 			}
 			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["src_id"] == $checkAccount_id)		/* transfer from */
 			{
-				$realBalance[ $tr["dest_id"] ] = $trMod->getDestResult($tr_id);
+				$realBalance[ $tr["dest_id"] ] = $tr["dest_result"];
 
 				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["src_amount"], 2);
 				$tr["realbal"] = [ $checkAccount_id => $realBalance[$checkAccount_id],
@@ -153,7 +153,7 @@ ini_set('max_execution_time', '0');
 					}
 					else
 					{
-						$realBalance[$tr["src_id"]] = $trMod->getSrcResult($tr_id);
+						$realBalance[$tr["src_id"]] = $tr["src_result"];
 					}
 
 					$tr["realbal"][$tr["src_id"]] = $realBalance[$tr["src_id"]];
@@ -166,7 +166,7 @@ ini_set('max_execution_time', '0');
 					}
 					else
 					{
-						$realBalance[$tr["dest_id"]] = $trMod->getDestResult($tr_id);
+						$realBalance[$tr["dest_id"]] = $tr["dest_result"];
 					}
 
 					$tr["realbal"][$tr["dest_id"]] = $realBalance[$tr["dest_id"]];

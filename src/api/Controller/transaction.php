@@ -12,8 +12,6 @@ class TransactionApiController extends ApiController
 
 	public function index()
 	{
-		wlog("TransactionApiController::index()");
-
 		$respObj = new apiResponse();
 
 		$ids = $this->getRequestedIds();
@@ -37,8 +35,6 @@ class TransactionApiController extends ApiController
 
 	public function getList()
 	{
-		wlog("TransactionApiController::getList()");
-
 		$respObj = new apiResponse();
 
 
@@ -55,7 +51,7 @@ class TransactionApiController extends ApiController
 		$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
 		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
-		if ($acc_id && !$accMod->is_exist($acc_id))
+		if (!$accMod->is_exist($acc_id))
 			$acc_id = 0;
 
 		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
@@ -64,8 +60,6 @@ class TransactionApiController extends ApiController
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
 
 		$trArr = $this->trMod->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
-
-		wlog("trArr: ".var_export($trArr, TRUE));
 
 		$respObj->data = [];
 		foreach($trArr as $trans)
@@ -92,8 +86,6 @@ class TransactionApiController extends ApiController
 	public function create()
 	{
 		global $db;
-
-		wlog("TransactionApiController::create()");
 
 		$respObj = new apiResponse();
 
@@ -163,8 +155,6 @@ class TransactionApiController extends ApiController
 	{
 		global $db;
 
-		wlog("TransactionApiController::update()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())
@@ -228,8 +218,6 @@ class TransactionApiController extends ApiController
 
 	public function del()
 	{
-		wlog("TransactionApiController::del()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())
@@ -255,8 +243,6 @@ class TransactionApiController extends ApiController
 
 	public function setPos()
 	{
-		wlog("TransactionApiController::setPos()");
-
 		$respObj = new apiResponse();
 
 		if (!$this->isPOST())

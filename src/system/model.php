@@ -14,8 +14,6 @@ abstract class Model
 	// Create new item and return id
 	public function create($params)
 	{
-		wlog("Model::create()");
-
 		if (!is_array($params))
 			return 0;
 
@@ -46,8 +44,6 @@ abstract class Model
 	// Update specified item and return boolean result
 	public function update($item_id, $params)
 	{
-		wlog("Model::update(item_id: ".$item_id.")");
-
 		$item_id = intval($item_id);
 		if (!$item_id || !is_array($params))
 			return FALSE;
@@ -78,8 +74,6 @@ abstract class Model
 	// Delete specified item
 	public function del($item_id)
 	{
-		wlog("Model::del(item_id: ".$item_id.")");
-
 		$item_id = intval($item_id);
 		if (!$item_id)
 			return FALSE;

@@ -38,8 +38,6 @@ class AccountModel extends CachedTable
 	// Create DB table if not exist
 	private function createTable()
 	{
-		wlog("AccountModel::createTable()");
-
 		$res = $this->dbObj->createTableQ($this->tbl_name,
 						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
 						"`owner_id` INT(11) NOT NULL, ".

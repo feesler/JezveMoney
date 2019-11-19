@@ -114,21 +114,27 @@ class UserModel extends CachedTable
 	// Check correctness login/password data
 	private function checkLoginData($login, $password)
 	{
+		$uObj = $this->getItem($this->getIdByLogin($login));
+		if (!$uObj)
+			return FALSE;
+
 		$salt = $this->getSalt($login);
 		$hashed = $this->getHash($password, $salt);
-		$passHash = $this->getPassHash($login);
 
-		return $this->checkHash($hashed, $salt, $passHash);
+		return $this->checkHash($hashed, $salt, $uObj->passhash);
 	}
 
 
 	// Check correctness of cookies data
 	private function checkCookie($login, $passhash)
 	{
-		$salt = $this->getSalt($login);
-		$userHash = $this->getPassHash($login);
+		$uObj = $this->getItem($this->getIdByLogin($login));
+		if (!$uObj)
+			return FALSE;
 
-		return $this->checkHash($passhash, $salt, $userHash);
+		$salt = $this->getSalt($login);
+
+		return $this->checkHash($passhash, $salt, $uObj->passhash);
 	}
 
 
@@ -185,32 +191,12 @@ class UserModel extends CachedTable
 	}
 
 
-	// Return access type of specified user
-	public function getAccess($id)
-	{
-		$uObj = $this->getItem($id);
-		if (!$uObj)
-			return NULL;
-
-		return $uObj->access;
-	}
-
-
 	// Check user has admin access
-	public function isAdmin($id)
+	public function isAdmin($item_id)
 	{
-		return (($this->getAccess($id) & 0x1) == 0x1);
-	}
+		$uObj = $this->getItem($item_id);
 
-
-	// Return login of user
-	public function getLogin($id)
-	{
-		$uObj = $this->getItem($id);
-		if (!$uObj)
-			return NULL;
-
-		return $uObj->login;
+		return ($uObj && ($uObj->access & 0x1) == 0x1);
 	}
 
 
@@ -278,19 +264,6 @@ class UserModel extends CachedTable
 		$this->cleanCache();
 
 		return TRUE;
-	}
-
-
-	// Return password hash for specified user
-	public function getPassHash($login)
-	{
-		$u_id = $this->getIdByLogin($login);
-
-		$uObj = $this->getItem($u_id);
-		if (!$uObj)
-			return NULL;
-
-		return $uObj->passhash;
 	}
 
 
@@ -447,12 +420,12 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		// check user is exist
-		$curLogin = $this->getLogin($user_id);
-		if (is_null($curLogin))
+		$uObj = $this->getItem($user_id);
+		if (!$uObj)
 			return FALSE;
 
 		// check current login is not the same
-		if ($curLogin == $login)
+		if ($uObj->login == $login)
 			return TRUE;
 
 		// check no user exist with the same login
@@ -475,7 +448,7 @@ class UserModel extends CachedTable
 	}
 
 
-	// Set up new login for user
+	// Set up access level for user
 	public function setAccess($user_id, $access)
 	{
 		$user_id = intval($user_id);
@@ -484,12 +457,12 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		// check user is exist
-		$curAccess = $this->getAccess($user_id);
-		if (is_null($curAccess))
+		$uObj = $this->getItem($user_id);
+		if (!$uObj)
 			return FALSE;
 
 		// check current access level is not the same
-		if ($curAccess == $access)
+		if ($uObj->access == $access)
 			return TRUE;
 
 		$curDate = date("Y-m-d H:i:s");

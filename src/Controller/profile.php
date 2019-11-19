@@ -6,14 +6,15 @@ class ProfileController extends Controller
 	{
 		global $uMod, $user_id, $user_name;
 
-		$user_login = $uMod->getLogin($user_id);
+		$uObj = $uMod->getItem($user_id);
+		if (!$uObj)
+			throw new Error("User not found");
+
+		$user_login = $uObj->login;
 
 		$action = $this->action;
 
 		$person_name = "";
-		$uObj = $uMod->getItem($user_id);
-		if (!$uObj)
-			throw new Error("User not found");
 
 		$pMod = new PersonModel($user_id);
 		$pObj = $pMod->getItem($uObj->owner_id);
@@ -95,8 +96,11 @@ class ProfileController extends Controller
 		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
 			$this->fail($defMsg);
 
-		$login = $uMod->getLogin($user_id);
-		if (!$uMod->changePassword($login, $_POST["oldpwd"], $_POST["newpwd"]))
+		$uObj = $uMod->getItem($user_id);
+		if (!$uObj)
+			$this->fail($defMsg);
+
+		if (!$uMod->changePassword($uObj->login, $_POST["oldpwd"], $_POST["newpwd"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_PASSWORD);

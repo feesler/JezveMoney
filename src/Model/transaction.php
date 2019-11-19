@@ -28,8 +28,6 @@ class TransactionModel extends CachedTable
 	// Create DB table if not exist
 	private function createTable()
 	{
-		wlog("TransactionModel::createTable()");
-
 		$res = $this->dbObj->createTableQ($this->tbl_name,
 						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
 						"`user_id` INT(11) NOT NULL, ".
@@ -287,10 +285,10 @@ class TransactionModel extends CachedTable
 
 
 	// Cancel changes of transaction
-	public function cancel($trans_id)
+	public function cancel($item_id)
 	{
 		// check transaction is exist
-		$trObj = $this->getItem($trans_id);
+		$trObj = $this->getItem($item_id);
 		if (!$trObj)
 			return FALSE;
 

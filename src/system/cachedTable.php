@@ -60,18 +60,7 @@ abstract class CachedTable extends Model
 	}
 
 
-	// Return value of specified object from cache
-	protected function getCache($obj_id, $val)
-	{
-		$item = $this->getItem($obj_id);
-		if (is_null($item) || !isset($item->$val))
-			return NULL;
-
-		return $item->$val;
-	}
-
-
-	// Clean cached data. Next getCache() request will update cache
+	// Clean cached data. Next access to the cache will request update of data from DB
 	protected function cleanCache()
 	{
 		$this->cache = NULL;

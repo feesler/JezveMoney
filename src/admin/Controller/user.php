@@ -93,8 +93,11 @@ class UserAdminController extends Controller
 		if (!isset($_POST["user_id"]) || !isset($_POST["user_pass"]))
 			$this->fail($defMsg);
 
-		$login = $uMod->getLogin($_POST["user_id"]);
-		if (!$uMod->setPassword($login, $_POST["user_pass"]))
+		$uObj = $uMod->getItem($_POST["user_id"]);
+		if (!$uObj)
+			$this->fail($defMsg);
+
+		if (!$uMod->setPassword($uObj->login, $_POST["user_pass"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_PASSWORD);
