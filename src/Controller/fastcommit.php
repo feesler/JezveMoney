@@ -216,9 +216,18 @@ class FastCommitController extends Controller
 		$currMod = new CurrencyModel();
 
 		$acc_id = intval($_POST["acc_id"]);
-		echo("Account: ".$acc_id." ".$accMod->getName($acc_id)."<br>");
-		$curr_id = $accMod->getCurrency($acc_id);
-		echo("Currency: ".$curr_id." ".$currMod->getName($curr_id)."<br><br>");
+		$accObj = $accMod->getItem($acc_id);
+		if (!$accObj)
+			throw new Error("Account not found");
+
+		echo("Account: ".$acc_id." ".$accObj->name."<br>");
+		$curr_id = $accObj->curr_id;
+
+		$currObj = $currMod->getItem($curr_id);
+		if (!$currObj)
+			throw new Error("Currency not found");
+
+		echo("Currency: ".$curr_id." ".$currObj->name."<br><br>");
 		foreach($_POST["tr_type"] AS $tr_key => $tr_type)
 		{
 			$tr_amount = floatval($_POST["amount"][$tr_key]);
@@ -249,7 +258,15 @@ class FastCommitController extends Controller
 				echo("src_amount: ".$tr_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$curr_id."; dest_curr ".$tr_dest_curr_id);
 				echo("; ".$tr_date." ".$tr_comment."<br>");
 
-				$trans_id = $trMod->create(EXPENSE, $acc_id, 0, $tr_amount, $tr_dest_amount, $curr_id, $tr_dest_curr_id, $tr_date, $tr_comment);
+				$trans_id = $trMod->create([ "type" => EXPENSE,
+												"src_id" => $acc_id,
+												"dest_id" => 0,
+												"src_amount" => $tr_amount,
+												"dest_amount" => $tr_dest_amount,
+												"src_curr" => $curr_id,
+												"dest_curr" => $tr_dest_curr_id,
+												"date" => $tr_date,
+												"comment" => $tr_comment ]);
 			}
 			else if ($tr_type == "income")
 			{
@@ -265,7 +282,15 @@ class FastCommitController extends Controller
 				echo("src_amount: ".$tr_src_amount."; dest_amount: ".$tr_amount."; src_curr: ".$tr_src_curr_id."; dest_curr ".$curr_id);
 				echo("; ".$tr_date." ".$tr_comment."<br>");
 
-				$trans_id = $trMod->create(INCOME, 0, $acc_id, $tr_src_amount, $tr_amount, $tr_src_curr_id, $curr_id, $tr_date, $tr_comment);
+				$trans_id = $trMod->create([ "type" => INCOME,
+												"src_id" => 0,
+												"dest_id" => $acc_id,
+												"src_amount" => $tr_src_amount,
+												"dest_amount" => $tr_amount,
+												"src_curr" => $tr_src_curr_id,
+												"dest_curr" => $curr_id,
+												"date" => $tr_date,
+												"comment" => $tr_comment ]);
 			}
 			else if ($tr_type == "transferfrom" || $tr_type == "transferto")
 			{
@@ -274,32 +299,44 @@ class FastCommitController extends Controller
 					$tr_src_acc_id = $acc_id;
 					$tr_src_curr_id = $curr_id;
 					$tr_dest_acc_id = intval($_POST["dest_acc_id"][$tr_key]);
-					$tr_dest_curr_id = $accMod->getCurrency($tr_dest_acc_id);
+					$destAcc = $accMod->getItem($tr_dest_acc_id);
+					if (!$destAcc)
+						throw new Error("Account not found");
+
+					$tr_dest_curr_id = $destAcc->curr_id;
 					$tr_src_amount = $tr_amount;
 					$tr_dest_amount = ($tr_dest_curr_id != $tr_src_curr_id) ? floatval($_POST["dest_amount"][$tr_key]) : $tr_amount;
 
-					echo("Dest account: ".$tr_dest_acc_id." ".$accMod->getName($tr_dest_acc_id)."<br>");
+					echo("Dest account: ".$tr_dest_acc_id." ".$destAcc->name."<br>");
 				}
 				else
 				{
 					$tr_src_acc_id = intval($_POST["dest_acc_id"][$tr_key]);
-					$tr_src_curr_id = $accMod->getCurrency($tr_src_acc_id);
+					$srcAcc = $accMod->getItem($tr_src_acc_id);
+					if (!$srcAcc)
+						throw new Error("Account not found");
+
+					$tr_src_curr_id = $srcAcc->curr_id;
 					$tr_dest_acc_id = $acc_id;
 					$tr_dest_curr_id = $curr_id;
 					$tr_src_amount = ($tr_dest_curr_id != $tr_src_curr_id) ? floatval($_POST["dest_amount"][$tr_key]) : $tr_amount;
 					$tr_dest_amount = $tr_amount;
 
-					echo("Source account: ".$tr_src_acc_id." ".$accMod->getName($tr_src_acc_id)."<br>");
+					echo("Source account: ".$tr_src_acc_id." ".$srcAcc->name."<br>");
 				}
 
 				echo("src_amount: ".$tr_src_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$tr_src_curr_id."; dest_curr ".$tr_dest_curr_id);
 				echo("; ".$tr_date." ".$tr_comment."<br>");
 
-				$trans_id = $trMod->create(TRANSFER,
-											$tr_src_acc_id, $tr_dest_acc_id,
-											$tr_src_amount, $tr_dest_amount,
-											$tr_src_curr_id, $tr_dest_curr_id,
-											$tr_date, $tr_comment);
+				$trans_id = $trMod->create([ "type" => TRANSFER,
+												"src_id" => $tr_src_acc_id,
+												"dest_id" => $tr_dest_acc_id,
+												"src_amount" => $tr_src_amount,
+												"dest_amount" => $tr_dest_amount,
+												"src_curr" => $tr_src_curr_id,
+												"dest_curr" => $tr_dest_curr_id,
+												"date" => $tr_date,
+												"comment" => $tr_comment]);
 			}
 			else if ($tr_type == "debtfrom" || $tr_type == "debtto")
 			{
@@ -308,12 +345,21 @@ class FastCommitController extends Controller
 				$tr_src_amount = $tr_dest_amount = $tr_amount;
 				$tr_src_curr_id = $tr_dest_curr_id = $curr_id;
 
-				echo(($op ? "give" : "take")."; person: ".$person_id." ".$pMod->getName($person_id)."<br>");
+				$pObj = $pMod->getItem($person_id);
+				if (!$pObj)
+					throw new Error("Person not found");
 
-				$trans_id = $debtMod->create($op, $acc_id, $person_id,
-									$tr_src_amount, $tr_dest_amount,
-									$tr_src_curr_id, $tr_dest_curr_id,
-									$tr_date, $tr_comment);
+				echo(($op ? "give" : "take")."; person: ".$person_id." ".$pObj->name."<br>");
+
+				$trans_id = $debtMod->create([ "op" => $op,
+												"acc_id" => $acc_id,
+												"person_id" => $person_id,
+												"src_amount" => $tr_src_amount,
+												"dest_amount" => $tr_dest_amount,
+												"src_curr" => $tr_src_curr_id,
+												"dest_curr" => $tr_dest_curr_id,
+												"date" => $tr_date,
+												"comment" => $tr_comment]);
 			}
 			else
 			{
