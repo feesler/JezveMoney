@@ -15,7 +15,11 @@ class PersonModel extends CachedTable
 		self::$user_id = intval($user_id);
 		// find owner person
 		$uMod = new UserModel();
-		self::$owner_id = $uMod->getOwner(self::$user_id);
+		$uObj = $uMod->getItem(self::$user_id);
+		if (!$uObj)
+			throw new Error("User not found");
+
+		self::$owner_id = $uObj->owner_id;
 
 		$this->tbl_name = "persons";
 
@@ -50,98 +54,126 @@ class PersonModel extends CachedTable
 	}
 
 
-	// Update cache
-	protected function updateCache()
+	// Convert DB row to item object
+	protected function rowToObj($row)
 	{
-		self::$dcache = [];
+		if (is_null($row))
+			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id);
-		while($row = $this->dbObj->fetchRow($qResult))
+		$res = new stdClass;
+		$res->id = intval($row["id"]);
+		$res->name = $row["name"];
+		$res->format = intval($row["user_id"]);
+		$res->createdate = strtotime($row["createdate"]);
+		$res->updatedate = strtotime($row["updatedate"]);
+
+		return $res;
+	}
+
+
+	// Called from CachedTable::updateCache() and return data query object
+	protected function dataQuery()
+	{
+		return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id, NULL, "id ASC");
+	}
+
+
+	protected function checkParams($params, $isUpdate = FALSE)
+	{
+		$avFields = ["name"];
+		$res = [];
+
+		if (!$isUpdate)
 		{
-			$person_id = $row["id"];
-
-			self::$dcache[$person_id]["name"] = $row["name"];
-			self::$dcache[$person_id]["user_id"] = intval($row["user_id"]);
-			self::$dcache[$person_id]["createdate"] = strtotime($row["createdate"]);
-			self::$dcache[$person_id]["updatedate"] = strtotime($row["updatedate"]);
+			foreach($avFields as $field)
+			{
+				if (!isset($params[$field]))
+				{
+					wlog($field." parameter not found");
+					return NULL;
+				}
+			}
 		}
+
+		if (isset($params["name"]))
+		{
+			$res["name"] = $this->dbObj->escape($params["name"]);
+			if (is_empty($res["name"]))
+			{
+				wlog("Invalid name specified");
+				return NULL;
+			}
+		}
+
+		return $res;
 	}
 
 
-	// Create new person
-	public function create($pname)
+	// Preparations for item create
+	protected function preCreate($params)
 	{
-		if (is_null($pname) || $pname == "")
-			return 0;
+		$res = $this->checkParams($params);
+		if (is_null($res))
+			return NULL;
 
-		$person_name = $this->dbObj->escape($pname);
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+		if ($this->dbObj->rowsCount($qResult) > 0)
+		{
+			wlog("Such item already exist");
+			return NULL;
+		}
 
-		$curDate = date("Y-m-d H:i:s");
+		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
+		$res["user_id"] = self::$user_id;
 
-		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
-														"name" => $person_name,
-														"user_id" => self::$user_id,
-														"createdate" => $curDate,
-														"updatedate" => $curDate ]))
-			return 0;
-
-		$p_id = $this->dbObj->insertId();
-
-		$this->cleanCache();
-
-		return $p_id;
+		return $res;
 	}
 
 
-	// Update person information
-	public function edit($p_id, $pname)
+	// Preparations for item update
+	protected function preUpdate($item_id, $params)
 	{
-		if (!$p_id || !is_numeric($p_id) || !$pname || $pname == "")
-			return FALSE;
-
-		$person_id = intval($p_id);
-		$person_name = $this->dbObj->escape($pname);
-
 		// check person is exist
-		if (!$this->is_exist($person_id))
+		$currObj = $this->getItem($item_id);
+		if (!$currObj)
 			return FALSE;
 
-		$curDate = date("Y-m-d H:i:s");
+		$res = $this->checkParams($params, TRUE);
+		if (is_null($res))
+			return NULL;
 
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "name" => $person_name, "updatedate" => $curDate ],
-									"id=".$person_id))
-			return FALSE;
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+		$row = $this->dbObj->fetchRow($qResult);
+		if ($row)
+		{
+			$found_id = intval($row["id"]);
+			if ($found_id != $item_id)
+			{
+				wlog("Such item already exist");
+				return NULL;
+			}
+		}
 
-		$this->cleanCache();
+		$res["updatedate"] = date("Y-m-d H:i:s");
 
-		return TRUE;
+		return $res;
 	}
 
 
-	// Delete person
-	public function del($p_id)
+	// Preparations for item delete
+	protected function preDelete($item_id)
 	{
-		if (!$p_id || !is_numeric($p_id))
-			return FALSE;
-		$p_id = intval($p_id);
-
 		// check person is exist
-		if (!$this->is_exist($p_id))
+		$currObj = $this->getItem($item_id);
+		if (!$currObj)
 			return FALSE;
 
 		$accMod = new AccountModel(self::$user_id, TRUE);
-		if (!$accMod->onPersonDelete($p_id))
+		if (!$accMod->onPersonDelete($item_id))
 		{
-			wlog("accMod->onPersonDelete(".$p_id.") return FALSE");
+			wlog("accMod->onPersonDelete(".$item_id.") return FALSE");
 			return FALSE;
 		}
-
-		// delete person
-		if (!$this->dbObj->deleteQ($this->tbl_name, ["user_id=".self::$user_id, "id=".$p_id]))
-			return FALSE;
-
-		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -166,20 +198,6 @@ class PersonModel extends CachedTable
 		}
 
 		return 0;
-	}
-
-
-	// Return person name by specified id
-	public function getName($p_id)
-	{
-		return $this->getCache($p_id, "name");
-	}
-
-
-	// Return user of specified person
-	public function getUser($p_id)
-	{
-		return $this->getCache($p_id, "user_id");
 	}
 
 
@@ -209,9 +227,6 @@ class PersonModel extends CachedTable
 	// Create account of specified currency for person
 	public function createAccount($person_id, $curr_id)
 	{
-		if (!is_numeric($person_id) || !is_numeric($curr_id))
-			return 0;
-
 		$p_id = intval($person_id);
 		$c_id = intval($curr_id);
 		if (!$p_id || !$c_id)
@@ -221,7 +236,11 @@ class PersonModel extends CachedTable
 			return FALSE;
 
 		$accMod = new AccountModel(self::$user_id);
-		return $accMod->create($p_id, "acc_".$p_id."_".$c_id, 0.0, $c_id, 0);
+		return $accMod->create([ "owner_id" => $p_id,
+									"name" => "acc_".$p_id."_".$c_id,
+									"balance" => 0.0,
+									"curr_id" => $c_id,
+									"icon" => 0 ]);
 	}
 
 
@@ -231,11 +250,11 @@ class PersonModel extends CachedTable
 		if (!$this->checkCache())
 			return 0;
 
-		foreach(self::$dcache as $p_id => $row)
+		foreach($this->cache as $p_id => $item)
 		{
-			if ($p_id != self::$owner_id && $row["name"] == $p_name)
+			if ($p_id != self::$owner_id && $item->name == $p_name)
 			{
-				return $row["name"];
+				return $p_id;
 			}
 		}
 
@@ -269,7 +288,8 @@ class PersonModel extends CachedTable
 									"a.curr_id" => "curr_id",
 									"a.balance" => "balance"],
 							["persons AS p LEFT JOIN accounts AS a ON a.owner_id=p.id"],
-							$condArr);
+							$condArr,
+						 	NULL, "p.id ASC, a.id ASC");
 
 		$pArr = [];
 		while($row = $this->dbObj->fetchRow($qResult))

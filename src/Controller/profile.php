@@ -11,11 +11,16 @@ class ProfileController extends Controller
 		$action = $this->action;
 
 		$person_name = "";
-		$owner_id = $uMod->getOwner($user_id);
+		$uObj = $uMod->getItem($user_id);
+		if (!$uObj)
+			throw new Error("User not found");
 
 		$pMod = new PersonModel($user_id);
+		$pObj = $pMod->getItem($uObj->owner_id);
+		if (!$pObj)
+			throw new Error("Person not found");
 
-		$person_name = $pMod->getName($owner_id);
+		$person_name = $pObj->name;
 
 		$titleString = "Jezve Money | Profile";
 		if ($action == "changename")
@@ -66,7 +71,7 @@ class ProfileController extends Controller
 		if ($old_name == $db->escape($new_name))
 			$this->fail($defMsg);
 
-		if (!$pMod->edit($owner_id, $new_name))
+		if (!$pMod->update($owner_id, [ "name" => $new_name ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_NAME);

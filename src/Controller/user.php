@@ -97,7 +97,9 @@ wlog("UserController::logout()");
 		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
 			$this->fail($defMsg, "register");
 
-		if (!$uMod->register($_POST["login"], $_POST["password"], $_POST["name"]))
+		if (!$uMod->create([ "login" => $_POST["login"],
+								"password" => $_POST["password"],
+								"name" => $_POST["name"] ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_REGISTER);

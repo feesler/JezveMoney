@@ -36,14 +36,20 @@ class AccountsController extends Controller
 		$accMod = new AccountModel($user_id);
 		$currMod = new CurrencyModel();
 
-		$accInfo = ["name" => "",
-						"curr" => $currMod->getIdByPos(0),
-						"balance" => 0,
-						"initbalance" => 0,
-						"icon" => 0,
-						"iconclass" => ""];
-		$accInfo["sign"] = $currMod->getSign($accInfo["curr"]);
-		$accInfo["balfmt"] = $currMod->format($accInfo["balance"], $accInfo["curr"]);
+		$accInfo = new stdClass;
+		$accInfo->name = "";
+		$accInfo->curr = $currMod->getIdByPos(0);
+		$accInfo->balance = 0;
+		$accInfo->initbalance = 0;
+		$accInfo->icon = 0;
+		$accInfo->iconclass = "";
+
+		$currObj = $currMod->getItem($accInfo->curr);
+		if (!$currObj)
+			throw new Error("Currency not found");
+
+		$accInfo->sign = $currObj->sign;
+		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
 		$tileAccName = "New account";
 
 		$currArr = $currMod->getArray();
@@ -90,8 +96,8 @@ class AccountsController extends Controller
 
 		$accInfo = $accMod->getProperties($acc_id);
 
-		$accInfo["balfmt"] = $currMod->format($accInfo["balance"], $accInfo["curr"]);
-		$tileAccName = $accInfo["name"];
+		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
+		$tileAccName = $accInfo->name;
 
 		$currArr = $currMod->getArray();
 		$icons = $accMod->getIconsArray();
@@ -118,8 +124,14 @@ class AccountsController extends Controller
 			$this->fail($defMsg);
 
 		$accMod = new AccountModel($user_id);
-		$owner_id = $uMod->getOwner($user_id);
-		if (!$accMod->create($owner_id, $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+		$uObj = $uMod->getItem($user_id);
+		if (!$uObj)
+			$this->fail($defMsg);
+		if (!$accMod->create([ "owner_id" => $uObj->owner_id,
+								"name" => $_POST["accname"],
+								"balance" => $_POST["balance"],
+								"curr_id" => $_POST["currency"],
+								"icon" => $_POST["icon"] ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_CREATE);
@@ -140,7 +152,11 @@ class AccountsController extends Controller
 			$this->fail($defMsg);
 
 		$accMod = new AccountModel($user_id);
-		if (!$accMod->edit($_POST["accid"], $_POST["accname"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+		if (!$accMod->update($_POST["accid"],
+								[ "name" => $_POST["accname"],
+									"balance" => $_POST["balance"],
+									"curr_id" => $_POST["currency"],
+									"icon" => $_POST["icon"] ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_UPDATE);

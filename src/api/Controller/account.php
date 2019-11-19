@@ -58,11 +58,18 @@ class AccountApiController extends ApiController
 		if (!isset($_POST["name"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
 			$respObj->fail();
 
-		$owner_id = $this->uMod->getOwner($this->user_id);
+		$uObj = $this->uMod->getItem($this->user_id);
+		if (!$uObj)
+			$respObj->fail("User not found");
 
+		$owner_id = $uObj->owner_id;
 		wlog("owner: ".$owner_id);
 
-		$acc_id = $this->accMod->create($owner_id, $_POST["name"], $_POST["balance"], $_POST["currency"], $_POST["icon"]);
+		$acc_id = $this->accMod->create([ "owner_id" => $owner_id,
+											"name" => $_POST["name"],
+											"balance" => $_POST["balance"],
+											"curr_id" => $_POST["currency"],
+											"icon" => $_POST["icon"] ]);
 		if (!$acc_id)
 			$respObj->fail();
 
@@ -83,7 +90,10 @@ class AccountApiController extends ApiController
 		if (!isset($_POST["id"]) || !isset($_POST["name"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
 			$respObj->fail();
 
-		if (!$this->accMod->edit($_POST["id"], $_POST["name"], $_POST["balance"], $_POST["currency"], $_POST["icon"]))
+		if (!$this->accMod->update($_POST["id"], [ "name" => $_POST["name"],
+													"balance" => $_POST["balance"],
+													"curr_id" => $_POST["currency"],
+													"icon" => $_POST["icon"] ]))
 			$respObj->fail();
 
 		$respObj->ok();

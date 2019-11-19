@@ -7,7 +7,10 @@ class ProfileApiController extends ApiController
 		parent::initAPI();
 
 		$this->pMod = new PersonModel($this->user_id);
-		$this->owner_id = $this->uMod->getOwner($this->user_id);
+		$uObj = $this->uMod->getItem($this->user_id);
+		if (!$uObj)
+			throw new Error("User not found");
+		$this->owner_id = $uObj->owner_id;
 	}
 
 
@@ -17,9 +20,11 @@ class ProfileApiController extends ApiController
 
 		$respObj = new apiResponse();
 
-		$pName = $this->pMod->getName($this->owner_id);
+		$pObj = $this->pMod->getItem($this->owner_id);
+		if (!$pObj)
+			$respObj->fail("Person not found");
 
-		$respObj->data = ["name" => $pName];
+		$respObj->data = ["name" => $pObj->name];
 		$respObj->ok();
 	}
 
@@ -33,13 +38,17 @@ class ProfileApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		$old_name = $this->pMod->getName($this->owner_id);
+		$pObj = $this->pMod->getItem($this->owner_id);
+		if (!$pObj)
+			$respObj->fail("Person not found");
+
+		$old_name = $pObj->name;
 		$new_name = $_POST["name"];
 
 		if ($old_name == $new_name)
 			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
-		if (!$this->pMod->edit($this->owner_id, $new_name))
+		if (!$this->pMod->update($this->owner_id, [ "name" => $new_name ]))
 			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
 		$respObj->msg = getMessage(MSG_PROFILE_NAME);

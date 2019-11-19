@@ -66,10 +66,12 @@ class UserAdminController extends Controller
 
 		if (isset($_POST["user_name"]))
 		{
-			$owner_id = $uMod->getOwner($_POST["user_id"]);
+			$userObj = $uMod->getItem($_POST["user_id"]);
+			if (!$userObj)
+				$this->fail($defMsg);
 
 			$pMod = new PersonModel($_POST["user_id"]);
-			if (!$pMod->edit($owner_id, $_POST["user_name"]))
+			if (!$pMod->update($userObj->owner_id, [ "name" => $_POST["user_name"] ]))
 				$this->fail($defMsg);
 		}
 

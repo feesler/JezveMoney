@@ -45,7 +45,7 @@ class UserApiController extends ApiController
 		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
 			$respObj->fail();
 
-		if ($this->uMod->getId($_POST["login"]) != 0)
+		if ($this->uMod->getIdByLogin($_POST["login"]) != 0)
 			$respObj->fail("Username already exist. Please select another one.");
 
 		if (!$this->uMod->register($_POST["login"], $_POST["password"], $_POST["name"]))

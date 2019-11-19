@@ -12,20 +12,26 @@ Class DebtModel
 		$this->user_id = intval($user_id);
 
 		$uMod = new UserModel();
-		$this->owner_id = $uMod->getOwner($this->user_id);
+		$uObj = $uMod->getItem($this->user_id);
+		if (!$uObj)
+			throw new Error("User not found");
+		$this->owner_id = $uObj->owner_id;
 	}
 
 
 	// Create new debt operation
-	public function create($op, $acc_id, $p_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment)
+	public function create($params)
 	{
-		if (!is_numeric($p_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
-			return 0;
+		$op = intval($params["op"]);
 
-		$account_id = intval($acc_id);
-		$person_id = intval($p_id);
-		$src_curr = intval($src_curr);
-		$dest_curr = intval($dest_curr);
+		$account_id = intval($params["acc_id"]);
+		$person_id = intval($params["person_id"]);
+		$src_curr = intval($params["src_curr"]);
+		$dest_curr = intval($params["dest_curr"]);
+		$src_amount = floatval($params["src_amount"]);
+		$dest_amount = floatval($params["dest_amount"]);
+		$tr_date = $params["date"];
+		$comment = $params["comment"];
 		if (!$person_id || !$src_curr || !$dest_curr)
 			return 0;
 
@@ -54,24 +60,33 @@ Class DebtModel
 		}
 
 		$transMod = new TransactionModel($this->user_id);
-		$trans_id = $transMod->create(4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment);
+		$trans_id = $transMod->create([ "type" => DEBT,
+										"src_id" => $src_id,
+										"dest_id" => $dest_id,
+										"src_amount" => $src_amount,
+										"dest_amount" => $dest_amount,
+										"src_curr" => $src_curr,
+										"dest_curr" => $dest_curr,
+										"date" => $tr_date,
+										"comment" => $comment ]);
 
 		return $trans_id;
 	}
 
 
 	// Update debt operation
-	public function edit($trans_id, $op, $acc_id, $p_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment)
+	public function update($trans_id, $params)
 	{
-		if (!is_numeric($trans_id) || !is_numeric($p_id) || !is_numeric($src_curr) || !is_numeric($dest_curr))
-			return FALSE;
-
 		$tr_id = intval($trans_id);
-		$account_id = intval($acc_id);
-		$person_id = intval($p_id);
-		$src_curr = intval($src_curr);
-		$dest_curr = intval($dest_curr);
-
+		$op = intval($params["op"]);
+		$account_id = intval($params["acc_id"]);
+		$person_id = intval($params["person_id"]);
+		$src_curr = intval($params["src_curr"]);
+		$dest_curr = intval($params["dest_curr"]);
+		$src_amount = floatval($params["src_amount"]);
+		$dest_amount = floatval($params["dest_amount"]);
+		$tr_date = $params["date"];
+		$comment = $params["comment"];
 		if (!$tr_id || !$person_id || !$src_curr || !$dest_curr)
 			return FALSE;
 
@@ -100,7 +115,15 @@ Class DebtModel
 		}
 
 		$transMod = new TransactionModel($this->user_id);
-		if (!$transMod->edit($tr_id, 4, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $tr_date, $comment))
+		if (!$transMod->update($tr_id, [ "type" => DEBT,
+										"src_id" => $src_id,
+										"dest_id" => $dest_id,
+										"src_amount" => $src_amount,
+										"dest_amount" => $dest_amount,
+										"src_curr" => $src_curr,
+										"dest_curr" => $dest_curr,
+										"date" => $tr_date,
+										"comment" => $comment ]))
 			return FALSE;
 
 		return TRUE;

@@ -74,10 +74,11 @@ class PersonsController extends Controller
 
 		$pMod = new PersonModel($user_id);
 
-		if (!$pMod->is_exist($p_id))
+		$pObj = $pMod->getItem($p_id);
+		if (!$pObj)
 			$this->fail(ERR_PERSON_UPDATE);
 
-		$pName = $pMod->getName($p_id);
+		$pName = $pObj->name;
 
 		$titleString = "Jezve Money | ";
 		$headString = "Edit person";
@@ -107,7 +108,7 @@ class PersonsController extends Controller
 		if ($check_id != 0)
 			$this->fail(ERR_PERSON_UPDATE_EXIST);
 
-		if (!$pMod->create($person_name))
+		if (!$pMod->create([ "name" => $person_name ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_CREATE);
@@ -137,7 +138,7 @@ class PersonsController extends Controller
 			$this->fail($defMsg);
 
 		$person_id = intval($_POST["pid"]);
-		if (!$pMod->edit($person_id, $person_name))
+		if (!$pMod->update($person_id, [ "name" => $person_name ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_UPDATE);

@@ -124,8 +124,8 @@
 <?php		} else {	?>
 							<div class="tile_header"><label id="acclbl"><?=$accLbl?></label><div id="noacc_btn" class="iconlink small_icon"><button type="button"><span class="icon close_gray"></span></button></div></div>
 							<div class="tile_container">
-								<div id="acc_tile" class="tile<?=$debtAcc["iconclass"]?>"><div class="tilelink"><span><span class="acc_bal"><?=$debtAcc["balfmt"]?></span><span class="acc_name"><?=$debtAcc["name"]?></span></span></div></div>
-								<input id="acc_id" name="acc_id" type="hidden" value="<?=$debtAcc["id"]?>">
+								<div id="acc_tile" class="tile<?=($debtAcc->iconclass)?>"><div class="tilelink"><span><span class="acc_bal"><?=($debtAcc->balfmt)?></span><span class="acc_name"><?=($debtAcc->name)?></span></span></div></div>
+								<input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
 <?php		}	?>
 							</div>
 
@@ -170,7 +170,7 @@
 						<div id="source" class="acc_float">
 							<div><label>Source account</label></div>
 							<div class="tile_container">
-								<div id="source_tile" class="tile<?=$src["iconclass"]?>"><div class="tilelink"><span><span class="acc_bal"><?=$src["balfmt"]?></span><span class="acc_name"><?=$src["name"]?></span></span></div></div>
+								<div id="source_tile" class="tile<?=($src->iconclass)?>"><div class="tilelink"><span><span class="acc_bal"><?=($src->balfmt)?></span><span class="acc_name"><?=($src->name)?></span></span></div></div>
 								<input id="src_id" name="src_id" type="hidden" value="<?=$tr["src_id"]?>">
 							</div>
 
@@ -197,7 +197,7 @@
 										<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
 									</div>
 								</div>
-<?php	if (($trans_type == TRANSFER && $src["curr"] == $dest["curr"]) || (($trans_type == EXPENSE || $trans_type == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
+<?php	if (($trans_type == TRANSFER && $src->curr == $dest->curr) || (($trans_type == EXPENSE || $trans_type == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
 								<div id="exch_left">
@@ -215,7 +215,7 @@
 						<div id="destination" class="acc_float">
 							<div><label>Destination account</label></div>
 							<div class="tile_container">
-								<div id="dest_tile" class="tile<?=$dest["iconclass"]?>"><div class="tilelink"><span><span class="acc_bal"><?=$dest["balfmt"]?></span><span class="acc_name"><?=$dest["name"]?></span></span></div></div>
+								<div id="dest_tile" class="tile<?=($dest->iconclass)?>"><div class="tilelink"><span><span class="acc_bal"><?=($dest->balfmt)?></span><span class="acc_name"><?=($dest->name)?></span></span></div></div>
 								<input id="dest_id" name="dest_id" type="hidden" value="<?=$tr["dest_id"]?>">
 							</div>
 
@@ -333,9 +333,9 @@
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$srcAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
 <?php	if ($trans_type == DEBT) {		?>
-									<input id="resbal" class="summ_text" type="text" value="<?=($give ? $person_res_balance : $debtAcc["balance"])?>">
+									<input id="resbal" class="summ_text" type="text" value="<?=($give ? $person_res_balance : ($debtAcc ? $debtAcc->balance : ""))?>">
 <?php	} else {	?>
-									<input id="resbal" class="summ_text" type="text" value="<?=$src["balance"]?>">
+									<input id="resbal" class="summ_text" type="text" value="<?=($src->balance)?>">
 <?php	}	?>
 								</div>
 							</div>
@@ -349,9 +349,9 @@
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$destAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
 <?php	if ($trans_type == DEBT) {		?>
-									<input id="resbal_d" class="summ_text" type="text" value="<?=($give ? $debtAcc["balance"] : $person_res_balance )?>">
+									<input id="resbal_d" class="summ_text" type="text" value="<?=($give ? ($debtAcc ? $debtAcc->balance : "") : $person_res_balance )?>">
 <?php	} else {	?>
-									<input id="resbal_d" class="summ_text" type="text" value="<?=$dest["balance"]?>">
+									<input id="resbal_d" class="summ_text" type="text" value="<?=($dest->balance)?>">
 <?php	}	?>
 								</div>
 							</div>

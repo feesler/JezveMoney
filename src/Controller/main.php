@@ -18,10 +18,13 @@ class MainController extends Controller
 		$totalsArr = $accMod->getTotalsArray();
 		foreach($totalsArr as $curr_id => $balance)
 		{
-			$balfmt = $currMod->format($balance, $curr_id);
-			$currName = $currMod->getName($curr_id);
+			$currObj = $currMod->getItem($curr_id);
+			if (!$currObj)
+				throw new Error('Wrong currency id: '.$curr_id);
 
-			$totalsArr[$curr_id] = ["bal" => $balance, "balfmt" => $balfmt, "name" => $currName];
+			$balfmt = $currMod->format($balance, $curr_id);
+
+			$totalsArr[$curr_id] = ["bal" => $balance, "balfmt" => $balfmt, "name" => $currObj->name];
 		}
 
 		// Prepare data of transaction list items
@@ -37,7 +40,12 @@ class MainController extends Controller
 			if ($trans->src_id != 0)
 			{
 				if ($trans->type == EXPENSE || $trans->type == TRANSFER)
-					$accStr .= $accMod->getName($trans->src_id);
+				{
+					$accObj = $accMod->getItem($trans->src_id);
+					if (!$accObj)
+						throw new Error("Invalid source account id: ".$trans->src_id);
+					$accStr .= $accObj->name;
+				}
 				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 			}
@@ -48,7 +56,12 @@ class MainController extends Controller
 			if ($trans->dest_id != 0)
 			{
 				if ($trans->type == INCOME || $trans->type == TRANSFER)
-					$accStr .= $accMod->getName($trans->dest_id);
+				{
+					$accObj = $accMod->getItem($trans->dest_id);
+					if (!$accObj)
+						throw new Error("Invalid destination account id: ".$trans->dest_id);
+					$accStr .= $accObj->name;
+				}
 				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
 			}
@@ -92,7 +105,8 @@ class MainController extends Controller
 		$byCurrency = TRUE;
 		$curr_acc_id = $currMod->getIdByPos(0);
 		if (!$curr_acc_id)
-			fail();
+			throw new Error("No currencies found");
+
 		$groupType_id = 2;		// group by week
 
 		$statArr = getStatArray($user_id, $byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);

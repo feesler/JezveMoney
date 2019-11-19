@@ -16,6 +16,7 @@
 
 	$classes = ["CachedTable" => "system/cachedTable.php",
 					"Controller" => "system/controller.php",
+					"Model" => "system/model.php",
 					"ApiController" => "system/apicontroller.php",
 				// Controllers
 					"MainController" => "Controller/main.php",
@@ -320,9 +321,14 @@
 		// Get name of user person
 		if ($user_id)
 		{
-			$owner_id = $uMod->getOwner($user_id);
+			$uObj = $uMod->getItem($user_id);
+			if (!$uObj)
+				throw new Error("User not found");
+
 			$persMod = new PersonModel($user_id);
-			$user_name = $persMod->getName($owner_id);
+			$personObj = $persMod->getItem($uObj->owner_id);
+			if ($personObj)
+				$user_name = $personObj->name;
 		}
 
 		if ($loggedIn)		// user should be logged in to access

@@ -21,14 +21,15 @@ class CurrencyApiController extends ApiController
 		$currArr = [];
 		foreach($ids as $curr_id)
 		{
-			if (!$this->model->is_exist($curr_id))
+			$currObj = $this->model->getItem($curr_id);
+			if (!$currObj)
 				$respObj->fail();
 
-			$currObj = new stdClass;
-			$currObj->id = $curr_id;
-			$currObj->name = $this->model->getName($curr_id);
-			$currObj->sign = $this->model->getSign($curr_id);
-			$currObj->format = $this->model->getFormat($curr_id);
+			$res = new stdClass;
+			$res->id = $curr_id;
+			$res->name = $currObj->name;
+			$res->sign = $currObj->sign;
+			$res->format = $currObj->format;
 
 			$currArr[] = $currObj;
 		}

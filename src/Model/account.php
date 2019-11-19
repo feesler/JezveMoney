@@ -26,6 +26,7 @@ class AccountModel extends CachedTable
 			$this->createTable();
 
 		$this->currMod = new CurrencyModel();
+		$this->personMod = new PersonModel(self::$user_id);
 	}
 
 
@@ -60,153 +61,203 @@ class AccountModel extends CachedTable
 	}
 
 
-	// Update cache
-	protected function updateCache()
+	// Convert DB row to item object
+	protected function rowToObj($row)
 	{
-		self::$dcache = [];
+		if (is_null($row))
+			return NULL;
 
+		$res = new stdClass;
+		$res->id = intval($row["id"]);
+		$res->user_id = intval($row["user_id"]);
+		$res->name = $row["name"];
+		$res->owner_id = intval($row["owner_id"]);
+		$res->curr_id = intval($row["curr_id"]);
+		$res->balance = floatval($row["balance"]);
+		$res->initbalance = floatval($row["initbalance"]);
+		$res->icon = intval($row["icon"]);
+		$res->createdate = strtotime($row["createdate"]);
+		$res->updatedate = strtotime($row["updatedate"]);
+
+		return $res;
+	}
+
+
+	// Called from CachedTable::updateCache() and return data query object
+	protected function dataQuery()
+	{
 		// find owner person
 		$uMod = new UserModel();
-		self::$owner_id = $uMod->getOwner(self::$user_id);
+		$uObj = $uMod->getItem(self::$user_id);
+		if (!$uObj)
+			throw new Error("User not found");
+		self::$owner_id = $uObj->owner_id;
 
 		$condArr = ["user_id=".self::$user_id];
 		if (!self::$full_list && self::$owner_id != 0)
 			$condArr[] = "owner_id=".self::$owner_id;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "id");
-		while($row = $this->dbObj->fetchRow($qResult))
+		return $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "id ASC");
+	}
+
+
+	protected function checkParams($params, $isUpdate = FALSE)
+	{
+		$avFields = ["owner_id", "name", "balance", "curr_id", "icon"];
+		$res = [];
+
+		if (!$isUpdate)
 		{
-			$acc_id = $row["id"];
-
-			self::$dcache[$acc_id]["user_id"] = $row["user_id"];
-			self::$dcache[$acc_id]["name"] = $row["name"];
-			self::$dcache[$acc_id]["owner_id"] = intval($row["owner_id"]);
-			self::$dcache[$acc_id]["curr_id"] = intval($row["curr_id"]);
-			self::$dcache[$acc_id]["balance"] = floatval($row["balance"]);
-			self::$dcache[$acc_id]["initbalance"] = floatval($row["initbalance"]);
-			self::$dcache[$acc_id]["icon"] = intval($row["icon"]);
-			self::$dcache[$acc_id]["createdate"] = strtotime($row["createdate"]);
-			self::$dcache[$acc_id]["updatedate"] = strtotime($row["updatedate"]);
+			foreach($avFields as $field)
+			{
+				if (!isset($params[$field]))
+				{
+					wlog($field." parameter not found");
+					return NULL;
+				}
+			}
 		}
+
+		if (isset($params["owner_id"]))
+		{
+			$res["owner_id"] = intval($params["owner_id"]);
+			if (!$res["owner_id"])
+			{
+				wlog("Invalid owner_id specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["name"]))
+		{
+			$res["name"] = $this->dbObj->escape($params["name"]);
+			if (is_empty($res["name"]))
+			{
+				wlog("Invalid name specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["balance"]))
+		{
+			$res["balance"] = floatval($params["balance"]);
+		}
+
+		if (isset($params["curr_id"]))
+		{
+			$res["curr_id"] = intval($params["curr_id"]);
+			if (!$this->currMod->is_exist($res["curr_id"]))
+			{
+				wlog("Invalid curr_id specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["icon"]))
+		{
+			$res["icon"] = intval($params["icon"]);
+			if ($res["icon"] < 0 || $res["icon"] > count(self::$iconClass))
+			{
+				wlog("Invalid icon specified");
+				return NULL;
+			}
+		}
+
+		return $res;
 	}
 
 
-	// Create new account for current user
-	public function create($owner_id, $accname, $balance, $curr_id, $icon_type)
+	// Preparations for item create
+	protected function preCreate($params)
 	{
-		if (!is_numeric($owner_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
-			return 0;
+		$res = $this->checkParams($params);
+		if (is_null($res))
+			return NULL;
 
-		$owner_id = intval($owner_id);
-		$accname = $this->dbObj->escape($accname);
-		$balance = floatval($balance);
-		$curr_id = intval($curr_id);
-		$icon_type = intval($icon_type);
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+		if ($this->dbObj->rowsCount($qResult) > 0)
+		{
+			wlog("Such item already exist");
+			return NULL;
+		}
 
-		if (!$accname || $accname == "" || !$curr_id)
-			return 0;
+		$res["initbalance"] = $res["balance"];
+		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
+		$res["user_id"] = self::$user_id;
 
-		$curDate = date("Y-m-d H:i:s");
-
-		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
-														"user_id" => self::$user_id,
-														"owner_id" => $owner_id,
-														"curr_id" => $curr_id,
-														"balance" => $balance,
-														"initbalance" => $balance,
-														"name" => $accname,
-														"icon" => $icon_type,
-														"createdate" => $curDate,
-														"updatedate" => $curDate ]))
-			return 0;
-
-		$acc_id = $this->dbObj->insertId();
-
-		$this->cleanCache();
-
-		return $acc_id;
+		return $res;
 	}
 
 
-	// Update account information
-	public function edit($acc_id, $accname, $balance, $curr_id, $icon_type)
+	// Preparations for item update
+	protected function preUpdate($item_id, $params)
 	{
-		if (!$acc_id || !is_numeric($acc_id) || !$accname || !is_numeric($balance) || !is_numeric($curr_id) || !is_numeric($icon_type))
-			return FALSE;
-
-		$acc_id = intval($acc_id);
-		$accname = $this->dbObj->escape($accname);
-		$balance = floatval($balance);
-		$curr_id = intval($curr_id);
-		$icon_type = intval($icon_type);
-
 		// check account is exist
-		if (!$this->is_exist($acc_id))
+		$accObj = $this->getItem($item_id);
+		if (!$accObj)
 			return FALSE;
 
 		// check user of account
-		if ($this->getUser($acc_id) != self::$user_id)
+		if ($accObj->user_id != self::$user_id)
 			return FALSE;
 
-		// check is currency exist
-		if (!$this->currMod->is_exist($curr_id))
-			return FALSE;
+		$res = $this->checkParams($params, TRUE);
+		if (is_null($res))
+			return NULL;
+
+		if (isset($res["name"]))
+		{
+			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+			$row = $this->dbObj->fetchRow($qResult);
+			if ($row)
+			{
+				$found_id = intval($row["id"]);
+				if ($found_id != $item_id)
+				{
+					wlog("Such item already exist");
+					return NULL;
+				}
+			}
+		}
 
 		// get initial balance to calc difference
-		$diff = 0.0;
-		$initbalance = $this->getInitBalance($acc_id);
-		$diff = $balance - $initbalance;
+		$diff = round($res["balance"] - $accObj->initbalance, 2);
 
-		$curDate = date("Y-m-d H:i:s");
-
-		$assingArr = [ "name" => $accname, "curr_id" => $curr_id, "icon" => $icon_type, "updatedate" => $curDate];
-
-		if (abs($diff) > 0.01)
+		if (abs($diff) >= 0.01)
 		{
-			$newbalance = $this->getBalance($acc_id) + $diff;
-
-			$assingArr["balance"] = $newbalance;
-			$assingArr["initbalance"] = $balance;
+			$res["balance"] = $accObj->balance + $diff;
+			$res["initbalance"] = $res["balance"];
+		}
+		else
+		{
+			unset($res["balance"]);
+			unset($res["initbalance"]);
 		}
 
-		if (!$this->dbObj->updateQ($this->tbl_name, $assingArr, "id=".$acc_id))
-			return FALSE;
+		$res["updatedate"] = date("Y-m-d H:i:s");
 
-		$this->cleanCache();
-
-		return TRUE;
+		return $res;
 	}
 
 
-	// Delete account
-	public function del($acc_id)
+	// Preparations for item delete
+	protected function preDelete($item_id)
 	{
-		if (!$acc_id || !is_numeric($acc_id))
-			return FALSE;
-
-		$acc_id = intval($acc_id);
-
 		// check account is exist
-		if (!$this->is_exist($acc_id))
+		$accObj = $this->getItem($item_id);
+		if (!$accObj)
 			return FALSE;
 
 		// check user of account
-		if ($this->getUser($acc_id) != self::$user_id)
+		if ($accObj->user_id != self::$user_id)
 			return FALSE;
 
 		$transMod = new TransactionModel(self::$user_id);
-		if (!$transMod->onAccountDelete($acc_id))
+		if (!$transMod->onAccountDelete($item_id))
 		{
-			wlog("trans->onAccountDelete(".$acc_id.") return FALSE");
+			wlog("trans->onAccountDelete(".$item_id.") return FALSE");
 			return FALSE;
 		}
-
-		// delete account
-		$condArr = ["user_id=".self::$user_id, "id=".$acc_id];
-		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
-			return FALSE;
-
-		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -221,9 +272,9 @@ class AccountModel extends CachedTable
 		if (!$this->checkCache())
 			return FALSE;
 
-		foreach(self::$dcache as $acc_id => $row)
+		foreach($this->cache as $acc_id => $item)
 		{
-			if ($row["owner_id"] == $p_id)
+			if ($item->owner_id == $p_id)
 			{
 				if (!$this->del($acc_id))
 					return FALSE;
@@ -242,9 +293,9 @@ class AccountModel extends CachedTable
 
 		$newValue = $this->dbObj->escape($newValue);
 
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ $field => $newValue, "updatedate" => date("Y-m-d H:i:s") ],
-									"id=".$acc_id))
+		if (!$this->update($acc_id,
+							[ $field => $newValue,
+								"updatedate" => date("Y-m-d H:i:s") ]))
 			return FALSE;
 
 		$this->cleanCache();
@@ -270,148 +321,31 @@ class AccountModel extends CachedTable
 	}
 
 
-	// Return owner of account
-	public function getOwner($acc_id)
-	{
-		return $this->getCache($acc_id, "owner_id");
-	}
-
-
-	// Return user of account
-	public function getUser($acc_id)
-	{
-		return $this->getCache($acc_id, "user_id");
-	}
-
-
-	// Return currency of account
-	public function getCurrency($acc_id)
-	{
-		return $this->getCache($acc_id, "curr_id");
-	}
-
-
-	// Set currency of account
-	public function setCurrency($acc_id, $curr_id)
-	{
-		if (!$acc_id || is_numeric($curr_id))
-			return FALSE;
-
-		return $this->setValue($acc_id, "curr_id", intval($curr_id));
-	}
-
-
-	// Return name of account
-	public function getName($acc_id)
-	{
-		return $this->getCache($acc_id, "name");
-	}
-
-
-	// Set initial balance of account
-	public function setName($acc_id, $name)
-	{
-		if (!$acc_id || is_null($name) || $name == "")
-			return FALSE;
-
-		return $this->setValue($acc_id, "name", $name);
-	}
-
-
-	// Return current balance of account
-	public function getBalance($acc_id)
-	{
-		return $this->getCache($acc_id, "balance");
-	}
-
-
-	// Set owner of account
-	public function setOwner($acc_id, $owner_id)
-	{
-		if (!$acc_id || !$owner_id || !is_numeric($owner_id))
-			return FALSE;
-
-		return $this->setValue($acc_id, "owner_id", intval($owner_id));
-	}
-
-
 	// Set balance of account
 	public function setBalance($acc_id, $balance)
 	{
-		if (!$acc_id || !is_numeric($balance))
-			return FALSE;
-
-		return $this->setValue($acc_id, "balance", floatval($balance));
-	}
-
-
-	// Return name of account
-	public function getInitBalance($acc_id)
-	{
-		return $this->getCache($acc_id, "initbalance");
-	}
-
-
-	// Set initial balance of account
-	public function setInitBalance($acc_id, $initbalance)
-	{
-		if (!$acc_id || !is_numeric($initbalance))
-			return FALSE;
-
-		return $this->setValue($acc_id, "initbalance", floatval($initbalance));
-	}
-
-
-	// Return icon type of account
-	public function getIcon($acc_id)
-	{
-		return $this->getCache($acc_id, "icon");
-	}
-
-
-	// Return name of account
-	public function setIcon($acc_id, $icon_type)
-	{
-		if (!$acc_id || !is_numeric($icon_type))
-			return FALSE;
-
-		return $this->setValue($acc_id, "icon", intval($icon_type));
-	}
-
-
-	// Return id of account by specified position
-	public function getIdByPos($position)
-	{
-		if (!$this->checkCache())
-			return 0;
-
-		$keys = array_keys(self::$dcache);
-		if (isset($keys[$position]))
-			return $keys[$position];
-
-		return 0;
+		return $this->update($acc_id, [ "balance" => $balance ]);
 	}
 
 
 	// Return name of account if owner is user or name of person else
 	public function getNameOrPerson($acc_id)
 	{
-		if (!is_numeric($acc_id))
-			return "";
+		$accObj = $this->getItem($acc_id);
+		if (!$accObj || !isset($accObj->owner_id))
+			return NULL;
 
-		$acc_id = intval($acc_id);
-		if (!$acc_id)
-			return "";
-
-		$acc_onwer = $this->getOwner($acc_id);
-		if (self::$owner_id == $acc_onwer || !self::$full_list)
+		if (self::$owner_id == $accObj->owner_id || !self::$full_list)
 		{
-			return $this->getName($acc_id);
+			return $accObj->name;
 		}
 		else
 		{
-			$persMod = new PersonModel(self::$user_id);
-			return $persMod->getName($acc_onwer);
+			$pObj = $this->personMod->getItem($accObj->owner_id);
+			if (!$pObj)
+				return NULL;
+
+			return $pObj->name;
 		}
 	}
 
@@ -431,16 +365,16 @@ class AccountModel extends CachedTable
 		if (!$this->checkCache())
 			return $resArr;
 
-		foreach(self::$dcache as $acc_id => $row)
+		foreach($this->cache as $acc_id => $item)
 		{
 			$accObj = new stdClass;
 
 			$accObj->id = $acc_id;
-			$accObj->curr_id = $row["curr_id"];
-			$accObj->balance = $row["balance"];
-			$accObj->name = $row["name"];
-			$accObj->icon = $row["icon"];
-			$accObj->initbalance = $row["initbalance"];
+			$accObj->curr_id = $item->curr_id;
+			$accObj->balance = $item->balance;
+			$accObj->name = $item->name;
+			$accObj->icon = $item->icon;
+			$accObj->initbalance = $item->initbalance;
 
 			$resArr[] = $accObj;
 		}
@@ -457,16 +391,14 @@ class AccountModel extends CachedTable
 		if (!$this->checkCache())
 			return $res;
 
-		$accounts = count(self::$dcache);
+		$accounts = count($this->cache);
 
-		foreach(self::$dcache as $acc_id => $row)
+		foreach($this->cache as $acc_id => $item)
 		{
-			$acc_balance = $this->getBalance($acc_id);
-			$icon_id = $row["icon"];
-			$acc_icon = $this->getIconClass($icon_id);
-			$balance_fmt = $this->currMod->format($row["balance"], $row["curr_id"]);
+			$acc_icon = $this->getIconClass($item->icon);
+			$balance_fmt = $this->currMod->format($item->balance, $item->curr_id);
 
-			$res[$acc_id] = ["name" => $row["name"],
+			$res[$acc_id] = ["name" => $item->name,
 								"balance" => $balance_fmt,
 								"icon" => $acc_icon];
 		}
@@ -492,14 +424,16 @@ class AccountModel extends CachedTable
 		if (!$this->checkCache())
 			return $res;
 
-		foreach(self::$dcache as $acc_id => $row)
+		foreach($this->cache as $acc_id => $item)
 		{
-			$currname = $this->currMod->getName($row["curr_id"]);
+			$currObj = $this->currMod->getItem($item->curr_id);
+			if (!$currObj)
+				return NULL;
 
-			if ($currname != "" && !isset($res[$row["curr_id"]]))
-				$res[$row["curr_id"]] = 0;
+			if (!isset($res[$item->curr_id]))
+				$res[$item->curr_id] = 0;
 
-			$res[$row["curr_id"]] += $row["balance"];
+			$res[$item->curr_id] += $item->balance;
 		}
 
 		return $res;
@@ -509,19 +443,22 @@ class AccountModel extends CachedTable
 	// Build array with properties of account
 	public function getProperties($acc_id)
 	{
-		$acc_id = intval($acc_id);
-		if (!$this->is_exist($acc_id))
+		$accObj = $this->getItem($acc_id);
+		if (!$accObj)
 			return NULL;
 
-		$res = ["id" => $acc_id,
-					"owner" => self::$dcache[$acc_id]["owner_id"],
-					"name" => self::$dcache[$acc_id]["name"],
-					"balance" => self::$dcache[$acc_id]["balance"],
-					"initbalance" => self::$dcache[$acc_id]["initbalance"],
-					"curr" => self::$dcache[$acc_id]["curr_id"],
-					"sign" => $this->currMod->getSign(self::$dcache[$acc_id]["curr_id"]),
-					"icon" => self::$dcache[$acc_id]["icon"],
-					"iconclass" => $this->getIconClass(self::$dcache[$acc_id]["icon"])];
+		$res = new stdClass;
+		$res->id = $accObj->id;
+		$res->owner = $accObj->owner_id;		// TODO : use owner_id
+		$res->name = $accObj->name;
+		$res->balance = $accObj->balance;
+		$res->initbalance = $accObj->initbalance;
+		$res->curr = $accObj->curr_id;			// TODO : use curr_id
+
+		$currObj = $this->currMod->getItem($accObj->curr_id);
+		$res->sign = ($currObj) ? $currObj->sign : NULL;
+		$res->icon = $accObj->icon;
+		$res->iconclass = $this->getIconClass($accObj->icon);
 
 		return $res;
 	}

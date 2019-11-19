@@ -41,75 +41,122 @@ class CurrencyModel extends CachedTable
 	}
 
 
-	// Update cache
-	protected function updateCache()
+	// Convert DB row to item object
+	protected function rowToObj($row)
 	{
-		self::$dcache = [];
+		if (is_null($row))
+			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name);
-		while($row = $this->dbObj->fetchRow($qResult))
+		$res = new stdClass;
+		$res->id = intval($row["id"]);
+		$res->name = $row["name"];
+		$res->sign = $row["sign"];
+		$res->format = intval($row["format"]);
+		$res->createdate = strtotime($row["createdate"]);
+		$res->updatedate = strtotime($row["updatedate"]);
+
+		return $res;
+	}
+
+
+	// Called from CachedTable::updateCache() and return data query object
+	protected function dataQuery()
+	{
+		return $this->dbObj->selectQ("*", $this->tbl_name);
+	}
+
+
+	protected function checkParams($params, $isUpdate = FALSE)
+	{
+		$avFields = ["name", "sign", "format"];
+		$res = [];
+
+		if (!$isUpdate)
 		{
-			$curr_id = $row["id"];
-
-			self::$dcache[$curr_id]["name"] = $row["name"];
-			self::$dcache[$curr_id]["sign"] = $row["sign"];
-			self::$dcache[$curr_id]["format"] = $row["format"];
-			self::$dcache[$curr_id]["createdate"] = strtotime($row["createdate"]);
-			self::$dcache[$curr_id]["updatedate"] = strtotime($row["updatedate"]);
+			foreach($avFields as $field)
+			{
+				if (!isset($params[$field]))
+				{
+					wlog($field." parameter not found");
+					return NULL;
+				}
+			}
 		}
+
+		if (isset($params["name"]))
+		{
+			$res["name"] = $this->dbObj->escape($params["name"]);
+			if (is_empty($res["name"]))
+			{
+				wlog("Invalid name specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["sign"]))
+		{
+			$res["sign"] = $this->dbObj->escape($params["sign"]);
+			if (is_empty($res["sign"]))
+			{
+				wlog("Invalid sign specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["format"]))
+			$res["format"] = intval($params["format"]);
+
+		return $res;
 	}
 
 
-	// Create new currency and return id if successfully
-	public function create($curr_name, $curr_sign, $curr_format)
+	// Preparations for item create
+	protected function preCreate($params)
 	{
-		$curr_name = $this->dbObj->escape($curr_name);
-		$curr_sign = $this->dbObj->escape($curr_sign);
-		$curr_format = intval($curr_format);
+		$res = $this->checkParams($params);
+		if (is_null($res))
+			return NULL;
 
-		if (!$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
-			return 0;
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+		if ($this->dbObj->rowsCount($qResult) > 0)
+		{
+			wlog("Such item already exist");
+			return NULL;
+		}
 
-		$curDate = date("Y-m-d H:i:s");
+		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
-		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
-														"name" => $curr_name,
-														"sign" => $curr_sign,
-														"format" => $curr_format,
-														"createdate" => $curDate,
-														"updatedate" => $curDate ]))
-			return 0;
-
-		$this->cleanCache();
-
-		return $this->dbObj->insertId();
+		return $res;
 	}
 
 
-	// Edit specified currency
-	public function edit($curr_id, $curr_name, $curr_sign, $curr_format)
+	// Preparations for item update
+	protected function preUpdate($item_id, $params)
 	{
-		$curr_id = intval($curr_id);
-		$curr_name = $this->dbObj->escape($curr_name);
-		$curr_sign = $this->dbObj->escape($curr_sign);
-		$curr_format = intval($curr_format);
-
-		if (!$curr_id || !$curr_name || $curr_name == "" || !$curr_sign || $curr_sign == "")
+		// check currency is exist
+		$currObj = $this->getItem($item_id);
+		if (!$currObj)
 			return FALSE;
 
-		if (!$this->is_exist($curr_id))
-			return FALSE;
+		$res = $this->checkParams($params, TRUE);
+		if (is_null($res))
+			return NULL;
 
-		$curDate = date("Y-m-d H:i:s");
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+		$row = $this->dbObj->fetchRow($qResult);
+		if ($row)
+		{
+			$found_id = intval($row["id"]);
+			if ($found_id != $item_id)
+			{
+				wlog("Such item already exist");
+				return NULL;
+			}
+		}
 
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "name" => $curr_name, "sign" => $curr_sign, "format" => $curr_format, "updatedate" => $curDate],
-									"id=".$curr_id))
-			return FALSE;
+		$res["updatedate"] = date("Y-m-d H:i:s");
 
-		$this->cleanCache();
-
-		return TRUE;
+		return $res;
 	}
 
 
@@ -132,69 +179,31 @@ class CurrencyModel extends CachedTable
 	}
 
 
-	// Delete specified currency
-	public function del($curr_id)
+	// Preparations for item delete
+	protected function preDelete($item_id)
 	{
-		$curr_id = intval($curr_id);
-		if (!$curr_id)
+		// check currency is exist
+		$currObj = $this->getItem($item_id);
+		if (!$currObj)
 			return FALSE;
 
 		// don't delete currencies in use
-		if ($this->isInUse($curr_id))
+		if ($this->isInUse($item_id))
 			return FALSE;
-
-		if (!$this->dbObj->deleteQ($this->tbl_name, "id=".$curr_id))
-			return FALSE;
-
-		$this->cleanCache();
 
 		return TRUE;
-	}
-
-
-	// Return name of specified currency
-	public function getName($curr_id)
-	{
-		return $this->getCache($curr_id, "name");
-	}
-
-
-	// Return sign of specified currency
-	public function getSign($curr_id)
-	{
-		return $this->getCache($curr_id, "sign");
-	}
-
-
-	// Return format of specified currency
-	public function getFormat($curr_id)
-	{
-		return $this->getCache($curr_id, "format");
 	}
 
 
 	// Format value in specified currency
 	public function format($value, $curr_id)
 	{
-		$fmt = $this->getFormat($curr_id);
-		$sign = $this->getSign($curr_id);
+		$currObj = $this->getItem($curr_id);
+		if (!$currObj)
+			return NULL;
 
-		$sfmt = (($fmt) ? ($sign." %s") : ("%s ".$sign));
+		$sfmt = (($currObj->format) ? ($currObj->sign." %s") : ("%s ".$currObj->sign));
 		return valFormat($sfmt, $value);
-	}
-
-
-	// Return id of account by specified position
-	public function getIdByPos($position)
-	{
-		if (!$this->checkCache())
-			return 0;
-
-		$keys = array_keys(self::$dcache);
-		if (isset($keys[$position]))
-			return $keys[$position];
-
-		return 0;
 	}
 
 
@@ -206,14 +215,14 @@ class CurrencyModel extends CachedTable
 		if (!$this->checkCache())
 			return $res;
 
-		foreach(self::$dcache as $curr_id => $row)
+		foreach($this->cache as $curr_id => $item)
 		{
 			$currObj = new stdClass;
 
-			$currObj->id = $curr_id;
-			$currObj->name = $row["name"];
-			$currObj->sign = $row["sign"];
-			$currObj->format = intval($row["format"]);
+			$currObj->id = $item->id;
+			$currObj->name = $item->name;
+			$currObj->sign = $item->sign;
+			$currObj->format = $item->format;
 
 			$res[] = $currObj;
 		}

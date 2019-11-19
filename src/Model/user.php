@@ -42,23 +42,29 @@ class UserModel extends CachedTable
 	}
 
 
-	// Update cache
-	protected function updateCache()
+	// Convert DB row to item object
+	protected function rowToObj($row)
 	{
-		self::$dcache = [];
+		if (is_null($row))
+			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name);
-		while($row = $this->dbObj->fetchRow($qResult))
-		{
-			$user_id = $row["id"];
+		$res = new stdClass;
+		$res->id = intval($row["id"]);
+		$res->login = $row["login"];
+		$res->passhash = $row["passhash"];
+		$res->owner_id = intval($row["owner_id"]);
+		$res->access = intval($row["access"]);
+		$res->createdate = strtotime($row["createdate"]);
+		$res->updatedate = strtotime($row["updatedate"]);
 
-			self::$dcache[$user_id]["login"] = $row["login"];
-			self::$dcache[$user_id]["passhash"] = $row["passhash"];
-			self::$dcache[$user_id]["owner_id"] = intval($row["owner_id"]);
-			self::$dcache[$user_id]["access"] = intval($row["access"]);
-			self::$dcache[$user_id]["createdate"] = strtotime($row["createdate"]);
-			self::$dcache[$user_id]["updatedate"] = strtotime($row["updatedate"]);
-		}
+		return $res;
+	}
+
+
+	// Called from CachedTable::updateCache() and return data query object
+	protected function dataQuery()
+	{
+		return $this->dbObj->selectQ("*", $this->tbl_name);
 	}
 
 
@@ -170,7 +176,7 @@ class UserModel extends CachedTable
 			return 0;
 		}
 
-		$user_id = $this->getId($loginCook);
+		$user_id = $this->getIdByLogin($loginCook);
 		$_SESSION["userid"] = $user_id;
 
 		$this->setupCookies($loginCook, $passCook);
@@ -182,7 +188,11 @@ class UserModel extends CachedTable
 	// Return access type of specified user
 	public function getAccess($id)
 	{
-		return $this->getCache($id, "access");
+		$uObj = $this->getItem($id);
+		if (!$uObj)
+			return NULL;
+
+		return $uObj->access;
 	}
 
 
@@ -196,19 +206,23 @@ class UserModel extends CachedTable
 	// Return login of user
 	public function getLogin($id)
 	{
-		return $this->getCache($id, "login");
+		$uObj = $this->getItem($id);
+		if (!$uObj)
+			return NULL;
+
+		return $uObj->login;
 	}
 
 
 	// Return user id by specified login
-	public function getId($login)
+	public function getIdByLogin($login)
 	{
 		if (!$this->checkCache())
 			return 0;
 
-		foreach(self::$dcache as $u_id => $row)
+		foreach($this->cache as $u_id => $item)
 		{
-			if ($row["login"] == $login)
+			if ($item->login == $login)
 				return $u_id;
 		}
 
@@ -225,7 +239,10 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		// check owner is already the same
-		$cur_owner = $this->getOwner($u_id);
+		$uObj = $this->getItem($u_id);
+		if (!$uObj)
+			return FALSE;
+		$cur_owner = $uObj->owner_id;
 		if ($cur_owner == $o_id)
 			return TRUE;
 
@@ -244,13 +261,6 @@ class UserModel extends CachedTable
 		$this->cleanCache();
 
 		return TRUE;
-	}
-
-
-	// Return owner person of specified user
-	public function getOwner($user_id)
-	{
-		return $this->getCache($user_id, "owner_id");
 	}
 
 
@@ -274,43 +284,95 @@ class UserModel extends CachedTable
 	// Return password hash for specified user
 	public function getPassHash($login)
 	{
-		$u_id = $this->getId($login);
+		$u_id = $this->getIdByLogin($login);
 
-		return $this->getCache($u_id, "passhash");
+		$uObj = $this->getItem($u_id);
+		if (!$uObj)
+			return NULL;
+
+		return $uObj->passhash;
 	}
 
 
-	// Register new user
-	public function register($login, $password, $p_name)
+	protected function checkParams($params, $isUpdate = FALSE)
 	{
-		if (!$login || $login == "" || !$password || $password == "" || !$p_name || $p_name == "")
-			return FALSE;
+		$avFields = ["login", "password", "name"];
+		$res = [];
+
+		if (!$isUpdate)
+		{
+			foreach($avFields as $field)
+			{
+				if (!isset($params[$field]))
+				{
+					wlog($field." parameter not found");
+					return NULL;
+				}
+			}
+		}
+
+		if (isset($params["login"]))
+		{
+			$res["login"] = $this->dbObj->escape($params["login"]);
+			if (is_empty($res["login"]))
+			{
+				wlog("Invalid login specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["password"]) && isset($res["login"]))
+		{
+			$res["passhash"] = $this->createHash($res["login"], $params["password"]);
+			if (is_empty($res["passhash"]))
+			{
+				wlog("Invalid password specified");
+				return NULL;
+			}
+		}
+
+		if (isset($params["name"]))
+		{
+			$res["name"] = $this->dbObj->escape($params["name"]);
+			if (is_empty($res["name"]))
+			{
+				wlog("Invalid name specified");
+				return NULL;
+			}
+		}
+
+		return $res;
+	}
+
+
+	protected function preCreate($params)
+	{
+		$res = $this->checkParams($params);
+		if (is_null($res))
+			return NULL;
 
 		// check user exist
-		if ($this->getId($login) != 0)
+		if ($this->getIdByLogin($res["login"]) != 0)
 			return FALSE;
 
-		$passhash = $this->createHash($login, $password);
-		$elogin = $this->dbObj->escape($login);
-		$curDate = date("Y-m-d H:i:s");
+		$res["owner_id"] = 0;
+		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
+		$this->personName = $res["name"];
+		unset($res["name"]);
 
-		if (!$this->dbObj->insertQ($this->tbl_name, [ "id" => NULL,
-														"login" => $elogin,
-														"passhash" => $passhash,
-														"createdate" => $curDate,
-														"updatedate" => $curDate ]))
-			return FALSE;
+		return $res;
+	}
 
-		$user_id = $this->dbObj->insertId();
 
-		$pMod = new PersonModel($user_id);
-		$p_id = $pMod->create($p_name);
-
-		$this->setOwner($user_id, $p_id);
-
+	protected function postCreate($item_id)
+	{
 		$this->cleanCache();
 
-		return TRUE;
+		$pMod = new PersonModel($item_id);
+		$p_id = $pMod->create($this->personName);
+		unset($this->personName);
+
+		$this->setOwner($item_id, $p_id);
 	}
 
 
@@ -324,7 +386,7 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		sessionStart();
-		$_SESSION["userid"] = $this->getId($login);
+		$_SESSION["userid"] = $this->getIdByLogin($login);
 
 		$preHash = $this->createPreHash($login, $password);
 
@@ -364,7 +426,7 @@ class UserModel extends CachedTable
 		if (!$login || !$newpass)
 			return FALSE;
 
-		$user_id = $this->getId($login);
+		$user_id = $this->getIdByLogin($login);
 
 		$passhash = $this->createHash($login, $newpass);
 		if (!$this->setPassHash($login, $passhash))
@@ -394,7 +456,7 @@ class UserModel extends CachedTable
 			return TRUE;
 
 		// check no user exist with the same login
-		$luser_id = $this->getId($login);
+		$luser_id = $this->getIdByLogin($login);
 		if ($luser_id != 0 && $luser_id != $user_id)
 			return FALSE;
 
@@ -472,17 +534,21 @@ class UserModel extends CachedTable
 			$accCountArr[$o_id] = $acc_cnt;
 		}
 
-		foreach($this->cache as $u_id => $row)
+		foreach($this->cache as $u_id => $item)
 		{
 			$userObj = new stdClass;
 
 			$userObj->id = $u_id;
-			$userObj->login = $row["login"];
-			$userObj->access = $row["access"];
+			$userObj->login = $item->login;
+			$userObj->access = $item->access;
 
 			$pMod = new PersonModel($u_id);
-			$userObj->owner = $pMod->getName($row["owner_id"]);
-			$userObj->accCount = isset($accCountArr[$row["owner_id"]]) ? $accCountArr[$row["owner_id"]] : 0;
+			$pObj = $pMod->getItem($item->owner_id);
+			if (!$pObj)
+				throw new Error("Person ".$item->owner_id." not found");
+
+			$userObj->owner = $pObj->name;
+			$userObj->accCount = isset($accCountArr[$item->owner_id]) ? $accCountArr[$item->owner_id] : 0;
 			$userObj->trCount = isset($trCountArr[$u_id]) ? $trCountArr[$u_id] : 0;
 			$userObj->pCount = $pMod->getCount();
 
@@ -494,7 +560,7 @@ class UserModel extends CachedTable
 
 
 	// Delete user and all related data
-	public function del($user_id)
+	protected function preDelete($user_id)
 	{
 		$u_id = intval($user_id);
 		if (!$u_id)
@@ -505,9 +571,6 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		if (!$this->dbObj->deleteQ("persons", "user_id=".$u_id))
-			return FALSE;
-
-		if (!$this->dbObj->deleteQ($this->tbl_name, "id=".$u_id))
 			return FALSE;
 
 		return TRUE;

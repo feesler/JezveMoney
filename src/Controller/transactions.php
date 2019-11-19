@@ -139,12 +139,6 @@ class TransactionsController extends Controller
 		$trListData = [];
 		foreach($transArr as $trans)
 		{
-			if ($trans->type == DEBT)
-			{
-				$src_owner_id = $accMod->getOwner($trans->src_id);
-				$dest_owner_id = $accMod->getOwner($trans->dest_id);
-			}
-
 			$itemData = ["id" => $trans->id];
 
 			// Build accounts string
@@ -152,7 +146,7 @@ class TransactionsController extends Controller
 			if ($trans->src_id != 0)
 			{
 				if ($trans->type == EXPENSE || $trans->type == TRANSFER)		// expense or transfer
-					$accStr .= $accMod->getName($trans->src_id);
+					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->src_id);
 			}
@@ -163,7 +157,7 @@ class TransactionsController extends Controller
 			if ($trans->dest_id != 0)
 			{
 				if ($trans->type == INCOME || $trans->type == TRANSFER)		// income or transfer
-					$accStr .= $accMod->getName($trans->dest_id);
+					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
 				else if ($trans->type == DEBT)
 					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
 			}
@@ -266,15 +260,26 @@ class TransactionsController extends Controller
 
 			// Prepare person account
 			$person_id = $pMod->getIdByPos(0);
-			$person_name = $pMod->getName($person_id);
+			$pObj = $pMod->getItem($person_id);
+			if (!$pObj)
+				throw new Error("Person not found");
+
+			$person_name = $pObj->name;
 
 			$accMod = new AccountModel($user_id, TRUE);
-			$person_acc_id = $pMod->getAccount($person_id, $debtAcc["curr"]);
+			$person_acc_id = $pMod->getAccount($person_id, $debtAcc->curr);
 			$person_acc = $accMod->getProperties($person_acc_id);
-			$person_res_balance = $person_acc ? $person_acc["balance"] : 0.0;
+			$person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
 			$person_balance = $person_res_balance;
 
-			$tr = ["src_id" => $person_acc_id, "dest_id" => $acc_id, "src_amount" => 0, "dest_amount" => 0, "src_curr" => $debtAcc["curr"], "dest_curr" => $debtAcc["curr"], "type" => $trans_type, "comment" => ""];
+			$tr = [ "src_id" => $person_acc_id,
+					"dest_id" => $acc_id,
+					"src_amount" => 0,
+					"dest_amount" => 0,
+					"src_curr" => $debtAcc->curr,
+					"dest_curr" => $debtAcc->curr,
+					"type" => $trans_type,
+					"comment" => "" ];
 			$give = TRUE;
 		}
 		else
@@ -294,10 +299,24 @@ class TransactionsController extends Controller
 						"dest_id" => $dest_id,
 						"src_amount" => 0,
 						"dest_amount" => 0,
-						"src_curr" => ($src_id != 0) ? $accMod->getCurrency($src_id) : 0,
-						"dest_curr" => ($dest_id != 0) ? $accMod->getCurrency($dest_id) : 0,
+						"src_curr" => 0,
+						"dest_curr" => 0,
 						"type" => $trans_type,
 						"comment" => ""];
+
+			if ($src_id != 0)
+			{
+				$accObj = $accMod->getItem($src_id);
+				if ($accObj)
+					$tr["src_curr"] = $accObj->curr_id;
+			}
+
+			if ($dest_id != 0)
+			{
+				$accObj = $accMod->getItem($dest_id);
+				if ($accObj)
+					$tr["dest_curr"] = $accObj->curr_id;
+			}
 
 			if ($trans_type == EXPENSE)
 				$tr["dest_curr"] = $tr["src_curr"];
@@ -339,7 +358,7 @@ class TransactionsController extends Controller
 
 			$balDiff = $tr["src_amount"];
 			if ($trans_type != DEBT)
-				$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
+				$src->balfmt = $currMod->format($src->balance + $balDiff, $src->curr);
 		}
 
 		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
@@ -352,7 +371,7 @@ class TransactionsController extends Controller
 
 			$balDiff = $tr["dest_amount"];
 			if ($trans_type != DEBT)
-				$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
+				$dest->balfmt = $currMod->format($dest->balance - $balDiff, $dest->curr);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -360,11 +379,11 @@ class TransactionsController extends Controller
 
 		if ($trans_type != DEBT)
 		{
-			$transCurr = (($trans_type == EXPENSE) ? $src["curr"] : $dest["curr"]);
-			$transAccCurr = (($trans_type == EXPENSE) ? $src["curr"] : $dest["curr"]);
+			$transCurr = (($trans_type == EXPENSE) ? $src->curr : $dest->curr);
+			$transAccCurr = (($trans_type == EXPENSE) ? $src->curr : $dest->curr);
 
-			$srcAmountCurr = (!is_null($src)) ? $src["curr"] : $dest["curr"];
-			$destAmountCurr = (!is_null($dest)) ? $dest["curr"] : $src["curr"];
+			$srcAmountCurr = (!is_null($src)) ? $src->curr : $dest->curr;
+			$destAmountCurr = (!is_null($dest)) ? $dest->curr : $src->curr;
 
 			// Show destination amount for expense and source amount for income by default because it's amount with changing currency.
 			// Meanwhile source amount for expense and destination amount for income always have the same currency as account.
@@ -380,8 +399,8 @@ class TransactionsController extends Controller
 
 			$noAccount = FALSE;
 
-			$srcAmountCurr = $debtAcc["curr"];
-			$destAmountCurr = $debtAcc["curr"];
+			$srcAmountCurr = $debtAcc->curr;
+			$destAmountCurr = $debtAcc->curr;
 
 			$showSrcAmount = TRUE;
 			$showDestAmount = FALSE;
@@ -411,13 +430,17 @@ class TransactionsController extends Controller
 					$accLbl = "Source account";
 			}
 
-			$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] + $tr["dest_amount"], $debtAcc["curr"]);
+			$debtAcc->balfmt = $currMod->format($debtAcc->balance + $tr["dest_amount"], $debtAcc->curr);
 
 			$p_balfmt = $currMod->format($person_balance, $srcAmountCurr);
 		}
 
-		$srcAmountSign = $currMod->getSign($srcAmountCurr);
-		$destAmountSign = $currMod->getSign($destAmountCurr);
+		$currObj = $currMod->getItem($srcAmountCurr);
+		$srcAmountSign = $currObj ? $currObj->sign : NULL;
+
+		$currObj = $currMod->getItem($destAmountCurr);
+		$destAmountSign = $currObj ? $currObj->sign : NULL;
+
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = 1;
 
@@ -426,13 +449,13 @@ class TransactionsController extends Controller
 		$rtExchange = $exchValue." ".$exchSign;
 		if ($trans_type != DEBT)
 		{
-			$rtSrcResBal = $currMod->format($src["balance"], $src["curr"]);
-			$rtDestResBal = $currMod->format($dest["balance"], $dest["curr"]);
+			$rtSrcResBal = $src ? $currMod->format($src->balance, $src->curr) : NULL;
+			$rtDestResBal = $dest ? $currMod->format($dest->balance, $dest->curr) : NULL;
 		}
 		else
 		{
-			$rtSrcResBal = $currMod->format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
-			$rtDestResBal = $currMod->format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
+			$rtSrcResBal = $currMod->format(($give) ? $person_res_balance : $debtAcc->balance, $srcAmountCurr);
+			$rtDestResBal = $currMod->format(($give) ? $debtAcc->balance : $person_res_balance, $destAmountCurr);
 		}
 
 		$dateFmt = date("d.m.Y");
@@ -516,7 +539,7 @@ class TransactionsController extends Controller
 				$srcBalTitle .= " (Source)";
 
 			$balDiff = $tr["src_amount"];
-			$src["balfmt"] = $currMod->format($src["balance"] + $balDiff, $src["curr"]);
+			$src->balfmt = $currMod->format($src->balance + $balDiff, $src->curr);
 		}
 
 		$destBalTitle = "Result balance";
@@ -526,7 +549,7 @@ class TransactionsController extends Controller
 				$destBalTitle .= " (Destination)";
 
 			$balDiff = $tr["dest_amount"];
-			$dest["balfmt"] = $currMod->format($dest["balance"] - $balDiff, $dest["curr"]);
+			$dest->balfmt = $currMod->format($dest->balance - $balDiff, $dest->curr);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -539,7 +562,8 @@ class TransactionsController extends Controller
 			else if ($trans_type == INCOME && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
 				$transAcc_id = $tr["dest_id"];
 
-			$transAccCurr = $accMod->getCurrency($transAcc_id);
+			$accObj = $accMod->getItem($transAcc_id);
+			$transAccCurr = ($accObj) ? $accObj->curr_id : NULL;
 
 			$srcAmountCurr = $tr["src_curr"];
 			$destAmountCurr = $tr["dest_curr"];
@@ -569,18 +593,25 @@ class TransactionsController extends Controller
 			$src = $accMod->getProperties($tr["src_id"]);
 			$dest = $accMod->getProperties($tr["dest_id"]);
 
-			$user_owner = $uMod->getOwner($user_id);
-			$give = (!is_null($src) && $src["owner"] != $user_owner);
+			$uObj = $uMod->getItem($user_id);
+			if (!$uObj)
+				throw new Error("User not found");
+
+			$give = (!is_null($src) && $src->owner != $uObj->owner_id);
 
 			$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 			$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
-			$person_id = ($give) ? $src["owner"] : $dest["owner"];
-			$person_name = $pMod->getName($person_id);
+			$person_id = ($give) ? $src->owner : $dest->owner;
+			$pObj = $pMod->getItem($person_id);
+			if (!$pObj)
+				throw new Error("Person not found");
+
+			$person_name = $pObj->name;
 
 			$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
 			$person_acc = $accMod->getProperties($person_acc_id);
-			$person_res_balance = $person_acc["balance"];
+			$person_res_balance = $person_acc->balance;
 			$person_balance = $person_res_balance + (($give) ? $tr["src_amount"] : -$tr["dest_amount"]);
 
 			$debtAcc = $give ? $dest : $src;
@@ -590,13 +621,17 @@ class TransactionsController extends Controller
 			$destAmountCurr = $tr["dest_curr"];
 			if ($noAccount)
 			{
-				$destAmountCurr = $person_acc["curr"];
+				$destAmountCurr = $person_acc->curr;
 
 				$accMod = new AccountModel($user_id);
 				$acc_id = $accMod->getIdByPos(0);
-				$acc_name = $accMod->getName($acc_id);
-				$acc_balance = $currMod->format($accMod->getBalance($acc_id), $accMod->getCurrency($acc_id));
-				$acc_ic = $accMod->getIconClass($accMod->getIcon($acc_id));
+				$accObj = $accMod->getItem($acc_id);
+				if (!$accObj)
+					throw new Error("Account ".$acc_id." not found");
+
+				$acc_name = $accObj->name;
+				$acc_balance = $currMod->format($accObj->balance, $accObj->curr_id);
+				$acc_ic = $accMod->getIconClass(($accObj) ? $accObj->icon : NULL);
 			}
 			else
 			{
@@ -632,16 +667,20 @@ class TransactionsController extends Controller
 					$accLbl = "Source account";
 
 				if ($give)
-					$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] - $tr["dest_amount"], $debtAcc["curr"]);
+					$debtAcc->balfmt = $currMod->format($debtAcc->balance - $tr["dest_amount"], $debtAcc->curr);
 				else
-					$debtAcc["balfmt"] = $currMod->format($debtAcc["balance"] + $tr["src_amount"], $debtAcc["curr"]);
+					$debtAcc->balfmt = $currMod->format($debtAcc->balance + $tr["src_amount"], $debtAcc->curr);
 			}
 
 			$p_balfmt = $currMod->format($person_balance, $srcAmountCurr);
 		}
 
-		$srcAmountSign = $currMod->getSign($srcAmountCurr);
-		$destAmountSign = $currMod->getSign($destAmountCurr);
+		$currObj = $currMod->getItem($srcAmountCurr);
+		$srcAmountSign = $currObj ? $currObj->sign : NULL;
+
+		$currObj = $currMod->getItem($destAmountCurr);
+		$destAmountSign = $currObj ? $currObj->sign : NULL;
+
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
 		$backExchSign = $srcAmountSign."/".$destAmountSign;
@@ -654,13 +693,14 @@ class TransactionsController extends Controller
 			$rtExchange .= " (".$backExchValue." ".$backExchSign.")";
 		if ($trans_type != DEBT)
 		{
-			$rtSrcResBal = $currMod->format($src["balance"], $src["curr"]);
-			$rtDestResBal = $currMod->format($dest["balance"], $dest["curr"]);
+			$rtSrcResBal = ($src) ? $currMod->format($src->balance, $src->curr) : NULL;
+			$rtDestResBal = ($dest) ? $currMod->format($dest->balance, $dest->curr) : NULL;
 		}
 		else
 		{
-			$rtSrcResBal = $currMod->format(($give) ? $person_res_balance : $debtAcc["balance"], $srcAmountCurr);
-			$rtDestResBal = $currMod->format(($give) ? $debtAcc["balance"] : $person_res_balance, $destAmountCurr);
+			$acc_res_balance = ($debtAcc) ? $debtAcc->balance : NULL;
+			$rtSrcResBal = $currMod->format(($give) ? $person_res_balance : $acc_res_balance, $srcAmountCurr);
+			$rtDestResBal = $currMod->format(($give) ? $acc_res_balance : $person_res_balance, $destAmountCurr);
 		}
 
 		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
@@ -728,7 +768,15 @@ class TransactionsController extends Controller
 
 		if ($trans_type == DEBT)
 		{
-			if (!$debtMod->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$debtMod->create([ "op" => $debt_op,
+									"acc_id" => $acc_id,
+									"person_id" => $person_id,
+									"src_amount" => $src_amount,
+									"dest_amount" => $dest_amount,
+									"src_curr" => $src_curr,
+									"dest_curr" => $dest_curr,
+									"date" => $fdate,
+									"comment" => $comment ]))
 				$this->fail($defMsg);
 
 			setMessage(MSG_DEBT_CREATE);
@@ -746,19 +794,29 @@ class TransactionsController extends Controller
 			$accMod = new AccountModel($user_id);
 			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
 			{
-				$src_acc_curr = $accMod->getCurrency($src_id);
+				$accObj = $accMod->getItem($src_id);
+				$src_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
 				if ($src_acc_curr != $src_curr)
 					fail($defMsg);
 			}
 
 			if ($trans_type == INCOME || $trans_type == TRANSFER)
 			{
-				$dest_acc_curr = $accMod->getCurrency($dest_id);
+				$accObj = $accMod->getItem($dest_id);
+				$dest_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
 				if ($dest_acc_curr != $dest_curr)
 					fail($defMsg);
 			}
 
-			if (!$transMod->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$transMod->create([ "type" => $trans_type,
+										"src_id" => $src_id,
+										"dest_id" => $dest_id,
+										"src_amount" => $src_amount,
+										"dest_amount" => $dest_amount,
+										"src_curr" => $src_curr,
+										"dest_curr" => $dest_curr,
+										"date" => $fdate,
+										"comment" => $comment ]))
 				$this->fail($defMsg);
 
 			setMessage(MSG_TRANS_CREATE);
@@ -814,7 +872,15 @@ class TransactionsController extends Controller
 		$trans_id = intval($_POST["transid"]);
 		if ($trans_type == DEBT)
 		{
-			if (!$debtMod->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$debtMod->update($trans_id, [ "op" => $debt_op,
+												"acc_id" => $acc_id,
+												"person_id" => $person_id,
+												"src_amount" => $src_amount,
+												"dest_amount" => $dest_amount,
+												"src_curr" => $src_curr,
+												"dest_curr" => $dest_curr,
+												"date" => $fdate,
+												"comment" => $comment ]))
 				$this->fail($defMsg);
 			setMessage(MSG_DEBT_UPDATE);
 		}
@@ -824,19 +890,29 @@ class TransactionsController extends Controller
 			$accMod = new AccountModel($user_id);
 			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
 			{
-				$src_acc_curr = $accMod->getCurrency($src_id);
+				$accObj = $accMod->getItem($src_id);
+				$src_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
 				if ($src_acc_curr != $src_curr)
 					fail($defMsg);
 			}
 
 			if ($trans_type == INCOME || $trans_type == TRANSFER)
 			{
-				$dest_acc_curr = $accMod->getCurrency($dest_id);
+				$accObj = $accMod->getItem($dest_id);
+				$dest_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
 				if ($dest_acc_curr != $dest_curr)
 					fail($defMsg);
 			}
 
-			if (!$transMod->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$transMod->update($trans_id, [ "type" => $trans_type,
+												"src_id" => $src_id,
+												"dest_id" => $dest_id,
+												"src_amount" => $src_amount,
+												"dest_amount" => $dest_amount,
+												"src_curr" => $src_curr,
+												"dest_curr" => $dest_curr,
+												"date" => $fdate,
+												"comment" => $comment ]))
 				$this->fail($defMsg);
 		}
 

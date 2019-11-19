@@ -46,7 +46,9 @@ class CurrencyAdminController extends Controller
 
 		$curr_format = (isset($_POST["curr_format"]) && $_POST["curr_format"] == "on") ? 1 : 0;
 
-		if (!$this->model->create($_POST["curr_name"], $_POST["curr_sign"], $curr_format))
+		if (!$this->model->create([ "name" => $_POST["curr_name"],
+									"sign" => $_POST["curr_sign"],
+									"format" => $curr_format ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_CURRENCY_CREATE);
@@ -67,7 +69,9 @@ class CurrencyAdminController extends Controller
 		if (!isset($_POST["curr_id"]))
 			$this->fail($defMsg);
 
-		if (!$this->model->edit($_POST["curr_id"], $_POST["curr_name"], $_POST["curr_sign"], $curr_format))
+		if (!$this->model->update($_POST["curr_id"], [ "name" => $_POST["curr_name"],
+														"sign" => $_POST["curr_sign"],
+														"format" => $curr_format ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_CURRENCY_UPDATE);

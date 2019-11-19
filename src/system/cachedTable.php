@@ -1,41 +1,53 @@
 <?php
 
-abstract class CachedTable
+abstract class CachedTable extends Model
 {
 	protected $cache = NULL;
-
-
-	// Class constructor
-	public function __construct()
-	{
-	}
 
 
 	// Return link to cache of derived class
 	abstract protected function &getDerivedCache();
 
 
+	// Query data from DB and return result object
+	abstract protected function dataQuery();
+
+
 	// Update cache
-	abstract protected function updateCache();
+	protected function updateCache()
+	{
+		$this->cache = [];
+
+		$qResult = $this->dataQuery();
+		if (!$qResult)
+			return;
+
+		while($row = $this->dbObj->fetchRow($qResult))
+		{
+			$obj = $this->rowToObj($row);
+			if (!is_null($obj))
+				$this->cache[$obj->id] = $obj;
+		}
+	}
 
 
 	// Check state of cache and update if needed
-	protected function checkCache($obj_id = 0)
+	protected function checkCache()
 	{
 		$this->cache =& $this->getDerivedCache();
 
-		if (is_null($this->cache) || $obj_id != 0)
-			$this->updateCache($obj_id);
+		if (is_null($this->cache))
+			$this->updateCache();
 
 		return (!is_null($this->cache));
 	}
 
 
-	// Return value of specified object from cache
-	protected function getCache($obj_id, $val)
+	// Return specified object from cache
+	public function getItem($obj_id)
 	{
 		$obj_id = intval($obj_id);
-		if (!$obj_id || !$val)
+		if (!$obj_id)
 			return NULL;
 
 		if (!$this->checkCache())
@@ -44,7 +56,18 @@ abstract class CachedTable
 		if (!isset($this->cache[$obj_id]))
 			return NULL;
 
-		return $this->cache[$obj_id][$val];
+		return $this->cache[$obj_id];
+	}
+
+
+	// Return value of specified object from cache
+	protected function getCache($obj_id, $val)
+	{
+		$item = $this->getItem($obj_id);
+		if (is_null($item) || !isset($item->$val))
+			return NULL;
+
+		return $item->$val;
 	}
 
 
@@ -58,19 +81,32 @@ abstract class CachedTable
 	// Return count of objects
 	public function getCount()
 	{
-		if (!self::checkCache())
+		if (!$this->checkCache())
 			return 0;
 
 		return count($this->cache);
 	}
 
 
+	// Return latest id from set of objects
+	public function getLatestId()
+	{
+		if (!$this->checkCache())
+			return 0;
+
+		$res = 0;
+		foreach($this->cache as $item_id => $itemObj)
+		{
+			$res = max($res, $item_id);
+		}
+
+		return $res;
+	}
+
+
 	// Check is specified object is exist
 	public function is_exist($obj_id)
 	{
-		if (!is_numeric($obj_id))
-			return FALSE;
-
 		$obj_id = intval($obj_id);
 		if (!$obj_id)
 			return FALSE;
@@ -79,5 +115,37 @@ abstract class CachedTable
 			return FALSE;
 
 		return isset($this->cache[$obj_id]);
+	}
+
+
+	// Return id of item by specified position
+	public function getIdByPos($position)
+	{
+		if (!$this->checkCache())
+			return 0;
+
+		$keys = array_keys($this->cache);
+		if (isset($keys[$position]))
+			return $keys[$position];
+
+		return 0;
+	}
+
+
+	protected function postCreate($item_id)
+	{
+		$this->cleanCache();
+	}
+
+
+	protected function postUpdate($item_id)
+	{
+		$this->cleanCache();
+	}
+
+
+	protected function postDelete($item_id)
+	{
+		$this->cleanCache();
 	}
 }
