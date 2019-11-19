@@ -5,6 +5,7 @@ var Environment = (function()
 	var restbl = null;
 	var totalRes = null, okRes = null, failRes = null;
 	var baseURL = null;
+	var results = null;
 
 
 	function getBaseUrl()
@@ -171,7 +172,10 @@ var Environment = (function()
 	{
 		message = message || '';
 
-		totalRes.innerHTML = ++results.total;
+		if (results.expected)
+			totalRes.innerHTML = ++results.total + '/' + results.expected;
+		else
+			totalRes.innerHTML = ++results.total;
 		okRes.innerHTML = (res) ? ++results.ok : results.ok;
 		failRes.innerHTML = (res) ? results.fail : ++results.fail;
 
@@ -221,7 +225,7 @@ var Environment = (function()
 	}
 
 
-	async function initTests(url, navHandler)
+	async function initTests(config, navHandler)
 	{
 		var startbtn = ge('startbtn');
 		totalRes = ge('totalRes');
@@ -232,14 +236,21 @@ var Environment = (function()
 		if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
 			throw new Error('Fail to init tests');
 
-		baseURL = url;
+		if (!config || !config.url)
+			throw new Error('Invalid config: test URL not found');
+
+		baseURL = config.url;
 
 		startbtn.onclick = async function()
 		{
-			results = { total : 0, ok : 0, fail : 0 };
-			await addResult('Test initialization', 'OK');
+			results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
-			let view = await navigation(async () => viewframe.src = url );
+			if (config.testsExpected)
+				results.expected = config.testsExpected;
+
+			await addResult('Test initialization', true);
+
+			let view = await navigation(async () => viewframe.src = baseURL );
 			view = await navHandler(view);
 		};
 	}

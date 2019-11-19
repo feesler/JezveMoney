@@ -653,15 +653,15 @@ async function reloginAsTester(view)
 var config = {
 /*	url : 'https://jezve.net/money/'	*/
 	url : 'http://jezvemoney/'
+	testsExpected : 589
 };
+
+
+var main = { config : config,
+				startTests : startTests };
 
 
 if (typeof module !== 'undefined' && module.exports)
 {
-	module.exports = { testURL : config.url,
-						startTests : startTests };
-}
-else
-{
-	var testURL = config.url;
+	module.exports = main;
 }

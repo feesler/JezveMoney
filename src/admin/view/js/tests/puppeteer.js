@@ -10,6 +10,7 @@ var Environment = (function()
 {
 	var browserPage = null;
 	var baseURL = null;
+	var results = null;
 
 
 	function getBaseUrl()
@@ -189,7 +190,16 @@ var Environment = (function()
 
 	function addResult(descr, res, message)
 	{
-		console.log(descr + ': ' + (res ? chalk.green('OK') : chalk.red('FAIL')) + (message ? ' ' + message : ''));
+		if (res)
+			results.ok++;
+		else
+			results.fail++;
+
+		let counter = ++results.total;
+		if (results.expected)
+			counter += '/' + results.expected;
+
+		console.log('[' + counter + '] ' + descr + ': ' + (res ? chalk.green('OK') : chalk.red('FAIL')) + (message ? ' ' + message : ''));
 	}
 
 
@@ -232,16 +242,24 @@ var Environment = (function()
 	}
 
 
-	async function initTests(url, navHandler)
+	async function initTests(config, navHandler)
 	{
 		let res = 1;
 		let view;
 		let browser;
 
-		baseURL = url;
-
 		try
 		{
+			results = { total : 0, ok : 0, fail : 0, expected : 0 };
+
+			if (!config || !config.url)
+				throw new Error('Invalid config: test URL not found');
+
+			baseURL = config.url;
+
+			if (config.testsExpected)
+				results.expected = config.testsExpected;
+
 			browser = await puppeteer.launch({ headless : true,
 												args : [ '--proxy-server="direct://"',
 															'--proxy-bypass-list=*' ] });
@@ -249,7 +267,9 @@ var Environment = (function()
 			browserPage = (allPages.length) ? allPages[0] : await browser.newPage();
 			browserPage.setDefaultNavigationTimeout(0);
 
-			view = await navigation(() => browserPage.goto(url));
+			await addResult('Test initialization', true);
+
+			view = await navigation(() => browserPage.goto(baseURL));
 			view = await navHandler(view);
 			res = 0;
 		}
@@ -285,4 +305,4 @@ var Environment = (function()
 })();
 
 
-Environment.init(main.testURL, main.startTests);
+Environment.init(main.config, main.startTests);
