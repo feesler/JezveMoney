@@ -208,7 +208,7 @@ class CurrencyModel extends CachedTable
 
 
 	// Return array of currencies
-	public function getArray()
+	public function getData()
 	{
 		$res = [];
 

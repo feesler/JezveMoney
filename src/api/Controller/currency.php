@@ -44,7 +44,7 @@ class CurrencyApiController extends ApiController
 	{
 		$respObj = new apiResponse;
 
-		$respObj->data = $this->model->getArray();
+		$respObj->data = $this->model->getData();
 		$respObj->ok();
 	}
 

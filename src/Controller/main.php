@@ -11,8 +11,8 @@ class MainController extends Controller
 		$persMod = new PersonModel($user_id);
 		$currMod = new CurrencyModel();
 
-		$currArr = $currMod->getArray();
-		$accArr = $accMod->getArray();
+		$currArr = $currMod->getData();
+		$accArr = $accMod->getData();
 
 		$tilesArr = $accMod->getTilesArray();
 		$totalsArr = $accMod->getTotalsArray();
@@ -29,7 +29,7 @@ class MainController extends Controller
 
 		// Prepare data of transaction list items
 		$tr_count = 5;
-		$latestArr = $transMod->getArray(0, 0, TRUE, $tr_count);
+		$latestArr = $transMod->getData(0, 0, TRUE, $tr_count);
 		$trListData = [];
 		foreach($latestArr as $trans)
 		{
@@ -80,7 +80,7 @@ class MainController extends Controller
 			$trListData[] = $itemData;
 		}
 
-		$persArr = $persMod->getArray();
+		$persArr = $persMod->getData();
 		foreach($persArr as $ind => $pData)
 		{
 			$noDebts = TRUE;

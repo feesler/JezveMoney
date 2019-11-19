@@ -68,16 +68,16 @@ class TransactionsController extends Controller
 			$filterObj->mode = "details";
 		}
 
-		$accArr = $this->accModel->getArray();
+		$accArr = $this->accModel->getData();
 		$accounts = $this->accModel->getCount();
 
 		$tr_on_page = 20;
 
 		$totalTrCount = $this->model->getCount();
-		$transArr = ($totalTrCount) ? $this->model->getArray($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : [];
+		$transArr = ($totalTrCount) ? $this->model->getData($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : [];
 		$transCount = $this->model->getTransCount($trans_type, $accFilter, $searchReq, $stDate, $endDate);
 
-		$currArr = $this->currModel->getArray();
+		$currArr = $this->currModel->getData();
 
 		// Prepare transaction types menu
 		$trTypes = ["All", "Expense", "Income", "Transfer", "Debt"];
@@ -405,11 +405,11 @@ class TransactionsController extends Controller
 		}
 
 		// Common arrays
-		$currArr = $this->currModel->getArray();
+		$currArr = $this->currModel->getData();
 
-		$accArr = $this->accModel->getArray();
+		$accArr = $this->accModel->getData();
 		if ($trans_type == DEBT)
-			$persArr = $pMod->getArray();
+			$persArr = $pMod->getData();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
@@ -637,11 +637,11 @@ class TransactionsController extends Controller
 
 
 		// Common arrays
-		$currArr = $this->currModel->getArray();
+		$currArr = $this->currModel->getData();
 
-		$accArr = $this->accModel->getArray();
+		$accArr = $this->accModel->getData();
 		if ($trans_type == DEBT)
-			$persArr = $pMod->getArray();
+			$persArr = $pMod->getData();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";

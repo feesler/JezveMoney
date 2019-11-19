@@ -279,7 +279,7 @@ class PersonModel extends CachedTable
 
 
 	// Return javascript array of persons
-	public function getArray()
+	public function getData()
 	{
 		$condArr = ["p.user_id=".self::$user_id, "p.id<>".self::$owner_id];
 		$qResult = $this->dbObj->selectQ(["p.name" => "name",

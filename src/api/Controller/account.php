@@ -37,7 +37,7 @@ class AccountApiController extends ApiController
 	{
 		$respObj = new apiResponse();
 
-		$respObj->data = $this->accMod->getArray();
+		$respObj->data = $this->accMod->getData();
 		$respObj->ok();
 	}
 

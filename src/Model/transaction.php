@@ -782,7 +782,7 @@ class TransactionModel extends CachedTable
 
 
 	// Return array of transactions
-	public function getArray($trans_type, $accounts = NULL, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
+	public function getData($trans_type, $accounts = NULL, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
 	{
 		$res = [];
 

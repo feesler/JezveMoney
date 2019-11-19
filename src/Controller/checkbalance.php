@@ -60,7 +60,7 @@ ini_set('max_execution_time', '0');
 		$realBalance = [];
 		$accName = [];
 
-		$accArr = $accMod->getArray([ "full" => TRUE ]);
+		$accArr = $accMod->getData([ "full" => TRUE ]);
 		foreach($accArr as $item)
 		{
 			$initBalance[$item->id] = $item->initbalance;

@@ -8,7 +8,7 @@ class PersonsController extends Controller
 
 		$pMod = new PersonModel($user_id);
 
-		$persArr = $pMod->getArray();
+		$persArr = $pMod->getData();
 
 		$titleString = "Jezve Money | Persons";
 

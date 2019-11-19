@@ -58,7 +58,7 @@ class AccountsController extends Controller
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
 		$tileAccName = "New account";
 
-		$currArr = $currMod->getArray();
+		$currArr = $currMod->getData();
 		$icons = $this->model->getIconsArray();
 
 		$titleString = "Jezve Money | ";
@@ -104,7 +104,7 @@ class AccountsController extends Controller
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
 		$tileAccName = $accInfo->name;
 
-		$currArr = $currMod->getArray();
+		$currArr = $currMod->getData();
 		$icons = $this->model->getIconsArray();
 
 		$titleString = "Jezve Money | ";

@@ -15,11 +15,11 @@ class FastCommitController extends Controller
 		}
 
 		$accMod = new AccountModel($user_id);
-		$accArr = $accMod->getArray();
+		$accArr = $accMod->getData();
 		$currMod = new CurrencyModel();
-		$currArr = $currMod->getArray();
+		$currArr = $currMod->getData();
 		$pMod = new PersonModel($user_id);
-		$persArr = $pMod->getArray();
+		$persArr = $pMod->getData();
 
 		$this->css->page = "fastcommit.css";
 		$this->buildCSS();

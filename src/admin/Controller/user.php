@@ -7,7 +7,7 @@ class UserAdminController extends Controller
 		global $uMod, $user_name, $user_id;
 		global $menuItems;
 
-		$uArr = $uMod->getArray();
+		$uArr = $uMod->getData();
 
 		$menuItems["users"]["active"] = TRUE;
 

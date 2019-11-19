@@ -41,7 +41,7 @@ class PersonApiController extends ApiController
 
 		$respObj = new apiResponse();
 
-		$respObj->data = $this->pMod->getArray();
+		$respObj->data = $this->pMod->getData();
 		$respObj->ok();
 	}
 

@@ -59,7 +59,7 @@ class TransactionApiController extends ApiController
 		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
 
-		$trArr = $this->trMod->getArray($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
+		$trArr = $this->trMod->getData($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
 
 		$respObj->data = [];
 		foreach($trArr as $trans)

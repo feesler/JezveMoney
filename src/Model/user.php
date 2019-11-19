@@ -479,7 +479,7 @@ class UserModel extends CachedTable
 
 
 	// Return array of users
-	public function getArray()
+	public function getData()
 	{
 		$res = [];
 

@@ -13,7 +13,7 @@ class CurrencyAdminController extends Controller
 		global $uMod, $user_name, $user_id;
 		global $menuItems;
 
-		$currArr = $this->model->getArray();
+		$currArr = $this->model->getData();
 
 		$menuItems["curr"]["active"] = TRUE;
 

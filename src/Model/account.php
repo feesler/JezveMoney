@@ -347,7 +347,7 @@ class AccountModel extends CachedTable
 
 
 	// Return array of accounts
-	public function getArray($params = NULL)
+	public function getData($params = NULL)
 	{
 		$resArr = [];
 
