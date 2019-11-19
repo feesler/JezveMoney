@@ -48,7 +48,7 @@ class AccountModel extends CachedTable
 						"`updatedate` DATETIME NOT NULL, ".
 						"PRIMARY KEY (`id`), ".
 						"KEY `user_id` (`user_id`)",
-						"DEFAULT CHARACTER SET = utf8 COLLATE utf8_general_ci");
+						"DEFAULT CHARACTER SET = utf8 COLLATE utf8mb4_general_ci");
 
 		return $res;
 	}
