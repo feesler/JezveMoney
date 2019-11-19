@@ -279,7 +279,7 @@ class TransactionModel extends CachedTable
 		if ($trObj->pos === 0)
 		{
 			$latest_pos = $this->getLatestPos($trObj->date);
-			$this->updatePos($trans_id, $latest_pos + 1);
+			$this->updatePos($item_id, $latest_pos + 1);
 		}
 	}
 
