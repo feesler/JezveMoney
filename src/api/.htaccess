@@ -1,3 +1,3 @@
 RewriteEngine on
-RewriteBase /money/api/
+RewriteBase /api/
 RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]
