@@ -652,7 +652,7 @@ async function reloginAsTester(view)
 
 var config = {
 /*	url : 'https://jezve.net/money/'	*/
-	url : 'http://jezvemoney/'
+	url : 'http://jezvemoney:8096/',
 	testsExpected : 589
 };
 

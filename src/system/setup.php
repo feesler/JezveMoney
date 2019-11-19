@@ -1,7 +1,7 @@
 <?php
 	// Prepare root directories
 	$pparts = pathinfo(__FILE__);
-	$path_length = strrpos($pparts["dirname"], "/");
+	$path_length = strrpos($pparts["dirname"], DIRECTORY_SEPARATOR);
 	$approot = substr(__FILE__, 0, $path_length + 1);
 	define("APPROOT", $approot);
 
@@ -18,7 +18,8 @@
 	// Check development or release environment
 	$productionHost = "jezvemoney.ru";
 	$devHost = "jezve.net";
-	$avHosts = [$productionHost, $devHost];
+	$localDevHost = "jezvemoney:8096";
+	$avHosts = [$productionHost, $devHost, $localDevHost];
 
 	if (!isset($_SERVER["HTTP_HOST"]) || !in_array($_SERVER["HTTP_HOST"], $avHosts))
 	{
@@ -32,12 +33,21 @@
 		define("APPPROT", "https://");
 		define("APPPATH", "/");
 		define("PRODUCTION", TRUE);
+		define("LOCAL_DEV", FALSE);
 	}
 	else if (strcmp(APPHOST, $devHost) == 0)
 	{
 		define("APPPROT", "https://");
 		define("APPPATH", "/money/");
 		define("PRODUCTION", FALSE);
+		define("LOCALDEV", FALSE);
+	}
+	else if (strcmp(APPHOST, $localDevHost) == 0)
+	{
+		define("APPPROT", "http://");
+		define("APPPATH", "/");
+		define("PRODUCTION", FALSE);
+		define("LOCALDEV", TRUE);
 	}
 
 	// Error settings
@@ -57,7 +67,7 @@
 	}
 
 
-	if (!isSecure())
+	if (!isSecure() && !LOCALDEV)
 	{
 		header("HTTP/1.1 302 Found", TRUE, 302);
 		header("Location: ".APPPROT.APPHOST.$ruri);
