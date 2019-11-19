@@ -2,14 +2,21 @@
 
 class AccountsController extends Controller
 {
+	public function __construct()
+	{
+		global $user_id;
+
+		$this->model = new AccountModel($user_id);
+	}
+
+
 	public function index()
 	{
 		global $user_id, $user_name, $uMod;
 
-		$accMod = new AccountModel($user_id);
 		$transMod = new TransactionModel($user_id);
 
-		$tilesArr = $accMod->getTilesArray();
+		$tilesArr = $this->model->getTilesArray();
 
 		$titleString = "Jezve Money | Accounts";
 
@@ -33,7 +40,6 @@ class AccountsController extends Controller
 
 		$action = "new";
 
-		$accMod = new AccountModel($user_id);
 		$currMod = new CurrencyModel();
 
 		$accInfo = new stdClass;
@@ -53,7 +59,7 @@ class AccountsController extends Controller
 		$tileAccName = "New account";
 
 		$currArr = $currMod->getArray();
-		$icons = $accMod->getIconsArray();
+		$icons = $this->model->getIconsArray();
 
 		$titleString = "Jezve Money | ";
 		$headString = "New account";
@@ -87,20 +93,19 @@ class AccountsController extends Controller
 
 		$action = "edit";
 
-		$accMod = new AccountModel($user_id);
 		$currMod = new CurrencyModel();
 
 		$acc_id = intval($this->actionParam);
 		if (!$acc_id)
 			$this->fail();
 
-		$accInfo = $accMod->getProperties($acc_id);
+		$accInfo = $this->model->getProperties($acc_id);
 
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
 		$tileAccName = $accInfo->name;
 
 		$currArr = $currMod->getArray();
-		$icons = $accMod->getIconsArray();
+		$icons = $this->model->getIconsArray();
 
 		$titleString = "Jezve Money | ";
 		$headString = ($action == "new") ? "New account" : "Edit account";
@@ -123,11 +128,10 @@ class AccountsController extends Controller
 		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
 			$this->fail($defMsg);
 
-		$accMod = new AccountModel($user_id);
 		$uObj = $uMod->getItem($user_id);
 		if (!$uObj)
 			$this->fail($defMsg);
-		if (!$accMod->create([ "owner_id" => $uObj->owner_id,
+		if (!$this->model->create([ "owner_id" => $uObj->owner_id,
 								"name" => $_POST["accname"],
 								"balance" => $_POST["balance"],
 								"curr_id" => $_POST["currency"],
@@ -142,8 +146,6 @@ class AccountsController extends Controller
 
 	public function updateAccount()
 	{
-		global $user_id;
-
 		$defMsg = ERR_ACCOUNT_UPDATE;
 
 		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
@@ -151,8 +153,7 @@ class AccountsController extends Controller
 		if (!isset($_POST["accid"]))
 			$this->fail($defMsg);
 
-		$accMod = new AccountModel($user_id);
-		if (!$accMod->update($_POST["accid"],
+		if (!$this->model->update($_POST["accid"],
 								[ "name" => $_POST["accname"],
 									"balance" => $_POST["balance"],
 									"curr_id" => $_POST["currency"],
@@ -167,8 +168,6 @@ class AccountsController extends Controller
 
 	public function del()
 	{
-		global $user_id;
-
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 			setLocation(BASEURL."accounts/");
 
@@ -177,13 +176,11 @@ class AccountsController extends Controller
 		if (!isset($_POST["accounts"]))
 			fail($defMsg);
 
-		$accMod = new AccountModel($user_id);
-
 		$acc_arr = explode(",", $_POST["accounts"]);
 		foreach($acc_arr as $acc_id)
 		{
 			$acc_id = intval($acc_id);
-			if (!$accMod->del($acc_id))
+			if (!$this->model->del($acc_id))
 				$this->fail($defMsg);
 		}
 
@@ -195,16 +192,12 @@ class AccountsController extends Controller
 
 	public function reset()
 	{
-		global $user_id;
-
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 			setLocation(BASEURL."accounts/");
 
 		$defMsg = ERR_ACCOUNTS_RESET;
 
-		$accMod = new AccountModel($user_id);
-
-		if (!$accMod->reset())
+		if (!$this->model->reset())
 			fail($defMsg);
 		setMessage(MSG_ACCOUNTS_RESET);
 

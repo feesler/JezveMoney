@@ -54,27 +54,21 @@ ini_set('max_execution_time', '0');
 
 
 		$trMod = new TransactionModel($user_id);
-		$accMod = new AccountModel($user_id, TRUE);
-
-		$condArr = ["user_id=".$user_id];
-		if ($checkAccount_id != 0)
-			$condArr[] = "id=".$checkAccount_id;
-		$qResult = $db->selectQ("*", "accounts", $condArr);
-		if ($db->rowsCount($qResult) == 0)
-			fail();
+		$accMod = new AccountModel($user_id);
 
 		$initBalance = [];
 		$curBalance = [];
 		$realBalance = [];
 		$accName = [];
-		while($row = $this->dbObj->fetchRow($qResult))
-		{
-			$acc_id = intval($row["id"]);
-			$initBalance[$acc_id] = floatval($row["initbalance"]);
-			$curBalance[$acc_id] = floatval($row["balance"]);
-			$accName[$acc_id] = $accMod->getNameOrPerson($acc_id);
 
-			$realBalance[$acc_id] = $initBalance[$acc_id];
+		$accArr = $accMod->getArray([ "full" => TRUE ]);
+		foreach($accArr as $item)
+		{
+			$initBalance[$item->id] = $item->initbalance;
+			$curBalance[$item->id] = $item->balance;
+			$accName[$item->id] = $accMod->getNameOrPerson($item->id);
+
+			$realBalance[$item->id] = $initBalance[$item->id];
 		}
 
 

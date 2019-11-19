@@ -5,21 +5,26 @@ class AccountModel extends CachedTable
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $owner_id = 0;
-	static private $full_list = FALSE;
 	static private $icons = ["No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash"];
 	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
 
 
 	// Class constructor
-	public function __construct($user_id, $full = FALSE)
+	public function __construct($user_id)
 	{
-		if ($user_id != self::$user_id || $full != self::$full_list)
+		if ($user_id != self::$user_id)
 			self::$dcache = NULL;
 
 		$this->tbl_name = "accounts";
 
-		self::$full_list = $full;
 		self::$user_id = intval($user_id);
+
+		$uMod = new UserModel();
+		$uObj = $uMod->getItem(self::$user_id);
+		if (!$uObj)
+			throw new Error("User not found");
+
+		self::$owner_id = $uObj->owner_id;
 
 		$this->dbObj = mysqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
@@ -86,18 +91,7 @@ class AccountModel extends CachedTable
 	// Called from CachedTable::updateCache() and return data query object
 	protected function dataQuery()
 	{
-		// find owner person
-		$uMod = new UserModel();
-		$uObj = $uMod->getItem(self::$user_id);
-		if (!$uObj)
-			throw new Error("User not found");
-		self::$owner_id = $uObj->owner_id;
-
-		$condArr = ["user_id=".self::$user_id];
-		if (!self::$full_list && self::$owner_id != 0)
-			$condArr[] = "owner_id=".self::$owner_id;
-
-		return $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "id ASC");
+		return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id, NULL, "id ASC");
 	}
 
 
@@ -266,9 +260,6 @@ class AccountModel extends CachedTable
 	// Remove accounts of specified person
 	public function onPersonDelete($p_id)
 	{
-		if (!self::$full_list)
-			return FALSE;
-
 		if (!$this->checkCache())
 			return FALSE;
 
@@ -335,7 +326,7 @@ class AccountModel extends CachedTable
 		if (!$accObj || !isset($accObj->owner_id))
 			return NULL;
 
-		if (self::$owner_id == $accObj->owner_id || !self::$full_list)
+		if (self::$owner_id == $accObj->owner_id)
 		{
 			return $accObj->name;
 		}
@@ -357,29 +348,49 @@ class AccountModel extends CachedTable
 	}
 
 
-	// Return Javascript array of accounts
-	public function getArray()
+	// Return array of accounts
+	public function getArray($params = NULL)
 	{
 		$resArr = [];
 
 		if (!$this->checkCache())
 			return $resArr;
 
+		$includePersons = (is_array($params) && isset($params["full"]) && $params["full"] == TRUE);
+
 		foreach($this->cache as $acc_id => $item)
 		{
-			$accObj = new stdClass;
+			if (!$includePersons && $item->owner_id != self::$owner_id)
+				continue;
 
-			$accObj->id = $acc_id;
-			$accObj->curr_id = $item->curr_id;
-			$accObj->balance = $item->balance;
-			$accObj->name = $item->name;
-			$accObj->icon = $item->icon;
-			$accObj->initbalance = $item->initbalance;
+			$accObj = clone $item;
 
 			$resArr[] = $accObj;
 		}
 
 		return $resArr;
+	}
+
+
+	// Return count of objects
+	public function getCount($params = NULL)
+	{
+		$res = 0;
+
+		if (!$this->checkCache())
+			return $res;
+
+		$includePersons = (is_array($params) && isset($params["full"]) && $params["full"] == TRUE);
+
+		foreach($this->cache as $acc_id => $item)
+		{
+			if (!$includePersons && $item->owner_id != self::$owner_id)
+				continue;
+
+			$res++;
+		}
+
+		return $res;
 	}
 
 
@@ -395,6 +406,9 @@ class AccountModel extends CachedTable
 
 		foreach($this->cache as $acc_id => $item)
 		{
+			if ($item->owner_id != self::$owner_id)
+				continue;
+
 			$acc_icon = $this->getIconClass($item->icon);
 			$balance_fmt = $this->currMod->format($item->balance, $item->curr_id);
 
@@ -426,6 +440,9 @@ class AccountModel extends CachedTable
 
 		foreach($this->cache as $acc_id => $item)
 		{
+			if ($item->owner_id != self::$owner_id)
+				continue;
+
 			$currObj = $this->currMod->getItem($item->curr_id);
 			if (!$currObj)
 				return NULL;

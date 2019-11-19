@@ -168,7 +168,7 @@ class PersonModel extends CachedTable
 		if (!$currObj)
 			return FALSE;
 
-		$accMod = new AccountModel(self::$user_id, TRUE);
+		$accMod = new AccountModel(self::$user_id);
 		if (!$accMod->onPersonDelete($item_id))
 		{
 			wlog("accMod->onPersonDelete(".$item_id.") return FALSE");

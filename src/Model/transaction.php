@@ -19,6 +19,7 @@ class TransactionModel extends CachedTable
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 
+		$this->accModel = new AccountModel($user_id);
 		$this->currMod = new CurrencyModel();
 	}
 
@@ -209,13 +210,12 @@ class TransactionModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$accMod = new AccountModel(self::$user_id, TRUE);
 		$uMod = new UserModel();
 
 		$srcBalance = 0;
 		if ($res["src_id"] != 0)
 		{
-			$accObj = $accMod->getItem($res["src_id"]);
+			$accObj = $this->accModel->getItem($res["src_id"]);
 			if (!$accObj)
 				return 0;
 			$srcBalance = $accObj->balance;
@@ -225,14 +225,14 @@ class TransactionModel extends CachedTable
 		if ($res["src_id"] != 0 && ($res["type"] == EXPENSE || $res["type"] == TRANSFER || $res["type"] == DEBT))
 		{
 			$srcBalance -= $res["src_amount"];
-			if (!$accMod->setBalance($res["src_id"], $srcBalance))
+			if (!$this->accModel->setBalance($res["src_id"], $srcBalance))
 				return 0;
 		}
 
 		$destBalance = 0;
 		if ($res["dest_id"] != 0)
 		{
-			$accObj = $accMod->getItem($res["dest_id"]);
+			$accObj = $this->accModel->getItem($res["dest_id"]);
 			if (!$accObj)
 				return 0;
 			$destBalance = $accObj->balance;
@@ -242,7 +242,7 @@ class TransactionModel extends CachedTable
 		if ($res["dest_id"] != 0 && ($res["type"] == INCOME || $res["type"] == TRANSFER || $res["type"] == DEBT))
 		{
 			$destBalance += $res["dest_amount"];
-			if (!$accMod->setBalance($res["dest_id"], $destBalance))
+			if (!$this->accModel->setBalance($res["dest_id"], $destBalance))
 				return 0;
 		}
 
@@ -302,14 +302,13 @@ class TransactionModel extends CachedTable
 		if ($trObj->user_id != self::$user_id)
 			return FALSE;
 
-		$accMod = new AccountModel(self::$user_id, TRUE);
 		$uMod = new UserModel();
 
 		// check source account is exist
 		$srcBalance = 0;
 		if ($trObj->src_id != 0)
 		{
-			$accObj = $accMod->getItem($trObj->src_id);
+			$accObj = $this->accModel->getItem($trObj->src_id);
 			if (!$accObj)
 				return 0;
 
@@ -320,7 +319,7 @@ class TransactionModel extends CachedTable
 		$destBalance = 0;
 		if ($trObj->dest_id != 0)
 		{
-			$accObj = $accMod->getItem($trObj->dest_id);
+			$accObj = $this->accModel->getItem($trObj->dest_id);
 			if (!$accObj)
 				return 0;
 
@@ -331,7 +330,7 @@ class TransactionModel extends CachedTable
 		if ($trObj->src_id != 0 && ($trObj->type == EXPENSE || $trObj->type == TRANSFER || $trObj->type == DEBT))
 		{
 			$srcBalance += $trObj->src_amount;
-			if (!$accMod->setBalance($trObj->src_id, $srcBalance))
+			if (!$this->accModel->setBalance($trObj->src_id, $srcBalance))
 				return FALSE;
 		}
 
@@ -339,7 +338,7 @@ class TransactionModel extends CachedTable
 		if ($trObj->dest_id != 0 && ($trObj->type == INCOME || $trObj->type == TRANSFER || $trObj->type == DEBT))
 		{
 			$destBalance -= $trObj->dest_amount;
-			if (!$accMod->setBalance($trObj->dest_id, $destBalance))
+			if (!$this->accModel->setBalance($trObj->dest_id, $destBalance))
 				return FALSE;
 		}
 
@@ -371,14 +370,13 @@ class TransactionModel extends CachedTable
 		if (!$this->cancel($item_id))
 			return FALSE;
 
-		$accMod = new AccountModel(self::$user_id, TRUE);
 		$uMod = new UserModel();
 
 		// check source account is exist
 		$srcBalance = 0;
 		if ($res["src_id"] != 0)
 		{
-			$accObj = $accMod->getItem($res["src_id"]);
+			$accObj = $this->accModel->getItem($res["src_id"]);
 			if (!$accObj)
 				return 0;
 			$srcBalance = $accObj->balance;
@@ -389,7 +387,7 @@ class TransactionModel extends CachedTable
 		{
 			$srcBalance -= $res["src_amount"];
 
-			if (!$accMod->setBalance($res["src_id"], $srcBalance))
+			if (!$this->accModel->setBalance($res["src_id"], $srcBalance))
 				return FALSE;
 		}
 
@@ -397,7 +395,7 @@ class TransactionModel extends CachedTable
 		$destBalance = 0;
 		if ($res["dest_id"] != 0)
 		{
-			$accObj = $accMod->getItem($res["dest_id"]);
+			$accObj = $this->accModel->getItem($res["dest_id"]);
 			if (!$accObj)
 				return 0;
 			$destBalance = $accObj->balance;
@@ -408,7 +406,7 @@ class TransactionModel extends CachedTable
 		{
 			$destBalance += $res["dest_amount"];
 
-			if (!$accMod->setBalance($res["dest_id"], $destBalance))
+			if (!$this->accModel->setBalance($res["dest_id"], $destBalance))
 				return FALSE;
 		}
 
@@ -568,9 +566,7 @@ class TransactionModel extends CachedTable
 		}
 		else
 		{
-			$accMod = new AccountModel(self::$user_id, TRUE);
-
-			$accObj = $accMod->getItem($acc_id);
+			$accObj = $this->accModel->getItem($acc_id);
 			$res = ($accObj) ? $accObj->initbalance : NULL;
 		}
 
@@ -680,9 +676,8 @@ class TransactionModel extends CachedTable
 			return FALSE;
 
 		$uMod = new UserModel();
-		$accMod = new AccountModel(self::$user_id, TRUE);
 
-		$accObj = $accMod->getItem($acc_id);
+		$accObj = $this->accModel->getItem($acc_id);
 		if (!$accObj)
 			return FALSE;
 
@@ -806,8 +801,7 @@ class TransactionModel extends CachedTable
 			return $res;
 
 		$persMod = new PersonModel(self::$user_id);
-		$accMod = new AccountModel(self::$user_id, TRUE);
-		if (!$accMod->getCount())
+		if (!$this->accModel->getCount([ "full" => TRUE ]))
 			return $res;
 
 		if (!$this->dbObj->countQ($this->tbl_name, "user_id=".self::$user_id))
@@ -888,14 +882,14 @@ class TransactionModel extends CachedTable
 				$src_owner_id = $dest_owner_id = 0;
 				if ($trans->src_id != 0)
 				{
-					$accObj = $accMod->getItem($trans->src_id);
+					$accObj = $this->accModel->getItem($trans->src_id);
 					if ($accObj)
 						$src_owner_id = $accObj->owner_id;
 				}
 
 				if ($trans->dest_id != 0)
 				{
-					$accObj = $accMod->getItem($trans->dest_id);
+					$accObj = $this->accModel->getItem($trans->dest_id);
 					if ($accObj)
 						$dest_owner_id = $accObj->owner_id;
 				}

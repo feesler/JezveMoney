@@ -14,7 +14,7 @@ class FastCommitController extends Controller
 			return;
 		}
 
-		$accMod = new AccountModel($user_id, FALSE);
+		$accMod = new AccountModel($user_id);
 		$accArr = $accMod->getArray();
 		$currMod = new CurrencyModel();
 		$currArr = $currMod->getArray();
@@ -209,7 +209,7 @@ class FastCommitController extends Controller
 
 		header("Content-type: text/html; charset=utf-8");
 
-		$accMod = new AccountModel($user_id, FALSE);
+		$accMod = new AccountModel($user_id);
 		$trMod = new TransactionModel($user_id);
 		$debtMod = new DebtModel($user_id);
 		$pMod = new PersonModel($user_id);
