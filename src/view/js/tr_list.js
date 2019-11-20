@@ -285,6 +285,31 @@ function initControls()
 						editable : false,
 						mobile : isMobile }))
 		accDDList = null;
+
+	var searchFrm = ge('searchFrm');
+	if (searchFrm)
+		searchFrm.onsubmit = onSearchSubmit.bind(null, searchFrm);
+
+	var btn;
+	var calendar_btn = ge('calendar_btn');
+	if (calendar_btn)
+	{
+		btn = calendar_btn.firstElementChild;
+		if (btn)
+			btn.onclick = showCalendar;
+	}
+
+	btn = ge('cal_rbtn');
+	if (btn)
+		btn.onclick = showCalendar;
+
+	var del_btn = ge('del_btn');
+	if (del_btn)
+	{
+		btn = del_btn.firstElementChild;
+		if (btn)
+			btn.onclick = showDeletePopup;
+	}
 }
 
 
@@ -329,32 +354,6 @@ function initTransListDrag()
 		}
 
 		listItem_wr = listItem_wr.nextElementSibling;
-	}
-
-
-	var searchFrm = ge('searchFrm');
-	if (searchFrm)
-		searchFrm.onsubmit = onSearchSubmit.bind(null, searchFrm);
-
-	var btn;
-	var calendar_btn = ge('calendar_btn');
-	if (calendar_btn)
-	{
-		btn = calendar_btn.firstElementChild;
-		if (btn)
-			btn.onclick = showCalendar;
-	}
-
-	btn = ge('cal_rbtn');
-	if (btn)
-		btn.onclick = showCalendar;
-
-	var del_btn = ge('del_btn');
-	if (del_btn)
-	{
-		btn = del_btn.firstElementChild;
-		if (btn)
-			btn.onclick = showDeletePopup;
 	}
 }
 
