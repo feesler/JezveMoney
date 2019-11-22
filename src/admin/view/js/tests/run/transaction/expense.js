@@ -91,8 +91,8 @@ function createExpense(view, accNum, onState, params)
 				var fmtBal = formatCurrency(expBalance, srcAcc.curr_id);
 
 				// Accounts widget changes
-				var accWidget = { tiles : { length : App.accounts.length } };
-				accWidget.tiles[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
+				var accWidget = { tiles : { items : { length : App.accounts.length } } };
+				accWidget.tiles.items[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 				// Transactions widget changes
 				var fmtAmount = '- ' + formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
@@ -102,8 +102,8 @@ function createExpense(view, accNum, onState, params)
 				}
 
 				var transWidget = { title : 'Transactions',
-									transList : { length : Math.min(App.transactions.length + 1, 5) } };
-				transWidget.transList[0] = { accountTitle : srcAcc.name,
+									transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
+				transWidget.transList.items[0] = { accountTitle : srcAcc.name,
 												amountText : fmtAmount,
 											 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
 											 	comment : ('comment' in params) ? params.comment : '' };
@@ -112,9 +112,9 @@ function createExpense(view, accNum, onState, params)
 
 				await test('Expense transaction submit', async () => {}, view, state);
 
-				App.transactions = view.content.widgets[2].transList;
-				App.accounts = view.content.widgets[0].tiles;
-				App.persons = view.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList.items;
+				App.accounts = view.content.widgets[0].tiles.items;
+				App.persons = view.content.widgets[3].infoTiles.items;
 				App.notify();
 
 				return view;
@@ -137,9 +137,9 @@ function updateExpense(view, pos, params)
 			.then(view => view.filterByType(EXPENSE))
 			.then(async view =>
 			{
-				App.beforeUpdateTransaction = { trCount : view.content.transactions.length };
+				App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
-				let trObj = await view.getTransactionObject(view.content.transactions[pos].id);
+				let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
@@ -183,8 +183,8 @@ function updateExpense(view, pos, params)
 					fmtAmount += ' (- ' + formatCurrency(params.destAmount, params.destCurr) + ')';
 				}
 
-				var state = { values : { transactions : { length : transCount } } };
-				state.values.transactions[pos] = { id : trans_id,
+				var state = { values : { transList : { items : { length : transCount } } } };
+				state.values.transList.items[pos] = { id : trans_id,
 													accountTitle : updSrcAcc.name,
 													amountText : fmtAmount,
 												 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
@@ -209,7 +209,7 @@ function updateExpense(view, pos, params)
 				var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
 
 				// Accounts widget changes
-				var accWidget = { tiles : { length : App.accounts.length } };
+				var accWidget = { tiles : { items : { length : App.accounts.length } } };
 				var expBalance, fmtBal;
 				// Chech if account was changed we need to update both
 				if (updSrcAccPos != origSrcAccPos)
@@ -217,19 +217,19 @@ function updateExpense(view, pos, params)
 					expBalance = origSrcBalance + origSrcAmount;
 					fmtBal = formatCurrency(expBalance, origSrcAcc.curr_id);
 
-					accWidget.tiles[origSrcAccPos] = { balance : fmtBal, name : origSrcAcc.name };
+					accWidget.tiles.items[origSrcAccPos] = { balance : fmtBal, name : origSrcAcc.name };
 
 					expBalance = updSrcAcc.balance - normalize(sa);
 					fmtBal = formatCurrency(expBalance, updSrcAcc.curr_id);
 
-					accWidget.tiles[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
+					accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 				}
 				else		// account not changed
 				{
 					var expBalance = origSrcBalance + origSrcAmount - normalize(sa);
 					var fmtBal = formatCurrency(expBalance, updSrcAcc.curr_id);
 
-					accWidget.tiles[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
+					accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 				}
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget } } };

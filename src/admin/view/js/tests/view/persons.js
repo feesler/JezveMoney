@@ -50,10 +50,10 @@ PersonsView.prototype.goToCreatePerson = function()
 // Select specified person, click on edit button and return navigation promise
 PersonsView.prototype.goToUpdatePerson = async function(num)
 {
-	if (!this.content.tiles || this.content.tiles.length <= num || num < 0)
+	if (!this.content.tiles || this.content.tiles.items.length <= num || num < 0)
 		throw new Error('Wrong person number specified');
 
-	await this.content.tiles[num].click();
+	await this.content.tiles.items[num].click();
 
 	if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
 		!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
@@ -76,10 +76,10 @@ PersonsView.prototype.deletePersons = function(persons)
 		return prev
 				.then(() => this.performAction(() =>
 				{
-					if (person_num < 0 || person_num >= this.content.tiles.length)
+					if (person_num < 0 || person_num >= this.content.tiles.items.length)
 						throw new Error('Wrong account number');
 
-					return this.content.tiles[person_num].click();
+					return this.content.tiles.items[person_num].click();
 				}))
 				.then(async () =>
 				{

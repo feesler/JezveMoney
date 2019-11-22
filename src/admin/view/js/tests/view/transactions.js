@@ -42,7 +42,7 @@ TransactionsView.prototype.parseContent = async function()
 	res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 
 	res.title = await this.prop(res.titleEl, 'innerText');
-	res.transactions = await this.parseTransactionsList(await this.query('#tritems'));
+	res.transList = await this.parseTransactionsList(await this.query('#tritems'));
 
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
@@ -69,10 +69,10 @@ TransactionsView.prototype.goToCreateTransaction = function()
 // Select specified account, click on edit button and return navigation promise
 TransactionsView.prototype.goToUpdateTransaction = async function(num)
 {
-	if (!this.content.transactions || this.content.transactions.length <= num || num < 0)
+	if (!this.content.transList || this.content.transList.items.length <= num || num < 0)
 		throw new Error('Wrong transaction number specified');
 
-	await this.content.transactions[num].click();
+	await this.content.transList.items[num].click();
 
 	if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
 		!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
@@ -96,10 +96,10 @@ TransactionsView.prototype.deleteTransactions = function(tr)
 		return prev
 				.then(() => this.performAction(() =>
 				{
-					if (tr_num < 0 || tr_num >= this.content.transactions.length)
+					if (tr_num < 0 || tr_num >= this.content.transList.items.length)
 						throw 'Wrong account number';
 
-					return this.content.transactions[tr_num].click();
+					return this.content.transList.items[tr_num].click();
 				}))
 				.then(async () =>
 				{

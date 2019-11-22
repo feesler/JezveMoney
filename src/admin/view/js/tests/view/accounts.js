@@ -51,10 +51,10 @@ AccountsView.prototype.goToCreateAccount = function()
 // Select specified account, click on edit button and return navigation promise
 AccountsView.prototype.goToUpdateAccount = async function(num)
 {
-	if (!this.content.tiles || this.content.tiles.length <= num)
+	if (!this.content.tiles || this.content.tiles.items.length <= num)
 		throw new Error('Wrong account number specified');
 
-	await this.content.tiles[num].click();
+	await this.content.tiles.items[num].click();
 
 	if (!this.content.toolbar.elem || !this.isVisible(this.content.toolbar.elem) ||
 		!this.content.toolbar.editBtn || !this.isVisible(this.content.toolbar.editBtn.elem))
@@ -78,10 +78,10 @@ AccountsView.prototype.deleteAccounts = function(acc)
 		return prev
 				.then(() => this.performAction(() =>
 				{
-					if (acc_num >= this.content.tiles.length)
+					if (acc_num >= this.content.tiles.items.length)
 						throw new Error('Wrong account number');
 
-					return this.content.tiles[acc_num].click();
+					return this.content.tiles.items[acc_num].click();
 				}))
 				.then(async () =>
 				{

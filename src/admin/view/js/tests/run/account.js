@@ -73,14 +73,14 @@ async function createAccount1(view)
 
 async function checkCreateAccount(view, params)
 {
-	var state = { value : { tiles : { length : App.accounts.length + 1 } } };
+	var state = { value : { tiles : { items : { length : App.accounts.length + 1 } } } };
 	var fmtBal = formatCurrency(normalize(params.balance), params.curr_id);
 
-	state.value.tiles[App.accounts.length] = { balance : fmtBal, name : params.name, icon : params.icon };
+	state.value.tiles.items[App.accounts.length] = { balance : fmtBal, name : params.name, icon : params.icon };
 
 	await test('Account create', async () => {}, view, state);
 
-	App.accounts = view.content.tiles;
+	App.accounts = view.content.tiles.items;
 	App.notify();
 
 	return view;
@@ -129,14 +129,14 @@ async function editAccount1(view)
 
 async function checkUpdateAccount(params, view)
 {
-	var state = { value : { tiles : { length : App.accounts.length } } };
+	var state = { value : { tiles : { items : { length : App.accounts.length } } } };
 	var fmtBal = formatCurrency(normalize(params.balance), params.curr_id);
 
-	state.value.tiles[params.updatePos] = { balance : fmtBal, name : params.name, icon : params.icon };
+	state.value.tiles.items[params.updatePos] = { balance : fmtBal, name : params.name, icon : params.icon };
 
 	await test('Account update', async () => {}, view, state);
 
-	App.accounts = view.content.tiles;
+	App.accounts = view.content.tiles.items;
 	App.notify();
 
 	return view;
@@ -191,11 +191,11 @@ function deleteAccounts(view, accounts)
 	return view.deleteAccounts(accounts)
 			.then(async view =>
 			{
-				var state = { value : { tiles : { length : App.accounts.length - accounts.length } } };
+				var state = { value : { tiles : { items : { length : App.accounts.length - accounts.length } } } };
 
 				await test('Delete accounts [' + accounts.join() + ']', async () => {}, view, state);
 
-				App.accounts = view.content.tiles;
+				App.accounts = view.content.tiles.items;
 				App.notify();
 
 				return view;

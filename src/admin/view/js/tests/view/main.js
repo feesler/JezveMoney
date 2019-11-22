@@ -77,10 +77,10 @@ MainView.prototype.goToNewTransactionByAccount = function(accNum)
 	if (accWidget.title != 'Accounts')
 		throw new Error('Wrong state of accounts widget');
 
-	 if (!accWidget.tiles || accWidget.tiles.length <= accNum)
+	 if (!accWidget.tiles || accWidget.tiles.items.length <= accNum)
 		throw new Error('Tile ' + accNum + ' not found');
 
-	var tile = accWidget.tiles[accNum];
+	var tile = accWidget.tiles.items[accNum];
 	var link = tile.linkElem;
 
 	return this.navigation(() => this.click(link));

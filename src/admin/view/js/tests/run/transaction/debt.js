@@ -148,8 +148,8 @@ function createDebt(view, onState, params)
 
 				let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
-				var personsWidget = { infoTiles : { length : App.persons.length } };
-				personsWidget.infoTiles[personPos] = { title : person.name, subtitle : debtSubtitle };
+				var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
+				personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 
 				state.values.widgets[3] = personsWidget;
 
@@ -157,15 +157,15 @@ function createDebt(view, onState, params)
 				if (acc)
 				{
 					var fmtAccBal = formatCurrency(acc.balance, acc.curr_id);
-					var accWidget = { tiles : { length : App.accounts.length } };
-					accWidget.tiles[accPos] = { balance : fmtAccBal, name : acc.name };
+					var accWidget = { tiles : { items : { length : App.accounts.length } } };
+					accWidget.tiles.items[accPos] = { balance : fmtAccBal, name : acc.name };
 
 					state.values.widgets[0] = accWidget;
 				}
 
 				// Transactions widget changes
 				var transWidget = { title : 'Transactions',
-									transList : { length : Math.min(App.transactions.length + 1, 5) } };
+									transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
 				var title = '';
 				var fmtAmount;
 
@@ -185,7 +185,7 @@ function createDebt(view, onState, params)
 				}
 				fmtAmount += formatCurrency(sa, personAccount.curr_id);
 
-				transWidget.transList[0] = { accountTitle : title,
+				transWidget.transList.items[0] = { accountTitle : title,
 												amountText : fmtAmount,
 											 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
 											 	comment : ('comment' in params) ? params.comment : '' };
@@ -194,9 +194,9 @@ function createDebt(view, onState, params)
 
 				await test('Debt transaction submit', async () => {}, view, state);
 
-				App.transactions = view.content.widgets[2].transList;
-				App.accounts = view.content.widgets[0].tiles;
-				App.persons = view.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList.items;
+				App.accounts = view.content.widgets[0].tiles.items;
+				App.persons = view.content.widgets[3].infoTiles.items;
 				App.notify();
 
 				return view;
@@ -220,9 +220,9 @@ function updateDebt(view, pos, params)
 			.then(view => view.filterByType(DEBT))
 			.then(async view =>
 			{
-				App.beforeUpdateTransaction = { trCount : view.content.transactions.length };
+				App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
-				let trObj = await view.getTransactionObject(view.content.transactions[pos].id);
+				let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
@@ -292,8 +292,8 @@ function updateDebt(view, pos, params)
 				}
 				fmtAmount += formatCurrency(updSrcAmount, updPersonAccount.curr_id);
 
-				var state = { values : { transactions : { length : transCount } } };
-				state.values.transactions[pos] = { id : trans_id,
+				var state = { values : { transList : { items : { length : transCount } } } };
+				state.values.transList.items[pos] = { id : trans_id,
 													accountTitle : title,
 													amountText : fmtAmount,
 												 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
@@ -328,7 +328,7 @@ function updateDebt(view, pos, params)
 
 				sa = da = normalize(origAmount);
 
-				var personsWidget = { infoTiles : { length : App.persons.length } };
+				var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
 
 				// Cancel transaction
 				if (origDebtType)
@@ -371,7 +371,7 @@ function updateDebt(view, pos, params)
 					}, []);
 
 					let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
-					personsWidget.infoTiles[origPersonPos] = { title : origPerson.name, subtitle : debtSubtitle };
+					personsWidget.infoTiles.items[origPersonPos] = { title : origPerson.name, subtitle : debtSubtitle };
 				}
 
 				let debtAccounts = updPerson.accounts.reduce((val, pacc) =>
@@ -385,30 +385,30 @@ function updateDebt(view, pos, params)
 
 				let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
-				personsWidget.infoTiles[updPersonPos] = { title : updPerson.name, subtitle : debtSubtitle };
+				personsWidget.infoTiles.items[updPersonPos] = { title : updPerson.name, subtitle : debtSubtitle };
 
 				state.values.widgets[3] = personsWidget;
 
 				// Accounts widget changes
-				var accWidget = { tiles : { length : App.accounts.length } };
+				var accWidget = { tiles : { items : { length : App.accounts.length } } };
 				if (origAcc && !origNoAccount)
 				{
 					var fmtAccBal = formatCurrency(origAcc.balance, origAcc.curr_id);
-					accWidget.tiles[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
+					accWidget.tiles.items[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
 				}
 				if (updAcc && !updNoAccount)
 				{
 					var fmtAccBal = formatCurrency(updAcc.balance, updAcc.curr_id);
-					accWidget.tiles[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
+					accWidget.tiles.items[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
 				}
 
 				state.values.widgets[0] = accWidget;
 
 				await test('Account and person balance update', async () => {}, view, state);
 
-				App.transactions = view.content.widgets[2].transList;
-				App.accounts = view.content.widgets[0].tiles;
-				App.persons = view.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList.items;
+				App.accounts = view.content.widgets[0].tiles.items;
+				App.persons = view.content.widgets[3].infoTiles.items;
 				App.notify();
 
 				return view;

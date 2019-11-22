@@ -269,9 +269,9 @@ function goToMainView(view)
 	return view.goToMainView()
 			.then(async view =>
 			{
-				App.transactions = view.content.widgets[2].transList;
-				App.accounts = view.content.widgets[0].tiles;
-				App.persons = view.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList.items;
+				App.accounts = view.content.widgets[0].tiles.items;
+				App.persons = view.content.widgets[3].infoTiles.items;
 				App.currencies = await view.global('currency');
 
 				App.notify();
@@ -438,14 +438,14 @@ function deleteTransactions(view, type, transactions)
 			.then(view => view.filterByType(type))
 			.then(async view =>
 			{
-				let trCount = view.content.transactions ? view.content.transactions.length : 0;
+				let trCount = view.content.transList ? view.content.transList.items.length : 0;
 				App.beforeDeleteTransaction.trCount = trCount;
 				App.beforeDeleteTransaction.deleteList = await Promise.all(transactions.map(trPos =>
 				{
 					if (trPos < 0 || trPos >= trCount)
 						throw new Error('Wrong transaction position: ' + trPos);
 
-					return view.getTransactionObject(view.content.transactions[trPos].id);
+					return view.getTransactionObject(view.content.transList.items[trPos].id);
 				}));
 
 				App.beforeDeleteTransaction.deleteList.forEach(trObj =>
@@ -459,11 +459,11 @@ function deleteTransactions(view, type, transactions)
 			})
 			.then(async view =>
 			{
-				var state = { value : { transactions : { length : App.transactions.length - transactions.length } } };
+				var state = { value : { transList : { items : { length : App.transactions.length - transactions.length } } } };
 
 				await test('Delete transactions [' + transactions.join() + ']', async () => {}, view, state);
 
-				App.transactions = view.content.transactions;
+				App.transactions = view.content.transList.items;
 				App.notify();
 
 				return view;
@@ -475,8 +475,8 @@ function deleteTransactions(view, type, transactions)
 				let origPersons = App.beforeDeleteTransaction.persons;
 
 				// Widget changes
-				var personsWidget = { infoTiles : { length : App.persons.length } };
-				var accWidget = { tiles : { length : App.accounts.length } };
+				var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
+				var accWidget = { tiles : { items : { length : App.accounts.length } } };
 
 				let affectedAccounts = [];
 				let affectedPersons = [];
@@ -601,7 +601,7 @@ function deleteTransactions(view, type, transactions)
 					let acc = affectedAccounts[accPos];
 					fmtBal = formatCurrency(acc.balance, acc.curr_id);
 
-					accWidget.tiles[accPos] = { balance : fmtBal, name : acc.name };
+					accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 				}
 
 				for(let personPos in affectedPersons)
@@ -619,16 +619,16 @@ function deleteTransactions(view, type, transactions)
 
 					let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
-					personsWidget.infoTiles[personPos] = { title : person.name, subtitle : debtSubtitle };
+					personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 				}
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
 
 				await test('Delete transactions [' + transactions.join() + ']', async () => {}, view, state);
 
-				App.transactions = view.content.widgets[2].transList;
-				App.accounts = view.content.widgets[0].tiles;
-				App.persons = view.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList.items;
+				App.accounts = view.content.widgets[0].tiles.items;
+				App.persons = view.content.widgets[3].infoTiles.items;
 				App.notify();
 
 				return view;

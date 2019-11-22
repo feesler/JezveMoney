@@ -193,7 +193,7 @@ TestView.prototype.parseTiles = async function(tilesEl, parseCallback)
 	if (!tilesEl)
 		return null;
 
-	var res = [];
+	var res = { elem : tilesEl, items : [] };
 	let children = await this.queryAll(tilesEl, ':scope > *');
 	if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
 		return res;
@@ -205,10 +205,10 @@ TestView.prototype.parseTiles = async function(tilesEl, parseCallback)
 		if (!tileObj)
 			throw new Error('Fail to parse tile');
 
-		res.push(tileObj);
+		res.items.push(tileObj);
 	}
 
-	res.sort(function(a, b)
+	res.items.sort(function(a, b)
 	{
 		return (a.id == b.id) ? 0 : ((a.id < b.id) ? -1 : 1);
 	});
@@ -229,7 +229,7 @@ TestView.prototype.parseTransactionsList = async function(listEl)
 		return null;
 
 	var self = this;
-	var res = [];
+	var res = { elem : listEl, items : [] };
 
 	let children = await this.queryAll(listEl, ':scope > *');
 	if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
@@ -274,7 +274,7 @@ TestView.prototype.parseTransactionsList = async function(listEl)
 			return self.click(this.elem);
 		};
 
-		res.push(itemObj);
+		res.items.push(itemObj);
 	}
 
 	return res;

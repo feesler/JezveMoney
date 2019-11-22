@@ -96,9 +96,9 @@ function createTransfer(view, onState, params)
 				var fmtDestBal = formatCurrency(expDestBalance, destAcc.curr_id);
 
 				// Accounts widget changes
-				var accWidget = { tiles : { length : App.accounts.length } };
-				accWidget.tiles[srcAccPos] = { balance : fmtSrcBal, name : srcAcc.name };
-				accWidget.tiles[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
+				var accWidget = { tiles : { items : { length : App.accounts.length } } };
+				accWidget.tiles.items[srcAccPos] = { balance : fmtSrcBal, name : srcAcc.name };
+				accWidget.tiles.items[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
 
 				// Transactions widget changes
 				var fmtAmount = formatCurrency(sa, srcAcc.curr_id);
@@ -108,8 +108,8 @@ function createTransfer(view, onState, params)
 				}
 
 				var transWidget = { title : 'Transactions',
-									transList : { length : Math.min(App.transactions.length + 1, 5) } };
-				transWidget.transList[0] = { accountTitle : srcAcc.name + ' → ' + destAcc.name,
+									transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
+				transWidget.transList.items[0] = { accountTitle : srcAcc.name + ' → ' + destAcc.name,
 												amountText : fmtAmount,
 											 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
 											 	comment : ('comment' in params) ? params.comment : '' };
@@ -118,9 +118,9 @@ function createTransfer(view, onState, params)
 
 				await test('Transfer transaction submit', async () => {}, view, state);
 
-				App.transactions = view.content.widgets[2].transList;
-				App.accounts = view.content.widgets[0].tiles;
-				App.persons = view.content.widgets[3].infoTiles;
+				App.transactions = view.content.widgets[2].transList.items;
+				App.accounts = view.content.widgets[0].tiles.items;
+				App.persons = view.content.widgets[3].infoTiles.items;
 				App.notify();
 
 				return view;
@@ -145,9 +145,9 @@ function updateTransfer(view, pos, params)
 			.then(view => view.filterByType(TRANSFER))
 			.then(async view =>
 			{
-				App.beforeUpdateTransaction = { trCount : view.content.transactions.length };
+				App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
-				let trObj = await view.getTransactionObject(view.content.transactions[pos].id);
+				let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
 				if (!trObj)
 					throw new Error('Transaction not found');
 
@@ -196,8 +196,8 @@ function updateTransfer(view, pos, params)
 					fmtAmount += ' (' + formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
 				}
 
-				var state = { values : { transactions : { length : transCount } } };
-				state.values.transactions[pos] = { id : trans_id,
+				var state = { values : { transList : { items : { length : transCount } } } };
+				state.values.transList.items[pos] = { id : trans_id,
 													accountTitle : updSrcAcc.name + ' → ' + updDestAcc.name,
 													amountText : fmtAmount,
 												 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
@@ -234,7 +234,7 @@ function updateTransfer(view, pos, params)
 				var da = updDestAmount;
 
 				// Accounts widget changes
-				var accWidget = { tiles : { length : App.accounts.length } };
+				var accWidget = { tiles : { items : { length : App.accounts.length } } };
 				var expBalance = [], fmtBal;
 
 				// Cancel transaction
@@ -263,7 +263,7 @@ function updateTransfer(view, pos, params)
 					let acc = affectedAccounts[accPos];
 					fmtBal = formatCurrency(acc.balance, acc.curr_id);
 
-					accWidget.tiles[accPos] = { balance : fmtBal, name : acc.name };
+					accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 				}
 
 				var state = { values : { widgets : { length : 5, 0 : accWidget } } };

@@ -18,7 +18,7 @@ function onAppUpdatePersons(props)
 
 async function checkInitialPersons(view)
 {
-	var state = { value : { tiles : { length : 0 } } };
+	var state = { value : { tiles : { items : { length : 0 } } } };
 	await test('Initial persons structure', async () => {}, view, state);
 
 	return view;
@@ -33,12 +33,12 @@ function createPerson(view, personName)
 			.then(view => view.createPerson(personName))
 			.then(async view =>
 			{
-				var state = { value : { tiles : { length : App.persons.length + 1 } } };
-				state.value.tiles[App.persons.length] = { name : personName };
+				var state = { value : { tiles : { items : { length : App.persons.length + 1 } } } };
+				state.value.tiles.items[App.persons.length] = { name : personName };
 
 				await test('Create person', async () => {}, view, state);
 
-				App.persons = view.content.tiles;
+				App.persons = view.content.tiles.items;
 				App.notify();
 
 				return view;
@@ -62,12 +62,12 @@ function updatePerson(view, num, personName)
 			})
 			.then(async view =>
 			{
-				var state = { values : { tiles : { length : App.persons.length } }};
-				state.values.tiles[num] = { name : personName };
+				var state = { values : { tiles : { items : { length : App.persons.length } } } };
+				state.values.tiles.items[num] = { name : personName };
 
 				await test('Update person', async () => {}, view, state);
 
-				App.persons = view.content.tiles;
+				App.persons = view.content.tiles.items;
 				App.notify();
 
 				return view;
@@ -80,7 +80,7 @@ function deletePersons(view, persons)
 	return view.deletePersons(persons)
 			.then(async (view) =>
 			{
-				var state = { values : { tiles : { length : App.persons.length - persons.length } } };
+				var state = { values : { tiles : { items : { length : App.persons.length - persons.length } } } };
 
 				await test('Delete persons [' + persons.join() + ']', async () => {}, view, state);
 
