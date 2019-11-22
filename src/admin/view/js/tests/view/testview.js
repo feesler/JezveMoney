@@ -269,7 +269,7 @@ TestView.prototype.parseTransactionsList = async function(listEl)
 		elem = await this.query(li, '.tritem_comm');
 		itemObj.comment = elem ? await this.prop(elem, 'innerText') : '';
 
-		itemObj.click = function()
+		itemObj.click = async function()
 		{
 			return self.click(this.elem);
 		};

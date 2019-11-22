@@ -84,6 +84,9 @@ function deletePersons(view, persons)
 
 				await test('Delete persons [' + persons.join() + ']', async () => {}, view, state);
 
+				App.persons = view.content.tiles.items;
+				App.notify();
+
 				return view;
 			});
 }
