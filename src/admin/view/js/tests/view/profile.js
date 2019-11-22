@@ -75,6 +75,37 @@ ProfileView.prototype.parseContent = async function()
 };
 
 
+ProfileView.prototype.resetAccounts = function()
+{
+	return this.performAction(() =>
+	{
+		if (!this.content.resetBtn)
+			throw new Error('Reset accounts button not found');
+
+		return this.click(this.content.resetBtn);
+	})
+	.then(async () =>
+	{
+		if (!this.content.reset_warning || !this.content.reset_warning.elem || !await this.isVisible(this.content.reset_warning.elem))
+			throw new Error('Warning popup not appear');
+		if (!this.content.reset_warning.okBtn)
+			throw new Error('Confirm button not found');
+
+		return this.navigation(() => this.click(this.content.reset_warning.okBtn));
+	})
+	// Use view here instead of this because the instance was changed after navigation
+	.then(view =>
+	{
+		if (!view.msgPopup)
+			throw new Error('Message popup not found');
+
+		if (!view.msgPopup.success || view.msgPopup.message !== 'Accounts successfully reseted')
+			throw new Error('Fail to reset accounts');
+
+		return view.performAction(() => view.msgPopup.close());
+	});
+};
+
 
 ProfileView.prototype.resetAll = function()
 {
