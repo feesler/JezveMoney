@@ -168,9 +168,20 @@ var Environment = (function()
 	}
 
 
-	async function addResult(descr, res, message)
+	async function addResult(descr, res)
 	{
-		message = message || '';
+		var err = null;
+		var resStr;
+		var message = '';
+
+		if (descr instanceof Error)
+		{
+			err = descr;
+			descr = err.descr;
+			delete err.descr;
+			res = false;
+			message = err.message;
+		}
 
 		if (results.expected)
 			totalRes.innerHTML = ++results.total + '/' + results.expected;
@@ -179,9 +190,14 @@ var Environment = (function()
 		okRes.innerHTML = (res) ? ++results.ok : results.ok;
 		failRes.innerHTML = (res) ? results.fail : ++results.fail;
 
+		resStr = (res ? 'OK' : 'FAIL');
+
 		restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
-											ce('td', { innerHTML : (res ? 'OK' : 'FAIL') }),
+											ce('td', { innerHTML : resStr }),
 										 	ce('td', { innerHTML : message }) ]));
+
+		if (err)
+			console.error(err);
 	}
 
 
@@ -204,17 +220,11 @@ var Environment = (function()
 					throw new Error('View document not found');
 
 				checkPHPerrors(env, vdoc.documentElement.innerHTML);
-				try
-				{
-					let viewClass = await route(env, await getUrl());
 
-					let view = new viewClass({ environment : env });
-					resolve(view.parse());
-				}
-				catch(e)
-				{
-					reject(e.message, false);
-				}
+				let viewClass = await route(env, await getUrl());
+
+				let view = new viewClass({ environment : env });
+				resolve(view.parse());
 			};
 		});
 
@@ -243,15 +253,22 @@ var Environment = (function()
 
 		startbtn.onclick = async function()
 		{
-			results = { total : 0, ok : 0, fail : 0, expected : 0 };
+			try
+			{
+				results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
-			if (config.testsExpected)
-				results.expected = config.testsExpected;
+				if (config.testsExpected)
+					results.expected = config.testsExpected;
 
-			await addResult('Test initialization', true);
+				await addResult('Test initialization', true);
 
-			let view = await navigation(async () => viewframe.src = baseURL );
-			view = await navHandler(view);
+				let view = await navigation(async () => viewframe.src = baseURL );
+				view = await navHandler(view);
+			}
+			catch(e)
+			{
+				addResult(e);
+			}
 		};
 	}
 

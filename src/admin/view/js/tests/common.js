@@ -330,7 +330,11 @@ function test(descr, action, view, state)
 				let res = await view.checkState(expState);
 				view.addResult(descr, res);
 			})
-			.catch(e => view.addResult(descr, false, e.message));
+			.catch(e =>
+			{
+				e.descr = descr;
+				throw e;
+			});
 }
 
 

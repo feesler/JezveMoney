@@ -34,7 +34,7 @@ else
 	transactions.debt = runDebt;
 }
 
-var results = {};
+
 var App = {
 	accounts : [],
 	persons : [],

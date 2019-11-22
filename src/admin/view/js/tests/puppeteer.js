@@ -188,18 +188,43 @@ var Environment = (function()
 	}
 
 
-	function addResult(descr, res, message)
+	function addResult(descr, res)
 	{
+		let err = null;
+		let resStr;
+		let message = null;
+
+		if (descr instanceof Error)
+		{
+			err = descr;
+			descr = err.descr;
+			delete err.descr;
+			res = false;
+			message = err.message;
+		}
+
+		descr = (descr) ? descr + ': ' : '';
+		message = (message) ? ' ' + message : '';
+
 		if (res)
+		{
 			results.ok++;
+			resStr = chalk.green('OK');
+		}
 		else
+		{
 			results.fail++;
+			resStr = chalk.red('FAIL');
+		}
 
 		let counter = ++results.total;
 		if (results.expected)
 			counter += '/' + results.expected;
 
-		console.log('[' + counter + '] ' + descr + ': ' + (res ? chalk.green('OK') : chalk.red('FAIL')) + (message ? ' ' + message : ''));
+		console.log('[' + counter + '] ' + descr + resStr + message);
+
+		if (err)
+			console.error(err);
 	}
 
 
@@ -272,9 +297,9 @@ var Environment = (function()
 			view = await navHandler(view);
 			res = 0;
 		}
-		catch(msg)
+		catch(e)
 		{
-			addResult(msg, false);
+			addResult(e);
 		}
 
 		if (browser)
