@@ -545,20 +545,21 @@ TestView.prototype.parseDatePickerRow = async function(elem)
 	var self = this;
 	var res = { elem : elem };
 
-	var iconLinkElem = await this.query(elem, '.iconlink');
+	res.iconLink = await this.parseIconLink(await this.query(elem, '.iconlink'));
+	if (!res.iconLink)
+		throw new Error('Iconlink of date picker not found');
 
-	res.iconLink = await this.parseIconLink(iconLinkElem);
 	res.inputRow = await this.parseInputRow(await this.query(elem, '.iconlink + *'));
-	if (!res.inputRow)
-		throw new Error('Input row of date picker not found');
+	if (!res.inputRow || !res.inputRow.datePickerBtn)
+		throw new Error('Unexpected structure of date picker input row');
 	res.date = res.inputRow.value;
 
 	res.input = async function(val)
 	{
-		if (self.isVisible(this.iconLink))
+		if (self.isVisible(this.iconLink.elem))
 		{
 			await this.iconLink.click();
-			await self.click(this.datePickerBtn);
+			await self.click(this.inputRow.datePickerBtn);
 		}
 
 		return this.inputRow.input(val);

@@ -54,7 +54,7 @@ async function submitTransferTransaction(view, params)
 		await test('Destination amount (' + params.destAmount + ') input', () => view.inputDestAmount(params.destAmount), view);
 
 	if ('date' in params)
-		await test('Date (' + params.date + ') input', () => view.inputDate(params.date), view);
+		await test('Date (' + params.date + ') input', () => view.changeDate(params.date), view);
 
 	if ('comment' in params)
 		await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);

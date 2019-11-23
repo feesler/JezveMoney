@@ -56,7 +56,7 @@ async function submitExpenseTransaction(view, params)
 		await test('Source amount (' + params.srcAmount + ') input', () => view.inputSrcAmount(params.srcAmount), view);
 
 	if ('date' in params)
-		await test('Date (' + params.date + ') input', () => view.inputDate(params.date), view);
+		await test('Date (' + params.date + ') input', () => view.changeDate(params.date), view);
 
 	if ('comment' in params)
 		await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);

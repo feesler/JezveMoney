@@ -452,7 +452,7 @@ TransactionView.prototype.inputExchRate = function(val)
 
 TransactionView.prototype.changeDate = function(val)
 {
-	return this.performAction(() => this.content.datePicker.inputDate(val));
+	return this.performAction(() => this.content.datePicker.input(val));
 };
 
 
