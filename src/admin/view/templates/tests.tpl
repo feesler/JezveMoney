@@ -30,7 +30,7 @@ onReady(function()
 						<div class="tbl_container"><table><tbody id="restbl"></tbody></table></div>
 					</div>
 					<div class="ph"></div>
-					<div class="testview"><iframe id="viewframe" src="https://jezve.net/money/"></iframe></div>
+					<div class="testview"><iframe id="viewframe" src="<?=BASEURL?>"></iframe></div>
 				</div>
 			</div>
 		</div>

@@ -27,7 +27,17 @@
 		exit;
 	}
 
- 	define("APPHOST", $_SERVER["HTTP_HOST"]);
+	$host = $_SERVER["HTTP_HOST"];
+ 	define("APPHOST", $host);
+
+	$pos = strpos($host, ":");
+	if ($pos !== FALSE)
+		$domain = substr($host, 0, $pos);
+	else
+		$domain = $host;
+
+ 	define("APPDOMAIN", $domain);
+
 	if (strcmp(APPHOST, $productionHost) == 0)
 	{
 		define("APPPROT", "https://");
