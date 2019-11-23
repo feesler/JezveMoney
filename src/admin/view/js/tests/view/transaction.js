@@ -93,6 +93,9 @@ TransactionView.prototype.parseCommentRow = async function(elem)
 	var iconLinkElem = await this.query(elem, '.iconlink');
 
 	res.iconLink = await this.parseIconLink(iconLinkElem);
+	if (!res.iconLink)
+		throw new Error('Iconlink of comment not found');
+
 	res.inputRow = await this.parseInputRow(await this.query('#comment_block'));
 	if (!res.inputRow)
 		throw new Error('Input row of comment not found');
@@ -100,7 +103,7 @@ TransactionView.prototype.parseCommentRow = async function(elem)
 
 	res.input = async function(val)
 	{
-		if (await self.isVisible(this.iconLink))
+		if (await self.isVisible(this.iconLink.elem))
 			await this.iconLink.click();
 
 		return this.inputRow.input(val);
