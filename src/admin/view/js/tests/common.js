@@ -162,6 +162,18 @@ function formatCurrency(val, curr_id)
 
 
 /*
+*	Persons
+*/
+function getPersonByAcc(persons, acc_id)
+{
+	return persons.find(p =>
+	{
+		return p.accounts && p.accounts.some(a => a.id == acc_id);
+	});
+}
+
+
+/*
 *	Normalized decimal calculations
 */
 
@@ -352,6 +364,7 @@ var commonModule = { EXPENSE : EXPENSE,
 					Currency : Currency,
 					getCurrency : getCurrency,
 					formatCurrency : formatCurrency,
+					getPersonByAcc : getPersonByAcc,
 					fixFloat : fixFloat,
 					correct : correct,
 					correctExch : correctExch,
