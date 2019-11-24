@@ -14,7 +14,10 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function onAppUpdateTransfer(props)
+var runTransfer = (function()
+{
+
+function onAppUpdate(props)
 {
 	props = props || {};
 
@@ -515,10 +518,11 @@ async function transferTransactionLoop(view, actionState, action)
 }
 
 
-var runTransfer = { onAppUpdate : onAppUpdateTransfer,
-					createTransfer : createTransfer,
-					updateTransfer : updateTransfer,
-					transferTransactionLoop : transferTransactionLoop };
+ 	return { onAppUpdate : onAppUpdate,
+				create : createTransfer,
+				update : updateTransfer,
+				stateLoop : transferTransactionLoop };
+})();
 
 
 if (typeof module !== 'undefined' && module.exports)

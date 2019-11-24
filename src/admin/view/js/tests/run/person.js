@@ -7,7 +7,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function onAppUpdatePersons(props)
+var runPersons = (function()
+{
+
+
+function onAppUpdate(props)
 {
 	props = props || {};
 
@@ -92,11 +96,12 @@ function deletePersons(view, persons)
 }
 
 
-var runPersons = { onAppUpdate : onAppUpdatePersons,
-					checkInitialPersons : checkInitialPersons,
-					createPerson : createPerson,
-					updatePerson : updatePerson,
-					deletePersons : deletePersons };
+	return { onAppUpdate : onAppUpdate,
+				checkInitial : checkInitialPersons,
+				create : createPerson,
+				update : updatePerson,
+				del : deletePersons };
+})();
 
 
 if (typeof module !== 'undefined' && module.exports)

@@ -16,7 +16,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function onAppUpdateExpense(props)
+var runExpense = (function()
+{
+
+
+function onAppUpdate(props)
 {
 	props = props || {};
 
@@ -412,10 +416,11 @@ async function expenseTransactionLoop(view, actionState, action)
 }
 
 
-var runExpense = { onAppUpdate : onAppUpdateExpense,
-					createExpense : createExpense,
-					updateExpense : updateExpense,
-					expenseTransactionLoop : expenseTransactionLoop };
+ 	return { onAppUpdate : onAppUpdate,
+				create : createExpense,
+				update : updateExpense,
+				stateLoop : expenseTransactionLoop };
+})();
 
 
 if (typeof module !== 'undefined' && module.exports)

@@ -16,7 +16,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function onAppUpdateTransactions(props)
+var runTransactions = (function()
+{
+
+
+function onAppUpdate(props)
 {
 	props = props || {};
 
@@ -240,11 +244,10 @@ function deleteTransactions(view, type, transactions)
 }
 
 
+ 	return { onAppUpdate : onAppUpdate,
+				del : deleteTransactions };
+})();
 
-var runTransactions = { onAppUpdate : onAppUpdateTransactions,
-						del : deleteTransactions
-
-					 							};
 
 
 if (typeof module !== 'undefined' && module.exports)

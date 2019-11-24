@@ -12,7 +12,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-	function onAppUpdateStatistics(props)
+var runStatistics = (function()
+{
+
+
+	function onAppUpdate(props)
 	{
 		props = props || {};
 
@@ -111,8 +115,9 @@ if (typeof module !== 'undefined' && module.exports)
 	}
 
 
-var runStatistics = { onAppUpdate : onAppUpdate,
-						run : statisticsTests };
+	return { onAppUpdate : onAppUpdate,
+				run : statisticsTests };
+})();
 
 
 if (typeof module !== 'undefined' && module.exports)

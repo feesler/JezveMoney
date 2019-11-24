@@ -13,7 +13,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-function onAppUpdateAccounts(props)
+var runAccounts = (function()
+{
+
+
+function onAppUpdate(props)
 {
 	props = props || {};
 
@@ -203,14 +207,15 @@ function deleteAccounts(view, accounts)
 }
 
 
-var runAccounts = { onAppUpdate : onAppUpdateAccounts,
+	return { onAppUpdate : onAppUpdate,
 					createAccount1 : createAccount1,
 					checkCreateAccount : checkCreateAccount,
 					createAccount2 : createAccount2,
 					editAccount1 : editAccount1,
 					checkUpdateAccount : checkUpdateAccount,
-					createAccountWithParam : createAccountWithParam,
-					deleteAccounts : deleteAccounts };
+					create : createAccountWithParam,
+					del : deleteAccounts };
+})();
 
 
 if (typeof module !== 'undefined' && module.exports)
