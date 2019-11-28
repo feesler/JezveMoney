@@ -1,4 +1,6 @@
 const process = require('process');
+const querystring = require('querystring');
+const http = require('http');
 const puppeteer = require('puppeteer');
 const chalk = require('chalk');
 const common = require('./common.js');
@@ -188,6 +190,132 @@ var Environment = (function()
 	}
 
 
+	var reqCookies = {};
+
+
+	// Split attribute-value string divided by separator
+	function splitSep(str, sep)
+	{
+		let sepPos = str.indexOf(sep);
+		if (sepPos === -1)
+			return null;
+
+		return { name : str.substr(0, sepPos),
+					value : str.substr(sepPos + 1) };
+	}
+
+
+	function parseCookies(headers)
+	{
+		if (!headers)
+			return null;
+
+		let res = [];
+
+		if (!('set-cookie' in headers))
+			return res;
+
+		let cookies = headers['set-cookie'];
+
+		if (!common.isArray(cookies))
+			cookies = [ cookies ];
+
+		for(let cookieStr of cookies)
+		{
+			let cookieAttributes = cookieStr.split(';');
+			let cookieObj = {};
+
+			for(let attr of cookieAttributes)
+			{
+				attr = splitSep(attr.trim(), '=');
+				if (!attr)
+					continue;
+
+				if (typeof cookieObj.name === 'undefined')
+				{
+					cookieObj.name = attr.name;
+					cookieObj.value = attr.value;
+					cookieObj.attr = [];
+				}
+				else
+				{
+					cookieObj.attr[attr.name] = attr.value;
+				}
+			}
+
+			res.push(cookieObj);
+		}
+
+		return res;
+	}
+
+
+	async function httpRequest(method, url, data, headers)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			let supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
+
+			method = method.toLowerCase();
+			if (supportedMethods.indexOf(method) == -1)
+				reject('Unexpected method ' + method);
+
+			let postData = null;
+			let options = { method : method, headers : {} };
+
+			if (headers)
+				common.setParam(options.headers, headers);
+
+			options.headers['Cookie'] = [];
+			for(let cookieName in reqCookies)
+			{
+				let cookieVal = reqCookies[cookieName];
+				options.headers['Cookie'].push(cookieName + '=' + cookieVal);
+			}
+
+			if (method == 'post' && data)
+			{
+				postData = querystring.stringify(data);
+
+				common.setParam(options.headers,
+									{ 'Content-Type' : 'application/x-www-form-urlencoded',
+										'Content-Length' : Buffer.byteLength(postData) });
+			}
+
+
+			let req = http.request(url, options, res =>
+			{
+				let body = '';
+
+				res.setEncoding('utf8');
+				res.on('data', chunk => body += chunk);
+				res.on('end', () =>
+				{
+					let newCookies = parseCookies(res.headers);
+
+					for(let cookie of newCookies)
+					{
+						if (cookie.value == '')
+							delete reqCookies[cookie.name];
+						else
+							reqCookies[cookie.name] = cookie.value;
+					}
+
+					resolve({ status : res.statusCode,
+								headers : res.headers,
+								body : body });
+				});
+			});
+
+			if (postData)
+				req.write(postData);
+
+			req.on('error', e => reject(e.message));
+			req.end();
+		});
+	}
+
+
 	function addResult(descr, res)
 	{
 		let err = null;
@@ -324,6 +452,7 @@ var Environment = (function()
 				global : getGlobal,
 				click : clickEmul,
 				input : inputEmul,
+				httpReq : httpRequest,
 				addResult : addResult,
 				setBlock : setBlock };
 })();

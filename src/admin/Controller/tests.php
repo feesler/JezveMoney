@@ -23,6 +23,7 @@ class TestsAdminController extends Controller
 		$this->jsAdmin[] = "tests/common.js";
 		$this->jsAdmin[] = "tests/browser.js";
 		$this->jsAdmin[] = "tests/router.js";
+		$this->jsAdmin[] = "tests/api.js";
 		$this->jsAdmin[] = "tests/view/testview.js";
 		$this->jsAdmin[] = "tests/view/login.js";
 		$this->jsAdmin[] = "tests/view/main.js";
@@ -39,6 +40,7 @@ class TestsAdminController extends Controller
 		$this->jsAdmin[] = "tests/view/transactions.js";
 		$this->jsAdmin[] = "tests/view/statistics.js";
 
+		$this->jsAdmin[] = "tests/run/api.js";
 		$this->jsAdmin[] = "tests/run/account.js";
 		$this->jsAdmin[] = "tests/run/person.js";
 		$this->jsAdmin[] = "tests/run/transactions.js";

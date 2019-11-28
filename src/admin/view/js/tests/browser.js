@@ -168,6 +168,45 @@ var Environment = (function()
 	}
 
 
+	async function httpRequest(method, url, data, headers)
+	{
+		let supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
+
+		method = method.toLowerCase();
+		if (supportedMethods.indexOf(method) == -1)
+			reject('Unexpected method ' + method);
+
+		let postData = null;
+		let options = { method : method, headers : {} };
+
+		if (headers)
+			common.setParam(options.headers, headers);
+
+		if (method == 'post' && data)
+		{
+			postData = common.urlJoin(data);
+
+			let encoder = new TextEncoder();
+			let uint8Array = encoder.encode(postData);
+
+			common.setParam(options.headers,
+								{ 'Content-Type' : 'application/x-www-form-urlencoded',
+									'Content-Length' : uint8Array.length });
+			options.body = postData;
+		}
+
+
+		let resp = await fetch(url, options);
+
+		let res = { status : resp.status,
+		 			headers : resp.headers }
+
+		res.body = await resp.text();
+
+		return res;
+	}
+
+
 	async function addResult(descr, res)
 	{
 		var err = null;
@@ -289,6 +328,7 @@ var Environment = (function()
 		click : clickEmul,
 		input : inputEmul,
 		onChange : onChange,
+		httpReq : httpRequest,
 		addResult : addResult,
 	 	setBlock : setBlock
 	};

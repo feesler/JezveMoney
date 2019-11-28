@@ -13,6 +13,8 @@ if (typeof module !== 'undefined' && module.exports)
 
 	var runStatistics = require('./run/statistics.js');
 
+	var runAPI = require('./run/api.js');
+
 	var common = require('./common.js');
 	var copyObject = common.copyObject;
 	var test = common.test;
@@ -50,6 +52,13 @@ var statistics = runStatistics;
 
 
 var App = {
+
+	config : {
+	/*	url : 'https://jezve.net/money/'	*/
+		url : 'http://jezvemoney:8096/',
+		testsExpected : 589
+	},
+
 	accounts : [],
 	persons : [],
 	transactions : [],
@@ -71,6 +80,8 @@ var App = {
 		transactions.debt.onAppUpdate(notification);
 
 		statistics.onAppUpdate(notification);
+
+		runAPI.onAppUpdate(notification);
 	},
 
 	goToMainView : goToMainView
@@ -83,6 +94,7 @@ async function startTests(view)
 
 	App.notify();
 
+	view = await apiTests(view);
 	view = await reloginAsTester(view);
 	view = await view.goToProfile();
 	view = await view.resetAll();
@@ -376,6 +388,14 @@ async function runDeleteDebtTests(view)
 }
 
 
+async function apiTests(view)
+{
+	await runAPI.run(view, App);
+
+	return view;
+}
+
+
 async function reloginAsTester(view)
 {
 	if (view.isUserLoggedIn())
@@ -390,14 +410,7 @@ async function reloginAsTester(view)
 }
 
 
-var config = {
-/*	url : 'https://jezve.net/money/'	*/
-	url : 'http://jezvemoney:8096/',
-	testsExpected : 589
-};
-
-
-var main = { config : config,
+var main = { config : App.config,
 				startTests : startTests };
 
 

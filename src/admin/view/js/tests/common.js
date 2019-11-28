@@ -297,6 +297,33 @@ function extend(Child, Parent)
 }
 
 
+// Join parameters and values of object to URL
+function urlJoin(obj)
+{
+	var arr = [], par;
+
+	if (typeof obj !== 'object')
+		return '';
+
+	for(par in obj)
+	{
+		val = obj[par];
+		if (isArray(val))
+		{
+			val.forEach(function(arrItem)
+			{
+				if (typeof arrItem !== 'object')
+					arr.push(par + '[]=' + arrItem.toString());
+			});
+		}
+		else if (typeof val !== 'object')
+			arr.push(par + '=' + val.toString());
+	}
+
+	return arr.join('&');
+}
+
+
 function onAppUpdateCommon(props)
 {
 	props = props || {};
@@ -430,6 +457,7 @@ var commonModule = { EXPENSE : EXPENSE,
 					idSearch : idSearch,
 					copyObject : copyObject,
 					extend : extend,
+					urlJoin,
 					onAppUpdate : onAppUpdateCommon,
 					checkPHPerrors : checkPHPerrors,
 					checkObjValue : checkObjValue,
