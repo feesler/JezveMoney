@@ -11,6 +11,7 @@ if (typeof module !== 'undefined' && module.exports)
 	var normalize = common.normalize;
 	var normalizeExch = common.normalizeExch;
 	var isValidValue = common.isValidValue;
+	var checkObjValue = common.checkObjValue;
 	var EXPENSE = common.EXPENSE;
 	var INCOME = common.INCOME;
 	var TRANSFER = common.TRANSFER;
@@ -668,40 +669,6 @@ TestView.prototype.checkVisibility = async function(controls, expected)
 };
 
 
-TestView.prototype.checkObjValue = async function(obj, expectedObj)
-{
-	if (obj === expectedObj)
-		return true;
-
-	var value, expected;
-	for(var vKey in expectedObj)
-	{
-		if (!(vKey in obj))
-			return { key : vKey };
-
-		expected = expectedObj[vKey];
-		value = obj[vKey];
-		if (isObject(expected))
-		{
-			var res = await this.checkObjValue(value, expected);
-			if (res !== true)
-			{
-				res.key = vKey + '.' + res.key;
-				return res;
-			}
-		}
-		else if (value !== expected)
-		{
-			return { key : vKey,
-						value : value,
-						expected : expected };
-		}
-	}
-
-	return true;
-};
-
-
 TestView.prototype.checkValues = async function(controls)
 {
 	var res = true;
@@ -716,7 +683,7 @@ TestView.prototype.checkValues = async function(controls)
 
 		if (isObject(expected))
 		{
-			res = await this.checkObjValue(control, expected);
+			res = await checkObjValue(control, expected, true);
 			if (res !== true)
 			{
 				res.key = countrolName + '.' + res.key;

@@ -328,6 +328,55 @@ function checkPHPerrors(env, content)
 }
 
 
+async function checkObjValue(obj, expectedObj, ret = false)
+{
+	var res = true;
+
+	if (obj === expectedObj)
+		return true;
+
+	var value, expected;
+	for(var vKey in expectedObj)
+	{
+		if (obj === null || !(vKey in obj))
+		{
+			res = { key : vKey };
+			break;
+		}
+
+		expected = expectedObj[vKey];
+		value = obj[vKey];
+		if (isObject(expected))
+		{
+			var res = await checkObjValue(value, expected);
+			if (res !== true)
+			{
+				res.key = vKey + '.' + res.key;
+				break;
+			}
+		}
+		else if (value !== expected)
+		{
+			res = { key : vKey,
+						value : value,
+						expected : expected };
+			break;
+		}
+	}
+
+	if (res !== true && !ret)
+	{
+		if ('expected' in res)
+			throw new Error('Not expected value "' + res.value + '" for (' + res.key + ') "' + res.expected  + '" is expected');
+		else
+			throw new Error('Path (' + res.key + ') not found');
+	}
+
+	return res;
+}
+
+
+
 // Run action, check state and add result to the list
 function test(descr, action, view, state)
 {
@@ -377,6 +426,7 @@ var commonModule = { EXPENSE : EXPENSE,
 					extend : extend,
 					onAppUpdate : onAppUpdateCommon,
 					checkPHPerrors : checkPHPerrors,
+					checkObjValue : checkObjValue,
 					test : test };
 
 
