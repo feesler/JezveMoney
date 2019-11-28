@@ -58,7 +58,7 @@ class PersonApiController extends ApiController
 		if (!isset($_POST["name"]))
 			$respObj->fail();
 
-		$p_id = $this->pMod->create($_POST["name"]);
+		$p_id = $this->pMod->create([ "name" => $_POST["name"] ]);
 		if (!$p_id)
 			$respObj->fail();
 
@@ -79,7 +79,7 @@ class PersonApiController extends ApiController
 		if (!isset($_POST["id"]) || !isset($_POST["name"]))
 			$respObj->fail();
 
-		if (!$this->pMod->edit($_POST["id"], $_POST["name"]))
+		if (!$this->pMod->edit($_POST["id"], [ "name" => $_POST["name"] ]))
 			$respObj->fail();
 
 		$respObj->ok();
