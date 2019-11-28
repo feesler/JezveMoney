@@ -14,9 +14,6 @@ class UserApiController extends ApiController
 
 		$respObj = new apiResponse();
 
-		if ($this->user_id != 0)
-			$respObj->fail();
-
 		if (!$this->isPOST())
 			$respObj->fail();
 

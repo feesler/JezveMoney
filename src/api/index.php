@@ -53,7 +53,7 @@
 
 	// Check correct user authentication for controller
 	$loggedOutControllers = ["user/login", "user/register"];
-	$rebuildRoute = $contrStr.(count($routeParts) ? $routeParts[0] : "");
+	$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
 	$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
 
 
