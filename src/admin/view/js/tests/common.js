@@ -378,24 +378,30 @@ async function checkObjValue(obj, expectedObj, ret = false)
 
 
 // Run action, check state and add result to the list
-function test(descr, action, view, state)
+async function test(descr, action, env, state)
 {
-	let actPromise = action();
-	if (!actPromise)
-		throw new Error('Action should return promise');
+	try
+	{
+		let actRes = await action();
+		let res;
 
-	return actPromise
-			.then(async () =>
-			{
-				let expState = (typeof state === 'undefined') ? view.expectedState : state;
-				let res = await view.checkState(expState);
-				view.addResult(descr, res);
-			})
-			.catch(e =>
-			{
-				e.descr = descr;
-				throw e;
-			});
+		if (env.checkState)
+		{
+			let expState = (typeof state === 'undefined') ? env.expectedState : state;
+			res = await env.checkState(expState);
+		}
+		else
+		{
+			res = actRes;
+		}
+
+		env.addResult(descr, res);
+	}
+	catch(e)
+	{
+		e.descr = descr;
+		throw e;
+	}
 }
 
 
