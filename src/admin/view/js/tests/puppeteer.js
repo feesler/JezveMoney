@@ -433,6 +433,8 @@ var Environment = (function()
 		if (browser)
 			await browser.close();
 
+		console.log('Total: ' + results.total + ' Passed: ' + results.ok + ' Failed: ' + results.fail);
+
 		process.exit(res);
 	}
 
