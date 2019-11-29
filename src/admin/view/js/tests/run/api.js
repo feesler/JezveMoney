@@ -104,6 +104,50 @@ var runAPI = (function()
 	}
 
 
+	async function getExpectedTransaction(params)
+	{
+		let res = App.copyObject(params);
+
+		let isDebt = (res.transtype == App.DEBT);
+		if (isDebt)
+		{
+			let personsList = await api.person.read(res.person_id);
+			let personObj = App.idSearch(personsList, res.person_id);
+			if (!personObj)
+				throw new Error('Person not found');
+
+			let reqCurr = (res.debtop == 1) ? res.src_curr : res.dest_curr;
+			let personAcc = personObj.accounts.find(item => (item.curr_id == reqCurr));
+
+			if (res.debtop == 1)
+			{
+				if (personAcc)
+					res.src_id = personAcc.id;
+				res.dest_id = res.acc_id;
+			}
+			else
+			{
+				res.src_id = res.acc_id;
+				if (personAcc)
+					res.dest_id = personAcc.id;
+			}
+
+			delete res.debtop;
+			delete res.person_id;
+			delete res.acc_id;
+		}
+
+		res.type = res.transtype;
+		delete res.transtype;
+
+		res.comment = res.comm;
+		delete res.comm;
+
+		return res;
+	}
+
+
+
 	// Create person with specified params (name)
 	// And check expected state of app
 	async function apiCreateTransactionTest(params)
@@ -116,41 +160,7 @@ var runAPI = (function()
 			if (!App.isArray(trBefore))
 				return false;
 
-			let expTransObj = App.copyObject(params);
-			let isDebt = (expTransObj.transtype == App.DEBT);
-			if (isDebt)
-			{
-				let personsList = await api.person.read(expTransObj.person_id);
-				let personObj = App.idSearch(personsList, expTransObj.person_id);
-				if (!personObj)
-					throw new Error('Person not found');
-
-				let reqCurr = (expTransObj.debtop == 1) ? expTransObj.src_curr : expTransObj.dest_curr;
-				let personAcc = personObj.accounts.find(item => (item.curr_id == reqCurr));
-
-				if (expTransObj.debtop == 1)
-				{
-					if (personAcc)
-						expTransObj.src_id = personAcc.id;
-					expTransObj.dest_id = expTransObj.acc_id;
-				}
-				else
-				{
-					expTransObj.src_id = expTransObj.acc_id;
-					if (personAcc)
-						expTransObj.dest_id = personAcc.id;
-				}
-
-				delete expTransObj.debtop;
-				delete expTransObj.person_id;
-				delete expTransObj.acc_id;
-			}
-
-			expTransObj.type = expTransObj.transtype;
-			delete expTransObj.transtype;
-
-			expTransObj.comment = expTransObj.comm;
-			delete expTransObj.comm;
+			let expTransObj = await getExpectedTransaction(params);
 
 			let createRes = await api.transaction.create(params);
 			if (!createRes || !createRes.id)
