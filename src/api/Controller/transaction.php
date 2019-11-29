@@ -66,6 +66,7 @@ class TransactionApiController extends ApiController
 		{
 			$tr = new stdClass;
 			$tr->id = $trans->id;
+			$tr->type = $trans->type;
 			$tr->src_id = $trans->src_id;
 			$tr->dest_id = $trans->dest_id;
 			$tr->src_amount = $trans->src_amount;
@@ -85,7 +86,7 @@ class TransactionApiController extends ApiController
 
 	public function create()
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$respObj = new apiResponse();
 
@@ -128,7 +129,15 @@ class TransactionApiController extends ApiController
 
 		if ($trans_type == DEBT)
 		{
-			if (!$debtMod->create($debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$debtMod->create([ "op" => $debt_op,
+									"acc_id" => $acc_id,
+									"person_id" => $person_id,
+									"src_amount" => $src_amount,
+									"dest_amount" => $dest_amount,
+									"src_curr" => $src_curr,
+									"dest_curr" => $dest_curr,
+									"date" => $fdate,
+									"comment" => $comment ]))
 				$respObj->fail();
 		}
 		else
@@ -140,7 +149,15 @@ class TransactionApiController extends ApiController
 			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				$respObj->fail();
 
-			$trans_id = $this->trMod->create($trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment);
+			$trans_id = $this->trMod->create([ "type" => $trans_type,
+												"src_id" => $src_id,
+												"dest_id" => $dest_id,
+												"src_amount" => $src_amount,
+												"dest_amount" => $dest_amount,
+												"src_curr" => $src_curr,
+												"dest_curr" => $dest_curr,
+												"date" => $fdate,
+												"comment" => $comment ]);
 			if (!$trans_id)
 				$respObj->fail();
 
@@ -153,7 +170,7 @@ class TransactionApiController extends ApiController
 
 	public function update()
 	{
-		global $db;
+		$db = mysqlDB::getInstance();
 
 		$respObj = new apiResponse();
 
@@ -199,12 +216,28 @@ class TransactionApiController extends ApiController
 
 		if ($trans_type == DEBT)
 		{
-			if (!$debtMod->edit($trans_id, $debt_op, $acc_id, $person_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$debtMod->update($trans_id, [ "op" => $debt_op,
+												"acc_id" => $acc_id,
+												"person_id" => $person_id,
+												"src_amount" => $src_amount,
+												"dest_amount" => $dest_amount,
+												"src_curr" => $src_curr,
+												"dest_curr" => $dest_curr,
+												"date" => $fdate,
+												"comment" => $comment ]))
 				$respObj->fail();
 		}
 		else
 		{
-			if (!$this->trMod->edit($trans_id, $trans_type, $src_id, $dest_id, $src_amount, $dest_amount, $src_curr, $dest_curr, $fdate, $comment))
+			if (!$this->trMod->update($trans_id, [ "type" => $trans_type,
+												"src_id" => $src_id,
+												"dest_id" => $dest_id,
+												"src_amount" => $src_amount,
+												"dest_amount" => $dest_amount,
+												"src_curr" => $src_curr,
+												"dest_curr" => $dest_curr,
+												"date" => $fdate,
+												"comment" => $comment ]))
 				$respObj->fail();
 		}
 		$ttStr = TransactionModel::getTypeString($trans_type);
