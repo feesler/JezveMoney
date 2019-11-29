@@ -1,12 +1,5 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	const common = require('../common.js');
-	var test = common.test;
-	var isArray = common.isArray;
-	var idSearch = common.idSearch;
-	var copyObject = common.copyObject;
-	var checkObjValue = common.checkObjValue;
-
 	var api = require('../api.js');
 
 	var App = null;
@@ -35,12 +28,15 @@ var runAPI = (function()
 	// And check expected state of app
 	async function apiCreateAccountTest(params)
 	{
-		await test('Create account', async () => {
+		let acc_id = 0;
+
+		await App.test('Create account', async () =>
+		{
 			let accBefore = await api.account.list();
-			if (!isArray(accBefore))
+			if (!App.isArray(accBefore))
 				return false;
 
-			let expAccObj = copyObject(params);
+			let expAccObj = App.copyObject(params);
 			expAccObj.curr_id = params.currency;
 			delete expAccObj.currency;
 
@@ -48,20 +44,24 @@ var runAPI = (function()
 			if (!createRes || !createRes.id)
 				return false;
 
+			acc_id = createRes.id;
+
 			let accList = await api.account.list();
-			if (!isArray(accList))
+			if (!App.isArray(accList))
 				return false;
 
 			if (accList.length != accBefore.length + 1)
 				throw new Error('Length of accounts list must increase');
 
-			if (idSearch(accBefore, createRes.id))
+			if (App.idSearch(accBefore, acc_id))
 				throw new Error('Already exist account returned');
 
-			let accObj = idSearch(accList, createRes.id);
+			let accObj = App.idSearch(accList, acc_id);
 
-			return checkObjValue(accObj, expAccObj);
+			return App.checkObjValue(accObj, expAccObj);
 		}, env);
+
+		return acc_id;
 	}
 
 
@@ -69,31 +69,38 @@ var runAPI = (function()
 	// And check expected state of app
 	async function apiCreatePersonTest(params)
 	{
-		await test('Create person', async () => {
+		let person_id = 0;
+
+		await App.test('Create person', async () =>
+		{
 			let pBefore = await api.person.list();
-			if (!isArray(pBefore))
+			if (!App.isArray(pBefore))
 				return false;
 
-			let expPersonObj = copyObject(params);
+			let expPersonObj = App.copyObject(params);
 
 			let createRes = await api.person.create(params);
 			if (!createRes || !createRes.id)
 				return false;
 
+			person_id = createRes.id;
+
 			let pList = await api.person.list();
-			if (!isArray(pList))
+			if (!App.isArray(pList))
 				return false;
 
 			if (pList.length != pBefore.length + 1)
 				throw new Error('Length of persons list must increase');
 
-			if (idSearch(pBefore, createRes.id))
+			if (App.idSearch(pBefore, person_id))
 				throw new Error('Already exist person returned');
 
-			let personObj = idSearch(pList, createRes.id);
+			let personObj = App.idSearch(pList, person_id);
 
-			return checkObjValue(personObj, expPersonObj);
+			return App.checkObjValue(personObj, expPersonObj);
 		}, env);
+
+		return person_id;
 	}
 
 
@@ -104,45 +111,50 @@ var runAPI = (function()
 
 		api.setEnv(env, App);
 
-		await test('Login user', () => api.user.login('test', 'test'), env);
+		await App.test('Login user', () => api.user.login('test', 'test'), env);
 
-		await test('Reset all data', async () => {
+		await App.test('Reset all data', async () => {
 			return await api.profile.reset();
 		}, env);
 
 		env.setBlock('Accounts', 1);
 
-		await test('Reset accounts', async () => {
+		await App.test('Reset accounts', async () => {
 			return await api.account.reset();
 		}, env);
 
-		await test('Accounts list', async () => {
+		await App.test('Accounts list', async () => {
 			let accList = await api.account.list();
 
-			return isArray(accList) && accList.length == 0;
+			return App.isArray(accList) && accList.length == 0;
 		}, env);
 
-		await apiCreateAccountTest({ name : 'acc ru', currency : 1, balance : 100, icon : 1 });
-		await apiCreateAccountTest({ name : 'acc usd', currency : 2, balance : 10.5, icon : 5 });
+		const RUB = 1;
+		const USD = 2;
+		const EUR = 3;
+
+		let ACC_RU = await apiCreateAccountTest({ name : 'acc ru', currency : RUB, balance : 100, icon : 1 });
+		let ACC_USD = await apiCreateAccountTest({ name : 'acc usd', currency : USD, balance : 10.5, icon : 5 });
 
 
 		env.setBlock('Persons', 1);
 
-		await test('Persons list', async () => {
+		await App.test('Persons list', async () => {
 			let pList = await api.person.list();
 
-			return isArray(pList);
+			return App.isArray(pList);
 		}, env);
 
-		await apiCreatePersonTest({ name : 'Person X' });
-		await apiCreatePersonTest({ name : 'Y' });
+		let PERSON_X = await apiCreatePersonTest({ name : 'Person X' });
+		let PERSON_Y = await apiCreatePersonTest({ name : 'Y' });
+
 
 		env.setBlock('Transactions', 1);
 
-		await test('Transactions list', async () => {
+		await App.test('Transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return isArray(trList);
+			return App.isArray(trList) && trList.length == 0;
 		}, env);
 	}
 
