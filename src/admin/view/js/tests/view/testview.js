@@ -110,7 +110,8 @@ TestView.prototype.parseMessage = async function()
 
 	var res = { contentElem : popupContent };
 
-	res.success = await this.hasClass(res.contentElem, 'msg_success');
+	res.success = await this.hasClass(res.contentElem, 'msg_success') &&
+					!(await this.hasClass(res.contentElem, 'msg_error'));
 
 	res.messageElem = await this.query(res.contentElem, '.popup_message');
 	if (!res.messageElem)
@@ -119,6 +120,9 @@ TestView.prototype.parseMessage = async function()
 	res.message = await this.prop(res.messageElem, 'innerText');
 	res.closeBtn = await this.query(res.contentElem, '.close_btn > button');
 	res.close = () => this.click(res.closeBtn);
+
+	if (!res.success)
+		console.log('Error popup appear: ' + res.message);
 
 	return res;
 };
