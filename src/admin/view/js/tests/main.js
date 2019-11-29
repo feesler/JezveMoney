@@ -16,16 +16,7 @@ if (typeof module !== 'undefined' && module.exports)
 	var runAPI = require('./run/api.js');
 
 	var common = require('./common.js');
-	var copyObject = common.copyObject;
-	var test = common.test;
-	var getPosById = common.getPosById;
 
-	var EXPENSE = common.EXPENSE;
-	var INCOME = common.INCOME;
-	var TRANSFER = common.TRANSFER;
-	var DEBT = common.DEBT;
-
-	var formatCurrency = common.formatCurrency;
 }
 else
 {
@@ -91,6 +82,11 @@ var App = {
 async function startTests(view)
 {
 	console.log('Starting tests');
+
+	for(let key in common)
+	{
+		App[key] = common[key];
+	}
 
 	App.notify();
 
