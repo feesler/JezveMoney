@@ -240,15 +240,8 @@ TestView.prototype.parseTransactionsList = async function(listEl)
 	if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
 		return res;
 
-	var listItems;
-	if (await this.prop(listEl, 'tagName') == 'TABLE')
-	{
-		listItems = await this.queryAll(listEl, 'tr');
-	}
-	else
-	{
-		listItems = await this.queryAll(listEl, '.trlist_item_wrap > div');
-	}
+	res.details = (await this.prop(listEl, 'tagName') == 'TABLE');
+	let listItems = await this.queryAll(listEl, (res.details) ? 'tr' : '.trlist_item_wrap > div');
 
 	for(var i = 0; i < listItems.length; i++)
 	{
