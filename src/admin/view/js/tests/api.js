@@ -6,6 +6,7 @@ var apiModule = (function()
 {
 	let defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
 	let env = null;
+	let App = null;
 	let apiBase = null;
 
 
@@ -15,7 +16,8 @@ var apiModule = (function()
 			throw new Error('Unexpected setup');
 
 		env = e;
-		apiBase = app.config.url + 'api/';
+		App = app;
+		apiBase = App.config.url + 'api/';
 	}
 
 
@@ -111,6 +113,32 @@ var apiModule = (function()
 	let accReqFields = ['name', 'balance', 'currency', 'icon'];
 
 
+	async function readAccount()
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let apiReq = 'account/';
+		if (ids.length == 1)
+			apiReq += ids[0];
+		else
+			apiReq += '?' + urlJoin({ id : ids });
+
+		let jsonRes = await apiGet(apiReq);
+		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
+			return false;
+
+		return jsonRes.data;
+	}
+
+
 	async function createAccount(options)
 	{
 		let postData = checkFields(options, accReqFields);
@@ -133,6 +161,28 @@ var apiModule = (function()
 		postData.id = id;
 
 		let apiRes = await apiPost('account/update', postData);
+		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+			return false;
+
+		return true;
+	}
+
+
+	async function deleteAccount(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let postData = { id : ids };
+
+		let apiRes = await apiPost('account/delete', postData);
 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
 			return false;
 
@@ -165,6 +215,32 @@ var apiModule = (function()
 	let pReqFields = ['name'];
 
 
+	async function readPerson()
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let apiReq = 'person/';
+		if (ids.length == 1)
+			apiReq += ids[0];
+		else
+			apiReq += '?' + urlJoin({ id : ids });
+
+		let jsonRes = await apiGet(apiReq);
+		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
+			return false;
+
+		return jsonRes.data;
+	}
+
+
 	async function createPerson(options)
 	{
 		let postData = checkFields(options, pReqFields);
@@ -194,6 +270,28 @@ var apiModule = (function()
 	}
 
 
+	async function deletePerson(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let postData = { id : ids };
+
+		let apiRes = await apiPost('person/delete', postData);
+		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+			return false;
+
+		return true;
+	}
+
+
 	async function personsList()
 	{
 		let jsonRes = await apiGet('person/list');
@@ -207,6 +305,54 @@ var apiModule = (function()
 /**
  * Transactions
  */
+
+	let trReqFields = ['transtype', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comm'];
+	let clTrReqFields = ['src_id', 'src_id'];
+	let debtReqFields = ['debtop', 'person_id', 'acc_id'];
+
+
+	async function readTransaction()
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let apiReq = 'account/';
+		if (ids.length == 1)
+			apiReq += ids[0];
+		else
+			apiReq += '?' + urlJoin({ id : ids });
+
+		let jsonRes = await apiGet(apiReq);
+		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
+			return false;
+
+		return jsonRes.data;
+	}
+
+
+ 	async function createTransaction(options)
+ 	{
+ 		let postData = checkFields(options, trReqFields);
+
+		let isDebt = (postData.transtype == App.DEBT);
+		let addData = checkFields(options, isDebt ? debtReqFields : clTrReqFields);
+
+		App.setParam(postData, addData);
+
+ 		let apiRes = await apiPost('transaction/create', postData);
+ 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+ 			return false;
+
+ 		return apiRes.data;
+ 	}
+
 
 	async function transList()
 	{
@@ -232,19 +378,25 @@ var apiModule = (function()
 		},
 
 		account : {
+			read : readAccount,
 			create : createAccount,
 			update : updateAccount,
+			del : deleteAccount,
 			list : accountsList,
 			reset : resetAccounts
 		},
 
 		person : {
+			read : readPerson,
 			create : createPerson,
 			update : updatePerson,
+			del : deletePerson,
 			list : personsList
 		},
 
 		transaction : {
+			read : readTransaction,
+			create : createTransaction,
 			list : transList
 		}
 	};
