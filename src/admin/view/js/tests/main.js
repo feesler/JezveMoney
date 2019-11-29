@@ -16,7 +16,7 @@ if (typeof module !== 'undefined' && module.exports)
 	var runAPI = require('./run/api.js');
 
 	var common = require('./common.js');
-
+	var config = require('./config.js');
 }
 else
 {
@@ -44,11 +44,7 @@ var statistics = runStatistics;
 
 var App = {
 
-	config : {
-	/*	url : 'https://jezve.net/money/'	*/
-		url : 'http://jezvemoney:8096/',
-		testsExpected : 589
-	},
+	config,
 
 	accounts : [],
 	persons : [],

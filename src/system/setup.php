@@ -18,7 +18,7 @@
 	// Check development or release environment
 	$productionHost = "jezvemoney.ru";
 	$devHost = "jezve.net";
-	$localDevHost = "jezvemoney:8096";
+	$localDevHost = "testsrv:8096";
 	$avHosts = [$productionHost, $devHost, $localDevHost];
 
 	if (!isset($_SERVER["HTTP_HOST"]) || !in_array($_SERVER["HTTP_HOST"], $avHosts))
