@@ -313,7 +313,16 @@ class AccountModel extends CachedTable
 	// Set balance of account
 	public function setBalance($acc_id, $balance)
 	{
-		return $this->update($acc_id, [ "balance" => $balance ]);
+		$accObj = $this->getItem($acc_id);
+		if (!$accObj)
+			return NULL;
+
+		if (!$this->dbObj->updateQ($this->tbl_name, [ "balance" => $balance ], "id=".$acc_id))
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
 	}
 
 
