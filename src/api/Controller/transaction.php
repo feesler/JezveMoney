@@ -129,16 +129,19 @@ class TransactionApiController extends ApiController
 
 		if ($trans_type == DEBT)
 		{
-			if (!$debtMod->create([ "op" => $debt_op,
-									"acc_id" => $acc_id,
-									"person_id" => $person_id,
-									"src_amount" => $src_amount,
-									"dest_amount" => $dest_amount,
-									"src_curr" => $src_curr,
-									"dest_curr" => $dest_curr,
-									"date" => $fdate,
-									"comment" => $comment ]))
+			$trans_id = $debtMod->create([ "op" => $debt_op,
+											"acc_id" => $acc_id,
+											"person_id" => $person_id,
+											"src_amount" => $src_amount,
+											"dest_amount" => $dest_amount,
+											"src_curr" => $src_curr,
+											"dest_curr" => $dest_curr,
+											"date" => $fdate,
+											"comment" => $comment ]);
+			if (!$trans_id)
 				$respObj->fail();
+
+			$respObj->data = ["id" => $trans_id];
 		}
 		else
 		{
