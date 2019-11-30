@@ -23,11 +23,9 @@ class PersonApiController extends ApiController
 		$res = [];
 		foreach($ids as $person_id)
 		{
-			$personObj = new stdClass;
-			$personObj->id = $person_id;
-			$personObj->name = $this->pMod->getName($person_id);
-
-			$res[] = $personObj;
+			$personObj = $this->pMod->getItem($person_id);
+			if ($personObj)
+				$res[] = $personObj;
 		}
 
 		$respObj->data = $res;
