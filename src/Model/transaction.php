@@ -247,8 +247,10 @@ class TransactionModel extends CachedTable
 		// check target date is today
 		$today_date = getdate();
 		$target_date = getdate($res["date"]);
+		$today_time = mktime(0, 0, 0, $today_date["mon"], $today_date["mday"], $today_date["year"]);
+		$target_time = mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]);
 
-		if (mktime(0, 0, 0, $today_date["mon"], $today_date["mday"], $today_date["year"]) > mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]))
+		if ($today_time > $target_time)
 		{
 			$res["pos"] = 0;
 		}
