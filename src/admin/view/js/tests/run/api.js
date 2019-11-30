@@ -104,6 +104,84 @@ var runAPI = (function()
 	}
 
 
+	function convDate(dateStr)
+	{
+		return (dateStr) ? Date.parse(dateStr.split('.').reverse().join('-')) : null;
+	}
+
+
+	function getExpectedPos(trList, params)
+	{
+		let pos = getLastestPos(trList, params.date);
+
+		return pos + 1;
+	}
+
+
+	function getLastestPos(trList, date = null)
+	{
+		let cmpDate = convDate(date);
+		let checkList = (cmpDate) ? trList.filter(item => convDate(item.date) == cmpDate) : trList;
+
+		let res = checkList.reduce((r, item) => Math.max(r, item.pos), 0);
+
+		return res;
+	}
+
+
+	function updatePos(trList, item_id, pos)
+	{
+		let trObj = App.idSearch(trList, item_id);
+		if (!trObj)
+			throw new Error('Transaction ' + item_id + ' not found');
+
+		let oldPos = trObj.pos;
+		if (oldPos == pos)
+			return;
+
+		if (trList.find(item => item.pos == pos))
+		{
+			for(let item of trList)
+			{
+				if (oldPos == 0)			// insert with specified position
+				{
+					if (item.pos >= pos)
+						item.pos += 1;
+				}
+				else if (pos < oldPos)		// moving up
+				{
+					if (item.pos >= pos && item.pos < oldPos)
+						item.pos += 1;
+				}
+				else if (pos > oldPos)		// moving down
+				{
+					if (item.pos > oldPos && item.pos <= pos)
+						item.pos -= 1;
+				}
+			}
+		}
+
+		trObj.pos = pos;
+	}
+
+
+	// Apply transaction to accounts
+	function getExpectedAccounts(accList, transObj)
+	{
+		let res = App.copyObject(accList);
+
+		let srcAcc = App.idSearch(res, transObj.src_id);
+		if (srcAcc)
+			srcAcc.balance -= transObj.src_amount;
+
+		let destAcc = App.idSearch(res, transObj.dest_id);
+		if (destAcc)
+			destAcc.balance += transObj.dest_amount;
+
+		return res;
+	}
+
+
 	async function getExpectedTransaction(params)
 	{
 		let res = App.copyObject(params);
@@ -111,13 +189,15 @@ var runAPI = (function()
 		let isDebt = (res.transtype == App.DEBT);
 		if (isDebt)
 		{
-			let personsList = await api.person.read(res.person_id);
-			let personObj = App.idSearch(personsList, res.person_id);
+			let personObj = await api.person.read(res.person_id);
 			if (!personObj)
 				throw new Error('Person not found');
 
+			if (!personObj.accounts)
+				personObj.accounts = [];
+
 			let reqCurr = (res.debtop == 1) ? res.src_curr : res.dest_curr;
-			let personAcc = personObj.accounts.find(item => (item.curr_id == reqCurr));
+			let personAcc = (personObj.accounts) ? personObj.accounts.find(item => item.curr_id == reqCurr) : null;
 
 			if (res.debtop == 1)
 			{
@@ -147,7 +227,6 @@ var runAPI = (function()
 	}
 
 
-
 	// Create person with specified params (name)
 	// And check expected state of app
 	async function apiCreateTransactionTest(params)
@@ -160,27 +239,33 @@ var runAPI = (function()
 			if (!App.isArray(trBefore))
 				return false;
 
+			// Prepare expected transaction object
 			let expTransObj = await getExpectedTransaction(params);
+			expTransObj.pos = getExpectedPos(trBefore, params);
 
+			// Prepare expected updates of accounts
+			let accBefore = await api.account.list();
+			let expAccountList = getExpectedAccounts(accBefore, expTransObj);
+
+			// Send API sequest to server
 			let createRes = await api.transaction.create(params);
 			if (!createRes || !createRes.id)
 				return false;
 
-			transaction_id = createRes.id;
+			expTransObj.id = transaction_id = createRes.id;
+
+			// Prepare expected updates of transactions
+			let expTransList = App.copyObject(trBefore);
+			expTransList.push(expTransObj);
+			updatePos(expTransList, transaction_id, expTransObj.pos);
 
 			let trList = await api.transaction.list();
-			if (!App.isArray(trList))
-				return false;
-
-			if (trList.length != trBefore.length + 1)
-				throw new Error('Length of transactions list must increase');
-
-			if (App.idSearch(trBefore, transaction_id))
-				throw new Error('Already exist transaction returned');
-
+			let accList = await api.account.list();
 			let transObj = App.idSearch(trList, transaction_id);
 
-			return App.checkObjValue(transObj, expTransObj);
+			return App.checkObjValue(transObj, expTransObj) &&
+					App.checkObjValue(trList, expTransList) &&
+					App.checkObjValue(accList, expAccountList);
 		}, env);
 
 		return transaction_id;
@@ -216,7 +301,8 @@ var runAPI = (function()
 		const USD = 2;
 		const EUR = 3;
 
-		let ACC_RU = await apiCreateAccountTest({ name : 'acc ru', currency : RUB, balance : 100, icon : 1 });
+		let ACC_RUB = await apiCreateAccountTest({ name : 'acc ru', currency : RUB, balance : 100, icon : 1 });
+		let CASH_RUB = await apiCreateAccountTest({ name : 'cash ru', currency : RUB, balance : 5000, icon : 3 });
 		let ACC_USD = await apiCreateAccountTest({ name : 'acc usd', currency : USD, balance : 10.5, icon : 5 });
 
 
@@ -242,15 +328,114 @@ var runAPI = (function()
 			return App.isArray(trList) && trList.length == 0;
 		}, env);
 
-		let TR_EXPENSE_1 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
-															src_id : ACC_RU,
-															dest_id : 0,
-														 	src_amount : 100,
-														 	dest_amount : 100,
-															src_curr : RUB,
-															dest_curr : RUB,
-															date : App.formatDate(now),
-														 	comm : '' });
+
+		const TR_EXPENSE_1 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
+																src_id : ACC_RUB,
+																dest_id : 0,
+															 	src_amount : 100,
+															 	dest_amount : 100,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_EXPENSE_2 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
+																src_id : ACC_RUB,
+																dest_id : 0,
+															 	src_amount : 100,
+															 	dest_amount : 7608,
+																src_curr : RUB,
+																dest_curr : EUR,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_EXPENSE_3 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
+																src_id : ACC_USD,
+																dest_id : 0,
+															 	src_amount : 1,
+															 	dest_amount : 1,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+
+		const TR_INCOME_1 = await apiCreateTransactionTest({ transtype : App.INCOME,
+																src_id : 0,
+																dest_id : ACC_RUB,
+															 	src_amount : 1000.50,
+															 	dest_amount : 1000.50,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_INCOME_2 = await apiCreateTransactionTest({ transtype : App.INCOME,
+																src_id : 0,
+																dest_id : ACC_USD,
+															 	src_amount : 6500,
+															 	dest_amount : 100,
+																src_curr : USD,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+
+
+		const TR_TRANSFER_1 = await apiCreateTransactionTest({ transtype : App.TRANSFER,
+																src_id : ACC_RUB,
+																dest_id : CASH_RUB,
+															 	src_amount : 500,
+															 	dest_amount : 500,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_TRANSFER_2 = await apiCreateTransactionTest({ transtype : App.TRANSFER,
+																src_id : ACC_RUB,
+																dest_id : ACC_USD,
+															 	src_amount : 6500,
+															 	dest_amount : 100,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+
+		const TR_DEBT_1 = await apiCreateTransactionTest({ transtype : App.DEBT,
+																debtop : 1,
+																person_id : PERSON_X,
+																acc_id : CASH_RUB,
+															 	src_amount : 500,
+															 	dest_amount : 500,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_DEBT_2 = await apiCreateTransactionTest({ transtype : App.DEBT,
+																debtop : 2,
+																person_id : PERSON_Y,
+																acc_id : CASH_RUB,
+															 	src_amount : 1000,
+															 	dest_amount : 1000,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_DEBT_3 = await apiCreateTransactionTest({ transtype : App.DEBT,
+																debtop : 1,
+																person_id : PERSON_X,
+																acc_id : 0,
+															 	src_amount : 500,
+															 	dest_amount : 500,
+																src_curr : RUB,
+																dest_curr : RUB,
+																date : App.formatDate(now),
+															 	comm : '' });
+		const TR_DEBT_4 = await apiCreateTransactionTest({ transtype : App.DEBT,
+																debtop : 2,
+																person_id : PERSON_Y,
+																acc_id : 0,
+															 	src_amount : 1000,
+															 	dest_amount : 1000,
+																src_curr : USD,
+																dest_curr : USD,
+																date : App.formatDate(now),
+															 	comm : '' });
 
 	}
 
