@@ -113,7 +113,7 @@ var apiModule = (function()
 	let accReqFields = ['name', 'balance', 'currency', 'icon'];
 
 
-	async function readAccount()
+	async function readAccount(ids)
 	{
 		if (!Array.isArray(ids))
 			ids = [ ids ];
@@ -215,7 +215,7 @@ var apiModule = (function()
 	let pReqFields = ['name'];
 
 
-	async function readPerson()
+	async function readPerson(ids)
 	{
 		if (!Array.isArray(ids))
 			ids = [ ids ];
@@ -307,7 +307,7 @@ var apiModule = (function()
  */
 
 	let trReqFields = ['transtype', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comm'];
-	let clTrReqFields = ['src_id', 'src_id'];
+	let clTrReqFields = ['src_id', 'dest_id'];
 	let debtReqFields = ['debtop', 'person_id', 'acc_id'];
 
 
@@ -342,7 +342,7 @@ var apiModule = (function()
  		let postData = checkFields(options, trReqFields);
 
 		let isDebt = (postData.transtype == App.DEBT);
-		let addData = checkFields(options, isDebt ? debtReqFields : clTrReqFields);
+		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
 
 		App.setParam(postData, addData);
 
@@ -356,7 +356,7 @@ var apiModule = (function()
 
 	async function transList()
 	{
-		let jsonRes = await apiGet('transaction/list');
+		let jsonRes = await apiGet('transaction/list?count=0');
 		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
 			return false;
 
