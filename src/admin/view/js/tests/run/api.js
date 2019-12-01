@@ -233,6 +233,11 @@ var runAPI = (function()
 	{
 		let transaction_id = 0;
 
+		if (!params.date)
+			params.date = App.formatDate(new Date());
+		if (!params.comm)
+			params.comm = '';
+
 		await App.test('Create transaction', async () =>
 		{
 			let trBefore = await api.transaction.list();
@@ -269,6 +274,85 @@ var runAPI = (function()
 		}, env);
 
 		return transaction_id;
+	}
+
+
+	async function createExpenseTest(params)
+	{
+		params.transtype = App.EXPENSE;
+		params.dest_id = 0;
+
+		if (!params.dest_amount)
+			params.dest_amount = params.src_amount;
+
+		let accList = await api.account.list();
+		let acc = App.idSearch(accList, params.src_id);
+		params.src_curr = acc.curr_id;
+
+		if (!params.dest_curr)
+			params.dest_curr = params.src_curr;
+
+		return apiCreateTransactionTest(params);
+	}
+
+
+	async function createIncomeTest(params)
+	{
+		params.transtype = App.INCOME;
+		params.src_id = 0;
+
+		if (!params.src_amount)
+			params.src_amount = params.dest_amount;
+
+		let accList = await api.account.list();
+		let acc = App.idSearch(accList, params.dest_id);
+		params.dest_curr = acc.curr_id;
+
+		if (!params.src_curr)
+			params.src_curr = params.dest_curr;
+
+		return apiCreateTransactionTest(params);
+	}
+
+
+	async function createTransferTest(params)
+	{
+		params.transtype = App.TRANSFER;
+
+		if (!params.dest_amount)
+			params.dest_amount = params.src_amount;
+
+		let accList = await api.account.list();
+
+		let srcAcc = App.idSearch(accList, params.src_id);
+		params.src_curr = srcAcc.curr_id;
+
+		let destAcc = App.idSearch(accList, params.dest_id);
+		params.dest_curr = destAcc.curr_id;
+
+		if (!params.src_curr)
+			params.src_curr = params.dest_curr;
+
+		return apiCreateTransactionTest(params);
+	}
+
+
+	async function createDebtTest(params)
+	{
+		params.transtype = App.DEBT;
+
+		if (!params.dest_amount)
+			params.dest_amount = params.src_amount;
+
+		let accList = await api.account.list();
+
+		let acc = App.idSearch(accList, params.acc_id);
+		if (acc)
+			params.src_curr = params.dest_curr = acc.curr_id;
+		else
+			params.src_curr = params.dest_curr = (params.src_curr || params.dest_curr);
+
+		return apiCreateTransactionTest(params);
 	}
 
 
@@ -329,113 +413,58 @@ var runAPI = (function()
 		}, env);
 
 
-		const TR_EXPENSE_1 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
-																src_id : ACC_RUB,
-																dest_id : 0,
-															 	src_amount : 100,
-															 	dest_amount : 100,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_EXPENSE_2 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
-																src_id : ACC_RUB,
-																dest_id : 0,
-															 	src_amount : 100,
-															 	dest_amount : 7608,
-																src_curr : RUB,
-																dest_curr : EUR,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_EXPENSE_3 = await apiCreateTransactionTest({ transtype : App.EXPENSE,
-																src_id : ACC_USD,
-																dest_id : 0,
-															 	src_amount : 1,
-															 	dest_amount : 1,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
 
-		const TR_INCOME_1 = await apiCreateTransactionTest({ transtype : App.INCOME,
-																src_id : 0,
-																dest_id : ACC_RUB,
-															 	src_amount : 1000.50,
-															 	dest_amount : 1000.50,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_INCOME_2 = await apiCreateTransactionTest({ transtype : App.INCOME,
-																src_id : 0,
-																dest_id : ACC_USD,
-															 	src_amount : 6500,
-															 	dest_amount : 100,
-																src_curr : USD,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
+		const TR_EXPENSE_1 = await createExpenseTest({ src_id : ACC_RUB,
+														src_amount : 100 });
+
+		const TR_EXPENSE_2 = await createExpenseTest({ src_id : ACC_RUB,
+														src_amount : 100,
+														dest_amount : 7608,
+														dest_curr : EUR });
+
+		const TR_EXPENSE_3 = await createExpenseTest({ src_id : ACC_USD,
+														src_amount : 1 });
+
+		const TR_INCOME_1 = await createIncomeTest({ dest_id : ACC_RUB,
+														dest_amount : 1000.50 });
+
+		const TR_INCOME_2 = await createIncomeTest({ dest_id : ACC_USD,
+													 	src_amount : 6500,
+													 	dest_amount : 100,
+														dest_curr : RUB });
 
 
-		const TR_TRANSFER_1 = await apiCreateTransactionTest({ transtype : App.TRANSFER,
-																src_id : ACC_RUB,
-																dest_id : CASH_RUB,
-															 	src_amount : 500,
-															 	dest_amount : 500,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_TRANSFER_2 = await apiCreateTransactionTest({ transtype : App.TRANSFER,
-																src_id : ACC_RUB,
-																dest_id : ACC_USD,
-															 	src_amount : 6500,
-															 	dest_amount : 100,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
+		const TR_TRANSFER_1 = await createTransferTest({ src_id : ACC_RUB,
+															dest_id : CASH_RUB,
+														 	src_amount : 500,
+														 	dest_amount : 500 });
 
-		const TR_DEBT_1 = await apiCreateTransactionTest({ transtype : App.DEBT,
-																debtop : 1,
-																person_id : PERSON_X,
-																acc_id : CASH_RUB,
-															 	src_amount : 500,
-															 	dest_amount : 500,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_DEBT_2 = await apiCreateTransactionTest({ transtype : App.DEBT,
-																debtop : 2,
-																person_id : PERSON_Y,
-																acc_id : CASH_RUB,
-															 	src_amount : 1000,
-															 	dest_amount : 1000,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_DEBT_3 = await apiCreateTransactionTest({ transtype : App.DEBT,
-																debtop : 1,
-																person_id : PERSON_X,
-																acc_id : 0,
-															 	src_amount : 500,
-															 	dest_amount : 500,
-																src_curr : RUB,
-																dest_curr : RUB,
-																date : App.formatDate(now),
-															 	comm : '' });
-		const TR_DEBT_4 = await apiCreateTransactionTest({ transtype : App.DEBT,
-																debtop : 2,
-																person_id : PERSON_Y,
-																acc_id : 0,
-															 	src_amount : 1000,
-															 	dest_amount : 1000,
-																src_curr : USD,
-																dest_curr : USD,
-																date : App.formatDate(now),
-															 	comm : '' });
+		const TR_TRANSFER_2 = await createTransferTest({ src_id : ACC_RUB,
+															dest_id : ACC_USD,
+														 	src_amount : 6500,
+														 	dest_amount : 100 });
+
+		const TR_DEBT_1 = await createDebtTest({ debtop : 1,
+													person_id : PERSON_X,
+													acc_id : CASH_RUB,
+												 	src_amount : 500 });
+
+		const TR_DEBT_2 = await createDebtTest({ debtop : 2,
+													person_id : PERSON_Y,
+													acc_id : CASH_RUB,
+												 	src_amount : 1000 });
+
+		const TR_DEBT_3 = await createDebtTest({ debtop : 1,
+													person_id : PERSON_X,
+													acc_id : 0,
+												 	src_amount : 500,
+													src_curr : RUB });
+
+		const TR_DEBT_4 = await createDebtTest({ debtop : 2,
+													person_id : PERSON_Y,
+													acc_id : 0,
+												 	src_amount : 1000,
+													src_curr : USD });
 
 	}
 
