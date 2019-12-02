@@ -277,6 +277,48 @@ var runAPI = (function()
 	}
 
 
+	// Update person with specified params (name)
+	// And check expected state of app
+	async function apiUpdatePersonTest(id, params)
+	{
+		let updateRes = false;
+
+		await App.test('Update person', async () =>
+		{
+			let pBefore = await api.person.list();
+			if (!App.isArray(pBefore))
+				return false;
+
+			let origPerson = App.idSearch(pBefore, id);
+
+			let expPersonObj = App.copyObject(origPerson);
+			App.setParam(expPersonObj, params);
+
+			let updateRes = await api.person.update(id, params);
+			if (!updateRes)
+				return false;
+
+			let expPersonList = App.copyObject(pBefore);
+			let pIndex = expPersonList.findIndex(item => item.id == expPersonObj.id);
+			if (pIndex !== -1)
+				expPersonList.splice(pIndex, 1, expPersonObj);
+
+			let pList = await api.person.list();
+			if (!App.isArray(pList))
+				return false;
+
+			let personObj = App.idSearch(pList, id);
+
+			let res = App.checkObjValue(personObj, expPersonObj) &&
+						App.checkObjValue(pList, expPersonList);
+
+			return res;
+		}, env);
+
+		return updateRes;
+	}
+
+
 	function convDate(dateStr)
 	{
 		return (dateStr) ? Date.parse(dateStr.split('.').reverse().join('-')) : null;
@@ -825,10 +867,15 @@ var runAPI = (function()
 		 await apiUpdateAccountTest(ACC_RUB, { name : 'acc rub', balance : 101, icon : 2 });
 
 
-		 /**
-		  * Delete accounts
-		  */
+		/**
+		 * Delete accounts
+		 */
 		  await apiDeleteAccountTest([ ACC_USD, CASH_RUB ]);
+
+		/**
+		 * Update person
+		 */
+		 await apiUpdatePersonTest(PERSON_X, { name : 'XX!' });
 	}
 
 
