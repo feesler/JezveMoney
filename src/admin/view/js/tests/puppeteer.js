@@ -1,5 +1,4 @@
 const process = require('process');
-const querystring = require('querystring');
 const http = require('http');
 const puppeteer = require('puppeteer');
 const chalk = require('chalk');
@@ -275,7 +274,7 @@ var Environment = (function()
 
 			if (method == 'post' && data)
 			{
-				postData = querystring.stringify(data);
+				postData = common.urlJoin(data);
 
 				common.setParam(options.headers,
 									{ 'Content-Type' : 'application/x-www-form-urlencoded',

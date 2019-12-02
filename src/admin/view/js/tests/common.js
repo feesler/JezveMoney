@@ -302,7 +302,7 @@ function urlJoin(obj)
 {
 	var arr = [], par;
 
-	if (typeof obj !== 'object')
+	if (!isObject(obj))
 		return '';
 
 	for(par in obj)
@@ -312,11 +312,11 @@ function urlJoin(obj)
 		{
 			val.forEach(function(arrItem)
 			{
-				if (typeof arrItem !== 'object')
+				if (!isObject(arrItem))
 					arr.push(par + '[]=' + arrItem.toString());
 			});
 		}
-		else if (typeof val !== 'object')
+		else if (!isObject(val))
 			arr.push(par + '=' + val.toString());
 	}
 
