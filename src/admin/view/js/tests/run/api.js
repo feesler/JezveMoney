@@ -23,6 +23,9 @@ var runAPI = (function()
 			App = props.App;
 	}
 
+	/**
+	 * Account tests
+	 */
 
 	// Create account with specified params (name, currency, balance, icon)
 	// And check expected state of app
@@ -103,7 +106,7 @@ var runAPI = (function()
 				expAccObj.initbalance = expAccObj.balance;
 			}
 
-			// Prepare expected updates of transactions
+			// Prepare expected updates of accounts list
 			let expAccList = App.copyObject(accBefore);
 			let accIndex = expAccList.findIndex(item => item.id == expAccObj.id);
 			if (accIndex !== -1)
@@ -125,6 +128,115 @@ var runAPI = (function()
 		return updateRes;
 	}
 
+
+	// Delete specified account(s)
+	// And check expected state of app
+	async function apiDeleteAccountTest(ids)
+	{
+		let deleteRes;
+
+		await App.test('Delete account', async () =>
+		{
+			if (!App.isArray(ids))
+				ids = [ ids ];
+
+			let accBefore = await api.account.list();
+			if (!App.isArray(accBefore))
+				return false;
+
+			// Prepare expected updates of accounts list
+			let expAccList = App.copyObject(accBefore);
+			for(let acc_id of ids)
+			{
+				let accIndex = expAccList.findIndex(item => item.id == acc_id);
+				if (accIndex !== -1)
+					expAccList.splice(accIndex, 1);
+			}
+
+			// Prepare expected updates of transactions
+			let trBefore = await api.transaction.list();
+			let expTransList = [];
+
+			for(let trans of trBefore)
+			{
+				if (trans.type == App.EXPENSE && ids.indexOf(trans.src_id) !== -1)
+					continue;
+				if (trans.type == App.INCOME && ids.indexOf(trans.dest_id) !== -1)
+					continue;
+				if ((trans.type == App.TRANSFER || trans.type == App.DEBT) &&
+					ids.indexOf(trans.src_id) !== -1 && ids.indexOf(trans.dest_id) !== -1)
+					continue;
+				if (trans.type == App.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
+					continue;
+				if (trans.type == App.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
+					continue;
+
+				let convTrans = App.copyObject(trans);
+
+				if (convTrans.type == App.TRANSFER)
+				{
+					if (ids.indexOf(convTrans.src_id) !== -1)
+					{
+						convTrans.type = App.INCOME;
+						convTrans.src_id = 0;
+					}
+					else if (ids.indexOf(convTrans.dest_id) !== -1)
+					{
+						convTrans.type = App.EXPENSE;
+						convTrans.dest_id = 0;
+					}
+				}
+				else if (convTrans.type == App.DEBT)
+				{
+					for(let acc_id of ids)
+					{
+						let acc = App.idSearch(accBefore, acc_id);
+
+						if (convTrans.src_id == acc_id)
+						{
+							if (acc.owner_id != App.user_id)
+							{
+								convTrans.type = App.INCOME;
+							}
+
+							convTrans.src_id = 0;
+						}
+						else if (convTrans.dest_id == acc_id)
+						{
+							if (acc.owner_id != App.user_id)
+							{
+								convTrans.type = App.EXPENSE;
+							}
+							convTrans.dest_id = 0;
+						}
+					}
+				}
+
+				expTransList.push(convTrans);
+			}
+			trBefore.filter(item => ids.indexOf(item.src_id) !== -1 || ids.indexOf(item.dest_id) !== -1);
+
+			// Send API sequest to server
+			deleteRes = await api.account.del(ids);
+			if (!deleteRes)
+				throw new Error('Fail to delete account(s)');
+
+			let accList = await api.account.list();
+			let trList = await api.transaction.list();
+
+			let res = App.checkObjValue(accList, expAccList) &&
+						App.checkObjValue(trList, expTransList);
+
+			return res;
+		}, env);
+
+		return deleteRes;
+	}
+
+
+	/**
+	 * Person tests
+	 */
 
 	// Create person with specified params (name)
 	// And check expected state of app
@@ -712,6 +824,11 @@ var runAPI = (function()
 		 */
 		 await apiUpdateAccountTest(ACC_RUB, { name : 'acc rub', balance : 101, icon : 2 });
 
+
+		 /**
+		  * Delete accounts
+		  */
+		  await apiDeleteAccountTest([ ACC_USD, CASH_RUB ]);
 	}
 
 
