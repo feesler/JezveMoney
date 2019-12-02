@@ -666,7 +666,7 @@ TestView.prototype.checkVisibility = async function(controls, expected)
 };
 
 
-TestView.prototype.checkValues = async function(controls)
+TestView.prototype.checkValues = function(controls)
 {
 	var res = true;
 	var control, expected, fact;
@@ -680,7 +680,7 @@ TestView.prototype.checkValues = async function(controls)
 
 		if (isObject(expected))
 		{
-			res = await checkObjValue(control, expected, true);
+			res = checkObjValue(control, expected, true);
 			if (res !== true)
 			{
 				res.key = countrolName + '.' + res.key;
@@ -710,7 +710,7 @@ TestView.prototype.checkValues = async function(controls)
 
 TestView.prototype.checkState = async function(stateObj)
 {
-	return stateObj && await this.checkVisibility(this.content, stateObj.visibility) && await this.checkValues(stateObj.values);
+	return stateObj && await this.checkVisibility(this.content, stateObj.visibility) && this.checkValues(stateObj.values);
 };
 
 

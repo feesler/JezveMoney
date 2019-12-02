@@ -355,7 +355,7 @@ function checkPHPerrors(env, content)
 }
 
 
-async function checkObjValue(obj, expectedObj, ret = false)
+function checkObjValue(obj, expectedObj, ret = false)
 {
 	var res = true;
 
@@ -375,7 +375,7 @@ async function checkObjValue(obj, expectedObj, ret = false)
 		value = obj[vKey];
 		if (isObject(expected))
 		{
-			var res = await checkObjValue(value, expected);
+			var res = checkObjValue(value, expected, ret);
 			if (res !== true)
 			{
 				res.key = vKey + '.' + res.key;
