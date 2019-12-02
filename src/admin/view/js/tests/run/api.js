@@ -65,6 +65,67 @@ var runAPI = (function()
 	}
 
 
+	// Update account with specified params (name, currency, balance, icon)
+	// And check expected state of app
+	async function apiUpdateAccountTest(id, params)
+	{
+		let updateRes;
+
+		let accList = await api.account.read(id);
+		let updParams = accList[0];
+
+		updParams.currency = updParams.curr;
+		delete updParams.curr;
+
+		App.setParam(updParams, params);
+
+		await App.test('Update account', async () =>
+		{
+			let accBefore = await api.account.list();
+			if (!App.isArray(accBefore))
+				return false;
+			let origAcc = App.idSearch(accBefore, updParams.id);
+
+			// Prepare expected account object
+			let expAccObj = App.copyObject(updParams);
+			expAccObj.id = id;
+			expAccObj.owner_id = expAccObj.owner;
+			expAccObj.curr_id = expAccObj.currency;
+			delete expAccObj.currency;
+			delete expAccObj.owner;
+			delete expAccObj.sign;
+			delete expAccObj.iconclass;
+
+			let balDiff = expAccObj.balance - origAcc.initbalance;
+			if (balDiff.toFixed(2) != 0)
+			{
+				expAccObj.balance = origAcc.balance + balDiff;
+				expAccObj.initbalance = expAccObj.balance;
+			}
+
+			// Prepare expected updates of transactions
+			let expAccList = App.copyObject(accBefore);
+			let accIndex = expAccList.findIndex(item => item.id == expAccObj.id);
+			if (accIndex !== -1)
+				expAccList.splice(accIndex, 1, expAccObj);
+
+			// Send API sequest to server
+			updateRes = await api.account.update(id, updParams);
+			if (!updateRes)
+				throw new Error('Fail to update account');
+
+			let accList = await api.account.list();
+			let accObj = App.idSearch(accList, id);
+
+			let res = App.checkObjValue(accObj, expAccObj) &&
+						App.checkObjValue(accList, expAccList);
+			return res;
+		}, env);
+
+		return updateRes;
+	}
+
+
 	// Create person with specified params (name)
 	// And check expected state of app
 	async function apiCreatePersonTest(params)
@@ -436,7 +497,6 @@ var runAPI = (function()
 			expTrans.pos = origTrans.pos;
 
 			// Prepare expected updates of accounts
-
 			let accCanceled = cancelTransaction(accBefore, origTrans);
 			let expAccountList = applyTransaction(accCanceled, expTrans);
 
@@ -617,6 +677,12 @@ var runAPI = (function()
 		await apiUpdateTransactionTest({ id : TR_DEBT_3,
 											debtop : 1,
 											acc_id : ACC_RUB });
+
+		/**
+		 * Update accounts
+		 */
+		 await apiUpdateAccountTest(ACC_RUB, { name : 'acc rub', balance : 101, icon : 2 });
+
 	}
 
 
