@@ -316,7 +316,7 @@ var apiModule = (function()
 	let debtReqFields = ['debtop', 'person_id', 'acc_id'];
 
 
-	async function readTransaction()
+	async function readTransaction(ids)
 	{
 		if (!Array.isArray(ids))
 			ids = [ ids ];
@@ -328,7 +328,7 @@ var apiModule = (function()
 				throw new Error('Wrong id specified');
 		}
 
-		let apiReq = 'account/';
+		let apiReq = 'transaction/';
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
