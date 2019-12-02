@@ -450,7 +450,8 @@ var runAPI = (function()
 		let accBefore = await api.account.list();
 
 		let trList = await api.transaction.read(params.id);
-		let updParams = trList[0];
+		let origTrans = trList[0];
+		let updParams = App.copyObject(origTrans);
 
 		updParams.transtype = updParams.type;
 		delete updParams.type;
@@ -458,13 +459,14 @@ var runAPI = (function()
 		let origDate = new Date(updParams.date);
 		updParams.date = App.formatDate(origDate);
 
+		let fullAccList = await api.account.list(true);
+
+		let srcAcc = App.idSearch(fullAccList, updParams.src_id);
+		let destAcc = App.idSearch(fullAccList, updParams.dest_id);
+
 		let isDebt = (updParams.transtype == App.DEBT);
 		if (isDebt)
 		{
-			let fullAccList = await api.account.list(true);
-
-			let srcAcc = App.idSearch(fullAccList, updParams.src_id);
-			let destAcc = App.idSearch(fullAccList, updParams.dest_id);
 			if (srcAcc && srcAcc.owner_id != App.user_id)
 			{
 				updParams.debtop = 1;
@@ -486,6 +488,33 @@ var runAPI = (function()
 		delete updParams.comment;
 
 		App.setParam(updParams, params);
+
+		// Synchronize currencies with accounts
+		if (isDebt)
+		{
+			if (updParams.acc_id && updParams.acc_id != origTrans.acc_id)
+			{
+				let acc = App.idSearch(fullAccList, updParams.acc_id);
+				if (updParams.debtop == 1)
+					updParams.dest_curr = acc.curr_id;
+				else
+					updParams.src_curr = acc.curr_id;
+			}
+		}
+		else
+		{
+			if (updParams.src_id && updParams.src_id != origTrans.src_id)
+			{
+				let acc = App.idSearch(fullAccList, updParams.src_id);
+				updParams.src_curr = acc.curr_id;
+			}
+
+			if (updParams.dest_id && updParams.dest_id != origTrans.dest_id)
+			{
+				let acc = App.idSearch(fullAccList, updParams.dest_id);
+				updParams.dest_curr = acc.curr_id;
+			}
+		}
 
 		await App.test('Update transaction', async () =>
 		{
