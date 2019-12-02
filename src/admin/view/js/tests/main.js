@@ -46,6 +46,8 @@ var App = {
 
 	config,
 
+	user_id : 2,
+
 	accounts : [],
 	persons : [],
 	transactions : [],

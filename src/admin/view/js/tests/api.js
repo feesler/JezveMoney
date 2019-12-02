@@ -359,6 +359,28 @@ var apiModule = (function()
  	}
 
 
+ 	async function updateTransaction(options)
+	{
+		let id = parseInt(options.id);
+		if (!id || isNaN(id))
+		{
+			console.debug(options);
+			throw new Error('Wrong id specified');
+		}
+
+		let postData = checkFields(options, trReqFields);
+		postData.transid = id;
+
+		let isDebt = (postData.transtype == App.DEBT);
+		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
+
+		App.setParam(postData, addData);
+
+ 		let apiRes = await apiPost('transaction/update', postData);
+ 		return (apiRes && apiRes.result && apiRes.result == 'ok');
+ 	}
+
+
 	async function transList()
 	{
 		let jsonRes = await apiGet('transaction/list?count=0');
@@ -402,6 +424,7 @@ var apiModule = (function()
 		transaction : {
 			read : readTransaction,
 			create : createTransaction,
+			update : updateTransaction,
 			list : transList
 		}
 	};
