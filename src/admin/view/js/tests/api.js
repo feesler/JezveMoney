@@ -190,9 +190,14 @@ var apiModule = (function()
 	}
 
 
-	async function accountsList()
+	async function accountsList(full)
 	{
-		let jsonRes = await apiGet('account/list');
+		let reqUrl = 'account/list';
+
+		if (full)
+			reqUrl += '?full=1';
+
+		let jsonRes = await apiGet(reqUrl);
 		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
 			return false;
 

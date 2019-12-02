@@ -37,7 +37,11 @@ class AccountApiController extends ApiController
 	{
 		$respObj = new apiResponse();
 
-		$respObj->data = $this->accMod->getData();
+		$params = [];
+		if (isset($_GET["full"]) && $_GET["full"] == 1)
+			$params["full"] = TRUE;
+
+		$respObj->data = $this->accMod->getData($params);
 		$respObj->ok();
 	}
 
