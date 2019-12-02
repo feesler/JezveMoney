@@ -53,7 +53,15 @@ var apiModule = (function()
 		if (response.status != 200)
 			return false;
 
-		return JSON.parse(response.body);
+		try
+		{
+			return JSON.parse(response.body);
+		}
+		catch(e)
+		{
+			console.log(response.body);
+			throw e;
+		}
 	}
 
 
@@ -70,7 +78,15 @@ var apiModule = (function()
 		if (response.status != 200)
 			return false;
 
-		return JSON.parse(response.body);
+		try
+		{
+			return JSON.parse(response.body);
+		}
+		catch(e)
+		{
+			console.log(response.body);
+			throw e;
+		}
 	}
 
 
