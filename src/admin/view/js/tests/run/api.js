@@ -788,6 +788,52 @@ var runAPI = (function()
 	}
 
 
+	// Delete specified transaction(s)
+	// And check expected state of app
+	async function apiDeleteTransactionTest(ids)
+	{
+		let deleteRes;
+
+		await App.test('Delete transaction', async () =>
+		{
+			if (!App.isArray(ids))
+				ids = [ ids ];
+
+			let trBefore = await api.transaction.list();
+			let accBefore = await api.account.list();
+			if (!App.isArray(trBefore))
+				return false;
+
+			// Prepare expected updates of transactions list
+			let expTransList = App.copyObject(trBefore);
+			let expAccList = App.copyObject(accBefore);
+			for(let tr_id of ids)
+			{
+				let trIndex = expTransList.findIndex(item => item.id == tr_id);
+				if (trIndex !== -1)
+					expTransList.splice(trIndex, 1);
+
+				expAccList = cancelTransaction(expAccList, App.idSearch(trBefore, tr_id));
+			}
+
+			// Send API sequest to server
+			deleteRes = await api.transaction.del(ids);
+			if (!deleteRes)
+				throw new Error('Fail to delete account(s)');
+
+			let accList = await api.account.list();
+			let trList = await api.transaction.list();
+
+			let res = App.checkObjValue(accList, expAccList) &&
+						App.checkObjValue(trList, expTransList);
+
+			return res;
+		}, env);
+
+		return deleteRes;
+	}
+
+
 	async function runTests(view, App)
 	{
 		console.log('api.run()');
@@ -952,6 +998,12 @@ var runAPI = (function()
 		 * Delete person
 		 */
 		 await apiDeletePersonTest(PERSON_Y);
+
+
+		 /**
+		  * Delete transaction
+		  */
+		  await apiDeleteTransactionTest([ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ]);
 	}
 
 

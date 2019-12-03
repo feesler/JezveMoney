@@ -397,6 +397,28 @@ var apiModule = (function()
  	}
 
 
+	async function deleteTransaction(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let postData = { id : ids };
+
+		let apiRes = await apiPost('transaction/delete', postData);
+		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+			return false;
+
+		return true;
+	}
+
+
 	async function transList()
 	{
 		let jsonRes = await apiGet('transaction/list?count=0');
@@ -441,6 +463,7 @@ var apiModule = (function()
 			read : readTransaction,
 			create : createTransaction,
 			update : updateTransaction,
+			del : deleteTransaction,
 			list : transList
 		}
 	};
