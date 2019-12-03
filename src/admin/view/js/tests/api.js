@@ -429,6 +429,92 @@ var apiModule = (function()
 	}
 
 
+	async function expenseTransaction(params)
+	{
+		let res = App.copyObject(params);
+
+		res.transtype = App.EXPENSE;
+		res.dest_id = 0;
+
+		if (!res.dest_amount)
+			res.dest_amount = res.src_amount;
+
+		let accList = await accountsList();
+		let acc = App.idSearch(accList, res.src_id);
+		res.src_curr = acc.curr_id;
+
+		if (!res.dest_curr)
+			res.dest_curr = res.src_curr;
+
+		return res;
+	}
+
+
+	async function incomeTransaction(params)
+	{
+		let res = App.copyObject(params);
+
+		res.transtype = App.INCOME;
+		res.src_id = 0;
+
+		if (!res.src_amount)
+			res.src_amount = res.dest_amount;
+
+		let accList = await accountsList();
+		let acc = App.idSearch(accList, res.dest_id);
+		res.dest_curr = acc.curr_id;
+
+		if (!res.src_curr)
+			res.src_curr = res.dest_curr;
+
+		return res;
+	}
+
+
+	async function transferTransaction(params)
+	{
+		let res = App.copyObject(params);
+
+		res.transtype = App.TRANSFER;
+
+		if (!res.dest_amount)
+			res.dest_amount = res.src_amount;
+
+		let accList = await accountsList();
+
+		let srcAcc = App.idSearch(accList, res.src_id);
+		res.src_curr = srcAcc.curr_id;
+
+		let destAcc = App.idSearch(accList, res.dest_id);
+		res.dest_curr = destAcc.curr_id;
+
+		if (!res.src_curr)
+			res.src_curr = res.dest_curr;
+
+		return res;
+	}
+
+
+	async function debtTransaction(params)
+	{
+		let res = App.copyObject(params);
+
+		res.transtype = App.DEBT;
+
+		if (!res.dest_amount)
+			res.dest_amount = res.src_amount;
+
+		let accList = await accountsList();
+
+		let acc = App.idSearch(accList, res.acc_id);
+		if (acc)
+			res.src_curr = res.dest_curr = acc.curr_id;
+		else
+			res.src_curr = res.dest_curr = (res.src_curr || res.dest_curr);
+
+		return res;
+	}
+
 
 	return {
 		setEnv : setupEnvironment,
@@ -464,7 +550,13 @@ var apiModule = (function()
 			create : createTransaction,
 			update : updateTransaction,
 			del : deleteTransaction,
-			list : transList
+			list : transList,
+
+		// tools for short transaction declarations
+			expense : expenseTransaction,
+			income : incomeTransaction,
+			transfer : transferTransaction,
+			debt : debtTransaction,
 		}
 	};
 

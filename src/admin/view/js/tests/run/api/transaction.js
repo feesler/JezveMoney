@@ -223,80 +223,25 @@ var runTransactionAPI = (function()
 
 	async function createExpenseTest(params)
 	{
-		params.transtype = App.EXPENSE;
-		params.dest_id = 0;
-
-		if (!params.dest_amount)
-			params.dest_amount = params.src_amount;
-
-		let accList = await api.account.list();
-		let acc = App.idSearch(accList, params.src_id);
-		params.src_curr = acc.curr_id;
-
-		if (!params.dest_curr)
-			params.dest_curr = params.src_curr;
-
-		return apiCreateTransactionTest(params);
+		return apiCreateTransactionTest(await api.transaction.expense(params));
 	}
 
 
 	async function createIncomeTest(params)
 	{
-		params.transtype = App.INCOME;
-		params.src_id = 0;
-
-		if (!params.src_amount)
-			params.src_amount = params.dest_amount;
-
-		let accList = await api.account.list();
-		let acc = App.idSearch(accList, params.dest_id);
-		params.dest_curr = acc.curr_id;
-
-		if (!params.src_curr)
-			params.src_curr = params.dest_curr;
-
-		return apiCreateTransactionTest(params);
+		return apiCreateTransactionTest(await api.transaction.income(params));
 	}
 
 
 	async function createTransferTest(params)
 	{
-		params.transtype = App.TRANSFER;
-
-		if (!params.dest_amount)
-			params.dest_amount = params.src_amount;
-
-		let accList = await api.account.list();
-
-		let srcAcc = App.idSearch(accList, params.src_id);
-		params.src_curr = srcAcc.curr_id;
-
-		let destAcc = App.idSearch(accList, params.dest_id);
-		params.dest_curr = destAcc.curr_id;
-
-		if (!params.src_curr)
-			params.src_curr = params.dest_curr;
-
-		return apiCreateTransactionTest(params);
+		return apiCreateTransactionTest(await api.transaction.transfer(params));
 	}
 
 
 	async function createDebtTest(params)
 	{
-		params.transtype = App.DEBT;
-
-		if (!params.dest_amount)
-			params.dest_amount = params.src_amount;
-
-		let accList = await api.account.list();
-
-		let acc = App.idSearch(accList, params.acc_id);
-		if (acc)
-			params.src_curr = params.dest_curr = acc.curr_id;
-		else
-			params.src_curr = params.dest_curr = (params.src_curr || params.dest_curr);
-
-		return apiCreateTransactionTest(params);
+		return apiCreateTransactionTest(await api.transaction.debt(params));
 	}
 
 
