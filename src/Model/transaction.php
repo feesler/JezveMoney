@@ -691,7 +691,7 @@ class TransactionModel extends CachedTable
 
 		// delete expenses and incomes
 		$condArr = [$userCond];
-		$condArr[] = "((src_id=".$acc_id." AND type=".EXPENSE.") OR (dest_id=".$acc_id." AND type=".INCOME."))";
+		$condArr[] = "((src_id=".$acc_id." AND dest_id=0) OR (dest_id=".$acc_id." AND src_id=0))";
 		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
 			return FALSE;
 
