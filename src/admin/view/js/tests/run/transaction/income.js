@@ -1,27 +1,17 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../../common.js');
-	var test = common.test;
-	var formatDate = common.formatDate;
-	var isObject = common.isObject;
-	var setParam = common.setParam;
-	var normalize = common.normalize;
-	var getCurrency = common.getCurrency;
-	var formatCurrency = common.formatCurrency;
-	var INCOME = common.INCOME;
-
-	var App = null;
-}
-
-
 var runIncome = (function()
 {
+	let App = null;
+	let test = null;
+
 	function onAppUpdate(props)
 	{
 		props = props || {};
 
 		if ('App' in props)
+		{
 			App = props.App;
+			test = App.test;
+		}
 	}
 
 
@@ -39,7 +29,7 @@ var runIncome = (function()
 
 		if ('srcCurr' in params)
 		{
-			let curr = getCurrency(params.srcCurr);
+			let curr = App.getCurrency(params.srcCurr);
 			if (!curr)
 				throw new Error('Currency (' + params.srcCurr + ') not found');
 
@@ -75,7 +65,7 @@ var runIncome = (function()
 		// Step 0: navigate
 		view = await App.goToMainView(view);
 		view = await view.goToNewTransactionByAccount(accNum);
-		view = await view.changeTransactionType(INCOME);
+		view = await view.changeTransactionType(App.INCOME);
 		view = await incomeTransactionLoop(view, onState, view => submitIncomeTransaction(view, params));
 
 		// Step
@@ -86,25 +76,25 @@ var runIncome = (function()
 		// In case of income with different currency use destination amount value
 		// In case of income with the same currency copy source amount value
 		var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
-		var expBalance = destAcc.balance + normalize(da);
-		var fmtBal = formatCurrency(expBalance, destAcc.curr_id);
+		var expBalance = destAcc.balance + App.normalize(da);
+		var fmtBal = App.formatCurrency(expBalance, destAcc.curr_id);
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : App.accounts.length } } };
 		accWidget.tiles.items[destAccPos] = { balance : fmtBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '+ ' + formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id);
+		var fmtAmount = '+ ' + App.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id);
 		if ('srcCurr' in params && 'destAmount' in params)
 		{
-			fmtAmount += ' (+ ' + formatCurrency(params.destAmount, destAcc.curr_id) + ')';
+			fmtAmount += ' (+ ' + App.formatCurrency(params.destAmount, destAcc.curr_id) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
 		transWidget.transList.items[0] = { accountTitle : destAcc.name,
 										amountText : fmtAmount,
-									 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
@@ -127,13 +117,13 @@ var runIncome = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!isObject(params))
+		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
 
 		// Step 0: navigate to transactions view and filter by income
 		view = await App.goToMainView(view);
 		view = await view.goToTransactions();
-		view = await view.filterByType(INCOME);
+		view = await view.filterByType(App.INCOME);
 
 		// Step 1: Save count of transactions and navigate to update transaction view
 		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
@@ -152,7 +142,7 @@ var runIncome = (function()
 
 		await test('Initial state of update income view', async () => view.setExpectedState(isDiff ? 2 : 0), view);
 
-		setParam(App.beforeUpdateTransaction,
+		App.setParam(App.beforeUpdateTransaction,
 					{ id : view.model.id,
 						destAcc : view.model.destAccount,
 						destAccPos : await view.getAccountPos(view.model.destAccount.id),
@@ -166,7 +156,7 @@ var runIncome = (function()
 		view = await submitIncomeTransaction(view, params);
 
 		// Step 3: Check update of transactions list
-		view = await view.filterByType(INCOME);
+		view = await view.filterByType(App.INCOME);
 
 	 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
 		let trans_id = App.beforeUpdateTransaction.id;
@@ -175,17 +165,17 @@ var runIncome = (function()
 		let origComment = App.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = '+ ' + formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
+		var fmtAmount = '+ ' + App.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
 		if ('srcCurr' in params && 'destAmount' in params)
 		{
-			fmtAmount += ' (+ ' + formatCurrency(params.destAmount, updDestAcc.curr_id) + ')';
+			fmtAmount += ' (+ ' + App.formatCurrency(params.destAmount, updDestAcc.curr_id) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updDestAcc.name,
 											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
+										 	dateFmt : ('date' in params) ? App.formatDate(new Date(params.date)) : origDate,
 										 	comment : ('comment' in params) ? params.comment : origComment };
 
 		await test('Transaction update', async () => {}, view, state);
@@ -211,19 +201,19 @@ var runIncome = (function()
 		if (origDestAccPos != updDestAccPos)
 		{
 			expBalance = origDestBalance - origDestAmount;
-			fmtBal = formatCurrency(expBalance, origDestAcc.curr_id);
+			fmtBal = App.formatCurrency(expBalance, origDestAcc.curr_id);
 
 			accWidget.tiles.items[origDestAccPos] = { balance : fmtBal, name : origDestAcc.name };
 
-			expBalance = updDestAcc.balance + normalize(da);
-			fmtBal = formatCurrency(expBalance, updDestAcc.curr_id);
+			expBalance = updDestAcc.balance + App.normalize(da);
+			fmtBal = App.formatCurrency(expBalance, updDestAcc.curr_id);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}
 		else		// account not changed
 		{
-			var expBalance = origDestBalance - origDestAmount + normalize(da);
-			var fmtBal = formatCurrency(expBalance, updDestAcc.curr_id);
+			var expBalance = origDestBalance - origDestAmount + App.normalize(da);
+			var fmtBal = App.formatCurrency(expBalance, updDestAcc.curr_id);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}

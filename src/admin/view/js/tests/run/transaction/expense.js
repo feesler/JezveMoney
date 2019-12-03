@@ -1,29 +1,17 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../../common.js');
-	var test = common.test;
-	var formatDate = common.formatDate;
-	var isObject = common.isObject;
-	var setParam = common.setParam;
-	var idSearch = common.idSearch;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var getCurrency = common.getCurrency;
-	var formatCurrency = common.formatCurrency;
-	var EXPENSE = common.EXPENSE;
-
-	var App = null;
-}
-
-
 var runExpense = (function()
 {
+	let App = null;
+	let test = null;
+
 	function onAppUpdate(props)
 	{
 		props = props || {};
 
 		if ('App' in props)
+		{
 			App = props.App;
+			test = App.test;
+		}
 	}
 
 
@@ -41,7 +29,7 @@ var runExpense = (function()
 
 		if ('destCurr' in params)
 		{
-			let curr = getCurrency(params.destCurr);
+			let curr = App.getCurrency(params.destCurr);
 			if (!curr)
 				throw new Error('Currency (' + params.destCurr + ') not found');
 
@@ -90,25 +78,25 @@ var runExpense = (function()
 		// In case of expense with different currency use source amount value
 		// In case of expense with the same currency copy destination amount value
 		var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
-		var expBalance = srcAcc.balance - normalize(sa);
-		var fmtBal = formatCurrency(expBalance, srcAcc.curr_id);
+		var expBalance = srcAcc.balance - App.normalize(sa);
+		var fmtBal = App.formatCurrency(expBalance, srcAcc.curr_id);
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : App.accounts.length } } };
 		accWidget.tiles.items[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '- ' + formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
+		var fmtAmount = '- ' + App.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
 		if ('destCurr' in params && 'srcAmount' in params)
 		{
-			fmtAmount += ' (- ' + formatCurrency(params.destAmount, params.destCurr) + ')';
+			fmtAmount += ' (- ' + App.formatCurrency(params.destAmount, params.destCurr) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
 		transWidget.transList.items[0] = { accountTitle : srcAcc.name,
 										amountText : fmtAmount,
-									 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
@@ -131,14 +119,14 @@ var runExpense = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!isObject(params))
+		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
 
 		view.setBlock('Update expense [' + pos + ']', 2);
 
 		view = await App.goToMainView(view);
 		view = await view.goToTransactions();
-		view = await view.filterByType(EXPENSE);
+		view = await view.filterByType(App.EXPENSE);
 
 		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
@@ -156,7 +144,7 @@ var runExpense = (function()
 
 		await test('Initial state of update expense view', async () => view.setExpectedState(isDiff ? 2 : 0), view);
 
-		setParam(App.beforeUpdateTransaction,
+		App.setParam(App.beforeUpdateTransaction,
 					{ id : view.model.id,
 						srcAcc : view.model.srcAccount,
 						srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
@@ -170,7 +158,7 @@ var runExpense = (function()
 		view = await submitExpenseTransaction(view, params);
 
 		// Step
-		view = await view.filterByType(EXPENSE);
+		view = await view.filterByType(App.EXPENSE);
 
 	 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
 		let trans_id = App.beforeUpdateTransaction.id;
@@ -179,17 +167,17 @@ var runExpense = (function()
 		let origComment = App.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = '- ' + formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id);
+		var fmtAmount = '- ' + App.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id);
 		if ('destCurr' in params && 'srcAmount' in params)
 		{
-			fmtAmount += ' (- ' + formatCurrency(params.destAmount, params.destCurr) + ')';
+			fmtAmount += ' (- ' + App.formatCurrency(params.destAmount, params.destCurr) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updSrcAcc.name,
 											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
+										 	dateFmt : ('date' in params) ? App.formatDate(new Date(params.date)) : origDate,
 										 	comment : ('comment' in params) ? params.comment : origComment };
 
 		await test('Transaction update', async () => {}, view, state);
@@ -215,19 +203,19 @@ var runExpense = (function()
 		if (updSrcAccPos != origSrcAccPos)
 		{
 			expBalance = origSrcBalance + origSrcAmount;
-			fmtBal = formatCurrency(expBalance, origSrcAcc.curr_id);
+			fmtBal = App.formatCurrency(expBalance, origSrcAcc.curr_id);
 
 			accWidget.tiles.items[origSrcAccPos] = { balance : fmtBal, name : origSrcAcc.name };
 
-			expBalance = updSrcAcc.balance - normalize(sa);
-			fmtBal = formatCurrency(expBalance, updSrcAcc.curr_id);
+			expBalance = updSrcAcc.balance - App.normalize(sa);
+			fmtBal = App.formatCurrency(expBalance, updSrcAcc.curr_id);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 		else		// account not changed
 		{
-			var expBalance = origSrcBalance + origSrcAmount - normalize(sa);
-			var fmtBal = formatCurrency(expBalance, updSrcAcc.curr_id);
+			var expBalance = origSrcBalance + origSrcAmount - App.normalize(sa);
+			var fmtBal = App.formatCurrency(expBalance, updSrcAcc.curr_id);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
@@ -250,9 +238,9 @@ var runExpense = (function()
 
 			if (trObj)
 			{
-				let srcAcc = idSearch(App.accounts, view.model.srcAccount.id);
+				let srcAcc = App.idSearch(App.accounts, view.model.srcAccount.id);
 
-				let initialBal = normalize(view.model.fSrcResBal + trObj.srcAmount);
+				let initialBal = App.normalize(view.model.fSrcResBal + trObj.srcAmount);
 				view.model.srcAccount.fmtBalance = view.model.srcCurr.formatValue(initialBal);
 			}
 

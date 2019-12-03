@@ -1,27 +1,17 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../../common.js');
-	var test = common.test;
-	var formatDate = common.formatDate;
-	var isObject = common.isObject;
-	var setParam = common.setParam;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var formatCurrency = common.formatCurrency;
-	var TRANSFER = common.TRANSFER;
-
-	var App = null;
-}
-
-
 var runTransfer = (function()
 {
+	let App = null;
+	let test = null;
+
 	function onAppUpdate(props)
 	{
 		props = props || {};
 
 		if ('App' in props)
+		{
 			App = props.App;
+			test = App.test;
+		}
 	}
 
 
@@ -77,7 +67,7 @@ var runTransfer = (function()
 	{
 		view = await App.goToMainView(view);
 		view = await view.goToNewTransactionByAccount(0);
-		view = await view.changeTransactionType(TRANSFER);
+		view = await view.changeTransactionType(App.TRANSFER);
 		view = await transferTransactionLoop(view, onState, view => submitTransferTransaction(view, params));
 
 		let srcAcc = App.beforeSubmitTransaction.srcAcc;
@@ -91,10 +81,10 @@ var runTransfer = (function()
 		// In case of transfer between accounts with the same currency copy source amount value
 		var sa = params.srcAmount;
 		var da = ('destAmount' in params) ? params.destAmount : params.srcAmount;
-		var expSrcBalance = srcAcc.balance - normalize(sa);
-		var expDestBalance = destAcc.balance + normalize(da);
-		var fmtSrcBal = formatCurrency(expSrcBalance, srcAcc.curr_id);
-		var fmtDestBal = formatCurrency(expDestBalance, destAcc.curr_id);
+		var expSrcBalance = srcAcc.balance - App.normalize(sa);
+		var expDestBalance = destAcc.balance + App.normalize(da);
+		var fmtSrcBal = App.formatCurrency(expSrcBalance, srcAcc.curr_id);
+		var fmtDestBal = App.formatCurrency(expDestBalance, destAcc.curr_id);
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : App.accounts.length } } };
@@ -102,17 +92,17 @@ var runTransfer = (function()
 		accWidget.tiles.items[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = formatCurrency(sa, srcAcc.curr_id);
+		var fmtAmount = App.formatCurrency(sa, srcAcc.curr_id);
 		if ('destAmount' in params)
 		{
-			fmtAmount += ' (' + formatCurrency(da, destAcc.curr_id) + ')';
+			fmtAmount += ' (' + App.formatCurrency(da, destAcc.curr_id) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
 		transWidget.transList.items[0] = { accountTitle : srcAcc.name + ' → ' + destAcc.name,
 										amountText : fmtAmount,
-									 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
@@ -135,7 +125,7 @@ var runTransfer = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!isObject(params))
+		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
 
 		view.setBlock('Update transfer transaction ' + pos, 3);
@@ -143,7 +133,7 @@ var runTransfer = (function()
 		// Step 0: Navigate to transactions list view and filter by transfer
 		view = await App.goToMainView(view);
 		view = await view.goToTransactions();
-		view = await view.filterByType(TRANSFER);
+		view = await view.filterByType(App.TRANSFER);
 
 		// Step 1: Save count of transactions and navigate to update transaction view
 		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
@@ -162,7 +152,7 @@ var runTransfer = (function()
 
 		await test('Initial state of update transfer view', async () => view.setExpectedState(isDiff ? 3 : 0), view);
 
-		setParam(App.beforeUpdateTransaction,
+		App.setParam(App.beforeUpdateTransaction,
 					{ id : view.model.id,
 						srcAcc : view.model.srcAccount,
 						srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
@@ -178,7 +168,7 @@ var runTransfer = (function()
 		view = await submitTransferTransaction(view, params);
 
 		// Step 3: Check update of transactions list
-		view = await view.filterByType(TRANSFER);
+		view = await view.filterByType(App.TRANSFER);
 
 		let trans_id = App.beforeUpdateTransaction.id;
 	 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
@@ -190,17 +180,17 @@ var runTransfer = (function()
 		let origComment = App.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = formatCurrency(updSrcAmount, updSrcAcc.curr_id);
+		var fmtAmount = App.formatCurrency(updSrcAmount, updSrcAcc.curr_id);
 		if (updSrcAcc.curr_id != updDestAcc.curr_id)
 		{
-			fmtAmount += ' (' + formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
+			fmtAmount += ' (' + App.formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updSrcAcc.name + ' → ' + updDestAcc.name,
 											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? formatDate(new Date(params.date)) : origDate,
+										 	dateFmt : ('date' in params) ? App.formatDate(new Date(params.date)) : origDate,
 										 	comment : ('comment' in params) ? params.comment : origComment };
 
 		await test('Transaction update', async () => {}, view, state);
@@ -243,7 +233,7 @@ var runTransfer = (function()
 			affectedAccounts[updSrcAccPos] = { balance : updSrcAcc.balance, name : updSrcAcc.name, curr_id : updSrcAcc.curr_id };
 		}
 
-		affectedAccounts[updSrcAccPos].balance -= normalize(sa);
+		affectedAccounts[updSrcAccPos].balance -= App.normalize(sa);
 
 		// Chech if account was changed we need to update both
 		if (!(updDestAccPos in affectedAccounts))
@@ -251,12 +241,12 @@ var runTransfer = (function()
 			affectedAccounts[updDestAccPos] = { balance : updDestAcc.balance, name : updDestAcc.name, curr_id : updDestAcc.curr_id };
 		}
 
-		affectedAccounts[updDestAccPos].balance += normalize(da);
+		affectedAccounts[updDestAccPos].balance += App.normalize(da);
 
 		for(let accPos in affectedAccounts)
 		{
 			let acc = affectedAccounts[accPos];
-			fmtBal = formatCurrency(acc.balance, acc.curr_id);
+			fmtBal = App.formatCurrency(acc.balance, acc.curr_id);
 
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}

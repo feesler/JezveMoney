@@ -1,25 +1,18 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var test = common.test;
-
-	var EXPENSE = common.EXPENSE;
-	var INCOME = common.INCOME;
-	var TRANSFER = common.TRANSFER;
-	var DEBT = common.DEBT;
-
-	var App = null;
-}
-
-
 var runStatistics = (function()
 {
+	let App = null;
+	let test = null
+
+
 	function onAppUpdate(props)
 	{
 		props = props || {};
 
 		if ('App' in props)
+		{
 			App = props.App;
+			test = App.test;
+		}
 	}
 
 
@@ -35,32 +28,32 @@ var runStatistics = (function()
 		await test('Expense statistics view', async () => {}, view, state);
 
 		// Income transactions filter
-		view = await view.filterByType(INCOME);
+		view = await view.filterByType(App.INCOME);
 
 		var state = { value : { chart : { bars : { length : 0 } } } };
 		await test('Income statistics view', async () => {}, view, state);
 
 		// Transfer transactions filter
-		view = await view.filterByType(TRANSFER);
+		view = await view.filterByType(App.TRANSFER);
 
 		var state = { value : { chart : { bars : { length : 2 } } } };
 		await test('Transfer statistics view', async () => {}, view, state);
 
 		// Debt transactions filter
-		view = await view.filterByType(DEBT);
+		view = await view.filterByType(App.DEBT);
 
 		var state = { value : { chart : { bars : { length : 3 } } } };
 		await test('Debt statistics view', async () => {}, view, state);
 
 		// Filter by accounts
-		view = await view.filterByType(EXPENSE);
+		view = await view.filterByType(App.EXPENSE);
 		view = await view.selectAccountByPos(1);
 
 		var state = { value : { chart : { bars : { length : 0 } } } };
 		await test('Filter statistics by account', async () => {}, view, state);
 
 		// Test grouping
-		view = await view.filterByType(DEBT);
+		view = await view.filterByType(App.DEBT);
 		view = await view.groupByDay();
 
 		var state = { value : { chart : { bars : { length : 1 } } } };

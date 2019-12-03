@@ -1,27 +1,17 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../../common.js');
-	var test = common.test;
-	var formatDate = common.formatDate;
-	var isObject = common.isObject;
-	var setParam = common.setParam;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var formatCurrency = common.formatCurrency;
-	var DEBT = common.DEBT;
-
-	var App = null;
-}
-
-
 var runDebt = (function()
 {
+	let App = null;
+	let test = null;
+
 	function onAppUpdate(props)
 	{
 		props = props || {};
 
 		if ('App' in props)
+		{
 			App = props.App;
+			test = App.test;
+		}
 	}
 
 
@@ -110,7 +100,7 @@ var runDebt = (function()
 	{
 		view = await App.goToMainView(view)
 		view = await view.goToNewTransactionByAccount(0);
-		view = await view.changeTransactionType(DEBT);
+		view = await view.changeTransactionType(App.DEBT);
 		view = await debtTransactionLoop(view, onState, view => submitDebtTransaction(view, params));
 
 		let person = App.beforeSubmitTransaction.person;
@@ -123,7 +113,7 @@ var runDebt = (function()
 		var state = { values : { widgets : { length : 5 } } };
 		var sa, da;
 
-		sa = da = normalize(params.srcAmount);
+		sa = da = App.normalize(params.srcAmount);
 
 		if (debtType)
 		{
@@ -143,7 +133,7 @@ var runDebt = (function()
 			if (pacc.balance == 0)
 				return val;
 
-			let fmtBal = formatCurrency(pacc.balance, pacc.curr_id);
+			let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
 			return val.concat(fmtBal);
 		}, []);
 
@@ -157,7 +147,7 @@ var runDebt = (function()
 		// Accounts widget changes
 		if (acc)
 		{
-			var fmtAccBal = formatCurrency(acc.balance, acc.curr_id);
+			var fmtAccBal = App.formatCurrency(acc.balance, acc.curr_id);
 			var accWidget = { tiles : { items : { length : App.accounts.length } } };
 			accWidget.tiles.items[accPos] = { balance : fmtAccBal, name : acc.name };
 
@@ -184,11 +174,11 @@ var runDebt = (function()
 			title += person.name;
 			fmtAmount = (acc) ? '- ' : '+ ';
 		}
-		fmtAmount += formatCurrency(sa, personAccount.curr_id);
+		fmtAmount += App.formatCurrency(sa, personAccount.curr_id);
 
 		transWidget.transList.items[0] = { accountTitle : title,
 										amountText : fmtAmount,
-									 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		state.values.widgets[2] = transWidget;
@@ -210,7 +200,7 @@ var runDebt = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!isObject(params))
+		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
 
 		view.setBlock('Update debt transaction ' + pos, 3);
@@ -218,7 +208,7 @@ var runDebt = (function()
 		// Step
 		view = await App.goToMainView(view);
 		view = await view.goToTransactions();
-		view = await view.filterByType(DEBT);
+		view = await view.filterByType(App.DEBT);
 
 		// Step
 		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
@@ -241,7 +231,7 @@ var runDebt = (function()
 
 		await test('Initial state of update debt view', async () => view.setExpectedState(expState), view);
 
-		setParam(App.beforeUpdateTransaction,
+		App.setParam(App.beforeUpdateTransaction,
 					{ id : view.model.id,
 						person : view.model.person,
 							personPos : await view.getPersonPos(view.model.person.id),
@@ -261,7 +251,7 @@ var runDebt = (function()
 		view = await submitDebtTransaction(view, params);
 
 		// Step
-		view = await view.filterByType(DEBT);
+		view = await view.filterByType(App.DEBT);
 
 		let trans_id = App.beforeUpdateTransaction.id;
 		let transCount = App.beforeUpdateTransaction.trCount;
@@ -290,13 +280,13 @@ var runDebt = (function()
 			title += updPerson.name;
 			fmtAmount = (updAcc && !updNoAccount) ? '- ' : '+ ';
 		}
-		fmtAmount += formatCurrency(updSrcAmount, updPersonAccount.curr_id);
+		fmtAmount += App.formatCurrency(updSrcAmount, updPersonAccount.curr_id);
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : title,
 											amountText : fmtAmount,
-										 	dateFmt : formatDate(('date' in params) ? new Date(params.date) : new Date()),
+										 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 										 	comment : ('comment' in params) ? params.comment : '' };
 
 		await test('Transaction update', async () => {}, view, state);
@@ -320,7 +310,7 @@ var runDebt = (function()
 		var state = { values : { widgets : { length : 5 } } };
 		var sa, da;
 
-		sa = da = normalize(origAmount);
+		sa = da = App.normalize(origAmount);
 
 		var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
 
@@ -339,7 +329,7 @@ var runDebt = (function()
 		}
 
 		// Apply new transaction
-		sa = da = normalize(updAmount);
+		sa = da = App.normalize(updAmount);
 		if (updDebtType)
 		{
 			updPersonAccount.balance -= sa;
@@ -360,7 +350,7 @@ var runDebt = (function()
 				if (pacc.balance == 0)
 					return val;
 
-				let fmtBal = formatCurrency(pacc.balance, pacc.curr_id);
+				let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
 				return val.concat(fmtBal);
 			}, []);
 
@@ -373,7 +363,7 @@ var runDebt = (function()
 			if (pacc.balance == 0)
 				return val;
 
-			let fmtBal = formatCurrency(pacc.balance, pacc.curr_id);
+			let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
 			return val.concat(fmtBal);
 		}, []);
 
@@ -387,12 +377,12 @@ var runDebt = (function()
 		var accWidget = { tiles : { items : { length : App.accounts.length } } };
 		if (origAcc && !origNoAccount)
 		{
-			var fmtAccBal = formatCurrency(origAcc.balance, origAcc.curr_id);
+			var fmtAccBal = App.formatCurrency(origAcc.balance, origAcc.curr_id);
 			accWidget.tiles.items[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
 		}
 		if (updAcc && !updNoAccount)
 		{
-			var fmtAccBal = formatCurrency(updAcc.balance, updAcc.curr_id);
+			var fmtAccBal = App.formatCurrency(updAcc.balance, updAcc.curr_id);
 			accWidget.tiles.items[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
 		}
 

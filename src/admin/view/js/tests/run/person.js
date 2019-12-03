@@ -1,20 +1,17 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var test = common.test;
-
-	var App = null;
-}
-
-
 var runPersons = (function()
 {
+	let App = null;
+	let test = null;
+
 	function onAppUpdate(props)
 	{
 		props = props || {};
 
 		if ('App' in props)
+		{
 			App = props.App;
+			test = App.test;
+		}
 	}
 
 
