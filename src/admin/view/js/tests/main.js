@@ -48,6 +48,8 @@ var App = {
 
 	user_id : 2,
 
+	run : {},
+
 	accounts : [],
 	persons : [],
 	transactions : [],
