@@ -252,7 +252,7 @@ class mysqlDB
 		if (is_null($result))
 			return NULL;
 
-		return mysqli_fetch_array($result);
+		return mysqli_fetch_array($result, MYSQLI_ASSOC);
 	}
 
 
