@@ -90,7 +90,7 @@ class TransactionModel extends CachedTable
 	// Called from CachedTable::updateCache() and return data query object
 	protected function dataQuery()
 	{
-		return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id);
+		return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=".self::$user_id, NULL, "pos ASC");
 	}
 
 
