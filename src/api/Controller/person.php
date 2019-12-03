@@ -77,7 +77,7 @@ class PersonApiController extends ApiController
 		if (!isset($_POST["id"]) || !isset($_POST["name"]))
 			$respObj->fail();
 
-		if (!$this->pMod->edit($_POST["id"], [ "name" => $_POST["name"] ]))
+		if (!$this->pMod->update($_POST["id"], [ "name" => $_POST["name"] ]))
 			$respObj->fail();
 
 		$respObj->ok();
