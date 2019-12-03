@@ -169,17 +169,17 @@ async function createTransactionTests(view)
 	view = await runCreateExpenseTests(view);
 
 	view = await view.goToNewTransactionByAccount(0);
-	view = await view.changeTransactionType(INCOME);
+	view = await view.changeTransactionType(App.INCOME);
 	view = await transactions.income.stateLoop(view);
 	view = await runCreateIncomeTests(view);
 
 	view = await view.goToNewTransactionByAccount(0);
-	view = await view.changeTransactionType(TRANSFER);
+	view = await view.changeTransactionType(App.TRANSFER);
 	view = await transactions.transfer.stateLoop(view);
 	view = await runCreateTransferTests(view);
 
 	view = await view.goToNewTransactionByAccount(0);
-	view = await view.changeTransactionType(DEBT);
+	view = await view.changeTransactionType(App.DEBT);
 	view = await transactions.debt.stateLoop(view);
 	view = await runCreateDebtTests(view);
 
@@ -342,8 +342,8 @@ async function runDeleteExpenseTests(view)
 {
 	view.setBlock('Delete expense transactions', 2);
 
-	view = await transactions.del(view, EXPENSE, [0]);
-	view = await transactions.del(view, EXPENSE, [0, 1]);
+	view = await transactions.del(view, App.EXPENSE, [0]);
+	view = await transactions.del(view, App.EXPENSE, [0, 1]);
 
 	return view;
 }
@@ -353,8 +353,8 @@ async function runDeleteIncomeTests(view)
 {
 	view.setBlock('Delete income transactions', 2);
 
-	view = await transactions.del(view, INCOME, [0]);
-	view = await transactions.del(view, INCOME, [0, 1, 2]);
+	view = await transactions.del(view, App.INCOME, [0]);
+	view = await transactions.del(view, App.INCOME, [0, 1, 2]);
 
 	return view;
 }
@@ -364,8 +364,8 @@ async function runDeleteTransferTests(view)
 {
 	view.setBlock('Delete transfer transactions', 2);
 
-	view = await transactions.del(view, TRANSFER, [1]);
-	view = await transactions.del(view, TRANSFER, [0, 2]);
+	view = await transactions.del(view, App.TRANSFER, [1]);
+	view = await transactions.del(view, App.TRANSFER, [0, 2]);
 
 	return view;
 }
@@ -375,8 +375,8 @@ async function runDeleteDebtTests(view)
 {
 	view.setBlock('Delete debt transactions', 2);
 
-	view = await transactions.del(view, DEBT, [0]);
-	view = await transactions.del(view, DEBT, [0, 1]);
+	view = await transactions.del(view, App.DEBT, [0]);
+	view = await transactions.del(view, App.DEBT, [0, 1]);
 
 	return view;
 }
