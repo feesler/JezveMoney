@@ -129,6 +129,75 @@ var runAPI = (function()
 	}
 
 
+	function onAccountDelete(trList, accList, ids)
+	{
+		let res = [];
+
+		if (!App.isArray(ids))
+			ids = [ ids ];
+
+		for(let trans of trList)
+		{
+			if (trans.type == App.EXPENSE && ids.indexOf(trans.src_id) !== -1)
+				continue;
+			if (trans.type == App.INCOME && ids.indexOf(trans.dest_id) !== -1)
+				continue;
+			if ((trans.type == App.TRANSFER || trans.type == App.DEBT) &&
+				ids.indexOf(trans.src_id) !== -1 && ids.indexOf(trans.dest_id) !== -1)
+				continue;
+			if (trans.type == App.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
+				continue;
+			if (trans.type == App.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
+				continue;
+
+			let convTrans = App.copyObject(trans);
+
+			if (convTrans.type == App.TRANSFER)
+			{
+				if (ids.indexOf(convTrans.src_id) !== -1)
+				{
+					convTrans.type = App.INCOME;
+					convTrans.src_id = 0;
+				}
+				else if (ids.indexOf(convTrans.dest_id) !== -1)
+				{
+					convTrans.type = App.EXPENSE;
+					convTrans.dest_id = 0;
+				}
+			}
+			else if (convTrans.type == App.DEBT)
+			{
+				for(let acc_id of ids)
+				{
+					let acc = App.idSearch(accList, acc_id);
+
+					if (convTrans.src_id == acc_id)
+					{
+						if (acc.owner_id != App.user_id)
+						{
+							convTrans.type = App.INCOME;
+						}
+
+						convTrans.src_id = 0;
+					}
+					else if (convTrans.dest_id == acc_id)
+					{
+						if (acc.owner_id != App.user_id)
+						{
+							convTrans.type = App.EXPENSE;
+						}
+						convTrans.dest_id = 0;
+					}
+				}
+			}
+
+			res.push(convTrans);
+		}
+
+		return res;
+	}
+
+
 	// Delete specified account(s)
 	// And check expected state of app
 	async function apiDeleteAccountTest(ids)
@@ -155,66 +224,8 @@ var runAPI = (function()
 
 			// Prepare expected updates of transactions
 			let trBefore = await api.transaction.list();
-			let expTransList = [];
-
-			for(let trans of trBefore)
-			{
-				if (trans.type == App.EXPENSE && ids.indexOf(trans.src_id) !== -1)
-					continue;
-				if (trans.type == App.INCOME && ids.indexOf(trans.dest_id) !== -1)
-					continue;
-				if ((trans.type == App.TRANSFER || trans.type == App.DEBT) &&
-					ids.indexOf(trans.src_id) !== -1 && ids.indexOf(trans.dest_id) !== -1)
-					continue;
-				if (trans.type == App.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
-					continue;
-				if (trans.type == App.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
-					continue;
-
-				let convTrans = App.copyObject(trans);
-
-				if (convTrans.type == App.TRANSFER)
-				{
-					if (ids.indexOf(convTrans.src_id) !== -1)
-					{
-						convTrans.type = App.INCOME;
-						convTrans.src_id = 0;
-					}
-					else if (ids.indexOf(convTrans.dest_id) !== -1)
-					{
-						convTrans.type = App.EXPENSE;
-						convTrans.dest_id = 0;
-					}
-				}
-				else if (convTrans.type == App.DEBT)
-				{
-					for(let acc_id of ids)
-					{
-						let acc = App.idSearch(accBefore, acc_id);
-
-						if (convTrans.src_id == acc_id)
-						{
-							if (acc.owner_id != App.user_id)
-							{
-								convTrans.type = App.INCOME;
-							}
-
-							convTrans.src_id = 0;
-						}
-						else if (convTrans.dest_id == acc_id)
-						{
-							if (acc.owner_id != App.user_id)
-							{
-								convTrans.type = App.EXPENSE;
-							}
-							convTrans.dest_id = 0;
-						}
-					}
-				}
-
-				expTransList.push(convTrans);
-			}
-			trBefore.filter(item => ids.indexOf(item.src_id) !== -1 || ids.indexOf(item.dest_id) !== -1);
+			let expTransList = onAccountDelete(trBefore, accBefore, ids);
+			expTransList.sort((a, b) => a.pos - b.pos);
 
 			// Send API sequest to server
 			deleteRes = await api.account.del(ids);
@@ -316,6 +327,66 @@ var runAPI = (function()
 		}, env);
 
 		return updateRes;
+	}
+
+
+	// Delete specified person(s)
+	// And check expected state of app
+	async function apiDeletePersonTest(ids)
+	{
+		let deleteRes;
+
+		await App.test('Delete person', async () =>
+		{
+			if (!App.isArray(ids))
+				ids = [ ids ];
+
+			let accList = await api.account.list();
+			if (!App.isArray(accList))
+				return false;
+			let pBefore = await api.person.list();
+			if (!App.isArray(pBefore))
+				return false;
+
+			// Prepare expected updates of accounts list
+			let expPersonList = App.copyObject(pBefore);
+			let accRemoveList = [];
+			for(let person_id of ids)
+			{
+				let pIndex = expPersonList.findIndex(item => item.id == person_id);
+				if (pIndex !== -1)
+				{
+					if (App.isArray(expPersonList[pIndex].accounts))
+					{
+						for(let personAcc of expPersonList[pIndex].accounts)
+						{
+							accRemoveList.push(personAcc.id);
+						}
+					}
+					expPersonList.splice(pIndex, 1);
+				}
+			}
+
+			// Prepare expected updates of transactions
+			let trBefore = await api.transaction.list();
+			let expTransList = onAccountDelete(trBefore, accList, accRemoveList);
+			expTransList.sort((a, b) => a.pos - b.pos);
+
+			// Send API sequest to server
+			deleteRes = await api.person.del(ids);
+			if (!deleteRes)
+				throw new Error('Fail to delete person(s)');
+
+			let pList = await api.person.list();
+			let trList = await api.transaction.list();
+
+			let res = App.checkObjValue(pList, expPersonList) &&
+						App.checkObjValue(trList, expTransList);
+
+			return res;
+		}, env);
+
+		return deleteRes;
 	}
 
 
@@ -876,6 +947,11 @@ var runAPI = (function()
 		 * Update person
 		 */
 		 await apiUpdatePersonTest(PERSON_X, { name : 'XX!' });
+
+		/**
+		 * Delete person
+		 */
+		 await apiDeletePersonTest(PERSON_Y);
 	}
 
 
