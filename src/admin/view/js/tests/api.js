@@ -148,8 +148,8 @@ var apiModule = (function()
 			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
-		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
-			return false;
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to read account');
 
 		return jsonRes.data;
 	}
@@ -161,7 +161,7 @@ var apiModule = (function()
 
 		let apiRes = await apiPost('account/create', postData);
 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+			throw new Error('Fail to create account');
 
 		return apiRes.data;
 	}
@@ -178,7 +178,7 @@ var apiModule = (function()
 
 		let apiRes = await apiPost('account/update', postData);
 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+			throw new Error('Fail to update account');
 
 		return true;
 	}
@@ -199,8 +199,8 @@ var apiModule = (function()
 		let postData = { id : ids };
 
 		let apiRes = await apiPost('account/delete', postData);
-		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+		if (!apiRes || apiRes.result != 'ok')
+			throw new Error('Fail to delete account');
 
 		return true;
 	}
@@ -214,8 +214,8 @@ var apiModule = (function()
 			reqUrl += '?full=1';
 
 		let jsonRes = await apiGet(reqUrl);
-		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
-			return false;
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to obtain list of accounts');
 
 		return jsonRes.data;
 	}
@@ -225,7 +225,10 @@ var apiModule = (function()
 	{
 		let jsonRes = await apiGet('account/reset');
 
-		return (jsonRes && jsonRes.result && jsonRes.result == 'ok');
+		if (!jsonRes || jsonRes.result != 'ok');
+			throw new Error('Fail to reset accounts');
+
+		return true;
 	}
 
 
@@ -255,8 +258,8 @@ var apiModule = (function()
 			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
-		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
-			return false;
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to read person');
 
 		return jsonRes.data;
 	}
@@ -267,8 +270,8 @@ var apiModule = (function()
 		let postData = checkFields(options, pReqFields);
 
 		let apiRes = await apiPost('person/create', postData);
-		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+		if (!apiRes || apiRes.result != 'ok')
+			throw new Error('Fail to create person');
 
 		return apiRes.data;
 	}
@@ -284,8 +287,8 @@ var apiModule = (function()
 		postData.id = id;
 
 		let apiRes = await apiPost('person/update', postData);
-		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+		if (!apiRes || apiRes.result != 'ok')
+			throw new Error('Fail to update person');
 
 		return true;
 	}
@@ -306,8 +309,8 @@ var apiModule = (function()
 		let postData = { id : ids };
 
 		let apiRes = await apiPost('person/delete', postData);
-		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+		if (!apiRes || apiRes.result != 'ok')
+			throw new Error('Fail to delete person');
 
 		return true;
 	}
@@ -316,8 +319,8 @@ var apiModule = (function()
 	async function personsList()
 	{
 		let jsonRes = await apiGet('person/list');
-		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
-			return false;
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to obtain list of persons');
 
 		return jsonRes.data;
 	}
@@ -351,8 +354,8 @@ var apiModule = (function()
 			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
-		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
-			return false;
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to read transaction');
 
 		return jsonRes.data;
 	}
@@ -368,8 +371,8 @@ var apiModule = (function()
 		App.setParam(postData, addData);
 
  		let apiRes = await apiPost('transaction/create', postData);
- 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
- 			return false;
+ 		if (!apiRes || apiRes.result != 'ok')
+ 			throw new Error('Fail to create transaction');
 
  		return apiRes.data;
  	}
@@ -393,7 +396,10 @@ var apiModule = (function()
 		App.setParam(postData, addData);
 
  		let apiRes = await apiPost('transaction/update', postData);
- 		return (apiRes && apiRes.result && apiRes.result == 'ok');
+ 		if (!apiRes || apiRes.result != 'ok')
+			throw new Error('Fail to update transaction');
+
+		return true;
  	}
 
 
@@ -412,8 +418,8 @@ var apiModule = (function()
 		let postData = { id : ids };
 
 		let apiRes = await apiPost('transaction/delete', postData);
-		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			return false;
+		if (!apiRes || apiRes.result != 'ok')
+			throw new Error('Fail to delete transaction');
 
 		return true;
 	}
@@ -422,8 +428,8 @@ var apiModule = (function()
 	async function transList()
 	{
 		let jsonRes = await apiGet('transaction/list?count=0');
-		if (!jsonRes || !jsonRes.result || jsonRes.result != 'ok')
-			return false;
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to obtain list of transactions');
 
 		return jsonRes.data;
 	}
