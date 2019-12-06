@@ -47,7 +47,7 @@ class TestsAdminController extends Controller
 		$this->jsAdmin[] = "tests/run/api/transaction.js";
 		$this->jsAdmin[] = "tests/run/account.js";
 		$this->jsAdmin[] = "tests/run/person.js";
-		$this->jsAdmin[] = "tests/run/transactions.js";
+		$this->jsAdmin[] = "tests/run/transaction/common.js";
 		$this->jsAdmin[] = "tests/run/transaction/expense.js";
 		$this->jsAdmin[] = "tests/run/transaction/income.js";
 		$this->jsAdmin[] = "tests/run/transaction/transfer.js";

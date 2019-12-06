@@ -5,7 +5,7 @@ if (typeof module !== 'undefined' && module.exports)
 	var runAccounts = require('./run/account.js');
 	var runPersons = require('./run/person.js');
 
-	var runTransactions = require('./run/transactions.js');
+	var runTransactionsCommon = require('./run/transaction/common.js');
 	var runExpense = require('./run/transaction/expense.js');
 	var runIncome = require('./run/transaction/income.js');
 	var runTransfer = require('./run/transaction/transfer.js');
@@ -28,7 +28,7 @@ var accounts = runAccounts;
 var persons = runPersons;
 
 var transactions = {
-	common : runTransactions,
+	common : runTransactionsCommon,
 	expense : runExpense,
 	income : runIncome,
 	transfer : runTransfer,

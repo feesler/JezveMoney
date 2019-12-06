@@ -1,4 +1,4 @@
-var runTransactions = (function()
+var runTransactionsCommon = (function()
 {
 	let App = null;
 	let test = null;
@@ -235,5 +235,5 @@ var runTransactions = (function()
 
 if (typeof module !== 'undefined' && module.exports)
 {
-	module.exports = runTransactions;
+	module.exports = runTransactionsCommon;
 }
