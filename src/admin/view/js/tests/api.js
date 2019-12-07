@@ -225,7 +225,7 @@ var apiModule = (function()
 	{
 		let jsonRes = await apiGet('account/reset');
 
-		if (!jsonRes || jsonRes.result != 'ok');
+		if (!jsonRes || jsonRes.result != 'ok')
 			throw new Error('Fail to reset accounts');
 
 		return true;
