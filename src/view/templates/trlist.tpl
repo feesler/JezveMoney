@@ -15,7 +15,7 @@
 <?php		}	?>
 							</div>
 <?php	}	?>
-<?php	if ($tr_on_page > 0 && $showPaginator == TRUE) {		?>
+<?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
 							<div class="paginator"><?php
 			foreach($pagesArr as $pageItem) {
 				if (!is_numeric($pageItem["text"])) {
@@ -73,7 +73,7 @@
 <?php	} else {	?>
 						</div>
 <?php	}	?>
-<?php	if ($tr_on_page > 0 && $showPaginator == TRUE) {		?>
+<?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
 							<div class="paginator"><?php
 			foreach($pagesArr as $pageItem) {
 				if (!is_numeric($pageItem["text"])) {

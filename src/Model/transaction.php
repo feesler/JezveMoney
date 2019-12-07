@@ -784,8 +784,11 @@ class TransactionModel extends CachedTable
 
 
 	// Return array of transactions
-	public function getData($trans_type, $accounts = NULL, $isDesc = FALSE, $tr_on_page = 0, $page_num = 0, $searchStr = NULL, $startDate = NULL, $endDate = NULL, $details = FALSE)
+	public function getData($params = NULL)
 	{
+		if (is_null($params))
+			$params = [];
+
 		$res = [];
 
 		if (!self::$user_id)
@@ -800,33 +803,42 @@ class TransactionModel extends CachedTable
 		if (!$owner_id)
 			return $res;
 
-		$persMod = new PersonModel(self::$user_id);
 		if (!$this->accModel->getCount([ "full" => TRUE ]))
 			return $res;
 
+		// Skip if no transactions at all
 		if (!$this->dbObj->countQ($this->tbl_name, "user_id=".self::$user_id))
 			return $res;
 
-		$tr_type = intval($trans_type);
-		$sReq = $this->dbObj->escape($searchStr);
+		$condArr = [ "user_id=".self::$user_id ];
 
-		$condArr = [];
-		$condArr[] = "user_id=".self::$user_id;
+		// Transaction type condition
+		$tr_type = isset($params["type"]) ? intval($params["type"]) : 0;
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
-		if ($accounts != NULL)
+
+		// Accounts filter condition
+		if (isset($params["accounts"]) && !is_null($params["accounts"]))
 		{
-			$accCond = $this->getAccCondition($accounts);
+			$accCond = $this->getAccCondition($params["accounts"]);
 			if (!is_empty($accCond))
 				$condArr[] = "(".$accCond.")";
 		}
-		if (!is_empty($sReq))
-			$condArr[] = "comment LIKE '%".$sReq."%'";
 
-		if (!is_null($startDate) && !is_null($endDate))
+		// Search condition
+		if (isset($params["search"]))
 		{
-			$stdate = strtotime($startDate);
-			$enddate = strtotime($endDate);
+			$sReq = $this->dbObj->escape($params["search"]);
+			if (!is_empty($sReq))
+				$condArr[] = "comment LIKE '%".$sReq."%'";
+		}
+
+		// Date range condition
+		if (isset($params["startDate"]) && !is_null($params["startDate"]) &&
+			isset($params["endDate"]) && !is_null($params["endDate"]))
+		{
+			$stdate = strtotime($params["startDate"]);
+			$enddate = strtotime($params["endDate"]);
 			if ($stdate != -1 && $enddate != -1)
 			{
 				$fstdate = date("Y-m-d H:i:s", $stdate);
@@ -837,9 +849,16 @@ class TransactionModel extends CachedTable
 			}
 		}
 
+		// Sort order condition
+		$isDesc = (isset($params["desc"]) && $params["desc"] == TRUE);
 		$orderAndLimit = "pos ".(($isDesc == TRUE) ? "DESC" : "ASC");
+
+		// Pagination conditions
+		$tr_on_page = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
 		if ($tr_on_page > 0)
 		{
+			$page_num = isset($params["page"]) ? intval($params["page"]) : 0;
+
 			$transCount = $this->dbObj->countQ($this->tbl_name, $condArr);
 
 			$limitOffset = ($tr_on_page * $page_num);
@@ -869,13 +888,10 @@ class TransactionModel extends CachedTable
 			$trans->date = date("d.m.Y", strtotime($row["date"]));
 			$trans->pos = intval($row["pos"]);
 
-			if ($details)
-			{
-				$balArr = $this->getBalance($trans->id);
+			$balArr = $this->getBalance($trans->id);
 
-				$trans->src_balance = (($trans->src_id != 0 && isset($balArr[$trans->src_id])) ? $balArr[$trans->src_id] : 0.0);
-				$trans->dest_balance = (($trans->dest_id != 0 && isset($balArr[$trans->dest_id])) ? $balArr[$trans->dest_id] : 0.0);
-			}
+			$trans->src_balance = (($trans->src_id != 0 && isset($balArr[$trans->src_id])) ? $balArr[$trans->src_id] : 0.0);
+			$trans->dest_balance = (($trans->dest_id != 0 && isset($balArr[$trans->dest_id])) ? $balArr[$trans->dest_id] : 0.0);
 
 			if ($trans->type == DEBT)
 			{
@@ -924,32 +940,39 @@ class TransactionModel extends CachedTable
 
 
 	// Return total count of transactions for specified condition
-	public function getTransCount($trans_type, $accounts = NULL, $searchStr = NULL, $startDate = NULL, $endDate = NULL)
+	public function getTransCount($params = NULL)
 	{
 		if (!self::$user_id)
 			return 0;
 
-		$tr_type = intval($trans_type);
-		$sReq = $this->dbObj->escape($searchStr);
+		$condArr = [ "user_id=".self::$user_id ];
 
-		$condArr = ["user_id=".self::$user_id];
+		if (is_null($params))
+			$params = [];
+
+		$tr_type = isset($params["type"]) ?  intval($params["type"]) : 0;
 		if ($tr_type != 0)
 			$condArr[] = "type=".$tr_type;
 
-		if ($accounts != NULL)
+		if (isset($params["accounts"]) && !is_null($params["accounts"]))
 		{
-			$accCond = $this->getAccCondition($accounts);
+			$accCond = $this->getAccCondition($params["accounts"]);
 			if (!is_empty($accCond))
 				$condArr[] = "(".$accCond.")";
 		}
 
-		if (!is_empty($sReq))
-			$condArr[] = "comment LIKE '%".$sReq."%'";
-
-		if (!is_null($startDate) && !is_null($endDate))
+		if (isset($params["search"]))
 		{
-			$stdate = strtotime($startDate);
-			$enddate = strtotime($endDate);
+			$sReq = $this->dbObj->escape($params["search"]);
+			if (!is_empty($sReq))
+				$condArr[] = "comment LIKE '%".$sReq."%'";
+		}
+
+		if (isset($params["startDate"]) && !is_null($params["startDate"]) &&
+			isset($params["endDate"]) && !is_null($params["endDate"]))
+		{
+			$stdate = strtotime($params["startDate"]);
+			$enddate = strtotime($params["endDate"]);
 			if ($stdate != -1 && $enddate != -1)
 			{
 				$fstdate = date("Y-m-d H:i:s", $stdate);
@@ -964,29 +987,53 @@ class TransactionModel extends CachedTable
 	}
 
 
-	// Return link to specified page
-	public function getPageLink($trans_type, $acc_id, $page_num, $searchStr, $startDate, $endDate, $details)
+	// Return link to page with specified params
+	// Convert App filter to GET
+	public function getPageLink($params = NULL)
 	{
-		$params = ["type" => $this->getTypeString($trans_type),
-						"page" => $page_num];
-		if (count($acc_id) > 0)
-			$params["acc_id"] = implode(",", $acc_id);
-		if ($details == TRUE)
-			$params["mode"] = "details";
-		if (!is_empty($searchStr))
-			$params["search"] = $searchStr;
-		if (!is_empty($startDate) && !is_empty($endDate))
+		if (is_null($params))
+			$params = [];
+
+		$linkParams = [];
+
+		// Convert type to string
+		if (isset($params["type"]))
+			$linkParams["type"] = $this->getTypeString($params["type"]);
+		// Page number
+		if (isset($params["page"]))
 		{
-			$params["stdate"] = $startDate;
-			$params["enddate"] = $endDate;
+			$pNum = intval($params["page"]);
+			if ($pNum > 1)
+				$linkParams["page"] = $pNum;
 		}
-		$linkStr = urlJoin(BASEURL."transactions/", $params);
+		// Convert accounts list filter
+		if (is_array($params["accounts"]) && count($params["accounts"]) > 0)
+			$linkParams["acc_id"] = implode(",", $params["accounts"]);
+		// Set list view mode
+		if (isset($params["details"]) && $params["details"] == TRUE)
+			$linkParams["mode"] = "details";
+		// Copy search string if not empty
+		if (isset($params["search"]) && !is_empty($params["search"]))
+			$linkParams["search"] = $params["search"];
+		// Copy date range parameters if exists
+		if (isset($params["startDate"]) && !is_empty($params["startDate"]) &&
+			isset($params["endDate"]) && !is_empty($params["endDate"]))
+		{
+			$linkParams["stdate"] = $startDate;
+			$linkParams["enddate"] = $endDate;
+		}
+
+		$linkStr = urlJoin(BASEURL."transactions/", $linkParams);
 
 		return $linkStr;
 	}
 
 
+	// Build paginator for specified condition:
+	// 		page_num - zero based index of current page
+	// 		pages_count - total count of pages available
 	// Return array of paginator items
+	// 		paginator_item: [ "text" => string, optional "active" => bool ]
 	public function getPaginatorArray($page_num, $pages_count)
 	{
 		$res = [];

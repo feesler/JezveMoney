@@ -17,16 +17,25 @@ class TransactionsController extends Controller
 		global $user_id, $user_name, $uMod;
 
 		$filterObj = new stdClass;
+		$trParams = [ "onPage" => 10,
+						"desc" => TRUE ];
 
-		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
+		// Obtain requested transaction type filter
+		$filterObj->type = (isset($_GET["type"])) ? $_GET["type"] : "all";
 
-		$trans_type = TransactionModel::getStringType($type_str);
-		if (is_null($trans_type))
+		$trParams["type"] = TransactionModel::getStringType($filterObj->type);
+		if (is_null($trParams["type"]))
 			$this->fail();
 
-		$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
+		// Obtain requested page number
+		if (isset($_GET["page"]))
+		{
+			$filterObj->page = intval($_GET["page"]);
+			if ($filterObj->page > 1)
+				$trParams["page"] = $filterObj->page - 1;
+		}
 
-		// Prepare array of accounts
+		// Prepare array of requested accounts filter
 		$accFilter = [];
 		if (isset($_GET["acc_id"]))
 		{
@@ -37,15 +46,19 @@ class TransactionsController extends Controller
 				if ($acc_id && $this->accModel->is_exist($acc_id))
 					$accFilter[] = $acc_id;
 			}
+
+			if (count($accFilter) > 0)
+				$trParams["accounts"] = $filterObj->acc_id = $accFilter;
 		}
 
-		$filterObj->acc_id = $accFilter;
-		$filterObj->type = $type_str;
-
+		// Obtain requested search query
 		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
 		if (!is_null($searchReq))
-			$filterObj->search = $searchReq;
+		{
+			$trParams["search"] = $filterObj->search = $searchReq;
+		}
 
+		// Obtain requested date range
 		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
 		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
 
@@ -57,10 +70,11 @@ class TransactionsController extends Controller
 			if ($sdate != -1 && $edate != -1)
 				$dateFmt = date("d.m.Y", $sdate)." - ".date("d.m.Y", $edate);
 
-			$filterObj->stdate = $stDate;
-			$filterObj->enddate = $endDate;
+			$trParams["startDate"] = $filterObj->stdate = $stDate;
+			$trParams["endDate"] = $filterObj->enddate = $endDate;
 		}
 
+		// Obtain requested view mode
 		$showDetails = FALSE;
 		if (isset($_GET["mode"]) && $_GET["mode"] == "details")
 		{
@@ -71,11 +85,10 @@ class TransactionsController extends Controller
 		$accArr = $this->accModel->getData();
 		$accounts = $this->accModel->getCount();
 
-		$tr_on_page = 20;
-
 		$totalTrCount = $this->model->getCount();
-		$transArr = ($totalTrCount) ? $this->model->getData($trans_type, $accFilter, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, TRUE) : [];
-		$transCount = $this->model->getTransCount($trans_type, $accFilter, $searchReq, $stDate, $endDate);
+
+		$transArr = ($totalTrCount) ? $this->model->getData($trParams) : [];
+		$transCount = $this->model->getTransCount($trParams);
 
 		$currArr = $this->currModel->getData();
 
@@ -85,20 +98,16 @@ class TransactionsController extends Controller
 		$baseUrl = BASEURL."transactions/";
 		foreach($trTypes as $ind => $trTypeName)
 		{
-			$params = ["type" => strtolower($trTypeName)];
-			if (count($filterObj->acc_id) > 0)
-				$params["acc_id"] = implode(",", $filterObj->acc_id);
-			if ($showDetails)
-				$params["mode"] = "details";
-			if (!is_empty($searchReq))
-				$params["search"] = $searchReq;
-			if (!is_empty($stDate) && !is_empty($endDate))
-			{
-				$params["stdate"] = $stDate;
-				$params["enddate"] = $endDate;
-			}
+			$urlParams = (array)$filterObj;
 
-			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $params)];
+			$urlParams["type"] = strtolower($trTypeName);
+			if (isset($urlParams["acc_id"]))
+				$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
+
+			// Clear page number because list of transactions guaranteed to change on change accounts filter
+			unset($urlParams["page"]);
+
+			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $urlParams)];
 		}
 
 		$showPaginator = TRUE;
@@ -108,32 +117,33 @@ class TransactionsController extends Controller
 		if ($showPaginator == TRUE)
 		{
 			// Prepare classic/details mode link
-			$params = ["type" => $this->model->getTypeString($trans_type),
-							"mode" => (($details) ? "classic" : "details")];
-			if (count($filterObj->acc_id) > 0)
-				$params["acc_id"] = implode(",", $filterObj->acc_id);
-			if ($page_num != 0)
-				$params["page"] = ($page_num + 1);
-			if (!is_empty($searchReq))
-				$params["search"] = $searchReq;
-			if (!is_empty($stDate) && !is_empty($endDate))
-			{
-				$params["stdate"] = $stDate;
-				$params["enddate"] = $endDate;
-			}
-			$linkStr = urlJoin(BASEURL."transactions/", $params);
+			$urlParams = (array)$filterObj;
+
+			$urlParams["mode"] = ($details) ? "classic" : "details";
+			if (isset($urlParams["acc_id"]) && count($urlParams["acc_id"]) > 0)
+				$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
+
+			$linkStr = urlJoin(BASEURL."transactions/", $urlParams);
 
 			// Build data for paginator
-			if ($tr_on_page > 0)
+			if ($trParams["onPage"] > 0)
 			{
-				$pageCount = ceil($transCount / $tr_on_page);
-				$pagesArr = ($transCount > $tr_on_page) ? $this->model->getPaginatorArray($page_num, $pageCount) : [];
+				$urlParams = (array)$filterObj;
+
+				$pageCount = ceil($transCount / $trParams["onPage"]);
+				$page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
+				$pagesArr = ($transCount > $trParams["onPage"]) ? $this->model->getPaginatorArray($page_num, $pageCount) : [];
+
+				if (isset($urlParams["acc_id"]))
+					$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
+
 				foreach($pagesArr as $ind => $pageItem)
 				{
 					if (is_numeric($pageItem["text"]) && !$pageItem["active"])
 					{
-						$pNum = intval($pageItem["text"]);
-						$pagesArr[$ind]["link"] = $this->model->getPageLink($trans_type, $filterObj->acc_id, $pNum, $searchReq, $stDate, $endDate, $details);
+						$urlParams["page"] = intval($pageItem["text"]);
+
+						$pagesArr[$ind]["link"] = urlJoin(BASEURL."transactions/", $urlParams);
 					}
 				}
 			}

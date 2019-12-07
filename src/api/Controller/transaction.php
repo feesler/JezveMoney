@@ -40,26 +40,34 @@ class TransactionApiController extends ApiController
 
 		$accMod = new AccountModel($this->user_id);
 
+		$params = [];
+
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
 
-		$trans_type = TransactionModel::getStringType($type_str);
-		if (is_null($trans_type))
+		$params["type"] = TransactionModel::getStringType($type_str);
+		if (is_null($params["type"]))
 			$respObj->fail();
 
-		$tr_on_page = (isset($_GET["count"]) && is_numeric($_GET["count"])) ? intval($_GET["count"]) : 10;
+		$params["onPage"] = (isset($_GET["count"]) && is_numeric($_GET["count"])) ? intval($_GET["count"]) : 10;
 
-		$page_num = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
+		$params["page"] = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
 		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
 		if (!$accMod->is_exist($acc_id))
 			$acc_id = 0;
+		if ($acc_id != 0)
+			$params["accounts"] = $acc_id;
 
-		$searchReq = (isset($_GET["search"]) ? $_GET["search"] : NULL);
+		if (isset($_GET["search"]))
+			$params["search"] = $_GET["search"];
 
-		$stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : NULL);
-		$endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : NULL);
+		if (isset($_GET["stdate"]) && isset($_GET["enddate"]))
+		{
+			$params["startDate"] = $_GET["stdate"];
+			$params["endDate"] = $_GET["enddate"];
+		}
 
-		$trArr = $this->trMod->getData($trans_type, $acc_id, TRUE, $tr_on_page, $page_num, $searchReq, $stDate, $endDate, FALSE);
+		$trArr = $this->trMod->getData($params);
 
 		$respObj->data = [];
 		foreach($trArr as $trans)

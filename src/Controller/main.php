@@ -28,8 +28,7 @@ class MainController extends Controller
 		}
 
 		// Prepare data of transaction list items
-		$tr_count = 5;
-		$latestArr = $transMod->getData(0, 0, TRUE, $tr_count);
+		$latestArr = $transMod->getData([ "desc" => TRUE, "onPage" => 5 ]);
 		$trListData = [];
 		foreach($latestArr as $trans)
 		{

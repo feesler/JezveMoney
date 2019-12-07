@@ -25,7 +25,7 @@
 					<div class="clearfix">
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
-			if ($menuItem[0] == $trans_type) {		?>
+			if ($menuItem[0] == $trParams["type"]) {		?>
 							<span><b><?=$menuItem[1]?></b></span>
 <?php		} else {		?>
 							<span><a href="<?=$menuItem[2]?>"><?=$menuItem[1]?></a></span>
