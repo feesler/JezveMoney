@@ -313,11 +313,11 @@ function urlJoin(obj)
 			val.forEach(function(arrItem)
 			{
 				if (!isObject(arrItem))
-					arr.push(par + '[]=' + arrItem.toString());
+					arr.push(encodeURIComponent(par) + '[]=' + encodeURIComponent(arrItem.toString()));
 			});
 		}
 		else if (!isObject(val))
-			arr.push(par + '=' + val.toString());
+			arr.push(encodeURIComponent(par) + '=' + encodeURIComponent(val.toString()));
 	}
 
 	return arr.join('&');
