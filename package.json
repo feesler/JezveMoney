@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node ./src/admin/view/js/tests/puppeteer.js"
+    "test": "node ./src/admin/view/js/tests/node.js"
   },
   "keywords": [
     "money",
