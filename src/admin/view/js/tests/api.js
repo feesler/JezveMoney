@@ -363,6 +363,11 @@ var apiModule = (function()
 
  	async function createTransaction(options)
  	{
+		if (!options.date)
+			options.date = App.formatDate(new Date());
+		if (typeof options.comm === 'undefined')
+			options.comm = '';
+
  		let postData = checkFields(options, trReqFields);
 
 		let isDebt = (postData.transtype == App.DEBT);
@@ -437,6 +442,9 @@ var apiModule = (function()
 
 	async function expenseTransaction(params)
 	{
+		if (!params.src_id)
+			throw new Error('Source account not specified');
+
 		let res = App.copyObject(params);
 
 		res.transtype = App.EXPENSE;
@@ -458,6 +466,9 @@ var apiModule = (function()
 
 	async function incomeTransaction(params)
 	{
+		if (!params.dest_id)
+			throw new Error('Destination account not specified');
+
 		let res = App.copyObject(params);
 
 		res.transtype = App.INCOME;
@@ -479,6 +490,11 @@ var apiModule = (function()
 
 	async function transferTransaction(params)
 	{
+		if (!params.src_id)
+			throw new Error('Source account not specified');
+		if (!params.dest_id)
+			throw new Error('Destination account not specified');
+
 		let res = App.copyObject(params);
 
 		res.transtype = App.TRANSFER;
@@ -503,6 +519,9 @@ var apiModule = (function()
 
 	async function debtTransaction(params)
 	{
+		if (!params.person_id)
+			throw new Error('Person not specified');
+
 		let res = App.copyObject(params);
 
 		res.transtype = App.DEBT;

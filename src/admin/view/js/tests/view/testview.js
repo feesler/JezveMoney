@@ -535,6 +535,94 @@ TestView.prototype.parseInputRow = async function(elem)
 };
 
 
+TestView.prototype.parseDatePickerFilter = async function(elem)
+{
+	if (!elem)
+		return null;
+
+	var self = this;
+	var res = { elem : elem };
+
+	res.iconLink = await this.parseIconLink(await this.query(elem, '.iconlink'));
+	if (!res.iconLink)
+		throw new Error('Iconlink of date picker not found');
+
+	res.inputElem = await this.query(elem, '.stretch_input > input');
+	if (!res.inputElem)
+		throw new Error('Input element not found');
+
+	res.datePickerBtn = await this.query(elem, '#cal_rbtn');
+	if (!res.datePickerBtn)
+		throw new Error('Date picker button not found');
+
+	res.dayCells = [];
+	let cells = await this.queryAll(elem, '.calTbl td');
+	for(let cell of cells)
+	{
+		if (await this.hasClass(cell, 'omonth'))
+			continue;
+
+		let dayCell = { elem : cell };
+
+		dayCell.day = await this.prop(cell, 'innerHTML');
+		console.log(dayCell.day);
+
+		res.dayCells.push(dayCell);
+	}
+
+
+	res.select = async function(val)
+	{
+		if (await self.isVisible(this.iconLink.elem))
+		{
+			await this.iconLink.click();
+			await performAction(() => self.click(this.datePickerBtn));
+		}
+
+		let cell = self.dateFilter.dayCells.find(item => item.day == val);
+		if (cell)
+			await performAction(() => self.click(cell));
+	};
+
+
+	res.selectRange = async function(val1, val2)
+	{
+		await self.performAction(async () =>
+		{
+			if (await self.isVisible(this.iconLink.elem))
+				return this.iconLink.click();
+			else
+				return self.click(this.datePickerBtn);
+		});
+
+		let cell1 = self.content.dateFilter.dayCells.find(item => item.day == val1);
+		if (!cell1)
+			throw new Error('Cell ' + val1 + ' not found');
+
+		let cell2 = self.content.dateFilter.dayCells.find(item => item.day == val2);
+		if (!cell2)
+			throw new Error('Cell ' + val2 + ' not found');
+
+		await self.click(cell1.elem);
+		return self.click(cell2.elem);
+	};
+
+
+	res.input = async function(val)
+	{
+		if (self.isVisible(this.iconLink.elem))
+		{
+			await this.iconLink.click();
+			await performAction(() => self.click(this.datePickerBtn));
+		}
+
+		return self.input(this.inputElem, val);
+	};
+
+	return res;
+};
+
+
 TestView.prototype.parseDatePickerRow = async function(elem)
 {
 	if (!elem)

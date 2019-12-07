@@ -11,6 +11,7 @@ if (typeof module !== 'undefined' && module.exports)
 	var runTransfer = require('./run/transaction/transfer.js');
 	var runDebt = require('./run/transaction/debt.js');
 
+	var runTransList = require('./run/transactions.js');
 	var runStatistics = require('./run/statistics.js');
 
 	var runAPI = require('./run/api.js');
@@ -98,6 +99,7 @@ async function startTests(view)
 	view = await personTests(view);
 	view = await transactionTests(view);
 	view = await statistics.run(view);
+	view = await transactionsListTests(view);
 
 	return view;
 }
@@ -387,6 +389,14 @@ async function runDeleteDebtTests(view)
 async function apiTests(view)
 {
 	await runAPI.run(view, App);
+
+	return view;
+}
+
+
+async function transactionsListTests(view)
+{
+	view = await runTransList.run(view, App);
 
 	return view;
 }
