@@ -33,7 +33,6 @@ var runAPI = (function()
 
 	async function runTests(view, App)
 	{
-		console.log('api.run()');
 		env = view.props.environment;
 
 		api.setEnv(env, App);
@@ -46,7 +45,7 @@ var runAPI = (function()
 		person.setEnv(env, App);
 		transaction.setEnv(env, App);
 
-		await App.test('Login user', () => api.user.login('test', 'test'), env);
+		await App.test('Login user', () => api.user.login(App.config.testUser.login, App.config.testUser.password), env);
 
 		await App.test('Reset all data', async () => {
 			return await api.profile.reset();

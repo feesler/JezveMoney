@@ -412,7 +412,7 @@ async function reloginAsTester(view)
 	if (!(view instanceof LoginView))
 		throw new Error('Wrong page');
 
-	return view.loginAs('test', 'test');
+	return view.loginAs(App.config.testUser.login, App.config.testUser.password);
 }
 
 
