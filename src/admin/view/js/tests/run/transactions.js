@@ -135,8 +135,6 @@ var runTransList = (function()
 				await api.transaction.create(debtParam);
 			}
 		}
-
-		return view;
 	}
 
 
@@ -148,16 +146,7 @@ var runTransList = (function()
 
 		api.setEnv(env, App);
 
-	if (0){
-		preCreateData(view, App);
-	}else{
-		accIds.push(2597);
-		accIds.push(2598);
-		accIds.push(2599);
-		accIds.push(2600);
-		personIds.push(1114);
-		personIds.push(1115);
-	}
+		await preCreateData();
 
 		view = await App.goToMainView(view);
 		view = await view.goToTransactions();

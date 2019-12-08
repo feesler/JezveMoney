@@ -53,9 +53,7 @@ var runAPI = (function()
 
 		env.setBlock('Accounts', 1);
 
-		await App.test('Reset accounts', async () => {
-			return await api.account.reset();
-		}, env);
+		await App.test('Reset accounts', () => api.account.reset(), env);
 
 		await App.test('Accounts list', async () => {
 			let accList = await api.account.list();

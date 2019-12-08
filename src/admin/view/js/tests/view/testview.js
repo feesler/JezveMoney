@@ -562,10 +562,7 @@ TestView.prototype.parseDatePickerFilter = async function(elem)
 		if (await this.hasClass(cell, 'omonth'))
 			continue;
 
-		let dayCell = { elem : cell };
-
-		dayCell.day = await this.prop(cell, 'innerHTML');
-		console.log(dayCell.day);
+		let dayCell = { elem : cell, day : await this.prop(cell, 'innerHTML') };
 
 		res.dayCells.push(dayCell);
 	}

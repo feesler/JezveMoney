@@ -271,15 +271,17 @@ TransactionsView.prototype.parseContent = async function()
 		throw new Error('Search form not found');
 
 	res.modeSelector = await this.parseModeSelector(await this.query('.trans_list .mode_selector'));
-	if (!res.modeSelector)
-		throw new Error('Mode selector not found');
-
 	res.paginator = await this.parsePaginator(await this.query('.trans_list .paginator'));
-	if (!res.paginator)
-		throw new Error('Paginator not found');
 
 	res.title = await this.prop(res.titleEl, 'innerText');
-	res.transList = await this.parseTransactionsList(await this.query('#tritems'));
+	res.transList = await this.parseTransactionsList(await this.query('#trlist'));
+	if (!res.transList)
+		throw new Error('List of transactions not found');
+
+	if (res.transList.items && res.transList.items.length && !res.modeSelector)
+		throw new Error('Mode selector not found');
+	if (res.transList.items && res.transList.items.length && !res.paginator)
+		throw new Error('Paginator not found');
 
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
