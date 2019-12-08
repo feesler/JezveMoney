@@ -37,6 +37,8 @@ var runAPI = (function()
 
 		api.setEnv(env, App);
 
+		App.setBlock('API tests', 1);
+
 		const account = App.run.api.account;
 		const person = App.run.api.person;
 		const transaction = App.run.api.transaction;
@@ -51,7 +53,7 @@ var runAPI = (function()
 			return await api.profile.reset();
 		}, env);
 
-		env.setBlock('Accounts', 1);
+		env.setBlock('Accounts', 2);
 
 		await App.test('Reset accounts', () => api.account.reset(), env);
 
@@ -70,7 +72,7 @@ var runAPI = (function()
 		let ACC_USD = await account.createTest({ name : 'acc usd', currency : USD, balance : 10.5, icon : 5 });
 
 
-		env.setBlock('Persons', 1);
+		env.setBlock('Persons', 2);
 
 		await App.test('Persons list', async () => {
 			let pList = await api.person.list();
@@ -87,7 +89,7 @@ var runAPI = (function()
 		let weekAgo = App.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
 		let yesterday = App.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
 
-		env.setBlock('Transactions', 1);
+		env.setBlock('Transactions', 2);
 
 		await App.test('Transactions list', async () => {
 			let trList = await api.transaction.list();

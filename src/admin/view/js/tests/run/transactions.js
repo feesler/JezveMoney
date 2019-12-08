@@ -67,6 +67,8 @@ var runTransList = (function()
 
 	async function preCreateData()
 	{
+		console.log('Precreate data...');
+
 		dateList = dateList.map(item => App.formatDate(item));
 
 		await api.user.login('test', 'test');
@@ -135,6 +137,8 @@ var runTransList = (function()
 				await api.transaction.create(debtParam);
 			}
 		}
+
+		console.log('Done');
 	}
 
 
@@ -145,6 +149,8 @@ var runTransList = (function()
 		let test = App.test;
 
 		api.setEnv(env, App);
+
+		App.setBlock('Transaction List view', 1);
 
 		await preCreateData();
 
