@@ -150,7 +150,7 @@ var runTransList = (function()
 
 		api.setEnv(env, App);
 
-		App.setBlock('Transaction List view', 1);
+		env.setBlock('Transaction List view', 1);
 
 		await preCreateData();
 

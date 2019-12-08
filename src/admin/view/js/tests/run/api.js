@@ -31,13 +31,13 @@ var runAPI = (function()
 	}
 
 
-	async function runTests(view, App)
+	async function runTests(view, app)
 	{
 		env = view.props.environment;
 
-		api.setEnv(env, App);
+		api.setEnv(env, app);
 
-		App.setBlock('API tests', 1);
+		env.setBlock('API tests', 1);
 
 		const account = App.run.api.account;
 		const person = App.run.api.person;
