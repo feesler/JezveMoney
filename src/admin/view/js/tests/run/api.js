@@ -208,6 +208,13 @@ var runAPI = (function()
 		  * Delete transaction
 		  */
 		await transaction.deleteTest([ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ]);
+
+
+		await App.test('Result transactions list', async () => {
+			let trList = await api.transaction.list();
+
+			return App.isArray(trList) && trList.length == 2;
+		}, env);
 	}
 
 
