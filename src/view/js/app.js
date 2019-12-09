@@ -28,12 +28,19 @@ function onUserClick()
 }
 
 
+var messageBox = null;
+
+
 // Create message
 function createMessage(message, msgClass)
 {
-	var messageBox;
+	if (messageBox)
+	{
+		messageBox.destroy();
+		messageBox = null;
+	}
 
-	messageBox = Popup.create({ id : 'popup7',
+	messageBox = Popup.create({ id : 'notificationPopup',
 						content : message,
 						btn : { closeBtn : true },
 						additional : 'msg ' + msgClass,
