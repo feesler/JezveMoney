@@ -412,7 +412,7 @@ async function test(descr, action, env, state)
 		let actRes = await action();
 		let res;
 
-		if (env.checkState)
+		if (env && env.checkState)
 		{
 			let expState = (typeof state === 'undefined') ? env.expectedState : state;
 			res = await env.checkState(expState);

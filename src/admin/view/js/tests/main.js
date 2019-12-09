@@ -93,14 +93,21 @@ async function startTests(view)
 	App.notify();
 
 	view = await apiTests(view);
-	view = await profile.relogin(view, App.config.testUser);
-	view = await view.goToProfile();
-	view = await view.resetAll();
+	view = await profileTests(view);
 	view = await accountTests(view);
 	view = await personTests(view);
 	view = await transactionTests(view);
 	view = await statistics.run(view);
 	view = await transactionsListTests(view);
+
+	return view;
+}
+
+
+async function profileTests(view)
+{
+	view = await profile.relogin(view, App.config.testUser);
+	view = await profile.resetAll(view);
 
 	return view;
 }

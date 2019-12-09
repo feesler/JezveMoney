@@ -47,8 +47,30 @@ var runProfile = (function()
 	}
 
 
+	async function resetAllTest(view)
+	{
+		env = view.props.environment;
+
+		view = await view.goToProfile();
+		view = await view.resetAll();
+
+		await test('Reset all data', async () =>
+		{
+			view = await App.goToMainView(view);
+
+			return App.checkObjValue(App.transactions, []) &&
+						App.checkObjValue(App.accounts, []) &&
+						App.checkObjValue(App.persons, []);
+		}, env);
+
+
+		return view;
+	}
+
+
 	return { onAppUpdate : onAppUpdate,
-				relogin : reloginAs };
+				relogin : reloginAs,
+			 	resetAll : resetAllTest };
 })();
 
 
