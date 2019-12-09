@@ -103,7 +103,12 @@ class TransactionsController extends Controller
 			// Clear page number because list of transactions guaranteed to change on change accounts filter
 			unset($urlParams["page"]);
 
-			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $urlParams)];
+			$menuItem = new stdClass;
+			$menuItem->ind = $ind;
+			$menuItem->title = $trTypeName;
+			$menuItem->url = urlJoin($baseUrl, $urlParams);
+
+			$transMenu[] = $menuItem;
 		}
 
 		$showPaginator = TRUE;
@@ -344,7 +349,12 @@ class TransactionsController extends Controller
 			if ($acc_id != 0)
 				$params["acc_id"] = $acc_id;
 
-			$transMenu[] = [($ind + 1), $trTypeName, urlJoin($baseUrl, $params)];
+			$menuItem = new stdClass;
+			$menuItem->ind = $ind + 1;
+			$menuItem->title = $trTypeName;
+			$menuItem->url = urlJoin($baseUrl, $params);
+
+			$transMenu[] = $menuItem;
 		}
 
 		$formAction = BASEURL."transactions/".$action."/?type=".$type_str;
@@ -521,7 +531,12 @@ class TransactionsController extends Controller
 		{
 			$params = ["type" => strtolower($trTypeName)];
 
-			$transMenu[] = [($ind + 1), $trTypeName, urlJoin($baseUrl, $params)];
+			$menuItem = new stdClass;
+			$menuItem->ind = $ind + 1;
+			$menuItem->title = $trTypeName;
+			$menuItem->url = urlJoin($baseUrl, $params);
+
+			$transMenu[] = $menuItem;
 		}
 
 		$formAction = BASEURL."transactions/".$action."/";

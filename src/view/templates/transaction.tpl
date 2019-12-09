@@ -53,10 +53,10 @@
 <?php	}	?>
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
-			if ($menuItem[0] == $trans_type) {		?>
-							<span><b><?=$menuItem[1]?></b></span>
+			if ($menuItem->ind == $trans_type) {		?>
+							<span><b><?=$menuItem->title?></b></span>
 <?php		} else {		?>
-							<span><a href="<?=$menuItem[2]?>"><?=$menuItem[1]?></a></span>
+							<span><a href="<?=$menuItem->url?>"><?=$menuItem->title?></a></span>
 <?php		}
 		}	?>
 						</div>
