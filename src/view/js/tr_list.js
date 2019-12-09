@@ -477,10 +477,16 @@ function buildAddress()
 
 	setParam(locFilter, filterObj);
 
-	if (locFilter.acc_id.length)
-		locFilter.acc_id = locFilter.acc_id.join();
-	else if ('acc_id' in filterObj)
-		delete filterObj['acc_id'];
+	if ('acc_id' in filterObj)
+	{
+		if (!isArray(locFilter.acc_id))
+			locFilter.acc_id = [ locFilter.acc_id ];
+
+		if (locFilter.acc_id.length)
+			locFilter.acc_id = locFilter.acc_id.join();
+		else
+			delete filterObj['acc_id'];
+	}
 
 	for(var name in locFilter)
 	{
@@ -504,7 +510,7 @@ function onAccountChange(obj)
 	// Check all accounts from the new selection present in current selection
 	for(acc in obj)
 	{
-		if (filterObj.acc_id.indexOf(parseInt(acc)) == -1)
+		if (!filterObj.acc_id || filterObj.acc_id.indexOf(parseInt(acc)) == -1)
 		{
 			reloadNeeded = true;
 			break;
@@ -528,6 +534,10 @@ function onAccountChange(obj)
 		filterObj.acc_id.push(parseInt(acc));
 	}
 
+	// Clear page number because list of transactions guaranteed to change on change accounts filter
+	if ('page' in filterObj)
+		delete filterObj.page;
+
 	window.location = buildAddress();
 }
 
@@ -545,6 +555,10 @@ function onSearchSubmit(frm)
 		filterObj.search = searchInp.value;
 	else if ('search' in filterObj)
 		delete filterObj['search'];
+
+	// Clear page number because list of transactions guaranteed to change on change search query
+	if ('page' in filterObj)
+		delete filterObj.page;
 
 	window.location = buildAddress();
 
@@ -627,8 +641,18 @@ function onDatePickerHide()
 	if (!selRange)
 		return;
 
-	filterObj.stdate = Calendar.format(selRange.start);
-	filterObj.enddate = Calendar.format(selRange.end);
+	var newStartDate = Calendar.format(selRange.start);
+	var newEndDate = Calendar.format(selRange.end);
+
+	if (filterObj.stdate == newStartDate && filterObj.enddate == newEndDate)
+		return;
+
+	filterObj.stdate = newStartDate;
+	filterObj.enddate = newEndDate;
+
+	// Clear page number because list of transactions guaranteed to change on change date range
+	if ('page' in filterObj)
+		delete filterObj.page;
 
 	window.location = buildAddress();
 }
