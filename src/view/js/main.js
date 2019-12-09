@@ -84,6 +84,10 @@ function showChangeNamePopup()
 								closeBtn : true });
 	}
 
+	var newname = ge('newname');
+	if (newname)
+		newname.value = p_name;
+
 	cnPopup.show();
 
 	return false;
@@ -112,6 +116,12 @@ function onChangePasswordResult(response)
 		if (res.msg)
 			createMessage(res.msg, 'msg_error');
 	}
+
+	var frm = ge('changepass');
+	if (frm)
+		frm = frm.firstElementChild;
+	if (frm)
+		frm.reset();
 }
 
 
@@ -213,6 +223,12 @@ function onChangeNameResult(response)
 		if (res.msg)
 			createMessage(res.msg, 'msg_error');
 	}
+
+	var frm = ge('changename');
+	if (frm)
+		frm = frm.firstElementChild;
+	if (frm)
+		frm.reset();
 }
 
 
