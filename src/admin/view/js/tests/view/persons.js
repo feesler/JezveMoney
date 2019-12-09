@@ -63,7 +63,7 @@ PersonsView.prototype.goToUpdatePerson = async function(num)
 };
 
 
-PersonsView.prototype.deletePersons = function(persons)
+PersonsView.prototype.deletePersons = async function(persons)
 {
 	if (!persons)
 		throw new Error('No persons specified');
@@ -71,38 +71,32 @@ PersonsView.prototype.deletePersons = function(persons)
 	if (!isArray(persons))
 		persons = [persons];
 
-	let selectPromise = persons.reduce((prev, person_num, ind) =>
+	let ind = 0;
+	for(let person_num of persons)
 	{
-		return prev
-				.then(() => this.performAction(() =>
-				{
-					if (person_num < 0 || person_num >= this.content.tiles.items.length)
-						throw new Error('Wrong account number');
+		if (person_num < 0 || person_num >= this.content.tiles.items.length)
+			throw new Error('Wrong account number');
 
-					return this.content.tiles.items[person_num].click();
-				}))
-				.then(async () =>
-				{
-					let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
-					if (ind == 0 && !editIsVisible)
-						throw new Error('Edit button is not visible');
-					else if (ind > 0 && editIsVisible)
-						throw new Error('Edit button is visible while more than one person is selected');
+		await this.performAction(() => this.content.tiles.items[person_num].click());
 
-					if (!await this.isVisible(this.content.toolbar.delBtn.elem))
-						throw new Error('Delete button is not visible');
-				});
-	}, Promise.resolve());
+		let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
+		if (ind == 0 && !editIsVisible)
+			throw new Error('Edit button is not visible');
+		else if (ind > 0 && editIsVisible)
+			throw new Error('Edit button is visible while more than one person is selected');
 
-	return selectPromise
-			.then(() => this.performAction(() => this.content.toolbar.delBtn.click()))
-			.then(async () =>
-			{
-				if (!await this.isVisible(this.content.delete_warning.elem))
-					throw new Error('Delete account warning popup not appear');
+		if (!await this.isVisible(this.content.toolbar.delBtn.elem))
+			throw new Error('Delete button is not visible');
 
-				return this.navigation(() => this.click(this.content.delete_warning.okBtn));
-			});
+		ind++;
+	}
+
+	await this.performAction(() => this.content.toolbar.delBtn.click());
+
+	if (!await this.isVisible(this.content.delete_warning.elem))
+		throw new Error('Delete account warning popup not appear');
+
+	return this.navigation(() => this.click(this.content.delete_warning.okBtn));
 };
 
 

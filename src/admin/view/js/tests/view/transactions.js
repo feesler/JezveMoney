@@ -395,7 +395,7 @@ TransactionsView.prototype.goToUpdateTransaction = async function(num)
 
 
 // Delete secified transactions and return navigation promise
-TransactionsView.prototype.deleteTransactions = function(tr)
+TransactionsView.prototype.deleteTransactions = async function(tr)
 {
 	if (!tr)
 		throw new Error('No transactions specified');
@@ -403,41 +403,34 @@ TransactionsView.prototype.deleteTransactions = function(tr)
 	if (!isArray(tr))
 		tr = [tr];
 
-	let selectPromise = tr.reduce((prev, tr_num, ind) =>
+	let ind = 0;
+	for(let tr_num of tr)
 	{
-		return prev
-				.then(() => this.performAction(() =>
-				{
-					if (tr_num < 0 || tr_num >= this.content.transList.items.length)
-						throw 'Wrong account number';
+		if (tr_num < 0 || tr_num >= this.content.transList.items.length)
+			throw 'Wrong account number';
 
-					return this.content.transList.items[tr_num].click();
-				}))
-				.then(async () =>
-				{
-					var editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
-					if (ind == 0 && !editIsVisible)
-						throw 'Edit button is not visible';
-					else if (ind > 0 && editIsVisible)
-						throw 'Edit button is visible while more than one transactions is selected';
+		await this.performAction(() => this.content.transList.items[tr_num].click());
 
-					if (!await this.isVisible(this.content.toolbar.delBtn.elem))
-						throw 'Delete button is not visible';
-				});
-	}, Promise.resolve());
+		var editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
+		if (ind == 0 && !editIsVisible)
+			throw 'Edit button is not visible';
+		else if (ind > 0 && editIsVisible)
+			throw 'Edit button is visible while more than one transactions is selected';
 
-	return selectPromise
-			.then(() => this.performAction(() => this.content.toolbar.delBtn.click()))
-			.then(async () =>
-			{
-				if (!await this.isVisible(this.content.delete_warning.elem))
-					throw 'Delete transaction warning popup not appear';
+		if (!await this.isVisible(this.content.toolbar.delBtn.elem))
+			throw 'Delete button is not visible';
 
-				if (!this.content.delete_warning.okBtn)
-					throw 'OK button not found';
+		ind++;
+	}
 
-				return this.navigation(() => this.click(this.content.delete_warning.okBtn));
-			});
+	await this.performAction(() => this.content.toolbar.delBtn.click());
+
+	if (!await this.isVisible(this.content.delete_warning.elem))
+		throw 'Delete transaction warning popup not appear';
+	if (!this.content.delete_warning.okBtn)
+		throw 'OK button not found';
+
+	return this.navigation(() => this.click(this.content.delete_warning.okBtn));
 };
 
 
