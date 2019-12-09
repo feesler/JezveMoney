@@ -692,7 +692,7 @@ class TransactionsController extends Controller
 		$exchSign = $destAmountSign."/".$srcAmountSign;
 		$exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
 		$backExchSign = $srcAmountSign."/".$destAmountSign;
-		$backExchValue = round(1 / $exchValue, 5);
+		$backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
 
 		$rtSrcAmount = $this->currModel->format($tr["src_amount"], $srcAmountCurr);
 		$rtDestAmount = $this->currModel->format($tr["dest_amount"], $destAmountCurr);

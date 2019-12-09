@@ -331,7 +331,11 @@ TransactionView.prototype.updateExch = function(model)
 
 	if (isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
 	{
-		model.invExchRate = parseFloat((1 / model.fExchRate).toFixed(5));
+		let backExchRate = 1;
+		if (model.fSrcAmount != 0 && model.fDestAmount != 0)
+			backExchRate = model.fSrcAmount / model.fDestAmount;
+
+		model.invExchRate = parseFloat(backExchRate.toFixed(5));
 
 		exchText += ' ('  + model.invExchRate + ' ' + model.backExchSign + ')';
 	}

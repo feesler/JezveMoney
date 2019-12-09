@@ -523,7 +523,9 @@ function TransactionViewModel()
 		exchText = exchSigns;
 		if (isValidValue(val) && val != 1 && val != 0)
 		{
-			invExch = parseFloat((1 / val).toFixed(5));
+			let fsa = Transaction.srcAmount();
+			let fda = Transaction.destAmount();
+			invExch = parseFloat((fsa / fda).toFixed(5));
 
 			exchText += ' ('  + invExch + ' ' + srcCurr.sign + '/' + destCurr.sign + ')';
 		}

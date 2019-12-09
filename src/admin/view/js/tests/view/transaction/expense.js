@@ -292,8 +292,6 @@ ExpenseTransactionView.prototype.inputExchRate = async function(val)
 	var fNewValue = (isValidValue(val)) ? normalizeExch(val) : val;
 	if (this.model.fExchRate != fNewValue)
 	{
-		this.updateExch(this.model);
-
 		if (isValidValue(this.model.srcAmount))
 		{
 			var newDestAmount = correct(this.model.fSrcAmount * fNewValue);
@@ -304,6 +302,8 @@ ExpenseTransactionView.prototype.inputExchRate = async function(val)
 			var newSrcAmount = correct(this.model.fDestAmount / fNewValue);
 			this.setSrcAmount(this.model, newSrcAmount);
 		}
+
+		this.updateExch(this.model);
 	}
 
 	this.setExpectedState(3);
