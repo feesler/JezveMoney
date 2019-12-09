@@ -1,7 +1,6 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	var LoginView = require('./view/login.js');
-
+	var runProfile = require('./run/profile.js');
 	var runAccounts = require('./run/account.js');
 	var runPersons = require('./run/person.js');
 
@@ -25,6 +24,7 @@ else
 }
 
 
+var profile = runProfile;
 var accounts = runAccounts;
 var persons = runPersons;
 
@@ -62,6 +62,7 @@ var App = {
 
 		common.onAppUpdate(notification);
 
+		profile.onAppUpdate(notification);
 		accounts.onAppUpdate(notification);
 		persons.onAppUpdate(notification);
 
@@ -92,7 +93,7 @@ async function startTests(view)
 	App.notify();
 
 	view = await apiTests(view);
-	view = await reloginAsTester(view);
+	view = await profile.relogin(view, App.config.testUser);
 	view = await view.goToProfile();
 	view = await view.resetAll();
 	view = await accountTests(view);
@@ -399,20 +400,6 @@ async function transactionsListTests(view)
 	view = await runTransList.run(view, App);
 
 	return view;
-}
-
-
-async function reloginAsTester(view)
-{
-	if (view.isUserLoggedIn())
-	{
-		view = await view.logoutUser();
-	}
-
-	if (!(view instanceof LoginView))
-		throw new Error('Wrong page');
-
-	return view.loginAs(App.config.testUser.login, App.config.testUser.password);
 }
 
 
