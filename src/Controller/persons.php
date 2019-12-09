@@ -4,11 +4,7 @@ class PersonsController extends Controller
 {
 	public function index()
 	{
-		global $user_id, $user_name, $uMod;
-
-		$pMod = new PersonModel($user_id);
-
-		$persArr = $pMod->getData();
+		$persArr = $this->personMod->getData();
 
 		$titleString = "Jezve Money | Persons";
 
@@ -30,8 +26,6 @@ class PersonsController extends Controller
 
 	public function create()
 	{
-		global $user_id, $user_name, $uMod;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->createPerson();
@@ -56,8 +50,6 @@ class PersonsController extends Controller
 
 	public function update()
 	{
-		global $user_id, $user_name, $uMod;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->updatePerson();
@@ -72,9 +64,7 @@ class PersonsController extends Controller
 		if (!$p_id)
 			$this->fail(ERR_PERSON_UPDATE);
 
-		$pMod = new PersonModel($user_id);
-
-		$pObj = $pMod->getItem($p_id);
+		$pObj = $this->personMod->getItem($p_id);
 		if (!$pObj)
 			$this->fail(ERR_PERSON_UPDATE);
 
@@ -94,21 +84,18 @@ class PersonsController extends Controller
 
 	public function createPerson()
 	{
-		global $user_id;
-
 		$defMsg = ERR_PERSON_CREATE;
 
-		$pMod = new PersonModel($user_id);
 		if (!isset($_POST["pname"]))
 			$this->fail($defMsg);
 
 		$person_name = $_POST["pname"];
 
-		$check_id = $pMod->findByName($person_name);
+		$check_id = $this->personMod->findByName($person_name);
 		if ($check_id != 0)
 			$this->fail(ERR_PERSON_UPDATE_EXIST);
 
-		if (!$pMod->create([ "name" => $person_name ]))
+		if (!$this->personMod->create([ "name" => $person_name ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_CREATE);
@@ -119,18 +106,14 @@ class PersonsController extends Controller
 
 	public function updatePerson()
 	{
-		global $user_id;
-
 		$defMsg = ERR_PERSON_UPDATE;
-
-		$pMod = new PersonModel($user_id);
 
 		if (!isset($_POST["pname"]))
 			$this->fail($defMsg);
 
 		$person_name = $_POST["pname"];
 
-		$check_id = $pMod->findByName($person_name);
+		$check_id = $this->personMod->findByName($person_name);
 		if ($check_id != 0)
 			$this->fail(ERR_PERSON_UPDATE_EXIST);
 
@@ -138,7 +121,7 @@ class PersonsController extends Controller
 			$this->fail($defMsg);
 
 		$person_id = intval($_POST["pid"]);
-		if (!$pMod->update($person_id, [ "name" => $person_name ]))
+		if (!$this->personMod->update($person_id, [ "name" => $person_name ]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_UPDATE);
@@ -149,14 +132,10 @@ class PersonsController extends Controller
 
 	public function del()
 	{
-		global $user_id;
-
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 			setLocation(BASEURL."persons/");
 
 		$defMsg = ERR_PERSON_DELETE;
-
-		$pMod = new PersonModel($user_id);
 
 		if (!isset($_POST["persons"]))
 			$this->fail($defMsg);
@@ -165,7 +144,7 @@ class PersonsController extends Controller
 		foreach($p_arr as $p_id)
 		{
 			$p_id = intval($p_id);
-			if (!$pMod->del($p_id))
+			if (!$this->personMod->del($p_id))
 				$this->fail($defMsg);
 		}
 

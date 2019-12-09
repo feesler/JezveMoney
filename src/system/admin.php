@@ -1,5 +1,4 @@
 <?php
-	checkUser(TRUE, TRUE);
 
 	$menuItems = ["curr" => ["title" => "Currencies", "link" => "currency/"],
 				"query" => ["title" => "Queries", "link" => "query/"],

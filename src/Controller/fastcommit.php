@@ -6,20 +6,17 @@ class FastCommitController extends Controller
 {
 	public function index()
 	{
-		global $user_id;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->commit();
 			return;
 		}
 
-		$accMod = new AccountModel($user_id);
+		$accMod = new AccountModel($this->user_id);
 		$accArr = $accMod->getData();
 		$currMod = new CurrencyModel();
 		$currArr = $currMod->getData();
-		$pMod = new PersonModel($user_id);
-		$persArr = $pMod->getData();
+		$persArr = $this->personMod->getData();
 
 		$this->css->page = "fastcommit.css";
 		$this->buildCSS();
@@ -202,17 +199,14 @@ class FastCommitController extends Controller
 
 	public function commit()
 	{
-		global $user_id;
-
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 			return;
 
 		header("Content-type: text/html; charset=utf-8");
 
-		$accMod = new AccountModel($user_id);
-		$trMod = new TransactionModel($user_id);
-		$debtMod = new DebtModel($user_id);
-		$pMod = new PersonModel($user_id);
+		$accMod = new AccountModel($this->user_id);
+		$trMod = new TransactionModel($this->user_id);
+		$debtMod = new DebtModel($this->user_id);
 		$currMod = new CurrencyModel();
 
 		$acc_id = intval($_POST["acc_id"]);
@@ -345,7 +339,7 @@ class FastCommitController extends Controller
 				$tr_src_amount = $tr_dest_amount = $tr_amount;
 				$tr_src_curr_id = $tr_dest_curr_id = $curr_id;
 
-				$pObj = $pMod->getItem($person_id);
+				$pObj = $this->personMod->getItem($person_id);
 				if (!$pObj)
 					throw new Error("Person not found");
 

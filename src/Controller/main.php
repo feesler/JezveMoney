@@ -4,11 +4,8 @@ class MainController extends Controller
 {
 	public function index()
 	{
-		global $user_name, $user_id, $uMod;
-
-		$accMod = new AccountModel($user_id);
-		$transMod = new TransactionModel($user_id);
-		$persMod = new PersonModel($user_id);
+		$accMod = new AccountModel($this->user_id);
+		$transMod = new TransactionModel($this->user_id);
 		$currMod = new CurrencyModel();
 
 		$currArr = $currMod->getData();
@@ -79,7 +76,7 @@ class MainController extends Controller
 			$trListData[] = $itemData;
 		}
 
-		$persArr = $persMod->getData();
+		$persArr = $this->personMod->getData();
 		foreach($persArr as $ind => $pData)
 		{
 			$noDebts = TRUE;
@@ -108,7 +105,7 @@ class MainController extends Controller
 
 		$groupType_id = 2;		// group by week
 
-		$statArr = getStatArray($user_id, $byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
+		$statArr = getStatArray($this->user_id, $byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
 		$titleString = "Jezve Money";
 

@@ -11,6 +11,10 @@ abstract class Controller
 
 	abstract public function index();
 
+	protected function onStart()
+	{
+	}
+
 
 	public function initDefResources()
 	{
@@ -86,5 +90,42 @@ abstract class Controller
 		}
 
 		return $res;
+	}
+
+
+	// Check user status required for page access
+	public function checkUser($loggedIn = TRUE, $adminOnly = FALSE)
+	{
+		$this->uMod = new UserModel();
+		// Check session and cookies
+		$this->user_id = $this->uMod->check();
+
+		// Get name of user person
+		if ($this->user_id)
+		{
+			$uObj = $this->uMod->getItem($this->user_id);
+			if (!$uObj)
+				throw new Error("User not found");
+
+			$this->personMod = new PersonModel($this->user_id);
+			$personObj = $this->personMod->getItem($uObj->owner_id);
+			if ($personObj)
+				$this->user_name = $personObj->name;
+		}
+
+		if ($loggedIn)		// user should be logged in to access
+		{
+			if (!$this->user_id)
+				setLocation(BASEURL."login/");
+			else if ($adminOnly && !$this->uMod->isAdmin($this->user_id))
+				setLocation(BASEURL);
+		}
+		else				// user should be logged out ot access
+		{
+			if ($this->user_id != 0)
+				setLocation(BASEURL);
+		}
+
+		$this->onStart();
 	}
 }

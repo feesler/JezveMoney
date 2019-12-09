@@ -305,47 +305,6 @@
 	}
 
 
-	$uMod = NULL;
-	$user_id = 0;
-	$user_name = NULL;
-
-	// Check user status required for page access
-	function checkUser($loggedIn = TRUE, $adminOnly = FALSE)
-	{
-		global $uMod, $user_id, $user_name;
-
-		$uMod = new UserModel();
-		// Check session and cookies
-		$user_id = $uMod->check();
-
-		// Get name of user person
-		if ($user_id)
-		{
-			$uObj = $uMod->getItem($user_id);
-			if (!$uObj)
-				throw new Error("User not found");
-
-			$persMod = new PersonModel($user_id);
-			$personObj = $persMod->getItem($uObj->owner_id);
-			if ($personObj)
-				$user_name = $personObj->name;
-		}
-
-		if ($loggedIn)		// user should be logged in to access
-		{
-			if (!$user_id)
-				setLocation(BASEURL."login/");
-			else if ($adminOnly && !$uMod->isAdmin($user_id))
-				setLocation(BASEURL);
-		}
-		else				// user should be logged out ot access
-		{
-			if ($user_id != 0)
-				setLocation(BASEURL);
-		}
-	}
-
-
 	// Append to file name unique string to fix cache issues
 	function auto_version($file)
 	{

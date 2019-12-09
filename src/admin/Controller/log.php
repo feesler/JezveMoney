@@ -2,7 +2,7 @@
 
 class LogsAdminController extends Controller
 {
-	public function __construct()
+	protected function onStart()
 	{
 		$this->filename = APPROOT."system/logs/log.txt";
 	}

@@ -36,12 +36,12 @@
 	$loggedOutControllers = ["login", "register"];
 	$isLogOutCont = in_array($contrStr, $loggedOutControllers);
 
-	checkUser(!$isLogOutCont);
-
 
 	$contClass = $controllersMap[$contrStr];
 
 	$controller = new $contClass();
+
+	$controller->checkUser(!$isLogOutCont);
 
 	// Prepare action
 	if ($contClass == "UserController")

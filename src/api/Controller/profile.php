@@ -6,7 +6,7 @@ class ProfileApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->pMod = new PersonModel($this->user_id);
+		$this->personMod = new PersonModel($this->user_id);
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
 			throw new Error("User not found");
@@ -18,7 +18,7 @@ class ProfileApiController extends ApiController
 	{
 		$respObj = new apiResponse();
 
-		$pObj = $this->pMod->getItem($this->owner_id);
+		$pObj = $this->personMod->getItem($this->owner_id);
 		if (!$pObj)
 			$respObj->fail("Person not found");
 
@@ -34,7 +34,7 @@ class ProfileApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		$pObj = $this->pMod->getItem($this->owner_id);
+		$pObj = $this->personMod->getItem($this->owner_id);
 		if (!$pObj)
 			$respObj->fail("Person not found");
 
@@ -44,7 +44,7 @@ class ProfileApiController extends ApiController
 		if ($old_name == $new_name)
 			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
-		if (!$this->pMod->update($this->owner_id, [ "name" => $new_name ]))
+		if (!$this->personMod->update($this->owner_id, [ "name" => $new_name ]))
 			$respObj->fail(getMessage(ERR_PROFILE_NAME));
 
 		$respObj->msg = getMessage(MSG_PROFILE_NAME);
@@ -88,7 +88,7 @@ class ProfileApiController extends ApiController
 		if (!$accMod->reset())
 			$this->fail(getMessage(ERR_PROFILE_RESETALL));
 
-		if (!$this->pMod->reset())
+		if (!$this->personMod->reset())
 			$this->fail(getMessage(ERR_PROFILE_RESETALL));
 
 		$respObj->msg = getMessage(MSG_PROFILE_RESETALL);

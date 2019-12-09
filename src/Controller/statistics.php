@@ -4,10 +4,8 @@ class StatisticsController extends Controller
 {
 	public function index()
 	{
-		global $user_name, $user_id, $uMod;
-
-		$transMod = new TransactionModel($user_id);
-		$accMod = new AccountModel($user_id);
+		$transMod = new TransactionModel($this->user_id);
+		$accMod = new AccountModel($this->user_id);
 		$currMod = new CurrencyModel();
 		$filterObj = new stdClass;
 
@@ -132,7 +130,7 @@ class StatisticsController extends Controller
 
 		$transArr = $transMod->getData($trans_type, $acc_id, TRUE, 10, 0, NULL, $stDate, $endDate);
 
-		$statArr = getStatArray($user_id, $byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
+		$statArr = getStatArray($this->user_id, $byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
 
 		$titleString = "Jezve Money | Statistics";
 

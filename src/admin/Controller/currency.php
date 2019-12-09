@@ -2,7 +2,7 @@
 
 class CurrencyAdminController extends Controller
 {
-	public function __construct()
+	protected function onStart()
 	{
 		$this->model = new CurrencyModel();
 	}
@@ -10,7 +10,6 @@ class CurrencyAdminController extends Controller
 
 	public function index()
 	{
-		global $uMod, $user_name, $user_id;
 		global $menuItems;
 
 		$currArr = $this->model->getData();

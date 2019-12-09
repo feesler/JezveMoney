@@ -4,10 +4,9 @@ class UserAdminController extends Controller
 {
 	public function index()
 	{
-		global $uMod, $user_name, $user_id;
 		global $menuItems;
 
-		$uArr = $uMod->getData();
+		$uArr = $this->uMod->getData();
 
 		$menuItems["users"]["active"] = TRUE;
 
@@ -33,14 +32,12 @@ class UserAdminController extends Controller
 
 	public function create()
 	{
-		global $uMod;
-
 		$defMsg = ERR_USER_CREATE;
 
 		if (!isset($_POST["user_login"]) || !isset($_POST["user_pass"]) || !isset($_POST["user_name"]))
 			$this->fail($defMsg);
 
-		if (!$uMod->register($_POST["user_login"], $_POST["user_pass"], $_POST["user_name"]))
+		if (!$this->uMod->register($_POST["user_login"], $_POST["user_pass"], $_POST["user_name"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_USER_CREATE);
@@ -51,8 +48,6 @@ class UserAdminController extends Controller
 
 	public function update()
 	{
-		global $uMod;
-
 		$defMsg = ERR_USER_UPDATE;
 
 		if (!isset($_POST["user_id"]))
@@ -60,13 +55,13 @@ class UserAdminController extends Controller
 
 		if (isset($_POST["user_login"]))
 		{
-			if (!$uMod->setLogin($_POST["user_id"], $_POST["user_login"]))
+			if (!$this->uMod->setLogin($_POST["user_id"], $_POST["user_login"]))
 				$this->fail($defMsg);
 		}
 
 		if (isset($_POST["user_name"]))
 		{
-			$userObj = $uMod->getItem($_POST["user_id"]);
+			$userObj = $this->uMod->getItem($_POST["user_id"]);
 			if (!$userObj)
 				$this->fail($defMsg);
 
@@ -76,7 +71,7 @@ class UserAdminController extends Controller
 		}
 
 		$isAdminFlag = isset($_POST["isadmin"]) && $_POST["isadmin"] == "on";
-		$uMod->setAccess($_POST["user_id"], $isAdminFlag ? 1 : 0);
+		$this->uMod->setAccess($_POST["user_id"], $isAdminFlag ? 1 : 0);
 
 		setMessage(MSG_USER_UPDATE);
 
@@ -86,18 +81,16 @@ class UserAdminController extends Controller
 
 	public function changePassword()
 	{
-		global $uMod;
-
 		$defMsg = ERR_PROFILE_PASSWORD;
 
 		if (!isset($_POST["user_id"]) || !isset($_POST["user_pass"]))
 			$this->fail($defMsg);
 
-		$uObj = $uMod->getItem($_POST["user_id"]);
+		$uObj = $this->uMod->getItem($_POST["user_id"]);
 		if (!$uObj)
 			$this->fail($defMsg);
 
-		if (!$uMod->setPassword($uObj->login, $_POST["user_pass"]))
+		if (!$this->uMod->setPassword($uObj->login, $_POST["user_pass"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_PROFILE_PASSWORD);
@@ -108,14 +101,12 @@ class UserAdminController extends Controller
 
 	public function del()
 	{
-		global $uMod;
-
 		$defMsg = ERR_USER_DELETE;
 
 		if (!isset($_POST["user_id"]))
 			$this->fail($defMsg);
 
-		if (!$uMod->del($_POST["user_id"]))
+		if (!$this->uMod->del($_POST["user_id"]))
 			$this->fail($defMsg);
 
 		setMessage(MSG_USER_DELETE);

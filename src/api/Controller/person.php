@@ -6,7 +6,7 @@ class PersonApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->pMod = new PersonModel($this->user_id);
+		$this->personMod = new PersonModel($this->user_id);
 	}
 
 
@@ -23,7 +23,7 @@ class PersonApiController extends ApiController
 		$res = [];
 		foreach($ids as $person_id)
 		{
-			$personObj = $this->pMod->getItem($person_id);
+			$personObj = $this->personMod->getItem($person_id);
 			if ($personObj)
 				$res[] = $personObj;
 		}
@@ -39,7 +39,7 @@ class PersonApiController extends ApiController
 
 		$respObj = new apiResponse();
 
-		$respObj->data = $this->pMod->getData();
+		$respObj->data = $this->personMod->getData();
 		$respObj->ok();
 	}
 
@@ -56,7 +56,7 @@ class PersonApiController extends ApiController
 		if (!isset($_POST["name"]))
 			$respObj->fail();
 
-		$p_id = $this->pMod->create([ "name" => $_POST["name"] ]);
+		$p_id = $this->personMod->create([ "name" => $_POST["name"] ]);
 		if (!$p_id)
 			$respObj->fail();
 
@@ -77,7 +77,7 @@ class PersonApiController extends ApiController
 		if (!isset($_POST["id"]) || !isset($_POST["name"]))
 			$respObj->fail();
 
-		if (!$this->pMod->update($_POST["id"], [ "name" => $_POST["name"] ]))
+		if (!$this->personMod->update($_POST["id"], [ "name" => $_POST["name"] ]))
 			$respObj->fail();
 
 		$respObj->ok();
@@ -103,7 +103,7 @@ class PersonApiController extends ApiController
 			if (!$item_id)
 				continue;
 
-			if (!$this->pMod->del($item_id))
+			if (!$this->personMod->del($item_id))
 				$respObj->fail();
 		}
 

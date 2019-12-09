@@ -33,11 +33,10 @@
 	if (!isset($controllersMap[$contrStr]))
 		setLocation(BASEURL);
 
-	checkUser(TRUE, TRUE);
-
 	$contClass = $controllersMap[$contrStr];
 
 	$controller = new $contClass();
+	$controller->checkUser(TRUE, TRUE);
 
 	// Prepare action
 	$action = array_shift($routeParts);

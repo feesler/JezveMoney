@@ -2,20 +2,16 @@
 
 class TransactionsController extends Controller
 {
-	public function __construct()
+	protected function onStart()
 	{
-		global $user_id;
-
-		$this->model = new TransactionModel($user_id);
-		$this->accModel = new AccountModel($user_id);
+		$this->model = new TransactionModel($this->user_id);
+		$this->accModel = new AccountModel($this->user_id);
 		$this->currModel = new CurrencyModel();
 	}
 
 
 	public function index()
 	{
-		global $user_id, $user_name, $uMod;
-
 		$filterObj = new stdClass;
 		$trParams = [ "onPage" => 10,
 						"desc" => TRUE ];
@@ -228,8 +224,6 @@ class TransactionsController extends Controller
 
 	public function create()
 	{
-		global $user_id, $user_name, $uMod;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->createTransaction();
@@ -262,20 +256,19 @@ class TransactionsController extends Controller
 
 		if ($trans_type == DEBT)
 		{
-			$debtMod = new DebtModel($user_id);
-			$pMod = new PersonModel($user_id);
+			$debtMod = new DebtModel($this->user_id);
 
 			$debtAcc = $this->accModel->getProperties($acc_id);
 
 			// Prepare person account
-			$person_id = $pMod->getIdByPos(0);
-			$pObj = $pMod->getItem($person_id);
+			$person_id = $this->personMod->getIdByPos(0);
+			$pObj = $this->personMod->getItem($person_id);
 			if (!$pObj)
 				throw new Error("Person not found");
 
 			$person_name = $pObj->name;
 
-			$person_acc_id = $pMod->getAccount($person_id, $debtAcc->curr);
+			$person_acc_id = $this->personMod->getAccount($person_id, $debtAcc->curr);
 			$person_acc = $this->accModel->getProperties($person_acc_id);
 			$person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
 			$person_balance = $person_res_balance;
@@ -419,7 +412,7 @@ class TransactionsController extends Controller
 
 		$accArr = $this->accModel->getData();
 		if ($trans_type == DEBT)
-			$persArr = $pMod->getData();
+			$persArr = $this->personMod->getData();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
@@ -486,8 +479,6 @@ class TransactionsController extends Controller
 
 	public function update()
 	{
-		global $uMod, $user_id, $user_name;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->updateTransaction();
@@ -510,8 +501,7 @@ class TransactionsController extends Controller
 
 		if ($trans_type == DEBT)
 		{
-			$debtMod = new DebtModel($user_id);
-			$pMod = new PersonModel($user_id);
+			$debtMod = new DebtModel($this->user_id);
 		}
 
 		$acc_count = $this->accModel->getCount([ "full" => ($trans_type == DEBT) ]);
@@ -597,7 +587,7 @@ class TransactionsController extends Controller
 			$src = $this->accModel->getProperties($tr["src_id"]);
 			$dest = $this->accModel->getProperties($tr["dest_id"]);
 
-			$uObj = $uMod->getItem($user_id);
+			$uObj = $this->uMod->getItem($this->user_id);
 			if (!$uObj)
 				throw new Error("User not found");
 
@@ -607,7 +597,7 @@ class TransactionsController extends Controller
 			$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$person_id = ($give) ? $src->owner : $dest->owner;
-			$pObj = $pMod->getItem($person_id);
+			$pObj = $this->personMod->getItem($person_id);
 			if (!$pObj)
 				throw new Error("Person not found");
 
@@ -651,7 +641,7 @@ class TransactionsController extends Controller
 
 		$accArr = $this->accModel->getData();
 		if ($trans_type == DEBT)
-			$persArr = $pMod->getData();
+			$persArr = $this->personMod->getData();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
@@ -726,8 +716,6 @@ class TransactionsController extends Controller
 
 	public function createTransaction()
 	{
-		global $user_id;
-
 		if (!isset($_GET["type"]))
 			$this->fail();
 		$trans_type = TransactionModel::getStringType($_GET["type"]);
@@ -745,11 +733,10 @@ class TransactionsController extends Controller
 			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
 				$this->fail($defMsg);
 
-			$persMod = new PersonModel($user_id);
-			if (!$persMod->is_exist($person_id))		// person should exist
+			if (!$this->personMod->is_exist($person_id))		// person should exist
 				$this->fail($defMsg);
 
-			$debtMod = new DebtModel($user_id);
+			$debtMod = new DebtModel($this->user_id);
 		}
 		else
 		{
@@ -828,8 +815,6 @@ class TransactionsController extends Controller
 
 	public function updateTransaction()
 	{
-		global $user_id;
-
 		$trans_type = intval($_POST["transtype"]);
 
 		$defMsg = ($trans_type == DEBT) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
@@ -843,11 +828,10 @@ class TransactionsController extends Controller
 			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
 				$this->fail($defMsg);
 
-			$persMod = new PersonModel($user_id);
-			if (!$persMod->is_exist($person_id))		// person should exist
+			if (!$this->personMod->is_exist($person_id))		// person should exist
 				$this->fail($defMsg);
 
-			$debtMod = new DebtModel($user_id);
+			$debtMod = new DebtModel($this->user_id);
 		}
 		else
 		{
@@ -920,8 +904,6 @@ class TransactionsController extends Controller
 
 	public function del()
 	{
-		global $user_id;
-
 		if ($_SERVER["REQUEST_METHOD"] != "POST")
 			setLocation(BASEURL."transactions/");
 

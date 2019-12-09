@@ -41,7 +41,10 @@
 	}
 
 
-	checkUser();
+	$uMod = new UserModel();
+	$user_id = $uMod->check();
+	if (!$user_id)
+		fail();
 
 	if (!isset($_GET["id"]))
 		fail();

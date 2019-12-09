@@ -4,7 +4,7 @@ class TestsAdminController extends Controller
 {
 	public function index()
 	{
-		global $menuItems, $user_id;
+		global $menuItems;
 
 		$titleString = "Admin panel | Tests";
 
@@ -13,7 +13,7 @@ class TestsAdminController extends Controller
 		$currMod = new CurrencyModel();
 		$currArr = $currMod->getData();
 
-		$accMod = new AccountModel($user_id);
+		$accMod = new AccountModel($this->user_id);
 		$icons = $accMod->getIconsArray();
 
 

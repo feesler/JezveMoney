@@ -2,19 +2,15 @@
 
 class AccountsController extends Controller
 {
-	public function __construct()
+	protected function onStart()
 	{
-		global $user_id;
-
-		$this->model = new AccountModel($user_id);
+		$this->model = new AccountModel($this->user_id);
 	}
 
 
 	public function index()
 	{
-		global $user_id, $user_name, $uMod;
-
-		$transMod = new TransactionModel($user_id);
+		$transMod = new TransactionModel($this->user_id);
 
 		$tilesArr = $this->model->getTilesArray();
 
@@ -30,8 +26,6 @@ class AccountsController extends Controller
 
 	public function create()
 	{
-		global $user_id, $user_name, $uMod;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->createAccount();
@@ -83,8 +77,6 @@ class AccountsController extends Controller
 
 	public function update()
 	{
-		global $user_id, $user_name, $uMod;
-
 		if ($_SERVER["REQUEST_METHOD"] == "POST")
 		{
 			$this->updateAccount();
@@ -121,14 +113,12 @@ class AccountsController extends Controller
 
 	public function createAccount()
 	{
-		global $uMod, $user_id;
-
 		$defMsg = ERR_ACCOUNT_CREATE;
 
 		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
 			$this->fail($defMsg);
 
-		$uObj = $uMod->getItem($user_id);
+		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
 			$this->fail($defMsg);
 		if (!$this->model->create([ "owner_id" => $uObj->owner_id,

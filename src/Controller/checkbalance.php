@@ -11,8 +11,6 @@ class CheckBalanceController extends Controller
 
 	public function index()
 	{
-		global $user_id, $user_name, $uMod;
-
 ini_set('max_execution_time', '0');
 
 		$db = mysqlDB::getInstance();
@@ -53,7 +51,7 @@ ini_set('max_execution_time', '0');
 		}
 
 
-		$accMod = new AccountModel($user_id);
+		$accMod = new AccountModel($this->user_id);
 
 		$initBalance = [];
 		$curBalance = [];
@@ -72,7 +70,7 @@ ini_set('max_execution_time', '0');
 
 		$prev_date = 0;
 
-		$condArr = ["user_id=".$user_id];
+		$condArr = ["user_id=".$this->user_id];
 		if ($checkAccount_id != 0)
 		{
 			$accCond = ["(src_id=".$checkAccount_id." AND (type=".EXPENSE." OR type=".TRANSFER." OR type=".DEBT."))",
