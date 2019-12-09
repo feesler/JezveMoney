@@ -601,7 +601,7 @@ function urlJoin(obj)
 {
 	var arr = [], par;
 
-	if (typeof obj !== 'object')
+	if (!isObject(obj))
 		return '';
 
 	for(par in obj)
@@ -611,12 +611,12 @@ function urlJoin(obj)
 		{
 			val.forEach(function(arrItem)
 			{
-				if (typeof arrItem !== 'object')
-					arr.push(par + '[]=' + arrItem.toString());
+				if (!isObject(arrItem))
+					arr.push(encodeURIComponent(par) + '[]=' + encodeURIComponent(arrItem.toString()));
 			});
 		}
-		else if (typeof val !== 'object')
-			arr.push(par + '=' + val.toString());
+		else if (!isObject(val))
+			arr.push(encodeURIComponent(par) + '=' + encodeURIComponent(val.toString()));
 	}
 
 	return arr.join('&');
