@@ -516,7 +516,7 @@ var Calendar = new (function()
 				selRange.start = tdate;
 			}
 
-			if (isFunction(rangeCallback) && selRange.start && selRange.end)
+			if (selRange.start && selRange.end)
 			{
 				curRange = { start : selRange.start, end : selRange.end };
 				selRange = { start : null, end : null };
@@ -524,8 +524,67 @@ var Calendar = new (function()
 				cleanAll();
 				highLightRange(curRange);
 
-				rangeCallback(curRange);
+				if (isFunction(rangeCallback))
+				{
+					rangeCallback(curRange);
+				}
 			}
+		}
+
+
+		function convDate(date)
+		{
+			if (isDate(date))
+				return date;
+			if (typeof date !== 'string')
+				return null;
+
+			let parts = date.split('.');
+			if (!isArray(parts) || parts.length != 3)
+				return null;
+
+			return new Date(parts[2], parts[1] - 1, parts[0]);
+		}
+
+
+		function setSelection(date, dateTo)
+		{
+			cleanHL();
+
+			date = convDate(date);
+			if (!date)
+				return;
+
+			dateTo = convDate(dateTo);
+			if (dateTo)		// Date range selection
+			{
+				curRange = { start : null, end : null };
+				selRange = { start : date, end : dateTo };
+
+				// Check swap in needed
+				if (selRange.start - selRange.end > 0)
+				{
+					var tdate = selRange.end;
+					selRange.end = selRange.start;
+					selRange.start = tdate;
+				}
+
+				curRange = { start : selRange.start, end : selRange.end };
+				selRange = { start : null, end : null };
+
+				cleanAll();
+				highLightRange(curRange);
+			}
+			else			// Single day selection
+			{
+				if (actDate != null)
+					deactivateCell(actDate);
+
+				actDate = date;
+				activateCell(actDate);
+			}
+
+			showMonth(date);
 		}
 
 
@@ -751,11 +810,11 @@ var Calendar = new (function()
 				show(wrapperObj, false);
 			baseObj.appendChild(wrapperObj);
 
-			if (params.range == true && isFunction(params.onrangeselect))
-			{
+			if (params.range == true)
 				rangeMode = true;
+			if (rangeMode && isFunction(params.onrangeselect))
 				rangeCallback = params.onrangeselect;
-			}
+
 			dateCallback = params.ondateselect;
 
 			showCallback = params.onshow || null;
@@ -799,10 +858,29 @@ var Calendar = new (function()
 		{
 			return isVisible(wrapperObj);
 		}
+
+
+		this.setSelection = function(start, end)
+		{
+			setSelection(start, end);
+		}
 	}
 
 
 	// Calendar global object public methods
+
+	// Create new date picker control and return instance
+	// @param params {object}:
+	//    wrapper_id {string} - identifier of element where date picker will be rendered
+	//    static {boolean} - if set true, date picker will be statically placed
+	//    range {boolean} - turn on date range select mode
+	//    onrangeselect {function} - date range select callback
+	//    ondateselect {function} - single date select callback
+	//    onshow {function} - dynamic date picker shown callback
+	//    onhide {function} - dynamic date picker hidden callback
+	//    animated {boolean} - animate transitions between views if possible
+	//    relparent {string} - identifier of relative alignment element
+	//    date {Date} - initial date to show
 	this.create = function(params)
 	{
 		return new datePicker(params);

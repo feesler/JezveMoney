@@ -329,6 +329,17 @@ var Popup = new (function()
 	}
 
 // Popup global object public methods
+
+	// @param {object} params:
+	//   id {string} - identifier of element will be created for popup
+	//   nodim {boolean} - option to not dim background on popup appear
+	//   onclose {function} - popup close event handler
+	//   additional {string|array} - list of additional CSS classes for popup
+	//   title {string} - title of popup
+	//   btn {object}:
+	//     okBtn {false|object} - attributes of control. Removed if false is specified
+	//     cancelBtn {false|object} - attributes of control. Removed if false is specified
+	//     closeBtn {false|object} - attributes of control. Removed if false is specified
 	this.create = function(params)
 	{
 		return new Modal(params);
