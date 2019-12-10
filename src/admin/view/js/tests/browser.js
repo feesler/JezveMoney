@@ -74,6 +74,36 @@ var Environment = (function()
 	}
 
 
+	async function waitFor(selector, options)
+	{
+		options = options || {};
+		let timeout = options.timeout || 30000;
+
+		return new Promise((resolve, reject) =>
+		{
+			let limit = setTimeout(() =>
+			{
+				throw new Error('waitFor(' + selector + ') timeout');
+			}, timeout);
+
+			async function queryFun()
+			{
+				let res = await vquery(selector);
+				if (res)
+				{
+					clearTimeout(limit);
+					resolve(res);
+				}
+
+				console.log('queryFun');
+				setTimeout(queryFun, 200);
+			}
+
+			queryFun();
+		});
+	}
+
+
 	async function getGlobal(prop)
 	{
 		let res = viewframe.contentWindow;
@@ -321,6 +351,7 @@ var Environment = (function()
 		query : vquery,
 		queryAll : vqueryall,
 		prop : vprop,
+		wait : waitFor,
 		global : getGlobal,
 		hasClass : hasClass,
 		isVisible : isVisible,

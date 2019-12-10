@@ -83,6 +83,12 @@ var Environment = (function()
 	}
 
 
+	async function waitFor(selector, options)
+	{
+		return browserPage.waitForSelector(selector, options);
+	}
+
+
 	async function getGlobal(prop)
 	{
 		let windowHandle = await browserPage.evaluateHandle(() => window);
@@ -450,6 +456,7 @@ var Environment = (function()
 				selectByValue : selectByValue,
 				onChange : onChangeEmul,
 				prop : vprop,
+				wait : waitFor,
 				global : getGlobal,
 				click : clickEmul,
 				input : inputEmul,

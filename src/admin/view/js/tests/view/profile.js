@@ -52,7 +52,7 @@ ProfileView.prototype.parseContent = async function()
 	res.changeNamePopup.newNameInp = await this.query('#newname');
 	if (res.changeNamePopup.elem)
 	{
-		res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, 'popup_controls > input.btn.ok_btn');
+		res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, '.popup_controls > input.btn.ok_btn');
 		res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close_btn > button');
 	}
 
@@ -63,7 +63,7 @@ ProfileView.prototype.parseContent = async function()
 	res.changePassPopup.newPassInp = await this.query('#newpwd');
 	if (res.changePassPopup.elem)
 	{
-		res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, 'popup_controls > input.btn.ok_btn');
+		res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, '.popup_controls > input.btn.ok_btn');
 		res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close_btn > button');
 	}
 
@@ -72,6 +72,51 @@ ProfileView.prototype.parseContent = async function()
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
+};
+
+
+ProfileView.prototype.changeName = async function(newName)
+{
+	await this.performAction(() => this.click(this.content.nameLinkElem));
+
+	if (!this.content.changeNamePopup || !(await this.isVisible(this.content.changeNamePopup.elem)))
+		throw new Error('Change name popup not appear');
+
+	await this.performAction(() => this.input(this.content.changeNamePopup.newNameInp, newName));
+	await this.performAction(() => this.click(this.content.changeNamePopup.okBtn));
+
+	await this.performAction(() => this.wait('.popup_content.msg'));
+
+	if (!this.msgPopup)
+		throw new Error('Message popup not found');
+
+	if (!this.msgPopup.success || this.msgPopup.message !== 'User name successfully updated.')
+		throw new Error('Fail to update user name');
+
+	return this.performAction(() => this.msgPopup.close());
+};
+
+
+ProfileView.prototype.changePassword = async function(oldPass, newPass)
+{
+	await this.performAction(() => this.click(this.content.changePassLinkElem));
+
+	if (!this.content.changePassPopup || !(await this.isVisible(this.content.changePassPopup.elem)))
+		throw new Error('Change password popup not appear');
+
+	await this.performAction(() => this.input(this.content.changePassPopup.oldPassInp, oldPass));
+	await this.performAction(() => this.input(this.content.changePassPopup.newPassInp, newPass));
+	await this.performAction(() => this.click(this.content.changePassPopup.okBtn));
+
+	await this.performAction(() => this.wait('.popup_content.msg'));
+
+	if (!this.msgPopup)
+		throw new Error('Message popup not found');
+
+	if (!this.msgPopup.success || this.msgPopup.message !== 'Password successfully updated.')
+		throw new Error('Fail to update password');
+
+	return this.performAction(() => this.msgPopup.close());
 };
 
 

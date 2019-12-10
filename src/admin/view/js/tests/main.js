@@ -108,6 +108,8 @@ async function profileTests(view)
 {
 	view = await profile.relogin(view, App.config.testUser);
 	view = await profile.resetAll(view);
+	view = await profile.changeName(view);
+	view = await profile.changePass(view);
 
 	return view;
 }
