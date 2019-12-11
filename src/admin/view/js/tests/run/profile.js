@@ -77,6 +77,10 @@ var runProfile = (function()
 		await test('Change name', async () =>
 		{
 			let newName = '^^&&>>';
+
+			if (view.header.user.name == newName)
+				newName += ' 1';
+
 			view = await view.changeName(newName);
 
 			return view.header.user.name == newName;
