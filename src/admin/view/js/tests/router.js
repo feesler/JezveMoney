@@ -4,6 +4,7 @@ if (typeof module !== 'undefined' && module.exports)
 
 	var MainView = require('./view/main.js');
 	var LoginView = require('./view/login.js');
+	var RegisterView = require('./view/register.js');
 	var ProfileView = require('./view/profile.js');
 	var AccountView = require('./view/account.js');
 	var AccountsView = require('./view/accounts.js');
@@ -50,6 +51,10 @@ async function route(env, url)
 	if (part === 'login')
 	{
 		return LoginView;
+	}
+	else if (part === 'register')
+	{
+		return RegisterView;
 	}
 	else if (part === 'profile')
 	{

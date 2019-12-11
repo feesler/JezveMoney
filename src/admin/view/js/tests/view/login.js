@@ -38,5 +38,12 @@ LoginView.prototype.loginAs = async function(login, password)
 };
 
 
+LoginView.prototype.goToRegistration = async function()
+{
+	return this.navigation(() => this.click(this.content.registerLink));
+};
+
+
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = LoginView;

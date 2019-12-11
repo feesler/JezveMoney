@@ -106,6 +106,8 @@ async function startTests(view)
 
 async function profileTests(view)
 {
+	view = await profile.register(view, { login : 'newuser', name : 'Newbie', password : '12345' });
+	view = await profile.deleteProfile(view);
 	view = await profile.relogin(view, App.config.testUser);
 	view = await profile.resetAll(view);
 	view = await profile.changeName(view);

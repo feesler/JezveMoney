@@ -8,6 +8,7 @@ if (typeof module !== 'undefined' && module.exports)
 	var extend = common.extend;
 
 	var TestView = require('./testview.js');
+	var LoginView = require('./login.js');
 }
 
 
@@ -173,6 +174,33 @@ ProfileView.prototype.resetAll = async function()
 
 	if (!view.msgPopup.success || view.msgPopup.message !== 'All data successfully reseted.')
 		throw new Error('Fail to reset all');
+
+	return view.performAction(() => view.msgPopup.close());
+};
+
+
+ProfileView.prototype.deleteProfile = async function()
+{
+	if (!this.content.deleteProfileBtn)
+		throw new Error('Delete button not found');
+
+	await this.performAction(() => this.click(this.content.deleteProfileBtn));
+
+	if (!this.content.delete_warning || !this.content.delete_warning.elem || !await this.isVisible(this.content.delete_warning.elem))
+		throw new Error('Warning popup not appear');
+	if (!this.content.delete_warning.okBtn)
+		throw new Error('Confirm button not found');
+
+	let view = await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+	if (!(view instanceof LoginView))
+		throw new Error('Unexpected page');
+
+	// Use view here instead of this because the instance was changed after navigation
+	if (!view.msgPopup)
+		throw new Error('Message popup not found');
+
+	if (!view.msgPopup.success || view.msgPopup.message !== 'Your profile is successfully deleted.')
+		throw new Error('Fail to delete profile');
 
 	return view.performAction(() => view.msgPopup.close());
 };

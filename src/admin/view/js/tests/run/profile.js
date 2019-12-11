@@ -2,6 +2,7 @@
 if (typeof module !== 'undefined' && module.exports)
 {
 	var LoginView = require('../view/login.js');
+	var RegisterView = require('../view/register.js');
 	var MainView = require('../view/main.js');
 }
 
@@ -42,6 +43,45 @@ var runProfile = (function()
 
 		view = await view.loginAs(userObj.login, userObj.password);
 		await test('Test user login', () => (view instanceof MainView), env);
+
+		return view;
+	}
+
+
+	async function registrationTest(view, userObj)
+	{
+		env = view.props.environment;
+
+		if (!userObj || !userObj.login || !userObj.name || !userObj.password)
+			throw new Error('Wrong user object');
+
+		if (view.isUserLoggedIn())
+		{
+			view = await view.logoutUser();
+		}
+
+		if (!(view instanceof LoginView))
+			throw new Error('Unexpected page');
+
+		view = await view.goToRegistration();
+		if (!(view instanceof RegisterView))
+			throw new Error('Unexpected page');
+
+		await test('Test user resitration', async () =>
+		{
+			view = await view.registerAs(userObj.login, userObj.name, userObj.password);
+
+			return true;
+		}, env);
+
+		await test('Login with new account', async () =>
+		{
+			view = await view.loginAs(userObj.login, userObj.password);
+			if (!(view instanceof MainView))
+				throw new Error('Fail to login');
+
+			return true;
+		}, env);
 
 		return view;
 	}
@@ -126,11 +166,30 @@ var runProfile = (function()
 		return view;
 	}
 
+
+	async function deleteProfileTest(view)
+	{
+		env = view.props.environment;
+
+		view = await view.goToProfile();
+
+		await test('Delete profile', async () =>
+		{
+			view = await view.deleteProfile();
+
+			return true;
+		}, env);
+
+		return view;
+	}
+
 	return { onAppUpdate : onAppUpdate,
 				relogin : reloginAs,
+				register : registrationTest,
 			 	resetAll : resetAllTest,
 			 	changeName : changeNameTest,
-				changePass : changePasswordTest };
+				changePass : changePasswordTest,
+				deleteProfile : deleteProfileTest };
 })();
 
 
