@@ -342,7 +342,7 @@ class UserModel extends CachedTable
 		$this->cleanCache();
 
 		$pMod = new PersonModel($item_id);
-		$p_id = $pMod->create($this->personName);
+		$p_id = $pMod->create([ "name" => $this->personName ]);
 		unset($this->personName);
 
 		$this->setOwner($item_id, $p_id);
