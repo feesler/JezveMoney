@@ -24,7 +24,7 @@
 
 	addMessage("MSG_NONE");
 
-	addMessage("MSG_REGISTER");
+	addMessage("MSG_REGISTER", MSG_TYPE_SUCCESS, "You successfully registered.");
 	addMessage("ERR_REGISTER_FAIL", MSG_TYPE_ERROR, "Fail to register.");
 	addMessage("MSG_LOGIN");
 	addMessage("ERR_LOGIN_FAIL", MSG_TYPE_ERROR, "Wrong login/password. Please check it and try to retype again.");
