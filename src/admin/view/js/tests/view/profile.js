@@ -79,13 +79,15 @@ ProfileView.prototype.changeName = async function(newName)
 {
 	await this.performAction(() => this.click(this.content.nameLinkElem));
 
+	await this.performAction(() => this.wait('.popup_content.chname_popup', { visible : true }));
+
 	if (!this.content.changeNamePopup || !(await this.isVisible(this.content.changeNamePopup.elem)))
 		throw new Error('Change name popup not appear');
 
 	await this.performAction(() => this.input(this.content.changeNamePopup.newNameInp, newName));
 	await this.performAction(() => this.click(this.content.changeNamePopup.okBtn));
 
-	await this.performAction(() => this.wait('.popup_content.msg'));
+	await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
 
 	if (!this.msgPopup)
 		throw new Error('Message popup not found');
@@ -93,13 +95,17 @@ ProfileView.prototype.changeName = async function(newName)
 	if (!this.msgPopup.success || this.msgPopup.message !== 'User name successfully updated.')
 		throw new Error('Fail to update user name');
 
-	return this.performAction(() => this.msgPopup.close());
+	await this.performAction(() => this.msgPopup.close());
+
+	return this;
 };
 
 
 ProfileView.prototype.changePassword = async function(oldPass, newPass)
 {
 	await this.performAction(() => this.click(this.content.changePassLinkElem));
+
+	await this.performAction(() => this.wait('.popup_content.chpass_popup', { visible : true }));
 
 	if (!this.content.changePassPopup || !(await this.isVisible(this.content.changePassPopup.elem)))
 		throw new Error('Change password popup not appear');
@@ -108,7 +114,7 @@ ProfileView.prototype.changePassword = async function(oldPass, newPass)
 	await this.performAction(() => this.input(this.content.changePassPopup.newPassInp, newPass));
 	await this.performAction(() => this.click(this.content.changePassPopup.okBtn));
 
-	await this.performAction(() => this.wait('.popup_content.msg'));
+	await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
 
 	if (!this.msgPopup)
 		throw new Error('Message popup not found');
@@ -116,7 +122,9 @@ ProfileView.prototype.changePassword = async function(oldPass, newPass)
 	if (!this.msgPopup.success || this.msgPopup.message !== 'Password successfully updated.')
 		throw new Error('Fail to update password');
 
-	return this.performAction(() => this.msgPopup.close());
+	await this.performAction(() => this.msgPopup.close());
+
+	return this;
 };
 
 

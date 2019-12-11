@@ -78,25 +78,45 @@ var Environment = (function()
 	{
 		options = options || {};
 		let timeout = options.timeout || 30000;
+		let visible = options.visible || false;
+		let hidden = options.hidden || false;
 
 		return new Promise((resolve, reject) =>
 		{
+			let qTimer = 0;
 			let limit = setTimeout(() =>
 			{
+				if (qTimer)
+					clearTimeout(qTimer);
 				throw new Error('waitFor(' + selector + ') timeout');
 			}, timeout);
 
 			async function queryFun()
 			{
+				let meetCond = false;
 				let res = await vquery(selector);
 				if (res)
+				{
+					if (visible || hidden)
+					{
+						let selVisibility = await isVisible(res, true);
+						meetCond = ((visible && selVisibility) || (hidden && !selVisibility));
+					}
+					else
+					{
+						meetCond = true;
+					}
+				}
+
+				if (meetCond)
 				{
 					clearTimeout(limit);
 					resolve(res);
 				}
-
-				console.log('queryFun');
-				setTimeout(queryFun, 200);
+				else
+				{
+					qTimer = setTimeout(queryFun, 200);
+				}
 			}
 
 			queryFun();
