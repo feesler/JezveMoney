@@ -13,18 +13,20 @@
 <?php	if ($query != "") {		?>
 <?php		if ($qerr_num == 0) {		?>
 					<table class="adm_tbl">
+<?php			if (is_array($resArr) && count($resArr) > 0) {	?>
 						<tr>
-<?php			foreach($resArr[0] as $ind => $val) {		?>
+<?php				foreach($resArr[0] as $ind => $val) {		?>
 							<th><?=$ind?></th>
-<?php			}	?>
-						</tr>
-<?php			foreach($resArr as $row) {		?>
-						<tr>
-<?php				foreach($row as $val) {	?>
-							<td><?=$val?></td>
 <?php				}	?>
 						</tr>
-<?php			}		?>
+<?php				foreach($resArr as $row) {		?>
+						<tr>
+<?php					foreach($row as $val) {	?>
+							<td><?=$val?></td>
+<?php				}	?>
+							</tr>
+<?php				}		?>
+<?php			}	?>
 						<tr><td colspan="<?=$cols?>">Rows: <?=$rows?></td></tr>
 					</table>
 <?php		} else {	?>
