@@ -62,6 +62,11 @@ var runIncome = (function()
 
 	async function createIncome(view, accNum, onState, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Create income (' + titleParams.join(', ') + ')', 2);
+
 		// Step 0: navigate
 		view = await App.goToMainView(view);
 		view = await view.goToNewTransactionByAccount(accNum);
@@ -113,6 +118,11 @@ var runIncome = (function()
 	// Update income transaction and check results
 	async function updateIncome(view, pos, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Update income [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
@@ -229,7 +239,7 @@ var runIncome = (function()
 	async function incomeTransactionLoop(view, actionState, action)
 	{
 	// State 0
-		view.setBlock('Income', 2);
+		view.setBlock('Income loop', 2);
 		await test('Initial state of new income view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);

@@ -164,6 +164,17 @@ var runTransactionAPI = (function()
 	}
 
 
+	function getTypeStr(type)
+	{
+		var typeToStr = { 1 : 'expense', 2 : 'income', 3 : 'transfer', 4 : 'debt' };
+
+		if (!type || !(type in typeToStr))
+			throw new Error('Unknown transaction type ' + type);
+
+		return typeToStr[type];
+	}
+
+
 	// Create transaction with specified params
 	// (transtype, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comm)
 	async function apiCreateTransactionTest(params)
@@ -175,7 +186,7 @@ var runTransactionAPI = (function()
 		if (!params.comm)
 			params.comm = '';
 
-		await App.test('Create transaction', async () =>
+		await App.test('Create ' + getTypeStr(params.transtype) + ' transaction', async () =>
 		{
 			let trBefore = await api.transaction.list();
 			if (!App.isArray(trBefore))
@@ -320,11 +331,11 @@ var runTransactionAPI = (function()
 			}
 		}
 
-		await App.test('Update transaction', async () =>
-		{
-			let trBefore = await api.transaction.list();
-			let origTrans = App.idSearch(trBefore, updParams.id);
+		let trBefore = await api.transaction.list();
+		let origTrans = App.idSearch(trBefore, updParams.id);
 
+		await App.test('Update ' + getTypeStr(origTrans.type) + ' transaction', async () =>
+		{
 			// Prepare expected transaction object
 			let expTrans = await getExpectedTransaction(updParams);
 			expTrans.pos = origTrans.pos;

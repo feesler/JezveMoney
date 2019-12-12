@@ -98,6 +98,11 @@ var runDebt = (function()
 
 	async function createDebt(view, onState, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Create debt (' + titleParams.join(', ') + ')', 2);
+
 		view = await App.goToMainView(view)
 		view = await view.goToNewTransactionByAccount(0);
 		view = await view.changeTransactionType(App.DEBT);
@@ -196,14 +201,17 @@ var runDebt = (function()
 
 	async function updateDebt(view, pos, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Update debt [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
 		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
-
-		view.setBlock('Update debt transaction ' + pos, 3);
 
 		// Step
 		view = await App.goToMainView(view);
@@ -401,7 +409,7 @@ var runDebt = (function()
 
 	async function debtTransactionLoop(view, actionState, action)
 	{
-		view.setBlock('Debt', 2);
+		view.setBlock('Debt loop', 2);
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);

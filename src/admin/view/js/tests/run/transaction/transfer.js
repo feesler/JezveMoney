@@ -65,6 +65,11 @@ var runTransfer = (function()
 
 	async function createTransfer(view, onState, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Create transfer (' + titleParams.join(', ') + ')', 2);
+
 		view = await App.goToMainView(view);
 		view = await view.goToNewTransactionByAccount(0);
 		view = await view.changeTransactionType(App.TRANSFER);
@@ -121,14 +126,17 @@ var runTransfer = (function()
 	// Update transfer transaction and check results
 	async function updateTransfer(view, pos, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Update transfer [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
 		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
-
-		view.setBlock('Update transfer transaction ' + pos, 3);
 
 		// Step 0: Navigate to transactions list view and filter by transfer
 		view = await App.goToMainView(view);
@@ -261,7 +269,7 @@ var runTransfer = (function()
 
 	async function transferTransactionLoop(view, actionState, action)
 	{
-		view.setBlock('Transfer', 2);
+		view.setBlock('Transfer loop', 2);
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);

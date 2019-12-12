@@ -65,6 +65,11 @@ var runExpense = (function()
 
 	async function createExpense(view, accNum, onState, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Create expense (' + titleParams.join(', ') + ')', 2);
+
 		// Step 0:
 		view = await App.goToMainView(view);
 		view = await view.goToNewTransactionByAccount(accNum);
@@ -115,14 +120,17 @@ var runExpense = (function()
 	// Update expense transaction and check results
 	async function updateExpense(view, pos, params)
 	{
+		let titleParams = [];
+		for(let k in params)
+			titleParams.push(k + ': ' + params[k]);
+		view.setBlock('Update expense [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
 		if (!App.isObject(params))
 			throw new Error('Parameters not specified');
-
-		view.setBlock('Update expense [' + pos + ']', 2);
 
 		view = await App.goToMainView(view);
 		view = await view.goToTransactions();
