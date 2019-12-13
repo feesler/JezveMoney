@@ -2,6 +2,8 @@
 
 class AccountModel extends CachedTable
 {
+	use Singleton;
+
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $owner_id = 0;
@@ -9,29 +11,23 @@ class AccountModel extends CachedTable
 	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
 
 
-	// Class constructor
-	public function __construct($user_id)
+	protected function onStart()
 	{
-		if ($user_id != self::$user_id)
-			self::$dcache = NULL;
-
 		$this->tbl_name = "accounts";
 
-		self::$user_id = intval($user_id);
-
-		$uMod = new UserModel();
-		$uObj = $uMod->getItem(self::$user_id);
-		if (!$uObj)
+		$uMod = UserModel::getInstance();
+		if (!$uMod->currentUser)
 			throw new Error("User not found");
 
-		self::$owner_id = $uObj->owner_id;
+		self::$user_id = $uMod->currentUser->id;
+		self::$owner_id = $uMod->currentUser->owner_id;
 
 		$this->dbObj = mysqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 
-		$this->currMod = new CurrencyModel();
-		$this->personMod = new PersonModel(self::$user_id);
+		$this->currMod = CurrencyModel::getInstance();
+		$this->personMod = PersonModel::getInstance();
 	}
 
 
@@ -244,7 +240,7 @@ class AccountModel extends CachedTable
 		if ($accObj->user_id != self::$user_id)
 			return FALSE;
 
-		$transMod = new TransactionModel(self::$user_id);
+		$transMod = TransactionModel::getInstance();
 		if (!$transMod->onAccountDelete($item_id))
 		{
 			wlog("trans->onAccountDelete(".$item_id.") return FALSE");
@@ -363,10 +359,34 @@ class AccountModel extends CachedTable
 		if (!$this->checkCache())
 			return $resArr;
 
-		$includePersons = (is_array($params) && isset($params["full"]) && $params["full"] == TRUE);
+		if (!is_array($params))
+			$params = [];
 
-		foreach($this->cache as $acc_id => $item)
+		$includePersons = (isset($params["full"]) && $params["full"] == TRUE);
+		$person_id = (isset($params["person"])) ? intval($params["person"]) : 0;
+
+		$itemsData = [];
+		if ($person_id && UserModel::isAdminUser())
 		{
+			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, NULL, NULL, "id ASC");
+			while($row = $this->dbObj->fetchRow($qResult))
+			{
+				$obj = $this->rowToObj($row);
+				if (!is_null($obj))
+					$itemsData[$obj->id] = $obj;
+			}
+
+			$includePersons = TRUE;
+		}
+		else
+		{
+			$itemsData = $this->cache;
+		}
+
+		foreach($itemsData as $acc_id => $item)
+		{
+			if ($person_id && $item->owner_id != $person_id)
+				continue;
 			if (!$includePersons && $item->owner_id != self::$owner_id)
 				continue;
 

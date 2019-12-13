@@ -10,10 +10,10 @@ class TestsAdminController extends Controller
 
 		$menuItems["tests"]["active"] = TRUE;
 
-		$currMod = new CurrencyModel();
+		$currMod = CurrencyModel::getInstance();
 		$currArr = $currMod->getData();
 
-		$accMod = new AccountModel($this->user_id);
+		$accMod = AccountModel::getInstance();
 		$icons = $accMod->getIconsArray();
 
 

@@ -4,9 +4,9 @@ class TransactionsController extends Controller
 {
 	protected function onStart()
 	{
-		$this->model = new TransactionModel($this->user_id);
-		$this->accModel = new AccountModel($this->user_id);
-		$this->currModel = new CurrencyModel();
+		$this->model = TransactionModel::getInstance();
+		$this->accModel = AccountModel::getInstance();
+		$this->currModel = CurrencyModel::getInstance();
 	}
 
 
@@ -261,7 +261,7 @@ class TransactionsController extends Controller
 
 		if ($trans_type == DEBT)
 		{
-			$debtMod = new DebtModel($this->user_id);
+			$debtMod = DebtModel::getInstance();
 
 			$debtAcc = $this->accModel->getProperties($acc_id);
 
@@ -511,7 +511,7 @@ class TransactionsController extends Controller
 
 		if ($trans_type == DEBT)
 		{
-			$debtMod = new DebtModel($this->user_id);
+			$debtMod = DebtModel::getInstance();
 		}
 
 		$acc_count = $this->accModel->getCount([ "full" => ($trans_type == DEBT) ]);
@@ -751,7 +751,7 @@ class TransactionsController extends Controller
 			if (!$this->personMod->is_exist($person_id))		// person should exist
 				$this->fail($defMsg);
 
-			$debtMod = new DebtModel($this->user_id);
+			$debtMod = DebtModel::getInstance();
 		}
 		else
 		{
@@ -846,7 +846,7 @@ class TransactionsController extends Controller
 			if (!$this->personMod->is_exist($person_id))		// person should exist
 				$this->fail($defMsg);
 
-			$debtMod = new DebtModel($this->user_id);
+			$debtMod = DebtModel::getInstance();
 		}
 		else
 		{

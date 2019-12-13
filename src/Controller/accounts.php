@@ -4,13 +4,13 @@ class AccountsController extends Controller
 {
 	protected function onStart()
 	{
-		$this->model = new AccountModel($this->user_id);
+		$this->model = AccountModel::getInstance();
 	}
 
 
 	public function index()
 	{
-		$transMod = new TransactionModel($this->user_id);
+		$transMod = TransactionModel::getInstance();
 
 		$tilesArr = $this->model->getTilesArray();
 
@@ -34,7 +34,7 @@ class AccountsController extends Controller
 
 		$action = "new";
 
-		$currMod = new CurrencyModel();
+		$currMod = CurrencyModel::getInstance();
 
 		$accInfo = new stdClass;
 		$accInfo->name = "";
@@ -85,7 +85,7 @@ class AccountsController extends Controller
 
 		$action = "edit";
 
-		$currMod = new CurrencyModel();
+		$currMod = CurrencyModel::getInstance();
 
 		$acc_id = intval($this->actionParam);
 		if (!$acc_id)

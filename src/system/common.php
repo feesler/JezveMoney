@@ -17,6 +17,7 @@
 	$classes = ["CachedTable" => "system/cachedTable.php",
 					"Controller" => "system/controller.php",
 					"Model" => "system/model.php",
+					"Singleton" => "system/singleton.php",
 					"ApiController" => "system/apicontroller.php",
 				// Controllers
 					"MainController" => "Controller/main.php",

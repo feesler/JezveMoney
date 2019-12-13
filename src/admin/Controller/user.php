@@ -6,7 +6,7 @@ class UserAdminController extends Controller
 	{
 		global $menuItems;
 
-		$uArr = $this->uMod->getData();
+		$uArr = $this->uMod->getData([ "all" => TRUE ]);
 
 		$menuItems["users"]["active"] = TRUE;
 
@@ -65,8 +65,7 @@ class UserAdminController extends Controller
 			if (!$userObj)
 				$this->fail($defMsg);
 
-			$pMod = new PersonModel($_POST["user_id"]);
-			if (!$pMod->update($userObj->owner_id, [ "name" => $_POST["user_name"] ]))
+			if (!$this->personMod->update($userObj->owner_id, [ "name" => $_POST["user_name"] ]))
 				$this->fail($defMsg);
 		}
 

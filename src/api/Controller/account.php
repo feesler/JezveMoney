@@ -6,13 +6,13 @@ class AccountApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->accMod = new AccountModel($this->user_id);
+		$this->model = AccountModel::getInstance();
 	}
 
 
 	public function index()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		$ids = $this->getRequestedIds();
 		if (is_null($ids) || !is_array($ids) || !count($ids))
@@ -21,7 +21,7 @@ class AccountApiController extends ApiController
 		$res = [];
 		foreach($ids as $acc_id)
 		{
-			$props = $this->accMod->getProperties($acc_id);
+			$props = $this->model->getProperties($acc_id);
 			if (is_null($props))
 				$respObj->fail("Account not found");
 
@@ -35,20 +35,20 @@ class AccountApiController extends ApiController
 
 	public function getList()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		$params = [];
 		if (isset($_GET["full"]) && $_GET["full"] == 1)
 			$params["full"] = TRUE;
 
-		$respObj->data = $this->accMod->getData($params);
+		$respObj->data = $this->model->getData($params);
 		$respObj->ok();
 	}
 
 
 	public function create()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -63,7 +63,7 @@ class AccountApiController extends ApiController
 		$owner_id = $uObj->owner_id;
 		wlog("owner: ".$owner_id);
 
-		$acc_id = $this->accMod->create([ "owner_id" => $owner_id,
+		$acc_id = $this->model->create([ "owner_id" => $owner_id,
 											"name" => $_POST["name"],
 											"balance" => $_POST["balance"],
 											"curr_id" => $_POST["currency"],
@@ -78,7 +78,7 @@ class AccountApiController extends ApiController
 
 	public function update()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -86,7 +86,7 @@ class AccountApiController extends ApiController
 		if (!isset($_POST["id"]) || !isset($_POST["name"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
 			$respObj->fail();
 
-		if (!$this->accMod->update($_POST["id"], [ "name" => $_POST["name"],
+		if (!$this->model->update($_POST["id"], [ "name" => $_POST["name"],
 													"balance" => $_POST["balance"],
 													"curr_id" => $_POST["currency"],
 													"icon" => $_POST["icon"] ]))
@@ -98,7 +98,7 @@ class AccountApiController extends ApiController
 
 	public function del()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -113,7 +113,7 @@ class AccountApiController extends ApiController
 			if (!$acc_id)
 				continue;
 
-			if (!$this->accMod->del($acc_id))
+			if (!$this->model->del($acc_id))
 				$respObj->fail();
 		}
 
@@ -123,9 +123,9 @@ class AccountApiController extends ApiController
 
 	public function reset()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
-		if (!$this->accMod->reset())
+		if (!$this->model->reset())
 			$respObj->fail();
 
 		$respObj->ok();

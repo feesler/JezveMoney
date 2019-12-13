@@ -51,7 +51,7 @@ ini_set('max_execution_time', '0');
 		}
 
 
-		$accMod = new AccountModel($this->user_id);
+		$accMod = AccountModel::getInstance();
 
 		$initBalance = [];
 		$curBalance = [];

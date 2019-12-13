@@ -2,25 +2,28 @@
 
 class TransactionModel extends CachedTable
 {
+	use Singleton;
+
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
 
 
-	// Class constructor
-	public function __construct($user_id)
+	protected function onStart()
 	{
-		if ($user_id != self::$user_id)
-			self::$dcache = NULL;
-		self::$user_id = intval($user_id);
-
 		$this->tbl_name = "transactions";
 		$this->dbObj = mysqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 
-		$this->accModel = new AccountModel($user_id);
-		$this->currMod = new CurrencyModel();
+		$uMod = UserModel::getInstance();
+		if (!$uMod->currentUser)
+			throw new Error("User not found");
+
+		self::$user_id = $uMod->currentUser->id;
+
+		$this->accModel = AccountModel::getInstance();
+		$this->currMod = CurrencyModel::getInstance();
 	}
 
 
@@ -208,7 +211,7 @@ class TransactionModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$uMod = new UserModel();
+		$uMod = UserModel::getInstance();
 
 		$srcBalance = 0;
 		if ($res["src_id"] != 0)
@@ -302,7 +305,7 @@ class TransactionModel extends CachedTable
 		if ($trObj->user_id != self::$user_id)
 			return FALSE;
 
-		$uMod = new UserModel();
+		$uMod = UserModel::getInstance();
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -370,7 +373,7 @@ class TransactionModel extends CachedTable
 		if (!$this->cancel($item_id))
 			return FALSE;
 
-		$uMod = new UserModel();
+		$uMod = UserModel::getInstance();
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -675,7 +678,7 @@ class TransactionModel extends CachedTable
 		if (!self::$user_id)
 			return FALSE;
 
-		$uMod = new UserModel();
+		$uMod = UserModel::getInstance();
 
 		$accObj = $this->accModel->getItem($acc_id);
 		if (!$accObj)
@@ -796,7 +799,7 @@ class TransactionModel extends CachedTable
 		if (!self::$user_id)
 			return $res;
 
-		$uMod = new UserModel();
+		$uMod = UserModel::getInstance();
 		$uObj = $uMod->getItem(self::$user_id);
 		if (!$uObj)
 			throw new Error("User not found");

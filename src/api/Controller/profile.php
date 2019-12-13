@@ -6,17 +6,16 @@ class ProfileApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->personMod = new PersonModel($this->user_id);
-		$uObj = $this->uMod->getItem($this->user_id);
-		if (!$uObj)
+		$this->personMod = PersonModel::getInstance();
+		if (!$this->uMod->currentUser)
 			throw new Error("User not found");
-		$this->owner_id = $uObj->owner_id;
+		$this->owner_id = $this->uMod->currentUser->owner_id;
 	}
 
 
 	public function read()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		$pObj = $this->personMod->getItem($this->owner_id);
 		if (!$pObj)
@@ -29,7 +28,7 @@ class ProfileApiController extends ApiController
 
 	public function changename()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -56,7 +55,7 @@ class ProfileApiController extends ApiController
 
 	public function changepass()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -79,12 +78,12 @@ class ProfileApiController extends ApiController
 
 	public function reset()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		$accMod = new AccountModel($this->user_id);
+		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset())
 			$this->fail(getMessage(ERR_PROFILE_RESETALL));
 

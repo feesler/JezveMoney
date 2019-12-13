@@ -12,7 +12,7 @@ class UserApiController extends ApiController
 	{
 		wlog("UserApiController::login()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -31,7 +31,7 @@ class UserApiController extends ApiController
 	{
 		wlog("UserApiController::register()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if ($this->user_id != 0)		// need to log out first
 			$respObj->fail();

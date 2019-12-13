@@ -112,9 +112,10 @@ function assignJoin($assignments)
 
 class mysqlDB
 {
+	use Singleton;
+
 	private static $conn = NULL;		// connection
 	private static $dbname = NULL;		// current database name
-	private static $inst = NULL;
 	private static $tblCache = NULL;	// cache of exist tables
 	private static $settings = NULL;	// saved connection settings
 
@@ -131,22 +132,6 @@ class mysqlDB
 	}
 
 
-	// Constructor
-	protected function __construct()
-	{
-		wlog("");
-	}
-
-
-	public static function getInstance()
-	{
-		if (is_null(self::$inst))
-			self::$inst = new mysqlDB;
-
-		return self::$inst;
-	}
-
-
 	public function getConnection()
 	{
 		return self::$conn;
@@ -154,7 +139,7 @@ class mysqlDB
 
 
 	// Connect to database server
-	public function connect()
+	protected function connect()
 	{
 		$dbcnx = mysqli_connect(self::$settings->location, self::$settings->user, self::$settings->passwd);
 		if ($dbcnx)

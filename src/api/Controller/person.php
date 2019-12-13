@@ -6,7 +6,7 @@ class PersonApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->personMod = new PersonModel($this->user_id);
+		$this->personMod = PersonModel::getInstance();
 	}
 
 
@@ -14,7 +14,7 @@ class PersonApiController extends ApiController
 	{
 		wlog("PersonApiController::index()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		$ids = $this->getRequestedIds();
 		if (is_null($ids) || !is_array($ids) || !count($ids))
@@ -37,7 +37,7 @@ class PersonApiController extends ApiController
 	{
 		wlog("PersonApiController::getList()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		$respObj->data = $this->personMod->getData();
 		$respObj->ok();
@@ -48,7 +48,7 @@ class PersonApiController extends ApiController
 	{
 		wlog("PersonApiController::create()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -69,7 +69,7 @@ class PersonApiController extends ApiController
 	{
 		wlog("PersonApiController::update()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -88,7 +88,7 @@ class PersonApiController extends ApiController
 	{
 		wlog("PersonApiController::update()");
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();

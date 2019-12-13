@@ -2,24 +2,22 @@
 
 class PersonModel extends CachedTable
 {
+	use Singleton;
+
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $owner_id = 0;		// person of user
 
 
-	// Class constructor
-	public function __construct($user_id)
+	protected function onStart()
 	{
-		if ($user_id != self::$user_id)
-			self::$dcache = NULL;
-		self::$user_id = intval($user_id);
 		// find owner person
-		$uMod = new UserModel();
-		$uObj = $uMod->getItem(self::$user_id);
-		if (!$uObj)
-			throw new Error("User not found");
-
-		self::$owner_id = $uObj->owner_id;
+		$uMod = UserModel::getInstance();
+		if ($uMod->currentUser)
+		{
+			self::$user_id = $uMod->currentUser->id;
+			self::$owner_id = $uMod->currentUser->owner_id;
+		}
 
 		$this->tbl_name = "persons";
 
@@ -63,7 +61,7 @@ class PersonModel extends CachedTable
 		$res = new stdClass;
 		$res->id = intval($row["id"]);
 		$res->name = $row["name"];
-		$res->format = intval($row["user_id"]);
+		$res->user_id = intval($row["user_id"]);
 		$res->createdate = strtotime($row["createdate"]);
 		$res->updatedate = strtotime($row["updatedate"]);
 
@@ -124,7 +122,26 @@ class PersonModel extends CachedTable
 		}
 
 		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
-		$res["user_id"] = self::$user_id;
+
+		// For registration/admin cases
+		$targetUser = self::$user_id;
+		if (!$targetUser)
+		{
+			if (!isset($params["user_id"]))
+			{
+				wlog("User not specified");
+				return NULL;
+			}
+			$targetUser = intval($params["user_id"]);
+		}
+
+		if (!$targetUser)
+		{
+			wlog("User not specified");
+			return NULL;
+		}
+
+		$res["user_id"] = $targetUser;
 
 		return $res;
 	}
@@ -168,7 +185,7 @@ class PersonModel extends CachedTable
 		if (!$currObj)
 			return FALSE;
 
-		$accMod = new AccountModel(self::$user_id);
+		$accMod = AccountModel::getInstance();
 		if (!$accMod->onPersonDelete($item_id))
 		{
 			wlog("accMod->onPersonDelete(".$item_id.") return FALSE");
@@ -185,7 +202,8 @@ class PersonModel extends CachedTable
 		if (!$this->checkCache())
 			return 0;
 
-		if (count(self::$dcache) == 1)		// no persons except user owner
+		// Check user not logged in or there is only user owner person
+		if (!self::$owner_id || count(self::$dcache) == 1)
 			return 0;
 
 		$keys = array_keys(self::$dcache);
@@ -235,7 +253,7 @@ class PersonModel extends CachedTable
 		if (!$this->is_exist($p_id))
 			return FALSE;
 
-		$accMod = new AccountModel(self::$user_id);
+		$accMod = AccountModel::getInstance();
 		return $accMod->create([ "owner_id" => $p_id,
 									"name" => "acc_".$p_id."_".$c_id,
 									"balance" => 0.0,
@@ -278,57 +296,77 @@ class PersonModel extends CachedTable
 	}
 
 
-	// Return javascript array of persons
-	public function getData()
+	public function getItem($obj_id)
 	{
-		$condArr = ["p.user_id=".self::$user_id, "p.id<>".self::$owner_id];
-		$qResult = $this->dbObj->selectQ(["p.name" => "name",
-									"p.id" => "pid",
-									"a.id" => "aid",
-									"a.curr_id" => "curr_id",
-									"a.balance" => "balance"],
-							["persons AS p LEFT JOIN accounts AS a ON a.owner_id=p.id"],
-							$condArr,
-						 	NULL, "p.id ASC, a.id ASC");
-
-		$pArr = [];
-		while($row = $this->dbObj->fetchRow($qResult))
+		$item = parent::getItem($obj_id);
+		if (intval($obj_id) && UserModel::isAdminUser())
 		{
-			$p_id = intval($row["pid"]);
-
-			$ind = NULL;
-			foreach($pArr as $pInd => $pVal)
-			{
-				if ($pVal->id == $p_id)
-				{
-					$ind = $pInd;
-					break;
-				}
-			}
-
-			if (is_null($ind))
-				$ind = count($pArr);
-
-			if (!isset($pArr[$ind]))
-			{
-				$pArr[$ind] = new stdClass;
-
-				$pArr[$ind]->id = $p_id;
-				$pArr[$ind]->name = $row["name"];
-				$pArr[$ind]->accounts = [];
-			}
-			if (!is_null($row["aid"]))
-			{
-				$pAccObj = new stdClass;
-
-				$pAccObj->id = intval($row["aid"]);
-				$pAccObj->curr_id = intval($row["curr_id"]);
-				$pAccObj->balance = floatval($row["balance"]);
-
-				$pArr[$ind]->accounts[] = $pAccObj;
-			}
+			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "id=".intval($obj_id), NULL, "id ASC");
+			$row = $this->dbObj->fetchRow($qResult);
+			$item = $this->rowToObj($row);
 		}
 
-		return $pArr;
+		return $item;
+	}
+
+
+	// Return count of objects
+	public function getCount($params = NULL)
+	{
+		if (!is_array($params))
+			$params = [];
+
+		$userRequest = isset($params["user"]) ? intval($params["user"]) : 0;
+
+		if ($userRequest && UserModel::isAdminUser())
+		{
+			$uMod = UserModel::getInstance();
+			$uObj = $uMod->getItem($userRequest);
+			if (!$uObj)
+				return 0;
+
+			return $this->dbObj->countQ($this->tbl_name, [ "user_id=".$userRequest, "id<>".$uObj->owner_id ]);
+		}
+		else
+		{
+			return parent::getCount();
+		}
+	}
+
+
+	// Return javascript array of persons
+	public function getData($params = NULL)
+	{
+		if (!is_array($params))
+			$params = [];
+
+		$accMod = AccountModel::getInstance();
+		$requestAll = (isset($params["full"]) && $params["full"] == TRUE && UserModel::isAdminUser());
+
+		$condArr = [];
+		if (!$requestAll)
+		{
+			$condArr[] = "user_id=".self::$user_id;
+			$condArr[] = "id<>".self::$owner_id;
+		}
+
+		$res = [];
+
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "id ASC");
+		while($row = $this->dbObj->fetchRow($qResult))
+		{
+			$itemObj = $this->rowToObj($row);
+			if (!$itemObj)
+				continue;
+
+			unset($itemObj->createdate);
+			unset($itemObj->updatedate);
+
+			$itemObj->accounts = $accMod->getData([ "person" => $itemObj->id ]);
+
+			$res[] = $itemObj;
+		}
+
+		return $res;
 	}
 }

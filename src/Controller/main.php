@@ -4,9 +4,9 @@ class MainController extends Controller
 {
 	public function index()
 	{
-		$accMod = new AccountModel($this->user_id);
-		$transMod = new TransactionModel($this->user_id);
-		$currMod = new CurrencyModel();
+		$accMod = AccountModel::getInstance();
+		$transMod = TransactionModel::getInstance();
+		$currMod = CurrencyModel::getInstance();
 
 		$currArr = $currMod->getData();
 		$accArr = $accMod->getData();

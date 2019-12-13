@@ -108,7 +108,7 @@ class ProfileController extends Controller
 
 		$defMsg = ERR_PROFILE_RESETALL;
 
-		$accMod = new AccountModel($this->user_id);
+		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset())
 			$this->fail($defMsg);
 
@@ -125,10 +125,10 @@ class ProfileController extends Controller
 	{
 		$defMsg = ERR_PROFILE_DELETE;
 
-		$this->uMod->logout();
-
 		if (!$this->uMod->del($this->user_id))
 			$this->fail($defMsg);
+
+		$this->uMod->logout();
 
 		setMessage(MSG_PROFILE_DELETE);
 

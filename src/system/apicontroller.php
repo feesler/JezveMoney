@@ -9,7 +9,7 @@ class ApiController extends Controller
 	// Common API initialization
 	public function initAPI()
 	{
-		$this->uMod = new UserModel();
+		$this->uMod = UserModel::getInstance();
 		$this->user_id = $this->uMod->check();
 		if ($this->authRequired && $this->user_id == 0)
 		{

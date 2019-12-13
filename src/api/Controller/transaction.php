@@ -6,13 +6,13 @@ class TransactionApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->trMod = new TransactionModel($this->user_id);
+		$this->model = TransactionModel::getInstance();
 	}
 
 
 	public function index()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		$ids = $this->getRequestedIds();
 		if (is_null($ids) || !is_array($ids) || !count($ids))
@@ -21,7 +21,7 @@ class TransactionApiController extends ApiController
 		$res = [];
 		foreach($ids as $trans_id)
 		{
-			$props = $this->trMod->getProperties($trans_id);
+			$props = $this->model->getProperties($trans_id);
 			if (is_null($props))
 				$respObj->fail("Transaction ".$trans_id." not found");
 
@@ -35,10 +35,9 @@ class TransactionApiController extends ApiController
 
 	public function getList()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
-
-		$accMod = new AccountModel($this->user_id);
+		$accMod = AccountModel::getInstance();
 
 		$params = [];
 
@@ -67,7 +66,7 @@ class TransactionApiController extends ApiController
 			$params["endDate"] = $_GET["enddate"];
 		}
 
-		$trArr = $this->trMod->getData($params);
+		$trArr = $this->model->getData($params);
 
 		$respObj->data = [];
 		foreach($trArr as $trans)
@@ -96,7 +95,7 @@ class TransactionApiController extends ApiController
 	{
 		$db = mysqlDB::getInstance();
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -112,11 +111,11 @@ class TransactionApiController extends ApiController
 			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
 				$respObj->fail();
 
-			$pers = new PersonModel($this->user_id);
+			$pers = PersonModel::getInstance();
 			if (!$pers->is_exist($person_id))		// person should exist
 				$respObj->fail();
 
-			$debtMod = new DebtModel($this->user_id);
+			$debtMod = DebtModel::getInstance();
 		}
 		else
 		{
@@ -160,7 +159,7 @@ class TransactionApiController extends ApiController
 			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
 				$respObj->fail();
 
-			$trans_id = $this->trMod->create([ "type" => $trans_type,
+			$trans_id = $this->model->create([ "type" => $trans_type,
 												"src_id" => $src_id,
 												"dest_id" => $dest_id,
 												"src_amount" => $src_amount,
@@ -183,7 +182,7 @@ class TransactionApiController extends ApiController
 	{
 		$db = mysqlDB::getInstance();
 
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -203,11 +202,11 @@ class TransactionApiController extends ApiController
 			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
 				$respObj->fail();
 
-			$pers = new PersonModel($this->user_id);
+			$pers = PersonModel::getInstance();
 			if (!$pers->is_exist($person_id))		// person should exist
 				$respObj->fail();
 
-			$debtMod = new DebtModel($this->user_id);
+			$debtMod = DebtModel::getInstance();
 		}
 		else
 		{
@@ -240,7 +239,7 @@ class TransactionApiController extends ApiController
 		}
 		else
 		{
-			if (!$this->trMod->update($trans_id, [ "type" => $trans_type,
+			if (!$this->model->update($trans_id, [ "type" => $trans_type,
 												"src_id" => $src_id,
 												"dest_id" => $dest_id,
 												"src_amount" => $src_amount,
@@ -262,7 +261,7 @@ class TransactionApiController extends ApiController
 
 	public function del()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -277,7 +276,7 @@ class TransactionApiController extends ApiController
 			if (!$trans_id)
 				continue;
 
-			if (!$this->trMod->del($trans_id))
+			if (!$this->model->del($trans_id))
 				$respObj->fail();
 		}
 
@@ -287,7 +286,7 @@ class TransactionApiController extends ApiController
 
 	public function setPos()
 	{
-		$respObj = new apiResponse();
+		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
@@ -301,7 +300,7 @@ class TransactionApiController extends ApiController
 		if (!$tr_id || !$to_pos)
 			$respObj->fail();
 
-		if (!$this->trMod->updatePos($tr_id, $to_pos))
+		if (!$this->model->updatePos($tr_id, $to_pos))
 			$respObj->fail();
 
 		$respObj->ok();

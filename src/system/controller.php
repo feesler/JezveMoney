@@ -96,19 +96,18 @@ abstract class Controller
 	// Check user status required for page access
 	public function checkUser($loggedIn = TRUE, $adminOnly = FALSE)
 	{
-		$this->uMod = new UserModel();
+		$this->uMod = UserModel::getInstance();
 		// Check session and cookies
 		$this->user_id = $this->uMod->check();
 
 		// Get name of user person
 		if ($this->user_id)
 		{
-			$uObj = $this->uMod->getItem($this->user_id);
-			if (!$uObj)
+			if (!$this->uMod->currentUser)
 				throw new Error("User not found");
 
-			$this->personMod = new PersonModel($this->user_id);
-			$personObj = $this->personMod->getItem($uObj->owner_id);
+			$this->personMod = PersonModel::getInstance();
+			$personObj = $this->personMod->getItem($this->uMod->currentUser->owner_id);
 			if ($personObj)
 				$this->user_name = $personObj->name;
 		}

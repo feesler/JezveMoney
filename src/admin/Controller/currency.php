@@ -4,7 +4,7 @@ class CurrencyAdminController extends Controller
 {
 	protected function onStart()
 	{
-		$this->model = new CurrencyModel();
+		$this->model = CurrencyModel::getInstance();
 	}
 
 

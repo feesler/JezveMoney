@@ -6,7 +6,7 @@ class CurrencyApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->model = new CurrencyModel();
+		$this->model = CurrencyModel::getInstance();
 	}
 
 

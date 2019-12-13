@@ -41,7 +41,7 @@
 	}
 
 
-	$uMod = new UserModel();
+	$uMod = UserModel::getInstance();
 	$user_id = $uMod->check();
 	if (!$user_id)
 		fail();
@@ -54,7 +54,7 @@
 		fail();
 
 
-	$accMod = new AccountModel($user_id, TRUE);
+	$accMod = AccountModel::getInstance();
 
 
 	$realBalance = [];

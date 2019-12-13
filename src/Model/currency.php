@@ -2,11 +2,12 @@
 
 class CurrencyModel extends CachedTable
 {
+	use Singleton;
+
 	static private $dcache = NULL;
 
 
-	// Class constructor
-	public function __construct()
+	protected function onStart()
 	{
 		$this->tbl_name = "currency";
 		$this->dbObj = mysqlDB::getInstance();

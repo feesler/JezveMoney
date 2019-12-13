@@ -1,21 +1,21 @@
 <?php
 
-Class DebtModel
+class DebtModel
 {
+	use Singleton;
+
 	private $user_id = 0;
 	private $owner_id = 0;		// person of user
 
 
-	// Class constructor
-	public function __construct($user_id)
+	protected function onStart()
 	{
-		$this->user_id = intval($user_id);
-
-		$uMod = new UserModel();
-		$uObj = $uMod->getItem($this->user_id);
-		if (!$uObj)
+		$uMod = UserModel::getInstance();
+		if (!$uMod->currentUser)
 			throw new Error("User not found");
-		$this->owner_id = $uObj->owner_id;
+
+		$this->user_id = $uMod->currentUser->id;
+		$this->owner_id = $uMod->currentUser->owner_id;
 	}
 
 
@@ -38,7 +38,7 @@ Class DebtModel
 		if ($op != 1 && $op != 2)
 			return 0;
 
-		$pMod = new PersonModel($this->user_id);
+		$pMod = PersonModel::getInstance();
 		if (!$pMod->is_exist($person_id))
 			return 0;
 
@@ -59,7 +59,7 @@ Class DebtModel
 			$dest_id = $p_acc;
 		}
 
-		$transMod = new TransactionModel($this->user_id);
+		$transMod = TransactionModel::getInstance();
 		$trans_id = $transMod->create([ "type" => DEBT,
 										"src_id" => $src_id,
 										"dest_id" => $dest_id,
@@ -93,7 +93,7 @@ Class DebtModel
 		if ($op != 1 && $op != 2)
 			return FALSE;
 
-		$pMod = new PersonModel($this->user_id);
+		$pMod = PersonModel::getInstance();
 		if (!$pMod->is_exist($person_id))
 			return FALSE;
 
@@ -114,7 +114,7 @@ Class DebtModel
 			$dest_id = $p_acc;
 		}
 
-		$transMod = new TransactionModel($this->user_id);
+		$transMod = TransactionModel::getInstance();
 		if (!$transMod->update($tr_id, [ "type" => DEBT,
 										"src_id" => $src_id,
 										"dest_id" => $dest_id,

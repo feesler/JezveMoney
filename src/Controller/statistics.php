@@ -4,9 +4,9 @@ class StatisticsController extends Controller
 {
 	public function index()
 	{
-		$transMod = new TransactionModel($this->user_id);
-		$accMod = new AccountModel($this->user_id);
-		$currMod = new CurrencyModel();
+		$transMod = TransactionModel::getInstance();
+		$accMod = AccountModel::getInstance();
+		$currMod = CurrencyModel::getInstance();
 		$filterObj = new stdClass;
 
 		$byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");

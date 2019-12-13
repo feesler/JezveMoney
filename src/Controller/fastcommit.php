@@ -12,9 +12,9 @@ class FastCommitController extends Controller
 			return;
 		}
 
-		$accMod = new AccountModel($this->user_id);
+		$accMod = AccountModel::getInstance();
 		$accArr = $accMod->getData();
-		$currMod = new CurrencyModel();
+		$currMod = CurrencyModel::getInstance();
 		$currArr = $currMod->getData();
 		$persArr = $this->personMod->getData();
 
@@ -204,10 +204,10 @@ class FastCommitController extends Controller
 
 		header("Content-type: text/html; charset=utf-8");
 
-		$accMod = new AccountModel($this->user_id);
-		$trMod = new TransactionModel($this->user_id);
-		$debtMod = new DebtModel($this->user_id);
-		$currMod = new CurrencyModel();
+		$accMod = AccountModel::getInstance();
+		$trMod = TransactionModel::getInstance();
+		$debtMod = DebtModel::getInstance();
+		$currMod = CurrencyModel::getInstance();
 
 		$acc_id = intval($_POST["acc_id"]);
 		$accObj = $accMod->getItem($acc_id);

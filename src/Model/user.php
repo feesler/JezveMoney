@@ -2,11 +2,13 @@
 
 class UserModel extends CachedTable
 {
+	use Singleton;
+
 	static private $dcache = NULL;
+	public $currentUser = NULL;
 
 
-	// Class constructor
-	public function __construct()
+	protected function onStart()
 	{
 		$this->tbl_name = "users";
 		$this->dbObj = mysqlDB::getInstance();
@@ -167,7 +169,11 @@ class UserModel extends CachedTable
 
 		// check session variable
 		if (isset($_SESSION["userid"]))
-			return intval($_SESSION["userid"]);
+		{
+			$user_id = intval($_SESSION["userid"]);
+			$this->currentUser = $this->getItem($user_id);
+			return $user_id;
+		}
 
 		// check cookies
 		if (!isset($_COOKIE["login"]) || !isset($_COOKIE["passhash"]))
@@ -187,6 +193,8 @@ class UserModel extends CachedTable
 
 		$this->setupCookies($loginCook, $passCook);
 
+		$this->currentUser = $this->getItem($user_id);
+
 		return $user_id;
 	}
 
@@ -197,6 +205,14 @@ class UserModel extends CachedTable
 		$uObj = $this->getItem($item_id);
 
 		return ($uObj && ($uObj->access & 0x1) == 0x1);
+	}
+
+
+	// Check current user has admin access
+	static function isAdminUser()
+	{
+		$uMod = static::getInstance();
+		return ($uMod && $uMod->currentUser && ($uMod->currentUser->access & 0x1) == 0x1);
 	}
 
 
@@ -341,8 +357,9 @@ class UserModel extends CachedTable
 	{
 		$this->cleanCache();
 
-		$pMod = new PersonModel($item_id);
-		$p_id = $pMod->create([ "name" => $this->personName ]);
+		$pMod = PersonModel::getInstance();
+		$p_id = $pMod->create([ "name" => $this->personName, "user_id" => $item_id ]);
+
 		unset($this->personName);
 
 		$this->setOwner($item_id, $p_id);
@@ -375,6 +392,9 @@ class UserModel extends CachedTable
 		sessionStart();
 		session_unset();
 		session_destroy();
+
+		unset($this->currentUser);
+		$this->currentUser = NULL;
 
 		$this->deleteCookies();
 	}
@@ -483,6 +503,9 @@ class UserModel extends CachedTable
 	{
 		$res = [];
 
+		if (!static::isAdminUser())
+			return $res;
+
 		if (!$this->checkCache())
 			return $res;
 
@@ -507,6 +530,7 @@ class UserModel extends CachedTable
 			$accCountArr[$o_id] = $acc_cnt;
 		}
 
+		$pMod = PersonModel::getInstance();
 		foreach($this->cache as $u_id => $item)
 		{
 			$userObj = new stdClass;
@@ -515,15 +539,12 @@ class UserModel extends CachedTable
 			$userObj->login = $item->login;
 			$userObj->access = $item->access;
 
-			$pMod = new PersonModel($u_id);
 			$pObj = $pMod->getItem($item->owner_id);
-			if (!$pObj)
-				throw new Error("Person ".$item->owner_id." not found");
+			$userObj->owner = $pObj ? $pObj->name : "No person";
 
-			$userObj->owner = $pObj->name;
 			$userObj->accCount = isset($accCountArr[$item->owner_id]) ? $accCountArr[$item->owner_id] : 0;
 			$userObj->trCount = isset($trCountArr[$u_id]) ? $trCountArr[$u_id] : 0;
-			$userObj->pCount = $pMod->getCount();
+			$userObj->pCount = $pMod->getCount([ "user" => $u_id ]);
 
 			$res[] = $userObj;
 		}
@@ -539,7 +560,7 @@ class UserModel extends CachedTable
 		if (!$u_id)
 			return FALSE;
 
-		$accMod = new AccountModel($u_id);
+		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset())
 			return FALSE;
 
