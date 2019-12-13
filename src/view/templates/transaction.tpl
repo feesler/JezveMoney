@@ -16,11 +16,11 @@
 	};
 <?php	}	?>
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
-<?php	if ($trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == DEBT) {		?>
 	var persons = <?=f_json_encode($persArr)?>;
 <?php	}	?>
 
-<?php	if ($trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == DEBT) {		?>
 	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>, <?=$person_id?>, <?=($give ? "true" : "false")?>, <?=$acc_id?>, <?=($noAccount ? "true" : "false")?>);
 <?php	} else {		?>
 	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
@@ -53,7 +53,7 @@
 <?php	}	?>
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
-			if ($menuItem->ind == $trans_type) {		?>
+			if ($menuItem->ind == $tr["type"]) {		?>
 							<span><b><?=$menuItem->title?></b></span>
 <?php		} else {		?>
 							<span><a href="<?=$menuItem->url?>"><?=$menuItem->title?></a></span>
@@ -61,12 +61,12 @@
 		}	?>
 						</div>
 
-<?php	if ($action == "new" && $acc_count < 2 && $trans_type == TRANSFER) {	?>
+<?php	if ($action == "new" && $acc_count < 2 && $tr["type"] == TRANSFER) {	?>
 						<div class="align_block"><span>You need at lease two accounts for transfer.</span></div>
-<?php	} else if ($action == "new" && !$acc_count && $trans_type != TRANSFER) {		?>
+<?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
 						<div class="align_block"><span>You have no one account. Please create one.</span></div>
 <?php	} else {		?>
-<?php	if ($trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == DEBT) {		?>
 						<div id="person" class="acc_float">
 							<input id="person_id" name="person_id" type="hidden" value="<?=$person_id?>">
 							<div><label>Person name</label></div>
@@ -165,8 +165,8 @@
 								<button class="dashed_btn resbal_btn" type="button"><span>Select account</span></button>
 							</div>
 						</div>
-<?php	}	/* if ($trans_type == DEBT) */	?>
-<?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER) {		?>
+<?php	}	/* if ($tr["type"] == DEBT) */	?>
+<?php	if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {		?>
 						<div id="source" class="acc_float">
 							<div><label>Source account</label></div>
 							<div class="tile_container">
@@ -175,7 +175,7 @@
 							</div>
 
 							<div class="tile_right_block">
-<?php	if ($trans_type == TRANSFER) {		?>
+<?php	if ($tr["type"] == TRANSFER) {		?>
 								<div id="src_amount_left" style="display: none;">
 									<span><?=$srcAmountLbl?></span>
 									<div>
@@ -183,7 +183,7 @@
 									</div>
 								</div>
 <?php	}	?>
-<?php	if ($trans_type == EXPENSE) {		?>
+<?php	if ($tr["type"] == EXPENSE) {		?>
 								<div id="dest_amount_left" style="display: none;">
 									<span><?=$destAmountLbl?></span>
 									<div>
@@ -197,7 +197,7 @@
 										<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
 									</div>
 								</div>
-<?php	if (($trans_type == TRANSFER && $src->curr == $dest->curr) || (($trans_type == EXPENSE || $trans_type == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
+<?php	if (($tr["type"] == TRANSFER && $src->curr == $dest->curr) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
 								<div id="exch_left">
@@ -211,7 +211,7 @@
 						</div>
 <?php	}	?>
 
-<?php	if ($trans_type == INCOME || $trans_type == TRANSFER) {		?>
+<?php	if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
 						<div id="destination" class="acc_float">
 							<div><label>Destination account</label></div>
 							<div class="tile_container">
@@ -238,7 +238,7 @@
 										<button id="resbal_d_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtDestResBal?></span></button>
 									</div>
 								</div>
-<?php	if ($trans_type == INCOME) {		?>
+<?php	if ($tr["type"] == INCOME) {		?>
 <?php		if ($tr["src_curr"] == $tr["dest_curr"]) {		?>
 								<div id="exch_left" style="display: none;">
 <?php		} else {		?>
@@ -253,7 +253,7 @@
 							</div>
 						</div>
 <?php	}	?>
-<?php	if ($trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == DEBT) {		?>
 						<div id="operation" class="non_float">
 							<div><label>Operation</label></div>
 							<div class="op_sel clearfix">
@@ -269,13 +269,13 @@
 <?php	}	?>
 							<div><label for="src_amount"><?=$srcAmountLbl?></label></div>
 							<div>
-<?php	if ($trans_type != INCOME) {		?>
+<?php	if ($tr["type"] != INCOME) {		?>
 								<div class="btn rcurr_btn inact_rbtn right_float"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	} else {	?>
 								<div class="btn rcurr_btn right_float"><div id="srcamountsign"><?=$srcAmountSign?></div></div>
 <?php	}	?>
 								<input id="src_curr" name="src_curr" type="hidden" value="<?=$srcAmountCurr?>">
-<?php	if ($trans_type != INCOME) {		?>
+<?php	if ($tr["type"] != INCOME) {		?>
 								<div class="stretch_input std_input">
 <?php	} else {	?>
 								<div class="stretch_input std_input rbtn_input">
@@ -296,13 +296,13 @@
 <?php	}	?>
 							<div><label for="dest_amount"><?=$destAmountLbl?></label></div>
 							<div>
-<?php	if ($trans_type == EXPENSE) {		?>
+<?php	if ($tr["type"] == EXPENSE) {		?>
 								<div class="btn rcurr_btn right_float"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	} else {	?>
 								<div class="btn rcurr_btn inact_rbtn right_float"><div id="destamountsign"><?=$destAmountSign?></div></div>
 <?php	}	?>
 								<input id="dest_curr" name="dest_curr" type="hidden" value="<?=$destAmountCurr?>">
-<?php	if ($trans_type == EXPENSE) {		?>
+<?php	if ($tr["type"] == EXPENSE) {		?>
 								<div class="stretch_input std_input rbtn_input">
 <?php	} else {	?>
 								<div class="stretch_input std_input">
@@ -326,13 +326,13 @@
 							</div>
 						</div>
 
-<?php	if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {		?>
 						<div id="result_balance" class="non_float" style="display: none;">
 							<div><label for="resbal"><?=$srcBalTitle?></label></div>
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign"><?=$srcAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
-<?php	if ($trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == DEBT) {		?>
 									<input id="resbal" class="summ_text" type="text" value="<?=($give ? $person_res_balance : ($debtAcc ? $debtAcc->balance : ""))?>">
 <?php	} else {	?>
 									<input id="resbal" class="summ_text" type="text" value="<?=($src->balance)?>">
@@ -342,13 +342,13 @@
 						</div>
 <?php	}	?>
 
-<?php	if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == INCOME || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {		?>
 						<div id="result_balance_dest" class="non_float" style="display: none;">
 							<div><label for="resbal_d"><?=$destBalTitle?></label></div>
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="res_currsign_d"><?=$destAmountSign?></div></div></div>
 								<div class="stretch_input std_input">
-<?php	if ($trans_type == DEBT) {		?>
+<?php	if ($tr["type"] == DEBT) {		?>
 									<input id="resbal_d" class="summ_text" type="text" value="<?=($give ? ($debtAcc ? $debtAcc->balance : "") : $person_res_balance )?>">
 <?php	} else {	?>
 									<input id="resbal_d" class="summ_text" type="text" value="<?=($dest->balance)?>">

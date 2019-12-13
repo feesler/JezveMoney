@@ -239,15 +239,19 @@ class TransactionsController extends Controller
 
 		$defMsg = ERR_TRANS_CREATE;
 
+		$tr = [ "src_amount" => 0,
+				"dest_amount" => 0,
+				"comment" => "" ];
+
 		// check predefined type of transaction
 		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
-		$trans_type = TransactionModel::getStringType($type_str);
-		if (!$trans_type)
+		$tr["type"] = TransactionModel::getStringType($type_str);
+		if (!$tr["type"])
 		{
 			$type_str = "expense";
-			$trans_type = TransactionModel::getStringType($type_str);
+			$tr["type"] = TransactionModel::getStringType($type_str);
 		}
-		if (!$trans_type)
+		if (!$tr["type"])
 			$this->fail($defMsg);
 
 		// check predefined account
@@ -259,7 +263,7 @@ class TransactionsController extends Controller
 		if (!$acc_id)
 			$this->fail($defMsg);
 
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 		{
 			$debtMod = DebtModel::getInstance();
 
@@ -278,14 +282,11 @@ class TransactionsController extends Controller
 			$person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
 			$person_balance = $person_res_balance;
 
-			$tr = [ "src_id" => $person_acc_id,
-					"dest_id" => $acc_id,
-					"src_amount" => 0,
-					"dest_amount" => 0,
-					"src_curr" => $debtAcc->curr,
-					"dest_curr" => $debtAcc->curr,
-					"type" => $trans_type,
-					"comment" => "" ];
+			$tr["src_id"] = $person_acc_id;
+			$tr["dest_id"] = $acc_id;
+			$tr["src_curr"] = $debtAcc->curr;
+			$tr["dest_curr"] = $debtAcc->curr;
+
 			$give = TRUE;
 		}
 		else
@@ -293,22 +294,17 @@ class TransactionsController extends Controller
 			// set source and destination accounts
 			$src_id = 0;
 			$dest_id = 0;
-			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
+			if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER)
 				$src_id = ($acc_id ? $acc_id : $this->accModel->getIdByPos(0));
-			else if ($trans_type == INCOME)		// income
+			else if ($tr["type"] == INCOME)		// income
 				$dest_id = ($acc_id ? $acc_id : $this->accModel->getIdByPos(0));
 
-			if ($trans_type == TRANSFER)
+			if ($tr["type"] == TRANSFER)
 				$dest_id = $this->accModel->getAnother($src_id);
 
-			$tr = ["src_id" => $src_id,
-						"dest_id" => $dest_id,
-						"src_amount" => 0,
-						"dest_amount" => 0,
-						"src_curr" => 0,
-						"dest_curr" => 0,
-						"type" => $trans_type,
-						"comment" => ""];
+			$tr["src_id"] = $src_id;
+			$tr["dest_id"] = $dest_id;
+			$tr["comment"] = "";
 
 			if ($src_id != 0)
 			{
@@ -324,15 +320,15 @@ class TransactionsController extends Controller
 					$tr["dest_curr"] = $accObj->curr_id;
 			}
 
-			if ($trans_type == EXPENSE)
+			if ($tr["type"] == EXPENSE)
 				$tr["dest_curr"] = $tr["src_curr"];
-			else if ($trans_type == INCOME)
+			else if ($tr["type"] == INCOME)
 				$tr["src_curr"] = $tr["dest_curr"];
 		}
 
 		$acc_count = $this->accModel->getCount();
 
-		if ($trans_type != DEBT)
+		if ($tr["type"] != DEBT)
 		{
 			// get information about source and destination accounts
 			$src = $this->accModel->getProperties($tr["src_id"]);
@@ -359,50 +355,50 @@ class TransactionsController extends Controller
 
 		$formAction = BASEURL."transactions/".$action."/?type=".$type_str;
 
-		if ($trans_type == EXPENSE || $trans_type == TRANSFER || $trans_type == DEBT)
+		if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER || $tr["type"] == DEBT)
 		{
 			$srcBalTitle = "Result balance";
-			if ($trans_type == TRANSFER)
+			if ($tr["type"] == TRANSFER)
 				$srcBalTitle .= " (Source)";
-			else if ($trans_type == DEBT)
+			else if ($tr["type"] == DEBT)
 				$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 
 			$balDiff = $tr["src_amount"];
-			if ($trans_type != DEBT)
+			if ($tr["type"] != DEBT)
 				$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr);
 		}
 
-		if ($trans_type == INCOME || $trans_type == TRANSFER || $trans_type == DEBT)
+		if ($tr["type"] == INCOME || $tr["type"] == TRANSFER || $tr["type"] == DEBT)
 		{
 			$destBalTitle = "Result balance";
-			if ($trans_type == TRANSFER)
+			if ($tr["type"] == TRANSFER)
 				$destBalTitle .= " (Destination)";
-			else if ($trans_type == DEBT)
+			else if ($tr["type"] == DEBT)
 				$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$balDiff = $tr["dest_amount"];
-			if ($trans_type != DEBT)
+			if ($tr["type"] != DEBT)
 				$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
 		$transAccCurr = 0;		// currency of transaction account
 
-		if ($trans_type != DEBT)
+		if ($tr["type"] != DEBT)
 		{
-			$transCurr = (($trans_type == EXPENSE) ? $src->curr : $dest->curr);
-			$transAccCurr = (($trans_type == EXPENSE) ? $src->curr : $dest->curr);
+			$transCurr = (($tr["type"] == EXPENSE) ? $src->curr : $dest->curr);
+			$transAccCurr = (($tr["type"] == EXPENSE) ? $src->curr : $dest->curr);
 
 			$srcAmountCurr = (!is_null($src)) ? $src->curr : $dest->curr;
 			$destAmountCurr = (!is_null($dest)) ? $dest->curr : $src->curr;
 
 			// Show destination amount for expense and source amount for income by default because it's amount with changing currency.
 			// Meanwhile source amount for expense and destination amount for income always have the same currency as account.
-			$showSrcAmount = ($trans_type != EXPENSE);
-			if ($trans_type == TRANSFER)
+			$showSrcAmount = ($tr["type"] != EXPENSE);
+			if ($tr["type"] == TRANSFER)
 				$showDestAmount = ($srcAmountCurr != $destAmountCurr);
 			else
-				$showDestAmount = ($trans_type != INCOME);
+				$showDestAmount = ($tr["type"] != INCOME);
 		}
 		else
 		{
@@ -421,13 +417,13 @@ class TransactionsController extends Controller
 		$currArr = $this->currModel->getData();
 
 		$accArr = $this->accModel->getData();
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 			$persArr = $this->personMod->getData();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
 
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 		{
 			if ($noAccount)
 			{
@@ -458,7 +454,7 @@ class TransactionsController extends Controller
 		$rtSrcAmount = $this->currModel->format($tr["src_amount"], $srcAmountCurr);
 		$rtDestAmount = $this->currModel->format($tr["dest_amount"], $destAmountCurr);
 		$rtExchange = $exchValue." ".$exchSign;
-		if ($trans_type != DEBT)
+		if ($tr["type"] != DEBT)
 		{
 			$rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr) : NULL;
 			$rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr) : NULL;
@@ -472,7 +468,7 @@ class TransactionsController extends Controller
 		$dateFmt = date("d.m.Y");
 
 		$titleString = "Jezve Money | ";
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 			$headString = "New debt";
 		else
 			$headString = "New transaction";
@@ -507,16 +503,15 @@ class TransactionsController extends Controller
 			$this->fail($defMsg);
 
 		$tr = $this->model->getProperties($trans_id);
-		$trans_type = $tr["type"];			// TODO : temporarily
 
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 		{
 			$debtMod = DebtModel::getInstance();
 		}
 
-		$acc_count = $this->accModel->getCount([ "full" => ($trans_type == DEBT) ]);
+		$acc_count = $this->accModel->getCount([ "full" => ($tr["type"] == DEBT) ]);
 
-		if ($trans_type != DEBT)
+		if ($tr["type"] != DEBT)
 		{
 			// get information about source and destination accounts
 			$src = $this->accModel->getProperties($tr["src_id"]);
@@ -542,9 +537,9 @@ class TransactionsController extends Controller
 		$formAction = BASEURL."transactions/".$action."/";
 
 		$srcBalTitle = "Result balance";
-		if ($trans_type == EXPENSE || $trans_type == TRANSFER)
+		if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER)
 		{
-			if ($trans_type == TRANSFER)
+			if ($tr["type"] == TRANSFER)
 				$srcBalTitle .= " (Source)";
 
 			$balDiff = $tr["src_amount"];
@@ -552,9 +547,9 @@ class TransactionsController extends Controller
 		}
 
 		$destBalTitle = "Result balance";
-		if ($trans_type == INCOME || $trans_type == TRANSFER)
+		if ($tr["type"] == INCOME || $tr["type"] == TRANSFER)
 		{
-			if ($trans_type == TRANSFER)
+			if ($tr["type"] == TRANSFER)
 				$destBalTitle .= " (Destination)";
 
 			$balDiff = $tr["dest_amount"];
@@ -564,11 +559,11 @@ class TransactionsController extends Controller
 		$transAcc_id = 0;		// main transaction account id
 		$transAccCurr = 0;		// currency of transaction account
 
-		if ($trans_type != DEBT)
+		if ($tr["type"] != DEBT)
 		{
-			if ((($trans_type == EXPENSE && $tr["dest_id"] == 0) || ($trans_type == TRANSFER && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
+			if ((($tr["type"] == EXPENSE && $tr["dest_id"] == 0) || ($tr["type"] == TRANSFER && $tr["dest_id"] != 0)) && $tr["src_id"] != 0)
 				$transAcc_id = $tr["src_id"];
-			else if ($trans_type == INCOME && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
+			else if ($tr["type"] == INCOME && $tr["dest_id"] != 0 && $tr["src_id"] == 0)
 				$transAcc_id = $tr["dest_id"];
 
 			$accObj = $this->accModel->getItem($transAcc_id);
@@ -579,12 +574,12 @@ class TransactionsController extends Controller
 
 			if ($srcAmountCurr == $destAmountCurr)
 			{
-				if ($trans_type == EXPENSE)
+				if ($tr["type"] == EXPENSE)
 				{
 					$showSrcAmount = FALSE;
 					$showDestAmount = TRUE;
 				}
-				else if ($trans_type == INCOME || $trans_type == TRANSFER)
+				else if ($tr["type"] == INCOME || $tr["type"] == TRANSFER)
 				{
 					$showSrcAmount = TRUE;
 					$showDestAmount = FALSE;
@@ -655,13 +650,13 @@ class TransactionsController extends Controller
 		$currArr = $this->currModel->getData();
 
 		$accArr = $this->accModel->getData();
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 			$persArr = $this->personMod->getData();
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
 
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 		{
 			if ($noAccount)
 			{
@@ -699,7 +694,7 @@ class TransactionsController extends Controller
 		$rtExchange = $exchValue." ".$exchSign;
 		if ($exchValue != 1)
 			$rtExchange .= " (".$backExchValue." ".$backExchSign.")";
-		if ($trans_type != DEBT)
+		if ($tr["type"] != DEBT)
 		{
 			$rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr) : NULL;
 			$rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr) : NULL;
@@ -714,7 +709,7 @@ class TransactionsController extends Controller
 		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
 
 		$titleString = "Jezve Money | ";
-		if ($trans_type == DEBT)
+		if ($tr["type"] == DEBT)
 			$headString = "Edit debt";
 		else
 			$headString = "Edit transaction";
