@@ -366,6 +366,11 @@ class UserModel extends CachedTable
 	}
 
 
+	protected function preUpdate($item_id, $params)
+	{
+	}
+
+
 	// Loggin in user
 	public function login($login, $password)
 	{
