@@ -756,7 +756,7 @@ class TransactionModel extends CachedTable
 	// Return condition string for list of accounts
 	private function getAccCondition($accounts = NULL)
 	{
-		$setCond = $this->inSetCondition($accounts);
+		$setCond = inSetCondition($accounts);
 		if (is_null($setCond))
 			return "";
 

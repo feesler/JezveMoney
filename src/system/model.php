@@ -72,21 +72,6 @@ abstract class Model
 	protected function postDelete($item_id){}
 
 
-	// Return right part of query condition to check field equal id or in set of ids
-	// Zero values are omitted. In case no valid values found NULL is returned
-	public function inSetCondition($ids)
-	{
-		if (is_null($ids))
-			return NULL;
-
-		$validIds = skipZeros($ids);
-		if (!count($validIds))
-			return NULL;
-
-		return (count($validIds) == 1) ? "=".$validIds[0] : " IN (".implode(",", $validIds).")";
-	}
-
-
 	// Delete specified item
 	public function del($item_id)
 	{
