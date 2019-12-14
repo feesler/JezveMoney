@@ -559,17 +559,17 @@ class UserModel extends CachedTable
 
 
 	// Delete user and all related data
-	protected function preDelete($user_id)
+	protected function preDelete($items)
 	{
-		$u_id = intval($user_id);
-		if (!$u_id)
-			return FALSE;
-
 		$accMod = AccountModel::getInstance();
-		if (!$accMod->reset())
+		if (!$accMod->reset($items))
 			return FALSE;
 
-		if (!$this->dbObj->deleteQ("persons", "user_id=".$u_id))
+		$setCond = inSetCondition($items);
+		if (is_null($setCond))
+			return FALSE;
+
+		if (!$this->dbObj->deleteQ("persons", "user_id".$setCond))
 			return FALSE;
 
 		return TRUE;

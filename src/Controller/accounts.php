@@ -166,13 +166,9 @@ class AccountsController extends Controller
 		if (!isset($_POST["accounts"]))
 			fail($defMsg);
 
-		$acc_arr = explode(",", $_POST["accounts"]);
-		foreach($acc_arr as $acc_id)
-		{
-			$acc_id = intval($acc_id);
-			if (!$this->model->del($acc_id))
-				$this->fail($defMsg);
-		}
+		$ids = explode(",", rawurldecode($_POST["accounts"]));
+		if (!$this->model->del($ids))
+			$this->fail($defMsg);
 
 		setMessage(MSG_ACCOUNT_DELETE);
 

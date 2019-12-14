@@ -270,15 +270,8 @@ class TransactionApiController extends ApiController
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$respObj->fail("No account specified");
 
-		foreach($ids as $trans_id)
-		{
-			$trans_id = intval($trans_id);
-			if (!$trans_id)
-				continue;
-
-			if (!$this->model->del($trans_id))
-				$respObj->fail();
-		}
+		if (!$this->model->del($ids))
+			$respObj->fail();
 
 		$respObj->ok();
 	}

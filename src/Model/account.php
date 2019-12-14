@@ -229,44 +229,45 @@ class AccountModel extends CachedTable
 
 
 	// Preparations for item delete
-	protected function preDelete($item_id)
+	protected function preDelete($items)
 	{
-		// check account is exist
-		$accObj = $this->getItem($item_id);
-		if (!$accObj)
-			return FALSE;
-
-		// check user of account
-		if ($accObj->user_id != self::$user_id)
-			return FALSE;
-
-		$transMod = TransactionModel::getInstance();
-		if (!$transMod->onAccountDelete($item_id))
+		foreach($items as $item_id)
 		{
-			wlog("trans->onAccountDelete(".$item_id.") return FALSE");
-			return FALSE;
+			// check account is exist
+			$accObj = $this->getItem($item_id);
+			if (!$accObj)
+				return FALSE;
+
+			// check user of account
+			if ($accObj->user_id != self::$user_id)
+				return FALSE;
 		}
 
-		return TRUE;
+		$transMod = TransactionModel::getInstance();
+
+		return $transMod->onAccountDelete($items);
 	}
 
 
-	// Remove accounts of specified person
-	public function onPersonDelete($p_id)
+	// Remove accounts of specified person(s)
+	public function onPersonDelete($persons)
 	{
+		if (is_null($persons))
+			return;
+		if (!is_array($persons))
+			$persons = [ $persons ];
+
 		if (!$this->checkCache())
 			return FALSE;
 
+		$accToDel = [];
 		foreach($this->cache as $acc_id => $item)
 		{
-			if ($item->owner_id == $p_id)
-			{
-				if (!$this->del($acc_id))
-					return FALSE;
-			}
+			if (in_array($item->owner_id, $persons))
+				$accToDel[] = $acc_id;
 		}
 
-		return TRUE;
+		return $this->del($accToDel);
 	}
 
 
@@ -290,14 +291,18 @@ class AccountModel extends CachedTable
 
 
 	// Delete all accounts of user
-	public function reset()
+	public function reset($users)
 	{
+		$setCond = inSetCondition($users);
+		if (is_null($setCond))
+			return TRUE;
+
 		// delete all transactions of user
-		if (!$this->dbObj->deleteQ("transactions", "user_id=".self::$user_id))
+		if (!$this->dbObj->deleteQ("transactions", "user_id".$setCond))
 			return FALSE;
 
 		// delete all accounts of user
-		if (!$this->dbObj->deleteQ($this->tbl_name, "user_id=".self::$user_id))
+		if (!$this->dbObj->deleteQ($this->tbl_name, "user_id".$setCond))
 			return FALSE;
 
 		$this->cleanCache();

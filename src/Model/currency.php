@@ -181,16 +181,19 @@ class CurrencyModel extends CachedTable
 
 
 	// Preparations for item delete
-	protected function preDelete($item_id)
+	protected function preDelete($items)
 	{
-		// check currency is exist
-		$currObj = $this->getItem($item_id);
-		if (!$currObj)
-			return FALSE;
+		foreach($items as $item_id)
+		{
+			// check currency is exist
+			$currObj = $this->getItem($item_id);
+			if (!$currObj)
+				return FALSE;
 
-		// don't delete currencies in use
-		if ($this->isInUse($item_id))
-			return FALSE;
+			// don't delete currencies in use
+			if ($this->isInUse($item_id))
+				return FALSE;
+		}
 
 		return TRUE;
 	}

@@ -67,27 +67,32 @@ abstract class Model
 
 
 	// Check delete conditions and return boolean result
-	abstract protected function preDelete($item_id);
+	abstract protected function preDelete($items);
 	// Perform model-specific actions after delete successfully completed
-	protected function postDelete($item_id){}
+	protected function postDelete($items){}
 
 
 	// Delete specified item
-	public function del($item_id)
+	public function del($items)
 	{
-		$item_id = intval($item_id);
-		if (!$item_id)
+		if (!is_array($items))
+			$items = [ $items ];
+		if (!count($items))
+			return TRUE;
+
+		$setCond = inSetCondition($items);
+		if (is_null($setCond))
 			return FALSE;
 
-		$prepareRes = $this->preDelete($item_id);
+		$prepareRes = $this->preDelete($items);
 		if (!$prepareRes)
 			return FALSE;
 
-		$qRes = $this->dbObj->deleteQ($this->tbl_name, "id=".$item_id);
+		$qRes = $this->dbObj->deleteQ($this->tbl_name, "id".$setCond);
 		if (!$qRes)
 		    return FALSE;
 
-		$this->postDelete($item_id);
+		$this->postDelete($items);
 
 		return TRUE;
 	}

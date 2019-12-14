@@ -107,15 +107,8 @@ class AccountApiController extends ApiController
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$respObj->fail("No account specified");
 
-		foreach($ids as $acc_id)
-		{
-			$acc_id = intval($acc_id);
-			if (!$acc_id)
-				continue;
-
-			if (!$this->model->del($acc_id))
-				$respObj->fail();
-		}
+		if (!$this->model->del($ids))
+			$respObj->fail();
 
 		$respObj->ok();
 	}
@@ -125,7 +118,7 @@ class AccountApiController extends ApiController
 	{
 		$respObj = new apiResponse;
 
-		if (!$this->model->reset())
+		if (!$this->model->reset($this->user_id))
 			$respObj->fail();
 
 		$respObj->ok();

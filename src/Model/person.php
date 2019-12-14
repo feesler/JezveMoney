@@ -177,22 +177,20 @@ class PersonModel extends CachedTable
 	}
 
 
-	// Preparations for item delete
-	protected function preDelete($item_id)
+	// Preparations for items delete
+	protected function preDelete($items)
 	{
-		// check person is exist
-		$currObj = $this->getItem($item_id);
-		if (!$currObj)
-			return FALSE;
-
 		$accMod = AccountModel::getInstance();
-		if (!$accMod->onPersonDelete($item_id))
+
+		foreach($items as $item_id)
 		{
-			wlog("accMod->onPersonDelete(".$item_id.") return FALSE");
-			return FALSE;
+			// check person is exist
+			$pObj = $this->getItem($item_id);
+			if (!$pObj)
+				return FALSE;
 		}
 
-		return TRUE;
+		return $accMod->onPersonDelete($items);
 	}
 
 
@@ -299,9 +297,9 @@ class PersonModel extends CachedTable
 	public function getItem($obj_id)
 	{
 		$item = parent::getItem($obj_id);
-		if (intval($obj_id) && UserModel::isAdminUser())
+		if (is_null($item) && intval($obj_id) && UserModel::isAdminUser())
 		{
-			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "id=".intval($obj_id), NULL, "id ASC");
+			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "id=".intval($obj_id));
 			$row = $this->dbObj->fetchRow($qResult);
 			$item = $this->rowToObj($row);
 		}

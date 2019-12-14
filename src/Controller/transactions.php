@@ -35,7 +35,7 @@ class TransactionsController extends Controller
 		$accFilter = [];
 		if (isset($_GET["acc_id"]))
 		{
-			$accExpl = explode(",", $_GET["acc_id"]);
+			$accExpl = explode(",", rawurldecode($_GET["acc_id"]));
 			foreach($accExpl as $acc_id)
 			{
 				$acc_id = intval(trim($acc_id));
@@ -921,13 +921,10 @@ class TransactionsController extends Controller
 
 		if (!isset($_POST["transactions"]))
 			$this->fail($defMsg);
-		$trans_arr = explode(",", $_POST["transactions"]);
-		foreach($trans_arr as $trans_id)
-		{
-			$trans_id = intval($trans_id);
-			if (!$this->model->del($trans_id))
-				$this->fail();
-		}
+
+		$ids = explode(",", $_POST["transactions"]);
+		if (!$this->model->del($ids))
+			$this->fail();
 
 		setMessage(MSG_TRANS_DELETE);
 		setLocation(BASEURL."transactions/");

@@ -140,13 +140,9 @@ class PersonsController extends Controller
 		if (!isset($_POST["persons"]))
 			$this->fail($defMsg);
 
-		$p_arr = explode(",", $_POST["persons"]);
-		foreach($p_arr as $p_id)
-		{
-			$p_id = intval($p_id);
-			if (!$this->personMod->del($p_id))
-				$this->fail($defMsg);
-		}
+		$ids = explode(",", rawurldecode($_POST["persons"]));
+		if (!$this->personMod->del($ids))
+			$this->fail($defMsg);
 
 		setMessage(MSG_PERSON_DELETE);
 

@@ -97,15 +97,8 @@ class PersonApiController extends ApiController
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$respObj->fail("No persons specified");
 
-		foreach($ids as $item_id)
-		{
-			$item_id = intval($item_id);
-			if (!$item_id)
-				continue;
-
-			if (!$this->personMod->del($item_id))
-				$respObj->fail();
-		}
+		if (!$this->personMod->del($ids))
+			$respObj->fail();
 
 		$respObj->ok();
 	}
