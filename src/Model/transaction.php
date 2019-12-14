@@ -756,35 +756,11 @@ class TransactionModel extends CachedTable
 	// Return condition string for list of accounts
 	private function getAccCondition($accounts = NULL)
 	{
-		if (is_null($accounts))
+		$setCond = $this->inSetCondition($accounts);
+		if (is_null($setCond))
 			return "";
 
-		$accCond = [];
-		if (is_array($accounts))
-		{
-			$accIds = [];
-			foreach($accounts as $acc_id)
-			{
-				$acc_id = intval($acc_id);
-				if ($acc_id)
-					$accIds[] = $acc_id;
-			}
-
-			$accList = implode(",", $accIds);
-			$accCond[] = "src_id IN (".$accList.")";
-			$accCond[] = "dest_id IN (".$accList.")";
-		}
-		else
-		{
-			$acc_id = intval($accounts);
-			if ($acc_id)
-			{
-				$accCond[] = "src_id=".$acc_id;
-				$accCond[] = "dest_id=".$acc_id;
-			}
-		}
-
-		return orJoin($accCond);
+		return orJoin([ "src_id".$setCond, "dest_id".$setCond ]);
 	}
 
 
