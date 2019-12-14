@@ -78,17 +78,8 @@ abstract class Model
 	{
 		if (is_null($ids))
 			return NULL;
-		if (!is_array($ids))
-			$ids = [ $ids ];
 
-		$validIds = [];
-		foreach($ids as $id)
-		{
-			$id = intval($id);
-			if ($id)
-				$validIds[] = $id;
-		}
-
+		$validIds = skipZeros($ids);
 		if (!count($validIds))
 			return NULL;
 

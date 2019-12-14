@@ -315,3 +315,20 @@
 		$mtime = filemtime(APPROOT.$file);
 		return $file."?".$mtime;
 	}
+
+
+	function skipZeros($arr)
+	{
+		$res = [];
+		if (!is_array($arr))
+			$arr = [ $arr ];
+
+		foreach($arr as $val)
+		{
+			$val = intval($val);
+			if ($val)
+				$res[] = $val;
+		}
+
+		return $res;
+	}
