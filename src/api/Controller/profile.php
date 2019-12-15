@@ -21,7 +21,7 @@ class ProfileApiController extends ApiController
 		if (!$pObj)
 			$respObj->fail("Person not found");
 
-		$respObj->data = ["name" => $pObj->name];
+		$respObj->data = [ "user_id" => $this->user_id, "name" => $pObj->name ];
 		$respObj->ok();
 	}
 
