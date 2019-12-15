@@ -16,11 +16,13 @@ if (typeof module !== 'undefined' && module.exports)
 	var runAPI = require('./run/api.js');
 
 	var common = require('./common.js');
+	var api = require('./api.js');
 	var config = require('./config.js');
 }
 else
 {
 	var common = commonModule;
+	var api = apiModule;
 }
 
 
@@ -47,7 +49,7 @@ var App = {
 
 	config,
 
-	user_id : 2,
+	user_id : null,
 
 	run : {},
 
@@ -77,6 +79,28 @@ var App = {
 		runAPI.onAppUpdate(notification);
 	},
 
+	init : async function(view)
+	{
+		for(let key in common)
+		{
+			App[key] = common[key];
+		}
+
+		api.setEnv(view.props.environment, this);
+
+		let loginResult = await api.user.login(config.testUser.login, config.testUser.password);
+		if (!loginResult)
+			throw new Error('Fail to login');
+
+		let userProfile = await api.profile.read();
+		if (!userProfile || !userProfile.user_id)
+			throw new Error('Fail to read user profile');
+
+		this.user_id = userProfile.user_id;
+
+		App.notify();
+	},
+
 	goToMainView : goToMainView
 };
 
@@ -85,12 +109,7 @@ async function startTests(view)
 {
 	console.log('Starting tests');
 
-	for(let key in common)
-	{
-		App[key] = common[key];
-	}
-
-	App.notify();
+	await App.init(view);
 
 	view = await apiTests(view);
 	view = await profileTests(view);
