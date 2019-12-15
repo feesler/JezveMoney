@@ -324,8 +324,14 @@ var Environment = (function()
 	}
 
 
-	async function initTests(config, navHandler)
+	async function initTests(app)
 	{
+		if (!app)
+			throw new Error('Invalid App');
+
+		if (!app.config || !app.config.url)
+			throw new Error('Invalid config: test URL not found');
+
 		var startbtn = ge('startbtn');
 		totalRes = ge('totalRes');
 		okRes = ge('okRes');
@@ -335,10 +341,7 @@ var Environment = (function()
 		if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
 			throw new Error('Fail to init tests');
 
-		if (!config || !config.url)
-			throw new Error('Invalid config: test URL not found');
-
-		baseURL = config.url;
+		baseURL = app.config.url;
 
 		startbtn.onclick = async function()
 		{
@@ -352,7 +355,7 @@ var Environment = (function()
 				await addResult('Test initialization', true);
 
 				let view = await navigation(async () => viewframe.src = baseURL );
-				view = await navHandler(view);
+				view = await app.startTests(view);
 			}
 			catch(e)
 			{

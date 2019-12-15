@@ -101,6 +101,7 @@ var App = {
 		App.notify();
 	},
 
+	startTests,
 	goToMainView : goToMainView
 };
 
@@ -435,11 +436,8 @@ async function transactionsListTests(view)
 }
 
 
-var main = { config : App.config,
-				startTests : startTests };
-
 
 if (typeof module !== 'undefined' && module.exports)
 {
-	module.exports = main;
+	module.exports = App;
 }
