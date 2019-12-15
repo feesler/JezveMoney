@@ -24,6 +24,7 @@ var runTransactionAPI = (function()
 	}
 
 
+	// Convert date string from DD.MM.YYYY format to YYYY-MM-DD
 	function convDate(dateStr)
 	{
 		return (dateStr) ? Date.parse(dateStr.split('.').reverse().join('-')) : null;
@@ -263,16 +264,13 @@ var runTransactionAPI = (function()
 		let updateRes;
 
 		let accBefore = await api.account.list();
+		let trBefore = await api.transaction.list();
+		let origTrans = App.idSearch(trBefore, params.id);
 
-		let trList = await api.transaction.read(params.id);
-		let origTrans = trList[0];
 		let updParams = App.copyObject(origTrans);
 
 		updParams.transtype = updParams.type;
 		delete updParams.type;
-
-		let origDate = new Date(updParams.date);
-		updParams.date = App.formatDate(origDate);
 
 		let fullAccList = await api.account.list(true);
 
@@ -330,9 +328,6 @@ var runTransactionAPI = (function()
 				updParams.dest_curr = acc.curr_id;
 			}
 		}
-
-		let trBefore = await api.transaction.list();
-		let origTrans = App.idSearch(trBefore, updParams.id);
 
 		await App.test('Update ' + getTypeStr(origTrans.type) + ' transaction', async () =>
 		{
