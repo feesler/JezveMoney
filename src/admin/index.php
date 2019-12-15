@@ -7,7 +7,7 @@
 							"query" => "QueryAdminController",
 							"log" => "LogsAdminController",
 							"tests" => "TestsAdminController",
-							"apitest" => "APITestAdminController",
+							"apiconsole" => "ApiConsoleAdminController",
 							"user" => "UserAdminController"];
 
 	$actionsMap = ["new" => "create",

@@ -43,7 +43,7 @@
 					"QueryAdminController" => "admin/Controller/query.php",
 					"LogsAdminController" => "admin/Controller/log.php",
 					"TestsAdminController" => "admin/Controller/tests.php",
-					"APITestAdminController" => "admin/Controller/apitest.php",
+					"ApiConsoleAdminController" => "admin/Controller/apiconsole.php",
 				// Models
 					"AccountModel" => "Model/account.php",
 					"CurrencyModel" => "Model/currency.php",
