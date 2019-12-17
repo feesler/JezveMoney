@@ -15,8 +15,10 @@ var runDebt = (function()
 	}
 
 
-	async function submitDebtTransaction(view, params)
+	async function submitDebtTransaction(app, params)
 	{
+		let view = app.view;
+
 		if ('acc' in params)
 		{
 			if (params.acc === null)
@@ -73,7 +75,7 @@ var runDebt = (function()
 		if ('comment' in params)
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
-		App.beforeSubmitTransaction = { person : view.model.person,
+		app.beforeSubmitTransaction = { person : view.model.person,
 		 								personPos : await view.getPersonPos(view.model.person.id),
 										personAccount : view.getPersonAccount(view.model.person, view.model.src_curr_id),
 										noAccount : view.model.noAccount,
@@ -82,43 +84,45 @@ var runDebt = (function()
 										srcAmount : view.model.fSrcAmount,
 										destAmount : view.model.fDestAmount };
 
-		if (!App.beforeSubmitTransaction.personAccount)
+		if (!app.beforeSubmitTransaction.personAccount)
 		{
-			App.beforeSubmitTransaction.personAccount = { curr_id : view.model.src_curr_id, balance : 0 };
-			App.beforeSubmitTransaction.person.accounts.push(App.beforeSubmitTransaction.personAccount);
+			app.beforeSubmitTransaction.personAccount = { curr_id : view.model.src_curr_id, balance : 0 };
+			app.beforeSubmitTransaction.person.accounts.push(app.beforeSubmitTransaction.personAccount);
 		}
 
-		if (App.beforeSubmitTransaction.acc)
-			App.beforeSubmitTransaction.accPos = await view.getAccountPos(view.model.account.id);
-		App.notify();
+		if (app.beforeSubmitTransaction.acc)
+			app.beforeSubmitTransaction.accPos = await view.getAccountPos(view.model.account.id);
+		app.notify();
 
 		return view.submit();
 	}
 
 
-	async function createDebt(view, onState, params)
+	async function createDebt(app, onState, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Create debt (' + titleParams.join(', ') + ')', 2);
 
-		view = await App.goToMainView(view)
-		view = await view.goToNewTransactionByAccount(0);
-		view = await view.changeTransactionType(App.DEBT);
-		view = await debtTransactionLoop(view, onState, view => submitDebtTransaction(view, params));
+		await app.goToMainView(app)
+		await app.view.goToNewTransactionByAccount(0);
+		await app.view.changeTransactionType(app.DEBT);
+		await debtTransactionLoop(app, onState, app => submitDebtTransaction(app, params));
 
-		let person = App.beforeSubmitTransaction.person;
-		let personPos = App.beforeSubmitTransaction.personPos;
-		let personAccount = App.beforeSubmitTransaction.personAccount;
-		let acc = App.beforeSubmitTransaction.acc;
-		let accPos = App.beforeSubmitTransaction.accPos;
-		let debtType = App.beforeSubmitTransaction.debtType;
+		let person = app.beforeSubmitTransaction.person;
+		let personPos = app.beforeSubmitTransaction.personPos;
+		let personAccount = app.beforeSubmitTransaction.personAccount;
+		let acc = app.beforeSubmitTransaction.acc;
+		let accPos = app.beforeSubmitTransaction.accPos;
+		let debtType = app.beforeSubmitTransaction.debtType;
 
 		var state = { values : { widgets : { length : 5 } } };
 		var sa, da;
 
-		sa = da = App.normalize(params.srcAmount);
+		sa = da = app.normalize(params.srcAmount);
 
 		if (debtType)
 		{
@@ -138,13 +142,13 @@ var runDebt = (function()
 			if (pacc.balance == 0)
 				return val;
 
-			let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
+			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
 			return val.concat(fmtBal);
 		}, []);
 
 		let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
-		var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
+		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
 		personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 
 		state.values.widgets[3] = personsWidget;
@@ -152,8 +156,8 @@ var runDebt = (function()
 		// Accounts widget changes
 		if (acc)
 		{
-			var fmtAccBal = App.formatCurrency(acc.balance, acc.curr_id);
-			var accWidget = { tiles : { items : { length : App.accounts.length } } };
+			var fmtAccBal = app.formatCurrency(acc.balance, acc.curr_id);
+			var accWidget = { tiles : { items : { length : app.accounts.length } } };
 			accWidget.tiles.items[accPos] = { balance : fmtAccBal, name : acc.name };
 
 			state.values.widgets[0] = accWidget;
@@ -161,7 +165,7 @@ var runDebt = (function()
 
 		// Transactions widget changes
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
+							transList : { items : { length : Math.min(app.transactions.length + 1, 5) } } };
 		var title = '';
 		var fmtAmount;
 
@@ -179,28 +183,28 @@ var runDebt = (function()
 			title += person.name;
 			fmtAmount = (acc) ? '- ' : '+ ';
 		}
-		fmtAmount += App.formatCurrency(sa, personAccount.curr_id);
+		fmtAmount += app.formatCurrency(sa, personAccount.curr_id);
 
 		transWidget.transList.items[0] = { accountTitle : title,
 										amountText : fmtAmount,
-									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		state.values.widgets[2] = transWidget;
 
-		await test('Debt transaction submit', async () => {}, view, state);
+		await test('Debt transaction submit', async () => {}, app.view, state);
 
-		App.transactions = view.content.widgets[2].transList.items;
-		App.accounts = view.content.widgets[0].tiles.items;
-		App.persons = view.content.widgets[3].infoTiles.items;
-		App.notify();
-
-		return view;
+		app.transactions = app.view.content.widgets[2].transList.items;
+		app.accounts = app.view.content.widgets[0].tiles.items;
+		app.persons = app.view.content.widgets[3].infoTiles.items;
+		app.notify();
 	}
 
 
-	async function updateDebt(view, pos, params)
+	async function updateDebt(app, pos, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
@@ -210,25 +214,27 @@ var runDebt = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!App.isObject(params))
+		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
 
 		// Step
-		view = await App.goToMainView(view);
-		view = await view.goToTransactions();
-		view = await view.filterByType(App.DEBT);
+		await app.goToMainView(app);
+		await app.view.goToTransactions();
+		await app.view.filterByType(app.DEBT);
+		view = app.view;
 
 		// Step
-		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
+		app.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
 		let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
 		if (!trObj)
 			throw new Error('Transaction not found');
 
-		App.beforeUpdateTransaction.trObj = trObj;
-		App.notify();
+		app.beforeUpdateTransaction.trObj = trObj;
+		app.notify();
 
-		view = await view.goToUpdateTransaction(pos);
+		await app.view.goToUpdateTransaction(pos);
+		view = app.view;
 
 		// Step
 		let expState;
@@ -239,7 +245,7 @@ var runDebt = (function()
 
 		await test('Initial state of update debt view', async () => view.setExpectedState(expState), view);
 
-		App.setParam(App.beforeUpdateTransaction,
+		app.setParam(app.beforeUpdateTransaction,
 					{ id : view.model.id,
 						person : view.model.person,
 							personPos : await view.getPersonPos(view.model.person.id),
@@ -254,21 +260,21 @@ var runDebt = (function()
 						destAmount : view.model.fDestAmount,
 						date : view.model.date,
 						comment : view.model.comment});
-		App.notify();
+		app.notify();
 
-		view = await submitDebtTransaction(view, params);
+		await submitDebtTransaction(app, params);
 
 		// Step
-		view = await view.filterByType(App.DEBT);
+		await app.view.filterByType(app.DEBT);
 
-		let trans_id = App.beforeUpdateTransaction.id;
-		let transCount = App.beforeUpdateTransaction.trCount;
-		let updPerson = App.beforeSubmitTransaction.person;
-		let updPersonAccount = App.beforeSubmitTransaction.personAccount;
-		let updAcc = App.beforeSubmitTransaction.acc;
-		let updNoAccount = App.beforeSubmitTransaction.noAccount;
-		let updDebtType = App.beforeSubmitTransaction.debtType;
-		let updSrcAmount = App.beforeSubmitTransaction.srcAmount;
+		let trans_id = app.beforeUpdateTransaction.id;
+		let transCount = app.beforeUpdateTransaction.trCount;
+		let updPerson = app.beforeSubmitTransaction.person;
+		let updPersonAccount = app.beforeSubmitTransaction.personAccount;
+		let updAcc = app.beforeSubmitTransaction.acc;
+		let updNoAccount = app.beforeSubmitTransaction.noAccount;
+		let updDebtType = app.beforeSubmitTransaction.debtType;
+		let updSrcAmount = app.beforeSubmitTransaction.srcAmount;
 
 		// Transactions list changes
 		var title = '';
@@ -288,39 +294,39 @@ var runDebt = (function()
 			title += updPerson.name;
 			fmtAmount = (updAcc && !updNoAccount) ? '- ' : '+ ';
 		}
-		fmtAmount += App.formatCurrency(updSrcAmount, updPersonAccount.curr_id);
+		fmtAmount += app.formatCurrency(updSrcAmount, updPersonAccount.curr_id);
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : title,
 											amountText : fmtAmount,
-										 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
+										 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 										 	comment : ('comment' in params) ? params.comment : '' };
 
-		await test('Transaction update', async () => {}, view, state);
+		await test('Transaction update', async () => {}, app.view, state);
 
-		view = await App.goToMainView(view);
+		await app.goToMainView(app);
 
 		// Step
-		let origPerson = App.beforeUpdateTransaction.person;
-		let origPersonPos = App.beforeUpdateTransaction.personPos;
-		let origPersonAccount = App.beforeUpdateTransaction.personAccount;
-		let origAcc = App.beforeUpdateTransaction.acc;
-		let origAccPos = App.beforeUpdateTransaction.accPos;
-		let origDebtType = App.beforeUpdateTransaction.debtType;
-		let origAmount = App.beforeUpdateTransaction.srcAmount;
-		let origNoAccount = App.beforeUpdateTransaction.noAccount;
+		let origPerson = app.beforeUpdateTransaction.person;
+		let origPersonPos = app.beforeUpdateTransaction.personPos;
+		let origPersonAccount = app.beforeUpdateTransaction.personAccount;
+		let origAcc = app.beforeUpdateTransaction.acc;
+		let origAccPos = app.beforeUpdateTransaction.accPos;
+		let origDebtType = app.beforeUpdateTransaction.debtType;
+		let origAmount = app.beforeUpdateTransaction.srcAmount;
+		let origNoAccount = app.beforeUpdateTransaction.noAccount;
 
-		let updPersonPos = App.beforeSubmitTransaction.personPos;
-		let updAccPos = App.beforeSubmitTransaction.accPos;
-		let updAmount = App.beforeSubmitTransaction.srcAmount;
+		let updPersonPos = app.beforeSubmitTransaction.personPos;
+		let updAccPos = app.beforeSubmitTransaction.accPos;
+		let updAmount = app.beforeSubmitTransaction.srcAmount;
 
 		var state = { values : { widgets : { length : 5 } } };
 		var sa, da;
 
-		sa = da = App.normalize(origAmount);
+		sa = da = app.normalize(origAmount);
 
-		var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
+		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
 
 		// Cancel transaction
 		if (origDebtType)
@@ -337,7 +343,7 @@ var runDebt = (function()
 		}
 
 		// Apply new transaction
-		sa = da = App.normalize(updAmount);
+		sa = da = app.normalize(updAmount);
 		if (updDebtType)
 		{
 			updPersonAccount.balance -= sa;
@@ -358,7 +364,7 @@ var runDebt = (function()
 				if (pacc.balance == 0)
 					return val;
 
-				let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
+				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
 				return val.concat(fmtBal);
 			}, []);
 
@@ -371,7 +377,7 @@ var runDebt = (function()
 			if (pacc.balance == 0)
 				return val;
 
-			let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
+			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
 			return val.concat(fmtBal);
 		}, []);
 
@@ -382,40 +388,40 @@ var runDebt = (function()
 		state.values.widgets[3] = personsWidget;
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		if (origAcc && !origNoAccount)
 		{
-			var fmtAccBal = App.formatCurrency(origAcc.balance, origAcc.curr_id);
+			var fmtAccBal = app.formatCurrency(origAcc.balance, origAcc.curr_id);
 			accWidget.tiles.items[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
 		}
 		if (updAcc && !updNoAccount)
 		{
-			var fmtAccBal = App.formatCurrency(updAcc.balance, updAcc.curr_id);
+			var fmtAccBal = app.formatCurrency(updAcc.balance, updAcc.curr_id);
 			accWidget.tiles.items[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
 		}
 
 		state.values.widgets[0] = accWidget;
 
-		await test('Account and person balance update', async () => {}, view, state);
+		await test('Account and person balance update', async () => {}, app.view, state);
 
-		App.transactions = view.content.widgets[2].transList.items;
-		App.accounts = view.content.widgets[0].tiles.items;
-		App.persons = view.content.widgets[3].infoTiles.items;
-		App.notify();
-
-		return view;
+		app.transactions = app.view.content.widgets[2].transList.items;
+		app.accounts = app.view.content.widgets[0].tiles.items;
+		app.persons = app.view.content.widgets[3].infoTiles.items;
+		app.notify();
 	}
 
 
-	async function debtTransactionLoop(view, actionState, action)
+	async function debtTransactionLoop(app, actionState, action)
 	{
+		let view = app.view;
+
 		view.setBlock('Debt loop', 2);
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);
 		var actionRequested = !isNaN(actionState);
 		if (actionState === 0)
-			return action(view);
+			return action(app);
 
 	// Input source amount
 		await test('Source amount (1) input', () => view.inputSrcAmount('1'), view);

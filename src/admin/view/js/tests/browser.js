@@ -6,6 +6,7 @@ var Environment = (function()
 	var totalRes = null, okRes = null, failRes = null;
 	var baseURL = null;
 	var results = null;
+	var app = null;
 
 
 	function getBaseUrl()
@@ -312,8 +313,10 @@ var Environment = (function()
 
 				let viewClass = await route(env, await getUrl());
 
-				let view = new viewClass({ environment : env });
-				resolve(view.parse());
+				app.view = new viewClass({ app : app, environment : env });
+				await app.view.parse();
+
+				resolve();
 			};
 		});
 
@@ -324,8 +327,10 @@ var Environment = (function()
 	}
 
 
-	async function initTests(app)
+	async function initTests(appInstance)
 	{
+		app = appInstance;
+
 		if (!app)
 			throw new Error('Invalid App');
 
@@ -354,8 +359,8 @@ var Environment = (function()
 
 				await addResult('Test initialization', true);
 
-				let view = await navigation(async () => viewframe.src = baseURL );
-				view = await app.startTests(view);
+				await navigation(() => viewframe.src = baseURL);
+				await app.startTests(app);
 			}
 			catch(e)
 			{

@@ -34,18 +34,22 @@ RegisterView.prototype.parseContent = async function()
 
 RegisterView.prototype.registerAs = async function(login, name, password)
 {
+	let app = this.app;
+
 	await this.input(this.content.loginInp, login);
 	await this.input(this.content.nameInp, name);
  	await this.input(this.content.passwordInp, password);
 
-	let view = await this.navigation(() => this.click(this.content.submitBtn));
+	await this.navigation(() => this.click(this.content.submitBtn));
+
+	let view = app.view;
 	if (!(view instanceof LoginView))
 		throw new Error('Unexpected page');
 
 	if (!view.msgPopup || !view.msgPopup.success || view.msgPopup.message != 'You successfully registered.')
 		throw new Error('Notification popup not appear');
 
-	return view.performAction(() => view.msgPopup.close());
+	await view.performAction(() => view.msgPopup.close());
 };
 
 

@@ -79,14 +79,14 @@ var App = {
 		runAPI.onAppUpdate(notification);
 	},
 
-	init : async function(view)
+	init : async function()
 	{
 		for(let key in common)
 		{
-			App[key] = common[key];
+			this[key] = common[key];
 		}
 
-		api.setEnv(view.props.environment, this);
+		api.setEnv(this.view.props.environment, this);
 
 		let loginResult = await api.user.login(config.testUser.login, config.testUser.password);
 		if (!loginResult)
@@ -98,7 +98,7 @@ var App = {
 
 		this.user_id = userProfile.user_id;
 
-		App.notify();
+		this.notify();
 	},
 
 	startTests,
@@ -106,333 +106,287 @@ var App = {
 };
 
 
-async function startTests(view)
+async function startTests(app)
 {
 	console.log('Starting tests');
 
-	await App.init(view);
+	await app.init();
 
-	view = await apiTests(view);
-	view = await profileTests(view);
-	view = await accountTests(view);
-	view = await personTests(view);
-	view = await transactionTests(view);
-	view = await statistics.run(view);
-	view = await transactionsListTests(view);
-
-	return view;
+	await apiTests(app);
+	await profileTests(app);
+	await accountTests(app);
+	await personTests(app);
+	await transactionTests(app);
+	await statistics.run(app);
+	await transactionsListTests(app);
 }
 
 
-async function profileTests(view)
+async function profileTests(app)
 {
-	view.setBlock('Profile tests', 1);
+	app.view.setBlock('Profile tests', 1);
 
-	view = await profile.register(view, { login : 'newuser', name : 'Newbie', password : '12345' });
-	view = await profile.deleteProfile(view);
-	view = await profile.relogin(view, App.config.testUser);
-	view = await profile.resetAll(view);
-	view = await profile.changeName(view);
-	view = await profile.changePass(view);
-
-	return view;
+	await profile.register(app, { login : 'newuser', name : 'Newbie', password : '12345' });
+	await profile.deleteProfile(app);
+	await profile.relogin(app, app.config.testUser);
+	await profile.resetAll(app);
+	await profile.changeName(app);
+	await profile.changePass(app);
 }
 
 
-async function accountTests(view)
+async function accountTests(app)
 {
-	view.setBlock('Accounts', 1);
+	app.view.setBlock('Accounts', 1);
 
-	view = await goToMainView(view);
-	view = await view.goToAccounts();
-	view = await view.goToCreateAccount();
-	view = await accounts.createAccount1(view);
-	view = await view.goToCreateAccount();
-	view = await accounts.createAccount2(view);
-	view = await view.goToUpdateAccount(0);
-	view = await accounts.editAccount1(view);
-	view = await view.goToCreateAccount();
-	view = await accounts.create(view, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 });
-	view = await accounts.del(view, [0, 1]);
-	view = await view.goToCreateAccount();
-	view = await accounts.create(view, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 });
-	view = await view.goToCreateAccount();
-	view = await accounts.create(view, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 });
-	view = await view.goToCreateAccount();
-	view = await accounts.create(view, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 });
-	view = await view.goToCreateAccount();
-	view = await accounts.create(view, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 });
-
-	return view;
+	await app.goToMainView(app);
+	await app.view.goToAccounts();
+	await app.view.goToCreateAccount();
+	await accounts.createAccount1(app);
+	await app.view.goToCreateAccount();
+	await accounts.createAccount2(app);
+	await app.view.goToUpdateAccount(0);
+	await accounts.editAccount1(app);
+	await app.view.goToCreateAccount();
+	await accounts.create(app, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 });
+	await accounts.del(app, [0, 1]);
+	await app.view.goToCreateAccount();
+	await accounts.create(app, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 });
+	await app.view.goToCreateAccount();
+	await accounts.create(app, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 });
+	await app.view.goToCreateAccount();
+	await accounts.create(app, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 });
+	await app.view.goToCreateAccount();
+	await accounts.create(app, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 });
 }
 
 
-async function personTests(view)
+async function personTests(app)
 {
-	view.setBlock('Persons', 1);
+	app.view.setBlock('Persons', 1);
 
-	view = await goToMainView(view);
-	view = await view.goToPersons();
-	view = await persons.checkInitial(view);
-	view = await persons.create(view, 'Alex');
-	view = await persons.create(view, 'Maria');
-	view = await persons.create(view, 'Johnny');
-	view = await persons.create(view, 'Иван');
-	view = await persons.update(view, 3, 'Ivan<');
-	view = await persons.del(view, [0, 2]);
-
-	return view;
+	await app.goToMainView(app);
+	await app.view.goToPersons();
+	await persons.checkInitial(app);
+	await persons.create(app, 'Alex');
+	await persons.create(app, 'Maria');
+	await persons.create(app, 'Johnny');
+	await persons.create(app, 'Иван');
+	await persons.update(app, 3, 'Ivan<');
+	await persons.del(app, [0, 2]);
 }
 
 
-async function transactionTests(view)
+async function transactionTests(app)
 {
-	view.setBlock('Transactions', 1);
+	app.view.setBlock('Transactions', 1);
 
-	view = await createTransactionTests(view);
-	view = await updateTransactionTests(view);
-	view = await deleteTransactionTests(view);
-
-	return view;
+	await createTransactionTests(app);
+	await updateTransactionTests(app);
+	await deleteTransactionTests(app);
 }
 
 
-async function createTransactionTests(view)
+async function createTransactionTests(app)
 {
-	view.setBlock('Create transaction', 1);
+	app.view.setBlock('Create transaction', 1);
 
-	view = await goToMainView(view);
-	view = await view.goToNewTransactionByAccount(0);
-	view = await transactions.expense.stateLoop(view);
-	view = await runCreateExpenseTests(view);
+	await app.goToMainView(app);
+	await app.view.goToNewTransactionByAccount(0);
+	await transactions.expense.stateLoop(app);
+	await runCreateExpenseTests(app);
 
-	view = await view.goToNewTransactionByAccount(0);
-	view = await view.changeTransactionType(App.INCOME);
-	view = await transactions.income.stateLoop(view);
-	view = await runCreateIncomeTests(view);
+	await app.view.goToNewTransactionByAccount(0);
+	await app.view.changeTransactionType(App.INCOME);
+	await transactions.income.stateLoop(app);
+	await runCreateIncomeTests(app);
 
-	view = await view.goToNewTransactionByAccount(0);
-	view = await view.changeTransactionType(App.TRANSFER);
-	view = await transactions.transfer.stateLoop(view);
-	view = await runCreateTransferTests(view);
+	await app.view.goToNewTransactionByAccount(0);
+	await app.view.changeTransactionType(App.TRANSFER);
+	await transactions.transfer.stateLoop(app);
+	await runCreateTransferTests(app);
 
-	view = await view.goToNewTransactionByAccount(0);
-	view = await view.changeTransactionType(App.DEBT);
-	view = await transactions.debt.stateLoop(view);
-	view = await runCreateDebtTests(view);
-
-	return view;
+	await app.view.goToNewTransactionByAccount(0);
+	await app.view.changeTransactionType(App.DEBT);
+	await transactions.debt.stateLoop(app);
+	await runCreateDebtTests(app);
 }
 
 
-async function updateTransactionTests(view)
+async function updateTransactionTests(app)
 {
-	view.setBlock('Update transaction', 1);
+	app.view.setBlock('Update transaction', 1);
 
-	view = await runUpdateExpenseTests(view);
-	view = await runUpdateIncomeTests(view);
-	view = await runUpdateTransferTests(view);
-	view = await runUpdateDebtTests(view);
-
-	return view;
+	await runUpdateExpenseTests(app);
+	await runUpdateIncomeTests(app);
+	await runUpdateTransferTests(app);
+	await runUpdateDebtTests(app);
 }
 
 
-async function deleteTransactionTests(view)
+async function deleteTransactionTests(app)
 {
-	view.setBlock('Delete transaction', 1);
+	app.view.setBlock('Delete transaction', 1);
 
-	view = await runDeleteExpenseTests(view);
-	view = await runDeleteIncomeTests(view);
-	view = await runDeleteTransferTests(view);
-	view = await runDeleteDebtTests(view);
-
-	return view;
+	await runDeleteExpenseTests(app);
+	await runDeleteIncomeTests(app);
+	await runDeleteTransferTests(app);
+	await runDeleteDebtTests(app);
 }
 
 
-async function goToMainView(view)
+async function goToMainView(app)
 {
-	view = await view.goToMainView();
+	await app.view.goToMainView();
 
-	App.transactions = view.content.widgets[2].transList.items;
-	App.accounts = view.content.widgets[0].tiles.items;
-	App.persons = view.content.widgets[3].infoTiles.items;
-	App.currencies = await view.global('currency');
+	app.transactions = app.view.content.widgets[2].transList.items;
+	app.accounts = app.view.content.widgets[0].tiles.items;
+	app.persons = app.view.content.widgets[3].infoTiles.items;
+	app.currencies = await app.view.global('currency');
 
-	App.notify();
-
-	return view;
+	app.notify();
 }
 
 
-async function runCreateExpenseTests(view)
+async function runCreateExpenseTests(app)
 {
-	view.setBlock('Create expense transactions', 1);
+	app.view.setBlock('Create expense transactions', 1);
 
-	view = await transactions.expense.create(view, 0, 0, { destAmount : '123.7801' })
-	view = await transactions.expense.create(view, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 });
-	view = await transactions.expense.create(view, 1, 0, { destAmount : '0.01' });
-	view = await transactions.expense.create(view, 1, 0, { srcAcc : 4, destAmount : '99.99' });
-
-	return view;
+	await transactions.expense.create(app, 0, 0, { destAmount : '123.7801' })
+	await transactions.expense.create(app, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 });
+	await transactions.expense.create(app, 1, 0, { destAmount : '0.01' });
+	await transactions.expense.create(app, 1, 0, { srcAcc : 4, destAmount : '99.99' });
 }
 
 
-async function runCreateIncomeTests(view)
+async function runCreateIncomeTests(app)
 {
-	view.setBlock('Create income transactions', 1);
+	app.view.setBlock('Create income transactions', 1);
 
-	view = await transactions.income.create(view, 0, 0, { srcAmount : '10023.7801' });
-	view = await transactions.income.create(view, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 });
-	view = await transactions.income.create(view, 1, 0, { srcAmount : '0.01' });
-	view = await transactions.income.create(view, 1, 0, { destAcc : 4, srcAmount : '99.99' });
-
-	return view;
+	await transactions.income.create(app, 0, 0, { srcAmount : '10023.7801' });
+	await transactions.income.create(app, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 });
+	await transactions.income.create(app, 1, 0, { srcAmount : '0.01' });
+	await transactions.income.create(app, 1, 0, { destAcc : 4, srcAmount : '99.99' });
 }
 
 
-async function runCreateTransferTests(view)
+async function runCreateTransferTests(app)
 {
-	view.setBlock('Create transfer transactions', 1);
+	app.view.setBlock('Create transfer transactions', 1);
 
-	view = await transactions.transfer.create(view, 0, { srcAmount : '1000' })
-	view = await transactions.transfer.create(view, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' });
-	view = await transactions.transfer.create(view, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' });
-	view = await transactions.transfer.create(view, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' });
-	view = await transactions.transfer.create(view, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' });
-
-	return view;
+	await transactions.transfer.create(app, 0, { srcAmount : '1000' })
+	await transactions.transfer.create(app, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' });
+	await transactions.transfer.create(app, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' });
+	await transactions.transfer.create(app, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' });
+	await transactions.transfer.create(app, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' });
 }
 
 
-async function runCreateDebtTests(view)
+async function runCreateDebtTests(app)
 {
-	view.setBlock('Submit debt transactions', 1);
+	app.view.setBlock('Submit debt transactions', 1);
 
-	view = await transactions.debt.create(view, 0, { srcAmount : '1000' });
-	view = await transactions.debt.create(view, 0, { debtType : false, acc : 2, srcAmount : '200' });
-	view = await transactions.debt.create(view, 0, { debtType : true, acc : 3, srcAmount : '100.0101' });
-	view = await transactions.debt.create(view, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' });
-	view = await transactions.debt.create(view, 0, { acc : null, srcAmount : '105' });
-	view = await transactions.debt.create(view, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' });
-
-	return view;
+	await transactions.debt.create(app, 0, { srcAmount : '1000' });
+	await transactions.debt.create(app, 0, { debtType : false, acc : 2, srcAmount : '200' });
+	await transactions.debt.create(app, 0, { debtType : true, acc : 3, srcAmount : '100.0101' });
+	await transactions.debt.create(app, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' });
+	await transactions.debt.create(app, 0, { acc : null, srcAmount : '105' });
+	await transactions.debt.create(app, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' });
 }
 
 
-async function runUpdateExpenseTests(view)
+async function runUpdateExpenseTests(app)
 {
-	view.setBlock('Update expense transactions', 2);
+	app.view.setBlock('Update expense transactions', 2);
 
-	view = await transactions.expense.update(view, 3, { destAmount : '124.7701' });
-	view = await transactions.expense.update(view, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 });
-	view = await transactions.expense.update(view, 1, { destAmount : '0.02' });
-	view = await transactions.expense.update(view, 0, { srcAcc : 3, destAmount : '99.9' });
-
-	return view;
+	await transactions.expense.update(app, 3, { destAmount : '124.7701' });
+	await transactions.expense.update(app, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 });
+	await transactions.expense.update(app, 1, { destAmount : '0.02' });
+	await transactions.expense.update(app, 0, { srcAcc : 3, destAmount : '99.9' });
 }
 
 
-async function runUpdateIncomeTests(view)
+async function runUpdateIncomeTests(app)
 {
-	view.setBlock('Update income transactions', 2);
+	app.view.setBlock('Update income transactions', 2);
 
-	view = await transactions.income.update(view, 0, { srcAmount : '100.001' });
-	view = await transactions.income.update(view, 1, { srcAmount : '0.02' });
-	view = await transactions.income.update(view, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 });
-	view = await transactions.income.update(view, 3, { destAcc : 3, srcAmount : '99.9' });
-
-	return view;
+	await transactions.income.update(app, 0, { srcAmount : '100.001' });
+	await transactions.income.update(app, 1, { srcAmount : '0.02' });
+	await transactions.income.update(app, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 });
+	await transactions.income.update(app, 3, { destAcc : 3, srcAmount : '99.9' });
 }
 
 
-async function runUpdateTransferTests(view)
+async function runUpdateTransferTests(app)
 {
-	view.setBlock('Update transfer transactions', 2);
+	app.view.setBlock('Update transfer transactions', 2);
 
-	view = await transactions.transfer.update(view, 0, { destAcc : 0, srcAmount : '11' });
-	view = await transactions.transfer.update(view, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' });
-	view = await transactions.transfer.update(view, 2, { srcAcc : 3, srcAmount : '5.0301' });
-	view = await transactions.transfer.update(view, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' });
-	view = await transactions.transfer.update(view, 4, { srcAmount : '1050.01' });
-
-	return view;
+	await transactions.transfer.update(app, 0, { destAcc : 0, srcAmount : '11' });
+	await transactions.transfer.update(app, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' });
+	await transactions.transfer.update(app, 2, { srcAcc : 3, srcAmount : '5.0301' });
+	await transactions.transfer.update(app, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' });
+	await transactions.transfer.update(app, 4, { srcAmount : '1050.01' });
 }
 
 
-async function runUpdateDebtTests(view)
+async function runUpdateDebtTests(app)
 {
-	view.setBlock('Update debt transactions', 2);
+	app.view.setBlock('Update debt transactions', 2);
 
-	view = await transactions.debt.update(view, 0, { person : 0, srcAmount : '105' });
-	view = await transactions.debt.update(view, 1, { acc : 1, srcAmount : '105' });
-	view = await transactions.debt.update(view, 2, { debtType : true, srcAmount : '10' });
-	view = await transactions.debt.update(view, 3, { debtType : false, acc : 2, srcAmount : '200.0202' });
-	view = await transactions.debt.update(view, 4, { acc : null, srcAmount : '200' });
-	view = await transactions.debt.update(view, 5, { srcAmount : '1001' });
-
-	return view;
+	await transactions.debt.update(app, 0, { person : 0, srcAmount : '105' });
+	await transactions.debt.update(app, 1, { acc : 1, srcAmount : '105' });
+	await transactions.debt.update(app, 2, { debtType : true, srcAmount : '10' });
+	await transactions.debt.update(app, 3, { debtType : false, acc : 2, srcAmount : '200.0202' });
+	await transactions.debt.update(app, 4, { acc : null, srcAmount : '200' });
+	await transactions.debt.update(app, 5, { srcAmount : '1001' });
 }
 
 
-async function runDeleteExpenseTests(view)
+async function runDeleteExpenseTests(app)
 {
-	view.setBlock('Delete expense transactions', 2);
+	app.view.setBlock('Delete expense transactions', 2);
 
-	view = await transactions.del(view, App.EXPENSE, [0]);
-	view = await transactions.del(view, App.EXPENSE, [0, 1]);
-
-	return view;
+	await transactions.del(app, App.EXPENSE, [0]);
+	await transactions.del(app, App.EXPENSE, [0, 1]);
 }
 
 
-async function runDeleteIncomeTests(view)
+async function runDeleteIncomeTests(app)
 {
-	view.setBlock('Delete income transactions', 2);
+	app.view.setBlock('Delete income transactions', 2);
 
-	view = await transactions.del(view, App.INCOME, [0]);
-	view = await transactions.del(view, App.INCOME, [0, 1, 2]);
-
-	return view;
+	await transactions.del(app, App.INCOME, [0]);
+	await transactions.del(app, App.INCOME, [0, 1, 2]);
 }
 
 
-async function runDeleteTransferTests(view)
+async function runDeleteTransferTests(app)
 {
-	view.setBlock('Delete transfer transactions', 2);
+	app.view.setBlock('Delete transfer transactions', 2);
 
-	view = await transactions.del(view, App.TRANSFER, [1]);
-	view = await transactions.del(view, App.TRANSFER, [0, 2]);
-
-	return view;
+	await transactions.del(app, App.TRANSFER, [1]);
+	await transactions.del(app, App.TRANSFER, [0, 2]);
 }
 
 
-async function runDeleteDebtTests(view)
+async function runDeleteDebtTests(app)
 {
-	view.setBlock('Delete debt transactions', 2);
+	app.view.setBlock('Delete debt transactions', 2);
 
-	view = await transactions.del(view, App.DEBT, [0]);
-	view = await transactions.del(view, App.DEBT, [0, 1]);
-
-	return view;
+	await transactions.del(app, App.DEBT, [0]);
+	await transactions.del(app, App.DEBT, [0, 1]);
 }
 
 
-async function apiTests(view)
+async function apiTests(app)
 {
-	await runAPI.run(view, App);
-
-	return view;
+	await runAPI.run(app);
 }
 
 
-async function transactionsListTests(view)
+async function transactionsListTests(app)
 {
-	view = await runTransList.run(view, App);
-
-	return view;
+	await runTransList.run(app);
 }
 
 

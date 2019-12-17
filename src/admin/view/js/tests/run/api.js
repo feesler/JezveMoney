@@ -31,9 +31,9 @@ var runAPI = (function()
 	}
 
 
-	async function runTests(view, app)
+	async function runTests(app)
 	{
-		env = view.props.environment;
+		env = app.view.props.environment;
 
 		api.setEnv(env, app);
 

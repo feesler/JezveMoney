@@ -15,8 +15,10 @@ var runIncome = (function()
 	}
 
 
-	async function submitIncomeTransaction(view, params)
+	async function submitIncomeTransaction(app, params)
 	{
+		let view = app.view;
+
 		if ('destAcc' in params)
 		{
 			let acc = await view.getAccountByPos(params.destAcc);
@@ -29,7 +31,7 @@ var runIncome = (function()
 
 		if ('srcCurr' in params)
 		{
-			let curr = App.getCurrency(params.srcCurr);
+			let curr = app.getCurrency(params.srcCurr);
 			if (!curr)
 				throw new Error('Currency (' + params.srcCurr + ') not found');
 
@@ -51,73 +53,76 @@ var runIncome = (function()
 		if ('comment' in params)
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
-		App.beforeSubmitTransaction = { destAcc : view.model.destAccount,
+		app.beforeSubmitTransaction = { destAcc : view.model.destAccount,
 										destAccPos : await view.getAccountPos(view.model.destAccount.id) };
 		if (view.model.isUpdate)
-			App.beforeSubmitTransaction.id = view.model.id;
+			app.beforeSubmitTransaction.id = view.model.id;
 
 		return view.submit();
 	}
 
 
-	async function createIncome(view, accNum, onState, params)
+	async function createIncome(app, accNum, onState, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Create income (' + titleParams.join(', ') + ')', 2);
 
 		// Step 0: navigate
-		view = await App.goToMainView(view);
-		view = await view.goToNewTransactionByAccount(accNum);
-		view = await view.changeTransactionType(App.INCOME);
-		view = await incomeTransactionLoop(view, onState, view => submitIncomeTransaction(view, params));
+		await app.goToMainView(app);
+		await app.view.goToNewTransactionByAccount(accNum);
+		await app.view.changeTransactionType(app.INCOME);
+		await incomeTransactionLoop(app, onState, app => submitIncomeTransaction(app, params));
+		view = app.view;
 
 		// Step
-		let destAcc = App.beforeSubmitTransaction.destAcc;
-		let destAccPos = App.beforeSubmitTransaction.destAccPos;
+		let destAcc = app.beforeSubmitTransaction.destAcc;
+		let destAccPos = app.beforeSubmitTransaction.destAccPos;
 
 		// Obtain real destination amount from props:
 		// In case of income with different currency use destination amount value
 		// In case of income with the same currency copy source amount value
 		var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
-		var expBalance = destAcc.balance + App.normalize(da);
-		var fmtBal = App.formatCurrency(expBalance, destAcc.curr_id);
+		var expBalance = destAcc.balance + app.normalize(da);
+		var fmtBal = app.formatCurrency(expBalance, destAcc.curr_id);
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		accWidget.tiles.items[destAccPos] = { balance : fmtBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '+ ' + App.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id);
+		var fmtAmount = '+ ' + app.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id);
 		if ('srcCurr' in params && 'destAmount' in params)
 		{
-			fmtAmount += ' (+ ' + App.formatCurrency(params.destAmount, destAcc.curr_id) + ')';
+			fmtAmount += ' (+ ' + app.formatCurrency(params.destAmount, destAcc.curr_id) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
+							transList : { items : { length : Math.min(app.transactions.length + 1, 5) } } };
 		transWidget.transList.items[0] = { accountTitle : destAcc.name,
 										amountText : fmtAmount,
-									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
 
 		await test('Income transaction submit', async () => {}, view, state);
 
-		App.transactions = view.content.widgets[2].transList.items;
-		App.accounts = view.content.widgets[0].tiles.items;
-		App.persons = view.content.widgets[3].infoTiles.items;
-		App.notify();
-
-		return view;
+		app.transactions = view.content.widgets[2].transList.items;
+		app.accounts = view.content.widgets[0].tiles.items;
+		app.persons = view.content.widgets[3].infoTiles.items;
+		app.notify();
 	}
 
 
 	// Update income transaction and check results
-	async function updateIncome(view, pos, params)
+	async function updateIncome(app, pos, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
@@ -127,32 +132,34 @@ var runIncome = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!App.isObject(params))
+		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
 
 		// Step 0: navigate to transactions view and filter by income
-		view = await App.goToMainView(view);
-		view = await view.goToTransactions();
-		view = await view.filterByType(App.INCOME);
+		await app.goToMainView(app);
+		await app.view.goToTransactions();
+		await app.view.filterByType(app.INCOME);
+		view = app.view;
 
 		// Step 1: Save count of transactions and navigate to update transaction view
-		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
+		app.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
 		let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
 		if (!trObj)
 			throw new Error('Transaction not found');
 
-		App.beforeUpdateTransaction.trObj = trObj;
-		App.notify();
+		app.beforeUpdateTransaction.trObj = trObj;
+		app.notify();
 
-		view = await view.goToUpdateTransaction(pos);
+		await app.view.goToUpdateTransaction(pos);
+		view = app.view;
 
 		// Step 2: Save original data of transaction, perform update actions and submit
-		let isDiff = (App.beforeUpdateTransaction.trObj.src_curr != App.beforeUpdateTransaction.trObj.dest_curr);
+		let isDiff = (app.beforeUpdateTransaction.trObj.src_curr != app.beforeUpdateTransaction.trObj.dest_curr);
 
 		await test('Initial state of update income view', async () => view.setExpectedState(isDiff ? 2 : 0), view);
 
-		App.setParam(App.beforeUpdateTransaction,
+		app.setParam(app.beforeUpdateTransaction,
 					{ id : view.model.id,
 						destAcc : view.model.destAccount,
 						destAccPos : await view.getAccountPos(view.model.destAccount.id),
@@ -161,43 +168,43 @@ var runIncome = (function()
 						destAmount : view.model.fDestAmount,
 						date : view.model.date,
 						comment : view.model.comment});
-		App.notify();
+		app.notify();
 
-		view = await submitIncomeTransaction(view, params);
+		await submitIncomeTransaction(app, params);
 
 		// Step 3: Check update of transactions list
-		view = await view.filterByType(App.INCOME);
+		await app.view.filterByType(app.INCOME);
 
-	 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
-		let trans_id = App.beforeUpdateTransaction.id;
-		let transCount = App.beforeUpdateTransaction.trCount;
-		let origDate = App.beforeUpdateTransaction.date;
-		let origComment = App.beforeUpdateTransaction.comment;
+	 	let updDestAcc = app.beforeSubmitTransaction.destAcc;
+		let trans_id = app.beforeUpdateTransaction.id;
+		let transCount = app.beforeUpdateTransaction.trCount;
+		let origDate = app.beforeUpdateTransaction.date;
+		let origComment = app.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = '+ ' + App.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
+		var fmtAmount = '+ ' + app.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
 		if ('srcCurr' in params && 'destAmount' in params)
 		{
-			fmtAmount += ' (+ ' + App.formatCurrency(params.destAmount, updDestAcc.curr_id) + ')';
+			fmtAmount += ' (+ ' + app.formatCurrency(params.destAmount, updDestAcc.curr_id) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updDestAcc.name,
 											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? App.formatDate(new Date(params.date)) : origDate,
+										 	dateFmt : ('date' in params) ? app.formatDate(new Date(params.date)) : origDate,
 										 	comment : ('comment' in params) ? params.comment : origComment };
 
-		await test('Transaction update', async () => {}, view, state);
+		await test('Transaction update', async () => {}, app.view, state);
 
 		// Step 4: Check updates of affected accounts
-		view = await App.goToMainView(view);
+		await app.goToMainView(app);
 
-		let updDestAccPos = App.beforeSubmitTransaction.destAccPos;
-	 	let origDestAcc = App.beforeUpdateTransaction.destAcc;
-		let origDestAccPos = App.beforeUpdateTransaction.destAccPos;
-		let origDestBalance = App.beforeUpdateTransaction.destBalance;
-		let origDestAmount = App.beforeUpdateTransaction.destAmount;
+		let updDestAccPos = app.beforeSubmitTransaction.destAccPos;
+	 	let origDestAcc = app.beforeUpdateTransaction.destAcc;
+		let origDestAccPos = app.beforeUpdateTransaction.destAccPos;
+		let origDestBalance = app.beforeUpdateTransaction.destBalance;
+		let origDestAmount = app.beforeUpdateTransaction.destAmount;
 
 		// Obtain real source amount from props:
 		// In case of income with different currency use source amount value
@@ -205,39 +212,39 @@ var runIncome = (function()
 		var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		var expBalance, fmtBal;
 		// Chech if account was changed we need to update both
 		if (origDestAccPos != updDestAccPos)
 		{
 			expBalance = origDestBalance - origDestAmount;
-			fmtBal = App.formatCurrency(expBalance, origDestAcc.curr_id);
+			fmtBal = app.formatCurrency(expBalance, origDestAcc.curr_id);
 
 			accWidget.tiles.items[origDestAccPos] = { balance : fmtBal, name : origDestAcc.name };
 
-			expBalance = updDestAcc.balance + App.normalize(da);
-			fmtBal = App.formatCurrency(expBalance, updDestAcc.curr_id);
+			expBalance = updDestAcc.balance + app.normalize(da);
+			fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}
 		else		// account not changed
 		{
-			var expBalance = origDestBalance - origDestAmount + App.normalize(da);
-			var fmtBal = App.formatCurrency(expBalance, updDestAcc.curr_id);
+			var expBalance = origDestBalance - origDestAmount + app.normalize(da);
+			var fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget } } };
 
-		await test('Account balance update', async () => {}, view, state);
-
-		return view;
+		await test('Account balance update', async () => {}, app.view, state);
 	}
 
 
-	async function incomeTransactionLoop(view, actionState, action)
+	async function incomeTransactionLoop(app, actionState, action)
 	{
+		let view = app.view;
+
 	// State 0
 		view.setBlock('Income loop', 2);
 		await test('Initial state of new income view', async () => view.setExpectedState(0), view);
@@ -245,7 +252,7 @@ var runIncome = (function()
 		actionState = parseInt(actionState);
 		var actionRequested = !isNaN(actionState);
 		if (actionState === 0)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -262,7 +269,7 @@ var runIncome = (function()
 		await test('(2) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 		if (actionState === 1)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -283,7 +290,7 @@ var runIncome = (function()
 		await test('(3) Change source curency to USD', () => view.changeSourceCurrency(2), view);
 
 		if (actionState === 2)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -305,7 +312,7 @@ var runIncome = (function()
 		await test('(7) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 		if (actionState === 4)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -322,7 +329,7 @@ var runIncome = (function()
 		await test('(20) Click on exchange rate', () => view.clickExchRate(), view);
 
 		if (actionState === 4)
-			return action(view);
+			return action(app);
 
 	// Transition 14: Click on exchange rate block and move from State 4 to State 3
 		await test('(14) Click on exchange rate', () => view.clickDestResultBalance(), view);

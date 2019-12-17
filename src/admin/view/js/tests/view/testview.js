@@ -24,6 +24,8 @@ function TestView(props)
 {
 	this.props = props || {};
 
+	this.app = this.props.app;
+
 	if (this.props.environment)
 	{
 		for(let key in this.props.environment)
@@ -690,8 +692,6 @@ TestView.prototype.parse = async function()
 	this.msgPopup = await this.parseMessage();
 	this.content = await this.parseContent();
 	this.model = await this.buildModel(this.content);
-
-	return this;
 };
 
 
@@ -705,7 +705,7 @@ TestView.prototype.performAction = async function(action)
 
 	await action.call(this);
 
-	return this.parse();
+	await this.parse();
 };
 
 
@@ -807,7 +807,7 @@ TestView.prototype.goToProfile = async function()
 
 	await this.click(this.header.user.menuBtn);		// open user menu
 
-	return this.navigation(() => {
+	await this.navigation(() => {
 		setTimeout(() => this.click(this.header.user.profileBtn), 500);
 	});
 };
@@ -818,16 +818,16 @@ TestView.prototype.logoutUser = async function()
 {
 	await this.click(this.header.user.menuBtn);
 
-	return this.navigation(() => this.click(this.header.user.logoutBtn));
+	await this.navigation(() => this.click(this.header.user.logoutBtn));
 };
 
 
-TestView.prototype.goToMainView = function()
+TestView.prototype.goToMainView = async function()
 {
 	if (!this.isUserLoggedIn())
 		throw new Error('User not logged in');
 
-	return this.navigation(() => this.click(this.header.logo.linkElem));
+	await this.navigation(() => this.click(this.header.logo.linkElem));
 };
 
 

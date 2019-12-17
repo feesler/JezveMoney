@@ -15,72 +15,64 @@ var runPersons = (function()
 	}
 
 
-	async function checkInitialPersons(view)
+	async function checkInitialPersons(app)
 	{
 		var state = { value : { tiles : { items : { length : 0 } } } };
-		await test('Initial persons structure', async () => {}, view, state);
-
-		return view;
+		await test('Initial persons structure', async () => {}, app.view, state);
 	}
 
 
 	// From persons list view go to new person view, input name and submit
 	// Next check name result and callback
-	async function createPerson(view, personName)
+	async function createPerson(app, personName)
 	{
-		view = await view.goToCreatePerson();
-		view = await view.createPerson(personName);
+		await app.view.goToCreatePerson();
+		await app.view.createPerson(personName);
 
-		var state = { value : { tiles : { items : { length : App.persons.length + 1 } } } };
-		state.value.tiles.items[App.persons.length] = { name : personName };
+		var state = { value : { tiles : { items : { length : app.persons.length + 1 } } } };
+		state.value.tiles.items[app.persons.length] = { name : personName };
 
-		await test('Create person', async () => {}, view, state);
+		await test('Create person', async () => {}, app.view, state);
 
-		App.persons = view.content.tiles.items;
-		App.notify();
-
-		return view;
+		app.persons = app.view.content.tiles.items;
+		app.notify();
 	}
 
 
-	async function updatePerson(view, num, personName)
+	async function updatePerson(app, num, personName)
 	{
-		view = await view.goToUpdatePerson(num);
+		await app.view.goToUpdatePerson(num);
 
 		var state = { visibility : { name : true },
-	 					values : { name : App.persons[num].name } };
+	 					values : { name : app.persons[num].name } };
 
-		await test('Update person view state', async () => {}, view, state);
+		await test('Update person view state', async () => {}, app.view, state);
 
-		await view.inputName(personName);
+		await app.view.inputName(personName);
 
-		view = await view.navigation(() => view.click(view.content.submitBtn));
+		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 
 		// Check updates in the person tiles
-		var state = { values : { tiles : { items : { length : App.persons.length } } } };
+		var state = { values : { tiles : { items : { length : app.persons.length } } } };
 		state.values.tiles.items[num] = { name : personName };
 
-		await test('Update person', async () => {}, view, state);
+		await test('Update person', async () => {}, app.view, state);
 
-		App.persons = view.content.tiles.items;
-		App.notify();
-
-		return view;
+		app.persons = app.view.content.tiles.items;
+		app.notify();
 	}
 
 
-	async function deletePersons(view, persons)
+	async function deletePersons(app, persons)
 	{
-		view = await view.deletePersons(persons);
+		await app.view.deletePersons(persons);
 
-		var state = { values : { tiles : { items : { length : App.persons.length - persons.length } } } };
+		var state = { values : { tiles : { items : { length : app.persons.length - persons.length } } } };
 
-		await test('Delete persons [' + persons.join() + ']', async () => {}, view, state);
+		await test('Delete persons [' + persons.join() + ']', async () => {}, app.view, state);
 
-		App.persons = view.content.tiles.items;
-		App.notify();
-
-		return view;
+		app.persons = app.view.content.tiles.items;
+		app.notify();
 	}
 
 

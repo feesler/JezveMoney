@@ -16,71 +16,69 @@ var runStatistics = (function()
 	}
 
 
-	async function statisticsTests(view)
+	async function statisticsTests(app)
 	{
-		view.setBlock('Statistics', 1);
+		app.view.setBlock('Statistics', 1);
 
-		view = await App.goToMainView(view);
-		view = await view.goToStatistics();
+		await app.goToMainView(app);
+		await app.view.goToStatistics();
 
 		// Expense transactions filter
 		var state = { value : { chart : { bars : { length : 1 } } } };
-		await test('Expense statistics view', async () => {}, view, state);
+		await test('Expense statistics view', async () => {}, app.view, state);
 
 		// Income transactions filter
-		view = await view.filterByType(App.INCOME);
+		await app.view.filterByType(app.INCOME);
 
 		var state = { value : { chart : { bars : { length : 0 } } } };
-		await test('Income statistics view', async () => {}, view, state);
+		await test('Income statistics view', async () => {}, app.view, state);
 
 		// Transfer transactions filter
-		view = await view.filterByType(App.TRANSFER);
+		await app.view.filterByType(app.TRANSFER);
 
 		var state = { value : { chart : { bars : { length : 2 } } } };
-		await test('Transfer statistics view', async () => {}, view, state);
+		await test('Transfer statistics view', async () => {}, app.view, state);
 
 		// Debt transactions filter
-		view = await view.filterByType(App.DEBT);
+		await app.view.filterByType(app.DEBT);
 
 		var state = { value : { chart : { bars : { length : 3 } } } };
-		await test('Debt statistics view', async () => {}, view, state);
+		await test('Debt statistics view', async () => {}, app.view, state);
 
 		// Filter by accounts
-		view = await view.filterByType(App.EXPENSE);
-		view = await view.selectAccountByPos(1);
+		await app.view.filterByType(app.EXPENSE);
+		await app.view.selectAccountByPos(1);
 
 		var state = { value : { chart : { bars : { length : 0 } } } };
-		await test('Filter statistics by account', async () => {}, view, state);
+		await test('Filter statistics by account', async () => {}, app.view, state);
 
 		// Test grouping
-		view = await view.filterByType(App.DEBT);
-		view = await view.groupByDay();
+		await app.view.filterByType(app.DEBT);
+		await app.view.groupByDay();
 
 		var state = { value : { chart : { bars : { length : 1 } } } };
-		await test('Group statistics by day', async () => {}, view, state);
+		await test('Group statistics by day', async () => {}, app.view, state);
 
-		view = await view.groupByWeek();
-
-		var state = { value : { chart : { bars : { length : 1 } } } };
-		await test('Group statistics by week', async () => {}, view, state);
-
-		view = await view.groupByMonth();
+		await app.view.groupByWeek();
 
 		var state = { value : { chart : { bars : { length : 1 } } } };
-		await test('Group statistics by month', async () => {}, view, state);
+		await test('Group statistics by week', async () => {}, app.view, state);
 
-		view = await view.groupByYear();
+		await app.view.groupByMonth();
 
 		var state = { value : { chart : { bars : { length : 1 } } } };
-		await test('Group statistics by year', async () => {}, view, state);
+		await test('Group statistics by month', async () => {}, app.view, state);
+
+		await app.view.groupByYear();
+
+		var state = { value : { chart : { bars : { length : 1 } } } };
+		await test('Group statistics by year', async () => {}, app.view, state);
 
 		// Filter by currencies
-		view = await view.byCurrencies();
+		await app.view.byCurrencies();
 
 		var state = { value : { chart : { bars : { length : 1 } } } };
-		await test('Filter by currencies', async () => {}, view, state);
-
-		return view;
+		await test('Filter by currencies', async () => {}, app.view, state);
 	}
 
 

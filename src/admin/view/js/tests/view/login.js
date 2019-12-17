@@ -34,13 +34,13 @@ LoginView.prototype.loginAs = async function(login, password)
 {
 	await this.input(this.content.loginInp, login);
  	await this.input(this.content.passwordInp, password);
-	return this.navigation(() => this.click(this.content.submitBtn));
+	await this.navigation(() => this.click(this.content.submitBtn));
 };
 
 
 LoginView.prototype.goToRegistration = async function()
 {
-	return this.navigation(() => this.click(this.content.registerLink));
+	await this.navigation(() => this.click(this.content.registerLink));
 };
 
 

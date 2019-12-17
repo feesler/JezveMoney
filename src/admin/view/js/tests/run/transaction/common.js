@@ -15,71 +15,71 @@ var runTransactionsCommon = (function()
 	}
 
 
-	async function deleteTransactions(view, type, transactions)
+	async function deleteTransactions(app, type, transactions)
 	{
-		view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
+		app.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
 
-		view = await App.goToMainView(view);
+		await app.goToMainView(app);
 
 		// Save accounts and persons before delete transactions
-		App.beforeDeleteTransaction = {};
+		app.beforeDeleteTransaction = {};
 
-		App.beforeDeleteTransaction.accounts = App.copyObject(await view.global('accounts'));
-		App.beforeDeleteTransaction.persons = App.copyObject(await view.global('persons'));
-		App.notify();
+		app.beforeDeleteTransaction.accounts = app.copyObject(await app.view.global('accounts'));
+		app.beforeDeleteTransaction.persons = app.copyObject(await app.view.global('persons'));
+		app.notify();
 
 		// Navigate to transactions view and filter by specified type of transaction
-		view = await view.goToTransactions();
-		view = await view.filterByType(type);
+		await app.view.goToTransactions();
+		await app.view.filterByType(type);
 
-		let trCount = view.content.transList ? view.content.transList.items.length : 0;
-		App.beforeDeleteTransaction.trCount = trCount;
+		let trCount = app.view.content.transList ? app.view.content.transList.items.length : 0;
+		app.beforeDeleteTransaction.trCount = trCount;
 
-		App.beforeDeleteTransaction.deleteList = [];
+		app.beforeDeleteTransaction.deleteList = [];
 		for(let trPos of transactions)
 		{
 			if (trPos < 0 || trPos >= trCount)
 				throw new Error('Wrong transaction position: ' + trPos);
 
-			let trObj = await view.getTransactionObject(view.content.transList.items[trPos].id);
+			let trObj = await app.view.getTransactionObject(app.view.content.transList.items[trPos].id);
 			if (!trObj)
 				throw new Error('Transaction not found');
 
-			App.beforeDeleteTransaction.deleteList.push(trObj);
+			app.beforeDeleteTransaction.deleteList.push(trObj);
 		}
 
-		App.notify();
+		app.notify();
 
 		// Request view to select and delete transactions and wait for navigation
-		view = await view.deleteTransactions(transactions);
+		await app.view.deleteTransactions(transactions);
 
 		// Check count of transactions
-		var state = { value : { transList : { items : { length : App.transactions.length - transactions.length } } } };		// TODO use max and calculate proper
+		var state = { value : { transList : { items : { length : app.transactions.length - transactions.length } } } };		// TODO use max and calculate proper
 
-		await test('Transactions list update', async () => {}, view, state);
+		await test('Transactions list update', async () => {}, app.view, state);
 
-		App.transactions = view.content.transList.items;
-		App.notify();
+		app.transactions = app.view.content.transList.items;
+		app.notify();
 
 
 		// Navigate to main view and check changes in affected accounts and persons
-		view = await App.goToMainView(view);
+		await app.goToMainView(app);
 
-		let origAccounts = App.beforeDeleteTransaction.accounts;
-		let origPersons = App.beforeDeleteTransaction.persons;
+		let origAccounts = app.beforeDeleteTransaction.accounts;
+		let origPersons = app.beforeDeleteTransaction.persons;
 
 		// Widget changes
-		var personsWidget = { infoTiles : { items : { length : App.persons.length } } };
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 
 		let affectedAccounts = [];
 		let affectedPersons = [];
 
-		for(let tr of App.beforeDeleteTransaction.deleteList)
+		for(let tr of app.beforeDeleteTransaction.deleteList)
 		{
-			if (tr.type == App.EXPENSE)
+			if (tr.type == app.EXPENSE)
 			{
-				let srcAccPos = App.getPosById(origAccounts, tr.src_id);
+				let srcAccPos = app.getPosById(origAccounts, tr.src_id);
 				if (srcAccPos === -1)
 					throw new Error('Account ' + tr.src_id + ' not found');
 
@@ -94,9 +94,9 @@ var runTransactionsCommon = (function()
 
 				affectedAccounts[srcAccPos].balance += tr.src_amount;
 			}
-			else if (tr.type == App.INCOME)
+			else if (tr.type == app.INCOME)
 			{
-				let destAccPos = App.getPosById(origAccounts, tr.dest_id);
+				let destAccPos = app.getPosById(origAccounts, tr.dest_id);
 				if (destAccPos === -1)
 					throw new Error('Account ' + tr.dest_id + ' not found');
 
@@ -111,9 +111,9 @@ var runTransactionsCommon = (function()
 
 				affectedAccounts[destAccPos].balance -= tr.dest_amount;
 			}
-			else if (tr.type == App.TRANSFER)
+			else if (tr.type == app.TRANSFER)
 			{
-				let srcAccPos = App.getPosById(origAccounts, tr.src_id);
+				let srcAccPos = app.getPosById(origAccounts, tr.src_id);
 				if (srcAccPos === -1)
 					throw new Error('Account ' + tr.src_id + ' not found');
 
@@ -126,7 +126,7 @@ var runTransactionsCommon = (function()
 													curr_id : acc.curr_id };
 				}
 
-				let destAccPos = App.getPosById(origAccounts, tr.dest_id);
+				let destAccPos = app.getPosById(origAccounts, tr.dest_id);
 				if (destAccPos === -1)
 					throw new Error('Account ' + tr.dest_id + ' not found');
 
@@ -142,22 +142,22 @@ var runTransactionsCommon = (function()
 				affectedAccounts[srcAccPos].balance += tr.src_amount;
 				affectedAccounts[destAccPos].balance -= tr.dest_amount;
 			}
-			else if (tr.type == App.DEBT)
+			else if (tr.type == app.DEBT)
 			{
 				let personAcc_id = (tr.debtType == 1) ? tr.src_id : tr.dest_id;
-				let person = App.getPersonByAcc(origPersons, personAcc_id);
+				let person = app.getPersonByAcc(origPersons, personAcc_id);
 				if (!person)
 					throw new Error('Not found person with account ' + personAcc_id);
 
 				if (!person.accounts)
 					person.accounts = [];
 
-				let personPos = App.getPosById(origPersons, person.id);
+				let personPos = app.getPosById(origPersons, person.id);
 
 				if (!(personPos in affectedPersons))
 				{
 					affectedPersons[personPos] = { name : person.name,
-													accounts : App.copyObject(person.accounts) };
+													accounts : app.copyObject(person.accounts) };
 				}
 
 				let personAcc = affectedPersons[personPos].accounts.find(a => a.id == personAcc_id);
@@ -169,7 +169,7 @@ var runTransactionsCommon = (function()
 				let acc_id = (tr.debtType == 1) ? tr.dest_id : tr.src_id;
 				if (acc_id)
 				{
-					let accPos = App.getPosById(origAccounts, acc_id);
+					let accPos = app.getPosById(origAccounts, acc_id);
 					if (accPos === -1)
 						throw new Error('Account ' + acc_id + ' not found');
 
@@ -191,7 +191,7 @@ var runTransactionsCommon = (function()
 		for(let accPos in affectedAccounts)
 		{
 			let acc = affectedAccounts[accPos];
-			fmtBal = App.formatCurrency(acc.balance, acc.curr_id);
+			fmtBal = app.formatCurrency(acc.balance, acc.curr_id);
 
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}
@@ -205,7 +205,7 @@ var runTransactionsCommon = (function()
 				if (pacc.balance == 0)
 					return val;
 
-				let fmtBal = App.formatCurrency(pacc.balance, pacc.curr_id);
+				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
 				return val.concat(fmtBal);
 			}, []);
 
@@ -216,14 +216,12 @@ var runTransactionsCommon = (function()
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
 
-		await test('Acounts and persons update', async () => {}, view, state);
+		await test('Acounts and persons update', async () => {}, app.view, state);
 
-		App.transactions = view.content.widgets[2].transList.items;
-		App.accounts = view.content.widgets[0].tiles.items;
-		App.persons = view.content.widgets[3].infoTiles.items;
-		App.notify();
-
-		return view;
+		app.transactions = app.view.content.widgets[2].transList.items;
+		app.accounts = app.view.content.widgets[0].tiles.items;
+		app.persons = app.view.content.widgets[3].infoTiles.items;
+		app.notify();
 	}
 
 

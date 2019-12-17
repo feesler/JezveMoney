@@ -15,8 +15,10 @@ var runExpense = (function()
 	}
 
 
-	async function submitExpenseTransaction(view, params)
+	async function submitExpenseTransaction(app, params)
 	{
+		let view = app.view;
+
 		if ('srcAcc' in params)
 		{
 			let acc = await view.getAccountByPos(params.srcAcc);
@@ -29,7 +31,7 @@ var runExpense = (function()
 
 		if ('destCurr' in params)
 		{
-			let curr = App.getCurrency(params.destCurr);
+			let curr = app.getCurrency(params.destCurr);
 			if (!curr)
 				throw new Error('Currency (' + params.destCurr + ') not found');
 
@@ -51,75 +53,79 @@ var runExpense = (function()
 		if ('comment' in params)
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
-		App.beforeSubmitTransaction = { srcAcc : view.model.srcAccount,
+		app.beforeSubmitTransaction = { srcAcc : view.model.srcAccount,
 										srcAccPos : await view.getAccountPos(view.model.srcAccount.id) };
 
 		if (view.model.isUpdate)
-			App.beforeSubmitTransaction.id = view.model.id;
+			app.beforeSubmitTransaction.id = view.model.id;
 
-		App.notify();
+		app.notify();
 
 		return view.submit();
 	}
 
 
-	async function createExpense(view, accNum, onState, params)
+	async function createExpense(app, accNum, onState, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Create expense (' + titleParams.join(', ') + ')', 2);
 
 		// Step 0:
-		view = await App.goToMainView(view);
-		view = await view.goToNewTransactionByAccount(accNum);
-		view = await expenseTransactionLoop(view, onState, view => submitExpenseTransaction(view, params));
+		await app.goToMainView(app);
+		view = app.view;
+		await view.goToNewTransactionByAccount(accNum);
+		await expenseTransactionLoop(app, onState, app => submitExpenseTransaction(app, params));
+		view = app.view;
 
 		// Step
-	 	let srcAcc = App.beforeSubmitTransaction.srcAcc;
-		let srcAccPos = App.beforeSubmitTransaction.srcAccPos;
+	 	let srcAcc = app.beforeSubmitTransaction.srcAcc;
+		let srcAccPos = app.beforeSubmitTransaction.srcAccPos;
 
 		// Obtain real source amount from props:
 		// In case of expense with different currency use source amount value
 		// In case of expense with the same currency copy destination amount value
 		var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
-		var expBalance = srcAcc.balance - App.normalize(sa);
-		var fmtBal = App.formatCurrency(expBalance, srcAcc.curr_id);
+		var expBalance = srcAcc.balance - app.normalize(sa);
+		var fmtBal = app.formatCurrency(expBalance, srcAcc.curr_id);
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		accWidget.tiles.items[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '- ' + App.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
+		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
 		if ('destCurr' in params && 'srcAmount' in params)
 		{
-			fmtAmount += ' (- ' + App.formatCurrency(params.destAmount, params.destCurr) + ')';
+			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
+							transList : { items : { length : Math.min(app.transactions.length + 1, 5) } } };
 		transWidget.transList.items[0] = { accountTitle : srcAcc.name,
 										amountText : fmtAmount,
-									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
 
 		await test('Expense transaction submit', async () => {}, view, state);
 
-		App.transactions = view.content.widgets[2].transList.items;
-		App.accounts = view.content.widgets[0].tiles.items;
-		App.persons = view.content.widgets[3].infoTiles.items;
-		App.notify();
-
-		return view;
+		app.transactions = view.content.widgets[2].transList.items;
+		app.accounts = view.content.widgets[0].tiles.items;
+		app.persons = view.content.widgets[3].infoTiles.items;
+		app.notify();
 	}
 
 
 	// Update expense transaction and check results
-	async function updateExpense(view, pos, params)
+	async function updateExpense(app, pos, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
@@ -129,30 +135,32 @@ var runExpense = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!App.isObject(params))
+		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
 
-		view = await App.goToMainView(view);
-		view = await view.goToTransactions();
-		view = await view.filterByType(App.EXPENSE);
+		await app.goToMainView(app);
+		await app.view.goToTransactions();
+		await app.view.filterByType(app.EXPENSE);
 
-		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
+		app.beforeUpdateTransaction = { trCount : app.view.content.transList.items.length };
 
-		let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
+		let trObj = await app.view.getTransactionObject(app.view.content.transList.items[pos].id);
 		if (!trObj)
 			throw new Error('Transaction not found');
 
-		App.beforeUpdateTransaction.trObj = trObj;
-		App.notify();
+		app.beforeUpdateTransaction.trObj = trObj;
+		app.notify();
 
-		view = await view.goToUpdateTransaction(pos);
+		await app.view.goToUpdateTransaction(pos);
+
+		view = app.view;
 
 		// Step
-		let isDiff = (App.beforeUpdateTransaction.trObj.src_curr != App.beforeUpdateTransaction.trObj.dest_curr);
+		let isDiff = (app.beforeUpdateTransaction.trObj.src_curr != app.beforeUpdateTransaction.trObj.dest_curr);
 
-		await test('Initial state of update expense view', async () => view.setExpectedState(isDiff ? 2 : 0), view);
+		await test('Initial state of update expense view', async () => app.view.setExpectedState(isDiff ? 2 : 0), view);
 
-		App.setParam(App.beforeUpdateTransaction,
+		app.setParam(app.beforeUpdateTransaction,
 					{ id : view.model.id,
 						srcAcc : view.model.srcAccount,
 						srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
@@ -161,43 +169,43 @@ var runExpense = (function()
 						destAmount : view.model.fDestAmount,
 						date : view.model.date,
 						comment : view.model.comment });
-		App.notify();
+		app.notify();
 
-		view = await submitExpenseTransaction(view, params);
+		await submitExpenseTransaction(app, params);
 
 		// Step
-		view = await view.filterByType(App.EXPENSE);
+		await app.view.filterByType(app.EXPENSE);
 
-	 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
-		let trans_id = App.beforeUpdateTransaction.id;
-		let transCount = App.beforeUpdateTransaction.trCount;
-		let origDate = App.beforeUpdateTransaction.date;
-		let origComment = App.beforeUpdateTransaction.comment;
+	 	let updSrcAcc = app.beforeSubmitTransaction.srcAcc;
+		let trans_id = app.beforeUpdateTransaction.id;
+		let transCount = app.beforeUpdateTransaction.trCount;
+		let origDate = app.beforeUpdateTransaction.date;
+		let origComment = app.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = '- ' + App.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id);
+		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id);
 		if ('destCurr' in params && 'srcAmount' in params)
 		{
-			fmtAmount += ' (- ' + App.formatCurrency(params.destAmount, params.destCurr) + ')';
+			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updSrcAcc.name,
 											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? App.formatDate(new Date(params.date)) : origDate,
+										 	dateFmt : ('date' in params) ? app.formatDate(new Date(params.date)) : origDate,
 										 	comment : ('comment' in params) ? params.comment : origComment };
 
-		await test('Transaction update', async () => {}, view, state);
+		await test('Transaction update', async () => {}, app.view, state);
 
-		view = await App.goToMainView(view);
+		await app.goToMainView(app);
 
 		// Step
-		let updSrcAccPos = App.beforeSubmitTransaction.srcAccPos;
-	 	let origSrcAcc = App.beforeUpdateTransaction.srcAcc;
-		let origSrcAccPos = App.beforeUpdateTransaction.srcAccPos;
-		let origSrcBalance = App.beforeUpdateTransaction.srcBalance;
-		let origSrcAmount = App.beforeUpdateTransaction.srcAmount;
+		let updSrcAccPos = app.beforeSubmitTransaction.srcAccPos;
+	 	let origSrcAcc = app.beforeUpdateTransaction.srcAcc;
+		let origSrcAccPos = app.beforeUpdateTransaction.srcAccPos;
+		let origSrcBalance = app.beforeUpdateTransaction.srcBalance;
+		let origSrcAmount = app.beforeUpdateTransaction.srcAmount;
 
 		// Obtain real source amount from props:
 		// In case of expense with different currency use source amount value
@@ -205,39 +213,39 @@ var runExpense = (function()
 		var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		var expBalance, fmtBal;
 		// Chech if account was changed we need to update both
 		if (updSrcAccPos != origSrcAccPos)
 		{
 			expBalance = origSrcBalance + origSrcAmount;
-			fmtBal = App.formatCurrency(expBalance, origSrcAcc.curr_id);
+			fmtBal = app.formatCurrency(expBalance, origSrcAcc.curr_id);
 
 			accWidget.tiles.items[origSrcAccPos] = { balance : fmtBal, name : origSrcAcc.name };
 
-			expBalance = updSrcAcc.balance - App.normalize(sa);
-			fmtBal = App.formatCurrency(expBalance, updSrcAcc.curr_id);
+			expBalance = updSrcAcc.balance - app.normalize(sa);
+			fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 		else		// account not changed
 		{
-			var expBalance = origSrcBalance + origSrcAmount - App.normalize(sa);
-			var fmtBal = App.formatCurrency(expBalance, updSrcAcc.curr_id);
+			var expBalance = origSrcBalance + origSrcAmount - app.normalize(sa);
+			var fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget } } };
 
-		await test('Account balance update', async () => {}, view, state);
-
-		return view;
+		await test('Account balance update', async () => {}, app.view, state);
 	}
 
 
-	async function expenseTransactionLoop(view, actionState, action)
+	async function expenseTransactionLoop(app, actionState, action)
 	{
+		let view = app.view;
+
 	// State 0
 		view.setBlock('Expense loop', 2);
 		await test('Initial state of new expense view', async () =>
@@ -246,9 +254,9 @@ var runExpense = (function()
 
 			if (trObj)
 			{
-				let srcAcc = App.idSearch(App.accounts, view.model.srcAccount.id);
+				let srcAcc = app.idSearch(app.accounts, view.model.srcAccount.id);
 
-				let initialBal = App.normalize(view.model.fSrcResBal + trObj.srcAmount);
+				let initialBal = app.normalize(view.model.fSrcResBal + trObj.srcAmount);
 				view.model.srcAccount.fmtBalance = view.model.srcCurr.formatValue(initialBal);
 			}
 
@@ -258,7 +266,7 @@ var runExpense = (function()
 		actionState = parseInt(actionState);
 		var actionRequested = !isNaN(actionState);
 		if (actionState === 0)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -275,7 +283,7 @@ var runExpense = (function()
 		await test('(2) Click on source result balance', () => view.clickSrcResultBalance(), view);
 
 		if (actionState === 1)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -302,7 +310,7 @@ var runExpense = (function()
 		await test('(4) Change destination curency to USD', () => view.changeDestCurrency(2), view);
 
 		if (actionState === 2)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -320,7 +328,7 @@ var runExpense = (function()
 		await test('(8) Click on exchange rate', () => view.clickExchRate(), view);
 
 		if (actionState === 3)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -359,7 +367,7 @@ var runExpense = (function()
 		await test('(6) Click on source result block', () => view.clickSrcResultBalance(), view);
 
 		if (actionState === 4)
-			return action(view);
+			return action(app);
 
 	// Transition 10: change account to another one with currency different than current destination currency and stay on State 4
 		await test('(10) Change account to another one with currency different than current destination currency',
@@ -401,9 +409,6 @@ var runExpense = (function()
 	// Transition 11: select source account with the same currency as destination and move from State 4 to State 1
 		await test('(11) Change account to another one with the same currency as destination',
 				() => view.changeSrcAccountByPos(2), view);
-
-
-		return view;
 	}
 
 

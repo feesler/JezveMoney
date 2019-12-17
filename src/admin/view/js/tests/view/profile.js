@@ -97,8 +97,6 @@ ProfileView.prototype.changeName = async function(newName)
 		throw new Error('Fail to update user name');
 
 	await this.performAction(() => this.msgPopup.close());
-
-	return this;
 };
 
 
@@ -124,13 +122,13 @@ ProfileView.prototype.changePassword = async function(oldPass, newPass)
 		throw new Error('Fail to update password');
 
 	await this.performAction(() => this.msgPopup.close());
-
-	return this;
 };
 
 
 ProfileView.prototype.resetAccounts = async function()
 {
+	let app = this.app;
+
 	if (!this.content.resetBtn)
 		throw new Error('Reset accounts button not found');
 
@@ -141,21 +139,23 @@ ProfileView.prototype.resetAccounts = async function()
 	if (!this.content.reset_warning.okBtn)
 		throw new Error('Confirm button not found');
 
-	let view = await this.navigation(() => this.click(this.content.reset_warning.okBtn));
+	await this.navigation(() => this.click(this.content.reset_warning.okBtn));
 
 	// Use view here instead of this because the instance was changed after navigation
-	if (!view.msgPopup)
+	if (!app.view.msgPopup)
 		throw new Error('Message popup not found');
 
-	if (!view.msgPopup.success || view.msgPopup.message !== 'Accounts successfully reseted')
+	if (!app.view.msgPopup.success || app.view.msgPopup.message !== 'Accounts successfully reseted')
 		throw new Error('Fail to reset accounts');
 
-	return view.performAction(() => view.msgPopup.close());
+	await app.view.performAction(() => view.msgPopup.close());
 };
 
 
 ProfileView.prototype.resetAll = async function()
 {
+	let app = this.app;
+
 	if (!this.content.resetAllBtn)
 		throw new Error('Reset all button not found');
 
@@ -166,21 +166,23 @@ ProfileView.prototype.resetAll = async function()
 	if (!this.content.reset_all_warning.okBtn)
 		throw new Error('Confirm button not found');
 
-	let view = await this.navigation(() => this.click(this.content.reset_all_warning.okBtn));
+	await this.navigation(() => this.click(this.content.reset_all_warning.okBtn));
 
 	// Use view here instead of this because the instance was changed after navigation
-	if (!view.msgPopup)
+	if (!app.view.msgPopup)
 		throw new Error('Message popup not found');
 
-	if (!view.msgPopup.success || view.msgPopup.message !== 'All data successfully reseted.')
+	if (!app.view.msgPopup.success || app.view.msgPopup.message !== 'All data successfully reseted.')
 		throw new Error('Fail to reset all');
 
-	return view.performAction(() => view.msgPopup.close());
+	await app.view.performAction(() => app.view.msgPopup.close());
 };
 
 
 ProfileView.prototype.deleteProfile = async function()
 {
+	let app = this.app;
+
 	if (!this.content.deleteProfileBtn)
 		throw new Error('Delete button not found');
 
@@ -191,18 +193,18 @@ ProfileView.prototype.deleteProfile = async function()
 	if (!this.content.delete_warning.okBtn)
 		throw new Error('Confirm button not found');
 
-	let view = await this.navigation(() => this.click(this.content.delete_warning.okBtn));
-	if (!(view instanceof LoginView))
+	await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+	if (!(app.view instanceof LoginView))
 		throw new Error('Unexpected page');
 
 	// Use view here instead of this because the instance was changed after navigation
-	if (!view.msgPopup)
+	if (!app.view.msgPopup)
 		throw new Error('Message popup not found');
 
-	if (!view.msgPopup.success || view.msgPopup.message !== 'Your profile is successfully deleted.')
+	if (!app.view.msgPopup.success || app.view.msgPopup.message !== 'Your profile is successfully deleted.')
 		throw new Error('Fail to delete profile');
 
-	return view.performAction(() => view.msgPopup.close());
+	await app.view.performAction(() => app.view.msgPopup.close());
 };
 
 

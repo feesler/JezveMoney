@@ -15,8 +15,10 @@ var runTransfer = (function()
 	}
 
 
-	async function submitTransferTransaction(view, params)
+	async function submitTransferTransaction(app, params)
 	{
+		let view = app.view;
+
 		if ('srcAcc' in params)
 		{
 			let acc = await view.getAccountByPos(params.srcAcc);
@@ -51,34 +53,37 @@ var runTransfer = (function()
 		if ('comment' in params)
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
-		App.beforeSubmitTransaction = { srcAcc : view.model.srcAccount,
+		app.beforeSubmitTransaction = { srcAcc : view.model.srcAccount,
 									srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
 									destAcc : view.model.destAccount,
 									destAccPos : await view.getAccountPos(view.model.destAccount.id),
 								 	srcAmount : view.model.fSrcAmount,
 								 	destAmount : view.model.fDestAmount };
-		App.notify();
+		app.notify();
 
 		return view.submit();
 	}
 
 
-	async function createTransfer(view, onState, params)
+	async function createTransfer(app, onState, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Create transfer (' + titleParams.join(', ') + ')', 2);
 
-		view = await App.goToMainView(view);
-		view = await view.goToNewTransactionByAccount(0);
-		view = await view.changeTransactionType(App.TRANSFER);
-		view = await transferTransactionLoop(view, onState, view => submitTransferTransaction(view, params));
+		await app.goToMainView(app);
+		await app.view.goToNewTransactionByAccount(0);
+		await app.view.changeTransactionType(app.TRANSFER);
+		await transferTransactionLoop(app, onState, app => submitTransferTransaction(app, params));
+		view = app.view;
 
-		let srcAcc = App.beforeSubmitTransaction.srcAcc;
-		let srcAccPos = App.beforeSubmitTransaction.srcAccPos;
-		let destAcc = App.beforeSubmitTransaction.destAcc;
-		let destAccPos = App.beforeSubmitTransaction.destAccPos;
+		let srcAcc = app.beforeSubmitTransaction.srcAcc;
+		let srcAccPos = app.beforeSubmitTransaction.srcAccPos;
+		let destAcc = app.beforeSubmitTransaction.destAcc;
+		let destAccPos = app.beforeSubmitTransaction.destAccPos;
 
 		// Obtain real source and destination amount from props:
 		// Source amount expected to be always set
@@ -86,46 +91,46 @@ var runTransfer = (function()
 		// In case of transfer between accounts with the same currency copy source amount value
 		var sa = params.srcAmount;
 		var da = ('destAmount' in params) ? params.destAmount : params.srcAmount;
-		var expSrcBalance = srcAcc.balance - App.normalize(sa);
-		var expDestBalance = destAcc.balance + App.normalize(da);
-		var fmtSrcBal = App.formatCurrency(expSrcBalance, srcAcc.curr_id);
-		var fmtDestBal = App.formatCurrency(expDestBalance, destAcc.curr_id);
+		var expSrcBalance = srcAcc.balance - app.normalize(sa);
+		var expDestBalance = destAcc.balance + app.normalize(da);
+		var fmtSrcBal = app.formatCurrency(expSrcBalance, srcAcc.curr_id);
+		var fmtDestBal = app.formatCurrency(expDestBalance, destAcc.curr_id);
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		accWidget.tiles.items[srcAccPos] = { balance : fmtSrcBal, name : srcAcc.name };
 		accWidget.tiles.items[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = App.formatCurrency(sa, srcAcc.curr_id);
+		var fmtAmount = app.formatCurrency(sa, srcAcc.curr_id);
 		if ('destAmount' in params)
 		{
-			fmtAmount += ' (' + App.formatCurrency(da, destAcc.curr_id) + ')';
+			fmtAmount += ' (' + app.formatCurrency(da, destAcc.curr_id) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(App.transactions.length + 1, 5) } } };
+							transList : { items : { length : Math.min(app.transactions.length + 1, 5) } } };
 		transWidget.transList.items[0] = { accountTitle : srcAcc.name + ' → ' + destAcc.name,
 										amountText : fmtAmount,
-									 	dateFmt : App.formatDate(('date' in params) ? new Date(params.date) : new Date()),
+									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
 
 		await test('Transfer transaction submit', async () => {}, view, state);
 
-		App.transactions = view.content.widgets[2].transList.items;
-		App.accounts = view.content.widgets[0].tiles.items;
-		App.persons = view.content.widgets[3].infoTiles.items;
-		App.notify();
-
-		return view;
+		app.transactions = view.content.widgets[2].transList.items;
+		app.accounts = view.content.widgets[0].tiles.items;
+		app.persons = view.content.widgets[3].infoTiles.items;
+		app.notify();
 	}
 
 
 	// Update transfer transaction and check results
-	async function updateTransfer(view, pos, params)
+	async function updateTransfer(app, pos, params)
 	{
+		let view = app.view;
+
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
@@ -135,32 +140,34 @@ var runTransfer = (function()
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		if (!App.isObject(params))
+		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
 
 		// Step 0: Navigate to transactions list view and filter by transfer
-		view = await App.goToMainView(view);
-		view = await view.goToTransactions();
-		view = await view.filterByType(App.TRANSFER);
+		await app.goToMainView(app);
+		await app.view.goToTransactions();
+		await app.view.filterByType(app.TRANSFER);
+		view = app.view;
 
 		// Step 1: Save count of transactions and navigate to update transaction view
-		App.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
+		app.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
 
 		let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
 		if (!trObj)
 			throw new Error('Transaction not found');
 
-		App.beforeUpdateTransaction.trObj = trObj;
-		App.notify();
+		app.beforeUpdateTransaction.trObj = trObj;
+		app.notify();
 
-		view = await view.goToUpdateTransaction(pos);
+		await view.goToUpdateTransaction(pos);
+		view = app.view;
 
 		// Step 2: Save original data of transaction, perform update actions and submit
-		let isDiff = (App.beforeUpdateTransaction.trObj.src_curr != App.beforeUpdateTransaction.trObj.dest_curr);
+		let isDiff = (app.beforeUpdateTransaction.trObj.src_curr != app.beforeUpdateTransaction.trObj.dest_curr);
 
 		await test('Initial state of update transfer view', async () => view.setExpectedState(isDiff ? 3 : 0), view);
 
-		App.setParam(App.beforeUpdateTransaction,
+		app.setParam(app.beforeUpdateTransaction,
 					{ id : view.model.id,
 						srcAcc : view.model.srcAccount,
 						srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
@@ -173,51 +180,51 @@ var runTransfer = (function()
 						date : view.model.date,
 						comment : view.model.comment});
 
-		view = await submitTransferTransaction(view, params);
+		await submitTransferTransaction(app, params);
 
 		// Step 3: Check update of transactions list
-		view = await view.filterByType(App.TRANSFER);
+		await app.view.filterByType(app.TRANSFER);
 
-		let trans_id = App.beforeUpdateTransaction.id;
-	 	let updSrcAcc = App.beforeSubmitTransaction.srcAcc;
-	 	let updDestAcc = App.beforeSubmitTransaction.destAcc;
-		let updSrcAmount = App.beforeSubmitTransaction.srcAmount;
-		let updDestAmount = App.beforeSubmitTransaction.destAmount;
-		let transCount = App.beforeUpdateTransaction.trCount;
-		let origDate = App.beforeUpdateTransaction.date;
-		let origComment = App.beforeUpdateTransaction.comment;
+		let trans_id = app.beforeUpdateTransaction.id;
+	 	let updSrcAcc = app.beforeSubmitTransaction.srcAcc;
+	 	let updDestAcc = app.beforeSubmitTransaction.destAcc;
+		let updSrcAmount = app.beforeSubmitTransaction.srcAmount;
+		let updDestAmount = app.beforeSubmitTransaction.destAmount;
+		let transCount = app.beforeUpdateTransaction.trCount;
+		let origDate = app.beforeUpdateTransaction.date;
+		let origComment = app.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = App.formatCurrency(updSrcAmount, updSrcAcc.curr_id);
+		var fmtAmount = app.formatCurrency(updSrcAmount, updSrcAcc.curr_id);
 		if (updSrcAcc.curr_id != updDestAcc.curr_id)
 		{
-			fmtAmount += ' (' + App.formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
+			fmtAmount += ' (' + app.formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updSrcAcc.name + ' → ' + updDestAcc.name,
 											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? App.formatDate(new Date(params.date)) : origDate,
+										 	dateFmt : ('date' in params) ? app.formatDate(new Date(params.date)) : origDate,
 										 	comment : ('comment' in params) ? params.comment : origComment };
 
-		await test('Transaction update', async () => {}, view, state);
+		await test('Transaction update', async () => {}, app.view, state);
 
-		view = await App.goToMainView(view);
+		await app.goToMainView(app);
 
 		// Step 4: Check updates of affected accounts
-		let updSrcAccPos = App.beforeSubmitTransaction.srcAccPos;
-	 	let origSrcAcc = App.beforeUpdateTransaction.srcAcc;
-		let origSrcAccPos = App.beforeUpdateTransaction.srcAccPos;
-		let origSrcBalance = App.beforeUpdateTransaction.srcBalance;
+		let updSrcAccPos = app.beforeSubmitTransaction.srcAccPos;
+	 	let origSrcAcc = app.beforeUpdateTransaction.srcAcc;
+		let origSrcAccPos = app.beforeUpdateTransaction.srcAccPos;
+		let origSrcBalance = app.beforeUpdateTransaction.srcBalance;
 
-		let updDestAccPos = App.beforeSubmitTransaction.destAccPos;
-	 	let origDestAcc = App.beforeUpdateTransaction.destAcc;
-		let origDestAccPos = App.beforeUpdateTransaction.destAccPos;
-		let origDestBalance = App.beforeUpdateTransaction.destBalance;
+		let updDestAccPos = app.beforeSubmitTransaction.destAccPos;
+	 	let origDestAcc = app.beforeUpdateTransaction.destAcc;
+		let origDestAccPos = app.beforeUpdateTransaction.destAccPos;
+		let origDestBalance = app.beforeUpdateTransaction.destBalance;
 
-		let origSrcAmount = App.beforeUpdateTransaction.srcAmount;
-		let origDestAmount = App.beforeUpdateTransaction.destAmount;
+		let origSrcAmount = app.beforeUpdateTransaction.srcAmount;
+		let origDestAmount = app.beforeUpdateTransaction.destAmount;
 
 		// Obtain real source and destination amount from props:
 		// Source amount expected to be always set
@@ -227,7 +234,7 @@ var runTransfer = (function()
 		var da = updDestAmount;
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : App.accounts.length } } };
+		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		var expBalance = [], fmtBal;
 
 		// Cancel transaction
@@ -241,7 +248,7 @@ var runTransfer = (function()
 			affectedAccounts[updSrcAccPos] = { balance : updSrcAcc.balance, name : updSrcAcc.name, curr_id : updSrcAcc.curr_id };
 		}
 
-		affectedAccounts[updSrcAccPos].balance -= App.normalize(sa);
+		affectedAccounts[updSrcAccPos].balance -= app.normalize(sa);
 
 		// Chech if account was changed we need to update both
 		if (!(updDestAccPos in affectedAccounts))
@@ -249,33 +256,33 @@ var runTransfer = (function()
 			affectedAccounts[updDestAccPos] = { balance : updDestAcc.balance, name : updDestAcc.name, curr_id : updDestAcc.curr_id };
 		}
 
-		affectedAccounts[updDestAccPos].balance += App.normalize(da);
+		affectedAccounts[updDestAccPos].balance += app.normalize(da);
 
 		for(let accPos in affectedAccounts)
 		{
 			let acc = affectedAccounts[accPos];
-			fmtBal = App.formatCurrency(acc.balance, acc.curr_id);
+			fmtBal = app.formatCurrency(acc.balance, acc.curr_id);
 
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}
 
 		var state = { values : { widgets : { length : 5, 0 : accWidget } } };
 
-		await test('Account balance update', async () => {}, view, state);
-
-		return view;
+		await test('Account balance update', async () => {}, app.view, state);
 	}
 
 
-	async function transferTransactionLoop(view, actionState, action)
+	async function transferTransactionLoop(app, actionState, action)
 	{
+		let view = app.view;
+
 		view.setBlock('Transfer loop', 2);
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);
 		var actionRequested = !isNaN(actionState);
 		if (actionState === 0)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -300,7 +307,7 @@ var runTransfer = (function()
 		await test('(1) Click on source result balance', () => view.clickSrcResultBalance(), view);
 
 		if (actionState === 1)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -325,7 +332,7 @@ var runTransfer = (function()
 		await test('(9) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
 		if (actionState === 2)
-			return action(view);
+			return action(app);
 
 		if (!actionRequested)
 		{
@@ -349,7 +356,7 @@ var runTransfer = (function()
 	// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
 
 		if (actionState === 5)
-			return action(view);
+			return action(app);
 
 		await test('(16) Change source account', () => view.changeSrcAccountByPos(2), view);
 	// Transition 26: Change source account to another one with different currency (EUR) and stay on State 5
@@ -369,7 +376,7 @@ var runTransfer = (function()
 	// Transition 6: Change source account to another one with different currency than destination (USD) and move from State 0 to State 3
 
 		if (actionState === 3)
-			return action(view);
+			return action(app);
 
 		await test('(6) Change source account', () => view.changeSrcAccountByPos(2), view);
 	// Transition 43: Change source account to another one with different currency than destination (RUB) and stay on State 3

@@ -65,11 +65,11 @@ var runTransList = (function()
 	];
 
 
-	async function preCreateData()
+	async function preCreateData(app)
 	{
 		console.log('Precreate data...');
 
-		dateList = dateList.map(item => App.formatDate(item));
+		dateList = dateList.map(item => app.formatDate(item));
 
 		await api.user.login('test', 'test');
 		await api.profile.reset();
@@ -142,20 +142,19 @@ var runTransList = (function()
 	}
 
 
-	async function runTests(view, app)
+	async function runTests(app)
 	{
-		env = view.props.environment;
-		App = app;
-		let test = App.test;
+		env = app.view.props.environment;
+		let test = app.test;
 
-		api.setEnv(env, App);
+		api.setEnv(env, app);
 
 		env.setBlock('Transaction List view', 1);
 
-		await preCreateData();
+		await preCreateData(app);
 
-		view = await App.goToMainView(view);
-		view = await view.goToTransactions();
+		await app.goToMainView(app);
+		await app.view.goToTransactions();
 
 		const onPage = 10;
 		let totalExpenses = expensesList.length * dateList.length;
@@ -174,53 +173,53 @@ var runTransList = (function()
 									modeSelector : { listMode : { isActive : true },
 														detailsMode : { isActive : false } } } };
 
-		await test('Initial state of transaction list view', async () => {}, view, state);
+		await test('Initial state of transaction list view', async () => {}, app.view, state);
 
 		state.values.paginator.active = 2;
-		view = await view.goToNextPage();
-		await test('Navigate to page 2', () => {}, view, state);
+		await app.view.goToNextPage();
+		await test('Navigate to page 2', () => {}, app.view, state);
 
 		state.values.modeSelector.detailsMode.isActive = true;
 		state.values.modeSelector.listMode.isActive = false;
-		view = await view.setDetailsMode();
-		await test('Change list mode to details', () => {}, view, state);
+		await app.view.setDetailsMode();
+		await test('Change list mode to details', () => {}, app.view, state);
 
 		state.values.paginator.active = 3;
-		view = await view.goToNextPage();
-		await test('Navigate to page 3', () => {}, view, state);
+		await app.view.goToNextPage();
+		await test('Navigate to page 3', () => {}, app.view, state);
 
-		state.values.typeMenu.activeType = App.EXPENSE;
+		state.values.typeMenu.activeType = app.EXPENSE;
 		state.values.paginator.active = 1;
 		state.values.paginator.pages = Math.ceil(totalExpenses / onPage);
-		view = await view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Expense', () => {}, view, state);
+		await app.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Expense', () => {}, app.view, state);
 
-		state.values.typeMenu.activeType = App.INCOME;
+		state.values.typeMenu.activeType = app.INCOME;
 		state.values.paginator.pages = Math.ceil(totalIncomes / onPage);
-		view = await view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Income', () => {}, view, state);
+		await app.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Income', () => {}, app.view, state);
 
-		state.values.typeMenu.activeType = App.TRANSFER;
+		state.values.typeMenu.activeType = app.TRANSFER;
 		state.values.paginator.pages = Math.ceil(totalTransfers / onPage);
-		view = await view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter Transfer transactions', () => {}, view, state);
+		await app.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter Transfer transactions', () => {}, app.view, state);
 
-		state.values.typeMenu.activeType = App.DEBT;
+		state.values.typeMenu.activeType = app.DEBT;
 		state.values.paginator.pages = Math.ceil(totalDebts / onPage);
-		view = await view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Debt', () => {}, view, state);
+		await app.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Debt', () => {}, app.view, state);
 
 		let acc_2_debts = 1 * dateList.length;
 		let acc_2_week = 5;
 		let acc_2_all = acc_2_week  * dateList.length;
 		state.values.paginator.pages = Math.ceil(acc_2_debts / onPage);
-		view = await view.filterByAccounts(accIds[2]);
-		await test('Filter by accounts', () => {}, view, state);
+		await app.view.filterByAccounts(accIds[2]);
+		await test('Filter by accounts', () => {}, app.view, state);
 
 		state.values.typeMenu.activeType = 0;
 		state.values.paginator.pages = Math.ceil(acc_2_all / onPage);
-		view = await view.filterByType(state.values.typeMenu.activeType);
-		await test('Show all transactions', () => {}, view, state);
+		await app.view.filterByType(state.values.typeMenu.activeType);
+		await test('Show all transactions', () => {}, app.view, state);
 
 		let day1 = now.getDate();
 		let day2;
@@ -236,12 +235,12 @@ var runTransList = (function()
 
 		state.values.typeMenu.activeType = 0;
 		state.values.paginator.pages = Math.ceil(acc_2_week / onPage);
-		view = await view.selectDateRange(day1, day2);
-		await test('Select date range', () => {}, view, state);
+		await app.view.selectDateRange(day1, day2);
+		await test('Select date range', () => {}, app.view, state);
 
 		state.values.searchForm.value = '1';
-		view = await view.search(state.values.searchForm.value);
-		await test('Search', () => {}, view, state);
+		await app.view.search(state.values.searchForm.value);
+		await test('Search', () => {}, app.view, state);
 	}
 
 
