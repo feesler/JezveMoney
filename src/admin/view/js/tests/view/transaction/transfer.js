@@ -693,42 +693,15 @@ clickExchRate()
 
 changeSourceCurrency(val)
 {
-	if (this.model.src_curr_id == val)
-		return super.changeSourceCurrency(val);
-
-	this.model.src_curr_id = parseInt(val);
-	this.model.srcCurr = getCurrency(this.model.src_curr_id);
-
-	this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
-
-	if (this.model.isDiffCurr && this.model.state === 0)			// Transition 3
-	{
-		this.updateExch(this.model);
-		this.setExpectedState(2);
-	}
-	else if (this.model.state === 2 || this.model.state === 3 || this.model.state === 4)
-	{
-		if (this.model.isDiffCurr)			// Transition 9, 21 or 15
-		{
-			this.updateExch(this.model);
-			this.setExpectedState(this.model.state);
-		}
-		else								// Transition 9
-		{
-			this.setDestAmount(this.model, this.model.srcAmount);
-			this.calcExchByAmounts(this.model);
-			this.updateExch(this.model);
-			if (this.model.state === 2 || this.model.state === 3)	// Transition 10 or 16
-				this.setExpectedState(0);
-			else													// Transition 22
-				this.setExpectedState(1);
-		}
-	}
-	else
-		throw new Error('Unexpected transition');
-
-	return super.changeSourceCurrency(val);
+	throw new Error('Unexpected action: can\'t change source currency of transfter transaction');
 }
+
+
+changeDestCurrency(val)
+{
+	throw new Error('Unexpected action: can\'t change destination currency of transfter transaction');
+}
+
 
 }
 

@@ -739,6 +739,18 @@ clickSrcAmount()
 	return super.clickSrcAmount();
 }
 
+
+changeSourceCurrency(val)
+{
+	throw new Error('Unexpected action: can\'t change source currency of debt transaction');
+}
+
+
+changeDestCurrency(val)
+{
+	throw new Error('Unexpected action: can\'t change destination currency of debt transaction');
+}
+
 }
 
 
