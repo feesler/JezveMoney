@@ -10,115 +10,113 @@ if (typeof module !== 'undefined' && module.exports)
 // Main view class
 class MainView extends TestView
 {
-
-async parseContent()
-{
-	var widgetsElem = await this.queryAll('.content_wrap .widget');
-	if (!widgetsElem)
-		throw new Error('Fail to parse main view widgets');
-
-	var res = {};
-	res.widgets = [];
-	for(var i = 0; i < widgetsElem.length; i++)
+	async parseContent()
 	{
-		var widget = { elem : widgetsElem[i],
-						titleElem : await this.query(widgetsElem[i], '.widget_title'),
-						linkElem : await this.query(widgetsElem[i], '.widget_title > a'),
-						textElem : await this.query(widgetsElem[i], '.widget_title span') };
+		var widgetsElem = await this.queryAll('.content_wrap .widget');
+		if (!widgetsElem)
+			throw new Error('Fail to parse main view widgets');
 
-		if (widget.linkElem)
-			widget.link = await this.prop(widget.linkElem, 'href');
-		if (widget.textElem)
-			widget.title = await this.prop(widget.textElem, 'innerText');
+		var res = {};
+		res.widgets = [];
+		for(var i = 0; i < widgetsElem.length; i++)
+		{
+			var widget = { elem : widgetsElem[i],
+							titleElem : await this.query(widgetsElem[i], '.widget_title'),
+							linkElem : await this.query(widgetsElem[i], '.widget_title > a'),
+							textElem : await this.query(widgetsElem[i], '.widget_title span') };
 
-		var tiles = await this.parseTiles(await this.query(widget.elem, '.tiles'));
-		if (tiles)
-			widget.tiles = tiles;
-		tiles = await this.parseInfoTiles(await this.query(widget.elem, '.info_tiles'));
-		if (tiles)
-			widget.infoTiles = tiles;
+			if (widget.linkElem)
+				widget.link = await this.prop(widget.linkElem, 'href');
+			if (widget.textElem)
+				widget.title = await this.prop(widget.textElem, 'innerText');
 
-		var transactions = await this.parseTransactionsList(await this.query(widget.elem, '.trans_list'));
-		if (transactions)
-			widget.transList = transactions;
+			var tiles = await this.parseTiles(await this.query(widget.elem, '.tiles'));
+			if (tiles)
+				widget.tiles = tiles;
+			tiles = await this.parseInfoTiles(await this.query(widget.elem, '.info_tiles'));
+			if (tiles)
+				widget.infoTiles = tiles;
 
-		res.widgets.push(widget);
+			var transactions = await this.parseTransactionsList(await this.query(widget.elem, '.trans_list'));
+			if (transactions)
+				widget.transList = transactions;
+
+			res.widgets.push(widget);
+		}
+
+		return res;
 	}
 
-	return res;
-}
+
+	goToAccounts()
+	{
+	 	if (!this.content.widgets || !this.content.widgets[0])
+			throw new Error('Accounts widget not found');
+
+		var widget = this.content.widgets[0];
+		if (widget.title != 'Accounts')
+			throw new Error('Wrong widget');
+
+		return this.navigation(() => this.click(widget.linkElem));
+	}
 
 
-goToAccounts()
-{
- 	if (!this.content.widgets || !this.content.widgets[0])
-		throw new Error('Accounts widget not found');
+	goToNewTransactionByAccount(accNum)
+	{
+		if (!this.content.widgets || !this.content.widgets[0])
+			throw new Error('Wrong state of main view');
 
-	var widget = this.content.widgets[0];
-	if (widget.title != 'Accounts')
-		throw new Error('Wrong widget');
+		var accWidget = this.content.widgets[0];
+		if (accWidget.title != 'Accounts')
+			throw new Error('Wrong state of accounts widget');
 
-	return this.navigation(() => this.click(widget.linkElem));
-}
+		 if (!accWidget.tiles || accWidget.tiles.items.length <= accNum)
+			throw new Error('Tile ' + accNum + ' not found');
 
+		var tile = accWidget.tiles.items[accNum];
+		var link = tile.linkElem;
 
-goToNewTransactionByAccount(accNum)
-{
-	if (!this.content.widgets || !this.content.widgets[0])
-		throw new Error('Wrong state of main view');
-
-	var accWidget = this.content.widgets[0];
-	if (accWidget.title != 'Accounts')
-		throw new Error('Wrong state of accounts widget');
-
-	 if (!accWidget.tiles || accWidget.tiles.items.length <= accNum)
-		throw new Error('Tile ' + accNum + ' not found');
-
-	var tile = accWidget.tiles.items[accNum];
-	var link = tile.linkElem;
-
-	return this.navigation(() => this.click(link));
-}
+		return this.navigation(() => this.click(link));
+	}
 
 
-goToTransactions()
-{
-	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw new Error('Fail to parse main view widgets');
+	goToTransactions()
+	{
+		if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+			throw new Error('Fail to parse main view widgets');
 
-	var widget = this.content.widgets[2];
-	if (widget.title != 'Transactions')
-		throw new Error('Wrong widget');
+		var widget = this.content.widgets[2];
+		if (widget.title != 'Transactions')
+			throw new Error('Wrong widget');
 
-	return this.navigation(() => this.click(widget.linkElem));
-}
-
-
-goToPersons()
-{
-	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw new Error('Fail to parse main view widgets');
-
-	var widget = this.content.widgets[3];
-	if (widget.title != 'Persons')
-		throw new Error('Wrong widget');
-
-	return this.navigation(() => this.click(widget.linkElem));
-}
+		return this.navigation(() => this.click(widget.linkElem));
+	}
 
 
-goToStatistics()
-{
-	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
-		throw new Error('Fail to parse main view widgets');
+	goToPersons()
+	{
+		if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+			throw new Error('Fail to parse main view widgets');
 
-	var widget = this.content.widgets[4];
-	if (widget.title != 'Statistics')
-		throw new Error('Wrong widget');
+		var widget = this.content.widgets[3];
+		if (widget.title != 'Persons')
+			throw new Error('Wrong widget');
 
-	return this.navigation(() => this.click(widget.linkElem));
-}
+		return this.navigation(() => this.click(widget.linkElem));
+	}
 
+
+	goToStatistics()
+	{
+		if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+			throw new Error('Fail to parse main view widgets');
+
+		var widget = this.content.widgets[4];
+		if (widget.title != 'Statistics')
+			throw new Error('Wrong widget');
+
+		return this.navigation(() => this.click(widget.linkElem));
+	}
 }
 
 
