@@ -16,18 +16,18 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // Create or update expense transaction view tests
-function ExpenseTransactionView()
+class ExpenseTransactionView extends TransactionView
 {
-	ExpenseTransactionView.parent.constructor.apply(this, arguments);
+
+constructor(...args)
+{
+	super(...args);
 
 	this.expectedState = {};
 }
 
 
-extend(ExpenseTransactionView, TransactionView);
-
-
-ExpenseTransactionView.prototype.buildModel = async function(cont)
+async buildModel(cont)
 {
 	var res = {};
 
@@ -88,12 +88,12 @@ ExpenseTransactionView.prototype.buildModel = async function(cont)
 	res.comment = cont.comment_row.value;
 
 	return res;
-};
+}
 
 
 // Set source amount value
 // State 0 or 1: source and destination currencies are the same
-ExpenseTransactionView.prototype.setSrcAmount = function(model, val)
+setSrcAmount(model, val)
 {
 	model.srcAmount = val;
 
@@ -107,12 +107,12 @@ ExpenseTransactionView.prototype.setSrcAmount = function(model, val)
 	}
 
 	return model;
-};
+}
 
 
 // Set destination amount value
 // State 0 or 1: source and destination currencies are the same
-ExpenseTransactionView.prototype.setDestAmount = function(model, val)
+setDestAmount(model, val)
 {
 	model.destAmount = val;
 
@@ -123,10 +123,10 @@ ExpenseTransactionView.prototype.setDestAmount = function(model, val)
 	}
 
 	return model;
-};
+}
 
 
-ExpenseTransactionView.prototype.setExpectedState = function(state_id)
+setExpectedState(state_id)
 {
 	var res = {};
 
@@ -194,10 +194,10 @@ ExpenseTransactionView.prototype.setExpectedState = function(state_id)
 	this.expectedState = res;
 
 	return res;
-};
+}
 
 
-ExpenseTransactionView.prototype.inputSrcAmount = function(val)
+inputSrcAmount(val)
 {
 	if (!this.model.isDiffCurr)
 		throw new Error('Wrong state: can\'t input source amount on state ' + this.model.state);
@@ -219,11 +219,11 @@ ExpenseTransactionView.prototype.inputSrcAmount = function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return ExpenseTransactionView.parent.inputSrcAmount.apply(this, arguments);
-};
+	return super.inputSrcAmount(val);
+}
 
 
-ExpenseTransactionView.prototype.inputDestAmount = async function(val)
+async inputDestAmount(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
@@ -247,11 +247,11 @@ ExpenseTransactionView.prototype.inputDestAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return ExpenseTransactionView.parent.inputDestAmount.apply(this, arguments);
-};
+	return super.inputDestAmount(val);
+}
 
 
-ExpenseTransactionView.prototype.inputResBalance = async function(val)
+async inputResBalance(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -278,11 +278,11 @@ ExpenseTransactionView.prototype.inputResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return ExpenseTransactionView.parent.inputResBalance.apply(this, arguments);
-};
+	return super.inputResBalance(val);
+}
 
 
-ExpenseTransactionView.prototype.inputExchRate = async function(val)
+async inputExchRate(val)
 {
 	if (this.model.state !== 3)
 		throw new Error('Unexpected state ' + this.model.state + ' to input exchange rate');
@@ -308,22 +308,22 @@ ExpenseTransactionView.prototype.inputExchRate = async function(val)
 
 	this.setExpectedState(3);
 
-	return ExpenseTransactionView.parent.inputExchRate.apply(this, arguments);
-};
+	return super.inputExchRate(val);
+}
 
 
-ExpenseTransactionView.prototype.clickSrcResultBalance = async function()
+async clickSrcResultBalance()
 {
 	if (this.model.state === 0)
 		this.setExpectedState(1);
 	else if (this.model.state === 2 || this.model.state === 3)
 		this.setExpectedState(4);
 
-	return ExpenseTransactionView.parent.clickSrcResultBalance.apply(this, arguments);
-};
+	return super.clickSrcResultBalance();
+}
 
 
-ExpenseTransactionView.prototype.changeSrcAccount = async function(account_id)
+async changeSrcAccount(account_id)
 {
 	var newAcc = await this.getAccount(account_id);
 
@@ -381,34 +381,33 @@ ExpenseTransactionView.prototype.changeSrcAccount = async function(account_id)
 		}
 	}
 
+	return super.changeSrcAccount(account_id);
+}
 
-	return ExpenseTransactionView.parent.changeSrcAccount.apply(this, arguments);
-};
 
-
-ExpenseTransactionView.prototype.clickDestAmount = async function()
+async clickDestAmount()
 {
 	if (this.model.state === 1)		// Transition 3
 		this.setExpectedState(0);
 	else if (this.model.state === 3 || this.model.state === 4)		// Transition 16 or 7
 		this.setExpectedState(2);
 
-	return ExpenseTransactionView.parent.clickDestAmount.apply(this, arguments);
-};
+	return super.clickDestAmount();
+}
 
 
-ExpenseTransactionView.prototype.clickExchRate = async function()
+async clickExchRate()
 {
 	this.setExpectedState(3);
 
-	return ExpenseTransactionView.parent.clickExchRate.apply(this, arguments);
-};
+	return super.clickExchRate();
+}
 
 
-ExpenseTransactionView.prototype.changeDestCurrency = async function(val)
+async changeDestCurrency(val)
 {
 	if (this.model.dest_curr_id == val)
-		return ExpenseTransactionView.parent.changeDestCurrency.apply(this, arguments);
+		return super.changeDestCurrency(val);
 
 	this.model.dest_curr_id = parseInt(val);
 	this.model.destCurr = getCurrency(this.model.dest_curr_id);
@@ -438,8 +437,10 @@ ExpenseTransactionView.prototype.changeDestCurrency = async function(val)
 	else
 		throw new Error('Unexpected transition');
 
-	return ExpenseTransactionView.parent.changeDestCurrency.apply(this, arguments);
-};
+	return super.changeDestCurrency(val);
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

@@ -9,16 +9,10 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // List of persons view class
-function PersonsView()
+class PersonsView extends TestView
 {
-	PersonsView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(PersonsView, TestView);
-
-
-PersonsView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
  				addBtn : await this.parseIconLink(await this.query('#add_btn')),
@@ -37,18 +31,18 @@ PersonsView.prototype.parseContent = async function()
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
-};
+}
 
 
 // Click on add button and return navigation promise
-PersonsView.prototype.goToCreatePerson = function()
+async goToCreatePerson()
 {
 	return this.navigation(() => this.content.addBtn.click());
-};
+}
 
 
 // Select specified person, click on edit button and return navigation promise
-PersonsView.prototype.goToUpdatePerson = async function(num)
+async goToUpdatePerson(num)
 {
 	if (!this.content.tiles || this.content.tiles.items.length <= num || num < 0)
 		throw new Error('Wrong person number specified');
@@ -60,10 +54,10 @@ PersonsView.prototype.goToUpdatePerson = async function(num)
 		throw new Error('Update person button not visible');
 
 	return this.navigation(() => this.content.toolbar.editBtn.click());
-};
+}
 
 
-PersonsView.prototype.deletePersons = async function(persons)
+async deletePersons(persons)
 {
 	if (!persons)
 		throw new Error('No persons specified');
@@ -97,7 +91,9 @@ PersonsView.prototype.deletePersons = async function(persons)
 		throw new Error('Delete account warning popup not appear');
 
 	return this.navigation(() => this.click(this.content.delete_warning.okBtn));
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

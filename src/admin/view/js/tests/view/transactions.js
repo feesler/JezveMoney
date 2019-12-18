@@ -10,22 +10,16 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // List of transactions view class
-function TransactionsView()
+class TransactionsView extends TestView
 {
-	TransactionsView.parent.constructor.apply(this, arguments);
+
+async getTransactionObject(trans_id)
+{
+	return idSearch(await this.global('transArr'), trans_id);
 }
 
 
-extend(TransactionsView, TestView);
-
-
-TransactionsView.prototype.getTransactionObject = async function(trans_id)
-{
-	return idSearch(await this.global('transArr'), trans_id);
-};
-
-
-TransactionsView.prototype.parseSearchForm = async function(elem)
+async parseSearchForm(elem)
 {
 	if (!elem)
 		return null;
@@ -49,10 +43,10 @@ TransactionsView.prototype.parseSearchForm = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TransactionsView.prototype.parseModeSelector = async function(elem)
+async parseModeSelector(elem)
 {
 	if (!elem)
 		return null;
@@ -76,10 +70,10 @@ TransactionsView.prototype.parseModeSelector = async function(elem)
 	res.details = res.detailsMode.isActive;
 
 	return res;
-};
+}
 
 
-TransactionsView.prototype.parsePaginator = async function(elem)
+async parsePaginator(elem)
 {
 	if (!elem)
 		return null;
@@ -236,10 +230,10 @@ TransactionsView.prototype.parsePaginator = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TransactionsView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
  				addBtn : await this.parseIconLink(await this.query('#add_btn')),
@@ -286,10 +280,10 @@ TransactionsView.prototype.parseContent = async function()
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
-};
+}
 
 
-TransactionsView.prototype.filterByAccounts = async function(accounts)
+async filterByAccounts(accounts)
 {
 	if (!isArray(accounts))
 		accounts = [ accounts ];
@@ -302,84 +296,85 @@ TransactionsView.prototype.filterByAccounts = async function(accounts)
 		}
 		return this.click(this.content.accDropDown.selectBtn);
 	});
-};
+}
 
 
-TransactionsView.prototype.selectDateRange = async function(start, end)
+async selectDateRange(start, end)
 {
 	return this.navigation(() => this.content.dateFilter.selectRange(start, end));
-};
+}
 
-TransactionsView.prototype.search = async function(text)
+
+async search(text)
 {
 	return this.navigation(async () =>
 	{
 		await this.content.searchForm.input(text);
 		return this.content.searchForm.submit();
 	});
-};
+}
 
 
-TransactionsView.prototype.setClassicMode = async function()
+async setClassicMode()
 {
 	if (this.content.modeSelector.listMode.isActive)
 		return;
 
 	return this.navigation(() => this.content.modeSelector.listMode.elem.click());
-};
+}
 
 
-TransactionsView.prototype.setDetailsMode = async function()
+async setDetailsMode()
 {
 	if (this.content.modeSelector.detailsMode.isActive)
 		return;
 
 	return this.navigation(() => this.content.modeSelector.detailsMode.elem.click());
-};
+}
 
 
-TransactionsView.prototype.pagesCount = function()
+pagesCount()
 {
 	return this.content.paginator.items.length;
-};
+}
 
 
-TransactionsView.prototype.goToPrevPage = async function(type)
+async goToPrevPage(type)
 {
 	if (this.content.paginator.isFirstPage())
-		return;
+		throw new Error('Can\'t go to previous page');
 
 	return this.navigation(() => this.content.paginator.goToPrevPage());
-};
+}
 
 
-TransactionsView.prototype.goToNextPage = async function(type)
+async goToNextPage(type)
 {
 	if (this.content.paginator.isLastPage())
-		return;
+		throw new Error('Can\'t go to next page');
 
 	return this.navigation(() => this.content.paginator.goToNextPage());
-};
+}
 
 
-TransactionsView.prototype.filterByType = async function(type)
+async filterByType(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
 	return this.navigation(() => this.content.typeMenu.items[type].click());
-};
+}
 
 
 // Click on add button and return navigation promise
-TransactionsView.prototype.goToCreateTransaction = function()
+goToCreateTransaction()
 {
 	return this.navigation(() => this.content.addBtn.click());
-};
+}
 
 
 // Select specified account, click on edit button and return navigation promise
-TransactionsView.prototype.goToUpdateTransaction = async function(num)
+async goToUpdateTransaction(num)
 {
 	if (!this.content.transList || this.content.transList.items.length <= num || num < 0)
 		throw new Error('Wrong transaction number specified');
@@ -391,11 +386,11 @@ TransactionsView.prototype.goToUpdateTransaction = async function(num)
 		throw 'Update transaction button not visible';
 
 	return this.navigation(() => this.content.toolbar.editBtn.click());
-};
+}
 
 
 // Delete secified transactions and return navigation promise
-TransactionsView.prototype.deleteTransactions = async function(tr)
+async deleteTransactions(tr)
 {
 	if (!tr)
 		throw new Error('No transactions specified');
@@ -431,7 +426,9 @@ TransactionsView.prototype.deleteTransactions = async function(tr)
 		throw 'OK button not found';
 
 	return this.navigation(() => this.click(this.content.delete_warning.okBtn));
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

@@ -8,16 +8,10 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // Create or update account view tests
-function PersonView()
+class PersonView extends TestView
 {
-	PersonView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(PersonView, TestView);
-
-
-PersonView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = {};
 
@@ -41,22 +35,24 @@ PersonView.prototype.parseContent = async function()
 		throw new Error('Submit button not found');
 
 	return res;
-};
+}
 
 
-PersonView.prototype.inputName = async function(val)
+async inputName(val)
 {
 	return this.performAction(() => this.content.name.input(val));
-};
+}
 
 
 // Input name, submit and return navigation promise
-PersonView.prototype.createPerson = async function(personName)
+async createPerson(personName)
 {
 	await this.inputName(personName);
 
 	return this.navigation(() => this.click(this.content.submitBtn));
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

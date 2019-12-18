@@ -9,16 +9,10 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // List of accounts view class
-function AccountsView()
+class AccountsView extends TestView
 {
-	AccountsView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(AccountsView, TestView);
-
-
-AccountsView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
  				addBtn : await this.parseIconLink(await this.query('#add_btn')),
@@ -38,18 +32,18 @@ AccountsView.prototype.parseContent = async function()
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
-};
+}
 
 
 // Click on add button and return navigation promise
-AccountsView.prototype.goToCreateAccount = function()
+goToCreateAccount()
 {
 	return this.navigation(() => this.content.addBtn.click());
-};
+}
 
 
 // Select specified account, click on edit button and return navigation promise
-AccountsView.prototype.goToUpdateAccount = async function(num)
+async goToUpdateAccount(num)
 {
 	if (!this.content.tiles || this.content.tiles.items.length <= num)
 		throw new Error('Wrong account number specified');
@@ -61,11 +55,11 @@ AccountsView.prototype.goToUpdateAccount = async function(num)
 		throw new Error('Update account button not visible');
 
 	return this.navigation(() => this.content.toolbar.editBtn.click());
-};
+}
 
 
 // Delete secified accounts and return navigation promise
-AccountsView.prototype.deleteAccounts = async function(acc)
+async deleteAccounts(acc)
 {
 	if (!acc)
 		throw new Error('No accounts specified');
@@ -102,7 +96,9 @@ AccountsView.prototype.deleteAccounts = async function(acc)
 		throw new Error('OK button not found');
 
 	return this.navigation(() => this.click(this.content.delete_warning.okBtn));
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

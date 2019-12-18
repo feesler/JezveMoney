@@ -1,23 +1,14 @@
 if (typeof module !== 'undefined' && module.exports)
 {
-	const common = require('../common.js');
-	var extend = common.extend;
-
 	var TestView = require('./testview.js');
 }
 
 
 // Statistics view class
-function StatisticsView()
+class StatisticsView extends TestView
 {
-	StatisticsView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(StatisticsView, TestView);
-
-
-StatisticsView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = { titleEl : await this.query('.content_wrap > .heading > h1') };
 
@@ -49,95 +40,97 @@ StatisticsView.prototype.parseContent = async function()
 	}
 
 	return res;
-};
+}
 
 
-StatisticsView.prototype.filterByType = async function(type)
+async filterByType(type)
 {
 	if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 		return;
 
 	return this.navigation(() => this.content.typeMenu.items[type].click());
-};
+}
 
 
-StatisticsView.prototype.byAccounts = function()
+async byAccounts()
 {
 	return this.navigation(() => this.content.filterByDropDown.selectByValue(0));
-};
+}
 
 
-StatisticsView.prototype.byCurrencies = function()
+async byCurrencies()
 {
 	return this.navigation(() => this.content.filterByDropDown.selectByValue(1));
-};
+}
 
 
-StatisticsView.prototype.selectAccount = async function(acc_id)
+async selectAccount(acc_id)
 {
 	if (!this.content.accountsDropDown)
 		throw new Error('Account drop down control not found');
 
 	return this.navigation(() => this.content.accountsDropDown.selectByValue(acc_id));
-};
+}
 
 
-StatisticsView.prototype.selectAccountByPos = async function(pos)
+async selectAccountByPos(pos)
 {
 	if (!this.content.accountsDropDown)
 		throw new Error('Account drop down control not found');
 
 	return this.selectAccount(this.content.accountsDropDown.items[pos].id);
-};
+}
 
 
-StatisticsView.prototype.selectCurrency = function(curr_id)
+async selectCurrency(curr_id)
 {
 	return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1));
-};
+}
 
 
-StatisticsView.prototype.selectCurrencyByPos = function(pos)
+async selectCurrencyByPos(pos)
 {
 	if (this.content.currencyDropDown)
 		return this.selectCurrency(this.content.currencyDropDown.items[pos].id);
-};
+}
 
 
-StatisticsView.prototype.groupBy = function(group)
+async groupBy(group)
 {
 	return this.navigation(() => this.content.groupDropDown.selectByValue(group));
-};
+}
 
 
-StatisticsView.prototype.noGroup = function(group)
+async noGroup()
 {
 	return this.groupBy(0);
-};
+}
 
 
-StatisticsView.prototype.groupByDay = function(group)
+async groupByDay()
 {
 	return this.groupBy(1);
-};
+}
 
 
-StatisticsView.prototype.groupByWeek = function(group)
+async groupByWeek()
 {
 	return this.groupBy(2);
-};
+}
 
 
-StatisticsView.prototype.groupByMonth = function(group)
+async groupByMonth()
 {
 	return this.groupBy(3);
-};
+}
 
 
-StatisticsView.prototype.groupByYear = function(group)
+async groupByYear()
 {
 	return this.groupBy(4);
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

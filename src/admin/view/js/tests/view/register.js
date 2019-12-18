@@ -8,17 +8,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Log in view class
-function RegisterView()
+// Registration view class
+class RegisterView extends TestView
 {
-	RegisterView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(RegisterView, TestView);
-
-
-RegisterView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = { loginInp : await this.query('#login'),
  				nameInp : await this.query('#name'),
@@ -29,10 +23,10 @@ RegisterView.prototype.parseContent = async function()
 		throw new Error('Unexpected structure of register view');
 
 	return res;
-};
+}
 
 
-RegisterView.prototype.registerAs = async function(login, name, password)
+async registerAs(login, name, password)
 {
 	let app = this.app;
 
@@ -50,7 +44,9 @@ RegisterView.prototype.registerAs = async function(login, name, password)
 		throw new Error('Notification popup not appear');
 
 	await view.performAction(() => view.msgPopup.close());
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

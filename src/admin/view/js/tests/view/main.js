@@ -7,17 +7,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Main view tests
-function MainView()
+// Main view class
+class MainView extends TestView
 {
-	MainView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(MainView, TestView);
-
-
-MainView.prototype.parseContent = async function()
+async parseContent()
 {
 	var widgetsElem = await this.queryAll('.content_wrap .widget');
 	if (!widgetsElem)
@@ -52,10 +46,10 @@ MainView.prototype.parseContent = async function()
 	}
 
 	return res;
-};
+}
 
 
-MainView.prototype.goToAccounts = function()
+goToAccounts()
 {
  	if (!this.content.widgets || !this.content.widgets[0])
 		throw new Error('Accounts widget not found');
@@ -65,10 +59,10 @@ MainView.prototype.goToAccounts = function()
 		throw new Error('Wrong widget');
 
 	return this.navigation(() => this.click(widget.linkElem));
-};
+}
 
 
-MainView.prototype.goToNewTransactionByAccount = function(accNum)
+goToNewTransactionByAccount(accNum)
 {
 	if (!this.content.widgets || !this.content.widgets[0])
 		throw new Error('Wrong state of main view');
@@ -84,10 +78,10 @@ MainView.prototype.goToNewTransactionByAccount = function(accNum)
 	var link = tile.linkElem;
 
 	return this.navigation(() => this.click(link));
-};
+}
 
 
-MainView.prototype.goToTransactions = function()
+goToTransactions()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
 		throw new Error('Fail to parse main view widgets');
@@ -97,10 +91,10 @@ MainView.prototype.goToTransactions = function()
 		throw new Error('Wrong widget');
 
 	return this.navigation(() => this.click(widget.linkElem));
-};
+}
 
 
-MainView.prototype.goToPersons = function()
+goToPersons()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
 		throw new Error('Fail to parse main view widgets');
@@ -110,10 +104,10 @@ MainView.prototype.goToPersons = function()
 		throw new Error('Wrong widget');
 
 	return this.navigation(() => this.click(widget.linkElem));
-};
+}
 
 
-MainView.prototype.goToStatistics = function()
+goToStatistics()
 {
 	if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
 		throw new Error('Fail to parse main view widgets');
@@ -123,7 +117,9 @@ MainView.prototype.goToStatistics = function()
 		throw new Error('Wrong widget');
 
 	return this.navigation(() => this.click(widget.linkElem));
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

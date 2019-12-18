@@ -15,19 +15,19 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Create or update transfer transaction view tests
-function DebtTransactionView()
+// Create or update transfer transaction view class
+class DebtTransactionView extends TransactionView
 {
-	DebtTransactionView.parent.constructor.apply(this, arguments);
+
+constructor(...args)
+{
+	super(...args);
 
 	this.expectedState = {};
 }
 
 
-extend(DebtTransactionView, TransactionView);
-
-
-DebtTransactionView.prototype.parseOperation = async function(el)
+async parseOperation(el)
 {
 	var res = { elem : el };
 
@@ -40,10 +40,10 @@ DebtTransactionView.prototype.parseOperation = async function(el)
 	res.type = await this.prop(res.debtgive, 'checked');
 
 	return res;
-};
+}
 
 
-DebtTransactionView.prototype.buildModel = async function(cont)
+async buildModel(cont)
 {
 	var res = {};
 
@@ -158,12 +158,12 @@ DebtTransactionView.prototype.buildModel = async function(cont)
 	res.comment = cont.comment_row.value;
 
 	return res;
-};
+}
 
 
 // Set source amount value
 // State 0, 1 or 2: source and destination currencies are the same
-DebtTransactionView.prototype.setSrcAmount = async function(model, val)
+async setSrcAmount(model, val)
 {
 	model.srcAmount = val;
 
@@ -203,12 +203,12 @@ DebtTransactionView.prototype.setSrcAmount = async function(model, val)
 	}
 
 	return model;
-};
+}
 
 
 // Set destination amount value
 // State 0, 1 or 2: source and destination currencies are the same
-DebtTransactionView.prototype.setDestAmount = async function(model, val)
+async setDestAmount(model, val)
 {
 	model.destAmount = val;
 
@@ -248,10 +248,10 @@ DebtTransactionView.prototype.setDestAmount = async function(model, val)
 	}
 
 	return model;
-};
+}
 
 
-DebtTransactionView.prototype.setExpectedState = function(state_id)
+setExpectedState(state_id)
 {
 	var res = {};
 
@@ -374,10 +374,10 @@ DebtTransactionView.prototype.setExpectedState = function(state_id)
 	this.expectedState = res;
 
 	return res;
-};
+}
 
 
-DebtTransactionView.prototype.changePerson = async function(val)
+async changePerson(val)
 {
 	this.model.person = await this.getPerson(val);
 
@@ -406,16 +406,16 @@ DebtTransactionView.prototype.changePerson = async function(val)
 	this.setExpectedState(this.model.state);
 
 	return this.performAction(() => this.content.person.selectAccount(val));
-};
+}
 
 
-DebtTransactionView.prototype.changePersonByPos = async function(pos)
+async changePersonByPos(pos)
 {
 	return this.changePerson(this.content.person.dropDown.items[pos].id);
-};
+}
 
 
-DebtTransactionView.prototype.toggleDebtType = async function()
+async toggleDebtType()
 {
 	var newValue = !this.model.debtType;
 
@@ -495,10 +495,10 @@ DebtTransactionView.prototype.toggleDebtType = async function()
 
 
 	return this.performAction(() => this.click(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
-};
+}
 
 
-DebtTransactionView.prototype.inputSrcAmount = async function(val)
+async inputSrcAmount(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 	var valueChanged = (this.model.fSrcAmount != fNewValue);
@@ -512,11 +512,11 @@ DebtTransactionView.prototype.inputSrcAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return DebtTransactionView.parent.inputSrcAmount.apply(this, arguments);
-};
+	return super.inputSrcAmount(val);
+}
 
 
-DebtTransactionView.prototype.inputResBalance = async function(val)
+async inputResBalance(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -537,11 +537,11 @@ DebtTransactionView.prototype.inputResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return DebtTransactionView.parent.inputResBalance.apply(this, arguments);
-};
+	return super.inputResBalance(val);
+}
 
 
-DebtTransactionView.prototype.inputDestResBalance = async function(val)
+async inputDestResBalance(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -562,11 +562,11 @@ DebtTransactionView.prototype.inputDestResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return DebtTransactionView.parent.inputDestResBalance.apply(this, arguments);
-};
+	return super.inputDestResBalance(val);
+}
 
 
-DebtTransactionView.prototype.clickSrcResultBalance = function()
+clickSrcResultBalance()
 {
 	if (this.model.state === 0 || this.model.state === 2)			// Transition 1 or 4
 		this.setExpectedState(1);
@@ -577,11 +577,11 @@ DebtTransactionView.prototype.clickSrcResultBalance = function()
 	else
 		throw new Error('Unexpected state');
 
-	return DebtTransactionView.parent.clickSrcResultBalance.apply(this, arguments);
-};
+	return super.clickSrcResultBalance();
+}
 
 
-DebtTransactionView.prototype.clickDestResultBalance = function()
+clickDestResultBalance()
 {
 	if (this.model.state === 0 || this.model.state === 1)				// Transition 3 or 5
 		this.setExpectedState(2);
@@ -592,11 +592,11 @@ DebtTransactionView.prototype.clickDestResultBalance = function()
 	else
 		throw new Error('Unexpected state');
 
-	return DebtTransactionView.parent.clickDestResultBalance.apply(this, arguments);
-};
+	return super.clickDestResultBalance();
+}
 
 
-DebtTransactionView.prototype.toggleAccount = async function()
+async toggleAccount()
 {
 	this.model.noAccount = !this.model.noAccount;
 
@@ -658,10 +658,10 @@ DebtTransactionView.prototype.toggleAccount = async function()
 		return this.performAction(() => this.content.noacc_btn.click());
 	else
 		return this.performAction(() => this.content.selaccount.click());
-};
+}
 
 
-DebtTransactionView.prototype.changeAccount = async function(account_id)
+async changeAccount(account_id)
 {
 	var newAcc = await this.getAccount(account_id);
 
@@ -714,16 +714,16 @@ DebtTransactionView.prototype.changeAccount = async function(account_id)
 	this.setExpectedState(this.model.state);
 
 	return this.performAction(() => this.content.account.selectAccount(account_id));
-};
+}
 
 
-DebtTransactionView.prototype.changeAccountByPos = function(pos)
+changeAccountByPos(pos)
 {
 	return this.changeAccount(this.content.account.dropDown.items[pos].id);
-};
+}
 
 
-DebtTransactionView.prototype.clickSrcAmount = function()
+clickSrcAmount()
 {
 	if (this.model.state === 1 || this.model.state === 2)			// Transition 2 or 4
 		this.setExpectedState(0);
@@ -736,8 +736,10 @@ DebtTransactionView.prototype.clickSrcAmount = function()
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
 
-	return DebtTransactionView.parent.clickSrcAmount.apply(this, arguments);
-};
+	return super.clickSrcAmount();
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

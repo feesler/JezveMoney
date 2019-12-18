@@ -8,16 +8,10 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // Log in view class
-function LoginView()
+class LoginView extends TestView
 {
-	LoginView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(LoginView, TestView);
-
-
-LoginView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = { loginInp : await this.query('#login'),
  				passwordInp : await this.query('#password'),
@@ -27,21 +21,23 @@ LoginView.prototype.parseContent = async function()
 		throw new Error('Wrong login view structure');
 
 	return res;
-};
+}
 
 
-LoginView.prototype.loginAs = async function(login, password)
+async loginAs(login, password)
 {
 	await this.input(this.content.loginInp, login);
  	await this.input(this.content.passwordInp, password);
 	await this.navigation(() => this.click(this.content.submitBtn));
-};
+}
 
 
-LoginView.prototype.goToRegistration = async function()
+async goToRegistration()
 {
 	await this.navigation(() => this.click(this.content.registerLink));
-};
+}
+
+}
 
 
 

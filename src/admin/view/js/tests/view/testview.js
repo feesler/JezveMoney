@@ -19,8 +19,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Common test view class constructor
-function TestView(props)
+// Common test view class
+class TestView
+{
+
+constructor(props)
 {
 	this.props = props || {};
 
@@ -44,15 +47,15 @@ function TestView(props)
 }
 
 
-TestView.prototype.isUserLoggedIn = function()
+isUserLoggedIn()
 {
 	var loggedOutLocations = ['login', 'register'];
 
 	return loggedOutLocations.every((item) => this.location.indexOf('/' + item) === -1);
-};
+}
 
 
-TestView.prototype.parseHeader = async function()
+async parseHeader()
 {
 	var el;
 	var res = {};
@@ -101,10 +104,10 @@ TestView.prototype.parseHeader = async function()
 	}
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseMessage = async function()
+async parseMessage()
 {
 	let popupContent = await this.query('.popup_content.msg');
 	if (!popupContent)
@@ -127,20 +130,20 @@ TestView.prototype.parseMessage = async function()
 		console.log('Error popup appear: ' + res.message);
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseId = function(id)
+parseId(id)
 {
 	if (typeof id !== 'string')
 		return id;
 
 	var pos = id.indexOf('_');
 	return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
-};
+}
 
 
-TestView.prototype.parseTile = async function(tileEl)
+async parseTile(tileEl)
 {
 	if (!tileEl || !await this.hasClass(tileEl, 'tile'))
 		throw new Error('Wrong tile structure');
@@ -175,10 +178,10 @@ TestView.prototype.parseTile = async function(tileEl)
 	};
 
 	return tileObj;
-};
+}
 
 
-TestView.prototype.parseInfoTile = async function(tileEl)
+async parseInfoTile(tileEl)
 {
 	if (!tileEl || !await this.hasClass(tileEl, 'info_tile'))
 		throw new Error('Wrong info tile structure');
@@ -192,10 +195,10 @@ TestView.prototype.parseInfoTile = async function(tileEl)
 	tileObj.subtitle = await this.prop(tileObj.subtitleEl, 'innerText');
 
 	return tileObj;
-};
+}
 
 
-TestView.prototype.parseTiles = async function(tilesEl, parseCallback)
+async parseTiles(tilesEl, parseCallback)
 {
 	if (!tilesEl)
 		return null;
@@ -221,16 +224,16 @@ TestView.prototype.parseTiles = async function(tilesEl, parseCallback)
 	});
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseInfoTiles = function(tilesEl)
+async parseInfoTiles(tilesEl)
 {
 	return this.parseTiles(tilesEl, this.parseInfoTile);
-};
+}
 
 
-TestView.prototype.parseTransactionsList = async function(listEl)
+async parseTransactionsList(listEl)
 {
 	if (!listEl)
 		return null;
@@ -278,10 +281,10 @@ TestView.prototype.parseTransactionsList = async function(listEl)
 	}
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseDropDown = async function(elem)
+async parseDropDown(elem)
 {
 	if (!elem)
 		return null;
@@ -370,10 +373,10 @@ TestView.prototype.parseDropDown = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TestView.prototype.getTransactionType = function(str)
+getTransactionType(str)
 {
 	var strToType = { 'ALL' : 0, 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
 
@@ -382,10 +385,10 @@ TestView.prototype.getTransactionType = function(str)
 
 	var key = str.toUpperCase();
 	return (strToType[key] !== undefined) ? strToType[key] : null;
-};
+}
 
 
-TestView.prototype.getTransactionTypeStr = function(type)
+getTransactionTypeStr(type)
 {
 	var typeToStr = { 1 : 'EXPENSE', 2 : 'INCOME', 3 : 'TRANSFER', 4 : 'DEBT' };
 
@@ -393,10 +396,10 @@ TestView.prototype.getTransactionTypeStr = function(type)
 		return null;
 
 	return (typeToStr[type] !== undefined) ? typeToStr[type] : null;
-};
+}
 
 
-TestView.prototype.parseTransactionTypeMenu = async function(elem)
+async parseTransactionTypeMenu(elem)
 {
 	var self = this;
 	var res = { elem : elem, items : [], activeType : null };
@@ -433,11 +436,11 @@ TestView.prototype.parseTransactionTypeMenu = async function(elem)
 	}
 
 	return res;
-};
+}
 
 
 
-TestView.prototype.parseIconLink = async function(elem)
+async parseIconLink(elem)
 {
 	if (!elem)
 		return null;
@@ -471,10 +474,10 @@ TestView.prototype.parseIconLink = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseInputRow = async function(elem)
+async parseInputRow(elem)
 {
 	if (!elem)
 		return null;
@@ -534,10 +537,10 @@ TestView.prototype.parseInputRow = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseDatePickerFilter = async function(elem)
+async parseDatePickerFilter(elem)
 {
 	if (!elem)
 		return null;
@@ -619,10 +622,10 @@ TestView.prototype.parseDatePickerFilter = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseDatePickerRow = async function(elem)
+async parseDatePickerRow(elem)
 {
 	if (!elem)
 		return null;
@@ -651,10 +654,10 @@ TestView.prototype.parseDatePickerRow = async function(elem)
 	};
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseWarningPopup = async function(elem)
+async parseWarningPopup(elem)
 {
 	if (!elem)
 		return null;
@@ -669,22 +672,22 @@ TestView.prototype.parseWarningPopup = async function(elem)
 	res.cancelBtn = await this.query(elem, '.popup_controls > .btn.cancel_btn');
 
 	return res;
-};
+}
 
 
-TestView.prototype.parseContent = function()
+async parseContent()
 {
 	return {};
-};
+}
 
 
-TestView.prototype.buildModel = function()
+async buildModel()
 {
 	return {};
-};
+}
 
 
-TestView.prototype.parse = async function()
+async parse()
 {
 	this.location = await this.url();
 
@@ -692,10 +695,10 @@ TestView.prototype.parse = async function()
 	this.msgPopup = await this.parseMessage();
 	this.content = await this.parseContent();
 	this.model = await this.buildModel(this.content);
-};
+}
 
 
-TestView.prototype.performAction = async function(action)
+async performAction(action)
 {
 	if (!isFunction(action))
 		throw new Error('Wrong action specified');
@@ -706,7 +709,7 @@ TestView.prototype.performAction = async function(action)
 	await action.call(this);
 
 	await this.parse();
-};
+}
 
 
 // Compare visibiliy of specified controls with expected mask
@@ -717,7 +720,7 @@ TestView.prototype.performAction = async function(action)
 // Example:
 //     controls : { control_1 : { elem : Element }, control_2 : { childControl : { elem : Element } } }
 //     expected : { control_1 : true, control_2 : { childControl : true, invControl : false }, control_3 : false }
-TestView.prototype.checkVisibility = async function(controls, expected)
+async checkVisibility(controls, expected)
 {
 	var control, expVisible, factVisible, res;
 
@@ -748,10 +751,10 @@ TestView.prototype.checkVisibility = async function(controls, expected)
 	}
 
 	return true;
-};
+}
 
 
-TestView.prototype.checkValues = function(controls)
+checkValues(controls)
 {
 	var res = true;
 	var control, expected, fact;
@@ -790,17 +793,17 @@ TestView.prototype.checkValues = function(controls)
 	}
 
 	return res;
-};
+}
 
 
-TestView.prototype.checkState = async function(stateObj)
+async checkState(stateObj)
 {
 	return stateObj && await this.checkVisibility(this.content, stateObj.visibility) && this.checkValues(stateObj.values);
-};
+}
 
 
 // Click on profile menu item and return navigation promise
-TestView.prototype.goToProfile = async function()
+async goToProfile()
 {
 	if (!this.isUserLoggedIn())
 		throw new Error('User is not logged in');
@@ -810,25 +813,27 @@ TestView.prototype.goToProfile = async function()
 	await this.navigation(() => {
 		setTimeout(() => this.click(this.header.user.profileBtn), 500);
 	});
-};
+}
 
 
 // Click on logout link from user menu and return navigation promise
-TestView.prototype.logoutUser = async function()
+async logoutUser()
 {
 	await this.click(this.header.user.menuBtn);
 
 	await this.navigation(() => this.click(this.header.user.logoutBtn));
-};
+}
 
 
-TestView.prototype.goToMainView = async function()
+async goToMainView()
 {
 	if (!this.isUserLoggedIn())
 		throw new Error('User not logged in');
 
 	await this.navigation(() => this.click(this.header.logo.linkElem));
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

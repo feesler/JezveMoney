@@ -7,17 +7,11 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Create or update account view tests
-function AccountView()
+// Create or update account view class
+class AccountView extends TestView
 {
-	AccountView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(AccountView, TestView);
-
-
-AccountView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = {};
 
@@ -60,32 +54,33 @@ AccountView.prototype.parseContent = async function()
 		throw new Error('Submit button not found');
 
 	return res;
-};
+}
 
 
-AccountView.prototype.inputName = async function(val)
+async inputName(val)
 {
 	return this.performAction(() => this.content.name.input(val));
-};
+}
 
 
-AccountView.prototype.inputBalance = async function(val)
+async inputBalance(val)
 {
 	return this.performAction(() => this.content.balance.input(val));
-};
+}
 
 
-AccountView.prototype.changeCurrency = async function(val)
+async changeCurrency(val)
 {
 	return this.performAction(() => this.content.currDropDown.selectByValue(val));
-};
+}
 
 
-AccountView.prototype.changeIcon = async function(val)
+async changeIcon(val)
 {
 	return this.performAction(() => this.content.iconDropDown.selectByValue(val));
-};
+}
 
+}
 
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = AccountView;

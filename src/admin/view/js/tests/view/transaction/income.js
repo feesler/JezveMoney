@@ -15,19 +15,19 @@ if (typeof module !== 'undefined' && module.exports)
 }
 
 
-// Create or update income transaction view tests
-function IncomeTransactionView()
+// Create or update income transaction view class
+class IncomeTransactionView extends TransactionView
 {
-	IncomeTransactionView.parent.constructor.apply(this, arguments);
+
+constructor(...args)
+{
+	super(...args);
 
 	this.expectedState = {};
 }
 
 
-extend(IncomeTransactionView, TransactionView);
-
-
-IncomeTransactionView.prototype.buildModel = async function(cont)
+async buildModel(cont)
 {
 	var res = {};
 
@@ -88,12 +88,12 @@ IncomeTransactionView.prototype.buildModel = async function(cont)
 	res.comment = cont.comment_row.value;
 
 	return res;
-};
+}
 
 
 // Set source amount value
 // State 0 or 1: source and destination currencies are the same
-IncomeTransactionView.prototype.setSrcAmount = function(model, val)
+setSrcAmount(model, val)
 {
 	model.srcAmount = val;
 
@@ -104,12 +104,12 @@ IncomeTransactionView.prototype.setSrcAmount = function(model, val)
 	}
 
 	return model;
-};
+}
 
 
 // Set destination amount value
 // State 0 or 1: source and destination currencies are the same
-IncomeTransactionView.prototype.setDestAmount = function(model, val)
+setDestAmount(model, val)
 {
 	model.destAmount = val;
 
@@ -123,10 +123,10 @@ IncomeTransactionView.prototype.setDestAmount = function(model, val)
 	}
 
 	return model;
-};
+}
 
 
-IncomeTransactionView.prototype.setExpectedState = function(state_id)
+setExpectedState(state_id)
 {
 	var res = {};
 
@@ -194,10 +194,10 @@ IncomeTransactionView.prototype.setExpectedState = function(state_id)
 	this.expectedState = res;
 
 	return res;
-};
+}
 
 
-IncomeTransactionView.prototype.inputSrcAmount = async function(val)
+async inputSrcAmount(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
@@ -223,11 +223,11 @@ IncomeTransactionView.prototype.inputSrcAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return IncomeTransactionView.parent.inputSrcAmount.apply(this, arguments);
-};
+	return super.inputSrcAmount(val);
+}
 
 
-IncomeTransactionView.prototype.inputDestAmount = async function(val)
+async inputDestAmount(val)
 {
 	var fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
@@ -243,11 +243,11 @@ IncomeTransactionView.prototype.inputDestAmount = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return IncomeTransactionView.parent.inputDestAmount.apply(this, arguments);
-};
+	return super.inputDestAmount(val);
+}
 
 
-IncomeTransactionView.prototype.inputDestResBalance = async function(val)
+async inputDestResBalance(val)
 {
 	var fNewValue = isValidValue(val) ? normalize(val) : val;
 
@@ -274,11 +274,11 @@ IncomeTransactionView.prototype.inputDestResBalance = async function(val)
 
 	this.setExpectedState(this.model.state);
 
-	return IncomeTransactionView.parent.inputDestResBalance.apply(this, arguments);
-};
+	return super.inputDestResBalance(val);
+}
 
 
-IncomeTransactionView.prototype.inputExchRate = async function(val)
+async inputExchRate(val)
 {
 	if (this.model.state !== 3)
 		throw new Error('Unexpected state ' + this.model.state + ' to input exchange rate');
@@ -304,22 +304,22 @@ IncomeTransactionView.prototype.inputExchRate = async function(val)
 
 	this.setExpectedState(3);
 
-	return IncomeTransactionView.parent.inputExchRate.apply(this, arguments);
-};
+	return super.inputExchRate(val);
+}
 
 
-IncomeTransactionView.prototype.clickDestResultBalance = async function()
+async clickDestResultBalance()
 {
 	if (this.model.state === 0)
 		this.setExpectedState(1);		// Transition 2
 	else if (this.model.state === 2 || this.model.state === 3)
 		this.setExpectedState(4);		// Transition 7 or 14
 
-	return IncomeTransactionView.parent.clickDestResultBalance.apply(this, arguments);
-};
+	return super.clickDestResultBalance();
+}
 
 
-IncomeTransactionView.prototype.changeDestAccount = async function(account_id)
+async changeDestAccount(account_id)
 {
 	var newAcc = await this.getAccount(account_id);
 
@@ -377,44 +377,44 @@ IncomeTransactionView.prototype.changeDestAccount = async function(account_id)
 		}
 	}
 
-	return IncomeTransactionView.parent.changeDestAccount.apply(this, arguments);
-};
+	return super.changeDestAccount(account_id);
+}
 
 
-IncomeTransactionView.prototype.clickSrcAmount = async function()
+async clickSrcAmount()
 {
 	if (this.model.state === 1)		// Transition 4
 		this.setExpectedState(0);
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
 
-	return IncomeTransactionView.parent.clickSrcAmount.apply(this, arguments);
-};
+	return super.clickSrcAmount();
+}
 
 
-IncomeTransactionView.prototype.clickDestAmount = async function()
+async clickDestAmount()
 {
 	if (this.model.state === 3 || this.model.state === 4)		// Transition 13 or 19
 		this.setExpectedState(2);
 	else
 		throw new Error('Unexpected state ' + this.model.state + ' for clickDestAmount action');
 
-	return IncomeTransactionView.parent.clickDestAmount.apply(this, arguments);
-};
+	return super.clickDestAmount();
+}
 
 
-IncomeTransactionView.prototype.clickExchRate = async function()
+async clickExchRate()
 {
 	this.setExpectedState(3);	// Transition 20
 
-	return IncomeTransactionView.parent.clickExchRate.apply(this, arguments);
-};
+	return super.clickExchRate();
+}
 
 
-IncomeTransactionView.prototype.changeSourceCurrency = async function(val)
+async changeSourceCurrency(val)
 {
 	if (this.model.src_curr_id == val)
-		return IncomeTransactionView.parent.changeSourceCurrency.apply(this, arguments);
+		return super.changeSourceCurrency(val);
 
 	this.model.src_curr_id = parseInt(val);
 	this.model.srcCurr = getCurrency(this.model.src_curr_id);
@@ -447,8 +447,10 @@ IncomeTransactionView.prototype.changeSourceCurrency = async function(val)
 	else
 		throw new Error('Unexpected transition');
 
-	return IncomeTransactionView.parent.changeSourceCurrency.apply(this, arguments);
-};
+	return super.changeSourceCurrency(val);
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)

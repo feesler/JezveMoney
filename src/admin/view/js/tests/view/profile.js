@@ -13,16 +13,10 @@ if (typeof module !== 'undefined' && module.exports)
 
 
 // Profile view class
-function ProfileView()
+class ProfileView extends TestView
 {
-	ProfileView.parent.constructor.apply(this, arguments);
-}
 
-
-extend(ProfileView, TestView);
-
-
-ProfileView.prototype.parseContent = async function()
+async parseContent()
 {
 	var res = {};
 
@@ -73,10 +67,10 @@ ProfileView.prototype.parseContent = async function()
 	res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 	return res;
-};
+}
 
 
-ProfileView.prototype.changeName = async function(newName)
+async changeName(newName)
 {
 	await this.performAction(() => this.click(this.content.nameLinkElem));
 
@@ -97,10 +91,10 @@ ProfileView.prototype.changeName = async function(newName)
 		throw new Error('Fail to update user name');
 
 	await this.performAction(() => this.msgPopup.close());
-};
+}
 
 
-ProfileView.prototype.changePassword = async function(oldPass, newPass)
+async changePassword(oldPass, newPass)
 {
 	await this.performAction(() => this.click(this.content.changePassLinkElem));
 
@@ -122,10 +116,10 @@ ProfileView.prototype.changePassword = async function(oldPass, newPass)
 		throw new Error('Fail to update password');
 
 	await this.performAction(() => this.msgPopup.close());
-};
+}
 
 
-ProfileView.prototype.resetAccounts = async function()
+async resetAccounts()
 {
 	let app = this.app;
 
@@ -149,10 +143,10 @@ ProfileView.prototype.resetAccounts = async function()
 		throw new Error('Fail to reset accounts');
 
 	await app.view.performAction(() => view.msgPopup.close());
-};
+}
 
 
-ProfileView.prototype.resetAll = async function()
+async resetAll()
 {
 	let app = this.app;
 
@@ -176,10 +170,10 @@ ProfileView.prototype.resetAll = async function()
 		throw new Error('Fail to reset all');
 
 	await app.view.performAction(() => app.view.msgPopup.close());
-};
+}
 
 
-ProfileView.prototype.deleteProfile = async function()
+async deleteProfile()
 {
 	let app = this.app;
 
@@ -205,7 +199,9 @@ ProfileView.prototype.deleteProfile = async function()
 		throw new Error('Fail to delete profile');
 
 	await app.view.performAction(() => app.view.msgPopup.close());
-};
+}
+
+}
 
 
 if (typeof module !== 'undefined' && module.exports)
