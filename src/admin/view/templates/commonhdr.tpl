@@ -17,6 +17,9 @@
 <?php	foreach($this->jsAdmin as $jsFile) {	?>
 <script type="text/javascript" src="<?=BASEURL.auto_version("admin/view/js/".$jsFile)?>"></script>
 <?php	}	?>
+<?php	foreach($this->jsAdminModule as $jsFile) {	?>
+<script type="module" src="<?=BASEURL.auto_version("admin/view/js/".$jsFile)?>"></script>
+<?php	}	?>
 <script>
 var baseURL = '<?=BASEURL?>';
 

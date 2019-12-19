@@ -1,7 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var TestView = require('./testview.js');
-}
+import { TestView } from './testview.js';
 
 
 // Statistics view class
@@ -131,5 +128,4 @@ class StatisticsView extends TestView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = StatisticsView;
+export { StatisticsView };

@@ -1,15 +1,5 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var hasClass = common.hasClass;
-	var idSearch = common.idSearch;
-	var isObject = common.isObject;
-	var isFunction = common.isFunction;
-	var extend = common.extend;
-
-	var TestView = require('./testview.js');
-	var LoginView = require('./login.js');
-}
+import { TestView } from './testview.js';
+import { LoginView } from './login.js';
 
 
 // Profile view class
@@ -202,5 +192,4 @@ class ProfileView extends TestView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = ProfileView;
+export { ProfileView };

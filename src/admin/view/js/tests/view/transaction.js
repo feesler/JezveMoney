@@ -1,18 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var extend = common.extend;
-	var isArray = common.isArray;
-	var idSearch = common.idSearch;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var correct = common.correct;
-	var correctExch = common.correctExch;
-	var isValidValue = common.isValidValue;
-	var getPosById = common.getPosById;
-
-	var TestView = require('./testview.js');
-}
+import { TestView } from './testview.js';
 
 
 // Create or update transaction view class
@@ -203,7 +189,7 @@ class TransactionView extends TestView
 	// Return null if no account can't be found
 	async getAccount(acc_id)
 	{
-		return idSearch(await this.global('accounts'), acc_id);
+		return this.app.idSearch(await this.global('accounts'), acc_id);
 	}
 
 
@@ -222,7 +208,7 @@ class TransactionView extends TestView
 	// Return -1 in case account can't be found
 	async getAccountPos(acc_id)
 	{
-		return getPosById(await this.global('accounts'), acc_id);
+		return this.app.getPosById(await this.global('accounts'), acc_id);
 	}
 
 
@@ -233,7 +219,7 @@ class TransactionView extends TestView
 		let data = await this.global('accounts');
 		var pos;
 
-		if (!isArray(data) || data.length < 2 || !acc_id)
+		if (!this.app.isArray(data) || data.length < 2 || !acc_id)
 			return -1;
 
 		pos = await this.getAccountPos(acc_id);
@@ -249,7 +235,7 @@ class TransactionView extends TestView
 	// Return zero if no person found
 	async getPerson(person_id)
 	{
-		return idSearch(await this.global('persons'), person_id);
+		return this.app.idSearch(await this.global('persons'), person_id);
 	}
 
 
@@ -268,7 +254,7 @@ class TransactionView extends TestView
 	// Return zero if no person found
 	async getPersonPos(person_id)
 	{
-		return getPosById(await this.global('persons'), person_id);
+		return this.app.getPosById(await this.global('persons'), person_id);
 	}
 
 
@@ -307,7 +293,7 @@ class TransactionView extends TestView
 		if (model.fSrcAmount == 0 || model.fDestAmount == 0)
 			model.exchRate = 1;
 		else
-			model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
+			model.exchRate = this.app.correctExch(model.fDestAmount / model.fSrcAmount);
 
 		return model
 	}
@@ -315,14 +301,14 @@ class TransactionView extends TestView
 
 	updateExch(model)
 	{
-		model.fExchRate = isValidValue(model.exchRate) ? normalizeExch(model.exchRate) : model.exchRate;
+		model.fExchRate = this.app.isValidValue(model.exchRate) ? this.app.normalizeExch(model.exchRate) : model.exchRate;
 
 		model.exchSign = model.destCurr.sign + '/' + model.srcCurr.sign;
 		model.backExchSign = model.srcCurr.sign + '/' + model.destCurr.sign;
 
 		var exchText = model.exchSign;
 
-		if (isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
+		if (this.app.isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
 		{
 			let backExchRate = 1;
 			if (model.fSrcAmount != 0 && model.fDestAmount != 0)
@@ -463,5 +449,4 @@ class TransactionView extends TestView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = TransactionView;
+export { TransactionView };

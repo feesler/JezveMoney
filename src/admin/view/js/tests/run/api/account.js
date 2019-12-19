@@ -1,26 +1,21 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var api = require('../../api.js');
-}
-else
-{
-	var api = apiModule;
-}
+import { api } from '../../api.js';
 
 
 var runAccountAPI = (function()
 {
 	let env = null;
-	let App = null;
+	let app = null;
+	let test = null;
 
 
-	function setupEnvironment(e, app)
+	function setupEnvironment(e, App)
 	{
-		if (!e || !app)
+		if (!e || !App)
 			throw new Error('Unexpected setup');
 
 		env = e;
-		App = app;
+		app = App;
+		test = app.test;
 	}
 
 
@@ -34,13 +29,13 @@ var runAccountAPI = (function()
 	{
 		let acc_id = 0;
 
-		await App.test('Create account', async () =>
+		await test('Create account', async () =>
 		{
 			let accBefore = await api.account.list();
-			if (!App.isArray(accBefore))
+			if (!app.isArray(accBefore))
 				return false;
 
-			let expAccObj = App.copyObject(params);
+			let expAccObj = app.copyObject(params);
 			expAccObj.curr_id = params.currency;
 			delete expAccObj.currency;
 
@@ -51,18 +46,18 @@ var runAccountAPI = (function()
 			acc_id = createRes.id;
 
 			let accList = await api.account.list();
-			if (!App.isArray(accList))
+			if (!app.isArray(accList))
 				return false;
 
 			if (accList.length != accBefore.length + 1)
 				throw new Error('Length of accounts list must increase');
 
-			if (App.idSearch(accBefore, acc_id))
+			if (app.idSearch(accBefore, acc_id))
 				throw new Error('Already exist account returned');
 
-			let accObj = App.idSearch(accList, acc_id);
+			let accObj = app.idSearch(accList, acc_id);
 
-			return App.checkObjValue(accObj, expAccObj);
+			return app.checkObjValue(accObj, expAccObj);
 		}, env);
 
 		return acc_id;
@@ -81,17 +76,17 @@ var runAccountAPI = (function()
 		updParams.currency = updParams.curr;
 		delete updParams.curr;
 
-		App.setParam(updParams, params);
+		app.setParam(updParams, params);
 
-		await App.test('Update account', async () =>
+		await test('Update account', async () =>
 		{
 			let accBefore = await api.account.list();
-			if (!App.isArray(accBefore))
+			if (!app.isArray(accBefore))
 				return false;
-			let origAcc = App.idSearch(accBefore, updParams.id);
+			let origAcc = app.idSearch(accBefore, updParams.id);
 
 			// Prepare expected account object
-			let expAccObj = App.copyObject(updParams);
+			let expAccObj = app.copyObject(updParams);
 			expAccObj.id = id;
 			expAccObj.owner_id = expAccObj.owner;
 			expAccObj.curr_id = expAccObj.currency;
@@ -108,7 +103,7 @@ var runAccountAPI = (function()
 			}
 
 			// Prepare expected updates of accounts list
-			let expAccList = App.copyObject(accBefore);
+			let expAccList = app.copyObject(accBefore);
 			let accIndex = expAccList.findIndex(item => item.id == expAccObj.id);
 			if (accIndex !== -1)
 				expAccList.splice(accIndex, 1, expAccObj);
@@ -119,10 +114,10 @@ var runAccountAPI = (function()
 				throw new Error('Fail to update account');
 
 			let accList = await api.account.list();
-			let accObj = App.idSearch(accList, id);
+			let accObj = app.idSearch(accList, id);
 
-			let res = App.checkObjValue(accObj, expAccObj) &&
-						App.checkObjValue(accList, expAccList);
+			let res = app.checkObjValue(accObj, expAccObj) &&
+						app.checkObjValue(accList, expAccList);
 			return res;
 		}, env);
 
@@ -134,58 +129,58 @@ var runAccountAPI = (function()
 	{
 		let res = [];
 
-		if (!App.isArray(ids))
+		if (!app.isArray(ids))
 			ids = [ ids ];
 
 		for(let trans of trList)
 		{
-			if (trans.type == App.EXPENSE && ids.indexOf(trans.src_id) !== -1)
+			if (trans.type == app.EXPENSE && ids.indexOf(trans.src_id) !== -1)
 				continue;
-			if (trans.type == App.INCOME && ids.indexOf(trans.dest_id) !== -1)
+			if (trans.type == app.INCOME && ids.indexOf(trans.dest_id) !== -1)
 				continue;
-			if ((trans.type == App.TRANSFER || trans.type == App.DEBT) &&
+			if ((trans.type == app.TRANSFER || trans.type == app.DEBT) &&
 				ids.indexOf(trans.src_id) !== -1 && ids.indexOf(trans.dest_id) !== -1)
 				continue;
-			if (trans.type == App.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
+			if (trans.type == app.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
 				continue;
-			if (trans.type == App.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
+			if (trans.type == app.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
 				continue;
 
-			let convTrans = App.copyObject(trans);
+			let convTrans = app.copyObject(trans);
 
-			if (convTrans.type == App.TRANSFER)
+			if (convTrans.type == app.TRANSFER)
 			{
 				if (ids.indexOf(convTrans.src_id) !== -1)
 				{
-					convTrans.type = App.INCOME;
+					convTrans.type = app.INCOME;
 					convTrans.src_id = 0;
 				}
 				else if (ids.indexOf(convTrans.dest_id) !== -1)
 				{
-					convTrans.type = App.EXPENSE;
+					convTrans.type = app.EXPENSE;
 					convTrans.dest_id = 0;
 				}
 			}
-			else if (convTrans.type == App.DEBT)
+			else if (convTrans.type == app.DEBT)
 			{
 				for(let acc_id of ids)
 				{
-					let acc = App.idSearch(accList, acc_id);
+					let acc = app.idSearch(accList, acc_id);
 
 					if (convTrans.src_id == acc_id)
 					{
-						if (acc.owner_id != App.user_id)
+						if (acc.owner_id != app.user_id)
 						{
-							convTrans.type = App.INCOME;
+							convTrans.type = app.INCOME;
 						}
 
 						convTrans.src_id = 0;
 					}
 					else if (convTrans.dest_id == acc_id)
 					{
-						if (acc.owner_id != App.user_id)
+						if (acc.owner_id != app.user_id)
 						{
-							convTrans.type = App.EXPENSE;
+							convTrans.type = app.EXPENSE;
 						}
 						convTrans.dest_id = 0;
 					}
@@ -205,17 +200,17 @@ var runAccountAPI = (function()
 	{
 		let deleteRes;
 
-		await App.test('Delete account', async () =>
+		await test('Delete account', async () =>
 		{
-			if (!App.isArray(ids))
+			if (!app.isArray(ids))
 				ids = [ ids ];
 
 			let accBefore = await api.account.list();
-			if (!App.isArray(accBefore))
+			if (!app.isArray(accBefore))
 				return false;
 
 			// Prepare expected updates of accounts list
-			let expAccList = App.copyObject(accBefore);
+			let expAccList = app.copyObject(accBefore);
 			for(let acc_id of ids)
 			{
 				let accIndex = expAccList.findIndex(item => item.id == acc_id);
@@ -236,8 +231,8 @@ var runAccountAPI = (function()
 			let accList = await api.account.list();
 			let trList = await api.transaction.list();
 
-			let res = App.checkObjValue(accList, expAccList) &&
-						App.checkObjValue(trList, expTransList);
+			let res = app.checkObjValue(accList, expAccList) &&
+						app.checkObjValue(trList, expTransList);
 
 			return res;
 		}, env);
@@ -254,7 +249,5 @@ var runAccountAPI = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runAccountAPI;
-}
+export { runAccountAPI };
+

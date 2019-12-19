@@ -674,8 +674,5 @@ var runDebt = (function()
 })();
 
 
+export { runDebt };
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runDebt;
-}

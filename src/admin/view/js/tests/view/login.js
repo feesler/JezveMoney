@@ -1,10 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var extend = common.extend;
-
-	var TestView = require('./testview.js');
-}
+import { TestView } from './testview.js';
 
 
 // Log in view class
@@ -38,6 +32,5 @@ class LoginView extends TestView
 }
 
 
+export { LoginView };
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = LoginView;

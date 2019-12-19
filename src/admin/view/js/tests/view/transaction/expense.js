@@ -1,18 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../../common.js');
-	var extend = common.extend;
-	var setParam = common.setParam;
-	var idSearch = common.idSearch;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var correct = common.correct;
-	var correctExch = common.correctExch;
-	var isValidValue = common.isValidValue;
-	var getCurrency = common.getCurrency;
-
-	var TransactionView = require('../transaction.js');
-}
+import { TransactionView } from '../transaction.js';
 
 
 // Create or update expense transaction view tests
@@ -44,23 +30,23 @@ class ExpenseTransactionView extends TransactionView
 		if (res.srcAccount.curr_id != res.src_curr_id)
 			throw new Error('Unexpected source currency ' + res.src_curr_id + ' (' + res.srcAccount.curr_id + ' is expected)');
 
-		res.srcCurr = getCurrency(res.src_curr_id);
+		res.srcCurr = this.app.getCurrency(res.src_curr_id);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = getCurrency(res.dest_curr_id);
+		res.destCurr = this.app.getCurrency(res.dest_curr_id);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
 		res.srcAccount.fmtBalance = res.srcCurr.formatValue(res.srcAccount.balance);
 
 		res.srcAmount = cont.src_amount_row.value;
-		res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
+		res.fSrcAmount = this.app.isValidValue(res.srcAmount) ? this.app.normalize(res.srcAmount) : res.srcAmount;
 
 		res.destAmount = cont.dest_amount_row.value;
-		res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
+		res.fDestAmount = this.app.isValidValue(res.destAmount) ? this.app.normalize(res.destAmount) : res.destAmount;
 
 		res.srcResBal = cont.result_balance_row.value;
-		res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
+		res.fSrcResBal = this.app.isValidValue(res.srcResBal) ? this.app.normalize(res.srcResBal) : res.srcResBal;
 		res.fmtSrcResBal = res.srcCurr.formatValue(res.fSrcResBal);
 
 		res.exchRate = cont.exchange_row.value;
@@ -96,12 +82,12 @@ class ExpenseTransactionView extends TransactionView
 	{
 		model.srcAmount = val;
 
-		var newValue = isValidValue(val) ? normalize(val) : val;
+		var newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 		if (model.fSrcAmount != newValue)
 		{
 			model.fSrcAmount = newValue;
 
-			model.srcResBal = normalize(model.srcAccount.balance - model.fSrcAmount);
+			model.srcResBal = this.app.normalize(model.srcAccount.balance - model.fSrcAmount);
 			model.fmtSrcResBal = model.srcCurr.formatValue(model.srcResBal);
 		}
 
@@ -115,7 +101,7 @@ class ExpenseTransactionView extends TransactionView
 	{
 		model.destAmount = val;
 
-		var newValue = isValidValue(model.destAmount) ? normalize(model.destAmount) : model.destAmount;
+		var newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
 		if (model.fDestAmount != newValue)
 		{
 			model.fDestAmount = newValue;
@@ -149,42 +135,42 @@ class ExpenseTransactionView extends TransactionView
 
 		if (newState === 0 || newState === 1)
 		{
-			setParam(res.values, { src_amount_row : { label : 'Amount' },
+			this.app.setParam(res.values, { src_amount_row : { label : 'Amount' },
 									dest_amount_row : { label : 'Amount' } });
 		}
 		else
 		{
-			setParam(res.values, { src_amount_row : { label : 'Source amount' },
+			this.app.setParam(res.values, { src_amount_row : { label : 'Source amount' },
 									dest_amount_row : { label : 'Destination amount' } });
 		}
 
 		if (newState === 0)
 		{
-			setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : false,
+			this.app.setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : false,
 										src_amount_row : false, dest_amount_row : true, exchange_row : false,
 										result_balance_row : false } });
 		}
 		else if (newState === 1)
 		{
-			setParam(res, { visibility : { dest_amount_left : true, src_res_balance_left : false, exch_left : false,
+			this.app.setParam(res, { visibility : { dest_amount_left : true, src_res_balance_left : false, exch_left : false,
 										src_amount_row : false, dest_amount_row : false, exchange_row : false,
 										result_balance_row : true } });
 		}
 		else if (newState === 2)
 		{
-			setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : true,
+			this.app.setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : true,
 										src_amount_row : true, dest_amount_row : true, exchange_row : false,
 										result_balance_row : false } });
 		}
 		else if (newState === 3)
 		{
-			setParam(res, { visibility : { dest_amount_left : true,	src_res_balance_left : true, exch_left : false,
+			this.app.setParam(res, { visibility : { dest_amount_left : true,	src_res_balance_left : true, exch_left : false,
 										src_amount_row : true, dest_amount_row : false, exchange_row : true,
 										result_balance_row : false } });
 		}
 		else if (newState === 4)
 		{
-			setParam(res, { visibility : { dest_amount_left : true,
+			this.app.setParam(res, { visibility : { dest_amount_left : true,
 										src_res_balance_left : false, exch_left : true,
 										src_amount_row : true, dest_amount_row : false, exchange_row : false,
 										result_balance_row : true } });
@@ -201,7 +187,7 @@ class ExpenseTransactionView extends TransactionView
 		if (!this.model.isDiffCurr)
 			throw new Error('Wrong state: can\'t input source amount on state ' + this.model.state);
 
-		var fNewValue = (isValidValue(val)) ? normalize(val) : val;
+		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
 
 		this.model.srcAmount = val;
 
@@ -209,7 +195,7 @@ class ExpenseTransactionView extends TransactionView
 		{
 			this.model.fSrcAmount = fNewValue;
 
-			this.model.srcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+			this.model.srcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
 
 			this.calcExchByAmounts(this.model);
@@ -224,7 +210,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async inputDestAmount(val)
 	{
-		var fNewValue = (isValidValue(val)) ? normalize(val) : val;
+		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
 
 		this.model.destAmount = val;
 
@@ -234,7 +220,7 @@ class ExpenseTransactionView extends TransactionView
 
 			if (this.model.isDiffCurr)
 			{
-				if (isValidValue(this.model.srcAmount))
+				if (this.app.isValidValue(this.model.srcAmount))
 				{
 					this.calcExchByAmounts(this.model);
 					this.updateExch(this.model);
@@ -252,7 +238,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async inputResBalance(val)
 	{
-		var fNewValue = isValidValue(val) ? normalize(val) : val;
+		var fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 
 		this.model.srcResBal = val;
 
@@ -261,10 +247,10 @@ class ExpenseTransactionView extends TransactionView
 			this.model.fSrcResBal = fNewValue;
 			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
 
-			var newSrcAmount = normalize(this.model.srcAccount.balance - fNewValue);
+			var newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
 
 			this.model.srcAmount = newSrcAmount;
-			this.model.fSrcAmount = isValidValue(newSrcAmount) ? normalize(newSrcAmount) : newSrcAmount;
+			this.model.fSrcAmount = this.app.isValidValue(newSrcAmount) ? this.app.normalize(newSrcAmount) : newSrcAmount;
 
 			if (this.model.isDiffCurr)
 			{
@@ -288,17 +274,17 @@ class ExpenseTransactionView extends TransactionView
 
 		this.model.exchRate = val;
 
-		var fNewValue = (isValidValue(val)) ? normalizeExch(val) : val;
+		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalizeExch(val) : val;
 		if (this.model.fExchRate != fNewValue)
 		{
-			if (isValidValue(this.model.srcAmount))
+			if (this.app.isValidValue(this.model.srcAmount))
 			{
-				var newDestAmount = correct(this.model.fSrcAmount * fNewValue);
+				var newDestAmount = this.app.correct(this.model.fSrcAmount * fNewValue);
 				this.setDestAmount(this.model, newDestAmount);
 			}
-			else if (isValidValue(this.model.destAmount))
+			else if (this.app.isValidValue(this.model.destAmount))
 			{
-				var newSrcAmount = correct(this.model.fDestAmount / fNewValue);
+				var newSrcAmount = this.app.correct(this.model.fDestAmount / fNewValue);
 				this.setSrcAmount(this.model, newSrcAmount);
 			}
 
@@ -331,7 +317,7 @@ class ExpenseTransactionView extends TransactionView
 
 		this.model.srcAccount = newAcc;
 		this.model.src_curr_id = this.model.srcAccount.curr_id;
-		this.model.srcCurr = getCurrency(this.model.src_curr_id);
+		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id);
 		this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
 
 		// Copy source currency to destination currency if needed
@@ -342,7 +328,7 @@ class ExpenseTransactionView extends TransactionView
 		}
 
 		// Update result balance of source
-		var newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+		var newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 		if (this.model.fSrcResBal != newSrcResBal)
 		{
 			this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;
@@ -409,7 +395,7 @@ class ExpenseTransactionView extends TransactionView
 			return super.changeDestCurrency(val);
 
 		this.model.dest_curr_id = parseInt(val);
-		this.model.destCurr = getCurrency(this.model.dest_curr_id);
+		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id);
 
 		this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
 
@@ -442,5 +428,4 @@ class ExpenseTransactionView extends TransactionView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = ExpenseTransactionView;
+export { ExpenseTransactionView };

@@ -1,7 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var api = require('../api.js');
-}
+import { api } from '../api.js';
 
 
 var runTransList = (function()
@@ -248,7 +245,4 @@ var runTransList = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runTransList;
-}
+export { runTransList };

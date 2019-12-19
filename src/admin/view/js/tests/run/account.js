@@ -201,7 +201,4 @@ var runAccounts = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runAccounts;
-}
+export { runAccounts };

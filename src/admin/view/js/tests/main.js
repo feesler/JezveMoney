@@ -1,29 +1,22 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var runProfile = require('./run/profile.js');
-	var runAccounts = require('./run/account.js');
-	var runPersons = require('./run/person.js');
+import { common } from './common.js';
+import { api } from './api.js';
+import { config } from './config.js';
 
-	var runTransactionsCommon = require('./run/transaction/common.js');
-	var runExpense = require('./run/transaction/expense.js');
-	var runIncome = require('./run/transaction/income.js');
-	var runTransfer = require('./run/transaction/transfer.js');
-	var runDebt = require('./run/transaction/debt.js');
 
-	var runTransList = require('./run/transactions.js');
-	var runStatistics = require('./run/statistics.js');
+import { runProfile } from './run/profile.js';
+import { runAccounts } from './run/account.js';
+import { runPersons } from './run/person.js';
 
-	var runAPI = require('./run/api.js');
+import { runTransactionsCommon } from './run/transaction/common.js';
+import { runExpense } from './run/transaction/expense.js';
+import { runIncome } from './run/transaction/income.js';
+import { runTransfer } from './run/transaction/transfer.js';
+import { runDebt } from './run/transaction/debt.js';
 
-	var common = require('./common.js');
-	var api = require('./api.js');
-	var config = require('./config.js');
-}
-else
-{
-	var common = commonModule;
-	var api = apiModule;
-}
+import { runTransList } from './run/transactions.js';
+import { runStatistics } from './run/statistics.js';
+
+import { runAPI } from './run/api.js';
 
 
 var profile = runProfile;
@@ -390,8 +383,5 @@ async function transactionsListTests(app)
 }
 
 
+export { App };
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = App;
-}

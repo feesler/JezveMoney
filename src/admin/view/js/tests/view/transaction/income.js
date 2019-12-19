@@ -1,18 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../../common.js');
-	var extend = common.extend;
-	var setParam = common.setParam;
-	var idSearch = common.idSearch;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var correct = common.correct;
-	var correctExch = common.correctExch;
-	var isValidValue = common.isValidValue;
-	var getCurrency = common.getCurrency;
-
-	var TransactionView = require('../transaction.js');
-}
+import { TransactionView } from '../transaction.js';
 
 
 // Create or update income transaction view class
@@ -44,23 +30,23 @@ class IncomeTransactionView extends TransactionView
 		if (res.destAccount.curr_id != res.dest_curr_id)
 			throw new Error('Unexpected destination currency ' + res.dest_curr_id + '(' + res.destAccount.curr_id + ' is expected)');
 
-		res.srcCurr = getCurrency(res.src_curr_id);
+		res.srcCurr = this.app.getCurrency(res.src_curr_id);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = getCurrency(res.dest_curr_id);
+		res.destCurr = this.app.getCurrency(res.dest_curr_id);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
 		res.destAccount.fmtBalance = res.destCurr.formatValue(res.destAccount.balance);
 
 		res.srcAmount = cont.src_amount_row.value;
-		res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
+		res.fSrcAmount = this.app.isValidValue(res.srcAmount) ? this.app.normalize(res.srcAmount) : res.srcAmount;
 
 		res.destAmount = cont.dest_amount_row.value;
-		res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
+		res.fDestAmount = this.app.isValidValue(res.destAmount) ? this.app.normalize(res.destAmount) : res.destAmount;
 
 		res.destResBal = cont.result_balance_dest_row.value;
-		res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
+		res.fDestResBal = this.app.isValidValue(res.destResBal) ? this.app.normalize(res.destResBal) : res.destResBal;
 		res.fmtDestResBal = res.destCurr.formatValue(res.fDestResBal);
 
 		res.exchRate = cont.exchange_row.value;
@@ -96,7 +82,7 @@ class IncomeTransactionView extends TransactionView
 	{
 		model.srcAmount = val;
 
-		var newValue = isValidValue(val) ? normalize(val) : val;
+		var newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 		if (model.fSrcAmount != newValue)
 		{
 			model.fSrcAmount = newValue;
@@ -112,12 +98,12 @@ class IncomeTransactionView extends TransactionView
 	{
 		model.destAmount = val;
 
-		var newValue = isValidValue(model.destAmount) ? normalize(model.destAmount) : model.destAmount;
+		var newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
 		if (model.fDestAmount != newValue)
 		{
 			model.fDestAmount = newValue;
 
-			model.destResBal = normalize(model.destAccount.balance + model.fDestAmount);
+			model.destResBal = this.app.normalize(model.destAccount.balance + model.fDestAmount);
 			model.fmtDestResBal = model.destCurr.formatValue(model.destResBal);
 		}
 
@@ -150,42 +136,42 @@ class IncomeTransactionView extends TransactionView
 
 		if (newState === 0 || newState === 1)
 		{
-			setParam(res.values, { src_amount_row : { label : 'Amount' },
+			this.app.setParam(res.values, { src_amount_row : { label : 'Amount' },
 									dest_amount_row : { label : 'Amount' } });
 		}
 		else
 		{
-			setParam(res.values, { src_amount_row : { label : 'Source amount' },
+			this.app.setParam(res.values, { src_amount_row : { label : 'Source amount' },
 									dest_amount_row : { label : 'Destination amount' } });
 		}
 
 		if (newState === 0)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false, dest_res_balance_left : true, exch_left : false,
+			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false, dest_res_balance_left : true, exch_left : false,
 										src_amount_row : true, dest_amount_row : false,
 										result_balance_dest_row : false, exchange_row : false } });
 		}
 		else if (newState === 1)
 		{
-			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false, dest_res_balance_left : false, exch_left : false,
+			this.app.setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false, dest_res_balance_left : false, exch_left : false,
 										src_amount_row : false, dest_amount_row : false,
 										result_balance_dest_row : true, exchange_row : false } });
 		}
 		else if (newState === 2)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false, dest_res_balance_left : true, exch_left : true,
+			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false, dest_res_balance_left : true, exch_left : true,
 										src_amount_row : true, dest_amount_row : true, exchange_row : false,
 										result_balance_dest_row : false } });
 		}
 		else if (newState === 3)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true, dest_res_balance_left : true, exch_left : false,
+			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true, dest_res_balance_left : true, exch_left : false,
 										src_amount_row : true, dest_amount_row : false, exchange_row : true,
 										result_balance_dest_row : false } });
 		}
 		else if (newState === 4)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true, dest_res_balance_left : false, exch_left : true,
+			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true, dest_res_balance_left : false, exch_left : true,
 										src_amount_row : true, dest_amount_row : false, exchange_row : false,
 										result_balance_dest_row : true } });
 		}
@@ -198,7 +184,7 @@ class IncomeTransactionView extends TransactionView
 
 	async inputSrcAmount(val)
 	{
-		var fNewValue = (isValidValue(val)) ? normalize(val) : val;
+		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
 
 		this.model.srcAmount = val;
 
@@ -208,7 +194,7 @@ class IncomeTransactionView extends TransactionView
 
 			if (this.model.isDiffCurr)
 			{
-				if (isValidValue(this.model.destAmount))
+				if (this.app.isValidValue(this.model.destAmount))
 				{
 					this.calcExchByAmounts(this.model);
 					this.updateExch(this.model);
@@ -228,7 +214,7 @@ class IncomeTransactionView extends TransactionView
 
 	async inputDestAmount(val)
 	{
-		var fNewValue = (isValidValue(val)) ? normalize(val) : val;
+		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
 
 		this.setDestAmount(this.model, val)
 
@@ -248,7 +234,7 @@ class IncomeTransactionView extends TransactionView
 
 	async inputDestResBalance(val)
 	{
-		var fNewValue = isValidValue(val) ? normalize(val) : val;
+		var fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 
 		this.model.destResBal = val;
 
@@ -257,10 +243,10 @@ class IncomeTransactionView extends TransactionView
 			this.model.fDestResBal = fNewValue;
 			this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
 
-			var newSrcAmount = normalize(fNewValue - this.model.destAccount.balance);
+			var newSrcAmount = this.app.normalize(fNewValue - this.model.destAccount.balance);
 
 			this.model.srcAmount = newSrcAmount;
-			this.model.fSrcAmount = isValidValue(newSrcAmount) ? normalize(newSrcAmount) : newSrcAmount;
+			this.model.fSrcAmount = this.app.isValidValue(newSrcAmount) ? this.app.normalize(newSrcAmount) : newSrcAmount;
 
 			if (this.model.isDiffCurr)
 			{
@@ -284,17 +270,17 @@ class IncomeTransactionView extends TransactionView
 
 		this.model.exchRate = val;
 
-		var fNewValue = (isValidValue(val)) ? normalizeExch(val) : val;
+		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalizeExch(val) : val;
 		if (this.model.fExchRate != fNewValue)
 		{
-			if (isValidValue(this.model.srcAmount))
+			if (this.app.isValidValue(this.model.srcAmount))
 			{
-				var newDestAmount = correct(this.model.fSrcAmount * fNewValue);
+				var newDestAmount = this.app.correct(this.model.fSrcAmount * fNewValue);
 				this.setDestAmount(this.model, newDestAmount);
 			}
-			else if (isValidValue(this.model.destAmount))
+			else if (this.app.isValidValue(this.model.destAmount))
 			{
-				var newSrcAmount = correct(this.model.fDestAmount / fNewValue);
+				var newSrcAmount = this.app.correct(this.model.fDestAmount / fNewValue);
 				this.setSrcAmount(this.model, newSrcAmount);
 			}
 
@@ -327,7 +313,7 @@ class IncomeTransactionView extends TransactionView
 
 		this.model.destAccount = newAcc;
 		this.model.dest_curr_id = this.model.destAccount.curr_id;
-		this.model.destCurr = getCurrency(this.model.dest_curr_id);
+		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id);
 		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
 
 		// Copy destination currency to source currency if needed
@@ -338,7 +324,7 @@ class IncomeTransactionView extends TransactionView
 		}
 
 		// Update result balance of destination
-		var newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
+		var newDestResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
 		if (this.model.fDestResBal != newDestResBal)
 		{
 			this.model.destResBal = this.model.fDestResBal = newDestResBal;
@@ -416,7 +402,7 @@ class IncomeTransactionView extends TransactionView
 			return super.changeSourceCurrency(val);
 
 		this.model.src_curr_id = parseInt(val);
-		this.model.srcCurr = getCurrency(this.model.src_curr_id);
+		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id);
 
 		this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
 
@@ -452,5 +438,4 @@ class IncomeTransactionView extends TransactionView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = IncomeTransactionView;
+export { IncomeTransactionView };

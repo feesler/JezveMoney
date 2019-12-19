@@ -1,24 +1,3 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var idSearch = common.idSearch;
-	var isObject = common.isObject;
-	var isFunction = common.isFunction;
-	var idSearch = common.idSearch;
-	var fixFloat = common.fixFloat;
-	var correct = common.correct;
-	var correctExch = common.correctExch;
-	var normalize = common.normalize;
-	var normalizeExch = common.normalizeExch;
-	var isValidValue = common.isValidValue;
-	var checkObjValue = common.checkObjValue;
-	var EXPENSE = common.EXPENSE;
-	var INCOME = common.INCOME;
-	var TRANSFER = common.TRANSFER;
-	var DEBT = common.DEBT;
-}
-
-
 // Common test view class
 class TestView
 {
@@ -354,7 +333,7 @@ class TestView
 		{
 			if (this.isMobile)
 			{
-				var option = idSearch(this.items, val);
+				var option = self.app.idSearch(this.items, val);
 				if (!option)
 					throw new Error('Option item not found');
 
@@ -364,7 +343,7 @@ class TestView
 			else
 			{
 				await self.click(this.selectBtn);
-				var li = idSearch(this.items, val);
+				var li = self.app.idSearch(this.items, val);
 				if (!li)
 					throw new Error('List item not found');
 				return self.click(li.elem);
@@ -377,7 +356,7 @@ class TestView
 
 	getTransactionType(str)
 	{
-		var strToType = { 'ALL' : 0, 'EXPENSE' : EXPENSE, 'INCOME' : INCOME, 'TRANSFER' : TRANSFER, 'DEBT' : DEBT };
+		var strToType = { 'ALL' : 0, 'EXPENSE' : this.app.EXPENSE, 'INCOME' : this.app.INCOME, 'TRANSFER' : this.app.TRANSFER, 'DEBT' : this.app.DEBT };
 
 		if (!str)
 			return null;
@@ -699,7 +678,7 @@ class TestView
 
 	async performAction(action)
 	{
-		if (!isFunction(action))
+		if (!this.app.isFunction(action))
 			throw new Error('Wrong action specified');
 
 		if (!this.content && !this.header)
@@ -735,7 +714,7 @@ class TestView
 			expVisible = expected[countrolName];
 			control = controls[countrolName];
 
-			if (isObject(expVisible))
+			if (this.app.isObject(expVisible))
 			{
 				res = await this.checkVisibility(control, expVisible);
 			}
@@ -765,9 +744,9 @@ class TestView
 			if (!control)
 				throw new Error('Control (' + countrolName + ') not found');
 
-			if (isObject(expected))
+			if (this.app.isObject(expected))
 			{
-				res = checkObjValue(control, expected, true);
+				res = this.app.checkObjValue(control, expected, true);
 				if (res !== true)
 				{
 					res.key = countrolName + '.' + res.key;
@@ -835,5 +814,4 @@ class TestView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = TestView;
+export { TestView };

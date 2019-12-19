@@ -420,7 +420,4 @@ var runIncome = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runIncome;
-}
+export { runIncome };

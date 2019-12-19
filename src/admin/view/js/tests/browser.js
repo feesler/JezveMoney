@@ -1,3 +1,8 @@
+import { common } from './common.js';
+import { route } from './router.js';
+import { App } from './main.js';
+
+
 var Environment = (function()
 {
 	var vdoc = null;
@@ -299,8 +304,6 @@ var Environment = (function()
 
 	async function navigation(action)
 	{
-		let env = window.Environment;
-
 		var navPromise = new Promise(function(resolve, reject)
 		{
 			viewframe.onload = async function()
@@ -309,11 +312,11 @@ var Environment = (function()
 				if (!vdoc)
 					throw new Error('View document not found');
 
-				checkPHPerrors(env, vdoc.documentElement.innerHTML);
+				common.checkPHPerrors(Environment, vdoc.documentElement.innerHTML);
 
-				let viewClass = await route(env, await getUrl());
+				let viewClass = await route(Environment, await getUrl());
 
-				app.view = new viewClass({ app : app, environment : env });
+				app.view = new viewClass({ app : app, environment : Environment });
 				await app.view.parse();
 
 				resolve();
@@ -354,8 +357,8 @@ var Environment = (function()
 			{
 				results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
-				if (config.testsExpected)
-					results.expected = config.testsExpected;
+				if (app.config.testsExpected)
+					results.expected = app.config.testsExpected;
 
 				await addResult('Test initialization', true);
 
@@ -392,3 +395,6 @@ var Environment = (function()
 	 	setBlock : setBlock
 	};
 })();
+
+
+Environment.init(App);

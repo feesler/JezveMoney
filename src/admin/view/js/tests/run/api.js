@@ -1,21 +1,14 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var api = require('../api.js');
-	var runAccountAPI = require('./api/account.js');
-	var runPersonAPI = require('./api/person.js');
-	var runTransactionAPI = require('./api/transaction.js');
-
-	var App = null;
-}
-else
-{
-	var api = apiModule;
-}
+import { api } from '../api.js';
+import { runAccountAPI } from './api/account.js';
+import { runPersonAPI } from './api/person.js';
+import { runTransactionAPI } from './api/transaction.js';
 
 
 var runAPI = (function()
 {
 	let env = null;
+	let app = null;
+	let test = null;
 
 
 	function onAppUpdate(props)
@@ -23,9 +16,9 @@ var runAPI = (function()
 		props = props || {};
 
 		if ('App' in props)
-			App = props.App;
+			app = props.App;
 
-		App.run.api = { account : runAccountAPI,
+		app.run.api = { account : runAccountAPI,
 						person : runPersonAPI,
 					 	transaction : runTransactionAPI };
 	}
@@ -34,33 +27,34 @@ var runAPI = (function()
 	async function runTests(app)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		api.setEnv(env, app);
 
 		env.setBlock('API tests', 1);
 
-		const account = App.run.api.account;
-		const person = App.run.api.person;
-		const transaction = App.run.api.transaction;
+		const account = app.run.api.account;
+		const person = app.run.api.person;
+		const transaction = app.run.api.transaction;
 
-		account.setEnv(env, App);
-		person.setEnv(env, App);
-		transaction.setEnv(env, App);
+		account.setEnv(env, app);
+		person.setEnv(env, app);
+		transaction.setEnv(env, app);
 
-		await App.test('Login user', () => api.user.login(App.config.testUser.login, App.config.testUser.password), env);
+		await test('Login user', () => api.user.login(app.config.testUser.login, app.config.testUser.password), env);
 
-		await App.test('Reset all data', async () => {
+		await test('Reset all data', async () => {
 			return await api.profile.reset();
 		}, env);
 
 		env.setBlock('Accounts', 2);
 
-		await App.test('Reset accounts', () => api.account.reset(), env);
+		await test('Reset accounts', () => api.account.reset(), env);
 
-		await App.test('Accounts list', async () => {
+		await test('Accounts list', async () => {
 			let accList = await api.account.list();
 
-			return App.isArray(accList) && accList.length == 0;
+			return app.isArray(accList) && accList.length == 0;
 		}, env);
 
 		const RUB = 1;
@@ -74,10 +68,10 @@ var runAPI = (function()
 
 		env.setBlock('Persons', 2);
 
-		await App.test('Persons list', async () => {
+		await test('Persons list', async () => {
 			let pList = await api.person.list();
 
-			return App.isArray(pList);
+			return app.isArray(pList);
 		}, env);
 
 		let PERSON_X = await person.createTest({ name : 'Person X' });
@@ -85,16 +79,16 @@ var runAPI = (function()
 
 
 		let now = new Date();
-		let monthAgo = App.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-		let weekAgo = App.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
-		let yesterday = App.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+		let monthAgo = app.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+		let weekAgo = app.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+		let yesterday = app.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
 
 		env.setBlock('Transactions', 2);
 
-		await App.test('Transactions list', async () => {
+		await test('Transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return App.isArray(trList) && trList.length == 0;
+			return app.isArray(trList) && trList.length == 0;
 		}, env);
 
 
@@ -210,10 +204,10 @@ var runAPI = (function()
 		await transaction.deleteTest([ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ]);
 
 
-		await App.test('Result transactions list', async () => {
+		await test('Result transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return App.isArray(trList) && trList.length == 2;
+			return app.isArray(trList) && trList.length == 2;
 		}, env);
 	}
 
@@ -223,7 +217,4 @@ var runAPI = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runAPI;
-}
+export { runAPI };

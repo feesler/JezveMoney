@@ -1,10 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var extend = common.extend;
-
-	var TestView = require('./testview.js');
-}
+import { TestView } from './testview.js';
 
 
 // Create or update account view class
@@ -80,5 +74,4 @@ class AccountView extends TestView
 	}
 }
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = AccountView;
+export { AccountView };

@@ -84,7 +84,4 @@ var runPersons = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runPersons;
-}
+export { runPersons };

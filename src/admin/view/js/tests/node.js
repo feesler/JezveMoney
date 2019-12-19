@@ -1,10 +1,10 @@
-const process = require('process');
-const http = require('http');
-const puppeteer = require('puppeteer');
-const chalk = require('chalk');
-const common = require('./common.js');
-const route = require('./router.js');
-const App = require('./main.js');
+import process from 'process';
+import http from 'http';
+import puppeteer from 'puppeteer';
+import chalk from 'chalk';
+import { common } from './common.js';
+import { route } from './router.js';
+import { App } from './main.js';
 
 
 var Environment = (function()

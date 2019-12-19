@@ -1,10 +1,6 @@
-
-if (typeof module !== 'undefined' && module.exports)
-{
-	var LoginView = require('../view/login.js');
-	var RegisterView = require('../view/register.js');
-	var MainView = require('../view/main.js');
-}
+import { LoginView } from '../view/login.js';
+import { RegisterView } from '../view/register.js';
+import { MainView } from '../view/main.js';
 
 
 var runProfile = (function()
@@ -181,7 +177,4 @@ var runProfile = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runProfile;
-}
+export { runProfile };

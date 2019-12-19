@@ -27,6 +27,7 @@ abstract class Controller
 
 		$this->jsArr = ["lib/polyfill.min.js", "common.js", "ajax.js", "popup.js", "app.js"];
 		$this->jsAdmin = [];
+		$this->jsAdminModule = [];
 	}
 
 

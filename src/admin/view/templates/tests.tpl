@@ -1,13 +1,4 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
-<script>
-var currency = <?=f_json_encode($currArr)?>;
-var icons = <?=f_json_encode($icons)?>;
-onReady(function()
-{
-	if (Environment && isFunction(Environment.init))
-		Environment.init(App);
-});
-</script>
 </head>
 <body>
 <div class="page">

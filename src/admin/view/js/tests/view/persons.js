@@ -1,11 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var extend = common.extend;
-	var isArray = common.isArray;
-
-	var TestView = require('./testview.js');
-}
+import { TestView } from './testview.js';
 
 
 // List of persons view class
@@ -61,7 +54,7 @@ class PersonsView extends TestView
 		if (!persons)
 			throw new Error('No persons specified');
 
-		if (!isArray(persons))
+		if (!this.app.isArray(persons))
 			persons = [persons];
 
 		let ind = 0;
@@ -94,5 +87,4 @@ class PersonsView extends TestView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = PersonsView;
+export { PersonsView };

@@ -1,22 +1,17 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var URL = require('url').URL;
-
-	var MainView = require('./view/main.js');
-	var LoginView = require('./view/login.js');
-	var RegisterView = require('./view/register.js');
-	var ProfileView = require('./view/profile.js');
-	var AccountView = require('./view/account.js');
-	var AccountsView = require('./view/accounts.js');
-	var PersonView = require('./view/person.js');
-	var PersonsView = require('./view/persons.js');
-	var TransactionsView = require('./view/transactions.js');
-	var ExpenseTransactionView = require('./view/transaction/expense.js');
-	var IncomeTransactionView = require('./view/transaction/income.js');
-	var TransferTransactionView = require('./view/transaction/transfer.js');
-	var DebtTransactionView = require('./view/transaction/debt.js');
-	var StatisticsView = require('./view/statistics.js');
-}
+import { MainView } from './view/main.js';
+import { LoginView } from './view/login.js';
+import { RegisterView } from './view/register.js';
+import { ProfileView } from './view/profile.js';
+import { AccountView } from './view/account.js';
+import { AccountsView } from './view/accounts.js';
+import { PersonView } from './view/person.js';
+import { PersonsView } from './view/persons.js';
+import { TransactionsView } from './view/transactions.js';
+import { ExpenseTransactionView } from './view/transaction/expense.js';
+import { IncomeTransactionView } from './view/transaction/income.js';
+import { TransferTransactionView } from './view/transaction/transfer.js';
+import { DebtTransactionView } from './view/transaction/debt.js';
+import { StatisticsView } from './view/statistics.js';
 
 
 // Process request url and return view class if match
@@ -124,7 +119,4 @@ async function route(env, url)
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = route;
-}
+export { route };

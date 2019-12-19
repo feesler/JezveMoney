@@ -1,3 +1,6 @@
+import { TransactionsView } from '../../view/transactions.js';
+
+
 var runTransactionsCommon = (function()
 {
 	let App = null;
@@ -191,7 +194,7 @@ var runTransactionsCommon = (function()
 		for(let accPos in affectedAccounts)
 		{
 			let acc = affectedAccounts[accPos];
-			fmtBal = app.formatCurrency(acc.balance, acc.curr_id);
+			let fmtBal = app.formatCurrency(acc.balance, acc.curr_id);
 
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}
@@ -230,8 +233,5 @@ var runTransactionsCommon = (function()
 })();
 
 
+export { runTransactionsCommon };
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runTransactionsCommon;
-}

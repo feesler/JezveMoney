@@ -6,18 +6,18 @@ var apiModule = (function()
 {
 	let defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
 	let env = null;
-	let App = null;
+	let app = null;
 	let apiBase = null;
 
 
-	function setupEnvironment(e, app)
+	function setupEnvironment(e, App)
 	{
-		if (!e || !app || !app.config || !app.config.url)
+		if (!e || !App || !App.config || !App.config.url)
 			throw new Error('Unexpected setup');
 
 		env = e;
-		App = app;
-		apiBase = App.config.url + 'api/';
+		app = App;
+		apiBase = app.config.url + 'api/';
 	}
 
 
@@ -364,16 +364,16 @@ var apiModule = (function()
  	async function createTransaction(options)
  	{
 		if (!options.date)
-			options.date = App.formatDate(new Date());
+			options.date = app.formatDate(new Date());
 		if (typeof options.comm === 'undefined')
 			options.comm = '';
 
  		let postData = checkFields(options, trReqFields);
 
-		let isDebt = (postData.transtype == App.DEBT);
+		let isDebt = (postData.transtype == app.DEBT);
 		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
 
-		App.setParam(postData, addData);
+		app.setParam(postData, addData);
 
  		let apiRes = await apiPost('transaction/create', postData);
  		if (!apiRes || apiRes.result != 'ok')
@@ -395,10 +395,10 @@ var apiModule = (function()
 		let postData = checkFields(options, trReqFields);
 		postData.transid = id;
 
-		let isDebt = (postData.transtype == App.DEBT);
+		let isDebt = (postData.transtype == app.DEBT);
 		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
 
-		App.setParam(postData, addData);
+		app.setParam(postData, addData);
 
  		let apiRes = await apiPost('transaction/update', postData);
  		if (!apiRes || apiRes.result != 'ok')
@@ -445,16 +445,16 @@ var apiModule = (function()
 		if (!params.src_id)
 			throw new Error('Source account not specified');
 
-		let res = App.copyObject(params);
+		let res = app.copyObject(params);
 
-		res.transtype = App.EXPENSE;
+		res.transtype = app.EXPENSE;
 		res.dest_id = 0;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
 		let accList = await accountsList();
-		let acc = App.idSearch(accList, res.src_id);
+		let acc = app.idSearch(accList, res.src_id);
 		res.src_curr = acc.curr_id;
 
 		if (!res.dest_curr)
@@ -469,16 +469,16 @@ var apiModule = (function()
 		if (!params.dest_id)
 			throw new Error('Destination account not specified');
 
-		let res = App.copyObject(params);
+		let res = app.copyObject(params);
 
-		res.transtype = App.INCOME;
+		res.transtype = app.INCOME;
 		res.src_id = 0;
 
 		if (!res.src_amount)
 			res.src_amount = res.dest_amount;
 
 		let accList = await accountsList();
-		let acc = App.idSearch(accList, res.dest_id);
+		let acc = app.idSearch(accList, res.dest_id);
 		res.dest_curr = acc.curr_id;
 
 		if (!res.src_curr)
@@ -495,19 +495,19 @@ var apiModule = (function()
 		if (!params.dest_id)
 			throw new Error('Destination account not specified');
 
-		let res = App.copyObject(params);
+		let res = app.copyObject(params);
 
-		res.transtype = App.TRANSFER;
+		res.transtype = app.TRANSFER;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
 		let accList = await accountsList();
 
-		let srcAcc = App.idSearch(accList, res.src_id);
+		let srcAcc = app.idSearch(accList, res.src_id);
 		res.src_curr = srcAcc.curr_id;
 
-		let destAcc = App.idSearch(accList, res.dest_id);
+		let destAcc = app.idSearch(accList, res.dest_id);
 		res.dest_curr = destAcc.curr_id;
 
 		if (!res.src_curr)
@@ -522,16 +522,16 @@ var apiModule = (function()
 		if (!params.person_id)
 			throw new Error('Person not specified');
 
-		let res = App.copyObject(params);
+		let res = app.copyObject(params);
 
-		res.transtype = App.DEBT;
+		res.transtype = app.DEBT;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
 		let accList = await accountsList();
 
-		let acc = App.idSearch(accList, res.acc_id);
+		let acc = app.idSearch(accList, res.acc_id);
 		if (acc)
 			res.src_curr = res.dest_curr = acc.curr_id;
 		else
@@ -588,7 +588,4 @@ var apiModule = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = apiModule;
-}
+export { apiModule as api };

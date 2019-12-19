@@ -1,12 +1,4 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	const common = require('../common.js');
-	var extend = common.extend;
-	var isArray = common.isArray;
-	var idSearch = common.idSearch;
-
-	var TestView = require('./testview.js');
-}
+import { TestView } from './testview.js';
 
 
 // List of transactions view class
@@ -14,7 +6,7 @@ class TransactionsView extends TestView
 {
 	async getTransactionObject(trans_id)
 	{
-		return idSearch(await this.global('transArr'), trans_id);
+		return this.app.idSearch(await this.global('transArr'), trans_id);
 	}
 
 
@@ -284,7 +276,7 @@ class TransactionsView extends TestView
 
 	async filterByAccounts(accounts)
 	{
-		if (!isArray(accounts))
+		if (!this.app.isArray(accounts))
 			accounts = [ accounts ];
 
 		return this.navigation(async () =>
@@ -394,7 +386,7 @@ class TransactionsView extends TestView
 		if (!tr)
 			throw new Error('No transactions specified');
 
-		if (!isArray(tr))
+		if (!this.app.isArray(tr))
 			tr = [tr];
 
 		let ind = 0;
@@ -430,5 +422,4 @@ class TransactionsView extends TestView
 }
 
 
-if (typeof module !== 'undefined' && module.exports)
-	module.exports = TransactionsView;
+export { TransactionsView };

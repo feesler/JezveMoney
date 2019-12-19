@@ -307,7 +307,7 @@ function urlJoin(obj)
 
 	for(par in obj)
 	{
-		val = obj[par];
+		let val = obj[par];
 		if (isArray(val))
 		{
 			val.forEach(function(arrItem)
@@ -464,7 +464,4 @@ var commonModule = { EXPENSE : EXPENSE,
 					test : test };
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = commonModule;
-}
+export { commonModule as common };

@@ -1,26 +1,21 @@
-if (typeof module !== 'undefined' && module.exports)
-{
-	var api = require('../../api.js');
-}
-else
-{
-	var api = apiModule;
-}
+import { api } from '../../api.js';
 
 
 var runTransactionAPI = (function()
 {
 	let env = null;
-	let App = null;
+	let app = null;
+	let test = null;
 
 
-	function setupEnvironment(e, app)
+	function setupEnvironment(e, App)
 	{
-		if (!e || !app)
+		if (!e || !App)
 			throw new Error('Unexpected setup');
 
 		env = e;
-		App = app;
+		app = App;
+		test = app.test;
 	}
 
 
@@ -52,7 +47,7 @@ var runTransactionAPI = (function()
 
 	function updatePos(trList, item_id, pos)
 	{
-		let trObj = App.idSearch(trList, item_id);
+		let trObj = app.idSearch(trList, item_id);
 		if (!trObj)
 			throw new Error('Transaction ' + item_id + ' not found');
 
@@ -89,13 +84,13 @@ var runTransactionAPI = (function()
 	// Apply transaction to accounts
 	function applyTransaction(accList, transObj)
 	{
-		let res = App.copyObject(accList);
+		let res = app.copyObject(accList);
 
-		let srcAcc = App.idSearch(res, transObj.src_id);
+		let srcAcc = app.idSearch(res, transObj.src_id);
 		if (srcAcc)
 			srcAcc.balance -= transObj.src_amount;
 
-		let destAcc = App.idSearch(res, transObj.dest_id);
+		let destAcc = app.idSearch(res, transObj.dest_id);
 		if (destAcc)
 			destAcc.balance += transObj.dest_amount;
 
@@ -106,13 +101,13 @@ var runTransactionAPI = (function()
 	// Cancel transaction to accounts
 	function cancelTransaction(accList, transObj)
 	{
-		let res = App.copyObject(accList);
+		let res = app.copyObject(accList);
 
-		let srcAcc = App.idSearch(res, transObj.src_id);
+		let srcAcc = app.idSearch(res, transObj.src_id);
 		if (srcAcc)
 			srcAcc.balance += transObj.src_amount;
 
-		let destAcc = App.idSearch(res, transObj.dest_id);
+		let destAcc = app.idSearch(res, transObj.dest_id);
 		if (destAcc)
 			destAcc.balance -= transObj.dest_amount;
 
@@ -122,9 +117,9 @@ var runTransactionAPI = (function()
 
 	async function getExpectedTransaction(params)
 	{
-		let res = App.copyObject(params);
+		let res = app.copyObject(params);
 
-		let isDebt = (res.transtype == App.DEBT);
+		let isDebt = (res.transtype == app.DEBT);
 		if (isDebt)
 		{
 			let personObj = await api.person.read(res.person_id);
@@ -183,14 +178,14 @@ var runTransactionAPI = (function()
 		let transaction_id = 0;
 
 		if (!params.date)
-			params.date = App.formatDate(new Date());
+			params.date = app.formatDate(new Date());
 		if (!params.comm)
 			params.comm = '';
 
-		await App.test('Create ' + getTypeStr(params.transtype) + ' transaction', async () =>
+		await test('Create ' + getTypeStr(params.transtype) + ' transaction', async () =>
 		{
 			let trBefore = await api.transaction.list();
-			if (!App.isArray(trBefore))
+			if (!app.isArray(trBefore))
 				return false;
 
 			// Prepare expected transaction object
@@ -209,7 +204,7 @@ var runTransactionAPI = (function()
 			expTrans.id = transaction_id = createRes.id;
 
 			// Prepare expected updates of transactions
-			let expTransList = App.copyObject(trBefore);
+			let expTransList = app.copyObject(trBefore);
 			expTransList.push(expTrans);
 
 			let trPos = getExpectedPos(expTransList, params);
@@ -220,11 +215,11 @@ var runTransactionAPI = (function()
 
 			let trList = await api.transaction.list();
 			let accList = await api.account.list();
-			let transObj = App.idSearch(trList, transaction_id);
+			let transObj = app.idSearch(trList, transaction_id);
 
-			let res = App.checkObjValue(transObj, expTrans) &&
-						App.checkObjValue(trList, expTransList) &&
-						App.checkObjValue(accList, expAccountList);
+			let res = app.checkObjValue(transObj, expTrans) &&
+						app.checkObjValue(trList, expTransList) &&
+						app.checkObjValue(accList, expAccountList);
 
 			return res;
 		}, env);
@@ -265,28 +260,28 @@ var runTransactionAPI = (function()
 
 		let accBefore = await api.account.list();
 		let trBefore = await api.transaction.list();
-		let origTrans = App.idSearch(trBefore, params.id);
+		let origTrans = app.idSearch(trBefore, params.id);
 
-		let updParams = App.copyObject(origTrans);
+		let updParams = app.copyObject(origTrans);
 
 		updParams.transtype = updParams.type;
 		delete updParams.type;
 
 		let fullAccList = await api.account.list(true);
 
-		let srcAcc = App.idSearch(fullAccList, updParams.src_id);
-		let destAcc = App.idSearch(fullAccList, updParams.dest_id);
+		let srcAcc = app.idSearch(fullAccList, updParams.src_id);
+		let destAcc = app.idSearch(fullAccList, updParams.dest_id);
 
-		let isDebt = (updParams.transtype == App.DEBT);
+		let isDebt = (updParams.transtype == app.DEBT);
 		if (isDebt)
 		{
-			if (srcAcc && srcAcc.owner_id != App.user_id)
+			if (srcAcc && srcAcc.owner_id != app.user_id)
 			{
 				updParams.debtop = 1;
 				updParams.person_id = srcAcc.owner_id;
 				updParams.acc_id = (destAcc) ? destAcc.id : 0;
 			}
-			else if (destAcc && destAcc.owner_id != App.user_id)
+			else if (destAcc && destAcc.owner_id != app.user_id)
 			{
 				updParams.debtop = 2;
 				updParams.person_id = destAcc.owner_id;
@@ -300,14 +295,14 @@ var runTransactionAPI = (function()
 		updParams.comm = updParams.comment;
 		delete updParams.comment;
 
-		App.setParam(updParams, params);
+		app.setParam(updParams, params);
 
 		// Synchronize currencies with accounts
 		if (isDebt)
 		{
 			if (updParams.acc_id && updParams.acc_id != origTrans.acc_id)
 			{
-				let acc = App.idSearch(fullAccList, updParams.acc_id);
+				let acc = app.idSearch(fullAccList, updParams.acc_id);
 				if (updParams.debtop == 1)
 					updParams.dest_curr = acc.curr_id;
 				else
@@ -318,18 +313,18 @@ var runTransactionAPI = (function()
 		{
 			if (updParams.src_id && updParams.src_id != origTrans.src_id)
 			{
-				let acc = App.idSearch(fullAccList, updParams.src_id);
+				let acc = app.idSearch(fullAccList, updParams.src_id);
 				updParams.src_curr = acc.curr_id;
 			}
 
 			if (updParams.dest_id && updParams.dest_id != origTrans.dest_id)
 			{
-				let acc = App.idSearch(fullAccList, updParams.dest_id);
+				let acc = app.idSearch(fullAccList, updParams.dest_id);
 				updParams.dest_curr = acc.curr_id;
 			}
 		}
 
-		await App.test('Update ' + getTypeStr(origTrans.type) + ' transaction', async () =>
+		await test('Update ' + getTypeStr(origTrans.type) + ' transaction', async () =>
 		{
 			// Prepare expected transaction object
 			let expTrans = await getExpectedTransaction(updParams);
@@ -345,7 +340,7 @@ var runTransactionAPI = (function()
 				return false;
 
 			// Prepare expected updates of transactions
-			let expTransList = App.copyObject(trBefore);
+			let expTransList = app.copyObject(trBefore);
 			let trIndex = expTransList.findIndex(item => item.id == expTrans.id);
 			if (trIndex !== -1)
 				expTransList.splice(trIndex, 1, expTrans);
@@ -360,11 +355,11 @@ var runTransactionAPI = (function()
 
 			let trList = await api.transaction.list();
 			let accList = await api.account.list();
-			let transObj = App.idSearch(trList, updParams.id);
+			let transObj = app.idSearch(trList, updParams.id);
 
-			let res = App.checkObjValue(transObj, expTrans) &&
-						App.checkObjValue(trList, expTransList) &&
-						App.checkObjValue(accList, expAccountList);
+			let res = app.checkObjValue(transObj, expTrans) &&
+						app.checkObjValue(trList, expTransList) &&
+						app.checkObjValue(accList, expAccountList);
 
 			return res;
 		}, env);
@@ -379,26 +374,26 @@ var runTransactionAPI = (function()
 	{
 		let deleteRes;
 
-		await App.test('Delete transaction', async () =>
+		await test('Delete transaction', async () =>
 		{
-			if (!App.isArray(ids))
+			if (!app.isArray(ids))
 				ids = [ ids ];
 
 			let trBefore = await api.transaction.list();
 			let accBefore = await api.account.list();
-			if (!App.isArray(trBefore))
+			if (!app.isArray(trBefore))
 				return false;
 
 			// Prepare expected updates of transactions list
-			let expTransList = App.copyObject(trBefore);
-			let expAccList = App.copyObject(accBefore);
+			let expTransList = app.copyObject(trBefore);
+			let expAccList = app.copyObject(accBefore);
 			for(let tr_id of ids)
 			{
 				let trIndex = expTransList.findIndex(item => item.id == tr_id);
 				if (trIndex !== -1)
 					expTransList.splice(trIndex, 1);
 
-				expAccList = cancelTransaction(expAccList, App.idSearch(trBefore, tr_id));
+				expAccList = cancelTransaction(expAccList, app.idSearch(trBefore, tr_id));
 			}
 
 			// Send API sequest to server
@@ -409,8 +404,8 @@ var runTransactionAPI = (function()
 			let accList = await api.account.list();
 			let trList = await api.transaction.list();
 
-			let res = App.checkObjValue(accList, expAccList) &&
-						App.checkObjValue(trList, expTransList);
+			let res = app.checkObjValue(accList, expAccList) &&
+						app.checkObjValue(trList, expTransList);
 
 			return res;
 		}, env);
@@ -430,7 +425,5 @@ var runTransactionAPI = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runTransactionAPI;
-}
+export { runTransactionAPI };
+

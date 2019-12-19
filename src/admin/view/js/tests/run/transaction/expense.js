@@ -419,7 +419,4 @@ var runExpense = (function()
 })();
 
 
-if (typeof module !== 'undefined' && module.exports)
-{
-	module.exports = runExpense;
-}
+export { runExpense };
