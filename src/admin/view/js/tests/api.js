@@ -91,6 +91,48 @@ var apiModule = (function()
 
 
 /**
+ * Currency
+ */
+
+	async function readCurrency(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new Error('Wrong id specified');
+		}
+
+		let apiReq = 'currency/';
+		if (ids.length == 1)
+			apiReq += ids[0];
+		else
+			apiReq += '?' + urlJoin({ id : ids });
+
+		let jsonRes = await apiGet(apiReq);
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to read currency');
+
+		return jsonRes.data;
+	}
+
+
+	async function currenciesList()
+	{
+		let reqUrl = 'currency/list';
+
+		let jsonRes = await apiGet(reqUrl);
+		if (!jsonRes || jsonRes.result != 'ok')
+			throw new Error('Fail to obtain list of currencies');
+
+		return jsonRes.data;
+	}
+
+
+/**
  * User/profile
  */
 
@@ -543,6 +585,11 @@ var apiModule = (function()
 
 	return {
 		setEnv : setupEnvironment,
+
+		currency : {
+			read : readCurrency,	
+			list : currenciesList
+		},
 
 		user : {
 			login : loginUser
