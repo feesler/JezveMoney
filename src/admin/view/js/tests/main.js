@@ -38,20 +38,24 @@ var statistics = runStatistics;
 
 
 
-var App = {
+class Application
+{
+	constructor()
+	{
+		this.config = config;
 
-	config,
+		this.user_id = null;
 
-	user_id : null,
+		this.run = {};
 
-	run : {},
+		this.accounts = [];
+		this.persons = [];
+		this.transactions = [];
+		this.currencies = [];
+	}
 
-	accounts : [],
-	persons : [],
-	transactions : [],
-	currencies : [],
 
-	notify : function()
+	notify()
 	{
 		let notification = { App : this };
 
@@ -70,9 +74,10 @@ var App = {
 		statistics.onAppUpdate(notification);
 
 		runAPI.onAppUpdate(notification);
-	},
+	}
 
-	init : async function()
+
+	async init()
 	{
 		for(let key in common)
 		{
@@ -81,7 +86,7 @@ var App = {
 
 		api.setEnv(this.view.props.environment, this);
 
-		let loginResult = await api.user.login(config.testUser.login, config.testUser.password);
+		let loginResult = await api.user.login(this.config.testUser.login, this.config.testUser.password);
 		if (!loginResult)
 			throw new Error('Fail to login');
 
@@ -92,26 +97,36 @@ var App = {
 		this.user_id = userProfile.user_id;
 
 		this.notify();
-	},
-
-	startTests,
-	goToMainView : goToMainView
-};
+	}
 
 
-async function startTests(app)
-{
-	console.log('Starting tests');
+	async startTests()
+	{
+		console.log('Starting tests');
 
-	await app.init();
+		await this.init();
 
-	await apiTests(app);
-	await profileTests(app);
-	await accountTests(app);
-	await personTests(app);
-	await transactionTests(app);
-	await statistics.run(app);
-	await transactionsListTests(app);
+		await apiTests(this);
+		await profileTests(this);
+		await accountTests(this);
+		await personTests(this);
+		await transactionTests(this);
+		await statistics.run(this);
+		await transactionsListTests(this);
+	}
+
+
+	async goToMainView()
+	{
+		await this.view.goToMainView();
+
+		this.transactions = this.view.content.widgets[2].transList.items;
+		this.accounts = this.view.content.widgets[0].tiles.items;
+		this.persons = this.view.content.widgets[3].infoTiles.items;
+		this.currencies = await this.view.global('currency');
+
+		this.notify();
+	}
 }
 
 
@@ -132,7 +147,7 @@ async function accountTests(app)
 {
 	app.view.setBlock('Accounts', 1);
 
-	await app.goToMainView(app);
+	await app.goToMainView();
 	await app.view.goToAccounts();
 	await app.view.goToCreateAccount();
 	await accounts.createAccount1(app);
@@ -158,7 +173,7 @@ async function personTests(app)
 {
 	app.view.setBlock('Persons', 1);
 
-	await app.goToMainView(app);
+	await app.goToMainView();
 	await app.view.goToPersons();
 	await persons.checkInitial(app);
 	await persons.create(app, 'Alex');
@@ -184,7 +199,7 @@ async function createTransactionTests(app)
 {
 	app.view.setBlock('Create transaction', 1);
 
-	await app.goToMainView(app);
+	await app.goToMainView();
 	await app.view.goToNewTransactionByAccount(0);
 	await transactions.expense.stateLoop(app);
 	await runCreateExpenseTests(app);
@@ -225,19 +240,6 @@ async function deleteTransactionTests(app)
 	await runDeleteIncomeTests(app);
 	await runDeleteTransferTests(app);
 	await runDeleteDebtTests(app);
-}
-
-
-async function goToMainView(app)
-{
-	await app.view.goToMainView();
-
-	app.transactions = app.view.content.widgets[2].transList.items;
-	app.accounts = app.view.content.widgets[0].tiles.items;
-	app.persons = app.view.content.widgets[3].infoTiles.items;
-	app.currencies = await app.view.global('currency');
-
-	app.notify();
 }
 
 
@@ -383,5 +385,8 @@ async function transactionsListTests(app)
 }
 
 
-export { App };
 
+let App = new Application;
+
+
+export { App };

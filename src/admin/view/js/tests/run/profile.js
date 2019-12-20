@@ -88,7 +88,7 @@ var runProfile = (function()
 
 		await test('Reset all data', async () =>
 		{
-			await app.goToMainView(app);
+			await app.goToMainView();
 
 			return app.checkObjValue(app.transactions, []) &&
 						app.checkObjValue(app.accounts, []) &&

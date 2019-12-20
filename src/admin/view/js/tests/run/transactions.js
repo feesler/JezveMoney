@@ -150,7 +150,7 @@ var runTransList = (function()
 
 		await preCreateData(app);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToTransactions();
 
 		const onPage = 10;

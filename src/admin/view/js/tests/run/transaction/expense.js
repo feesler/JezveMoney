@@ -75,7 +75,7 @@ var runExpense = (function()
 		view.setBlock('Create expense (' + titleParams.join(', ') + ')', 2);
 
 		// Step 0:
-		await app.goToMainView(app);
+		await app.goToMainView();
 		view = app.view;
 		await view.goToNewTransactionByAccount(accNum);
 		await expenseTransactionLoop(app, onState, app => submitExpenseTransaction(app, params));
@@ -138,7 +138,7 @@ var runExpense = (function()
 		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.EXPENSE);
 
@@ -198,7 +198,7 @@ var runExpense = (function()
 
 		await test('Transaction update', async () => {}, app.view, state);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 
 		// Step
 		let updSrcAccPos = app.beforeSubmitTransaction.srcAccPos;

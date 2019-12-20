@@ -20,7 +20,7 @@ var runStatistics = (function()
 	{
 		app.view.setBlock('Statistics', 1);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToStatistics();
 
 		// Expense transactions filter

@@ -107,7 +107,7 @@ var runDebt = (function()
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Create debt (' + titleParams.join(', ') + ')', 2);
 
-		await app.goToMainView(app)
+		await app.goToMainView()
 		await app.view.goToNewTransactionByAccount(0);
 		await app.view.changeTransactionType(app.DEBT);
 		await debtTransactionLoop(app, onState, app => submitDebtTransaction(app, params));
@@ -218,7 +218,7 @@ var runDebt = (function()
 			throw new Error('Parameters not specified');
 
 		// Step
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.DEBT);
 		view = app.view;
@@ -305,7 +305,7 @@ var runDebt = (function()
 
 		await test('Transaction update', async () => {}, app.view, state);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 
 		// Step
 		let origPerson = app.beforeUpdateTransaction.person;

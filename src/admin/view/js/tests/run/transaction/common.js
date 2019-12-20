@@ -22,7 +22,7 @@ var runTransactionsCommon = (function()
 	{
 		app.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 
 		// Save accounts and persons before delete transactions
 		app.beforeDeleteTransaction = {};
@@ -66,7 +66,7 @@ var runTransactionsCommon = (function()
 
 
 		// Navigate to main view and check changes in affected accounts and persons
-		await app.goToMainView(app);
+		await app.goToMainView();
 
 		let origAccounts = app.beforeDeleteTransaction.accounts;
 		let origPersons = app.beforeDeleteTransaction.persons;

@@ -74,7 +74,7 @@ var runTransfer = (function()
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Create transfer (' + titleParams.join(', ') + ')', 2);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToNewTransactionByAccount(0);
 		await app.view.changeTransactionType(app.TRANSFER);
 		await transferTransactionLoop(app, onState, app => submitTransferTransaction(app, params));
@@ -144,7 +144,7 @@ var runTransfer = (function()
 			throw new Error('Parameters not specified');
 
 		// Step 0: Navigate to transactions list view and filter by transfer
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.TRANSFER);
 		view = app.view;
@@ -210,7 +210,7 @@ var runTransfer = (function()
 
 		await test('Transaction update', async () => {}, app.view, state);
 
-		await app.goToMainView(app);
+		await app.goToMainView();
 
 		// Step 4: Check updates of affected accounts
 		let updSrcAccPos = app.beforeSubmitTransaction.srcAccPos;

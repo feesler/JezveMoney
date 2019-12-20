@@ -72,7 +72,7 @@ var runIncome = (function()
 		view.setBlock('Create income (' + titleParams.join(', ') + ')', 2);
 
 		// Step 0: navigate
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToNewTransactionByAccount(accNum);
 		await app.view.changeTransactionType(app.INCOME);
 		await incomeTransactionLoop(app, onState, app => submitIncomeTransaction(app, params));
@@ -136,7 +136,7 @@ var runIncome = (function()
 			throw new Error('Parameters not specified');
 
 		// Step 0: navigate to transactions view and filter by income
-		await app.goToMainView(app);
+		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.INCOME);
 		view = app.view;
@@ -198,7 +198,7 @@ var runIncome = (function()
 		await test('Transaction update', async () => {}, app.view, state);
 
 		// Step 4: Check updates of affected accounts
-		await app.goToMainView(app);
+		await app.goToMainView();
 
 		let updDestAccPos = app.beforeSubmitTransaction.destAccPos;
 	 	let origDestAcc = app.beforeUpdateTransaction.destAcc;

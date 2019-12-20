@@ -435,7 +435,7 @@ var Environment = (function()
 			await addResult('Test initialization', true);
 
 			await navigation(() => browserPage.goto(baseURL));
-			await app.startTests(app);
+			await app.startTests();
 			res = 0;
 		}
 		catch(e)

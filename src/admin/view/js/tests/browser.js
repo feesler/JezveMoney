@@ -363,7 +363,7 @@ var Environment = (function()
 				await addResult('Test initialization', true);
 
 				await navigation(() => viewframe.src = baseURL);
-				await app.startTests(app);
+				await app.startTests();
 			}
 			catch(e)
 			{
