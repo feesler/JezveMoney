@@ -455,13 +455,13 @@ var Environment = (function()
 	return { init : initTests,
 				baseUrl : getBaseUrl,
 				url : getUrl,
-				navigation : navigation,
+				navigation,
 				parent : vparent,
 				query : vquery,
 				queryAll : vqueryall,
-				hasClass : hasClass,
-				isVisible : isVisible,
-				selectByValue : selectByValue,
+				hasClass,
+				isVisible,
+				selectByValue,
 				onChange : onChangeEmul,
 				prop : vprop,
 				wait : waitFor,
@@ -469,8 +469,8 @@ var Environment = (function()
 				click : clickEmul,
 				input : inputEmul,
 				httpReq : httpRequest,
-				addResult : addResult,
-				setBlock : setBlock };
+				addResult,
+				setBlock };
 })();
 
 

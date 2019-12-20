@@ -413,7 +413,7 @@ var runIncome = (function()
 	}
 
 
-	return { onAppUpdate : onAppUpdate,
+	return { onAppUpdate,
 				create : createIncome,
 				update : updateIncome,
 				stateLoop : incomeTransactionLoop };

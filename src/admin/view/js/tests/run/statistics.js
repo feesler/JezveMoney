@@ -82,7 +82,7 @@ var runStatistics = (function()
 	}
 
 
-	return { onAppUpdate : onAppUpdate,
+	return { onAppUpdate,
 				run : statisticsTests };
 })();
 

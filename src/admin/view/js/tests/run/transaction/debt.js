@@ -667,7 +667,7 @@ var runDebt = (function()
 	}
 
 
- 	return { onAppUpdate : onAppUpdate,
+ 	return { onAppUpdate,
 				create : createDebt,
 				update : updateDebt,
 				stateLoop : debtTransactionLoop };

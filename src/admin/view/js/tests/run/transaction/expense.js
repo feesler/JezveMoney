@@ -412,7 +412,7 @@ var runExpense = (function()
 	}
 
 
- 	return { onAppUpdate : onAppUpdate,
+ 	return { onAppUpdate,
 				create : createExpense,
 				update : updateExpense,
 				stateLoop : expenseTransactionLoop };

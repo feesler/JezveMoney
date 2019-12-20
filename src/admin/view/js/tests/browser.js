@@ -377,22 +377,22 @@ var Environment = (function()
 		init : initTests,
 		baseUrl : getBaseUrl,
 		url : getUrl,
-		navigation : navigation,
+		navigation,
 		parent : vparent,
 		query : vquery,
 		queryAll : vqueryall,
 		prop : vprop,
 		wait : waitFor,
 		global : getGlobal,
-		hasClass : hasClass,
-		isVisible : isVisible,
-		selectByValue : selectByValue,
+		hasClass,
+		isVisible,
+		selectByValue,
 		click : clickEmul,
 		input : inputEmul,
-		onChange : onChange,
+		onChange,
 		httpReq : httpRequest,
-		addResult : addResult,
-	 	setBlock : setBlock
+		addResult,
+	 	setBlock
 	};
 })();
 

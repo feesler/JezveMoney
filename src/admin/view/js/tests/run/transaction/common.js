@@ -228,7 +228,7 @@ var runTransactionsCommon = (function()
 	}
 
 
- 	return { onAppUpdate : onAppUpdate,
+ 	return { onAppUpdate,
 				del : deleteTransactions };
 })();
 

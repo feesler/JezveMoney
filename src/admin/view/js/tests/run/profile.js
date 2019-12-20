@@ -167,7 +167,7 @@ var runProfile = (function()
 	}
 
 
-	return { onAppUpdate : onAppUpdate,
+	return { onAppUpdate,
 				relogin : reloginAs,
 				register : registrationTest,
 			 	resetAll : resetAllTest,

@@ -76,7 +76,7 @@ var runPersons = (function()
 	}
 
 
-	return { onAppUpdate : onAppUpdate,
+	return { onAppUpdate,
 				checkInitial : checkInitialPersons,
 				create : createPerson,
 				update : updatePerson,

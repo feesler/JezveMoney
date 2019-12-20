@@ -190,14 +190,14 @@ var runAccounts = (function()
 	}
 
 
-	return { onAppUpdate : onAppUpdate,
-					createAccount1 : createAccount1,
-					checkCreateAccount : checkCreateAccount,
-					createAccount2 : createAccount2,
-					editAccount1 : editAccount1,
-					checkUpdateAccount : checkUpdateAccount,
-					create : createAccountWithParam,
-					del : deleteAccounts };
+	return { onAppUpdate,
+				createAccount1,
+				checkCreateAccount,
+				createAccount2,
+				editAccount1,
+				checkUpdateAccount,
+				create : createAccountWithParam,
+				del : deleteAccounts };
 })();
 
 

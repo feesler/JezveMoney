@@ -514,7 +514,7 @@ var runTransfer = (function()
 	}
 
 
- 	return { onAppUpdate : onAppUpdate,
+ 	return { onAppUpdate,
 				create : createTransfer,
 				update : updateTransfer,
 				stateLoop : transferTransactionLoop };

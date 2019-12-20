@@ -212,7 +212,7 @@ var runAPI = (function()
 	}
 
 
-	return { onAppUpdate : onAppUpdate,
+	return { onAppUpdate,
 				run : runTests };
 })();
 
