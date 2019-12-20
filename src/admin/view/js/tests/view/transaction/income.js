@@ -30,10 +30,10 @@ class IncomeTransactionView extends TransactionView
 		if (res.destAccount.curr_id != res.dest_curr_id)
 			throw new Error('Unexpected destination currency ' + res.dest_curr_id + '(' + res.destAccount.curr_id + ' is expected)');
 
-		res.srcCurr = this.app.getCurrency(res.src_curr_id);
+		res.srcCurr = this.app.getCurrency(res.src_curr_id, this.app.currencies);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = this.app.getCurrency(res.dest_curr_id);
+		res.destCurr = this.app.getCurrency(res.dest_curr_id, this.app.currencies);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
@@ -313,7 +313,7 @@ class IncomeTransactionView extends TransactionView
 
 		this.model.destAccount = newAcc;
 		this.model.dest_curr_id = this.model.destAccount.curr_id;
-		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id);
+		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
 		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
 
 		// Copy destination currency to source currency if needed
@@ -402,7 +402,7 @@ class IncomeTransactionView extends TransactionView
 			return super.changeSourceCurrency(val);
 
 		this.model.src_curr_id = parseInt(val);
-		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id);
+		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id, this.app.currencies);
 
 		this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
 

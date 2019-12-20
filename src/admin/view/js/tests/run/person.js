@@ -1,22 +1,12 @@
 var runPersons = (function()
 {
-	let App = null;
 	let test = null;
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function checkInitialPersons(app)
 	{
+		test = app.test;
+
 		var state = { value : { tiles : { items : { length : 0 } } } };
 		await test('Initial persons structure', async () => {}, app.view, state);
 	}
@@ -26,6 +16,8 @@ var runPersons = (function()
 	// Next check name result and callback
 	async function createPerson(app, personName)
 	{
+		test = app.test;
+
 		await app.view.goToCreatePerson();
 		await app.view.createPerson(personName);
 
@@ -35,12 +27,13 @@ var runPersons = (function()
 		await test('Create person', async () => {}, app.view, state);
 
 		app.persons = app.view.content.tiles.items;
-		app.notify();
 	}
 
 
 	async function updatePerson(app, num, personName)
 	{
+		test = app.test;
+
 		await app.view.goToUpdatePerson(num);
 
 		var state = { visibility : { name : true },
@@ -59,12 +52,13 @@ var runPersons = (function()
 		await test('Update person', async () => {}, app.view, state);
 
 		app.persons = app.view.content.tiles.items;
-		app.notify();
 	}
 
 
 	async function deletePersons(app, persons)
 	{
+		test = app.test;
+
 		await app.view.deletePersons(persons);
 
 		var state = { values : { tiles : { items : { length : app.persons.length - persons.length } } } };
@@ -72,12 +66,10 @@ var runPersons = (function()
 		await test('Delete persons [' + persons.join() + ']', async () => {}, app.view, state);
 
 		app.persons = app.view.content.tiles.items;
-		app.notify();
 	}
 
 
-	return { onAppUpdate,
-				checkInitial : checkInitialPersons,
+	return { checkInitial : checkInitialPersons,
 				create : createPerson,
 				update : updatePerson,
 				del : deletePersons };

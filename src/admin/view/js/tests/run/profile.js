@@ -5,26 +5,14 @@ import { MainView } from '../view/main.js';
 
 var runProfile = (function()
 {
-	let App = null;
 	let test = null;
 	let env = null;
-
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function reloginAs(app, userObj)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		if (!userObj || !userObj.login || !userObj.password)
 			throw new Error('Wrong user object');
@@ -45,6 +33,7 @@ var runProfile = (function()
 	async function registrationTest(app, userObj)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		if (!userObj || !userObj.login || !userObj.name || !userObj.password)
 			throw new Error('Wrong user object');
@@ -82,6 +71,7 @@ var runProfile = (function()
 	async function resetAllTest(app)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		await app.view.goToProfile();
 		await app.view.resetAll();
@@ -100,6 +90,7 @@ var runProfile = (function()
 	async function changeNameTest(app)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		await app.view.goToProfile();
 
@@ -128,6 +119,7 @@ var runProfile = (function()
 	async function changePasswordTest(app)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		await app.view.goToProfile();
 
@@ -155,6 +147,7 @@ var runProfile = (function()
 	async function deleteProfileTest(app)
 	{
 		env = app.view.props.environment;
+		test = app.test;
 
 		await app.view.goToProfile();
 
@@ -167,8 +160,7 @@ var runProfile = (function()
 	}
 
 
-	return { onAppUpdate,
-				relogin : reloginAs,
+	return { relogin : reloginAs,
 				register : registrationTest,
 			 	resetAll : resetAllTest,
 			 	changeName : changeNameTest,

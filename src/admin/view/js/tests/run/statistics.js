@@ -1,23 +1,9 @@
 var runStatistics = (function()
 {
-	let App = null;
-	let test = null
-
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
-
-
 	async function statisticsTests(app)
 	{
+		let test = app.test;
+
 		app.view.setBlock('Statistics', 1);
 
 		await app.goToMainView();
@@ -82,8 +68,7 @@ var runStatistics = (function()
 	}
 
 
-	return { onAppUpdate,
-				run : statisticsTests };
+	return { run : statisticsTests };
 })();
 
 

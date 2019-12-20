@@ -36,10 +36,10 @@ class TransferTransactionView extends TransactionView
 		if (res.destAccount.curr_id != res.dest_curr_id)
 			throw new Error('Unexpected destination currency ' + res.dest_curr_id + '(' + res.destAccount.curr_id + ' is expected)');
 
-		res.srcCurr = this.app.getCurrency(res.src_curr_id);
+		res.srcCurr = this.app.getCurrency(res.src_curr_id, this.app.currencies);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = this.app.getCurrency(res.dest_curr_id);
+		res.destCurr = this.app.getCurrency(res.dest_curr_id, this.app.currencies);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
@@ -454,7 +454,7 @@ class TransferTransactionView extends TransactionView
 
 		this.model.srcAccount = newAcc;
 		this.model.src_curr_id = this.model.srcAccount.curr_id;
-		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id);
+		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id, this.app.currencies);
 		this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
 
 		// Update result balance of source
@@ -473,7 +473,7 @@ class TransferTransactionView extends TransactionView
 
 			this.model.destAccount = await this.getAccount(nextAcc_id);
 			this.model.dest_curr_id = this.model.destAccount.curr_id;
-			this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id);
+			this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
 			this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
 
 			// Copy source amount to destination amount
@@ -549,7 +549,7 @@ class TransferTransactionView extends TransactionView
 
 		this.model.destAccount = newAcc;
 		this.model.dest_curr_id = this.model.destAccount.curr_id;
-		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id);
+		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
 		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
 
 		// Update result balance of destination
@@ -568,7 +568,7 @@ class TransferTransactionView extends TransactionView
 				throw new Error('Next account not found');
 			this.model.srcAccount = newSrcAcc;
 			this.model.src_curr_id = this.model.srcAccount.curr_id;
-			this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id);
+			this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id, this.app.currencies);
 			this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
 
 			// Copy destination amount to source amount

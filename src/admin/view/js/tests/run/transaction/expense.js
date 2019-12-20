@@ -1,23 +1,12 @@
 var runExpense = (function()
 {
-	let App = null;
 	let test = null;
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function submitExpenseTransaction(app, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		if ('srcAcc' in params)
 		{
@@ -31,7 +20,7 @@ var runExpense = (function()
 
 		if ('destCurr' in params)
 		{
-			let curr = app.getCurrency(params.destCurr);
+			let curr = app.getCurrency(params.destCurr, app.currencies);
 			if (!curr)
 				throw new Error('Currency (' + params.destCurr + ') not found');
 
@@ -59,8 +48,6 @@ var runExpense = (function()
 		if (view.model.isUpdate)
 			app.beforeSubmitTransaction.id = view.model.id;
 
-		app.notify();
-
 		return view.submit();
 	}
 
@@ -68,6 +55,7 @@ var runExpense = (function()
 	async function createExpense(app, accNum, onState, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -90,17 +78,17 @@ var runExpense = (function()
 		// In case of expense with the same currency copy destination amount value
 		var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
 		var expBalance = srcAcc.balance - app.normalize(sa);
-		var fmtBal = app.formatCurrency(expBalance, srcAcc.curr_id);
+		var fmtBal = app.formatCurrency(expBalance, srcAcc.curr_id, app.currencies);
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		accWidget.tiles.items[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id);
+		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id, app.currencies);
 		if ('destCurr' in params && 'srcAmount' in params)
 		{
-			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr) + ')';
+			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr, app.currencies) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
@@ -117,7 +105,6 @@ var runExpense = (function()
 		app.transactions = view.content.widgets[2].transList.items;
 		app.accounts = view.content.widgets[0].tiles.items;
 		app.persons = view.content.widgets[3].infoTiles.items;
-		app.notify();
 	}
 
 
@@ -125,6 +112,7 @@ var runExpense = (function()
 	async function updateExpense(app, pos, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -149,7 +137,6 @@ var runExpense = (function()
 			throw new Error('Transaction not found');
 
 		app.beforeUpdateTransaction.trObj = trObj;
-		app.notify();
 
 		await app.view.goToUpdateTransaction(pos);
 
@@ -169,7 +156,6 @@ var runExpense = (function()
 						destAmount : view.model.fDestAmount,
 						date : view.model.date,
 						comment : view.model.comment });
-		app.notify();
 
 		await submitExpenseTransaction(app, params);
 
@@ -183,10 +169,10 @@ var runExpense = (function()
 		let origComment = app.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id);
+		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id, app.currencies);
 		if ('destCurr' in params && 'srcAmount' in params)
 		{
-			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr) + ')';
+			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr, app.currencies) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
@@ -219,19 +205,19 @@ var runExpense = (function()
 		if (updSrcAccPos != origSrcAccPos)
 		{
 			expBalance = origSrcBalance + origSrcAmount;
-			fmtBal = app.formatCurrency(expBalance, origSrcAcc.curr_id);
+			fmtBal = app.formatCurrency(expBalance, origSrcAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[origSrcAccPos] = { balance : fmtBal, name : origSrcAcc.name };
 
 			expBalance = updSrcAcc.balance - app.normalize(sa);
-			fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id);
+			fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 		else		// account not changed
 		{
 			var expBalance = origSrcBalance + origSrcAmount - app.normalize(sa);
-			var fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id);
+			var fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
@@ -245,6 +231,7 @@ var runExpense = (function()
 	async function expenseTransactionLoop(app, actionState, action)
 	{
 		let view = app.view;
+		test = app.test;
 
 	// State 0
 		view.setBlock('Expense loop', 2);
@@ -412,8 +399,7 @@ var runExpense = (function()
 	}
 
 
- 	return { onAppUpdate,
-				create : createExpense,
+ 	return { create : createExpense,
 				update : updateExpense,
 				stateLoop : expenseTransactionLoop };
 })();

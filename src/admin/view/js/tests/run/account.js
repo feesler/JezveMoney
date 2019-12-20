@@ -2,19 +2,11 @@ var runAccounts = (function()
 {
 	let test = null;
 
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			test = props.App.test;
-		}
-	}
-
 
 	async function createAccount1(app)
 	{
+		test = app.test;
+
 		var state = { visibility : { heading : true, iconDropDown : true, name : true, currDropDown : true },
 						values : { tile : { name : 'New account', balance : '0 ₽' },
 								name : '', balance : '0' } };
@@ -64,20 +56,23 @@ var runAccounts = (function()
 
 	async function checkCreateAccount(app, params)
 	{
+		test = app.test;
+
 		var state = { value : { tiles : { items : { length : app.accounts.length + 1 } } } };
-		var fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id);
+		var fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id, app.currencies);
 
 		state.value.tiles.items[app.accounts.length] = { balance : fmtBal, name : params.name, icon : params.icon };
 
 		await test('Account create', async () => {}, app.view, state);
 
 		app.accounts = app.view.content.tiles.items;
-		app.notify();
 	}
 
 
 	async function createAccount2(app)
 	{
+		test = app.test;
+
 		var state = { values : { tile : { name : 'acc_2', balance : '0 ₽' }, currDropDown : { textValue : 'RUB' } } };
 
 	// Input account name
@@ -97,12 +92,14 @@ var runAccounts = (function()
 
 	async function editAccount1(app)
 	{
+		test = app.test;
+
 		var state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : app.view.tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
 
 		await test('Initial state of edit account view', async () => {}, app.view, state);
 
 	// Change currency to USD
-		var fmtBal = app.formatCurrency(1000.01, 2);
+		var fmtBal = app.formatCurrency(1000.01, 2, app.currencies);
 		app.setParam(state.values, { tile : { balance : fmtBal }, currDropDown : { textValue : 'USD' } });
 		await test('USD currency select', () => app.view.changeCurrency(2), app.view, state);
 
@@ -122,25 +119,28 @@ var runAccounts = (function()
 
 	async function checkUpdateAccount(app, params)
 	{
+		test = app.test;
+
 		var state = { value : { tiles : { items : { length : app.accounts.length } } } };
-		var fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id);
+		var fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id, app.currencies);
 
 		state.value.tiles.items[params.updatePos] = { balance : fmtBal, name : params.name, icon : params.icon };
 
 		await test('Account update', async () => {}, app.view, state);
 
 		app.accounts = app.view.content.tiles.items;
-		app.notify();
 	}
 
 
 	async function createAccountWithParam(app, params)
 	{
+		test = app.test;
+
 		if (!params)
 			throw new Error('No params specified');
 		if (!params.name || !params.name.length)
 			throw new Error('Name not specified');
-		var currObj = app.getCurrency(params.curr_id);
+		var currObj = app.getCurrency(params.curr_id, app.currencies);
 		if (!currObj)
 			throw new Error('Wrong currency specified');
 		var normBalance = app.normalize(params.balance);
@@ -153,12 +153,12 @@ var runAccounts = (function()
 		await test('Account tile name update', () => app.view.inputName(params.name), app.view, state);
 
 	// Change currency
-		var fmtBal = app.formatCurrency(0, currObj.id);
+		var fmtBal = app.formatCurrency(0, currObj.id, app.currencies);
 		app.setParam(state.values, { currDropDown : { textValue : currObj.name }, tile : { balance : fmtBal } });
 		await test(currObj.name + ' currency select', () => app.view.changeCurrency(currObj.id), app.view, state);
 
 	// Input balance
-		fmtBal = app.formatCurrency(normBalance, currObj.id);
+		fmtBal = app.formatCurrency(normBalance, currObj.id, app.currencies);
 		app.setParam(state.values, { tile : { balance : fmtBal } });
 		await test('Tile balance format update', () => app.view.inputBalance(params.balance), app.view, state);
 
@@ -179,6 +179,8 @@ var runAccounts = (function()
 
 	async function deleteAccounts(app, accounts)
 	{
+		test = app.test;
+
 		await app.view.deleteAccounts(accounts);
 
 		var state = { value : { tiles : { items : { length : app.accounts.length - accounts.length } } } };
@@ -186,12 +188,10 @@ var runAccounts = (function()
 		await test('Delete accounts [' + accounts.join() + ']', async () => {}, app.view, state);
 
 		app.accounts = app.view.content.tiles.items;
-		app.notify();
 	}
 
 
-	return { onAppUpdate,
-				createAccount1,
+	return { createAccount1,
 				checkCreateAccount,
 				createAccount2,
 				editAccount1,

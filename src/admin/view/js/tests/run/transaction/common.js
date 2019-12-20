@@ -3,23 +3,13 @@ import { TransactionsView } from '../../view/transactions.js';
 
 var runTransactionsCommon = (function()
 {
-	let App = null;
 	let test = null;
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function deleteTransactions(app, type, transactions)
 	{
+		test = app.test;
+
 		app.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
 
 		await app.goToMainView();
@@ -29,7 +19,6 @@ var runTransactionsCommon = (function()
 
 		app.beforeDeleteTransaction.accounts = app.copyObject(await app.view.global('accounts'));
 		app.beforeDeleteTransaction.persons = app.copyObject(await app.view.global('persons'));
-		app.notify();
 
 		// Navigate to transactions view and filter by specified type of transaction
 		await app.view.goToTransactions();
@@ -51,7 +40,6 @@ var runTransactionsCommon = (function()
 			app.beforeDeleteTransaction.deleteList.push(trObj);
 		}
 
-		app.notify();
 
 		// Request view to select and delete transactions and wait for navigation
 		await app.view.deleteTransactions(transactions);
@@ -62,7 +50,6 @@ var runTransactionsCommon = (function()
 		await test('Transactions list update', async () => {}, app.view, state);
 
 		app.transactions = app.view.content.transList.items;
-		app.notify();
 
 
 		// Navigate to main view and check changes in affected accounts and persons
@@ -194,7 +181,7 @@ var runTransactionsCommon = (function()
 		for(let accPos in affectedAccounts)
 		{
 			let acc = affectedAccounts[accPos];
-			let fmtBal = app.formatCurrency(acc.balance, acc.curr_id);
+			let fmtBal = app.formatCurrency(acc.balance, acc.curr_id, app.currencies);
 
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}
@@ -208,7 +195,7 @@ var runTransactionsCommon = (function()
 				if (pacc.balance == 0)
 					return val;
 
-				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
+				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
 				return val.concat(fmtBal);
 			}, []);
 
@@ -224,12 +211,10 @@ var runTransactionsCommon = (function()
 		app.transactions = app.view.content.widgets[2].transList.items;
 		app.accounts = app.view.content.widgets[0].tiles.items;
 		app.persons = app.view.content.widgets[3].infoTiles.items;
-		app.notify();
 	}
 
 
- 	return { onAppUpdate,
-				del : deleteTransactions };
+ 	return { del : deleteTransactions };
 })();
 
 

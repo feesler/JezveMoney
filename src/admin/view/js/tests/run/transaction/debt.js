@@ -1,23 +1,12 @@
 var runDebt = (function()
 {
-	let App = null;
 	let test = null;
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function submitDebtTransaction(app, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		if ('acc' in params)
 		{
@@ -92,7 +81,6 @@ var runDebt = (function()
 
 		if (app.beforeSubmitTransaction.acc)
 			app.beforeSubmitTransaction.accPos = await view.getAccountPos(view.model.account.id);
-		app.notify();
 
 		return view.submit();
 	}
@@ -101,6 +89,7 @@ var runDebt = (function()
 	async function createDebt(app, onState, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -142,7 +131,7 @@ var runDebt = (function()
 			if (pacc.balance == 0)
 				return val;
 
-			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
+			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
 			return val.concat(fmtBal);
 		}, []);
 
@@ -156,7 +145,7 @@ var runDebt = (function()
 		// Accounts widget changes
 		if (acc)
 		{
-			var fmtAccBal = app.formatCurrency(acc.balance, acc.curr_id);
+			var fmtAccBal = app.formatCurrency(acc.balance, acc.curr_id, app.currencies);
 			var accWidget = { tiles : { items : { length : app.accounts.length } } };
 			accWidget.tiles.items[accPos] = { balance : fmtAccBal, name : acc.name };
 
@@ -183,7 +172,7 @@ var runDebt = (function()
 			title += person.name;
 			fmtAmount = (acc) ? '- ' : '+ ';
 		}
-		fmtAmount += app.formatCurrency(sa, personAccount.curr_id);
+		fmtAmount += app.formatCurrency(sa, personAccount.curr_id, app.currencies);
 
 		transWidget.transList.items[0] = { accountTitle : title,
 										amountText : fmtAmount,
@@ -197,7 +186,6 @@ var runDebt = (function()
 		app.transactions = app.view.content.widgets[2].transList.items;
 		app.accounts = app.view.content.widgets[0].tiles.items;
 		app.persons = app.view.content.widgets[3].infoTiles.items;
-		app.notify();
 	}
 
 
@@ -231,7 +219,6 @@ var runDebt = (function()
 			throw new Error('Transaction not found');
 
 		app.beforeUpdateTransaction.trObj = trObj;
-		app.notify();
 
 		await app.view.goToUpdateTransaction(pos);
 		view = app.view;
@@ -260,7 +247,6 @@ var runDebt = (function()
 						destAmount : view.model.fDestAmount,
 						date : view.model.date,
 						comment : view.model.comment});
-		app.notify();
 
 		await submitDebtTransaction(app, params);
 
@@ -294,7 +280,7 @@ var runDebt = (function()
 			title += updPerson.name;
 			fmtAmount = (updAcc && !updNoAccount) ? '- ' : '+ ';
 		}
-		fmtAmount += app.formatCurrency(updSrcAmount, updPersonAccount.curr_id);
+		fmtAmount += app.formatCurrency(updSrcAmount, updPersonAccount.curr_id, app.currencies);
 
 		var state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
@@ -364,7 +350,7 @@ var runDebt = (function()
 				if (pacc.balance == 0)
 					return val;
 
-				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
+				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
 				return val.concat(fmtBal);
 			}, []);
 
@@ -377,7 +363,7 @@ var runDebt = (function()
 			if (pacc.balance == 0)
 				return val;
 
-			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id);
+			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
 			return val.concat(fmtBal);
 		}, []);
 
@@ -391,12 +377,12 @@ var runDebt = (function()
 		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		if (origAcc && !origNoAccount)
 		{
-			var fmtAccBal = app.formatCurrency(origAcc.balance, origAcc.curr_id);
+			var fmtAccBal = app.formatCurrency(origAcc.balance, origAcc.curr_id, app.currencies);
 			accWidget.tiles.items[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
 		}
 		if (updAcc && !updNoAccount)
 		{
-			var fmtAccBal = app.formatCurrency(updAcc.balance, updAcc.curr_id);
+			var fmtAccBal = app.formatCurrency(updAcc.balance, updAcc.curr_id, app.currencies);
 			accWidget.tiles.items[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
 		}
 
@@ -407,13 +393,13 @@ var runDebt = (function()
 		app.transactions = app.view.content.widgets[2].transList.items;
 		app.accounts = app.view.content.widgets[0].tiles.items;
 		app.persons = app.view.content.widgets[3].infoTiles.items;
-		app.notify();
 	}
 
 
 	async function debtTransactionLoop(app, actionState, action)
 	{
 		let view = app.view;
+		test = app.test;
 
 		view.setBlock('Debt loop', 2);
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
@@ -667,8 +653,7 @@ var runDebt = (function()
 	}
 
 
- 	return { onAppUpdate,
-				create : createDebt,
+ 	return { create : createDebt,
 				update : updateDebt,
 				stateLoop : debtTransactionLoop };
 })();

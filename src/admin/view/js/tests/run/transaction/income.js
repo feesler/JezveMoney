@@ -1,23 +1,12 @@
 var runIncome = (function()
 {
-	let App = null;
 	let test = null;
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function submitIncomeTransaction(app, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		if ('destAcc' in params)
 		{
@@ -31,7 +20,7 @@ var runIncome = (function()
 
 		if ('srcCurr' in params)
 		{
-			let curr = app.getCurrency(params.srcCurr);
+			let curr = app.getCurrency(params.srcCurr, app.currencies);
 			if (!curr)
 				throw new Error('Currency (' + params.srcCurr + ') not found');
 
@@ -65,6 +54,7 @@ var runIncome = (function()
 	async function createIncome(app, accNum, onState, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -87,17 +77,17 @@ var runIncome = (function()
 		// In case of income with the same currency copy source amount value
 		var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
 		var expBalance = destAcc.balance + app.normalize(da);
-		var fmtBal = app.formatCurrency(expBalance, destAcc.curr_id);
+		var fmtBal = app.formatCurrency(expBalance, destAcc.curr_id, app.currencies);
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : app.accounts.length } } };
 		accWidget.tiles.items[destAccPos] = { balance : fmtBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '+ ' + app.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id);
+		var fmtAmount = '+ ' + app.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : destAcc.curr_id, app.currencies);
 		if ('srcCurr' in params && 'destAmount' in params)
 		{
-			fmtAmount += ' (+ ' + app.formatCurrency(params.destAmount, destAcc.curr_id) + ')';
+			fmtAmount += ' (+ ' + app.formatCurrency(params.destAmount, destAcc.curr_id, app.currencies) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
@@ -114,7 +104,6 @@ var runIncome = (function()
 		app.transactions = view.content.widgets[2].transList.items;
 		app.accounts = view.content.widgets[0].tiles.items;
 		app.persons = view.content.widgets[3].infoTiles.items;
-		app.notify();
 	}
 
 
@@ -122,6 +111,7 @@ var runIncome = (function()
 	async function updateIncome(app, pos, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -149,7 +139,6 @@ var runIncome = (function()
 			throw new Error('Transaction not found');
 
 		app.beforeUpdateTransaction.trObj = trObj;
-		app.notify();
 
 		await app.view.goToUpdateTransaction(pos);
 		view = app.view;
@@ -168,7 +157,6 @@ var runIncome = (function()
 						destAmount : view.model.fDestAmount,
 						date : view.model.date,
 						comment : view.model.comment});
-		app.notify();
 
 		await submitIncomeTransaction(app, params);
 
@@ -182,10 +170,10 @@ var runIncome = (function()
 		let origComment = app.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = '+ ' + app.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id);
+		var fmtAmount = '+ ' + app.formatCurrency(params.srcAmount, ('srcCurr' in params) ? params.srcCurr : updDestAcc.curr_id, app.currencies);
 		if ('srcCurr' in params && 'destAmount' in params)
 		{
-			fmtAmount += ' (+ ' + app.formatCurrency(params.destAmount, updDestAcc.curr_id) + ')';
+			fmtAmount += ' (+ ' + app.formatCurrency(params.destAmount, updDestAcc.curr_id, app.currencies) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
@@ -218,19 +206,19 @@ var runIncome = (function()
 		if (origDestAccPos != updDestAccPos)
 		{
 			expBalance = origDestBalance - origDestAmount;
-			fmtBal = app.formatCurrency(expBalance, origDestAcc.curr_id);
+			fmtBal = app.formatCurrency(expBalance, origDestAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[origDestAccPos] = { balance : fmtBal, name : origDestAcc.name };
 
 			expBalance = updDestAcc.balance + app.normalize(da);
-			fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id);
+			fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}
 		else		// account not changed
 		{
 			var expBalance = origDestBalance - origDestAmount + app.normalize(da);
-			var fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id);
+			var fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}
@@ -244,6 +232,7 @@ var runIncome = (function()
 	async function incomeTransactionLoop(app, actionState, action)
 	{
 		let view = app.view;
+		test = app.test;
 
 	// State 0
 		view.setBlock('Income loop', 2);
@@ -413,8 +402,7 @@ var runIncome = (function()
 	}
 
 
-	return { onAppUpdate,
-				create : createIncome,
+	return { create : createIncome,
 				update : updateIncome,
 				stateLoop : incomeTransactionLoop };
 })();

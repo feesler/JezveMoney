@@ -89,11 +89,6 @@ function formatDate(date, month, year)
 /*
 *	Currencies
 */
-if (typeof module !== 'undefined' && module.exports)
-{
-	var currency = null;
-}
-
 
 // Format specified value
 function formatValue(val)
@@ -130,9 +125,9 @@ Currency.prototype.formatValue = function(val)
 
 
 // Return currency object for specified id
-function getCurrency(curr_id)
+function getCurrency(curr_id, currList)
 {
-	var currObj = idSearch(currency, curr_id);
+	var currObj = idSearch(currList, curr_id);
 	if (!currObj)
 		return null;
 
@@ -141,11 +136,11 @@ function getCurrency(curr_id)
 
 
 // Format value with rules of specified currency
-function formatCurrency(val, curr_id)
+function formatCurrency(val, curr_id, currList)
 {
 	var curr, nval, fmtVal;
 
-	curr = getCurrency(curr_id);
+	curr = getCurrency(curr_id, currList);
 	if (!curr)
 		return null;
 
@@ -324,18 +319,6 @@ function urlJoin(obj)
 }
 
 
-function onAppUpdateCommon(props)
-{
-	props = props || {};
-
-	let App = props.App;
-	if (!App)
-		return;
-
-	currency = App.currencies;
-}
-
-
 function checkPHPerrors(env, content)
 {
 	var errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
@@ -458,7 +441,6 @@ var commonModule = { EXPENSE,
 					copyObject,
 					extend,
 					urlJoin,
-					onAppUpdate : onAppUpdateCommon,
 					checkPHPerrors,
 					checkObjValue,
 					test };

@@ -1,23 +1,12 @@
 var runTransfer = (function()
 {
-	let App = null;
 	let test = null;
-
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-		{
-			App = props.App;
-			test = App.test;
-		}
-	}
 
 
 	async function submitTransferTransaction(app, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		if ('srcAcc' in params)
 		{
@@ -59,7 +48,6 @@ var runTransfer = (function()
 									destAccPos : await view.getAccountPos(view.model.destAccount.id),
 								 	srcAmount : view.model.fSrcAmount,
 								 	destAmount : view.model.fDestAmount };
-		app.notify();
 
 		return view.submit();
 	}
@@ -68,6 +56,7 @@ var runTransfer = (function()
 	async function createTransfer(app, onState, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -93,8 +82,8 @@ var runTransfer = (function()
 		var da = ('destAmount' in params) ? params.destAmount : params.srcAmount;
 		var expSrcBalance = srcAcc.balance - app.normalize(sa);
 		var expDestBalance = destAcc.balance + app.normalize(da);
-		var fmtSrcBal = app.formatCurrency(expSrcBalance, srcAcc.curr_id);
-		var fmtDestBal = app.formatCurrency(expDestBalance, destAcc.curr_id);
+		var fmtSrcBal = app.formatCurrency(expSrcBalance, srcAcc.curr_id, app.currencies);
+		var fmtDestBal = app.formatCurrency(expDestBalance, destAcc.curr_id, app.currencies);
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : app.accounts.length } } };
@@ -102,10 +91,10 @@ var runTransfer = (function()
 		accWidget.tiles.items[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = app.formatCurrency(sa, srcAcc.curr_id);
+		var fmtAmount = app.formatCurrency(sa, srcAcc.curr_id, app.currencies);
 		if ('destAmount' in params)
 		{
-			fmtAmount += ' (' + app.formatCurrency(da, destAcc.curr_id) + ')';
+			fmtAmount += ' (' + app.formatCurrency(da, destAcc.curr_id, app.currencies) + ')';
 		}
 
 		var transWidget = { title : 'Transactions',
@@ -122,7 +111,6 @@ var runTransfer = (function()
 		app.transactions = view.content.widgets[2].transList.items;
 		app.accounts = view.content.widgets[0].tiles.items;
 		app.persons = view.content.widgets[3].infoTiles.items;
-		app.notify();
 	}
 
 
@@ -130,6 +118,7 @@ var runTransfer = (function()
 	async function updateTransfer(app, pos, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -157,7 +146,6 @@ var runTransfer = (function()
 			throw new Error('Transaction not found');
 
 		app.beforeUpdateTransaction.trObj = trObj;
-		app.notify();
 
 		await view.goToUpdateTransaction(pos);
 		view = app.view;
@@ -195,10 +183,10 @@ var runTransfer = (function()
 		let origComment = app.beforeUpdateTransaction.comment;
 
 		// Transactions list changes
-		var fmtAmount = app.formatCurrency(updSrcAmount, updSrcAcc.curr_id);
+		var fmtAmount = app.formatCurrency(updSrcAmount, updSrcAcc.curr_id, app.currencies);
 		if (updSrcAcc.curr_id != updDestAcc.curr_id)
 		{
-			fmtAmount += ' (' + app.formatCurrency(updDestAmount, updDestAcc.curr_id) + ')';
+			fmtAmount += ' (' + app.formatCurrency(updDestAmount, updDestAcc.curr_id, app.currencies) + ')';
 		}
 
 		var state = { values : { transList : { items : { length : transCount } } } };
@@ -261,7 +249,7 @@ var runTransfer = (function()
 		for(let accPos in affectedAccounts)
 		{
 			let acc = affectedAccounts[accPos];
-			fmtBal = app.formatCurrency(acc.balance, acc.curr_id);
+			fmtBal = app.formatCurrency(acc.balance, acc.curr_id, app.currencies);
 
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}
@@ -275,6 +263,7 @@ var runTransfer = (function()
 	async function transferTransactionLoop(app, actionState, action)
 	{
 		let view = app.view;
+		test = app.test;
 
 		view.setBlock('Transfer loop', 2);
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);
@@ -514,8 +503,7 @@ var runTransfer = (function()
 	}
 
 
- 	return { onAppUpdate,
-				create : createTransfer,
+ 	return { create : createTransfer,
 				update : updateTransfer,
 				stateLoop : transferTransactionLoop };
 })();

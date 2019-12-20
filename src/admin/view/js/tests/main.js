@@ -54,29 +54,6 @@ class Application
 		this.currencies = [];
 	}
 
-
-	notify()
-	{
-		let notification = { App : this };
-
-		common.onAppUpdate(notification);
-
-		profile.onAppUpdate(notification);
-		accounts.onAppUpdate(notification);
-		persons.onAppUpdate(notification);
-
-		transactions.common.onAppUpdate(notification);
-		transactions.expense.onAppUpdate(notification);
-		transactions.income.onAppUpdate(notification);
-		transactions.transfer.onAppUpdate(notification);
-		transactions.debt.onAppUpdate(notification);
-
-		statistics.onAppUpdate(notification);
-
-		runAPI.onAppUpdate(notification);
-	}
-
-
 	async init()
 	{
 		for(let key in common)
@@ -96,7 +73,7 @@ class Application
 
 		this.user_id = userProfile.user_id;
 
-		this.notify();
+		this.currencies = await api.currency.list();
 	}
 
 
@@ -123,9 +100,6 @@ class Application
 		this.transactions = this.view.content.widgets[2].transList.items;
 		this.accounts = this.view.content.widgets[0].tiles.items;
 		this.persons = this.view.content.widgets[3].infoTiles.items;
-		this.currencies = await this.view.global('currency');
-
-		this.notify();
 	}
 
 

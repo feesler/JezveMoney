@@ -47,10 +47,10 @@ class DebtTransactionView extends TransactionView
 		if (res.src_curr_id != res.dest_curr_id)
 			throw new Error('Source and destination currencies are not the same');
 
-		res.srcCurr = this.app.getCurrency(res.src_curr_id);
+		res.srcCurr = this.app.getCurrency(res.src_curr_id, this.app.currencies);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = this.app.getCurrency(res.dest_curr_id);
+		res.destCurr = this.app.getCurrency(res.dest_curr_id, this.app.currencies);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
@@ -664,8 +664,8 @@ class DebtTransactionView extends TransactionView
 		}
 
 		this.model.src_curr_id = this.model.dest_curr_id = this.model.account.curr_id;
-		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id);
-		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id);
+		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id, this.app.currencies);
+		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
 
 		if (this.model.debtType)
 		{

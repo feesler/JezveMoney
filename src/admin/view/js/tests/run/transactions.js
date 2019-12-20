@@ -4,7 +4,6 @@ import { api } from '../api.js';
 var runTransList = (function()
 {
 	let env = null;
-	let App = null;
 
 	const RUB = 1;
 	const USD = 2;

@@ -11,19 +11,6 @@ var runAPI = (function()
 	let test = null;
 
 
-	function onAppUpdate(props)
-	{
-		props = props || {};
-
-		if ('App' in props)
-			app = props.App;
-
-		app.run.api = { account : runAccountAPI,
-						person : runPersonAPI,
-					 	transaction : runTransactionAPI };
-	}
-
-
 	async function runTests(app)
 	{
 		env = app.view.props.environment;
@@ -32,6 +19,10 @@ var runAPI = (function()
 		api.setEnv(env, app);
 
 		env.setBlock('API tests', 1);
+
+		app.run.api = { account : runAccountAPI,
+						person : runPersonAPI,
+					 	transaction : runTransactionAPI };
 
 		const account = app.run.api.account;
 		const person = app.run.api.person;
@@ -212,8 +203,7 @@ var runAPI = (function()
 	}
 
 
-	return { onAppUpdate,
-				run : runTests };
+	return { run : runTests };
 })();
 
 
