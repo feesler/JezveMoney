@@ -788,9 +788,7 @@ class TestView
 
 		await this.click(this.header.user.menuBtn);		// open user menu
 
-		await this.navigation(() => {
-			setTimeout(() => this.click(this.header.user.profileBtn), 500);
-		});
+		await this.navigation(() => this.click(this.header.user.profileBtn));
 	}
 
 
