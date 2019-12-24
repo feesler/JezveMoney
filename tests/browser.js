@@ -396,5 +396,4 @@ var Environment = (function()
 	};
 })();
 
-
-Environment.init(App);
+onReady(() => Environment.init(App));
