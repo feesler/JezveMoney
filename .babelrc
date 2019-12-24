@@ -1,0 +1,18 @@
+{
+	"presets": [
+		[
+			"@babel/preset-env",
+			{
+				"targets": "> 1%, not dead"
+			}
+		]
+	],
+	"plugins": [
+		[
+			"@babel/transform-runtime",
+			{
+				"regenerator": true
+			}
+		]
+	]
+}

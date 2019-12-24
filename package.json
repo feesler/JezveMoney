@@ -5,7 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node ./tests/node.js"
+    "test": "node ./tests/node.js",
+    "build-babel": "npx babel ./tests --out-dir ./tests-build",
+	"build-browser": "browserify ./tests-build/browser.js -o ./src/admin/view/js/tests/bundle.js -t [ babelify --presets [ \"@babel/preset-env\" ] --plugins [ \"@babel/transform-runtime\" ] ]"
   },
   "keywords": [
     "money",
@@ -14,7 +16,16 @@
   "author": "Henry Feesler",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-transform-regenerator": "^7.7.5",
+    "@babel/plugin-transform-runtime": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
+    "babelify": "^10.0.0",
     "chalk": "^2.4.2",
     "puppeteer": "^2.0.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.7.7"
   }
 }
