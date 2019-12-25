@@ -9,7 +9,7 @@
     "build": "npm-run-all clean build-tests build-tests-bundle",
     "clean": "del-cli --force ./build",
     "build-tests": "npx babel ./tests --out-dir ./build",
-    "build-tests-bundle": "browserify ./build/browser.js -o ./src/admin/view/js/tests/index.js -t [ babelify --presets [ '@babel/preset-env' ] --plugins [ '@babel/transform-runtime' ] ]"
+    "build-tests-bundle": "browserify ./build/browser.js -o ./src/admin/view/js/tests/index.js -t [ babelify --presets [ \"@babel/preset-env\" ] --plugins [ \"@babel/transform-runtime\" ] ]"
   },
   "keywords": [
     "money",
