@@ -6,8 +6,10 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./tests/node.js",
-    "build-babel": "npx babel ./tests --out-dir ./tests-build",
-	"build-browser": "browserify ./tests-build/browser.js -o ./src/admin/view/js/tests/bundle.js -t [ babelify --presets [ \"@babel/preset-env\" ] --plugins [ \"@babel/transform-runtime\" ] ]"
+    "build": "npm-run-all clean build-tests build-tests-bundle",
+    "clean": "del-cli --force ./build",
+    "build-tests": "npx babel ./tests --out-dir ./build",
+    "build-tests-bundle": "browserify ./build/browser.js -o ./src/admin/view/js/tests/index.js -t [ babelify --presets [ '@babel/preset-env' ] --plugins [ '@babel/transform-runtime' ] ]"
   },
   "keywords": [
     "money",
@@ -22,7 +24,10 @@
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.7",
     "babelify": "^10.0.0",
+    "browserify": "^16.5.0",
     "chalk": "^2.4.2",
+    "del-cli": "^3.0.0",
+    "npm-run-all": "^4.1.5",
     "puppeteer": "^2.0.0"
   },
   "dependencies": {
