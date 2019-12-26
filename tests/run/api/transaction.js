@@ -19,13 +19,6 @@ var runTransactionAPI = (function()
 	}
 
 
-	// Convert date string from DD.MM.YYYY format to YYYY-MM-DD
-	function convDate(dateStr)
-	{
-		return (dateStr) ? Date.parse(dateStr.split('.').reverse().join('-')) : null;
-	}
-
-
 	function getExpectedPos(trList, params)
 	{
 		let pos = getLastestPos(trList, params.date);
@@ -36,8 +29,8 @@ var runTransactionAPI = (function()
 
 	function getLastestPos(trList, date = null)
 	{
-		let cmpDate = convDate(date);
-		let checkList = (cmpDate) ? trList.filter(item => convDate(item.date) <= cmpDate) : trList;
+		let cmpDate = app.convDate(date);
+		let checkList = (cmpDate) ? trList.filter(item => app.convDate(item.date) <= cmpDate) : trList;
 
 		let res = checkList.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
 

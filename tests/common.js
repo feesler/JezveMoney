@@ -72,6 +72,16 @@ function setParam(obj, params)
 }
 
 
+// Convert date string from DD.MM.YYYY to timestamp
+function convDate(dateStr)
+{
+	if (!dateStr)
+		return null;
+
+	return Date.parse(dateStr.split('.').reverse().join('-'));
+}
+
+
 // Format date as DD.MM.YYYY
 function formatDate(date, month, year)
 {
@@ -424,6 +434,7 @@ var commonModule = { EXPENSE,
 					isFunction,
 					isObject,
 					setParam,
+					convDate,
 					formatDate,
 					formatValue,
 					Currency,

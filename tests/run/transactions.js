@@ -3,6 +3,7 @@ import { api } from '../api.js';
 
 var runTransList = (function()
 {
+	let app = null;
 	let env = null;
 
 	const RUB = 1;
@@ -108,7 +109,7 @@ var runTransList = (function()
 	}
 
 
-	async function preCreateData(app)
+	async function preCreateData()
 	{
 		console.log('Precreate data...');
 
@@ -199,15 +200,6 @@ var runTransList = (function()
 	}
 
 
-	// Convert date string from DD.MM.YYYY format to YYYY-MM-DD
-	function convDate(dateStr)
-	{
-		return (dateStr) ? new Date( Date.parse(dateStr.split('.').reverse().join('-')) ) : null;
-	}
-
-
-	let isDate = null;
-
 	function filterTransactionsByDate(trans, start, end)
 	{
 		if (!trans)
@@ -215,18 +207,14 @@ var runTransList = (function()
 
 		return trans.filter(item =>
 		{
-			let date = convDate(item.date);
+			let date = app.convDate(item.date);
 			if (!date)
 				return false;
 
-			if (isDate(start) && date < start)
-			{
+			if (start && date < start)
 				return false;
-			}
-			if (isDate(end) && date > end)
-			{
+			if (end && date > end)
 				return false;
-			}
 
 			return true;
 		});
@@ -242,11 +230,11 @@ var runTransList = (function()
 	}
 
 
-	async function runTests(app)
+	async function runTests(appInstance)
 	{
-		const onPage = app.config.transactionsOnPage;
+		app = appInstance;
 		env = app.view.props.environment;
-		isDate = app.isDate;
+		const onPage = app.config.transactionsOnPage;
 		let test = app.test;
 
 		api.setEnv(env, app);
@@ -298,8 +286,8 @@ var runTransList = (function()
 			day2 = day1 + 6;
 		}
 
-		let weekStartDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), day1));
-		let weekEndDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), day2));
+		let weekStartDate = Date.UTC(now.getFullYear(), now.getMonth(), day1);
+		let weekEndDate = Date.UTC(now.getFullYear(), now.getMonth(), day2);
 
 		let acc_2_week = filterTransactionsByDate(acc_2_all, weekStartDate, weekEndDate);
 
