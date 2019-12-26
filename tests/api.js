@@ -110,7 +110,7 @@ var apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + urlJoin({ id : ids });
+			apiReq += '?' + app.urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -187,7 +187,7 @@ var apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + urlJoin({ id : ids });
+			apiReq += '?' + app.urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -297,7 +297,7 @@ var apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + urlJoin({ id : ids });
+			apiReq += '?' + app.urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -393,7 +393,7 @@ var apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + urlJoin({ id : ids });
+			apiReq += '?' + app.urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -587,7 +587,7 @@ var apiModule = (function()
 		setEnv : setupEnvironment,
 
 		currency : {
-			read : readCurrency,	
+			read : readCurrency,
 			list : currenciesList
 		},
 
