@@ -324,15 +324,51 @@ class TransactionsView extends TestView
 	}
 
 
+	currentPage()
+	{
+		return this.content.paginator ? this.content.paginator.active : 1;
+	}
+
+
 	pagesCount()
 	{
-		return this.content.paginator.items.length;
+		return this.content.paginator ? this.content.paginator.items.length : 1;
+	}
+
+
+	isFirstPage()
+	{
+		return !this.content.paginator || this.content.paginator.isFirstPage();
+	}
+
+
+	isLastPage()
+	{
+		return !this.content.paginator || this.content.paginator.isLastPage();
+	}
+
+
+	async goToFirstPage(type)
+	{
+		if (this.isFirstPage())
+			return this;
+
+		return this.navigation(() => this.content.paginator.goToFirstPage());
+	}
+
+
+	async goToLastPage(type)
+	{
+		if (this.isLastPage())
+			return this;
+
+		return this.navigation(() => this.content.paginator.goToLastPage());
 	}
 
 
 	async goToPrevPage(type)
 	{
-		if (this.content.paginator.isFirstPage())
+		if (this.isFirstPage())
 			throw new Error('Can\'t go to previous page');
 
 		return this.navigation(() => this.content.paginator.goToPrevPage());
@@ -341,7 +377,7 @@ class TransactionsView extends TestView
 
 	async goToNextPage(type)
 	{
-		if (this.content.paginator.isLastPage())
+		if (this.isLastPage())
 			throw new Error('Can\'t go to next page');
 
 		return this.navigation(() => this.content.paginator.goToNextPage());
@@ -406,16 +442,72 @@ class TransactionsView extends TestView
 	// Delete specified transactions and return navigation promise
 	async deleteTransactions(tr)
 	{
-		await this.selectTransactions(tr);
+		let app = this.app;
 
-		await this.performAction(() => this.content.toolbar.delBtn.click());
+		if (!tr)
+			throw new Error('No transactions specified');
 
-		if (!await this.isVisible(this.content.delete_warning.elem))
-			throw 'Delete transaction warning popup not appear';
-		if (!this.content.delete_warning.okBtn)
-			throw 'OK button not found';
+		if (!app.isArray(tr))
+			tr = [tr];
 
-		return this.navigation(() => this.click(this.content.delete_warning.okBtn));
+		let currentType = app.view.content.typeMenu.activeType;
+
+		await this.goToFirstPage();
+
+		let trOnCurrentPage;
+		let absTrOnCurrentPage;
+
+		while(true)
+		{
+			let pageNum = app.view.currentPage();
+			const onPage = 10;
+
+			absTrOnCurrentPage = tr.filter(tr_num => {
+				return tr_num >= onPage * (pageNum - 1) &&
+						tr_num < onPage * pageNum;
+			});
+
+			trOnCurrentPage = absTrOnCurrentPage.map(tr_num => tr_num - (pageNum - 1) * onPage);
+
+			if (trOnCurrentPage.length)
+			{
+				await app.view.selectTransactions(trOnCurrentPage);
+
+				await app.view.performAction(() => app.view.content.toolbar.delBtn.click());
+
+				if (!await app.view.isVisible(app.view.content.delete_warning.elem))
+					throw 'Delete transaction warning popup not appear';
+				if (!app.view.content.delete_warning.okBtn)
+					throw 'OK button not found';
+
+				await app.view.navigation(() => app.view.click(app.view.content.delete_warning.okBtn));
+
+				// After delete transactions navigation occurs to page without filters, so we need to restore it
+				await app.view.filterByType(currentType);
+
+				// Exclude previously removed transactions
+				tr = tr.filter(tr_num => !absTrOnCurrentPage.includes(tr_num))
+				if (!tr.length)
+					break;
+
+				// Shift positions
+				tr = tr.map(tr_num => tr_num - trOnCurrentPage.length);
+			}
+			else
+			{
+				if (app.view.isLastPage())
+				{
+					if (tr.length)
+						throw new Error('Transaction(s) ' + tr.join() + ' can not be removed');
+					else
+						break;
+				}
+				else
+				{
+					await app.view.goToNextPage();
+				}
+			}
+		}
 	}
 
 }

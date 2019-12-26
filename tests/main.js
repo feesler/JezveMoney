@@ -315,7 +315,7 @@ class Application
 		this.view.setBlock('Delete expense transactions', 2);
 
 		await transactions.del(this, App.EXPENSE, [0]);
-		await transactions.del(this, App.EXPENSE, [0, 1]);
+		await transactions.del(this, App.EXPENSE, [0, 1, 11, 13]);
 	}
 
 
@@ -324,7 +324,7 @@ class Application
 		this.view.setBlock('Delete income transactions', 2);
 
 		await transactions.del(this, App.INCOME, [0]);
-		await transactions.del(this, App.INCOME, [0, 1, 2]);
+		await transactions.del(this, App.INCOME, [0, 1, 2, 15]);
 	}
 
 

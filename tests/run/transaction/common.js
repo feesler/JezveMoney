@@ -6,6 +6,41 @@ var runTransactionsCommon = (function()
 	let test = null;
 
 
+	async function iterateTransactionPages(app)
+	{
+		let res = { items : [], pages : [] };
+
+		if (!(app.view instanceof TransactionsView) || !app.view.content.transList)
+			throw new Error('Not expected view');
+
+		if (!app.view.isFirstPage())
+			await app.view.goToFirstPage();
+
+		while(app.view.content.transList.items.length)
+		{
+			let pageItems = app.view.content.transList.items.map(item => {
+				return {
+					id : item.id,
+					accountTitle : item.accountTitle,
+					amountText : item.amountText,
+					dateFmt : item.dateFmt,
+					comment : item.comment
+				}
+			});
+
+			res.pages.push(pageItems);
+			res.items.push(...pageItems);
+
+			if (app.view.isLastPage())
+				break;
+
+			await app.view.goToNextPage();
+		}
+
+		return res;
+	}
+
+
 	async function deleteTransactions(app, type, transactions)
 	{
 		test = app.test;
@@ -24,7 +59,9 @@ var runTransactionsCommon = (function()
 		await app.view.goToTransactions();
 		await app.view.filterByType(type);
 
-		let trCount = app.view.content.transList ? app.view.content.transList.items.length : 0;
+		let transListBefore = await iterateTransactionPages(app);
+
+		let trCount = transListBefore.items.length;
 		app.beforeDeleteTransaction.trCount = trCount;
 
 		app.beforeDeleteTransaction.deleteList = [];
@@ -33,7 +70,7 @@ var runTransactionsCommon = (function()
 			if (trPos < 0 || trPos >= trCount)
 				throw new Error('Wrong transaction position: ' + trPos);
 
-			let trObj = await app.view.getTransactionObject(app.view.content.transList.items[trPos].id);
+			let trObj = transListBefore.items[trPos];
 			if (!trObj)
 				throw new Error('Transaction not found');
 
@@ -43,13 +80,26 @@ var runTransactionsCommon = (function()
 
 		// Request view to select and delete transactions and wait for navigation
 		await app.view.deleteTransactions(transactions);
+		await app.view.filterByType(type);
+
+		let transListAfter = await iterateTransactionPages(app);
 
 		// Check count of transactions
-		var state = { value : { transList : { items : { length : app.transactions.length - transactions.length } } } };		// TODO use max and calculate proper
+		await test('Transactions list update', async () =>
+		{
+			if (transListBefore.items.length - transactions.length != transListAfter.items.length)
+				throw new Error('Unexpected count of transactions');
 
-		await test('Transactions list update', async () => {}, app.view, state);
+			for(let trItem of app.beforeDeleteTransaction.deleteList)
+			{
+				if (transListAfter.items.find(item => item.id == trItem.id))
+					throw new Error('Transaction ' + trItem.id + ' not deleted');
+			}
 
-		app.transactions = app.view.content.transList.items;
+			return true;
+		}, app.view.props.environment);
+
+		app.transactions = transListAfter.items;
 
 
 		// Navigate to main view and check changes in affected accounts and persons
@@ -204,7 +254,7 @@ var runTransactionsCommon = (function()
 			personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 		}
 
-		var state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
+		let state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
 
 		await test('Acounts and persons update', async () => {}, app.view, state);
 
