@@ -364,26 +364,9 @@ class TransactionsView extends TestView
 	}
 
 
-	// Select specified account, click on edit button and return navigation promise
-	async goToUpdateTransaction(num)
+	async selectTransactions(tr)
 	{
-		if (!this.content.transList || this.content.transList.items.length <= num || num < 0)
-			throw new Error('Wrong transaction number specified');
-
-		await this.content.transList.items[num].click();
-
-		if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
-			!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
-			throw 'Update transaction button not visible';
-
-		return this.navigation(() => this.content.toolbar.editBtn.click());
-	}
-
-
-	// Delete secified transactions and return navigation promise
-	async deleteTransactions(tr)
-	{
-		if (!tr)
+		if (typeof tr === 'undefined')
 			throw new Error('No transactions specified');
 
 		if (!this.app.isArray(tr))
@@ -393,7 +376,7 @@ class TransactionsView extends TestView
 		for(let tr_num of tr)
 		{
 			if (tr_num < 0 || tr_num >= this.content.transList.items.length)
-				throw 'Wrong account number';
+				throw 'Wrong transaction number';
 
 			await this.performAction(() => this.content.transList.items[tr_num].click());
 
@@ -408,6 +391,22 @@ class TransactionsView extends TestView
 
 			ind++;
 		}
+	}
+
+
+	// Select specified transaction, click on edit button and return navigation promise
+	async goToUpdateTransaction(num)
+	{
+		await this.selectTransactions(num);
+
+		return this.navigation(() => this.content.toolbar.editBtn.click());
+	}
+
+
+	// Delete specified transactions and return navigation promise
+	async deleteTransactions(tr)
+	{
+		await this.selectTransactions(tr);
 
 		await this.performAction(() => this.content.toolbar.delBtn.click());
 
