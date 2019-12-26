@@ -89,7 +89,6 @@ class Application
 		await this.personTests();
 		await this.transactionTests();
 		await statistics.run(this);
-		await this.transactionsListTests();
 	}
 
 
@@ -164,6 +163,7 @@ class Application
 
 		await this.createTransactionTests();
 		await this.updateTransactionTests();
+		await this.transactionsListTests();
 		await this.deleteTransactionTests();
 	}
 

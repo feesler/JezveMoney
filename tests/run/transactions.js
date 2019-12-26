@@ -17,7 +17,7 @@ var runTransList = (function()
 
 	let accIds = [];
 
-	let personsList = [{ name : 'Maria' }, { name : 'Ivan <<' }];
+	let personsList = [{ name : 'Alex' }, { name : 'noname &' }];
 	let personIds = [];
 
 	let now = new Date();
@@ -26,6 +26,11 @@ var runTransList = (function()
 	let yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
 
 	let dateList = [now, yesterday, weekAgo, monthAgo];
+
+	let newExpenses = [];
+	let newIncomes = [];
+	let newTransfers = [];
+	let newDebts = [];
 
 	let expensesList = [
 		{ src_id : 0, src_amount : '500', comm : 'lalala' },
@@ -61,6 +66,48 @@ var runTransList = (function()
 	];
 
 
+	async function setupAccounts(list)
+	{
+		let res = [];
+
+		let accountsBefore = await api.account.list();
+		for(let params of list)
+		{
+			let acc = accountsBefore.find(item => item.name == params.name);
+			if (!acc)
+			{
+				acc = await api.account.create(params);
+			}
+
+			if (acc)
+				res.push(acc.id);
+		}
+
+		return res;
+	}
+
+
+	async function setupPersons(list)
+	{
+		let res = [];
+
+		let personsBefore = await api.person.list();
+		for(let params of list)
+		{
+			let pers = personsBefore.find(item => item.name == params.name);
+			if (!pers)
+			{
+				pers = await api.person.create(params);
+			}
+
+			if (pers)
+				res.push(pers.id);
+		}
+
+		return res;
+	}
+
+
 	async function preCreateData(app)
 	{
 		console.log('Precreate data...');
@@ -68,21 +115,9 @@ var runTransList = (function()
 		dateList = dateList.map(item => app.formatDate(item));
 
 		await api.user.login('test', 'test');
-		await api.profile.reset();
 
-		// Accounts
-		for(let params of accountsList)
-		{
-			let res = await api.account.create(params);
-			accIds.push(res.id);
-		}
-
-		// Persons
-		for(let params of personsList)
-		{
-			let res = await api.person.create(params);
-			personIds.push(res.id);
-		}
+		accIds = await setupAccounts(accountsList);
+		personIds = await setupPersons(personsList);
 
 		// Expense transactions
 		for(let params of expensesList)
@@ -92,7 +127,9 @@ var runTransList = (function()
 			for(let date of dateList)
 			{
 				expenseParam.date = date;
-				await api.transaction.create(expenseParam);
+				let createResult = await api.transaction.create(expenseParam);
+				if (createResult)
+					newExpenses.push(createResult.id);
 			}
 		}
 
@@ -104,7 +141,9 @@ var runTransList = (function()
 			for(let date of dateList)
 			{
 				incomeParam.date = date;
-				await api.transaction.create(incomeParam);
+				let createResult = await api.transaction.create(incomeParam);
+				if (createResult)
+					newIncomes.push(createResult.id);
 			}
 		}
 
@@ -117,7 +156,9 @@ var runTransList = (function()
 			for(let date of dateList)
 			{
 				transferParam.date = date;
-				await api.transaction.create(transferParam);
+				let createResult = await api.transaction.create(transferParam);
+				if (createResult)
+					newTransfers.push(createResult.id);
 			}
 		}
 
@@ -130,7 +171,9 @@ var runTransList = (function()
 			for(let date of dateList)
 			{
 				debtParam.date = date;
-				await api.transaction.create(debtParam);
+				let createResult = await api.transaction.create(debtParam);
+				if (createResult)
+					newDebts.push(createResult.id);
 			}
 		}
 
@@ -138,25 +181,127 @@ var runTransList = (function()
 	}
 
 
+	function filterTransactionsByType(trans, type)
+	{
+		if (!trans)
+			throw new Error('Wrong parameters');
+
+		return trans.filter(item => item.type == type);
+	}
+
+
+	function filterTransactionsByAccount(trans, acc_id)
+	{
+		if (!trans || !acc_id)
+			throw new Error('Wrong parameters');
+
+		return trans.filter(item => item.src_id == acc_id || item.dest_id == acc_id);
+	}
+
+
+	// Convert date string from DD.MM.YYYY format to YYYY-MM-DD
+	function convDate(dateStr)
+	{
+		return (dateStr) ? new Date( Date.parse(dateStr.split('.').reverse().join('-')) ) : null;
+	}
+
+
+	let isDate = null;
+
+	function filterTransactionsByDate(trans, start, end)
+	{
+		if (!trans)
+			throw new Error('Wrong parameters');
+
+		return trans.filter(item =>
+		{
+			let date = convDate(item.date);
+			if (!date)
+				return false;
+
+			if (isDate(start) && date < start)
+			{
+				return false;
+			}
+			if (isDate(end) && date > end)
+			{
+				return false;
+			}
+
+			return true;
+		});
+	}
+
+
+	function filterTransactionsByQuery(trans, query)
+	{
+		if (!trans)
+			throw new Error('Wrong parameters');
+
+		return trans.filter(item => item.comment.indexOf(query) !== -1);
+	}
+
+
 	async function runTests(app)
 	{
 		env = app.view.props.environment;
+		isDate = app.isDate;
 		let test = app.test;
 
 		api.setEnv(env, app);
 
 		env.setBlock('Transaction List view', 1);
 
+		let transBefore = await api.transaction.list();
+		let expensesBefore = transBefore.filter(item => item.type == app.EXPENSE);
+		let incomesBefore = transBefore.filter(item => item.type == app.INCOME);
+		let transfersBefore = transBefore.filter(item => item.type == app.TRANSFER);
+		let debtsBefore = transBefore.filter(item => item.type == app.DEBT);
+
 		await preCreateData(app);
+
+		if (newExpenses.length)
+			newExpenses = await api.transaction.read(newExpenses);
+		if (newIncomes.length)
+			newIncomes = await api.transaction.read(newIncomes);
+		if (newTransfers.length)
+			newTransfers = await api.transaction.read(newTransfers);
+		if (newDebts.length)
+			newDebts = await api.transaction.read(newDebts);
+
+		let newTransactions = newExpenses.concat(newIncomes, newTransfers, newDebts);
+
+		let allTransactions = transBefore.concat(newTransactions);
 
 		await app.goToMainView();
 		await app.view.goToTransactions();
 
 		const onPage = 10;
-		let totalExpenses = expensesList.length * dateList.length;
-		let totalIncomes = incomesList.length * dateList.length;
-		let totalTransfers = transfersList.length * dateList.length;
-		let totalDebts = debtsList.length * dateList.length;
+		let totalExpenses = newExpenses.length + expensesBefore.length;
+		let totalIncomes = newIncomes.length + incomesBefore.length;
+		let totalTransfers = newTransfers.length + transfersBefore.length;
+		let totalDebts = newDebts.length + debtsBefore.length;
+
+		let acc_2_all = filterTransactionsByAccount(allTransactions, accIds[2]);
+		let acc_2_debts = filterTransactionsByType(acc_2_all, app.DEBT);
+
+		// Prepare date range for week
+		let day1 = now.getDate();
+		let day2;
+		if (day1 > 22)
+		{
+			day2 = day1;
+			day1 = day2 - 6;
+		}
+		else
+		{
+			day2 = day1 + 6;
+		}
+
+		let weekStartDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), day1));
+		let weekEndDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), day2));
+
+		let acc_2_week = filterTransactionsByDate(acc_2_all, weekStartDate, weekEndDate);
 
 		let totalTransactions = totalExpenses + totalIncomes + totalTransfers + totalDebts;
 		let expectedPages = Math.ceil(totalTransactions / onPage);
@@ -205,35 +350,27 @@ var runTransList = (function()
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Debt', () => {}, app.view, state);
 
-		let acc_2_debts = 1 * dateList.length;
-		let acc_2_week = 5;
-		let acc_2_all = acc_2_week  * dateList.length;
-		state.values.paginator.pages = Math.ceil(acc_2_debts / onPage);
+		// Filter by account 2 and debt
+		state.values.paginator.pages = Math.ceil(acc_2_debts.length / onPage);
 		await app.view.filterByAccounts(accIds[2]);
 		await test('Filter by accounts', () => {}, app.view, state);
 
+		// Filter by account 2
 		state.values.typeMenu.activeType = 0;
-		state.values.paginator.pages = Math.ceil(acc_2_all / onPage);
+		state.values.paginator.pages = Math.ceil(acc_2_all.length / onPage);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Show all transactions', () => {}, app.view, state);
 
-		let day1 = now.getDate();
-		let day2;
-		if (day1 > 22)
-		{
-			day2 = day1;
-			day1 = day2 - 6;
-		}
-		else
-		{
-			day2 = day1 + 6;
-		}
-
 		state.values.typeMenu.activeType = 0;
-		state.values.paginator.pages = Math.ceil(acc_2_week / onPage);
+
+		// Filter by account 2 and last week date
+		state.values.paginator.pages = Math.ceil(acc_2_week.length / onPage);
 		await app.view.selectDateRange(day1, day2);
 		await test('Select date range', () => {}, app.view, state);
 
+		let acc_2_query = filterTransactionsByQuery(acc_2_week, '1');
+
+		state.values.paginator.pages = Math.ceil(acc_2_query.length / onPage);
 		state.values.searchForm.value = '1';
 		await app.view.search(state.values.searchForm.value);
 		await test('Search', () => {}, app.view, state);
