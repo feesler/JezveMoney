@@ -92,7 +92,7 @@ var runExpense = (function()
 		}
 
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(app.transactions.length + 1, 5) } } };
+							transList : { items : { length : Math.min(app.transactions.length + 1, app.config.latestTransactions) } } };
 		transWidget.transList.items[0] = { accountTitle : srcAcc.name,
 										amountText : fmtAmount,
 									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),

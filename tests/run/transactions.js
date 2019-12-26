@@ -244,6 +244,7 @@ var runTransList = (function()
 
 	async function runTests(app)
 	{
+		const onPage = app.config.transactionsOnPage;
 		env = app.view.props.environment;
 		isDate = app.isDate;
 		let test = app.test;
@@ -276,7 +277,6 @@ var runTransList = (function()
 		await app.goToMainView();
 		await app.view.goToTransactions();
 
-		const onPage = 10;
 		let totalExpenses = newExpenses.length + expensesBefore.length;
 		let totalIncomes = newIncomes.length + incomesBefore.length;
 		let totalTransfers = newTransfers.length + transfersBefore.length;

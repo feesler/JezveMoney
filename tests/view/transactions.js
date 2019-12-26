@@ -443,6 +443,7 @@ class TransactionsView extends TestView
 	async deleteTransactions(tr)
 	{
 		let app = this.app;
+		const onPage = app.config.transactionsOnPage;
 
 		if (!tr)
 			throw new Error('No transactions specified');
@@ -460,7 +461,7 @@ class TransactionsView extends TestView
 		while(true)
 		{
 			let pageNum = app.view.currentPage();
-			const onPage = 10;
+
 
 			absTrOnCurrentPage = tr.filter(tr_num => {
 				return tr_num >= onPage * (pageNum - 1) &&

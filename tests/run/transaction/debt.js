@@ -154,7 +154,7 @@ var runDebt = (function()
 
 		// Transactions widget changes
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(app.transactions.length + 1, 5) } } };
+							transList : { items : { length : Math.min(app.transactions.length + 1, app.config.latestTransactions) } } };
 		var title = '';
 		var fmtAmount;
 
