@@ -108,7 +108,7 @@ var runDebt = (function()
 		let accPos = app.beforeSubmitTransaction.accPos;
 		let debtType = app.beforeSubmitTransaction.debtType;
 
-		var state = { values : { widgets : { length : 5 } } };
+		var state = { values : { widgets : { length : app.config.widgetsCount } } };
 		var sa, da;
 
 		sa = da = app.normalize(params.srcAmount);
@@ -126,21 +126,13 @@ var runDebt = (function()
 				acc.balance -= sa;
 		}
 
-		var debtAccounts = person.accounts.reduce((val, pacc) =>
-		{
-			if (pacc.balance == 0)
-				return val;
-
-			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
-			return val.concat(fmtBal);
-		}, []);
-
+		let debtAccounts = app.filterPersonDebts(app, person.accounts);
 		let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
 		personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 
-		state.values.widgets[3] = personsWidget;
+		state.values.widgets[app.config.PersonsWidgetPos] = personsWidget;
 
 		// Accounts widget changes
 		if (acc)
@@ -149,7 +141,7 @@ var runDebt = (function()
 			var accWidget = { tiles : { items : { length : app.accounts.length } } };
 			accWidget.tiles.items[accPos] = { balance : fmtAccBal, name : acc.name };
 
-			state.values.widgets[0] = accWidget;
+			state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		}
 
 		// Transactions widget changes
@@ -179,13 +171,13 @@ var runDebt = (function()
 									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
-		state.values.widgets[2] = transWidget;
+		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
 		await test('Debt transaction submit', async () => {}, app.view, state);
 
-		app.transactions = app.view.content.widgets[2].transList.items;
-		app.accounts = app.view.content.widgets[0].tiles.items;
-		app.persons = app.view.content.widgets[3].infoTiles.items;
+		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
+		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 
@@ -307,7 +299,7 @@ var runDebt = (function()
 		let updAccPos = app.beforeSubmitTransaction.accPos;
 		let updAmount = app.beforeSubmitTransaction.srcAmount;
 
-		var state = { values : { widgets : { length : 5 } } };
+		var state = { values : { widgets : { length : app.config.widgetsCount } } };
 		var sa, da;
 
 		sa = da = app.normalize(origAmount);
@@ -345,33 +337,17 @@ var runDebt = (function()
 
 		if (origPersonPos != updPersonPos)
 		{
-			let debtAccounts = origPerson.accounts.reduce((val, pacc) =>
-			{
-				if (pacc.balance == 0)
-					return val;
-
-				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
-				return val.concat(fmtBal);
-			}, []);
-
+			let debtAccounts = app.filterPersonDebts(app, origPerson.accounts);
 			let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 			personsWidget.infoTiles.items[origPersonPos] = { title : origPerson.name, subtitle : debtSubtitle };
 		}
 
-		let debtAccounts = updPerson.accounts.reduce((val, pacc) =>
-		{
-			if (pacc.balance == 0)
-				return val;
-
-			let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
-			return val.concat(fmtBal);
-		}, []);
-
+		let debtAccounts = app.filterPersonDebts(app, updPerson.accounts);
 		let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 		personsWidget.infoTiles.items[updPersonPos] = { title : updPerson.name, subtitle : debtSubtitle };
 
-		state.values.widgets[3] = personsWidget;
+		state.values.widgets[app.config.PersonsWidgetPos] = personsWidget;
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : app.accounts.length } } };
@@ -386,13 +362,13 @@ var runDebt = (function()
 			accWidget.tiles.items[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
 		}
 
-		state.values.widgets[0] = accWidget;
+		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 
 		await test('Account and person balance update', async () => {}, app.view, state);
 
-		app.transactions = app.view.content.widgets[2].transList.items;
-		app.accounts = app.view.content.widgets[0].tiles.items;
-		app.persons = app.view.content.widgets[3].infoTiles.items;
+		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
+		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 

@@ -178,6 +178,20 @@ function getPersonByAcc(persons, acc_id)
 }
 
 
+// Format non-zero balances of person accounts
+// Return array of strings
+function filterPersonDebts(app, accounts)
+{
+	if (!app || !Array.isArray(accounts))
+		throw new Error('Unexpected input');
+
+	let res = accounts.filter(acc => acc.balance != 0)
+						.map(acc => app.formatCurrency(acc.balance, acc.curr_id, app.currencies));
+
+	return res;
+}
+
+
 /*
 *	Normalized decimal calculations
 */
@@ -441,6 +455,7 @@ var commonModule = { EXPENSE,
 					getCurrency,
 					formatCurrency,
 					getPersonByAcc,
+					filterPersonDebts,
 					fixFloat,
 					correct,
 					correctExch,

@@ -240,27 +240,21 @@ var runTransactionsCommon = (function()
 		{
 			let person = affectedPersons[personPos];
 
-			let debtAccounts = person.accounts.reduce((val, pacc) =>
-			{
-				if (pacc.balance == 0)
-					return val;
-
-				let fmtBal = app.formatCurrency(pacc.balance, pacc.curr_id, app.currencies);
-				return val.concat(fmtBal);
-			}, []);
-
+			let debtAccounts = app.filterPersonDebts(app, person.accounts);
 			let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 			personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 		}
 
-		let state = { values : { widgets : { length : 5, 0 : accWidget, 3 : personsWidget } } };
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
+		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
+		state.values.widgets[app.config.PersonsWidgetPos] = personsWidget;
 
 		await test('Acounts and persons update', async () => {}, app.view, state);
 
-		app.transactions = app.view.content.widgets[2].transList.items;
-		app.accounts = app.view.content.widgets[0].tiles.items;
-		app.persons = app.view.content.widgets[3].infoTiles.items;
+		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
+		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 
