@@ -44,10 +44,10 @@ class MainView extends TestView
 
 	goToAccounts()
 	{
-	 	if (!this.content.widgets || !this.content.widgets[0])
+	 	if (!this.content.widgets || !this.content.widgets[this.app.config.AccountsWidgetPos])
 			throw new Error('Accounts widget not found');
 
-		var widget = this.content.widgets[0];
+		var widget = this.content.widgets[this.app.config.AccountsWidgetPos];
 		if (widget.title != 'Accounts')
 			throw new Error('Wrong widget');
 
@@ -57,10 +57,10 @@ class MainView extends TestView
 
 	goToNewTransactionByAccount(accNum)
 	{
-		if (!this.content.widgets || !this.content.widgets[0])
+		if (!this.content.widgets || !this.content.widgets[this.app.config.AccountsWidgetPos])
 			throw new Error('Wrong state of main view');
 
-		var accWidget = this.content.widgets[0];
+		var accWidget = this.content.widgets[this.app.config.AccountsWidgetPos];
 		if (accWidget.title != 'Accounts')
 			throw new Error('Wrong state of accounts widget');
 
@@ -76,10 +76,10 @@ class MainView extends TestView
 
 	goToTransactions()
 	{
-		if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+		if (!this.content || !this.content.widgets || this.content.widgets.length != this.app.config.widgetsCount)
 			throw new Error('Fail to parse main view widgets');
 
-		var widget = this.content.widgets[2];
+		var widget = this.content.widgets[this.app.config.LatestWidgetPos];
 		if (widget.title != 'Transactions')
 			throw new Error('Wrong widget');
 
@@ -89,10 +89,10 @@ class MainView extends TestView
 
 	goToPersons()
 	{
-		if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+		if (!this.content || !this.content.widgets || this.content.widgets.length != this.app.config.widgetsCount)
 			throw new Error('Fail to parse main view widgets');
 
-		var widget = this.content.widgets[3];
+		var widget = this.content.widgets[this.app.config.PersonsWidgetPos];
 		if (widget.title != 'Persons')
 			throw new Error('Wrong widget');
 
@@ -102,10 +102,10 @@ class MainView extends TestView
 
 	goToStatistics()
 	{
-		if (!this.content || !this.content.widgets || this.content.widgets.length != 5)
+		if (!this.content || !this.content.widgets || this.content.widgets.length != this.app.config.widgetsCount)
 			throw new Error('Fail to parse main view widgets');
 
-		var widget = this.content.widgets[4];
+		var widget = this.content.widgets[this.app.config.StatisticsWidgetPos];
 		if (widget.title != 'Statistics')
 			throw new Error('Wrong widget');
 

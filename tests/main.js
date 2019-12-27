@@ -96,9 +96,9 @@ class Application
 	{
 		await this.view.goToMainView();
 
-		this.transactions = this.view.content.widgets[2].transList.items;
-		this.accounts = this.view.content.widgets[0].tiles.items;
-		this.persons = this.view.content.widgets[3].infoTiles.items;
+		this.transactions = this.view.content.widgets[this.config.LatestWidgetPos].transList.items;
+		this.accounts = this.view.content.widgets[this.config.AccountsWidgetPos].tiles.items;
+		this.persons = this.view.content.widgets[this.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 

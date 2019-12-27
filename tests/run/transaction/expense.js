@@ -98,13 +98,15 @@ var runExpense = (function()
 									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
-		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
+		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
+		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
 		await test('Expense transaction submit', async () => {}, view, state);
 
-		app.transactions = view.content.widgets[2].transList.items;
-		app.accounts = view.content.widgets[0].tiles.items;
-		app.persons = view.content.widgets[3].infoTiles.items;
+		app.transactions = view.content.widgets[app.config.LatestWidgetPos].transList.items;
+		app.accounts = view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.persons = view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 
@@ -222,7 +224,8 @@ var runExpense = (function()
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 
-		var state = { values : { widgets : { length : 5, 0 : accWidget } } };
+		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 
 		await test('Account balance update', async () => {}, app.view, state);
 	}

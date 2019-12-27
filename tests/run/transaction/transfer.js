@@ -104,13 +104,15 @@ var runTransfer = (function()
 									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
 									 	comment : ('comment' in params) ? params.comment : '' };
 
-		var state = { values : { widgets : { length : 5, 0 : accWidget, 2 : transWidget } } };
+		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
+		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
 		await test('Transfer transaction submit', async () => {}, view, state);
 
-		app.transactions = view.content.widgets[2].transList.items;
-		app.accounts = view.content.widgets[0].tiles.items;
-		app.persons = view.content.widgets[3].infoTiles.items;
+		app.transactions = view.content.widgets[app.config.LatestWidgetPos].transList.items;
+		app.accounts = view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.persons = view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 
@@ -189,7 +191,7 @@ var runTransfer = (function()
 			fmtAmount += ' (' + app.formatCurrency(updDestAmount, updDestAcc.curr_id, app.currencies) + ')';
 		}
 
-		var state = { values : { transList : { items : { length : transCount } } } };
+		let state = { values : { transList : { items : { length : transCount } } } };
 		state.values.transList.items[pos] = { id : trans_id,
 											accountTitle : updSrcAcc.name + ' → ' + updDestAcc.name,
 											amountText : fmtAmount,
@@ -254,7 +256,8 @@ var runTransfer = (function()
 			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
 		}
 
-		var state = { values : { widgets : { length : 5, 0 : accWidget } } };
+		state = { values : { widgets : { length : app.config.widgetsCount } } };
+		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 
 		await test('Account balance update', async () => {}, app.view, state);
 	}
