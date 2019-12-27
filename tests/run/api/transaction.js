@@ -1,4 +1,5 @@
 import { api } from '../../api.js';
+import { TransactionsList } from '../../trlist.js';
 
 
 var runTransactionAPI = (function()
@@ -16,61 +17,6 @@ var runTransactionAPI = (function()
 		env = e;
 		app = App;
 		test = app.test;
-	}
-
-
-	function getExpectedPos(trList, params)
-	{
-		let pos = getLastestPos(trList, params.date);
-
-		return pos + 1;
-	}
-
-
-	function getLastestPos(trList, date = null)
-	{
-		let cmpDate = app.convDate(date);
-		let checkList = (cmpDate) ? trList.filter(item => app.convDate(item.date) <= cmpDate) : trList;
-
-		let res = checkList.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
-
-		return res;
-	}
-
-
-	function updatePos(trList, item_id, pos)
-	{
-		let trObj = app.idSearch(trList, item_id);
-		if (!trObj)
-			throw new Error('Transaction ' + item_id + ' not found');
-
-		let oldPos = trObj.pos;
-		if (oldPos == pos)
-			return;
-
-		if (trList.find(item => item.pos == pos))
-		{
-			for(let item of trList)
-			{
-				if (oldPos == 0)			// insert with specified position
-				{
-					if (item.pos >= pos)
-						item.pos += 1;
-				}
-				else if (pos < oldPos)		// moving up
-				{
-					if (item.pos >= pos && item.pos < oldPos)
-						item.pos += 1;
-				}
-				else if (pos > oldPos)		// moving down
-				{
-					if (item.pos > oldPos && item.pos <= pos)
-						item.pos -= 1;
-				}
-			}
-		}
-
-		trObj.pos = pos;
 	}
 
 
@@ -197,21 +143,15 @@ var runTransactionAPI = (function()
 			expTrans.id = transaction_id = createRes.id;
 
 			// Prepare expected updates of transactions
-			let expTransList = app.copyObject(trBefore);
-			expTransList.push(expTrans);
-
-			let trPos = getExpectedPos(expTransList, params);
-			updatePos(expTransList, transaction_id, trPos);
-
-			expTransList.sort((a, b) => a.pos - b.pos);
-
+			let expTransList = new TransactionsList(app, trBefore);
+			expTransList.create(expTrans);
 
 			let trList = await api.transaction.list();
 			let accList = await api.account.list();
 			let transObj = app.idSearch(trList, transaction_id);
 
 			let res = app.checkObjValue(transObj, expTrans) &&
-						app.checkObjValue(trList, expTransList) &&
+						app.checkObjValue(trList, expTransList.list) &&
 						app.checkObjValue(accList, expAccountList);
 
 			return res;
@@ -333,25 +273,16 @@ var runTransactionAPI = (function()
 				return false;
 
 			// Prepare expected updates of transactions
-			let expTransList = app.copyObject(trBefore);
-			let trIndex = expTransList.findIndex(item => item.id == expTrans.id);
-			if (trIndex !== -1)
-				expTransList.splice(trIndex, 1, expTrans);
+			let expTransList = new TransactionsList(app, trBefore);
 
-			if (origTrans.date != expTrans.date)
-			{
-				expTrans.pos = 0;
-				let newPos = getExpectedPos(expTransList, updParams);
-				updatePos(expTransList, expTrans.id, newPos);
-				expTransList.sort((a, b) => a.pos - b.pos);
-			}
+			expTransList.update(expTrans.id, expTrans);
 
 			let trList = await api.transaction.list();
 			let accList = await api.account.list();
 			let transObj = app.idSearch(trList, updParams.id);
 
 			let res = app.checkObjValue(transObj, expTrans) &&
-						app.checkObjValue(trList, expTransList) &&
+						app.checkObjValue(trList, expTransList.list) &&
 						app.checkObjValue(accList, expAccountList);
 
 			return res;
