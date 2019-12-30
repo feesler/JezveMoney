@@ -922,7 +922,7 @@ class TransactionsController extends Controller
 		if (!isset($_POST["transactions"]))
 			$this->fail($defMsg);
 
-		$ids = explode(",", $_POST["transactions"]);
+		$ids = explode(",", rawurldecode($_POST["transactions"]));
 		if (!$this->model->del($ids))
 			$this->fail();
 

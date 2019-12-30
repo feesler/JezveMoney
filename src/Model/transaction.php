@@ -1073,7 +1073,7 @@ class TransactionModel extends CachedTable
 				$res[] = ["text" => "..."];
 				$res[] = ["text" => $pages_count, "active" => FALSE];
 			}
-			else if ($page_num > $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
+			else if ($page_num >= $groupLimit && $page_num >= $pages_count - $groupLimit)		// 1 ... 14 15 16 17 18
 			{
 				$res[] = ["text" => 1, "active" => FALSE];
 				$res[] = ["text" => "..."];
