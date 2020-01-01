@@ -99,7 +99,7 @@
 
 		$val = floatval($val);
 
-		if (floor($val) == $val)
+		if (strval(round($val)) == strval($val))
 			$nf = number_format($val, 0, "", " ");
 		else
 			$nf = number_format($val, 2, ".", " ");
