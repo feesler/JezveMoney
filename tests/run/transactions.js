@@ -21,13 +21,6 @@ var runTransList = (function()
 	let personsList = [{ name : 'Alex' }, { name : 'noname &' }];
 	let personIds = [];
 
-	let now = new Date();
-	let monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-	let weekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-	let yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-
-	let dateList = [now, yesterday, weekAgo, monthAgo];
-
 	let newExpenses = [];
 	let newIncomes = [];
 	let newTransfers = [];
@@ -113,8 +106,6 @@ var runTransList = (function()
 	{
 		console.log('Precreate data...');
 
-		dateList = dateList.map(item => app.formatDate(item));
-
 		await api.user.login('test', 'test');
 
 		accIds = await setupAccounts(accountsList);
@@ -125,7 +116,7 @@ var runTransList = (function()
 		{
 			params.src_id = accIds[params.src_id];
 			let expenseParam = await api.transaction.expense(params);
-			for(let date of dateList)
+			for(let date of app.dateList)
 			{
 				expenseParam.date = date;
 				let createResult = await api.transaction.create(expenseParam);
@@ -139,7 +130,7 @@ var runTransList = (function()
 		{
 			params.dest_id = accIds[params.dest_id];
 			let incomeParam = await api.transaction.income(params);
-			for(let date of dateList)
+			for(let date of app.dateList)
 			{
 				incomeParam.date = date;
 				let createResult = await api.transaction.create(incomeParam);
@@ -154,7 +145,7 @@ var runTransList = (function()
 			params.src_id = accIds[params.src_id];
 			params.dest_id = accIds[params.dest_id];
 			let transferParam = await api.transaction.transfer(params);
-			for(let date of dateList)
+			for(let date of app.dateList)
 			{
 				transferParam.date = date;
 				let createResult = await api.transaction.create(transferParam);
@@ -169,7 +160,7 @@ var runTransList = (function()
 			params.person_id = personIds[params.person_id];
 			params.acc_id = (params.acc_id) ? accIds[params.acc_id] : 0;
 			let debtParam = await api.transaction.debt(params);
-			for(let date of dateList)
+			for(let date of app.dateList)
 			{
 				debtParam.date = date;
 				let createResult = await api.transaction.create(debtParam);

@@ -52,7 +52,11 @@ class Application
 		this.persons = [];
 		this.transactions = [];
 		this.currencies = [];
+
+		this.dates = {};
+		this.dateList = [];
 	}
+
 
 	async init()
 	{
@@ -74,6 +78,15 @@ class Application
 		this.user_id = userProfile.user_id;
 
 		this.currencies = await api.currency.list();
+
+		let now = new Date();
+		this.dates.now = this.formatDate(now);
+		this.dates.monthAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+		this.dates.weekAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+		this.dates.yesterday = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+		this.dates.yearAgo = this.formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
+
+		this.dateList.push(...Object.values(this.dates));
 	}
 
 
