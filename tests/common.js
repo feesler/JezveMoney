@@ -382,7 +382,7 @@ function checkObjValue(obj, expectedObj, ret = false)
 		value = obj[vKey];
 		if (isObject(expected) || isArray(expected))
 		{
-			var res = checkObjValue(value, expected, ret);
+			var res = checkObjValue(value, expected, true);
 			if (res !== true)
 			{
 				res.key = vKey + '.' + res.key;

@@ -744,7 +744,7 @@ class TestView
 			if (!control)
 				throw new Error('Control (' + countrolName + ') not found');
 
-			if (this.app.isObject(expected))
+			if (this.app.isObject(expected) || this.app.isArray(expected))
 			{
 				res = this.app.checkObjValue(control, expected, true);
 				if (res !== true)
