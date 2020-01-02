@@ -4,17 +4,9 @@ import { TransactionView } from '../transaction.js';
 // Create or update expense transaction view tests
 class ExpenseTransactionView extends TransactionView
 {
-	constructor(...args)
-	{
-		super(...args);
-
-		this.expectedState = {};
-	}
-
-
 	async buildModel(cont)
 	{
-		var res = {};
+		let res = {};
 
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
@@ -52,8 +44,8 @@ class ExpenseTransactionView extends TransactionView
 		res.exchRate = cont.exchange_row.value;
 		this.updateExch(res);
 
-		var isResBalRowVisible = !!(cont.result_balance_row && await this.isVisible(cont.result_balance_row.elem));
-		var isExchRowVisible = !!(cont.exchange_row && await this.isVisible(cont.exchange_row.elem));
+		let isResBalRowVisible = !!(cont.result_balance_row && await this.isVisible(cont.result_balance_row.elem));
+		let isExchRowVisible = !!(cont.exchange_row && await this.isVisible(cont.exchange_row.elem));
 
 		res.isDiffCurr = (res.src_curr_id != res.dest_curr_id);
 
@@ -82,7 +74,7 @@ class ExpenseTransactionView extends TransactionView
 	{
 		model.srcAmount = val;
 
-		var newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 		if (model.fSrcAmount != newValue)
 		{
 			model.fSrcAmount = newValue;
@@ -101,7 +93,7 @@ class ExpenseTransactionView extends TransactionView
 	{
 		model.destAmount = val;
 
-		var newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
+		let newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
 		if (model.fDestAmount != newValue)
 		{
 			model.fDestAmount = newValue;
@@ -113,14 +105,11 @@ class ExpenseTransactionView extends TransactionView
 
 	setExpectedState(state_id)
 	{
-		var res = {};
-
-		var newState = parseInt(state_id);
-
+		let newState = parseInt(state_id);
 		if (isNaN(newState) || newState < 0 || newState > 4)
 			throw new Error('Wrong state specified');
 
-		var res = { model : { state : newState },
+		let res = { model : { state : newState },
 					visibility : { source : true, destination : false, src_amount_left : false,
 									dest_res_balance_left : false, result_balance_dest_row : false },
 					values : { typeMenu : { activeType : 1 }, /* EXPENSE */
@@ -187,7 +176,7 @@ class ExpenseTransactionView extends TransactionView
 		if (!this.model.isDiffCurr)
 			throw new Error('Wrong state: can\'t input source amount on state ' + this.model.state);
 
-		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
+		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
 
 		this.model.srcAmount = val;
 
@@ -210,7 +199,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async inputDestAmount(val)
 	{
-		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
+		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
 
 		this.model.destAmount = val;
 
@@ -238,7 +227,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async inputResBalance(val)
 	{
-		var fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 
 		this.model.srcResBal = val;
 
@@ -247,7 +236,7 @@ class ExpenseTransactionView extends TransactionView
 			this.model.fSrcResBal = fNewValue;
 			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
 
-			var newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
+			let newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
 
 			this.model.srcAmount = newSrcAmount;
 			this.model.fSrcAmount = this.app.isValidValue(newSrcAmount) ? this.app.normalize(newSrcAmount) : newSrcAmount;
@@ -274,17 +263,17 @@ class ExpenseTransactionView extends TransactionView
 
 		this.model.exchRate = val;
 
-		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalizeExch(val) : val;
+		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalizeExch(val) : val;
 		if (this.model.fExchRate != fNewValue)
 		{
 			if (this.app.isValidValue(this.model.srcAmount))
 			{
-				var newDestAmount = this.app.correct(this.model.fSrcAmount * fNewValue);
+				let newDestAmount = this.app.correct(this.model.fSrcAmount * fNewValue);
 				this.setDestAmount(this.model, newDestAmount);
 			}
 			else if (this.app.isValidValue(this.model.destAmount))
 			{
-				var newSrcAmount = this.app.correct(this.model.fDestAmount / fNewValue);
+				let newSrcAmount = this.app.correct(this.model.fDestAmount / fNewValue);
 				this.setSrcAmount(this.model, newSrcAmount);
 			}
 
@@ -310,7 +299,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async changeSrcAccount(account_id)
 	{
-		var newAcc = await this.getAccount(account_id);
+		let newAcc = await this.getAccount(account_id);
 
 		if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 			return;
@@ -328,7 +317,7 @@ class ExpenseTransactionView extends TransactionView
 		}
 
 		// Update result balance of source
-		var newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+		let newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 		if (this.model.fSrcResBal != newSrcResBal)
 		{
 			this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;

@@ -7,7 +7,7 @@ class RegisterView extends TestView
 {
 	async parseContent()
 	{
-		var res = { loginInp : await this.query('#login'),
+		let res = { loginInp : await this.query('#login'),
 	 				nameInp : await this.query('#name'),
 	 				passwordInp : await this.query('#password'),
 					submitBtn : await this.query('.login_controls .btn.ok_btn'),

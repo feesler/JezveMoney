@@ -6,7 +6,7 @@ class AccountView extends TestView
 {
 	async parseContent()
 	{
-		var res = {};
+		let res = {};
 
 		res.heading = { elem : await this.query('.heading > h1') };
 		if (!res.heading.elem)

@@ -1,8 +1,8 @@
 // Types of transactions
-var EXPENSE = 1;
-var INCOME = 2;
-var TRANSFER = 3;
-var DEBT = 4;
+const EXPENSE = 1;
+const INCOME = 2;
+const TRANSFER = 3;
+const DEBT = 4;
 
 
 // Check object is array
@@ -22,7 +22,7 @@ function isDate(obj)
 // Check object is function
 function isFunction(obj)
 {
-	var getType = {};
+	let getType = {};
 	return obj && (getType.toString.call(obj) === '[object Function]' || typeof obj === 'function');
 }
 
@@ -37,7 +37,7 @@ function isObject(o)
 // Set parameters of object
 function setParam(obj, params)
 {
-	var par, val;
+	let par, val;
 
 	if (!obj || !params || typeof params !== 'object')
 		return;
@@ -120,12 +120,12 @@ function Currency(props)
 // Format specified value using rules of currency
 Currency.prototype.formatValue = function(val)
 {
-	var nval = normalize(val);
+	let nval = normalize(val);
 
 	if (Math.floor(nval) != nval)
 		nval = nval.toFixed(2);
 
-	var fmtVal = formatValue(nval);
+	let fmtVal = formatValue(nval);
 
 	if (this.format)
 		return this.sign + ' ' + fmtVal;
@@ -137,7 +137,7 @@ Currency.prototype.formatValue = function(val)
 // Return currency object for specified id
 function getCurrency(curr_id, currList)
 {
-	var currObj = idSearch(currList, curr_id);
+	let currObj = idSearch(currList, curr_id);
 	if (!currObj)
 		return null;
 
@@ -148,7 +148,7 @@ function getCurrency(curr_id, currList)
 // Format value with rules of specified currency
 function formatCurrency(val, curr_id, currList)
 {
-	var curr, nval, fmtVal;
+	let curr, nval, fmtVal;
 
 	curr = getCurrency(curr_id, currList);
 	if (!curr)
@@ -272,7 +272,7 @@ function idSearch(arr, id)
 	if (!isArray(arr))
 		return null;
 
-	var res = arr.find(item => item && item.id == id);
+	let res = arr.find(item => item && item.id == id);
 	if (typeof res === 'undefined')
 		return null;
 
@@ -289,8 +289,8 @@ function copyObject(item)
 	}
 	else if (isObject(item))
 	{
-		var res = {};
-		for(var key in item)
+		let res = {};
+		for(let key in item)
 		{
 			res[key] = copyObject(item[key]);
 		}
@@ -319,7 +319,7 @@ function extend(Child, Parent)
 // Join parameters and values of object to URL
 function urlJoin(obj)
 {
-	var arr = [], par;
+	let arr = [], par;
 
 	if (!isObject(obj))
 		return '';
@@ -345,14 +345,14 @@ function urlJoin(obj)
 
 function checkPHPerrors(env, content)
 {
-	var errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
+	const errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
 
 	if (!env)
 		return false;
 	if (!content)
 		return true;
 
-	var found = errSignatures.some(function(lookupStr)
+	let found = errSignatures.some(function(lookupStr)
 	{
 		return (content.indexOf(lookupStr) !== -1);
 	});
@@ -364,13 +364,13 @@ function checkPHPerrors(env, content)
 
 function checkObjValue(obj, expectedObj, ret = false)
 {
-	var res = true;
+	let res = true;
 
 	if (obj === expectedObj)
 		return true;
 
-	var value, expected;
-	for(var vKey in expectedObj)
+	let value, expected;
+	for(let vKey in expectedObj)
 	{
 		if (obj === null || !(vKey in obj))
 		{
@@ -382,7 +382,7 @@ function checkObjValue(obj, expectedObj, ret = false)
 		value = obj[vKey];
 		if (isObject(expected) || isArray(expected))
 		{
-			var res = checkObjValue(value, expected, true);
+			let res = checkObjValue(value, expected, true);
 			if (res !== true)
 			{
 				res.key = vKey + '.' + res.key;

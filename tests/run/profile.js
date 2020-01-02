@@ -81,8 +81,8 @@ var runProfile = (function()
 			await app.goToMainView();
 
 			return app.checkObjValue(app.transactions, []) &&
-						app.checkObjValue(app.accounts, []) &&
-						app.checkObjValue(app.persons, []);
+						app.checkObjValue(app.accountTiles, []) &&
+						app.checkObjValue(app.personTiles, []);
 		}, env);
 	}
 

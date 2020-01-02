@@ -7,7 +7,7 @@ var runAccounts = (function()
 	{
 		test = app.test;
 
-		var state = { visibility : { heading : true, iconDropDown : true, name : true, currDropDown : true },
+		let state = { visibility : { heading : true, iconDropDown : true, name : true, currDropDown : true },
 						values : { tile : { name : 'New account', balance : '0 ₽' },
 								name : '', balance : '0' } };
 
@@ -59,14 +59,14 @@ var runAccounts = (function()
 	{
 		test = app.test;
 
-		var state = { value : { tiles : { items : { length : app.accounts.length + 1 } } } };
-		var fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id, app.currencies);
+		let state = { value : { tiles : { items : { length : app.accountTiles.length + 1 } } } };
+		let fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id, app.currencies);
 
-		state.value.tiles.items[app.accounts.length] = { balance : fmtBal, name : params.name, icon : params.icon };
+		state.value.tiles.items[app.accountTiles.length] = { balance : fmtBal, name : params.name, icon : params.icon };
 
 		await test('Account create', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.tiles.items;
+		app.accountTiles = app.view.content.tiles.items;
 	}
 
 
@@ -74,7 +74,7 @@ var runAccounts = (function()
 	{
 		test = app.test;
 
-		var state = { values : { tile : { name : 'acc_2', balance : '0 ₽' }, currDropDown : { textValue : 'RUB' } } };
+		let state = { values : { tile : { name : 'acc_2', balance : '0 ₽' }, currDropDown : { textValue : 'RUB' } } };
 
 	// Input account name
 		await test('Account tile name update', () => app.view.inputName('acc_2'), app.view, state);
@@ -97,12 +97,12 @@ var runAccounts = (function()
 	{
 		test = app.test;
 
-		var state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : app.view.tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
+		let state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : app.view.tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
 
 		await test('Initial state of edit account view', async () => {}, app.view, state);
 
 	// Change currency to USD
-		var fmtBal = app.formatCurrency(1000.01, 2, app.currencies);
+		let fmtBal = app.formatCurrency(1000.01, 2, app.currencies);
 		app.setParam(state.values, { tile : { balance : fmtBal }, currDropDown : { textValue : 'USD' } });
 		await test('USD currency select', () => app.view.changeCurrency(2), app.view, state);
 
@@ -126,14 +126,14 @@ var runAccounts = (function()
 	{
 		test = app.test;
 
-		var state = { value : { tiles : { items : { length : app.accounts.length } } } };
-		var fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id, app.currencies);
+		let state = { value : { tiles : { items : { length : app.accountTiles.length } } } };
+		let fmtBal = app.formatCurrency(app.normalize(params.balance), params.curr_id, app.currencies);
 
 		state.value.tiles.items[params.updatePos] = { balance : fmtBal, name : params.name, icon : params.icon };
 
 		await test('Account update', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.tiles.items;
+		app.accountTiles = app.view.content.tiles.items;
 	}
 
 
@@ -145,20 +145,20 @@ var runAccounts = (function()
 			throw new Error('No params specified');
 		if (!params.name || !params.name.length)
 			throw new Error('Name not specified');
-		var currObj = app.getCurrency(params.curr_id, app.currencies);
+		let currObj = app.getCurrency(params.curr_id, app.currencies);
 		if (!currObj)
 			throw new Error('Wrong currency specified');
-		var normBalance = app.normalize(params.balance);
+		let normBalance = app.normalize(params.balance);
 		if (isNaN(normBalance))
 			throw new Error('Balance not specified');
 
-		var state = { values : { tile : { name : params.name }, name : params.name } };
+		let state = { values : { tile : { name : params.name }, name : params.name } };
 
 	// Input account name
 		await test('Account tile name update', () => app.view.inputName(params.name), app.view, state);
 
 	// Change currency
-		var fmtBal = app.formatCurrency(0, currObj.id, app.currencies);
+		let fmtBal = app.formatCurrency(0, currObj.id, app.currencies);
 		app.setParam(state.values, { currDropDown : { textValue : currObj.name }, tile : { balance : fmtBal } });
 		await test(currObj.name + ' currency select', () => app.view.changeCurrency(currObj.id), app.view, state);
 
@@ -192,11 +192,11 @@ var runAccounts = (function()
 
 		await app.view.deleteAccounts(accounts);
 
-		var state = { value : { tiles : { items : { length : app.accounts.length - accounts.length } } } };
+		let state = { value : { tiles : { items : { length : app.accountTiles.length - accounts.length } } } };
 
 		await test('Delete accounts [' + accounts.join() + ']', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.tiles.items;
+		app.accountTiles = app.view.content.tiles.items;
 	}
 
 

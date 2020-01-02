@@ -19,11 +19,11 @@ import { runStatistics } from './run/statistics.js';
 import { runAPI } from './run/api.js';
 
 
-var profile = runProfile;
-var accounts = runAccounts;
-var persons = runPersons;
+let profile = runProfile;
+let accounts = runAccounts;
+let persons = runPersons;
 
-var transactions = {
+let transactions = {
 	common : runTransactionsCommon,
 	expense : runExpense,
 	income : runIncome,
@@ -34,7 +34,7 @@ var transactions = {
 // Shortcuts
 transactions.del = transactions.common.del;
 
-var statistics = runStatistics;
+let statistics = runStatistics;
 
 
 
@@ -48,8 +48,8 @@ class Application
 
 		this.run = {};
 
-		this.accounts = [];
-		this.persons = [];
+		this.accountTiles = [];
+		this.personTiles = [];
 		this.transactions = [];
 		this.currencies = [];
 

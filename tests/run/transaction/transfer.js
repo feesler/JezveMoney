@@ -99,36 +99,36 @@ var runTransfer = (function()
 		// Source amount expected to be always set
 		// In case of transfer between accounts with different currency use destination amount value
 		// In case of transfer between accounts with the same currency copy source amount value
-		var sa = params.srcAmount;
-		var da = ('destAmount' in params) ? params.destAmount : params.srcAmount;
-		var expSrcBalance = srcAcc.balance - app.normalize(sa);
-		var expDestBalance = destAcc.balance + app.normalize(da);
-		var fmtSrcBal = app.formatCurrency(expSrcBalance, srcAcc.curr_id, app.currencies);
-		var fmtDestBal = app.formatCurrency(expDestBalance, destAcc.curr_id, app.currencies);
+		let sa = params.srcAmount;
+		let da = ('destAmount' in params) ? params.destAmount : params.srcAmount;
+		let expSrcBalance = srcAcc.balance - app.normalize(sa);
+		let expDestBalance = destAcc.balance + app.normalize(da);
+		let fmtSrcBal = app.formatCurrency(expSrcBalance, srcAcc.curr_id, app.currencies);
+		let fmtDestBal = app.formatCurrency(expDestBalance, destAcc.curr_id, app.currencies);
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
 		accWidget.tiles.items[srcAccPos] = { balance : fmtSrcBal, name : srcAcc.name };
 		accWidget.tiles.items[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
-		let posInWidget = expTransList.list.length - expTransList.list[newTransInd].pos;
-		if (posInWidget >= 0 && posInWidget < app.config.latestTransactions)
+
+		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
 		{
 			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[newTransInd]);
-			transWidget.transList.items[posInWidget] = listItem;
+			transWidget.transList.items[newTransInd] = listItem;
 		}
 
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
 		await test('Transfer transaction submit', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 
 		// Read updated list of transactions
 		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
@@ -239,7 +239,7 @@ var runTransfer = (function()
 		// Transactions list changes
 		await app.goToMainView();
 
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
 		let updTransInd = expTransList.findItem(trans_id);
@@ -254,8 +254,8 @@ var runTransfer = (function()
 
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
-		var expBalance = [], fmtBal;
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
+		let expBalance = [], fmtBal;
 
 		// Cancel transaction
 		let affectedAccounts = [];
@@ -307,7 +307,7 @@ var runTransfer = (function()
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);
-		var actionRequested = !isNaN(actionState);
+		let actionRequested = !isNaN(actionState);
 		if (actionState === 0)
 			return action(app);
 

@@ -6,15 +6,15 @@ class MainView extends TestView
 {
 	async parseContent()
 	{
-		var widgetsElem = await this.queryAll('.content_wrap .widget');
+		let widgetsElem = await this.queryAll('.content_wrap .widget');
 		if (!widgetsElem)
 			throw new Error('Fail to parse main view widgets');
 
-		var res = {};
+		let res = {};
 		res.widgets = [];
-		for(var i = 0; i < widgetsElem.length; i++)
+		for(let i = 0; i < widgetsElem.length; i++)
 		{
-			var widget = { elem : widgetsElem[i],
+			let widget = { elem : widgetsElem[i],
 							titleElem : await this.query(widgetsElem[i], '.widget_title'),
 							linkElem : await this.query(widgetsElem[i], '.widget_title > a'),
 							textElem : await this.query(widgetsElem[i], '.widget_title span') };
@@ -24,14 +24,14 @@ class MainView extends TestView
 			if (widget.textElem)
 				widget.title = await this.prop(widget.textElem, 'innerText');
 
-			var tiles = await this.parseTiles(await this.query(widget.elem, '.tiles'));
+			let tiles = await this.parseTiles(await this.query(widget.elem, '.tiles'));
 			if (tiles)
 				widget.tiles = tiles;
 			tiles = await this.parseInfoTiles(await this.query(widget.elem, '.info_tiles'));
 			if (tiles)
 				widget.infoTiles = tiles;
 
-			var transactions = await this.parseTransactionsList(await this.query(widget.elem, '.trans_list'));
+			let transactions = await this.parseTransactionsList(await this.query(widget.elem, '.trans_list'));
 			if (transactions)
 				widget.transList = transactions;
 
@@ -47,7 +47,7 @@ class MainView extends TestView
 	 	if (!this.content.widgets || !this.content.widgets[this.app.config.AccountsWidgetPos])
 			throw new Error('Accounts widget not found');
 
-		var widget = this.content.widgets[this.app.config.AccountsWidgetPos];
+		let widget = this.content.widgets[this.app.config.AccountsWidgetPos];
 		if (widget.title != 'Accounts')
 			throw new Error('Wrong widget');
 
@@ -60,15 +60,15 @@ class MainView extends TestView
 		if (!this.content.widgets || !this.content.widgets[this.app.config.AccountsWidgetPos])
 			throw new Error('Wrong state of main view');
 
-		var accWidget = this.content.widgets[this.app.config.AccountsWidgetPos];
+		let accWidget = this.content.widgets[this.app.config.AccountsWidgetPos];
 		if (accWidget.title != 'Accounts')
 			throw new Error('Wrong state of accounts widget');
 
 		 if (!accWidget.tiles || accWidget.tiles.items.length <= accNum)
 			throw new Error('Tile ' + accNum + ' not found');
 
-		var tile = accWidget.tiles.items[accNum];
-		var link = tile.linkElem;
+		let tile = accWidget.tiles.items[accNum];
+		let link = tile.linkElem;
 
 		return this.navigation(() => this.click(link));
 	}
@@ -79,7 +79,7 @@ class MainView extends TestView
 		if (!this.content || !this.content.widgets || this.content.widgets.length != this.app.config.widgetsCount)
 			throw new Error('Fail to parse main view widgets');
 
-		var widget = this.content.widgets[this.app.config.LatestWidgetPos];
+		let widget = this.content.widgets[this.app.config.LatestWidgetPos];
 		if (widget.title != 'Transactions')
 			throw new Error('Wrong widget');
 
@@ -92,7 +92,7 @@ class MainView extends TestView
 		if (!this.content || !this.content.widgets || this.content.widgets.length != this.app.config.widgetsCount)
 			throw new Error('Fail to parse main view widgets');
 
-		var widget = this.content.widgets[this.app.config.PersonsWidgetPos];
+		let widget = this.content.widgets[this.app.config.PersonsWidgetPos];
 		if (widget.title != 'Persons')
 			throw new Error('Wrong widget');
 
@@ -105,7 +105,7 @@ class MainView extends TestView
 		if (!this.content || !this.content.widgets || this.content.widgets.length != this.app.config.widgetsCount)
 			throw new Error('Fail to parse main view widgets');
 
-		var widget = this.content.widgets[this.app.config.StatisticsWidgetPos];
+		let widget = this.content.widgets[this.app.config.StatisticsWidgetPos];
 		if (widget.title != 'Statistics')
 			throw new Error('Wrong widget');
 

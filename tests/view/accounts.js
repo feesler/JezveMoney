@@ -6,7 +6,7 @@ class AccountsView extends TestView
 {
 	async parseContent()
 	{
-		var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
+		let res = { titleEl : await this.query('.content_wrap > .heading > h1'),
 	 				addBtn : await this.parseIconLink(await this.query('#add_btn')),
 					toolbar : {
 						elem : await this.query('#toolbar'),
@@ -67,7 +67,7 @@ class AccountsView extends TestView
 
 			await this.performAction(() => this.content.tiles.items[acc_num].click());
 
-			var editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
+			let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
 			if (ind == 0 && !editIsVisible)
 				throw new Error('Edit button is not visible');
 			else if (ind > 0 && editIsVisible)

@@ -7,9 +7,9 @@ class ProfileView extends TestView
 {
 	async parseContent()
 	{
-		var res = {};
+		let res = {};
 
-		var blocks = await this.queryAll('.content_wrap > .profile_block');
+		let blocks = await this.queryAll('.content_wrap > .profile_block');
 		if (blocks.length != 4)
 			throw new Error('Wrong profile view structure');
 
@@ -23,7 +23,7 @@ class ProfileView extends TestView
 		res.login = res.loginElem.innerText;
 		res.name = res.nameElem.innerText;
 
-		var buttons = await this.queryAll(blocks[3], 'input[type="button"]');
+		let buttons = await this.queryAll(blocks[3], 'input[type="button"]');
 		if (!buttons || buttons.length != 3)
 			throw new Error('Wrong profile view structure');
 		res.resetBtn = buttons[0];

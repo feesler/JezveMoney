@@ -4,17 +4,9 @@ import { TransactionView } from '../transaction.js';
 // Create or update transfer transaction view class
 class DebtTransactionView extends TransactionView
 {
-	constructor(...args)
-	{
-		super(...args);
-
-		this.expectedState = {};
-	}
-
-
 	async parseOperation(el)
 	{
-		var res = { elem : el };
+		let res = { elem : el };
 
 		if (!res.elem)
 			return null;
@@ -30,7 +22,7 @@ class DebtTransactionView extends TransactionView
 
 	async buildModel(cont)
 	{
-		var res = {};
+		let res = {};
 
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
@@ -54,12 +46,12 @@ class DebtTransactionView extends TransactionView
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
-		var personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
+		let personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
 		res.personAccount = this.getPersonAccount(res.person, personAccountCurr);
 		if (!res.personAccount)
 			res.personAccount = { balance : 0, curr_id : personAccountCurr };
 
-		var isSelectAccountVisible = !!(cont.selaccount && await this.isVisible(cont.selaccount.elem));
+		let isSelectAccountVisible = !!(cont.selaccount && await this.isVisible(cont.selaccount.elem));
 
 		res.noAccount = isSelectAccountVisible;
 
@@ -109,10 +101,10 @@ class DebtTransactionView extends TransactionView
 		res.exchRate = cont.exchange_row.value;
 		this.updateExch(res);
 
-		var isSrcAmountRowVisible = !!(cont.src_amount_row && await this.isVisible(cont.src_amount_row.elem));
-		var isSrcResBalRowVisible = !!(cont.result_balance_row && await this.isVisible(cont.result_balance_row.elem));
-		var isDestResBalRowVisible = !!(cont.result_balance_dest_row && await this.isVisible(cont.result_balance_dest_row.elem));
-		var isExchRowVisible = !!(cont.exchange_row && await this.isVisible(cont.exchange_row.elem));
+		let isSrcAmountRowVisible = !!(cont.src_amount_row && await this.isVisible(cont.src_amount_row.elem));
+		let isSrcResBalRowVisible = !!(cont.result_balance_row && await this.isVisible(cont.result_balance_row.elem));
+		let isDestResBalRowVisible = !!(cont.result_balance_dest_row && await this.isVisible(cont.result_balance_dest_row.elem));
+		let isExchRowVisible = !!(cont.exchange_row && await this.isVisible(cont.exchange_row.elem));
 
 		res.isDiffCurr = false;
 
@@ -152,7 +144,7 @@ class DebtTransactionView extends TransactionView
 	{
 		model.srcAmount = val;
 
-		var newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 		if (model.fSrcAmount != newValue || model.srcResBal == '')
 		{
 			model.fSrcAmount = newValue;
@@ -173,7 +165,7 @@ class DebtTransactionView extends TransactionView
 
 					if (model.lastAccount_id)
 					{
-						var lastAcc = await this.getAccount(model.lastAccount_id);
+						let lastAcc = await this.getAccount(model.lastAccount_id);
 						if (!lastAcc)
 							throw new Error('Last account not found');
 
@@ -197,7 +189,7 @@ class DebtTransactionView extends TransactionView
 	{
 		model.destAmount = val;
 
-		var newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
+		let newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
 		if (model.fDestAmount != newValue || model.destResBal == '')
 		{
 			model.fDestAmount = newValue;
@@ -214,7 +206,7 @@ class DebtTransactionView extends TransactionView
 
 					if (model.lastAccount_id)
 					{
-						var lastAcc = await this.getAccount(model.lastAccount_id);
+						let lastAcc = await this.getAccount(model.lastAccount_id);
 						if (!lastAcc)
 							throw new Error('Last account not found');
 
@@ -238,14 +230,11 @@ class DebtTransactionView extends TransactionView
 
 	setExpectedState(state_id)
 	{
-		var res = {};
-
-		var newState = parseInt(state_id);
-
+		let newState = parseInt(state_id);
 		if (isNaN(newState) || newState < 0 || newState > 9)
 			throw new Error('Wrong state specified');
 
-		var res = { model : { state : newState },
+		let res = { model : { state : newState },
 					visibility : { person : true, account : { tile : !this.model.noAccount },
 									selaccount : this.model.noAccount, noacc_btn : !this.model.noAccount,
 									dest_amount_row : false, dest_amount_left : false,
@@ -366,7 +355,7 @@ class DebtTransactionView extends TransactionView
 	{
 		this.model.person = await this.getPerson(val);
 
-		var personAccCurr_id = (this.model.debtType) ? this.model.srcCurr.id : this.model.destCurr.id;
+		let personAccCurr_id = (this.model.debtType) ? this.model.srcCurr.id : this.model.destCurr.id;
 		this.model.personAccount = this.getPersonAccount(this.model.person, personAccCurr_id);
 		if (!this.model.personAccount)
 			this.model.personAccount = { balance : 0, curr_id : personAccCurr_id };
@@ -402,7 +391,7 @@ class DebtTransactionView extends TransactionView
 
 	async toggleDebtType()
 	{
-		var newValue = !this.model.debtType;
+		let newValue = !this.model.debtType;
 
 		if (newValue)
 		{
@@ -421,7 +410,7 @@ class DebtTransactionView extends TransactionView
 		}
 		else if (this.model.noAccount && !newValue)
 		{
-			var lastAcc = await this.getAccount(this.model.lastAccount_id);
+			let lastAcc = await this.getAccount(this.model.lastAccount_id);
 			if (!lastAcc)
 				throw new Error('Last account not found');
 
@@ -435,7 +424,7 @@ class DebtTransactionView extends TransactionView
 		}
 		else if (this.model.noAccount && newValue)
 		{
-			var lastAcc = await this.getAccount(this.model.lastAccount_id);
+			let lastAcc = await this.getAccount(this.model.lastAccount_id);
 			if (!lastAcc)
 				throw new Error('Last account not found');
 
@@ -485,8 +474,8 @@ class DebtTransactionView extends TransactionView
 
 	async inputSrcAmount(val)
 	{
-		var fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
-		var valueChanged = (this.model.fSrcAmount != fNewValue);
+		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
+		let valueChanged = (this.model.fSrcAmount != fNewValue);
 
 		await this.setSrcAmount(this.model, val);
 
@@ -503,7 +492,7 @@ class DebtTransactionView extends TransactionView
 
 	async inputResBalance(val)
 	{
-		var fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 
 		this.model.srcResBal = val;
 
@@ -512,7 +501,7 @@ class DebtTransactionView extends TransactionView
 			this.model.fSrcResBal = fNewValue;
 			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
 
-			var newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
+			let newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
 
 			this.model.srcAmount = newSrcAmount;
 			this.model.fSrcAmount = this.app.isValidValue(newSrcAmount) ? this.app.normalize(newSrcAmount) : newSrcAmount;
@@ -528,7 +517,7 @@ class DebtTransactionView extends TransactionView
 
 	async inputDestResBalance(val)
 	{
-		var fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 
 		this.model.destResBal = val;
 
@@ -537,7 +526,7 @@ class DebtTransactionView extends TransactionView
 			this.model.fDestResBal = fNewValue;
 			this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
 
-			var newDestAmount = this.app.normalize(fNewValue - this.model.destAccount.balance);
+			let newDestAmount = this.app.normalize(fNewValue - this.model.destAccount.balance);
 
 			this.model.destAmount = newDestAmount;
 			this.model.fDestAmount = this.app.isValidValue(newDestAmount) ? this.app.normalize(newDestAmount) : newDestAmount;
@@ -648,7 +637,7 @@ class DebtTransactionView extends TransactionView
 
 	async changeAccount(account_id)
 	{
-		var newAcc = await this.getAccount(account_id);
+		let newAcc = await this.getAccount(account_id);
 
 		if (!this.model.account || !newAcc || newAcc.id == this.model.account.id)
 			return;
@@ -657,7 +646,7 @@ class DebtTransactionView extends TransactionView
 
 		if (this.model.personAccount.curr_id != this.model.account.curr_id)
 		{
-			var person_id = this.model.person.id;
+			let person_id = this.model.person.id;
 			this.model.personAccount = this.getPersonAccount(this.model.person, this.model.account.curr_id);
 			if (!this.model.personAccount)
 				this.model.personAccount = { balance : 0, curr_id : this.model.account.curr_id };
@@ -679,7 +668,7 @@ class DebtTransactionView extends TransactionView
 		}
 
 		this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
-		var newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+		let newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 		if (this.model.fSrcResBal != newSrcResBal)
 		{
 			this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;
@@ -687,7 +676,7 @@ class DebtTransactionView extends TransactionView
 		this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
 
 		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
-		var newDestResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
+		let newDestResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
 		if (this.model.fDestResBal != newDestResBal)
 		{
 			this.model.destResBal = this.model.fDestResBal = newDestResBal;

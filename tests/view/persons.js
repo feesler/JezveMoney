@@ -6,7 +6,7 @@ class PersonsView extends TestView
 {
 	async parseContent()
 	{
-		var res = { titleEl : await this.query('.content_wrap > .heading > h1'),
+		let res = { titleEl : await this.query('.content_wrap > .heading > h1'),
 	 				addBtn : await this.parseIconLink(await this.query('#add_btn')),
 					toolbar : {
 						elem : await this.query('#toolbar'),

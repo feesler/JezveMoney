@@ -4,13 +4,21 @@ import { TestView } from './testview.js';
 // Create or update transaction view class
 class TransactionView extends TestView
 {
+	constructor(...args)
+	{
+		super(...args);
+
+		this.expectedState = {};
+	}
+
+
 	async parseTileRightItem(elem)
 	{
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 		res.titleElem = await this.query(elem, ':scope > *');
 		if (!res.titleElem)
 			throw new Error('Title element not found');
@@ -38,7 +46,7 @@ class TransactionView extends TestView
 		if (!elem)
 			return null;
 
-		var res = { elem : elem };
+		let res = { elem : elem };
 
 		let lbl = await this.query(elem, 'div > label');
 		if (!lbl)
@@ -66,10 +74,10 @@ class TransactionView extends TestView
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 
-		var iconLinkElem = await this.query(elem, '.iconlink');
+		let iconLinkElem = await this.query(elem, '.iconlink');
 
 		res.iconLink = await this.parseIconLink(iconLinkElem);
 		if (!res.iconLink)
@@ -94,7 +102,7 @@ class TransactionView extends TestView
 
 	async parseContent()
 	{
-		var res = {};
+		let res = {};
 
 		res.isUpdate = await this.global('edit_mode');
 
@@ -217,7 +225,7 @@ class TransactionView extends TestView
 	async getNextAccount(acc_id)
 	{
 		let data = await this.global('accounts');
-		var pos;
+		let pos;
 
 		if (!this.app.isArray(data) || data.length < 2 || !acc_id)
 			return -1;
@@ -261,7 +269,7 @@ class TransactionView extends TestView
 	// Return account of person in specified currency
 	getPersonAccount(person, curr_id)
 	{
-		var resAcc = null;
+		let resAcc = null;
 
 		if (!person || !person.accounts || !curr_id)
 			return resAcc;
@@ -269,7 +277,7 @@ class TransactionView extends TestView
 		// check person have account in specified currency
 		person.accounts.some(function(acc)
 		{
-			var cond = (acc.curr_id == curr_id);
+			let cond = (acc.curr_id == curr_id);
 
 			if (cond)
 				resAcc = acc;
@@ -306,7 +314,7 @@ class TransactionView extends TestView
 		model.exchSign = model.destCurr.sign + '/' + model.srcCurr.sign;
 		model.backExchSign = model.srcCurr.sign + '/' + model.destCurr.sign;
 
-		var exchText = model.exchSign;
+		let exchText = model.exchSign;
 
 		if (this.app.isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
 		{

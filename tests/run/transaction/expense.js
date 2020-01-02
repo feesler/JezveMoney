@@ -101,16 +101,16 @@ var runExpense = (function()
 		// Obtain real source amount from props:
 		// In case of expense with different currency use source amount value
 		// In case of expense with the same currency copy destination amount value
-		var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
-		var expBalance = srcAcc.balance - app.normalize(sa);
-		var fmtBal = app.formatCurrency(expBalance, srcAcc.curr_id, app.currencies);
+		let sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
+		let expBalance = srcAcc.balance - app.normalize(sa);
+		let fmtBal = app.formatCurrency(expBalance, srcAcc.curr_id, app.currencies);
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
 		accWidget.tiles.items[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 		// Transactions widget changes
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
 		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
@@ -120,14 +120,14 @@ var runExpense = (function()
 		}
 
 
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
 		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 
 		// Read updated list of transactions
 		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
@@ -228,7 +228,7 @@ var runExpense = (function()
 
 		await app.goToMainView();
 
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
 		let updTransInd = expTransList.findItem(trans_id);
@@ -239,8 +239,8 @@ var runExpense = (function()
 		}
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
-		var expBalance, fmtBal;
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
+		let expBalance, fmtBal;
 		// Chech if account was changed we need to update both
 		if (updSrcAccPos != origSrcAccPos)
 		{
@@ -256,13 +256,13 @@ var runExpense = (function()
 		}
 		else		// account not changed
 		{
-			var expBalance = origSrcBalance + origSrcAmount - app.normalize(updSrcAmount);
-			var fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id, app.currencies);
+			let expBalance = origSrcBalance + origSrcAmount - app.normalize(updSrcAmount);
+			let fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
@@ -285,7 +285,7 @@ var runExpense = (function()
 
 			if (trObj)
 			{
-				let srcAcc = app.idSearch(app.accounts, view.model.srcAccount.id);
+				let srcAcc = app.idSearch(app.accountTiles, view.model.srcAccount.id);
 
 				let initialBal = app.normalize(view.model.fSrcResBal + trObj.srcAmount);
 				view.model.srcAccount.fmtBalance = view.model.srcCurr.formatValue(initialBal);
@@ -295,7 +295,7 @@ var runExpense = (function()
 		}, view);
 
 		actionState = parseInt(actionState);
-		var actionRequested = !isNaN(actionState);
+		let actionRequested = !isNaN(actionState);
 		if (actionState === 0)
 			return action(app);
 

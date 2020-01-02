@@ -100,34 +100,33 @@ var runIncome = (function()
 		// Obtain real destination amount from props:
 		// In case of income with different currency use destination amount value
 		// In case of income with the same currency copy source amount value
-		var da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
-		var expBalance = destAcc.balance + app.normalize(da);
-		var fmtBal = app.formatCurrency(expBalance, destAcc.curr_id, app.currencies);
+		let da = ('srcCurr' in params && 'destAmount' in params) ? params.destAmount : params.srcAmount;
+		let expBalance = destAcc.balance + app.normalize(da);
+		let fmtBal = app.formatCurrency(expBalance, destAcc.curr_id, app.currencies);
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
 		accWidget.tiles.items[destAccPos] = { balance : fmtBal, name : destAcc.name };
 
 		// Transactions widget changes
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
-		let posInWidget = expTransList.list.length - expTransList.list[newTransInd].pos;
-		if (posInWidget >= 0 && posInWidget < app.config.latestTransactions)
+		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
 		{
 			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[newTransInd]);
-			transWidget.transList.items[posInWidget] = listItem;
+			transWidget.transList.items[newTransInd] = listItem;
 		}
 
 
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
 		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 
 		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
 
@@ -226,7 +225,7 @@ var runIncome = (function()
 		// Transactions list changes
 		await app.goToMainView();
 
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
 		let updTransInd = expTransList.findItem(trans_id);
@@ -239,8 +238,8 @@ var runIncome = (function()
 		// Step 4: Check updates of affected accounts
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
-		var expBalance, fmtBal;
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
+		let expBalance, fmtBal;
 		// Chech if account was changed we need to update both
 		if (origDestAccPos != updDestAccPos)
 		{
@@ -256,13 +255,13 @@ var runIncome = (function()
 		}
 		else		// account not changed
 		{
-			var expBalance = origDestBalance - origDestAmount + app.normalize(updDestAmount);
-			var fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id, app.currencies);
+			expBalance = origDestBalance - origDestAmount + app.normalize(updDestAmount);
+			fmtBal = app.formatCurrency(expBalance, updDestAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updDestAccPos] = { balance : fmtBal, name : updDestAcc.name };
 		}
 
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
@@ -284,7 +283,7 @@ var runIncome = (function()
 		await test('Initial state of new income view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);
-		var actionRequested = !isNaN(actionState);
+		let actionRequested = !isNaN(actionState);
 		if (actionState === 0)
 			return action(app);
 

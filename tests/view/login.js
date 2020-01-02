@@ -6,7 +6,7 @@ class LoginView extends TestView
 {
 	async parseContent()
 	{
-		var res = { loginInp : await this.query('#login'),
+		let res = { loginInp : await this.query('#login'),
 	 				passwordInp : await this.query('#password'),
 					submitBtn : await this.query('.login_controls .btn.ok_btn'),
 					registerLink : await this.query('.login_controls .alter_link > a') };

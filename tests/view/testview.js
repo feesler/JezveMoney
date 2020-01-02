@@ -27,7 +27,7 @@ class TestView
 
 	isUserLoggedIn()
 	{
-		var loggedOutLocations = ['login', 'register'];
+		const loggedOutLocations = ['login', 'register'];
 
 		return loggedOutLocations.every((item) => this.location.indexOf('/' + item) === -1);
 	}
@@ -35,8 +35,8 @@ class TestView
 
 	async parseHeader()
 	{
-		var el;
-		var res = {};
+		let el;
+		let res = {};
 
 		res.elem = await this.query('.page > .page_wrapper > .header');
 		if (!res.elem)
@@ -68,14 +68,14 @@ class TestView
 				throw new Error('Menu element not found');
 
 			res.user.menuItems = [];
-			var menuLinks = await this.queryAll(res.user.menuEl, 'ul > li > a');
-			for(var i = 0; i < menuLinks.length; i++)
+			let menuLinks = await this.queryAll(res.user.menuEl, 'ul > li > a');
+			for(let i = 0; i < menuLinks.length; i++)
 			{
 				el = menuLinks[i];
 				res.user.menuItems.push({ elem : el, link : await this.prop(el, 'href'), text : await this.prop(el, 'innerText') });
 			}
 
-			var itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
+			let itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
 
 			res.user.profileBtn = res.user.menuItems[itemShift].elem;
 			res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
@@ -91,7 +91,7 @@ class TestView
 		if (!popupContent)
 			return null;
 
-		var res = { contentElem : popupContent };
+		let res = { contentElem : popupContent };
 
 		res.success = await this.hasClass(res.contentElem, 'msg_success') &&
 						!(await this.hasClass(res.contentElem, 'msg_error'));
@@ -116,7 +116,7 @@ class TestView
 		if (typeof id !== 'string')
 			return id;
 
-		var pos = id.indexOf('_');
+		let pos = id.indexOf('_');
 		return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
 	}
 
@@ -126,8 +126,8 @@ class TestView
 		if (!tileEl || !await this.hasClass(tileEl, 'tile'))
 			throw new Error('Wrong tile structure');
 
-		var self = this;
-		var tileObj = { elem : tileEl, linkElem : await this.query(tileEl, ':scope > *'),
+		let self = this;
+		let tileObj = { elem : tileEl, linkElem : await this.query(tileEl, ':scope > *'),
 						balanceEL : await this.query(tileEl, '.acc_bal'),
 						nameEL : await this.query(tileEl, '.acc_name') };
 
@@ -164,7 +164,7 @@ class TestView
 		if (!tileEl || !await this.hasClass(tileEl, 'info_tile'))
 			throw new Error('Wrong info tile structure');
 
-		var tileObj = { elem : tileEl,
+		let tileObj = { elem : tileEl,
 						titleEl : await this.query(tileEl, '.info_title'),
 						subtitleEl : await this.query(tileEl, '.info_subtitle') };
 
@@ -181,15 +181,15 @@ class TestView
 		if (!tilesEl)
 			return null;
 
-		var res = { elem : tilesEl, items : [] };
+		let res = { elem : tilesEl, items : [] };
 		let children = await this.queryAll(tilesEl, ':scope > *');
 		if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
 			return res;
 
-		var callback = parseCallback || this.parseTile;
-		for(var i = 0; i < children.length; i++)
+		let callback = parseCallback || this.parseTile;
+		for(let i = 0; i < children.length; i++)
 		{
-			var tileObj = await callback.call(this, children[i]);
+			let tileObj = await callback.call(this, children[i]);
 			if (!tileObj)
 				throw new Error('Fail to parse tile');
 
@@ -216,8 +216,8 @@ class TestView
 		if (!listEl)
 			return null;
 
-		var self = this;
-		var res = { elem : listEl, items : [] };
+		let self = this;
+		let res = { elem : listEl, items : [] };
 
 		let children = await this.queryAll(listEl, ':scope > *');
 		if (!children || !children.length || (children.length == 1 && await this.prop(children[0], 'tagName') == 'SPAN'))
@@ -226,12 +226,12 @@ class TestView
 		res.details = (await this.prop(listEl, 'tagName') == 'TABLE');
 		let listItems = await this.queryAll(listEl, (res.details) ? 'tr' : '.trlist_item_wrap > div');
 
-		for(var i = 0; i < listItems.length; i++)
+		for(let i = 0; i < listItems.length; i++)
 		{
-			var li = listItems[i];
-			var itemObj = { id : this.parseId(await this.prop(li, 'id')), elem : li };
+			let li = listItems[i];
+			let itemObj = { id : this.parseId(await this.prop(li, 'id')), elem : li };
 
-			var elem = await this.query(li, '.tritem_acc_name > span');
+			let elem = await this.query(li, '.tritem_acc_name > span');
 			if (!elem)
 				throw new Error('Account title not found');
 			itemObj.accountTitle = await this.prop(elem, 'innerText');
@@ -267,8 +267,8 @@ class TestView
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 		if (!res.elem || (!await this.hasClass(res.elem, 'dd_container') && !await this.hasClass(res.elem, 'dd_attached')))
 			throw new Error('Wrong drop down element');
 
@@ -307,7 +307,7 @@ class TestView
 					if (await this.prop(option, 'disabled'))
 						continue;
 
-					var itemObj = { id : this.parseId(await this.prop(option, 'value')), text : await this.prop(option, 'innerText'), elem : option };
+					let itemObj = { id : this.parseId(await this.prop(option, 'value')), text : await this.prop(option, 'innerText'), elem : option };
 
 					res.items.push(itemObj);
 				}
@@ -317,12 +317,12 @@ class TestView
 
 			if (res.listContainer)
 			{
-				var listItems = await this.queryAll(res.elem, '.ddlist li > div');
+				let listItems = await this.queryAll(res.elem, '.ddlist li > div');
 				res.items = [];
-				for(var i = 0; i < listItems.length; i++)
+				for(let i = 0; i < listItems.length; i++)
 				{
-					var li = listItems[i];
-					var itemObj = { id : this.parseId(await this.prop(li, 'id')), text : await this.prop(li, 'innerText'), elem : li };
+					let li = listItems[i];
+					let itemObj = { id : this.parseId(await this.prop(li, 'id')), text : await this.prop(li, 'innerText'), elem : li };
 
 					res.items.push(itemObj);
 				}
@@ -333,7 +333,7 @@ class TestView
 		{
 			if (this.isMobile)
 			{
-				var option = self.app.idSearch(this.items, val);
+				let option = self.app.idSearch(this.items, val);
 				if (!option)
 					throw new Error('Option item not found');
 
@@ -343,7 +343,7 @@ class TestView
 			else
 			{
 				await self.click(this.selectBtn);
-				var li = self.app.idSearch(this.items, val);
+				let li = self.app.idSearch(this.items, val);
 				if (!li)
 					throw new Error('List item not found');
 				return self.click(li.elem);
@@ -356,19 +356,19 @@ class TestView
 
 	getTransactionType(str)
 	{
-		var strToType = { 'ALL' : 0, 'EXPENSE' : this.app.EXPENSE, 'INCOME' : this.app.INCOME, 'TRANSFER' : this.app.TRANSFER, 'DEBT' : this.app.DEBT };
+		let strToType = { 'ALL' : 0, 'EXPENSE' : this.app.EXPENSE, 'INCOME' : this.app.INCOME, 'TRANSFER' : this.app.TRANSFER, 'DEBT' : this.app.DEBT };
 
 		if (!str)
 			return null;
 
-		var key = str.toUpperCase();
+		let key = str.toUpperCase();
 		return (strToType[key] !== undefined) ? strToType[key] : null;
 	}
 
 
 	getTransactionTypeStr(type)
 	{
-		var typeToStr = { 1 : 'EXPENSE', 2 : 'INCOME', 3 : 'TRANSFER', 4 : 'DEBT' };
+		let typeToStr = { 1 : 'EXPENSE', 2 : 'INCOME', 3 : 'TRANSFER', 4 : 'DEBT' };
 
 		if (!type)
 			return null;
@@ -379,11 +379,11 @@ class TestView
 
 	async parseTransactionTypeMenu(elem)
 	{
-		var self = this;
-		var res = { elem : elem, items : [], activeType : null };
+		let self = this;
+		let res = { elem : elem, items : [], activeType : null };
 
-		var menuItems = await this.queryAll(elem, 'span');
-		for(var i = 0; i < menuItems.length; i++)
+		let menuItems = await this.queryAll(elem, 'span');
+		for(let i = 0; i < menuItems.length; i++)
 		{
 			let menuItem = await this.query(menuItems[i], ':scope > *');
 			if (!menuItem)
@@ -391,7 +391,7 @@ class TestView
 			let tagName = await this.prop(menuItem, 'tagName');
 			let itemTitle = await this.prop(menuItem, 'innerText');
 
-			var menuItemObj = { elem : menuItem, text : itemTitle, type : this.getTransactionType(itemTitle) };
+			let menuItemObj = { elem : menuItem, text : itemTitle, type : this.getTransactionType(itemTitle) };
 
 			if (tagName == 'B')
 			{
@@ -423,8 +423,8 @@ class TestView
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 
 		if (!await this.hasClass(elem, 'iconlink'))
 			throw new Error('Wrong icon link');
@@ -460,8 +460,8 @@ class TestView
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 
 		res.labelEl = await this.query(elem, 'label');
 		if (!res.labelEl)
@@ -523,8 +523,8 @@ class TestView
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 
 		res.iconLink = await this.parseIconLink(await this.query(elem, '.iconlink'));
 		if (!res.iconLink)
@@ -608,8 +608,8 @@ class TestView
 		if (!elem)
 			return null;
 
-		var self = this;
-		var res = { elem : elem };
+		let self = this;
+		let res = { elem : elem };
 
 		res.iconLink = await this.parseIconLink(await this.query(elem, '.iconlink'));
 		if (!res.iconLink)
@@ -640,7 +640,7 @@ class TestView
 		if (!elem)
 			return null;
 
-		var res = { elem : elem };
+		let res = { elem : elem };
 
 		res.titleElem = await this.query(elem, '.popup_title');
 		res.title = await this.prop(res.titleElem, 'innerText');
@@ -700,7 +700,7 @@ class TestView
 	//     expected : { control_1 : true, control_2 : { childControl : true, invControl : false }, control_3 : false }
 	async checkVisibility(controls, expected)
 	{
-		var control, expVisible, factVisible, res;
+		let control, expVisible, factVisible, res;
 
 		if (!controls)
 			throw new Error('Wrong parameters');
@@ -709,7 +709,7 @@ class TestView
 		if (typeof expected === 'undefined')
 			return true;
 
-		for(var countrolName in expected)
+		for(let countrolName in expected)
 		{
 			expVisible = expected[countrolName];
 			control = controls[countrolName];
@@ -734,10 +734,10 @@ class TestView
 
 	checkValues(controls)
 	{
-		var res = true;
-		var control, expected, fact;
+		let res = true;
+		let control, expected, fact;
 
-		for(var countrolName in controls)
+		for(let countrolName in controls)
 		{
 			expected = controls[countrolName];
 			control = this.content[countrolName];

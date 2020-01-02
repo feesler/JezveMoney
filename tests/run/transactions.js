@@ -254,7 +254,7 @@ var runTransList = (function()
 		if (newDebts.length)
 			newDebts = await api.transaction.read(newDebts);
 
-		let newTransactions = newExpenses.concat(newIncomes, newTransfers, newDebts);
+		let newTransactions = [].concat(newExpenses, newIncomes, newTransfers, newDebts);
 
 		let allTransactions = transBefore.concat(newTransactions);
 

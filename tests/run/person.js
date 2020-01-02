@@ -7,7 +7,7 @@ var runPersons = (function()
 	{
 		test = app.test;
 
-		var state = { value : { tiles : { items : { length : 0 } } } };
+		let state = { value : { tiles : { items : { length : 0 } } } };
 		await test('Initial persons structure', async () => {}, app.view, state);
 	}
 
@@ -23,7 +23,7 @@ var runPersons = (function()
 		app.personsCache = null;
 		await app.view.createPerson(personName);
 
-		var state = { value : { tiles : { items : { length : app.persons.length + 1 } } } };
+		let state = { value : { tiles : { items : { length : app.persons.length + 1 } } } };
 		state.value.tiles.items[app.persons.length] = { name : personName };
 
 		await test('Create person', async () => {}, app.view, state);
@@ -38,7 +38,7 @@ var runPersons = (function()
 
 		await app.view.goToUpdatePerson(num);
 
-		var state = { visibility : { name : true },
+		let state = { visibility : { name : true },
 	 					values : { name : app.persons[num].name } };
 
 		await test('Update person view state', async () => {}, app.view, state);
@@ -49,7 +49,7 @@ var runPersons = (function()
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 
 		// Check updates in the person tiles
-		var state = { values : { tiles : { items : { length : app.persons.length } } } };
+		state = { values : { tiles : { items : { length : app.persons.length } } } };
 		state.values.tiles.items[num] = { name : personName };
 
 		await test('Update person', async () => {}, app.view, state);
@@ -65,7 +65,7 @@ var runPersons = (function()
 		app.personsCache = null;
 		await app.view.deletePersons(persons);
 
-		var state = { values : { tiles : { items : { length : app.persons.length - persons.length } } } };
+		let state = { values : { tiles : { items : { length : app.persons.length - persons.length } } } };
 
 		await test('Delete persons [' + persons.join() + ']', async () => {}, app.view, state);
 

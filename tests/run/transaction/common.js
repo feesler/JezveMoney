@@ -225,8 +225,8 @@ var runTransactionsCommon = (function()
 		let origPersons = app.beforeDeleteTransaction.persons;
 
 		// Widget changes
-		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
+		var personsWidget = { infoTiles : { items : { length : app.personTiles.length } } };
+		var accWidget = { tiles : { items : { length : app.accountTiles.length } } };
 
 		let affectedAccounts = [];
 		let affectedPersons = [];
@@ -371,8 +371,8 @@ var runTransactionsCommon = (function()
 		app.accountsCache = null;
 		app.personsCache = null;
 
-		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 

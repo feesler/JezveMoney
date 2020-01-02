@@ -9,10 +9,11 @@ import { App } from './main.js';
 
 var Environment = (function()
 {
-	var browserPage = null;
-	var baseURL = null;
-	var results = null;
-	var app = null;
+	let browserPage = null;
+	let baseURL = null;
+	let results = null;
+	let app = null;
+	let reqCookies = {};
 
 
 	function getBaseUrl()
@@ -194,9 +195,6 @@ var Environment = (function()
 	{
 		return elem.evaluate(el => el.onchange());
 	}
-
-
-	var reqCookies = {};
 
 
 	// Split attribute-value string divided by separator

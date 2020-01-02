@@ -5,13 +5,13 @@ import { App } from './main.js';
 
 var Environment = (function()
 {
-	var vdoc = null;
-	var viewframe = null;
-	var restbl = null;
-	var totalRes = null, okRes = null, failRes = null;
-	var baseURL = null;
-	var results = null;
-	var app = null;
+	let vdoc = null;
+	let viewframe = null;
+	let restbl = null;
+	let totalRes = null, okRes = null, failRes = null;
+	let baseURL = null;
+	let results = null;
+	let app = null;
 
 
 	function getBaseUrl()
@@ -176,7 +176,7 @@ var Environment = (function()
 
 	async function selectByValue(selectObj, selValue, selBool)
 	{
-		var i;
+		let i;
 
 		if (!selectObj || !selectObj.options)
 			return -1;
@@ -216,10 +216,10 @@ var Environment = (function()
 		}
 		else if (document.createEvent)
 		{
-			var evt = document.createEvent("MouseEvents");
+			let evt = document.createEvent("MouseEvents");
 			evt.initMouseEvent("click", true, true, viewframe.contentWindow,
 			0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			var allowDefault = elemObj.dispatchEvent(evt);
+			let allowDefault = elemObj.dispatchEvent(evt);
 		}
 	}
 
@@ -265,9 +265,9 @@ var Environment = (function()
 
 	async function addResult(descr, res)
 	{
-		var err = null;
-		var resStr;
-		var message = '';
+		let err = null;
+		let resStr;
+		let message = '';
 
 		if (descr instanceof Error)
 		{
@@ -304,7 +304,7 @@ var Environment = (function()
 
 	async function navigation(action)
 	{
-		var navPromise = new Promise(function(resolve, reject)
+		let navPromise = new Promise(function(resolve, reject)
 		{
 			viewframe.onload = async function()
 			{
@@ -340,7 +340,7 @@ var Environment = (function()
 		if (!app.config || !app.config.url)
 			throw new Error('Invalid config: test URL not found');
 
-		var startbtn = ge('startbtn');
+		let startbtn = ge('startbtn');
 		totalRes = ge('totalRes');
 		okRes = ge('okRes');
 		failRes = ge('failRes');

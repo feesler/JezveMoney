@@ -6,7 +6,7 @@ class PersonView extends TestView
 {
 	async parseContent()
 	{
-		var res = {};
+		let res = {};
 
 		res.headingElem = await this.query('.heading > h1');
 		if (!res.headingElem)

@@ -101,7 +101,7 @@ var runTransactionAPI = (function()
 
 	function getTypeStr(type)
 	{
-		var typeToStr = { 1 : 'expense', 2 : 'income', 3 : 'transfer', 4 : 'debt' };
+		const typeToStr = { 1 : 'expense', 2 : 'income', 3 : 'transfer', 4 : 'debt' };
 
 		if (!type || !(type in typeToStr))
 			throw new Error('Unknown transaction type ' + type);

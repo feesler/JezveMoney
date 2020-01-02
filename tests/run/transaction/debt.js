@@ -164,8 +164,8 @@ var runDebt = (function()
 			comment });
 
 
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
-		var sa, da;
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let sa, da;
 
 		sa = da = app.normalize(srcAmount);
 
@@ -185,7 +185,7 @@ var runDebt = (function()
 		let debtAccounts = app.filterPersonDebts(app, person.accounts);
 		let debtSubtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
-		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
+		let personsWidget = { infoTiles : { items : { length : app.personTiles.length } } };
 		personsWidget.infoTiles.items[personPos] = { title : person.name, subtitle : debtSubtitle };
 
 		state.values.widgets[app.config.PersonsWidgetPos] = personsWidget;
@@ -193,15 +193,15 @@ var runDebt = (function()
 		// Accounts widget changes
 		if (acc)
 		{
-			var fmtAccBal = app.formatCurrency(acc.balance, acc.curr_id, app.currencies);
-			var accWidget = { tiles : { items : { length : app.accounts.length } } };
+			let fmtAccBal = app.formatCurrency(acc.balance, acc.curr_id, app.currencies);
+			let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
 			accWidget.tiles.items[accPos] = { balance : fmtAccBal, name : acc.name };
 
 			state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		}
 
 		// Transactions widget changes
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
 		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
@@ -214,8 +214,8 @@ var runDebt = (function()
 
 		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 
 		// Read updated list of transactions
 		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
@@ -232,7 +232,7 @@ var runDebt = (function()
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
-		view.setBlock('Update debt [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+		app.view.setBlock('Update debt [' + pos + '] (' + titleParams.join(', ') + ')', 2);
 
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)
@@ -247,46 +247,44 @@ var runDebt = (function()
 		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.DEBT);
-		view = app.view;
 
 		// Step
-		app.beforeUpdateTransaction = { trCount : view.content.transList.items.length };
+		app.beforeUpdateTransaction = { trCount : expTransList.list.length };
 
-		let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
+		let trObj = await app.view.getTransactionObject(app.view.content.transList.items[pos].id);
 		if (!trObj)
 			throw new Error('Transaction not found');
 
 		app.beforeUpdateTransaction.trObj = trObj;
 
 		await app.view.goToUpdateTransaction(pos);
-		view = app.view;
 
 		// Step
 		let expState;
-		if (view.model.noAccount)
-			expState = (view.model.debtType) ? 6 : 7;
+		if (app.view.model.noAccount)
+			expState = (app.view.model.debtType) ? 6 : 7;
 		else
-			expState = (view.model.debtType) ? 0 : 3;
+			expState = (app.view.model.debtType) ? 0 : 3;
 
-		await test('Initial state of update debt view', async () => view.setExpectedState(expState), view);
+		await test('Initial state of update debt view', async () => app.view.setExpectedState(expState), app.view);
 
 		app.setParam(app.beforeUpdateTransaction,
-					{ id : view.model.id,
-						person : view.model.person,
-						personPos : await view.getPersonPos(view.model.person.id),
-						personAccount : view.getPersonAccount(view.model.person, view.model.src_curr_id),
-						noAccount : view.model.noAccount,
-						acc : view.model.noAccount ? view.model.account : null,
-						accPos : view.model.noAccount ? await view.getAccountPos(view.model.account.id) : -1,
-						srcAcc : view.model.srcAccount,
-						destAcc : view.model.destAccount,
-						debtType : view.model.debtType,
-						srcBalance : view.model.fSrcResBal,
-						destBalance : view.model.fDestResBal,
-						srcAmount : view.model.fSrcAmount,
-						destAmount : view.model.fDestAmount,
-						date : view.model.date,
-						comment : view.model.comment});
+					{ id : app.view.model.id,
+						person : app.view.model.person,
+						personPos : await app.view.getPersonPos(app.view.model.person.id),
+						personAccount : app.view.getPersonAccount(app.view.model.person, app.view.model.src_curr_id),
+						noAccount : app.view.model.noAccount,
+						acc : app.view.model.noAccount ? app.view.model.account : null,
+						accPos : app.view.model.noAccount ? await app.view.getAccountPos(app.view.model.account.id) : -1,
+						srcAcc : app.view.model.srcAccount,
+						destAcc : app.view.model.destAccount,
+						debtType : app.view.model.debtType,
+						srcBalance : app.view.model.fSrcResBal,
+						destBalance : app.view.model.fDestResBal,
+						srcAmount : app.view.model.fSrcAmount,
+						destAmount : app.view.model.fDestAmount,
+						date : app.view.model.date,
+						comment : app.view.model.comment});
 
 		await submitDebtTransaction(app, params);
 
@@ -375,15 +373,15 @@ var runDebt = (function()
 
 		await app.goToMainView();
 
-		var transWidget = { title : 'Transactions',
+		let transWidget = { title : 'Transactions',
 							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 		// Step
-		var state = { values : { widgets : { length : app.config.widgetsCount } } };
-		var sa, da;
+		let state = { values : { widgets : { length : app.config.widgetsCount } } };
+		let sa, da;
 
 		sa = da = app.normalize(origSrcAmount);
 
-		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
+		let personsWidget = { infoTiles : { items : { length : app.personTiles.length } } };
 
 		// Cancel transaction
 		if (origDebtType)
@@ -429,15 +427,15 @@ var runDebt = (function()
 		state.values.widgets[app.config.PersonsWidgetPos] = personsWidget;
 
 		// Accounts widget changes
-		var accWidget = { tiles : { items : { length : app.accounts.length } } };
+		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
 		if (origAcc && !origNoAccount)
 		{
-			var fmtAccBal = app.formatCurrency(origAcc.balance, origAcc.curr_id, app.currencies);
+			let fmtAccBal = app.formatCurrency(origAcc.balance, origAcc.curr_id, app.currencies);
 			accWidget.tiles.items[origAccPos] = { balance : fmtAccBal, name : origAcc.name };
 		}
 		if (updAcc && !updNoAccount)
 		{
-			var fmtAccBal = app.formatCurrency(updAcc.balance, updAcc.curr_id, app.currencies);
+			let fmtAccBal = app.formatCurrency(updAcc.balance, updAcc.curr_id, app.currencies);
 			accWidget.tiles.items[updAccPos] = { balance : fmtAccBal, name : updAcc.name };
 		}
 
@@ -446,8 +444,8 @@ var runDebt = (function()
 
 		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 
 		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
 	}
@@ -462,7 +460,7 @@ var runDebt = (function()
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
 
 		actionState = parseInt(actionState);
-		var actionRequested = !isNaN(actionState);
+		let actionRequested = !isNaN(actionState);
 		if (actionState === 0)
 			return action(app);
 
