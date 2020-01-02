@@ -1,3 +1,8 @@
+import { api } from '../../api.js';
+import { runTransactionsCommon } from './common.js'
+import { TransactionsList } from '../../trlist.js'
+
+
 var runDebt = (function()
 {
 	let test = null;
@@ -69,9 +74,15 @@ var runDebt = (function()
 										personAccount : view.getPersonAccount(view.model.person, view.model.src_curr_id),
 										noAccount : view.model.noAccount,
 										acc : view.model.account,
+										srcAcc : view.model.srcAccount,
+										destAcc : view.model.destAccount,
 										debtType : view.model.debtType,
 										srcAmount : view.model.fSrcAmount,
-										destAmount : view.model.fDestAmount };
+										destAmount : view.model.fDestAmount,
+									 	srcCurr : view.model.srcCurr,
+									 	destCurr : view.model.destCurr,
+										date : view.model.date,
+										comment : view.model.comment };
 
 		if (!app.beforeSubmitTransaction.personAccount)
 		{
@@ -91,30 +102,72 @@ var runDebt = (function()
 
 	async function createDebt(app, onState, params)
 	{
-		let view = app.view;
+		let env = app.view.props.environment;
 		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
-		view.setBlock('Create debt (' + titleParams.join(', ') + ')', 2);
+		app.view.setBlock('Create debt (' + titleParams.join(', ') + ')', 2);
 
+		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
+
+		// Navigate to create transaction page
 		await app.goToMainView()
 		await app.view.goToNewTransactionByAccount(0);
 		await app.view.changeTransactionType(app.DEBT);
+
+		// Input data and submit
 		await debtTransactionLoop(app, onState, app => submitDebtTransaction(app, params));
 
-		let person = app.beforeSubmitTransaction.person;
-		let personPos = app.beforeSubmitTransaction.personPos;
-		let personAccount = app.beforeSubmitTransaction.personAccount;
-		let acc = app.beforeSubmitTransaction.acc;
-		let accPos = app.beforeSubmitTransaction.accPos;
-		let debtType = app.beforeSubmitTransaction.debtType;
+		// Prepare data for next calculations
+		let {
+			person,
+			personPos,
+			personAccount,
+			acc,
+			accPos,
+			srcAcc,
+			destAcc,
+			debtType,
+			srcAmount,
+			destAmount,
+			srcCurr,
+			destCurr,
+			date,
+			comment
+		} = app.beforeSubmitTransaction;
+
+		if (!('id' in personAccount))
+		{
+			let personObj = await app.getPerson(person.id);
+			let newPersonAcc = personObj.accounts.find(item => item.curr_id == personAccount.curr_id);
+			if (newPersonAcc)
+			{
+				personAccount.id = newPersonAcc.id;
+				if (debtType)
+					srcAcc = personAccount;
+				else
+					destAcc = personAccount;
+			}
+		}
+
+		let newTransInd = expTransList.create({
+			type : app.DEBT,
+			src_id : (srcAcc ? srcAcc.id : 0),
+			dest_id : (destAcc ? destAcc.id : 0),
+			src_amount : srcAmount,
+			dest_amount : destAmount,
+		 	src_curr : srcCurr.id,
+			dest_curr : destCurr.id,
+			date,
+			comment });
+
 
 		var state = { values : { widgets : { length : app.config.widgetsCount } } };
 		var sa, da;
 
-		sa = da = app.normalize(params.srcAmount);
+		sa = da = app.normalize(srcAmount);
 
 		if (debtType)
 		{
@@ -149,44 +202,32 @@ var runDebt = (function()
 
 		// Transactions widget changes
 		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(app.transactions.length + 1, app.config.latestTransactions) } } };
-		var title = '';
-		var fmtAmount;
+							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
-		if (debtType)
+		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
 		{
-			title = person.name;
-			if (acc)
-				title += ' → ' + acc.name;
-			fmtAmount = (acc) ? '+ ' : '- ';
+			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[newTransInd]);
+			transWidget.transList.items[newTransInd] = listItem;
 		}
-		else
-		{
-			if (acc)
-				title = acc.name + ' → ';
-			title += person.name;
-			fmtAmount = (acc) ? '- ' : '+ ';
-		}
-		fmtAmount += app.formatCurrency(sa, personAccount.curr_id, app.currencies);
-
-		transWidget.transList.items[0] = { accountTitle : title,
-										amountText : fmtAmount,
-									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
-									 	comment : ('comment' in params) ? params.comment : '' };
 
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
-		await test('Debt transaction submit', async () => {}, app.view, state);
+		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
 		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
 		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+
+		// Read updated list of transactions
+		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
+
+		app.transactions = expTransList.list;
 	}
 
 
 	async function updateDebt(app, pos, params)
 	{
 		let view = app.view;
+		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
@@ -199,6 +240,8 @@ var runDebt = (function()
 
 		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
+
+		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
 		// Step
 		await app.goToMainView();
@@ -230,11 +273,13 @@ var runDebt = (function()
 		app.setParam(app.beforeUpdateTransaction,
 					{ id : view.model.id,
 						person : view.model.person,
-							personPos : await view.getPersonPos(view.model.person.id),
+						personPos : await view.getPersonPos(view.model.person.id),
 						personAccount : view.getPersonAccount(view.model.person, view.model.src_curr_id),
 						noAccount : view.model.noAccount,
 						acc : view.model.noAccount ? view.model.account : null,
 						accPos : view.model.noAccount ? await view.getAccountPos(view.model.account.id) : -1,
+						srcAcc : view.model.srcAccount,
+						destAcc : view.model.destAccount,
 						debtType : view.model.debtType,
 						srcBalance : view.model.fSrcResBal,
 						destBalance : view.model.fDestResBal,
@@ -248,64 +293,95 @@ var runDebt = (function()
 		// Step
 		await app.view.filterByType(app.DEBT);
 
-		let trans_id = app.beforeUpdateTransaction.id;
-		let transCount = app.beforeUpdateTransaction.trCount;
-		let updPerson = app.beforeSubmitTransaction.person;
-		let updPersonAccount = app.beforeSubmitTransaction.personAccount;
-		let updAcc = app.beforeSubmitTransaction.acc;
-		let updNoAccount = app.beforeSubmitTransaction.noAccount;
-		let updDebtType = app.beforeSubmitTransaction.debtType;
-		let updSrcAmount = app.beforeSubmitTransaction.srcAmount;
+		let {
+			debtType : updDebtType,
+			person : updPerson,
+			personPos : updPersonPos,
+			personAccount : updPersonAccount,
+			acc : updAcc,
+			accPos : updAccPos,
+			noAccount : updNoAccount,
+			srcAcc : updSrcAcc,
+			srcAccPos : updSrcAccPos,
+			destAcc : updDestAcc,
+			destAccPos : updDestAccPos,
+			srcAmount : updSrcAmount,
+			destAmount : updDestAmount,
+			srcCurr : updSrcCurr,
+			destCurr : updDestCurr,
+			date : updDate,
+			comment : updComment
+		} = app.beforeSubmitTransaction;
 
-		// Transactions list changes
-		var title = '';
-		var fmtAmount;
+		let {
+			id : trans_id,
+			debtType : origDebtType,
+			person : origPerson,
+			personPos : origPersonPos,
+			personAccount : origPersonAccount,
+			acc : origAcc,
+			accPos : origAccPos,
+			noAccount : origNoAccount,
+			srcAcc : origSrcAcc,
+			srcAccPos : origSrcAccPos,
+			destAcc : origDestAcc,
+			destAccPos : origDestAccPos,
+			destBalance : origDestBalance,
+			srcAmount : origSrcAmount,
+			destAmount : origDestAmount,
+			date : origDate,
+			comment : origComment,
+			trCount : transCount
+		} = app.beforeUpdateTransaction;
+
+		if (!('id' in updPersonAccount))
+		{
+			let personObj = await app.getPerson(person.id);
+			let newPersonAcc = personObj.accounts.find(item => item.curr_id == updPersonAccount.curr_id);
+			if (newPersonAcc)
+			{
+				updPersonAccount.id = newPersonAcc.id;
+				if (debtType)
+					srcAcc = personAccount;
+				else
+					destAcc = personAccount;
+			}
+		}
 
 		if (updDebtType)
 		{
-			title = updPerson.name;
-			if (updAcc && !updNoAccount)
-				title += ' → ' + updAcc.name;
-			fmtAmount = (updAcc && !updNoAccount) ? '+ ' : '- ';
+			updSrcAcc = updPersonAccount;
+			updDestAcc = (updNoAccount) ? null : updAcc;
 		}
 		else
 		{
-			if (updAcc && !updNoAccount)
-				title = updAcc.name + ' → ';
-			title += updPerson.name;
-			fmtAmount = (updAcc && !updNoAccount) ? '- ' : '+ ';
+			updSrcAcc = (updNoAccount) ? null : updAcc;
+			updDestAcc = updPersonAccount;
 		}
-		fmtAmount += app.formatCurrency(updSrcAmount, updPersonAccount.curr_id, app.currencies);
 
-		var state = { values : { transList : { items : { length : transCount } } } };
-		state.values.transList.items[pos] = { id : trans_id,
-											accountTitle : title,
-											amountText : fmtAmount,
-										 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
-										 	comment : ('comment' in params) ? params.comment : '' };
-
-		await test('Transaction update', async () => {}, app.view, state);
+		// Transactions list changes
+		expTransList.update(trans_id, {
+			id : trans_id,
+			type : app.DEBT,
+			src_id : (updSrcAcc ? updSrcAcc.id : 0),
+			dest_id : (updDestAcc ? updDestAcc.id : 0),
+			src_amount : updSrcAmount,
+			dest_amount : updDestAmount,
+		 	src_curr : updSrcCurr.id,
+			dest_curr : updDestCurr.id,
+			date : updDate,
+			comment : updComment,
+		 	pos : trObj.pos });
 
 		await app.goToMainView();
 
+		var transWidget = { title : 'Transactions',
+							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 		// Step
-		let origPerson = app.beforeUpdateTransaction.person;
-		let origPersonPos = app.beforeUpdateTransaction.personPos;
-		let origPersonAccount = app.beforeUpdateTransaction.personAccount;
-		let origAcc = app.beforeUpdateTransaction.acc;
-		let origAccPos = app.beforeUpdateTransaction.accPos;
-		let origDebtType = app.beforeUpdateTransaction.debtType;
-		let origAmount = app.beforeUpdateTransaction.srcAmount;
-		let origNoAccount = app.beforeUpdateTransaction.noAccount;
-
-		let updPersonPos = app.beforeSubmitTransaction.personPos;
-		let updAccPos = app.beforeSubmitTransaction.accPos;
-		let updAmount = app.beforeSubmitTransaction.srcAmount;
-
 		var state = { values : { widgets : { length : app.config.widgetsCount } } };
 		var sa, da;
 
-		sa = da = app.normalize(origAmount);
+		sa = da = app.normalize(origSrcAmount);
 
 		var personsWidget = { infoTiles : { items : { length : app.persons.length } } };
 
@@ -324,7 +400,7 @@ var runDebt = (function()
 		}
 
 		// Apply new transaction
-		sa = da = app.normalize(updAmount);
+		sa = da = app.normalize(updSrcAmount);
 		if (updDebtType)
 		{
 			updPersonAccount.balance -= sa;
@@ -366,12 +442,14 @@ var runDebt = (function()
 		}
 
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
+		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
-		await test('Account and person balance update', async () => {}, app.view, state);
+		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
 		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
 		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+
+		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
 	}
 
 

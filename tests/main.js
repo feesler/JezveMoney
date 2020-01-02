@@ -79,6 +79,7 @@ class Application
 			throw new Error('Fail to read user profile');
 
 		this.user_id = userProfile.user_id;
+		this.owner_id = userProfile.owner_id;
 
 		this.currencies = await api.currency.list();
 
@@ -233,16 +234,19 @@ class Application
 		await transactions.expense.stateLoop(this);
 		await this.runCreateExpenseTests();
 
+		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
 		await this.view.changeTransactionType(App.INCOME);
 		await transactions.income.stateLoop(this);
 		await this.runCreateIncomeTests();
 
+		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
 		await this.view.changeTransactionType(App.TRANSFER);
 		await transactions.transfer.stateLoop(this);
 		await this.runCreateTransferTests();
 
+		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
 		await this.view.changeTransactionType(App.DEBT);
 		await transactions.debt.stateLoop(this);
@@ -278,8 +282,8 @@ class Application
 
 		await transactions.expense.create(this, 0, 0, { destAmount : '123.7801' })
 		await transactions.expense.create(this, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 });
-		await transactions.expense.create(this, 1, 0, { destAmount : '0.01' });
-		await transactions.expense.create(this, 1, 0, { srcAcc : 4, destAmount : '99.99' });
+		await transactions.expense.create(this, 1, 0, { destAmount : '0.01', date : this.dates.yesterday });
+		await transactions.expense.create(this, 1, 0, { srcAcc : 4, destAmount : '99.99', date : this.dates.monthAgo });
 	}
 
 
@@ -287,10 +291,10 @@ class Application
 	{
 		this.view.setBlock('Create income transactions', 1);
 
-		await transactions.income.create(this, 0, 0, { srcAmount : '10023.7801' });
+		await transactions.income.create(this, 0, 0, { srcAmount : '10023.7801', date : this.dates.yesterday });
 		await transactions.income.create(this, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 });
-		await transactions.income.create(this, 1, 0, { srcAmount : '0.01' });
-		await transactions.income.create(this, 1, 0, { destAcc : 4, srcAmount : '99.99' });
+		await transactions.income.create(this, 1, 0, { srcAmount : '0.01', date : this.dates.weekAgo });
+		await transactions.income.create(this, 1, 0, { destAcc : 4, srcAmount : '99.99', date : this.dates.monthAgo });
 	}
 
 
@@ -311,10 +315,10 @@ class Application
 		this.view.setBlock('Submit debt transactions', 1);
 
 		await transactions.debt.create(this, 0, { srcAmount : '1000' });
-		await transactions.debt.create(this, 0, { debtType : false, acc : 2, srcAmount : '200' });
+		await transactions.debt.create(this, 0, { debtType : false, acc : 2, srcAmount : '200', date : this.dates.weekAgo });
 		await transactions.debt.create(this, 0, { debtType : true, acc : 3, srcAmount : '100.0101' });
-		await transactions.debt.create(this, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10' });
-		await transactions.debt.create(this, 0, { acc : null, srcAmount : '105' });
+		await transactions.debt.create(this, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10', date : this.dates.yesterday });
+		await transactions.debt.create(this, 0, { acc : null, srcAmount : '105', date : this.dates.yesterday });
 		await transactions.debt.create(this, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' });
 	}
 
@@ -324,9 +328,9 @@ class Application
 		this.view.setBlock('Update expense transactions', 2);
 
 		await transactions.expense.update(this, 3, { destAmount : '124.7701' });
-		await transactions.expense.update(this, 2, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 });
-		await transactions.expense.update(this, 1, { destAmount : '0.02' });
-		await transactions.expense.update(this, 0, { srcAcc : 3, destAmount : '99.9' });
+		await transactions.expense.update(this, 0, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 });
+		await transactions.expense.update(this, 2, { destAmount : '0.02', date : this.dates.weekAgo });
+		await transactions.expense.update(this, 3, { srcAcc : 3, destAmount : '99.9', date : this.dates.yesterday });
 	}
 
 
@@ -334,9 +338,9 @@ class Application
 	{
 		this.view.setBlock('Update income transactions', 2);
 
-		await transactions.income.update(this, 0, { srcAmount : '100.001' });
-		await transactions.income.update(this, 1, { srcAmount : '0.02' });
-		await transactions.income.update(this, 2, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 });
+		await transactions.income.update(this, 1, { srcAmount : '100.001', date : this.dates.weekAgo });
+		await transactions.income.update(this, 2, { srcAmount : '0.02' });
+		await transactions.income.update(this, 0, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 });
 		await transactions.income.update(this, 3, { destAcc : 3, srcAmount : '99.9' });
 	}
 
@@ -358,11 +362,11 @@ class Application
 		this.view.setBlock('Update debt transactions', 2);
 
 		await transactions.debt.update(this, 0, { person : 0, srcAmount : '105' });
-		await transactions.debt.update(this, 1, { acc : 1, srcAmount : '105' });
-		await transactions.debt.update(this, 2, { debtType : true, srcAmount : '10' });
-		await transactions.debt.update(this, 3, { debtType : false, acc : 2, srcAmount : '200.0202' });
-		await transactions.debt.update(this, 4, { acc : null, srcAmount : '200' });
-		await transactions.debt.update(this, 5, { srcAmount : '1001' });
+		await transactions.debt.update(this, 3, { acc : 1, srcAmount : '105', date : this.dates.now });
+		await transactions.debt.update(this, 4, { debtType : true, srcAmount : '10' });
+		await transactions.debt.update(this, 1, { debtType : false, acc : 2, srcAmount : '200.0202', date : this.dates.monthAgo });
+		await transactions.debt.update(this, 5, { acc : null, srcAmount : '200' });
+		await transactions.debt.update(this, 2, { srcAmount : '1001', date : this.dates.weekAgo });
 	}
 
 

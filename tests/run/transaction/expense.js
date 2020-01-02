@@ -1,3 +1,8 @@
+import { api } from '../../api.js';
+import { runTransactionsCommon } from './common.js'
+import { TransactionsList } from '../../trlist.js'
+
+
 var runExpense = (function()
 {
 	let test = null;
@@ -43,7 +48,13 @@ var runExpense = (function()
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
 		app.beforeSubmitTransaction = { srcAcc : view.model.srcAccount,
-										srcAccPos : await view.getAccountPos(view.model.srcAccount.id) };
+										srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
+									 	srcCurr : view.model.srcCurr,
+									 	destCurr : view.model.destCurr,
+									 	srcAmount : view.model.fSrcAmount,
+									 	destAmount : view.model.fDestAmount,
+									 	date : view.model.date,
+										comment : view.model.comment };
 
 		if (view.model.isUpdate)
 			app.beforeSubmitTransaction.id = view.model.id;
@@ -57,24 +68,35 @@ var runExpense = (function()
 
 	async function createExpense(app, accNum, onState, params)
 	{
-		let view = app.view;
+		let env = app.view.props.environment;
 		test = app.test;
 
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
-		view.setBlock('Create expense (' + titleParams.join(', ') + ')', 2);
+		app.view.setBlock('Create expense (' + titleParams.join(', ') + ')', 2);
 
-		// Step 0:
+		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
+
+		// Navigate to create transaction page
 		await app.goToMainView();
-		view = app.view;
-		await view.goToNewTransactionByAccount(accNum);
-		await expenseTransactionLoop(app, onState, app => submitExpenseTransaction(app, params));
-		view = app.view;
+		await app.view.goToNewTransactionByAccount(accNum);
 
-		// Step
-	 	let srcAcc = app.beforeSubmitTransaction.srcAcc;
-		let srcAccPos = app.beforeSubmitTransaction.srcAccPos;
+		// Input data and submit
+		await expenseTransactionLoop(app, onState, app => submitExpenseTransaction(app, params));
+
+		// Prepare data for next calculations
+	 	let { srcAcc, srcAccPos, srcAmount, destAmount, srcCurr, destCurr, date, comment } = app.beforeSubmitTransaction;
+		let newTransInd = expTransList.create({
+			type : app.EXPENSE,
+			src_id : srcAcc.id,
+			dest_id : 0,
+			src_amount : srcAmount,
+			dest_amount : destAmount,
+		 	src_curr : srcCurr.id,
+			dest_curr : destCurr.id,
+			date,
+			comment });
 
 		// Obtain real source amount from props:
 		// In case of expense with different currency use source amount value
@@ -88,28 +110,29 @@ var runExpense = (function()
 		accWidget.tiles.items[srcAccPos] = { balance : fmtBal, name : srcAcc.name };
 
 		// Transactions widget changes
-		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, srcAcc.curr_id, app.currencies);
-		if ('destCurr' in params && 'srcAmount' in params)
+		var transWidget = { title : 'Transactions',
+							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
+
+		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
 		{
-			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr, app.currencies) + ')';
+			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[newTransInd]);
+			transWidget.transList.items[newTransInd] = listItem;
 		}
 
-		var transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(app.transactions.length + 1, app.config.latestTransactions) } } };
-		transWidget.transList.items[0] = { accountTitle : srcAcc.name,
-										amountText : fmtAmount,
-									 	dateFmt : app.formatDate(('date' in params) ? new Date(params.date) : new Date()),
-									 	comment : ('comment' in params) ? params.comment : '' };
 
 		var state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
 		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
-		await test('Expense transaction submit', async () => {}, view, state);
+		await test('Main page widgets update', async () => {}, app.view, state);
 
-		app.transactions = view.content.widgets[app.config.LatestWidgetPos].transList.items;
-		app.accounts = view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.persons = view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
+		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+
+		// Read updated list of transactions
+		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
+
+		app.transactions = expTransList.list;
 	}
 
 
@@ -131,11 +154,13 @@ var runExpense = (function()
 		if (!app.isObject(params))
 			throw new Error('Parameters not specified');
 
+		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
+
 		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.EXPENSE);
 
-		app.beforeUpdateTransaction = { trCount : app.view.content.transList.items.length };
+		app.beforeUpdateTransaction = { trCount : expTransList.list.length };
 
 		let trObj = await app.view.getTransactionObject(app.view.content.transList.items[pos].id);
 		if (!trObj)
@@ -167,41 +192,51 @@ var runExpense = (function()
 		// Step
 		await app.view.filterByType(app.EXPENSE);
 
-	 	let updSrcAcc = app.beforeSubmitTransaction.srcAcc;
-		let trans_id = app.beforeUpdateTransaction.id;
-		let transCount = app.beforeUpdateTransaction.trCount;
-		let origDate = app.beforeUpdateTransaction.date;
-		let origComment = app.beforeUpdateTransaction.comment;
+		let { srcAcc : updSrcAcc,
+				srcAccPos : updSrcAccPos,
+				srcBalance : updSrcBalance,
+				srcAmount : updSrcAmount,
+				destAmount : updDestAmount,
+				srcCurr : updSrcCurr,
+				destCurr : updDestCurr,
+				date : updDate,
+				comment : updComment } = app.beforeSubmitTransaction;
+
+		let { id : trans_id,
+				srcAcc : origSrcAcc,
+				srcAccPos : origSrcAccPos,
+				srcBalance : origSrcBalance,
+				srcAmount : origSrcAmount,
+				destAmount : origDestAmount,
+				date : origDate,
+				comment : origComment,
+				trCount : transCount } = app.beforeUpdateTransaction;
 
 		// Transactions list changes
-		var fmtAmount = '- ' + app.formatCurrency(('srcAmount' in params) ? params.srcAmount : params.destAmount, updSrcAcc.curr_id, app.currencies);
-		if ('destCurr' in params && 'srcAmount' in params)
-		{
-			fmtAmount += ' (- ' + app.formatCurrency(params.destAmount, params.destCurr, app.currencies) + ')';
-		}
-
-		var state = { values : { transList : { items : { length : transCount } } } };
-		state.values.transList.items[pos] = { id : trans_id,
-											accountTitle : updSrcAcc.name,
-											amountText : fmtAmount,
-										 	dateFmt : ('date' in params) ? app.formatDate(new Date(params.date)) : origDate,
-										 	comment : ('comment' in params) ? params.comment : origComment };
-
-		await test('Transaction update', async () => {}, app.view, state);
+		expTransList.update(trans_id, {
+			id : trans_id,
+			type : app.EXPENSE,
+			src_id : updSrcAcc.id,
+			dest_id : 0,
+			src_amount : updSrcAmount,
+			dest_amount : updDestAmount,
+		 	src_curr : updSrcCurr.id,
+			dest_curr : updDestCurr.id,
+			date : updDate,
+			comment : updComment,
+		 	pos : trObj.pos });
 
 		await app.goToMainView();
 
-		// Step
-		let updSrcAccPos = app.beforeSubmitTransaction.srcAccPos;
-	 	let origSrcAcc = app.beforeUpdateTransaction.srcAcc;
-		let origSrcAccPos = app.beforeUpdateTransaction.srcAccPos;
-		let origSrcBalance = app.beforeUpdateTransaction.srcBalance;
-		let origSrcAmount = app.beforeUpdateTransaction.srcAmount;
+		var transWidget = { title : 'Transactions',
+							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
 
-		// Obtain real source amount from props:
-		// In case of expense with different currency use source amount value
-		// In case of expense with the same currency copy destination amount value
-		var sa = ('destCurr' in params && 'srcAmount' in params) ? params.srcAmount : params.destAmount;
+		let updTransInd = expTransList.findItem(trans_id);
+		if (updTransInd >= 0 && updTransInd < app.config.latestTransactions)
+		{
+			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[updTransInd]);
+			transWidget.transList.items[updTransInd] = listItem;
+		}
 
 		// Accounts widget changes
 		var accWidget = { tiles : { items : { length : app.accounts.length } } };
@@ -214,14 +249,14 @@ var runExpense = (function()
 
 			accWidget.tiles.items[origSrcAccPos] = { balance : fmtBal, name : origSrcAcc.name };
 
-			expBalance = updSrcAcc.balance - app.normalize(sa);
+			expBalance = updSrcAcc.balance - app.normalize(updSrcAmount);
 			fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
 		}
 		else		// account not changed
 		{
-			var expBalance = origSrcBalance + origSrcAmount - app.normalize(sa);
+			var expBalance = origSrcBalance + origSrcAmount - app.normalize(updSrcAmount);
 			var fmtBal = app.formatCurrency(expBalance, updSrcAcc.curr_id, app.currencies);
 
 			accWidget.tiles.items[updSrcAccPos] = { balance : fmtBal, name : updSrcAcc.name };
@@ -229,8 +264,11 @@ var runExpense = (function()
 
 		var state = { values : { widgets : { length : app.config.widgetsCount } } };
 		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
+		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
 
-		await test('Account balance update', async () => {}, app.view, state);
+		await test('Main page widgets update', async () => {}, app.view, state);
+
+		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
 	}
 
 

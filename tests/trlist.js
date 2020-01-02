@@ -28,11 +28,24 @@ class TransactionsList
 	}
 
 
-	updatePos(item_id, pos)
+	updatePosById(item_id, pos)
 	{
-		let trObj = this.list.find(item => item.id == item_id);
-		if (!trObj)
+		let ind = this.findItem(item_id);
+		if (ind === -1)
 			throw new Error('Transaction ' + item_id + ' not found');
+
+		return this.updatePos(ind, pos);
+	}
+
+
+	updatePos(ind, pos)
+	{
+		if (ind < 0 || ind >= this.list.length)
+			throw new Error('Wrong transaction index: ' + ind);
+
+		let trObj = this.list[ind];
+		if (!trObj)
+			throw new Error('Transaction not found');
 
 		let oldPos = trObj.pos;
 		if (oldPos == pos)
@@ -64,22 +77,31 @@ class TransactionsList
 	}
 
 
+	findItem(item_id)
+	{
+		return this.list.findIndex(item => item.id == item_id);
+	}
+
+
 	create(transObj)
 	{
+		let ind = this.list.length;
 		this.list.push(transObj);
 
 		let expPos = this.getExpectedPos(transObj);
-		this.updatePos(transObj.id, expPos);
+		this.updatePos(ind, expPos);
 
 		this.sort();
+
+		return this.list.findIndex(item => item == transObj);
 	}
 
 
 	update(id, transObj)
 	{
-		let ind = this.list.findIndex(item => item.id == transObj.id);
+		let ind = this.findItem(id);
 		if (ind === -1)
-			return;
+			return false;
 
 		let origObj = this.list[ind];
 
@@ -89,10 +111,12 @@ class TransactionsList
 		{
 			transObj.pos = 0;
 			let newPos = this.getExpectedPos(transObj);
-			this.updatePos(transObj.id, newPos);
+			this.updatePosById(transObj.id, newPos);
 
 			this.sort();
 		}
+
+		return true;
 	}
 
 

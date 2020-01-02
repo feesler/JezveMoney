@@ -1,4 +1,7 @@
 import { TransactionsView } from '../../view/transactions.js';
+import { MainView } from '../../view/main.js';
+import { TransactionsList } from '../../trlist.js';
+import { api } from '../../api.js';
 
 
 var runTransactionsCommon = (function()
@@ -16,6 +19,7 @@ var runTransactionsCommon = (function()
 		if (!app.view.isFirstPage())
 			await app.view.goToFirstPage();
 
+		let pos = app.view.pagesCount() * app.config.transactionsOnPage;
 		while(app.view.content.transList.items.length)
 		{
 			let pageItems = app.view.content.transList.items.map(item => {
@@ -24,7 +28,8 @@ var runTransactionsCommon = (function()
 					accountTitle : item.accountTitle,
 					amountText : item.amountText,
 					dateFmt : item.dateFmt,
-					comment : item.comment
+					comment : item.comment,
+					pos : pos--
 				}
 			});
 
@@ -38,6 +43,117 @@ var runTransactionsCommon = (function()
 		}
 
 		return res;
+	}
+
+
+	async function convertTransactionToListItem(app, transObj)
+	{
+		let res = {};
+
+		let srcAcc = await app.getAccount(transObj.src_id);
+		let destAcc = await app.getAccount(transObj.dest_id);
+
+		if (transObj.type == app.EXPENSE)
+		{
+			res.amountText = '- ' + app.formatCurrency(transObj.src_amount, transObj.src_curr, app.currencies);
+			if (transObj.src_curr != transObj.dest_curr)
+			{
+				res.amountText += ' (- ' + app.formatCurrency(transObj.dest_amount, transObj.dest_curr, app.currencies) + ')';
+			}
+
+			res.accountTitle = srcAcc.name;
+		}
+		else if (transObj.type == app.INCOME)
+		{
+			res.amountText = '+ ' + app.formatCurrency(transObj.src_amount, transObj.src_curr, app.currencies);
+			if (transObj.src_curr != transObj.dest_curr)
+			{
+				res.amountText += ' (+ ' + app.formatCurrency(transObj.dest_amount, transObj.dest_curr, app.currencies) + ')';
+			}
+
+			res.accountTitle = destAcc.name;
+		}
+		else if (transObj.type == app.TRANSFER)
+		{
+			res.amountText = app.formatCurrency(transObj.src_amount, transObj.src_curr, app.currencies);
+			if (transObj.src_curr != transObj.dest_curr)
+			{
+				res.amountText += ' (' + app.formatCurrency(transObj.dest_amount, transObj.dest_curr, app.currencies) + ')';
+			}
+
+			res.accountTitle = srcAcc.name + ' → ' + destAcc.name;
+		}
+		else if (transObj.type == app.DEBT)
+		{
+			res.accountTitle = '';
+			let debtType = (!!srcAcc && srcAcc.owner_id != app.owner_id);
+			let personAcc = debtType ? srcAcc : destAcc;
+			let person = await app.getPerson(personAcc.owner_id);
+			let acc = debtType ? destAcc : srcAcc;
+
+			if (debtType)
+			{
+				res.accountTitle = person.name;
+				if (acc)
+					res.accountTitle += ' → ' + acc.name;
+				res.amountText = (acc) ? '+ ' : '- ';
+			}
+			else
+			{
+				if (acc)
+					res.accountTitle = acc.name + ' → ';
+				res.accountTitle += person.name;
+				res.amountText = (srcAcc) ? '- ' : '+ ';
+			}
+
+			res.amountText += app.formatCurrency(transObj.src_amount, personAcc.curr_id, app.currencies);
+		}
+
+		res.dateFmt = transObj.date;
+		res.comment = transObj.comment;
+
+		return res;
+	}
+
+
+	// Check transactions data from API is the same as show on the transactions list page
+	// Return instance of TransactionsList with current data
+	async function checkTransactionsDataConsistency(app, descr, transList)
+	{
+		let env = app.view.props.environment;
+		let test = app.test;
+
+		// Save all transactions
+		if (!(app.view instanceof MainView))
+			await app.goToMainView();
+		await app.view.goToTransactions();
+		let transListBefore = await iterateTransactionPages(app);
+
+		let expTransList = null;
+		if (transList)
+		{
+			expTransList = transList;
+		}
+		else
+		{
+			// Read transactions from API
+			let trBefore = await api.transaction.list();
+
+			// Prepare expected list data
+			expTransList = new TransactionsList(app, trBefore);
+		}
+
+		let expListItems = [];
+		// Convert transaction objects to list items
+		for(let transObj of expTransList.list)
+		{
+			let listItem = await runTransactionsCommon.convertToListItem(app, transObj);
+			expListItems.push(listItem);
+		}
+
+		await test(descr, () => app.checkObjValue(transListBefore.items, expListItems), env);
+
+		return expTransList;
 	}
 
 
@@ -255,13 +371,15 @@ var runTransactionsCommon = (function()
 		app.accountsCache = null;
 		app.personsCache = null;
 
-		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
 		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
 		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 
- 	return { del : deleteTransactions };
+ 	return { iteratePages : iterateTransactionPages,
+				convertToListItem : convertTransactionToListItem,
+				checkData : checkTransactionsDataConsistency,
+				del : deleteTransactions };
 })();
 
 
