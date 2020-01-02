@@ -63,6 +63,8 @@ class Application
 
 	async init()
 	{
+		this.startTime = Date.now();
+
 		for(let key in common)
 		{
 			this[key] = common[key];
@@ -91,6 +93,28 @@ class Application
 		this.dates.yearAgo = this.formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
 		this.dateList.push(...Object.values(this.dates));
+	}
+
+
+	finish()
+	{
+		const SECOND = 1000;
+		const MINUTE = 60000;
+		const HOUR = 3600000;
+
+		let testsDuration = Date.now() - this.startTime;
+		let hours = Math.floor(testsDuration / HOUR);
+		let minutes = Math.floor((testsDuration % HOUR) / MINUTE);
+		let seconds = Math.floor((testsDuration % MINUTE) / SECOND);
+
+		let timeTitle = [];
+		if (hours > 0)
+			timeTitle.push(hours + 'h');
+		if (minutes > 0)
+			timeTitle.push(minutes + 'm');
+		timeTitle.push(seconds + 's');
+
+		console.log('Duration of tests: ' + timeTitle.join(' '));
 	}
 
 
@@ -146,6 +170,8 @@ class Application
 		await this.personTests();
 		await this.transactionTests();
 		await statistics.run(this);
+
+		this.finish();
 	}
 
 
