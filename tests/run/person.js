@@ -19,6 +19,8 @@ var runPersons = (function()
 		test = app.test;
 
 		await app.view.goToCreatePerson();
+
+		app.personsCache = null;
 		await app.view.createPerson(personName);
 
 		var state = { value : { tiles : { items : { length : app.persons.length + 1 } } } };
@@ -43,6 +45,7 @@ var runPersons = (function()
 
 		await app.view.inputName(personName);
 
+		app.personsCache = null;
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 
 		// Check updates in the person tiles
@@ -59,6 +62,7 @@ var runPersons = (function()
 	{
 		test = app.test;
 
+		app.personsCache = null;
 		await app.view.deletePersons(persons);
 
 		var state = { values : { tiles : { items : { length : app.persons.length - persons.length } } } };

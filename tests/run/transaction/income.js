@@ -47,6 +47,9 @@ var runIncome = (function()
 		if (view.model.isUpdate)
 			app.beforeSubmitTransaction.id = view.model.id;
 
+		app.accountsCache = null;
+		app.personsCache = null;
+
 		return view.submit();
 	}
 

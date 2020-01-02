@@ -48,6 +48,7 @@ var runAccounts = (function()
 		app.setParam(state.values, { tile : { balance : '1 000.01 ₽' }, balance : '1000.01' });
 		await test('Input (1000.01) balance', () => app.view.inputBalance('1000.01'), app.view, state);
 
+		app.accountsCache = null;
 
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 		await checkCreateAccount(app, { name : 'acc_1', balance : 1000.01, curr_id : 1 });
@@ -85,6 +86,8 @@ var runAccounts = (function()
 		state.values.tile.balance = '€ 1 000.01';
 		await test('Account tile balance on EUR 1 000.01 balance input field', () => app.view.inputBalance('1000.01'), app.view, state);
 
+		app.accountsCache = null;
+
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 		await checkCreateAccount(app, { name : 'acc_2', balance : 1000.01, curr_id : 3 });
 	}
@@ -106,6 +109,8 @@ var runAccounts = (function()
 	// Change icon to purse
 		state.values.tile.icon = app.view.tileIcons[1];
 		await test('Icon change', () => app.view.changeIcon(1), app.view, state);
+
+		app.accountsCache = null;
 
 	// Submit
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
@@ -172,6 +177,8 @@ var runAccounts = (function()
 			await test('Tile icon update', () => app.view.changeIcon(params.icon), app.view, state);
 		}
 
+		app.accountsCache = null;
+
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 		await checkCreateAccount(app, params);
 	}
@@ -180,6 +187,8 @@ var runAccounts = (function()
 	async function deleteAccounts(app, accounts)
 	{
 		test = app.test;
+
+		app.accountsCache = null;
 
 		await app.view.deleteAccounts(accounts);
 

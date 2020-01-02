@@ -55,6 +55,9 @@ class Application
 
 		this.dates = {};
 		this.dateList = [];
+
+		this.accountsCache = [];
+		this.personsCache = [];
 	}
 
 
@@ -87,6 +90,46 @@ class Application
 		this.dates.yearAgo = this.formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
 		this.dateList.push(...Object.values(this.dates));
+	}
+
+
+	async getAccount(acc_id)
+	{
+		let id = parseInt(acc_id);
+		if (!id || isNaN(id))
+			return null;
+
+		let accObj = null;
+
+		if (this.isArray(this.accountsCache))
+			accObj = this.accountsCache.find(item => item.id == id);
+		if (!accObj)
+		{
+			this.accountsCache = await api.account.list(true);
+			accObj = this.accountsCache.find(item => item.id == id);
+		}
+
+		return accObj;
+	}
+
+
+	async getPerson(person_id)
+	{
+		let id = parseInt(person_id);
+		if (!id || isNaN(id))
+			return null;
+
+		let personObj = null;
+
+		if (this.isArray(this.personsCache))
+			personObj = this.personsCache.find(item => item.id == id);
+		if (!personObj)
+		{
+			this.personsCache = await api.person.list();
+			personObj = this.personsCache.find(item => item.id == id);
+		}
+
+		return personObj;
 	}
 
 

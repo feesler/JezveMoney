@@ -49,6 +49,9 @@ var runTransfer = (function()
 								 	srcAmount : view.model.fSrcAmount,
 								 	destAmount : view.model.fDestAmount };
 
+		app.accountsCache = null;
+		app.personsCache = null;
+
 		return view.submit();
 	}
 

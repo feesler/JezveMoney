@@ -82,6 +82,9 @@ var runDebt = (function()
 		if (app.beforeSubmitTransaction.acc)
 			app.beforeSubmitTransaction.accPos = await view.getAccountPos(view.model.account.id);
 
+		app.accountsCache = null;
+		app.personsCache = null;
+
 		return view.submit();
 	}
 

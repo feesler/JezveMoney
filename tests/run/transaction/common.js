@@ -252,6 +252,9 @@ var runTransactionsCommon = (function()
 
 		await test('Acounts and persons update', async () => {}, app.view, state);
 
+		app.accountsCache = null;
+		app.personsCache = null;
+
 		app.transactions = app.view.content.widgets[app.config.LatestWidgetPos].transList.items;
 		app.accounts = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
 		app.persons = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
