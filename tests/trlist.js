@@ -5,6 +5,7 @@ class TransactionsList
 	{
 		this.app = app;
 		this.list = app.copyObject(list);
+		this.sort();
 	}
 
 
@@ -97,7 +98,7 @@ class TransactionsList
 
 	sort()
 	{
-		this.list.sort((a, b) => a.pos - b.pos);
+		this.list.sort((a, b) => b.pos - a.pos);
 	}
 }
 

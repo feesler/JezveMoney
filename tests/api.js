@@ -478,6 +478,8 @@ var apiModule = (function()
 		if (!jsonRes || jsonRes.result != 'ok')
 			throw new Error('Fail to obtain list of transactions');
 
+		jsonRes.data.sort((a, b) => b.pos - a.pos);
+
 		return jsonRes.data;
 	}
 

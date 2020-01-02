@@ -144,7 +144,6 @@ var runPersonAPI = (function()
 			// Prepare expected updates of transactions
 			let trBefore = await api.transaction.list();
 			let expTransList = app.run.api.account.onDelete(trBefore, accList, accRemoveList);
-			expTransList.sort((a, b) => a.pos - b.pos);
 
 			// Send API sequest to server
 			deleteRes = await api.person.del(ids);
