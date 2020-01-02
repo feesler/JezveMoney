@@ -230,11 +230,16 @@ var runTransList = (function()
 	}
 
 
+	function expectedPages(listLength)
+	{
+		return Math.max(Math.ceil(listLength / app.config.transactionsOnPage), 1);
+	}
+
+
 	async function runTests(appInstance)
 	{
 		app = appInstance;
 		env = app.view.props.environment;
-		const onPage = app.config.transactionsOnPage;
 		let test = app.test;
 
 		api.setEnv(env, app);
@@ -274,6 +279,7 @@ var runTransList = (function()
 		let acc_2_debts = filterTransactionsByType(acc_2_all, app.DEBT);
 
 		// Prepare date range for week
+		let now = new Date(app.convDate(app.dates.now));
 		let day1 = now.getDate();
 		let day2;
 		if (day1 > 22)
@@ -292,13 +298,12 @@ var runTransList = (function()
 		let acc_2_week = filterTransactionsByDate(acc_2_all, weekStartDate, weekEndDate);
 
 		let totalTransactions = totalExpenses + totalIncomes + totalTransfers + totalDebts;
-		let expectedPages = Math.ceil(totalTransactions / onPage);
 
 		let state = { visibility : { typeMenu : true, accDropDown : true, searchForm : true,
 										modeSelector : true, paginator : true, transList : true },
 	 					values : { typeMenu : { activeType : 0 },
 									searchForm : { value : '' },
-									paginator : { pages : expectedPages, active : 1 },
+									paginator : { pages : expectedPages(totalTransactions), active : 1 },
 									modeSelector : { listMode : { isActive : true },
 														detailsMode : { isActive : false } } } };
 
@@ -319,46 +324,46 @@ var runTransList = (function()
 
 		state.values.typeMenu.activeType = app.EXPENSE;
 		state.values.paginator.active = 1;
-		state.values.paginator.pages = Math.ceil(totalExpenses / onPage);
+		state.values.paginator.pages = expectedPages(totalExpenses);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Expense', () => {}, app.view, state);
 
 		state.values.typeMenu.activeType = app.INCOME;
-		state.values.paginator.pages = Math.ceil(totalIncomes / onPage);
+		state.values.paginator.pages = expectedPages(totalIncomes);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Income', () => {}, app.view, state);
 
 		state.values.typeMenu.activeType = app.TRANSFER;
-		state.values.paginator.pages = Math.ceil(totalTransfers / onPage);
+		state.values.paginator.pages = expectedPages(totalTransfers);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter Transfer transactions', () => {}, app.view, state);
 
 		state.values.typeMenu.activeType = app.DEBT;
-		state.values.paginator.pages = Math.ceil(totalDebts / onPage);
+		state.values.paginator.pages = expectedPages(totalDebts);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Debt', () => {}, app.view, state);
 
 		// Filter by account 2 and debt
-		state.values.paginator.pages = Math.ceil(acc_2_debts.length / onPage);
+		state.values.paginator.pages = expectedPages(acc_2_debts.length);
 		await app.view.filterByAccounts(accIds[2]);
 		await test('Filter by accounts', () => {}, app.view, state);
 
 		// Filter by account 2
 		state.values.typeMenu.activeType = 0;
-		state.values.paginator.pages = Math.ceil(acc_2_all.length / onPage);
+		state.values.paginator.pages = expectedPages(acc_2_all.length);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Show all transactions', () => {}, app.view, state);
 
 		state.values.typeMenu.activeType = 0;
 
 		// Filter by account 2 and last week date
-		state.values.paginator.pages = Math.ceil(acc_2_week.length / onPage);
+		state.values.paginator.pages = expectedPages(acc_2_week.length);
 		await app.view.selectDateRange(day1, day2);
 		await test('Select date range', () => {}, app.view, state);
 
 		let acc_2_query = filterTransactionsByQuery(acc_2_week, '1');
 
-		state.values.paginator.pages = Math.ceil(acc_2_query.length / onPage);
+		state.values.paginator.pages = expectedPages(acc_2_query.length);
 		state.values.searchForm.value = '1';
 		await app.view.search(state.values.searchForm.value);
 		await test('Search', () => {}, app.view, state);

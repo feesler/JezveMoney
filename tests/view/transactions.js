@@ -332,7 +332,10 @@ class TransactionsView extends TestView
 
 	pagesCount()
 	{
-		return this.content.paginator ? this.content.paginator.items.length : 1;
+		if (this.content.paginator && this.content.paginator.items && this.content.paginator.items.length)
+			return this.content.paginator.items.length;
+		else
+			return 1;
 	}
 
 
