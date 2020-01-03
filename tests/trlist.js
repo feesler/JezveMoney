@@ -103,11 +103,11 @@ class TransactionsList
 		if (ind === -1)
 			return false;
 
-		let origObj = this.list[ind];
+		let origObj = this.list.splice(ind, 1, transObj);
+		if (!origObj || !origObj.length)
+			return false;
 
-		this.list.splice(ind, 1, transObj);
-
-		if (origObj.date != transObj.date)
+		if (origObj[0].date != transObj.date)
 		{
 			transObj.pos = 0;
 			let newPos = this.getExpectedPos(transObj);
@@ -117,6 +117,40 @@ class TransactionsList
 		}
 
 		return true;
+	}
+
+
+	del(type, inds)
+	{
+		let typedIndexes = (this.app.isArray(inds)) ? inds : [ inds ];
+		let indexes = [];
+
+		// Save absolute indexes of items with specified type
+		let typeItems = [];
+		this.list.forEach((item, ind) =>
+		{
+			if (type == 0 || item.type == type)
+				typeItems.push(ind);
+		});
+
+		// Check requested indexes and map its absolute values
+		for(let ind of typedIndexes)
+		{
+			if (ind < 0 || ind >= typeItems.length)
+				throw new Error('Wrong transaction position: ' + ind);
+
+			indexes.push(typeItems[ind]);
+		}
+
+		let shift = 0;
+		let delList = [];
+		for(let ind of indexes)
+		{
+			let item = this.list.splice(ind - (shift++), 1);
+			delList.push(item[0]);
+		}
+
+		return delList;
 	}
 
 

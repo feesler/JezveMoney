@@ -163,66 +163,25 @@ var runTransactionsCommon = (function()
 
 		app.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
 
+		let expTransList = await checkTransactionsDataConsistency(app, 'Initial data consistency');
+
 		await app.goToMainView();
 
 		// Save accounts and persons before delete transactions
-		app.beforeDeleteTransaction = {};
-
-		app.beforeDeleteTransaction.accounts = app.copyObject(await app.view.global('accounts'));
-		app.beforeDeleteTransaction.persons = app.copyObject(await app.view.global('persons'));
+		let origAccounts = app.copyObject(await app.view.global('accounts'));
+		let origPersons = app.copyObject(await app.view.global('persons'));
 
 		// Navigate to transactions view and filter by specified type of transaction
 		await app.view.goToTransactions();
 		await app.view.filterByType(type);
-
-		let transListBefore = await iterateTransactionPages(app);
-
-		let trCount = transListBefore.items.length;
-		app.beforeDeleteTransaction.trCount = trCount;
-
-		app.beforeDeleteTransaction.deleteList = [];
-		for(let trPos of transactions)
-		{
-			if (trPos < 0 || trPos >= trCount)
-				throw new Error('Wrong transaction position: ' + trPos);
-
-			let trObj = transListBefore.items[trPos];
-			if (!trObj)
-				throw new Error('Transaction not found');
-
-			app.beforeDeleteTransaction.deleteList.push(trObj);
-		}
-
-
-		// Request view to select and delete transactions and wait for navigation
+		// Request view to select and delete transactions
 		await app.view.deleteTransactions(transactions);
-		await app.view.filterByType(type);
 
-		let transListAfter = await iterateTransactionPages(app);
-
-		// Check count of transactions
-		await test('Transactions list update', async () =>
-		{
-			if (transListBefore.items.length - transactions.length != transListAfter.items.length)
-				throw new Error('Unexpected count of transactions');
-
-			for(let trItem of app.beforeDeleteTransaction.deleteList)
-			{
-				if (transListAfter.items.find(item => item.id == trItem.id))
-					throw new Error('Transaction ' + trItem.id + ' not deleted');
-			}
-
-			return true;
-		}, app.view.props.environment);
-
-		app.transactions = transListAfter.items;
-
+		// Prepare expected transaction list
+		let removedTrans = expTransList.del(type, transactions);
 
 		// Navigate to main view and check changes in affected accounts and persons
 		await app.goToMainView();
-
-		let origAccounts = app.beforeDeleteTransaction.accounts;
-		let origPersons = app.beforeDeleteTransaction.persons;
 
 		// Widget changes
 		var personsWidget = { infoTiles : { items : { length : app.personTiles.length } } };
@@ -231,7 +190,7 @@ var runTransactionsCommon = (function()
 		let affectedAccounts = [];
 		let affectedPersons = [];
 
-		for(let tr of app.beforeDeleteTransaction.deleteList)
+		for(let tr of removedTrans)
 		{
 			if (tr.type == app.EXPENSE)
 			{
@@ -300,7 +259,11 @@ var runTransactionsCommon = (function()
 			}
 			else if (tr.type == app.DEBT)
 			{
-				let personAcc_id = (tr.debtType == 1) ? tr.src_id : tr.dest_id;
+				let srcAcc = await app.getAccount(tr.src_id);
+				let destAcc = await app.getAccount(tr.dest_id);
+
+				let debtType = (!!srcAcc && srcAcc.owner_id != app.owner_id);
+				let personAcc_id = (debtType) ? tr.src_id : tr.dest_id;
 				let person = app.getPersonByAcc(origPersons, personAcc_id);
 				if (!person)
 					throw new Error('Not found person with account ' + personAcc_id);
@@ -320,9 +283,9 @@ var runTransactionsCommon = (function()
 				if (!personAcc)
 					throw new Error('Not found account of person');
 
-				personAcc.balance += (tr.debtType == 1) ? tr.src_amount : -tr.dest_amount;
+				personAcc.balance += (debtType) ? tr.src_amount : -tr.dest_amount;
 
-				let acc_id = (tr.debtType == 1) ? tr.dest_id : tr.src_id;
+				let acc_id = (debtType) ? tr.dest_id : tr.src_id;
 				if (acc_id)
 				{
 					let accPos = app.getPosById(origAccounts, acc_id);
@@ -373,6 +336,10 @@ var runTransactionsCommon = (function()
 
 		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
 		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+
+		await checkTransactionsDataConsistency(app, 'List of transactions update', expTransList);
+
+		app.transactions = expTransList.list;
 	}
 
 
