@@ -23,12 +23,12 @@ var runPersons = (function()
 		app.personsCache = null;
 		await app.view.createPerson(personName);
 
-		let state = { value : { tiles : { items : { length : app.persons.length + 1 } } } };
-		state.value.tiles.items[app.persons.length] = { name : personName };
+		let state = { value : { tiles : { items : { length : app.personTiles.length + 1 } } } };
+		state.value.tiles.items[app.personTiles.length] = { name : personName };
 
 		await test('Create person', async () => {}, app.view, state);
 
-		app.persons = app.view.content.tiles.items;
+		app.personTiles = app.view.content.tiles.items;
 	}
 
 
@@ -39,7 +39,7 @@ var runPersons = (function()
 		await app.view.goToUpdatePerson(num);
 
 		let state = { visibility : { name : true },
-	 					values : { name : app.persons[num].name } };
+	 					values : { name : app.personTiles[num].name } };
 
 		await test('Update person view state', async () => {}, app.view, state);
 
@@ -49,12 +49,12 @@ var runPersons = (function()
 		await app.view.navigation(() => app.view.click(app.view.content.submitBtn));
 
 		// Check updates in the person tiles
-		state = { values : { tiles : { items : { length : app.persons.length } } } };
+		state = { values : { tiles : { items : { length : app.personTiles.length } } } };
 		state.values.tiles.items[num] = { name : personName };
 
 		await test('Update person', async () => {}, app.view, state);
 
-		app.persons = app.view.content.tiles.items;
+		app.personTiles = app.view.content.tiles.items;
 	}
 
 
@@ -65,11 +65,11 @@ var runPersons = (function()
 		app.personsCache = null;
 		await app.view.deletePersons(persons);
 
-		let state = { values : { tiles : { items : { length : app.persons.length - persons.length } } } };
+		let state = { values : { tiles : { items : { length : app.personTiles.length - persons.length } } } };
 
 		await test('Delete persons [' + persons.join() + ']', async () => {}, app.view, state);
 
-		app.persons = app.view.content.tiles.items;
+		app.personTiles = app.view.content.tiles.items;
 	}
 
 
