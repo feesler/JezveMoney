@@ -102,6 +102,31 @@ var runTransList = (function()
 	}
 
 
+	async function populateTransactions(list, convertFunc)
+	{
+		let res = [];
+
+		if (!list)
+			return res;
+
+		if (!app.isArray(list))
+			list = [ list ];
+
+		for(let props of list)
+		{
+			let convertedProps = await convertFunc(props);
+			for(let date of app.dateList)
+			{
+				convertedProps.date = date;
+				let createResult = await api.transaction.create(convertedProps);
+				res.push(createResult.id);
+			}
+		}
+
+		return res;
+	}
+
+
 	async function preCreateData()
 	{
 		console.log('Precreate data...');
@@ -112,62 +137,38 @@ var runTransList = (function()
 		personIds = await setupPersons(personsList);
 
 		// Expense transactions
-		for(let params of expensesList)
+		let created = await populateTransactions(expensesList, props =>
 		{
-			params.src_id = accIds[params.src_id];
-			let expenseParam = await api.transaction.expense(params);
-			for(let date of app.dateList)
-			{
-				expenseParam.date = date;
-				let createResult = await api.transaction.create(expenseParam);
-				if (createResult)
-					newExpenses.push(createResult.id);
-			}
-		}
+			props.src_id = accIds[props.src_id];
+			return api.transaction.expense(props);
+		});
+		newExpenses.push(...created);
 
 		// Income transactions
-		for(let params of incomesList)
-		{
-			params.dest_id = accIds[params.dest_id];
-			let incomeParam = await api.transaction.income(params);
-			for(let date of app.dateList)
+		created = await populateTransactions(incomesList, props =>
 			{
-				incomeParam.date = date;
-				let createResult = await api.transaction.create(incomeParam);
-				if (createResult)
-					newIncomes.push(createResult.id);
-			}
-		}
+				props.dest_id = accIds[props.dest_id];
+				return api.transaction.income(props);
+			});
+		newIncomes.push(...created);
 
 		// Transfer transactions
-		for(let params of transfersList)
-		{
-			params.src_id = accIds[params.src_id];
-			params.dest_id = accIds[params.dest_id];
-			let transferParam = await api.transaction.transfer(params);
-			for(let date of app.dateList)
+		created = await populateTransactions(transfersList, props =>
 			{
-				transferParam.date = date;
-				let createResult = await api.transaction.create(transferParam);
-				if (createResult)
-					newTransfers.push(createResult.id);
-			}
-		}
+				props.src_id = accIds[props.src_id];
+				props.dest_id = accIds[props.dest_id];
+				return api.transaction.transfer(props);
+			});
+		newTransfers.push(...created);
 
 		// Debt transactions
-		for(let params of debtsList)
-		{
-			params.person_id = personIds[params.person_id];
-			params.acc_id = (params.acc_id) ? accIds[params.acc_id] : 0;
-			let debtParam = await api.transaction.debt(params);
-			for(let date of app.dateList)
+		created = await populateTransactions(debtsList, props =>
 			{
-				debtParam.date = date;
-				let createResult = await api.transaction.create(debtParam);
-				if (createResult)
-					newDebts.push(createResult.id);
-			}
-		}
+				props.person_id = personIds[props.person_id];
+				props.acc_id = (props.acc_id) ? accIds[props.acc_id] : 0;
+				return api.transaction.debt(props);
+			});
+		newDebts.push(...created);
 
 		console.log('Done');
 	}
