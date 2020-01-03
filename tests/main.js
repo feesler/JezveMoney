@@ -305,10 +305,17 @@ class Application
 	{
 		this.view.setBlock('Create expense transactions', 1);
 
-		await transactions.expense.create(this, 0, 0, { destAmount : '123.7801' })
-		await transactions.expense.create(this, 3, 2, { srcAmount : '100', destAmount : '7013.21', destCurr : 1 });
-		await transactions.expense.create(this, 1, 0, { destAmount : '0.01', date : this.dates.yesterday });
-		await transactions.expense.create(this, 1, 0, { srcAcc : 4, destAmount : '99.99', date : this.dates.monthAgo });
+		let list = [
+			{ fromAccount : 0, destAmount : '123.7801' },
+			{ fromAccount : 3, srcAmount : '100', destAmount : '7013.21', destCurr : 1 },
+			{ fromAccount : 1, destAmount : '0.01', date : this.dates.yesterday },
+			{ fromAccount : 1, srcAcc : 4, destAmount : '99.99', date : this.dates.monthAgo },
+		];
+
+		for(let props of list)
+		{
+			await transactions.expense.create(this, props);
+		}
 	}
 
 
@@ -316,10 +323,17 @@ class Application
 	{
 		this.view.setBlock('Create income transactions', 1);
 
-		await transactions.income.create(this, 0, 0, { srcAmount : '10023.7801', date : this.dates.yesterday });
-		await transactions.income.create(this, 3, 2, { srcAmount : '7013.21', destAmount : '100', srcCurr : 1 });
-		await transactions.income.create(this, 1, 0, { srcAmount : '0.01', date : this.dates.weekAgo });
-		await transactions.income.create(this, 1, 0, { destAcc : 4, srcAmount : '99.99', date : this.dates.monthAgo });
+		let list = [
+			{ fromAccount : 0, srcAmount : '10023.7801', date : this.dates.yesterday },
+			{ fromAccount : 3, srcAmount : '7013.21', destAmount : '100', srcCurr : 2 },
+			{ fromAccount : 1, srcAmount : '0.01', date : this.dates.weekAgo },
+			{ fromAccount : 1, destAcc : 4, srcAmount : '99.99', date : this.dates.monthAgo },
+		];
+
+		for(let props of list)
+		{
+			await transactions.income.create(this, props);
+		}
 	}
 
 
@@ -327,11 +341,18 @@ class Application
 	{
 		this.view.setBlock('Create transfer transactions', 1);
 
-		await transactions.transfer.create(this, 0, { srcAmount : '1000' })
-		await transactions.transfer.create(this, 0, { destAcc : 2, srcAmount : '11.4', destAmount : '10' });
-		await transactions.transfer.create(this, 0, { srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' });
-		await transactions.transfer.create(this, 0, { srcAcc : 2, srcAmount : '10', destAmount : '9.75' });
-		await transactions.transfer.create(this, 0, { destAcc : 3, srcAmount : '10', destAmount : '9.50' });
+		let list = [
+			{ srcAmount : '1000' },
+			{ destAcc : 2, srcAmount : '11.4', destAmount : '10' },
+			{ srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' },
+			{ srcAcc : 2, srcAmount : '10', destAmount : '9.75' },
+			{ destAcc : 3, srcAmount : '10', destAmount : '9.50' },
+		];
+
+		for(let props of list)
+		{
+			await transactions.transfer.create(this, props);
+		}
 	}
 
 
@@ -339,12 +360,19 @@ class Application
 	{
 		this.view.setBlock('Submit debt transactions', 1);
 
-		await transactions.debt.create(this, 0, { srcAmount : '1000' });
-		await transactions.debt.create(this, 0, { debtType : false, acc : 2, srcAmount : '200', date : this.dates.weekAgo });
-		await transactions.debt.create(this, 0, { debtType : true, acc : 3, srcAmount : '100.0101' });
-		await transactions.debt.create(this, 0, { debtType : false, person : 1, acc : 3, srcAmount : '10', date : this.dates.yesterday });
-		await transactions.debt.create(this, 0, { acc : null, srcAmount : '105', date : this.dates.yesterday });
-		await transactions.debt.create(this, 0, { debtType : false, person : 1, acc : null, srcAmount : '105' });
+		let list = [
+			{ srcAmount : '1000' },
+			{ debtType : false, acc : 2, srcAmount : '200', date : this.dates.weekAgo },
+			{ debtType : true, acc : 3, srcAmount : '100.0101' },
+			{ debtType : false, person : 1, acc : 3, srcAmount : '10', date : this.dates.yesterday },
+			{ acc : null, srcAmount : '105', date : this.dates.yesterday },
+			{ debtType : false, person : 1, acc : null, srcAmount : '105' },
+		];
+
+		for(let props of list)
+		{
+			await transactions.debt.create(this, props);
+		}
 	}
 
 
@@ -352,10 +380,17 @@ class Application
 	{
 		this.view.setBlock('Update expense transactions', 2);
 
-		await transactions.expense.update(this, 3, { destAmount : '124.7701' });
-		await transactions.expense.update(this, 0, { srcAmount : '101', destAmount : '7065.30', destCurr : 1 });
-		await transactions.expense.update(this, 2, { destAmount : '0.02', date : this.dates.weekAgo });
-		await transactions.expense.update(this, 3, { srcAcc : 3, destAmount : '99.9', date : this.dates.yesterday });
+		let list = [
+			{ pos : 3, destAmount : '124.7701' },
+			{ pos : 0, srcAmount : '101', destAmount : '7065.30', destCurr : 1 },
+			{ pos : 2, destAmount : '0.02', date : this.dates.weekAgo },
+			{ pos : 3, srcAcc : 3, destAmount : '99.9', date : this.dates.yesterday },
+		];
+
+		for(let props of list)
+		{
+			await transactions.expense.update(this, props);
+		}
 	}
 
 
@@ -363,10 +398,17 @@ class Application
 	{
 		this.view.setBlock('Update income transactions', 2);
 
-		await transactions.income.update(this, 1, { srcAmount : '100.001', date : this.dates.weekAgo });
-		await transactions.income.update(this, 2, { srcAmount : '0.02' });
-		await transactions.income.update(this, 0, { srcAmount : '7065.30', destAmount : '101', srcCurr : 1 });
-		await transactions.income.update(this, 3, { destAcc : 3, srcAmount : '99.9' });
+		let list = [
+			{ pos : 1, srcAmount : '100.001', date : this.dates.weekAgo },
+			{ pos : 2, srcAmount : '0.02' },
+			{ pos : 0, srcAmount : '7065.30', destAmount : '101', srcCurr : 1 },
+			{ pos : 3, destAcc : 3, srcAmount : '99.9' },
+		];
+
+		for(let props of list)
+		{
+			await transactions.income.update(this, props);
+		}
 	}
 
 
@@ -374,11 +416,18 @@ class Application
 	{
 		this.view.setBlock('Update transfer transactions', 2);
 
-		await transactions.transfer.update(this, 0, { destAcc : 0, srcAmount : '11' });
-		await transactions.transfer.update(this, 1, { srcAcc : 2, srcAmount : '100', destAmount : '97.55' });
-		await transactions.transfer.update(this, 2, { srcAcc : 3, srcAmount : '5.0301' });
-		await transactions.transfer.update(this, 3, { srcAcc : 0, srcAmount : '50', destAmount : '0.82' });
-		await transactions.transfer.update(this, 4, { srcAmount : '1050.01' });
+		let list = [
+			{ pos : 0, destAcc : 0, srcAmount : '11' },
+			{ pos : 1, srcAcc : 2, srcAmount : '100', destAmount : '97.55' },
+			{ pos : 2, srcAcc : 3, srcAmount : '5.0301' },
+			{ pos : 3, srcAcc : 0, srcAmount : '50', destAmount : '0.82' },
+			{ pos : 4, srcAmount : '1050.01' },
+		];
+
+		for(let props of list)
+		{
+			await transactions.transfer.update(this, props);
+		}
 	}
 
 
@@ -386,12 +435,19 @@ class Application
 	{
 		this.view.setBlock('Update debt transactions', 2);
 
-		await transactions.debt.update(this, 0, { person : 0, srcAmount : '105' });
-		await transactions.debt.update(this, 3, { acc : 1, srcAmount : '105', date : this.dates.now });
-		await transactions.debt.update(this, 4, { debtType : true, srcAmount : '10' });
-		await transactions.debt.update(this, 1, { debtType : false, acc : 2, srcAmount : '200.0202', date : this.dates.monthAgo });
-		await transactions.debt.update(this, 5, { acc : null, srcAmount : '200' });
-		await transactions.debt.update(this, 2, { srcAmount : '1001', date : this.dates.weekAgo });
+		let list = [
+			{ pos : 0, person : 0, srcAmount : '105' },
+			{ pos : 3, acc : 1, srcAmount : '105', date : this.dates.now },
+			{ pos : 4, debtType : true, srcAmount : '10' },
+			{ pos : 1, debtType : false, acc : 2, srcAmount : '200.0202', date : this.dates.monthAgo },
+			{ pos : 5, acc : null, srcAmount : '200' },
+			{ pos : 2, srcAmount : '1001', date : this.dates.weekAgo },
+		];
+
+		for(let props of list)
+		{
+			await transactions.debt.update(this, props);
+		}
 	}
 
 
@@ -399,8 +455,15 @@ class Application
 	{
 		this.view.setBlock('Delete expense transactions', 2);
 
-		await transactions.del(this, App.EXPENSE, [0]);
-		await transactions.del(this, App.EXPENSE, [0, 1, 11, 13]);
+		let list = [
+			[0],
+			[0, 1, 11, 13],
+		];
+
+		for(let props of list)
+		{
+			await transactions.del(this, App.EXPENSE, props);
+		}
 	}
 
 
@@ -408,8 +471,15 @@ class Application
 	{
 		this.view.setBlock('Delete income transactions', 2);
 
-		await transactions.del(this, App.INCOME, [0]);
-		await transactions.del(this, App.INCOME, [0, 1, 2, 15]);
+		let list = [
+			[0],
+			[0, 1, 2, 15],
+		];
+
+		for(let props of list)
+		{
+			await transactions.del(this, App.INCOME, props);
+		}
 	}
 
 
@@ -417,8 +487,15 @@ class Application
 	{
 		this.view.setBlock('Delete transfer transactions', 2);
 
-		await transactions.del(this, App.TRANSFER, [1]);
-		await transactions.del(this, App.TRANSFER, [0, 2]);
+		let list = [
+			[1],
+			[0, 2],
+		];
+
+		for(let props of list)
+		{
+			await transactions.del(this, App.INCOME, props);
+		}
 	}
 
 
@@ -426,8 +503,15 @@ class Application
 	{
 		this.view.setBlock('Delete debt transactions', 2);
 
-		await transactions.del(this, App.DEBT, [0]);
-		await transactions.del(this, App.DEBT, [0, 1]);
+		let list = [
+			[0],
+			[0, 1],
+		];
+
+		for(let props of list)
+		{
+			await transactions.del(this, App.DEBT, props);
+		}
 	}
 
 

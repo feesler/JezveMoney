@@ -66,7 +66,7 @@ var runExpense = (function()
 	}
 
 
-	async function createExpense(app, accNum, onState, params)
+	async function createExpense(app, params)
 	{
 		let env = app.view.props.environment;
 		test = app.test;
@@ -79,11 +79,12 @@ var runExpense = (function()
 		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
 		// Navigate to create transaction page
+		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
 		await app.goToMainView();
 		await app.view.goToNewTransactionByAccount(accNum);
 
 		// Input data and submit
-		await expenseTransactionLoop(app, onState, app => submitExpenseTransaction(app, params));
+		await submitExpenseTransaction(app, params);
 
 		// Prepare data for next calculations
 	 	let { srcAcc, srcAccPos, srcAmount, destAmount, srcCurr, destCurr, date, comment } = app.beforeSubmitTransaction;
@@ -137,22 +138,23 @@ var runExpense = (function()
 
 
 	// Update expense transaction and check results
-	async function updateExpense(app, pos, params)
+	async function updateExpense(app, params)
 	{
 		let view = app.view;
 		test = app.test;
+
+		if (!app.isObject(params))
+			throw new Error('Parameters not specified');
+
+		let pos = parseInt(params.pos);
+		if (isNaN(pos) || pos < 0)
+			throw new Error('Position of transaction not specified');
+		delete params.pos;
 
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Update expense [' + pos + '] (' + titleParams.join(', ') + ')', 2);
-
-		pos = parseInt(pos);
-		if (isNaN(pos) || pos < 0)
-			throw new Error('Position of transaction not specified');
-
-		if (!app.isObject(params))
-			throw new Error('Parameters not specified');
 
 		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
@@ -279,60 +281,32 @@ var runExpense = (function()
 
 	// State 0
 		view.setBlock('Expense loop', 2);
-		await test('Initial state of new expense view', async () =>
-		{
-			let trObj = await view.getUpdateTransactionObj();
+		await test('Initial state of new expense view', async () => view.setExpectedState(0), view);
 
-			if (trObj)
-			{
-				let srcAcc = app.idSearch(app.accountTiles, view.model.srcAccount.id);
 
-				let initialBal = app.normalize(view.model.fSrcResBal + trObj.srcAmount);
-				view.model.srcAccount.fmtBalance = view.model.srcCurr.formatValue(initialBal);
-			}
+	// Input destination amount
+		await test('Destination amount (1) input', () => view.inputDestAmount('1'), view);
+		await test('Destination amount (1.) input', () => view.inputDestAmount('1.'), view);
+		await test('Destination amount (1.0) input', () => view.inputDestAmount('1.0'), view);
+		await test('Destination amount (1.01) input', () => view.inputDestAmount('1.01'), view);
+		await test('Destination amount (1.010) input', () => view.inputDestAmount('1.010'), view);
+		await test('Destination amount (1.0101) input', () => view.inputDestAmount('1.0101'), view);
 
-			view.setExpectedState(0);
-		}, view);
-
-		actionState = parseInt(actionState);
-		let actionRequested = !isNaN(actionState);
-		if (actionState === 0)
-			return action(app);
-
-		if (!actionRequested)
-		{
-			// Input destination amount
-			await test('Destination amount (1) input', () => view.inputDestAmount('1'), view);
-			await test('Destination amount (1.) input', () => view.inputDestAmount('1.'), view);
-			await test('Destination amount (1.0) input', () => view.inputDestAmount('1.0'), view);
-			await test('Destination amount (1.01) input', () => view.inputDestAmount('1.01'), view);
-			await test('Destination amount (1.010) input', () => view.inputDestAmount('1.010'), view);
-			await test('Destination amount (1.0101) input', () => view.inputDestAmount('1.0101'), view);
-		}
 
 	// Transition 2: click on result balance block and move from State 0 to State 1
 		await test('(2) Click on source result balance', () => view.clickSrcResultBalance(), view);
 
-		if (actionState === 1)
-			return action(app);
+	// Input result balance
+		await test('Result balance (499.9) input', () => view.inputResBalance('499.9'), view);
+		await test('Result balance (499.90) input', () => view.inputResBalance('499.90'), view);
+		await test('Result balance (499.901) input', () => view.inputResBalance('499.901'), view);
 
-		if (!actionRequested)
-		{
-			// Input result balance
-			await test('Result balance (499.9) input', () => view.inputResBalance('499.9'), view);
-			await test('Result balance (499.90) input', () => view.inputResBalance('499.90'), view);
-			await test('Result balance (499.901) input', () => view.inputResBalance('499.901'), view);
-		}
+	// Transition 12: change account to another one with different currency and stay on State 1
+		await test('(12) Change account to another one with currency different than current destination currency',
+				() => view.changeSrcAccountByPos(2), view);
 
-		if (!actionRequested)
-		{
-			// Transition 12: change account to another one with different currency and stay on State 1
-			await test('(12) Change account to another one with currency different than current destination currency',
-					() => view.changeSrcAccountByPos(2), view);
-
-			// Change account back
-			await test('(12) Change account back', () => view.changeSrcAccountByPos(0), view);
-		}
+	// Change account back
+		await test('(12) Change account back', () => view.changeSrcAccountByPos(0), view);
 
 	// Transition 3: click on destination amount block and move from State 1 to State 0
 		await test('(3) Click on destination amount', () => view.clickDestAmount(), view);
@@ -340,65 +314,47 @@ var runExpense = (function()
 	// Transition 4: select different currency for destination and move from State 0 to State 2
 		await test('(4) Change destination curency to USD', () => view.changeDestCurrency(2), view);
 
-		if (actionState === 2)
-			return action(app);
-
-		if (!actionRequested)
-		{
-			// Input source amount
-			await test('Empty source amount input', () => view.inputSrcAmount(''), view);
-			await test('Source amount (.) input', () => view.inputSrcAmount('.'), view);
-			await test('Source amount (0.) input', () => view.inputSrcAmount('0.'), view);
-			await test('Source amount (.0) input', () => view.inputSrcAmount('.0'), view);
-			await test('Source amount (.01) input', () => view.inputSrcAmount('.01'), view);
-			await test('Source amount (1.01) input', () => view.inputSrcAmount('1.01'), view);
-			await test('Source amount (1.010) input', () => view.inputSrcAmount('1.010'), view);
-		}
+	// Input source amount
+		await test('Empty source amount input', () => view.inputSrcAmount(''), view);
+		await test('Source amount (.) input', () => view.inputSrcAmount('.'), view);
+		await test('Source amount (0.) input', () => view.inputSrcAmount('0.'), view);
+		await test('Source amount (.0) input', () => view.inputSrcAmount('.0'), view);
+		await test('Source amount (.01) input', () => view.inputSrcAmount('.01'), view);
+		await test('Source amount (1.01) input', () => view.inputSrcAmount('1.01'), view);
+		await test('Source amount (1.010) input', () => view.inputSrcAmount('1.010'), view);
 
 	// Transition 8: click on exchange rate block and move from State 2 to State 3
 		await test('(8) Click on exchange rate', () => view.clickExchRate(), view);
 
-		if (actionState === 3)
-			return action(app);
-
-		if (!actionRequested)
-		{
-			// Input exchange rate
-			await test('Input exchange rate (1.09)', () => view.inputExchRate('1.09'), view);
-			await test('Input exchange rate (3.09)', () => view.inputExchRate('3.09'), view);
-			await test('Input exchange rate (.)', () => view.inputExchRate('.'), view);
-			await test('Input exchange rate (.0)', () => view.inputExchRate('.0'), view);
-			await test('Input exchange rate (.09)', () => view.inputExchRate('.09'), view);
-			await test('Input exchange rate (.090101)', () => view.inputExchRate('.090101'), view);
-		}
+		// Input exchange rate
+		await test('Input exchange rate (1.09)', () => view.inputExchRate('1.09'), view);
+		await test('Input exchange rate (3.09)', () => view.inputExchRate('3.09'), view);
+		await test('Input exchange rate (.)', () => view.inputExchRate('.'), view);
+		await test('Input exchange rate (.0)', () => view.inputExchRate('.0'), view);
+		await test('Input exchange rate (.09)', () => view.inputExchRate('.09'), view);
+		await test('Input exchange rate (.090101)', () => view.inputExchRate('.090101'), view);
 
 		// Transition 16: click on destination amount block and move from State 3 to State 2
 		await test('(16) Click on destination amount', () => view.clickDestAmount(), view);
 
-		if (!actionRequested)
-		{
-			// Transition 13: select another currency different from currency of source account and stay on state
-			await test('(13) Change destination curency to EUR', () => view.changeDestCurrency(3), view);
+		// Transition 13: select another currency different from currency of source account and stay on state
+		await test('(13) Change destination curency to EUR', () => view.changeDestCurrency(3), view);
 
-			// Transition 9: select same currency as source account and move from State 2 to State 0
-			await test('(9) Change destination curency to RUB', () => view.changeDestCurrency(1), view);
+		// Transition 9: select same currency as source account and move from State 2 to State 0
+		await test('(9) Change destination curency to RUB', () => view.changeDestCurrency(1), view);
 
-			// Transition 1: change account to another one with different currency and stay on State 0
-			await test('(1) Change account to another one with different currency', () => view.changeSrcAccountByPos(2), view);
+		// Transition 1: change account to another one with different currency and stay on State 0
+		await test('(1) Change account to another one with different currency', () => view.changeSrcAccountByPos(2), view);
 
-			// Transition 4: select different currency for destination and move from State 0 to State 2
-			await test('(4) Select different currency for destination', () => view.changeDestCurrency(3), view);
+		// Transition 4: select different currency for destination and move from State 0 to State 2
+		await test('(4) Select different currency for destination', () => view.changeDestCurrency(3), view);
 
-			// Transition 5: change account to another one with currency different than current destination currency and stay on State 2
-			await test('(5) Change account to another one with currency different than current destination currency',
-					() => view.changeSrcAccountByPos(0), view);
-		}
+		// Transition 5: change account to another one with currency different than current destination currency and stay on State 2
+		await test('(5) Change account to another one with currency different than current destination currency',
+				() => view.changeSrcAccountByPos(0), view);
 
 	// Transition 6: click on source result balance block and move from State 2 to State 4
 		await test('(6) Click on source result block', () => view.clickSrcResultBalance(), view);
-
-		if (actionState === 4)
-			return action(app);
 
 	// Transition 10: change account to another one with currency different than current destination currency and stay on State 4
 		await test('(10) Change account to another one with currency different than current destination currency',

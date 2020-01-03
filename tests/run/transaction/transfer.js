@@ -65,7 +65,7 @@ var runTransfer = (function()
 	}
 
 
-	async function createTransfer(app, onState, params)
+	async function createTransfer(app, params)
 	{
 		let env = app.view.props.environment;
 		test = app.test;
@@ -78,12 +78,13 @@ var runTransfer = (function()
 		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
 		// Navigate to create transaction page
+		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
 		await app.goToMainView();
-		await app.view.goToNewTransactionByAccount(0);
+		await app.view.goToNewTransactionByAccount(accNum);
 		await app.view.changeTransactionType(app.TRANSFER);
 
 		// Input data and submit
-		await transferTransactionLoop(app, onState, app => submitTransferTransaction(app, params));
+		await submitTransferTransaction(app, params);
 
 		let { srcAcc, srcAccPos, destAcc, destAccPos, srcAmount, destAmount, srcCurr, destCurr, date, comment } = app.beforeSubmitTransaction;
 		let newTransInd = expTransList.create({ src_id : srcAcc.id,
@@ -138,22 +139,23 @@ var runTransfer = (function()
 
 
 	// Update transfer transaction and check results
-	async function updateTransfer(app, pos, params)
+	async function updateTransfer(app, params)
 	{
 		let view = app.view;
 		test = app.test;
+
+		if (!app.isObject(params))
+			throw new Error('Parameters not specified');
+
+		let pos = parseInt(params.pos);
+		if (isNaN(pos) || pos < 0)
+			throw new Error('Position of transaction not specified');
+		delete params.pos;
 
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Update transfer [' + pos + '] (' + titleParams.join(', ') + ')', 2);
-
-		pos = parseInt(pos);
-		if (isNaN(pos) || pos < 0)
-			throw new Error('Position of transaction not specified');
-
-		if (!app.isObject(params))
-			throw new Error('Parameters not specified');
 
 		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
@@ -298,7 +300,7 @@ var runTransfer = (function()
 	}
 
 
-	async function transferTransactionLoop(app, actionState, action)
+	async function transferTransactionLoop(app)
 	{
 		let view = app.view;
 		test = app.test;
@@ -306,25 +308,17 @@ var runTransfer = (function()
 		view.setBlock('Transfer loop', 2);
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);
 
-		actionState = parseInt(actionState);
-		let actionRequested = !isNaN(actionState);
-		if (actionState === 0)
-			return action(app);
-
-		if (!actionRequested)
-		{
-			// Input source amount
-			await test('Source amount (1) input', () => view.inputSrcAmount('1'), view);
-			await test('Source amount (1.) input', () => view.inputSrcAmount('1.'), view);
-			await test('Source amount (1.0) input', () => view.inputSrcAmount('1.0'), view);
-			await test('Source amount (1.01) input', () => view.inputSrcAmount('1.01'), view);
-			await test('Source amount (1.010) input', () => view.inputSrcAmount('1.010'), view);
-			await test('Source amount (1.0101) input', () => view.inputSrcAmount('1.0101'), view);
-			await test('Emptry source amount input', () => view.inputSrcAmount(''), view);
-			await test('Source amount (.) input', () => view.inputSrcAmount('.'), view);
-			await test('Source amount (.0) input', () => view.inputSrcAmount('.0'), view);
-			await test('Source amount (.09) input', () => view.inputSrcAmount('.09'), view);
-		}
+	// Input source amount
+		await test('Source amount (1) input', () => view.inputSrcAmount('1'), view);
+		await test('Source amount (1.) input', () => view.inputSrcAmount('1.'), view);
+		await test('Source amount (1.0) input', () => view.inputSrcAmount('1.0'), view);
+		await test('Source amount (1.01) input', () => view.inputSrcAmount('1.01'), view);
+		await test('Source amount (1.010) input', () => view.inputSrcAmount('1.010'), view);
+		await test('Source amount (1.0101) input', () => view.inputSrcAmount('1.0101'), view);
+		await test('Emptry source amount input', () => view.inputSrcAmount(''), view);
+		await test('Source amount (.) input', () => view.inputSrcAmount('.'), view);
+		await test('Source amount (.0) input', () => view.inputSrcAmount('.0'), view);
+		await test('Source amount (.09) input', () => view.inputSrcAmount('.09'), view);
 
 	// Transition 7: Change destination account to another one with same currency as source (EUR)
 		await test('(7) Change destination account', () => view.changeDestAccountByPos(0), view);
@@ -333,58 +327,42 @@ var runTransfer = (function()
 	// Transition 1: Click by source balance and move from State 0 to State 1
 		await test('(1) Click on source result balance', () => view.clickSrcResultBalance(), view);
 
-		if (actionState === 1)
-			return action(app);
+	// Input source result balance
+		await test('Source result balance (400) input', () => view.inputResBalance('400'), view);
+		await test('Source result balance (400.) input', () => view.inputResBalance('400.'), view);
+		await test('Source result balance (400.9) input', () => view.inputResBalance('400.9'), view);
+		await test('Source result balance (400.99) input', () => view.inputResBalance('400.99'), view);
+		await test('Source result balance (400.990) input', () => view.inputResBalance('400.990'), view);
+		await test('Source result balance (400.9901) input', () => view.inputResBalance('400.9901'), view);
+		await test('Empty result balance input', () => view.inputResBalance(''), view);
+		await test('Source result balance (.) input', () => view.inputResBalance('.'), view);
+		await test('Source result balance (.0) input', () => view.inputResBalance('.0'), view);
+		await test('Source result balance (.01) input', () => view.inputResBalance('.01'), view);
 
-		if (!actionRequested)
-		{
-			// Input source result balance
-			await test('Source result balance (400) input', () => view.inputResBalance('400'), view);
-			await test('Source result balance (400.) input', () => view.inputResBalance('400.'), view);
-			await test('Source result balance (400.9) input', () => view.inputResBalance('400.9'), view);
-			await test('Source result balance (400.99) input', () => view.inputResBalance('400.99'), view);
-			await test('Source result balance (400.990) input', () => view.inputResBalance('400.990'), view);
-			await test('Source result balance (400.9901) input', () => view.inputResBalance('400.9901'), view);
-			await test('Empty result balance input', () => view.inputResBalance(''), view);
-			await test('Source result balance (.) input', () => view.inputResBalance('.'), view);
-			await test('Source result balance (.0) input', () => view.inputResBalance('.0'), view);
-			await test('Source result balance (.01) input', () => view.inputResBalance('.01'), view);
-		}
-
-		// Transition 11: Change source account to another one with same currency as destination and stay on State 1
+	// Transition 11: Change source account to another one with same currency as destination and stay on State 1
 		await test('(11) Change source account', () => view.changeSrcAccountByPos(4), view);
-		// Transition 13: Change destination account to another one with same currency as source and stay on State 1
+	// Transition 13: Change destination account to another one with same currency as source and stay on State 1
 		await test('(13) Change destination account', () => view.changeDestAccountByPos(4), view);
-		// Transition 9: Click by destination balance and move from State 1 to State 2
+	// Transition 9: Click by destination balance and move from State 1 to State 2
 		await test('(9) Click on destination result balance', () => view.clickDestResultBalance(), view);
 
-		if (actionState === 2)
-			return action(app);
-
-		if (!actionRequested)
-		{
-			// Input destination result balance
-			await test('Destination result balance (600) input', () => view.inputDestResBalance('600'), view);
-			await test('Destination result balance (600.) input', () => view.inputDestResBalance('600.'), view);
-			await test('Destination result balance (600.9) input', () => view.inputDestResBalance('600.9'), view);
-			await test('Destination result balance (600.90) input', () => view.inputDestResBalance('600.90'), view);
-			await test('Destination result balance (600.901) input', () => view.inputDestResBalance('600.901'), view);
-			await test('Destination result balance (600.9010) input', () => view.inputDestResBalance('600.9010'), view);
-			await test('Destination result balance (600.90101) input', () => view.inputDestResBalance('600.90101'), view);
-			await test('Empty destination result balance input', () => view.inputDestResBalance(''), view);
-			await test('Destination result balance (.) input', () => view.inputDestResBalance('.'), view);
-			await test('Destination result balance (.0) input', () => view.inputDestResBalance('.0'), view);
-		}
+	// Input destination result balance
+		await test('Destination result balance (600) input', () => view.inputDestResBalance('600'), view);
+		await test('Destination result balance (600.) input', () => view.inputDestResBalance('600.'), view);
+		await test('Destination result balance (600.9) input', () => view.inputDestResBalance('600.9'), view);
+		await test('Destination result balance (600.90) input', () => view.inputDestResBalance('600.90'), view);
+		await test('Destination result balance (600.901) input', () => view.inputDestResBalance('600.901'), view);
+		await test('Destination result balance (600.9010) input', () => view.inputDestResBalance('600.9010'), view);
+		await test('Destination result balance (600.90101) input', () => view.inputDestResBalance('600.90101'), view);
+		await test('Empty destination result balance input', () => view.inputDestResBalance(''), view);
+		await test('Destination result balance (.) input', () => view.inputDestResBalance('.'), view);
+		await test('Destination result balance (.0) input', () => view.inputDestResBalance('.0'), view);
 
 	// Transition 15: Change source account to another one with same currency and stay on State 2
 		await test('(15) Change source account', () => view.changeSrcAccountByPos(4), view);
 	// Transition 17: Change destination account to another one with same currency and stay on State 2
 		await test('(17) Change destination account', () => view.changeDestAccount(4), view);
 	// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
-
-		if (actionState === 5)
-			return action(app);
-
 		await test('(16) Change source account', () => view.changeSrcAccountByPos(2), view);
 	// Transition 26: Change source account to another one with different currency (EUR) and stay on State 5
 		await test('(26) Change source account', () => view.changeSrcAccountByPos(3), view);
@@ -401,10 +379,6 @@ var runTransfer = (function()
 	// Transition 2: Click by source amount and move from State 1 to State 0
 		await test('(2) Click on source amount', () => view.clickSrcAmount(), view);
 	// Transition 6: Change source account to another one with different currency than destination (USD) and move from State 0 to State 3
-
-		if (actionState === 3)
-			return action(app);
-
 		await test('(6) Change source account', () => view.changeSrcAccountByPos(2), view);
 	// Transition 43: Change source account to another one with different currency than destination (RUB) and stay on State 3
 		await test('(43) Change source account', () => view.changeSrcAccountByPos(1), view);

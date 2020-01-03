@@ -100,7 +100,7 @@ var runDebt = (function()
 	}
 
 
-	async function createDebt(app, onState, params)
+	async function createDebt(app, params)
 	{
 		let env = app.view.props.environment;
 		test = app.test;
@@ -113,12 +113,13 @@ var runDebt = (function()
 		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
 		// Navigate to create transaction page
+		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
 		await app.goToMainView()
-		await app.view.goToNewTransactionByAccount(0);
+		await app.view.goToNewTransactionByAccount(accNum);
 		await app.view.changeTransactionType(app.DEBT);
 
 		// Input data and submit
-		await debtTransactionLoop(app, onState, app => submitDebtTransaction(app, params));
+		await submitDebtTransaction(app, params);
 
 		// Prepare data for next calculations
 		let {
@@ -224,22 +225,23 @@ var runDebt = (function()
 	}
 
 
-	async function updateDebt(app, pos, params)
+	async function updateDebt(app, params)
 	{
 		let view = app.view;
 		test = app.test;
+
+		if (!app.isObject(params))
+			throw new Error('Parameters not specified');
+
+		let pos = parseInt(params.pos);
+		if (isNaN(pos) || pos < 0)
+			throw new Error('Position of transaction not specified');
+		delete params.pos;
 
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
 		app.view.setBlock('Update debt [' + pos + '] (' + titleParams.join(', ') + ')', 2);
-
-		pos = parseInt(pos);
-		if (isNaN(pos) || pos < 0)
-			throw new Error('Position of transaction not specified');
-
-		if (!app.isObject(params))
-			throw new Error('Parameters not specified');
 
 		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
 
@@ -451,18 +453,13 @@ var runDebt = (function()
 	}
 
 
-	async function debtTransactionLoop(app, actionState, action)
+	async function debtTransactionLoop(app)
 	{
 		let view = app.view;
 		test = app.test;
 
 		view.setBlock('Debt loop', 2);
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
-
-		actionState = parseInt(actionState);
-		let actionRequested = !isNaN(actionState);
-		if (actionState === 0)
-			return action(app);
 
 	// Input source amount
 		await test('Source amount (1) input', () => view.inputSrcAmount('1'), view);
@@ -703,8 +700,6 @@ var runDebt = (function()
 		await test('(18) Change debt type', () => view.toggleDebtType(), view);
 	// Transition 50: Disable account and move from State 5 to State 7
 		await test('(50) Disable account', () => view.toggleAccount(), view);
-
-		return view;
 	}
 
 
