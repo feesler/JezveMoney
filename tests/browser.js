@@ -304,7 +304,7 @@ var Environment = (function()
 
 	async function navigation(action)
 	{
-		let navPromise = new Promise(function(resolve, reject)
+		let navPromise = new Promise((resolve, reject) =>
 		{
 			viewframe.onload = async function()
 			{
@@ -327,6 +327,12 @@ var Environment = (function()
 			await action();
 
 		return navPromise;
+	}
+
+
+	async function goTo(url)
+	{
+		await navigation(() => viewframe.src = url);
 	}
 
 
@@ -362,7 +368,7 @@ var Environment = (function()
 
 				await addResult('Test initialization', true);
 
-				await navigation(() => viewframe.src = baseURL);
+				await goTo(baseURL);
 				await app.startTests();
 			}
 			catch(e)
@@ -378,6 +384,7 @@ var Environment = (function()
 		baseUrl : getBaseUrl,
 		url : getUrl,
 		navigation,
+		goTo,
 		parent : vparent,
 		query : vquery,
 		queryAll : vqueryall,

@@ -9,7 +9,7 @@ import { App } from './main.js';
 
 var Environment = (function()
 {
-	let browserPage = null;
+	let page = null;
 	let baseURL = null;
 	let results = null;
 	let app = null;
@@ -24,7 +24,7 @@ var Environment = (function()
 
 	async function getUrl()
 	{
-		return browserPage.url();
+		return page.url();
 	}
 
 
@@ -44,7 +44,7 @@ var Environment = (function()
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : browserPage;
+		let parent = parentSpecified ? arguments[0] : page;
 
 		return (typeof query === 'string') ? parent.$(query) : query;
 	}
@@ -57,7 +57,7 @@ var Environment = (function()
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : browserPage;
+		let parent = parentSpecified ? arguments[0] : page;
 
 		return (typeof query === 'string') ? parent.$$(query) : query;
 	}
@@ -87,15 +87,15 @@ var Environment = (function()
 
 	async function waitFor(selector, options)
 	{
-		return browserPage.waitForSelector(selector, options);
+		return page.waitForSelector(selector, options);
 	}
 
 
 	async function getGlobal(prop)
 	{
-		let windowHandle = await browserPage.evaluateHandle(() => window);
+		let windowHandle = await page.evaluateHandle(() => window);
 
-		return browserPage.evaluate((w, prop) =>
+		return page.evaluate((w, prop) =>
 		{
 			let res = w;
 			let propPath = prop.split('.');
@@ -122,7 +122,7 @@ var Environment = (function()
 	async function isVisible(elem, recursive)
 	{
 		if (typeof elem === 'string')
-			elem = browserPage.$('#' + elem);
+			elem = page.$('#' + elem);
 
 		return elem.evaluate((el, r) =>
 		{
@@ -178,10 +178,10 @@ var Environment = (function()
 		if (val == '')
 		{
 			await elem.focus();
-			await browserPage.keyboard.down('ControlLeft');
-			await browserPage.keyboard.press('KeyA');
-			await browserPage.keyboard.up('ControlLeft');
-			return browserPage.keyboard.press('Delete');
+			await page.keyboard.down('ControlLeft');
+			await page.keyboard.press('KeyA');
+			await page.keyboard.up('ControlLeft');
+			return page.keyboard.press('Delete');
 		}
 		else
 		{
@@ -380,9 +380,9 @@ var Environment = (function()
 
 		let navPromise = new Promise((resolve, reject) =>
 		{
-			browserPage.once('load', async () =>
+			page.once('load', async () =>
 			{
-				let content = await browserPage.content();
+				let content = await page.content();
 
 				common.checkPHPerrors(Environment, content);
 
@@ -398,6 +398,12 @@ var Environment = (function()
 		await action();
 
 		return navPromise;
+	}
+
+
+	async function goTo(url)
+	{
+		await navigation(() => page.goto(url));
 	}
 
 
@@ -428,11 +434,11 @@ var Environment = (function()
 												args : [ '--proxy-server="direct://"',
 															'--proxy-bypass-list=*' ] });
 			let allPages = await browser.pages();
-			browserPage = (allPages.length) ? allPages[0] : await browser.newPage();
+			page = (allPages.length) ? allPages[0] : await browser.newPage();
 
 			await addResult('Test initialization', true);
 
-			await navigation(() => browserPage.goto(baseURL));
+			await goTo(baseURL);
 			await app.startTests();
 			res = 0;
 		}
@@ -454,6 +460,7 @@ var Environment = (function()
 				baseUrl : getBaseUrl,
 				url : getUrl,
 				navigation,
+				goTo,
 				parent : vparent,
 				query : vquery,
 				queryAll : vqueryall,
