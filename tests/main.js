@@ -70,7 +70,7 @@ class Application
 			this[key] = common[key];
 		}
 
-		api.setEnv(this.view.props.environment, this);
+		api.setEnv(this);
 
 		let loginResult = await api.user.login(this.config.testUser.login, this.config.testUser.password);
 		if (!loginResult)

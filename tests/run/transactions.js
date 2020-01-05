@@ -234,7 +234,7 @@ var runTransList = (function()
 		env = app.view.props.environment;
 		let test = app.test;
 
-		api.setEnv(env, app);
+		api.setEnv(app);
 
 		env.setBlock('Transaction List view', 1);
 

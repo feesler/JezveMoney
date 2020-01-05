@@ -68,7 +68,7 @@ var runExpense = (function()
 
 	async function createExpense(app, params)
 	{
-		let env = app.view.props.environment;
+		let env = app.environment;
 		test = app.test;
 
 		let titleParams = [];

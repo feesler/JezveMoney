@@ -10,13 +10,13 @@ var apiModule = (function()
 	let apiBase = null;
 
 
-	function setupEnvironment(e, App)
+	function setupEnvironment(App)
 	{
-		if (!e || !App || !App.config || !App.config.url)
+		if (!App || !App.config || !App.config.url || !App.environment)
 			throw new Error('Unexpected setup');
 
-		env = e;
 		app = App;
+		env = app.environment;
 		apiBase = app.config.url + 'api/';
 	}
 

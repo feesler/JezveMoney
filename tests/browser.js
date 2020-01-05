@@ -339,6 +339,7 @@ var Environment = (function()
 	async function initTests(appInstance)
 	{
 		app = appInstance;
+		app.environment = Environment;
 
 		if (!app)
 			throw new Error('Invalid App');

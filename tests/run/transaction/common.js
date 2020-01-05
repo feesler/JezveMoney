@@ -120,7 +120,7 @@ var runTransactionsCommon = (function()
 	// Return instance of TransactionsList with current data
 	async function checkTransactionsDataConsistency(app, descr, transList)
 	{
-		let env = app.view.props.environment;
+		let env = app.environment;
 		let test = app.test;
 
 		// Save all transactions

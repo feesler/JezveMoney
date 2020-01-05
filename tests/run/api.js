@@ -16,7 +16,7 @@ var runAPI = (function()
 		env = app.view.props.environment;
 		test = app.test;
 
-		api.setEnv(env, app);
+		api.setEnv(app);
 
 		env.setBlock('API tests', 1);
 

@@ -102,7 +102,7 @@ var runDebt = (function()
 
 	async function createDebt(app, params)
 	{
-		let env = app.view.props.environment;
+		let env = app.environment;
 		test = app.test;
 
 		let titleParams = [];

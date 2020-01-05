@@ -416,6 +416,7 @@ var Environment = (function()
 		try
 		{
 			app = appInstance;
+			app.environment = Environment;
 
 			results = { total : 0, ok : 0, fail : 0, expected : 0 };
 

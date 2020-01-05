@@ -67,7 +67,7 @@ var runIncome = (function()
 
 	async function createIncome(app, params)
 	{
-		let env = app.view.props.environment;
+		let env = app.environment;
 		test = app.test;
 
 		let titleParams = [];
