@@ -1,6 +1,7 @@
 import { common } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
+import { AppState } from './state.js';
 
 
 import { runProfile } from './run/profile.js';
@@ -55,9 +56,6 @@ class Application
 
 		this.dates = {};
 		this.dateList = [];
-
-		this.accountsCache = [];
-		this.personsCache = [];
 	}
 
 
@@ -82,6 +80,8 @@ class Application
 
 		this.user_id = userProfile.user_id;
 		this.owner_id = userProfile.owner_id;
+
+		this.state = new AppState(this);
 
 		this.currencies = await api.currency.list();
 
@@ -115,46 +115,6 @@ class Application
 		timeTitle.push(seconds + 's');
 
 		console.log('Duration of tests: ' + timeTitle.join(' '));
-	}
-
-
-	async getAccount(acc_id)
-	{
-		let id = parseInt(acc_id);
-		if (!id || isNaN(id))
-			return null;
-
-		let accObj = null;
-
-		if (this.isArray(this.accountsCache))
-			accObj = this.accountsCache.find(item => item.id == id);
-		if (!accObj)
-		{
-			this.accountsCache = await api.account.list(true);
-			accObj = this.accountsCache.find(item => item.id == id);
-		}
-
-		return accObj;
-	}
-
-
-	async getPerson(person_id)
-	{
-		let id = parseInt(person_id);
-		if (!id || isNaN(id))
-			return null;
-
-		let personObj = null;
-
-		if (this.isArray(this.personsCache))
-			personObj = this.personsCache.find(item => item.id == id);
-		if (!personObj)
-		{
-			this.personsCache = await api.person.list();
-			personObj = this.personsCache.find(item => item.id == id);
-		}
-
-		return personObj;
 	}
 
 

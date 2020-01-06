@@ -8,6 +8,7 @@ class IncomeTransactionView extends TransactionView
 	{
 		let res = {};
 
+		res.type = 2;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;

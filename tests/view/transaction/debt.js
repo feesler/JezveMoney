@@ -24,6 +24,7 @@ class DebtTransactionView extends TransactionView
 	{
 		let res = {};
 
+		res.type = 4;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;

@@ -47,21 +47,14 @@ var runTransfer = (function()
 		if ('comment' in params)
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
-		app.beforeSubmitTransaction = { srcAcc : view.model.srcAccount,
-									srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
-									destAcc : view.model.destAccount,
-									destAccPos : await view.getAccountPos(view.model.destAccount.id),
-									srcCurr : view.model.srcCurr,
-									destCurr : view.model.destCurr,
-									srcAmount : view.model.fSrcAmount,
-									destAmount : view.model.fDestAmount,
-									date : view.model.date,
-									comment : view.model.comment };
+		let res = view.getExpectedTransaction();
 
-		app.accountsCache = null;
-		app.personsCache = null;
+		app.state.accounts = null;
+		app.state.persons = null;
 
-		return view.submit();
+		await view.submit();
+
+		return res;
 	}
 
 
@@ -75,7 +68,10 @@ var runTransfer = (function()
 			titleParams.push(k + ': ' + params[k]);
 		app.view.setBlock('Create transfer (' + titleParams.join(', ') + ')', 2);
 
-		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
+		let accList = await app.state.getAccountsList();
+		let pList = await app.state.getPersonsList();
+		let trBefore = await api.transaction.list();
+		let expTransList = new TransactionsList(app, trBefore);
 
 		// Navigate to create transaction page
 		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
@@ -84,49 +80,14 @@ var runTransfer = (function()
 		await app.view.changeTransactionType(app.TRANSFER);
 
 		// Input data and submit
-		await submitTransferTransaction(app, params);
+		let expectedTransaction = await submitTransferTransaction(app, params);
 
-		let { srcAcc, srcAccPos, destAcc, destAccPos, srcAmount, destAmount, srcCurr, destCurr, date, comment } = app.beforeSubmitTransaction;
-		let newTransInd = expTransList.create({ src_id : srcAcc.id,
-												dest_id : destAcc.id,
-												src_amount : srcAmount,
-												dest_amount : destAmount,
-											 	src_curr : srcCurr.id,
-												dest_curr : destCurr.id,
-												date,
-												comment });
+		// Prepare data for next calculations
+		let afterCreate = app.state.createTransaction(accList, expectedTransaction);
+		expTransList.create(expectedTransaction);
+		let expectedState = await app.state.render(afterCreate, pList, expTransList.list);
 
-		// Obtain real source and destination amount from props:
-		// Source amount expected to be always set
-		// In case of transfer between accounts with different currency use destination amount value
-		// In case of transfer between accounts with the same currency copy source amount value
-		let sa = params.srcAmount;
-		let da = ('destAmount' in params) ? params.destAmount : params.srcAmount;
-		let expSrcBalance = srcAcc.balance - app.normalize(sa);
-		let expDestBalance = destAcc.balance + app.normalize(da);
-		let fmtSrcBal = app.formatCurrency(expSrcBalance, srcAcc.curr_id, app.currencies);
-		let fmtDestBal = app.formatCurrency(expDestBalance, destAcc.curr_id, app.currencies);
-
-		// Accounts widget changes
-		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
-		accWidget.tiles.items[srcAccPos] = { balance : fmtSrcBal, name : srcAcc.name };
-		accWidget.tiles.items[destAccPos] = { balance : fmtDestBal, name : destAcc.name };
-
-		// Transactions widget changes
-		let transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
-
-		if (newTransInd >= 0 && newTransInd < app.config.latestTransactions)
-		{
-			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[newTransInd]);
-			transWidget.transList.items[newTransInd] = listItem;
-		}
-
-		let state = { values : { widgets : { length : app.config.widgetsCount } } };
-		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
-		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
-
-		await test('Transfer transaction submit', async () => {}, app.view, state);
+		await test('Main page widgets update', async () => {}, app.view, expectedState);
 
 		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
 		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
@@ -157,142 +118,31 @@ var runTransfer = (function()
 			titleParams.push(k + ': ' + params[k]);
 		view.setBlock('Update transfer [' + pos + '] (' + titleParams.join(', ') + ')', 2);
 
-		let expTransList = await runTransactionsCommon.checkData(app, 'Initial data consistency');
+		let accList = await app.state.getAccountsList();
+		let pList = await app.state.getPersonsList();
+		let trBefore = await api.transaction.list();
+		let expTransList = new TransactionsList(app, trBefore);
 
 		// Step 0: Navigate to transactions list view and filter by transfer
 		await app.goToMainView();
 		await app.view.goToTransactions();
 		await app.view.filterByType(app.TRANSFER);
-		view = app.view;
-
-		// Step 1: Save count of transactions and navigate to update transaction view
-		app.beforeUpdateTransaction = { trCount : expTransList.list.length };
-
-		let trObj = await view.getTransactionObject(view.content.transList.items[pos].id);
-		if (!trObj)
-			throw new Error('Transaction not found');
-
-		app.beforeUpdateTransaction.trObj = trObj;
-
-		await view.goToUpdateTransaction(pos);
-		view = app.view;
+		await app.view.goToUpdateTransaction(pos);
 
 		// Step 2: Save original data of transaction, perform update actions and submit
-		let isDiff = (app.beforeUpdateTransaction.trObj.src_curr != app.beforeUpdateTransaction.trObj.dest_curr);
+		let origTransaction = app.view.getExpectedTransaction();
+		let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-		await test('Initial state of update transfer view', async () => view.setExpectedState(isDiff ? 3 : 0), view);
+		await test('Initial state of update transfer view', async () => app.view.setExpectedState(isDiff ? 3 : 0), app.view);
 
-		app.setParam(app.beforeUpdateTransaction,
-					{ id : view.model.id,
-						srcAcc : view.model.srcAccount,
-						srcAccPos : await view.getAccountPos(view.model.srcAccount.id),
-						srcBalance : view.model.fSrcResBal,
-						destAcc : view.model.destAccount,
-						destAccPos : await view.getAccountPos(view.model.destAccount.id),
-						destBalance : view.model.fDestResBal,
-						srcAmount : view.model.fSrcAmount,
-						destAmount : view.model.fDestAmount,
-						date : view.model.date,
-						comment : view.model.comment});
+		let expectedTransaction = await submitTransferTransaction(app, params);
 
-		await submitTransferTransaction(app, params);
+		let afterUpdate = app.state.updateTransaction(accList, origTransaction, expectedTransaction);
+		expTransList.update(origTransaction.id, expectedTransaction);
+		let expectedState = await app.state.render(afterUpdate, pList, expTransList.list);
 
-		// Step 3: Check update of transactions list
-		await app.view.filterByType(app.TRANSFER);
-
-		let { srcAcc : updSrcAcc,
-				srcAccPos : updSrcAccPos,
-				destAcc : updDestAcc,
-				destAccPos : updDestAccPos,
-				srcAmount : updSrcAmount,
-				destAmount : updDestAmount,
-				srcCurr : updSrcCurr,
-				destCurr : updDestCurr,
-				date : updDate,
-				comment : updComment } = app.beforeSubmitTransaction;
-
-		let { id : trans_id,
-				srcAcc : origSrcAcc,
-				srcAccPos : origSrcAccPos,
-				destAcc : origDestAcc,
-				destAccPos : origDestAccPos,
-				srcBalance : origSrcBalance,
-				destBalance : origDestBalance,
-				srcAmount : origSrcAmount,
-				destAmount : origDestAmount,
-				date : origDate,
-				comment : origComment,
-				trCount : transCount } = app.beforeUpdateTransaction;
-
-		// Transactions list changes
-		expTransList.update(trans_id, {
-			id : trans_id,
-			type : app.TRANSFER,
-			src_id : updSrcAcc.id,
-			dest_id : updDestAcc.id,
-			src_amount : updSrcAmount,
-			dest_amount : updDestAmount,
-		 	src_curr : updSrcCurr.id,
-			dest_curr : updDestCurr.id,
-			date : updDate,
-			comment : updComment,
-		 	pos : trObj.pos });
-
-		// Transactions list changes
 		await app.goToMainView();
-
-		let transWidget = { title : 'Transactions',
-							transList : { items : { length : Math.min(expTransList.list.length, app.config.latestTransactions) } } };
-
-		let updTransInd = expTransList.findItem(trans_id);
-		if (updTransInd >= 0 && updTransInd < app.config.latestTransactions)
-		{
-			let listItem = await runTransactionsCommon.convertToListItem(app, expTransList.list[updTransInd]);
-			transWidget.transList.items[updTransInd] = listItem;
-		}
-
-
-		// Step 4: Check updates of affected accounts
-
-
-		// Accounts widget changes
-		let accWidget = { tiles : { items : { length : app.accountTiles.length } } };
-		let expBalance = [], fmtBal;
-
-		// Cancel transaction
-		let affectedAccounts = [];
-		affectedAccounts[origSrcAccPos] = { balance : origSrcBalance + origSrcAmount, name : origSrcAcc.name, curr_id : origSrcAcc.curr_id };
-		affectedAccounts[origDestAccPos] = { balance : origDestBalance - origDestAmount, name : origDestAcc.name, curr_id : origDestAcc.curr_id };
-
-		// Chech if account was changed we need to update both
-		if (!(updSrcAccPos in affectedAccounts))
-		{
-			affectedAccounts[updSrcAccPos] = { balance : updSrcAcc.balance, name : updSrcAcc.name, curr_id : updSrcAcc.curr_id };
-		}
-
-		affectedAccounts[updSrcAccPos].balance -= app.normalize(updSrcAmount);
-
-		// Chech if account was changed we need to update both
-		if (!(updDestAccPos in affectedAccounts))
-		{
-			affectedAccounts[updDestAccPos] = { balance : updDestAcc.balance, name : updDestAcc.name, curr_id : updDestAcc.curr_id };
-		}
-
-		affectedAccounts[updDestAccPos].balance += app.normalize(updDestAmount);
-
-		for(let accPos in affectedAccounts)
-		{
-			let acc = affectedAccounts[accPos];
-			fmtBal = app.formatCurrency(acc.balance, acc.curr_id, app.currencies);
-
-			accWidget.tiles.items[accPos] = { balance : fmtBal, name : acc.name };
-		}
-
-		let state = { values : { widgets : { length : app.config.widgetsCount } } };
-		state.values.widgets[app.config.AccountsWidgetPos] = accWidget;
-		state.values.widgets[app.config.LatestWidgetPos] = transWidget;
-
-		await test('Main page widgets update', async () => {}, app.view, state);
+		await test('Main page widgets update', async () => {}, app.view, expectedState);
 
 		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
 

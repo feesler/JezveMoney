@@ -194,6 +194,27 @@ class TransactionView extends TestView
 	}
 
 
+	getExpectedTransaction()
+	{
+		let res = {};
+
+		if (this.model.isUpdate)
+			res.id = this.model.id;
+
+		res.type = this.model.type;
+		res.src_id = (this.model.srcAccount) ? this.model.srcAccount.id : 0;
+		res.dest_id = (this.model.destAccount) ? this.model.destAccount.id : 0;
+		res.src_amount = this.model.fSrcAmount;
+		res.dest_amount = this.model.fDestAmount;
+		res.src_curr = this.model.src_curr_id;
+		res.dest_curr = this.model.dest_curr_id;
+		res.date = this.model.date;
+		res.comment = this.model.comment;
+
+		return res;
+	}
+
+
 	// Return null if no account can't be found
 	async getAccount(acc_id)
 	{

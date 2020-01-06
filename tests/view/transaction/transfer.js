@@ -8,6 +8,7 @@ class TransferTransactionView extends TransactionView
 	{
 		let res = {};
 
+		res.type = 3;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;

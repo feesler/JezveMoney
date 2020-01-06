@@ -20,40 +20,6 @@ var runTransactionAPI = (function()
 	}
 
 
-	// Apply transaction to accounts
-	function applyTransaction(accList, transObj)
-	{
-		let res = app.copyObject(accList);
-
-		let srcAcc = app.idSearch(res, transObj.src_id);
-		if (srcAcc)
-			srcAcc.balance -= transObj.src_amount;
-
-		let destAcc = app.idSearch(res, transObj.dest_id);
-		if (destAcc)
-			destAcc.balance += transObj.dest_amount;
-
-		return res;
-	}
-
-
-	// Cancel transaction to accounts
-	function cancelTransaction(accList, transObj)
-	{
-		let res = app.copyObject(accList);
-
-		let srcAcc = app.idSearch(res, transObj.src_id);
-		if (srcAcc)
-			srcAcc.balance += transObj.src_amount;
-
-		let destAcc = app.idSearch(res, transObj.dest_id);
-		if (destAcc)
-			destAcc.balance -= transObj.dest_amount;
-
-		return res;
-	}
-
-
 	async function getExpectedTransaction(params)
 	{
 		let res = app.copyObject(params);
@@ -133,7 +99,7 @@ var runTransactionAPI = (function()
 
 			// Prepare expected updates of accounts
 			let accBefore = await api.account.list();
-			let expAccountList = applyTransaction(accBefore, expTrans);
+			let expAccountList = app.state.applyTransaction(accBefore, expTrans);
 
 			// Send API sequest to server
 			let createRes = await api.transaction.create(params);
@@ -264,8 +230,8 @@ var runTransactionAPI = (function()
 			expTrans.pos = origTrans.pos;
 
 			// Prepare expected updates of accounts
-			let accCanceled = cancelTransaction(accBefore, origTrans);
-			let expAccountList = applyTransaction(accCanceled, expTrans);
+			let accCanceled = app.state.cancelTransaction(accBefore, origTrans);
+			let expAccountList = app.state.applyTransaction(accCanceled, expTrans);
 
 			// Send API sequest to server
 			updateRes = await api.transaction.update(updParams);
@@ -317,7 +283,7 @@ var runTransactionAPI = (function()
 				if (trIndex !== -1)
 					expTransList.splice(trIndex, 1);
 
-				expAccList = cancelTransaction(expAccList, app.idSearch(trBefore, tr_id));
+				expAccList = app.state.cancelTransaction(expAccList, app.idSearch(trBefore, tr_id));
 			}
 
 			// Send API sequest to server
