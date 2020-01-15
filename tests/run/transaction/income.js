@@ -60,92 +60,24 @@ var runIncome = (function()
 
 	async function createIncome(app, params)
 	{
-		let env = app.environment;
-		test = app.test;
-
-		let titleParams = [];
-		for(let k in params)
-			titleParams.push(k + ': ' + params[k]);
-		app.view.setBlock('Create income (' + titleParams.join(', ') + ')', 2);
-
-		let accList = await app.state.getAccountsList();
-		let pList = await app.state.getPersonsList();
-		let trBefore = await api.transaction.list();
-		let expTransList = new TransactionsList(app, trBefore);
-
-		// Navigate to create transaction page
-		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
-		await app.goToMainView();
-		await app.view.goToNewTransactionByAccount(accNum);
-		await app.view.changeTransactionType(app.INCOME);
-
-		// Input data and submit
-		let expectedTransaction = await submitIncomeTransaction(app, params);
-
-		// Prepare data for next calculations
-		let afterCreate = app.state.createTransaction(accList, expectedTransaction);
-		expTransList.create(expectedTransaction);
-		let expectedState = await app.state.render(afterCreate, pList, expTransList.list);
-
-		await test('Main page widgets update', async () => {}, app.view, expectedState);
-
-		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
-
-		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
-
-		app.transactions = expTransList.list;
+		await runTransactionsCommon.create(app, app.INCOME, params, submitIncomeTransaction);
 	}
 
 
 	// Update income transaction and check results
 	async function updateIncome(app, params)
 	{
-		let view = app.view;
 		test = app.test;
 
-		if (!app.isObject(params))
-			throw new Error('Parameters not specified');
+		await runTransactionsCommon.update(app, app.INCOME, params, async (app, params) =>
+		{
+			let origTransaction = app.view.getExpectedTransaction();
+			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-		let pos = parseInt(params.pos);
-		if (isNaN(pos) || pos < 0)
-			throw new Error('Position of transaction not specified');
-		delete params.pos;
+			await test('Initial state of update income view', async () => app.view.setExpectedState(isDiff ? 2 : 0), app.view);
 
-		let titleParams = [];
-		for(let k in params)
-			titleParams.push(k + ': ' + params[k]);
-		app.view.setBlock('Update income [' + pos + '] (' + titleParams.join(', ') + ')', 2);
-
-		let accList = await app.state.getAccountsList();
-		let pList = await app.state.getPersonsList();
-		let trBefore = await api.transaction.list();
-		let expTransList = new TransactionsList(app, trBefore);
-
-		// Step 0: navigate to transactions view and filter by income
-		await app.goToMainView();
-		await app.view.goToTransactions();
-		await app.view.filterByType(app.INCOME);
-		await app.view.goToUpdateTransaction(pos);
-
-		// Step 2: Save original data of transaction, perform update actions and submit
-		let origTransaction = app.view.getExpectedTransaction();
-		let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
-
-		await test('Initial state of update income view', async () => app.view.setExpectedState(isDiff ? 2 : 0), app.view);
-
-		let expectedTransaction = await submitIncomeTransaction(app, params);
-
-		let afterUpdate = app.state.updateTransaction(accList, origTransaction, expectedTransaction);
-		expTransList.update(origTransaction.id, expectedTransaction);
-		let expectedState = await app.state.render(afterUpdate, pList, expTransList.list);
-
-		await app.goToMainView();
-		await test('Main page widgets update', async () => {}, app.view, expectedState);
-
-		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
-
-		app.transactions = expTransList.list;
+			return submitIncomeTransaction(app, params);
+		});
 	}
 
 
