@@ -86,9 +86,17 @@ var runExpense = (function()
 		let view = app.view;
 		test = app.test;
 
+		const RUB = 1;
+		const USD = 2;
+		const EUR = 3;
+		const ACC_3 = 0;
+		const ACC_RUB = 1;
+		const ACC_USD = 2;
+		const ACC_EUR = 3;
+
 	// State 0
 		view.setBlock('Expense loop', 2);
-		await test('Initial state of new expense view', async () => view.setExpectedState(0), view);
+		await test('Initial state of new expense view', () => view.setExpectedState(0), view);
 
 	// Input destination amount
 		await test('Destination amount (1) input', () => view.inputDestAmount('1'), view);
@@ -108,16 +116,16 @@ var runExpense = (function()
 
 	// Transition 12: change account to another one with different currency and stay on State 1
 		await test('(12) Change account to another one with currency different than current destination currency',
-				() => view.changeSrcAccountByPos(2), view);
+			() => view.changeSrcAccountByPos(ACC_USD), view);
 
 	// Change account back
-		await test('(12) Change account back', () => view.changeSrcAccountByPos(0), view);
+		await test('(12) Change account back', () => view.changeSrcAccountByPos(ACC_3), view);
 
 	// Transition 3: click on destination amount block and move from State 1 to State 0
 		await test('(3) Click on destination amount', () => view.clickDestAmount(), view);
 
 	// Transition 4: select different currency for destination and move from State 0 to State 2
-		await test('(4) Change destination curency to USD', () => view.changeDestCurrency(2), view);
+		await test('(4) Change destination curency to USD', () => view.changeDestCurrency(USD), view);
 
 	// Input source amount
 		await test('Empty source amount input', () => view.inputSrcAmount(''), view);
@@ -141,58 +149,45 @@ var runExpense = (function()
 
 	// Transition 16: click on destination amount block and move from State 3 to State 2
 		await test('(16) Click on destination amount', () => view.clickDestAmount(), view);
-
 	// Transition 13: select another currency different from currency of source account and stay on state
-		await test('(13) Change destination curency to EUR', () => view.changeDestCurrency(3), view);
-
+		await test('(13) Change destination curency to EUR', () => view.changeDestCurrency(EUR), view);
 	// Transition 9: select same currency as source account and move from State 2 to State 0
-		await test('(9) Change destination curency to RUB', () => view.changeDestCurrency(1), view);
-
+		await test('(9) Change destination curency to RUB', () => view.changeDestCurrency(RUB), view);
 	// Transition 1: change account to another one with different currency and stay on State 0
-		await test('(1) Change account to another one with different currency', () => view.changeSrcAccountByPos(2), view);
-
-	// Transition 4: select different currency for destination and move from State 0 to State 2
-		await test('(4) Select different currency for destination', () => view.changeDestCurrency(3), view);
+		await test('(1) Change account to another one with different currency', () => view.changeSrcAccountByPos(ACC_USD), view);
 
 	// Transition 5: change account to another one with currency different than current destination currency and stay on State 2
+		await view.changeDestCurrency(EUR);		// move from State 0 to State 2
 		await test('(5) Change account to another one with currency different than current destination currency',
-				() => view.changeSrcAccountByPos(0), view);
+			() => view.changeSrcAccountByPos(ACC_3), view);
 
 	// Transition 6: click on source result balance block and move from State 2 to State 4
 		await test('(6) Click on source result block', () => view.clickSrcResultBalance(), view);
 
 	// Transition 10: change account to another one with currency different than current destination currency and stay on State 4
 		await test('(10) Change account to another one with currency different than current destination currency',
-				() => view.changeSrcAccountByPos(2), view);
+			() => view.changeSrcAccountByPos(ACC_USD), view);
 
 	// Transition 7: click on destination amount block and move from State 4 to State 2
 		await test('(7) Click on source amount block', () => view.clickDestAmount(), view);
 
 	// Transition 14: select source account with the same currency as destination and move from State 2 to State 0
 		await test('(14) Change account to another one with the same currency as current destination currency',
-				() => view.changeSrcAccountByPos(3), view);
-
-	// Transition 4: select different currency for destination and move from State 0 to State 2
-		await test('(4) Select different currency for destination', () => view.changeDestCurrency(1), view);
-
-	// Transition 8: click on exchange rate block and move from State 2 to State 3
-		await test('(8) Click on exchange rate', () => view.clickExchRate(), view);
+			() => view.changeSrcAccountByPos(ACC_EUR), view);
 
 	// Transition 17: change account to another one with currency different than current destination currency and stay on State 3
+		await view.changeDestCurrency(RUB);		// move from State 0 to State 2
+		await view.clickExchRate();				// move from State 2 to State 3
 		await test('(17) Change account to another one with currency different than current destination currency',
-				() => view.changeSrcAccountByPos(2), view);
+			() => view.changeSrcAccountByPos(ACC_USD), view);
 
 	// Transition 15: select source account with the same currency as destination and move from State 2 to State 0
 		await test('(15) Change account to another one with the same currency as destination',
-				() => view.changeSrcAccountByPos(1), view);
-
-	// Transition 4: select different currency for destination and move from State 0 to State 2
-		await test('(4) Select different currency for destination', () => view.changeDestCurrency(2), view);
-
-	// Transition 6: click on source result balance block and move from State 2 to State 4
-		await test('(6) Click on source result balance block', () => view.clickSrcResultBalance(), view);
+			() => view.changeSrcAccountByPos(ACC_RUB), view);
 
 	// Transition 19: click on exchange rate block and move from State 4 to State 3
+		await view.changeDestCurrency(USD);		// move from State 0 to State 2
+		await view.clickSrcResultBalance();		// move from State 2 to State 4
 		await test('(19) Click on exchange rate block', () => view.clickExchRate(), view);
 
 	// Transition 18: click on source result balance and move from State 3 to State 4
@@ -200,7 +195,7 @@ var runExpense = (function()
 
 	// Transition 11: select source account with the same currency as destination and move from State 4 to State 1
 		await test('(11) Change account to another one with the same currency as destination',
-				() => view.changeSrcAccountByPos(2), view);
+				() => view.changeSrcAccountByPos(ACC_USD), view);
 	}
 
 
