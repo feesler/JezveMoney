@@ -5,6 +5,23 @@ const TRANSFER = 3;
 const DEBT = 4;
 
 
+// Return string for specified type of transaction
+function getTransactionTypeStr(type)
+{
+	const typeToStr = {
+		[EXPENSE] : 'expense',
+		[INCOME] : 'income',
+		[TRANSFER] : 'transfer',
+		[DEBT] : 'debt'
+	};
+
+	if (!type || !(type in typeToStr))
+		throw new Error('Unknown transaction type ' + type);
+
+	return typeToStr[type];
+}
+
+
 // Check object is array
 function isArray(obj)
 {
@@ -443,6 +460,7 @@ var commonModule = { EXPENSE,
 					INCOME,
 					TRANSFER,
 					DEBT,
+					getTransactionTypeStr,
 					isArray,
 					isDate,
 					isFunction,
