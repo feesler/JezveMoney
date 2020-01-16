@@ -87,11 +87,13 @@ var runAPI = (function()
 		 * Create transactions
 		 */
 		const TR_EXPENSE_1 = await transaction.createExpenseTest({ src_id : ACC_RUB,
-														src_amount : 100 });
+														src_amount : 100,
+													 	comm : '11' });
 		const TR_EXPENSE_2 = await transaction.createExpenseTest({ src_id : ACC_RUB,
 														src_amount : 7608,
 														dest_amount : 100,
-														dest_curr : EUR });
+														dest_curr : EUR,
+													 	comm : '22' });
 		const TR_EXPENSE_3 = await transaction.createExpenseTest({ src_id : ACC_USD,
 														src_amount : 1,
 														date : yesterday });
@@ -115,7 +117,8 @@ var runAPI = (function()
 		const TR_DEBT_1 = await transaction.createDebtTest({ debtop : 1,
 													person_id : PERSON_X,
 													acc_id : CASH_RUB,
-												 	src_amount : 500 });
+												 	src_amount : 500,
+												 	comm : 'x41' });
 		const TR_DEBT_2 = await transaction.createDebtTest({ debtop : 2,
 													person_id : PERSON_Y,
 													acc_id : CASH_RUB,
