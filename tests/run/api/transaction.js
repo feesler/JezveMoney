@@ -308,7 +308,7 @@ var runTransactionAPI = (function()
 			{
 				let filtered = trListBefore.filterByType(params.type);
 				trListBefore = new TransactionsList(app, filtered);
-				reqParams.type = params.type;
+				reqParams.type = app.getTransactionTypeStr(params.type);
 			}
 			if ('accounts' in params)
 			{
