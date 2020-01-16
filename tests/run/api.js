@@ -167,6 +167,24 @@ var runAPI = (function()
 											debtop : 1,
 											acc_id : ACC_RUB });
 
+
+		/**
+		 * Filter transactions
+		 */
+		 await transaction.filterTest({ type : app.DEBT });
+
+		 await transaction.filterTest({ accounts : ACC_RUB });
+
+		 await transaction.filterTest({ type : app.DEBT,
+			 							accounts : ACC_RUB });
+
+		 await transaction.filterTest({ startDate : now,
+			 							endDate : new Date(now + 604800) });
+
+		 await transaction.filterTest({ startDate : now,
+			 							endDate : new Date(now + 604800),
+									 	search : '1' });
+
 		/**
 		 * Update accounts
 		 */

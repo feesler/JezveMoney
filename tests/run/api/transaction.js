@@ -293,6 +293,63 @@ var runTransactionAPI = (function()
 	}
 
 
+	// Filter list of transaction by specified params
+	async function apiFilterTransactionsTest(params)
+	{
+		await test('Filter transactions', async () =>
+		{
+			let trBefore = await api.transaction.list();
+			let expTransList = app.copyObject(trBefore);
+			let trListBefore = new TransactionsList(app, expTransList);
+
+			let reqParams = {};
+
+			if ('type' in params)
+			{
+				let filtered = trListBefore.filterByType(params.type);
+				trListBefore = new TransactionsList(app, filtered);
+				reqParams.type = params.type;
+			}
+			if ('accounts' in params)
+			{
+				let filtered = trListBefore.filterByAccounts(params.accounts);
+				trListBefore = new TransactionsList(app, filtered);
+				reqParams.acc_id = params.accounts;
+			}
+			if ('page' in params)
+			{
+				let filtered = trListBefore.getPage(params.page);
+				trListBefore = new TransactionsList(app, filtered);
+				reqParams.page = params.page;
+			}
+			if ('startDate' in params && 'endDate' in params)
+			{
+				let filtered = trListBefore.filterByDate(params.startDate, params.endDate);
+				trListBefore = new TransactionsList(app, filtered);
+				reqParams.stdate = app.formatDate(params.startDate);
+				reqParams.enddate = app.formatDate(params.endDate);
+			}
+			if ('search' in params)
+			{
+				let filtered = trListBefore.filterByQuery(params.search);
+				trListBefore = new TransactionsList(app, filtered);
+				reqParams.search = params.search;
+			}
+			expTransList = trListBefore.list;
+
+			// Send API sequest to server
+			let trList = await api.transaction.list(reqParams);
+			if (!trList)
+				throw new Error('Fail to read list of transactions');
+
+			let res = app.checkObjValue(trList, expTransList);
+
+			return res;
+		}, env);
+	}
+
+
+
 	return { setEnv : setupEnvironment,
 				createTest : apiCreateTransactionTest,
 				createExpenseTest,
@@ -300,7 +357,8 @@ var runTransactionAPI = (function()
 				createTransferTest,
 				createDebtTest,
 	 			updateTest : apiUpdateTransactionTest,
-				deleteTest : apiDeleteTransactionTest };
+				deleteTest : apiDeleteTransactionTest,
+				filterTest : apiFilterTransactionsTest };
 })();
 
 

@@ -472,9 +472,22 @@ var apiModule = (function()
 	}
 
 
-	async function transList()
+	let filterFields = ['type', 'acc_id', 'page', 'stdate', 'enddate', 'search'];
+
+	async function transList(params)
 	{
-		let jsonRes = await apiGet('transaction/list?count=0');
+		params = params || {};
+
+		let reqParams = { count : 0 };
+		for(let prop in params)
+		{
+			if (filterFields.indexOf(prop) !== -1)
+				reqParams[prop] = params[prop];
+		}
+
+		let apiReq = 'transaction/list?' + app.urlJoin(reqParams);
+
+		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
 			throw new Error('Fail to obtain list of transactions');
 
