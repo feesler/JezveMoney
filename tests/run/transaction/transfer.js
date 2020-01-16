@@ -148,7 +148,7 @@ var runTransfer = (function()
 	// Transition 15: Change source account to another one with same currency and stay on State 2
 		await test('(15) Change source account', () => view.changeSrcAccountByPos(CARD_RUB), view);
 	// Transition 17: Change destination account to another one with same currency and stay on State 2
-		await test('(17) Change destination account', () => view.changeDestAccount(4), view);
+		await test('(17) Change destination account', () => view.changeDestAccountByPos(CARD_RUB), view);
 	// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
 		await test('(16) Change source account', () => view.changeSrcAccountByPos(ACC_USD), view);
 	// Transition 26: Change source account to another one with different currency (EUR) and stay on State 5
