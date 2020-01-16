@@ -1,3 +1,4 @@
+import { TransactionsList } from '../trlist.js';
 import { api } from '../api.js';
 
 
@@ -174,54 +175,6 @@ var runTransList = (function()
 	}
 
 
-	function filterTransactionsByType(trans, type)
-	{
-		if (!trans)
-			throw new Error('Wrong parameters');
-
-		return trans.filter(item => item.type == type);
-	}
-
-
-	function filterTransactionsByAccount(trans, acc_id)
-	{
-		if (!trans || !acc_id)
-			throw new Error('Wrong parameters');
-
-		return trans.filter(item => item.src_id == acc_id || item.dest_id == acc_id);
-	}
-
-
-	function filterTransactionsByDate(trans, start, end)
-	{
-		if (!trans)
-			throw new Error('Wrong parameters');
-
-		return trans.filter(item =>
-		{
-			let date = app.convDate(item.date);
-			if (!date)
-				return false;
-
-			if (start && date < start)
-				return false;
-			if (end && date > end)
-				return false;
-
-			return true;
-		});
-	}
-
-
-	function filterTransactionsByQuery(trans, query)
-	{
-		if (!trans)
-			throw new Error('Wrong parameters');
-
-		return trans.filter(item => item.comment.indexOf(query) !== -1);
-	}
-
-
 	function expectedPages(listLength)
 	{
 		return Math.max(Math.ceil(listLength / app.config.transactionsOnPage), 1);
@@ -267,8 +220,10 @@ var runTransList = (function()
 		let totalTransfers = newTransfers.length + transfersBefore.length;
 		let totalDebts = newDebts.length + debtsBefore.length;
 
-		let acc_2_all = filterTransactionsByAccount(allTransactions, accIds[2]);
-		let acc_2_debts = filterTransactionsByType(acc_2_all, app.DEBT);
+		let allTrList = new TransactionsList(app, allTransactions);
+		let acc_2_all = allTrList.filterByAccounts(accIds[2]);
+		let acc2AllTrList = new TransactionsList(app, acc_2_all);
+		let acc_2_debts = acc2AllTrList.filterByType(app.DEBT);
 
 		// Prepare date range for week
 		let now = new Date(app.convDate(app.dates.now));
@@ -287,7 +242,7 @@ var runTransList = (function()
 		let weekStartDate = Date.UTC(now.getFullYear(), now.getMonth(), day1);
 		let weekEndDate = Date.UTC(now.getFullYear(), now.getMonth(), day2);
 
-		let acc_2_week = filterTransactionsByDate(acc_2_all, weekStartDate, weekEndDate);
+		let acc_2_week = acc2AllTrList.filterByDate(weekStartDate, weekEndDate);
 
 		let totalTransactions = totalExpenses + totalIncomes + totalTransfers + totalDebts;
 
@@ -328,7 +283,7 @@ var runTransList = (function()
 		state.values.typeMenu.activeType = app.TRANSFER;
 		state.values.paginator.pages = expectedPages(totalTransfers);
 		await app.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter Transfer transactions', () => {}, app.view, state);
+		await test('Filter by Transfer', () => {}, app.view, state);
 
 		state.values.typeMenu.activeType = app.DEBT;
 		state.values.paginator.pages = expectedPages(totalDebts);
@@ -340,20 +295,19 @@ var runTransList = (function()
 		await app.view.filterByAccounts(accIds[2]);
 		await test('Filter by accounts', () => {}, app.view, state);
 
-		// Filter by account 2
+		// Filter by account 2 and all types of transaction
 		state.values.typeMenu.activeType = 0;
 		state.values.paginator.pages = expectedPages(acc_2_all.length);
 		await app.view.filterByType(state.values.typeMenu.activeType);
 		await test('Show all transactions', () => {}, app.view, state);
-
-		state.values.typeMenu.activeType = 0;
 
 		// Filter by account 2 and last week date
 		state.values.paginator.pages = expectedPages(acc_2_week.length);
 		await app.view.selectDateRange(day1, day2);
 		await test('Select date range', () => {}, app.view, state);
 
-		let acc_2_query = filterTransactionsByQuery(acc_2_week, '1');
+		let acc2WeekTrList = new TransactionsList(app, acc_2_week);
+		let acc_2_query = acc2WeekTrList.filterByQuery('1');
 
 		state.values.paginator.pages = expectedPages(acc_2_query.length);
 		state.values.searchForm.value = '1';

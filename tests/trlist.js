@@ -5,6 +5,7 @@ class TransactionsList
 	{
 		this.app = app;
 		this.list = app.copyObject(list);
+		this.availTypes = [ app.EXPENSE, app.INCOME, app.TRANSFER, app.DEBT ];
 		this.sort();
 	}
 
@@ -151,6 +152,65 @@ class TransactionsList
 		}
 
 		return delList;
+	}
+
+
+	filterByType(type)
+	{
+		if (this.availTypes.indexOf(type) === -1)
+			throw new Error('Wrong parameters');
+
+		let res = this.app.copyObject(this.list);
+
+		return res.filter(item => item.type == type);
+	}
+
+
+	filterByAccounts(ids)
+	{
+		if (!ids)
+			throw new Error('Wrong parameters');
+
+		let res = this.app.copyObject(this.list);
+		let accounts = (Array.isArray(ids)) ? ids : [ ids ];
+		if (!accounts.length)
+			return res;
+
+		return res.filter(item => accounts.indexOf(item.src_id) !== -1 || accounts.indexOf(item.dest_id) !== -1);
+	}
+
+
+	filterByDate(start, end)
+	{
+		let res = this.app.copyObject(this.list);
+		if (!start && !end)
+			return res;
+
+		return res.filter(item =>
+		{
+			let date = this.app.convDate(item.date);
+			if (!date)
+				return false;
+
+			if (start && date < start)
+				return false;
+			if (end && date > end)
+				return false;
+
+			return true;
+		});
+	}
+
+
+	filterByQuery(query)
+	{
+		let res = this.app.copyObject(this.list);
+		if (!query)
+			return res;
+
+		let lcQuery = query.toLowerCase();
+
+		return res.filter(item => item.comment.toLowerCase().indexOf(lcQuery) !== -1);
 	}
 
 
