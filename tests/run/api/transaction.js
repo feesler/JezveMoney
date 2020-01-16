@@ -326,8 +326,8 @@ var runTransactionAPI = (function()
 			{
 				let filtered = trListBefore.filterByDate(params.startDate, params.endDate);
 				trListBefore = new TransactionsList(app, filtered);
-				reqParams.stdate = app.formatDate(params.startDate);
-				reqParams.enddate = app.formatDate(params.endDate);
+				reqParams.stdate = app.formatDate(new Date(app.fixDate(params.startDate)));
+				reqParams.enddate = app.formatDate(new Date(app.fixDate(params.endDate)));
 			}
 			if ('search' in params)
 			{

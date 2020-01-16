@@ -92,10 +92,14 @@ function setParam(obj, params)
 // Convert date string from DD.MM.YYYY to timestamp
 function convDate(dateStr)
 {
-	if (!dateStr)
+	if (typeof dateStr !== 'string')
 		return null;
 
-	return Date.parse(dateStr.split('.').reverse().join('-'));
+	let res = Date.parse(dateStr.split('.').reverse().join('-'));
+	if (isNaN(res))
+		return null;
+
+	return res;
 }
 
 
@@ -110,6 +114,28 @@ function formatDate(date, month, year)
 	}
 
 	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year;
+}
+
+
+// Return timestamp for the start of the day
+function cutDate(date)
+{
+	if (!isDate(date))
+		return null;
+
+	return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+
+// Convert Date object, timestamp or DD.MM.YYYY string to the timestamp of the start of day
+function fixDate(date)
+{
+	if (isDate(date))
+		return cutDate(date);
+	else if (typeof date === 'number')
+		return cutDate(new Date(date));
+	else
+		return convDate(date);
 }
 
 
@@ -469,6 +495,8 @@ var commonModule = { EXPENSE,
 					setParam,
 					convDate,
 					formatDate,
+					cutDate,
+					fixDate,
 					formatValue,
 					Currency,
 					getCurrency,

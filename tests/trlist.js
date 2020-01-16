@@ -186,15 +186,18 @@ class TransactionsList
 		if (!start && !end)
 			return res;
 
+		let fStart = this.app.fixDate(start);
+		let fEnd = this.app.fixDate(end);
+
 		return res.filter(item =>
 		{
 			let date = this.app.convDate(item.date);
 			if (!date)
 				return false;
 
-			if (start && date < start)
+			if (fStart && date < fStart)
 				return false;
-			if (end && date > end)
+			if (fEnd && date > fEnd)
 				return false;
 
 			return true;
