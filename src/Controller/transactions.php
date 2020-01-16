@@ -272,10 +272,7 @@ class TransactionsController extends Controller
 			// Prepare person account
 			$person_id = $this->personMod->getIdByPos(0);
 			$pObj = $this->personMod->getItem($person_id);
-			if (!$pObj)
-				throw new Error("Person not found");
-
-			$person_name = $pObj->name;
+			$person_name = ($pObj) ? $pObj->name : NULL;
 
 			$person_acc_id = $this->personMod->getAccount($person_id, $debtAcc->curr);
 			$person_acc = $this->accModel->getProperties($person_acc_id);
@@ -291,6 +288,7 @@ class TransactionsController extends Controller
 		}
 		else
 		{
+			$person_id = 0;
 			// set source and destination accounts
 			$src_id = 0;
 			$dest_id = 0;
@@ -377,7 +375,7 @@ class TransactionsController extends Controller
 				$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
 			$balDiff = $tr["dest_amount"];
-			if ($tr["type"] != DEBT)
+			if ($tr["type"] != DEBT && !is_null($dest))
 				$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr);
 		}
 
