@@ -316,12 +316,16 @@ var runTransactionAPI = (function()
 				trListBefore = new TransactionsList(app, filtered);
 				reqParams.acc_id = params.accounts;
 			}
-			if ('page' in params)
+
+			if ('onPage' in params)
 			{
-				let filtered = trListBefore.getPage(params.page);
-				trListBefore = new TransactionsList(app, filtered);
-				reqParams.page = params.page;
+				reqParams.count = params.onPage;
 			}
+			let filtered = trListBefore.getPage(('page' in params) ? params.page : 1, params.onPage);
+			trListBefore = new TransactionsList(app, filtered);
+			if ('page' in params)
+				reqParams.page = params.page;
+
 			if ('startDate' in params && 'endDate' in params)
 			{
 				let filtered = trListBefore.filterByDate(params.startDate, params.endDate);

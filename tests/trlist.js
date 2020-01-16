@@ -217,6 +217,21 @@ class TransactionsList
 	}
 
 
+	getPage(num, limit)
+	{
+		let pageLimit = (typeof limit !== 'undefined') ? limit : this.app.config.transactionsOnPage;
+
+		if (num < 1 || num > Math.ceil(this.list.length / pageLimit))
+			throw new Error('Wrong page');
+
+		let res = this.app.copyObject(this.list);
+		let offset = (num - 1) * pageLimit;
+		let offsetLimit = this.list.length - offset;
+
+		return res.splice(offset, Math.max(pageLimit, offsetLimit));
+	}
+
+
 	sort()
 	{
 		this.list.sort((a, b) => b.pos - a.pos);

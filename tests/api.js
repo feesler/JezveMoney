@@ -472,7 +472,7 @@ var apiModule = (function()
 	}
 
 
-	let filterFields = ['type', 'acc_id', 'page', 'stdate', 'enddate', 'search'];
+	let filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search'];
 
 	async function transList(params)
 	{

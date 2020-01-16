@@ -178,6 +178,11 @@ var runAPI = (function()
 		 await transaction.filterTest({ type : app.DEBT,
 			 							accounts : ACC_RUB });
 
+		await transaction.filterTest({ onPage : 10 });
+
+		await transaction.filterTest({ onPage : 10,
+			 							page : 2 });
+
 		await transaction.filterTest({ startDate : now.getTime(),
 			 							endDate : now.getTime() + 604800000 });
 
