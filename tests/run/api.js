@@ -34,9 +34,7 @@ var runAPI = (function()
 
 		await test('Login user', () => api.user.login(app.config.testUser.login, app.config.testUser.password), env);
 
-		await test('Reset all data', async () => {
-			return await api.profile.reset();
-		}, env);
+		await test('Reset all data', () => api.profile.reset(), env);
 
 		env.setBlock('Accounts', 2);
 
@@ -170,15 +168,14 @@ var runAPI = (function()
 											debtop : 1,
 											acc_id : ACC_RUB });
 
-
 		/**
 		 * Filter transactions
 		 */
-		 await transaction.filterTest({ type : app.DEBT });
+		await transaction.filterTest({ type : app.DEBT });
 
-		 await transaction.filterTest({ accounts : ACC_RUB });
+		await transaction.filterTest({ accounts : ACC_RUB });
 
-		 await transaction.filterTest({ type : app.DEBT,
+		await transaction.filterTest({ type : app.DEBT,
 			 							accounts : ACC_RUB });
 
 		await transaction.filterTest({ onPage : 10 });
