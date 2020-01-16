@@ -387,7 +387,8 @@ function checkObjValue(obj, expectedObj, ret = false)
 		return true;
 
 	let value, expected;
-	for(let vKey in expectedObj)
+	let expectedKeys = Object.getOwnPropertyNames(expectedObj);
+	for(let vKey of expectedKeys)
 	{
 		if (obj === null || !(vKey in obj))
 		{
