@@ -28,9 +28,9 @@ var runAPI = (function()
 		const person = app.run.api.person;
 		const transaction = app.run.api.transaction;
 
-		account.setEnv(env, app);
-		person.setEnv(env, app);
-		transaction.setEnv(env, app);
+		account.setEnv(app);
+		person.setEnv(app);
+		transaction.setEnv(app);
 
 		await test('Login user', () => api.user.login(app.config.testUser.login, app.config.testUser.password), env);
 

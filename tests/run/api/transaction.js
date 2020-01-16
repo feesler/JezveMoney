@@ -9,13 +9,13 @@ var runTransactionAPI = (function()
 	let test = null;
 
 
-	function setupEnvironment(e, App)
+	function setupEnvironment(App)
 	{
-		if (!e || !App)
+		if (!App || !App.environment)
 			throw new Error('Unexpected setup');
 
-		env = e;
 		app = App;
+		env = app.environment;
 		test = app.test;
 	}
 
