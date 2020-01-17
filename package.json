@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./tests/node.js",
+	"debug": "node --inspect-brk ./tests/node.js",
     "build": "npm-run-all clean build-tests build-tests-bundle",
     "clean": "del-cli --force ./build",
     "build-tests": "npx babel ./tests --out-dir ./build",
