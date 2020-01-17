@@ -3,19 +3,16 @@ import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
 
 
-var runExpense = (function()
+let runExpense =
 {
-	let test = null;
-
-
-	async function submitExpenseTransaction(app, params)
+	async submit(params)
 	{
-		let view = app.view;
-		test = app.test;
+		let view = this.view;
+		let test = this.test;
 
 		if ('srcAcc' in params)
 		{
-			let acc = await app.state.getAccountByPos(params.srcAcc);
+			let acc = await this.state.getAccountByPos(params.srcAcc);
 			if (!acc)
 				throw new Error('Account (' + params.srcAcc + ') not found');
 
@@ -25,7 +22,7 @@ var runExpense = (function()
 
 		if ('destCurr' in params)
 		{
-			let curr = app.getCurrency(params.destCurr, app.currencies);
+			let curr = this.getCurrency(params.destCurr, this.currencies);
 			if (!curr)
 				throw new Error('Currency (' + params.destCurr + ') not found');
 
@@ -49,42 +46,45 @@ var runExpense = (function()
 
 		let res = view.getExpectedTransaction();
 
-		app.state.accounts = null;
-		app.state.persons = null;
+		this.state.accounts = null;
+		this.state.persons = null;
 
 		await view.submit();
 
 		return res;
-	}
+	},
 
 
-	async function createExpense(app, params)
+	async create(params)
 	{
-		await runTransactionsCommon.create(app, app.EXPENSE, params, submitExpenseTransaction);
-	}
+		let scope = this.run.transactions;
+
+		await scope.create(this.EXPENSE, params, scope.expense.submit);
+	},
 
 
 	// Update expense transaction and check results
-	async function updateExpense(app, params)
+	async update(params)
 	{
-		test = app.test;
+		let scope = this.run.transactions;
+		let test = this.test;
 
-		await runTransactionsCommon.update(app, app.EXPENSE, params, async (app, params) =>
+		await scope.update(this.EXPENSE, params, async (params) =>
 		{
-			let origTransaction = app.view.getExpectedTransaction();
+			let origTransaction = this.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-			await test('Initial state of update expense view', () => app.view.setExpectedState(isDiff ? 2 : 0), app.view);
+			await test('Initial state of update expense view', () => this.view.setExpectedState(isDiff ? 2 : 0), this.view);
 
-			return submitExpenseTransaction(app, params);
+			return scope.expense.submit(params);
 		});
-	}
+	},
 
 
-	async function expenseTransactionLoop(app)
+	async stateLoop()
 	{
-		let view = app.view;
-		test = app.test;
+		let view = this.view;
+		let test = this.test;
 
 		const RUB = 1;
 		const USD = 2;
@@ -197,12 +197,7 @@ var runExpense = (function()
 		await test('(11) Change account to another one with the same currency as destination',
 				() => view.changeSrcAccountByPos(ACC_USD), view);
 	}
-
-
- 	return { create : createExpense,
-				update : updateExpense,
-				stateLoop : expenseTransactionLoop };
-})();
+};
 
 
 export { runExpense };

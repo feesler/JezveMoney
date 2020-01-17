@@ -2,66 +2,63 @@ import { TransactionsList } from '../trlist.js';
 import { api } from '../api.js';
 
 
-var runTransList = (function()
+const RUB = 1;
+const USD = 2;
+const EUR = 3;
+const PLN = 4;
+
+let accountsList = [{ name : 'acc_4', currency : RUB, balance : '60500.12', icon : 1 },
+					{ name : 'acc_5', currency : RUB, balance : '78000', icon : 2 },
+					{ name : 'cash USD', currency : USD, balance : '10000', icon : 4 },
+					{ name : 'cash EUR', currency : EUR, balance : '1000', icon : 5 }];
+
+let accIds = [];
+
+let personsList = [{ name : 'Alex' }, { name : 'noname &' }];
+let personIds = [];
+
+let newExpenses = [];
+let newIncomes = [];
+let newTransfers = [];
+let newDebts = [];
+
+let expensesList = [
+	{ src_id : 0, src_amount : '500', comm : 'lalala' },
+	{ src_id : 0, src_amount : '500', destCurr : USD, comm : 'lalala' },
+	{ src_id : 1, src_amount : '100', comm : 'hohoho' },
+	{ src_id : 1, src_amount : '780', dest_amount : '10', destCurr : EUR, comm : 'кккк' },
+	{ src_id : 2, src_amount : '50', comm : '1111' }
+];
+
+let incomesList = [
+	{ dest_id : 3, src_amount : '100', dest_amount : '7500', destCurr : RUB, comm : '232323' },
+	{ dest_id : 0, src_amount : '1000000', dest_amount : '64000', srcCurr : PLN, comm : '111 кккк' },
+	{ dest_id : 0, dest_amount : '100', comm : '22222' },
+	{ dest_id : 1, src_amount : '7013.21', dest_amount : '5000', comm : '33333' },
+	{ dest_id : 3, src_amount : '287', dest_amount : '4', srcCurr : 1, comm : 'dddd' },
+	{ dest_id : 3, dest_amount : '33', comm : '11 ho' }
+];
+
+let transfersList = [
+	{ src_id : 0, dest_id : 1, src_amount : '300', comm : 'd4' },
+	{ src_id : 0, dest_id : 2, src_amount : '6500', dest_amount : '100', comm : 'g6' },
+	{ src_id : 1, dest_id : 0, src_amount : '800.01', comm : 'x0' },
+	{ src_id : 1, dest_id : 2, src_amount : '7', dest_amount : '0.08', comm : 'l2' },
+	{ src_id : 3, dest_id : 2, src_amount : '5.0301', dest_amount : '4.7614', comm : 'i1' }
+];
+
+let debtsList = [
+	{ debtop : 1, person_id : 0, src_amount : '1050', src_curr : RUB, comm : '111 кккк' },
+	{ debtop : 1, person_id : 1, acc_id : 1, src_amount : '780', comm : '--**' },
+	{ debtop : 2, person_id : 0, src_amount : '990.99', src_curr : RUB, comm : 'ппп ppp' },
+	{ debtop : 2, person_id : 1, acc_id : 2, src_amount : '105', comm : '6050 кккк' },
+	{ debtop : 1, person_id : 0, acc_id : 3, src_amount : '4', comm : '111 кккк' }
+];
+
+
+let runTransList =
 {
-	let app = null;
-	let env = null;
-
-	const RUB = 1;
-	const USD = 2;
-	const EUR = 3;
-	const PLN = 4;
-
-	let accountsList = [{ name : 'acc_4', currency : RUB, balance : '60500.12', icon : 1 },
- 						{ name : 'acc_5', currency : RUB, balance : '78000', icon : 2 },
-						{ name : 'cash USD', currency : USD, balance : '10000', icon : 4 },
-						{ name : 'cash EUR', currency : EUR, balance : '1000', icon : 5 }];
-
-	let accIds = [];
-
-	let personsList = [{ name : 'Alex' }, { name : 'noname &' }];
-	let personIds = [];
-
-	let newExpenses = [];
-	let newIncomes = [];
-	let newTransfers = [];
-	let newDebts = [];
-
-	let expensesList = [
-		{ src_id : 0, src_amount : '500', comm : 'lalala' },
-		{ src_id : 0, src_amount : '500', destCurr : USD, comm : 'lalala' },
-		{ src_id : 1, src_amount : '100', comm : 'hohoho' },
-		{ src_id : 1, src_amount : '780', dest_amount : '10', destCurr : EUR, comm : 'кккк' },
-		{ src_id : 2, src_amount : '50', comm : '1111' }
-	];
-
-	let incomesList = [
-		{ dest_id : 3, src_amount : '100', dest_amount : '7500', destCurr : RUB, comm : '232323' },
-		{ dest_id : 0, src_amount : '1000000', dest_amount : '64000', srcCurr : PLN, comm : '111 кккк' },
-		{ dest_id : 0, dest_amount : '100', comm : '22222' },
-		{ dest_id : 1, src_amount : '7013.21', dest_amount : '5000', comm : '33333' },
-		{ dest_id : 3, src_amount : '287', dest_amount : '4', srcCurr : 1, comm : 'dddd' },
-		{ dest_id : 3, dest_amount : '33', comm : '11 ho' }
-	];
-
-	let transfersList = [
-		{ src_id : 0, dest_id : 1, src_amount : '300', comm : 'd4' },
-		{ src_id : 0, dest_id : 2, src_amount : '6500', dest_amount : '100', comm : 'g6' },
-		{ src_id : 1, dest_id : 0, src_amount : '800.01', comm : 'x0' },
-		{ src_id : 1, dest_id : 2, src_amount : '7', dest_amount : '0.08', comm : 'l2' },
-		{ src_id : 3, dest_id : 2, src_amount : '5.0301', dest_amount : '4.7614', comm : 'i1' }
-	];
-
-	let debtsList = [
-		{ debtop : 1, person_id : 0, src_amount : '1050', src_curr : RUB, comm : '111 кккк' },
-		{ debtop : 1, person_id : 1, acc_id : 1, src_amount : '780', comm : '--**' },
-		{ debtop : 2, person_id : 0, src_amount : '990.99', src_curr : RUB, comm : 'ппп ppp' },
-		{ debtop : 2, person_id : 1, acc_id : 2, src_amount : '105', comm : '6050 кккк' },
-		{ debtop : 1, person_id : 0, acc_id : 3, src_amount : '4', comm : '111 кккк' }
-	];
-
-
-	async function setupAccounts(list)
+	async setupAccounts(list)
 	{
 		let res = [];
 
@@ -79,10 +76,10 @@ var runTransList = (function()
 		}
 
 		return res;
-	}
+	},
 
 
-	async function setupPersons(list)
+	async setupPersons(list)
 	{
 		let res = [];
 
@@ -100,23 +97,23 @@ var runTransList = (function()
 		}
 
 		return res;
-	}
+	},
 
 
-	async function populateTransactions(list, convertFunc)
+	async populateTransactions(list, convertFunc)
 	{
 		let res = [];
 
 		if (!list)
 			return res;
 
-		if (!app.isArray(list))
+		if (!Array.isArray(list))
 			list = [ list ];
 
 		for(let props of list)
 		{
 			let convertedProps = await convertFunc(props);
-			for(let date of app.dateList)
+			for(let date of this.dateList)
 			{
 				convertedProps.date = date;
 				let createResult = await api.transaction.create(convertedProps);
@@ -125,20 +122,22 @@ var runTransList = (function()
 		}
 
 		return res;
-	}
+	},
 
 
-	async function preCreateData()
+	async preCreateData()
 	{
+		let scope = this.run.transactions.list;
+
 		console.log('Precreate data...');
 
 		await api.user.login('test', 'test');
 
-		accIds = await setupAccounts(accountsList);
-		personIds = await setupPersons(personsList);
+		accIds = await scope.setupAccounts(accountsList);
+		personIds = await scope.setupPersons(personsList);
 
 		// Expense transactions
-		let created = await populateTransactions(expensesList, props =>
+		let created = await scope.populateTransactions(expensesList, props =>
 		{
 			props.src_id = accIds[props.src_id];
 			return api.transaction.expense(props);
@@ -146,7 +145,7 @@ var runTransList = (function()
 		newExpenses.push(...created);
 
 		// Income transactions
-		created = await populateTransactions(incomesList, props =>
+		created = await scope.populateTransactions(incomesList, props =>
 			{
 				props.dest_id = accIds[props.dest_id];
 				return api.transaction.income(props);
@@ -154,7 +153,7 @@ var runTransList = (function()
 		newIncomes.push(...created);
 
 		// Transfer transactions
-		created = await populateTransactions(transfersList, props =>
+		created = await scope.populateTransactions(transfersList, props =>
 			{
 				props.src_id = accIds[props.src_id];
 				props.dest_id = accIds[props.dest_id];
@@ -163,7 +162,7 @@ var runTransList = (function()
 		newTransfers.push(...created);
 
 		// Debt transactions
-		created = await populateTransactions(debtsList, props =>
+		created = await scope.populateTransactions(debtsList, props =>
 			{
 				props.person_id = personIds[props.person_id];
 				props.acc_id = (props.acc_id) ? accIds[props.acc_id] : 0;
@@ -172,32 +171,32 @@ var runTransList = (function()
 		newDebts.push(...created);
 
 		console.log('Done');
-	}
+	},
 
 
-	function expectedPages(listLength)
+	expectedPages(listLength)
 	{
-		return Math.max(Math.ceil(listLength / app.config.transactionsOnPage), 1);
-	}
+		return Math.max(Math.ceil(listLength / this.config.transactionsOnPage), 1);
+	},
 
 
-	async function runTests(appInstance)
+	async run()
 	{
-		app = appInstance;
-		env = app.view.props.environment;
-		let test = app.test;
+		let scope = this.run.transactions.list;
+		let env = this.environment;
+		let test = this.test;
 
-		api.setEnv(app);
+		api.setEnv(this);
 
 		env.setBlock('Transaction List view', 1);
 
 		let transBefore = await api.transaction.list();
-		let expensesBefore = transBefore.filter(item => item.type == app.EXPENSE);
-		let incomesBefore = transBefore.filter(item => item.type == app.INCOME);
-		let transfersBefore = transBefore.filter(item => item.type == app.TRANSFER);
-		let debtsBefore = transBefore.filter(item => item.type == app.DEBT);
+		let expensesBefore = transBefore.filter(item => item.type == this.EXPENSE);
+		let incomesBefore = transBefore.filter(item => item.type == this.INCOME);
+		let transfersBefore = transBefore.filter(item => item.type == this.TRANSFER);
+		let debtsBefore = transBefore.filter(item => item.type == this.DEBT);
 
-		await preCreateData(app);
+		await scope.preCreateData();
 
 		if (newExpenses.length)
 			newExpenses = await api.transaction.read(newExpenses);
@@ -212,21 +211,21 @@ var runTransList = (function()
 
 		let allTransactions = transBefore.concat(newTransactions);
 
-		await app.goToMainView();
-		await app.view.goToTransactions();
+		await this.goToMainView();
+		await this.view.goToTransactions();
 
 		let totalExpenses = newExpenses.length + expensesBefore.length;
 		let totalIncomes = newIncomes.length + incomesBefore.length;
 		let totalTransfers = newTransfers.length + transfersBefore.length;
 		let totalDebts = newDebts.length + debtsBefore.length;
 
-		let allTrList = new TransactionsList(app, allTransactions);
+		let allTrList = new TransactionsList(this, allTransactions);
 		let acc_2_all = allTrList.filterByAccounts(accIds[2]);
-		let acc2AllTrList = new TransactionsList(app, acc_2_all);
-		let acc_2_debts = acc2AllTrList.filterByType(app.DEBT);
+		let acc2AllTrList = new TransactionsList(this, acc_2_all);
+		let acc_2_debts = acc2AllTrList.filterByType(this.DEBT);
 
 		// Prepare date range for week
-		let now = new Date(app.convDate(app.dates.now));
+		let now = new Date(this.convDate(this.dates.now));
 		let day1 = now.getDate();
 		let day2;
 		if (day1 > 22)
@@ -250,74 +249,71 @@ var runTransList = (function()
 										modeSelector : true, paginator : true, transList : true },
 	 					values : { typeMenu : { activeType : 0 },
 									searchForm : { value : '' },
-									paginator : { pages : expectedPages(totalTransactions), active : 1 },
+									paginator : { pages : scope.expectedPages(totalTransactions), active : 1 },
 									modeSelector : { listMode : { isActive : true },
 														detailsMode : { isActive : false } } } };
 
-		await test('Initial state of transaction list view', async () => {}, app.view, state);
+		await test('Initial state of transaction list view', async () => {}, this.view, state);
 
 		state.values.paginator.active = 2;
-		await app.view.goToNextPage();
-		await test('Navigate to page 2', () => {}, app.view, state);
+		await this.view.goToNextPage();
+		await test('Navigate to page 2', () => {}, this.view, state);
 
 		state.values.modeSelector.detailsMode.isActive = true;
 		state.values.modeSelector.listMode.isActive = false;
-		await app.view.setDetailsMode();
-		await test('Change list mode to details', () => {}, app.view, state);
+		await this.view.setDetailsMode();
+		await test('Change list mode to details', () => {}, this.view, state);
 
 		state.values.paginator.active = 3;
-		await app.view.goToNextPage();
-		await test('Navigate to page 3', () => {}, app.view, state);
+		await this.view.goToNextPage();
+		await test('Navigate to page 3', () => {}, this.view, state);
 
-		state.values.typeMenu.activeType = app.EXPENSE;
+		state.values.typeMenu.activeType = this.EXPENSE;
 		state.values.paginator.active = 1;
-		state.values.paginator.pages = expectedPages(totalExpenses);
-		await app.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Expense', () => {}, app.view, state);
+		state.values.paginator.pages = scope.expectedPages(totalExpenses);
+		await this.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Expense', () => {}, this.view, state);
 
-		state.values.typeMenu.activeType = app.INCOME;
-		state.values.paginator.pages = expectedPages(totalIncomes);
-		await app.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Income', () => {}, app.view, state);
+		state.values.typeMenu.activeType = this.INCOME;
+		state.values.paginator.pages = scope.expectedPages(totalIncomes);
+		await this.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Income', () => {}, this.view, state);
 
-		state.values.typeMenu.activeType = app.TRANSFER;
-		state.values.paginator.pages = expectedPages(totalTransfers);
-		await app.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Transfer', () => {}, app.view, state);
+		state.values.typeMenu.activeType = this.TRANSFER;
+		state.values.paginator.pages = scope.expectedPages(totalTransfers);
+		await this.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Transfer', () => {}, this.view, state);
 
-		state.values.typeMenu.activeType = app.DEBT;
-		state.values.paginator.pages = expectedPages(totalDebts);
-		await app.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Debt', () => {}, app.view, state);
+		state.values.typeMenu.activeType = this.DEBT;
+		state.values.paginator.pages = scope.expectedPages(totalDebts);
+		await this.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Debt', () => {}, this.view, state);
 
 		// Filter by account 2 and debt
-		state.values.paginator.pages = expectedPages(acc_2_debts.length);
-		await app.view.filterByAccounts(accIds[2]);
-		await test('Filter by accounts', () => {}, app.view, state);
+		state.values.paginator.pages = scope.expectedPages(acc_2_debts.length);
+		await this.view.filterByAccounts(accIds[2]);
+		await test('Filter by accounts', () => {}, this.view, state);
 
 		// Filter by account 2 and all types of transaction
 		state.values.typeMenu.activeType = 0;
-		state.values.paginator.pages = expectedPages(acc_2_all.length);
-		await app.view.filterByType(state.values.typeMenu.activeType);
-		await test('Show all transactions', () => {}, app.view, state);
+		state.values.paginator.pages = scope.expectedPages(acc_2_all.length);
+		await this.view.filterByType(state.values.typeMenu.activeType);
+		await test('Show all transactions', () => {}, this.view, state);
 
 		// Filter by account 2 and last week date
-		state.values.paginator.pages = expectedPages(acc_2_week.length);
-		await app.view.selectDateRange(day1, day2);
-		await test('Select date range', () => {}, app.view, state);
+		state.values.paginator.pages = scope.expectedPages(acc_2_week.length);
+		await this.view.selectDateRange(day1, day2);
+		await test('Select date range', () => {}, this.view, state);
 
-		let acc2WeekTrList = new TransactionsList(app, acc_2_week);
+		let acc2WeekTrList = new TransactionsList(this, acc_2_week);
 		let acc_2_query = acc2WeekTrList.filterByQuery('1');
 
-		state.values.paginator.pages = expectedPages(acc_2_query.length);
+		state.values.paginator.pages = scope.expectedPages(acc_2_query.length);
 		state.values.searchForm.value = '1';
-		await app.view.search(state.values.searchForm.value);
-		await test('Search', () => {}, app.view, state);
+		await this.view.search(state.values.searchForm.value);
+		await test('Search', () => {}, this.view, state);
 	}
-
-
-	return { run : runTests };
-})();
+};
 
 
 export { runTransList };

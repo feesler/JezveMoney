@@ -3,170 +3,159 @@ import { RegisterView } from '../view/register.js';
 import { MainView } from '../view/main.js';
 
 
-var runProfile = (function()
+let runProfile =
 {
-	let test = null;
-	let env = null;
-
-
-	async function reloginAs(app, userObj)
+	async relogin(userObj)
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
 
 		if (!userObj || !userObj.login || !userObj.password)
 			throw new Error('Wrong user object');
 
-		if (app.view.isUserLoggedIn())
+		if (this.view.isUserLoggedIn())
 		{
-			await app.view.logoutUser();
+			await this.view.logoutUser();
 		}
 
-		if (!(app.view instanceof LoginView))
+		if (!(this.view instanceof LoginView))
 			throw new Error('Wrong page');
 
-		await app.view.loginAs(userObj.login, userObj.password);
-		await test('Test user login', () => (app.view instanceof MainView), env);
-	}
+		await this.view.loginAs(userObj.login, userObj.password);
+		await test('Test user login', () => (this.view instanceof MainView), env);
+	},
 
 
-	async function registrationTest(app, userObj)
+	async register(userObj)
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
 
 		if (!userObj || !userObj.login || !userObj.name || !userObj.password)
 			throw new Error('Wrong user object');
 
-		if (app.view.isUserLoggedIn())
+		if (this.view.isUserLoggedIn())
 		{
-			await app.view.logoutUser();
+			await this.view.logoutUser();
 		}
 
-		if (!(app.view instanceof LoginView))
+		if (!(this.view instanceof LoginView))
 			throw new Error('Unexpected page');
 
-		await app.view.goToRegistration();
-		if (!(app.view instanceof RegisterView))
+		await this.view.goToRegistration();
+		if (!(this.view instanceof RegisterView))
 			throw new Error('Unexpected page');
 
 		await test('Test user resitration', async () =>
 		{
-			await app.view.registerAs(userObj.login, userObj.name, userObj.password);
+			await this.view.registerAs(userObj.login, userObj.name, userObj.password);
 
 			return true;
 		}, env);
 
 		await test('Login with new account', async () =>
 		{
-			await app.view.loginAs(userObj.login, userObj.password);
-			if (!(app.view instanceof MainView))
+			await this.view.loginAs(userObj.login, userObj.password);
+			if (!(this.view instanceof MainView))
 				throw new Error('Fail to login');
 
 			return true;
 		}, env);
-	}
+	},
 
 
-	async function resetAllTest(app)
+	async resetAll()
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
 
-		await app.view.goToProfile();
-		await app.view.resetAll();
+		await this.view.goToProfile();
+		await this.view.resetAll();
 
 		await test('Reset all data', async () =>
 		{
-			await app.goToMainView();
+			await this.goToMainView();
 
-			return app.checkObjValue(app.transactions, []) &&
-						app.checkObjValue(app.accountTiles, []) &&
-						app.checkObjValue(app.personTiles, []);
+			return this.checkObjValue(this.transactions, []) &&
+						this.checkObjValue(this.accountTiles, []) &&
+						this.checkObjValue(this.personTiles, []);
 		}, env);
-	}
+	},
 
 
-	async function changeNameTest(app)
+	async changeName()
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
 
-		await app.view.goToProfile();
+		await this.view.goToProfile();
 
 		await test('Change name', async () =>
 		{
 			let newName = '^^&&>>';
 
-			if (app.view.header.user.name == newName)
+			if (this.view.header.user.name == newName)
 				newName += ' 1';
 
-			await app.view.changeName(newName);
+			await this.view.changeName(newName);
 
-			return app.view.header.user.name == newName;
+			return this.view.header.user.name == newName;
 		}, env);
 
 		await test('Change name back', async () =>
 		{
 			let newName = 'Tester';
-			await app.view.changeName(newName);
+			await this.view.changeName(newName);
 
-			return app.view.header.user.name == newName;
+			return this.view.header.user.name == newName;
 		}, env);
-	}
+	},
 
 
-	async function changePasswordTest(app)
+	async changePass()
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
+		let scope = this.run.profile;
 
-		await app.view.goToProfile();
+		await this.view.goToProfile();
 
 		let newPass = '123';
 		await test('Change password', async () =>
 		{
-			await app.view.changePassword(app.config.testUser.password, newPass);
-			await reloginAs(app, { login : app.config.testUser.login, password : newPass });
-			await app.view.goToProfile();
+			await this.view.changePassword(this.config.testUser.password, newPass);
+			await scope.relogin({ login : this.config.testUser.login, password : newPass });
+			await this.view.goToProfile();
 
 			return true;
 		}, env);
 
 		await test('Change password back', async () =>
 		{
-			await app.view.changePassword(newPass, app.config.testUser.password);
-			await reloginAs(app, app.config.testUser);
-			await app.view.goToProfile();
+			await this.view.changePassword(newPass, this.config.testUser.password);
+			await scope.relogin(this.config.testUser);
+			await this.view.goToProfile();
 
 			return true;
 		}, env);
-	}
+	},
 
 
-	async function deleteProfileTest(app)
+	async deleteProfile()
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
 
-		await app.view.goToProfile();
+		await this.view.goToProfile();
 
 		await test('Delete profile', async () =>
 		{
-			await app.view.deleteProfile();
+			await this.view.deleteProfile();
 
 			return true;
 		}, env);
 	}
-
-
-	return { relogin : reloginAs,
-				register : registrationTest,
-			 	resetAll : resetAllTest,
-			 	changeName : changeNameTest,
-				changePass : changePasswordTest,
-				deleteProfile : deleteProfileTest };
-})();
+};
 
 
 export { runProfile };

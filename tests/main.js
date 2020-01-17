@@ -3,7 +3,6 @@ import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
 
-
 import { runProfile } from './run/profile.js';
 import { runAccounts } from './run/account.js';
 import { runPersons } from './run/person.js';
@@ -18,25 +17,6 @@ import { runTransList } from './run/transactions.js';
 import { runStatistics } from './run/statistics.js';
 
 import { runAPI } from './run/api.js';
-
-
-let profile = runProfile;
-let accounts = runAccounts;
-let persons = runPersons;
-
-let transactions = {
-	common : runTransactionsCommon,
-	expense : runExpense,
-	income : runIncome,
-	transfer : runTransfer,
-	debt : runDebt
-};
-
-// Shortcuts
-transactions.del = transactions.common.del;
-
-let statistics = runStatistics;
-
 
 
 class Application
@@ -59,17 +39,50 @@ class Application
 	}
 
 
+	bindRunner(runner)
+	{
+		let res = {};
+
+		let methods = Object.keys(runner);
+		for(let method of methods)
+		{
+			res[method] = runner[method].bind(this);
+		}
+
+		return res;
+	}
+
+
 	async init()
 	{
 		this.startTime = Date.now();
 
+		// Inject common functions
 		for(let key in common)
 		{
 			this[key] = common[key];
 		}
 
+		// Setup test runners
+		this.run.api = this.bindRunner(runAPI);
+
+		this.run.profile = this.bindRunner(runProfile);
+		this.run.accounts = this.bindRunner(runAccounts);
+		this.run.persons = this.bindRunner(runPersons);
+
+		this.run.transactions = this.bindRunner(runTransactionsCommon);
+		this.run.transactions.expense = this.bindRunner(runExpense);
+		this.run.transactions.income = this.bindRunner(runIncome);
+		this.run.transactions.transfer = this.bindRunner(runTransfer);
+		this.run.transactions.debt = this.bindRunner(runDebt);
+
+		this.run.transactions.list = this.bindRunner(runTransList);
+
+		this.run.statistics = this.bindRunner(runStatistics);
+
 		api.setEnv(this);
 
+		// Login and obtain profile information
 		let loginResult = await api.user.login(this.config.testUser.login, this.config.testUser.password);
 		if (!loginResult)
 			throw new Error('Fail to login');
@@ -129,7 +142,7 @@ class Application
 		await this.accountTests();
 		await this.personTests();
 		await this.transactionTests();
-		await statistics.run(this);
+		await this.run.statistics.run();
 
 		this.finish();
 	}
@@ -148,12 +161,12 @@ class Application
 	{
 		this.view.setBlock('Profile tests', 1);
 
-		await profile.register(this, { login : 'newuser', name : 'Newbie', password : '12345' });
-		await profile.deleteProfile(this);
-		await profile.relogin(this, this.config.testUser);
-		await profile.resetAll(this);
-		await profile.changeName(this);
-		await profile.changePass(this);
+		await this.run.profile.register({ login : 'newuser', name : 'Newbie', password : '12345' });
+		await this.run.profile.deleteProfile();
+		await this.run.profile.relogin(this.config.testUser);
+		await this.run.profile.resetAll();
+		await this.run.profile.changeName();
+		await this.run.profile.changePass();
 	}
 
 
@@ -164,22 +177,22 @@ class Application
 		await this.goToMainView();
 		await this.view.goToAccounts();
 		await this.view.goToCreateAccount();
-		await accounts.createAccount1(this);
+		await this.run.accounts.createAccount1();
 		await this.view.goToCreateAccount();
-		await accounts.createAccount2(this);
+		await this.run.accounts.createAccount2();
 		await this.view.goToUpdateAccount(0);
-		await accounts.editAccount1(this);
+		await this.run.accounts.editAccount1();
 		await this.view.goToCreateAccount();
-		await accounts.create(this, { name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 });
-		await accounts.del(this, [0, 1]);
+		await this.run.accounts.create({ name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 });
+		await this.run.accounts.del([0, 1]);
 		await this.view.goToCreateAccount();
-		await accounts.create(this, { name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 });
+		await this.run.accounts.create({ name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 });
 		await this.view.goToCreateAccount();
-		await accounts.create(this, { name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 });
+		await this.run.accounts.create({ name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 });
 		await this.view.goToCreateAccount();
-		await accounts.create(this, { name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 });
+		await this.run.accounts.create({ name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 });
 		await this.view.goToCreateAccount();
-		await accounts.create(this, { name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 });
+		await this.run.accounts.create({ name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 });
 	}
 
 
@@ -189,13 +202,13 @@ class Application
 
 		await this.goToMainView();
 		await this.view.goToPersons();
-		await persons.checkInitial(this);
-		await persons.create(this, 'Alex');
-		await persons.create(this, 'Maria');
-		await persons.create(this, 'Johnny');
-		await persons.create(this, 'Иван');
-		await persons.update(this, 3, 'Ivan<');
-		await persons.del(this, [0, 2]);
+		await this.run.persons.checkInitial();
+		await this.run.persons.create('Alex');
+		await this.run.persons.create('Maria');
+		await this.run.persons.create('Johnny');
+		await this.run.persons.create('Иван');
+		await this.run.persons.update(3, 'Ivan<');
+		await this.run.persons.del([0, 2]);
 	}
 
 
@@ -216,25 +229,25 @@ class Application
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await transactions.expense.stateLoop(this);
+		await this.run.transactions.expense.stateLoop();
 		await this.runCreateExpenseTests();
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(App.INCOME);
-		await transactions.income.stateLoop(this);
+		await this.view.changeTransactionType(this.INCOME);
+		await this.run.transactions.income.stateLoop();
 		await this.runCreateIncomeTests();
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(App.TRANSFER);
-		await transactions.transfer.stateLoop(this);
+		await this.view.changeTransactionType(this.TRANSFER);
+		await this.run.transactions.transfer.stateLoop();
 		await this.runCreateTransferTests();
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(App.DEBT);
-		await transactions.debt.stateLoop(this);
+		await this.view.changeTransactionType(this.DEBT);
+		await this.run.transactions.debt.stateLoop();
 		await this.runCreateDebtTests();
 	}
 
@@ -274,7 +287,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.expense.create(this, props);
+			await this.run.transactions.expense.create(props);
 		}
 	}
 
@@ -292,7 +305,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.income.create(this, props);
+			await this.run.transactions.income.create(props);
 		}
 	}
 
@@ -311,7 +324,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.transfer.create(this, props);
+			await this.run.transactions.transfer.create(props);
 		}
 	}
 
@@ -331,7 +344,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.debt.create(this, props);
+			await this.run.transactions.debt.create(props);
 		}
 	}
 
@@ -349,7 +362,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.expense.update(this, props);
+			await this.run.transactions.expense.update(props);
 		}
 	}
 
@@ -367,7 +380,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.income.update(this, props);
+			await this.run.transactions.income.update(props);
 		}
 	}
 
@@ -386,7 +399,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.transfer.update(this, props);
+			await this.run.transactions.transfer.update(props);
 		}
 	}
 
@@ -406,7 +419,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.debt.update(this, props);
+			await this.run.transactions.debt.update(props);
 		}
 	}
 
@@ -422,7 +435,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.del(this, App.EXPENSE, props);
+			await this.run.transactions.del(this.EXPENSE, props);
 		}
 	}
 
@@ -438,7 +451,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.del(this, App.INCOME, props);
+			await this.run.transactions.del(this.INCOME, props);
 		}
 	}
 
@@ -454,7 +467,7 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.del(this, App.INCOME, props);
+			await this.run.transactions.del(this.TRANSFER, props);
 		}
 	}
 
@@ -470,20 +483,20 @@ class Application
 
 		for(let props of list)
 		{
-			await transactions.del(this, App.DEBT, props);
+			await this.run.transactions.del(this.DEBT, props);
 		}
 	}
 
 
 	async apiTests()
 	{
-		await runAPI.run(this);
+		await this.run.api.run();
 	}
 
 
 	async transactionsListTests()
 	{
-		await runTransList.run(this);
+		await this.run.transactions.list.run();
 	}
 }
 

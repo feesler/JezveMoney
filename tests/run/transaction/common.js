@@ -4,25 +4,22 @@ import { TransactionsList } from '../../trlist.js';
 import { api } from '../../api.js';
 
 
-var runTransactionsCommon = (function()
+let runTransactionsCommon =
 {
-	let test = null;
-
-
-	async function iterateTransactionPages(app)
+	async iteratePages()
 	{
 		let res = { items : [], pages : [] };
 
-		if (!(app.view instanceof TransactionsView) || !app.view.content.transList)
+		if (!(this.view instanceof TransactionsView) || !this.view.content.transList)
 			throw new Error('Not expected view');
 
-		if (!app.view.isFirstPage())
-			await app.view.goToFirstPage();
+		if (!this.view.isFirstPage())
+			await this.view.goToFirstPage();
 
-		let pos = app.view.pagesCount() * app.config.transactionsOnPage;
-		while(app.view.content.transList.items.length)
+		let pos = this.view.pagesCount() * this.config.transactionsOnPage;
+		while(this.view.content.transList.items.length)
 		{
-			let pageItems = app.view.content.transList.items.map(item => {
+			let pageItems = this.view.content.transList.items.map(item => {
 				return {
 					id : item.id,
 					accountTitle : item.accountTitle,
@@ -36,84 +33,87 @@ var runTransactionsCommon = (function()
 			res.pages.push(pageItems);
 			res.items.push(...pageItems);
 
-			if (app.view.isLastPage())
+			if (this.view.isLastPage())
 				break;
 
-			await app.view.goToNextPage();
+			await this.view.goToNextPage();
 		}
 
 		return res;
-	}
+	},
 
 
 	// Check transactions data from API is the same as show on the transactions list page
 	// Return instance of TransactionsList with current data
-	async function checkTransactionsDataConsistency(app, descr, transList)
+	async checkData(descr, transList)
 	{
-		let env = app.environment;
-		let test = app.test;
+		let env = this.environment;
+		let test = this.test;
+		let scope = this.run.transactions;
 
 		// Save all transactions
-		if (!(app.view instanceof MainView))
-			await app.goToMainView();
-		await app.view.goToTransactions();
-		let transListBefore = await iterateTransactionPages(app);
+		if (!(this.view instanceof MainView))
+			await this.goToMainView();
+		await this.view.goToTransactions();
+		let transListBefore = await scope.iteratePages();
 
-		let expListItems = await app.state.renderTransactionsList(transList.list);
+		let expListItems = await this.state.renderTransactionsList(transList.list);
 
-		await test(descr, () => app.checkObjValue(transListBefore.items, expListItems), env);
-	}
+		await test(descr, () => this.checkObjValue(transListBefore.items, expListItems), env);
+	},
 
 
-	async function createTransaction(app, type, params, submitHandler)
+	async create(type, params, submitHandler)
 	{
-		let env = app.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
+		let scope = this.run.transactions;
 
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
-		app.view.setBlock('Create ' + app.getTransactionTypeStr(type) + ' (' + titleParams.join(', ') + ')', 2);
+		this.view.setBlock('Create ' + this.getTransactionTypeStr(type) + ' (' + titleParams.join(', ') + ')', 2);
 
-		let accList = await app.state.getAccountsList();
-		let pList = await app.state.getPersonsList();
+		let accList = await this.state.getAccountsList();
+		let pList = await this.state.getPersonsList();
 		let trBefore = await api.transaction.list();
-		let expTransList = new TransactionsList(app, trBefore);
+		let expTransList = new TransactionsList(this, trBefore);
 
 		// Navigate to create transaction page
 		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
-		await app.goToMainView();
-		await app.view.goToNewTransactionByAccount(accNum);
+		await this.goToMainView();
+		await this.view.goToNewTransactionByAccount(accNum);
 
-		if (app.view.content.typeMenu.activeType != type)
-			await app.view.changeTransactionType(type);
+		if (this.view.content.typeMenu.activeType != type)
+			await this.view.changeTransactionType(type);
 
 		// Input data and submit
-		let expectedTransaction = await submitHandler(app, params);
+		let expectedTransaction = await submitHandler.call(this, params);
 
 		// Prepare data for next calculations
-		let afterCreate = app.state.createTransaction(accList, expectedTransaction);
+		let afterCreate = this.state.createTransaction(accList, expectedTransaction);
 		expTransList.create(expectedTransaction);
-		let expectedState = await app.state.render(afterCreate, pList, expTransList.list);
+		let expectedState = await this.state.render(afterCreate, pList, expTransList.list);
 
-		await test('Main page widgets update', async () => {}, app.view, expectedState);
+		await test('Main page widgets update', async () => {}, this.view, expectedState);
 
-		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		this.accountTiles = this.view.content.widgets[this.config.AccountsWidgetPos].tiles.items;
+		this.personTiles = this.view.content.widgets[this.config.PersonsWidgetPos].infoTiles.items;
 
 		// Read updated list of transactions
-		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
+		await scope.checkData('List of transactions update', expTransList);
 
-		app.transactions = expTransList.list;
-	}
+		this.transactions = expTransList.list;
+	},
 
 
-	async function updateTransaction(app, type, params, submitHandler)
+	async update(type, params, submitHandler)
 	{
-		let view = app.view;
-		test = app.test;
+		let view = this.view;
+		let test = this.test;
+		let scope = this.run.transactions;
 
-		if (!app.isObject(params))
+		if (!this.isObject(params))
 			throw new Error('Parameters not specified');
 
 		let pos = parseInt(params.pos);
@@ -124,94 +124,88 @@ var runTransactionsCommon = (function()
 		let titleParams = [];
 		for(let k in params)
 			titleParams.push(k + ': ' + params[k]);
-		view.setBlock('Update ' + app.getTransactionTypeStr(type) + ' [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+		view.setBlock('Update ' + this.getTransactionTypeStr(type) + ' [' + pos + '] (' + titleParams.join(', ') + ')', 2);
 
-		let accList = await app.state.getAccountsList();
-		let pList = await app.state.getPersonsList();
+		let accList = await this.state.getAccountsList();
+		let pList = await this.state.getPersonsList();
 		let trBefore = await api.transaction.list();
-		let expTransList = new TransactionsList(app, trBefore);
+		let expTransList = new TransactionsList(this, trBefore);
 
-		await app.goToMainView();
-		await app.view.goToTransactions();
+		await this.goToMainView();
+		await this.view.goToTransactions();
 
-		if (app.view.content.typeMenu.activeType != type)
-			await app.view.filterByType(type);
+		if (this.view.content.typeMenu.activeType != type)
+			await this.view.filterByType(type);
 
-		await app.view.goToUpdateTransaction(pos);
+		await this.view.goToUpdateTransaction(pos);
 
 		// Step
-		let origTransaction = app.view.getExpectedTransaction();
+		let origTransaction = this.view.getExpectedTransaction();
 
-		let canceled = app.state.cancelTransaction(accList, origTransaction);
-		app.state.accounts = canceled;
-		await app.view.parse();
+		let canceled = this.state.cancelTransaction(accList, origTransaction);
+		this.state.accounts = canceled;
+		await this.view.parse();
 
-		let expectedTransaction = await submitHandler(app, params);
+		let expectedTransaction = await submitHandler.call(this, params);
 
-		let afterUpdate = app.state.updateTransaction(accList, origTransaction, expectedTransaction);
+		let afterUpdate = this.state.updateTransaction(accList, origTransaction, expectedTransaction);
 		expTransList.update(origTransaction.id, expectedTransaction);
-		let expectedState = await app.state.render(afterUpdate, pList, expTransList.list);
+		let expectedState = await this.state.render(afterUpdate, pList, expTransList.list);
 
-		await app.goToMainView();
-		await test('Main page widgets update', async () => {}, app.view, expectedState);
+		await this.goToMainView();
+		await test('Main page widgets update', async () => {}, this.view, expectedState);
 
-		await runTransactionsCommon.checkData(app, 'List of transactions update', expTransList);
-	}
+		await scope.checkData('List of transactions update', expTransList);
+	},
 
 
-	async function deleteTransactions(app, type, transactions)
+	async del(type, transactions)
 	{
-		test = app.test;
+		let test = this.test;
+		let scope = this.run.transactions;
 
-		app.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
+		this.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
 
-		await app.goToMainView();
+		await this.goToMainView();
 
 		// Save accounts and persons before delete transactions
-		let accList = await app.state.getAccountsList();
-		let pList = await app.state.getPersonsList();
+		let accList = await this.state.getAccountsList();
+		let pList = await this.state.getPersonsList();
 		let trBefore = await api.transaction.list();
-		let expTransList = new TransactionsList(app, trBefore);
+		let expTransList = new TransactionsList(this, trBefore);
 
 		// Navigate to transactions view and filter by specified type of transaction
-		await app.view.goToTransactions();
-		await app.view.filterByType(type);
+		await this.view.goToTransactions();
+		await this.view.filterByType(type);
 		// Request view to select and delete transactions
-		await app.view.deleteTransactions(transactions);
+		await this.view.deleteTransactions(transactions);
 
-		app.state.accounts = null;
-		app.state.persons = null;
+		this.state.accounts = null;
+		this.state.persons = null;
 
-		await app.goToMainView();
+		await this.goToMainView();
 
 		// Prepare expected transaction list
 		let removedTrans = expTransList.del(type, transactions);
 
 		for(let tr of removedTrans)
 		{
-			let afterDelete = app.state.deleteTransaction(accList, tr);
+			let afterDelete = this.state.deleteTransaction(accList, tr);
 			accList = afterDelete;
 		}
 
-		let expectedState = await app.state.render(accList, pList, expTransList.list);
+		let expectedState = await this.state.render(accList, pList, expTransList.list);
 
-		await test('Main page widgets update', async () => {}, app.view, expectedState);
+		await test('Main page widgets update', async () => {}, this.view, expectedState);
 
-		app.accountTiles = app.view.content.widgets[app.config.AccountsWidgetPos].tiles.items;
-		app.personTiles = app.view.content.widgets[app.config.PersonsWidgetPos].infoTiles.items;
+		this.accountTiles = this.view.content.widgets[this.config.AccountsWidgetPos].tiles.items;
+		this.personTiles = this.view.content.widgets[this.config.PersonsWidgetPos].infoTiles.items;
 
-		await checkTransactionsDataConsistency(app, 'List of transactions update', expTransList);
+		await scope.checkData('List of transactions update', expTransList);
 
-		app.transactions = expTransList.list;
+		this.transactions = expTransList.list;
 	}
-
-
- 	return { iteratePages : iterateTransactionPages,
-				checkData : checkTransactionsDataConsistency,
-				create : createTransaction,
-				update : updateTransaction,
-				del : deleteTransactions };
-})();
+};
 
 
 export { runTransactionsCommon };

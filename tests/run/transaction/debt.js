@@ -3,15 +3,12 @@ import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
 
 
-var runDebt = (function()
+let runDebt =
 {
-	let test = null;
-
-
-	async function submitDebtTransaction(app, params)
+	async submit(params)
 	{
-		let view = app.view;
-		test = app.test;
+		let view = this.view;
+		let test = this.test;
 
 		if ('acc' in params)
 		{
@@ -30,7 +27,7 @@ var runDebt = (function()
 					await test('Enable account', () => view.toggleAccount(), view);
 				}
 
-				let acc = await app.state.getAccountByPos(params.acc);
+				let acc = await this.state.getAccountByPos(params.acc);
 				if (!acc)
 					throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -41,7 +38,7 @@ var runDebt = (function()
 
 		if ('person' in params)
 		{
-			let person = await app.state.getPersonByPos(params.person);
+			let person = await this.state.getPersonByPos(params.person);
 			if (!person)
 				throw new Error('Person (' + params.person + ') not found');
 
@@ -76,29 +73,31 @@ var runDebt = (function()
 			type : view.model.debtType
 		};
 
-		app.state.accounts = null;
-		app.state.persons = null;
+		this.state.accounts = null;
+		this.state.persons = null;
 
 		await view.submit();
 
 		return res;
-	}
+	},
 
 
-	async function createDebt(app, params)
+	async create(params)
 	{
-		await runTransactionsCommon.create(app, app.DEBT, params, async (app, params) =>
+		let scope = this.run.transactions;
+
+		await scope.create(this.DEBT, params, async (params) =>
 		{
-			let expectedTransaction = await submitDebtTransaction(app, params);
+			let expectedTransaction = await scope.debt.submit(params);
 
 			// Obtain newly created account of person
 			if ((expectedTransaction.debt.type && !expectedTransaction.src_id) ||
 				(!expectedTransaction.debt.type && !expectedTransaction.dest_id))
 			{
-				let accList = await app.state.getAccountsList();
+				let accList = await this.state.getAccountsList();
 				let pcurr_id = expectedTransaction.debt.type ? expectedTransaction.src_curr : expectedTransaction.dest_curr;
 
-				let personAccount = await app.state.getPersonAccount(expectedTransaction.debt.person_id, pcurr_id);
+				let personAccount = await this.state.getPersonAccount(expectedTransaction.debt.person_id, pcurr_id);
 				if (!personAccount)
 					throw new Error('Person account not found');
 
@@ -112,33 +111,34 @@ var runDebt = (function()
 
 			return expectedTransaction;
 		});
-	}
+	},
 
 
-	async function updateDebt(app, params)
+	async update(params)
 	{
-		test = app.test;
+		let test = this.test;
+		let scope = this.run.transactions;
 
-		await runTransactionsCommon.update(app, app.DEBT, params, async (app, params) =>
+		await scope.update(this.DEBT, params, async (params) =>
 		{
 			let expState;
-			if (app.view.model.noAccount)
-				expState = (app.view.model.debtType) ? 6 : 7;
+			if (this.view.model.noAccount)
+				expState = (this.view.model.debtType) ? 6 : 7;
 			else
-				expState = (app.view.model.debtType) ? 0 : 3;
+				expState = (this.view.model.debtType) ? 0 : 3;
 
-			await test('Initial state of update debt view', () => app.view.setExpectedState(expState), app.view);
+			await test('Initial state of update debt view', () => this.view.setExpectedState(expState), this.view);
 
-			let expectedTransaction = await submitDebtTransaction(app, params);
+			let expectedTransaction = await scope.debt.submit(params);
 
 			// Obtain newly created account of person
 			if ((expectedTransaction.debt.type && !expectedTransaction.src_id) ||
 				(!expectedTransaction.debt.type && !expectedTransaction.dest_id))
 			{
-				let accList = await app.state.getAccountsList();
+				let accList = await this.state.getAccountsList();
 				let pcurr_id = expectedTransaction.debt.type ? expectedTransaction.src_curr : expectedTransaction.dest_curr;
 
-				let personAccount = await app.state.getPersonAccount(expectedTransaction.debt.person_id, pcurr_id);
+				let personAccount = await this.state.getPersonAccount(expectedTransaction.debt.person_id, pcurr_id);
 				if (!personAccount)
 					throw new Error('Person account not found');
 
@@ -152,13 +152,13 @@ var runDebt = (function()
 
 			return expectedTransaction;
 		});
-	}
+	},
 
 
-	async function debtTransactionLoop(app)
+	async stateLoop()
 	{
-		let view = app.view;
-		test = app.test;
+		let view = this.view;
+		let test = this.test;
 
 		const ACC_3 = 0;
 		const ACC_RUB = 1;
@@ -371,11 +371,7 @@ var runDebt = (function()
 		await test('(50) Disable account', () => view.toggleAccount(), view);
 	}
 
-
- 	return { create : createDebt,
-				update : updateDebt,
-				stateLoop : debtTransactionLoop };
-})();
+};
 
 
 export { runDebt };

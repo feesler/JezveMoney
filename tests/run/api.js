@@ -4,35 +4,26 @@ import { runPersonAPI } from './api/person.js';
 import { runTransactionAPI } from './api/transaction.js';
 
 
-var runAPI = (function()
+let runAPI =
 {
-	let env = null;
-	let app = null;
-	let test = null;
-
-
-	async function runTests(app)
+	async run()
 	{
-		env = app.view.props.environment;
-		test = app.test;
+		let env = this.environment;
+		let test = this.test;
 
-		api.setEnv(app);
+		api.setEnv(this);
 
 		env.setBlock('API tests', 1);
 
-		app.run.api = { account : runAccountAPI,
-						person : runPersonAPI,
-					 	transaction : runTransactionAPI };
+		this.run.api.account = this.bindRunner(runAccountAPI);
+		this.run.api.person = this.bindRunner(runPersonAPI);
+		this.run.api.transaction = this.bindRunner(runTransactionAPI);
 
-		const account = app.run.api.account;
-		const person = app.run.api.person;
-		const transaction = app.run.api.transaction;
+		const account = this.run.api.account;
+		const person = this.run.api.person;
+		const transaction = this.run.api.transaction;
 
-		account.setEnv(app);
-		person.setEnv(app);
-		transaction.setEnv(app);
-
-		await test('Login user', () => api.user.login(app.config.testUser.login, app.config.testUser.password), env);
+		await test('Login user', () => api.user.login(this.config.testUser.login, this.config.testUser.password), env);
 
 		await test('Reset all data', () => api.profile.reset(), env);
 
@@ -43,7 +34,7 @@ var runAPI = (function()
 		await test('Accounts list', async () => {
 			let accList = await api.account.list();
 
-			return app.isArray(accList) && accList.length == 0;
+			return this.isArray(accList) && accList.length == 0;
 		}, env);
 
 		const RUB = 1;
@@ -60,7 +51,7 @@ var runAPI = (function()
 		await test('Persons list', async () => {
 			let pList = await api.person.list();
 
-			return app.isArray(pList);
+			return this.isArray(pList);
 		}, env);
 
 		let PERSON_X = await person.createTest({ name : 'Person X' });
@@ -68,16 +59,16 @@ var runAPI = (function()
 
 
 		let now = new Date();
-		let monthAgo = app.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-		let weekAgo = app.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
-		let yesterday = app.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+		let monthAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+		let weekAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+		let yesterday = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
 
 		env.setBlock('Transactions', 2);
 
 		await test('Transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return app.isArray(trList) && trList.length == 0;
+			return this.isArray(trList) && trList.length == 0;
 		}, env);
 
 
@@ -171,11 +162,11 @@ var runAPI = (function()
 		/**
 		 * Filter transactions
 		 */
-		await transaction.filterTest({ type : app.DEBT });
+		await transaction.filterTest({ type : this.DEBT });
 
 		await transaction.filterTest({ accounts : ACC_RUB });
 
-		await transaction.filterTest({ type : app.DEBT,
+		await transaction.filterTest({ type : this.DEBT,
 			 							accounts : ACC_RUB });
 
 		await transaction.filterTest({ onPage : 10 });
@@ -221,13 +212,11 @@ var runAPI = (function()
 		await test('Result transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return app.isArray(trList) && trList.length == 2;
+			return this.isArray(trList) && trList.length == 2;
 		}, env);
 	}
 
-
-	return { run : runTests };
-})();
+};
 
 
 export { runAPI };

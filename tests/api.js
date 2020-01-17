@@ -2,7 +2,7 @@
  * API tests module
  * @return
  */
-var apiModule = (function()
+let apiModule = (function()
 {
 	let defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
 	let env = null;

@@ -1,41 +1,27 @@
 import { api } from '../../api.js';
 
 
-var runAccountAPI = (function()
+let runAccountAPI =
 {
-	let env = null;
-	let app = null;
-	let test = null;
-
-
-	function setupEnvironment(App)
-	{
-		if (!App || !App.environment)
-			throw new Error('Unexpected setup');
-
-		app = App;
-		env = app.environment;
-		test = app.test;
-	}
-
-
 	/**
 	 * Account tests
 	 */
 
 	// Create account with specified params (name, currency, balance, icon)
 	// And check expected state of app
-	async function apiCreateAccountTest(params)
+	async createTest(params)
 	{
+		let env = this.environment;
+		let test = this.test;
 		let acc_id = 0;
 
 		await test('Create account', async () =>
 		{
 			let accBefore = await api.account.list();
-			if (!app.isArray(accBefore))
+			if (!this.isArray(accBefore))
 				return false;
 
-			let expAccObj = app.copyObject(params);
+			let expAccObj = this.copyObject(params);
 			expAccObj.curr_id = params.currency;
 			delete expAccObj.currency;
 
@@ -46,28 +32,30 @@ var runAccountAPI = (function()
 			acc_id = createRes.id;
 
 			let accList = await api.account.list();
-			if (!app.isArray(accList))
+			if (!this.isArray(accList))
 				return false;
 
 			if (accList.length != accBefore.length + 1)
 				throw new Error('Length of accounts list must increase');
 
-			if (app.idSearch(accBefore, acc_id))
+			if (this.idSearch(accBefore, acc_id))
 				throw new Error('Already exist account returned');
 
-			let accObj = app.idSearch(accList, acc_id);
+			let accObj = this.idSearch(accList, acc_id);
 
-			return app.checkObjValue(accObj, expAccObj);
+			return this.checkObjValue(accObj, expAccObj);
 		}, env);
 
 		return acc_id;
-	}
+	},
 
 
 	// Update account with specified params (name, currency, balance, icon)
 	// And check expected state of app
-	async function apiUpdateAccountTest(id, params)
+	async updateTest(id, params)
 	{
+		let env = this.environment;
+		let test = this.test;
 		let updateRes;
 
 		let accList = await api.account.read(id);
@@ -76,17 +64,17 @@ var runAccountAPI = (function()
 		updParams.currency = updParams.curr;
 		delete updParams.curr;
 
-		app.setParam(updParams, params);
+		this.setParam(updParams, params);
 
 		await test('Update account', async () =>
 		{
 			let accBefore = await api.account.list();
-			if (!app.isArray(accBefore))
+			if (!this.isArray(accBefore))
 				return false;
-			let origAcc = app.idSearch(accBefore, updParams.id);
+			let origAcc = this.idSearch(accBefore, updParams.id);
 
 			// Prepare expected account object
-			let expAccObj = app.copyObject(updParams);
+			let expAccObj = this.copyObject(updParams);
 			expAccObj.id = id;
 			expAccObj.owner_id = expAccObj.owner;
 			expAccObj.curr_id = expAccObj.currency;
@@ -103,7 +91,7 @@ var runAccountAPI = (function()
 			}
 
 			// Prepare expected updates of accounts list
-			let expAccList = app.copyObject(accBefore);
+			let expAccList = this.copyObject(accBefore);
 			let accIndex = expAccList.findIndex(item => item.id == expAccObj.id);
 			if (accIndex !== -1)
 				expAccList.splice(accIndex, 1, expAccObj);
@@ -114,73 +102,73 @@ var runAccountAPI = (function()
 				throw new Error('Fail to update account');
 
 			let accList = await api.account.list();
-			let accObj = app.idSearch(accList, id);
+			let accObj = this.idSearch(accList, id);
 
-			let res = app.checkObjValue(accObj, expAccObj) &&
-						app.checkObjValue(accList, expAccList);
+			let res = this.checkObjValue(accObj, expAccObj) &&
+						this.checkObjValue(accList, expAccList);
 			return res;
 		}, env);
 
 		return updateRes;
-	}
+	},
 
 
-	function onAccountDelete(trList, accList, ids)
+	onDelete(trList, accList, ids)
 	{
 		let res = [];
 
-		if (!app.isArray(ids))
+		if (!this.isArray(ids))
 			ids = [ ids ];
 
 		for(let trans of trList)
 		{
-			if (trans.type == app.EXPENSE && ids.indexOf(trans.src_id) !== -1)
+			if (trans.type == this.EXPENSE && ids.indexOf(trans.src_id) !== -1)
 				continue;
-			if (trans.type == app.INCOME && ids.indexOf(trans.dest_id) !== -1)
+			if (trans.type == this.INCOME && ids.indexOf(trans.dest_id) !== -1)
 				continue;
-			if ((trans.type == app.TRANSFER || trans.type == app.DEBT) &&
+			if ((trans.type == this.TRANSFER || trans.type == this.DEBT) &&
 				ids.indexOf(trans.src_id) !== -1 && ids.indexOf(trans.dest_id) !== -1)
 				continue;
-			if (trans.type == app.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
+			if (trans.type == this.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
 				continue;
-			if (trans.type == app.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
+			if (trans.type == this.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
 				continue;
 
-			let convTrans = app.copyObject(trans);
+			let convTrans = this.copyObject(trans);
 
-			if (convTrans.type == app.TRANSFER)
+			if (convTrans.type == this.TRANSFER)
 			{
 				if (ids.indexOf(convTrans.src_id) !== -1)
 				{
-					convTrans.type = app.INCOME;
+					convTrans.type = this.INCOME;
 					convTrans.src_id = 0;
 				}
 				else if (ids.indexOf(convTrans.dest_id) !== -1)
 				{
-					convTrans.type = app.EXPENSE;
+					convTrans.type = this.EXPENSE;
 					convTrans.dest_id = 0;
 				}
 			}
-			else if (convTrans.type == app.DEBT)
+			else if (convTrans.type == this.DEBT)
 			{
 				for(let acc_id of ids)
 				{
-					let acc = app.idSearch(accList, acc_id);
+					let acc = this.idSearch(accList, acc_id);
 
 					if (convTrans.src_id == acc_id)
 					{
-						if (acc.owner_id != app.user_id)
+						if (acc.owner_id != this.user_id)
 						{
-							convTrans.type = app.INCOME;
+							convTrans.type = this.INCOME;
 						}
 
 						convTrans.src_id = 0;
 					}
 					else if (convTrans.dest_id == acc_id)
 					{
-						if (acc.owner_id != app.user_id)
+						if (acc.owner_id != this.user_id)
 						{
-							convTrans.type = app.EXPENSE;
+							convTrans.type = this.EXPENSE;
 						}
 						convTrans.dest_id = 0;
 					}
@@ -191,26 +179,28 @@ var runAccountAPI = (function()
 		}
 
 		return res;
-	}
+	},
 
 
 	// Delete specified account(s)
 	// And check expected state of app
-	async function apiDeleteAccountTest(ids)
+	async deleteTest(ids)
 	{
+		let env = this.environment;
+		let test = this.test;
 		let deleteRes;
 
 		await test('Delete account', async () =>
 		{
-			if (!app.isArray(ids))
+			if (!this.isArray(ids))
 				ids = [ ids ];
 
 			let accBefore = await api.account.list();
-			if (!app.isArray(accBefore))
+			if (!this.isArray(accBefore))
 				return false;
 
 			// Prepare expected updates of accounts list
-			let expAccList = app.copyObject(accBefore);
+			let expAccList = this.copyObject(accBefore);
 			for(let acc_id of ids)
 			{
 				let accIndex = expAccList.findIndex(item => item.id == acc_id);
@@ -220,7 +210,7 @@ var runAccountAPI = (function()
 
 			// Prepare expected updates of transactions
 			let trBefore = await api.transaction.list();
-			let expTransList = onAccountDelete(trBefore, accBefore, ids);
+			let expTransList = this.run.api.account.onDelete(trBefore, accBefore, ids);
 
 			// Send API sequest to server
 			deleteRes = await api.account.del(ids);
@@ -230,22 +220,15 @@ var runAccountAPI = (function()
 			let accList = await api.account.list();
 			let trList = await api.transaction.list();
 
-			let res = app.checkObjValue(accList, expAccList) &&
-						app.checkObjValue(trList, expTransList);
+			let res = this.checkObjValue(accList, expAccList) &&
+						this.checkObjValue(trList, expTransList);
 
 			return res;
 		}, env);
 
 		return deleteRes;
 	}
-
-
-	return { setEnv : setupEnvironment,
-				createTest : apiCreateAccountTest,
-	 			updateTest : apiUpdateAccountTest,
-				deleteTest : apiDeleteAccountTest,
-				onDelete : onAccountDelete };
-})();
+};
 
 
 export { runAccountAPI };
