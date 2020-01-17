@@ -221,7 +221,7 @@ var Environment = (function()
 
 		let cookies = headers['set-cookie'];
 
-		if (!common.isArray(cookies))
+		if (!Array.isArray(cookies))
 			cookies = [ cookies ];
 
 		for(let cookieStr of cookies)

@@ -54,7 +54,7 @@ class PersonsView extends TestView
 		if (!persons)
 			throw new Error('No persons specified');
 
-		if (!this.app.isArray(persons))
+		if (!Array.isArray(persons))
 			persons = [persons];
 
 		let ind = 0;

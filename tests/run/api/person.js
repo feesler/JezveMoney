@@ -18,7 +18,7 @@ let runPersonAPI =
 		await test('Create person', async () =>
 		{
 			let pBefore = await api.person.list();
-			if (!this.isArray(pBefore))
+			if (!Array.isArray(pBefore))
 				return false;
 
 			let expPersonObj = this.copyObject(params);
@@ -30,7 +30,7 @@ let runPersonAPI =
 			person_id = createRes.id;
 
 			let pList = await api.person.list();
-			if (!this.isArray(pList))
+			if (!Array.isArray(pList))
 				return false;
 
 			if (pList.length != pBefore.length + 1)
@@ -59,7 +59,7 @@ let runPersonAPI =
 		await test('Update person', async () =>
 		{
 			let pBefore = await api.person.list();
-			if (!this.isArray(pBefore))
+			if (!Array.isArray(pBefore))
 				return false;
 
 			let origPerson = this.idSearch(pBefore, id);
@@ -77,7 +77,7 @@ let runPersonAPI =
 				expPersonList.splice(pIndex, 1, expPersonObj);
 
 			let pList = await api.person.list();
-			if (!this.isArray(pList))
+			if (!Array.isArray(pList))
 				return false;
 
 			let personObj = this.idSearch(pList, id);
@@ -102,14 +102,14 @@ let runPersonAPI =
 
 		await test('Delete person', async () =>
 		{
-			if (!this.isArray(ids))
+			if (!Array.isArray(ids))
 				ids = [ ids ];
 
 			let accList = await api.account.list();
-			if (!this.isArray(accList))
+			if (!Array.isArray(accList))
 				return false;
 			let pBefore = await api.person.list();
-			if (!this.isArray(pBefore))
+			if (!Array.isArray(pBefore))
 				return false;
 
 			// Prepare expected updates of accounts list
@@ -120,7 +120,7 @@ let runPersonAPI =
 				let pIndex = expPersonList.findIndex(item => item.id == person_id);
 				if (pIndex !== -1)
 				{
-					if (this.isArray(expPersonList[pIndex].accounts))
+					if (Array.isArray(expPersonList[pIndex].accounts))
 					{
 						for(let personAcc of expPersonList[pIndex].accounts)
 						{

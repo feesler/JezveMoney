@@ -123,7 +123,7 @@ class TransactionsList
 
 	del(type, inds)
 	{
-		let typedIndexes = (this.app.isArray(inds)) ? inds : [ inds ];
+		let typedIndexes = (Array.isArray(inds)) ? inds : [ inds ];
 		let indexes = [];
 
 		// Save absolute indexes of items with specified type

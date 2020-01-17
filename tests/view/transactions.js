@@ -276,7 +276,7 @@ class TransactionsView extends TestView
 
 	async filterByAccounts(accounts)
 	{
-		if (!this.app.isArray(accounts))
+		if (!Array.isArray(accounts))
 			accounts = [ accounts ];
 
 		return this.navigation(async () =>
@@ -408,7 +408,7 @@ class TransactionsView extends TestView
 		if (typeof tr === 'undefined')
 			throw new Error('No transactions specified');
 
-		if (!this.app.isArray(tr))
+		if (!Array.isArray(tr))
 			tr = [tr];
 
 		let ind = 0;
@@ -451,7 +451,7 @@ class TransactionsView extends TestView
 		if (!tr)
 			throw new Error('No transactions specified');
 
-		if (!app.isArray(tr))
+		if (!Array.isArray(tr))
 			tr = [tr];
 
 		let currentType = app.view.content.typeMenu.activeType;

@@ -22,13 +22,6 @@ function getTransactionTypeStr(type)
 }
 
 
-// Check object is array
-function isArray(obj)
-{
-	return (Object.prototype.toString.call(obj) === '[object Array]');
-}
-
-
 // Check object is date
 function isDate(obj)
 {
@@ -62,7 +55,7 @@ function setParam(obj, params)
 	for(par in params)
 	{
 		val = params[par];
-		if (isArray(val))
+		if (Array.isArray(val))
 		{
 			obj[par] = val.map(function(item){ return item; });
 		}
@@ -302,7 +295,7 @@ function isValidValue(val)
 // Search for object with specified id and return its position
 function getPosById(arr, id)
 {
-	if (!isArray(arr) || !id)
+	if (!Array.isArray(arr) || !id)
 		return -1;
 
 	return arr.findIndex(item => item && item.id == id);
@@ -312,7 +305,7 @@ function getPosById(arr, id)
 // Search for array of objects by id key
 function idSearch(arr, id)
 {
-	if (!isArray(arr))
+	if (!Array.isArray(arr))
 		return null;
 
 	let res = arr.find(item => item && item.id == id);
@@ -326,7 +319,7 @@ function idSearch(arr, id)
 // Return deep copy of object
 function copyObject(item)
 {
-	if (isArray(item))
+	if (Array.isArray(item))
 	{
 		return item.map(copyObject);
 	}
@@ -370,7 +363,7 @@ function urlJoin(obj)
 	for(par in obj)
 	{
 		let val = obj[par];
-		if (isArray(val))
+		if (Array.isArray(val))
 		{
 			val.forEach(function(arrItem)
 			{
@@ -424,7 +417,7 @@ function checkObjValue(obj, expectedObj, ret = false)
 
 		expected = expectedObj[vKey];
 		value = obj[vKey];
-		if (isObject(expected) || isArray(expected))
+		if (isObject(expected) || Array.isArray(expected))
 		{
 			let res = checkObjValue(value, expected, true);
 			if (res !== true)
@@ -488,7 +481,6 @@ var commonModule = { EXPENSE,
 					TRANSFER,
 					DEBT,
 					getTransactionTypeStr,
-					isArray,
 					isDate,
 					isFunction,
 					isObject,

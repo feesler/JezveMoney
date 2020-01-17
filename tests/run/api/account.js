@@ -18,7 +18,7 @@ let runAccountAPI =
 		await test('Create account', async () =>
 		{
 			let accBefore = await api.account.list();
-			if (!this.isArray(accBefore))
+			if (!Array.isArray(accBefore))
 				return false;
 
 			let expAccObj = this.copyObject(params);
@@ -32,7 +32,7 @@ let runAccountAPI =
 			acc_id = createRes.id;
 
 			let accList = await api.account.list();
-			if (!this.isArray(accList))
+			if (!Array.isArray(accList))
 				return false;
 
 			if (accList.length != accBefore.length + 1)
@@ -69,7 +69,7 @@ let runAccountAPI =
 		await test('Update account', async () =>
 		{
 			let accBefore = await api.account.list();
-			if (!this.isArray(accBefore))
+			if (!Array.isArray(accBefore))
 				return false;
 			let origAcc = this.idSearch(accBefore, updParams.id);
 
@@ -117,7 +117,7 @@ let runAccountAPI =
 	{
 		let res = [];
 
-		if (!this.isArray(ids))
+		if (!Array.isArray(ids))
 			ids = [ ids ];
 
 		for(let trans of trList)
@@ -192,11 +192,11 @@ let runAccountAPI =
 
 		await test('Delete account', async () =>
 		{
-			if (!this.isArray(ids))
+			if (!Array.isArray(ids))
 				ids = [ ids ];
 
 			let accBefore = await api.account.list();
-			if (!this.isArray(accBefore))
+			if (!Array.isArray(accBefore))
 				return false;
 
 			// Prepare expected updates of accounts list

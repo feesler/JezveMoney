@@ -66,7 +66,7 @@ let runTransactionAPI =
 		await test('Create ' + this.getTransactionTypeStr(params.transtype) + ' transaction', async () =>
 		{
 			let trBefore = await api.transaction.list();
-			if (!this.isArray(trBefore))
+			if (!Array.isArray(trBefore))
 				return false;
 
 			// Prepare expected transaction object
@@ -247,12 +247,12 @@ let runTransactionAPI =
 
 		await test('Delete transaction', async () =>
 		{
-			if (!this.isArray(ids))
+			if (!Array.isArray(ids))
 				ids = [ ids ];
 
 			let trBefore = await api.transaction.list();
 			let accBefore = await api.account.list();
-			if (!this.isArray(trBefore))
+			if (!Array.isArray(trBefore))
 				return false;
 
 			// Prepare expected updates of transactions list

@@ -34,7 +34,7 @@ let runAPI =
 		await test('Accounts list', async () => {
 			let accList = await api.account.list();
 
-			return this.isArray(accList) && accList.length == 0;
+			return Array.isArray(accList) && accList.length == 0;
 		}, env);
 
 		const RUB = 1;
@@ -51,7 +51,7 @@ let runAPI =
 		await test('Persons list', async () => {
 			let pList = await api.person.list();
 
-			return this.isArray(pList);
+			return Array.isArray(pList);
 		}, env);
 
 		let PERSON_X = await person.createTest({ name : 'Person X' });
@@ -68,7 +68,7 @@ let runAPI =
 		await test('Transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return this.isArray(trList) && trList.length == 0;
+			return Array.isArray(trList) && trList.length == 0;
 		}, env);
 
 
@@ -212,7 +212,7 @@ let runAPI =
 		await test('Result transactions list', async () => {
 			let trList = await api.transaction.list();
 
-			return this.isArray(trList) && trList.length == 2;
+			return Array.isArray(trList) && trList.length == 2;
 		}, env);
 	}
 

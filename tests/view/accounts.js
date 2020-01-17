@@ -56,7 +56,7 @@ class AccountsView extends TestView
 		if (!acc)
 			throw new Error('No accounts specified');
 
-		if (!this.app.isArray(acc))
+		if (!Array.isArray(acc))
 			acc = [acc];
 
 		let ind = 0;
