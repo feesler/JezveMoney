@@ -74,7 +74,7 @@ var runTransfer = (function()
 			let origTransaction = app.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-			await test('Initial state of update transfer view', async () => app.view.setExpectedState(isDiff ? 3 : 0), app.view);
+			await test('Initial state of update transfer view', () => app.view.setExpectedState(isDiff ? 3 : 0), app.view);
 
 			return submitTransferTransaction(app, params);
 		});

@@ -127,7 +127,7 @@ var runDebt = (function()
 			else
 				expState = (app.view.model.debtType) ? 0 : 3;
 
-			await test('Initial state of update debt view', async () => app.view.setExpectedState(expState), app.view);
+			await test('Initial state of update debt view', () => app.view.setExpectedState(expState), app.view);
 
 			let expectedTransaction = await submitDebtTransaction(app, params);
 

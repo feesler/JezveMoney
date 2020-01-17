@@ -74,7 +74,7 @@ var runIncome = (function()
 			let origTransaction = app.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-			await test('Initial state of update income view', async () => app.view.setExpectedState(isDiff ? 2 : 0), app.view);
+			await test('Initial state of update income view', () => app.view.setExpectedState(isDiff ? 2 : 0), app.view);
 
 			return submitIncomeTransaction(app, params);
 		});
