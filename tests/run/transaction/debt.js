@@ -30,7 +30,7 @@ var runDebt = (function()
 					await test('Enable account', () => view.toggleAccount(), view);
 				}
 
-				let acc = await view.getAccountByPos(params.acc);
+				let acc = await app.state.getAccountByPos(params.acc);
 				if (!acc)
 					throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -41,7 +41,7 @@ var runDebt = (function()
 
 		if ('person' in params)
 		{
-			let person = await view.getPersonByPos(params.person);
+			let person = await app.state.getPersonByPos(params.person);
 			if (!person)
 				throw new Error('Person (' + params.person + ') not found');
 

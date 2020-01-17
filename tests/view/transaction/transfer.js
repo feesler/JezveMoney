@@ -13,11 +13,11 @@ class TransferTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.srcAccount = await this.getAccount(cont.source.id);
+		res.srcAccount = await this.app.state.getAccount(cont.source.id);
 		if (!res.srcAccount)
 			throw new Error('Source account not found');
 
-		res.destAccount = await this.getAccount(cont.destination.id);
+		res.destAccount = await this.app.state.getAccount(cont.destination.id);
 		if (!res.destAccount)
 			throw new Error('Destination account not found');
 
@@ -437,7 +437,7 @@ class TransferTransactionView extends TransactionView
 
 	async changeSrcAccount(account_id)
 	{
-		let newAcc = await this.getAccount(account_id);
+		let newAcc = await this.app.state.getAccount(account_id);
 
 		if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 			return;
@@ -457,11 +457,11 @@ class TransferTransactionView extends TransactionView
 
 		if (newAcc.id == this.model.destAccount.id)
 		{
-			let nextAcc_id = await this.getNextAccount(newAcc.id);
+			let nextAcc_id = await this.app.state.getNextAccount(newAcc.id);
 			if (!nextAcc_id)
 				throw new Error('Next account not found');
 
-			this.model.destAccount = await this.getAccount(nextAcc_id);
+			this.model.destAccount = await this.app.state.getAccount(nextAcc_id);
 			this.model.dest_curr_id = this.model.destAccount.curr_id;
 			this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
 			this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
@@ -532,7 +532,7 @@ class TransferTransactionView extends TransactionView
 
 	async changeDestAccount(account_id)
 	{
-		let newAcc = await this.getAccount(account_id);
+		let newAcc = await this.app.state.getAccount(account_id);
 
 		if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 			return;
@@ -552,8 +552,8 @@ class TransferTransactionView extends TransactionView
 
 		if (newAcc.id == this.model.srcAccount.id)
 		{
-			let nextAcc_id = await this.getNextAccount(newAcc.id);
-			let newSrcAcc = await this.getAccount(nextAcc_id);
+			let nextAcc_id = await this.app.state.getNextAccount(newAcc.id);
+			let newSrcAcc = await this.app.state.getAccount(nextAcc_id);
 			if (!newSrcAcc)
 				throw new Error('Next account not found');
 			this.model.srcAccount = newSrcAcc;

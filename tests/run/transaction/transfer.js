@@ -15,7 +15,7 @@ var runTransfer = (function()
 
 		if ('srcAcc' in params)
 		{
-			let acc = await view.getAccountByPos(params.srcAcc);
+			let acc = await app.state.getAccountByPos(params.srcAcc);
 			if (!acc)
 				throw new Error('Account (' + params.srcAcc + ') not found');
 
@@ -25,7 +25,7 @@ var runTransfer = (function()
 
 		if ('destAcc' in params)
 		{
-			let acc = await view.getAccountByPos(params.destAcc);
+			let acc = await app.state.getAccountByPos(params.destAcc);
 			if (!acc)
 				throw new Error('Account (' + params.destAcc + ') not found');
 

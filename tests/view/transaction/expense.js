@@ -13,7 +13,7 @@ class ExpenseTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.srcAccount = await this.getAccount(cont.source.id);
+		res.srcAccount = await this.app.state.getAccount(cont.source.id);
 		if (!res.srcAccount)
 			throw new Error('Source account not found');
 
@@ -300,7 +300,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async changeSrcAccount(account_id)
 	{
-		let newAcc = await this.getAccount(account_id);
+		let newAcc = await this.app.state.getAccount(account_id);
 
 		if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 			return;

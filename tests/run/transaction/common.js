@@ -141,6 +141,11 @@ var runTransactionsCommon = (function()
 
 		// Step
 		let origTransaction = app.view.getExpectedTransaction();
+
+		let canceled = app.state.cancelTransaction(accList, origTransaction);
+		app.state.accounts = canceled;
+		await app.view.parse();
+
 		let expectedTransaction = await submitHandler(app, params);
 
 		let afterUpdate = app.state.updateTransaction(accList, origTransaction, expectedTransaction);

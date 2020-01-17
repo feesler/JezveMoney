@@ -25,28 +25,82 @@ class AppState
 	}
 
 
+	async getUserAccountsList()
+	{
+		let accList = await this.getAccountsList();
+
+		return accList.filter(item => item.owner_id == this.app.owner_id);
+	}
+
+
 	async getAccount(acc_id)
 	{
-//console.log(`getAccount(${acc_id})`);
 		let id = parseInt(acc_id);
 		if (!id || isNaN(id))
 			return null;
 
 		if (!Array.isArray(this.accounts))
 			this.accounts = await api.account.list(true);
-//console.log('accounts:', this.accounts);
+
 		let accObj = this.accounts.find(item => item.id == id);
 
 		return accObj;
 	}
 
 
+	async getAccountByPos(accPos)
+	{
+		let pos = parseInt(accPos);
+		if (isNaN(pos))
+			return null;
+
+		let userAccounts = await this.getUserAccountsList();
+		if (pos < 0 || pos >= userAccounts.length)
+			return null;
+
+		let accObj = userAccounts[pos];
+
+		return accObj;
+	}
+
+
+	// Return current position of account in accounts array
+	// Return -1 in case account can't be found
+	async getAccountPos(acc_id)
+	{
+		let userAccounts = await this.getUserAccountsList();
+
+		return userAccounts.findIndex(item => item.id == acc_id);
+	}
+
+
+	// Return another user account id if possible
+	// Return zero if no account found
+	async getNextAccount(acc_id)
+	{
+		if (!acc_id)
+			return 0;
+
+		let userAccounts = await this.getUserAccountsList();
+
+		if (!Array.isArray(userAccounts) || userAccounts.length < 2)
+			return 0;
+
+		let pos = await this.getAccountPos(acc_id);
+		if (pos === -1)
+			return 0;
+
+		pos = ((pos == userAccounts.length - 1) ? 0 : pos + 1);
+
+		return userAccounts[pos].id;
+	}
+
+
 	async getPersonsList()
 	{
-//console.log('getPersonsList()');
 		if (!Array.isArray(this.persons))
 			this.persons = await api.person.list();
-//console.log('persons: ', this.persons);
+
 		return this.persons;
 	}
 
@@ -61,6 +115,24 @@ class AppState
 			this.persons = await api.person.list();
 
 		let personObj = this.persons.find(item => item.id == id);
+
+		return personObj;
+	}
+
+
+	async getPersonByPos(personPos)
+	{
+		let pos = parseInt(personPos);
+		if (isNaN(pos))
+			return null;
+
+		if (!Array.isArray(this.persons))
+			this.persons = await api.person.list();
+
+		if (pos < 0 || pos >= this.persons.length)
+			return null;
+
+		let personObj = this.persons[pos];
 
 		return personObj;
 	}

@@ -15,7 +15,7 @@ var runIncome = (function()
 
 		if ('destAcc' in params)
 		{
-			let acc = await view.getAccountByPos(params.destAcc);
+			let acc = await app.state.getAccountByPos(params.destAcc);
 			if (!acc)
 				throw new Error('Account (' + params.destAcc + ') not found');
 

@@ -15,7 +15,7 @@ var runExpense = (function()
 
 		if ('srcAcc' in params)
 		{
-			let acc = await view.getAccountByPos(params.srcAcc);
+			let acc = await app.state.getAccountByPos(params.srcAcc);
 			if (!acc)
 				throw new Error('Account (' + params.srcAcc + ') not found');
 

@@ -13,7 +13,7 @@ class IncomeTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.destAccount = await this.getAccount(cont.destination.id);
+		res.destAccount = await this.app.state.getAccount(cont.destination.id);
 		if (!res.destAccount)
 			throw new Error('Destination account not found');
 
@@ -296,7 +296,7 @@ class IncomeTransactionView extends TransactionView
 
 	async changeDestAccount(account_id)
 	{
-		let newAcc = await this.getAccount(account_id);
+		let newAcc = await this.app.state.getAccount(account_id);
 
 		if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 			return;
