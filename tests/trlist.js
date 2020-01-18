@@ -157,12 +157,16 @@ class TransactionsList
 
 	filterByType(type)
 	{
-		if (this.availTypes.indexOf(type) === -1)
+		// If type == 0 or no value is specified assume filter is set as ALL
+		if (!type)
+			return this;
+
+		if (!this.availTypes.includes(type))
 			throw new Error('Wrong parameters');
 
-		let res = this.app.copyObject(this.list);
+		let res = this.list.filter(item => item.type == type);
 
-		return res.filter(item => item.type == type);
+		return new TransactionsList(this.app, res);
 	}
 
 
@@ -171,25 +175,25 @@ class TransactionsList
 		if (!ids)
 			throw new Error('Wrong parameters');
 
-		let res = this.app.copyObject(this.list);
 		let accounts = (Array.isArray(ids)) ? ids : [ ids ];
 		if (!accounts.length)
-			return res;
+			return this;
 
-		return res.filter(item => accounts.indexOf(item.src_id) !== -1 || accounts.indexOf(item.dest_id) !== -1);
+		let res = this.list.filter(item => accounts.includes(item.src_id) || accounts.includes(item.dest_id));
+
+		return new TransactionsList(this.app, res);
 	}
 
 
 	filterByDate(start, end)
 	{
-		let res = this.app.copyObject(this.list);
 		if (!start && !end)
-			return res;
+			return this;
 
 		let fStart = this.app.fixDate(start);
 		let fEnd = this.app.fixDate(end);
 
-		return res.filter(item =>
+		let res = this.list.filter(item =>
 		{
 			let date = this.app.convDate(item.date);
 			if (!date)
@@ -202,18 +206,21 @@ class TransactionsList
 
 			return true;
 		});
+
+		return new TransactionsList(this.app, res);
 	}
 
 
 	filterByQuery(query)
 	{
-		let res = this.app.copyObject(this.list);
 		if (!query)
-			return res;
+			return this;
 
 		let lcQuery = query.toLowerCase();
 
-		return res.filter(item => item.comment.toLowerCase().indexOf(lcQuery) !== -1);
+		let res = this.list.filter(item => item.comment.toLowerCase().indexOf(lcQuery) !== -1);
+
+		return new TransactionsList(this.app, res);
 	}
 
 
@@ -224,11 +231,11 @@ class TransactionsList
 		if (num < 1 || num > Math.ceil(this.list.length / pageLimit))
 			throw new Error('Wrong page');
 
-		let res = this.app.copyObject(this.list);
 		let offset = (num - 1) * pageLimit;
-		let offsetLimit = this.list.length - offset;
 
-		return res.splice(offset, Math.max(pageLimit, offsetLimit));
+		let res = this.list.slice(offset, Math.min(offset + pageLimit, this.list.length));
+
+		return new TransactionsList(this.app, res);
 	}
 
 

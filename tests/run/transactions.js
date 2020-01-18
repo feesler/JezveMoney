@@ -220,10 +220,12 @@ let runTransList =
 		let totalDebts = newDebts.length + debtsBefore.length;
 
 		let allTrList = new TransactionsList(this, allTransactions);
+		// Filter all transactions with account acc_2
 		let acc_2_all = allTrList.filterByAccounts(accIds[2]);
-		let acc2AllTrList = new TransactionsList(this, acc_2_all);
-		let acc_2_debts = acc2AllTrList.filterByType(this.DEBT);
+		// Filter debt transactions with account acc_2
+		let acc_2_debts = acc_2_all.filterByType(this.DEBT);
 
+		// Filter transactions with account acc_2 over the week
 		// Prepare date range for week
 		let now = new Date(this.convDate(this.dates.now));
 		let day1 = now.getDate();
@@ -241,7 +243,10 @@ let runTransList =
 		let weekStartDate = Date.UTC(now.getFullYear(), now.getMonth(), day1);
 		let weekEndDate = Date.UTC(now.getFullYear(), now.getMonth(), day2);
 
-		let acc_2_week = acc2AllTrList.filterByDate(weekStartDate, weekEndDate);
+		let acc_2_week = acc_2_all.filterByDate(weekStartDate, weekEndDate);
+		// Search transactions with '1' in the comment
+		let acc_2_query = acc_2_all.filterByQuery('1');
+
 
 		let totalTransactions = totalExpenses + totalIncomes + totalTransfers + totalDebts;
 
@@ -290,25 +295,22 @@ let runTransList =
 		await test('Filter by Debt', () => {}, this.view, state);
 
 		// Filter by account 2 and debt
-		state.values.paginator.pages = scope.expectedPages(acc_2_debts.length);
+		state.values.paginator.pages = scope.expectedPages(acc_2_debts.list.length);
 		await this.view.filterByAccounts(accIds[2]);
 		await test('Filter by accounts', () => {}, this.view, state);
 
 		// Filter by account 2 and all types of transaction
 		state.values.typeMenu.activeType = 0;
-		state.values.paginator.pages = scope.expectedPages(acc_2_all.length);
+		state.values.paginator.pages = scope.expectedPages(acc_2_all.list.length);
 		await this.view.filterByType(state.values.typeMenu.activeType);
 		await test('Show all transactions', () => {}, this.view, state);
 
 		// Filter by account 2 and last week date
-		state.values.paginator.pages = scope.expectedPages(acc_2_week.length);
+		state.values.paginator.pages = scope.expectedPages(acc_2_week.list.length);
 		await this.view.selectDateRange(day1, day2);
 		await test('Select date range', () => {}, this.view, state);
 
-		let acc2WeekTrList = new TransactionsList(this, acc_2_week);
-		let acc_2_query = acc2WeekTrList.filterByQuery('1');
-
-		state.values.paginator.pages = scope.expectedPages(acc_2_query.length);
+		state.values.paginator.pages = scope.expectedPages(acc_2_query.list.length);
 		state.values.searchForm.value = '1';
 		await this.view.search(state.values.searchForm.value);
 		await test('Search', () => {}, this.view, state);

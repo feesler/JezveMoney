@@ -294,21 +294,18 @@ let runTransactionAPI =
 		await test('Filter transactions', async () =>
 		{
 			let trBefore = await api.transaction.list();
-			let expTransList = this.copyObject(trBefore);
-			let trListBefore = new TransactionsList(this, expTransList);
+			let trListBefore = new TransactionsList(this, trBefore);
 
 			let reqParams = {};
 
 			if ('type' in params)
 			{
-				let filtered = trListBefore.filterByType(params.type);
-				trListBefore = new TransactionsList(this, filtered);
+				trListBefore = trListBefore.filterByType(params.type);
 				reqParams.type = this.getTransactionTypeStr(params.type);
 			}
 			if ('accounts' in params)
 			{
-				let filtered = trListBefore.filterByAccounts(params.accounts);
-				trListBefore = new TransactionsList(this, filtered);
+				trListBefore = trListBefore.filterByAccounts(params.accounts);
 				reqParams.acc_id = params.accounts;
 			}
 
@@ -316,25 +313,23 @@ let runTransactionAPI =
 			{
 				reqParams.count = params.onPage;
 			}
-			let filtered = trListBefore.getPage(('page' in params) ? params.page : 1, params.onPage);
-			trListBefore = new TransactionsList(this, filtered);
+			trListBefore = trListBefore.getPage(('page' in params) ? params.page : 1, params.onPage);
 			if ('page' in params)
 				reqParams.page = params.page;
 
 			if ('startDate' in params && 'endDate' in params)
 			{
-				let filtered = trListBefore.filterByDate(params.startDate, params.endDate);
-				trListBefore = new TransactionsList(this, filtered);
+				trListBefore = trListBefore.filterByDate(params.startDate, params.endDate);
 				reqParams.stdate = this.formatDate(new Date(this.fixDate(params.startDate)));
 				reqParams.enddate = this.formatDate(new Date(this.fixDate(params.endDate)));
 			}
 			if ('search' in params)
 			{
-				let filtered = trListBefore.filterByQuery(params.search);
-				trListBefore = new TransactionsList(this, filtered);
+				trListBefore = trListBefore.filterByQuery(params.search);
 				reqParams.search = params.search;
 			}
-			expTransList = trListBefore.list;
+
+			let expTransList = trListBefore.list;
 
 			// Send API sequest to server
 			let trList = await api.transaction.list(reqParams);
