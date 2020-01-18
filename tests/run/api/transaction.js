@@ -308,15 +308,6 @@ let runTransactionAPI =
 				trListBefore = trListBefore.filterByAccounts(params.accounts);
 				reqParams.acc_id = params.accounts;
 			}
-
-			if ('onPage' in params)
-			{
-				reqParams.count = params.onPage;
-			}
-			trListBefore = trListBefore.getPage(('page' in params) ? params.page : 1, params.onPage);
-			if ('page' in params)
-				reqParams.page = params.page;
-
 			if ('startDate' in params && 'endDate' in params)
 			{
 				trListBefore = trListBefore.filterByDate(params.startDate, params.endDate);
@@ -328,6 +319,14 @@ let runTransactionAPI =
 				trListBefore = trListBefore.filterByQuery(params.search);
 				reqParams.search = params.search;
 			}
+
+			if ('onPage' in params)
+			{
+				reqParams.count = params.onPage;
+			}
+			trListBefore = trListBefore.getPage(('page' in params) ? params.page : 1, params.onPage);
+			if ('page' in params)
+				reqParams.page = params.page;
 
 			let expTransList = trListBefore.list;
 
