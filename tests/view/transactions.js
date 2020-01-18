@@ -4,12 +4,6 @@ import { TestView } from './testview.js';
 // List of transactions view class
 class TransactionsView extends TestView
 {
-	async getTransactionObject(trans_id)
-	{
-		return this.app.idSearch(await this.global('transArr'), trans_id);
-	}
-
-
 	async parseSearchForm(elem)
 	{
 		if (!elem)

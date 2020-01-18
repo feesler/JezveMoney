@@ -289,18 +289,8 @@ function isValidValue(val)
 
 
 /*
-*	Search in arrays
+*	Other
 */
-
-// Search for object with specified id and return its position
-function getPosById(arr, id)
-{
-	if (!Array.isArray(arr) || !id)
-		return -1;
-
-	return arr.findIndex(item => item && item.id == id);
-}
-
 
 // Return deep copy of object
 function copyObject(item)
@@ -487,7 +477,6 @@ var commonModule = { EXPENSE,
 					normalize,
 					normalizeExch,
 					isValidValue,
-					getPosById,
 					copyObject,
 					extend,
 					urlJoin,
