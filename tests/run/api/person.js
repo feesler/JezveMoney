@@ -36,10 +36,10 @@ let runPersonAPI =
 			if (pList.length != pBefore.length + 1)
 				throw new Error('Length of persons list must increase');
 
-			if (this.idSearch(pBefore, person_id))
+			if (pBefore.find(item => item.id == person_id))
 				throw new Error('Already exist person returned');
 
-			let personObj = this.idSearch(pList, person_id);
+			let personObj = pList.find(item => item.id == person_id);
 
 			return this.checkObjValue(personObj, expPersonObj);
 		}, env);
@@ -62,7 +62,7 @@ let runPersonAPI =
 			if (!Array.isArray(pBefore))
 				return false;
 
-			let origPerson = this.idSearch(pBefore, id);
+			let origPerson = pBefore.find(item => item.id == id);
 
 			let expPersonObj = this.copyObject(origPerson);
 			this.setParam(expPersonObj, params);
@@ -80,7 +80,7 @@ let runPersonAPI =
 			if (!Array.isArray(pList))
 				return false;
 
-			let personObj = this.idSearch(pList, id);
+			let personObj = pList.find(item => item.id == id);
 
 			let res = this.checkObjValue(personObj, expPersonObj) &&
 						this.checkObjValue(pList, expPersonList);

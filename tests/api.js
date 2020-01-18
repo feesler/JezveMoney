@@ -511,7 +511,7 @@ let apiModule = (function()
 			res.dest_amount = res.src_amount;
 
 		let accList = await accountsList();
-		let acc = app.idSearch(accList, res.src_id);
+		let acc = accList.find(item => item.id == res.src_id);
 		res.src_curr = acc.curr_id;
 
 		if (!res.dest_curr)
@@ -535,7 +535,7 @@ let apiModule = (function()
 			res.src_amount = res.dest_amount;
 
 		let accList = await accountsList();
-		let acc = app.idSearch(accList, res.dest_id);
+		let acc = accList.find(item => item.id == res.dest_id);
 		res.dest_curr = acc.curr_id;
 
 		if (!res.src_curr)
@@ -561,10 +561,10 @@ let apiModule = (function()
 
 		let accList = await accountsList();
 
-		let srcAcc = app.idSearch(accList, res.src_id);
+		let srcAcc = accList.find(item => item.id == res.src_id);
 		res.src_curr = srcAcc.curr_id;
 
-		let destAcc = app.idSearch(accList, res.dest_id);
+		let destAcc = accList.find(item => item.id == res.dest_id);
 		res.dest_curr = destAcc.curr_id;
 
 		if (!res.src_curr)
@@ -588,7 +588,7 @@ let apiModule = (function()
 
 		let accList = await accountsList();
 
-		let acc = app.idSearch(accList, res.acc_id);
+		let acc = accList.find(item => item.id == res.acc_id);
 		if (acc)
 			res.src_curr = res.dest_curr = acc.curr_id;
 		else

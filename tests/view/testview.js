@@ -333,7 +333,7 @@ class TestView
 		{
 			if (this.isMobile)
 			{
-				let option = self.app.idSearch(this.items, val);
+				let option = this.items.find(item => item.id == val);
 				if (!option)
 					throw new Error('Option item not found');
 
@@ -343,7 +343,7 @@ class TestView
 			else
 			{
 				await self.click(this.selectBtn);
-				let li = self.app.idSearch(this.items, val);
+				let li = this.items.find(item => item.id == val);
 				if (!li)
 					throw new Error('List item not found');
 				return self.click(li.elem);

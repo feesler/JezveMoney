@@ -90,7 +90,7 @@ let runTransactionAPI =
 
 			let trList = await api.transaction.list();
 			let accList = await api.account.list();
-			let transObj = this.idSearch(trList, transaction_id);
+			let transObj = trList.find(item => item.id == transaction_id);
 
 			let res = this.checkObjValue(transObj, expTrans) &&
 						this.checkObjValue(trList, expTransList.list) &&
@@ -138,7 +138,7 @@ let runTransactionAPI =
 
 		let accBefore = await api.account.list();
 		let trBefore = await api.transaction.list();
-		let origTrans = this.idSearch(trBefore, params.id);
+		let origTrans = trBefore.find(item => item.id == params.id);
 
 		let updParams = this.copyObject(origTrans);
 
@@ -147,8 +147,8 @@ let runTransactionAPI =
 
 		let fullAccList = await api.account.list(true);
 
-		let srcAcc = this.idSearch(fullAccList, updParams.src_id);
-		let destAcc = this.idSearch(fullAccList, updParams.dest_id);
+		let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
+		let destAcc = fullAccList.find(item => item.id == updParams.dest_id);
 
 		let isDebt = (updParams.transtype == this.DEBT);
 		if (isDebt)
@@ -180,7 +180,7 @@ let runTransactionAPI =
 		{
 			if (updParams.acc_id && updParams.acc_id != origTrans.acc_id)
 			{
-				let acc = this.idSearch(fullAccList, updParams.acc_id);
+				let acc = fullAccList.find(item => item.id == updParams.acc_id);
 				if (updParams.debtop == 1)
 					updParams.dest_curr = acc.curr_id;
 				else
@@ -191,13 +191,13 @@ let runTransactionAPI =
 		{
 			if (updParams.src_id && updParams.src_id != origTrans.src_id)
 			{
-				let acc = this.idSearch(fullAccList, updParams.src_id);
+				let acc = fullAccList.find(item => item.id == updParams.src_id);
 				updParams.src_curr = acc.curr_id;
 			}
 
 			if (updParams.dest_id && updParams.dest_id != origTrans.dest_id)
 			{
-				let acc = this.idSearch(fullAccList, updParams.dest_id);
+				let acc = fullAccList.find(item => item.id == updParams.dest_id);
 				updParams.dest_curr = acc.curr_id;
 			}
 		}
@@ -224,7 +224,7 @@ let runTransactionAPI =
 
 			let trList = await api.transaction.list();
 			let accList = await api.account.list();
-			let transObj = this.idSearch(trList, updParams.id);
+			let transObj = trList.find(item => item.id == updParams.id);
 
 			let res = this.checkObjValue(transObj, expTrans) &&
 						this.checkObjValue(trList, expTransList.list) &&
@@ -264,7 +264,7 @@ let runTransactionAPI =
 				if (trIndex !== -1)
 					expTransList.splice(trIndex, 1);
 
-				expAccList = this.state.cancelTransaction(expAccList, this.idSearch(trBefore, tr_id));
+				expAccList = this.state.cancelTransaction(expAccList, trBefore.find(item => item.id == tr_id));
 			}
 
 			// Send API sequest to server

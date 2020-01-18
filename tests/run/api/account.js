@@ -38,10 +38,10 @@ let runAccountAPI =
 			if (accList.length != accBefore.length + 1)
 				throw new Error('Length of accounts list must increase');
 
-			if (this.idSearch(accBefore, acc_id))
+			if (accBefore.find(item => item.id == acc_id))
 				throw new Error('Already exist account returned');
 
-			let accObj = this.idSearch(accList, acc_id);
+			let accObj = accList.find(item => item.id == acc_id);
 
 			return this.checkObjValue(accObj, expAccObj);
 		}, env);
@@ -71,7 +71,7 @@ let runAccountAPI =
 			let accBefore = await api.account.list();
 			if (!Array.isArray(accBefore))
 				return false;
-			let origAcc = this.idSearch(accBefore, updParams.id);
+			let origAcc = accBefore.find(item => item.id == updParams.id);
 
 			// Prepare expected account object
 			let expAccObj = this.copyObject(updParams);
@@ -102,7 +102,7 @@ let runAccountAPI =
 				throw new Error('Fail to update account');
 
 			let accList = await api.account.list();
-			let accObj = this.idSearch(accList, id);
+			let accObj = accList.find(item => item.id == id);
 
 			let res = this.checkObjValue(accObj, expAccObj) &&
 						this.checkObjValue(accList, expAccList);
@@ -153,7 +153,7 @@ let runAccountAPI =
 			{
 				for(let acc_id of ids)
 				{
-					let acc = this.idSearch(accList, acc_id);
+					let acc = accList.find(item => item.id == acc_id);
 
 					if (convTrans.src_id == acc_id)
 					{

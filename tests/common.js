@@ -173,7 +173,7 @@ Currency.prototype.formatValue = function(val)
 // Return currency object for specified id
 function getCurrency(curr_id, currList)
 {
-	let currObj = idSearch(currList, curr_id);
+	let currObj = currList.find(item => item.id == curr_id);
 	if (!currObj)
 		return null;
 
@@ -299,20 +299,6 @@ function getPosById(arr, id)
 		return -1;
 
 	return arr.findIndex(item => item && item.id == id);
-}
-
-
-// Search for array of objects by id key
-function idSearch(arr, id)
-{
-	if (!Array.isArray(arr))
-		return null;
-
-	let res = arr.find(item => item && item.id == id);
-	if (typeof res === 'undefined')
-		return null;
-
-	return res;
 }
 
 
@@ -502,7 +488,6 @@ var commonModule = { EXPENSE,
 					normalizeExch,
 					isValidValue,
 					getPosById,
-					idSearch,
 					copyObject,
 					extend,
 					urlJoin,
