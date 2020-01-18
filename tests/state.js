@@ -341,8 +341,7 @@ class AppState
 	{
 		let res = { title : 'Transactions', transList : {} };
 
-		let latestTransactionsList = this.app.copyObject(transactionsList)
-										.splice(0, this.app.config.latestTransactions);
+		let latestTransactionsList = transactionsList.slice(0, this.app.config.latestTransactions);
 
 		res.transList.items = await this.renderTransactionsList(latestTransactionsList);
 
