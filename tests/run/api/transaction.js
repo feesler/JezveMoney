@@ -295,47 +295,33 @@ let runTransactionAPI =
 		{
 			let trBefore = await api.transaction.list();
 			let trListBefore = new TransactionsList(this, trBefore);
+			let expTransList = trListBefore.filter(params);
 
+			// Prepare request parameters
 			let reqParams = {};
 
 			if ('type' in params)
-			{
-				trListBefore = trListBefore.filterByType(params.type);
 				reqParams.type = this.getTransactionTypeStr(params.type);
-			}
 			if ('accounts' in params)
-			{
-				trListBefore = trListBefore.filterByAccounts(params.accounts);
 				reqParams.acc_id = params.accounts;
-			}
 			if ('startDate' in params && 'endDate' in params)
 			{
-				trListBefore = trListBefore.filterByDate(params.startDate, params.endDate);
 				reqParams.stdate = this.formatDate(new Date(this.fixDate(params.startDate)));
 				reqParams.enddate = this.formatDate(new Date(this.fixDate(params.endDate)));
 			}
 			if ('search' in params)
-			{
-				trListBefore = trListBefore.filterByQuery(params.search);
 				reqParams.search = params.search;
-			}
-
 			if ('onPage' in params)
-			{
 				reqParams.count = params.onPage;
-			}
-			trListBefore = trListBefore.getPage(('page' in params) ? params.page : 1, params.onPage);
 			if ('page' in params)
 				reqParams.page = params.page;
-
-			let expTransList = trListBefore.list;
 
 			// Send API sequest to server
 			let trList = await api.transaction.list(reqParams);
 			if (!trList)
 				throw new Error('Fail to read list of transactions');
 
-			let res = this.checkObjValue(trList, expTransList);
+			let res = this.checkObjValue(trList, expTransList.list);
 
 			return res;
 		}, env);

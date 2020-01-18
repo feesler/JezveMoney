@@ -155,45 +155,61 @@ class TransactionsList
 	}
 
 
-	filterByType(type)
+	getItemsByType(list, type)
 	{
 		// If type == 0 or no value is specified assume filter is set as ALL
 		if (!type)
-			return this;
+			return list;
 
 		if (!this.availTypes.includes(type))
 			throw new Error('Wrong parameters');
 
-		let res = this.list.filter(item => item.type == type);
-
-		return new TransactionsList(this.app, res);
+		return list.filter(item => item.type == type);
 	}
 
 
-	filterByAccounts(ids)
+	filterByType(type)
+	{
+		let items = this.getItemsByType(this.list, type);
+		if (items == this.list)
+			return this;
+
+		return new TransactionsList(this.app, items);
+	}
+
+
+	getItemsByAccounts(list, ids)
 	{
 		if (!ids)
 			throw new Error('Wrong parameters');
 
 		let accounts = (Array.isArray(ids)) ? ids : [ ids ];
 		if (!accounts.length)
-			return this;
+			return list;
 
-		let res = this.list.filter(item => accounts.includes(item.src_id) || accounts.includes(item.dest_id));
-
-		return new TransactionsList(this.app, res);
+		return list.filter(item => accounts.includes(item.src_id) || accounts.includes(item.dest_id));
 	}
 
 
-	filterByDate(start, end)
+	filterByAccounts(ids)
+	{
+		let items = this.getItemsByAccounts(this.list, ids);
+		if (items == this.list)
+			return this;
+
+		return new TransactionsList(this.app, items);
+	}
+
+
+	getItemsByDate(list, start, end)
 	{
 		if (!start && !end)
-			return this;
+			return list;
 
 		let fStart = this.app.fixDate(start);
 		let fEnd = this.app.fixDate(end);
 
-		let res = this.list.filter(item =>
+		return list.filter(item =>
 		{
 			let date = this.app.convDate(item.date);
 			if (!date)
@@ -206,36 +222,91 @@ class TransactionsList
 
 			return true;
 		});
+	}
 
-		return new TransactionsList(this.app, res);
+
+	filterByDate(list, start, end)
+	{
+		let items = this.getItemsByDate(this.list, start, end);
+		if (items == this.list)
+			return this;
+
+		return new TransactionsList(this.app, items);
+	}
+
+
+	getItemsByQuery(list, query)
+	{
+		if (!query)
+			return list;
+
+		let lcQuery = query.toLowerCase();
+
+		return list.filter(item => item.comment.toLowerCase().indexOf(lcQuery) !== -1);
 	}
 
 
 	filterByQuery(query)
 	{
-		if (!query)
+		let items = this.getItemsByQuery(this.list, query);
+		if (items == this.list)
 			return this;
 
-		let lcQuery = query.toLowerCase();
+		return new TransactionsList(this.app, items);
+	}
 
-		let res = this.list.filter(item => item.comment.toLowerCase().indexOf(lcQuery) !== -1);
 
-		return new TransactionsList(this.app, res);
+	getItemsPage(list, num, limit)
+	{
+		let pageLimit = (typeof limit !== 'undefined') ? limit : this.app.config.transactionsOnPage;
+
+		if (num < 1 || num > Math.ceil(list.length / pageLimit))
+			throw new Error('Wrong page');
+
+		let offset = (num - 1) * pageLimit;
+
+		return list.slice(offset, Math.min(offset + pageLimit, list.length));
 	}
 
 
 	getPage(num, limit)
 	{
-		let pageLimit = (typeof limit !== 'undefined') ? limit : this.app.config.transactionsOnPage;
+		let items = this.getItemsPage(this.list, num, limit);
+		if (items == this.list)
+			return this;
 
-		if (num < 1 || num > Math.ceil(this.list.length / pageLimit))
-			throw new Error('Wrong page');
+		return new TransactionsList(this.app, items);
+	}
 
-		let offset = (num - 1) * pageLimit;
 
-		let res = this.list.slice(offset, Math.min(offset + pageLimit, this.list.length));
+	getItems(list, par)
+	{
+		let res = list;
+		let params = par || {};
 
-		return new TransactionsList(this.app, res);
+		if ('type' in params)
+			res = this.getItemsByType(res, params.type);
+		if ('accounts' in params)
+			res = this.getItemsByAccounts(res, params.accounts);
+		if ('startDate' in params && 'endDate' in params)
+			res = this.getItemsByDate(res, params.startDate, params.endDate);
+		if ('search' in params)
+			res = this.getItemsByQuery(res, params.search);
+
+		let targetPage = ('page' in params) ? params.page : 1;
+		res = this.getItemsPage(res, targetPage, params.onPage);
+
+		return res;
+	}
+
+
+	filter(params)
+	{
+		let items = this.getItems(this.list, params);
+		if (items == this.list)
+			return this;
+
+		return new TransactionsList(this.app, items);
 	}
 
 
