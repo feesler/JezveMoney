@@ -15,6 +15,9 @@ class AppState
 		api.setEnv(app);
 	}
 
+/**
+ * Accounts
+ */
 
 	async getAccountsList()
 	{
@@ -95,6 +98,9 @@ class AppState
 		return userAccounts[pos].id;
 	}
 
+/**
+ * Persons
+ */
 
 	async getPersonsList()
 	{
@@ -154,6 +160,24 @@ class AppState
 		return accObj;
 	}
 
+
+	// Format non-zero balances of person accounts
+	// Return array of strings
+	filterPersonDebts(accounts)
+	{
+		if (!Array.isArray(accounts))
+			throw new Error('Unexpected input');
+
+		let res = accounts.filter(item => item.balance != 0)
+							.map(item => this.app.formatCurrency(item.balance, item.curr_id, this.app.currencies));
+
+		return res;
+	}
+
+
+/**
+ * Transactions
+ */
 
 	// Apply transaction to accounts
 	applyTransaction(accList, transObj)
@@ -298,7 +322,7 @@ class AppState
 
 		res.title = person.name;
 
-		let debtAccounts = this.app.filterPersonDebts(this.app, person.accounts);
+		let debtAccounts = this.filterPersonDebts(person.accounts);
 		res.subtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
 
 		return res;
