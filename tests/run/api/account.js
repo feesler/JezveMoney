@@ -113,75 +113,6 @@ let runAccountAPI =
 	},
 
 
-	onDelete(trList, accList, ids)
-	{
-		let res = [];
-
-		if (!Array.isArray(ids))
-			ids = [ ids ];
-
-		for(let trans of trList)
-		{
-			if (trans.type == this.EXPENSE && ids.indexOf(trans.src_id) !== -1)
-				continue;
-			if (trans.type == this.INCOME && ids.indexOf(trans.dest_id) !== -1)
-				continue;
-			if ((trans.type == this.TRANSFER || trans.type == this.DEBT) &&
-				ids.indexOf(trans.src_id) !== -1 && ids.indexOf(trans.dest_id) !== -1)
-				continue;
-			if (trans.type == this.DEBT && ids.indexOf(trans.src_id) !== -1 && trans.dest_id == 0)
-				continue;
-			if (trans.type == this.DEBT && ids.indexOf(trans.dest_id) !== -1 && trans.src_id == 0)
-				continue;
-
-			let convTrans = this.copyObject(trans);
-
-			if (convTrans.type == this.TRANSFER)
-			{
-				if (ids.indexOf(convTrans.src_id) !== -1)
-				{
-					convTrans.type = this.INCOME;
-					convTrans.src_id = 0;
-				}
-				else if (ids.indexOf(convTrans.dest_id) !== -1)
-				{
-					convTrans.type = this.EXPENSE;
-					convTrans.dest_id = 0;
-				}
-			}
-			else if (convTrans.type == this.DEBT)
-			{
-				for(let acc_id of ids)
-				{
-					let acc = accList.find(item => item.id == acc_id);
-
-					if (convTrans.src_id == acc_id)
-					{
-						if (acc.owner_id != this.user_id)
-						{
-							convTrans.type = this.INCOME;
-						}
-
-						convTrans.src_id = 0;
-					}
-					else if (convTrans.dest_id == acc_id)
-					{
-						if (acc.owner_id != this.user_id)
-						{
-							convTrans.type = this.EXPENSE;
-						}
-						convTrans.dest_id = 0;
-					}
-				}
-			}
-
-			res.push(convTrans);
-		}
-
-		return res;
-	},
-
-
 	// Delete specified account(s)
 	// And check expected state of app
 	async deleteTest(ids)
@@ -210,7 +141,7 @@ let runAccountAPI =
 
 			// Prepare expected updates of transactions
 			let trBefore = await api.transaction.list();
-			let expTransList = this.run.api.account.onDelete(trBefore, accBefore, ids);
+			let expTransList = this.state.deleteAccounts(trBefore, accBefore, ids);
 
 			// Send API sequest to server
 			deleteRes = await api.account.del(ids);

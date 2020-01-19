@@ -133,7 +133,7 @@ let runPersonAPI =
 
 			// Prepare expected updates of transactions
 			let trBefore = await api.transaction.list();
-			let expTransList = this.run.api.account.onDelete(trBefore, accList, accRemoveList);
+			let expTransList = this.state.deleteAccounts(trBefore, accList, accRemoveList);
 
 			// Send API sequest to server
 			deleteRes = await api.person.del(ids);
