@@ -46,6 +46,10 @@ class AccountView extends TestView
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
 
+		res.cancelBtn = await this.query('.acc_controls .cancel_btn');
+		if (!res.cancelBtn)
+			throw new Error('Cancel button not found');
+
 		return res;
 	}
 

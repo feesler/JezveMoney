@@ -174,25 +174,17 @@ class Application
 	{
 		this.view.setBlock('Accounts', 1);
 
-		await this.goToMainView();
-		await this.view.goToAccounts();
-		await this.view.goToCreateAccount();
-		await this.run.accounts.createAccount1();
-		await this.view.goToCreateAccount();
-		await this.run.accounts.createAccount2();
-		await this.view.goToUpdateAccount(0);
-		await this.run.accounts.editAccount1();
-		await this.view.goToCreateAccount();
-		await this.run.accounts.create({ name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 });
+		await this.run.accounts.stateLoop();
+
+		this.view.setBlock('Create accounts', 2);
+		await this.run.accounts.create({ name : 'acc_1', balance : 1000.01, curr_id : 1 });
+		await this.run.accounts.create({ name : 'acc_2', balance : '1000.01', curr_id : 3 });
+
+		this.view.setBlock('Update accounts', 2);
+		await this.run.accounts.update({ pos : 0, icon : 1, curr_id : 2 });
+
+		this.view.setBlock('Delete accounts', 2);
 		await this.run.accounts.del([0, 1]);
-		await this.view.goToCreateAccount();
-		await this.run.accounts.create({ name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 });
-		await this.view.goToCreateAccount();
-		await this.run.accounts.create({ name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 });
-		await this.view.goToCreateAccount();
-		await this.run.accounts.create({ name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 });
-		await this.view.goToCreateAccount();
-		await this.run.accounts.create({ name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 });
 	}
 
 
@@ -212,9 +204,29 @@ class Application
 	}
 
 
+	async prepareTransactionTests()
+	{
+		let accList =
+		[
+			{ name : 'acc_3', currency : 1, balance : '500.99', icon : 2 },
+			{ name : 'acc RUB', currency : 1, balance : '500.99', icon : 5 },
+			{ name : 'acc USD', currency : 2, balance : '500.99', icon : 4 },
+			{ name : 'acc EUR', currency : 3, balance : '10000.99', icon : 3 },
+			{ name : 'card RUB', currency : 1, balance : '35000.40', icon : 3 },
+		];
+
+		for(let account of accList)
+		{
+			await api.account.create(account);
+		}
+	}
+
+
 	async transactionTests()
 	{
 		this.view.setBlock('Transactions', 1);
+
+		await this.prepareTransactionTests();
 
 		await this.createTransactionTests();
 		await this.updateTransactionTests();

@@ -1,14 +1,29 @@
+import { MainView } from '../view/main.js';
+import { AccountsView } from '../view/accounts.js';
+
+
 let runAccounts =
 {
-	async createAccount1()
+	async stateLoop()
 	{
 		let test = this.test;
 
+		this.view.setBlock('View state loop', 2);
+
+	// Navigate to create account view
+		if (!(this.view instanceof AccountsView))
+		{
+			await this.goToMainView();
+			await this.view.goToAccounts();
+		}
+		await this.view.goToCreateAccount();
+
+	// Check initial state
 		let state = { visibility : { heading : true, iconDropDown : true, name : true, currDropDown : true },
 						values : { tile : { name : 'New account', balance : '0 ₽' },
 								name : '', balance : '0' } };
 
-		await test('Initial state of new account view', async () => {}, this.view, state);
+		await test('Initial state of new account view', () => {}, this.view, state);
 
 		this.setParam(state.values, { tile : { name : 'acc_1' }, name : 'acc_1' });
 		await test('Account name input', () => this.view.inputName('acc_1'), this.view, state);
@@ -47,90 +62,81 @@ let runAccounts =
 
 		this.state.accounts = null;
 
-		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
-		await this.run.accounts.checkCreateAccount({ name : 'acc_1', balance : 1000.01, curr_id : 1 });
+		await this.view.navigation(() => this.view.click(this.view.content.cancelBtn));
 	},
 
 
-	async checkCreateAccount(params)
+	setExpectedState(account)
 	{
-		let test = this.test;
+		let tileIcon = this.view.tileIcons[account.icon];
+		let currObj = this.getCurrency(account.curr_id, this.currencies);
+		if (!currObj)
+			throw new Error('Unexpected currency specified');
 
-		let state = { value : { tiles : { items : { length : this.accountTiles.length + 1 } } } };
-		let fmtBal = this.formatCurrency(this.normalize(params.balance), params.curr_id, this.currencies);
+		let res = {
+			values : {
+				tile : this.state.accountToTile(account),
+				name : account.name,
+				currDropDown : { textValue : currObj.name },
+				iconDropDown : { textValue : tileIcon.title }
+			}
+		};
 
-		state.value.tiles.items[this.accountTiles.length] = { balance : fmtBal, name : params.name, icon : params.icon };
-
-		await test('Account create', async () => {}, this.view, state);
-
-		this.accountTiles = this.view.content.tiles.items;
+		return res;
 	},
 
 
-	async createAccount2()
+	async submitAccount(account, params)
 	{
+		let view = this.view;
 		let test = this.test;
-
-		let state = { values : { tile : { name : 'acc_2', balance : '0 ₽' }, currDropDown : { textValue : 'RUB' } } };
+		let scope = this.run.accounts;
+		let expected = this.copyObject(account);
 
 	// Input account name
-		await test('Account tile name update', () => this.view.inputName('acc_2'), this.view, state);
+		if ('name' in params)
+		{
+			expected.name = params.name;
+			view.expectedState = scope.setExpectedState(expected);
+			await test(`Input name (${params.name})`, () => view.inputName(params.name), view);
+		}
 
-	// Change currency to EUR
-		this.setParam(state.values, { tile : { balance : '€ 0' }, currDropDown : { textValue : 'EUR' } });
-		await test('EUR currency select', () => this.view.changeCurrency(3), this.view, state);
+		// Change currency
+		if ('curr_id' in params)
+	{
+			expected.curr_id = params.curr_id;
+			view.expectedState = scope.setExpectedState(expected);
+			await test(`Select currency ${params.curr_id}`, () => view.changeCurrency(params.curr_id), view);
+		}
 
-		state.values.tile.balance = '€ 1 000.01';
-		await test('Account tile balance on EUR 1 000.01 balance input field', () => this.view.inputBalance('1000.01'), this.view, state);
+		// Input balance
+		if ('balance' in params)
+		{
+			let normBalance = this.normalize(params.balance);
+			if (isNaN(normBalance))
+				throw new Error('Wrong balance value specified');
+
+			expected.balance = normBalance;
+			view.expectedState = scope.setExpectedState(expected);
+			await test('Tile balance format update', () => view.inputBalance(params.balance), view);
+		}
+
+		// Change icon
+		if ('icon' in params)
+		{
+			if (params.icon < 0 || params.icon > view.tileIcons.length)
+				throw new Error('Icon not found');
+
+			expected.icon = params.icon;
+			view.expectedState = scope.setExpectedState(expected);
+			await test('Tile icon update', () => view.changeIcon(params.icon), view);
+		}
 
 		this.state.accounts = null;
 
 		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
-		await this.run.accounts.checkCreateAccount({ name : 'acc_2', balance : 1000.01, curr_id : 3 });
-	},
 
-
-	async editAccount1()
-	{
-		let test = this.test;
-
-		let state = { values : { tile : { name : 'acc_1', balance : '1 000.01 ₽', icon : this.view.tileIcons[2] }, currDropDown : { textValue : 'RUB' } } };
-
-		await test('Initial state of edit account view', async () => {}, this.view, state);
-
-	// Change currency to USD
-		let fmtBal = this.formatCurrency(1000.01, 2, this.currencies);
-		this.setParam(state.values, { tile : { balance : fmtBal }, currDropDown : { textValue : 'USD' } });
-		await test('USD currency select', () => this.view.changeCurrency(2), this.view, state);
-
-	// Change icon to purse
-		state.values.tile.icon = this.view.tileIcons[1];
-		await test('Icon change', () => this.view.changeIcon(1), this.view, state);
-
-		this.state.accounts = null;
-
-	// Submit
-		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
-		await this.run.accounts.checkUpdateAccount({ updatePos : 0,
-										name : 'acc_1',
-										balance : 1000.01,
-										curr_id : 2,
-										icon : this.view.tileIcons[1] });
-	},
-
-
-	async checkUpdateAccount(params)
-	{
-		let test = this.test;
-
-		let state = { value : { tiles : { items : { length : this.accountTiles.length } } } };
-		let fmtBal = this.formatCurrency(this.normalize(params.balance), params.curr_id, this.currencies);
-
-		state.value.tiles.items[params.updatePos] = { balance : fmtBal, name : params.name, icon : params.icon };
-
-		await test('Account update', async () => {}, this.view, state);
-
-		this.accountTiles = this.view.content.tiles.items;
+		return expected;
 	},
 
 
@@ -140,44 +146,69 @@ let runAccounts =
 
 		if (!params)
 			throw new Error('No params specified');
+
+		let title = this.formatProps(params);
+		this.view.setBlock(`Create account (${title})`, 2);
+
 		if (!params.name || !params.name.length)
 			throw new Error('Name not specified');
-		let currObj = this.getCurrency(params.curr_id, this.currencies);
-		if (!currObj)
-			throw new Error('Wrong currency specified');
-		let normBalance = this.normalize(params.balance);
-		if (isNaN(normBalance))
-			throw new Error('Balance not specified');
 
-		let state = { values : { tile : { name : params.name }, name : params.name } };
-
-	// Input account name
-		await test('Account tile name update', () => this.view.inputName(params.name), this.view, state);
-
-	// Change currency
-		let fmtBal = this.formatCurrency(0, currObj.id, this.currencies);
-		this.setParam(state.values, { currDropDown : { textValue : currObj.name }, tile : { balance : fmtBal } });
-		await test(currObj.name + ' currency select', () => this.view.changeCurrency(currObj.id), this.view, state);
-
-	// Input balance
-		fmtBal = this.formatCurrency(normBalance, currObj.id, this.currencies);
-		this.setParam(state.values, { tile : { balance : fmtBal } });
-		await test('Tile balance format update', () => this.view.inputBalance(params.balance), this.view, state);
-
-	// Change icon
-		if (params.icon)
+	// Navigate to create account view
+		if (!(this.view instanceof AccountsView))
 		{
-			if (params.icon < 0 || params.icon > this.view.tileIcons.length)
-				throw new Error('Icon not found');
-
-			this.setParam(state.values, { iconDropDown : { textValue : this.view.tileIcons[params.icon].title }, tile : { icon : this.view.tileIcons[params.icon] } });
-			await test('Tile icon update', () => this.view.changeIcon(params.icon), this.view, state);
+			await this.goToMainView();
+			await this.view.goToAccounts();
 		}
+		await this.view.goToCreateAccount();
 
-		this.state.accounts = null;
+	// Check initial state
+		let expectedList = await this.state.getUserAccountsList();
+		let expAccount = { name : '', balance : '0', curr_id : 1, icon : 0 };
+		expAccount = await this.run.accounts.submitAccount(expAccount, params);
 
-		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
-		await this.run.accounts.checkCreateAccount(params);
+		expectedList.push(expAccount);
+		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+
+		await test('Create account', () => {}, this.view);
+	},
+
+
+	async update(params)
+	{
+		let test = this.test;
+
+		if (!params)
+			throw new Error('No params specified');
+
+		let pos = parseInt(params.pos);
+		if (isNaN(pos))
+			throw new Error('Position of account not specified');
+		delete params.pos;
+
+		let title = this.formatProps(params);
+		this.view.setBlock(`Update account [${pos}] (${title})`, 2);
+
+		// Navigate to create account view
+		if (!(this.view instanceof AccountsView))
+		{
+			await this.goToMainView();
+			await this.view.goToAccounts();
+		}
+		await this.view.goToUpdateAccount(pos);
+
+		// Check initial state
+		let expectedList = await this.state.getUserAccountsList();
+		let expAccount = await this.state.getAccountByPos(pos);
+		if (!expAccount)
+			throw new Error('Can not find specified account');
+
+		expAccount = await this.run.accounts.submitAccount(expAccount, params);
+
+		expectedList[pos] = expAccount;
+
+		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+
+		await test('Update account', () => {}, this.view);
 	},
 
 
@@ -185,13 +216,20 @@ let runAccounts =
 	{
 		let test = this.test;
 
+		// Navigate to create account view
+		if (!(this.view instanceof AccountsView))
+		{
+			await this.goToMainView();
+			await this.view.goToAccounts();
+		}
+
 		this.state.accounts = null;
 
 		await this.view.deleteAccounts(accounts);
 
 		let state = { value : { tiles : { items : { length : this.accountTiles.length - accounts.length } } } };
 
-		await test('Delete accounts [' + accounts.join() + ']', async () => {}, this.view, state);
+		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view, state);
 
 		this.accountTiles = this.view.content.tiles.items;
 	}

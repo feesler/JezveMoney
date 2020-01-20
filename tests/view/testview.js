@@ -505,7 +505,7 @@ class TestView
 
 		res.input = async function(val)
 		{
-			return self.input(this.valueInput, val);
+			return self.input(this.valueInput, val.toString());
 		};
 
 		res.selectCurr = async function(val)
