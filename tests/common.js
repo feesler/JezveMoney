@@ -341,6 +341,16 @@ function urlJoin(obj)
 }
 
 
+function formatProps(params)
+{
+	let res = [];
+	for(let key in params)
+		res.push(key + ': ' + params[key]);
+
+	return res.join(', ');
+}
+
+
 function checkPHPerrors(env, content)
 {
 	const errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
@@ -465,6 +475,7 @@ var commonModule = { EXPENSE,
 					copyObject,
 					extend,
 					urlJoin,
+					formatProps,
 					checkPHPerrors,
 					checkObjValue,
 					test };

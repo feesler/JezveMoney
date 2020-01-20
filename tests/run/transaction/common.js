@@ -69,10 +69,7 @@ let runTransactionsCommon =
 		let test = this.test;
 		let scope = this.run.transactions;
 
-		let titleParams = [];
-		for(let k in params)
-			titleParams.push(k + ': ' + params[k]);
-		this.view.setBlock('Create ' + this.getTransactionTypeStr(type) + ' (' + titleParams.join(', ') + ')', 2);
+		this.view.setBlock('Create ' + this.getTransactionTypeStr(type) + ' (' + this.formatProps(params) + ')', 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
@@ -121,10 +118,7 @@ let runTransactionsCommon =
 			throw new Error('Position of transaction not specified');
 		delete params.pos;
 
-		let titleParams = [];
-		for(let k in params)
-			titleParams.push(k + ': ' + params[k]);
-		view.setBlock('Update ' + this.getTransactionTypeStr(type) + ' [' + pos + '] (' + titleParams.join(', ') + ')', 2);
+		view.setBlock('Update ' + this.getTransactionTypeStr(type) + ' [' + pos + '] (' + this.formatProps(params) + ')', 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
