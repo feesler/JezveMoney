@@ -2,6 +2,7 @@ import { common } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
+import { Currency } from './currency.js';
 
 import { runProfile } from './run/profile.js';
 import { runAccounts } from './run/account.js';
@@ -32,7 +33,6 @@ class Application
 		this.accountTiles = [];
 		this.personTiles = [];
 		this.transactions = [];
-		this.currencies = [];
 
 		this.dates = {};
 		this.dateList = [];
@@ -95,8 +95,7 @@ class Application
 		this.owner_id = userProfile.owner_id;
 
 		this.state = new AppState(this);
-
-		this.currencies = await api.currency.list();
+		await Currency.init();
 
 		let now = new Date();
 		this.dates.now = this.formatDate(now);

@@ -1,4 +1,5 @@
 import { TransactionView } from '../transaction.js';
+import { Currency } from '../../currency.js';
 
 
 // Create or update expense transaction view tests
@@ -23,14 +24,14 @@ class ExpenseTransactionView extends TransactionView
 		if (res.srcAccount.curr_id != res.src_curr_id)
 			throw new Error('Unexpected source currency ' + res.src_curr_id + ' (' + res.srcAccount.curr_id + ' is expected)');
 
-		res.srcCurr = this.app.getCurrency(res.src_curr_id, this.app.currencies);
+		res.srcCurr = Currency.getById(res.src_curr_id);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = this.app.getCurrency(res.dest_curr_id, this.app.currencies);
+		res.destCurr = Currency.getById(res.dest_curr_id);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
-		res.srcAccount.fmtBalance = res.srcCurr.formatValue(res.srcAccount.balance);
+		res.srcAccount.fmtBalance = res.srcCurr.format(res.srcAccount.balance);
 
 		res.srcAmount = cont.src_amount_row.value;
 		res.fSrcAmount = this.app.isValidValue(res.srcAmount) ? this.app.normalize(res.srcAmount) : res.srcAmount;
@@ -40,7 +41,7 @@ class ExpenseTransactionView extends TransactionView
 
 		res.srcResBal = cont.result_balance_row.value;
 		res.fSrcResBal = this.app.isValidValue(res.srcResBal) ? this.app.normalize(res.srcResBal) : res.srcResBal;
-		res.fmtSrcResBal = res.srcCurr.formatValue(res.fSrcResBal);
+		res.fmtSrcResBal = res.srcCurr.format(res.fSrcResBal);
 
 		res.exchRate = cont.exchange_row.value;
 		this.updateExch(res);
@@ -81,7 +82,7 @@ class ExpenseTransactionView extends TransactionView
 			model.fSrcAmount = newValue;
 
 			model.srcResBal = this.app.normalize(model.srcAccount.balance - model.fSrcAmount);
-			model.fmtSrcResBal = model.srcCurr.formatValue(model.srcResBal);
+			model.fmtSrcResBal = model.srcCurr.format(model.srcResBal);
 		}
 
 		return model;
@@ -117,7 +118,7 @@ class ExpenseTransactionView extends TransactionView
 								source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 								src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
 								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },
-								dest_amount_left : this.model.destCurr.formatValue(this.model.fDestAmount),
+								dest_amount_left : this.model.destCurr.format(this.model.fDestAmount),
 								result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance', isCurrActive : false },
 								src_res_balance_left : this.model.fmtSrcResBal,
 								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
@@ -186,7 +187,7 @@ class ExpenseTransactionView extends TransactionView
 			this.model.fSrcAmount = fNewValue;
 
 			this.model.srcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
-			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+			this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
 			this.calcExchByAmounts(this.model);
 			this.updateExch(this.model);
@@ -235,7 +236,7 @@ class ExpenseTransactionView extends TransactionView
 		if (this.model.fSrcResBal !== fNewValue)
 		{
 			this.model.fSrcResBal = fNewValue;
-			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+			this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
 			let newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
 
@@ -307,8 +308,8 @@ class ExpenseTransactionView extends TransactionView
 
 		this.model.srcAccount = newAcc;
 		this.model.src_curr_id = this.model.srcAccount.curr_id;
-		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id, this.app.currencies);
-		this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
+		this.model.srcCurr = Currency.getById(this.model.src_curr_id);
+		this.model.srcAccount.fmtBalance = this.model.srcCurr.format(this.model.srcAccount.balance);
 
 		// Copy source currency to destination currency if needed
 		if (this.model.state === 0 || this.model.state === 1)		// Transition 1 or 12
@@ -323,7 +324,7 @@ class ExpenseTransactionView extends TransactionView
 		{
 			this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;
 		}
-		this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.fSrcResBal);
+		this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.fSrcResBal);
 
 		// Update exchange rate
 		this.calcExchByAmounts(this.model);
@@ -385,7 +386,7 @@ class ExpenseTransactionView extends TransactionView
 			return super.changeDestCurrency(val);
 
 		this.model.dest_curr_id = parseInt(val);
-		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
+		this.model.destCurr = Currency.getById(this.model.dest_curr_id);
 
 		this.model.isDiffCurr = (this.model.src_curr_id != this.model.dest_curr_id);
 

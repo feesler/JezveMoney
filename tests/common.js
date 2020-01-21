@@ -210,84 +210,11 @@ function fixDate(date)
 }
 
 
-/*
-*	Currencies
-*/
 
 // Format specified value
 function formatValue(val)
 {
 	return val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
-}
-
-
-// Currency object constructor
-function Currency(props)
-{
-	this.id = props.id;
-	this.format = props.format;
-	this.sign = props.sign;
-	this.name = props.name;
-}
-
-
-// Format specified value using rules of currency
-Currency.prototype.formatValue = function(val)
-{
-	let nval = normalize(val);
-
-	if (Math.floor(nval) != nval)
-		nval = nval.toFixed(2);
-
-	let fmtVal = formatValue(nval);
-
-	if (this.format)
-		return this.sign + ' ' + fmtVal;
-	else
-		return fmtVal + ' ' + this.sign;
-};
-
-
-// Return currency object for specified id
-function getCurrency(curr_id, currList)
-{
-	let currObj = currList.find(item => item.id == curr_id);
-	if (!currObj)
-		return null;
-
-	return new Currency(currObj);
-}
-
-
-function findCurrencyByName(name, currList)
-{
-	let qName = name.toUpperCase();
-	let currObj = currList.find(item => item.name.toUpperCase() == qName);
-	if (!currObj)
-		return null;
-
-	return new Currency(currObj);
-}
-
-
-// Format value with rules of specified currency
-function formatCurrency(val, curr_id, currList)
-{
-	let curr, nval, fmtVal;
-
-	curr = getCurrency(curr_id, currList);
-	if (!curr)
-		return null;
-
-	nval = normalize(val);
-	if (Math.floor(nval) == nval)
-		fmtVal = formatValue(nval);
-	else
-		fmtVal = formatValue(nval.toFixed(2));
-	if (curr.format)
-		return curr.sign + ' ' + fmtVal;
-	else
-		return fmtVal + ' ' + curr.sign;
 }
 
 
@@ -542,10 +469,6 @@ var commonModule = { EXPENSE,
 					cutDate,
 					fixDate,
 					formatValue,
-					Currency,
-					getCurrency,
-					findCurrencyByName,
-					formatCurrency,
 					fixFloat,
 					correct,
 					correctExch,

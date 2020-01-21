@@ -1,4 +1,5 @@
 import { TransactionView } from '../transaction.js';
+import { Currency } from '../../currency.js';
 
 
 // Create or update transfer transaction view class
@@ -40,10 +41,10 @@ class DebtTransactionView extends TransactionView
 		if (res.src_curr_id != res.dest_curr_id)
 			throw new Error('Source and destination currencies are not the same');
 
-		res.srcCurr = this.app.getCurrency(res.src_curr_id, this.app.currencies);
+		res.srcCurr = Currency.getById(res.src_curr_id);
 		if (!res.srcCurr)
 			throw new Error('Source currency not found');
-		res.destCurr = this.app.getCurrency(res.dest_curr_id, this.app.currencies);
+		res.destCurr = Currency.getById(res.dest_curr_id);
 		if (!res.destCurr)
 			throw new Error('Destination currency not found');
 
@@ -78,9 +79,9 @@ class DebtTransactionView extends TransactionView
 		}
 
 		if (res.srcAccount)
-			res.srcAccount.fmtBalance = res.srcCurr.formatValue(res.srcAccount.balance);
+			res.srcAccount.fmtBalance = res.srcCurr.format(res.srcAccount.balance);
 		if (res.destAccount)
-			res.destAccount.fmtBalance = res.destCurr.formatValue(res.destAccount.balance);
+			res.destAccount.fmtBalance = res.destCurr.format(res.destAccount.balance);
 
 		res.srcAmount = cont.src_amount_row.value;
 		res.fSrcAmount = this.app.isValidValue(res.srcAmount) ? this.app.normalize(res.srcAmount) : res.srcAmount;
@@ -93,11 +94,11 @@ class DebtTransactionView extends TransactionView
 
 		res.srcResBal = cont.result_balance_row.value;
 		res.fSrcResBal = this.app.isValidValue(res.srcResBal) ? this.app.normalize(res.srcResBal) : res.srcResBal;
-		res.fmtSrcResBal = res.srcCurr.formatValue(res.fSrcResBal);
+		res.fmtSrcResBal = res.srcCurr.format(res.fSrcResBal);
 
 		res.destResBal = cont.result_balance_dest_row.value;
 		res.fDestResBal = this.app.isValidValue(res.destResBal) ? this.app.normalize(res.destResBal) : res.destResBal;
-		res.fmtDestResBal = res.destCurr.formatValue(res.fDestResBal);
+		res.fmtDestResBal = res.destCurr.format(res.fDestResBal);
 
 		res.exchRate = cont.exchange_row.value;
 		this.updateExch(res);
@@ -177,7 +178,7 @@ class DebtTransactionView extends TransactionView
 				}
 			}
 
-			model.fmtSrcResBal = model.srcCurr.formatValue(model.srcResBal);
+			model.fmtSrcResBal = model.srcCurr.format(model.srcResBal);
 		}
 
 		return model;
@@ -222,7 +223,7 @@ class DebtTransactionView extends TransactionView
 				}
 			}
 
-			model.fmtDestResBal = model.destCurr.formatValue(model.destResBal);
+			model.fmtDestResBal = model.destCurr.format(model.destResBal);
 		}
 
 		return model;
@@ -242,7 +243,7 @@ class DebtTransactionView extends TransactionView
 									exchange_row : false, exch_left : false },
 					values : { typeMenu : { activeType : 4 }, /* DEBT */
 								src_amount_row : { value : this.model.srcAmount.toString(), label : 'Amount', currSign : this.model.srcCurr.sign, isCurrActive : false },
-								src_amount_left : this.model.srcCurr.formatValue(this.model.fSrcAmount),
+								src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
 								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
 								result_balance_row : { value : this.model.srcResBal.toString(), isCurrActive : false },
 								result_balance_dest_row : { value : this.model.destResBal.toString(), isCurrActive : false },
@@ -364,18 +365,18 @@ class DebtTransactionView extends TransactionView
 		if (this.model.debtType)
 		{
 			this.model.srcAccount = this.model.personAccount;
-			this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
+			this.model.srcAccount.fmtBalance = this.model.srcCurr.format(this.model.srcAccount.balance);
 
 			this.model.srcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
-			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+			this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 		}
 		else
 		{
 			this.model.destAccount = this.model.personAccount;
-			this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
+			this.model.destAccount.fmtBalance = this.model.destCurr.format(this.model.destAccount.balance);
 
 			this.model.destResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
-			this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
+			this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 		}
 
 		this.setExpectedState(this.model.state);
@@ -417,7 +418,7 @@ class DebtTransactionView extends TransactionView
 
 			this.model.srcResBal = this.app.normalize(lastAcc.balance - this.model.fSrcAmount);
 		}
-		this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+		this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
 		if (this.model.destAccount)
 		{
@@ -431,7 +432,7 @@ class DebtTransactionView extends TransactionView
 
 			this.model.destResBal = this.app.normalize(lastAcc.balance + this.model.fDestAmount);
 		}
-		this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
+		this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
 		if (this.model.debtType)
 		{
@@ -500,7 +501,7 @@ class DebtTransactionView extends TransactionView
 		if (this.model.fSrcResBal !== fNewValue)
 		{
 			this.model.fSrcResBal = fNewValue;
-			this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+			this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
 			let newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
 
@@ -525,7 +526,7 @@ class DebtTransactionView extends TransactionView
 		if (this.model.fDestResBal !== fNewValue)
 		{
 			this.model.fDestResBal = fNewValue;
-			this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
+			this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
 			let newDestAmount = this.app.normalize(fNewValue - this.model.destAccount.balance);
 
@@ -602,20 +603,20 @@ class DebtTransactionView extends TransactionView
 				this.model.destAccount = this.model.account;
 
 				this.model.destResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
-				this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
+				this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 			}
 			else
 			{
 				this.model.srcAccount = this.model.account;
 
 				this.model.srcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
-				this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+				this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 			}
 
 			if (this.model.srcAccount)
-				this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
+				this.model.srcAccount.fmtBalance = this.model.srcCurr.format(this.model.srcAccount.balance);
 			if (this.model.destAccount)
-				this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
+				this.model.destAccount.fmtBalance = this.model.destCurr.format(this.model.destAccount.balance);
 
 			if (this.model.state === 6)
 				this.setExpectedState(0);			// Transition 26
@@ -654,8 +655,8 @@ class DebtTransactionView extends TransactionView
 		}
 
 		this.model.src_curr_id = this.model.dest_curr_id = this.model.account.curr_id;
-		this.model.srcCurr = this.app.getCurrency(this.model.src_curr_id, this.app.currencies);
-		this.model.destCurr = this.app.getCurrency(this.model.dest_curr_id, this.app.currencies);
+		this.model.srcCurr = Currency.getById(this.model.src_curr_id);
+		this.model.destCurr = Currency.getById(this.model.dest_curr_id);
 
 		if (this.model.debtType)
 		{
@@ -668,21 +669,21 @@ class DebtTransactionView extends TransactionView
 			this.model.destAccount = this.model.personAccount;
 		}
 
-		this.model.srcAccount.fmtBalance = this.model.srcCurr.formatValue(this.model.srcAccount.balance);
+		this.model.srcAccount.fmtBalance = this.model.srcCurr.format(this.model.srcAccount.balance);
 		let newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 		if (this.model.fSrcResBal != newSrcResBal)
 		{
 			this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;
 		}
-		this.model.fmtSrcResBal = this.model.srcCurr.formatValue(this.model.srcResBal);
+		this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
-		this.model.destAccount.fmtBalance = this.model.destCurr.formatValue(this.model.destAccount.balance);
+		this.model.destAccount.fmtBalance = this.model.destCurr.format(this.model.destAccount.balance);
 		let newDestResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
 		if (this.model.fDestResBal != newDestResBal)
 		{
 			this.model.destResBal = this.model.fDestResBal = newDestResBal;
 		}
-		this.model.fmtDestResBal = this.model.destCurr.formatValue(this.model.destResBal);
+		this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
 		this.updateExch(this.model);
 

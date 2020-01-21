@@ -1,6 +1,7 @@
 import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
+import { Currency } from '../../currency.js';
 
 
 let runIncome =
@@ -22,7 +23,7 @@ let runIncome =
 
 		if ('srcCurr' in params)
 		{
-			let curr = this.getCurrency(params.srcCurr, this.currencies);
+			let curr = Currency.getById(params.srcCurr);
 			if (!curr)
 				throw new Error('Currency (' + params.srcCurr + ') not found');
 

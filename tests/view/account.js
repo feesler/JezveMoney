@@ -1,4 +1,5 @@
 import { TestView } from './testview.js';
+import { Currency } from '../currency.js';
 
 
 // Create or update account view class
@@ -30,7 +31,7 @@ class AccountView extends TestView
 
 		// Currency
 		let selectedCurr = cont.currDropDown.textValue;
-		res.currObj = this.app.findCurrencyByName(selectedCurr, this.app.currencies);
+		res.currObj = Currency.findByName(selectedCurr);
 		if (!res.currObj)
 			throw new Error(`Currency ${selectedCurr} not found`);
 
@@ -52,7 +53,7 @@ class AccountView extends TestView
 		this.model.balance = account.balance.toString();
 		this.model.fBalance = account.balance;
 
-		this.model.currObj = this.app.getCurrency(account.curr_id, this.app.currencies);
+		this.model.currObj = Currency.getById(account.curr_id);
 		if (!this.model.currObj)
 			throw new Error(`Unexpected currency ${account.curr_id}`);
 
@@ -176,7 +177,7 @@ class AccountView extends TestView
 	async changeCurrency(val)
 	{
 		let curr_id = parseInt(val);
-		this.model.currObj = this.app.getCurrency(curr_id, this.app.currencies);
+		this.model.currObj = Currency.getById(curr_id);
 		if (!this.model.currObj)
 			throw new Error(`Unexpected currency ${val}`);
 

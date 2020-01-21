@@ -1,4 +1,5 @@
 import { api } from './api.js';
+import { Currency } from './currency.js';
 
 
 class AppState
@@ -9,7 +10,6 @@ class AppState
 
 		this.accounts = null;
 		this.persons = null;
-		this.currencies = [];
 		this.transactions = [];
 
 		api.setEnv(app);
@@ -169,7 +169,7 @@ class AppState
 			throw new Error('Unexpected input');
 
 		let res = accounts.filter(item => item.balance != 0)
-							.map(item => this.app.formatCurrency(item.balance, item.curr_id, this.app.currencies));
+							.map(item => Currency.format(item.curr_id, item.balance));
 
 		return res;
 	}
@@ -309,7 +309,7 @@ class AppState
 	{
 		let res = {};
 
-		res.balance = this.app.formatCurrency(account.balance, account.curr_id, this.app.currencies);
+		res.balance = Currency.format(account.curr_id, account.balance);
 		res.name = account.name;
 		res.icon = account.icon;
 
@@ -340,30 +340,30 @@ class AppState
 
 		if (transObj.type == app.EXPENSE)
 		{
-			res.amountText = '- ' + app.formatCurrency(transObj.src_amount, transObj.src_curr, app.currencies);
+			res.amountText = '- ' + Currency.format(transObj.src_curr, transObj.src_amount);
 			if (transObj.src_curr != transObj.dest_curr)
 			{
-				res.amountText += ' (- ' + app.formatCurrency(transObj.dest_amount, transObj.dest_curr, app.currencies) + ')';
+				res.amountText += ' (- ' + Currency.format(transObj.dest_curr, transObj.dest_amount) + ')';
 			}
 
 			res.accountTitle = srcAcc.name;
 		}
 		else if (transObj.type == app.INCOME)
 		{
-			res.amountText = '+ ' + app.formatCurrency(transObj.src_amount, transObj.src_curr, app.currencies);
+			res.amountText = '+ ' + Currency.format(transObj.src_curr, transObj.src_amount);
 			if (transObj.src_curr != transObj.dest_curr)
 			{
-				res.amountText += ' (+ ' + app.formatCurrency(transObj.dest_amount, transObj.dest_curr, app.currencies) + ')';
+				res.amountText += ' (+ ' + Currency.format(transObj.dest_curr, transObj.dest_amount) + ')';
 			}
 
 			res.accountTitle = destAcc.name;
 		}
 		else if (transObj.type == app.TRANSFER)
 		{
-			res.amountText = app.formatCurrency(transObj.src_amount, transObj.src_curr, app.currencies);
+			res.amountText = Currency.format(transObj.src_curr, transObj.src_amount);
 			if (transObj.src_curr != transObj.dest_curr)
 			{
-				res.amountText += ' (' + app.formatCurrency(transObj.dest_amount, transObj.dest_curr, app.currencies) + ')';
+				res.amountText += ' (' + Currency.format(transObj.dest_curr, transObj.dest_amount) + ')';
 			}
 
 			res.accountTitle = srcAcc.name + ' → ' + destAcc.name;
@@ -391,7 +391,7 @@ class AppState
 				res.amountText = (srcAcc) ? '- ' : '+ ';
 			}
 
-			res.amountText += app.formatCurrency(transObj.src_amount, personAcc.curr_id, app.currencies);
+			res.amountText += Currency.format(personAcc.curr_id, transObj.src_amount);
 		}
 
 		res.dateFmt = transObj.date;
