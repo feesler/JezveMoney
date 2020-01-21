@@ -181,6 +181,17 @@ function getCurrency(curr_id, currList)
 }
 
 
+function findCurrencyByName(name, currList)
+{
+	let qName = name.toUpperCase();
+	let currObj = currList.find(item => item.name.toUpperCase() == qName);
+	if (!currObj)
+		return null;
+
+	return new Currency(currObj);
+}
+
+
 // Format value with rules of specified currency
 function formatCurrency(val, curr_id, currList)
 {
@@ -464,6 +475,7 @@ var commonModule = { EXPENSE,
 					formatValue,
 					Currency,
 					getCurrency,
+					findCurrencyByName,
 					formatCurrency,
 					getPersonByAcc,
 					fixFloat,

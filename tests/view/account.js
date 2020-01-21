@@ -4,6 +4,101 @@ import { TestView } from './testview.js';
 // Create or update account view class
 class AccountView extends TestView
 {
+	constructor(...args)
+	{
+		super(...args);
+
+		this.nameTyped = false;
+	}
+
+
+	async buildModel(cont)
+	{
+		let res = {};
+
+		res.isUpdate = cont.isUpdate;
+		if (res.isUpdate)
+			res.id = cont.id;
+
+		// Name
+		res.name = cont.name.value;
+		res.nameTyped = this.nameTyped;
+
+		// Iniital balance
+		res.balance = cont.balance.value;
+		res.fBalance = this.app.isValidValue(res.balance) ? this.app.normalize(res.balance) : res.balance;
+
+		// Currency
+		let selectedCurr = cont.currDropDown.textValue;
+		res.currObj = this.app.findCurrencyByName(selectedCurr, this.app.currencies);
+		if (!res.currObj)
+			throw new Error(`Currency ${selectedCurr} not found`);
+
+		res.curr_id = res.currObj.id
+
+		// Icon
+		let selectedIcon = cont.iconDropDown.textValue.toUpperCase();
+		res.icon = this.tileIcons.findIndex(item => item.title.toUpperCase() == selectedIcon);
+		res.tileIcon = this.tileIcons[res.icon];
+
+		return res;
+	}
+
+
+	setExpectedAccount(account)
+	{
+		this.model.name = account.name.toString();
+
+		this.model.balance = account.balance.toString();
+		this.model.fBalance = account.balance;
+
+		this.model.currObj = this.app.getCurrency(account.curr_id, this.app.currencies);
+		if (!this.model.currObj)
+			throw new Error(`Unexpected currency ${account.curr_id}`);
+
+		this.model.curr_id = this.model.currObj.id;
+
+		this.setExpectedState();
+	}
+
+
+	getExpectedAccount()
+	{
+		return {
+			name : this.model.name,
+			balance : this.model.fBalance,
+			curr_id : this.model.curr_id,
+			icon : this.model.icon
+		};
+	}
+
+
+	setExpectedState()
+	{
+		let account = this.getExpectedAccount();
+		let accTile = this.app.state.accountToTile(account);
+
+		if (!this.model.nameTyped && !this.model.isUpdate)
+			accTile.name = 'New account';
+
+		let res = {
+			visibility : {
+				heading : true, tile : true, iconDropDown : true, name : true, currDropDown : true
+			},
+			values : {
+				tile : accTile,
+				name : account.name,
+				currDropDown : { textValue : this.model.currObj.name },
+				iconDropDown : { textValue : this.model.tileIcon.title }
+			}
+		};
+
+		this.expectedState = res;
+
+		return res;
+	}
+
+
 	async parseContent()
 	{
 		let res = {};
@@ -20,9 +115,9 @@ class AccountView extends TestView
 			throw new Error('Form element not found');
 
 		let hiddenEl = await this.query('#accid');
-		res.isEdit = (!!hiddenEl);
+		res.isUpdate = (!!hiddenEl);
 
-		let curChildren = (res.isEdit) ? 3 : 2;
+		let curChildren = (res.isUpdate) ? 3 : 2;
 		let elem = await this.query('form > *:nth-child(' + curChildren + ')');
 
 		res.iconDropDown = await this.parseDropDown(await this.query(elem, '.dd_container'));
@@ -56,24 +151,54 @@ class AccountView extends TestView
 
 	async inputName(val)
 	{
+		this.model.name = val;
+		this.model.nameTyped = this.nameTyped = true;
+
+		this.setExpectedState();
+
 		return this.performAction(() => this.content.name.input(val));
 	}
 
 
 	async inputBalance(val)
 	{
+		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+
+		this.model.balance = val;
+		this.model.fBalance = fNewValue;
+
+		this.setExpectedState();
+
 		return this.performAction(() => this.content.balance.input(val));
 	}
 
 
 	async changeCurrency(val)
 	{
+		let curr_id = parseInt(val);
+		this.model.currObj = this.app.getCurrency(curr_id, this.app.currencies);
+		if (!this.model.currObj)
+			throw new Error(`Unexpected currency ${val}`);
+
+		this.model.curr_id = this.model.currObj.id;
+
+		this.setExpectedState();
+
 		return this.performAction(() => this.content.currDropDown.selectByValue(val));
 	}
 
 
 	async changeIcon(val)
 	{
+		let iconInd = parseInt(val);
+		if (iconInd < 0 || iconInd > this.tileIcons.length)
+			throw new Error(`Icon ${val} not found`);
+
+		this.model.icon = iconInd;
+		this.model.tileIcon = this.tileIcons[iconInd];
+
+		this.setExpectedState();
+
 		return this.performAction(() => this.content.iconDropDown.selectByValue(val));
 	}
 }
