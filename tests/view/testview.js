@@ -14,14 +14,6 @@ class TestView
 				this[key] = this.props.environment[key];
 			}
 		}
-
-		this.tileIcons = [{ className : null, title : 'No icon' },
-							{ className : 'purse_icon', title : 'Purse' },
-							{ className : 'safe_icon', title : 'Safe' },
-							{ className : 'card_icon', title : 'Card' },
-							{ className : 'percent_icon', title : 'Percent' },
-							{ className : 'bank_icon', title : 'Bank' },
-							{ className : 'cash_icon', title : 'Cash' }];
 	}
 
 
@@ -134,21 +126,9 @@ class TestView
 		tileObj.id = this.parseId(await this.prop(tileEl, 'id'));
 		tileObj.balance = await this.prop(tileObj.balanceEL, 'innerText');
 		tileObj.name = await this.prop(tileObj.nameEL, 'innerText');
-		tileObj.icon = null;
 
-		let isIcon = await this.hasClass(tileObj.elem, 'tile_icon');
-		if (isIcon)
-		{
-			for(let item of this.tileIcons)
-			{
-				let found = await this.hasClass(tileObj.elem, item.className);
-				if (found)
-				{
-					tileObj.icon = item;
-					break;
-				}
-			}
-		}
+		let iconObj = this.app.findIconByClassName(await this.prop(tileObj.elem, 'className'));
+		tileObj.icon = iconObj.id;
 
 		tileObj.click = async function()
 		{

@@ -37,9 +37,9 @@ class AccountView extends TestView
 		res.curr_id = res.currObj.id
 
 		// Icon
-		let selectedIcon = cont.iconDropDown.textValue.toUpperCase();
-		res.icon = this.tileIcons.findIndex(item => item.title.toUpperCase() == selectedIcon);
-		res.tileIcon = this.tileIcons[res.icon];
+		let iconObj = this.app.findIconByTitle(cont.iconDropDown.textValue);
+		res.icon = iconObj.id;
+		res.tileIcon = iconObj;
 
 		return res;
 	}
@@ -190,12 +190,12 @@ class AccountView extends TestView
 
 	async changeIcon(val)
 	{
-		let iconInd = parseInt(val);
-		if (iconInd < 0 || iconInd > this.tileIcons.length)
+		let iconObj = this.app.getIcon(val);
+		if (!iconObj)
 			throw new Error(`Icon ${val} not found`);
 
-		this.model.icon = iconInd;
-		this.model.tileIcon = this.tileIcons[iconInd];
+		this.model.icon = iconObj.id;
+		this.model.tileIcon = iconObj;
 
 		this.setExpectedState();
 

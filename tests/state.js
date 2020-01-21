@@ -311,6 +311,7 @@ class AppState
 
 		res.balance = this.app.formatCurrency(account.balance, account.curr_id, this.app.currencies);
 		res.name = account.name;
+		res.icon = account.icon;
 
 		return res;
 	}

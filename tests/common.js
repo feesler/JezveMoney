@@ -22,6 +22,84 @@ function getTransactionTypeStr(type)
 }
 
 
+// Available tile icons
+const tileIcons = [
+	{ id : 0, className : null, title : 'No icon' },
+	{ id : 1, className : 'purse_icon', title : 'Purse' },
+	{ id : 2, className : 'safe_icon', title : 'Safe' },
+	{ id : 3, className : 'card_icon', title : 'Card' },
+	{ id : 4, className : 'percent_icon', title : 'Percent' },
+	{ id : 5, className : 'bank_icon', title : 'Bank' },
+	{ id : 6, className : 'cash_icon', title : 'Cash' },
+];
+
+
+/**
+ * Find icon by id
+ * @param {int} icon - id of icon
+ * @return {tileIconObject} or null if not found
+ */
+function getIcon(icon)
+{
+	let icon_id = parseInt(icon);
+	if (isNaN(icon_id))
+		return null;
+
+	let res = tileIcons.find(item => item.id == icon_id);
+	if (!res)
+		return null;
+
+	return res;
+}
+
+
+/**
+ * Try to find icon by title string
+ * @param {string} val - icon title
+ * @return {tileIconObject}
+ */
+function findIconByTitle(val)
+{
+	let noIcon = tileIcons[0];
+
+	if (typeof val !== 'string')
+		return noIcon;
+
+	let title = val.toUpperCase();
+	let res = tileIcons.find(item => item.title.toUpperCase() == title);
+	if (!res)
+		return noIcon;
+
+	return res;
+}
+
+
+/**
+ * Try to find icon by class property of element
+ * @param {string} val - className property of element
+ * @return {tileIconObject}
+ */
+function findIconByClassName(val)
+{
+	let noIcon = tileIcons[0];
+
+	if (typeof val !== 'string')
+		return noIcon;
+
+	let classList = val.split(' ');
+	if (!classList.includes('tile_icon'))
+		return noIcon;
+
+	for(let item of tileIcons)
+	{
+		if (classList.includes(item.className))
+			return item;
+	}
+
+	return noIcon;
+}
+
+
 // Check object is date
 function isDate(obj)
 {
@@ -464,6 +542,9 @@ var commonModule = { EXPENSE,
 					TRANSFER,
 					DEBT,
 					getTransactionTypeStr,
+					getIcon,
+					findIconByTitle,
+					findIconByClassName,
 					isDate,
 					isFunction,
 					isObject,
