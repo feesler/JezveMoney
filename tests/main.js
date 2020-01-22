@@ -55,8 +55,6 @@ class Application
 
 	async init()
 	{
-		this.startTime = Date.now();
-
 		// Inject common functions
 		for(let key in common)
 		{
@@ -134,7 +132,7 @@ class Application
 	{
 		console.log('Starting tests');
 
-		await this.init();
+		this.startTime = Date.now();
 
 		await this.apiTests();
 		await this.profileTests();

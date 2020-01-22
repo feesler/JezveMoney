@@ -1,32 +1,39 @@
-import { common } from './common.js';
-import { route } from './router.js';
-import { App } from './main.js';
+import { common } from '../common.js';
+import { route } from '../router.js';
+import { App } from '../main.js';
+
+import { Environment } from './base.js';
 
 
-var Environment = (function()
+class BrowserEnvironment extends Environment
 {
-	let vdoc = null;
-	let viewframe = null;
-	let restbl = null;
-	let totalRes = null, okRes = null, failRes = null;
-	let baseURL = null;
-	let results = null;
-	let app = null;
+	constructor()
+	{
+		super();
+
+		this.vdoc = null;
+		this.viewframe = null;
+		this.restbl = null;
+		this.totalRes = null;
+		this.okRes = null
+		this.failRes = null;
+		this.baseURL = null;
+	}
 
 
-	function getBaseUrl()
+	baseUrl()
 	{
 		return baseURL;
 	}
 
 
-	async function getUrl()
+	async url()
 	{
-		return viewframe.contentWindow.location.href;
+		return this.viewframe.contentWindow.location.href;
 	}
 
 
-	async function vparent(elem)
+	async parent(elem)
 	{
 		if (!elem)
 			return null;
@@ -35,33 +42,33 @@ var Environment = (function()
 	}
 
 
-	async function vquery()
+	async query()
 	{
 		if (!arguments.length)
 			return null;
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : vdoc;
+		let parent = parentSpecified ? arguments[0] : this.vdoc;
 
 		return (typeof query === 'string') ? parent.querySelector(query) : query;
 	}
 
 
-	async function vqueryall()
+	async queryAll()
 	{
 		if (!arguments.length)
 			return null;
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : vdoc;
+		let parent = parentSpecified ? arguments[0] : this.vdoc;
 
 		return (typeof query === 'string') ? parent.querySelectorAll(query) : query;
 	}
 
 
-	async function vprop(elem, prop)
+	async prop(elem, prop)
 	{
 		if (!elem || typeof prop !== 'string')
 			return null;
@@ -80,7 +87,7 @@ var Environment = (function()
 	}
 
 
-	async function waitFor(selector, options)
+	async wait(selector, options)
 	{
 		options = options || {};
 		let timeout = options.timeout || 30000;
@@ -94,18 +101,18 @@ var Environment = (function()
 			{
 				if (qTimer)
 					clearTimeout(qTimer);
-				throw new Error('waitFor(' + selector + ') timeout');
+				throw new Error('wait(' + selector + ') timeout');
 			}, timeout);
 
 			async function queryFun()
 			{
 				let meetCond = false;
-				let res = await vquery(selector);
+				let res = await this.query(selector);
 				if (res)
 				{
 					if (visible || hidden)
 					{
-						let selVisibility = await isVisible(res, true);
+						let selVisibility = await this.isVisible(res, true);
 						meetCond = ((visible && selVisibility) || (hidden && !selVisibility));
 					}
 					else
@@ -121,18 +128,18 @@ var Environment = (function()
 				}
 				else
 				{
-					qTimer = setTimeout(queryFun, 200);
+					qTimer = setTimeout(queryFun.bind(this), 200);
 				}
 			}
 
-			queryFun();
+			queryFun.call(this);
 		});
 	}
 
 
-	async function getGlobal(prop)
+	async global(prop)
 	{
-		let res = viewframe.contentWindow;
+		let res = this.viewframe.contentWindow;
 		let propPath = prop.split('.');
 
 		for(let propName of propPath)
@@ -146,14 +153,14 @@ var Environment = (function()
 	}
 
 
-	async function hasClass(elem, cl)
+	async hasClass(elem, cl)
 	{
 		return elem.classList.contains(cl);
 	}
 
 
 	// elem could be an id string or element handle
-	async function isVisible(elem, recursive)
+	async isVisible(elem, recursive)
 	{
 		if (typeof elem === 'string')
 			elem = await vquery('#' + elem);
@@ -174,7 +181,7 @@ var Environment = (function()
 	}
 
 
-	async function selectByValue(selectObj, selValue, selBool)
+	async selectByValue(selectObj, selValue, selBool)
 	{
 		let i;
 
@@ -194,13 +201,13 @@ var Environment = (function()
 	}
 
 
-	async function onChange(elem)
+	async onChange(elem)
 	{
 		return elem.onchange();
 	}
 
 
-	async function inputEmul(elemObj, val)
+	async input(elemObj, val)
 	{
 		elemObj.value = val;
 		if (elemObj.oninput)
@@ -208,7 +215,7 @@ var Environment = (function()
 	}
 
 
-	async function clickEmul(elemObj)
+	async click(elemObj)
 	{
 		if (elemObj.click)
 		{
@@ -216,15 +223,15 @@ var Environment = (function()
 		}
 		else if (document.createEvent)
 		{
-			let evt = document.createEvent("MouseEvents");
-			evt.initMouseEvent("click", true, true, viewframe.contentWindow,
+			let evt = document.createEvent('MouseEvents');
+			evt.initMouseEvent('click', true, true, this.viewframe.contentWindow,
 			0, 0, 0, 0, 0, false, false, false, false, 0, null);
 			let allowDefault = elemObj.dispatchEvent(evt);
 		}
 	}
 
 
-	async function httpRequest(method, url, data, headers)
+	async httpReq(method, url, data, headers)
 	{
 		let supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
 
@@ -263,7 +270,7 @@ var Environment = (function()
 	}
 
 
-	async function addResult(descr, res)
+	async addResult(descr, res)
 	{
 		let err = null;
 		let resStr;
@@ -278,16 +285,16 @@ var Environment = (function()
 			message = err.message;
 		}
 
-		if (results.expected)
-			totalRes.innerHTML = ++results.total + '/' + results.expected;
+		if (this.results.expected)
+			this.totalRes.innerHTML = ++this.results.total + '/' + this.results.expected;
 		else
-			totalRes.innerHTML = ++results.total;
-		okRes.innerHTML = (res) ? ++results.ok : results.ok;
-		failRes.innerHTML = (res) ? results.fail : ++results.fail;
+			this.totalRes.innerHTML = ++this.results.total;
+		this.okRes.innerHTML = (res) ? ++this.results.ok : this.results.ok;
+		this.failRes.innerHTML = (res) ? this.results.fail : ++this.results.fail;
 
 		resStr = (res ? 'OK' : 'FAIL');
 
-		restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
+		this.restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
 											ce('td', { innerHTML : resStr }),
 										 	ce('td', { innerHTML : message }) ]));
 
@@ -296,28 +303,28 @@ var Environment = (function()
 	}
 
 
-	async function setBlock(title, category)
+	async setBlock(title, category)
 	{
-		restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : title }) ));
+		this.restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : title }) ));
 	}
 
 
-	async function navigation(action)
+	async navigation(action)
 	{
 		let navPromise = new Promise((resolve, reject) =>
 		{
-			viewframe.onload = async function()
+			this.viewframe.onload = async () =>
 			{
-				vdoc = viewframe.contentWindow.document;
-				if (!vdoc)
+				this.vdoc = this.viewframe.contentWindow.document;
+				if (!this.vdoc)
 					throw new Error('View document not found');
 
-				common.checkPHPerrors(Environment, vdoc.documentElement.innerHTML);
+				common.checkPHPerrors(this, this.vdoc.documentElement.innerHTML);
 
-				let viewClass = await route(Environment, await getUrl());
+				let viewClass = await route(this, await this.url());
 
-				app.view = new viewClass({ app : app, environment : Environment });
-				await app.view.parse();
+				this.app.view = new viewClass({ app : this.app, environment : this });
+				await this.app.view.parse();
 
 				resolve();
 			};
@@ -330,78 +337,60 @@ var Environment = (function()
 	}
 
 
-	async function goTo(url)
+	async goTo(url)
 	{
-		await navigation(() => viewframe.src = url);
+		await this.navigation(() => this.viewframe.src = url);
 	}
 
 
-	async function initTests(appInstance)
+	async init(appInstance)
 	{
-		app = appInstance;
-		app.environment = Environment;
-
-		if (!app)
+		if (!appInstance)
 			throw new Error('Invalid App');
 
-		if (!app.config || !app.config.url)
+		this.app = appInstance;
+		this.app.environment = this;
+		this.app.init();
+
+		if (!this.app.config || !this.app.config.url)
 			throw new Error('Invalid config: test URL not found');
 
 		let startbtn = ge('startbtn');
-		totalRes = ge('totalRes');
-		okRes = ge('okRes');
-		failRes = ge('failRes');
-		viewframe = ge('viewframe');
-		restbl = ge('restbl');
-		if (!startbtn || !totalRes || !okRes || !failRes || !viewframe || !restbl)
+		this.totalRes = ge('totalRes');
+		this.okRes = ge('okRes');
+		this.failRes = ge('failRes');
+		this.viewframe = ge('viewframe');
+		this.restbl = ge('restbl');
+		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.viewframe || !this.restbl)
 			throw new Error('Fail to init tests');
 
-		baseURL = app.config.url;
+		this.baseURL = this.app.config.url;
 
-		startbtn.onclick = async function()
+		startbtn.onclick = async () =>
 		{
 			try
 			{
-				results = { total : 0, ok : 0, fail : 0, expected : 0 };
+				this.results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
-				if (app.config.testsExpected)
-					results.expected = app.config.testsExpected;
+				if (this.app.config.testsExpected)
+					this.results.expected = this.app.config.testsExpected;
 
-				await addResult('Test initialization', true);
+				await this.addResult('Test initialization', true);
 
-				await goTo(baseURL);
-				await app.startTests();
+				await this.goTo(this.baseURL);
+				await this.app.startTests();
 			}
 			catch(e)
 			{
-				addResult(e);
+				this.addResult(e);
 			}
 		};
 	}
 
+}
 
-	return {
-		init : initTests,
-		baseUrl : getBaseUrl,
-		url : getUrl,
-		navigation,
-		goTo,
-		parent : vparent,
-		query : vquery,
-		queryAll : vqueryall,
-		prop : vprop,
-		wait : waitFor,
-		global : getGlobal,
-		hasClass,
-		isVisible,
-		selectByValue,
-		click : clickEmul,
-		input : inputEmul,
-		onChange,
-		httpReq : httpRequest,
-		addResult,
-	 	setBlock
-	};
-})();
-
-onReady(() => Environment.init(App));
+onReady(() =>
+{
+	let env = new BrowserEnvironment();
+	env.init(App);
+});

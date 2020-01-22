@@ -2,33 +2,38 @@ import process from 'process';
 import http from 'http';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
-import { common } from './common.js';
-import { route } from './router.js';
-import { App } from './main.js';
+import { common } from '../common.js';
+import { route } from '../router.js';
+
+import { Environment } from './base.js'
 
 
-var Environment = (function()
+
+class NodeEnvironment extends Environment
 {
-	let page = null;
-	let baseURL = null;
-	let results = null;
-	let app = null;
-	let reqCookies = {};
-
-
-	function getBaseUrl()
+	constructor(...args)
 	{
-		return baseURL;
+		super(...args);
+
+		this.page = null;
+		this.baseURL = null;
+		this.reqCookies = {};
 	}
 
 
-	async function getUrl()
+	baseUrl()
 	{
-		return page.url();
+		return this.baseURL;
 	}
 
 
-	async function vparent(elem)
+	async url()
+	{
+		return this.page.url();
+	}
+
+
+	async parent(elem)
 	{
 		if (!elem)
 			return null;
@@ -37,33 +42,33 @@ var Environment = (function()
 	}
 
 
-	async function vquery()
+	async query()
 	{
 		if (!arguments.length)
 			return null;
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : page;
+		let parent = parentSpecified ? arguments[0] : this.page;
 
 		return (typeof query === 'string') ? parent.$(query) : query;
 	}
 
 
-	async function vqueryall()
+	async queryAll()
 	{
 		if (!arguments.length)
 			return null;
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : page;
+		let parent = parentSpecified ? arguments[0] : this.page;
 
 		return (typeof query === 'string') ? parent.$$(query) : query;
 	}
 
 
-	async function vprop(elem, prop)
+	async prop(elem, prop)
 	{
 		if (!elem || typeof prop !== 'string')
 			return null;
@@ -85,17 +90,17 @@ var Environment = (function()
 	}
 
 
-	async function waitFor(selector, options)
+	async wait(selector, options)
 	{
-		return page.waitForSelector(selector, options);
+		return this.page.waitForSelector(selector, options);
 	}
 
 
-	async function getGlobal(prop)
+	async global(prop)
 	{
-		let windowHandle = await page.evaluateHandle(() => window);
+		let windowHandle = await this.page.evaluateHandle(() => window);
 
-		return page.evaluate((w, prop) =>
+		return this.page.evaluate((w, prop) =>
 		{
 			let res = w;
 			let propPath = prop.split('.');
@@ -112,17 +117,17 @@ var Environment = (function()
 	}
 
 
-	async function hasClass(elem, cl)
+	async hasClass(elem, cl)
 	{
 		return elem.evaluate((el, cl) => el.classList.contains(cl), cl);
 	}
 
 
 	// elem could be an id string or element handle
-	async function isVisible(elem, recursive)
+	async isVisible(elem, recursive)
 	{
 		if (typeof elem === 'string')
-			elem = page.$('#' + elem);
+			elem = this.page.$('#' + elem);
 
 		return elem.evaluate((el, r) =>
 		{
@@ -144,19 +149,19 @@ var Environment = (function()
 
 
 	// Select item with specified value if exist
-	async function selectByValue(selectObj, selValue, selBool)
+	async selectByValue(selectObj, selValue, selBool)
 	{
 		if (!selectObj)
 			return false;
 
-		let options = await vprop(selectObj, 'options');
+		let options = await this.prop(selectObj, 'options');
 		if (!options)
 			return false;
 
 		for(let i = 0, l = options.length; i < l; i++)
 		{
 			let option = options[i];
-			if (option && await vprop(option, 'value') == selValue)
+			if (option && await this.prop(option, 'value') == selValue)
 			{
 				await option.evaluate((el, sel) => el.selected = (sel !== undefined) ? sel : true, selBool);
 				return true;
@@ -167,21 +172,21 @@ var Environment = (function()
 	}
 
 
-	async function clickEmul(elem)
+	async click(elem)
 	{
 		return elem.click();
 	}
 
 
-	async function inputEmul(elem, val)
+	async input(elem, val)
 	{
 		if (val == '')
 		{
 			await elem.focus();
-			await page.keyboard.down('ControlLeft');
-			await page.keyboard.press('KeyA');
-			await page.keyboard.up('ControlLeft');
-			return page.keyboard.press('Delete');
+			await this.page.keyboard.down('ControlLeft');
+			await this.page.keyboard.press('KeyA');
+			await this.page.keyboard.up('ControlLeft');
+			return this.page.keyboard.press('Delete');
 		}
 		else
 		{
@@ -191,14 +196,14 @@ var Environment = (function()
 	}
 
 
-	async function onChangeEmul(elem)
+	async onChange(elem)
 	{
 		return elem.evaluate(el => el.onchange());
 	}
 
 
 	// Split attribute-value string divided by separator
-	function splitSep(str, sep)
+	splitSep(str, sep)
 	{
 		let sepPos = str.indexOf(sep);
 		if (sepPos === -1)
@@ -209,7 +214,7 @@ var Environment = (function()
 	}
 
 
-	function parseCookies(headers)
+	parseCookies(headers)
 	{
 		if (!headers)
 			return null;
@@ -231,7 +236,7 @@ var Environment = (function()
 
 			for(let attr of cookieAttributes)
 			{
-				attr = splitSep(attr.trim(), '=');
+				attr = this.splitSep(attr.trim(), '=');
 				if (!attr)
 					continue;
 
@@ -254,7 +259,7 @@ var Environment = (function()
 	}
 
 
-	async function httpRequest(method, url, data, headers)
+	async httpReq(method, url, data, headers)
 	{
 		return new Promise((resolve, reject) =>
 		{
@@ -271,9 +276,9 @@ var Environment = (function()
 				common.setParam(options.headers, headers);
 
 			options.headers['Cookie'] = [];
-			for(let cookieName in reqCookies)
+			for(let cookieName in this.reqCookies)
 			{
-				let cookieVal = reqCookies[cookieName];
+				let cookieVal = this.reqCookies[cookieName];
 				options.headers['Cookie'].push(cookieName + '=' + cookieVal);
 			}
 
@@ -295,14 +300,14 @@ var Environment = (function()
 				res.on('data', chunk => body += chunk);
 				res.on('end', () =>
 				{
-					let newCookies = parseCookies(res.headers);
+					let newCookies = this.parseCookies(res.headers);
 
 					for(let cookie of newCookies)
 					{
 						if (cookie.value == '')
-							delete reqCookies[cookie.name];
+							delete this.reqCookies[cookie.name];
 						else
-							reqCookies[cookie.name] = cookie.value;
+							this.reqCookies[cookie.name] = cookie.value;
 					}
 
 					resolve({ status : res.statusCode,
@@ -320,7 +325,7 @@ var Environment = (function()
 	}
 
 
-	function addResult(descr, res)
+	addResult(descr, res)
 	{
 		let err = null;
 		let resStr;
@@ -340,18 +345,18 @@ var Environment = (function()
 
 		if (res)
 		{
-			results.ok++;
+			this.results.ok++;
 			resStr = chalk.green('OK');
 		}
 		else
 		{
-			results.fail++;
+			this.results.fail++;
 			resStr = chalk.red('FAIL');
 		}
 
-		let counter = ++results.total;
-		if (results.expected)
-			counter += '/' + results.expected;
+		let counter = ++this.results.total;
+		if (this.results.expected)
+			counter += '/' + this.results.expected;
 
 		console.log('[' + counter + '] ' + descr + resStr + message);
 
@@ -360,7 +365,7 @@ var Environment = (function()
 	}
 
 
-	function setBlock(title, category)
+	setBlock(title, category)
 	{
 		if (category == 1)
 			title = chalk.whiteBright.bgBlue(' ' + title + ' ');
@@ -373,23 +378,23 @@ var Environment = (function()
 	}
 
 
-	async function navigation(action)
+	async navigation(action)
 	{
 		if (!common.isFunction(action))
 			throw new Error('Wrong action specified');
 
 		let navPromise = new Promise((resolve, reject) =>
 		{
-			page.once('load', async () =>
+			this.page.once('load', async () =>
 			{
-				let content = await page.content();
+				let content = await this.page.content();
 
-				common.checkPHPerrors(Environment, content);
+				common.checkPHPerrors(this, content);
 
-				let viewClass = await route(Environment, await getUrl());
+				let viewClass = await route(this, await this.url());
 
-				app.view = new viewClass({ app : app, environment : Environment });
-				await app.view.parse();
+				this.app.view = new viewClass({ app : this.app, environment : this });
+				await this.app.view.parse();
 
 				resolve();
 			});
@@ -401,13 +406,13 @@ var Environment = (function()
 	}
 
 
-	async function goTo(url)
+	async goTo(url)
 	{
-		await navigation(() => page.goto(url));
+		await this.navigation(() => this.page.goto(url));
 	}
 
 
-	async function initTests(appInstance)
+	async init(appInstance)
 	{
 		let res = 1;
 		let view;
@@ -415,69 +420,50 @@ var Environment = (function()
 
 		try
 		{
-			app = appInstance;
-			app.environment = Environment;
-
-			results = { total : 0, ok : 0, fail : 0, expected : 0 };
-
-			if (!app)
+			if (!appInstance)
 				throw new Error('Invalid App');
 
-			if (!app.config || !app.config.url)
+			this.app = appInstance;
+			this.app.environment = this;
+			this.app.init();
+
+			this.results = { total : 0, ok : 0, fail : 0, expected : 0 };
+
+			if (!this.app.config || !this.app.config.url)
 				throw new Error('Invalid config: test URL not found');
 
-			baseURL = app.config.url;
+			this.baseURL = this.app.config.url;
 
-			if (app.config.testsExpected)
-				results.expected = app.config.testsExpected;
+			if (this.app.config.testsExpected)
+				this.results.expected = this.app.config.testsExpected;
 
 			browser = await puppeteer.launch({ headless : true,
 												args : [ '--proxy-server="direct://"',
 															'--proxy-bypass-list=*' ] });
 			let allPages = await browser.pages();
-			page = (allPages.length) ? allPages[0] : await browser.newPage();
+			this.page = (allPages.length) ? allPages[0] : await browser.newPage();
 
-			await addResult('Test initialization', true);
+			await this.addResult('Test initialization', true);
 
-			await goTo(baseURL);
-			await app.startTests();
+			await this.goTo(this.baseURL);
+			await this.app.startTests();
 			res = 0;
 		}
 		catch(e)
 		{
-			addResult(e);
+			this.addResult(e);
 		}
 
 		if (browser)
 			await browser.close();
 
-		console.log('Total: ' + results.total + ' Passed: ' + results.ok + ' Failed: ' + results.fail);
+		console.log('Total: ' + this.results.total + ' Passed: ' + this.results.ok + ' Failed: ' + this.results.fail);
 
 		process.exit(res);
 	}
 
 
-	return { init : initTests,
-				baseUrl : getBaseUrl,
-				url : getUrl,
-				navigation,
-				goTo,
-				parent : vparent,
-				query : vquery,
-				queryAll : vqueryall,
-				hasClass,
-				isVisible,
-				selectByValue,
-				onChange : onChangeEmul,
-				prop : vprop,
-				wait : waitFor,
-				global : getGlobal,
-				click : clickEmul,
-				input : inputEmul,
-				httpReq : httpRequest,
-				addResult,
-				setBlock };
-})();
+}
 
 
-Environment.init(App);
+export { NodeEnvironment };

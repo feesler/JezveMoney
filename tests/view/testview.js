@@ -9,10 +9,7 @@ class TestView
 
 		if (this.props.environment)
 		{
-			for(let key in this.props.environment)
-			{
-				this[key] = this.props.environment[key];
-			}
+			this.props.environment.inject(this);
 		}
 	}
 
