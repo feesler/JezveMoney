@@ -15,6 +15,54 @@ class AppState
 		api.setEnv(app);
 	}
 
+
+	// Return id of item with specified index(absolute position) in list
+	posToId(list, pos)
+	{
+		if (!Array.isArray(list))
+			throw new Error('Invalid list specified');
+
+		let ind = parseInt(pos);
+		if (isNaN(ind) || ind < 0 || ind >= list.length)
+			throw new Error(`Invalid position ${pos} specified`);
+
+		let item = list[pos];
+
+		return item.id;
+	}
+
+
+	positionsToIds(list, positions)
+	{
+		if (!Array.isArray(list))
+			throw new Error('Invalid list specified');
+
+		let posList = Array.isArray(positions) ? positions : [ positions ];
+
+		return posList.map(item => this.posToId(list, item));
+	}
+
+
+	deleteByIds(list, ids)
+	{
+		if (!Array.isArray(list) || !ids)
+			throw new Error('Unexpected input');
+
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		let res = this.app.copyObject(list);
+		for(let id of ids)
+		{
+			let ind = res.findIndex(item => item.id == id);
+			if (ind !== -1)
+				res.splice(ind, 1);
+		}
+
+		return res;
+	}
+
+
 /**
  * Accounts
  */
@@ -232,7 +280,18 @@ class AppState
 	}
 
 
-	// Delete accounts and return
+	// Return expected list of transactions after update specified account
+	updateAccount(trList, accList, account)
+	{
+		let origAcc = accList.find(item => item.id == account.id);
+		if (!origAcc)
+			throw new Error('Specified account not found in the original list');
+
+		return trList;
+	}
+
+
+	// Return expected list of transactions after delete specified accounts
 	deleteAccounts(trList, accList, ids)
 	{
 		let res = [];

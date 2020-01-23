@@ -1,5 +1,7 @@
 import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
+import { TransactionsList } from '../trlist.js';
+import { api } from '../api.js';
 
 
 let runAccounts =
@@ -141,6 +143,8 @@ let runAccounts =
 		await this.view.goToUpdateAccount(pos);
 
 		// Check initial state
+		let accBefore = await api.account.list();
+		let trBefore = await api.transaction.list();
 		let expectedList = await this.state.getUserAccountsList();
 		let expAccount = await this.state.getAccountByPos(pos);
 		if (!expAccount)
@@ -152,15 +156,23 @@ let runAccounts =
 
 		expectedList[pos] = expAccount;
 
+		// Prepare expected updates of transactions list
+		let trAfter = this.state.updateAccount(trBefore, accBefore, expAccount);
+		let expTransList = new TransactionsList(this, trAfter);
+
 		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
 
 		await test('Update account', () => {}, this.view);
+
+		await this.run.transactions.checkData('List of transactions update', expTransList);
 	},
 
 
 	async del(accounts)
 	{
 		let test = this.test;
+
+		this.view.setBlock(`Delete account(s) [${accounts.join()}]`, 2);
 
 		// Navigate to create account view
 		if (!(this.view instanceof AccountsView))
@@ -169,15 +181,27 @@ let runAccounts =
 			await this.view.goToAccounts();
 		}
 
+		// Check initial state
+		let accBefore = await this.state.getUserAccountsList();
+		let trBefore = await api.transaction.list();
+		let ids = this.state.positionsToIds(accBefore, accounts);
+
 		this.state.accounts = null;
 
 		await this.view.deleteAccounts(accounts);
 
-		let state = { value : { tiles : { items : { length : this.accountTiles.length - accounts.length } } } };
+		// Prepare expected updates of accounts list
+		let expectedList = this.state.deleteByIds(accBefore, ids);
+		// Prepare expected updates of transactions
+		let trAfter = this.state.deleteAccounts(trBefore, accBefore, ids);
+		let expTransList = new TransactionsList(this, trAfter);
 
-		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view, state);
+		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
 
+		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view);
 		this.accountTiles = this.view.content.tiles.items;
+
+		await this.run.transactions.checkData('List of transactions update', expTransList);
 	}
 };
 
