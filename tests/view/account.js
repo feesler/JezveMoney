@@ -65,12 +65,17 @@ class AccountView extends TestView
 
 	getExpectedAccount()
 	{
-		return {
+		let res = {
 			name : this.model.name,
 			balance : this.model.fBalance,
 			curr_id : this.model.curr_id,
 			icon : this.model.icon
 		};
+
+		if (this.model.isUpdate)
+			res.id = this.model.id;
+
+		return res;
 	}
 
 
@@ -117,6 +122,12 @@ class AccountView extends TestView
 
 		let hiddenEl = await this.query('#accid');
 		res.isUpdate = (!!hiddenEl);
+		if (res.isUpdate)
+		{
+			res.id = parseInt(await this.prop(hiddenEl, 'value'));
+			if (!res.id)
+				throw new Error('Wrong account id');
+		}
 
 		let curChildren = (res.isUpdate) ? 3 : 2;
 		let elem = await this.query('form > *:nth-child(' + curChildren + ')');
