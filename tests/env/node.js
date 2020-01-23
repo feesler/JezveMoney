@@ -266,7 +266,7 @@ class NodeEnvironment extends Environment
 			let supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
 
 			method = method.toLowerCase();
-			if (supportedMethods.indexOf(method) == -1)
+			if (!supportedMethods.includes(method))
 				reject('Unexpected method ' + method);
 
 			let postData = null;

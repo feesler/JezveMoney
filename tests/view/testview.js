@@ -18,7 +18,7 @@ class TestView
 	{
 		const loggedOutLocations = ['login', 'register'];
 
-		return loggedOutLocations.every((item) => this.location.indexOf('/' + item) === -1);
+		return loggedOutLocations.every(item => !this.location.includes('/' + item));
 	}
 
 

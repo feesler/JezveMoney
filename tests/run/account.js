@@ -55,7 +55,7 @@ let runAccounts =
 		let test = this.test;
 		let scope = this.run.accounts;
 
-	// Input account name
+		// Input account name
 		if ('name' in params)
 			await test(`Input name (${params.name})`, () => view.inputName(params.name), view);
 

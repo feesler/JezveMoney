@@ -28,7 +28,7 @@ async function route(env, url)
 
 	// Remove leading directory if needed
 	let reqPath = reqUrl.pathname;
-	if (reqPath.indexOf(testUrl.pathname) === 0)
+	if (reqPath.startsWith(testUrl.pathname))
 	{
 		reqPath = reqPath.substr(testUrl.pathname.length);
 	}

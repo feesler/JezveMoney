@@ -228,7 +228,7 @@ function fixFloat(str)
 	if (typeof(str) == "string")
 	{
 		str = str.replace(/,/g, '.');
-		if (str.indexOf('.') === 0 || !str.length)
+		if (str.startsWith('.') || !str.length)
 			str = '0' + str;
 		return str;
 	}
@@ -364,10 +364,7 @@ function checkPHPerrors(env, content)
 	if (!content)
 		return true;
 
-	let found = errSignatures.some(function(lookupStr)
-	{
-		return (content.indexOf(lookupStr) !== -1);
-	});
+	let found = errSignatures.some(item => content.includes(item));
 
 	if (found)
 		env.addResult('PHP error signature found', false);

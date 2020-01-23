@@ -481,7 +481,7 @@ let apiModule = (function()
 		let reqParams = { count : 0 };
 		for(let prop in params)
 		{
-			if (filterFields.indexOf(prop) !== -1)
+			if (filterFields.includes(prop))
 				reqParams[prop] = params[prop];
 		}
 

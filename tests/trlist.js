@@ -242,7 +242,7 @@ class TransactionsList
 
 		let lcQuery = query.toLowerCase();
 
-		return list.filter(item => item.comment.toLowerCase().indexOf(lcQuery) !== -1);
+		return list.filter(item => item.comment.toLowerCase().includes(lcQuery));
 	}
 
 
