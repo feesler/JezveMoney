@@ -49,6 +49,7 @@ let runExpense =
 
 		this.state.accounts = null;
 		this.state.persons = null;
+		this.state.transactions = null;
 
 		await view.submit();
 

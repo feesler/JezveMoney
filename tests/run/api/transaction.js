@@ -65,7 +65,7 @@ let runTransactionAPI =
 
 		await test('Create ' + this.getTransactionTypeStr(params.transtype) + ' transaction', async () =>
 		{
-			let trBefore = await api.transaction.list();
+			let trBefore = await this.state.getTransactionsList();
 			if (!Array.isArray(trBefore))
 				return false;
 
@@ -74,8 +74,10 @@ let runTransactionAPI =
 			expTrans.pos = 0;
 
 			// Prepare expected updates of accounts
-			let accBefore = await api.account.list();
-			let expAccountList = this.state.applyTransaction(accBefore, expTrans);
+			let accBefore = await this.state.getAccountsList();
+
+			this.state.accounts = null;
+			this.state.transactions = null;
 
 			// Send API sequest to server
 			let createRes = await api.transaction.create(params);
@@ -84,12 +86,15 @@ let runTransactionAPI =
 
 			expTrans.id = transaction_id = createRes.id;
 
+			// Prepare expected updates of accounts
+			let expAccountList = this.state.applyTransaction(accBefore, expTrans);
+
 			// Prepare expected updates of transactions
 			let expTransList = new TransactionsList(this, trBefore);
 			expTransList.create(expTrans);
 
-			let trList = await api.transaction.list();
-			let accList = await api.account.list();
+			let trList = await this.state.getTransactionsList();
+			let accList = await this.state.getAccountsList();
 			let transObj = trList.find(item => item.id == transaction_id);
 
 			let res = this.checkObjValue(transObj, expTrans) &&
@@ -136,8 +141,7 @@ let runTransactionAPI =
 		let scope = this.run.api.transaction;
 		let updateRes;
 
-		let accBefore = await api.account.list();
-		let trBefore = await api.transaction.list();
+		let trBefore = await this.state.getTransactionsList();
 		let origTrans = trBefore.find(item => item.id == params.id);
 
 		let updParams = this.copyObject(origTrans);
@@ -145,7 +149,7 @@ let runTransactionAPI =
 		updParams.transtype = updParams.type;
 		delete updParams.type;
 
-		let fullAccList = await api.account.list(true);
+		let fullAccList = await this.state.getAccountsList();
 
 		let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
 		let destAcc = fullAccList.find(item => item.id == updParams.dest_id);
@@ -208,22 +212,25 @@ let runTransactionAPI =
 			let expTrans = await scope.getExpectedTransaction(updParams);
 			expTrans.pos = origTrans.pos;
 
-			// Prepare expected updates of accounts
-			let accCanceled = this.state.cancelTransaction(accBefore, origTrans);
-			let expAccountList = this.state.applyTransaction(accCanceled, expTrans);
+			this.state.accounts = null;
+			this.state.transactions = null;
 
 			// Send API sequest to server
 			updateRes = await api.transaction.update(updParams);
 			if (!updateRes)
 				return false;
 
+			// Prepare expected updates of accounts
+			let accCanceled = this.state.cancelTransaction(fullAccList, origTrans);
+			let expAccountList = this.state.applyTransaction(accCanceled, expTrans);
+
 			// Prepare expected updates of transactions
 			let expTransList = new TransactionsList(this, trBefore);
 
 			expTransList.update(expTrans.id, expTrans);
 
-			let trList = await api.transaction.list();
-			let accList = await api.account.list();
+			let trList = await this.state.getTransactionsList();
+			let accList = await this.state.getAccountsList();
 			let transObj = trList.find(item => item.id == updParams.id);
 
 			let res = this.checkObjValue(transObj, expTrans) &&
@@ -250,8 +257,8 @@ let runTransactionAPI =
 			if (!Array.isArray(ids))
 				ids = [ ids ];
 
-			let trBefore = await api.transaction.list();
-			let accBefore = await api.account.list();
+			let trBefore = await this.state.getTransactionsList();
+			let accBefore = await this.state.getAccountsList();
 			if (!Array.isArray(trBefore))
 				return false;
 
@@ -267,13 +274,16 @@ let runTransactionAPI =
 				expAccList = this.state.cancelTransaction(expAccList, trBefore.find(item => item.id == tr_id));
 			}
 
+			this.state.accounts = null;
+			this.state.transactions = null;
+
 			// Send API sequest to server
 			deleteRes = await api.transaction.del(ids);
 			if (!deleteRes)
 				throw new Error('Fail to delete account(s)');
 
-			let accList = await api.account.list();
-			let trList = await api.transaction.list();
+			let accList = await this.state.getAccountsList();
+			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(accList, expAccList) &&
 						this.checkObjValue(trList, expTransList);
@@ -293,7 +303,7 @@ let runTransactionAPI =
 
 		await test('Filter transactions', async () =>
 		{
-			let trBefore = await api.transaction.list();
+			let trBefore = await this.state.getTransactionsList();
 			let trListBefore = new TransactionsList(this, trBefore);
 			let expTransList = trListBefore.filter(params);
 

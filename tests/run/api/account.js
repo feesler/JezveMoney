@@ -17,7 +17,7 @@ let runAccountAPI =
 
 		await test('Create account', async () =>
 		{
-			let accBefore = await api.account.list();
+			let accBefore = await this.state.getAccountsList();
 			if (!Array.isArray(accBefore))
 				return false;
 
@@ -25,13 +25,15 @@ let runAccountAPI =
 			expAccObj.curr_id = params.currency;
 			delete expAccObj.currency;
 
+			this.state.accounts = null;
+
 			let createRes = await api.account.create(params);
 			if (!createRes || !createRes.id)
 				return false;
 
 			acc_id = createRes.id;
 
-			let accList = await api.account.list();
+			let accList = await this.state.getAccountsList();
 			if (!Array.isArray(accList))
 				return false;
 
@@ -68,9 +70,9 @@ let runAccountAPI =
 
 		await test('Update account', async () =>
 		{
-			let trBefore = await api.transaction.list();
+			let trBefore = await this.state.getTransactionsList();
 
-			let accBefore = await api.account.list();
+			let accBefore = await this.state.getAccountsList();
 			if (!Array.isArray(accBefore))
 				return false;
 			let origAcc = accBefore.find(item => item.id == updParams.id);
@@ -101,13 +103,16 @@ let runAccountAPI =
 			// Prepare expected updates of transactions list
 			let expTransList = this.state.updateAccount(trBefore, accBefore, expAccObj);
 
+			this.state.accounts = null;
+			this.state.transactions = null;
+
 			// Send API sequest to server
 			updateRes = await api.account.update(id, updParams);
 			if (!updateRes)
 				throw new Error('Fail to update account');
 
-			let accList = await api.account.list();
-			let trList = await api.transaction.list();
+			let accList = await this.state.getAccountsList();
+			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(accList, expAccList) &&
 						this.checkObjValue(trList, expTransList);
@@ -131,7 +136,7 @@ let runAccountAPI =
 			if (!Array.isArray(ids))
 				ids = [ ids ];
 
-			let accBefore = await api.account.list();
+			let accBefore = await this.state.getAccountsList();
 			if (!Array.isArray(accBefore))
 				return false;
 
@@ -145,16 +150,19 @@ let runAccountAPI =
 			}
 
 			// Prepare expected updates of transactions
-			let trBefore = await api.transaction.list();
+			let trBefore = await this.state.getTransactionsList();
 			let expTransList = this.state.deleteAccounts(trBefore, accBefore, ids);
+
+			this.state.accounts = null;
+			this.state.transactions = null;
 
 			// Send API sequest to server
 			deleteRes = await api.account.del(ids);
 			if (!deleteRes)
 				throw new Error('Fail to delete account(s)');
 
-			let accList = await api.account.list();
-			let trList = await api.transaction.list();
+			let accList = await this.state.getAccountsList();
+			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(accList, expAccList) &&
 						this.checkObjValue(trList, expTransList);

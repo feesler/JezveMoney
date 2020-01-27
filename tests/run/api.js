@@ -32,7 +32,7 @@ let runAPI =
 		await test('Reset accounts', () => api.account.reset(), env);
 
 		await test('Accounts list', async () => {
-			let accList = await api.account.list();
+			let accList = await this.state.getAccountsList();
 
 			return Array.isArray(accList) && accList.length == 0;
 		}, env);
@@ -49,7 +49,7 @@ let runAPI =
 		env.setBlock('Persons', 2);
 
 		await test('Persons list', async () => {
-			let pList = await api.person.list();
+			let pList = await this.state.getPersonsList();
 
 			return Array.isArray(pList);
 		}, env);
@@ -66,7 +66,7 @@ let runAPI =
 		env.setBlock('Transactions', 2);
 
 		await test('Transactions list', async () => {
-			let trList = await api.transaction.list();
+			let trList = await this.state.getTransactionsList();
 
 			return Array.isArray(trList) && trList.length == 0;
 		}, env);

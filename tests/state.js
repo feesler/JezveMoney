@@ -91,7 +91,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.accounts))
-			this.accounts = await api.account.list(true);
+			this.accounts = await this.getAccountsList();
 
 		let accObj = this.accounts.find(item => item.id == id);
 
@@ -166,7 +166,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.persons))
-			this.persons = await api.person.list();
+			this.persons = await this.getPersonsList();
 
 		let personObj = this.persons.find(item => item.id == id);
 
@@ -181,7 +181,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.persons))
-			this.persons = await api.person.list();
+			this.persons = await this.getPersonsList();
 
 		if (pos < 0 || pos >= this.persons.length)
 			return null;
@@ -200,7 +200,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.accounts))
-			this.accounts = await api.account.list(true);
+			this.accounts = await this.getAccountsList();
 
 		let accObj = this.accounts.find(item => item.owner_id == p_id &&
 												item.curr_id == curr_id);
@@ -226,6 +226,14 @@ class AppState
 /**
  * Transactions
  */
+	async getTransactionsList()
+	{
+		if (!Array.isArray(this.transactions))
+			this.transactions = await api.transaction.list();
+
+		return this.transactions;
+	}
+
 
 	// Apply transaction to accounts
 	applyTransaction(accList, transObj)

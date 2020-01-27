@@ -62,7 +62,7 @@ let runTransList =
 	{
 		let res = [];
 
-		let accountsBefore = await api.account.list();
+		let accountsBefore = await this.state.getAccountsList();
 		for(let params of list)
 		{
 			let acc = accountsBefore.find(item => item.name == params.name);
@@ -83,7 +83,7 @@ let runTransList =
 	{
 		let res = [];
 
-		let personsBefore = await api.person.list();
+		let personsBefore = await this.state.getPersonsList();
 		for(let params of list)
 		{
 			let pers = personsBefore.find(item => item.name == params.name);
@@ -190,7 +190,7 @@ let runTransList =
 
 		env.setBlock('Transaction List view', 1);
 
-		let transBefore = await api.transaction.list();
+		let transBefore = await this.state.getTransactionsList();
 		let expensesBefore = transBefore.filter(item => item.type == this.EXPENSE);
 		let incomesBefore = transBefore.filter(item => item.type == this.INCOME);
 		let transfersBefore = transBefore.filter(item => item.type == this.TRANSFER);

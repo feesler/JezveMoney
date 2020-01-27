@@ -17,11 +17,13 @@ let runPersonAPI =
 
 		await test('Create person', async () =>
 		{
-			let pBefore = await api.person.list();
+			let pBefore = await this.state.getPersonsList();
 			if (!Array.isArray(pBefore))
 				return false;
 
 			let expPersonObj = this.copyObject(params);
+
+			this.state.persons = null;
 
 			let createRes = await api.person.create(params);
 			if (!createRes || !createRes.id)
@@ -29,7 +31,7 @@ let runPersonAPI =
 
 			person_id = createRes.id;
 
-			let pList = await api.person.list();
+			let pList = await this.state.getPersonsList();
 			if (!Array.isArray(pList))
 				return false;
 
@@ -58,7 +60,7 @@ let runPersonAPI =
 
 		await test('Update person', async () =>
 		{
-			let pBefore = await api.person.list();
+			let pBefore = await this.state.getPersonsList();
 			if (!Array.isArray(pBefore))
 				return false;
 
@@ -66,6 +68,8 @@ let runPersonAPI =
 
 			let expPersonObj = this.copyObject(origPerson);
 			this.setParam(expPersonObj, params);
+
+			this.state.persons = null;
 
 			let updateRes = await api.person.update(id, params);
 			if (!updateRes)
@@ -76,7 +80,7 @@ let runPersonAPI =
 			if (pIndex !== -1)
 				expPersonList.splice(pIndex, 1, expPersonObj);
 
-			let pList = await api.person.list();
+			let pList = await this.state.getPersonsList();
 			if (!Array.isArray(pList))
 				return false;
 
@@ -105,10 +109,10 @@ let runPersonAPI =
 			if (!Array.isArray(ids))
 				ids = [ ids ];
 
-			let accList = await api.account.list();
+			let accList = await this.state.getAccountsList();
 			if (!Array.isArray(accList))
 				return false;
-			let pBefore = await api.person.list();
+			let pBefore = await this.state.getPersonsList();
 			if (!Array.isArray(pBefore))
 				return false;
 
@@ -132,16 +136,20 @@ let runPersonAPI =
 			}
 
 			// Prepare expected updates of transactions
-			let trBefore = await api.transaction.list();
+			let trBefore = await this.state.getTransactionsList();
 			let expTransList = this.state.deleteAccounts(trBefore, accList, accRemoveList);
+
+			this.state.accounts = null;
+			this.state.persons = null;
+			this.state.transactions = null;
 
 			// Send API sequest to server
 			deleteRes = await api.person.del(ids);
 			if (!deleteRes)
 				throw new Error('Fail to delete person(s)');
 
-			let pList = await api.person.list();
-			let trList = await api.transaction.list();
+			let pList = await this.state.getPersonsList();
+			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(pList, expPersonList) &&
 						this.checkObjValue(trList, expTransList);

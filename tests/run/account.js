@@ -79,6 +79,7 @@ let runAccounts =
 			await test('Tile icon update', () => view.changeIcon(params.icon), view);
 
 		this.state.accounts = null;
+		this.state.transactions = null;
 
 		let expected = this.view.getExpectedAccount();
 
@@ -148,8 +149,8 @@ let runAccounts =
 		await this.view.goToUpdateAccount(pos);
 
 		// Check initial state
-		let accBefore = await api.account.list();
-		let trBefore = await api.transaction.list();
+		let accBefore = await this.state.getAccountsList();
+		let trBefore = await this.state.getTransactionsList();
 		let expectedList = await this.state.getUserAccountsList();
 		let expAccount = await this.state.getAccountByPos(pos);
 		if (!expAccount)
@@ -188,10 +189,11 @@ let runAccounts =
 
 		// Check initial state
 		let accBefore = await this.state.getUserAccountsList();
-		let trBefore = await api.transaction.list();
+		let trBefore = await this.state.getTransactionsList();
 		let ids = this.state.positionsToIds(accBefore, accounts);
 
 		this.state.accounts = null;
+		this.state.transactions = null;
 
 		await this.view.deleteAccounts(accounts);
 

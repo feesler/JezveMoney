@@ -73,7 +73,7 @@ let runTransactionsCommon =
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
-		let trBefore = await api.transaction.list();
+		let trBefore = await this.state.getTransactionsList();
 		let expTransList = new TransactionsList(this, trBefore);
 
 		// Navigate to create transaction page
@@ -122,7 +122,7 @@ let runTransactionsCommon =
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
-		let trBefore = await api.transaction.list();
+		let trBefore = await this.state.getTransactionsList();
 		let expTransList = new TransactionsList(this, trBefore);
 
 		await this.goToMainView();
@@ -165,7 +165,7 @@ let runTransactionsCommon =
 		// Save accounts and persons before delete transactions
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
-		let trBefore = await api.transaction.list();
+		let trBefore = await this.state.getTransactionsList();
 		let expTransList = new TransactionsList(this, trBefore);
 
 		// Navigate to transactions view and filter by specified type of transaction
@@ -176,6 +176,7 @@ let runTransactionsCommon =
 
 		this.state.accounts = null;
 		this.state.persons = null;
+		this.state.transactions = null;
 
 		await this.goToMainView();
 
