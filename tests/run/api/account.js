@@ -141,13 +141,7 @@ let runAccountAPI =
 				return false;
 
 			// Prepare expected updates of accounts list
-			let expAccList = this.copyObject(accBefore);
-			for(let acc_id of ids)
-			{
-				let accIndex = expAccList.findIndex(item => item.id == acc_id);
-				if (accIndex !== -1)
-					expAccList.splice(accIndex, 1);
-			}
+			let expAccList = this.state.deleteByIds(accBefore, ids);
 
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();

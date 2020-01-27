@@ -194,12 +194,7 @@ let runTransactionsCommon =
 
 		// Prepare expected transaction list
 		let removedTrans = expTransList.del(type, transactions);
-
-		for(let tr of removedTrans)
-		{
-			let afterDelete = this.state.deleteTransaction(accList, tr);
-			accList = afterDelete;
-		}
+		accList = this.state.deleteTransactions(accList, removedTrans);
 
 		let expectedState = await this.state.render(accList, pList, expTransList.list);
 

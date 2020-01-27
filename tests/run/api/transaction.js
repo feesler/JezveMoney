@@ -119,7 +119,7 @@ let runTransactionAPI =
 			expTrans = updState.transaction;
 			accBefore = updState.accounts;
 
-			let expAccountList = this.state.applyTransaction(accBefore, expTrans);
+			let expAccountList = this.state.createTransaction(accBefore, expTrans);
 
 			// Prepare expected updates of transactions
 			let expTransList = new TransactionsList(this, trBefore);
@@ -257,8 +257,7 @@ let runTransactionAPI =
 			expTrans = updState.transaction;
 			fullAccList = updState.accounts;
 
-			let accCanceled = this.state.cancelTransaction(fullAccList, origTrans);
-			let expAccountList = this.state.applyTransaction(accCanceled, expTrans);
+			let expAccountList = this.state.updateTransaction(fullAccList, origTrans, expTrans);
 
 			// Prepare expected updates of transactions
 			let expTransList = new TransactionsList(this, trBefore);
@@ -300,15 +299,8 @@ let runTransactionAPI =
 
 			// Prepare expected updates of transactions list
 			let expTransList = this.copyObject(trBefore);
-			let expAccList = this.copyObject(accBefore);
-			for(let tr_id of ids)
-			{
-				let trIndex = expTransList.findIndex(item => item.id == tr_id);
-				if (trIndex !== -1)
-					expTransList.splice(trIndex, 1);
-
-				expAccList = this.state.cancelTransaction(expAccList, trBefore.find(item => item.id == tr_id));
-			}
+			let expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.find(item => item.id == id)));
+			expTransList = this.state.deleteByIds(expTransList, ids);
 
 			this.state.accounts = null;
 			this.state.transactions = null;

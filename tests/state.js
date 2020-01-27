@@ -282,9 +282,17 @@ class AppState
 	}
 
 
-	deleteTransaction(accList, transObj)
+	deleteTransactions(accList, transactions)
 	{
-		return this.cancelTransaction(accList, transObj);
+		let transList = Array.isArray(transactions) ? transactions : [ transactions ];
+		let res = accList;
+
+		for(let transObj of transList)
+		{
+			res = this.cancelTransaction(res, transObj);
+		}
+
+		return res;
 	}
 
 
