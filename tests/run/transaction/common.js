@@ -45,21 +45,33 @@ let runTransactionsCommon =
 
 	// Check transactions data from API is the same as show on the transactions list page
 	// Return instance of TransactionsList with current data
-	async checkData(descr, transList)
+	async checkData(descr, expTransList, iterateView = false)
 	{
 		let env = this.environment;
 		let test = this.test;
 		let scope = this.run.transactions;
+		let transList, expected;
 
 		// Save all transactions
+		if (iterateView)
+		{
 		if (!(this.view instanceof MainView))
 			await this.goToMainView();
 		await this.view.goToTransactions();
-		let transListBefore = await scope.iteratePages();
+			let transListPages = await scope.iteratePages();
+			transList = transListPages.items;
 
-		let expListItems = await this.state.renderTransactionsList(transList.list);
+			let expListItems = await this.state.renderTransactionsList(expTransList.list);
 
-		await test(descr, () => this.checkObjValue(transListBefore.items, expListItems), env);
+			await test(descr, () => this.checkObjValue(transListPages.items, expListItems), env);
+		}
+		else
+		{
+			transList = await this.state.getTransactionsList();
+			expected = expTransList.list;
+		}
+
+		await test(descr, () => this.checkObjValue(transList, expTransList.list), env);
 	},
 
 
