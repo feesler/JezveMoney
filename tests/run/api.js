@@ -31,12 +31,6 @@ let runAPI =
 
 		await test('Reset accounts', () => api.account.reset(), env);
 
-		await test('Accounts list', async () => {
-			let accList = await this.state.getAccountsList();
-
-			return Array.isArray(accList) && accList.length == 0;
-		}, env);
-
 		const RUB = 1;
 		const USD = 2;
 		const EUR = 3;
@@ -48,12 +42,6 @@ let runAPI =
 
 		env.setBlock('Persons', 2);
 
-		await test('Persons list', async () => {
-			let pList = await this.state.getPersonsList();
-
-			return Array.isArray(pList);
-		}, env);
-
 		let PERSON_X = await person.createTest({ name : 'Person X' });
 		let PERSON_Y = await person.createTest({ name : 'Y' });
 
@@ -64,12 +52,6 @@ let runAPI =
 		let yesterday = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
 
 		env.setBlock('Transactions', 2);
-
-		await test('Transactions list', async () => {
-			let trList = await this.state.getTransactionsList();
-
-			return Array.isArray(trList) && trList.length == 0;
-		}, env);
 
 
 		/**
@@ -207,13 +189,6 @@ let runAPI =
 		  * Delete transaction
 		  */
 		await transaction.deleteTest([ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ]);
-
-
-		await test('Result transactions list', async () => {
-			let trList = await api.transaction.list();
-
-			return Array.isArray(trList) && trList.length == 2;
-		}, env);
 	}
 
 };
