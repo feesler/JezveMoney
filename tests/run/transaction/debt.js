@@ -68,7 +68,7 @@ let runDebt =
 
 		let res = view.getExpectedTransaction();
 
-		res.debt = {
+		let debt = {
 			person_id : view.model.person.id,
 			type : view.model.debtType
 		};
@@ -78,6 +78,23 @@ let runDebt =
 		this.state.transactions = null;
 
 		await view.submit();
+
+		// Obtain newly created account of person
+		if ((debt.type && !res.src_id) ||
+			(!debt.type && !res.dest_id))
+		{
+			let accList = await this.state.getAccountsList();
+			let pcurr_id = debt.type ? res.src_curr : res.dest_curr;
+
+			let personAccount = await this.state.getPersonAccount(debt.person_id, pcurr_id);
+			if (!personAccount)
+				throw new Error('Person account not found');
+
+			if (debt.type)
+				res.src_id = personAccount.id;
+			else
+				res.dest_id = personAccount.id;
+		}
 
 		return res;
 	},
@@ -90,25 +107,6 @@ let runDebt =
 		await scope.create(this.DEBT, params, async (params) =>
 		{
 			let expectedTransaction = await scope.debt.submit(params);
-
-			// Obtain newly created account of person
-			if ((expectedTransaction.debt.type && !expectedTransaction.src_id) ||
-				(!expectedTransaction.debt.type && !expectedTransaction.dest_id))
-			{
-				let accList = await this.state.getAccountsList();
-				let pcurr_id = expectedTransaction.debt.type ? expectedTransaction.src_curr : expectedTransaction.dest_curr;
-
-				let personAccount = await this.state.getPersonAccount(expectedTransaction.debt.person_id, pcurr_id);
-				if (!personAccount)
-					throw new Error('Person account not found');
-
-				if (expectedTransaction.debt.type)
-					expectedTransaction.src_id = personAccount.id;
-				else
-					expectedTransaction.dest_id = personAccount.id;
-			}
-
-			delete expectedTransaction.debt;
 
 			return expectedTransaction;
 		});
@@ -131,25 +129,6 @@ let runDebt =
 			await test('Initial state of update debt view', () => this.view.setExpectedState(expState), this.view);
 
 			let expectedTransaction = await scope.debt.submit(params);
-
-			// Obtain newly created account of person
-			if ((expectedTransaction.debt.type && !expectedTransaction.src_id) ||
-				(!expectedTransaction.debt.type && !expectedTransaction.dest_id))
-			{
-				let accList = await this.state.getAccountsList();
-				let pcurr_id = expectedTransaction.debt.type ? expectedTransaction.src_curr : expectedTransaction.dest_curr;
-
-				let personAccount = await this.state.getPersonAccount(expectedTransaction.debt.person_id, pcurr_id);
-				if (!personAccount)
-					throw new Error('Person account not found');
-
-				if (expectedTransaction.debt.type)
-					expectedTransaction.src_id = personAccount.id;
-				else
-					expectedTransaction.dest_id = personAccount.id;
-			}
-
-			delete expectedTransaction.debt;
 
 			return expectedTransaction;
 		});

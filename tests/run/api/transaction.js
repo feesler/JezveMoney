@@ -11,15 +11,8 @@ let runTransactionAPI =
 		let isDebt = (res.transtype == this.DEBT);
 		if (isDebt)
 		{
-			let personObj = await api.person.read(res.person_id);
-			if (!personObj)
-				throw new Error('Person not found');
-
-			if (!personObj.accounts)
-				personObj.accounts = [];
-
 			let reqCurr = (res.debtop == 1) ? res.src_curr : res.dest_curr;
-			let personAcc = (personObj.accounts) ? personObj.accounts.find(item => item.curr_id == reqCurr) : null;
+			let personAcc = await this.state.getPersonAccount(res.person_id, reqCurr);
 
 			if (res.debtop == 1)
 			{
@@ -44,6 +37,41 @@ let runTransactionAPI =
 
 		res.comment = res.comm;
 		delete res.comm;
+
+		return res;
+	},
+
+
+	async updateExpectedTransaction(expTrans, accList, params)
+	{
+		let isDebt = (params.transtype == this.DEBT);
+		if (!isDebt)
+			return { transaction : expTrans, accounts : accList };
+
+		let res = {
+			transaction : this.copyObject(expTrans),
+			accounts : this.copyObject(accList)
+		};
+
+		let debtType = params.debtop == 1;
+
+		// Obtain newly created account of person
+		if ((debtType && !res.transaction.src_id) ||
+			(!debtType && !res.transaction.dest_id))
+		{
+			let pcurr_id = debtType ? res.transaction.src_curr : res.transaction.dest_curr;
+
+			let personAccount = await this.state.getPersonAccount(params.person_id, pcurr_id);
+			if (!personAccount)
+				throw new Error('Person account not found');
+
+			if (debtType)
+				res.transaction.src_id = personAccount.id;
+			else
+				res.transaction.dest_id = personAccount.id;
+
+			res.accounts.push(personAccount);
+		}
 
 		return res;
 	},
@@ -87,6 +115,10 @@ let runTransactionAPI =
 			expTrans.id = transaction_id = createRes.id;
 
 			// Prepare expected updates of accounts
+			let updState = await scope.updateExpectedTransaction(expTrans, accBefore, params);
+			expTrans = updState.transaction;
+			accBefore = updState.accounts;
+
 			let expAccountList = this.state.applyTransaction(accBefore, expTrans);
 
 			// Prepare expected updates of transactions
@@ -221,6 +253,10 @@ let runTransactionAPI =
 				return false;
 
 			// Prepare expected updates of accounts
+			let updState = await scope.updateExpectedTransaction(expTrans, fullAccList, updParams);
+			expTrans = updState.transaction;
+			fullAccList = updState.accounts;
+
 			let accCanceled = this.state.cancelTransaction(fullAccList, origTrans);
 			let expAccountList = this.state.applyTransaction(accCanceled, expTrans);
 
