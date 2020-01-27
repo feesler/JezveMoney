@@ -330,7 +330,7 @@ class AppState
 				continue;
 			if (trans.type == this.app.INCOME && destRemoved)
 				continue;
-			if ((trans.type == this.TRANSFER || trans.type == this.DEBT) &&
+			if ((trans.type == this.app.TRANSFER || trans.type == this.app.DEBT) &&
 				srcRemoved && destRemoved)
 				continue;
 			if (trans.type == this.app.DEBT && srcRemoved && trans.dest_id == 0)
