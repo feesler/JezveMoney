@@ -52,7 +52,7 @@ function initControls()
 	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		currDDList = null;
 
-	var finpFunc = function(e){ return onAccBalanceInput(this); };
+	var finpFunc = function(e){ return onAccInitBalanceInput(this); };
 	var fkeyFunc = function(e){ return onFieldKey(e, this); };
 
 	var elem = ge('balance');
@@ -186,13 +186,14 @@ function setSign(obj, curr_id)
 // Update account tile with the current values
 function updateAccountTile()
 {
-	var formatBalance, icon, iconType;
+	var formatBalance, bal, icon, iconType;
 
 	icon = ge('icon');
 	if (!icon)
 		return;
 
-	formatBalance = formatCurrency(acc_balance, acc_currency);
+	bal = acc_balance + new_init_balance - acc_init_balance;
+	formatBalance = formatCurrency(bal, acc_currency);
 	iconType = parseInt(selectedValue(icon));
 
 	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
@@ -212,12 +213,12 @@ function onAccNameInput(obj)
 
 
 // Account initial balance input event handler
-function onAccBalanceInput(obj)
+function onAccInitBalanceInput(obj)
 {
 	if (!obj)
 		return;
 
-	acc_balance = normalize(obj.value);
+	new_init_balance = normalize(obj.value);
 
 	updateAccountTile();
 }

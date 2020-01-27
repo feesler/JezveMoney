@@ -26,8 +26,14 @@ class AccountView extends TestView
 		res.nameTyped = this.nameTyped;
 
 		// Iniital balance
-		res.balance = cont.balance.value;
-		res.fBalance = this.app.isValidValue(res.balance) ? this.app.normalize(res.balance) : res.balance;
+		res.initbalance = cont.balance.value;
+		res.fInitBalance = this.app.isValidValue(res.initbalance) ? this.app.normalize(res.initbalance) : res.initbalance;
+
+		let origBalance = (res.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
+		let origInitBalance = (res.isUpdate && this.origAccount) ? this.origAccount.initbalance : 0;
+
+		res.balance = origBalance + res.fInitBalance - origInitBalance;
+		res.fBalance = res.balance;
 
 		// Currency
 		let selectedCurr = cont.currDropDown.textValue;
@@ -48,7 +54,12 @@ class AccountView extends TestView
 
 	setExpectedAccount(account)
 	{
+		this.origAccount = this.app.copyObject(account);
+
 		this.model.name = account.name.toString();
+
+		this.model.initbalance = account.initbalance.toString();
+		this.model.fInitBalance = this.app.normalize(account.initbalance);
 
 		this.model.balance = account.balance.toString();
 		this.model.fBalance = account.balance;
@@ -67,13 +78,18 @@ class AccountView extends TestView
 	{
 		let res = {
 			name : this.model.name,
-			balance : this.model.fBalance,
+			initbalance : this.model.initbalance,
 			curr_id : this.model.curr_id,
 			icon : this.model.icon
 		};
 
 		if (this.model.isUpdate)
 			res.id = this.model.id;
+
+		let origBalance = (this.model.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
+		let origInitBalance = (this.model.isUpdate && this.origAccount) ? this.origAccount.initbalance : 0;
+
+		res.balance = origBalance + this.app.normalize(res.initbalance) - origInitBalance;
 
 		return res;
 	}
@@ -94,6 +110,7 @@ class AccountView extends TestView
 			values : {
 				tile : accTile,
 				name : account.name,
+				balance : account.initbalance.toString(),
 				currDropDown : { textValue : this.model.currObj.name },
 				iconDropDown : { textValue : this.model.tileIcon.title }
 			}
@@ -176,8 +193,8 @@ class AccountView extends TestView
 	{
 		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
 
-		this.model.balance = val;
-		this.model.fBalance = fNewValue;
+		this.model.initbalance = val;
+		this.model.fInitBalance = fNewValue;
 
 		this.setExpectedState();
 

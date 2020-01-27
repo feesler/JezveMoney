@@ -6,7 +6,9 @@
 <?php	}	?>
 	var acc_name = <?=f_json_encode($accInfo->name)?>;
 	var acc_currency = <?=$accInfo->curr?>;
-	var acc_balance = <?=$accInfo->initbalance?>;
+	var acc_balance = <?=$accInfo->balance?>;
+	var acc_init_balance = <?=$accInfo->initbalance?>;
+	var new_init_balance = <?=$accInfo->initbalance?>;
 
 	onReady(initControls);
 </script>

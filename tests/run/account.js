@@ -21,7 +21,7 @@ let runAccounts =
 		await this.view.goToCreateAccount();
 
 	// Check initial state
-		let expAccount = { name : '', balance : '0', curr_id : 1, icon : 0 };
+		let expAccount = { name : '', initbalance : 0, balance : '0', curr_id : 1, icon : 0 };
 		this.view.setExpectedAccount(expAccount);
 		await test('Initial state of account view', () => {}, this.view);
 
@@ -106,7 +106,7 @@ let runAccounts =
 
 	// Check initial state
 		let expectedList = await this.state.getUserAccountsList();
-		let expAccount = { name : '', balance : '0', curr_id : 1, icon : 0 };
+		let expAccount = { name : '', initbalance : '0', balance : 0, curr_id : 1, icon : 0 };
 		this.view.setExpectedAccount(expAccount);
 		await test('Initial state of account view', () => {}, this.view);
 
