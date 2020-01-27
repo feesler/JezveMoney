@@ -68,6 +68,8 @@ let runAccountAPI =
 
 		await test('Update account', async () =>
 		{
+			let trBefore = await api.transaction.list();
+
 			let accBefore = await api.account.list();
 			if (!Array.isArray(accBefore))
 				return false;
@@ -96,16 +98,19 @@ let runAccountAPI =
 			if (accIndex !== -1)
 				expAccList.splice(accIndex, 1, expAccObj);
 
+			// Prepare expected updates of transactions list
+			let expTransList = this.state.updateAccount(trBefore, accBefore, expAccObj);
+
 			// Send API sequest to server
 			updateRes = await api.account.update(id, updParams);
 			if (!updateRes)
 				throw new Error('Fail to update account');
 
 			let accList = await api.account.list();
-			let accObj = accList.find(item => item.id == id);
+			let trList = await api.transaction.list();
 
-			let res = this.checkObjValue(accObj, expAccObj) &&
-						this.checkObjValue(accList, expAccList);
+			let res = this.checkObjValue(accList, expAccList) &&
+						this.checkObjValue(trList, expTransList);
 			return res;
 		}, env);
 

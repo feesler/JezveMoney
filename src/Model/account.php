@@ -228,6 +228,14 @@ class AccountModel extends CachedTable
 	}
 
 
+	protected function postUpdate($item_id)
+	{
+		$transMod = TransactionModel::getInstance();
+
+		return $transMod->onAccountUpdate($item_id);
+	}
+
+
 	// Preparations for item delete
 	protected function preDelete($items)
 	{

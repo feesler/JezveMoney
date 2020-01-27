@@ -173,13 +173,29 @@ class Application
 
 		await this.run.accounts.stateLoop();
 
+		await this.createAccountTests();
+		await this.deleteAccountTests();
+	}
+
+
+	async createAccountTests()
+	{
 		this.view.setBlock('Create accounts', 2);
 		await this.run.accounts.create({ name : 'acc_1', balance : 1000.01, curr_id : 1 });
 		await this.run.accounts.create({ name : 'acc_2', balance : '1000.01', curr_id : 3 });
+	}
 
+
+	async updateAccountTests()
+	{
 		this.view.setBlock('Update accounts', 2);
 		await this.run.accounts.update({ pos : 0, icon : 1, curr_id : 2 });
+		await this.run.accounts.update({ pos : 0, curr_id : 1 });
+	}
 
+
+	async deleteAccountTests()
+	{
 		this.view.setBlock('Delete accounts', 2);
 		await this.run.accounts.del([0, 1]);
 	}
@@ -229,6 +245,9 @@ class Application
 		await this.updateTransactionTests();
 		await this.transactionsListTests();
 		await this.deleteTransactionTests();
+
+		await this.updateAccountTests();
+		await this.deleteAccountTests();
 	}
 
 

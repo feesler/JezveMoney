@@ -287,7 +287,29 @@ class AppState
 		if (!origAcc)
 			throw new Error('Specified account not found in the original list');
 
+		if (origAcc.curr_id == account.curr_id)
 		return trList;
+
+		let res = [];
+		for(let trans of trList)
+		{
+			let convTrans = this.app.copyObject(trans);
+
+			if (convTrans.src_id == account.id)
+			{
+				convTrans.src_curr = account.curr_id;
+				convTrans.src_amount = convTrans.dest_amount;
+			}
+			if (convTrans.dest_id == account.id)
+			{
+				convTrans.dest_curr = account.curr_id;
+				convTrans.dest_amount = convTrans.src_amount;
+			}
+
+			res.push(convTrans);
+		}
+
+		return res;
 	}
 
 

@@ -675,6 +675,44 @@ class TransactionModel extends CachedTable
 	}
 
 
+	public function onAccountUpdate($acc_id)
+	{
+		$accObj = $this->accModel->getItem($acc_id);
+		if (!$accObj)
+			return FALSE;
+
+		$new_curr = $accObj->curr_id;
+		$curDate = date("Y-m-d H:i:s");
+		$userCond = "user_id=".self::$user_id;
+
+		// Update destination transactions
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "src_curr" => $new_curr, "updatedate" => $curDate ],
+									[ $userCond, "src_id=".qnull($acc_id) ]))
+			return FALSE;
+
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									"src_amount=dest_amount",
+									[ $userCond, "src_id=".qnull($acc_id), "dest_curr=".qnull($new_curr) ]))
+			return FALSE;
+
+		// Update destination transactions
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									[ "dest_curr" => $new_curr, "updatedate" => $curDate ],
+									[ $userCond, "dest_id=".qnull($acc_id) ]))
+			return FALSE;
+
+		if (!$this->dbObj->updateQ($this->tbl_name,
+									"dest_amount=src_amount",
+									[ $userCond, "dest_id=".qnull($acc_id), "src_curr=".qnull($new_curr) ]))
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
 	// Remove specified account from transactions
 	public function onAccountDelete($accounts)
 	{

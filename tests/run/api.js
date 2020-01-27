@@ -184,7 +184,7 @@ let runAPI =
 		/**
 		 * Update accounts
 		 */
-		await account.updateTest(ACC_RUB, { name : 'acc rub', balance : 101, icon : 2 });
+		await account.updateTest(ACC_RUB, { name : 'acc rub', currency : USD, balance : 101, icon : 2 });
 
 
 		/**
