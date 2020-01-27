@@ -25,6 +25,11 @@ let runAccounts =
 		this.view.setExpectedAccount(expAccount);
 		await test('Initial state of account view', () => {}, this.view);
 
+	// Check account name is 'New account' brefore input name
+		await test('Change currency', () => this.view.changeCurrency(3), this.view);
+		await test('Input balance (100 .01)', () => this.view.inputBalance('100.01'), this.view);
+		await test('Change icon', () => this.view.changeIcon(1), this.view);
+
 		await test('Account name input', () => this.view.inputName('acc_1'), this.view);
 
 	// Change currency to USD

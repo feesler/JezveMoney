@@ -1,3 +1,4 @@
+var accNameChanged = false;
 var accounts = new Selection();
 var dwPopup = null;		// delete warning popup
 
@@ -186,7 +187,7 @@ function setSign(obj, curr_id)
 // Update account tile with the current values
 function updateAccountTile()
 {
-	var formatBalance, bal, icon, iconType;
+	var formatBalance, bal, name, icon, iconType;
 
 	icon = ge('icon');
 	if (!icon)
@@ -196,7 +197,12 @@ function updateAccountTile()
 	formatBalance = formatCurrency(bal, acc_currency);
 	iconType = parseInt(selectedValue(icon));
 
-	setTileInfo('acc_tile', acc_name, formatBalance, iconType);
+	if (typeof account_id === 'undefined' && !accNameChanged)
+		name = 'New account';
+	else
+		name = acc_name;
+
+	setTileInfo('acc_tile', name, formatBalance, iconType);
 }
 
 
@@ -206,6 +212,7 @@ function onAccNameInput(obj)
 	if (!obj)
 		return;
 
+	accNameChanged = true;
 	acc_name = obj.value;
 
 	updateAccountTile();
