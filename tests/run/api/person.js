@@ -117,23 +117,10 @@ let runPersonAPI =
 				return false;
 
 			// Prepare expected updates of accounts list
-			let expPersonList = this.copyObject(pBefore);
-			let accRemoveList = [];
-			for(let person_id of ids)
-			{
-				let pIndex = expPersonList.findIndex(item => item.id == person_id);
-				if (pIndex !== -1)
-				{
-					if (Array.isArray(expPersonList[pIndex].accounts))
-					{
-						for(let personAcc of expPersonList[pIndex].accounts)
-						{
-							accRemoveList.push(personAcc.id);
-						}
-					}
-					expPersonList.splice(pIndex, 1);
-				}
-			}
+			let expPersonList = this.state.deleteByIds(pBefore, ids);
+			let accRemoveList = pBefore.filter(item => Array.isArray(item.accounts) && ids.includes(item.id))
+										.flatMap(item => item.accounts)
+										.map(item => item.id);
 
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();
