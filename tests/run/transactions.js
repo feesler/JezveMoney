@@ -189,16 +189,13 @@ let runTransList =
 
 		env.setBlock('Transaction List view', 1);
 
-		let transBefore = await this.state.getTransactionsList();
-
 		await scope.list.preCreateData();
 
-		let allTransactions = await this.state.getTransactionsList();
+		let allTrList = await this.state.getTransactionsList();
 
 		await this.goToMainView();
 		await this.view.goToTransactions();
 
-		let allTrList = new TransactionsList(this, allTransactions);
 		// Filter all transactions with account acc_2
 		let acc_2_all = allTrList.filterByAccounts(accIds[2]);
 		// Filter debt transactions with account acc_2

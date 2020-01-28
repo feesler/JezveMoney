@@ -163,8 +163,7 @@ let runAccounts =
 		expectedList[pos] = expAccount;
 
 		// Prepare expected updates of transactions list
-		let trAfter = this.state.updateAccount(trBefore, accBefore, expAccount);
-		let expTransList = new TransactionsList(this, trAfter);
+		let expTransList = trBefore.updateAccount(accBefore, expAccount);
 
 		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
 
@@ -200,8 +199,7 @@ let runAccounts =
 		// Prepare expected updates of accounts list
 		let expectedList = this.state.deleteByIds(accBefore, ids);
 		// Prepare expected updates of transactions
-		let trAfter = this.state.deleteAccounts(trBefore, accBefore, ids);
-		let expTransList = new TransactionsList(this, trAfter);
+		let expTransList = trBefore.deleteAccounts(accBefore, ids);
 
 		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
 

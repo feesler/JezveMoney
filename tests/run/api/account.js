@@ -71,7 +71,6 @@ let runAccountAPI =
 		await test('Update account', async () =>
 		{
 			let trBefore = await this.state.getTransactionsList();
-
 			let accBefore = await this.state.getAccountsList();
 			if (!Array.isArray(accBefore))
 				return false;
@@ -101,7 +100,7 @@ let runAccountAPI =
 				expAccList.splice(accIndex, 1, expAccObj);
 
 			// Prepare expected updates of transactions list
-			let expTransList = this.state.updateAccount(trBefore, accBefore, expAccObj);
+			let expTransList = trBefore.updateAccount(accBefore, expAccObj);
 
 			this.state.accounts = null;
 			this.state.transactions = null;
@@ -115,7 +114,7 @@ let runAccountAPI =
 			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(accList, expAccList) &&
-						this.checkObjValue(trList, expTransList);
+						this.checkObjValue(trList.list, expTransList.list);
 			return res;
 		}, env);
 
@@ -145,7 +144,7 @@ let runAccountAPI =
 
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();
-			let expTransList = this.state.deleteAccounts(trBefore, accBefore, ids);
+			let expTransList = trBefore.deleteAccounts(accBefore, ids);
 
 			this.state.accounts = null;
 			this.state.transactions = null;
@@ -159,7 +158,7 @@ let runAccountAPI =
 			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(accList, expAccList) &&
-						this.checkObjValue(trList, expTransList);
+						this.checkObjValue(trList.list, expTransList.list);
 
 			return res;
 		}, env);
@@ -170,4 +169,3 @@ let runAccountAPI =
 
 
 export { runAccountAPI };
-

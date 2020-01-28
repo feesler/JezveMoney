@@ -155,6 +155,14 @@ class TransactionsList
 	}
 
 
+	deleteItems(ids)
+	{
+		let res = this.app.state.deleteByIds(this.list, ids);
+
+		return new TransactionsList(this.app, res);
+	}
+
+
 	getItemsByType(list, type)
 	{
 		// If type == 0 or no value is specified assume filter is set as ALL
@@ -321,6 +329,129 @@ class TransactionsList
 		const onPage = this.app.config.transactionsOnPage;
 
 		return Math.max(Math.ceil(this.list.length / onPage), 1);
+	}
+
+
+	// Return expected list of transactions after update specified account
+	onUpdateAccount(list, accList, account)
+	{
+		let origAcc = accList.find(item => item.id == account.id);
+		if (!origAcc)
+			throw new Error('Specified account not found in the original list');
+
+		if (origAcc.curr_id == account.curr_id)
+			return list;
+
+		let res = [];
+		for(let trans of list)
+		{
+			let convTrans = this.app.copyObject(trans);
+
+			if (convTrans.src_id == account.id)
+			{
+				convTrans.src_curr = account.curr_id;
+				convTrans.src_amount = convTrans.dest_amount;
+			}
+			if (convTrans.dest_id == account.id)
+			{
+				convTrans.dest_curr = account.curr_id;
+				convTrans.dest_amount = convTrans.src_amount;
+			}
+
+			res.push(convTrans);
+		}
+
+		return res;
+	}
+
+
+	// Return expected list of transactions after update specified account
+	updateAccount(accList, account)
+	{
+		let res = this.onUpdateAccount(this.list, accList, account);
+
+		return new TransactionsList(this.app, res);
+	}
+
+
+	// Return expected list of transactions after delete specified accounts
+	onDeleteAccounts(list, accList, ids)
+	{
+		let res = [];
+
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let trans of list)
+		{
+			let srcRemoved = ids.includes(trans.src_id);
+			let destRemoved = ids.includes(trans.dest_id);
+
+			if (trans.type == this.app.EXPENSE && srcRemoved)
+				continue;
+			if (trans.type == this.app.INCOME && destRemoved)
+				continue;
+			if ((trans.type == this.app.TRANSFER || trans.type == this.app.DEBT) &&
+				srcRemoved && destRemoved)
+				continue;
+			if (trans.type == this.app.DEBT && srcRemoved && trans.dest_id == 0)
+				continue;
+			if (trans.type == this.app.DEBT && destRemoved && trans.src_id == 0)
+				continue;
+
+			let convTrans = this.app.copyObject(trans);
+
+			if (convTrans.type == this.app.TRANSFER)
+			{
+				if (ids.includes(convTrans.src_id))
+				{
+					convTrans.type = this.app.INCOME;
+					convTrans.src_id = 0;
+				}
+				else if (ids.includes(convTrans.dest_id))
+				{
+					convTrans.type = this.app.EXPENSE;
+					convTrans.dest_id = 0;
+				}
+			}
+			else if (convTrans.type == this.app.DEBT)
+			{
+				for(let acc_id of ids)
+				{
+					let acc = accList.find(item => item.id == acc_id);
+
+					if (convTrans.src_id == acc_id)
+					{
+						if (acc.owner_id != this.app.owner_id)
+						{
+							convTrans.type = this.app.INCOME;
+						}
+
+						convTrans.src_id = 0;
+					}
+					else if (convTrans.dest_id == acc_id)
+					{
+						if (acc.owner_id != this.app.owner_id)
+						{
+							convTrans.type = this.app.EXPENSE;
+						}
+						convTrans.dest_id = 0;
+					}
+				}
+			}
+
+			res.push(convTrans);
+		}
+
+		return res;
+	}
+
+
+	deleteAccounts(accList, ids)
+	{
+		let res = this.onDeleteAccounts(this.list, accList, ids);
+
+		return new TransactionsList(this.app, res);
 	}
 }
 

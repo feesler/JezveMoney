@@ -57,9 +57,9 @@ let runTransactionsCommon =
 		{
 			if (!(this.view instanceof TransactionsView))
 			{
-		if (!(this.view instanceof MainView))
-			await this.goToMainView();
-		await this.view.goToTransactions();
+				if (!(this.view instanceof MainView))
+					await this.goToMainView();
+				await this.view.goToTransactions();
 			}
 
 			let transListPages = await scope.iteratePages();
@@ -69,7 +69,7 @@ let runTransactionsCommon =
 		}
 		else
 		{
-			transList = await this.state.getTransactionsList();
+			transList = await this.state.getTransactionsList(true);
 			expected = expTransList.list;
 		}
 
@@ -87,8 +87,7 @@ let runTransactionsCommon =
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
-		let trBefore = await this.state.getTransactionsList();
-		let expTransList = new TransactionsList(this, trBefore);
+		let expTransList = await this.state.getTransactionsList();
 
 		// Navigate to create transaction page
 		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
@@ -136,8 +135,7 @@ let runTransactionsCommon =
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
-		let trBefore = await this.state.getTransactionsList();
-		let expTransList = new TransactionsList(this, trBefore);
+		let expTransList = await this.state.getTransactionsList();
 
 		await this.goToMainView();
 		await this.view.goToTransactions();
@@ -179,8 +177,7 @@ let runTransactionsCommon =
 		// Save accounts and persons before delete transactions
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
-		let trBefore = await this.state.getTransactionsList();
-		let expTransList = new TransactionsList(this, trBefore);
+		let expTransList = await this.state.getTransactionsList();
 
 		// Navigate to transactions view and filter by specified type of transaction
 		await this.view.goToTransactions();

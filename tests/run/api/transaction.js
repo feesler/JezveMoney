@@ -93,9 +93,7 @@ let runTransactionAPI =
 
 		await test('Create ' + this.getTransactionTypeStr(params.transtype) + ' transaction', async () =>
 		{
-			let trBefore = await this.state.getTransactionsList();
-			if (!Array.isArray(trBefore))
-				return false;
+			let expTransList = await this.state.getTransactionsList();
 
 			// Prepare expected transaction object
 			let expTrans = await scope.getExpectedTransaction(params);
@@ -122,15 +120,12 @@ let runTransactionAPI =
 			let expAccountList = this.state.createTransaction(accBefore, expTrans);
 
 			// Prepare expected updates of transactions
-			let expTransList = new TransactionsList(this, trBefore);
 			expTransList.create(expTrans);
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
-			let transObj = trList.find(item => item.id == transaction_id);
 
-			let res = this.checkObjValue(transObj, expTrans) &&
-						this.checkObjValue(trList, expTransList.list) &&
+			let res = this.checkObjValue(trList.list, expTransList.list) &&
 						this.checkObjValue(accList, expAccountList);
 
 			return res;
@@ -173,8 +168,8 @@ let runTransactionAPI =
 		let scope = this.run.api.transaction;
 		let updateRes;
 
-		let trBefore = await this.state.getTransactionsList();
-		let origTrans = trBefore.find(item => item.id == params.id);
+		let expTransList = await this.state.getTransactionsList();
+		let origTrans = expTransList.list.find(item => item.id == params.id);
 
 		let updParams = this.copyObject(origTrans);
 
@@ -260,16 +255,12 @@ let runTransactionAPI =
 			let expAccountList = this.state.updateTransaction(fullAccList, origTrans, expTrans);
 
 			// Prepare expected updates of transactions
-			let expTransList = new TransactionsList(this, trBefore);
-
 			expTransList.update(expTrans.id, expTrans);
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
-			let transObj = trList.find(item => item.id == updParams.id);
 
-			let res = this.checkObjValue(transObj, expTrans) &&
-						this.checkObjValue(trList, expTransList.list) &&
+			let res = this.checkObjValue(trList.list, expTransList.list) &&
 						this.checkObjValue(accList, expAccountList);
 
 			return res;
@@ -294,13 +285,10 @@ let runTransactionAPI =
 
 			let trBefore = await this.state.getTransactionsList();
 			let accBefore = await this.state.getAccountsList();
-			if (!Array.isArray(trBefore))
-				return false;
 
 			// Prepare expected updates of transactions list
-			let expTransList = this.copyObject(trBefore);
-			let expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.find(item => item.id == id)));
-			expTransList = this.state.deleteByIds(expTransList, ids);
+			let expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.list.find(item => item.id == id)));
+			let expTransList = trBefore.deleteItems(ids);
 
 			this.state.accounts = null;
 			this.state.transactions = null;
@@ -314,7 +302,7 @@ let runTransactionAPI =
 			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(accList, expAccList) &&
-						this.checkObjValue(trList, expTransList);
+						this.checkObjValue(trList.list, expTransList.list);
 
 			return res;
 		}, env);
@@ -332,8 +320,7 @@ let runTransactionAPI =
 		await test('Filter transactions', async () =>
 		{
 			let trBefore = await this.state.getTransactionsList();
-			let trListBefore = new TransactionsList(this, trBefore);
-			let expTransList = trListBefore.filter(params);
+			let expTransList = trBefore.filter(params);
 
 			// Prepare request parameters
 			let reqParams = {};
@@ -368,4 +355,3 @@ let runTransactionAPI =
 
 
 export { runTransactionAPI };
-

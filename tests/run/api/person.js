@@ -137,7 +137,7 @@ let runPersonAPI =
 
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();
-			let expTransList = this.state.deleteAccounts(trBefore, accList, accRemoveList);
+			let expTransList = trBefore.deleteAccounts(accList, accRemoveList);
 
 			this.state.accounts = null;
 			this.state.persons = null;
@@ -152,7 +152,7 @@ let runPersonAPI =
 			let trList = await this.state.getTransactionsList();
 
 			let res = this.checkObjValue(pList, expPersonList) &&
-						this.checkObjValue(trList, expTransList);
+						this.checkObjValue(trList.list, expTransList.list);
 
 			return res;
 		}, env);
@@ -163,4 +163,3 @@ let runPersonAPI =
 
 
 export { runPersonAPI };
-
