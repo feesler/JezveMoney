@@ -1,4 +1,4 @@
-import { common } from './common.js';
+import { normalize, formatValue } from './common.js';
 import { api } from './api.js';
 
 
@@ -19,12 +19,12 @@ class Currency
 	// Format specified value using rules of currency
 	format(val)
 	{
-		let nval = common.normalize(val);
+		let nval = normalize(val);
 
 		if (Math.floor(nval) != nval)
 			nval = nval.toFixed(2);
 
-		let fmtVal = common.formatValue(nval);
+		let fmtVal = formatValue(nval);
 
 		if (this.flags)
 			return this.sign + ' ' + fmtVal;

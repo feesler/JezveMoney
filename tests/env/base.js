@@ -1,3 +1,6 @@
+import { isFunction } from '../common.js';
+
+
 class Environment
 {
 	constructor()
@@ -36,7 +39,7 @@ class Environment
 
 		for(let method of this.interface)
 		{
-			if (!this.app.isFunction(this[method]))
+			if (!isFunction(this[method]))
 				throw new Error(`Method ${method} not implemented`);
 
 			target[method] = this[method].bind(this);

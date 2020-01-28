@@ -1,4 +1,5 @@
 import { api } from '../../api.js';
+import { test, copyObject, setParam, checkObjValue } from '../../common.js';
 
 
 let runAccountAPI =
@@ -11,8 +12,6 @@ let runAccountAPI =
 	// And check expected state of app
 	async createTest(params)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let acc_id = 0;
 
 		await test('Create account', async () =>
@@ -21,7 +20,7 @@ let runAccountAPI =
 			if (!Array.isArray(accBefore))
 				return false;
 
-			let expAccObj = this.copyObject(params);
+			let expAccObj = copyObject(params);
 			expAccObj.curr_id = params.currency;
 			delete expAccObj.currency;
 
@@ -45,8 +44,8 @@ let runAccountAPI =
 
 			let accObj = accList.find(item => item.id == acc_id);
 
-			return this.checkObjValue(accObj, expAccObj);
-		}, env);
+			return checkObjValue(accObj, expAccObj);
+		}, this.environment);
 
 		return acc_id;
 	},
@@ -56,8 +55,6 @@ let runAccountAPI =
 	// And check expected state of app
 	async updateTest(id, params)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let updateRes;
 
 		let accList = await api.account.read(id);
@@ -66,7 +63,7 @@ let runAccountAPI =
 		updParams.currency = updParams.curr;
 		delete updParams.curr;
 
-		this.setParam(updParams, params);
+		setParam(updParams, params);
 
 		await test('Update account', async () =>
 		{
@@ -77,7 +74,7 @@ let runAccountAPI =
 			let origAcc = accBefore.find(item => item.id == updParams.id);
 
 			// Prepare expected account object
-			let expAccObj = this.copyObject(updParams);
+			let expAccObj = copyObject(updParams);
 			expAccObj.id = id;
 			expAccObj.owner_id = expAccObj.owner;
 			expAccObj.curr_id = expAccObj.currency;
@@ -110,10 +107,10 @@ let runAccountAPI =
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();
 
-			let res = this.checkObjValue(accList, expAccList) &&
-						this.checkObjValue(trList.list, expTransList.list);
+			let res = checkObjValue(accList, expAccList) &&
+						checkObjValue(trList.list, expTransList.list);
 			return res;
-		}, env);
+		}, this.environment);
 
 		return updateRes;
 	},
@@ -123,8 +120,6 @@ let runAccountAPI =
 	// And check expected state of app
 	async deleteTest(ids)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let deleteRes;
 
 		await test('Delete account', async () =>
@@ -154,11 +149,11 @@ let runAccountAPI =
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();
 
-			let res = this.checkObjValue(accList, expAccList) &&
-						this.checkObjValue(trList.list, expTransList.list);
+			let res = checkObjValue(accList, expAccList) &&
+						checkObjValue(trList.list, expTransList.list);
 
 			return res;
-		}, env);
+		}, this.environment);
 
 		return deleteRes;
 	}

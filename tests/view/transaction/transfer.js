@@ -1,5 +1,7 @@
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../currency.js';
+import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { App } from '../../main.js'
 
 
 // Transfer transaction view class
@@ -14,11 +16,11 @@ class TransferTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.srcAccount = await this.app.state.getAccount(cont.source.id);
+		res.srcAccount = await App.state.getAccount(cont.source.id);
 		if (!res.srcAccount)
 			throw new Error('Source account not found');
 
-		res.destAccount = await this.app.state.getAccount(cont.destination.id);
+		res.destAccount = await App.state.getAccount(cont.destination.id);
 		if (!res.destAccount)
 			throw new Error('Destination account not found');
 
@@ -41,17 +43,17 @@ class TransferTransactionView extends TransactionView
 		res.destAccount.fmtBalance = res.destCurr.format(res.destAccount.balance);
 
 		res.srcAmount = cont.src_amount_row.value;
-		res.fSrcAmount = this.app.isValidValue(res.srcAmount) ? this.app.normalize(res.srcAmount) : res.srcAmount;
+		res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
 		res.destAmount = cont.dest_amount_row.value;
-		res.fDestAmount = this.app.isValidValue(res.destAmount) ? this.app.normalize(res.destAmount) : res.destAmount;
+		res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
 		res.srcResBal = cont.result_balance_row.value;
-		res.fSrcResBal = this.app.isValidValue(res.srcResBal) ? this.app.normalize(res.srcResBal) : res.srcResBal;
+		res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
 		res.fmtSrcResBal = res.srcCurr.format(res.fSrcResBal);
 
 		res.destResBal = cont.result_balance_dest_row.value;
-		res.fDestResBal = this.app.isValidValue(res.destResBal) ? this.app.normalize(res.destResBal) : res.destResBal;
+		res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
 		res.fmtDestResBal = res.destCurr.format(res.fDestResBal);
 
 		res.exchRate = cont.exchange_row.value;
@@ -107,12 +109,12 @@ class TransferTransactionView extends TransactionView
 	{
 		model.srcAmount = val;
 
-		let newValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let newValue = isValidValue(val) ? normalize(val) : val;
 		if (model.fSrcAmount != newValue)
 		{
 			model.fSrcAmount = newValue;
 
-			model.srcResBal = this.app.normalize(model.srcAccount.balance - model.fSrcAmount);
+			model.srcResBal = normalize(model.srcAccount.balance - model.fSrcAmount);
 			model.fmtSrcResBal = model.srcCurr.format(model.srcResBal);
 		}
 
@@ -126,12 +128,12 @@ class TransferTransactionView extends TransactionView
 	{
 		model.destAmount = val;
 
-		let newValue = this.app.isValidValue(model.destAmount) ? this.app.normalize(model.destAmount) : model.destAmount;
+		let newValue = isValidValue(model.destAmount) ? normalize(model.destAmount) : model.destAmount;
 		if (model.fDestAmount != newValue)
 		{
 			model.fDestAmount = newValue;
 
-			model.destResBal = this.app.normalize(model.destAccount.balance + model.fDestAmount);
+			model.destResBal = normalize(model.destAccount.balance + model.fDestAmount);
 			model.fmtDestResBal = model.destCurr.format(model.destResBal);
 		}
 
@@ -163,18 +165,18 @@ class TransferTransactionView extends TransactionView
 
 		if (newState === 0 || newState === 1 || newState === 2)
 		{
-			this.app.setParam(res.values, { src_amount_row : { label : 'Amount' },
+			setParam(res.values, { src_amount_row : { label : 'Amount' },
 									dest_amount_row : { label : 'Amount' } });
 		}
 		else
 		{
-			this.app.setParam(res.values, { src_amount_row : { label : 'Source amount' },
+			setParam(res.values, { src_amount_row : { label : 'Source amount' },
 									dest_amount_row : { label : 'Destination amount' } });
 		}
 
 		if (newState === 0)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false,
+			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false,
 											src_res_balance_left : true, dest_res_balance_left : true,
 											exch_left : false,
 											src_amount_row : true, dest_amount_row : false,
@@ -183,7 +185,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 1)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
+			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
 											src_res_balance_left : false, dest_res_balance_left : true,
 											exch_left : false,
 											src_amount_row : false, dest_amount_row : false,
@@ -192,7 +194,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 2)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
+			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
 											src_res_balance_left : true, dest_res_balance_left : false,
 											exch_left : false,
 											src_amount_row : false, dest_amount_row : false,
@@ -201,7 +203,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 3)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false,
+			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false,
 											src_res_balance_left : true, dest_res_balance_left : true,
 											exch_left : true,
 											src_amount_row : true, dest_amount_row : true,
@@ -210,7 +212,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 4)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
+			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
 											src_res_balance_left : false, dest_res_balance_left : true,
 											exch_left : true,
 											src_amount_row : false, dest_amount_row : true,
@@ -219,7 +221,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 5)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true,
+			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true,
 											src_res_balance_left : true, dest_res_balance_left : false,
 											exch_left : true,
 											src_amount_row : true, dest_amount_row : false,
@@ -228,7 +230,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 6)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : true, dest_amount_left : true,
+			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : true,
 											src_res_balance_left : false, dest_res_balance_left : false,
 											exch_left : true,
 											src_amount_row : false, dest_amount_row : false,
@@ -237,7 +239,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 7)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true,
+			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true,
 											src_res_balance_left : true, dest_res_balance_left : true,
 											exch_left : false,
 											src_amount_row : true, dest_amount_row : false,
@@ -246,7 +248,7 @@ class TransferTransactionView extends TransactionView
 		}
 		else if (newState === 8)
 		{
-			this.app.setParam(res, { visibility : { src_amount_left : true, dest_amount_left : true,
+			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : true,
 											src_res_balance_left : false, dest_res_balance_left : true,
 											exch_left : false,
 											src_amount_row : false, dest_amount_row : false,
@@ -265,7 +267,7 @@ class TransferTransactionView extends TransactionView
 		if (this.model.state !== 0 && this.model.state !== 3 && this.model.state !== 5 && this.model.state !== 7)
 			throw new Error('Unexpected state ' + this.model.state + ' to input source amount');
 
-		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
+		let fNewValue = (isValidValue(val)) ? normalize(val) : val;
 		let valueChanged = (this.model.fSrcAmount != fNewValue);
 
 		this.setSrcAmount(this.model, val);
@@ -294,7 +296,7 @@ class TransferTransactionView extends TransactionView
 		if (this.model.state !== 3 && this.model.state !== 4)
 			throw new Error('Unexpected state ' + this.model.state + ' to input destination amount');
 
-		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalize(val) : val;
+		let fNewValue = (isValidValue(val)) ? normalize(val) : val;
 		let valueChanged = (this.model.fDestAmount != fNewValue);
 
 		this.setDestAmount(this.model, val)
@@ -318,7 +320,7 @@ class TransferTransactionView extends TransactionView
 
 	inputResBalance(val)
 	{
-		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let fNewValue = isValidValue(val) ? normalize(val) : val;
 
 		this.model.srcResBal = val;
 
@@ -327,10 +329,10 @@ class TransferTransactionView extends TransactionView
 			this.model.fSrcResBal = fNewValue;
 			this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
-			let newSrcAmount = this.app.normalize(this.model.srcAccount.balance - fNewValue);
+			let newSrcAmount = normalize(this.model.srcAccount.balance - fNewValue);
 
 			this.model.srcAmount = newSrcAmount;
-			this.model.fSrcAmount = this.app.isValidValue(newSrcAmount) ? this.app.normalize(newSrcAmount) : newSrcAmount;
+			this.model.fSrcAmount = isValidValue(newSrcAmount) ? normalize(newSrcAmount) : newSrcAmount;
 
 			if (this.model.isDiffCurr)
 			{
@@ -349,7 +351,7 @@ class TransferTransactionView extends TransactionView
 
 	inputDestResBalance(val)
 	{
-		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let fNewValue = isValidValue(val) ? normalize(val) : val;
 
 		this.model.destResBal = val;
 
@@ -358,10 +360,10 @@ class TransferTransactionView extends TransactionView
 			this.model.fDestResBal = fNewValue;
 			this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
-			let newDestAmount = this.app.normalize(fNewValue - this.model.destAccount.balance);
+			let newDestAmount = normalize(fNewValue - this.model.destAccount.balance);
 
 			this.model.destAmount = newDestAmount;
-			this.model.fDestAmount = this.app.isValidValue(newDestAmount) ? this.app.normalize(newDestAmount) : newDestAmount;
+			this.model.fDestAmount = isValidValue(newDestAmount) ? normalize(newDestAmount) : newDestAmount;
 
 			if (this.model.isDiffCurr)
 			{
@@ -385,17 +387,17 @@ class TransferTransactionView extends TransactionView
 
 		this.model.exchRate = val;
 
-		let fNewValue = (this.app.isValidValue(val)) ? this.app.normalizeExch(val) : val;
+		let fNewValue = (isValidValue(val)) ? normalizeExch(val) : val;
 		if (this.model.fExchRate != fNewValue)
 		{
-			if (this.app.isValidValue(this.model.srcAmount))
+			if (isValidValue(this.model.srcAmount))
 			{
-				let newDestAmount = this.app.correct(this.model.fSrcAmount * fNewValue);
+				let newDestAmount = correct(this.model.fSrcAmount * fNewValue);
 				this.setDestAmount(this.model, newDestAmount);
 			}
-			else if (this.app.isValidValue(this.model.destAmount))
+			else if (isValidValue(this.model.destAmount))
 			{
-				let newSrcAmount = this.app.correct(this.model.fDestAmount / fNewValue);
+				let newSrcAmount = correct(this.model.fDestAmount / fNewValue);
 				this.setSrcAmount(this.model, newSrcAmount);
 			}
 
@@ -438,7 +440,7 @@ class TransferTransactionView extends TransactionView
 
 	async changeSrcAccount(account_id)
 	{
-		let newAcc = await this.app.state.getAccount(account_id);
+		let newAcc = await App.state.getAccount(account_id);
 
 		if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 			return;
@@ -449,7 +451,7 @@ class TransferTransactionView extends TransactionView
 		this.model.srcAccount.fmtBalance = this.model.srcCurr.format(this.model.srcAccount.balance);
 
 		// Update result balance of source
-		let newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+		let newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 		if (this.model.fSrcResBal != newSrcResBal)
 		{
 			this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;
@@ -458,11 +460,11 @@ class TransferTransactionView extends TransactionView
 
 		if (newAcc.id == this.model.destAccount.id)
 		{
-			let nextAcc_id = await this.app.state.getNextAccount(newAcc.id);
+			let nextAcc_id = await App.state.getNextAccount(newAcc.id);
 			if (!nextAcc_id)
 				throw new Error('Next account not found');
 
-			this.model.destAccount = await this.app.state.getAccount(nextAcc_id);
+			this.model.destAccount = await App.state.getAccount(nextAcc_id);
 			this.model.dest_curr_id = this.model.destAccount.curr_id;
 			this.model.destCurr = Currency.getById(this.model.dest_curr_id);
 			this.model.destAccount.fmtBalance = this.model.destCurr.format(this.model.destAccount.balance);
@@ -475,7 +477,7 @@ class TransferTransactionView extends TransactionView
 			this.model.fDestAmount = this.model.fSrcAmount;
 
 			// Update result balance of destination
-			let newDestResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
+			let newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
 			if (this.model.fDestResBal != newDestResBal)
 			{
 				this.model.destResBal = this.model.fDestResBal = newDestResBal;
@@ -533,7 +535,7 @@ class TransferTransactionView extends TransactionView
 
 	async changeDestAccount(account_id)
 	{
-		let newAcc = await this.app.state.getAccount(account_id);
+		let newAcc = await App.state.getAccount(account_id);
 
 		if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 			return;
@@ -544,7 +546,7 @@ class TransferTransactionView extends TransactionView
 		this.model.destAccount.fmtBalance = this.model.destCurr.format(this.model.destAccount.balance);
 
 		// Update result balance of destination
-		let newDestResBal = this.app.normalize(this.model.destAccount.balance + this.model.fDestAmount);
+		let newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
 		if (this.model.fDestResBal != newDestResBal)
 		{
 			this.model.destResBal = this.model.fDestResBal = newDestResBal;
@@ -553,8 +555,8 @@ class TransferTransactionView extends TransactionView
 
 		if (newAcc.id == this.model.srcAccount.id)
 		{
-			let nextAcc_id = await this.app.state.getNextAccount(newAcc.id);
-			let newSrcAcc = await this.app.state.getAccount(nextAcc_id);
+			let nextAcc_id = await App.state.getNextAccount(newAcc.id);
+			let newSrcAcc = await App.state.getAccount(nextAcc_id);
 			if (!newSrcAcc)
 				throw new Error('Next account not found');
 			this.model.srcAccount = newSrcAcc;
@@ -570,7 +572,7 @@ class TransferTransactionView extends TransactionView
 			this.model.fSrcAmount = this.model.fDestAmount;
 
 			// Update result balance of source
-			let newSrcResBal = this.app.normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+			let newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
 			if (this.model.fSrcResBal != newSrcResBal)
 			{
 				this.model.srcResBal = this.model.fSrcResBal = newSrcResBal;

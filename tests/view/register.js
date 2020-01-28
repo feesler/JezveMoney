@@ -1,5 +1,6 @@
 import { TestView } from './testview.js';
 import { LoginView } from './login.js';
+import { App } from '../main.js';
 
 
 // Registration view class
@@ -21,22 +22,19 @@ class RegisterView extends TestView
 
 	async registerAs(login, name, password)
 	{
-		let app = this.app;
-
 		await this.input(this.content.loginInp, login);
 		await this.input(this.content.nameInp, name);
 	 	await this.input(this.content.passwordInp, password);
 
 		await this.navigation(() => this.click(this.content.submitBtn));
 
-		let view = app.view;
-		if (!(view instanceof LoginView))
+		if (!(App.view instanceof LoginView))
 			throw new Error('Unexpected page');
 
-		if (!view.msgPopup || !view.msgPopup.success || view.msgPopup.message != 'You successfully registered.')
+		if (!App.view.msgPopup || !App.view.msgPopup.success || App.view.msgPopup.message != 'You successfully registered.')
 			throw new Error('Notification popup not appear');
 
-		await view.performAction(() => view.msgPopup.close());
+		await App.view.performAction(() => App.view.msgPopup.close());
 	}
 }
 

@@ -1,5 +1,6 @@
 import { TransactionsList } from '../trlist.js';
 import { api } from '../api.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, test, convDate } from '../common.js';
 
 
 const RUB = 1;
@@ -182,12 +183,10 @@ let runTransList =
 	async run()
 	{
 		let scope = this.run.transactions;
-		let env = this.environment;
-		let test = this.test;
 
 		api.setEnv(this);
 
-		env.setBlock('Transaction List view', 1);
+		this.view.setBlock('Transaction List view', 1);
 
 		await scope.list.preCreateData();
 
@@ -199,11 +198,11 @@ let runTransList =
 		// Filter all transactions with account acc_2
 		let acc_2_all = allTrList.filterByAccounts(accIds[2]);
 		// Filter debt transactions with account acc_2
-		let acc_2_debts = acc_2_all.filterByType(this.DEBT);
+		let acc_2_debts = acc_2_all.filterByType(DEBT);
 
 		// Filter transactions with account acc_2 over the week
 		// Prepare date range for week
-		let now = new Date(this.convDate(this.dates.now));
+		let now = new Date(convDate(this.dates.now));
 		let day1 = now.getDate();
 		let day2;
 		if (day1 > 22)
@@ -247,9 +246,9 @@ let runTransList =
 		await test('Navigate to page 3', () => {}, this.view, state);
 
 		// Expense
-		let allExpenses = allTrList.filterByType(this.EXPENSE);
+		let allExpenses = allTrList.filterByType(EXPENSE);
 
-		state.values.typeMenu.activeType = this.EXPENSE;
+		state.values.typeMenu.activeType = EXPENSE;
 		state.values.paginator.active = 1;
 		state.values.paginator.pages = allExpenses.expectedPages();
 		await this.view.filterByType(state.values.typeMenu.activeType);
@@ -257,27 +256,27 @@ let runTransList =
 		await scope.checkData('Correctness of transaction list', allExpenses, true);
 
 		// Income
-		let allIncomes = allTrList.filterByType(this.INCOME);
+		let allIncomes = allTrList.filterByType(INCOME);
 
-		state.values.typeMenu.activeType = this.INCOME;
+		state.values.typeMenu.activeType = INCOME;
 		state.values.paginator.pages = allIncomes.expectedPages();
 		await this.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Income', () => {}, this.view, state);
 		await scope.checkData('Correctness of transaction list', allIncomes, true);
 
 		// Transfer
-		let allTransfers = allTrList.filterByType(this.TRANSFER);
+		let allTransfers = allTrList.filterByType(TRANSFER);
 
-		state.values.typeMenu.activeType = this.TRANSFER;
+		state.values.typeMenu.activeType = TRANSFER;
 		state.values.paginator.pages = allTransfers.expectedPages();
 		await this.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Transfer', () => {}, this.view, state);
 		await scope.checkData('Correctness of transaction list', allTransfers, true);
 
 		// Debt
-		let allDebts = allTrList.filterByType(this.DEBT);
+		let allDebts = allTrList.filterByType(DEBT);
 
-		state.values.typeMenu.activeType = this.DEBT;
+		state.values.typeMenu.activeType = DEBT;
 		state.values.paginator.pages = allDebts.expectedPages();
 		await this.view.filterByType(state.values.typeMenu.activeType);
 		await test('Filter by Debt', () => {}, this.view, state);

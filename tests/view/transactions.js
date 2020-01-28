@@ -1,4 +1,5 @@
 import { TestView } from './testview.js';
+import { App } from '../main.js';
 
 
 // List of transactions view class
@@ -439,8 +440,7 @@ class TransactionsView extends TestView
 	// Delete specified transactions and return navigation promise
 	async deleteTransactions(tr)
 	{
-		let app = this.app;
-		const onPage = app.config.transactionsOnPage;
+		const onPage = App.config.transactionsOnPage;
 
 		if (!tr)
 			throw new Error('No transactions specified');
@@ -448,7 +448,7 @@ class TransactionsView extends TestView
 		if (!Array.isArray(tr))
 			tr = [tr];
 
-		let currentType = app.view.content.typeMenu.activeType;
+		let currentType = App.view.content.typeMenu.activeType;
 
 		await this.goToFirstPage();
 
@@ -457,7 +457,7 @@ class TransactionsView extends TestView
 
 		while(true)
 		{
-			let pageNum = app.view.currentPage();
+			let pageNum = App.view.currentPage();
 
 
 			absTrOnCurrentPage = tr.filter(tr_num => {
@@ -469,19 +469,19 @@ class TransactionsView extends TestView
 
 			if (trOnCurrentPage.length)
 			{
-				await app.view.selectTransactions(trOnCurrentPage);
+				await App.view.selectTransactions(trOnCurrentPage);
 
-				await app.view.performAction(() => app.view.content.toolbar.delBtn.click());
+				await App.view.performAction(() => App.view.content.toolbar.delBtn.click());
 
-				if (!await app.view.isVisible(app.view.content.delete_warning.elem))
+				if (!await App.view.isVisible(App.view.content.delete_warning.elem))
 					throw 'Delete transaction warning popup not appear';
-				if (!app.view.content.delete_warning.okBtn)
+				if (!App.view.content.delete_warning.okBtn)
 					throw 'OK button not found';
 
-				await app.view.navigation(() => app.view.click(app.view.content.delete_warning.okBtn));
+				await App.view.navigation(() => App.view.click(App.view.content.delete_warning.okBtn));
 
 				// After delete transactions navigation occurs to page without filters, so we need to restore it
-				await app.view.filterByType(currentType);
+				await App.view.filterByType(currentType);
 
 				// Exclude previously removed transactions
 				tr = tr.filter(tr_num => !absTrOnCurrentPage.includes(tr_num))
@@ -493,7 +493,7 @@ class TransactionsView extends TestView
 			}
 			else
 			{
-				if (app.view.isLastPage())
+				if (App.view.isLastPage())
 				{
 					if (tr.length)
 						throw new Error('Transaction(s) ' + tr.join() + ' can not be removed');
@@ -502,7 +502,7 @@ class TransactionsView extends TestView
 				}
 				else
 				{
-					await app.view.goToNextPage();
+					await App.view.goToNextPage();
 				}
 			}
 		}

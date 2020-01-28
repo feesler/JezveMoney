@@ -2,6 +2,7 @@ import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
 import { Currency } from '../../currency.js';
+import { INCOME, test } from '../../common.js'
 
 
 let runIncome =
@@ -9,7 +10,6 @@ let runIncome =
 	async submit(params)
 	{
 		let view = this.view;
-		let test = this.test;
 
 		if ('destAcc' in params)
 		{
@@ -61,7 +61,7 @@ let runIncome =
 	{
 		let scope = this.run.transactions;
 
-		await scope.create(this.INCOME, params, scope.income.submit);
+		await scope.create(INCOME, params, scope.income.submit);
 	},
 
 
@@ -69,9 +69,8 @@ let runIncome =
 	async update(params)
 	{
 		let scope = this.run.transactions;
-		let test = this.test;
 
-		await scope.update(this.INCOME, params, async (params) =>
+		await scope.update(INCOME, params, async (params) =>
 		{
 			let origTransaction = this.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
@@ -86,7 +85,6 @@ let runIncome =
 	async stateLoop()
 	{
 		let view = this.view;
-		let test = this.test;
 
 		const RUB = 1;
 		const USD = 2;

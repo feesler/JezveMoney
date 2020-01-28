@@ -1,11 +1,21 @@
+import {
+	EXPENSE,
+	INCOME,
+	TRANSFER,
+	DEBT,
+	copyObject,
+	convDate,
+	fixDate
+} from './common.js';
+import { App } from './main.js';
+
 
 class TransactionsList
 {
-	constructor(app, list)
+	constructor(list)
 	{
-		this.app = app;
-		this.list = app.copyObject(list);
-		this.availTypes = [ app.EXPENSE, app.INCOME, app.TRANSFER, app.DEBT ];
+		this.list = copyObject(list);
+		this.availTypes = [ EXPENSE, INCOME, TRANSFER, DEBT ];
 		this.sort();
 	}
 
@@ -20,8 +30,8 @@ class TransactionsList
 
 	getLastestPos(date = null)
 	{
-		let cmpDate = this.app.convDate(date);
-		let checkList = (cmpDate) ? this.list.filter(item => this.app.convDate(item.date) <= cmpDate) : this.list;
+		let cmpDate = convDate(date);
+		let checkList = (cmpDate) ? this.list.filter(item => convDate(item.date) <= cmpDate) : this.list;
 
 		let res = checkList.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
 
@@ -157,9 +167,9 @@ class TransactionsList
 
 	deleteItems(ids)
 	{
-		let res = this.app.state.deleteByIds(this.list, ids);
+		let res = App.state.deleteByIds(this.list, ids);
 
-		return new TransactionsList(this.app, res);
+		return new TransactionsList(res);
 	}
 
 
@@ -182,7 +192,7 @@ class TransactionsList
 		if (items == this.list)
 			return this;
 
-		return new TransactionsList(this.app, items);
+		return new TransactionsList(items);
 	}
 
 
@@ -205,7 +215,7 @@ class TransactionsList
 		if (items == this.list)
 			return this;
 
-		return new TransactionsList(this.app, items);
+		return new TransactionsList(items);
 	}
 
 
@@ -214,12 +224,12 @@ class TransactionsList
 		if (!start && !end)
 			return list;
 
-		let fStart = this.app.fixDate(start);
-		let fEnd = this.app.fixDate(end);
+		let fStart = fixDate(start);
+		let fEnd = fixDate(end);
 
 		return list.filter(item =>
 		{
-			let date = this.app.convDate(item.date);
+			let date = convDate(item.date);
 			if (!date)
 				return false;
 
@@ -239,7 +249,7 @@ class TransactionsList
 		if (items == this.list)
 			return this;
 
-		return new TransactionsList(this.app, items);
+		return new TransactionsList(items);
 	}
 
 
@@ -260,13 +270,13 @@ class TransactionsList
 		if (items == this.list)
 			return this;
 
-		return new TransactionsList(this.app, items);
+		return new TransactionsList(items);
 	}
 
 
 	getItemsPage(list, num, limit)
 	{
-		let pageLimit = (typeof limit !== 'undefined') ? limit : this.app.config.transactionsOnPage;
+		let pageLimit = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
 		if (num < 1 || num > Math.ceil(list.length / pageLimit))
 			throw new Error('Wrong page');
@@ -283,7 +293,7 @@ class TransactionsList
 		if (items == this.list)
 			return this;
 
-		return new TransactionsList(this.app, items);
+		return new TransactionsList(items);
 	}
 
 
@@ -314,7 +324,7 @@ class TransactionsList
 		if (items == this.list)
 			return this;
 
-		return new TransactionsList(this.app, items);
+		return new TransactionsList(items);
 	}
 
 
@@ -326,7 +336,7 @@ class TransactionsList
 
 	expectedPages()
 	{
-		const onPage = this.app.config.transactionsOnPage;
+		const onPage = App.config.transactionsOnPage;
 
 		return Math.max(Math.ceil(this.list.length / onPage), 1);
 	}
@@ -345,7 +355,7 @@ class TransactionsList
 		let res = [];
 		for(let trans of list)
 		{
-			let convTrans = this.app.copyObject(trans);
+			let convTrans = copyObject(trans);
 
 			if (convTrans.src_id == account.id)
 			{
@@ -370,7 +380,7 @@ class TransactionsList
 	{
 		let res = this.onUpdateAccount(this.list, accList, account);
 
-		return new TransactionsList(this.app, res);
+		return new TransactionsList(res);
 	}
 
 
@@ -387,34 +397,34 @@ class TransactionsList
 			let srcRemoved = ids.includes(trans.src_id);
 			let destRemoved = ids.includes(trans.dest_id);
 
-			if (trans.type == this.app.EXPENSE && srcRemoved)
+			if (trans.type == EXPENSE && srcRemoved)
 				continue;
-			if (trans.type == this.app.INCOME && destRemoved)
+			if (trans.type == INCOME && destRemoved)
 				continue;
-			if ((trans.type == this.app.TRANSFER || trans.type == this.app.DEBT) &&
+			if ((trans.type == TRANSFER || trans.type == DEBT) &&
 				srcRemoved && destRemoved)
 				continue;
-			if (trans.type == this.app.DEBT && srcRemoved && trans.dest_id == 0)
+			if (trans.type == DEBT && srcRemoved && trans.dest_id == 0)
 				continue;
-			if (trans.type == this.app.DEBT && destRemoved && trans.src_id == 0)
+			if (trans.type == DEBT && destRemoved && trans.src_id == 0)
 				continue;
 
-			let convTrans = this.app.copyObject(trans);
+			let convTrans = copyObject(trans);
 
-			if (convTrans.type == this.app.TRANSFER)
+			if (convTrans.type == TRANSFER)
 			{
 				if (ids.includes(convTrans.src_id))
 				{
-					convTrans.type = this.app.INCOME;
+					convTrans.type = INCOME;
 					convTrans.src_id = 0;
 				}
 				else if (ids.includes(convTrans.dest_id))
 				{
-					convTrans.type = this.app.EXPENSE;
+					convTrans.type = EXPENSE;
 					convTrans.dest_id = 0;
 				}
 			}
-			else if (convTrans.type == this.app.DEBT)
+			else if (convTrans.type == DEBT)
 			{
 				for(let acc_id of ids)
 				{
@@ -422,18 +432,18 @@ class TransactionsList
 
 					if (convTrans.src_id == acc_id)
 					{
-						if (acc.owner_id != this.app.owner_id)
+						if (acc.owner_id != App.owner_id)
 						{
-							convTrans.type = this.app.INCOME;
+							convTrans.type = INCOME;
 						}
 
 						convTrans.src_id = 0;
 					}
 					else if (convTrans.dest_id == acc_id)
 					{
-						if (acc.owner_id != this.app.owner_id)
+						if (acc.owner_id != App.owner_id)
 						{
-							convTrans.type = this.app.EXPENSE;
+							convTrans.type = EXPENSE;
 						}
 						convTrans.dest_id = 0;
 					}
@@ -451,7 +461,7 @@ class TransactionsList
 	{
 		let res = this.onDeleteAccounts(this.list, accList, ids);
 
-		return new TransactionsList(this.app, res);
+		return new TransactionsList(res);
 	}
 }
 

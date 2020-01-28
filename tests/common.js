@@ -1,12 +1,12 @@
 // Types of transactions
-const EXPENSE = 1;
-const INCOME = 2;
-const TRANSFER = 3;
-const DEBT = 4;
+export const EXPENSE = 1;
+export const INCOME = 2;
+export const TRANSFER = 3;
+export const DEBT = 4;
 
 
 // Return string for specified type of transaction
-function getTransactionTypeStr(type)
+export function getTransactionTypeStr(type)
 {
 	const typeToStr = {
 		[EXPENSE] : 'expense',
@@ -19,6 +19,24 @@ function getTransactionTypeStr(type)
 		throw new Error('Unknown transaction type ' + type);
 
 	return typeToStr[type];
+}
+
+
+export function getTransactionType(str)
+{
+	const strToType = {
+		'ALL' : 0,
+		'EXPENSE' : EXPENSE,
+		'INCOME' : INCOME,
+		'TRANSFER' : TRANSFER,
+		'DEBT' : DEBT
+	};
+
+	if (!str)
+		return null;
+
+	let key = str.toUpperCase();
+	return (key in strToType) ? strToType[key] : null;
 }
 
 
@@ -39,7 +57,7 @@ const tileIcons = [
  * @param {int} icon - id of icon
  * @return {tileIconObject} or null if not found
  */
-function getIcon(icon)
+export function getIcon(icon)
 {
 	let icon_id = parseInt(icon);
 	if (isNaN(icon_id))
@@ -58,7 +76,7 @@ function getIcon(icon)
  * @param {string} val - icon title
  * @return {tileIconObject}
  */
-function findIconByTitle(val)
+export function findIconByTitle(val)
 {
 	let noIcon = tileIcons[0];
 
@@ -79,7 +97,7 @@ function findIconByTitle(val)
  * @param {string} val - className property of element
  * @return {tileIconObject}
  */
-function findIconByClassName(val)
+export function findIconByClassName(val)
 {
 	let noIcon = tileIcons[0];
 
@@ -101,14 +119,14 @@ function findIconByClassName(val)
 
 
 // Check object is date
-function isDate(obj)
+export function isDate(obj)
 {
 	return (obj instanceof Date && !isNaN(obj.valueOf()));
 }
 
 
 // Check object is function
-function isFunction(obj)
+export function isFunction(obj)
 {
 	let getType = {};
 	return obj && (getType.toString.call(obj) === '[object Function]' || typeof obj === 'function');
@@ -116,14 +134,14 @@ function isFunction(obj)
 
 
 // Check object is {}
-function isObject(o)
+export function isObject(o)
 {
 	return null != o && typeof o === 'object' && Object.prototype.toString.call(o) === '[object Object]';
 }
 
 
 // Set parameters of object
-function setParam(obj, params)
+export function setParam(obj, params)
 {
 	let par, val;
 
@@ -161,7 +179,7 @@ function setParam(obj, params)
 
 
 // Convert date string from DD.MM.YYYY to timestamp
-function convDate(dateStr)
+export function convDate(dateStr)
 {
 	if (typeof dateStr !== 'string')
 		return null;
@@ -175,7 +193,7 @@ function convDate(dateStr)
 
 
 // Format date as DD.MM.YYYY
-function formatDate(date, month, year)
+export function formatDate(date, month, year)
 {
 	if (isDate(date) && !month && !year)
 	{
@@ -189,7 +207,7 @@ function formatDate(date, month, year)
 
 
 // Return timestamp for the start of the day
-function cutDate(date)
+export function cutDate(date)
 {
 	if (!isDate(date))
 		return null;
@@ -199,7 +217,7 @@ function cutDate(date)
 
 
 // Convert Date object, timestamp or DD.MM.YYYY string to the timestamp of the start of day
-function fixDate(date)
+export function fixDate(date)
 {
 	if (isDate(date))
 		return cutDate(date);
@@ -212,7 +230,7 @@ function fixDate(date)
 
 
 // Format specified value
-function formatValue(val)
+export function formatValue(val)
 {
 	return val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
 }
@@ -223,7 +241,7 @@ function formatValue(val)
 */
 
 // Fix string to correct float number format
-function fixFloat(str)
+export function fixFloat(str)
 {
 	if (typeof(str) == "string")
 	{
@@ -240,7 +258,7 @@ function fixFloat(str)
 
 
 // Correct calculated value
-function correct(val, prec)
+export function correct(val, prec)
 {
 	prec = prec || 2;
 
@@ -249,14 +267,14 @@ function correct(val, prec)
 
 
 // Correct calculated exchange rate value
-function correctExch(val)
+export function correctExch(val)
 {
 	return correct(val, 5);
 }
 
 
 // Normalize monetary value from string
-function normalize(val, prec)
+export function normalize(val, prec)
 {
 	prec = prec || 2;
 
@@ -265,14 +283,14 @@ function normalize(val, prec)
 
 
 // Normalize exchange rate value from string
-function normalizeExch(val)
+export function normalizeExch(val)
 {
 	return normalize(val, 5);
 }
 
 
 // Check value is valid
-function isValidValue(val)
+export function isValidValue(val)
 {
 	return (val != undefined && val != null && !isNaN(parseFloat(fixFloat(val))));
 }
@@ -283,7 +301,7 @@ function isValidValue(val)
 */
 
 // Return deep copy of object
-function copyObject(item)
+export function copyObject(item)
 {
 	if (Array.isArray(item))
 	{
@@ -307,7 +325,7 @@ function copyObject(item)
 
 
 // Join parameters and values of object to URL
-function urlJoin(obj)
+export function urlJoin(obj)
 {
 	let arr = [], par;
 
@@ -333,7 +351,7 @@ function urlJoin(obj)
 }
 
 
-function formatProps(params)
+export function formatProps(params)
 {
 	let res = [];
 	for(let key in params)
@@ -343,7 +361,7 @@ function formatProps(params)
 }
 
 
-function checkPHPerrors(env, content)
+export function checkPHPerrors(env, content)
 {
 	const errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
 
@@ -359,7 +377,7 @@ function checkPHPerrors(env, content)
 }
 
 
-function checkObjValue(obj, expectedObj, ret = false)
+export function checkObjValue(obj, expectedObj, ret = false)
 {
 	let res = true;
 
@@ -408,9 +426,8 @@ function checkObjValue(obj, expectedObj, ret = false)
 }
 
 
-
 // Run action, check state and add result to the list
-async function test(descr, action, env, state)
+export async function test(descr, action, env, state)
 {
 	try
 	{
@@ -435,37 +452,3 @@ async function test(descr, action, env, state)
 		throw e;
 	}
 }
-
-
-var commonModule = { EXPENSE,
-					INCOME,
-					TRANSFER,
-					DEBT,
-					getTransactionTypeStr,
-					getIcon,
-					findIconByTitle,
-					findIconByClassName,
-					isDate,
-					isFunction,
-					isObject,
-					setParam,
-					convDate,
-					formatDate,
-					cutDate,
-					fixDate,
-					formatValue,
-					fixFloat,
-					correct,
-					correctExch,
-					normalize,
-					normalizeExch,
-					isValidValue,
-					copyObject,
-					urlJoin,
-					formatProps,
-					checkPHPerrors,
-					checkObjValue,
-					test };
-
-
-export { commonModule as common };

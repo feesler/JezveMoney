@@ -2,6 +2,7 @@ import { api } from '../api.js';
 import { runAccountAPI } from './api/account.js';
 import { runPersonAPI } from './api/person.js';
 import { runTransactionAPI } from './api/transaction.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, test, formatDate } from '../common.js';
 
 
 let runAPI =
@@ -9,7 +10,6 @@ let runAPI =
 	async run()
 	{
 		let env = this.environment;
-		let test = this.test;
 
 		api.setEnv(this);
 
@@ -47,9 +47,9 @@ let runAPI =
 
 
 		let now = new Date();
-		let monthAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-		let weekAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
-		let yesterday = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+		let monthAgo = formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+		let weekAgo = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+		let yesterday = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
 
 		env.setBlock('Transactions', 2);
 
@@ -144,11 +144,11 @@ let runAPI =
 		/**
 		 * Filter transactions
 		 */
-		await transaction.filterTest({ type : this.DEBT });
+		await transaction.filterTest({ type : DEBT });
 
 		await transaction.filterTest({ accounts : ACC_RUB });
 
-		await transaction.filterTest({ type : this.DEBT,
+		await transaction.filterTest({ type : DEBT,
 			 							accounts : ACC_RUB });
 
 		await transaction.filterTest({ onPage : 10 });

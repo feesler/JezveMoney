@@ -2,7 +2,7 @@ import process from 'process';
 import http from 'http';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
-import { common } from '../common.js';
+import { setParam, urlJoin, isFunction, checkPHPerrors } from '../common.js';
 import { route } from '../router.js';
 
 import { Environment } from './base.js'
@@ -273,7 +273,7 @@ class NodeEnvironment extends Environment
 			let options = { method : method, headers : {} };
 
 			if (headers)
-				common.setParam(options.headers, headers);
+				setParam(options.headers, headers);
 
 			options.headers['Cookie'] = [];
 			for(let cookieName in this.reqCookies)
@@ -284,9 +284,9 @@ class NodeEnvironment extends Environment
 
 			if (method == 'post' && data)
 			{
-				postData = common.urlJoin(data);
+				postData = urlJoin(data);
 
-				common.setParam(options.headers,
+				setParam(options.headers,
 									{ 'Content-Type' : 'application/x-www-form-urlencoded',
 										'Content-Length' : Buffer.byteLength(postData) });
 			}
@@ -380,7 +380,7 @@ class NodeEnvironment extends Environment
 
 	async navigation(action)
 	{
-		if (!common.isFunction(action))
+		if (!isFunction(action))
 			throw new Error('Wrong action specified');
 
 		let navPromise = new Promise((resolve, reject) =>
@@ -389,11 +389,11 @@ class NodeEnvironment extends Environment
 			{
 				let content = await this.page.content();
 
-				common.checkPHPerrors(this, content);
+				checkPHPerrors(this, content);
 
 				let viewClass = await route(this, await this.url());
 
-				this.app.view = new viewClass({ app : this.app, environment : this });
+				this.app.view = new viewClass({ environment : this });
 				await this.app.view.parse();
 
 				resolve();
@@ -415,7 +415,6 @@ class NodeEnvironment extends Environment
 	async init(appInstance)
 	{
 		let res = 1;
-		let view;
 		let browser;
 
 		try

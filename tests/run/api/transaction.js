@@ -1,14 +1,24 @@
 import { api } from '../../api.js';
 import { TransactionsList } from '../../trlist.js';
+import {
+	DEBT,
+	test,
+	copyObject,
+	setParam,
+	formatDate,
+	fixDate,
+	checkObjValue,
+	getTransactionTypeStr
+} from '../../common.js';
 
 
 let runTransactionAPI =
 {
 	async getExpectedTransaction(params)
 	{
-		let res = this.copyObject(params);
+		let res = copyObject(params);
 
-		let isDebt = (res.transtype == this.DEBT);
+		let isDebt = (res.transtype == DEBT);
 		if (isDebt)
 		{
 			let reqCurr = (res.debtop == 1) ? res.src_curr : res.dest_curr;
@@ -44,13 +54,13 @@ let runTransactionAPI =
 
 	async updateExpectedTransaction(expTrans, accList, params)
 	{
-		let isDebt = (params.transtype == this.DEBT);
+		let isDebt = (params.transtype == DEBT);
 		if (!isDebt)
 			return { transaction : expTrans, accounts : accList };
 
 		let res = {
-			transaction : this.copyObject(expTrans),
-			accounts : this.copyObject(accList)
+			transaction : copyObject(expTrans),
+			accounts : copyObject(accList)
 		};
 
 		let debtType = params.debtop == 1;
@@ -81,17 +91,15 @@ let runTransactionAPI =
 	// (transtype, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comm)
 	async createTest(params)
 	{
-		let test = this.test;
-		let env = this.environment;
 		let scope = this.run.api.transaction;
 		let transaction_id = 0;
 
 		if (!params.date)
-			params.date = this.formatDate(new Date());
+			params.date = formatDate(new Date());
 		if (!params.comm)
 			params.comm = '';
 
-		await test('Create ' + this.getTransactionTypeStr(params.transtype) + ' transaction', async () =>
+		await test('Create ' + getTransactionTypeStr(params.transtype) + ' transaction', async () =>
 		{
 			let expTransList = await this.state.getTransactionsList();
 
@@ -125,11 +133,11 @@ let runTransactionAPI =
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
 
-			let res = this.checkObjValue(trList.list, expTransList.list) &&
-						this.checkObjValue(accList, expAccountList);
+			let res = checkObjValue(trList.list, expTransList.list) &&
+						checkObjValue(accList, expAccountList);
 
 			return res;
-		}, env);
+		}, this.environment);
 
 		return transaction_id;
 	},
@@ -163,15 +171,13 @@ let runTransactionAPI =
 	// (transtype, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comm)
 	async updateTest(params)
 	{
-		let test = this.test;
-		let env = this.environment;
 		let scope = this.run.api.transaction;
 		let updateRes;
 
 		let expTransList = await this.state.getTransactionsList();
 		let origTrans = expTransList.list.find(item => item.id == params.id);
 
-		let updParams = this.copyObject(origTrans);
+		let updParams = copyObject(origTrans);
 
 		updParams.transtype = updParams.type;
 		delete updParams.type;
@@ -181,7 +187,7 @@ let runTransactionAPI =
 		let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
 		let destAcc = fullAccList.find(item => item.id == updParams.dest_id);
 
-		let isDebt = (updParams.transtype == this.DEBT);
+		let isDebt = (updParams.transtype == DEBT);
 		if (isDebt)
 		{
 			if (srcAcc && srcAcc.owner_id != this.user_id)
@@ -204,7 +210,7 @@ let runTransactionAPI =
 		updParams.comm = updParams.comment;
 		delete updParams.comment;
 
-		this.setParam(updParams, params);
+		setParam(updParams, params);
 
 		// Synchronize currencies with accounts
 		if (isDebt)
@@ -233,7 +239,7 @@ let runTransactionAPI =
 			}
 		}
 
-		await test('Update ' + this.getTransactionTypeStr(origTrans.type) + ' transaction', async () =>
+		await test('Update ' + getTransactionTypeStr(origTrans.type) + ' transaction', async () =>
 		{
 			// Prepare expected transaction object
 			let expTrans = await scope.getExpectedTransaction(updParams);
@@ -260,11 +266,11 @@ let runTransactionAPI =
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
 
-			let res = this.checkObjValue(trList.list, expTransList.list) &&
-						this.checkObjValue(accList, expAccountList);
+			let res = checkObjValue(trList.list, expTransList.list) &&
+						checkObjValue(accList, expAccountList);
 
 			return res;
-		}, env);
+		}, this.environment);
 
 		return updateRes;
 	},
@@ -274,8 +280,6 @@ let runTransactionAPI =
 	// And check expected state of app
 	async deleteTest(ids)
 	{
-		let test = this.test;
-		let env = this.environment;
 		let deleteRes;
 
 		await test('Delete transaction', async () =>
@@ -301,11 +305,11 @@ let runTransactionAPI =
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();
 
-			let res = this.checkObjValue(accList, expAccList) &&
-						this.checkObjValue(trList.list, expTransList.list);
+			let res = checkObjValue(accList, expAccList) &&
+						checkObjValue(trList.list, expTransList.list);
 
 			return res;
-		}, env);
+		}, this.environment);
 
 		return deleteRes;
 	},
@@ -314,9 +318,6 @@ let runTransactionAPI =
 	// Filter list of transaction by specified params
 	async filterTest(params)
 	{
-		let test = this.test;
-		let env = this.environment;
-
 		await test('Filter transactions', async () =>
 		{
 			let trBefore = await this.state.getTransactionsList();
@@ -326,13 +327,13 @@ let runTransactionAPI =
 			let reqParams = {};
 
 			if ('type' in params)
-				reqParams.type = this.getTransactionTypeStr(params.type);
+				reqParams.type = getTransactionTypeStr(params.type);
 			if ('accounts' in params)
 				reqParams.acc_id = params.accounts;
 			if ('startDate' in params && 'endDate' in params)
 			{
-				reqParams.stdate = this.formatDate(new Date(this.fixDate(params.startDate)));
-				reqParams.enddate = this.formatDate(new Date(this.fixDate(params.endDate)));
+				reqParams.stdate = formatDate(new Date(fixDate(params.startDate)));
+				reqParams.enddate = formatDate(new Date(fixDate(params.endDate)));
 			}
 			if ('search' in params)
 				reqParams.search = params.search;
@@ -346,10 +347,10 @@ let runTransactionAPI =
 			if (!trList)
 				throw new Error('Fail to read list of transactions');
 
-			let res = this.checkObjValue(trList, expTransList.list);
+			let res = checkObjValue(trList, expTransList.list);
 
 			return res;
-		}, env);
+		}, this.environment);
 	}
 };
 

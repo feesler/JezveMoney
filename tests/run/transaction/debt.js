@@ -1,6 +1,7 @@
 import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
+import { DEBT, test } from '../../common.js'
 
 
 let runDebt =
@@ -8,7 +9,6 @@ let runDebt =
 	async submit(params)
 	{
 		let view = this.view;
-		let test = this.test;
 
 		if ('acc' in params)
 		{
@@ -104,7 +104,7 @@ let runDebt =
 	{
 		let scope = this.run.transactions;
 
-		await scope.create(this.DEBT, params, async (params) =>
+		await scope.create(DEBT, params, async (params) =>
 		{
 			let expectedTransaction = await scope.debt.submit(params);
 
@@ -115,10 +115,9 @@ let runDebt =
 
 	async update(params)
 	{
-		let test = this.test;
 		let scope = this.run.transactions;
 
-		await scope.update(this.DEBT, params, async (params) =>
+		await scope.update(DEBT, params, async (params) =>
 		{
 			let expState;
 			if (this.view.model.noAccount)
@@ -138,7 +137,6 @@ let runDebt =
 	async stateLoop()
 	{
 		let view = this.view;
-		let test = this.test;
 
 		const ACC_3 = 0;
 		const ACC_RUB = 1;
@@ -262,7 +260,6 @@ let runDebt =
 		await view.toggleDebtType();				// move from State 2 to State 5
 		await test('(22) Change person', () => view.changePersonByPos(MARIA), view);
 
-
 	// Transition 23: Change person to another one and stay on State 4
 		await view.clickDestResultBalance();		// move from State 5 to State 4
 		await test('(23) Change person', () => view.changePersonByPos(IVAN), view);
@@ -355,4 +352,3 @@ let runDebt =
 
 
 export { runDebt };
-

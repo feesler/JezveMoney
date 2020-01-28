@@ -1,15 +1,13 @@
 import { LoginView } from '../view/login.js';
 import { RegisterView } from '../view/register.js';
 import { MainView } from '../view/main.js';
+import { test, formatDate, checkObjValue } from '../common.js';
 
 
 let runProfile =
 {
 	async relogin(userObj)
 	{
-		let env = this.environment;
-		let test = this.test;
-
 		if (!userObj || !userObj.login || !userObj.password)
 			throw new Error('Wrong user object');
 
@@ -22,15 +20,12 @@ let runProfile =
 			throw new Error('Wrong page');
 
 		await this.view.loginAs(userObj.login, userObj.password);
-		await test('Test user login', () => (this.view instanceof MainView), env);
+		await test('Test user login', () => (this.view instanceof MainView), this.environment);
 	},
 
 
 	async register(userObj)
 	{
-		let env = this.environment;
-		let test = this.test;
-
 		if (!userObj || !userObj.login || !userObj.name || !userObj.password)
 			throw new Error('Wrong user object');
 
@@ -46,12 +41,12 @@ let runProfile =
 		if (!(this.view instanceof RegisterView))
 			throw new Error('Unexpected page');
 
-		await test('Test user resitration', async () =>
+		await test('Test user regitration', async () =>
 		{
 			await this.view.registerAs(userObj.login, userObj.name, userObj.password);
 
 			return true;
-		}, env);
+		}, this.environment);
 
 		await test('Login with new account', async () =>
 		{
@@ -60,15 +55,12 @@ let runProfile =
 				throw new Error('Fail to login');
 
 			return true;
-		}, env);
+		}, this.environment);
 	},
 
 
 	async resetAll()
 	{
-		let env = this.environment;
-		let test = this.test;
-
 		await this.view.goToProfile();
 		await this.view.resetAll();
 
@@ -76,18 +68,15 @@ let runProfile =
 		{
 			await this.goToMainView();
 
-			return this.checkObjValue(this.transactions, []) &&
-						this.checkObjValue(this.accountTiles, []) &&
-						this.checkObjValue(this.personTiles, []);
-		}, env);
+			return checkObjValue(this.transactions, []) &&
+						checkObjValue(this.accountTiles, []) &&
+						checkObjValue(this.personTiles, []);
+		}, this.environment);
 	},
 
 
 	async changeName()
 	{
-		let env = this.environment;
-		let test = this.test;
-
 		await this.view.goToProfile();
 
 		await test('Change name', async () =>
@@ -100,7 +89,7 @@ let runProfile =
 			await this.view.changeName(newName);
 
 			return this.view.header.user.name == newName;
-		}, env);
+		}, this.environment);
 
 		await test('Change name back', async () =>
 		{
@@ -108,14 +97,12 @@ let runProfile =
 			await this.view.changeName(newName);
 
 			return this.view.header.user.name == newName;
-		}, env);
+		}, this.environment);
 	},
 
 
 	async changePass()
 	{
-		let env = this.environment;
-		let test = this.test;
 		let scope = this.run.profile;
 
 		await this.view.goToProfile();
@@ -128,7 +115,7 @@ let runProfile =
 			await this.view.goToProfile();
 
 			return true;
-		}, env);
+		}, this.environment);
 
 		await test('Change password back', async () =>
 		{
@@ -137,15 +124,12 @@ let runProfile =
 			await this.view.goToProfile();
 
 			return true;
-		}, env);
+		}, this.environment);
 	},
 
 
 	async deleteProfile()
 	{
-		let env = this.environment;
-		let test = this.test;
-
 		await this.view.goToProfile();
 
 		await test('Delete profile', async () =>
@@ -153,7 +137,7 @@ let runProfile =
 			await this.view.deleteProfile();
 
 			return true;
-		}, env);
+		}, this.environment);
 	}
 };
 

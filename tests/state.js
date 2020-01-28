@@ -1,19 +1,19 @@
 import { api } from './api.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, copyObject } from './common.js';
 import { Currency } from './currency.js';
 import { TransactionsList } from './trlist.js';
+import { App } from './main.js';
 
 
 class AppState
 {
-	constructor(app)
+	constructor()
 	{
-		this.app = app;
-
 		this.accounts = null;
 		this.persons = null;
 		this.transactions = null;
 
-		api.setEnv(app);
+		api.setEnv(App);
 	}
 
 
@@ -52,7 +52,7 @@ class AppState
 		if (!Array.isArray(ids))
 			ids = [ ids ];
 
-		let res = this.app.copyObject(list);
+		let res = copyObject(list);
 		for(let id of ids)
 		{
 			let ind = res.findIndex(item => item.id == id);
@@ -81,7 +81,7 @@ class AppState
 	{
 		let accList = await this.getAccountsList();
 
-		return accList.filter(item => item.owner_id == this.app.owner_id);
+		return accList.filter(item => item.owner_id == App.owner_id);
 	}
 
 
@@ -235,14 +235,14 @@ class AppState
 		if (returnRaw)
 			return this.transactions;
 		else
-			return new TransactionsList(this.app, this.transactions);
+			return new TransactionsList(this.transactions);
 	}
 
 
 	// Apply transaction to accounts
 	applyTransaction(accList, transObj)
 	{
-		let res = this.app.copyObject(accList);
+		let res = copyObject(accList);
 
 		let srcAcc = res.find(item => item.id == transObj.src_id);
 		if (srcAcc)
@@ -259,7 +259,7 @@ class AppState
 	// Cancel transaction to accounts
 	cancelTransaction(accList, transObj)
 	{
-		let res = this.app.copyObject(accList);
+		let res = copyObject(accList);
 
 		let srcAcc = res.find(item => item.id == transObj.src_id);
 		if (srcAcc)
@@ -327,13 +327,12 @@ class AppState
 
 	async transactionToListItem(transObj)
 	{
-		let app = this.app;
 		let res = {};
 
 		let srcAcc = await this.getAccount(transObj.src_id);
 		let destAcc = await this.getAccount(transObj.dest_id);
 
-		if (transObj.type == app.EXPENSE)
+		if (transObj.type == EXPENSE)
 		{
 			res.amountText = '- ' + Currency.format(transObj.src_curr, transObj.src_amount);
 			if (transObj.src_curr != transObj.dest_curr)
@@ -343,7 +342,7 @@ class AppState
 
 			res.accountTitle = srcAcc.name;
 		}
-		else if (transObj.type == app.INCOME)
+		else if (transObj.type == INCOME)
 		{
 			res.amountText = '+ ' + Currency.format(transObj.src_curr, transObj.src_amount);
 			if (transObj.src_curr != transObj.dest_curr)
@@ -353,7 +352,7 @@ class AppState
 
 			res.accountTitle = destAcc.name;
 		}
-		else if (transObj.type == app.TRANSFER)
+		else if (transObj.type == TRANSFER)
 		{
 			res.amountText = Currency.format(transObj.src_curr, transObj.src_amount);
 			if (transObj.src_curr != transObj.dest_curr)
@@ -363,10 +362,10 @@ class AppState
 
 			res.accountTitle = srcAcc.name + ' → ' + destAcc.name;
 		}
-		else if (transObj.type == app.DEBT)
+		else if (transObj.type == DEBT)
 		{
 			res.accountTitle = '';
-			let debtType = (!!srcAcc && srcAcc.owner_id != app.owner_id);
+			let debtType = (!!srcAcc && srcAcc.owner_id != App.owner_id);
 			let personAcc = debtType ? srcAcc : destAcc;
 			let person = await this.getPerson(personAcc.owner_id);
 			if (!person)
@@ -437,7 +436,7 @@ class AppState
 	{
 		let res = { title : 'Transactions', transList : {} };
 
-		let latestTransactionsList = transactionsList.slice(0, this.app.config.latestTransactions);
+		let latestTransactionsList = transactionsList.slice(0, App.config.latestTransactions);
 
 		res.transList.items = await this.renderTransactionsList(latestTransactionsList);
 
@@ -447,17 +446,17 @@ class AppState
 
 	async render(accountList, personList, transactionList)
 	{
-		let res = { values : { widgets : { length : this.app.config.widgetsCount } } };
+		let res = { values : { widgets : { length : App.config.widgetsCount } } };
 
 		// Accounts widget
 		let accWidget = this.renderAccountsWidget(accountList);
-		res.values.widgets[this.app.config.AccountsWidgetPos] = accWidget;
+		res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
 		// Persons widget
 		let personsWidget = this.renderPersonsWidget(personList);
-		res.values.widgets[this.app.config.PersonsWidgetPos] = personsWidget;
+		res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
 		// Transactions widget
 		let transWidget = await this.renderTransactionsWidget(transactionList);
-		res.values.widgets[this.app.config.LatestWidgetPos] = transWidget;
+		res.values.widgets[App.config.LatestWidgetPos] = transWidget;
 
 		return res;
 	}

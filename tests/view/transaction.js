@@ -1,4 +1,6 @@
 import { TestView } from './testview.js';
+import { correctExch, isValidValue, normalizeExch } from '../common.js'
+import { App } from '../main.js';
 
 
 // Create or update transaction view class
@@ -227,7 +229,7 @@ class TransactionView extends TestView
 		if (model.fSrcAmount == 0 || model.fDestAmount == 0)
 			model.exchRate = 1;
 		else
-			model.exchRate = this.app.correctExch(model.fDestAmount / model.fSrcAmount);
+			model.exchRate = correctExch(model.fDestAmount / model.fSrcAmount);
 
 		return model
 	}
@@ -235,14 +237,14 @@ class TransactionView extends TestView
 
 	updateExch(model)
 	{
-		model.fExchRate = this.app.isValidValue(model.exchRate) ? this.app.normalizeExch(model.exchRate) : model.exchRate;
+		model.fExchRate = isValidValue(model.exchRate) ? normalizeExch(model.exchRate) : model.exchRate;
 
 		model.exchSign = model.destCurr.sign + '/' + model.srcCurr.sign;
 		model.backExchSign = model.srcCurr.sign + '/' + model.destCurr.sign;
 
 		let exchText = model.exchSign;
 
-		if (this.app.isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
+		if (isValidValue(model.exchRate) && model.fExchRate != 0 && model.fExchRate != 1)
 		{
 			let backExchRate = 1;
 			if (model.fSrcAmount != 0 && model.fDestAmount != 0)

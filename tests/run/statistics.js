@@ -1,9 +1,10 @@
+import { EXPENSE, INCOME, TRANSFER, DEBT, test } from '../common.js';
+
+
 let runStatistics =
 {
 	async run()
 	{
-		let test = this.test;
-
 		this.view.setBlock('Statistics', 1);
 
 		await this.goToMainView();
@@ -14,32 +15,32 @@ let runStatistics =
 		await test('Expense statistics view', () => {}, this.view, state);
 
 		// Income transactions filter
-		await this.view.filterByType(this.INCOME);
+		await this.view.filterByType(INCOME);
 
 		state.value.chart.bars.length = 0;
 		await test('Income statistics view', () => {}, this.view, state);
 
 		// Transfer transactions filter
-		await this.view.filterByType(this.TRANSFER);
+		await this.view.filterByType(TRANSFER);
 
 		state.value.chart.bars.length = 2;
 		await test('Transfer statistics view', () => {}, this.view, state);
 
 		// Debt transactions filter
-		await this.view.filterByType(this.DEBT);
+		await this.view.filterByType(DEBT);
 
 		state.value.chart.bars.length = 3;
 		await test('Debt statistics view', () => {}, this.view, state);
 
 		// Filter by accounts
-		await this.view.filterByType(this.EXPENSE);
+		await this.view.filterByType(EXPENSE);
 		await this.view.selectAccountByPos(1);
 
 		state.value.chart.bars.length = 0;
 		await test('Filter statistics by account', () => {}, this.view, state);
 
 		// Test grouping
-		await this.view.filterByType(this.DEBT);
+		await this.view.filterByType(DEBT);
 		await this.view.groupByDay();
 		state.value.chart.bars.length = 1;
 		await test('Group statistics by day', () => {}, this.view, state);

@@ -1,4 +1,4 @@
-import { common } from './common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, formatDate } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
@@ -55,12 +55,6 @@ class Application
 
 	async init()
 	{
-		// Inject common functions
-		for(let key in common)
-		{
-			this[key] = common[key];
-		}
-
 		// Setup test runners
 		this.run.api = this.bindRunner(runAPI);
 
@@ -92,15 +86,15 @@ class Application
 		this.user_id = userProfile.user_id;
 		this.owner_id = userProfile.owner_id;
 
-		this.state = new AppState(this);
+		this.state = new AppState();
 		await Currency.init();
 
 		let now = new Date();
-		this.dates.now = this.formatDate(now);
-		this.dates.monthAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-		this.dates.weekAgo = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
-		this.dates.yesterday = this.formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
-		this.dates.yearAgo = this.formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
+		this.dates.now = formatDate(now);
+		this.dates.monthAgo = formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+		this.dates.weekAgo = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+		this.dates.yesterday = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+		this.dates.yearAgo = formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
 		this.dateList.push(...Object.values(this.dates));
 	}
@@ -262,19 +256,19 @@ class Application
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(this.INCOME);
+		await this.view.changeTransactionType(INCOME);
 		await this.run.transactions.income.stateLoop();
 		await this.runCreateIncomeTests();
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(this.TRANSFER);
+		await this.view.changeTransactionType(TRANSFER);
 		await this.run.transactions.transfer.stateLoop();
 		await this.runCreateTransferTests();
 
 		await this.goToMainView();
 		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(this.DEBT);
+		await this.view.changeTransactionType(DEBT);
 		await this.run.transactions.debt.stateLoop();
 		await this.runCreateDebtTests();
 	}
@@ -463,7 +457,7 @@ class Application
 
 		for(let props of list)
 		{
-			await this.run.transactions.del(this.EXPENSE, props);
+			await this.run.transactions.del(EXPENSE, props);
 		}
 	}
 
@@ -479,7 +473,7 @@ class Application
 
 		for(let props of list)
 		{
-			await this.run.transactions.del(this.INCOME, props);
+			await this.run.transactions.del(INCOME, props);
 		}
 	}
 
@@ -495,7 +489,7 @@ class Application
 
 		for(let props of list)
 		{
-			await this.run.transactions.del(this.TRANSFER, props);
+			await this.run.transactions.del(TRANSFER, props);
 		}
 	}
 
@@ -511,7 +505,7 @@ class Application
 
 		for(let props of list)
 		{
-			await this.run.transactions.del(this.DEBT, props);
+			await this.run.transactions.del(DEBT, props);
 		}
 	}
 

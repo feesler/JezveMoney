@@ -2,6 +2,13 @@ import { TransactionsView } from '../../view/transactions.js';
 import { MainView } from '../../view/main.js';
 import { TransactionsList } from '../../trlist.js';
 import { api } from '../../api.js';
+import {
+	test,
+	isObject,
+	checkObjValue,
+	formatProps,
+	getTransactionTypeStr
+} from '../../common.js';
 
 
 let runTransactionsCommon =
@@ -47,8 +54,6 @@ let runTransactionsCommon =
 	// Return instance of TransactionsList with current data
 	async checkData(descr, expTransList, iterateView = false)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let scope = this.run.transactions;
 		let transList, expected;
 
@@ -73,17 +78,15 @@ let runTransactionsCommon =
 			expected = expTransList.list;
 		}
 
-		await test(descr, () => this.checkObjValue(transList, expected), env);
+		await test(descr, () => checkObjValue(transList, expected), this.environment);
 	},
 
 
 	async create(type, params, submitHandler)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let scope = this.run.transactions;
 
-		this.view.setBlock('Create ' + this.getTransactionTypeStr(type) + ' (' + this.formatProps(params) + ')', 2);
+		this.view.setBlock('Create ' + getTransactionTypeStr(type) + ' (' + formatProps(params) + ')', 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
@@ -120,10 +123,9 @@ let runTransactionsCommon =
 	async update(type, params, submitHandler)
 	{
 		let view = this.view;
-		let test = this.test;
 		let scope = this.run.transactions;
 
-		if (!this.isObject(params))
+		if (!isObject(params))
 			throw new Error('Parameters not specified');
 
 		let pos = parseInt(params.pos);
@@ -131,7 +133,7 @@ let runTransactionsCommon =
 			throw new Error('Position of transaction not specified');
 		delete params.pos;
 
-		view.setBlock('Update ' + this.getTransactionTypeStr(type) + ' [' + pos + '] (' + this.formatProps(params) + ')', 2);
+		view.setBlock('Update ' + getTransactionTypeStr(type) + ' [' + pos + '] (' + formatProps(params) + ')', 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
@@ -167,7 +169,6 @@ let runTransactionsCommon =
 
 	async del(type, transactions)
 	{
-		let test = this.test;
 		let scope = this.run.transactions;
 
 		this.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);

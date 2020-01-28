@@ -1,9 +1,10 @@
+import { test } from '../common.js';
+
+
 let runPersons =
 {
 	async checkInitial()
 	{
-		let test = this.test;
-
 		let state = { value : { tiles : { items : { length : 0 } } } };
 		await test('Initial persons structure', () => {}, this.view, state);
 	},
@@ -13,8 +14,6 @@ let runPersons =
 	// Next check name result and callback
 	async create(personName)
 	{
-		let test = this.test;
-
 		await this.view.goToCreatePerson();
 
 		this.state.persons = null;
@@ -31,8 +30,6 @@ let runPersons =
 
 	async update(num, personName)
 	{
-		let test = this.test;
-
 		await this.view.goToUpdatePerson(num);
 
 		let state = { visibility : { name : true },
@@ -57,8 +54,6 @@ let runPersons =
 
 	async del(persons)
 	{
-		let test = this.test;
-
 		this.state.persons = null;
 		await this.view.deletePersons(persons);
 

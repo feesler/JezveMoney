@@ -1,6 +1,7 @@
 import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
+import { TRANSFER, test } from '../../common.js'
 
 
 let runTransfer =
@@ -8,7 +9,6 @@ let runTransfer =
 	async submit(params)
 	{
 		let view = this.view;
-		let test = this.test;
 
 		if ('srcAcc' in params)
 		{
@@ -60,7 +60,7 @@ let runTransfer =
 	{
 		let scope = this.run.transactions;
 
-		await scope.create(this.TRANSFER, params, scope.transfer.submit);
+		await scope.create(TRANSFER, params, scope.transfer.submit);
 	},
 
 
@@ -68,9 +68,8 @@ let runTransfer =
 	async update(params)
 	{
 		let scope = this.run.transactions;
-		let test = this.test;
 
-		await scope.update(this.TRANSFER, params, async (params) =>
+		await scope.update(TRANSFER, params, async (params) =>
 		{
 			let origTransaction = this.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
@@ -85,7 +84,6 @@ let runTransfer =
 	async stateLoop()
 	{
 		let view = this.view;
-		let test = this.test;
 
 		const ACC_3 = 0;
 		const ACC_RUB = 1;

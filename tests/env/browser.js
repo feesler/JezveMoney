@@ -1,4 +1,4 @@
-import { common } from '../common.js';
+import { setParam, urlJoin, isFunction, checkPHPerrors } from '../common.js';
 import { route } from '../router.js';
 import { App } from '../main.js';
 
@@ -243,16 +243,16 @@ class BrowserEnvironment extends Environment
 		let options = { method : method, headers : {} };
 
 		if (headers)
-			common.setParam(options.headers, headers);
+			setParam(options.headers, headers);
 
 		if (method == 'post' && data)
 		{
-			postData = common.urlJoin(data);
+			postData = urlJoin(data);
 
 			let encoder = new TextEncoder();
 			let uint8Array = encoder.encode(postData);
 
-			common.setParam(options.headers,
+			setParam(options.headers,
 								{ 'Content-Type' : 'application/x-www-form-urlencoded',
 									'Content-Length' : uint8Array.length });
 			options.body = postData;
@@ -319,11 +319,11 @@ class BrowserEnvironment extends Environment
 				if (!this.vdoc)
 					throw new Error('View document not found');
 
-				common.checkPHPerrors(this, this.vdoc.documentElement.innerHTML);
+				checkPHPerrors(this, this.vdoc.documentElement.innerHTML);
 
 				let viewClass = await route(this, await this.url());
 
-				this.app.view = new viewClass({ app : this.app, environment : this });
+				this.app.view = new viewClass({ environment : this });
 				await this.app.view.parse();
 
 				resolve();

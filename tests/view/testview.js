@@ -1,11 +1,23 @@
+import {
+	EXPENSE,
+	INCOME,
+	TRANSFER,
+	DEBT,
+	findIconByClassName,
+	isFunction,
+	isObject,
+	checkObjValue,
+	getTransactionType
+} from '../common.js';
+
+
+
 // Common test view class
 class TestView
 {
 	constructor(props)
 	{
 		this.props = props || {};
-
-		this.app = this.props.app;
 
 		if (this.props.environment)
 		{
@@ -124,7 +136,7 @@ class TestView
 		tileObj.balance = await this.prop(tileObj.balanceEL, 'innerText');
 		tileObj.name = await this.prop(tileObj.nameEL, 'innerText');
 
-		let iconObj = this.app.findIconByClassName(await this.prop(tileObj.elem, 'className'));
+		let iconObj = findIconByClassName(await this.prop(tileObj.elem, 'className'));
 		tileObj.icon = iconObj.id;
 
 		tileObj.click = async function()
@@ -331,29 +343,6 @@ class TestView
 	}
 
 
-	getTransactionType(str)
-	{
-		let strToType = { 'ALL' : 0, 'EXPENSE' : this.app.EXPENSE, 'INCOME' : this.app.INCOME, 'TRANSFER' : this.app.TRANSFER, 'DEBT' : this.app.DEBT };
-
-		if (!str)
-			return null;
-
-		let key = str.toUpperCase();
-		return (strToType[key] !== undefined) ? strToType[key] : null;
-	}
-
-
-	getTransactionTypeStr(type)
-	{
-		let typeToStr = { 1 : 'EXPENSE', 2 : 'INCOME', 3 : 'TRANSFER', 4 : 'DEBT' };
-
-		if (!type)
-			return null;
-
-		return (typeToStr[type] !== undefined) ? typeToStr[type] : null;
-	}
-
-
 	async parseTransactionTypeMenu(elem)
 	{
 		let self = this;
@@ -368,7 +357,7 @@ class TestView
 			let tagName = await this.prop(menuItem, 'tagName');
 			let itemTitle = await this.prop(menuItem, 'innerText');
 
-			let menuItemObj = { elem : menuItem, text : itemTitle, type : this.getTransactionType(itemTitle) };
+			let menuItemObj = { elem : menuItem, text : itemTitle, type : getTransactionType(itemTitle) };
 
 			if (tagName == 'B')
 			{
@@ -655,7 +644,7 @@ class TestView
 
 	async performAction(action)
 	{
-		if (!this.app.isFunction(action))
+		if (!isFunction(action))
 			throw new Error('Wrong action specified');
 
 		if (!this.content && !this.header)
@@ -691,7 +680,7 @@ class TestView
 			expVisible = expected[countrolName];
 			control = controls[countrolName];
 
-			if (this.app.isObject(expVisible))
+			if (isObject(expVisible))
 			{
 				res = await this.checkVisibility(control, expVisible);
 			}
@@ -721,9 +710,9 @@ class TestView
 			if (!control)
 				throw new Error('Control (' + countrolName + ') not found');
 
-			if (this.app.isObject(expected) || Array.isArray(expected))
+			if (isObject(expected) || Array.isArray(expected))
 			{
-				res = this.app.checkObjValue(control, expected, true);
+				res = checkObjValue(control, expected, true);
 				if (res !== true)
 				{
 					res.key = countrolName + '.' + res.key;

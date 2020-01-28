@@ -1,5 +1,14 @@
 import { TestView } from './testview.js';
 import { Currency } from '../currency.js';
+import {
+	getIcon,
+	isValidValue,
+	normalize,
+	setParam,
+	findIconByTitle,
+	copyObject
+} from '../common.js'
+import { App } from '../main.js'
 
 
 // Create or update account view class
@@ -27,7 +36,7 @@ class AccountView extends TestView
 
 		// Iniital balance
 		res.initbalance = cont.balance.value;
-		res.fInitBalance = this.app.isValidValue(res.initbalance) ? this.app.normalize(res.initbalance) : res.initbalance;
+		res.fInitBalance = isValidValue(res.initbalance) ? normalize(res.initbalance) : res.initbalance;
 
 		let origBalance = (res.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
 		let origInitBalance = (res.isUpdate && this.origAccount) ? this.origAccount.initbalance : 0;
@@ -44,7 +53,7 @@ class AccountView extends TestView
 		res.curr_id = res.currObj.id
 
 		// Icon
-		let iconObj = this.app.findIconByTitle(cont.iconDropDown.textValue);
+		let iconObj = findIconByTitle(cont.iconDropDown.textValue);
 		res.icon = iconObj.id;
 		res.tileIcon = iconObj;
 
@@ -54,12 +63,12 @@ class AccountView extends TestView
 
 	setExpectedAccount(account)
 	{
-		this.origAccount = this.app.copyObject(account);
+		this.origAccount = copyObject(account);
 
 		this.model.name = account.name.toString();
 
 		this.model.initbalance = account.initbalance.toString();
-		this.model.fInitBalance = this.app.normalize(account.initbalance);
+		this.model.fInitBalance = normalize(account.initbalance);
 
 		this.model.balance = account.balance.toString();
 		this.model.fBalance = account.balance;
@@ -89,7 +98,7 @@ class AccountView extends TestView
 		let origBalance = (this.model.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
 		let origInitBalance = (this.model.isUpdate && this.origAccount) ? this.origAccount.initbalance : 0;
 
-		res.balance = origBalance + this.app.normalize(res.initbalance) - origInitBalance;
+		res.balance = origBalance + normalize(res.initbalance) - origInitBalance;
 
 		return res;
 	}
@@ -98,7 +107,7 @@ class AccountView extends TestView
 	setExpectedState()
 	{
 		let account = this.getExpectedAccount();
-		let accTile = this.app.state.accountToTile(account);
+		let accTile = App.state.accountToTile(account);
 
 		if (!this.model.nameTyped && !this.model.isUpdate)
 			accTile.name = 'New account';
@@ -191,7 +200,7 @@ class AccountView extends TestView
 
 	async inputBalance(val)
 	{
-		let fNewValue = this.app.isValidValue(val) ? this.app.normalize(val) : val;
+		let fNewValue = isValidValue(val) ? normalize(val) : val;
 
 		this.model.initbalance = val;
 		this.model.fInitBalance = fNewValue;
@@ -219,7 +228,7 @@ class AccountView extends TestView
 
 	async changeIcon(val)
 	{
-		let iconObj = this.app.getIcon(val);
+		let iconObj = getIcon(val);
 		if (!iconObj)
 			throw new Error(`Icon ${val} not found`);
 

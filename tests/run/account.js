@@ -2,14 +2,13 @@ import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
 import { TransactionsList } from '../trlist.js';
 import { api } from '../api.js';
+import { test, formatProps } from '../common.js';
 
 
 let runAccounts =
 {
 	async stateLoop()
 	{
-		let test = this.test;
-
 		this.view.setBlock('View state loop', 2);
 
 	// Navigate to create account view
@@ -58,25 +57,23 @@ let runAccounts =
 
 	async submitAccount(params)
 	{
-		let view = this.view;
-		let test = this.test;
 		let scope = this.run.accounts;
 
 		// Input account name
 		if ('name' in params)
-			await test(`Input name (${params.name})`, () => view.inputName(params.name), view);
+			await test(`Input name (${params.name})`, () => this.view.inputName(params.name), this.view);
 
 		// Change currency
 		if ('curr_id' in params)
-			await test(`Select currency ${params.curr_id}`, () => view.changeCurrency(params.curr_id), view);
+			await test(`Select currency ${params.curr_id}`, () => this.view.changeCurrency(params.curr_id), this.view);
 
 		// Input balance
 		if ('balance' in params)
-			await test('Tile balance format update', () => view.inputBalance(params.balance), view);
+			await test('Tile balance format update', () => this.view.inputBalance(params.balance), this.view);
 
 		// Change icon
 		if ('icon' in params)
-			await test('Tile icon update', () => view.changeIcon(params.icon), view);
+			await test('Tile icon update', () => this.view.changeIcon(params.icon), this.view);
 
 		this.state.accounts = null;
 		this.state.transactions = null;
@@ -91,12 +88,10 @@ let runAccounts =
 
 	async create(params)
 	{
-		let test = this.test;
-
 		if (!params)
 			throw new Error('No params specified');
 
-		let title = this.formatProps(params);
+		let title = formatProps(params);
 		this.view.setBlock(`Create account (${title})`, 2);
 
 		if (!params.name || !params.name.length)
@@ -127,8 +122,6 @@ let runAccounts =
 
 	async update(params)
 	{
-		let test = this.test;
-
 		if (!params)
 			throw new Error('No params specified');
 
@@ -137,7 +130,7 @@ let runAccounts =
 			throw new Error('Position of account not specified');
 		delete params.pos;
 
-		let title = this.formatProps(params);
+		let title = formatProps(params);
 		this.view.setBlock(`Update account [${pos}] (${title})`, 2);
 
 		// Navigate to create account view
@@ -175,8 +168,6 @@ let runAccounts =
 
 	async del(accounts)
 	{
-		let test = this.test;
-
 		this.view.setBlock(`Delete account(s) [${accounts.join()}]`, 2);
 
 		// Navigate to create account view

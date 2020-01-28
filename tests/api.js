@@ -1,3 +1,15 @@
+import {
+	EXPENSE,
+	INCOME,
+	TRANSFER,
+	DEBT,
+	copyObject,
+	urlJoin,
+	formatDate,
+	setParam
+} from './common.js';
+
+
 /**
  * API tests module
  * @return
@@ -110,7 +122,7 @@ let apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + app.urlJoin({ id : ids });
+			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -187,7 +199,7 @@ let apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + app.urlJoin({ id : ids });
+			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -297,7 +309,7 @@ let apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + app.urlJoin({ id : ids });
+			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -393,7 +405,7 @@ let apiModule = (function()
 		if (ids.length == 1)
 			apiReq += ids[0];
 		else
-			apiReq += '?' + app.urlJoin({ id : ids });
+			apiReq += '?' + urlJoin({ id : ids });
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -406,16 +418,16 @@ let apiModule = (function()
  	async function createTransaction(options)
  	{
 		if (!options.date)
-			options.date = app.formatDate(new Date());
+			options.date = formatDate(new Date());
 		if (typeof options.comm === 'undefined')
 			options.comm = '';
 
  		let postData = checkFields(options, trReqFields);
 
-		let isDebt = (postData.transtype == app.DEBT);
+		let isDebt = (postData.transtype == DEBT);
 		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
 
-		app.setParam(postData, addData);
+		setParam(postData, addData);
 
  		let apiRes = await apiPost('transaction/create', postData);
  		if (!apiRes || apiRes.result != 'ok')
@@ -437,10 +449,10 @@ let apiModule = (function()
 		let postData = checkFields(options, trReqFields);
 		postData.transid = id;
 
-		let isDebt = (postData.transtype == app.DEBT);
+		let isDebt = (postData.transtype == DEBT);
 		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
 
-		app.setParam(postData, addData);
+		setParam(postData, addData);
 
  		let apiRes = await apiPost('transaction/update', postData);
  		if (!apiRes || apiRes.result != 'ok')
@@ -485,7 +497,7 @@ let apiModule = (function()
 				reqParams[prop] = params[prop];
 		}
 
-		let apiReq = 'transaction/list?' + app.urlJoin(reqParams);
+		let apiReq = 'transaction/list?' + urlJoin(reqParams);
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
@@ -502,9 +514,9 @@ let apiModule = (function()
 		if (!params.src_id)
 			throw new Error('Source account not specified');
 
-		let res = app.copyObject(params);
+		let res = copyObject(params);
 
-		res.transtype = app.EXPENSE;
+		res.transtype = EXPENSE;
 		res.dest_id = 0;
 
 		if (!res.dest_amount)
@@ -526,9 +538,9 @@ let apiModule = (function()
 		if (!params.dest_id)
 			throw new Error('Destination account not specified');
 
-		let res = app.copyObject(params);
+		let res = copyObject(params);
 
-		res.transtype = app.INCOME;
+		res.transtype = INCOME;
 		res.src_id = 0;
 
 		if (!res.src_amount)
@@ -552,9 +564,9 @@ let apiModule = (function()
 		if (!params.dest_id)
 			throw new Error('Destination account not specified');
 
-		let res = app.copyObject(params);
+		let res = copyObject(params);
 
-		res.transtype = app.TRANSFER;
+		res.transtype = TRANSFER;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
@@ -579,9 +591,9 @@ let apiModule = (function()
 		if (!params.person_id)
 			throw new Error('Person not specified');
 
-		let res = app.copyObject(params);
+		let res = copyObject(params);
 
-		res.transtype = app.DEBT;
+		res.transtype = DEBT;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;

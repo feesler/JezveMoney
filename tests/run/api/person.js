@@ -1,4 +1,5 @@
 import { api } from '../../api.js';
+import { test, setParam, copyObject, checkObjValue } from '../../common.js';
 
 
 let runPersonAPI =
@@ -11,8 +12,6 @@ let runPersonAPI =
 	// And check expected state of app
 	async createTest(params)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let person_id = 0;
 
 		await test('Create person', async () =>
@@ -21,7 +20,7 @@ let runPersonAPI =
 			if (!Array.isArray(pBefore))
 				return false;
 
-			let expPersonObj = this.copyObject(params);
+			let expPersonObj = copyObject(params);
 
 			this.state.persons = null;
 
@@ -43,8 +42,8 @@ let runPersonAPI =
 
 			let personObj = pList.find(item => item.id == person_id);
 
-			return this.checkObjValue(personObj, expPersonObj);
-		}, env);
+			return checkObjValue(personObj, expPersonObj);
+		}, this.environment);
 
 		return person_id;
 	},
@@ -54,8 +53,6 @@ let runPersonAPI =
 	// And check expected state of app
 	async updateTest(id, params)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let updateRes = false;
 
 		await test('Update person', async () =>
@@ -66,8 +63,8 @@ let runPersonAPI =
 
 			let origPerson = pBefore.find(item => item.id == id);
 
-			let expPersonObj = this.copyObject(origPerson);
-			this.setParam(expPersonObj, params);
+			let expPersonObj = copyObject(origPerson);
+			setParam(expPersonObj, params);
 
 			this.state.persons = null;
 
@@ -75,7 +72,7 @@ let runPersonAPI =
 			if (!updateRes)
 				return false;
 
-			let expPersonList = this.copyObject(pBefore);
+			let expPersonList = copyObject(pBefore);
 			let pIndex = expPersonList.findIndex(item => item.id == expPersonObj.id);
 			if (pIndex !== -1)
 				expPersonList.splice(pIndex, 1, expPersonObj);
@@ -86,11 +83,11 @@ let runPersonAPI =
 
 			let personObj = pList.find(item => item.id == id);
 
-			let res = this.checkObjValue(personObj, expPersonObj) &&
-						this.checkObjValue(pList, expPersonList);
+			let res = checkObjValue(personObj, expPersonObj) &&
+						checkObjValue(pList, expPersonList);
 
 			return res;
-		}, env);
+		}, this.environment);
 
 		return updateRes;
 	},
@@ -100,8 +97,6 @@ let runPersonAPI =
 	// And check expected state of app
 	async deleteTest(ids)
 	{
-		let env = this.environment;
-		let test = this.test;
 		let deleteRes;
 
 		await test('Delete person', async () =>
@@ -138,11 +133,11 @@ let runPersonAPI =
 			let pList = await this.state.getPersonsList();
 			let trList = await this.state.getTransactionsList();
 
-			let res = this.checkObjValue(pList, expPersonList) &&
-						this.checkObjValue(trList.list, expTransList.list);
+			let res = checkObjValue(pList, expPersonList) &&
+						checkObjValue(trList.list, expTransList.list);
 
 			return res;
-		}, env);
+		}, this.environment);
 
 		return deleteRes;
 	}
