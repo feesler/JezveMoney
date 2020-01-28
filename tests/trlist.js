@@ -225,7 +225,7 @@ class TransactionsList
 	}
 
 
-	filterByDate(list, start, end)
+	filterByDate(start, end)
 	{
 		let items = this.getItemsByDate(this.list, start, end);
 		if (items == this.list)
