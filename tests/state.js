@@ -471,6 +471,9 @@ class AppState
 			let debtType = (!!srcAcc && srcAcc.owner_id != app.owner_id);
 			let personAcc = debtType ? srcAcc : destAcc;
 			let person = await this.getPerson(personAcc.owner_id);
+			if (!person)
+				throw new Error(`Person ${personAcc.owner_id} not found`);
+
 			let acc = debtType ? destAcc : srcAcc;
 
 			if (debtType)

@@ -314,6 +314,14 @@ class TransactionsList
 	{
 		this.list.sort((a, b) => b.pos - a.pos);
 	}
+
+
+	expectedPages()
+	{
+		const onPage = this.app.config.transactionsOnPage;
+
+		return Math.max(Math.ceil(this.list.length / onPage), 1);
+	}
 }
 
 
