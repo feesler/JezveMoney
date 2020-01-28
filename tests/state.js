@@ -408,11 +408,16 @@ class AppState
 	}
 
 
-	renderPersonsWidget(personsList)
+	renderPersonsWidget(personsList, mainPage = true)
 	{
-		let res = { infoTiles : {} };
+		let res = {};
 
-		res.infoTiles.items = personsList.map(item => this.personToTile(item));
+		let personTiles = personsList.map(item => this.personToTile(item));
+
+		if (mainPage)
+			res.infoTiles = { items : personTiles };
+		else
+			res.tiles = { items : personTiles };
 
 		return res;
 	}

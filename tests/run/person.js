@@ -1,12 +1,13 @@
 import { test } from '../common.js';
+import { PersonsView } from '../view/persons.js';
 
 
 let runPersons =
 {
 	async checkInitial()
 	{
-		let state = { value : { tiles : { items : { length : 0 } } } };
-		await test('Initial persons structure', () => {}, this.view, state);
+		this.view.expectedState = { value : { tiles : { items : { length : 0 } } } };
+		await test('Initial persons structure', () => {}, this.view);
 	},
 
 
@@ -14,15 +15,23 @@ let runPersons =
 	// Next check name result and callback
 	async create(personName)
 	{
+		// Navigate to create person view
+		if (!(this.view instanceof PersonsView))
+		{
+			await this.goToMainView();
+			await this.view.goToPersons();
+		}
 		await this.view.goToCreatePerson();
+
+		let expectedList = await this.state.getPersonsList();
+		let expectedPerson = { name : personName, accounts : [] };
+		expectedList.push(expectedPerson);
 
 		this.state.persons = null;
 		await this.view.createPerson(personName);
 
-		let state = { value : { tiles : { items : { length : this.personTiles.length + 1 } } } };
-		state.value.tiles.items[this.personTiles.length] = { name : personName };
-
-		await test('Create person', () => {}, this.view, state);
+		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		await test(`Create person (${personName})`, () => {}, this.view);
 
 		this.personTiles = this.view.content.tiles.items;
 	},
@@ -30,12 +39,21 @@ let runPersons =
 
 	async update(num, personName)
 	{
+		// Navigate to update person view
+		if (!(this.view instanceof PersonsView))
+		{
+			await this.goToMainView();
+			await this.view.goToPersons();
+		}
 		await this.view.goToUpdatePerson(num);
 
-		let state = { visibility : { name : true },
-	 					values : { name : this.personTiles[num].name } };
+		let expectedList = await this.state.getPersonsList();
+		let expectedPerson = await this.state.getPersonByPos(num);
 
-		await test('Update person view state', () => {}, this.view, state);
+		this.view.expectedState = { visibility : { name : true },
+	 								values : { name : expectedPerson.name } };
+
+		await test('Update person view state', () => {}, this.view);
 
 		await this.view.inputName(personName);
 
@@ -43,10 +61,11 @@ let runPersons =
 		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
 
 		// Check updates in the person tiles
-		state = { values : { tiles : { items : { length : this.personTiles.length } } } };
-		state.values.tiles.items[num] = { name : personName };
+		expectedPerson.name = personName;
+		expectedList[num] = expectedPerson;
 
-		await test('Update person', () => {}, this.view, state);
+		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		await test(`Update person [${num}]`, () => {}, this.view);
 
 		this.personTiles = this.view.content.tiles.items;
 	},
@@ -54,12 +73,25 @@ let runPersons =
 
 	async del(persons)
 	{
+		// Navigate to persons list view
+		if (!(this.view instanceof PersonsView))
+		{
+			await this.goToMainView();
+			await this.view.goToPersons();
+		}
+
+		// Prepare expected updates of accounts list
+		let expectedList = await this.state.getPersonsList();
+		let ids = this.state.positionsToIds(expectedList, persons);
+		expectedList = this.state.deleteByIds(expectedList, ids);
+
 		this.state.persons = null;
+		this.state.accounts = null;
+		this.state.transactions = null;
 		await this.view.deletePersons(persons);
 
-		let state = { values : { tiles : { items : { length : this.personTiles.length - persons.length } } } };
-
-		await test('Delete persons [' + persons.join() + ']', () => {}, this.view, state);
+		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		await test('Delete persons [' + persons.join() + ']', () => {}, this.view);
 
 		this.personTiles = this.view.content.tiles.items;
 	}
