@@ -253,7 +253,7 @@ class TransactionsView extends TestView
 		res.paginator = await this.parsePaginator(await this.query('.trans_list .paginator'));
 
 		res.title = await this.prop(res.titleEl, 'innerText');
-		res.transList = await this.parseTransactionsList(await this.query('#trlist'));
+		res.transList = await this.parseTransactionsList(await this.query('#tritems'));
 		if (!res.transList)
 			throw new Error('List of transactions not found');
 
