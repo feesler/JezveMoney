@@ -55,15 +55,17 @@ let runTransactionsCommon =
 		// Save all transactions
 		if (iterateView)
 		{
+			if (!(this.view instanceof TransactionsView))
+			{
 		if (!(this.view instanceof MainView))
 			await this.goToMainView();
 		await this.view.goToTransactions();
+			}
+
 			let transListPages = await scope.iteratePages();
 			transList = transListPages.items;
 
-			let expListItems = await this.state.renderTransactionsList(expTransList.list);
-
-			await test(descr, () => this.checkObjValue(transListPages.items, expListItems), env);
+			expected = await this.state.renderTransactionsList(expTransList.list);
 		}
 		else
 		{
@@ -71,7 +73,7 @@ let runTransactionsCommon =
 			expected = expTransList.list;
 		}
 
-		await test(descr, () => this.checkObjValue(transList, expTransList.list), env);
+		await test(descr, () => this.checkObjValue(transList, expected), env);
 	},
 
 
@@ -211,4 +213,3 @@ let runTransactionsCommon =
 
 
 export { runTransactionsCommon };
-
