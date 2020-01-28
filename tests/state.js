@@ -10,7 +10,7 @@ class AppState
 
 		this.accounts = null;
 		this.persons = null;
-		this.transactions = [];
+		this.transactions = null;
 
 		api.setEnv(app);
 	}
