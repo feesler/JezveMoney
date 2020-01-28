@@ -106,17 +106,12 @@ let runTransactionsCommon =
 		// Prepare data for next calculations
 		let afterCreate = this.state.createTransaction(accList, expectedTransaction);
 		expTransList.create(expectedTransaction);
-		let expectedState = await this.state.render(afterCreate, pList, expTransList.list);
+		this.view.expectedState = await this.state.render(afterCreate, pList, expTransList.list);
 
-		await test('Main page widgets update', async () => {}, this.view, expectedState);
-
-		this.accountTiles = this.view.content.widgets[this.config.AccountsWidgetPos].tiles.items;
-		this.personTiles = this.view.content.widgets[this.config.PersonsWidgetPos].infoTiles.items;
+		await test('Main page widgets update', () => {}, this.view);
 
 		// Read updated list of transactions
 		await scope.checkData('List of transactions update', expTransList);
-
-		this.transactions = expTransList.list;
 	},
 
 
@@ -156,12 +151,13 @@ let runTransactionsCommon =
 
 		let expectedTransaction = await submitHandler.call(this, params);
 
+		await this.goToMainView();
+
 		let afterUpdate = this.state.updateTransaction(accList, origTransaction, expectedTransaction);
 		expTransList.update(origTransaction.id, expectedTransaction);
-		let expectedState = await this.state.render(afterUpdate, pList, expTransList.list);
+		this.view.expectedState = await this.state.render(afterUpdate, pList, expTransList.list);
 
-		await this.goToMainView();
-		await test('Main page widgets update', async () => {}, this.view, expectedState);
+		await test('Main page widgets update', () => {}, this.view);
 
 		await scope.checkData('List of transactions update', expTransList);
 	},
@@ -196,16 +192,10 @@ let runTransactionsCommon =
 		let removedTrans = expTransList.del(type, transactions);
 		accList = this.state.deleteTransactions(accList, removedTrans);
 
-		let expectedState = await this.state.render(accList, pList, expTransList.list);
-
-		await test('Main page widgets update', async () => {}, this.view, expectedState);
-
-		this.accountTiles = this.view.content.widgets[this.config.AccountsWidgetPos].tiles.items;
-		this.personTiles = this.view.content.widgets[this.config.PersonsWidgetPos].infoTiles.items;
+		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
+		await test('Main page widgets update', async () => {}, this.view);
 
 		await scope.checkData('List of transactions update', expTransList);
-
-		this.transactions = expTransList.list;
 	}
 };
 

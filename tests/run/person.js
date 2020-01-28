@@ -32,8 +32,6 @@ let runPersons =
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
 		await test(`Create person (${personName})`, () => {}, this.view);
-
-		this.personTiles = this.view.content.tiles.items;
 	},
 
 
@@ -52,7 +50,6 @@ let runPersons =
 
 		this.view.expectedState = { visibility : { name : true },
 	 								values : { name : expectedPerson.name } };
-
 		await test('Update person view state', () => {}, this.view);
 
 		await this.view.inputName(personName);
@@ -66,8 +63,6 @@ let runPersons =
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
 		await test(`Update person [${num}]`, () => {}, this.view);
-
-		this.personTiles = this.view.content.tiles.items;
 	},
 
 
@@ -92,8 +87,6 @@ let runPersons =
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
 		await test('Delete persons [' + persons.join() + ']', () => {}, this.view);
-
-		this.personTiles = this.view.content.tiles.items;
 	}
 };
 

@@ -64,14 +64,10 @@ let runProfile =
 		await this.view.goToProfile();
 		await this.view.resetAll();
 
-		await test('Reset all data', async () =>
-		{
-			await this.goToMainView();
+		await this.goToMainView();
 
-			return checkObjValue(this.transactions, []) &&
-						checkObjValue(this.accountTiles, []) &&
-						checkObjValue(this.personTiles, []);
-		}, this.environment);
+		this.view.expectedState = await this.state.render([], [], []);
+		await test('Reset all data', () => {}, this.view);
 	},
 
 

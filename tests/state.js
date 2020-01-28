@@ -92,7 +92,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.accounts))
-			this.accounts = await this.getAccountsList();
+			await this.getAccountsList();
 
 		let accObj = this.accounts.find(item => item.id == id);
 
@@ -167,7 +167,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.persons))
-			this.persons = await this.getPersonsList();
+			await this.getPersonsList();
 
 		let personObj = this.persons.find(item => item.id == id);
 
@@ -182,7 +182,7 @@ class AppState
 			return null;
 
 		if (!Array.isArray(this.persons))
-			this.persons = await this.getPersonsList();
+			await this.getPersonsList();
 
 		if (pos < 0 || pos >= this.persons.length)
 			return null;

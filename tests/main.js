@@ -25,15 +25,8 @@ class Application
 	constructor()
 	{
 		this.config = config;
-
 		this.user_id = null;
-
 		this.run = {};
-
-		this.accountTiles = [];
-		this.personTiles = [];
-		this.transactions = [];
-
 		this.dates = {};
 		this.dateList = [];
 	}
@@ -142,9 +135,6 @@ class Application
 	async goToMainView()
 	{
 		await this.view.goToMainView();
-
-		this.accountTiles = this.view.content.widgets[this.config.AccountsWidgetPos].tiles.items;
-		this.personTiles = this.view.content.widgets[this.config.PersonsWidgetPos].infoTiles.items;
 	}
 
 

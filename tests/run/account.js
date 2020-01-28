@@ -193,9 +193,7 @@ let runAccounts =
 		let expTransList = trBefore.deleteAccounts(accBefore, ids);
 
 		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
-
 		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view);
-		this.accountTiles = this.view.content.tiles.items;
 
 		await this.run.transactions.checkData('List of transactions update', expTransList);
 	}
