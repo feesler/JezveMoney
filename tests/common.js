@@ -306,18 +306,6 @@ function copyObject(item)
 }
 
 
-// Extend child prototype by parent
-function extend(Child, Parent)
-{
-	function F(){};
-
-	F.prototype = Parent.prototype;
-	Child.prototype = new F();
-	Child.prototype.constructor = Child;
-	Child.parent = Parent.prototype;
-}
-
-
 // Join parameters and values of object to URL
 function urlJoin(obj)
 {
@@ -473,7 +461,6 @@ var commonModule = { EXPENSE,
 					normalizeExch,
 					isValidValue,
 					copyObject,
-					extend,
 					urlJoin,
 					formatProps,
 					checkPHPerrors,
