@@ -1,5 +1,5 @@
 import { TestView } from './testview.js';
-import { App } from '../main.js';
+import { App } from '../app.js';
 
 
 // List of transactions view class

@@ -1,5 +1,5 @@
 import { TestView } from './testview.js';
-import { App } from '../main.js';
+import { App } from '../app.js';
 
 
 // Main view class

@@ -1,6 +1,6 @@
 import { TestView } from './testview.js';
 import { correctExch, isValidValue, normalizeExch } from '../common.js'
-import { App } from '../main.js';
+import { App } from '../app.js';
 
 
 // Create or update transaction view class

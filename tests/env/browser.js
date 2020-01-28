@@ -1,7 +1,6 @@
 import { setParam, urlJoin, isFunction, checkPHPerrors } from '../common.js';
 import { route } from '../router.js';
-import { App } from '../main.js';
-
+import { App } from '../app.js';
 import { Environment } from './base.js';
 
 

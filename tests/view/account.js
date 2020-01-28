@@ -8,7 +8,7 @@ import {
 	findIconByTitle,
 	copyObject
 } from '../common.js'
-import { App } from '../main.js'
+import { App } from '../app.js'
 
 
 // Create or update account view class

@@ -1,7 +1,7 @@
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../currency.js';
 import { isValidValue, normalize, setParam } from '../../common.js'
-import { App } from '../../main.js'
+import { App } from '../../app.js'
 
 
 // Create or update transfer transaction view class

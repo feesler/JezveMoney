@@ -2,7 +2,7 @@ import { api } from './api.js';
 import { EXPENSE, INCOME, TRANSFER, DEBT, copyObject } from './common.js';
 import { Currency } from './currency.js';
 import { TransactionsList } from './trlist.js';
-import { App } from './main.js';
+import { App } from './app.js';
 
 
 class AppState

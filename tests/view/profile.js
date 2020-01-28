@@ -1,6 +1,6 @@
 import { TestView } from './testview.js';
 import { LoginView } from './login.js';
-import { App } from '../main.js';
+import { App } from '../app.js';
 
 
 // Profile view class

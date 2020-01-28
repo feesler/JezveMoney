@@ -7,7 +7,7 @@ import {
 	convDate,
 	fixDate
 } from './common.js';
-import { App } from './main.js';
+import { App } from './app.js';
 
 
 class TransactionsList
