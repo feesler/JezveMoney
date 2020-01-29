@@ -38,7 +38,7 @@ class ProfileController extends Controller
 	function fail($msg = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 		setLocation(BASEURL."profile/");
 	}
 
@@ -69,7 +69,7 @@ class ProfileController extends Controller
 		if (!$this->personMod->update($owner_id, [ "name" => $new_name ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_PROFILE_NAME);
+		Message::set(MSG_PROFILE_NAME);
 
 		setLocation(BASEURL."profile/");
 	}
@@ -95,7 +95,7 @@ class ProfileController extends Controller
 		if (!$this->uMod->changePassword($uObj->login, $_POST["oldpwd"], $_POST["newpwd"]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_PROFILE_PASSWORD);
+		Message::set(MSG_PROFILE_PASSWORD);
 
 		setLocation(BASEURL."profile/");
 	}
@@ -115,7 +115,7 @@ class ProfileController extends Controller
 		if (!$this->personMod->reset())
 			$this->fail($defMsg);
 
-		setMessage(MSG_PROFILE_RESETALL);
+		Message::set(MSG_PROFILE_RESETALL);
 
 		setLocation(BASEURL."profile/");
 	}
@@ -130,7 +130,7 @@ class ProfileController extends Controller
 
 		$this->uMod->logout();
 
-		setMessage(MSG_PROFILE_DELETE);
+		Message::set(MSG_PROFILE_DELETE);
 
 		setLocation(BASEURL."login/");
 	}

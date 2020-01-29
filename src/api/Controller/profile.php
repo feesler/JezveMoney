@@ -41,12 +41,12 @@ class ProfileApiController extends ApiController
 		$new_name = $_POST["name"];
 
 		if ($old_name == $new_name)
-			$respObj->fail(getMessage(ERR_PROFILE_NAME));
+			$respObj->fail(Message::get(ERR_PROFILE_NAME));
 
 		if (!$this->personMod->update($this->owner_id, [ "name" => $new_name ]))
-			$respObj->fail(getMessage(ERR_PROFILE_NAME));
+			$respObj->fail(Message::get(ERR_PROFILE_NAME));
 
-		$respObj->msg = getMessage(MSG_PROFILE_NAME);
+		$respObj->msg = Message::get(MSG_PROFILE_NAME);
 		$respObj->data = ["name" => $new_name];
 
 		$respObj->ok();
@@ -61,16 +61,16 @@ class ProfileApiController extends ApiController
 			$respObj->fail();
 
 		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
-			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
+			$respObj->fail(Message::get(ERR_PROFILE_PASSWORD));
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
-			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
+			$respObj->fail(Message::get(ERR_PROFILE_PASSWORD));
 
 		if (!$this->uMod->changePassword($uObj->login, $_POST["oldpwd"], $_POST["newpwd"]))
-			$respObj->fail(getMessage(ERR_PROFILE_PASSWORD));
+			$respObj->fail(Message::get(ERR_PROFILE_PASSWORD));
 
-		$respObj->msg = getMessage(MSG_PROFILE_PASSWORD);
+		$respObj->msg = Message::get(MSG_PROFILE_PASSWORD);
 
 		$respObj->ok();
 	}
@@ -85,12 +85,12 @@ class ProfileApiController extends ApiController
 
 		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset($this->user_id))
-			$this->fail(getMessage(ERR_PROFILE_RESETALL));
+			$this->fail(Message::get(ERR_PROFILE_RESETALL));
 
 		if (!$this->personMod->reset())
-			$this->fail(getMessage(ERR_PROFILE_RESETALL));
+			$this->fail(Message::get(ERR_PROFILE_RESETALL));
 
-		$respObj->msg = getMessage(MSG_PROFILE_RESETALL);
+		$respObj->msg = Message::get(MSG_PROFILE_RESETALL);
 
 		$respObj->ok();
 	}

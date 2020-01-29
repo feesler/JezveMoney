@@ -10,7 +10,7 @@ class UserController extends Controller
 	function fail($msg = NULL, $action = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 		if ($action == "register")
 			setLocation(BASEURL."register/");
 		else
@@ -46,7 +46,7 @@ class UserController extends Controller
 		if (!$this->uMod->login($_POST["login"], $_POST["password"]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_LOGIN);
+		Message::set(MSG_LOGIN);
 
 		setLocation(BASEURL);
 	}
@@ -90,7 +90,7 @@ class UserController extends Controller
 									"name" => $_POST["name"] ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_REGISTER);
+		Message::set(MSG_REGISTER);
 
 		setLocation(BASEURL);
 	}

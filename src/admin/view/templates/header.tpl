@@ -9,5 +9,5 @@
 <?php		}		?>
 <?php	}	?>
 			</div>
-<?php	checkMessage();		?>
+<?php	Message::check();		?>
 		</div>

@@ -29,7 +29,7 @@ class CurrencyAdminController extends AdminController
 	function fail($msg = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 		setLocation(BASEURL."admin/currency/");
 	}
 
@@ -48,7 +48,7 @@ class CurrencyAdminController extends AdminController
 									"format" => $curr_format ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_CURRENCY_CREATE);
+		Message::set(MSG_CURRENCY_CREATE);
 
 		setLocation(BASEURL."admin/currency/");
 	}
@@ -71,7 +71,7 @@ class CurrencyAdminController extends AdminController
 														"format" => $curr_format ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_CURRENCY_UPDATE);
+		Message::set(MSG_CURRENCY_UPDATE);
 
 		setLocation(BASEURL."admin/currency/");
 	}
@@ -87,7 +87,7 @@ class CurrencyAdminController extends AdminController
 		if (!$this->model->del($_POST["curr_id"]))
 			fail($defMsg);
 
-		setMessage(MSG_CURRENCY_DELETE);
+		Message::set(MSG_CURRENCY_DELETE);
 
 		setLocation(BASEURL."admin/currency/");
 	}

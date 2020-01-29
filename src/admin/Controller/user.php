@@ -22,7 +22,7 @@ class UserAdminController extends AdminController
 	public function fail($msg = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 
 		setLocation(BASEURL."admin/user/");
 	}
@@ -38,7 +38,7 @@ class UserAdminController extends AdminController
 		if (!$this->uMod->register($_POST["user_login"], $_POST["user_pass"], $_POST["user_name"]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_USER_CREATE);
+		Message::set(MSG_USER_CREATE);
 
 		setLocation(BASEURL."admin/user/");
 	}
@@ -70,7 +70,7 @@ class UserAdminController extends AdminController
 		$isAdminFlag = isset($_POST["isadmin"]) && $_POST["isadmin"] == "on";
 		$this->uMod->setAccess($_POST["user_id"], $isAdminFlag ? 1 : 0);
 
-		setMessage(MSG_USER_UPDATE);
+		Message::set(MSG_USER_UPDATE);
 
 		setLocation(BASEURL."admin/user/");
 	}
@@ -90,7 +90,7 @@ class UserAdminController extends AdminController
 		if (!$this->uMod->setPassword($uObj->login, $_POST["user_pass"]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_PROFILE_PASSWORD);
+		Message::set(MSG_PROFILE_PASSWORD);
 
 		setLocation(BASEURL."admin/user/");
 	}
@@ -106,7 +106,7 @@ class UserAdminController extends AdminController
 		if (!$this->uMod->del($_POST["user_id"]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_USER_DELETE);
+		Message::set(MSG_USER_DELETE);
 
 		setLocation(BASEURL."admin/user/");
 	}

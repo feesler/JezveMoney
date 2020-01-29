@@ -1,5 +1,5 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
-<?php	checkMessage();		?>
+<?php	Message::check();		?>
 <script>onReady(initLoginPage)</script>
 </head>
 <body>

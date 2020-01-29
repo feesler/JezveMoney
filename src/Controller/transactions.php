@@ -222,7 +222,7 @@ class TransactionsController extends Controller
 	private function fail($msg = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 		setLocation(BASEURL);
 	}
 
@@ -775,7 +775,7 @@ class TransactionsController extends Controller
 									"comment" => $comment ]))
 				$this->fail($defMsg);
 
-			setMessage(MSG_DEBT_CREATE);
+			Message::set(MSG_DEBT_CREATE);
 		}
 		else
 		{
@@ -814,7 +814,7 @@ class TransactionsController extends Controller
 										"comment" => $comment ]))
 				$this->fail($defMsg);
 
-			setMessage(MSG_TRANS_CREATE);
+			Message::set(MSG_TRANS_CREATE);
 		}
 
 		setLocation(BASEURL);
@@ -872,7 +872,7 @@ class TransactionsController extends Controller
 												"date" => $fdate,
 												"comment" => $comment ]))
 				$this->fail($defMsg);
-			setMessage(MSG_DEBT_UPDATE);
+			Message::set(MSG_DEBT_UPDATE);
 		}
 		else
 		{
@@ -905,7 +905,7 @@ class TransactionsController extends Controller
 				$this->fail($defMsg);
 		}
 
-		setMessage(MSG_TRANS_UPDATE);
+		Message::set(MSG_TRANS_UPDATE);
 		setLocation(BASEURL."transactions/");
 	}
 
@@ -924,7 +924,7 @@ class TransactionsController extends Controller
 		if (!$this->model->del($ids))
 			$this->fail();
 
-		setMessage(MSG_TRANS_DELETE);
+		Message::set(MSG_TRANS_DELETE);
 		setLocation(BASEURL."transactions/");
 	}
 }

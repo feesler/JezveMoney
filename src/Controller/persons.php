@@ -19,7 +19,7 @@ class PersonsController extends Controller
 	private function fail($msg = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 		setLocation(BASEURL."persons/");
 	}
 
@@ -98,7 +98,7 @@ class PersonsController extends Controller
 		if (!$this->personMod->create([ "name" => $person_name ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_PERSON_CREATE);
+		Message::set(MSG_PERSON_CREATE);
 
 		setLocation(BASEURL."persons/");
 	}
@@ -124,7 +124,7 @@ class PersonsController extends Controller
 		if (!$this->personMod->update($person_id, [ "name" => $person_name ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_PERSON_UPDATE);
+		Message::set(MSG_PERSON_UPDATE);
 
 		setLocation(BASEURL."persons/");
 	}
@@ -144,7 +144,7 @@ class PersonsController extends Controller
 		if (!$this->personMod->del($ids))
 			$this->fail($defMsg);
 
-		setMessage(MSG_PERSON_DELETE);
+		Message::set(MSG_PERSON_DELETE);
 
 		setLocation(BASEURL."persons/");
 	}

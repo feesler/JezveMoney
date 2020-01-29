@@ -18,4 +18,4 @@
 <?php	}	?>
 			</div>
 		</div>
-<?php	checkMessage();		?>
+<?php	Message::check();		?>

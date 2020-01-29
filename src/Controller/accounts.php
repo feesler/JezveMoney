@@ -70,7 +70,7 @@ class AccountsController extends Controller
 	private function fail($msg = NULL)
 	{
 		if (!is_null($msg))
-			setMessage($msg);
+			Message::set($msg);
 		setLocation(BASEURL."accounts/");
 	}
 
@@ -128,7 +128,7 @@ class AccountsController extends Controller
 								"icon" => $_POST["icon"] ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_ACCOUNT_CREATE);
+		Message::set(MSG_ACCOUNT_CREATE);
 
 		setLocation(BASEURL."accounts/");
 	}
@@ -150,7 +150,7 @@ class AccountsController extends Controller
 									"icon" => $_POST["icon"] ]))
 			$this->fail($defMsg);
 
-		setMessage(MSG_ACCOUNT_UPDATE);
+		Message::set(MSG_ACCOUNT_UPDATE);
 
 		setLocation(BASEURL."accounts/");
 	}
@@ -170,7 +170,7 @@ class AccountsController extends Controller
 		if (!$this->model->del($ids))
 			$this->fail($defMsg);
 
-		setMessage(MSG_ACCOUNT_DELETE);
+		Message::set(MSG_ACCOUNT_DELETE);
 
 		setLocation(BASEURL."accounts/");
 	}
@@ -185,7 +185,7 @@ class AccountsController extends Controller
 
 		if (!$this->model->reset())
 			fail($defMsg);
-		setMessage(MSG_ACCOUNTS_RESET);
+		Message::set(MSG_ACCOUNTS_RESET);
 
 		setLocation(BASEURL."accounts/");
 	}
