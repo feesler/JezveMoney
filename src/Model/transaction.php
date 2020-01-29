@@ -671,7 +671,7 @@ class TransactionModel extends CachedTable
 	}
 
 
-	public function onAccountUpdate($acc_id)
+	public function onAccountCurrencyUpdate($acc_id)
 	{
 		$accObj = $this->accModel->getItem($acc_id);
 		if (!$accObj)
@@ -681,7 +681,7 @@ class TransactionModel extends CachedTable
 		$curDate = date("Y-m-d H:i:s");
 		$userCond = "user_id=".self::$user_id;
 
-		// Update destination transactions
+		// Update source transactions
 		if (!$this->dbObj->updateQ($this->tbl_name,
 									[ "src_curr" => $new_curr, "updatedate" => $curDate ],
 									[ $userCond, "src_id=".qnull($acc_id) ]))

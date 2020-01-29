@@ -208,6 +208,8 @@ class AccountModel extends CachedTable
 			}
 		}
 
+		$this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $accObj->curr_id);
+
 		// get initial balance to calc difference
 		$diff = round($res["balance"] - $accObj->initbalance, 2);
 
@@ -230,9 +232,14 @@ class AccountModel extends CachedTable
 
 	protected function postUpdate($item_id)
 	{
-		$transMod = TransactionModel::getInstance();
+		if ($this->currencyUpdated)
+		{
+			$transMod = TransactionModel::getInstance();
 
-		return $transMod->onAccountUpdate($item_id);
+			$transMod->onAccountCurrencyUpdate($item_id);
+		}
+
+		unset($this->currencyUpdated);
 	}
 
 
