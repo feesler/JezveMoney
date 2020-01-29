@@ -141,16 +141,16 @@
 		{
 			$tables["accounts"] = "a";
 			$condArr[] = "a.curr_id=".$curr_acc_id;
-			if ($trans_type == 1)			// expense or transfer
+			if ($trans_type == EXPENSE)			// expense
 				$condArr[] = "tr.src_id=a.id";
-			else if ($trans_type == 2)		// income
+			else if ($trans_type == INCOME)		// income
 				$condArr[] = "tr.dest_id=a.id";
 		}
 		else
 		{
-			if ($trans_type == 1)			// expense or transfer
+			if ($trans_type == EXPENSE)			// expense
 				$condArr[] = "tr.src_id=".$curr_acc_id;
-			else if ($trans_type == 2)		// income
+			else if ($trans_type == INCOME)		// income
 				$condArr[] = "tr.dest_id=".$curr_acc_id;
 		}
 
@@ -163,7 +163,7 @@
 
 			if ($group_type == 0)		// no grouping
 			{
-				$amountArr[] = floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
+				$amountArr[] = floatval($row[($trans_type == EXPENSE) ? "src_amount" : "dest_amount"]);
 
 				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
 				{
@@ -201,7 +201,7 @@
 				$groupArr[] = [date("d.m.Y", $trans_time), 1];
 			}
 
-			$curSum += floatval($row[($trans_type == 1) ? "src_amount" : "dest_amount"]);
+			$curSum += floatval($row[($trans_type == EXPENSE) ? "src_amount" : "dest_amount"]);
 		}
 
 		// save remain value
