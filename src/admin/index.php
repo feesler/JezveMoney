@@ -28,7 +28,6 @@
 		$noLogs = TRUE;
 
 	require_once("../system/setup.php");
-	require_once("../system/admin.php");
 
 	if (!isset($controllersMap[$contrStr]))
 		setLocation(BASEURL);

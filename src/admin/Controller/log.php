@@ -1,6 +1,6 @@
 <?php
 
-class LogsAdminController extends Controller
+class LogsAdminController extends AdminController
 {
 	protected function onStart()
 	{
@@ -10,15 +10,13 @@ class LogsAdminController extends Controller
 
 	public function index()
 	{
-		global $menuItems;
-
 		$contents = "";
 		if (file_exists($this->filename) && is_readable($this->filename))
 		{
 			$contents = file_get_contents($this->filename);
 		}
 
-		$menuItems["log"]["active"] = TRUE;
+		$this->menuItems["log"]["active"] = TRUE;
 
 		$titleString = "Admin panel | Log";
 

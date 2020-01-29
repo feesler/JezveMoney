@@ -1,11 +1,9 @@
 <?php
 
-class MainAdminController extends Controller
+class MainAdminController extends AdminController
 {
 	public function index()
 	{
-		global $menuItems;
-
 		$titleString = "Admin panel";
 
 		$this->buildCSS();

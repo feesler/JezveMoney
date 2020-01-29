@@ -1,14 +1,12 @@
 <?php
 
-class UserAdminController extends Controller
+class UserAdminController extends AdminController
 {
 	public function index()
 	{
-		global $menuItems;
-
 		$uArr = $this->uMod->getData([ "all" => TRUE ]);
 
-		$menuItems["users"]["active"] = TRUE;
+		$this->menuItems["users"]["active"] = TRUE;
 
 		$titleString = "Admin panel | Users";
 

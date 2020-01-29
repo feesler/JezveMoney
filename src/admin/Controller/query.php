@@ -1,11 +1,9 @@
 <?php
 
-class QueryAdminController extends Controller
+class QueryAdminController extends AdminController
 {
 	public function index()
 	{
-		global $menuItems;
-
 		$query = NULL;
 		$cols = 0;
 		$rows = 0;
@@ -32,7 +30,7 @@ class QueryAdminController extends Controller
 			}
 		}
 
-		$menuItems["query"]["active"] = TRUE;
+		$this->menuItems["query"]["active"] = TRUE;
 
 		$titleString = "Admin panel | DB queries";
 

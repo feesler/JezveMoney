@@ -1,14 +1,12 @@
 <?php
 
-class TestsAdminController extends Controller
+class TestsAdminController extends AdminController
 {
 	public function index()
 	{
-		global $menuItems;
-
 		$titleString = "Admin panel | Tests";
 
-		$menuItems["tests"]["active"] = TRUE;
+		$this->menuItems["tests"]["active"] = TRUE;
 
 		$currMod = CurrencyModel::getInstance();
 		$currArr = $currMod->getData();

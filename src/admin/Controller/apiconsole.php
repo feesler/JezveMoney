@@ -1,12 +1,10 @@
 <?php
 
-class ApiConsoleAdminController extends Controller
+class ApiConsoleAdminController extends AdminController
 {
 	public function index()
 	{
-		global $menuItems;
-
-		$menuItems["apiconsole"]["active"] = TRUE;
+		$this->menuItems["apiconsole"]["active"] = TRUE;
 
 		$titleString = "Admin panel | API console";
 

@@ -23,11 +23,8 @@ abstract class Controller
 		$this->css->libs = ["popup.css"];
 		$this->css->app = ["app.css"];
 		$this->css->page = [];
-		$this->cssAdmin = ["admin.css"];
 
 		$this->jsArr = ["lib/polyfill.min.js", "common.js", "ajax.js", "popup.js", "app.js"];
-		$this->jsAdmin = [];
-		$this->jsAdminModule = [];
 	}
 
 

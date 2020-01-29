@@ -1,6 +1,6 @@
 <?php
 
-class CurrencyAdminController extends Controller
+class CurrencyAdminController extends AdminController
 {
 	protected function onStart()
 	{
@@ -10,11 +10,9 @@ class CurrencyAdminController extends Controller
 
 	public function index()
 	{
-		global $menuItems;
-
 		$currArr = $this->model->getData();
 
-		$menuItems["curr"]["active"] = TRUE;
+		$this->menuItems["curr"]["active"] = TRUE;
 
 		$titleString = "Admin panel | Currency";
 
