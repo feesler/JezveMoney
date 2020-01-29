@@ -1,6 +1,6 @@
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../currency.js';
-import { isValidValue, normalize, setParam } from '../../common.js'
+import { DEBT, isValidValue, normalize, setParam } from '../../common.js'
 import { App } from '../../app.js'
 
 
@@ -27,12 +27,12 @@ class DebtTransactionView extends TransactionView
 	{
 		let res = {};
 
-		res.type = 4;
+		res.type = DEBT;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		if (cont.typeMenu.activeType != 4)
+		if (cont.typeMenu.activeType != DEBT)
 			throw new Error('Wrong page');
 
 		res.person = await App.state.getPerson(cont.person.id);
@@ -243,7 +243,7 @@ class DebtTransactionView extends TransactionView
 									selaccount : this.model.noAccount, noacc_btn : !this.model.noAccount,
 									dest_amount_row : false, dest_amount_left : false,
 									exchange_row : false, exch_left : false },
-					values : { typeMenu : { activeType : 4 }, /* DEBT */
+					values : { typeMenu : { activeType : DEBT },
 								src_amount_row : { value : this.model.srcAmount.toString(), label : 'Amount', currSign : this.model.srcCurr.sign, isCurrActive : false },
 								src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
 								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
@@ -265,7 +265,6 @@ class DebtTransactionView extends TransactionView
 			else
 				res.values.dest_res_balance_left = this.model.fmtDestResBal;
 
-
 			if (!this.model.noAccount)
 				setParam(res.values.account, { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } });
 		}
@@ -281,7 +280,6 @@ class DebtTransactionView extends TransactionView
 				res.values.src_res_balance_left = '';
 			else
 				res.values.src_res_balance_left = this.model.fmtSrcResBal;
-
 
 			if (!this.model.noAccount)
 				setParam(res.values.account, { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } });

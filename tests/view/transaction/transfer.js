@@ -1,6 +1,6 @@
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../currency.js';
-import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { TRANSFER, isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
 import { App } from '../../app.js'
 
 
@@ -11,7 +11,7 @@ class TransferTransactionView extends TransactionView
 	{
 		let res = {};
 
-		res.type = 3;
+		res.type = TRANSFER;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;
@@ -149,7 +149,7 @@ class TransferTransactionView extends TransactionView
 
 		let res = { model : { state : newState },
 					visibility : { source : true, destination : true },
-					values : { typeMenu : { activeType : 3 }, /* TRANSFER */
+					values : { typeMenu : { activeType : TRANSFER },
 								source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 								destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
 								src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },

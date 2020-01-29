@@ -1,6 +1,6 @@
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../currency.js';
-import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { INCOME, isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
 import { App } from '../../app.js'
 
 
@@ -11,7 +11,7 @@ class IncomeTransactionView extends TransactionView
 	{
 		let res = {};
 
-		res.type = 2;
+		res.type = INCOME;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;
@@ -115,7 +115,7 @@ class IncomeTransactionView extends TransactionView
 
 		let res = { model : { state : newState },
 					visibility : { source : false, destination : true, result_balance_row : false, src_res_balance_left : false },
-					values : { typeMenu : { activeType : 2 }, /* INCOME */
+					values : { typeMenu : { activeType : INCOME },
 								destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
 								src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : true },
 								src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),

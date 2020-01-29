@@ -1,6 +1,6 @@
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../currency.js';
-import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { EXPENSE, isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
 import { App } from '../../app.js'
 
 
@@ -11,7 +11,7 @@ class ExpenseTransactionView extends TransactionView
 	{
 		let res = {};
 
-		res.type = 1;
+		res.type = EXPENSE;
 		res.isUpdate = cont.isUpdate;
 		if (res.isUpdate)
 			res.id = cont.id;
