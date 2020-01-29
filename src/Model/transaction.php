@@ -931,24 +931,9 @@ class TransactionModel extends CachedTable
 
 		while($row = $this->dbObj->fetchRow($qResult))
 		{
-			$trans = new stdClass;
-
-			$trans->id = intval($row["id"]);
-			$trans->type = intval($row["type"]);
-			$trans->src_id = intval($row["src_id"]);
-			$trans->dest_id = intval($row["dest_id"]);
-			$trans->src_amount = floatval($row["src_amount"]);
-			$trans->dest_amount = floatval($row["dest_amount"]);
-			$trans->src_curr = intval($row["src_curr"]);
-			$trans->dest_curr = intval($row["dest_curr"]);
-			$trans->comment = $row["comment"];
+			$trans = $this->rowToObj($row);
 			$trans->date = date("d.m.Y", strtotime($row["date"]));
-			$trans->pos = intval($row["pos"]);
-
-			$balArr = $this->getBalance($trans->id);
-
-			$trans->src_balance = (($trans->src_id != 0 && isset($balArr[$trans->src_id])) ? $balArr[$trans->src_id] : 0.0);
-			$trans->dest_balance = (($trans->dest_id != 0 && isset($balArr[$trans->dest_id])) ? $balArr[$trans->dest_id] : 0.0);
+			unset($row);
 
 			if ($trans->type == DEBT)
 			{
@@ -1139,26 +1124,6 @@ class TransactionModel extends CachedTable
 		}
 
 		return $res;
-	}
-
-
-	// Return balance of accounts after specified transaction
-	public function getBalance($trans_id)
-	{
-		if (!self::$user_id)
-			return NULL;
-
-		$trObj = $this->getItem($trans_id);
-		if (!$trObj)
-			return NULL;
-
-		if (!$trObj->src_id && !$trObj->dest_id)
-			return NULL;
-
-		$balArr = [ $trObj->src_id => $trObj->src_result,
-					$trObj->dest_id => $trObj->dest_result ];
-
-		return $balArr;
 	}
 
 

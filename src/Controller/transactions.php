@@ -194,12 +194,12 @@ class TransactionsController extends Controller
 
 				if ($trans->src_id != 0)
 				{
-					$itemData["balance"][] = $this->currModel->format($trans->src_balance, $trans->src_curr);
+					$itemData["balance"][] = $this->currModel->format($trans->src_result, $trans->src_curr);
 				}
 
 				if ($trans->dest_id != 0)
 				{
-					$itemData["balance"][] = $this->currModel->format($trans->dest_balance, $trans->dest_curr);
+					$itemData["balance"][] = $this->currModel->format($trans->dest_result, $trans->dest_curr);
 				}
 			}
 
