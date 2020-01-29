@@ -553,7 +553,7 @@ class TransactionModel extends CachedTable
 		if ($pos === -1)
 			$pos = $this->getLatestPos() + 1;
 
-		$condArr = [ "user_id=".self::$user_id, "pos < ".$pos, "(".$accCond.")" ];
+		$condArr = [ "user_id=".self::$user_id, "pos < ".$pos, $accCond ];
 		$ignore_trans_id = intval($ignore_trans_id);
 		if ($ignore_trans_id)
 			$condArr[] = "id<>".$ignore_trans_id;
@@ -594,7 +594,7 @@ class TransactionModel extends CachedTable
 		$condArr = [ "user_id=".self::$user_id, "pos>=".$pos ];
 		$accCond = $this->getAccCondition([ $src_id, $dest_id ]);
 		if (!is_empty($accCond))
-			$condArr[] = "(".$accCond.")";
+			$condArr[] = $accCond;
 
 		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
 		while($row = $this->dbObj->fetchRow($qResult))
@@ -751,8 +751,15 @@ class TransactionModel extends CachedTable
 
 		// delete expenses and incomes
 		// transactions where both accounts in set will be also deleted
-		$condArr = [$userCond];
-		$condArr[] = "((src_id".$setCond." AND dest_id=0) OR (dest_id".$setCond." AND src_id=0) OR (src_id".$setCond." AND dest_id".$setCond."))";
+		$condArr = [
+			$userCond,
+			orJoin([
+				"src_id$setCond AND dest_id=0",
+				"dest_id$setCond AND src_id=0",
+				"src_id$setCond AND dest_id$setCond"
+			])
+		];
+
 		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
 			return FALSE;
 
@@ -870,7 +877,7 @@ class TransactionModel extends CachedTable
 		{
 			$accCond = $this->getAccCondition($params["accounts"]);
 			if (!is_empty($accCond))
-				$condArr[] = "(".$accCond.")";
+				$condArr[] = $accCond;
 		}
 
 		// Search condition
@@ -1006,7 +1013,7 @@ class TransactionModel extends CachedTable
 		{
 			$accCond = $this->getAccCondition($params["accounts"]);
 			if (!is_empty($accCond))
-				$condArr[] = "(".$accCond.")";
+				$condArr[] = $accCond;
 		}
 
 		if (isset($params["search"]))

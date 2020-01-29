@@ -73,10 +73,12 @@ ini_set('max_execution_time', '0');
 		$condArr = ["user_id=".$this->user_id];
 		if ($checkAccount_id != 0)
 		{
-			$accCond = ["(src_id=".$checkAccount_id." AND (type=".EXPENSE." OR type=".TRANSFER." OR type=".DEBT."))",
-							"(dest_id=".$checkAccount_id." AND (type=".INCOME." OR type=".TRANSFER." OR type=".DEBT."))"];
+			$accCond = [
+				andJoin([ "src_id=$checkAccount_id", "type".inSetCondition([ EXPENSE, TRANSFER, DEBT ]) ]),
+				andJoin([ "dest_id=$checkAccount_id", "type".inSetCondition([ INCOME, TRANSFER, DEBT ]) ])
+			];
 
-			$condArr[] = "(".orJoin($accCond).")";
+			$condArr[] = orJoin($accCond);
 		}
 
 		$qResult = $db->selectQ("*", "transactions", $condArr, NULL, "pos");

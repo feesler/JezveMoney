@@ -68,6 +68,16 @@ function andJoin($pieces)
 }
 
 
+function brace($str)
+{
+	$len = strlen($str);
+	if ($len > 1 &&	($str[0] != "(" || $str[ $len - 1 ] != ")"))
+		return "( ".$str." )";
+
+	return $str;
+}
+
+
 // Prepare string of OR joined conditions for query
 function orJoin($pieces)
 {
@@ -75,7 +85,7 @@ function orJoin($pieces)
 
 	if (is_array($pieces))
 	{
-		$fstr = implode(" OR ", $pieces);
+		$fstr = "(".implode(" OR ", array_map("brace", $pieces)).")";
 	}
 	else if (is_string($pieces))
 	{

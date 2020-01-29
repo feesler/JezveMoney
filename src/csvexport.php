@@ -77,10 +77,12 @@
 	$condArr = ["user_id=".$user_id];
 	if ($checkAccount_id != 0)
 	{
-		$accCond = [];
-		$accCond[] = "(src_id=".$checkAccount_id." AND (type=1 OR type=3 OR type=4))";	// source
-		$accCond[] = "(dest_id=".$checkAccount_id." AND (type=2 OR type=3 OR type=4))";	// destination
-		$condArr[] = "(".orJoin($accCond).")";
+		$accCond = [
+			andJoin([ "src_id=".$checkAccount_id, "type".inSetCondition([ EXPENSE, TRANSFER, DEBT ]) ]),
+			andJoin([ "dest_id=".$checkAccount_id, "type".inSetCondition([ INCOME, TRANSFER, DEBT ]) ])
+		];
+
+		$condArr[] = orJoin($accCond);
 	}
 
 	$qResult = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
