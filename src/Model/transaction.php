@@ -27,7 +27,6 @@ class TransactionModel extends CachedTable
 	}
 
 
-
 	// Create DB table if not exist
 	private function createTable()
 	{
@@ -305,8 +304,6 @@ class TransactionModel extends CachedTable
 		if ($trObj->user_id != self::$user_id)
 			return FALSE;
 
-		$uMod = UserModel::getInstance();
-
 		// check source account is exist
 		$srcBalance = 0;
 		if ($trObj->src_id != 0)
@@ -372,8 +369,6 @@ class TransactionModel extends CachedTable
 		// cancel transaction
 		if (!$this->cancel($item_id))
 			return FALSE;
-
-		$uMod = UserModel::getInstance();
 
 		// check source account is exist
 		$srcBalance = 0;
@@ -725,8 +720,6 @@ class TransactionModel extends CachedTable
 		if (!$uObj)
 			throw new Error("User not found");
 
-		$u_owner = $uObj->owner_id;
-
 		$userCond = "user_id=".self::$user_id;
 
 		if (!is_array($accounts))
@@ -840,6 +833,14 @@ class TransactionModel extends CachedTable
 
 
 	// Return array of transactions
+	// Params:
+	//   type - type of transaction filter. Default is ALL
+	//   accounts - array of accounts to filter by. Default is empty
+	//   search - query string to search by comments. Default is empty
+	//   startDate - start date of transactions filter. Default is empty
+	//   endDate - end date of transactions filter. Default is empty
+	//   desc - sort result descending
+	//   onPage - count of transactions per page.
 	public function getData($params = NULL)
 	{
 		if (is_null($params))
