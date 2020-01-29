@@ -79,7 +79,7 @@ class TransactionModel extends CachedTable
 		$res->dest_result = floatval($row["dest_result"]);
 		$res->src_curr = intval($row["src_curr"]);
 		$res->dest_curr = intval($row["dest_curr"]);
-		$res->date = $row["date"];		// TODO : check why date not converted
+		$res->date = strtotime($row["date"]);
 		$res->comment = $row["comment"];
 		$res->pos = intval($row["pos"]);
 		$res->createdate = strtotime($row["createdate"]);
@@ -409,7 +409,7 @@ class TransactionModel extends CachedTable
 		}
 
 		// check date is changed
-		$orig_date = getdate(strtotime($trObj->date));
+		$orig_date = getdate($trObj->date);
 		$target_date = getdate($res["date"]);
 
 		$orig_time = mktime(0, 0, 0, $orig_date["mon"], $orig_date["mday"], $orig_date["year"]);
@@ -659,7 +659,7 @@ class TransactionModel extends CachedTable
 
 		$condArr = ["user_id=".self::$user_id];
 		if ($trans_date != -1)
-			$condArr[] = "date <= ".qnull($trans_date);
+			$condArr[] = "date <= ".qnull(date("Y-m-d H:i:s", $trans_date));
 
 		$qResult = $this->dbObj->selectQ("pos", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
 		if ($this->dbObj->rowsCount($qResult) != 1)
@@ -932,7 +932,6 @@ class TransactionModel extends CachedTable
 		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$trans = $this->rowToObj($row);
-			$trans->date = date("d.m.Y", strtotime($row["date"]));
 			unset($row);
 
 			if ($trans->type == DEBT)
@@ -1163,7 +1162,7 @@ class TransactionModel extends CachedTable
 					"dest_curr" => $item->dest_curr,
 					"src_amount" => $item->src_amount,
 					"dest_amount" => $item->dest_amount,
-					"date" => $item->date,
+					"date" => date("Y-m-d H:i:s", $item->date),
 					"comment" => $item->comment ];
 
 		return $res;
