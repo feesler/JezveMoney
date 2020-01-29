@@ -14,51 +14,51 @@
 	}
 
 
-	$classes = ["CachedTable" => "system/cachedTable.php",
-					"Controller" => "system/controller.php",
-					"Model" => "system/model.php",
-					"Singleton" => "system/singleton.php",
-					"ApiController" => "system/apicontroller.php",
-					"AdminController" => "system/admincontroller.php",
-				// Controllers
-					"MainController" => "Controller/main.php",
-					"AccountsController" => "Controller/accounts.php",
-					"PersonsController" => "Controller/persons.php",
-					"TransactionsController" => "Controller/transactions.php",
-					"UserController" => "Controller/user.php",
-					"ProfileController" => "Controller/profile.php",
-					"StatisticsController" => "Controller/statistics.php",
-					"FastCommitController" => "Controller/fastcommit.php",
-					"CheckBalanceController" => "Controller/checkbalance.php",
-				// API controllers
-					"CurrencyApiController" => "api/Controller/currency.php",
-					"AccountApiController" => "api/Controller/account.php",
-					"PersonApiController" => "api/Controller/person.php",
-					"TransactionApiController" => "api/Controller/transaction.php",
-					"UserApiController" => "api/Controller/user.php",
-					"ProfileApiController" => "api/Controller/profile.php",
-				// Admin controllers
-					"CurrencyAdminController" => "admin/Controller/currency.php",
-					"UserAdminController" => "admin/Controller/user.php",
-					"MainAdminController" => "admin/Controller/main.php",
-					"QueryAdminController" => "admin/Controller/query.php",
-					"LogsAdminController" => "admin/Controller/log.php",
-					"TestsAdminController" => "admin/Controller/tests.php",
-					"ApiConsoleAdminController" => "admin/Controller/apiconsole.php",
-				// Models
-					"AccountModel" => "Model/account.php",
-					"CurrencyModel" => "Model/currency.php",
-					"DebtModel" => "Model/debt.php",
-					"mysqlDB" => "system/mysql.php",
-					"PersonModel" => "Model/person.php",
-					"TransactionModel" => "Model/transaction.php",
-					"UserModel" => "Model/user.php",
-					"apiResponse" => "system/apiResponse.php"];
-
 	// Check class name and try to load file
 	function autoLoadClass($className)
 	{
-		global $classes;
+		$classes = [
+			"CachedTable" => "system/cachedTable.php",
+			"Controller" => "system/controller.php",
+			"Model" => "system/model.php",
+			"Singleton" => "system/singleton.php",
+			"ApiController" => "system/apicontroller.php",
+			"AdminController" => "system/admincontroller.php",
+		// Controllers
+			"MainController" => "Controller/main.php",
+			"AccountsController" => "Controller/accounts.php",
+			"PersonsController" => "Controller/persons.php",
+			"TransactionsController" => "Controller/transactions.php",
+			"UserController" => "Controller/user.php",
+			"ProfileController" => "Controller/profile.php",
+			"StatisticsController" => "Controller/statistics.php",
+			"FastCommitController" => "Controller/fastcommit.php",
+			"CheckBalanceController" => "Controller/checkbalance.php",
+		// API controllers
+			"CurrencyApiController" => "api/Controller/currency.php",
+			"AccountApiController" => "api/Controller/account.php",
+			"PersonApiController" => "api/Controller/person.php",
+			"TransactionApiController" => "api/Controller/transaction.php",
+			"UserApiController" => "api/Controller/user.php",
+			"ProfileApiController" => "api/Controller/profile.php",
+		// Admin controllers
+			"CurrencyAdminController" => "admin/Controller/currency.php",
+			"UserAdminController" => "admin/Controller/user.php",
+			"MainAdminController" => "admin/Controller/main.php",
+			"QueryAdminController" => "admin/Controller/query.php",
+			"LogsAdminController" => "admin/Controller/log.php",
+			"TestsAdminController" => "admin/Controller/tests.php",
+			"ApiConsoleAdminController" => "admin/Controller/apiconsole.php",
+		// Models
+			"AccountModel" => "Model/account.php",
+			"CurrencyModel" => "Model/currency.php",
+			"DebtModel" => "Model/debt.php",
+			"mysqlDB" => "system/mysql.php",
+			"PersonModel" => "Model/person.php",
+			"TransactionModel" => "Model/transaction.php",
+			"UserModel" => "Model/user.php",
+			"apiResponse" => "system/apiResponse.php"
+		];
 
 		if (isset($classes[$className]))
 		{
