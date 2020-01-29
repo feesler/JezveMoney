@@ -599,21 +599,17 @@ class TransactionModel extends CachedTable
 		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
 		while($row = $this->dbObj->fetchRow($qResult))
 		{
-			$tr = new stdClass;
-			$tr->id = intval($row["id"]);
-			$tr->type = intval($row["type"]);
-			$tr->src_id = intval($row["src_id"]);
-			$tr->dest_id = intval($row["dest_id"]);
-			$tr->srcAmount = floatval($row["src_amount"]);
-			$tr->destAmount = floatval($row["dest_amount"]);
+			$tr = $this->rowToObj($row);
 
 			$assingments = [];
 			if ($tr->type == EXPENSE || $tr->type == TRANSFER || $tr->type == DEBT)
 			{
 				if (isset($results[$tr->src_id]))
 				{
-					$results[$tr->src_id] = round($results[$tr->src_id] - $tr->srcAmount, 2);
-					$assingments["src_result"] = $results[$tr->src_id];
+					$results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
+					$diff = round($tr->src_result - $results[$tr->src_id], 2);
+					if (abs($diff) >= 0.01)
+						$assingments["src_result"] = $results[$tr->src_id];
 				}
 			}
 
@@ -621,13 +617,18 @@ class TransactionModel extends CachedTable
 			{
 				if (isset($results[$tr->dest_id]))
 				{
-					$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->destAmount, 2);
-					$assingments["dest_result"] = $results[$tr->dest_id];
+					$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
+					$diff = round($tr->dest_result - $results[$tr->dest_id], 2);
+					if (abs($diff) >= 0.01)
+						$assingments["dest_result"] = $results[$tr->dest_id];
 				}
 			}
 
-			if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id=".$tr->id))
-				return FALSE;
+			if (count($assingments))
+			{
+				if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id=".$tr->id))
+					return FALSE;
+			}
 		}
 
 		$this->cleanCache();
