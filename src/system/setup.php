@@ -86,10 +86,9 @@
 
 	define("BASEURL", APPPROT.APPHOST.APPPATH);
 
-	if (!isset($noLogs))
+	require_once(APPROOT."system/log.php");
+	if (!isset($noLogs) || !$noLogs)
 	{
-		require_once(APPROOT."system/log.php");
-
 		wlog("\r\nBEGIN");
 		wlog("BASEURL: ".BASEURL);
 		wlog("approot: ".APPROOT);
@@ -108,10 +107,6 @@
 			wlog("POST data:");
 			wlog(file_get_contents('php://input'));
 		}
-	}
-	else
-	{
-		function wlog(){}
 	}
 
 	$route = (isset($_GET["route"])) ? $_GET["route"] : "";

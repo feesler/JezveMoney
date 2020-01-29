@@ -1,29 +1,51 @@
 <?php
-	$logfname = APPROOT."system/logs/log.txt";
+
+class Logger
+{
+	private static $filename = APPROOT."system/logs/log.txt";
 
 
 	// Write string to log file
-	function wlog($str)
+	public static function write($str)
 	{
-		global $logfname;
+		file_put_contents(self::$filename, $str."\r\n", FILE_APPEND);
+	}
 
-		$fp = fopen($logfname, "a+");
-		if ($fp)
-		{
-			$str .= "\r\n";
 
-			fwrite($fp, $str);
-			fclose($fp);
-		}
+	public static function read()
+	{
+		if (!file_exists(self::$filename) || !is_readable(self::$filename))
+			return "";
+
+		return file_get_contents(self::$filename);
 	}
 
 
 	// Clean log file
-	function clog()
+	public static function clean()
 	{
-		global $logfname;
+		if (!file_exists(self::$filename) || !is_writable(self::$filename))
+			return;
 
-		$fp = fopen($logfname, "w");
-		if ($fp)
-			fclose($fp);
+		file_put_contents(self::$filename, "");
 	}
+
+}
+
+if (isset($noLogs) && $noLogs == TRUE)
+{
+	function wlog(){}
+}
+else
+{
+	function wlog($str)
+	{
+		Logger::write($str);
+	}
+}
+
+
+function clog()
+{
+	Logger::clean();
+}

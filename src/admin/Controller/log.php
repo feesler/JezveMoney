@@ -2,19 +2,9 @@
 
 class LogsAdminController extends AdminController
 {
-	protected function onStart()
-	{
-		$this->filename = APPROOT."system/logs/log.txt";
-	}
-
-
 	public function index()
 	{
-		$contents = "";
-		if (file_exists($this->filename) && is_readable($this->filename))
-		{
-			$contents = file_get_contents($this->filename);
-		}
+		$contents = Logger::read();
 
 		$this->menuItems["log"]["active"] = TRUE;
 
@@ -30,8 +20,7 @@ class LogsAdminController extends AdminController
 	{
 		if (isset($_POST["clean"]) && $_POST["clean"] == "1")
 		{
-			if (file_exists($this->filename))
-				unlink($this->filename);
+			Logger::clean();
 		}
 
 		setLocation(BASEURL."admin/log/");
