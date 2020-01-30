@@ -572,6 +572,48 @@ class TransactionModel extends CachedTable
 	}
 
 
+	protected function pushUniq(&$storage, $key, $value)
+	{
+		if (!is_array($storage))
+			throw new Error("Invalid storage specified");
+
+		if (!isset($storage[$key]))
+			$storage[$key] = [];
+
+		if (!in_array($value, $storage[$key]))
+			$storage[$key][] = $value;
+	}
+
+
+	// Search for specified array of values in storage
+	// Values may be in different order
+	// If found remove item from storage and return key
+	// Return NULL if no value is found
+	protected function findInStorage(&$storage, $expectedValues)
+	{
+		foreach($storage as $key => $values)
+		{
+			if (!array_diff($expectedValues, $values) &&
+				!array_diff($values, $expectedValues))
+			{
+				unset($storage[$key]);
+				return $key;
+			}
+		}
+
+		return NULL;
+	}
+
+
+	protected function diffAssignment($field, $diff)
+	{
+		if (floatval($diff) > 0)
+			return "$field=$field+$diff";
+		else
+			return "$field=$field$diff";
+	}
+
+
 	//
 	protected function updateResults($src_id, $dest_id, $ignore_trans_id, $pos)
 	{
@@ -591,39 +633,60 @@ class TransactionModel extends CachedTable
 		if (!is_empty($accCond))
 			$condArr[] = $accCond;
 
+		$srcAssingments = [];
+		$destAssingments = [];
+
 		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
 		while($row = $this->dbObj->fetchRow($qResult))
 		{
 			$tr = $this->rowToObj($row);
+			unset($row);
 
-			$assingments = [];
 			if ($tr->type == EXPENSE || $tr->type == TRANSFER || $tr->type == DEBT)
 			{
-				if (isset($results[$tr->src_id]))
+				if ($tr->src_id && isset($results[$tr->src_id]))
 				{
 					$results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
-					$diff = round($tr->src_result - $results[$tr->src_id], 2);
+					$diff = round($results[$tr->src_id] - $tr->src_result, 2);
 					if (abs($diff) >= 0.01)
-						$assingments["src_result"] = $results[$tr->src_id];
+						$this->pushUniq($srcAssingments, strval($diff), $tr->id);
 				}
 			}
 
 			if ($tr->type == INCOME || $tr->type == TRANSFER || $tr->type == DEBT)
 			{
-				if (isset($results[$tr->dest_id]))
+				if ($tr->dest_id && isset($results[$tr->dest_id]))
 				{
 					$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
-					$diff = round($tr->dest_result - $results[$tr->dest_id], 2);
+					$diff = round($results[$tr->dest_id] - $tr->dest_result, 2);
 					if (abs($diff) >= 0.01)
-						$assingments["dest_result"] = $results[$tr->dest_id];
+						$this->pushUniq($destAssingments, strval($diff), $tr->id);
 				}
 			}
+		}
 
-			if (count($assingments))
-			{
-				if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id=".$tr->id))
-					return FALSE;
-			}
+		foreach($srcAssingments as $diff => $ids)
+		{
+			$assingments = [
+				$this->diffAssignment("src_result", $diff)
+			];
+
+			$destDiff = $this->findInStorage($destAssingments, $ids);
+			if (!is_null($destDiff))
+				$assingments[] = $this->diffAssignment("dest_result", $destDiff);
+
+			if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id".inSetCondition($ids)))
+				return FALSE;
+		}
+
+		foreach($destAssingments as $diff => $ids)
+		{
+			$assingments = [
+				$this->diffAssignment("dest_result", $diff)
+			];
+
+			if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id".inSetCondition($ids)))
+				return FALSE;
 		}
 
 		$this->cleanCache();
