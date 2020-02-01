@@ -333,3 +333,30 @@
 
 		return $res;
 	}
+
+
+	// Check is all of expected fields present in the array or object
+	// Return array with only expected fields or FALSE if something goes wrong
+	function checkFields($obj, $expectedFields)
+	{
+		if (is_null($obj) || !is_array($expectedFields))
+			return FALSE;
+
+		if (!is_array($obj))
+			$obj = (array)$obj;
+
+		$res = [];
+		foreach($expectedFields as $field)
+		{
+			if (!array_key_exists($field, $obj))
+			{
+				wlog("checkFields() .. ".var_export($obj, TRUE));
+				wlog("Field $field not found");
+				return FALSE;
+			}
+
+			$res[$field] = $obj[$field];
+		}
+
+		return $res;
+	}

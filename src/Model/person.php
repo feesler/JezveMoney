@@ -81,17 +81,9 @@ class PersonModel extends CachedTable
 		$avFields = ["name"];
 		$res = [];
 
-		if (!$isUpdate)
-		{
-			foreach($avFields as $field)
-			{
-				if (!isset($params[$field]))
-				{
-					wlog($field." parameter not found");
-					return NULL;
-				}
-			}
-		}
+		// In CREATE mode all fields is required
+		if (!$isUpdate && !checkFields($params, $avFields))
+			return NULL;
 
 		if (isset($params["name"]))
 		{
