@@ -55,6 +55,25 @@ abstract class Controller
 	}
 
 
+	// Obtain input of request and try to decode it as JSON
+	protected function getJSONContent($asArray = FALSE)
+	{
+		$rawData = file_get_contents('php://input');
+
+		try
+		{
+			$json = JSON::decode($rawData, $asArray);
+		}
+		catch(Exception $e)
+		{
+			wlog($e);
+			$json = NULL;
+		}
+
+		return $json;
+	}
+
+
 	// Obtain requested ids from actionParam of from GET id parameter and return array of integers
 	protected function getRequestedIds($isPOST = FALSE)
 	{

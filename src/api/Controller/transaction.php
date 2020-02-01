@@ -178,6 +178,25 @@ class TransactionApiController extends ApiController
 	}
 
 
+	public function createMultiple()
+	{
+		$respObj = new apiResponse;
+
+		if (!$this->isPOST())
+			$respObj->fail();
+
+		$request = $this->getJSONContent(TRUE);
+
+		$trans_ids = $this->model->createMultiple($request);
+		if (!$trans_ids)
+			$respObj->fail();
+
+		$respObj->data = ["ids" => $trans_ids];
+
+		$respObj->ok();
+	}
+
+
 	public function update()
 	{
 		$db = mysqlDB::getInstance();

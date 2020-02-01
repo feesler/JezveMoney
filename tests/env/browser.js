@@ -238,7 +238,6 @@ class BrowserEnvironment extends Environment
 		if (!supportedMethods.includes(method))
 			reject('Unexpected method ' + method);
 
-		let postData = null;
 		let options = { method : method, headers : {} };
 
 		if (headers)
@@ -246,7 +245,7 @@ class BrowserEnvironment extends Environment
 
 		if (method == 'post' && data)
 		{
-			postData = urlJoin(data);
+			let postData = (typeof data === 'string') ? data : urlJoin(data);
 
 			let encoder = new TextEncoder();
 			let uint8Array = encoder.encode(postData);

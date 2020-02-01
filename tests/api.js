@@ -415,23 +415,57 @@ let apiModule = (function()
 	}
 
 
- 	async function createTransaction(options)
- 	{
+	function prepareTransactionData(options)
+	{
 		if (!options.date)
 			options.date = formatDate(new Date());
 		if (typeof options.comm === 'undefined')
 			options.comm = '';
 
- 		let postData = checkFields(options, trReqFields);
+ 		let res = checkFields(options, trReqFields);
 
-		let isDebt = (postData.transtype == DEBT);
-		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
+		let isDebt = (res.transtype == DEBT);
+		let additionalData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
 
-		setParam(postData, addData);
+		setParam(res, additionalData);
+
+		return res;
+	}
+
+
+ 	async function createTransaction(options)
+ 	{
+		let postData = prepareTransactionData(options);
 
  		let apiRes = await apiPost('transaction/create', postData);
  		if (!apiRes || apiRes.result != 'ok')
  			throw new Error('Fail to create transaction');
+
+ 		return apiRes.data;
+ 	}
+
+
+ 	async function createMultipleTransactions(data)
+ 	{
+		let transactions = (Array.isArray(data)) ? data : [ data ];
+
+		let postData = [];
+		for(let options of transactions)
+		{
+			let itemData = prepareTransactionData(options);
+
+			itemData.type = itemData.transtype;
+			delete itemData.transtype;
+
+			itemData.comment = itemData.comm;
+			delete itemData.comm;
+
+			postData.push(itemData);
+		}
+
+ 		let apiRes = await apiPost('transaction/createMultiple', JSON.stringify(postData));
+ 		if (!apiRes || apiRes.result != 'ok')
+ 			throw new Error('Fail to create transactions');
 
  		return apiRes.data;
  	}

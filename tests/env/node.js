@@ -284,7 +284,7 @@ class NodeEnvironment extends Environment
 
 			if (method == 'post' && data)
 			{
-				postData = urlJoin(data);
+				postData = (typeof data === 'string') ? data : urlJoin(data);
 
 				setParam(options.headers,
 									{ 'Content-Type' : 'application/x-www-form-urlencoded',
