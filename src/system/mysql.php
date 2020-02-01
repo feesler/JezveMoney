@@ -3,24 +3,23 @@
 // Return quotted string or NULL
 function qnull($str)
 {
-	return (is_null($str) ? "NULL" : "'".$str."'");
+	return (is_null($str) ? "NULL" : "'$str'");
 }
 
 
 // Quotting join
 function qjoin($glue, $pieces)
 {
-	$res = "";
-
 	if (!is_array($pieces))
-		return $res;
+		return "";
 
-	for($i = 0; $i < count($pieces); $i++)
+	$quotted = [];
+	foreach($pieces as $item)
 	{
-		$res .= ($i ? $glue : "").qnull($pieces[$i]);
+		$quotted[] = qnull($item);
 	}
 
-	return $res;
+	return implode($glue, $quotted);
 }
 
 
@@ -35,7 +34,7 @@ function asJoin($pieces)
 		foreach($pieces as $pkey => $pval)
 		{
 			if (is_string($pkey))
-				$parr[] = $pkey." AS ".$pval;
+				$parr[] = "$pkey AS $pval";
 			else
 				$parr[] = $pval;
 		}
@@ -72,7 +71,7 @@ function brace($str)
 {
 	$len = strlen($str);
 	if ($len > 1 &&	($str[0] != "(" || $str[ $len - 1 ] != ")"))
-		return "( ".$str." )";
+		return "($str)";
 
 	return $str;
 }
@@ -120,6 +119,24 @@ function assignJoin($assignments)
 }
 
 
+function fieldsJoin($fields)
+{
+	$quotted = [];
+	foreach($fields as $field)
+	{
+		$quotted[] = "`$field`";
+	}
+
+	return "(".implode(", ", $quotted).")";
+}
+
+
+function valuesJoin($values)
+{
+	return "(".qjoin(", ", $values).")";
+}
+
+
 // Return right part of query condition to check field equal id or in set of ids
 // Zero values are omitted. In case no valid values found NULL is returned
 function inSetCondition($ids)
@@ -128,10 +145,13 @@ function inSetCondition($ids)
 		return NULL;
 
 	$validIds = skipZeros($ids);
-	if (!count($validIds))
+	if (!is_array($validIds) || !count($validIds))
 		return NULL;
 
-	return (count($validIds) == 1) ? "=".$validIds[0] : " IN (".implode(",", $validIds).")";
+	if (count($validIds) == 1)
+		return "=".$validIds[0];
+	else
+		return " IN (".implode(",", $validIds).")";
 }
 
 
@@ -189,8 +209,8 @@ class mysqlDB
 		if ($res)
 			self::$dbname = $name;
 
-		$errno = mysqli_errno(self::$conn);
-		wlog("Result: ".($errno ? ($errno." - ".mysqli_error(self::$conn)) : "ok"));
+		$this->errno = mysqli_errno(self::$conn);
+		wlog("Result: ".($this->errno ? ($this->errno." - ".mysqli_error(self::$conn)) : "ok"));
 
 		return $res;
 	}
@@ -228,12 +248,15 @@ class mysqlDB
 		if (!$this->checkConnection())
 			return NULL;
 
+		$this->insert_id = NULL;
+		$this->affected = NULL;
+
 		wlog("Query: ".$query);
 
 		$res = mysqli_query(self::$conn, $query);
 
-		$errno = mysqli_errno(self::$conn);
-		wlog("Result: ".($errno ? ($errno." - ".mysqli_error(self::$conn)) : "ok"));
+		$this->errno = mysqli_errno(self::$conn);
+		wlog("Result: ".($this->errno ? ($this->errno." - ".mysqli_error(self::$conn)) : "ok"));
 
 		return ($res !== FALSE) ? $res : NULL;
 	}
@@ -247,17 +270,17 @@ class mysqlDB
 		if (!$fstr || !$tstr)
 			return $resArr;
 
-		$query = "SELECT ".$fstr." FROM ".$tstr;
+		$query = "SELECT $fstr FROM $tstr";
 		if ($condition)
 			$query .= " WHERE ".andJoin($condition);
 		if ($group)
-			$query .= " GROUP BY ".$group;
+			$query .= " GROUP BY $group";
 		if ($order)
-			$query .= " ORDER BY ".$order;
+			$query .= " ORDER BY $order";
 		$query .= ";";
 
 		$result = $this->rawQ($query);
-		if ($result === FALSE || mysqli_errno(self::$conn) != 0)
+		if ($result === FALSE || $this->errno != 0)
 			return NULL;
 
 		return $result;
@@ -285,7 +308,7 @@ class mysqlDB
 	// Insert query
 	public function insertQ($table, $data)
 	{
-		if (empty($table) || !is_array($data) || !count($data))
+		if (!is_array($data) || !count($data))
 			return FALSE;
 
 		$fields = [];
@@ -295,15 +318,17 @@ class mysqlDB
 			if (!is_string($key))
 				continue;
 
-			$fields[] = "`".$key."`";
-			$values[] = qnull($value);
+			$fields[] = $key;
+			$values[] = $value;
 		}
 
-		$query = "INSERT INTO `".$table."` (".implode(", ", $fields).") VALUES (".implode(", ", $values).");";
+		$query = "INSERT INTO `$table` ".fieldsJoin($fields)." VALUES ".valuesJoin($values).";";
 		$this->rawQ($query);
-		$errno = mysqli_errno(self::$conn);
 
-		return ($errno == 0);
+		$this->insert_id = $this->insertId();
+		$this->affected = $this->affectedRows();
+
+		return ($this->errno == 0);
 	}
 
 
@@ -311,6 +336,13 @@ class mysqlDB
 	public function insertId()
 	{
 		return mysqli_insert_id(self::$conn);
+	}
+
+
+	// Return last insert id
+	public function affectedRows()
+	{
+		return mysqli_affected_rows(self::$conn);
 	}
 
 
@@ -326,9 +358,8 @@ class mysqlDB
 		$query .= ";";
 
 		$this->rawQ($query);
-		$errno = mysqli_errno(self::$conn);
 
-		return ($errno == 0);
+		return ($this->errno == 0);
 	}
 
 
@@ -340,7 +371,8 @@ class mysqlDB
 
 		$query = "TRUNCATE TABLE `".$table."`;";
 		$this->rawQ($query);
-		return (mysqli_errno(self::$conn) == 0);
+
+		return ($this->errno == 0);
 	}
 
 
@@ -356,7 +388,7 @@ class mysqlDB
 		$query = "DELETE FROM `".$table."` WHERE ".andJoin($condition).";";
 		$this->rawQ($query);
 
-		return (mysqli_errno(self::$conn) == 0);
+		return ($this->errno == 0);
 	}
 
 
@@ -371,9 +403,8 @@ class mysqlDB
 		$query .= ";";
 
 		$result = $this->rawQ($query);
-		$errno = mysqli_errno(self::$conn);
 		$rows = mysqli_num_rows($result);
-		if (!$errno && $rows == 1)
+		if (!$this->errno && $rows == 1)
 		{
 			$row = mysqli_fetch_array($result);
 			if ($row)
@@ -392,11 +423,10 @@ class mysqlDB
 			$query = "SHOW TABLES;";
 
 			$result = $this->rawQ($query);
-			$errno = mysqli_errno(self::$conn);
 			$rows = mysqli_num_rows($result);
 
 			self::$tblCache = [];
-			if ($result && !$errno && $rows > 0)
+			if ($result && !$this->errno && $rows > 0)
 			{
 				while($row = mysqli_fetch_array($result))
 				{
@@ -416,14 +446,13 @@ class mysqlDB
 		if (!$table || $table == "" || !$defs || $defs == "")
 			return FALSE;
 
-		$query = "CREATE TABLE IF NOT EXISTS `".$table."` (".$defs.") ".$options.";";
+		$query = "CREATE TABLE IF NOT EXISTS `$table` ($defs) $options;";
 
 		$this->rawQ($query);
-		$errno = mysqli_errno(self::$conn);
-		if ($errno == 0)
+		if ($this->errno == 0)
 			self::$tblCache[$table] = TRUE;
 
-		return ($errno == 0);
+		return ($this->errno == 0);
 	}
 
 
@@ -435,11 +464,10 @@ class mysqlDB
 
 		$query = "DROP TABLE IF EXISTS `".$table."`;";
 		$this->rawQ($query);
-		$errno = mysqli_errno(self::$conn);
-		if ($errno == 0)
+		if ($this->errno == 0)
 			unset(self::$tblCache[$table]);
 
-		return ($errno == 0);
+		return ($this->errno == 0);
 	}
 
 }
