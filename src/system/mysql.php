@@ -142,18 +142,21 @@ class mysqlDB
 	private static $conn = NULL;		// connection
 	private static $dbname = NULL;		// current database name
 	private static $tblCache = NULL;	// cache of exist tables
-	private static $settings = NULL;	// saved connection settings
+	private static $config = NULL;		// saved connection settings
 
 
-	public static function setup($dblocation, $dbuser, $dbpasswd, $dbname)
+	public static function setup($config)
 	{
-		if (is_null(self::$settings))
-			self::$settings = new stdClass;
+		$reqFields = ["location", "user", "password", "name"];
 
-		self::$settings->location = $dblocation;
-		self::$settings->user = $dbuser;
-		self::$settings->passwd = $dbpasswd;
-		self::$settings->database = $dbname;
+		if (!is_null(self::$config))
+			throw new Error("DB already configured");
+
+		$config = checkFields($config, $reqFields);
+		if (!$config)
+			throw new Error("Invalid DB configuration");
+
+		self::$config = $config;
 	}
 
 
@@ -166,7 +169,7 @@ class mysqlDB
 	// Connect to database server
 	protected function connect()
 	{
-		$dbcnx = mysqli_connect(self::$settings->location, self::$settings->user, self::$settings->passwd);
+		$dbcnx = mysqli_connect(self::$config["location"], self::$config["user"], self::$config["password"]);
 		if ($dbcnx)
 			self::$conn = $dbcnx;
 
@@ -193,9 +196,28 @@ class mysqlDB
 	}
 
 
+	// Check connection is already created
+	private function checkConnection()
+	{
+		if (!is_null(self::$conn))
+			return TRUE;
+
+		if (!$this->connect())
+			return FALSE;
+		if (!$this->selectDB(self::$config["name"]))
+			return FALSE;
+		$this->rawQ("SET NAMES 'utf8';");
+
+		return TRUE;
+	}
+
+
 	// Return escaped string
 	public function escape($str)
 	{
+		if (!$this->checkConnection())
+			return NULL;
+
 		return mysqli_real_escape_string(self::$conn, $str);
 	}
 
@@ -203,14 +225,8 @@ class mysqlDB
 	// Raw query to database
 	public function rawQ($query)
 	{
-		if (is_null(self::$conn))
-		{
-			if (!$this->connect())
-				return NULL;
-			if (!$this->selectDB(self::$settings->database))
-				return NULL;
-			$this->rawQ("SET NAMES 'utf8';");
-		}
+		if (!$this->checkConnection())
+			return NULL;
 
 		wlog("Query: ".$query);
 

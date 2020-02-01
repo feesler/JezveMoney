@@ -117,9 +117,8 @@
 	require_once(APPROOT."system/common.php");
 	spl_autoload_register("autoLoadClass");
 
-	require_once(APPROOT."system/dbsetup.php");
-
-	mysqlDB::setup($db_location, $db_user, $db_password, $db_name);
+	$dbConfig = ( require_once(APPROOT."system/dbsetup.php") );
+	mysqlDB::setup($dbConfig);
 
 	date_default_timezone_set("Europe/Moscow");
 
