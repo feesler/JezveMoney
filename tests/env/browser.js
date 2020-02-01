@@ -314,18 +314,25 @@ class BrowserEnvironment extends Environment
 		{
 			this.viewframe.onload = async () =>
 			{
-				this.vdoc = this.viewframe.contentWindow.document;
-				if (!this.vdoc)
-					throw new Error('View document not found');
+				try
+				{
+					this.vdoc = this.viewframe.contentWindow.document;
+					if (!this.vdoc)
+						throw new Error('View document not found');
 
-				checkPHPerrors(this, this.vdoc.documentElement.innerHTML);
+					checkPHPerrors(this, this.vdoc.documentElement.innerHTML);
 
-				let viewClass = await route(this, await this.url());
+					let viewClass = await route(this, await this.url());
 
-				this.app.view = new viewClass({ environment : this });
-				await this.app.view.parse();
+					this.app.view = new viewClass({ environment : this });
+					await this.app.view.parse();
 
-				resolve();
+					resolve();
+				}
+				catch(e)
+				{
+					reject(e);
+				}
 			};
 		});
 

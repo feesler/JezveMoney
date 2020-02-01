@@ -387,16 +387,23 @@ class NodeEnvironment extends Environment
 		{
 			this.page.once('load', async () =>
 			{
-				let content = await this.page.content();
+				try
+				{
+					let content = await this.page.content();
 
-				checkPHPerrors(this, content);
+					checkPHPerrors(this, content);
 
-				let viewClass = await route(this, await this.url());
+					let viewClass = await route(this, await this.url());
 
-				this.app.view = new viewClass({ environment : this });
-				await this.app.view.parse();
+					this.app.view = new viewClass({ environment : this });
+					await this.app.view.parse();
 
-				resolve();
+					resolve();
+				}
+				catch(e)
+				{
+					reject(e);
+				}
 			});
 		});
 
