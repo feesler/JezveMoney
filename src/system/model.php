@@ -11,19 +11,29 @@ abstract class Model
 	protected function postCreate($item_id){}
 
 
-	// Create new item and return id
-	public function create($params)
+	// Prepare data of single row for new item insert query
+	private function prepareRow($params)
 	{
 		if (!is_array($params))
 			return 0;
 
-		$prepareRes = $this->preCreate($params);
-		if (is_null($prepareRes))
+		$res = $this->preCreate($params);
+		if (!is_array($res))
+			return NULL;
+
+		$res["id"] = NULL;	// overwrite id even if it is set
+
+		return $res;
+	}
+
+
+	// Create new item and return id
+	public function create($params)
+	{
+		$prepared = $this->prepareRow($params);
+		if (!is_array($prepared))
 			return 0;
-
-		$prepareRes["id"] = NULL;	// overwrite id even if it is set
-
-		if (!$this->dbObj->insertQ($this->tbl_name, $prepareRes))
+		if (!$this->dbObj->insertQ($this->tbl_name, $prepared))
 			return 0;
 
 		$item_id = $this->dbObj->insertId();
@@ -32,6 +42,47 @@ abstract class Model
 		$this->postCreate($item_id);
 
 		return $item_id;
+	}
+
+
+	// Create multiple items
+	// Return list of ids if succeeded or NULL otherwise
+	public function createMultiple($params)
+	{
+		if (!is_array($params))
+			return NULL;
+
+		$prepared = [];
+		foreach($params as $item)
+		{
+			$row = $this->prepareRow($item);
+			if (!is_array($row))
+				return NULL;
+
+			$prepared[] = $row;
+		}
+
+		$rowsPrepared = count($prepared);
+
+		if (!$this->dbObj->insertMultipleQ($this->tbl_name, $prepared))
+			return NULL;
+		unset($prepared);
+
+		if ($rowsPrepared != $this->dbObj->affected)
+		{
+			wlog("Unexpected count of affected rows");
+			return NULL;
+		}
+
+		$res = [];
+		$item_id = $this->dbObj->insert_id;
+		while($rowsPrepared--)
+		{
+			$res[] = $item_id;
+			$this->postCreate($item_id++);
+		}
+
+		return $res;
 	}
 
 

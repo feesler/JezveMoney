@@ -346,6 +346,49 @@ class mysqlDB
 	}
 
 
+	// Insert multiple rows query
+	// $data should be array of row arrays, each same as for insertQ() method
+	// Obtain fields from the first item of data array
+	// Next other rows is compared match
+	public function insertMultipleQ($table, $data)
+	{
+		if (empty($table) || !is_array($data) || !count($data) || !is_array($data[0]))
+			return FALSE;
+
+		// Obtain fields from first data row
+		$fields = [];
+		foreach($data[0] as $key => $val)
+		{
+			if (is_string($key))
+				$fields[] = $key;
+		}
+		if (!count($fields))
+			return FALSE;
+
+		$rowsValues = [];
+		foreach($data as $row)
+		{
+			if (!is_array($row))
+				return FALSE;
+
+			$values = checkFields($row, $fields);
+			if (!is_array($values))
+				return FALSE;
+
+			$rowsValues[] = valuesJoin($values);
+		}
+
+		$query = "INSERT INTO `$table` ".fieldsJoin($fields)." VALUES ".implode(",", $rowsValues);
+		$query .= ";";
+		$this->rawQ($query);
+
+		$this->insert_id = $this->insertId();
+		$this->affected = $this->affectedRows();
+
+		return ($this->errno == 0);
+	}
+
+
 	// Update query
 	public function updateQ($table, $data, $condition = NULL)
 	{
