@@ -115,6 +115,7 @@
 	$sitetheme = 1;
 
 	require_once(APPROOT."system/common.php");
+	require_once(APPROOT."system/json.php");
 	spl_autoload_register("autoLoadClass");
 
 	$dbConfig = ( require_once(APPROOT."system/dbsetup.php") );

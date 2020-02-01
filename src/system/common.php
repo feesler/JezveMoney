@@ -265,20 +265,6 @@
 	}
 
 
-	// Prepare matches callback for preg_replace_callback
-	function prepareUTF8($matches)
-	{
-		return json_decode('"'.$matches[1].'"');
-	}
-
-
-	// Fixed json_encode function
-	function f_json_encode($obj)
-	{
-		return preg_replace_callback('/((\\\u[01-9a-fA-F]{4})+)/', 'prepareUTF8', json_encode($obj));
-	}
-
-
 	// Build URL from base and array of parameters
 	function urlJoin($base, $params = NULL)
 	{

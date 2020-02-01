@@ -193,7 +193,7 @@ class FastCommitController extends Controller
 		if (isset($hdrs["x-file-id"]))
 			unlink($fname);
 
-		echo(f_json_encode($data));
+		echo(JSON::encode($data));
 	}
 
 

@@ -10,8 +10,8 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 .bad_val{ background-color: #FFB0B0; }
 </style>
 <script>
-var transactions = <?=f_json_encode($transArr)?>;
-var account_id = <?=f_json_encode($checkAccount_id)?>;
+var transactions = <?=JSON::encode($transArr)?>;
+var account_id = <?=JSON::encode($checkAccount_id)?>;
 </script>
 </head>
 <body>

@@ -1,6 +1,6 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-	var currency = <?=f_json_encode($currArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
 
 	onReady(initControls);
 </script>

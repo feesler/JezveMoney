@@ -200,7 +200,7 @@ ini_set('max_execution_time', '0');
 
 		if (isset($_GET["tr"]))
 		{
-			echo("var transactions = ".f_json_encode($transArr).";");
+			echo("var transactions = ".JSON::encode($transArr).";");
 			exit;
 		}
 		else

@@ -1,10 +1,10 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-	var currency = <?=f_json_encode($currArr)?>;
-	var accounts = <?=f_json_encode($accArr)?>;
-	var persons = <?=f_json_encode($persArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
+	var accounts = <?=JSON::encode($accArr)?>;
+	var persons = <?=JSON::encode($persArr)?>;
 	var accCurr = <?=$curr_acc_id?>;
-	var chartData = <?=f_json_encode($statArr)?>;
+	var chartData = <?=JSON::encode($statArr)?>;
 
 	onReady(initStatWidget);
 </script>

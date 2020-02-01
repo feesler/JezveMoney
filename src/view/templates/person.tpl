@@ -2,7 +2,7 @@
 <?php	if ($action == "edit") {		?>
 <script>
 	var person_id = <?=$p_id?>;
-	var personName = <?=f_json_encode($pName)?>;
+	var personName = <?=JSON::encode($pName)?>;
 
 	onReady(initControls);
 </script>

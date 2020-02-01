@@ -1,8 +1,8 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-var accounts = <?=f_json_encode($accArr)?>;
-var currencies = <?=f_json_encode($currArr)?>;
-var persons = <?=f_json_encode($persArr)?>;
+var accounts = <?=JSON::encode($accArr)?>;
+var currencies = <?=JSON::encode($currArr)?>;
+var persons = <?=JSON::encode($persArr)?>;
 
 onReady(initPage);
 </script>

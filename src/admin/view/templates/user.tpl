@@ -1,6 +1,6 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-	var users = <?=f_json_encode($uArr)?>;
+	var users = <?=JSON::encode($uArr)?>;
 
 	onReady(initControls);
 </script>

@@ -1,10 +1,10 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-	var currency = <?=f_json_encode($currArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
 <?php	if ($action == "edit") {	?>
 	var account_id = <?=$acc_id?>;
 <?php	}	?>
-	var acc_name = <?=f_json_encode($accInfo->name)?>;
+	var acc_name = <?=JSON::encode($accInfo->name)?>;
 	var acc_currency = <?=$accInfo->curr?>;
 	var acc_balance = <?=$accInfo->balance?>;
 	var acc_init_balance = <?=$accInfo->initbalance?>;

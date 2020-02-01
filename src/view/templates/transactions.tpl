@@ -1,10 +1,10 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
 <script>
-	var accounts = <?=f_json_encode($accArr)?>;
-	var currency = <?=f_json_encode($currArr)?>;
-	var transArr = <?=f_json_encode($transArr)?>;
-	var filterObj = <?=f_json_encode($filterObj)?>;
+	var accounts = <?=JSON::encode($accArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
+	var transArr = <?=JSON::encode($transArr)?>;
+	var filterObj = <?=JSON::encode($filterObj)?>;
 
 	onReady(initTransListDrag);
 	onReady(initToolbar);

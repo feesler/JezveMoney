@@ -1,6 +1,6 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-	var p_name = <?=f_json_encode($person_name)?>;
+	var p_name = <?=JSON::encode($person_name)?>;
 
 	onReady(initProfilePage);
 </script>

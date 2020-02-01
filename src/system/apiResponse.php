@@ -6,7 +6,7 @@ class apiResponse
 	{
 		header("Content-Type: application/json; charset=utf-8");
 
-		return f_json_encode($this);
+		return JSON::encode($this);
 	}
 
 

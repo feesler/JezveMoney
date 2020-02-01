@@ -1,7 +1,7 @@
 <?php	include("./view/templates/commonhdr.tpl");	?>
 <script>
-	var accounts = <?=f_json_encode($accArr)?>;
-	var currency = <?=f_json_encode($currArr)?>;
+	var accounts = <?=JSON::encode($accArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
 <?php	if ($action == "edit") {	?>
 	var edit_transaction =
 	{
@@ -17,7 +17,7 @@
 <?php	}	?>
 	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
 <?php	if ($tr["type"] == DEBT) {		?>
-	var persons = <?=f_json_encode($persArr)?>;
+	var persons = <?=JSON::encode($persArr)?>;
 <?php	}	?>
 
 <?php	if ($tr["type"] == DEBT) {		?>
