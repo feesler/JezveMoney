@@ -412,16 +412,16 @@ class TransactionModel extends CachedTable
 		}
 		else
 		{
-			$this->updateResults($trObj->src_id, $trObj->dest_id, 0, $trObj->pos);
+			$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $trObj->pos);
 		}
 
 		// Update results of accounts
 		if ($this->originalTrans->src_id != $trObj->src_id ||
 			$this->originalTrans->dest_id != $trObj->dest_id)
 		{
-			$this->updateResults($this->originalTrans->src_id, $this->originalTrans->dest_id, 0, $trObj->pos);
+			$this->updateResults([ $this->originalTrans->src_id, $this->originalTrans->dest_id ], $trObj->pos);
 		}
-		unset($this->updateOriginalTrans);
+		unset($this->originalTrans);
 	}
 
 
@@ -502,7 +502,7 @@ class TransactionModel extends CachedTable
 			return FALSE;
 
 		$updateFromPos = ($old_pos != 0) ? min($old_pos, $new_pos) : $new_pos;
-		$this->updateResults($trObj->src_id, $trObj->dest_id, 0, $updateFromPos);
+		$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $updateFromPos);
 
 		$this->cleanCache();
 
@@ -511,7 +511,7 @@ class TransactionModel extends CachedTable
 
 
 	// Return result balance of account before transaction with specifiec position
-	public function getLatestResult($acc_id, $ignore_trans_id, $pos = -1)
+	public function getLatestResult($acc_id, $pos = -1)
 	{
 		$acc_id = intval($acc_id);
 		if (!$acc_id)
@@ -528,9 +528,6 @@ class TransactionModel extends CachedTable
 		else
 		{
 			$condArr = [ "user_id=".self::$user_id, "pos < $pos", "pos<>0", $accCond ];
-			$ignore_trans_id = intval($ignore_trans_id);
-			if ($ignore_trans_id)
-				$condArr[] = "id<>".$ignore_trans_id;
 
 			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
 			$resultBalanceAvailable = ($this->dbObj->rowsCount($qResult) == 1);
@@ -597,21 +594,24 @@ class TransactionModel extends CachedTable
 
 
 	//
-	protected function updateResults($src_id, $dest_id, $ignore_trans_id, $pos)
+	protected function updateResults($accounts, $pos)
 	{
-		if (!$src_id && !$dest_id)
-			return FALSE;
+		if (!is_array($accounts))
+			$accounts = [ $accounts ];
 
 		// Get previous results
 		$results = [];
-		if ($src_id != 0)
-			$results[$src_id] = $this->getLatestResult($src_id, $ignore_trans_id, $pos);
-		if ($dest_id != 0)
-			$results[$dest_id] = $this->getLatestResult($dest_id, $ignore_trans_id, $pos);
+		foreach($accounts as $account_id)
+		{
+			if (!$account_id)
+				continue;
+
+			$results[$account_id] = $this->getLatestResult($account_id, $pos);
+		}
 
 		// Request affected transactions
 		$condArr = [ "user_id=".self::$user_id, "pos>=".$pos ];
-		$accCond = $this->getAccCondition([ $src_id, $dest_id ]);
+		$accCond = $this->getAccCondition($accounts);
 		if (!is_empty($accCond))
 			$condArr[] = $accCond;
 
@@ -708,7 +708,7 @@ class TransactionModel extends CachedTable
 
 		foreach($this->removedItems as $trObj)
 		{
-			$this->updateResults($trObj->src_id, $trObj->dest_id, $trObj->id, $trObj->pos + 1);
+			$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $trObj->pos + 1);
 		}
 
 		unset($this->removedItems);
@@ -770,7 +770,7 @@ class TransactionModel extends CachedTable
 			return FALSE;
 
 		// Update results
-		$this->updateResults($acc_id, $acc_id, 0, 0);
+		$this->updateResults($acc_id, 0);
 
 		$this->cleanCache();
 
@@ -902,10 +902,7 @@ class TransactionModel extends CachedTable
 			return FALSE;
 
 		// Update results of transactions with affected accounts
-		foreach($ids as $acc_id)
-		{
-			$this->updateResults($acc_id, $acc_id, 0, 0);
-		}
+		$this->updateResults($ids, 0);
 
 		return TRUE;
 	}
