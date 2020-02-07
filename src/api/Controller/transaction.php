@@ -186,8 +186,24 @@ class TransactionApiController extends ApiController
 			$respObj->fail();
 
 		$request = $this->getJSONContent(TRUE);
+		$transactions = [];
+		foreach($request as $item)
+		{
+			if ($item["type"] == DEBT)
+			{
+				$debtModel = DebtModel::getInstance();
+				$debtTrans = $debtModel->prepareTransaction($item);
+				$transObj = (array)$debtTrans;
+			}
+			else
+			{
+				$transObj = $item;
+			}
 
-		$trans_ids = $this->model->createMultiple($request);
+			$transactions[] = $transObj;
+		}
+
+		$trans_ids = $this->model->createMultiple($transactions);
 		if (!$trans_ids)
 			$respObj->fail();
 
