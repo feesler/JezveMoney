@@ -207,8 +207,8 @@ class AccountModel extends CachedTable
 
 		if (abs($diff) >= 0.01)
 		{
-			$res["balance"] = $accObj->balance + $diff;
 			$res["initbalance"] = $res["balance"];
+			$res["balance"] = $accObj->balance + $diff;
 		}
 		else
 		{
