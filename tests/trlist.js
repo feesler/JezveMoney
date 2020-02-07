@@ -278,8 +278,9 @@ class TransactionsList
 	{
 		let pageLimit = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
-		if (num < 1 || num > Math.ceil(list.length / pageLimit))
-			throw new Error('Wrong page');
+		let totalPages = this.expectedPages(pageLimit);
+		if (num < 1 || num > totalPages)
+			throw new Error(`Wrong page ${num}`);
 
 		let offset = (num - 1) * pageLimit;
 
@@ -334,9 +335,9 @@ class TransactionsList
 	}
 
 
-	expectedPages()
+	expectedPages(limit)
 	{
-		const onPage = App.config.transactionsOnPage;
+		let onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
 		return Math.max(Math.ceil(this.list.length / onPage), 1);
 	}

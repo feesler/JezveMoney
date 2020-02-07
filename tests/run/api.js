@@ -45,12 +45,6 @@ let runAPI =
 		let PERSON_X = await person.createTest({ name : 'Person X' });
 		let PERSON_Y = await person.createTest({ name : 'Y' });
 
-
-		let now = new Date();
-		let monthAgo = formatDate(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-		let weekAgo = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
-		let yesterday = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
-
 		env.setBlock('Transactions', 2);
 
 
@@ -67,7 +61,7 @@ let runAPI =
 													 	comm : '22' });
 		const TR_EXPENSE_3 = await transaction.createExpenseTest({ src_id : ACC_USD,
 														src_amount : 1,
-														date : yesterday });
+														date : this.dates.yesterday });
 
 		const TR_INCOME_1 = await transaction.createIncomeTest({ dest_id : ACC_RUB,
 														dest_amount : 1000.50 });
@@ -116,7 +110,7 @@ let runAPI =
 		await transaction.updateTest({ id : TR_EXPENSE_3,
 											dest_amount : 0.89,
 											dest_curr : EUR,
-										 	date : weekAgo });
+										 	date : this.dates.weekAgo });
 
 		await transaction.updateTest({ id : TR_INCOME_1,
 											dest_id : CASH_RUB });
@@ -130,7 +124,7 @@ let runAPI =
 		await transaction.updateTest({ id : TR_TRANSFER_2,
 											dest_id : CASH_RUB,
 										 	dest_amount : 6500,
-										 	date : yesterday });
+										 	date : this.dates.yesterday });
 
 		await transaction.updateTest({ id : TR_DEBT_1,
 											debtop : 2 });
@@ -156,11 +150,11 @@ let runAPI =
 		await transaction.filterTest({ onPage : 10,
 			 							page : 2 });
 
-		await transaction.filterTest({ startDate : now.getTime(),
-			 							endDate : now.getTime() + 604800000 });
+		await transaction.filterTest({ startDate : this.dates.now,
+			 							endDate : this.dates.weekAfter });
 
-		await transaction.filterTest({ startDate : now.getTime(),
-			 							endDate : now.getTime() + 604800000,
+		await transaction.filterTest({ startDate : this.dates.now,
+			 							endDate : this.dates.weekAfter,
 									 	search : '1' });
 
 		/**

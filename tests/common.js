@@ -335,6 +335,10 @@ export function urlJoin(obj)
 	for(par in obj)
 	{
 		let val = obj[par];
+
+		if (typeof val === 'undefined')
+			continue;
+
 		if (Array.isArray(val))
 		{
 			val.forEach(function(arrItem)

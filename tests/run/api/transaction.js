@@ -8,6 +8,7 @@ import {
 	formatDate,
 	fixDate,
 	checkObjValue,
+	formatProps,
 	getTransactionTypeStr
 } from '../../common.js';
 
@@ -318,7 +319,7 @@ let runTransactionAPI =
 	// Filter list of transaction by specified params
 	async filterTest(params)
 	{
-		await test('Filter transactions', async () =>
+		await test(`Filter transactions (${formatProps(params)})`, async () =>
 		{
 			let trBefore = await this.state.getTransactionsList();
 			let expTransList = trBefore.filter(params);
