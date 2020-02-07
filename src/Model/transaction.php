@@ -1117,6 +1117,145 @@ class TransactionModel extends CachedTable
 	}
 
 
+	// Return series array of amounts and date of transactions for statistics histogram
+	public function getHistogramSeries($byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
+	{
+		$curr_acc_id = intval($curr_acc_id);
+		$trans_type = intval($trans_type);
+		if (!self::$user_id || !$curr_acc_id || !$trans_type)
+			return NULL;
+
+		$amountArr = [];
+		$groupArr = [];
+		$sumDate = NULL;
+		$curDate = NULL;
+		$prevDate = NULL;
+		$curSum = 0.0;
+		$itemsInGroup = 0;
+		$trans_time = 0;
+
+		$fields = ["tr.date" => "date", "tr.src_amount" => "src_amount", "tr.dest_amount" => "dest_amount"];
+		$tables = ["transactions" => "tr"];
+		$condArr =  ["tr.user_id=".self::$user_id, "tr.type=".$trans_type];
+
+		if ($byCurrency)
+		{
+			$tables["accounts"] = "a";
+			$condArr[] = "a.curr_id=".$curr_acc_id;
+			if ($trans_type == EXPENSE)			// expense
+				$condArr[] = "tr.src_id=a.id";
+			else if ($trans_type == INCOME)		// income
+				$condArr[] = "tr.dest_id=a.id";
+		}
+		else
+		{
+			if ($trans_type == EXPENSE)			// expense
+				$condArr[] = "tr.src_id=".$curr_acc_id;
+			else if ($trans_type == INCOME)		// income
+				$condArr[] = "tr.dest_id=".$curr_acc_id;
+		}
+
+		$qResult = $this->dbObj->selectQ($fields, $tables, $condArr, NULL, "pos ASC");
+		while($row = $this->dbObj->fetchRow($qResult))
+		{
+			$trans_time = strtotime($row["date"]);
+			$dateInfo = getdate($trans_time);
+			$itemsInGroup++;
+
+			if ($group_type == 0)		// no grouping
+			{
+				$amountArr[] = floatval($row[($trans_type == EXPENSE) ? "src_amount" : "dest_amount"]);
+
+				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
+				{
+					$groupArr[] = [date("d.m.Y", $trans_time), $itemsInGroup];
+					$itemsInGroup = 0;
+				}
+				$prevDate = $dateInfo["mday"];
+			}
+			else if ($group_type == 1)	// group by day
+			{
+				$curDate = $dateInfo["mday"];
+			}
+			else if ($group_type == 2)	// group by week
+			{
+				$curDate = intval(date("W", $trans_time));
+			}
+			else if ($group_type == 3)	// group by month
+			{
+				$curDate = $dateInfo["mon"];
+			}
+			else if ($group_type == 4)	// group by year
+			{
+				$curDate = $dateInfo["year"];
+			}
+
+			if ($sumDate == NULL)		// first iteration
+			{
+				$sumDate = $curDate;
+			}
+			else if ($sumDate != NULL && $sumDate != $curDate)
+			{
+				$sumDate = $curDate;
+				$amountArr[] = $curSum;
+				$curSum = 0.0;
+				$groupArr[] = [date("d.m.Y", $trans_time), 1];
+			}
+
+			$curSum += floatval($row[($trans_type == EXPENSE) ? "src_amount" : "dest_amount"]);
+		}
+
+		// save remain value
+		if ($group_type != 0 && $curSum != 0.0)
+		{
+			if ($sumDate != NULL && $sumDate != $curDate)
+			{
+				$amountArr[] = $curSum;
+				$groupArr[] = [date("d.m.Y", $trans_time), 1];
+			}
+			else
+			{
+				if (!count($amountArr))
+					$amountArr[] = $curSum;
+				else
+					$amountArr[count($amountArr) - 1] += $curSum;
+				if (!count($groupArr))
+					$groupArr[] = [date("d.m.Y", $trans_time), 1];
+				else if ($group_type == 0)
+					$groupArr[count($groupArr) - 1][1]++;
+			}
+		}
+
+		if ($limit > 0)
+		{
+			$amountCount = count($amountArr);
+			$limitCount = min($amountCount, $limit);
+			$amountArr = array_slice($amountArr, -$limitCount);
+
+			$groupCount = count($groupArr);
+
+			$newGroupsCount = 0;
+			$groupLimit = 0;
+			$i = $groupCount - 1;
+			while($i >= 0 && $groupLimit < $limitCount)
+			{
+				$groupLimit += $groupArr[$i][1];
+
+				$newGroupsCount++;
+				$i--;
+			}
+
+			$groupArr = array_slice($groupArr, -$newGroupsCount);
+		}
+
+		$res = new stdClass;
+		$res->values = $amountArr;
+		$res->series = $groupArr;
+
+		return $res;
+	}
+
+
 	// Return link to page with specified params
 	// Convert App filter to GET
 	public function getPageLink($params = NULL)

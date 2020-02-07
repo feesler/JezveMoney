@@ -130,7 +130,7 @@ class StatisticsController extends Controller
 
 		$transArr = $transMod->getData($trans_type, $acc_id, TRUE, 10, 0, NULL, $stDate, $endDate);
 
-		$statArr = getStatArray($this->user_id, $byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
+		$statArr = $transMod->getHistogramSeries($byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
 
 		$titleString = "Jezve Money | Statistics";
 

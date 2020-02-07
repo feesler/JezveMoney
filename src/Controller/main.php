@@ -105,7 +105,7 @@ class MainController extends Controller
 
 		$groupType_id = 2;		// group by week
 
-		$statArr = getStatArray($this->user_id, $byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
+		$statArr = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
 		$titleString = "Jezve Money";
 
