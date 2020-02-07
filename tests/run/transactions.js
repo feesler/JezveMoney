@@ -1,6 +1,6 @@
 import { TransactionsList } from '../trlist.js';
 import { api } from '../api.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, test, convDate } from '../common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, test, convDate, copyObject } from '../common.js';
 
 
 const RUB = 1;
@@ -119,8 +119,7 @@ let runTransList =
 			for(let date of this.dateList)
 			{
 				convertedProps.date = date;
-				let createResult = await api.transaction.create(convertedProps);
-				res.push(createResult.id);
+				res.push(copyObject(convertedProps));
 			}
 		}
 
@@ -172,6 +171,9 @@ let runTransList =
 				return api.transaction.debt(props);
 			});
 		newDebts.push(...created);
+
+		let multi = [].concat(newExpenses, newIncomes, newTransfers, newDebts);
+		await api.transaction.createMultiple(multi);
 
 		this.state.accounts = null;
 		this.state.transactions = null;

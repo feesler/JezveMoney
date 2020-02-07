@@ -6,18 +6,18 @@ abstract class Model
 	protected $tbl_name = NULL;
 
 
-	abstract protected function preCreate($params);
+	abstract protected function preCreate($params, $isMultiple = FALSE);
 	// Perform model-specific actions after new item successfully created
 	protected function postCreate($item_id){}
 
 
 	// Prepare data of single row for new item insert query
-	private function prepareRow($params)
+	private function prepareRow($params, $isMultiple = FALSE)
 	{
 		if (!is_array($params))
 			return 0;
 
-		$res = $this->preCreate($params);
+		$res = $this->preCreate($params, $isMultiple);
 		if (!is_array($res))
 			return NULL;
 
@@ -30,7 +30,7 @@ abstract class Model
 	// Create new item and return id
 	public function create($params)
 	{
-		$prepared = $this->prepareRow($params);
+		$prepared = $this->prepareRow($params, FALSE);
 		if (!is_array($prepared))
 			return 0;
 		if (!$this->dbObj->insertQ($this->tbl_name, $prepared))
@@ -55,7 +55,7 @@ abstract class Model
 		$prepared = [];
 		foreach($params as $item)
 		{
-			$row = $this->prepareRow($item);
+			$row = $this->prepareRow($item, TRUE);
 			if (!is_array($row))
 				return NULL;
 
@@ -78,9 +78,10 @@ abstract class Model
 		$item_id = $this->dbObj->insert_id;
 		while($rowsPrepared--)
 		{
-			$res[] = $item_id;
-			$this->postCreate($item_id++);
+			$res[] = $item_id++;
 		}
+
+		$this->postCreate($res);
 
 		return $res;
 	}

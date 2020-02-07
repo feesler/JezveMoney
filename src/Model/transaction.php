@@ -196,7 +196,7 @@ class TransactionModel extends CachedTable
 
 
 	// Preparations for item create
-	protected function preCreate($params)
+	protected function preCreate($params, $isMultiple = FALSE)
 	{
 		$res = $this->checkParams($params);
 		if (is_null($res))
@@ -204,39 +204,10 @@ class TransactionModel extends CachedTable
 
 		$uMod = UserModel::getInstance();
 
-		$srcBalance = 0;
-		if ($res["src_id"] != 0)
-		{
-			$accObj = $this->accModel->getItem($res["src_id"]);
-			if (!$accObj)
-				return 0;
-			$srcBalance = $accObj->balance;
-		}
+		if (!isset($this->balanceChanges))
+			$this->balanceChanges = [];
 
-		// update balance of source account
-		if ($res["src_id"] != 0 && ($res["type"] == EXPENSE || $res["type"] == TRANSFER || $res["type"] == DEBT))
-		{
-			$srcBalance -= $res["src_amount"];
-			if (!$this->accModel->setBalance($res["src_id"], $srcBalance))
-				return 0;
-		}
-
-		$destBalance = 0;
-		if ($res["dest_id"] != 0)
-		{
-			$accObj = $this->accModel->getItem($res["dest_id"]);
-			if (!$accObj)
-				return 0;
-			$destBalance = $accObj->balance;
-		}
-
-		// update balance of destination account
-		if ($res["dest_id"] != 0 && ($res["type"] == INCOME || $res["type"] == TRANSFER || $res["type"] == DEBT))
-		{
-			$destBalance += $res["dest_amount"];
-			if (!$this->accModel->setBalance($res["dest_id"], $destBalance))
-				return 0;
-		}
+		$this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
 
 		// check target date is today
 		$today_date = getdate();
@@ -250,12 +221,23 @@ class TransactionModel extends CachedTable
 		}
 		else
 		{
-			$res["pos"] = $this->getLatestPos() + 1;
+			if ($isMultiple)
+			{
+				if (!isset($this->latestPos))
+				{
+					$this->latestPos = $this->getLatestPos();
+				}
+				$res["pos"] = (++$this->latestPos);
+			}
+			else
+			{
+				$res["pos"] = $this->getLatestPos() + 1;
+			}
 		}
 
 		$res["date"] = date("Y-m-d H:i:s", $res["date"]);
-		$res["src_result"] = $srcBalance;
-		$res["dest_result"] = $destBalance;
+		$res["src_result"] = ($res["src_id"] != 0) ? $this->balanceChanges[ $res["src_id"] ] : 0;
+		$res["dest_result"] = ($res["dest_id"] != 0) ? $this->balanceChanges[ $res["dest_id"] ] : 0;
 		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 		$res["user_id"] = self::$user_id;
 
@@ -263,82 +245,102 @@ class TransactionModel extends CachedTable
 	}
 
 
-	protected function postCreate($item_id)
+	protected function postCreate($items)
 	{
 		$this->cleanCache();
 
-		$trObj = $this->getItem($item_id);
-		if (!$trObj)
-			return;
+		if (!is_array($items))
+			$items = [ $items ];
 
-		// update position of transaction if target date is not today
-		if ($trObj->pos === 0)
+		// Commit balance changes for affected accounts
+		$this->accModel->updateBalances($this->balanceChanges);
+		unset($this->balanceChanges);
+		unset($this->latestPos);
+
+		foreach($items as $item_id)
 		{
-			$latest_pos = $this->getLatestPos($trObj->date);
-			$this->updatePos($item_id, $latest_pos + 1);
+			$trObj = $this->getItem($item_id);
+			if (!$trObj)
+				return;
+
+			// Update position of transaction if target date is not today
+			if ($trObj->pos === 0)
+			{
+				$latest_pos = $this->getLatestPos($trObj->date);
+				$this->updatePos($item_id, $latest_pos + 1);
+			}
 		}
 	}
 
 
-	// Cancel changes of transaction
-	public function cancel($item_id)
+	public function pushBalance($account_id, $accountsList = [])
 	{
-		// check transaction is exist
-		$trObj = $this->getItem($item_id);
-		if (!$trObj)
-			return FALSE;
+		$res = $accountsList;
 
-		// check type of transaction
-		if ($trObj->type != EXPENSE && $trObj->type != INCOME && $trObj->type != TRANSFER && $trObj->type != DEBT)
-			return FALSE;
+		if (!$account_id)
+			return $res;
 
-		// check user is the same
-		if ($trObj->user_id != self::$user_id)
-			return FALSE;
-
-		// check source account is exist
-		$srcBalance = 0;
-		if ($trObj->src_id != 0)
+		if (!isset($res[$account_id]))
 		{
-			$accObj = $this->accModel->getItem($trObj->src_id);
-			if (!$accObj)
-				return 0;
+			$account = $this->accModel->getItem($account_id);
+			if ($account)
+				$res[$account_id] = $account->balance;
+			else
+				$res[$account_id] = 0;
 
-			$srcBalance = $accObj->balance;
+		return $res;
+	}
+
+
+	// Apply specified transaction to the list of accounts and return new state
+	// If accounts list not specified returns only impact of transaction
+	public function applyTransaction($trans, $accountsList = [])
+	{
+		if (!$trans)
+			throw new Error("Invalid Transaction object");
+
+		$trans = (object)$trans;
+		$res = $accountsList;
+
+		if ($trans->src_id != 0)
+		{
+			$res = $this->pushBalance($trans->src_id, $res);
+			$res[ $trans->src_id ] = round($res[ $trans->src_id ] - $trans->src_amount, 2);
 		}
 
-		// check destination account is exist
-		$destBalance = 0;
-		if ($trObj->dest_id != 0)
+		if ($trans->dest_id != 0)
 		{
-			$accObj = $this->accModel->getItem($trObj->dest_id);
-			if (!$accObj)
-				return 0;
-
-			$destBalance = $accObj->balance;
+			$res = $this->pushBalance($trans->dest_id, $res);
+			$res[ $trans->dest_id ] = round($res[ $trans->dest_id ] + $trans->dest_amount, 2);
 		}
 
-		// update balance of source account
-		if ($trObj->src_id != 0 && ($trObj->type == EXPENSE || $trObj->type == TRANSFER || $trObj->type == DEBT))
+		return $res;
+	}
+
+
+	// Cancel changes by specified transaction on list of accounts and return new state
+	// If accounts list not specified returns only cancel of transaction impact
+	public function cancelTransaction($trans, $accountsList = [])
+	{
+		if (!$trans)
+			throw new Error("Invalid Transaction object");
+
+		$trans = (object)$trans;
+		$res = $accountsList;
+
+		if ($trans->src_id != 0)
 		{
-			$srcBalance += $trObj->src_amount;
-			if (!$this->accModel->setBalance($trObj->src_id, $srcBalance))
-				return FALSE;
+			$res = $this->pushBalance($trans->src_id, $res);
+			$res[ $trans->src_id ] = round($res[ $trans->src_id ] + $trans->src_amount, 2);
 		}
 
-		// update balance of destination account
-		if ($trObj->dest_id != 0 && ($trObj->type == INCOME || $trObj->type == TRANSFER || $trObj->type == DEBT))
+		if ($trans->dest_id != 0)
 		{
-			$destBalance -= $trObj->dest_amount;
-			if (!$this->accModel->setBalance($trObj->dest_id, $destBalance))
-				return FALSE;
+			$res = $this->pushBalance($trans->dest_id, $res);
+			$res[ $trans->dest_id ] = round($res[ $trans->dest_id ] - $trans->dest_amount, 2);
 		}
 
-		$this->updateResults($trObj->src_id, $trObj->dest_id, $trObj->id, $trObj->pos + 1);
-
-		$this->cleanCache();
-
-		return TRUE;
+		return $res;
 	}
 
 
@@ -358,47 +360,10 @@ class TransactionModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		// cancel transaction
-		if (!$this->cancel($item_id))
-			return FALSE;
+		$this->originalTrans = $trObj;
 
-		// check source account is exist
-		$srcBalance = 0;
-		if ($res["src_id"] != 0)
-		{
-			$accObj = $this->accModel->getItem($res["src_id"]);
-			if (!$accObj)
-				return 0;
-			$srcBalance = $accObj->balance;
-		}
-
-		// update balance of source account
-		if ($res["src_id"] != 0 && ($res["type"] == EXPENSE || $res["type"] == TRANSFER || $res["type"] == DEBT))
-		{
-			$srcBalance -= $res["src_amount"];
-
-			if (!$this->accModel->setBalance($res["src_id"], $srcBalance))
-				return FALSE;
-		}
-
-		// check destination account is exist
-		$destBalance = 0;
-		if ($res["dest_id"] != 0)
-		{
-			$accObj = $this->accModel->getItem($res["dest_id"]);
-			if (!$accObj)
-				return 0;
-			$destBalance = $accObj->balance;
-		}
-
-		// update balance of destination account
-		if ($res["dest_id"] != 0 && ($res["type"] == INCOME || $res["type"] == TRANSFER || $res["type"] == DEBT))
-		{
-			$destBalance += $res["dest_amount"];
-
-			if (!$this->accModel->setBalance($res["dest_id"], $destBalance))
-				return FALSE;
-		}
+		$canceled = $this->cancelTransaction($trObj);
+		$this->balanceChanges = $this->applyTransaction($res, $canceled);
 
 		// check date is changed
 		$orig_date = getdate($trObj->date);
@@ -418,8 +383,8 @@ class TransactionModel extends CachedTable
 
 		if (isset($res["date"]))
 			$res["date"] = date("Y-m-d H:i:s", $res["date"]);
-		$res["src_result"] = $srcBalance;
-		$res["dest_result"] = $destBalance;
+		$res["src_result"] = ($res["src_id"] != 0) ? $this->balanceChanges[ $res["src_id"] ] : 0;
+		$res["dest_result"] = ($res["dest_id"] != 0) ? $this->balanceChanges[ $res["dest_id"] ] : 0;
 		$res["updatedate"] = date("Y-m-d H:i:s");
 
 		return $res;
@@ -428,9 +393,15 @@ class TransactionModel extends CachedTable
 
 	protected function postUpdate($item_id)
 	{
+		$this->cleanCache();
+
 		$trObj = $this->getItem($item_id);
 		if (!$trObj)
 			return;
+
+		// Commit balance changes for affected accounts
+		$this->accModel->updateBalances($this->balanceChanges);
+		unset($this->balanceChanges);
 
 		// update position of transaction if target date is not today
 		if ($trObj->pos === 0)
@@ -442,6 +413,14 @@ class TransactionModel extends CachedTable
 		{
 			$this->updateResults($trObj->src_id, $trObj->dest_id, 0, $trObj->pos);
 		}
+
+		// Update results of accounts
+		if ($this->originalTrans->src_id != $trObj->src_id ||
+			$this->originalTrans->dest_id != $trObj->dest_id)
+		{
+			$this->updateResults($this->originalTrans->src_id, $this->originalTrans->dest_id, 0, $trObj->pos);
+		}
+		unset($this->updateOriginalTrans);
 	}
 
 
@@ -521,7 +500,8 @@ class TransactionModel extends CachedTable
 		if (!$this->dbObj->updateQ($this->tbl_name, [ "pos" => $new_pos, "updatedate" => $curDate ], "id=".$trans_id))
 			return FALSE;
 
-		$this->updateResults($trObj->src_id, $trObj->dest_id, 0, min($old_pos, $new_pos));
+		$updateFromPos = ($old_pos != 0) ? min($old_pos, $new_pos) : $new_pos;
+		$this->updateResults($trObj->src_id, $trObj->dest_id, 0, $updateFromPos);
 
 		$this->cleanCache();
 
@@ -540,13 +520,22 @@ class TransactionModel extends CachedTable
 		if ($pos === -1)
 			$pos = $this->getLatestPos() + 1;
 
-		$condArr = [ "user_id=".self::$user_id, "pos < ".$pos, $accCond ];
-		$ignore_trans_id = intval($ignore_trans_id);
-		if ($ignore_trans_id)
-			$condArr[] = "id<>".$ignore_trans_id;
+		if ($pos < 2)
+		{
+			$resultBalanceAvailable = FALSE;
+		}
+		else
+		{
+			$condArr = [ "user_id=".self::$user_id, "pos < $pos", "pos<>0", $accCond ];
+			$ignore_trans_id = intval($ignore_trans_id);
+			if ($ignore_trans_id)
+				$condArr[] = "id<>".$ignore_trans_id;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
-		if ($this->dbObj->rowsCount($qResult) == 1)
+			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
+			$resultBalanceAvailable = ($this->dbObj->rowsCount($qResult) == 1);
+		}
+
+		if ($resultBalanceAvailable)
 		{
 			$row = $this->dbObj->fetchRow($qResult);
 			if ($acc_id == intval($row["src_id"]))
@@ -690,19 +679,40 @@ class TransactionModel extends CachedTable
 	// Preparations for item delete
 	protected function preDelete($items)
 	{
+		$this->balanceChanges = [];
+		$this->removedItems = [];
 		foreach($items as $item_id)
 		{
-			// check transaction is exist
+			// check transaction is exists
 			$trObj = $this->getItem($item_id);
 			if (!$trObj)
 				return FALSE;
 
 			// cancel transaction
-			if (!$this->cancel($item_id))
-				return FALSE;
+			$this->balanceChanges = $this->cancelTransaction($trObj, $this->balanceChanges);
+
+			$this->removedItems[] = $trObj;
 		}
 
 		return TRUE;
+	}
+
+
+	// Preparations for item delete
+	protected function postDelete($items)
+	{
+		// Commit balance changes for affected accounts
+		$this->accModel->updateBalances($this->balanceChanges);
+		unset($this->balanceChanges);
+
+		foreach($this->removedItems as $trObj)
+		{
+			$this->updateResults($trObj->src_id, $trObj->dest_id, $trObj->id, $trObj->pos + 1);
+		}
+
+		unset($this->removedItems);
+
+		$this->cleanCache();
 	}
 
 
@@ -726,7 +736,7 @@ class TransactionModel extends CachedTable
 	}
 
 
-	public function onAccountCurrencyUpdate($acc_id)
+	public function onAccountUpdate($acc_id)
 	{
 		$accObj = $this->accModel->getItem($acc_id);
 		if (!$accObj)
@@ -758,6 +768,9 @@ class TransactionModel extends CachedTable
 									[ $userCond, "dest_id=".qnull($acc_id), "src_curr=".qnull($new_curr) ]))
 			return FALSE;
 
+		// Update results
+		$this->updateResults($acc_id, $acc_id, 0, 0);
+
 		$this->cleanCache();
 
 		return TRUE;
@@ -780,22 +793,22 @@ class TransactionModel extends CachedTable
 		if (!is_array($accounts))
 			$accounts = [ $accounts ];
 
-		$setCond = inSetCondition($accounts);
-		if (is_null($setCond))
-			return FALSE;
+		$ids = [];
 		$personAccounts = [];
 		$userAccounts = [];
-		foreach($accounts as $acc_id)
+		foreach($accounts as $accObj)
 		{
-			$accObj = $this->accModel->getItem($acc_id);
-			if (!$accObj)
-				continue;
+			$ids[] = $accObj->id;
 
 			if ($accObj->owner_id == $uObj->owner_id)
-				$userAccounts[] = $acc_id;
+				$userAccounts[] = $accObj->id;
 			else
-				$personAccounts[] = $acc_id;
+				$personAccounts[] = $accObj->id;
 		}
+
+		$setCond = inSetCondition($ids);
+		if (is_null($setCond))
+			return FALSE;
 
 
 		// delete expenses and incomes
@@ -809,10 +822,25 @@ class TransactionModel extends CachedTable
 			])
 		];
 
-		if (!$this->dbObj->deleteQ($this->tbl_name, $condArr))
-			return FALSE;
+		$itemsToRemove = [];
+		$idsToRemove = [];
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr);
+		while($row = $this->dbObj->fetchRow($qResult))
+		{
+			$item = $this->rowToObj($row);
+			unset($row);
 
-		$this->cleanCache();
+			$itemsToRemove[] = $item;
+			$idsToRemove[] = $item->id;
+		}
+
+		if (count($idsToRemove) > 0)
+		{
+			if (!$this->dbObj->deleteQ($this->tbl_name, "id".inSetCondition($idsToRemove)))
+				return FALSE;
+
+			$this->cleanCache();
+		}
 
 		$curDate = date("Y-m-d H:i:s");
 
@@ -825,14 +853,14 @@ class TransactionModel extends CachedTable
 			// set outgoing debt(person take) as income to destination account
 			$condArr = [ $userCond, "src_id".$pSetCond, "type=".DEBT ];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate ],
+										[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate, "src_result" => 0 ],
 										$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as expense from source account
 			$condArr = [ $userCond, "dest_id".$pSetCond, "type=".DEBT ];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate ],
+										[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate, "dest_result" => 0 ],
 										$condArr))
 				return FALSE;
 		}
@@ -846,14 +874,14 @@ class TransactionModel extends CachedTable
 			// set outgoing debt(person take) as debt without acc
 			$condArr = [ $userCond, "src_id".$uSetCond, "type=".DEBT ];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "src_id" => 0, "type" => DEBT, "updatedate" => $curDate ],
+										[ "src_id" => 0, "type" => DEBT, "updatedate" => $curDate, "src_result" => 0 ],
 										$condArr))
 				return FALSE;
 
 			// set incoming debt(person give) as debt without acc
 			$condArr = [ $userCond, "dest_id".$uSetCond, "type=".DEBT ];
 			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "dest_id" => 0, "type" => DEBT, "updatedate" => $curDate ],
+										[ "dest_id" => 0, "type" => DEBT, "updatedate" => $curDate, "dest_result" => 0 ],
 										$condArr))
 				return FALSE;
 		}
@@ -861,16 +889,22 @@ class TransactionModel extends CachedTable
 		// set transfer from account as income to destination account
 		$condArr = [ $userCond, "src_id".$setCond, "type=".TRANSFER ];
 		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate ],
+									[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate, "src_result" => 0 ],
 									$condArr))
 			return FALSE;
 
 		// set transfer to account as expense from source account
 		$condArr = [ $userCond, "dest_id".$setCond, "type=".TRANSFER ];
 		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate ],
+									[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate, "dest_result" => 0 ],
 									$condArr))
 			return FALSE;
+
+		// Update results of transactions with affected accounts
+		foreach($ids as $acc_id)
+		{
+			$this->updateResults($acc_id, $acc_id, 0, 0);
+		}
 
 		return TRUE;
 	}

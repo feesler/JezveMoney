@@ -80,6 +80,8 @@ class TransactionApiController extends ApiController
 			$tr->dest_amount = $trans->dest_amount;
 			$tr->src_curr = $trans->src_curr;
 			$tr->dest_curr = $trans->dest_curr;
+			$tr->src_result = $trans->src_result;
+			$tr->dest_result = $trans->dest_result;
 			$tr->date = date("d.m.Y", $trans->date);
 			$tr->comment = $trans->comment;
 			$tr->pos = $trans->pos;

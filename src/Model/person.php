@@ -100,7 +100,7 @@ class PersonModel extends CachedTable
 
 
 	// Preparations for item create
-	protected function preCreate($params)
+	protected function preCreate($params, $isMultiple = FALSE)
 	{
 		$res = $this->checkParams($params);
 		if (is_null($res))

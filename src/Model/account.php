@@ -148,7 +148,7 @@ class AccountModel extends CachedTable
 
 
 	// Preparations for item create
-	protected function preCreate($params)
+	protected function preCreate($params, $isMultiple = FALSE)
 	{
 		$res = $this->checkParams($params);
 		if (is_null($res))
@@ -207,11 +207,13 @@ class AccountModel extends CachedTable
 
 		if (abs($diff) >= 0.01)
 		{
+			$this->balanceUpdated = TRUE;
 			$res["initbalance"] = $res["balance"];
 			$res["balance"] = $accObj->balance + $diff;
 		}
 		else
 		{
+			$this->balanceUpdated = FALSE;
 			unset($res["balance"]);
 			unset($res["initbalance"]);
 		}
@@ -224,20 +226,25 @@ class AccountModel extends CachedTable
 
 	protected function postUpdate($item_id)
 	{
-		if ($this->currencyUpdated)
+		$this->cleanCache();
+
+		if ($this->currencyUpdated || $this->balanceUpdated)
 		{
 			$transMod = TransactionModel::getInstance();
 
-			$transMod->onAccountCurrencyUpdate($item_id);
+			$transMod->onAccountUpdate($item_id);
 		}
 
 		unset($this->currencyUpdated);
+		unset($this->balanceUpdated);
 	}
 
 
 	// Preparations for item delete
 	protected function preDelete($items)
 	{
+		$this->removedItems = [];
+
 		foreach($items as $item_id)
 		{
 			// check account is exist
@@ -248,11 +255,24 @@ class AccountModel extends CachedTable
 			// check user of account
 			if ($accObj->user_id != self::$user_id)
 				return FALSE;
+
+			$this->removedItems[] = $accObj;
 		}
+
+		return TRUE;
+	}
+
+
+	protected function postDelete($items)
+	{
+		$this->cleanCache();
 
 		$transMod = TransactionModel::getInstance();
 
-		return $transMod->onAccountDelete($items);
+		$res = $transMod->onAccountDelete($this->removedItems);
+		unset($this->removedItems);
+
+		return $res;
 	}
 
 
@@ -329,6 +349,40 @@ class AccountModel extends CachedTable
 			return FALSE;
 
 		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	public function updateBalances($balanceChanges)
+	{
+		$accounts = [];
+		foreach($balanceChanges as $acc_id => $balance)
+		{
+			$accObj = $this->getItem($acc_id);
+			if (!$accObj)
+				return NULL;
+
+			$accObj->balance = $balance;
+
+			$accObj->createdate = date("Y-m-d H:i:s", $accObj->createdate);
+			$accObj->updatedate = date("Y-m-d H:i:s", $accObj->updatedate);
+
+			$accounts[] = (array)$accObj;
+		}
+
+		if (count($accounts) == 1)
+		{
+			$account = $accounts[0];
+			$this->setBalance($account["id"], $account["balance"]);
+		}
+		else
+		{
+			if (!$this->dbObj->updateMultipleQ($this->tbl_name, $accounts))
+				return FALSE;
+
+			$this->cleanCache();
+		}
 
 		return TRUE;
 	}

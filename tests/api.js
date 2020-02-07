@@ -681,6 +681,7 @@ let apiModule = (function()
 		transaction : {
 			read : readTransaction,
 			create : createTransaction,
+			createMultiple : createMultipleTransactions,
 			update : updateTransaction,
 			del : deleteTransaction,
 			list : transList,

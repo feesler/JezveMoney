@@ -324,10 +324,15 @@
 
 	// Check is all of expected fields present in the array or object
 	// Return array with only expected fields or FALSE if something goes wrong
-	function checkFields($obj, $expectedFields)
+	function checkFields($obj, $expectedFields, $throw = FALSE)
 	{
 		if (is_null($obj) || !is_array($expectedFields))
-			return FALSE;
+		{
+			if ($throw)
+				throw new Error("Invalid input");
+			else
+				return FALSE;
+		}
 
 		if (!is_array($obj))
 			$obj = (array)$obj;
@@ -337,9 +342,17 @@
 		{
 			if (!array_key_exists($field, $obj))
 			{
-				wlog("checkFields() .. ".var_export($obj, TRUE));
-				wlog("Field $field not found");
-				return FALSE;
+				$msg = "Field $field not found";
+				if ($throw)
+				{
+					throw new Error($msg);
+				}
+				else
+				{
+					wlog("checkFields() .. ".var_export($obj, TRUE));
+					wlog($msg);
+					return FALSE;
+				}
 			}
 
 			$res[$field] = $obj[$field];
