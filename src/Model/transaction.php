@@ -7,6 +7,9 @@ class TransactionModel extends CachedTable
 	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
+	static private $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
+	static private $srcAvailTypes = [ EXPENSE, TRANSFER, DEBT ];
+	static private $destAvailTypes = [ INCOME, TRANSFER, DEBT ];
 
 
 	protected function onStart()
@@ -99,7 +102,6 @@ class TransactionModel extends CachedTable
 	protected function checkParams($params, $isUpdate = FALSE)
 	{
 		$avFields = ["type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment"];
-		$avTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 		$res = [];
 
 		// In CREATE mode all fields is required
@@ -109,7 +111,7 @@ class TransactionModel extends CachedTable
 		if (isset($params["type"]))
 		{
 			$res["type"] = intval($params["type"]);
-			if (!in_array($res["type"], $avTypes))
+			if (!in_array($res["type"], self::$availTypes))
 			{
 				wlog("Invalid type specified");
 				return NULL;
@@ -119,8 +121,8 @@ class TransactionModel extends CachedTable
 		if (isset($params["src_id"]))
 		{
 			$res["src_id"] = intval($params["src_id"]);
-			if ((($res["type"] == EXPENSE || $res["type"] == TRANSFER) && !$res["src_id"]) ||
-				($res["type"] == INCOME && $res["src_id"] != 0))
+			if (($res["src_id"] && !in_array($res["type"], self::$srcAvailTypes)) ||
+				(!$res["src_id"] && in_array($res["type"], [EXPENSE, TRANSFER])))
 			{
 				wlog("Invalid src_id specified");
 				return NULL;
@@ -130,8 +132,8 @@ class TransactionModel extends CachedTable
 		if (isset($params["dest_id"]))
 		{
 			$res["dest_id"] = intval($params["dest_id"]);
-			if (($res["type"] == EXPENSE && $res["dest_id"] != 0) ||
-				(($res["type"] == INCOME || $res["type"] == TRANSFER) && !$res["dest_id"]))
+			if (($res["dest_id"] && !in_array($res["type"], self::$destAvailTypes)) ||
+				(!$res["dest_id"] && in_array($res["type"], [INCOME, TRANSFER])))
 			{
 				wlog("Invalid dest_id specified");
 				return NULL;
