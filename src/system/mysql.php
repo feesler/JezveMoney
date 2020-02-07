@@ -350,7 +350,7 @@ class mysqlDB
 	// $data should be array of row arrays, each same as for insertQ() method
 	// Obtain fields from the first item of data array
 	// Next other rows is compared match
-	public function insertMultipleQ($table, $data)
+	public function insertMultipleQ($table, $data, $isUpdate = FALSE)
 	{
 		if (empty($table) || !is_array($data) || !count($data) || !is_array($data[0]))
 			return FALSE;
@@ -379,6 +379,19 @@ class mysqlDB
 		}
 
 		$query = "INSERT INTO `$table` ".fieldsJoin($fields)." VALUES ".implode(",", $rowsValues);
+		if ($isUpdate)
+		{
+			$query .= " ON DUPLICATE KEY UPDATE ";
+			$valuesUpdate = [];
+			foreach($fields as $field)
+			{
+				if ($field == "id")
+					continue;
+
+				$valuesUpdate[] = "$field=VALUES($field)";
+			}
+			$query .= implode(",", $valuesUpdate);
+		}
 		$query .= ";";
 		$this->rawQ($query);
 
@@ -403,6 +416,12 @@ class mysqlDB
 		$this->rawQ($query);
 
 		return ($this->errno == 0);
+	}
+
+
+	public function updateMultipleQ($table, $data)
+	{
+		return $this->insertMultipleQ($table, $data, TRUE);
 	}
 
 
