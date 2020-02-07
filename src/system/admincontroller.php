@@ -6,6 +6,7 @@ abstract class AdminController extends Controller
 		"curr" => [ "title" => "Currencies", "link" => "currency/" ],
 		"query" => [ "title" => "Queries", "link" => "query/" ],
 		"log" => [ "title" => "Logs", "link" => "log/" ],
+		"balance" => [ "title" => "Balance", "link" => "balance/" ],
 		"tests" => [ "title" => "Tests", "link" => "tests/" ],
 		"apiconsole" => [ "title" => "API console", "link" => "apiconsole/" ],
 		"users" => [ "title" => "Users", "link" => "user/" ]

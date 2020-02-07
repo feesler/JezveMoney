@@ -3,6 +3,7 @@
 	$action = NULL;
 
 	$controllersMap = ["index" => "MainAdminController",
+							"balance" => "BalanceAdminController",
 							"currency" => "CurrencyAdminController",
 							"query" => "QueryAdminController",
 							"log" => "LogsAdminController",

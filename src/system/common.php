@@ -43,6 +43,7 @@
 			"ProfileApiController" => "api/Controller/profile.php",
 		// Admin controllers
 			"CurrencyAdminController" => "admin/Controller/currency.php",
+			"BalanceAdminController" => "admin/Controller/balance.php",
 			"UserAdminController" => "admin/Controller/user.php",
 			"MainAdminController" => "admin/Controller/main.php",
 			"QueryAdminController" => "admin/Controller/query.php",
