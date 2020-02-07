@@ -5,7 +5,7 @@
 	var account_id = <?=$acc_id?>;
 <?php	}	?>
 	var acc_name = <?=JSON::encode($accInfo->name)?>;
-	var acc_currency = <?=$accInfo->curr?>;
+	var acc_currency = <?=$accInfo->curr_id?>;
 	var acc_balance = <?=$accInfo->balance?>;
 	var acc_init_balance = <?=$accInfo->initbalance?>;
 	var new_init_balance = <?=$accInfo->initbalance?>;
@@ -58,7 +58,7 @@
 							<div class="std_input">
 								<select id="currency" name="currency">
 <?php	foreach($currArr as $currInfo) {
-			if ($currInfo->id == $accInfo->curr) {	?>
+			if ($currInfo->id == $accInfo->curr_id) {	?>
 									<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
 <?php		} else {	?>
 									<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>

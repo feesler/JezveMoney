@@ -6,6 +6,7 @@ class TransactionModel extends CachedTable
 
 	static private $dcache = NULL;
 	static private $user_id = 0;
+	static private $owner_id = 0;
 	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
 	static private $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 	static private $srcAvailTypes = [ EXPENSE, TRANSFER, DEBT ];
@@ -24,6 +25,7 @@ class TransactionModel extends CachedTable
 			throw new Error("User not found");
 
 		self::$user_id = $uMod->currentUser->id;
+		self::$owner_id = $uMod->currentUser->owner_id;
 
 		$this->accModel = AccountModel::getInstance();
 		$this->currMod = CurrencyModel::getInstance();
@@ -1023,45 +1025,6 @@ class TransactionModel extends CachedTable
 			$trans = $this->rowToObj($row);
 			unset($row);
 
-			if ($trans->type == DEBT)
-			{
-				$src_owner_id = $dest_owner_id = 0;
-				if ($trans->src_id != 0)
-				{
-					$accObj = $this->accModel->getItem($trans->src_id);
-					if ($accObj)
-						$src_owner_id = $accObj->owner_id;
-				}
-
-				if ($trans->dest_id != 0)
-				{
-					$accObj = $this->accModel->getItem($trans->dest_id);
-					if ($accObj)
-						$dest_owner_id = $accObj->owner_id;
-				}
-			}
-
-			$trans->fsrcAmount = "";
-			if ($trans->type == EXPENSE || ($trans->type == DEBT && ($dest_owner_id == 0 || $src_owner_id == $owner_id)))			// expense
-				$trans->fsrcAmount .= "- ";
-			else if ($trans->type == INCOME || ($trans->type == DEBT && ($src_owner_id == 0 || $dest_owner_id == $owner_id)))			// income
-				$trans->fsrcAmount .= "+ ";
-			$trans->fsrcAmount .= $this->currMod->format($trans->src_amount, $trans->src_curr);
-
-			if ($trans->src_curr != $trans->dest_curr)
-			{
-				$trans->fdestAmount = "";
-				if ($trans->type == EXPENSE || ($trans->type == DEBT && $src_owner_id == $owner_id))			// expense
-					$trans->fdestAmount .= "- ";
-				else if ($trans->type == INCOME || ($trans->type == DEBT && $dest_owner_id == $owner_id))			// income
-					$trans->fdestAmount .= "+ ";
-				$trans->fdestAmount .= $this->currMod->format($trans->dest_amount, $trans->dest_curr);
-			}
-			else
-				$trans->fdestAmount = $trans->fsrcAmount;
-
-			$trans->debtType = ($trans->type == DEBT) ? (($dest_owner_id == 0 || $dest_owner_id == $owner_id) ? 1 : 2) : 0;
-
 			$res[] = $trans;
 		}
 
@@ -1354,6 +1317,102 @@ class TransactionModel extends CachedTable
 	}
 
 
+	// Convert transaction object to list item
+	public function getListItem($transaction, $detailsMode = FALSE)
+	{
+		if (!$transaction || !$transaction->id)
+			throw new Error("Invalid transaction specified");
+
+		$res = ["id" => $transaction->id];
+
+		// Build accounts string
+		$accStr = "";
+		if ($transaction->src_id != 0 && in_array($transaction->type, self::$srcAvailTypes))
+		{
+			$accStr .= $this->accModel->getNameOrPerson($transaction->src_id);
+		}
+
+		if ($transaction->src_id != 0 && $transaction->dest_id != 0 &&
+			in_array($transaction->type, [ TRANSFER, DEBT ]))
+			$accStr .= " → ";
+
+		if ($transaction->dest_id != 0 && in_array($transaction->type, self::$destAvailTypes))
+		{
+			$accStr .= $this->accModel->getNameOrPerson($transaction->dest_id);
+		}
+
+		$res["acc"] = $accStr;
+
+		// Build amount string
+		if ($transaction->type == DEBT)
+		{
+			$src_owner_id = $dest_owner_id = 0;
+			if ($transaction->src_id != 0)
+			{
+				$accObj = $this->accModel->getItem($transaction->src_id);
+				if ($accObj)
+					$src_owner_id = $accObj->owner_id;
+			}
+
+			if ($transaction->dest_id != 0)
+			{
+				$accObj = $this->accModel->getItem($transaction->dest_id);
+				if ($accObj)
+					$dest_owner_id = $accObj->owner_id;
+			}
+
+			$debtType = ($dest_owner_id == 0 || $dest_owner_id == self::$owner_id) ? 1 : 2;
+		}
+
+		$fmtSrcAmount = "";
+		if ($transaction->type == EXPENSE || ($transaction->type == DEBT && ($dest_owner_id == 0 || $src_owner_id == self::$owner_id)))			// expense
+			$fmtSrcAmount .= "- ";
+		else if ($transaction->type == INCOME || ($transaction->type == DEBT && ($src_owner_id == 0 || $dest_owner_id == self::$owner_id)))			// income
+			$fmtSrcAmount .= "+ ";
+		$fmtSrcAmount .= $this->currMod->format($transaction->src_amount, $transaction->src_curr);
+
+		if ($transaction->src_curr != $transaction->dest_curr)
+		{
+			$fmtDestAmount = "";
+			if ($transaction->type == EXPENSE || ($transaction->type == DEBT && $src_owner_id == self::$owner_id))			// expense
+				$fmtDestAmount .= "- ";
+			else if ($transaction->type == INCOME || ($transaction->type == DEBT && $dest_owner_id == self::$owner_id))			// income
+				$fmtDestAmount .= "+ ";
+			$fmtDestAmount .= $this->currMod->format($transaction->dest_amount, $transaction->dest_curr);
+		}
+		else
+			$fmtDestAmount = $fmtSrcAmount;
+
+		$amStr = $fmtSrcAmount;
+		if ($fmtSrcAmount != $fmtDestAmount)
+		{
+			$fmtDestAmount = $this->currMod->format($transaction->dest_amount, $transaction->dest_curr);
+			$amStr .= " ($fmtDestAmount)";
+		}
+		$res["amount"] = $amStr;
+
+		$res["date"] =  date("d.m.Y", $transaction->date);
+		$res["comm"] = $transaction->comment;
+
+		if ($detailsMode)
+		{
+			$res["balance"] = [];
+
+			if ($transaction->src_id != 0)
+			{
+				$res["balance"][] = $this->currMod->format($transaction->src_result, $transaction->src_curr);
+			}
+
+			if ($transaction->dest_id != 0)
+			{
+				$res["balance"][] = $this->currMod->format($transaction->dest_result, $transaction->dest_curr);
+			}
+		}
+
+		return $res;
+	}
+
+
 	// Return string for specified transaction type
 	public static function getStringType($trans_type)
 	{
@@ -1372,27 +1431,5 @@ class TransactionModel extends CachedTable
 			return NULL;
 
 		return self::$typeStrArr[$trans_type];
-	}
-
-
-	// Build array with properties of account
-	public function getProperties($trans_id)
-	{
-		$item = $this->getItem($trans_id);
-		if (!$item)
-			return NULL;
-
-		$res = ["id" => $trans_id,
-					"src_id" => $item->src_id,
-					"dest_id" => $item->dest_id,
-					"type" => $item->type,
-					"src_curr" => $item->src_curr,
-					"dest_curr" => $item->dest_curr,
-					"src_amount" => $item->src_amount,
-					"dest_amount" => $item->dest_amount,
-					"date" => date("Y-m-d H:i:s", $item->date),
-					"comment" => $item->comment ];
-
-		return $res;
 	}
 }

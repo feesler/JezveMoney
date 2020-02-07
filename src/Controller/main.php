@@ -29,49 +29,7 @@ class MainController extends Controller
 		$trListData = [];
 		foreach($latestArr as $trans)
 		{
-			$itemData = ["id" => $trans->id];
-
-			// Build accounts string
-			$accStr = "";
-			if ($trans->src_id != 0)
-			{
-				if ($trans->type == EXPENSE || $trans->type == TRANSFER)
-				{
-					$accObj = $accMod->getItem($trans->src_id);
-					if (!$accObj)
-						throw new Error("Invalid source account id: ".$trans->src_id);
-					$accStr .= $accObj->name;
-				}
-				else if ($trans->type == DEBT)
-					$accStr .= $accMod->getNameOrPerson($trans->src_id);
-			}
-
-			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == TRANSFER || $trans->type == DEBT))
-				$accStr .= " → ";
-
-			if ($trans->dest_id != 0)
-			{
-				if ($trans->type == INCOME || $trans->type == TRANSFER)
-				{
-					$accObj = $accMod->getItem($trans->dest_id);
-					if (!$accObj)
-						throw new Error("Invalid destination account id: ".$trans->dest_id);
-					$accStr .= $accObj->name;
-				}
-				else if ($trans->type == DEBT)
-					$accStr .= $accMod->getNameOrPerson($trans->dest_id);
-			}
-
-			$itemData["acc"] = $accStr;
-
-			// Build amount string
-			$amStr = $trans->fsrcAmount;
-			if ($trans->fsrcAmount != $trans->fdestAmount)
-				$amStr .= " (".$trans->fdestAmount.")";
-			$itemData["amount"] = $amStr;
-
-			$itemData["date"] = $trans->date;
-			$itemData["comm"] = $trans->comment;
+			$itemData = $transMod->getListItem($trans);
 
 			$trListData[] = $itemData;
 		}

@@ -199,7 +199,7 @@
 										<button id="resbal_b" class="dashed_btn resbal_btn" type="button"><span><?=$rtSrcResBal?></span></button>
 									</div>
 								</div>
-<?php	if (($tr["type"] == TRANSFER && $src->curr == $dest->curr) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
+<?php	if (($tr["type"] == TRANSFER && $src->curr_id == $dest->curr_id) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
 								<div id="exch_left" style="display: none;">
 <?php	} else {	?>
 								<div id="exch_left">

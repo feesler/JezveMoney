@@ -21,11 +21,11 @@ class AccountApiController extends ApiController
 		$res = [];
 		foreach($ids as $acc_id)
 		{
-			$props = $this->model->getProperties($acc_id);
-			if (is_null($props))
+			$item = $this->model->getItem($acc_id);
+			if (is_null($item))
 				$respObj->fail("Account not found");
 
-			$res[] = $props;
+			$res[] = $item;
 		}
 
 		$respObj->data = $res;

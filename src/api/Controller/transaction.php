@@ -21,11 +21,13 @@ class TransactionApiController extends ApiController
 		$res = [];
 		foreach($ids as $trans_id)
 		{
-			$props = $this->model->getProperties($trans_id);
-			if (is_null($props))
+			$item = $this->model->getItem($trans_id);
+			if (is_null($item))
 				$respObj->fail("Transaction ".$trans_id." not found");
 
-			$res[] = $props;
+			$item->date = date("d.m.Y", $item->date);
+
+			$res[] = $item;
 		}
 
 		$respObj->data = $res;
@@ -66,28 +68,15 @@ class TransactionApiController extends ApiController
 			$params["endDate"] = $_GET["enddate"];
 		}
 
-		$trArr = $this->model->getData($params);
-
-		$respObj->data = [];
-		foreach($trArr as $trans)
+		$items = $this->model->getData($params);
+		$trArr = [];
+		foreach($items as $item)
 		{
-			$tr = new stdClass;
-			$tr->id = $trans->id;
-			$tr->type = $trans->type;
-			$tr->src_id = $trans->src_id;
-			$tr->dest_id = $trans->dest_id;
-			$tr->src_amount = $trans->src_amount;
-			$tr->dest_amount = $trans->dest_amount;
-			$tr->src_curr = $trans->src_curr;
-			$tr->dest_curr = $trans->dest_curr;
-			$tr->src_result = $trans->src_result;
-			$tr->dest_result = $trans->dest_result;
-			$tr->date = date("d.m.Y", $trans->date);
-			$tr->comment = $trans->comment;
-			$tr->pos = $trans->pos;
+			$item->date = date("d.m.Y", $item->date);
 
-			$respObj->data[] = $tr;
+			$trArr[] = $item;
 		}
+		$respObj->data = $trArr;
 
 		$respObj->ok();
 	}

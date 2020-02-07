@@ -154,55 +154,7 @@ class TransactionsController extends Controller
 		$trListData = [];
 		foreach($transArr as $trans)
 		{
-			$itemData = ["id" => $trans->id];
-
-			// Build accounts string
-			$accStr = "";
-			if ($trans->src_id != 0)
-			{
-				if ($trans->type == EXPENSE || $trans->type == TRANSFER)		// expense or transfer
-					$accStr .= $this->accModel->getNameOrPerson($trans->src_id);
-				else if ($trans->type == DEBT)
-					$accStr .= $this->accModel->getNameOrPerson($trans->src_id);
-			}
-
-			if ($trans->src_id != 0 && $trans->dest_id != 0 && ($trans->type == TRANSFER || $trans->type == DEBT))
-				$accStr .= " → ";
-
-			if ($trans->dest_id != 0)
-			{
-				if ($trans->type == INCOME || $trans->type == TRANSFER)		// income or transfer
-					$accStr .= $this->accModel->getNameOrPerson($trans->dest_id);
-				else if ($trans->type == DEBT)
-					$accStr .= $this->accModel->getNameOrPerson($trans->dest_id);
-			}
-
-			$itemData["acc"] = $accStr;
-
-			// Build amount string
-			$amStr = $trans->fsrcAmount;
-			if ($trans->fsrcAmount != $trans->fdestAmount)
-				$amStr .= " (".$trans->fdestAmount.")";
-			$itemData["amount"] = $amStr;
-
-			$itemData["date"] = $trans->date;
-			$itemData["comm"] = $trans->comment;
-
-			if ($details)
-			{
-				$itemData["balance"] = [];
-
-				if ($trans->src_id != 0)
-				{
-					$itemData["balance"][] = $this->currModel->format($trans->src_result, $trans->src_curr);
-				}
-
-				if ($trans->dest_id != 0)
-				{
-					$itemData["balance"][] = $this->currModel->format($trans->dest_result, $trans->dest_curr);
-				}
-			}
-
+			$itemData = $this->model->getListItem($trans, $details);
 
 			$trListData[] = $itemData;
 		}
@@ -267,22 +219,22 @@ class TransactionsController extends Controller
 		{
 			$debtMod = DebtModel::getInstance();
 
-			$debtAcc = $this->accModel->getProperties($acc_id);
+			$debtAcc = $this->accModel->getItem($acc_id);
 
 			// Prepare person account
 			$person_id = $this->personMod->getIdByPos(0);
 			$pObj = $this->personMod->getItem($person_id);
 			$person_name = ($pObj) ? $pObj->name : NULL;
 
-			$person_acc_id = $this->personMod->getAccount($person_id, $debtAcc->curr);
-			$person_acc = $this->accModel->getProperties($person_acc_id);
+			$person_acc_id = $this->personMod->getAccount($person_id, $debtAcc->curr_id);
+			$person_acc = $this->accModel->getItem($person_acc_id);
 			$person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
 			$person_balance = $person_res_balance;
 
 			$tr["src_id"] = $person_acc_id;
 			$tr["dest_id"] = $acc_id;
-			$tr["src_curr"] = $debtAcc->curr;
-			$tr["dest_curr"] = $debtAcc->curr;
+			$tr["src_curr"] = $debtAcc->curr_id;
+			$tr["dest_curr"] = $debtAcc->curr_id;
 
 			$give = TRUE;
 		}
@@ -329,8 +281,8 @@ class TransactionsController extends Controller
 		if ($tr["type"] != DEBT)
 		{
 			// get information about source and destination accounts
-			$src = $this->accModel->getProperties($tr["src_id"]);
-			$dest = $this->accModel->getProperties($tr["dest_id"]);
+			$src = $this->accModel->getItem($tr["src_id"]);
+			$dest = $this->accModel->getItem($tr["dest_id"]);
 		}
 
 		// Prepare transaction types menu
@@ -362,8 +314,11 @@ class TransactionsController extends Controller
 				$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 
 			$balDiff = $tr["src_amount"];
-			if ($tr["type"] != DEBT)
-				$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr);
+			if ($tr["type"] != DEBT && !is_null($src))
+			{
+				$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr_id);
+				$src->iconclass = $this->accModel->getIconClass($src->icon);
+			}
 		}
 
 		if ($tr["type"] == INCOME || $tr["type"] == TRANSFER || $tr["type"] == DEBT)
@@ -376,7 +331,10 @@ class TransactionsController extends Controller
 
 			$balDiff = $tr["dest_amount"];
 			if ($tr["type"] != DEBT && !is_null($dest))
-				$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr);
+			{
+				$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr_id);
+				$dest->iconclass = $this->accModel->getIconClass($dest->icon);
+			}
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -384,11 +342,11 @@ class TransactionsController extends Controller
 
 		if ($tr["type"] != DEBT)
 		{
-			$transCurr = (($tr["type"] == EXPENSE) ? $src->curr : $dest->curr);
-			$transAccCurr = (($tr["type"] == EXPENSE) ? $src->curr : $dest->curr);
+			$transCurr = (($tr["type"] == EXPENSE) ? $src->curr_id : $dest->curr_id);
+			$transAccCurr = (($tr["type"] == EXPENSE) ? $src->curr_id : $dest->curr_id);
 
-			$srcAmountCurr = (!is_null($src)) ? $src->curr : $dest->curr;
-			$destAmountCurr = (!is_null($dest)) ? $dest->curr : $src->curr;
+			$srcAmountCurr = (!is_null($src)) ? $src->curr_id : $dest->curr_id;
+			$destAmountCurr = (!is_null($dest)) ? $dest->curr_id : $src->curr_id;
 
 			// Show destination amount for expense and source amount for income by default because it's amount with changing currency.
 			// Meanwhile source amount for expense and destination amount for income always have the same currency as account.
@@ -404,8 +362,8 @@ class TransactionsController extends Controller
 
 			$noAccount = FALSE;
 
-			$srcAmountCurr = $debtAcc->curr;
-			$destAmountCurr = $debtAcc->curr;
+			$srcAmountCurr = $debtAcc->curr_id;
+			$destAmountCurr = $debtAcc->curr_id;
 
 			$showSrcAmount = TRUE;
 			$showDestAmount = FALSE;
@@ -435,7 +393,8 @@ class TransactionsController extends Controller
 					$accLbl = "Source account";
 			}
 
-			$debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["dest_amount"], $debtAcc->curr);
+			$debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["dest_amount"], $debtAcc->curr_id);
+			$debtAcc->iconclass = $this->accModel->getIconClass($debtAcc->icon);
 
 			$p_balfmt = $this->currModel->format($person_balance, $srcAmountCurr);
 		}
@@ -454,8 +413,8 @@ class TransactionsController extends Controller
 		$rtExchange = $exchValue." ".$exchSign;
 		if ($tr["type"] != DEBT)
 		{
-			$rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr) : NULL;
-			$rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr) : NULL;
+			$rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : NULL;
+			$rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : NULL;
 		}
 		else
 		{
@@ -500,7 +459,7 @@ class TransactionsController extends Controller
 		if (!$this->model->is_exist($trans_id))
 			$this->fail($defMsg);
 
-		$tr = $this->model->getProperties($trans_id);
+		$tr = (array)$this->model->getItem($trans_id);
 
 		if ($tr["type"] == DEBT)
 		{
@@ -512,8 +471,8 @@ class TransactionsController extends Controller
 		if ($tr["type"] != DEBT)
 		{
 			// get information about source and destination accounts
-			$src = $this->accModel->getProperties($tr["src_id"]);
-			$dest = $this->accModel->getProperties($tr["dest_id"]);
+			$src = $this->accModel->getItem($tr["src_id"]);
+			$dest = $this->accModel->getItem($tr["dest_id"]);
 		}
 
 		// Prepare transaction types menu
@@ -541,7 +500,8 @@ class TransactionsController extends Controller
 				$srcBalTitle .= " (Source)";
 
 			$balDiff = $tr["src_amount"];
-			$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr);
+			$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr_id);
+			$src->iconclass = $this->accModel->getIconClass(($src) ? $src->icon : NULL);
 		}
 
 		$destBalTitle = "Result balance";
@@ -551,7 +511,8 @@ class TransactionsController extends Controller
 				$destBalTitle .= " (Destination)";
 
 			$balDiff = $tr["dest_amount"];
-			$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr);
+			$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr_id);
+			$dest->iconclass = $this->accModel->getIconClass(($dest) ? $dest->icon : NULL);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -592,19 +553,19 @@ class TransactionsController extends Controller
 		else
 		{
 			// get information about source and destination accounts
-			$src = $this->accModel->getProperties($tr["src_id"]);
-			$dest = $this->accModel->getProperties($tr["dest_id"]);
+			$src = $this->accModel->getItem($tr["src_id"]);
+			$dest = $this->accModel->getItem($tr["dest_id"]);
 
 			$uObj = $this->uMod->getItem($this->user_id);
 			if (!$uObj)
 				throw new Error("User not found");
 
-			$give = (!is_null($src) && $src->owner != $uObj->owner_id);
+			$give = (!is_null($src) && $src->owner_id != $uObj->owner_id);
 
 			$srcBalTitle .= ($give) ? " (Person)" : " (Account)";
 			$destBalTitle .= ($give) ? " (Account)" : " (Person)";
 
-			$person_id = ($give) ? $src->owner : $dest->owner;
+			$person_id = ($give) ? $src->owner_id : $dest->owner_id;
 			$pObj = $this->personMod->getItem($person_id);
 			if (!$pObj)
 				throw new Error("Person not found");
@@ -612,7 +573,7 @@ class TransactionsController extends Controller
 			$person_name = $pObj->name;
 
 			$person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
-			$person_acc = $this->accModel->getProperties($person_acc_id);
+			$person_acc = $this->accModel->getItem($person_acc_id);
 			$person_res_balance = $person_acc->balance;
 			$person_balance = $person_res_balance + (($give) ? $tr["src_amount"] : -$tr["dest_amount"]);
 
@@ -623,7 +584,7 @@ class TransactionsController extends Controller
 			$destAmountCurr = $tr["dest_curr"];
 			if ($noAccount)
 			{
-				$destAmountCurr = $person_acc->curr;
+				$destAmountCurr = $person_acc->curr_id;
 
 				$acc_id = $this->accModel->getIdByPos(0);
 				$accObj = $this->accModel->getItem($acc_id);
@@ -668,9 +629,11 @@ class TransactionsController extends Controller
 					$accLbl = "Source account";
 
 				if ($give)
-					$debtAcc->balfmt = $this->currModel->format($debtAcc->balance - $tr["dest_amount"], $debtAcc->curr);
+					$debtAcc->balfmt = $this->currModel->format($debtAcc->balance - $tr["dest_amount"], $debtAcc->curr_id);
 				else
-					$debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["src_amount"], $debtAcc->curr);
+					$debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["src_amount"], $debtAcc->curr_id);
+
+				$debtAcc->iconclass = $this->accModel->getIconClass($debtAcc->icon);
 			}
 
 			$p_balfmt = $this->currModel->format($person_balance, $srcAmountCurr);
@@ -694,8 +657,8 @@ class TransactionsController extends Controller
 			$rtExchange .= " (".$backExchValue." ".$backExchSign.")";
 		if ($tr["type"] != DEBT)
 		{
-			$rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr) : NULL;
-			$rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr) : NULL;
+			$rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : NULL;
+			$rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : NULL;
 		}
 		else
 		{
@@ -704,7 +667,7 @@ class TransactionsController extends Controller
 			$rtDestResBal = $this->currModel->format(($give) ? $acc_res_balance : $person_res_balance, $destAmountCurr);
 		}
 
-		$dateFmt = date("d.m.Y", strtotime($tr["date"]));
+		$dateFmt = date("d.m.Y", $tr["date"]);
 
 		$titleString = "Jezve Money | ";
 		if ($tr["type"] == DEBT)

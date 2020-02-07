@@ -550,30 +550,6 @@ class AccountModel extends CachedTable
 	}
 
 
-	// Build array with properties of account
-	public function getProperties($acc_id)
-	{
-		$accObj = $this->getItem($acc_id);
-		if (!$accObj)
-			return NULL;
-
-		$res = new stdClass;
-		$res->id = $accObj->id;
-		$res->owner = $accObj->owner_id;		// TODO : use owner_id
-		$res->name = $accObj->name;
-		$res->balance = $accObj->balance;
-		$res->initbalance = $accObj->initbalance;
-		$res->curr = $accObj->curr_id;			// TODO : use curr_id
-
-		$currObj = $this->currMod->getItem($accObj->curr_id);
-		$res->sign = ($currObj) ? $currObj->sign : NULL;
-		$res->icon = $accObj->icon;
-		$res->iconclass = $this->getIconClass($accObj->icon);
-
-		return $res;
-	}
-
-
 	// Try to find account different from specified
 	public function getAnother($acc_id)
 	{

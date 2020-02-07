@@ -38,18 +38,18 @@ class AccountsController extends Controller
 
 		$accInfo = new stdClass;
 		$accInfo->name = "";
-		$accInfo->curr = $currMod->getIdByPos(0);
+		$accInfo->curr_id = $currMod->getIdByPos(0);
 		$accInfo->balance = 0;
 		$accInfo->initbalance = 0;
 		$accInfo->icon = 0;
 		$accInfo->iconclass = "";
 
-		$currObj = $currMod->getItem($accInfo->curr);
+		$currObj = $currMod->getItem($accInfo->curr_id);
 		if (!$currObj)
 			throw new Error("Currency not found");
 
 		$accInfo->sign = $currObj->sign;
-		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
+		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
 		$tileAccName = "New account";
 
 		$currArr = $currMod->getData();
@@ -91,9 +91,12 @@ class AccountsController extends Controller
 		if (!$acc_id)
 			$this->fail();
 
-		$accInfo = $this->model->getProperties($acc_id);
+		$accInfo = $this->model->getItem($acc_id);
 
-		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr);
+		$currObj = $currMod->getItem($accInfo->curr_id);
+		$accInfo->sign = ($currObj) ? $currObj->sign : NULL;
+		$accInfo->iconclass = $this->model->getIconClass($accInfo->icon);
+		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
 		$tileAccName = $accInfo->name;
 
 		$currArr = $currMod->getData();
