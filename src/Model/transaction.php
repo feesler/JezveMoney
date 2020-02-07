@@ -287,6 +287,7 @@ class TransactionModel extends CachedTable
 				$res[$account_id] = $account->balance;
 			else
 				$res[$account_id] = 0;
+		}
 
 		return $res;
 	}
