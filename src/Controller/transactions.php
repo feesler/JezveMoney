@@ -112,7 +112,6 @@ class TransactionsController extends Controller
 		}
 
 		$showPaginator = TRUE;
-		$details = $showDetails;
 
 		// Prepare mode selector and paginator
 		if ($showPaginator == TRUE)
@@ -120,7 +119,7 @@ class TransactionsController extends Controller
 			// Prepare classic/details mode link
 			$urlParams = (array)$filterObj;
 
-			$urlParams["mode"] = ($details) ? "classic" : "details";
+			$urlParams["mode"] = ($showDetails) ? "classic" : "details";
 			if (isset($urlParams["acc_id"]) && count($urlParams["acc_id"]) > 0)
 				$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
 
@@ -154,7 +153,7 @@ class TransactionsController extends Controller
 		$trListData = [];
 		foreach($transArr as $trans)
 		{
-			$itemData = $this->model->getListItem($trans, $details);
+			$itemData = $this->model->getListItem($trans, $showDetails);
 
 			$trListData[] = $itemData;
 		}

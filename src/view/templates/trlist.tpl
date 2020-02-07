@@ -8,7 +8,7 @@
 <?php	} else {		?>
 <?php	if ($showPaginator == TRUE) {		?>
 							<div class="mode_selector">
-<?php		if ($details) {		?>
+<?php		if ($showDetails) {		?>
 								<a class="list_mode" href="<?=$linkStr?>"><span class="icon"></span><span>Classic</span></a><b class="details_mode"><span class="icon"></span><span>Details</span></b>
 <?php		} else {		?>
 								<b class="list_mode"><span class="icon"></span><span>Classic</span></b><a class="details_mode" href="<?=$linkStr?>"><span class="icon"></span><span>Details</span></a>
@@ -27,13 +27,13 @@
 				}
 			}	?></div>
 <?php	}	?>
-<?php	if ($details) {	?>
+<?php	if ($showDetails) {	?>
 							<table id="tritems" class="details_table">
 <?php	} else {	?>
 							<div id="tritems">
 <?php	}	?>
 <?php	foreach($trListData as $trItem) {	?>
-<?php	if ($details) {		?>
+<?php	if ($showDetails) {		?>
 								<tbody class="trlist_item_wrap"><tr id="tr_<?=$trItem["id"]?>">
 									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=$trItem["acc"]?>"><span><?=$trItem["acc"]?></span></div></div></td>
 									<td><div class="tritem_sum"><span><?=$trItem["amount"]?></span></div></td>
@@ -68,7 +68,7 @@
 							</div>
 <?php	}	?>
 <?php	}	?>
-<?php	if ($details) {		?>
+<?php	if ($showDetails) {		?>
 						</table>
 <?php	} else {	?>
 						</div>
