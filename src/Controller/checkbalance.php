@@ -34,8 +34,8 @@ ini_set('max_execution_time', '0');
 			{
 				$fixbal = floatval($_POST["fixbal"]);
 
-				if (!$db->updateQ("accounts", ["balance"], [$fixbal], "id=".$checkAccount_id))
-					fail();
+				if (!$db->updateQ("accounts", [ "balance" => $fixbal ], "id=".$checkAccount_id))
+					$this->fail();
 
 				$fixed = TRUE;
 			}

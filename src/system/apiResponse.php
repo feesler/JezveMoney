@@ -6,7 +6,11 @@ class apiResponse
 	{
 		header("Content-Type: application/json; charset=utf-8");
 
-		return JSON::encode($this);
+		$output = JSON::encode($this);
+		wlog("API response: ".$output);
+
+		echo($output);
+		exit;
 	}
 
 
@@ -16,8 +20,7 @@ class apiResponse
 		if (!is_null($msg) && is_string($msg))
 			$this->msg = $msg;
 
-		echo($this->render());
-		exit();
+		$this->render();
 	}
 
 
@@ -25,7 +28,6 @@ class apiResponse
 	{
 		$this->result = "ok";
 
-		echo($this->render());
-		exit();
+		$this->render();
 	}
 }

@@ -8,6 +8,9 @@ class Logger
 	// Write string to log file
 	public static function write($str)
 	{
+		if (is_null($str))
+			$str = "";
+
 		file_put_contents(self::$filename, $str."\r\n", FILE_APPEND);
 	}
 
@@ -38,7 +41,7 @@ if (isset($noLogs) && $noLogs == TRUE)
 }
 else
 {
-	function wlog($str)
+	function wlog($str = NULL)
 	{
 		Logger::write($str);
 	}
