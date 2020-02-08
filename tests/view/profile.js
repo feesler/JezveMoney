@@ -73,14 +73,6 @@ class ProfileView extends TestView
 		await this.performAction(() => this.click(this.content.changeNamePopup.okBtn));
 
 		await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
-
-		if (!this.msgPopup)
-			throw new Error('Message popup not found');
-
-		if (!this.msgPopup.success || this.msgPopup.message !== 'User name successfully updated.')
-			throw new Error('Fail to update user name');
-
-		await this.performAction(() => this.msgPopup.close());
 	}
 
 
@@ -98,14 +90,6 @@ class ProfileView extends TestView
 		await this.performAction(() => this.click(this.content.changePassPopup.okBtn));
 
 		await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
-
-		if (!this.msgPopup)
-			throw new Error('Message popup not found');
-
-		if (!this.msgPopup.success || this.msgPopup.message !== 'Password successfully updated.')
-			throw new Error('Fail to update password');
-
-		await this.performAction(() => this.msgPopup.close());
 	}
 
 
@@ -122,15 +106,6 @@ class ProfileView extends TestView
 			throw new Error('Confirm button not found');
 
 		await this.navigation(() => this.click(this.content.reset_warning.okBtn));
-
-		// Use view here instead of this because the instance was changed after navigation
-		if (!App.view.msgPopup)
-			throw new Error('Message popup not found');
-
-		if (!App.view.msgPopup.success || App.view.msgPopup.message !== 'Accounts successfully reseted')
-			throw new Error('Fail to reset accounts');
-
-		await App.view.performAction(() => App.view.msgPopup.close());
 	}
 
 
@@ -147,15 +122,6 @@ class ProfileView extends TestView
 			throw new Error('Confirm button not found');
 
 		await this.navigation(() => this.click(this.content.reset_all_warning.okBtn));
-
-		// Use view here instead of this because the instance was changed after navigation
-		if (!App.view.msgPopup)
-			throw new Error('Message popup not found');
-
-		if (!App.view.msgPopup.success || App.view.msgPopup.message !== 'All data successfully reseted.')
-			throw new Error('Fail to reset all');
-
-		await App.view.performAction(() => App.view.msgPopup.close());
 	}
 
 
@@ -174,15 +140,6 @@ class ProfileView extends TestView
 		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 		if (!(App.view instanceof LoginView))
 			throw new Error('Unexpected page');
-
-		// Use view here instead of this because the instance was changed after navigation
-		if (!App.view.msgPopup)
-			throw new Error('Message popup not found');
-
-		if (!App.view.msgPopup.success || App.view.msgPopup.message !== 'Your profile is successfully deleted.')
-			throw new Error('Fail to delete profile');
-
-		await App.view.performAction(() => App.view.msgPopup.close());
 	}
 }
 

@@ -30,11 +30,6 @@ class RegisterView extends TestView
 
 		if (!(App.view instanceof LoginView))
 			throw new Error('Unexpected page');
-
-		if (!App.view.msgPopup || !App.view.msgPopup.success || App.view.msgPopup.message != 'You successfully registered.')
-			throw new Error('Notification popup not appear');
-
-		await App.view.performAction(() => App.view.msgPopup.close());
 	}
 }
 

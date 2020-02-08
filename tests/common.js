@@ -385,6 +385,27 @@ export function checkObjValue(obj, expectedObj, ret = false)
 {
 	let res = true;
 
+	// undefined means no care
+	if (typeof expectedObj === 'undefined')
+		return true;
+
+	if (!isObject(expectedObj) && !Array.isArray(expectedObj))
+	{
+		if (obj === expectedObj)
+			return true;
+
+		if (ret)
+		{
+		 	return { key : '',
+						value : obj,
+						expected : expectedObj };
+		}
+		else
+		{
+			throw new Error('Not expected value "' + obj + '", "' + expectedObj  + '" is expected');
+		}
+	}
+
 	if (obj === expectedObj)
 		return true;
 

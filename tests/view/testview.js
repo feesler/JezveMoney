@@ -656,6 +656,15 @@ class TestView
 	}
 
 
+	async closeNotification()
+	{
+		if (!this.msgPopup)
+			return;
+
+		await this.performAction(() => this.msgPopup.close());
+	}
+
+
 	// Compare visibiliy of specified controls with expected mask
 	// In the controls object each value must be an object with 'elem' property containing pointer to DOM element
 	// In the expected object each value must be a boolean value
@@ -742,7 +751,15 @@ class TestView
 
 	async checkState(stateObj)
 	{
-		return stateObj && await this.checkVisibility(this.content, stateObj.visibility) && this.checkValues(stateObj.values);
+		if (!stateObj)
+			throw new Error('Invalid expected state object');
+
+		checkObjValue(this.msgPopup, (stateObj.msgPopup) ? stateObj.msgPopup : null);
+		checkObjValue(this.header, stateObj.header);
+		await this.checkVisibility(this.content, stateObj.visibility);
+		this.checkValues(stateObj.values);
+
+		return true;
 	}
 
 

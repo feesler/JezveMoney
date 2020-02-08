@@ -1,4 +1,7 @@
 import { TestView } from './testview.js';
+import { MainView } from './main.js';
+import { RegisterView } from './register.js';
+import { App } from '../app.js';
 
 
 // Log in view class
@@ -22,12 +25,18 @@ class LoginView extends TestView
 		await this.input(this.content.loginInp, login);
 	 	await this.input(this.content.passwordInp, password);
 		await this.navigation(() => this.click(this.content.submitBtn));
+
+		if (!(App.view instanceof MainView))
+			throw new Error('Fail to login');
 	}
 
 
 	async goToRegistration()
 	{
 		await this.navigation(() => this.click(this.content.registerLink));
+
+		if (!(App.view instanceof RegisterView))
+			throw new Error('Unexpected page');
 	}
 }
 

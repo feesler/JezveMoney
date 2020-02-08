@@ -1,7 +1,7 @@
 import { LoginView } from '../view/login.js';
 import { RegisterView } from '../view/register.js';
 import { MainView } from '../view/main.js';
-import { test, formatDate, checkObjValue } from '../common.js';
+import { setParam, test, formatDate, checkObjValue } from '../common.js';
 
 
 let runProfile =
@@ -20,7 +20,8 @@ let runProfile =
 			throw new Error('Wrong page');
 
 		await this.view.loginAs(userObj.login, userObj.password);
-		await test('Test user login', () => (this.view instanceof MainView), this.environment);
+		this.view.expectedState = { msgPopup : null };
+		await test('Test user login', () => {}, this.view);
 	},
 
 
@@ -38,24 +39,34 @@ let runProfile =
 			throw new Error('Unexpected page');
 
 		await this.view.goToRegistration();
-		if (!(this.view instanceof RegisterView))
-			throw new Error('Unexpected page');
 
-		await test('Test user regitration', async () =>
-		{
-			await this.view.registerAs(userObj.login, userObj.name, userObj.password);
+		await this.view.registerAs(userObj.login, userObj.name, userObj.password);
+		this.view.expectedState = { msgPopup : { success : true, message : 'You successfully registered.' } };
 
-			return true;
-		}, this.environment);
+		await test('User registration', () => {}, this.view);
+		await this.view.closeNotification();
 
-		await test('Login with new account', async () =>
-		{
-			await this.view.loginAs(userObj.login, userObj.password);
-			if (!(this.view instanceof MainView))
-				throw new Error('Fail to login');
+		await this.view.loginAs(userObj.login, userObj.password);
+		this.view.expectedState = { msgPopup : null };
+		await test('Login with new account', () => {}, this.view);
+	},
 
-			return true;
-		}, this.environment);
+
+	async resetAccounts()
+	{
+		let persons = await this.getPersonsList();
+
+		await this.view.goToProfile();
+		await this.view.resetAccounts();
+
+		this.view.expectedState = { msgPopup : { success : true, message : 'Accounts successfully reseted' } };
+		await test('Reset all data', () => {}, this.view);
+
+		await this.view.closeNotification();
+		await this.goToMainView();
+
+		this.view.expectedState = await this.state.render([], persons, []);
+		await test('Main view update', () => {}, this.view);
 	},
 
 
@@ -64,10 +75,14 @@ let runProfile =
 		await this.view.goToProfile();
 		await this.view.resetAll();
 
+		this.view.expectedState = { msgPopup : { success : true, message : 'All data successfully reseted.' } };
+		await test('Reset all data', () => {}, this.view);
+
+		await this.view.closeNotification();
 		await this.goToMainView();
 
 		this.view.expectedState = await this.state.render([], [], []);
-		await test('Reset all data', () => {}, this.view);
+		await test('Main view update', () => {}, this.view);
 	},
 
 
@@ -84,16 +99,24 @@ let runProfile =
 
 			await this.view.changeName(newName);
 
-			return this.view.header.user.name == newName;
-		}, this.environment);
+			this.view.expectedState = {
+				msgPopup : { success : true, message : 'User name successfully updated.' },
+				header : { user : { name : newName } }
+			};
+		}, this.view);
+		await this.view.closeNotification();
 
 		await test('Change name back', async () =>
 		{
 			let newName = 'Tester';
 			await this.view.changeName(newName);
 
-			return this.view.header.user.name == newName;
-		}, this.environment);
+			this.view.expectedState = {
+				msgPopup : { success : true, message : 'User name successfully updated.' },
+				header : { user : { name : newName } }
+			};
+		}, this.view);
+		await this.view.closeNotification();
 	},
 
 
@@ -107,6 +130,12 @@ let runProfile =
 		await test('Change password', async () =>
 		{
 			await this.view.changePassword(this.config.testUser.password, newPass);
+			this.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
+		}, this.view);
+		await this.view.closeNotification();
+
+		await test('Login with new password', async () =>
+		{
 			await scope.relogin({ login : this.config.testUser.login, password : newPass });
 			await this.view.goToProfile();
 
@@ -116,11 +145,12 @@ let runProfile =
 		await test('Change password back', async () =>
 		{
 			await this.view.changePassword(newPass, this.config.testUser.password);
-			await scope.relogin(this.config.testUser);
-			await this.view.goToProfile();
+			this.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
+		}, this.view);
+		await this.view.closeNotification();
 
-			return true;
-		}, this.environment);
+		await scope.relogin(this.config.testUser);
+		await this.view.goToProfile();
 	},
 
 
@@ -128,12 +158,11 @@ let runProfile =
 	{
 		await this.view.goToProfile();
 
-		await test('Delete profile', async () =>
-		{
-			await this.view.deleteProfile();
+		await this.view.deleteProfile();
+		this.view.expectedState = { msgPopup : { success : true, message : 'Your profile is successfully deleted.' } };
+		await test('Delete profile', () => {}, this.view);
 
-			return true;
-		}, this.environment);
+		await this.view.closeNotification();
 	}
 };
 
