@@ -146,25 +146,25 @@ let runTransactionAPI =
 
 	async createExpenseTest(params)
 	{
-		return this.run.api.transaction.createTest(await api.transaction.expense(params));
+		return this.run.api.transaction.createTest(await this.run.transactions.expenseTransaction(params));
 	},
 
 
 	async createIncomeTest(params)
 	{
-		return this.run.api.transaction.createTest(await api.transaction.income(params));
+		return this.run.api.transaction.createTest(await this.run.transactions.incomeTransaction(params));
 	},
 
 
 	async createTransferTest(params)
 	{
-		return this.run.api.transaction.createTest(await api.transaction.transfer(params));
+		return this.run.api.transaction.createTest(await this.run.transactions.transferTransaction(params));
 	},
 
 
 	async createDebtTest(params)
 	{
-		return this.run.api.transaction.createTest(await api.transaction.debt(params));
+		return this.run.api.transaction.createTest(await this.run.transactions.debtTransaction(params));
 	},
 
 

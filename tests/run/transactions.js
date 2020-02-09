@@ -142,7 +142,7 @@ let runTransList =
 		let created = await scope.populateTransactions(expensesList, props =>
 		{
 			props.src_id = accIds[props.src_id];
-			return api.transaction.expense(props);
+			return this.run.transactions.expenseTransaction(props);
 		});
 		newExpenses.push(...created);
 
@@ -150,7 +150,7 @@ let runTransList =
 		created = await scope.populateTransactions(incomesList, props =>
 			{
 				props.dest_id = accIds[props.dest_id];
-				return api.transaction.income(props);
+				return this.run.transactions.incomeTransaction(props);
 			});
 		newIncomes.push(...created);
 
@@ -159,7 +159,7 @@ let runTransList =
 			{
 				props.src_id = accIds[props.src_id];
 				props.dest_id = accIds[props.dest_id];
-				return api.transaction.transfer(props);
+				return this.run.transactions.transferTransaction(props);
 			});
 		newTransfers.push(...created);
 
@@ -168,7 +168,7 @@ let runTransList =
 			{
 				props.person_id = personIds[props.person_id];
 				props.acc_id = (props.acc_id) ? accIds[props.acc_id] : 0;
-				return api.transaction.debt(props);
+				return this.run.transactions.debtTransaction(props);
 			});
 		newDebts.push(...created);
 

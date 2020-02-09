@@ -543,107 +543,6 @@ let apiModule = (function()
 	}
 
 
-	async function expenseTransaction(params)
-	{
-		if (!params.src_id)
-			throw new Error('Source account not specified');
-
-		let res = copyObject(params);
-
-		res.transtype = EXPENSE;
-		res.dest_id = 0;
-
-		if (!res.dest_amount)
-			res.dest_amount = res.src_amount;
-
-		let accList = await accountsList();
-		let acc = accList.find(item => item.id == res.src_id);
-		res.src_curr = acc.curr_id;
-
-		if (!res.dest_curr)
-			res.dest_curr = res.src_curr;
-
-		return res;
-	}
-
-
-	async function incomeTransaction(params)
-	{
-		if (!params.dest_id)
-			throw new Error('Destination account not specified');
-
-		let res = copyObject(params);
-
-		res.transtype = INCOME;
-		res.src_id = 0;
-
-		if (!res.src_amount)
-			res.src_amount = res.dest_amount;
-
-		let accList = await accountsList();
-		let acc = accList.find(item => item.id == res.dest_id);
-		res.dest_curr = acc.curr_id;
-
-		if (!res.src_curr)
-			res.src_curr = res.dest_curr;
-
-		return res;
-	}
-
-
-	async function transferTransaction(params)
-	{
-		if (!params.src_id)
-			throw new Error('Source account not specified');
-		if (!params.dest_id)
-			throw new Error('Destination account not specified');
-
-		let res = copyObject(params);
-
-		res.transtype = TRANSFER;
-
-		if (!res.dest_amount)
-			res.dest_amount = res.src_amount;
-
-		let accList = await accountsList();
-
-		let srcAcc = accList.find(item => item.id == res.src_id);
-		res.src_curr = srcAcc.curr_id;
-
-		let destAcc = accList.find(item => item.id == res.dest_id);
-		res.dest_curr = destAcc.curr_id;
-
-		if (!res.src_curr)
-			res.src_curr = res.dest_curr;
-
-		return res;
-	}
-
-
-	async function debtTransaction(params)
-	{
-		if (!params.person_id)
-			throw new Error('Person not specified');
-
-		let res = copyObject(params);
-
-		res.transtype = DEBT;
-
-		if (!res.dest_amount)
-			res.dest_amount = res.src_amount;
-
-		let accList = await accountsList();
-
-		let acc = accList.find(item => item.id == res.acc_id);
-		if (acc)
-			res.src_curr = res.dest_curr = acc.curr_id;
-		else
-			res.src_curr = res.dest_curr = (res.src_curr || res.dest_curr);
-
-		return res;
-	}
-
-
 	return {
 		setEnv : setupEnvironment,
 
@@ -685,12 +584,6 @@ let apiModule = (function()
 			update : updateTransaction,
 			del : deleteTransaction,
 			list : transList,
-
-		// tools for short transaction declarations
-			expense : expenseTransaction,
-			income : incomeTransaction,
-			transfer : transferTransaction,
-			debt : debtTransaction,
 		}
 	};
 

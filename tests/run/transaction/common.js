@@ -3,8 +3,10 @@ import { MainView } from '../../view/main.js';
 import { TransactionsList } from '../../trlist.js';
 import { api } from '../../api.js';
 import {
+	EXPENSE, INCOME, TRANSFER, DEBT, 
 	test,
 	isObject,
+	copyObject,
 	checkObjValue,
 	formatProps,
 	getTransactionTypeStr
@@ -13,6 +15,109 @@ import {
 
 let runTransactionsCommon =
 {
+	async expenseTransaction(params)
+	{
+		if (!params.src_id)
+			throw new Error('Source account not specified');
+
+		let res = copyObject(params);
+
+		res.transtype = EXPENSE;
+		res.dest_id = 0;
+
+		if (!res.dest_amount)
+			res.dest_amount = res.src_amount;
+
+		let acc = await this.state.getAccount(res.src_id);
+		if (!acc)
+			throw new Error('Account not found');
+		res.src_curr = acc.curr_id;
+
+		if (!res.dest_curr)
+			res.dest_curr = res.src_curr;
+
+		return res;
+	},
+
+
+	async incomeTransaction(params)
+	{
+		if (!params.dest_id)
+			throw new Error('Destination account not specified');
+
+		let res = copyObject(params);
+
+		res.transtype = INCOME;
+		res.src_id = 0;
+
+		if (!res.src_amount)
+			res.src_amount = res.dest_amount;
+
+		let acc = await this.state.getAccount(res.dest_id);
+		if (!acc)
+			throw new Error('Account not found');
+		res.dest_curr = acc.curr_id;
+
+		if (!res.src_curr)
+			res.src_curr = res.dest_curr;
+
+		return res;
+	},
+
+
+	async transferTransaction(params)
+	{
+		if (!params.src_id)
+			throw new Error('Source account not specified');
+		if (!params.dest_id)
+			throw new Error('Destination account not specified');
+
+		let res = copyObject(params);
+
+		res.transtype = TRANSFER;
+
+		if (!res.dest_amount)
+			res.dest_amount = res.src_amount;
+
+		let srcAcc = await this.state.getAccount(res.src_id);
+		if (!srcAcc)
+			throw new Error('Account not found');
+		res.src_curr = srcAcc.curr_id;
+
+		let destAcc = await this.state.getAccount(res.dest_id);
+		if (!destAcc)
+			throw new Error('Account not found');
+		res.dest_curr = destAcc.curr_id;
+
+		if (!res.src_curr)
+			res.src_curr = res.dest_curr;
+
+		return res;
+	},
+
+
+	async debtTransaction(params)
+	{
+		if (!params.person_id)
+			throw new Error('Person not specified');
+
+		let res = copyObject(params);
+
+		res.transtype = DEBT;
+
+		if (!res.dest_amount)
+			res.dest_amount = res.src_amount;
+
+		let acc = await this.state.getAccount(res.acc_id);
+		if (acc)
+			res.src_curr = res.dest_curr = acc.curr_id;
+		else
+			res.src_curr = res.dest_curr = (res.src_curr || res.dest_curr);
+
+		return res;
+	},
+
+
 	async iteratePages()
 	{
 		let res = { items : [], pages : [] };
