@@ -196,6 +196,53 @@ let runAccounts =
 		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view);
 
 		await this.run.transactions.checkData('List of transactions update', expTransList);
+	},
+
+
+	async delFromUpdate(pos)
+	{
+		let view = this.view;
+		let scope = this.run.accounts;
+
+		pos = parseInt(pos);
+		if (isNaN(pos) || pos < 0)
+			throw new Error('Position of account not specified');
+
+		view.setBlock('Delete account from update view [' + pos + ']', 2);
+
+		let accList = await this.state.getAccountsList();
+		let pList = await this.state.getPersonsList();
+		let trBefore = await this.state.getTransactionsList();
+
+		if (!(this.view instanceof AccountsView))
+		{
+			if (!(this.view instanceof MainView))
+				await this.goToMainView();
+			await this.view.goToAccounts();
+		}
+
+		await this.view.goToUpdateAccount(pos);
+		await this.view.deleteSelfItem();
+
+		// Prepare expected updates of accounts list
+		let ids = this.state.positionsToIds(accList,pos)
+		let expectedList = this.state.deleteByIds(accList, ids);
+		// Prepare expected updates of transactions
+		let expTransList = trBefore.deleteAccounts(accList, ids);
+
+		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+		await test('Delete account [' + pos + ']', () => {}, this.view);
+
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
+		await this.goToMainView();
+
+		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
+		await test('Main page widgets update', async () => {}, this.view);
+
+		await this.run.transactions.checkData('List of transactions update', expTransList);
 	}
 };
 

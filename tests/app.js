@@ -284,6 +284,8 @@ class Application
 		await this.runDeleteIncomeTests();
 		await this.runDeleteTransferTests();
 		await this.runDeleteDebtTests();
+
+		await this.runDeleteFromUpdateTests();
 	}
 
 
@@ -498,6 +500,19 @@ class Application
 		{
 			await this.run.transactions.del(DEBT, props);
 		}
+	}
+
+
+	async runDeleteFromUpdateTests()
+	{
+		this.view.setBlock('Delete transaction from update view', 2);
+		await this.run.transactions.delFromUpdate(DEBT, 0);
+
+		this.view.setBlock('Delete account from update view', 2);
+		await this.run.accounts.delFromUpdate(0);
+
+		this.view.setBlock('Delete person from update view', 2);
+		await this.run.persons.delFromUpdate(0);
 	}
 
 

@@ -114,9 +114,10 @@ class ExpenseTransactionView extends TransactionView
 			throw new Error('Wrong state specified');
 
 		let res = { model : { state : newState },
-					visibility : { source : true, destination : false, src_amount_left : false,
+					visibility : { delBtn : this.model.isUpdate,
+									source : true, destination : false, src_amount_left : false,
 									dest_res_balance_left : false, result_balance_dest_row : false },
-					values : { typeMenu : { activeType : 1 }, /* EXPENSE */
+					values : { typeMenu : { activeType : EXPENSE },
 								source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 								src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
 								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },
@@ -125,6 +126,9 @@ class ExpenseTransactionView extends TransactionView
 								src_res_balance_left : this.model.fmtSrcResBal,
 								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
 								exch_left : this.model.fmtExch } };
+
+		if (this.model.isUpdate)
+			res.values.delBtn = { title : 'Delete' };
 
 		if (newState === 0 || newState === 1)
 		{

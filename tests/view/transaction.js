@@ -1,5 +1,5 @@
 import { TestView } from './testview.js';
-import { correctExch, isValidValue, normalizeExch } from '../common.js'
+import { DEBT, correctExch, isValidValue, normalizeExch } from '../common.js'
 import { App } from '../app.js';
 
 
@@ -123,11 +123,11 @@ class TransactionView extends TestView
 		if (res.heading.elem)
 			res.heading.title = await this.prop(res.heading.elem, 'innerText');
 
-		res.delBtn = await this.query('#del_btn');
+		res.delBtn = await this.parseIconLink(await this.query('#del_btn'));
 
 		res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
 
-		if (res.typeMenu.activeType == 4)	/* DEBT */
+		if (res.typeMenu.activeType == DEBT)
 		{
 			res.person = await this.parseTileBlock(await this.query('#person'));
 			if (res.person)
@@ -191,6 +191,8 @@ class TransactionView extends TestView
 
 		res.submitBtn = await this.query('#submitbtn');
 		res.cancelBtn = await this.query('#submitbtn + *');
+
+		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
 
 		return res;
 	}
@@ -267,6 +269,29 @@ class TransactionView extends TestView
 			return;
 
 		return this.navigation(() => this.content.typeMenu.items[type].click());
+	}
+
+
+	async clickDeleteButton()
+	{
+		if (!this.content.isUpdate || !this.content.delBtn)
+			throw new Error('Unexpected action clickDeleteButton');
+
+		return this.performAction(() => this.content.delBtn.click());
+	}
+
+
+	// Click on delete button and confirm wanring popup
+	async deleteSelfItem()
+	{
+		await this.clickDeleteButton();
+
+		if (!await this.isVisible(this.content.delete_warning.elem))
+			throw 'Delete transaction warning popup not appear';
+		if (!this.content.delete_warning.okBtn)
+			throw 'OK button not found';
+
+		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}
 
 

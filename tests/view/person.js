@@ -17,7 +17,9 @@ class PersonView extends TestView
 		if (!res.formElem)
 			throw new Error('Form element not found');
 
-		res.isEdit = (!!await this.query('#pid'));
+		res.isUpdate = (!!await this.query('#pid'));
+
+		res.delBtn = await this.parseIconLink(await this.query('#del_btn'));
 
 		res.name = await this.parseInputRow(await this.query(res.formElem, 'div.non_float'));
 		if (!res.name)
@@ -27,7 +29,32 @@ class PersonView extends TestView
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
 
+		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+
 		return res;
+	}
+
+
+	async clickDeleteButton()
+	{
+		if (!this.content.isUpdate || !this.content.delBtn)
+			throw new Error('Unexpected action clickDeleteButton');
+
+		return this.performAction(() => this.content.delBtn.click());
+	}
+
+
+	// Click on delete button and confirm wanring popup
+	async deleteSelfItem()
+	{
+		await this.clickDeleteButton();
+
+		if (!await this.isVisible(this.content.delete_warning.elem))
+			throw 'Delete transaction warning popup not appear';
+		if (!this.content.delete_warning.okBtn)
+			throw 'OK button not found';
+
+		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}
 
 

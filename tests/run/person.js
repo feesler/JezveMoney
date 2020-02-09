@@ -1,5 +1,6 @@
 import { test } from '../common.js';
 import { PersonsView } from '../view/persons.js';
+import { MainView } from '../view/main.js';
 
 
 let runPersons =
@@ -87,6 +88,57 @@ let runPersons =
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
 		await test('Delete persons [' + persons.join() + ']', () => {}, this.view);
+	},
+
+
+	async delFromUpdate(pos)
+	{
+		pos = parseInt(pos);
+		if (isNaN(pos) || pos < 0)
+			throw new Error('Position of person not specified');
+
+		this.view.setBlock('Delete person from update view [' + pos + ']', 2);
+
+		let accList = await this.state.getAccountsList();
+		let pList = await this.state.getPersonsList();
+		let trBefore = await this.state.getTransactionsList();
+
+		if (!(this.view instanceof PersonsView))
+		{
+			if (!(this.view instanceof MainView))
+				await this.goToMainView();
+			await this.view.goToPersons();
+		}
+
+		this.state.persons = null;
+		this.state.accounts = null;
+		this.state.transactions = null;
+
+		await this.view.goToUpdatePerson(pos);
+		await this.view.deleteSelfItem();
+
+		// Prepare expected updates of persons list
+		let personObj = pList[pos];
+		let expectedList = this.state.deleteByIds(pList, personObj.id);
+		// Prepare expected updates of transactions
+		let personAccounts = personObj.accounts.map(item => item.id);
+		let expTransList = trBefore.deleteAccounts(accList, personAccounts);
+		// Prepare expected updates of accounts list
+		let expAccList = this.state.deleteByIds(accList, personAccounts);
+
+		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		await test('Delete person [' + pos + ']', () => {}, this.view);
+
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
+		await this.goToMainView();
+
+		this.view.expectedState = await this.state.render(expAccList, pList, expTransList.list);
+		await test('Main page widgets update', async () => {}, this.view);
+
+		await this.run.transactions.checkData('List of transactions update', expTransList);
 	}
 };
 

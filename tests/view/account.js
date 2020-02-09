@@ -140,6 +140,8 @@ class AccountView extends TestView
 			throw new Error('Heading element not found');
 		res.heading.text = await this.prop(res.heading.elem, 'innerText');
 
+		res.delBtn = await this.parseIconLink(await this.query('#del_btn'));
+
 		res.tile = await this.parseTile(await this.query('#acc_tile'));
 
 		res.formElem = await this.query('form');
@@ -183,7 +185,32 @@ class AccountView extends TestView
 		if (!res.cancelBtn)
 			throw new Error('Cancel button not found');
 
+		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+
 		return res;
+	}
+
+
+	async clickDeleteButton()
+	{
+		if (!this.content.isUpdate || !this.content.delBtn)
+			throw new Error('Unexpected action clickDeleteButton');
+
+		return this.performAction(() => this.content.delBtn.click());
+	}
+
+
+	// Click on delete button and confir wanring popup
+	async deleteSelfItem()
+	{
+		await this.clickDeleteButton();
+
+		if (!await this.isVisible(this.content.delete_warning.elem))
+			throw 'Delete transaction warning popup not appear';
+		if (!this.content.delete_warning.okBtn)
+			throw 'OK button not found';
+
+		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}
 
 

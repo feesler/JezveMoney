@@ -62,8 +62,7 @@ class DebtTransactionView extends TransactionView
 		res.account = await App.state.getAccount(cont.account.id);
 		if (!res.account && !res.noAccount)
 			throw new Error('Account not found');
-
-		if (res.account && res.account.curr_id != res.src_curr_id)
+		if (!res.noAccount && res.account && res.account.curr_id != ((res.debtType) ? res.src_curr_id : res.dest_curr_id))
 			throw new Error('Wrong currency of account');
 
 		if (this.model && this.model.lastAccount_id)
@@ -239,7 +238,8 @@ class DebtTransactionView extends TransactionView
 			throw new Error('Wrong state specified');
 
 		let res = { model : { state : newState },
-					visibility : { person : true, account : { tile : !this.model.noAccount },
+					visibility : { delBtn : this.model.isUpdate,
+									person : true, account : { tile : !this.model.noAccount },
 									selaccount : this.model.noAccount, noacc_btn : !this.model.noAccount,
 									dest_amount_row : false, dest_amount_left : false,
 									exchange_row : false, exch_left : false },
@@ -251,6 +251,9 @@ class DebtTransactionView extends TransactionView
 								result_balance_dest_row : { value : this.model.destResBal.toString(), isCurrActive : false },
 								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
 								exch_left : this.model.fmtExch } };
+
+		if (this.model.isUpdate)
+			res.values.delBtn = { title : 'Delete' };
 
 		if (this.model.debtType)
 		{

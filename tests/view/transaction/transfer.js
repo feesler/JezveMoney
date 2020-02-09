@@ -148,7 +148,7 @@ class TransferTransactionView extends TransactionView
 			throw new Error('Wrong state specified');
 
 		let res = { model : { state : newState },
-					visibility : { source : true, destination : true },
+					visibility : { delBtn : this.model.isUpdate, source : true, destination : true },
 					values : { typeMenu : { activeType : TRANSFER },
 								source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 								destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
@@ -162,6 +162,9 @@ class TransferTransactionView extends TransactionView
 								dest_res_balance_left : this.model.fmtDestResBal,
 								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
 								exch_left : this.model.fmtExch } };
+
+		if (this.model.isUpdate)
+			res.values.delBtn = { title : 'Delete' };
 
 		if (newState === 0 || newState === 1 || newState === 2)
 		{

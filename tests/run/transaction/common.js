@@ -196,6 +196,51 @@ let runTransactionsCommon =
 		await test('Main page widgets update', async () => {}, this.view);
 
 		await scope.checkData('List of transactions update', expTransList);
+	},
+
+
+	async delFromUpdate(type, pos)
+	{
+		let view = this.view;
+		let scope = this.run.transactions;
+
+		pos = parseInt(pos);
+		if (isNaN(pos) || pos < 0)
+			throw new Error('Position of transaction not specified');
+
+		view.setBlock('Delete ' + getTransactionTypeStr(type) + ' from update view [' + pos + ']', 2);
+
+		let accList = await this.state.getAccountsList();
+		let pList = await this.state.getPersonsList();
+		let expTransList = await this.state.getTransactionsList();
+
+		if (!(this.view instanceof TransactionsView))
+		{
+			if (!(this.view instanceof MainView))
+				await this.goToMainView();
+			await this.view.goToTransactions();
+		}
+
+		if (this.view.content.typeMenu.activeType != type)
+			await this.view.filterByType(type);
+
+		await this.view.goToUpdateTransaction(pos);
+		await this.view.deleteSelfItem();
+
+		// Prepare expected transaction list
+		let removedTrans = expTransList.del(0, pos);
+		accList = this.state.deleteTransactions(accList, removedTrans);
+
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
+		await this.goToMainView();
+
+		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
+		await test('Main page widgets update', async () => {}, this.view);
+
+		await scope.checkData('List of transactions update', expTransList);
 	}
 };
 
