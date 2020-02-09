@@ -141,6 +141,8 @@ function initControls()
 	var del_btn = ge('del_btn');
 	if (del_btn)
 		del_btn.onclick = onDelete;
+
+	persons = new Selection();
 }
 
 
