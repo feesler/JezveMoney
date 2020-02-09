@@ -85,7 +85,7 @@
 	</div>
 </div>
 <?php	if ($action == "edit") {	?>
-<form id="delform" method="post" action="./modules/account.php?act=del">
+<form id="delform" method="post" action="<?=BASEURL?>accounts/del">
 <input name="accounts" type="hidden" value="<?=$acc_id?>">
 </form>
 <?php	}	?>
