@@ -76,7 +76,7 @@ class PersonsController extends Controller
 
 		array_push($this->css->libs, "iconlink.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "persons.js");
+		array_push($this->jsArr, "selection.js", "persons.js");
 
 		include("./view/templates/person.tpl");
 	}
