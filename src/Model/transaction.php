@@ -199,6 +199,78 @@ class TransactionModel extends CachedTable
 	}
 
 
+	protected function commitAffected()
+	{
+		if (!isset($this->affectedTransactions) || !is_array($this->affectedTransactions) || !count($this->affectedTransactions))
+			return FALSE;
+
+		$curDate = date("Y-m-d H:i:s");
+
+		foreach($this->affectedTransactions as $item_id => $item)
+		{
+			$item = (array)$item;
+
+			if (!is_string($item["date"]))
+				$item["date"] = date("Y-m-d H:i:s", $item["date"]);
+			if (!is_string($item["createdate"]))
+				$item["createdate"] = date("Y-m-d H:i:s", $item["createdate"]);
+
+			$item["updatedate"] = $curDate;
+
+			$this->affectedTransactions[$item_id] = $item;
+		}
+
+		if (!$this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions))
+			return FALSE;
+
+		unset($this->affectedTransactions);
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	protected function getAffected($item)
+	{
+		if (!$item || !$item->id)
+			return NULL;
+
+		if (!isset($this->affectedTransactions)
+			|| !is_array($this->affectedTransactions)
+			|| !isset($this->affectedTransactions[$item->id]))
+			return $item;
+
+		return $this->affectedTransactions[$item->id];
+	}
+
+
+	protected function pushAffected($item)
+	{
+		if (!$item || !$item->id)
+			return FALSE;
+
+		if (!isset($this->affectedTransactions))
+			$this->affectedTransactions = [];
+
+		$this->affectedTransactions[$item->id] = $item;
+
+		return TRUE;
+	}
+
+
+	protected function sortAffected()
+	{
+		uasort($this->cache, function($a, $b)
+		{
+			$a = $this->getAffected($a);
+			$b = $this->getAffected($b);
+
+			return $a->pos - $b->pos;
+		});
+	}
+
+
 	// Preparations for item create
 	protected function preCreate($params, $isMultiple = FALSE)
 	{
@@ -228,9 +300,7 @@ class TransactionModel extends CachedTable
 			if ($isMultiple)
 			{
 				if (!isset($this->latestPos))
-				{
 					$this->latestPos = $this->getLatestPos();
-				}
 				$res["pos"] = (++$this->latestPos);
 			}
 			else
@@ -274,6 +344,8 @@ class TransactionModel extends CachedTable
 				$this->updatePos($item_id, $latest_pos + 1);
 			}
 		}
+
+		$this->commitAffected();
 	}
 
 
@@ -426,6 +498,8 @@ class TransactionModel extends CachedTable
 			$this->updateResults([ $this->originalTrans->src_id, $this->originalTrans->dest_id ], $trObj->pos);
 		}
 		unset($this->originalTrans);
+
+		$this->commitAffected();
 	}
 
 
@@ -439,11 +513,38 @@ class TransactionModel extends CachedTable
 
 		foreach($this->cache as $tr_id => $item)
 		{
-			if ($item->pos == $tr_pos)
+			$trans = $this->getAffected($item);
+
+			if ($trans->pos == $tr_pos)
 				return TRUE;
 		}
 
 		return FALSE;
+	}
+
+
+	protected function getRange($fromPos, $includeFrom, $toPos, $includeTo)
+	{
+		if (!$this->checkCache())
+			return FALSE;
+
+		$res = [];
+		foreach($this->cache as $tr_id => $item)
+		{
+			$trans = $this->getAffected($item);
+
+			if (($includeFrom && ($trans->pos < $fromPos)) ||
+				(!$includeFrom && ($trans->pos <= $fromPos)))
+				continue;
+
+			if (($includeTo && ($trans->pos > $toPos)) ||
+				(!$includeTo && ($trans->pos >= $toPos)))
+				continue;
+
+			$res[$tr_id] = $trans;
+		}
+
+		return $res;
 	}
 
 
@@ -463,12 +564,6 @@ class TransactionModel extends CachedTable
 			return FALSE;
 
 		$old_pos = $trObj->pos;
-
-		$condArr = [ "user_id=".self::$user_id ];
-
-		$curDate = date("Y-m-d H:i:s");
-
-		$assignArr = [];
 		if ($old_pos == $new_pos)
 		{
 			return TRUE;
@@ -479,121 +574,85 @@ class TransactionModel extends CachedTable
 			{
 				$latest = $this->getLatestPos();
 
-				$condArr[] = "pos >= ".$new_pos;
-				$condArr[] = "pos <= ".$latest;
-				$assignArr[] = "pos=pos+1";
+				$affectedRange = $this->getRange($new_pos, TRUE, $latest, TRUE);
+				foreach($affectedRange as $tr_id => $item)
+				{
+					$queryItem = clone $item;
+					$queryItem->pos++;
+					$this->pushAffected($queryItem);
+				}
 			}
 			else if ($new_pos < $old_pos)		// moving up
 			{
-				$condArr[] = "pos >= ".$new_pos;
-				$condArr[] = "pos < ".$old_pos;
-				$assignArr[] = "pos=pos+1";
+				$affectedRange = $this->getRange($new_pos, TRUE, $old_pos, FALSE);
+				foreach($affectedRange as $tr_id => $item)
+				{
+					$queryItem = clone $item;
+					$queryItem->pos++;
+					$this->pushAffected($queryItem);
+				}
 			}
 			else if ($new_pos > $old_pos)		// moving down
 			{
-				$condArr[] = "pos > ".$old_pos;
-				$condArr[] = "pos <= ".$new_pos;
-				$assignArr[] = "pos=pos-1";
+				$affectedRange = $this->getRange($old_pos, FALSE, $new_pos, TRUE);
+				foreach($affectedRange as $tr_id => $item)
+				{
+					$queryItem = clone $item;
+					$queryItem->pos--;
+					$this->pushAffected($queryItem);
+				}
 			}
-
-			$assignArr["updatedate"] = $curDate;
-
-			if (!$this->dbObj->updateQ($this->tbl_name, $assignArr, $condArr))
-				return FALSE;
 		}
 
-		if (!$this->dbObj->updateQ($this->tbl_name, [ "pos" => $new_pos, "updatedate" => $curDate ], "id=".$trans_id))
-			return FALSE;
+		$queryItem = clone $trObj;
+		$queryItem->pos = $new_pos;
+		$this->pushAffected($queryItem);
+		$this->sortAffected();
+
+		if (!$old_pos && isset($this->originalTrans))
+			$old_pos = $this->originalTrans->pos;
 
 		$updateFromPos = ($old_pos != 0) ? min($old_pos, $new_pos) : $new_pos;
 		$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $updateFromPos);
-
-		$this->cleanCache();
 
 		return TRUE;
 	}
 
 
-	// Return result balance of account before transaction with specifiec position
-	public function getLatestResult($acc_id, $pos = -1)
+	// Return result balance of account before transaction with specified position
+	public function getLatestResult($acc_id, $pos = FALSE)
 	{
 		$acc_id = intval($acc_id);
 		if (!$acc_id)
 			return NULL;
-
-		$accCond = $this->getAccCondition($acc_id);
-		if ($pos === -1)
+		if ($pos === FALSE)
 			$pos = $this->getLatestPos() + 1;
 
-		if ($pos < 2)
+		$res = NULL;
+		if ($pos > 1)
 		{
-			$resultBalanceAvailable = FALSE;
-		}
-		else
-		{
-			$condArr = [ "user_id=".self::$user_id, "pos < $pos", "pos<>0", $accCond ];
+			$posOfRes = 0;
+			foreach($this->cache as $tr_id => $item)
+			{
+				$trans = $this->getAffected($item);
 
-			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
-			$resultBalanceAvailable = ($this->dbObj->rowsCount($qResult) == 1);
+				if ($trans->src_id != $acc_id && $trans->dest_id != $acc_id)
+					continue;
+				if (!$trans->pos || $trans->pos >= $pos || $trans->pos <= $posOfRes)
+					continue;
+
+				$res = ($trans->src_id == $acc_id) ? $trans->src_result : $trans->dest_result;
+				$posOfRes = $trans->pos;
+			}
 		}
 
-		if ($resultBalanceAvailable)
-		{
-			$row = $this->dbObj->fetchRow($qResult);
-			if ($acc_id == intval($row["src_id"]))
-				$res = floatval($row["src_result"]);
-			else
-				$res = floatval($row["dest_result"]);
-		}
-		else
+		if (is_null($res))
 		{
 			$accObj = $this->accModel->getItem($acc_id);
 			$res = ($accObj) ? $accObj->initbalance : NULL;
 		}
 
 		return $res;
-	}
-
-
-	protected function pushUniq(&$storage, $key, $value)
-	{
-		if (!is_array($storage))
-			throw new Error("Invalid storage specified");
-
-		if (!isset($storage[$key]))
-			$storage[$key] = [];
-
-		if (!in_array($value, $storage[$key]))
-			$storage[$key][] = $value;
-	}
-
-
-	// Search for specified array of values in storage
-	// Values may be in different order
-	// If found remove item from storage and return key
-	// Return NULL if no value is found
-	protected function findInStorage(&$storage, $expectedValues)
-	{
-		foreach($storage as $key => $values)
-		{
-			if (!array_diff($expectedValues, $values) &&
-				!array_diff($values, $expectedValues))
-			{
-				unset($storage[$key]);
-				return $key;
-			}
-		}
-
-		return NULL;
-	}
-
-
-	protected function diffAssignment($field, $diff)
-	{
-		if (floatval($diff) > 0)
-			return "$field=$field+$diff";
-		else
-			return "$field=$field$diff";
 	}
 
 
@@ -614,19 +673,19 @@ class TransactionModel extends CachedTable
 		}
 
 		// Request affected transactions
-		$condArr = [ "user_id=".self::$user_id, "pos>=".$pos ];
-		$accCond = $this->getAccCondition($accounts);
-		if (!is_empty($accCond))
-			$condArr[] = $accCond;
+		if (!$this->checkCache())
+			return NULL;
 
-		$srcAssingments = [];
-		$destAssingments = [];
-
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "pos ASC");
-		while($row = $this->dbObj->fetchRow($qResult))
+		foreach($this->cache as $item_id => $item)
 		{
-			$tr = $this->rowToObj($row);
-			unset($row);
+			$tr = $this->getAffected($item);
+
+			if (!in_array($tr->src_id, $accounts) && !in_array($tr->dest_id, $accounts))
+				continue;
+			if ($tr->pos < $pos)
+				continue;
+
+			$queryItem = NULL;
 
 			if ($tr->type == EXPENSE || $tr->type == TRANSFER || $tr->type == DEBT)
 			{
@@ -635,7 +694,12 @@ class TransactionModel extends CachedTable
 					$results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
 					$diff = round($results[$tr->src_id] - $tr->src_result, 2);
 					if (abs($diff) >= 0.01)
-						$this->pushUniq($srcAssingments, strval($diff), $tr->id);
+					{
+						if (is_null($queryItem))
+							$queryItem = clone $tr;
+
+						$queryItem->src_result = $results[$tr->src_id];
+					}
 				}
 			}
 
@@ -646,36 +710,18 @@ class TransactionModel extends CachedTable
 					$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
 					$diff = round($results[$tr->dest_id] - $tr->dest_result, 2);
 					if (abs($diff) >= 0.01)
-						$this->pushUniq($destAssingments, strval($diff), $tr->id);
+					{
+						if (is_null($queryItem))
+							$queryItem = clone $tr;
+
+						$queryItem->dest_result = $results[$tr->dest_id];
+					}
 				}
 			}
+
+			if (!is_null($queryItem))
+				$this->pushAffected($queryItem);
 		}
-
-		foreach($srcAssingments as $diff => $ids)
-		{
-			$assingments = [
-				$this->diffAssignment("src_result", $diff)
-			];
-
-			$destDiff = $this->findInStorage($destAssingments, $ids);
-			if (!is_null($destDiff))
-				$assingments[] = $this->diffAssignment("dest_result", $destDiff);
-
-			if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id".inSetCondition($ids)))
-				return FALSE;
-		}
-
-		foreach($destAssingments as $diff => $ids)
-		{
-			$assingments = [
-				$this->diffAssignment("dest_result", $diff)
-			];
-
-			if (!$this->dbObj->updateQ($this->tbl_name, $assingments, "id".inSetCondition($ids)))
-				return FALSE;
-		}
-
-		$this->cleanCache();
 
 		return TRUE;
 	}
@@ -696,7 +742,9 @@ class TransactionModel extends CachedTable
 			// cancel transaction
 			$this->balanceChanges = $this->cancelTransaction($trObj, $this->balanceChanges);
 
-			$this->removedItems[] = $trObj;
+			$this->removedItems[] = clone $trObj;
+
+			unset($this->cache[$trObj->id]);
 		}
 
 		return TRUE;
@@ -714,30 +762,33 @@ class TransactionModel extends CachedTable
 		{
 			$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $trObj->pos + 1);
 		}
-
 		unset($this->removedItems);
+
+		$this->commitAffected();
 
 		$this->cleanCache();
 	}
 
 
 	// Return latest position of user transactions
-	public function getLatestPos($trans_date = -1)
+	public function getLatestPos($trans_date = FALSE)
 	{
-		if (!self::$user_id)
+		$res = 0;
+
+		if (!$this->checkCache())
 			return 0;
 
-		$condArr = ["user_id=".self::$user_id];
-		if ($trans_date != -1)
-			$condArr[] = "date <= ".qnull(date("Y-m-d H:i:s", $trans_date));
+		foreach($this->cache as $tr_id => $item)
+		{
+			$trans = $this->getAffected($item);
 
-		$qResult = $this->dbObj->selectQ("pos", $this->tbl_name, $condArr, NULL, "pos DESC LIMIT 1");
-		if ($this->dbObj->rowsCount($qResult) != 1)
-			return 0;
+			if ($trans_date !== FALSE && $trans->date > $trans_date)
+				continue;
 
-		$row = $this->dbObj->fetchRow($qResult);
+			$res = max($trans->pos, $res);
+		}
 
-		return intval($row["pos"]);
+		return $res;
 	}
 
 
@@ -748,35 +799,38 @@ class TransactionModel extends CachedTable
 			return FALSE;
 
 		$new_curr = $accObj->curr_id;
-		$curDate = date("Y-m-d H:i:s");
-		$userCond = "user_id=".self::$user_id;
+		if (!$this->checkCache())
+			return 0;
 
-		// Update source transactions
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "src_curr" => $new_curr, "updatedate" => $curDate ],
-									[ $userCond, "src_id=".qnull($acc_id) ]))
-			return FALSE;
+		foreach($this->cache as $item_id => $item)
+		{
+			$trans = $this->getAffected($item);
 
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									"src_amount=dest_amount",
-									[ $userCond, "src_id=".qnull($acc_id), "dest_curr=".qnull($new_curr) ]))
-			return FALSE;
+			if ($trans->src_id != $acc_id && $trans->dest_id != $acc_id)
+				continue;
 
-		// Update destination transactions
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "dest_curr" => $new_curr, "updatedate" => $curDate ],
-									[ $userCond, "dest_id=".qnull($acc_id) ]))
-			return FALSE;
+			if ($trans->src_id == $acc_id)
+			{
+				$trans->src_curr = $new_curr;
 
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									"dest_amount=src_amount",
-									[ $userCond, "dest_id=".qnull($acc_id), "src_curr=".qnull($new_curr) ]))
-			return FALSE;
+				if ($trans->dest_curr == $new_curr)
+					$trans->src_amount = $trans->dest_amount;
+			}
 
-		// Update results
+			if ($trans->dest_id == $acc_id)
+			{
+				$trans->dest_curr = $new_curr;
+
+				if ($trans->src_curr == $new_curr)
+					$trans->dest_amount = $trans->src_amount;
+			}
+
+			$this->pushAffected($trans);
+		}
+
 		$this->updateResults($acc_id, 0);
 
-		$this->cleanCache();
+		$this->commitAffected();
 
 		return TRUE;
 	}
@@ -792,8 +846,6 @@ class TransactionModel extends CachedTable
 		$uObj = $uMod->getItem(self::$user_id);
 		if (!$uObj)
 			throw new Error("User not found");
-
-		$userCond = "user_id=".self::$user_id;
 
 		if (!is_array($accounts))
 			$accounts = [ $accounts ];
@@ -811,33 +863,95 @@ class TransactionModel extends CachedTable
 				$personAccounts[] = $accObj->id;
 		}
 
-		$setCond = inSetCondition($ids);
-		if (is_null($setCond))
-			return FALSE;
+		if (!$this->checkCache())
+			return 0;
 
+		$curDate = date("Y-m-d H:i:s");
 
-		// delete expenses and incomes
-		// transactions where both accounts in set will be also deleted
-		$condArr = [
-			$userCond,
-			orJoin([
-				"src_id$setCond AND dest_id=0",
-				"dest_id$setCond AND src_id=0",
-				"src_id$setCond AND dest_id$setCond"
-			])
-		];
-
-		$itemsToRemove = [];
 		$idsToRemove = [];
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr);
-		while($row = $this->dbObj->fetchRow($qResult))
+		foreach($this->cache as $item_id => $item)
 		{
-			$item = $this->rowToObj($row);
-			unset($row);
+			$isAffected = FALSE;		// TODO : maybe use queryItem
+			$trans = $this->getAffected($item);
 
-			$itemsToRemove[] = $item;
-			$idsToRemove[] = $item->id;
+			$srcMatch = in_array($trans->src_id, $ids);
+			$destMatch = in_array($trans->dest_id, $ids);
+			if (!$srcMatch && !$destMatch)
+				continue;
+
+			if (($srcMatch && $destMatch)
+				|| ($srcMatch && $trans->dest_id == 0)
+				|| ($destMatch && $trans->src_id == 0))
+			{
+				$idsToRemove[] = $item_id;
+				unset($this->cache[$item_id]);
+				continue;
+			}
+
+			$queryItem = NULL;
+
+			// check account of person
+
+			// set outgoing debt(person take) as income to destination account
+			if ($trans->type == DEBT && in_array($trans->src_id, $personAccounts))
+			{
+				$queryItem = clone $trans;
+				$queryItem->type = INCOME;
+				$queryItem->src_id = 0;
+				$queryItem->src_result = 0;
+			}
+
+			// set incoming debt(person give) as expense from source account
+			if ($trans->type == DEBT && in_array($trans->dest_id, $personAccounts))
+			{
+				$queryItem = clone $trans;
+				$queryItem->type = EXPENSE;
+				$queryItem->dest_id = 0;
+				$queryItem->dest_result = 0;
+			}
+
+			// check account of user
+
+			// set outgoing debt(person take) as debt without acc
+			if ($trans->type == DEBT && in_array($trans->src_id, $userAccounts))
+			{
+				$queryItem = clone $trans;
+				$queryItem->src_id = 0;
+				$queryItem->src_result = 0;
+			}
+
+			// set incoming debt(person give) as debt without acc
+			if ($trans->type == DEBT && in_array($trans->dest_id, $userAccounts))
+			{
+				$queryItem = clone $trans;
+				$queryItem->dest_id = 0;
+				$queryItem->dest_result = 0;
+			}
+
+			// set transfer from account as income to destination account
+			if ($trans->type == TRANSFER && in_array($trans->src_id, $ids))
+			{
+				$queryItem = clone $trans;
+				$queryItem->type == INCOME;
+				$queryItem->src_id = 0;
+				$queryItem->src_result = 0;
+			}
+
+			// set transfer to account as expense from source account
+			if ($trans->type == TRANSFER && in_array($trans->dest_id, $ids))
+			{
+				$queryItem = clone $trans;
+				$queryItem->type == EXPENSE;
+				$queryItem->dest_id = 0;
+				$queryItem->dest_result = 0;
+			}
+
+			if (!is_null($queryItem))
+				$this->pushAffected($queryItem);
 		}
+
+		// Update results of transactions with affected accounts
+		$this->updateResults($ids, 0);
 
 		if (count($idsToRemove) > 0)
 		{
@@ -847,66 +961,7 @@ class TransactionModel extends CachedTable
 			$this->cleanCache();
 		}
 
-		$curDate = date("Y-m-d H:i:s");
-
-		if (count($personAccounts))		// specified account is account of person
-		{
-			$pSetCond = inSetCondition($personAccounts);
-			if (is_null($pSetCond))
-				return FALSE;
-
-			// set outgoing debt(person take) as income to destination account
-			$condArr = [ $userCond, "src_id".$pSetCond, "type=".DEBT ];
-			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate, "src_result" => 0 ],
-										$condArr))
-				return FALSE;
-
-			// set incoming debt(person give) as expense from source account
-			$condArr = [ $userCond, "dest_id".$pSetCond, "type=".DEBT ];
-			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate, "dest_result" => 0 ],
-										$condArr))
-				return FALSE;
-		}
-
-		if (count($userAccounts))		// specified account is account of user
-		{
-			$uSetCond = inSetCondition($userAccounts);
-			if (is_null($uSetCond))
-				return FALSE;
-
-			// set outgoing debt(person take) as debt without acc
-			$condArr = [ $userCond, "src_id".$uSetCond, "type=".DEBT ];
-			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "src_id" => 0, "type" => DEBT, "updatedate" => $curDate, "src_result" => 0 ],
-										$condArr))
-				return FALSE;
-
-			// set incoming debt(person give) as debt without acc
-			$condArr = [ $userCond, "dest_id".$uSetCond, "type=".DEBT ];
-			if (!$this->dbObj->updateQ($this->tbl_name,
-										[ "dest_id" => 0, "type" => DEBT, "updatedate" => $curDate, "dest_result" => 0 ],
-										$condArr))
-				return FALSE;
-		}
-
-		// set transfer from account as income to destination account
-		$condArr = [ $userCond, "src_id".$setCond, "type=".TRANSFER ];
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "src_id" => 0, "type" => INCOME, "updatedate" => $curDate, "src_result" => 0 ],
-									$condArr))
-			return FALSE;
-
-		// set transfer to account as expense from source account
-		$condArr = [ $userCond, "dest_id".$setCond, "type=".TRANSFER ];
-		if (!$this->dbObj->updateQ($this->tbl_name,
-									[ "dest_id" => 0, "type" => EXPENSE, "updatedate" => $curDate, "dest_result" => 0 ],
-									$condArr))
-			return FALSE;
-
-		// Update results of transactions with affected accounts
-		$this->updateResults($ids, 0);
+		$this->commitAffected();
 
 		return TRUE;
 	}
