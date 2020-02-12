@@ -370,9 +370,9 @@ class NodeEnvironment extends Environment
 		if (category == 1)
 			title = chalk.whiteBright.bgBlue(' ' + title + ' ');
 		else if (category == 2)
-			title = chalk.whiteBright.bgBlueBright(' ' + title + ' ');
+			title = chalk.black.bgGreen(' ' + title + ' ');
 		else if (category == 3)
-			title = chalk.whiteBright(' ' + title + ' ');
+			title = chalk.cyan(' ' + title + ' ');
 
 		console.log(title);
 	}
