@@ -26,7 +26,7 @@ class PersonsController extends Controller
 
 	public function create()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->createPerson();
 			return;
@@ -50,7 +50,7 @@ class PersonsController extends Controller
 
 	public function update()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->updatePerson();
 			return;
@@ -82,8 +82,11 @@ class PersonsController extends Controller
 	}
 
 
-	public function createPerson()
+	protected function createPerson()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."persons/");
+
 		$defMsg = ERR_PERSON_CREATE;
 
 		if (!isset($_POST["pname"]))
@@ -104,8 +107,11 @@ class PersonsController extends Controller
 	}
 
 
-	public function updatePerson()
+	protected function updatePerson()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."persons/");
+
 		$defMsg = ERR_PERSON_UPDATE;
 
 		if (!isset($_POST["pname"]))
@@ -132,7 +138,7 @@ class PersonsController extends Controller
 
 	public function del()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			setLocation(BASEURL."persons/");
 
 		$defMsg = ERR_PERSON_DELETE;

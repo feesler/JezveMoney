@@ -6,7 +6,7 @@ class FastCommitController extends Controller
 {
 	public function index()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->commit();
 			return;
@@ -80,7 +80,7 @@ class FastCommitController extends Controller
 	{
 		wlog("FastCommitController::upload()");
 
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			return;
 
 		$file_cont = file_get_contents('php://input');
@@ -199,7 +199,7 @@ class FastCommitController extends Controller
 
 	public function commit()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			return;
 
 		header("Content-type: text/html; charset=utf-8");

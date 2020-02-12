@@ -20,7 +20,7 @@ class UserController extends Controller
 
 	public function login()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->loginUser();
 			return;
@@ -36,8 +36,13 @@ class UserController extends Controller
 	}
 
 
-	public function loginUser()
+	protected function loginUser()
 	{
+		if (!$this->isPOST())
+		{
+			setLocation(BASEURL."login/");
+		}
+
 		$defMsg = ERR_LOGIN_FAIL;
 
 		if (!isset($_POST["login"]) || !isset($_POST["password"]))
@@ -62,7 +67,7 @@ class UserController extends Controller
 
 	public function register()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->registerUser();
 			return;
@@ -78,8 +83,13 @@ class UserController extends Controller
 	}
 
 
-	public function registerUser()
+	protected function registerUser()
 	{
+		if (!$this->isPOST())
+		{
+			setLocation(BASEURL);
+		}
+
 		$defMsg = ERR_REGISTER_FAIL;
 
 		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))

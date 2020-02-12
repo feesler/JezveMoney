@@ -180,7 +180,7 @@ class TransactionsController extends Controller
 
 	public function create()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->createTransaction();
 			return;
@@ -441,7 +441,7 @@ class TransactionsController extends Controller
 
 	public function update()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->updateTransaction();
 			return;
@@ -684,8 +684,11 @@ class TransactionsController extends Controller
 	}
 
 
-	public function createTransaction()
+	protected function createTransaction()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL);
+
 		if (!isset($_GET["type"]))
 			$this->fail();
 		$trans_type = TransactionModel::getStringType($_GET["type"]);
@@ -783,8 +786,11 @@ class TransactionsController extends Controller
 	}
 
 
-	public function updateTransaction()
+	protected function updateTransaction()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL);
+
 		$trans_type = intval($_POST["transtype"]);
 
 		$defMsg = ($trans_type == DEBT) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
@@ -874,7 +880,7 @@ class TransactionsController extends Controller
 
 	public function del()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			setLocation(BASEURL."transactions/");
 
 		$defMsg = ERR_TRANS_DELETE;

@@ -26,7 +26,7 @@ class AccountsController extends Controller
 
 	public function create()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->createAccount();
 			return;
@@ -77,7 +77,7 @@ class AccountsController extends Controller
 
 	public function update()
 	{
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		if ($this->isPOST())
 		{
 			$this->updateAccount();
 			return;
@@ -114,8 +114,11 @@ class AccountsController extends Controller
 	}
 
 
-	public function createAccount()
+	protected function createAccount()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."accounts/");
+
 		$defMsg = ERR_ACCOUNT_CREATE;
 
 		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
@@ -137,8 +140,11 @@ class AccountsController extends Controller
 	}
 
 
-	public function updateAccount()
+	protected function updateAccount()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."accounts/");
+
 		$defMsg = ERR_ACCOUNT_UPDATE;
 
 		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
@@ -161,7 +167,7 @@ class AccountsController extends Controller
 
 	public function del()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			setLocation(BASEURL."accounts/");
 
 		$defMsg = ERR_ACCOUNT_DELETE;
@@ -181,7 +187,7 @@ class AccountsController extends Controller
 
 	public function reset()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			setLocation(BASEURL."accounts/");
 
 		$defMsg = ERR_ACCOUNTS_RESET;

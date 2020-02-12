@@ -45,11 +45,8 @@ class ProfileController extends Controller
 
 	public function changeName()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
-		{
-			$this->index();
-			return;
-		}
+		if (!$this->isPOST())
+			setLocation(BASEURL."profile/");
 
 		$defMsg = ERR_PROFILE_NAME;
 
@@ -77,11 +74,8 @@ class ProfileController extends Controller
 
 	public function changePass()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
-		{
-			$this->index();
-			return;
-		}
+		if (!$this->isPOST())
+			setLocation(BASEURL."profile/");
 
 		$defMsg = ERR_PROFILE_PASSWORD;
 
@@ -103,7 +97,7 @@ class ProfileController extends Controller
 
 	public function resetAll()
 	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST")
+		if (!$this->isPOST())
 			setLocation(BASEURL."profile/");
 
 		$defMsg = ERR_PROFILE_RESETALL;
@@ -123,6 +117,9 @@ class ProfileController extends Controller
 
 	public function del()
 	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."profile/");
+
 		$defMsg = ERR_PROFILE_DELETE;
 
 		if (!$this->uMod->del($this->user_id))
