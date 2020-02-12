@@ -183,19 +183,4 @@ class AccountsController extends Controller
 
 		setLocation(BASEURL."accounts/");
 	}
-
-
-	public function reset()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."accounts/");
-
-		$defMsg = ERR_ACCOUNTS_RESET;
-
-		if (!$this->model->reset())
-			fail($defMsg);
-		Message::set(MSG_ACCOUNTS_RESET);
-
-		setLocation(BASEURL."accounts/");
-	}
 }

@@ -95,6 +95,23 @@ class ProfileController extends Controller
 	}
 
 
+	public function reset()
+	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."profile/");
+
+		$defMsg = ERR_ACCOUNTS_RESET;
+
+		$accMod = AccountModel::getInstance();
+		if (!$accMod->reset())
+			$this->fail($defMsg);
+
+		Message::set(MSG_ACCOUNTS_RESET);
+
+		setLocation(BASEURL."profile/");
+	}
+
+
 	public function resetAll()
 	{
 		if (!$this->isPOST())

@@ -35,7 +35,7 @@
 					<div class="profile_block">
 						<h2>Reset data</h2>
 						<div>
-							<form id="resetacc_form" method="post" action="<?=BASEURL?>accounts/reset/">
+							<form id="resetacc_form" method="post" action="<?=BASEURL?>profile/reset/">
 							</form>
 							<span>You also may reset all your accounts data.<br>
 							<input id="resetAccBtn" class="btn ok_btn" type="button" value="Reset"></span>
