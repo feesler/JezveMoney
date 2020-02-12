@@ -103,7 +103,7 @@ class ProfileController extends Controller
 		$defMsg = ERR_PROFILE_RESETALL;
 
 		$accMod = AccountModel::getInstance();
-		if (!$accMod->reset($this->user_id))
+		if (!$accMod->reset())
 			$this->fail($defMsg);
 
 		if (!$this->personMod->reset())

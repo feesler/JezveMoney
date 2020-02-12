@@ -312,8 +312,17 @@ class AccountModel extends CachedTable
 
 
 	// Delete all accounts of user
-	public function reset($users)
+	public function reset($users = NULL)
 	{
+		if (is_null($users))
+			$users = self::$user_id;
+		if (!is_array($users))
+			$users = [ $users ];
+
+		// Normal user may reset only self data
+		if (!UserModel::isAdminUser() && (count($users) != 1 || $users[0] != self::$user_id))
+			return FALSE;
+
 		$setCond = inSetCondition($users);
 		if (is_null($setCond))
 			return TRUE;
