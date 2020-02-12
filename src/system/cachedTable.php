@@ -1,12 +1,21 @@
 <?php
 
+trait CachedInstance
+{
+	static protected $dcache = NULL;
+}
+
+
 abstract class CachedTable extends Model
 {
 	protected $cache = NULL;
 
 
 	// Return link to cache of derived class
-	abstract protected function &getDerivedCache();
+	protected function &getDerivedCache()
+	{
+		return static::$dcache;
+	}
 
 
 	// Query data from DB and return result object

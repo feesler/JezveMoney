@@ -3,8 +3,8 @@
 class AccountModel extends CachedTable
 {
 	use Singleton;
+	use CachedInstance;
 
-	static private $dcache = NULL;
 	static private $user_id = 0;
 	static private $owner_id = 0;
 	static private $icons = ["No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash"];
@@ -52,12 +52,6 @@ class AccountModel extends CachedTable
 		return $res;
 	}
 
-
-	// Return link to cache of derived class
-	protected function &getDerivedCache()
-	{
-		return self::$dcache;
-	}
 
 
 	// Convert DB row to item object

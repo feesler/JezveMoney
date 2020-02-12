@@ -3,8 +3,8 @@
 class UserModel extends CachedTable
 {
 	use Singleton;
+	use CachedInstance;
 
-	static private $dcache = NULL;
 	public $currentUser = NULL;
 
 
@@ -34,13 +34,6 @@ class UserModel extends CachedTable
 						"DEFAULT CHARACTER SET = utf8 COLLATE utf8mb4_general_ci");
 
 		return $res;
-	}
-
-
-	// Return link to cache of derived class
-	protected function &getDerivedCache()
-	{
-		return self::$dcache;
 	}
 
 
