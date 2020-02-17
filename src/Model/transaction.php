@@ -864,7 +864,6 @@ class TransactionModel extends CachedTable
 		$idsToRemove = [];
 		foreach($this->cache as $item_id => $item)
 		{
-			$isAffected = FALSE;		// TODO : maybe use queryItem
 			$trans = $this->getAffected($item);
 
 			$srcMatch = in_array($trans->src_id, $ids);
@@ -922,19 +921,19 @@ class TransactionModel extends CachedTable
 			}
 
 			// set transfer from account as income to destination account
-			if ($trans->type == TRANSFER && in_array($trans->src_id, $ids))
+			if ($trans->type == TRANSFER && $srcMatch)
 			{
 				$queryItem = clone $trans;
-				$queryItem->type == INCOME;
+				$queryItem->type = INCOME;
 				$queryItem->src_id = 0;
 				$queryItem->src_result = 0;
 			}
 
 			// set transfer to account as expense from source account
-			if ($trans->type == TRANSFER && in_array($trans->dest_id, $ids))
+			if ($trans->type == TRANSFER && $destMatch)
 			{
 				$queryItem = clone $trans;
-				$queryItem->type == EXPENSE;
+				$queryItem->type = EXPENSE;
 				$queryItem->dest_id = 0;
 				$queryItem->dest_result = 0;
 			}
