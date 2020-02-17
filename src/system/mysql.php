@@ -352,7 +352,11 @@ class mysqlDB
 	// Next other rows is compared match
 	public function insertMultipleQ($table, $data, $isUpdate = FALSE)
 	{
-		if (empty($table) || !is_array($data) || !count($data) || !is_array($data[0]))
+		if (empty($table) || !is_array($data) || !count($data))
+			return FALSE;
+
+		$data = array_values($data);
+		if (!is_array($data[0]))
 			return FALSE;
 
 		// Obtain fields from first data row
