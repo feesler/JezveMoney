@@ -16,6 +16,9 @@ class BalanceAdminController extends AdminController
 		$results = [];
 		foreach($resArr as $tr)
 		{
+			$tr->typeStr = TransactionModel::getTypeString($tr->type);
+			$tr->dateStr = date("d.m.Y", $tr->date);
+
 			if ($tr->src_id && in_array($tr->type, $srcAvailTypes))
 			{
 				if (!isset($results[$tr->src_id]))
