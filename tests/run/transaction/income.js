@@ -3,6 +3,7 @@ import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
 import { Currency } from '../../currency.js';
 import { INCOME, test } from '../../common.js'
+import { IncomeTransactionView } from '../../view/transaction/income.js'
 
 
 let runIncome =
@@ -84,8 +85,6 @@ let runIncome =
 
 	async stateLoop()
 	{
-		let view = this.view;
-
 		const RUB = 1;
 		const USD = 2;
 		const EUR = 3;
@@ -94,6 +93,17 @@ let runIncome =
 		const ACC_USD = 2;
 		const ACC_EUR = 3;
 		const CARD_RUB = 4;
+
+	// Navigate to create income view
+		if (!(this.view instanceof IncomeTransactionView))
+		{
+			await this.goToMainView();
+			await this.view.goToNewTransactionByAccount(0);
+			if (this.view.content.typeMenu.activeType != INCOME)
+				await this.view.changeTransactionType(INCOME);
+		}
+
+		let view = this.view;
 
 	// State 0
 		view.setBlock('Income loop', 2);

@@ -2,6 +2,7 @@ import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
 import { DEBT, test } from '../../common.js'
+import { DebtTransactionView } from '../../view/transaction/debt.js'
 
 
 let runDebt =
@@ -136,8 +137,6 @@ let runDebt =
 
 	async stateLoop()
 	{
-		let view = this.view;
-
 		const ACC_3 = 0;
 		const ACC_RUB = 1;
 		const ACC_USD = 2;
@@ -145,6 +144,17 @@ let runDebt =
 		const CARD_RUB = 4;
 		const MARIA = 0;
 		const IVAN = 1;
+
+	// Navigate to create income view
+		if (!(this.view instanceof DebtTransactionView))
+		{
+			await this.goToMainView();
+			await this.view.goToNewTransactionByAccount(0);
+			if (this.view.content.typeMenu.activeType != DEBT)
+				await this.view.changeTransactionType(DEBT);
+		}
+
+		let view = this.view;
 
 		view.setBlock('Debt loop', 2);
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);

@@ -2,6 +2,7 @@ import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
 import { TransactionsList } from '../../trlist.js'
 import { TRANSFER, test } from '../../common.js'
+import { TransferTransactionView } from '../../view/transaction/transfer.js'
 
 
 let runTransfer =
@@ -83,13 +84,22 @@ let runTransfer =
 
 	async stateLoop()
 	{
-		let view = this.view;
-
 		const ACC_3 = 0;
 		const ACC_RUB = 1;
 		const ACC_USD = 2;
 		const ACC_EUR = 3;
 		const CARD_RUB = 4;
+
+	// Navigate to create income view
+		if (!(this.view instanceof TransferTransactionView))
+		{
+			await this.goToMainView();
+			await this.view.goToNewTransactionByAccount(0);
+			if (this.view.content.typeMenu.activeType != TRANSFER)
+				await this.view.changeTransactionType(TRANSFER);
+		}
+
+		let view = this.view;
 
 		view.setBlock('Transfer loop', 2);
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);

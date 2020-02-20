@@ -226,6 +226,7 @@ class Application
 
 		await this.prepareTransactionTests();
 
+		await this.transactionStateLoopTests();
 		await this.createTransactionTests();
 		await this.updateTransactionTests();
 		await this.transactionsListTests();
@@ -236,31 +237,24 @@ class Application
 	}
 
 
+	async transactionStateLoopTests()
+	{
+		this.view.setBlock('Transaction view state loops', 1);
+
+		await this.run.transactions.expense.stateLoop();
+		await this.run.transactions.income.stateLoop();
+		await this.run.transactions.transfer.stateLoop();
+		await this.run.transactions.debt.stateLoop();
+	}
+
+
 	async createTransactionTests()
 	{
 		this.view.setBlock('Create transaction', 1);
 
-		await this.goToMainView();
-		await this.view.goToNewTransactionByAccount(0);
-		await this.run.transactions.expense.stateLoop();
 		await this.runCreateExpenseTests();
-
-		await this.goToMainView();
-		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(INCOME);
-		await this.run.transactions.income.stateLoop();
 		await this.runCreateIncomeTests();
-
-		await this.goToMainView();
-		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(TRANSFER);
-		await this.run.transactions.transfer.stateLoop();
 		await this.runCreateTransferTests();
-
-		await this.goToMainView();
-		await this.view.goToNewTransactionByAccount(0);
-		await this.view.changeTransactionType(DEBT);
-		await this.run.transactions.debt.stateLoop();
 		await this.runCreateDebtTests();
 	}
 
@@ -346,7 +340,7 @@ class Application
 
 	async runCreateDebtTests()
 	{
-		this.view.setBlock('Submit debt transactions', 1);
+		this.view.setBlock('Create debt transactions', 1);
 
 		let list = [
 			{ srcAmount : '1000' },
