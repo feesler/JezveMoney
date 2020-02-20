@@ -216,6 +216,8 @@ let runTransactionsCommon =
 		pList = updState.persons;
 		afterCreate = updState.accounts;
 
+		expTransList = expTransList.updateResults(afterCreate);
+
 		this.view.expectedState = await this.state.render(afterCreate, pList, expTransList.list);
 
 		await test('Main page widgets update', () => {}, this.view);
@@ -269,6 +271,7 @@ let runTransactionsCommon =
 		let updState = await this.state.updatePersons(pList, afterUpdate, expectedTransaction, origTransaction);
 		pList = updState.persons;
 		afterUpdate = updState.accounts;
+		expTransList = expTransList.updateResults(afterUpdate);
 
 		this.view.expectedState = await this.state.render(afterUpdate, pList, expTransList.list);
 
@@ -306,6 +309,7 @@ let runTransactionsCommon =
 		// Prepare expected transaction list
 		let removedTrans = expTransList.del(type, transactions);
 		accList = this.state.deleteTransactions(accList, removedTrans);
+		expTransList = expTransList.updateResults(accList);
 
 		this.state.accounts = null;
 		this.state.persons = null;
@@ -358,6 +362,7 @@ let runTransactionsCommon =
 		// Prepare expected transaction list
 		let removedTrans = expTransList.del(type, pos);
 		accList = this.state.deleteTransactions(accList, removedTrans);
+		expTransList = expTransList.updateResults(accList);
 
 		await this.goToMainView();
 

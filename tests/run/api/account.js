@@ -86,6 +86,7 @@ let runAccountAPI =
 
 			// Prepare expected updates of transactions list
 			let expTransList = trBefore.updateAccount(accBefore, expAccObj);
+			expTransList = expTransList.updateResults(expAccList);
 
 			this.state.accounts = null;
 			this.state.transactions = null;
@@ -128,6 +129,7 @@ let runAccountAPI =
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();
 			let expTransList = trBefore.deleteAccounts(accBefore, ids);
+			expTransList = expTransList.updateResults(expAccList);
 
 			this.state.accounts = null;
 			this.state.transactions = null;

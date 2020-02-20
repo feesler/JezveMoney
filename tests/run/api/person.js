@@ -115,6 +115,7 @@ let runPersonAPI =
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();
 			let expTransList = trBefore.deleteAccounts(accList, accRemoveList);
+			expTransList = expTransList.updateResults(accList);
 
 			this.state.accounts = null;
 			this.state.persons = null;

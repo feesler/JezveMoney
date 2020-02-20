@@ -479,6 +479,45 @@ class TransactionsList
 
 		return new TransactionsList(res);
 	}
+
+
+	updateResults(accList)
+	{
+		if (!Array.isArray(accList))
+			throw new Error('Invalid parameters');
+
+		// Reset balance of all accounts to initial values
+		let accounts = copyObject(accList);
+		for(let acc of accounts)
+		{
+			acc.balance = acc.initbalance;
+		}
+
+		let list = this.sortAsc();
+
+		for(let trans of list)
+		{
+			accounts = App.state.applyTransaction(accounts, trans);
+
+			trans.src_result = 0;
+			if (trans.src_id)
+			{
+				let srcAcc = accounts.find(item => item.id == trans.src_id);
+				if (srcAcc)
+					trans.src_result = srcAcc.balance;
+			}
+
+			trans.dest_result = 0;
+			if (trans.dest_id)
+			{
+				let destAcc = accounts.find(item => item.id == trans.dest_id);
+				if (destAcc)
+					trans.dest_result = destAcc.balance;
+			}
+		}
+
+		return new TransactionsList(list);
+	}
 }
 
 

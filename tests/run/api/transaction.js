@@ -157,6 +157,8 @@ let runTransactionAPI =
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
 
+			expTransList = expTransList.updateResults(accList);
+
 			let res = checkObjValue(trList.list, expTransList.list) &&
 						checkObjValue(accList, expAccountList);
 
@@ -287,6 +289,7 @@ let runTransactionAPI =
 
 			// Prepare expected updates of transactions
 			expTransList.update(expTrans.id, expTrans);
+			expTransList = expTransList.updateResults(fullAccList);
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
@@ -318,6 +321,7 @@ let runTransactionAPI =
 			// Prepare expected updates of transactions list
 			let expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.list.find(item => item.id == id)));
 			let expTransList = trBefore.deleteItems(ids);
+			expTransList = expTransList.updateResults(accBefore);
 
 			this.state.accounts = null;
 			this.state.transactions = null;

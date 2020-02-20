@@ -158,6 +158,8 @@ let runAccounts =
 		// Prepare expected updates of transactions list
 		let expTransList = trBefore.updateAccount(accBefore, expAccount);
 
+		expTransList = expTransList.updateResults(accBefore);
+
 		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
 
 		await test('Update account', () => {}, this.view);
@@ -193,6 +195,8 @@ let runAccounts =
 		let expectedList = this.state.deleteByIds(accList, ids);
 		// Prepare expected updates of transactions
 		let expTransList = trBefore.deleteAccounts(accList, ids);
+
+		expTransList = expTransList.updateResults(expectedList);
 
 		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
 		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view);

@@ -126,6 +126,8 @@ let runPersons =
 		// Prepare expected updates of accounts list
 		let expAccList = this.state.deleteByIds(accList, personAccounts);
 
+		expTransList = expTransList.updateResults(accList);
+
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
 		await test('Delete person [' + pos + ']', () => {}, this.view);
 
