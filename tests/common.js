@@ -423,7 +423,7 @@ export function checkObjValue(obj, expectedObj, ret = false)
 		value = obj[vKey];
 		if (isObject(expected) || Array.isArray(expected))
 		{
-			let res = checkObjValue(value, expected, true);
+			res = checkObjValue(value, expected, true);
 			if (res !== true)
 			{
 				res.key = vKey + '.' + res.key;

@@ -135,7 +135,7 @@ let runPersons =
 
 		await this.goToMainView();
 
-		this.view.expectedState = await this.state.render(expAccList, pList, expTransList.list);
+		this.view.expectedState = await this.state.render(expAccList, expectedList, expTransList.list);
 		await test('Main page widgets update', async () => {}, this.view);
 
 		await this.run.transactions.checkData('List of transactions update', expTransList);

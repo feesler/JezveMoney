@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, copyObject } from './common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, copyObject, normalize } from './common.js';
 import { Currency } from './currency.js';
 import { TransactionsList } from './trlist.js';
 import { App } from './app.js';
@@ -71,7 +71,14 @@ class AppState
 	async getAccountsList()
 	{
 		if (!Array.isArray(this.accounts))
+		{
 			this.accounts = await api.account.list(true);
+			this.accounts.forEach(item =>
+			{
+				delete item.createdate;
+				delete item.updatedate;
+			});
+		}
 
 		return this.accounts;
 	}
@@ -154,7 +161,15 @@ class AppState
 	async getPersonsList()
 	{
 		if (!Array.isArray(this.persons))
+		{
 			this.persons = await api.person.list();
+			this.persons.forEach(item =>
+			{
+				delete item.createdate;
+				delete item.updatedate;
+			});
+		}
+
 
 		return this.persons;
 	}
@@ -224,13 +239,103 @@ class AppState
 	}
 
 
+	// Update persons
+	async updatePersons(pList, accList, transaction = null, origTransaction = null)
+	{
+		if (!Array.isArray(pList) || !Array.isArray(accList))
+			throw new Error('Invalid parameters');
+
+		let res = {
+			persons : copyObject(pList),
+			accounts : copyObject(accList)
+		};
+
+		// Delete case
+		// If transaction is not set, check and remove person accounts absent in the accounts list
+		if (!transaction)
+		{
+			for(let person of res.persons)
+			{
+				person.accounts = res.accounts.filter(item => item.owner_id == person.id);
+			}
+
+			return res;
+		}
+
+		if (transaction.type != DEBT)
+			return res;
+
+		// Update case
+		if (origTransaction)
+		{
+			let orig = copyObject(origTransaction);
+			// TODO : do not use! Bad practice: we need to calculate
+			orig.srcAcc = await this.getAccount(orig.src_id);
+			orig.destAcc = await this.getAccount(orig.dest_id);
+
+	 		orig.debtType = (!!orig.srcAcc && orig.srcAcc.owner_id != App.owner_id);
+			orig.personAccount = (orig.debtType) ? orig.srcAcc : orig.destAcc;
+			if (!orig.personAccount)
+				throw new Error('Invalid transaction: person account not found');
+
+			// Save updates in result
+			orig.person = res.persons.find(item => item.id == orig.personAccount.owner_id);
+			if (!orig.person)
+				throw new Error('Invalid transaction: person not found');
+
+			let ind = orig.person.accounts.findIndex(item => item.id == orig.personAccount.id);
+			if (ind !== -1)
+				orig.person.accounts[ind] = orig.personAccount;
+
+			ind = res.accounts.findIndex(item => item.id == orig.personAccount.id);
+			if (ind !== -1)
+				res.accounts[ind] = orig.personAccount;
+			else
+				res.accounts.push(orig.personAccount);
+		}
+
+		let srcAcc = await this.getAccount(transaction.src_id);
+		let destAcc = await this.getAccount(transaction.dest_id);
+ 		let debtType = (!!srcAcc && srcAcc.owner_id != App.owner_id);
+
+		let personAccount = (debtType) ? srcAcc : destAcc;
+		if (!personAccount)
+			throw new Error('Invalid transaction: person account not found');
+
+		let person = res.persons.find(item => item.id == personAccount.owner_id);
+		if (!person)
+			throw new Error('Invalid transaction: person not found');
+
+		let ind = person.accounts.findIndex(item => item.id == personAccount.id);
+		if (ind !== -1)
+			person.accounts[ind] = personAccount;
+		else
+			person.accounts.push(personAccount);
+
+		ind = res.accounts.findIndex(item => item.id == personAccount.id);
+		if (ind !== -1)
+			res.accounts[ind] = personAccount;
+		else
+			res.accounts.push(personAccount);
+
+		return res;
+	}
+
+
 /**
  * Transactions
  */
 	async getTransactionsList(returnRaw = false)
 	{
 		if (!Array.isArray(this.transactions))
+		{
 			this.transactions = await api.transaction.list();
+			this.transactions.forEach(item =>
+			{
+				delete item.createdate;
+				delete item.updatedate;
+			});
+		}
 
 		if (returnRaw)
 			return this.transactions;
@@ -246,11 +351,17 @@ class AppState
 
 		let srcAcc = res.find(item => item.id == transObj.src_id);
 		if (srcAcc)
-			srcAcc.balance -= transObj.src_amount;
+		{
+			srcAcc.balance = normalize(srcAcc.balance - transObj.src_amount);
+			transObj.src_result = srcAcc.balance;
+		}
 
 		let destAcc = res.find(item => item.id == transObj.dest_id);
 		if (destAcc)
-			destAcc.balance += transObj.dest_amount;
+		{
+			destAcc.balance = normalize(destAcc.balance + transObj.dest_amount);
+			transObj.dest_result = destAcc.balance;
+		}
 
 		return res;
 	}
@@ -263,11 +374,17 @@ class AppState
 
 		let srcAcc = res.find(item => item.id == transObj.src_id);
 		if (srcAcc)
-			srcAcc.balance += transObj.src_amount;
+		{
+			srcAcc.balance = normalize(srcAcc.balance + transObj.src_amount);
+			transObj.src_result = srcAcc.balance;
+		}
 
 		let destAcc = res.find(item => item.id == transObj.dest_id);
 		if (destAcc)
-			destAcc.balance -= transObj.dest_amount;
+		{
+			destAcc.balance = normalize(destAcc.balance - transObj.dest_amount);
+			transObj.dest_result = destAcc.balance;
+		}
 
 		return res;
 	}
@@ -312,14 +429,22 @@ class AppState
 	}
 
 
-	personToTile(person)
+	personToTile(person, mainPage = true)
 	{
 		let res = {};
 
-		res.title = person.name;
+		if (mainPage)
+		{
+			res.title = person.name;
 
-		let debtAccounts = this.filterPersonDebts(person.accounts);
-		res.subtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
+			let debtAccounts = this.filterPersonDebts(person.accounts);
+			res.subtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
+		}
+		else
+		{
+			res.name = person.name;
+			res.balance = '';
+		}
 
 		return res;
 	}
@@ -402,7 +527,8 @@ class AppState
 	{
 		let res = { tiles : {} };
 
-		res.tiles.items = accList.map(item => this.accountToTile(item));
+		res.tiles.items = accList.filter(item => item.owner_id == App.owner_id)
+									.map(item => this.accountToTile(item));
 
 		return res;
 	}
@@ -410,9 +536,11 @@ class AppState
 
 	renderPersonsWidget(personsList, mainPage = true)
 	{
-		let res = {};
+		if (!Array.isArray(personsList))
+			throw new Error('Invalid data');
 
-		let personTiles = personsList.map(item => this.personToTile(item));
+		let res = {};
+		let personTiles = personsList.map(item => this.personToTile(item, mainPage));
 
 		if (mainPage)
 			res.infoTiles = { items : personTiles };

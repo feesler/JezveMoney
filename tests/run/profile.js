@@ -54,13 +54,17 @@ let runProfile =
 
 	async resetAccounts()
 	{
-		let persons = await this.getPersonsList();
+		let persons = await this.state.getPersonsList();
+
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
 
 		await this.view.goToProfile();
 		await this.view.resetAccounts();
 
 		this.view.expectedState = { msgPopup : { success : true, message : 'Accounts successfully reseted' } };
-		await test('Reset all data', () => {}, this.view);
+		await test('Reset accounts data', () => {}, this.view);
 
 		await this.view.closeNotification();
 		await this.goToMainView();
@@ -72,6 +76,10 @@ let runProfile =
 
 	async resetAll()
 	{
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
 		await this.view.goToProfile();
 		await this.view.resetAll();
 

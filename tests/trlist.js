@@ -97,6 +97,7 @@ class TransactionsList
 	create(transObj)
 	{
 		let ind = this.list.length;
+		transObj.pos = 0;
 		this.list.push(transObj);
 
 		let expPos = this.getExpectedPos(transObj);
@@ -126,6 +127,8 @@ class TransactionsList
 
 			this.sort();
 		}
+		else
+			transObj.pos = origObj[0].pos;
 
 		return true;
 	}
@@ -284,7 +287,11 @@ class TransactionsList
 
 		let offset = (num - 1) * pageLimit;
 
-		return list.slice(offset, Math.min(offset + pageLimit, list.length));
+		let res = copyObject(list);
+
+		res.sort((a, b) => a.pos - b.pos);
+
+		return res.slice(offset, Math.min(offset + pageLimit, res.length));
 	}
 
 
@@ -332,6 +339,14 @@ class TransactionsList
 	sort()
 	{
 		this.list.sort((a, b) => b.pos - a.pos);
+	}
+
+
+	sortAsc()
+	{
+		let res = copyObject(this.list);
+
+		return res.sort((a, b) => a.pos - b.pos);
 	}
 
 

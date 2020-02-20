@@ -66,6 +66,18 @@ let runTransactionAPI =
 
 		let debtType = params.debtop == 1;
 
+		if (params.acc_id)
+		{
+			let account = await this.state.getAccount(params.acc_id);
+			if (!account)
+				throw new Error('Account not found');
+
+			if (debtType)
+				res.transaction.dest_id = account.id;
+			else
+				res.transaction.src_id = account.id;
+		}
+
 		// Obtain newly created account of person
 		if ((debtType && !res.transaction.src_id) ||
 			(!debtType && !res.transaction.dest_id))
@@ -76,12 +88,20 @@ let runTransactionAPI =
 			if (!personAccount)
 				throw new Error('Person account not found');
 
+			// Save id of person account into transaction
 			if (debtType)
 				res.transaction.src_id = personAccount.id;
 			else
 				res.transaction.dest_id = personAccount.id;
 
-			res.accounts.push(personAccount);
+			// Check if account of person is not set yet
+			// Cancel transaction from person account because accounts was
+			let pAcc = res.accounts.find(item => item.id == personAccount.id)
+			if (!pAcc)
+			{
+				personAccount.balance = 0;
+				res.accounts.push(personAccount);
+			}
 		}
 
 		return res;
@@ -112,6 +132,7 @@ let runTransactionAPI =
 			let accBefore = await this.state.getAccountsList();
 
 			this.state.accounts = null;
+			this.state.persons = null;
 			this.state.transactions = null;
 
 			// Send API sequest to server
@@ -124,12 +145,14 @@ let runTransactionAPI =
 			// Prepare expected updates of accounts
 			let updState = await scope.updateExpectedTransaction(expTrans, accBefore, params);
 			expTrans = updState.transaction;
-			accBefore = updState.accounts;
-
-			let expAccountList = this.state.createTransaction(accBefore, expTrans);
+			let expAccountList = this.state.createTransaction(updState.accounts, expTrans);
 
 			// Prepare expected updates of transactions
 			expTransList.create(expTrans);
+
+			this.state.accounts = null;
+			this.state.persons = null;
+			this.state.transactions = null;
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
@@ -247,6 +270,7 @@ let runTransactionAPI =
 			expTrans.pos = origTrans.pos;
 
 			this.state.accounts = null;
+			this.state.persons = null;
 			this.state.transactions = null;
 
 			// Send API sequest to server

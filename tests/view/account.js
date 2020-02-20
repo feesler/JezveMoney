@@ -87,6 +87,7 @@ class AccountView extends TestView
 	{
 		let res = {
 			name : this.model.name,
+			owner_id : App.owner_id,
 			initbalance : this.model.initbalance,
 			curr_id : this.model.curr_id,
 			icon : this.model.icon

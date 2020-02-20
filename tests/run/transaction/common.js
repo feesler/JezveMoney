@@ -3,7 +3,7 @@ import { MainView } from '../../view/main.js';
 import { TransactionsList } from '../../trlist.js';
 import { api } from '../../api.js';
 import {
-	EXPENSE, INCOME, TRANSFER, DEBT, 
+	EXPENSE, INCOME, TRANSFER, DEBT,
 	test,
 	isObject,
 	copyObject,
@@ -211,6 +211,11 @@ let runTransactionsCommon =
 		// Prepare data for next calculations
 		let afterCreate = this.state.createTransaction(accList, expectedTransaction);
 		expTransList.create(expectedTransaction);
+
+		let updState = await this.state.updatePersons(pList, afterCreate, expectedTransaction);
+		pList = updState.persons;
+		afterCreate = updState.accounts;
+
 		this.view.expectedState = await this.state.render(afterCreate, pList, expTransList.list);
 
 		await test('Main page widgets update', () => {}, this.view);
@@ -260,6 +265,11 @@ let runTransactionsCommon =
 
 		let afterUpdate = this.state.updateTransaction(accList, origTransaction, expectedTransaction);
 		expTransList.update(origTransaction.id, expectedTransaction);
+
+		let updState = await this.state.updatePersons(pList, afterUpdate, expectedTransaction, origTransaction);
+		pList = updState.persons;
+		afterUpdate = updState.accounts;
+
 		this.view.expectedState = await this.state.render(afterUpdate, pList, expTransList.list);
 
 		await test('Main page widgets update', () => {}, this.view);
@@ -297,6 +307,14 @@ let runTransactionsCommon =
 		let removedTrans = expTransList.del(type, transactions);
 		accList = this.state.deleteTransactions(accList, removedTrans);
 
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
+		let updState = await this.state.updatePersons(pList, accList);
+		pList = updState.persons;
+		accList = updState.accounts;
+
 		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
 		await test('Main page widgets update', async () => {}, this.view);
 
@@ -330,17 +348,26 @@ let runTransactionsCommon =
 			await this.view.filterByType(type);
 
 		await this.view.goToUpdateTransaction(pos);
-		await this.view.deleteSelfItem();
-
-		// Prepare expected transaction list
-		let removedTrans = expTransList.del(0, pos);
-		accList = this.state.deleteTransactions(accList, removedTrans);
 
 		this.state.accounts = null;
 		this.state.persons = null;
 		this.state.transactions = null;
 
+		await this.view.deleteSelfItem();
+
+		// Prepare expected transaction list
+		let removedTrans = expTransList.del(type, pos);
+		accList = this.state.deleteTransactions(accList, removedTrans);
+
 		await this.goToMainView();
+
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
+		let updState = await this.state.updatePersons(pList, accList);
+		pList = updState.persons;
+		accList = updState.accounts;
 
 		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
 		await test('Main page widgets update', async () => {}, this.view);

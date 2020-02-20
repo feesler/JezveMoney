@@ -57,41 +57,32 @@ let runAccountAPI =
 	{
 		let updateRes;
 
-		let accList = await api.account.read(id);
-		let updParams = accList[0];
-
-		updParams.currency = updParams.curr;
-		delete updParams.curr;
-
-		setParam(updParams, params);
-
 		await test('Update account', async () =>
 		{
 			let trBefore = await this.state.getTransactionsList();
 			let accBefore = await this.state.getAccountsList();
-			if (!Array.isArray(accBefore))
-				return false;
-			let origAcc = accBefore.find(item => item.id == updParams.id);
+
+			let origAccInd = accBefore.findIndex(item => item.id == id);
+			let origAcc = accBefore[origAccInd];
+
+			let updParams = copyObject(origAcc);
+			updParams.currency = ('currency' in params) ? params.currency : updParams.curr_id;
+			delete updParams.curr_id;
 
 			// Prepare expected account object
-			let expAccObj = copyObject(updParams);
-			expAccObj.id = id;
-			expAccObj.owner_id = expAccObj.owner;
-			expAccObj.curr_id = expAccObj.currency;
-			delete expAccObj.currency;
-			delete expAccObj.owner;
-			delete expAccObj.sign;
-			delete expAccObj.iconclass;
+			let expAccObj = copyObject(origAcc);
+			expAccObj.curr_id = updParams.currency;
 
 			let balDiff = expAccObj.balance - origAcc.initbalance;
 			if (balDiff.toFixed(2) != 0)
 			{
-				expAccObj.balance = origAcc.balance + balDiff;
 				expAccObj.initbalance = expAccObj.balance;
+				expAccObj.balance = origAcc.balance + balDiff;
 			}
 
 			// Prepare expected updates of accounts list
-			let expAccList = this.state.deleteByIds(accBefore, expAccObj.id);
+			let expAccList = copyObject(accBefore);
+			expAccList.splice(origAccInd, 1, expAccObj);
 
 			// Prepare expected updates of transactions list
 			let expTransList = trBefore.updateAccount(accBefore, expAccObj);

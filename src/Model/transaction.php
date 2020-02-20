@@ -1433,7 +1433,6 @@ class TransactionModel extends CachedTable
 		$amStr = $fmtSrcAmount;
 		if ($fmtSrcAmount != $fmtDestAmount)
 		{
-			$fmtDestAmount = $this->currMod->format($transaction->dest_amount, $transaction->dest_curr);
 			$amStr .= " ($fmtDestAmount)";
 		}
 		$res["amount"] = $amStr;

@@ -81,12 +81,7 @@ let runPersonAPI =
 			if (!Array.isArray(pList))
 				return false;
 
-			let personObj = pList.find(item => item.id == id);
-
-			let res = checkObjValue(personObj, expPersonObj) &&
-						checkObjValue(pList, expPersonList);
-
-			return res;
+			return checkObjValue(pList, expPersonList);
 		}, this.environment);
 
 		return updateRes;
