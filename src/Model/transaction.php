@@ -680,36 +680,22 @@ class TransactionModel extends CachedTable
 
 			$queryItem = NULL;
 
-			if ($tr->type == EXPENSE || $tr->type == TRANSFER || $tr->type == DEBT)
+			if (in_array($tr->type, self::$srcAvailTypes) && $tr->src_id && isset($results[$tr->src_id]))
 			{
-				if ($tr->src_id && isset($results[$tr->src_id]))
-				{
-					$results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
-					$diff = round($results[$tr->src_id] - $tr->src_result, 2);
-					if (abs($diff) >= 0.01)
-					{
-						if (is_null($queryItem))
-							$queryItem = clone $tr;
+				if (is_null($queryItem))
+					$queryItem = clone $tr;
 
-						$queryItem->src_result = $results[$tr->src_id];
-					}
-				}
+				$results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
+				$queryItem->src_result = $results[$tr->src_id];
 			}
 
-			if ($tr->type == INCOME || $tr->type == TRANSFER || $tr->type == DEBT)
+			if (in_array($tr->type, self::$destAvailTypes) && $tr->dest_id && isset($results[$tr->dest_id]))
 			{
-				if ($tr->dest_id && isset($results[$tr->dest_id]))
-				{
-					$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
-					$diff = round($results[$tr->dest_id] - $tr->dest_result, 2);
-					if (abs($diff) >= 0.01)
-					{
-						if (is_null($queryItem))
-							$queryItem = clone $tr;
+				if (is_null($queryItem))
+					$queryItem = clone $tr;
 
-						$queryItem->dest_result = $results[$tr->dest_id];
-					}
-				}
+				$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
+				$queryItem->dest_result = $results[$tr->dest_id];
 			}
 
 			if (!is_null($queryItem))
