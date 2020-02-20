@@ -1,5 +1,5 @@
 import { api } from '../../api.js';
-import { test, copyObject, setParam, checkObjValue } from '../../common.js';
+import { test, copyObject, setParam, checkObjValue, formatProps } from '../../common.js';
 
 
 let runAccountAPI =
@@ -57,7 +57,7 @@ let runAccountAPI =
 	{
 		let updateRes;
 
-		await test('Update account', async () =>
+		await test(`Update account (${id}, ${formatProps(params)})`, async () =>
 		{
 			let trBefore = await this.state.getTransactionsList();
 			let accBefore = await this.state.getAccountsList();

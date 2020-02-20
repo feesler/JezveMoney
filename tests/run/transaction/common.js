@@ -191,7 +191,7 @@ let runTransactionsCommon =
 	{
 		let scope = this.run.transactions;
 
-		this.view.setBlock('Create ' + getTransactionTypeStr(type) + ' (' + formatProps(params) + ')', 2);
+		this.view.setBlock(`Create ${getTransactionTypeStr(type)} (${formatProps(params)})`, 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
@@ -240,7 +240,7 @@ let runTransactionsCommon =
 			throw new Error('Position of transaction not specified');
 		delete params.pos;
 
-		view.setBlock('Update ' + getTransactionTypeStr(type) + ' [' + pos + '] (' + formatProps(params) + ')', 2);
+		view.setBlock(`Update ${getTransactionTypeStr(type)} [${pos}] (${formatProps(params)})`, 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
