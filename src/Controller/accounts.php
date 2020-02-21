@@ -103,7 +103,7 @@ class AccountsController extends Controller
 		$icons = $this->model->getIconsArray();
 
 		$titleString = "Jezve Money | ";
-		$headString = ($action == "new") ? "New account" : "Edit account";
+		$headString = "Edit account";
 		$titleString .= $headString;
 
 		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
