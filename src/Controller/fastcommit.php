@@ -209,6 +209,9 @@ class FastCommitController extends Controller
 		$debtMod = DebtModel::getInstance();
 		$currMod = CurrencyModel::getInstance();
 
+		if (!isset($_POST["acc_id"]))
+			throw new Error("Account not specified");
+
 		$acc_id = intval($_POST["acc_id"]);
 		$accObj = $accMod->getItem($acc_id);
 		if (!$accObj)
@@ -222,6 +225,8 @@ class FastCommitController extends Controller
 			throw new Error("Currency not found");
 
 		echo("Currency: ".$curr_id." ".$currObj->name."<br><br>");
+
+		$transactions = [];
 		foreach($_POST["tr_type"] AS $tr_key => $tr_type)
 		{
 			$tr_amount = floatval($_POST["amount"][$tr_key]);
@@ -252,15 +257,17 @@ class FastCommitController extends Controller
 				echo("src_amount: ".$tr_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$curr_id."; dest_curr ".$tr_dest_curr_id);
 				echo("; ".$tr_date." ".$tr_comment."<br>");
 
-				$trans_id = $trMod->create([ "type" => EXPENSE,
-												"src_id" => $acc_id,
-												"dest_id" => 0,
-												"src_amount" => $tr_amount,
-												"dest_amount" => $tr_dest_amount,
-												"src_curr" => $curr_id,
-												"dest_curr" => $tr_dest_curr_id,
-												"date" => $tr_date,
-												"comment" => $tr_comment ]);
+				$transObj = [
+					"type" => EXPENSE,
+					"src_id" => $acc_id,
+					"dest_id" => 0,
+					"src_amount" => $tr_amount,
+					"dest_amount" => $tr_dest_amount,
+					"src_curr" => $curr_id,
+					"dest_curr" => $tr_dest_curr_id,
+					"date" => $tr_date,
+					"comment" => $tr_comment
+				];
 			}
 			else if ($tr_type == "income")
 			{
@@ -276,15 +283,17 @@ class FastCommitController extends Controller
 				echo("src_amount: ".$tr_src_amount."; dest_amount: ".$tr_amount."; src_curr: ".$tr_src_curr_id."; dest_curr ".$curr_id);
 				echo("; ".$tr_date." ".$tr_comment."<br>");
 
-				$trans_id = $trMod->create([ "type" => INCOME,
-												"src_id" => 0,
-												"dest_id" => $acc_id,
-												"src_amount" => $tr_src_amount,
-												"dest_amount" => $tr_amount,
-												"src_curr" => $tr_src_curr_id,
-												"dest_curr" => $curr_id,
-												"date" => $tr_date,
-												"comment" => $tr_comment ]);
+				$transObj = [
+					"type" => INCOME,
+					"src_id" => 0,
+					"dest_id" => $acc_id,
+					"src_amount" => $tr_src_amount,
+					"dest_amount" => $tr_amount,
+					"src_curr" => $tr_src_curr_id,
+					"dest_curr" => $curr_id,
+					"date" => $tr_date,
+					"comment" => $tr_comment
+				];
 			}
 			else if ($tr_type == "transferfrom" || $tr_type == "transferto")
 			{
@@ -322,15 +331,17 @@ class FastCommitController extends Controller
 				echo("src_amount: ".$tr_src_amount."; dest_amount: ".$tr_dest_amount."; src_curr: ".$tr_src_curr_id."; dest_curr ".$tr_dest_curr_id);
 				echo("; ".$tr_date." ".$tr_comment."<br>");
 
-				$trans_id = $trMod->create([ "type" => TRANSFER,
-												"src_id" => $tr_src_acc_id,
-												"dest_id" => $tr_dest_acc_id,
-												"src_amount" => $tr_src_amount,
-												"dest_amount" => $tr_dest_amount,
-												"src_curr" => $tr_src_curr_id,
-												"dest_curr" => $tr_dest_curr_id,
-												"date" => $tr_date,
-												"comment" => $tr_comment]);
+				$transObj = [
+					"type" => TRANSFER,
+					"src_id" => $tr_src_acc_id,
+					"dest_id" => $tr_dest_acc_id,
+					"src_amount" => $tr_src_amount,
+					"dest_amount" => $tr_dest_amount,
+					"src_curr" => $tr_src_curr_id,
+					"dest_curr" => $tr_dest_curr_id,
+					"date" => $tr_date,
+					"comment" => $tr_comment
+				];
 			}
 			else if ($tr_type == "debtfrom" || $tr_type == "debtto")
 			{
@@ -345,15 +356,20 @@ class FastCommitController extends Controller
 
 				echo(($op ? "give" : "take")."; person: ".$person_id." ".$pObj->name."<br>");
 
-				$trans_id = $debtMod->create([ "op" => $op,
-												"acc_id" => $acc_id,
-												"person_id" => $person_id,
-												"src_amount" => $tr_src_amount,
-												"dest_amount" => $tr_dest_amount,
-												"src_curr" => $tr_src_curr_id,
-												"dest_curr" => $tr_dest_curr_id,
-												"date" => $tr_date,
-												"comment" => $tr_comment]);
+				$debtTrans = [
+					"op" => $op,
+					"acc_id" => $acc_id,
+					"person_id" => $person_id,
+					"src_amount" => $tr_src_amount,
+					"dest_amount" => $tr_dest_amount,
+					"src_curr" => $tr_src_curr_id,
+					"dest_curr" => $tr_dest_curr_id,
+					"date" => $tr_date,
+					"comment" => $tr_comment
+				];
+
+				$debtTrans = $debtMod->prepareTransaction($debtTrans);
+				$transObj = (array)$debtTrans;
 			}
 			else
 			{
@@ -361,15 +377,18 @@ class FastCommitController extends Controller
 				break;
 			}
 
-			if ($trans_id == 0)
-			{
-				echo("Fail to create transaction<br>");
-				break;
-			}
-			else
-				echo("New transaction id: ".$trans_id."<br>");
-			echo("<br>");
+			$transactions[] = $transObj;
 		}
+
+		$trans_ids = $trMod->createMultiple($transactions);
+		if (is_null($trans_ids))
+		{
+			echo("Fail to create transactions<br>");
+			return;
+		}
+		else
+			echo("New transaction id: ".implode(", ", $trans_ids)."<br>");
+		echo("<br>");
 
 		echo("<a href=\"".BASEURL."fastcommit/\">Ok</a><br>");
 	}

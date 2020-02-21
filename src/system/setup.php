@@ -89,12 +89,13 @@
 	require_once(APPROOT."system/log.php");
 	if (!isset($noLogs) || !$noLogs)
 	{
-		wlog("\r\nBEGIN");
+		wlog("\r\n==================================================");
+		wlog($_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"]);
 		wlog("BASEURL: ".BASEURL);
 		wlog("approot: ".APPROOT);
-		wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
+		if (isset($_SERVER["REMOTE_ADDR"]))
+			wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
-		wlog("Request: ".$_SERVER["REQUEST_METHOD"]." ".$ruri);
 
 		wlog("Headers: ");
 		foreach(getallheaders() as $cKey => $cVal)
@@ -124,3 +125,5 @@
 	date_default_timezone_set("Europe/Moscow");
 
 	require_once(APPROOT."system/message.php");
+
+	wlog("==================================================");
