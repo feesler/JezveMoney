@@ -34,7 +34,11 @@ onReady(initPage);
 		<div id="rowsContainer"></div>
 	</div>
 	<div class="controls">
-		<div class="std_margin"><input id="newRowBtn" class="btn ok_btn" type="button" value="+"><input id="newPhBtn" class="btn ok_btn" type="button" value="+"></div>
+		<div class="std_margin">
+			<input id="newRowBtn" class="btn ok_btn" type="button" value="+">
+			<input id="newPhBtn" class="btn ok_btn" type="button" value="+">
+			<input id="importAllBtn" class="btn ok_btn" type="button" value="->>" disabled>
+		</div>
 		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span></div>
 	</div>
 </body>

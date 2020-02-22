@@ -724,6 +724,10 @@ function importLoadCallback(response)
 
 		addPlaceholder();
 	});
+
+	var importAllBtn = ge('importAllBtn');
+	if (importAllBtn)
+		importAllBtn.disabled = false;
 }
 
 
@@ -811,6 +815,12 @@ function mapImportRow(impRowObj)
 	trcount.innerHTML = trRows.length;
 
 	updateRowsPos();
+}
+
+
+function onImportAll()
+{
+	impRows.forEach(mapImportRow);
 }
 
 
@@ -993,9 +1003,10 @@ function initPage()
 	var newPhBtn = ge('newPhBtn');
 	var submitbtn = ge('submitbtn');
 	var fileimportfrm = ge('fileimportfrm');
+	var importAllBtn = ge('importAllBtn');
 	trcount = ge('trcount');
 	var acc_id = ge('acc_id');
-	if (!newRowBtn || !newPhBtn || !fileimportfrm || !submitbtn || !trcount || !acc_id)
+	if (!newRowBtn || !newPhBtn || !fileimportfrm || !importAllBtn || !submitbtn || !trcount || !acc_id)
 		return;
 
 	newRowBtn.onclick = createRow;
@@ -1003,6 +1014,7 @@ function initPage()
 
 	acc_id.onchange = onMainAccChange;
 
+	importAllBtn.onclick = onImportAll;
 	submitbtn.onclick = onSubmitClick;
 
 	createRow();
