@@ -23,7 +23,6 @@ onReady(initPage);
 	</div>
 </form>
 
-<form id="fastcommitfrm" method="post" action="<?=BASEURL?>fastcommit/">
 	<select id="acc_id" name="acc_id">
 <?php foreach($accArr as $accObj) {	?>
 		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
@@ -38,6 +37,5 @@ onReady(initPage);
 		<div class="std_margin"><input id="newRowBtn" class="btn ok_btn" type="button" value="+"><input id="newPhBtn" class="btn ok_btn" type="button" value="+"></div>
 		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span></div>
 	</div>
-</form>
 </body>
 </html>

@@ -61,6 +61,15 @@ function cleanTrRows()
 }
 
 
+// Remove all imported rows
+function cleanImpRows()
+{
+	impRows = [];
+
+	removeChilds(importRows);
+}
+
+
 function delRow(rowObj)
 {
 	var delPos;
@@ -474,20 +483,120 @@ function onPersonChange(rowObj)
 
 function onSubmitClick()
 {
-	var fastcommitfrm = ge('fastcommitfrm');
-	if (!fastcommitfrm)
+	if (!Array.isArray(trRows))
 		return;
 
-	trRows.forEach(function(rowObj)
+	var reqObj = trRows.map(function(rowObj)
 	{
-		rowObj.amountInp.value = fixFloat(rowObj.amountInp.value);
-		rowObj.destAmountInp.value = fixFloat(rowObj.destAmountInp.value);
+		var trObj = {};
 
-		enable(rowObj.destAccSel, true);
-		enable(rowObj.destAmountInp, true);
+		var selType = selectedValue(rowObj.trTypeSel);
+		var secondAcc = idSearch(accounts, parseInt(rowObj.destAccIdInp.value));
+		var person = idSearch(persons, parseInt(rowObj.personIdInp.value));
+		var amountVal = fixFloat(rowObj.amountInp.value);
+		var secondAmountVal = fixFloat(rowObj.destAmountInp.value);
+		var selectedCurr = parseInt(rowObj.currIdInp.value);
+
+		if (selType == 'expense')
+		{
+			trObj.type = EXPENSE;
+			trObj.src_id = mainAccObj.id;
+			trObj.dest_id = 0;
+			trObj.src_curr = mainAccObj.curr_id;
+			trObj.dest_curr = selectedCurr;
+			trObj.src_amount = amountVal;
+			trObj.dest_amount = (trObj.src_curr == trObj.dest_curr) ? amountVal : secondAmountVal;
+		}
+		else if (selType == 'income')
+		{
+			trObj.type = INCOME;
+			trObj.src_id = 0;
+			trObj.dest_id = mainAccObj.id;
+			trObj.src_curr = selectedCurr;
+			trObj.dest_curr = mainAccObj.curr_id;
+			trObj.src_amount = (trObj.src_curr == trObj.dest_curr) ? amountVal : secondAmountVal;
+			trObj.dest_amount = amountVal;
+
+		}
+		else if (selType == 'transferfrom')
+		{
+			if (!secondAcc)
+				throw new Error('Invalid transaction: Second account not set');
+
+			trObj.type = TRANSFER;
+			trObj.src_id = mainAccObj.id;
+			trObj.dest_id = secondAcc.id;
+			trObj.src_curr = mainAccObj.curr_id;
+			trObj.dest_curr = secondAcc.curr_id;
+			trObj.src_amount = amountVal;
+			trObj.dest_amount = (trObj.src_curr == trObj.dest_curr) ? amountVal : secondAmountVal;
+
+		}
+		else if (selType == 'transferto')
+		{
+			if (!secondAcc)
+				throw new Error('Invalid transaction: Second account not set');
+
+			trObj.type = TRANSFER;
+			trObj.src_id = secondAcc.id;
+			trObj.dest_id = mainAccObj.id;
+			trObj.src_curr = secondAcc.curr_id;
+			trObj.dest_curr = mainAccObj.curr_id;
+			trObj.src_amount = (trObj.src_curr == trObj.dest_curr) ? amountVal : secondAmountVal;
+			trObj.dest_amount = amountVal;
+		}
+		else if (selType == 'debtfrom' || selType == 'debtto')
+		{
+			if (!person)
+				throw new Error('Invalid transaction: Person not set');
+
+			trObj.type = DEBT;
+			trObj.debtop = (selType == 'debtfrom') ? 1 : 2;
+			trObj.person_id = person.id;
+			trObj.acc_id = mainAccObj.id;
+			trObj.src_curr = mainAccObj.curr_id;
+			trObj.dest_curr = mainAccObj.curr_id;
+			trObj.src_amount = amountVal;
+			trObj.dest_amount = amountVal;
+		}
+
+		trObj.date = rowObj.dateInp.value;
+		trObj.comment = rowObj.commInp.value;
+
+		return trObj;
 	});
 
-	fastcommitfrm.submit();
+	ajax.post(baseURL + 'api/transaction/createMultiple/', JSON.stringify(reqObj), onCommitResult);
+}
+
+
+function onCommitResult(response)
+{
+	var status = false;
+	var message = 'Fail to import transactions';
+
+	try
+	{
+		var respObj = JSON.parse(response);
+
+		status = (respObj && respObj.result == 'ok');
+		if (status)
+		{
+			message = 'All transactions have been successfully imported';
+			cleanTrRows();
+			cleanImpRows();
+		}
+		else if (respObj && respObj.msg)
+		{
+			message = respObj.msg;
+		}
+	}
+	catch(e)
+	{
+		message = e.message;
+	}
+
+	createMessage(message, (status ? 'msg_success' : 'msg_error'));
 }
 
 
@@ -495,7 +604,8 @@ function getRowByElem(rowEl)
 {
 	var resObj = null;
 
-	trRows.some(function(rowObj){
+	trRows.some(function(rowObj)
+	{
 		var cond = (rowEl == rowObj.rowEl);
 		if (cond)
 			resObj = rowObj;
