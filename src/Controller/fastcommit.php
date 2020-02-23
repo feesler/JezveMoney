@@ -1,6 +1,10 @@
 <?php
 
-require_once(APPROOT."system/library/phpexcel/PHPExcel.php");
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 
 class FastCommitController extends Controller
 {
@@ -28,17 +32,17 @@ class FastCommitController extends Controller
 	}
 
 
-	// Short alias for PHPExcel_Cell::stringFromColumnIndex() method
+	// Short alias for Coordinate::stringFromColumnIndex() method
 	private static function columnStr($ind)
 	{
-		return PHPExcel_Cell::stringFromColumnIndex($ind);
+		return Coordinate::stringFromColumnIndex($ind);
 	}
 
 
-	// Short alias for PHPExcel_Cell::columnIndexFromString() method
+	// Short alias for Coordinate::columnIndexFromString() method
 	private static function columnInd($str)
 	{
-		return PHPExcel_Cell::columnIndexFromString($str) - 1;
+		return Coordinate::columnIndexFromString($str) - 1;
 	}
 
 
@@ -63,7 +67,7 @@ class FastCommitController extends Controller
 		}
 
 		$fileId = $hdrs["x-file-id"];
-		$fname = APPPATH."system/upload/".$fileId;
+		$fname = APPROOT."system/uploads/".$fileId;
 
 		$totalSize = 0;
 		if (file_exists($fname))
@@ -122,20 +126,23 @@ class FastCommitController extends Controller
 			$isCardStatement = (strcmp($_POST["isCard"], "card") == 0);
 		}
 
+		$fileType = strtoupper($fileType);
 		wlog("File type: ".$fileType);
 
-		if (strtoupper($fileType) == "XLS")
-			$readedType = "Excel5";
-		else if (strtoupper($fileType) == "XLSX")
-			$readedType = "Excel2007";
-		else if (strtoupper($fileType) == "CSV")
-			$readedType = "CSV";
+		if ($fileType == "XLS")
+			$readedType = "Xls";
+		else if ($fileType == "XLSX")
+			$readedType = "Xlsx";
+		else if ($fileType == "CSV")
+			$readedType = "Csv";
+		else
+			throw new Error("Unknown file type");
 
-		$objReader = PHPExcel_IOFactory::createReader($readedType);
-		if ($readedType == "CSV")
-			$objReader->setDelimiter(";");
-		$srcPHPExcel = $objReader->load($fname);
-		$src = $srcPHPExcel->getActiveSheet();
+		$reader = IOFactory::createReader($readedType);
+		if ($readedType == "Csv")
+			$reader->setDelimiter(';');
+		$spreadsheet = $reader->load($fname);
+		$src = $spreadsheet->getActiveSheet();
 
 		if ($isCardStatement)
 		{
@@ -170,10 +177,15 @@ class FastCommitController extends Controller
 
 			$dateVal = $src->getCell($date_col.$row_ind)->getValue();
 			wlog("Date(".$desc_col.$row_ind."): ".$dateVal);
-			if ($readedType == "CSV")
+			if ($readedType == "Csv")
+			{
 				$dateFmt = strtotime($dateVal);
+			}
 			else
-				$dateFmt = PHPExcel_Shared_Date::ExcelToPHP($dateVal);
+			{
+				$dateTime = Date::excelToDateTimeObject($dateVal);
+				$dateFmt = $dateTime->getTimestamp();
+			}
 			wlog("Formatted: ".$dateFmt.", ".date("d.m.Y", $dateFmt));
 
 			$dataObj->date = date("d.m.Y", $dateFmt);

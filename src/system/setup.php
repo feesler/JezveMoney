@@ -118,6 +118,7 @@
 	require_once(APPROOT."system/common.php");
 	require_once(APPROOT."system/json.php");
 	spl_autoload_register("autoLoadClass");
+	require_once(APPROOT."vendor/autoload.php");
 
 	$dbConfig = ( require_once(APPROOT."system/dbsetup.php") );
 	mysqlDB::setup($dbConfig);
