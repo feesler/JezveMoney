@@ -120,8 +120,19 @@ function onTileClick(acc_id)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
 			edit_btn.firstElementChild.href = baseURL + 'accounts/edit/' + selArr[0];
+	}
+
+	if (accounts.count() > 0)
+	{
 		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			export_btn.firstElementChild.href = './csvexport.php?id=' + selArr[0];
+		{
+			var exportURL = baseURL + 'accounts/export/';
+			if (accounts.count() == 1)
+				exportURL += selArr[0];
+			else
+				exportURL += '?' + urlJoin(selArr);
+			export_btn.firstElementChild.href = exportURL;
+		}
 	}
 
 	show('toolbar', (accounts.count() > 0));
