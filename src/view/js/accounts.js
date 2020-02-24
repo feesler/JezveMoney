@@ -131,7 +131,7 @@ function onTileClick(acc_id)
 			if (selCount == 1)
 				exportURL += selArr[0];
 			else
-				exportURL += '?' + urlJoin(selArr);
+				exportURL += '?' + urlJoin({ id : selArr });
 			export_btn.firstElementChild.href = exportURL;
 		}
 	}
