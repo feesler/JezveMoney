@@ -22,13 +22,13 @@
 						<tbody>
 <?php	foreach($uArr as $userInfo) {		?>
 							<tr>
-								<td><?=$userInfo->id?></td>
-								<td><?=$userInfo->login?></td>
-								<td><?=$userInfo->owner?></td>
-								<td><?=$userInfo->access?></td>
-								<td><?=$userInfo->accCount?></td>
-								<td><?=$userInfo->trCount?></td>
-								<td><?=$userInfo->pCount?></td>
+								<td><?=e($userInfo->id)?></td>
+								<td><?=e($userInfo->login)?></td>
+								<td><?=e($userInfo->owner)?></td>
+								<td><?=e($userInfo->access)?></td>
+								<td><?=e($userInfo->accCount)?></td>
+								<td><?=e($userInfo->trCount)?></td>
+								<td><?=e($userInfo->pCount)?></td>
 							</tr>
 <?php	}	?>
 						</tbody>

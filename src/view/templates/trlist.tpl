@@ -19,9 +19,9 @@
 							<div class="paginator"><?php
 			foreach($pagesArr as $pageItem) {
 				if (!is_numeric($pageItem["text"])) {
-					?><span><?=$pageItem["text"]?></span><?php
+					?><span><?=e($pageItem["text"])?></span><?php
 				} else if ($pageItem["active"]) {
-					?><span><b><?=$pageItem["text"]?></b></span><?php
+					?><span><b><?=e($pageItem["text"])?></b></span><?php
 				} else {
 					?><span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span><?php
 				}
@@ -34,20 +34,20 @@
 <?php	}	?>
 <?php	foreach($trListData as $trItem) {	?>
 <?php	if ($showDetails) {		?>
-								<tbody class="trlist_item_wrap"><tr id="tr_<?=$trItem["id"]?>">
-									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=$trItem["acc"]?>"><span><?=$trItem["acc"]?></span></div></div></td>
-									<td><div class="tritem_sum"><span><?=$trItem["amount"]?></span></div></td>
+								<tbody class="trlist_item_wrap"><tr id="tr_<?=e($trItem["id"])?>">
+									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=e($trItem["acc"])?>"><span><?=e($trItem["acc"])?></span></div></div></td>
+									<td><div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div></td>
 									<td><div class="tritem_balance">
-										<span><?=implode("</span><span>", $trItem["balance"])?></span>
+										<span><?=implode("</span><span>", array_map("e", $trItem["balance"]))?></span>
 									</div></td>
 									<td>
 										<div class="tritem_date_comm">
-											<span><?=$trItem["date"]?></span>
+											<span><?=e($trItem["date"])?></span>
 										</div>
 									</td>
 									<td><div class="ellipsis_cell">
 <?php		if ($trItem["comm"] != "") {		?>
-										<div title="<?=$trItem["comm"]?>"><span class="tritem_comm"><?=$trItem["comm"]?></span></div>
+										<div title="<?=e($trItem["comm"])?>"><span class="tritem_comm"><?=e($trItem["comm"])?></span></div>
 <?php		} else {		?>
 										<div></div>
 <?php		}	?>
@@ -55,13 +55,13 @@
 								</tr></tbody>
 <?php	} else {		?>
 							<div class="trlist_item_wrap">
-								<div id="tr_<?=$trItem["id"]?>" class="trlist_item">
-									<div class="tritem_acc_name"><span><?=$trItem["acc"]?></span></div>
-									<div class="tritem_sum"><span><?=$trItem["amount"]?></span></div>
+								<div id="tr_<?=e($trItem["id"])?>" class="trlist_item">
+									<div class="tritem_acc_name"><span><?=e($trItem["acc"])?></span></div>
+									<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
 									<div class="tritem_date_comm">
-										<span><?=$trItem["date"]?></span>
+										<span><?=e($trItem["date"])?></span>
 <?php		if ($trItem["comm"] != "") {		?>
-										<span class="tritem_comm"><?=$trItem["comm"]?></span>
+										<span class="tritem_comm"><?=e($trItem["comm"])?></span>
 <?php		}	?>
 									</div>
 								</div>
@@ -77,9 +77,9 @@
 							<div class="paginator"><?php
 			foreach($pagesArr as $pageItem) {
 				if (!is_numeric($pageItem["text"])) {
-					?><span><?=$pageItem["text"]?></span><?php
+					?><span><?=e($pageItem["text"])?></span><?php
 				} else if ($pageItem["active"]) {
-					?><span><b><?=$pageItem["text"]?></b></span><?php
+					?><span><b><?=e($pageItem["text"])?></b></span><?php
 				} else {
 					?><span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span><?php
 				}

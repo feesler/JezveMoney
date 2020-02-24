@@ -19,7 +19,7 @@
 					<div id="tilesContainer" class="tiles"><?php
 	if (count($tilesArr)) {
 		foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></button></div><?php
+?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($tile["balance"])?></span><span class="acc_name"><?=e($tile["name"])?></span></span></button></div><?php
 		}
 	} else {	?>
 						<span>You have no one account. Please create one.</span>

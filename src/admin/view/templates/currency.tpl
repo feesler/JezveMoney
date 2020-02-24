@@ -22,10 +22,10 @@
 						<tbody>
 <?php	foreach($currArr as $currInfo) {		?>
 							<tr>
-								<td><?=$currInfo->id?></td>
-								<td><?=$currInfo->name?></td>
-								<td><?=$currInfo->sign?></td>
-								<td><?=$currInfo->format?></td>
+								<td><?=e($currInfo->id)?></td>
+								<td><?=e($currInfo->name)?></td>
+								<td><?=e($currInfo->sign)?></td>
+								<td><?=e($currInfo->format)?></td>
 							</tr>
 <?php	}	?>
 						</tbody>

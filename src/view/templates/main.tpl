@@ -23,7 +23,7 @@
 						<span>You have no one account. Please create one.</span>
 <?php	} else {
 			foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=$acc_id?>" class="tile<?=$tile["icon"]?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=$acc_id?>" class="tilelink"><span><span class="acc_bal"><?=$tile["balance"]?></span><span class="acc_name"><?=$tile["name"]?></span></span></a></div><?php
+?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink"><span><span class="acc_bal"><?=e($tile["balance"])?></span><span class="acc_name"><?=e($tile["name"])?></span></span></a></div><?php
 			}
 		}	?></div>
 					</div>
@@ -36,8 +36,8 @@
 <?php	} else {	?>
 <?php		foreach($totalsArr as $curr_id => $currData) {	?>
 							<div class="info_tile">
-								<span class="info_title"><?=$currData["name"]?></span>
-								<span class="info_subtitle"><?=$currData["balfmt"]?></span>
+								<span class="info_title"><?=e($currData["name"])?></span>
+								<span class="info_subtitle"><?=e($currData["balfmt"])?></span>
 							</div>
 <?php		}	?>
 <?php	}	?>
@@ -54,13 +54,13 @@
 <?php	} else {	?>
 <?php		foreach($trListData as $trItem) {	?>
 							<div class="trlist_item_wrap">
-								<div id="tr_<?=$trItem["id"]?>" class="trlist_item">
-									<div class="tritem_acc_name"><span><?=$trItem["acc"]?></span></div>
-									<div class="tritem_sum"><span><?=$trItem["amount"]?></span></div>
+								<div id="tr_<?=e($trItem["id"])?>" class="trlist_item">
+									<div class="tritem_acc_name"><span><?=e($trItem["acc"])?></span></div>
+									<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
 									<div class="tritem_date_comm">
-										<span><?=$trItem["date"]?></span>
+										<span><?=e($trItem["date"])?></span>
 <?php		if ($trItem["comm"] != "") {		?>
-										<span class="tritem_comm"><?=$trItem["comm"]?></span>
+										<span class="tritem_comm"><?=e($trItem["comm"])?></span>
 <?php		}	?>
 									</div>
 								</div>
@@ -78,11 +78,11 @@
 <?php	} else {	?>
 <?php		foreach($persArr as $pData) {	?>
 							<div class="info_tile">
-								<span class="info_title"><?=$pData->name?></span>
+								<span class="info_title"><?=e($pData->name)?></span>
 <?php			if ($pData->nodebts) {		?>
 								<span class="info_subtitle">No debts</span>
 <?php			} else {	?>
-								<span class="info_subtitle"><?=implode("<br>", $pData->balfmt)?></span>
+								<span class="info_subtitle"><?=implode("<br>", array_map("e", $pData->balfmt))?></span>
 <?php			}	?>
 							</div>
 <?php		}	?>

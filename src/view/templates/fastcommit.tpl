@@ -25,7 +25,7 @@ onReady(initPage);
 
 	<select id="acc_id" name="acc_id">
 <?php foreach($accArr as $accObj) {	?>
-		<option value="<?=$accObj->id?>"><?=$accObj->name?></option>
+		<option value="<?=e($accObj->id)?>"><?=e($accObj->name)?></option>
 <?php }	?>
 	</select>
 

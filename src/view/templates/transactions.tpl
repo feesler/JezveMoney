@@ -38,7 +38,7 @@
 							<div class="right_float">
 								<button class="btn icon_btn search_btn right_float" type="submit"><span></span></button>
 								<div class="stretch_input rbtn_input">
-									<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : $searchReq)?>">
+									<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
 								</div>
 							</div>
 							</form>
@@ -49,9 +49,9 @@
 										<option value="0">All</option>
 <?php	foreach($accArr as $accData) {
 			if (in_array($accData->id, $accFilter)) {		?>
-										<option value="<?=$accData->id?>" selected><?=$accData->name?></option>
+										<option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
 <?php		} else {		?>
-										<option value="<?=$accData->id?>"><?=$accData->name?></option>
+										<option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
 <?php		}
 		}	?>
 									</select>
@@ -62,13 +62,13 @@
 <?php if (is_empty($dateFmt)) {		?>
 								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php } else {	?>
-								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
+								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php }		?>
 								<div id="date_block" style="display: none;">
 									<div>
 										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
 										<div class="stretch_input rbtn_input">
-											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
+											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>
 										<div id="calendar"></div>
 									</div>

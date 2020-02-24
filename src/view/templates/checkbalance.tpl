@@ -35,10 +35,10 @@ var account_id = <?=JSON::encode($checkAccount_id)?>;
 				<tr><td>ID</td><td>Account</td><td>initBalance</td><td>curBalance</td></tr>
 <?php	foreach($accName as $acc_id => $acc_name) {		?>
 				<tr>
-					<td><?=$acc_id?></td>
-					<td><?=$acc_name?></td>
-					<td><?=$initBalance[$acc_id]?></td>
-					<td><?=$curBalance[$acc_id]?></td>
+					<td><?=e($acc_id)?></td>
+					<td><?=e($acc_name)?></td>
+					<td><?=e($initBalance[$acc_id])?></td>
+					<td><?=e($curBalance[$acc_id])?></td>
 				</tr>
 <?php	}	?>
 			</table>
@@ -49,84 +49,84 @@ var account_id = <?=JSON::encode($checkAccount_id)?>;
 <?php	foreach($transArr as $tr_id => $tr) {	?>
 	<tr>
 		<td class="id_cell">
-			<a href="<?=BASEURL?>transactions/edit/<?=$tr_id?>" target="_blank"><?=$tr_id?></a>
+			<a href="<?=BASEURL?>transactions/edit/<?=e($tr_id)?>" target="_blank"><?=e($tr_id)?></a>
 		</td>
 <?php	if ($tr["type"] == EXPENSE) {		?>
 <?php		if ($checkAccount_id == 0) {	?>
-		<td>Expense from <?=$tr["src_name"]?></td>
+		<td>Expense from <?=e($tr["src_name"])?></td>
 <?php		} else {	?>
 		<td>Expense</td>
 <?php		}	?>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td class="sum_cell" colspan="2">- <?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">- <?=e($tr["dest_amount"])?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">- <?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">-<?=e($tr["src_amount"])?></td><td class="sum_cell act_sum">- <?=e($tr["dest_amount"])?></td>
 <?php		}	?>
 <?php	} else if ($tr["type"] == INCOME) {	?>
 <?php		if ($checkAccount_id == 0) {	?>
-		<td>Income to <?=$tr["dest_name"]?></td>
+		<td>Income to <?=e($tr["dest_name"])?></td>
 <?php		} else {	?>
 		<td>Income</td>
 <?php		}	?>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td class="sum_cell" colspan="2">+ <?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">+ <?=e($tr["dest_amount"])?></td>
 <?php		} else {	?>
-		<td class="sum_cell">+<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+ <?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">+<?=e($tr["src_amount"])?></td><td class="sum_cell act_sum">+ <?=e($tr["dest_amount"])?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id) {	/* transfer to */	?>
-		<td>Transfer from <?=$tr["src_name"]?></td>
+		<td>Transfer from <?=e($tr["src_name"])?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
-		<td class="sum_cell" colspan="2">+<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">+<?=e($tr["dest_amount"])?></td>
 <?php		} else {	?>
-		<td class="sum_cell act_sum">+<?=$tr["src_amount"]?></td><td class="sum_cell">+<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell act_sum">+<?=e($tr["src_amount"])?></td><td class="sum_cell">+<?=e($tr["dest_amount"])?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["src_id"] == $checkAccount_id) {		/* transfer from */	?>
-		<td>Transfer to <?=$tr["dest_name"]?></td>
+		<td>Transfer to <?=e($tr["dest_name"])?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
-		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">-<?=e($tr["dest_amount"])?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">-<?=e($tr["src_amount"])?></td><td class="sum_cell act_sum">-<?=e($tr["dest_amount"])?></td>
 <?php		}	?>
 <?php	} else if ($checkAccount_id == 0 && $tr["type"] == TRANSFER) {		/* Transfer between two accounts */		?>
-		<td>Transfer from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
+		<td>Transfer from <?=e($tr["src_name"])?> to <?=e($tr["dest_name"])?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {		?>
-		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">-<?=e($tr["dest_amount"])?></td>
 <?php		} else {	?>
-		<td class="sum_cell">-<?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+ <?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">-<?=e($tr["src_amount"])?></td><td class="sum_cell act_sum">+ <?=e($tr["dest_amount"])?></td>
 <?php		}	?>
 <?php	} else if ($tr["type"] == DEBT) {		?>
-		<td>Debt from <?=$tr["src_name"]?> to <?=$tr["dest_name"]?></td>
+		<td>Debt from <?=e($tr["src_name"])?> to <?=e($tr["dest_name"])?></td>
 <?php		if ($tr["src_amount"] == $tr["dest_amount"]) {	?>
-		<td class="sum_cell" colspan="2">-<?=$tr["dest_amount"]?></td>
+		<td class="sum_cell" colspan="2">-<?=e($tr["dest_amount"])?></td>
 <?php		} else {		?>
-		<td class="sum_cell">- <?=$tr["src_amount"]?></td><td class="sum_cell act_sum">+ <?=$tr["dest_amount"]?></td>
+		<td class="sum_cell">- <?=e($tr["src_amount"])?></td><td class="sum_cell act_sum">+ <?=e($tr["dest_amount"])?></td>
 <?php		}	?>
 <?php	}	?>
-		<td><?=$tr["comment"]?></td>
+		<td><?=e($tr["comment"])?></td>
 <?php	$cspan = ($tr["src_id"] && $tr["dest_id"]) ? "" : " colspan=\"2\"";
 
 		if ($tr["src_id"]) {
 			if ($tr["realbal"][ $tr["src_id"] ] < 0.0) {	?>
-		<td class="sum_cell bad_val"<?=$cspan?>><?=$tr["realbal"][ $tr["src_id"] ]?></td>
+		<td class="sum_cell bad_val"<?=$cspan?>><?=e($tr["realbal"][ $tr["src_id"] ])?></td>
 <?php		} else {		?>
-		<td class="sum_cell"<?=$cspan?>><?=$tr["realbal"][ $tr["src_id"] ]?></td>
+		<td class="sum_cell"<?=$cspan?>><?=e($tr["realbal"][ $tr["src_id"] ])?></td>
 <?php		}
 		}
 
 		if ($tr["dest_id"]) {
 			if ($tr["realbal"][ $tr["dest_id"] ] < 0.0) {	?>
-		<td class="sum_cell bad_val"<?=$cspan?>><?=$tr["realbal"][ $tr["dest_id"] ]?></td>
+		<td class="sum_cell bad_val"<?=$cspan?>><?=e($tr["realbal"][ $tr["dest_id"] ])?></td>
 <?php		} else {		?>
-		<td class="sum_cell"<?=$cspan?>><?=$tr["realbal"][ $tr["dest_id"] ]?></td>
+		<td class="sum_cell"<?=$cspan?>><?=e($tr["realbal"][ $tr["dest_id"] ])?></td>
 <?php		}
 		}
 
 		if (!$tr["correctdate"]) {		?>
-		<td class="bad_val"><?=$tr["datefmt"]?></td>
+		<td class="bad_val"><?=e($tr["datefmt"])?></td>
 <?php	} else {	?>
-		<td><?=$tr["datefmt"]?></td>
+		<td><?=e($tr["datefmt"])?></td>
 <?php	}		?>
-		<td id="tr_<?=$tr_id?>"><input type="button" value="<?=$tr["pos"]?>"></td>
+		<td id="tr_<?=e($tr_id)?>"><input type="button" value="<?=e($tr["pos"])?>"></td>
 	</tr>
 <?php	}		?>
 	<tr>
@@ -136,10 +136,10 @@ var account_id = <?=JSON::encode($checkAccount_id)?>;
 <?php	foreach($balanceDiff as $acc_id => $bdiff) {	?>
 <?php		if ($checkAccount_id == 0 || ($checkAccount_id != 0 && $checkAccount_id == $acc_id)) {		?>
 				<tr>
-					<td><?=$acc_id?></td>
-					<td><?=$accName[$acc_id]?></td>
-					<td><?=$realBalance[$acc_id]?></td>
-					<td><?=$bdiff?></td>
+					<td><?=e($acc_id)?></td>
+					<td><?=e($accName[$acc_id])?></td>
+					<td><?=e($realBalance[$acc_id])?></td>
+					<td><?=e($bdiff)?></td>
 				</tr>
 <?php		}	?>
 <?php	}	?>
@@ -149,8 +149,8 @@ var account_id = <?=JSON::encode($checkAccount_id)?>;
 </table>
 
 <?php	if ($checkAccount_id != 0 && $balanceDiff[$checkAccount_id] != 0) {	?>
-<form method="post" action="./checkbalance.php?id=<?=$checkAccount_id?>&act=fix">
-<input name="fixbal" type="hidden" value="<?=$realBalance[$checkAccount_id]?>">
+<form method="post" action="./checkbalance.php?id=<?=e($checkAccount_id)?>&act=fix">
+<input name="fixbal" type="hidden" value="<?=e($realBalance[$checkAccount_id])?>">
 <input type="submit" value="Fix balance">
 </form>
 <?php	}	?>

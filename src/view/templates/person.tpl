@@ -16,20 +16,20 @@
 			<div class="content">
 				<div class="content_wrap">
 					<div class="heading">
-						<h1><?=$headString?></h1>
+						<h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {		?>
 						<div id="del_btn" class="iconlink"><button type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 					<div>
-						<form id="personForm" method="post" action="<?=BASEURL?>persons/<?=$action?>/">
+						<form id="personForm" method="post" action="<?=e(BASEURL."persons/".$action)?>/">
 <?php	if ($action == "edit") {		?>
-						<input id="pid" name="pid" type="hidden" value="<?=$p_id?>">
+						<input id="pid" name="pid" type="hidden" value="<?=e($p_id)?>">
 <?php	}	?>
 						<div class="non_float std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
-								<input id="pname" name="pname" type="text" value="<?=$pName?>">
+								<input id="pname" name="pname" type="text" value="<?=e($pName)?>">
 							</div>
 						</div>
 
@@ -43,7 +43,7 @@
 </div>
 <?php	if ($action == "edit") {		?>
 <form id="delform" method="post" action="<?=BASEURL?>persons/del/">
-<input name="persons" type="hidden" value="<?=$p_id?>">
+<input name="persons" type="hidden" value="<?=e($p_id)?>">
 </form>
 <?php	}	?>
 </body>
