@@ -271,7 +271,11 @@ class AccountsController extends Controller
 			$sheet->setCellValue($colStr["dest_result"].$row_ind,
 									$currMod->format($transaction->dest_result, $transaction->dest_curr));
 
-			$sheet->setCellValue($colStr["date"].$row_ind, Date::PHPToExcel($transaction->date));
+			if ($writerType == "Csv")
+				$dateFmt = date("d.m.Y", $transaction->date);
+			else
+				$dateFmt = Date::PHPToExcel($transaction->date);
+			$sheet->setCellValue($colStr["date"].$row_ind, $dateFmt);
 
 			$sheet->setCellValue($colStr["comment"].$row_ind, $transaction->comment);
 		}
