@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(TPL_PATH."commonhdr.tpl");	?>
 <script>
 	var currency = <?=JSON::encode($currArr)?>;
 	var accCurr = <?=$accCurr?>;
@@ -12,7 +12,7 @@
 <body>
 <div class="page">
 	<div class="page_wrapper">
-<?php	require_once("./view/templates/header.tpl");	?>
+<?php	require_once(TPL_PATH."header.tpl");	?>
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">
@@ -24,9 +24,9 @@
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
 			if ($menuItem[0] == $trans_type) {		?>
-							<span><b><?=$menuItem[1]?></b></span>
+							<span><b><?=e($menuItem[1])?></b></span>
 <?php		} else {		?>
-							<span><a href="<?=$menuItem[2]?>"><?=$menuItem[1]?></a></span>
+							<span><a href="<?=e($menuItem[2])?>"><?=e($menuItem[1])?></a></span>
 <?php		}
 		}	?>
 						</div>

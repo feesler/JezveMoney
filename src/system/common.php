@@ -63,7 +63,7 @@
 
 		if (isset($classes[$className]))
 		{
-			require(APPROOT.$classes[$className]);
+			require(APP_ROOT.$classes[$className]);
 		}
 	}
 
@@ -124,40 +124,56 @@
 
 
 	// Build URL from base and array of parameters
-	function urlJoin($base, $params = NULL)
+	function urlJoin($base, $params = NULL, $raw = FALSE)
 	{
-		$resStr = "";
-
 		if (is_empty($base))
-			return $resStr;
-
-		$resStr = $base;
+			return "";
 
 		if (!is_array($params))
-			return $resStr;
+			return $base;
 
 		$pairs = [];
+		$encode = ($raw) ? "rawurlencode" : "urlencode";
 		foreach($params as $pkey => $pval)
 		{
-			$pairs[] = urlencode($pkey)."=".urlencode($pval);
+			if (is_array($pval))
+			{
+				foreach($pval as $akey => $avalue)
+				{
+					if (is_string($akey))
+						$pairs[] = $encode($pkey)."[".$encode($akey)."]=".$encode($avalue);
+					else if (is_numeric($akey))
+						$pairs[] = $encode($pkey)."[]=".$encode($avalue);
+				}
+			}
+			else if (!is_null($pval) && !is_object($pval))
+			{
+				$pairs[] = $encode($pkey)."=".$encode($pval);
+			}
 		}
+
+		$resStr = $base;
 		if (count($pairs))
 			$resStr .= "?";
 		$resStr .= implode("&", $pairs);
 
-		$resStr = htmlentities($resStr);
-
 		return $resStr;
+	}
+
+
+	function pathJoin(...$segments)
+	{
+		return implode(DIRECTORY_SEPARATOR, $segments);
 	}
 
 
 	// Append to file name unique string to fix cache issues
 	function auto_version($file)
 	{
-		if (!file_exists(APPROOT.$file))
+		if (!file_exists(APP_ROOT.$file))
 			return $file;
 
-		$mtime = filemtime(APPROOT.$file);
+		$mtime = filemtime(APP_ROOT.$file);
 		return $file."?".$mtime;
 	}
 
@@ -199,17 +215,10 @@
 		{
 			if (!array_key_exists($field, $obj))
 			{
-				$msg = "Field $field not found";
 				if ($throw)
-				{
-					throw new Error($msg);
-				}
+					throw new Error("Field $field not found");
 				else
-				{
-					wlog("checkFields() .. ".var_export($obj, TRUE));
-					wlog($msg);
 					return FALSE;
-				}
 			}
 
 			$res[$field] = $obj[$field];

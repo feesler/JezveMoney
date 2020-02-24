@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(TPL_PATH."commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
 <script>
 	var accounts = <?=JSON::encode($accArr)?>;
@@ -13,7 +13,7 @@
 <body>
 <div class="page">
 	<div class="page_wrapper">
-<?php	require_once("./view/templates/header.tpl");	?>
+<?php	require_once(TPL_PATH."header.tpl");	?>
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">
@@ -26,9 +26,9 @@
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
 			if ($menuItem->ind == $trParams["type"]) {		?>
-							<span><b><?=$menuItem->title?></b></span>
+							<span><b><?=e($menuItem->title)?></b></span>
 <?php		} else {		?>
-							<span><a href="<?=$menuItem->url?>"><?=$menuItem->title?></a></span>
+							<span><a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a></span>
 <?php		}
 		}	?>
 						</div>
@@ -77,7 +77,7 @@
 						</div>
 
 <?php
-	include("./view/templates/trlist.tpl");
+	include(TPL_PATH."trlist.tpl");
 ?>
 					</div>
 				</div>

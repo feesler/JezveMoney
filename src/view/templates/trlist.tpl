@@ -9,9 +9,9 @@
 <?php	if ($showPaginator == TRUE) {		?>
 							<div class="mode_selector">
 <?php		if ($showDetails) {		?>
-								<a class="list_mode" href="<?=$linkStr?>"><span class="icon"></span><span>Classic</span></a><b class="details_mode"><span class="icon"></span><span>Details</span></b>
+								<a class="list_mode" href="<?=e($linkStr)?>"><span class="icon"></span><span>Classic</span></a><b class="details_mode"><span class="icon"></span><span>Details</span></b>
 <?php		} else {		?>
-								<b class="list_mode"><span class="icon"></span><span>Classic</span></b><a class="details_mode" href="<?=$linkStr?>"><span class="icon"></span><span>Details</span></a>
+								<b class="list_mode"><span class="icon"></span><span>Classic</span></b><a class="details_mode" href="<?=e($linkStr)?>"><span class="icon"></span><span>Details</span></a>
 <?php		}	?>
 							</div>
 <?php	}	?>
@@ -23,7 +23,7 @@
 				} else if ($pageItem["active"]) {
 					?><span><b><?=$pageItem["text"]?></b></span><?php
 				} else {
-					?><span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span><?php
+					?><span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span><?php
 				}
 			}	?></div>
 <?php	}	?>
@@ -81,7 +81,7 @@
 				} else if ($pageItem["active"]) {
 					?><span><b><?=$pageItem["text"]?></b></span><?php
 				} else {
-					?><span><a href="<?=$pageItem["link"]?>"><?=$pageItem["text"]?></a></span><?php
+					?><span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span><?php
 				}
 			}	?></div>
 <?php	}	?>
