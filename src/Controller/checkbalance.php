@@ -204,6 +204,6 @@ ini_set('max_execution_time', '0');
 			exit;
 		}
 		else
-			include("./view/templates/checkbalance.tpl");
+			include(TPL_PATH."checkbalance.tpl");
 	}
 }

@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
 <script>
 onReady(initControls);
 </script>
@@ -6,7 +6,7 @@ onReady(initControls);
 <body>
 <div class="page">
 	<div class="page_wrapper">
-<?php	include("./view/templates/header.tpl");	?>
+<?php	include(ADMIN_TPL_PATH."header.tpl");	?>
 
 		<div class="container">
 			<div class="content">

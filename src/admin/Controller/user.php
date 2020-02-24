@@ -15,7 +15,7 @@ class UserAdminController extends AdminController
 		$this->jsArr[] = "currency.js";
 		$this->jsAdmin[] = "user.js";
 
-		include("./view/templates/user.tpl");
+		include(ADMIN_TPL_PATH."user.tpl");
 	}
 
 

@@ -99,7 +99,7 @@ class Message
 		else if ($msgType == MSG_TYPE_ERROR)
 			$msgClass .= " msg_error";
 
-		include(APPROOT."view/templates/message.tpl");
+		include(TPL_PATH."message.tpl");
 
 		$_SESSION["msg"] = MSG_NONE;
 	}

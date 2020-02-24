@@ -31,7 +31,7 @@ class ProfileController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "main.js");
 
-		include("./view/templates/profile.tpl");
+		include(TPL_PATH."profile.tpl");
 	}
 
 

@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(TPL_PATH."commonhdr.tpl");	?>
 <script>
 	var currency = <?=JSON::encode($currArr)?>;
 <?php	if ($action == "edit") {	?>
@@ -16,7 +16,7 @@
 <body>
 <div class="page">
 	<div class="page_wrapper">
-<?php	require_once("./view/templates/header.tpl");		?>
+<?php	require_once(TPL_PATH."header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
 				<div class="content_wrap">

@@ -8,6 +8,6 @@ class MainAdminController extends AdminController
 
 		$this->buildCSS();
 
-		include("./view/templates/index.tpl");
+		include(ADMIN_TPL_PATH."index.tpl");
 	}
 }

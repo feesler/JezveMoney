@@ -28,7 +28,7 @@ class FastCommitController extends Controller
 
 		$titleString = "Jezve Money | Fast Commit";
 
-		include("./view/templates/fastcommit.tpl");
+		include(TPL_PATH."fastcommit.tpl");
 	}
 
 
@@ -67,7 +67,7 @@ class FastCommitController extends Controller
 		}
 
 		$fileId = $hdrs["x-file-id"];
-		$fname = APPROOT."system/uploads/".$fileId;
+		$fname = UPLOAD_PATH.$fileId;
 
 		$totalSize = 0;
 		if (file_exists($fname))
@@ -100,7 +100,7 @@ class FastCommitController extends Controller
 			$fileType = $hdrs["x-file-type"];
 			$fileStatType = $hdrs["x-file-stat-type"];
 
-			$fname = APPROOT."system/uploads/".$fileId.".".$fileType;
+			$fname = UPLOAD_PATH.$fileId.".".$fileType;
 			$fhnd = fopen($fname, "a");
 			if ($fhnd === FALSE)
 			{
@@ -121,7 +121,7 @@ class FastCommitController extends Controller
 			if (!isset($_POST["fileName"]) || !isset($_POST["isCard"]))
 				return;
 
-			$fname = APPROOT."system/uploads/".$_POST["fileName"];
+			$fname = UPLOAD_PATH.$_POST["fileName"];
 			$fileType = substr(strrchr($fname, "."), 1);
 			$isCardStatement = (strcmp($_POST["isCard"], "card") == 0);
 		}

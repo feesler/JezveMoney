@@ -22,7 +22,7 @@ class CurrencyAdminController extends AdminController
 		$this->jsArr[] = "currency.js";
 		$this->jsAdmin[] = "currency.js";
 
-		include("./view/templates/currency.tpl");
+		include(ADMIN_TPL_PATH."currency.tpl");
 	}
 
 

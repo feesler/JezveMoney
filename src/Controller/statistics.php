@@ -139,7 +139,7 @@ class StatisticsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "calendar.js", "ddlist.js", "lib/raphael.min.js", "charts.js", "statistics.js");
 
-		include("./view/templates/statistics.tpl");
+		include(TPL_PATH."statistics.tpl");
 	}
 
 

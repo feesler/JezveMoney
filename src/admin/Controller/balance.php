@@ -65,6 +65,6 @@ class BalanceAdminController extends AdminController
 
 		$this->buildCSS();
 
-		include("./view/templates/balance.tpl");
+		include(ADMIN_TPL_PATH."balance.tpl");
 	}
 }

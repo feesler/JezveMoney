@@ -12,7 +12,7 @@ class LogsAdminController extends AdminController
 
 		$this->buildCSS();
 
-		include("./view/templates/log.tpl");
+		include(ADMIN_TPL_PATH."log.tpl");
 	}
 
 

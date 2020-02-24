@@ -3,7 +3,7 @@
 	$pparts = pathinfo(__FILE__);
 	$path_length = strrpos($pparts["dirname"], DIRECTORY_SEPARATOR);
 	$approot = substr(__FILE__, 0, $path_length + 1);
-	define("APPROOT", $approot);
+	define("APP_ROOT", $approot);
 
 
 	// Check request is HTTPS
@@ -28,7 +28,7 @@
 	}
 
 	$host = $_SERVER["HTTP_HOST"];
- 	define("APPHOST", $host);
+ 	define("APP_HOST", $host);
 
 	$pos = strpos($host, ":");
 	if ($pos !== FALSE)
@@ -36,28 +36,28 @@
 	else
 		$domain = $host;
 
- 	define("APPDOMAIN", $domain);
+ 	define("APP_DOMAIN", $domain);
 
-	if (strcmp(APPHOST, $productionHost) == 0)
+	if (strcmp(APP_HOST, $productionHost) == 0)
 	{
-		define("APPPROT", "https://");
-		define("APPPATH", "/");
+		define("APP_PROTOCOL", "https://");
+		define("APP_PATH", "/");
 		define("PRODUCTION", TRUE);
 		define("LOCAL_DEV", FALSE);
 	}
-	else if (strcmp(APPHOST, $devHost) == 0)
+	else if (strcmp(APP_HOST, $devHost) == 0)
 	{
-		define("APPPROT", "https://");
-		define("APPPATH", "/money/");
+		define("APP_PROTOCOL", "https://");
+		define("APP_PATH", "/money/");
 		define("PRODUCTION", FALSE);
-		define("LOCALDEV", FALSE);
+		define("LOCAL_DEV", FALSE);
 	}
-	else if (strcmp(APPHOST, $localDevHost) == 0)
+	else if (strcmp(APP_HOST, $localDevHost) == 0)
 	{
-		define("APPPROT", "http://");
-		define("APPPATH", "/");
+		define("APP_PROTOCOL", "http://");
+		define("APP_PATH", "/");
 		define("PRODUCTION", FALSE);
-		define("LOCALDEV", TRUE);
+		define("LOCAL_DEV", TRUE);
 	}
 
 	// Error settings
@@ -77,22 +77,29 @@
 	}
 
 
-	if (!isSecure() && !LOCALDEV)
+	if (!isSecure() && !LOCAL_DEV)
 	{
 		header("HTTP/1.1 302 Found", TRUE, 302);
-		header("Location: ".APPPROT.APPHOST.$ruri);
+		header("Location: ".APP_PROTOCOL.APP_HOST.$ruri);
 		exit;
 	}
 
-	define("BASEURL", APPPROT.APPHOST.APPPATH);
+	define("BASEURL", APP_PROTOCOL.APP_HOST.APP_PATH);
 
-	require_once(APPROOT."system/log.php");
+	require_once(APP_ROOT."system/common.php");
+
+	define("TPL_PATH", pathJoin(APP_ROOT, "view", "templates").DIRECTORY_SEPARATOR);
+	define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "view", "templates").DIRECTORY_SEPARATOR);
+	define("UPLOAD_PATH", pathJoin(APP_ROOT, "uploads").DIRECTORY_SEPARATOR);
+	define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs").DIRECTORY_SEPARATOR);
+
+	require_once(APP_ROOT."system/log.php");
 	if (!isset($noLogs) || !$noLogs)
 	{
 		wlog("\r\n==================================================");
 		wlog($_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"]);
 		wlog("BASEURL: ".BASEURL);
-		wlog("approot: ".APPROOT);
+		wlog("approot: ".APP_ROOT);
 		if (isset($_SERVER["REMOTE_ADDR"]))
 			wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
 		wlog("Time: ".date("r"));
@@ -115,16 +122,16 @@
 
 	$sitetheme = 1;
 
-	require_once(APPROOT."system/common.php");
-	require_once(APPROOT."system/json.php");
+	require_once(APP_ROOT."system/json.php");
 	spl_autoload_register("autoLoadClass");
-	require_once(APPROOT."vendor/autoload.php");
+	require_once(APP_ROOT."vendor/autoload.php");
 
-	$dbConfig = ( require_once(APPROOT."system/dbsetup.php") );
+	$dbConfig = ( require_once(APP_ROOT."system/dbsetup.php") );
 	mysqlDB::setup($dbConfig);
 
 	date_default_timezone_set("Europe/Moscow");
 
-	require_once(APPROOT."system/message.php");
+
+	require_once(APP_ROOT."system/message.php");
 
 	wlog("==================================================");

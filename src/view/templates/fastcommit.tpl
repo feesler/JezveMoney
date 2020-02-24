@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(TPL_PATH."commonhdr.tpl");	?>
 <script>
 var accounts = <?=JSON::encode($accArr)?>;
 var currencies = <?=JSON::encode($currArr)?>;

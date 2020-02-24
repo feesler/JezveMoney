@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(TPL_PATH."commonhdr.tpl");	?>
 <?php	Message::check();		?>
 <script>onReady(initLoginPage)</script>
 </head>

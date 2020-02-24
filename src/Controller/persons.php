@@ -12,7 +12,7 @@ class PersonsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "toolbar.js", "persons.js");
 
-		include("./view/templates/persons.tpl");
+		include(TPL_PATH."persons.tpl");
 	}
 
 
@@ -44,7 +44,7 @@ class PersonsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "persons.js");
 
-		include("./view/templates/person.tpl");
+		include(TPL_PATH."person.tpl");
 	}
 
 
@@ -78,7 +78,7 @@ class PersonsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "persons.js");
 
-		include("./view/templates/person.tpl");
+		include(TPL_PATH."person.tpl");
 	}
 
 

@@ -32,7 +32,7 @@ class UserController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "main.js");
 
-		include("./view/templates/login.tpl");
+		include(TPL_PATH."login.tpl");
 	}
 
 
@@ -79,7 +79,7 @@ class UserController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "main.js");
 
-		include("./view/templates/register.tpl");
+		include(TPL_PATH."register.tpl");
 	}
 
 

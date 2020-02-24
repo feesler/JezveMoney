@@ -36,6 +36,6 @@ class QueryAdminController extends AdminController
 
 		$this->buildCSS();
 
-		include("./view/templates/query.tpl");
+		include(ADMIN_TPL_PATH."query.tpl");
 	}
 }

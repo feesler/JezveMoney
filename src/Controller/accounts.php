@@ -26,7 +26,7 @@ class AccountsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "toolbar.js", "accounts.js");
 
-		include("./view/templates/accounts.tpl");
+		include(TPL_PATH."accounts.tpl");
 	}
 
 
@@ -69,7 +69,7 @@ class AccountsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
 
-		include("./view/templates/account.tpl");
+		include(TPL_PATH."account.tpl");
 	}
 
 
@@ -116,7 +116,7 @@ class AccountsController extends Controller
 		$this->buildCSS();
 		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
 
-		include("./view/templates/account.tpl");
+		include(TPL_PATH."account.tpl");
 	}
 
 

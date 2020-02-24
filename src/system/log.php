@@ -2,7 +2,7 @@
 
 class Logger
 {
-	private static $filename = APPROOT."system/logs/log.txt";
+	private static $filename = LOGS_PATH."log.txt";
 
 
 	// Write string to log file

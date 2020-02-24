@@ -12,10 +12,10 @@
 <meta name="msapplication-TileColor" content="#20A0FF">
 <title><?=$titleString?></title>
 <?php	foreach($this->cssArr as $cssFile) {	?>
-<link rel="stylesheet" type="text/css" href="<?=BASEURL?><?=auto_version("view/css/".$cssFile)?>">
+<link rel="stylesheet" type="text/css" href="<?=BASEURL.auto_version("view/css/".$cssFile)?>">
 <?php	}	?>
 <?php	foreach($this->jsArr as $jsFile) {	?>
-<script type="text/javascript" src="<?=BASEURL?><?=auto_version("view/js/".$jsFile)?>"></script>
+<script type="text/javascript" src="<?=BASEURL.auto_version("view/js/".$jsFile)?>"></script>
 <?php	}	?>
 <script>
 var baseURL = '<?=BASEURL?>';

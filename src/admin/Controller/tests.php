@@ -20,6 +20,6 @@ class TestsAdminController extends AdminController
 
 		$this->jsAdminModule[] = "tests/index.js";
 
-		include("./view/templates/tests.tpl");
+		include(ADMIN_TPL_PATH."tests.tpl");
 	}
 }

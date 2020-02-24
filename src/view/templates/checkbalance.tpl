@@ -1,4 +1,4 @@
-<?php	include("./view/templates/commonhdr.tpl");	?>
+<?php	include(TPL_PATH."commonhdr.tpl");	?>
 <style>
 table{border-collapse:collapse;}
 td{ padding: 2px 5px; border:1px solid #000000; }
