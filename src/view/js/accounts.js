@@ -109,25 +109,26 @@ function onTileClick(acc_id)
 		tile.appendChild(actDiv);
 	}
 
-	show(edit_btn, (accounts.count() == 1));
-	show(export_btn, (accounts.count() == 1));
-	show(del_btn, (accounts.count() > 0));
+	var selCount = accounts.count();
+	show(edit_btn, (selCount == 1));
+	show(export_btn, (selCount > 0));
+	show(del_btn, (selCount > 0));
 
 	selArr = accounts.getIdArray();
 	delaccounts.value = selArr.join();
 
-	if (accounts.count() == 1)
+	if (selCount == 1)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
 			edit_btn.firstElementChild.href = baseURL + 'accounts/edit/' + selArr[0];
 	}
 
-	if (accounts.count() > 0)
+	if (selCount > 0)
 	{
 		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
 		{
 			var exportURL = baseURL + 'accounts/export/';
-			if (accounts.count() == 1)
+			if (selCount == 1)
 				exportURL += selArr[0];
 			else
 				exportURL += '?' + urlJoin(selArr);
@@ -135,8 +136,8 @@ function onTileClick(acc_id)
 		}
 	}
 
-	show('toolbar', (accounts.count() > 0));
-	if (accounts.count() > 0)
+	show('toolbar', (selCount > 0));
+	if (selCount > 0)
 	{
 		onScroll();
 	}
