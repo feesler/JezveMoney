@@ -37,10 +37,7 @@ class AccountsView extends TestView
 	// Select specified account, click on edit button and return navigation promise
 	async goToUpdateAccount(num)
 	{
-		if (!this.content.tiles || this.content.tiles.items.length <= num)
-			throw new Error('Wrong account number specified');
-
-		await this.content.tiles.items[num].click();
+		await this.selectAccounts(num);
 
 		if (!this.content.toolbar.elem || !this.isVisible(this.content.toolbar.elem) ||
 			!this.content.toolbar.editBtn || !this.isVisible(this.content.toolbar.editBtn.elem))
@@ -50,14 +47,13 @@ class AccountsView extends TestView
 	}
 
 
-	// Delete secified accounts and return navigation promise
-	async deleteAccounts(acc)
+	async selectAccounts(acc)
 	{
-		if (!acc)
+		if (typeof acc === 'undefined')
 			throw new Error('No accounts specified');
 
 		if (!Array.isArray(acc))
-			acc = [acc];
+			acc = [ acc ];
 
 		let ind = 0;
 		for(let acc_num of acc)
@@ -78,6 +74,25 @@ class AccountsView extends TestView
 
 			ind++;
 		}
+	}
+
+
+	async deselectAccounts()
+	{
+		let ind = 0;
+		for(let acc_num = 0, l = this.content.tiles.items.length; acc_num < l; acc_num++)
+		{
+			let tile = this.content.tiles.items[acc_num];
+			if (tile.isActive)
+				await this.performAction(() => this.content.tiles.items[acc_num].click());
+		}
+	}
+
+
+	// Delete secified accounts and return navigation promise
+	async deleteAccounts(acc)
+	{
+		await this.selectAccounts(acc);
 
 		await this.performAction(() => this.content.toolbar.delBtn.click());
 
@@ -88,6 +103,24 @@ class AccountsView extends TestView
 			throw new Error('OK button not found');
 
 		return this.navigation(() => this.click(this.content.delete_warning.okBtn));
+	}
+
+
+	// Export transactions of specified accounts
+	async exportAccounts(acc)
+	{
+		let urlBefore = this.location;
+		await this.selectAccounts(acc);
+
+		let downloadURL = await this.prop(this.content.toolbar.exportBtn.linkElem, 'href');
+
+		let exportResp = await this.httpReq('GET', downloadURL);
+		if (!exportResp || exportResp.status != 200)
+			throw new Error('Invalid response');
+
+		await this.deselectAccounts();
+
+		return exportResp.body;
 	}
 }
 

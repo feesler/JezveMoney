@@ -186,6 +186,22 @@ class Application
 	}
 
 
+	async exportAccountsTest()
+	{
+		this.view.setBlock('Export accounts', 2);
+
+		let tests = [
+			[0],
+			[0, 1],
+		];
+
+		for(let props of tests)
+		{
+			await this.run.accounts.exportTest(props);
+		}
+	}
+
+
 	async personTests()
 	{
 		this.view.setBlock('Persons', 1);
@@ -232,6 +248,7 @@ class Application
 		await this.transactionsListTests();
 		await this.deleteTransactionTests();
 
+		await this.exportAccountsTest();
 		await this.updateAccountTests();
 		await this.deleteAccountTests();
 	}

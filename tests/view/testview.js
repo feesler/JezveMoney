@@ -128,13 +128,18 @@ class TestView
 			throw new Error('Wrong tile structure');
 
 		let self = this;
-		let tileObj = { elem : tileEl, linkElem : await this.query(tileEl, ':scope > *'),
-						balanceEL : await this.query(tileEl, '.acc_bal'),
-						nameEL : await this.query(tileEl, '.acc_name') };
+		let tileObj = {
+			elem : tileEl,
+			linkElem : await this.query(tileEl, ':scope > *'),
+			balanceEL : await this.query(tileEl, '.acc_bal'),
+			nameEL : await this.query(tileEl, '.acc_name')
+		};
 
 		tileObj.id = this.parseId(await this.prop(tileEl, 'id'));
 		tileObj.balance = await this.prop(tileObj.balanceEL, 'innerText');
 		tileObj.name = await this.prop(tileObj.nameEL, 'innerText');
+
+		tileObj.isActive = !!(await this.query(tileEl, '.act'));
 
 		let iconObj = findIconByClassName(await this.prop(tileObj.elem, 'className'));
 		tileObj.icon = iconObj.id;

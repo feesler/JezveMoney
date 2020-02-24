@@ -1,8 +1,9 @@
 import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
 import { TransactionsList } from '../trlist.js';
+import { Currency } from '../currency.js';
 import { api } from '../api.js';
-import { test, formatProps } from '../common.js';
+import { getTransactionTypeStr, test, formatDate, formatProps } from '../common.js';
 
 
 let runAccounts =
@@ -170,6 +171,9 @@ let runAccounts =
 
 	async del(accounts)
 	{
+		if (!Array.isArray(accounts))
+			accounts = [ accounts ];
+
 		this.view.setBlock(`Delete account(s) [${accounts.join()}]`, 2);
 
 		// Navigate to create account view
@@ -237,7 +241,7 @@ let runAccounts =
 
 		// Prepare expected updates of accounts list
 		let userAccList = accList.filter(item => item.owner_id == this.owner_id);
-		let ids = this.state.positionsToIds(userAccList, pos)
+		let ids = this.state.positionsToIds(userAccList, pos);
 		let expectedList = this.state.deleteByIds(accList, ids);
 		// Prepare expected updates of transactions
 		let expTransList = trBefore.deleteAccounts(accList, ids);
@@ -257,7 +261,57 @@ let runAccounts =
 		await test('Main page widgets update', async () => {}, this.view);
 
 		await this.run.transactions.checkData('List of transactions update', expTransList);
-	}
+	},
+
+
+	async exportTest(accounts)
+	{
+		if (!Array.isArray(accounts))
+			accounts = [ accounts ];
+
+		// Navigate to create account view
+		if (!(this.view instanceof AccountsView))
+		{
+			await this.goToMainView();
+			await this.view.goToAccounts();
+		}
+
+		// Prepare expected content
+		let delimiter = ';';
+		let rows = [];
+		let headerRow = [ 'ID', 'Type', 'Source amount', 'Destination amount', 'Source result', 'Destination result', 'Date', 'Comment' ];
+		rows.push(headerRow.join(delimiter));
+
+		let userAccList = await this.state.getUserAccountsList();
+		let ids = this.state.positionsToIds(userAccList, accounts);
+		let trList = await this.state.getTransactionsList();
+		trList = trList.filterByAccounts(ids);
+		let transactions = trList.sortAsc();
+
+		for(let transaction of transactions)
+		{
+			let row = [
+				transaction.id,
+				getTransactionTypeStr(transaction.type),
+				Currency.format(transaction.src_curr, transaction.src_amount),
+				Currency.format(transaction.dest_curr, transaction.dest_amount),
+				Currency.format(transaction.src_curr, transaction.src_result),
+				Currency.format(transaction.dest_curr, transaction.dest_result),
+				transaction.date,
+				transaction.comment
+			];
+
+			rows.push(row.join(delimiter));
+		}
+
+		let expectedContent = rows.join('\r\n');
+		expectedContent = expectedContent.trim();
+
+		let content = await this.view.exportAccounts(accounts);
+		content = content.trim();
+
+		await test(`Export accounts [${accounts.join()}]`, () => expectedContent == content, this.environment);
+	},
 };
 
 
