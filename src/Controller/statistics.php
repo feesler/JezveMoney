@@ -58,10 +58,10 @@ class StatisticsController extends Controller
 		}
 
 		// Prepare transaction types menu
-		$trTypes = ["All", "Expense", "Income", "Transfer", "Debt"];
+		$trTypes = [0 => "All", EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 		$transMenu = [];
 		$baseUrl = BASEURL."statistics/";
-		foreach($trTypes as $ind => $trTypeName)
+		foreach($trTypes as $type => $trTypeName)
 		{
 			$params = ["type" => strtolower($trTypeName)];
 			if ($byCurrency)
@@ -75,7 +75,12 @@ class StatisticsController extends Controller
 					$params["acc_id"] = $acc_id;
 			}
 
-			$transMenu[] = [$ind, $trTypeName, urlJoin($baseUrl, $params)];
+			$menuItem = new stdClass;
+			$menuItem->type = $type;
+			$menuItem->title = $trTypeName;
+			$menuItem->link = urlJoin($baseUrl, $params);
+
+			$transMenu[] = $menuItem;
 		}
 
 		$byCurrArr = [["title" => "Accounts", "selected" => ($byCurrency == FALSE)],

@@ -23,10 +23,10 @@
 					<div>
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
-			if ($menuItem[0] == $trans_type) {		?>
-							<span><b><?=e($menuItem[1])?></b></span>
+			if ($menuItem->type == $trans_type) {		?>
+							<span><b><?=e($menuItem->title)?></b></span>
 <?php		} else {		?>
-							<span><a href="<?=e($menuItem[2])?>"><?=e($menuItem[1])?></a></span>
+							<span><a href="<?=e($menuItem->link)?>"><?=e($menuItem->title)?></a></span>
 <?php		}
 		}	?>
 						</div>
