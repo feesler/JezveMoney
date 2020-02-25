@@ -166,16 +166,32 @@ class Application
 	async createAccountTests()
 	{
 		this.view.setBlock('Create accounts', 2);
-		await this.run.accounts.create({ name : 'acc_1', balance : 1000.01, curr_id : 1 });
-		await this.run.accounts.create({ name : 'acc_2', balance : '1000.01', curr_id : 3 });
+
+		let tests = [
+			{ name : 'acc_1', balance : 1000.01, curr_id : 1 },
+			{ name : 'acc_2', balance : '1000.01', curr_id : 3 },
+		];
+
+		for(let props of tests)
+		{
+			await this.run.accounts.create(props);
+		}
 	}
 
 
 	async updateAccountTests()
 	{
 		this.view.setBlock('Update accounts', 2);
-		await this.run.accounts.update({ pos : 0, icon : 1, curr_id : 2 });
-		await this.run.accounts.update({ pos : 0, curr_id : 1 });
+
+		let tests = [
+			{ pos : 0, icon : 1, curr_id : 2 },
+			{ pos : 0, curr_id : 1 },
+		];
+
+		for(let props of tests)
+		{
+			await this.run.accounts.update(props);
+		}
 	}
 
 
@@ -206,15 +222,59 @@ class Application
 	{
 		this.view.setBlock('Persons', 1);
 
-		await this.goToMainView();
-		await this.view.goToPersons();
-		await this.run.persons.checkInitial();
-		await this.run.persons.create('Alex');
-		await this.run.persons.create('Maria');
-		await this.run.persons.create('Johnny');
-		await this.run.persons.create('Иван');
-		await this.run.persons.update(3, 'Ivan<');
-		await this.run.persons.del([0, 2]);
+		await this.createPersonTests();
+		await this.updatePersonTests();
+		await this.deletePersonTests();
+	}
+
+
+	async createPersonTests()
+	{
+		this.view.setBlock('Create persons', 2);
+
+		let tests = [
+			{ name : '&&<div>' },
+			{ name : 'Alex' },
+			{ name : 'Maria' },
+			{ name : 'Johnny' },
+			{ name : 'Иван' },
+		];
+
+		for(let props of tests)
+		{
+			await this.run.persons.create(props.name);
+		}
+	}
+
+
+	async updatePersonTests()
+	{
+		this.view.setBlock('Update persons', 2);
+
+		let tests = [
+			{ pos : 4, name : 'Ivan<' },
+		];
+
+		for(let props of tests)
+		{
+			await this.run.persons.update(props.pos, props.name);
+		}
+	}
+
+
+	async deletePersonTests()
+	{
+		this.view.setBlock('Delete persons', 2);
+
+		let tests = [
+			[0],
+			[0, 2],
+		];
+
+		for(let props of tests)
+		{
+			await this.run.persons.del(props);
+		}
 	}
 
 

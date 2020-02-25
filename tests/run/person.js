@@ -5,13 +5,6 @@ import { MainView } from '../view/main.js';
 
 let runPersons =
 {
-	async checkInitial()
-	{
-		this.view.expectedState = { value : { tiles : { items : { length : 0 } } } };
-		await test('Initial persons structure', () => {}, this.view);
-	},
-
-
 	// From persons list view go to new person view, input name and submit
 	// Next check name result and callback
 	async create(personName)
@@ -97,7 +90,7 @@ let runPersons =
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of person not specified');
 
-		this.view.setBlock('Delete person from update view [' + pos + ']', 2);
+		this.view.setBlock(`Delete person from update view [${pos}]`, 2);
 
 		let accList = await this.state.getAccountsList();
 		let pList = await this.state.getPersonsList();
@@ -129,7 +122,7 @@ let runPersons =
 		expTransList = expTransList.updateResults(accList);
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
-		await test('Delete person [' + pos + ']', () => {}, this.view);
+		await test(`Delete person [${pos}]`, () => {}, this.view);
 
 		this.state.accounts = null;
 		this.state.persons = null;
