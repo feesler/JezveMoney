@@ -117,8 +117,6 @@
 		}
 	}
 
-	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
-
 	require_once(APP_ROOT."system/json.php");
 	spl_autoload_register("autoLoadClass");
 	require_once(APP_ROOT."vendor/autoload.php");

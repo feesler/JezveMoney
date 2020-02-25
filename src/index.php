@@ -1,6 +1,8 @@
 <?php
 	require_once("./system/setup.php");
 
+	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
+
 	$controller = NULL;
 	$action = NULL;
 
