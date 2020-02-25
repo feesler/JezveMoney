@@ -18,12 +18,12 @@
 
 					<div class="profile_block">
 						<h2>Account name</h2>
-						<span><?=$user_login;?></span>
+						<span><?=e($user_login)?></span>
 					</div>
 
 					<div class="profile_block">
 						<h2>User name</h2>
-						<span id="namestatic"><?=$person_name?></span>
+						<span id="namestatic"><?=e($person_name)?></span>
 						<div><a id="changeNameBtn" href="<?=BASEURL?>profile/changename/">Change</a></div>
 					</div>
 
@@ -68,7 +68,7 @@
 <form method="post" action="<?=BASEURL?>profile/changename/">
 	<div class="non_float">
 		<label for="newname">New name</label>
-		<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=$person_name?>"></div>
+		<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=e($person_name)?>"></div>
 	</div>
 </form>
 </div>

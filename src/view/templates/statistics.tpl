@@ -36,9 +36,9 @@
 								<select id="filter_type">
 <?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
 <?php		if ($byCurrItem["selected"]) {		?>
-									<option value="<?=$ind?>" selected><?=$byCurrItem["title"]?></option>
+									<option value="<?=e($ind)?>" selected><?=e($byCurrItem["title"])?></option>
 <?php		} else {	?>
-									<option value="<?=$ind?>"><?=$byCurrItem["title"]?></option>
+									<option value="<?=e($ind)?>"><?=e($byCurrItem["title"])?></option>
 <?php		}	?>
 <?php	}	?>
 								</select>
@@ -52,9 +52,9 @@
 								<select id="acc_id">
 <?php	foreach($accArr as $accInfo) {
 			if ($accInfo->id == $acc_id) {	?>
-									<option value="<?=$accInfo->id?>" selected><?=$accInfo->name?></option>
+									<option value="<?=e($accInfo->id)?>" selected><?=e($accInfo->name)?></option>
 <?php		} else {	?>
-									<option value="<?=$accInfo->id?>"><?=$accInfo->name?></option>
+									<option value="<?=e($accInfo->id)?>"><?=e($accInfo->name)?></option>
 <?php		}
 		}		?>
 								</select>
@@ -68,9 +68,9 @@
 								<select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $curr_id) {	?>
-									<option value="<?=$currInfo->id?>" selected><?=$currInfo->name?></option>
+									<option value="<?=e($currInfo->id)?>" selected><?=e($currInfo->name)?></option>
 <?php		} else {	?>
-									<option value="<?=$currInfo->id?>"><?=$currInfo->name?></option>
+									<option value="<?=e($currInfo->id)?>"><?=e($currInfo->name)?></option>
 <?php		}
 		}		?>
 								</select>
@@ -80,9 +80,9 @@
 								<select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
-									<option value="<?=$val?>" selected><?=$grtype?></option>
+									<option value="<?=e($val)?>" selected><?=e($grtype)?></option>
 <?php		} else { ?>
-									<option value="<?=$val?>"><?=$grtype?></option>
+									<option value="<?=e($val)?>"><?=e($grtype)?></option>
 <?php		} ?>
 <?php	}	?>
 								</select>
@@ -94,13 +94,13 @@
 <?php	if (is_empty($dateFmt)) {		?>
 								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php	} else { 	?>
-								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=$dateFmt?></span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php	} 	?>
 								<div id="date_block" style="display: none;">
 									<div>
 										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
 										<div class="stretch_input rbtn_input">
-											<input id="date" name="date" type="text" value="<?=$dateFmt?>">
+											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>
 										<div id="calendar"></div>
 									</div>
