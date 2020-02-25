@@ -109,7 +109,7 @@ class FastCommitController extends Controller
 			}
 			$bytesWrite = fwrite($fhnd, $file_cont);
 			fclose($fhnd);
-			wlog("Bytes written: ".$bytesWrite);
+
 			$totalSize = filesize($fname);
 
 			// Start process file
@@ -168,7 +168,6 @@ class FastCommitController extends Controller
 		do
 		{
 			$descVal = $src->getCell($desc_col.$row_ind)->getValue();
-			wlog("Descr(".$desc_col.$row_ind."): ".$descVal);
 			$edesc = trim($descVal);
 			if (is_empty($edesc))
 				break;
@@ -176,7 +175,6 @@ class FastCommitController extends Controller
 			$dataObj = new stdClass;
 
 			$dateVal = $src->getCell($date_col.$row_ind)->getValue();
-			wlog("Date(".$desc_col.$row_ind."): ".$dateVal);
 			if ($readedType == "Csv")
 			{
 				$dateFmt = strtotime($dateVal);
@@ -186,7 +184,6 @@ class FastCommitController extends Controller
 				$dateTime = Date::excelToDateTimeObject($dateVal);
 				$dateFmt = $dateTime->getTimestamp();
 			}
-			wlog("Formatted: ".$dateFmt.", ".date("d.m.Y", $dateFmt));
 
 			$dataObj->date = date("d.m.Y", $dateFmt);
 

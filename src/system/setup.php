@@ -119,9 +119,6 @@
 
 	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
 
-
-	$sitetheme = 1;
-
 	require_once(APP_ROOT."system/json.php");
 	spl_autoload_register("autoLoadClass");
 	require_once(APP_ROOT."vendor/autoload.php");

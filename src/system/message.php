@@ -93,11 +93,11 @@ class Message
 
 		$msgMessage = $msgParam[1];
 
-		$msgClass = "msg";
+		$msgClass = "";
 		if ($msgType == MSG_TYPE_SUCCESS)
-			$msgClass .= " msg_success";
+			$msgClass = "msg_success";
 		else if ($msgType == MSG_TYPE_ERROR)
-			$msgClass .= " msg_error";
+			$msgClass = "msg_error";
 
 		include(TPL_PATH."message.tpl");
 
