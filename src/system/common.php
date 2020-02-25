@@ -76,20 +76,13 @@
 
 
 	// Convert string to be compatible with HTML
-	function htmlConvert($str, $lineEnd = FALSE)
+	function e($str, $lineEnd = FALSE)
 	{
 		$str = htmlentities($str, ENT_QUOTES, "UTF-8");
 		if ($lineEnd)
 			$str = str_replace(["\r\n", "\r", "\n"], "<br>", $str);
 
 		return $str;
-	}
-
-
-	// Short alias for htmlConvert
-	function e($str)
-	{
-		return htmlConvert($str);
 	}
 
 
