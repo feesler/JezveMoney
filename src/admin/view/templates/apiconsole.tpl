@@ -15,10 +15,10 @@ onReady(initControls);
 
 					<div class="left_column">
 						<ul id="controllersList" class="cont_list">
-							<li>
+							<li class="active">
 								<button>Accounts</button>
 								<ul class="sub_list">
-									<li data-target="getAccForm">Get accounts</li>
+									<li data-target="getAccForm" class="active">Get accounts</li>
 									<li data-target="readAccForm">Read account</li>
 									<li data-target="createAccForm">Create account</li>
 									<li data-target="editAccForm">Edit account</li>
@@ -81,16 +81,16 @@ onReady(initControls);
 					</div>
 
 					<div class="center_column">
-						<div id="getAccForm" class="test_container" style="display: none;">
+						<div id="getAccForm" class="test_form active">
 						<h3>Get accounts</h3>
-						<form action="<?=BASEURL?>api/account/list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account/list" method="get">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
 						</div>
 
-						<div id="readAccForm" class="test_container" style="display: none;">
+						<div id="readAccForm" class="test_form">
 						<h3>Read account</h3>
 						<div class="std_margin"><label for="readaccid">Id</label><input id="readaccid" type="text"></div>
 						<div class="acc_controls">
@@ -98,7 +98,7 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="createAccForm" class="test_container" style="display: none;">
+						<div id="createAccForm" class="test_form">
 						<h3>Create account</h3>
 						<div class="std_margin">
 							<label for="accname">Name</label>
@@ -121,7 +121,7 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="editAccForm" class="test_container" style="display: none;">
+						<div id="editAccForm" class="test_form">
 						<h3>Edit account</h3>
 						<div class="std_margin">
 							<label for="updaccid">Id</label>
@@ -148,7 +148,7 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="delAccForm" class="test_container" style="display: none;">
+						<div id="delAccForm" class="test_form">
 						<h3>Delete account</h3>
 						<div class="std_margin">
 							<label for="delaccounts">Accounts (comma separated ids)</label>
@@ -159,18 +159,18 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="resetAccForm" class="test_container" style="display: none;">
+						<div id="resetAccForm" class="test_form">
 						<h3>Reset accounts</h3>
-						<form action="<?=BASEURL?>api/account/reset" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/account/reset" method="post">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
 						</div>
 
-						<div id="getTrForm" class="test_container" style="display: none;">
+						<div id="getTrForm" class="test_form">
 						<h3>Get transactions</h3>
-						<form action="<?=BASEURL?>api/transaction/list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/list" method="get">
 							<div class="std_margin">
 								<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
 								<input name="count" type="text" value="10" disabled>
@@ -201,7 +201,7 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="readTrForm" class="test_container" style="display: none;">
+						<div id="readTrForm" class="test_form">
 						<h3>Read transaction</h3>
 						<div class="std_margin">
 							<label for="readtransid">Id</label>
@@ -212,9 +212,9 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="createTrForm" class="test_container" style="display: none;">
+						<div id="createTrForm" class="test_form">
 						<h3>Create transaction</h3>
-						<form action="<?=BASEURL?>api/transaction/create" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/create" method="post">
 							<div class="std_margin">
 								<label for="transtype">Type (1-3)</label>
 								<input name="transtype" type="text">
@@ -261,9 +261,9 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="createDebtForm" class="test_container" style="display: none;">
+						<div id="createDebtForm" class="test_form">
 						<h3>Create debt</h3>
-						<form action="<?=BASEURL?>api/transaction/create" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/create" method="post">
 							<input name="transtype" type="hidden" value="4">
 							<div class="std_margin">
 								<label for="person_id">Person id</label>
@@ -312,9 +312,9 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="editTrForm" class="test_container" style="display: none;">
+						<div id="editTrForm" class="test_form">
 						<h3>Edit transaction</h3>
-						<form action="<?=BASEURL?>api/transaction/update" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/update" method="post">
 							<div class="std_margin">
 								<label for="transid">Transaction id</label>
 								<input name="transid" type="text">
@@ -368,9 +368,9 @@ onReady(initControls);
 						</div>
 
 
-						<div id="editDebtForm" class="test_container" style="display: none;">
+						<div id="editDebtForm" class="test_form">
 						<h3>Edit debt</h3>
-						<form action="<?=BASEURL?>api/transaction/update" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/update" method="post">
 							<input name="transtype" type="hidden" value="4">
 							<div class="std_margin">
 								<label for="transid">Transaction id</label>
@@ -424,7 +424,7 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="delTrForm" class="test_container" style="display: none;">
+						<div id="delTrForm" class="test_form">
 						<h3>Delete transactions</h3>
 						<div class="std_margin">
 							<label for="deltransactions">Transactions (comma separated ids)</label>
@@ -436,9 +436,9 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="setTrPosForm" class="test_container" style="display: none;">
+						<div id="setTrPosForm" class="test_form">
 						<h3>Set position of transacction</h3>
-						<form action="<?=BASEURL?>api/transaction/setpos" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/transaction/setpos" method="post">
 							<div class="std_margin">
 								<label for="id">Id</label>
 								<input name="id" type="text">
@@ -453,16 +453,16 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="getPersonsForm" class="test_container" style="display: none;">
+						<div id="getPersonsForm" class="test_form">
 						<h3>Get persons</h3>
-						<form action="<?=BASEURL?>api/person/list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person/list" method="get">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
 						</div>
 
-						<div id="readPersonForm" class="test_container" style="display: none;">
+						<div id="readPersonForm" class="test_form">
 						<h3>Read person</h3>
 						<div class="std_margin">
 							<label for="readpid">Id</label>
@@ -473,9 +473,9 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="createPersonForm" class="test_container" style="display: none;">
+						<div id="createPersonForm" class="test_form">
 						<h3>Create person</h3>
-						<form action="<?=BASEURL?>api/person/create" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person/create" method="post">
 							<div class="std_margin">
 								<label for="pname">Name</label>
 								<input id="pname" name="name" type="text">
@@ -486,9 +486,9 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="editPersonForm" class="test_container" style="display: none;">
+						<div id="editPersonForm" class="test_form">
 						<h3>Edit person</h3>
-						<form action="<?=BASEURL?>api/person/update" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/person/update" method="post">
 							<div class="std_margin">
 								<label for="updpid">Id</label>
 								<input id="updpid" name="id" type="text">
@@ -503,7 +503,7 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="delPersonForm" class="test_container" style="display: none;">
+						<div id="delPersonForm" class="test_form">
 						<h3>Delete persons</h3>
 						<div class="std_margin">
 							<label for="delpersons">Persons (comma separated ids)</label>
@@ -514,16 +514,16 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="getCurrForm" class="test_container" style="display: none;">
+						<div id="getCurrForm" class="test_form">
 						<h3>Get currencies</h3>
-						<form action="<?=BASEURL?>api/currency/list" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/currency/list" method="get">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
 						</div>
 
-						<div id="readCurrForm" class="test_container" style="display: none;">
+						<div id="readCurrForm" class="test_form">
 						<h3>Read currency</h3>
 						<div class="std_margin">
 							<label for="curr_id">Id</label>
@@ -534,9 +534,9 @@ onReady(initControls);
 						</div>
 						</div>
 
-						<div id="loginForm" class="test_container" style="display: none;">
+						<div id="loginForm" class="test_form">
 						<h3>Login</h3>
-						<form action="<?=BASEURL?>api/login/" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/login/" method="post">
 							<div class="std_margin">
 								<label for="login">Login</label>
 								<input name="login" type="text"><br>
@@ -552,9 +552,9 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="registerForm" class="test_container" style="display: none;">
+						<div id="registerForm" class="test_form">
 						<h3>Register</h3>
-						<form action="<?=BASEURL?>api/register/" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/register/" method="post">
 							<div class="std_margin">
 								<label for="login">Login</label>
 								<input name="login" type="text"><br>
@@ -574,18 +574,18 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="readProfileForm" class="test_container" style="display: none;">
+						<div id="readProfileForm" class="test_form">
 						<h3>Read profile</h3>
-						<form action="<?=BASEURL?>api/profile/read" method="get" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile/read" method="get">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
 						</div>
 
-						<div id="changeNameForm" class="test_container" style="display: none;">
+						<div id="changeNameForm" class="test_form">
 						<h3>Change name</h3>
-						<form action="<?=BASEURL?>api/profile/changename" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile/changename" method="post">
 							<div class="std_margin">
 								<label for="chname">Name</label>
 								<input id="chname" name="name" type="text"><br>
@@ -597,9 +597,9 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="changePwdForm" class="test_container" style="display: none;">
+						<div id="changePwdForm" class="test_form">
 						<h3>Change password</h3>
-						<form action="<?=BASEURL?>api/profile/changepass" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile/changepass" method="post">
 							<div class="std_margin">
 								<label for="oldpwd">Old password</label>
 								<input id="oldpwd" name="oldpwd" type="text"><br>
@@ -615,9 +615,9 @@ onReady(initControls);
 						</form>
 						</div>
 
-						<div id="resetAllForm" class="test_container" style="display: none;">
+						<div id="resetAllForm" class="test_form">
 						<h3>Reset all data</h3>
-						<form action="<?=BASEURL?>api/profile/reset" method="post" onsubmit="return onFormSubmit(this);">
+						<form action="<?=BASEURL?>api/profile/reset" method="post">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -626,7 +626,9 @@ onReady(initControls);
 					</div>
 
 					<div class="right_column">
-						<input id="clearResultsBtn" class="adm_act_btn" type="button" value="clear" style="display: none;">
+						<div class="req_log clearfix">
+							<h2>Request log</h2><input id="clearResultsBtn" class="adm_act_btn" type="button" value="clear" disabled>
+						</div>
 						<div id="results"></div>
 					</div>
 				</div>

@@ -34,6 +34,12 @@
 }
 
 
+.adm_act_btn:disabled
+{
+	background-color: #708290;
+}
+
+
 /* Admin table */
 .adm_tbl
 {

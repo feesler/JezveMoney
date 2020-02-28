@@ -1,3 +1,22 @@
+h2
+{
+	font-size: 18px;
+	font-weight: 400;
+	clear: both;
+	margin: 0px 0px 12px 0px;
+}
+
+
+h3
+{
+	font-size: 16px;
+	font-weight: 500;
+	clear: both;
+	margin: 0px 0px 12px 0px;
+}
+
+
+
 .left_column
 {
 	display: inline-block;
@@ -10,7 +29,8 @@
 {
 	display: inline-block;
 	float: left;
-	width: 50%;
+	width: 35%;
+	padding: 0 2.5%;
 }
 
 
@@ -18,15 +38,22 @@
 {
 	display: inline-block;
 	float: left;
-	width: 35%;
+	width: 45%;
 }
 
 
-.cont_list
+/* Left menus */
+
+/* Section header */
+.menu_section
 {
+	font-size: 18px;
+	font-weight: 500;
+	margin: 10px 0 0 0;
 }
 
 
+/* Menu lists */
 .cont_list > li
 {
 	padding: 5px;
@@ -68,6 +95,8 @@
 	list-style-type: none;
 	cursor: pointer;
 	padding: 5px 0px;
+	text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 
@@ -84,46 +113,231 @@
 }
 
 
-.test_container
+.btn_link
 {
-	background-color: #E0F0FF;
+	background: none;
+	cursor: pointer;
+	color: #2db8f8;
+	text-decoration: none;
+	font-size: inherit;
+}
+
+
+.btn_link:hover
+{
+	text-decoration: underline;
+}
+
+
+/* View containers */
+.test_form
+{
+	background-color: #f3f3f3;
 	max-width: 400px;
+	padding: 12px;
+	display: none;
+	border: 1px solid #BBBBBB;
+    border-radius: 3px;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+
+.test_form.active
+{
 	display: inline-block;
-	float: left;
-	margin: 0px 20px 20px 0px;
-	padding: 5px;
 }
 
-
-.res_container
+.test_form input[type="checkbox"]
 {
-	padding: 5px;
-	margin: 5px;
-	background-color: #66FFAA;
+	margin: 0 5px 2px 0;
+	vertical-align: middle;
 }
 
 
-h2
-{
-	font-family: "Segoe UI Light", "Segoe UI", Arial, sanf-serif;
-	font-size: 22px;
-	font-weight: normal;
-	clear: both;
-}
-
-
-h3
-{
-	font-family: "Segoe UI", Arial, sanf-serif;
-	font-size: 18px;
-	font-weight: normal;
-	clear: both;
-}
-
-
-input[type="text"]
+.test_form input[type="text"]
 {
 	border: 1px solid #000000;
 	float: none;
 	display: inline;
+	padding: 3px;
+}
+
+
+.test_form input:disabled
+{
+	border-color: #888888;
+}
+
+
+/* Info sections */
+.info_section
+{
+	margin: 25px 0 0 0;
+	overflow: hidden;
+}
+
+
+.info_section > div ul
+{
+	padding: 0 0 0 25px;
+	list-style-position: outside;
+}
+
+
+/* Markup */
+.params
+{
+	color: #0080BB;
+}
+
+
+.optional
+{
+	color: #808080;
+}
+
+
+.listpar
+{
+	color: #00BB80;
+}
+
+
+.objmembers
+{
+	padding: 0 0 0 15px;
+	display: block;
+}
+
+
+/* Requests log */
+
+/* Both request and response container */
+.req_item
+{
+	padding: 5px;
+	margin: 5px 0;
+	border: 1px solid #D7D7D7;
+	border-radius: 2px;
+}
+
+
+.req_item .req_container,
+.req_item .res_container
+{
+	margin: 5px 0;
+}
+
+
+/* Request */
+.req_item .req_container .title,
+.req_item .res_container .title
+{
+	font-size: 14px;
+	font-weight: bold;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: #FFFFFF;
+	background-color: #66a1f0;
+	cursor: pointer;
+	height: 25px;
+	line-height: 25px;
+}
+
+
+.req_item .req_container .title:before,
+.req_item .res_container .title:before
+{
+	content: '-';
+	padding: 0px 10px;
+	display: inline-block;
+	width: 0.5rem;
+	text-align: center;
+}
+
+
+.req_item .req_container .title:hover:before
+{
+	background-color: #95c3ff;
+}
+
+
+.req_item .req_container.collapsed .title:before,
+.req_item .res_container.collapsed .title:before
+{
+	content: '+';
+}
+
+
+.req_item .req_container.collapsed .req_details,
+.req_item .res_container.collapsed .res_details
+{
+	display: none;
+}
+
+
+.req_item .req_container .req_details,
+.req_item .res_container .res_details
+{
+	word-break: break-all;
+	font-size: 14px;
+	padding: 0 5px;
+}
+
+
+/* Result */
+.req_item .res_container.res_pending
+{
+	background: none;
+	border: 1px dashed #CCCCCC;
+	color: #CCCCCC;
+}
+
+
+.req_item .res_container.res_ok .title
+{
+	background-color: #65d458;
+}
+
+
+.req_item .res_container.res_fail .title
+{
+	background-color: #FF6666;
+}
+
+
+.req_item .res_container.res_ok .title:hover:before
+{
+	background-color: #59b74e;
+}
+
+
+.req_item .res_container.res_fail .title:hover:before
+{
+	background-color: #ff8a8a;
+}
+
+
+
+/* Requests log */
+.req_log
+{
+	overflow: hidden;
+}
+
+
+.req_log h2
+{
+	display: inline-block;
+	float: left;
+	clear: none;
+}
+
+
+.req_log input[type="button"]
+{
+	float: right;
+	display: inline-block;
 }
