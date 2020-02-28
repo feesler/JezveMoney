@@ -319,7 +319,7 @@ class TransactionApiController extends ApiController
 		if (!$tr_id || !$to_pos)
 			$respObj->fail();
 
-		if (!$this->model->updatePos($tr_id, $to_pos))
+		if (!$this->model->updatePosition($tr_id, $to_pos))
 			$respObj->fail();
 
 		$respObj->ok();

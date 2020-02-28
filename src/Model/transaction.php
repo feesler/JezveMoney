@@ -542,7 +542,7 @@ class TransactionModel extends CachedTable
 
 
 	// Update position of specified transaction and fix position of
-	public function updatePos($trans_id, $new_pos)
+	protected function updatePos($trans_id, $new_pos)
 	{
 		$trans_id = intval($trans_id);
 		$new_pos = intval($new_pos);
@@ -609,6 +609,17 @@ class TransactionModel extends CachedTable
 		$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $updateFromPos);
 
 		return TRUE;
+	}
+
+
+	// For external use: update position and commit affected
+	public function updatePosition($trans_id, $new_pos)
+	{
+		$res = $this->updatePos($trans_id, $new_pos);
+		if ($res)
+			$this->commitAffected();
+
+		return $res;
 	}
 
 
@@ -1332,7 +1343,7 @@ class TransactionModel extends CachedTable
 			{
 				$res[] = ["text" => 1, "active" => FALSE];
 				$res[] = ["text" => "..."];
-				for($i = $pages_count - ($breakLimit); $i < $pages_count; $i++)
+				for($i = $pages_count - $breakLimit; $i < $pages_count; $i++)
 				{
 					$res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
 				}
