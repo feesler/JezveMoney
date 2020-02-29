@@ -355,7 +355,7 @@ class BrowserEnvironment extends Environment
 
 		this.app = appInstance;
 		this.app.environment = this;
-		this.app.init();
+		await this.app.init();
 
 		if (!this.app.config || !this.app.config.url)
 			throw new Error('Invalid config: test URL not found');

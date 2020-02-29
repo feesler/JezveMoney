@@ -431,7 +431,7 @@ class NodeEnvironment extends Environment
 
 			this.app = appInstance;
 			this.app.environment = this;
-			this.app.init();
+			await this.app.init();
 
 			this.results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
