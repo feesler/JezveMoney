@@ -11,6 +11,10 @@ let runAPI =
 	{
 		let env = this.environment;
 
+		const RUB = 1;
+		const USD = 2;
+		const EUR = 3;
+
 		api.setEnv(this);
 
 		env.setBlock('API tests', 1);
@@ -23,17 +27,58 @@ let runAPI =
 		const person = this.run.api.person;
 		const transaction = this.run.api.transaction;
 
-		await test('Login user', () => api.user.login(this.config.testUser.login, this.config.testUser.password), env);
+		// Register new user
+		env.setBlock('User', 2);
+
+		await api.user.logout();
+		await test('User registration', () => api.user.register(this.config.apiTestUser), env);
+
+		await test('Login new user', () => api.user.login(this.config.apiTestUser), env);
+
+		env.setBlock('Profile', 2);
+
+		let newName = 'App tester';
+		await test('Change user name', async () => 
+		{
+			let chnameRes = await api.profile.changeName({ name : newName })
+			if (!chnameRes)
+				throw new Error('Fail to change user name');
+
+			let profileData = await api.profile.read();
+			return (profileData && profileData.name == newName);
+		}, env);
+
+		let newPass = '54321';
+		await test('Change user password', async () => 
+		{
+			let chpassRes = await api.profile.changePassword({ oldPassword: this.config.apiTestUser.password, newPassword: newPass })
+			if (!chpassRes)
+				throw new Error('Fail to change user password');
+
+			await api.user.logout();
+			let loginRes = await api.user.login({
+				login : this.config.apiTestUser.login,
+				password : newPass
+			});
+
+			if (loginRes)
+				this.config.apiTestUser.password = newPass;
+
+			return loginRes;
+		}, env);
+
+		this.state.accounts = null;
+		this.state.persons = null;
+		this.state.transactions = null;
+
+		// Login with main test user
+		await test('Login main user', () => api.user.login(this.config.testUser), env);
 
 		await test('Reset all data', () => api.profile.reset(), env);
 
 		env.setBlock('Accounts', 2);
 
 		await test('Reset accounts', () => api.account.reset(), env);
-
-		const RUB = 1;
-		const USD = 2;
-		const EUR = 3;
 
 		let ACC_RUB = await account.createTest({ name : 'acc ru', currency : RUB, balance : 100, icon : 1 });
 		let CASH_RUB = await account.createTest({ name : 'cash ru', currency : RUB, balance : 5000, icon : 3 });
@@ -179,10 +224,19 @@ let runAPI =
 		await person.deleteTest(PERSON_Y);
 
 
-		 /**
-		  * Delete transaction
-		  */
+		/**
+		 * Delete transaction
+		 */
 		await transaction.deleteTest([ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ]);
+
+
+		/**
+		 * Delete user profile
+		 */
+		await test('Login new user', () => api.user.login(this.config.apiTestUser), env);
+		await test('Delete user profile', () => api.profile.del(), env);
+
+		await api.user.login(this.config.testUser);
 	}
 
 };

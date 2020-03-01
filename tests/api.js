@@ -149,9 +149,9 @@ let apiModule = (function()
  */
 
 	// Try to login user and return boolean result
-	async function loginUser(login, password)
+	async function loginUser({ login, password })
 	{
-		let apiRes = await apiPost('login', { login : login, pwd : password });
+		let apiRes = await apiPost('login', { login, pwd : password });
 
 		return (apiRes && apiRes.result && apiRes.result == 'ok');
 	}
@@ -160,6 +160,14 @@ let apiModule = (function()
 	async function logoutUser()
 	{
 		let apiRes = await apiPost('logout');
+
+		return (apiRes && apiRes.result && apiRes.result == 'ok');
+	}
+
+
+	async function registerUser({ login, password, name })
+	{
+		let apiRes = await apiPost('register', { login, password, name });
 
 		return (apiRes && apiRes.result && apiRes.result == 'ok');
 	}
@@ -176,10 +184,36 @@ let apiModule = (function()
 	}
 
 
+	async function changeUserName({ name })
+	{
+		let apiRes = await apiPost('profile/changename', { name });
+
+		return (apiRes && apiRes.result && apiRes.result == 'ok');
+	}
+
+
+	async function changeUserPassword({ oldPassword, newPassword })
+	{
+		let apiRes = await apiPost('profile/changepass', { oldpwd : oldPassword, newpwd : newPassword });
+
+		return (apiRes && apiRes.result && apiRes.result == 'ok');
+	}
+
+
 	// Reset all data and return boolean result
 	async function resetProfile()
 	{
 		let apiRes = await apiPost('profile/reset');
+
+		return (apiRes && apiRes.result && apiRes.result == 'ok');
+	}
+
+
+	// Delete user and all related data
+	async function deleteProfile()
+	{
+		let apiRes = await apiPost('profile/delete');
+
 		return (apiRes && apiRes.result && apiRes.result == 'ok');
 	}
 
@@ -561,12 +595,16 @@ let apiModule = (function()
 
 		user : {
 			login : loginUser,
-			logout: logoutUser
+			logout: logoutUser,
+			register : registerUser
 		},
 
 		profile : {
 			read : readProfile,
-			reset : resetProfile
+			changeName : changeUserName,
+			changePassword : changeUserPassword,
+			reset : resetProfile,
+			del: deleteProfile,
 		},
 
 		account : {
