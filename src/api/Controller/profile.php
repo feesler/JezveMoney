@@ -94,4 +94,18 @@ class ProfileApiController extends ApiController
 
 		$respObj->ok();
 	}
+
+	
+	public function del()
+	{
+		$respObj = new apiResponse;
+
+		if (!$this->isPOST())
+			$respObj->fail();
+
+		if (!$this->uMod->del($this->user_id))
+			$respObj->fail();
+
+		$respObj->ok();
+	}
 }

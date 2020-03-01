@@ -142,8 +142,6 @@ class ProfileController extends Controller
 		if (!$this->uMod->del($this->user_id))
 			$this->fail($defMsg);
 
-		$this->uMod->logout();
-
 		Message::set(MSG_PROFILE_DELETE);
 
 		setLocation(BASEURL."login/");

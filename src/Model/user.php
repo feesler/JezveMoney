@@ -559,4 +559,11 @@ class UserModel extends CachedTable
 
 		return TRUE;
 	}
+
+
+	protected function postDelete($items)
+	{
+		if ($this->currentUser && in_array($this->currentUser->id, $items))
+			$this->logout();
+	}
 }
