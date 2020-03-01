@@ -157,6 +157,14 @@ let apiModule = (function()
 	}
 
 
+	async function logoutUser()
+	{
+		let apiRes = await apiPost('logout');
+
+		return (apiRes && apiRes.result && apiRes.result == 'ok');
+	}
+
+
 	// Read profile data of user
 	async function readProfile()
 	{
@@ -552,7 +560,8 @@ let apiModule = (function()
 		},
 
 		user : {
-			login : loginUser
+			login : loginUser,
+			logout: logoutUser
 		},
 
 		profile : {

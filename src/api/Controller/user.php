@@ -27,6 +27,21 @@ class UserApiController extends ApiController
 	}
 
 
+	public function logout()
+	{
+		wlog("UserApiController::logout()");
+
+		$respObj = new apiResponse;
+
+		if (!$this->isPOST())
+			$respObj->fail();
+
+		$this->uMod->logout();
+
+		$respObj->ok();
+	}
+
+
 	public function register()
 	{
 		wlog("UserApiController::register()");

@@ -304,7 +304,7 @@ class NodeEnvironment extends Environment
 
 					for(let cookie of newCookies)
 					{
-						if (cookie.value == '')
+						if (cookie.value == '' || cookie.value == 'deleted')
 							delete this.reqCookies[cookie.name];
 						else
 							this.reqCookies[cookie.name] = cookie.value;

@@ -64,6 +64,7 @@ onReady(initControls);
 								<button>User</button>
 								<ul class="sub_list">
 									<li data-target="loginForm">Login</li>
+									<li data-target="logoutForm">Logout</li>
 									<li data-target="registerForm">Register</li>
 								</ul>
 							</li>
@@ -550,6 +551,15 @@ onReady(initControls);
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
+						</div>
+
+						<div id="logoutForm" class="test_form">
+							<h3>Login</h3>
+							<form action="<?=BASEURL?>api/logout/" method="post">
+								<div class="acc_controls">
+									<input class="adm_act_btn" type="submit" value="submit">
+								</div>
+							</form>
 						</div>
 
 						<div id="registerForm" class="test_form">

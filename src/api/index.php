@@ -7,6 +7,7 @@
 	$action = NULL;
 
 	$aliasMap = ["login" => "user/login",
+						"logout" => "user/logout",
 						"register" => "user/register"];
 
 	$controllersMap = ["currency" => "CurrencyApiController",

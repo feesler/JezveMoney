@@ -732,7 +732,12 @@ function initControls()
 	if (!loginForm)
 		throw new Error('Fail to init view');
 	loginForm.onsubmit = onFormSubmit;
-	
+
+	var logoutForm = document.querySelector('#logoutForm > form');
+	if (!logoutForm)
+		throw new Error('Fail to init view');
+	logoutForm.onsubmit = onFormSubmit;
+
 	var registerForm = document.querySelector('#registerForm > form');
 	if (!registerForm)
 		throw new Error('Fail to init view');
