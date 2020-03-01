@@ -45,7 +45,7 @@ class UserApiController extends ApiController
 		if (!$this->uMod->create([ "login" => $_POST["login"],
 									"password" => $_POST["password"],
 									"name" => $_POST["name"] ]))
-			$this->fail();
+			$respObj->fail();
 
 		$respObj->ok();
 	}
