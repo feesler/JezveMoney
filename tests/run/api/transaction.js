@@ -1,6 +1,10 @@
 import { api } from '../../api.js';
 import { TransactionsList } from '../../trlist.js';
+import { ApiRequestError } from '../../apirequesterror.js'
 import {
+	EXPENSE,
+	INCOME,
+	TRANSFER,
 	DEBT,
 	test,
 	copyObject,
@@ -15,6 +19,52 @@ import {
 
 let runTransactionAPI =
 {
+	async checkCorrectness(params)
+	{
+		let isDebt = (params.transtype == DEBT);
+		if (isDebt)
+		{
+			if (!params.person_id)
+				return false;
+
+			let person = await this.state.getPerson(params.person_id);
+			if (!person)
+				return false;
+
+			if (params.acc_id)
+			{
+				let account = await this.state.getAccount(params.acc_id);
+				if (!account)
+					return false;
+			}
+		}
+		else
+		{
+			if (params.src_id)
+			{
+				if (params.transtype == INCOME)
+					return false;
+
+				let account = await this.state.getAccount(params.src_id);
+				if (!account)
+					return false;
+			}
+
+			if (params.dest_id)
+			{
+				if (params.transtype == EXPENSE)
+					return false;
+
+				let account = await this.state.getAccount(params.dest_id);
+				if (!account)
+					return false;
+			}
+		}
+
+		return true;
+	},
+
+
 	async getExpectedTransaction(params)
 	{
 		let res = copyObject(params);
@@ -114,6 +164,7 @@ let runTransactionAPI =
 	{
 		let scope = this.run.api.transaction;
 		let transaction_id = 0;
+		let resExpected = false;
 
 		if (!params.date)
 			params.date = formatDate(new Date());
@@ -123,6 +174,8 @@ let runTransactionAPI =
 		await test('Create ' + getTransactionTypeStr(params.transtype) + ' transaction', async () =>
 		{
 			let expTransList = await this.state.getTransactionsList();
+
+			resExpected = await scope.checkCorrectness(params);
 
 			// Prepare expected transaction object
 			let expTrans = await scope.getExpectedTransaction(params);
@@ -136,19 +189,36 @@ let runTransactionAPI =
 			this.state.transactions = null;
 
 			// Send API sequest to server
-			let createRes = await api.transaction.create(params);
-			if (!createRes || !createRes.id)
-				return false;
+			let createRes;
+			try
+			{
+				createRes = await api.transaction.create(params);
+				if (resExpected && (!createRes || !createRes.id))
+					return false;
+			}
+			catch(e)
+			{
+				if (!(e instanceof ApiRequestError) || resExpected)
+					throw e;
+			}
 
-			expTrans.id = transaction_id = createRes.id;
+			let expAccountList;
+			if (resExpected)
+			{
+				expTrans.id = transaction_id = createRes.id;
 
-			// Prepare expected updates of accounts
-			let updState = await scope.updateExpectedTransaction(expTrans, accBefore, params);
-			expTrans = updState.transaction;
-			let expAccountList = this.state.createTransaction(updState.accounts, expTrans);
+				// Prepare expected updates of accounts
+				let updState = await scope.updateExpectedTransaction(expTrans, accBefore, params);
+				expTrans = updState.transaction;
+				expAccountList = this.state.createTransaction(updState.accounts, expTrans);
 
-			// Prepare expected updates of transactions
-			expTransList.create(expTrans);
+				// Prepare expected updates of transactions
+				expTransList.create(expTrans);
+			}
+			else
+			{
+				expAccountList = accBefore;
+			}
 
 			this.state.accounts = null;
 			this.state.persons = null;
@@ -199,97 +269,143 @@ let runTransactionAPI =
 	{
 		let scope = this.run.api.transaction;
 		let updateRes;
+		let isDebt = false;
+		let resExpected;
 
 		let expTransList = await this.state.getTransactionsList();
 		let origTrans = expTransList.list.find(item => item.id == params.id);
 
-		let updParams = copyObject(origTrans);
-
-		updParams.transtype = updParams.type;
-		delete updParams.type;
-
 		let fullAccList = await this.state.getAccountsList();
 
-		let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
-		let destAcc = fullAccList.find(item => item.id == updParams.dest_id);
-
-		let isDebt = (updParams.transtype == DEBT);
-		if (isDebt)
+		let updParams;
+		if (origTrans)
 		{
-			if (srcAcc && srcAcc.owner_id != this.user_id)
+			updParams = copyObject(origTrans);
+
+			updParams.transtype = updParams.type;
+			delete updParams.type;
+
+			isDebt = (updParams.transtype == DEBT);
+			if (isDebt)
 			{
-				updParams.debtop = 1;
-				updParams.person_id = srcAcc.owner_id;
-				updParams.acc_id = (destAcc) ? destAcc.id : 0;
-			}
-			else if (destAcc && destAcc.owner_id != this.user_id)
-			{
-				updParams.debtop = 2;
-				updParams.person_id = destAcc.owner_id;
-				updParams.acc_id = (srcAcc) ? srcAcc.id : 0;
+				let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
+				let destAcc = fullAccList.find(item => item.id == updParams.dest_id);
+
+				if (srcAcc && srcAcc.owner_id != this.owner_id)
+				{
+					updParams.debtop = 1;
+					updParams.person_id = srcAcc.owner_id;
+					updParams.acc_id = (destAcc) ? destAcc.id : 0;
+				}
+				else if (destAcc && destAcc.owner_id != this.owner_id)
+				{
+					updParams.debtop = 2;
+					updParams.person_id = destAcc.owner_id;
+					updParams.acc_id = (srcAcc) ? srcAcc.id : 0;
+				}
+
+				delete updParams.src_id;
+				delete updParams.dest_id;
 			}
 
-			delete updParams.src_id;
-			delete updParams.dest_id;
+			updParams.comm = updParams.comment;
+			delete updParams.comment;
 		}
-
-		updParams.comm = updParams.comment;
-		delete updParams.comment;
+		else
+		{
+			updParams = { date : formatDate(new Date()), comm : '' };
+		}
 
 		setParam(updParams, params);
 
 		// Synchronize currencies with accounts
-		if (isDebt)
+		if (origTrans)
 		{
-			if (updParams.acc_id && updParams.acc_id != origTrans.acc_id)
+			if (isDebt)
 			{
-				let acc = fullAccList.find(item => item.id == updParams.acc_id);
-				if (updParams.debtop == 1)
-					updParams.dest_curr = acc.curr_id;
-				else
-					updParams.src_curr = acc.curr_id;
+				if (updParams.acc_id && updParams.acc_id != origTrans.acc_id)
+				{
+					let acc = fullAccList.find(item => item.id == updParams.acc_id);
+					if (acc)
+					{
+						if (updParams.debtop == 1)
+							updParams.dest_curr = acc.curr_id;
+						else
+							updParams.src_curr = acc.curr_id;
+					}
+				}
+			}
+			else
+			{
+				if (updParams.src_id && updParams.src_id != origTrans.src_id)
+				{
+					let acc = fullAccList.find(item => item.id == updParams.src_id);
+					if (acc)
+						updParams.src_curr = acc.curr_id;
+				}
+
+				if (updParams.dest_id && updParams.dest_id != origTrans.dest_id)
+				{
+					let acc = fullAccList.find(item => item.id == updParams.dest_id);
+					if (acc)
+						updParams.dest_curr = acc.curr_id;
+				}
 			}
 		}
+
+		let testDescr = '';
+		if (origTrans)
+			testDescr = 'Update ' + getTransactionTypeStr(origTrans.type) + ' transaction';
 		else
-		{
-			if (updParams.src_id && updParams.src_id != origTrans.src_id)
-			{
-				let acc = fullAccList.find(item => item.id == updParams.src_id);
-				updParams.src_curr = acc.curr_id;
-			}
+			testDescr = 'Update transaction';
 
-			if (updParams.dest_id && updParams.dest_id != origTrans.dest_id)
-			{
-				let acc = fullAccList.find(item => item.id == updParams.dest_id);
-				updParams.dest_curr = acc.curr_id;
-			}
-		}
-
-		await test('Update ' + getTransactionTypeStr(origTrans.type) + ' transaction', async () =>
+		await test(testDescr, async () =>
 		{
+			if (origTrans)
+				resExpected = await scope.checkCorrectness(updParams);
+			else
+				resExpected = false;
+
 			// Prepare expected transaction object
 			let expTrans = await scope.getExpectedTransaction(updParams);
-			expTrans.pos = origTrans.pos;
+			if (origTrans)
+				expTrans.pos = origTrans.pos;
 
 			this.state.accounts = null;
 			this.state.persons = null;
 			this.state.transactions = null;
 
 			// Send API sequest to server
-			updateRes = await api.transaction.update(updParams);
-			if (!updateRes)
-				return false;
+			try
+			{
+				updateRes = await api.transaction.update(updParams);
+				if (resExpected != updateRes)
+					return false;
+			}
+			catch(e)
+			{
+				if (!(e instanceof ApiRequestError) || resExpected)
+					throw e;
+			}
 
-			// Prepare expected updates of accounts
-			let updState = await scope.updateExpectedTransaction(expTrans, fullAccList, updParams);
-			expTrans = updState.transaction;
-			fullAccList = updState.accounts;
+			let expAccountList;
+			if (resExpected)
+			{
+				// Prepare expected updates of accounts
+				let updState = await scope.updateExpectedTransaction(expTrans, fullAccList, updParams);
+				expTrans = updState.transaction;
+				fullAccList = updState.accounts;
 
-			let expAccountList = this.state.updateTransaction(fullAccList, origTrans, expTrans);
+				expAccountList = this.state.updateTransaction(fullAccList, origTrans, expTrans);
 
-			// Prepare expected updates of transactions
-			expTransList.update(expTrans.id, expTrans);
-			expTransList = expTransList.updateResults(fullAccList);
+				// Prepare expected updates of transactions
+				expTransList.update(expTrans.id, expTrans);
+				expTransList = expTransList.updateResults(fullAccList);
+			}
+			else
+			{
+				expAccountList = fullAccList;
+			}
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
@@ -309,6 +425,7 @@ let runTransactionAPI =
 	async deleteTest(ids)
 	{
 		let deleteRes;
+		let resExpected = true;
 
 		await test('Delete transaction', async () =>
 		{
@@ -318,18 +435,44 @@ let runTransactionAPI =
 			let trBefore = await this.state.getTransactionsList();
 			let accBefore = await this.state.getAccountsList();
 
+			for(let transaction_id of ids)
+			{
+				if (trBefore.findItem(transaction_id) === -1)
+				{
+					resExpected = false;
+					break;
+				}
+			}
+
 			// Prepare expected updates of transactions list
-			let expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.list.find(item => item.id == id)));
-			let expTransList = trBefore.deleteItems(ids);
-			expTransList = expTransList.updateResults(accBefore);
+			let expAccList, expTransList;
+			if (resExpected)
+			{
+				expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.list.find(item => item.id == id)));
+				expTransList = trBefore.deleteItems(ids);
+				expTransList = expTransList.updateResults(accBefore);
+			}
+			else
+			{
+				expAccList = accBefore;
+				expTransList = trBefore;
+			}
 
 			this.state.accounts = null;
 			this.state.transactions = null;
 
 			// Send API sequest to server
-			deleteRes = await api.transaction.del(ids);
-			if (!deleteRes)
-				throw new Error('Fail to delete account(s)');
+			try
+			{
+				deleteRes = await api.transaction.del(ids);
+				if (resExpected != deleteRes)
+					return false;				
+			}
+			catch(e)
+			{
+				if (!(e instanceof ApiRequestError) || resExpected)
+					throw e;
+			}
 
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();

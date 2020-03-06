@@ -14,7 +14,7 @@ var config =
 
 	transactionsOnPage : 10,
 	latestTransactions : 5,
-	testsExpected : 610
+	testsExpected : 632
 };
 
 

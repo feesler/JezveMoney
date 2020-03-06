@@ -122,6 +122,17 @@ class TransactionModel extends CachedTable
 				wlog("Invalid src_id specified");
 				return NULL;
 			}
+
+			// Check owner of account
+			if ($res["src_id"])
+			{
+				$srcAcc = $this->accModel->getItem($res["src_id"]);
+				if (!$srcAcc || $srcAcc->user_id != self::$user_id)
+				{
+					wlog("Invalid src_id specified");
+					return NULL;
+				}
+			}
 		}
 
 		if (isset($params["dest_id"]))
@@ -132,6 +143,17 @@ class TransactionModel extends CachedTable
 			{
 				wlog("Invalid dest_id specified");
 				return NULL;
+			}
+
+			// Check owner of account
+			if ($res["dest_id"])
+			{
+				$srcAcc = $this->accModel->getItem($res["dest_id"]);
+				if (!$srcAcc || $srcAcc->user_id != self::$user_id)
+				{
+					wlog("Invalid dest_id specified");
+					return NULL;
+				}
 			}
 		}
 
