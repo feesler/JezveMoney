@@ -146,8 +146,10 @@ let apiModule = (function()
 
 
 /**
- * User/profile
+ * User
  */
+
+	let userReqFields = ['name', 'balance', 'currency', 'icon'];
 
 	// Try to login user and return boolean result
 	async function loginUser({ login, password })
@@ -174,6 +176,85 @@ let apiModule = (function()
 	}
 
 
+	async function usersList()
+	{
+		let reqUrl = 'user/list';
+
+		let jsonRes = await apiGet(reqUrl);
+		if (!jsonRes || jsonRes.result != 'ok')
+		{
+			let msg = (jsonRes && jsonRes.msg) ? jsonRes.msg : 'Fail to obtain list of users';
+			throw new ApiRequestError(msg);
+		}
+
+		return jsonRes.data;
+	}
+
+
+	async function createUser(options)
+	{
+		let postData = checkFields(options, userReqFields);
+
+		let apiRes = await apiPost('user/create', postData);
+		if (!apiRes || apiRes.result != 'ok')
+			throw new ApiRequestError('Fail to create user');
+
+		return apiRes.data;
+	}
+
+
+	async function updateUser(id, options)
+	{
+		id = parseInt(id);
+		if (!id || isNaN(id))
+			throw new ApiRequestError('Wrong id specified');
+
+		let postData = checkFields(options, accReqFields);
+		postData.id = id;
+
+		let apiRes = await apiPost('user/update', postData);
+		if (!apiRes || apiRes.result != 'ok')
+			throw new ApiRequestError('Fail to update user');
+
+		return true;
+	}
+
+
+	async function resetUserPassword(id, newPassword)
+	{
+		let apiRes = await apiPost('user/changePassword', { id, pass : newPassword });
+
+		return (apiRes && apiRes.result && apiRes.result == 'ok');
+	}
+
+
+	// Delete user and all related data
+	async function deleteUser(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ids];
+
+		for (let id of ids)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new ApiRequestError('Wrong id specified');
+		}
+
+		let postData = { id: ids };
+
+		let apiRes = await apiPost('user/delete', postData);
+		if (!apiRes || apiRes.result != 'ok')
+			throw new ApiRequestError('Fail to delete user');
+
+		return true;
+	}
+
+
+/**
+ * Profile
+ */
+
 	// Read profile data of user
 	async function readProfile()
 	{
@@ -193,7 +274,7 @@ let apiModule = (function()
 	}
 
 
-	async function changeUserPassword({ oldPassword, newPassword })
+	async function changeProfilePassword({ oldPassword, newPassword })
 	{
 		let apiRes = await apiPost('profile/changepass', { oldpwd : oldPassword, newpwd : newPassword });
 
@@ -201,7 +282,7 @@ let apiModule = (function()
 	}
 
 
-	// Reset all data and return boolean result
+	// Reset all data of current user and return boolean result
 	async function resetProfile()
 	{
 		let apiRes = await apiPost('profile/reset');
@@ -210,7 +291,7 @@ let apiModule = (function()
 	}
 
 
-	// Delete user and all related data
+	// Delete current user and all related data
 	async function deleteProfile()
 	{
 		let apiRes = await apiPost('profile/delete');
@@ -597,13 +678,19 @@ let apiModule = (function()
 		user : {
 			login : loginUser,
 			logout: logoutUser,
-			register : registerUser
+			register : registerUser,
+
+			list : usersList,
+			create : createUser,
+			update : updateUser,
+			changePassword : resetUserPassword,
+			del: deleteUser
 		},
 
 		profile : {
 			read : readProfile,
 			changeName : changeUserName,
-			changePassword : changeUserPassword,
+			changePassword : changeProfilePassword,
 			reset : resetProfile,
 			del: deleteProfile,
 		},
