@@ -8,6 +8,7 @@ import {
 	formatDate,
 	setParam
 } from './common.js';
+import { ApiRequestError } from './apirequesterror.js'
 
 
 /**
@@ -115,7 +116,7 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let apiReq = 'currency/';
@@ -126,7 +127,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to read currency');
+			throw new ApiRequestError('Fail to read currency');
 
 		return jsonRes.data;
 	}
@@ -138,7 +139,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(reqUrl);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to obtain list of currencies');
+			throw new ApiRequestError('Fail to obtain list of currencies');
 
 		return jsonRes.data;
 	}
@@ -234,7 +235,7 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let apiReq = 'account/';
@@ -245,7 +246,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to read account');
+			throw new ApiRequestError('Fail to read account');
 
 		return jsonRes.data;
 	}
@@ -257,7 +258,7 @@ let apiModule = (function()
 
 		let apiRes = await apiPost('account/create', postData);
 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			throw new Error('Fail to create account');
+			throw new ApiRequestError('Fail to create account');
 
 		return apiRes.data;
 	}
@@ -267,14 +268,14 @@ let apiModule = (function()
 	{
 		id = parseInt(id);
 		if (!id || isNaN(id))
-			throw new Error('Wrong id specified');
+			throw new ApiRequestError('Wrong id specified');
 
 		let postData = checkFields(options, accReqFields);
 		postData.id = id;
 
 		let apiRes = await apiPost('account/update', postData);
 		if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-			throw new Error('Fail to update account');
+			throw new ApiRequestError('Fail to update account');
 
 		return true;
 	}
@@ -289,14 +290,14 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let postData = { id : ids };
 
 		let apiRes = await apiPost('account/delete', postData);
 		if (!apiRes || apiRes.result != 'ok')
-			throw new Error('Fail to delete account');
+			throw new ApiRequestError('Fail to delete account');
 
 		return true;
 	}
@@ -311,7 +312,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(reqUrl);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to obtain list of accounts');
+			throw new ApiRequestError('Fail to obtain list of accounts');
 
 		return jsonRes.data;
 	}
@@ -322,7 +323,7 @@ let apiModule = (function()
 		let jsonRes = await apiGet('account/reset');
 
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to reset accounts');
+			throw new ApiRequestError('Fail to reset accounts');
 
 		return true;
 	}
@@ -344,7 +345,7 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let apiReq = 'person/';
@@ -355,7 +356,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to read person');
+			throw new ApiRequestError('Fail to read person');
 
 		return jsonRes.data;
 	}
@@ -367,7 +368,7 @@ let apiModule = (function()
 
 		let apiRes = await apiPost('person/create', postData);
 		if (!apiRes || apiRes.result != 'ok')
-			throw new Error('Fail to create person');
+			throw new ApiRequestError('Fail to create person');
 
 		return apiRes.data;
 	}
@@ -377,14 +378,14 @@ let apiModule = (function()
 	{
 		id = parseInt(id);
 		if (!id || isNaN(id))
-			throw new Error('Wrong id specified');
+			throw new ApiRequestError('Wrong id specified');
 
 		let postData = checkFields(options, pReqFields);
 		postData.id = id;
 
 		let apiRes = await apiPost('person/update', postData);
 		if (!apiRes || apiRes.result != 'ok')
-			throw new Error('Fail to update person');
+			throw new ApiRequestError('Fail to update person');
 
 		return true;
 	}
@@ -399,14 +400,14 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let postData = { id : ids };
 
 		let apiRes = await apiPost('person/delete', postData);
 		if (!apiRes || apiRes.result != 'ok')
-			throw new Error('Fail to delete person');
+			throw new ApiRequestError('Fail to delete person');
 
 		return true;
 	}
@@ -416,7 +417,7 @@ let apiModule = (function()
 	{
 		let jsonRes = await apiGet('person/list');
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to obtain list of persons');
+			throw new ApiRequestError('Fail to obtain list of persons');
 
 		return jsonRes.data;
 	}
@@ -440,7 +441,7 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let apiReq = 'transaction/';
@@ -451,7 +452,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to read transaction');
+			throw new ApiRequestError('Fail to read transaction');
 
 		return jsonRes.data;
 	}
@@ -481,7 +482,7 @@ let apiModule = (function()
 
  		let apiRes = await apiPost('transaction/create', postData);
  		if (!apiRes || apiRes.result != 'ok')
- 			throw new Error('Fail to create transaction');
+ 			throw new ApiRequestError('Fail to create transaction');
 
  		return apiRes.data;
  	}
@@ -507,7 +508,7 @@ let apiModule = (function()
 
  		let apiRes = await apiPost('transaction/createMultiple', JSON.stringify(postData));
  		if (!apiRes || apiRes.result != 'ok')
- 			throw new Error('Fail to create transactions');
+ 			throw new ApiRequestError('Fail to create transactions');
 
  		return apiRes.data;
  	}
@@ -519,7 +520,7 @@ let apiModule = (function()
 		if (!id || isNaN(id))
 		{
 			console.debug(options);
-			throw new Error('Wrong id specified');
+			throw new ApiRequestError('Wrong id specified');
 		}
 
 		let postData = checkFields(options, trReqFields);
@@ -532,7 +533,7 @@ let apiModule = (function()
 
  		let apiRes = await apiPost('transaction/update', postData);
  		if (!apiRes || apiRes.result != 'ok')
-			throw new Error('Fail to update transaction');
+			throw new ApiRequestError('Fail to update transaction');
 
 		return true;
  	}
@@ -547,14 +548,14 @@ let apiModule = (function()
 		{
 			id = parseInt(id);
 			if (!id || isNaN(id))
-				throw new Error('Wrong id specified');
+				throw new ApiRequestError('Wrong id specified');
 		}
 
 		let postData = { id : ids };
 
 		let apiRes = await apiPost('transaction/delete', postData);
 		if (!apiRes || apiRes.result != 'ok')
-			throw new Error('Fail to delete transaction');
+			throw new ApiRequestError('Fail to delete transaction');
 
 		return true;
 	}
@@ -577,7 +578,7 @@ let apiModule = (function()
 
 		let jsonRes = await apiGet(apiReq);
 		if (!jsonRes || jsonRes.result != 'ok')
-			throw new Error('Fail to obtain list of transactions');
+			throw new ApiRequestError('Fail to obtain list of transactions');
 
 		jsonRes.data.sort((a, b) => b.pos - a.pos);
 
