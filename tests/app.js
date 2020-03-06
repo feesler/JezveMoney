@@ -68,7 +68,7 @@ class Application
 		api.setEnv(this);
 
 		// Login and obtain profile information
-		let loginResult = await api.user.login(this.config.testUser.login, this.config.testUser.password);
+		let loginResult = await api.user.login(this.config.testUser);
 		if (!loginResult)
 			throw new Error('Fail to login');
 
