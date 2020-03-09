@@ -20,6 +20,7 @@ class PersonModel extends CachedTable
 		}
 
 		$this->tbl_name = "persons";
+		$this->adminForce = FALSE;
 
 		$this->dbObj = mysqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
@@ -132,12 +133,29 @@ class PersonModel extends CachedTable
 	}
 
 
+	public function adminUpdate($item_id, $params)
+	{
+		if (!UserModel::isAdminUser())
+			return FALSE;
+
+		$this->adminForce = TRUE;
+		$res = $this->update($item_id, $params);
+		$this->adminForce = FALSE;
+
+		return $res;
+	}
+
+
 	// Preparations for item update
 	protected function preUpdate($item_id, $params)
 	{
 		// check person is exist
-		$currObj = $this->getItem($item_id);
-		if (!$currObj)
+		$personObj = $this->getItem($item_id);
+		if (!$personObj)
+			return FALSE;
+
+		// check user of person
+		if (!$this->adminForce && $personObj->user_id != self::$user_id)
 			return FALSE;
 
 		$res = $this->checkParams($params, TRUE);
@@ -162,6 +180,19 @@ class PersonModel extends CachedTable
 	}
 
 
+	public function adminDelete($items)
+	{
+		if (!UserModel::isAdminUser())
+			return FALSE;
+
+		$this->adminForce = TRUE;
+		$res = $this->del($items);
+		$this->adminForce = FALSE;
+
+		return $res;
+	}
+
+
 	// Preparations for items delete
 	protected function preDelete($items)
 	{
@@ -172,6 +203,10 @@ class PersonModel extends CachedTable
 			// check person is exist
 			$pObj = $this->getItem($item_id);
 			if (!$pObj)
+				return FALSE;
+
+			// check user of person
+			if (!$this->adminForce && $pObj->user_id != self::$user_id)
 				return FALSE;
 		}
 

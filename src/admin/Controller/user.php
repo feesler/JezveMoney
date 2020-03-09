@@ -35,7 +35,9 @@ class UserAdminController extends AdminController
 		if (!isset($_POST["user_login"]) || !isset($_POST["user_pass"]) || !isset($_POST["user_name"]))
 			$this->fail($defMsg);
 
-		if (!$this->uMod->register($_POST["user_login"], $_POST["user_pass"], $_POST["user_name"]))
+		if (!$this->uMod->create([ "login" => $_POST["user_login"],
+									"password" => $_POST["user_pass"],
+									"name" => $_POST["user_name"] ]))
 			$this->fail($defMsg);
 
 		Message::set(MSG_USER_CREATE);
@@ -63,7 +65,7 @@ class UserAdminController extends AdminController
 			if (!$userObj)
 				$this->fail($defMsg);
 
-			if (!$this->personMod->update($userObj->owner_id, [ "name" => $_POST["user_name"] ]))
+			if (!$this->personMod->adminUpdate($userObj->owner_id, [ "name" => $_POST["user_name"] ]))
 				$this->fail($defMsg);
 		}
 
