@@ -103,11 +103,27 @@ let runAPI =
 		let ACC_USD = await account.createTest({ name : 'acc usd', currency : USD, balance : 10.5, icon : 5 });
 
 
+		/**
+		 * Security tests of accounts
+		 */
+		env.setBlock('Accounts security', 2);
+		await account.updateTest(API_USER_ACC_RUB, { name : 'EUR', currency : EUR, balance : 10, icon : 2 });		// TODO : use curr_id
+		await account.deleteTest(API_USER_ACC_RUB);
+
+
 		env.setBlock('Persons', 2);
 
 		let PERSON_X = await person.createTest({ name : 'Person X' });
 		let PERSON_Y = await person.createTest({ name : 'Y' });
 
+		/**
+		 * Security tests of persons
+		 */
+		env.setBlock('Persons security', 2);
+		await person.updateTest(API_USER_PERSON, { name : 'API Person' });
+		await person.deleteTest(API_USER_PERSON);
+
+		
 		env.setBlock('Transactions', 2);
 
 

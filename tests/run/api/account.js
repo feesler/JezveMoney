@@ -1,9 +1,49 @@
 import { api } from '../../api.js';
-import { test, copyObject, setParam, checkObjValue, formatProps } from '../../common.js';
+import { ApiRequestError } from '../../apirequesterror.js'
+import { Currency } from '../../currency.js';
+import {
+	getIcon,
+	test,
+	copyObject,
+	isObject,
+	setParam,
+	checkObjValue,
+	isValidValue,
+	formatProps
+} from '../../common.js';
 
 
 let runAccountAPI =
 {
+	async checkCorrectness(params, id)
+	{
+		if (!isObject(params))
+			return false;
+
+		if (typeof params.name !== 'string' || params.name == '')
+			return false;
+
+		// Check there is no account with same name
+		let accList = await this.state.getAccountsList();
+		let lname = params.name.toLowerCase();
+		let accObj = accList.find(item => item.name.toLowerCase() == lname);
+		if (accObj && (!id || (id && id != accObj.id)))
+			return false;
+
+		let currObj = Currency.getById(params.currency);
+		if (!currObj)
+			return false;
+
+		if (!getIcon(params.icon))
+			return false;
+
+		if (!isValidValue(params.balance))
+			return false;
+
+		return true;
+	},
+
+
 	/**
 	 * Account tests
 	 */
@@ -12,6 +52,8 @@ let runAccountAPI =
 	// And check expected state of app
 	async createTest(params)
 	{
+		let scope = this.run.api.account;
+		let resExpected = false;
 		let acc_id = 0;
 
 		await test('Create account', async () =>
@@ -20,31 +62,36 @@ let runAccountAPI =
 			if (!Array.isArray(accBefore))
 				return false;
 
+			resExpected = await scope.checkCorrectness(params);
+
 			let expAccObj = copyObject(params);
 			expAccObj.curr_id = params.currency;
 			delete expAccObj.currency;
 
 			this.state.accounts = null;
 
-			let createRes = await api.account.create(params);
-			if (!createRes || !createRes.id)
-				return false;
+			let createRes;
+			try
+			{
+				createRes = await api.account.create(params);
+				if (resExpected && (!createRes || !createRes.id))
+					return false;
+			}
+			catch(e)
+			{
+				if (!(e instanceof ApiRequestError) || resExpected)
+					throw e;
+			}
 
 			acc_id = createRes.id;
 
+			let expAccList = copyObject(accBefore);
+			if (resExpected)
+				expAccList.push(expAccObj);
+
 			let accList = await this.state.getAccountsList();
-			if (!Array.isArray(accList))
-				return false;
 
-			if (accList.length != accBefore.length + 1)
-				throw new Error('Length of accounts list must increase');
-
-			if (accBefore.find(item => item.id == acc_id))
-				throw new Error('Already exist account returned');
-
-			let accObj = accList.find(item => item.id == acc_id);
-
-			return checkObjValue(accObj, expAccObj);
+			return checkObjValue(accList, expAccList);
 		}, this.environment);
 
 		return acc_id;
@@ -55,7 +102,8 @@ let runAccountAPI =
 	// And check expected state of app
 	async updateTest(id, params)
 	{
-		let updateRes;
+		let scope = this.run.api.account;
+		let updateRes, resExpected;
 
 		await test(`Update account (${id}, ${formatProps(params)})`, async () =>
 		{
@@ -63,38 +111,61 @@ let runAccountAPI =
 			let accBefore = await this.state.getAccountsList();
 
 			let origAccInd = accBefore.findIndex(item => item.id == id);
-			let origAcc = accBefore[origAccInd];
+			let origAcc = (origAccInd !== -1) ? accBefore[origAccInd] : null;
+			let updParams, expAccList, expTransList;
 
-			let updParams = copyObject(origAcc);
-			updParams.currency = ('currency' in params) ? params.currency : updParams.curr_id;
-			delete updParams.curr_id;
-
-			// Prepare expected account object
-			let expAccObj = copyObject(origAcc);
-			expAccObj.curr_id = updParams.currency;
-
-			let balDiff = expAccObj.balance - origAcc.initbalance;
-			if (balDiff.toFixed(2) != 0)
+			if (origAcc)
 			{
-				expAccObj.initbalance = expAccObj.balance;
-				expAccObj.balance = origAcc.balance + balDiff;
+				updParams = copyObject(origAcc);
+				updParams.currency = ('currency' in params) ? params.currency : updParams.curr_id;
+				delete updParams.curr_id;
+
+				// Prepare expected account object
+				let expAccObj = copyObject(origAcc);
+				expAccObj.curr_id = updParams.currency;
+
+				let balDiff = expAccObj.balance - origAcc.initbalance;
+				if (balDiff.toFixed(2) != 0)
+				{
+					expAccObj.initbalance = expAccObj.balance;
+					expAccObj.balance = origAcc.balance + balDiff;
+				}
+
+				// Prepare expected updates of accounts list
+				expAccList = copyObject(accBefore);
+				expAccList.splice(origAccInd, 1, expAccObj);
+
+				// Prepare expected updates of transactions list
+				expTransList = trBefore.updateAccount(accBefore, expAccObj)
+										.updateResults(expAccList);
+			}
+			else
+			{
+				updParams = params;
+				expTransList = trBefore;
+				expAccList = accBefore;
 			}
 
-			// Prepare expected updates of accounts list
-			let expAccList = copyObject(accBefore);
-			expAccList.splice(origAccInd, 1, expAccObj);
-
-			// Prepare expected updates of transactions list
-			let expTransList = trBefore.updateAccount(accBefore, expAccObj);
-			expTransList = expTransList.updateResults(expAccList);
+			if (origAcc)
+				resExpected = await scope.checkCorrectness(updParams, id);
+			else
+				resExpected = false;
 
 			this.state.accounts = null;
 			this.state.transactions = null;
 
 			// Send API sequest to server
-			updateRes = await api.account.update(id, updParams);
-			if (!updateRes)
-				throw new Error('Fail to update account');
+			try
+			{
+				updateRes = await api.account.update(id, updParams);
+				if (resExpected != updateRes)
+					return false;
+			}
+			catch(e)
+			{
+				if (!(e instanceof ApiRequestError) || resExpected)
+					throw e;
+			}
 
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();
@@ -113,6 +184,7 @@ let runAccountAPI =
 	async deleteTest(ids)
 	{
 		let deleteRes;
+		let resExpected = true;
 
 		await test('Delete account', async () =>
 		{
@@ -123,21 +195,48 @@ let runAccountAPI =
 			if (!Array.isArray(accBefore))
 				return false;
 
-			// Prepare expected updates of accounts list
-			let expAccList = this.state.deleteByIds(accBefore, ids);
+			for(let acc_id of ids)
+			{
+				if (!accBefore.find(item => item.id == acc_id))
+				{
+					resExpected = false;
+					break;
+				}
+			}
 
+			let expAccList, expTransList;
 			// Prepare expected updates of transactions
 			let trBefore = await this.state.getTransactionsList();
-			let expTransList = trBefore.deleteAccounts(accBefore, ids);
-			expTransList = expTransList.updateResults(expAccList);
+			if (resExpected)
+			{
+				// Prepare expected updates of accounts list
+				expAccList = this.state.deleteByIds(accBefore, ids);
+
+				expTransList = trBefore.deleteAccounts(accBefore, ids)
+										.updateResults(expAccList);
+			}
+			else
+			{
+				expAccList = accBefore;
+				expTransList = trBefore;
+			}
+
 
 			this.state.accounts = null;
 			this.state.transactions = null;
 
 			// Send API sequest to server
-			deleteRes = await api.account.del(ids);
-			if (!deleteRes)
-				throw new Error('Fail to delete account(s)');
+			try
+			{
+				deleteRes = await api.account.del(ids);
+				if (resExpected != deleteRes)
+					return false;				
+			}
+			catch(e)
+			{
+				if (!(e instanceof ApiRequestError) || resExpected)
+					throw e;
+			}
 
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();

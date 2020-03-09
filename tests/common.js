@@ -4,6 +4,8 @@ export const INCOME = 2;
 export const TRANSFER = 3;
 export const DEBT = 4;
 
+export const availTransTypes = [ EXPENSE, INCOME, TRANSFER, DEBT ];
+
 
 // Return string for specified type of transaction
 export function getTransactionTypeStr(type)
