@@ -100,15 +100,6 @@ class PersonModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
-		if ($this->dbObj->rowsCount($qResult) > 0)
-		{
-			wlog("Such item already exist");
-			return NULL;
-		}
-
-		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
-
 		// For registration/admin cases
 		$targetUser = self::$user_id;
 		if (!$targetUser)
@@ -126,6 +117,15 @@ class PersonModel extends CachedTable
 			wlog("User not specified");
 			return NULL;
 		}
+
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, [ "name=".qnull($res["name"]), "user_id=".$targetUser ]);
+		if ($this->dbObj->rowsCount($qResult) > 0)
+		{
+			wlog("Such item already exist");
+			return NULL;
+		}
+
+		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
 		$res["user_id"] = $targetUser;
 
@@ -162,7 +162,7 @@ class PersonModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, [ "name=".qnull($res["name"]), "user_id=".$personObj->user_id ]);		// TODO : do not use select + why looking for name in all users?
 		$row = $this->dbObj->fetchRow($qResult);
 		if ($row)
 		{
