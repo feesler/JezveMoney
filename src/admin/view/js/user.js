@@ -1,3 +1,6 @@
+var selectedItem = null;
+
+
 // Return user object for specified id
 function getUser(user_id)
 {
@@ -8,34 +11,36 @@ function getUser(user_id)
 // Update fields with specified user
 function setUserValues(userObj)
 {
-	var user_id, del_user_id, user_login, user_name, user_pass, isadmin;
+	var user_id, user_login, user_name, user_pass, isadmin;
 
 	user_id = ge('user_id');
-	del_user_id = ge('del_user_id');
 	user_login = ge('user_login');
 	user_name = ge('user_name');
 	user_pass = ge('user_pass');
 	isadmin = ge('isadmin');
-	if (!user_id || !del_user_id || !user_login || !user_name || !user_pass || !isadmin)
+	isdefault = ge('isdefault');
+	if (!user_id || !user_login || !user_name || !user_pass || !isadmin || !isdefault)
 		return;
 
 	if (userObj)
 	{
+		enable(user_id, true);
 		user_id.value = userObj.id;
-		del_user_id.value = userObj.id;
 		user_login.value = userObj.login;
 		user_name.value = userObj.owner;
 		user_pass.value = '';
 		isadmin.checked = (userObj.access == 1);
+		isdefault.checked = (userObj.access == 0);
 	}
 	else			// clean
 	{
+		enable(user_id, false);
 		user_id.value = '';
-		del_user_id.value = '';
 		user_login.value = '';
 		user_name.value = '';
 		user_pass.value = '';
 		isadmin.checked = false;
+		isdefault.checked = false;
 	}
 }
 
@@ -50,9 +55,10 @@ function selectUser(id)
 		return;
 
 	currObj = getUser(id);
+	selectedItem = currObj;
 	if (currObj)
 	{
-		user_frm.action = baseURL + 'admin/user/edit';
+		user_frm.action = baseURL + 'api/user/update';
 		setUserValues(currObj);
 		show('del_btn', true);
 		show('updbtn', true);
@@ -82,8 +88,9 @@ function newUser()
 	enable('user_pass', true);
 	show('admin_block', true);
 	enable('isadmin', true);
+	enable('isdefault', true);
 
-	frm.action = baseURL + 'admin/user/new';
+	frm.action = baseURL + 'api/user/create';
 	setUserValues(null);
 
 	dwPopup.setTitle('Create user');
@@ -105,6 +112,7 @@ function updateUser()
 	enable('user_pass', false);
 	show('admin_block', true);
 	enable('isadmin', true);
+	enable('isdefault', true);
 
 	dwPopup.setTitle('Update user');
 	dwPopup.show();
@@ -128,6 +136,7 @@ function setUserPass()
 	enable('user_pass', true);
 	show('admin_block', false);
 	enable('isadmin', false);
+	enable('isdefault', false);
 
 	frm.action = baseURL + 'admin/user/chpwd';
 
@@ -139,15 +148,138 @@ function setUserPass()
 // Delete user button click handler
 function deleteUser()
 {
-	var delfrm = ge('delfrm');
-
-	if (!delfrm)
+	if (!selectedItem || !selectedItem.id)
 		return;
 
 	if (confirm('Are you sure want to delete selected user?'))
 	{
-		delfrm.submit();
+		ajax.post(baseURL + 'api/user/del', urlJoin({ id : selectedItem.id }), onSubmitResult);
 	}
+}
+
+
+function onFormSubmit()
+{
+	var link, els = {}, params;
+	var formEl = this;
+
+	if (!formEl || !formEl.elements)
+		return false;
+
+	var inputEl;
+	for(var i = 0; i < formEl.elements.length; i++)
+	{
+		inputEl = formEl.elements[i];
+
+		if (inputEl.disabled || inputEl.name == '')
+			continue;
+
+		if ((inputEl.type == 'checkbox' || inputEl.type == 'radio') && !inputEl.checked)
+			continue;
+
+		els[formEl.elements[i].name] = formEl.elements[i].value;
+	}
+
+	if (formEl.method == 'get')
+	{
+		params = urlJoin(els);
+		link = formEl.action;
+		if (params != '')
+			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
+		ajax.get(link, onSubmitResult);
+	}
+	else if (formEl.method == 'post')
+	{
+		params = urlJoin(els);
+		link = formEl.action;
+		ajax.post(link, params, onSubmitResult);
+	}
+
+	return false;
+}
+
+
+function onSubmitResult(response)
+{
+	var respObj;
+	var failMessage = 'Fail to submit request';
+	var res = false;
+
+	try
+	{
+		respObj = JSON.parse(response);
+		res = (respObj && respObj.result == 'ok');
+		if (!res && respObj && respObj.msg)
+			failMessage = respObj.msg;
+	}
+	catch(e)
+	{
+		console.log(e.message);
+	}
+
+	if (!res)
+	{
+		createMessage(failMessage, 'msg_error');
+		return;
+	}
+
+	requestList();
+}
+
+
+function requestList()
+{
+	ajax.get(baseURL + 'api/user/list', onListResult);
+}
+
+
+function onListResult(response)
+{
+	var respObj;
+	var res = false;
+
+	try
+	{
+		respObj = JSON.parse(response);
+		res = (respObj && respObj.result == 'ok');
+	}
+	catch(e)
+	{
+		console.log(e.message);
+	}
+
+	if (!res)
+		return;
+
+	var users_list = ge('users_list');
+	if (!users_list)
+		return;
+
+	removeChilds(users_list);
+
+	users = respObj.data;
+
+	var rows = users.map(function(item)
+	{
+		var row = ce('tr', {}, [
+			ce('td', { innerText : item.id }),
+			ce('td', { innerText : item.login }),
+			ce('td', { innerText : item.owner }),
+			ce('td', { innerText : item.access }),
+			ce('td', { innerText : item.accCount }),
+			ce('td', { innerText : item.trCount }),
+			ce('td', { innerText : item.pCount })
+		]);
+
+		row.onclick = onRowClick.bind(row);
+
+		return row;
+	});
+
+	addChilds(users_list, rows);
+
+	selectUser(null);
+	dwPopup.close();
 }
 
 
@@ -176,10 +308,12 @@ function initControls()
 
 	// popup initialization
 	var frm = ge('user_frm');
+	frm.onsubmit = onFormSubmit;
 	dwPopup = Popup.create({ id : 'user_popup',
-							content : frm,
-							additional : 'center_only curr_content',
-						 	btn : { okBtn : { onclick : frm.submit.bind(frm) }, closeBtn : true }});
+								content : frm,
+								additional : 'center_only curr_content',
+								btn : { closeBtn : true }
+							});
 }
 
 

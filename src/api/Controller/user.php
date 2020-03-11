@@ -84,7 +84,7 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$res->fail();
 
-		if (!isset($_POST["login"]) || !isset($_POST["pass"]) || !isset($_POST["name"]))
+		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
 			$res->fail($defMsg);
 
 		$new_user_id = $this->uMod->create([ "login" => $_POST["login"],
@@ -124,13 +124,14 @@ class UserApiController extends ApiController
 			if (!$userObj)
 				$res->fail($defMsg);
 
-			if (!$this->personMod->update($userObj->owner_id, [ "name" => $_POST["name"] ]))
+			$personMod = PersonModel::getInstance();
+			if (!$personMod->adminUpdate($userObj->owner_id, [ "name" => $_POST["name"] ]))
 				$res->fail($defMsg);
 		}
 
-		if (isset($_POST["name"]))
+		if (isset($_POST["access"]))
 		{
-			$this->uMod->setAccess($_POST["user_id"], intval($_POST["access"]));
+			$this->uMod->setAccess($_POST["id"], intval($_POST["access"]));
 		}
 
 		$res->msg = Message::get(MSG_USER_UPDATE);
