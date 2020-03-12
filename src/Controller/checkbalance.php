@@ -9,10 +9,17 @@ class CheckBalanceController extends Controller
 	}
 
 
+	public function getName($acc_id)
+	{
+		if (!isset($this->accName) || !is_array($this->accName))
+			return NULL;
+
+		return isset($this->accName[$acc_id]) ? $this->accName[$acc_id] : NULL;
+	}
+
+
 	public function index()
 	{
-ini_set('max_execution_time', '0');
-
 		$db = mysqlDB::getInstance();
 
 		if (is_null($this->actionParam) || $this->actionParam == "all")
@@ -52,133 +59,110 @@ ini_set('max_execution_time', '0');
 
 
 		$accMod = AccountModel::getInstance();
+		$trMod = TransactionModel::getInstance();
 
 		$initBalance = [];
 		$curBalance = [];
 		$realBalance = [];
-		$accName = [];
+		$this->accName = [];
 
 		$accArr = $accMod->getData([ "full" => TRUE ]);
 		foreach($accArr as $item)
 		{
 			$initBalance[$item->id] = $item->initbalance;
 			$curBalance[$item->id] = $item->balance;
-			$accName[$item->id] = $accMod->getNameOrPerson($item->id);
+			$this->accName[$item->id] = $accMod->getNameOrPerson($item->id);
 
 			$realBalance[$item->id] = $initBalance[$item->id];
 		}
 
 		$prev_date = 0;
 
-		$condArr = ["user_id=".$this->user_id];
+		$params = [];
 		if ($checkAccount_id != 0)
+			$params["accounts"] = $checkAccount_id;
+		$transArr = $trMod->getData($params);
+
+		foreach($transArr as $tr)
 		{
-			$accCond = [
-				andJoin([ "src_id=$checkAccount_id", "type".inSetCondition([ EXPENSE, TRANSFER, DEBT ]) ]),
-				andJoin([ "dest_id=$checkAccount_id", "type".inSetCondition([ INCOME, TRANSFER, DEBT ]) ])
-			];
+			unset($tr->createdate);
+			unset($tr->updatedate);
 
-			$condArr[] = orJoin($accCond);
-		}
-
-		$qResult = $db->selectQ("*", "transactions", $condArr, NULL, "pos");
-		$transArr = [];
-		while($row = $db->fetchRow($qResult))
-		{
-			$tr_id = intval($row["id"]);
-			$tr = ["type" => intval($row["type"]),
-						"src_id" => intval($row["src_id"]),
-						"dest_id" => intval($row["dest_id"]),
-						"src_amount" => floatval($row["src_amount"]),
-						"dest_amount" => floatval($row["dest_amount"]),
-						"src_result" => floatval($row["src_result"]),
-						"dest_result" => floatval($row["dest_result"]),
-						"comment" => $row["comment"],
-						"date" => strtotime($row["date"]),
-						"pos" => intval($row["pos"])];
-
-			unset($row);
-
-			$tr["src_name"] = $tr["src_id"] && isset($accName[$tr["src_id"]]) ? $accName[$tr["src_id"]] : NULL;
-			$tr["dest_name"] = $tr["dest_id"] && isset($accName[$tr["dest_id"]]) ? $accName[$tr["dest_id"]] : NULL;
-
-			if ($tr["type"] == EXPENSE)
+			if ($tr->type == EXPENSE)
 			{
-				if (!isset($realBalance[$tr["src_id"]]))
-					$realBalance[$tr["src_id"]] = $tr["src_result"];
+				if (!isset($realBalance[$tr->src_id]))
+					$realBalance[$tr->src_id] = $tr->src_result;
 
-				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
-				$tr["realbal"] = [ $tr["src_id"] => $realBalance[$tr["src_id"]] ];
+				$realBalance[$tr->src_id] = round($realBalance[$tr->src_id] - $tr->src_amount, 2);
+				$tr->realbal = [ $tr->src_id => $realBalance[$tr->src_id] ];
 			}
-			else if ($tr["type"] == INCOME)
+			else if ($tr->type == INCOME)
 			{
-				if (!isset($realBalance[ $tr["dest_id"] ]))
-					$realBalance[ $tr["dest_id"] ] = $tr["dest_result"];
+				if (!isset($realBalance[ $tr->dest_id ]))
+					$realBalance[ $tr->dest_id ] = $tr->dest_result;
 
-				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
-				$tr["realbal"] = [ $tr["dest_id"] => $realBalance[$tr["dest_id"]] ];
+				$realBalance[$tr->dest_id] = round($realBalance[$tr->dest_id] + $tr->dest_amount, 2);
+				$tr->realbal = [ $tr->dest_id => $realBalance[$tr->dest_id] ];
 			}
-			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["dest_id"] == $checkAccount_id)		/* transfer to */
+			else if ($checkAccount_id != 0 && $tr->type == TRANSFER && $tr->dest_id == $checkAccount_id)		/* transfer to */
 			{
-				$realBalance[ $tr["src_id"] ] = $tr["src_result"];
+				$realBalance[ $tr->src_id ] = $tr->src_result;
 
-				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr["dest_amount"], 2);
-				$tr["realbal"] = [ $checkAccount_id => $realBalance[$checkAccount_id],
-									$tr["src_id"] => $realBalance[ $tr["src_id"] ] ];
+				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] + $tr->dest_amount, 2);
+				$tr->realbal = [ $checkAccount_id => $realBalance[$checkAccount_id],
+									$tr->src_id => $realBalance[ $tr->src_id ] ];
 			}
-			else if ($checkAccount_id != 0 && $tr["type"] == TRANSFER && $tr["src_id"] == $checkAccount_id)		/* transfer from */
+			else if ($checkAccount_id != 0 && $tr->type == TRANSFER && $tr->src_id == $checkAccount_id)		/* transfer from */
 			{
-				$realBalance[ $tr["dest_id"] ] = $tr["dest_result"];
+				$realBalance[ $tr->dest_id ] = $tr->dest_result;
 
-				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr["src_amount"], 2);
-				$tr["realbal"] = [ $checkAccount_id => $realBalance[$checkAccount_id],
-									$tr["dest_id"] => $realBalance[ $tr["dest_id"] ] ];
+				$realBalance[$checkAccount_id] = round($realBalance[$checkAccount_id] - $tr->src_amount, 2);
+				$tr->realbal = [ $checkAccount_id => $realBalance[$checkAccount_id],
+									$tr->dest_id => $realBalance[ $tr->dest_id ] ];
 			}
-			else if ($checkAccount_id == 0 && $tr["type"] == TRANSFER)		/* Transfer between two accounts */
+			else if ($checkAccount_id == 0 && $tr->type == TRANSFER)		/* Transfer between two accounts */
 			{
-				$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
-				$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
-				$tr["realbal"] = [ $tr["src_id"] => $realBalance[$tr["src_id"]],
-									$tr["dest_id"] => $realBalance[$tr["dest_id"]] ];
+				$realBalance[$tr->src_id] = round($realBalance[$tr->src_id] - $tr->src_amount, 2);
+				$realBalance[$tr->dest_id] = round($realBalance[$tr->dest_id] + $tr->dest_amount, 2);
+				$tr->realbal = [ $tr->src_id => $realBalance[$tr->src_id],
+									$tr->dest_id => $realBalance[$tr->dest_id] ];
 			}
-			else if ($tr["type"] == DEBT)
+			else if ($tr->type == DEBT)
 			{
-				$tr["realbal"] = [];
+				$tr->realbal = [];
 
-				if ($tr["src_id"] != 0)
+				if ($tr->src_id != 0)
 				{
-					if ($tr["src_id"] == $checkAccount_id || $checkAccount_id == 0)
+					if ($tr->src_id == $checkAccount_id || $checkAccount_id == 0)
 					{
-						$realBalance[$tr["src_id"]] = round($realBalance[$tr["src_id"]] - $tr["src_amount"], 2);
+						$realBalance[$tr->src_id] = round($realBalance[$tr->src_id] - $tr->src_amount, 2);
 					}
 					else
 					{
-						$realBalance[$tr["src_id"]] = $tr["src_result"];
+						$realBalance[$tr->src_id] = $tr->src_result;
 					}
 
-					$tr["realbal"][$tr["src_id"]] = $realBalance[$tr["src_id"]];
+					$tr->realbal[$tr->src_id] = $realBalance[$tr->src_id];
 				}
-				if ($tr["dest_id"] != 0)
+				if ($tr->dest_id != 0)
 				{
-					if ($tr["dest_id"] == $checkAccount_id || $checkAccount_id == 0)
+					if ($tr->dest_id == $checkAccount_id || $checkAccount_id == 0)
 					{
-						$realBalance[$tr["dest_id"]] = round($realBalance[$tr["dest_id"]] + $tr["dest_amount"], 2);
+						$realBalance[$tr->dest_id] = round($realBalance[$tr->dest_id] + $tr->dest_amount, 2);
 					}
 					else
 					{
-						$realBalance[$tr["dest_id"]] = $tr["dest_result"];
+						$realBalance[$tr->dest_id] = $tr->dest_result;
 					}
 
-					$tr["realbal"][$tr["dest_id"]] = $realBalance[$tr["dest_id"]];
+					$tr->realbal[$tr->dest_id] = $realBalance[$tr->dest_id];
 				}
 			}
 
-			$tr["correctdate"] = ($tr["date"] >= $prev_date);
-			if ($tr["correctdate"])
-				$prev_date = $tr["date"];
-			$tr["datefmt"] = date("d.m.Y", $tr["date"]);
-
-			$transArr[$tr_id] = $tr;
+			$tr->correctdate = ($tr->date >= $prev_date);
+			if ($tr->correctdate)
+				$prev_date = $tr->date;
+			$tr->datefmt = date("d.m.Y", $tr->date);
 		}
 
 
