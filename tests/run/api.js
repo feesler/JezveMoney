@@ -77,8 +77,8 @@ let runAPI =
 
 		env.setBlock('Prepare data for security tests', 2);
 
-		const API_USER_ACC_RUB = await account.createTest({ name : 'RUB', currency : RUB, balance : 100.1, icon : 5 });
-		const API_USER_ACC_USD = await account.createTest({ name : 'USD', currency : USD, balance : 50, icon : 2 });
+		const API_USER_ACC_RUB = await account.createTest({ name : 'RUB', curr_id : RUB, balance : 100.1, icon : 5 });
+		const API_USER_ACC_USD = await account.createTest({ name : 'USD', curr_id : USD, balance : 50, icon : 2 });
 		const API_USER_PERSON = await person.createTest({ name : 'API user Person' });
 		const API_USER_TRANSACTION = await transaction.createExpenseTest({
 			src_id: API_USER_ACC_RUB,
@@ -98,16 +98,16 @@ let runAPI =
 
 		await test('Reset accounts', () => api.account.reset(), env);
 
-		let ACC_RUB = await account.createTest({ name : 'acc ru', currency : RUB, balance : 100, icon : 1 });
-		let CASH_RUB = await account.createTest({ name : 'cash ru', currency : RUB, balance : 5000, icon : 3 });
-		let ACC_USD = await account.createTest({ name : 'acc usd', currency : USD, balance : 10.5, icon : 5 });
+		let ACC_RUB = await account.createTest({ name : 'acc ru', curr_id : RUB, balance : 100, icon : 1 });
+		let CASH_RUB = await account.createTest({ name : 'cash ru', curr_id : RUB, balance : 5000, icon : 3 });
+		let ACC_USD = await account.createTest({ name : 'acc usd', curr_id : USD, balance : 10.5, icon : 5 });
 
 
 		/**
 		 * Security tests of accounts
 		 */
 		env.setBlock('Accounts security', 2);
-		await account.updateTest(API_USER_ACC_RUB, { name : 'EUR', currency : EUR, balance : 10, icon : 2 });		// TODO : use curr_id
+		await account.updateTest(API_USER_ACC_RUB, { name : 'EUR', curr_id : EUR, balance : 10, icon : 2 });
 		await account.deleteTest(API_USER_ACC_RUB);
 
 
@@ -123,7 +123,7 @@ let runAPI =
 		await person.updateTest(API_USER_PERSON, { name : 'API Person' });
 		await person.deleteTest(API_USER_PERSON);
 
-		
+
 		env.setBlock('Transactions', 2);
 
 
@@ -134,12 +134,12 @@ let runAPI =
 
 		const TR_EXPENSE_1 = await transaction.createExpenseTest({ src_id : ACC_RUB,
 														src_amount : 100,
-													 	comm : '11' });
+													 	comment: '11' });
 		const TR_EXPENSE_2 = await transaction.createExpenseTest({ src_id : ACC_RUB,
 														src_amount : 7608,
 														dest_amount : 100,
 														dest_curr : EUR,
-													 	comm : '22' });
+													 	comment: '22' });
 		const TR_EXPENSE_3 = await transaction.createExpenseTest({ src_id : ACC_USD,
 														src_amount : 1,
 														date : this.dates.yesterday });
@@ -160,21 +160,21 @@ let runAPI =
 														 	src_amount : 6500,
 														 	dest_amount : 100 });
 
-		const TR_DEBT_1 = await transaction.createDebtTest({ debtop : 1,
+		const TR_DEBT_1 = await transaction.createDebtTest({ op : 1,
 													person_id : PERSON_X,
 													acc_id : CASH_RUB,
 												 	src_amount : 500,
-												 	comm : 'x41' });
-		const TR_DEBT_2 = await transaction.createDebtTest({ debtop : 2,
+												 	comment: 'x41' });
+		const TR_DEBT_2 = await transaction.createDebtTest({ op : 2,
 													person_id : PERSON_Y,
 													acc_id : CASH_RUB,
 												 	src_amount : 1000 });
-		const TR_DEBT_3 = await transaction.createDebtTest({ debtop : 1,
+		const TR_DEBT_3 = await transaction.createDebtTest({ op : 1,
 													person_id : PERSON_X,
 													acc_id : 0,
 												 	src_amount : 500,
 													src_curr : RUB });
-		const TR_DEBT_4 = await transaction.createDebtTest({ debtop : 2,
+		const TR_DEBT_4 = await transaction.createDebtTest({ op : 2,
 													person_id : PERSON_Y,
 													acc_id : 0,
 												 	src_amount : 1000,
@@ -210,12 +210,12 @@ let runAPI =
 										 	date : this.dates.yesterday });
 
 		await transaction.updateTest({ id : TR_DEBT_1,
-											debtop : 2 });
+											op : 2 });
 		await transaction.updateTest({ id : TR_DEBT_2,
 											person_id : PERSON_Y,
 											acc_id : 0 });
 		await transaction.updateTest({ id : TR_DEBT_3,
-											debtop : 1,
+											op : 1,
 											acc_id : ACC_RUB });
 
 
@@ -225,10 +225,10 @@ let runAPI =
 		env.setBlock('Transaction security', 2);
 		env.setBlock('Create', 3);
 
-		await transaction.createTest({ transtype : EXPENSE, src_id : API_USER_ACC_RUB, dest_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
-		await transaction.createTest({ transtype : INCOME, src_id : 0, dest_id : API_USER_ACC_RUB, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
-		await transaction.createTest({ transtype : TRANSFER, src_id : CASH_RUB, dest_id : API_USER_ACC_RUB, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
-		await transaction.createDebtTest({ transtype : DEBT, debtop : 1, person_id : API_USER_PERSON, acc_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
+		await transaction.createTest({ type : EXPENSE, src_id : API_USER_ACC_RUB, dest_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
+		await transaction.createTest({ type : INCOME, src_id : 0, dest_id : API_USER_ACC_RUB, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
+		await transaction.createTest({ type : TRANSFER, src_id : CASH_RUB, dest_id : API_USER_ACC_RUB, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
+		await transaction.createDebtTest({ type : DEBT, op : 1, person_id : API_USER_PERSON, acc_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
 
 		/**
 		 * Security tests for update transactions
@@ -239,7 +239,7 @@ let runAPI =
 		await transaction.updateTest({ id : TR_INCOME_1, dest_id : API_USER_ACC_RUB });
 		await transaction.updateTest({ id : TR_TRANSFER_1, src_id : API_USER_ACC_RUB, dest_id : API_USER_ACC_USD });
 		// Trying to update transaction of another user
-		await transaction.updateTest({ id: API_USER_TRANSACTION, transtype : EXPENSE, src_id : CASH_RUB, dest_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
+		await transaction.updateTest({ id: API_USER_TRANSACTION, type : EXPENSE, src_id : CASH_RUB, dest_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 });
 		// Trying to set person of another user
 		await transaction.updateTest({ id: TR_DEBT_1, person_id : API_USER_PERSON });
 		// Trying to set account of another user
@@ -247,7 +247,7 @@ let runAPI =
 		// Trying to set both person and account of another user
 		await transaction.updateTest({ id: TR_DEBT_3, person_id : API_USER_PERSON, acc_id : API_USER_ACC_RUB });
 
-		/**	
+		/**
 		 * Security tests for delete transaction
 		 */
 		env.setBlock('Delete', 3);
@@ -281,7 +281,7 @@ let runAPI =
 		/**
 		 * Update accounts
 		 */
-		await account.updateTest(ACC_RUB, { name : 'acc rub', currency : USD, balance : 101, icon : 2 });
+		await account.updateTest(ACC_RUB, { name : 'acc rub', curr_id : USD, balance : 101, icon : 2 });
 
 
 		/**

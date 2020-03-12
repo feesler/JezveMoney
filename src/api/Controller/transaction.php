@@ -2,6 +2,10 @@
 
 class TransactionApiController extends ApiController
 {
+	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
+	protected $debtRequiredFields = [ "type", "person_id", "acc_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
+
+
 	public function initAPI()
 	{
 		parent::initAPI();
@@ -91,51 +95,19 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		$trans_type = intval($_POST["transtype"]);
-
-		if ($trans_type == DEBT)
-		{
-			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
-			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
-			$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
-
-			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
-				$respObj->fail();
-
-			$pers = PersonModel::getInstance();
-			if (!$pers->is_exist($person_id))		// person should exist
-				$respObj->fail();
-
-			$debtMod = DebtModel::getInstance();
-		}
-		else
-		{
-			$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
-			$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
-		}
-		$src_amount = floatval($_POST["src_amount"]);
-		$dest_amount = floatval($_POST["dest_amount"]);
-		$src_curr = (isset($_POST["src_curr"])) ? intval($_POST["src_curr"]) : 0;
-		$dest_curr = (isset($_POST["dest_curr"])) ? intval($_POST["dest_curr"]) : 0;
-		$trdate = strtotime($_POST["date"]);
-		$fdate = date("Y-m-d H:i:s", $trdate);
-		$comment = $db->escape($_POST["comm"]);
-
-		if ($src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
+		if (!isset($_POST["type"]))
 			$respObj->fail();
 
+		$trans_type = intval($_POST["type"]);
+
+		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
+		if ($reqData === FALSE)
+			$this->fail();
 
 		if ($trans_type == DEBT)
 		{
-			$trans_id = $debtMod->create([ "op" => $debt_op,
-											"acc_id" => $acc_id,
-											"person_id" => $person_id,
-											"src_amount" => $src_amount,
-											"dest_amount" => $dest_amount,
-											"src_curr" => $src_curr,
-											"dest_curr" => $dest_curr,
-											"date" => $fdate,
-											"comment" => $comment ]);
+			$debtMod = DebtModel::getInstance();
+			$trans_id = $debtMod->create($reqData);
 			if (!$trans_id)
 				$respObj->fail();
 
@@ -143,22 +115,7 @@ class TransactionApiController extends ApiController
 		}
 		else
 		{
-			if ($trans_type == EXPENSE && (!$src_id || !$src_curr || !$dest_curr))
-				$respObj->fail();
-			if ($trans_type == INCOME && (!$dest_id || !$src_curr || !$dest_curr))
-				$respObj->fail();
-			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
-				$respObj->fail();
-
-			$trans_id = $this->model->create([ "type" => $trans_type,
-												"src_id" => $src_id,
-												"dest_id" => $dest_id,
-												"src_amount" => $src_amount,
-												"dest_amount" => $dest_amount,
-												"src_curr" => $src_curr,
-												"dest_curr" => $dest_curr,
-												"date" => $fdate,
-												"comment" => $comment ]);
+			$trans_id = $this->model->create($reqData);
 			if (!$trans_id)
 				$respObj->fail();
 
@@ -213,72 +170,27 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["transid"]))
-					$respObj->fail();
-		$trans_id = intval($_POST["transid"]);
+		if (!isset($_POST["id"]))
+			$respObj->fail();
 
-		$trans_type = intval($_POST["transtype"]);
+		$trans_id = intval($_POST["id"]);
+		$trans_type = intval($_POST["type"]);
+
+		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
+		if ($reqData === FALSE)
+			$this->fail();
 
 		if ($trans_type == DEBT)
 		{
-			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
-			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
-			$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
-
-			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
-				$respObj->fail();
-
-			$pers = PersonModel::getInstance();
-			if (!$pers->is_exist($person_id))		// person should exist
-				$respObj->fail();
-
 			$debtMod = DebtModel::getInstance();
-		}
-		else
-		{
-			$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
-			$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
-		}
-		$src_amount = floatval($_POST["src_amount"]);
-		$dest_amount = floatval($_POST["dest_amount"]);
-		$src_curr = (isset($_POST["src_curr"])) ? intval($_POST["src_curr"]) : 0;
-		$dest_curr = (isset($_POST["dest_curr"])) ? intval($_POST["dest_curr"]) : 0;
-		$trdate = strtotime($_POST["date"]);
-		$fdate = date("Y-m-d H:i:s", $trdate);
-		$comment = $db->escape($_POST["comm"]);
-
-		if ($src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
-			$respObj->fail();
-
-		if ($trans_type == DEBT)
-		{
-			if (!$debtMod->update($trans_id, [ "op" => $debt_op,
-												"acc_id" => $acc_id,
-												"person_id" => $person_id,
-												"src_amount" => $src_amount,
-												"dest_amount" => $dest_amount,
-												"src_curr" => $src_curr,
-												"dest_curr" => $dest_curr,
-												"date" => $fdate,
-												"comment" => $comment ]))
+			if (!$debtMod->update($trans_id, $reqData))
 				$respObj->fail();
 		}
 		else
 		{
-			if (!$this->model->update($trans_id, [ "type" => $trans_type,
-												"src_id" => $src_id,
-												"dest_id" => $dest_id,
-												"src_amount" => $src_amount,
-												"dest_amount" => $dest_amount,
-												"src_curr" => $src_curr,
-												"dest_curr" => $dest_curr,
-												"date" => $fdate,
-												"comment" => $comment ]))
+			if (!$this->model->update($trans_id, $reqData))
 				$respObj->fail();
 		}
-		$ttStr = TransactionModel::getTypeString($trans_type);
-		if (is_null($ttStr))
-			$respObj->fail();
 
 		$respObj->ok();
 	}

@@ -48,9 +48,9 @@
 					<div>
 						<form id="mainfrm" method="post" action="<?=e($formAction)?>">
 <?php	if ($action == "edit") {	?>
-						<input name="transid" type="hidden" value="<?=e($tr["id"])?>">
-						<input name="transtype" type="hidden" value="<?=e($tr["type"])?>">
+						<input name="id" type="hidden" value="<?=e($tr["id"])?>">
 <?php	}	?>
+						<input name="type" type="hidden" value="<?=e($tr["type"])?>">
 						<div id="trtype_menu" class="subHeader">
 <?php	forEach($transMenu as $menuItem) {
 			if ($menuItem->ind == $tr["type"]) {		?>
@@ -211,6 +211,8 @@
 								</div>
 							</div>
 						</div>
+<?php	} else if ($tr["type"] == INCOME) {	?>
+						<input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 <?php	}	?>
 
 <?php	if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
@@ -254,13 +256,15 @@
 <?php	}	?>
 							</div>
 						</div>
+<?php	} else if ($tr["type"] == EXPENSE) {	?>
+						<input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
 <?php	}	?>
 <?php	if ($tr["type"] == DEBT) {		?>
 						<div id="operation" class="non_float">
 							<div><label>Operation</label></div>
 							<div class="op_sel clearfix">
-								<label><input id="debtgive" name="debtop" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span></label>
-								<label><input id="debttake" name="debtop" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span></label>
+								<label><input id="debtgive" name="op" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span></label>
+								<label><input id="debttake" name="op" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span></label>
 							</div>
 						</div>
 <?php	}	?>
@@ -384,7 +388,7 @@
 								<div><label for="comm">Comment</label></div>
 								<div>
 									<div class="stretch_input std_input">
-										<input id="comm" name="comm" type="text" value="<?=e($tr["comment"])?>">
+										<input id="comm" name="comment" type="text" value="<?=e($tr["comment"])?>">
 									</div>
 								</div>
 							</div>

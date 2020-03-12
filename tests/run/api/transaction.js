@@ -6,6 +6,8 @@ import {
 	INCOME,
 	TRANSFER,
 	DEBT,
+	availTransTypes,
+	isObject,
 	test,
 	copyObject,
 	setParam,
@@ -21,8 +23,13 @@ let runTransactionAPI =
 {
 	async checkCorrectness(params)
 	{
-		let isDebt = (params.transtype == DEBT);
-		if (isDebt)
+		if (!isObject(params))
+			return false;
+
+		if (!availTransTypes.includes(params.type))
+			return false;
+
+		if (params.type == DEBT)
 		{
 			if (!params.person_id)
 				return false;
@@ -42,7 +49,7 @@ let runTransactionAPI =
 		{
 			if (params.src_id)
 			{
-				if (params.transtype == INCOME)
+				if (params.type == INCOME)
 					return false;
 
 				let account = await this.state.getAccount(params.src_id);
@@ -52,7 +59,7 @@ let runTransactionAPI =
 
 			if (params.dest_id)
 			{
-				if (params.transtype == EXPENSE)
+				if (params.type == EXPENSE)
 					return false;
 
 				let account = await this.state.getAccount(params.dest_id);
@@ -69,13 +76,13 @@ let runTransactionAPI =
 	{
 		let res = copyObject(params);
 
-		let isDebt = (res.transtype == DEBT);
+		let isDebt = (res.type == DEBT);
 		if (isDebt)
 		{
-			let reqCurr = (res.debtop == 1) ? res.src_curr : res.dest_curr;
+			let reqCurr = (res.op == 1) ? res.src_curr : res.dest_curr;
 			let personAcc = await this.state.getPersonAccount(res.person_id, reqCurr);
 
-			if (res.debtop == 1)
+			if (res.op == 1)
 			{
 				if (personAcc)
 					res.src_id = personAcc.id;
@@ -88,16 +95,10 @@ let runTransactionAPI =
 					res.dest_id = personAcc.id;
 			}
 
-			delete res.debtop;
+			delete res.op;
 			delete res.person_id;
 			delete res.acc_id;
 		}
-
-		res.type = res.transtype;
-		delete res.transtype;
-
-		res.comment = res.comm;
-		delete res.comm;
 
 		return res;
 	},
@@ -105,7 +106,7 @@ let runTransactionAPI =
 
 	async updateExpectedTransaction(expTrans, accList, params)
 	{
-		let isDebt = (params.transtype == DEBT);
+		let isDebt = (params.type == DEBT);
 		if (!isDebt)
 			return { transaction : expTrans, accounts : accList };
 
@@ -114,7 +115,7 @@ let runTransactionAPI =
 			accounts : copyObject(accList)
 		};
 
-		let debtType = params.debtop == 1;
+		let debtType = params.op == 1;
 
 		if (params.acc_id)
 		{
@@ -159,7 +160,7 @@ let runTransactionAPI =
 
 
 	// Create transaction with specified params
-	// (transtype, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comm)
+	// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
 	async createTest(params)
 	{
 		let scope = this.run.api.transaction;
@@ -168,10 +169,10 @@ let runTransactionAPI =
 
 		if (!params.date)
 			params.date = formatDate(new Date());
-		if (!params.comm)
-			params.comm = '';
+		if (!params.comment)
+			params.comment = '';
 
-		await test('Create ' + getTransactionTypeStr(params.transtype) + ' transaction', async () =>
+		await test('Create ' + getTransactionTypeStr(params.type) + ' transaction', async () =>
 		{
 			let expTransList = await this.state.getTransactionsList();
 
@@ -264,7 +265,7 @@ let runTransactionAPI =
 
 
 	// Update transaction with specified params
-	// (transtype, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comm)
+	// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment
 	async updateTest(params)
 	{
 		let scope = this.run.api.transaction;
@@ -282,10 +283,7 @@ let runTransactionAPI =
 		{
 			updParams = copyObject(origTrans);
 
-			updParams.transtype = updParams.type;
-			delete updParams.type;
-
-			isDebt = (updParams.transtype == DEBT);
+			isDebt = (updParams.type == DEBT);
 			if (isDebt)
 			{
 				let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
@@ -293,13 +291,13 @@ let runTransactionAPI =
 
 				if (srcAcc && srcAcc.owner_id != this.owner_id)
 				{
-					updParams.debtop = 1;
+					updParams.op = 1;
 					updParams.person_id = srcAcc.owner_id;
 					updParams.acc_id = (destAcc) ? destAcc.id : 0;
 				}
 				else if (destAcc && destAcc.owner_id != this.owner_id)
 				{
-					updParams.debtop = 2;
+					updParams.op = 2;
 					updParams.person_id = destAcc.owner_id;
 					updParams.acc_id = (srcAcc) ? srcAcc.id : 0;
 				}
@@ -307,13 +305,10 @@ let runTransactionAPI =
 				delete updParams.src_id;
 				delete updParams.dest_id;
 			}
-
-			updParams.comm = updParams.comment;
-			delete updParams.comment;
 		}
 		else
 		{
-			updParams = { date : formatDate(new Date()), comm : '' };
+			updParams = { date : formatDate(new Date()), comment : '' };
 		}
 
 		setParam(updParams, params);
@@ -328,7 +323,7 @@ let runTransactionAPI =
 					let acc = fullAccList.find(item => item.id == updParams.acc_id);
 					if (acc)
 					{
-						if (updParams.debtop == 1)
+						if (updParams.op == 1)
 							updParams.dest_curr = acc.curr_id;
 						else
 							updParams.src_curr = acc.curr_id;
@@ -449,8 +444,8 @@ let runTransactionAPI =
 			if (resExpected)
 			{
 				expAccList = this.state.deleteTransactions(accBefore, ids.map(id => trBefore.list.find(item => item.id == id)));
-				expTransList = trBefore.deleteItems(ids);
-				expTransList = expTransList.updateResults(accBefore);
+				expTransList = trBefore.deleteItems(ids)
+										.updateResults(accBefore);
 			}
 			else
 			{

@@ -22,7 +22,7 @@ let runTransactionsCommon =
 
 		let res = copyObject(params);
 
-		res.transtype = EXPENSE;
+		res.type = EXPENSE;
 		res.dest_id = 0;
 
 		if (!res.dest_amount)
@@ -47,7 +47,7 @@ let runTransactionsCommon =
 
 		let res = copyObject(params);
 
-		res.transtype = INCOME;
+		res.type = INCOME;
 		res.src_id = 0;
 
 		if (!res.src_amount)
@@ -74,7 +74,7 @@ let runTransactionsCommon =
 
 		let res = copyObject(params);
 
-		res.transtype = TRANSFER;
+		res.type = TRANSFER;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
@@ -103,7 +103,7 @@ let runTransactionsCommon =
 
 		let res = copyObject(params);
 
-		res.transtype = DEBT;
+		res.type = DEBT;
 
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;

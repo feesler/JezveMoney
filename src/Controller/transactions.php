@@ -2,6 +2,10 @@
 
 class TransactionsController extends Controller
 {
+	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
+	protected $debtRequiredFields = [ "type", "person_id", "acc_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
+
+
 	protected function onStart()
 	{
 		$this->model = TransactionModel::getInstance();
@@ -302,7 +306,7 @@ class TransactionsController extends Controller
 			$transMenu[] = $menuItem;
 		}
 
-		$formAction = BASEURL."transactions/".$action."/?type=".$type_str;
+		$formAction = BASEURL."transactions/".$action."/";
 
 		if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER || $tr["type"] == DEBT)
 		{
@@ -689,94 +693,28 @@ class TransactionsController extends Controller
 		if (!$this->isPOST())
 			setLocation(BASEURL);
 
-		if (!isset($_GET["type"]))
+		if (!isset($_POST["type"]))
 			$this->fail();
-		$trans_type = TransactionModel::getStringType($_GET["type"]);
-		if (!$trans_type)
-			$this->fail();
+
+		$trans_type = intval($_POST["type"]);
 
 		$defMsg = ($trans_type == DEBT) ? ERR_DEBT_CREATE : ERR_TRANS_CREATE;
 
+		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
+		if ($reqData === FALSE)
+			$this->fail();
+
 		if ($trans_type == DEBT)
 		{
-			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
-			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
-			$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
-
-			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
-				$this->fail($defMsg);
-
-			if (!$this->personMod->is_exist($person_id))		// person should exist
-				$this->fail($defMsg);
-
 			$debtMod = DebtModel::getInstance();
-		}
-		else
-		{
-			$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
-			$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
-		}
-		$src_amount = floatval($_POST["src_amount"]);
-		$dest_amount = floatval($_POST["dest_amount"]);
-		$src_curr = (isset($_POST["src_curr"])) ? intval($_POST["src_curr"]) : 0;
-		$dest_curr = (isset($_POST["dest_curr"])) ? intval($_POST["dest_curr"]) : 0;
-		$trdate = strtotime($_POST["date"]);
-		$fdate = date("Y-m-d H:i:s", $trdate);
-		$comment = $_POST["comm"];
-
-		if ($src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
-			$this->fail($defMsg);
-
-		if ($trans_type == DEBT)
-		{
-			if (!$debtMod->create([ "op" => $debt_op,
-									"acc_id" => $acc_id,
-									"person_id" => $person_id,
-									"src_amount" => $src_amount,
-									"dest_amount" => $dest_amount,
-									"src_curr" => $src_curr,
-									"dest_curr" => $dest_curr,
-									"date" => $fdate,
-									"comment" => $comment ]))
+			if (!$debtMod->create($reqData))
 				$this->fail($defMsg);
 
 			Message::set(MSG_DEBT_CREATE);
 		}
 		else
 		{
-			if ($trans_type == EXPENSE && (!$src_id || !$src_curr || !$dest_curr))
-				fail($defMsg);
-			if ($trans_type == INCOME && (!$dest_id || !$src_curr || !$dest_curr))
-				fail($defMsg);
-			if ($trans_type == TRANSFER && (!$src_id || !$dest_id || !$src_curr || !$dest_id))
-				fail($defMsg);
-
-			// Check currency of account is the same as specified in transaction
-			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
-			{
-				$accObj = $this->accModel->getItem($src_id);
-				$src_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
-				if ($src_acc_curr != $src_curr)
-					fail($defMsg);
-			}
-
-			if ($trans_type == INCOME || $trans_type == TRANSFER)
-			{
-				$accObj = $this->accModel->getItem($dest_id);
-				$dest_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
-				if ($dest_acc_curr != $dest_curr)
-					fail($defMsg);
-			}
-
-			if (!$this->model->create([ "type" => $trans_type,
-										"src_id" => $src_id,
-										"dest_id" => $dest_id,
-										"src_amount" => $src_amount,
-										"dest_amount" => $dest_amount,
-										"src_curr" => $src_curr,
-										"dest_curr" => $dest_curr,
-										"date" => $fdate,
-										"comment" => $comment ]))
+			if (!$this->model->create($reqData))
 				$this->fail($defMsg);
 
 			Message::set(MSG_TRANS_CREATE);
@@ -791,85 +729,27 @@ class TransactionsController extends Controller
 		if (!$this->isPOST())
 			setLocation(BASEURL);
 
-		$trans_type = intval($_POST["transtype"]);
+		if (!isset($_POST["id"]) || !isset($_POST["type"]))
+			$this->fail();
+
+		$trans_type = intval($_POST["type"]);
 
 		$defMsg = ($trans_type == DEBT) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
 
+		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
+		if ($reqData === FALSE)
+			$this->fail();
+
 		if ($trans_type == DEBT)
 		{
-			$debt_op = (isset($_POST["debtop"])) ? intval($_POST["debtop"]) : 0;
-			$person_id = (isset($_POST["person_id"])) ? intval($_POST["person_id"]) : 0;
-			$acc_id = (isset($_POST["acc_id"])) ? intval($_POST["acc_id"]) : 0;
-
-			if (($debt_op != 1 && $debt_op != 2) || !$person_id)
-				$this->fail($defMsg);
-
-			if (!$this->personMod->is_exist($person_id))		// person should exist
-				$this->fail($defMsg);
-
 			$debtMod = DebtModel::getInstance();
-		}
-		else
-		{
-			$src_id = (isset($_POST["src_id"])) ? intval($_POST["src_id"]) : 0;
-			$dest_id = (isset($_POST["dest_id"])) ? intval($_POST["dest_id"]) : 0;
-		}
-		$src_amount = floatval($_POST["src_amount"]);
-		$dest_amount = floatval($_POST["dest_amount"]);
-		$src_curr = (isset($_POST["src_curr"])) ? intval($_POST["src_curr"]) : 0;
-		$dest_curr = (isset($_POST["dest_curr"])) ? intval($_POST["dest_curr"]) : 0;
-		$trdate = strtotime($_POST["date"]);
-		$fdate = date("Y-m-d H:i:s", $trdate);
-		$comment = $_POST["comm"];
-
-		if ($src_amount == 0.0 || $dest_amount == 0.0 || $trdate == -1)
-			$this->fail($defMsg);
-
-		if (!isset($_POST["transid"]))
-			$this->fail($defMsg);
-		$trans_id = intval($_POST["transid"]);
-		if ($trans_type == DEBT)
-		{
-			if (!$debtMod->update($trans_id, [ "op" => $debt_op,
-												"acc_id" => $acc_id,
-												"person_id" => $person_id,
-												"src_amount" => $src_amount,
-												"dest_amount" => $dest_amount,
-												"src_curr" => $src_curr,
-												"dest_curr" => $dest_curr,
-												"date" => $fdate,
-												"comment" => $comment ]))
+			if (!$debtMod->update($_POST["id"], $reqData))
 				$this->fail($defMsg);
 			Message::set(MSG_DEBT_UPDATE);
 		}
 		else
 		{
-			// Check currency of account is the same as specified in transaction
-			if ($trans_type == EXPENSE || $trans_type == TRANSFER)
-			{
-				$accObj = $this->accModel->getItem($src_id);
-				$src_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
-				if ($src_acc_curr != $src_curr)
-					fail($defMsg);
-			}
-
-			if ($trans_type == INCOME || $trans_type == TRANSFER)
-			{
-				$accObj = $this->accModel->getItem($dest_id);
-				$dest_acc_curr = ($accObj) ? $accObj->curr_id : NULL;
-				if ($dest_acc_curr != $dest_curr)
-					fail($defMsg);
-			}
-
-			if (!$this->model->update($trans_id, [ "type" => $trans_type,
-												"src_id" => $src_id,
-												"dest_id" => $dest_id,
-												"src_amount" => $src_amount,
-												"dest_amount" => $dest_amount,
-												"src_curr" => $src_curr,
-												"dest_curr" => $dest_curr,
-												"date" => $fdate,
-												"comment" => $comment ]))
+			if (!$this->model->update($_POST["id"], $reqData))
 				$this->fail($defMsg);
 		}
 

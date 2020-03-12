@@ -46,8 +46,8 @@
 										</div>
 									</td>
 									<td><div class="ellipsis_cell">
-<?php		if ($trItem["comm"] != "") {		?>
-										<div title="<?=e($trItem["comm"])?>"><span class="tritem_comm"><?=e($trItem["comm"])?></span></div>
+<?php		if ($trItem["comment"] != "") {		?>
+										<div title="<?=e($trItem["comment"])?>"><span class="tritem_comm"><?=e($trItem["comment"])?></span></div>
 <?php		} else {		?>
 										<div></div>
 <?php		}	?>
@@ -60,8 +60,8 @@
 									<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
 									<div class="tritem_date_comm">
 										<span><?=e($trItem["date"])?></span>
-<?php		if ($trItem["comm"] != "") {		?>
-										<span class="tritem_comm"><?=e($trItem["comm"])?></span>
+<?php		if ($trItem["comment"] != "") {		?>
+										<span class="tritem_comm"><?=e($trItem["comment"])?></span>
 <?php		}	?>
 									</div>
 								</div>

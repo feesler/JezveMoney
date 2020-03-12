@@ -24,12 +24,12 @@
 					<div>
 						<form id="personForm" method="post" action="<?=e(BASEURL."persons/".$action)?>/">
 <?php	if ($action == "edit") {		?>
-						<input id="pid" name="pid" type="hidden" value="<?=e($p_id)?>">
+						<input id="pid" name="id" type="hidden" value="<?=e($p_id)?>">
 <?php	}	?>
 						<div class="non_float std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
-								<input id="pname" name="pname" type="text" value="<?=e($pName)?>">
+								<input id="pname" name="name" type="text" value="<?=e($pName)?>">
 							</div>
 						</div>
 

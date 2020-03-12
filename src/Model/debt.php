@@ -24,7 +24,7 @@ class DebtModel
 	// Convert debt specific params to transaction object
 	public function prepareTransaction($params)
 	{
-		$mandatoryParams = ["person_id", "debtop", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment"];
+		$mandatoryParams = ["person_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment"];
 
 		checkFields($params, $mandatoryParams, TRUE);
 
@@ -34,7 +34,7 @@ class DebtModel
 		if (isset($params["id"]))
 			$res->id = intval($params["id"]);
 
-		$op = intval($params["debtop"]);
+		$op = intval($params["op"]);
 		if ($op != 1 && $op != 2)
 			throw new Error("Unknown debt operation: $op");
 

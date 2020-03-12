@@ -8,10 +8,10 @@ const USD = 2;
 const EUR = 3;
 const PLN = 4;
 
-let accountsList = [{ name : 'acc_4', currency : RUB, balance : '60500.12', icon : 1 },
-					{ name : 'acc_5', currency : RUB, balance : '78000', icon : 2 },
-					{ name : 'cash USD', currency : USD, balance : '10000', icon : 4 },
-					{ name : 'cash EUR', currency : EUR, balance : '1000', icon : 5 }];
+let accountsList = [{ name : 'acc_4', curr_id : RUB, balance : '60500.12', icon : 1 },
+					{ name : 'acc_5', curr_id : RUB, balance : '78000', icon : 2 },
+					{ name : 'cash USD', curr_id : USD, balance : '10000', icon : 4 },
+					{ name : 'cash EUR', curr_id : EUR, balance : '1000', icon : 5 }];
 
 let accIds = [];
 
@@ -24,36 +24,36 @@ let newTransfers = [];
 let newDebts = [];
 
 let expensesList = [
-	{ src_id : 0, src_amount : '500', comm : 'lalala' },
-	{ src_id : 0, src_amount : '500', destCurr : USD, comm : 'lalala' },
-	{ src_id : 1, src_amount : '100', comm : 'hohoho' },
-	{ src_id : 1, src_amount : '780', dest_amount : '10', destCurr : EUR, comm : 'кккк' },
-	{ src_id : 2, src_amount : '50', comm : '1111' }
+	{ src_id : 0, src_amount : '500', comment: 'lalala' },
+	{ src_id : 0, src_amount : '500', dest_curr : USD, comment: 'lalala' },
+	{ src_id : 1, src_amount : '100', comment: 'hohoho' },
+	{ src_id : 1, src_amount : '780', dest_amount : '10', dest_curr : EUR, comment: 'кккк' },
+	{ src_id : 2, src_amount : '50', comment: '1111' }
 ];
 
 let incomesList = [
-	{ dest_id : 3, src_amount : '100', dest_amount : '7500', destCurr : RUB, comm : '232323' },
-	{ dest_id : 0, src_amount : '1000000', dest_amount : '64000', srcCurr : PLN, comm : '111 кккк' },
-	{ dest_id : 0, dest_amount : '100', comm : '22222' },
-	{ dest_id : 1, src_amount : '7013.21', dest_amount : '5000', comm : '33333' },
-	{ dest_id : 3, src_amount : '287', dest_amount : '4', srcCurr : 1, comm : 'dddd' },
-	{ dest_id : 3, dest_amount : '33', comm : '11 ho' }
+	{ dest_id : 3, src_amount : '7500', dest_amount : '100', src_curr : RUB, comment: '232323' },
+	{ dest_id : 0, src_amount : '1000000', dest_amount : '64000', src_curr : PLN, comment: '111 кккк' },
+	{ dest_id : 0, dest_amount : '100', comment: '22222' },
+	{ dest_id : 1, src_amount : '7013.21', dest_amount : '5000', comment: '33333' },
+	{ dest_id : 3, src_amount : '287', dest_amount : '4', src_curr : RUB, comment: 'dddd' },
+	{ dest_id : 3, dest_amount : '33', comment: '11 ho' }
 ];
 
 let transfersList = [
-	{ src_id : 0, dest_id : 1, src_amount : '300', comm : 'd4' },
-	{ src_id : 0, dest_id : 2, src_amount : '6500', dest_amount : '100', comm : 'g6' },
-	{ src_id : 1, dest_id : 0, src_amount : '800.01', comm : 'x0' },
-	{ src_id : 1, dest_id : 2, src_amount : '7', dest_amount : '0.08', comm : 'l2' },
-	{ src_id : 3, dest_id : 2, src_amount : '5.0301', dest_amount : '4.7614', comm : 'i1' }
+	{ src_id : 0, dest_id : 1, src_amount : '300', comment: 'd4' },
+	{ src_id : 0, dest_id : 2, src_amount : '6500', dest_amount : '100', comment: 'g6' },
+	{ src_id : 1, dest_id : 0, src_amount : '800.01', comment: 'x0' },
+	{ src_id : 1, dest_id : 2, src_amount : '7', dest_amount : '0.08', comment: 'l2' },
+	{ src_id : 3, dest_id : 2, src_amount : '5.0301', dest_amount : '4.7614', comment: 'i1' }
 ];
 
 let debtsList = [
-	{ debtop : 1, person_id : 0, src_amount : '1050', src_curr : RUB, comm : '111 кккк' },
-	{ debtop : 1, person_id : 1, acc_id : 1, src_amount : '780', comm : '--**' },
-	{ debtop : 2, person_id : 0, src_amount : '990.99', src_curr : RUB, comm : 'ппп ppp' },
-	{ debtop : 2, person_id : 1, acc_id : 2, src_amount : '105', comm : '6050 кккк' },
-	{ debtop : 1, person_id : 0, acc_id : 3, src_amount : '4', comm : '111 кккк' }
+	{ op : 1, person_id : 0, src_amount : '1050', src_curr : RUB, comment: '111 кккк' },
+	{ op : 1, person_id : 1, acc_id : 1, src_amount : '780', comment: '--**' },
+	{ op : 2, person_id : 0, src_amount : '990.99', src_curr : RUB, comment: 'ппп ppp' },
+	{ op : 2, person_id : 1, acc_id : 2, src_amount : '105', comment: '6050 кккк' },
+	{ op : 1, person_id : 0, acc_id : 3, src_amount : '4', comment: '111 кккк' }
 ];
 
 

@@ -2,6 +2,9 @@
 
 class PersonsController extends Controller
 {
+	protected $requiredFields = [ "name" ];
+
+	
 	public function index()
 	{
 		$persArr = $this->personMod->getData();
@@ -89,16 +92,11 @@ class PersonsController extends Controller
 
 		$defMsg = ERR_PERSON_CREATE;
 
-		if (!isset($_POST["pname"]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
 			$this->fail($defMsg);
-
-		$person_name = $_POST["pname"];
-
-		$check_id = $this->personMod->findByName($person_name);
-		if ($check_id != 0)
-			$this->fail(ERR_PERSON_UPDATE_EXIST);
-
-		if (!$this->personMod->create([ "name" => $person_name ]))
+			
+		if (!$this->personMod->create($reqData))
 			$this->fail($defMsg);
 
 		Message::set(MSG_PERSON_CREATE);
@@ -114,20 +112,14 @@ class PersonsController extends Controller
 
 		$defMsg = ERR_PERSON_UPDATE;
 
-		if (!isset($_POST["pname"]))
+		if (!isset($_POST["id"]))
 			$this->fail($defMsg);
 
-		$person_name = $_POST["pname"];
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
+			$respObj->fail($defMsg);
 
-		$check_id = $this->personMod->findByName($person_name);
-		if ($check_id != 0)
-			$this->fail(ERR_PERSON_UPDATE_EXIST);
-
-		if (!isset($_POST["pid"]))
-			$this->fail($defMsg);
-
-		$person_id = intval($_POST["pid"]);
-		if (!$this->personMod->update($person_id, [ "name" => $person_name ]))
+		if (!$this->personMod->update($_POST["id"], $reqData))
 			$this->fail($defMsg);
 
 		Message::set(MSG_PERSON_UPDATE);

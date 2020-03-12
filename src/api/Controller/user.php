@@ -2,6 +2,9 @@
 
 class UserApiController extends ApiController
 {
+	protected $createRequiredFields = [ "login", "password", "name" ];
+
+
 	public function initAPI()
 	{
 		parent::initAPI();
@@ -12,15 +15,17 @@ class UserApiController extends ApiController
 	{
 		wlog("UserApiController::login()");
 
+		$requiredFields = [ "login", "password" ];
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["login"]) || !isset($_POST["pwd"]))
+		$reqData = checkFields($_POST, $requiredFields);
+		if ($reqData === FALSE)
 			$respObj->fail();
 
-		if (!$this->uMod->login($_POST["login"], $_POST["pwd"]))
+		if (!$this->uMod->login($reqData["login"], $reqData["password"]))
 			$respObj->fail();
 
 		$respObj->ok();
@@ -54,12 +59,11 @@ class UserApiController extends ApiController
 		if ($this->user_id != 0)		// need to log out first
 			$respObj->fail();
 
-		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
+		$reqData = checkFields($_POST, $this->createRequiredFields);
+		if ($reqData === FALSE)
 			$respObj->fail();
 
-		if (!$this->uMod->create([ "login" => $_POST["login"],
-									"password" => $_POST["password"],
-									"name" => $_POST["name"] ]))
+		if (!$this->uMod->create($reqData))
 			$respObj->fail();
 
 		$respObj->ok();
@@ -84,12 +88,11 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$res->fail();
 
-		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
+		$reqData = checkFields($_POST, $this->createRequiredFields);
+		if ($reqData === FALSE)
 			$res->fail($defMsg);
 
-		$new_user_id = $this->uMod->create([ "login" => $_POST["login"],
-												"password" => $_POST["password"],
-												"name" => $_POST["name"] ]);
+		$new_user_id = $this->uMod->create($reqData);
 		if (!$new_user_id)
 			$res->fail($defMsg);
 
@@ -141,6 +144,7 @@ class UserApiController extends ApiController
 
 	protected function changePassword()
 	{
+		$requiredFields = [ "id", "password" ];
 		$defMsg = ERR_PROFILE_PASSWORD;
 
 		$res = new apiResponse;
@@ -148,14 +152,15 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$res->fail($defMsg);
 
-		if (!isset($_POST["id"]) || !isset($_POST["pass"]))
+		$reqData = checkFields($_POST, $requiredFields);
+		if ($reqData === FALSE)
 			$res->fail($defMsg);
 
-		$uObj = $this->uMod->getItem($_POST["id"]);
+		$uObj = $this->uMod->getItem($reqData["id"]);
 		if (!$uObj)
 			$res->fail($defMsg);
 
-		if (!$this->uMod->setPassword($uObj->login, $_POST["pass"]))
+		if (!$this->uMod->setPassword($uObj->login, $reqData["password"]))
 			$res->fail($defMsg);
 
 		$res->msg = Message::get(MSG_PROFILE_PASSWORD);

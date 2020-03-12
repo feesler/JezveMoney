@@ -30,7 +30,7 @@ let runAccountAPI =
 		if (accObj && (!id || (id && id != accObj.id)))
 			return false;
 
-		let currObj = Currency.getById(params.currency);
+		let currObj = Currency.getById(params.curr_id);
 		if (!currObj)
 			return false;
 
@@ -48,7 +48,7 @@ let runAccountAPI =
 	 * Account tests
 	 */
 
-	// Create account with specified params (name, currency, balance, icon)
+	// Create account with specified params (name, curr_id, balance, icon)
 	// And check expected state of app
 	async createTest(params)
 	{
@@ -65,8 +65,6 @@ let runAccountAPI =
 			resExpected = await scope.checkCorrectness(params);
 
 			let expAccObj = copyObject(params);
-			expAccObj.curr_id = params.currency;
-			delete expAccObj.currency;
 
 			this.state.accounts = null;
 
@@ -98,7 +96,7 @@ let runAccountAPI =
 	},
 
 
-	// Update account with specified params (name, currency, balance, icon)
+	// Update account with specified params (name, curr_id, balance, icon)
 	// And check expected state of app
 	async updateTest(id, params)
 	{
@@ -117,12 +115,11 @@ let runAccountAPI =
 			if (origAcc)
 			{
 				updParams = copyObject(origAcc);
-				updParams.currency = ('currency' in params) ? params.currency : updParams.curr_id;
-				delete updParams.curr_id;
+				updParams.curr_id = ('curr_id' in params) ? params.curr_id : updParams.curr_id;
 
 				// Prepare expected account object
 				let expAccObj = copyObject(origAcc);
-				expAccObj.curr_id = updParams.currency;
+				expAccObj.curr_id = updParams.curr_id;
 
 				let balDiff = expAccObj.balance - origAcc.initbalance;
 				if (balDiff.toFixed(2) != 0)
@@ -230,7 +227,7 @@ let runAccountAPI =
 			{
 				deleteRes = await api.account.del(ids);
 				if (resExpected != deleteRes)
-					return false;				
+					return false;
 			}
 			catch(e)
 			{

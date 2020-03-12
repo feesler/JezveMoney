@@ -10,7 +10,10 @@ class TransactionModel extends CachedTable
 	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
 	static private $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 	static private $srcAvailTypes = [ EXPENSE, TRANSFER, DEBT ];
+	static private $srcMandatoryTypes = [ EXPENSE, TRANSFER ];
+
 	static private $destAvailTypes = [ INCOME, TRANSFER, DEBT ];
+	static private $destMandatoryTypes = [ INCOME, TRANSFER ];
 
 
 	protected function onStart()
@@ -113,11 +116,13 @@ class TransactionModel extends CachedTable
 			}
 		}
 
+		$srcAcc = NULL;
 		if (isset($params["src_id"]))
 		{
 			$res["src_id"] = intval($params["src_id"]);
+			// Check set state of account according to type of transaction
 			if (($res["src_id"] && !in_array($res["type"], self::$srcAvailTypes)) ||
-				(!$res["src_id"] && in_array($res["type"], [EXPENSE, TRANSFER])))
+				(!$res["src_id"] && in_array($res["type"], self::$srcMandatoryTypes)))
 			{
 				wlog("Invalid src_id specified");
 				return NULL;
@@ -135,11 +140,13 @@ class TransactionModel extends CachedTable
 			}
 		}
 
+		$destAcc = NULL;
 		if (isset($params["dest_id"]))
 		{
 			$res["dest_id"] = intval($params["dest_id"]);
+			// Check set state of account according to type of transaction
 			if (($res["dest_id"] && !in_array($res["type"], self::$destAvailTypes)) ||
-				(!$res["dest_id"] && in_array($res["type"], [INCOME, TRANSFER])))
+				(!$res["dest_id"] && in_array($res["type"], self::$destMandatoryTypes)))
 			{
 				wlog("Invalid dest_id specified");
 				return NULL;
@@ -148,8 +155,8 @@ class TransactionModel extends CachedTable
 			// Check owner of account
 			if ($res["dest_id"])
 			{
-				$srcAcc = $this->accModel->getItem($res["dest_id"]);
-				if (!$srcAcc || $srcAcc->user_id != self::$user_id)
+				$destAcc = $this->accModel->getItem($res["dest_id"]);
+				if (!$destAcc || $destAcc->user_id != self::$user_id)
 				{
 					wlog("Invalid dest_id specified");
 					return NULL;
@@ -180,7 +187,8 @@ class TransactionModel extends CachedTable
 		if (isset($params["src_curr"]))
 		{
 			$res["src_curr"] = intval($params["src_curr"]);
-			if (!$this->currMod->is_exist($res["src_curr"]))
+			if (!$this->currMod->is_exist($res["src_curr"]) ||
+				($srcAcc && $srcAcc->curr_id != $res["src_curr"]))
 			{
 				wlog("Invalid src_curr specified");
 				return NULL;
@@ -190,7 +198,8 @@ class TransactionModel extends CachedTable
 		if (isset($params["dest_curr"]))
 		{
 			$res["dest_curr"] = intval($params["dest_curr"]);
-			if (!$this->currMod->is_exist($res["dest_curr"]))
+			if (!$this->currMod->is_exist($res["dest_curr"]) ||
+				($destAcc && $destAcc->curr_id != $res["dest_curr"]))
 			{
 				wlog("Invalid dest_curr specified");
 				return NULL;
@@ -1457,7 +1466,7 @@ class TransactionModel extends CachedTable
 		$res["amount"] = $amStr;
 
 		$res["date"] =  date("d.m.Y", $transaction->date);
-		$res["comm"] = $transaction->comment;
+		$res["comment"] = $transaction->comment;
 
 		if ($detailsMode)
 		{

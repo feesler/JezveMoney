@@ -45,25 +45,20 @@ class ProfileController extends Controller
 
 	public function changeName()
 	{
+		$requiredFileds = [ "name" ];
+
 		if (!$this->isPOST())
 			setLocation(BASEURL."profile/");
 
 		$defMsg = ERR_PROFILE_NAME;
 
-		if (!isset($_POST["newname"]))
-			$this->fail($defMsg);
-
-		$new_name = $_POST["newname"];
-		if (is_empty($new_name))
+		$reqData = checkFields($_POST, $requiredFields);
+		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
 		$owner_id = $this->uMod->getOwner($this->user_id);
-		$old_name = $this->personMod->getName($owner_id);
 
-		if ($old_name == $db->escape($new_name))
-			$this->fail($defMsg);
-
-		if (!$this->personMod->update($owner_id, [ "name" => $new_name ]))
+		if (!$this->personMod->update($owner_id, $reqData))
 			$this->fail($defMsg);
 
 		Message::set(MSG_PROFILE_NAME);
@@ -74,19 +69,22 @@ class ProfileController extends Controller
 
 	public function changePass()
 	{
+		$requiredFileds = [ "current", "new" ];
+
 		if (!$this->isPOST())
 			setLocation(BASEURL."profile/");
 
 		$defMsg = ERR_PROFILE_PASSWORD;
 
-		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
+		$reqData = checkFields($_POST, $requiredFields);
+		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
 			$this->fail($defMsg);
 
-		if (!$this->uMod->changePassword($uObj->login, $_POST["oldpwd"], $_POST["newpwd"]))
+		if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]))
 			$this->fail($defMsg);
 
 		Message::set(MSG_PROFILE_PASSWORD);

@@ -110,7 +110,7 @@ class TransactionView extends TestView
 
 		if (res.isUpdate)
 		{
-			let hiddenEl = await this.query('input[name="transid"]');
+			let hiddenEl = await this.query('input[name="id"]');
 			if (!hiddenEl)
 				throw new Error('Transaction id field not found');
 

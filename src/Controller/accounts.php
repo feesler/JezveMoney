@@ -8,6 +8,9 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class AccountsController extends Controller
 {
+	protected $requiredFields = [ "name", "balance", "curr_id", "icon" ];
+
+
 	protected function onStart()
 	{
 		$this->model = AccountModel::getInstance();
@@ -127,17 +130,17 @@ class AccountsController extends Controller
 
 		$defMsg = ERR_ACCOUNT_CREATE;
 
-		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
 			$this->fail($defMsg);
-		if (!$this->model->create([ "owner_id" => $uObj->owner_id,
-								"name" => $_POST["accname"],
-								"balance" => $_POST["balance"],
-								"curr_id" => $_POST["currency"],
-								"icon" => $_POST["icon"] ]))
+
+		$reqData["owner_id"] = $uObj->owner_id;
+
+		if (!$this->model->create($reqData))
 			$this->fail($defMsg);
 
 		Message::set(MSG_ACCOUNT_CREATE);
@@ -153,16 +156,14 @@ class AccountsController extends Controller
 
 		$defMsg = ERR_ACCOUNT_UPDATE;
 
-		if (!isset($_POST["accname"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
-			$this->fail($defMsg);
-		if (!isset($_POST["accid"]))
+		if (!isset($_POST["id"]))
 			$this->fail($defMsg);
 
-		if (!$this->model->update($_POST["accid"],
-								[ "name" => $_POST["accname"],
-									"balance" => $_POST["balance"],
-									"curr_id" => $_POST["currency"],
-									"icon" => $_POST["icon"] ]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
+			$this->fail($defMsg);
+
+		if (!$this->model->update($_POST["id"], $reqData))
 			$this->fail($defMsg);
 
 		Message::set(MSG_ACCOUNT_UPDATE);

@@ -154,7 +154,7 @@ function onChangePassSubmit(frm)
 	}
 
 	ajax.post(baseURL + 'api/profile/changepass',
-				urlJoin({ 'oldpwd' : oldpwd.value, 'newpwd' : newpwd.value }),
+				urlJoin({ 'current' : oldpwd.value, 'new' : newpwd.value }),
 				onChangePasswordResult);
 
 	return false;

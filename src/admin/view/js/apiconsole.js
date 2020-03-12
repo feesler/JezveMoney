@@ -455,10 +455,10 @@ function onReadAccountSubmit()
 
 function onCreateAccountSubmit()
 {
-	var nameInp = ge('accname');
-	var balanceInput = ge('accbalance');
-	var currencyInput = ge('acccurrency');
-	var iconInput = ge('accicon');
+	var nameInp = ge('reate_account_name');
+	var balanceInput = ge('reate_account_balance');
+	var currencyInput = ge('create_account_curr');
+	var iconInput = ge('create_account_icon');
 
 	if (!nameInp || !balanceInput || !currencyInput || !iconInput)
 		return;
@@ -480,11 +480,11 @@ function onCreateAccountSubmit()
 
 function onUpdateAccountSubmit()
 {
-	var idInp = ge('updaccid');
-	var nameInp = ge('updaccname');
-	var balanceInput = ge('updaccbalance');
-	var currencyInput = ge('updacccurrency');
-	var iconInput = ge('updaccicon');
+	var idInp = ge('update_account_id');
+	var nameInp = ge('update_account_name');
+	var balanceInput = ge('update_account_balance');
+	var currencyInput = ge('update_account_curr');
+	var iconInput = ge('update_account_icon');
 
 	if (!idInp || !nameInp || !balanceInput || !currencyInput || !iconInput)
 		return;
@@ -523,7 +523,7 @@ function onDeleteAccountSubmit()
 
 function onCurrencyReadSubmit()
 {
-	var curr_id_inp = ge('curr_id');
+	var curr_id_inp = ge('read_curr_id');
 
 	if (!curr_id_inp)
 		return;
@@ -540,7 +540,7 @@ function onCurrencyReadSubmit()
 
 function onReadPersonSubmit()
 {
-	var id_inp = ge('readpid');
+	var id_inp = ge('read_person_id');
 
 	if (!id_inp)
 		return;
@@ -573,7 +573,7 @@ function onDeletePersonSubmit()
 
 function onReadTransactionSubmit()
 {
-	var transInp = ge('readtransid');
+	var transInp = ge('read_trans_id');
 
 	if (!transInp)
 		return;
@@ -632,10 +632,6 @@ function initControls()
 	var readaccbtn = ge('readaccbtn');
 	if (readaccbtn)
 		readaccbtn.onclick = onReadAccountSubmit;
-
-	var accbtn = ge('accbtn');
-	if (accbtn)
-		accbtn.onclick = onCreateAccountSubmit;
 
 	var accbtn = ge('accbtn');
 	if (accbtn)

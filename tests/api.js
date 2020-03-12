@@ -154,9 +154,9 @@ let apiModule = (function()
 	// Try to login user and return boolean result
 	async function loginUser({ login, password })
 	{
-		let apiRes = await apiPost('login', { login, pwd : password });
+		let apiRes = await apiPost('login', { login, password });
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -164,7 +164,7 @@ let apiModule = (function()
 	{
 		let apiRes = await apiPost('logout');
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -172,7 +172,7 @@ let apiModule = (function()
 	{
 		let apiRes = await apiPost('register', { login, password, name });
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -220,11 +220,11 @@ let apiModule = (function()
 	}
 
 
-	async function resetUserPassword(id, newPassword)
+	async function resetUserPassword(id, password)
 	{
-		let apiRes = await apiPost('user/changePassword', { id, pass : newPassword });
+		let apiRes = await apiPost('user/changePassword', { id, password });
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -270,15 +270,15 @@ let apiModule = (function()
 	{
 		let apiRes = await apiPost('profile/changename', { name });
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
 	async function changeProfilePassword({ oldPassword, newPassword })
 	{
-		let apiRes = await apiPost('profile/changepass', { oldpwd : oldPassword, newpwd : newPassword });
+		let apiRes = await apiPost('profile/changepass', { current : oldPassword, new : newPassword });
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -287,7 +287,7 @@ let apiModule = (function()
 	{
 		let apiRes = await apiPost('profile/reset');
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -296,7 +296,7 @@ let apiModule = (function()
 	{
 		let apiRes = await apiPost('profile/delete');
 
-		return (apiRes && apiRes.result && apiRes.result == 'ok');
+		return (apiRes && apiRes.result == 'ok');
 	}
 
 
@@ -304,7 +304,7 @@ let apiModule = (function()
  * Accounts
  */
 
-	let accReqFields = ['name', 'balance', 'currency', 'icon'];
+	let accReqFields = ['name', 'balance', 'curr_id', 'icon'];
 
 
 	async function readAccount(ids)
@@ -508,9 +508,9 @@ let apiModule = (function()
  * Transactions
  */
 
-	let trReqFields = ['transtype', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comm'];
+	let trReqFields = ['type', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
 	let clTrReqFields = ['src_id', 'dest_id'];
-	let debtReqFields = ['debtop', 'person_id', 'acc_id'];
+	let debtReqFields = ['op', 'person_id', 'acc_id'];
 
 
 	async function readTransaction(ids)
@@ -543,13 +543,11 @@ let apiModule = (function()
 	{
 		if (!options.date)
 			options.date = formatDate(new Date());
-		if (typeof options.comm === 'undefined')
-			options.comm = '';
+		if (typeof options.comment === 'undefined')
+			options.comment = '';
 
  		let res = checkFields(options, trReqFields);
-
-		let isDebt = (res.transtype == DEBT);
-		let additionalData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
+		let additionalData = checkFields(options, (res.type == DEBT) ? debtReqFields : clTrReqFields);
 
 		setParam(res, additionalData);
 
@@ -577,13 +575,6 @@ let apiModule = (function()
 		for(let options of transactions)
 		{
 			let itemData = prepareTransactionData(options);
-
-			itemData.type = itemData.transtype;
-			delete itemData.transtype;
-
-			itemData.comment = itemData.comm;
-			delete itemData.comm;
-
 			postData.push(itemData);
 		}
 
@@ -605,10 +596,9 @@ let apiModule = (function()
 		}
 
 		let postData = checkFields(options, trReqFields);
-		postData.transid = id;
+		postData.id = id;
 
-		let isDebt = (postData.transtype == DEBT);
-		let addData = checkFields(options, (isDebt) ? debtReqFields : clTrReqFields);
+		let addData = checkFields(options, (postData.type == DEBT) ? debtReqFields : clTrReqFields);
 
 		setParam(postData, addData);
 

@@ -28,26 +28,22 @@ class ProfileApiController extends ApiController
 
 	public function changename()
 	{
+		$requiredFields = [ "name" ];
+		$defMsg = Message::get(ERR_PROFILE_PASSWORD);
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		$pObj = $this->personMod->getItem($this->owner_id);
-		if (!$pObj)
-			$respObj->fail("Person not found");
+		$reqData = checkFields($_POST, $requiredFields);
+		if ($reqData === FALSE)
+			$respObj->fail($defMsg);
 
-		$old_name = $pObj->name;
-		$new_name = $_POST["name"];
-
-		if ($old_name == $new_name)
-			$respObj->fail(Message::get(ERR_PROFILE_NAME));
-
-		if (!$this->personMod->update($this->owner_id, [ "name" => $new_name ]))
-			$respObj->fail(Message::get(ERR_PROFILE_NAME));
+		if (!$this->personMod->update($this->owner_id, $reqData))
+			$respObj->fail($defMsg);
 
 		$respObj->msg = Message::get(MSG_PROFILE_NAME);
-		$respObj->data = ["name" => $new_name];
+		$respObj->data = $reqData;
 
 		$respObj->ok();
 	}
@@ -55,20 +51,23 @@ class ProfileApiController extends ApiController
 
 	public function changepass()
 	{
+		$requiredFields = [ "current", "new" ];
+		$defMsg = Message::get(ERR_PROFILE_PASSWORD);
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["oldpwd"]) || !isset($_POST["newpwd"]))
-			$respObj->fail(Message::get(ERR_PROFILE_PASSWORD));
+		$reqData = checkFields($_POST, $requiredFields);
+		if ($reqData === FALSE)
+			$respObj->fail($defMsg);
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
-			$respObj->fail(Message::get(ERR_PROFILE_PASSWORD));
+			$respObj->fail($defMsg);
 
-		if (!$this->uMod->changePassword($uObj->login, $_POST["oldpwd"], $_POST["newpwd"]))
-			$respObj->fail(Message::get(ERR_PROFILE_PASSWORD));
+		if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]))
+			$respObj->fail($defMsg);
 
 		$respObj->msg = Message::get(MSG_PROFILE_PASSWORD);
 
@@ -78,6 +77,7 @@ class ProfileApiController extends ApiController
 
 	public function reset()
 	{
+		$defMsg = Message::get(ERR_PROFILE_PASSWORD);
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
@@ -85,10 +85,10 @@ class ProfileApiController extends ApiController
 
 		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset($this->user_id))
-			$this->fail(Message::get(ERR_PROFILE_RESETALL));
+			$this->fail($defMsg);
 
 		if (!$this->personMod->reset())
-			$this->fail(Message::get(ERR_PROFILE_RESETALL));
+			$this->fail($defMsg);
 
 		$respObj->msg = Message::get(MSG_PROFILE_RESETALL);
 

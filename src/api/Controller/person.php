@@ -2,6 +2,9 @@
 
 class PersonApiController extends ApiController
 {
+	protected $requiredFields = [ "name" ];
+
+
 	public function initAPI()
 	{
 		parent::initAPI();
@@ -53,10 +56,11 @@ class PersonApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["name"]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
 			$respObj->fail();
 
-		$p_id = $this->personMod->create([ "name" => $_POST["name"] ]);
+		$p_id = $this->personMod->create($reqData);
 		if (!$p_id)
 			$respObj->fail();
 
@@ -74,10 +78,14 @@ class PersonApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["id"]) || !isset($_POST["name"]))
+		if (!isset($_POST["id"]))
 			$respObj->fail();
 
-		if (!$this->personMod->update($_POST["id"], [ "name" => $_POST["name"] ]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
+			$respObj->fail();
+
+		if (!$this->personMod->update($_POST["id"], $reqData))
 			$respObj->fail();
 
 		$respObj->ok();

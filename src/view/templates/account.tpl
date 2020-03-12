@@ -30,7 +30,7 @@
 					<div>
 						<form id="accForm" method="post" action="<?=e(BASEURL."accounts/".$action)?>/">
 <?php	if ($action == "edit") {		?>
-						<input id="accid" name="accid" type="hidden" value="<?=e($acc_id)?>">
+						<input id="accid" name="id" type="hidden" value="<?=e($acc_id)?>">
 <?php	}	?>
 						<div class="non_float std_margin">
 							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($accInfo->balfmt)?></span><span class="acc_name"><?=e($tileAccName)?></span></span></button></div>
@@ -51,12 +51,12 @@
 						</div>
 						<div class="non_float std_margin">
 							<label for="accname">Account name</label>
-							<div class="stretch_input std_input"><input id="accname" name="accname" type="text" value="<?=e($accInfo->name)?>"></div>
+							<div class="stretch_input std_input"><input id="accname" name="name" type="text" value="<?=e($accInfo->name)?>"></div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="currency">Currency</label>
 							<div class="std_input">
-								<select id="currency" name="currency">
+								<select id="currency" name="curr_id">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $accInfo->curr_id) {	?>
 									<option value="<?=e($currInfo->id)?>" selected><?=e($currInfo->name)?></option>

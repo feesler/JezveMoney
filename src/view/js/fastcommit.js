@@ -551,7 +551,7 @@ function onSubmitClick()
 				throw new Error('Invalid transaction: Person not set');
 
 			trObj.type = DEBT;
-			trObj.debtop = (selType == 'debtfrom') ? 1 : 2;
+			trObj.op = (selType == 'debtfrom') ? 1 : 2;
 			trObj.person_id = person.id;
 			trObj.acc_id = mainAccObj.id;
 			trObj.src_curr = mainAccObj.curr_id;

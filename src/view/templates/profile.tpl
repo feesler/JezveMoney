@@ -68,7 +68,7 @@
 <form method="post" action="<?=BASEURL?>profile/changename/">
 	<div class="non_float">
 		<label for="newname">New name</label>
-		<div class="stretch_input std_input"><input id="newname" name="newname" type="text" value="<?=e($person_name)?>"></div>
+		<div class="stretch_input std_input"><input id="newname" name="name" type="text" value="<?=e($person_name)?>"></div>
 	</div>
 </form>
 </div>
@@ -77,12 +77,12 @@
 <form method="post" action="<?=BASEURL?>profile/changepass/">
 	<div class="non_float">
 		<label for="oldpwd">Current password</label>
-		<div class="stretch_input std_input"><input id="oldpwd" name="oldpwd" type="password"></div>
+		<div class="stretch_input std_input"><input id="oldpwd" name="current" type="password"></div>
 	</div>
 
 	<div class="non_float">
 		<label for="newpwd">New password</label>
-		<div class="stretch_input std_input"><input id="newpwd" name="newpwd" type="password"></div>
+		<div class="stretch_input std_input"><input id="newpwd" name="new" type="password"></div>
 	</div>
 </form>
 </div>

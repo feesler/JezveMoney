@@ -2,6 +2,9 @@
 
 class AccountApiController extends ApiController
 {
+	protected $requiredFields = [ "name", "balance", "curr_id", "icon" ];
+
+
 	public function initAPI()
 	{
 		parent::initAPI();
@@ -53,21 +56,17 @@ class AccountApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["name"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
 			$respObj->fail();
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
 			$respObj->fail("User not found");
 
-		$owner_id = $uObj->owner_id;
-		wlog("owner: ".$owner_id);
+		$reqData["owner_id"] = $uObj->owner_id;
 
-		$acc_id = $this->model->create([ "owner_id" => $owner_id,
-											"name" => $_POST["name"],
-											"balance" => $_POST["balance"],
-											"curr_id" => $_POST["currency"],
-											"icon" => $_POST["icon"] ]);
+		$acc_id = $this->model->create($reqData);
 		if (!$acc_id)
 			$respObj->fail();
 
@@ -83,13 +82,14 @@ class AccountApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["id"]) || !isset($_POST["name"]) || !isset($_POST["balance"]) || !isset($_POST["currency"]) || !isset($_POST["icon"]))
+		if (!isset($_POST["id"]))
 			$respObj->fail();
 
-		if (!$this->model->update($_POST["id"], [ "name" => $_POST["name"],
-													"balance" => $_POST["balance"],
-													"curr_id" => $_POST["currency"],
-													"icon" => $_POST["icon"] ]))
+		$reqData = checkFields($_POST, $this->requiredFields);
+		if ($reqData === FALSE)
+			$respObj->fail();
+
+		if (!$this->model->update($_POST["id"], $reqData))
 			$respObj->fail();
 
 		$respObj->ok();

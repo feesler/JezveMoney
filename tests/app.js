@@ -282,11 +282,11 @@ class Application
 	{
 		let accList =
 		[
-			{ name : 'acc_3', currency : 1, balance : '500.99', icon : 2 },
-			{ name : 'acc RUB', currency : 1, balance : '500.99', icon : 5 },
-			{ name : 'acc USD', currency : 2, balance : '500.99', icon : 4 },
-			{ name : 'acc EUR', currency : 3, balance : '10000.99', icon : 3 },
-			{ name : 'card RUB', currency : 1, balance : '35000.40', icon : 3 },
+			{ name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 },
+			{ name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 },
+			{ name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 },
+			{ name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 },
+			{ name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 },
 		];
 
 		for(let account of accList)
