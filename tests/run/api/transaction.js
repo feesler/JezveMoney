@@ -74,6 +74,11 @@ let runTransactionAPI =
 
 	async getExpectedTransaction(params, accList)
 	{
+		if (!params.date)
+			params.date = this.dates.now;
+		if (!params.comment)
+			params.comment = '';
+
 		let res = {
 			transaction : copyObject(params),
 			accounts : copyObject(accList)
@@ -157,29 +162,19 @@ let runTransactionAPI =
 	{
 		let scope = this.run.api.transaction;
 		let transaction_id = 0;
-		let resExpected = false;
-
-		if (!params.date)
-			params.date = formatDate(new Date());
-		if (!params.comment)
-			params.comment = '';
 
 		await test('Create ' + getTransactionTypeStr(params.type) + ' transaction', async () =>
 		{
-			let expAccountList;
 			let expTransList = await this.state.getTransactionsList();
-
-			resExpected = await scope.checkCorrectness(params);
-
-			// Prepare expected updates of accounts
 			let accBefore = await this.state.getAccountsList();
+			let resExpected = await scope.checkCorrectness(params);
 
 			// Prepare expected transaction object
 			let updState = await scope.getExpectedTransaction(params, accBefore);
 			let expTrans = updState.transaction;
 			expTrans.pos = 0;
 
-			expAccountList = updState.accounts;
+			let expAccountList = updState.accounts;
 
 			this.state.accounts = null;
 			this.state.persons = null;
@@ -258,34 +253,29 @@ let runTransactionAPI =
 
 
 	// Update transaction with specified params
-	// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment
+	// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
 	async updateTest(params)
 	{
 		let scope = this.run.api.transaction;
 		let updateRes;
-		let resExpected = false;
 
 		let expTransList = await this.state.getTransactionsList();
 		let origTrans = expTransList.list.find(item => item.id == params.id);
-
 		let fullAccList = await this.state.getAccountsList();
 
-		let updParams;
+		let updParams = { date : this.dates.now, comment : '' };
 		if (origTrans)
 			updParams = scope.transactionToRequest(origTrans, fullAccList);
-		else
-			updParams = { date : formatDate(new Date()), comment : '' };
 
 		setParam(updParams, params);
 
-		let testDescr = '';
+		let testDescr = 'Update transaction';
 		if (origTrans)
 			testDescr = 'Update ' + getTransactionTypeStr(origTrans.type) + ' transaction';
-		else
-			testDescr = 'Update transaction';
 
 		await test(testDescr, async () =>
 		{
+			let resExpected = false;
 			if (origTrans)
 				resExpected = await scope.checkCorrectness(updParams);
 
