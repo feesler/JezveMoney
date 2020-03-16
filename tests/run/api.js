@@ -203,9 +203,11 @@ let runAPI =
 
 		await transaction.updateTest({ id : TR_TRANSFER_1,
 											dest_id : ACC_USD,
+											dest_curr : USD,
 										 	dest_amount : 8 });
 		await transaction.updateTest({ id : TR_TRANSFER_2,
 											dest_id : CASH_RUB,
+											dest_curr : RUB,
 										 	dest_amount : 6500,
 										 	date : this.dates.yesterday });
 

@@ -17,6 +17,21 @@ class AppState
 	}
 
 
+	getLatestId(list)
+	{
+		if (!Array.isArray(list))
+			throw new Error('Invalid list specified');
+		
+		let res = 0;
+		for(let item of list)
+		{
+			res = Math.max(item.id, res);
+		}
+
+		return res;
+	}
+
+
 	// Return id of item with specified index(absolute position) in list
 	posToId(list, pos)
 	{
@@ -220,6 +235,37 @@ class AppState
 
 		let accObj = this.accounts.find(item => item.owner_id == p_id &&
 												item.curr_id == curr_id);
+
+		return accObj;
+	}
+
+
+	async getExpectedPersonAccount(person_id, currency_id)
+	{
+		let p_id = parseInt(person_id);
+		let curr_id = parseInt(currency_id);
+		if (!p_id || !curr_id)
+			return null;
+
+		if (!Array.isArray(this.accounts))
+			this.accounts = await this.getAccountsList();
+
+		let accObj = this.accounts.find(item => item.owner_id == p_id &&
+												item.curr_id == curr_id);
+
+		if (!accObj)
+		{
+			let latest = this.getLatestId(this.accounts);
+
+			accObj = {
+				id : latest + 1,
+				name : `acc_${person_id}_${currency_id}`,
+				initbalance : 0,
+				balance : 0,
+				curr_id : currency_id,
+				icon : 0
+			};
+		}
 
 		return accObj;
 	}

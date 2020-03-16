@@ -72,88 +72,80 @@ let runTransactionAPI =
 	},
 
 
-	async getExpectedTransaction(params)
+	async getExpectedTransaction(params, accList)
 	{
-		let res = copyObject(params);
+		let res = {
+			transaction : copyObject(params),
+			accounts : copyObject(accList)
+		};
 
-		let isDebt = (res.type == DEBT);
-		if (isDebt)
+		if (params.type != DEBT)
+			return res;
+
+		let reqCurr = (res.transaction.op == 1) ? res.transaction.src_curr : res.transaction.dest_curr;
+		let personAcc = await this.state.getExpectedPersonAccount(res.transaction.person_id, reqCurr);
+		if (!personAcc)
+			throw new Error('Fail to obtain expected account of person');
+
+		// Save new account of person
+		if (!res.accounts.find(item => item.id == personAcc.id))
 		{
-			let reqCurr = (res.op == 1) ? res.src_curr : res.dest_curr;
-			let personAcc = await this.state.getPersonAccount(res.person_id, reqCurr);
-
-			if (res.op == 1)
-			{
-				if (personAcc)
-					res.src_id = personAcc.id;
-				res.dest_id = res.acc_id;
-			}
-			else
-			{
-				res.src_id = res.acc_id;
-				if (personAcc)
-					res.dest_id = personAcc.id;
-			}
-
-			delete res.op;
-			delete res.person_id;
-			delete res.acc_id;
+			res.accounts.push(personAcc);
 		}
+
+		if (res.transaction.op == 1)
+		{
+			res.transaction.src_id = personAcc.id;
+			res.transaction.dest_id = res.transaction.acc_id;
+		}
+		else
+		{
+			res.transaction.src_id = res.transaction.acc_id;
+			res.transaction.dest_id = personAcc.id;
+		}
+
+		// Different currencies not supported yet for debts
+		res.transaction.src_curr = res.transaction.dest_curr = reqCurr;
+
+		delete res.transaction.op;
+		delete res.transaction.person_id;
+		delete res.transaction.acc_id;
 
 		return res;
 	},
 
 
-	async updateExpectedTransaction(expTrans, accList, params)
+	// Convert real transaction object to request
+	// Currently only DEBT affected:
+	//  (person_id, acc_id, op) parameters are used instead of (src_id, dest_id)
+	transactionToRequest(transaction, accList)
 	{
-		let isDebt = (params.type == DEBT);
-		if (!isDebt)
-			return { transaction : expTrans, accounts : accList };
+		if (!transaction)
+			return transaction;
 
-		let res = {
-			transaction : copyObject(expTrans),
-			accounts : copyObject(accList)
-		};
+		let res = copyObject(transaction);
+		if (transaction.type != DEBT)
+			return res;
 
-		let debtType = params.op == 1;
-
-		if (params.acc_id)
+		let srcAcc = accList.find(item => item.id == transaction.src_id);
+		let destAcc = accList.find(item => item.id == transaction.dest_id);
+		if (srcAcc && srcAcc.owner_id != this.owner_id)
 		{
-			let account = await this.state.getAccount(params.acc_id);
-			if (!account)
-				throw new Error('Account not found');
-
-			if (debtType)
-				res.transaction.dest_id = account.id;
-			else
-				res.transaction.src_id = account.id;
+			res.op = 1;
+			res.person_id = srcAcc.owner_id;
+			res.acc_id = (destAcc) ? destAcc.id : 0;
 		}
-
-		// Obtain newly created account of person
-		if ((debtType && !res.transaction.src_id) ||
-			(!debtType && !res.transaction.dest_id))
+		else if (destAcc && destAcc.owner_id != this.owner_id)
 		{
-			let pcurr_id = debtType ? res.transaction.src_curr : res.transaction.dest_curr;
-
-			let personAccount = await this.state.getPersonAccount(params.person_id, pcurr_id);
-			if (!personAccount)
-				throw new Error('Person account not found');
-
-			// Save id of person account into transaction
-			if (debtType)
-				res.transaction.src_id = personAccount.id;
-			else
-				res.transaction.dest_id = personAccount.id;
-
-			// Check if account of person is not set yet
-			// Cancel transaction from person account because accounts was
-			let pAcc = res.accounts.find(item => item.id == personAccount.id)
-			if (!pAcc)
-			{
-				personAccount.balance = 0;
-				res.accounts.push(personAccount);
-			}
+			res.op = 2;
+			res.person_id = destAcc.owner_id;
+			res.acc_id = (srcAcc) ? srcAcc.id : 0;
 		}
+		else
+			throw new Error('Invalid transaction');
+
+		delete res.src_id;
+		delete res.dest_id;
 
 		return res;
 	},
@@ -174,16 +166,20 @@ let runTransactionAPI =
 
 		await test('Create ' + getTransactionTypeStr(params.type) + ' transaction', async () =>
 		{
+			let expAccountList;
 			let expTransList = await this.state.getTransactionsList();
 
 			resExpected = await scope.checkCorrectness(params);
 
-			// Prepare expected transaction object
-			let expTrans = await scope.getExpectedTransaction(params);
-			expTrans.pos = 0;
-
 			// Prepare expected updates of accounts
 			let accBefore = await this.state.getAccountsList();
+
+			// Prepare expected transaction object
+			let updState = await scope.getExpectedTransaction(params, accBefore);
+			let expTrans = updState.transaction;
+			expTrans.pos = 0;
+
+			expAccountList = updState.accounts;
 
 			this.state.accounts = null;
 			this.state.persons = null;
@@ -203,18 +199,17 @@ let runTransactionAPI =
 					throw e;
 			}
 
-			let expAccountList;
 			if (resExpected)
 			{
-				expTrans.id = transaction_id = createRes.id;
+				let latest = this.state.getLatestId(expTransList.list);
+				transaction_id = expTrans.id = (latest > 0) ? (latest + 1) : createRes.id;
 
 				// Prepare expected updates of accounts
-				let updState = await scope.updateExpectedTransaction(expTrans, accBefore, params);
-				expTrans = updState.transaction;
-				expAccountList = this.state.createTransaction(updState.accounts, expTrans);
+				expAccountList = this.state.createTransaction(expAccountList, expTrans);
 
 				// Prepare expected updates of transactions
 				expTransList.create(expTrans);
+				expTransList = expTransList.updateResults(expAccountList);
 			}
 			else
 			{
@@ -227,8 +222,6 @@ let runTransactionAPI =
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
-
-			expTransList = expTransList.updateResults(accList);
 
 			let res = checkObjValue(trList.list, expTransList.list) &&
 						checkObjValue(accList, expAccountList);
@@ -270,8 +263,7 @@ let runTransactionAPI =
 	{
 		let scope = this.run.api.transaction;
 		let updateRes;
-		let isDebt = false;
-		let resExpected;
+		let resExpected = false;
 
 		let expTransList = await this.state.getTransactionsList();
 		let origTrans = expTransList.list.find(item => item.id == params.id);
@@ -280,73 +272,11 @@ let runTransactionAPI =
 
 		let updParams;
 		if (origTrans)
-		{
-			updParams = copyObject(origTrans);
-
-			isDebt = (updParams.type == DEBT);
-			if (isDebt)
-			{
-				let srcAcc = fullAccList.find(item => item.id == updParams.src_id);
-				let destAcc = fullAccList.find(item => item.id == updParams.dest_id);
-
-				if (srcAcc && srcAcc.owner_id != this.owner_id)
-				{
-					updParams.op = 1;
-					updParams.person_id = srcAcc.owner_id;
-					updParams.acc_id = (destAcc) ? destAcc.id : 0;
-				}
-				else if (destAcc && destAcc.owner_id != this.owner_id)
-				{
-					updParams.op = 2;
-					updParams.person_id = destAcc.owner_id;
-					updParams.acc_id = (srcAcc) ? srcAcc.id : 0;
-				}
-
-				delete updParams.src_id;
-				delete updParams.dest_id;
-			}
-		}
+			updParams = scope.transactionToRequest(origTrans, fullAccList);
 		else
-		{
 			updParams = { date : formatDate(new Date()), comment : '' };
-		}
 
 		setParam(updParams, params);
-
-		// Synchronize currencies with accounts
-		if (origTrans)
-		{
-			if (isDebt)
-			{
-				if (updParams.acc_id && updParams.acc_id != origTrans.acc_id)
-				{
-					let acc = fullAccList.find(item => item.id == updParams.acc_id);
-					if (acc)
-					{
-						if (updParams.op == 1)
-							updParams.dest_curr = acc.curr_id;
-						else
-							updParams.src_curr = acc.curr_id;
-					}
-				}
-			}
-			else
-			{
-				if (updParams.src_id && updParams.src_id != origTrans.src_id)
-				{
-					let acc = fullAccList.find(item => item.id == updParams.src_id);
-					if (acc)
-						updParams.src_curr = acc.curr_id;
-				}
-
-				if (updParams.dest_id && updParams.dest_id != origTrans.dest_id)
-				{
-					let acc = fullAccList.find(item => item.id == updParams.dest_id);
-					if (acc)
-						updParams.dest_curr = acc.curr_id;
-				}
-			}
-		}
 
 		let testDescr = '';
 		if (origTrans)
@@ -358,13 +288,17 @@ let runTransactionAPI =
 		{
 			if (origTrans)
 				resExpected = await scope.checkCorrectness(updParams);
-			else
-				resExpected = false;
 
 			// Prepare expected transaction object
-			let expTrans = await scope.getExpectedTransaction(updParams);
-			if (origTrans)
-				expTrans.pos = origTrans.pos;
+			let expTrans;
+			if (resExpected)
+			{
+				let updState = await scope.getExpectedTransaction(updParams, fullAccList);
+				expTrans = updState.transaction;
+				fullAccList = updState.accounts;
+				if (origTrans)
+					expTrans.pos = origTrans.pos;
+			}
 
 			this.state.accounts = null;
 			this.state.persons = null;
@@ -387,20 +321,20 @@ let runTransactionAPI =
 			if (resExpected)
 			{
 				// Prepare expected updates of accounts
-				let updState = await scope.updateExpectedTransaction(expTrans, fullAccList, updParams);
-				expTrans = updState.transaction;
-				fullAccList = updState.accounts;
-
 				expAccountList = this.state.updateTransaction(fullAccList, origTrans, expTrans);
 
 				// Prepare expected updates of transactions
 				expTransList.update(expTrans.id, expTrans);
-				expTransList = expTransList.updateResults(fullAccList);
+				expTransList = expTransList.updateResults(expAccountList);
 			}
 			else
 			{
 				expAccountList = fullAccList;
 			}
+
+			this.state.accounts = null;
+			this.state.persons = null;
+			this.state.transactions = null;
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
@@ -461,13 +395,17 @@ let runTransactionAPI =
 			{
 				deleteRes = await api.transaction.del(ids);
 				if (resExpected != deleteRes)
-					return false;				
+					return false;
 			}
 			catch(e)
 			{
 				if (!(e instanceof ApiRequestError) || resExpected)
 					throw e;
 			}
+
+			this.state.accounts = null;
+			this.state.persons = null;
+			this.state.transactions = null;
 
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();
