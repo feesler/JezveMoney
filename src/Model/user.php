@@ -315,6 +315,15 @@ class UserModel extends CachedTable
 			}
 		}
 
+		if (isset($params["access"]) && self::isAdminUser())
+		{
+			$res["access"] = intval($params["access"]);
+		}
+		else
+		{
+			$res["access"] = 0;
+		}
+
 		return $res;
 	}
 
@@ -416,14 +425,16 @@ class UserModel extends CachedTable
 			return FALSE;
 
 		$preHash = $this->createPreHash($login, $newpass);
-		$this->setupCookies($login, $preHash);
+
+		if ($this->currentUser && $user_id == $this->currentUser->id)
+			$this->setupCookies($login, $preHash);
 
 		return TRUE;
 	}
 
 
 	// Set up new login for user
-	public function setLogin($user_id, $login)
+	public function setLogin($user_id, $login, $password)
 	{
 		$user_id = intval($user_id);
 		if (!$user_id || is_empty($login))
@@ -432,6 +443,9 @@ class UserModel extends CachedTable
 		// check user is exist
 		$uObj = $this->getItem($user_id);
 		if (!$uObj)
+			return FALSE;
+
+		if (!$this->checkLoginData($uObj->login, $password))
 			return FALSE;
 
 		// check current login is not the same
@@ -443,7 +457,7 @@ class UserModel extends CachedTable
 		if ($luser_id != 0 && $luser_id != $user_id)
 			return FALSE;
 
-		$passhash = $this->createHash($login, $newpass);
+		$passhash = $this->createHash($login, $password);
 		$elogin = $this->dbObj->escape($login);
 		$curDate = date("Y-m-d H:i:s");
 

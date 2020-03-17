@@ -89,6 +89,26 @@ class PersonModel extends CachedTable
 			}
 		}
 
+		// Admin case
+		if (isset($params["user_id"]))
+		{
+			$res["user_id"] = intval($params["user_id"]);
+			if ($res["user_id"] != self::$user_id && !(self::$user_id && UserModel::isAdminUser()))
+			{
+				wlog("Invalid user_id");
+				return NULL;
+			}
+		}
+		else if (self::$user_id)		// Registration
+		{
+			$res["user_id"] = self::$user_id;
+		}
+		else
+		{
+			wlog("Can't obtain user_id");
+			return NULL;
+		}
+
 		return $res;
 	}
 
@@ -100,25 +120,7 @@ class PersonModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		// For registration/admin cases
-		$targetUser = self::$user_id;
-		if (!$targetUser)
-		{
-			if (!isset($params["user_id"]))
-			{
-				wlog("User not specified");
-				return NULL;
-			}
-			$targetUser = intval($params["user_id"]);
-		}
-
-		if (!$targetUser)
-		{
-			wlog("User not specified");
-			return NULL;
-		}
-
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, [ "name=".qnull($res["name"]), "user_id=".$targetUser ]);
+		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, [ "name=".qnull($res["name"]), "user_id=".$res["user_id"] ]);
 		if ($this->dbObj->rowsCount($qResult) > 0)
 		{
 			wlog("Such item already exist");
@@ -126,8 +128,6 @@ class PersonModel extends CachedTable
 		}
 
 		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
-
-		$res["user_id"] = $targetUser;
 
 		return $res;
 	}

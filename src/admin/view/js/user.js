@@ -108,8 +108,8 @@ function updateUser()
 	enable('user_login', true);
 	show('name_block', true);
 	enable('user_name', true);
-	show('pwd_block', false);
-	enable('user_pass', false);
+	show('pwd_block', true);
+	enable('user_pass', true);
 	show('admin_block', true);
 	enable('isadmin', true);
 	enable('isdefault', true);
