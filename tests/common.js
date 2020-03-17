@@ -371,15 +371,13 @@ export function checkPHPerrors(env, content)
 {
 	const errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
 
-	if (!env)
-		return false;
 	if (!content)
 		return true;
 
 	let found = errSignatures.some(item => content.includes(item));
 
 	if (found)
-		env.addResult('PHP error signature found', false);
+		throw new Error('PHP error signature found');
 }
 
 
