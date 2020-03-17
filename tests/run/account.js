@@ -50,8 +50,6 @@ let runAccounts =
 		await test('Change icon', () => this.view.changeIcon(2), this.view);
 		await test('Input (1000.01) balance', () => this.view.inputBalance('1000.01'), this.view);
 
-		this.state.accounts = null;
-
 		await this.view.navigation(() => this.view.click(this.view.content.cancelBtn));
 	},
 
@@ -76,8 +74,7 @@ let runAccounts =
 		if ('icon' in params)
 			await test('Tile icon update', () => this.view.changeIcon(params.icon), this.view);
 
-		this.state.accounts = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		let expected = this.view.getExpectedAccount();
 
@@ -190,8 +187,7 @@ let runAccounts =
 		let trBefore = await this.state.getTransactionsList();
 		let ids = this.state.positionsToIds(userAccList, accounts);
 
-		this.state.accounts = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.view.deleteAccounts(accounts);
 
@@ -233,9 +229,7 @@ let runAccounts =
 
 		await this.view.goToUpdateAccount(pos);
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.view.deleteSelfItem();
 

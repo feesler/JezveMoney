@@ -9,6 +9,12 @@ class AppState
 {
 	constructor()
 	{
+		this.cleanCache();
+	}
+
+
+	cleanCache()
+	{
 		this.accounts = null;
 		this.persons = null;
 		this.transactions = null;

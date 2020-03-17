@@ -300,9 +300,7 @@ let runTransactionsCommon =
 		// Request view to select and delete transactions
 		await this.view.deleteTransactions(transactions);
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.goToMainView();
 
@@ -311,9 +309,7 @@ let runTransactionsCommon =
 		accList = this.state.deleteTransactions(accList, removedTrans);
 		expTransList = expTransList.updateResults(accList);
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		let updState = await this.state.updatePersons(pList, accList);
 		pList = updState.persons;
@@ -353,9 +349,7 @@ let runTransactionsCommon =
 
 		await this.view.goToUpdateTransaction(pos);
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.view.deleteSelfItem();
 
@@ -366,9 +360,7 @@ let runTransactionsCommon =
 
 		await this.goToMainView();
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		let updState = await this.state.updatePersons(pList, accList);
 		pList = updState.persons;

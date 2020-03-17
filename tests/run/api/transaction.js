@@ -176,9 +176,7 @@ let runTransactionAPI =
 
 			let expAccountList = updState.accounts;
 
-			this.state.accounts = null;
-			this.state.persons = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			// Send API sequest to server
 			let createRes;
@@ -211,9 +209,7 @@ let runTransactionAPI =
 				expAccountList = accBefore;
 			}
 
-			this.state.accounts = null;
-			this.state.persons = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
@@ -290,9 +286,7 @@ let runTransactionAPI =
 					expTrans.pos = origTrans.pos;
 			}
 
-			this.state.accounts = null;
-			this.state.persons = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			// Send API sequest to server
 			try
@@ -322,9 +316,7 @@ let runTransactionAPI =
 				expAccountList = fullAccList;
 			}
 
-			this.state.accounts = null;
-			this.state.persons = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			let trList = await this.state.getTransactionsList();
 			let accList = await this.state.getAccountsList();
@@ -377,9 +369,6 @@ let runTransactionAPI =
 				expTransList = trBefore;
 			}
 
-			this.state.accounts = null;
-			this.state.transactions = null;
-
 			// Send API sequest to server
 			try
 			{
@@ -393,9 +382,7 @@ let runTransactionAPI =
 					throw e;
 			}
 
-			this.state.accounts = null;
-			this.state.persons = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			let accList = await this.state.getAccountsList();
 			let trList = await this.state.getTransactionsList();

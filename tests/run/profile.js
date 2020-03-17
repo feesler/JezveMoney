@@ -56,9 +56,7 @@ let runProfile =
 	{
 		let persons = await this.state.getPersonsList();
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.view.goToProfile();
 		await this.view.resetAccounts();
@@ -76,9 +74,7 @@ let runProfile =
 
 	async resetAll()
 	{
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.view.goToProfile();
 		await this.view.resetAll();

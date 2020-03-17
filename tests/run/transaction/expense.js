@@ -48,9 +48,7 @@ let runExpense =
 
 		let res = view.getExpectedTransaction();
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await view.submit();
 

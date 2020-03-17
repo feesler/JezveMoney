@@ -66,7 +66,7 @@ let runAccountAPI =
 
 			let expAccObj = copyObject(params);
 
-			this.state.accounts = null;
+			this.state.cleanCache();
 
 			let createRes;
 			try
@@ -148,8 +148,7 @@ let runAccountAPI =
 			else
 				resExpected = false;
 
-			this.state.accounts = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			// Send API sequest to server
 			try
@@ -218,9 +217,7 @@ let runAccountAPI =
 				expTransList = trBefore;
 			}
 
-
-			this.state.accounts = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			// Send API sequest to server
 			try

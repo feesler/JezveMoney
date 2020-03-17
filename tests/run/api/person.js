@@ -51,7 +51,7 @@ let runPersonAPI =
 
 			let expPersonObj = copyObject(params);
 
-			this.state.persons = null;
+			this.state.cleanCache();
 
 			let createRes;
 			try
@@ -102,13 +102,13 @@ let runPersonAPI =
 				expPersonObj = copyObject(origPerson);
 				setParam(expPersonObj, params);
 			}
-			
+
 			if (origPerson)
 				resExpected = await scope.checkCorrectness(params, id);
 			else
 				resExpected = false;
 
-			this.state.persons = null;
+			this.state.cleanCache();
 
 			let updateRes;
 			try
@@ -185,9 +185,7 @@ let runPersonAPI =
 				expPersonList = copyObject(pBefore);
 			}
 
-			this.state.accounts = null;
-			this.state.persons = null;
-			this.state.transactions = null;
+			this.state.cleanCache();
 
 			// Send API sequest to server
 			try

@@ -74,9 +74,7 @@ let runDebt =
 			type : view.model.debtType
 		};
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await view.submit();
 

@@ -83,9 +83,7 @@ let runAPI =
 			src_amount: 100
 		});
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		// Login with main test user
 		await test('Login main user', () => api.user.login(this.config.testUser), env);

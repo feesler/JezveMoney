@@ -21,7 +21,7 @@ let runPersons =
 		let expectedPerson = { name : personName, accounts : [] };
 		expectedList.push(expectedPerson);
 
-		this.state.persons = null;
+		this.state.cleanCache();
 		await this.view.createPerson(personName);
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
@@ -48,7 +48,7 @@ let runPersons =
 
 		await this.view.inputName(personName);
 
-		this.state.persons = null;
+		this.state.cleanCache();
 		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
 
 		// Check updates in the person tiles
@@ -74,9 +74,7 @@ let runPersons =
 		let ids = this.state.positionsToIds(expectedList, persons);
 		expectedList = this.state.deleteByIds(expectedList, ids);
 
-		this.state.persons = null;
-		this.state.accounts = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 		await this.view.deletePersons(persons);
 
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
@@ -103,9 +101,7 @@ let runPersons =
 			await this.view.goToPersons();
 		}
 
-		this.state.persons = null;
-		this.state.accounts = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.view.goToUpdatePerson(pos);
 		await this.view.deleteSelfItem();
@@ -124,9 +120,7 @@ let runPersons =
 		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
 		await test(`Delete person [${pos}]`, () => {}, this.view);
 
-		this.state.accounts = null;
-		this.state.persons = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		await this.goToMainView();
 

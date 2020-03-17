@@ -69,7 +69,7 @@ let runTransList =
 			let acc = accountsBefore.find(item => item.name == params.name);
 			if (!acc)
 			{
-				this.state.accounts = null;
+				this.state.cleanCache();
 				acc = await api.account.create(params);
 			}
 
@@ -91,7 +91,7 @@ let runTransList =
 			let pers = personsBefore.find(item => item.name == params.name);
 			if (!pers)
 			{
-				this.state.persons = null;
+				this.state.cleanCache();
 				pers = await api.person.create(params);
 			}
 
@@ -175,8 +175,7 @@ let runTransList =
 		let multi = [].concat(newExpenses, newIncomes, newTransfers, newDebts);
 		await api.transaction.createMultiple(multi);
 
-		this.state.accounts = null;
-		this.state.transactions = null;
+		this.state.cleanCache();
 
 		console.log('Done');
 	},
