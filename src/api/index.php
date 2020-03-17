@@ -1,99 +1,54 @@
 <?php
 	require_once("../system/setup.php");
+	require_once("../system/router.php");
 
-	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
+	$router = new Router();
+	$router->setRoutes([
+		"currency" => "CurrencyApiController",
+		"account" => "AccountApiController",
+		"person" => "PersonApiController",
+		"transaction" => "TransactionApiController",
+		"user" => "UserApiController",
+		"profile" => "ProfileApiController"
+	]);
 
-	$controller = NULL;
-	$action = NULL;
+	$router->setAliases([
+		"login" => "user/login",
+		"logout" => "user/logout",
+		"register" => "user/register",
+	]);
 
-	$aliasMap = ["login" => "user/login",
-						"logout" => "user/logout",
-						"register" => "user/register"];
+	$router->setActionsMap([
+		"new" => "create",
+		"edit" => "update",
+		"delete" => "del",
+		"list" => "getList"
+	]);
 
-	$controllersMap = ["currency" => "CurrencyApiController",
-							"account" => "AccountApiController",
-							"person" => "PersonApiController",
-							"transaction" => "TransactionApiController",
-							"user" => "UserApiController",
-							"profile" => "ProfileApiController"
-							];
-
-	$actionsMap = ["new" => "create",
-						"edit" => "update",
-						"delete" => "del",
-						"list" => "getList"];
-
-	// Parse route
-	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
-
-	$route = trim($route, "/\\");
-	$routeParts = explode("/", $route);
-
-	// Prepare controller
-	$contrStr = array_shift($routeParts);
-	if (!$contrStr)
-		$contrStr = "main";
-
-	// Check aliases
-	if (isset($aliasMap[$contrStr]))
+	$router->onStart(function($controller, $contrStr)
 	{
-		$aliasReplace = $aliasMap[$contrStr];
-		wlog("Found alias for ".$contrStr." : ".$aliasReplace);
+		// Check correct user authentication for controller
+		$loggedOutControllers = ["login", "register"];
+		$isLogOutCont = in_array($contrStr, $loggedOutControllers);
 
-		$unshiftParts = array_reverse(explode("/", $aliasReplace));
-		foreach($unshiftParts as $uPart)
+		$controller->checkUser(!$isLogOutCont);
+	});
+
+	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
+	{
+		// Check correct user authentication for controller
+		$loggedOutControllers = ["user/login", "user/register"];
+		$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
+		$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+
+		$controller->authRequired = !$isLogOutCont;
+
+		if ($controller instanceof ApiController)
 		{
-			array_unshift($routeParts, $uPart);
+			$controller->initAPI();
 		}
-		wlog("Rewrite route as: ".implode("/", $routeParts));
-
-		$contrStr = array_shift($routeParts);
-	}
-
-	if (!isset($controllersMap[$contrStr]))
-		setLocation(BASEURL);
-
-	// Check correct user authentication for controller
-	$loggedOutControllers = ["user/login", "user/register"];
-	$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
-	$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+	});
 
 
-	$contClass = $controllersMap[$contrStr];
+	$router->route();
 
-	$controller = new $contClass();
-
-	// Prepare action
-	$action = array_shift($routeParts);
-	if (!$action)
-		$action = "index";
-
-	// Rewrite action if needed
-	if (isset($actionsMap[$action]))
-		$action = $actionsMap[$action];
-
-	$actionParam = NULL;
-	if (!method_exists($controller, $action))
-	{
-		$actionParam = $action;
-		$action = "index";
-	}
-
-	$controller->action = $action;
-
-	if (is_null($actionParam))
-		$actionParam = array_shift($routeParts);
-	$controller->actionParam = $actionParam;
-
-	$controller->authRequired = !$isLogOutCont;
-
-	if ($controller instanceof ApiController)
-	{
-		$controller->initAPI();
-	}
-
-	wlog("Controller class: ".$contClass);
-	wlog("Action: ".$action);
-
-	if (method_exists($controller, $action))
-		$controller->$action();

@@ -1,61 +1,42 @@
 <?php
-
-	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
-
-	$controller = NULL;
-	$action = NULL;
-
-	$controllersMap = ["index" => "MainAdminController",
-							"balance" => "BalanceAdminController",
-							"currency" => "CurrencyAdminController",
-							"query" => "QueryAdminController",
-							"log" => "LogsAdminController",
-							"tests" => "TestsAdminController",
-							"apiconsole" => "ApiConsoleAdminController",
-							"user" => "UserAdminController"];
-
-	$actionsMap = ["new" => "create",
-						"edit" => "update",
-						"chpwd" => "changePassword"];
-
-	// Parse route
-	$route = (isset($_GET["route"])) ? $_GET["route"] : "";
-	$route = trim($route, "/\\");
-	$routeParts = explode("/", $route);
-
-	// Prepare controller
-	$contrStr = array_shift($routeParts);
-	if (!$contrStr)
-		$contrStr = "index";
-
-	if ($contrStr == "log")
-		$noLogs = TRUE;
+	$noLogs = TRUE;
 
 	require_once("../system/setup.php");
+	require_once("../system/router.php");
 
-	if (!isset($controllersMap[$contrStr]))
-		setLocation(BASEURL);
+	$router = new Router();
+	$router->setRoutes([
+		"main" => "MainAdminController",
+		"balance" => "BalanceAdminController",
+		"currency" => "CurrencyAdminController",
+		"query" => "QueryAdminController",
+		"log" => "LogsAdminController",
+		"tests" => "TestsAdminController",
+		"apiconsole" => "ApiConsoleAdminController",
+		"user" => "UserAdminController"
+	]);
 
-	$contClass = $controllersMap[$contrStr];
+	$router->setActionsMap([
+		"new" => "create",
+		"edit" => "update",
+		"chpwd" => "changePassword"
+	]);
 
-	$controller = new $contClass();
-	$controller->checkUser(TRUE, TRUE);
+	$router->onStart(function($controller, $contrStr)
+	{
+		global $noLogs;
 
-	// Prepare action
-	$action = array_shift($routeParts);
-	if (!$action)
-		$action = "index";
+		if ($contrStr != "log")
+			$noLogs = FALSE;
 
-	// Rewrite action if needed
-	if (isset($actionsMap[$action]))
-		$action = $actionsMap[$action];
+		$controller->checkUser(TRUE, TRUE);
+	});
 
-	$controller->action = $action;
+	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
+	{
+		$controller->initDefResources();
+	});
 
-	$actionParam = array_shift($routeParts);
-	$controller->actionParam = $actionParam;
 
-	$controller->initDefResources();
+	$router->route();
 
-	if (method_exists($controller, $action))
-		$controller->$action();
