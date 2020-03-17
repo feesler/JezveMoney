@@ -27,7 +27,7 @@ function setUserValues(userObj)
 		enable(user_id, true);
 		user_id.value = userObj.id;
 		user_login.value = userObj.login;
-		user_name.value = userObj.owner;
+		user_name.value = userObj.name;
 		user_pass.value = '';
 		isadmin.checked = (userObj.access == 1);
 		isdefault.checked = (userObj.access == 0);
@@ -264,7 +264,7 @@ function onListResult(response)
 		var row = ce('tr', {}, [
 			ce('td', { innerText : item.id }),
 			ce('td', { innerText : item.login }),
-			ce('td', { innerText : item.owner }),
+			ce('td', { innerText : item.name }),
 			ce('td', { innerText : item.access }),
 			ce('td', { innerText : item.accCount }),
 			ce('td', { innerText : item.trCount }),

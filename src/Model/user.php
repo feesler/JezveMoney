@@ -528,9 +528,10 @@ class UserModel extends CachedTable
 			$userObj->id = $u_id;
 			$userObj->login = $item->login;
 			$userObj->access = $item->access;
+			$userObj->owner_id = $item->owner_id;
 
 			$pObj = $pMod->getItem($item->owner_id);
-			$userObj->owner = $pObj ? $pObj->name : "No person";
+			$userObj->name = $pObj ? $pObj->name : "No person";
 
 			$userObj->accCount = isset($accCountArr[$item->owner_id]) ? $accCountArr[$item->owner_id] : 0;
 			$userObj->trCount = isset($trCountArr[$u_id]) ? $trCountArr[$u_id] : 0;

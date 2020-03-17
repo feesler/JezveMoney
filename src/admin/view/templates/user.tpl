@@ -17,14 +17,14 @@
 
 					<table id="users_tbl" class="adm_tbl">
 						<thead>
-							<tr><th>id</th><th>login</th><th>owner</th><th>access</th><th>accounts</th><th>transactions</th><th>persons</th></tr>
+							<tr><th>id</th><th>login</th><th>name</th><th>access</th><th>accounts</th><th>transactions</th><th>persons</th></tr>
 						</thead>
 						<tbody id="users_list">
 <?php	foreach($uArr as $userInfo) {		?>
 							<tr>
 								<td><?=e($userInfo->id)?></td>
 								<td><?=e($userInfo->login)?></td>
-								<td><?=e($userInfo->owner)?></td>
+								<td><?=e($userInfo->name)?></td>
 								<td><?=e($userInfo->access)?></td>
 								<td><?=e($userInfo->accCount)?></td>
 								<td><?=e($userInfo->trCount)?></td>
