@@ -26,11 +26,12 @@
 		"edit" => "update"
 	]);
 
-	$router->onStart(function($controller, $contrStr)
+	$router->onStart(function($controller, $contrStr, $routeParts)
 	{
 		// Check correct user authentication for controller
-		$loggedOutControllers = ["login", "register"];
-		$isLogOutCont = in_array($contrStr, $loggedOutControllers);
+		$loggedOutControllers = ["user/login", "user/register"];
+		$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
+		$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
 
 		$controller->checkUser(!$isLogOutCont);
 	});

@@ -92,9 +92,7 @@ class Router
 		$controller = new $contClass();
 
 		if (is_callable($this->onStartHandler))
-			call_user_func_array($this->onStartHandler, [$controller, $contrStr]);
-
-//		$controller->checkUser(!$isLogOutCont);
+			call_user_func_array($this->onStartHandler, [$controller, $contrStr, $routeParts]);
 
 		// Prepare action
 		$action = array_shift($routeParts);

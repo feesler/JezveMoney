@@ -25,16 +25,7 @@
 		"list" => "getList"
 	]);
 
-	$router->onStart(function($controller, $contrStr)
-	{
-		// Check correct user authentication for controller
-		$loggedOutControllers = ["login", "register"];
-		$isLogOutCont = in_array($contrStr, $loggedOutControllers);
-
-		$controller->checkUser(!$isLogOutCont);
-	});
-
-	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
+	$router->onStart(function($controller, $contrStr, $routeParts)
 	{
 		// Check correct user authentication for controller
 		$loggedOutControllers = ["user/login", "user/register"];
@@ -42,7 +33,10 @@
 		$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
 
 		$controller->authRequired = !$isLogOutCont;
+	});
 
+	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
+	{
 		if ($controller instanceof ApiController)
 		{
 			$controller->initAPI();
@@ -51,4 +45,3 @@
 
 
 	$router->route();
-
