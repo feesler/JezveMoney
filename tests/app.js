@@ -65,8 +65,6 @@ class Application
 
 		this.run.statistics = this.bindRunner(runStatistics);
 
-		api.setEnv(this);
-
 		// Login and obtain profile information
 		let loginResult = await api.user.login(this.config.testUser);
 		if (!loginResult)

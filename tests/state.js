@@ -12,8 +12,6 @@ class AppState
 		this.accounts = null;
 		this.persons = null;
 		this.transactions = null;
-
-		api.setEnv(App);
 	}
 
 
@@ -21,7 +19,7 @@ class AppState
 	{
 		if (!Array.isArray(list))
 			throw new Error('Invalid list specified');
-		
+
 		let res = 0;
 		for(let item of list)
 		{

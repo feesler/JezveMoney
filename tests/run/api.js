@@ -17,8 +17,6 @@ let runAPI =
 
 		let newApiTesterName = 'App tester';
 
-		api.setEnv(this);
-
 		env.setBlock('API tests', 1);
 
 		this.run.api.account = this.bindRunner(runAccountAPI);

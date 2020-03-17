@@ -186,8 +186,6 @@ let runTransList =
 	{
 		let scope = this.run.transactions;
 
-		api.setEnv(this);
-
 		this.view.setBlock('Transaction List view', 1);
 
 		await scope.list.preCreateData();
