@@ -7,9 +7,10 @@ class ProfileApiController extends ApiController
 		parent::initAPI();
 
 		$this->personMod = PersonModel::getInstance();
-		if (!$this->uMod->currentUser)
+		if (!$this->user_id)
 			throw new Error("User not found");
-		$this->owner_id = $this->uMod->currentUser->owner_id;
+
+		$this->owner_id = $this->uMod->getOwner();
 	}
 
 

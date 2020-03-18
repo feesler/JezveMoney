@@ -16,11 +16,11 @@ class AccountModel extends CachedTable
 		$this->tbl_name = "accounts";
 
 		$uMod = UserModel::getInstance();
-		if (!$uMod->currentUser)
+		self::$user_id = $uMod->getUser();
+		if (!self::$user_id)
 			throw new Error("User not found");
 
-		self::$user_id = $uMod->currentUser->id;
-		self::$owner_id = $uMod->currentUser->owner_id;
+		self::$owner_id = $uMod->getOwner();
 
 		$this->dbObj = mysqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))

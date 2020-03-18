@@ -5,7 +5,7 @@ class UserModel extends CachedTable
 	use Singleton;
 	use CachedInstance;
 
-	public $currentUser = NULL;
+	private $currentUser = NULL;
 
 
 	protected function onStart()
@@ -206,6 +206,26 @@ class UserModel extends CachedTable
 	{
 		$uMod = static::getInstance();
 		return ($uMod && $uMod->currentUser && ($uMod->currentUser->access & 0x1) == 0x1);
+	}
+
+
+	// Return id of currently logged in user or 0 if no user logged in
+	public function getUser()
+	{
+		if (!$this->currentUser)
+			return 0;
+
+		return $this->currentUser->id;
+	}
+
+
+	// Return id of owner person of currently logged in user or 0 if no user logged in
+	public function getOwner()
+	{
+		if (!$this->currentUser)
+			return 0;
+
+		return $this->currentUser->owner_id;
 	}
 
 
@@ -614,6 +634,18 @@ class UserModel extends CachedTable
 	// Delete user and all related data
 	protected function preDelete($items)
 	{
+		if (!$this->currentUser)
+			return FALSE;
+
+		if (!static::isAdminUser())
+		{
+			foreach($items as $item)
+			{
+				if ($item->id != $this->currentUser->id)
+					return FALSE;
+			}
+		}
+
 		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset($items))
 			return FALSE;

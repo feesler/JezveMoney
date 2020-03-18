@@ -13,11 +13,11 @@ class PersonModel extends CachedTable
 	{
 		// find owner person
 		$uMod = UserModel::getInstance();
-		if ($uMod->currentUser)
-		{
-			self::$user_id = $uMod->currentUser->id;
-			self::$owner_id = $uMod->currentUser->owner_id;
-		}
+		self::$user_id = $uMod->getUser();
+		if (!self::$user_id)
+			throw new Error("User not found");
+
+		self::$owner_id = $uMod->getOwner();
 
 		$this->tbl_name = "persons";
 		$this->adminForce = FALSE;

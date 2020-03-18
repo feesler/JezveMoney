@@ -120,13 +120,16 @@ abstract class Controller
 		// Get name of user person
 		if ($this->user_id)
 		{
-			if (!$this->uMod->currentUser)
-				throw new Error("User not found");
+			$this->owner_id = $this->uMod->getOwner();
 
 			$this->personMod = PersonModel::getInstance();
-			$personObj = $this->personMod->getItem($this->uMod->currentUser->owner_id);
+			$personObj = $this->personMod->getItem($this->owner_id);
 			if ($personObj)
 				$this->user_name = $personObj->name;
+		}
+		else
+		{
+			$this->owner_id = 0;
 		}
 
 		if ($loggedIn)		// user should be logged in to access

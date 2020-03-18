@@ -11,11 +11,11 @@ class DebtModel
 	protected function onStart()
 	{
 		$uMod = UserModel::getInstance();
-		if (!$uMod->currentUser)
+		$this->user_id = $uMod->getUser();
+		if (!$this->user_id)
 			throw new Error("User not found");
 
-		$this->user_id = $uMod->currentUser->id;
-		$this->owner_id = $uMod->currentUser->owner_id;
+		$this->owner_id = $uMod->getOwner();
 
 		$this->personModel = PersonModel::getInstance();
 	}
