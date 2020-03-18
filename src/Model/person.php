@@ -14,9 +14,6 @@ class PersonModel extends CachedTable
 		// find owner person
 		$uMod = UserModel::getInstance();
 		self::$user_id = $uMod->getUser();
-		if (!self::$user_id)
-			throw new Error("User not found");
-
 		self::$owner_id = $uMod->getOwner();
 
 		$this->tbl_name = "persons";
@@ -89,17 +86,18 @@ class PersonModel extends CachedTable
 			}
 		}
 
-		// Admin case
+		// Registration/admin case
 		if (isset($params["user_id"]))
 		{
 			$res["user_id"] = intval($params["user_id"]);
-			if ($res["user_id"] != self::$user_id && !(self::$user_id && UserModel::isAdminUser()))
+			if (!$res["user_id"] ||
+				(self::$user_id && $res["user_id"] != self::$user_id && !UserModel::isAdminUser()))
 			{
 				wlog("Invalid user_id");
 				return NULL;
 			}
 		}
-		else if (self::$user_id)		// Registration
+		else if (self::$user_id)
 		{
 			$res["user_id"] = self::$user_id;
 		}

@@ -639,9 +639,9 @@ class UserModel extends CachedTable
 
 		if (!static::isAdminUser())
 		{
-			foreach($items as $item)
+			foreach($items as $item_id)
 			{
-				if ($item->id != $this->currentUser->id)
+				if ($item_id != $this->currentUser->id)
 					return FALSE;
 			}
 		}

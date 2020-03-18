@@ -30,7 +30,7 @@ class ProfileApiController extends ApiController
 	public function changename()
 	{
 		$requiredFields = [ "name" ];
-		$defMsg = Message::get(ERR_PROFILE_PASSWORD);
+		$defMsg = Message::get(ERR_PROFILE_NAME);
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
@@ -96,7 +96,7 @@ class ProfileApiController extends ApiController
 		$respObj->ok();
 	}
 
-	
+
 	public function del()
 	{
 		$respObj = new apiResponse;
