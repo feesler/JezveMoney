@@ -92,6 +92,8 @@ class UserApiController extends ApiController
 		if ($reqData === FALSE)
 			$res->fail($defMsg);
 
+		$reqData["access"] = isset($_POST["access"]) ? intval($_POST["access"]) : 0;
+
 		$new_user_id = $this->uMod->create($reqData);
 		if (!$new_user_id)
 			$res->fail($defMsg);
@@ -115,27 +117,16 @@ class UserApiController extends ApiController
 		if (!isset($_POST["id"]))
 			$res->fail($defMsg);
 
-		if (isset($_POST["login"]))
-		{
-			if (!$this->uMod->setLogin($_POST["id"], $_POST["login"]))
-				$res->fail($defMsg);
-		}
-
-		if (isset($_POST["name"]))
-		{
-			$userObj = $this->uMod->getItem($_POST["id"]);
-			if (!$userObj)
-				$res->fail($defMsg);
-
-			$personMod = PersonModel::getInstance();
-			if (!$personMod->adminUpdate($userObj->owner_id, [ "name" => $_POST["name"] ]))
-				$res->fail($defMsg);
-		}
+		$reqData = checkFields($_POST, $this->createRequiredFields);
+		if ($reqData === FALSE)
+			$res->fail($defMsg);
 
 		if (isset($_POST["access"]))
-		{
-			$this->uMod->setAccess($_POST["id"], intval($_POST["access"]));
-		}
+			$reqData["access"] = intval($_POST["access"]);
+
+		$updateRes = $this->uMod->update($_POST["id"], $reqData);
+		if (!$updateRes)
+			$res->fail($defMsg);
 
 		$res->msg = Message::get(MSG_USER_UPDATE);
 		$res->ok();

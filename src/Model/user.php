@@ -362,6 +362,59 @@ class UserModel extends CachedTable
 
 	protected function preUpdate($item_id, $params)
 	{
+		$userObj = $this->getItem($item_id);
+		if (!$userObj)
+			return NULL;
+
+		$res = $this->checkParams($params, TRUE);
+		if (is_null($res))
+			return NULL;
+
+		if (isset($res["login"]) && isset($res["passhash"]))
+		{
+			// check no user exist with the same login
+			$luser_id = $this->getIdByLogin($res["login"]);
+			if ($luser_id != 0 && $luser_id != $item_id)
+				return NULL;
+		}
+
+		$this->personName = $res["name"];
+		unset($res["name"]);
+
+		$res["updatedate"] = date("Y-m-d H:i:s");
+
+		return $res;
+	}
+
+
+	protected function postUpdate($item_id)
+	{
+		$this->cleanCache();
+
+		if ($this->personName)
+		{
+			$userObj = $this->getItem($item_id);
+			if (!$userObj)
+				return;
+
+			$personMod = PersonModel::getInstance();
+			$personObj = $personMod->getItem($userObj->owner_id);
+			if (!$personObj)
+			{
+				$person_id = $personMod->create([ "name" => $this->personName, "user_id" => $item_id ]);
+				if (!$person_id)
+					$res->fail($defMsg);
+
+				$this->setOwner($item_id, $person_id);
+			}
+			else
+			{
+				if (!$personMod->adminUpdate($userObj->owner_id, [ "name" => $this->personName ]))
+					$res->fail($defMsg);
+			}
+
+			unset($this->personName);
+		}
 	}
 
 
