@@ -30,7 +30,7 @@ class CheckBalanceController extends Controller
 		{
 			$checkAccount_id = intval($this->actionParam);
 			if (!$checkAccount_id)
-				fail();
+				$this->fail();
 		}
 
 		$fixed = FALSE;
