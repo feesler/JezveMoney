@@ -1,0 +1,24 @@
+.query-form,
+.query-history
+{
+	display: inline-block;
+	float: left;
+	height: 100%;
+}
+
+
+.query-form
+{
+	width: 50%;
+}
+
+
+.query-form textarea
+{
+	max-width: 90%
+}
+
+.query-history
+{
+	width: 45%;
+}

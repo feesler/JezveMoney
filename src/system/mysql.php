@@ -256,7 +256,8 @@ class mysqlDB
 		$res = mysqli_query(self::$conn, $query);
 
 		$this->errno = mysqli_errno(self::$conn);
-		wlog("Result: ".($this->errno ? ($this->errno." - ".mysqli_error(self::$conn)) : "ok"));
+		$this->errorMessage = mysqli_error(self::$conn);
+		wlog("Result: ".($this->errno ? ($this->errno." - ".$this->errorMessage) : "ok"));
 
 		return ($res !== FALSE) ? $res : NULL;
 	}

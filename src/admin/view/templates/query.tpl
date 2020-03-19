@@ -33,16 +33,25 @@
 					<div style="color: red;">Error: <?=e($qerr_num)?><br><?=e($qerror)?></div><br>
 <?php		}	?>
 <?php	}	?>
-					<form method="post" action="<?=BASEURL?>admin/query/">
-					<label>Query type</label><br>
-					<input name="qtype" type="radio" value="1" checked> Select
-					<label>Query</label><br>
-					<textarea id="query" name="query" rows="5" cols="80"><?=e($query)?></textarea><br>
+					<div class="query-form">
+						<form method="post" action="<?=BASEURL?>admin/query/">
+						<label>Query type</label><br>
+						<input name="qtype" type="radio" value="1" checked> Select
+						<label>Query</label><br>
+						<textarea id="query" name="query" rows="5" cols="80"><?=e($query)?></textarea><br>
 
-					<div class="acc_controls">
-						<input class="adm_act_btn" type="submit" value="Query">
+						<div class="acc_controls">
+							<input class="adm_act_btn" type="submit" value="Query">
+						</div>
+						</form>
 					</div>
-					</form>
+					<div class="query-history">
+						<table class="adm_tbl">
+<?php	foreach($latestQueries as $item) {		?>
+							<tr><td><?=e($item)?></td></tr>
+<?php	}	?>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
