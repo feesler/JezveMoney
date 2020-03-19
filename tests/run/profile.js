@@ -2,6 +2,7 @@ import { LoginView } from '../view/login.js';
 import { RegisterView } from '../view/register.js';
 import { MainView } from '../view/main.js';
 import { setParam, test, formatDate, checkObjValue } from '../common.js';
+import { api } from '../api.js';
 
 
 let runProfile =
@@ -29,6 +30,12 @@ let runProfile =
 	{
 		if (!userObj || !userObj.login || !userObj.name || !userObj.password)
 			throw new Error('Wrong user object');
+
+		// Check user not exist
+		let users = await api.user.list();
+		let apiUser = users.find(item => item.login == userObj.login);
+		if (apiUser)
+			await api.user.del(apiUser.id);
 
 		if (this.view.isUserLoggedIn())
 		{

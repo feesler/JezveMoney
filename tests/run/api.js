@@ -32,8 +32,7 @@ let runAPI =
 
 		// Remove apiTestUser is exist
 		let users = await api.user.list();
-		let possibleApiUserNames = [ this.config.apiTestUser.name, newApiTesterName ];
-		let apiUser = users.find(item => possibleApiUserNames.includes(item.name));
+		let apiUser = users.find(item => item.login == this.config.apiTestUser.login);
 		if (apiUser)
 			await api.user.del(apiUser.id);
 
