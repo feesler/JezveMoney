@@ -12,8 +12,42 @@
 		return (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || $_SERVER["SERVER_PORT"] == 443;
 	}
 
-	$ruri = $_SERVER["REQUEST_URI"];
-	$userAgent = $_SERVER["HTTP_USER_AGENT"];
+
+	function bootLog()
+	{
+		wlog("\r\n==================================================");
+		wlog($_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"]);
+		wlog("BASEURL: ".BASEURL);
+		wlog("approot: ".APP_ROOT);
+		if (isset($_SERVER["REMOTE_ADDR"]))
+			wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
+		wlog("Time: ".date("r"));
+
+		wlog("Headers: ");
+		foreach(getallheaders() as $cKey => $cVal)
+		{
+			wlog($cKey.": ".$cVal);
+		}
+
+		if ($_SERVER["REQUEST_METHOD"] == "POST")
+		{
+			wlog("POST data:");
+			wlog(file_get_contents('php://input'));
+		}
+	}
+
+
+	function setLogs($enable)
+	{
+		global $noLogs;
+
+		$writeBootLog = ($noLogs && $enable);
+		$noLogs = !$enable;
+
+		if ($writeBootLog)
+			bootLog();
+	}
+
 
 	// Check development or release environment
 	$productionHost = "jezvemoney.ru";
@@ -80,7 +114,7 @@
 	if (!isSecure() && !LOCAL_DEV)
 	{
 		header("HTTP/1.1 302 Found", TRUE, 302);
-		header("Location: ".APP_PROTOCOL.APP_HOST.$ruri);
+		header("Location: ".APP_PROTOCOL.APP_HOST.$_SERVER["REQUEST_URI"]);
 		exit;
 	}
 
@@ -96,25 +130,7 @@
 	require_once(APP_ROOT."system/log.php");
 	if (!isset($noLogs) || !$noLogs)
 	{
-		wlog("\r\n==================================================");
-		wlog($_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"]);
-		wlog("BASEURL: ".BASEURL);
-		wlog("approot: ".APP_ROOT);
-		if (isset($_SERVER["REMOTE_ADDR"]))
-			wlog("IP: ".$_SERVER["REMOTE_ADDR"]);
-		wlog("Time: ".date("r"));
-
-		wlog("Headers: ");
-		foreach(getallheaders() as $cKey => $cVal)
-		{
-			wlog($cKey.": ".$cVal);
-		}
-
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
-		{
-			wlog("POST data:");
-			wlog(file_get_contents('php://input'));
-		}
+		bootLog();
 	}
 
 	require_once(APP_ROOT."system/json.php");

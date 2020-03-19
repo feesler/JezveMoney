@@ -35,16 +35,15 @@ class Logger
 
 }
 
-if (isset($noLogs) && $noLogs == TRUE)
+
+function wlog($str = NULL)
 {
-	function wlog(){}
-}
-else
-{
-	function wlog($str = NULL)
-	{
-		Logger::write($str);
-	}
+	global $noLogs;
+
+	if (isset($noLogs) && $noLogs == TRUE)
+		return;
+
+	Logger::write($str);
 }
 
 

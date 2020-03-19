@@ -24,10 +24,7 @@
 
 	$router->onStart(function($controller, $contrStr)
 	{
-		global $noLogs;
-
-		if ($contrStr != "log")
-			$noLogs = FALSE;
+		setLogs($contrStr != "log");
 
 		$controller->checkUser(TRUE, TRUE);
 	});
