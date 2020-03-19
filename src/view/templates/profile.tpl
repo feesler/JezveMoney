@@ -1,9 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<script>
-	var p_name = <?=JSON::encode($person_name)?>;
-
-	onReady(initProfilePage);
-</script>
 </head>
 <body>
 <div class="page">
@@ -86,5 +81,12 @@
 	</div>
 </form>
 </div>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	var p_name = <?=JSON::encode($person_name)?>;
+
+	onReady(initProfilePage);
+</script>
 </body>
 </html>

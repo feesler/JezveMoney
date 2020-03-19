@@ -9,10 +9,6 @@ input[type="button"]{ border: 0 none; padding: 2px 5px; }
 .act_sum{ background-color: #B0FFB0; }
 .bad_val{ background-color: #FFB0B0; }
 </style>
-<script>
-var transactions = <?=JSON::encode($transArr)?>;
-var account_id = <?=JSON::encode($checkAccount_id)?>;
-</script>
 </head>
 <body>
 <?php	if ($fixed) {	?>
@@ -154,5 +150,10 @@ var account_id = <?=JSON::encode($checkAccount_id)?>;
 <input type="submit" value="Fix balance">
 </form>
 <?php	}	?>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	var account_id = <?=JSON::encode($checkAccount_id)?>;
+</script>
 </body>
 </html>

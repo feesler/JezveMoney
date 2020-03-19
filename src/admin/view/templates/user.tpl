@@ -1,9 +1,4 @@
 <?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
-<script>
-	var users = <?=JSON::encode($uArr)?>;
-
-	onReady(initControls);
-</script>
 </head>
 <body>
 <div class="page">
@@ -72,8 +67,12 @@
 	<input class="btn ok_btn" type="submit" value="Submit">
 </div>
 </form>
-</form>
 
-<form>
+<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
+<script>
+	var users = <?=JSON::encode($uArr)?>;
+
+	onReady(initControls);
+</script>
 </body>
 </html>

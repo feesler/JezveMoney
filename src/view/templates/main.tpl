@@ -1,13 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<script>
-	var currency = <?=JSON::encode($currArr)?>;
-	var accounts = <?=JSON::encode($accArr)?>;
-	var persons = <?=JSON::encode($persArr)?>;
-	var accCurr = <?=$curr_acc_id?>;
-	var chartData = <?=JSON::encode($statArr)?>;
-
-	onReady(initStatWidget);
-</script>
 </head>
 <body>
 <div class="page">
@@ -99,5 +90,16 @@
 		</div>
 	</div>
 </div>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	var currency = <?=JSON::encode($currArr)?>;
+	var accounts = <?=JSON::encode($accArr)?>;
+	var persons = <?=JSON::encode($persArr)?>;
+	var accCurr = <?=$curr_acc_id?>;
+	var chartData = <?=JSON::encode($statArr)?>;
+
+	onReady(initStatWidget);
+</script>
 </body>
 </html>

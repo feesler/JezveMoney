@@ -1,14 +1,5 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
-<script>
-	var accounts = <?=JSON::encode($accArr)?>;
-	var currency = <?=JSON::encode($currArr)?>;
-	var transArr = <?=JSON::encode($transArr)?>;
-	var filterObj = <?=JSON::encode($filterObj)?>;
-
-	onReady(initTransListDrag);
-	onReady(initToolbar);
-</script>
 </head>
 <body>
 <div class="page">
@@ -102,5 +93,16 @@
 <form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
 <input id="deltrans" name="transactions" type="hidden" value="">
 </form>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	var accounts = <?=JSON::encode($accArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
+	var transArr = <?=JSON::encode($transArr)?>;
+	var filterObj = <?=JSON::encode($filterObj)?>;
+
+	onReady(initTransListDrag);
+	onReady(initToolbar);
+</script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<script>onReady(initRegisterPage)</script>
 <body>
 <?php	require_once(TPL_PATH."header.tpl");		?>
 <form id="regfrm" action="<?=BASEURL?>register/" method="post">
@@ -19,5 +18,8 @@
 	</div>
 </div>
 </form>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>onReady(initRegisterPage)</script>
 </body>
 </html>

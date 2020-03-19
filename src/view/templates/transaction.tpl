@@ -1,36 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<script>
-	var accounts = <?=JSON::encode($accArr)?>;
-	var currency = <?=JSON::encode($currArr)?>;
-<?php	if ($action == "edit") {	?>
-	var edit_transaction =
-	{
-		srcAcc : <?=$tr["src_id"]?>,
-		destAcc : <?=$tr["dest_id"]?>,
-		srcAmount : <?=$tr["src_amount"]?>,
-		destAmount : <?=$tr["dest_amount"]?>,
-		srcCurr : <?=$tr["src_curr"]?>,
-		destCurr : <?=$tr["dest_curr"]?>,
-		type : <?=$tr["type"]?>
-
-	};
-<?php	}	?>
-	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
-<?php	if ($tr["type"] == DEBT) {		?>
-	var persons = <?=JSON::encode($persArr)?>;
-<?php	}	?>
-
-<?php	if ($tr["type"] == DEBT) {		?>
-	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>, <?=$person_id?>, <?=($give ? "true" : "false")?>, <?=$acc_id?>, <?=($noAccount ? "true" : "false")?>);
-<?php	} else {		?>
-	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
-<?php	}		?>
-
-	var ViewModel = new TransactionViewModel();
-
-	onReady(Transaction.initModel.bind(Transaction));
-	onReady(ViewModel.initControls.bind(ViewModel));
-</script>
 </head>
 <body>
 <div class="page">
@@ -408,5 +376,39 @@
 <input name="transactions" type="hidden" value="<?=e($tr["id"])?>">
 </form>
 <?php	}	?>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	var accounts = <?=JSON::encode($accArr)?>;
+	var currency = <?=JSON::encode($currArr)?>;
+<?php	if ($action == "edit") {	?>
+	var edit_transaction =
+	{
+		srcAcc : <?=$tr["src_id"]?>,
+		destAcc : <?=$tr["dest_id"]?>,
+		srcAmount : <?=$tr["src_amount"]?>,
+		destAmount : <?=$tr["dest_amount"]?>,
+		srcCurr : <?=$tr["src_curr"]?>,
+		destCurr : <?=$tr["dest_curr"]?>,
+		type : <?=$tr["type"]?>
+
+	};
+<?php	}	?>
+	var edit_mode = <?=(($action == "edit") ? "true" : "false")?>;
+<?php	if ($tr["type"] == DEBT) {		?>
+	var persons = <?=JSON::encode($persArr)?>;
+<?php	}	?>
+
+<?php	if ($tr["type"] == DEBT) {		?>
+	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>, <?=$person_id?>, <?=($give ? "true" : "false")?>, <?=$acc_id?>, <?=($noAccount ? "true" : "false")?>);
+<?php	} else {		?>
+	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
+<?php	}		?>
+
+	var ViewModel = new TransactionViewModel();
+
+	onReady(Transaction.initModel.bind(Transaction));
+	onReady(ViewModel.initControls.bind(ViewModel));
+</script>
 </body>
 </html>

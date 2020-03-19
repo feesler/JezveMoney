@@ -27,5 +27,6 @@
 		</div>
 	</div>
 </div>
+<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 </body>
 </html>

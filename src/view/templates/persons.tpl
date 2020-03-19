@@ -1,8 +1,5 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 <link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
-<script>
-	onReady(initPersonsList);
-</script>
 </head>
 <body>
 <div class="page">
@@ -45,5 +42,10 @@
 <form id="delform" method="post" action="<?=BASEURL?>persons/del/">
 <input id="delpersons" name="persons" type="hidden" value="">
 </form>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	onReady(initPersonsList);
+</script>
 </body>
 </html>

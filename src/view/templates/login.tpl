@@ -1,6 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<?php	Message::check();		?>
-<script>onReady(initLoginPage)</script>
 </head>
 <body>
 <form id="loginfrm" action="<?=BASEURL?>login/" method="post">
@@ -27,5 +25,8 @@
 	</div>
 </div>
 </form>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>onReady(initLoginPage)</script>
 </body>
 </html>

@@ -1,17 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<script>
-	var currency = <?=JSON::encode($currArr)?>;
-<?php	if ($action == "edit") {	?>
-	var account_id = <?=$acc_id?>;
-<?php	}	?>
-	var acc_name = <?=JSON::encode($accInfo->name)?>;
-	var acc_currency = <?=$accInfo->curr_id?>;
-	var acc_balance = <?=$accInfo->balance?>;
-	var acc_init_balance = <?=$accInfo->initbalance?>;
-	var new_init_balance = <?=$accInfo->initbalance?>;
-
-	onReady(initControls);
-</script>
 </head>
 <body>
 <div class="page">
@@ -89,5 +76,20 @@
 <input name="accounts" type="hidden" value="<?=e($acc_id)?>">
 </form>
 <?php	}	?>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+	var currency = <?=JSON::encode($currArr)?>;
+<?php	if ($action == "edit") {	?>
+	var account_id = <?=$acc_id?>;
+<?php	}	?>
+	var acc_name = <?=JSON::encode($accInfo->name)?>;
+	var acc_currency = <?=$accInfo->curr_id?>;
+	var acc_balance = <?=$accInfo->balance?>;
+	var acc_init_balance = <?=$accInfo->initbalance?>;
+	var new_init_balance = <?=$accInfo->initbalance?>;
+
+	onReady(initControls);
+</script>
 </body>
 </html>

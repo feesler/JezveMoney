@@ -1,7 +1,4 @@
 <?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
-<script>
-onReady(initControls);
-</script>
 </head>
 <body>
 <div class="page">
@@ -646,5 +643,9 @@ onReady(initControls);
 		</div>
 	</div>
 </div>
+<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
+<script>
+	onReady(initControls);
+</script>
 </body>
 </html>

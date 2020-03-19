@@ -1,11 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<script>
-var accounts = <?=JSON::encode($accArr)?>;
-var currencies = <?=JSON::encode($currArr)?>;
-var persons = <?=JSON::encode($persArr)?>;
-
-onReady(initPage);
-</script>
 </head>
 <body>
 <form id="fileimportfrm" method="post" enctype="multipart/form-data" action="<?=BASEURL?>fastcommit/upload">
@@ -41,5 +34,14 @@ onReady(initPage);
 		</div>
 		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span></div>
 	</div>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<script>
+var accounts = <?=JSON::encode($accArr)?>;
+var currencies = <?=JSON::encode($currArr)?>;
+var persons = <?=JSON::encode($persArr)?>;
+
+onReady(initPage);
+</script>
 </body>
 </html>

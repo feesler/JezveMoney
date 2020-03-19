@@ -1,12 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<?php	if ($action == "edit") {		?>
-<script>
-	var person_id = <?=$p_id?>;
-	var personName = <?=JSON::encode($pName)?>;
-
-	onReady(initControls);
-</script>
-<?php	}	?>
 </head>
 <body>
 <div class="page">
@@ -45,6 +37,16 @@
 <form id="delform" method="post" action="<?=BASEURL?>persons/del/">
 <input name="persons" type="hidden" value="<?=e($p_id)?>">
 </form>
+<?php	}	?>
+
+<?php	include(TPL_PATH."footer.tpl");	?>
+<?php	if ($action == "edit") {		?>
+<script>
+	var person_id = <?=$p_id?>;
+	var personName = <?=JSON::encode($pName)?>;
+
+	onReady(initControls);
+</script>
 <?php	}	?>
 </body>
 </html>

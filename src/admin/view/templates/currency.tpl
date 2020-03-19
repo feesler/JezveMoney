@@ -1,9 +1,4 @@
 <?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
-<script>
-	var currency = <?=JSON::encode($currArr)?>;
-
-	onReady(initControls);
-</script>
 </head>
 <body>
 <div class="page">
@@ -58,5 +53,13 @@
 </div>
 <div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">Sign before value</label></div>
 </form>
+
+<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
+
+<script>
+	var currency = <?=JSON::encode($currArr)?>;
+
+	onReady(initControls);
+</script>
 </body>
 </html>
