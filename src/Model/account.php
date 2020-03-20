@@ -148,8 +148,8 @@ class AccountModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
-		if ($this->dbObj->rowsCount($qResult) > 0)
+		$foundItem = $this->findByName($res["name"]);
+		if ($foundItem)
 		{
 			wlog("Such item already exist");
 			return NULL;
@@ -181,16 +181,11 @@ class AccountModel extends CachedTable
 
 		if (isset($res["name"]))
 		{
-			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=".qnull($res["name"]));
-			$row = $this->dbObj->fetchRow($qResult);
-			if ($row)
+			$foundItem = $this->findByName($res["name"]);
+			if ($foundItem && $foundItem->id != $item_id)
 			{
-				$found_id = intval($row["id"]);
-				if ($found_id != $item_id)
-				{
-					wlog("Such item already exist");
-					return NULL;
-				}
+				wlog("Such item already exist");
+				return NULL;
 			}
 		}
 
@@ -565,5 +560,30 @@ class AccountModel extends CachedTable
 			$newacc_id = $this->getIdByPos(1);
 
 		return $newacc_id;
+	}
+
+
+	public function findByName($acc_name, $caseSens = FALSE)
+	{
+		if (is_empty($acc_name))
+			return NULL;
+		
+		if (!$this->checkCache())
+			return NULL;
+
+		if (!$caseSens)
+			$acc_name = strtolower($acc_name);
+		foreach($this->cache as $item)
+		{
+			// Skip accounts of persons
+			if ($item->owner_id != self::$owner_id)
+				continue;
+
+			if (($caseSens && $item->name == $acc_name) ||
+				(!$caseSens && strtolower($item->name) == $acc_name))
+				return $item;
+		}
+
+		return NULL;
 	}
 }

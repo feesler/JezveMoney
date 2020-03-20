@@ -118,8 +118,8 @@ class PersonModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, [ "name=".qnull($res["name"]), "user_id=".$res["user_id"] ]);
-		if ($this->dbObj->rowsCount($qResult) > 0)
+		$foundItem = $this->findByName($res["name"]);
+		if ($foundItem)
 		{
 			wlog("Such item already exist");
 			return NULL;
@@ -160,16 +160,11 @@ class PersonModel extends CachedTable
 		if (is_null($res))
 			return NULL;
 
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, [ "name=".qnull($res["name"]), "user_id=".$personObj->user_id ]);		// TODO : do not use select + why looking for name in all users?
-		$row = $this->dbObj->fetchRow($qResult);
-		if ($row)
+		$foundItem = $this->findByName($res["name"]);
+		if ($foundItem && $foundItem->id != $item_id)
 		{
-			$found_id = intval($row["id"]);
-			if ($found_id != $item_id)
-			{
-				wlog("Such item already exist");
-				return NULL;
-			}
+			wlog("Such item already exist");
+			return NULL;
 		}
 
 		$res["updatedate"] = date("Y-m-d H:i:s");
@@ -279,17 +274,25 @@ class PersonModel extends CachedTable
 
 
 	// Search person with specified name and return id if success
-	public function findByName($p_name)
+	public function findByName($p_name, $caseSens = FALSE)
 	{
+		if (is_empty($p_name))
+			return NULL;
+
 		if (!$this->checkCache())
 			return 0;
 
+		if (!$caseSens)
+			$p_name = strtolower($p_name);
 		foreach($this->cache as $p_id => $item)
 		{
-			if ($p_id != self::$owner_id && $item->name == $p_name)
-			{
-				return $p_id;
-			}
+			// Skip person of user
+			if ($p_id == self::$owner_id)
+				continue;
+			
+			if (($caseSens && $item->name == $p_name) ||
+				(!$caseSens && strtolower($item->name) == $p_name))
+				return $item;
 		}
 
 		return 0;
