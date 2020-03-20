@@ -209,11 +209,15 @@ class TransactionsController extends Controller
 		if (!$tr["type"])
 			$this->fail($defMsg);
 
-		// check predefined account
+		// Check specified account
 		$acc_id = 0;
 		if (isset($_GET["acc_id"]))
 			$acc_id = intval($_GET["acc_id"]);
-		if (!$acc_id || !$this->accModel->is_exist($acc_id))		// TODO : think about redirect or warning message
+		// Redirect if invalid account is specified
+		if ($acc_id && !$this->accModel->is_exist($acc_id))
+			$this->fail($defMsg);
+		// Use first account if nothing is specified
+		if (!$acc_id)
 			$acc_id = $this->accModel->getIdByPos(0);
 		if (!$acc_id)
 			$this->fail($defMsg);
