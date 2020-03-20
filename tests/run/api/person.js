@@ -66,11 +66,12 @@ let runPersonAPI =
 					throw e;
 			}
 
-			person_id = createRes.id;
-
 			let expPersonList = copyObject(pBefore);
 			if (resExpected)
+			{
 				expPersonList.push(expPersonObj);
+				person_id = createRes.id;
+			}
 
 			let pList = await this.state.getPersonsList();
 

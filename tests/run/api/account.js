@@ -81,11 +81,12 @@ let runAccountAPI =
 					throw e;
 			}
 
-			acc_id = createRes.id;
-
 			let expAccList = copyObject(accBefore);
 			if (resExpected)
+			{
 				expAccList.push(expAccObj);
+				acc_id = createRes.id;
+			}
 
 			let accList = await this.state.getAccountsList();
 

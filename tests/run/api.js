@@ -98,6 +98,8 @@ let runAPI =
 		let CASH_RUB = await account.createTest({ name : 'cash ru', curr_id : RUB, balance : 5000, icon : 3 });
 		let ACC_USD = await account.createTest({ name : 'acc usd', curr_id : USD, balance : 10.5, icon : 5 });
 
+		// Try to create account with existing name
+		await account.createTest({ name : 'acc ru', curr_id : USD, balance : 10.5, icon : 0 });
 
 		/**
 		 * Security tests of accounts
@@ -111,6 +113,9 @@ let runAPI =
 
 		let PERSON_X = await person.createTest({ name : 'Person X' });
 		let PERSON_Y = await person.createTest({ name : 'Y' });
+
+		// Try to create person with existing name
+		await person.createTest({ name : 'Y' });
 
 		/**
 		 * Security tests of persons
@@ -281,6 +286,8 @@ let runAPI =
 		 */
 		await account.updateTest(ACC_RUB, { name : 'acc rub', curr_id : USD, balance : 101, icon : 2 });
 
+		// Try to update name of account to an existing one
+		await account.updateTest(CASH_RUB, { name : 'acc rub' });
 
 		/**
 		 * Delete accounts
@@ -290,6 +297,8 @@ let runAPI =
 		/**
 		 * Update person
 		 */
+		await person.updateTest(PERSON_X, { name : 'XX!' });
+		// Try to update name of person to an existing one
 		await person.updateTest(PERSON_X, { name : 'XX!' });
 
 		/**
