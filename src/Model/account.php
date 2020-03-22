@@ -265,6 +265,65 @@ class AccountModel extends CachedTable
 	}
 
 
+	// Return account of person with specified currency if exist
+	public function getPersonAccount($person_id, $curr_id)
+	{
+		$person_id = intval($person_id);
+		if ($person_id == self::$owner_id || !$this->personMod->is_exist($person_id))
+		{
+			wlog("Invalid person specified");
+			return NULL;
+		}
+
+		$curr_id = intval($curr_id);
+		if (!$this->currMod->is_exist($curr_id))
+		{
+			wlog("Invalid currency specified");
+			return NULL;
+		}
+
+		if (!$this->checkCache())
+			return FALSE;
+
+		foreach($this->cache as $item)
+		{
+			if ($item->owner_id == $person_id && $item->curr_id == $curr_id)
+				return $item;
+		}
+
+		return NULL;
+	}
+
+
+	// Create account with specified currency for person
+	public function createPersonAccount($person_id, $curr_id)
+	{
+		$person_id = intval($person_id);
+		if ($person_id == self::$owner_id || !$this->personMod->is_exist($person_id))
+		{
+			wlog("Invalid person specified");
+			return NULL;
+		}
+
+		$curr_id = intval($curr_id);
+		if (!$curr_id)
+		{
+			wlog("Invalid currency specified");
+			return NULL;
+		}
+
+		$createRes = $this->create([
+							"owner_id" => $person_id,
+							"name" => "acc_".$person_id."_".$curr_id,
+							"balance" => 0.0,
+							"curr_id" => $curr_id,
+							"icon" => 0
+						]);
+
+		return $this->getItem($createRes);
+	}
+
+
 	// Remove accounts of specified person(s)
 	public function onPersonDelete($persons)
 	{

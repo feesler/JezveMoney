@@ -230,49 +230,6 @@ class PersonModel extends CachedTable
 	}
 
 
-	// Return account with specified currency if exist
-	public function getAccount($person_id, $curr_id)
-	{
-		if (!is_numeric($person_id) || !is_numeric($curr_id))
-			return 0;
-
-		$p_id = intval($person_id);
-		$c_id = intval($curr_id);
-
-		$condArr = ["user_id=".self::$user_id,
-						"owner_id=".$p_id,
-						"curr_id=".$c_id];
-
-		$qResult = $this->dbObj->selectQ("id", "accounts", $condArr);
-		if ($this->dbObj->rowsCount($qResult) != 1)
-			return 0;
-
-		$row = $this->dbObj->fetchRow($qResult);
-
-		return intval($row["id"]);
-	}
-
-
-	// Create account of specified currency for person
-	public function createAccount($person_id, $curr_id)
-	{
-		$p_id = intval($person_id);
-		$c_id = intval($curr_id);
-		if (!$p_id || !$c_id)
-			return 0;
-
-		if (!$this->is_exist($p_id))
-			return FALSE;
-
-		$accMod = AccountModel::getInstance();
-		return $accMod->create([ "owner_id" => $p_id,
-									"name" => "acc_".$p_id."_".$c_id,
-									"balance" => 0.0,
-									"curr_id" => $c_id,
-									"icon" => 0 ]);
-	}
-
-
 	// Search person with specified name and return id if success
 	public function findByName($p_name, $caseSens = FALSE)
 	{

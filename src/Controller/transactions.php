@@ -233,8 +233,8 @@ class TransactionsController extends Controller
 			$pObj = $this->personMod->getItem($person_id);
 			$person_name = ($pObj) ? $pObj->name : NULL;
 
-			$person_acc_id = $this->personMod->getAccount($person_id, $debtAcc->curr_id);
-			$person_acc = $this->accModel->getItem($person_acc_id);
+			$person_acc = $this->accModel->getPersonAccount($person_id, $debtAcc->curr_id);
+			$person_acc_id = ($person_acc) ? $person_acc->id : 0;
 			$person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
 			$person_balance = $person_res_balance;
 

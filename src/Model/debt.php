@@ -4,20 +4,11 @@ class DebtModel
 {
 	use Singleton;
 
-	private $user_id = 0;
-	private $owner_id = 0;		// person of user
-
 
 	protected function onStart()
 	{
-		$uMod = UserModel::getInstance();
-		$this->user_id = $uMod->getUser();
-		if (!$this->user_id)
-			throw new Error("User not found");
-
-		$this->owner_id = $uMod->getOwner();
-
 		$this->personModel = PersonModel::getInstance();
+		$this->accModel = AccountModel::getInstance();
 	}
 
 
@@ -39,8 +30,6 @@ class DebtModel
 			throw new Error("Unknown debt operation: $op");
 
 		$person_id = intval($params["person_id"]);
-		if (!$this->personModel->is_exist($person_id))		// person should exist
-			throw new Error("Person $person_id not found");
 
 		$res->src_curr = intval($params["src_curr"]);
 		$res->dest_curr = intval($params["dest_curr"]);
@@ -48,23 +37,23 @@ class DebtModel
 			throw new Error("Invalid currency");
 
 		$curr_id = ($op == 1) ? $res->src_curr : $res->dest_curr;
-		$personAccount_id = $this->personModel->getAccount($person_id, $curr_id);
-		if (!$personAccount_id)
-			$personAccount_id = $this->personModel->createAccount($person_id, $curr_id);
-		if (!$personAccount_id)
+		$personAccount = $this->accModel->getPersonAccount($person_id, $curr_id);
+		if (!$personAccount)
+			$personAccount = $this->accModel->createPersonAccount($person_id, $curr_id);
+		if (!$personAccount)
 			throw new Error("Fail to obtain person account: person_id: $person_id, curr_id: $curr_id");
 
 		$account_id = isset($params["acc_id"]) ? intval($params["acc_id"]) : 0;
 
 		if ($op == 1)		// give
 		{
-			$res->src_id = $personAccount_id;
+			$res->src_id = $personAccount->id;
 			$res->dest_id = $account_id;
 		}
 		else if ($op == 2)	// take
 		{
 			$res->src_id = $account_id;
-			$res->dest_id = $personAccount_id;
+			$res->dest_id = $personAccount->id;
 		}
 
 		$res->src_amount = floatval($params["src_amount"]);
@@ -98,25 +87,21 @@ class DebtModel
 		if ($op != 1 && $op != 2)
 			return 0;
 
-		$pMod = PersonModel::getInstance();
-		if (!$pMod->is_exist($person_id))
-			return 0;
-
-		$p_acc = $pMod->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-		if (!$p_acc)
-			$p_acc = $pMod->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-		if (!$p_acc)
+		$personAccount = $this->accModel->getPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+		if (!$personAccount)
+			$personAccount = $this->accModel->createPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+		if (!$personAccount)
 			return 0;
 
 		if ($op == 1)		// give
 		{
-			$src_id = $p_acc;
+			$src_id = $personAccount->id;
 			$dest_id = $account_id;
 		}
 		else if ($op == 2)	// take
 		{
 			$src_id = $account_id;
-			$dest_id = $p_acc;
+			$dest_id = $personAccount->id;
 		}
 
 		$transMod = TransactionModel::getInstance();
@@ -153,25 +138,21 @@ class DebtModel
 		if ($op != 1 && $op != 2)
 			return FALSE;
 
-		$pMod = PersonModel::getInstance();
-		if (!$pMod->is_exist($person_id))
-			return FALSE;
-
-		$p_acc = $pMod->getAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-		if (!$p_acc)
-			$p_acc = $pMod->createAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-		if (!$p_acc)
+		$personAccount = $this->accModel->getPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+		if (!$personAccount)
+			$personAccount = $this->accModel->createPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
+		if (!$personAccount)
 			return FALSE;
 
 		if ($op == 1)		// give
 		{
-			$src_id = $p_acc;
+			$src_id = $personAccount->id;
 			$dest_id = $account_id;
 		}
 		else if ($op == 2)	// take
 		{
 			$src_id = $account_id;
-			$dest_id = $p_acc;
+			$dest_id = $personAccount->id;
 		}
 
 		$transMod = TransactionModel::getInstance();
