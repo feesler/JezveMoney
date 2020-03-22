@@ -373,6 +373,15 @@ class TransactionModel extends CachedTable
 	}
 
 
+	protected function getAffectedAccount($account_id)
+	{
+		if (isset($this->balanceChanges) && isset($this->balanceChanges[$account_id]))
+			return $this->balanceChanges[$account_id];
+		else
+			return $this->accModel->getItem($account_id);;
+	}
+
+
 	public function pushBalance($account_id, $accountsList = [])
 	{
 		$res = $accountsList;
@@ -382,7 +391,7 @@ class TransactionModel extends CachedTable
 
 		if (!isset($res[$account_id]))
 		{
-			$account = $this->accModel->getItem($account_id);
+			$account = $this->getAffectedAccount($account_id);
 			if ($account)
 				$res[$account_id] = $account->balance;
 			else
@@ -691,11 +700,12 @@ class TransactionModel extends CachedTable
 	}
 
 
-	//
+	// Update result balance values of specified transactions 
+	//    accounts - id or arrays of account ids to filter transactions by
+	//    pos - position of transaction to start update from, inclusively
 	protected function updateResults($accounts, $pos)
 	{
-		if (!is_array($accounts))
-			$accounts = [ $accounts ];
+		$accounts = skipZeros($accounts);
 
 		// Get previous results
 		$results = [];
@@ -721,22 +731,21 @@ class TransactionModel extends CachedTable
 				continue;
 
 			$queryItem = NULL;
+			$results = $this->applyTransaction($tr, $results);
 
-			if (in_array($tr->type, self::$srcAvailTypes) && $tr->src_id && isset($results[$tr->src_id]))
+			if (in_array($tr->type, self::$srcAvailTypes) && $tr->src_id && in_array($tr->src_id, $accounts))
 			{
 				if (is_null($queryItem))
 					$queryItem = clone $tr;
 
-				$results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
 				$queryItem->src_result = $results[$tr->src_id];
 			}
 
-			if (in_array($tr->type, self::$destAvailTypes) && $tr->dest_id && isset($results[$tr->dest_id]))
+			if (in_array($tr->type, self::$destAvailTypes) && $tr->dest_id && in_array($tr->dest_id, $accounts))
 			{
 				if (is_null($queryItem))
 					$queryItem = clone $tr;
 
-				$results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
 				$queryItem->dest_result = $results[$tr->dest_id];
 			}
 
