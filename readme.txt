@@ -17,3 +17,13 @@ WebGrind profiler:
 
 Find in project:
 	grep -srn  --exclude-dir={vendor,node_modules} " request " ./
+
+
+Update Node.js packages:
+	npm update
+
+Composer
+Update packages:
+	composer update
+Optimize autoload:
+	composer dump-autoload -a

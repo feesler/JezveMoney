@@ -1,6 +1,7 @@
 {
 	"config": {
-		"vendor-dir": "src/vendor"
+		"vendor-dir": "src/vendor",
+		"classmap-authoritative": true
 	},
 	"require": {
 		"phpoffice/phpspreadsheet": "^1.10"
