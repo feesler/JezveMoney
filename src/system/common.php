@@ -156,7 +156,13 @@
 
 	function pathJoin(...$segments)
 	{
-		return implode(DIRECTORY_SEPARATOR, $segments);
+		$trimmed = [];
+		foreach($segments as $segment)
+		{
+			$trimmed[] = trim($segment, DIRECTORY_SEPARATOR);
+		}
+
+		return implode(DIRECTORY_SEPARATOR, $trimmed);
 	}
 
 

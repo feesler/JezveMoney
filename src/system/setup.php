@@ -124,7 +124,7 @@
 
 	define("TPL_PATH", pathJoin(APP_ROOT, "view", "templates").DIRECTORY_SEPARATOR);
 	define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "view", "templates").DIRECTORY_SEPARATOR);
-	define("UPLOAD_PATH", pathJoin(APP_ROOT, "uploads").DIRECTORY_SEPARATOR);
+	define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads").DIRECTORY_SEPARATOR);
 	define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs").DIRECTORY_SEPARATOR);
 
 	require_once(APP_ROOT."system/log.php");

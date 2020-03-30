@@ -988,7 +988,7 @@ function onFileImport()
 			return false;
 
 		reqObj.fileName = el.value;
-		reqObj.isCard = isCard;
+		reqObj.isCard = (isCard ? 1 : 0);
 
 		ajax.post(baseURL + 'fastcommit/upload/', urlJoin(reqObj), onImportSuccess);
 	}

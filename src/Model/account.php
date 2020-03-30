@@ -413,6 +413,7 @@ class AccountModel extends CachedTable
 
 	public function updateBalances($balanceChanges)
 	{
+		$curDate = date("Y-m-d H:i:s");
 		$accounts = [];
 		foreach($balanceChanges as $acc_id => $balance)
 		{
@@ -421,9 +422,8 @@ class AccountModel extends CachedTable
 				return NULL;
 
 			$accObj->balance = $balance;
-
 			$accObj->createdate = date("Y-m-d H:i:s", $accObj->createdate);
-			$accObj->updatedate = date("Y-m-d H:i:s", $accObj->updatedate);
+			$accObj->updatedate = $curDate;
 
 			$accounts[] = (array)$accObj;
 		}

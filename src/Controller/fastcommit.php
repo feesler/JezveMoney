@@ -42,7 +42,7 @@ class FastCommitController extends Controller
 	// Short alias for Coordinate::columnIndexFromString() method
 	private static function columnInd($str)
 	{
-		return Coordinate::columnIndexFromString($str) - 1;
+		return Coordinate::columnIndexFromString($str);
 	}
 
 
@@ -104,7 +104,7 @@ class FastCommitController extends Controller
 			$fhnd = fopen($fname, "a");
 			if ($fhnd === FALSE)
 			{
-				wlog("No file id specified");
+				wlog("Can't open file $fname");
 				exit;
 			}
 			$bytesWrite = fwrite($fhnd, $file_cont);
@@ -123,7 +123,7 @@ class FastCommitController extends Controller
 
 			$fname = UPLOAD_PATH.$_POST["fileName"];
 			$fileType = substr(strrchr($fname, "."), 1);
-			$isCardStatement = (strcmp($_POST["isCard"], "card") == 0);
+			$isCardStatement = (intval($_POST["isCard"]) == 1);
 		}
 
 		$fileType = strtoupper($fileType);
@@ -140,27 +140,30 @@ class FastCommitController extends Controller
 
 		$reader = IOFactory::createReader($readedType);
 		if ($readedType == "Csv")
+		{
 			$reader->setDelimiter(';');
+			$reader->setEnclosure('');
+		}
 		$spreadsheet = $reader->load($fname);
 		$src = $spreadsheet->getActiveSheet();
 
 		if ($isCardStatement)
 		{
-			$date_col = self::columnStr(0);
-			$desc_col = self::columnStr(2);
-			$trCurr_col = self::columnStr(6);
-			$trAmount_col = self::columnStr(7);
-			$accCurr_col = self::columnStr(8);
-			$accAmount_col = self::columnStr(9);
+			$date_col = self::columnStr(1);
+			$desc_col = self::columnStr(3);
+			$trCurr_col = self::columnStr(7);
+			$trAmount_col = self::columnStr(8);
+			$accCurr_col = self::columnStr(9);
+			$accAmount_col = self::columnStr(10);
 		}
 		else	// account statement
 		{
-			$date_col = self::columnStr(0);
-			$desc_col = self::columnStr(1);
-			$trCurr_col = self::columnStr(2);
-			$trAmount_col = self::columnStr(3);
-			$accCurr_col = self::columnStr(4);
-			$accAmount_col = self::columnStr(5);
+			$date_col = self::columnStr(1);
+			$desc_col = self::columnStr(2);
+			$trCurr_col = self::columnStr(3);
+			$trAmount_col = self::columnStr(4);
+			$accCurr_col = self::columnStr(5);
+			$accAmount_col = self::columnStr(6);
 		}
 		$row_ind = 2;
 
@@ -169,12 +172,13 @@ class FastCommitController extends Controller
 		{
 			$descVal = $src->getCell($desc_col.$row_ind)->getValue();
 			$edesc = trim($descVal);
-			if (is_empty($edesc))
-				break;
 
 			$dataObj = new stdClass;
 
 			$dateVal = $src->getCell($date_col.$row_ind)->getValue();
+			if (is_empty($dateVal))
+				break;
+
 			if ($readedType == "Csv")
 			{
 				$dateFmt = strtotime($dateVal);
@@ -197,7 +201,7 @@ class FastCommitController extends Controller
 
 			$row_ind++;
 		}
-		while(!is_empty($edesc));
+		while(!is_empty($dateVal));
 
 		if (isset($hdrs["x-file-id"]))
 			unlink($fname);

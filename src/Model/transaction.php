@@ -208,8 +208,8 @@ class TransactionModel extends CachedTable
 
 		if (isset($params["date"]))
 		{
-			$res["date"] = strtotime($params["date"]);
-			if ($res["date"] === FALSE)
+			$res["date"] = is_string($params["date"]) ? strtotime($params["date"]) : intval($params["date"]);
+			if (!$res["date"])
 			{
 				wlog("Invalid date specified");
 				return NULL;
@@ -230,28 +230,36 @@ class TransactionModel extends CachedTable
 
 		$curDate = date("Y-m-d H:i:s");
 
+		$this->sortAffected();
+
 		foreach($this->affectedTransactions as $item_id => $item)
 		{
 			$item = (array)$item;
 
-			if (!is_string($item["date"]))
-				$item["date"] = date("Y-m-d H:i:s", $item["date"]);
-			if (!is_string($item["createdate"]))
-				$item["createdate"] = date("Y-m-d H:i:s", $item["createdate"]);
+			$res = $this->checkParams($item);
+			if (is_null($res))
+				return FALSE;
 
-			$item["updatedate"] = $curDate;
+			$res["date"] = date("Y-m-d H:i:s", $item["date"]);
+			$res["createdate"] = is_string($item["createdate"]) ? $item["createdate"] : date("Y-m-d H:i:s", $item["createdate"]);
+			$res["updatedate"] = $curDate;
+			$res["src_result"] = floatval($item["src_result"]);
+			$res["dest_result"] = floatval($item["dest_result"]);
+			$res["pos"] = intval($item["pos"]);
+			$res["user_id"] = self::$user_id;
+			$res["id"] = $item["id"];
 
-			$this->affectedTransactions[$item_id] = $item;
+			$this->affectedTransactions[$item_id] = $res;
 		}
 
-		if (!$this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions))
-			return FALSE;
+		$updResult = $this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions);
+		wlog(" update result: ".$updResult);
 
 		unset($this->affectedTransactions);
 
 		$this->cleanCache();
 
-		return TRUE;
+		return $updResult;
 	}
 
 
@@ -285,6 +293,9 @@ class TransactionModel extends CachedTable
 
 	protected function sortAffected()
 	{
+		if (!is_array($this->cache))
+			return;
+
 		uasort($this->cache, function($a, $b)
 		{
 			$a = $this->getAffected($a);
@@ -700,7 +711,7 @@ class TransactionModel extends CachedTable
 	}
 
 
-	// Update result balance values of specified transactions 
+	// Update result balance values of specified transactions
 	//    accounts - id or arrays of account ids to filter transactions by
 	//    pos - position of transaction to start update from, inclusively
 	protected function updateResults($accounts, $pos)
