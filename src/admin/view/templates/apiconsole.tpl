@@ -54,6 +54,9 @@
 								<ul class="sub_list">
 									<li data-target="getCurrForm">Get currencies</li>
 									<li data-target="readCurrForm">Read currency</li>
+									<li data-target="createCurrForm">Create currency</li>
+									<li data-target="editCurrForm">Edit currency</li>
+									<li data-target="delCurrForm">Delete currencies</li>
 								</ul>
 							</li>
 
@@ -528,7 +531,64 @@
 							<input id="read_curr_id" type="text">
 						</div>
 						<div class="acc_controls">
-							<input class="adm_act_btn" type="button" value="submit" onclick="onCurrencyReadSubmit();">
+							<input id="readcurrbtn" class="adm_act_btn" type="button" value="submit">
+						</div>
+						</div>
+
+						<div id="createCurrForm" class="test_form">
+						<h3>Create currency</h3>
+						<form action="<?=BASEURL?>api/currency/create" method="post">
+							<div class="std_margin">
+								<label for="create_currency_name">Name</label>
+								<input id="create_currency_name" name="name" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="create_currency_sign">Sign</label>
+								<input id="create_currency_sign" name="sign" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="create_currency_format">Format(0 - sign on right, 1 - sign on left)</label>
+								<input id="create_currency_format" name="format" type="text">
+							</div>
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
+						<div id="editCurrForm" class="test_form">
+						<h3>Edit currency</h3>
+						<form action="<?=BASEURL?>api/currency/update" method="post">
+							<div class="std_margin">
+								<label for="update_currency_id">Id</label>
+								<input id="update_currency_id" name="id" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_currency_name">Name</label>
+								<input id="update_currency_name" name="name" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_currency_sign">Sign</label>
+								<input id="update_currency_sign" name="sign" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_currency_format">Format(0 - sign on right, 1 - sign on left)</label>
+								<input id="update_currency_format" name="format" type="text">
+							</div>
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
+						<div id="delCurrForm" class="test_form">
+						<h3>Delete currency</h3>
+						<div class="std_margin">
+							<label for="delcurrencies">Currencies (comma separated ids)</label>
+							<input id="delcurrencies" type="text">
+						</div>
+						<div class="acc_controls">
+							<input id="delcurrbtn" class="adm_act_btn" type="button" value="submit">
 						</div>
 						</div>
 

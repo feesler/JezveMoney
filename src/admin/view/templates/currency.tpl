@@ -14,7 +14,7 @@
 						<thead>
 							<tr><th>id</th><th>name</th><th>sign</th><th>format</th></tr>
 						</thead>
-						<tbody>
+						<tbody id="curr_list">
 <?php	foreach($currArr as $currInfo) {		?>
 							<tr>
 								<td><?=e($currInfo->id)?></td>
@@ -28,30 +28,36 @@
 
 					<div class="acc_controls">
 						<input class="adm_act_btn" type="button" value="new" onclick="newCurr()">
-						<input id="updbtn" class="adm_act_btn" type="button" value="update" onclick="updateCurr()" style="display: none;">
+						<input id="updbtn" class="adm_act_btn" type="button" value="update" style="display: none;">
 						<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteCurr()" style="display: none;">
 					</div>
-
-					<form id="delfrm" method="post" action="<?=BASEURL?>admin/currency/del" onsubmit="return onDeleteSubmit(this);">
-						<input id="del_curr_id" name="curr_id" type="hidden">
-					</form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<form id="curr_frm" method="post" action="<?=BASEURL?>admin/currency/new" style="display: none;">
-<input id="curr_id" name="curr_id" type="hidden">
+<form id="curr_frm" method="post" action="<?=BASEURL?>api/currency/new" style="display: none;">
+<input id="curr_id" name="id" type="hidden">
 <div class="non_float">
 	<label for="curr_name">Name</label>
-	<div class="stretch_input"><input id="curr_name" name="curr_name" type="text"></div>
+	<div class="stretch_input"><input id="curr_name" name="name" type="text"></div>
 </div>
 <div class="non_float">
 	<label for="curr_sign">Sign</label>
-	<div class="stretch_input"><input id="curr_sign" name="curr_sign" type="text"></div>
+	<div class="stretch_input"><input id="curr_sign" name="sign" type="text"></div>
 </div>
-<div class="check_wr"><input id="curr_format" name="curr_format" type="checkbox"><label for="curr_format">Sign before value</label></div>
+<div id="admin_block" class="non_float">
+	<div id="admin_block" class="check_wr">
+		<label for="isbefore"><input id="isbefore" name="format" type="radio" value="1">Sign before value</label>
+	</div>
+	<div id="admin_block" class="check_wr">
+		<label for="isafter"><input id="isafter" name="format" type="radio" value="0">Sign after value</label>
+	</div>
+</div>
+<div class="popup_form_controls">
+	<input class="btn ok_btn" type="submit" value="Submit">
+</div>
 </form>
 
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>

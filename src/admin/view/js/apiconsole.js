@@ -538,6 +538,19 @@ function onCurrencyReadSubmit()
 }
 
 
+function onDeleteCurrencySubmit()
+{
+	var id_inp = ge('delcurrencies');
+	if (!id_inp)
+		return;
+
+	var idsPar = csToIds(id_inp.value);
+	var data = urlJoin(idsPar);
+
+	api.post(baseURL + 'api/currency/delete', data);
+}
+
+
 function onReadPersonSubmit()
 {
 	var id_inp = ge('read_person_id');
@@ -721,6 +734,23 @@ function initControls()
 		throw new Error('Fail to init view');
 	getCurrForm.onsubmit = function(e){ return onFormSubmit(e, isCurrenciesArray); };
 
+	var readcurrbtn = ge('readcurrbtn');
+	if (readcurrbtn)
+		readcurrbtn.onclick = onCurrencyReadSubmit;
+
+	var createCurrForm = document.querySelector('#createCurrForm > form');
+	if (!createCurrForm)
+		throw new Error('Fail to init view');
+	createCurrForm.onsubmit = function(e){ return onFormSubmit(e, isCreateResult); };
+
+	var editCurrForm = document.querySelector('#editCurrForm > form');
+	if (!editCurrForm)
+		throw new Error('Fail to init view');
+	editCurrForm.onsubmit = onFormSubmit;
+
+	var delcurrbtn = ge('delcurrbtn');
+	if (delcurrbtn)
+		delcurrbtn.onclick = onDeleteCurrencySubmit;
 /**
  * User
  */

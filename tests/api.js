@@ -85,6 +85,11 @@ async function apiPost(method, data = {})
 let userReqFields = ['login', 'password', 'name'];
 
 /**
+ * Currency
+ */
+let currReqFields = ['name', 'sign', 'format'];
+
+/**
  * Accounts
  */
 let accReqFields = ['name', 'balance', 'curr_id', 'icon'];
@@ -146,6 +151,53 @@ export const api = {
 			return jsonRes.data;
 		},
 
+		create : async function(options)
+		{
+			let postData = checkFields(options, currReqFields);
+
+			let apiRes = await apiPost('currency/create', postData);
+			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to create account');
+
+			return apiRes.data;
+		},
+
+		update : async function(id, options)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new ApiRequestError('Wrong id specified');
+
+			let postData = checkFields(options, currReqFields);
+			postData.id = id;
+
+			let apiRes = await apiPost('currency/update', postData);
+			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to update currency');
+
+			return true;
+		},
+
+		del : async function(ids)
+		{
+			if (!Array.isArray(ids))
+				ids = [ ids ];
+
+			for(let id of ids)
+			{
+				id = parseInt(id);
+				if (!id || isNaN(id))
+					throw new ApiRequestError('Wrong id specified');
+			}
+
+			let postData = { id : ids };
+
+			let apiRes = await apiPost('currency/delete', postData);
+			if (!apiRes || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to delete currency');
+
+			return true;
+		},
 
 		list : async function()
 		{
@@ -158,7 +210,6 @@ export const api = {
 			return jsonRes.data;
 		}
 	},
-
 
 	user : {
 		// Try to login user and return boolean result

@@ -1,31 +1,34 @@
+var selectedItem = null;
+
+
 // Update fields with specified currency
 function setCurrencyValues(currObj)
 {
-	var curr_id, del_curr_id, curr_name, curr_sign, curr_format;
+	var curr_id, curr_name, curr_sign, isbefore, isafter;
 
 	curr_id = ge('curr_id');
-	del_curr_id = ge('del_curr_id');
 	curr_name = ge('curr_name');
 	curr_sign = ge('curr_sign');
-	curr_format = ge('curr_format');
-	if (!curr_id || !del_curr_id || !curr_name || !curr_sign || !curr_format)
+	isbefore = ge('isbefore');
+	isafter = ge('isafter');
+	if (!curr_id || !curr_name || !curr_sign || !isbefore || !isafter)
 		return;
 
 	if (currObj)
 	{
 		curr_id.value = currObj.id;
-		del_curr_id.value = currObj.id;
 		curr_name.value = currObj.name;
 		curr_sign.value = currObj.sign;
-		curr_format.checked = (currObj.format == 1);
+		isbefore.checked = (currObj.format == 1);
+		isafter.checked = (currObj.format == 0);
 	}
 	else			// clean
 	{
 		curr_id.value = '';
-		del_curr_id.value = '';
 		curr_name.value = '';
 		curr_sign.value = '';
-		curr_format.checked = false;
+		isbefore.checked = false;
+		isafter.checked = true;
 	}
 }
 
@@ -40,17 +43,19 @@ function selectCurrency(id)
 		return;
 
 	currObj = getCurrency(id);
+	selectedItem = currObj;
 	if (currObj)
 	{
-		curr_frm.action = baseURL + 'admin/currency/edit';
+		curr_frm.action = baseURL + 'api/currency/update';
 		setCurrencyValues(currObj);
-		show('del_btn', true);
-		show('updbtn', true);
 	}
 	else			// clean
 	{
 		setCurrencyValues(null);
 	}
+
+	show('del_btn', (currObj != null));
+	show('updbtn', (currObj != null));
 }
 
 
@@ -63,7 +68,7 @@ function newCurr()
 	if (!curr_frm)
 		return;
 
-	curr_frm.action = baseURL + 'admin/currency/new';
+	curr_frm.action = baseURL + 'api/currency/create';
 	setCurrencyValues(null);
 
 	dwPopup.show();
@@ -81,15 +86,135 @@ function updateCurr()
 // Delete currency button click handler
 function deleteCurr()
 {
-	var delfrm = ge('delfrm');
-
-	if (!delfrm)
+	if (!selectedItem || !selectedItem.id)
 		return;
 
 	if (confirm('Are you sure want to delete selected currency?'))
 	{
-		delfrm.submit();
+		ajax.post(baseURL + 'api/currency/del', urlJoin({ id : selectedItem.id }), onSubmitResult);
 	}
+}
+
+
+function onFormSubmit()
+{
+	var link, els = {}, params;
+	var formEl = this;
+
+	if (!formEl || !formEl.elements)
+		return false;
+
+	var inputEl;
+	for(var i = 0; i < formEl.elements.length; i++)
+	{
+		inputEl = formEl.elements[i];
+
+		if (inputEl.disabled || inputEl.name == '')
+			continue;
+
+		if ((inputEl.type == 'checkbox' || inputEl.type == 'radio') && !inputEl.checked)
+			continue;
+
+		els[formEl.elements[i].name] = formEl.elements[i].value;
+	}
+
+	if (formEl.method == 'get')
+	{
+		params = urlJoin(els);
+		link = formEl.action;
+		if (params != '')
+			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
+		ajax.get(link, onSubmitResult);
+	}
+	else if (formEl.method == 'post')
+	{
+		params = urlJoin(els);
+		link = formEl.action;
+		ajax.post(link, params, onSubmitResult);
+	}
+
+	return false;
+}
+
+
+function onSubmitResult(response)
+{
+	var respObj;
+	var failMessage = 'Fail to submit request';
+	var res = false;
+
+	try
+	{
+		respObj = JSON.parse(response);
+		res = (respObj && respObj.result == 'ok');
+		if (!res && respObj && respObj.msg)
+			failMessage = respObj.msg;
+	}
+	catch(e)
+	{
+		console.log(e.message);
+	}
+
+	if (!res)
+	{
+		createMessage(failMessage, 'msg_error');
+		return;
+	}
+
+	requestList();
+}
+
+
+function requestList()
+{
+	ajax.get(baseURL + 'api/currency/list', onListResult);
+}
+
+
+function onListResult(response)
+{
+	var respObj;
+	var res = false;
+
+	try
+	{
+		respObj = JSON.parse(response);
+		res = (respObj && respObj.result == 'ok');
+	}
+	catch(e)
+	{
+		console.log(e.message);
+	}
+
+	if (!res)
+		return;
+
+	var curr_list = ge('curr_list');
+	if (!curr_list)
+		return;
+
+	removeChilds(curr_list);
+
+	currency = respObj.data;
+
+	var rows = currency.map(function(item)
+	{
+		var row = ce('tr', {}, [
+			ce('td', { innerText : item.id }),
+			ce('td', { innerText : item.name }),
+			ce('td', { innerText : item.sign }),
+			ce('td', { innerText : item.format }),
+		]);
+
+		row.onclick = onRowClick.bind(row);
+
+		return row;
+	});
+
+	addChilds(curr_list, rows);
+
+	selectCurrency(null);
+	dwPopup.close();
 }
 
 
@@ -118,10 +243,17 @@ function initControls()
 
 	// popup initialization
 	var frm = ge('curr_frm');
+	frm.onsubmit = onFormSubmit;
 	dwPopup = Popup.create({ id : 'currency_popup',
 							content : frm,
 							additional : 'center_only curr_content',
-						 	btn : { okBtn : { onclick : frm.submit.bind(frm) }, closeBtn : true }});
+						 	btn : { closeBtn : true }});
+
+	var updbtn = ge('updbtn');
+	updbtn.onclick = updateCurr;
+
+	var del_btn = ge('del_btn');
+	del_btn.onclick = deleteCurr;
 }
 
 
