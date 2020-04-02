@@ -88,8 +88,6 @@ class TransactionApiController extends ApiController
 
 	public function create()
 	{
-		$db = mysqlDB::getInstance();
-
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
@@ -163,8 +161,6 @@ class TransactionApiController extends ApiController
 
 	public function update()
 	{
-		$db = mysqlDB::getInstance();
-
 		$respObj = new apiResponse;
 
 		if (!$this->isPOST())

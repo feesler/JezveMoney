@@ -9,7 +9,7 @@ class CurrencyModel extends CachedTable
 	protected function onStart()
 	{
 		$this->tbl_name = "currency";
-		$this->dbObj = mysqlDB::getInstance();
+		$this->dbObj = MySqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 	}

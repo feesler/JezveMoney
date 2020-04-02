@@ -19,7 +19,7 @@ class PersonModel extends CachedTable
 		$this->tbl_name = "persons";
 		$this->adminForce = FALSE;
 
-		$this->dbObj = mysqlDB::getInstance();
+		$this->dbObj = MySqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 	}

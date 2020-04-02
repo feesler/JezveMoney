@@ -6,7 +6,7 @@ class QueryAdminController extends AdminController
 	{
 		$this->tableName = "admin_query";
 
-		$this->db = mysqlDB::getInstance();
+		$this->db = MySqlDB::getInstance();
 		if (!$this->db->isTableExist($this->tableName))
 			$this->createTable();
 	}

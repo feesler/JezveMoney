@@ -54,7 +54,7 @@
 			"AccountModel" => "Model/account.php",
 			"CurrencyModel" => "Model/currency.php",
 			"DebtModel" => "Model/debt.php",
-			"mysqlDB" => "system/mysql.php",
+			"MySqlDB" => "system/mysql.php",
 			"PersonModel" => "Model/person.php",
 			"TransactionModel" => "Model/transaction.php",
 			"UserModel" => "Model/user.php",

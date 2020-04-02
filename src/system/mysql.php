@@ -155,7 +155,7 @@ function inSetCondition($ids)
 }
 
 
-class mysqlDB
+class MySqlDB
 {
 	use Singleton;
 

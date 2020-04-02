@@ -138,7 +138,7 @@
 	require_once(APP_ROOT."vendor/autoload.php");
 
 	$dbConfig = ( require_once(APP_ROOT."system/dbsetup.php") );
-	mysqlDB::setup($dbConfig);
+	MySqlDB::setup($dbConfig);
 
 	date_default_timezone_set("Europe/Moscow");
 

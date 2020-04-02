@@ -20,7 +20,7 @@ class CheckBalanceController extends Controller
 
 	public function index()
 	{
-		$db = mysqlDB::getInstance();
+		$db = MySqlDB::getInstance();
 
 		if (is_null($this->actionParam) || $this->actionParam == "all")
 		{

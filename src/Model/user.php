@@ -11,7 +11,7 @@ class UserModel extends CachedTable
 	protected function onStart()
 	{
 		$this->tbl_name = "users";
-		$this->dbObj = mysqlDB::getInstance();
+		$this->dbObj = MySqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 	}

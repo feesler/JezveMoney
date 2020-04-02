@@ -22,7 +22,7 @@ class AccountModel extends CachedTable
 
 		self::$owner_id = $uMod->getOwner();
 
-		$this->dbObj = mysqlDB::getInstance();
+		$this->dbObj = MySqlDB::getInstance();
 		if (!$this->dbObj->isTableExist($this->tbl_name))
 			$this->createTable();
 
