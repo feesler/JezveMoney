@@ -258,7 +258,7 @@ class AccountsController extends Controller
 									$transaction->id);
 
 			$sheet->setCellValue($colStr["type"].$row_ind,
-									TransactionModel::getTypeString($transaction->type));
+									TransactionModel::typeToString($transaction->type));
 
 			$sheet->setCellValue($colStr["src_amount"].$row_ind,
 									$currMod->format($transaction->src_amount, $transaction->src_curr));

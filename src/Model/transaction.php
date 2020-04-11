@@ -1325,7 +1325,7 @@ class TransactionModel extends CachedTable
 
 		// Convert type to string
 		if (isset($params["type"]))
-			$linkParams["type"] = $this->getTypeString($params["type"]);
+			$linkParams["type"] = $this->typeToString($params["type"]);
 		// Page number
 		if (isset($params["page"]))
 		{
@@ -1519,7 +1519,7 @@ class TransactionModel extends CachedTable
 
 
 	// Return string for specified transaction type
-	public static function getTypeString($trans_type)
+	public static function typeToString($trans_type)
 	{
 		if (!isset(self::$typeStrArr[$trans_type]))
 			return NULL;
