@@ -3,7 +3,7 @@ import { PersonsView } from '../view/persons.js';
 import { MainView } from '../view/main.js';
 
 
-let runPersons =
+export const runPersons =
 {
 	// From persons list view go to new person view, input name and submit
 	// Next check name result and callback
@@ -17,14 +17,14 @@ let runPersons =
 		}
 		await this.view.goToCreatePerson();
 
-		let expectedList = await this.state.getPersonsList();
-		let expectedPerson = { name : personName, accounts : [] };
-		expectedList.push(expectedPerson);
+		await this.state.fetch();
 
-		this.state.cleanCache();
+		let expectedPerson = { name : personName };
+		this.state.createPerson(expectedPerson);
+		
 		await this.view.createPerson(personName);
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
 		await test(`Create person (${personName})`, () => {}, this.view);
 	},
 
@@ -39,8 +39,10 @@ let runPersons =
 		}
 		await this.view.goToUpdatePerson(num);
 
-		let expectedList = await this.state.getPersonsList();
-		let expectedPerson = await this.state.getPersonByPos(num);
+		await this.state.fetch();
+		let expectedPerson = this.state.persons.getItemByIndex(num);
+		if (!expectedPerson)
+			throw new Error('Can not find specified person');
 
 		this.view.expectedState = { visibility : { name : true },
 	 								values : { name : expectedPerson.name } };
@@ -48,14 +50,13 @@ let runPersons =
 
 		await this.view.inputName(personName);
 
-		this.state.cleanCache();
 		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
 
 		// Check updates in the person tiles
 		expectedPerson.name = personName;
-		expectedList[num] = expectedPerson;
+		this.state.updatePerson(expectedPerson);
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
 		await test(`Update person [${num}]`, () => {}, this.view);
 	},
 
@@ -69,15 +70,13 @@ let runPersons =
 			await this.view.goToPersons();
 		}
 
-		// Prepare expected updates of accounts list
-		let expectedList = await this.state.getPersonsList();
-		let ids = this.state.positionsToIds(expectedList, persons);
-		expectedList = this.state.deleteByIds(expectedList, ids);
+		// Prepare expected updates of persons list
+		await this.state.fetch();
+		this.state.deletePersons(this.state.persons.positionsToIds(persons));
 
-		this.state.cleanCache();
 		await this.view.deletePersons(persons);
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
 		await test('Delete persons [' + persons.join() + ']', () => {}, this.view);
 	},
 
@@ -90,10 +89,6 @@ let runPersons =
 
 		this.view.setBlock(`Delete person from update view [${pos}]`, 2);
 
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let trBefore = await this.state.getTransactionsList();
-
 		if (!(this.view instanceof PersonsView))
 		{
 			if (!(this.view instanceof MainView))
@@ -101,35 +96,21 @@ let runPersons =
 			await this.view.goToPersons();
 		}
 
-		this.state.cleanCache();
+		await this.state.fetch();
+		this.state.deletePersons(this.state.persons.positionsToIds(pos));
 
 		await this.view.goToUpdatePerson(pos);
 		await this.view.deleteSelfItem();
 
-		// Prepare expected updates of persons list
-		let personObj = pList[pos];
-		let expectedList = this.state.deleteByIds(pList, personObj.id);
-		// Prepare expected updates of transactions
-		let personAccounts = personObj.accounts.map(item => item.id);
-		let expTransList = trBefore.deleteAccounts(accList, personAccounts);
-		// Prepare expected updates of accounts list
-		let expAccList = this.state.deleteByIds(accList, personAccounts);
-
-		expTransList = expTransList.updateResults(accList);
-
-		this.view.expectedState = { values : this.state.renderPersonsWidget(expectedList, false) };
+		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
 		await test(`Delete person [${pos}]`, () => {}, this.view);
-
-		this.state.cleanCache();
 
 		await this.goToMainView();
 
-		this.view.expectedState = await this.state.render(expAccList, expectedList, expTransList.list);
+		this.view.expectedState = this.state.render();
 		await test('Main page widgets update', async () => {}, this.view);
 
-		await this.run.transactions.checkData('List of transactions update', expTransList);
+		await this.run.transactions.checkData('List of transactions update', this.state.transactions);
 	}
 };
 
-
-export { runPersons };

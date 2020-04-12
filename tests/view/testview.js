@@ -1,15 +1,10 @@
 import {
-	EXPENSE,
-	INCOME,
-	TRANSFER,
-	DEBT,
 	findIconByClassName,
 	isFunction,
 	isObject,
 	checkObjValue,
-	getTransactionType
 } from '../common.js';
-
+import { Transaction } from '../model/transaction.js'
 
 
 // Common test view class
@@ -362,7 +357,7 @@ class TestView
 			let tagName = await this.prop(menuItem, 'tagName');
 			let itemTitle = await this.prop(menuItem, 'innerText');
 
-			let menuItemObj = { elem : menuItem, text : itemTitle, type : getTransactionType(itemTitle) };
+			let menuItemObj = { elem : menuItem, text : itemTitle, type : Transaction.strToType(itemTitle) };
 
 			if (tagName == 'B')
 			{

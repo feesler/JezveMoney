@@ -1,9 +1,9 @@
-import { normalize, formatValue } from './common.js';
-import { api } from './api.js';
+import { normalize, formatValue } from '../common.js';
+import { api } from '../api.js';
 
 
 // Currency object
-class Currency
+export class Currency
 {
 	constructor(props)
 	{
@@ -96,5 +96,3 @@ class Currency
 	}
 }
 
-
-export { Currency };

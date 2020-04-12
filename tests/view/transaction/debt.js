@@ -1,6 +1,7 @@
 import { TransactionView } from '../transaction.js';
-import { Currency } from '../../currency.js';
-import { DEBT, isValidValue, normalize, setParam } from '../../common.js'
+import { Currency } from '../../model/currency.js';
+import { isValidValue, normalize, setParam } from '../../common.js'
+import { DEBT } from '../../model/transaction.js';
 import { App } from '../../app.js'
 
 
@@ -35,7 +36,7 @@ class DebtTransactionView extends TransactionView
 		if (cont.typeMenu.activeType != DEBT)
 			throw new Error('Wrong page');
 
-		res.person = await App.state.getPerson(cont.person.id);
+		res.person = App.state.persons.getItem(cont.person.id);
 		res.debtType = cont.operation.type;
 
 		res.src_curr_id = parseInt(cont.src_amount_row.hiddenValue);
@@ -51,15 +52,15 @@ class DebtTransactionView extends TransactionView
 			throw new Error('Destination currency not found');
 
 		let personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
-		res.personAccount = await App.state.getPersonAccount(res.person.id, personAccountCurr);
+		res.personAccount = App.state.getPersonAccount(res.person.id, personAccountCurr);
 		if (!res.personAccount)
-			res.personAccount = { balance : 0, curr_id : personAccountCurr };
+			res.personAccount = App.state.getExpectedPersonAccount(res.person.id, personAccountCurr);
 
 		let isSelectAccountVisible = !!(cont.selaccount && await this.isVisible(cont.selaccount.elem));
 
 		res.noAccount = isSelectAccountVisible;
 
-		res.account = await App.state.getAccount(cont.account.id);
+		res.account = App.state.accounts.getItem(cont.account.id);
 		if (!res.account && !res.noAccount)
 			throw new Error('Account not found');
 		if (!res.noAccount && res.account && res.account.curr_id != ((res.debtType) ? res.src_curr_id : res.dest_curr_id))
@@ -141,6 +142,28 @@ class DebtTransactionView extends TransactionView
 	}
 
 
+	getExpectedTransaction()
+	{
+		let res = {};
+
+		if (this.model.isUpdate)
+			res.id = this.model.id;
+
+		res.type = this.model.type;
+		res.person_id = this.model.person.id;
+		res.acc_id = this.model.noAccount ? 0 : this.model.account.id;
+		res.op = this.model.debtType ? 1 : 2;
+		res.src_amount = this.model.fSrcAmount;
+		res.dest_amount = this.model.fDestAmount;
+		res.src_curr = this.model.src_curr_id;
+		res.dest_curr = this.model.dest_curr_id;
+		res.date = this.model.date;
+		res.comment = this.model.comment;
+
+		return res;
+	}
+
+
 	// Set source amount value
 	// State 0, 1 or 2: source and destination currencies are the same
 	async setSrcAmount(model, val)
@@ -168,7 +191,7 @@ class DebtTransactionView extends TransactionView
 
 					if (model.lastAccount_id)
 					{
-						let lastAcc = await App.state.getAccount(model.lastAccount_id);
+						let lastAcc = App.state.accounts.getItem(model.lastAccount_id);
 						if (!lastAcc)
 							throw new Error('Last account not found');
 
@@ -209,7 +232,7 @@ class DebtTransactionView extends TransactionView
 
 					if (model.lastAccount_id)
 					{
-						let lastAcc = await App.state.getAccount(model.lastAccount_id);
+						let lastAcc = App.state.accounts.getItem(model.lastAccount_id);
 						if (!lastAcc)
 							throw new Error('Last account not found');
 
@@ -358,10 +381,10 @@ class DebtTransactionView extends TransactionView
 
 	async changePerson(val)
 	{
-		this.model.person = await App.state.getPerson(val);
+		this.model.person = App.state.persons.getItem(val);
 
 		let personAccCurr_id = (this.model.debtType) ? this.model.srcCurr.id : this.model.destCurr.id;
-		this.model.personAccount = await App.state.getPersonAccount(this.model.person.id, personAccCurr_id);
+		this.model.personAccount = App.state.getPersonAccount(this.model.person.id, personAccCurr_id);
 		if (!this.model.personAccount)
 			this.model.personAccount = { balance : 0, curr_id : personAccCurr_id };
 
@@ -415,7 +438,7 @@ class DebtTransactionView extends TransactionView
 		}
 		else if (this.model.noAccount && !newValue)
 		{
-			let lastAcc = await App.state.getAccount(this.model.lastAccount_id);
+			let lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
 			if (!lastAcc)
 				throw new Error('Last account not found');
 
@@ -429,7 +452,7 @@ class DebtTransactionView extends TransactionView
 		}
 		else if (this.model.noAccount && newValue)
 		{
-			let lastAcc = await App.state.getAccount(this.model.lastAccount_id);
+			let lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
 			if (!lastAcc)
 				throw new Error('Last account not found');
 
@@ -597,7 +620,7 @@ class DebtTransactionView extends TransactionView
 		else
 		{
 			if (this.model.lastAccount_id)
-				this.model.account = await App.state.getAccount(this.model.lastAccount_id);
+				this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);
 			if (!this.model.account)
 				throw new Error('Account not found');
 
@@ -642,7 +665,7 @@ class DebtTransactionView extends TransactionView
 
 	async changeAccount(account_id)
 	{
-		let newAcc = await App.state.getAccount(account_id);
+		let newAcc = App.state.accounts.getItem(account_id);
 
 		if (!this.model.account || !newAcc || newAcc.id == this.model.account.id)
 			return;
@@ -652,7 +675,7 @@ class DebtTransactionView extends TransactionView
 		if (this.model.personAccount.curr_id != this.model.account.curr_id)
 		{
 			let person_id = this.model.person.id;
-			this.model.personAccount = await App.state.getPersonAccount(this.model.person.id, this.model.account.curr_id);
+			this.model.personAccount = App.state.getPersonAccount(this.model.person.id, this.model.account.curr_id);
 			if (!this.model.personAccount)
 				this.model.personAccount = { balance : 0, curr_id : this.model.account.curr_id };
 		}

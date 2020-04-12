@@ -1,8 +1,9 @@
-import { EXPENSE, INCOME, TRANSFER, DEBT, formatDate } from './common.js';
+import { formatDate } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
-import { Currency } from './currency.js';
+import { Currency } from './model/currency.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT } from './model/transaction.js';
 
 import { runProfile } from './run/profile.js';
 import { runAccounts } from './run/account.js';

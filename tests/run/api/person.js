@@ -7,29 +7,11 @@ import {
 	copyObject,
 	checkObjValue
 } from '../../common.js';
+import { AppState } from '../../state.js';
 
 
-let runPersonAPI =
+export const runPersonAPI =
 {
-	async checkCorrectness(params, id)
-	{
-		if (!isObject(params))
-			return false;
-
-		if (typeof params.name !== 'string' || params.name == '')
-			return false;
-
-		// Check there is no person with same name
-		let personsList = await this.state.getPersonsList();
-		let lname = params.name.toLowerCase();
-		let personObj = personsList.find(item => item.name.toLowerCase() == lname);
-		if (personObj && (!id || id && id != personObj.id))
-			return false;
-
-		return true;
-	},
-
-
 	/**
 	 * Person tests
 	 */
@@ -38,20 +20,13 @@ let runPersonAPI =
 	// And check expected state of app
 	async createTest(params)
 	{
-		let scope = this.run.api.person;
 		let person_id = 0;
 
 		await test('Create person', async () =>
 		{
-			let pBefore = await this.state.getPersonsList();
-			if (!Array.isArray(pBefore))
-				return false;
-
-			let resExpected = await scope.checkCorrectness(params);
-
-			let expPersonObj = copyObject(params);
-
-			this.state.cleanCache();
+			let expected = new AppState;
+			await expected.fetch();
+			let resExpected = expected.createPerson(params);
 
 			let createRes;
 			try
@@ -66,16 +41,14 @@ let runPersonAPI =
 					throw e;
 			}
 
-			let expPersonList = copyObject(pBefore);
-			if (resExpected)
-			{
-				expPersonList.push(expPersonObj);
+			if (createRes)
 				person_id = createRes.id;
-			}
+			else
+				person_id = resExpected;
 
-			let pList = await this.state.getPersonsList();
+			await this.state.fetch();
 
-			return checkObjValue(pList, expPersonList);
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return person_id;
@@ -86,30 +59,16 @@ let runPersonAPI =
 	// And check expected state of app
 	async updateTest(id, params)
 	{
-		let scope = this.run.api.person;
 		let updateRes = false;
-		let resExpected;
 
 		await test('Update person', async () =>
 		{
-			let pBefore = await this.state.getPersonsList();
-			if (!Array.isArray(pBefore))
-				return false;
+			let expected = new AppState;
+			await expected.fetch();
 
-			let origPerson = pBefore.find(item => item.id == id);
-			let expPersonObj;
-			if (origPerson)
-			{
-				expPersonObj = copyObject(origPerson);
-				setParam(expPersonObj, params);
-			}
-
-			if (origPerson)
-				resExpected = await scope.checkCorrectness(params, id);
-			else
-				resExpected = false;
-
-			this.state.cleanCache();
+			params.id = id;
+			let resExpected = expected.updatePerson(params);
+			let updParams = (resExpected) ? expected.persons.getItem(id) : params;
 
 			let updateRes;
 			try
@@ -124,17 +83,9 @@ let runPersonAPI =
 					throw e;
 			}
 
-			let expPersonList = copyObject(pBefore);
-			if (resExpected)
-			{
-				let pIndex = expPersonList.findIndex(item => item.id == expPersonObj.id);
-				if (pIndex !== -1)
-					expPersonList.splice(pIndex, 1, expPersonObj);
-			}
+			await this.state.fetch();
 
-			let pList = await this.state.getPersonsList();
-
-			return checkObjValue(pList, expPersonList);
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return updateRes;
@@ -145,48 +96,14 @@ let runPersonAPI =
 	// And check expected state of app
 	async deleteTest(ids)
 	{
-		let deleteRes;
-		let resExpected = true;
+		let deleteRes = false;
 
 		await test('Delete person', async () =>
 		{
-			if (!Array.isArray(ids))
-				ids = [ ids ];
+			let expected = new AppState;
+			await expected.fetch();
 
-			let pBefore = await this.state.getPersonsList();
-			if (!Array.isArray(pBefore))
-				return false;
-
-			for(let person_id of ids)
-			{
-				if (!pBefore.find(item => item.id == person_id))
-				{
-					resExpected = false;
-					break;
-				}
-			}
-
-			// Prepare expected updates of accounts list
-			let expPersonList;
-			let expTransList = await this.state.getTransactionsList();
-			if (resExpected)
-			{
-				expPersonList = this.state.deleteByIds(pBefore, ids);
-				let accRemoveList = pBefore.filter(item => Array.isArray(item.accounts) && ids.includes(item.id))
-											.flatMap(item => item.accounts)
-											.map(item => item.id);
-
-				// Prepare expected updates of transactions
-				let accList = await this.state.getAccountsList();
-				expTransList = expTransList.deleteAccounts(accList, accRemoveList)
-											.updateResults(accList);
-			}
-			else
-			{
-				expPersonList = copyObject(pBefore);
-			}
-
-			this.state.cleanCache();
+			let resExpected = expected.deletePersons(ids);
 
 			// Send API sequest to server
 			try
@@ -201,18 +118,11 @@ let runPersonAPI =
 					throw e;
 			}
 
-			let pList = await this.state.getPersonsList();
-			let trList = await this.state.getTransactionsList();
+			await this.state.fetch();
 
-			let res = checkObjValue(pList, expPersonList) &&
-						checkObjValue(trList.list, expTransList.list);
-
-			return res;
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return deleteRes;
 	}
 };
-
-
-export { runPersonAPI };

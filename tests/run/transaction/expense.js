@@ -1,12 +1,14 @@
 import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
-import { TransactionsList } from '../../trlist.js'
-import { Currency } from '../../currency.js';
-import { EXPENSE, test } from '../../common.js'
+import { TransactionsList } from '../../model/transactionslist.js'
+import { Currency } from '../../model/currency.js';
+import { test } from '../../common.js'
+import { EXPENSE } from '../../model/transaction.js';
 import { ExpenseTransactionView } from '../../view/transaction/expense.js'
+import { App } from '../../app.js';
 
 
-let runExpense =
+export const runExpense =
 {
 	async submit(params)
 	{
@@ -14,7 +16,7 @@ let runExpense =
 
 		if ('srcAcc' in params)
 		{
-			let acc = await this.state.getAccountByPos(params.srcAcc);
+			let acc = this.state.accounts.getItemByIndex(params.srcAcc);
 			if (!acc)
 				throw new Error('Account (' + params.srcAcc + ') not found');
 
@@ -47,8 +49,6 @@ let runExpense =
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
 		let res = view.getExpectedTransaction();
-
-		this.state.cleanCache();
 
 		await view.submit();
 
@@ -90,6 +90,8 @@ let runExpense =
 		const ACC_RUB = 1;
 		const ACC_USD = 2;
 		const ACC_EUR = 3;
+
+		await App.state.fetch();
 
 	// Navigate to create expense view
 		if (!(this.view instanceof ExpenseTransactionView))
@@ -207,5 +209,3 @@ let runExpense =
 	}
 };
 
-
-export { runExpense };

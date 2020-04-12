@@ -1,12 +1,13 @@
 import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
-import { TransactionsList } from '../trlist.js';
-import { Currency } from '../currency.js';
+import { Transaction } from '../model/transaction.js';
+import { TransactionsList } from '../model/transactionslist.js';
+import { Currency } from '../model/currency.js';
 import { api } from '../api.js';
-import { getTransactionTypeStr, test, formatDate, formatProps } from '../common.js';
+import { test, formatDate, formatProps } from '../common.js';
 
 
-let runAccounts =
+export const runAccounts =
 {
 	async stateLoop()
 	{
@@ -67,14 +68,12 @@ let runAccounts =
 			await test(`Select currency ${params.curr_id}`, () => this.view.changeCurrency(params.curr_id), this.view);
 
 		// Input balance
-		if ('balance' in params)
-			await test('Tile balance format update', () => this.view.inputBalance(params.balance), this.view);
+		if ('initbalance' in params)
+			await test('Tile balance format update', () => this.view.inputBalance(params.initbalance), this.view);
 
 		// Change icon
 		if ('icon' in params)
 			await test('Tile icon update', () => this.view.changeIcon(params.icon), this.view);
-
-		this.state.cleanCache();
 
 		let expected = this.view.getExpectedAccount();
 
@@ -104,15 +103,17 @@ let runAccounts =
 		await this.view.goToCreateAccount();
 
 	// Check initial state
-		let expectedList = await this.state.getUserAccountsList();
+		await this.state.fetch();
+
 		let expAccount = { name : '', owner_id : this.owner_id, initbalance : '0', balance : 0, curr_id : 1, icon : 0 };
 		this.view.setExpectedAccount(expAccount);
 		await test('Initial state of account view', () => {}, this.view);
 
 		expAccount = await this.run.accounts.submitAccount(params);
 
-		expectedList.push(expAccount);
-		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+		this.state.createAccount(expAccount);
+
+		this.view.expectedState = { values : this.state.renderAccountsWidget(this.state.accounts.getUserAccounts(true)) };
 
 		await test('Create account', () => {}, this.view);
 	},
@@ -140,10 +141,9 @@ let runAccounts =
 		await this.view.goToUpdateAccount(pos);
 
 		// Check initial state
-		let accBefore = await this.state.getAccountsList();
-		let trBefore = await this.state.getTransactionsList();
-		let expectedList = await this.state.getUserAccountsList();
-		let expAccount = await this.state.getAccountByPos(pos);
+		await this.state.fetch();
+
+		let expAccount = this.state.accounts.getItemByIndex(pos);
 		if (!expAccount)
 			throw new Error('Can not find specified account');
 		this.view.setExpectedAccount(expAccount);
@@ -151,18 +151,13 @@ let runAccounts =
 
 		expAccount = await this.run.accounts.submitAccount(params);
 
-		expectedList[pos] = expAccount;
+		this.state.updateAccount(expAccount);
 
-		// Prepare expected updates of transactions list
-		let expTransList = trBefore.updateAccount(accBefore, expAccount);
-
-		expTransList = expTransList.updateResults(accBefore);
-
-		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+		this.view.expectedState = { values : this.state.renderAccountsWidget(this.state.accounts.getUserAccounts(true)) };
 
 		await test('Update account', () => {}, this.view);
 
-		await this.run.transactions.checkData('List of transactions update', expTransList);
+		await this.run.transactions.checkData('List of transactions update', this.state.transactions);
 	},
 
 
@@ -181,27 +176,17 @@ let runAccounts =
 		}
 
 		// Check initial state
-		let userAccList = await this.state.getUserAccountsList();
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let trBefore = await this.state.getTransactionsList();
-		let ids = this.state.positionsToIds(userAccList, accounts);
+		await this.state.fetch();
 
-		this.state.cleanCache();
+		let userAccList = this.state.accounts.getUserAccounts();
+		this.state.deleteAccounts(userAccList.positionsToIds(accounts));
 
 		await this.view.deleteAccounts(accounts);
 
-		// Prepare expected updates of accounts list
-		let expectedList = this.state.deleteByIds(accList, ids);
-		// Prepare expected updates of transactions
-		let expTransList = trBefore.deleteAccounts(accList, ids);
-
-		expTransList = expTransList.updateResults(expectedList);
-
-		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+		this.view.expectedState = { values : this.state.renderAccountsWidget(this.state.accounts.getUserAccounts(true)) };
 		await test('Delete accounts [' + accounts.join() + ']', () => {}, this.view);
 
-		await this.run.transactions.checkData('List of transactions update', expTransList);
+		await this.run.transactions.checkData('List of transactions update', this.state.transactions);
 	},
 
 
@@ -216,10 +201,6 @@ let runAccounts =
 
 		view.setBlock('Delete account from update view [' + pos + ']', 2);
 
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let trBefore = await this.state.getTransactionsList();
-
 		if (!(this.view instanceof AccountsView))
 		{
 			if (!(this.view instanceof MainView))
@@ -229,32 +210,22 @@ let runAccounts =
 
 		await this.view.goToUpdateAccount(pos);
 
-		this.state.cleanCache();
+		await this.state.fetch();
+
+		let userAccList = this.state.accounts.getUserAccounts();
+		this.state.deleteAccounts(userAccList.positionsToIds(pos));
 
 		await this.view.deleteSelfItem();
 
-		// Prepare expected updates of accounts list
-		let userAccList = accList.filter(item => item.owner_id == this.owner_id);
-		let ids = this.state.positionsToIds(userAccList, pos);
-		let expectedList = this.state.deleteByIds(accList, ids);
-		// Prepare expected updates of transactions
-		let expTransList = trBefore.deleteAccounts(accList, ids);
-
-		expTransList = expTransList.updateResults(expectedList);
-
-		let updState = await this.state.updatePersons(pList, expectedList);
-		pList = updState.persons;
-		expectedList = updState.accounts;
-
-		this.view.expectedState = { values : this.state.renderAccountsWidget(expectedList) };
+		this.view.expectedState = { values : this.state.renderAccountsWidget(this.state.accounts.data) };
 		await test('Delete account [' + pos + ']', () => {}, this.view);
 
 		await this.goToMainView();
 
-		this.view.expectedState = await this.state.render(expectedList, pList, expTransList.list);
-		await test('Main page widgets update', async () => {}, this.view);
+		this.view.expectedState = this.state.render();
+		await test('Main page widgets update', () => {}, this.view);
 
-		await this.run.transactions.checkData('List of transactions update', expTransList);
+		await this.run.transactions.checkData('List of transactions update', this.state.transactions);
 	},
 
 
@@ -276,17 +247,18 @@ let runAccounts =
 		let headerRow = [ 'ID', 'Type', 'Source amount', 'Destination amount', 'Source result', 'Destination result', 'Date', 'Comment' ];
 		rows.push(headerRow.join(delimiter));
 
-		let userAccList = await this.state.getUserAccountsList();
-		let ids = this.state.positionsToIds(userAccList, accounts);
-		let trList = await this.state.getTransactionsList();
-		trList = trList.filterByAccounts(ids);
+		// Prepare state
+		await this.state.fetch();
+		let userAccList = this.state.accounts.getUserAccounts();
+		let ids = userAccList.positionsToIds(accounts);
+		let trList = this.state.transactions.filterByAccounts(ids);
 		let transactions = trList.sortAsc();
 
 		for(let transaction of transactions)
 		{
 			let row = [
 				transaction.id,
-				getTransactionTypeStr(transaction.type),
+				Transaction.typeToStr(transaction.type),
 				Currency.format(transaction.src_curr, transaction.src_amount),
 				Currency.format(transaction.dest_curr, transaction.dest_amount),
 				Currency.format(transaction.src_curr, transaction.src_result),
@@ -308,5 +280,3 @@ let runAccounts =
 	},
 };
 
-
-export { runAccounts };

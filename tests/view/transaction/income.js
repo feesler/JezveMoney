@@ -1,6 +1,7 @@
 import { TransactionView } from '../transaction.js';
-import { Currency } from '../../currency.js';
-import { INCOME, isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { Currency } from '../../model/currency.js';
+import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { INCOME } from '../../model/transaction.js';
 import { App } from '../../app.js'
 
 
@@ -16,7 +17,7 @@ class IncomeTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.destAccount = await App.state.getAccount(cont.destination.id);
+		res.destAccount = App.state.accounts.getItem(cont.destination.id);
 		if (!res.destAccount)
 			throw new Error('Destination account not found');
 
@@ -303,7 +304,7 @@ class IncomeTransactionView extends TransactionView
 
 	async changeDestAccount(account_id)
 	{
-		let newAcc = await App.state.getAccount(account_id);
+		let newAcc = App.state.accounts.getItem(account_id);
 
 		if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 			return;

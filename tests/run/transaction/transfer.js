@@ -1,11 +1,13 @@
 import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
-import { TransactionsList } from '../../trlist.js'
-import { TRANSFER, test } from '../../common.js'
+import { TransactionsList } from '../../model/transactionslist.js'
+import { test } from '../../common.js'
+import { TRANSFER } from '../../model/transaction.js';
 import { TransferTransactionView } from '../../view/transaction/transfer.js'
+import { App } from '../../app.js';
 
 
-let runTransfer =
+export const runTransfer =
 {
 	async submit(params)
 	{
@@ -13,7 +15,7 @@ let runTransfer =
 
 		if ('srcAcc' in params)
 		{
-			let acc = await this.state.getAccountByPos(params.srcAcc);
+			let acc = this.state.accounts.getItemByIndex(params.srcAcc);
 			if (!acc)
 				throw new Error('Account (' + params.srcAcc + ') not found');
 
@@ -23,7 +25,7 @@ let runTransfer =
 
 		if ('destAcc' in params)
 		{
-			let acc = await this.state.getAccountByPos(params.destAcc);
+			let acc = this.state.accounts.getItemByIndex(params.destAcc);
 			if (!acc)
 				throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -46,8 +48,6 @@ let runTransfer =
 			await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment), view);
 
 		let res = view.getExpectedTransaction();
-
-		this.state.cleanCache();
 
 		await view.submit();
 
@@ -87,6 +87,8 @@ let runTransfer =
 		const ACC_USD = 2;
 		const ACC_EUR = 3;
 		const CARD_RUB = 4;
+
+		await App.state.fetch();
 
 	// Navigate to create income view
 		if (!(this.view instanceof TransferTransactionView))
@@ -295,5 +297,3 @@ let runTransfer =
 	}
 };
 
-
-export { runTransfer };

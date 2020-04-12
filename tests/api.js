@@ -1,13 +1,10 @@
 import {
-	EXPENSE,
-	INCOME,
-	TRANSFER,
-	DEBT,
 	copyObject,
 	urlJoin,
 	formatDate,
 	setParam
 } from './common.js';
+import { DEBT } from './model/transaction.js'
 import { ApiRequestError } from './apirequesterror.js'
 import { App } from './app.js';
 
@@ -92,7 +89,7 @@ let currReqFields = ['name', 'sign', 'format'];
 /**
  * Accounts
  */
-let accReqFields = ['name', 'balance', 'curr_id', 'icon'];
+let accReqFields = ['name', 'initbalance', 'curr_id', 'icon'];
 
 /**
  * Persons

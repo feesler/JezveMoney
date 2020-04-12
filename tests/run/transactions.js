@@ -1,6 +1,7 @@
-import { TransactionsList } from '../trlist.js';
+import { TransactionsList } from '../model/transactionslist.js';
 import { api } from '../api.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, test, convDate, copyObject } from '../common.js';
+import { test, convDate, copyObject } from '../common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT } from '../model/transaction.js';
 
 
 const RUB = 1;
@@ -57,19 +58,27 @@ let debtsList = [
 ];
 
 
-let runTransList =
+export const runTransList =
 {
 	async setupAccounts(list)
 	{
 		let res = [];
 
+/*
 		let accountsBefore = await this.state.getAccountsList();
+*/
+		await this.state.fetch();
 		for(let params of list)
 		{
+			let acc = this.state.accounts.findByName(params.name);
+/*
 			let acc = accountsBefore.find(item => item.name == params.name);
+*/
 			if (!acc)
 			{
+/*
 				this.state.cleanCache();
+*/
 				acc = await api.account.create(params);
 			}
 
@@ -85,13 +94,21 @@ let runTransList =
 	{
 		let res = [];
 
+/*
 		let personsBefore = await this.state.getPersonsList();
+*/
+		await this.state.fetch();
 		for(let params of list)
 		{
+/*
 			let pers = personsBefore.find(item => item.name == params.name);
+*/
+			let pers = this.state.persons.findByName(params.name);
 			if (!pers)
 			{
+/*
 				this.state.cleanCache();
+*/
 				pers = await api.person.create(params);
 			}
 
@@ -103,7 +120,7 @@ let runTransList =
 	},
 
 
-	async populateTransactions(list, convertFunc)
+	populateTransactions(list, convertFunc)
 	{
 		let res = [];
 
@@ -115,7 +132,7 @@ let runTransList =
 
 		for(let props of list)
 		{
-			let convertedProps = await convertFunc(props);
+			let convertedProps = convertFunc(props);
 			for(let date of this.dateList)
 			{
 				convertedProps.date = date;
@@ -139,7 +156,7 @@ let runTransList =
 		personIds = await scope.setupPersons(personsList);
 
 		// Expense transactions
-		let created = await scope.populateTransactions(expensesList, props =>
+		let created = scope.populateTransactions(expensesList, props =>
 		{
 			props.src_id = accIds[props.src_id];
 			return this.run.transactions.expenseTransaction(props);
@@ -147,7 +164,7 @@ let runTransList =
 		newExpenses.push(...created);
 
 		// Income transactions
-		created = await scope.populateTransactions(incomesList, props =>
+		created = scope.populateTransactions(incomesList, props =>
 			{
 				props.dest_id = accIds[props.dest_id];
 				return this.run.transactions.incomeTransaction(props);
@@ -155,7 +172,7 @@ let runTransList =
 		newIncomes.push(...created);
 
 		// Transfer transactions
-		created = await scope.populateTransactions(transfersList, props =>
+		created = scope.populateTransactions(transfersList, props =>
 			{
 				props.src_id = accIds[props.src_id];
 				props.dest_id = accIds[props.dest_id];
@@ -164,7 +181,7 @@ let runTransList =
 		newTransfers.push(...created);
 
 		// Debt transactions
-		created = await scope.populateTransactions(debtsList, props =>
+		created = scope.populateTransactions(debtsList, props =>
 			{
 				props.person_id = personIds[props.person_id];
 				props.acc_id = (props.acc_id) ? accIds[props.acc_id] : 0;
@@ -174,8 +191,6 @@ let runTransList =
 
 		let multi = [].concat(newExpenses, newIncomes, newTransfers, newDebts);
 		await api.transaction.createMultiple(multi);
-
-		this.state.cleanCache();
 
 		console.log('Done');
 	},
@@ -189,7 +204,8 @@ let runTransList =
 
 		await scope.list.preCreateData();
 
-		let allTrList = await this.state.getTransactionsList();
+		await this.state.fetch();
+		let allTrList = this.state.transactions;
 
 		await this.goToMainView();
 		await this.view.goToTransactions();
@@ -311,5 +327,3 @@ let runTransList =
 	}
 };
 
-
-export { runTransList };

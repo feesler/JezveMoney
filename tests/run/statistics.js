@@ -1,4 +1,5 @@
-import { EXPENSE, INCOME, TRANSFER, DEBT, test } from '../common.js';
+import { test } from '../common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT } from '../model/transaction.js';
 
 
 let runStatistics =

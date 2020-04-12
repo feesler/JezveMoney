@@ -1,19 +1,22 @@
-import { api } from './api.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, copyObject, normalize } from './common.js';
-import { Currency } from './currency.js';
-import { TransactionsList } from './trlist.js';
+import {
+	getIcon,
+	isValidValue,
+	isObject,
+	copyObject,
+	setParam,
+	checkObjValue
+} from './common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, availTransTypes } from './model/transaction.js';
 import { App } from './app.js';
+import { Currency } from './model/currency.js';
+import { AccountsList } from './model/accountslist.js';
+import { PersonsList } from './model/personslist.js';
+import { TransactionsList } from './model/transactionslist.js';
 
 
-class AppState
+export class AppState
 {
 	constructor()
-	{
-		this.cleanCache();
-	}
-
-
-	cleanCache()
 	{
 		this.accounts = null;
 		this.persons = null;
@@ -21,65 +24,37 @@ class AppState
 	}
 
 
-	getLatestId(list)
+	async fetch()
 	{
-		if (!Array.isArray(list))
-			throw new Error('Invalid list specified');
+		let accounts = await AccountsList.fetch();
+		this.accounts = new AccountsList(accounts);
 
-		let res = 0;
-		for(let item of list)
-		{
-			res = Math.max(item.id, res);
-		}
+		let persons = await PersonsList.fetch();
+		this.persons = new PersonsList(persons);
 
+		let transactions = await TransactionsList.fetch();
+		this.transactions = new TransactionsList(transactions);
+	}
+
+
+	meetExpectation(expected)
+	{
+		let res = checkObjValue(this.accounts.data, expected.accounts.data) &&
+					checkObjValue(this.transactions.data, expected.transactions.data) &&
+					checkObjValue(this.persons.data, expected.persons.data);
 		return res;
 	}
 
 
-	// Return id of item with specified index(absolute position) in list
-	posToId(list, pos)
+/**
+ * Profile
+ */
+
+	resetAll()
 	{
-		if (!Array.isArray(list))
-			throw new Error('Invalid list specified');
-
-		let ind = parseInt(pos);
-		if (isNaN(ind) || ind < 0 || ind >= list.length)
-			throw new Error(`Invalid position ${pos} specified`);
-
-		let item = list[pos];
-
-		return item.id;
-	}
-
-
-	positionsToIds(list, positions)
-	{
-		if (!Array.isArray(list))
-			throw new Error('Invalid list specified');
-
-		let posList = Array.isArray(positions) ? positions : [ positions ];
-
-		return posList.map(item => this.posToId(list, item));
-	}
-
-
-	deleteByIds(list, ids)
-	{
-		if (!Array.isArray(list) || !ids)
-			throw new Error('Unexpected input');
-
-		if (!Array.isArray(ids))
-			ids = [ ids ];
-
-		let res = copyObject(list);
-		for(let id of ids)
-		{
-			let ind = res.findIndex(item => item.id == id);
-			if (ind !== -1)
-				res.splice(ind, 1);
-		}
-
-		return res;
+		this.accounts = new AccountsList([]);
+		this.persons = new PersonsList([]);
+		this.transactions = new TransactionsList([]);
 	}
 
 
@@ -87,182 +62,480 @@ class AppState
  * Accounts
  */
 
-	async getAccountsList()
+	checkAccountCorrectness(params)
 	{
-		if (!Array.isArray(this.accounts))
+		if (!isObject(params))
+			return false;
+
+		if (typeof params.name !== 'string' || params.name == '')
+			return false;
+
+		// Check there is no account with same name
+		let accObj = this.accounts.findByName(params.name);
+		if (accObj && (!params.id || (params.id && params.id != accObj.id)))
+			return false;
+
+		let currObj = Currency.getById(params.curr_id);
+		if (!currObj)
+			return false;
+
+		if (!getIcon(params.icon))
+			return false;
+
+		if (!isValidValue(params.initbalance))
+			return false;
+
+		return true;
+	}
+
+
+	createAccount(params)
+	{
+		let resExpected = this.checkAccountCorrectness(params);
+		if (!resExpected)
+			return false;
+
+		let ind = this.accounts.create(params);
+		let item = this.accounts.getItemByIndex(ind);
+		this.updatePersonAccounts();
+
+		return item.id;
+	}
+
+
+	updateAccount(params)
+	{
+		let origAcc = this.accounts.getItem(params.id);
+		if (!origAcc)
+			return false;
+	
+		// Prepare expected account object
+		let expAccount = copyObject(origAcc);
+		setParam(expAccount, params);
+
+		let resExpected = this.checkAccountCorrectness(expAccount);
+		if (!resExpected)
+			return false;
+
+		let balDiff = expAccount.initbalance - origAcc.initbalance;
+		if (balDiff.toFixed(2) != 0)
 		{
-			this.accounts = await api.account.list(true);
-			this.accounts.forEach(item =>
-			{
-				delete item.createdate;
-				delete item.updatedate;
-			});
+			//expAccount.initbalance = expAccount.balance;
+			expAccount.balance = origAcc.balance + balDiff;
 		}
 
-		return this.accounts;
+		// Prepare expected updates of transactions list
+		this.transactions = this.transactions.updateAccount(this.accounts.data, expAccount);
+
+		// Prepare expected updates of accounts list
+		this.accounts.update(expAccount);
+
+		this.updateTransResults();
+		this.updatePersonAccounts();
+
+		return true;
 	}
 
 
-	async getUserAccountsList()
+	deleteAccounts(ids)
 	{
-		let accList = await this.getAccountsList();
+		if (!Array.isArray(ids))
+			ids = [ ids ];
 
-		return accList.filter(item => item.owner_id == App.owner_id);
+		for(let acc_id of ids)
+		{
+			if (!this.accounts.getItem(acc_id))
+				return false;
+		}
+
+		this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids)
+
+		// Prepare expected updates of accounts list
+		this.accounts.deleteItems(ids);
+
+		this.updateTransResults();
+		this.updatePersonAccounts();
+
+		return true;
 	}
 
 
-	async getAccount(acc_id)
+	resetAccounts()
 	{
-		let id = parseInt(acc_id);
-		if (!id || isNaN(id))
-			return null;
+		this.accounts = new AccountsList([]);
+		this.transactions = new TransactionsList([]);
 
-		if (!Array.isArray(this.accounts))
-			await this.getAccountsList();
-
-		let accObj = this.accounts.find(item => item.id == id);
-
-		return accObj;
-	}
-
-
-	async getAccountByPos(accPos)
-	{
-		let pos = parseInt(accPos);
-		if (isNaN(pos))
-			return null;
-
-		let userAccounts = await this.getUserAccountsList();
-		if (pos < 0 || pos >= userAccounts.length)
-			return null;
-
-		let accObj = userAccounts[pos];
-
-		return accObj;
-	}
-
-
-	// Return current position of account in accounts array
-	// Return -1 in case account can't be found
-	async getAccountPos(acc_id)
-	{
-		let userAccounts = await this.getUserAccountsList();
-
-		return userAccounts.findIndex(item => item.id == acc_id);
-	}
-
-
-	// Return another user account id if possible
-	// Return zero if no account found
-	async getNextAccount(acc_id)
-	{
-		if (!acc_id)
-			return 0;
-
-		let userAccounts = await this.getUserAccountsList();
-
-		if (!Array.isArray(userAccounts) || userAccounts.length < 2)
-			return 0;
-
-		let pos = await this.getAccountPos(acc_id);
-		if (pos === -1)
-			return 0;
-
-		pos = ((pos == userAccounts.length - 1) ? 0 : pos + 1);
-
-		return userAccounts[pos].id;
+		return true;
 	}
 
 /**
  * Persons
  */
 
-	async getPersonsList()
+	checkPersonCorrectness(params)
 	{
-		if (!Array.isArray(this.persons))
+		if (!isObject(params))
+			return false;
+
+		if (typeof params.name !== 'string' || params.name == '')
+			return false;
+
+		// Check there is no person with same name
+		let personObj = this.persons.findByName(params.name);
+		if (personObj && (!params.id || params.id && params.id != personObj.id))
+			return false;
+
+		return true;
+	}
+
+
+	createPerson(params)
+	{
+		let resExpected = this.checkPersonCorrectness(params);
+		if (!resExpected)
+			return false;
+
+		let ind = this.persons.create(params);
+		let item = this.persons.getItemByIndex(ind);
+		item.accounts = [];
+
+		return item.id;
+	}
+
+
+	updatePerson(params)
+	{
+		let origPerson = this.persons.getItem(params.id);
+		if (!origPerson)
+			return false;
+
+		let expPerson = copyObject(origPerson);
+		setParam(expPerson, params);
+	
+		let resExpected = this.checkPersonCorrectness(params);
+		if (!resExpected)
+			return false;
+
+		this.persons.update(expPerson);
+
+		return true;
+	}
+
+
+	deletePersons(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let person_id of ids)
 		{
-			this.persons = await api.person.list();
-			this.persons.forEach(item =>
-			{
-				delete item.createdate;
-				delete item.updatedate;
-			});
+			if (!this.persons.getItem(person_id))
+				return false;
 		}
 
+		// Prepare expected updates of accounts list
+		let accountsToDelete = this.persons.data.filter(item => Array.isArray(item.accounts) && ids.includes(item.id))
+												.flatMap(item => item.accounts)
+												.map(item => item.id);
 
-		return this.persons;
+		this.persons.deleteItems(ids);
+
+		// Prepare expected updates of transactions
+		this.transactions = this.transactions.deleteAccounts(this.accounts.data, accountsToDelete)
+
+		this.accounts.deleteItems(accountsToDelete);
+
+		this.updateTransResults();
+
+		return true;
 	}
 
+/**
+ * Transactions
+ */
 
-	async getPerson(person_id)
+	checkTransactionCorrectness(params)
 	{
-		let id = parseInt(person_id);
-		if (!id || isNaN(id))
-			return null;
+		if (!isObject(params))
+			return false;
 
-		if (!Array.isArray(this.persons))
-			await this.getPersonsList();
+		if (!availTransTypes.includes(params.type))
+			return false;
 
-		let personObj = this.persons.find(item => item.id == id);
+		if (params.type == DEBT)
+		{
+			if (!params.person_id)
+				return false;
 
-		return personObj;
+			let person = this.persons.getItem(params.person_id);
+			if (!person)
+				return false;
+
+			if (params.acc_id)
+			{
+				let account = this.accounts.getItem(params.acc_id);
+				if (!account)
+					return false;
+			}
+		}
+		else
+		{
+			if (params.src_id)
+			{
+				if (params.type == INCOME)
+					return false;
+
+				let account = this.accounts.getItem(params.src_id);
+				if (!account)
+					return false;
+			}
+
+			if (params.dest_id)
+			{
+				if (params.type == EXPENSE)
+					return false;
+
+				let account = this.accounts.getItem(params.dest_id);
+				if (!account)
+					return false;
+			}
+		}
+
+		return true;
 	}
 
 
-	async getPersonByPos(personPos)
+	// Convert real transaction object to request
+	// Currently only DEBT affected:
+	//  (person_id, acc_id, op) parameters are used instead of (src_id, dest_id)
+	transactionToRequest(transaction)
 	{
-		let pos = parseInt(personPos);
-		if (isNaN(pos))
-			return null;
+		if (!transaction)
+			return transaction;
 
-		if (!Array.isArray(this.persons))
-			await this.getPersonsList();
+		let res = copyObject(transaction);
+		if (transaction.type != DEBT)
+			return res;
 
-		if (pos < 0 || pos >= this.persons.length)
-			return null;
+		let srcAcc = this.accounts.getItem(transaction.src_id);
+		let destAcc = this.accounts.getItem(transaction.dest_id);
+		if (srcAcc && srcAcc.owner_id != App.owner_id)
+		{
+			res.op = 1;
+			res.person_id = srcAcc.owner_id;
+			res.acc_id = (destAcc) ? destAcc.id : 0;
+		}
+		else if (destAcc && destAcc.owner_id != App.owner_id)
+		{
+			res.op = 2;
+			res.person_id = destAcc.owner_id;
+			res.acc_id = (srcAcc) ? srcAcc.id : 0;
+		}
+		else
+			throw new Error('Invalid transaction');
 
-		let personObj = this.persons[pos];
+		delete res.src_id;
+		delete res.dest_id;
 
-		return personObj;
+		return res;
 	}
 
 
-	async getPersonAccount(person_id, currency_id)
+	getExpectedTransaction(params)
+	{
+		if (!params.date)
+			params.date = App.dates.now;
+		if (!params.comment)
+			params.comment = '';
+
+		let res = copyObject(params);
+
+		if (params.type != DEBT)
+			return res;
+
+		let reqCurr = (res.op == 1) ? res.src_curr : res.dest_curr;
+		let personAcc = this.getExpectedPersonAccount(res.person_id, reqCurr);
+		if (!personAcc)
+			throw new Error('Fail to obtain expected account of person');
+
+		// Save new account of person
+		if (!this.accounts.getItem(personAcc.id))
+		{
+			this.accounts.data.push(personAcc);
+		}
+
+		if (res.op == 1)
+		{
+			res.src_id = personAcc.id;
+			res.dest_id = res.acc_id;
+		}
+		else
+		{
+			res.src_id = res.acc_id;
+			res.dest_id = personAcc.id;
+		}
+
+		// Different currencies not supported yet for debts
+		res.src_curr = res.dest_curr = reqCurr;
+
+		delete res.op;
+		delete res.person_id;
+		delete res.acc_id;
+
+		return res;
+	}
+
+
+	updateTransResults()
+	{
+		let accounts = this.accounts.toInitial();
+
+		let list = this.transactions.sortAsc();
+
+		for(let trans of list)
+		{
+			accounts.data = AccountsList.applyTransaction(accounts.data, trans);
+
+			trans.src_result = 0;
+			if (trans.src_id)
+			{
+				let srcAcc = accounts.getItem(trans.src_id);
+				if (srcAcc)
+					trans.src_result = srcAcc.balance;
+			}
+
+			trans.dest_result = 0;
+			if (trans.dest_id)
+			{
+				let destAcc = accounts.getItem(trans.dest_id);
+				if (destAcc)
+					trans.dest_result = destAcc.balance;
+			}
+		}
+
+		this.transactions = new TransactionsList(list);
+	}
+
+
+	updatePersonAccounts()
+	{
+		for(let person of this.persons.data)
+		{
+			person.accounts = this.accounts.data.filter(item => item.owner_id == person.id);
+		}
+	}
+
+
+	createTransaction(params)
+	{
+		let resExpected = this.checkTransactionCorrectness(params);
+		if (!resExpected)
+			return false;
+
+		// Prepare expected transaction object
+		let expTrans = this.getExpectedTransaction(params);
+		expTrans.pos = 0;
+
+		// Prepare expected updates of accounts
+		this.accounts = this.accounts.createTransaction(expTrans);
+		
+		// Prepare expected updates of transactions
+		let ind = this.transactions.create(expTrans);
+		this.updateTransResults();
+		this.updatePersonAccounts();
+
+		let item = this.transactions.getItemByIndex(ind);
+
+		return item.id;
+	}
+
+
+	updateTransaction(params)
+	{
+		let origTrans = this.transactions.getItem(params.id);
+		if (!origTrans)
+			return false;
+
+		// Convert original transaction to request form (only for DEBT: person_id, acc_id, op fields)
+		let updTrans = this.transactionToRequest(origTrans);
+		setParam(updTrans, params);
+
+		let correct = this.checkTransactionCorrectness(updTrans);
+		if (!correct)
+			return false;
+
+		// Prepare expected transaction object
+		let expTrans = this.getExpectedTransaction(updTrans);
+
+		// Prepare expected updates of accounts
+		this.accounts = this.accounts.updateTransaction(origTrans, expTrans);
+
+		// Prepare expected updates of transactions
+		this.transactions.update(expTrans.id, expTrans);
+		this.updateTransResults();
+		this.updatePersonAccounts();
+
+		return true;
+	}
+
+
+	deleteTransactions(ids)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		let itemsToDelete = [];
+		for(let transaction_id of ids)
+		{
+			let item = this.transactions.getItem(transaction_id);
+			if (!item)
+				return false;
+
+			itemsToDelete.push(item);
+		}
+
+		// Prepare expected updates of transactions list
+		this.accounts = this.accounts.deleteTransactions(itemsToDelete);
+		this.transactions.deleteItems(ids)
+		this.updateTransResults();
+		this.updatePersonAccounts();
+
+		return true;
+	}
+
+
+	getPersonAccount(person_id, currency_id)
 	{
 		let p_id = parseInt(person_id);
 		let curr_id = parseInt(currency_id);
 		if (!p_id || !curr_id)
 			return null;
 
-		if (!Array.isArray(this.accounts))
-			this.accounts = await this.getAccountsList();
-
-		let accObj = this.accounts.find(item => item.owner_id == p_id &&
-												item.curr_id == curr_id);
+		let accObj = this.accounts.data.find(item => item.owner_id == p_id &&
+													item.curr_id == curr_id);
 
 		return accObj;
 	}
 
 
-	async getExpectedPersonAccount(person_id, currency_id)
+	getExpectedPersonAccount(person_id, currency_id)
 	{
 		let p_id = parseInt(person_id);
 		let curr_id = parseInt(currency_id);
 		if (!p_id || !curr_id)
 			return null;
 
-		if (!Array.isArray(this.accounts))
-			this.accounts = await this.getAccountsList();
-
-		let accObj = this.accounts.find(item => item.owner_id == p_id &&
-												item.curr_id == curr_id);
+		let accObj = this.accounts.data.find(item => item.owner_id == p_id &&
+													item.curr_id == curr_id);
 
 		if (!accObj)
 		{
-			let latest = this.getLatestId(this.accounts);
+			let latest = this.accounts.getLatestId();
 
 			accObj = {
 				id : latest + 1,
+				owner_id : p_id,
+				user_id : App.user_id,
 				name : `acc_${person_id}_${currency_id}`,
 				initbalance : 0,
 				balance : 0,
@@ -290,7 +563,7 @@ class AppState
 
 
 	// Update persons
-	async updatePersons(pList, accList, transaction = null, origTransaction = null)
+	updatePersons(pList, accList, transaction = null, origTransaction = null)
 	{
 		if (!Array.isArray(pList) || !Array.isArray(accList))
 			throw new Error('Invalid parameters');
@@ -319,9 +592,9 @@ class AppState
 		if (origTransaction)
 		{
 			let orig = copyObject(origTransaction);
-			// TODO : do not use! Bad practice: we need to calculate
-			orig.srcAcc = await this.getAccount(orig.src_id);
-			orig.destAcc = await this.getAccount(orig.dest_id);
+
+			orig.srcAcc = this.accounts.getItem(orig.src_id);
+			orig.destAcc = this.accounts.getItem(orig.dest_id);
 
 	 		orig.debtType = (!!orig.srcAcc && orig.srcAcc.owner_id != App.owner_id);
 			orig.personAccount = (orig.debtType) ? orig.srcAcc : orig.destAcc;
@@ -344,8 +617,8 @@ class AppState
 				res.accounts.push(orig.personAccount);
 		}
 
-		let srcAcc = await this.getAccount(transaction.src_id);
-		let destAcc = await this.getAccount(transaction.dest_id);
+		let srcAcc = this.accounts.getItem(transaction.src_id);
+		let destAcc = this.accounts.getItem(transaction.dest_id);
  		let debtType = (!!srcAcc && srcAcc.owner_id != App.owner_id);
 
 		let personAccount = (debtType) ? srcAcc : destAcc;
@@ -367,101 +640,6 @@ class AppState
 			res.accounts[ind] = personAccount;
 		else
 			res.accounts.push(personAccount);
-
-		return res;
-	}
-
-
-/**
- * Transactions
- */
-	async getTransactionsList(returnRaw = false)
-	{
-		if (!Array.isArray(this.transactions))
-		{
-			this.transactions = await api.transaction.list();
-			this.transactions.forEach(item =>
-			{
-				delete item.createdate;
-				delete item.updatedate;
-			});
-		}
-
-		if (returnRaw)
-			return this.transactions;
-		else
-			return new TransactionsList(this.transactions);
-	}
-
-
-	// Apply transaction to accounts
-	applyTransaction(accList, transObj)
-	{
-		let res = copyObject(accList);
-
-		let srcAcc = res.find(item => item.id == transObj.src_id);
-		if (srcAcc)
-		{
-			srcAcc.balance = normalize(srcAcc.balance - transObj.src_amount);
-			transObj.src_result = srcAcc.balance;
-		}
-
-		let destAcc = res.find(item => item.id == transObj.dest_id);
-		if (destAcc)
-		{
-			destAcc.balance = normalize(destAcc.balance + transObj.dest_amount);
-			transObj.dest_result = destAcc.balance;
-		}
-
-		return res;
-	}
-
-
-	// Cancel transaction to accounts
-	cancelTransaction(accList, transObj)
-	{
-		let res = copyObject(accList);
-
-		let srcAcc = res.find(item => item.id == transObj.src_id);
-		if (srcAcc)
-		{
-			srcAcc.balance = normalize(srcAcc.balance + transObj.src_amount);
-			transObj.src_result = srcAcc.balance;
-		}
-
-		let destAcc = res.find(item => item.id == transObj.dest_id);
-		if (destAcc)
-		{
-			destAcc.balance = normalize(destAcc.balance - transObj.dest_amount);
-			transObj.dest_result = destAcc.balance;
-		}
-
-		return res;
-	}
-
-
-	createTransaction(accList, transObj)
-	{
-		return this.applyTransaction(accList, transObj);
-	}
-
-
-	updateTransaction(accList, origTransaction, newTransaction)
-	{
-		let afterCancel = this.cancelTransaction(accList, origTransaction);
-		return this.applyTransaction(afterCancel, newTransaction);
-	}
-
-
-	deleteTransactions(accList, transactions)
-	{
-		let transList = Array.isArray(transactions) ? transactions : [ transactions ];
-		let res = accList;
-
-		for(let transObj of transList)
-		{
-			res = this.cancelTransaction(res, transObj);
-		}
 
 		return res;
 	}
@@ -500,12 +678,12 @@ class AppState
 	}
 
 
-	async transactionToListItem(transObj)
+	transactionToListItem(transObj)
 	{
 		let res = {};
 
-		let srcAcc = await this.getAccount(transObj.src_id);
-		let destAcc = await this.getAccount(transObj.dest_id);
+		let srcAcc = this.accounts.getItem(transObj.src_id);
+		let destAcc = this.accounts.getItem(transObj.dest_id);
 
 		if (transObj.type == EXPENSE)
 		{
@@ -542,7 +720,7 @@ class AppState
 			res.accountTitle = '';
 			let debtType = (!!srcAcc && srcAcc.owner_id != App.owner_id);
 			let personAcc = debtType ? srcAcc : destAcc;
-			let person = await this.getPerson(personAcc.owner_id);
+			let person = this.persons.getItem(personAcc.owner_id);
 			if (!person)
 				throw new Error(`Person ${personAcc.owner_id} not found`);
 
@@ -601,49 +779,39 @@ class AppState
 	}
 
 
-	async renderTransactionsList(transactionsList)
+	renderTransactionsList(transactionsList)
 	{
-		let res = [];
-
-		for(let item of transactionsList)
-		{
-			let listItem = await this.transactionToListItem(item);
-			res.push(listItem);
-		}
-
-		return res;
+		return transactionsList.map(item => this.transactionToListItem(item));
 	}
 
 
-	async renderTransactionsWidget(transactionsList)
+	renderTransactionsWidget(transactionsList)
 	{
 		let res = { title : 'Transactions', transList : {} };
 
 		let latestTransactionsList = transactionsList.slice(0, App.config.latestTransactions);
 
-		res.transList.items = await this.renderTransactionsList(latestTransactionsList);
+		res.transList.items = this.renderTransactionsList(latestTransactionsList);
 
 		return res;
 	}
 
 
-	async render(accountList, personList, transactionList)
+	render()
 	{
 		let res = { values : { widgets : { length : App.config.widgetsCount } } };
 
 		// Accounts widget
-		let accWidget = this.renderAccountsWidget(accountList);
+		let accWidget = this.renderAccountsWidget(this.accounts.getUserAccounts(true));
 		res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
 		// Persons widget
-		let personsWidget = this.renderPersonsWidget(personList);
+		let personsWidget = this.renderPersonsWidget(this.persons.data);
 		res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
 		// Transactions widget
-		let transWidget = await this.renderTransactionsWidget(transactionList);
+		let transWidget = this.renderTransactionsWidget(this.transactions.data);
 		res.values.widgets[App.config.LatestWidgetPos] = transWidget;
 
 		return res;
 	}
 }
 
-
-export { AppState };

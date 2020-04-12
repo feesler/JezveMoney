@@ -1,21 +1,21 @@
 import { TransactionsView } from '../../view/transactions.js';
 import { MainView } from '../../view/main.js';
-import { TransactionsList } from '../../trlist.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, Transaction } from '../../model/transaction.js';
+import { TransactionsList } from '../../model/transactionslist.js';
+import { AccountsList } from '../../model/accountslist.js';
 import { api } from '../../api.js';
 import {
-	EXPENSE, INCOME, TRANSFER, DEBT,
 	test,
 	isObject,
 	copyObject,
 	checkObjValue,
 	formatProps,
-	getTransactionTypeStr
 } from '../../common.js';
 
 
-let runTransactionsCommon =
+export const runTransactionsCommon =
 {
-	async expenseTransaction(params)
+	expenseTransaction(params)
 	{
 		if (!params.src_id)
 			throw new Error('Source account not specified');
@@ -28,7 +28,7 @@ let runTransactionsCommon =
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
-		let acc = await this.state.getAccount(res.src_id);
+		let acc = this.state.accounts.getItem(res.src_id);
 		if (!acc)
 			throw new Error('Account not found');
 		res.src_curr = acc.curr_id;
@@ -40,7 +40,7 @@ let runTransactionsCommon =
 	},
 
 
-	async incomeTransaction(params)
+	incomeTransaction(params)
 	{
 		if (!params.dest_id)
 			throw new Error('Destination account not specified');
@@ -53,7 +53,7 @@ let runTransactionsCommon =
 		if (!res.src_amount)
 			res.src_amount = res.dest_amount;
 
-		let acc = await this.state.getAccount(res.dest_id);
+		let acc = this.state.accounts.getItem(res.dest_id);
 		if (!acc)
 			throw new Error('Account not found');
 		res.dest_curr = acc.curr_id;
@@ -65,7 +65,7 @@ let runTransactionsCommon =
 	},
 
 
-	async transferTransaction(params)
+	transferTransaction(params)
 	{
 		if (!params.src_id)
 			throw new Error('Source account not specified');
@@ -79,12 +79,12 @@ let runTransactionsCommon =
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
-		let srcAcc = await this.state.getAccount(res.src_id);
+		let srcAcc = this.state.accounts.getItem(res.src_id);
 		if (!srcAcc)
 			throw new Error('Account not found');
 		res.src_curr = srcAcc.curr_id;
 
-		let destAcc = await this.state.getAccount(res.dest_id);
+		let destAcc = this.state.accounts.getItem(res.dest_id);
 		if (!destAcc)
 			throw new Error('Account not found');
 		res.dest_curr = destAcc.curr_id;
@@ -96,7 +96,7 @@ let runTransactionsCommon =
 	},
 
 
-	async debtTransaction(params)
+	debtTransaction(params)
 	{
 		if (!params.person_id)
 			throw new Error('Person not specified');
@@ -108,7 +108,7 @@ let runTransactionsCommon =
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
-		let acc = await this.state.getAccount(res.acc_id);
+		let acc = this.state.accounts.getItem(res.acc_id);
 		if (acc)
 			res.src_curr = res.dest_curr = acc.curr_id;
 		else
@@ -175,12 +175,13 @@ let runTransactionsCommon =
 			let transListPages = await scope.iteratePages();
 			transList = transListPages.items;
 
-			expected = await this.state.renderTransactionsList(expTransList.list);
+			expected = this.state.renderTransactionsList(expTransList.data);
 		}
 		else
 		{
-			transList = await this.state.getTransactionsList(true);
-			expected = expTransList.list;
+			expected = copyObject(expTransList.data);
+			await this.state.fetch();
+			transList = this.state.transactions.data;
 		}
 
 		await test(descr, () => checkObjValue(transList, expected), this.environment);
@@ -191,11 +192,9 @@ let runTransactionsCommon =
 	{
 		let scope = this.run.transactions;
 
-		this.view.setBlock(`Create ${getTransactionTypeStr(type)} (${formatProps(params)})`, 2);
+		this.view.setBlock(`Create ${Transaction.typeToStr(type)} (${formatProps(params)})`, 2);
 
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let expTransList = await this.state.getTransactionsList();
+		await this.state.fetch();
 
 		// Navigate to create transaction page
 		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
@@ -208,22 +207,14 @@ let runTransactionsCommon =
 		// Input data and submit
 		let expectedTransaction = await submitHandler.call(this, params);
 
-		// Prepare data for next calculations
-		let afterCreate = this.state.createTransaction(accList, expectedTransaction);
-		expTransList.create(expectedTransaction);
+		this.state.createTransaction(expectedTransaction);
 
-		let updState = await this.state.updatePersons(pList, afterCreate, expectedTransaction);
-		pList = updState.persons;
-		afterCreate = updState.accounts;
-
-		expTransList = expTransList.updateResults(afterCreate);
-
-		this.view.expectedState = await this.state.render(afterCreate, pList, expTransList.list);
+		this.view.expectedState = this.state.render();
 
 		await test('Main page widgets update', () => {}, this.view);
 
 		// Read updated list of transactions
-		await scope.checkData('List of transactions update', expTransList);
+		await scope.checkData('List of transactions update', this.state.transactions);
 	},
 
 
@@ -240,11 +231,9 @@ let runTransactionsCommon =
 			throw new Error('Position of transaction not specified');
 		delete params.pos;
 
-		view.setBlock(`Update ${getTransactionTypeStr(type)} [${pos}] (${formatProps(params)})`, 2);
+		view.setBlock(`Update ${Transaction.typeToStr(type)} [${pos}] (${formatProps(params)})`, 2);
 
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let expTransList = await this.state.getTransactionsList();
+		await this.state.fetch();
 
 		await this.goToMainView();
 		await this.view.goToTransactions();
@@ -256,28 +245,24 @@ let runTransactionsCommon =
 
 		// Step
 		let origTransaction = this.view.getExpectedTransaction();
-
-		let canceled = this.state.cancelTransaction(accList, origTransaction);
-		this.state.accounts = canceled;
+		origTransaction = this.state.getExpectedTransaction(origTransaction);
+		let originalAccounts = copyObject(this.state.accounts.data);
+		let canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
+		this.state.accounts.data = canceled;
 		await this.view.parse();
 
 		let expectedTransaction = await submitHandler.call(this, params);
 
 		await this.goToMainView();
 
-		let afterUpdate = this.state.updateTransaction(accList, origTransaction, expectedTransaction);
-		expTransList.update(origTransaction.id, expectedTransaction);
+		this.state.accounts.data = originalAccounts;
+		this.state.updateTransaction(expectedTransaction);
 
-		let updState = await this.state.updatePersons(pList, afterUpdate, expectedTransaction, origTransaction);
-		pList = updState.persons;
-		afterUpdate = updState.accounts;
-		expTransList = expTransList.updateResults(afterUpdate);
-
-		this.view.expectedState = await this.state.render(afterUpdate, pList, expTransList.list);
+		this.view.expectedState = this.state.render();
 
 		await test('Main page widgets update', () => {}, this.view);
 
-		await scope.checkData('List of transactions update', expTransList);
+		await scope.checkData('List of transactions update', this.state.transactions);
 	},
 
 
@@ -289,10 +274,9 @@ let runTransactionsCommon =
 
 		await this.goToMainView();
 
-		// Save accounts and persons before delete transactions
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let expTransList = await this.state.getTransactionsList();
+		await this.state.fetch();
+		let ids = this.state.transactions.filterByType(type).positionsToIds(transactions);
+		this.state.deleteTransactions(ids);
 
 		// Navigate to transactions view and filter by specified type of transaction
 		await this.view.goToTransactions();
@@ -300,25 +284,12 @@ let runTransactionsCommon =
 		// Request view to select and delete transactions
 		await this.view.deleteTransactions(transactions);
 
-		this.state.cleanCache();
-
 		await this.goToMainView();
 
-		// Prepare expected transaction list
-		let removedTrans = expTransList.del(type, transactions);
-		accList = this.state.deleteTransactions(accList, removedTrans);
-		expTransList = expTransList.updateResults(accList);
-
-		this.state.cleanCache();
-
-		let updState = await this.state.updatePersons(pList, accList);
-		pList = updState.persons;
-		accList = updState.accounts;
-
-		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
+		this.view.expectedState = this.state.render();
 		await test('Main page widgets update', async () => {}, this.view);
 
-		await scope.checkData('List of transactions update', expTransList);
+		await scope.checkData('List of transactions update', this.state.transactions);
 	},
 
 
@@ -331,11 +302,11 @@ let runTransactionsCommon =
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of transaction not specified');
 
-		view.setBlock('Delete ' + getTransactionTypeStr(type) + ' from update view [' + pos + ']', 2);
+		view.setBlock(`Delete ${Transaction.typeToStr(type)} from update view [${pos}]`, 2);
 
-		let accList = await this.state.getAccountsList();
-		let pList = await this.state.getPersonsList();
-		let expTransList = await this.state.getTransactionsList();
+		await this.state.fetch();
+		let ids = this.state.transactions.filterByType(type).positionsToIds(pos);
+		this.state.deleteTransactions(ids);
 
 		if (!(this.view instanceof TransactionsView))
 		{
@@ -349,29 +320,14 @@ let runTransactionsCommon =
 
 		await this.view.goToUpdateTransaction(pos);
 
-		this.state.cleanCache();
-
 		await this.view.deleteSelfItem();
-
-		// Prepare expected transaction list
-		let removedTrans = expTransList.del(type, pos);
-		accList = this.state.deleteTransactions(accList, removedTrans);
-		expTransList = expTransList.updateResults(accList);
 
 		await this.goToMainView();
 
-		this.state.cleanCache();
+		this.view.expectedState = this.state.render();
+		await test('Main page widgets update', () => {}, this.view);
 
-		let updState = await this.state.updatePersons(pList, accList);
-		pList = updState.persons;
-		accList = updState.accounts;
-
-		this.view.expectedState = await this.state.render(accList, pList, expTransList.list);
-		await test('Main page widgets update', async () => {}, this.view);
-
-		await scope.checkData('List of transactions update', expTransList);
+		await scope.checkData('List of transactions update', this.state.transactions);
 	}
 };
 
-
-export { runTransactionsCommon };

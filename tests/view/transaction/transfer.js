@@ -1,6 +1,7 @@
 import { TransactionView } from '../transaction.js';
-import { Currency } from '../../currency.js';
-import { TRANSFER, isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { Currency } from '../../model/currency.js';
+import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { TRANSFER } from '../../model/transaction.js';
 import { App } from '../../app.js'
 
 
@@ -16,11 +17,11 @@ class TransferTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.srcAccount = await App.state.getAccount(cont.source.id);
+		res.srcAccount = App.state.accounts.getItem(cont.source.id);
 		if (!res.srcAccount)
 			throw new Error('Source account not found');
 
-		res.destAccount = await App.state.getAccount(cont.destination.id);
+		res.destAccount = App.state.accounts.getItem(cont.destination.id);
 		if (!res.destAccount)
 			throw new Error('Destination account not found');
 
@@ -443,7 +444,7 @@ class TransferTransactionView extends TransactionView
 
 	async changeSrcAccount(account_id)
 	{
-		let newAcc = await App.state.getAccount(account_id);
+		let newAcc = App.state.accounts.getItem(account_id);
 
 		if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 			return;
@@ -463,11 +464,11 @@ class TransferTransactionView extends TransactionView
 
 		if (newAcc.id == this.model.destAccount.id)
 		{
-			let nextAcc_id = await App.state.getNextAccount(newAcc.id);
+			let nextAcc_id = App.state.accounts.getNext(newAcc.id);
 			if (!nextAcc_id)
 				throw new Error('Next account not found');
 
-			this.model.destAccount = await App.state.getAccount(nextAcc_id);
+			this.model.destAccount = App.state.accounts.getItem(nextAcc_id);
 			this.model.dest_curr_id = this.model.destAccount.curr_id;
 			this.model.destCurr = Currency.getById(this.model.dest_curr_id);
 			this.model.destAccount.fmtBalance = this.model.destCurr.format(this.model.destAccount.balance);
@@ -538,7 +539,7 @@ class TransferTransactionView extends TransactionView
 
 	async changeDestAccount(account_id)
 	{
-		let newAcc = await App.state.getAccount(account_id);
+		let newAcc = App.state.accounts.getItem(account_id);
 
 		if (!this.model.destAccount || !newAcc || newAcc.id == this.model.destAccount.id)
 			return;
@@ -558,8 +559,8 @@ class TransferTransactionView extends TransactionView
 
 		if (newAcc.id == this.model.srcAccount.id)
 		{
-			let nextAcc_id = await App.state.getNextAccount(newAcc.id);
-			let newSrcAcc = await App.state.getAccount(nextAcc_id);
+			let nextAcc_id = App.state.accounts.getNext(newAcc.id);
+			let newSrcAcc = App.state.accounts.getItem(nextAcc_id);
 			if (!newSrcAcc)
 				throw new Error('Next account not found');
 			this.model.srcAccount = newSrcAcc;

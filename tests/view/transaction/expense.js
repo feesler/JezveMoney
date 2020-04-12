@@ -1,6 +1,7 @@
 import { TransactionView } from '../transaction.js';
-import { Currency } from '../../currency.js';
-import { EXPENSE, isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { Currency } from '../../model/currency.js';
+import { isValidValue, normalize, normalizeExch, correct, setParam } from '../../common.js'
+import { EXPENSE } from '../../model/transaction.js';
 import { App } from '../../app.js'
 
 
@@ -16,7 +17,7 @@ class ExpenseTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		res.srcAccount = await App.state.getAccount(cont.source.id);
+		res.srcAccount = App.state.accounts.getItem(cont.source.id);
 		if (!res.srcAccount)
 			throw new Error('Source account not found');
 
@@ -307,7 +308,7 @@ class ExpenseTransactionView extends TransactionView
 
 	async changeSrcAccount(account_id)
 	{
-		let newAcc = await App.state.getAccount(account_id);
+		let newAcc = App.state.accounts.getItem(account_id);
 
 		if (!this.model.srcAccount || !newAcc || newAcc.id == this.model.srcAccount.id)
 			return;

@@ -1,11 +1,13 @@
 import { api } from '../../api.js';
 import { runTransactionsCommon } from './common.js'
-import { TransactionsList } from '../../trlist.js'
-import { DEBT, test } from '../../common.js'
+import { TransactionsList } from '../../model/transactionslist.js'
+import { test } from '../../common.js'
+import { DEBT } from '../../model/transaction.js';
 import { DebtTransactionView } from '../../view/transaction/debt.js'
+import { App } from '../../app.js';
 
 
-let runDebt =
+export const runDebt =
 {
 	async submit(params)
 	{
@@ -28,7 +30,7 @@ let runDebt =
 					await test('Enable account', () => view.toggleAccount(), view);
 				}
 
-				let acc = await this.state.getAccountByPos(params.acc);
+				let acc = this.state.accounts.getItemByIndex(params.acc);
 				if (!acc)
 					throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -39,7 +41,7 @@ let runDebt =
 
 		if ('person' in params)
 		{
-			let person = await this.state.getPersonByPos(params.person);
+			let person = this.state.persons.getItemByIndex(params.person);
 			if (!person)
 				throw new Error('Person (' + params.person + ') not found');
 
@@ -74,26 +76,7 @@ let runDebt =
 			type : view.model.debtType
 		};
 
-		this.state.cleanCache();
-
 		await view.submit();
-
-		// Obtain newly created account of person
-		if ((debt.type && !res.src_id) ||
-			(!debt.type && !res.dest_id))
-		{
-			let accList = await this.state.getAccountsList();
-			let pcurr_id = debt.type ? res.src_curr : res.dest_curr;
-
-			let personAccount = await this.state.getPersonAccount(debt.person_id, pcurr_id);
-			if (!personAccount)
-				throw new Error('Person account not found');
-
-			if (debt.type)
-				res.src_id = personAccount.id;
-			else
-				res.dest_id = personAccount.id;
-		}
 
 		return res;
 	},
@@ -142,6 +125,8 @@ let runDebt =
 		const CARD_RUB = 4;
 		const MARIA = 0;
 		const IVAN = 1;
+
+		await App.state.fetch();
 
 	// Navigate to create income view
 		if (!(this.view instanceof DebtTransactionView))
@@ -358,5 +343,3 @@ let runDebt =
 
 };
 
-
-export { runDebt };

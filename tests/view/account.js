@@ -1,5 +1,5 @@
 import { TestView } from './testview.js';
-import { Currency } from '../currency.js';
+import { Currency } from '../model/currency.js';
 import {
 	getIcon,
 	isValidValue,

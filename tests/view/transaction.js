@@ -1,5 +1,6 @@
 import { TestView } from './testview.js';
-import { DEBT, correctExch, isValidValue, normalizeExch } from '../common.js'
+import { correctExch, isValidValue, normalizeExch } from '../common.js'
+import { DEBT } from '../model/transaction.js';
 import { App } from '../app.js';
 
 

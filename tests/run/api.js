@@ -2,7 +2,8 @@ import { api } from '../api.js';
 import { runAccountAPI } from './api/account.js';
 import { runPersonAPI } from './api/person.js';
 import { runTransactionAPI } from './api/transaction.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, test, formatDate } from '../common.js';
+import { test, formatDate } from '../common.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT } from '../model/transaction.js';
 
 
 let runAPI =
@@ -75,15 +76,13 @@ let runAPI =
 
 		env.setBlock('Prepare data for security tests', 2);
 
-		const API_USER_ACC_RUB = await account.createTest({ name : 'RUB', curr_id : RUB, balance : 100.1, icon : 5 });
-		const API_USER_ACC_USD = await account.createTest({ name : 'USD', curr_id : USD, balance : 50, icon : 2 });
+		const API_USER_ACC_RUB = await account.createTest({ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5 });
+		const API_USER_ACC_USD = await account.createTest({ name : 'USD', curr_id : USD, initbalance : 50, icon : 2 });
 		const API_USER_PERSON = await person.createTest({ name : 'API user Person' });
 		const API_USER_TRANSACTION = await transaction.createExpenseTest({
 			src_id: API_USER_ACC_RUB,
 			src_amount: 100
 		});
-
-		this.state.cleanCache();
 
 		// Login with main test user
 		await test('Login main user', () => api.user.login(this.config.testUser), env);
@@ -94,18 +93,18 @@ let runAPI =
 
 		await test('Reset accounts', () => api.account.reset(), env);
 
-		let ACC_RUB = await account.createTest({ name : 'acc ru', curr_id : RUB, balance : 100, icon : 1 });
-		let CASH_RUB = await account.createTest({ name : 'cash ru', curr_id : RUB, balance : 5000, icon : 3 });
-		let ACC_USD = await account.createTest({ name : 'acc usd', curr_id : USD, balance : 10.5, icon : 5 });
+		let ACC_RUB = await account.createTest({ name : 'acc ru', curr_id : RUB, initbalance : 100, icon : 1 });
+		let CASH_RUB = await account.createTest({ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon : 3 });
+		let ACC_USD = await account.createTest({ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon : 5 });
 
 		// Try to create account with existing name
-		await account.createTest({ name : 'acc ru', curr_id : USD, balance : 10.5, icon : 0 });
+		await account.createTest({ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0 });
 
 		/**
 		 * Security tests of accounts
 		 */
 		env.setBlock('Accounts security', 2);
-		await account.updateTest(API_USER_ACC_RUB, { name : 'EUR', curr_id : EUR, balance : 10, icon : 2 });
+		await account.updateTest(API_USER_ACC_RUB, { name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2 });
 		await account.deleteTest(API_USER_ACC_RUB);
 
 
@@ -284,7 +283,7 @@ let runAPI =
 		/**
 		 * Update accounts
 		 */
-		await account.updateTest(ACC_RUB, { name : 'acc rub', curr_id : USD, balance : 101, icon : 2 });
+		await account.updateTest(ACC_RUB, { name : 'acc rub', curr_id : USD, initbalance : 101, icon : 2 });
 
 		// Try to update name of account to an existing one
 		await account.updateTest(CASH_RUB, { name : 'acc rub' });

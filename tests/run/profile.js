@@ -5,7 +5,7 @@ import { setParam, test, formatDate, checkObjValue } from '../common.js';
 import { api } from '../api.js';
 
 
-let runProfile =
+export const runProfile =
 {
 	async relogin(userObj)
 	{
@@ -61,9 +61,8 @@ let runProfile =
 
 	async resetAccounts()
 	{
-		let persons = await this.state.getPersonsList();
-
-		this.state.cleanCache();
+		await this.state.fetch();
+		this.state.resetAccounts();
 
 		await this.view.goToProfile();
 		await this.view.resetAccounts();
@@ -74,14 +73,14 @@ let runProfile =
 		await this.view.closeNotification();
 		await this.goToMainView();
 
-		this.view.expectedState = await this.state.render([], persons, []);
+		this.view.expectedState = this.state.render();
 		await test('Main view update', () => {}, this.view);
 	},
 
 
 	async resetAll()
 	{
-		this.state.cleanCache();
+		this.state.resetAll();
 
 		await this.view.goToProfile();
 		await this.view.resetAll();
@@ -92,7 +91,7 @@ let runProfile =
 		await this.view.closeNotification();
 		await this.goToMainView();
 
-		this.view.expectedState = await this.state.render([], [], []);
+		this.view.expectedState = this.state.render();
 		await test('Main view update', () => {}, this.view);
 	},
 
@@ -177,5 +176,3 @@ let runProfile =
 	}
 };
 
-
-export { runProfile };

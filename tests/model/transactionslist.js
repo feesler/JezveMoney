@@ -1,22 +1,41 @@
 import {
+	copyObject,
+	convDate,
+	fixDate
+} from '../common.js';
+import { App } from '../app.js';
+import { api } from '../api.js';
+import { List } from './list.js';
+import {
 	EXPENSE,
 	INCOME,
 	TRANSFER,
 	DEBT,
-	copyObject,
-	convDate,
-	fixDate
-} from './common.js';
-import { App } from './app.js';
+	availTransTypes
+} from './transaction.js';
+import { AccountsList } from './accountslist.js';
 
 
-class TransactionsList
+export class TransactionsList extends List
 {
-	constructor(list)
+	constructor(...args)
 	{
-		this.list = copyObject(list);
-		this.availTypes = [ EXPENSE, INCOME, TRANSFER, DEBT ];
+		super(...args);
+
 		this.sort();
+	}
+
+
+	static async fetch()
+	{
+		let res = await api.transaction.list();
+		res.forEach(item =>
+		{
+			delete item.createdate;
+			delete item.updatedate;
+		});
+		
+		return res;
 	}
 
 
@@ -31,7 +50,7 @@ class TransactionsList
 	getLastestPos(date = null)
 	{
 		let cmpDate = convDate(date);
-		let checkList = (cmpDate) ? this.list.filter(item => convDate(item.date) <= cmpDate) : this.list;
+		let checkList = (cmpDate) ? this.data.filter(item => convDate(item.date) <= cmpDate) : this.data;
 
 		let res = checkList.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
 
@@ -41,9 +60,9 @@ class TransactionsList
 
 	updatePosById(item_id, pos)
 	{
-		let ind = this.findItem(item_id);
+		let ind = this.getIndexOf(item_id);
 		if (ind === -1)
-			throw new Error('Transaction ' + item_id + ' not found');
+			throw new Error(`Transaction ${item_id} not found`);
 
 		return this.updatePos(ind, pos);
 	}
@@ -51,10 +70,10 @@ class TransactionsList
 
 	updatePos(ind, pos)
 	{
-		if (ind < 0 || ind >= this.list.length)
-			throw new Error('Wrong transaction index: ' + ind);
+		if (ind < 0 || ind >= this.data.length)
+			throw new Error(`Wrong transaction index: ${ind}`);
 
-		let trObj = this.list[ind];
+		let trObj = this.data[ind];
 		if (!trObj)
 			throw new Error('Transaction not found');
 
@@ -62,9 +81,9 @@ class TransactionsList
 		if (oldPos == pos)
 			return;
 
-		if (this.list.find(item => item.pos == pos))
+		if (this.data.find(item => item.pos == pos))
 		{
-			for(let item of this.list)
+			for(let item of this.data)
 			{
 				if (oldPos == 0)			// insert with specified position
 				{
@@ -88,38 +107,42 @@ class TransactionsList
 	}
 
 
-	findItem(item_id)
+	create(item)
 	{
-		return this.list.findIndex(item => item.id == item_id);
-	}
+		item.pos = 0;
 
-
-	create(transObj)
-	{
-		let ind = this.list.length;
+		let ind = super.create(item);
+/*
+		let ind = this.data.length;
 		transObj.pos = 0;
-		this.list.push(transObj);
-
+		this.data.push(transObj);
+*/
+		let transObj = this.data[ind];
 		let expPos = this.getExpectedPos(transObj);
 		this.updatePos(ind, expPos);
 
 		this.sort();
 
-		return this.list.findIndex(item => item == transObj);
+		return this.data.findIndex(item => item == transObj);
 	}
 
 
 	update(id, transObj)
 	{
-		let ind = this.findItem(id);
-		if (ind === -1)
+		let item = this.getItem(id);
+		if (!item)
 			return false;
 
-		let origObj = this.list.splice(ind, 1, transObj);
+		let origObj = copyObject(item);
+/*
+		let origObj = this.data.splice(ind, 1, transObj);
 		if (!origObj || !origObj.length)
 			return false;
+*/
+		if (!super.update(transObj))
+			return false;
 
-		if (origObj[0].date != transObj.date)
+		if (origObj.date != transObj.date)
 		{
 			transObj.pos = 0;
 			let newPos = this.getExpectedPos(transObj);
@@ -128,12 +151,13 @@ class TransactionsList
 			this.sort();
 		}
 		else
-			transObj.pos = origObj[0].pos;
+			transObj.pos = origObj.pos;
 
 		return true;
 	}
 
 
+/*
 	del(type, inds)
 	{
 		let typedIndexes = (Array.isArray(inds)) ? inds : [ inds ];
@@ -141,7 +165,7 @@ class TransactionsList
 
 		// Save absolute indexes of items with specified type
 		let typeItems = [];
-		this.list.forEach((item, ind) =>
+		this.data.forEach((item, ind) =>
 		{
 			if (type == 0 || item.type == type)
 				typeItems.push(ind);
@@ -160,20 +184,22 @@ class TransactionsList
 		let delList = [];
 		for(let ind of indexes)
 		{
-			let item = this.list.splice(ind - (shift++), 1);
+			let item = this.data.splice(ind - (shift++), 1);
 			delList.push(item[0]);
 		}
 
 		return delList;
 	}
+*/
 
-
+/*
 	deleteItems(ids)
 	{
-		let res = App.state.deleteByIds(this.list, ids);
+		let res = this.deleteByIds(this.data, ids);
 
 		return new TransactionsList(res);
 	}
+*/
 
 
 	getItemsByType(list, type)
@@ -182,7 +208,7 @@ class TransactionsList
 		if (!type)
 			return list;
 
-		if (!this.availTypes.includes(type))
+		if (!availTransTypes.includes(type))
 			throw new Error('Wrong parameters');
 
 		return list.filter(item => item.type == type);
@@ -191,8 +217,8 @@ class TransactionsList
 
 	filterByType(type)
 	{
-		let items = this.getItemsByType(this.list, type);
-		if (items == this.list)
+		let items = this.getItemsByType(this.data, type);
+		if (items == this.data)
 			return this;
 
 		return new TransactionsList(items);
@@ -214,8 +240,8 @@ class TransactionsList
 
 	filterByAccounts(ids)
 	{
-		let items = this.getItemsByAccounts(this.list, ids);
-		if (items == this.list)
+		let items = this.getItemsByAccounts(this.data, ids);
+		if (items == this.data)
 			return this;
 
 		return new TransactionsList(items);
@@ -248,8 +274,8 @@ class TransactionsList
 
 	filterByDate(start, end)
 	{
-		let items = this.getItemsByDate(this.list, start, end);
-		if (items == this.list)
+		let items = this.getItemsByDate(this.data, start, end);
+		if (items == this.data)
 			return this;
 
 		return new TransactionsList(items);
@@ -269,8 +295,8 @@ class TransactionsList
 
 	filterByQuery(query)
 	{
-		let items = this.getItemsByQuery(this.list, query);
-		if (items == this.list)
+		let items = this.getItemsByQuery(this.data, query);
+		if (items == this.data)
 			return this;
 
 		return new TransactionsList(items);
@@ -297,8 +323,8 @@ class TransactionsList
 
 	getPage(num, limit)
 	{
-		let items = this.getItemsPage(this.list, num, limit);
-		if (items == this.list)
+		let items = this.getItemsPage(this.data, num, limit);
+		if (items == this.data)
 			return this;
 
 		return new TransactionsList(items);
@@ -328,8 +354,8 @@ class TransactionsList
 
 	filter(params)
 	{
-		let items = this.getItems(this.list, params);
-		if (items == this.list)
+		let items = this.getItems(this.data, params);
+		if (items == this.data)
 			return this;
 
 		return new TransactionsList(items);
@@ -338,13 +364,13 @@ class TransactionsList
 
 	sort()
 	{
-		this.list.sort((a, b) => b.pos - a.pos);
+		this.data.sort((a, b) => b.pos - a.pos);
 	}
 
 
 	sortAsc()
 	{
-		let res = copyObject(this.list);
+		let res = copyObject(this.data);
 
 		return res.sort((a, b) => a.pos - b.pos);
 	}
@@ -354,7 +380,7 @@ class TransactionsList
 	{
 		let onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
-		return Math.max(Math.ceil(this.list.length / onPage), 1);
+		return Math.max(Math.ceil(this.data.length / onPage), 1);
 	}
 
 
@@ -376,12 +402,14 @@ class TransactionsList
 			if (convTrans.src_id == account.id)
 			{
 				convTrans.src_curr = account.curr_id;
-				convTrans.src_amount = convTrans.dest_amount;
+				if (convTrans.dest_curr == account.curr_id)
+					convTrans.src_amount = convTrans.dest_amount;
 			}
 			if (convTrans.dest_id == account.id)
 			{
 				convTrans.dest_curr = account.curr_id;
-				convTrans.dest_amount = convTrans.src_amount;
+				if (convTrans.src_curr == account.curr_id)
+					convTrans.dest_amount = convTrans.src_amount;
 			}
 
 			res.push(convTrans);
@@ -394,7 +422,7 @@ class TransactionsList
 	// Return expected list of transactions after update specified account
 	updateAccount(accList, account)
 	{
-		let res = this.onUpdateAccount(this.list, accList, account);
+		let res = this.onUpdateAccount(this.data, accList, account);
 
 		return new TransactionsList(res);
 	}
@@ -475,50 +503,8 @@ class TransactionsList
 
 	deleteAccounts(accList, ids)
 	{
-		let res = this.onDeleteAccounts(this.list, accList, ids);
+		let res = this.onDeleteAccounts(this.data, accList, ids);
 
 		return new TransactionsList(res);
 	}
-
-
-	updateResults(accList)
-	{
-		if (!Array.isArray(accList))
-			throw new Error('Invalid parameters');
-
-		// Reset balance of all accounts to initial values
-		let accounts = copyObject(accList);
-		for(let acc of accounts)
-		{
-			acc.balance = acc.initbalance;
-		}
-
-		let list = this.sortAsc();
-
-		for(let trans of list)
-		{
-			accounts = App.state.applyTransaction(accounts, trans);
-
-			trans.src_result = 0;
-			if (trans.src_id)
-			{
-				let srcAcc = accounts.find(item => item.id == trans.src_id);
-				if (srcAcc)
-					trans.src_result = srcAcc.balance;
-			}
-
-			trans.dest_result = 0;
-			if (trans.dest_id)
-			{
-				let destAcc = accounts.find(item => item.id == trans.dest_id);
-				if (destAcc)
-					trans.dest_result = destAcc.balance;
-			}
-		}
-
-		return new TransactionsList(list);
-	}
 }
-
-
-export { TransactionsList };
