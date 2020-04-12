@@ -121,25 +121,37 @@ function prepareTransactionData(options)
 }
 
 
+function idsRequest(base, ids)
+{
+	if (!base)
+		throw new ApiRequestError('Invalid request');
+
+	if (!Array.isArray(ids))
+		ids = [ ids ];
+
+	// Check correctness of ids
+	for(let id of ids)
+	{
+		id = parseInt(id);
+		if (!id || isNaN(id))
+			throw new ApiRequestError('Wrong id specified');
+	}
+
+	let res = base;
+	if (ids.length == 1)
+		res += ids[0];
+	else
+		res += '?' + urlJoin({ id : ids });
+
+	return res;
+}
+
+
 export const api = {
 	currency : {
 		read : async function(ids)
 		{
-			if (!Array.isArray(ids))
-				ids = [ ids ];
-
-			for(let id of ids)
-			{
-				id = parseInt(id);
-				if (!id || isNaN(id))
-					throw new ApiRequestError('Wrong id specified');
-			}
-
-			let apiReq = 'currency/';
-			if (ids.length == 1)
-				apiReq += ids[0];
-			else
-				apiReq += '?' + urlJoin({ id : ids });
+			let apiReq = idsRequest('currency/', ids);
 
 			let jsonRes = await apiGet(apiReq);
 			if (!jsonRes || jsonRes.result != 'ok')
@@ -353,21 +365,7 @@ export const api = {
 	account : {
 		read : async function(ids)
 		{
-			if (!Array.isArray(ids))
-				ids = [ ids ];
-
-			for(let id of ids)
-			{
-				id = parseInt(id);
-				if (!id || isNaN(id))
-					throw new ApiRequestError('Wrong id specified');
-			}
-
-			let apiReq = 'account/';
-			if (ids.length == 1)
-				apiReq += ids[0];
-			else
-				apiReq += '?' + urlJoin({ id : ids });
+			let apiReq = idsRequest('account/', ids);
 
 			let jsonRes = await apiGet(apiReq);
 			if (!jsonRes || jsonRes.result != 'ok')
@@ -452,21 +450,7 @@ export const api = {
 	person : {
 		read : async function(ids)
 		{
-			if (!Array.isArray(ids))
-				ids = [ ids ];
-
-			for(let id of ids)
-			{
-				id = parseInt(id);
-				if (!id || isNaN(id))
-					throw new ApiRequestError('Wrong id specified');
-			}
-
-			let apiReq = 'person/';
-			if (ids.length == 1)
-				apiReq += ids[0];
-			else
-				apiReq += '?' + urlJoin({ id : ids });
+			let apiReq = idsRequest('person/', ids);
 
 			let jsonRes = await apiGet(apiReq);
 			if (!jsonRes || jsonRes.result != 'ok')
@@ -536,21 +520,7 @@ export const api = {
 	transaction : {
 		read : async function(ids)
 		{
-			if (!Array.isArray(ids))
-				ids = [ ids ];
-
-			for(let id of ids)
-			{
-				id = parseInt(id);
-				if (!id || isNaN(id))
-					throw new ApiRequestError('Wrong id specified');
-			}
-
-			let apiReq = 'transaction/';
-			if (ids.length == 1)
-				apiReq += ids[0];
-			else
-				apiReq += '?' + urlJoin({ id : ids });
+			let apiReq = idsRequest('transaction/', ids);
 
 			let jsonRes = await apiGet(apiReq);
 			if (!jsonRes || jsonRes.result != 'ok')
