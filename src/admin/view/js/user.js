@@ -60,14 +60,15 @@ function selectUser(id)
 	{
 		user_frm.action = baseURL + 'api/user/update';
 		setUserValues(currObj);
-		show('del_btn', true);
-		show('updbtn', true);
-		show('passbtn', true);
 	}
 	else			// clean
 	{
 		setUserValues(null);
 	}
+
+	show('del_btn', (currObj != null));
+	show('updbtn', (currObj != null));
+	show('passbtn', (currObj != null));
 }
 
 
