@@ -166,8 +166,8 @@ class Application
 		this.view.setBlock('Create accounts', 2);
 
 		let tests = [
-			{ name : 'acc_1', balance : 1000.01, curr_id : 1 },
-			{ name : 'acc_2', balance : '1000.01', curr_id : 3 },
+			{ name : 'acc_1', initbalance : 1000.01, curr_id : 1 },
+			{ name : 'acc_2', initbalance : '1000.01', curr_id : 3 },
 		];
 
 		for(let props of tests)
@@ -280,11 +280,11 @@ class Application
 	{
 		let accList =
 		[
-			{ name : 'acc_3', curr_id : 1, balance : '500.99', icon : 2 },
-			{ name : 'acc RUB', curr_id : 1, balance : '500.99', icon : 5 },
-			{ name : 'acc USD', curr_id : 2, balance : '500.99', icon : 4 },
-			{ name : 'acc EUR', curr_id : 3, balance : '10000.99', icon : 3 },
-			{ name : 'card RUB', curr_id : 1, balance : '35000.40', icon : 3 },
+			{ name : 'acc_3', curr_id : 1, initbalance : '500.99', icon : 2 },
+			{ name : 'acc RUB', curr_id : 1, initbalance : '500.99', icon : 5 },
+			{ name : 'acc USD', curr_id : 2, initbalance : '500.99', icon : 4 },
+			{ name : 'acc EUR', curr_id : 3, initbalance : '10000.99', icon : 3 },
+			{ name : 'card RUB', curr_id : 1, initbalance : '35000.40', icon : 3 },
 		];
 
 		for(let account of accList)

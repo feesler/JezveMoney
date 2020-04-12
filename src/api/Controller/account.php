@@ -2,7 +2,7 @@
 
 class AccountApiController extends ApiController
 {
-	protected $requiredFields = [ "name", "balance", "curr_id", "icon" ];
+	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon" ];
 
 
 	public function initAPI()

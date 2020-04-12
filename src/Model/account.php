@@ -85,7 +85,7 @@ class AccountModel extends CachedTable
 
 	protected function checkParams($params, $isUpdate = FALSE)
 	{
-		$avFields = ["owner_id", "name", "balance", "curr_id", "icon"];
+		$avFields = ["owner_id", "name", "initbalance", "curr_id", "icon"];
 		$res = [];
 
 		// In CREATE mode all fields is required
@@ -112,9 +112,9 @@ class AccountModel extends CachedTable
 			}
 		}
 
-		if (isset($params["balance"]))
+		if (isset($params["initbalance"]))
 		{
-			$res["balance"] = floatval($params["balance"]);
+			$res["initbalance"] = floatval($params["initbalance"]);
 		}
 
 		if (isset($params["curr_id"]))
@@ -155,7 +155,7 @@ class AccountModel extends CachedTable
 			return NULL;
 		}
 
-		$res["initbalance"] = $res["balance"];
+		$res["balance"] = $res["initbalance"];
 		$res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 		$res["user_id"] = self::$user_id;
 
@@ -192,12 +192,10 @@ class AccountModel extends CachedTable
 		$this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $accObj->curr_id);
 
 		// get initial balance to calc difference
-		$diff = round($res["balance"] - $accObj->initbalance, 2);
-
+		$diff = round($res["initbalance"] - $accObj->initbalance, 2);
 		if (abs($diff) >= 0.01)
 		{
 			$this->balanceUpdated = TRUE;
-			$res["initbalance"] = $res["balance"];
 			$res["balance"] = $accObj->balance + $diff;
 		}
 		else
@@ -315,7 +313,7 @@ class AccountModel extends CachedTable
 		$createRes = $this->create([
 							"owner_id" => $person_id,
 							"name" => "acc_".$person_id."_".$curr_id,
-							"balance" => 0.0,
+							"initbalance" => 0.0,
 							"curr_id" => $curr_id,
 							"icon" => 0
 						]);

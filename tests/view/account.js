@@ -88,7 +88,7 @@ class AccountView extends TestView
 		let res = {
 			name : this.model.name,
 			owner_id : App.owner_id,
-			initbalance : this.model.initbalance,
+			initbalance : this.model.fInitBalance,
 			curr_id : this.model.curr_id,
 			icon : this.model.icon
 		};
@@ -99,7 +99,7 @@ class AccountView extends TestView
 		let origBalance = (this.model.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
 		let origInitBalance = (this.model.isUpdate && this.origAccount) ? this.origAccount.initbalance : 0;
 
-		res.balance = origBalance + normalize(res.initbalance) - origInitBalance;
+		res.balance = normalize(origBalance + res.initbalance - origInitBalance);
 
 		return res;
 	}
@@ -119,8 +119,8 @@ class AccountView extends TestView
 			},
 			values : {
 				tile : accTile,
-				name : account.name,
-				balance : account.initbalance.toString(),
+				name : this.model.name.toString(),
+				balance : this.model.initbalance.toString(),
 				currDropDown : { textValue : this.model.currObj.name },
 				iconDropDown : { textValue : this.model.tileIcon.title }
 			}

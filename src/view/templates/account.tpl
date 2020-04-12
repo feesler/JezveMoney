@@ -59,7 +59,7 @@
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=e($accInfo->sign)?></div></div></div>
 								<div class="stretch_input std_input">
-									<input class="summ_text" id="balance" name="balance" type="text" value="<?=e($accInfo->initbalance)?>">
+									<input class="summ_text" id="balance" name="initbalance" type="text" value="<?=e($accInfo->initbalance)?>">
 								</div>
 							</div>
 						</div>

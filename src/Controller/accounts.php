@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class AccountsController extends Controller
 {
-	protected $requiredFields = [ "name", "balance", "curr_id", "icon" ];
+	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon" ];
 
 
 	protected function onStart()

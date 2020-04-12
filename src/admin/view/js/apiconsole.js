@@ -455,12 +455,12 @@ function onReadAccountSubmit()
 
 function onCreateAccountSubmit()
 {
-	var nameInp = ge('reate_account_name');
-	var balanceInput = ge('reate_account_balance');
+	var nameInp = ge('create_account_name');
+	var initbalanceInput = ge('create_account_initbalance');
 	var currencyInput = ge('create_account_curr');
 	var iconInput = ge('create_account_icon');
 
-	if (!nameInp || !balanceInput || !currencyInput || !iconInput)
+	if (!nameInp || !initbalanceInput || !currencyInput || !iconInput)
 		return;
 
 	var link = baseURL + 'api/account/create';
@@ -468,8 +468,8 @@ function onCreateAccountSubmit()
 	var params = {};
 
 	params.name = nameInp.value;
-	params.balance = balanceInput.value;
-	params.currency = currencyInput.value;
+	params.initbalance = initbalanceInput.value;
+	params.curr_id = currencyInput.value;
 	params.icon = iconInput.value;
 
  	var data = urlJoin(params);
@@ -482,11 +482,11 @@ function onUpdateAccountSubmit()
 {
 	var idInp = ge('update_account_id');
 	var nameInp = ge('update_account_name');
-	var balanceInput = ge('update_account_balance');
+	var initbalanceInput = ge('update_account_initbalance');
 	var currencyInput = ge('update_account_curr');
 	var iconInput = ge('update_account_icon');
 
-	if (!idInp || !nameInp || !balanceInput || !currencyInput || !iconInput)
+	if (!idInp || !nameInp || !initbalanceInput || !currencyInput || !iconInput)
 		return;
 
 	var link = baseURL + 'api/account/update';
@@ -495,8 +495,8 @@ function onUpdateAccountSubmit()
 
 	params.id = idInp.value;
 	params.name = nameInp.value;
-	params.balance = balanceInput.value;
-	params.currency = currencyInput.value;
+	params.initbalance = initbalanceInput.value;
+	params.curr_id = currencyInput.value;
 	params.icon = iconInput.value;
 
  	var data = urlJoin(params);

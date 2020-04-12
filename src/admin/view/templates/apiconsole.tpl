@@ -106,8 +106,8 @@
 							<input id="create_account_name" type="text">
 						</div>
 						<div class="std_margin">
-							<label for="create_account_balance">Balance</label>
-							<input id="create_account_balance" type="text">
+							<label for="create_account_initbalance">Initial balance</label>
+							<input id="create_account_initbalance" type="text">
 						</div>
 						<div class="std_margin">
 							<label for="create_account_curr">Currency (1-5, 10-22)</label>
@@ -133,8 +133,8 @@
 							<input id="update_account_name" type="text">
 						</div>
 						<div class="std_margin">
-							<label for="update_account_balance">Balance</label>
-							<input id="update_account_balance" type="text">
+							<label for="update_account_initbalance">Initial balance</label>
+							<input id="update_account_initbalance" type="text">
 						</div>
 						<div class="std_margin">
 							<label for="update_account_curr">Currency (1-5, 10-22)</label>

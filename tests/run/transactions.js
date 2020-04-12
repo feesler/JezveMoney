@@ -8,10 +8,10 @@ const USD = 2;
 const EUR = 3;
 const PLN = 4;
 
-let accountsList = [{ name : 'acc_4', curr_id : RUB, balance : '60500.12', icon : 1 },
-					{ name : 'acc_5', curr_id : RUB, balance : '78000', icon : 2 },
-					{ name : 'cash USD', curr_id : USD, balance : '10000', icon : 4 },
-					{ name : 'cash EUR', curr_id : EUR, balance : '1000', icon : 5 }];
+let accountsList = [{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1 },
+					{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2 },
+					{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4 },
+					{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5 }];
 
 let accIds = [];
 
