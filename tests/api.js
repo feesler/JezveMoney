@@ -362,6 +362,17 @@ export const api = {
 		},
 	},
 
+	state : {
+		read : async function()
+		{
+			let jsonRes = await apiGet('state');
+			if (!jsonRes || jsonRes.result != 'ok')
+				throw new ApiRequestError('Fail to read state');
+
+			return jsonRes.data;
+		},
+	},
+
 	account : {
 		read : async function(ids)
 		{

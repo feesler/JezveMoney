@@ -1,4 +1,3 @@
-import { TransactionsList } from '../model/transactionslist.js';
 import { api } from '../api.js';
 import { test, convDate, copyObject } from '../common.js';
 import { EXPENSE, INCOME, TRANSFER, DEBT } from '../model/transaction.js';
@@ -9,10 +8,12 @@ const USD = 2;
 const EUR = 3;
 const PLN = 4;
 
-let accountsList = [{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1 },
-					{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2 },
-					{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4 },
-					{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5 }];
+let accountsList = [
+	{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1 },
+	{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2 },
+	{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4 },
+	{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5 }
+];
 
 let accIds = [];
 
@@ -64,22 +65,13 @@ export const runTransList =
 	{
 		let res = [];
 
-/*
-		let accountsBefore = await this.state.getAccountsList();
-*/
-		await this.state.fetch();
 		for(let params of list)
 		{
 			let acc = this.state.accounts.findByName(params.name);
-/*
-			let acc = accountsBefore.find(item => item.name == params.name);
-*/
 			if (!acc)
 			{
-/*
-				this.state.cleanCache();
-*/
 				acc = await api.account.create(params);
+				this.state.createAccount(params);
 			}
 
 			if (acc)
@@ -94,22 +86,13 @@ export const runTransList =
 	{
 		let res = [];
 
-/*
-		let personsBefore = await this.state.getPersonsList();
-*/
-		await this.state.fetch();
 		for(let params of list)
 		{
-/*
-			let pers = personsBefore.find(item => item.name == params.name);
-*/
 			let pers = this.state.persons.findByName(params.name);
 			if (!pers)
 			{
-/*
-				this.state.cleanCache();
-*/
 				pers = await api.person.create(params);
+				this.state.createPerson(params);
 			}
 
 			if (pers)
@@ -151,6 +134,7 @@ export const runTransList =
 		console.log('Precreate data...');
 
 		await api.user.login('test', 'test');
+		await this.state.fetch();
 
 		accIds = await scope.setupAccounts(accountsList);
 		personIds = await scope.setupPersons(personsList);
@@ -192,6 +176,8 @@ export const runTransList =
 		let multi = [].concat(newExpenses, newIncomes, newTransfers, newDebts);
 		await api.transaction.createMultiple(multi);
 
+		await this.state.fetch();
+
 		console.log('Done');
 	},
 
@@ -204,7 +190,6 @@ export const runTransList =
 
 		await scope.list.preCreateData();
 
-		await this.state.fetch();
 		let allTrList = this.state.transactions;
 
 		await this.goToMainView();
@@ -245,7 +230,7 @@ export const runTransList =
 									modeSelector : { listMode : { isActive : true },
 														detailsMode : { isActive : false } } } };
 
-		await test('Initial state of transaction list view', async () => {}, this.view, state);
+		await test('Initial state of transaction list view', () => {}, this.view, state);
 
 		state.values.paginator.active = 2;
 		await this.view.goToNextPage();

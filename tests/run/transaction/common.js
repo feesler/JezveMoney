@@ -194,8 +194,6 @@ export const runTransactionsCommon =
 
 		this.view.setBlock(`Create ${Transaction.typeToStr(type)} (${formatProps(params)})`, 2);
 
-		await this.state.fetch();
-
 		// Navigate to create transaction page
 		let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
 		await this.goToMainView();
@@ -232,8 +230,6 @@ export const runTransactionsCommon =
 		delete params.pos;
 
 		view.setBlock(`Update ${Transaction.typeToStr(type)} [${pos}] (${formatProps(params)})`, 2);
-
-		await this.state.fetch();
 
 		await this.goToMainView();
 		await this.view.goToTransactions();
@@ -274,7 +270,6 @@ export const runTransactionsCommon =
 
 		await this.goToMainView();
 
-		await this.state.fetch();
 		let ids = this.state.transactions.filterByType(type).positionsToIds(transactions);
 		this.state.deleteTransactions(ids);
 
@@ -304,7 +299,6 @@ export const runTransactionsCommon =
 
 		view.setBlock(`Delete ${Transaction.typeToStr(type)} from update view [${pos}]`, 2);
 
-		await this.state.fetch();
 		let ids = this.state.transactions.filterByType(type).positionsToIds(pos);
 		this.state.deleteTransactions(ids);
 

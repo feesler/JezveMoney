@@ -372,7 +372,7 @@ export function checkObjValue(obj, expectedObj, ret = false)
 	let expectedKeys = Object.getOwnPropertyNames(expectedObj);
 	for(let vKey of expectedKeys)
 	{
-		if (obj === null || !(vKey in obj))
+		if (obj == null || !(vKey in obj))
 		{
 			res = { key : vKey };
 			break;

@@ -1,21 +1,10 @@
 import { api } from '../../api.js';
 import { ApiRequestError } from '../../apirequesterror.js'
-import {
-	isObject,
-	test,
-	setParam,
-	copyObject,
-	checkObjValue
-} from '../../common.js';
-import { AppState } from '../../state.js';
+import { test } from '../../common.js';
 
 
 export const runPersonAPI =
 {
-	/**
-	 * Person tests
-	 */
-
 	// Create person with specified params (name)
 	// And check expected state of app
 	async createTest(params)
@@ -24,8 +13,7 @@ export const runPersonAPI =
 
 		await test('Create person', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 			let resExpected = expected.createPerson(params);
 
 			let createRes;
@@ -41,13 +29,9 @@ export const runPersonAPI =
 					throw e;
 			}
 
-			if (createRes)
-				person_id = createRes.id;
-			else
-				person_id = resExpected;
+			person_id = (createRes) ? createRes.id : resExpected;
 
 			await this.state.fetch();
-
 			return this.state.meetExpectation(expected);
 		}, this.environment);
 
@@ -63,17 +47,15 @@ export const runPersonAPI =
 
 		await test('Update person', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 
 			params.id = id;
 			let resExpected = expected.updatePerson(params);
 			let updParams = (resExpected) ? expected.persons.getItem(id) : params;
 
-			let updateRes;
 			try
 			{
-				updateRes = await api.person.update(id, params);
+				updateRes = await api.person.update(id, updParams);
 				if (resExpected != updateRes)
 					return false;
 			}
@@ -84,7 +66,6 @@ export const runPersonAPI =
 			}
 
 			await this.state.fetch();
-
 			return this.state.meetExpectation(expected);
 		}, this.environment);
 
@@ -100,9 +81,7 @@ export const runPersonAPI =
 
 		await test('Delete person', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
-
+			let expected = this.state.clone();
 			let resExpected = expected.deletePersons(ids);
 
 			// Send API sequest to server
@@ -119,7 +98,6 @@ export const runPersonAPI =
 			}
 
 			await this.state.fetch();
-
 			return this.state.meetExpectation(expected);
 		}, this.environment);
 

@@ -28,8 +28,7 @@ export const runAccountAPI =
 
 		await test('Create account', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 			let resExpected = expected.createAccount(params);
 
 			let createRes;
@@ -45,15 +44,10 @@ export const runAccountAPI =
 					throw e;
 			}
 
-			if (createRes)
-				acc_id = createRes.id;
-			else
-				acc_id = resExpected;
+			acc_id = (createRes) ? createRes.id : resExpected;
 
 			await this.state.fetch();
-
-			let res = this.state.meetExpectation(expected);
-			return res;
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return acc_id;
@@ -68,8 +62,7 @@ export const runAccountAPI =
 
 		await test(`Update account (${id}, ${formatProps(params)})`, async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 
 			params.id = id;
 			let resExpected = expected.updateAccount(params);
@@ -98,9 +91,7 @@ export const runAccountAPI =
 			}
 
 			await this.state.fetch();
-
-			let res = this.state.meetExpectation(expected);
-			return res;
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return updateRes;
@@ -115,8 +106,7 @@ export const runAccountAPI =
 
 		await test('Delete account', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 			let resExpected = expected.deleteAccounts(ids);
 
 			// Send API sequest to server
@@ -133,9 +123,7 @@ export const runAccountAPI =
 			}
 
 			await this.state.fetch();
-
-			let res = this.state.meetExpectation(expected);
-			return res;
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return deleteRes;

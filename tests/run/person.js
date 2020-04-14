@@ -17,8 +17,6 @@ export const runPersons =
 		}
 		await this.view.goToCreatePerson();
 
-		await this.state.fetch();
-
 		let expectedPerson = { name : personName };
 		this.state.createPerson(expectedPerson);
 		
@@ -39,7 +37,6 @@ export const runPersons =
 		}
 		await this.view.goToUpdatePerson(num);
 
-		await this.state.fetch();
 		let expectedPerson = this.state.persons.getItemByIndex(num);
 		if (!expectedPerson)
 			throw new Error('Can not find specified person');
@@ -71,7 +68,6 @@ export const runPersons =
 		}
 
 		// Prepare expected updates of persons list
-		await this.state.fetch();
 		this.state.deletePersons(this.state.persons.positionsToIds(persons));
 
 		await this.view.deletePersons(persons);
@@ -96,7 +92,6 @@ export const runPersons =
 			await this.view.goToPersons();
 		}
 
-		await this.state.fetch();
 		this.state.deletePersons(this.state.persons.positionsToIds(pos));
 
 		await this.view.goToUpdatePerson(pos);
@@ -108,7 +103,7 @@ export const runPersons =
 		await this.goToMainView();
 
 		this.view.expectedState = this.state.render();
-		await test('Main page widgets update', async () => {}, this.view);
+		await test('Main page widgets update', () => {}, this.view);
 
 		await this.run.transactions.checkData('List of transactions update', this.state.transactions);
 	}

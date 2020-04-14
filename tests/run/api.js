@@ -42,6 +42,7 @@ let runAPI =
 		await test('User registration', () => api.user.register(this.config.apiTestUser), env);
 
 		await test('Login new user', () => api.user.login(this.config.apiTestUser), env);
+		await this.state.fetch();
 
 		env.setBlock('Profile', 2);
 
@@ -75,6 +76,7 @@ let runAPI =
 		}, env);
 
 		env.setBlock('Prepare data for security tests', 2);
+		await this.state.fetch();
 
 		const API_USER_ACC_RUB = await account.createTest({ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5 });
 		const API_USER_ACC_USD = await account.createTest({ name : 'USD', curr_id : USD, initbalance : 50, icon : 2 });
@@ -86,12 +88,15 @@ let runAPI =
 
 		// Login with main test user
 		await test('Login main user', () => api.user.login(this.config.testUser), env);
+		await this.state.fetch();
 
 		await test('Reset all data', () => api.profile.reset(), env);
+		this.state.resetAll();
 
 		env.setBlock('Accounts', 2);
 
 		await test('Reset accounts', () => api.account.reset(), env);
+		this.state.resetAccounts();
 
 		let ACC_RUB = await account.createTest({ name : 'acc ru', curr_id : RUB, initbalance : 100, icon : 1 });
 		let CASH_RUB = await account.createTest({ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon : 3 });

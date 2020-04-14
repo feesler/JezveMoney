@@ -8,7 +8,48 @@ export class List
 		if (!Array.isArray(data))
 			throw new Error('Invalid data specified');
 
+		this.setData(data);
+	}
+
+
+	setData(data)
+	{
 		this.data = copyObject(data);
+		this.filterData();
+	}
+
+
+	filterData()
+	{
+	}
+
+
+	reset()
+	{
+		this.data = [];
+	}
+
+
+	async fetch()
+	{
+		throw new Error('Fetch not implemented');
+	}
+
+
+	filterData()
+	{
+		this.data.forEach(item =>
+		{
+			delete item.createdate;
+			delete item.updatedate;
+		});
+	}
+
+
+	async refresh()
+	{
+		let newData = await this.fetch();
+		this.setData(newData);
 	}
 
 
@@ -80,6 +121,20 @@ export class List
 	}
 
 
+	// Return expected value of next id
+	getNextId()
+	{
+		if (this.autoincrement)
+			return this.autoincrement;
+
+		let latest = this.getLatestId();
+		if (latest > 0)
+			return latest + 1;
+
+		return 0;
+	}
+
+
 	// Push item to the end of list, automatically generate id
 	// Return index of new item in the list
 	create(item)
@@ -89,9 +144,12 @@ export class List
 
 		let itemObj = copyObject(item);
 
-		let latest = this.getLatestId();
-		if (latest > 0)
-			itemObj.id = latest + 1;
+		let next_id = this.getNextId();
+		if (next_id)
+		{
+			itemObj.id = next_id;
+			this.autoincrement = next_id + 1;
+		}
 
 		let res = this.data.length;
 		this.data.push(itemObj);

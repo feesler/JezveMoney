@@ -4,15 +4,26 @@ import { api } from '../api.js';
 
 export class PersonsList extends List
 {
-	static async fetch()
+	async fetch()
 	{
-		let res = await api.person.list();
+		return api.person.list();
+	}
 
-		res.forEach(item =>
+
+	filterData()
+	{
+		this.data.forEach(item =>
 		{
 			delete item.createdate;
 			delete item.updatedate;
 		});
+	}
+
+
+	clone()
+	{
+		let res = new PersonsList(this.data);
+		res.autoincrement = this.autoincrement;
 
 		return res;
 	}

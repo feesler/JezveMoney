@@ -23,6 +23,8 @@ export const runProfile =
 		await this.view.loginAs(userObj.login, userObj.password);
 		this.view.expectedState = { msgPopup : null };
 		await test('Test user login', () => {}, this.view);
+
+		await this.state.fetch();
 	},
 
 
@@ -56,12 +58,13 @@ export const runProfile =
 		await this.view.loginAs(userObj.login, userObj.password);
 		this.view.expectedState = { msgPopup : null };
 		await test('Login with new account', () => {}, this.view);
+
+		await this.state.fetch();
 	},
 
 
 	async resetAccounts()
 	{
-		await this.state.fetch();
 		this.state.resetAccounts();
 
 		await this.view.goToProfile();

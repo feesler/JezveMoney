@@ -6,14 +6,16 @@ import { App } from '../app.js';
 
 export class AccountsList extends List
 {
-	static async fetch()
+	async fetch()
 	{
-		let res = await api.account.list(true);
-		res.forEach(item =>
-		{
-			delete item.createdate;
-			delete item.updatedate;
-		});
+		return api.account.list(true);
+	}
+
+
+	clone()
+	{
+		let res = new AccountsList(this.data);
+		res.autoincrement = this.autoincrement;
 
 		return res;
 	}

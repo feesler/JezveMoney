@@ -12,6 +12,7 @@ import { Currency } from './model/currency.js';
 import { AccountsList } from './model/accountslist.js';
 import { PersonsList } from './model/personslist.js';
 import { TransactionsList } from './model/transactionslist.js';
+import { api } from './api.js';
 
 
 export class AppState
@@ -26,14 +27,35 @@ export class AppState
 
 	async fetch()
 	{
-		let accounts = await AccountsList.fetch();
-		this.accounts = new AccountsList(accounts);
+		let newState = await api.state.read();
 
-		let persons = await PersonsList.fetch();
-		this.persons = new PersonsList(persons);
+		if (!this.accounts)
+			this.accounts = new AccountsList;
+		this.accounts.data = newState.accounts.data;
+		this.accounts.autoincrement = newState.accounts.autoincrement;
 
-		let transactions = await TransactionsList.fetch();
-		this.transactions = new TransactionsList(transactions);
+		if (!this.persons)
+			this.persons = new PersonsList;
+		this.persons.data = newState.persons.data;
+		this.persons.autoincrement = newState.persons.autoincrement;
+
+		if (!this.transactions)
+			this.transactions = new TransactionsList;
+		this.transactions.data = newState.transactions.data;
+		this.transactions.sort();
+		this.transactions.autoincrement = newState.transactions.autoincrement;
+	}
+
+
+	clone()
+	{
+		let res = new AppState;
+
+		res.accounts = this.accounts.clone();
+		res.persons = this.persons.clone();
+		res.transactions = this.transactions.clone();
+
+		return res;
 	}
 
 
@@ -52,9 +74,9 @@ export class AppState
 
 	resetAll()
 	{
-		this.accounts = new AccountsList([]);
-		this.persons = new PersonsList([]);
-		this.transactions = new TransactionsList([]);
+		this.accounts.reset();
+		this.persons.reset();
+		this.transactions.reset();
 	}
 
 
@@ -162,8 +184,8 @@ export class AppState
 
 	resetAccounts()
 	{
-		this.accounts = new AccountsList([]);
-		this.transactions = new TransactionsList([]);
+		this.accounts.data = [];
+		this.transactions.data = [];
 
 		return true;
 	}

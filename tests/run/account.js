@@ -1,9 +1,7 @@
 import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
 import { Transaction } from '../model/transaction.js';
-import { TransactionsList } from '../model/transactionslist.js';
 import { Currency } from '../model/currency.js';
-import { api } from '../api.js';
 import { test, formatDate, formatProps } from '../common.js';
 
 
@@ -57,8 +55,6 @@ export const runAccounts =
 
 	async submitAccount(params)
 	{
-		let scope = this.run.accounts;
-
 		// Input account name
 		if ('name' in params)
 			await test(`Input name (${params.name})`, () => this.view.inputName(params.name), this.view);
@@ -193,7 +189,6 @@ export const runAccounts =
 	async delFromUpdate(pos)
 	{
 		let view = this.view;
-		let scope = this.run.accounts;
 
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)

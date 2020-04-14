@@ -1,33 +1,28 @@
 import { api } from '../../api.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, Transaction } from '../../model/transaction.js';
+import { Transaction } from '../../model/transaction.js';
 import { TransactionsList } from '../../model/transactionslist.js';
 import { ApiRequestError } from '../../apirequesterror.js'
 import {
-	isObject,
 	test,
-	copyObject,
 	setParam,
 	formatDate,
 	fixDate,
 	checkObjValue,
 	formatProps
 } from '../../common.js';
-import { AppState } from '../../state.js';
 
 
-let runTransactionAPI =
+export const runTransactionAPI =
 {
 	// Create transaction with specified params
 	// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
 	async createTest(params)
 	{
-		let scope = this.run.api.transaction;
 		let transaction_id = 0;
 
 		await test(`Create ${Transaction.typeToStr(params.type)} transaction`, async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 			let resExpected = expected.createTransaction(params);
 
 			// Send API sequest to server
@@ -44,15 +39,10 @@ let runTransactionAPI =
 					throw e;
 			}
 
-			if (createRes)
-				transaction_id = createRes.id;
-			else
-				transaction_id = resExpected;
+			transaction_id = (createRes) ? createRes.id : resExpected;
 
 			await this.state.fetch();
-
-			let res = this.state.meetExpectation(expected);
-			return res;
+			return this.state.meetExpectation(expected);
 		}, this.environment);
 
 		return transaction_id;
@@ -91,25 +81,17 @@ let runTransactionAPI =
 
 		await test('Update transaction', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
-
+			let expected = this.state.clone();
 			let resExpected = expected.updateTransaction(params);
 
 			// Obtain data for API request
 			let updParams = { date : this.dates.now, comment : '' };
 			let expTrans = expected.transactions.getItem(params.id);
-			if (resExpected)
-			{
-				updParams = expected.transactionToRequest(expTrans);
-			}
-			else
-			{
-				if (expTrans)
-					updParams = expected.transactionToRequest(expTrans);
 
+			if (expTrans)
+				updParams = expected.transactionToRequest(expTrans);
+			if (!resExpected)
 				setParam(updParams, params);
-			};
 
 			// Send API sequest to server
 			try
@@ -125,7 +107,6 @@ let runTransactionAPI =
 			}
 
 			await this.state.fetch();
-
 			return this.state.meetExpectation(expected);
 		}, this.environment);
 
@@ -138,12 +119,10 @@ let runTransactionAPI =
 	async deleteTest(ids)
 	{
 		let deleteRes;
-		let resExpected = true;
 
 		await test('Delete transaction', async () =>
 		{
-			let expected = new AppState;
-			await expected.fetch();
+			let expected = this.state.clone();
 			let resExpected = expected.deleteTransactions(ids);
 
 			// Send API sequest to server
@@ -160,7 +139,6 @@ let runTransactionAPI =
 			}
 
 			await this.state.fetch();
-
 			return this.state.meetExpectation(expected);
 		}, this.environment);
 
@@ -173,9 +151,7 @@ let runTransactionAPI =
 	{
 		await test(`Filter transactions (${formatProps(params)})`, async () =>
 		{
-			let data = await TransactionsList.fetch();
-			let transactions = new TransactionsList(data);
-
+			let transactions = this.state.transactions.clone();
 			let expTransList = transactions.filter(params);
 
 			// Prepare request parameters
@@ -202,12 +178,8 @@ let runTransactionAPI =
 			if (!trList)
 				throw new Error('Fail to read list of transactions');
 
-			let res = checkObjValue(trList, expTransList.data);
-
-			return res;
+			return checkObjValue(trList, expTransList.data);
 		}, this.environment);
 	}
 };
 
-
-export { runTransactionAPI };

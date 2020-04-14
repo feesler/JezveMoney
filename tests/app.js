@@ -78,7 +78,8 @@ class Application
 		this.user_id = userProfile.user_id;
 		this.owner_id = userProfile.owner_id;
 
-		this.state = new AppState();
+		this.state = new AppState;
+		await this.state.fetch();
 		await Currency.init();
 
 		let now = new Date();

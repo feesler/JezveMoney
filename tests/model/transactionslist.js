@@ -13,28 +13,29 @@ import {
 	DEBT,
 	availTransTypes
 } from './transaction.js';
-import { AccountsList } from './accountslist.js';
 
 
 export class TransactionsList extends List
 {
-	constructor(...args)
+	async fetch()
 	{
-		super(...args);
+		return api.transaction.list();
+	}
+
+
+	setData(data)
+	{
+		super.setData(data);
 
 		this.sort();
 	}
 
 
-	static async fetch()
+	clone()
 	{
-		let res = await api.transaction.list();
-		res.forEach(item =>
-		{
-			delete item.createdate;
-			delete item.updatedate;
-		});
-		
+		let res = new TransactionsList(this.data);
+		res.autoincrement = this.autoincrement;
+
 		return res;
 	}
 
