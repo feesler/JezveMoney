@@ -537,4 +537,25 @@ class MySqlDB
 		return ($this->errno == 0);
 	}
 
+
+	// Return current autoincrement value of specified table
+	// Return FALSE in case of error
+	public function getAutoIncrement($table)
+	{
+		if (!self::$dbname)
+			return FALSE;
+
+		$table = $this->escape($table);
+		if (!$table || $table == "")
+			return FALSE;
+
+		$qResult = $this->selectQ("AUTO_INCREMENT", "INFORMATION_SCHEMA.TABLES",
+									[ "TABLE_SCHEMA=".qnull(self::$dbname),
+										"TABLE_NAME=".qnull($table)]);
+		$row = $this->fetchRow($qResult);
+		if (!$row)
+			return FALSE;
+
+		return intval($row["AUTO_INCREMENT"]);
+	}
 }

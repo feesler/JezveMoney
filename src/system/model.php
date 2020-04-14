@@ -148,4 +148,11 @@ abstract class Model
 
 		return TRUE;
 	}
+
+
+	// Return currenct autoincrement value of table
+	public function autoIncrement()
+	{
+		return $this->dbObj->getAutoIncrement($this->tbl_name);
+	}
 }
