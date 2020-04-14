@@ -41,6 +41,7 @@
 			"TransactionApiController" => "api/Controller/transaction.php",
 			"UserApiController" => "api/Controller/user.php",
 			"ProfileApiController" => "api/Controller/profile.php",
+			"StateApiController" => "api/Controller/state.php",
 		// Admin controllers
 			"CurrencyAdminController" => "admin/Controller/currency.php",
 			"BalanceAdminController" => "admin/Controller/balance.php",

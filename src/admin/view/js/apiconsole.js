@@ -631,6 +631,13 @@ function initControls()
 	clearResultsBtn = ge('clearResultsBtn');
 	if (clearResultsBtn)
 		clearResultsBtn.onclick = clearResults;
+/**
+ * Common
+ */
+	var readStateForm = document.querySelector('#readStateForm > form');
+	if (!readStateForm)
+		throw new Error('Fail to init view');
+	readStateForm.onsubmit = onFormSubmit;
 
 /**
  * Accounts

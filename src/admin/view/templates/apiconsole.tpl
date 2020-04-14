@@ -12,6 +12,13 @@
 
 					<div class="left_column">
 						<ul id="controllersList" class="cont_list">
+							<li>
+								<button>Common</button>
+								<ul class="sub_list">
+									<li data-target="readStateForm">Read state</li>
+								</ul>
+							</li>
+
 							<li class="active">
 								<button>Accounts</button>
 								<ul class="sub_list">
@@ -82,6 +89,15 @@
 					</div>
 
 					<div class="center_column">
+						<div id="readStateForm" class="test_form">
+						<h3>Read state</h3>
+						<form action="<?=BASEURL?>api/state" method="get">
+							<div class="acc_controls">
+								<input id="readstatebtn" class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
+						</div>
+
 						<div id="getAccForm" class="test_form active">
 						<h3>Get accounts</h3>
 						<form action="<?=BASEURL?>api/account/list" method="get">

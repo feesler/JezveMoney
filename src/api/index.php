@@ -9,7 +9,8 @@
 		"person" => "PersonApiController",
 		"transaction" => "TransactionApiController",
 		"user" => "UserApiController",
-		"profile" => "ProfileApiController"
+		"profile" => "ProfileApiController",
+		"state" => "StateApiController"
 	]);
 
 	$router->setAliases([
