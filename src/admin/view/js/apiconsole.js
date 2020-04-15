@@ -554,7 +554,6 @@ function onDeleteCurrencySubmit()
 function onReadPersonSubmit()
 {
 	var id_inp = ge('read_person_id');
-
 	if (!id_inp)
 		return;
 
@@ -571,16 +570,13 @@ function onReadPersonSubmit()
 function onDeletePersonSubmit()
 {
 	var persondInp = ge('delpersons');
-
 	if (!persondInp)
 		return;
 
-	var link = baseURL + 'api/person/delete';
-
 	var idsPar = csToIds(persondInp.value);
-	data = urlJoin(idsPar);
+	var data = urlJoin(idsPar);
 
-	api.post(link, data);
+	api.post(baseURL + 'api/person/delete', data);
 }
 
 

@@ -310,7 +310,7 @@ class PersonModel extends CachedTable
 	}
 
 
-	// Return javascript array of persons
+	// Return array of persons
 	public function getData($params = NULL)
 	{
 		if (!is_array($params))

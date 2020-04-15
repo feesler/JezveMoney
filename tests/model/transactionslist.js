@@ -113,11 +113,7 @@ export class TransactionsList extends List
 		item.pos = 0;
 
 		let ind = super.create(item);
-/*
-		let ind = this.data.length;
-		transObj.pos = 0;
-		this.data.push(transObj);
-*/
+
 		let transObj = this.data[ind];
 		let expPos = this.getExpectedPos(transObj);
 		this.updatePos(ind, expPos);
@@ -135,11 +131,7 @@ export class TransactionsList extends List
 			return false;
 
 		let origObj = copyObject(item);
-/*
-		let origObj = this.data.splice(ind, 1, transObj);
-		if (!origObj || !origObj.length)
-			return false;
-*/
+
 		if (!super.update(transObj))
 			return false;
 
@@ -156,51 +148,6 @@ export class TransactionsList extends List
 
 		return true;
 	}
-
-
-/*
-	del(type, inds)
-	{
-		let typedIndexes = (Array.isArray(inds)) ? inds : [ inds ];
-		let indexes = [];
-
-		// Save absolute indexes of items with specified type
-		let typeItems = [];
-		this.data.forEach((item, ind) =>
-		{
-			if (type == 0 || item.type == type)
-				typeItems.push(ind);
-		});
-
-		// Check requested indexes and map its absolute values
-		for(let ind of typedIndexes)
-		{
-			if (ind < 0 || ind >= typeItems.length)
-				throw new Error('Wrong transaction position: ' + ind);
-
-			indexes.push(typeItems[ind]);
-		}
-
-		let shift = 0;
-		let delList = [];
-		for(let ind of indexes)
-		{
-			let item = this.data.splice(ind - (shift++), 1);
-			delList.push(item[0]);
-		}
-
-		return delList;
-	}
-*/
-
-/*
-	deleteItems(ids)
-	{
-		let res = this.deleteByIds(this.data, ids);
-
-		return new TransactionsList(res);
-	}
-*/
 
 
 	getItemsByType(list, type)
