@@ -443,7 +443,8 @@ export class AppState
 	{
 		for(let person of this.persons.data)
 		{
-			person.accounts = this.accounts.data.filter(item => item.owner_id == person.id);
+			person.accounts = this.accounts.data.filter(item => item.owner_id == person.id)
+												.map(item => { return { id : item.id, balance : item.balance, curr_id : item.curr_id }; });
 		}
 	}
 
@@ -557,7 +558,6 @@ export class AppState
 			accObj = {
 				id : latest + 1,
 				owner_id : p_id,
-				user_id : App.user_id,
 				name : `acc_${person_id}_${currency_id}`,
 				initbalance : 0,
 				balance : 0,

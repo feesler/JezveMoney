@@ -27,11 +27,9 @@ class TransactionApiController extends ApiController
 		{
 			$item = $this->model->getItem($trans_id);
 			if (is_null($item))
-				$respObj->fail("Transaction ".$trans_id." not found");
+				$respObj->fail("Transaction $trans_id not found");
 
-			$item->date = date("d.m.Y", $item->date);
-
-			$res[] = $item;
+			$res[] = new Transaction($item);
 		}
 
 		$respObj->data = $res;
@@ -73,15 +71,13 @@ class TransactionApiController extends ApiController
 		}
 
 		$items = $this->model->getData($params);
-		$trArr = [];
+		$res = [];
 		foreach($items as $item)
 		{
-			$item->date = date("d.m.Y", $item->date);
-
-			$trArr[] = $item;
+			$res[] = new Transaction($item);
 		}
-		$respObj->data = $trArr;
 
+		$respObj->data = $res;
 		$respObj->ok();
 	}
 
@@ -190,7 +186,6 @@ class TransactionApiController extends ApiController
 
 		$respObj->ok();
 	}
-
 
 
 	public function del()

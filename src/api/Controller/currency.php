@@ -21,24 +21,17 @@ class CurrencyApiController extends ApiController
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$respObj->fail("No currency specified");
 
-		$currArr = [];
+		$res = [];
 		foreach($ids as $curr_id)
 		{
-			$currObj = $this->model->getItem($curr_id);
-			if (!$currObj)
-				$respObj->fail();
+			$item = $this->model->getItem($curr_id);
+			if (!$item)
+				$respObj->fail("Currency $curr_id not found");
 
-			$res = new stdClass;
-			$res->id = $curr_id;
-			$res->name = $currObj->name;
-			$res->sign = $currObj->sign;
-			$res->format = $currObj->format;
-
-			$currArr[] = $currObj;
+			$res[] = new Currency($item);
 		}
 
-		$respObj->data = $currArr;
-
+		$respObj->data = $res;
 		$respObj->ok();
 	}
 
@@ -47,7 +40,14 @@ class CurrencyApiController extends ApiController
 	{
 		$respObj = new apiResponse;
 
-		$respObj->data = $this->model->getData();
+		$res = [];
+		$currencies = $this->model->getData();
+		foreach($currencies as $item)
+		{
+			$res[] = new Currency($item);
+		}
+
+		$respObj->data = $res;
 		$respObj->ok();
 	}
 

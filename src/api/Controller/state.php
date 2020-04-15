@@ -19,7 +19,12 @@ class StateApiController extends ApiController
 		$res = new stdClass;
 
 		$res->accounts = new stdClass;
-		$res->accounts->data = $this->accModel->getData([ "full" => TRUE ]);
+		$res->accounts->data = [];
+		$items = $this->accModel->getData([ "full" => TRUE ]);
+		foreach($items as $item)
+		{
+			$res->accounts->data[] = new Account($item);
+		}
 		$res->accounts->autoincrement = $this->accModel->autoIncrement();
 
 		$res->transactions = new stdClass;
@@ -27,14 +32,17 @@ class StateApiController extends ApiController
 		$items = $this->trModel->getData([ "onPage" => 0 ]);
 		foreach($items as $item)
 		{
-			$item->date = date("d.m.Y", $item->date);
-
-			$res->transactions->data[] = $item;
+			$res->transactions->data[] = new Transaction($item);
 		}
 		$res->transactions->autoincrement = $this->trModel->autoIncrement();
 
 		$res->persons = new stdClass;
-		$res->persons->data = $this->pModel->getData();
+		$res->persons->data = [];
+		$items = $this->pModel->getData();
+		foreach($items as $item)
+		{
+			$res->persons->data[] = new Person($item);
+		}
 		$res->persons->autoincrement = $this->pModel->autoIncrement();
 
 		$respObj->data = $res;

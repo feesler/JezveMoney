@@ -9,7 +9,7 @@ class PersonApiController extends ApiController
 	{
 		parent::initAPI();
 
-		$this->personMod = PersonModel::getInstance();
+		$this->model = PersonModel::getInstance();
 	}
 
 
@@ -26,9 +26,11 @@ class PersonApiController extends ApiController
 		$res = [];
 		foreach($ids as $person_id)
 		{
-			$personObj = $this->personMod->getItem($person_id);
-			if ($personObj)
-				$res[] = $personObj;
+			$item = $this->model->getItem($person_id);
+			if (!$item)
+				$respObj->fail("Person $person_id not found");
+
+			$res[] = new Person($item);
 		}
 
 		$respObj->data = $res;
@@ -42,7 +44,14 @@ class PersonApiController extends ApiController
 
 		$respObj = new apiResponse;
 
-		$respObj->data = $this->personMod->getData();
+		$res = [];
+		$persons = $this->model->getData();
+		foreach($persons as $item)
+		{
+			$res[] = new Person($item);
+		}
+
+		$respObj->data = $res;
 		$respObj->ok();
 	}
 
@@ -60,7 +69,7 @@ class PersonApiController extends ApiController
 		if ($reqData === FALSE)
 			$respObj->fail();
 
-		$p_id = $this->personMod->create($reqData);
+		$p_id = $this->model->create($reqData);
 		if (!$p_id)
 			$respObj->fail();
 
@@ -85,7 +94,7 @@ class PersonApiController extends ApiController
 		if ($reqData === FALSE)
 			$respObj->fail();
 
-		if (!$this->personMod->update($_POST["id"], $reqData))
+		if (!$this->model->update($_POST["id"], $reqData))
 			$respObj->fail();
 
 		$respObj->ok();
@@ -105,7 +114,7 @@ class PersonApiController extends ApiController
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$respObj->fail("No persons specified");
 
-		if (!$this->personMod->del($ids))
+		if (!$this->model->del($ids))
 			$respObj->fail();
 
 		$respObj->ok();

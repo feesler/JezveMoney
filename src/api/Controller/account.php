@@ -26,9 +26,9 @@ class AccountApiController extends ApiController
 		{
 			$item = $this->model->getItem($acc_id);
 			if (is_null($item))
-				$respObj->fail("Account not found");
+				$respObj->fail("Account $acc_id not found");
 
-			$res[] = $item;
+			$res[] = new Account($item);
 		}
 
 		$respObj->data = $res;
@@ -44,7 +44,14 @@ class AccountApiController extends ApiController
 		if (isset($_GET["full"]) && $_GET["full"] == 1)
 			$params["full"] = TRUE;
 
-		$respObj->data = $this->model->getData($params);
+		$accounts = $this->model->getData($params);
+		$res = [];
+		foreach($accounts as $item)
+		{
+			$res[] = new Account($item);
+		}
+
+		$respObj->data = $res;
 		$respObj->ok();
 	}
 

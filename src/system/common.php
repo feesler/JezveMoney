@@ -51,6 +51,11 @@
 			"LogsAdminController" => "admin/Controller/log.php",
 			"TestsAdminController" => "admin/Controller/tests.php",
 			"ApiConsoleAdminController" => "admin/Controller/apiconsole.php",
+		// Items
+			"Account" => "api/item/account.php",
+			"Person" => "api/item/person.php",
+			"Transaction" => "api/item/transaction.php",
+			"Currency" => "api/item/currency.php",
 		// Models
 			"AccountModel" => "Model/account.php",
 			"CurrencyModel" => "Model/currency.php",
