@@ -14,7 +14,7 @@ class Person
 		else
 		{
 			$accModel = AccountModel::getInstance();
-			$accData = $accModel->getData([ "person" => $res->id ]);
+			$accData = $accModel->getData([ "person" => $this->id ]);
 		}
 
 		$this->accounts = [];
