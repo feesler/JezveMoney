@@ -22,48 +22,48 @@
 							<li class="active">
 								<button>Accounts</button>
 								<ul class="sub_list">
-									<li data-target="getAccForm" class="active">Get accounts</li>
-									<li data-target="readAccForm">Read account</li>
-									<li data-target="createAccForm">Create account</li>
-									<li data-target="editAccForm">Edit account</li>
-									<li data-target="delAccForm">Delete account</li>
-									<li data-target="resetAccForm">Reset accounts</li>
+									<li data-target="listAccForm" class="active">List</li>
+									<li data-target="readAccForm">Read</li>
+									<li data-target="createAccForm">Create</li>
+									<li data-target="updateAccForm">Update</li>
+									<li data-target="delAccForm">Delete</li>
+									<li data-target="resetAccForm">Reset</li>
 								</ul>
 							</li>
 
 							<li>
 								<button>Transactions</button>
 								<ul class="sub_list">
-									<li data-target="getTrForm">Get transactions</li>
-									<li data-target="readTrForm">Read transaction</li>
-									<li data-target="createTrForm">Create transaction</li>
+									<li data-target="listTrForm">List</li>
+									<li data-target="readTrForm">Read</li>
+									<li data-target="createTrForm">Create</li>
 									<li data-target="createDebtForm">Create debt</li>
-									<li data-target="editTrForm">Edit transaction</li>
-									<li data-target="editDebtForm">Edit debt</li>
-									<li data-target="delTrForm">Delete transactions</li>
-									<li data-target="setTrPosForm">Set position of transacction</li>
+									<li data-target="updateTrForm">Update</li>
+									<li data-target="updateDebtForm">Update debt</li>
+									<li data-target="delTrForm">Delete</li>
+									<li data-target="setTrPosForm">Set position</li>
 								</ul>
 							</li>
 
 							<li>
 								<button>Persons</button>
 								<ul class="sub_list">
-									<li data-target="getPersonsForm">Get persons</li>
-									<li data-target="readPersonForm">Read person</li>
-									<li data-target="createPersonForm">Create person</li>
-									<li data-target="editPersonForm">Edit person</li>
-									<li data-target="delPersonForm">Delete persons</li>
+									<li data-target="listPersonsForm">List</li>
+									<li data-target="readPersonForm">Read</li>
+									<li data-target="createPersonForm">Create</li>
+									<li data-target="updatePersonForm">Update</li>
+									<li data-target="delPersonForm">Delete</li>
 								</ul>
 							</li>
 
 							<li>
 								<button>Currency</button>
 								<ul class="sub_list">
-									<li data-target="getCurrForm">Get currencies</li>
-									<li data-target="readCurrForm">Read currency</li>
-									<li data-target="createCurrForm">Create currency</li>
-									<li data-target="editCurrForm">Edit currency</li>
-									<li data-target="delCurrForm">Delete currencies</li>
+									<li data-target="listCurrForm">List</li>
+									<li data-target="readCurrForm">Read</li>
+									<li data-target="createCurrForm">Create</li>
+									<li data-target="updateCurrForm">Update</li>
+									<li data-target="delCurrForm">Delete</li>
 								</ul>
 							</li>
 
@@ -91,16 +91,16 @@
 					<div class="center_column">
 						<div id="readStateForm" class="test_form">
 						<h3>Read state</h3>
-						<form action="<?=BASEURL?>api/state" method="get">
+						<form action="<?=BASEURL?>api/state" method="list">
 							<div class="acc_controls">
 								<input id="readstatebtn" class="adm_act_btn" type="submit" value="submit">
 							</div>
 						</form>
 						</div>
 
-						<div id="getAccForm" class="test_form active">
-						<h3>Get accounts</h3>
-						<form action="<?=BASEURL?>api/account/list" method="get">
+						<div id="listAccForm" class="test_form active">
+						<h3>List accounts</h3>
+						<form action="<?=BASEURL?>api/account/list" method="list">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -108,7 +108,7 @@
 						</div>
 
 						<div id="readAccForm" class="test_form">
-						<h3>Read account</h3>
+						<h3>Read accounts by ids</h3>
 						<div class="std_margin"><label for="readaccid">Id</label><input id="readaccid" type="text"></div>
 						<div class="acc_controls">
 							<input id="readaccbtn" class="adm_act_btn" type="button" value="submit">
@@ -117,56 +117,60 @@
 
 						<div id="createAccForm" class="test_form">
 						<h3>Create account</h3>
-						<div class="std_margin">
-							<label for="create_account_name">Name</label>
-							<input id="create_account_name" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="create_account_initbalance">Initial balance</label>
-							<input id="create_account_initbalance" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="create_account_curr">Currency (1-5, 10-22)</label>
-							<input id="create_account_curr" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="create_account_icon">Icon (1-6; 0 - no icon)</label>
-							<input id="create_account_icon" type="text">
-						</div>
-						<div class="acc_controls">
-							<input id="accbtn" class="adm_act_btn" type="button" value="submit">
-						</div>
+						<form action="<?=BASEURL?>api/account/create" method="post">
+							<div class="std_margin">
+								<label for="create_account_name">Name</label>
+								<input id="create_account_name" name="name" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="create_account_initbalance">Initial balance</label>
+								<input id="create_account_initbalance" name="initbalance" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="create_account_curr">Currency (1-5, 10-22)</label>
+								<input id="create_account_curr" name="curr_id" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="create_account_icon">Icon (1-6; 0 - no icon)</label>
+								<input id="create_account_icon" name="icon" type="text">
+							</div>
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
 						</div>
 
-						<div id="editAccForm" class="test_form">
-						<h3>Edit account</h3>
-						<div class="std_margin">
-							<label for="update_account_id">Id</label>
-							<input id="update_account_id" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="update_account_name">Name</label>
-							<input id="update_account_name" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="update_account_initbalance">Initial balance</label>
-							<input id="update_account_initbalance" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="update_account_curr">Currency (1-5, 10-22)</label>
-							<input id="update_account_curr" type="text">
-						</div>
-						<div class="std_margin">
-							<label for="update_account_icon">Icon (1-6; 0 - no icon)</label>
-							<input id="update_account_icon" type="text">
-						</div>
-						<div class="acc_controls">
-							<input id="updaccbtn" class="adm_act_btn" type="button" value="submit">
-						</div>
+						<div id="updateAccForm" class="test_form">
+						<h3>Update account</h3>
+						<form action="<?=BASEURL?>api/account/update" method="post">
+							<div class="std_margin">
+								<label for="update_account_id">Id</label>
+								<input id="update_account_id" name="id" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_account_name">Name</label>
+								<input id="update_account_name" name="name" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_account_initbalance">Initial balance</label>
+								<input id="update_account_initbalance" name="initbalance" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_account_curr">Currency (1-5, 10-22)</label>
+								<input id="update_account_curr" name="curr_id" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_account_icon">Icon (1-6; 0 - no icon)</label>
+								<input id="update_account_icon" name="icon" type="text">
+							</div>
+							<div class="acc_controls">
+								<input class="adm_act_btn" type="submit" value="submit">
+							</div>
+						</form>
 						</div>
 
 						<div id="delAccForm" class="test_form">
-						<h3>Delete account</h3>
+						<h3>Delete accounts</h3>
 						<div class="std_margin">
 							<label for="delaccounts">Accounts (comma separated ids)</label>
 							<input id="delaccounts" type="text">
@@ -185,9 +189,9 @@
 						</form>
 						</div>
 
-						<div id="getTrForm" class="test_form">
-						<h3>Get transactions</h3>
-						<form action="<?=BASEURL?>api/transaction/list" method="get">
+						<div id="listTrForm" class="test_form">
+						<h3>List</h3>
+						<form action="<?=BASEURL?>api/transaction/list" method="list">
 							<div class="std_margin">
 								<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
 								<input name="count" type="text" value="10" disabled>
@@ -219,7 +223,7 @@
 						</div>
 
 						<div id="readTrForm" class="test_form">
-						<h3>Read transaction</h3>
+						<h3>Read by ids</h3>
 						<div class="std_margin">
 							<label for="read_trans_id">Id</label>
 							<input id="read_trans_id" type="text">
@@ -230,7 +234,7 @@
 						</div>
 
 						<div id="createTrForm" class="test_form">
-						<h3>Create transaction</h3>
+						<h3>Create</h3>
 						<form action="<?=BASEURL?>api/transaction/create" method="post">
 							<div class="std_margin">
 								<label for="create_trans_type">Type (1-3)</label>
@@ -329,8 +333,8 @@
 						</form>
 						</div>
 
-						<div id="editTrForm" class="test_form">
-						<h3>Edit transaction</h3>
+						<div id="updateTrForm" class="test_form">
+						<h3>Update</h3>
 						<form action="<?=BASEURL?>api/transaction/update" method="post">
 							<div class="std_margin">
 								<label for="update_trans_id">Transaction id</label>
@@ -385,8 +389,8 @@
 						</div>
 
 
-						<div id="editDebtForm" class="test_form">
-						<h3>Edit debt</h3>
+						<div id="updateDebtForm" class="test_form">
+						<h3>Update debt</h3>
 						<form action="<?=BASEURL?>api/transaction/update" method="post">
 							<input name="type" type="hidden" value="4">
 							<div class="std_margin">
@@ -470,9 +474,9 @@
 						</form>
 						</div>
 
-						<div id="getPersonsForm" class="test_form">
-						<h3>Get persons</h3>
-						<form action="<?=BASEURL?>api/person/list" method="get">
+						<div id="listPersonsForm" class="test_form">
+						<h3>List persons</h3>
+						<form action="<?=BASEURL?>api/person/list" method="list">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -503,8 +507,8 @@
 						</form>
 						</div>
 
-						<div id="editPersonForm" class="test_form">
-						<h3>Edit person</h3>
+						<div id="updatePersonForm" class="test_form">
+						<h3>Update person</h3>
 						<form action="<?=BASEURL?>api/person/update" method="post">
 							<div class="std_margin">
 								<label for="update_person_id">Id</label>
@@ -531,9 +535,9 @@
 						</div>
 						</div>
 
-						<div id="getCurrForm" class="test_form">
+						<div id="listCurrForm" class="test_form">
 						<h3>Get currencies</h3>
-						<form action="<?=BASEURL?>api/currency/list" method="get">
+						<form action="<?=BASEURL?>api/currency/list" method="list">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -572,8 +576,8 @@
 						</form>
 						</div>
 
-						<div id="editCurrForm" class="test_form">
-						<h3>Edit currency</h3>
+						<div id="updateCurrForm" class="test_form">
+						<h3>Update currency</h3>
 						<form action="<?=BASEURL?>api/currency/update" method="post">
 							<div class="std_margin">
 								<label for="update_currency_id">Id</label>
@@ -659,7 +663,7 @@
 
 						<div id="readProfileForm" class="test_form">
 						<h3>Read profile</h3>
-						<form action="<?=BASEURL?>api/profile/read" method="get">
+						<form action="<?=BASEURL?>api/profile/read" method="list">
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>

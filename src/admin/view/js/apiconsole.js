@@ -1,8 +1,8 @@
 var activeController = null;
 var activeFormLink = null;
 var activeForm = null;
-
 var clearResultsBtn = null;
+
 
 var api = (function()
 {
@@ -27,8 +27,8 @@ var api = (function()
 			reqText = reqText.substr(baseURL.length);
 
 		reqItem.requestContainer.append(ce('div', { className : 'title', innerText : reqData.method + ' ' + reqText }));
-		if (reqData.postdata)
-			reqItem.requestContainer.append(ce('div', { className : 'req_details', innerText : reqData.postdata }));
+		if (reqData.data)
+			reqItem.requestContainer.append(ce('div', { className : 'req_details', innerText : reqData.data }));
 
 		reqItem.resultContainer = ce('div', { className : 'res_container res_pending', innerText : 'Pending...' });
 
@@ -98,25 +98,104 @@ var api = (function()
 	}
 
 
-	return {
-		get : function(link, callback)
-		{
-			var reqContainer = addRequestItem({ url : link, method : 'GET' });
+	function postData(data)
+	{
+		return urlJoin(data);
+	}
 
-			ajax.get(link, function(text)
+
+	// Check request data is single id case { id : value | [ value ] } 
+	// Return id value if match and false overwise
+	function singleIdData(data)
+	{
+		var keys = Object.keys(data);
+
+		if (keys.length != 1 && keys[0] != 'id')
+			return false;
+
+		if (!Array.isArray(data.id))
+			return data.id;
+
+		if (data.id.length != 1)
+			return false;
+
+		return data.id[0];
+	}
+
+
+	// Convert API request object to request item
+	function getRequestItem(request, isPOST)
+	{
+		if (!isObject(request))
+			throw new Error('Invalid request');
+		if (typeof request.method !== 'string' || !request.method.length)
+			throw new Error('Invalid API request method');
+
+		var prefix = baseURL + 'api/';
+		var res = {
+			url : + request.method
+		};
+
+		if (request.method.indexOf(prefix) === -1)
+			res.url = prefix + request.method;
+		else
+			res.url = request.method;
+
+		if (request.data)
+		{
+			if (isPOST)
 			{
-				ajaxCallback(text, reqContainer, callback);
-			});
+				res.method = 'POST';
+				res.data = postData(request.data);
+			}
+			else
+			{
+				res.method = 'GET';
+				var id = singleIdData(request.data);
+				if (id)
+				{
+					res.url += id;
+				}
+				else
+				{
+					var params = urlJoin(request.data);
+					if (params.length)
+						res.url += '?' + params;
+				}
+			}
+		}
+
+		return res;
+	}
+
+	return {
+		get : function(request, callback)
+		{
+			var requestItem = getRequestItem(request);
+			var reqContainer = addRequestItem(requestItem);
+
+			ajax.get(
+				requestItem.url,
+				function(text)
+				{
+					ajaxCallback(text, reqContainer, callback);
+				}
+			);
 		},
 
-		post : function(link, params, callback)
+		post : function(request, callback)
 		{
-			var reqContainer = addRequestItem({ url : link, method : 'POST', postdata : params });
+			var requestItem = getRequestItem(request, true);
+			var reqContainer = addRequestItem(requestItem);
 
-			ajax.post(link, params, function(text)
-			{
-				ajaxCallback(text, reqContainer, callback);
-			});
+			ajax.post(
+				requestItem.url,
+				requestItem.data,
+				function(text)
+				{
+					ajaxCallback(text, reqContainer, callback);
+				}
+			);
 		}
 	};
 })();
@@ -190,7 +269,7 @@ function clearResults()
 
 function onFormSubmit(e, verifyCallback)
 {
-	var link, els = {}, params;
+	var els = {};
 
 	e = fixEvent(e);
 
@@ -204,20 +283,16 @@ function onFormSubmit(e, verifyCallback)
 			els[formEl.elements[i].name] = formEl.elements[i].value;
 	}
 
+	var request = {
+		method : formEl.action,
+		data : els,
+		verify : verifyCallback
+	};
+
 	if (formEl.method == 'get')
-	{
-		params = urlJoin(els);
-		link = formEl.action;
-		if (params != '')
-			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
-		api.get(link, verifyCallback);
-	}
+		api.get(request);
 	else if (formEl.method == 'post')
-	{
-		params = urlJoin(els);
-		link = formEl.action;
-		api.post(link, params, verifyCallback);
-	}
+		api.post(request);
 
 	return false;
 }
@@ -239,14 +314,21 @@ function onCheck(obj, elName)
 }
 
 
-function csToIds(values)
+// Concatenate specified ids to URL base
+function parseIds(values)
 {
-	if (!values || !values.length)
-		return null;
+	if (typeof values !== 'string' || !values)
+		throw new Error('Invalid values specified');
 
-	var ids = values.split(',');
-	if (!isArray(ids))
-		return null;
+	// Check correctness of ids
+	var ids = values.split(',').map(function(item)
+	{
+		var id = parseInt(item);
+		if (!id || isNaN(id))
+			throw new Error('Wrong id specified');
+
+		return id;
+	});
 
 	return { id : ids };
 }
@@ -436,105 +518,45 @@ function isProfile(obj)
  * Form event handlers
  */
 
+
 function onReadAccountSubmit()
 {
 	var accInp = ge('readaccid');
-
 	if (!accInp)
 		return;
 
-	var link = baseURL + 'api/account/';
-
-	var idsPar = csToIds(accInp.value);
-	if (idsPar)
-		link += '?' + urlJoin(idsPar);
-
-	api.get(link, isAccountsArray);
-}
-
-
-function onCreateAccountSubmit()
-{
-	var nameInp = ge('create_account_name');
-	var initbalanceInput = ge('create_account_initbalance');
-	var currencyInput = ge('create_account_curr');
-	var iconInput = ge('create_account_icon');
-
-	if (!nameInp || !initbalanceInput || !currencyInput || !iconInput)
-		return;
-
-	var link = baseURL + 'api/account/create';
-
-	var params = {};
-
-	params.name = nameInp.value;
-	params.initbalance = initbalanceInput.value;
-	params.curr_id = currencyInput.value;
-	params.icon = iconInput.value;
-
- 	var data = urlJoin(params);
-
-	api.post(link, data, isCreateResult);
-}
-
-
-function onUpdateAccountSubmit()
-{
-	var idInp = ge('update_account_id');
-	var nameInp = ge('update_account_name');
-	var initbalanceInput = ge('update_account_initbalance');
-	var currencyInput = ge('update_account_curr');
-	var iconInput = ge('update_account_icon');
-
-	if (!idInp || !nameInp || !initbalanceInput || !currencyInput || !iconInput)
-		return;
-
-	var link = baseURL + 'api/account/update';
-
-	var params = {};
-
-	params.id = idInp.value;
-	params.name = nameInp.value;
-	params.initbalance = initbalanceInput.value;
-	params.curr_id = currencyInput.value;
-	params.icon = iconInput.value;
-
- 	var data = urlJoin(params);
-
-	api.post(link, data);
+	api.get({
+		method : 'account/',
+		data : parseIds(accInp.value),
+		verify : isAccountsArray
+	});
 }
 
 
 function onDeleteAccountSubmit()
 {
 	var accountsInp = ge('delaccounts');
-
 	if (!accountsInp)
 		return;
 
-	var link = baseURL + 'api/account/delete';
-
-	var idsPar = csToIds(accountsInp.value);
-	data = urlJoin(idsPar);
-
-	api.post(link, data);
+	api.post({
+		method : 'account/delete',
+		data : parseIds(accountsInp.value)
+	});
 }
 
 
 function onCurrencyReadSubmit()
 {
 	var curr_id_inp = ge('read_curr_id');
-
 	if (!curr_id_inp)
 		return;
 
-	var link = baseURL + 'api/currency/';
-
-	var idsPar = csToIds(curr_id_inp.value);
-	if (idsPar)
-		link += '?' + urlJoin(idsPar);
-
-	api.get(link, isCurrenciesArray);
+	api.get({
+		method : 'currency/',
+		data : parseIds(curr_id_inp.value),
+		verify : isCurrenciesArray
+	});
 }
 
 
@@ -544,10 +566,10 @@ function onDeleteCurrencySubmit()
 	if (!id_inp)
 		return;
 
-	var idsPar = csToIds(id_inp.value);
-	var data = urlJoin(idsPar);
-
-	api.post(baseURL + 'api/currency/delete', data);
+	api.post({
+		method : 'currency/delete',
+		data : parseIds(id_inp.value)
+	});
 }
 
 
@@ -557,13 +579,11 @@ function onReadPersonSubmit()
 	if (!id_inp)
 		return;
 
-	var link = baseURL + 'api/person/';
-
-	var idsPar = csToIds(id_inp.value);
-	if (idsPar)
-		link += '?' + urlJoin(idsPar);
-
-	api.get(link, isPersonsArray);
+	api.get({
+		method : 'person/',
+		data : parseIds(id_inp.value),
+		verify : isPersonsArray
+	});
 }
 
 
@@ -573,43 +593,37 @@ function onDeletePersonSubmit()
 	if (!persondInp)
 		return;
 
-	var idsPar = csToIds(persondInp.value);
-	var data = urlJoin(idsPar);
-
-	api.post(baseURL + 'api/person/delete', data);
+	api.post({
+		method : 'person/delete',
+		data : parseIds(persondInp.value)
+	});
 }
 
 
 function onReadTransactionSubmit()
 {
 	var transInp = ge('read_trans_id');
-
 	if (!transInp)
 		return;
 
-	var link = baseURL + 'api/transaction/';
-
-	var idsPar = csToIds(transInp.value);
-	if (idsPar)
-		link += '?' + urlJoin(idsPar);
-
-	api.get(link, isTransactionsArray);
+	api.get({
+		method : 'transaction/',
+		data : parseIds(transInp.value),
+		verify : isTransactionsArray
+	});
 }
 
 
 function onDeleteTransactionSubmit()
 {
 	var transInp = ge('deltransactions');
-
 	if (!transInp)
 		return;
 
-	var link = baseURL + 'api/transaction/delete';
-
-	var idsPar = csToIds(transInp.value);
-	data = urlJoin(idsPar);
-
-	api.post(link, data);
+	api.post({
+		method : 'transaction/delete',
+		data : parseIds(transInp.value)
+	});
 }
 
 
@@ -618,7 +632,6 @@ function initControls()
 	var controllersList = ge('controllersList');
 	if (controllersList)
 		controllersList.onclick = onContrClick;
-
 
 	activeForm = document.querySelector('.test_form.active');
 	activeController = document.querySelector('#controllersList > li.active');
@@ -638,36 +651,41 @@ function initControls()
 /**
  * Accounts
  */
-	var getAccForm = ge('getAccForm');
-	if (!getAccForm)
+	var listAccForm = document.querySelector('#listAccForm > form');
+	if (!listAccForm)
 		throw new Error('Fail to init view');
-	var form = getAccForm.querySelector('form');
-	if (form)
-		form.onsubmit = function(e){ return onFormSubmit(e, isAccountsArray); };
+	listAccForm.onsubmit = function(e){ return onFormSubmit(e, isAccountsArray); };
 
 	var readaccbtn = ge('readaccbtn');
 	if (readaccbtn)
 		readaccbtn.onclick = onReadAccountSubmit;
 
-	var accbtn = ge('accbtn');
-	if (accbtn)
-		accbtn.onclick = onCreateAccountSubmit;
+	var createAccForm = document.querySelector('#createAccForm > form');
+	if (!createAccForm)
+		throw new Error('Fail to init view');
+	createAccForm.onsubmit = function(e){ return onFormSubmit(e, isCreateResult); };
 
-	var updaccbtn = ge('updaccbtn');
-	if (updaccbtn)
-		updaccbtn.onclick = onUpdateAccountSubmit;
+	var updateAccForm = document.querySelector('#updateAccForm > form');
+	if (!updateAccForm)
+		throw new Error('Fail to init view');
+	updateAccForm.onsubmit = onFormSubmit;
 
 	var delaccbtn = ge('delaccbtn');
 	if (delaccbtn)
 		delaccbtn.onclick = onDeleteAccountSubmit;
 
+	var resetAccForm = document.querySelector('#resetAccForm > form');
+	if (!resetAccForm)
+		throw new Error('Fail to init view');
+	resetAccForm.onsubmit = onFormSubmit;
+
 /**
  * Persons
  */
-	var getPersonsForm = document.querySelector('#getPersonsForm > form');
-	if (!getPersonsForm)
+	var listPersonsForm = document.querySelector('#listPersonsForm > form');
+	if (!listPersonsForm)
 		throw new Error('Fail to init view');
-	getPersonsForm.onsubmit = function(e){ return onFormSubmit(e, isPersonsArray); };
+	listPersonsForm.onsubmit = function(e){ return onFormSubmit(e, isPersonsArray); };
 
 	var readpersonbtn = ge('readpersonbtn');
 	if (readpersonbtn)
@@ -678,10 +696,10 @@ function initControls()
 		throw new Error('Fail to init view');
 	createPersonForm.onsubmit = function (e) { return onFormSubmit(e, isCreateResult); };
 
-	var editPersonForm = document.querySelector('#editPersonForm > form');
-	if (!editPersonForm)
+	var updatePersonForm = document.querySelector('#updatePersonForm > form');
+	if (!updatePersonForm)
 		throw new Error('Fail to init view');
-	editPersonForm.onsubmit = onFormSubmit;
+		updatePersonForm.onsubmit = onFormSubmit;
 
 	var delpersonbtn = ge('delpersonbtn');
 	if (delpersonbtn)
@@ -690,10 +708,10 @@ function initControls()
 /**
  * Transactions
  */
-	var getTrForm = document.querySelector('#getTrForm > form');
-	if (!getTrForm)
+	var listTrForm = document.querySelector('#listTrForm > form');
+	if (!listTrForm)
 		throw new Error('Fail to init view');
-	getTrForm.onsubmit = function(e){ return onFormSubmit(e, isTransactionsArray); };
+	listTrForm.onsubmit = function(e){ return onFormSubmit(e, isTransactionsArray); };
 
 	var readtransbtn = ge('readtransbtn');
 	if (readtransbtn)
@@ -709,15 +727,15 @@ function initControls()
 		throw new Error('Fail to init view');
 	createDebtForm.onsubmit = function(e){ return onFormSubmit(e, isCreateResult); };
 
-	var editTrForm = document.querySelector('#editTrForm > form');
-	if (!editTrForm)
+	var updateTrForm = document.querySelector('#updateTrForm > form');
+	if (!updateTrForm)
 		throw new Error('Fail to init view');
-	editTrForm.onsubmit = onFormSubmit;
+	updateTrForm.onsubmit = onFormSubmit;
 
-	var editDebtForm = document.querySelector('#editDebtForm > form');
-	if (!editDebtForm)
+	var updateDebtForm = document.querySelector('#updateDebtForm > form');
+	if (!updateDebtForm)
 		throw new Error('Fail to init view');
-	editDebtForm.onsubmit = onFormSubmit;
+	updateDebtForm.onsubmit = onFormSubmit;
 
 	var deltransbtn = ge('deltransbtn');
 	if (deltransbtn)
@@ -728,11 +746,10 @@ function initControls()
 		throw new Error('Fail to init view');
 	setTrPosForm.onsubmit = onFormSubmit;
 
-
 /**
  * Currencies
  */
-	var getCurrForm = document.querySelector('#getCurrForm > form');
+	var getCurrForm = document.querySelector('#listCurrForm > form');
 	if (!getCurrForm)
 		throw new Error('Fail to init view');
 	getCurrForm.onsubmit = function(e){ return onFormSubmit(e, isCurrenciesArray); };
@@ -746,10 +763,10 @@ function initControls()
 		throw new Error('Fail to init view');
 	createCurrForm.onsubmit = function(e){ return onFormSubmit(e, isCreateResult); };
 
-	var editCurrForm = document.querySelector('#editCurrForm > form');
-	if (!editCurrForm)
+	var updateCurrForm = document.querySelector('#updateCurrForm > form');
+	if (!updateCurrForm)
 		throw new Error('Fail to init view');
-	editCurrForm.onsubmit = onFormSubmit;
+	updateCurrForm.onsubmit = onFormSubmit;
 
 	var delcurrbtn = ge('delcurrbtn');
 	if (delcurrbtn)
