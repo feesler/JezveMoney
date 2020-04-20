@@ -1,111 +1,130 @@
-import { test } from '../common.js';
+import { test, setParam } from '../common.js';
 import { PersonsView } from '../view/persons.js';
 import { MainView } from '../view/main.js';
+import { App } from '../app.js';
 
 
-export const runPersons =
-{
+
 	// From persons list view go to new person view, input name and submit
 	// Next check name result and callback
-	async create(personName)
+	export async function create(params)
 	{
 		// Navigate to create person view
-		if (!(this.view instanceof PersonsView))
+		if (!(App.view instanceof PersonsView))
 		{
-			await this.goToMainView();
-			await this.view.goToPersons();
+			await App.goToMainView();
+			await App.view.goToPersons();
 		}
-		await this.view.goToCreatePerson();
+		await App.view.goToCreatePerson();
 
-		let expectedPerson = { name : personName };
-		this.state.createPerson(expectedPerson);
-		
-		await this.view.createPerson(personName);
+		App.state.createPerson(params);
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
-		await test(`Create person (${personName})`, () => {}, this.view);
-	},
+		await App.view.createPerson(params.name);
+
+		App.view.expectedState = { values : App.state.renderPersonsWidget(App.state.persons.data, false) };
+		await test(`Create person ({ name : ${params.name} })`, () => {}, App.view);
+
+		await App.state.fetch();
+	}
 
 
-	async update(num, personName)
+	export async function update(params)
 	{
-		// Navigate to update person view
-		if (!(this.view instanceof PersonsView))
-		{
-			await this.goToMainView();
-			await this.view.goToPersons();
-		}
-		await this.view.goToUpdatePerson(num);
+		if (!params)
+			throw new Error('No params specified');
 
-		let expectedPerson = this.state.persons.getItemByIndex(num);
+		let pos;
+		if ('id' in params)
+		{
+			pos = App.state.persons.getIndexOf(params.id);
+		}
+		else
+		{
+			pos = parseInt(params.pos);
+			if (isNaN(pos))
+				throw new Error('Position of person not specified');
+			delete params.pos;
+		}
+
+		// Navigate to update person view
+		if (!(App.view instanceof PersonsView))
+		{
+			await App.goToMainView();
+			await App.view.goToPersons();
+		}
+		await App.view.goToUpdatePerson(pos);
+
+		let expectedPerson = App.state.persons.getItemByIndex(pos);
 		if (!expectedPerson)
 			throw new Error('Can not find specified person');
 
-		this.view.expectedState = { visibility : { name : true },
+		App.view.expectedState = { visibility : { name : true },
 	 								values : { name : expectedPerson.name } };
-		await test('Update person view state', () => {}, this.view);
+		await test('Update person view state', () => {}, App.view);
 
-		await this.view.inputName(personName);
+		await App.view.inputName(params.name);
 
-		await this.view.navigation(() => this.view.click(this.view.content.submitBtn));
+		await App.view.navigation(() => App.view.click(App.view.content.submitBtn));
 
 		// Check updates in the person tiles
-		expectedPerson.name = personName;
-		this.state.updatePerson(expectedPerson);
+		setParam(expectedPerson, params);
+		App.state.updatePerson(expectedPerson);
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
-		await test(`Update person [${num}]`, () => {}, this.view);
-	},
+		App.view.expectedState = { values : App.state.renderPersonsWidget(App.state.persons.data, false) };
+		await test(`Update person [${pos}]`, () => {}, App.view);
+
+		await App.state.fetch();
+	}
 
 
-	async del(persons)
+	export async function del(persons)
 	{
 		// Navigate to persons list view
-		if (!(this.view instanceof PersonsView))
+		if (!(App.view instanceof PersonsView))
 		{
-			await this.goToMainView();
-			await this.view.goToPersons();
+			await App.goToMainView();
+			await App.view.goToPersons();
 		}
 
 		// Prepare expected updates of persons list
-		this.state.deletePersons(this.state.persons.positionsToIds(persons));
+		App.state.deletePersons(App.state.persons.positionsToIds(persons));
 
-		await this.view.deletePersons(persons);
+		await App.view.deletePersons(persons);
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
-		await test('Delete persons [' + persons.join() + ']', () => {}, this.view);
-	},
+		App.view.expectedState = { values : App.state.renderPersonsWidget(App.state.persons.data, false) };
+		await test('Delete persons [' + persons.join() + ']', () => {}, App.view);
+
+		await App.state.fetch();
+	}
 
 
-	async delFromUpdate(pos)
+	export async function delFromUpdate(pos)
 	{
 		pos = parseInt(pos);
 		if (isNaN(pos) || pos < 0)
 			throw new Error('Position of person not specified');
 
-		this.view.setBlock(`Delete person from update view [${pos}]`, 2);
+		App.view.setBlock(`Delete person from update view [${pos}]`, 2);
 
-		if (!(this.view instanceof PersonsView))
+		if (!(App.view instanceof PersonsView))
 		{
-			if (!(this.view instanceof MainView))
-				await this.goToMainView();
-			await this.view.goToPersons();
+			if (!(App.view instanceof MainView))
+				await App.goToMainView();
+			await App.view.goToPersons();
 		}
 
-		this.state.deletePersons(this.state.persons.positionsToIds(pos));
+		App.state.deletePersons(App.state.persons.positionsToIds(pos));
 
-		await this.view.goToUpdatePerson(pos);
-		await this.view.deleteSelfItem();
+		await App.view.goToUpdatePerson(pos);
+		await App.view.deleteSelfItem();
 
-		this.view.expectedState = { values : this.state.renderPersonsWidget(this.state.persons.data, false) };
-		await test(`Delete person [${pos}]`, () => {}, this.view);
+		App.view.expectedState = { values : App.state.renderPersonsWidget(App.state.persons.data, false) };
+		await test(`Delete person [${pos}]`, () => {}, App.view);
 
-		await this.goToMainView();
+		await App.goToMainView();
 
-		this.view.expectedState = this.state.render();
-		await test('Main page widgets update', () => {}, this.view);
+		App.view.expectedState = App.state.render();
+		await test('Main page widgets update', () => {}, App.view);
 
-		await this.run.transactions.checkData('List of transactions update', this.state.transactions);
+		await App.state.fetchAndTest();
 	}
-};
-

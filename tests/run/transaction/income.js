@@ -1,6 +1,5 @@
 import { api } from '../../api.js';
-import { runTransactionsCommon } from './common.js'
-import { TransactionsList } from '../../model/transactionslist.js'
+import * as TransactionTests from './common.js'
 import { Currency } from '../../model/currency.js';
 import { test } from '../../common.js'
 import { INCOME } from '../../model/transaction.js';
@@ -8,15 +7,13 @@ import { IncomeTransactionView } from '../../view/transaction/income.js'
 import { App } from '../../app.js';
 
 
-export const runIncome =
-{
-	async submit(params)
+	export async function submit(params)
 	{
-		let view = this.view;
+		let view = App.view;
 
 		if ('destAcc' in params)
 		{
-			let acc = this.state.accounts.getItemByIndex(params.destAcc);
+			let acc = App.state.accounts.getItemByIndex(params.destAcc);
 			if (!acc)
 				throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -53,35 +50,31 @@ export const runIncome =
 		await view.submit();
 
 		return res;
-	},
+	}
 
 
-	async create(params)
+	export async function create(params)
 	{
-		let scope = this.run.transactions;
-
-		await scope.create(INCOME, params, scope.income.submit);
-	},
+		await TransactionTests.create(INCOME, params, params => submit(params));
+	}
 
 
 	// Update income transaction and check results
-	async update(params)
+	export async function update(params)
 	{
-		let scope = this.run.transactions;
-
-		await scope.update(INCOME, params, async (params) =>
+		await TransactionTests.update(INCOME, params, async (params) =>
 		{
-			let origTransaction = this.view.getExpectedTransaction();
+			let origTransaction = App.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-			await test('Initial state of update income view', () => this.view.setExpectedState(isDiff ? 2 : 0), this.view);
+			await test('Initial state of update income view', () => App.view.setExpectedState(isDiff ? 2 : 0), App.view);
 
-			return scope.income.submit(params);
+			return submit(params);
 		});
-	},
+	}
 
 
-	async stateLoop()
+	export async function stateLoop()
 	{
 		const RUB = 1;
 		const USD = 2;
@@ -90,20 +83,19 @@ export const runIncome =
 		const ACC_RUB = 1;
 		const ACC_USD = 2;
 		const ACC_EUR = 3;
-		const CARD_RUB = 4;
 
 		await App.state.fetch();
 
 	// Navigate to create income view
-		if (!(this.view instanceof IncomeTransactionView))
+		if (!(App.view instanceof IncomeTransactionView))
 		{
-			await this.goToMainView();
-			await this.view.goToNewTransactionByAccount(0);
-			if (this.view.content.typeMenu.activeType != INCOME)
-				await this.view.changeTransactionType(INCOME);
+			await App.goToMainView();
+			await App.view.goToNewTransactionByAccount(0);
+			if (App.view.content.typeMenu.activeType != INCOME)
+				await App.view.changeTransactionType(INCOME);
 		}
 
-		let view = this.view;
+		let view = App.view;
 
 	// State 0
 		view.setBlock('Income loop', 2);
@@ -217,5 +209,4 @@ export const runIncome =
 		await view.clickDestResultBalance();			// move from State 2 to State 4
 		await test('(22) Change source currency to RUB', () => view.changeSourceCurrency(RUB), view);
 	}
-};
 

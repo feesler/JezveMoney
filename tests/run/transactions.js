@@ -1,6 +1,8 @@
 import { api } from '../api.js';
+import { App } from '../app.js';
+import { checkData } from './transaction/common.js';
 import { test, convDate, copyObject } from '../common.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT } from '../model/transaction.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, Transaction } from '../model/transaction.js';
 
 
 const RUB = 1;
@@ -59,19 +61,17 @@ let debtsList = [
 ];
 
 
-export const runTransList =
-{
-	async setupAccounts(list)
+	async function setupAccounts(list)
 	{
 		let res = [];
 
 		for(let params of list)
 		{
-			let acc = this.state.accounts.findByName(params.name);
+			let acc = App.state.accounts.findByName(params.name);
 			if (!acc)
 			{
 				acc = await api.account.create(params);
-				this.state.createAccount(params);
+				App.state.createAccount(params);
 			}
 
 			if (acc)
@@ -79,20 +79,20 @@ export const runTransList =
 		}
 
 		return res;
-	},
+	}
 
 
-	async setupPersons(list)
+	async function setupPersons(list)
 	{
 		let res = [];
 
 		for(let params of list)
 		{
-			let pers = this.state.persons.findByName(params.name);
+			let pers = App.state.persons.findByName(params.name);
 			if (!pers)
 			{
 				pers = await api.person.create(params);
-				this.state.createPerson(params);
+				App.state.createPerson(params);
 			}
 
 			if (pers)
@@ -100,10 +100,10 @@ export const runTransList =
 		}
 
 		return res;
-	},
+	}
 
 
-	populateTransactions(list, convertFunc)
+	function populateTransactions(list, convertFunc)
 	{
 		let res = [];
 
@@ -116,7 +116,7 @@ export const runTransList =
 		for(let props of list)
 		{
 			let convertedProps = convertFunc(props);
-			for(let date of this.dateList)
+			for(let date of App.dateList)
 			{
 				convertedProps.date = date;
 				res.push(copyObject(convertedProps));
@@ -124,76 +124,72 @@ export const runTransList =
 		}
 
 		return res;
-	},
+	}
 
 
-	async preCreateData()
+	async function preCreateData()
 	{
-		let scope = this.run.transactions.list;
-
 		console.log('Precreate data...');
 
 		await api.user.login('test', 'test');
-		await this.state.fetch();
+		await App.state.fetch();
 
-		accIds = await scope.setupAccounts(accountsList);
-		personIds = await scope.setupPersons(personsList);
+		accIds = await setupAccounts(accountsList);
+		personIds = await setupPersons(personsList);
 
 		// Expense transactions
-		let created = scope.populateTransactions(expensesList, props =>
+		let created = populateTransactions(expensesList, props =>
 		{
 			props.src_id = accIds[props.src_id];
-			return this.run.transactions.expenseTransaction(props);
+			return Transaction.expense(props, App.state);
 		});
 		newExpenses.push(...created);
 
 		// Income transactions
-		created = scope.populateTransactions(incomesList, props =>
+		created = populateTransactions(incomesList, props =>
 			{
 				props.dest_id = accIds[props.dest_id];
-				return this.run.transactions.incomeTransaction(props);
+				return Transaction.income(props, App.state);
 			});
 		newIncomes.push(...created);
 
 		// Transfer transactions
-		created = scope.populateTransactions(transfersList, props =>
+		created = populateTransactions(transfersList, props =>
 			{
 				props.src_id = accIds[props.src_id];
 				props.dest_id = accIds[props.dest_id];
-				return this.run.transactions.transferTransaction(props);
+				return Transaction.transfer(props, App.state);
 			});
 		newTransfers.push(...created);
 
 		// Debt transactions
-		created = scope.populateTransactions(debtsList, props =>
+		created = populateTransactions(debtsList, props =>
 			{
 				props.person_id = personIds[props.person_id];
 				props.acc_id = (props.acc_id) ? accIds[props.acc_id] : 0;
-				return this.run.transactions.debtTransaction(props);
+				return Transaction.debt(props, App.state);
 			});
 		newDebts.push(...created);
 
 		let multi = [].concat(newExpenses, newIncomes, newTransfers, newDebts);
 		await api.transaction.createMultiple(multi);
 
-		await this.state.fetch();
+		await App.state.fetch();
 
 		console.log('Done');
-	},
+	}
 
 
-	async run()
+	export async function run()
 	{
-		let scope = this.run.transactions;
+		App.view.setBlock('Transaction List view', 1);
 
-		this.view.setBlock('Transaction List view', 1);
+		await preCreateData();
 
-		await scope.list.preCreateData();
+		let allTrList = App.state.transactions;
 
-		let allTrList = this.state.transactions;
-
-		await this.goToMainView();
-		await this.view.goToTransactions();
+		await App.goToMainView();
+		await App.view.goToTransactions();
 
 		// Filter all transactions with account acc_2
 		let acc_2_all = allTrList.filterByAccounts(accIds[2]);
@@ -202,7 +198,7 @@ export const runTransList =
 
 		// Filter transactions with account acc_2 over the week
 		// Prepare date range for week
-		let now = new Date(convDate(this.dates.now));
+		let now = new Date(convDate(App.dates.now));
 		let day1 = now.getDate();
 		let day2;
 		if (day1 > 22)
@@ -230,20 +226,20 @@ export const runTransList =
 									modeSelector : { listMode : { isActive : true },
 														detailsMode : { isActive : false } } } };
 
-		await test('Initial state of transaction list view', () => {}, this.view, state);
+		await test('Initial state of transaction list view', () => {}, App.view, state);
 
 		state.values.paginator.active = 2;
-		await this.view.goToNextPage();
-		await test('Navigate to page 2', () => {}, this.view, state);
+		await App.view.goToNextPage();
+		await test('Navigate to page 2', () => {}, App.view, state);
 
 		state.values.modeSelector.detailsMode.isActive = true;
 		state.values.modeSelector.listMode.isActive = false;
-		await this.view.setDetailsMode();
-		await test('Change list mode to details', () => {}, this.view, state);
+		await App.view.setDetailsMode();
+		await test('Change list mode to details', () => {}, App.view, state);
 
 		state.values.paginator.active = 3;
-		await this.view.goToNextPage();
-		await test('Navigate to page 3', () => {}, this.view, state);
+		await App.view.goToNextPage();
+		await test('Navigate to page 3', () => {}, App.view, state);
 
 		// Expense
 		let allExpenses = allTrList.filterByType(EXPENSE);
@@ -251,64 +247,62 @@ export const runTransList =
 		state.values.typeMenu.activeType = EXPENSE;
 		state.values.paginator.active = 1;
 		state.values.paginator.pages = allExpenses.expectedPages();
-		await this.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Expense', () => {}, this.view, state);
-		await scope.checkData('Correctness of transaction list', allExpenses, true);
+		await App.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Expense', () => {}, App.view, state);
+		await checkData('Correctness of transaction list', allExpenses, true);
 
 		// Income
 		let allIncomes = allTrList.filterByType(INCOME);
 
 		state.values.typeMenu.activeType = INCOME;
 		state.values.paginator.pages = allIncomes.expectedPages();
-		await this.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Income', () => {}, this.view, state);
-		await scope.checkData('Correctness of transaction list', allIncomes, true);
+		await App.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Income', () => {}, App.view, state);
+		await checkData('Correctness of transaction list', allIncomes, true);
 
 		// Transfer
 		let allTransfers = allTrList.filterByType(TRANSFER);
 
 		state.values.typeMenu.activeType = TRANSFER;
 		state.values.paginator.pages = allTransfers.expectedPages();
-		await this.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Transfer', () => {}, this.view, state);
-		await scope.checkData('Correctness of transaction list', allTransfers, true);
+		await App.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Transfer', () => {}, App.view, state);
+		await checkData('Correctness of transaction list', allTransfers, true);
 
 		// Debt
 		let allDebts = allTrList.filterByType(DEBT);
 
 		state.values.typeMenu.activeType = DEBT;
 		state.values.paginator.pages = allDebts.expectedPages();
-		await this.view.filterByType(state.values.typeMenu.activeType);
-		await test('Filter by Debt', () => {}, this.view, state);
-		await scope.checkData('Correctness of transaction list', allDebts, true);
+		await App.view.filterByType(state.values.typeMenu.activeType);
+		await test('Filter by Debt', () => {}, App.view, state);
+		await checkData('Correctness of transaction list', allDebts, true);
 
 		// Filter by account 2 and debt
 		state.values.paginator.pages = acc_2_debts.expectedPages();
-		await this.view.filterByAccounts(accIds[2]);
-		await test('Filter by accounts', () => {}, this.view, state);
-		await scope.checkData('Correctness of transaction list', acc_2_debts, true);
+		await App.view.filterByAccounts(accIds[2]);
+		await test('Filter by accounts', () => {}, App.view, state);
+		await checkData('Correctness of transaction list', acc_2_debts, true);
 
 		// Filter by account 2 and all types of transaction
 		state.values.typeMenu.activeType = 0;
 		state.values.paginator.pages = acc_2_all.expectedPages();
-		await this.view.filterByType(state.values.typeMenu.activeType);
-		await test('Show all transactions of account', () => {}, this.view, state);
-		await scope.checkData('Correctness of transaction list', acc_2_all, true);
+		await App.view.filterByType(state.values.typeMenu.activeType);
+		await test('Show all transactions of account', () => {}, App.view, state);
+		await checkData('Correctness of transaction list', acc_2_all, true);
 
 		// Filter by account 2 and last week date
 		state.values.paginator.pages = acc_2_week.expectedPages();
-		await this.view.selectDateRange(day1, day2);
-		await test('Select date range', () => {}, this.view, state);
+		await App.view.selectDateRange(day1, day2);
+		await test('Select date range', () => {}, App.view, state);
 
-		await scope.checkData('Correctness of transaction list', acc_2_week, true);
+		await checkData('Correctness of transaction list', acc_2_week, true);
 
 		// Search '1'
 		state.values.paginator.pages = acc_2_query.expectedPages();
 		state.values.searchForm.value = '1';
-		await this.view.search(state.values.searchForm.value);
-		await test('Search', () => {}, this.view, state);
+		await App.view.search(state.values.searchForm.value);
+		await test('Search', () => {}, App.view, state);
 
-		await scope.checkData('Correctness of transaction list', acc_2_query, true);
+		await checkData('Correctness of transaction list', acc_2_query, true);
 	}
-};
-

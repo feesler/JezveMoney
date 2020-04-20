@@ -1,17 +1,13 @@
-import { api } from '../../api.js';
-import { runTransactionsCommon } from './common.js'
-import { TransactionsList } from '../../model/transactionslist.js'
+import * as TransactionTests from './common.js'
 import { test } from '../../common.js'
 import { DEBT } from '../../model/transaction.js';
 import { DebtTransactionView } from '../../view/transaction/debt.js'
 import { App } from '../../app.js';
 
 
-export const runDebt =
-{
-	async submit(params)
+	export async function submit(params)
 	{
-		let view = this.view;
+		let view = App.view;
 
 		if ('acc' in params)
 		{
@@ -30,7 +26,7 @@ export const runDebt =
 					await test('Enable account', () => view.toggleAccount(), view);
 				}
 
-				let acc = this.state.accounts.getItemByIndex(params.acc);
+				let acc = App.state.accounts.getItemByIndex(params.acc);
 				if (!acc)
 					throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -41,7 +37,7 @@ export const runDebt =
 
 		if ('person' in params)
 		{
-			let person = this.state.persons.getItemByIndex(params.person);
+			let person = App.state.persons.getItemByIndex(params.person);
 			if (!person)
 				throw new Error('Person (' + params.person + ') not found');
 
@@ -79,44 +75,40 @@ export const runDebt =
 		await view.submit();
 
 		return res;
-	},
+	}
 
 
-	async create(params)
+	export async function create(params)
 	{
-		let scope = this.run.transactions;
-
-		await scope.create(DEBT, params, async (params) =>
+		await TransactionTests.create(DEBT, params, async (params) =>
 		{
-			let expectedTransaction = await scope.debt.submit(params);
+			let expectedTransaction = await submit(params);
 
 			return expectedTransaction;
 		});
-	},
+	}
 
 
-	async update(params)
+	export async function update(params)
 	{
-		let scope = this.run.transactions;
-
-		await scope.update(DEBT, params, async (params) =>
+		await TransactionTests.update(DEBT, params, async (params) =>
 		{
 			let expState;
-			if (this.view.model.noAccount)
-				expState = (this.view.model.debtType) ? 6 : 7;
+			if (App.view.model.noAccount)
+				expState = (App.view.model.debtType) ? 6 : 7;
 			else
-				expState = (this.view.model.debtType) ? 0 : 3;
+				expState = (App.view.model.debtType) ? 0 : 3;
 
-			await test('Initial state of update debt view', () => this.view.setExpectedState(expState), this.view);
+			await test('Initial state of update debt view', () => App.view.setExpectedState(expState), App.view);
 
-			let expectedTransaction = await scope.debt.submit(params);
+			let expectedTransaction = await submit(params);
 
 			return expectedTransaction;
 		});
-	},
+	}
 
 
-	async stateLoop()
+	export async function stateLoop()
 	{
 		const ACC_3 = 0;
 		const ACC_RUB = 1;
@@ -129,15 +121,15 @@ export const runDebt =
 		await App.state.fetch();
 
 	// Navigate to create income view
-		if (!(this.view instanceof DebtTransactionView))
+		if (!(App.view instanceof DebtTransactionView))
 		{
-			await this.goToMainView();
-			await this.view.goToNewTransactionByAccount(0);
-			if (this.view.content.typeMenu.activeType != DEBT)
-				await this.view.changeTransactionType(DEBT);
+			await App.goToMainView();
+			await App.view.goToNewTransactionByAccount(0);
+			if (App.view.content.typeMenu.activeType != DEBT)
+				await App.view.changeTransactionType(DEBT);
 		}
 
-		let view = this.view;
+		let view = App.view;
 
 		view.setBlock('Debt loop', 2);
 		await test('Initial state of new debt view', async () => view.setExpectedState(0), view);
@@ -340,6 +332,3 @@ export const runDebt =
 		await view.toggleDebtType();			// move from State 2 to State 5
 		await test('(50) Disable account', () => view.toggleAccount(), view);
 	}
-
-};
-

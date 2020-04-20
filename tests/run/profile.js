@@ -1,34 +1,31 @@
 import { LoginView } from '../view/login.js';
-import { RegisterView } from '../view/register.js';
-import { MainView } from '../view/main.js';
-import { setParam, test, formatDate, checkObjValue } from '../common.js';
+import { test } from '../common.js';
 import { api } from '../api.js';
+import { App } from '../app.js';
 
 
-export const runProfile =
-{
-	async relogin(userObj)
+	export async function relogin(userObj)
 	{
 		if (!userObj || !userObj.login || !userObj.password)
 			throw new Error('Wrong user object');
 
-		if (this.view.isUserLoggedIn())
+		if (App.view.isUserLoggedIn())
 		{
-			await this.view.logoutUser();
+			await App.view.logoutUser();
 		}
 
-		if (!(this.view instanceof LoginView))
+		if (!(App.view instanceof LoginView))
 			throw new Error('Wrong page');
 
-		await this.view.loginAs(userObj.login, userObj.password);
-		this.view.expectedState = { msgPopup : null };
-		await test('Test user login', () => {}, this.view);
+		await App.view.loginAs(userObj.login, userObj.password);
+		App.view.expectedState = { msgPopup : null };
+		await test('Test user login', () => {}, App.view);
 
-		await this.state.fetch();
-	},
+		await App.state.fetch();
+	}
 
 
-	async register(userObj)
+	export async function register(userObj)
 	{
 		if (!userObj || !userObj.login || !userObj.name || !userObj.password)
 			throw new Error('Wrong user object');
@@ -39,143 +36,139 @@ export const runProfile =
 		if (apiUser)
 			await api.user.del(apiUser.id);
 
-		if (this.view.isUserLoggedIn())
+		if (App.view.isUserLoggedIn())
 		{
-			await this.view.logoutUser();
+			await App.view.logoutUser();
 		}
 
-		if (!(this.view instanceof LoginView))
+		if (!(App.view instanceof LoginView))
 			throw new Error('Unexpected page');
 
-		await this.view.goToRegistration();
+		await App.view.goToRegistration();
 
-		await this.view.registerAs(userObj.login, userObj.name, userObj.password);
-		this.view.expectedState = { msgPopup : { success : true, message : 'You successfully registered.' } };
+		await App.view.registerAs(userObj.login, userObj.name, userObj.password);
+		App.view.expectedState = { msgPopup : { success : true, message : 'You successfully registered.' } };
 
-		await test('User registration', () => {}, this.view);
-		await this.view.closeNotification();
+		await test('User registration', () => {}, App.view);
+		await App.view.closeNotification();
 
-		await this.view.loginAs(userObj.login, userObj.password);
-		this.view.expectedState = { msgPopup : null };
-		await test('Login with new account', () => {}, this.view);
+		await App.view.loginAs(userObj.login, userObj.password);
+		App.view.expectedState = { msgPopup : null };
+		await test('Login with new account', () => {}, App.view);
 
-		await this.state.fetch();
-	},
+		await App.state.fetch();
+	}
 
 
-	async resetAccounts()
+	export async function resetAccounts()
 	{
-		this.state.resetAccounts();
+		App.state.resetAccounts();
 
-		await this.view.goToProfile();
-		await this.view.resetAccounts();
+		await App.view.goToProfile();
+		await App.view.resetAccounts();
 
-		this.view.expectedState = { msgPopup : { success : true, message : 'Accounts successfully reseted' } };
-		await test('Reset accounts data', () => {}, this.view);
+		App.view.expectedState = { msgPopup : { success : true, message : 'Accounts successfully reseted' } };
+		await test('Reset accounts data', () => {}, App.view);
 
-		await this.view.closeNotification();
-		await this.goToMainView();
+		await App.view.closeNotification();
+		await App.goToMainView();
 
-		this.view.expectedState = this.state.render();
-		await test('Main view update', () => {}, this.view);
-	},
+		App.view.expectedState = App.state.render();
+		await test('Main view update', () => {}, App.view);
+	}
 
 
-	async resetAll()
+	export async function resetAll()
 	{
-		this.state.resetAll();
+		App.state.resetAll();
 
-		await this.view.goToProfile();
-		await this.view.resetAll();
+		await App.view.goToProfile();
+		await App.view.resetAll();
 
-		this.view.expectedState = { msgPopup : { success : true, message : 'All data successfully reseted.' } };
-		await test('Reset all data', () => {}, this.view);
+		App.view.expectedState = { msgPopup : { success : true, message : 'All data successfully reseted.' } };
+		await test('Reset all data', () => {}, App.view);
 
-		await this.view.closeNotification();
-		await this.goToMainView();
+		await App.view.closeNotification();
+		await App.goToMainView();
 
-		this.view.expectedState = this.state.render();
-		await test('Main view update', () => {}, this.view);
-	},
+		App.view.expectedState = App.state.render();
+		await test('Main view update', () => {}, App.view);
+	}
 
 
-	async changeName()
+	export async function changeName()
 	{
-		await this.view.goToProfile();
+		await App.view.goToProfile();
 
 		await test('Change name', async () =>
 		{
 			let newName = '^^&&>>';
 
-			if (this.view.header.user.name == newName)
+			if (App.view.header.user.name == newName)
 				newName += ' 1';
 
-			await this.view.changeName(newName);
+			await App.view.changeName(newName);
 
-			this.view.expectedState = {
+			App.view.expectedState = {
 				msgPopup : { success : true, message : 'User name successfully updated.' },
 				header : { user : { name : newName } }
 			};
-		}, this.view);
-		await this.view.closeNotification();
+		}, App.view);
+		await App.view.closeNotification();
 
 		await test('Change name back', async () =>
 		{
 			let newName = 'Tester';
-			await this.view.changeName(newName);
+			await App.view.changeName(newName);
 
-			this.view.expectedState = {
+			App.view.expectedState = {
 				msgPopup : { success : true, message : 'User name successfully updated.' },
 				header : { user : { name : newName } }
 			};
-		}, this.view);
-		await this.view.closeNotification();
-	},
+		}, App.view);
+		await App.view.closeNotification();
+	}
 
 
-	async changePass()
+	export async function changePass()
 	{
-		let scope = this.run.profile;
-
-		await this.view.goToProfile();
+		await App.view.goToProfile();
 
 		let newPass = '123';
 		await test('Change password', async () =>
 		{
-			await this.view.changePassword(this.config.testUser.password, newPass);
-			this.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
-		}, this.view);
-		await this.view.closeNotification();
+			await App.view.changePassword(App.config.testUser.password, newPass);
+			App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
+		}, App.view);
+		await App.view.closeNotification();
 
 		await test('Login with new password', async () =>
 		{
-			await scope.relogin({ login : this.config.testUser.login, password : newPass });
-			await this.view.goToProfile();
+			await relogin({ login : App.config.testUser.login, password : newPass });
+			await App.view.goToProfile();
 
 			return true;
-		}, this.environment);
+		}, App.environment);
 
 		await test('Change password back', async () =>
 		{
-			await this.view.changePassword(newPass, this.config.testUser.password);
-			this.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
-		}, this.view);
-		await this.view.closeNotification();
+			await App.view.changePassword(newPass, App.config.testUser.password);
+			App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
+		}, App.view);
+		await App.view.closeNotification();
 
-		await scope.relogin(this.config.testUser);
-		await this.view.goToProfile();
-	},
-
-
-	async deleteProfile()
-	{
-		await this.view.goToProfile();
-
-		await this.view.deleteProfile();
-		this.view.expectedState = { msgPopup : { success : true, message : 'Your profile is successfully deleted.' } };
-		await test('Delete profile', () => {}, this.view);
-
-		await this.view.closeNotification();
+		await relogin(App.config.testUser);
+		await App.view.goToProfile();
 	}
-};
 
+
+	export async function deleteProfile()
+	{
+		await App.view.goToProfile();
+
+		await App.view.deleteProfile();
+		App.view.expectedState = { msgPopup : { success : true, message : 'Your profile is successfully deleted.' } };
+		await test('Delete profile', () => {}, App.view);
+
+		await App.view.closeNotification();
+	}

@@ -4,7 +4,8 @@ import {
 	isObject,
 	copyObject,
 	setParam,
-	checkObjValue
+	checkObjValue,
+	test
 } from './common.js';
 import { EXPENSE, INCOME, TRANSFER, DEBT, availTransTypes } from './model/transaction.js';
 import { App } from './app.js';
@@ -29,21 +30,41 @@ export class AppState
 	{
 		let newState = await api.state.read();
 
+		this.setState(newState);
+	}
+
+
+	setState(state)
+	{
 		if (!this.accounts)
 			this.accounts = new AccountsList;
-		this.accounts.data = newState.accounts.data;
-		this.accounts.autoincrement = newState.accounts.autoincrement;
+		this.accounts.data = state.accounts.data;
+		this.accounts.autoincrement = state.accounts.autoincrement;
 
 		if (!this.persons)
 			this.persons = new PersonsList;
-		this.persons.data = newState.persons.data;
-		this.persons.autoincrement = newState.persons.autoincrement;
+		this.persons.data = state.persons.data;
+		this.persons.autoincrement = state.persons.autoincrement;
 
 		if (!this.transactions)
 			this.transactions = new TransactionsList;
-		this.transactions.data = newState.transactions.data;
+		this.transactions.data = state.transactions.data;
 		this.transactions.sort();
-		this.transactions.autoincrement = newState.transactions.autoincrement;
+		this.transactions.autoincrement = state.transactions.autoincrement;
+	}
+
+
+	async fetchAndTest()
+	{
+		let newState = new AppState;
+
+		await test('App status', async () =>
+		{
+			await newState.fetch();
+			return await newState.meetExpectation(this);
+		}, App.environment);
+
+		this.setState(newState);
 	}
 
 

@@ -1,24 +1,25 @@
-import { formatDate } from './common.js';
+import { formatDate, setParam } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
 import { Currency } from './model/currency.js';
 import { EXPENSE, INCOME, TRANSFER, DEBT } from './model/transaction.js';
 
-import { runProfile } from './run/profile.js';
-import { runAccounts } from './run/account.js';
-import { runPersons } from './run/person.js';
+import * as ProfileTests from './run/profile.js';
+import * as AccountTests from './run/account.js';
+import * as PersonTests from './run/person.js';
 
-import { runTransactionsCommon } from './run/transaction/common.js';
-import { runExpense } from './run/transaction/expense.js';
-import { runIncome } from './run/transaction/income.js';
-import { runTransfer } from './run/transaction/transfer.js';
-import { runDebt } from './run/transaction/debt.js';
+import * as TransactionTests from './run/transaction/common.js';
+import * as ExpenseTransactionTests from './run/transaction/expense.js';
+import * as IncomeTransactionTests from './run/transaction/income.js';
+import * as TransferTransactionTests from './run/transaction/transfer.js';
+import * as DebtTransactionTests from './run/transaction/debt.js';
 
-import { runTransList } from './run/transactions.js';
-import { runStatistics } from './run/statistics.js';
+import * as TransactionListTests from './run/transactions.js';
+import * as StatisticsTests from './run/statistics.js';
 
-import { runAPI } from './run/api.js';
+import * as ApiTests from './run/api.js';
+import { Runner } from './runner.js';
 
 
 class Application
@@ -33,38 +34,10 @@ class Application
 	}
 
 
-	bindRunner(runner)
-	{
-		let res = {};
-
-		let methods = Object.keys(runner);
-		for(let method of methods)
-		{
-			res[method] = runner[method].bind(this);
-		}
-
-		return res;
-	}
-
-
 	async init()
 	{
-		// Setup test runners
-		this.run.api = this.bindRunner(runAPI);
-
-		this.run.profile = this.bindRunner(runProfile);
-		this.run.accounts = this.bindRunner(runAccounts);
-		this.run.persons = this.bindRunner(runPersons);
-
-		this.run.transactions = this.bindRunner(runTransactionsCommon);
-		this.run.transactions.expense = this.bindRunner(runExpense);
-		this.run.transactions.income = this.bindRunner(runIncome);
-		this.run.transactions.transfer = this.bindRunner(runTransfer);
-		this.run.transactions.debt = this.bindRunner(runDebt);
-
-		this.run.transactions.list = this.bindRunner(runTransList);
-
-		this.run.statistics = this.bindRunner(runStatistics);
+		// Setup test runner
+		this.runner = new Runner;
 
 		// Login and obtain profile information
 		let loginResult = await api.user.login(this.config.testUser);
@@ -122,12 +95,12 @@ class Application
 
 		this.startTime = Date.now();
 
-		await this.apiTests();
+		await ApiTests.run();
 		await this.profileTests();
 		await this.accountTests();
 		await this.personTests();
 		await this.transactionTests();
-		await this.run.statistics.run();
+		await StatisticsTests.run();
 
 		this.finish();
 	}
@@ -143,12 +116,16 @@ class Application
 	{
 		this.view.setBlock('Profile tests', 1);
 
-		await this.run.profile.register({ login : 'newuser', name : 'Newbie', password : '12345' });
-		await this.run.profile.deleteProfile();
-		await this.run.profile.relogin(this.config.testUser);
-		await this.run.profile.resetAll();
-		await this.run.profile.changeName();
-		await this.run.profile.changePass();
+		const tasks = [
+			{ action : ProfileTests.register, data : { login : 'newuser', name : 'Newbie', password : '12345' } },
+			{ action : ProfileTests.deleteProfile },
+			{ action : ProfileTests.relogin, data : this.config.testUser },
+			{ action : ProfileTests.resetAll },
+			{ action : ProfileTests.changeName },
+			{ action : ProfileTests.changePass },
+		];
+
+		await this.runner.runTasks(tasks);
 	}
 
 
@@ -156,7 +133,7 @@ class Application
 	{
 		this.view.setBlock('Accounts', 1);
 
-		await this.run.accounts.stateLoop();
+		await AccountTests.stateLoop();
 
 		await this.createAccountTests();
 		await this.deleteAccountTests();
@@ -167,15 +144,12 @@ class Application
 	{
 		this.view.setBlock('Create accounts', 2);
 
-		let tests = [
+		let data = [
 			{ name : 'acc_1', initbalance : 1000.01, curr_id : 1 },
 			{ name : 'acc_2', initbalance : '1000.01', curr_id : 3 },
 		];
 
-		for(let props of tests)
-		{
-			await this.run.accounts.create(props);
-		}
+		await this.runner.runGroup(AccountTests.create, data);
 	}
 
 
@@ -183,22 +157,24 @@ class Application
 	{
 		this.view.setBlock('Update accounts', 2);
 
-		let tests = [
+		let data = [
 			{ pos : 0, icon : 1, curr_id : 2 },
 			{ pos : 0, curr_id : 1 },
 		];
 
-		for(let props of tests)
-		{
-			await this.run.accounts.update(props);
-		}
+		await this.runner.runGroup(AccountTests.update, data);
 	}
 
 
 	async deleteAccountTests()
 	{
 		this.view.setBlock('Delete accounts', 2);
-		await this.run.accounts.del([0, 1]);
+
+		const data = [
+			[0, 1]
+		];
+
+		await this.runner.runGroup(AccountTests.del, data);
 	}
 
 
@@ -206,15 +182,12 @@ class Application
 	{
 		this.view.setBlock('Export accounts', 2);
 
-		let tests = [
+		let data = [
 			[0],
 			[0, 1],
 		];
 
-		for(let props of tests)
-		{
-			await this.run.accounts.exportTest(props);
-		}
+		await this.runner.runGroup(AccountTests.del, data);
 	}
 
 
@@ -232,7 +205,7 @@ class Application
 	{
 		this.view.setBlock('Create persons', 2);
 
-		let tests = [
+		let data = [
 			{ name : '&&<div>' },
 			{ name : 'Alex' },
 			{ name : 'Maria' },
@@ -240,10 +213,7 @@ class Application
 			{ name : 'Иван' },
 		];
 
-		for(let props of tests)
-		{
-			await this.run.persons.create(props.name);
-		}
+		await this.runner.runGroup(PersonTests.create, data);
 	}
 
 
@@ -251,14 +221,11 @@ class Application
 	{
 		this.view.setBlock('Update persons', 2);
 
-		let tests = [
+		let data = [
 			{ pos : 4, name : 'Ivan<' },
 		];
 
-		for(let props of tests)
-		{
-			await this.run.persons.update(props.pos, props.name);
-		}
+		await this.runner.runGroup(PersonTests.update, data);
 	}
 
 
@@ -266,15 +233,12 @@ class Application
 	{
 		this.view.setBlock('Delete persons', 2);
 
-		let tests = [
+		let data = [
 			[0],
 			[0, 2],
 		];
 
-		for(let props of tests)
-		{
-			await this.run.persons.del(props);
-		}
+		await this.runner.runGroup(PersonTests.del, data);
 	}
 
 
@@ -305,7 +269,7 @@ class Application
 		await this.transactionStateLoopTests();
 		await this.createTransactionTests();
 		await this.updateTransactionTests();
-		await this.transactionsListTests();
+		await TransactionListTests.run();
 		await this.deleteTransactionTests();
 
 		await this.exportAccountsTest();
@@ -318,10 +282,10 @@ class Application
 	{
 		this.view.setBlock('Transaction view state loops', 1);
 
-		await this.run.transactions.expense.stateLoop();
-		await this.run.transactions.income.stateLoop();
-		await this.run.transactions.transfer.stateLoop();
-		await this.run.transactions.debt.stateLoop();
+		await ExpenseTransactionTests.stateLoop();
+		await IncomeTransactionTests.stateLoop();
+		await TransferTransactionTests.stateLoop();
+		await DebtTransactionTests.stateLoop();
 	}
 
 
@@ -364,17 +328,14 @@ class Application
 	{
 		this.view.setBlock('Create expense transactions', 1);
 
-		let list = [
+		let data = [
 			{ fromAccount : 0, destAmount : '123.7801' },
 			{ fromAccount : 3, srcAmount : '100', destAmount : '7013.21', destCurr : 1 },
 			{ fromAccount : 1, destAmount : '0.01', date : this.dates.yesterday },
 			{ fromAccount : 1, srcAcc : 4, destAmount : '99.99', date : this.dates.monthAgo },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.expense.create(props);
-		}
+		await this.runner.runGroup(ExpenseTransactionTests.create, data);
 	}
 
 
@@ -382,17 +343,14 @@ class Application
 	{
 		this.view.setBlock('Create income transactions', 1);
 
-		let list = [
+		let data = [
 			{ fromAccount : 0, srcAmount : '10023.7801', date : this.dates.yesterday },
 			{ fromAccount : 3, srcAmount : '7013.21', destAmount : '100', srcCurr : 2 },
 			{ fromAccount : 1, srcAmount : '0.01', date : this.dates.weekAgo },
 			{ fromAccount : 1, destAcc : 4, srcAmount : '99.99', date : this.dates.monthAgo },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.income.create(props);
-		}
+		await this.runner.runGroup(IncomeTransactionTests.create, data);
 	}
 
 
@@ -400,7 +358,7 @@ class Application
 	{
 		this.view.setBlock('Create transfer transactions', 1);
 
-		let list = [
+		let data = [
 			{ srcAmount : '1000' },
 			{ destAcc : 2, srcAmount : '11.4', destAmount : '10' },
 			{ srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' },
@@ -408,10 +366,7 @@ class Application
 			{ destAcc : 3, srcAmount : '10', destAmount : '9.50' },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.transfer.create(props);
-		}
+		await this.runner.runGroup(TransferTransactionTests.create, data);
 	}
 
 
@@ -419,7 +374,7 @@ class Application
 	{
 		this.view.setBlock('Create debt transactions', 1);
 
-		let list = [
+		let data = [
 			{ srcAmount : '1000' },
 			{ debtType : false, acc : 2, srcAmount : '200', date : this.dates.weekAgo },
 			{ debtType : true, acc : 3, srcAmount : '100.0101' },
@@ -428,10 +383,7 @@ class Application
 			{ debtType : false, person : 1, acc : null, srcAmount : '105' },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.debt.create(props);
-		}
+		await this.runner.runGroup(DebtTransactionTests.create, data);
 	}
 
 
@@ -439,17 +391,14 @@ class Application
 	{
 		this.view.setBlock('Update expense transactions', 2);
 
-		let list = [
+		let data = [
 			{ pos : 3, destAmount : '124.7701' },
 			{ pos : 0, srcAmount : '101', destAmount : '7065.30', destCurr : 1 },
 			{ pos : 2, destAmount : '0.02', date : this.dates.weekAgo },
 			{ pos : 3, srcAcc : 3, destAmount : '99.9', date : this.dates.yesterday },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.expense.update(props);
-		}
+		await this.runner.runGroup(ExpenseTransactionTests.update, data);
 	}
 
 
@@ -457,17 +406,14 @@ class Application
 	{
 		this.view.setBlock('Update income transactions', 2);
 
-		let list = [
+		let data = [
 			{ pos : 1, srcAmount : '100.001', date : this.dates.weekAgo },
 			{ pos : 2, srcAmount : '0.02' },
 			{ pos : 0, srcAmount : '7065.30', destAmount : '101', srcCurr : 1 },
 			{ pos : 3, destAcc : 3, srcAmount : '99.9' },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.income.update(props);
-		}
+		await this.runner.runGroup(IncomeTransactionTests.update, data);
 	}
 
 
@@ -475,7 +421,7 @@ class Application
 	{
 		this.view.setBlock('Update transfer transactions', 2);
 
-		let list = [
+		let data = [
 			{ pos : 0, destAcc : 0, srcAmount : '11' },
 			{ pos : 1, srcAcc : 2, srcAmount : '100', destAmount : '97.55' },
 			{ pos : 2, srcAcc : 3, srcAmount : '5.0301' },
@@ -483,10 +429,7 @@ class Application
 			{ pos : 4, srcAmount : '1050.01' },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.transfer.update(props);
-		}
+		await this.runner.runGroup(TransferTransactionTests.update, data);
 	}
 
 
@@ -494,7 +437,7 @@ class Application
 	{
 		this.view.setBlock('Update debt transactions', 2);
 
-		let list = [
+		let data = [
 			{ pos : 0, person : 0, srcAmount : '105' },
 			{ pos : 3, acc : 1, srcAmount : '105', date : this.dates.now },
 			{ pos : 4, debtType : true, srcAmount : '10' },
@@ -503,10 +446,7 @@ class Application
 			{ pos : 2, srcAmount : '1001', date : this.dates.weekAgo },
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.debt.update(props);
-		}
+		await this.runner.runGroup(DebtTransactionTests.update, data);
 	}
 
 
@@ -514,15 +454,12 @@ class Application
 	{
 		this.view.setBlock('Delete expense transactions', 2);
 
-		let list = [
+		let data = [
 			[0],
 			[0, 1, 11, 13],
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.del(EXPENSE, props);
-		}
+		await this.runner.runGroup(TransactionTests.del.bind(null, EXPENSE), data);
 	}
 
 
@@ -530,15 +467,12 @@ class Application
 	{
 		this.view.setBlock('Delete income transactions', 2);
 
-		let list = [
+		let data = [
 			[0],
 			[0, 1, 2, 15],
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.del(INCOME, props);
-		}
+		await this.runner.runGroup(TransactionTests.del.bind(null, INCOME), data);
 	}
 
 
@@ -546,15 +480,12 @@ class Application
 	{
 		this.view.setBlock('Delete transfer transactions', 2);
 
-		let list = [
+		let data = [
 			[1],
 			[0, 2],
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.del(TRANSFER, props);
-		}
+		await this.runner.runGroup(TransactionTests.del.bind(null, TRANSFER), data);
 	}
 
 
@@ -562,45 +493,28 @@ class Application
 	{
 		this.view.setBlock('Delete debt transactions', 2);
 
-		let list = [
+		let data = [
 			[0],
 			[0, 1],
 		];
 
-		for(let props of list)
-		{
-			await this.run.transactions.del(DEBT, props);
-		}
+		await this.runner.runGroup(TransactionTests.del.bind(null, DEBT), data);
 	}
 
 
 	async runDeleteFromUpdateTests()
 	{
-		this.view.setBlock('Delete transaction from update view', 2);
-		await this.run.transactions.delFromUpdate(DEBT, 0);
+		this.view.setBlock('Delete from update view tests', 2);
 
-		this.view.setBlock('Delete account from update view', 2);
-		await this.run.accounts.delFromUpdate(0);
+		const tasks = [
+			{ action : TransactionTests.delFromUpdate.bind(null, DEBT), data : 0 },
+			{ action : AccountTests.delFromUpdate, data : 0},
+			{ action : PersonTests.delFromUpdate, data : 0},
+		];
 
-		this.view.setBlock('Delete person from update view', 2);
-		await this.run.persons.delFromUpdate(0);
-	}
-
-
-	async apiTests()
-	{
-		await this.run.api.run();
-	}
-
-
-	async transactionsListTests()
-	{
-		await this.run.transactions.list.run();
+		await this.runner.runTasks(tasks);
 	}
 }
 
 
-let App = new Application;
-
-
-export { App };
+export const App = new Application;

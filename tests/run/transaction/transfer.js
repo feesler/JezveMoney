@@ -1,21 +1,17 @@
-import { api } from '../../api.js';
-import { runTransactionsCommon } from './common.js'
-import { TransactionsList } from '../../model/transactionslist.js'
+import * as TransactionTests from './common.js'
 import { test } from '../../common.js'
 import { TRANSFER } from '../../model/transaction.js';
 import { TransferTransactionView } from '../../view/transaction/transfer.js'
 import { App } from '../../app.js';
 
 
-export const runTransfer =
-{
-	async submit(params)
+	export async function submit(params)
 	{
-		let view = this.view;
+		let view = App.view;
 
 		if ('srcAcc' in params)
 		{
-			let acc = this.state.accounts.getItemByIndex(params.srcAcc);
+			let acc = App.state.accounts.getItemByIndex(params.srcAcc);
 			if (!acc)
 				throw new Error('Account (' + params.srcAcc + ') not found');
 
@@ -25,7 +21,7 @@ export const runTransfer =
 
 		if ('destAcc' in params)
 		{
-			let acc = this.state.accounts.getItemByIndex(params.destAcc);
+			let acc = App.state.accounts.getItemByIndex(params.destAcc);
 			if (!acc)
 				throw new Error('Account (' + params.destAcc + ') not found');
 
@@ -52,35 +48,31 @@ export const runTransfer =
 		await view.submit();
 
 		return res;
-	},
+	}
 
 
-	async create(params)
+	export async function create(params)
 	{
-		let scope = this.run.transactions;
-
-		await scope.create(TRANSFER, params, scope.transfer.submit);
-	},
+		await TransactionTests.create(TRANSFER, params, params => submit(params));
+	}
 
 
 	// Update transfer transaction and check results
-	async update(params)
+	export async function update(params)
 	{
-		let scope = this.run.transactions;
-
-		await scope.update(TRANSFER, params, async (params) =>
+		await TransactionTests.update(TRANSFER, params, async (params) =>
 		{
-			let origTransaction = this.view.getExpectedTransaction();
+			let origTransaction = App.view.getExpectedTransaction();
 			let isDiff = (origTransaction.src_curr != origTransaction.dest_curr);
 
-			await test('Initial state of update transfer view', () => this.view.setExpectedState(isDiff ? 3 : 0), this.view);
+			await test('Initial state of update transfer view', () => App.view.setExpectedState(isDiff ? 3 : 0), App.view);
 
-			return scope.transfer.submit(params);
+			return submit(params);
 		});
-	},
+	}
 
 
-	async stateLoop()
+	export async function stateLoop()
 	{
 		const ACC_3 = 0;
 		const ACC_RUB = 1;
@@ -91,15 +83,15 @@ export const runTransfer =
 		await App.state.fetch();
 
 	// Navigate to create income view
-		if (!(this.view instanceof TransferTransactionView))
+		if (!(App.view instanceof TransferTransactionView))
 		{
-			await this.goToMainView();
-			await this.view.goToNewTransactionByAccount(0);
-			if (this.view.content.typeMenu.activeType != TRANSFER)
-				await this.view.changeTransactionType(TRANSFER);
+			await App.goToMainView();
+			await App.view.goToNewTransactionByAccount(0);
+			if (App.view.content.typeMenu.activeType != TRANSFER)
+				await App.view.changeTransactionType(TRANSFER);
 		}
 
-		let view = this.view;
+		let view = App.view;
 
 		view.setBlock('Transfer loop', 2);
 		await test('Initial state of new transfer view', async () => view.setExpectedState(0), view);
@@ -295,5 +287,4 @@ export const runTransfer =
 		await view.clickDestResultBalance();				// move from State 4 to State 6
 		await test('(48) Change destination account', () => view.changeDestAccountByPos(ACC_RUB), view);
 	}
-};
 
