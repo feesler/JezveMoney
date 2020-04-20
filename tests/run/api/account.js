@@ -9,109 +9,107 @@ import {
 import { App } from '../../app.js';
 
 
+// Create account with specified params (name, curr_id, balance, icon)
+// And check expected state of app
+export async function create(params)
+{
+	let acc_id = 0;
 
-	// Create account with specified params (name, curr_id, balance, icon)
-	// And check expected state of app
-	export async function create(params)
+	await test('Create account', async () =>
 	{
-		let acc_id = 0;
+		let expected = App.state.clone();
+		let resExpected = expected.createAccount(params);
 
-		await test('Create account', async () =>
+		let createRes;
+		try
 		{
-			let expected = App.state.clone();
-			let resExpected = expected.createAccount(params);
+			createRes = await api.account.create(params);
+			if (resExpected && (!createRes || !createRes.id))
+				return false;
+		}
+		catch(e)
+		{
+			if (!(e instanceof ApiRequestError) || resExpected)
+				throw e;
+		}
 
-			let createRes;
-			try
-			{
-				createRes = await api.account.create(params);
-				if (resExpected && (!createRes || !createRes.id))
-					return false;
-			}
-			catch(e)
-			{
-				if (!(e instanceof ApiRequestError) || resExpected)
-					throw e;
-			}
+		acc_id = (createRes) ? createRes.id : resExpected;
 
-			acc_id = (createRes) ? createRes.id : resExpected;
+		await App.state.fetch();
+		return App.state.meetExpectation(expected);
+	}, App.environment);
 
-			await App.state.fetch();
-			return App.state.meetExpectation(expected);
-		}, App.environment);
-
-		return acc_id;
-	}
+	return acc_id;
+}
 
 
-	// Update account with specified params (name, curr_id, balance, icon)
-	// And check expected state of app
-	export async function update(params)
+// Update account with specified params (name, curr_id, balance, icon)
+// And check expected state of app
+export async function update(params)
+{
+	let updateRes = false;
+
+	await test(`Update account (${formatProps(params)})`, async () =>
 	{
-		let updateRes = false;
+		let expected = App.state.clone();
+		let resExpected = expected.updateAccount(params);
+		let updParams = {};
 
-		await test(`Update account (${formatProps(params)})`, async () =>
+		let item = expected.accounts.getItem(params.id);
+		if (item)
+			updParams = copyObject(item);
+
+		if (!resExpected)
+			setParam(updParams, params);
+
+		// Send API sequest to server
+		try
 		{
-			let expected = App.state.clone();
-			let resExpected = expected.updateAccount(params);
-			let updParams = {};
+			updateRes = await api.account.update(params.id, updParams);
+			if (resExpected != updateRes)
+				return false;
+		}
+		catch(e)
+		{
+			if (!(e instanceof ApiRequestError) || resExpected)
+				throw e;
+		}
 
-			let item = expected.accounts.getItem(params.id);
-			if (item)
-				updParams = copyObject(item);
+		await App.state.fetch();
+		return App.state.meetExpectation(expected);
+	}, App.environment);
 
-			if (!resExpected)
-				setParam(updParams, params);
-
-			// Send API sequest to server
-			try
-			{
-				updateRes = await api.account.update(params.id, updParams);
-				if (resExpected != updateRes)
-					return false;
-			}
-			catch(e)
-			{
-				if (!(e instanceof ApiRequestError) || resExpected)
-					throw e;
-			}
-
-			await App.state.fetch();
-			return App.state.meetExpectation(expected);
-		}, App.environment);
-
-		return updateRes;
-	}
+	return updateRes;
+}
 
 
-	// Delete specified account(s)
-	// And check expected state of app
-	export async function del(ids)
+// Delete specified account(s)
+// And check expected state of app
+export async function del(ids)
+{
+	let deleteRes = false;
+
+	await test('Delete account', async () =>
 	{
-		let deleteRes = false;
+		let expected = App.state.clone();
+		let resExpected = expected.deleteAccounts(ids);
 
-		await test('Delete account', async () =>
+		// Send API sequest to server
+		try
 		{
-			let expected = App.state.clone();
-			let resExpected = expected.deleteAccounts(ids);
+			deleteRes = await api.account.del(ids);
+			if (resExpected != deleteRes)
+				return false;
+		}
+		catch(e)
+		{
+			if (!(e instanceof ApiRequestError) || resExpected)
+				throw e;
+		}
 
-			// Send API sequest to server
-			try
-			{
-				deleteRes = await api.account.del(ids);
-				if (resExpected != deleteRes)
-					return false;
-			}
-			catch(e)
-			{
-				if (!(e instanceof ApiRequestError) || resExpected)
-					throw e;
-			}
+		await App.state.fetch();
+		return App.state.meetExpectation(expected);
+	}, App.environment);
 
-			await App.state.fetch();
-			return App.state.meetExpectation(expected);
-		}, App.environment);
-
-		return deleteRes;
-	}
-
+	return deleteRes;
+}
