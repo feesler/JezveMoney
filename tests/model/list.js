@@ -55,7 +55,8 @@ export class List
 
 	getItem(id)
 	{
-		return this.data.find(item => item.id == id);
+		let res = this.data.find(item => item.id == id);
+		return copyObject(res);
 	}
 
 
@@ -63,7 +64,8 @@ export class List
 	{
 		let itemIds = Array.isArray(ids) ? ids : [ ids ];
 
-		return this.data.filter(item => itemIds.includes(item.id));
+		let res = this.data.filter(item => itemIds.includes(item.id));
+		return copyObject(res);
 	}
 
 
@@ -76,7 +78,7 @@ export class List
 		if (isNaN(pos) || pos < 0 || pos >= this.data.length)
 			return null;
 		
-		return this.data[pos];
+		return copyObject(this.data[pos]);
 	}
 
 
@@ -169,7 +171,8 @@ export class List
 		if (ind === -1)
 			return false;
 
-		this.data.splice(ind, 1, item);
+		let itemObj = copyObject(item);
+		this.data.splice(ind, 1, itemObj);
 
 		return true;
 	}

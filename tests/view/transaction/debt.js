@@ -54,7 +54,7 @@ class DebtTransactionView extends TransactionView
 		let personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
 		res.personAccount = App.state.getPersonAccount(res.person.id, personAccountCurr);
 		if (!res.personAccount)
-			res.personAccount = App.state.getExpectedPersonAccount(res.person.id, personAccountCurr);
+			res.personAccount =  { balance : 0, curr_id : personAccountCurr };
 
 		let isSelectAccountVisible = !!(cont.selaccount && await this.isVisible(cont.selaccount.elem));
 

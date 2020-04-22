@@ -257,6 +257,8 @@ class Application
 		{
 			await api.account.create(account);
 		}
+
+		await this.state.fetch();
 	}
 
 

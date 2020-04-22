@@ -38,17 +38,17 @@ export class AppState
 	{
 		if (!this.accounts)
 			this.accounts = new AccountsList;
-		this.accounts.data = state.accounts.data;
+		this.accounts.data = copyObject(state.accounts.data);
 		this.accounts.autoincrement = state.accounts.autoincrement;
 
 		if (!this.persons)
 			this.persons = new PersonsList;
-		this.persons.data = state.persons.data;
+		this.persons.data = copyObject(state.persons.data);
 		this.persons.autoincrement = state.persons.autoincrement;
 
 		if (!this.transactions)
 			this.transactions = new TransactionsList;
-		this.transactions.data = state.transactions.data;
+		this.transactions.data = copyObject(state.transactions.data);
 		this.transactions.sort();
 		this.transactions.autoincrement = state.transactions.autoincrement;
 	}
@@ -163,7 +163,6 @@ export class AppState
 		let balDiff = expAccount.initbalance - origAcc.initbalance;
 		if (balDiff.toFixed(2) != 0)
 		{
-			//expAccount.initbalance = expAccount.balance;
 			expAccount.balance = origAcc.balance + balDiff;
 		}
 
@@ -401,12 +400,6 @@ export class AppState
 		if (!personAcc)
 			throw new Error('Fail to obtain expected account of person');
 
-		// Save new account of person
-		if (!this.accounts.getItem(personAcc.id))
-		{
-			this.accounts.data.push(personAcc);
-		}
-
 		if (res.op == 1)
 		{
 			res.src_id = personAcc.id;
@@ -558,10 +551,12 @@ export class AppState
 		let accObj = this.accounts.data.find(item => item.owner_id == p_id &&
 													item.curr_id == curr_id);
 
-		return accObj;
+		return copyObject(accObj);
 	}
 
 
+	// Search for account of person in specified currency
+	// In case no such account exist create new account with expected properties
 	getExpectedPersonAccount(person_id, currency_id)
 	{
 		let p_id = parseInt(person_id);
@@ -569,25 +564,22 @@ export class AppState
 		if (!p_id || !curr_id)
 			return null;
 
-		let accObj = this.accounts.data.find(item => item.owner_id == p_id &&
-													item.curr_id == curr_id);
+		let accObj = this.getPersonAccount(person_id, currency_id);
+		if (accObj)
+			return accObj;
 
-		if (!accObj)
-		{
-			let latest = this.accounts.getLatestId();
+		accObj = {
+			owner_id : p_id,
+			name : `acc_${person_id}_${currency_id}`,
+			initbalance : 0,
+			balance : 0,
+			curr_id : currency_id,
+			icon : 0
+		};
 
-			accObj = {
-				id : latest + 1,
-				owner_id : p_id,
-				name : `acc_${person_id}_${currency_id}`,
-				initbalance : 0,
-				balance : 0,
-				curr_id : currency_id,
-				icon : 0
-			};
-		}
+		let ind = this.accounts.create(accObj);
 
-		return accObj;
+		return this.accounts.getItemByIndex(ind);
 	}
 
 

@@ -1,5 +1,6 @@
 import { List } from "./list.js";
 import { api } from '../api.js';
+import { copyObject } from "../common.js";
 
 
 export class PersonsList extends List
@@ -31,17 +32,19 @@ export class PersonsList extends List
 
 	findByName(name, caseSens = false)
 	{
-		let lookupName;
+		let lookupName, res;
 
 		if (caseSens)
 		{
 			lookupName = name;
-			return this.data.find(item => item.name == lookupName);
+			res = this.data.find(item => item.name == lookupName);
 		}
 		else
 		{
 			lookupName = name.toLowerCase();
-			return this.data.find(item => item.name.toLowerCase() == lookupName);
+			res = this.data.find(item => item.name.toLowerCase() == lookupName);
 		}
+
+		return copyObject(res);
 	}
 }

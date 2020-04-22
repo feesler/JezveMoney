@@ -126,25 +126,26 @@ export class TransactionsList extends List
 
 	update(id, transObj)
 	{
-		let item = this.getItem(id);
-		if (!item)
+		let origObj = this.getItem(id);
+		if (!origObj)
 			return false;
 
-		let origObj = copyObject(item);
+		if (origObj.date == transObj.date)
+			transObj.pos = origObj.pos;
 
 		if (!super.update(transObj))
 			return false;
 
 		if (origObj.date != transObj.date)
 		{
+			transObj = this.data.find(item => item.id == id);
+
 			transObj.pos = 0;
 			let newPos = this.getExpectedPos(transObj);
 			this.updatePosById(transObj.id, newPos);
 
 			this.sort();
 		}
-		else
-			transObj.pos = origObj.pos;
 
 		return true;
 	}
