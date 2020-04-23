@@ -1,8 +1,10 @@
 import { TestView } from './testview.js';
+import { DropDown } from './component/dropdown.js';
+import { TransactionTypeMenu } from './component/transactiontypemenu.js';
 
 
 // Statistics view class
-class StatisticsView extends TestView
+export class StatisticsView extends TestView
 {
 	async parseContent()
 	{
@@ -11,17 +13,32 @@ class StatisticsView extends TestView
 		if (!res.titleEl)
 			throw new Error('Wrong statistics view structure');
 
-		res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
+		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('#trtype_menu'));
 		res.title = await this.prop(res.titleEl, 'innerText');
 
 		let filtersList = await this.queryAll('.tr_filter.filter_sel');
 		if (!filtersList || filtersList.length != 4)
 			throw new Error('Wrong statistics view structure');
 
-		res.filterByDropDown = await this.parseDropDown(await this.query(filtersList[0], ':scope > *'));
-		res.accountsDropDown = (await this.isVisible(filtersList[1])) ? await this.parseDropDown(await this.query(filtersList[1], ':scope > *')) : null;
-		res.currencyDropDown = (await this.isVisible(filtersList[2])) ? await this.parseDropDown(await this.query(filtersList[2], ':scope > *')) : null;
-		res.groupDropDown = await this.parseDropDown(await this.query(filtersList[3], ':scope > *'));
+		let filterByElem = await this.query(filtersList[0], ':scope > *');
+		res.filterByDropDown = await DropDown.create(this, filterByElem);
+
+		res.accountsDropDown = null;
+		if (await this.isVisible(filtersList[1]))
+		{
+			let ddElem = await this.query(filtersList[1], ':scope > *');
+			res.accountsDropDown = await DropDown.create(this, ddElem);
+		}
+
+		res.currencyDropDown = null;
+		if (await this.isVisible(filtersList[2]))
+		{
+			let ddElem = await this.query(filtersList[2], ':scope > *');
+			res.currencyDropDown = await DropDown.create(this, ddElem);
+		}
+
+		let groupElem = await this.query(filtersList[3], ':scope > *');
+		res.groupDropDown = await DropDown.create(this, groupElem);
 
 		res.chart = { elem : await this.query('#chart'), bars : [] };
 		if (!res.chart)
@@ -126,6 +143,3 @@ class StatisticsView extends TestView
 		return this.groupBy(4);
 	}
 }
-
-
-export { StatisticsView };

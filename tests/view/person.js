@@ -1,8 +1,11 @@
 import { TestView } from './testview.js';
+import { InputRow } from './component/inputrow.js';
+import { IconLink } from './component/iconlink.js';
+import { WarningPopup } from './component/warningpopup.js';
 
 
 // Create or update account view tests
-class PersonView extends TestView
+export class PersonView extends TestView
 {
 	async parseContent()
 	{
@@ -19,9 +22,9 @@ class PersonView extends TestView
 
 		res.isUpdate = (!!await this.query('#pid'));
 
-		res.delBtn = await this.parseIconLink(await this.query('#del_btn'));
+		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 
-		res.name = await this.parseInputRow(await this.query(res.formElem, 'div.non_float'));
+		res.name = await InputRow.create(this, await this.query(res.formElem, 'div.non_float'));
 		if (!res.name)
 			throw new Error('Person name input not found');
 
@@ -29,7 +32,7 @@ class PersonView extends TestView
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
 
-		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
 	}
@@ -73,5 +76,3 @@ class PersonView extends TestView
 	}
 }
 
-
-export { PersonView };

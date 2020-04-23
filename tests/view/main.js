@@ -1,9 +1,13 @@
 import { TestView } from './testview.js';
 import { App } from '../app.js';
+import { TransactionList } from './component/transactionlist.js';
+import { TilesList } from './component/tileslist.js';
+import { Tile } from './component/tile.js';
+import { InfoTile } from './component/infotile.js';
 
 
 // Main view class
-class MainView extends TestView
+export class MainView extends TestView
 {
 	async parseContent()
 	{
@@ -25,14 +29,14 @@ class MainView extends TestView
 			if (widget.textElem)
 				widget.title = await this.prop(widget.textElem, 'innerText');
 
-			let tiles = await this.parseTiles(await this.query(widget.elem, '.tiles'));
+			let tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
 			if (tiles)
 				widget.tiles = tiles;
-			tiles = await this.parseInfoTiles(await this.query(widget.elem, '.info_tiles'));
-			if (tiles)
-				widget.infoTiles = tiles;
+			let infoTiles = await TilesList.create(this, await this.query(widget.elem, '.info_tiles'), InfoTile);
+			if (infoTiles)
+				widget.infoTiles = infoTiles;
 
-			let transactions = await this.parseTransactionsList(await this.query(widget.elem, '.trans_list'));
+			let transactions = await TransactionList.create(this, await this.query(widget.elem, '.trans_list'));
 			if (transactions)
 				widget.transList = transactions;
 
@@ -114,5 +118,3 @@ class MainView extends TestView
 	}
 }
 
-
-export { MainView };

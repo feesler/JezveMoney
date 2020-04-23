@@ -4,7 +4,7 @@ import { App } from '../app.js';
 
 
 // Registration view class
-class RegisterView extends TestView
+export class RegisterView extends TestView
 {
 	async parseContent()
 	{
@@ -32,6 +32,3 @@ class RegisterView extends TestView
 			throw new Error('Unexpected page');
 	}
 }
-
-
-export { RegisterView };

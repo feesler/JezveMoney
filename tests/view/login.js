@@ -5,7 +5,7 @@ import { App } from '../app.js';
 
 
 // Log in view class
-class LoginView extends TestView
+export class LoginView extends TestView
 {
 	async parseContent()
 	{
@@ -39,7 +39,4 @@ class LoginView extends TestView
 			throw new Error('Unexpected page');
 	}
 }
-
-
-export { LoginView };
 

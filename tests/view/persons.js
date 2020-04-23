@@ -1,26 +1,30 @@
 import { TestView } from './testview.js';
+import { TilesList } from './component/tileslist.js';
+import { Tile } from './component/tile.js';
+import { IconLink } from './component/iconlink.js';
+import { WarningPopup } from './component/warningpopup.js';
 
 
 // List of persons view class
-class PersonsView extends TestView
+export class PersonsView extends TestView
 {
 	async parseContent()
 	{
 		let res = { titleEl : await this.query('.content_wrap > .heading > h1'),
-	 				addBtn : await this.parseIconLink(await this.query('#add_btn')),
+	 				addBtn : await IconLink.create(this, await this.query('#add_btn')),
 					toolbar : {
 						elem : await this.query('#toolbar'),
-						editBtn : await this.parseIconLink(await this.query('#edit_btn')),
-						delBtn : await this.parseIconLink(await this.query('#del_btn'))
+						editBtn : await IconLink.create(this, await this.query('#edit_btn')),
+						delBtn : await IconLink.create(this, await this.query('#del_btn'))
 					}
 				};
 		if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 			throw new Error('Wrong persons view structure');
 
 		res.title = this.prop(res.titleEl, 'innerText');
-		res.tiles = await this.parseTiles(await this.query('.tiles'));
+		res.tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
 
-		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
 	}
@@ -86,5 +90,3 @@ class PersonsView extends TestView
 	}
 }
 
-
-export { PersonsView };

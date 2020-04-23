@@ -4,15 +4,19 @@ import {
 	getIcon,
 	isValidValue,
 	normalize,
-	setParam,
 	findIconByTitle,
 	copyObject
 } from '../common.js'
 import { App } from '../app.js'
+import { Tile } from './component/tile.js';
+import { DropDown } from './component/dropdown.js';
+import { InputRow } from './component/inputrow.js';
+import { IconLink } from './component/iconlink.js';
+import { WarningPopup } from './component/warningpopup.js';
 
 
 // Create or update account view class
-class AccountView extends TestView
+export class AccountView extends TestView
 {
 	constructor(...args)
 	{
@@ -141,9 +145,9 @@ class AccountView extends TestView
 			throw new Error('Heading element not found');
 		res.heading.text = await this.prop(res.heading.elem, 'innerText');
 
-		res.delBtn = await this.parseIconLink(await this.query('#del_btn'));
+		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 
-		res.tile = await this.parseTile(await this.query('#acc_tile'));
+		res.tile = await Tile.create(this, await this.query('#acc_tile'));
 
 		res.formElem = await this.query('form');
 		if (!res.formElem)
@@ -159,24 +163,24 @@ class AccountView extends TestView
 		}
 
 		let curChildren = (res.isUpdate) ? 3 : 2;
-		let elem = await this.query('form > *:nth-child(' + curChildren + ')');
+		let elem = await this.query('form > *:nth-child(' + curChildren + ') .dd_container');
 
-		res.iconDropDown = await this.parseDropDown(await this.query(elem, '.dd_container'));
+		res.iconDropDown = await DropDown.create(this, elem);
 
 		curChildren++;
 		elem = await this.query('form > *:nth-child(' + curChildren + ')');
-		res.name = await this.parseInputRow(elem);
+		res.name = await InputRow.create(this, elem);
 		if (!res.name)
 			throw new Error('Account name input not found');
 
 		curChildren++;
-		elem = await this.query('form > *:nth-child(' + curChildren + ')');
-		res.currDropDown = await this.parseDropDown(await this.query(elem, '.dd_container'));
+		elem = await this.query(`form > *:nth-child(${curChildren}) .dd_container`);
+		res.currDropDown = await DropDown.create(this, elem);
 
 		curChildren++;
 		elem = await this.query('form > *:nth-child(' + curChildren + ')');
 
-		res.balance = await this.parseInputRow(elem);
+		res.balance = await InputRow.create(this, elem);
 
 		res.submitBtn = await this.query('.acc_controls .ok_btn');
 		if (!res.submitBtn)
@@ -186,7 +190,7 @@ class AccountView extends TestView
 		if (!res.cancelBtn)
 			throw new Error('Cancel button not found');
 
-		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
 	}
@@ -268,5 +272,3 @@ class AccountView extends TestView
 		return this.performAction(() => this.content.iconDropDown.selectByValue(val));
 	}
 }
-
-export { AccountView };

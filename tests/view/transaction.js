@@ -1,105 +1,24 @@
 import { TestView } from './testview.js';
 import { correctExch, isValidValue, normalizeExch } from '../common.js'
 import { DEBT } from '../model/transaction.js';
-import { App } from '../app.js';
+import { TransactionTypeMenu } from './component/transactiontypemenu.js';
+import { InputRow } from './component/inputrow.js';
+import { IconLink } from './component/iconlink.js';
+import { WarningPopup } from './component/warningpopup.js';
+import { DatePickerRow } from './component/datepickerrow.js';
+import { CommentRow } from './component/commentrow.js';
+import { TileInfoItem } from './component/tileinfoitem.js';
+import { TileBlock } from './component/tileblock.js';
 
 
 // Create or update transaction view class
-class TransactionView extends TestView
+export class TransactionView extends TestView
 {
 	constructor(...args)
 	{
 		super(...args);
 
 		this.expectedState = {};
-	}
-
-
-	async parseTileRightItem(elem)
-	{
-		if (!elem)
-			return null;
-
-		let self = this;
-		let res = { elem : elem };
-		res.titleElem = await this.query(elem, ':scope > *');
-		if (!res.titleElem)
-			throw new Error('Title element not found');
-		res.title = await this.prop(res.titleElem, 'innerText');
-
-		res.buttonElem = await this.query(elem, 'button');
-		if (!res.buttonElem)
-			throw new Error('Button element not found');
-		let buttonInner = await this.query(res.buttonElem, 'span');
-		if (!buttonInner)
-			throw new Error('Wrong structure of tile info block');
-		res.value = await this.prop(buttonInner, 'innerText');
-
-		res.click = async function()
-		{
-			return self.click(this.buttonElem);
-		};
-
-		return res;
-	}
-
-
-	async parseTileBlock(elem)
-	{
-		if (!elem)
-			return null;
-
-		let res = { elem : elem };
-
-		let lbl = await this.query(elem, 'div > label');
-		if (!lbl)
-			throw new Error('Tile block label not found');
-		res.label = await this.prop(lbl, 'innerText');
-
-		res.tile = await this.parseTile(await this.query(elem, '.tile'));
-		if (!res.tile)
-			throw new Error('Tile not found');
-
-		res.dropDown = await this.parseDropDown(await this.query(elem, '.dd_attached'));
-
-		res.selectAccount = async function(val)
-		{
-			if (res.dropDown)
-				return res.dropDown.selectByValue(val);
-		};
-
-		return res;
-	}
-
-
-	async parseCommentRow(elem)
-	{
-		if (!elem)
-			return null;
-
-		let self = this;
-		let res = { elem : elem };
-
-		let iconLinkElem = await this.query(elem, '.iconlink');
-
-		res.iconLink = await this.parseIconLink(iconLinkElem);
-		if (!res.iconLink)
-			throw new Error('Iconlink of comment not found');
-
-		res.inputRow = await this.parseInputRow(await this.query('#comment_block'));
-		if (!res.inputRow)
-			throw new Error('Input row of comment not found');
-		res.value = res.inputRow.value;
-
-		res.input = async function(val)
-		{
-			if (await self.isVisible(this.iconLink.elem))
-				await this.iconLink.click();
-
-			return this.inputRow.input(val);
-		};
-
-		return res;
 	}
 
 
@@ -124,20 +43,20 @@ class TransactionView extends TestView
 		if (res.heading.elem)
 			res.heading.title = await this.prop(res.heading.elem, 'innerText');
 
-		res.delBtn = await this.parseIconLink(await this.query('#del_btn'));
+		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 
-		res.typeMenu = await this.parseTransactionTypeMenu(await this.query('#trtype_menu'));
+		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('#trtype_menu'));
 
 		if (res.typeMenu.activeType == DEBT)
 		{
-			res.person = await this.parseTileBlock(await this.query('#person'));
+			res.person = await TileBlock.create(this, await this.query('#person'));
 			if (res.person)
 			{
 				let personIdInp = await this.query('#person_id');
 				res.person.id = parseInt(await this.prop(personIdInp, 'value'));
 			}
 
-			res.account = await this.parseTileBlock(await this.query('#source'));
+			res.account = await TileBlock.create(this, await this.query('#source'));
 			if (res.account)
 			{
 				let accountIdInp = await this.query('#acc_id');
@@ -159,13 +78,13 @@ class TransactionView extends TestView
 		}
 		else
 		{
-			res.source = await this.parseTileBlock(await this.query('#source'));
+			res.source = await TileBlock.create(this, await this.query('#source'));
 			if (res.source)
 			{
 				let srcIdInp = await this.query('#src_id');
 				res.source.id = parseInt(await this.prop(srcIdInp, 'value'));
 			}
-			res.destination = await this.parseTileBlock(await this.query('#destination'));
+			res.destination = await TileBlock.create(this, await this.query('#destination'));
 			if (res.destination)
 			{
 				let destIdInp = await this.query('#dest_id');
@@ -173,27 +92,27 @@ class TransactionView extends TestView
 			}
 		}
 
-		res.src_amount_left = await this.parseTileRightItem(await this.query('#src_amount_left'));
-		res.dest_amount_left = await this.parseTileRightItem(await this.query('#dest_amount_left'));
-		res.src_res_balance_left = await this.parseTileRightItem(await this.query('#src_res_balance_left'));
-		res.dest_res_balance_left = await this.parseTileRightItem(await this.query('#dest_res_balance_left'));
-		res.exch_left = await this.parseTileRightItem(await this.query('#exch_left'));
+		res.src_amount_left = await TileInfoItem.create(this, await this.query('#src_amount_left'));
+		res.dest_amount_left = await TileInfoItem.create(this, await this.query('#dest_amount_left'));
+		res.src_res_balance_left = await TileInfoItem.create(this, await this.query('#src_res_balance_left'));
+		res.dest_res_balance_left = await TileInfoItem.create(this, await this.query('#dest_res_balance_left'));
+		res.exch_left = await TileInfoItem.create(this, await this.query('#exch_left'));
 
-		res.src_amount_row = await this.parseInputRow(await this.query('#src_amount_row'));
-		res.dest_amount_row = await this.parseInputRow(await this.query('#dest_amount_row'));
-		res.exchange_row = await this.parseInputRow(await this.query('#exchange'));
-		res.result_balance_row = await this.parseInputRow(await this.query('#result_balance'));
-		res.result_balance_dest_row = await this.parseInputRow(await this.query('#result_balance_dest'));
+		res.src_amount_row = await InputRow.create(this, await this.query('#src_amount_row'));
+		res.dest_amount_row = await InputRow.create(this, await this.query('#dest_amount_row'));
+		res.exchange_row = await InputRow.create(this, await this.query('#exchange'));
+		res.result_balance_row = await InputRow.create(this, await this.query('#result_balance'));
+		res.result_balance_dest_row = await InputRow.create(this, await this.query('#result_balance_dest'));
 
 		let calendarBtn = await this.query('#calendar_btn');
-		res.datePicker = await this.parseDatePickerRow(await this.parent(calendarBtn));
+		res.datePicker = await DatePickerRow.create(this, await this.parent(calendarBtn));
 		let commentBtn = await this.query('#comm_btn');
-		res.comment_row = await this.parseCommentRow(await this.parent(commentBtn));
+		res.comment_row = await CommentRow.create(this, await this.parent(commentBtn));
 
 		res.submitBtn = await this.query('#submitbtn');
 		res.cancelBtn = await this.query('#submitbtn + *');
 
-		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
 	}
@@ -409,6 +328,3 @@ class TransactionView extends TestView
 		return this.performAction(() => this.content.comment_row.input(val));
 	}
 }
-
-
-export { TransactionView };

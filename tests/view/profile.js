@@ -1,10 +1,11 @@
 import { TestView } from './testview.js';
 import { LoginView } from './login.js';
 import { App } from '../app.js';
+import { WarningPopup } from './component/warningpopup.js';
 
 
 // Profile view class
-class ProfileView extends TestView
+export class ProfileView extends TestView
 {
 	async parseContent()
 	{
@@ -52,9 +53,9 @@ class ProfileView extends TestView
 			res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close_btn > button');
 		}
 
-		res.reset_warning = await this.parseWarningPopup(await this.query('#reset_warning'));
-		res.reset_all_warning = await this.parseWarningPopup(await this.query('#reset_all_warning'));
-		res.delete_warning = await this.parseWarningPopup(await this.query('#delete_warning'));
+		res.reset_warning = await WarningPopup.create(this, await this.query('#reset_warning'));
+		res.reset_all_warning = await WarningPopup.create(this, await this.query('#reset_all_warning'));
+		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
 	}
@@ -143,5 +144,3 @@ class ProfileView extends TestView
 	}
 }
 
-
-export { ProfileView };
