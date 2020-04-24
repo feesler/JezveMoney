@@ -1,4 +1,4 @@
-var config =
+export const  config =
 {
 /*	url : 'https://jezve.net/money/'	*/
 	url : 'http://testsrv:8096/',
@@ -14,8 +14,6 @@ var config =
 
 	transactionsOnPage : 10,
 	latestTransactions : 5,
-	testsExpected : 642
+	testsExpected : 640
 };
 
-
-export { config };

@@ -187,7 +187,7 @@ class Application
 			[0, 1],
 		];
 
-		await this.runner.runGroup(AccountTests.del, data);
+		await this.runner.runGroup(AccountTests.exportTest, data);
 	}
 
 
