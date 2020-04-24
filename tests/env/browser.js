@@ -63,7 +63,7 @@ class BrowserEnvironment extends Environment
 		let query = parentSpecified ? arguments[1]: arguments[0];
 		let parent = parentSpecified ? arguments[0] : this.vdoc;
 
-		return (typeof query === 'string') ? parent.querySelectorAll(query) : query;
+		return (typeof query === 'string') ? Array.from(parent.querySelectorAll(query)) : query;
 	}
 
 

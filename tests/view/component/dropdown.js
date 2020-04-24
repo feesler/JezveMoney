@@ -1,4 +1,5 @@
 import { NullableComponent } from './component.js';
+import { asyncMap } from '../../common.js';
 
 
 export class DropDown extends NullableComponent
@@ -54,20 +55,18 @@ export class DropDown extends NullableComponent
 				this.items.push(itemObj);
 			}
 		}
-		else
+		else if (this.listContainer)
 		{
-			if (this.listContainer)
+			let listItems = await env.queryAll(this.elem, '.ddlist li > div');
+			this.items = await asyncMap(listItems, async (item) =>
 			{
-				let listItems = await env.queryAll(this.elem, '.ddlist li > div');
-				this.items = [];
-				for(let i = 0; i < listItems.length; i++)
-				{
-					let li = listItems[i];
-					let itemObj = { id : this.parseId(await env.prop(li, 'id')), text : await env.prop(li, 'innerText'), elem : li };
+				return {
+					id : this.parseId(await env.prop(item, 'id')),
+					text : await env.prop(item, 'innerText'),
+					elem : item
+				};
+			});
 
-					this.items.push(itemObj);
-				}
-			}
 		}
 	}
 

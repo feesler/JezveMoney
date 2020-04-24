@@ -1,6 +1,3 @@
-
-
-
 // Available tile icons
 const tileIcons = [
 	{ id : 0, className : null, title : 'No icon' },
@@ -98,6 +95,18 @@ export function isFunction(obj)
 export function isObject(o)
 {
 	return null != o && typeof o === 'object' && Object.prototype.toString.call(o) === '[object Object]';
+}
+
+
+export async function asyncMap(data, func)
+{
+	if (!Array.isArray(data))
+		throw new Error('Invalid data type');
+	if (!isFunction(func))
+		throw new Error('Invalid function type');
+
+	let tasks = data.map(func);
+	return Promise.all(tasks);
 }
 
 

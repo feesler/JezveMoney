@@ -1,4 +1,5 @@
 import { NullableComponent } from './component.js';
+import { asyncMap } from '../../common.js';
 
 
 export class Paginator extends NullableComponent
@@ -16,16 +17,16 @@ export class Paginator extends NullableComponent
 		let ellipsisBefore = false;
 		let prevPageItem = null;
 		let elems = await env.queryAll(this.elem, ':scope > span');
-
 		if (elems.length == 1)
 			throw new Error('Single item paginator control');
 
+		let children = await asyncMap(elems, item => env.query(item, ':scope > *'));
+		elems.forEach((item, ind) => item.child = children[ind]);
+
 		for(let itemElem of elems)
 		{
-			let child = await env.query(itemElem, ':scope > *');
-
 			// Check element with no child contain ellipsis and skip
-			if (!child)
+			if (!itemElem.child)
 			{
 				if (await env.prop(itemElem, 'innerText') != '...')
 					throw new Error('Unexpected paginator item');
@@ -42,11 +43,11 @@ export class Paginator extends NullableComponent
 
 			let item = { elem : itemElem };
 
-			let tagName = await env.prop(child, 'tagName');
+			let tagName = await env.prop(itemElem.child, 'tagName');
 			if (tagName == 'A')
 			{
-				item.linkElem = child;
-				item.link = await env.prop(child, 'href');
+				item.linkElem = itemElem.child;
+				item.link = await env.prop(itemElem.child, 'href');
 				item.isActive = false;
 			}
 			else if (tagName == 'B')
@@ -56,7 +57,7 @@ export class Paginator extends NullableComponent
 			else
 				throw new Error('Unexpected stucture of paginator control');
 
-			item.title = await env.prop(child, 'innerText');
+			item.title = await env.prop(itemElem.child, 'innerText');
 			item.num = parseInt(item.title);
 			if (!item.title || isNaN(item.num) || item.num < 1)
 				throw new Error('Unexpected title of paginator item');

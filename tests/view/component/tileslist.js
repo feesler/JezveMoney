@@ -1,6 +1,7 @@
 import { NullableComponent } from './component.js';
 import { Tile } from './tile.js';
 import { InfoTile } from './infotile.js';
+import { asyncMap } from '../../common.js';
 
 
 export class TilesList extends NullableComponent
@@ -21,17 +22,11 @@ export class TilesList extends NullableComponent
 		const env = this.parent.props.environment;
 
 		this.items = [];
-		let children = await env.queryAll(this.elem, ':scope > *');
-		if (!children || !children.length || (children.length == 1 && await env.prop(children[0], 'tagName') == 'SPAN'))
+		let listItems = await env.queryAll(this.elem, ':scope > *');
+		if (!listItems || !listItems.length || (listItems.length == 1 && await env.prop(listItems[0], 'tagName') == 'SPAN'))
 			return;
 
-		for(let i = 0; i < children.length; i++)
-		{
-			let tileObj = await this.tileClass.create(this.parent, children[i]);
-
-			this.items.push(tileObj);
-		}
-
+		this.items = await asyncMap(listItems, item => this.tileClass.create(this.parent, item));
 		this.items.sort((a, b) => a.id - b.id);
 	}
 
