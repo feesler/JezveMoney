@@ -1,4 +1,6 @@
 import { NullableComponent } from './component.js';
+import { Tile } from './tile.js';
+import { InfoTile } from './infotile.js';
 
 
 export class TilesList extends NullableComponent
@@ -31,5 +33,39 @@ export class TilesList extends NullableComponent
 		}
 
 		this.items.sort((a, b) => a.id - b.id);
+	}
+
+
+	static renderAccounts(accountsList)
+	{
+		if (!Array.isArray(accountsList))
+			throw new Error('Invalid data');
+
+		let res = {
+			tiles : {
+				items : accountsList.map(Tile.renderAccount)
+			}
+		};
+
+		return res;
+	}
+
+
+	static renderPersons(personsList, tileClass = Tile)
+	{
+		if (!Array.isArray(personsList))
+			throw new Error('Invalid data');
+
+		let personTiles = {
+			items : personsList.map(tileClass.renderPerson)
+		};
+
+		let res = {};
+		if (tileClass == InfoTile)
+			res.infoTiles = personTiles;
+		else
+			res.tiles = personTiles;
+
+		return res;
 	}
 }

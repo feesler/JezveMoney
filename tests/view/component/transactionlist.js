@@ -23,4 +23,29 @@ export class TransactionList extends NullableComponent
 			this.items.push(itemObj);
 		}
 	}
+
+
+	static render(transactions, state)
+	{
+		if (!Array.isArray(transactions))
+			return [];
+
+		return transactions.map(item => TransactionListItem.render(item, state));
+	}
+
+
+	static renderWidget(transactions, state)
+	{
+		if (!Array.isArray(transactions))
+			throw new Error('Invalid data');
+
+		let res = {
+			title : 'Transactions',
+			transList : {
+				items : this.render(transactions, state)
+			}
+		};
+
+		return res;
+	}
 }

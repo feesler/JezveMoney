@@ -112,7 +112,7 @@ export class AccountView extends TestView
 	setExpectedState()
 	{
 		let account = this.getExpectedAccount();
-		let accTile = App.state.accountToTile(account);
+		let accTile = Tile.renderAccount(account);
 
 		if (!this.model.nameTyped && !this.model.isUpdate)
 			accTile.name = 'New account';

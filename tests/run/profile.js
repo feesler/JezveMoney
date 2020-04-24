@@ -1,4 +1,5 @@
 import { LoginView } from '../view/login.js';
+import { MainView } from '../view/main.js';
 import { test } from '../common.js';
 import { api } from '../api.js';
 import { App } from '../app.js';
@@ -73,7 +74,7 @@ export async function resetAccounts()
 	await App.view.closeNotification();
 	await App.goToMainView();
 
-	App.view.expectedState = App.state.render();
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main view update', () => {}, App.view);
 }
 
@@ -91,7 +92,7 @@ export async function resetAll()
 	await App.view.closeNotification();
 	await App.goToMainView();
 
-	App.view.expectedState = App.state.render();
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main view update', () => {}, App.view);
 }
 

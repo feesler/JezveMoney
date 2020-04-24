@@ -116,5 +116,28 @@ export class MainView extends TestView
 
 		return this.navigation(() => this.click(widget.linkElem));
 	}
+
+
+	static render(state)
+	{
+		let res = {
+			values : {
+			widgets : { length : App.config.widgetsCount } }
+		};
+
+		// Accounts widget
+		let accWidget = TilesList.renderAccounts(state.accounts.getUserAccounts(true));
+		res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
+		// Persons widget
+		let personsWidget = TilesList.renderPersons(state.persons.data, InfoTile);
+		res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
+
+		// Transactions widget
+		let latestTransactionsList = state.transactions.data.slice(0, App.config.latestTransactions);
+		let transWidget = TransactionList.renderWidget(latestTransactionsList, state);
+		res.values.widgets[App.config.LatestWidgetPos] = transWidget;
+
+		return res;
+	}
 }
 

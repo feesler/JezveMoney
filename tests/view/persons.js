@@ -88,5 +88,15 @@ export class PersonsView extends TestView
 
 		return this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}
+
+
+	static render(state)
+	{
+		let res = {
+			values : TilesList.renderPersons(state.persons.data)
+		};
+
+		return res;
+	}
 }
 

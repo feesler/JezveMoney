@@ -126,4 +126,14 @@ export class AccountsView extends TestView
 
 		return exportResp.body;
 	}
+
+
+	static render(state)
+	{
+		let res = {
+			values : TilesList.renderAccounts(state.accounts.getUserAccounts(true))
+		};
+
+		return res;
+	}
 }

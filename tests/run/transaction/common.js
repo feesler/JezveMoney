@@ -1,4 +1,5 @@
 import { TransactionsView } from '../../view/transactions.js';
+import { TransactionList } from '../../view/component/transactionlist.js';
 import { MainView } from '../../view/main.js';
 import { Transaction } from '../../model/transaction.js';
 import { AccountsList } from '../../model/accountslist.js';
@@ -68,7 +69,7 @@ export async function checkData(descr, expTransList, iterateView = false)
 		let transListPages = await iteratePages();
 		transList = transListPages.items;
 
-		expected = App.state.renderTransactionsList(expTransList.data);
+		expected = TransactionList.render(expTransList.data, App.state);
 	}
 	else
 	{
@@ -98,8 +99,7 @@ export async function create(type, params, submitHandler)
 
 	App.state.createTransaction(expectedTransaction);
 
-	App.view.expectedState = App.state.render();
-
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => {}, App.view);
 
 	await App.state.fetchAndTest();
@@ -143,8 +143,7 @@ export async function update(type, params, submitHandler)
 	App.state.accounts.data = originalAccounts;
 	App.state.updateTransaction(expectedTransaction);
 
-	App.view.expectedState = App.state.render();
-
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => {}, App.view);
 
 	await App.state.fetchAndTest();
@@ -168,7 +167,7 @@ export async function del(type, transactions)
 
 	await App.goToMainView();
 
-	App.view.expectedState = App.state.render();
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', async () => {}, App.view);
 
 	await App.state.fetchAndTest();
@@ -202,7 +201,7 @@ export async function delFromUpdate(type, pos)
 
 	await App.goToMainView();
 
-	App.view.expectedState = App.state.render();
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => {}, App.view);
 
 	await App.state.fetchAndTest();

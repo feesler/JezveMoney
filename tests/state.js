@@ -14,6 +14,7 @@ import { AccountsList } from './model/accountslist.js';
 import { PersonsList } from './model/personslist.js';
 import { TransactionsList } from './model/transactionslist.js';
 import { api } from './api.js';
+import { InfoTile } from './view/component/infotile.js';
 
 
 export class AppState
@@ -51,6 +52,8 @@ export class AppState
 		this.transactions.data = copyObject(state.transactions.data);
 		this.transactions.sort();
 		this.transactions.autoincrement = state.transactions.autoincrement;
+
+		this.profile = copyObject(state.profile);
 	}
 
 
@@ -75,6 +78,7 @@ export class AppState
 		res.accounts = this.accounts.clone();
 		res.persons = this.persons.clone();
 		res.transactions = this.transactions.clone();
+		res.profile = copyObject(this.profile);
 
 		return res;
 	}
@@ -84,7 +88,8 @@ export class AppState
 	{
 		let res = checkObjValue(this.accounts.data, expected.accounts.data) &&
 					checkObjValue(this.transactions.data, expected.transactions.data) &&
-					checkObjValue(this.persons.data, expected.persons.data);
+					checkObjValue(this.persons.data, expected.persons.data) &&
+					checkObjValue(this.profile, expected.profile);
 		return res;
 	}
 
@@ -361,13 +366,13 @@ export class AppState
 
 		let srcAcc = this.accounts.getItem(transaction.src_id);
 		let destAcc = this.accounts.getItem(transaction.dest_id);
-		if (srcAcc && srcAcc.owner_id != App.owner_id)
+		if (srcAcc && srcAcc.owner_id != this.profile.owner_id)
 		{
 			res.op = 1;
 			res.person_id = srcAcc.owner_id;
 			res.acc_id = (destAcc) ? destAcc.id : 0;
 		}
-		else if (destAcc && destAcc.owner_id != App.owner_id)
+		else if (destAcc && destAcc.owner_id != this.profile.owner_id)
 		{
 			res.op = 2;
 			res.person_id = destAcc.owner_id;
@@ -580,190 +585,6 @@ export class AppState
 		let ind = this.accounts.create(accObj);
 
 		return this.accounts.getItemByIndex(ind);
-	}
-
-
-	// Format non-zero balances of person accounts
-	// Return array of strings
-	filterPersonDebts(accounts)
-	{
-		if (!Array.isArray(accounts))
-			throw new Error('Unexpected input');
-
-		let res = accounts.filter(item => item.balance != 0)
-							.map(item => Currency.format(item.curr_id, item.balance));
-
-		return res;
-	}
-
-
-	accountToTile(account)
-	{
-		let res = {};
-
-		res.balance = Currency.format(account.curr_id, account.balance);
-		res.name = account.name;
-		res.icon = account.icon;
-
-		return res;
-	}
-
-
-	personToTile(person, mainPage = true)
-	{
-		let res = {};
-
-		if (mainPage)
-		{
-			res.title = person.name;
-
-			let debtAccounts = this.filterPersonDebts(person.accounts);
-			res.subtitle = debtAccounts.length ? debtAccounts.join('\n') : 'No debts';
-		}
-		else
-		{
-			res.name = person.name;
-			res.balance = '';
-		}
-
-		return res;
-	}
-
-
-	transactionToListItem(transObj)
-	{
-		let res = {};
-
-		let srcAcc = this.accounts.getItem(transObj.src_id);
-		let destAcc = this.accounts.getItem(transObj.dest_id);
-
-		if (transObj.type == EXPENSE)
-		{
-			res.amountText = '- ' + Currency.format(transObj.src_curr, transObj.src_amount);
-			if (transObj.src_curr != transObj.dest_curr)
-			{
-				res.amountText += ' (- ' + Currency.format(transObj.dest_curr, transObj.dest_amount) + ')';
-			}
-
-			res.accountTitle = srcAcc.name;
-		}
-		else if (transObj.type == INCOME)
-		{
-			res.amountText = '+ ' + Currency.format(transObj.src_curr, transObj.src_amount);
-			if (transObj.src_curr != transObj.dest_curr)
-			{
-				res.amountText += ' (+ ' + Currency.format(transObj.dest_curr, transObj.dest_amount) + ')';
-			}
-
-			res.accountTitle = destAcc.name;
-		}
-		else if (transObj.type == TRANSFER)
-		{
-			res.amountText = Currency.format(transObj.src_curr, transObj.src_amount);
-			if (transObj.src_curr != transObj.dest_curr)
-			{
-				res.amountText += ' (' + Currency.format(transObj.dest_curr, transObj.dest_amount) + ')';
-			}
-
-			res.accountTitle = srcAcc.name + ' → ' + destAcc.name;
-		}
-		else if (transObj.type == DEBT)
-		{
-			res.accountTitle = '';
-			let debtType = (!!srcAcc && srcAcc.owner_id != App.owner_id);
-			let personAcc = debtType ? srcAcc : destAcc;
-			let person = this.persons.getItem(personAcc.owner_id);
-			if (!person)
-				throw new Error(`Person ${personAcc.owner_id} not found`);
-
-			let acc = debtType ? destAcc : srcAcc;
-
-			if (debtType)
-			{
-				res.accountTitle = person.name;
-				if (acc)
-					res.accountTitle += ' → ' + acc.name;
-				res.amountText = (acc) ? '+ ' : '- ';
-			}
-			else
-			{
-				if (acc)
-					res.accountTitle = acc.name + ' → ';
-				res.accountTitle += person.name;
-				res.amountText = (srcAcc) ? '- ' : '+ ';
-			}
-
-			res.amountText += Currency.format(personAcc.curr_id, transObj.src_amount);
-		}
-
-		res.dateFmt = transObj.date;
-		res.comment = transObj.comment;
-
-		return res;
-	}
-
-
-	renderAccountsWidget(accList)
-	{
-		let res = { tiles : {} };
-
-		res.tiles.items = accList.filter(item => item.owner_id == App.owner_id)
-									.map(item => this.accountToTile(item));
-
-		return res;
-	}
-
-
-	renderPersonsWidget(personsList, mainPage = true)
-	{
-		if (!Array.isArray(personsList))
-			throw new Error('Invalid data');
-
-		let res = {};
-		let personTiles = personsList.map(item => this.personToTile(item, mainPage));
-
-		if (mainPage)
-			res.infoTiles = { items : personTiles };
-		else
-			res.tiles = { items : personTiles };
-
-		return res;
-	}
-
-
-	renderTransactionsList(transactionsList)
-	{
-		return transactionsList.map(item => this.transactionToListItem(item));
-	}
-
-
-	renderTransactionsWidget(transactionsList)
-	{
-		let res = { title : 'Transactions', transList : {} };
-
-		let latestTransactionsList = transactionsList.slice(0, App.config.latestTransactions);
-
-		res.transList.items = this.renderTransactionsList(latestTransactionsList);
-
-		return res;
-	}
-
-
-	render()
-	{
-		let res = { values : { widgets : { length : App.config.widgetsCount } } };
-
-		// Accounts widget
-		let accWidget = this.renderAccountsWidget(this.accounts.getUserAccounts(true));
-		res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
-		// Persons widget
-		let personsWidget = this.renderPersonsWidget(this.persons.data);
-		res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
-		// Transactions widget
-		let transWidget = this.renderTransactionsWidget(this.transactions.data);
-		res.values.widgets[App.config.LatestWidgetPos] = transWidget;
-
-		return res;
 	}
 }
 

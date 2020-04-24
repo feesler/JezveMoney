@@ -108,8 +108,7 @@ export async function create(params)
 
 	App.state.createAccount(expAccount);
 
-	App.view.expectedState = { values : App.state.renderAccountsWidget(App.state.accounts.getUserAccounts(true)) };
-
+	App.view.expectedState = AccountsView.render(App.state);
 	await test('Create account', () => {}, App.view);
 }
 
@@ -156,8 +155,7 @@ export async function update(params)
 
 	App.state.updateAccount(expAccount);
 
-	App.view.expectedState = { values : App.state.renderAccountsWidget(App.state.accounts.getUserAccounts(true)) };
-
+	App.view.expectedState = AccountsView.render(App.state);
 	await test('Update account', () => {}, App.view);
 
 	await App.state.fetchAndTest();
@@ -186,7 +184,7 @@ export async function del(accounts)
 
 	await App.view.deleteAccounts(accounts);
 
-	App.view.expectedState = { values : App.state.renderAccountsWidget(App.state.accounts.getUserAccounts(true)) };
+	App.view.expectedState = AccountsView.render(App.state);
 	await test('Delete accounts [' + accounts.join() + ']', () => {}, App.view);
 
 	await App.state.fetchAndTest();
@@ -217,12 +215,12 @@ export async function delFromUpdate(pos)
 
 	await App.view.deleteSelfItem();
 
-	App.view.expectedState = { values : App.state.renderAccountsWidget(App.state.accounts.data) };
+	App.view.expectedState = AccountsView.render(App.state);
 	await test('Delete account [' + pos + ']', () => {}, App.view);
 
 	await App.goToMainView();
 
-	App.view.expectedState = App.state.render();
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => {}, App.view);
 
 	await App.state.fetchAndTest();

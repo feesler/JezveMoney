@@ -1,5 +1,6 @@
 import { Component } from './component.js';
 import { findIconByClassName } from '../../common.js';
+import { Currency } from '../../model/currency.js';
 
 
 export class Tile extends Component
@@ -31,5 +32,28 @@ export class Tile extends Component
 		const env = this.parent.props.environment;
 
 		return env.click(this.linkElem);
+	}
+
+
+	static renderAccount(account)
+	{
+		let res = {
+			balance : Currency.format(account.curr_id, account.balance),
+			name : account.name,
+			icon : account.icon,
+		};
+
+		return res;
+	}
+
+
+	static renderPerson(person)
+	{
+		let res = {
+			name : person.name,
+			balance : '',
+		};
+
+		return res;
 	}
 }
