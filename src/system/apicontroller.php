@@ -38,5 +38,7 @@ class ApiController extends Controller
 			$res = new apiResponse;
 			$res->fail("Access denied");
 		}
+
+		$this->owner_id = $this->uMod->getOwner();
 	}
 }

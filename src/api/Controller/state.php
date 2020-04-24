@@ -45,6 +45,14 @@ class StateApiController extends ApiController
 		}
 		$res->persons->autoincrement = $this->pModel->autoIncrement();
 
+		$res->profile = new stdClass;
+		$pObj = $this->pModel->getItem($this->owner_id);
+		if (!$pObj)
+			$respObj->fail("Person not found");
+		$res->profile->user_id = $this->user_id;
+		$res->profile->owner_id = $this->owner_id;
+		$res->profile->name = $pObj->name;
+
 		$respObj->data = $res;
 		$respObj->ok();
 	}
