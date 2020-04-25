@@ -1,5 +1,4 @@
-import { setParam, urlJoin, isFunction, checkPHPerrors } from '../common.js';
-import { route } from '../router.js';
+import { setParam, urlJoin, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment } from './base.js';
 
@@ -307,8 +306,20 @@ class BrowserEnvironment extends Environment
 	}
 
 
+	async getContent()
+	{
+		if (!this.vdoc || !this.vdoc.documentElement)
+			return '';
+
+		return this.vdoc.documentElement.innerHTML;
+	}
+
+
 	async navigation(action)
 	{
+		if (!isFunction(action))
+			throw new Error('Wrong action specified');
+
 		let navPromise = new Promise((resolve, reject) =>
 		{
 			this.viewframe.onload = async () =>
@@ -319,12 +330,7 @@ class BrowserEnvironment extends Environment
 					if (!this.vdoc)
 						throw new Error('View document not found');
 
-					checkPHPerrors(this, this.vdoc.documentElement.innerHTML);
-
-					let viewClass = await route(this, await this.url());
-
-					this.app.view = new viewClass({ environment : this });
-					await this.app.view.parse();
+					await this.onNavigate();
 
 					resolve();
 				}
@@ -335,8 +341,7 @@ class BrowserEnvironment extends Environment
 			};
 		});
 
-		if (isFunction(action))
-			await action();
+		await action();
 
 		return navPromise;
 	}

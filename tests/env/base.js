@@ -1,7 +1,8 @@
-import { isFunction } from '../common.js';
+import { isFunction, checkPHPerrors } from '../common.js';
+import { route } from '../router.js';
 
 
-class Environment
+export class Environment
 {
 	constructor()
 	{
@@ -28,6 +29,7 @@ class Environment
 			'httpReq',
 			'addResult',
 			'setBlock',
+			'getContent',
 		];
 	}
 
@@ -45,7 +47,17 @@ class Environment
 			target[method] = this[method].bind(this);
 		}
 	}
+
+
+	async onNavigate()
+	{
+		let content = await this.getContent();
+
+		checkPHPerrors(this, content);
+
+		let viewClass = await route(this, await this.url());
+
+		this.app.view = new viewClass({ environment : this });
+		await this.app.view.parse();
+	}
 }
-
-
-export { Environment };

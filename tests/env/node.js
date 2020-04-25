@@ -2,9 +2,7 @@ import process from 'process';
 import http from 'http';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
-import { setParam, urlJoin, isFunction, checkPHPerrors } from '../common.js';
-import { route } from '../router.js';
-
+import { setParam, urlJoin, isFunction } from '../common.js';
 import { Environment } from './base.js'
 
 
@@ -379,6 +377,12 @@ class NodeEnvironment extends Environment
 	}
 
 
+	async getContent()
+	{
+		return this.page.content();
+	}
+
+
 	async navigation(action)
 	{
 		if (!isFunction(action))
@@ -390,14 +394,7 @@ class NodeEnvironment extends Environment
 			{
 				try
 				{
-					let content = await this.page.content();
-
-					checkPHPerrors(this, content);
-
-					let viewClass = await route(this, await this.url());
-
-					this.app.view = new viewClass({ environment : this });
-					await this.app.view.parse();
+					await this.onNavigate();
 
 					resolve();
 				}
