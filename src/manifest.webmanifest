@@ -1,0 +1,22 @@
+{
+	"short_name": "Jezve Money",
+	"name": "Jezve Money",
+	"description": "Personal finance application",
+	"icons": [
+		{
+			"src": "/view/img/icon_192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "/view/img/icon_512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	],
+	"start_url": "/",
+	"background_color": "#20A0FF",
+	"display": "standalone",
+	"scope": "/",
+	"theme_color": "#20A0FF"
+}
