@@ -335,7 +335,7 @@ export function formatProps(params)
 }
 
 
-export function checkPHPerrors(env, content)
+export function checkPHPerrors(content)
 {
 	const errSignatures = ['<b>Notice</b>', '<b>Parse error</b>', '<b>Fatal error</b>', 'xdebug-error'];
 

@@ -53,7 +53,7 @@ export class Environment
 	{
 		let content = await this.getContent();
 
-		checkPHPerrors(this, content);
+		checkPHPerrors(content);
 
 		let viewClass = await route(this, await this.url());
 
