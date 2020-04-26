@@ -14,9 +14,9 @@ export async function submit(params)
 	{
 		let acc = App.state.accounts.getItemByIndex(params.srcAcc);
 		if (!acc)
-			throw new Error('Account (' + params.srcAcc + ') not found');
+			throw new Error(`Account (${params.srcAcc}) not found`);
 
-		await test('Change source account to (' + acc.name + ')',
+		await test(`Change source account to (${acc.name})`,
 				() => view.changeSrcAccountByPos(params.srcAcc));
 	}
 
@@ -24,25 +24,25 @@ export async function submit(params)
 	{
 		let curr = Currency.getById(params.destCurr);
 		if (!curr)
-			throw new Error('Currency (' + params.destCurr + ') not found');
+			throw new Error(`Currency (${params.destCurr}) not found`);
 
-		await test('Change destination currency to ' + curr.name,
+		await test(`Change destination currency to ${curr.name}`,
 				() => view.changeDestCurrency(params.destCurr));
 	}
 
 	if (!('destAmount' in params))
 		throw new Error('Destination amount value not specified');
 
-	await test('Destination amount (' + params.destAmount + ') input', () => view.inputDestAmount(params.destAmount));
+	await test(`Destination amount (${params.destAmount}) input`, () => view.inputDestAmount(params.destAmount));
 
 	if ('destCurr' in params && 'srcAmount' in params)
-		await test('Source amount (' + params.srcAmount + ') input', () => view.inputSrcAmount(params.srcAmount));
+		await test(`Source amount (${params.srcAmount}) input`, () => view.inputSrcAmount(params.srcAmount));
 
 	if ('date' in params)
-		await test('Date (' + params.date + ') input', () => view.changeDate(params.date));
+		await test(`Date (${params.date}) input`, () => view.changeDate(params.date));
 
 	if ('comment' in params)
-		await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment));
+		await test(`Comment (${params.comment}) input`, () => view.inputComment(params.comment));
 
 	let res = view.getExpectedTransaction();
 

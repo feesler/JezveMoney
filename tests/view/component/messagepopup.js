@@ -18,7 +18,7 @@ export class MessagePopup extends NullableComponent
 		this.closeBtn = await env.query(this.elem, '.close_btn > button');
 
 		if (!this.success)
-			console.log('Error popup appear: ' + this.message);
+			console.log(`Error popup appear: ${this.message}`);
 	}
 
 	async close()

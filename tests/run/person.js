@@ -91,7 +91,7 @@ export async function del(persons)
 	await App.view.deletePersons(persons);
 
 	App.view.expectedState = PersonsView.render(App.state);
-	await test('Delete persons [' + persons.join() + ']', () => App.view.checkState());
+	await test(`Delete persons [${persons.join()}]`, () => App.view.checkState());
 
 	await App.state.fetch();
 }
@@ -124,6 +124,5 @@ export async function delFromUpdate(pos)
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }

@@ -8,7 +8,9 @@ export class StatisticsView extends TestView
 {
 	async parseContent()
 	{
-		let res = { titleEl : await this.query('.content_wrap > .heading > h1') };
+		let res = {
+			titleEl : await this.query('.content_wrap > .heading > h1')
+		};
 
 		if (!res.titleEl)
 			throw new Error('Wrong statistics view structure');

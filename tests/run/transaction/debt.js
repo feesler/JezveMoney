@@ -27,9 +27,9 @@ export async function submit(params)
 
 			let acc = App.state.accounts.getItemByIndex(params.acc);
 			if (!acc)
-				throw new Error('Account (' + params.destAcc + ') not found');
+				throw new Error(`Account (${params.destAcc}) not found`);
 
-			await test('Change account to (' + acc.name + ')', () => view.changeAccountByPos(params.acc));
+			await test(`Change account to (${acc.name})`, () => view.changeAccountByPos(params.acc));
 		}
 	}
 
@@ -37,30 +37,30 @@ export async function submit(params)
 	{
 		let person = App.state.persons.getItemByIndex(params.person);
 		if (!person)
-			throw new Error('Person (' + params.person + ') not found');
+			throw new Error(`Person (${params.person}) not found`);
 
-		await test('Change person to (' + person.name + ')', () => view.changePersonByPos(params.person));
+		await test(`Change person to (${person.name})`, () => view.changePersonByPos(params.person));
 	}
 
 	if ('debtType' in params)
 	{
 		if (!!params.debtType != view.model.debtType)
 		{
-			await test('Change debt type (' + (params.debtType ? 'give' : 'take') + ')',
-						() => view.toggleDebtType());
+			let debtTypeStr = params.debtType ? 'give' : 'take';
+			await test(`Change debt type (${debtTypeStr})`, () => view.toggleDebtType());
 		}
 	}
 
 	if (!('srcAmount' in params))
 		throw new Error('Source amount value not specified');
 
-	await test('Source amount (' + params.srcAmount + ') input', () => view.inputSrcAmount(params.srcAmount));
+	await test(`Source amount (${params.srcAmount}) input`, () => view.inputSrcAmount(params.srcAmount));
 
 	if ('date' in params)
-		await test('Date (' + params.date + ') input', () => view.changeDate(params.date));
+		await test(`Date (${params.date}) input`, () => view.changeDate(params.date));
 
 	if ('comment' in params)
-		await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment));
+		await test(`Comment (${params.comment}) input`, () => view.inputComment(params.comment));
 
 	let res = view.getExpectedTransaction();
 

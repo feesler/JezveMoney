@@ -7,14 +7,13 @@ import {
 	checkObjValue,
 	test
 } from './common.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, availTransTypes } from './model/transaction.js';
+import { EXPENSE, INCOME, DEBT, availTransTypes } from './model/transaction.js';
 import { App } from './app.js';
 import { Currency } from './model/currency.js';
 import { AccountsList } from './model/accountslist.js';
 import { PersonsList } from './model/personslist.js';
 import { TransactionsList } from './model/transactionslist.js';
 import { api } from './api.js';
-import { InfoTile } from './view/component/infotile.js';
 
 
 export class AppState
@@ -60,14 +59,13 @@ export class AppState
 	async fetchAndTest()
 	{
 		let newState = new AppState;
+		await newState.fetch();
 
-		await test('App status', async () =>
-		{
-			await newState.fetch();
-			return await newState.meetExpectation(this);
-		});
+		let res = newState.meetExpectation(this)
+		if (res)
+			this.setState(newState);
 
-		this.setState(newState);
+		return res;
 	}
 
 

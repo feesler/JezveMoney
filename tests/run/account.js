@@ -25,7 +25,7 @@ export async function stateLoop()
 
 	// Check account name is 'New account' brefore input name
 	await test('Change currency', () => App.view.changeCurrency(3));
-	await test('Input balance (100 .01)', () => App.view.inputBalance('100.01'));
+	await test('Input balance (100.01)', () => App.view.inputBalance('100.01'));
 	await test('Change icon', () => App.view.changeIcon(1));
 
 	await test('Account name input', () => App.view.inputName('acc_1'));
@@ -185,7 +185,7 @@ export async function del(accounts)
 	await App.view.deleteAccounts(accounts);
 
 	App.view.expectedState = AccountsView.render(App.state);
-	await test('Delete accounts [' + accounts.join() + ']', () => App.view.checkState());
+	await test(`Delete accounts [${accounts.join()}]`, () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -197,7 +197,7 @@ export async function delFromUpdate(pos)
 	if (isNaN(pos) || pos < 0)
 		throw new Error('Position of account not specified');
 
-	App.view.setBlock('Delete account from update view [' + pos + ']', 2);
+	App.view.setBlock(`Delete account from update view [${pos}]`, 2);
 
 	if (!(App.view instanceof AccountsView))
 	{
@@ -216,7 +216,7 @@ export async function delFromUpdate(pos)
 	await App.view.deleteSelfItem();
 
 	App.view.expectedState = AccountsView.render(App.state);
-	await test('Delete account [' + pos + ']', () => App.view.checkState());
+	await test(`Delete account [${pos}]`, () => App.view.checkState());
 
 	await App.goToMainView();
 

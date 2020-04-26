@@ -10,15 +10,17 @@ export class AccountsView extends TestView
 {
 	async parseContent()
 	{
-		let res = { titleEl : await this.query('.content_wrap > .heading > h1'),
-	 				addBtn : await IconLink.create(this, await this.query('#add_btn')),
-					toolbar : {
-						elem : await this.query('#toolbar'),
-						editBtn : await IconLink.create(this, await this.query('#edit_btn')),
-						exportBtn : await IconLink.create(this, await this.query('#export_btn')),
-						delBtn : await IconLink.create(this, await this.query('#del_btn'))
-					}
-				};
+		let res = {
+			titleEl : await this.query('.content_wrap > .heading > h1'),
+			addBtn : await IconLink.create(this, await this.query('#add_btn')),
+			toolbar : {
+				elem : await this.query('#toolbar'),
+				editBtn : await IconLink.create(this, await this.query('#edit_btn')),
+				exportBtn : await IconLink.create(this, await this.query('#export_btn')),
+				delBtn : await IconLink.create(this, await this.query('#del_btn'))
+			}
+		};
+
 		if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 			throw new Error('Wrong accounts view structure');
 
@@ -83,7 +85,6 @@ export class AccountsView extends TestView
 
 	async deselectAccounts()
 	{
-		let ind = 0;
 		for(let acc_num = 0, l = this.content.tiles.items.length; acc_num < l; acc_num++)
 		{
 			let tile = this.content.tiles.items[acc_num];
@@ -113,7 +114,6 @@ export class AccountsView extends TestView
 	// Export transactions of specified accounts
 	async exportAccounts(acc)
 	{
-		let urlBefore = this.location;
 		await this.selectAccounts(acc);
 
 		let downloadURL = await this.prop(this.content.toolbar.exportBtn.linkElem, 'href');

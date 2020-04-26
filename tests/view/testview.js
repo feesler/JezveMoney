@@ -110,7 +110,7 @@ export class TestView
 			}
 
 			if (!res)
-				throw new Error('Not expected visibility(' + factVisible + ') of "' + countrolName + '" control');
+				throw new Error(`Not expected visibility(${factVisible}) of \\"${countrolName}\\" control`);
 		}
 
 		return true;
@@ -127,7 +127,7 @@ export class TestView
 			expected = controls[countrolName];
 			control = this.content[countrolName];
 			if (!control)
-				throw new Error('Control (' + countrolName + ') not found');
+				throw new Error(`Control (${countrolName}) not found`);
 
 			if (isObject(expected) || Array.isArray(expected))
 			{
@@ -140,9 +140,11 @@ export class TestView
 			}
 			else if (control.value !== expected)
 			{
-				res = { key : countrolName,
-								value : control.value,
-								expected : expected };
+				res = {
+					key : countrolName,
+					value : control.value,
+					expected : expected
+				};
 				break;
 			}
 		}
@@ -150,9 +152,9 @@ export class TestView
 		if (res !== true)
 		{
 			if ('expected' in res)
-				throw new Error('Not expected value "' + res.value + '" for (' + res.key + ') "' + res.expected  + '" is expected');
+				throw new Error(`Not expected value \\"${res.value}\\" for (${res.key}) \\"${res.expected}\\" is expected`);
 			else
-				throw new Error('Path (' + res.key + ') not found');
+				throw new Error(`Path (${res.key}) not found`);
 		}
 
 		return res;

@@ -10,14 +10,16 @@ export class PersonsView extends TestView
 {
 	async parseContent()
 	{
-		let res = { titleEl : await this.query('.content_wrap > .heading > h1'),
-	 				addBtn : await IconLink.create(this, await this.query('#add_btn')),
-					toolbar : {
-						elem : await this.query('#toolbar'),
-						editBtn : await IconLink.create(this, await this.query('#edit_btn')),
-						delBtn : await IconLink.create(this, await this.query('#del_btn'))
-					}
-				};
+		let res = {
+			titleEl : await this.query('.content_wrap > .heading > h1'),
+			addBtn : await IconLink.create(this, await this.query('#add_btn')),
+			toolbar : {
+				elem : await this.query('#toolbar'),
+				editBtn : await IconLink.create(this, await this.query('#edit_btn')),
+				delBtn : await IconLink.create(this, await this.query('#del_btn'))
+			}
+		};
+
 		if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
 			throw new Error('Wrong persons view structure');
 

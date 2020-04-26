@@ -22,8 +22,8 @@ export class ProfileView extends TestView
 		if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
 			throw new Error('Wrong profile view structure');
 
-		res.login = res.loginElem.innerText;
-		res.name = res.nameElem.innerText;
+		res.login = await this.prop(res.loginElem, 'innerText');
+		res.name = await this.prop(res.nameElem, 'innerText');
 
 		let buttons = await this.queryAll(blocks[3], 'input[type="button"]');
 		if (!buttons || buttons.length != 3)
@@ -32,21 +32,25 @@ export class ProfileView extends TestView
 		res.resetAllBtn = buttons[1];
 		res.deleteProfileBtn = buttons[2];
 
-		res.changeNamePopup = {};
-		res.changeNamePopup.elem = await this.query('#chname_popup');
-		res.changeNamePopup.content = await this.query('#changename');
-		res.changeNamePopup.newNameInp = await this.query('#newname');
+		res.changeNamePopup = {
+			elem : await this.query('#chname_popup'),
+			content : await this.query('#changename'),
+			newNameInp : await this.query('#newname'),
+		};
+
 		if (res.changeNamePopup.elem)
 		{
 			res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, '.popup_controls > input.btn.ok_btn');
 			res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close_btn > button');
 		}
 
-		res.changePassPopup = {};
-		res.changePassPopup.elem = await this.query('#chpass_popup');
-		res.changePassPopup.content = await this.query('#changepass');
-		res.changePassPopup.oldPassInp = await this.query('#oldpwd');
-		res.changePassPopup.newPassInp = await this.query('#newpwd');
+		res.changePassPopup = {
+			elem : await this.query('#chpass_popup'),
+			content : await this.query('#changepass'),
+			oldPassInp : await this.query('#oldpwd'),
+			newPassInp : await this.query('#newpwd'),
+		};
+
 		if (res.changePassPopup.elem)
 		{
 			res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, '.popup_controls > input.btn.ok_btn');

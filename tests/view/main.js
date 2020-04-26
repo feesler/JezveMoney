@@ -17,12 +17,14 @@ export class MainView extends TestView
 
 		let res = {};
 		res.widgets = [];
-		for(let i = 0; i < widgetsElem.length; i++)
+		for(let wElem of widgetsElem)
 		{
-			let widget = { elem : widgetsElem[i],
-							titleElem : await this.query(widgetsElem[i], '.widget_title'),
-							linkElem : await this.query(widgetsElem[i], '.widget_title > a'),
-							textElem : await this.query(widgetsElem[i], '.widget_title span') };
+			let widget = {
+				elem : wElem,
+				titleElem : await this.query(wElem, '.widget_title'),
+				linkElem : await this.query(wElem, '.widget_title > a'),
+				textElem : await this.query(wElem, '.widget_title span')
+			};
 
 			if (widget.linkElem)
 				widget.link = await this.prop(widget.linkElem, 'href');
@@ -70,7 +72,7 @@ export class MainView extends TestView
 			throw new Error('Wrong state of accounts widget');
 
 		 if (!accWidget.tiles || accWidget.tiles.items.length <= accNum)
-			throw new Error('Tile ' + accNum + ' not found');
+			throw new Error(`Tile ${accNum} not found`);
 
 		let tile = accWidget.tiles.items[accNum];
 		let link = tile.linkElem;

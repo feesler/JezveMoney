@@ -6,7 +6,7 @@ import { App } from '../../app.js'
 
 
 // Create or update transfer transaction view class
-class DebtTransactionView extends TransactionView
+export class DebtTransactionView extends TransactionView
 {
 	async parseOperation(el)
 	{
@@ -260,30 +260,37 @@ class DebtTransactionView extends TransactionView
 		if (isNaN(newState) || newState < 0 || newState > 9)
 			throw new Error('Wrong state specified');
 
-		let res = { model : { state : newState },
-					visibility : { delBtn : this.model.isUpdate,
-									person : true, account : { tile : !this.model.noAccount },
-									selaccount : this.model.noAccount, noacc_btn : !this.model.noAccount,
-									dest_amount_row : false, dest_amount_left : false,
-									exchange_row : false, exch_left : false },
-					values : { typeMenu : { activeType : DEBT },
-								src_amount_row : { value : this.model.srcAmount.toString(), label : 'Amount', currSign : this.model.srcCurr.sign, isCurrActive : false },
-								src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
-								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
-								result_balance_row : { value : this.model.srcResBal.toString(), isCurrActive : false },
-								result_balance_dest_row : { value : this.model.destResBal.toString(), isCurrActive : false },
-								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
-								exch_left : this.model.fmtExch } };
+		let res = {
+			model : { state : newState },
+			visibility : {
+				delBtn : this.model.isUpdate,
+				person : true, account : { tile : !this.model.noAccount },
+				selaccount : this.model.noAccount, noacc_btn : !this.model.noAccount,
+				dest_amount_row : false, dest_amount_left : false,
+				exchange_row : false, exch_left : false },
+			values : {
+				typeMenu : { activeType : DEBT },
+				src_amount_row : { value : this.model.srcAmount.toString(), label : 'Amount', currSign : this.model.srcCurr.sign, isCurrActive : false },
+				src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
+				dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
+				result_balance_row : { value : this.model.srcResBal.toString(), isCurrActive : false },
+				result_balance_dest_row : { value : this.model.destResBal.toString(), isCurrActive : false },
+				exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
+				exch_left : this.model.fmtExch
+			}
+		};
 
 		if (this.model.isUpdate)
 			res.values.delBtn = { title : 'Delete' };
 
 		if (this.model.debtType)
 		{
-			setParam(res.values, { person : { tile : { name : this.model.person.name, balance : this.model.srcAccount.fmtBalance } },
-									src_res_balance_left : this.model.fmtSrcResBal,
-									result_balance_row : { label : 'Result balance (Person)' },
-									result_balance_dest_row : { label : 'Result balance (Account)' } });
+			setParam(res.values, {
+						person : { tile : { name : this.model.person.name, balance : this.model.srcAccount.fmtBalance } },
+						src_res_balance_left : this.model.fmtSrcResBal,
+						result_balance_row : { label : 'Result balance (Person)' },
+						result_balance_dest_row : { label : 'Result balance (Account)' }
+					});
 
 			// Check initial state
 			if (this.model.noAccount && !this.model.lastAccount_id && this.model.destResBal == '')
@@ -292,14 +299,20 @@ class DebtTransactionView extends TransactionView
 				res.values.dest_res_balance_left = this.model.fmtDestResBal;
 
 			if (!this.model.noAccount)
-				setParam(res.values.account, { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } });
+			{
+				setParam(res.values.account, {
+							tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance }
+						});
+			}
 		}
 		else
 		{
-			setParam(res.values, { person : { tile : { name : this.model.person.name, balance : this.model.destAccount.fmtBalance } },
-									dest_res_balance_left : this.model.fmtDestResBal,
-									result_balance_row : { label : 'Result balance (Account)' },
-									result_balance_dest_row : { label : 'Result balance (Person)' } });
+			setParam(res.values, {
+						person : { tile : { name : this.model.person.name, balance : this.model.destAccount.fmtBalance } },
+						dest_res_balance_left : this.model.fmtDestResBal,
+						result_balance_row : { label : 'Result balance (Account)' },
+						result_balance_dest_row : { label : 'Result balance (Person)' }
+					});
 
 			// Check initial state
 			if (this.model.noAccount && !this.model.lastAccount_id && this.model.srcResBal == '')
@@ -308,69 +321,93 @@ class DebtTransactionView extends TransactionView
 				res.values.src_res_balance_left = this.model.fmtSrcResBal;
 
 			if (!this.model.noAccount)
-				setParam(res.values.account, { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } });
+			{
+				setParam(res.values.account, {
+							tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance }
+						});
+			}
 		}
 
 
 		if (newState === 0)
 		{
-			setParam(res.visibility, { src_amount_row : true, src_amount_left : false,
-										result_balance_row : false, src_res_balance_left : true,
-										result_balance_dest_row : false, dest_res_balance_left : true });
+			setParam(res.visibility, {
+						src_amount_row : true, src_amount_left : false,
+						result_balance_row : false, src_res_balance_left : true,
+						result_balance_dest_row : false, dest_res_balance_left : true
+					});
 		}
 		else if (newState === 1)
 		{
-			setParam(res.visibility, { src_amount_row : false, src_amount_left : true,
-										result_balance_row : true, src_res_balance_left : false,
-										result_balance_dest_row : false, dest_res_balance_left : true });
+			setParam(res.visibility, {
+						src_amount_row : false, src_amount_left : true,
+						result_balance_row : true, src_res_balance_left : false,
+						result_balance_dest_row : false, dest_res_balance_left : true
+					});
 		}
 		else if (newState === 2)
 		{
-			setParam(res.visibility, { src_amount_row : false, src_amount_left : true,
-										result_balance_row : false, src_res_balance_left : true,
-										result_balance_dest_row : true, dest_res_balance_left : false });
+			setParam(res.visibility, {
+						src_amount_row : false, src_amount_left : true,
+						result_balance_row : false, src_res_balance_left : true,
+						result_balance_dest_row : true, dest_res_balance_left : false
+					});
 		}
 		else if (newState === 3)
 		{
-			setParam(res.visibility, { src_amount_row : true, src_amount_left : false,
-										result_balance_row : false, src_res_balance_left : true,
-										result_balance_dest_row : false, dest_res_balance_left : true });
+			setParam(res.visibility, {
+						src_amount_row : true, src_amount_left : false,
+						result_balance_row : false, src_res_balance_left : true,
+						result_balance_dest_row : false, dest_res_balance_left : true
+					});
 		}
 		else if (newState === 4)
 		{
-			setParam(res.visibility, { src_amount_row : false, src_amount_left : true,
-										result_balance_row : false, src_res_balance_left : true,
-										result_balance_dest_row : true, dest_res_balance_left : false });
+			setParam(res.visibility, {
+						src_amount_row : false, src_amount_left : true,
+						result_balance_row : false, src_res_balance_left : true,
+						result_balance_dest_row : true, dest_res_balance_left : false
+					});
 		}
 		else if (newState === 5)
 		{
-			setParam(res.visibility, { src_amount_row : false, src_amount_left : true,
-										result_balance_row : true, src_res_balance_left : false,
-										result_balance_dest_row : false, dest_res_balance_left : true });
+			setParam(res.visibility, {
+						src_amount_row : false, src_amount_left : true,
+						result_balance_row : true, src_res_balance_left : false,
+						result_balance_dest_row : false, dest_res_balance_left : true
+					});
 		}
 		else if (newState === 6)
 		{
-			setParam(res.visibility, { src_amount_row : true, src_amount_left : false,
-										result_balance_row : false, src_res_balance_left : true,
-										result_balance_dest_row : false, dest_res_balance_left : false });
+			setParam(res.visibility, {
+						src_amount_row : true, src_amount_left : false,
+						result_balance_row : false, src_res_balance_left : true,
+						result_balance_dest_row : false, dest_res_balance_left : false
+					});
 		}
 		else if (newState === 7)
 		{
-			setParam(res.visibility, { src_amount_row : true, src_amount_left : false,
-										result_balance_row : false, src_res_balance_left : false,
-										result_balance_dest_row : false, dest_res_balance_left : true });
+			setParam(res.visibility, {
+						src_amount_row : true, src_amount_left : false,
+						result_balance_row : false, src_res_balance_left : false,
+						result_balance_dest_row : false, dest_res_balance_left : true
+					});
 		}
 		else if (newState === 8)
 		{
-			setParam(res.visibility, { src_amount_row : false, src_amount_left : true,
-										result_balance_row : false, src_res_balance_left : false,
-										result_balance_dest_row : true, dest_res_balance_left : false });
+			setParam(res.visibility, {
+						src_amount_row : false, src_amount_left : true,
+						result_balance_row : false, src_res_balance_left : false,
+						result_balance_dest_row : true, dest_res_balance_left : false
+					});
 		}
 		else if (newState === 9)
 		{
-			setParam(res.visibility, { src_amount_row : false, src_amount_left : true,
-										result_balance_row : true, src_res_balance_left : false,
-										result_balance_dest_row : false, dest_res_balance_left : false });
+			setParam(res.visibility, {
+						src_amount_row : false, src_amount_left : true,
+						result_balance_row : true, src_res_balance_left : false,
+						result_balance_dest_row : false, dest_res_balance_left : false
+					});
 		}
 
 		this.expectedState = res;
@@ -746,24 +783,21 @@ class DebtTransactionView extends TransactionView
 		else if (this.model.state === 9)		// Transition 35
 			this.setExpectedState(6);
 		else
-			throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
+			throw new Error(`Unexpected state ${this.model.state} for clickSrcAmount action`);
 
 		return super.clickSrcAmount();
 	}
 
 
-	changeSourceCurrency(val)
+	changeSourceCurrency()
 	{
 		throw new Error('Unexpected action: can\'t change source currency of debt transaction');
 	}
 
 
-	changeDestCurrency(val)
+	changeDestCurrency()
 	{
 		throw new Error('Unexpected action: can\'t change destination currency of debt transaction');
 	}
 
 }
-
-
-export { DebtTransactionView };

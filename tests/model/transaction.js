@@ -23,7 +23,7 @@ export class Transaction
 		};
 
 		if (!type || !(type in typeToStr))
-			throw new Error('Unknown transaction type ' + type);
+			throw new Error(`Unknown transaction type ${type}`);
 
 		return typeToStr[type];
 	}

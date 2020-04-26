@@ -1,4 +1,3 @@
-import { api } from '../../api.js';
 import * as TransactionTests from './common.js'
 import { Currency } from '../../model/currency.js';
 import { test } from '../../common.js'
@@ -15,35 +14,33 @@ export async function submit(params)
 	{
 		let acc = App.state.accounts.getItemByIndex(params.destAcc);
 		if (!acc)
-			throw new Error('Account (' + params.destAcc + ') not found');
+			throw new Error(`Account (${params.destAcc}) not found`);
 
-		await test('Change destination account to (' + acc.name + ')',
-				() => view.changeDestAccountByPos(params.destAcc));
+		await test(`Change destination account to (${acc.name})`, () => view.changeDestAccountByPos(params.destAcc));
 	}
 
 	if ('srcCurr' in params)
 	{
 		let curr = Currency.getById(params.srcCurr);
 		if (!curr)
-			throw new Error('Currency (' + params.srcCurr + ') not found');
+			throw new Error(`Currency (${params.srcCurr}) not found`);
 
-		await test('Change source currency to ' + curr.name,
-				() => view.changeSourceCurrency(params.srcCurr));
+		await test(`Change source currency to ${curr.name}`, () => view.changeSourceCurrency(params.srcCurr));
 	}
 
 	if (!('srcAmount' in params))
 		throw new Error('Source amount value not specified');
 
-	await test('Source amount (' + params.srcAmount + ') input', () => view.inputSrcAmount(params.srcAmount));
+	await test(`Source amount (${params.srcAmount}) input`, () => view.inputSrcAmount(params.srcAmount));
 
 	if ('srcCurr' in params && 'destAmount' in params)
-		await test('Destination amount (' + params.destAmount + ') input', () => view.inputDestAmount(params.destAmount));
+		await test(`Destination amount (${params.destAmount}) input`, () => view.inputDestAmount(params.destAmount));
 
 	if ('date' in params)
-		await test('Date (' + params.date + ') input', () => view.changeDate(params.date));
+		await test(`Date (${params.date}) input`, () => view.changeDate(params.date));
 
 	if ('comment' in params)
-		await test('Comment (' + params.comment + ') input', () => view.inputComment(params.comment));
+		await test(`Comment (${params.comment}) input`, () => view.inputComment(params.comment));
 
 	let res = view.getExpectedTransaction();
 

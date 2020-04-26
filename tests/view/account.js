@@ -163,12 +163,12 @@ export class AccountView extends TestView
 		}
 
 		let curChildren = (res.isUpdate) ? 3 : 2;
-		let elem = await this.query('form > *:nth-child(' + curChildren + ') .dd_container');
+		let elem = await this.query(`form > *:nth-child(${curChildren}) .dd_container`);
 
 		res.iconDropDown = await DropDown.create(this, elem);
 
 		curChildren++;
-		elem = await this.query('form > *:nth-child(' + curChildren + ')');
+		elem = await this.query(`form > *:nth-child(${curChildren})`);
 		res.name = await InputRow.create(this, elem);
 		if (!res.name)
 			throw new Error('Account name input not found');
@@ -178,7 +178,7 @@ export class AccountView extends TestView
 		res.currDropDown = await DropDown.create(this, elem);
 
 		curChildren++;
-		elem = await this.query('form > *:nth-child(' + curChildren + ')');
+		elem = await this.query(`form > *:nth-child(${curChildren})`);
 
 		res.balance = await InputRow.create(this, elem);
 

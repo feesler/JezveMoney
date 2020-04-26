@@ -101,8 +101,7 @@ export async function create(type, params, submitHandler)
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }
 
 
@@ -145,14 +144,13 @@ export async function update(type, params, submitHandler)
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }
 
 
 export async function del(type, transactions)
 {
-	App.view.setBlock('Delete transactions [' + transactions.join() + ']', 3);
+	App.view.setBlock(`Delete transactions [${transactions.join()}]`, 3);
 
 	await App.goToMainView();
 
@@ -169,8 +167,7 @@ export async function del(type, transactions)
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }
 
 
@@ -203,6 +200,5 @@ export async function delFromUpdate(type, pos)
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }

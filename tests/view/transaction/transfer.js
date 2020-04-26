@@ -6,7 +6,7 @@ import { App } from '../../app.js'
 
 
 // Transfer transaction view class
-class TransferTransactionView extends TransactionView
+export class TransferTransactionView extends TransactionView
 {
 	async buildModel(cont)
 	{
@@ -29,9 +29,9 @@ class TransferTransactionView extends TransactionView
 		res.dest_curr_id = cont.dest_amount_row ? parseInt(cont.dest_amount_row.hiddenValue) : 0;
 
 		if (res.srcAccount.curr_id != res.src_curr_id)
-			throw new Error('Unexpected destination currency ' + res.dest_curr_id + '(' + res.destAccount.curr_id + ' is expected)');
+			throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
 		if (res.destAccount.curr_id != res.dest_curr_id)
-			throw new Error('Unexpected destination currency ' + res.dest_curr_id + '(' + res.destAccount.curr_id + ' is expected)');
+			throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
 
 		res.srcCurr = Currency.getById(res.src_curr_id);
 		if (!res.srcCurr)
@@ -148,116 +148,142 @@ class TransferTransactionView extends TransactionView
 		if (isNaN(newState) || newState < 0 || newState > 8)
 			throw new Error('Wrong state specified');
 
-		let res = { model : { state : newState },
-					visibility : { delBtn : this.model.isUpdate, source : true, destination : true },
-					values : { typeMenu : { activeType : TRANSFER },
-								source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
-								destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
-								src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
-								src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
-								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
-								dest_amount_left : this.model.destCurr.format(this.model.fDestAmount),
-								result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance (Source)', isCurrActive : false },
-								src_res_balance_left : this.model.fmtSrcResBal,
-								result_balance_dest_row : { value : this.model.destResBal.toString(), label : 'Result balance (Destination)', isCurrActive : false },
-								dest_res_balance_left : this.model.fmtDestResBal,
-								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
-								exch_left : this.model.fmtExch } };
+		let res = {
+			model : { state : newState },
+			visibility : { delBtn : this.model.isUpdate, source : true, destination : true },
+			values : {
+				typeMenu : { activeType : TRANSFER },
+				source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
+				destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
+				src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
+				src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
+				dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },
+				dest_amount_left : this.model.destCurr.format(this.model.fDestAmount),
+				result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance (Source)', isCurrActive : false },
+				src_res_balance_left : this.model.fmtSrcResBal,
+				result_balance_dest_row : { value : this.model.destResBal.toString(), label : 'Result balance (Destination)', isCurrActive : false },
+				dest_res_balance_left : this.model.fmtDestResBal,
+				exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
+				exch_left : this.model.fmtExch
+			}
+		};
 
 		if (this.model.isUpdate)
 			res.values.delBtn = { title : 'Delete' };
 
 		if (newState === 0 || newState === 1 || newState === 2)
 		{
-			setParam(res.values, { src_amount_row : { label : 'Amount' },
-									dest_amount_row : { label : 'Amount' } });
+			setParam(res.values, {
+						src_amount_row : { label : 'Amount' },
+						dest_amount_row : { label : 'Amount' }
+					});
 		}
 		else
 		{
-			setParam(res.values, { src_amount_row : { label : 'Source amount' },
-									dest_amount_row : { label : 'Destination amount' } });
+			setParam(res.values, {
+						src_amount_row : { label : 'Source amount' },
+						dest_amount_row : { label : 'Destination amount' }
+					});
 		}
 
 		if (newState === 0)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false,
-											src_res_balance_left : true, dest_res_balance_left : true,
-											exch_left : false,
-											src_amount_row : true, dest_amount_row : false,
-											result_balance_row : false, result_balance_dest_row : false,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : false, dest_amount_left : false,
+						src_res_balance_left : true, dest_res_balance_left : true,
+						exch_left : false,
+						src_amount_row : true, dest_amount_row : false,
+						result_balance_row : false, result_balance_dest_row : false,
+						exchange_row : false
+					});
 		}
 		else if (newState === 1)
 		{
-			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
-											src_res_balance_left : false, dest_res_balance_left : true,
-											exch_left : false,
-											src_amount_row : false, dest_amount_row : false,
-											result_balance_row : true, result_balance_dest_row : false,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : true, dest_amount_left : false,
+						src_res_balance_left : false, dest_res_balance_left : true,
+						exch_left : false,
+						src_amount_row : false, dest_amount_row : false,
+						result_balance_row : true, result_balance_dest_row : false,
+						exchange_row : false
+					});
 		}
 		else if (newState === 2)
 		{
-			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
-											src_res_balance_left : true, dest_res_balance_left : false,
-											exch_left : false,
-											src_amount_row : false, dest_amount_row : false,
-											result_balance_row : false, result_balance_dest_row : true,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : true, dest_amount_left : false,
+						src_res_balance_left : true, dest_res_balance_left : false,
+						exch_left : false,
+						src_amount_row : false, dest_amount_row : false,
+						result_balance_row : false, result_balance_dest_row : true,
+						exchange_row : false
+					});
 		}
 		else if (newState === 3)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : false,
-											src_res_balance_left : true, dest_res_balance_left : true,
-											exch_left : true,
-											src_amount_row : true, dest_amount_row : true,
-											result_balance_row : false, result_balance_dest_row : false,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : false, dest_amount_left : false,
+						src_res_balance_left : true, dest_res_balance_left : true,
+						exch_left : true,
+						src_amount_row : true, dest_amount_row : true,
+						result_balance_row : false, result_balance_dest_row : false,
+						exchange_row : false
+					});
 		}
 		else if (newState === 4)
 		{
-			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : false,
-											src_res_balance_left : false, dest_res_balance_left : true,
-											exch_left : true,
-											src_amount_row : false, dest_amount_row : true,
-											result_balance_row : true, result_balance_dest_row : false,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : true, dest_amount_left : false,
+						src_res_balance_left : false, dest_res_balance_left : true,
+						exch_left : true,
+						src_amount_row : false, dest_amount_row : true,
+						result_balance_row : true, result_balance_dest_row : false,
+						exchange_row : false
+					});
 		}
 		else if (newState === 5)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true,
-											src_res_balance_left : true, dest_res_balance_left : false,
-											exch_left : true,
-											src_amount_row : true, dest_amount_row : false,
-											result_balance_row : false, result_balance_dest_row : true,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : false, dest_amount_left : true,
+						src_res_balance_left : true, dest_res_balance_left : false,
+						exch_left : true,
+						src_amount_row : true, dest_amount_row : false,
+						result_balance_row : false, result_balance_dest_row : true,
+						exchange_row : false
+					});
 		}
 		else if (newState === 6)
 		{
-			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : true,
-											src_res_balance_left : false, dest_res_balance_left : false,
-											exch_left : true,
-											src_amount_row : false, dest_amount_row : false,
-											result_balance_row : true, result_balance_dest_row : true,
-											exchange_row : false } });
+			setParam(res.visibility, {
+						src_amount_left : true, dest_amount_left : true,
+						src_res_balance_left : false, dest_res_balance_left : false,
+						exch_left : true,
+						src_amount_row : false, dest_amount_row : false,
+						result_balance_row : true, result_balance_dest_row : true,
+						exchange_row : false
+					});
 		}
 		else if (newState === 7)
 		{
-			setParam(res, { visibility : { src_amount_left : false, dest_amount_left : true,
-											src_res_balance_left : true, dest_res_balance_left : true,
-											exch_left : false,
-											src_amount_row : true, dest_amount_row : false,
-											result_balance_row : false, result_balance_dest_row : false,
-											exchange_row : true } });
+			setParam(res.visibility, {
+						src_amount_left : false, dest_amount_left : true,
+						src_res_balance_left : true, dest_res_balance_left : true,
+						exch_left : false,
+						src_amount_row : true, dest_amount_row : false,
+						result_balance_row : false, result_balance_dest_row : false,
+						exchange_row : true
+					});
 		}
 		else if (newState === 8)
 		{
-			setParam(res, { visibility : { src_amount_left : true, dest_amount_left : true,
-											src_res_balance_left : false, dest_res_balance_left : true,
-											exch_left : false,
-											src_amount_row : false, dest_amount_row : false,
-											result_balance_row : true, result_balance_dest_row : false,
-											exchange_row : true } });
+			setParam(res.visibility, {
+						src_amount_left : true, dest_amount_left : true,
+						src_res_balance_left : false, dest_res_balance_left : true,
+						exch_left : false,
+						src_amount_row : false, dest_amount_row : false,
+						result_balance_row : true, result_balance_dest_row : false,
+						exchange_row : true
+					});
 		}
 
 		this.expectedState = res;
@@ -269,7 +295,7 @@ class TransferTransactionView extends TransactionView
 	inputSrcAmount(val)
 	{
 		if (this.model.state !== 0 && this.model.state !== 3 && this.model.state !== 5 && this.model.state !== 7)
-			throw new Error('Unexpected state ' + this.model.state + ' to input source amount');
+			throw new Error(`Unexpected state ${this.model.state} to input source amount`);
 
 		let fNewValue = (isValidValue(val)) ? normalize(val) : val;
 		let valueChanged = (this.model.fSrcAmount != fNewValue);
@@ -298,7 +324,7 @@ class TransferTransactionView extends TransactionView
 	inputDestAmount(val)
 	{
 		if (this.model.state !== 3 && this.model.state !== 4)
-			throw new Error('Unexpected state ' + this.model.state + ' to input destination amount');
+			throw new Error(`Unexpected state ${this.model.state} to input destination amount`);
 
 		let fNewValue = (isValidValue(val)) ? normalize(val) : val;
 		let valueChanged = (this.model.fDestAmount != fNewValue);
@@ -387,7 +413,7 @@ class TransferTransactionView extends TransactionView
 	inputExchRate(val)
 	{
 		if (this.model.state !== 3)
-			throw new Error('Unexpected state ' + this.model.state + ' to input exchange rate');
+			throw new Error(`Unexpected state ${this.model.state} to input exchange rate`);
 
 		this.model.exchRate = val;
 
@@ -506,7 +532,7 @@ class TransferTransactionView extends TransactionView
 				 	this.model.state === 6 || this.model.state === 7 || this.model.state === 8)
 				this.setExpectedState(this.model.state);			// Transition 43, 36, 26, 49, 51 or 57
 			else
-				throw new Error('changeSrcAccount(): Unexpected state ' + this.model.state + ' with different currencies');
+				throw new Error(`changeSrcAccount(): Unexpected state ${this.model.state} with different currencies`);
 		}
 		else
 		{
@@ -530,7 +556,7 @@ class TransferTransactionView extends TransactionView
 				this.setExpectedState(2);			// Transition 27
 			}
 			else
-				throw new Error('changeSrcAccount(): Unexpected state ' + this.model.state + ' with same currencies');
+				throw new Error(`changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
 		}
 
 		return super.changeSrcAccount(account_id);
@@ -601,7 +627,7 @@ class TransferTransactionView extends TransactionView
 						this.model.state === 6 || this.model.state === 7 || this.model.state === 8)			// Transition 47, 59 or 53
 				this.setExpectedState(this.model.state);
 			else
-				throw new Error('changeDestAccount(): Unexpected state ' + this.model.state + ' with different currencies');
+				throw new Error(`changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
 		}
 		else
 		{
@@ -625,7 +651,7 @@ class TransferTransactionView extends TransactionView
 				this.setExpectedState(2);
 			}
 			else
-				throw new Error('changeDestAccount(): Unexpected state ' + this.model.state + ' with same currencies');
+				throw new Error(`changeDestAccount(): Unexpected state ${this.model.state} with same currencies`);
 		}
 
 		return super.changeDestAccount(account_id);
@@ -643,7 +669,7 @@ class TransferTransactionView extends TransactionView
 		else if (this.model.state === 8)		// Transition 23
 			this.setExpectedState(7);
 		else
-			throw new Error('Unexpected state ' + this.model.state + ' for clickSrcAmount action');
+			throw new Error(`Unexpected state ${this.model.state} for clickSrcAmount action`);
 
 		return super.clickSrcAmount();
 	}
@@ -656,7 +682,7 @@ class TransferTransactionView extends TransactionView
 		else if (this.model.state === 6 || this.model.state === 8)		// Transition 33 or 35
 			this.setExpectedState(4);
 		else
-			throw new Error('Unexpected state ' + this.model.state + ' for clickDestAmount action');
+			throw new Error(`Unexpected state ${this.model.state} for clickDestAmount action`);
 
 		return super.clickDestAmount();
 	}
@@ -684,6 +710,3 @@ class TransferTransactionView extends TransactionView
 		throw new Error('Unexpected action: can\'t change destination currency of transfter transaction');
 	}
 }
-
-
-export { TransferTransactionView };

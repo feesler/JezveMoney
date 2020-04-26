@@ -20,8 +20,7 @@ export async function create(params)
 
 	await test(`Create ${Transaction.typeToStr(params.type)} transaction`, async () =>
 	{
-		let expected = App.state.clone();
-		let resExpected = expected.createTransaction(params);
+		let resExpected = App.state.createTransaction(params);
 
 		// Send API sequest to server
 		let createRes;
@@ -39,8 +38,7 @@ export async function create(params)
 
 		transaction_id = (createRes) ? createRes.id : resExpected;
 
-		await App.state.fetch();
-		return App.state.meetExpectation(expected);
+		return App.state.fetchAndTest();
 	});
 
 	return transaction_id;
@@ -79,15 +77,14 @@ export async function update(params)
 
 	await test('Update transaction', async () =>
 	{
-		let expected = App.state.clone();
-		let resExpected = expected.updateTransaction(params);
+		let resExpected = App.state.updateTransaction(params);
 
 		// Obtain data for API request
 		let updParams = { date : App.dates.now, comment : '' };
-		let expTrans = expected.transactions.getItem(params.id);
+		let expTrans = App.state.transactions.getItem(params.id);
 
 		if (expTrans)
-			updParams = expected.transactionToRequest(expTrans);
+			updParams = App.state.transactionToRequest(expTrans);
 		if (!resExpected)
 			setParam(updParams, params);
 
@@ -104,8 +101,7 @@ export async function update(params)
 				throw e;
 		}
 
-		await App.state.fetch();
-		return App.state.meetExpectation(expected);
+		return App.state.fetchAndTest();
 	});
 
 	return updateRes;
@@ -120,8 +116,7 @@ export async function del(ids)
 
 	await test('Delete transaction', async () =>
 	{
-		let expected = App.state.clone();
-		let resExpected = expected.deleteTransactions(ids);
+		let resExpected = App.state.deleteTransactions(ids);
 
 		// Send API sequest to server
 		try
@@ -136,8 +131,7 @@ export async function del(ids)
 				throw e;
 		}
 
-		await App.state.fetch();
-		return App.state.meetExpectation(expected);
+		return App.state.fetchAndTest();
 	});
 
 	return deleteRes;

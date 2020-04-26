@@ -266,7 +266,7 @@ class NodeEnvironment extends Environment
 
 			method = method.toLowerCase();
 			if (!supportedMethods.includes(method))
-				reject('Unexpected method ' + method);
+				reject(`Unexpected method ${method}`);
 
 			let postData = null;
 			let options = { method : method, headers : {} };
@@ -461,7 +461,7 @@ class NodeEnvironment extends Environment
 		if (browser)
 			await browser.close();
 
-		console.log('Total: ' + this.results.total + ' Passed: ' + this.results.ok + ' Failed: ' + this.results.fail);
+		console.log(`Total: ${this.results.total} Passed: ${this.results.ok} Failed: ${this.results.fail}`);
 
 		process.exit(res);
 	}

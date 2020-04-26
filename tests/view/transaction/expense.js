@@ -6,7 +6,7 @@ import { App } from '../../app.js'
 
 
 // Create or update expense transaction view tests
-class ExpenseTransactionView extends TransactionView
+export class ExpenseTransactionView extends TransactionView
 {
 	async buildModel(cont)
 	{
@@ -25,7 +25,7 @@ class ExpenseTransactionView extends TransactionView
 		res.dest_curr_id = cont.dest_amount_row ? parseInt(cont.dest_amount_row.hiddenValue) : 0;
 
 		if (res.srcAccount.curr_id != res.src_curr_id)
-			throw new Error('Unexpected source currency ' + res.src_curr_id + ' (' + res.srcAccount.curr_id + ' is expected)');
+			throw new Error(`Unexpected source currency ${res.src_curr_id} (${res.srcAccount.curr_id} is expected)`);
 
 		res.srcCurr = Currency.getById(res.src_curr_id);
 		if (!res.srcCurr)
@@ -114,64 +114,83 @@ class ExpenseTransactionView extends TransactionView
 		if (isNaN(newState) || newState < 0 || newState > 4)
 			throw new Error('Wrong state specified');
 
-		let res = { model : { state : newState },
-					visibility : { delBtn : this.model.isUpdate,
-									source : true, destination : false, src_amount_left : false,
-									dest_res_balance_left : false, result_balance_dest_row : false },
-					values : { typeMenu : { activeType : EXPENSE },
-								source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
-								src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
-								dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },
-								dest_amount_left : this.model.destCurr.format(this.model.fDestAmount),
-								result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance', isCurrActive : false },
-								src_res_balance_left : this.model.fmtSrcResBal,
-								exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
-								exch_left : this.model.fmtExch } };
+		let res = {
+			model : { state : newState },
+			visibility : {
+				delBtn : this.model.isUpdate,
+				source : true, destination : false, src_amount_left : false, dest_res_balance_left : false, result_balance_dest_row : false
+			},
+			values : {
+				typeMenu : { activeType : EXPENSE },
+				source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
+				src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
+				dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },
+				dest_amount_left : this.model.destCurr.format(this.model.fDestAmount),
+				result_balance_row : { value : this.model.srcResBal.toString(), label : 'Result balance', isCurrActive : false },
+				src_res_balance_left : this.model.fmtSrcResBal,
+				exchange_row : { value : this.model.exchRate.toString(), currSign : this.model.exchSign },
+				exch_left : this.model.fmtExch
+			}
+		};
 
 		if (this.model.isUpdate)
 			res.values.delBtn = { title : 'Delete' };
 
 		if (newState === 0 || newState === 1)
 		{
-			setParam(res.values, { src_amount_row : { label : 'Amount' },
-									dest_amount_row : { label : 'Amount' } });
+			setParam(res.values, {
+						src_amount_row : { label : 'Amount' },
+						dest_amount_row : { label : 'Amount' }
+					});
 		}
 		else
 		{
-			setParam(res.values, { src_amount_row : { label : 'Source amount' },
-									dest_amount_row : { label : 'Destination amount' } });
+			setParam(res.values, {
+						src_amount_row : { label : 'Source amount' },
+						dest_amount_row : { label : 'Destination amount' }
+					});
 		}
 
 		if (newState === 0)
 		{
-			setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : false,
-										src_amount_row : false, dest_amount_row : true, exchange_row : false,
-										result_balance_row : false } });
+			setParam(res.visibility, {
+						dest_amount_left : false, src_res_balance_left : true, exch_left : false,
+						src_amount_row : false, dest_amount_row : true, exchange_row : false,
+						result_balance_row : false
+					});
 		}
 		else if (newState === 1)
 		{
-			setParam(res, { visibility : { dest_amount_left : true, src_res_balance_left : false, exch_left : false,
-										src_amount_row : false, dest_amount_row : false, exchange_row : false,
-										result_balance_row : true } });
+			setParam(res.visibility, {
+						dest_amount_left : true, src_res_balance_left : false, exch_left : false,
+						src_amount_row : false, dest_amount_row : false, exchange_row : false,
+						result_balance_row : true
+					});
 		}
 		else if (newState === 2)
 		{
-			setParam(res, { visibility : { dest_amount_left : false, src_res_balance_left : true, exch_left : true,
-										src_amount_row : true, dest_amount_row : true, exchange_row : false,
-										result_balance_row : false } });
+			setParam(res.visibility, {
+						dest_amount_left : false, src_res_balance_left : true, exch_left : true,
+						src_amount_row : true, dest_amount_row : true, exchange_row : false,
+						result_balance_row : false
+					});
 		}
 		else if (newState === 3)
 		{
-			setParam(res, { visibility : { dest_amount_left : true,	src_res_balance_left : true, exch_left : false,
-										src_amount_row : true, dest_amount_row : false, exchange_row : true,
-										result_balance_row : false } });
+			setParam(res.visibility, {
+						dest_amount_left : true,	src_res_balance_left : true, exch_left : false,
+						src_amount_row : true, dest_amount_row : false, exchange_row : true,
+						result_balance_row : false
+					});
 		}
 		else if (newState === 4)
 		{
-			setParam(res, { visibility : { dest_amount_left : true,
-										src_res_balance_left : false, exch_left : true,
-										src_amount_row : true, dest_amount_row : false, exchange_row : false,
-										result_balance_row : true } });
+			setParam(res.visibility, {
+						dest_amount_left : true,
+						src_res_balance_left : false, exch_left : true,
+						src_amount_row : true, dest_amount_row : false, exchange_row : false,
+						result_balance_row : true
+					});
 		}
 
 		this.expectedState = res;
@@ -183,7 +202,7 @@ class ExpenseTransactionView extends TransactionView
 	inputSrcAmount(val)
 	{
 		if (!this.model.isDiffCurr)
-			throw new Error('Wrong state: can\'t input source amount on state ' + this.model.state);
+			throw new Error(`Wrong state: can't input source amount on state ${this.model.state}`);
 
 		let fNewValue = (isValidValue(val)) ? normalize(val) : val;
 
@@ -268,7 +287,7 @@ class ExpenseTransactionView extends TransactionView
 	async inputExchRate(val)
 	{
 		if (this.model.state !== 3)
-			throw new Error('Unexpected state ' + this.model.state + ' to input exchange rate');
+			throw new Error(`Unexpected state ${this.model.state} to input exchange rate`);
 
 		this.model.exchRate = val;
 
@@ -343,7 +362,7 @@ class ExpenseTransactionView extends TransactionView
 			if (this.model.state === 2 || this.model.state === 3 || this.model.state === 4)			// Transition 5, 17 or 10
 				this.setExpectedState(this.model.state);
 			else
-				throw new Error('Unexpected state ' + this.model.state + ' with different currencies');
+				throw new Error(`Unexpected state ${this.model.state} with different currencies`);
 		}
 		else
 		{
@@ -424,6 +443,3 @@ class ExpenseTransactionView extends TransactionView
 	}
 
 }
-
-
-export { ExpenseTransactionView };

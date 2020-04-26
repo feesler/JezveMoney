@@ -17,8 +17,7 @@ export async function create(params)
 
 	await test('Create account', async () =>
 	{
-		let expected = App.state.clone();
-		let resExpected = expected.createAccount(params);
+		let resExpected = App.state.createAccount(params);
 
 		let createRes;
 		try
@@ -35,8 +34,7 @@ export async function create(params)
 
 		acc_id = (createRes) ? createRes.id : resExpected;
 
-		await App.state.fetch();
-		return App.state.meetExpectation(expected);
+		return App.state.fetchAndTest();
 	});
 
 	return acc_id;
@@ -51,11 +49,10 @@ export async function update(params)
 
 	await test(`Update account (${formatProps(params)})`, async () =>
 	{
-		let expected = App.state.clone();
-		let resExpected = expected.updateAccount(params);
+		let resExpected = App.state.updateAccount(params);
 		let updParams = {};
 
-		let item = expected.accounts.getItem(params.id);
+		let item = App.state.accounts.getItem(params.id);
 		if (item)
 			updParams = copyObject(item);
 
@@ -75,8 +72,7 @@ export async function update(params)
 				throw e;
 		}
 
-		await App.state.fetch();
-		return App.state.meetExpectation(expected);
+		return App.state.fetchAndTest();
 	});
 
 	return updateRes;
@@ -91,8 +87,7 @@ export async function del(ids)
 
 	await test('Delete account', async () =>
 	{
-		let expected = App.state.clone();
-		let resExpected = expected.deleteAccounts(ids);
+		let resExpected = App.state.deleteAccounts(ids);
 
 		// Send API sequest to server
 		try
@@ -107,8 +102,7 @@ export async function del(ids)
 				throw e;
 		}
 
-		await App.state.fetch();
-		return App.state.meetExpectation(expected);
+		return App.state.fetchAndTest();
 	});
 
 	return deleteRes;

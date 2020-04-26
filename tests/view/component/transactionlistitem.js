@@ -80,7 +80,7 @@ export class TransactionListItem extends Component
 				res.amountText += ' (' + Currency.format(transaction.dest_curr, transaction.dest_amount) + ')';
 			}
 
-			res.accountTitle = srcAcc.name + ' → ' + destAcc.name;
+			res.accountTitle = `${srcAcc.name} → ${destAcc.name}`;
 		}
 		else if (transaction.type == DEBT)
 		{
