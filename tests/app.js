@@ -1,4 +1,4 @@
-import { formatDate, setParam } from './common.js';
+import { formatDate, setupTest } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
@@ -64,6 +64,8 @@ class Application
 		this.dates.yearAgo = formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
 		this.dateList.push(...Object.values(this.dates));
+
+		setupTest(this.environment);
 	}
 
 

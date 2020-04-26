@@ -226,7 +226,9 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		return this.performAction(() => this.content.name.input(val));
+		await this.performAction(() => this.content.name.input(val));
+
+		return this.checkState();
 	}
 
 
@@ -239,7 +241,9 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		return this.performAction(() => this.content.balance.input(val));
+		await this.performAction(() => this.content.balance.input(val));
+
+		return this.checkState();
 	}
 
 
@@ -254,7 +258,9 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		return this.performAction(() => this.content.currDropDown.selectByValue(val));
+		await this.performAction(() => this.content.currDropDown.selectByValue(val));
+
+		return this.checkState();
 	}
 
 
@@ -269,6 +275,8 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		return this.performAction(() => this.content.iconDropDown.selectByValue(val));
+		await this.performAction(() => this.content.iconDropDown.selectByValue(val));
+
+		return this.checkState();
 	}
 }

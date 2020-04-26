@@ -197,7 +197,7 @@ export class TransactionView extends TestView
 		if (!this.content.isUpdate || !this.content.delBtn)
 			throw new Error('Unexpected action clickDeleteButton');
 
-		return this.performAction(() => this.content.delBtn.click());
+		await this.performAction(() => this.content.delBtn.click());
 	}
 
 
@@ -223,108 +223,144 @@ export class TransactionView extends TestView
 
 	async changeSrcAccount(val)
 	{
-		return this.performAction(() => this.content.source.selectAccount(val));
+		await this.performAction(() => this.content.source.selectAccount(val));
+
+		return this.checkState();
 	}
 
 
 	async changeSrcAccountByPos(pos)
 	{
-		return this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
+		await this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
+
+		return this.checkState();
 	}
 
 
 	async changeDestAccount(val)
 	{
-		return this.performAction(() => this.content.destination.selectAccount(val));
+		await this.performAction(() => this.content.destination.selectAccount(val));
+
+		return this.checkState();
 	}
 
 
 	async changeDestAccountByPos(pos)
 	{
-		return this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
+		await this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
+
+		return this.checkState();
 	}
 
 
 	async inputSrcAmount(val)
 	{
-		return this.performAction(() => this.content.src_amount_row.input(val));
+		await this.performAction(() => this.content.src_amount_row.input(val));
+
+		return this.checkState();
 	}
 
 
 	async clickSrcAmount()
 	{
-		return this.performAction(() => this.content.src_amount_left.click());
+		await this.performAction(() => this.content.src_amount_left.click());
+
+		return this.checkState();
 	}
 
 
 	async inputDestAmount(val)
 	{
-		return this.performAction(() => this.content.dest_amount_row.input(val));
+		await this.performAction(() => this.content.dest_amount_row.input(val));
+
+		return this.checkState();
 	}
 
 
 	async clickSrcResultBalance()
 	{
-		return this.performAction(() => this.content.src_res_balance_left.click());
+		await this.performAction(() => this.content.src_res_balance_left.click());
+
+		return this.checkState();
 	}
 
 
 	async clickDestResultBalance()
 	{
-		return this.performAction(() => this.content.dest_res_balance_left.click());
+		await this.performAction(() => this.content.dest_res_balance_left.click());
+
+		return this.checkState();
 	}
 
 
 	async clickDestAmount()
 	{
-		return this.performAction(() => this.content.dest_amount_left.click());
+		await this.performAction(() => this.content.dest_amount_left.click());
+
+		return this.checkState();
 	}
 
 
 	async inputResBalance(val)
 	{
-		return this.performAction(() => this.content.result_balance_row.input(val))
+		await this.performAction(() => this.content.result_balance_row.input(val))
+
+		return this.checkState();
 	}
 
 
 	async inputDestResBalance(val)
 	{
-		return this.performAction(() => this.content.result_balance_dest_row.input(val))
+		await this.performAction(() => this.content.result_balance_dest_row.input(val))
+
+		return this.checkState();
 	}
 
 
 	async changeSourceCurrency(val)
 	{
-		return this.performAction(() => this.content.src_amount_row.selectCurr(val));
+		await this.performAction(() => this.content.src_amount_row.selectCurr(val));
+
+		return this.checkState();
 	}
 
 
 	async changeDestCurrency(val)
 	{
-		return this.performAction(() => this.content.dest_amount_row.selectCurr(val));
+		await this.performAction(() => this.content.dest_amount_row.selectCurr(val));
+
+		return this.checkState();
 	}
 
 
 	async clickExchRate()
 	{
-		return this.performAction(() => this.content.exch_left.click());
+		await this.performAction(() => this.content.exch_left.click());
+
+		return this.checkState();
 	}
 
 
 	async inputExchRate(val)
 	{
-		return this.performAction(() => this.content.exchange_row.input(val));
+		await this.performAction(() => this.content.exchange_row.input(val));
+
+		return this.checkState();
 	}
 
 
 	async changeDate(val)
 	{
-		return this.performAction(() => this.content.datePicker.input(val));
+		await this.performAction(() => this.content.datePicker.input(val));
+
+		return this.checkState();
 	}
 
 
 	async inputComment(val)
 	{
-		return this.performAction(() => this.content.comment_row.input(val));
+		await this.performAction(() => this.content.comment_row.input(val));
+
+		return this.checkState();
 	}
 }

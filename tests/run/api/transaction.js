@@ -41,7 +41,7 @@ export async function create(params)
 
 		await App.state.fetch();
 		return App.state.meetExpectation(expected);
-	}, App.environment);
+	});
 
 	return transaction_id;
 }
@@ -106,7 +106,7 @@ export async function update(params)
 
 		await App.state.fetch();
 		return App.state.meetExpectation(expected);
-	}, App.environment);
+	});
 
 	return updateRes;
 }
@@ -138,7 +138,7 @@ export async function del(ids)
 
 		await App.state.fetch();
 		return App.state.meetExpectation(expected);
-	}, App.environment);
+	});
 
 	return deleteRes;
 }
@@ -177,5 +177,5 @@ export async function filter(params)
 			throw new Error('Fail to read list of transactions');
 
 		return checkObjValue(trList, expTransList.data);
-	}, App.environment);
+	});
 }

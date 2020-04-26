@@ -78,7 +78,7 @@ export async function checkData(descr, expTransList, iterateView = false)
 		transList = App.state.transactions.data;
 	}
 
-	await test(descr, () => checkObjValue(transList, expected), App.environment);
+	await test(descr, () => checkObjValue(transList, expected));
 }
 
 
@@ -100,7 +100,7 @@ export async function create(type, params, submitHandler)
 	App.state.createTransaction(expectedTransaction);
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main page widgets update', () => {}, App.view);
+	await test('Main page widgets update', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -144,7 +144,7 @@ export async function update(type, params, submitHandler)
 	App.state.updateTransaction(expectedTransaction);
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main page widgets update', () => {}, App.view);
+	await test('Main page widgets update', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -168,7 +168,7 @@ export async function del(type, transactions)
 	await App.goToMainView();
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main page widgets update', async () => {}, App.view);
+	await test('Main page widgets update', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -202,7 +202,7 @@ export async function delFromUpdate(type, pos)
 	await App.goToMainView();
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main page widgets update', () => {}, App.view);
+	await test('Main page widgets update', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }

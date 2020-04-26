@@ -37,7 +37,7 @@ export async function create(params)
 
 		await App.state.fetch();
 		return App.state.meetExpectation(expected);
-	}, App.environment);
+	});
 
 	return acc_id;
 }
@@ -77,7 +77,7 @@ export async function update(params)
 
 		await App.state.fetch();
 		return App.state.meetExpectation(expected);
-	}, App.environment);
+	});
 
 	return updateRes;
 }
@@ -109,7 +109,7 @@ export async function del(ids)
 
 		await App.state.fetch();
 		return App.state.meetExpectation(expected);
-	}, App.environment);
+	});
 
 	return deleteRes;
 }

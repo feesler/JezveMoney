@@ -21,32 +21,32 @@ export async function stateLoop()
 	// Check initial state
 	let expAccount = { name : '', initbalance : 0, balance : '0', curr_id : 1, icon : 0 };
 	App.view.setExpectedAccount(expAccount);
-	await test('Initial state of account view', () => {}, App.view);
+	await test('Initial state of account view', () => App.view.checkState());
 
 	// Check account name is 'New account' brefore input name
-	await test('Change currency', () => App.view.changeCurrency(3), App.view);
-	await test('Input balance (100 .01)', () => App.view.inputBalance('100.01'), App.view);
-	await test('Change icon', () => App.view.changeIcon(1), App.view);
+	await test('Change currency', () => App.view.changeCurrency(3));
+	await test('Input balance (100 .01)', () => App.view.inputBalance('100.01'));
+	await test('Change icon', () => App.view.changeIcon(1));
 
-	await test('Account name input', () => App.view.inputName('acc_1'), App.view);
+	await test('Account name input', () => App.view.inputName('acc_1'));
 
 	// Change currency to USD
-	await test('Change currency', () => App.view.changeCurrency(2), App.view);
+	await test('Change currency', () => App.view.changeCurrency(2));
 
-	await test('Input balance (100 000.01)', () => App.view.inputBalance('100000.01'), App.view);
+	await test('Input balance (100 000.01)', () => App.view.inputBalance('100000.01'));
 
 	// Change currency back to RUB
-	await test('Change currency back', () => App.view.changeCurrency(1), App.view);
+	await test('Change currency back', () => App.view.changeCurrency(1));
 
 	// Input empty value for initial balance
-	await test('Input empty balance', () => App.view.inputBalance(''), App.view);
-	await test('Input dot (.) balance', () => App.view.inputBalance('.'), App.view);
-	await test('Input (.01) balance', () => App.view.inputBalance('.01'), App.view);
-	await test('Input (10000000.01) balance', () => App.view.inputBalance('10000000.01'), App.view);
+	await test('Input empty balance', () => App.view.inputBalance(''));
+	await test('Input dot (.) balance', () => App.view.inputBalance('.'));
+	await test('Input (.01) balance', () => App.view.inputBalance('.01'));
+	await test('Input (10000000.01) balance', () => App.view.inputBalance('10000000.01'));
 
 	// Change icon to safe
-	await test('Change icon', () => App.view.changeIcon(2), App.view);
-	await test('Input (1000.01) balance', () => App.view.inputBalance('1000.01'), App.view);
+	await test('Change icon', () => App.view.changeIcon(2));
+	await test('Input (1000.01) balance', () => App.view.inputBalance('1000.01'));
 
 	await App.view.navigation(() => App.view.click(App.view.content.cancelBtn));
 }
@@ -56,19 +56,19 @@ export async function submitAccount(params)
 {
 	// Input account name
 	if ('name' in params)
-		await test(`Input name (${params.name})`, () => App.view.inputName(params.name), App.view);
+		await test(`Input name (${params.name})`, () => App.view.inputName(params.name));
 
 	// Change currency
 	if ('curr_id' in params)
-		await test(`Select currency ${params.curr_id}`, () => App.view.changeCurrency(params.curr_id), App.view);
+		await test(`Select currency ${params.curr_id}`, () => App.view.changeCurrency(params.curr_id));
 
 	// Input balance
 	if ('initbalance' in params)
-		await test('Tile balance format update', () => App.view.inputBalance(params.initbalance), App.view);
+		await test('Tile balance format update', () => App.view.inputBalance(params.initbalance));
 
 	// Change icon
 	if ('icon' in params)
-		await test('Tile icon update', () => App.view.changeIcon(params.icon), App.view);
+		await test('Tile icon update', () => App.view.changeIcon(params.icon));
 
 	let expected = App.view.getExpectedAccount();
 
@@ -102,14 +102,14 @@ export async function create(params)
 
 	let expAccount = { name : '', owner_id : App.owner_id, initbalance : '0', balance : 0, curr_id : 1, icon : 0 };
 	App.view.setExpectedAccount(expAccount);
-	await test('Initial state of account view', () => {}, App.view);
+	await test('Initial state of account view', () => App.view.checkState());
 
 	expAccount = await submitAccount(params);
 
 	App.state.createAccount(expAccount);
 
 	App.view.expectedState = AccountsView.render(App.state);
-	await test('Create account', () => {}, App.view);
+	await test('Create account', () => App.view.checkState());
 }
 
 
@@ -149,14 +149,14 @@ export async function update(params)
 	if (!expAccount)
 		throw new Error('Can not find specified account');
 	App.view.setExpectedAccount(expAccount);
-	await test('Initial state of account view', () => {}, App.view);
+	await test('Initial state of account view', () => App.view.checkState());
 
 	expAccount = await submitAccount(params);
 
 	App.state.updateAccount(expAccount);
 
 	App.view.expectedState = AccountsView.render(App.state);
-	await test('Update account', () => {}, App.view);
+	await test('Update account', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -185,7 +185,7 @@ export async function del(accounts)
 	await App.view.deleteAccounts(accounts);
 
 	App.view.expectedState = AccountsView.render(App.state);
-	await test('Delete accounts [' + accounts.join() + ']', () => {}, App.view);
+	await test('Delete accounts [' + accounts.join() + ']', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -216,12 +216,12 @@ export async function delFromUpdate(pos)
 	await App.view.deleteSelfItem();
 
 	App.view.expectedState = AccountsView.render(App.state);
-	await test('Delete account [' + pos + ']', () => {}, App.view);
+	await test('Delete account [' + pos + ']', () => App.view.checkState());
 
 	await App.goToMainView();
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main page widgets update', () => {}, App.view);
+	await test('Main page widgets update', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }
@@ -274,5 +274,5 @@ export async function exportTest(accounts)
 	let content = await App.view.exportAccounts(accounts);
 	content = content.trim();
 
-	await test(`Export accounts [${accounts.join()}]`, () => expectedContent == content, App.environment);
+	await test(`Export accounts [${accounts.join()}]`, () => expectedContent == content);
 }

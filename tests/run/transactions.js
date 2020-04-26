@@ -226,20 +226,20 @@ export async function run()
 								modeSelector : { listMode : { isActive : true },
 													detailsMode : { isActive : false } } } };
 
-	await test('Initial state of transaction list view', () => {}, App.view, state);
+	await test('Initial state of transaction list view', () => App.view.checkState(state));
 
 	state.values.paginator.active = 2;
 	await App.view.goToNextPage();
-	await test('Navigate to page 2', () => {}, App.view, state);
+	await test('Navigate to page 2', () => App.view.checkState(state));
 
 	state.values.modeSelector.detailsMode.isActive = true;
 	state.values.modeSelector.listMode.isActive = false;
 	await App.view.setDetailsMode();
-	await test('Change list mode to details', () => {}, App.view, state);
+	await test('Change list mode to details', () => App.view.checkState(state));
 
 	state.values.paginator.active = 3;
 	await App.view.goToNextPage();
-	await test('Navigate to page 3', () => {}, App.view, state);
+	await test('Navigate to page 3', () => App.view.checkState(state));
 
 	// Expense
 	let allExpenses = allTrList.filterByType(EXPENSE);
@@ -248,7 +248,7 @@ export async function run()
 	state.values.paginator.active = 1;
 	state.values.paginator.pages = allExpenses.expectedPages();
 	await App.view.filterByType(state.values.typeMenu.activeType);
-	await test('Filter by Expense', () => {}, App.view, state);
+	await test('Filter by Expense', () => App.view.checkState(state));
 	await checkData('Correctness of transaction list', allExpenses, true);
 
 	// Income
@@ -257,7 +257,7 @@ export async function run()
 	state.values.typeMenu.activeType = INCOME;
 	state.values.paginator.pages = allIncomes.expectedPages();
 	await App.view.filterByType(state.values.typeMenu.activeType);
-	await test('Filter by Income', () => {}, App.view, state);
+	await test('Filter by Income', () => App.view.checkState(state));
 	await checkData('Correctness of transaction list', allIncomes, true);
 
 	// Transfer
@@ -266,7 +266,7 @@ export async function run()
 	state.values.typeMenu.activeType = TRANSFER;
 	state.values.paginator.pages = allTransfers.expectedPages();
 	await App.view.filterByType(state.values.typeMenu.activeType);
-	await test('Filter by Transfer', () => {}, App.view, state);
+	await test('Filter by Transfer', () => App.view.checkState(state));
 	await checkData('Correctness of transaction list', allTransfers, true);
 
 	// Debt
@@ -275,26 +275,26 @@ export async function run()
 	state.values.typeMenu.activeType = DEBT;
 	state.values.paginator.pages = allDebts.expectedPages();
 	await App.view.filterByType(state.values.typeMenu.activeType);
-	await test('Filter by Debt', () => {}, App.view, state);
+	await test('Filter by Debt', () => App.view.checkState(state));
 	await checkData('Correctness of transaction list', allDebts, true);
 
 	// Filter by account 2 and debt
 	state.values.paginator.pages = acc_2_debts.expectedPages();
 	await App.view.filterByAccounts(accIds[2]);
-	await test('Filter by accounts', () => {}, App.view, state);
+	await test('Filter by accounts', () => App.view.checkState(state));
 	await checkData('Correctness of transaction list', acc_2_debts, true);
 
 	// Filter by account 2 and all types of transaction
 	state.values.typeMenu.activeType = 0;
 	state.values.paginator.pages = acc_2_all.expectedPages();
 	await App.view.filterByType(state.values.typeMenu.activeType);
-	await test('Show all transactions of account', () => {}, App.view, state);
+	await test('Show all transactions of account', () => App.view.checkState(state));
 	await checkData('Correctness of transaction list', acc_2_all, true);
 
 	// Filter by account 2 and last week date
 	state.values.paginator.pages = acc_2_week.expectedPages();
 	await App.view.selectDateRange(day1, day2);
-	await test('Select date range', () => {}, App.view, state);
+	await test('Select date range', () => App.view.checkState(state));
 
 	await checkData('Correctness of transaction list', acc_2_week, true);
 
@@ -302,7 +302,7 @@ export async function run()
 	state.values.paginator.pages = acc_2_query.expectedPages();
 	state.values.searchForm.value = '1';
 	await App.view.search(state.values.searchForm.value);
-	await test('Search', () => {}, App.view, state);
+	await test('Search', () => App.view.checkState(state));
 
 	await checkData('Correctness of transaction list', acc_2_query, true);
 }

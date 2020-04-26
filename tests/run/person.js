@@ -21,7 +21,7 @@ export async function create(params)
 	await App.view.createPerson(params.name);
 
 	App.view.expectedState = PersonsView.render(App.state);
-	await test(`Create person ({ name : ${params.name} })`, () => {}, App.view);
+	await test(`Create person ({ name : ${params.name} })`, () => App.view.checkState());
 
 	await App.state.fetch();
 }
@@ -59,7 +59,7 @@ export async function update(params)
 
 	App.view.expectedState = { visibility : { name : true },
 								values : { name : expectedPerson.name } };
-	await test('Update person view state', () => {}, App.view);
+	await test('Update person view state', () => App.view.checkState());
 
 	await App.view.inputName(params.name);
 
@@ -70,7 +70,7 @@ export async function update(params)
 	App.state.updatePerson(expectedPerson);
 
 	App.view.expectedState = PersonsView.render(App.state);
-	await test(`Update person [${pos}]`, () => {}, App.view);
+	await test(`Update person [${pos}]`, () => App.view.checkState());
 
 	await App.state.fetch();
 }
@@ -91,7 +91,7 @@ export async function del(persons)
 	await App.view.deletePersons(persons);
 
 	App.view.expectedState = PersonsView.render(App.state);
-	await test('Delete persons [' + persons.join() + ']', () => {}, App.view);
+	await test('Delete persons [' + persons.join() + ']', () => App.view.checkState());
 
 	await App.state.fetch();
 }
@@ -118,12 +118,12 @@ export async function delFromUpdate(pos)
 	await App.view.deleteSelfItem();
 
 	App.view.expectedState = PersonsView.render(App.state);
-	await test(`Delete person [${pos}]`, () => {}, App.view);
+	await test(`Delete person [${pos}]`, () => App.view.checkState());
 
 	await App.goToMainView();
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main page widgets update', () => {}, App.view);
+	await test('Main page widgets update', () => App.view.checkState());
 
 	await App.state.fetchAndTest();
 }

@@ -407,7 +407,9 @@ class DebtTransactionView extends TransactionView
 
 		this.setExpectedState(this.model.state);
 
-		return this.performAction(() => this.content.person.selectAccount(val));
+		await this.performAction(() => this.content.person.selectAccount(val));
+
+		return this.checkState();
 	}
 
 
@@ -496,7 +498,9 @@ class DebtTransactionView extends TransactionView
 		}
 
 
-		return this.performAction(() => this.click(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
+		await this.performAction(() => this.click(this.model.debtType ? this.content.operation.debtgive : this.content.operation.debttake));
+
+		return this.checkState();
 	}
 
 
@@ -657,9 +661,11 @@ class DebtTransactionView extends TransactionView
 		}
 
 		if (this.model.noAccount)
-			return this.performAction(() => this.content.noacc_btn.click());
+			await this.performAction(() => this.content.noacc_btn.click());
 		else
-			return this.performAction(() => this.content.selaccount.click());
+			await this.performAction(() => this.content.selaccount.click());
+
+		return this.checkState();
 	}
 
 
@@ -715,17 +721,21 @@ class DebtTransactionView extends TransactionView
 
 		this.setExpectedState(this.model.state);
 
-		return this.performAction(() => this.content.account.selectAccount(account_id));
+		await this.performAction(() => this.content.account.selectAccount(account_id));
+
+		return this.checkState();
 	}
 
 
-	changeAccountByPos(pos)
+	async changeAccountByPos(pos)
 	{
-		return this.changeAccount(this.content.account.dropDown.items[pos].id);
+		await this.changeAccount(this.content.account.dropDown.items[pos].id);
+
+		return this.checkState();
 	}
 
 
-	clickSrcAmount()
+	async clickSrcAmount()
 	{
 		if (this.model.state === 1 || this.model.state === 2)			// Transition 2 or 4
 			this.setExpectedState(0);

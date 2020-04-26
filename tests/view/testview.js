@@ -159,8 +159,9 @@ export class TestView
 	}
 
 
-	async checkState(stateObj)
+	async checkState(state)
 	{
+		let stateObj = (typeof state === 'undefined') ? this.expectedState : state;
 		if (!stateObj)
 			throw new Error('Invalid expected state object');
 

@@ -36,9 +36,9 @@ export async function run()
 
 	// Register new user
 	await api.user.logout();
-	await test('User registration', () => api.user.register(App.config.apiTestUser), env);
+	await test('User registration', () => api.user.register(App.config.apiTestUser));
 
-	await test('Login new user', () => api.user.login(App.config.apiTestUser), env);
+	await test('Login new user', () => api.user.login(App.config.apiTestUser));
 	await App.state.fetch();
 
 	env.setBlock('Profile', 2);
@@ -51,7 +51,7 @@ export async function run()
 
 		let profileData = await api.profile.read();
 		return (profileData && profileData.name == newApiTesterName);
-	}, env);
+	});
 
 	let newPass = '54321';
 	await test('Change user password', async () =>
@@ -70,7 +70,7 @@ export async function run()
 			App.config.apiTestUser.password = newPass;
 
 		return loginRes;
-	}, env);
+	});
 
 	env.setBlock('Prepare data for security tests', 2);
 	await App.state.fetch();
@@ -101,15 +101,15 @@ export async function run()
 	const [ API_USER_TRANSACTION ] = await App.runner.runGroup(actions.transaction.create, apiTestUserData.transactions);
 
 	// Login with main test user
-	await test('Login main user', () => api.user.login(App.config.testUser), env);
+	await test('Login main user', () => api.user.login(App.config.testUser));
 	await App.state.fetch();
 
-	await test('Reset all data', () => api.profile.reset(), env);
+	await test('Reset all data', () => api.profile.reset());
 	App.state.resetAll();
 
 	env.setBlock('Accounts', 2);
 
-	await test('Reset accounts', () => api.account.reset(), env);
+	await test('Reset accounts', () => api.account.reset());
 	App.state.resetAccounts();
 
 	const createAccData = [
@@ -296,8 +296,8 @@ export async function run()
 	/**
 	 * Delete user profile
 	 */
-	await test('Login new user', () => api.user.login(App.config.apiTestUser), env);
-	await test('Delete user profile', () => api.profile.del(), env);
+	await test('Login new user', () => api.user.login(App.config.apiTestUser));
+	await test('Delete user profile', () => api.profile.del());
 
 	await api.user.login(App.config.testUser);
 }

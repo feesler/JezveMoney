@@ -65,7 +65,7 @@ export class AppState
 		{
 			await newState.fetch();
 			return await newState.meetExpectation(this);
-		}, App.environment);
+		});
 
 		this.setState(newState);
 	}

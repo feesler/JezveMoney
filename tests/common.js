@@ -419,25 +419,25 @@ export function checkObjValue(obj, expectedObj, ret = false)
 }
 
 
-// Run action, check state and add result to the list
-export async function test(descr, action, env, state)
+let testEnv = null;
+
+export function setupTest(env)
+{
+	if (!env)
+		throw new Error('Invalid environment specified');
+
+	testEnv = env;
+}
+
+
+// Run action and add result to the list
+export async function test(descr, action)
 {
 	try
 	{
-		let actRes = await action();
-		let res;
+		let res = await action();
 
-		if (env && env.checkState)
-		{
-			let expState = (typeof state === 'undefined') ? env.expectedState : state;
-			res = await env.checkState(expState);
-		}
-		else
-		{
-			res = actRes;
-		}
-
-		env.addResult(descr, res);
+		testEnv.addResult(descr, res);
 	}
 	catch(e)
 	{

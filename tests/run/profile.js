@@ -20,7 +20,7 @@ export async function relogin(userObj)
 
 	await App.view.loginAs(userObj.login, userObj.password);
 	App.view.expectedState = { msgPopup : null };
-	await test('Test user login', () => {}, App.view);
+	await test('Test user login', () => App.view.checkState());
 
 	await App.state.fetch();
 }
@@ -50,12 +50,12 @@ export async function register(userObj)
 	await App.view.registerAs(userObj.login, userObj.name, userObj.password);
 	App.view.expectedState = { msgPopup : { success : true, message : 'You successfully registered.' } };
 
-	await test('User registration', () => {}, App.view);
+	await test('User registration', () => App.view.checkState());
 	await App.view.closeNotification();
 
 	await App.view.loginAs(userObj.login, userObj.password);
 	App.view.expectedState = { msgPopup : null };
-	await test('Login with new account', () => {}, App.view);
+	await test('Login with new account', () => App.view.checkState());
 
 	await App.state.fetch();
 }
@@ -69,13 +69,13 @@ export async function resetAccounts()
 	await App.view.resetAccounts();
 
 	App.view.expectedState = { msgPopup : { success : true, message : 'Accounts successfully reseted' } };
-	await test('Reset accounts data', () => {}, App.view);
+	await test('Reset accounts data', () => App.view.checkState());
 
 	await App.view.closeNotification();
 	await App.goToMainView();
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main view update', () => {}, App.view);
+	await test('Main view update', () => App.view.checkState());
 }
 
 
@@ -87,13 +87,13 @@ export async function resetAll()
 	await App.view.resetAll();
 
 	App.view.expectedState = { msgPopup : { success : true, message : 'All data successfully reseted.' } };
-	await test('Reset all data', () => {}, App.view);
+	await test('Reset all data', () => App.view.checkState());
 
 	await App.view.closeNotification();
 	await App.goToMainView();
 
 	App.view.expectedState = MainView.render(App.state);
-	await test('Main view update', () => {}, App.view);
+	await test('Main view update', () => App.view.checkState());
 }
 
 
@@ -114,7 +114,9 @@ export async function changeName()
 			msgPopup : { success : true, message : 'User name successfully updated.' },
 			header : { user : { name : newName } }
 		};
-	}, App.view);
+
+		return App.view.checkState();
+	});
 	await App.view.closeNotification();
 
 	await test('Change name back', async () =>
@@ -126,7 +128,9 @@ export async function changeName()
 			msgPopup : { success : true, message : 'User name successfully updated.' },
 			header : { user : { name : newName } }
 		};
-	}, App.view);
+
+		return App.view.checkState();
+	});
 	await App.view.closeNotification();
 }
 
@@ -140,7 +144,9 @@ export async function changePass()
 	{
 		await App.view.changePassword(App.config.testUser.password, newPass);
 		App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
-	}, App.view);
+
+		return App.view.checkState();
+	});
 	await App.view.closeNotification();
 
 	await test('Login with new password', async () =>
@@ -149,13 +155,15 @@ export async function changePass()
 		await App.view.goToProfile();
 
 		return true;
-	}, App.environment);
+	});
 
 	await test('Change password back', async () =>
 	{
 		await App.view.changePassword(newPass, App.config.testUser.password);
 		App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
-	}, App.view);
+
+		return App.view.checkState();
+	});
 	await App.view.closeNotification();
 
 	await relogin(App.config.testUser);
@@ -169,7 +177,7 @@ export async function deleteProfile()
 
 	await App.view.deleteProfile();
 	App.view.expectedState = { msgPopup : { success : true, message : 'Your profile is successfully deleted.' } };
-	await test('Delete profile', () => {}, App.view);
+	await test('Delete profile', () => App.view.checkState());
 
 	await App.view.closeNotification();
 }
