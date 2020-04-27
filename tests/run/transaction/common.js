@@ -1,5 +1,4 @@
 import { TransactionsView } from '../../view/transactions.js';
-import { TransactionList } from '../../view/component/transactionlist.js';
 import { MainView } from '../../view/main.js';
 import { Transaction } from '../../model/transaction.js';
 import { AccountsList } from '../../model/accountslist.js';
@@ -8,78 +7,8 @@ import {
 	test,
 	isObject,
 	copyObject,
-	checkObjValue,
 	formatProps,
 } from '../../common.js';
-
-
-export async function iteratePages()
-{
-	let res = { items : [], pages : [] };
-
-	if (!(App.view instanceof TransactionsView) || !App.view.content.transList)
-		throw new Error('Not expected view');
-
-	if (!App.view.isFirstPage())
-		await App.view.goToFirstPage();
-
-	let pos = App.view.pagesCount() * App.config.transactionsOnPage;
-	while(App.view.content.transList.items.length)
-	{
-		let pageItems = App.view.content.transList.items.map(item => {
-			return {
-				id : item.id,
-				accountTitle : item.accountTitle,
-				amountText : item.amountText,
-				dateFmt : item.dateFmt,
-				comment : item.comment,
-				pos : pos--
-			}
-		});
-
-		res.pages.push(pageItems);
-		res.items.push(...pageItems);
-
-		if (App.view.isLastPage())
-			break;
-
-		await App.view.goToNextPage();
-	}
-
-	return res;
-}
-
-
-// Check transactions data from API is the same as show on the transactions list page
-// Return instance of TransactionsList with current data
-export async function checkData(descr, expTransList, iterateView = false)
-{
-	let transList, expected;
-
-	// Save all transactions
-	if (iterateView)
-	{
-		if (!(App.view instanceof TransactionsView))
-		{
-			if (!(App.view instanceof MainView))
-				await App.goToMainView();
-			await App.view.goToTransactions();
-		}
-
-		let transListPages = await iteratePages();
-		transList = transListPages.items;
-
-		expected = TransactionList.render(expTransList.data, App.state);
-	}
-	else
-	{
-		expected = copyObject(expTransList.data);
-		await App.state.fetch();
-		transList = App.state.transactions.data;
-	}
-
-	await test(descr, () => checkObjValue(transList, expected));
-}
 
 
 export async function create(type, params, submitHandler)
