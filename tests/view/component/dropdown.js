@@ -49,6 +49,7 @@ export class DropDown extends NullableComponent
 				let itemObj = {
 					id : this.parseId(await env.prop(option, 'value')),
 					text : await env.prop(option, 'innerText'),
+					selected : await env.prop(option, 'selected'),
 					elem : option
 				};
 
@@ -63,6 +64,7 @@ export class DropDown extends NullableComponent
 				return {
 					id : this.parseId(await env.prop(item, 'id')),
 					text : await env.prop(item, 'innerText'),
+					selected : await env.prop(await env.query(item, "input[type=checkbox]"), 'checked'),
 					elem : item
 				};
 			});
@@ -92,5 +94,28 @@ export class DropDown extends NullableComponent
 				throw new Error('List item not found');
 			return env.click(li.elem);
 		}
-	};
+	}
+
+
+	async select(val)
+	{
+		const env = this.parent.props.environment;
+
+		let values = Array.isArray(val) ? val : [ val ];
+
+		for(let value of values)
+		{
+			await this.selectByValue(value);
+		}
+
+		return env.click(this.selectBtn);
+	}
+
+
+	getSelectedValues()
+	{
+		let res = this.items.filter(item => item.selected)
+							.map(item => item.id);
+		return res;
+	}
 }

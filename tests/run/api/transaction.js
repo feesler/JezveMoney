@@ -145,6 +145,11 @@ export async function filter(params)
 	{
 		let transactions = App.state.transactions.clone();
 		let expTransList = transactions.filter(params);
+		if ('page' in params || 'onPage' in params)
+		{
+			let targetPage = ('page' in params) ? params.page : 1;
+			expTransList = expTransList.getPage(targetPage, params.onPage);
+		}
 
 		// Prepare request parameters
 		let reqParams = {};

@@ -46,15 +46,24 @@ export class TransactionTypeMenu extends Component
 		this.items = [];
 		this.activeType = null;
 
-		let menuItems = await env.queryAll(this.elem, 'span');
-		for(let i = 0; i < menuItems.length; i++)
+		let menuItems = await env.queryAll(this.elem, 'span > *');
+		for(let item of menuItems)
 		{
-			let menuItemObj = await MenuItem.create(this.parent, await env.query(menuItems[i], ':scope > *'));
+			let menuItemObj = await MenuItem.create(this.parent, item);
 
 			if (menuItemObj.isActive)
 				this.activeType = menuItemObj.type;
 
 			this.items[menuItemObj.type] = menuItemObj;
 		}
+	}
+
+
+	async select(type)
+	{
+		if (this.activeType == type || !this.items[type])
+			return;
+
+		return this.items[type].click();
 	}
 }

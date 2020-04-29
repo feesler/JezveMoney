@@ -30,4 +30,12 @@ export class SearchForm extends NullableComponent
 
 		return env.click(this.submitBtn);
 	}
+
+
+	async search(val)
+	{
+		await this.input(val);
+
+		return this.submit();
+	}
 }

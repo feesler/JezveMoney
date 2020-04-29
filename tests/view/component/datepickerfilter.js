@@ -1,5 +1,6 @@
 import { NullableComponent } from './component.js';
 import { IconLink } from './iconlink.js';
+import { copyObject, isDate, fixDate } from '../../common.js';
 
 
 export class DatePickerFilter extends NullableComponent
@@ -15,6 +16,20 @@ export class DatePickerFilter extends NullableComponent
 		this.inputElem = await env.query(this.elem, '.stretch_input > input');
 		if (!this.inputElem)
 			throw new Error('Input element not found');
+
+		let dateValue = await env.prop(this.inputElem, 'value');
+		if (!dateValue)
+			dateValue = '';
+
+		if (dateValue == '')
+		{
+			this.value = { startDate : null, endDate : null };
+		}
+		else
+		{
+			let dates = dateValue.split(' - ');
+			this.value = { startDate : dates[0], endDate : dates[1] };
+		}
 
 		this.datePickerBtn = await env.query(this.elem, '#cal_rbtn');
 		if (!this.datePickerBtn)
@@ -53,9 +68,25 @@ export class DatePickerFilter extends NullableComponent
 	}
 
 
-	async selectRange(val1, val2)
+	isSameMonth(date1, date2)
+	{
+		if (!isDate(date1) || !isDate(date2))
+			throw new Error('Invalid parameters');
+		
+		return date1.getMonth() == date2.getMonth() && date1.getFullYear() == date2.getFullYear();
+	}
+
+
+	async selectRange(date1, date2)
 	{
 		const env = this.parent.props.environment;
+
+		if (!isDate(date1) || !isDate(date2))
+			throw new Error('Invalid parameters');
+
+		let now = new Date();
+		if (!this.isSameMonth(date1, now) || !this.isSameMonth(date2, now))
+			throw new Error('Only current month is supported now');
 
 		await this.parent.performAction(async () =>
 		{
@@ -65,16 +96,24 @@ export class DatePickerFilter extends NullableComponent
 				return env.click(this.datePickerBtn);
 		});
 
-		let cell1 = this.parent.content.dateFilter.dayCells.find(item => item.day == val1);
+		let day1 = date1.getDate();
+		let cell1 = this.parent.content.dateFilter.dayCells.find(item => item.day == day1);
 		if (!cell1)
 			throw new Error(`Cell ${val1} not found`);
 
-		let cell2 = this.parent.content.dateFilter.dayCells.find(item => item.day == val2);
+		let day2 = date2.getDate();
+		let cell2 = this.parent.content.dateFilter.dayCells.find(item => item.day == day2);
 		if (!cell2)
 			throw new Error(`Cell ${val2} not found`);
 
 		await env.click(cell1.elem);
 		return env.click(cell2.elem);
+	}
+
+
+	getSelectedRange()
+	{
+		return copyObject(this.value);
 	}
 
 

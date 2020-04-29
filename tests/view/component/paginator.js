@@ -103,6 +103,12 @@ export class Paginator extends NullableComponent
 	}
 
 
+	getPages()
+	{
+		return this.pages;
+	}
+
+
 	isFirstPage()
 	{
 		return (!this.activeItem || this.activeItem.ind == 0);

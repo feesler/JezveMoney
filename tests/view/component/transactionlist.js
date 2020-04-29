@@ -1,6 +1,6 @@
 import { NullableComponent } from './component.js';
 import { TransactionListItem } from './transactionlistitem.js';
-import { asyncMap } from '../../common.js';
+import { asyncMap, copyObject } from '../../common.js';
 
 
 export class TransactionList extends NullableComponent
@@ -16,6 +16,19 @@ export class TransactionList extends NullableComponent
 			return;
 
 		this.items = await asyncMap(listItems, item => TransactionListItem.create(this.parent, item));
+	}
+
+
+	getItems()
+	{
+		return this.items.map(item => {
+			return {
+				amountText : item.amountText,
+				amountTitle : item.amountTitle,
+				dateFmt : item.dateFmt,
+				comment : item.comment,
+			}
+		});
 	}
 
 

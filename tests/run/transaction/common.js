@@ -58,20 +58,21 @@ export async function update(type, params, submitHandler)
 
 	// Step
 	let origTransaction = App.view.getExpectedTransaction();
-	origTransaction = App.state.getExpectedTransaction(origTransaction);
-	let originalAccounts = copyObject(App.state.accounts.data);
+	let expectedState = App.state.clone();
+	origTransaction = expectedState.getExpectedTransaction(origTransaction);
+	let originalAccounts = copyObject(expectedState.accounts.data);
 	let canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
 	App.state.accounts.data = canceled;
 	await App.view.parse();
 
 	let expectedTransaction = await submitHandler(params);
 
+	expectedState.accounts.data = originalAccounts;
+	expectedState.updateTransaction(expectedTransaction);
+
 	await App.goToMainView();
 
-	App.state.accounts.data = originalAccounts;
-	App.state.updateTransaction(expectedTransaction);
-
-	App.view.expectedState = MainView.render(App.state);
+	App.view.expectedState = MainView.render(expectedState);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
 }
@@ -83,8 +84,9 @@ export async function del(type, transactions)
 
 	await App.goToMainView();
 
-	let ids = App.state.transactions.filterByType(type).positionsToIds(transactions);
-	App.state.deleteTransactions(ids);
+	let expectedState = App.state.clone();
+	let ids = expectedState.transactions.filterByType(type).positionsToIds(transactions);
+	expectedState.deleteTransactions(ids);
 
 	// Navigate to transactions view and filter by specified type of transaction
 	await App.view.goToTransactions();
@@ -93,6 +95,8 @@ export async function del(type, transactions)
 	await App.view.deleteTransactions(transactions);
 
 	await App.goToMainView();
+
+	App.state.setState(expectedState);
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());

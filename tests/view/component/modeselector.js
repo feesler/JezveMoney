@@ -23,4 +23,22 @@ export class ModeSelector extends NullableComponent
 
 		this.details = this.detailsMode.isActive;
 	}
+
+
+	async setDetailsMode()
+	{
+		if (this.detailsMode.isActive)
+			return;
+
+		return this.detailsMode.elem.click();
+	}
+
+
+	async setClassicMode()
+	{
+		if (this.listMode.isActive)
+			return;
+
+		return this.listMode.elem.click();
+	}
 }

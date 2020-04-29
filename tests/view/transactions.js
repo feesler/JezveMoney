@@ -9,6 +9,9 @@ import { Paginator } from './component/paginator.js';
 import { ModeSelector } from './component/modeselector.js';
 import { SearchForm } from './component/searchform.js';
 import { TransactionList } from './component/transactionlist.js';
+import { TransactionsList } from '../model/transactionslist.js';
+import { TransactionListItem } from './component/transactionlistitem.js';
+import { copyObject, isDate } from '../common.js';
 
 
 // List of transactions view class
@@ -66,53 +69,178 @@ export class TransactionsView extends TestView
 	}
 
 
+	async buildModel(cont)
+	{
+		let res = {};
+
+		await App.state.fetch();
+		res.data = App.state.transactions.clone();
+
+		res.filter = {
+			type : parseInt(cont.typeMenu.activeType),
+			accounts : cont.accDropDown.getSelectedValues(),
+			search : cont.searchForm.value,
+		};
+		let dateRange = cont.dateFilter.getSelectedRange();
+		if (dateRange && dateRange.startDate && dateRange.endDate)
+		{
+			res.filter.startDate = dateRange.startDate;
+			res.filter.endDate = dateRange.endDate;
+		}
+
+		res.filtered = res.data.filter(res.filter);
+		res.list = {
+			page : cont.paginator.active,
+			pages : cont.paginator.getPages(),
+			items : cont.transList.getItems()
+		};
+
+		res.detailsMode = cont.modeSelector.details;
+		res.deleteConfirmPopup = cont.delete_warning && await this.isVisible(cont.delete_warning.elem);
+
+		return res;
+	}
+
+
+	cloneModel(model)
+	{
+		let res = copyObject(model);
+
+		res.data = model.data.clone();
+		res.filtered = model.filtered.clone();
+
+		return res;
+	}
+
+
+	updateModelFilter(model)
+	{
+		let res = this.cloneModel(model);
+
+		res.filtered = res.data.filter(res.filter);
+
+		let pageItems = res.filtered.getPage(1);
+		res.list = {
+			page : 1,
+			pages : res.filtered.expectedPages(),
+			items : TransactionList.render(pageItems.data, App.state)
+		};
+
+		return res;
+	}
+
+
+	onFilterUpdate()
+	{
+		this.model = this.updateModelFilter(this.model);
+		return this.setExpectedState();
+	}
+
+
+	setModelPage(model, page)
+	{
+		if (page < 1 || page > model.list.pages)
+			throw new Error(`Invalid page number ${page}`);
+
+		let res = this.cloneModel(model);
+
+		res.filtered = res.data.filter(res.filter);
+		res.list.page = page;
+		let pageItems = res.filtered.getPage(page);
+		res.list.items = TransactionList.render(pageItems.data, App.state);
+
+		return res;
+	}
+
+
+	onPageChanged(page)
+	{
+		this.model = this.setModelPage(this.model, page);
+		return this.setExpectedState();
+	}
+
+
+	setExpectedState()
+	{
+		let res = {
+			visibility : {
+				typeMenu : true, accDropDown : true, searchForm : true,
+				modeSelector : true, paginator : true, transList : true
+			},
+			values : {
+				typeMenu : { activeType : this.model.filter.type },
+				searchForm : { value : this.model.filter.search },
+				paginator : {
+					pages : this.model.list.pages,
+					active : this.model.list.page
+				},
+				modeSelector : { details : this.model.detailsMode }
+			}
+		};
+
+		return res;
+	}
+
+
 	async filterByAccounts(accounts)
 	{
-		if (!Array.isArray(accounts))
-			accounts = [ accounts ];
+		this.model.filter.accounts = accounts;
+		let expected = this.onFilterUpdate();
 
-		return this.navigation(async () =>
-		{
-			for(let acc_id of accounts)
-			{
-				await this.content.accDropDown.selectByValue(acc_id);
-			}
-			return this.click(this.content.accDropDown.selectBtn);
-		});
+		await this.navigation(() => this.content.accDropDown.select(accounts));
+
+		return App.view.checkState(expected);
 	}
 
 
 	async selectDateRange(start, end)
 	{
-		return this.navigation(() => this.content.dateFilter.selectRange(start, end));
+		this.model.filter.startDate = start;
+		this.model.filter.endDate = end;
+		let expected = this.onFilterUpdate();
+
+		await this.navigation(() => this.content.dateFilter.selectRange(start, end));
+
+		return App.view.checkState(expected);
 	}
 
 
 	async search(text)
 	{
-		return this.navigation(async () =>
-		{
-			await this.content.searchForm.input(text);
-			return this.content.searchForm.submit();
-		});
+		this.model.filter.search = text;
+		let expected = this.onFilterUpdate();
+
+		await this.navigation(() => this.content.searchForm.search(text));
+
+		return App.view.checkState(expected);
 	}
 
 
 	async setClassicMode()
 	{
 		if (this.content.modeSelector.listMode.isActive)
-			return;
+			return false;
 
-		return this.navigation(() => this.content.modeSelector.listMode.elem.click());
+		this.model.detailsMode = false;
+		let expected = this.setExpectedState();
+
+		await this.navigation(() => this.content.modeSelector.setClassicMode());
+
+		return App.view.checkState(expected);
 	}
 
 
 	async setDetailsMode()
 	{
 		if (this.content.modeSelector.detailsMode.isActive)
-			return;
+			return false;
 
-		return this.navigation(() => this.content.modeSelector.detailsMode.elem.click());
+		this.model.detailsMode = true;
+		let expected = this.setExpectedState();
+
+		await this.navigation(() => this.content.modeSelector.setDetailsMode());
+
+		return App.view.checkState(expected);
 	}
 
 
@@ -143,39 +271,55 @@ export class TransactionsView extends TestView
 	}
 
 
-	async goToFirstPage(type)
+	async goToFirstPage()
 	{
 		if (this.isFirstPage())
 			return this;
 
-		return this.navigation(() => this.content.paginator.goToFirstPage());
+		let expected = this.onPageChanged(1);
+
+		await this.navigation(() => this.content.paginator.goToFirstPage());
+
+		return App.view.checkState(expected);
 	}
 
 
-	async goToLastPage(type)
+	async goToLastPage()
 	{
 		if (this.isLastPage())
-			return this;
+			return;
 
-		return this.navigation(() => this.content.paginator.goToLastPage());
+		let expected = this.onPageChanged(this.pagesCount());
+
+		await this.navigation(() => this.content.paginator.goToLastPage());
+
+		return App.view.checkState(expected);
 	}
 
 
-	async goToPrevPage(type)
+	async goToPrevPage()
 	{
 		if (this.isFirstPage())
 			throw new Error('Can\'t go to previous page');
 
-		return this.navigation(() => this.content.paginator.goToPrevPage());
+		let expected = this.onPageChanged(this.currentPage() - 1);
+
+		await this.navigation(() => this.content.paginator.goToPrevPage());
+
+		return App.view.checkState(expected);
 	}
 
 
-	async goToNextPage(type)
+	async goToNextPage()
 	{
 		if (this.isLastPage())
 			throw new Error('Can\'t go to next page');
 
-		return this.navigation(() => this.content.paginator.goToNextPage());
+		let expected = this.onPageChanged(this.currentPage() + 1);
+
+		await this.navigation(() => this.content.paginator.goToNextPage());
+
+		return App.view.checkState(expected);
 	}
 
 
@@ -184,7 +328,12 @@ export class TransactionsView extends TestView
 		if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
 			return;
 
-		return this.navigation(() => this.content.typeMenu.items[type].click());
+		this.model.filter.type = type;
+		let expected = this.onFilterUpdate();
+
+		await this.navigation(() => this.content.typeMenu.select(type));
+
+		return App.view.checkState(expected);
 	}
 
 
@@ -228,6 +377,10 @@ export class TransactionsView extends TestView
 	// Select specified transaction, click on edit button and return navigation promise
 	async goToUpdateTransaction(num)
 	{
+		let pos = parseInt(num);
+		if (isNaN(pos))
+			throw new Error('Invalid position of transaction');
+
 		await this.selectTransactions(num);
 
 		return this.navigation(() => this.content.toolbar.editBtn.click());

@@ -294,9 +294,6 @@ export class TransactionsList extends List
 		if ('search' in params)
 			res = this.getItemsByQuery(res, params.search);
 
-		let targetPage = ('page' in params) ? params.page : 1;
-		res = this.getItemsPage(res, targetPage, params.onPage);
-
 		return res;
 	}
 
@@ -325,11 +322,17 @@ export class TransactionsList extends List
 	}
 
 
-	expectedPages(limit)
+	getExpectedPages(list, limit)
 	{
 		let onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
-		return Math.max(Math.ceil(this.data.length / onPage), 1);
+		return Math.max(Math.ceil(list.length / onPage), 1);
+	}
+
+
+	expectedPages(limit)
+	{
+		return this.getExpectedPages(this.data, limit);
 	}
 
 
