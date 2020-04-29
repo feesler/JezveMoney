@@ -319,26 +319,33 @@ class PersonModel extends CachedTable
 		$accMod = AccountModel::getInstance();
 		$requestAll = (isset($params["full"]) && $params["full"] == TRUE && UserModel::isAdminUser());
 
-		$condArr = [];
-		if (!$requestAll)
+		$itemsData = [];
+		if ($requestAll)
 		{
-			$condArr[] = "user_id=".self::$user_id;
-			$condArr[] = "id<>".self::$owner_id;
+			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, NULL, NULL, "id ASC");
+			while($row = $this->dbObj->fetchRow($qResult))
+			{
+				$itemObj = $this->rowToObj($row);
+				if ($itemObj)
+					$itemsData[] = $itemObj;
+			}
+		}
+		else
+		{
+			if (!$this->checkCache())
+				return NULL;
+
+			$itemsData = $this->cache;
 		}
 
 		$res = [];
-
-		$qResult = $this->dbObj->selectQ("*", $this->tbl_name, $condArr, NULL, "id ASC");
-		while($row = $this->dbObj->fetchRow($qResult))
+		foreach($itemsData as $item)
 		{
-			$itemObj = $this->rowToObj($row);
-			if (!$itemObj)
+			if (!$requestAll && $item->id == self::$owner_id)
 				continue;
 
-			unset($itemObj->createdate);
-			unset($itemObj->updatedate);
-
-			$itemObj->accounts = $accMod->getData([ "person" => $itemObj->id ]);
+			$itemObj = clone $item;
+			$itemObj->accounts = $accMod->getData([ "person" => $item->id ]);
 
 			$res[] = $itemObj;
 		}

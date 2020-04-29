@@ -485,9 +485,11 @@ class AccountModel extends CachedTable
 
 		$includePersons = (isset($params["full"]) && $params["full"] == TRUE);
 		$person_id = (isset($params["person"])) ? intval($params["person"]) : 0;
+		if ($person_id)
+			$includePersons = TRUE;
 
 		$itemsData = [];
-		if ($person_id && UserModel::isAdminUser())
+		if ($person_id && !$this->personMod->is_exist($person_id) && UserModel::isAdminUser())
 		{
 			$qResult = $this->dbObj->selectQ("*", $this->tbl_name, NULL, NULL, "id ASC");
 			while($row = $this->dbObj->fetchRow($qResult))
@@ -496,8 +498,6 @@ class AccountModel extends CachedTable
 				if (!is_null($obj))
 					$itemsData[$obj->id] = $obj;
 			}
-
-			$includePersons = TRUE;
 		}
 		else
 		{
