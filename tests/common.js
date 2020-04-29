@@ -370,7 +370,7 @@ export function checkObjValue(obj, expectedObj, ret = false)
 		}
 		else
 		{
-			throw new Error('Not expected value "' + obj + '", "' + expectedObj  + '" is expected');
+			throw new Error(`Not expected value "${obj}", "${expectedObj}" is expected`);
 		}
 	}
 
@@ -410,9 +410,9 @@ export function checkObjValue(obj, expectedObj, ret = false)
 	if (res !== true && !ret)
 	{
 		if ('expected' in res)
-			throw new Error('Not expected value "' + res.value + '" for (' + res.key + ') "' + res.expected  + '" is expected');
+			throw new Error(`Not expected value "${res.value}" for (${res.key}) "${res.expected}" is expected`);
 		else
-			throw new Error('Path (' + res.key + ') not found');
+			throw new Error(`Path (${res.key}) not found`);
 	}
 
 	return res;

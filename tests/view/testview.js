@@ -110,7 +110,7 @@ export class TestView
 			}
 
 			if (!res)
-				throw new Error(`Not expected visibility(${factVisible}) of \\"${countrolName}\\" control`);
+				throw new Error(`Not expected visibility(${factVisible}) of "${countrolName}" control`);
 		}
 
 		return true;
@@ -152,7 +152,7 @@ export class TestView
 		if (res !== true)
 		{
 			if ('expected' in res)
-				throw new Error(`Not expected value \\"${res.value}\\" for (${res.key}) \\"${res.expected}\\" is expected`);
+				throw new Error(`Not expected value "${res.value}" for (${res.key}) "${res.expected}" is expected`);
 			else
 				throw new Error(`Path (${res.key}) not found`);
 		}
