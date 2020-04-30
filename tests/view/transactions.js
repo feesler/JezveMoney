@@ -9,9 +9,7 @@ import { Paginator } from './component/paginator.js';
 import { ModeSelector } from './component/modeselector.js';
 import { SearchForm } from './component/searchform.js';
 import { TransactionList } from './component/transactionlist.js';
-import { TransactionsList } from '../model/transactionslist.js';
-import { TransactionListItem } from './component/transactionlistitem.js';
-import { copyObject, isDate } from '../common.js';
+import { copyObject, fixDate } from '../common.js';
 
 
 // List of transactions view class
@@ -73,7 +71,6 @@ export class TransactionsView extends TestView
 	{
 		let res = {};
 
-		await App.state.fetch();
 		res.data = App.state.transactions.clone();
 
 		res.filter = {
@@ -199,7 +196,10 @@ export class TransactionsView extends TestView
 		this.model.filter.endDate = end;
 		let expected = this.onFilterUpdate();
 
-		await this.navigation(() => this.content.dateFilter.selectRange(start, end));
+		let startDate = new Date(fixDate(start));
+		let endDate = new Date(fixDate(end));
+
+		await this.navigation(() => this.content.dateFilter.selectRange(startDate, endDate));
 
 		return App.view.checkState(expected);
 	}
@@ -323,6 +323,43 @@ export class TransactionsView extends TestView
 	}
 
 
+	async iteratePages()
+	{
+		let res = { items : [], pages : [] };
+
+		if (!(App.view instanceof TransactionsView) || !App.view.content.transList)
+			throw new Error('Not expected view');
+
+		if (!App.view.isFirstPage())
+			await App.view.goToFirstPage();
+
+		let pos = App.view.pagesCount() * App.config.transactionsOnPage;
+		while(App.view.content.transList.items.length)
+		{
+			let pageItems = App.view.content.transList.items.map(item => {
+				return {
+					id : item.id,
+					accountTitle : item.accountTitle,
+					amountText : item.amountText,
+					dateFmt : item.dateFmt,
+					comment : item.comment,
+					pos : pos--
+				}
+			});
+
+			res.pages.push(pageItems);
+			res.items.push(...pageItems);
+
+			if (App.view.isLastPage())
+				break;
+
+			await App.view.goToNextPage();
+		}
+
+		return res;
+	}
+
+
 	async filterByType(type)
 	{
 		if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
@@ -429,6 +466,10 @@ export class TransactionsView extends TestView
 					throw 'OK button not found';
 
 				await App.view.navigation(() => App.view.click(App.view.content.delete_warning.okBtn));
+
+				// Refresh state and rebuild model
+				await App.state.fetch();
+				App.view.model = await App.view.buildModel(App.view.content);
 
 				// After delete transactions navigation occurs to page without filters, so we need to restore it
 				await App.view.filterByType(currentType);

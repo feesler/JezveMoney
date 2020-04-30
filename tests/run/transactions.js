@@ -1,9 +1,10 @@
 import { api } from '../api.js';
 import { App } from '../app.js';
-import { test, convDate, copyObject, checkObjValue } from '../common.js';
+import { test, copyObject, checkObjValue } from '../common.js';
 import { TransactionList } from '../view/component/transactionlist.js';
 import { TransactionsView } from '../view/transactions.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT, Transaction } from '../model/transaction.js';
+import { MainView } from '../view/main.js';
+import { Transaction, availTransTypes } from '../model/transaction.js';
 import { TransactionsList } from '../model/transactionslist.js';
 
 
@@ -182,40 +183,17 @@ async function preCreateData()
 }
 
 
-export async function iteratePages()
+
+// Navigate to transactions list page
+async function checkNavigation()
 {
-	let res = { items : [], pages : [] };
+	if (App.view instanceof TransactionsView)
+		return true;
 
-	if (!(App.view instanceof TransactionsView) || !App.view.content.transList)
-		throw new Error('Not expected view');
+	if (!(App.view instanceof MainView))
+		await App.goToMainView();
 
-	if (!App.view.isFirstPage())
-		await App.view.goToFirstPage();
-
-	let pos = App.view.pagesCount() * App.config.transactionsOnPage;
-	while(App.view.content.transList.items.length)
-	{
-		let pageItems = App.view.content.transList.items.map(item => {
-			return {
-				id : item.id,
-				accountTitle : item.accountTitle,
-				amountText : item.amountText,
-				dateFmt : item.dateFmt,
-				comment : item.comment,
-				pos : pos--
-			}
-		});
-
-		res.pages.push(pageItems);
-		res.items.push(...pageItems);
-
-		if (App.view.isLastPage())
-			break;
-
-		await App.view.goToNextPage();
-	}
-
-	return res;
+	await App.view.goToTransactions();
 }
 
 
@@ -225,13 +203,7 @@ export async function checkTransactionsList(expected)
 	if (!(expected instanceof TransactionsList))
 		throw new Error('Invalid data specified');
 
-	// Navigate to transactions list page
-	if (!(App.view instanceof TransactionsView))
-	{
-		if (!(App.view instanceof MainView))
-			await App.goToMainView();
-		await App.view.goToTransactions();
-	}
+	await checkNavigation();
 
 	let transListPages = await iteratePages();
 	let transList = transListPages.items;
@@ -242,88 +214,95 @@ export async function checkTransactionsList(expected)
 }
 
 
+export async function checkInitialState()
+{
+	await checkNavigation();
+
+	App.view.expectedState = App.view.setExpectedState();
+	await test('Initial state of transaction list view', () => App.view.checkState());
+}
+
+
+export async function goToNextPage()
+{
+	await checkNavigation();
+
+	await test('Navigate to next page', () => App.view.goToNextPage());
+}
+
+export async function setDetailsMode()
+{
+	await checkNavigation();
+
+	await test('Change list mode to details', () => App.view.setDetailsMode());
+}
+
+
+export async function filterByType(type)
+{
+	await checkNavigation();
+
+	let descr = (!type) ? 'Show all types of transactions' : `Filter by ${Transaction.typeToStr(type)}`;
+	await test(descr, () => App.view.filterByType(type));
+	await test('Correctness of transaction list', () => App.view.iteratePages());
+}
+
+
+export async function filterByAccounts(accounts)
+{
+	if (!Array.isArray(accounts))
+		accounts = [ accounts ];
+
+	await checkNavigation();
+
+	await test(`Filter by ${accounts.join()}`, () => App.view.filterByAccounts(accounts));
+	await test('Correctness of transaction list', () => App.view.iteratePages());
+}
+
+
+export async function filterByDate(start, end)
+{
+	await checkNavigation();
+
+	await test('Select date range', () => App.view.selectDateRange(start, end));
+	await test('Correctness of transaction list', () => App.view.iteratePages());
+}
+
+
+export async function search(text)
+{
+	await checkNavigation();
+
+	await test('Search', () => App.view.search(text));
+	await test('Correctness of transaction list', () => App.view.iteratePages());
+} 
+
+
 export async function run()
 {
 	App.view.setBlock('Transaction List view', 1);
 
 	await preCreateData();
 
-	let allTrList = App.state.transactions;
+	await checkInitialState();
 
-	await App.goToMainView();
-	await App.view.goToTransactions();
+	await goToNextPage();
+	await setDetailsMode();
+	await goToNextPage();
 
-	// Filter all transactions with account acc_2
-	let acc_2_all = allTrList.filterByAccounts(accIds[2]);
-	// Filter debt transactions with account acc_2
-	let acc_2_debts = acc_2_all.filterByType(DEBT);
-
-	// Filter transactions with account acc_2 over the week
-	// Prepare date range for week
-	let now = new Date(convDate(App.dates.now));
-	let day1 = now.getDate();
-	let day2;
-	if (day1 > 22)
+	for(let type of availTransTypes)
 	{
-		day2 = day1;
-		day1 = day2 - 6;
-	}
-	else
-	{
-		day2 = day1 + 6;
+		await filterByType(type);
 	}
 
-	let weekStart = Date.UTC(now.getFullYear(), now.getMonth(), day1);
-	let weekEnd = Date.UTC(now.getFullYear(), now.getMonth(), day2);
-	let weekStartDate = new Date(weekStart);
-	let weekEndDate = new Date(weekEnd);
+	await filterByAccounts(accIds[2]);
+	await filterByType(0);
 
-	let acc_2_week = acc_2_all.filterByDate(weekStartDate, weekEndDate);
-	// Search transactions with '1' in the comment
-	let acc_2_query = acc_2_week.filterByQuery('1');
+	let today = new Date();
+	let firstDay = Date.UTC(today.getFullYear(), today.getMonth(), 1);
+	let startDate = (today.getDate() > 6) ? App.dates.weekAgo : firstDay;
+	await filterByDate(startDate, today);
 
-	App.view.expectedState = App.view.setExpectedState();
-	await test('Initial state of transaction list view', () => App.view.checkState());
+	await search('1');
 
-	await test('Navigate to page 2', () => App.view.goToNextPage());
-
-	await test('Change list mode to details', () => App.view.setDetailsMode());
-
-	await test('Navigate to page 3', () => App.view.goToNextPage());
-
-	// Expense
-	let allExpenses = allTrList.filterByType(EXPENSE);
-	await test('Filter by Expense', () => App.view.filterByType(EXPENSE));
-	await test('Correctness of transaction list', () => checkTransactionsList(allExpenses));
-
-	// Income
-	let allIncomes = allTrList.filterByType(INCOME);
-	await test('Filter by Income', () => App.view.filterByType(INCOME));
-	await test('Correctness of transaction list', () => checkTransactionsList(allIncomes));
-
-	// Transfer
-	let allTransfers = allTrList.filterByType(TRANSFER);
-	await test('Filter by Transfer', () => App.view.filterByType(TRANSFER));
-	await test('Correctness of transaction list', () => checkTransactionsList(allTransfers));
-
-	// Debt
-	let allDebts = allTrList.filterByType(DEBT);
-	await test('Filter by Debt', () => App.view.filterByType(DEBT));
-	await test('Correctness of transaction list', () => checkTransactionsList(allDebts));
-
-	// Filter by account 2 and debt
-	await test('Filter by accounts', () => App.view.filterByAccounts(accIds[2]));
-	await test('Correctness of transaction list', () => checkTransactionsList(acc_2_debts));
-
-	// Filter by account 2 and all types of transaction
-	await test('Show all transactions of account', () => App.view.filterByType(0));
-	await test('Correctness of transaction list', () => checkTransactionsList(acc_2_all));
-
-	// Filter by account 2 and last week date
-	await test('Select date range', () => App.view.selectDateRange(weekStartDate, weekEndDate));
-	await test('Correctness of transaction list', () => checkTransactionsList(acc_2_week));
-
-	// Search '1'
-	await test('Search', () => App.view.search('1'));
-	await test('Correctness of transaction list', () => checkTransactionsList(acc_2_query));
 }
