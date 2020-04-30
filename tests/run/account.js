@@ -157,8 +157,7 @@ export async function update(params)
 
 	App.view.expectedState = AccountsView.render(App.state);
 	await test('Update account', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }
 
 
@@ -186,8 +185,7 @@ export async function del(accounts)
 
 	App.view.expectedState = AccountsView.render(App.state);
 	await test(`Delete accounts [${accounts.join()}]`, () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }
 
 
@@ -222,8 +220,7 @@ export async function delFromUpdate(pos)
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
-
-	await App.state.fetchAndTest();
+	await test('App state', () => App.state.fetchAndTest());
 }
 
 

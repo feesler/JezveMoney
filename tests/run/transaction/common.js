@@ -69,10 +69,11 @@ export async function update(type, params, submitHandler)
 
 	expectedState.accounts.data = originalAccounts;
 	expectedState.updateTransaction(expectedTransaction);
+	App.state.setState(expectedState);
 
 	await App.goToMainView();
 
-	App.view.expectedState = MainView.render(expectedState);
+	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
 }
@@ -97,7 +98,6 @@ export async function del(type, transactions)
 	await App.goToMainView();
 
 	App.state.setState(expectedState);
-
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
@@ -112,8 +112,9 @@ export async function delFromUpdate(type, pos)
 
 	App.view.setBlock(`Delete ${Transaction.typeToStr(type)} from update view [${pos}]`, 2);
 
-	let ids = App.state.transactions.filterByType(type).positionsToIds(pos);
-	App.state.deleteTransactions(ids);
+	let expectedState = App.state.clone();
+	let ids = expectedState.transactions.filterByType(type).positionsToIds(pos);
+	expectedState.deleteTransactions(ids);
 
 	if (!(App.view instanceof TransactionsView))
 	{
@@ -131,6 +132,7 @@ export async function delFromUpdate(type, pos)
 
 	await App.goToMainView();
 
+	App.state.setState(expectedState);
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
