@@ -375,9 +375,9 @@ export class TransactionsView extends TestView
 
 
 	// Click on add button and return navigation promise
-	goToCreateTransaction()
+	async goToCreateTransaction()
 	{
-		return this.navigation(() => this.content.addBtn.click());
+		await this.navigation(() => this.content.addBtn.click());
 	}
 
 

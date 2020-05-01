@@ -158,11 +158,16 @@ export class Transaction
 		if (!res.dest_amount)
 			res.dest_amount = res.src_amount;
 
-		let acc = state.accounts.getItem(res.acc_id);
+		let acc = res.acc_id ? state.accounts.getItem(res.acc_id) : null;
 		if (acc)
+		{
 			res.src_curr = res.dest_curr = acc.curr_id;
+		}
 		else
+		{
+			res.acc_id = 0;
 			res.src_curr = res.dest_curr = (res.src_curr || res.dest_curr);
+		}
 
 		return res;
 	}

@@ -1,9 +1,9 @@
-import { formatDate, setupTest } from './common.js';
+import { formatDate, setupTest, copyObject } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
 import { Currency } from './model/currency.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT } from './model/transaction.js';
+import { EXPENSE, INCOME, TRANSFER, DEBT, Transaction, availTransTypes } from './model/transaction.js';
 
 import * as ProfileTests from './run/profile.js';
 import * as AccountTests from './run/account.js';
@@ -20,6 +20,12 @@ import * as StatisticsTests from './run/statistics.js';
 
 import * as ApiTests from './run/api.js';
 import { Runner } from './runner.js';
+
+
+const RUB = 1;
+const USD = 2;
+const EUR = 3;
+const PLN = 4;
 
 
 class Application
@@ -64,6 +70,9 @@ class Application
 		this.dates.yearAgo = formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
 		this.dateList.push(...Object.values(this.dates));
+
+		let firstDay = Date.UTC(now.getFullYear(), now.getMonth(), 1);
+		this.dates.startDate = (now.getDate() > 6) ? this.dates.weekAgo : firstDay;
 
 		setupTest(this.environment);
 	}
@@ -147,8 +156,8 @@ class Application
 		this.view.setBlock('Create accounts', 2);
 
 		let data = [
-			{ name : 'acc_1', initbalance : 1000.01, curr_id : 1 },
-			{ name : 'acc_2', initbalance : '1000.01', curr_id : 3 },
+			{ name : 'acc_1', initbalance : 1000.01, curr_id : RUB },
+			{ name : 'acc_2', initbalance : '1000.01', curr_id : EUR },
 		];
 
 		await this.runner.runGroup(AccountTests.create, data);
@@ -160,8 +169,8 @@ class Application
 		this.view.setBlock('Update accounts', 2);
 
 		let data = [
-			{ pos : 0, icon : 1, curr_id : 2 },
-			{ pos : 0, curr_id : 1 },
+			{ pos : 0, icon : 1, curr_id : USD },
+			{ pos : 0, curr_id : RUB },
 		];
 
 		await this.runner.runGroup(AccountTests.update, data);
@@ -246,13 +255,12 @@ class Application
 
 	async prepareTransactionTests()
 	{
-		let accList =
-		[
-			{ name : 'acc_3', curr_id : 1, initbalance : '500.99', icon : 2 },
-			{ name : 'acc RUB', curr_id : 1, initbalance : '500.99', icon : 5 },
-			{ name : 'acc USD', curr_id : 2, initbalance : '500.99', icon : 4 },
-			{ name : 'acc EUR', curr_id : 3, initbalance : '10000.99', icon : 3 },
-			{ name : 'card RUB', curr_id : 1, initbalance : '35000.40', icon : 3 },
+		let accList = [
+			{ name : 'acc_3', curr_id : RUB, initbalance : '500.99', icon : 2 },
+			{ name : 'acc RUB', curr_id : RUB, initbalance : '500.99', icon : 5 },
+			{ name : 'acc USD', curr_id : USD, initbalance : '500.99', icon : 4 },
+			{ name : 'acc EUR', curr_id : EUR, initbalance : '10000.99', icon : 3 },
+			{ name : 'card RUB', curr_id : RUB, initbalance : '35000.40', icon : 3 },
 		];
 
 		for(let account of accList)
@@ -273,7 +281,7 @@ class Application
 		await this.transactionStateLoopTests();
 		await this.createTransactionTests();
 		await this.updateTransactionTests();
-		await TransactionListTests.run();
+		await this.transactionsListTests();
 		await this.deleteTransactionTests();
 
 		await this.exportAccountsTest();
@@ -312,6 +320,147 @@ class Application
 		await this.runUpdateIncomeTests();
 		await this.runUpdateTransferTests();
 		await this.runUpdateDebtTests();
+	}
+
+
+	async setupAccounts()
+	{
+		let data = [
+			{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1 },
+			{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2 },
+			{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4 },
+			{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5 },
+		];
+
+		let res = [];
+		for(let params of data)
+		{
+			let account = this.state.accounts.findByName(params.name);
+			if (!account)
+			{
+				account = await api.account.create(params);
+				this.state.createAccount(params);
+			}
+
+			if (account)
+				res.push(account.id);
+		}
+
+		return res;
+	}
+
+
+	async setupPersons()
+	{
+		let data = [
+			{ name : 'Alex' },
+			{ name : 'noname &' },
+		];
+
+		let res = [];
+		for(let params of data)
+		{
+			let person = this.state.persons.findByName(params.name);
+			if (!person)
+			{
+				person = await api.person.create(params);
+				this.state.createPerson(params);
+			}
+
+			if (person)
+				res.push(person.id);
+		}
+
+		return res;
+	}
+
+
+	async setupTransactions(accountIds, personIds)
+	{
+		const [ ACC_4, ACC_5, CASH_USD, CASH_EUR ] = accountIds;
+		const [ ALEX, NONAME ] = personIds;
+
+		let data = [
+			{ type : EXPENSE, src_id : ACC_4, src_amount : '500', comment: 'lalala' },
+			{ type : EXPENSE, src_id : ACC_4, src_amount : '500', dest_curr : USD, comment: 'lalala' },
+			{ type : EXPENSE, src_id : ACC_5, src_amount : '100', comment: 'hohoho' },
+			{ type : EXPENSE, src_id : ACC_5, src_amount : '780', dest_amount : '10', dest_curr : EUR, comment: 'кккк' },
+			{ type : EXPENSE, src_id : CASH_USD, src_amount : '50', comment: '1111' },
+			{ type : INCOME, dest_id : CASH_EUR, src_amount : '7500', dest_amount : '100', src_curr : RUB, comment: '232323' },
+			{ type : INCOME, dest_id : ACC_4, src_amount : '1000000', dest_amount : '64000', src_curr : PLN, comment: '111 кккк' },
+			{ type : INCOME, dest_id : ACC_4, dest_amount : '100', comment: '22222' },
+			{ type : INCOME, dest_id : ACC_5, src_amount : '7013.21', dest_amount : '5000', comment: '33333' },
+			{ type : INCOME, dest_id : CASH_EUR, src_amount : '287', dest_amount : '4', src_curr : RUB, comment: 'dddd' },
+			{ type : INCOME, dest_id : CASH_EUR, dest_amount : '33', comment: '11 ho' },
+			{ type : TRANSFER, src_id : ACC_4, dest_id : ACC_5, src_amount : '300', comment: 'd4' },
+			{ type : TRANSFER, src_id : ACC_4, dest_id : CASH_USD, src_amount : '6500', dest_amount : '100', comment: 'g6' },
+			{ type : TRANSFER, src_id : ACC_5, dest_id : ACC_4, src_amount : '800.01', comment: 'x0' },
+			{ type : TRANSFER, src_id : ACC_5, dest_id : CASH_USD, src_amount : '7', dest_amount : '0.08', comment: 'l2' },
+			{ type : TRANSFER, src_id : CASH_EUR, dest_id : CASH_USD, src_amount : '5.0301', dest_amount : '4.7614', comment: 'i1' },
+			{ type : DEBT, op : 1, person_id : ALEX, src_amount : '1050', src_curr : RUB, comment: '111 кккк' },
+			{ type : DEBT, op : 1, person_id : NONAME, acc_id : ACC_5, src_amount : '780', comment: '--**' },
+			{ type : DEBT, op : 2, person_id : ALEX, src_amount : '990.99', src_curr : RUB, comment: 'ппп ppp' },
+			{ type : DEBT, op : 2, person_id : NONAME, acc_id : CASH_USD, src_amount : '105', comment: '6050 кккк' },
+			{ type : DEBT, op : 1, person_id : ALEX, acc_id : CASH_EUR, src_amount : '4', comment: '111 кккк' },
+		];
+
+		let multi = [];
+		for(let transaction of data)
+		{
+			let extracted = Transaction.extract(transaction, this.state);
+			for(let date of this.dateList)
+			{
+				extracted.date = date;
+				multi.push(copyObject(extracted));
+			}
+		}
+
+		return api.transaction.createMultiple(multi);
+	}
+
+
+	async prepareTrListData()
+	{
+		await api.user.login('test', 'test');
+		await this.state.fetch();
+
+		let accIds = await this.setupAccounts();
+		let personIds = await this.setupPersons();
+		let transIds = await this.setupTransactions(accIds, personIds);
+
+		await this.state.fetch();
+
+		let res = {
+			accounts : accIds,
+			persons : personIds,
+			transactions : transIds
+		};
+
+		return res;
+	}
+
+
+	async transactionsListTests()
+	{
+		this.environment.setBlock('Transaction List view', 1);
+
+		let data = await this.prepareTrListData();
+
+		await this.runner.runTasks([
+			{ action : TransactionListTests.checkInitialState },
+			{ action : TransactionListTests.goToNextPage },
+			{ action : TransactionListTests.setDetailsMode },
+			{ action : TransactionListTests.goToNextPage },
+		]);
+
+		await this.runner.runGroup(TransactionListTests.filterByType, availTransTypes);
+
+		await this.runner.runTasks([
+			{ action : TransactionListTests.filterByAccounts, data : data.accounts[2] },
+			{ action : TransactionListTests.filterByType, data : 0 },
+			{ action : TransactionListTests.filterByDate, data : { start : this.dates.startDate, end : this.dates.now } },
+			{ action : TransactionListTests.search, data : '1' },
+		]);
 	}
 
 
