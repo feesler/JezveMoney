@@ -5,7 +5,6 @@ import {
 	copyObject,
 	setParam,
 	checkObjValue,
-	test
 } from './common.js';
 import { EXPENSE, INCOME, DEBT, availTransTypes } from './model/transaction.js';
 import { App } from './app.js';
@@ -101,6 +100,19 @@ export class AppState
 		this.accounts.reset();
 		this.persons.reset();
 		this.transactions.reset();
+	}
+
+
+	changeName(name)
+	{
+		this.profile.name = name;
+	}
+
+
+	deleteProfile()
+	{
+		this.resetAll();
+		delete this.profile;
 	}
 
 

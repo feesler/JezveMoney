@@ -45,30 +45,6 @@ export async function create(params)
 }
 
 
-export async function createExpenseTest(params)
-{
-	return createTest(Transaction.expense(params, App.state));
-}
-
-
-export async function createIncomeTest(params)
-{
-	return createTest(Transaction.income(params, App.state));
-}
-
-
-export async function createTransferTest(params)
-{
-	return createTest(Transaction.transfer(params, App.state));
-}
-
-
-export async function createDebtTest(params)
-{
-	return createTest(Transaction.debt(params, App.state));
-}
-
-
 // Update transaction with specified params
 // (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
 export async function update(params)

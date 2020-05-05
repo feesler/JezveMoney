@@ -106,7 +106,7 @@ class Application
 
 		this.startTime = Date.now();
 
-		await ApiTests.run();
+		await this.apiTests();
 		await this.profileTests();
 		await this.accountTests();
 		await this.personTests();
@@ -120,6 +120,365 @@ class Application
 	async goToMainView()
 	{
 		await this.view.goToMainView();
+	}
+
+
+	async apiTests()
+	{
+		this.environment.setBlock('API tests', 1);
+		this.environment.setBlock('User', 2);
+
+		await ApiTests.deleteUserIfExist(this.config.apiTestUser);
+		await ApiTests.registerAndLogin(this.config.apiTestUser);
+
+		await this.prepareApiSecurityTests();
+
+		// Login with main test user
+		await ApiTests.login(this.config.testUser);
+		await ApiTests.resetAll();
+
+		this.environment.setBlock('Accounts', 2);
+
+		await ApiTests.resetAccounts();
+
+		await this.apiCreateAccounts();
+		await this.apiCreatePersons();
+		await this.apiCreateTransactions();
+
+		await this.apiSecurityTests();
+
+		await this.apiUpdateTransactions();
+
+		await this.apiFilterTransactions();
+
+		await this.apiUpdateAccounts();
+		await this.apiDeleteAccounts();
+
+		await this.apiUpdatePersons();
+		await this.apiDeletePersons();
+
+		await this.apiDeleteTransactions();
+
+		await this.apiProfile();
+
+		await api.user.login(this.config.testUser);
+	}
+
+
+	async prepareApiSecurityTests()
+	{
+		this.environment.setBlock('Prepare data for security tests', 2);
+
+		[
+			this.API_USER_ACC_RUB,
+			this.API_USER_ACC_USD,
+		] = await this.runner.runGroup(ApiTests.createAccount, [
+			{ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5 },
+			{ name : 'USD', curr_id : USD, initbalance : 50, icon : 2 },
+		]);
+
+		[ this.API_USER_PERSON ] = await this.runner.runGroup(ApiTests.createPerson, [
+			{ name : 'API user Person' }
+		]);
+
+		[ this.API_USER_TRANSACTION ] = await this.runner.runGroup(ApiTests.extractAndCreateTransaction, [
+			{ type : EXPENSE, src_id: this.API_USER_ACC_RUB, src_amount: 100 }
+		]);
+	}
+
+
+	async apiSecurityTests()
+	{
+		await this.apiAccountsSecurity();
+		await this.apiPersonsSecurity();
+		await this.apiTransactionsSecurity();
+	}
+
+
+	async apiAccountsSecurity()
+	{
+		const { API_USER_ACC_RUB } = this;
+
+		this.environment.setBlock('Accounts security', 2);
+
+		const tasks = [
+			{ action : ApiTests.updateAccount, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2 } },
+			{ action : ApiTests.deleteAccounts, data : API_USER_ACC_RUB },
+		];
+
+		await this.runner.runTasks(tasks);
+	}
+
+
+	async apiPersonsSecurity()
+	{
+		const { API_USER_PERSON } = this;
+
+		this.environment.setBlock('Persons security', 2);
+
+		const tasks = [
+			{ action : ApiTests.updatePerson, data : { id : API_USER_PERSON, name : 'API Person' } },
+			{ action : ApiTests.deletePersons, data : API_USER_PERSON },
+		];
+
+		await this.runner.runTasks(tasks);
+	}
+
+
+	async apiTransactionsSecurity()
+	{
+		this.environment.setBlock('Transaction security', 2);
+
+		await this.apiCreateTransactionSecurity();
+		await this.apiUpdateTransactionSecurity();
+		await this.apiDeleteTransactionSecurity();
+	}
+
+
+	async apiCreateTransactionSecurity()
+	{
+		this.environment.setBlock('Create', 3);
+
+		const { API_USER_ACC_RUB, API_USER_PERSON, CASH_RUB } = this;
+
+		const data = [
+			{ type : EXPENSE, src_id : API_USER_ACC_RUB, dest_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
+			{ type : INCOME, src_id : 0, dest_id : API_USER_ACC_RUB, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
+			{ type : TRANSFER, src_id : CASH_RUB, dest_id : API_USER_ACC_RUB, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
+			{ type : DEBT, op : 1, person_id : API_USER_PERSON, acc_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
+		];
+
+		return this.runner.runGroup(ApiTests.createTransaction, data);
+	}
+
+
+	async apiUpdateTransactionSecurity()
+	{
+		this.environment.setBlock('Update', 3);
+
+		const {
+			API_USER_ACC_RUB, API_USER_ACC_USD,
+			API_USER_PERSON,
+			API_USER_TRANSACTION,
+			CASH_RUB,
+			TR_EXPENSE_1, TR_INCOME_1, TR_TRANSFER_1, TR_DEBT_1, TR_DEBT_2, TR_DEBT_3
+		} = this;
+
+		const data = [
+			{ id : TR_EXPENSE_1, src_id : API_USER_ACC_RUB },
+			{ id : TR_INCOME_1, dest_id : API_USER_ACC_RUB },
+			{ id : TR_TRANSFER_1, src_id : API_USER_ACC_RUB, dest_id : API_USER_ACC_USD },
+			// Trying to update transaction of another user
+			{ id: API_USER_TRANSACTION, type : EXPENSE, src_id : CASH_RUB, dest_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
+			// Trying to set person of another user
+			{ id: TR_DEBT_1, person_id : API_USER_PERSON },
+			// Trying to set account of another user
+			{ id: TR_DEBT_2, acc_id : API_USER_ACC_RUB },
+			// Trying to set both person and account of another user
+			{ id: TR_DEBT_3, person_id : API_USER_PERSON, acc_id : API_USER_ACC_RUB },
+		];
+
+		return this.runner.runGroup(ApiTests.updateTransaction, data);
+	}
+
+
+	async apiDeleteTransactionSecurity()
+	{
+		this.environment.setBlock('Delete', 3);
+	
+		const { API_USER_TRANSACTION } = this;
+
+		const data = [
+			[ API_USER_TRANSACTION ],
+		];
+
+		await this.runner.runGroup(ApiTests.deleteTransactions, data);
+	}
+
+
+	async apiCreateAccounts()
+	{
+		const data = [
+			{ name : 'acc ru', curr_id : RUB, initbalance : 100, icon : 1 },
+			{ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon : 3 },
+			{ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon : 5 },
+			// Try to create account with existing name
+			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0 },
+		];
+
+		[ this.ACC_RUB, this.CASH_RUB, this.ACC_USD ] = await this.runner.runGroup(ApiTests.createAccount, data);
+	}
+
+
+	async apiUpdateAccounts()
+	{
+		const { ACC_RUB, CASH_RUB } = this;
+
+		const data = [
+			{ id : ACC_RUB, name : 'acc rub', curr_id : USD, initbalance : 101, icon : 2 },
+			// Try to update name of account to an existing one
+			{ id : CASH_RUB, name : 'acc rub' },
+		];
+
+		return this.runner.runGroup(ApiTests.updateAccount, data);
+	}
+
+
+	async apiDeleteAccounts()
+	{
+		const { ACC_USD, CASH_RUB } = this;
+
+		const data = [
+			[ ACC_USD, CASH_RUB ],
+		];
+
+		return this.runner.runGroup(ApiTests.deleteAccounts, data);
+	}
+
+
+	async apiCreatePersons()
+	{
+		const data = [
+			{ name : 'Person X' },
+			{ name : 'Y' },
+			// Try to create person with existing name
+			{ name : 'Y' },
+		];
+
+		[ this.PERSON_X, this.PERSON_Y ] = await this.runner.runGroup(ApiTests.createPerson, data);
+	}
+
+
+	async apiUpdatePersons()
+	{
+		const { PERSON_X } = this;
+
+		const data = [
+			{ id : PERSON_X, name : 'XX!' },
+			// Try to update name of person to an existing one
+			{ id : PERSON_X, name : 'XX!' },
+		];
+
+		return this.runner.runGroup(ApiTests.updatePerson, data);
+	}
+
+
+	async apiDeletePersons()
+	{
+		const { PERSON_Y } = this;
+
+		const data = [
+			[ PERSON_Y ],
+		];
+
+		return this.runner.runGroup(ApiTests.deletePersons, data);
+	}
+
+
+	async apiCreateTransactions()
+	{
+		this.environment.setBlock('Create', 3);
+
+		const { CASH_RUB, ACC_RUB, ACC_USD, PERSON_X, PERSON_Y } = this;
+
+		const data = [
+			{ type : EXPENSE, src_id : ACC_RUB, src_amount : 100, comment: '11' },
+			{ type : EXPENSE, src_id : ACC_RUB, src_amount : 7608, dest_amount : 100, dest_curr : EUR, comment : '22' },
+			{ type : EXPENSE, src_id : ACC_USD, src_amount : 1, date : this.dates.yesterday },
+			{ type : INCOME, dest_id : ACC_RUB, dest_amount : 1000.50 },
+			{ type : INCOME, dest_id : ACC_USD, src_amount : 6500, dest_amount : 100, src_curr : RUB },
+			{ type : TRANSFER, src_id : ACC_RUB, dest_id : CASH_RUB, src_amount : 500, dest_amount : 500 },
+			{ type : TRANSFER, src_id : ACC_RUB, dest_id : ACC_USD, src_amount : 6500, dest_amount : 100 },
+			{ type : DEBT, op : 1, person_id : PERSON_X, acc_id : 0, src_amount : 500, src_curr : RUB },
+			{ type : DEBT, op : 2, person_id : PERSON_Y, acc_id : 0, src_amount : 1000, src_curr : USD },
+			{ type : DEBT, op : 1, person_id : PERSON_X, acc_id : 0, src_amount : 500, src_curr : RUB },
+			{ type : DEBT, op : 2, person_id : PERSON_Y, acc_id : 0, src_amount : 1000, src_curr : USD },
+		];
+
+		[
+			this.TR_EXPENSE_1, this.TR_EXPENSE_2, this.TR_EXPENSE_3,
+			this.TR_INCOME_1, this.TR_INCOME_2,
+			this.TR_TRANSFER_1, this.TR_TRANSFER_2,
+			this.TR_DEBT_1, this.TR_DEBT_2, this.TR_DEBT_3
+		] = await this.runner.runGroup(ApiTests.extractAndCreateTransaction, data);
+	}
+
+
+	async apiUpdateTransactions()
+	{
+		this.environment.setBlock('Update', 3);
+
+		const {
+			CASH_RUB, ACC_RUB, ACC_USD,
+			PERSON_Y,
+			TR_EXPENSE_1, TR_EXPENSE_2, TR_EXPENSE_3,
+			TR_INCOME_1, TR_INCOME_2,
+			TR_TRANSFER_1, TR_TRANSFER_2,
+			TR_DEBT_1, TR_DEBT_2, TR_DEBT_3
+		} = this;
+
+		const data = [
+			{ id : TR_EXPENSE_1, src_id : CASH_RUB },
+			{ id : TR_EXPENSE_2, dest_amount : 7608, dest_curr : RUB },
+			{ id : TR_EXPENSE_3, dest_amount : 0.89, dest_curr : EUR, date : this.dates.weekAgo },
+			{ id : TR_INCOME_1, dest_id : CASH_RUB },
+			{ id : TR_INCOME_2, src_amount : 100, src_curr : USD },
+			{ id : TR_TRANSFER_1, dest_id : ACC_USD, dest_curr : USD, dest_amount : 8 },
+			{ id : TR_TRANSFER_2, dest_id : CASH_RUB, dest_curr : RUB, dest_amount : 6500, date : this.dates.yesterday },
+			{ id : TR_DEBT_1, op : 2 },
+			{ id : TR_DEBT_2, person_id : PERSON_Y, acc_id : 0 },
+			{ id : TR_DEBT_3, op : 1, acc_id : ACC_RUB },
+		];
+
+		return this.runner.runGroup(ApiTests.updateTransaction, data);
+	}
+
+
+	async apiDeleteTransactions()
+	{
+		const { TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 } = this;
+
+		const data = [
+			[ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ],
+		];
+
+		return this.runner.runGroup(ApiTests.deleteTransactions, data);
+	}
+
+
+
+	async apiFilterTransactions()
+	{
+		this.environment.setBlock('Filter transactions', 2);
+
+		const { ACC_RUB } = this;
+
+		const data = [
+			{ type : DEBT },
+			{ accounts : ACC_RUB },
+			{ type : DEBT, accounts : ACC_RUB },
+			{ onPage : 10 },
+			{ onPage : 10, page : 2 },
+			{ startDate : this.dates.now, endDate : this.dates.weekAfter },
+			{ startDate : this.dates.now, endDate : this.dates.weekAfter, search : '1' },
+		];
+
+		return this.runner.runGroup(ApiTests.filterTransactions, data);
+	}
+
+
+	async apiProfile()
+	{
+		this.environment.setBlock('Profile', 2);
+
+		const tasks = [
+			{ action : ApiTests.login, data : this.config.apiTestUser },
+			{ action : ApiTests.changeName, data : 'App tester' },
+			{ action : ApiTests.changePassword, data : { user : this.config.apiTestUser, newPassword : '54321' } },
+			{ action : ApiTests.deleteProfile },
+		];
+
+		return this.runner.runTasks(tasks);
 	}
 
 

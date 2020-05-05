@@ -21,7 +21,7 @@ export class Runner
 	addTasks(tasks)
 	{
 		if (!Array.isArray(tasks))
-			throw new Error('Invalid action specified');
+			throw new Error('Invalid tasks specified. Array is expected');
 		
 		tasks.forEach(item => this.addTask(item.action, item.data));
 	}
@@ -52,6 +52,9 @@ export class Runner
 
 	addGroup(action, groupData)
 	{
+		if (!Array.isArray(groupData))
+			throw new Error('Invalid group data specified. Array is expected.');
+
 		groupData.forEach(data => this.addTask(action, data));
 	}
 
