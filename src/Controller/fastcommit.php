@@ -94,11 +94,14 @@ class FastCommitController extends Controller
 			$hdrs[strtolower($hdrName)] = $value;
 		}
 
+		$encodeCP1251 = FALSE;
 		if (isset($hdrs["x-file-id"]))
 		{
 			$fileId = $hdrs["x-file-id"];
 			$fileType = $hdrs["x-file-type"];
 			$fileStatType = $hdrs["x-file-stat-type"];
+			if (isset($hdrs["x-file-encode"]) && intval($hdrs["x-file-encode"]) == 1)
+				$encodeCP1251 = TRUE;
 
 			$fname = UPLOAD_PATH.$fileId.".".$fileType;
 			$fhnd = fopen($fname, "a");
@@ -124,6 +127,7 @@ class FastCommitController extends Controller
 			$fname = UPLOAD_PATH.$_POST["fileName"];
 			$fileType = substr(strrchr($fname, "."), 1);
 			$isCardStatement = (intval($_POST["isCard"]) == 1);
+			$encodeCP1251 = (intval($_POST["encode"]) == 1);
 		}
 
 		$fileType = strtoupper($fileType);
@@ -143,6 +147,8 @@ class FastCommitController extends Controller
 		{
 			$reader->setDelimiter(';');
 			$reader->setEnclosure('');
+			if ($encodeCP1251)
+				$reader->setInputEncoding('CP1251');
 		}
 		$spreadsheet = $reader->load($fname);
 		$src = $spreadsheet->getActiveSheet();

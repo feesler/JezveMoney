@@ -824,7 +824,7 @@ function onImportAll()
 }
 
 
-function Uploader(file, isCardStat, onSuccess, onFail, onProgress)
+function Uploader(file, options, onSuccess, onFail, onProgress)
 {
 	// fileId is unique file identificator
 	var fileId = file.name + '-' + file.size + '-' + +file.lastModifiedDate;
@@ -896,7 +896,9 @@ function Uploader(file, isCardStat, onSuccess, onFail, onProgress)
 		// which file upload
 		xhrUpload.setRequestHeader('X-File-Id', fileId);
 		xhrUpload.setRequestHeader('X-File-Type', fileType);
-		xhrUpload.setRequestHeader('X-File-Stat-Type', isCardStat ? 'card' : 'account');
+		xhrUpload.setRequestHeader('X-File-Stat-Type', options.isCard ? 'card' : 'account');
+		if (options.encode)
+			xhrUpload.setRequestHeader('X-File-Encode', 1);
 
 		xhrUpload.upload.onprogress = function(e)
 		{
@@ -963,7 +965,9 @@ function onFileImport()
 {
 	var fileUploadRadio = ge('fileUploadRadio');
 	var isCardCheck = ge('isCardCheck');
+	var isEncodeCheck = ge('isEncodeCheck');
 	var isCard = isCardCheck.checked;
+	var encode = isEncodeCheck.checked;
 
 	if (fileUploadRadio.checked)
 	{
@@ -975,7 +979,11 @@ function onFileImport()
 		if (!file)
 			return false;
 
-		uploader = new Uploader(file, isCard, onImportSuccess, onImportError, onImportProgress);
+		uploader = new Uploader(file,
+								{ isCard : isCard, encode : encode },
+								onImportSuccess,
+								onImportError,
+								onImportProgress);
 		uploader.upload();
 	}
 	else
@@ -989,6 +997,7 @@ function onFileImport()
 
 		reqObj.fileName = el.value;
 		reqObj.isCard = (isCard ? 1 : 0);
+		reqObj.encode = (encode ? 1 : 0);
 
 		ajax.post(baseURL + 'fastcommit/upload/', urlJoin(reqObj), onImportSuccess);
 	}

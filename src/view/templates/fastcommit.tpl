@@ -1,6 +1,7 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body>
+<div class="import_form">
 <form id="fileimportfrm" method="post" enctype="multipart/form-data" action="<?=BASEURL?>fastcommit/upload">
 	<div class="clearfix">
 		<div class="checkwrap inputwrap"><label><input id="fileUploadRadio" type="radio" name="importTypeRadio"><span>File upload</span><input id="fileInp" type="file"></label></div>
@@ -9,12 +10,14 @@
 		<div class="checkwrap inputwrap"><label><input type="radio" name="importTypeRadio"><span>Server</span><input id="srvFilePath" name="srvFilePath" type="text"></label></div>
 	</div>
 	<div class="clearfix">
-		<div class="checkwrap"><label><input id="isCardCheck" name="isCardCheck" name="isCardCheck" type="checkbox"><span>Card statement</span></label></div>
+		<div class="checkwrap"><label><input id="isCardCheck" name="isCard" type="checkbox"><span>Card statement</span></label></div>
+		<div class="checkwrap"><label><input id="isEncodeCheck" name="encode" type="checkbox"><span>CP-1251 encoding</span></label></div>
 	</div>
 	<div class="clearfix">
 		<input id="importbtn" class="btn ok_btn" type="submit" value="Import">
 	</div>
 </form>
+</div>
 
 	<select id="acc_id" name="acc_id">
 <?php foreach($accArr as $accObj) {	?>

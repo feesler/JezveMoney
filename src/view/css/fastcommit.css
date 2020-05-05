@@ -1,8 +1,15 @@
+.import_form
+{
+	padding: 10px;
+}
+
+
 .column
 {
 	float: left;
 	width: 49%;
 }
+
 
 .column #importRows
 {
@@ -107,11 +114,6 @@
 .tr_row_placeholder > select
 {
 	display: none;
-}
-
-#submitbtn
-{
-	margin-left: 10px;
 }
 
 
