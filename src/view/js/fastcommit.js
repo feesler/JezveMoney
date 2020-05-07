@@ -742,12 +742,24 @@ function mapImportRow(impRowObj)
 
 
 	accCurr = findCurrencyByName(impRowObj.data.accCurrVal);
-	trCurr = findCurrencyByName(impRowObj.data.trCurrVal);
-	if (!accCurr || !trCurr)	// unknown currency
+	if (!accCurr)
+	{
+		alert('Unknown currency ' + impRowObj.data.accCurrVal);
 		return;
+	}
+
+	trCurr = findCurrencyByName(impRowObj.data.trCurrVal);
+	if (!trCurr)
+	{
+		alert('Unknown currency ' + impRowObj.data.trCurrVal);
+		return;
+	}
 
 	if (accCurr.id != mainAccObj.curr_id)	// currency should be same as main account
+	{
+		alert('Currency must be the same as main account');
 		return;
+	}
 
 	rowObj = createRowObject();
 
