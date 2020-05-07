@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 
-class FastCommitController extends Controller
+class FastCommitController extends TemplateController
 {
 	public function index()
 	{

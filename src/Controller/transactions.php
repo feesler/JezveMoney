@@ -1,6 +1,6 @@
 <?php
 
-class TransactionsController extends Controller
+class TransactionsController extends TemplateController
 {
 	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
 	protected $debtRequiredFields = [ "type", "person_id", "acc_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];

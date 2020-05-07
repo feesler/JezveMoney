@@ -22,6 +22,7 @@
 			"Controller" => "system/controller.php",
 			"Model" => "system/model.php",
 			"Singleton" => "system/singleton.php",
+			"TemplateController" => "system/templatecontroller.php",
 			"ApiController" => "system/apicontroller.php",
 			"AdminController" => "system/admincontroller.php",
 		// Controllers

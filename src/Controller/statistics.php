@@ -1,6 +1,6 @@
 <?php
 
-class StatisticsController extends Controller
+class StatisticsController extends TemplateController
 {
 	public function index()
 	{

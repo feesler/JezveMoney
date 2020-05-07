@@ -1,6 +1,6 @@
 <?php
 
-class CheckBalanceController extends Controller
+class CheckBalanceController extends TemplateController
 {
 	public function fail()
 	{

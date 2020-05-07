@@ -1,6 +1,6 @@
 <?php
 
-abstract class AdminController extends Controller
+abstract class AdminController extends TemplateController
 {
 	protected $menuItems = [
 		"curr" => [ "title" => "Currencies", "link" => "currency/" ],

@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 
-class AccountsController extends Controller
+class AccountsController extends TemplateController
 {
 	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon" ];
 

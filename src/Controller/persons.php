@@ -1,6 +1,6 @@
 <?php
 
-class PersonsController extends Controller
+class PersonsController extends TemplateController
 {
 	protected $requiredFields = [ "name" ];
 
