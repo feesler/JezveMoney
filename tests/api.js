@@ -100,6 +100,7 @@ let pReqFields = ['name'];
  * Transactions
  */
 let trReqFields = ['type', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
+const setPosReqFields = ['id', 'pos'];
 let clTrReqFields = ['src_id', 'dest_id'];
 let debtReqFields = ['op', 'person_id', 'acc_id'];
 let filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search'];
@@ -634,6 +635,17 @@ export const api = {
 
 			return jsonRes.data;
 		},
+
+		setPos : async function(options)
+		{
+			let postData = checkFields(options, setPosReqFields);
+
+			let apiRes = await apiPost('transaction/setpos', postData);
+			if (!apiRes || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to delete transaction');
+
+			return true;
+		}
 	}
 };
 

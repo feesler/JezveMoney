@@ -174,6 +174,11 @@ export async function deleteTransactions(ids)
 	return TransactionApiTests.del(ids);
 }
 
+export async function setTransactionPos(data)
+{
+	return TransactionApiTests.setPos(data);
+}
+
 
 export async function filterTransactions(data)
 {

@@ -151,6 +151,15 @@ export class TransactionsList extends List
 	}
 
 
+	setPos(id, pos)
+	{
+		this.updatePosById(id, pos);
+		this.sort();
+
+		return true;
+	}
+
+
 	getItemsByType(list, type)
 	{
 		// If type == 0 or no value is specified assume filter is set as ALL

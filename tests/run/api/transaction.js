@@ -114,6 +114,35 @@ export async function del(ids)
 }
 
 
+// Set new position for specified transaction
+export async function setPos(params)
+{
+	let result;
+
+	await test('Set position of transaction', async () =>
+	{
+		let resExpected = App.state.setTransactionPos(params);
+
+		// Send API sequest to server
+		try
+		{
+			result = await api.transaction.setPos(params);
+			if (resExpected != result)
+				return false;
+		}
+		catch(e)
+		{
+			if (!(e instanceof ApiRequestError) || resExpected)
+				throw e;
+		}
+
+		return App.state.fetchAndTest();
+	});
+
+	return result;
+}
+
+
 // Filter list of transaction by specified params
 export async function filter(params)
 {

@@ -148,6 +148,7 @@ class Application
 		await this.apiSecurityTests();
 
 		await this.apiUpdateTransactions();
+		await this.apiSetTransactionPos();
 
 		await this.apiFilterTransactions();
 
@@ -445,6 +446,19 @@ class Application
 		return this.runner.runGroup(ApiTests.deleteTransactions, data);
 	}
 
+
+	async apiSetTransactionPos()
+	{
+		const { TR_EXPENSE_2, TR_INCOME_2, TR_TRANSFER_1 } = this;
+
+		const data = [
+			{ id : TR_EXPENSE_2, pos : 5 },
+			{ id : TR_INCOME_2, pos : 10 },
+			{ id : TR_TRANSFER_1, pos : 100 },
+		];
+
+		return this.runner.runGroup(ApiTests.setTransactionPos, data);
+	}
 
 
 	async apiFilterTransactions()

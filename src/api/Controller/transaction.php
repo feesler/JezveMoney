@@ -213,16 +213,11 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$respObj->fail();
 
-		if (!isset($_POST["id"]) || !is_numeric($_POST["id"]) ||
-			!isset($_POST["pos"]) || !is_numeric($_POST["pos"]))
+		$reqData = checkFields($_POST, ["id", "pos"]);
+		if ($reqData === FALSE)
 			$respObj->fail();
 
-		$tr_id = intval($_POST["id"]);
-		$to_pos = intval($_POST["pos"]);
-		if (!$tr_id || !$to_pos)
-			$respObj->fail();
-
-		if (!$this->model->updatePosition($tr_id, $to_pos))
+		if (!$this->model->updatePosition($reqData["id"], $reqData["pos"]))
 			$respObj->fail();
 
 		$respObj->ok();
