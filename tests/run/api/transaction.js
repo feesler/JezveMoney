@@ -45,6 +45,14 @@ export async function create(params)
 }
 
 
+export async function extractAndCreate(data)
+{
+	let extracted = Transaction.extract(data, App.state);
+
+	return create(extracted);
+}
+
+
 // Update transaction with specified params
 // (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
 export async function update(params)

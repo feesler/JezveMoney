@@ -1,10 +1,6 @@
 import { api } from '../api.js';
-import * as AccountApiTests from './api/account.js';
-import * as PersonApiTests from './api/person.js';
-import * as TransactionApiTests from './api/transaction.js';
 import { test } from '../common.js';
 import { App } from '../app.js';
-import { Transaction } from '../model/transaction.js';
 
 
 export async function deleteUserIfExist({ login })
@@ -110,77 +106,4 @@ export async function deleteProfile()
 		App.state.deleteProfile();
 		return true;
 	});
-}
-
-
-export async function createAccount(data)
-{
-	return AccountApiTests.create(data);
-}
-
-
-export async function updateAccount(data)
-{
-	return AccountApiTests.update(data);
-}
-
-
-export async function deleteAccounts(ids)
-{
-	return AccountApiTests.del(ids);
-}
-
-
-export async function createPerson(data)
-{
-	return PersonApiTests.create(data);
-}
-
-
-export async function updatePerson(data)
-{
-	return PersonApiTests.update(data);
-}
-
-
-export async function deletePersons(ids)
-{
-	return PersonApiTests.del(ids);
-}
-
-
-export async function createTransaction(data)
-{
-	return TransactionApiTests.create(data);
-}
-
-
-export async function extractAndCreateTransaction(data)
-{
-	let extracted = Transaction.extract(data, App.state);
-
-	return createTransaction(extracted);
-}
-
-
-export async function updateTransaction(data)
-{
-	return TransactionApiTests.update(data);
-}
-
-
-export async function deleteTransactions(ids)
-{
-	return TransactionApiTests.del(ids);
-}
-
-export async function setTransactionPos(data)
-{
-	return TransactionApiTests.setPos(data);
-}
-
-
-export async function filterTransactions(data)
-{
-	return TransactionApiTests.filter(data);
 }

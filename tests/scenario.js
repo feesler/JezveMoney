@@ -16,6 +16,9 @@ import * as TransactionListTests from './run/transactions.js';
 import * as StatisticsTests from './run/statistics.js';
 
 import * as ApiTests from './run/api.js';
+import * as AccountApiTests from './run/api/account.js';
+import * as PersonApiTests from './run/api/person.js';
+import * as TransactionApiTests from './run/api/transaction.js';
 
 import { api } from './api.js';
 import { Runner } from './runner.js';
@@ -130,16 +133,16 @@ export class Scenario
 		[
 			this.API_USER_ACC_RUB,
 			this.API_USER_ACC_USD,
-		] = await this.runner.runGroup(ApiTests.createAccount, [
+		] = await this.runner.runGroup(AccountApiTests.create, [
 			{ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5 },
 			{ name : 'USD', curr_id : USD, initbalance : 50, icon : 2 },
 		]);
 
-		[ this.API_USER_PERSON ] = await this.runner.runGroup(ApiTests.createPerson, [
+		[ this.API_USER_PERSON ] = await this.runner.runGroup(PersonApiTests.create, [
 			{ name : 'API user Person' }
 		]);
 
-		[ this.API_USER_TRANSACTION ] = await this.runner.runGroup(ApiTests.extractAndCreateTransaction, [
+		[ this.API_USER_TRANSACTION ] = await this.runner.runGroup(TransactionApiTests.extractAndCreate, [
 			{ type : EXPENSE, src_id: this.API_USER_ACC_RUB, src_amount: 100 }
 		]);
 	}
@@ -160,8 +163,8 @@ export class Scenario
 		this.environment.setBlock('Accounts security', 2);
 
 		const tasks = [
-			{ action : ApiTests.updateAccount, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2 } },
-			{ action : ApiTests.deleteAccounts, data : API_USER_ACC_RUB },
+			{ action : AccountApiTests.update, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2 } },
+			{ action : AccountApiTests.del, data : API_USER_ACC_RUB },
 		];
 
 		await this.runner.runTasks(tasks);
@@ -175,8 +178,8 @@ export class Scenario
 		this.environment.setBlock('Persons security', 2);
 
 		const tasks = [
-			{ action : ApiTests.updatePerson, data : { id : API_USER_PERSON, name : 'API Person' } },
-			{ action : ApiTests.deletePersons, data : API_USER_PERSON },
+			{ action : PersonApiTests.update, data : { id : API_USER_PERSON, name : 'API Person' } },
+			{ action : PersonApiTests.del, data : API_USER_PERSON },
 		];
 
 		await this.runner.runTasks(tasks);
@@ -206,7 +209,7 @@ export class Scenario
 			{ type : DEBT, op : 1, person_id : API_USER_PERSON, acc_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
 		];
 
-		return this.runner.runGroup(ApiTests.createTransaction, data);
+		return this.runner.runGroup(TransactionApiTests.create, data);
 	}
 
 
@@ -236,7 +239,7 @@ export class Scenario
 			{ id: TR_DEBT_3, person_id : API_USER_PERSON, acc_id : API_USER_ACC_RUB },
 		];
 
-		return this.runner.runGroup(ApiTests.updateTransaction, data);
+		return this.runner.runGroup(TransactionApiTests.update, data);
 	}
 
 
@@ -250,7 +253,7 @@ export class Scenario
 			[ API_USER_TRANSACTION ],
 		];
 
-		await this.runner.runGroup(ApiTests.deleteTransactions, data);
+		await this.runner.runGroup(TransactionApiTests.del, data);
 	}
 
 
@@ -264,7 +267,7 @@ export class Scenario
 			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0 },
 		];
 
-		[ this.ACC_RUB, this.CASH_RUB, this.ACC_USD ] = await this.runner.runGroup(ApiTests.createAccount, data);
+		[ this.ACC_RUB, this.CASH_RUB, this.ACC_USD ] = await this.runner.runGroup(AccountApiTests.create, data);
 	}
 
 
@@ -278,7 +281,7 @@ export class Scenario
 			{ id : CASH_RUB, name : 'acc rub' },
 		];
 
-		return this.runner.runGroup(ApiTests.updateAccount, data);
+		return this.runner.runGroup(AccountApiTests.update, data);
 	}
 
 
@@ -290,7 +293,7 @@ export class Scenario
 			[ ACC_USD, CASH_RUB ],
 		];
 
-		return this.runner.runGroup(ApiTests.deleteAccounts, data);
+		return this.runner.runGroup(AccountApiTests.del, data);
 	}
 
 
@@ -303,7 +306,7 @@ export class Scenario
 			{ name : 'Y' },
 		];
 
-		[ this.PERSON_X, this.PERSON_Y ] = await this.runner.runGroup(ApiTests.createPerson, data);
+		[ this.PERSON_X, this.PERSON_Y ] = await this.runner.runGroup(PersonApiTests.create, data);
 	}
 
 
@@ -317,7 +320,7 @@ export class Scenario
 			{ id : PERSON_X, name : 'XX!' },
 		];
 
-		return this.runner.runGroup(ApiTests.updatePerson, data);
+		return this.runner.runGroup(PersonApiTests.update, data);
 	}
 
 
@@ -329,7 +332,7 @@ export class Scenario
 			[ PERSON_Y ],
 		];
 
-		return this.runner.runGroup(ApiTests.deletePersons, data);
+		return this.runner.runGroup(PersonApiTests.del, data);
 	}
 
 
@@ -358,7 +361,7 @@ export class Scenario
 			this.TR_INCOME_1, this.TR_INCOME_2,
 			this.TR_TRANSFER_1, this.TR_TRANSFER_2,
 			this.TR_DEBT_1, this.TR_DEBT_2, this.TR_DEBT_3
-		] = await this.runner.runGroup(ApiTests.extractAndCreateTransaction, data);
+		] = await this.runner.runGroup(TransactionApiTests.extractAndCreate, data);
 	}
 
 
@@ -388,7 +391,7 @@ export class Scenario
 			{ id : TR_DEBT_3, op : 1, acc_id : ACC_RUB },
 		];
 
-		return this.runner.runGroup(ApiTests.updateTransaction, data);
+		return this.runner.runGroup(TransactionApiTests.update, data);
 	}
 
 
@@ -400,7 +403,7 @@ export class Scenario
 			[ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ],
 		];
 
-		return this.runner.runGroup(ApiTests.deleteTransactions, data);
+		return this.runner.runGroup(TransactionApiTests.del, data);
 	}
 
 
@@ -414,7 +417,7 @@ export class Scenario
 			{ id : TR_TRANSFER_1, pos : 100 },
 		];
 
-		return this.runner.runGroup(ApiTests.setTransactionPos, data);
+		return this.runner.runGroup(TransactionApiTests.setPos, data);
 	}
 
 
@@ -434,7 +437,7 @@ export class Scenario
 			{ startDate : App.dates.now, endDate : App.dates.weekAfter, search : '1' },
 		];
 
-		return this.runner.runGroup(ApiTests.filterTransactions, data);
+		return this.runner.runGroup(TransactionApiTests.filter, data);
 	}
 
 
