@@ -10,7 +10,7 @@ import { App } from './app.js';
 
 
 
-let defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
+const defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
 
 
 function checkFields(fields, expFields)
@@ -79,31 +79,31 @@ async function apiPost(method, data = {})
 /**
  * User
  */
-let userReqFields = ['login', 'password', 'name'];
+const userReqFields = ['login', 'password', 'name'];
 
 /**
  * Currency
  */
-let currReqFields = ['name', 'sign', 'format'];
+const currReqFields = ['name', 'sign', 'format'];
 
 /**
  * Accounts
  */
-let accReqFields = ['name', 'initbalance', 'curr_id', 'icon'];
+const accReqFields = ['name', 'initbalance', 'curr_id', 'icon'];
 
 /**
  * Persons
  */
-let pReqFields = ['name'];
+const pReqFields = ['name'];
 
 /**
  * Transactions
  */
-let trReqFields = ['type', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
+const trReqFields = ['type', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
 const setPosReqFields = ['id', 'pos'];
-let clTrReqFields = ['src_id', 'dest_id'];
-let debtReqFields = ['op', 'person_id', 'acc_id'];
-let filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search'];
+const clTrReqFields = ['src_id', 'dest_id'];
+const debtReqFields = ['op', 'person_id', 'acc_id'];
+const filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search'];
 
 
 function prepareTransactionData(options)
@@ -614,7 +614,7 @@ export const api = {
 			return true;
 		},
 
-		list : 	async function(params)
+		list : async function(params)
 		{
 			params = params || {};
 

@@ -96,7 +96,7 @@ class TransactionApiController extends ApiController
 
 		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
 		if ($reqData === FALSE)
-			$this->fail();
+			$respObj->fail();
 
 		if ($trans_type == DEBT)
 		{
@@ -170,7 +170,7 @@ class TransactionApiController extends ApiController
 
 		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
 		if ($reqData === FALSE)
-			$this->fail();
+			$respObj->fail();
 
 		if ($trans_type == DEBT)
 		{

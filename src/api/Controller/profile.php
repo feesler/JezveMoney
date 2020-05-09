@@ -86,10 +86,10 @@ class ProfileApiController extends ApiController
 
 		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset($this->user_id))
-			$this->fail($defMsg);
+			$respObj->fail($defMsg);
 
 		if (!$this->personMod->reset())
-			$this->fail($defMsg);
+			$respObj->fail($defMsg);
 
 		$respObj->msg = Message::get(MSG_PROFILE_RESETALL);
 

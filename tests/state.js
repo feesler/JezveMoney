@@ -556,6 +556,20 @@ export class AppState
 	}
 
 
+	setTransactionPos({ id, pos })
+	{
+		if (!parseInt(id) || !parseInt(pos))
+			return false;
+
+		if (!this.transactions.setPos(id, pos))
+			return false;
+
+		this.updateTransResults();
+
+		return true;
+	}
+
+
 	getPersonAccount(person_id, currency_id)
 	{
 		let p_id = parseInt(person_id);

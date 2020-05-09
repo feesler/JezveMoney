@@ -72,7 +72,7 @@ class Application
 		this.dateList.push(...Object.values(this.dates));
 
 		let firstDay = Date.UTC(now.getFullYear(), now.getMonth(), 1);
-		this.dates.startDate = (now.getDate() > 6) ? this.dates.weekAgo : firstDay;
+		this.dates.startDate = (now.getDate() > 7) ? this.dates.weekAgo : firstDay;
 
 		setupTest(this.environment);
 	}

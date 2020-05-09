@@ -66,7 +66,7 @@ class CurrencyApiController extends ApiController
 
 		$curr_id = $this->model->create($reqData);
 		if (!$curr_id)
-			$this->fail($defMsg);
+			$respObj->fail($defMsg);
 
 		$respObj->data = ["id" => $curr_id];
 		$respObj->ok();
