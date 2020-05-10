@@ -198,6 +198,39 @@ export function fixDate(date)
 }
 
 
+const SECOND = 1000;
+const MINUTE = 60000;
+const HOUR = 3600000;
+
+
+function leadZero(val)
+{
+	let v = parseInt(val);
+	if (isNaN(v))
+		throw new Error('Invalid time values speicifed');
+
+	if (v < 10)
+		return '0' + v;
+	else
+		return v.toString();
+}
+
+
+// Format time in milliseconds to HH:MM:SS format
+export function formatTime(time)
+{
+	let t = parseInt(time);
+
+	if (isNaN(t))
+		throw new Error('Invalid time values speicifed');
+
+	let hours = Math.floor(t / HOUR);
+	let minutes = Math.floor((t % HOUR) / MINUTE);
+	let seconds = Math.floor((t % MINUTE) / SECOND);
+
+	return leadZero(hours) + ':' + leadZero(minutes) + ':' + leadZero(seconds);
+}
+
 
 // Format specified value
 export function formatValue(val)

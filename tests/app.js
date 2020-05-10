@@ -1,4 +1,4 @@
-import { formatDate, setupTest } from './common.js';
+import { formatDate, formatTime, setupTest } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
@@ -63,23 +63,9 @@ class Application
 
 	afterRun()
 	{
-		const SECOND = 1000;
-		const MINUTE = 60000;
-		const HOUR = 3600000;
-
 		let testsDuration = Date.now() - this.startTime;
-		let hours = Math.floor(testsDuration / HOUR);
-		let minutes = Math.floor((testsDuration % HOUR) / MINUTE);
-		let seconds = Math.floor((testsDuration % MINUTE) / SECOND);
 
-		let timeTitle = [];
-		if (hours > 0)
-			timeTitle.push(hours + 'h');
-		if (minutes > 0)
-			timeTitle.push(minutes + 'm');
-		timeTitle.push(seconds + 's');
-
-		console.log('Duration of tests: ' + timeTitle.join(' '));
+		console.log('Duration of tests: ' + formatTime(testsDuration));
 	}
 
 
