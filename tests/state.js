@@ -187,7 +187,7 @@ export class AppState
 		// Prepare expected updates of accounts list
 		this.accounts.update(expAccount);
 
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 		this.updatePersonAccounts();
 
 		return true;
@@ -210,7 +210,7 @@ export class AppState
 		// Prepare expected updates of accounts list
 		this.accounts.deleteItems(ids);
 
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 		this.updatePersonAccounts();
 
 		return true;
@@ -302,7 +302,7 @@ export class AppState
 
 		this.accounts.deleteItems(accountsToDelete);
 
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 
 		return true;
 	}
@@ -437,37 +437,6 @@ export class AppState
 	}
 
 
-	updateTransResults()
-	{
-		let accounts = this.accounts.toInitial();
-
-		let list = this.transactions.sortAsc();
-
-		for(let trans of list)
-		{
-			accounts.data = AccountsList.applyTransaction(accounts.data, trans);
-
-			trans.src_result = 0;
-			if (trans.src_id)
-			{
-				let srcAcc = accounts.getItem(trans.src_id);
-				if (srcAcc)
-					trans.src_result = srcAcc.balance;
-			}
-
-			trans.dest_result = 0;
-			if (trans.dest_id)
-			{
-				let destAcc = accounts.getItem(trans.dest_id);
-				if (destAcc)
-					trans.dest_result = destAcc.balance;
-			}
-		}
-
-		this.transactions = new TransactionsList(list);
-	}
-
-
 	updatePersonAccounts()
 	{
 		for(let person of this.persons.data)
@@ -493,7 +462,7 @@ export class AppState
 		
 		// Prepare expected updates of transactions
 		let ind = this.transactions.create(expTrans);
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 		this.updatePersonAccounts();
 
 		let item = this.transactions.getItemByIndex(ind);
@@ -524,7 +493,7 @@ export class AppState
 
 		// Prepare expected updates of transactions
 		this.transactions.update(expTrans.id, expTrans);
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 		this.updatePersonAccounts();
 
 		return true;
@@ -549,7 +518,7 @@ export class AppState
 		// Prepare expected updates of transactions list
 		this.accounts = this.accounts.deleteTransactions(itemsToDelete);
 		this.transactions.deleteItems(ids)
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 		this.updatePersonAccounts();
 
 		return true;
@@ -564,7 +533,7 @@ export class AppState
 		if (!this.transactions.setPos(id, pos))
 			return false;
 
-		this.updateTransResults();
+		this.transactions.updateResults(this.accounts);
 
 		return true;
 	}

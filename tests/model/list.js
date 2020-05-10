@@ -15,12 +15,6 @@ export class List
 	setData(data)
 	{
 		this.data = copyObject(data);
-		this.filterData();
-	}
-
-
-	filterData()
-	{
 	}
 
 
@@ -33,16 +27,6 @@ export class List
 	async fetch()
 	{
 		throw new Error('Fetch not implemented');
-	}
-
-
-	filterData()
-	{
-		this.data.forEach(item =>
-		{
-			delete item.createdate;
-			delete item.updatedate;
-		});
 	}
 
 

@@ -11,16 +11,6 @@ export class PersonsList extends List
 	}
 
 
-	filterData()
-	{
-		this.data.forEach(item =>
-		{
-			delete item.createdate;
-			delete item.updatedate;
-		});
-	}
-
-
 	clone()
 	{
 		let res = new PersonsList(this.data);

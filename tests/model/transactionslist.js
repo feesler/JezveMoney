@@ -13,6 +13,7 @@ import {
 	DEBT,
 	availTransTypes
 } from './transaction.js';
+import { AccountsList } from './accountslist.js';
 
 
 export class TransactionsList extends List
@@ -157,6 +158,40 @@ export class TransactionsList extends List
 		this.sort();
 
 		return true;
+	}
+
+
+	updateResults(accountsList)
+	{
+		if (!(accountsList instanceof AccountsList))
+			throw new Error('Invalid accounts list specified');
+
+		let accounts = accountsList.toInitial();
+
+		let list = this.sortAsc();
+
+		for(let trans of list)
+		{
+			accounts.data = AccountsList.applyTransaction(accounts.data, trans);
+
+			trans.src_result = 0;
+			if (trans.src_id)
+			{
+				let srcAcc = accounts.getItem(trans.src_id);
+				if (srcAcc)
+					trans.src_result = srcAcc.balance;
+			}
+
+			trans.dest_result = 0;
+			if (trans.dest_id)
+			{
+				let destAcc = accounts.getItem(trans.dest_id);
+				if (destAcc)
+					trans.dest_result = destAcc.balance;
+			}
+		}
+
+		this.setData(list);
 	}
 
 
