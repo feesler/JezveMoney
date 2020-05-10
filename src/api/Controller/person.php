@@ -15,35 +15,26 @@ class PersonApiController extends ApiController
 
 	public function index()
 	{
-		wlog("PersonApiController::index()");
-
-		$respObj = new apiResponse;
-
 		$ids = $this->getRequestedIds();
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$respObj->fail("No persons specified");
+			$this->fail("No persons specified");
 
 		$res = [];
 		foreach($ids as $person_id)
 		{
 			$item = $this->model->getItem($person_id);
 			if (!$item)
-				$respObj->fail("Person $person_id not found");
+				$this->fail("Person $person_id not found");
 
 			$res[] = new Person($item);
 		}
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 
 
 	public function getList()
 	{
-		wlog("PersonApiController::getList()");
-
-		$respObj = new apiResponse;
-
 		$res = [];
 		$persons = $this->model->getData();
 		foreach($persons as $item)
@@ -51,73 +42,59 @@ class PersonApiController extends ApiController
 			$res[] = new Person($item);
 		}
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 
 
 	public function create()
 	{
-		wlog("PersonApiController::create()");
-
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		$p_id = $this->model->create($reqData);
 		if (!$p_id)
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->data = ["id" => $p_id];
-		$respObj->ok();
+		$this->ok([ "id" => $p_id ]);
 	}
 
 
 	public function update()
 	{
-		wlog("PersonApiController::update()");
-
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		if (!isset($_POST["id"]))
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		if (!$this->model->update($_POST["id"], $reqData))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function del()
 	{
-		wlog("PersonApiController::update()");
-
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$ids = $this->getRequestedIds(TRUE);
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$respObj->fail("No persons specified");
+			$this->fail("No persons specified");
 
 		if (!$this->model->del($ids))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 

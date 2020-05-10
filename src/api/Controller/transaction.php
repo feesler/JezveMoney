@@ -16,31 +16,26 @@ class TransactionApiController extends ApiController
 
 	public function index()
 	{
-		$respObj = new apiResponse;
-
 		$ids = $this->getRequestedIds();
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$respObj->fail("No transaction specified");
+			$this->fail("No transaction specified");
 
 		$res = [];
 		foreach($ids as $trans_id)
 		{
 			$item = $this->model->getItem($trans_id);
 			if (is_null($item))
-				$respObj->fail("Transaction $trans_id not found");
+				$this->fail("Transaction $trans_id not found");
 
 			$res[] = new Transaction($item);
 		}
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 
 
 	public function getList()
 	{
-		$respObj = new apiResponse;
-
 		$accMod = AccountModel::getInstance();
 
 		$params = [];
@@ -49,7 +44,7 @@ class TransactionApiController extends ApiController
 
 		$params["type"] = TransactionModel::getStringType($type_str);
 		if (is_null($params["type"]))
-			$respObj->fail();
+			$this->fail();
 
 		$params["onPage"] = (isset($_GET["count"]) && is_numeric($_GET["count"])) ? intval($_GET["count"]) : 10;
 
@@ -77,55 +72,46 @@ class TransactionApiController extends ApiController
 			$res[] = new Transaction($item);
 		}
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 
 
 	public function create()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		if (!isset($_POST["type"]))
-			$respObj->fail();
+			$this->fail();
 
 		$trans_type = intval($_POST["type"]);
 
 		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
+		$trans_id = 0;
 		if ($trans_type == DEBT)
 		{
 			$debtMod = DebtModel::getInstance();
 			$trans_id = $debtMod->create($reqData);
-			if (!$trans_id)
-				$respObj->fail();
-
-			$respObj->data = ["id" => $trans_id];
 		}
 		else
 		{
 			$trans_id = $this->model->create($reqData);
-			if (!$trans_id)
-				$respObj->fail();
-
-			$respObj->data = ["id" => $trans_id];
 		}
 
-		$respObj->ok();
+		if (!$trans_id)
+			$this->fail();
+
+		$this->ok([ "id" => $trans_id ]);
 	}
 
 
 	public function createMultiple()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$request = $this->getJSONContent(TRUE);
 		$transactions = [];
@@ -147,79 +133,71 @@ class TransactionApiController extends ApiController
 
 		$trans_ids = $this->model->createMultiple($transactions);
 		if (!$trans_ids)
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->data = ["ids" => $trans_ids];
-
-		$respObj->ok();
+		$this->ok([ "ids" => $trans_ids ]);
 	}
 
 
 	public function update()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		if (!isset($_POST["id"]))
-			$respObj->fail();
+			$this->fail();
 
 		$trans_id = intval($_POST["id"]);
 		$trans_type = intval($_POST["type"]);
 
 		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		if ($trans_type == DEBT)
 		{
 			$debtMod = DebtModel::getInstance();
 			if (!$debtMod->update($trans_id, $reqData))
-				$respObj->fail();
+				$this->fail();
 		}
 		else
 		{
 			if (!$this->model->update($trans_id, $reqData))
-				$respObj->fail();
+				$this->fail();
 		}
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function del()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$ids = $this->getRequestedIds(TRUE);
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$respObj->fail("No account specified");
+			$this->fail("No account specified");
 
 		if (!$this->model->del($ids))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function setPos()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, ["id", "pos"]);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		if (!$this->model->updatePosition($reqData["id"], $reqData["pos"]))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 }

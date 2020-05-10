@@ -15,31 +15,26 @@ class AccountApiController extends ApiController
 
 	public function index()
 	{
-		$respObj = new apiResponse;
-
 		$ids = $this->getRequestedIds();
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$respObj->fail("No account specified");
+			$this->fail("No account specified");
 
 		$res = [];
 		foreach($ids as $acc_id)
 		{
 			$item = $this->model->getItem($acc_id);
 			if (is_null($item))
-				$respObj->fail("Account $acc_id not found");
+				$this->fail("Account $acc_id not found");
 
 			$res[] = new Account($item);
 		}
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 
 
 	public function getList()
 	{
-		$respObj = new apiResponse;
-
 		$params = [];
 		if (isset($_GET["full"]) && $_GET["full"] == 1)
 			$params["full"] = TRUE;
@@ -51,84 +46,73 @@ class AccountApiController extends ApiController
 			$res[] = new Account($item);
 		}
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 
 
 	public function create()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
-			$respObj->fail("User not found");
+			$this->fail("User not found");
 
 		$reqData["owner_id"] = $uObj->owner_id;
 
 		$acc_id = $this->model->create($reqData);
 		if (!$acc_id)
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->data = ["id" => $acc_id];
-		$respObj->ok();
+		$this->ok([ "id" => $acc_id ]);
 	}
 
 
 	public function update()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		if (!isset($_POST["id"]))
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		if (!$this->model->update($_POST["id"], $reqData))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function del()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$ids = $this->getRequestedIds(TRUE);
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$respObj->fail("No account specified");
+			$this->fail("No account specified");
 
 		if (!$this->model->del($ids))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function reset()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->model->reset($this->user_id))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
-
 }

@@ -5,77 +5,58 @@ class UserApiController extends ApiController
 	protected $createRequiredFields = [ "login", "password", "name" ];
 
 
-	public function initAPI()
-	{
-		parent::initAPI();
-	}
-
-
 	public function login()
 	{
-		wlog("UserApiController::login()");
-
 		$requiredFields = [ "login", "password" ];
-		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		if (!$this->uMod->login($reqData["login"], $reqData["password"]))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function logout()
 	{
-		wlog("UserApiController::logout()");
-
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$this->uMod->logout();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	public function register()
 	{
-		wlog("UserApiController::register()");
-
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		if ($this->user_id != 0)		// need to log out first
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $this->createRequiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail();
+			$this->fail();
 
 		if (!$this->uMod->create($reqData))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 
 
 	protected function getList()
 	{
-		$res = new apiResponse;
-
-		$res->data = $this->uMod->getData();
-		$res->ok();
+		$data = $this->uMod->getData();
+		$this->ok($data);
 	}
 
 
@@ -83,25 +64,21 @@ class UserApiController extends ApiController
 	{
 		$defMsg = ERR_USER_CREATE;
 
-		$res = new apiResponse;
-
 		if (!$this->isPOST())
-			$res->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $this->createRequiredFields);
 		if ($reqData === FALSE)
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		$reqData["access"] = isset($_POST["access"]) ? intval($_POST["access"]) : 0;
 
 		$new_user_id = $this->uMod->create($reqData);
 		if (!$new_user_id)
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
-		$res->msg = Message::get(MSG_USER_CREATE);
-
-		$res->data = [ "id" => $new_user_id ];
-		$res->ok();
+		$this->setMessage(Message::get(MSG_USER_CREATE));
+		$this->ok([ "id" => $new_user_id ]);
 	}
 
 
@@ -109,27 +86,25 @@ class UserApiController extends ApiController
 	{
 		$defMsg = ERR_USER_UPDATE;
 
-		$res = new apiResponse;
-
 		if (!$this->isPOST())
-			$res->fail(defMsg);
+			$this->fail(defMsg);
 
 		if (!isset($_POST["id"]))
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		$reqData = checkFields($_POST, $this->createRequiredFields);
 		if ($reqData === FALSE)
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (isset($_POST["access"]))
 			$reqData["access"] = intval($_POST["access"]);
 
 		$updateRes = $this->uMod->update($_POST["id"], $reqData);
 		if (!$updateRes)
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
-		$res->msg = Message::get(MSG_USER_UPDATE);
-		$res->ok();
+		$this->setMessage(Message::get(MSG_USER_UPDATE));
+		$this->ok();
 	}
 
 
@@ -138,24 +113,22 @@ class UserApiController extends ApiController
 		$requiredFields = [ "id", "password" ];
 		$defMsg = ERR_PROFILE_PASSWORD;
 
-		$res = new apiResponse;
-
 		if (!$this->isPOST())
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		$reqData = checkFields($_POST, $requiredFields);
 		if ($reqData === FALSE)
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		$uObj = $this->uMod->getItem($reqData["id"]);
 		if (!$uObj)
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (!$this->uMod->setPassword($uObj->login, $reqData["password"]))
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
-		$res->msg = Message::get(MSG_PROFILE_PASSWORD);
-		$res->ok();
+		$this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
+		$this->ok();
 	}
 	
 
@@ -163,19 +136,17 @@ class UserApiController extends ApiController
 	{
 		$defMsg = ERR_USER_DELETE;
 
-		$res = new apiResponse;
-
 		if (!$this->isPOST())
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
 		$ids = $this->getRequestedIds(TRUE);
 		if (is_null($ids) || !is_array($ids) || !count($ids))
-			$res->fail("No account specified");
+			$this->fail("No account specified");
 
 		if (!$this->uMod->del($ids))
-			$res->fail($defMsg);
+			$this->fail($defMsg);
 
-		$res->msg = Message::get(MSG_USER_DELETE);
-		$res->ok();
+		$this->setMessage(Message::get(MSG_USER_DELETE));
+		$this->ok();
 	}
 }

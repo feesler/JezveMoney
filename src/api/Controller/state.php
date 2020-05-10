@@ -14,8 +14,6 @@ class StateApiController extends ApiController
 
 	public function index()
 	{
-		$respObj = new apiResponse;
-
 		$res = new stdClass;
 
 		$res->accounts = new stdClass;
@@ -48,12 +46,11 @@ class StateApiController extends ApiController
 		$res->profile = new stdClass;
 		$pObj = $this->pModel->getItem($this->owner_id);
 		if (!$pObj)
-			$respObj->fail("Person not found");
+			$this->fail("Person not found");
 		$res->profile->user_id = $this->user_id;
 		$res->profile->owner_id = $this->owner_id;
 		$res->profile->name = $pObj->name;
 
-		$respObj->data = $res;
-		$respObj->ok();
+		$this->ok($res);
 	}
 }

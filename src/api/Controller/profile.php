@@ -9,21 +9,16 @@ class ProfileApiController extends ApiController
 		$this->personMod = PersonModel::getInstance();
 		if (!$this->user_id)
 			throw new Error("User not found");
-
-		$this->owner_id = $this->uMod->getOwner();
 	}
 
 
 	public function read()
 	{
-		$respObj = new apiResponse;
-
 		$pObj = $this->personMod->getItem($this->owner_id);
 		if (!$pObj)
-			$respObj->fail("Person not found");
+			$this->fail("Person not found");
 
-		$respObj->data = [ "user_id" => $this->user_id, "owner_id" => $this->owner_id, "name" => $pObj->name ];
-		$respObj->ok();
+		$this->ok([ "user_id" => $this->user_id, "owner_id" => $this->owner_id, "name" => $pObj->name ]);
 	}
 
 
@@ -31,22 +26,19 @@ class ProfileApiController extends ApiController
 	{
 		$requiredFields = [ "name" ];
 		$defMsg = Message::get(ERR_PROFILE_NAME);
-		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (!$this->personMod->update($this->owner_id, $reqData))
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
-		$respObj->msg = Message::get(MSG_PROFILE_NAME);
-		$respObj->data = $reqData;
-
-		$respObj->ok();
+		$this->setMessage(Message::get(MSG_PROFILE_NAME));
+		$this->ok($reqData);
 	}
 
 
@@ -54,59 +46,53 @@ class ProfileApiController extends ApiController
 	{
 		$requiredFields = [ "current", "new" ];
 		$defMsg = Message::get(ERR_PROFILE_PASSWORD);
-		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$reqData = checkFields($_POST, $requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]))
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
-		$respObj->msg = Message::get(MSG_PROFILE_PASSWORD);
-
-		$respObj->ok();
+		$this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
+		$this->ok();
 	}
 
 
 	public function reset()
 	{
 		$defMsg = Message::get(ERR_PROFILE_PASSWORD);
-		$respObj = new apiResponse;
 
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		$accMod = AccountModel::getInstance();
 		if (!$accMod->reset($this->user_id))
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (!$this->personMod->reset())
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
-		$respObj->msg = Message::get(MSG_PROFILE_RESETALL);
-
-		$respObj->ok();
+		$this->setMessage(Message::get(MSG_PROFILE_RESETALL));
+		$this->ok();
 	}
 
 
 	public function del()
 	{
-		$respObj = new apiResponse;
-
 		if (!$this->isPOST())
-			$respObj->fail();
+			$this->fail();
 
 		if (!$this->uMod->del($this->user_id))
-			$respObj->fail();
+			$this->fail();
 
-		$respObj->ok();
+		$this->ok();
 	}
 }
