@@ -34,6 +34,30 @@ function isObject(o)
 }
 
 
+// Return deep copy of object
+function copyObject(item)
+{
+	if (Array.isArray(item))
+	{
+		return item.map(copyObject);
+	}
+	else if (isObject(item))
+	{
+		let res = {};
+		for(let key in item)
+		{
+			res[key] = copyObject(item[key]);
+		}
+
+		return res;
+	}
+	else
+	{
+		return item;
+	}
+}
+
+
 // Set parameters of object
 function setParam(obj, params)
 {
@@ -114,13 +138,6 @@ function re(obj)
 	var robj = ge(obj);
 
 	return (robj && robj.parentNode) ? robj.parentNode.removeChild(robj) : null;
-}
-
-
-// document.write wrapper
-function dw(a)
-{
-	document.write(a);
 }
 
 

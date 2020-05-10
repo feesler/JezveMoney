@@ -20,9 +20,12 @@ function onSubmitNewPos(tr_id)
 // Sent AJAX request to server to change position of transaction
 function sendChangePosRequest(trans_id, newPos)
 {
-	var params = { 'id' : trans_id, 'pos' : newPos };
-
-	ajax.post(baseURL + 'api/transaction/setpos', urlJoin(params), onChangePosCallback);
+	ajax.post({
+		url : baseURL + 'api/transaction/setpos',
+		data : JSON.stringify({ 'id' : trans_id, 'pos' : newPos }),
+		headers : { 'Content-Type' : 'application/json' },
+		callback : onChangePosCallback
+	});
 }
 
 

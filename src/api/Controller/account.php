@@ -55,7 +55,8 @@ class AccountApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$reqData = checkFields($_POST, $this->requiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $this->requiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
@@ -78,14 +79,15 @@ class AccountApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		if (!isset($_POST["id"]))
+		$request = $this->getRequestData();
+		if (!$request || !isset($request["id"]))
 			$this->fail();
 
-		$reqData = checkFields($_POST, $this->requiredFields);
+		$reqData = checkFields($request, $this->requiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
-		if (!$this->model->update($_POST["id"], $reqData))
+		if (!$this->model->update($request["id"], $reqData))
 			$this->fail();
 
 		$this->ok();
@@ -97,7 +99,7 @@ class AccountApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$ids = $this->getRequestedIds(TRUE);
+		$ids = $this->getRequestedIds(TRUE, $this->isJsonContent());
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$this->fail("No account specified");
 

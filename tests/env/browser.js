@@ -244,14 +244,21 @@ class BrowserEnvironment extends Environment
 
 		if (method == 'post' && data)
 		{
-			let postData = (typeof data === 'string') ? data : urlJoin(data);
+			let postData;
+			if (typeof data === 'string')
+			{
+				postData = data;
+				options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+			}
+			else
+			{
+				postData = JSON.stringify(data);
+				options.headers['Content-Type'] = 'application/json';
+			}
 
 			let encoder = new TextEncoder();
 			let uint8Array = encoder.encode(postData);
-
-			setParam(options.headers,
-								{ 'Content-Type' : 'application/x-www-form-urlencoded',
-									'Content-Length' : uint8Array.length });
+			options.headers['Content-Length'] = uint8Array.length;
 			options.body = postData;
 		}
 

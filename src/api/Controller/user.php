@@ -12,7 +12,8 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$reqData = checkFields($_POST, $requiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $requiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
@@ -42,7 +43,8 @@ class UserApiController extends ApiController
 		if ($this->user_id != 0)		// need to log out first
 			$this->fail();
 
-		$reqData = checkFields($_POST, $this->createRequiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $this->createRequiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
@@ -67,11 +69,12 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$reqData = checkFields($_POST, $this->createRequiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $this->createRequiredFields);
 		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
-		$reqData["access"] = isset($_POST["access"]) ? intval($_POST["access"]) : 0;
+		$reqData["access"] = isset($request["access"]) ? intval($request["access"]) : 0;
 
 		$new_user_id = $this->uMod->create($reqData);
 		if (!$new_user_id)
@@ -89,17 +92,18 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail(defMsg);
 
-		if (!isset($_POST["id"]))
+		$request = $this->getRequestData();
+		if (!isset($request["id"]))
 			$this->fail($defMsg);
 
-		$reqData = checkFields($_POST, $this->createRequiredFields);
+		$reqData = checkFields($request, $this->createRequiredFields);
 		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
-		if (isset($_POST["access"]))
-			$reqData["access"] = intval($_POST["access"]);
+		if (isset($request["access"]))
+			$reqData["access"] = intval($request["access"]);
 
-		$updateRes = $this->uMod->update($_POST["id"], $reqData);
+		$updateRes = $this->uMod->update($request["id"], $reqData);
 		if (!$updateRes)
 			$this->fail($defMsg);
 
@@ -116,7 +120,8 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail($defMsg);
 
-		$reqData = checkFields($_POST, $requiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $requiredFields);
 		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
@@ -139,7 +144,7 @@ class UserApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail($defMsg);
 
-		$ids = $this->getRequestedIds(TRUE);
+		$ids = $this->getRequestedIds(TRUE, $this->isJsonContent());
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$this->fail("No account specified");
 

@@ -139,7 +139,7 @@ function setUserPass()
 	enable('isadmin', false);
 	enable('isdefault', false);
 
-	frm.action = baseURL + 'admin/user/chpwd';
+	frm.action = baseURL + 'api/user/changePassword';
 
 	dwPopup.setTitle('Set password');
 	dwPopup.show();
@@ -154,14 +154,19 @@ function deleteUser()
 
 	if (confirm('Are you sure want to delete selected user?'))
 	{
-		ajax.post(baseURL + 'api/user/del', urlJoin({ id : selectedItem.id }), onSubmitResult);
+		ajax.post({
+			url : baseURL + 'api/user/del',
+			data : JSON.stringify({ id : selectedItem.id }),
+			headers : { 'Content-Type' : 'application/json' },
+			callback : onSubmitResult
+		});
 	}
 }
 
 
 function onFormSubmit()
 {
-	var link, els = {}, params;
+	var els = {};
 	var formEl = this;
 
 	if (!formEl || !formEl.elements)
@@ -183,17 +188,23 @@ function onFormSubmit()
 
 	if (formEl.method == 'get')
 	{
-		params = urlJoin(els);
-		link = formEl.action;
+		var params = urlJoin(els);
+		var link = formEl.action;
 		if (params != '')
 			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
-		ajax.get(link, onSubmitResult);
+		ajax.get({
+			url : link,
+			callback : onSubmitResult
+		});
 	}
 	else if (formEl.method == 'post')
 	{
-		params = urlJoin(els);
-		link = formEl.action;
-		ajax.post(link, params, onSubmitResult);
+		ajax.post({
+			url : formEl.action,
+			data : JSON.stringify(els),
+			headers : { 'Content-Type' : 'application/json' },
+			callback : onSubmitResult
+		});
 	}
 
 	return false;
@@ -230,7 +241,10 @@ function onSubmitResult(response)
 
 function requestList()
 {
-	ajax.get(baseURL + 'api/user/list', onListResult);
+	ajax.get({
+		url : baseURL + 'api/user/list',
+		callback : onListResult
+	});
 }
 
 

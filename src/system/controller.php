@@ -4,6 +4,7 @@ abstract class Controller
 {
 	public $action = NULL;
 	public $actionParam = NULL;
+	protected $headers = NULL;
 
 
 	abstract public function index();
@@ -20,11 +21,34 @@ abstract class Controller
 	}
 
 
+	protected function getHeader($name)
+	{
+		if (is_empty($name))
+			return NULL;
+
+		if (is_null($this->headers))
+		{
+			$this->headers = [];
+			foreach(getallheaders() as $header => $value)
+			{
+				$this->headers[strtolower($header)] = $value;
+			}
+		}
+
+		$lname = strtolower($name);
+		if (isset($this->headers[$lname]))
+			return $this->headers[$lname];
+
+		return NULL;
+	}
+
+
 	// Check request is AJAX
 	protected function isAJAX()
 	{
-		$hdrs = getallheaders();
-		return (isset($hdrs["X-Requested-With"]) && $hdrs["X-Requested-With"] == "XMLHttpRequest");
+		$xRequestedWith = $this->getHeader("X-Requested-With");
+
+		return ($xRequestedWith && $xRequestedWith == "XMLHttpRequest");
 	}
 
 
@@ -48,9 +72,13 @@ abstract class Controller
 
 
 	// Obtain requested ids from actionParam of from GET id parameter and return array of integers
-	protected function getRequestedIds($isPOST = FALSE)
+	protected function getRequestedIds($isPOST = FALSE, $isJSON = FALSE)
 	{
-		$httpSrc = $isPOST ? $_POST : $_GET;
+		if ($isPOST)
+			$httpSrc = ($isJSON) ? $this->getJSONContent(TRUE) : $_POST;
+		else
+			$httpSrc = $_GET;
+
 		if (is_null($this->actionParam) && !isset($httpSrc["id"]))
 			return NULL;
 

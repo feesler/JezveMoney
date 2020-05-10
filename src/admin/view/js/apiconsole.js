@@ -100,7 +100,7 @@ var api = (function()
 
 	function postData(data)
 	{
-		return urlJoin(data);
+		return JSON.stringify(data);
 	}
 
 
@@ -141,12 +141,15 @@ var api = (function()
 		else
 			res.url = request.method;
 
+		res.headers = ('headers' in request) ? request.headers : {};
+
 		if (request.data)
 		{
 			if (isPOST)
 			{
 				res.method = 'POST';
 				res.data = postData(request.data);
+				res.headers['Content-Type'] = 'application/json';
 			}
 			else
 			{
@@ -174,13 +177,12 @@ var api = (function()
 			var requestItem = getRequestItem(request);
 			var reqContainer = addRequestItem(requestItem);
 
-			ajax.get(
-				requestItem.url,
-				function(text)
-				{
-					ajaxCallback(text, reqContainer, callback);
-				}
-			);
+			requestItem.callback = function(text)
+			{
+				ajaxCallback(text, reqContainer, callback);
+			}
+
+			ajax.get(requestItem);
 		},
 
 		post : function(request, callback)
@@ -188,14 +190,12 @@ var api = (function()
 			var requestItem = getRequestItem(request, true);
 			var reqContainer = addRequestItem(requestItem);
 
-			ajax.post(
-				requestItem.url,
-				requestItem.data,
-				function(text)
-				{
-					ajaxCallback(text, reqContainer, callback);
-				}
-			);
+			requestItem.callback = function(text)
+			{
+				ajaxCallback(text, reqContainer, callback);
+			}
+
+			ajax.post(requestItem);
 		}
 	};
 })();
@@ -285,14 +285,13 @@ function onFormSubmit(e, verifyCallback)
 
 	var request = {
 		method : formEl.action,
-		data : els,
-		verify : verifyCallback
+		data : els
 	};
 
 	if (formEl.method == 'get')
-		api.get(request);
+		api.get(request, verifyCallback);
 	else if (formEl.method == 'post')
-		api.post(request);
+		api.post(request, verifyCallback);
 
 	return false;
 }

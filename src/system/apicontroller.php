@@ -74,4 +74,20 @@ class ApiController extends Controller
 
 		$this->owner_id = $this->uMod->getOwner();
 	}
+
+
+	protected function isJsonContent()
+	{
+		$contentType = $this->getHeader("Content-Type");
+		return ($contentType && $contentType == "application/json");
+	}
+
+
+	protected function getRequestData()
+	{
+		if ($this->isJsonContent())
+			return $this->getJSONContent(TRUE);
+		else
+			return $_POST;
+	}
 }

@@ -91,14 +91,19 @@ function deleteCurr()
 
 	if (confirm('Are you sure want to delete selected currency?'))
 	{
-		ajax.post(baseURL + 'api/currency/del', urlJoin({ id : selectedItem.id }), onSubmitResult);
+		ajax.post({
+			url : baseURL + 'api/currency/del',
+			data : JSON.stringify({ id : selectedItem.id }),
+			headers : { 'Content-Type' : 'application/json' },
+			callback : onSubmitResult
+		});
 	}
 }
 
 
 function onFormSubmit()
 {
-	var link, els = {}, params;
+	var els = {};
 	var formEl = this;
 
 	if (!formEl || !formEl.elements)
@@ -120,17 +125,23 @@ function onFormSubmit()
 
 	if (formEl.method == 'get')
 	{
-		params = urlJoin(els);
-		link = formEl.action;
+		var params = urlJoin(els);
+		var link = formEl.action;
 		if (params != '')
 			link += ((link.indexOf('?') != -1) ? '&' : '?') + params;
-		ajax.get(link, onSubmitResult);
+		ajax.get({
+			url : link,
+			callback : onSubmitResult
+		});
 	}
 	else if (formEl.method == 'post')
 	{
-		params = urlJoin(els);
-		link = formEl.action;
-		ajax.post(link, params, onSubmitResult);
+		ajax.post({
+			url : formEl.action,
+			data : JSON.stringify(els),
+			headers : { 'Content-Type' : 'application/json' },
+			callback : onSubmitResult
+		});
 	}
 
 	return false;
@@ -167,7 +178,10 @@ function onSubmitResult(response)
 
 function requestList()
 {
-	ajax.get(baseURL + 'api/currency/list', onListResult);
+	ajax.get({
+		url : baseURL + 'api/currency/list',
+		callback : onListResult
+	});
 }
 
 

@@ -53,7 +53,8 @@ class CurrencyApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail($defMsg);
 
-		$reqData = checkFields($_POST, $this->requiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $this->requiredFields);
 		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
@@ -72,14 +73,15 @@ class CurrencyApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		if (!isset($_POST["id"]))
+		$request = $this->getRequestData();
+		if (!$request || !isset($request["id"]))
 			$this->fail();
 
-		$reqData = checkFields($_POST, $this->requiredFields);
+		$reqData = checkFields($request, $this->requiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
-		if (!$this->model->update($_POST["id"], $reqData))
+		if (!$this->model->update($request["id"], $reqData))
 			$this->fail();
 
 		$this->ok();
@@ -93,7 +95,7 @@ class CurrencyApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail($defMsg);
 
-		$ids = $this->getRequestedIds(TRUE);
+		$ids = $this->getRequestedIds(TRUE, $this->isJsonContent());
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$this->fail("No currency specified");
 

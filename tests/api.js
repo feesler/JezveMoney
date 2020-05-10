@@ -563,7 +563,7 @@ export const api = {
 				postData.push(itemData);
 			}
 
-			let apiRes = await apiPost('transaction/createMultiple', JSON.stringify(postData));
+			let apiRes = await apiPost('transaction/createMultiple', postData);
 			if (!apiRes || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to create transactions');
 

@@ -566,7 +566,12 @@ function onSubmitClick()
 		return trObj;
 	});
 
-	ajax.post(baseURL + 'api/transaction/createMultiple/', JSON.stringify(reqObj), onCommitResult);
+	ajax.post({
+		url : baseURL + 'api/transaction/createMultiple/',
+		data : JSON.stringify(reqObj),
+		headers : { 'Content-Type' : 'application/json' },
+		callback : onCommitResult
+	});
 }
 
 
@@ -1011,7 +1016,11 @@ function onFileImport()
 		reqObj.isCard = (isCard ? 1 : 0);
 		reqObj.encode = (encode ? 1 : 0);
 
-		ajax.post(baseURL + 'fastcommit/upload/', urlJoin(reqObj), onImportSuccess);
+		ajax.post({
+			url : baseURL + 'fastcommit/upload/',
+			data : urlJoin(reqObj),
+			callback : onImportSuccess
+		});
 	}
 
 	return false;

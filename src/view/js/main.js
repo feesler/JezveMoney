@@ -153,9 +153,12 @@ function onChangePassSubmit(frm)
 		return false;
 	}
 
-	ajax.post(baseURL + 'api/profile/changepass',
-				urlJoin({ 'current' : oldpwd.value, 'new' : newpwd.value }),
-				onChangePasswordResult);
+	ajax.post({
+		url : baseURL + 'api/profile/changepass',
+		data : JSON.stringify({ 'current' : oldpwd.value, 'new' : newpwd.value }),
+		headers : { 'Content-Type' : 'application/json' },
+		callback : onChangePasswordResult
+	});
 
 	return false;
 }
@@ -253,9 +256,12 @@ function onChangeNameSubmit(frm)
 		return false;
 	}
 
-	ajax.post(baseURL + 'api/profile/changename',
-				urlJoin({ 'name' : newname.value }),
-				onChangeNameResult);
+	ajax.post({
+		url : baseURL + 'api/profile/changename',
+		data : JSON.stringify({ 'name' : newname.value }),
+		headers : { 'Content-Type' : 'application/json' },
+		callback : onChangeNameResult
+	});
 
 	return false;
 }

@@ -81,12 +81,13 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		if (!isset($_POST["type"]))
+		$request = $this->getRequestData();
+		if (!$request || !isset($request["type"]))
 			$this->fail();
 
-		$trans_type = intval($_POST["type"]);
+		$trans_type = intval($request["type"]);
 
-		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
+		$reqData = checkFields($request, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
@@ -113,7 +114,7 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$request = $this->getJSONContent(TRUE);
+		$request = $this->getRequestData();
 		$transactions = [];
 		foreach($request as $item)
 		{
@@ -144,13 +145,14 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		if (!isset($_POST["id"]))
+		$request = $this->getRequestData();
+		if (!$request || !isset($request["id"]))
 			$this->fail();
 
-		$trans_id = intval($_POST["id"]);
-		$trans_type = intval($_POST["type"]);
+		$trans_id = intval($request["id"]);
+		$trans_type = intval($request["type"]);
 
-		$reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
+		$reqData = checkFields($request, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
 		if ($reqData === FALSE)
 			$this->fail();
 
@@ -175,7 +177,7 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$ids = $this->getRequestedIds(TRUE);
+		$ids = $this->getRequestedIds(TRUE, $this->isJsonContent());
 		if (is_null($ids) || !is_array($ids) || !count($ids))
 			$this->fail("No account specified");
 
@@ -191,7 +193,8 @@ class TransactionApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$reqData = checkFields($_POST, ["id", "pos"]);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, ["id", "pos"]);
 		if ($reqData === FALSE)
 			$this->fail();
 

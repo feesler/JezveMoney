@@ -283,11 +283,18 @@ class NodeEnvironment extends Environment
 
 			if (method == 'post' && data)
 			{
-				postData = (typeof data === 'string') ? data : urlJoin(data);
+				if (typeof data === 'string')
+				{
+					postData = data;
+					options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+				}
+				else
+				{
+					postData = JSON.stringify(data);
+					options.headers['Content-Type'] = 'application/json';
+				}
 
-				setParam(options.headers,
-									{ 'Content-Type' : 'application/x-www-form-urlencoded',
-										'Content-Length' : Buffer.byteLength(postData) });
+				options.headers['Content-Length'] = Buffer.byteLength(postData);
 			}
 
 

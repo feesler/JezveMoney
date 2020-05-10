@@ -30,7 +30,8 @@ class ProfileApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$reqData = checkFields($_POST, $requiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $requiredFields);
 		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
@@ -50,7 +51,8 @@ class ProfileApiController extends ApiController
 		if (!$this->isPOST())
 			$this->fail();
 
-		$reqData = checkFields($_POST, $requiredFields);
+		$request = $this->getRequestData();
+		$reqData = checkFields($request, $requiredFields);
 		if ($reqData === FALSE)
 			$this->fail($defMsg);
 
