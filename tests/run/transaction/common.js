@@ -44,6 +44,9 @@ export async function runAction({ action, data })
 		testDescr = `Change person to (${person.name})`;
 	}
 
+	if (action == 'toggleAccount')
+		testDescr = App.view.model.noAccount ? 'Enable account' : 'Disable account';
+
 	if (action == 'changeAccountByPos')
 	{
 		if (data === null)
@@ -71,10 +74,10 @@ export async function runAction({ action, data })
 
 	if (action == 'toggleDebtType')
 	{
-		if (!!data == App.view.model.debtType)
+		if (typeof data !== 'undefined' && !!data == App.view.model.debtType)
 			return;
 
-		let debtTypeStr = data ? 'give' : 'take';
+		let debtTypeStr = App.view.model.debtType ? 'take' : 'give';
 		testDescr = `Change debt type (${debtTypeStr})`;
 	}
 
@@ -127,6 +130,24 @@ export async function runAction({ action, data })
 		testDescr = `Comment (${data}) input`;
 
 	await test(testDescr, () => App.view.runAction(action, data));
+}
+
+
+export async function runActions(actions)
+{
+	for(let action of actions)
+	{
+		await runAction(action);
+	}
+}
+
+
+export async function runGroup(action, data)
+{
+	for(let item of data)
+	{
+		await runAction({ action, data : item });
+	}
 }
 
 

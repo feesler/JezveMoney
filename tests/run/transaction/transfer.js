@@ -76,193 +76,192 @@ export async function stateLoop()
 	await test('Initial state of new transfer view', async () => view.setExpectedState(0));
 
 	// Input source amount
-	await test('Source amount (1) input', () => view.inputSrcAmount('1'));
-	await test('Source amount (1.) input', () => view.inputSrcAmount('1.'));
-	await test('Source amount (1.0) input', () => view.inputSrcAmount('1.0'));
-	await test('Source amount (1.01) input', () => view.inputSrcAmount('1.01'));
-	await test('Source amount (1.010) input', () => view.inputSrcAmount('1.010'));
-	await test('Source amount (1.0101) input', () => view.inputSrcAmount('1.0101'));
-	await test('Emptry source amount input', () => view.inputSrcAmount(''));
-	await test('Source amount (.) input', () => view.inputSrcAmount('.'));
-	await test('Source amount (.0) input', () => view.inputSrcAmount('.0'));
-	await test('Source amount (.09) input', () => view.inputSrcAmount('.09'));
+	const saInputData = [
+		'1',
+		'1.',
+		'1.0',
+		'1.01',
+		'1.010',
+		'1.0101',
+		'',
+		'.',
+		'.0',
+		'.09',
+	];
+	await TransactionTests.runGroup('inputSrcAmount', saInputData);
 
-	// Transition 7: Change destination account to another one with same currency as source (EUR)
-	await test('(7) Change destination account', () => view.changeDestAccountByPos(ACC_3));
-	// Transition 5: Change source account to another one with same currency as destination (USD)
-	await test('(5) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-	// Transition 1: Click by source balance and move from State 0 to State 1
-	await test('(1) Click on source result balance', () => view.clickSrcResultBalance());
+	await TransactionTests.runActions([
+		// Transition 7: Change destination account to another one with same currency as source (EUR)
+		{ action : 'changeDestAccountByPos', data : ACC_3 },
+		// Transition 5: Change source account to another one with same currency as destination (USD)
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 1: Click by source balance and move from State 0 to State 1
+		{ action : 'clickSrcResultBalance' },
+	]);
 
 	// Input source result balance
-	await test('Source result balance (400) input', () => view.inputResBalance('400'));
-	await test('Source result balance (400.) input', () => view.inputResBalance('400.'));
-	await test('Source result balance (400.9) input', () => view.inputResBalance('400.9'));
-	await test('Source result balance (400.99) input', () => view.inputResBalance('400.99'));
-	await test('Source result balance (400.990) input', () => view.inputResBalance('400.990'));
-	await test('Source result balance (400.9901) input', () => view.inputResBalance('400.9901'));
-	await test('Empty result balance input', () => view.inputResBalance(''));
-	await test('Source result balance (.) input', () => view.inputResBalance('.'));
-	await test('Source result balance (.0) input', () => view.inputResBalance('.0'));
-	await test('Source result balance (.01) input', () => view.inputResBalance('.01'));
+	const srbInputData = [
+		'400',
+		'400.',
+		'400.9',
+		'400.99',
+		'400.990',
+		'400.9901',
+		'',
+		'.',
+		'.0',
+		'.01',
+	];
+	await TransactionTests.runGroup('inputResBalance', srbInputData);
 
-	// Transition 11: Change source account to another one with same currency as destination and stay on State 1
-	await test('(11) Change source account', () => view.changeSrcAccountByPos(CARD_RUB));
-	// Transition 13: Change destination account to another one with same currency as source and stay on State 1
-	await test('(13) Change destination account', () => view.changeDestAccountByPos(CARD_RUB));
-	// Transition 9: Click by destination balance and move from State 1 to State 2
-	await test('(9) Click on destination result balance', () => view.clickDestResultBalance());
+	await TransactionTests.runActions([
+		// Transition 11: Change source account to another one with same currency as destination and stay on State 1
+		{ action : 'changeSrcAccountByPos', data : CARD_RUB },
+		// Transition 13: Change destination account to another one with same currency as source and stay on State 1
+		{ action : 'changeDestAccountByPos', data : CARD_RUB },
+		// Transition 9: Click by destination balance and move from State 1 to State 2
+		{ action : 'clickDestResultBalance' },
+	]);
 
 	// Input destination result balance
-	await test('Destination result balance (600) input', () => view.inputDestResBalance('600'));
-	await test('Destination result balance (600.) input', () => view.inputDestResBalance('600.'));
-	await test('Destination result balance (600.9) input', () => view.inputDestResBalance('600.9'));
-	await test('Destination result balance (600.90) input', () => view.inputDestResBalance('600.90'));
-	await test('Destination result balance (600.901) input', () => view.inputDestResBalance('600.901'));
-	await test('Destination result balance (600.9010) input', () => view.inputDestResBalance('600.9010'));
-	await test('Destination result balance (600.90101) input', () => view.inputDestResBalance('600.90101'));
-	await test('Empty destination result balance input', () => view.inputDestResBalance(''));
-	await test('Destination result balance (.) input', () => view.inputDestResBalance('.'));
-	await test('Destination result balance (.0) input', () => view.inputDestResBalance('.0'));
+	const drbInputData = [
+		'600',
+		'600.',
+		'600.9',
+		'600.90',
+		'600.901',
+		'600.9010',
+		'600.90101',
+		'',
+		'.',
+		'.0',
+	];
+	await TransactionTests.runGroup('inputDestResBalance', drbInputData);
 
-	// Transition 15: Change source account to another one with same currency and stay on State 2
-	await test('(15) Change source account', () => view.changeSrcAccountByPos(CARD_RUB));
-	// Transition 17: Change destination account to another one with same currency and stay on State 2
-	await test('(17) Change destination account', () => view.changeDestAccountByPos(CARD_RUB));
-	// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
-	await test('(16) Change source account', () => view.changeSrcAccountByPos(ACC_USD));
-	// Transition 26: Change source account to another one with different currency (EUR) and stay on State 5
-	await test('(26) Change source account', () => view.changeSrcAccountByPos(ACC_EUR));
-	// Transition 28: Change destination account to another one with different currency and stay on State 5
-	await test('(28) Change destination account', () => view.changeDestAccountByPos(ACC_3));
-	// Transition 27: Change source account to another one with same currency as destination (RUB) and move from State 5 to State 2
-	await test('(27) Change source account', () => view.changeSrcAccountByPos(ACC_RUB));
-	// Transition 18: Change destination account to another one with different currency than source (USD) and move from State 2 to State 5
-	await test('(18) Change destination account', () => view.changeDestAccountByPos(ACC_USD));
-	// Transition 29: Change destination account to another one with same currency as source and move from State 5 to State 2
-	await test('(29) Change destination account', () => view.changeDestAccountByPos(ACC_3));
-	// Transition 10: Click by source balance and move from State 1 to State 2
-	await test('(10) Click on source result balance', () => view.clickSrcResultBalance());
-	// Transition 2: Click by source amount and move from State 1 to State 0
-	await test('(2) Click on source amount', () => view.clickSrcAmount());
-	// Transition 6: Change source account to another one with different currency than destination (USD) and move from State 0 to State 3
-	await test('(6) Change source account', () => view.changeSrcAccountByPos(ACC_USD));
-	// Transition 43: Change source account to another one with different currency than destination (RUB) and stay on State 3
-	await test('(43) Change source account', () => view.changeSrcAccountByPos(ACC_RUB));
-	// Transition 41: Change destination account to another one with same currency as source (EUR) and stay on State 3
-	await test('(41) Change destination account', () => view.changeDestAccountByPos(ACC_EUR));
-
-	// Transition 44: Change source account to another one with same currency as destination (EUR > RUB) and move from State 3 to State 0
-	await view.changeSrcAccountByPos(ACC_EUR);
-	await test('(44) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-
-	// Transition 8: Change destination account to another one with different currency than source (USD) and move from State 0 to State 3
-	await test('(8) Change destination account', () => view.changeDestAccountByPos(ACC_USD));
-	// Transition 42: Change destination account to another one with same currency as source (RUB) and move from State 3 to State 0
-	await test('(42) Change destination account', () => view.changeDestAccountByPos(ACC_RUB));
-
-	// Transition 12: Change source account to another one with different currency than destination (EUR) and move from State 1 to State 4
-	await view.clickSrcResultBalance();					// move from State 0 to State 1
-	await test('(12) Change source account', () => view.changeSrcAccountByPos(ACC_EUR));
-
-	// Transition 36: Change source account to another one with different currency than destination (USD) and stay on State 4
-	await test('(36) Change source account', () => view.changeSrcAccountByPos(ACC_RUB));
-	// Transition 38: Change destination account to another one with different currency than source (RUB) and stay on State 4
-	await test('(38) Change destination account', () => view.changeDestAccountByPos(ACC_EUR));
-	// Transition 39: Change destination account to another one with same currency as source (RUB) and move from State 4 to State 1
-	await test('(39) Change destination account', () => view.changeDestAccountByPos(ACC_EUR));
-	// Transition 14: Change destination account to another one with different currency than source (USD) and move from State 1 to State 4
-	await test('(14) Change destination account', () => view.changeDestAccountByPos(ACC_USD));
-	// Transition 32: Click by destination result balance and move from State 4 to State 6
-	await test('(32) Click on destination result balance', () => view.clickDestResultBalance());
-	// Transition 49: Change source account to another one with different currency than destination (EUR) and stay on State 6
-	await test('(49) Change source account', () => view.changeSrcAccountByPos(ACC_EUR));
-	// Transition 47: Change destination account to another one with different currency than source (RUB) and stay on State 6
-	await test('(47) Change destination account', () => view.changeDestAccountByPos(ACC_3));
-	// Transition 20: Click by source amount and move from State 6 to State 5
-	await test('(20) Click on source amount', () => view.clickSrcAmount());
-	// Transition 19: Click by source result balance and move from State 5 to State 6
-	await test('(19) Click on source result balance', () => view.clickSrcResultBalance());
-	// Transition 45: Click by exchange rate and move from State 6 to State 8
-	await test('(45) Click on exchange rate', () => view.clickExchRate());
-	// Transition 51: Change source account to another one with different currency than destination (USD) and stay on State 6
-	await test('(51) Change source account', () => view.changeSrcAccountByPos(ACC_USD));
-	// Transition 53: Change destination account to another one with different currency than source (EUR) and stay on State 6
-	await test('(53) Change destination account', () => view.changeDestAccountByPos(ACC_EUR));
-	// Transition 23: Click by source amount and move from State 8 to State 7
-	await test('(23) Click on source amount', () => view.clickSrcAmount());
-	// Transition 57: Change source account to another one with different currency than destination (RUB) and stay on State 7
-	await test('(57) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-	// Transition 59: Change destination account to another one with different currency than source (USD) and stay on State 7
-	await test('(59) Change destination account', () => view.changeDestAccountByPos(ACC_USD));
-	// Transition 22: Click by source result balance and move from State 7 to State 8
-	await test('(22) Click on source result balance', () => view.clickSrcResultBalance());
-	// Transition 46: Click by destination result balance and move from State 8 to State 6
-	await test('(46) Click on destination result balance', () => view.clickDestResultBalance());
-	// Transition 33: Click by destination amount and move from State 6 to State 4
-	await test('(33) Click on destination amount', () => view.clickDestAmount());
-
-	// Transition 37: Change source account to another one with same currency as destination (RUB) and from State 4 to State 1
-	await view.changeSrcAccountByPos(ACC_EUR);		// change source to EUR first
-	await view.changeDestAccountByPos(CARD_RUB)		// change destination to RUB
-	await test('(37) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-
-	// Transition 21: Click by exchange rate and move from State 5 to State 7
-	await view.clickSrcAmount();						// move from State 1 to State 0
-	await view.clickDestResultBalance();				// move from State 0 to State 2
-	await view.changeDestAccountByPos(ACC_USD);			// move from State 2 to State 5
-	await test('(21) Click on exchange rate', () => view.clickExchRate());
-
-	// Transition 55: Click by destination amount and move from State 7 to State 3
-	await test('(55) Click on destination amount', () => view.clickDestAmount());
-	// Transition 25: Click by destination result balance and move from State 3 to State 5
-	await test('(25) Click on destination result balance', () => view.clickDestResultBalance());
-
-	// Transition 56: Click by destination result balance and move from State 7 to State 5
-	await view.clickExchRate();					// move from State 5 to State 7
-	await test('(56) Click on destination result balance', () => view.clickDestResultBalance());
-
-	// Transition 24: Click by destination amount and move from State 5 to State 3
-	await test('(24) Click on destination amount', () => view.clickDestAmount());
-	// Transition 40: Click by exchange rate and move from State 3 to State 7
-	await test('(40) Click on exchange rate', () => view.clickExchRate());
-	// Transition 60: Change destination account to another one with same currency as source (RUB) and move from State 7 to State 0
-	await test('(60) Change destination account', () => view.changeDestAccountByPos(ACC_RUB));
-
-	// Transition 58: Change source account to another one with same currency as destination (RUB) and from State 7 to State 0
-	await view.clickDestResultBalance();			// move from State 0 to State 2
-	await view.changeSrcAccountByPos(ACC_USD);		// move from State 2 to State 5
-	await view.clickExchRate();						// move from State 5 to State 7
-	await test('(58) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-
-	// Transition 30: Click by source amount and move from State 4 to State 3
-	await view.clickSrcResultBalance();				// move from State 0 to State 1
-	await view.changeSrcAccountByPos(ACC_EUR);		// move from State 1 to State 4
-	await test('(30) Click on source amount', () => view.clickSrcAmount());
-
-	// Transition 31: Click by source result balance and move from State 3 to State 4
-	await test('(31) Click on source result balance', () => view.clickSrcResultBalance());
-	// Transition 34: Click by exchange rate and move from State 4 to State 8
-	await test('(34) Click on exchange rate', () => view.clickExchRate());
-	// Transition 35: Click by destination amount and move from State 8 to State 4
-	await test('(35) Click on destination amount', () => view.clickDestAmount());
-
-	// Transition 52: Change source account to another one with same currency as destination (RUB) and from State 8 to State 1
-	await view.clickExchRate();						// move from State 4 to State 8
-	await test('(52) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-
-	// Transition 54: Change destination account to another one with same currency as source (RUB) and move from State 8 to State 1
-	await view.changeDestAccountByPos(ACC_USD);			// move from State 1 to State 4
-	await view.clickExchRate();							// move from State 4 to State 8
-	await test('(54) Change destination account', () => view.changeDestAccountByPos(ACC_RUB));
-
-	// Transition 50: Change source account to another one with same currency as destination (RUB) and from State 6 to State 1
-	await view.changeSrcAccountByPos(ACC_USD);		// move from State 1 to State 4
-	await view.clickDestResultBalance();			// move from State 4 to State 6
-	await test('(50) Change source account', () => view.changeSrcAccountByPos(ACC_3));
-
-	// Transition 48: Change destination account to another one with same currency as source (RUB) and move from State 1 to State 2
-	await view.changeDestAccountByPos(ACC_USD);			// move from State 1 to State 4
-	await view.clickDestResultBalance();				// move from State 4 to State 6
-	await test('(48) Change destination account', () => view.changeDestAccountByPos(ACC_RUB));
+	await TransactionTests.runActions([
+		// Transition 15: Change source account to another one with same currency and stay on State 2
+		{ action : 'changeSrcAccountByPos', data : CARD_RUB },
+		// Transition 17: Change destination account to another one with same currency and stay on State 2
+		{ action : 'changeDestAccountByPos', data : CARD_RUB },
+		// Transition 16: Change source account to another one with different currency (USD) and move from State 2 to State 5
+		{ action : 'changeSrcAccountByPos', data : ACC_USD },
+		// Transition 26: Change source account to another one with different currency (EUR) and stay on State 5
+		{ action : 'changeSrcAccountByPos', data : ACC_EUR },
+		// Transition 28: Change destination account to another one with different currency and stay on State 5
+		{ action : 'changeDestAccountByPos', data : ACC_3 },
+		// Transition 27: Change source account to another one with same currency as destination (RUB) and move from State 5 to State 2
+		{ action : 'changeSrcAccountByPos', data : ACC_RUB },
+		// Transition 18: Change destination account to another one with different currency than source (USD) and move from State 2 to State 5
+		{ action : 'changeDestAccountByPos', data : ACC_USD },
+		// Transition 29: Change destination account to another one with same currency as source and move from State 5 to State 2
+		{ action : 'changeDestAccountByPos', data : ACC_3 },
+		// Transition 10: Click by source balance and move from State 1 to State 2
+		{ action : 'clickSrcResultBalance' },
+		// Transition 2: Click by source amount and move from State 1 to State 0
+		{ action : 'clickSrcAmount' },
+		// Transition 6: Change source account to another one with different currency than destination (USD) and move from State 0 to State 3
+		{ action : 'changeSrcAccountByPos', data : ACC_USD },
+		// Transition 43: Change source account to another one with different currency than destination (RUB) and stay on State 3
+		{ action : 'changeSrcAccountByPos', data : ACC_RUB },
+		// Transition 41: Change destination account to another one with same currency as source (EUR) and stay on State 3
+		{ action : 'changeDestAccountByPos', data : ACC_EUR },
+		// Transition 44: Change source account to another one with same currency as destination (EUR > RUB) and move from State 3 to State 0
+		{ action : 'changeSrcAccountByPos', data : ACC_EUR },
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 8: Change destination account to another one with different currency than source (USD) and move from State 0 to State 3
+		{ action : 'changeDestAccountByPos', data : ACC_USD },
+		// Transition 42: Change destination account to another one with same currency as source (RUB) and move from State 3 to State 0
+		{ action : 'changeDestAccountByPos', data : ACC_RUB },
+		// Transition 12: Change source account to another one with different currency than destination (EUR) and move from State 1 to State 4
+		{ action : 'clickSrcResultBalance' },					// move from State 0 to State 1
+		{ action : 'changeSrcAccountByPos', data : ACC_EUR },
+		// Transition 36: Change source account to another one with different currency than destination (USD) and stay on State 4
+		{ action : 'changeSrcAccountByPos', data : ACC_RUB },
+		// Transition 38: Change destination account to another one with different currency than source (RUB) and stay on State 4
+		{ action : 'changeDestAccountByPos', data : ACC_EUR },
+		// Transition 39: Change destination account to another one with same currency as source (RUB) and move from State 4 to State 1
+		{ action : 'changeDestAccountByPos', data : ACC_EUR },
+		// Transition 14: Change destination account to another one with different currency than source (USD) and move from State 1 to State 4
+		{ action : 'changeDestAccountByPos', data : ACC_USD },
+		// Transition 32: Click by destination result balance and move from State 4 to State 6
+		{ action : 'clickDestResultBalance' },
+		// Transition 49: Change source account to another one with different currency than destination (EUR) and stay on State 6
+		{ action : 'changeSrcAccountByPos', data : ACC_EUR },
+		// Transition 47: Change destination account to another one with different currency than source (RUB) and stay on State 6
+		{ action : 'changeDestAccountByPos', data : ACC_3 },
+		// Transition 20: Click by source amount and move from State 6 to State 5
+		{ action : 'clickSrcAmount' },
+		// Transition 19: Click by source result balance and move from State 5 to State 6
+		{ action : 'clickSrcResultBalance' },
+		// Transition 45: Click by exchange rate and move from State 6 to State 8
+		{ action : 'clickExchRate' },
+		// Transition 51: Change source account to another one with different currency than destination (USD) and stay on State 6
+		{ action : 'changeSrcAccountByPos', data : ACC_USD },
+		// Transition 53: Change destination account to another one with different currency than source (EUR) and stay on State 6
+		{ action : 'changeDestAccountByPos', data : ACC_EUR },
+		// Transition 23: Click by source amount and move from State 8 to State 7
+		{ action : 'clickSrcAmount' },
+		// Transition 57: Change source account to another one with different currency than destination (RUB) and stay on State 7
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 59: Change destination account to another one with different currency than source (USD) and stay on State 7
+		{ action : 'changeDestAccountByPos', data : ACC_USD },
+		// Transition 22: Click by source result balance and move from State 7 to State 8
+		{ action : 'clickSrcResultBalance' },
+		// Transition 46: Click by destination result balance and move from State 8 to State 6
+		{ action : 'clickDestResultBalance' },
+		// Transition 33: Click by destination amount and move from State 6 to State 4
+		{ action : 'clickDestAmount' },
+		// Transition 37: Change source account to another one with same currency as destination (RUB) and from State 4 to State 1
+		{ action : 'changeSrcAccountByPos', data : ACC_EUR },		// change source to EUR first
+		{ action : 'changeDestAccountByPos', data : CARD_RUB },		// change destination to RUB
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 21: Click by exchange rate and move from State 5 to State 7
+		{ action : 'clickSrcAmount' },						// move from State 1 to State 0
+		{ action : 'clickDestResultBalance' },				// move from State 0 to State 2
+		{ action : 'changeDestAccountByPos', data : ACC_USD },			// move from State 2 to State 5
+		{ action : 'clickExchRate' },
+		// Transition 55: Click by destination amount and move from State 7 to State 3
+		{ action : 'clickDestAmount' },
+		// Transition 25: Click by destination result balance and move from State 3 to State 5
+		{ action : 'clickDestResultBalance' },
+		// Transition 56: Click by destination result balance and move from State 7 to State 5
+		{ action : 'clickExchRate' },					// move from State 5 to State 7
+		{ action : 'clickDestResultBalance' },
+		// Transition 24: Click by destination amount and move from State 5 to State 3
+		{ action : 'clickDestAmount' },
+		// Transition 40: Click by exchange rate and move from State 3 to State 7
+		{ action : 'clickExchRate' },
+		// Transition 60: Change destination account to another one with same currency as source (RUB) and move from State 7 to State 0
+		{ action : 'changeDestAccountByPos', data : ACC_RUB },
+		// Transition 58: Change source account to another one with same currency as destination (RUB) and from State 7 to State 0
+		{ action : 'clickDestResultBalance' },			// move from State 0 to State 2
+		{ action : 'changeSrcAccountByPos', data : ACC_USD },		// move from State 2 to State 5
+		{ action : 'clickExchRate' },						// move from State 5 to State 7
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 30: Click by source amount and move from State 4 to State 3
+		{ action : 'clickSrcResultBalance' },				// move from State 0 to State 1
+		{ action : 'changeSrcAccountByPos', data : ACC_EUR },		// move from State 1 to State 4
+		{ action : 'clickSrcAmount' },
+		// Transition 31: Click by source result balance and move from State 3 to State 4
+		{ action : 'clickSrcResultBalance' },
+		// Transition 34: Click by exchange rate and move from State 4 to State 8
+		{ action : 'clickExchRate' },
+		// Transition 35: Click by destination amount and move from State 8 to State 4
+		{ action : 'clickDestAmount' },
+		// Transition 52: Change source account to another one with same currency as destination (RUB) and from State 8 to State 1
+		{ action : 'clickExchRate' },						// move from State 4 to State 8
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 54: Change destination account to another one with same currency as source (RUB) and move from State 8 to State 1
+		{ action : 'changeDestAccountByPos', data : ACC_USD },			// move from State 1 to State 4
+		{ action : 'clickExchRate' },							// move from State 4 to State 8
+		{ action : 'changeDestAccountByPos', data : ACC_RUB },
+		// Transition 50: Change source account to another one with same currency as destination (RUB) and from State 6 to State 1
+		{ action : 'changeSrcAccountByPos', data : ACC_USD },		// move from State 1 to State 4
+		{ action : 'clickDestResultBalance' },			// move from State 4 to State 6
+		{ action : 'changeSrcAccountByPos', data : ACC_3 },
+		// Transition 48: Change destination account to another one with same currency as source (RUB) and move from State 1 to State 2
+		{ action : 'changeDestAccountByPos', data : ACC_USD },			// move from State 1 to State 4
+		{ action : 'clickDestResultBalance' },				// move from State 4 to State 6
+		{ action : 'changeDestAccountByPos', data : ACC_RUB },
+	]);
 }
