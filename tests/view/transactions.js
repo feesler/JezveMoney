@@ -427,76 +427,21 @@ export class TransactionsView extends TestView
 	// Delete specified transactions and return navigation promise
 	async deleteTransactions(tr)
 	{
-		const onPage = App.config.transactionsOnPage;
-
 		if (!tr)
 			throw new Error('No transactions specified');
 
 		if (!Array.isArray(tr))
 			tr = [tr];
 
-		let currentType = App.view.content.typeMenu.activeType;
+		await this.selectTransactions(tr);
 
-		await this.goToFirstPage();
+		await this.performAction(() => this.content.toolbar.delBtn.click());
 
-		let trOnCurrentPage;
-		let absTrOnCurrentPage;
+		if (!await this.isVisible(this.content.delete_warning.elem))
+			throw 'Delete transaction warning popup not appear';
+		if (!this.content.delete_warning.okBtn)
+			throw 'OK button not found';
 
-		while(true)
-		{
-			let pageNum = App.view.currentPage();
-
-
-			absTrOnCurrentPage = tr.filter(tr_num => {
-				return tr_num >= onPage * (pageNum - 1) &&
-						tr_num < onPage * pageNum;
-			});
-
-			trOnCurrentPage = absTrOnCurrentPage.map(tr_num => tr_num - (pageNum - 1) * onPage);
-
-			if (trOnCurrentPage.length)
-			{
-				await App.view.selectTransactions(trOnCurrentPage);
-
-				await App.view.performAction(() => App.view.content.toolbar.delBtn.click());
-
-				if (!await App.view.isVisible(App.view.content.delete_warning.elem))
-					throw 'Delete transaction warning popup not appear';
-				if (!App.view.content.delete_warning.okBtn)
-					throw 'OK button not found';
-
-				await App.view.navigation(() => App.view.click(App.view.content.delete_warning.okBtn));
-
-				// Refresh state and rebuild model
-				await App.state.fetch();
-				App.view.model = await App.view.buildModel(App.view.content);
-
-				// After delete transactions navigation occurs to page without filters, so we need to restore it
-				await App.view.filterByType(currentType);
-
-				// Exclude previously removed transactions
-				tr = tr.filter(tr_num => !absTrOnCurrentPage.includes(tr_num))
-				if (!tr.length)
-					break;
-
-				// Shift positions
-				tr = tr.map(tr_num => tr_num - trOnCurrentPage.length);
-			}
-			else
-			{
-				if (App.view.isLastPage())
-				{
-					if (tr.length)
-						throw new Error(`Transaction(s) ${tr.join()} can not be removed`);
-					else
-						break;
-				}
-				else
-				{
-					await App.view.goToNextPage();
-				}
-			}
-		}
+		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}
-
 }

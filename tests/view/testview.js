@@ -41,6 +41,12 @@ export class TestView
 	}
 
 
+	async updateModel()
+	{
+		this.model = await this.buildModel(this.content);
+	}
+
+
 	async parse()
 	{
 		this.location = await this.url();
@@ -48,7 +54,7 @@ export class TestView
 		this.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
 		this.msgPopup = await MessagePopup.create(this, await this.query('.popup_content.msg'));
 		this.content = await this.parseContent();
-		this.model = await this.buildModel(this.content);
+		await this.updateModel();
 	}
 
 

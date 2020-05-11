@@ -92,8 +92,58 @@ export async function del(type, transactions)
 	// Navigate to transactions view and filter by specified type of transaction
 	await App.view.goToTransactions();
 	await App.view.filterByType(type);
-	// Request view to select and delete transactions
-	await App.view.deleteTransactions(transactions);
+
+	let tr = copyObject(transactions);
+	let trOnCurrentPage;
+	let absTrOnCurrentPage;
+	const onPage = App.config.transactionsOnPage;
+
+	while(true)
+	{
+		let pageNum = App.view.currentPage();
+
+		absTrOnCurrentPage = tr.filter(tr_num => {
+			return tr_num >= onPage * (pageNum - 1) &&
+					tr_num < onPage * pageNum;
+		});
+
+		if (absTrOnCurrentPage.length)
+		{
+			trOnCurrentPage = absTrOnCurrentPage.map(tr_num => tr_num - (pageNum - 1) * onPage);
+
+			// Request view to select and delete transactions
+			await App.view.deleteTransactions(trOnCurrentPage);
+
+			// Refresh state and rebuild model
+			await App.state.fetch();
+			await App.view.updateModel();
+
+			// After delete transactions navigation occurs to page without filters, so we need to restore it
+			await App.view.filterByType(type);
+
+			// Exclude previously removed transactions
+			tr = tr.filter(tr_num => !absTrOnCurrentPage.includes(tr_num))
+			if (!tr.length)
+				break;
+
+			// Shift positions
+			tr = tr.map(tr_num => tr_num - trOnCurrentPage.length);
+		}
+		else
+		{
+			if (App.view.isLastPage())
+			{
+				if (tr.length)
+					throw new Error(`Transaction(s) ${tr.join()} can not be removed`);
+				else
+					break;
+			}
+			else
+			{
+				await App.view.goToNextPage();
+			}
+		}
+	}
 
 	await App.goToMainView();
 

@@ -34,6 +34,7 @@ export async function goToNextPage()
 	await test('Navigate to next page', () => App.view.goToNextPage());
 }
 
+
 export async function setDetailsMode()
 {
 	await checkNavigation();
