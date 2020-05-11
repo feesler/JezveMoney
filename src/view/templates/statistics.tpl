@@ -115,7 +115,6 @@
 <script>
 	var currency = <?=JSON::encode($currArr)?>;
 	var accCurr = <?=$accCurr?>;
-	var transArr = <?=JSON::encode($transArr)?>;
 	var filterObj = <?=JSON::encode($filterObj)?>;
 	var chartData = <?=JSON::encode($statArr)?>;
 

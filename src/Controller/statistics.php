@@ -125,15 +125,13 @@ class StatisticsController extends TemplateController
 		}
 
 		$accArr = $accMod->getData();
-
 		$currArr = $currMod->getData();
 		$accObj = $accMod->getItem($acc_id);
+
 		if ($byCurrency)
 			$accCurr = $curr_id;
 		else
 			$accCurr = ($accObj) ? $accObj->curr_id : 0;
-
-		$transArr = $transMod->getData($trans_type, $acc_id, TRUE, 10, 0, NULL, $stDate, $endDate);
 
 		$statArr = $transMod->getHistogramSeries($byCurrency, ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id), $trans_type, $groupType_id);
 

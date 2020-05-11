@@ -1192,37 +1192,50 @@ class TransactionModel extends CachedTable
 		$itemsInGroup = 0;
 		$trans_time = 0;
 
-		$fields = ["tr.date" => "date", "tr.src_amount" => "src_amount", "tr.dest_amount" => "dest_amount"];
-		$tables = ["transactions" => "tr"];
-		$condArr =  ["tr.user_id=".self::$user_id, "tr.type=".$trans_type];
+		if (!$this->checkCache())
+			return NULL;
 
-		if ($byCurrency)
+		foreach($this->cache as $item)
 		{
-			$tables["accounts"] = "a";
-			$condArr[] = "a.curr_id=".$curr_acc_id;
-			if ($trans_type == EXPENSE)			// expense
-				$condArr[] = "tr.src_id=a.id";
-			else if ($trans_type == INCOME)		// income
-				$condArr[] = "tr.dest_id=a.id";
-		}
-		else
-		{
-			if ($trans_type == EXPENSE)			// expense
-				$condArr[] = "tr.src_id=".$curr_acc_id;
-			else if ($trans_type == INCOME)		// income
-				$condArr[] = "tr.dest_id=".$curr_acc_id;
-		}
+			if ($item->type != $trans_type)
+				continue;
+			if ($byCurrency)
+			{
+				if ($trans_type == EXPENSE)
+				{
+					if ($item->src_curr != $curr_acc_id)
+						continue;
+				}
+				else
+				{
+					if ($item->dest_curr != $curr_acc_id)
+						continue;
+				}
+			}
+			else
+			{
+				if ($trans_type == EXPENSE)
+				{
+					if ($item->src_id != $curr_acc_id)
+						continue;
+				}
+				else
+				{
+					if ($item->dest_id != $curr_acc_id)
+						continue;
+				}
+			}
 
-		$qResult = $this->dbObj->selectQ($fields, $tables, $condArr, NULL, "pos ASC");
-		while($row = $this->dbObj->fetchRow($qResult))
-		{
-			$trans_time = strtotime($row["date"]);
+			$trans_time = $item->date;
 			$dateInfo = getdate($trans_time);
 			$itemsInGroup++;
 
 			if ($group_type == 0)		// no grouping
 			{
-				$amountArr[] = floatval($row[($trans_type == EXPENSE) ? "src_amount" : "dest_amount"]);
+				if ($trans_type == EXPENSE)
+					$amountArr[] = $item->src_amount;
+				else
+					$amountArr[] = $item->dest_amount;
 
 				if ($prevDate == NULL || $prevDate != $dateInfo["mday"])
 				{
@@ -1260,7 +1273,10 @@ class TransactionModel extends CachedTable
 				$groupArr[] = [date("d.m.Y", $trans_time), 1];
 			}
 
-			$curSum += floatval($row[($trans_type == EXPENSE) ? "src_amount" : "dest_amount"]);
+			if ($trans_type == EXPENSE)
+				$curSum += $item->src_amount;
+			else
+				$curSum += $item->dest_amount;
 		}
 
 		// save remain value
