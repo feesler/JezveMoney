@@ -598,7 +598,23 @@ export class Scenario
 
 		for(let account of accList)
 		{
+			if (App.state.accounts.findByName(account.name))
+				continue;
+
 			await api.account.create(account);
+		}
+
+		let personsList = [
+			{ name : 'Maria' },
+			{ name : 'Ivan<' },
+		];
+
+		for(let person of personsList)
+		{
+			if (App.state.persons.findByName(person.name))
+				continue;
+
+			await api.person.create(person);
 		}
 
 		await App.state.fetch();

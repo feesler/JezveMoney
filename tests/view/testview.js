@@ -72,6 +72,21 @@ export class TestView
 	}
 
 
+	isActionAvailable(action)
+	{
+		return (typeof action === 'string' && isFunction(this[action]));
+	}
+
+
+	async runAction(action, data)
+	{
+		if (!this.isActionAvailable(action))
+			throw new Error('Invalid action specified');
+
+		return this[action].call(this, data);
+	}
+
+
 	async closeNotification()
 	{
 		if (!this.msgPopup)

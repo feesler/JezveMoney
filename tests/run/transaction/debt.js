@@ -7,82 +7,33 @@ import { App } from '../../app.js';
 
 export async function submit(params)
 {
-	let view = App.view;
-
 	if ('acc' in params)
-	{
-		if (params.acc === null)
-		{
-			if (!view.model.noAccount)
-			{
-				await test('Disable account', () => view.toggleAccount());
-			}
-		}
-		else
-		{
-			if (view.model.noAccount)
-			{
-				await test('Enable account', () => view.toggleAccount());
-			}
-
-			let acc = App.state.accounts.getItemByIndex(params.acc);
-			if (!acc)
-				throw new Error(`Account (${params.destAcc}) not found`);
-
-			await test(`Change account to (${acc.name})`, () => view.changeAccountByPos(params.acc));
-		}
-	}
+		await TransactionTests.runAction({ action : 'changeAccountByPos', data : params.acc });
 
 	if ('person' in params)
-	{
-		let person = App.state.persons.getItemByIndex(params.person);
-		if (!person)
-			throw new Error(`Person (${params.person}) not found`);
-
-		await test(`Change person to (${person.name})`, () => view.changePersonByPos(params.person));
-	}
+		await TransactionTests.runAction({ action : 'changePersonByPos', data : params.person });
 
 	if ('debtType' in params)
-	{
-		if (!!params.debtType != view.model.debtType)
-		{
-			let debtTypeStr = params.debtType ? 'give' : 'take';
-			await test(`Change debt type (${debtTypeStr})`, () => view.toggleDebtType());
-		}
-	}
+		await TransactionTests.runAction({ action : 'toggleDebtType', data : params.debtType });
 
 	if (!('srcAmount' in params))
 		throw new Error('Source amount value not specified');
 
-	await test(`Source amount (${params.srcAmount}) input`, () => view.inputSrcAmount(params.srcAmount));
+	await TransactionTests.runAction({ action : 'inputSrcAmount', data : params.srcAmount });
 
 	if ('date' in params)
-		await test(`Date (${params.date}) input`, () => view.changeDate(params.date));
+		await TransactionTests.runAction({ action : 'changeDate', data : params.date });
 
 	if ('comment' in params)
-		await test(`Comment (${params.comment}) input`, () => view.inputComment(params.comment));
+		await TransactionTests.runAction({ action : 'inputComment', data : params.comment });
 
-	let res = view.getExpectedTransaction();
-
-	let debt = {
-		person_id : view.model.person.id,
-		type : view.model.debtType
-	};
-
-	await view.submit();
-
-	return res;
+	return TransactionTests.submit();
 }
 
 
 export async function create(params)
 {
-	await TransactionTests.create(DEBT, params, async (params) =>
-	{
-		let expectedTransaction = await submit(params);
-
-		return expectedTransaction;
-	});
+	await TransactionTests.create(DEBT, params, submit);
 }
 
 
@@ -98,9 +49,7 @@ export async function update(params)
 
 		await test('Initial state of update debt view', () => App.view.setExpectedState(expState), App.view);
 
-		let expectedTransaction = await submit(params);
-
-		return expectedTransaction;
+		return submit(params);
 	});
 }
 

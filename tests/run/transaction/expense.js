@@ -1,5 +1,4 @@
 import * as TransactionTests from './common.js'
-import { Currency } from '../../model/currency.js';
 import { test } from '../../common.js'
 import { EXPENSE } from '../../model/transaction.js';
 import { ExpenseTransactionView } from '../../view/transaction/expense.js'
@@ -8,53 +7,33 @@ import { App } from '../../app.js';
 
 export async function submit(params)
 {
-	let view = App.view;
-
 	if ('srcAcc' in params)
-	{
-		let acc = App.state.accounts.getItemByIndex(params.srcAcc);
-		if (!acc)
-			throw new Error(`Account (${params.srcAcc}) not found`);
-
-		await test(`Change source account to (${acc.name})`,
-				() => view.changeSrcAccountByPos(params.srcAcc));
-	}
+		await TransactionTests.runAction({ action : 'changeSrcAccountByPos', data : params.srcAcc });
 
 	if ('destCurr' in params)
-	{
-		let curr = Currency.getById(params.destCurr);
-		if (!curr)
-			throw new Error(`Currency (${params.destCurr}) not found`);
-
-		await test(`Change destination currency to ${curr.name}`,
-				() => view.changeDestCurrency(params.destCurr));
-	}
+		await TransactionTests.runAction({ action : 'changeDestCurrency', data : params.destCurr });
 
 	if (!('destAmount' in params))
 		throw new Error('Destination amount value not specified');
 
-	await test(`Destination amount (${params.destAmount}) input`, () => view.inputDestAmount(params.destAmount));
+	await TransactionTests.runAction({ action : 'inputDestAmount', data : params.destAmount });
 
 	if ('destCurr' in params && 'srcAmount' in params)
-		await test(`Source amount (${params.srcAmount}) input`, () => view.inputSrcAmount(params.srcAmount));
+		await TransactionTests.runAction({ action : 'inputSrcAmount', data : params.srcAmount });
 
 	if ('date' in params)
-		await test(`Date (${params.date}) input`, () => view.changeDate(params.date));
+		await TransactionTests.runAction({ action : 'changeDate', data : params.date });
 
 	if ('comment' in params)
-		await test(`Comment (${params.comment}) input`, () => view.inputComment(params.comment));
+		await TransactionTests.runAction({ action : 'inputComment', data : params.comment });
 
-	let res = view.getExpectedTransaction();
-
-	await view.submit();
-
-	return res;
+	return TransactionTests.submit();
 }
 
 
 export async function create(params)
 {
-	await TransactionTests.create(EXPENSE, params, params => submit(params));
+	await TransactionTests.create(EXPENSE, params, submit);
 }
 
 

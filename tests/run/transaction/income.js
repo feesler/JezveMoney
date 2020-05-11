@@ -11,48 +11,32 @@ export async function submit(params)
 	let view = App.view;
 
 	if ('destAcc' in params)
-	{
-		let acc = App.state.accounts.getItemByIndex(params.destAcc);
-		if (!acc)
-			throw new Error(`Account (${params.destAcc}) not found`);
-
-		await test(`Change destination account to (${acc.name})`, () => view.changeDestAccountByPos(params.destAcc));
-	}
+		await TransactionTests.runAction({ action : 'changeDestAccountByPos', data : params.destAcc });
 
 	if ('srcCurr' in params)
-	{
-		let curr = Currency.getById(params.srcCurr);
-		if (!curr)
-			throw new Error(`Currency (${params.srcCurr}) not found`);
-
-		await test(`Change source currency to ${curr.name}`, () => view.changeSourceCurrency(params.srcCurr));
-	}
+		await TransactionTests.runAction({ action : 'changeSourceCurrency', data : params.srcCurr });
 
 	if (!('srcAmount' in params))
 		throw new Error('Source amount value not specified');
 
-	await test(`Source amount (${params.srcAmount}) input`, () => view.inputSrcAmount(params.srcAmount));
+	await TransactionTests.runAction({ action : 'inputSrcAmount', data : params.srcAmount });
 
 	if ('srcCurr' in params && 'destAmount' in params)
-		await test(`Destination amount (${params.destAmount}) input`, () => view.inputDestAmount(params.destAmount));
+		await TransactionTests.runAction({ action : 'inputDestAmount', data : params.destAmount });
 
 	if ('date' in params)
-		await test(`Date (${params.date}) input`, () => view.changeDate(params.date));
+		await TransactionTests.runAction({ action : 'changeDate', data : params.date });
 
 	if ('comment' in params)
-		await test(`Comment (${params.comment}) input`, () => view.inputComment(params.comment));
+		await TransactionTests.runAction({ action : 'inputComment', data : params.comment });
 
-	let res = view.getExpectedTransaction();
-
-	await view.submit();
-
-	return res;
+	return TransactionTests.submit();
 }
 
 
 export async function create(params)
 {
-	await TransactionTests.create(INCOME, params, params => submit(params));
+	await TransactionTests.create(INCOME, params, submit);
 }
 
 

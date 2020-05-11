@@ -1,5 +1,7 @@
 import { TransactionsView } from '../../view/transactions.js';
+import { TransactionView } from '../../view/transaction.js';
 import { MainView } from '../../view/main.js';
+import { Currency } from '../../model/currency.js';
 import { Transaction } from '../../model/transaction.js';
 import { AccountsList } from '../../model/accountslist.js';
 import { App } from '../../app.js';
@@ -9,6 +11,133 @@ import {
 	copyObject,
 	formatProps,
 } from '../../common.js';
+
+
+export async function runAction({ action, data })
+{
+	let testDescr = null;
+
+	if (!(App.view instanceof TransactionView ))
+		throw new Error('Invalid view');
+
+	if (!App.view.isActionAvailable(action))
+		throw new Error('Invalid action specified');
+
+	if (action == 'changeSrcAccountByPos' || action == 'changeDestAccountByPos')
+	{
+		let acc = App.state.accounts.getItemByIndex(data);
+		if (!acc)
+			throw new Error(`Account (${data}) not found`);
+
+		if (action == 'changeSrcAccountByPos')
+			testDescr = `Change source account to (${acc.name})`;
+		else
+			testDescr = `Change destination account to (${acc.name})`;
+	}
+
+	if (action == 'changePersonByPos')
+	{
+		let person = App.state.persons.getItemByIndex(data);
+		if (!person)
+			throw new Error(`Person (${data}) not found`);
+
+		testDescr = `Change person to (${person.name})`;
+	}
+
+	if (action == 'changeAccountByPos')
+	{
+		if (data === null)
+		{
+			if (!App.view.model.noAccount)
+			{
+				await test('Disable account', () => App.view.toggleAccount());
+				return;
+			}
+		}
+		else
+		{
+			if (App.view.model.noAccount)
+			{
+				await test('Enable account', () => App.view.toggleAccount());
+			}
+
+			let acc = App.state.accounts.getItemByIndex(data);
+			if (!acc)
+				throw new Error(`Account (${data}) not found`);
+
+			testDescr = `Change account to (${acc.name})`;
+		}
+	}
+
+	if (action == 'toggleDebtType')
+	{
+		if (!!data == App.view.model.debtType)
+			return;
+
+		let debtTypeStr = data ? 'give' : 'take';
+		testDescr = `Change debt type (${debtTypeStr})`;
+	}
+
+	if (action == 'changeSourceCurrency' || action == 'changeDestCurrency')
+	{
+		let curr = Currency.getById(data);
+		if (!curr)
+			throw new Error(`Currency (${data}) not found`);
+
+		if (action == 'changeSourceCurrency')
+			testDescr = `Change source currency to ${curr.name}`;
+		else
+			testDescr = `Change destination currency to ${curr.name}`;
+	}
+
+	if (action == 'inputSrcAmount')
+		testDescr = `Source amount (${data}) input`;
+
+	if (action == 'inputDestAmount')
+		testDescr = `Destination amount (${data}) input`;
+
+	if (action == 'inputResBalance')
+		testDescr = `Source result balance (${data}) input`;
+
+	if (action == 'inputDestResBalance')
+		testDescr = `Destination result balance (${data}) input`;
+
+	if (action == 'inputExchRate')
+		testDescr = `Input exchange rate (${data})`;
+
+	if (action == 'clickSrcAmount')
+		testDescr = 'Click on source amount';
+
+	if (action == 'clickDestAmount')
+		testDescr = 'Click on destination amount';
+
+	if (action == 'clickSrcResultBalance')
+		testDescr = 'Click on source result balance';
+
+	if (action == 'clickDestResultBalance')
+		testDescr = 'Click on destination result balance';
+
+	if (action == 'clickExchRate')
+		testDescr = 'Click on exchange rate';
+
+	if (action == 'changeDate')
+		testDescr = `Date (${data}) input`;
+
+	if (action == 'inputComment')
+		testDescr = `Comment (${data}) input`;
+
+	await test(testDescr, () => App.view.runAction(action, data));
+}
+
+
+export async function submit()
+{
+	let res = App.view.getExpectedTransaction();
+
+	await App.view.submit();
+
+	return res;
+}
 
 
 export async function create(type, params, submitHandler)
