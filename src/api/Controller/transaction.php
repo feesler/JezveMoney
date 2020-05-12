@@ -46,6 +46,11 @@ class TransactionApiController extends ApiController
 		if (is_null($params["type"]))
 			$this->fail();
 
+		if (isset($_GET["order"]) && is_string($_GET["order"]) && strtolower($_GET["order"]) == "desc")
+		{
+			$params["desc"] = TRUE;
+		}
+
 		$params["onPage"] = (isset($_GET["count"]) && is_numeric($_GET["count"])) ? intval($_GET["count"]) : 10;
 
 		$params["page"] = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;

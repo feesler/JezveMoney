@@ -121,7 +121,7 @@ export class TransactionsList extends List
 
 		this.sort();
 
-		return this.data.findIndex(item => item == transObj);
+		return this.getIndexOf(transObj.id);
 	}
 
 
@@ -329,6 +329,14 @@ export class TransactionsList extends List
 		let res = list;
 		let params = par || {};
 
+		if ('order' in params && typeof params.order === 'string')
+		{
+			let lorder = params.order.toLowerCase();
+			if (lorder == 'asc')
+				res = this.sortItems(res, false);
+			else if (lorder == 'desc')
+				res = this.sortItems(res, true);
+		}
 		if ('type' in params)
 			res = this.getItemsByType(res, params.type);
 		if ('accounts' in params)
@@ -352,17 +360,35 @@ export class TransactionsList extends List
 	}
 
 
+	sortItems(list, desc = false)
+	{
+		if (!Array.isArray(list))
+			throw new Error('Invalid list specified');
+
+		let res = copyObject(list);
+
+		if (desc)
+			return res.sort((a, b) => b.pos - a.pos);
+		else
+			return res.sort((a, b) => a.pos - b.pos);
+	}
+
+
 	sort()
 	{
-		this.data.sort((a, b) => b.pos - a.pos);
+		this.data = this.sortItems(this.data, true);
 	}
 
 
 	sortAsc()
 	{
-		let res = copyObject(this.data);
+		return this.sortItems(this.data);
+	}
 
-		return res.sort((a, b) => a.pos - b.pos);
+
+	sortDesc()
+	{
+		return this.sortItems(this.data, true);
 	}
 
 

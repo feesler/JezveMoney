@@ -428,8 +428,11 @@ export class Scenario
 		const { ACC_RUB } = this;
 
 		const data = [
+			{ order : 'desc' },
+			{ order : 'asc' },
 			{ type : DEBT },
 			{ accounts : ACC_RUB },
+			{ accounts : ACC_RUB, order : 'desc' },
 			{ type : DEBT, accounts : ACC_RUB },
 			{ onPage : 10 },
 			{ onPage : 10, page : 2 },

@@ -94,3 +94,10 @@ textarea
 {
 	margin-right: 8px;
 }
+
+
+.check_wr.check_wr_inline
+{
+	display: inline-block;
+	margin-right: 10px;
+}

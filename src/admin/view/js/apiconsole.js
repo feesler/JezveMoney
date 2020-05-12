@@ -277,10 +277,18 @@ function onFormSubmit(e, verifyCallback)
 	if (!formEl || !formEl.elements)
 		return false;
 
-	for(i = 0; i < formEl.elements.length; i++)
+	var inputEl;
+	for(var i = 0; i < formEl.elements.length; i++)
 	{
-		if (!formEl.elements[i].disabled && formEl.elements[i].name != '')
-			els[formEl.elements[i].name] = formEl.elements[i].value;
+		inputEl = formEl.elements[i];
+
+		if (inputEl.disabled || inputEl.name == '')
+			continue;
+
+		if ((inputEl.type == 'checkbox' || inputEl.type == 'radio') && !inputEl.checked)
+			continue;
+
+		els[inputEl.name] = inputEl.value;
 	}
 
 	var request = {
@@ -299,16 +307,23 @@ function onFormSubmit(e, verifyCallback)
 
 function onCheck(obj, elName)
 {
-	var frm, el;
-
 	if (!obj || !obj.form || !elName)
 		return;
 
-	frm = obj.form;
+	var disableElements = !obj.checked;
+	var frm = obj.form;
 	if (frm.elements[elName])
 	{
-		el = frm.elements[elName];
-		el.disabled = !obj.checked;
+		var el = frm.elements[elName];
+		if (el instanceof NodeList)
+		{
+			for(var i = 0; i < el.length; i++)
+			{
+				el[i].disabled = disableElements;
+			}
+		}
+		else
+			el.disabled = disableElements;
 	}
 }
 

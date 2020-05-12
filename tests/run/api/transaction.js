@@ -167,6 +167,8 @@ export async function filter(params)
 		// Prepare request parameters
 		let reqParams = {};
 
+		if ('order' in params)
+			reqParams.order = params.order;
 		if ('type' in params)
 			reqParams.type = Transaction.typeToStr(params.type);
 		if ('accounts' in params)

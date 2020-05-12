@@ -193,6 +193,15 @@
 						<h3>List</h3>
 						<form action="<?=BASEURL?>api/transaction/list" method="list">
 							<div class="std_margin">
+								<input type="checkbox" onchange="onCheck(this, 'order');"><label>Order</label>
+								<div id="admin_block" class="check_wr check_wr_inline">
+									<label for="isasc"><input id="isasc" name="order" type="radio" value="asc" checked disabled>Ascending</label>
+								</div>
+								<div id="admin_block" class="check_wr check_wr_inline">
+									<label for="isdesc"><input id="isdesc" name="order" type="radio" value="desc" disabled>Descending</label>
+								</div>
+							</div>
+							<div class="std_margin">
 								<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
 								<input name="count" type="text" value="10" disabled>
 							</div>

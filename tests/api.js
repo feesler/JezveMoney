@@ -1,13 +1,7 @@
-import {
-	copyObject,
-	urlJoin,
-	formatDate,
-	setParam
-} from './common.js';
+import { urlJoin, formatDate, setParam } from './common.js';
 import { DEBT } from './model/transaction.js'
 import { ApiRequestError } from './apirequesterror.js'
 import { App } from './app.js';
-
 
 
 const defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
@@ -103,7 +97,7 @@ const trReqFields = ['type', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr
 const setPosReqFields = ['id', 'pos'];
 const clTrReqFields = ['src_id', 'dest_id'];
 const debtReqFields = ['op', 'person_id', 'acc_id'];
-const filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search'];
+const filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search', 'order'];
 
 
 function prepareTransactionData(options)
