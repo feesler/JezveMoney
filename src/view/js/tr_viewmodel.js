@@ -913,8 +913,10 @@ function TransactionViewModel()
 
 
 	// Field input event handler
-	function onFInput(obj)
+	function onFInput(e)
 	{
+		var obj = e.target;
+
 		if (obj.id == 'src_amount')
 			Transaction.update('src_amount', obj.value);
 		else if (obj.id == 'dest_amount')
@@ -1293,6 +1295,70 @@ function TransactionViewModel()
 	}
 
 
+	function replaceSelection(elem, text)
+	{
+		if (!elem)
+			return null;
+
+		var range = getCursorPos(elem);
+
+		var beforeSelection = elem.value.substr(0, range.start);
+		var afterSelection = elem.value.substr(range.end);
+
+		return beforeSelection + text + afterSelection;
+	}
+
+
+	function getInputContent(e)
+	{
+		if (e.type == 'paste')
+		{
+			return (e.clipboardData || window.clipboardData).getData('text');
+		}
+		else if (e.type == 'beforeinput')
+		{
+			return e.data;
+		}
+		else if (e.type == 'keypress')
+		{
+			return e.key;
+		}
+	}
+
+
+	function validateDecimalFieldInput(e)
+	{
+		var inputContent = getInputContent(e);
+		if (!inputContent || getInputContent.length == 0)
+			return true;
+
+		var expectedContent = replaceSelection(this, inputContent);
+		var res = isNum(fixFloat(expectedContent));
+		if (!res)
+		{
+			e.preventDefault();
+			e.stopPropagation();
+		}
+
+		return res;
+	}
+
+
+	function DecimalField(elem)
+	{
+		if (!elem)
+			return;
+
+		var beforeInputHandler = validateDecimalFieldInput.bind(elem);
+
+		elem.addEventListener('keypress', beforeInputHandler);
+		elem.addEventListener('paste', beforeInputHandler);
+		elem.addEventListener('beforeinput', beforeInputHandler);
+
+		elem.addEventListener('input', onFInput);
+	}
+
+
 	// Public methods
 
 	// Initialization of page controls
@@ -1330,19 +1396,11 @@ function TransactionViewModel()
 		setParam(ge('resbal_b'), { onclick : onResBalanceSelect });
 		setParam(ge('resbal_d_b'), { onclick : onResBalanceDestSelect });
 
-		var finpFunc = function(e){ return onFInput(this); };
-		var fkeyFunc = function(e){ return onFieldKey(e, this); };
-
-		elem = ge('src_amount');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('dest_amount');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('exchrate');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('resbal');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
-		elem = ge('resbal_d');
-		setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+		DecimalField(ge('src_amount'));
+		DecimalField(ge('dest_amount'));
+		DecimalField(ge('exchrate'));
+		DecimalField(ge('resbal'));
+		DecimalField(ge('resbal_d'));
 
 		elem = ge('calendar_btn');
 		if (elem)
