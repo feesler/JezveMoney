@@ -183,7 +183,7 @@ function onFormSubmit()
 		if ((inputEl.type == 'checkbox' || inputEl.type == 'radio') && !inputEl.checked)
 			continue;
 
-		els[formEl.elements[i].name] = formEl.elements[i].value;
+		els[inputEl.name] = inputEl.value;
 	}
 
 	if (formEl.method == 'get')

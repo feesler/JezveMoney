@@ -43,8 +43,8 @@ function copyObject(item)
 	}
 	else if (isObject(item))
 	{
-		let res = {};
-		for(let key in item)
+		var res = {};
+		for(var key in item)
 		{
 			res[key] = copyObject(item[key]);
 		}

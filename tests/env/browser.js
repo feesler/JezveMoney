@@ -1,4 +1,4 @@
-import { setParam, urlJoin, isFunction } from '../common.js';
+import { setParam, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment } from './base.js';
 

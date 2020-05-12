@@ -143,7 +143,7 @@ function normalizeExch(val)
 // Check value is valid
 function isValidValue(val)
 {
-	return (val != undefined && val != null && !isNaN(parseFloat(fixFloat(val))));
+	return (typeof val !== 'undefined' && val != null && !isNaN(parseFloat(fixFloat(val))));
 }
 
 

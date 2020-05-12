@@ -2,7 +2,7 @@ import process from 'process';
 import http from 'http';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
-import { setParam, urlJoin, isFunction } from '../common.js';
+import { setParam, isFunction } from '../common.js';
 import { Environment } from './base.js'
 
 

@@ -539,7 +539,7 @@ var Calendar = new (function()
 			if (typeof date !== 'string')
 				return null;
 
-			let parts = date.split('.');
+			var parts = date.split('.');
 			if (!isArray(parts) || parts.length != 3)
 				return null;
 
