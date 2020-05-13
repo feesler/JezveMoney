@@ -441,7 +441,7 @@ class TransactionsController extends TemplateController
 		array_push($this->css->libs, "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "decimalinput.js", "tr_model.js", "tr_viewmodel.js");
 
 		include(TPL_PATH."transaction.tpl");
 	}
@@ -686,7 +686,7 @@ class TransactionsController extends TemplateController
 		array_push($this->css->libs, "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "tr_model.js", "tr_viewmodel.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "decimalinput.js", "tr_model.js", "tr_viewmodel.js");
 
 		include(TPL_PATH."transaction.tpl");
 	}

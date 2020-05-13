@@ -2,6 +2,12 @@ function TransactionViewModel()
 {
 	var self = this;
 
+	this.srcAmountInput = null;
+	this.destAmountInput = null;
+	this.srcResBalanceInput = null;
+	this.destResBalanceInput = null;
+	this.exchangeInput = null;
+
 	var calendarObj = null;
 	var isMobile;
 	var accDDList = null;
@@ -1295,70 +1301,6 @@ function TransactionViewModel()
 	}
 
 
-	function replaceSelection(elem, text)
-	{
-		if (!elem)
-			return null;
-
-		var range = getCursorPos(elem);
-
-		var beforeSelection = elem.value.substr(0, range.start);
-		var afterSelection = elem.value.substr(range.end);
-
-		return beforeSelection + text + afterSelection;
-	}
-
-
-	function getInputContent(e)
-	{
-		if (e.type == 'paste')
-		{
-			return (e.clipboardData || window.clipboardData).getData('text');
-		}
-		else if (e.type == 'beforeinput')
-		{
-			return e.data;
-		}
-		else if (e.type == 'keypress')
-		{
-			return e.key;
-		}
-	}
-
-
-	function validateDecimalFieldInput(e)
-	{
-		var inputContent = getInputContent(e);
-		if (!inputContent || getInputContent.length == 0)
-			return true;
-
-		var expectedContent = replaceSelection(this, inputContent);
-		var res = isNum(fixFloat(expectedContent));
-		if (!res)
-		{
-			e.preventDefault();
-			e.stopPropagation();
-		}
-
-		return res;
-	}
-
-
-	function DecimalField(elem)
-	{
-		if (!elem)
-			return;
-
-		var beforeInputHandler = validateDecimalFieldInput.bind(elem);
-
-		elem.addEventListener('keypress', beforeInputHandler);
-		elem.addEventListener('paste', beforeInputHandler);
-		elem.addEventListener('beforeinput', beforeInputHandler);
-
-		elem.addEventListener('input', onFInput);
-	}
-
-
 	// Public methods
 
 	// Initialization of page controls
@@ -1396,11 +1338,11 @@ function TransactionViewModel()
 		setParam(ge('resbal_b'), { onclick : onResBalanceSelect });
 		setParam(ge('resbal_d_b'), { onclick : onResBalanceDestSelect });
 
-		DecimalField(ge('src_amount'));
-		DecimalField(ge('dest_amount'));
-		DecimalField(ge('exchrate'));
-		DecimalField(ge('resbal'));
-		DecimalField(ge('resbal_d'));
+		this.srcAmountInput = DecimalInput.create({ elem : ge('src_amount'), oninput : onFInput });
+		this.destAmountInput = DecimalInput.create({ elem : ge('dest_amount'), oninput : onFInput });
+		this.srcResBalanceInput = DecimalInput.create({ elem : ge('exchrate'), oninput : onFInput });
+		this.destResBalanceInput = DecimalInput.create({ elem : ge('resbal'), oninput : onFInput });
+		this.exchangeInput = DecimalInput.create({ elem : ge('resbal_d'), oninput : onFInput });
 
 		elem = ge('calendar_btn');
 		if (elem)

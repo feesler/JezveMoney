@@ -53,11 +53,7 @@ function initControls()
 	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
 		currDDList = null;
 
-	var finpFunc = function(e){ return onAccInitBalanceInput(this); };
-	var fkeyFunc = function(e){ return onFieldKey(e, this); };
-
-	var elem = ge('balance');
-	setParam(elem, { oninput : finpFunc.bind(elem), onkeypress : fkeyFunc.bind(elem) });
+	DecimalInput.create({ elem : ge('balance'), oninput : onAccInitBalanceInput });
 
 	// Update mode
 	if (typeof account_id !== 'undefined')
@@ -232,8 +228,9 @@ function onAccNameInput(obj)
 
 
 // Account initial balance input event handler
-function onAccInitBalanceInput(obj)
+function onAccInitBalanceInput(e)
 {
+	var obj = e.target;
 	if (!obj)
 		return;
 

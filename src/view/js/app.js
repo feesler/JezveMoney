@@ -69,45 +69,6 @@ function fixFloat(str)
 }
 
 
-// Check specified key code is float dot ('.' or ',')
-function isDot(code)
-{
-	return (code == 44 || code == 46);
-}
-
-
-// Check specified string have float dot ('.' or ',')
-function haveDot(str)
-{
-	return (typeof(str) == "string" && (str.indexOf('.') != -1 || str.indexOf(',') != -1));
-}
-
-
-function onFieldKey(event, obj)
-{
-	var code, isDig, isDel;
-
-	if (!obj)
-		return false;
-
-	code = getCode(event);
-	isDig = isDigit(code);
-	isDel = (isDig && event.which == 0);
-
-	if (!isDig)
-		return false;
-
-	if (!isDel)
-	{
-	// exclude ',' or '.' in one string
-		if (obj.value != '' && isDot(code) && haveDot(obj.value))
-			return false;
-	}
-
-	return true;
-}
-
-
 // Correct calculated value
 function correct(val, prec)
 {

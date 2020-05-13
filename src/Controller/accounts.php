@@ -70,7 +70,7 @@ class AccountsController extends TemplateController
 
 		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "decimalinput.js", "accounts.js");
 
 		include(TPL_PATH."account.tpl");
 	}
@@ -117,7 +117,7 @@ class AccountsController extends TemplateController
 
 		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "decimalinput.js", "accounts.js");
 
 		include(TPL_PATH."account.tpl");
 	}
