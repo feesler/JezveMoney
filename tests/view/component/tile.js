@@ -12,7 +12,7 @@ export class Tile extends Component
 		if (!this.elem || !await env.hasClass(this.elem, 'tile'))
 			throw new Error('Wrong tile structure');
 
-		this.linkElem = await env.query(this.elem, ':scope > *');
+		this.linkElem = await env.query(this.elem, '.tilelink');
 		this.balanceEL = await env.query(this.elem, '.acc_bal');
 		this.nameEL = await env.query(this.elem, '.acc_name');
 

@@ -17,6 +17,7 @@ export class InfoTile extends Component
 		this.id = this.parseId(await env.prop(this.elem, 'id'));
 		this.title = await env.prop(this.titleEl, 'innerText');
 		this.subtitle = await env.prop(this.subtitleEl, 'innerText');
+		this.subtitle = this.subtitle.split('\r\n').join('\n');
 	}
 
 

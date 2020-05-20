@@ -1,3 +1,7 @@
+import '@babel/polyfill';
+import 'core-js/features/url';
+import 'core-js/features/url-search-params';
+import 'whatwg-fetch';
 import { setParam, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment } from './base.js';
@@ -15,13 +19,13 @@ class BrowserEnvironment extends Environment
 		this.totalRes = null;
 		this.okRes = null
 		this.failRes = null;
-		this.baseURL = null;
+		this.base = null;
 	}
 
 
 	baseUrl()
 	{
-		return baseURL;
+		return this.base;
 	}
 
 
@@ -47,7 +51,7 @@ class BrowserEnvironment extends Environment
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.vdoc;
+		let parent = parentSpecified ? arguments[0] : this.vdoc.documentElement;
 
 		return (typeof query === 'string') ? parent.querySelector(query) : query;
 	}
@@ -60,7 +64,7 @@ class BrowserEnvironment extends Environment
 
 		let parentSpecified = (arguments.length > 1);
 		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.vdoc;
+		let parent = parentSpecified ? arguments[0] : this.vdoc.documentElement;
 
 		return (typeof query === 'string') ? Array.from(parent.querySelectorAll(query)) : query;
 	}
@@ -208,24 +212,46 @@ class BrowserEnvironment extends Environment
 	async input(elemObj, val)
 	{
 		elemObj.value = val;
-		if (elemObj.oninput)
-			elemObj.oninput();
+
+		let event;
+		if (typeof InputEvent !== 'function')
+		{
+			event = this.vdoc.createEvent('CustomEvent');
+			event.initCustomEvent('input', true, true, {});
+		}
+		else
+		{
+			event = new InputEvent('input', {
+				bubbles: true,
+				cancelable: true,
+			});
+		}
+		elemObj.dispatchEvent(event);
 	}
 
 
 	async click(elemObj)
 	{
-		if (elemObj.click)
+		if (!elemObj)
+			return;
+
+		let event;
+		if (typeof MouseEvent !== 'function')
 		{
-			elemObj.click();
+			event = this.vdoc.createEvent('MouseEvent');
+			event.initMouseEvent('click', 
+				true, true, this.viewframe.contentWindow,
+				0, 0, 0, 0, 0, false, false, false, false, 0, null);
 		}
-		else if (document.createEvent)
+		else
 		{
-			let evt = document.createEvent('MouseEvents');
-			evt.initMouseEvent('click', true, true, this.viewframe.contentWindow,
-			0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			let allowDefault = elemObj.dispatchEvent(evt);
+			event = new MouseEvent('click', {
+				view: this.viewframe.contentWindow,
+				bubbles: true,
+				cancelable: true
+			});
 		}
+		elemObj.dispatchEvent(event);
 	}
 
 
@@ -256,9 +282,6 @@ class BrowserEnvironment extends Environment
 				options.headers['Content-Type'] = 'application/json';
 			}
 
-			let encoder = new TextEncoder();
-			let uint8Array = encoder.encode(postData);
-			options.headers['Content-Length'] = uint8Array.length;
 			options.body = postData;
 		}
 
@@ -322,6 +345,104 @@ class BrowserEnvironment extends Environment
 	}
 
 
+	scopedQuerySelectorPolyfill(view)
+	{
+		try
+		{
+			// test for scope support
+			view.document.querySelector(':scope *');
+		}
+		catch(error)
+		{
+			(function(ElementPrototype)
+			{
+				// scope regex
+				var scope = /:scope(?![\w-])/gi;
+
+				// polyfill Element#querySelector
+				var querySelectorWithScope = polyfill(ElementPrototype.querySelector);
+
+				ElementPrototype.querySelector = function querySelector(selectors)
+				{
+					return querySelectorWithScope.apply(this, arguments);
+				};
+
+				// polyfill Element#querySelectorAll
+				var querySelectorAllWithScope = polyfill(ElementPrototype.querySelectorAll);
+
+				ElementPrototype.querySelectorAll = function querySelectorAll(selectors)
+				{
+					return querySelectorAllWithScope.apply(this, arguments);
+				};
+
+				// polyfill Element#matches
+				if (ElementPrototype.matches)
+				{
+					var matchesWithScope = polyfill(ElementPrototype.matches);
+
+					ElementPrototype.matches = function matches(selectors)
+					{
+						return matchesWithScope.apply(this, arguments);
+					};
+				}
+
+				// polyfill Element#closest
+				if (ElementPrototype.closest)
+				{
+					var closestWithScope = polyfill(ElementPrototype.closest);
+
+					ElementPrototype.closest = function closest(selectors)
+					{
+						return closestWithScope.apply(this, arguments);
+					};
+				}
+
+				function polyfill(qsa)
+				{
+					return function(selectors)
+					{
+						// whether the selectors contain :scope
+						var hasScope = selectors && scope.test(selectors);
+
+						if (hasScope)
+						{
+							// fallback attribute
+							var attr = 'q' + Math.floor(Math.random() * 9000000) + 1000000;
+
+							// replace :scope with the fallback attribute
+							arguments[0] = selectors.replace(scope, '[' + attr + ']');
+
+							// add the fallback attribute
+							this.setAttribute(attr, '');
+
+							// results of the qsa
+							var elementOrNodeList = qsa.apply(this, arguments);
+
+							// remove the fallback attribute
+							this.removeAttribute(attr);
+
+							// return the results of the qsa
+							return elementOrNodeList;
+						}
+						else
+						{
+							// return the results of the qsa
+							return qsa.apply(this, arguments);
+						}
+					};
+				}
+			})(view.Element.prototype);
+		}
+	}
+
+
+	// Apply polyfills not required by application, but needed for test engine
+	applyPolyfills(view)
+	{
+		this.scopedQuerySelectorPolyfill(view);
+	}
+
+
 	async navigation(action)
 	{
 		if (!isFunction(action))
@@ -336,6 +457,8 @@ class BrowserEnvironment extends Environment
 					this.vdoc = this.viewframe.contentWindow.document;
 					if (!this.vdoc)
 						throw new Error('View document not found');
+
+					this.applyPolyfills(this.viewframe.contentWindow);
 
 					await this.onNavigate();
 
@@ -381,7 +504,7 @@ class BrowserEnvironment extends Environment
 		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.viewframe || !this.restbl)
 			throw new Error('Fail to init tests');
 
-		this.baseURL = this.app.config.url;
+		this.base = this.app.config.url;
 
 		startbtn.onclick = async () =>
 		{
@@ -394,7 +517,7 @@ class BrowserEnvironment extends Environment
 
 				await this.addResult('Test initialization', true);
 
-				await this.goTo(this.baseURL);
+				await this.goTo(this.base);
 				await this.app.startTests();
 			}
 			catch(e)

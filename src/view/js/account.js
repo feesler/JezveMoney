@@ -43,7 +43,8 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 	tileObj.className = 'tile';
 	if (iconType <= tileIcons.length && tileIcons[iconType])
 	{
-		tileObj.classList.add('tile_icon', tileIcons[iconType]);
+		tileObj.classList.add('tile_icon');
+		tileObj.classList.add(tileIcons[iconType]);
 	}
 }
 

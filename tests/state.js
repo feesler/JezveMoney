@@ -284,16 +284,16 @@ export class AppState
 		if (!Array.isArray(ids))
 			ids = [ ids ];
 
+		let accountsToDelete = [];
 		for(let person_id of ids)
 		{
-			if (!this.persons.getItem(person_id))
+			let person = this.persons.getItem(person_id);
+			if (!person)
 				return false;
-		}
 
-		// Prepare expected updates of accounts list
-		let accountsToDelete = this.persons.data.filter(item => Array.isArray(item.accounts) && ids.includes(item.id))
-												.flatMap(item => item.accounts)
-												.map(item => item.id);
+			if (Array.isArray(person.accounts))
+				accountsToDelete.push(...person.accounts.map(item => item.id));
+		}
 
 		this.persons.deleteItems(ids);
 

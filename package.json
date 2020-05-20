@@ -10,7 +10,7 @@
     "build": "npm-run-all clean build-tests build-tests-bundle",
     "clean": "del-cli --force ./build",
     "build-tests": "npx babel ./tests --out-dir ./build",
-    "build-tests-bundle": "browserify ./build/env/browser.js -o ./src/admin/view/js/tests/index.js -t [ babelify --presets [ \"@babel/preset-env\" ] --plugins [ \"@babel/transform-runtime\" ] ]"
+    "build-tests-bundle": "browserify ./build/env/browser.js -o ./src/admin/view/js/tests/index.js -t [ babelify --presets [ \"@babel/preset-env\" ] --plugins [ \"@babel/transform-runtime\" \"@babel/plugin-proposal-class-properties\" ] ]"
   },
   "keywords": [
     "money",
@@ -20,19 +20,22 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
+    "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-regenerator": "^7.8.7",
-    "@babel/plugin-transform-runtime": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
     "babelify": "^10.0.0",
-    "browserify": "^16.5.0",
+    "browserify": "^16.5.1",
     "chalk": "^2.4.2",
-    "del-cli": "^3.0.0",
+    "del-cli": "^3.0.1",
     "npm-run-all": "^4.1.5",
-    "puppeteer": "^2.1.1"
+    "puppeteer": "^3.1.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.9.2"
+    "@babel/polyfill": "^7.8.7",
+    "@babel/runtime": "^7.9.6",
+    "core-js": "^3.6.5",
+    "whatwg-fetch": "^3.0.0"
   }
 }

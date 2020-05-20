@@ -89,7 +89,10 @@ var Popup = new (function()
 			{
 				var addClassNames = (isArray(params.additional)) ? params.additional : params.additional.split(' ');
 
-				contentObj.classList.add.apply(contentObj.classList, addClassNames);
+				addClassNames.forEach(function(item)
+				{
+					contentObj.classList.add(item);
+				});
 			}
 
 			prependChild(boxObj, messageObj);

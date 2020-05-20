@@ -14,7 +14,7 @@ class NodeEnvironment extends Environment
 		super(...args);
 
 		this.page = null;
-		this.baseURL = null;
+		this.base = null;
 		this.reqCookies = {};
 		this.results = { total : 0, ok : 0, fail : 0, expected : 0 };
 	}
@@ -22,7 +22,7 @@ class NodeEnvironment extends Environment
 
 	baseUrl()
 	{
-		return this.baseURL;
+		return this.base;
 	}
 
 
@@ -443,7 +443,7 @@ class NodeEnvironment extends Environment
 			if (!this.app.config || !this.app.config.url)
 				throw new Error('Invalid config: test URL not found');
 
-			this.baseURL = this.app.config.url;
+			this.base = this.app.config.url;
 
 			if (this.app.config.testsExpected)
 				this.results.expected = this.app.config.testsExpected;
@@ -456,7 +456,7 @@ class NodeEnvironment extends Environment
 
 			await this.addResult('Test initialization', true);
 
-			await this.goTo(this.baseURL);
+			await this.goTo(this.base);
 			await this.app.startTests();
 			res = 0;
 		}

@@ -60,4 +60,9 @@ export class Environment
 		this.app.view = new viewClass({ environment : this });
 		await this.app.view.parse();
 	}
+
+
+	async init(appInstance)
+	{
+	}
 }

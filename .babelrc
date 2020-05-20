@@ -3,17 +3,12 @@
 		[
 			"@babel/preset-env",
 			{
-				"targets": "> 1%, not dead"
+				"targets": "> 1%, not dead, ie >= 11"
 			}
 		]
 	],
 	"plugins": [
-		[
-			"@babel/transform-runtime",
-			{
-				"regenerator": true
-			}
-		],
+		"@babel/transform-runtime",
 		"@babel/plugin-proposal-class-properties"
 	]
 }
