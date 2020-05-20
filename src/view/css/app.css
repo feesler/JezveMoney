@@ -602,6 +602,12 @@ label
 }
 
 
+.ok_btn:disabled
+{
+	background-color: #5082AA;
+}
+
+
 .cancel_btn,
 .cancel_btn:visited
 {

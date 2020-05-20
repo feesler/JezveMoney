@@ -8,11 +8,11 @@ function TransactionViewModel()
 	this.destResBalanceInput = null;
 	this.exchangeInput = null;
 
-	var calendarObj = null;
-	var isMobile;
-	var accDDList = null;
-	var dwPopup = null;		// delete warning popup
-	var submitStarted = false;
+	this.calendarObj = null;
+	this.isMobile;
+	this.accDDList = null;
+	this.dwPopup = null;		// delete warning popup
+	this.submitStarted = false;
 	var singleTransDeleteTitle = 'Delete transaction';
 	var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 
