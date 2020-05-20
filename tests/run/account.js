@@ -179,7 +179,7 @@ export async function del(accounts)
 	await App.state.fetch();
 
 	let userAccList = App.state.accounts.getUserAccounts();
-	App.state.deleteAccounts(userAccList.positionsToIds(accounts));
+	App.state.deleteAccounts(userAccList.indexesToIds(accounts));
 
 	await App.view.deleteAccounts(accounts);
 
@@ -209,7 +209,7 @@ export async function delFromUpdate(pos)
 	await App.state.fetch();
 
 	let userAccList = App.state.accounts.getUserAccounts();
-	App.state.deleteAccounts(userAccList.positionsToIds(pos));
+	App.state.deleteAccounts(userAccList.indexesToIds(pos));
 
 	await App.view.deleteSelfItem();
 
@@ -245,7 +245,7 @@ export async function exportTest(accounts)
 	// Prepare state
 	await App.state.fetch();
 	let userAccList = App.state.accounts.getUserAccounts();
-	let ids = userAccList.positionsToIds(accounts);
+	let ids = userAccList.indexesToIds(accounts);
 	let trList = App.state.transactions.filterByAccounts(ids);
 	let transactions = trList.sortAsc();
 

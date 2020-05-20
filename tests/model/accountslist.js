@@ -175,6 +175,6 @@ export class AccountsList extends List
 
 		pos = ((pos == userAccounts.data.length - 1) ? 0 : pos + 1);
 
-		return userAccounts.posToId(pos);
+		return userAccounts.indexToId(pos);
 	}
 }

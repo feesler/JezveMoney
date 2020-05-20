@@ -86,7 +86,7 @@ export async function del(persons)
 	}
 
 	// Prepare expected updates of persons list
-	App.state.deletePersons(App.state.persons.positionsToIds(persons));
+	App.state.deletePersons(App.state.persons.indexesToIds(persons));
 
 	await App.view.deletePersons(persons);
 
@@ -112,7 +112,7 @@ export async function delFromUpdate(pos)
 		await App.view.goToPersons();
 	}
 
-	App.state.deletePersons(App.state.persons.positionsToIds(pos));
+	App.state.deletePersons(App.state.persons.indexesToIds(pos));
 
 	await App.view.goToUpdatePerson(pos);
 	await App.view.deleteSelfItem();

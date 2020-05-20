@@ -236,7 +236,7 @@ export async function del(type, transactions)
 	await App.goToMainView();
 
 	let expectedState = App.state.clone();
-	let ids = expectedState.transactions.filterByType(type).positionsToIds(transactions);
+	let ids = expectedState.transactions.filterByType(type).indexesToIds(transactions);
 	expectedState.deleteTransactions(ids);
 
 	// Navigate to transactions view and filter by specified type of transaction
@@ -313,7 +313,7 @@ export async function delFromUpdate(type, pos)
 	App.view.setBlock(`Delete ${Transaction.typeToStr(type)} from update view [${pos}]`, 2);
 
 	let expectedState = App.state.clone();
-	let ids = expectedState.transactions.filterByType(type).positionsToIds(pos);
+	let ids = expectedState.transactions.filterByType(type).indexesToIds(pos);
 	expectedState.deleteTransactions(ids);
 
 	if (!(App.view instanceof TransactionsView))

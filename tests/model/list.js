@@ -87,7 +87,7 @@ export class List
 
 
 	// Return id of item with specified index(absolute position) in list
-	posToId(pos)
+	indexToId(pos)
 	{
 		let ind = parseInt(pos);
 		if (isNaN(ind) || ind < 0 || ind >= this.data.length)
@@ -99,11 +99,11 @@ export class List
 	}
 
 
-	positionsToIds(positions)
+	indexesToIds(positions)
 	{
 		let posList = Array.isArray(positions) ? positions : [ positions ];
 
-		return posList.map(pos => this.posToId(pos));
+		return posList.map(pos => this.indexToId(pos));
 	}
 
 
