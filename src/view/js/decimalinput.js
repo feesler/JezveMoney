@@ -7,16 +7,17 @@ function DecimalInput(props)
 
 	this.elem = props.elem;
 
-	var beforeInputHandler = this.validateInput.bind(this);
+	this.beforeInputHandler = this.validateInput.bind(this);
 
-	this.elem.addEventListener('keypress', beforeInputHandler);
-	this.elem.addEventListener('paste', beforeInputHandler);
-	this.elem.addEventListener('beforeinput', beforeInputHandler);
+	this.elem.addEventListener('keypress', this.beforeInputHandler);
+	this.elem.addEventListener('paste', this.beforeInputHandler);
+	this.elem.addEventListener('beforeinput', this.beforeInputHandler);
 
 	if (isFunction(props.oninput))
 	{
+		this.inputHandler = this.handleInput.bind(this);
 		this.oninput = props.oninput;
-		this.elem.addEventListener('input', this.oninput);
+		this.elem.addEventListener('input', this.inputHandler);
 	}
 }
 
@@ -27,7 +28,25 @@ DecimalInput.create = function(props)
 		return null;
 
 	return new DecimalInput(props);
-}
+};
+
+
+DecimalInput.prototype.destroy = function()
+{
+	if (this.beforeInputHandler)
+	{
+		this.elem.removeEventListener('keypress', this.beforeInputHandler);
+		this.elem.removeEventListener('paste', this.beforeInputHandler);
+		this.elem.removeEventListener('beforeinput', this.beforeInputHandler);
+		this.beforeInputHandler = null;
+	}
+
+	if (this.inputHandler)
+	{
+		this.elem.removeEventListener('input', this.inputHandler);
+		this.inputHandler = null;
+	}
+};
 
 
 DecimalInput.prototype.replaceSelection = function(text)
@@ -39,7 +58,7 @@ DecimalInput.prototype.replaceSelection = function(text)
 	var afterSelection = origValue.substr(range.end);
 
 	return beforeSelection + text + afterSelection;
-}
+};
 
 
 DecimalInput.prototype.getInputContent = function(e)
@@ -56,7 +75,7 @@ DecimalInput.prototype.getInputContent = function(e)
 	{
 		return e.key;
 	}
-}
+};
 
 
 DecimalInput.prototype.validateInput = function(e)
@@ -74,6 +93,11 @@ DecimalInput.prototype.validateInput = function(e)
 	}
 
 	return res;
-}
+};
 
 
+DecimalInput.prototype.handleInput = function(e)
+{
+	if (isFunction(this.oninput))
+		this.oninput(e);
+};
