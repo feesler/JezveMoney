@@ -29,6 +29,7 @@ export class Environment
 			'httpReq',
 			'addResult',
 			'setBlock',
+			'setDuration',
 			'getContent',
 		];
 	}

@@ -2,7 +2,7 @@ import '@babel/polyfill';
 import 'core-js/features/url';
 import 'core-js/features/url-search-params';
 import 'whatwg-fetch';
-import { setParam, isFunction } from '../common.js';
+import { setParam, formatTime, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment } from './base.js';
 
@@ -19,6 +19,7 @@ class BrowserEnvironment extends Environment
 		this.totalRes = null;
 		this.okRes = null
 		this.failRes = null;
+		this.durationRes = null;
 		this.base = null;
 	}
 
@@ -336,6 +337,12 @@ class BrowserEnvironment extends Environment
 	}
 
 
+	setDuration(duration)
+	{
+		this.durationRes.innerText = formatTime(duration);
+	}
+
+
 	async getContent()
 	{
 		if (!this.vdoc || !this.vdoc.documentElement)
@@ -499,9 +506,10 @@ class BrowserEnvironment extends Environment
 		this.totalRes = ge('totalRes');
 		this.okRes = ge('okRes');
 		this.failRes = ge('failRes');
+		this.durationRes = ge('durationRes');
 		this.viewframe = ge('viewframe');
 		this.restbl = ge('restbl');
-		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.viewframe || !this.restbl)
+		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.restbl)
 			throw new Error('Fail to init tests');
 
 		this.base = this.app.config.url;

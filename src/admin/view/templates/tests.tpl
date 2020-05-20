@@ -15,6 +15,7 @@
 									<td class="title">Total</td><td id="totalRes"></td>
 									<td class="title">Ok</td><td id="okRes"></td>
 									<td class="title">Fail</td><td id="failRes"></td>
+									<td id="durationRes" class="duration"></td>
 								</tr>
 							</table>
 						</div>

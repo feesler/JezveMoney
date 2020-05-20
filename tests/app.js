@@ -1,4 +1,4 @@
-import { formatDate, formatTime, setupTest } from './common.js';
+import { formatDate, setupTest } from './common.js';
 import { api } from './api.js';
 import { config } from './config.js';
 import { AppState } from './state.js';
@@ -65,7 +65,7 @@ class Application
 	{
 		let testsDuration = Date.now() - this.startTime;
 
-		console.log('Duration of tests: ' + formatTime(testsDuration));
+		this.environment.setDuration(testsDuration);
 	}
 
 

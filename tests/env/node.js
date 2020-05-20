@@ -2,7 +2,7 @@ import process from 'process';
 import http from 'http';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
-import { setParam, isFunction } from '../common.js';
+import { setParam, formatTime, isFunction } from '../common.js';
 import { Environment } from './base.js'
 
 
@@ -381,6 +381,12 @@ class NodeEnvironment extends Environment
 			title = chalk.cyan(' ' + title + ' ');
 
 		console.log(title);
+	}
+
+
+	setDuration(duration)
+	{
+		console.log('Duration of tests: ' + formatTime(duration));
 	}
 
 
