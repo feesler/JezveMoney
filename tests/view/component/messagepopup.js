@@ -15,6 +15,7 @@ export class MessagePopup extends NullableComponent
 			throw new Error('Wrong structure of message popup');
 
 		this.message = await env.prop(this.messageElem, 'innerText');
+		this.message = this.message.trim();
 		this.closeBtn = await env.query(this.elem, '.close_btn > button');
 
 		if (!this.success)
