@@ -21,6 +21,7 @@ export class Environment
 			'isVisible',
 			'selectByValue',
 			'onChange',
+			'onBlur',
 			'prop',
 			'wait',
 			'global',

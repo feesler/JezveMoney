@@ -186,12 +186,10 @@ class BrowserEnvironment extends Environment
 
 	async selectByValue(selectObj, selValue, selBool)
 	{
-		let i;
-
 		if (!selectObj || !selectObj.options)
 			return -1;
 
-		for(i = 0, l = selectObj.options.length; i < l; i++)
+		for(let i = 0, l = selectObj.options.length; i < l; i++)
 		{
 			if (selectObj.options[i] && selectObj.options[i].value == selValue)
 			{
@@ -207,6 +205,12 @@ class BrowserEnvironment extends Environment
 	async onChange(elem)
 	{
 		return elem.onchange();
+	}
+
+
+	async onBlur(elem)
+	{
+		return elem.onblur();
 	}
 
 

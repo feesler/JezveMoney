@@ -16,6 +16,7 @@ function onIconSel(obj)
 
 	this.setText(obj.str);
 
+	iconType = obj.id;
 	updateAccountTile();
 }
 
@@ -195,15 +196,10 @@ function setSign(obj, curr_id)
 // Update account tile with the current values
 function updateAccountTile()
 {
-	var formatBalance, bal, name, icon, iconType;
-
-	icon = ge('icon');
-	if (!icon)
-		return;
+	var formatBalance, bal, name;
 
 	bal = acc_balance + new_init_balance - acc_init_balance;
 	formatBalance = formatCurrency(bal, acc_currency);
-	iconType = parseInt(selectedValue(icon));
 
 	if (typeof account_id === 'undefined' && !accNameChanged)
 		name = 'New account';

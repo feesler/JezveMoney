@@ -201,6 +201,12 @@ export class NodeEnvironment extends Environment
 	}
 
 
+	async onBlur(elem)
+	{
+		return elem.evaluate(el => el.onblur());
+	}
+
+
 	// Split attribute-value string divided by separator
 	splitSep(str, sep)
 	{
@@ -483,6 +489,3 @@ export class NodeEnvironment extends Environment
 
 
 }
-
-
-export { NodeEnvironment };

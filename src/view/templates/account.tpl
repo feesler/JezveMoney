@@ -88,6 +88,7 @@
 	var acc_balance = <?=$accInfo->balance?>;
 	var acc_init_balance = <?=$accInfo->initbalance?>;
 	var new_init_balance = <?=$accInfo->initbalance?>;
+	var iconType = <?=$accInfo->icon?>;
 
 	onReady(initControls);
 </script>

@@ -121,7 +121,7 @@ function DDList()
 
 		this.createParams = params;
 
-		if (!params.input_id || !params.selCB)
+		if (!params.input_id)
 			return false;
 
 		this.multi = params.multi || false;
@@ -543,7 +543,7 @@ function DDList()
 			if (this.isMobile)
 			{
 				elem = listItem;
-				elem.value = newidval + this.prepareId(elem.value);
+				elem.id = newidval + elem.value;
 			}
 			else
 			{
@@ -566,7 +566,7 @@ function DDList()
 		if (!option || !option.selected)
 			return null;
 
-		resObj.id = this.prepareId(option.value);
+		resObj.id = option.value;
 		resObj.str = option.innerHTML;
 
 		return resObj;
@@ -576,11 +576,9 @@ function DDList()
 	// Mobile onchange event handler
 	this.onChange = function()
 	{
-		var option, resObj;
+		var resObj;
 
 		if (!this.ulobj || !this.ulobj.options || this.ulobj.selectedIndex == -1)
-			return;
-		if (!this.selcb)
 			return;
 
 		this.selection.clear();
@@ -594,7 +592,8 @@ function DDList()
 					this.selection.select(resObj.id, resObj.str);
 				}
 			}
-			this.selcb.call(this, this.selection.selected);
+			if (this.selcb)
+				this.selcb.call(this, this.selection.selected);
 		}
 		else
 		{
@@ -602,7 +601,8 @@ function DDList()
 			if (resObj)
 			{
 				this.selection.select(resObj.id, resObj.str);
-				this.selcb.call(this, resObj);
+				if (this.selcb)
+					this.selcb.call(this, resObj);
 			}
 		}
 
@@ -612,10 +612,11 @@ function DDList()
 
 	this.onSelectBlur = function()
 	{
-		if (!this.isMobile || !this.changecb || !this.changed)
+		if (!this.isMobile || !this.changed)
 			return;
 
-		this.changecb.call(this, this.selection.selected);
+		if (this.changecb)
+			this.changecb.call(this, this.selection.selected);
 		this.changed = false;
 	}
 
@@ -648,7 +649,7 @@ function DDList()
 		var fe
 		var resObj = {};
 
-		if (!this.selcb || !obj)
+		if (!obj)
 			return;
 
 		fe = obj.firstElementChild;
@@ -677,7 +678,8 @@ function DDList()
 
 				this.check(resObj.id, this.selection.isSelected(resObj.id));
 
-				this.selcb.call(this, this.selection.selected);
+				if (this.selcb)
+					this.selcb.call(this, this.selection.selected);
 			}
 			else
 			{
@@ -687,7 +689,8 @@ function DDList()
 				if (this.selobj)
 					selectByValue(this.selobj, resObj.id);
 
-				this.selcb.call(this, resObj);
+				if (this.selcb)
+					this.selcb.call(this, resObj);
 			}
 		}
 
@@ -724,7 +727,7 @@ function DDList()
 	{
 		var resObj = {};
 
-		if (!this.multi || !this.selcb || !obj || !obj.parentNode)
+		if (!this.multi || !obj || !obj.parentNode)
 			return;
 
 		resObj.id = this.prepareId(obj.parentNode.parentNode.id);
@@ -739,7 +742,8 @@ function DDList()
 
 		this.changed = true;
 
-		this.selcb.call(this, this.selection.selected);
+		if (this.selcb)
+			this.selcb.call(this, this.selection.selected);
 	}
 
 
@@ -971,7 +975,9 @@ function DDList()
 
 			if (this.isMobile)
 			{
-				option.value = ((this.itemPrefix) ? this.itemPrefix : '') + val;
+				if (this.itemPrefix)
+					option.id = this.itemPrefix + val;
+				option.value = val;
 			}
 
 			if (option.selected)
@@ -1020,11 +1026,11 @@ function DDList()
 		{
 			this.fixIOS(this.ulobj);
 
-			liobj = ce('option', { value : idval, innerHTML : str });
+			liobj = ce('option', { id : idval, value : item_id, innerHTML : str });
 
 			if (!this.selobj && !this.multi && isEmpty(this.selection.selected) && !this.itemCount)
 			{
-				this.ulobj.appendChild(ce('option', { disabled : true, value : this.itemPrefix + 0, selected : true }));
+				this.ulobj.appendChild(ce('option', { id : this.itemPrefix + 0, disabled : true, value : 0, selected : true }));
 			}
 		}
 		else

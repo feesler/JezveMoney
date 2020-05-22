@@ -33,6 +33,7 @@ export class DropDown extends NullableComponent
 		}
 
 		this.selectElem = await env.query(this.elem, 'select');
+		this.isMulti = await env.prop(this.selectElem, 'multiple');
 
 		this.listContainer = await env.query(this.elem, '.ddlist');
 		this.isMobile = await env.hasClass(this.listContainer, 'ddmobile');
@@ -47,7 +48,7 @@ export class DropDown extends NullableComponent
 					continue;
 
 				let itemObj = {
-					id : this.parseId(await env.prop(option, 'value')),
+					id : this.parseId(await env.prop(option, 'id')),
 					text : await env.prop(option, 'innerText'),
 					selected : await env.prop(option, 'selected'),
 					elem : option
@@ -84,7 +85,7 @@ export class DropDown extends NullableComponent
 				throw new Error('Option item not found');
 
 			await env.selectByValue(this.selectElem, option.elem.value);
-			return env.onChange(this.selectElem);
+			await env.onChange(this.selectElem);
 		}
 		else
 		{
@@ -92,7 +93,7 @@ export class DropDown extends NullableComponent
 			let li = this.items.find(item => item.id == val);
 			if (!li)
 				throw new Error('List item not found');
-			return env.click(li.elem);
+			await env.click(li.elem);
 		}
 	}
 
@@ -108,7 +109,10 @@ export class DropDown extends NullableComponent
 			await this.selectByValue(value);
 		}
 
-		return env.click(this.selectBtn);
+		if (this.isMobile)
+			await env.onBlur(this.selectElem);
+		else if (this.isMulti)
+			await env.click(this.selectBtn);
 	}
 
 
