@@ -1,8 +1,8 @@
 <?php
 	// Prepare root directories
-	$pparts = pathinfo(__FILE__);
-	$path_length = strrpos($pparts["dirname"], DIRECTORY_SEPARATOR);
-	$approot = substr(__FILE__, 0, $path_length + 1);
+	$approot = $_SERVER['DOCUMENT_ROOT'];
+	if (strpos($approot, DIRECTORY_SEPARATOR) !== strlen($approot) - strlen(DIRECTORY_SEPARATOR))
+		$approot .= DIRECTORY_SEPARATOR;
 	define("APP_ROOT", $approot);
 
 
@@ -122,10 +122,10 @@
 
 	require_once(APP_ROOT."system/common.php");
 
-	define("TPL_PATH", pathJoin(APP_ROOT, "view", "templates").DIRECTORY_SEPARATOR);
-	define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "view", "templates").DIRECTORY_SEPARATOR);
-	define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads").DIRECTORY_SEPARATOR);
-	define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs").DIRECTORY_SEPARATOR);
+	define("TPL_PATH", pathJoin(APP_ROOT, "view", "templates"));
+	define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "view", "templates"));
+	define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads"));
+	define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs"));
 
 	require_once(APP_ROOT."system/log.php");
 	if (!isset($noLogs) || !$noLogs)
