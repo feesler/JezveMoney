@@ -1,13 +1,13 @@
 import process from 'process';
 import http from 'http';
+import https from 'https';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
 import { setParam, formatTime, isFunction } from '../common.js';
 import { Environment } from './base.js'
 
 
-
-class NodeEnvironment extends Environment
+export class NodeEnvironment extends Environment
 {
 	constructor(...args)
 	{
@@ -297,8 +297,10 @@ class NodeEnvironment extends Environment
 				options.headers['Content-Length'] = Buffer.byteLength(postData);
 			}
 
+			const targetURL = new URL(url);
+			const client = (targetURL.protocol.toLowerCase() === 'https:') ? https : http;
 
-			let req = http.request(url, options, res =>
+			let req = client.request(url, options, res =>
 			{
 				let body = '';
 
