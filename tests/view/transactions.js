@@ -9,7 +9,7 @@ import { Paginator } from './component/paginator.js';
 import { ModeSelector } from './component/modeselector.js';
 import { SearchForm } from './component/searchform.js';
 import { TransactionList } from './component/transactionlist.js';
-import { copyObject, fixDate } from '../common.js';
+import { copyObject, fixDate, setParam } from '../common.js';
 
 
 // List of transactions view class
@@ -48,17 +48,19 @@ export class TransactionsView extends TestView
 		if (!res.searchForm)
 			throw new Error('Search form not found');
 
-		res.modeSelector = await ModeSelector.create(this, await this.query('.trans_list .mode_selector'));
-		res.paginator = await Paginator.create(this, await this.query('.trans_list .paginator'));
+		let transList = await this.query('.trans_list');
+		if (!transList)
+			throw new Error('List of transactions not found');
+
+		res.modeSelector = await ModeSelector.create(this, await this.query(transList, '.mode_selector'));
+		res.paginator = await Paginator.create(this, await this.query(transList, '.paginator'));
 
 		res.title = await this.prop(res.titleEl, 'innerText');
 		res.transList = await TransactionList.create(this, await this.query('#tritems'));
-		if (!res.transList)
-			throw new Error('List of transactions not found');
 
-		if (res.transList.items && res.transList.items.length && !res.modeSelector)
+		if (res.transList && res.transList.items && res.transList.items.length && !res.modeSelector)
 			throw new Error('Mode selector not found');
-		if (res.transList.items && res.transList.items.length && !res.paginator)
+		if (res.transList && res.transList.items && res.transList.items.length && !res.paginator)
 			throw new Error('Paginator not found');
 
 		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
@@ -86,13 +88,33 @@ export class TransactionsView extends TestView
 		}
 
 		res.filtered = res.data.filter(res.filter);
-		res.list = {
-			page : cont.paginator.active,
-			pages : cont.paginator.getPages(),
-			items : cont.transList.getItems()
-		};
 
-		res.detailsMode = cont.modeSelector.details;
+		if (cont.paginator && cont.transList)
+		{
+			res.list = {
+				page : cont.paginator.active,
+				pages : cont.paginator.getPages(),
+				items : cont.transList.getItems()
+			};
+		}
+		else
+		{
+			res.list = {
+				page : 0,
+				pages : 0,
+				items : []
+			};
+		}
+
+		if (cont.modeSelector)
+		{
+			res.detailsMode = cont.modeSelector.details;
+		}
+		else
+		{
+			let locURL = new URL(this.location);
+			res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') == 'details';
+		}
 		res.deleteConfirmPopup = cont.delete_warning && await this.isVisible(cont.delete_warning.elem);
 
 		return res;
@@ -117,11 +139,22 @@ export class TransactionsView extends TestView
 		res.filtered = res.data.filter(res.filter);
 
 		let pageItems = res.filtered.getPage(1);
-		res.list = {
-			page : 1,
-			pages : res.filtered.expectedPages(),
-			items : TransactionList.render(pageItems.data, App.state)
-		};
+		if (res.filtered.itemsCount() > 0)
+		{
+			res.list = {
+				page : 1,
+				pages : res.filtered.expectedPages(),
+				items : TransactionList.render(pageItems.data, App.state)
+			};
+		}
+		else
+		{
+			res.list = {
+				page : 0,
+				pages : 0,
+				items : []
+			};
+		}
 
 		return res;
 	}
@@ -159,21 +192,29 @@ export class TransactionsView extends TestView
 
 	setExpectedState()
 	{
+		const isItemsAvailable = (this.model.filtered.itemsCount() > 0);
+
 		let res = {
 			visibility : {
 				typeMenu : true, accDropDown : true, searchForm : true,
-				modeSelector : true, paginator : true, transList : true
+				modeSelector : isItemsAvailable, paginator : isItemsAvailable, transList : isItemsAvailable
 			},
 			values : {
 				typeMenu : { activeType : this.model.filter.type },
 				searchForm : { value : this.model.filter.search },
+			}
+		};
+
+		if (isItemsAvailable)
+		{
+			setParam(res.values, {
 				paginator : {
 					pages : this.model.list.pages,
 					active : this.model.list.page
 				},
 				modeSelector : { details : this.model.detailsMode }
-			}
-		};
+			});
+		}
 
 		return res;
 	}
@@ -218,6 +259,8 @@ export class TransactionsView extends TestView
 
 	async setClassicMode()
 	{
+		if (!this.content.modeSelector)
+			return false;
 		if (this.content.modeSelector.listMode.isActive)
 			return false;
 
@@ -232,6 +275,8 @@ export class TransactionsView extends TestView
 
 	async setDetailsMode()
 	{
+		if (!this.content.modeSelector)
+			return false;
 		if (this.content.modeSelector.detailsMode.isActive)
 			return false;
 
@@ -327,8 +372,11 @@ export class TransactionsView extends TestView
 	{
 		let res = { items : [], pages : [] };
 
-		if (!(App.view instanceof TransactionsView) || !App.view.content.transList)
+		if (!(App.view instanceof TransactionsView))
 			throw new Error('Not expected view');
+
+ 		if (!App.view.content.transList)
+		 	return res;
 
 		if (!App.view.isFirstPage())
 			await App.view.goToFirstPage();
@@ -388,6 +436,9 @@ export class TransactionsView extends TestView
 
 		if (!Array.isArray(tr))
 			tr = [tr];
+
+		if (!this.content.transList)
+			throw new Error('No transactions available to select');
 
 		let ind = 0;
 		for(let tr_num of tr)
