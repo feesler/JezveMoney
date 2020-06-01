@@ -21,23 +21,23 @@ var transactions = (function()
 		if (trans.src_id != 0)
 		{
 			if (src_bal === null)
-				src_bal = trans.src_balance + trans.src_amount;		// trans.src_bal - trans.src_amount
-			trans.src_balance = src_bal - trans.src_amount;
+				src_bal = trans.src_result + trans.src_amount;
+			trans.src_result = src_bal - trans.src_amount;
 		}
 		else
 		{
-			trans.src_balance = 0;
+			trans.src_result = 0;
 		}
 
 		if (trans.dest_id != 0)
 		{
 			if (dest_bal === null)
-				dest_bal = trans.dest_balance - trans.dest_amount;		// trans.dest_bal + trans.dest_amount
-			trans.dest_balance = dest_bal + trans.dest_amount;
+				dest_bal = trans.dest_result - trans.dest_amount;
+			trans.dest_result = dest_bal + trans.dest_amount;
 		}
 		else
 		{
-			trans.dest_balance = 0;
+			trans.dest_result = 0;
 		}
 
 		trRow = ge('tr_' + trans.id);
@@ -63,14 +63,14 @@ var transactions = (function()
 		if (trans.type == EXPENSE || trans.type == TRANSFER || (trans.type == DEBT && trans.src_id != 0))
 		{
 			balSpan = ce('span');
-			balSpan.innerHTML = formatCurrency(trans.src_balance, trans.src_curr);
+			balSpan.innerHTML = formatCurrency(trans.src_result, trans.src_curr);
 			trBalanceItem.appendChild(balSpan);
 		}
 
 		if (trans.type == INCOME || trans.type == TRANSFER || (trans.type == DEBT && trans.dest_id != 0))
 		{
 			balSpan = ce('span');
-			balSpan.innerHTML = formatCurrency(trans.dest_balance, trans.dest_curr);
+			balSpan.innerHTML = formatCurrency(trans.dest_result, trans.dest_curr);
 			trBalanceItem.appendChild(balSpan);
 		}
 	}
@@ -133,12 +133,12 @@ var transactions = (function()
 
 				if (trans.src_id && initBalArr[trans.src_id] === undefined)
 				{
-					initBalArr[trans.src_id] = trans.src_balance + trans.src_amount;
+					initBalArr[trans.src_id] = trans.src_result + trans.src_amount;
 				}
 
 				if (trans.dest_id && initBalArr[trans.dest_id] === undefined)
 				{
-					initBalArr[trans.dest_id] = trans.dest_balance - trans.dest_amount;
+					initBalArr[trans.dest_id] = trans.dest_result - trans.dest_amount;
 				}
 			});
 
@@ -174,8 +174,8 @@ var transactions = (function()
 							updateBalance(trans, src_bal, dest_bal);
 					}
 
-					tBalanceArr[trans.src_id] = trans.src_balance;
-					tBalanceArr[trans.dest_id] = trans.dest_balance;
+					tBalanceArr[trans.src_id] = trans.src_result;
+					tBalanceArr[trans.dest_id] = trans.dest_result;
 				}, this);
 			}
 		}
