@@ -493,7 +493,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Create accounts', 2);
 
-		let data = [
+		const data = [
 			{ name : 'acc_1', initbalance : 1000.01, curr_id : RUB },
 			{ name : 'acc_2', initbalance : '1000.01', curr_id : EUR },
 		];
@@ -506,7 +506,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Update accounts', 2);
 
-		let data = [
+		const data = [
 			{ pos : 0, icon : 1, curr_id : USD },
 			{ pos : 0, curr_id : RUB },
 		];
@@ -531,7 +531,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Export accounts', 2);
 
-		let data = [
+		const data = [
 			[0],
 			[0, 1],
 		];
@@ -554,7 +554,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Create persons', 2);
 
-		let data = [
+		const data = [
 			{ name : '&&<div>' },
 			{ name : 'Alex' },
 			{ name : 'Maria' },
@@ -570,7 +570,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Update persons', 2);
 
-		let data = [
+		const data = [
 			{ pos : 4, name : 'Ivan<' },
 		];
 
@@ -582,7 +582,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Delete persons', 2);
 
-		let data = [
+		const data = [
 			[0],
 			[0, 2],
 		];
@@ -593,7 +593,7 @@ export class Scenario
 
 	async prepareTransactionTests()
 	{
-		let accList = [
+		const accList = [
 			{ name : 'acc_3', curr_id : RUB, initbalance : '500.99', icon : 2 },
 			{ name : 'acc RUB', curr_id : RUB, initbalance : '500.99', icon : 5 },
 			{ name : 'acc USD', curr_id : USD, initbalance : '500.99', icon : 4 },
@@ -601,7 +601,7 @@ export class Scenario
 			{ name : 'card RUB', curr_id : RUB, initbalance : '35000.40', icon : 3 },
 		];
 
-		for(let account of accList)
+		for(const account of accList)
 		{
 			if (App.state.accounts.findByName(account.name))
 				continue;
@@ -609,12 +609,12 @@ export class Scenario
 			await api.account.create(account);
 		}
 
-		let personsList = [
+		const personsList = [
 			{ name : 'Maria' },
 			{ name : 'Ivan<' },
 		];
 
-		for(let person of personsList)
+		for(const person of personsList)
 		{
 			if (App.state.persons.findByName(person.name))
 				continue;
@@ -784,7 +784,7 @@ export class Scenario
 
 		await App.state.fetch();
 
-		let res = {
+		const res = {
 			accounts : accIds,
 			persons : personIds,
 			transactions : transIds
@@ -798,7 +798,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Transaction List view', 1);
 
-		let data = await this.prepareTrListData();
+		const data = await this.prepareTrListData();
 
 		await this.runner.runTasks([
 			{ action : TransactionListTests.checkInitialState },
@@ -842,7 +842,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Create expense transactions', 1);
 
-		let data = [
+		const data = [
 			{ fromAccount : 0, destAmount : '123.7801' },
 			{ fromAccount : 3, srcAmount : '100', destAmount : '7013.21', destCurr : 1 },
 			{ fromAccount : 1, destAmount : '0.01', date : App.dates.yesterday },
@@ -857,7 +857,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Create income transactions', 1);
 
-		let data = [
+		const data = [
 			{ fromAccount : 0, srcAmount : '10023.7801', date : App.dates.yesterday },
 			{ fromAccount : 3, srcAmount : '7013.21', destAmount : '100', srcCurr : 2 },
 			{ fromAccount : 1, srcAmount : '0.01', date : App.dates.weekAgo },
@@ -872,7 +872,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Create transfer transactions', 1);
 
-		let data = [
+		const data = [
 			{ srcAmount : '1000' },
 			{ destAcc : 2, srcAmount : '11.4', destAmount : '10' },
 			{ srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' },
@@ -888,7 +888,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Create debt transactions', 1);
 
-		let data = [
+		const data = [
 			{ srcAmount : '1000' },
 			{ debtType : false, acc : 2, srcAmount : '200', date : App.dates.weekAgo },
 			{ debtType : true, acc : 3, srcAmount : '100.0101' },
@@ -905,7 +905,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Update expense transactions', 2);
 
-		let data = [
+		const data = [
 			{ pos : 3, destAmount : '124.7701' },
 			{ pos : 0, srcAmount : '101', destAmount : '7065.30', destCurr : 1 },
 			{ pos : 2, destAmount : '0.02', date : App.dates.weekAgo },
@@ -920,7 +920,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Update income transactions', 2);
 
-		let data = [
+		const data = [
 			{ pos : 1, srcAmount : '100.001', date : App.dates.weekAgo },
 			{ pos : 2, srcAmount : '0.02' },
 			{ pos : 0, srcAmount : '7065.30', destAmount : '101', srcCurr : 1 },
@@ -935,7 +935,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Update transfer transactions', 2);
 
-		let data = [
+		const data = [
 			{ pos : 0, destAcc : 0, srcAmount : '11' },
 			{ pos : 1, srcAcc : 2, srcAmount : '100', destAmount : '97.55' },
 			{ pos : 2, srcAcc : 3, srcAmount : '5.0301' },
@@ -951,7 +951,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Update debt transactions', 2);
 
-		let data = [
+		const data = [
 			{ pos : 0, person : 0, srcAmount : '105' },
 			{ pos : 3, acc : 1, srcAmount : '105', date : App.dates.now },
 			{ pos : 4, debtType : true, srcAmount : '10' },
@@ -968,7 +968,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Delete expense transactions', 2);
 
-		let data = [
+		const data = [
 			[0],
 			[0, 1, 11, 13],
 		];
@@ -981,7 +981,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Delete income transactions', 2);
 
-		let data = [
+		const data = [
 			[0],
 			[0, 1, 2, 15],
 		];
@@ -994,7 +994,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Delete transfer transactions', 2);
 
-		let data = [
+		const data = [
 			[1],
 			[0, 2],
 		];
@@ -1007,7 +1007,7 @@ export class Scenario
 	{
 		this.environment.setBlock('Delete debt transactions', 2);
 
-		let data = [
+		const data = [
 			[0],
 			[0, 1],
 		];
