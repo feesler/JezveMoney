@@ -491,12 +491,6 @@ function buildAddress()
 			delete filterObj['acc_id'];
 	}
 
-	for(var name in locFilter)
-	{
-		if (typeof locFilter[name] == 'string')
-			locFilter[name] = encodeURIComponent(locFilter[name]);
-	}
-
 	if (!isEmpty(locFilter))
 		newLocation += '?' + urlJoin(locFilter);
 
