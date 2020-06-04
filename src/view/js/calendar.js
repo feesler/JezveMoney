@@ -13,13 +13,6 @@ var Calendar = new (function()
 	}
 
 
-	// Check specified year is leap
-	function isLeap(year)
-	{
-		return ((year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0)));
-	}
-
-
 	// Return count of days in specified month
 	function getDaysInMonth(date)
 	{

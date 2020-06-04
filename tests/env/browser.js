@@ -46,27 +46,27 @@ class BrowserEnvironment extends Environment
 	}
 
 
-	async query()
+	async query(...args)
 	{
-		if (!arguments.length)
+		if (!args.length)
 			return null;
 
-		let parentSpecified = (arguments.length > 1);
-		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.vdoc.documentElement;
+		let parentSpecified = (args.length > 1);
+		let query = parentSpecified ? args[1]: args[0];
+		let parent = parentSpecified ? args[0] : this.vdoc.documentElement;
 
 		return (typeof query === 'string') ? parent.querySelector(query) : query;
 	}
 
 
-	async queryAll()
+	async queryAll(...args)
 	{
-		if (!arguments.length)
+		if (!args.length)
 			return null;
 
-		let parentSpecified = (arguments.length > 1);
-		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.vdoc.documentElement;
+		let parentSpecified = (args.length > 1);
+		let query = parentSpecified ? args[1]: args[0];
+		let parent = parentSpecified ? args[0] : this.vdoc.documentElement;
 
 		return (typeof query === 'string') ? Array.from(parent.querySelectorAll(query)) : query;
 	}
