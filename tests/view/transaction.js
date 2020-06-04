@@ -5,7 +5,7 @@ import { TransactionTypeMenu } from './component/transactiontypemenu.js';
 import { InputRow } from './component/inputrow.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
-import { DatePickerRow } from './component/datepickerrow.js';
+import { DatePickerRow } from './component/daterow.js';
 import { CommentRow } from './component/commentrow.js';
 import { TileInfoItem } from './component/tileinfoitem.js';
 import { TileBlock } from './component/tileblock.js';

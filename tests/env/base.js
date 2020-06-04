@@ -24,6 +24,7 @@ export class Environment
 			'onBlur',
 			'prop',
 			'wait',
+			'timeout',
 			'global',
 			'click',
 			'input',

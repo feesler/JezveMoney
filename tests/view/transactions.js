@@ -4,7 +4,7 @@ import { DropDown } from './component/dropdown.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
 import { TransactionTypeMenu } from './component/transactiontypemenu.js';
-import { DatePickerFilter } from './component/datepickerfilter.js';
+import { DatePickerFilter } from './component/datefilter.js';
 import { Paginator } from './component/paginator.js';
 import { ModeSelector } from './component/modeselector.js';
 import { SearchForm } from './component/searchform.js';

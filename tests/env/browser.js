@@ -5,6 +5,7 @@ import 'whatwg-fetch';
 import { setParam, formatTime, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment } from './base.js';
+import { setTimeout } from 'core-js';
 
 
 class BrowserEnvironment extends Environment
@@ -136,6 +137,19 @@ class BrowserEnvironment extends Environment
 			}
 
 			queryFun.call(this);
+		});
+	}
+
+
+	async timeout(ms)
+	{
+		let delay = parseInt(ms);
+		if (isNaN(delay))
+			throw new Error('Invalid timeout specified');
+
+		return new Promise(resolve =>
+		{
+			setTimeout(resolve, delay);
 		});
 	}
 

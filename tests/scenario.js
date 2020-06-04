@@ -812,7 +812,8 @@ export class Scenario
 		await this.runner.runTasks([
 			{ action : TransactionListTests.filterByAccounts, data : data.accounts[2] },
 			{ action : TransactionListTests.filterByType, data : 0 },
-			{ action : TransactionListTests.filterByDate, data : { start : App.dates.startDate, end : App.dates.now } },
+			{ action : TransactionListTests.filterByDate, data : { start : App.dates.weekAgo, end : App.dates.now } },
+			{ action : TransactionListTests.filterByDate, data : { start : App.dates.yearAgo, end : App.dates.monthAgo } },
 		]);
 
 		const searchData = [

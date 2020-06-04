@@ -1,6 +1,7 @@
 import { NullableComponent } from './component.js';
 import { IconLink } from './iconlink.js';
 import { copyObject, isDate, fixDate } from '../../common.js';
+import { DatePicker } from './datepicker.js';
 
 
 export class DatePickerFilter extends NullableComponent
@@ -35,45 +36,27 @@ export class DatePickerFilter extends NullableComponent
 		if (!this.datePickerBtn)
 			throw new Error('Date picker button not found');
 
-		this.dayCells = [];
-		let cells = await env.queryAll(this.elem, '.calTbl td');
-		for(let cell of cells)
-		{
-			if (await env.hasClass(cell, 'omonth'))
-				continue;
-
-			let dayCell = {
-				elem : cell,
-				day : await env.prop(cell, 'innerHTML')
-			};
-
-			this.dayCells.push(dayCell);
-		}
+		this.datePicker = await DatePicker.create(this.parent, await env.query(this.elem, '.calBase'));
 	}
 
 
-	async select(val)
+	async selectDate(date)
 	{
 		const env = this.parent.props.environment;
+
+		if (!isDate(date))
+			throw new Error('Invalid parameter');
 
 		if (await env.isVisible(this.iconLink.elem))
 		{
 			await this.iconLink.click();
-			await performAction(() => env.click(this.datePickerBtn));
+			await this.parse();
 		}
 
-		let cell = this.dayCells.find(item => item.day == val);
-		if (cell)
-			await this.parent.performAction(() => env.click(cell));
-	}
+		if (!this.datePicker)
+			throw new Error('Date picker component not found');
 
-
-	isSameMonth(date1, date2)
-	{
-		if (!isDate(date1) || !isDate(date2))
-			throw new Error('Invalid parameters');
-		
-		return date1.getMonth() == date2.getMonth() && date1.getFullYear() == date2.getFullYear();
+		await this.datePicker.selectDate(date);
 	}
 
 
@@ -84,30 +67,15 @@ export class DatePickerFilter extends NullableComponent
 		if (!isDate(date1) || !isDate(date2))
 			throw new Error('Invalid parameters');
 
-		let now = new Date();
-		if (!this.isSameMonth(date1, now) || !this.isSameMonth(date2, now))
-			throw new Error('Only current month is supported now');
+		if (await env.isVisible(this.iconLink.elem))
+			await this.iconLink.click();
+		else
+			await env.click(this.datePickerBtn);
+		await this.parse();
 
-		await this.parent.performAction(async () =>
-		{
-			if (await env.isVisible(this.iconLink.elem))
-				return this.iconLink.click();
-			else
-				return env.click(this.datePickerBtn);
-		});
-
-		let day1 = date1.getDate();
-		let cell1 = this.parent.content.dateFilter.dayCells.find(item => item.day == day1);
-		if (!cell1)
-			throw new Error(`Cell ${val1} not found`);
-
-		let day2 = date2.getDate();
-		let cell2 = this.parent.content.dateFilter.dayCells.find(item => item.day == day2);
-		if (!cell2)
-			throw new Error(`Cell ${val2} not found`);
-
-		await env.click(cell1.elem);
-		return env.click(cell2.elem);
+		if (!this.datePicker)
+			throw new Error('Date picker component not found');
+		await this.datePicker.selectRange(date1, date2);
 	}
 
 
@@ -121,7 +89,7 @@ export class DatePickerFilter extends NullableComponent
 	{
 		const env = this.parent.props.environment;
 
-		if (env.isVisible(this.iconLink.elem))
+		if (await env.isVisible(this.iconLink.elem))
 		{
 			await this.iconLink.click();
 			await this.parent.performAction(() => env.click(this.datePickerBtn));

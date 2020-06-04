@@ -95,6 +95,16 @@ export class NodeEnvironment extends Environment
 	}
 
 
+	async timeout(ms)
+	{
+		let delay = parseInt(ms);
+		if (isNaN(delay))
+			throw new Error('Invalid timeout specified');
+
+		return this.page.waitFor(delay);
+	}
+
+
 	async global(prop)
 	{
 		let windowHandle = await this.page.evaluateHandle(() => window);

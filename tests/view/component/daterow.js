@@ -1,6 +1,7 @@
 import { NullableComponent } from './component.js';
 import { IconLink } from './iconlink.js';
 import { InputRow } from './inputrow.js';
+import { DatePicker } from './datepicker.js';
 
 
 export class DatePickerRow extends NullableComponent
@@ -17,6 +18,28 @@ export class DatePickerRow extends NullableComponent
 		if (!this.inputRow || !this.inputRow.datePickerBtn)
 			throw new Error('Unexpected structure of date picker input row');
 		this.date = this.inputRow.value;
+
+		this.datePicker = await DatePicker.create(this.parent, await env.query(this.elem, '.calBase'));
+	}
+
+
+	async selectDate(date)
+	{
+		const env = this.parent.props.environment;
+
+		if (!isDate(date))
+			throw new Error('Invalid parameter');
+
+		if (await env.isVisible(this.iconLink.elem))
+		{
+			await this.iconLink.click();
+			await this.parse();
+		}
+
+		if (!this.datePicker)
+			throw new Error('Date picker component not found');
+
+		await this.datePicker.selectDate(date);
 	}
 
 
@@ -24,7 +47,7 @@ export class DatePickerRow extends NullableComponent
 	{
 		const env = this.parent.props.environment;
 
-		if (env.isVisible(this.iconLink.elem))
+		if (await env.isVisible(this.iconLink.elem))
 		{
 			await this.iconLink.click();
 			await env.click(this.inputRow.datePickerBtn);
