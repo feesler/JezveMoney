@@ -89,19 +89,9 @@ export class NodeEnvironment extends Environment
 	}
 
 
-	async wait(selector, options)
+	async waitForSelector(selector, options)
 	{
 		return this.page.waitForSelector(selector, options);
-	}
-
-
-	async timeout(ms)
-	{
-		let delay = parseInt(ms);
-		if (isNaN(delay))
-			throw new Error('Invalid timeout specified');
-
-		return this.page.waitFor(delay);
 	}
 
 

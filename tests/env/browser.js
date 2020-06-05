@@ -92,78 +92,39 @@ class BrowserEnvironment extends Environment
 
 
 	// Wait for specified selector on page or return by timeout
-	async wait(selector, options)
+	async waitForSelector(selector, options = {})
 	{
-		if (typeof selector !== 'string')
-			throw new Error('Invalid selector specified');
-
-		let {
+		const {
 			timeout = 30000,
 			visible = false,
 			hidden = false,
 		} = options;
+		
+		if (typeof selector !== 'string')
+			throw new Error('Invalid selector specified');
+		if (!!visible == !!hidden)
+			throw new Error('Invalid options specified');
 
-		if (visible && hidden)
-			throw new Error('Invalie options: can\'t wait for both visible and hidden');
-
-		return new Promise((resolve, reject) =>
+		return this.waitFor(() =>
 		{
-			let qTimer = 0;
-			let limit = setTimeout(() =>
-			{
-				if (qTimer)
-					clearTimeout(qTimer);
-				throw new Error('wait(' + selector + ') timeout');
-			}, timeout);
+			let res;
 
-			async function queryFun()
+			let elem = this.vdoc.documentElement.querySelector(selector);
+			if (elem)
 			{
-				let meetCond = false;
-				let res = this.vdoc.documentElement.querySelector(selector);
-				if (res)
-				{
-					if (visible || hidden)
-					{
-						let selVisibility = visibilityResolver(res, true);
-						meetCond = ((visible && selVisibility) || (hidden && !selVisibility));
-					}
-					else
-					{
-						meetCond = true;
-					}
-				}
-				else
-				{
-					if (hidden)
-						meetCond = true;
-				}
-
-				if (meetCond)
-				{
-					clearTimeout(limit);
-					resolve(res);
-				}
-				else
-				{
-					qTimer = setTimeout(queryFun.bind(this), 200);
-				}
+				let elemVisible = visibilityResolver(elem, true);
+				res = ((visible && elemVisible) || (hidden && !elemVisible));
+			}
+			else
+			{
+				res = hidden;
 			}
 
-			queryFun.call(this);
-		});
-	}
-
-
-	async timeout(ms)
-	{
-		let delay = parseInt(ms);
-		if (isNaN(delay))
-			throw new Error('Invalid timeout specified');
-
-		return new Promise(resolve =>
-		{
-			setTimeout(resolve, delay);
-		});
+			if (res)
+				return { value : elem };
+			else
+				return false;
+		}, { timeout });
 	}
 
 
