@@ -1,7 +1,16 @@
-import { urlJoin, formatDate, setParam } from './common.js';
-import { DEBT } from './model/transaction.js'
-import { ApiRequestError } from './apirequesterror.js'
-import { App } from './app.js';
+import { urlJoin, formatDate, setParam } from '../common.js';
+import { DEBT } from './transaction.js'
+import { App } from '../app.js';
+
+
+// Error class to throw in case of API response with result: fail
+export class ApiRequestError extends Error
+{
+	constructor(message)
+	{
+		super(message);
+	}
+}
 
 
 const defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };

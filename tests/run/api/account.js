@@ -1,5 +1,4 @@
-import { api } from '../../api.js';
-import { ApiRequestError } from '../../apirequesterror.js'
+import { api, ApiRequestError } from '../../model/api.js';
 import {
 	test,
 	copyObject,

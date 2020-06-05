@@ -1,4 +1,4 @@
-import { api } from '../api.js';
+import { api } from '../model/api.js';
 import { test } from '../common.js';
 import { App } from '../app.js';
 

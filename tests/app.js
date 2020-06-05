@@ -1,7 +1,7 @@
 import { formatDate, setupTest } from './common.js';
-import { api } from './api.js';
+import { api } from './model/api.js';
 import { config } from './config.js';
-import { AppState } from './state.js';
+import { AppState } from './model/state.js';
 import { Currency } from './model/currency.js';
 import { Scenario } from './scenario.js';
 

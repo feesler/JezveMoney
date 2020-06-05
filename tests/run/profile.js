@@ -1,7 +1,7 @@
 import { LoginView } from '../view/login.js';
 import { MainView } from '../view/main.js';
 import { test } from '../common.js';
-import { api } from '../api.js';
+import { api } from '../model/api.js';
 import { App } from '../app.js';
 
 
