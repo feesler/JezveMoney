@@ -91,12 +91,20 @@ class BrowserEnvironment extends Environment
 	}
 
 
+	// Wait for specified selector on page or return by timeout
 	async wait(selector, options)
 	{
-		options = options || {};
-		let timeout = options.timeout || 30000;
-		let visible = options.visible || false;
-		let hidden = options.hidden || false;
+		if (typeof selector !== 'string')
+			throw new Error('Invalid selector specified');
+
+		let {
+			timeout = 30000,
+			visible = false,
+			hidden = false,
+		} = options;
+
+		if (visible && hidden)
+			throw new Error('Invalie options: can\'t wait for both visible and hidden');
 
 		return new Promise((resolve, reject) =>
 		{
@@ -111,18 +119,23 @@ class BrowserEnvironment extends Environment
 			async function queryFun()
 			{
 				let meetCond = false;
-				let res = await this.query(selector);
+				let res = this.vdoc.documentElement.querySelector(selector);
 				if (res)
 				{
 					if (visible || hidden)
 					{
-						let selVisibility = await this.isVisible(res, true);
+						let selVisibility = visibilityResolver(res, true);
 						meetCond = ((visible && selVisibility) || (hidden && !selVisibility));
 					}
 					else
 					{
 						meetCond = true;
 					}
+				}
+				else
+				{
+					if (hidden)
+						meetCond = true;
 				}
 
 				if (meetCond)
