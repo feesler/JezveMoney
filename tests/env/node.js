@@ -4,7 +4,7 @@ import https from 'https';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
 import { setParam, formatTime, isFunction } from '../common.js';
-import { Environment } from './base.js'
+import { Environment, visibilityResolver } from './base.js'
 
 
 export class NodeEnvironment extends Environment
@@ -138,22 +138,7 @@ export class NodeEnvironment extends Environment
 		if (typeof elem === 'string')
 			elem = await this.page.$('#' + elem);
 
-		return elem.evaluate((el, r) =>
-		{
-			let robj = el;
-			while(robj && robj.nodeType && robj.nodeType != 9)
-			{
-				if (!robj.style || robj.style.display == 'none')
-					return false;
-
-				if (r !== true)
-					break;
-
-				robj = robj.parentNode;
-			}
-
-			return !!robj;
-		}, recursive);
+		return elem.evaluate(visibilityResolver, recursive);
 	}
 
 

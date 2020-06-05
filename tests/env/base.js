@@ -2,6 +2,24 @@ import { isFunction, checkPHPerrors } from '../common.js';
 import { route } from '../router.js';
 
 
+export function visibilityResolver(elem, recursive)
+{
+	let robj = elem;
+	while(robj && robj.nodeType && robj.nodeType != 9)
+	{
+		if (!robj.style || robj.style.display == 'none' || robj.style.visibility == 'hidden')
+			return false;
+
+		if (recursive !== true)
+			break;
+
+		robj = robj.parentNode;
+	}
+
+	return !!robj;
+}
+
+
 export class Environment
 {
 	constructor()

@@ -4,7 +4,7 @@ import 'core-js/features/url-search-params';
 import 'whatwg-fetch';
 import { setParam, formatTime, isFunction } from '../common.js';
 import { App } from '../app.js';
-import { Environment } from './base.js';
+import { Environment, visibilityResolver } from './base.js';
 import { setTimeout } from 'core-js';
 
 
@@ -182,19 +182,7 @@ class BrowserEnvironment extends Environment
 		if (typeof elem === 'string')
 			elem = await vquery('#' + elem);
 
-		let robj = elem;
-		while(robj && robj.nodeType && robj.nodeType != 9)
-		{
-			if (!robj.style || robj.style.display == 'none')
-				return false;
-
-			if (recursive !== true)
-				break;
-
-			robj = robj.parentNode;
-		}
-
-		return !!robj;
+		return visibilityResolver(elem, recursive);
 	}
 
 
