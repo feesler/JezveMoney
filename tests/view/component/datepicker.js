@@ -90,7 +90,20 @@ export class DatePicker extends NullableComponent
 			throw new Error('Specified cell not found');
 
 		await env.click(cell.elem);
-		await env.timeout(actionDelay);
+	}
+
+
+	async isTitleChanged()
+	{
+		const env = this.parent.props.environment;
+
+		let titleElem = await env.query(this.elem, '.calWrap .title');
+		if (!titleElem)
+			return false;
+
+		let title = await env.prop(titleElem, 'innerText');
+
+		return title != this.title;
 	}
 
 
@@ -99,7 +112,7 @@ export class DatePicker extends NullableComponent
 		const env = this.parent.props.environment;
 
 		await env.click(this.prevBtn);
-		await env.timeout(actionDelay);
+		await env.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
@@ -109,7 +122,7 @@ export class DatePicker extends NullableComponent
 		const env = this.parent.props.environment;
 
 		await env.click(this.nextBtn);
-		await env.timeout(actionDelay);
+		await env.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
@@ -119,13 +132,15 @@ export class DatePicker extends NullableComponent
 		const env = this.parent.props.environment;
 
 		await env.click(this.titleElem);
-		await env.timeout(actionDelay);
+		await env.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
 
 	async selectYear(year)
 	{
+		const env = this.parent.props.environment;
+
 		if (this.viewType != 'yearRange')
 			throw new Error(`Invalid type of date picker view: ${this.viewType}`);
 
@@ -135,12 +150,16 @@ export class DatePicker extends NullableComponent
 		while(this.current.yearRange.end < year)
 			this.navigateToNext();
 
-		return this.selectCell(year);
+		await this.selectCell(year);
+		await env.wait(() => this.isTitleChanged());
+		await this.parse();
 	}
 
 
 	async selectMonth(month, year)
 	{
+		const env = this.parent.props.environment;
+
 		if (this.viewType != 'year')
 			throw new Error(`Invalid type of date picker view: ${this.viewType}`);
 
@@ -164,7 +183,9 @@ export class DatePicker extends NullableComponent
 			}
 		}
 
-		return this.selectCell(shortMonthTitles[month]);
+		await this.selectCell(shortMonthTitles[month]);
+		await env.wait(() => this.isTitleChanged());
+		await this.parse();
 	}
 
 
@@ -184,7 +205,6 @@ export class DatePicker extends NullableComponent
 		{
 			await this.zoomOut();
 			await this.selectMonth(month, year);
-			await this.parse();
 		}
 		if (this.current.year != year)
 			throw new Error('Fail to set up specified year');
@@ -205,7 +225,6 @@ export class DatePicker extends NullableComponent
 			{
 				await this.zoomOut();
 				await this.selectMonth(month, year);
-				await this.parse();
 			}
 		}
 		if (this.current.month != month)
