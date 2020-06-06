@@ -10,6 +10,7 @@ import { ModeSelector } from './component/modeselector.js';
 import { SearchForm } from './component/searchform.js';
 import { TransactionList } from './component/transactionlist.js';
 import { copyObject, fixDate, setParam } from '../common.js';
+import { Toolbar } from './component/toolbar.js';
 
 
 // List of transactions view class
@@ -20,16 +21,11 @@ export class TransactionsView extends TestView
 		let res = {
 			titleEl : await this.query('.content_wrap > .heading > h1'),
 			addBtn : await IconLink.create(this, await this.query('#add_btn')),
-			toolbar : {
-				elem : await this.query('#toolbar'),
-				editBtn : await IconLink.create(this, await this.query('#edit_btn')),
-				exportBtn : await IconLink.create(this, await this.query('#export_btn')),
-				delBtn : await IconLink.create(this, await this.query('#del_btn'))
-			}
+			toolbar : await Toolbar.create(this, await this.query('#toolbar')),
 		};
 
-		if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.delBtn)
-			throw new Error('Wrong transactions view structure');
+		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.delBtn)
+			throw new Error('Invalid structure of transactions view');
 
 		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('#trtype_menu'));
 		if (!res.typeMenu)
@@ -448,14 +444,15 @@ export class TransactionsView extends TestView
 
 			await this.performAction(() => this.content.transList.items[tr_num].click());
 
-			let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
-			if (ind == 0 && !editIsVisible)
-				throw 'Edit button is not visible';
-			else if (ind > 0 && editIsVisible)
-				throw 'Edit button is visible while more than one transactions is selected';
+			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
+			if (ind == 0 && !updIsVisible)
+				throw new Error('Update button is not visible');
+			else if (ind > 0 && updIsVisible)
+				throw new Error('Update button is visible while more than one transactions is selected');
 
-			if (!await this.isVisible(this.content.toolbar.delBtn.elem))
-				throw 'Delete button is not visible';
+			let delIsVisible = await this.content.toolbar.isButtonVisible('del');
+			if (!delIsVisible)
+				throw new Error('Delete button is not visible');
 
 			ind++;
 		}
@@ -471,7 +468,7 @@ export class TransactionsView extends TestView
 
 		await this.selectTransactions(num);
 
-		return this.navigation(() => this.content.toolbar.editBtn.click());
+		return this.navigation(() => this.content.toolbar.clickButton('update'));
 	}
 
 
@@ -486,7 +483,7 @@ export class TransactionsView extends TestView
 
 		await this.selectTransactions(tr);
 
-		await this.performAction(() => this.content.toolbar.delBtn.click());
+		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
 		if (!await this.isVisible(this.content.delete_warning.elem))
 			throw 'Delete transaction warning popup not appear';

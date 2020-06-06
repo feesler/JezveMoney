@@ -3,6 +3,7 @@ import { TilesList } from './component/tileslist.js';
 import { Tile } from './component/tile.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
+import { Toolbar } from './component/toolbar.js';
 
 
 // List of accounts view class
@@ -13,16 +14,11 @@ export class AccountsView extends TestView
 		let res = {
 			titleEl : await this.query('.content_wrap > .heading > h1'),
 			addBtn : await IconLink.create(this, await this.query('#add_btn')),
-			toolbar : {
-				elem : await this.query('#toolbar'),
-				editBtn : await IconLink.create(this, await this.query('#edit_btn')),
-				exportBtn : await IconLink.create(this, await this.query('#export_btn')),
-				delBtn : await IconLink.create(this, await this.query('#del_btn'))
-			}
+			toolbar : await Toolbar.create(this, await this.query('#toolbar')),
 		};
 
-		if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
-			throw new Error('Wrong accounts view structure');
+		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
+			throw new Error('Invalid structure of accounts view');
 
 		res.title = this.prop(res.titleEl, 'innerText');
 		res.tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
@@ -45,11 +41,7 @@ export class AccountsView extends TestView
 	{
 		await this.selectAccounts(num);
 
-		if (!this.content.toolbar.elem || !this.isVisible(this.content.toolbar.elem) ||
-			!this.content.toolbar.editBtn || !this.isVisible(this.content.toolbar.editBtn.elem))
-			throw new Error('Update account button not visible');
-
-		return this.navigation(() => this.content.toolbar.editBtn.click());
+		return this.navigation(() => this.content.toolbar.clickButton('update'));
 	}
 
 
@@ -69,13 +61,13 @@ export class AccountsView extends TestView
 
 			await this.performAction(() => this.content.tiles.items[acc_num].click());
 
-			let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
-			if (ind == 0 && !editIsVisible)
-				throw new Error('Edit button is not visible');
-			else if (ind > 0 && editIsVisible)
-				throw new Error('Edit button is visible while more than one accounts is selected');
+			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
+			if (ind == 0 && !updIsVisible)
+				throw new Error('Update button is not visible');
+			else if (ind > 0 && updIsVisible)
+				throw new Error('Update button is visible while more than one accounts is selected');
 
-			if (!await this.isVisible(this.content.toolbar.delBtn.elem))
+			if (!await this.content.toolbar.isButtonVisible('del'))
 				throw new Error('Delete button is not visible');
 
 			ind++;
@@ -99,7 +91,7 @@ export class AccountsView extends TestView
 	{
 		await this.selectAccounts(acc);
 
-		await this.performAction(() => this.content.toolbar.delBtn.click());
+		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
 		if (!await this.isVisible(this.content.delete_warning.elem))
 			throw new Error('Delete account warning popup not appear');
@@ -116,7 +108,9 @@ export class AccountsView extends TestView
 	{
 		await this.selectAccounts(acc);
 
-		let downloadURL = await this.prop(this.content.toolbar.exportBtn.linkElem, 'href');
+		let downloadURL = this.content.toolbar.getButtonLink('export');
+		if (!downloadURL)
+			throw new Error('Invalid export URL');
 
 		let exportResp = await this.httpReq('GET', downloadURL);
 		if (!exportResp || exportResp.status != 200)
