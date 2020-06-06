@@ -15,8 +15,8 @@ export class IconLink extends NullableComponent
 		if (!this.linkElem)
 			throw new Error('Link element not found');
 
-		const tag = await this.prop(this.linkElem, 'tagName');
-		if (tag == 'A')
+		const tagName = await this.prop(this.linkElem, 'tagName');
+		if (tagName == 'A')
 			this.link = await this.prop(this.linkElem, 'href');
 
 		this.titleElem = await this.query(this.linkElem, '.icontitle');

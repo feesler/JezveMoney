@@ -66,7 +66,7 @@ export class Toolbar extends NullableComponent
 	getButtonLink(name)
 	{
 		const button = this.getItemByName(name);
-		if (!button || !button.linkElem)
+		if (!button)
 			throw new Error(`Button ${name} not found`);
 
 		return button.link;

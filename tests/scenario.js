@@ -69,6 +69,7 @@ export class Scenario
 
 	async runTestScenatio()
 	{
+		await ProfileTests.relogin(App.config.testUser);
 	}
 
 
