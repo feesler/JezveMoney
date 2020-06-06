@@ -3,6 +3,7 @@ import { TilesList } from './component/tileslist.js';
 import { Tile } from './component/tile.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
+import { Toolbar } from './component/toolbar.js';
 
 
 // List of persons view class
@@ -13,15 +14,11 @@ export class PersonsView extends TestView
 		let res = {
 			titleEl : await this.query('.content_wrap > .heading > h1'),
 			addBtn : await IconLink.create(this, await this.query('#add_btn')),
-			toolbar : {
-				elem : await this.query('#toolbar'),
-				editBtn : await IconLink.create(this, await this.query('#edit_btn')),
-				delBtn : await IconLink.create(this, await this.query('#del_btn'))
-			}
+			toolbar : await Toolbar.create(this, await this.query('#toolbar')),
 		};
 
-		if (!res.titleEl || !res.addBtn || !res.toolbar.elem || !res.toolbar.editBtn.elem || !res.toolbar.delBtn.elem)
-			throw new Error('Wrong persons view structure');
+		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.delBtn)
+			throw new Error('Invalid structure of persons view');
 
 		res.title = this.prop(res.titleEl, 'innerText');
 		res.tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
@@ -47,11 +44,7 @@ export class PersonsView extends TestView
 
 		await this.content.tiles.items[num].click();
 
-		if (!this.content.toolbar.elem || !await this.isVisible(this.content.toolbar.elem) ||
-			!this.content.toolbar.editBtn || !await this.isVisible(this.content.toolbar.editBtn.elem))
-			throw new Error('Update person button not visible');
-
-		return this.navigation(() => this.content.toolbar.editBtn.click());
+		return this.navigation(() => this.content.toolbar.clickButton('update'));
 	}
 
 
@@ -71,19 +64,19 @@ export class PersonsView extends TestView
 
 			await this.performAction(() => this.content.tiles.items[person_num].click());
 
-			let editIsVisible = await this.isVisible(this.content.toolbar.editBtn.elem);
-			if (ind == 0 && !editIsVisible)
-				throw new Error('Edit button is not visible');
-			else if (ind > 0 && editIsVisible)
-				throw new Error('Edit button is visible while more than one person is selected');
+			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
+			if (ind == 0 && !updIsVisible)
+				throw new Error('Update button is not visible');
+			else if (ind > 0 && updIsVisible)
+				throw new Error('Update button is visible while more than one person is selected');
 
-			if (!await this.isVisible(this.content.toolbar.delBtn.elem))
+			if (!await this.content.toolbar.isButtonVisible('del'))
 				throw new Error('Delete button is not visible');
 
 			ind++;
 		}
 
-		await this.performAction(() => this.content.toolbar.delBtn.click());
+		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
 		if (!await this.isVisible(this.content.delete_warning.elem))
 			throw new Error('Delete account warning popup not appear');

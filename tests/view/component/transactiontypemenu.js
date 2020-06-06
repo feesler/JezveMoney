@@ -6,22 +6,20 @@ class MenuItem extends Component
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
 		if (!this.elem)
 			throw new Error('Wrong structure of menu item');
 
-		this.text = await env.prop(this.elem, 'innerText');
+		this.text = await this.prop(this.elem, 'innerText');
 		this.type = Transaction.strToType(this.text);
 
-		let tagName = await env.prop(this.elem, 'tagName');
+		let tagName = await this.prop(this.elem, 'tagName');
 		if (tagName == 'B')
 		{
 			this.isActive = true;
 		}
 		else if (tagName == 'A')
 		{
-			this.link = await env.prop(this.elem, 'href');
+			this.link = await this.prop(this.elem, 'href');
 			this.isActive = false;
 		}
 	}
@@ -29,10 +27,8 @@ class MenuItem extends Component
 
 	async click()
 	{
-		const env = this.parent.props.environment;
-
 		if (!this.isActive)
-			return env.click(this.elem);
+			return this.environment.click(this.elem);
 	}
 }
 
@@ -41,12 +37,10 @@ export class TransactionTypeMenu extends Component
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
 		this.items = [];
 		this.activeType = null;
 
-		let menuItems = await env.queryAll(this.elem, 'span > *');
+		let menuItems = await this.queryAll(this.elem, 'span > *');
 		for(let item of menuItems)
 		{
 			let menuItemObj = await MenuItem.create(this.parent, item);

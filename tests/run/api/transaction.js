@@ -1,6 +1,5 @@
-import { api } from '../../api.js';
+import { api, ApiRequestError } from '../../model/api.js';
 import { Transaction } from '../../model/transaction.js';
-import { ApiRequestError } from '../../apirequesterror.js'
 import {
 	test,
 	setParam,

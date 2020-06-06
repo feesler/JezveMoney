@@ -5,13 +5,13 @@ import {
 	copyObject,
 	setParam,
 	checkObjValue,
-} from './common.js';
-import { EXPENSE, INCOME, DEBT, availTransTypes } from './model/transaction.js';
-import { App } from './app.js';
-import { Currency } from './model/currency.js';
-import { AccountsList } from './model/accountslist.js';
-import { PersonsList } from './model/personslist.js';
-import { TransactionsList } from './model/transactionslist.js';
+} from '../common.js';
+import { EXPENSE, INCOME, DEBT, availTransTypes } from './transaction.js';
+import { App } from '../app.js';
+import { Currency } from './currency.js';
+import { AccountsList } from './accountslist.js';
+import { PersonsList } from './personslist.js';
+import { TransactionsList } from './transactionslist.js';
 import { api } from './api.js';
 
 

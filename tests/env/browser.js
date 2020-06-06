@@ -4,7 +4,8 @@ import 'core-js/features/url-search-params';
 import 'whatwg-fetch';
 import { setParam, formatTime, isFunction } from '../common.js';
 import { App } from '../app.js';
-import { Environment } from './base.js';
+import { Environment, visibilityResolver } from './base.js';
+import { setTimeout } from 'core-js';
 
 
 class BrowserEnvironment extends Environment
@@ -36,7 +37,7 @@ class BrowserEnvironment extends Environment
 	}
 
 
-	async parent(elem)
+	async parentNode(elem)
 	{
 		if (!elem)
 			return null;
@@ -45,29 +46,29 @@ class BrowserEnvironment extends Environment
 	}
 
 
-	async query()
+	async query(...args)
 	{
-		if (!arguments.length)
+		if (!args.length)
 			return null;
 
-		let parentSpecified = (arguments.length > 1);
-		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.vdoc.documentElement;
+		let parentSpecified = (args.length > 1);
+		let selector = parentSpecified ? args[1]: args[0];
+		let parent = parentSpecified ? args[0] : this.vdoc.documentElement;
 
-		return (typeof query === 'string') ? parent.querySelector(query) : query;
+		return (typeof selector === 'string') ? parent.querySelector(selector) : selector;
 	}
 
 
-	async queryAll()
+	async queryAll(...args)
 	{
-		if (!arguments.length)
+		if (!args.length)
 			return null;
 
-		let parentSpecified = (arguments.length > 1);
-		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.vdoc.documentElement;
+		let parentSpecified = (args.length > 1);
+		let selector = parentSpecified ? args[1]: args[0];
+		let parent = parentSpecified ? args[0] : this.vdoc.documentElement;
 
-		return (typeof query === 'string') ? Array.from(parent.querySelectorAll(query)) : query;
+		return (typeof selector === 'string') ? Array.from(parent.querySelectorAll(selector)) : selector;
 	}
 
 
@@ -90,53 +91,40 @@ class BrowserEnvironment extends Environment
 	}
 
 
-	async wait(selector, options)
+	// Wait for specified selector on page or return by timeout
+	async waitForSelector(selector, options = {})
 	{
-		options = options || {};
-		let timeout = options.timeout || 30000;
-		let visible = options.visible || false;
-		let hidden = options.hidden || false;
+		const {
+			timeout = 30000,
+			visible = false,
+			hidden = false,
+		} = options;
+		
+		if (typeof selector !== 'string')
+			throw new Error('Invalid selector specified');
+		if (!!visible == !!hidden)
+			throw new Error('Invalid options specified');
 
-		return new Promise((resolve, reject) =>
+		return this.waitFor(() =>
 		{
-			let qTimer = 0;
-			let limit = setTimeout(() =>
-			{
-				if (qTimer)
-					clearTimeout(qTimer);
-				throw new Error('wait(' + selector + ') timeout');
-			}, timeout);
+			let res;
 
-			async function queryFun()
+			let elem = this.vdoc.documentElement.querySelector(selector);
+			if (elem)
 			{
-				let meetCond = false;
-				let res = await this.query(selector);
-				if (res)
-				{
-					if (visible || hidden)
-					{
-						let selVisibility = await this.isVisible(res, true);
-						meetCond = ((visible && selVisibility) || (hidden && !selVisibility));
-					}
-					else
-					{
-						meetCond = true;
-					}
-				}
-
-				if (meetCond)
-				{
-					clearTimeout(limit);
-					resolve(res);
-				}
-				else
-				{
-					qTimer = setTimeout(queryFun.bind(this), 200);
-				}
+				let elemVisible = visibilityResolver(elem, true);
+				res = ((visible && elemVisible) || (hidden && !elemVisible));
+			}
+			else
+			{
+				res = hidden;
 			}
 
-			queryFun.call(this);
-		});
+			if (res)
+				return { value : elem };
+			else
+				return false;
+		}, { timeout });
 	}
 
 
@@ -168,19 +156,7 @@ class BrowserEnvironment extends Environment
 		if (typeof elem === 'string')
 			elem = await vquery('#' + elem);
 
-		let robj = elem;
-		while(robj && robj.nodeType && robj.nodeType != 9)
-		{
-			if (!robj.style || robj.style.display == 'none')
-				return false;
-
-			if (recursive !== true)
-				break;
-
-			robj = robj.parentNode;
-		}
-
-		return !!robj;
+		return visibilityResolver(elem, recursive);
 	}
 
 
@@ -501,10 +477,14 @@ class BrowserEnvironment extends Environment
 
 		this.app = appInstance;
 		this.app.environment = this;
-		await this.app.init();
 
-		if (!this.app.config || !this.app.config.url)
-			throw new Error('Invalid config: test URL not found');
+		const origin = window.location.origin;
+		if (origin.includes('jezve.net'))
+			this.base = origin + '/money/';
+		else
+			this.base = origin + '/';
+
+		await this.app.init();
 
 		let startbtn = ge('startbtn');
 		this.totalRes = ge('totalRes');
@@ -515,8 +495,6 @@ class BrowserEnvironment extends Environment
 		this.restbl = ge('restbl');
 		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.restbl)
 			throw new Error('Fail to init tests');
-
-		this.base = this.app.config.url;
 
 		startbtn.onclick = async () =>
 		{

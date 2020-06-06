@@ -4,7 +4,7 @@ import {
 	fixDate
 } from '../common.js';
 import { App } from '../app.js';
-import { api } from '../api.js';
+import { api } from './api.js';
 import { List } from './list.js';
 import {
 	EXPENSE,
@@ -248,6 +248,12 @@ export class TransactionsList extends List
 
 		let fStart = fixDate(start);
 		let fEnd = fixDate(end);
+		if (fStart > fEnd)
+		{
+			let tmp = fEnd;
+			fEnd = fStart;
+			fStart = tmp;
+		}
 
 		return list.filter(item =>
 		{

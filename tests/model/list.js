@@ -37,6 +37,12 @@ export class List
 	}
 
 
+	itemsCount()
+	{
+		return this.data.length;
+	}
+
+
 	getItem(id)
 	{
 		let res = this.data.find(item => item.id == id);

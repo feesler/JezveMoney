@@ -7,15 +7,13 @@ export class CommentRow extends NullableComponent
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
-		let iconLinkElem = await env.query(this.elem, '.iconlink');
+		let iconLinkElem = await this.query(this.elem, '.iconlink');
 
 		this.iconLink = await IconLink.create(this.parent, iconLinkElem);
 		if (!this.iconLink)
 			throw new Error('Iconlink of comment not found');
 
-		this.inputRow = await InputRow.create(this.parent, await env.query(this.elem, '#comment_block'));
+		this.inputRow = await InputRow.create(this.parent, await this.query(this.elem, '#comment_block'));
 		if (!this.inputRow)
 			throw new Error('Input row of comment not found');
 
@@ -25,9 +23,7 @@ export class CommentRow extends NullableComponent
 
 	async input()
 	{
-		const env = this.parent.props.environment;
-
-		if (await env.isVisible(this.iconLink.elem))
+		if (await this.isVisible(this.iconLink.elem))
 			await this.iconLink.click();
 
 		return this.inputRow.input(val);

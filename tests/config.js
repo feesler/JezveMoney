@@ -1,7 +1,6 @@
 export const  config =
 {
-/*	url : 'https://jezve.net/money/'	*/
-	url : 'http://testsrv:8096/',
+	nodeURL : 'http://testsrv:8096/',
 	testUser : { login : 'test', password : 'test' },
 	apiTestUser : { login : 'apitest', password : '123', name : 'API Tester' },
 
@@ -14,6 +13,6 @@ export const  config =
 
 	transactionsOnPage : 10,
 	latestTransactions : 5,
-	testsExpected : 709
+	testsExpected : 717
 };
 

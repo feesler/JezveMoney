@@ -4,7 +4,7 @@ import https from 'https';
 import puppeteer from 'puppeteer';
 import chalk from 'chalk';
 import { setParam, formatTime, isFunction } from '../common.js';
-import { Environment } from './base.js'
+import { Environment, visibilityResolver } from './base.js'
 
 
 export class NodeEnvironment extends Environment
@@ -32,7 +32,7 @@ export class NodeEnvironment extends Environment
 	}
 
 
-	async parent(elem)
+	async parentNode(elem)
 	{
 		if (!elem)
 			return null;
@@ -41,29 +41,29 @@ export class NodeEnvironment extends Environment
 	}
 
 
-	async query()
+	async query(...args)
 	{
-		if (!arguments.length)
+		if (!args.length)
 			return null;
 
-		let parentSpecified = (arguments.length > 1);
-		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.page;
+		let parentSpecified = (args.length > 1);
+		let selector = parentSpecified ? args[1]: args[0];
+		let parent = parentSpecified ? args[0] : this.page;
 
-		return (typeof query === 'string') ? parent.$(query) : query;
+		return (typeof selector === 'string') ? parent.$(selector) : selector;
 	}
 
 
-	async queryAll()
+	async queryAll(...args)
 	{
-		if (!arguments.length)
+		if (!args.length)
 			return null;
 
-		let parentSpecified = (arguments.length > 1);
-		let query = parentSpecified ? arguments[1]: arguments[0];
-		let parent = parentSpecified ? arguments[0] : this.page;
+		let parentSpecified = (args.length > 1);
+		let selector = parentSpecified ? args[1]: args[0];
+		let parent = parentSpecified ? args[0] : this.page;
 
-		return (typeof query === 'string') ? parent.$$(query) : query;
+		return (typeof selector === 'string') ? parent.$$(selector) : selector;
 	}
 
 
@@ -89,7 +89,7 @@ export class NodeEnvironment extends Environment
 	}
 
 
-	async wait(selector, options)
+	async waitForSelector(selector, options)
 	{
 		return this.page.waitForSelector(selector, options);
 	}
@@ -126,24 +126,9 @@ export class NodeEnvironment extends Environment
 	async isVisible(elem, recursive)
 	{
 		if (typeof elem === 'string')
-			elem = this.page.$('#' + elem);
+			elem = await this.page.$('#' + elem);
 
-		return elem.evaluate((el, r) =>
-		{
-			let robj = el;
-			while(robj && robj.nodeType && robj.nodeType != 9)
-			{
-				if (!robj.style || robj.style.display == 'none')
-					return false;
-
-				if (r !== true)
-					break;
-
-				robj = robj.parentNode;
-			}
-
-			return !!robj;
-		}, recursive);
+		return elem.evaluate(visibilityResolver, recursive);
 	}
 
 
@@ -450,17 +435,17 @@ export class NodeEnvironment extends Environment
 
 			this.app = appInstance;
 			this.app.environment = this;
-			await this.app.init();
+
+			if (!this.app.config || !this.app.config.nodeURL)
+				throw new Error('Invalid config: test URL not found');
+			this.base = this.app.config.nodeURL;
 
 			this.results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
-			if (!this.app.config || !this.app.config.url)
-				throw new Error('Invalid config: test URL not found');
-
-			this.base = this.app.config.url;
-
 			if (this.app.config.testsExpected)
 				this.results.expected = this.app.config.testsExpected;
+
+			await this.app.init();
 
 			browser = await puppeteer.launch({ headless : true,
 												args : [ '--proxy-server="direct://"',

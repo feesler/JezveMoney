@@ -1,7 +1,16 @@
-import { urlJoin, formatDate, setParam } from './common.js';
-import { DEBT } from './model/transaction.js'
-import { ApiRequestError } from './apirequesterror.js'
-import { App } from './app.js';
+import { urlJoin, formatDate, setParam } from '../common.js';
+import { DEBT } from './transaction.js'
+import { App } from '../app.js';
+
+
+// Error class to throw in case of API response with result: fail
+export class ApiRequestError extends Error
+{
+	constructor(message)
+	{
+		super(message);
+	}
+}
 
 
 const defaultRequestHdrs = { 'X-Requested-With' : 'XMLHttpRequest' };
@@ -31,7 +40,7 @@ async function apiRequest(method, url, data = null)
 	if (!App.environment)
 		throw new Error('Environment not set up');
 
-	let reqUrl = App.config.url + 'api/' + url;
+	let reqUrl = App.environment.baseUrl() + 'api/' + url;
 
 	let response = await App.environment.httpReq(method, reqUrl, data, defaultRequestHdrs);
 	if (response.status != 200)

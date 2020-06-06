@@ -1,5 +1,5 @@
 import { copyObject, normalize } from '../common.js';
-import { api } from '../api.js';
+import { api } from './api.js';
 import { List } from './list.js';
 import { App } from '../app.js';
 

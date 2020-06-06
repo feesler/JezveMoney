@@ -7,12 +7,10 @@ export class TransactionList extends NullableComponent
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
 		this.items = [];
-		this.details = (await env.prop(this.elem, 'tagName') == 'TABLE');
-		let listItems = await env.queryAll(this.elem, (this.details) ? 'tr' : '.trlist_item_wrap > div');
-		if (!listItems || !listItems.length || (listItems.length == 1 && await env.prop(listItems[0], 'tagName') == 'SPAN'))
+		this.details = (await this.prop(this.elem, 'tagName') == 'TABLE');
+		let listItems = await this.queryAll(this.elem, (this.details) ? 'tr' : '.trlist_item_wrap > div');
+		if (!listItems || !listItems.length || (listItems.length == 1 && await this.prop(listItems[0], 'tagName') == 'SPAN'))
 			return;
 
 		this.items = await asyncMap(listItems, item => TransactionListItem.create(this.parent, item));

@@ -1,5 +1,5 @@
 import { normalize, formatValue } from '../common.js';
-import { api } from '../api.js';
+import { api } from './api.js';
 
 
 // Currency object

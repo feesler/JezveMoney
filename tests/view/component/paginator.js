@@ -6,21 +6,19 @@ export class Paginator extends NullableComponent
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
 		this.items = [];
 		this.activeItem = null;
 
-		if (!await env.hasClass(this.elem, 'paginator'))
+		if (!await this.hasClass(this.elem, 'paginator'))
 			throw new Error('Unexpected stucture of paginator control');
 
 		let ellipsisBefore = false;
 		let prevPageItem = null;
-		let elems = await env.queryAll(this.elem, ':scope > span');
+		let elems = await this.queryAll(this.elem, ':scope > span');
 		if (elems.length == 1)
 			throw new Error('Single item paginator control');
 
-		let children = await asyncMap(elems, item => env.query(item, ':scope > *'));
+		let children = await asyncMap(elems, item => this.query(item, ':scope > *'));
 		elems.forEach((item, ind) => item.child = children[ind]);
 
 		for(let itemElem of elems)
@@ -28,7 +26,7 @@ export class Paginator extends NullableComponent
 			// Check element with no child contain ellipsis and skip
 			if (!itemElem.child)
 			{
-				if (await env.prop(itemElem, 'innerText') != '...')
+				if (await this.prop(itemElem, 'innerText') != '...')
 					throw new Error('Unexpected paginator item');
 
 				// Check ellipsis is between two page number items:
@@ -43,11 +41,11 @@ export class Paginator extends NullableComponent
 
 			let item = { elem : itemElem };
 
-			let tagName = await env.prop(itemElem.child, 'tagName');
+			let tagName = await this.prop(itemElem.child, 'tagName');
 			if (tagName == 'A')
 			{
 				item.linkElem = itemElem.child;
-				item.link = await env.prop(itemElem.child, 'href');
+				item.link = await this.prop(itemElem.child, 'href');
 				item.isActive = false;
 			}
 			else if (tagName == 'B')
@@ -57,7 +55,7 @@ export class Paginator extends NullableComponent
 			else
 				throw new Error('Unexpected stucture of paginator control');
 
-			item.title = await env.prop(itemElem.child, 'innerText');
+			item.title = await this.prop(itemElem.child, 'innerText');
 			item.num = parseInt(item.title);
 			if (!item.title || isNaN(item.num) || item.num < 1)
 				throw new Error('Unexpected title of paginator item');
@@ -123,8 +121,6 @@ export class Paginator extends NullableComponent
 
 	async goToFirstPage()
 	{
-		const env = this.parent.props.environment;
-
 		if (!this.items.length)
 			return;
 
@@ -132,14 +128,12 @@ export class Paginator extends NullableComponent
 		if (item.isActive)
 			return;
 
-		return env.click(item.linkElem);
+		return this.click(item.linkElem);
 	}
 
 
 	async goToPrevPage()
 	{
-		const env = this.parent.props.environment;
-
 		if (this.isFirstPage())
 			return;
 
@@ -147,14 +141,12 @@ export class Paginator extends NullableComponent
 		if (item.isActive)
 			return;
 
-		return env.click(item.linkElem);
+		return this.click(item.linkElem);
 	}
 
 
 	async goToNextPage()
 	{
-		const env = this.parent.props.environment;
-
 		if (this.isLastPage())
 			return;
 
@@ -162,14 +154,12 @@ export class Paginator extends NullableComponent
 		if (item.isActive)
 			return;
 
-		return env.click(item.linkElem);
+		return this.click(item.linkElem);
 	}
 
 
 	async goToLastPage()
 	{
-		const env = this.parent.props.environment;
-
 		if (!this.items.length)
 			return;
 
@@ -177,6 +167,6 @@ export class Paginator extends NullableComponent
 		if (item.isActive)
 			return;
 
-		return env.click(item.linkElem);
+		return this.click(item.linkElem);
 	}
 }

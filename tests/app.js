@@ -1,7 +1,7 @@
 import { formatDate, setupTest } from './common.js';
-import { api } from './api.js';
+import { api } from './model/api.js';
 import { config } from './config.js';
-import { AppState } from './state.js';
+import { AppState } from './model/state.js';
 import { Currency } from './model/currency.js';
 import { Scenario } from './scenario.js';
 
@@ -47,9 +47,6 @@ class Application
 		this.dates.yearAgo = formatDate(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
 		this.dateList.push(...Object.values(this.dates));
-
-		let firstDay = Date.UTC(now.getFullYear(), now.getMonth(), 1);
-		this.dates.startDate = (now.getDate() > 7) ? this.dates.weekAgo : firstDay;
 
 		setupTest(this.environment);
 	}

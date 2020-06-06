@@ -60,7 +60,13 @@ export async function filterByAccounts(accounts)
 
 	await checkNavigation();
 
-	await test(`Filter by ${accounts.join()}`, () => App.view.filterByAccounts(accounts));
+	const accountNames = accounts.map(account_id =>
+	{
+		const item = App.state.accounts.getItem(account_id);
+		return item ? item.name : `(${account_id})`;
+	});
+
+	await test(`Filter by accounts [${accountNames.join()}]`, () => App.view.filterByAccounts(accounts));
 	await test('Correctness of transaction list', () => App.view.iteratePages());
 }
 
@@ -78,7 +84,7 @@ export async function search(text)
 {
 	await checkNavigation();
 
-	await test('Search', () => App.view.search(text));
+	await test(`Search (${text})`, () => App.view.search(text));
 	await test('Correctness of transaction list', () => App.view.iteratePages());
 } 
 

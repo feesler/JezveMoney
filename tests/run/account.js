@@ -224,6 +224,12 @@ export async function delFromUpdate(pos)
 }
 
 
+function quoteString(str)
+{
+	return '"' + str.toString().split('"').join('\\"') + '"';
+}
+
+
 export async function exportTest(accounts)
 {
 	if (!Array.isArray(accounts))
@@ -240,7 +246,7 @@ export async function exportTest(accounts)
 	let delimiter = ';';
 	let rows = [];
 	let headerRow = [ 'ID', 'Type', 'Source amount', 'Destination amount', 'Source result', 'Destination result', 'Date', 'Comment' ];
-	rows.push(headerRow.join(delimiter));
+	rows.push(headerRow);
 
 	// Prepare state
 	await App.state.fetch();
@@ -262,10 +268,11 @@ export async function exportTest(accounts)
 			transaction.comment
 		];
 
-		rows.push(row.join(delimiter));
+		rows.push(row);
 	}
 
-	let expectedContent = rows.join('\r\n');
+	let expectedContent = rows.map(row => row.map(quoteString).join(delimiter))
+								.join('\r\n');
 	expectedContent = expectedContent.trim();
 
 	let content = await App.view.exportAccounts(accounts);
