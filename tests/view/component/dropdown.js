@@ -80,7 +80,7 @@ export class DropDown extends NullableComponent
 			if (!option)
 				throw new Error('Option item not found');
 
-			await this.selectByValue(this.selectElem, option.elem.value);
+			await this.environment.selectByValue(this.selectElem, option.elem.value);
 			await this.onChange(this.selectElem);
 		}
 		else
