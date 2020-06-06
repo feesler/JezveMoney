@@ -8,6 +8,9 @@ class Logger
 	// Write string to log file
 	public static function write($str)
 	{
+		if (!is_writable(self::$filename))
+			return;
+
 		if (is_null($str))
 			$str = "";
 
