@@ -3,7 +3,6 @@
 	$approot = $_SERVER['DOCUMENT_ROOT'];
 	if (strpos($approot, DIRECTORY_SEPARATOR) !== strlen($approot) - strlen(DIRECTORY_SEPARATOR))
 		$approot .= DIRECTORY_SEPARATOR;
-	define("APP_ROOT", $approot);
 
 
 	// Check request is HTTPS
@@ -75,6 +74,7 @@
 	if (strcmp(APP_HOST, $productionHost) == 0)
 	{
 		define("APP_PROTOCOL", "https://");
+		define("APP_ROOT", $approot);
 		define("APP_PATH", "/");
 		define("PRODUCTION", TRUE);
 		define("LOCAL_DEV", FALSE);
@@ -82,6 +82,7 @@
 	else if (strcmp(APP_HOST, $devHost) == 0)
 	{
 		define("APP_PROTOCOL", "https://");
+		define("APP_ROOT", $approot."money/");
 		define("APP_PATH", "/money/");
 		define("PRODUCTION", FALSE);
 		define("LOCAL_DEV", FALSE);
@@ -89,6 +90,7 @@
 	else if (strcmp(APP_HOST, $localDevHost) == 0)
 	{
 		define("APP_PROTOCOL", "http://");
+		define("APP_ROOT", $approot);
 		define("APP_PATH", "/");
 		define("PRODUCTION", FALSE);
 		define("LOCAL_DEV", TRUE);
