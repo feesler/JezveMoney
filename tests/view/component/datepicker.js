@@ -11,33 +11,31 @@ export class DatePicker extends NullableComponent
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
+		this.wrapper = await this.query(this.elem, '.calWrap');
 
-		this.wrapper = await env.query(this.elem, '.calWrap');
-
-		this.prevBtn = await env.query(this.wrapper, '.calHeadTbl .nav.prev');
-		this.nextBtn = await env.query(this.wrapper, '.calHeadTbl .nav.next');
-		this.titleElem = await env.query(this.wrapper, '.title');
-		this.title = await env.prop(this.titleElem, 'innerText');
+		this.prevBtn = await this.query(this.wrapper, '.calHeadTbl .nav.prev');
+		this.nextBtn = await this.query(this.wrapper, '.calHeadTbl .nav.next');
+		this.titleElem = await this.query(this.wrapper, '.title');
+		this.title = await this.prop(this.titleElem, 'innerText');
 
 		this.cells = [];
 		this.viewType = 'month';
-		let elems = await env.queryAll(this.wrapper, '.calTbl td');
+		let elems = await this.queryAll(this.wrapper, '.calTbl td');
 		for(let elem of elems)
 		{
-			if (await env.hasClass(elem, 'monthCell'))
+			if (await this.hasClass(elem, 'monthCell'))
 				this.viewType = 'year';
-			else if (await env.hasClass(elem, 'yearCell'))
+			else if (await this.hasClass(elem, 'yearCell'))
 				this.viewType = 'yearRange';
 
-			if (await env.hasClass(elem, 'omonth'))
+			if (await this.hasClass(elem, 'omonth'))
 				continue;
 
 			let cell = {
 				elem : elem,
-				title : await env.prop(elem, 'innerText'),
-				active : await env.hasClass(elem, 'act'),
-				highlighted : await env.hasClass(elem, 'hl')
+				title : await this.prop(elem, 'innerText'),
+				active : await this.hasClass(elem, 'act'),
+				highlighted : await this.hasClass(elem, 'hl')
 			};
 
 			this.cells.push(cell);
@@ -79,9 +77,7 @@ export class DatePicker extends NullableComponent
 
 	async selectCell(val)
 	{
-		const env = this.parent.props.environment;
-
-		if (!await env.isVisible(this.wrapper))
+		if (!await this.isVisible(this.wrapper))
 			throw new Error('DatePicker is not visible');
 
 		const lval = val.toString().toLowerCase();
@@ -89,19 +85,17 @@ export class DatePicker extends NullableComponent
 		if (!cell)
 			throw new Error('Specified cell not found');
 
-		await env.click(cell.elem);
+		await this.click(cell.elem);
 	}
 
 
 	async isTitleChanged()
 	{
-		const env = this.parent.props.environment;
-
-		let titleElem = await env.query(this.elem, '.calWrap .title');
+		let titleElem = await this.query(this.elem, '.calWrap .title');
 		if (!titleElem)
 			return false;
 
-		let title = await env.prop(titleElem, 'innerText');
+		let title = await this.prop(titleElem, 'innerText');
 
 		return title != this.title;
 	}
@@ -109,38 +103,30 @@ export class DatePicker extends NullableComponent
 
 	async navigateToPrevious()
 	{
-		const env = this.parent.props.environment;
-
-		await env.click(this.prevBtn);
-		await env.wait(() => this.isTitleChanged());
+		await this.click(this.prevBtn);
+		await this.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
 
 	async navigateToNext()
 	{
-		const env = this.parent.props.environment;
-
-		await env.click(this.nextBtn);
-		await env.wait(() => this.isTitleChanged());
+		await this.click(this.nextBtn);
+		await this.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
 
 	async zoomOut()
 	{
-		const env = this.parent.props.environment;
-
-		await env.click(this.titleElem);
-		await env.wait(() => this.isTitleChanged());
+		await this.click(this.titleElem);
+		await this.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
 
 	async selectYear(year)
 	{
-		const env = this.parent.props.environment;
-
 		if (this.viewType != 'yearRange')
 			throw new Error(`Invalid type of date picker view: ${this.viewType}`);
 
@@ -151,15 +137,13 @@ export class DatePicker extends NullableComponent
 			this.navigateToNext();
 
 		await this.selectCell(year);
-		await env.wait(() => this.isTitleChanged());
+		await this.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 
 
 	async selectMonth(month, year)
 	{
-		const env = this.parent.props.environment;
-
 		if (this.viewType != 'year')
 			throw new Error(`Invalid type of date picker view: ${this.viewType}`);
 
@@ -184,7 +168,7 @@ export class DatePicker extends NullableComponent
 		}
 
 		await this.selectCell(shortMonthTitles[month]);
-		await env.wait(() => this.isTitleChanged());
+		await this.wait(() => this.isTitleChanged());
 		await this.parse();
 	}
 

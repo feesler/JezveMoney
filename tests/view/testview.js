@@ -10,14 +10,11 @@ import { MessagePopup } from './component/messagepopup.js';
 // Common test view class
 export class TestView
 {
-	constructor(props)
+	constructor({ environment })
 	{
-		this.props = props || {};
-
-		if (this.props.environment)
-		{
-			this.props.environment.inject(this);
-		}
+		this.environment = environment;
+		if (this.environment)
+			this.environment.inject(this);
 	}
 
 

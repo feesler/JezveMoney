@@ -37,7 +37,7 @@ class BrowserEnvironment extends Environment
 	}
 
 
-	async parent(elem)
+	async parentNode(elem)
 	{
 		if (!elem)
 			return null;
@@ -52,10 +52,10 @@ class BrowserEnvironment extends Environment
 			return null;
 
 		let parentSpecified = (args.length > 1);
-		let query = parentSpecified ? args[1]: args[0];
+		let selector = parentSpecified ? args[1]: args[0];
 		let parent = parentSpecified ? args[0] : this.vdoc.documentElement;
 
-		return (typeof query === 'string') ? parent.querySelector(query) : query;
+		return (typeof selector === 'string') ? parent.querySelector(selector) : selector;
 	}
 
 
@@ -65,10 +65,10 @@ class BrowserEnvironment extends Environment
 			return null;
 
 		let parentSpecified = (args.length > 1);
-		let query = parentSpecified ? args[1]: args[0];
+		let selector = parentSpecified ? args[1]: args[0];
 		let parent = parentSpecified ? args[0] : this.vdoc.documentElement;
 
-		return (typeof query === 'string') ? Array.from(parent.querySelectorAll(query)) : query;
+		return (typeof selector === 'string') ? Array.from(parent.querySelectorAll(selector)) : selector;
 	}
 
 

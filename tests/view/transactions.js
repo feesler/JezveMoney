@@ -40,7 +40,7 @@ export class TransactionsView extends TestView
 			throw new Error('Account filter control not found');
 
 		let calendarBtn = await this.query('#calendar_btn');
-		res.dateFilter = await DatePickerFilter.create(this, await this.parent(calendarBtn));
+		res.dateFilter = await DatePickerFilter.create(this, await this.parentNode(calendarBtn));
 		if (!res.dateFilter)
 			throw new Error('Date filter not found');
 

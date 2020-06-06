@@ -32,7 +32,7 @@ export class Environment
 			'url',
 			'navigation',
 			'goTo',
-			'parent',
+			'parentNode',
 			'query',
 			'queryAll',
 			'hasClass',
@@ -67,7 +67,14 @@ export class Environment
 			if (!isFunction(this[method]))
 				throw new Error(`Method ${method} not implemented`);
 
-			target[method] = this[method].bind(this);
+			if (!(method in target))
+			{
+				Object.defineProperty(target, method, {
+					value : this[method].bind(this),
+					writable : false,
+					enumerable : false,
+				});
+			}
 		}
 	}
 

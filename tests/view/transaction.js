@@ -105,9 +105,9 @@ export class TransactionView extends TestView
 		res.result_balance_dest_row = await InputRow.create(this, await this.query('#result_balance_dest'));
 
 		let calendarBtn = await this.query('#calendar_btn');
-		res.datePicker = await DatePickerRow.create(this, await this.parent(calendarBtn));
+		res.datePicker = await DatePickerRow.create(this, await this.parentNode(calendarBtn));
 		let commentBtn = await this.query('#comm_btn');
-		res.comment_row = await CommentRow.create(this, await this.parent(commentBtn));
+		res.comment_row = await CommentRow.create(this, await this.parentNode(commentBtn));
 
 		res.submitBtn = await this.query('#submitbtn');
 		res.cancelBtn = await this.query('#submitbtn + *');

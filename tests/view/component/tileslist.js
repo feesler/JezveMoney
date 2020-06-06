@@ -8,7 +8,7 @@ export class TilesList extends NullableComponent
 {
 	constructor(parent, elem, tileClass)
 	{
-		super(parent, elem, tileClass);
+		super(parent, elem);
 
 		if (!tileClass)
 			throw new Error('Invalid tile constructor specified');
@@ -19,11 +19,9 @@ export class TilesList extends NullableComponent
 
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
 		this.items = [];
-		let listItems = await env.queryAll(this.elem, ':scope > *');
-		if (!listItems || !listItems.length || (listItems.length == 1 && await env.prop(listItems[0], 'tagName') == 'SPAN'))
+		let listItems = await this.queryAll(this.elem, ':scope > *');
+		if (!listItems || !listItems.length || (listItems.length == 1 && await this.prop(listItems[0], 'tagName') == 'SPAN'))
 			return;
 
 		this.items = await asyncMap(listItems, item => this.tileClass.create(this.parent, item));

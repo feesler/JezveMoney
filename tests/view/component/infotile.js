@@ -6,17 +6,15 @@ export class InfoTile extends Component
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
-		if (!this.elem || !await env.hasClass(this.elem, 'info_tile'))
+		if (!this.elem || !await this.hasClass(this.elem, 'info_tile'))
 			throw new Error('Wrong info tile structure');
 
-		this.titleEl = await env.query(this.elem, '.info_title');
-		this.subtitleEl = await env.query(this.elem, '.info_subtitle');
+		this.titleEl = await this.query(this.elem, '.info_title');
+		this.subtitleEl = await this.query(this.elem, '.info_subtitle');
 
-		this.id = this.parseId(await env.prop(this.elem, 'id'));
-		this.title = await env.prop(this.titleEl, 'innerText');
-		this.subtitle = await env.prop(this.subtitleEl, 'innerText');
+		this.id = this.parseId(await this.prop(this.elem, 'id'));
+		this.title = await this.prop(this.titleEl, 'innerText');
+		this.subtitle = await this.prop(this.subtitleEl, 'innerText');
 		this.subtitle = this.subtitle.split('\r\n').join('\n');
 	}
 

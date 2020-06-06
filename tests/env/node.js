@@ -32,7 +32,7 @@ export class NodeEnvironment extends Environment
 	}
 
 
-	async parent(elem)
+	async parentNode(elem)
 	{
 		if (!elem)
 			return null;
@@ -47,10 +47,10 @@ export class NodeEnvironment extends Environment
 			return null;
 
 		let parentSpecified = (args.length > 1);
-		let query = parentSpecified ? args[1]: args[0];
+		let selector = parentSpecified ? args[1]: args[0];
 		let parent = parentSpecified ? args[0] : this.page;
 
-		return (typeof query === 'string') ? parent.$(query) : query;
+		return (typeof selector === 'string') ? parent.$(selector) : selector;
 	}
 
 
@@ -60,10 +60,10 @@ export class NodeEnvironment extends Environment
 			return null;
 
 		let parentSpecified = (args.length > 1);
-		let query = parentSpecified ? args[1]: args[0];
+		let selector = parentSpecified ? args[1]: args[0];
 		let parent = parentSpecified ? args[0] : this.page;
 
-		return (typeof query === 'string') ? parent.$$(query) : query;
+		return (typeof selector === 'string') ? parent.$$(selector) : selector;
 	}
 
 

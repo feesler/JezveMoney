@@ -9,6 +9,10 @@ export class Component
 
 		this.elem = elem;
 		this.parent = parent;
+
+		this.environment = parent.environment;
+		if (this.environment)
+			this.environment.inject(this);
 	}
 
 

@@ -5,13 +5,11 @@ export class WarningPopup extends NullableComponent
 {
 	async parse()
 	{
-		const env = this.parent.props.environment;
-
-		this.titleElem = await env.query(this.elem, '.popup_title');
-		this.title = await env.prop(this.titleElem, 'innerText');
-		this.messageElem = await env.query(this.elem, '.popup_message > div');
-		this.message = await env.prop(this.messageElem, 'innerText');
-		this.okBtn = await env.query(this.elem, '.popup_controls > .btn.ok_btn');
-		this.cancelBtn = await env.query(this.elem, '.popup_controls > .btn.cancel_btn');
+		this.titleElem = await this.query(this.elem, '.popup_title');
+		this.title = await this.prop(this.titleElem, 'innerText');
+		this.messageElem = await this.query(this.elem, '.popup_message > div');
+		this.message = await this.prop(this.messageElem, 'innerText');
+		this.okBtn = await this.query(this.elem, '.popup_controls > .btn.ok_btn');
+		this.cancelBtn = await this.query(this.elem, '.popup_controls > .btn.cancel_btn');
 	}
 }
