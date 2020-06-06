@@ -477,10 +477,14 @@ class BrowserEnvironment extends Environment
 
 		this.app = appInstance;
 		this.app.environment = this;
-		await this.app.init();
 
-		if (!this.app.config || !this.app.config.url)
-			throw new Error('Invalid config: test URL not found');
+		const origin = window.location.origin;
+		if (origin.includes('jezve.net'))
+			this.base = origin + '/money/';
+		else
+			this.base = origin + '/';
+
+		await this.app.init();
 
 		let startbtn = ge('startbtn');
 		this.totalRes = ge('totalRes');
@@ -491,8 +495,6 @@ class BrowserEnvironment extends Environment
 		this.restbl = ge('restbl');
 		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.restbl)
 			throw new Error('Fail to init tests');
-
-		this.base = this.app.config.url;
 
 		startbtn.onclick = async () =>
 		{

@@ -40,7 +40,7 @@ async function apiRequest(method, url, data = null)
 	if (!App.environment)
 		throw new Error('Environment not set up');
 
-	let reqUrl = App.config.url + 'api/' + url;
+	let reqUrl = App.environment.baseUrl() + 'api/' + url;
 
 	let response = await App.environment.httpReq(method, reqUrl, data, defaultRequestHdrs);
 	if (response.status != 200)

@@ -435,17 +435,17 @@ export class NodeEnvironment extends Environment
 
 			this.app = appInstance;
 			this.app.environment = this;
-			await this.app.init();
+
+			if (!this.app.config || !this.app.config.nodeURL)
+				throw new Error('Invalid config: test URL not found');
+			this.base = this.app.config.nodeURL;
 
 			this.results = { total : 0, ok : 0, fail : 0, expected : 0 };
 
-			if (!this.app.config || !this.app.config.url)
-				throw new Error('Invalid config: test URL not found');
-
-			this.base = this.app.config.url;
-
 			if (this.app.config.testsExpected)
 				this.results.expected = this.app.config.testsExpected;
+
+			await this.app.init();
 
 			browser = await puppeteer.launch({ headless : true,
 												args : [ '--proxy-server="direct://"',
