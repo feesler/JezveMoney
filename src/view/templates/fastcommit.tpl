@@ -42,7 +42,10 @@
 			<input id="newPhBtn" class="btn ok_btn" type="button" value="+">
 			<input id="importAllBtn" class="btn ok_btn" type="button" value="<?=e("->>")?>" disabled>
 		</div>
-		<div><input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span></div>
+		<div>
+			<input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span><br>
+			<span id="importpickstats" style="display: none;">Not picked on import: <span id="notpickedcount"></span></span>
+		</div>
 	</div>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
