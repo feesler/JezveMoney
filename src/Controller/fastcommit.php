@@ -117,7 +117,6 @@ class FastCommitController extends TemplateController
 
 			// Start process file
 			header("Content-type: text/html; charset=UTF-8");
-			$isCardStatement = (strcmp($fileStatType, "card") == 0 );
 		}
 		else
 		{
@@ -126,7 +125,7 @@ class FastCommitController extends TemplateController
 
 			$fname = UPLOAD_PATH.$_POST["fileName"];
 			$fileType = substr(strrchr($fname, "."), 1);
-			$isCardStatement = (intval($_POST["isCard"]) == 1);
+			$fileStatType = intval($_POST["statType"]);
 			$encodeCP1251 = (intval($_POST["encode"]) == 1);
 		}
 
@@ -153,7 +152,7 @@ class FastCommitController extends TemplateController
 		$spreadsheet = $reader->load($fname);
 		$src = $spreadsheet->getActiveSheet();
 
-		if ($isCardStatement)
+		if ($fileStatType == 1)		// debt card
 		{
 			$date_col = self::columnStr(1);
 			$desc_col = self::columnStr(3);
@@ -162,7 +161,16 @@ class FastCommitController extends TemplateController
 			$accCurr_col = self::columnStr(9);
 			$accAmount_col = self::columnStr(10);
 		}
-		else	// account statement
+		else if ($fileStatType == 2)		// credit card
+		{
+			$date_col = self::columnStr(1);
+			$desc_col = self::columnStr(4);
+			$trCurr_col = self::columnStr(8);
+			$trAmount_col = self::columnStr(9);
+			$accCurr_col = self::columnStr(10);
+			$accAmount_col = self::columnStr(11);
+		}
+		else if ($fileStatType == 0)	// account statement
 		{
 			$date_col = self::columnStr(1);
 			$desc_col = self::columnStr(2);

@@ -913,7 +913,7 @@ function Uploader(file, options, onSuccess, onFail, onProgress)
 		// which file upload
 		xhrUpload.setRequestHeader('X-File-Id', fileId);
 		xhrUpload.setRequestHeader('X-File-Type', fileType);
-		xhrUpload.setRequestHeader('X-File-Stat-Type', options.isCard ? 'card' : 'account');
+		xhrUpload.setRequestHeader('X-File-Stat-Type', options.statType);
 		if (options.encode)
 			xhrUpload.setRequestHeader('X-File-Encode', 1);
 
@@ -981,9 +981,9 @@ function onImportProgress(loaded, total)
 function onFileImport()
 {
 	var fileUploadRadio = ge('fileUploadRadio');
-	var isCardCheck = ge('isCardCheck');
+	var statTypeSel = ge('statTypeSel');
+	var statType = statTypeSel.value;
 	var isEncodeCheck = ge('isEncodeCheck');
-	var isCard = isCardCheck.checked;
 	var encode = isEncodeCheck.checked;
 
 	if (fileUploadRadio.checked)
@@ -997,7 +997,7 @@ function onFileImport()
 			return false;
 
 		uploader = new Uploader(file,
-								{ isCard : isCard, encode : encode },
+								{ statType : statType, encode : encode },
 								onImportSuccess,
 								onImportError,
 								onImportProgress);
@@ -1013,7 +1013,7 @@ function onFileImport()
 			return false;
 
 		reqObj.fileName = el.value;
-		reqObj.isCard = (isCard ? 1 : 0);
+		reqObj.statType = statType;
 		reqObj.encode = (encode ? 1 : 0);
 
 		ajax.post({
