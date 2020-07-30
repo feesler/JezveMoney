@@ -703,6 +703,14 @@ label
 }
 
 
+/* Stretching DropDown */
+.dd__fullwidth
+{
+	display: -ms-flexbox;
+	display: flex;
+}
+
+
 /* currency button */
 .curr_container
 {

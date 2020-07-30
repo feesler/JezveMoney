@@ -41,8 +41,8 @@ function onCurrencySel(obj)
 // Initialization of page controls
 function initControls()
 {
-	DropDown.create({ input_id : 'icon', onitemselect : onIconSel, editable : false });
-	DropDown.create({ input_id : 'currency', onitemselect : onCurrencySel, editable : false });
+	DropDown.create({ input_id : 'icon', onitemselect : onIconSel, editable : false, extraClass : 'dd__fullwidth' });
+	DropDown.create({ input_id : 'currency', onitemselect : onCurrencySel, editable : false, extraClass : 'dd__fullwidth' });
 
 	DecimalInput.create({ elem : ge('balance'), oninput : onAccInitBalanceInput });
 
