@@ -222,7 +222,7 @@ class AccountsController extends TemplateController
 		if ($writerType == "Csv")
 		{
 			$writer->setDelimiter(';');
-			$writer->setEnclosure('');
+			$writer->setEnclosure('"');
 			$writer->setLineEnding("\r\n");
 			$writer->setSheetIndex(0);
 		}
