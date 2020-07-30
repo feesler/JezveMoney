@@ -85,9 +85,9 @@ var Popup = new (function()
 			if (!contentObj || !boxObj)
 				return false;
 
-			if (isArray(params.additional) || typeof params.additional === 'string')
+			if (Array.isArray(params.additional) || typeof params.additional === 'string')
 			{
-				var addClassNames = (isArray(params.additional)) ? params.additional : params.additional.split(' ');
+				var addClassNames = (Array.isArray(params.additional)) ? params.additional : params.additional.split(' ');
 
 				addClassNames.forEach(function(item)
 				{

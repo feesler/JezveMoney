@@ -279,7 +279,7 @@ DragZone.prototype.isValidDragHandle = function(target)
 		return true;
 
 	handles = this._params.handles;
-	if (!isArray(handles))
+	if (!Array.isArray(handles))
 		handles = [handles];
 
 	return handles.some(function(hnd)
@@ -303,7 +303,7 @@ DragZone.prototype.isValidDragHandle = function(target)
 		else
 			elem = ge(hnd);
 
-		if (!isArray(elem))
+		if (!Array.isArray(elem))
 			elem = [elem];
 
 		return elem.some(function(el)

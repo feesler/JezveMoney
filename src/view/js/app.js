@@ -113,7 +113,7 @@ function idSearch(arr, id)
 {
 	var res = null;
 
-	if (!isArray(arr))
+	if (!Array.isArray(arr))
 		return res;
 
 	arr.some(function(obj)

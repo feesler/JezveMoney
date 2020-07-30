@@ -68,9 +68,9 @@ class AccountsController extends TemplateController
 		$headString = "New account";
 		$titleString .= $headString;
 
-		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "dropdown.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "decimalinput.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "dropdown.js", "decimalinput.js", "accounts.js");
 
 		include(TPL_PATH."account.tpl");
 	}
@@ -115,9 +115,9 @@ class AccountsController extends TemplateController
 		$headString = "Edit account";
 		$titleString .= $headString;
 
-		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "dropdown.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "decimalinput.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "dropdown.js", "decimalinput.js", "accounts.js");
 
 		include(TPL_PATH."account.tpl");
 	}

@@ -250,41 +250,15 @@ function onTransClick(tr_id)
 }
 
 
-// Account select callback
-function onAccountSel(obj)
-{
-	var sArr = [], str = '';
-
-	if (!obj)
-		return;
-
-	for(var id in obj)
-	{
-		sArr.push(obj[id]);
-	}
-
-	str = sArr.join(', ');
-
-	this.setText(str);
-}
-
-
 // Initialization of page controls
 function initControls()
 {
-	var isMobile;
-	var accDDList;
-
-	isMobile = (document.documentElement.clientWidth < 700);
-
-	accDDList = new DDList();
-	if (!accDDList.create({ input_id : 'acc_id',
-						selCB : onAccountSel,
-						selmsg : 'Select account',
-						changecb : onAccountChange,
-						editable : false,
-						mobile : isMobile }))
-		accDDList = null;
+	DropDown.create({
+		input_id : 'acc_id',
+		placeholder : 'Select account',
+		onchange : onAccountChange,
+		editable : false
+	});
 
 	var searchFrm = ge('searchFrm');
 	if (searchFrm)
@@ -482,7 +456,7 @@ function buildAddress()
 
 	if ('acc_id' in filterObj)
 	{
-		if (!isArray(locFilter.acc_id))
+		if (!Array.isArray(locFilter.acc_id))
 			locFilter.acc_id = [ locFilter.acc_id ];
 
 		if (locFilter.acc_id.length)
@@ -501,35 +475,38 @@ function buildAddress()
 // Account change event handler
 function onAccountChange(obj)
 {
-	var acc;
-	var reloadNeeded = false;
-
 	// Check all accounts from the new selection present in current selection
-	for(acc in obj)
+	var data = Array.isArray(obj) ? obj : [ obj ];
+	var reloadNeeded = data.some(function(item)
 	{
-		if (!filterObj.acc_id || filterObj.acc_id.indexOf(parseInt(acc)) == -1)
+		if (!filterObj.acc_id || !filterObj.acc_id.includes(parseInt(item.id)))
 		{
-			reloadNeeded = true;
-			break;
+			return true;
 		}
-	}
+
+		return false;
+	});
 
 	// Check all currenlty selected accounts present in the new selection
 	if (!reloadNeeded)
 	{
-		if (filterObj.acc_id.some(function(acc_id){ return !(acc_id in obj); }))
-			reloadNeeded = true;
+		reloadNeeded = filterObj.acc_id.some(function(acc_id)
+		{
+			return !data.find(function(item)
+			{
+				return item.id == acc_id;
+			})
+		});
 	}
 
 	if (!reloadNeeded)
 		return;
 
 	// Prepare parameters
-	filterObj.acc_id = [];
-	for(acc in obj)
+	filterObj.acc_id = data.map(function(item)
 	{
-		filterObj.acc_id.push(parseInt(acc));
-	}
+		return parseInt(item.id);
+	});
 
 	// Clear page number because list of transactions guaranteed to change on change accounts filter
 	if ('page' in filterObj)
@@ -628,7 +605,7 @@ function onRangeSelect(range)
 
 	calendarObj.hide();
 
-	datefield.value = Calendar.format(range.start) + ' - ' + Calendar.format(range.end);
+	datefield.value = DatePicker.format(range.start) + ' - ' + DatePicker.format(range.end);
 }
 
 
@@ -638,8 +615,8 @@ function onDatePickerHide()
 	if (!selRange)
 		return;
 
-	var newStartDate = Calendar.format(selRange.start);
-	var newEndDate = Calendar.format(selRange.end);
+	var newStartDate = DatePicker.format(selRange.start);
+	var newEndDate = DatePicker.format(selRange.end);
 
 	if (filterObj.stdate == newStartDate && filterObj.enddate == newEndDate)
 		return;
@@ -660,7 +637,7 @@ function showCalendar()
 {
 	if (!calendarObj)
 	{
-		calendarObj = Calendar.create({ wrapper_id : 'calendar',
+		calendarObj = DatePicker.create({ wrapper_id : 'calendar',
 										relparent : ge('calendar').parentNode,
 										range : true,
 										onrangeselect : onRangeSelect,

@@ -779,7 +779,7 @@ function importLoadCallback(response)
 	rowsContainer.classList.add('column');
 
 	data = JSON.parse(response);
-	if (!isArray(data))
+	if (!Array.isArray(data))
 		return;
 
 	cleanTrRows();

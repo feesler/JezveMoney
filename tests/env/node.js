@@ -67,6 +67,16 @@ export class NodeEnvironment extends Environment
 	}
 
 
+	async closest(elem, selector)
+	{
+		if (!elem || typeof selector !== 'string')
+			return null;
+
+		let res = await elem.evaluateHandle((el, sel) => el.closest(sel), selector);
+		return res.asElement();
+	}
+
+
 	async prop(elem, prop)
 	{
 		if (!elem || typeof prop !== 'string')

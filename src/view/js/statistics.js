@@ -37,7 +37,7 @@ function onRangeSelect(range)
 
 	selRange = range;
 
-	datefield.value = Calendar.format(range.start) + ' - ' + Calendar.format(range.end);
+	datefield.value = DatePicker.format(range.start) + ' - ' + DatePicker.format(range.end);
 }
 
 
@@ -47,8 +47,8 @@ function onDatePickerHide()
 	if (!selRange)
 		return;
 
-	filterObj.stdate = Calendar.format(selRange.start);
-	filterObj.enddate = Calendar.format(selRange.end);
+	filterObj.stdate = DatePicker.format(selRange.start);
+	filterObj.enddate = DatePicker.format(selRange.end);
 
 	window.location = buildAddress();
 }
@@ -59,7 +59,7 @@ function showCalendar()
 {
 	if (!calendarObj)
 	{
-		calendarObj = Calendar.create({ wrapper_id : 'calendar',
+		calendarObj = DatePicker.create({ wrapper_id : 'calendar',
 										relparent : ge('calendar').parentNode,
 										range : true,
 										onrangeselect : onRangeSelect,
@@ -235,35 +235,21 @@ function onBarOut(bar)
 // Initialization of page controls
 function initControls()
 {
-	var isMobile;
-	var filterDD, accCurrDD, groupDD;
-
-	isMobile = (document.documentElement.clientWidth < 700);
-
 	Charts.createHistogram({ data : chartData, container : 'chart', autoScale : true,
 							onbarclick : onBarClick, onscroll : onChartsScroll,
 							onbarover : onBarOver, onbarout : onBarOut });
 
-	filterDD = new DDList();
-	if (!filterDD.create({ input_id : 'filter_type', selCB : onFilterSel, editable : false, mobile : isMobile }))
-		filterDD = null;
-
-	accCurrDD = new DDList();
+	DropDown.create({ input_id : 'filter_type', onitemselect : onFilterSel, editable : false });
 	if (filterObj.filter == 'currency')
 	{
-		if (!accCurrDD.create({ input_id : 'curr_id', selCB : onCurrencySel, editable : false, mobile : isMobile }))
-			accCurrDD = null;
+		DropDown.create({ input_id : 'curr_id', onitemselect : onCurrencySel, editable : false });
 	}
 	else
 	{
-		if (!accCurrDD.create({ input_id : 'acc_id', selCB : onAccountSel, editable : false, mobile : isMobile }))
-			accCurrDD = null;
+		DropDown.create({ input_id : 'acc_id', onitemselect : onAccountSel, editable : false });
 	}
 
-	groupDD = new DDList();
-	if (!groupDD.create({ input_id : 'groupsel', selCB : onGroupSel, editable : false, mobile : isMobile }))
-		groupDD = null;
-
+	DropDown.create({ input_id : 'groupsel', onitemselect : onGroupSel, editable : false });
 
 	var btn;
 	var calendar_btn = ge('calendar_btn');

@@ -163,19 +163,17 @@ export class AccountView extends TestView
 		}
 
 		let curChildren = (res.isUpdate) ? 3 : 2;
-		let elem = await this.query(`form > *:nth-child(${curChildren}) .dd_container`);
 
-		res.iconDropDown = await DropDown.create(this, elem);
+		res.iconDropDown = await DropDown.createFromChild(this, await this.query('#icon'));
 
 		curChildren++;
-		elem = await this.query(`form > *:nth-child(${curChildren})`);
+		let elem = await this.query(`form > *:nth-child(${curChildren})`);
 		res.name = await InputRow.create(this, elem);
 		if (!res.name)
 			throw new Error('Account name input not found');
 
 		curChildren++;
-		elem = await this.query(`form > *:nth-child(${curChildren}) .dd_container`);
-		res.currDropDown = await DropDown.create(this, elem);
+		res.currDropDown = await DropDown.createFromChild(this, await this.query('#currency'));
 
 		curChildren++;
 		elem = await this.query(`form > *:nth-child(${curChildren})`);

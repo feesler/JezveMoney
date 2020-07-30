@@ -137,10 +137,10 @@ class StatisticsController extends TemplateController
 
 		$titleString = "Jezve Money | Statistics";
 
-		array_push($this->css->libs, "iconlink.css", "ddlist.css", "calendar.css", "charts.css");
+		array_push($this->css->libs, "iconlink.css", "dropdown.css", "datepicker.css", "charts.css");
 		$this->css->page[] = "statistics.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "calendar.js", "ddlist.js", "lib/raphael.min.js", "charts.js", "statistics.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "datepicker.js", "dropdown.js", "lib/raphael.min.js", "charts.js", "statistics.js");
 
 		include(TPL_PATH."statistics.tpl");
 	}

@@ -22,25 +22,21 @@ export class StatisticsView extends TestView
 		if (!filtersList || filtersList.length != 4)
 			throw new Error('Wrong statistics view structure');
 
-		let filterByElem = await this.query(filtersList[0], ':scope > *');
-		res.filterByDropDown = await DropDown.create(this, filterByElem);
+		res.filterByDropDown = await DropDown.createFromChild(this, await this.query('#filter_type'));
 
 		res.accountsDropDown = null;
 		if (await this.isVisible(filtersList[1]))
 		{
-			let ddElem = await this.query(filtersList[1], ':scope > *');
-			res.accountsDropDown = await DropDown.create(this, ddElem);
+			res.accountsDropDown = await DropDown.createFromChild(this, await this.query('#acc_id'));
 		}
 
 		res.currencyDropDown = null;
 		if (await this.isVisible(filtersList[2]))
 		{
-			let ddElem = await this.query(filtersList[2], ':scope > *');
-			res.currencyDropDown = await DropDown.create(this, ddElem);
+			res.currencyDropDown = await DropDown.createFromChild(this, await this.query('#curr_id'));
 		}
 
-		let groupElem = await this.query(filtersList[3], ':scope > *');
-		res.groupDropDown = await DropDown.create(this, groupElem);
+		res.groupDropDown = await DropDown.createFromChild(this, await this.query('#groupsel'));
 
 		res.chart = { elem : await this.query('#chart'), bars : [] };
 		if (!res.chart)

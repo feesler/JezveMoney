@@ -9,7 +9,6 @@ function TransactionViewModel()
 	this.exchangeInput = null;
 
 	this.calendarObj = null;
-	this.isMobile;
 	this.accDDList = null;
 	this.dwPopup = null;		// delete warning popup
 	this.submitStarted = false;
@@ -26,7 +25,7 @@ function TransactionViewModel()
 		if (!datefield)
 			return;
 
-		datefield.value = Calendar.format(date);
+		datefield.value = DatePicker.format(date);
 
 		self.calendarObj.hide();
 	}
@@ -37,7 +36,7 @@ function TransactionViewModel()
 	{
 		if (!self.calendarObj)
 		{
-			self.calendarObj = Calendar.create({ wrapper_id : 'calendar', relparent : ge('calendar').parentNode, ondateselect : onSelectDate });
+			self.calendarObj = DatePicker.create({ wrapper_id : 'calendar', relparent : ge('calendar').parentNode, ondateselect : onSelectDate });
 			if (!self.calendarObj)
 				return;
 		}
@@ -1288,16 +1287,11 @@ function TransactionViewModel()
 		if (self.accDDList)
 			return;
 
-		self.accDDList = new DDList();
-		if (self.accDDList.create({ input_id : 'acc_tile', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : self.isMobile }))
+		self.accDDList = DropDown.create({ input_id : 'acc_tile', listAttach : true, onitemselect : onDebtAccSel, editable : false });
+		accounts.forEach(function(acc)
 		{
-			accounts.forEach(function(acc)
-			{
-				self.accDDList.addItem(acc.id, acc.name);
-			});
-		}
-		else
-			self.accDDList = null;
+			self.accDDList.addItem(acc.id, acc.name);
+		});
 	}
 
 
@@ -1419,72 +1413,53 @@ function TransactionViewModel()
 			if (elem)
 				elem.onclick = onChangeDebtOp;
 
-			persDDList = new DDList();
-			if (persDDList.create({ input_id : 'person_tile', listAttach : true, selCB : onPersAccSel, editable : false, mobile : self.isMobile }))
+			persDDList = DropDown.create({ input_id : 'person_tile', listAttach : true, onitemselect : onPersAccSel, editable : false });
+			persons.forEach(function(person)
 			{
-				persons.forEach(function(person)
-				{
-					persDDList.addItem(person.id, person.name);
-				});
-			}
-			else
-				persDDList = null;
+				persDDList.addItem(person.id, person.name);
+			});
 
 			if (!Transaction.noAccount())
 				initAccList();
 		}
 		else
 		{
-			srcDDList = new DDList();
-			if (srcDDList.create({ input_id : 'source_tile', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : self.isMobile }))
+			srcDDList = DropDown.create({ input_id : 'source_tile', listAttach : true, onitemselect : onSrcAccSel, editable : false });
+			if (srcDDList)
 			{
 				accounts.forEach(function(acc)
 				{
 					srcDDList.addItem(acc.id, acc.name);
 				});
 			}
-			else
-				srcDDList = null;
 
-			destDDList = new DDList();
-			if (destDDList.create({ input_id : 'dest_tile', listAttach : true, selCB : onDestAccSel, editable : false, mobile : self.isMobile }))
+			destDDList = DropDown.create({ input_id : 'dest_tile', listAttach : true, onitemselect : onDestAccSel, editable : false });
+			if (destDDList)
 			{
 				accounts.forEach(function(acc)
 				{
 					destDDList.addItem(acc.id, acc.name);
 				});
 			}
-			else
-				destDDList = null;
 		}
 
 
 		if (Transaction.isIncome())
 		{
-			srcCurrDDList = new DDList();
-			if (srcCurrDDList.create({ input_id : 'srcamountsign', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : self.isMobile }))
+			srcCurrDDList = DropDown.create({ input_id : 'srcamountsign', listAttach : true, onitemselect : onSrcCurrencySel, editable : false });
+			currency.forEach(function(curr)
 			{
-				currency.forEach(function(curr)
-				{
-					srcCurrDDList.addItem(curr.id, curr.name);
-				});
-			}
-			else
-				srcCurrDDList = null;
+				srcCurrDDList.addItem(curr.id, curr.name);
+			});
 		}
 
 		if (Transaction.isExpense())
 		{
-			destCurrDDList = new DDList();
-			if (destCurrDDList.create({ input_id : 'destamountsign', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : self.isMobile }))
+			destCurrDDList = DropDown.create({ input_id : 'destamountsign', listAttach : true, onitemselect : onDestCurrencySel, editable : false });
+			currency.forEach(function(curr)
 			{
-				currency.forEach(function(curr)
-				{
-					destCurrDDList.addItem(curr.id, curr.name);
-				});
-			}
-			else
-				destCurrDDList = null;
+				destCurrDDList.addItem(curr.id, curr.name);
+			});
 		}
 	}
 }

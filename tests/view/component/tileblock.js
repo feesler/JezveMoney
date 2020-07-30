@@ -16,7 +16,7 @@ export class TileBlock extends NullableComponent
 		if (!this.tile)
 			throw new Error('Tile not found');
 
-		let ddElem = await this.query(this.elem, '.dd_attached');
+		let ddElem = await this.query(this.elem, '.dd__container_attached');
 		this.dropDown = await DropDown.create(this.parent, ddElem);
 	}
 

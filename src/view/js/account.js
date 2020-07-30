@@ -66,7 +66,7 @@ function getAccountPos(acc_id)
 {
 	var pos = -1;
 
-	if (!isArray(accounts) || !acc_id)
+	if (!Array.isArray(accounts) || !acc_id)
 		return -1;
 
 	accounts.some(function(acc, ind)
@@ -88,7 +88,7 @@ function getPrevAccount(acc_id)
 {
 	var pos;
 
-	if (!isArray(accounts) || accounts.length < 2 || !acc_id)
+	if (!Array.isArray(accounts) || accounts.length < 2 || !acc_id)
 		return -1;
 
 	pos = getAccountPos(acc_id);
@@ -107,7 +107,7 @@ function getNextAccount(acc_id)
 {
 	var pos;
 
-	if (!isArray(accounts) || accounts.length < 2 || !acc_id)
+	if (!Array.isArray(accounts) || accounts.length < 2 || !acc_id)
 		return -1;
 
 	pos = getAccountPos(acc_id);

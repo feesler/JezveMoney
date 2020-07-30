@@ -41,18 +41,8 @@ function onCurrencySel(obj)
 // Initialization of page controls
 function initControls()
 {
-	var isMobile;
-	var currDDList, iconDDList;
-
-	isMobile = (document.documentElement.clientWidth < 700);
-
-	iconDDList = new DDList();
-	if (!iconDDList.create({ input_id : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
-		iconDDList = null;
-
-	currDDList = new DDList();
-	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
-		currDDList = null;
+	DropDown.create({ input_id : 'icon', onitemselect : onIconSel, editable : false });
+	DropDown.create({ input_id : 'currency', onitemselect : onCurrencySel, editable : false });
 
 	DecimalInput.create({ elem : ge('balance'), oninput : onAccInitBalanceInput });
 
