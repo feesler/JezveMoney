@@ -1,4 +1,19 @@
 // Drop Down List constructor
+// params:
+//  input_id - identifier of element to attach DropDown comonent to
+//  editable - if set true user will be able to type text in the combo box
+//  disabled - if set true any interactions with componenet will be disabled
+//  useNativeSelect - if set true componenet will use native select element on small devices(less 768px width) to view list and edit selection
+//  fullScreen - if set true component will show fullscreen popup
+//  placeholder - placeholder text for component
+//  maxHeight - maximum count of items to show in drop down list
+//  onitemselect - item selected event handler
+//  onchange - selection changed event handler
+//  oninput - text field input event handler. If set true will filter list by value of input
+//  renderItem - callback for custom selected item render
+//  resultTarget - identifier or element to copy selection data to
+//  extraClass - additional CSS classes
+//  data - array of item objects { id, title }
 function DropDown(params)
 {
 	this.changed = false;
@@ -25,8 +40,6 @@ function DropDown(params)
 
 	this.useNativeSelect = ('useNativeSelect' in params) ? !!params.useNativeSelect : false;
 	this.fullScreen = ('fullScreen' in params) ? !!params.fullScreen : false;
-
-	this.separator = params.separator || ', ';
 
 	this.setMaxHeight(params);
 
@@ -264,16 +277,16 @@ DropDown.prototype.createCombo = function()
 
 	this.toggleBtn = this.createToggleButton();
 
-	res = ce('div',
-			{ className : 'dd__combo' },
-			[
-				this.selectionElem,
-				this.staticElem,
-				this.inputElem,
-				this.selectElem,
-				this.list,
-				this.toggleBtn
-			]);
+	res = ce('div', { className : 'dd__combo' });
+	if (this.multi)
+		addChilds(res, this.selectionElem);
+	addChilds(res, [
+		this.staticElem,
+		this.inputElem,
+		this.selectElem,
+		this.list,
+		this.toggleBtn
+	]);
 
 	return res;
 };
@@ -400,9 +413,13 @@ DropDown.prototype.onSelectItem = function(item)
 		{
 			this.selection.deselect(item.id);
 			item.selectedElem = null;
+			item.selected = false;
 		}
 		else
+		{
 			this.selection.select(item.id, item.title);
+			item.selected = true;
+		}
 
 		if (this.selectElem)
 			selectByValue(this.selectElem, item.id, this.selection.isSelected(item.id));
@@ -413,8 +430,9 @@ DropDown.prototype.onSelectItem = function(item)
 	}
 	else
 	{
-		this.selection.clear();
+		this.clearSelection();
 		this.selection.select(item.id, item.title);
+		item.selected = true;
 
 		if (this.selectElem)
 			selectByValue(this.selectElem, item.id);
@@ -672,7 +690,7 @@ DropDown.prototype.onInput = function()
 
 /*	List items methods */
 
-//
+// Return list item object by id
 DropDown.prototype.getItem = function(item_id)
 {
 	return this.items.find(function(item)
@@ -682,7 +700,7 @@ DropDown.prototype.getItem = function(item_id)
 };
 
 
-//
+// Return index of list item by id
 DropDown.prototype.getItemIndex = function(item_id)
 {
 	return this.items.findIndex(function(item)
@@ -692,7 +710,8 @@ DropDown.prototype.getItemIndex = function(item_id)
 };
 
 
-//
+// Return previous list item to specified by id
+// Return null in case specified list item is not found or on first position
 DropDown.prototype.getPrevItem = function(item_id)
 {
 	var ind = this.getItemIndex(item_id);
@@ -706,6 +725,8 @@ DropDown.prototype.getPrevItem = function(item_id)
 };
 
 
+// Return next list item to specified by id
+// Return null in case specified list item is not found or on last position
 DropDown.prototype.getNextItem = function(item_id)
 {
 	var ind = this.getItemIndex(item_id);
@@ -719,6 +740,7 @@ DropDown.prototype.getNextItem = function(item_id)
 };
 
 
+// Return array of visible(not hidden) list items
 DropDown.prototype.getVisibleItems = function()
 {
 	return this.items.filter(function(item)
@@ -728,6 +750,8 @@ DropDown.prototype.getVisibleItems = function()
 };
 
 
+// Return previous visible list item to specified by id
+// Return null in case specified list item is not found or on first position
 DropDown.prototype.getPrevVisibleItem = function(item_id)
 {
 	var item = this.getItem(item_id);
@@ -743,6 +767,8 @@ DropDown.prototype.getPrevVisibleItem = function(item_id)
 };
 
 
+// Return next visible list item to specified by id
+// Return null in case specified list item is not found or on last position
 DropDown.prototype.getNextVisibleItem = function(item_id)
 {
 	var item = this.getItem(item_id);
@@ -768,7 +794,7 @@ DropDown.prototype.getSelectedItems = function()
 };
 
 
-//
+// Return list item object which list element contains specified element
 DropDown.prototype.getItemByElem = function(elem)
 {
 	if (!elem)
@@ -789,7 +815,7 @@ DropDown.prototype.getListHeight = function()
 };
 
 
-//
+// Show or hide drop down list
 DropDown.prototype.show = function(val)
 {
 	if (isVisible(this.selectElem))
@@ -937,6 +963,7 @@ DropDown.prototype.makeEditable = function(val)
 };
 
 
+// Enable or disable component
 DropDown.prototype.enable = function(val)
 {
 	val = (typeof val !== 'undefined') ? val : true;
@@ -965,6 +992,7 @@ DropDown.prototype.enable = function(val)
 };
 
 
+// Show drop down list if hidden or hide if visible
 DropDown.prototype.toggleList = function()
 {
 	if (!this.list || !this.listElem || this.disabled)
@@ -986,6 +1014,7 @@ DropDown.prototype.toggleList = function()
 };
 
 
+// Activate or deactivate component
 DropDown.prototype.activate = function(val)
 {
 	if (val)
@@ -1000,6 +1029,7 @@ DropDown.prototype.activate = function(val)
 };
 
 
+// Check specified element is child of some selected item element
 DropDown.prototype.isSelectedItemElement = function(elem)
 {
 	return elem && Array.isArray(this.selectedElems) &&
@@ -1010,12 +1040,14 @@ DropDown.prototype.isSelectedItemElement = function(elem)
 };
 
 
+// Check specified element is child of component
 DropDown.prototype.isChildTarget = function(elem)
 {
 	return elem && this.containerElem.contains(elem);
 };
 
 
+// Return selected item element for specified item object
 DropDown.prototype.renderSelectedItem = function(item)
 {
 	var deselectButton = ce('span', { className : 'dd__del-selection-item-btn', innerHTML : '&times;' });
@@ -1025,6 +1057,7 @@ DropDown.prototype.renderSelectedItem = function(item)
 };
 
 
+// Render selection elements
 DropDown.prototype.renderSelection = function()
 {
 	var selectedItems = this.getSelectedItems();
@@ -1063,17 +1096,25 @@ DropDown.prototype.renderSelection = function()
 };
 
 
+// Deselect all items
+DropDown.prototype.clearSelection = function()
+{
+	this.items.forEach(function(item)
+	{
+		item.selected = false;
+	});
+	this.selection.clear();
+};
+
+
+// Return selected items data for 'itemselect' and 'change' events
 DropDown.prototype.getSelectionData = function()
 {
-	var selectedItems = this.items.filter(function(item)
-	{
-		item.selected = this.selection.isSelected(item.id);
-		return item.selected;
-	}, this)
-	.map(function(item)
-	{
-		return { id : item.id, value : item.title };
-	});
+	var selectedItems = this.getSelectedItems()
+							.map(function(item)
+							{
+								return { id : item.id, value : item.title };
+							});
 
 	if (this.multi)
 		return selectedItems;
