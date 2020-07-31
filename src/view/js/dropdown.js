@@ -127,8 +127,6 @@ function DropDown(params)
 
 	this.makeEditable(this.editable);
 
-	this.selection = new Selection();
-
 	this.items = [];
 	if (inpObj.tagName == 'SELECT')
 	{
@@ -322,7 +320,10 @@ DropDown.prototype.onListItemClick = function(e)
 {
 	var item = this.getItemByElem(e.target)
 	if (item)
-		this.onSelectItem(item);
+		this.toggleItem(item.id);
+
+	if (!this.multi)
+		this.show(false);
 
 	return true;
 };
@@ -334,15 +335,12 @@ DropDown.prototype.onChange = function()
 	if (!this.selectElem || !this.selectElem.options || this.selectElem.selectedIndex == -1)
 		return;
 
-	this.selection.clear();
 	this.items.forEach(function(item)
 	{
 		if (!item.optionElem)
 			return;
 
 		item.selected = item.optionElem.selected;
-		if (item.selected)
-			this.selection.select(item.id, item.title);
 	}, this);
 
 	this.sendItemSelectEvent();
@@ -401,54 +399,6 @@ DropDown.prototype.onBlur = function(e)
 };
 
 
-//
-DropDown.prototype.onSelectItem = function(item)
-{
-	if (!item || !item.id)
-		return;
-
-	if (this.multi)
-	{
-		if (this.selection.isSelected(item.id))
-		{
-			this.selection.deselect(item.id);
-			item.selectedElem = null;
-			item.selected = false;
-		}
-		else
-		{
-			this.selection.select(item.id, item.title);
-			item.selected = true;
-		}
-
-		if (this.selectElem)
-			selectByValue(this.selectElem, item.id, this.selection.isSelected(item.id));
-		if (this.resultTarget)
-			selectByValue(this.resultTarget, item.id, this.selection.isSelected(item.id));
-
-		this.check(item.id, this.selection.isSelected(item.id));
-	}
-	else
-	{
-		this.clearSelection();
-		this.selection.select(item.id, item.title);
-		item.selected = true;
-
-		if (this.selectElem)
-			selectByValue(this.selectElem, item.id);
-		if (this.resultTarget)
-			selectByValue(this.resultTarget, item.id);
-	}
-
-	this.sendItemSelectEvent();
-
-	this.changed = true;
-
-	if (!this.multi)
-		this.show(false);
-};
-
-
 // Click by delete button of selected item event handler
 DropDown.prototype.onDeleteSelectedItem = function(e)
 {
@@ -492,7 +442,7 @@ DropDown.prototype.onDeleteSelectedItem = function(e)
 
 	var item = selectedItems[index];
 	if (item)
-		this.deselect(item.id);
+		this.deselectItem(item.id);
 
 	return true;
 };
@@ -564,7 +514,7 @@ DropDown.prototype.onKey = function(e)
 
 			var item = selectedItems[index];
 			if (item)
-				this.deselect(item.id);
+				this.deselectItem(item.id);
 		}
 
 		return true;
@@ -655,7 +605,11 @@ DropDown.prototype.onKey = function(e)
 	else if (e.code == 'Enter')				// enter
 	{
 		if (this.actItem)
-			this.onSelectItem(this.actItem);
+		{
+			this.toggleItem(this.actItem.id);
+			if (!this.multi)
+				this.show(false);
+		}
 		e.preventDefault ? e.preventDefault() : (e.returnValue = false);
 	}
 	else if (e.code == 'Escape')
@@ -677,7 +631,7 @@ DropDown.prototype.onKey = function(e)
 };
 
 
-//
+// Handler for 'input' event of text field 
 DropDown.prototype.onInput = function()
 {
 	if (isFunction(this.inputCallback))
@@ -1103,7 +1057,6 @@ DropDown.prototype.clearSelection = function()
 	{
 		item.selected = false;
 	});
-	this.selection.clear();
 };
 
 
@@ -1166,10 +1119,10 @@ DropDown.prototype.saveResult = function()
 	}
 	else
 	{
-		var selItems = this.selection.getIdArray();
-		if (Array.isArray(selItems) && selItems.length > 0)
+		var selectedItems = this.getSelectedItems();
+		if (Array.isArray(selectedItems) && selectedItems.length > 0)
 		{
-			this.resultTarget.value = selItems[0];
+			this.resultTarget.value = selectedItems[0].id;
 		}
 		else
 		{
@@ -1179,17 +1132,54 @@ DropDown.prototype.saveResult = function()
 };
 
 
-DropDown.prototype.select = function(item_id)
+// Toggle item selected status
+DropDown.prototype.toggleItem = function(item_id)
 {
 	var item = this.getItem(item_id);
 	if (!item)
-		return;
+		throw new Error('Item ' + item_id + ' not found');
 
-	this.onSelectItem(item);
+	if (item.selected)
+		return this.deselectItem(item_id);
+	else
+		return this.selectItem(item_id);
 };
 
 
-DropDown.prototype.deselect = function(item_id)
+// Select specified item
+DropDown.prototype.selectItem = function(item_id)
+{
+	var item = this.getItem(item_id);
+	if (!item)
+		throw new Error('Item ' + item_id + ' not found');
+
+	if (item.selected)
+		return;
+
+	if (this.multi)
+	{
+		this.check(item.id, true);
+	}
+	else
+	{
+		this.clearSelection();
+	}
+
+	if (this.selectElem)
+		selectByValue(this.selectElem, item.id);
+	if (this.resultTarget)
+		selectByValue(this.resultTarget, item.id);
+
+	item.selected = true;
+
+	this.sendItemSelectEvent();
+
+	this.changed = true;
+};
+
+
+// Deselect specified item
+DropDown.prototype.deselectItem = function(item_id)
 {
 	var item = this.getItem(item_id);
 	if (!item)
@@ -1198,11 +1188,10 @@ DropDown.prototype.deselect = function(item_id)
 	if (!item.selected)
 		return;
 
-	this.selection.deselect(item_id);
 	if (this.multi)
 	{
-		selectByValue(this.selectElem, item_id, false);
 		this.check(item_id, false);
+		selectByValue(this.selectElem, item_id, false);
 		if (this.resultTarget)
 			selectByValue(this.resultTarget, item_id, false);
 	}
@@ -1217,6 +1206,8 @@ DropDown.prototype.deselect = function(item_id)
 	item.selected = false;
 
 	this.renderSelection();
+
+	this.changed = true;
 };
 
 
@@ -1400,8 +1391,6 @@ DropDown.prototype.parseSelect = function(elem)
 			{
 				this.check(item.id, true);
 			}
-
-			this.selection.select(item_id, title);
 		}
 	}
 
@@ -1455,7 +1444,7 @@ DropDown.prototype.addItem = function(item_id, str, appendToSelect)
 	if (typeof appendToSelect === 'undefined')
 		appendToSelect = true;
 
-	if (appendToSelect && !this.multi && isEmpty(this.selection.selected) && !this.items.length)
+	if (appendToSelect && !this.multi && !this.items.length)
 	{
 		this.selectElem.appendChild(ce('option', { disabled : true, value : 0, selected : true }));
 	}
