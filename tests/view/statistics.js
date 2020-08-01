@@ -65,13 +65,13 @@ export class StatisticsView extends TestView
 
 	async byAccounts()
 	{
-		return this.navigation(() => this.content.filterByDropDown.selectByValue(0));
+		return this.navigation(() => this.content.filterByDropDown.select(0));
 	}
 
 
 	async byCurrencies()
 	{
-		return this.navigation(() => this.content.filterByDropDown.selectByValue(1));
+		return this.navigation(() => this.content.filterByDropDown.select(1));
 	}
 
 
@@ -80,7 +80,7 @@ export class StatisticsView extends TestView
 		if (!this.content.accountsDropDown)
 			throw new Error('Account drop down control not found');
 
-		return this.navigation(() => this.content.accountsDropDown.selectByValue(acc_id));
+		return this.navigation(() => this.content.accountsDropDown.select(acc_id));
 	}
 
 
@@ -95,7 +95,7 @@ export class StatisticsView extends TestView
 
 	async selectCurrency(curr_id)
 	{
-		return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1));
+		return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.select(1));
 	}
 
 
@@ -108,7 +108,7 @@ export class StatisticsView extends TestView
 
 	async groupBy(group)
 	{
-		return this.navigation(() => this.content.groupDropDown.selectByValue(group));
+		return this.navigation(() => this.content.groupDropDown.select(group));
 	}
 
 

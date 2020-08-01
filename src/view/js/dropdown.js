@@ -322,6 +322,9 @@ DropDown.prototype.onListItemClick = function(e)
 	if (item)
 		this.toggleItem(item.id);
 
+	this.sendItemSelectEvent();
+	this.changed = true;
+
 	if (!this.multi)
 		this.show(false);
 
@@ -343,6 +346,7 @@ DropDown.prototype.onChange = function()
 		item.selected = item.optionElem.selected;
 	}, this);
 
+	this.renderSelection();
 	this.sendItemSelectEvent();
 
 	this.changed = true;
@@ -402,7 +406,7 @@ DropDown.prototype.onBlur = function(e)
 // Click by delete button of selected item event handler
 DropDown.prototype.onDeleteSelectedItem = function(e)
 {
-	if (!e || !e.target)
+	if (!e || !e.target || !this.multi)
 		return false;
 
 	if (e.type == 'keydown' && (
@@ -602,11 +606,14 @@ DropDown.prototype.onKey = function(e)
 		if (visibleItems.length > 0)
 			newItem = visibleItems[visibleItems.length - 1];
 	}
-	else if (e.code == 'Enter')				// enter
+	else if (e.code == 'Enter')
 	{
 		if (this.actItem)
 		{
 			this.toggleItem(this.actItem.id);
+			this.sendItemSelectEvent();
+			this.changed = true;
+
 			if (!this.multi)
 				this.show(false);
 		}
@@ -1083,8 +1090,6 @@ DropDown.prototype.sendItemSelectEvent = function()
 		var data = this.getSelectionData();
 		this.itemSelectCallback.call(this, data);
 	}
-
-	this.renderSelection();
 };
 
 
@@ -1139,7 +1144,7 @@ DropDown.prototype.toggleItem = function(item_id)
 	if (!item)
 		throw new Error('Item ' + item_id + ' not found');
 
-	if (item.selected)
+	if (item.selected && this.multi)
 		return this.deselectItem(item_id);
 	else
 		return this.selectItem(item_id);
@@ -1172,9 +1177,7 @@ DropDown.prototype.selectItem = function(item_id)
 
 	item.selected = true;
 
-	this.sendItemSelectEvent();
-
-	this.changed = true;
+	this.renderSelection();
 };
 
 
@@ -1206,8 +1209,6 @@ DropDown.prototype.deselectItem = function(item_id)
 	item.selected = false;
 
 	this.renderSelection();
-
-	this.changed = true;
 };
 
 

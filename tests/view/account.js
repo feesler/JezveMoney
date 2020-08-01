@@ -52,7 +52,7 @@ export class AccountView extends TestView
 		let selectedCurr = cont.currDropDown.textValue;
 		res.currObj = Currency.findByName(selectedCurr);
 		if (!res.currObj)
-			throw new Error(`Currency ${selectedCurr} not found`);
+			throw new Error(`Currency '${selectedCurr}' not found`);
 
 		res.curr_id = res.currObj.id
 

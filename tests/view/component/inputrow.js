@@ -57,9 +57,9 @@ export class InputRow extends NullableComponent
 	}
 
 
-	async selectCurr(val)
+	async selectCurr(curr_id)
 	{
 		if (this.isCurrActive && this.currDropDown)
-			return this.currDropDown.selectByValue(val);
+			return this.currDropDown.select(curr_id);
 	}
 }

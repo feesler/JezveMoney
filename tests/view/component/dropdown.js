@@ -57,7 +57,10 @@ export class DropDown extends NullableComponent
 				throw new Error('Input element not found');
 
 			this.editable = await this.isVisible(this.inputElem);
-			this.textValue = await ((this.editable) ? this.prop(this.inputElem, 'value') : this.prop(this.statSel, 'textContent'));
+			if (this.editable)
+				this.textValue = await this.prop(this.inputElem, 'value');
+			else
+				this.textValue = await this.prop(this.statSel, 'textContent')
 		}
 
 		this.selectElem = await this.query(this.elem, 'select');
@@ -109,12 +112,16 @@ export class DropDown extends NullableComponent
 	}
 
 
-	async selectByValue(val)
+	async selectItem(item_id)
 	{
-		await this.click(this.selectBtn);
-		let li = this.items.find(item => item.id == val);
+		let listVisible = await this.isVisible(this.listContainer);
+		if (!listVisible)
+			await this.click(this.selectBtn);
+
+		let li = this.items.find(item => item.id == item_id);
 		if (!li)
 			throw new Error('List item not found');
+
 		await this.click(li.elem);
 	}
 
@@ -125,7 +132,7 @@ export class DropDown extends NullableComponent
 
 		for(let value of values)
 		{
-			await this.selectByValue(value);
+			await this.selectItem(value);
 		}
 
 		if (this.isMulti)
