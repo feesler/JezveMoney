@@ -10,7 +10,7 @@
 					<div class="heading">
 						<h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {	?>
-						<div id="del_btn" class="iconlink"><button type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 
@@ -20,7 +20,7 @@
 						<input id="accid" name="id" type="hidden" value="<?=e($acc_id)?>">
 <?php	}	?>
 						<div class="non_float std_margin">
-							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($accInfo->balfmt)?></span><span class="acc_name"><?=e($tileAccName)?></span></span></button></div>
+							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($accInfo->balfmt)?></span><span class="acc_icon"><?=useIcon("tile-".$accInfo->iconname, 60, 54)?></span><span class="acc_name"><?=e($tileAccName)?></span></span></button></div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="icon">Icon</label>
@@ -77,6 +77,7 @@
 </form>
 <?php	}	?>
 
+<?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
 	var currency = <?=JSON::encode($currArr)?>;

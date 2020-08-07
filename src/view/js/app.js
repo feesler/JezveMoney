@@ -130,22 +130,6 @@ function idSearch(arr, id)
 }
 
 
-// Check real DPI value and load required stylesheet
-function fixDPI()
-{
-	var headEl, img_css;
-
-	img_css = baseURL + 'view/css/';
-	img_css += (getRealDPI() > 1) ? 'double_dpi.css' : 'single_dpi.css';
-	img_css += '?' + Date.now();
-	headEl = head();
-
-	if (headEl)
-		headEl.appendChild(ce('link', { rel : 'stylesheet', href : img_css }));
-}
-
-
-
 function initHeader()
 {
 	var userbtn = ge('userbtn');

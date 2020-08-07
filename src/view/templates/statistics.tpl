@@ -83,13 +83,13 @@
 						<div class="std_margin clearfix">
 							<div class="tr_filter">
 <?php	if (is_empty($dateFmt)) {		?>
-								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span>Select range</span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php	} else { 	?>
-								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php	} 	?>
 								<div id="date_block" style="display: none;">
 									<div>
-										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><?=svgIcon("cal")?></button>
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>

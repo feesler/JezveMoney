@@ -9,9 +9,9 @@
 <?php	if ($showPaginator == TRUE) {		?>
 							<div class="mode_selector">
 <?php		if ($showDetails) {		?>
-								<a class="list_mode" href="<?=e($linkStr)?>"><span class="icon"></span><span>Classic</span></a><b class="details_mode"><span class="icon"></span><span>Details</span></b>
+								<a class="list_mode" href="<?=e($linkStr)?>"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></a><b class="details_mode"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></b>
 <?php		} else {		?>
-								<b class="list_mode"><span class="icon"></span><span>Classic</span></b><a class="details_mode" href="<?=e($linkStr)?>"><span class="icon"></span><span>Details</span></a>
+								<b class="list_mode"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></b><a class="details_mode" href="<?=e($linkStr)?>"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></a>
 <?php		}	?>
 							</div>
 <?php	}	?>

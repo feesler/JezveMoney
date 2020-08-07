@@ -52,6 +52,7 @@ class AccountsController extends TemplateController
 		$accInfo->initbalance = 0;
 		$accInfo->icon = 0;
 		$accInfo->iconclass = "";
+		$accInfo->iconname = NULL;
 
 		$currObj = $currMod->getItem($accInfo->curr_id);
 		if (!$currObj)
@@ -106,6 +107,7 @@ class AccountsController extends TemplateController
 		$accInfo->sign = ($currObj) ? $currObj->sign : NULL;
 		$accInfo->iconclass = $this->model->getIconClass($accInfo->icon);
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
+		$accInfo->iconname = $this->model->getIconName($accInfo->icon);
 		$tileAccName = $accInfo->name;
 
 		$currArr = $currMod->getData();

@@ -45,12 +45,18 @@
 {
 	width: 15px;
 	height: 32px;
-	background-repeat: no-repeat;
-	background-size: 15px 32px;
 	position: absolute;
 	left: 0;
 	top: 50%;
 	margin-top: -16px;
+}
+
+
+.sidebar_ellipsis svg
+{
+	width: 15px;
+	height: 32px;
+	fill: #FFFFFF;
 }
 
 

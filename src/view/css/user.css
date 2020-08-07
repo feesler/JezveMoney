@@ -103,8 +103,13 @@
 .login_logo > .logo
 {
 	width: 62px;
-	background-repeat: no-repeat;
-	background-size: 62px 62px;
+}
+
+
+.login_logo > .logo > svg
+{
+	width: 62px;
+	height: 62px;
 }
 
 

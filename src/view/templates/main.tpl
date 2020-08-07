@@ -8,13 +8,13 @@
 			<div class="content">
 				<div class="content_wrap">
 					<div class="widget">
-						<div class="widget_title"><a href="<?=BASEURL?>accounts/"><span>Accounts</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>accounts/"><span>Accounts</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
 						<div class="tiles"><?php
 		if (!count($tilesArr)) {	?>
 						<span>You have no one account. Please create one.</span>
 <?php	} else {
 			foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink"><span><span class="acc_bal"><?=e($tile["balance"])?></span><span class="acc_name"><?=e($tile["name"])?></span></span></a></div><?php
+?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink"><span><span class="acc_bal"><?=e($tile["balance"])?></span><span class="acc_icon"><?=useIcon("tile-".$tile["iconname"], 60, 54)?></span><span class="acc_name"><?=e($tile["name"])?></span></span></a></div><?php
 			}
 		}	?></div>
 					</div>
@@ -36,7 +36,7 @@
 					</div>
 
 					<div class="widget break_widget latest_widget">
-						<div class="widget_title"><a href="<?=BASEURL?>transactions/"><span>Transactions</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>transactions/"><span>Transactions</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
 						<div id="trlist" class="trans_list">
 <?php	if (!count($trListData)) {	?>
 							<span>You have no one transaction yet.</span>
@@ -62,7 +62,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title"><a href="<?=BASEURL?>persons/"><span>Persons</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>persons/"><span>Persons</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
 						<div class="info_tiles">
 <?php	if (!count($persArr)) {		?>
 							<span>No persons here.</span>
@@ -82,7 +82,7 @@
 					</div>
 
 					<div class="widget">
-						<div class="widget_title"><a href="<?=BASEURL?>statistics/"><span>Statistics</span><div class="glyph"></div></a></div>
+						<div class="widget_title"><a href="<?=BASEURL?>statistics/"><span>Statistics</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
 						<div id="chart" class="charts widget_charts"></div>
 					</div>
 				</div>
@@ -91,6 +91,7 @@
 	</div>
 </div>
 
+<?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
 	var currency = <?=JSON::encode($currArr)?>;
