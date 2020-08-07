@@ -30,10 +30,10 @@
 					</table>
 
 					<div class="acc_controls">
-						<input class="adm_act_btn" type="button" value="new" onclick="newUser()">
-						<input id="updbtn" class="adm_act_btn" type="button" value="update" onclick="updateUser()" style="display: none;">
-						<input id="passbtn" class="adm_act_btn" type="button" value="set password" onclick="setUserPass()" style="display: none;">
-						<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteUser()" style="display: none;">
+						<input id="createbtn" class="adm_act_btn" type="button" value="new">
+						<input id="updbtn" class="adm_act_btn" type="button" value="update" style="display: none;">
+						<input id="passbtn" class="adm_act_btn" type="button" value="set password" style="display: none;">
+						<input id="del_btn" class="adm_act_btn" type="button" value="delete" style="display: none;">
 					</div>
 				</div>
 			</div>
