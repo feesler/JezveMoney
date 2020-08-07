@@ -89,3 +89,67 @@
 	color: #FFFFFF;
 }
 
+
+@media screen and (min-width: 701px)
+{
+
+/* Sidebar */
+.sidebar
+{
+	display: block;
+	position: fixed;
+	min-height: 0;
+	height: auto;
+	width: 100%;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+
+.sidebar > div
+{
+	position: static;
+	height: 50px;
+	width: 100%;
+
+	background-color: #44AAFF;
+}
+
+
+.sidebar > div > .siderbar_content,
+.sidebar.active > div > .siderbar_content
+{
+	display: block;
+	padding: 0px;
+	color: #FFFFFF;
+	background-color: #44AAFF;
+	position: static;
+	margin: 0px auto;
+	max-width: 824px;
+	min-width: 200px;
+}
+
+
+.sidebar_ellipsis
+{
+	display: none;
+}
+
+
+.sidebar_buttons
+{
+	display: block;
+	padding: 0;
+}
+
+
+.siderbar_content .iconlink
+{
+	clear: none;
+	float: left;
+	margin: 9px 0px 9px 12px;
+}
+
+
+}
