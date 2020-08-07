@@ -17,10 +17,6 @@
 	width: 100%;
 	height: 100%;
 	background-color: #000000;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";			/* IE 8 */
-	filter: alpha(opacity=50);		/* IE 5-7 */
-	-moz-opacity: 0.5;				/* Netscape */
-	-khtml-opacity: 0.5;			/* Safari 1.x */
 	opacity: 0.5;
 }
 
@@ -56,33 +52,14 @@
 	top: 10px;
 	right: 10px;
 	height: 14px;
-	width: 14px
-}
-
-
-.popup .close_btn > button,
-.box.dragging .close_btn > button
-{
-	height: 14px;
 	width: 14px;
 	border: 0 none;
 	cursor: pointer;
-	padding: 0;
 	background: none;
 }
 
 
-.popup .close_btn > button > span,
-.box.dragging .close_btn > button > span
-{
-	width: 14px;
-	height: 14px;
-	overflow: hidden;
-	display: inline-block;
-}
-
-
-.close_btn > button > span > svg
+.close_btn > svg
 {
 	width: 14px;
 	height: 14px;
@@ -90,7 +67,7 @@
 }
 
 
-.close_btn:hover > button > span > svg
+.close_btn:hover > svg
 {
 	fill: #000000;
 }

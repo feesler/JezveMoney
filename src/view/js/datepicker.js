@@ -402,7 +402,7 @@ DatePicker.prototype.onWheel = function(e)
 	if (!isFunction(this.currView.callback.nav) || !this.currView.nav)
 		return;
 
-	schedule(this.currView.callback.nav.bind(null, dir ? this.currView.nav.prev : this.currView.nav.next))();
+	setTimeout(this.currView.callback.nav.bind(null, dir ? this.currView.nav.prev : this.currView.nav.next));
 
 	e.preventDefault ? e.preventDefault() : (e.returnValue = false);
 };
@@ -419,21 +419,21 @@ DatePicker.prototype.onViewClick = function(e)
 		if (!isFunction(this.currView.callback.hdr))
 			return;
 
-		schedule(this.currView.callback.hdr.bind(null, this.currView.viewDate))();
+		setTimeout(this.currView.callback.hdr.bind(null, this.currView.viewDate));
 	}
 	else if (this.navPrevElem.contains(e.target))
 	{
 		if (!isFunction(this.currView.callback.nav) || !this.currView.nav)
 			return;
 
-		schedule(this.currView.callback.nav.bind(null, this.currView.nav.prev))();
+		setTimeout(this.currView.callback.nav.bind(null, this.currView.nav.prev));
 	}
 	else if (this.navNextElem.contains(e.target))
 	{
 		if (!isFunction(this.currView.callback.nav) || !this.currView.nav)
 			return;
 
-		schedule(this.currView.callback.nav.bind(null, this.currView.nav.next))();
+		setTimeout(this.currView.callback.nav.bind(null, this.currView.nav.next));
 	}
 	else
 	{
@@ -446,7 +446,7 @@ DatePicker.prototype.onViewClick = function(e)
 			var cond = (setObj.cell == e.target);
 
 			if (cond)
-				schedule(this.currView.callback.cell.bind(null, setObj.date))();
+				setTimeout(this.currView.callback.cell.bind(null, setObj.date));
 
 			return cond;
 		}, this);

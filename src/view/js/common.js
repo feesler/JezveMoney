@@ -478,16 +478,6 @@ function fixEvent(e, _this)
 }
 
 
-// Return wrapper to schedule specified function for execution after current script
-function schedule(func)
-{
-	return function()
-	{
-		setTimeout(func, 1);
-	}
-}
-
-
 // Handler for click on empty space event
 function onEmptyClick(e, callback, elem)
 {
@@ -530,10 +520,10 @@ function setEmptyClick(callback, elem)
 	if (onClickHandler && document.documentElement['on' + evName])
 		document.documentElement['on' + evName]();			// run previously set callback
 	document.documentElement['on' + evName] = null;
-	schedule(function()
+	setTimeout(function()
 	{
 		document.documentElement['on' + evName] = onClickHandler;
-	})();
+	});
 }
 
 

@@ -60,6 +60,7 @@ function DropDown(params)
 	this.toggleHandler = this.toggleList.bind(this);
 	this.inputHandler = this.onInput.bind(this)
 	this.keyHandler = this.onKey.bind(this);
+	this.hoverHandler = this.onMouseOver.bind(this);
 	this.scrollHandler = this.onScroll.bind(this);
 	this.selectChangeHandler = this.onChange.bind(this);
 	this.listItemClickHandler = this.onListItemClick.bind(this);
@@ -468,12 +469,20 @@ DropDown.prototype.onKey = function(e)
 	var selectedItems = null;
 	var visibleItems = null;
 
-	if (e.target == this.inputElem)
+	if ((this.editable && e.target == this.inputElem) ||
+		(!this.editable && e.target == this.toggleBtn))
 	{
 		if (e.code == 'Backspace' || e.code == 'ArrowLeft')
 		{
-			var cursorPos = getCursorPos(this.inputElem);
-			if (cursorPos.start == cursorPos.end && cursorPos.start == 0)
+			if (this.editable)
+			{
+				var cursorPos = getCursorPos(this.inputElem);
+				if (cursorPos.start == cursorPos.end && cursorPos.start == 0)
+				{
+					this.activateLastSelectedItem();
+				}
+			}
+			else
 			{
 				this.activateLastSelectedItem();
 			}
@@ -631,10 +640,25 @@ DropDown.prototype.onKey = function(e)
 	if (newItem)
 	{
 		this.setActive(newItem);
+		this.scrollToItem(newItem);
 		e.preventDefault ? e.preventDefault() : (e.returnValue = false);
 	}
 
 	return true;
+};
+
+
+// Handler for 'mouseover' event on list item
+DropDown.prototype.onMouseOver = function(e)
+{
+	if (this.blockScroll)
+		return;
+
+	var item = this.getItemByElem(e.target);
+	if (!item)
+		return;
+
+	this.setActive(item);
 };
 
 
@@ -789,6 +813,10 @@ DropDown.prototype.show = function(val)
 
 	if (val)
 	{
+		if (!this.editable && this.toggleBtn)
+			this.toggleBtn.focus();
+		this.activate(true);
+
 		var screenBottom = document.documentElement.scrollTop + document.documentElement.clientHeight;
 
 		this.containerElem.classList.add('dd__open');
@@ -1468,7 +1496,7 @@ DropDown.prototype.addItem = function(item_id, str, appendToSelect)
 		item.divElem.innerHTML = str;
 	}
 
-	item.divElem.addEventListener('mouseover', this.setActive.bind(this, item));
+	item.divElem.addEventListener('mouseover', this.hoverHandler);
 
 	item.elem = ce('li', {}, item.divElem);
 	item.elem.addEventListener('click', this.listItemClickHandler);
@@ -1501,9 +1529,6 @@ DropDown.prototype.setActive = function(item)
 
 	item.divElem.classList.add('dd__list-item_active');
 	this.actItem = item;
-
-	// scroll list to show new active item if needed
-	this.scrollToItem(item);
 
 	if (this.editable)
 		this.inputElem.focus();
@@ -1543,6 +1568,11 @@ DropDown.prototype.scrollToItem = function(item)
 		this.blockScroll = true;
 		this.list.scrollTop = Math.min(this.list.scrollHeight, listTop + itemBottom - listBottom);
 	}
+
+	setTimeout(function()
+	{
+		this.blockScroll = false;
+	}.bind(this), 200);
 };
 
 

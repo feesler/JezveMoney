@@ -211,7 +211,7 @@ function onBarClick(barRect, val)
 
 		setParam(this.popup.style, { left : px(popupX), top : px(popupY) });
 
-		schedule(setEmptyClick.bind(this, hideChartPopup.bind(this), [barRect[0]]))();
+		setTimeout(setEmptyClick.bind(this, hideChartPopup.bind(this), [barRect[0]]));
 	}
 }
 

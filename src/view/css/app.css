@@ -834,7 +834,7 @@ label
 }
 
 
-.popup .msg .close_btn:hover > button > span > svg
+.popup .msg .close_btn:hover > svg
 {
 	fill: #FFFFFF;
 }
@@ -853,8 +853,8 @@ label
 }
 
 
-.popup .close_btn > button,
-.box.dragging .close_btn > button
+.popup .close_btn,
+.box.dragging .close_btn
 {
 	display: block;
 }
