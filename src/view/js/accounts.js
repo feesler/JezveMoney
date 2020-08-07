@@ -14,8 +14,6 @@ function onIconSel(obj)
 	if (!obj)
 		return;
 
-	this.setText(obj.str);
-
 	iconType = obj.id;
 	updateAccountTile();
 }
@@ -29,8 +27,6 @@ function onCurrencySel(obj)
 	currsign = ge('currsign');
 	if (!obj || !currsign)
 		return;
-
-	this.setText(obj.str);
 
 	acc_currency = obj.id;
 	setSign('currsign', acc_currency);

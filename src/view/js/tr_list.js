@@ -207,7 +207,6 @@ var trListSortable = null;
 function onTransClick(tr_id)
 {
 	var transObj, edit_btn, del_btn, deltrans;
-	var actDiv;
 	var selArr;
 
 	transObj = ge('tr_' + tr_id);
