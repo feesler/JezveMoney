@@ -41,7 +41,7 @@ export class ProfileView extends TestView
 		if (res.changeNamePopup.elem)
 		{
 			res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, '.popup_controls > input.btn.ok_btn');
-			res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close_btn > button');
+			res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close_btn');
 		}
 
 		res.changePassPopup = {
@@ -54,7 +54,7 @@ export class ProfileView extends TestView
 		if (res.changePassPopup.elem)
 		{
 			res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, '.popup_controls > input.btn.ok_btn');
-			res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close_btn > button');
+			res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close_btn');
 		}
 
 		res.reset_warning = await WarningPopup.create(this, await this.query('#reset_warning'));
