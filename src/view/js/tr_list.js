@@ -261,7 +261,11 @@ function initControls()
 
 	var searchFrm = ge('searchFrm');
 	if (searchFrm)
-		searchFrm.onsubmit = onSearchSubmit.bind(null, searchFrm);
+		searchFrm.addEventListener('submit', onSearchSubmit);
+
+	var searchInp = ge('search');
+	if (searchInp)
+		searchInp.inputMode = 'search';
 
 	var btn;
 	var calendar_btn = ge('calendar_btn');
@@ -516,11 +520,9 @@ function onAccountChange(obj)
 
 
 // Transaction search form submit event handler
-function onSearchSubmit(frm)
+function onSearchSubmit()
 {
-	var searchInp;
-
-	searchInp = ge('search');
+	var searchInp = ge('search');
 	if (!searchInp)
 		return false;
 

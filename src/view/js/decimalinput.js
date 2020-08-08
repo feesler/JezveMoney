@@ -8,10 +8,11 @@ function DecimalInput(props)
 	this.elem = props.elem;
 
 	this.beforeInputHandler = this.validateInput.bind(this);
-
 	this.elem.addEventListener('keypress', this.beforeInputHandler);
 	this.elem.addEventListener('paste', this.beforeInputHandler);
 	this.elem.addEventListener('beforeinput', this.beforeInputHandler);
+
+	this.elem.inputMode = 'decimal';
 
 	if (isFunction(props.oninput))
 	{
