@@ -520,7 +520,7 @@ function onAccountChange(obj)
 
 
 // Transaction search form submit event handler
-function onSearchSubmit()
+function onSearchSubmit(e)
 {
 	var searchInp = ge('search');
 	if (!searchInp)
@@ -537,7 +537,7 @@ function onSearchSubmit()
 
 	window.location = buildAddress();
 
-	return false;
+	e.preventDefault();
 }
 
 
