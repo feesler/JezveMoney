@@ -332,11 +332,11 @@
 						</div>
 <?php	}	?>
 						<div class="non_float">
-							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
-									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
+									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><?=svgIcon("cal")?></button>
 									<div class="stretch_input std_input rbtn_input">
 										<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 									</div>
