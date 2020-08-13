@@ -1405,11 +1405,11 @@ function TransactionViewModel()
 			var persDDList;
 
 			elem = ge('noacc_btn');
-			if (elem && elem.firstElementChild)
-				elem.firstElementChild.onclick = toggleEnableAccount;
+			if (elem && elem)
+				elem.addEventListener('click', toggleEnableAccount);
 			elem = ge('selaccount');
 			if (elem && elem.firstElementChild)
-				elem.firstElementChild.onclick = toggleEnableAccount;
+				elem.firstElementChild.addEventListener('click', toggleEnableAccount);
 
 			elem = ge('debtgive');
 			if (elem)

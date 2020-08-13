@@ -87,12 +87,12 @@
 
 						<div id="source" class="acc_float">
 <?php		if ($noAccount) {		?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><div id="noacc_btn" class="iconlink small_icon" style="display: none;"><button type="button"><span class="icon"><?=svgIcon("close")?></span></button></div></div>
+							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="sm-icon-btn" type="button" style="display: none;"><?=svgIcon("close")?></button></div>
 							<div class="tile_container" style="display: none;">
 								<div id="acc_tile" class="tile<?=e($acc_ic)?>"><div class="tilelink"><span><span class="acc_bal"><?=e($acc_balance)?></span><span class="acc_name"><?=e($acc_name)?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
 <?php		} else {	?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><div id="noacc_btn" class="iconlink small_icon"><button type="button"><span class="icon"><?=svgIcon("close")?></span></button></div></div>
+							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="sm-icon-btn" type="button"><?=svgIcon("close")?></button></div>
 							<div class="tile_container">
 								<div id="acc_tile" class="tile<?=($debtAcc->iconclass)?>"><div class="tilelink"><span><span class="acc_bal"><?=($debtAcc->balfmt)?></span><span class="acc_name"><?=($debtAcc->name)?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">

@@ -135,35 +135,6 @@
 }
 
 
-/* 16x16 iconlink */
-.small_icon
-{
-	height: 16px;
-}
-
-
-.small_icon .icon
-{
-	width: 16px;
-	height: 16px;
-}
-
-
-.small_icon span
-{
-	height: 16px;
-	line-height: 16px;
-	font-size: 10px;
-}
-
-
-.small_icon > a,
-.small_icon > button
-{
-	height: 16px;
-}
-
-
 /* flat square button with icon */
 .icon_btn,
 .btn.icon_btn
@@ -183,4 +154,32 @@
 	width: 24px;
 	height: 24px;
 	fill: #FFFFFF;
+}
+
+
+/* Small icon button */
+.sm-icon-btn
+{
+    padding: 1px;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    float: left;
+    display: inline-block;
+    line-height: 20px;
+    height: 20px;
+}
+
+
+.sm-icon-btn > svg
+{
+	height: 14px;
+	width: 14px;
+	fill: #888888;
+}
+
+
+.sm-icon-btn:hover > svg
+{
+	fill: #000000;
 }
