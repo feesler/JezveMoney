@@ -193,7 +193,7 @@
 						<h3>List</h3>
 						<form action="<?=BASEURL?>api/transaction/list" method="list">
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'order');"><label>Order</label>
+								<input type="checkbox" data-target="order"><label>Order</label>
 								<div id="admin_block" class="check_wr check_wr_inline">
 									<label for="isasc"><input id="isasc" name="order" type="radio" value="asc" checked disabled>Ascending</label>
 								</div>
@@ -202,27 +202,27 @@
 								</div>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'count');"><label for="count">Max. count</label>
+								<input type="checkbox" data-target="count"><label for="count">Max. count</label>
 								<input name="count" type="text" value="10" disabled>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'page');"><label for="page">Page number</label>
+								<input type="checkbox" data-target="page"><label for="page">Page number</label>
 								<input name="page" type="text" value="0" disabled>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'acc_id');"><label for="acc_id">Account id (0 for all accounts)</label>
+								<input type="checkbox" data-target="acc_id"><label for="acc_id">Account id (0 for all accounts)</label>
 								<input name="acc_id" type="text" value="0" disabled>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'stdate');"><label for="stdate">Start date</label>
+								<input type="checkbox" data-target="stdate"><label for="stdate">Start date</label>
 								<input name="stdate" type="text" value="" disabled>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'enddate');"><label for="enddate">End date</label>
+								<input type="checkbox" data-target="enddate"><label for="enddate">End date</label>
 								<input name="enddate" type="text" value="" disabled>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" onchange="onCheck(this, 'search');"><label for="search">Search request</label>
+								<input type="checkbox" data-target="search"><label for="search">Search request</label>
 								<input name="search" type="text" value="" disabled>
 							</div>
 							<div class="acc_controls">

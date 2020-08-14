@@ -677,6 +677,91 @@ function addPlaceholder(refItem)
 }
 
 
+var transCache = null;
+var importedDateRange = null;
+
+// Return first found transaction with same date and amount as reference
+function findSameTransaction(reference)
+{
+	return transCache.find(function(item)
+	{
+		return (item.src_id == mainAccObj.id || item.dest_id == mainAccObj.id) &&
+				((item.src_amount == Math.abs(reference.trAmountVal) && item.dest_amount == Math.abs(reference.accAmountVal)) ||
+				(item.src_amount == Math.abs(reference.accAmountVal) && item.dest_amount == Math.abs(reference.trAmountVal))) &&
+				item.date == reference.date &&
+				!item.picked;
+	});
+}
+
+
+function onTrCacheResult(response)
+{
+	var jsondata;
+	try
+	{ 
+		jsondata = JSON.parse(response);
+	}
+	catch(e)
+	{
+		return;
+	}
+
+	if (!jsondata || jsondata.result != 'ok')
+		return;
+
+	transCache = jsondata.data;
+
+	impRows.forEach(function(row)
+	{
+		var transaction = findSameTransaction(row.data);
+
+		if (transaction)
+		{
+			transaction.picked = true;
+			mapImportRow(row);
+		}
+	});
+
+	var notPicked = transCache.filter(function(item)
+	{
+		return !item.picked;
+	});
+
+	var notpickedcount = ge('notpickedcount');
+	if (notpickedcount)
+	{
+		notpickedcount.innerText = notPicked.length + ' (' + notPicked.map(function(item){ return item.id; }).join() + ')';
+	}
+	show('importpickstats', true);
+}
+
+
+function timestampFromDateString(str)
+{
+	if (typeof str !== 'string')
+		throw new Error('Invalid type of parameter');
+
+	var dparts = str.split('.');
+	var res = new Date(dparts[2], dparts[1] - 1, dparts[0]);
+
+	return res.getTime();
+}
+
+
+// Format date as DD.MM.YYYY
+function formatDate(date)
+{
+	if (!isDate(date))
+		throw new Error('Invalid type of parameter');
+
+	var month = date.getMonth();
+	var year = date.getFullYear();
+	var date = date.getDate();
+
+	return ((date > 9) ? '' : '0') + date + '.' + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.' + year;
+}
+
+
 // Import data request callback
 function importLoadCallback(response)
 {
@@ -694,13 +779,23 @@ function importLoadCallback(response)
 	rowsContainer.classList.add('column');
 
 	data = JSON.parse(response);
-	if (!isArray(data))
+	if (!Array.isArray(data))
 		return;
 
 	cleanTrRows();
 
+	importedDateRange = { start : 0, end : 0 };
+
 	data.forEach(function(dataObj)
 	{
+		// Store date region of imported transactions
+		var timestamp = timestampFromDateString(dataObj.date);
+
+		if (importedDateRange.start == 0 || importedDateRange.start > timestamp)
+			importedDateRange.start = timestamp;
+		if (importedDateRange.end == 0 || importedDateRange.end < timestamp)
+			importedDateRange.end = timestamp;
+
 		var impRowObj = {};
 
 		impRowObj.data = dataObj;
@@ -733,6 +828,15 @@ function importLoadCallback(response)
 	var importAllBtn = ge('importAllBtn');
 	if (importAllBtn)
 		importAllBtn.disabled = false;
+
+	var reqParams = urlJoin({
+		count : 0,
+		stdate : formatDate(new Date(importedDateRange.start)),
+		enddate : formatDate(new Date(importedDateRange.end)),
+		acc_id : mainAccObj.id
+	});
+
+	ajax.get({ url : baseURL + 'api/transaction/list/?' + reqParams, callback : onTrCacheResult });
 }
 
 
@@ -913,7 +1017,7 @@ function Uploader(file, options, onSuccess, onFail, onProgress)
 		// which file upload
 		xhrUpload.setRequestHeader('X-File-Id', fileId);
 		xhrUpload.setRequestHeader('X-File-Type', fileType);
-		xhrUpload.setRequestHeader('X-File-Stat-Type', options.isCard ? 'card' : 'account');
+		xhrUpload.setRequestHeader('X-File-Stat-Type', options.statType);
 		if (options.encode)
 			xhrUpload.setRequestHeader('X-File-Encode', 1);
 
@@ -981,9 +1085,9 @@ function onImportProgress(loaded, total)
 function onFileImport()
 {
 	var fileUploadRadio = ge('fileUploadRadio');
-	var isCardCheck = ge('isCardCheck');
+	var statTypeSel = ge('statTypeSel');
+	var statType = statTypeSel.value;
 	var isEncodeCheck = ge('isEncodeCheck');
-	var isCard = isCardCheck.checked;
 	var encode = isEncodeCheck.checked;
 
 	if (fileUploadRadio.checked)
@@ -997,7 +1101,7 @@ function onFileImport()
 			return false;
 
 		uploader = new Uploader(file,
-								{ isCard : isCard, encode : encode },
+								{ statType : statType, encode : encode },
 								onImportSuccess,
 								onImportError,
 								onImportProgress);
@@ -1013,7 +1117,7 @@ function onFileImport()
 			return false;
 
 		reqObj.fileName = el.value;
-		reqObj.isCard = (isCard ? 1 : 0);
+		reqObj.statType = statType;
 		reqObj.encode = (encode ? 1 : 0);
 
 		ajax.post({

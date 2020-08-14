@@ -10,7 +10,7 @@
 					<div class="heading">
 						<h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {	?>
-						<div id="del_btn" class="iconlink"><button type="button"><span class="icon del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 					<div>
@@ -87,12 +87,12 @@
 
 						<div id="source" class="acc_float">
 <?php		if ($noAccount) {		?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><div id="noacc_btn" class="iconlink small_icon" style="display: none;"><button type="button"><span class="icon close_gray"></span></button></div></div>
+							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="sm-icon-btn" type="button" style="display: none;"><?=svgIcon("close")?></button></div>
 							<div class="tile_container" style="display: none;">
 								<div id="acc_tile" class="tile<?=e($acc_ic)?>"><div class="tilelink"><span><span class="acc_bal"><?=e($acc_balance)?></span><span class="acc_name"><?=e($acc_name)?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
 <?php		} else {	?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><div id="noacc_btn" class="iconlink small_icon"><button type="button"><span class="icon close_gray"></span></button></div></div>
+							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="sm-icon-btn" type="button"><?=svgIcon("close")?></button></div>
 							<div class="tile_container">
 								<div id="acc_tile" class="tile<?=($debtAcc->iconclass)?>"><div class="tilelink"><span><span class="acc_bal"><?=($debtAcc->balfmt)?></span><span class="acc_name"><?=($debtAcc->name)?></span></span></div></div>
 								<input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
@@ -332,11 +332,11 @@
 						</div>
 <?php	}	?>
 						<div class="non_float">
-							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon calendar"></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
+							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 							<div id="date_block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
-									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><span></span></button>
+									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><?=svgIcon("cal")?></button>
 									<div class="stretch_input std_input rbtn_input">
 										<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 									</div>
@@ -347,10 +347,10 @@
 
 						<div class="non_float">
 <?php	if (is_empty($tr["comment"])) {		?>
-							<div id="comm_btn" class="iconlink std_margin"><button type="button"><span class="icon add"></span><span class="icontitle"><span>Add comment</span></span></button></div>
+							<div id="comm_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>Add comment</span></span></button></div>
 							<div id="comment_block" style="display: none;">
 <?php	} else {	?>
-							<div id="comm_btn" class="iconlink std_margin" style="display: none;"><button type="button"><span class="icon add"></span><span class="icontitle"><span>Add comment</span></span></button></div>
+							<div id="comm_btn" class="iconlink std_margin" style="display: none;"><button type="button"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>Add comment</span></span></button></div>
 							<div id="comment_block">
 <?php	}	?>
 								<div><label for="comm">Comment</label></div>

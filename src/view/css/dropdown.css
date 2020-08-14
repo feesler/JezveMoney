@@ -1,0 +1,460 @@
+/* Container of drop down control */
+.dd__container
+{
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	position: relative;
+}
+
+
+.dd__container_active .dd__combo,
+.dd__container_active .dd__input,
+.dd__container_active .dd__single-selection,
+.dd__container_active .dd__toggle-btn
+{
+	background-color: #c7edff;
+}
+
+
+.dd__background
+{
+	display: none;
+}
+
+
+.dd__combo
+{
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-ms-flex-align: stretch;
+	align-items: stretch;
+	box-sizing: border-box;
+	position: relative;
+	width: 100%;
+	border: 2px solid #000000;
+	background-color: #FFFFFF;
+	padding: 0px 24px 0px 0px;
+}
+
+
+/* Current selection items */
+.dd__selection
+{
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	align-content: space-around;
+	font-weight: 400;
+	font-size: 1rem;
+	vertical-align: middle;
+}
+
+
+.dd__selection-item
+{
+	display: -ms-flexbox;
+	display: flex;
+	margin: 1px;
+	padding: 3px;
+	font-weight: normal;
+	white-space: nowrap;
+	background-color: #20A0FF;
+	color: #FFFFFF;
+}
+
+
+.dd__container_enabled .dd__selection > .dd__selection-item.dd__selection-item_active,
+.dd__container_enabled .dd__selection > .dd__selection-item:hover
+{
+	background-color: #1E82CC;
+}
+
+
+.dd__selection > .dd__selection-item > .dd__del-selection-item-btn
+{
+	color: #1e82cc;
+	padding: 0 0 0 3px;
+}
+
+
+.dd__container_enabled .dd__selection > .dd__selection-item_active > .dd__del-selection-item-btn,
+.dd__container_enabled .dd__selection > .dd__selection-item:hover > .dd__del-selection-item-btn
+{
+	color: #166096;
+	cursor: pointer;
+}
+
+
+.dd__container_enabled .dd__selection > .dd__selection-item > .dd__del-selection-item-btn:hover
+{
+	color: #FFFFFF;
+}
+
+
+.dd__container_disabled .dd__selection > .dd__selection-item
+{
+	color: #CCCCCC;
+	background-color: #dfdfdf;
+}
+
+
+.dd__container_disabled .dd__selection > .dd__selection-item > .dd__del-selection-item-btn
+{
+	display: none;
+}
+
+
+/* Disabled input */
+.dd__single-selection
+{
+	display: -ms-flexbox;
+	display: flex;
+	flex: 1 0 auto;
+	font-weight: 400;
+	font-size: 1rem;
+	padding: 0 0 0 4px;
+	margin: 0;
+	height: 1.75rem;
+	line-height: 1.75rem;
+	background-color: #FFFFFF;
+	color: #000000;
+}
+
+
+.dd__single-selection_placeholder
+{
+	color: #808080;
+}
+
+
+/* Editable input */
+.dd__input
+{
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	font-family: inherit;
+	font-weight: 400;
+	font-size: 1rem;
+	padding: 0 0 0 4px;
+	margin: 0;
+	height: 1.75rem;
+	line-height: 1.75rem;
+	min-width: 50px;
+	background-color: #FFFFFF;
+	color: #000000;
+}
+
+
+.dd__input:-ms-input-placeholder
+{
+    color: #808080 !important;
+    font-weight: 400 !important;
+}
+
+
+/* Select Drop Down button */
+.dd__toggle-btn
+{
+	background: none;
+	height: 100%;
+	max-height: 2rem;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	cursor: pointer;
+}
+
+
+.dd__toggle-btn path
+{
+	fill: #808080;
+	fill-opacity: 1;
+	stroke: none;
+}
+
+
+.dd__container_enabled .dd__toggle-btn:hover path
+{
+	fill: #000000;
+}
+
+
+/* Drop down list */
+.dd__list
+{
+	background-color: #FFFFFF;
+	border-right: 2px solid #000000;
+	border-left: 2px solid #000000;
+	overflow-y: auto;
+	position: absolute;
+	width: 100%;
+	display: none;
+	z-index: 100;
+}
+
+
+.dd__open .dd__list
+{
+	display: inline-block;
+}
+
+
+.dd__list_drop-down
+{
+	border-top: 0 none;
+	border-bottom: 2px solid #000000;
+	top: 100%;
+}
+
+
+/* Drop up list */
+.dd__list_drop-up
+{
+	border-top: 2px solid #000000;
+	border-bottom: 0 none;
+	bottom: 100%;
+}
+
+
+/* Drop list to right */
+.dd__list_drop-right
+{
+	left: -2px;
+}
+
+
+/* Drop list to left */
+.dd__list_drop-left
+{
+	right: -2px;
+}
+
+
+.dd__list > ul
+{
+	padding: 0;
+	margin: 0;
+	list-style-image: none;
+	list-style-type: none;
+	overflow-x: hidden;
+}
+
+
+.dd__list-item
+{
+	padding: 10px;
+	font-size: 1rem;
+	text-align: left;
+	border-width: 0px;
+	border-style: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	cursor: pointer;
+	color: #000000;
+	background-color: #FFFFFF;
+}
+
+
+.dd__list-item_active
+{
+	color: #FFFFFF;
+	background-color: #0000FF;
+}
+
+
+.dd__list-item > svg
+{
+	vertical-align: middle;
+	display: inline-block;
+	visibility: hidden;
+	margin: 0px 10px 0px 0px;
+	fill: #000000;
+}
+
+
+.dd__list-item_selected > svg
+{
+	visibility: visible;
+}
+
+
+.dd__list-item_active > svg
+{
+	fill: #FFFFFF;
+}
+
+
+.dd__container_attached select,
+.dd__container select
+{
+	display: none;
+}
+
+
+.dd__container_native.dd__container_attached select,
+.dd__container_native.dd__container select
+{
+	display: block;
+	position: absolute;
+	top: 0;
+	opacity: 0;
+	height: 100%;
+	width: 100%;
+}
+
+
+.dd__container.dd__container_native.dd__editable select
+{
+	right: 0;
+	width: 24px;
+}
+
+
+/* Full screen drop down */
+@media (max-width: 767px)
+{
+
+.dd__container.dd__fullscreen.dd__open
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100;
+}
+
+
+.dd__container.dd__fullscreen.dd__open .dd__background
+{
+	z-index: 110;
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0.9;
+	background-color: #FFFFFF;
+}
+
+
+.dd__container.dd__fullscreen.dd__open .dd__combo
+{
+	z-index: 120;
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	right: 2px;
+	width: auto;
+}
+
+
+.dd__container.dd__fullscreen.dd__open .dd__list
+{
+	z-index: 120;
+	border: 2px solid #000000;
+}
+
+}
+
+
+/* Attached drop down list */
+.dd__container_attached
+{
+	position: relative;
+}
+
+
+.dd__container_active.dd__container_attached
+{
+	outline: 2px #aee5ff solid;
+	outline-offset: 0.1rem;
+}
+
+
+.dd__container_attached .dd__list
+{
+	border: 2px solid #000000;
+	width: auto;
+	min-width: 130px;
+	max-width: 250px;
+}
+
+
+.dd__container_attached .dd__list_drop-down
+{
+	top: 0;
+}
+
+
+.dd__container_attached .dd__list_drop-up
+{
+	bottom: 0;
+}
+
+
+.dd__container_attached .dd__list_drop-right
+{
+	left: 0;
+}
+
+
+.dd__container_attached .dd__list_drop-left
+{
+	right: 0;
+}
+
+
+/* Disabled drop down */
+.dd__container.dd__container_disabled .dd__combo
+{
+	border: 2px solid #CCCCCC;
+}
+
+
+.dd__container.dd__container_disabled .dd__single-selection
+{
+	color: #CCCCCC;
+}
+
+
+.dd__container_disabled .dd__toggle-btn
+{
+	cursor: default;
+}
+
+
+.dd__container_disabled .dd__toggle-btn path
+{
+	fill: #CCCCCC;
+}
+
+
+/* Hidden option wrapper for iOS */
+.dd__opt-wrapper
+{
+	display: none;
+}
+
+
+/* Don't use native select on large screens even useNativeSelect option is set */
+@media (min-width: 768px)
+{
+
+.dd__container_native.dd__container_attached select,
+.dd__container_native.dd__container select
+{
+	display: none;
+}
+
+}

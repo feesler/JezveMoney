@@ -34,9 +34,9 @@ var Popup = new (function()
 			if (!boxObj || closeBtn)
 				return;
 
-			closeBtn = ce('div', { className : 'close_btn' },
-						ce('button', { type : 'button' },
-							ce('span')));
+			closeBtn = ce('button', { className : 'close_btn', type : 'button' },
+							svg('svg', {},
+								svg('path', { d : 'M 1.1415,2.4266 5.7838,7 1.1415,11.5356 2.4644,12.8585 7,8.2162 11.5734,12.8585 12.8585,11.5356 8.2162,7 12.8585,2.4266 11.5734,1.1415 7,5.7838 2.4644,1.1415 Z' })));
 			boxObj.appendChild(closeBtn);
 
 			setOnClose(closeBtn);
@@ -85,9 +85,9 @@ var Popup = new (function()
 			if (!contentObj || !boxObj)
 				return false;
 
-			if (isArray(params.additional) || typeof params.additional === 'string')
+			if (Array.isArray(params.additional) || typeof params.additional === 'string')
 			{
-				var addClassNames = (isArray(params.additional)) ? params.additional : params.additional.split(' ');
+				var addClassNames = (Array.isArray(params.additional)) ? params.additional : params.additional.split(' ');
 
 				addClassNames.forEach(function(item)
 				{
@@ -243,10 +243,10 @@ var Popup = new (function()
 
 			if (_params.closeOnEmptyClick === true)
 			{
-				schedule(function()
+				setTimeout(function()
 				{
 					setEmptyClick(closeModal.bind(self), [boxObj]);
-				})();
+				});
 			}
 		}
 

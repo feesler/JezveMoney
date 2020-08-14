@@ -93,6 +93,19 @@ a:hover
 }
 
 
+svg
+{
+	display: block;
+}
+
+
+svg *
+{
+	stroke-width: 0;
+	stroke-linejoin: round;
+}
+
+
 /* single line block */
 .non_float
 {
@@ -296,14 +309,19 @@ input[type="text"], input[type="password"], select
 }
 
 
-.logo > a > .logo_img
+.logo > a > .logo_icon
 {
-	background-repeat: no-repeat;
-	background-size: 50px 50px;
 	width: 50px;
 	height: 50px;
 	display: inline-block;
 	float: left;
+}
+
+
+.logo > a > .logo_icon svg
+{
+	width: 50px;
+	height: 50px;
 }
 
 
@@ -349,13 +367,18 @@ input[type="text"], input[type="password"], select
 
 .user_button .user_icon
 {
-	width: 32px;
-	height: 32px;
+	width: 24px;
+	height: 24px;
 	overflow: hidden;
 	float: left;
-	margin: 9px 0px;
-	background-position: -224px 0px;
-	background-size: 320px 64px;
+	margin: 13px 2px;
+}
+
+
+.user_button .user_icon svg
+{
+	width: 24px;
+	height: 24px;
 }
 
 
@@ -487,11 +510,16 @@ input[type="text"], input[type="password"], select
 {
 	width: 32px;
 	height: 32px;
-	background-size: 320px 64px;
-	background-repeat: no-repeat;
 	float: left;
 	display: inline-block;
-	background-position: -288px 3px;
+	margin: 7px 0 0 4px;
+}
+
+
+.widget_title .glyph svg
+{
+	width: 24px;
+	height: 24px;
 }
 
 
@@ -703,6 +731,14 @@ label
 }
 
 
+/* Stretching DropDown */
+.dd__fullwidth
+{
+	display: -ms-flexbox;
+	display: flex;
+}
+
+
 /* currency button */
 .curr_container
 {
@@ -798,27 +834,9 @@ label
 }
 
 
-/* White cross */
-.popup .msg .close_btn > button > span
+.popup .msg .close_btn:hover > svg
 {
-	background-position: -28px 0px;
-}
-
-
-/* Gray cross */
-.popup .close_btn > button > span,
-.box.dragging .close_btn > button > span
-{
-	background-position: 0px 0px;
-}
-
-
-/* Black cross on hover */
-.popup .close_btn > button:hover > span,
-.box.dragging .close_btn > button:hover > span,
-.popup .msg .close_btn > button:hover > span
-{
-	background-position: -14px 0px;
+	fill: #FFFFFF;
 }
 
 
@@ -835,8 +853,8 @@ label
 }
 
 
-.popup .close_btn > button,
-.box.dragging .close_btn > button
+.popup .close_btn,
+.box.dragging .close_btn
 {
 	display: block;
 }

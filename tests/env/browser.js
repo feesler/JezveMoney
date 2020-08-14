@@ -72,6 +72,12 @@ class BrowserEnvironment extends Environment
 	}
 
 
+	async closest(element, selector)
+	{
+		return (typeof selector === 'string') ? element.closest(selector) : selector;
+	}
+
+
 	async prop(elem, prop)
 	{
 		if (!elem || typeof prop !== 'string')

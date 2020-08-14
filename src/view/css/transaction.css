@@ -20,11 +20,7 @@
 	display: inline-block;
 	float: left;
 	width: auto;
-}
-
-.tile_header .iconlink
-{
-	margin: 2px 0px 2px 5px;
+	margin: 0 5px 0 0;
 }
 
 

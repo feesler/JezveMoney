@@ -305,13 +305,17 @@ function onFormSubmit(e, verifyCallback)
 }
 
 
-function onCheck(obj, elName)
+function onCheck(e)
 {
-	if (!obj || !obj.form || !elName)
+	if (!e.target || !e.target.form)
 		return;
 
-	var disableElements = !obj.checked;
-	var frm = obj.form;
+	var elName = e.target.dataset.target;
+	if (!elName)
+		return;
+
+	var disableElements = !e.target.checked;
+	var frm = e.target.form;
 	if (frm.elements[elName])
 	{
 		var el = frm.elements[elName];
@@ -726,6 +730,13 @@ function initControls()
 	if (!listTrForm)
 		throw new Error('Fail to init view');
 	listTrForm.onsubmit = function(e){ return onFormSubmit(e, isTransactionsArray); };
+
+	var checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = Array.from(checkboxes);
+	checkboxes.forEach(function(elem)
+	{
+		elem.addEventListener('change', onCheck);
+	});
 
 	var readtransbtn = ge('readtransbtn');
 	if (readtransbtn)

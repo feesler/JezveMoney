@@ -14,7 +14,7 @@ export class MessagePopup extends NullableComponent
 
 		this.message = await this.prop(this.messageElem, 'innerText');
 		this.message = this.message.trim();
-		this.closeBtn = await this.query(this.elem, '.close_btn > button');
+		this.closeBtn = await this.query(this.elem, '.close_btn');
 
 		if (!this.success)
 			console.log(`Error popup appear: ${this.message}`);

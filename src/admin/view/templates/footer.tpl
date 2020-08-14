@@ -10,6 +10,5 @@
 <script>
 	var baseURL = '<?=BASEURL?>';
 
-	onReady(fixDPI);
 <?php		Message::check();		?>
 </script>

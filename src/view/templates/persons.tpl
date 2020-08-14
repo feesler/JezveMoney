@@ -1,5 +1,4 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
-<link rel="stylesheet" media="all and (min-width: 701px)" type="text/css" href="<?=BASEURL?>view/css/screen.css" />
 </head>
 <body>
 <div class="page">
@@ -10,7 +9,7 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1>Persons</h1>
-						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>persons/new/"><span class="icon add"></span><span class="icontitle"><span>New</span></span></a></div>
+						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>persons/new/"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 					<div id="tilesContainer" class="tiles"><?php
 		if (count($persArr)) {
@@ -29,10 +28,10 @@
 		<div>
 			<div class="siderbar_content">
 				<div id="tb_content">
-					<div id="sbEllipsis" class="sidebar_ellipsis"></div>
+					<div id="sbEllipsis" class="sidebar_ellipsis"><?=svgIcon("sbellipsis")?></div>
 					<div id="sbButtons" class="sidebar_buttons">
-						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white edit"></span><span class="icontitle"><span>Edit</span></span></a></div>
-						<div id="del_btn" class="iconlink" style="display: none;"><button onclick="showDeletePopup();" type="button"><span class="icon icon_white del"></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white"><?=svgIcon("edit")?></span><span class="icontitle"><span>Edit</span></span></a></div>
+						<div id="del_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
 					</div>
 				</div>
 			</div>

@@ -4,7 +4,7 @@ var Charts = new (function()
 	// Return minimum value from array
 	function getMin(arrObj)
 	{
-		if (!isArray(arrObj))
+		if (!Array.isArray(arrObj))
 			return null;
 
 		return Math.min.apply(null, arrObj);
@@ -14,7 +14,7 @@ var Charts = new (function()
 	// Return maximum value from array
 	function getMax(arrObj)
 	{
-		if (!isArray(arrObj))
+		if (!Array.isArray(arrObj))
 			return null;
 
 		return Math.max.apply(null, arrObj);
@@ -78,7 +78,7 @@ var Charts = new (function()
 	// Remove elements
 	function removeElements(elems)
 	{
-		if (!isArray(elems))
+		if (!Array.isArray(elems))
 			elems = [elems];
 
 		elems.forEach(function(el)
@@ -123,7 +123,7 @@ var Charts = new (function()
 	// Return array of values
 	function mapValues(items)
 	{
-		if (!items || !isArray(items))
+		if (!items || !Array.isArray(items))
 			return null;
 
 		return items.map(function(item)
@@ -363,7 +363,7 @@ var Charts = new (function()
 		// Update height of specified array of bars
 		function updateBarHeight(barsArr, getHeight)
 		{
-			if (!isArray(barsArr) || !isFunction(getHeight))
+			if (!Array.isArray(barsArr) || !isFunction(getHeight))
 				return;
 
 			var barValues = mapValues(barsArr);
@@ -798,7 +798,7 @@ var Charts = new (function()
 		// Update scale of path
 		function updatePathScale(nodesArr, getHeight)
 		{
-			if (!isArray(nodesArr) || !isFunction(getHeight))
+			if (!Array.isArray(nodesArr) || !isFunction(getHeight))
 				return;
 
 			// update height of bars

@@ -75,9 +75,7 @@ function selectUser(id)
 // New user button click handler
 function newUser()
 {
-	var frm;
-
-	frm = ge('user_frm');
+	var frm = ge('user_frm');
 	if (!dwPopup || !frm)
 		return;
 
@@ -320,6 +318,19 @@ function initControls()
 
 		row = row.nextElementSibling;
 	}
+
+	var createbtn = ge('createbtn');
+	if (createbtn)
+		createbtn.addEventListener('click', newUser);
+	var updbtn = ge('updbtn');
+	if (updbtn)
+		updbtn.addEventListener('click', updateUser);
+	var passbtn = ge('passbtn');
+	if (passbtn)
+		passbtn.addEventListener('click', setUserPass);
+	var del_btn = ge('del_btn');
+	if (del_btn)
+		del_btn.addEventListener('click', deleteUser);
 
 	// popup initialization
 	var frm = ge('user_frm');

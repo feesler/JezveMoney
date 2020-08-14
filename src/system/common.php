@@ -238,3 +238,34 @@
 
 		return $res;
 	}
+
+
+	// Return content of specified SVG icon
+	function svgIcon($name)
+	{
+		$fileName = APP_ROOT."view/img/svg/$name.svg";
+		if (!file_exists($fileName))
+			return "";
+
+		$content = file_get_contents($fileName);
+		return $content;
+	}
+
+
+	// Return SVG use content for specified icon
+	// Related SVG symbols should be available on target page
+	function useIcon($name, $width = NULL, $height = NULL)
+	{
+		if (is_empty($name))
+			return "";
+
+		$width = $width ?? 32;
+		if (is_int($width))
+			$width = $width."px";
+
+		$height = $height ?? $width;
+
+		return "<svg class=\"icon-$name\" width=\"$width\" height=\"$height\">".
+				"<use xlink:href=\"#$name\"></use>".
+				"</svg>";
+	}

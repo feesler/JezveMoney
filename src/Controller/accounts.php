@@ -52,6 +52,7 @@ class AccountsController extends TemplateController
 		$accInfo->initbalance = 0;
 		$accInfo->icon = 0;
 		$accInfo->iconclass = "";
+		$accInfo->iconname = NULL;
 
 		$currObj = $currMod->getItem($accInfo->curr_id);
 		if (!$currObj)
@@ -68,9 +69,9 @@ class AccountsController extends TemplateController
 		$headString = "New account";
 		$titleString .= $headString;
 
-		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "dropdown.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "decimalinput.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "dropdown.js", "decimalinput.js", "accounts.js");
 
 		include(TPL_PATH."account.tpl");
 	}
@@ -106,6 +107,7 @@ class AccountsController extends TemplateController
 		$accInfo->sign = ($currObj) ? $currObj->sign : NULL;
 		$accInfo->iconclass = $this->model->getIconClass($accInfo->icon);
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
+		$accInfo->iconname = $this->model->getIconName($accInfo->icon);
 		$tileAccName = $accInfo->name;
 
 		$currArr = $currMod->getData();
@@ -115,9 +117,9 @@ class AccountsController extends TemplateController
 		$headString = "Edit account";
 		$titleString .= $headString;
 
-		array_push($this->css->libs, "iconlink.css", "ddlist.css", "tiles.css");
+		array_push($this->css->libs, "iconlink.css", "dropdown.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "ddlist.js", "decimalinput.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "dropdown.js", "decimalinput.js", "accounts.js");
 
 		include(TPL_PATH."account.tpl");
 	}
@@ -222,7 +224,7 @@ class AccountsController extends TemplateController
 		if ($writerType == "Csv")
 		{
 			$writer->setDelimiter(';');
-			$writer->setEnclosure('');
+			$writer->setEnclosure('"');
 			$writer->setLineEnding("\r\n");
 			$writer->setSheetIndex(0);
 		}

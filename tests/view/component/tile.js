@@ -20,7 +20,8 @@ export class Tile extends Component
 
 		this.isActive = !!(await this.query(this.elem, '.act'));
 
-		let iconObj = findIconByClassName(await this.prop(this.elem, 'className'));
+		this.iconElem = await this.query(this.elem, '.acc_icon > svg')
+		let iconObj = findIconByClassName(await this.prop(this.iconElem, 'className.baseVal'));
 		this.icon = iconObj.id;
 	}
 

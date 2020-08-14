@@ -3,7 +3,5 @@
 <?php	}	?>
 <script>
 	var baseURL = '<?=BASEURL?>';
-
-	onReady(fixDPI);
-	<?php		Message::check();		?>
+<?php		Message::check();		?>
 </script>

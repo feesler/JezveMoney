@@ -9,6 +9,7 @@ class AccountModel extends CachedTable
 	static private $owner_id = 0;
 	static private $icons = ["No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash"];
 	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
+	static private $iconNames = [NULL, "purse", "safe", "card", "percent", "bank", "cash"];
 
 
 	protected function onStart()
@@ -562,7 +563,8 @@ class AccountModel extends CachedTable
 
 			$res[$acc_id] = ["name" => $item->name,
 								"balance" => $balance_fmt,
-								"icon" => $acc_icon];
+								"icon" => $acc_icon,
+								"iconname" => $this->getIconName($item->icon)];
 		}
 
 		return $res;
@@ -575,6 +577,18 @@ class AccountModel extends CachedTable
 		$icon_id = intval($icon_id);
 
 		return ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " tile_icon ".self::$iconClass[$icon_id] : "";
+	}
+
+
+	// Return name of specified icon
+	public function getIconName($icon_id)
+	{
+		$icon_id = intval($icon_id);
+
+		if (isset(self::$iconNames[$icon_id]))
+			return self::$iconNames[$icon_id];
+		else
+			return NULL;
 	}
 
 

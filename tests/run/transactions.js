@@ -1,5 +1,5 @@
 import { App } from '../app.js';
-import { test } from '../common.js';
+import { test, formatDate, fixDate } from '../common.js';
 import { TransactionsView } from '../view/transactions.js';
 import { MainView } from '../view/main.js';
 import { Transaction } from '../model/transaction.js';
@@ -75,7 +75,10 @@ export async function filterByDate({ start, end })
 {
 	await checkNavigation();
 
-	await test('Select date range', () => App.view.selectDateRange(start, end));
+	let startDateFmt = formatDate(new Date(fixDate(start)));
+	let endDateFmt = formatDate(new Date(fixDate(end)));
+
+	await test(`Select date range (${startDateFmt} - ${endDateFmt})`, () => App.view.selectDateRange(start, end));
 	await test('Correctness of transaction list', () => App.view.iteratePages());
 }
 

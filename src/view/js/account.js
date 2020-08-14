@@ -20,31 +20,36 @@ function formatAccoutBalance(acc_id)
 // Update tile information
 function setTileInfo(tile_id, title, subTitle, iconType)
 {
-	var tileObj, titleObj = null, subTitleObj = null;
 	var tileIcons = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
+	var icons = [null, 'purse', 'safe', 'card', 'percent', 'bank', 'cash'];
 
-	tileObj = ge(tile_id);
+	var tileObj = ge(tile_id);
 	if (!tileObj)
 		return;
 
-	if (tileObj.firstElementChild && tileObj.firstElementChild.firstElementChild)
-		subTitleObj = tileObj.firstElementChild.firstElementChild.firstElementChild;
-
+	var subTitleObj = tileObj.querySelector('.acc_bal');
 	if (subTitleObj)
 	{
 		subTitleObj.innerHTML = subTitle;
-		titleObj = subTitleObj.nextElementSibling;
 	}
 
+	var titleObj = tileObj.querySelector('.acc_name');
 	if (titleObj)
 		titleObj.innerHTML = title;
 
 	iconType = iconType | 0;
-	tileObj.className = 'tile';
-	if (iconType <= tileIcons.length && tileIcons[iconType])
+
+	var iconElem = tileObj.querySelector('.acc_icon');
+	if (iconElem)
 	{
-		tileObj.classList.add('tile_icon');
-		tileObj.classList.add(tileIcons[iconType]);
+		removeChilds(iconElem);
+		if (iconType && icons[iconType])
+		{
+			var iconSVG = svg('svg', { 'class' : 'icon-tile-' + icons[iconType], width : '60px', height : '54px' },
+								svg('use', { 'href' : '#tile-' + icons[iconType] }));
+
+			iconElem.appendChild(iconSVG);
+		}
 	}
 }
 
@@ -66,7 +71,7 @@ function getAccountPos(acc_id)
 {
 	var pos = -1;
 
-	if (!isArray(accounts) || !acc_id)
+	if (!Array.isArray(accounts) || !acc_id)
 		return -1;
 
 	accounts.some(function(acc, ind)
@@ -88,7 +93,7 @@ function getPrevAccount(acc_id)
 {
 	var pos;
 
-	if (!isArray(accounts) || accounts.length < 2 || !acc_id)
+	if (!Array.isArray(accounts) || accounts.length < 2 || !acc_id)
 		return -1;
 
 	pos = getAccountPos(acc_id);
@@ -107,7 +112,7 @@ function getNextAccount(acc_id)
 {
 	var pos;
 
-	if (!isArray(accounts) || accounts.length < 2 || !acc_id)
+	if (!Array.isArray(accounts) || accounts.length < 2 || !acc_id)
 		return -1;
 
 	pos = getAccountPos(acc_id);

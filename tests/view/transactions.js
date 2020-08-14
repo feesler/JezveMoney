@@ -31,7 +31,7 @@ export class TransactionsView extends TestView
 		if (!res.typeMenu)
 			throw new Error('Search form not found');
 
-		res.accDropDown = await DropDown.create(this, await this.query('.tr_filter .dd_container'));
+		res.accDropDown = await DropDown.createFromChild(this, await this.query('#acc_id'));
 		if (!res.accDropDown)
 			throw new Error('Account filter control not found');
 
@@ -73,7 +73,7 @@ export class TransactionsView extends TestView
 
 		res.filter = {
 			type : parseInt(cont.typeMenu.activeType),
-			accounts : cont.accDropDown.getSelectedValues(),
+			accounts : cont.accDropDown.getSelectedValues().map(parseInt),
 			search : cont.searchForm.value,
 		};
 		let dateRange = cont.dateFilter.getSelectedRange();

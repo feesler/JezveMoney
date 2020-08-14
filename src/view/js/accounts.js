@@ -14,8 +14,6 @@ function onIconSel(obj)
 	if (!obj)
 		return;
 
-	this.setText(obj.str);
-
 	iconType = obj.id;
 	updateAccountTile();
 }
@@ -30,8 +28,6 @@ function onCurrencySel(obj)
 	if (!obj || !currsign)
 		return;
 
-	this.setText(obj.str);
-
 	acc_currency = obj.id;
 	setSign('currsign', acc_currency);
 	updateAccountTile();
@@ -41,18 +37,8 @@ function onCurrencySel(obj)
 // Initialization of page controls
 function initControls()
 {
-	var isMobile;
-	var currDDList, iconDDList;
-
-	isMobile = (document.documentElement.clientWidth < 700);
-
-	iconDDList = new DDList();
-	if (!iconDDList.create({ input_id : 'icon', selCB : onIconSel, editable : false, mobile : isMobile }))
-		iconDDList = null;
-
-	currDDList = new DDList();
-	if (!currDDList.create({ input_id : 'currency', selCB : onCurrencySel, editable : false, mobile : isMobile }))
-		currDDList = null;
+	DropDown.create({ input_id : 'icon', onitemselect : onIconSel, editable : false, extraClass : 'dd__fullwidth' });
+	DropDown.create({ input_id : 'currency', onitemselect : onCurrencySel, editable : false, extraClass : 'dd__fullwidth' });
 
 	DecimalInput.create({ elem : ge('balance'), oninput : onAccInitBalanceInput });
 

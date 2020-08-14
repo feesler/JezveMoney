@@ -22,25 +22,21 @@ export class StatisticsView extends TestView
 		if (!filtersList || filtersList.length != 4)
 			throw new Error('Wrong statistics view structure');
 
-		let filterByElem = await this.query(filtersList[0], ':scope > *');
-		res.filterByDropDown = await DropDown.create(this, filterByElem);
+		res.filterByDropDown = await DropDown.createFromChild(this, await this.query('#filter_type'));
 
 		res.accountsDropDown = null;
 		if (await this.isVisible(filtersList[1]))
 		{
-			let ddElem = await this.query(filtersList[1], ':scope > *');
-			res.accountsDropDown = await DropDown.create(this, ddElem);
+			res.accountsDropDown = await DropDown.createFromChild(this, await this.query('#acc_id'));
 		}
 
 		res.currencyDropDown = null;
 		if (await this.isVisible(filtersList[2]))
 		{
-			let ddElem = await this.query(filtersList[2], ':scope > *');
-			res.currencyDropDown = await DropDown.create(this, ddElem);
+			res.currencyDropDown = await DropDown.createFromChild(this, await this.query('#curr_id'));
 		}
 
-		let groupElem = await this.query(filtersList[3], ':scope > *');
-		res.groupDropDown = await DropDown.create(this, groupElem);
+		res.groupDropDown = await DropDown.createFromChild(this, await this.query('#groupsel'));
 
 		res.chart = { elem : await this.query('#chart'), bars : [] };
 		if (!res.chart)
@@ -69,13 +65,13 @@ export class StatisticsView extends TestView
 
 	async byAccounts()
 	{
-		return this.navigation(() => this.content.filterByDropDown.selectByValue(0));
+		return this.navigation(() => this.content.filterByDropDown.select(0));
 	}
 
 
 	async byCurrencies()
 	{
-		return this.navigation(() => this.content.filterByDropDown.selectByValue(1));
+		return this.navigation(() => this.content.filterByDropDown.select(1));
 	}
 
 
@@ -84,7 +80,7 @@ export class StatisticsView extends TestView
 		if (!this.content.accountsDropDown)
 			throw new Error('Account drop down control not found');
 
-		return this.navigation(() => this.content.accountsDropDown.selectByValue(acc_id));
+		return this.navigation(() => this.content.accountsDropDown.select(acc_id));
 	}
 
 
@@ -99,7 +95,7 @@ export class StatisticsView extends TestView
 
 	async selectCurrency(curr_id)
 	{
-		return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.selectByValue(1));
+		return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.select(1));
 	}
 
 
@@ -112,7 +108,7 @@ export class StatisticsView extends TestView
 
 	async groupBy(group)
 	{
-		return this.navigation(() => this.content.groupDropDown.selectByValue(group));
+		return this.navigation(() => this.content.groupDropDown.select(group));
 	}
 
 

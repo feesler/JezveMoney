@@ -34,7 +34,7 @@ export class DatePickerFilter extends NullableComponent
 		if (!this.datePickerBtn)
 			throw new Error('Date picker button not found');
 
-		this.datePicker = await DatePicker.create(this.parent, await this.query(this.elem, '.calBase'));
+		this.datePicker = await DatePicker.create(this.parent, await this.query(this.elem, '.dp__container'));
 	}
 
 

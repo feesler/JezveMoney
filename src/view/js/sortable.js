@@ -287,7 +287,7 @@ SortableDropTarget.prototype._getTargetElem = function(avatar, event)
 
 	while(el && el != root)
 	{
-		if ((isFunction(el.matches) && el.matches(itemSelector)) || el.classList.contains(phItemClass))
+		if ((isFunction(el.matches) && el.matches(itemSelector)) || (el.classList && el.classList.contains(phItemClass)))
 			return el;
 		el = el.parentNode;
 	}

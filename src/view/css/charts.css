@@ -26,6 +26,12 @@
 }
 
 
+.chart_content svg *
+{
+	stroke-width: 1px;
+}
+
+
 /* Bar chart information popup */
 .chart_popup
 {

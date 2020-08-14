@@ -7,7 +7,7 @@
 		<div class="box">
 			<div class="left_side">
 				<div class="u_cont">
-					<div class="login_logo"><span class="logo"></span><span class="title">Jezve Money</span></div>
+					<div class="login_logo"><span class="logo"><?=svgIcon("logo_u")?></span><span class="title">Jezve Money</span></div>
 				</div>
 			</div>
 			<div class="side_sep"></div>

@@ -5,13 +5,6 @@ function ge(a)
 }
 
 
-// Check object is array
-function isArray(obj)
-{
-	return (Object.prototype.toString.call(obj) === '[object Array]');
-}
-
-
 // Check object is date
 function isDate(obj)
 {
@@ -69,7 +62,7 @@ function setParam(obj, params)
 	for(par in params)
 	{
 		val = params[par];
-		if (isArray(val))
+		if (Array.isArray(val))
 		{
 			obj[par] = val.map(function(item){ return item; });
 		}
@@ -102,8 +95,8 @@ function addChilds(obj, childs)
 	if (!obj || !childs)
 		return;
 
-	if (!isArray(childs))
-		childs = [childs];
+	if (!Array.isArray(childs))
+		childs = [ childs ];
 
 	childs.forEach(function(child)
 	{
@@ -116,19 +109,35 @@ function addChilds(obj, childs)
 // Create specified DOM element and set parameters if specified
 function ce(tagName, params, childs)
 {
-	var obj, par;
-
 	if (typeof tagName !== 'string')
 		return null;
 
-	obj = document.createElement(tagName);
-	if (!obj)
+	var elem = document.createElement(tagName);
+	if (!elem)
 		return null;
 
-	setParam(obj, params);
-	addChilds(obj, childs);
+	setParam(elem, params);
+	addChilds(elem, childs);
 
-	return obj;
+	return elem;
+}
+
+
+function svg(tagName, attributues, children)
+{
+	if (typeof tagName !== 'string')
+		return null;
+
+	var elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+
+	for(var attr in attributues)
+	{
+		elem.setAttribute(attr, attributues[attr]);
+	}
+
+	addChilds(elem, children);
+
+	return elem;
 }
 
 
@@ -170,7 +179,8 @@ function isVisible(obj, recursive)
 
 	while(robj && robj.nodeType && robj.nodeType != 9)
 	{
-		if (!robj.style || robj.style.display == 'none')
+		var cstyle = computedStyle(robj);
+		if (!cstyle || cstyle.display == 'none' || cstyle.visibility == 'hidden')
 			return false;
 
 		if (recursive !== true)
@@ -468,16 +478,6 @@ function fixEvent(e, _this)
 }
 
 
-// Return wrapper to schedule specified function for execution after current script
-function schedule(func)
-{
-	return function()
-	{
-		setTimeout(func, 1);
-	}
-}
-
-
 // Handler for click on empty space event
 function onEmptyClick(e, callback, elem)
 {
@@ -488,7 +488,7 @@ function onEmptyClick(e, callback, elem)
 		return;
 	e = fixEvent(e);
 
-	if (!isArray(elem))
+	if (!Array.isArray(elem))
 		elem = [elem];
 
 	if (elem.every(function(el){
@@ -503,29 +503,27 @@ function onEmptyClick(e, callback, elem)
 // Set or unset event handler for
 function setEmptyClick(callback, elem)
 {
-	var onClickHandler, evName;
-
 	callback = callback || null;
 	elem = elem || null;
 
 	if (!document.documentElement)
 		return;
 
-	onClickHandler = ((callback) ? function(event)
+	var onClickHandler = ((callback) ? function(event)
 	{
 		event = event || window.event;
 		onEmptyClick(event, callback, elem);
 	} : null);
 
-	evName = ('ontouchstart' in window) ? 'touchend' : 'click';
+	var evName = 'click';
 
 	if (onClickHandler && document.documentElement['on' + evName])
 		document.documentElement['on' + evName]();			// run previously set callback
 	document.documentElement['on' + evName] = null;
-	schedule(function()
+	setTimeout(function()
 	{
 		document.documentElement['on' + evName] = onClickHandler;
-	})();
+	});
 }
 
 
@@ -658,7 +656,7 @@ function urlJoin(obj)
 	for(par in obj)
 	{
 		val = obj[par];
-		if (isArray(val))
+		if (Array.isArray(val))
 		{
 			val.forEach(function(arrItem)
 			{

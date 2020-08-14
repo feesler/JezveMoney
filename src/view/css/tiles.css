@@ -108,45 +108,8 @@ a.tilelink
 }
 
 
-/* tile icons */
-.tile_icon
+.acc_icon
 {
-	background-size: 100px 600px;
-	background-repeat: no-repeat;
-}
-
-
-.purse_icon
-{
-	background-position: 0px 0px;
-}
-
-
-.safe_icon
-{
-	background-position: 0px -100px;
-}
-
-
-.card_icon
-{
-	background-position: 0px -200px;
-}
-
-
-.percent_icon
-{
-	background-position: 0px -300px;
-}
-
-
-.bank_icon
-{
-	background-position: 0px -400px;
-}
-
-
-.cash_icon
-{
-	background-position: 0px -500px;
+	top: 23px;
+	left: 20px;
 }

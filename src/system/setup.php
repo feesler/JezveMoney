@@ -36,6 +36,16 @@
 	}
 
 
+	function domainFromHost($host)
+	{
+		$pos = strpos($host, ":");
+		if ($pos !== FALSE)
+			return substr($host, 0, $pos);
+		else
+			return $host;
+	}
+
+
 	function setLogs($enable)
 	{
 		global $noLogs;
@@ -63,13 +73,24 @@
 	$host = $_SERVER["HTTP_HOST"];
  	define("APP_HOST", $host);
 
-	$pos = strpos($host, ":");
-	if ($pos !== FALSE)
-		$domain = substr($host, 0, $pos);
-	else
-		$domain = $host;
+	$domain = domainFromHost($host);
 
  	define("APP_DOMAIN", $domain);
+
+/*
+	APP_HOST - application domain and port
+	APP_DOMAIN - application domain
+	APP_PROTOCOL - http:// or https://
+	APP_ROOT - path to the root directory
+	APP_PATH - relative path for cookies
+	PRODUCTION - is production (boolean)
+	LOCAL_DEV - is local development environment
+	BASEURL - base URL for project
+	TPL_PATH - path to the templates directory
+	ADMIN_TPL_PATH - path to the admin templates directory
+	UPLOAD_PATH - path to the uploads directory
+	LOGS_PATH - path to the logs directory
+*/
 
 	if (strcmp(APP_HOST, $productionHost) == 0)
 	{

@@ -1,6 +1,7 @@
 /* icon link */
 .iconlink
 {
+	box-sizing: border-box;
 	display: inline-block;
 	float: left;
 	overflow: hidden;
@@ -10,25 +11,51 @@
 
 .iconlink .icon
 {
+	box-sizing: border-box;
 	width: 32px;
 	height: 32px;
-	background-repeat: no-repeat;
-	background-size: 320px 64px;
+	border: 2px solid #000000;
+	border-radius: 50%;
+	padding: 2px;
 	overflow: hidden;
 	display: inline-block;
 	float: left;
 }
 
 
-.iconlink .icon_white
+.iconlink:hover .icon
 {
-	width: 32px;
-	height: 32px;
-	background-repeat: no-repeat;
-	background-size: 320px 64px;
-	overflow: hidden;
-	display: inline-block;
-	float: left;
+	background-color: #000000;
+}
+
+
+.iconlink:hover .icon svg *
+{
+	fill: #FFFFFF;
+}
+
+
+.iconlink .icon.icon_white
+{
+	border-color: #FFFFFF;
+}
+
+
+.iconlink:hover .icon.icon_white
+{
+	background-color: #FFFFFF;
+}
+
+
+.iconlink .icon.icon_white svg *
+{
+	fill: #FFFFFF;
+}
+
+
+.iconlink:hover .icon.icon_white svg *
+{
+	fill: #44AAFF;
 }
 
 
@@ -108,42 +135,13 @@
 }
 
 
-/* 16x16 iconlink */
-.small_icon
-{
-	height: 16px;
-}
-
-
-.small_icon .icon
-{
-	width: 16px;
-	height: 16px;
-}
-
-
-.small_icon span
-{
-	height: 16px;
-	line-height: 16px;
-	font-size: 10px;
-}
-
-
-.small_icon > a,
-.small_icon > button
-{
-	height: 16px;
-}
-
-
 /* flat square button with icon */
 .icon_btn,
 .btn.icon_btn
 {
 	width: 34px;
 	height: 34px;
-	padding: 2px;
+	padding: 5px;
 	margin: 0px;
 	color: #FFFFFF;
 	background-color: #0072C6;
@@ -151,134 +149,37 @@
 }
 
 
-.icon_btn > span,
-.btn.icon_btn > span
+.icon_btn > svg
 {
-	width: 32px;
-	height: 32px;
-	background-size: 320px 64px;
-	background-repeat: no-repeat;
-	display: block;
+	width: 24px;
+	height: 24px;
+	fill: #FFFFFF;
 }
 
 
-/* calendar button */
-.cal_btn > span
+/* Small icon button */
+.sm-icon-btn
 {
-	background-position: -192px -32px;
+    padding: 1px;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    float: left;
+    display: inline-block;
+    line-height: 20px;
+    height: 20px;
 }
 
 
-/* search button */
-.search_btn > span
+.sm-icon-btn > svg
 {
-	background-position: -192px 0px;
+	height: 14px;
+	width: 14px;
+	fill: #888888;
 }
 
 
-/* iconlink icons */
-.iconlink .add
+.sm-icon-btn:hover > svg
 {
-	background-position: 0px 0px;
-}
-
-
-.iconlink > *:hover > .add
-{
-	background-position: 0px -32px;
-}
-
-
-.iconlink .edit
-{
-	background-position: -32px 0px;
-}
-
-
-.iconlink > *:hover > .edit
-{
-	background-position: -32px -32px;
-}
-
-
-.iconlink .del
-{
-	background-position: -64px 0px;
-}
-
-
-.iconlink > *:hover > .del
-{
-	background-position: -64px -32px;
-}
-
-
-.iconlink .calendar
-{
-	background-position: -96px 0px;
-}
-
-
-.iconlink > *:hover > .calendar
-{
-	background-position: -96px -32px;
-}
-
-
-.iconlink .search
-{
-	background-position: -128px 0px;
-}
-
-
-.iconlink > *:hover > .search
-{
-	background-position: -128px -32px;
-}
-
-
-.iconlink .export
-{
-	background-position: -160px 0px;
-}
-
-
-.iconlink > *:hover > .export
-{
-	background-position: -160px -32px;
-}
-
-
-.iconlink .close
-{
-	width: 16px;
-	height: 16px;
-	background-position: -224px -32px;
-}
-
-
-.iconlink > *:hover > .close
-{
-	background-position: -224px -48px;
-}
-
-
-.iconlink .close_gray
-{
-	width: 16px;
-	height: 16px;
-	background-position: -240px -47px;
-}
-
-
-.iconlink > *:hover > .close_gray
-{
-	background-position: -223px -47px;
-}
-
-
-
-.iconlink .glyph
-{
-	background-position: -288px 0px;
+	fill: #000000;
 }

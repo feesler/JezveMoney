@@ -255,6 +255,16 @@ function initControls()
 		row = row.nextElementSibling;
 	}
 
+	var createbtn = ge('createbtn');
+	if (createbtn)
+		createbtn.addEventListener('click', newCurr);
+	var updbtn = ge('updbtn');
+	if (updbtn)
+		updbtn.addEventListener('click', updateCurr);
+	var del_btn = ge('del_btn');
+	if (del_btn)
+		del_btn.addEventListener('click', deleteCurr);
+
 	// popup initialization
 	var frm = ge('curr_frm');
 	frm.onsubmit = onFormSubmit;
@@ -262,12 +272,6 @@ function initControls()
 							content : frm,
 							additional : 'center_only curr_content',
 						 	btn : { closeBtn : true }});
-
-	var updbtn = ge('updbtn');
-	updbtn.onclick = updateCurr;
-
-	var del_btn = ge('del_btn');
-	del_btn.onclick = deleteCurr;
 }
 
 

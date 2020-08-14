@@ -17,7 +17,7 @@ export class DatePickerRow extends NullableComponent
 			throw new Error('Unexpected structure of date picker input row');
 		this.date = this.inputRow.value;
 
-		this.datePicker = await DatePicker.create(this.parent, await this.query(this.elem, '.calBase'));
+		this.datePicker = await DatePicker.create(this.parent, await this.query(this.elem, '.dp__container'));
 	}
 
 

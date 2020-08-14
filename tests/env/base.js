@@ -7,7 +7,8 @@ export function visibilityResolver(elem, recursive)
 	let robj = elem;
 	while(robj && robj.nodeType && robj.nodeType != 9)
 	{
-		if (!robj.style || robj.style.display == 'none' || robj.style.visibility == 'hidden')
+		let cStyle = getComputedStyle(robj, '');
+		if (!cStyle || cStyle.display == 'none' || cStyle.visibility == 'hidden')
 			return false;
 
 		if (recursive !== true)
@@ -35,6 +36,7 @@ export class Environment
 			'parentNode',
 			'query',
 			'queryAll',
+			'closest',
 			'hasClass',
 			'isVisible',
 			'selectByValue',

@@ -27,9 +27,9 @@
 					</table>
 
 					<div class="acc_controls">
-						<input class="adm_act_btn" type="button" value="new" onclick="newCurr()">
+						<input id="createbtn" class="adm_act_btn" type="button" value="new">
 						<input id="updbtn" class="adm_act_btn" type="button" value="update" style="display: none;">
-						<input id="del_btn" class="adm_act_btn" type="button" value="delete" onclick="deleteCurr()" style="display: none;">
+						<input id="del_btn" class="adm_act_btn" type="button" value="delete" style="display: none;">
 					</div>
 				</div>
 			</div>

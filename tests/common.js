@@ -1,12 +1,12 @@
 // Available tile icons
 const tileIcons = [
 	{ id : 0, className : null, title : 'No icon' },
-	{ id : 1, className : 'purse_icon', title : 'Purse' },
-	{ id : 2, className : 'safe_icon', title : 'Safe' },
-	{ id : 3, className : 'card_icon', title : 'Card' },
-	{ id : 4, className : 'percent_icon', title : 'Percent' },
-	{ id : 5, className : 'bank_icon', title : 'Bank' },
-	{ id : 6, className : 'cash_icon', title : 'Cash' },
+	{ id : 1, className : 'icon-tile-purse', title : 'Purse' },
+	{ id : 2, className : 'icon-tile-safe', title : 'Safe' },
+	{ id : 3, className : 'icon-tile-card', title : 'Card' },
+	{ id : 4, className : 'icon-tile-percent', title : 'Percent' },
+	{ id : 5, className : 'icon-tile-bank', title : 'Bank' },
+	{ id : 6, className : 'icon-tile-cash', title : 'Cash' },
 ];
 
 
@@ -63,9 +63,6 @@ export function findIconByClassName(val)
 		return noIcon;
 
 	let classList = val.split(' ');
-	if (!classList.includes('tile_icon'))
-		return noIcon;
-
 	for(let item of tileIcons)
 	{
 		if (classList.includes(item.className))

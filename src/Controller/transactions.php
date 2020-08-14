@@ -164,11 +164,11 @@ class TransactionsController extends TemplateController
 
 		$titleString = "Jezve Money | Transactions";
 
-		array_push($this->css->libs, "tiles.css", "iconlink.css", "calendar.css", "ddlist.css", "trlist.css", "toolbar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "datepicker.css", "dropdown.css", "trlist.css", "toolbar.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "calendar.js", "dragndrop.js",
-									"sortable.js", "toolbar.js", "ddlist.js", "tr_list.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "datepicker.js", "dragndrop.js",
+									"sortable.js", "toolbar.js", "dropdown.js", "tr_list.js");
 
 		include(TPL_PATH."transactions.tpl");
 	}
@@ -438,10 +438,10 @@ class TransactionsController extends TemplateController
 			$headString = "New transaction";
 		$titleString .= $headString;
 
-		array_push($this->css->libs, "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "dropdown.css", "datepicker.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "decimalinput.js", "tr_model.js", "tr_viewmodel.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "datepicker.js", "dropdown.js", "decimalinput.js", "tr_model.js", "tr_viewmodel.js");
 
 		include(TPL_PATH."transaction.tpl");
 	}
@@ -683,10 +683,10 @@ class TransactionsController extends TemplateController
 			$headString = "Edit transaction";
 		$titleString .= $headString;
 
-		array_push($this->css->libs, "tiles.css", "iconlink.css", "ddlist.css", "calendar.css");
+		array_push($this->css->libs, "tiles.css", "iconlink.css", "dropdown.css", "datepicker.css");
 		$this->css->page[] = "transaction.css";
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "calendar.js", "ddlist.js", "decimalinput.js", "tr_model.js", "tr_viewmodel.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "person.js", "datepicker.js", "dropdown.js", "decimalinput.js", "tr_model.js", "tr_viewmodel.js");
 
 		include(TPL_PATH."transaction.tpl");
 	}

@@ -11,31 +11,31 @@ export class DatePicker extends NullableComponent
 {
 	async parse()
 	{
-		this.wrapper = await this.query(this.elem, '.calWrap');
+		this.wrapper = await this.query(this.elem, '.dp__wrapper');
 
-		this.prevBtn = await this.query(this.wrapper, '.calHeadTbl .nav.prev');
-		this.nextBtn = await this.query(this.wrapper, '.calHeadTbl .nav.next');
-		this.titleElem = await this.query(this.wrapper, '.title');
+		this.prevBtn = await this.query(this.wrapper, '.dp__header .dp__header_nav:first-child');
+		this.nextBtn = await this.query(this.wrapper, '.dp__header .dp__header_nav:last-child');
+		this.titleElem = await this.query(this.wrapper, '.dp__header .dp__header_title');
 		this.title = await this.prop(this.titleElem, 'innerText');
 
 		this.cells = [];
 		this.viewType = 'month';
-		let elems = await this.queryAll(this.wrapper, '.calTbl td');
+		let elems = await this.queryAll(this.wrapper, '.dp__view-container .dp__cell');
 		for(let elem of elems)
 		{
-			if (await this.hasClass(elem, 'monthCell'))
+			if (await this.hasClass(elem, 'dp__year-view__cell'))
 				this.viewType = 'year';
-			else if (await this.hasClass(elem, 'yearCell'))
+			else if (await this.hasClass(elem, 'dp__year-range-view__cell'))
 				this.viewType = 'yearRange';
 
-			if (await this.hasClass(elem, 'omonth'))
+			if (await this.hasClass(elem, 'dp__other-month-cell'))
 				continue;
 
 			let cell = {
 				elem : elem,
 				title : await this.prop(elem, 'innerText'),
-				active : await this.hasClass(elem, 'act'),
-				highlighted : await this.hasClass(elem, 'hl')
+				active : await this.hasClass(elem, 'dp__cell_act'),
+				highlighted : await this.hasClass(elem, 'dp__cell_hl')
 			};
 
 			this.cells.push(cell);
@@ -91,7 +91,7 @@ export class DatePicker extends NullableComponent
 
 	async isTitleChanged()
 	{
-		let titleElem = await this.query(this.elem, '.calWrap .title');
+		let titleElem = await this.query(this.elem, '.dp__wrapper .dp__header_title');
 		if (!titleElem)
 			return false;
 

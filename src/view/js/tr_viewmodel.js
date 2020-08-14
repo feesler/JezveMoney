@@ -9,8 +9,11 @@ function TransactionViewModel()
 	this.exchangeInput = null;
 
 	this.calendarObj = null;
-	this.isMobile;
 	this.accDDList = null;
+	this.srcDDList = null;
+	this.destDDList = null;
+	this.srcCurrDDList = null;
+	this.destCurrDDList = null;
 	this.dwPopup = null;		// delete warning popup
 	this.submitStarted = false;
 	var singleTransDeleteTitle = 'Delete transaction';
@@ -26,7 +29,7 @@ function TransactionViewModel()
 		if (!datefield)
 			return;
 
-		datefield.value = Calendar.format(date);
+		datefield.value = DatePicker.format(date);
 
 		self.calendarObj.hide();
 	}
@@ -37,7 +40,7 @@ function TransactionViewModel()
 	{
 		if (!self.calendarObj)
 		{
-			self.calendarObj = Calendar.create({ wrapper_id : 'calendar', relparent : ge('calendar').parentNode, ondateselect : onSelectDate });
+			self.calendarObj = DatePicker.create({ wrapper_id : 'calendar', relparent : ge('calendar').parentNode, ondateselect : onSelectDate });
 			if (!self.calendarObj)
 				return;
 		}
@@ -625,15 +628,15 @@ function TransactionViewModel()
 	// Update currency signs near to input fields
 	function updateCurrSigns()
 	{
-		setSign('destamountsign', Transaction.destCurr());
-		setSign('srcamountsign', Transaction.srcCurr());
-		setSign('res_currsign', Transaction.srcCurr());
-		setSign('res_currsign_d', Transaction.destCurr());
+		setSign('destamountsign', self.destCurrDDList, Transaction.destCurr());
+		setSign('srcamountsign', self.srcCurrDDList, Transaction.srcCurr());
+		setSign('res_currsign', null, Transaction.srcCurr());
+		setSign('res_currsign_d', null, Transaction.destCurr());
 	}
 
 
 	// Set currency sign for specified field
-	function setSign(obj, curr_id)
+	function setSign(obj, ddown, curr_id)
 	{
 		var signobj, curr;
 
@@ -646,6 +649,9 @@ function TransactionViewModel()
 			return;
 
 		signobj.innerHTML = curr.sign;
+
+		if (ddown)
+			ddown.selectItem(curr_id);
 	}
 
 
@@ -1288,16 +1294,11 @@ function TransactionViewModel()
 		if (self.accDDList)
 			return;
 
-		self.accDDList = new DDList();
-		if (self.accDDList.create({ input_id : 'acc_tile', listAttach : true, selCB : onDebtAccSel, editable : false, mobile : self.isMobile }))
+		self.accDDList = DropDown.create({ input_id : 'acc_tile', listAttach : true, onitemselect : onDebtAccSel, editable : false });
+		accounts.forEach(function(acc)
 		{
-			accounts.forEach(function(acc)
-			{
-				self.accDDList.addItem(acc.id, acc.name);
-			});
-		}
-		else
-			self.accDDList = null;
+			self.accDDList.addItem(acc.id, acc.name);
+		});
 	}
 
 
@@ -1306,9 +1307,7 @@ function TransactionViewModel()
 	// Initialization of page controls
 	this.initControls = function()
 	{
-		var elem, srcDDList, destDDList, srcCurrDDList, destCurrDDList;
-
-		self.isMobile = (document.documentElement.clientWidth < 700);
+		var elem;
 
 		// Init form submit event handler
 		elem = ge('mainfrm');
@@ -1406,11 +1405,11 @@ function TransactionViewModel()
 			var persDDList;
 
 			elem = ge('noacc_btn');
-			if (elem && elem.firstElementChild)
-				elem.firstElementChild.onclick = toggleEnableAccount;
+			if (elem && elem)
+				elem.addEventListener('click', toggleEnableAccount);
 			elem = ge('selaccount');
 			if (elem && elem.firstElementChild)
-				elem.firstElementChild.onclick = toggleEnableAccount;
+				elem.firstElementChild.addEventListener('click', toggleEnableAccount);
 
 			elem = ge('debtgive');
 			if (elem)
@@ -1419,72 +1418,53 @@ function TransactionViewModel()
 			if (elem)
 				elem.onclick = onChangeDebtOp;
 
-			persDDList = new DDList();
-			if (persDDList.create({ input_id : 'person_tile', listAttach : true, selCB : onPersAccSel, editable : false, mobile : self.isMobile }))
+			this.persDDList = DropDown.create({ input_id : 'person_tile', listAttach : true, onitemselect : onPersAccSel, editable : false });
+			persons.forEach(function(person)
 			{
-				persons.forEach(function(person)
-				{
-					persDDList.addItem(person.id, person.name);
-				});
-			}
-			else
-				persDDList = null;
+				this.persDDList.addItem(person.id, person.name);
+			}, this);
 
 			if (!Transaction.noAccount())
 				initAccList();
 		}
 		else
 		{
-			srcDDList = new DDList();
-			if (srcDDList.create({ input_id : 'source_tile', listAttach : true, selCB : onSrcAccSel, editable : false, mobile : self.isMobile }))
+			this.srcDDList = DropDown.create({ input_id : 'source_tile', listAttach : true, onitemselect : onSrcAccSel, editable : false });
+			if (this.srcDDList)
 			{
 				accounts.forEach(function(acc)
 				{
-					srcDDList.addItem(acc.id, acc.name);
-				});
+					this.srcDDList.addItem(acc.id, acc.name);
+				}, this);
 			}
-			else
-				srcDDList = null;
 
-			destDDList = new DDList();
-			if (destDDList.create({ input_id : 'dest_tile', listAttach : true, selCB : onDestAccSel, editable : false, mobile : self.isMobile }))
+			this.destDDList = DropDown.create({ input_id : 'dest_tile', listAttach : true, onitemselect : onDestAccSel, editable : false });
+			if (this.destDDList)
 			{
 				accounts.forEach(function(acc)
 				{
-					destDDList.addItem(acc.id, acc.name);
-				});
+					this.destDDList.addItem(acc.id, acc.name);
+				}, this);
 			}
-			else
-				destDDList = null;
 		}
 
 
 		if (Transaction.isIncome())
 		{
-			srcCurrDDList = new DDList();
-			if (srcCurrDDList.create({ input_id : 'srcamountsign', listAttach : true, selCB : onSrcCurrencySel, editable : false, mobile : self.isMobile }))
+			this.srcCurrDDList = DropDown.create({ input_id : 'srcamountsign', listAttach : true, onitemselect : onSrcCurrencySel, editable : false });
+			currency.forEach(function(curr)
 			{
-				currency.forEach(function(curr)
-				{
-					srcCurrDDList.addItem(curr.id, curr.name);
-				});
-			}
-			else
-				srcCurrDDList = null;
+				this.srcCurrDDList.addItem(curr.id, curr.name);
+			}, this);
 		}
 
 		if (Transaction.isExpense())
 		{
-			destCurrDDList = new DDList();
-			if (destCurrDDList.create({ input_id : 'destamountsign', listAttach : true, selCB : onDestCurrencySel, editable : false, mobile : self.isMobile }))
+			this.destCurrDDList = DropDown.create({ input_id : 'destamountsign', listAttach : true, onitemselect : onDestCurrencySel, editable : false });
+			currency.forEach(function(curr)
 			{
-				currency.forEach(function(curr)
-				{
-					destCurrDDList.addItem(curr.id, curr.name);
-				});
-			}
-			else
-				destCurrDDList = null;
+				this.destCurrDDList.addItem(curr.id, curr.name);
+			}, this);
 		}
 	}
 }

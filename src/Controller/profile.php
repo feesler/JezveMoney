@@ -45,7 +45,7 @@ class ProfileController extends TemplateController
 
 	public function changeName()
 	{
-		$requiredFileds = [ "name" ];
+		$requiredFields = [ "name" ];
 
 		if (!$this->isPOST())
 			setLocation(BASEURL."profile/");
