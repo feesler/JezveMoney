@@ -87,6 +87,18 @@ function delRow(rowObj)
 }
 
 
+function toggleRow(rowObj)
+{
+	if (!rowObj || !rowObj.rowEl)
+		return;
+	
+	if (rowObj.rowEl.classList.contains('tr-picked-row'))
+		rowObj.rowEl.classList.remove('tr-picked-row')
+	else
+		rowObj.rowEl.classList.add('tr-picked-row')
+}
+
+
 function createRowObject()
 {
 	var rowObj = {};
@@ -149,6 +161,10 @@ function createRowObject()
 					onclick : delRow.bind(null, rowObj),
 					value : '-' });
 
+	rowObj.togglePickedBtn = ce('input', { className : 'btn ok_btn picked-btn', type : 'button',
+								onclick : toggleRow.bind(null, rowObj),
+								value : '*' });
+
 	rowObj.rowEl = ce('div', { className : 'tr_row clearfix' },
 		[ rowObj.trTypeSel,
 			rowObj.amountInp,
@@ -161,7 +177,8 @@ function createRowObject()
 			rowObj.destAmountInp,
 			rowObj.dateInp,
 			rowObj.commInp,
-			rowObj.delBtn ]);
+			rowObj.delBtn,
+			rowObj.togglePickedBtn ]);
 
 	return rowObj;
 }
@@ -482,7 +499,11 @@ function onSubmitClick()
 	if (!Array.isArray(trRows))
 		return;
 
-	var reqObj = trRows.map(function(rowObj)
+	var reqObj = trRows.filter(function(rowObj)
+	{
+		return rowObj && rowObj.rowEl && !rowObj.rowEl.classList.contains('tr-picked-row');
+	})
+	.map(function(rowObj)
 	{
 		var trObj = {};
 
@@ -714,6 +735,7 @@ function onTrCacheResult(response)
 		if (transaction)
 		{
 			transaction.picked = true;
+			row.data.picked = true;
 			mapImportRow(row);
 		}
 	});
@@ -863,6 +885,9 @@ function mapImportRow(impRowObj)
 	}
 
 	var rowObj = createRowObject();
+
+	if (impRowObj.data.picked)
+		rowObj.rowEl.classList.add('tr-picked-row');
 
 	var tr_type = (impRowObj.data.accAmountVal > 0) ? 'income' : 'expense';
 
