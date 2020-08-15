@@ -72,8 +72,6 @@ function cleanImpRows()
 
 function delRow(rowObj)
 {
-	var delPos;
-
 	if (!rowObj)
 		return;
 
@@ -81,8 +79,7 @@ function delRow(rowObj)
 		addPlaceholder(rowObj.rowEl);
 	re(rowObj.rowEl);
 
-	delPos = rowObj.pos;
-
+	var delPos = rowObj.pos;
 	trRows.splice(delPos, 1);
 	updateRowsPos();
 
@@ -103,7 +100,7 @@ function createRowObject()
 
 		rowObj.currSel.appendChild(option);
 	});
-	rowObj.currSel.onchange = onCurrChange.bind(rowObj.currSel, rowObj);
+	rowObj.currSel.addEventListener('change', onCurrChange.bind(rowObj.currSel, rowObj));
 
 	rowObj.trTypeSel = ce('select', { name : 'tr_type[]' },
 			[ ce('option', { value : 'expense', innerHTML : '-' }),
@@ -112,7 +109,7 @@ function createRowObject()
 				ce('option', { value : 'transferto', innerHTML : '<' }),
 				ce('option', { value : 'debtfrom', innerHTML : 'D>' }),
 				ce('option', { value : 'debtto', innerHTML : 'D<' }) ]);
-	rowObj.trTypeSel.onchange = onTrTypeChange.bind(rowObj.trTypeSel, rowObj);
+	rowObj.trTypeSel.addEventListener('change', onTrTypeChange.bind(rowObj.trTypeSel, rowObj));
 
 	rowObj.destAccIdInp = ce('input', { type : 'hidden', name : 'dest_acc_id[]', value : '' });
 
@@ -126,7 +123,7 @@ function createRowObject()
 
 		rowObj.destAccSel.appendChild(option);
 	});
-	rowObj.destAccSel.onchange = onDestChange.bind(rowObj.destAccSel, rowObj);
+	rowObj.destAccSel.addEventListener('change', onDestChange.bind(rowObj.destAccSel, rowObj));
 
 // Persons
 	rowObj.personIdInp = ce('input', { type : 'hidden', name : 'person_id[]', value : '' });
@@ -139,8 +136,7 @@ function createRowObject()
 		rowObj.personSel.appendChild(option);
 	});
 	show(rowObj.personSel, false);
-	rowObj.personSel.onchange = onPersonChange.bind(rowObj.personSel, rowObj);
-
+	rowObj.personSel.addEventListener('change', onPersonChange.bind(rowObj.personSel, rowObj));
 
 	rowObj.amountInp = ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' });
 
@@ -590,6 +586,7 @@ function onCommitResult(response)
 			message = 'All transactions have been successfully imported';
 			cleanTrRows();
 			cleanImpRows();
+			show('importpickstats', false);
 		}
 		else if (respObj && respObj.msg)
 		{
@@ -714,7 +711,6 @@ function onTrCacheResult(response)
 	impRows.forEach(function(row)
 	{
 		var transaction = findSameTransaction(row.data);
-
 		if (transaction)
 		{
 			transaction.picked = true;
@@ -843,21 +839,17 @@ function importLoadCallback(response)
 // Map import row to new transaction
 function mapImportRow(impRowObj)
 {
-	var rowObj;
-	var tr_type, accCurr, trCurr;
-
 	if (!impRowObj || !impRowObj.data)
 		return;
 
-
-	accCurr = findCurrencyByName(impRowObj.data.accCurrVal);
+	var accCurr = findCurrencyByName(impRowObj.data.accCurrVal);
 	if (!accCurr)
 	{
 		alert('Unknown currency ' + impRowObj.data.accCurrVal);
 		return;
 	}
 
-	trCurr = findCurrencyByName(impRowObj.data.trCurrVal);
+	var trCurr = findCurrencyByName(impRowObj.data.trCurrVal);
 	if (!trCurr)
 	{
 		alert('Unknown currency ' + impRowObj.data.trCurrVal);
@@ -870,22 +862,19 @@ function mapImportRow(impRowObj)
 		return;
 	}
 
-	rowObj = createRowObject();
+	var rowObj = createRowObject();
 
-	if (impRowObj.data.accAmountVal > 0)
-		tr_type = 'income';
-	else
-		tr_type = 'expense';
+	var tr_type = (impRowObj.data.accAmountVal > 0) ? 'income' : 'expense';
 
 	selectByValue(rowObj.trTypeSel, tr_type);
-	rowObj.trTypeSel.onchange(rowObj);
+	onTrTypeChange.call(rowObj.trTypeSel, rowObj);
 
 	rowObj.amountInp.value = Math.abs(impRowObj.data.accAmountVal);
 
 	if (trCurr.id != accCurr.id)
 	{
 		selectByValue(rowObj.currSel, trCurr.id);
-		rowObj.currSel.onchange(rowObj);
+		onCurrChange.call(rowObj.currSel, rowObj);
 		rowObj.destAmountInp.value = Math.abs(impRowObj.data.trAmountVal);
 	}
 
@@ -1038,7 +1027,6 @@ function Uploader(file, options, onSuccess, onFail, onProgress)
 		xhrUpload && xhrUpload.abort();
 	}
 
-
 	this.upload = upload;
 	this.pause = pause;
 }
@@ -1050,12 +1038,10 @@ function hashCode(str)
 	if (str.length == 0)
 		return 0;
 
-	var hash = 0,
-	i, chr, len;
-
-	for (i = 0; i < str.length; i++)
+	var hash = 0;
+	for(var i = 0; i < str.length; i++)
 	{
-		chr = str.charCodeAt(i);
+		var chr = str.charCodeAt(i);
 		hash = ((hash << 5) - hash) + chr;
 		hash |= 0; // Convert to 32bit integer
 	}
@@ -1082,7 +1068,7 @@ function onImportProgress(loaded, total)
 }
 
 
-function onFileImport()
+function onFileImport(e)
 {
 	var fileUploadRadio = ge('fileUploadRadio');
 	var statTypeSel = ge('statTypeSel');
@@ -1090,15 +1076,17 @@ function onFileImport()
 	var isEncodeCheck = ge('isEncodeCheck');
 	var encode = isEncodeCheck.checked;
 
+	e.preventDefault();
+
 	if (fileUploadRadio.checked)
 	{
 		var el = ge('fileInp')
 		if (!el)
-			return false;
+			return;
 
 		var file = el.files[0];
 		if (!file)
-			return false;
+			return;
 
 		uploader = new Uploader(file,
 								{ statType : statType, encode : encode },
@@ -1114,7 +1102,7 @@ function onFileImport()
 
 		el = ge('srvFilePath');
 		if (!el)
-			return false;
+			return;
 
 		reqObj.fileName = el.value;
 		reqObj.statType = statType;
@@ -1126,8 +1114,6 @@ function onFileImport()
 			callback : onImportSuccess
 		});
 	}
-
-	return false;
 }
 
 
@@ -1143,13 +1129,11 @@ function initPage()
 	if (!newRowBtn || !newPhBtn || !fileimportfrm || !importAllBtn || !submitbtn || !trcount || !acc_id)
 		return;
 
-	newRowBtn.onclick = createRow;
-	newPhBtn.onclick = addPlaceholder.bind(null, null);
-
-	acc_id.onchange = onMainAccChange;
-
-	importAllBtn.onclick = onImportAll;
-	submitbtn.onclick = onSubmitClick;
+	newRowBtn.addEventListener('click', createRow);
+	newPhBtn.addEventListener('click', addPlaceholder.bind(null, null));
+	acc_id.addEventListener('change', onMainAccChange);
+	importAllBtn.addEventListener('click', onImportAll);
+	submitbtn.addEventListener('click', onSubmitClick);
 
 	createRow();
 
@@ -1161,5 +1145,5 @@ function initPage()
 									copyWidth : true,
 									onlyRootHandle : true });
 
-	fileimportfrm.onsubmit = onFileImport;
+	fileimportfrm.addEventListener('submit', onFileImport);
 }
