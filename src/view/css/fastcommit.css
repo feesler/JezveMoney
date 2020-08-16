@@ -4,6 +4,12 @@
 }
 
 
+.import-tbl
+{
+	padding: 0px 0px 0px 10px;
+}
+
+
 .column
 {
 	float: left;
@@ -79,36 +85,85 @@
 }
 
 
-.tr_row > select,
-.tr_row input
+.tr_row > *
 {
 	display: inline;
 	float: left;
+}
+
+.tr_row > select,
+.tr_row > input[type="text"]
+{
 	border: 1px solid #000;
 	padding: 5px;
 	width: 100px;
 	margin: 0px 5px 0px 0px;
 }
 
+
 .tr_row > select[disabled],
-.tr_row input[disabled]
+.tr_row > input[disabled]
 {
 	border-color: #DDDDDD;
 	background-color: #EEEEEE;
 }
 
-.tr_row input[type=button]
+
+.tr_row > input[type="button"]
 {
 	width: 30px;
 	border: 0 none;
+	pointer-events: all;
 }
 
+
+.tr_row > input[type="checkbox"]
+{
+	margin: 10px;
+	width: 20px;
+	pointer-events: all;
+}
+
+
+/* Already exist transaction row */
+.tr_row.tr-disabled-row
+{
+	background-color: #EEEEEE;
+}
+
+
+.tr-disabled-row > select,
+.tr-disabled-row > select[disabled],
+.tr-disabled-row > input[type="text"],
+.tr-disabled-row > input[disabled]
+{
+	color: #DDDDDD;
+	border-color: #DDDDDD;
+	background-color: #EEEEEE;
+	pointer-events: none;
+}
+
+
+.tr-disabled-row input::placeholder
+{
+	color: #DDDDDD;
+}
+
+
+.tr_row .ok_btn
+{
+	pointer-events: all;
+}
+
+
+/* Placeholder */
 .tr_row_placeholder
 {
 	border: 1px dashed #888888;
 	height: 54px;
 	margin: 3px 0px;
 }
+
 
 .tr_row_placeholder > input,
 .tr_row_placeholder > select
@@ -127,11 +182,13 @@
 	line-height: 20px;
 }
 
+
 .checkwrap.inputwrap
 {
 	height: 30px;
 	line-height: 30px;
 }
+
 
 .checkwrap.inputwrap input[type="text"]
 {

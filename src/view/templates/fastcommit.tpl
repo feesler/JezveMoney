@@ -33,7 +33,7 @@
 	</select>
 
 	<div class="clearfix">
-		<table><tbody id="importRows"></tbody></table>
+		<table class="import-tbl"><tbody id="importRows"></tbody></table>
 		<div id="rowsContainer"></div>
 	</div>
 	<div class="controls">
