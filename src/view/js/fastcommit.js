@@ -70,6 +70,18 @@ function cleanImpRows()
 }
 
 
+function findRowByElement(elem)
+{
+	if (!elem)
+		return null;
+
+	return trRows.find(function(rowObj)
+	{
+		return rowObj && rowObj.rowEl == elem;
+	});
+}
+
+
 function delRow(rowObj)
 {
 	if (!rowObj)
@@ -87,15 +99,51 @@ function delRow(rowObj)
 }
 
 
-function toggleRow(rowObj)
+function getRowFromEvent(e)
 {
-	if (!rowObj || !rowObj.rowEl)
+	if (!e || !e.target)
+		return null;
+
+	var rowEl = e.target.closest('.tr_row');
+	return findRowByElement(rowEl);
+}
+
+
+function onRowChecked(rowObj)
+{
+	if (!rowObj)
 		return;
 	
-	if (rowObj.rowEl.classList.contains('tr-picked-row'))
-		rowObj.rowEl.classList.remove('tr-picked-row')
+	enableRow(rowObj, rowObj.enableCheck.checked);
+}
+
+
+function enableRow(rowObj, val)
+{
+	if (!rowObj)
+		return;
+
+	var newState = (typeof val === 'undefined') ? true : !!val;
+	if (newState)
+		rowObj.rowEl.classList.remove('tr-disabled-row');
 	else
-		rowObj.rowEl.classList.add('tr-picked-row')
+		rowObj.rowEl.classList.add('tr-disabled-row');
+
+	rowObj.enableCheck.checked = newState;
+	enable(rowObj.trTypeSel, newState);
+	enable(rowObj.amountInp, newState);
+	enable(rowObj.currIdInp, newState);
+	enable(rowObj.currSel, newState);
+	enable(rowObj.destAccIdInp, newState);
+	enable(rowObj.destAccSel, newState);
+	enable(rowObj.personIdInp, newState);
+	enable(rowObj.personSel, newState);
+	enable(rowObj.destAmountInp, newState);
+	enable(rowObj.dateInp, newState);
+	enable(rowObj.commInp, newState);
+
+	if (newState)
+		onTrTypeChanged(rowObj);
 }
 
 
@@ -103,6 +151,14 @@ function createRowObject()
 {
 	var rowObj = {};
 
+	// Row enable checkbox
+	rowObj.enableCheck = ce('input', { type : 'checkbox', checked : true });
+	rowObj.enableCheck.addEventListener('change', function(e)
+	{
+		onRowChecked(getRowFromEvent(e));
+	});
+
+	// Currency controls
 	rowObj.currIdInp = ce('input', { type : 'hidden', name : 'curr_id[]', value : mainAccObj.curr_id });
 	rowObj.currSel = ce('select');
 	currencies.forEach(function(currency)
@@ -112,8 +168,12 @@ function createRowObject()
 
 		rowObj.currSel.appendChild(option);
 	});
-	rowObj.currSel.addEventListener('change', onCurrChange.bind(rowObj.currSel, rowObj));
+	rowObj.currSel.addEventListener('change', function(e)
+	{
+		onCurrChanged(getRowFromEvent(e));
+	});
 
+	// Transaction type select
 	rowObj.trTypeSel = ce('select', { name : 'tr_type[]' },
 			[ ce('option', { value : 'expense', innerHTML : '-' }),
 				ce('option', { value : 'income', innerHTML : '+' }),
@@ -121,10 +181,13 @@ function createRowObject()
 				ce('option', { value : 'transferto', innerHTML : '<' }),
 				ce('option', { value : 'debtfrom', innerHTML : 'D>' }),
 				ce('option', { value : 'debtto', innerHTML : 'D<' }) ]);
-	rowObj.trTypeSel.addEventListener('change', onTrTypeChange.bind(rowObj.trTypeSel, rowObj));
+	rowObj.trTypeSel.addEventListener('change', function(e)
+	{
+		onTrTypeChanged(getRowFromEvent(e));
+	});
 
+	// Destination account controls
 	rowObj.destAccIdInp = ce('input', { type : 'hidden', name : 'dest_acc_id[]', value : '' });
-
 	rowObj.destAccSel = ce('select', { disabled : true },
 								ce('option', { value : 0, innerHTML : 'Destination account', selected : true, disabled : true }));
 	accounts.forEach(function(account)
@@ -135,11 +198,15 @@ function createRowObject()
 
 		rowObj.destAccSel.appendChild(option);
 	});
-	rowObj.destAccSel.addEventListener('change', onDestChange.bind(rowObj.destAccSel, rowObj));
+	rowObj.destAccSel.addEventListener('change', function(e)
+	{
+		var rowObj = getRowFromEvent(e);
+		if (rowObj)
+			onDestChanged(rowObj);
+	});
 
-// Persons
+	// Person controls
 	rowObj.personIdInp = ce('input', { type : 'hidden', name : 'person_id[]', value : '' });
-
 	rowObj.personSel = ce('select');
 	persons.forEach(function(person)
 	{
@@ -148,25 +215,28 @@ function createRowObject()
 		rowObj.personSel.appendChild(option);
 	});
 	show(rowObj.personSel, false);
-	rowObj.personSel.addEventListener('change', onPersonChange.bind(rowObj.personSel, rowObj));
+	rowObj.personSel.addEventListener('change', function(e)
+	{
+		onPersonChanged(getRowFromEvent(e));
+	});
 
+	// Amount controls
 	rowObj.amountInp = ce('input', { type : 'text', name : 'amount[]', placeholder : 'Amount' });
-
 	rowObj.destAmountInp = ce('input', { type : 'text', name : 'dest_amount[]',
 											disabled : true, placeholder : 'Destination amount' });
 
 	rowObj.dateInp = ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' });
 	rowObj.commInp = ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' });
-	rowObj.delBtn = ce('input', { className : 'btn ok_btn', type : 'button',
-					onclick : delRow.bind(null, rowObj),
-					value : '-' });
+	rowObj.delBtn = ce('input', { className : 'btn ok_btn', type : 'button', value : '-' });
+	rowObj.delBtn.addEventListener('click', function(e)
+	{
+		delRow(getRowFromEvent(e));
+	});
 
-	rowObj.togglePickedBtn = ce('input', { className : 'btn ok_btn picked-btn', type : 'button',
-								onclick : toggleRow.bind(null, rowObj),
-								value : '*' });
 
 	rowObj.rowEl = ce('div', { className : 'tr_row clearfix' },
-		[ rowObj.trTypeSel,
+		[ rowObj.enableCheck,
+			rowObj.trTypeSel,
 			rowObj.amountInp,
 			rowObj.currIdInp,
 			rowObj.currSel,
@@ -177,8 +247,7 @@ function createRowObject()
 			rowObj.destAmountInp,
 			rowObj.dateInp,
 			rowObj.commInp,
-			rowObj.delBtn,
-			rowObj.togglePickedBtn ]);
+			rowObj.delBtn ]);
 
 	return rowObj;
 }
@@ -266,10 +335,7 @@ function findNthItem(parent, n)
 // Add new transaction row and insert it into list
 function createRow()
 {
-	var rowsContainer;
-	var rowObj;
-
-	rowsContainer = ge('rowsContainer');
+	var rowsContainer = ge('rowsContainer');
 	if (!rowsContainer)
 		return;
 
@@ -277,7 +343,8 @@ function createRow()
 	if (!mainAccObj)
 		return;
 
-	rowObj = createRowObject();
+	var rowObj = createRowObject();
+	enableRow(rowObj, true);
 
 	var nextTrRow = null;
 	var firstPlaceholder = findPlaceholder();
@@ -378,14 +445,12 @@ function copyDestAcc(rowObj)
 }
 
 
-function onTrTypeChange(rowObj)
+function onTrTypeChanged(rowObj)
 {
-	var tr_type;
-
 	if (!rowObj)
 		return;
 
-	tr_type = selectedValue(rowObj.trTypeSel);
+	var tr_type = selectedValue(rowObj.trTypeSel);
 	if (!rowObj.destAccSel || !rowObj.destAccSel.options)
 		return;
 
@@ -443,10 +508,12 @@ function copyCurr(rowObj)
 }
 
 
-function onCurrChange(rowObj)
+function onCurrChanged(rowObj)
 {
-	copyCurr(rowObj);
+	if (!rowObj)
+		return;
 
+	copyCurr(rowObj);
 	syncDestAmountAvail(rowObj);
 }
 
@@ -472,8 +539,11 @@ function onMainAccChange()
 }
 
 
-function onDestChange(rowObj)
+function onDestChanged(rowObj)
 {
+	if (!rowObj)
+		return;
+
 	copyDestAcc(rowObj);
 	syncDestAmountAvail(rowObj);
 }
@@ -488,8 +558,11 @@ function copyPerson(rowObj)
 }
 
 
-function onPersonChange(rowObj)
+function onPersonChanged(rowObj)
 {
+	if (!rowObj)
+		return;
+
 	copyPerson(rowObj);
 }
 
@@ -501,7 +574,7 @@ function onSubmitClick()
 
 	var reqObj = trRows.filter(function(rowObj)
 	{
-		return rowObj && rowObj.rowEl && !rowObj.rowEl.classList.contains('tr-picked-row');
+		return rowObj && rowObj.rowEl && !rowObj.rowEl.classList.contains('tr-disabled-row');
 	})
 	.map(function(rowObj)
 	{
@@ -735,7 +808,7 @@ function onTrCacheResult(response)
 		if (transaction)
 		{
 			transaction.picked = true;
-			row.data.picked = true;
+			row.data.sameFound = true;
 			mapImportRow(row);
 		}
 	});
@@ -886,13 +959,10 @@ function mapImportRow(impRowObj)
 
 	var rowObj = createRowObject();
 
-	if (impRowObj.data.picked)
-		rowObj.rowEl.classList.add('tr-picked-row');
-
 	var tr_type = (impRowObj.data.accAmountVal > 0) ? 'income' : 'expense';
 
 	selectByValue(rowObj.trTypeSel, tr_type);
-	onTrTypeChange.call(rowObj.trTypeSel, rowObj);
+	onTrTypeChanged(rowObj);
 
 	rowObj.amountInp.value = Math.abs(impRowObj.data.accAmountVal);
 
@@ -943,6 +1013,8 @@ function mapImportRow(impRowObj)
 			trRows.splice(replacedRowObj.pos, 0, rowObj);
 		}
 	}
+
+	enableRow(rowObj, !impRowObj.data.sameFound);
 
 	insertAfter(rowObj.rowEl, item);
 	re(item);
