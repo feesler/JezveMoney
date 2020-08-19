@@ -28,7 +28,7 @@ class CurrencyModel extends CachedTable
 						"`createdate` DATETIME NOT NULL, ".
 						"`updatedate` DATETIME NOT NULL, ".
 						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8 COLLATE utf8mb4_general_ci");
+						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 
 		return $res;
 	}
