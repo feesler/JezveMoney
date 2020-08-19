@@ -19,8 +19,8 @@ function setCurrencyValues(currObj)
 		curr_id.value = currObj.id;
 		curr_name.value = currObj.name;
 		curr_sign.value = currObj.sign;
-		isbefore.checked = (currObj.format == 1);
-		isafter.checked = (currObj.format == 0);
+		isbefore.checked = (currObj.flags == 1);
+		isafter.checked = (currObj.flags == 0);
 	}
 	else			// clean
 	{
@@ -217,7 +217,7 @@ function onListResult(response)
 			ce('td', { innerText : item.id }),
 			ce('td', { innerText : item.name }),
 			ce('td', { innerText : item.sign }),
-			ce('td', { innerText : item.format }),
+			ce('td', { innerText : item.flags }),
 		]);
 
 		row.onclick = onRowClick.bind(row);

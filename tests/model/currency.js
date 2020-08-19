@@ -9,9 +9,7 @@ export class Currency
 	{
 		for(let key in props)
 		{
-			let thisKey = (key == 'format') ? 'flags' : key;
-
-			this[thisKey] = props[key];
+			this[key] = props[key];
 		}
 	}
 

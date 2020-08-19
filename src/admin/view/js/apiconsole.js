@@ -494,7 +494,7 @@ function isCurrency(obj)
 			id : isInt,
 			name : isString,
 			sign : isString,
-			format : isInt,
+			flags : isInt,
 		}, {
 			createdate : isInt,
 			updatedate : isInt,

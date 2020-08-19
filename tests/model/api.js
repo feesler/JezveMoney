@@ -87,7 +87,7 @@ const userReqFields = ['login', 'password', 'name'];
 /**
  * Currency
  */
-const currReqFields = ['name', 'sign', 'format'];
+const currReqFields = ['name', 'sign', 'flags'];
 
 /**
  * Accounts

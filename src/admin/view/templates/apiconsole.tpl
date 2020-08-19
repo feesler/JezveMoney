@@ -576,8 +576,8 @@
 								<input id="create_currency_sign" name="sign" type="text">
 							</div>
 							<div class="std_margin">
-								<label for="create_currency_format">Format(0 - sign on right, 1 - sign on left)</label>
-								<input id="create_currency_format" name="format" type="text">
+								<label for="create_currency_flags">Flags (0 - sign on right, 1 - sign on left)</label>
+								<input id="create_currency_flags" name="flags" type="text">
 							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
@@ -601,8 +601,8 @@
 								<input id="update_currency_sign" name="sign" type="text">
 							</div>
 							<div class="std_margin">
-								<label for="update_currency_format">Format(0 - sign on right, 1 - sign on left)</label>
-								<input id="update_currency_format" name="format" type="text">
+								<label for="update_currency_flags">Flags (0 - sign on right, 1 - sign on left)</label>
+								<input id="update_currency_flags" name="flags" type="text">
 							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">

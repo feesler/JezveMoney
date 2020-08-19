@@ -7,6 +7,6 @@ class Currency
 		$this->id = $obj->id;
 		$this->name = $obj->name;
 		$this->sign = $obj->sign;
-		$this->format = $obj->format;
+		$this->flags = $obj->flags;
 	}
 }
