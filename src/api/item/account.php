@@ -11,5 +11,6 @@ class Account
 		$this->initbalance = $obj->initbalance;
 		$this->balance = $obj->balance;
 		$this->icon = $obj->icon;
+		$this->flags = $obj->flags;
 	}
 }

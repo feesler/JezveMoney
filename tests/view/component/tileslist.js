@@ -1,6 +1,6 @@
 import { NullableComponent } from './component.js';
 import { Tile } from './tile.js';
-import { InfoTile } from './infotile.js';
+import { AccountsList } from '../../model/accountslist.js';
 import { asyncMap } from '../../common.js';
 
 
@@ -31,13 +31,28 @@ export class TilesList extends NullableComponent
 
 	static renderAccounts(accountsList)
 	{
-		if (!Array.isArray(accountsList))
+		if (!(accountsList instanceof AccountsList))
 			throw new Error('Invalid data');
 
+		let visibleAccounts = accountsList.getVisible(true);
+
 		let res = {
-			tiles : {
-				items : accountsList.map(Tile.renderAccount)
-			}
+			items : visibleAccounts.map(Tile.renderAccount)
+		};
+
+		return res;
+	}
+
+
+	static renderHiddenAccounts(accountsList)
+	{
+		if (!(accountsList instanceof AccountsList))
+			throw new Error('Invalid data');
+
+		let hiddenAccounts = accountsList.getHidden(true);
+
+		let res = {
+			items : hiddenAccounts.map(Tile.renderAccount)
 		};
 
 		return res;
@@ -49,15 +64,9 @@ export class TilesList extends NullableComponent
 		if (!Array.isArray(personsList))
 			throw new Error('Invalid data');
 
-		let personTiles = {
+		let res = {
 			items : personsList.map(tileClass.renderPerson)
 		};
-
-		let res = {};
-		if (tileClass == InfoTile)
-			res.infoTiles = personTiles;
-		else
-			res.tiles = personTiles;
 
 		return res;
 	}

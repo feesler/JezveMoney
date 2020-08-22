@@ -9,7 +9,7 @@ import {
 import { EXPENSE, INCOME, DEBT, availTransTypes } from './transaction.js';
 import { App } from '../app.js';
 import { Currency } from './currency.js';
-import { AccountsList } from './accountslist.js';
+import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
 import { api } from './api.js';
@@ -212,6 +212,30 @@ export class AppState
 
 		this.transactions.updateResults(this.accounts);
 		this.updatePersonAccounts();
+
+		return true;
+	}
+
+
+	showAccounts(ids, show = true)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let acc_id of ids)
+		{
+			let account = this.accounts.getItem(acc_id);
+			if (!account)
+				return false;
+
+			if (show)
+				account.flags &= ~ACCOUNT_HIDDEN;
+			else
+				account.flags |= ACCOUNT_HIDDEN;
+			
+			this.accounts.update(account);
+		}
+
 
 		return true;
 	}

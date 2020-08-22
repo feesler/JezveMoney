@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class AccountsController extends TemplateController
 {
-	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon" ];
+	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon", "flags" ];
 
 
 	protected function onStart()
@@ -22,6 +22,7 @@ class AccountsController extends TemplateController
 		$transMod = TransactionModel::getInstance();
 
 		$tilesArr = $this->model->getTilesArray();
+		$hiddenTilesArr = $this->model->getTilesArray([ "type" => "hidden" ]);
 
 		$titleString = "Jezve Money | Accounts";
 
@@ -53,6 +54,7 @@ class AccountsController extends TemplateController
 		$accInfo->icon = 0;
 		$accInfo->iconclass = "";
 		$accInfo->iconname = NULL;
+		$accInfo->flags = 0;
 
 		$currObj = $currMod->getItem($accInfo->curr_id);
 		if (!$currObj)
@@ -169,6 +171,42 @@ class AccountsController extends TemplateController
 			$this->fail($defMsg);
 
 		Message::set(MSG_ACCOUNT_UPDATE);
+
+		setLocation(BASEURL."accounts/");
+	}
+
+
+	public function show()
+	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."accounts/");
+
+		$defMsg = ERR_ACCOUNT_SHOW;
+
+		if (!isset($_POST["accounts"]))
+			$this->fail($defMsg);
+
+		$ids = explode(",", rawurldecode($_POST["accounts"]));
+		if (!$this->model->show($ids))
+			$this->fail($defMsg);
+
+		setLocation(BASEURL."accounts/");
+	}
+
+
+	public function hide()
+	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."accounts/");
+
+		$defMsg = ERR_ACCOUNT_HIDE;
+
+		if (!isset($_POST["accounts"]))
+			$this->fail($defMsg);
+
+		$ids = explode(",", rawurldecode($_POST["accounts"]));
+		if (!$this->model->hide($ids))
+			$this->fail($defMsg);
 
 		setLocation(BASEURL."accounts/");
 	}

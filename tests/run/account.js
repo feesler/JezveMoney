@@ -4,6 +4,7 @@ import { Transaction } from '../model/transaction.js';
 import { Currency } from '../model/currency.js';
 import { test, formatProps } from '../common.js';
 import { App } from '../app.js';
+import { AccountsList } from '../model/accountslist.js';
 
 
 export async function stateLoop()
@@ -221,6 +222,65 @@ export async function delFromUpdate(pos)
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
+}
+
+
+export async function show(accounts, val = true)
+{
+	if (!Array.isArray(accounts))
+		accounts = [ accounts ];
+
+	let showVerb = val ? 'Show' : 'Hide';
+	App.view.setBlock(`${showVerb} account(s) [${accounts.join()}]`, 2);
+
+	// Navigate to create account view
+	if (!(App.view instanceof AccountsView))
+	{
+		await App.goToMainView();
+		await App.view.goToAccounts();
+	}
+
+	// Check initial state
+	await App.state.fetch();
+
+	let userAccList = App.state.accounts.getUserAccounts();
+	let visibleAccList = userAccList.getVisible(true);
+	let hiddenAccList = userAccList.getHidden(true);
+
+	let ids = accounts.map(ind =>
+	{
+		if (ind < 0 || ind > userAccList.length)
+			throw new Error(`Invalid account index ${ind}`);
+
+		if (ind < visibleAccList.length)
+		{
+			return visibleAccList[ind].id;
+		}
+		else
+		{
+			let hiddenInd = ind - visibleAccList.length;
+			return hiddenAccList[hiddenInd].id;
+		}
+	});
+
+	App.state.showAccounts(ids, val);
+
+	if (val)
+		await App.view.showAccounts(accounts);
+	else
+		await App.view.hideAccounts(accounts);
+
+	App.view.expectedState = AccountsView.render(App.state);
+
+	await test(`${showVerb} accounts [${accounts.join()}]`, () => App.view.checkState());
+	await test('App state', () => App.state.fetchAndTest());
+}
+
+
+
+export async function hide(accounts)
+{
+	return show(accounts, false);
 }
 
 

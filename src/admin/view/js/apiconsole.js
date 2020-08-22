@@ -450,6 +450,7 @@ function isAccount(obj)
 			initbalance : isNum,
 			name : isString,
 			icon : isInt,
+			flags : isInt,
 		}, {
 			user_id : isInt,
 			createdate : isInt,
@@ -674,6 +675,13 @@ function initControls()
 		throw new Error('Fail to init view');
 	listAccForm.onsubmit = function(e){ return onFormSubmit(e, isAccountsArray); };
 
+	var checkboxes = listAccForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = Array.from(checkboxes);
+	checkboxes.forEach(function(elem)
+	{
+		elem.addEventListener('change', onCheck);
+	});
+
 	var readaccbtn = ge('readaccbtn');
 	if (readaccbtn)
 		readaccbtn.onclick = onReadAccountSubmit;
@@ -731,7 +739,7 @@ function initControls()
 		throw new Error('Fail to init view');
 	listTrForm.onsubmit = function(e){ return onFormSubmit(e, isTransactionsArray); };
 
-	var checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
 	checkboxes = Array.from(checkboxes);
 	checkboxes.forEach(function(elem)
 	{

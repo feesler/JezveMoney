@@ -88,7 +88,9 @@ export class PersonsView extends TestView
 	static render(state)
 	{
 		let res = {
-			values : TilesList.renderPersons(state.persons.data)
+			values : {
+				tiles : TilesList.renderPersons(state.persons.data)
+			}
 		};
 
 		return res;

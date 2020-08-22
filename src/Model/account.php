@@ -44,6 +44,7 @@ class AccountModel extends CachedTable
 						"`initbalance` DECIMAL(15,2) NOT NULL, ".
 						"`name` VARCHAR(255) NOT NULL, ".
 						"`icon` INT(11) NOT NULL DEFAULT '0', ".
+						"`flags` INT(11) NOT NULL DEFAULT '0', ".
 						"`createdate` DATETIME NOT NULL, ".
 						"`updatedate` DATETIME NOT NULL, ".
 						"PRIMARY KEY (`id`), ".
@@ -52,7 +53,6 @@ class AccountModel extends CachedTable
 
 		return $res;
 	}
-
 
 
 	// Convert DB row to item object
@@ -70,6 +70,7 @@ class AccountModel extends CachedTable
 		$res->balance = floatval($row["balance"]);
 		$res->initbalance = floatval($row["initbalance"]);
 		$res->icon = intval($row["icon"]);
+		$res->flags = intval($row["flags"]);
 		$res->createdate = strtotime($row["createdate"]);
 		$res->updatedate = strtotime($row["updatedate"]);
 
@@ -86,7 +87,7 @@ class AccountModel extends CachedTable
 
 	protected function checkParams($params, $isUpdate = FALSE)
 	{
-		$avFields = ["owner_id", "name", "initbalance", "curr_id", "icon"];
+		$avFields = ["owner_id", "name", "initbalance", "curr_id", "icon", "flags"];
 		$res = [];
 
 		// In CREATE mode all fields is required
@@ -136,6 +137,11 @@ class AccountModel extends CachedTable
 				wlog("Invalid icon specified");
 				return NULL;
 			}
+		}
+
+		if (isset($params["flags"]))
+		{
+			$res["flags"] = intval($params["flags"]);
 		}
 
 		return $res;
@@ -264,6 +270,60 @@ class AccountModel extends CachedTable
 	}
 
 
+	public function show($items)
+	{
+		if (!is_array($items))
+			$items = [ $items ];
+
+		foreach($items as $item_id)
+		{
+			// check account is exist
+			$accObj = $this->getItem($item_id);
+			if (!$accObj)
+				return FALSE;
+
+			// check user of account
+			if ($accObj->user_id != self::$user_id)
+				return FALSE;
+		}
+
+		$updRes = $this->dbObj->updateQ($this->tbl_name, [ "flags=flags&~".ACCOUNT_HIDDEN ], "id".inSetCondition($items));
+		if (!$updRes)
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	public function hide($items)
+	{
+		if (!is_array($items))
+			$items = [ $items ];
+
+		foreach($items as $item_id)
+		{
+			// check account is exist
+			$accObj = $this->getItem($item_id);
+			if (!$accObj)
+				return FALSE;
+
+			// check user of account
+			if ($accObj->user_id != self::$user_id)
+				return FALSE;
+		}
+
+		$updRes = $this->dbObj->updateQ($this->tbl_name, [ "flags=flags|".ACCOUNT_HIDDEN ], "id".inSetCondition($items));
+		if (!$updRes)
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
 	// Return account of person with specified currency if exist
 	public function getPersonAccount($person_id, $curr_id)
 	{
@@ -316,7 +376,8 @@ class AccountModel extends CachedTable
 							"name" => "acc_".$person_id."_".$curr_id,
 							"initbalance" => 0.0,
 							"curr_id" => $curr_id,
-							"icon" => 0
+							"icon" => 0,
+							"flags" => 0
 						]);
 
 		return $this->getItem($createRes);
@@ -474,6 +535,10 @@ class AccountModel extends CachedTable
 
 
 	// Return array of accounts
+	// $params - array of parameters
+	//   full - if set to TRUE include accounts of persons
+	//   type - select user accounts by visibility. Possible values: "all", "visible", "hidden"
+	//   person - return accounts of specified person
 	public function getData($params = NULL)
 	{
 		$resArr = [];
@@ -485,6 +550,9 @@ class AccountModel extends CachedTable
 			$params = [];
 
 		$includePersons = (isset($params["full"]) && $params["full"] == TRUE);
+		$requestedType = isset($params["type"]) ? $params["type"] : "visible";
+		$includeVisible = in_array($requestedType, ["all", "visible"]);
+		$includeHidden = in_array($requestedType, ["all", "hidden"]);
 		$person_id = (isset($params["person"])) ? intval($params["person"]) : 0;
 		if ($person_id)
 			$includePersons = TRUE;
@@ -511,6 +579,9 @@ class AccountModel extends CachedTable
 				continue;
 			if (!$includePersons && $item->owner_id != self::$owner_id)
 				continue;
+			$hidden = $this->isHidden($item);
+			if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden))
+				continue;
 
 			$accObj = clone $item;
 
@@ -518,6 +589,18 @@ class AccountModel extends CachedTable
 		}
 
 		return $resArr;
+	}
+
+
+	// Check item is hidden
+	public function isHidden($item)
+	{
+		if (is_int($item))
+			$item = $this->getItem($item);
+		if (!$item || !is_object($item) || !isset($item->flags))
+			throw new Error("Invalid account item");
+
+		return $item && ($item->flags & ACCOUNT_HIDDEN) == ACCOUNT_HIDDEN;
 	}
 
 
@@ -529,11 +612,20 @@ class AccountModel extends CachedTable
 		if (!$this->checkCache())
 			return $res;
 
-		$includePersons = (is_array($params) && isset($params["full"]) && $params["full"] == TRUE);
+		if (!is_array($params))
+			$params = [];
+
+		$includePersons = (isset($params["full"]) && $params["full"] == TRUE);
+		$requestedType = isset($params["type"]) ? $params["type"] : "visible";
+		$includeVisible = in_array($requestedType, ["all", "visible"]);
+		$includeHidden = in_array($requestedType, ["all", "hidden"]);
 
 		foreach($this->cache as $acc_id => $item)
 		{
 			if (!$includePersons && $item->owner_id != self::$owner_id)
+				continue;
+			$hidden = $this->isHidden($item);
+			if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden))
 				continue;
 
 			$res++;
@@ -544,18 +636,26 @@ class AccountModel extends CachedTable
 
 
 	// Return array of accounts for template
-	public function getTilesArray()
+	public function getTilesArray($params = NULL)
 	{
 		$res = [];
 
 		if (!$this->checkCache())
 			return $res;
 
-		$accounts = count($this->cache);
+		if (!is_array($params))
+			$params = [];
+
+		$requestedType = isset($params["type"]) ? $params["type"] : "visible";
+		$includeVisible = in_array($requestedType, ["all", "visible"]);
+		$includeHidden = in_array($requestedType, ["all", "hidden"]);
 
 		foreach($this->cache as $acc_id => $item)
 		{
 			if ($item->owner_id != self::$owner_id)
+				continue;
+			$hidden = $this->isHidden($item);
+			if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden))
 				continue;
 
 			$acc_icon = $this->getIconClass($item->icon);
@@ -619,18 +719,22 @@ class AccountModel extends CachedTable
 	}
 
 
-	// Try to find account different from specified
+	// Try to find visible account different from specified
 	public function getAnother($acc_id)
 	{
 		$acc_id = intval($acc_id);
-		if ($acc_id != 0 && $this->getCount() < 2)
+		if ($acc_id != 0 && $this->getCount([ "type" => "visible" ]) < 2)
 			return 0;
 
-		$newacc_id = $this->getIdByPos(0);
-		if ($newacc_id == $acc_id)
-			$newacc_id = $this->getIdByPos(1);
+		foreach($this->cache as $item)
+		{
+			if ($item->id != $acc_id &&
+				$item->owner_id == self::$owner_id &&
+				!$this->isHidden($item))
+				return $item->id;
+		}
 
-		return $newacc_id;
+		return 0;
 	}
 
 

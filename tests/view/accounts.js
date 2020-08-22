@@ -20,8 +20,9 @@ export class AccountsView extends TestView
 		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 			throw new Error('Invalid structure of accounts view');
 
-		res.title = this.prop(res.titleEl, 'innerText');
-		res.tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
+		res.title = await this.prop(res.titleEl, 'innerText');
+		res.tiles = await TilesList.create(this, await this.query('#tilesContainer'), Tile);
+		res.hiddenTiles = await TilesList.create(this, await this.query('#hiddenTilesContainer'), Tile);
 
 		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
@@ -56,10 +57,22 @@ export class AccountsView extends TestView
 		let ind = 0;
 		for(let acc_num of acc)
 		{
-			if (acc_num >= this.content.tiles.items.length)
-				throw new Error('Wrong account number');
+			if (acc_num < 0 || acc_num >= this.content.tiles.items.length + this.content.hiddenTiles.items.length)
+				throw new Error('Invalid account number');
 
-			await this.performAction(() => this.content.tiles.items[acc_num].click());
+			if (acc_num < this.content.tiles.items.length)
+			{
+				await this.performAction(() => this.content.tiles.items[acc_num].click());
+				if (!await this.content.toolbar.isButtonVisible('hide'))
+					throw new Error('Hide button is not visible');
+			}
+			else
+			{
+				let hiddenAccNum = acc_num - this.content.tiles.items.length;
+				await this.performAction(() => this.content.hiddenTiles.items[hiddenAccNum].click());
+				if (!await this.content.toolbar.isButtonVisible('show'))
+					throw new Error('Show button is not visible');
+			}
 
 			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
 			if (ind == 0 && !updIsVisible)
@@ -83,6 +96,13 @@ export class AccountsView extends TestView
 			if (tile.isActive)
 				await this.performAction(() => this.content.tiles.items[acc_num].click());
 		}
+
+		for(let acc_num = 0, l = this.content.hiddenTiles.items.length; acc_num < l; acc_num++)
+		{
+			let tile = this.content.hiddenTiles.items[acc_num];
+			if (tile.isActive)
+				await this.performAction(() => this.content.hiddenTiles.items[acc_num].click());
+		}
 	}
 
 
@@ -100,6 +120,24 @@ export class AccountsView extends TestView
 			throw new Error('OK button not found');
 
 		return this.navigation(() => this.click(this.content.delete_warning.okBtn));
+	}
+
+
+	// Show secified accounts and return navigation promise
+	async showAccounts(acc)
+	{
+		await this.selectAccounts(acc);
+
+		return this.navigation(() => this.content.toolbar.clickButton('show'));
+	}
+
+
+	// Hide secified accounts and return navigation promise
+	async hideAccounts(acc)
+	{
+		await this.selectAccounts(acc);
+
+		return this.navigation(() => this.content.toolbar.clickButton('hide'));
 	}
 
 
@@ -124,8 +162,13 @@ export class AccountsView extends TestView
 
 	static render(state)
 	{
+		let userAccounts = state.accounts.getUserAccounts();
+
 		let res = {
-			values : TilesList.renderAccounts(state.accounts.getUserAccounts(true))
+			values : {
+				tiles : TilesList.renderAccounts(userAccounts),
+				hiddenTiles : TilesList.renderHiddenAccounts(userAccounts)
+			}
 		};
 
 		return res;

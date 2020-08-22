@@ -18,7 +18,7 @@ class StateApiController extends ApiController
 
 		$res->accounts = new stdClass;
 		$res->accounts->data = [];
-		$items = $this->accModel->getData([ "full" => TRUE ]);
+		$items = $this->accModel->getData([ "full" => TRUE, "type" => "all" ]);
 		foreach($items as $item)
 		{
 			$res->accounts->data[] = new Account($item);

@@ -5,6 +5,8 @@
 	define("TRANSFER", 3);
 	define("DEBT", 4);
 
+	define("ACCOUNT_HIDDEN", 1);
+
 
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)

@@ -1297,7 +1297,8 @@ function TransactionViewModel()
 		self.accDDList = DropDown.create({ input_id : 'acc_tile', listAttach : true, onitemselect : onDebtAccSel, editable : false });
 		accounts.forEach(function(acc)
 		{
-			self.accDDList.addItem(acc.id, acc.name);
+			if (isHiddenAccount(acc))
+				self.accDDList.addItem(acc.id, acc.name);
 		});
 	}
 
@@ -1352,29 +1353,49 @@ function TransactionViewModel()
 		if (elem)
 			setParam(elem.firstElementChild, { onclick : showComment });
 
-		var srcAcc, destAcc;
+		var srcAcc = null, destAcc = null;
 
 		if (Transaction.isExpense() || Transaction.isTransfer())
-			srcAcc = getAccount(ge('src_id').value);
+		{
+			elem = ge('src_id');
+			if (elem)
+				srcAcc = getAccount(elem.value);
+		}
 		if (Transaction.isIncome() || Transaction.isTransfer())
-			destAcc = getAccount(ge('dest_id').value);
+		{
+			elem = ge('dest_id');
+			if (elem)
+				destAcc = getAccount(elem.value);
+		}
 
-		Transaction.set('exchrate', ge('exchrate').value);
+		elem = ge('exchrate');
+		if (elem)
+			Transaction.set('exchrate', elem.value);
 		if (Transaction.isExpense())
-			Transaction.set('src_initbal', srcAcc.balance);
+		{
+			if (srcAcc)
+				Transaction.set('src_initbal', srcAcc.balance);
+		}
 		else if (Transaction.isIncome())
-			Transaction.set('dest_initbal', destAcc.balance);
+		{
+			if (destAcc)
+				Transaction.set('dest_initbal', destAcc.balance);
+		}
 		else if (Transaction.isTransfer())
 		{
-			Transaction.set('src_initbal', srcAcc.balance);
-			Transaction.set('dest_initbal', destAcc.balance);
+			if (srcAcc)
+				Transaction.set('src_initbal', srcAcc.balance);
+			if (destAcc)
+				Transaction.set('dest_initbal', destAcc.balance);
 		}
 		else if (Transaction.isDebt())
 		{
-			var acc, p_bal;
+			var acc = null;
+			elem = ge('person_id')
 
-			acc = getPersonAccount(ge('person_id').value, Transaction.srcCurr());
-			p_bal = (acc) ? acc.balance : 0;
+			if (elem)
+				acc = getPersonAccount(elem.value, Transaction.srcCurr());
+			var p_bal = (acc) ? acc.balance : 0;
 
 			if (Transaction.debtType())
 				Transaction.set('src_initbal', p_bal);
@@ -1383,12 +1404,17 @@ function TransactionViewModel()
 
 			if (!Transaction.noAccount())
 			{
-				acc = getAccount(ge('acc_id').value);
+				elem = ge('acc_id');
+				if (elem)
+					acc = getAccount(elem.value);
 
-				if (Transaction.debtType())
-					Transaction.set('dest_initbal', acc.balance);
-				else
-					Transaction.set('src_initbal', acc.balance);
+				if (acc)
+				{
+					if (Transaction.debtType())
+						Transaction.set('dest_initbal', acc.balance);
+					else
+						Transaction.set('src_initbal', acc.balance);
+				}
 			}
 		}
 
@@ -1402,8 +1428,6 @@ function TransactionViewModel()
 
 		if (Transaction.isDebt())
 		{
-			var persDDList;
-
 			elem = ge('noacc_btn');
 			if (elem && elem)
 				elem.addEventListener('click', toggleEnableAccount);
@@ -1434,7 +1458,8 @@ function TransactionViewModel()
 			{
 				accounts.forEach(function(acc)
 				{
-					this.srcDDList.addItem(acc.id, acc.name);
+					if (isHiddenAccount(acc))
+						this.srcDDList.addItem(acc.id, acc.name);
 				}, this);
 			}
 
@@ -1443,7 +1468,8 @@ function TransactionViewModel()
 			{
 				accounts.forEach(function(acc)
 				{
-					this.destDDList.addItem(acc.id, acc.name);
+					if (isHiddenAccount(acc))
+						this.destDDList.addItem(acc.id, acc.name);
 				}, this);
 			}
 		}

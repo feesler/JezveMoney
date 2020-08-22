@@ -101,6 +101,17 @@
 						<div id="listAccForm" class="test_form active">
 						<h3>List accounts</h3>
 						<form action="<?=BASEURL?>api/account/list" method="list">
+							<div class="std_margin">
+								<input name="full" type="checkbox" value="1"><label for="count">Include accounts of persons</label>
+							</div>
+							<div class="std_margin">
+								<input type="checkbox" data-target="type"><label for="count">Type</label>
+								<select name="type" disabled>
+									<option value="all">All</option>
+									<option value="visible" selected>Visible</option>
+									<option value="hidden">Hidden</option>
+								</select>
+							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>
@@ -162,6 +173,10 @@
 							<div class="std_margin">
 								<label for="update_account_icon">Icon (1-6; 0 - no icon)</label>
 								<input id="update_account_icon" name="icon" type="text">
+							</div>
+							<div class="std_margin">
+								<label for="update_account_flags">Flags (0 - sign on right, 1 - sign on left)</label>
+								<input id="update_account_flags" name="flags" type="text">
 							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">

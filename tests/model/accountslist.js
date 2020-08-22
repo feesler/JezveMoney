@@ -4,6 +4,9 @@ import { List } from './list.js';
 import { App } from '../app.js';
 
 
+export const ACCOUNT_HIDDEN = 1;
+
+
 export class AccountsList extends List
 {
 	async fetch()
@@ -151,13 +154,35 @@ export class AccountsList extends List
 		let res = this.data.filter(item => item.owner_id == App.owner_id);
 
 		if (returnRaw)
-			return res;
+			return copyObject(res);
 		else
 			return new AccountsList(res);
 	}
 
 
-	// Return another user account id if possible
+	getVisible(returnRaw = false)
+	{
+		let res = this.data.filter(item => (item.flags & ACCOUNT_HIDDEN) == 0);
+
+		if (returnRaw)
+			return copyObject(res);
+		else
+			return new AccountsList(res);
+	}
+
+
+	getHidden(returnRaw = false)
+	{
+		let res = this.data.filter(item => (item.flags & ACCOUNT_HIDDEN) == 1);
+
+		if (returnRaw)
+			return copyObject(res);
+		else
+			return new AccountsList(res);
+	}
+
+
+	// Return another visible user account id if possible
 	// Return zero if no account found
 	getNext(acc_id)
 	{

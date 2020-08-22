@@ -64,6 +64,7 @@
 							</div>
 						</div>
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>accounts/">cancel</a></div>
+						<input id="flags" name="flags" type="hidden" value="<?=e($accInfo->flags)?>">
 						</form>
 					</div>
 				</div>

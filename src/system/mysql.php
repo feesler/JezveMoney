@@ -538,6 +538,27 @@ class MySqlDB
 	}
 
 
+	// Add columns to specified table
+	public function addColumns($table, $columns)
+	{
+		if (!$table || $table == "")
+			return FALSE;
+		if (!is_array($columns))
+			return FALSE;
+
+		$colDefs = [];
+		foreach($columns as $columnName => $columnDef)
+		{
+			$colDefs[] = $columnName." ".$columnDef;
+		}
+
+		$query = "ALTER TABLE `".$table."` ADD COLUMN (".implode(", ", $colDefs).");";
+		$this->rawQ($query);
+
+		return ($this->errno == 0);	
+	}
+
+
 	// Rename column in specified table
 	public function changeColumn($table, $oldName, $newName, $dataType)
 	{

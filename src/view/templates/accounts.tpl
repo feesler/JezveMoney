@@ -21,6 +21,18 @@
 <?php
 	}
 ?></div>
+<?php	if (count($hiddenTilesArr)) {	?>
+					<div class="heading">
+						<h1>Hidden</h1>
+					</div>
+					<div id="hiddenTilesContainer" class="tiles"><?php
+			foreach($hiddenTilesArr as $acc_id => $tile) {
+?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($tile["balance"])?></span><span class="acc_icon"><?=useIcon("tile-".$tile["iconname"], 60, 54)?></span><span class="acc_name"><?=e($tile["name"])?></span></span></button></div><?php
+			}
+?></div>
+<?php	} else {	?>
+					<div id="hiddenTilesContainer" class="tiles" style="display: none;"></div>
+<?php	}	?>
 				</div>
 			</div>
 		</div>
@@ -33,6 +45,8 @@
 					<div id="sbButtons" class="sidebar_buttons">
 						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white"><?=svgIcon("edit")?></span><span class="icontitle"><span>Edit</span></span></a></div>
 						<div id="export_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white"><?=svgIcon("export")?></span><span class="icontitle"><span>Export to CSV</span></span></a></div>
+						<div id="show_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("show")?></span><span class="icontitle"><span>Restore</span></span></button></div>
+						<div id="hide_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("hide")?></span><span class="icontitle"><span>Hide</span></span></button></div>
 						<div id="del_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
 					</div>
 				</div>
@@ -40,6 +54,12 @@
 		</div>
 	</div>
 </div>
+<form id="showform" method="post" action="<?=BASEURL?>accounts/show/">
+<input id="showaccounts" name="accounts" type="hidden" value="">
+</form>
+<form id="hideform" method="post" action="<?=BASEURL?>accounts/hide/">
+<input id="hideaccounts" name="accounts" type="hidden" value="">
+</form>
 <form id="delform" method="post" action="<?=BASEURL?>accounts/del/">
 <input id="delaccounts" name="accounts" type="hidden" value="">
 </form>

@@ -83,7 +83,8 @@ class TransactionsController extends TemplateController
 		}
 
 		$accArr = $this->accModel->getData();
-		$accounts = $this->accModel->getCount();
+		$hiddenAccArr = $this->accModel->getData([ "type" => "hidden" ]);
+		$accounts = $this->accModel->getCount([ "type" => "all" ]);
 
 		$totalTrCount = $this->model->getCount();
 
@@ -262,6 +263,8 @@ class TransactionsController extends TemplateController
 			$tr["src_id"] = $src_id;
 			$tr["dest_id"] = $dest_id;
 			$tr["comment"] = "";
+			$tr["src_curr"] = 0;
+			$tr["dest_curr"] = 0;
 
 			if ($src_id != 0)
 			{
@@ -349,11 +352,30 @@ class TransactionsController extends TemplateController
 
 		if ($tr["type"] != DEBT)
 		{
-			$transCurr = (($tr["type"] == EXPENSE) ? $src->curr_id : $dest->curr_id);
-			$transAccCurr = (($tr["type"] == EXPENSE) ? $src->curr_id : $dest->curr_id);
+			if ($tr["type"] == EXPENSE)
+			{
+				$transCurr = $src ? $src->curr_id : 0;
+				$transAccCurr = $src ? $src->curr_id : 0;
+			}
+			else
+			{
+				$transCurr = $dest ? $dest->curr_id : 0;
+				$transAccCurr = $dest ? $dest->curr_id : 0;
+			}
 
-			$srcAmountCurr = (!is_null($src)) ? $src->curr_id : $dest->curr_id;
-			$destAmountCurr = (!is_null($dest)) ? $dest->curr_id : $src->curr_id;
+			if (!is_null($src))
+				$srcAmountCurr = $src->curr_id;
+			else if (!is_null($dest))
+				$srcAmountCurr = $dest->curr_id;
+			else
+				$srcAmountCurr = 0;
+
+			if (!is_null($dest))
+				$destAmountCurr = $dest->curr_id;
+			else if (!is_null($src))
+				$destAmountCurr = $src->curr_id;
+			else
+				$destAmountCurr = 0;
 
 			// Show destination amount for expense and source amount for income by default because it's amount with changing currency.
 			// Meanwhile source amount for expense and destination amount for income always have the same currency as account.
@@ -379,7 +401,7 @@ class TransactionsController extends TemplateController
 		// Common arrays
 		$currArr = $this->currModel->getData();
 
-		$accArr = $this->accModel->getData();
+		$accArr = $this->accModel->getData([ "type" => "all" ]);
 		if ($tr["type"] == DEBT)
 			$persArr = $this->personMod->getData();
 
@@ -615,7 +637,7 @@ class TransactionsController extends TemplateController
 		// Common arrays
 		$currArr = $this->currModel->getData();
 
-		$accArr = $this->accModel->getData();
+		$accArr = $this->accModel->getData([ "type" => "all" ]);
 		if ($tr["type"] == DEBT)
 			$persArr = $this->personMod->getData();
 

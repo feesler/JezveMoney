@@ -4,6 +4,9 @@ var INCOME = 2;
 var TRANSFER = 3;
 var DEBT = 4;
 
+// Account flags
+var ACCOUNT_HIDDEN = 1;
+
 
 // Hide usem menu popup
 function hidePopup()

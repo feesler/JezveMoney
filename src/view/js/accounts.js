@@ -1,5 +1,6 @@
 var accNameChanged = false;
 var accounts = new Selection();
+var hiddenAccounts = new Selection();
 var dwPopup = null;		// delete warning popup
 
 var singleAccDeleteTitle = 'Delete account';
@@ -61,23 +62,25 @@ function initControls()
 
 
 // Tile click event handler
-function onTileClick(acc_id)
+function onTileClick(acc_id, isHidden)
 {
-	var tile, edit_btn, del_btn, delaccounts, export_btn;
-	var actDiv;
-	var selArr;
-
-	tile = ge('acc_' + acc_id);
-	edit_btn = ge('edit_btn');
-	del_btn = ge('del_btn');
-	delaccounts = ge('delaccounts');
-	export_btn = ge('export_btn');
-	if (!tile || !edit_btn || !delaccounts || !export_btn)
+	var tile = ge('acc_' + acc_id);
+	var edit_btn = ge('edit_btn');
+	var del_btn = ge('del_btn');
+	var showaccounts = ge('showaccounts');
+	var hideaccounts = ge('hideaccounts');
+	var delaccounts = ge('delaccounts');
+	var export_btn = ge('export_btn');
+	var show_btn = ge('show_btn');
+	var hide_btn = ge('hide_btn');
+	if (!tile || !edit_btn || !showaccounts || !hideaccounts || !delaccounts || !export_btn || !show_btn || !hide_btn)
 		return;
 
-	if (accounts.isSelected(acc_id))
+	var currentSelection = isHidden ? hiddenAccounts : accounts;
+	var actDiv;
+	if (currentSelection.isSelected(acc_id))
 	{
-		accounts.deselect(acc_id);
+		currentSelection.deselect(acc_id);
 
 		actDiv = ge('act_' + acc_id);
 		if (actDiv)
@@ -85,42 +88,50 @@ function onTileClick(acc_id)
 	}
 	else
 	{
-		accounts.select(acc_id);
+		currentSelection.select(acc_id);
 
-		actDiv = ce('div', { id : 'act_' + acc_id, className : 'act', onclick : onTileClick.bind(null, acc_id) });
+		actDiv = ce('div', { id : 'act_' + acc_id, className : 'act', onclick : onTileClick.bind(null, acc_id, isHidden) });
 
 		tile.appendChild(actDiv);
 	}
 
 	var selCount = accounts.count();
-	show(edit_btn, (selCount == 1));
-	show(export_btn, (selCount > 0));
-	show(del_btn, (selCount > 0));
+	var hiddenSelCount = hiddenAccounts.count();
+	var totalSelCount = selCount + hiddenSelCount;
+	show(edit_btn, (totalSelCount == 1));
+	show(export_btn, (totalSelCount > 0));
+	show(show_btn, (hiddenSelCount > 0));
+	show(hide_btn, (selCount > 0));
+	show(del_btn, (totalSelCount > 0));
 
-	selArr = accounts.getIdArray();
+	var selArr = accounts.getIdArray();
+	var hiddenSelArr = hiddenAccounts.getIdArray();
+	var totalSelArr = selArr.concat(hiddenSelArr);
+	showaccounts.value = totalSelArr.join();
+	hideaccounts.value = totalSelArr.join();
 	delaccounts.value = selArr.join();
 
-	if (selCount == 1)
+	if (totalSelCount == 1)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = baseURL + 'accounts/edit/' + selArr[0];
+			edit_btn.firstElementChild.href = baseURL + 'accounts/edit/' + totalSelArr[0];
 	}
 
-	if (selCount > 0)
+	if (totalSelCount > 0)
 	{
 		if (export_btn.firstElementChild && export_btn.firstElementChild.tagName.toLowerCase() == 'a')
 		{
 			var exportURL = baseURL + 'accounts/export/';
-			if (selCount == 1)
-				exportURL += selArr[0];
+			if (totalSelCount == 1)
+				exportURL += totalSelArr[0];
 			else
-				exportURL += '?' + urlJoin({ id : selArr });
+				exportURL += '?' + urlJoin({ id : totalSelArr });
 			export_btn.firstElementChild.href = exportURL;
 		}
 	}
 
-	show('toolbar', (selCount > 0));
-	if (selCount > 0)
+	show('toolbar', (totalSelCount > 0));
+	if (totalSelCount > 0)
 	{
 		onScroll();
 	}
@@ -130,15 +141,17 @@ function onTileClick(acc_id)
 // Initialization of page controls
 function initAccListControls()
 {
-	var tilesContainer, tileEl, btnEl, del_btn;
-	var pos, tile_id;
+	var btnEl, pos, tile_id;
 
-	tilesContainer = ge('tilesContainer');
-	del_btn = ge('del_btn');
-	if (!tilesContainer || !del_btn)
+	var tilesContainer = ge('tilesContainer');
+	var hiddenTilesContainer = ge('hiddenTilesContainer');
+	var show_btn = ge('show_btn');
+	var hide_btn = ge('hide_btn');
+	var del_btn = ge('del_btn');
+	if (!tilesContainer || !hiddenTilesContainer || !show_btn || !hide_btn || !del_btn)
 		return;
 
-	tileEl = tilesContainer.firstElementChild;
+	var tileEl = tilesContainer.firstElementChild;
 	while(tileEl)
 	{
 		pos = tileEl.id.indexOf('_');
@@ -149,12 +162,42 @@ function initAccListControls()
 			{
 				btnEl = tileEl.firstElementChild;
 				if (btnEl)
-					btnEl.onclick = onTileClick.bind(null, tile_id);
+					btnEl.onclick = onTileClick.bind(null, tile_id, false);
 			}
 		}
 
 		tileEl = tileEl.nextElementSibling;
 	}
+
+	tileEl = hiddenTilesContainer.firstElementChild;
+	while(tileEl)
+	{
+		pos = tileEl.id.indexOf('_');
+		if (pos !== -1)
+		{
+			tile_id = parseInt(tileEl.id.substr(pos + 1));
+			if (!isNaN(tile_id))
+			{
+				btnEl = tileEl.firstElementChild;
+				if (btnEl)
+					btnEl.onclick = onTileClick.bind(null, tile_id, true);
+			}
+		}
+
+		tileEl = tileEl.nextElementSibling;
+	}
+
+	show_btn.addEventListener('click', function()
+	{
+		var showform = ge('showform');
+			showform.submit();
+	});
+
+	hide_btn.addEventListener('click', function()
+	{
+		var hideform = ge('hideform');
+			hideform.submit();
+	});
 
 	btnEl = del_btn.firstElementChild;
 	if (btnEl)

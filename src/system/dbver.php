@@ -8,7 +8,7 @@ class DBVersion
 	protected function onStart()
 	{
 		$this->tbl_name = "dbver";
-		$this->latestVersion = 1;
+		$this->latestVersion = 2;
 		$this->dbClient = MySqlDB::getInstance();
 
 		if (!$this->dbClient->isTableExist($this->tbl_name))
@@ -70,6 +70,8 @@ class DBVersion
 
 		if ($current < 1)
 			$current = $inst->version1();
+		if ($current < 2)
+			$current = $inst->version2();
 
 		$inst->setVersion($inst->latestVersion);
 	}
@@ -77,8 +79,20 @@ class DBVersion
 
 	private function version1()
 	{
-		$this->dbClient->changeColumn("currency", "format", "flags", "INT(11) NOT NULL DEFAULT '0'");
+		$res = $this->dbClient->changeColumn("currency", "format", "flags", "INT(11) NOT NULL DEFAULT '0'");
+		if (!$res)
+			throw new Error("Fail to update currency table");
 
 		return 1;
+	}
+
+
+	private function version2()
+	{
+		$res = $this->dbClient->addColumns("accounts", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
+		if (!$res)
+			throw new Error("Fail to update accounts table");
+
+		return 2;
 	}
 }

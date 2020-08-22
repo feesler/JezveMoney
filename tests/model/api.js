@@ -92,7 +92,7 @@ const currReqFields = ['name', 'sign', 'flags'];
 /**
  * Accounts
  */
-const accReqFields = ['name', 'initbalance', 'curr_id', 'icon'];
+const accReqFields = ['name', 'initbalance', 'curr_id', 'icon', 'flags'];
 
 /**
  * Persons
