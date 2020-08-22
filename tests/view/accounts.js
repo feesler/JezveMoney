@@ -90,19 +90,13 @@ export class AccountsView extends TestView
 
 	async deselectAccounts()
 	{
-		for(let acc_num = 0, l = this.content.tiles.items.length; acc_num < l; acc_num++)
-		{
-			let tile = this.content.tiles.items[acc_num];
-			if (tile.isActive)
-				await this.performAction(() => this.content.tiles.items[acc_num].click());
-		}
+		let visibleActive = this.content.tiles.getActive();
+		if (visibleActive.length > 0)
+			await this.performAction(() => visibleActive.forEach(item => item.click()));
 
-		for(let acc_num = 0, l = this.content.hiddenTiles.items.length; acc_num < l; acc_num++)
-		{
-			let tile = this.content.hiddenTiles.items[acc_num];
-			if (tile.isActive)
-				await this.performAction(() => this.content.hiddenTiles.items[acc_num].click());
-		}
+		let hiddenActive = this.content.hiddenTiles.getActive();
+		if (hiddenActive.length > 0)
+			await this.performAction(() => hiddenActive.forEach(item => item.click()));
 	}
 
 
@@ -124,20 +118,18 @@ export class AccountsView extends TestView
 
 
 	// Show secified accounts and return navigation promise
-	async showAccounts(acc)
+	async showAccounts(acc, val = true)
 	{
 		await this.selectAccounts(acc);
 
-		return this.navigation(() => this.content.toolbar.clickButton('show'));
+		return this.navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
 	}
 
 
 	// Hide secified accounts and return navigation promise
 	async hideAccounts(acc)
 	{
-		await this.selectAccounts(acc);
-
-		return this.navigation(() => this.content.toolbar.clickButton('hide'));
+		return this.showAccounts(acc, false);
 	}
 
 

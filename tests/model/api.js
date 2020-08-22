@@ -284,7 +284,7 @@ export const api = {
 			if (!id || isNaN(id))
 				throw new ApiRequestError('Wrong id specified');
 
-			let postData = checkFields(options, accReqFields);
+			let postData = checkFields(options, userReqFields);
 			postData.id = id;
 
 			let apiRes = await apiPost('user/update', postData);

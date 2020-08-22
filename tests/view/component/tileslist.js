@@ -29,6 +29,15 @@ export class TilesList extends NullableComponent
 	}
 
 
+	/**
+	 * @returns {array} active items
+	 */
+	getActive()
+	{
+		return this.items.filter(item => item.isActive);
+	}
+
+
 	static renderAccounts(accountsList)
 	{
 		if (!(accountsList instanceof AccountsList))

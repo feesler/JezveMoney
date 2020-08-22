@@ -135,7 +135,7 @@ export class TransactionsView extends TestView
 		res.filtered = res.data.filter(res.filter);
 
 		let pageItems = res.filtered.getPage(1);
-		if (res.filtered.itemsCount() > 0)
+		if (res.filtered.length > 0)
 		{
 			res.list = {
 				page : 1,
@@ -188,7 +188,7 @@ export class TransactionsView extends TestView
 
 	setExpectedState()
 	{
-		const isItemsAvailable = (this.model.filtered.itemsCount() > 0);
+		const isItemsAvailable = (this.model.filtered.length > 0);
 
 		let res = {
 			visibility : {

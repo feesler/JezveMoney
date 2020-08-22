@@ -12,6 +12,12 @@ export class List
 	}
 
 
+	get length()
+	{
+		return this.data.length;
+	}
+
+
 	setData(data)
 	{
 		this.data = copyObject(data);
@@ -37,12 +43,6 @@ export class List
 	}
 
 
-	itemsCount()
-	{
-		return this.data.length;
-	}
-
-
 	getItem(id)
 	{
 		let res = this.data.find(item => item.id == id);
@@ -61,11 +61,8 @@ export class List
 
 	getItemByIndex(ind)
 	{
-		if (!this.data)
-			return null;
-
 		let pos = parseInt(ind);
-		if (isNaN(pos) || pos < 0 || pos >= this.data.length)
+		if (isNaN(pos) || pos < 0 || pos >= this.length)
 			return null;
 		
 		return copyObject(this.data[pos]);
@@ -96,7 +93,7 @@ export class List
 	indexToId(pos)
 	{
 		let ind = parseInt(pos);
-		if (isNaN(ind) || ind < 0 || ind >= this.data.length)
+		if (isNaN(ind) || ind < 0 || ind >= this.length)
 			throw new Error(`Invalid position ${pos} specified`);
 
 		let item = this.data[pos];
@@ -143,7 +140,7 @@ export class List
 			this.autoincrement = next_id + 1;
 		}
 
-		let res = this.data.length;
+		let res = this.length;
 		this.data.push(itemObj);
 
 		return res;
