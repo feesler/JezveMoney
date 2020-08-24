@@ -2,7 +2,7 @@
 
 class PersonApiController extends ApiController
 {
-	protected $requiredFields = [ "name" ];
+	protected $requiredFields = [ "name", "flags" ];
 
 
 	public function initAPI()
@@ -35,8 +35,14 @@ class PersonApiController extends ApiController
 
 	public function getList()
 	{
+		$params = [];
+		if (isset($_GET["full"]) && $_GET["full"] == 1)
+			$params["full"] = TRUE;
+		if (isset($_GET["type"]))
+			$params["type"] = $_GET["type"];
+
 		$res = [];
-		$persons = $this->model->getData();
+		$persons = $this->model->getData($params);
 		foreach($persons as $item)
 		{
 			$res[] = new Person($item);

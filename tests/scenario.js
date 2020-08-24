@@ -140,7 +140,7 @@ export class Scenario
 		]);
 
 		[ this.API_USER_PERSON ] = await this.runner.runGroup(PersonApiTests.create, [
-			{ name : 'API user Person' }
+			{ name : 'API user Person', flags : 0 }
 		]);
 
 		[ this.API_USER_TRANSACTION ] = await this.runner.runGroup(TransactionApiTests.extractAndCreate, [
@@ -179,7 +179,7 @@ export class Scenario
 		this.environment.setBlock('Persons security', 2);
 
 		const tasks = [
-			{ action : PersonApiTests.update, data : { id : API_USER_PERSON, name : 'API Person' } },
+			{ action : PersonApiTests.update, data : { id : API_USER_PERSON, name : 'API Person', flags : 0 } },
 			{ action : PersonApiTests.del, data : API_USER_PERSON },
 		];
 
@@ -301,10 +301,10 @@ export class Scenario
 	async apiCreatePersons()
 	{
 		const data = [
-			{ name : 'Person X' },
-			{ name : 'Y' },
+			{ name : 'Person X', flags : 0 },
+			{ name : 'Y', flags : 0 },
 			// Try to create person with existing name
-			{ name : 'Y' },
+			{ name : 'Y', flags : 0 },
 		];
 
 		[ this.PERSON_X, this.PERSON_Y ] = await this.runner.runGroup(PersonApiTests.create, data);
@@ -572,6 +572,8 @@ export class Scenario
 		this.environment.setBlock('Persons', 1);
 
 		await this.createPersonTests();
+		await this.hidePersonsTest();
+		await this.showPersonsTest();
 		await this.updatePersonTests();
 		await this.deletePersonTests();
 	}
@@ -618,6 +620,32 @@ export class Scenario
 	}
 
 
+	async hidePersonsTest()
+	{
+		this.environment.setBlock('Hide persons', 2);
+
+		const data = [
+			[0],
+			[0, 1],
+		];
+
+		await this.runner.runGroup(PersonTests.hide, data);
+	}
+
+
+	async showPersonsTest()
+	{
+		this.environment.setBlock('Show persons', 2);
+
+		const data = [
+			[2],
+			[0, 4],
+		];
+
+		await this.runner.runGroup(PersonTests.show, data);
+	}
+
+
 	async prepareTransactionTests()
 	{
 		const accList = [
@@ -637,8 +665,8 @@ export class Scenario
 		}
 
 		const personsList = [
-			{ name : 'Maria' },
-			{ name : 'Ivan<' },
+			{ name : 'Maria', flags : 0 },
+			{ name : 'Ivan<', flags : 0 },
 		];
 
 		for(const person of personsList)
@@ -736,8 +764,8 @@ export class Scenario
 	async setupPersons()
 	{
 		let data = [
-			{ name : 'Alex' },
-			{ name : 'noname &' },
+			{ name : 'Alex', flags : 0 },
+			{ name : 'noname &', flags : 0 },
 		];
 
 		let res = [];

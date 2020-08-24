@@ -131,7 +131,7 @@ export class MainView extends TestView
 		let accWidget = { tiles : TilesList.renderAccounts(state.accounts.getUserAccounts()) };
 		res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
 		// Persons widget
-		let personsWidget = { infoTiles : TilesList.renderPersons(state.persons.data, InfoTile) };
+		let personsWidget = { infoTiles : TilesList.renderPersons(state.persons, InfoTile) };
 		res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
 
 		// Transactions widget

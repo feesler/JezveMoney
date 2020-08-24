@@ -1445,7 +1445,8 @@ function TransactionViewModel()
 			this.persDDList = DropDown.create({ input_id : 'person_tile', listAttach : true, onitemselect : onPersAccSel, editable : false });
 			persons.forEach(function(person)
 			{
-				this.persDDList.addItem(person.id, person.name);
+				if (isVisiblePerson(person))
+					this.persDDList.addItem(person.id, person.name);
 			}, this);
 
 			if (!Transaction.noAccount())

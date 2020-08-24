@@ -8,7 +8,7 @@ class DBVersion
 	protected function onStart()
 	{
 		$this->tbl_name = "dbver";
-		$this->latestVersion = 2;
+		$this->latestVersion = 3;
 		$this->dbClient = MySqlDB::getInstance();
 
 		if (!$this->dbClient->isTableExist($this->tbl_name))
@@ -72,6 +72,8 @@ class DBVersion
 			$current = $inst->version1();
 		if ($current < 2)
 			$current = $inst->version2();
+		if ($current < 3)
+			$current = $inst->version3();
 
 		$inst->setVersion($inst->latestVersion);
 	}
@@ -94,5 +96,15 @@ class DBVersion
 			throw new Error("Fail to update accounts table");
 
 		return 2;
+	}
+
+
+	private function version3()
+	{
+		$res = $this->dbClient->addColumns("persons", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
+		if (!$res)
+			throw new Error("Fail to update persons table");
+
+		return 3;
 	}
 }

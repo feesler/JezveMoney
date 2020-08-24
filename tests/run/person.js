@@ -53,7 +53,8 @@ export async function update(params)
 	}
 	await App.view.goToUpdatePerson(pos);
 
-	let expectedPerson = App.state.persons.getItemByIndex(pos);
+	let ids = getPersonsByIndexes(pos);
+	let expectedPerson = App.state.persons.getItem(ids[0]);
 	if (!expectedPerson)
 		throw new Error('Can not find specified person');
 
@@ -86,7 +87,8 @@ export async function del(persons)
 	}
 
 	// Prepare expected updates of persons list
-	App.state.deletePersons(App.state.persons.indexesToIds(persons));
+	let ids = getPersonsByIndexes(persons);
+	App.state.deletePersons(ids);
 
 	await App.view.deletePersons(persons);
 
@@ -112,7 +114,8 @@ export async function delFromUpdate(pos)
 		await App.view.goToPersons();
 	}
 
-	App.state.deletePersons(App.state.persons.indexesToIds(pos));
+	let ids = getPersonsByIndexes(pos);
+	App.state.deletePersons(ids);
 
 	await App.view.goToUpdatePerson(pos);
 	await App.view.deleteSelfItem();
@@ -125,4 +128,68 @@ export async function delFromUpdate(pos)
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
+}
+
+
+function getPersonByIndex(ind, visibleList, hiddenList)
+{
+	if (ind < 0 || ind > visibleList.length + hiddenList.length)
+		throw new Error(`Invalid person index ${ind}`);
+
+	if (ind < visibleList.length)
+	{
+		return visibleList[ind].id;
+	}
+	else
+	{
+		let hiddenInd = ind - visibleList.length;
+		return hiddenList[hiddenInd].id;
+	}
+}
+
+
+function getPersonsByIndexes(persons)
+{
+	if (!Array.isArray(persons))
+		persons = [ persons ];
+
+	let visibleList = App.state.persons.getVisible(true);
+	let hiddenList = App.state.persons.getHidden(true);
+
+	return persons.map(ind => getPersonByIndex(ind, visibleList, hiddenList));
+}
+
+
+export async function show(persons, val = true)
+{
+	if (!Array.isArray(persons))
+		persons = [ persons ];
+
+	let showVerb = val ? 'Show' : 'Hide';
+	App.view.setBlock(`${showVerb} person(s) [${persons.join()}]`, 2);
+
+	// Navigate to create persons view
+	if (!(App.view instanceof PersonsView))
+	{
+		await App.goToMainView();
+		await App.view.goToPersons();
+	}
+
+	// Check initial state
+	await App.state.fetch();
+	let ids = getPersonsByIndexes(persons);
+	App.state.showPersons(ids, val);
+
+	await App.view.showPersons(persons, val);
+
+	App.view.expectedState = PersonsView.render(App.state);
+
+	await test(`${showVerb} persons [${persons.join()}]`, () => App.view.checkState());
+	await test('App state', () => App.state.fetchAndTest());
+}
+
+
+export async function hide(persons)
+{
+	return show(persons, false);
 }

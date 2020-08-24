@@ -21,11 +21,12 @@
 						<div class="non_float std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
-								<input id="pname" name="name" type="text" value="<?=e($pName)?>">
+								<input id="pname" name="name" type="text" value="<?=e($pInfo->name)?>">
 							</div>
 						</div>
 
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>persons/">cancel</a></div>
+						<input id="flags" name="flags" type="hidden" value="<?=e($pInfo->flags)?>">
 						</form>
 					</div>
 				</div>
@@ -43,7 +44,7 @@
 <?php	if ($action == "edit") {		?>
 <script>
 	var person_id = <?=$p_id?>;
-	var personName = <?=JSON::encode($pName)?>;
+	var personName = <?=JSON::encode($pInfo->name)?>;
 
 	onReady(initControls);
 </script>

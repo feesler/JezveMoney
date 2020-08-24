@@ -5,6 +5,24 @@ function getPerson(person_id)
 }
 
 
+function isVisiblePerson(person)
+{
+	if (!person || !('flags' in person))
+		throw new Error('Invalid person');
+
+	return (person.flags & PERSON_HIDDEN) == 0;
+}
+
+
+function isHiddenPerson(person)
+{
+	if (!person || !('flags' in person))
+		throw new Error('Invalid person');
+
+	return (person.flags & PERSON_HIDDEN) == PERSON_HIDDEN;
+}
+
+
 // Return person account object by id
 function findPersonAccountById(account_id)
 {

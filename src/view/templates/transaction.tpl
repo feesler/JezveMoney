@@ -34,7 +34,7 @@
 <?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
 						<div class="align_block"><span>You have no one active account. Please create one.</span></div>
 <?php	} else if ($action == "new" && !$person_id && $tr["type"] == DEBT) {		?>
-						<div class="align_block"><span>You need to create at least one person for debts.</span></div>
+						<div class="align_block"><span>You have no one active person. Please create one for debts.</span></div>
 <?php	} else {		?>
 <?php	if ($tr["type"] == DEBT) {		?>
 						<div id="person" class="acc_float">

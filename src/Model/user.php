@@ -372,7 +372,7 @@ class UserModel extends CachedTable
 		$this->cleanCache();
 
 		$pMod = PersonModel::getInstance();
-		$p_id = $pMod->create([ "name" => $this->personName, "user_id" => $item_id ]);
+		$p_id = $pMod->create([ "name" => $this->personName, "user_id" => $item_id, "flags" => 0 ]);
 
 		unset($this->personName);
 
@@ -421,7 +421,7 @@ class UserModel extends CachedTable
 			$personObj = $personMod->getItem($userObj->owner_id);
 			if (!$personObj)
 			{
-				$person_id = $personMod->create([ "name" => $this->personName, "user_id" => $item_id ]);
+				$person_id = $personMod->create([ "name" => $this->personName, "user_id" => $item_id, "flags" => 0 ]);
 				if (!$person_id)
 					$res->fail($defMsg);
 

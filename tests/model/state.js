@@ -10,7 +10,7 @@ import { EXPENSE, INCOME, DEBT, availTransTypes } from './transaction.js';
 import { App } from '../app.js';
 import { Currency } from './currency.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
-import { PersonsList } from './personslist.js';
+import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
 import { api } from './api.js';
 
@@ -330,6 +330,30 @@ export class AppState
 
 		return true;
 	}
+
+
+	showPersons(ids, show = true)
+	{
+		if (!Array.isArray(ids))
+			ids = [ ids ];
+
+		for(let person_id of ids)
+		{
+			let person = this.persons.getItem(person_id);
+			if (!person)
+				return false;
+
+			if (show)
+				person.flags &= ~PERSON_HIDDEN;
+			else
+				person.flags |= PERSON_HIDDEN;
+			
+			this.persons.update(person);
+		}
+
+		return true;
+	}
+
 
 /**
  * Transactions

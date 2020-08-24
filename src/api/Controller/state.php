@@ -36,7 +36,7 @@ class StateApiController extends ApiController
 
 		$res->persons = new stdClass;
 		$res->persons->data = [];
-		$items = $this->pModel->getData();
+		$items = $this->pModel->getData([ "type" => "all" ]);
 		foreach($items as $item)
 		{
 			$res->persons->data[] = new Person($item);

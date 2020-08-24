@@ -1,6 +1,7 @@
 import { NullableComponent } from './component.js';
 import { Tile } from './tile.js';
 import { AccountsList } from '../../model/accountslist.js';
+import { PersonsList } from '../../model/personslist.js';
 import { asyncMap } from '../../common.js';
 
 
@@ -70,11 +71,28 @@ export class TilesList extends NullableComponent
 
 	static renderPersons(personsList, tileClass = Tile)
 	{
-		if (!Array.isArray(personsList))
+		if (!(personsList instanceof PersonsList))
 			throw new Error('Invalid data');
 
+		let visiblePersons = personsList.getVisible(true);
+
 		let res = {
-			items : personsList.map(tileClass.renderPerson)
+			items : visiblePersons.map(tileClass.renderPerson)
+		};
+
+		return res;
+	}
+
+
+	static renderHiddenPersons(personsList, tileClass = Tile)
+	{
+		if (!(personsList instanceof PersonsList))
+			throw new Error('Invalid data');
+
+		let hiddenPersons = personsList.getHidden(true);
+
+		let res = {
+			items : hiddenPersons.map(tileClass.renderPerson)
 		};
 
 		return res;

@@ -501,6 +501,14 @@
 						<div id="listPersonsForm" class="test_form">
 						<h3>List persons</h3>
 						<form action="<?=BASEURL?>api/person/list" method="list">
+							<div class="std_margin">
+								<input type="checkbox" data-target="type"><label for="count">Type</label>
+								<select name="type" disabled>
+									<option value="all">All</option>
+									<option value="visible" selected>Visible</option>
+									<option value="hidden">Hidden</option>
+								</select>
+							</div>
 							<div class="acc_controls">
 								<input class="adm_act_btn" type="submit" value="submit">
 							</div>

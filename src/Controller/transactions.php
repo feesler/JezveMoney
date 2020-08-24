@@ -230,7 +230,8 @@ class TransactionsController extends TemplateController
 			$debtAcc = $this->accModel->getItem($acc_id);
 
 			// Prepare person account
-			$person_id = $this->personMod->getIdByPos(0);
+			$visiblePersons = $this->personMod->getData();
+			$person_id = (is_array($visiblePersons) && count($visiblePersons) > 0) ? $visiblePersons[0]->id : 0;
 			$pObj = $this->personMod->getItem($person_id);
 			$person_name = ($pObj) ? $pObj->name : NULL;
 
@@ -403,7 +404,7 @@ class TransactionsController extends TemplateController
 
 		$accArr = $this->accModel->getData([ "type" => "all" ]);
 		if ($tr["type"] == DEBT)
-			$persArr = $this->personMod->getData();
+			$persArr = $this->personMod->getData([ "type" => "all" ]);
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
@@ -639,7 +640,7 @@ class TransactionsController extends TemplateController
 
 		$accArr = $this->accModel->getData([ "type" => "all" ]);
 		if ($tr["type"] == DEBT)
-			$persArr = $this->personMod->getData();
+			$persArr = $this->personMod->getData([ "type" => "all" ]);
 
 		$srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
 		$destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";

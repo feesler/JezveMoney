@@ -1,24 +1,27 @@
 var persons = null;
+var hiddenPersons = null;
 var dwPopup = null;		// delete warning popup
 
 
 // Tile click event handler
-function onTileClick(p_id)
+function onTileClick(p_id, isHidden)
 {
-	var tile, edit_btn, del_btn, delpersons;
-	var actDiv;
-	var selArr;
-
-	tile = ge('p_' + p_id);
-	edit_btn = ge('edit_btn');
-	del_btn = ge('del_btn');
-	delpersons = ge('delpersons');
-	if (!tile || !edit_btn || !delpersons)
+	var tile = ge('p_' + p_id);
+	var edit_btn = ge('edit_btn');
+	var show_btn = ge('show_btn');
+	var hide_btn = ge('hide_btn');
+	var del_btn = ge('del_btn');
+	var showpersons = ge('showpersons');
+	var hidepersons = ge('hidepersons');
+	var delpersons = ge('delpersons');
+	if (!tile || !edit_btn || !show_btn || !hide_btn || !showpersons || !hidepersons || !delpersons)
 		return;
 
-	if (persons.isSelected(p_id))
+	var currentSelection = isHidden ? hiddenPersons : persons;
+	var actDiv;
+	if (currentSelection.isSelected(p_id))
 	{
-		persons.deselect(p_id);
+		currentSelection.deselect(p_id);
 
 		actDiv = ge('act_' + p_id);
 		if (actDiv)
@@ -26,27 +29,36 @@ function onTileClick(p_id)
 	}
 	else
 	{
-		persons.select(p_id);
+		currentSelection.select(p_id);
 
-		actDiv = ce('div', { id : 'act_' + p_id, className : 'act', onclick : onTileClick.bind(null, p_id) });
+		actDiv = ce('div', { id : 'act_' + p_id, className : 'act', onclick : onTileClick.bind(null, p_id, isHidden) });
 
 		tile.appendChild(actDiv);
 	}
 
-	show(edit_btn, (persons.count() == 1));
-	show(del_btn, (persons.count() > 0));
+	var selCount = persons.count();
+	var hiddenSelCount = hiddenPersons.count();
+	var totalSelCount = selCount + hiddenSelCount;
+	show(edit_btn, (totalSelCount == 1));
+	show(show_btn, (hiddenSelCount > 0));
+	show(hide_btn, (selCount > 0));
+	show(del_btn, (totalSelCount > 0));
 
-	selArr = persons.getIdArray();
-	delpersons.value = selArr.join();
+	var selArr = persons.getIdArray();
+	var hiddenSelArr = hiddenPersons.getIdArray();
+	var totalSelArr = selArr.concat(hiddenSelArr);
+	showpersons.value = totalSelArr.join();
+	hidepersons.value = totalSelArr.join();
+	delpersons.value = totalSelArr.join();
 
-	if (persons.count() == 1)
+	if (totalSelCount == 1)
 	{
 		if (edit_btn.firstElementChild && edit_btn.firstElementChild.tagName.toLowerCase() == 'a')
-			edit_btn.firstElementChild.href = baseURL + 'persons/edit/' + selArr[0];
+			edit_btn.firstElementChild.href = baseURL + 'persons/edit/' + totalSelArr[0];
 	}
 
-	show('toolbar', (persons.count() > 0));
-	if (persons.count() > 0)
+	show('toolbar', (totalSelCount > 0));
+	if (totalSelCount > 0)
 	{
 		onScroll();
 	}
@@ -106,12 +118,11 @@ function onDeletePopup(res)
 // Create and show person delete warning popup
 function showDeletePopup()
 {
-	var multi;
-
-	if (persons.count() == 0)
+	var totalSelCount = persons.count() + hiddenPersons.count();
+	if (totalSelCount == 0)
 		return;
 
-	multi = (persons.count() > 1);
+	var multi = (totalSelCount > 1);
 
 	// check popup already created
 	if (!dwPopup)
@@ -143,6 +154,7 @@ function initControls()
 		del_btn.onclick = onDelete;
 
 	persons = new Selection();
+	hiddenPersons = new Selection();
 }
 
 
@@ -158,6 +170,7 @@ function initPersonsList()
 
 	initToolbar();
 	persons = new Selection();
+	hiddenPersons = new Selection();
 
 	tileEl = tilesContainer.firstElementChild;
 	while(tileEl)
@@ -170,12 +183,42 @@ function initPersonsList()
 			{
 				btnEl = tileEl.firstElementChild;
 				if (btnEl)
-					btnEl.onclick = onTileClick.bind(null, tile_id);
+					btnEl.onclick = onTileClick.bind(null, tile_id, false);
 			}
 		}
 
 		tileEl = tileEl.nextElementSibling;
 	}
+
+	tileEl = hiddenTilesContainer.firstElementChild;
+	while(tileEl)
+	{
+		pos = tileEl.id.indexOf('_');
+		if (pos !== -1)
+		{
+			tile_id = parseInt(tileEl.id.substr(pos + 1));
+			if (!isNaN(tile_id))
+			{
+				btnEl = tileEl.firstElementChild;
+				if (btnEl)
+					btnEl.onclick = onTileClick.bind(null, tile_id, true);
+			}
+		}
+
+		tileEl = tileEl.nextElementSibling;
+	}
+
+	show_btn.addEventListener('click', function()
+	{
+		var showform = ge('showform');
+			showform.submit();
+	});
+
+	hide_btn.addEventListener('click', function()
+	{
+		var hideform = ge('hideform');
+			hideform.submit();
+	});
 
 	btnEl = del_btn.firstElementChild;
 	if (btnEl)

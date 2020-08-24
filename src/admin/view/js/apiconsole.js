@@ -506,13 +506,36 @@ function isCurrency(obj)
 function isCurrenciesArray(obj){ return isArrayOf(obj, isCurrency); }
 
 
+function isPersonAccount(obj)
+{
+	return verifyObject(obj, {
+			id : isInt,
+			curr_id : isInt,
+			balance : isNum,
+		}, {
+			owner_id : isInt,
+			initbalance : isNum,
+			name : isString,
+			icon : isInt,
+			flags : isInt,
+			user_id : isInt,
+			createdate : isInt,
+			updatedate : isInt,
+		});
+}
+
+
+function isPersonAccountsArray(obj){ return isArrayOf(obj, isPersonAccount); }
+
+
 function isPerson(obj)
 {
 	return verifyObject(obj, {
 			id : isInt,
 			name : isString,
+			flags : isInt,
 		}, {
-			accounts : isAccountsArray,
+			accounts : isPersonAccountsArray,
 			user_id: isInt,
 			createdate : isInt,
 			updatedate : isInt,
@@ -712,6 +735,13 @@ function initControls()
 	if (!listPersonsForm)
 		throw new Error('Fail to init view');
 	listPersonsForm.onsubmit = function(e){ return onFormSubmit(e, isPersonsArray); };
+
+	checkboxes = listPersonsForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = Array.from(checkboxes);
+	checkboxes.forEach(function(elem)
+	{
+		elem.addEventListener('change', onCheck);
+	});
 
 	var readpersonbtn = ge('readpersonbtn');
 	if (readpersonbtn)

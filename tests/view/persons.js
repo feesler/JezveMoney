@@ -21,7 +21,8 @@ export class PersonsView extends TestView
 			throw new Error('Invalid structure of persons view');
 
 		res.title = this.prop(res.titleEl, 'innerText');
-		res.tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
+		res.tiles = await TilesList.create(this, await this.query('#tilesContainer'), Tile);
+		res.hiddenTiles = await TilesList.create(this, await this.query('#hiddenTilesContainer'), Tile);
 
 		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
@@ -36,13 +37,53 @@ export class PersonsView extends TestView
 	}
 
 
+	async selectPersons(persons)
+	{
+		if (typeof persons === 'undefined')
+			throw new Error('No persons specified');
+
+		if (!Array.isArray(persons))
+			persons = [ persons ];
+
+		let ind = 0;
+		let totalTiles = this.content.tiles.items.length + this.content.hiddenTiles.items.length;
+		for(let p_num of persons)
+		{
+			if (p_num < 0 || p_num >= totalTiles)
+				throw new Error('Invalid person number');
+
+			if (p_num < this.content.tiles.items.length)
+			{
+				await this.performAction(() => this.content.tiles.items[p_num].click());
+				if (!await this.content.toolbar.isButtonVisible('hide'))
+					throw new Error('Hide button is not visible');
+			}
+			else
+			{
+				let hiddenNum = p_num - this.content.tiles.items.length;
+				await this.performAction(() => this.content.hiddenTiles.items[hiddenNum].click());
+				if (!await this.content.toolbar.isButtonVisible('show'))
+					throw new Error('Show button is not visible');
+			}
+
+			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
+			if (ind == 0 && !updIsVisible)
+				throw new Error('Update button is not visible');
+			else if (ind > 0 && updIsVisible)
+				throw new Error('Update button is visible while more than one accounts is selected');
+
+			if (!await this.content.toolbar.isButtonVisible('del'))
+				throw new Error('Delete button is not visible');
+
+			ind++;
+		}
+	}
+
+
 	// Select specified person, click on edit button and return navigation promise
 	async goToUpdatePerson(num)
 	{
-		if (!this.content.tiles || this.content.tiles.items.length <= num || num < 0)
-			throw new Error('Wrong person number specified');
-
-		await this.content.tiles.items[num].click();
+		await this.selectPersons(num);
 
 		return this.navigation(() => this.content.toolbar.clickButton('update'));
 	}
@@ -50,38 +91,30 @@ export class PersonsView extends TestView
 
 	async deletePersons(persons)
 	{
-		if (!persons)
-			throw new Error('No persons specified');
-
-		if (!Array.isArray(persons))
-			persons = [persons];
-
-		let ind = 0;
-		for(let person_num of persons)
-		{
-			if (person_num < 0 || person_num >= this.content.tiles.items.length)
-				throw new Error('Wrong account number');
-
-			await this.performAction(() => this.content.tiles.items[person_num].click());
-
-			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
-			if (ind == 0 && !updIsVisible)
-				throw new Error('Update button is not visible');
-			else if (ind > 0 && updIsVisible)
-				throw new Error('Update button is visible while more than one person is selected');
-
-			if (!await this.content.toolbar.isButtonVisible('del'))
-				throw new Error('Delete button is not visible');
-
-			ind++;
-		}
+		await this.selectPersons(persons);
 
 		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
 		if (!await this.isVisible(this.content.delete_warning.elem))
-			throw new Error('Delete account warning popup not appear');
+			throw new Error('Delete person(s) warning popup not appear');
 
 		return this.navigation(() => this.click(this.content.delete_warning.okBtn));
+	}
+
+
+	// Show secified accounts and return navigation promise
+	async showPersons(persons, val = true)
+	{
+		await this.selectPersons(persons);
+
+		return this.navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
+	}
+
+
+	// Hide secified accounts and return navigation promise
+	async hidePersons(persons)
+	{
+		return this.showPersons(persons, false);
 	}
 
 
@@ -89,7 +122,8 @@ export class PersonsView extends TestView
 	{
 		let res = {
 			values : {
-				tiles : TilesList.renderPersons(state.persons.data)
+				tiles : TilesList.renderPersons(state.persons),
+				hiddenTiles : TilesList.renderHiddenPersons(state.persons)
 			}
 		};
 

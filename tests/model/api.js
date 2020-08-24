@@ -97,7 +97,7 @@ const accReqFields = ['name', 'initbalance', 'curr_id', 'icon', 'flags'];
 /**
  * Persons
  */
-const pReqFields = ['name'];
+const pReqFields = ['name', 'flags'];
 
 /**
  * Transactions

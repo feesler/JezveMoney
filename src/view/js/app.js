@@ -7,6 +7,9 @@ var DEBT = 4;
 // Account flags
 var ACCOUNT_HIDDEN = 1;
 
+// Person flags
+var PERSON_HIDDEN = 1;
+
 
 // Hide usem menu popup
 function hidePopup()

@@ -154,6 +154,10 @@ Message::add("ERR_PERSON_CREATE_EXIST", MSG_TYPE_ERROR, "Fail to update person. 
 Message::add("MSG_PERSON_UPDATE");
 Message::add("ERR_PERSON_UPDATE", MSG_TYPE_ERROR, "Fail to update person.");
 Message::add("ERR_PERSON_UPDATE_EXIST", MSG_TYPE_ERROR, "Fail to update person. Person with same name already exist.");
+Message::add("MSG_PERSON_SHOW");
+Message::add("ERR_PERSON_SHOW", MSG_TYPE_ERROR, "Fail to show person.");
+Message::add("MSG_PERSON_HIDE");
+Message::add("ERR_PERSON_HIDE", MSG_TYPE_ERROR, "Fail to hide person.");
 Message::add("MSG_PERSON_DELETE");
 Message::add("ERR_PERSON_DELETE", MSG_TYPE_ERROR, "Fail to delete person.");
 

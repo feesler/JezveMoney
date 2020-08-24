@@ -7,6 +7,8 @@
 
 	define("ACCOUNT_HIDDEN", 1);
 
+	define("PERSON_HIDDEN", 1);
+
 
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)

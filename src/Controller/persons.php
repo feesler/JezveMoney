@@ -2,12 +2,13 @@
 
 class PersonsController extends TemplateController
 {
-	protected $requiredFields = [ "name" ];
+	protected $requiredFields = [ "name", "flags" ];
 
 	
 	public function index()
 	{
 		$persArr = $this->personMod->getData();
+		$hiddenPersArr = $this->personMod->getData([ "type" => "hidden" ]);
 
 		$titleString = "Jezve Money | Persons";
 
@@ -37,7 +38,9 @@ class PersonsController extends TemplateController
 
 		$action = "new";
 
-		$pName = "";
+		$pInfo = new stdClass;
+		$pInfo->name = "";
+		$pInfo->flags = 0;
 
 		$titleString = "Jezve Money | ";
 		$headString = "New person";
@@ -61,8 +64,6 @@ class PersonsController extends TemplateController
 
 		$action = "edit";
 
-		$pName = "";
-
 		$p_id = intval($this->actionParam);
 		if (!$p_id)
 			$this->fail(ERR_PERSON_UPDATE);
@@ -71,7 +72,7 @@ class PersonsController extends TemplateController
 		if (!$pObj)
 			$this->fail(ERR_PERSON_UPDATE);
 
-		$pName = $pObj->name;
+		$pInfo = clone $pObj;
 
 		$titleString = "Jezve Money | ";
 		$headString = "Edit person";
@@ -123,6 +124,42 @@ class PersonsController extends TemplateController
 			$this->fail($defMsg);
 
 		Message::set(MSG_PERSON_UPDATE);
+
+		setLocation(BASEURL."persons/");
+	}
+
+
+	public function show()
+	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."persons/");
+
+		$defMsg = ERR_PERSON_SHOW;
+
+		if (!isset($_POST["persons"]))
+			$this->fail($defMsg);
+
+		$ids = explode(",", rawurldecode($_POST["persons"]));
+		if (!$this->personMod->show($ids))
+			$this->fail($defMsg);
+
+		setLocation(BASEURL."persons/");
+	}
+
+
+	public function hide()
+	{
+		if (!$this->isPOST())
+			setLocation(BASEURL."persons/");
+
+		$defMsg = ERR_PERSON_HIDE;
+
+		if (!isset($_POST["persons"]))
+			$this->fail($defMsg);
+
+		$ids = explode(",", rawurldecode($_POST["persons"]));
+		if (!$this->personMod->hide($ids))
+			$this->fail($defMsg);
 
 		setLocation(BASEURL."persons/");
 	}
