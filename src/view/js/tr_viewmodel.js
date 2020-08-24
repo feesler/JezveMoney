@@ -1297,7 +1297,7 @@ function TransactionViewModel()
 		self.accDDList = DropDown.create({ input_id : 'acc_tile', listAttach : true, onitemselect : onDebtAccSel, editable : false });
 		accounts.forEach(function(acc)
 		{
-			if (isHiddenAccount(acc))
+			if (isVisibleAccount(acc))
 				self.accDDList.addItem(acc.id, acc.name);
 		});
 	}
@@ -1458,7 +1458,7 @@ function TransactionViewModel()
 			{
 				accounts.forEach(function(acc)
 				{
-					if (isHiddenAccount(acc))
+					if (isVisibleAccount(acc))
 						this.srcDDList.addItem(acc.id, acc.name);
 				}, this);
 			}
@@ -1468,7 +1468,7 @@ function TransactionViewModel()
 			{
 				accounts.forEach(function(acc)
 				{
-					if (isHiddenAccount(acc))
+					if (isVisibleAccount(acc))
 						this.destDDList.addItem(acc.id, acc.name);
 				}, this);
 			}

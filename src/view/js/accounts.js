@@ -109,7 +109,7 @@ function onTileClick(acc_id, isHidden)
 	var totalSelArr = selArr.concat(hiddenSelArr);
 	showaccounts.value = totalSelArr.join();
 	hideaccounts.value = totalSelArr.join();
-	delaccounts.value = selArr.join();
+	delaccounts.value = totalSelArr.join();
 
 	if (totalSelCount == 1)
 	{
@@ -268,10 +268,8 @@ function onAccInitBalanceInput(e)
 // New account submit event handler
 function onNewAccountSubmit(frm)
 {
-	var accname, balance;
-
-	accname = ge('accname');
-	balance = ge('balance');
+	var accname = ge('accname');
+	var balance = ge('balance');
 	if (!frm || !accname || !balance)
 		return false;
 
@@ -320,12 +318,11 @@ function onDeletePopup(res)
 // Create and show account delete warning popup
 function showDeletePopup()
 {
-	var multi;
-
-	if (accounts.count() == 0)
+	var totalSelCount = accounts.count() + hiddenAccounts.count();
+	if (totalSelCount == 0)
 		return;
 
-	multi = (accounts.count() > 1);
+	var multi = (totalSelCount > 1);
 
 	// check popup already created
 	if (!dwPopup)

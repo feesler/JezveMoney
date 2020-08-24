@@ -55,9 +55,10 @@ export class AccountsView extends TestView
 			acc = [ acc ];
 
 		let ind = 0;
+		let totalTiles = this.content.tiles.items.length + this.content.hiddenTiles.items.length;
 		for(let acc_num of acc)
 		{
-			if (acc_num < 0 || acc_num >= this.content.tiles.items.length + this.content.hiddenTiles.items.length)
+			if (acc_num < 0 || acc_num >= totalTiles)
 				throw new Error('Invalid account number');
 
 			if (acc_num < this.content.tiles.items.length)

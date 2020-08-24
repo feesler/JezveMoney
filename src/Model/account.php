@@ -270,7 +270,7 @@ class AccountModel extends CachedTable
 	}
 
 
-	public function show($items)
+	public function show($items, $val = TRUE)
 	{
 		if (!is_array($items))
 			$items = [ $items ];
@@ -287,7 +287,12 @@ class AccountModel extends CachedTable
 				return FALSE;
 		}
 
-		$updRes = $this->dbObj->updateQ($this->tbl_name, [ "flags=flags&~".ACCOUNT_HIDDEN ], "id".inSetCondition($items));
+		if ($val)
+			$condition = [ "flags=flags&~".ACCOUNT_HIDDEN ];
+		else
+			$condition = [ "flags=flags|".ACCOUNT_HIDDEN ];
+
+		$updRes = $this->dbObj->updateQ($this->tbl_name, $condition, "id".inSetCondition($items));
 		if (!$updRes)
 			return FALSE;
 
@@ -299,28 +304,7 @@ class AccountModel extends CachedTable
 
 	public function hide($items)
 	{
-		if (!is_array($items))
-			$items = [ $items ];
-
-		foreach($items as $item_id)
-		{
-			// check account is exist
-			$accObj = $this->getItem($item_id);
-			if (!$accObj)
-				return FALSE;
-
-			// check user of account
-			if ($accObj->user_id != self::$user_id)
-				return FALSE;
-		}
-
-		$updRes = $this->dbObj->updateQ($this->tbl_name, [ "flags=flags|".ACCOUNT_HIDDEN ], "id".inSetCondition($items));
-		if (!$updRes)
-			return FALSE;
-
-		$this->cleanCache();
-
-		return TRUE;
+		return $this->show($items, FALSE);
 	}
 
 
