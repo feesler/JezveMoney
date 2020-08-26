@@ -4,6 +4,7 @@ import { Transaction } from '../model/transaction.js';
 import { Currency } from '../model/currency.js';
 import { test, formatProps } from '../common.js';
 import { App } from '../app.js';
+import { AccountsList } from '../model/accountslist.js';
 
 
 export async function stateLoop()
@@ -145,7 +146,8 @@ export async function update(params)
 	}
 	await App.view.goToUpdateAccount(pos);
 
-	let expAccount = App.state.accounts.getItemByIndex(pos);
+	let ids = getAccountsByIndexes(pos);
+	let expAccount = App.state.accounts.getItem(ids[0]);
 	if (!expAccount)
 		throw new Error('Can not find specified account');
 	App.view.setExpectedAccount(expAccount);
@@ -178,8 +180,8 @@ export async function del(accounts)
 	// Check initial state
 	await App.state.fetch();
 
-	let userAccList = App.state.accounts.getUserAccounts();
-	App.state.deleteAccounts(userAccList.indexesToIds(accounts));
+	let ids = getAccountsByIndexes(accounts);
+	App.state.deleteAccounts(ids);
 
 	await App.view.deleteAccounts(accounts);
 
@@ -208,8 +210,8 @@ export async function delFromUpdate(pos)
 
 	await App.state.fetch();
 
-	let userAccList = App.state.accounts.getUserAccounts();
-	App.state.deleteAccounts(userAccList.indexesToIds(pos));
+	let ids = getAccountsByIndexes(pos);
+	App.state.deleteAccounts(ids);
 
 	await App.view.deleteSelfItem();
 
@@ -221,6 +223,76 @@ export async function delFromUpdate(pos)
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
+}
+
+
+function getAccountByIndex(ind, visibleAccList, hiddenAccList)
+{
+	if (ind < 0 || ind > visibleAccList.length + hiddenAccList.length)
+		throw new Error(`Invalid account index ${ind}`);
+
+	if (ind < visibleAccList.length)
+	{
+		return visibleAccList[ind].id;
+	}
+	else
+	{
+		let hiddenInd = ind - visibleAccList.length;
+		return hiddenAccList[hiddenInd].id;
+	}
+}
+
+
+function getAccountsByIndexes(accounts)
+{
+	if (!Array.isArray(accounts))
+		accounts = [ accounts ];
+
+	let userAccList = App.state.accounts.getUserAccounts();
+	let visibleAccList = userAccList.getVisible(true);
+	let hiddenAccList = userAccList.getHidden(true);
+
+	return accounts.map(ind => getAccountByIndex(ind, visibleAccList, hiddenAccList));
+}
+
+
+export async function show(accounts, val = true)
+{
+	if (!Array.isArray(accounts))
+		accounts = [ accounts ];
+
+	let showVerb = val ? 'Show' : 'Hide';
+	App.view.setBlock(`${showVerb} account(s) [${accounts.join()}]`, 2);
+
+	// Navigate to create account view
+	if (!(App.view instanceof AccountsView))
+	{
+		await App.goToMainView();
+		await App.view.goToAccounts();
+	}
+
+	// Check initial state
+	await App.state.fetch();
+
+	let ids = getAccountsByIndexes(accounts);
+	App.state.showAccounts(ids, val);
+
+	if (val)
+		await App.view.showAccounts(accounts);
+	else
+		await App.view.hideAccounts(accounts);
+
+	App.view.expectedState = AccountsView.render(App.state);
+
+	await test(`${showVerb} accounts [${accounts.join()}]`, () => App.view.checkState());
+	await test('App state', () => App.state.fetchAndTest());
+}
+
+
+
+export async function hide(accounts)
+{
+	return show(accounts, false);
 }
 
 
@@ -250,8 +322,7 @@ export async function exportTest(accounts)
 
 	// Prepare state
 	await App.state.fetch();
-	let userAccList = App.state.accounts.getUserAccounts();
-	let ids = userAccList.indexesToIds(accounts);
+	let ids = getAccountsByIndexes(accounts);
 	let trList = App.state.transactions.filterByAccounts(ids);
 	let transactions = trList.sortAsc();
 

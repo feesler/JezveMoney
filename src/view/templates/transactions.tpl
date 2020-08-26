@@ -43,6 +43,13 @@
 <?php		} else {		?>
 										<option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
 <?php		}
+		}
+		foreach($hiddenAccArr as $accData) {
+			if (in_array($accData->id, $accFilter)) {		?>
+										<option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
+<?php		} else {		?>
+										<option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
+<?php		}
 		}	?>
 									</select>
 								</div>

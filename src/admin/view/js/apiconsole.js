@@ -450,6 +450,7 @@ function isAccount(obj)
 			initbalance : isNum,
 			name : isString,
 			icon : isInt,
+			flags : isInt,
 		}, {
 			user_id : isInt,
 			createdate : isInt,
@@ -494,7 +495,7 @@ function isCurrency(obj)
 			id : isInt,
 			name : isString,
 			sign : isString,
-			format : isInt,
+			flags : isInt,
 		}, {
 			createdate : isInt,
 			updatedate : isInt,
@@ -505,13 +506,36 @@ function isCurrency(obj)
 function isCurrenciesArray(obj){ return isArrayOf(obj, isCurrency); }
 
 
+function isPersonAccount(obj)
+{
+	return verifyObject(obj, {
+			id : isInt,
+			curr_id : isInt,
+			balance : isNum,
+		}, {
+			owner_id : isInt,
+			initbalance : isNum,
+			name : isString,
+			icon : isInt,
+			flags : isInt,
+			user_id : isInt,
+			createdate : isInt,
+			updatedate : isInt,
+		});
+}
+
+
+function isPersonAccountsArray(obj){ return isArrayOf(obj, isPersonAccount); }
+
+
 function isPerson(obj)
 {
 	return verifyObject(obj, {
 			id : isInt,
 			name : isString,
+			flags : isInt,
 		}, {
-			accounts : isAccountsArray,
+			accounts : isPersonAccountsArray,
 			user_id: isInt,
 			createdate : isInt,
 			updatedate : isInt,
@@ -674,6 +698,13 @@ function initControls()
 		throw new Error('Fail to init view');
 	listAccForm.onsubmit = function(e){ return onFormSubmit(e, isAccountsArray); };
 
+	var checkboxes = listAccForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = Array.from(checkboxes);
+	checkboxes.forEach(function(elem)
+	{
+		elem.addEventListener('change', onCheck);
+	});
+
 	var readaccbtn = ge('readaccbtn');
 	if (readaccbtn)
 		readaccbtn.onclick = onReadAccountSubmit;
@@ -705,6 +736,13 @@ function initControls()
 		throw new Error('Fail to init view');
 	listPersonsForm.onsubmit = function(e){ return onFormSubmit(e, isPersonsArray); };
 
+	checkboxes = listPersonsForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = Array.from(checkboxes);
+	checkboxes.forEach(function(elem)
+	{
+		elem.addEventListener('change', onCheck);
+	});
+
 	var readpersonbtn = ge('readpersonbtn');
 	if (readpersonbtn)
 		readpersonbtn.onclick = onReadPersonSubmit;
@@ -731,7 +769,7 @@ function initControls()
 		throw new Error('Fail to init view');
 	listTrForm.onsubmit = function(e){ return onFormSubmit(e, isTransactionsArray); };
 
-	var checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
+	checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
 	checkboxes = Array.from(checkboxes);
 	checkboxes.forEach(function(elem)
 	{

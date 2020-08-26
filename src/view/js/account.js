@@ -5,6 +5,24 @@ function getAccount(account_id)
 }
 
 
+function isVisibleAccount(account)
+{
+	if (!account || !('flags' in account))
+		throw new Error('Invalid account');
+
+	return (account.flags & ACCOUNT_HIDDEN) == 0;
+}
+
+
+function isHiddenAccount(account)
+{
+	if (!account || !('flags' in account))
+		throw new Error('Invalid account');
+
+	return (account.flags & ACCOUNT_HIDDEN) == ACCOUNT_HIDDEN;
+}
+
+
 // Format balance of account value with currency
 function formatAccoutBalance(acc_id)
 {

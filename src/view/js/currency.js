@@ -9,7 +9,7 @@ function formatValue(val)
 function Currency(props)
 {
 	this.id = props.id;
-	this.format = props.format;
+	this.flags = props.flags;
 	this.sign = props.sign;
 	this.name = props.name;
 }
@@ -25,7 +25,7 @@ Currency.prototype.formatValue = function(val)
 
 	var fmtVal = formatValue(nval);
 
-	if (this.format)
+	if (this.flags)
 		return this.sign + ' ' + fmtVal;
 	else
 		return fmtVal + ' ' + this.sign;
@@ -57,7 +57,7 @@ function formatCurrency(val, curr_id)
 		fmtVal = formatValue(nval);
 	else
 		fmtVal = formatValue(nval.toFixed(2));
-	if (curr.format)
+	if (curr.flags)
 		return curr.sign + ' ' + fmtVal;
 	else
 		return fmtVal + ' ' + curr.sign;

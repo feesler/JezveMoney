@@ -87,17 +87,17 @@ const userReqFields = ['login', 'password', 'name'];
 /**
  * Currency
  */
-const currReqFields = ['name', 'sign', 'format'];
+const currReqFields = ['name', 'sign', 'flags'];
 
 /**
  * Accounts
  */
-const accReqFields = ['name', 'initbalance', 'curr_id', 'icon'];
+const accReqFields = ['name', 'initbalance', 'curr_id', 'icon', 'flags'];
 
 /**
  * Persons
  */
-const pReqFields = ['name'];
+const pReqFields = ['name', 'flags'];
 
 /**
  * Transactions
@@ -284,7 +284,7 @@ export const api = {
 			if (!id || isNaN(id))
 				throw new ApiRequestError('Wrong id specified');
 
-			let postData = checkFields(options, accReqFields);
+			let postData = checkFields(options, userReqFields);
 			postData.id = id;
 
 			let apiRes = await apiPost('user/update', postData);

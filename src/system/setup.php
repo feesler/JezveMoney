@@ -163,6 +163,9 @@
 	$dbConfig = ( require_once(APP_ROOT."system/dbsetup.php") );
 	MySqlDB::setup($dbConfig);
 
+	require_once(APP_ROOT."system/dbver.php");
+	DBVersion::autoUpdate();
+
 	date_default_timezone_set("Europe/Moscow");
 
 

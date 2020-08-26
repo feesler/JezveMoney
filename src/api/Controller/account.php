@@ -2,7 +2,7 @@
 
 class AccountApiController extends ApiController
 {
-	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon" ];
+	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon", "flags" ];
 
 
 	public function initAPI()
@@ -38,6 +38,8 @@ class AccountApiController extends ApiController
 		$params = [];
 		if (isset($_GET["full"]) && $_GET["full"] == 1)
 			$params["full"] = TRUE;
+		if (isset($_GET["type"]))
+			$params["type"] = $_GET["type"];
 
 		$accounts = $this->model->getData($params);
 		$res = [];

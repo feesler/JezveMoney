@@ -1,6 +1,7 @@
 import { NullableComponent } from './component.js';
 import { Tile } from './tile.js';
-import { InfoTile } from './infotile.js';
+import { AccountsList } from '../../model/accountslist.js';
+import { PersonsList } from '../../model/personslist.js';
 import { asyncMap } from '../../common.js';
 
 
@@ -29,15 +30,39 @@ export class TilesList extends NullableComponent
 	}
 
 
+	/**
+	 * @returns {array} active items
+	 */
+	getActive()
+	{
+		return this.items.filter(item => item.isActive);
+	}
+
+
 	static renderAccounts(accountsList)
 	{
-		if (!Array.isArray(accountsList))
+		if (!(accountsList instanceof AccountsList))
 			throw new Error('Invalid data');
 
+		let visibleAccounts = accountsList.getVisible(true);
+
 		let res = {
-			tiles : {
-				items : accountsList.map(Tile.renderAccount)
-			}
+			items : visibleAccounts.map(Tile.renderAccount)
+		};
+
+		return res;
+	}
+
+
+	static renderHiddenAccounts(accountsList)
+	{
+		if (!(accountsList instanceof AccountsList))
+			throw new Error('Invalid data');
+
+		let hiddenAccounts = accountsList.getHidden(true);
+
+		let res = {
+			items : hiddenAccounts.map(Tile.renderAccount)
 		};
 
 		return res;
@@ -46,18 +71,29 @@ export class TilesList extends NullableComponent
 
 	static renderPersons(personsList, tileClass = Tile)
 	{
-		if (!Array.isArray(personsList))
+		if (!(personsList instanceof PersonsList))
 			throw new Error('Invalid data');
 
-		let personTiles = {
-			items : personsList.map(tileClass.renderPerson)
+		let visiblePersons = personsList.getVisible(true);
+
+		let res = {
+			items : visiblePersons.map(tileClass.renderPerson)
 		};
 
-		let res = {};
-		if (tileClass == InfoTile)
-			res.infoTiles = personTiles;
-		else
-			res.tiles = personTiles;
+		return res;
+	}
+
+
+	static renderHiddenPersons(personsList, tileClass = Tile)
+	{
+		if (!(personsList instanceof PersonsList))
+			throw new Error('Invalid data');
+
+		let hiddenPersons = personsList.getHidden(true);
+
+		let res = {
+			items : hiddenPersons.map(tileClass.renderPerson)
+		};
 
 		return res;
 	}

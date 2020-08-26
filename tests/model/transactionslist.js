@@ -72,7 +72,7 @@ export class TransactionsList extends List
 
 	updatePos(ind, pos)
 	{
-		if (ind < 0 || ind >= this.data.length)
+		if (ind < 0 || ind >= this.length)
 			throw new Error(`Wrong transaction index: ${ind}`);
 
 		let trObj = this.data[ind];

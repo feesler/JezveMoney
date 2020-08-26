@@ -135,12 +135,12 @@ export class Scenario
 			this.API_USER_ACC_RUB,
 			this.API_USER_ACC_USD,
 		] = await this.runner.runGroup(AccountApiTests.create, [
-			{ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5 },
-			{ name : 'USD', curr_id : USD, initbalance : 50, icon : 2 },
+			{ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5, flags : 0 },
+			{ name : 'USD', curr_id : USD, initbalance : 50, icon : 2, flags : 0 },
 		]);
 
 		[ this.API_USER_PERSON ] = await this.runner.runGroup(PersonApiTests.create, [
-			{ name : 'API user Person' }
+			{ name : 'API user Person', flags : 0 }
 		]);
 
 		[ this.API_USER_TRANSACTION ] = await this.runner.runGroup(TransactionApiTests.extractAndCreate, [
@@ -164,7 +164,7 @@ export class Scenario
 		this.environment.setBlock('Accounts security', 2);
 
 		const tasks = [
-			{ action : AccountApiTests.update, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2 } },
+			{ action : AccountApiTests.update, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2, flags : 0 } },
 			{ action : AccountApiTests.del, data : API_USER_ACC_RUB },
 		];
 
@@ -179,7 +179,7 @@ export class Scenario
 		this.environment.setBlock('Persons security', 2);
 
 		const tasks = [
-			{ action : PersonApiTests.update, data : { id : API_USER_PERSON, name : 'API Person' } },
+			{ action : PersonApiTests.update, data : { id : API_USER_PERSON, name : 'API Person', flags : 0 } },
 			{ action : PersonApiTests.del, data : API_USER_PERSON },
 		];
 
@@ -261,11 +261,11 @@ export class Scenario
 	async apiCreateAccounts()
 	{
 		const data = [
-			{ name : 'acc ru', curr_id : RUB, initbalance : 100, icon : 1 },
-			{ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon : 3 },
-			{ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon : 5 },
+			{ name : 'acc ru', curr_id : RUB, initbalance : 100, icon : 1, flags : 0 },
+			{ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon : 3, flags : 0 },
+			{ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0 },
 			// Try to create account with existing name
-			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0 },
+			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0, flags : 0 },
 		];
 
 		[ this.ACC_RUB, this.CASH_RUB, this.ACC_USD ] = await this.runner.runGroup(AccountApiTests.create, data);
@@ -301,10 +301,10 @@ export class Scenario
 	async apiCreatePersons()
 	{
 		const data = [
-			{ name : 'Person X' },
-			{ name : 'Y' },
+			{ name : 'Person X', flags : 0 },
+			{ name : 'Y', flags : 0 },
 			// Try to create person with existing name
-			{ name : 'Y' },
+			{ name : 'Y', flags : 0 },
 		];
 
 		[ this.PERSON_X, this.PERSON_Y ] = await this.runner.runGroup(PersonApiTests.create, data);
@@ -528,6 +528,32 @@ export class Scenario
 	}
 
 
+	async hideAccountsTest()
+	{
+		this.environment.setBlock('Hide accounts', 2);
+
+		const data = [
+			[0],
+			[0, 4],
+		];
+
+		await this.runner.runGroup(AccountTests.hide, data);
+	}
+
+
+	async showAccountsTest()
+	{
+		this.environment.setBlock('Show accounts', 2);
+
+		const data = [
+			[5],
+			[0, 6],
+		];
+
+		await this.runner.runGroup(AccountTests.show, data);
+	}
+
+
 	async exportAccountsTest()
 	{
 		this.environment.setBlock('Export accounts', 2);
@@ -546,6 +572,8 @@ export class Scenario
 		this.environment.setBlock('Persons', 1);
 
 		await this.createPersonTests();
+		await this.hidePersonsTest();
+		await this.showPersonsTest();
 		await this.updatePersonTests();
 		await this.deletePersonTests();
 	}
@@ -592,14 +620,40 @@ export class Scenario
 	}
 
 
+	async hidePersonsTest()
+	{
+		this.environment.setBlock('Hide persons', 2);
+
+		const data = [
+			[0],
+			[0, 1],
+		];
+
+		await this.runner.runGroup(PersonTests.hide, data);
+	}
+
+
+	async showPersonsTest()
+	{
+		this.environment.setBlock('Show persons', 2);
+
+		const data = [
+			[2],
+			[0, 4],
+		];
+
+		await this.runner.runGroup(PersonTests.show, data);
+	}
+
+
 	async prepareTransactionTests()
 	{
 		const accList = [
-			{ name : 'acc_3', curr_id : RUB, initbalance : '500.99', icon : 2 },
-			{ name : 'acc RUB', curr_id : RUB, initbalance : '500.99', icon : 5 },
-			{ name : 'acc USD', curr_id : USD, initbalance : '500.99', icon : 4 },
-			{ name : 'acc EUR', curr_id : EUR, initbalance : '10000.99', icon : 3 },
-			{ name : 'card RUB', curr_id : RUB, initbalance : '35000.40', icon : 3 },
+			{ name : 'acc_3', curr_id : RUB, initbalance : '500.99', icon : 2, flags : 0 },
+			{ name : 'acc RUB', curr_id : RUB, initbalance : '500.99', icon : 5, flags : 0 },
+			{ name : 'acc USD', curr_id : USD, initbalance : '500.99', icon : 4, flags : 0 },
+			{ name : 'acc EUR', curr_id : EUR, initbalance : '10000.99', icon : 3, flags : 0 },
+			{ name : 'card RUB', curr_id : RUB, initbalance : '35000.40', icon : 3, flags : 0 },
 		];
 
 		for(const account of accList)
@@ -611,8 +665,8 @@ export class Scenario
 		}
 
 		const personsList = [
-			{ name : 'Maria' },
-			{ name : 'Ivan<' },
+			{ name : 'Maria', flags : 0 },
+			{ name : 'Ivan<', flags : 0 },
 		];
 
 		for(const person of personsList)
@@ -639,6 +693,8 @@ export class Scenario
 		await this.transactionsListTests();
 		await this.deleteTransactionTests();
 
+		await this.hideAccountsTest();
+		await this.showAccountsTest();
 		await this.exportAccountsTest();
 		await this.updateAccountTests();
 		await this.deleteAccountTests();
@@ -681,10 +737,10 @@ export class Scenario
 	async setupAccounts()
 	{
 		let data = [
-			{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1 },
-			{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2 },
-			{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4 },
-			{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5 },
+			{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1, flags : 0 },
+			{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2, flags : 0 },
+			{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4, flags : 0 },
+			{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5, flags : 0 },
 		];
 
 		let res = [];
@@ -708,8 +764,8 @@ export class Scenario
 	async setupPersons()
 	{
 		let data = [
-			{ name : 'Alex' },
-			{ name : 'noname &' },
+			{ name : 'Alex', flags : 0 },
+			{ name : 'noname &', flags : 0 },
 		];
 
 		let res = [];

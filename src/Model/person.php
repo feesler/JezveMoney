@@ -34,10 +34,11 @@ class PersonModel extends CachedTable
 						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
 						"`name` VARCHAR(255) NOT NULL, ".
 						"`user_id` INT(11) NOT NULL, ".
+						"`flags` INT(11) NOT NULL, ".
 						"`createdate` DATETIME NOT NULL, ".
 						"`updatedate` DATETIME NOT NULL, ".
 						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8 COLLATE utf8mb4_general_ci");
+						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 
 		return $res;
 	}
@@ -53,6 +54,7 @@ class PersonModel extends CachedTable
 		$res->id = intval($row["id"]);
 		$res->name = $row["name"];
 		$res->user_id = intval($row["user_id"]);
+		$res->flags = intval($row["flags"]);
 		$res->createdate = strtotime($row["createdate"]);
 		$res->updatedate = strtotime($row["updatedate"]);
 
@@ -69,7 +71,7 @@ class PersonModel extends CachedTable
 
 	protected function checkParams($params, $isUpdate = FALSE)
 	{
-		$avFields = ["name"];
+		$avFields = ["name", "flags"];
 		$res = [];
 
 		// In CREATE mode all fields is required
@@ -105,6 +107,11 @@ class PersonModel extends CachedTable
 		{
 			wlog("Can't obtain user_id");
 			return NULL;
+		}
+
+		if (isset($params["flags"]))
+		{
+			$res["flags"] = intval($params["flags"]);
 		}
 
 		return $res;
@@ -204,6 +211,44 @@ class PersonModel extends CachedTable
 		}
 
 		return $accMod->onPersonDelete($items);
+	}
+
+
+	public function show($items, $val = TRUE)
+	{
+		if (!is_array($items))
+			$items = [ $items ];
+
+		foreach($items as $item_id)
+		{
+			// check person is exist
+			$accObj = $this->getItem($item_id);
+			if (!$accObj)
+				return FALSE;
+
+			// check user of person
+			if ($accObj->user_id != self::$user_id)
+				return FALSE;
+		}
+
+		if ($val)
+			$condition = [ "flags=flags&~".PERSON_HIDDEN ];
+		else
+			$condition = [ "flags=flags|".PERSON_HIDDEN ];
+
+		$updRes = $this->dbObj->updateQ($this->tbl_name, $condition, "id".inSetCondition($items));
+		if (!$updRes)
+			return FALSE;
+
+		$this->cleanCache();
+
+		return TRUE;
+	}
+
+
+	public function hide($items)
+	{
+		return $this->show($items, FALSE);
 	}
 
 
@@ -310,7 +355,16 @@ class PersonModel extends CachedTable
 	}
 
 
-	// Return array of persons
+	/**
+	 * Return array of persons
+	 *
+	 * @param mixed[string] $params
+	 * 		Query parameters
+	 * 		- full (boolean): if set to TRUE and current user have admin rights method will return persons of all users ;
+	 * 		- type (string): visibility filter. Possible values: "all", "visible", "hidden" ;
+	 *
+	 * @return array of person objects
+	 */
 	public function getData($params = NULL)
 	{
 		if (!is_array($params))
@@ -318,6 +372,9 @@ class PersonModel extends CachedTable
 
 		$accMod = AccountModel::getInstance();
 		$requestAll = (isset($params["full"]) && $params["full"] == TRUE && UserModel::isAdminUser());
+		$requestedType = isset($params["type"]) ? $params["type"] : "visible";
+		$includeVisible = in_array($requestedType, ["all", "visible"]);
+		$includeHidden = in_array($requestedType, ["all", "hidden"]);
 
 		$itemsData = [];
 		if ($requestAll)
@@ -343,6 +400,9 @@ class PersonModel extends CachedTable
 		{
 			if (!$requestAll && $item->id == self::$owner_id)
 				continue;
+			$hidden = $this->isHidden($item);
+			if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden))
+				continue;
 
 			$itemObj = clone $item;
 			$itemObj->accounts = $accMod->getData([ "person" => $item->id ]);
@@ -351,5 +411,17 @@ class PersonModel extends CachedTable
 		}
 
 		return $res;
+	}
+
+
+	// Check item is hidden
+	public function isHidden($item)
+	{
+		if (is_int($item))
+			$item = $this->getItem($item);
+		if (!$item || !is_object($item) || !isset($item->flags))
+			throw new Error("Invalid person item");
+
+		return $item && ($item->flags & PERSON_HIDDEN) == PERSON_HIDDEN;
 	}
 }

@@ -12,7 +12,7 @@
 
 					<table id="currencies_tbl" class="adm_tbl">
 						<thead>
-							<tr><th>id</th><th>name</th><th>sign</th><th>format</th></tr>
+							<tr><th>id</th><th>name</th><th>sign</th><th>flags</th></tr>
 						</thead>
 						<tbody id="curr_list">
 <?php	foreach($currArr as $currInfo) {		?>
@@ -20,7 +20,7 @@
 								<td><?=e($currInfo->id)?></td>
 								<td><?=e($currInfo->name)?></td>
 								<td><?=e($currInfo->sign)?></td>
-								<td><?=e($currInfo->format)?></td>
+								<td><?=e($currInfo->flags)?></td>
 							</tr>
 <?php	}	?>
 						</tbody>
@@ -49,10 +49,10 @@
 </div>
 <div id="admin_block" class="non_float">
 	<div id="admin_block" class="check_wr">
-		<label for="isbefore"><input id="isbefore" name="format" type="radio" value="1">Sign before value</label>
+		<label for="isbefore"><input id="isbefore" name="flags" type="radio" value="1">Sign before value</label>
 	</div>
 	<div id="admin_block" class="check_wr">
-		<label for="isafter"><input id="isafter" name="format" type="radio" value="0">Sign after value</label>
+		<label for="isafter"><input id="isafter" name="flags" type="radio" value="0">Sign after value</label>
 	</div>
 </div>
 <div class="popup_form_controls">

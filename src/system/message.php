@@ -132,6 +132,10 @@ Message::add("MSG_ACCOUNT_CREATE");
 Message::add("ERR_ACCOUNT_CREATE", MSG_TYPE_ERROR, "Fail to create new account.");
 Message::add("MSG_ACCOUNT_UPDATE");
 Message::add("ERR_ACCOUNT_UPDATE", MSG_TYPE_ERROR, "Fail to update account.");
+Message::add("MSG_ACCOUNT_SHOW");
+Message::add("ERR_ACCOUNT_SHOW", MSG_TYPE_ERROR, "Fail to show account.");
+Message::add("MSG_ACCOUNT_HIDE");
+Message::add("ERR_ACCOUNT_HIDE", MSG_TYPE_ERROR, "Fail to hide account.");
 Message::add("MSG_ACCOUNT_DELETE");
 Message::add("ERR_ACCOUNT_DELETE", MSG_TYPE_ERROR, "Fail to delete account.");
 Message::add("MSG_ACCOUNTS_RESET", MSG_TYPE_SUCCESS, "Accounts successfully reseted");
@@ -150,6 +154,10 @@ Message::add("ERR_PERSON_CREATE_EXIST", MSG_TYPE_ERROR, "Fail to update person. 
 Message::add("MSG_PERSON_UPDATE");
 Message::add("ERR_PERSON_UPDATE", MSG_TYPE_ERROR, "Fail to update person.");
 Message::add("ERR_PERSON_UPDATE_EXIST", MSG_TYPE_ERROR, "Fail to update person. Person with same name already exist.");
+Message::add("MSG_PERSON_SHOW");
+Message::add("ERR_PERSON_SHOW", MSG_TYPE_ERROR, "Fail to show person.");
+Message::add("MSG_PERSON_HIDE");
+Message::add("ERR_PERSON_HIDE", MSG_TYPE_ERROR, "Fail to hide person.");
 Message::add("MSG_PERSON_DELETE");
 Message::add("ERR_PERSON_DELETE", MSG_TYPE_ERROR, "Fail to delete person.");
 

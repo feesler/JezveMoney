@@ -24,11 +24,11 @@ class CurrencyModel extends CachedTable
 						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
 						"`name` VARCHAR(128) NOT NULL, ".
 						"`sign` VARCHAR(64) NOT NULL, ".
-						"`format` INT(11) NOT NULL DEFAULT '0', ".
+						"`flags` INT(11) NOT NULL DEFAULT '0', ".
 						"`createdate` DATETIME NOT NULL, ".
 						"`updatedate` DATETIME NOT NULL, ".
 						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8 COLLATE utf8mb4_general_ci");
+						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 
 		return $res;
 	}
@@ -44,7 +44,7 @@ class CurrencyModel extends CachedTable
 		$res->id = intval($row["id"]);
 		$res->name = $row["name"];
 		$res->sign = $row["sign"];
-		$res->format = intval($row["format"]);
+		$res->flags = intval($row["flags"]);
 		$res->createdate = strtotime($row["createdate"]);
 		$res->updatedate = strtotime($row["updatedate"]);
 
@@ -61,7 +61,7 @@ class CurrencyModel extends CachedTable
 
 	protected function checkParams($params, $isUpdate = FALSE)
 	{
-		$avFields = ["name", "sign", "format"];
+		$avFields = ["name", "sign", "flags"];
 		$res = [];
 
 		// In CREATE mode all fields is required
@@ -88,8 +88,8 @@ class CurrencyModel extends CachedTable
 			}
 		}
 
-		if (isset($params["format"]))
-			$res["format"] = intval($params["format"]);
+		if (isset($params["flags"]))
+			$res["flags"] = intval($params["flags"]);
 
 		return $res;
 	}
@@ -190,7 +190,7 @@ class CurrencyModel extends CachedTable
 		if (!$currObj)
 			return NULL;
 
-		$sfmt = (($currObj->format) ? ($currObj->sign." %s") : ("%s ".$currObj->sign));
+		$sfmt = (($currObj->flags) ? ($currObj->sign." %s") : ("%s ".$currObj->sign));
 		return valFormat($sfmt, $value);
 	}
 
@@ -210,7 +210,7 @@ class CurrencyModel extends CachedTable
 			$currObj->id = $item->id;
 			$currObj->name = $item->name;
 			$currObj->sign = $item->sign;
-			$currObj->format = $item->format;
+			$currObj->flags = $item->flags;
 
 			$res[] = $currObj;
 		}

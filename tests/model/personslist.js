@@ -3,6 +3,9 @@ import { api } from './api.js';
 import { copyObject } from "../common.js";
 
 
+export const PERSON_HIDDEN = 1;
+
+
 export class PersonsList extends List
 {
 	async fetch()
@@ -36,5 +39,36 @@ export class PersonsList extends List
 		}
 
 		return copyObject(res);
+	}
+
+
+	isHidden(item)
+	{
+		if (!item)
+			throw new Error('Invalid person');
+
+		return (item.flags & PERSON_HIDDEN) == PERSON_HIDDEN;
+	}
+
+
+	getVisible(returnRaw = false)
+	{
+		let res = this.data.filter(item => !this.isHidden(item));
+
+		if (returnRaw)
+			return copyObject(res);
+		else
+			return new PersonsList(res);
+	}
+
+
+	getHidden(returnRaw = false)
+	{
+		let res = this.data.filter(item => this.isHidden(item));
+
+		if (returnRaw)
+			return copyObject(res);
+		else
+			return new PersonsList(res);
 	}
 }

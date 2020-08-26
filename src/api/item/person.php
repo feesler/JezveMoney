@@ -6,6 +6,7 @@ class Person
 	{
 		$this->id = $obj->id;
 		$this->name = $obj->name;
+		$this->flags = $obj->flags;
 
 		if (isset($obj->accounts) && is_array($obj->accounts))
 		{
