@@ -56,8 +56,9 @@ class TransactionApiController extends ApiController
 		$params["page"] = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
 		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
-		if (!$accMod->is_exist($acc_id))
-			$acc_id = 0;
+		if ($acc_id && !$accMod->is_exist($acc_id))
+			$this->fail("Invalid account");
+
 		if ($acc_id != 0)
 			$params["accounts"] = $acc_id;
 
