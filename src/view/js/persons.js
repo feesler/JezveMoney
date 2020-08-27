@@ -72,14 +72,15 @@ function onPersonSubmit(frm)
 	if (!p_name)
 		return false;
 
+	var valid = true;
 	if (!p_name.value || p_name.value == '')
 	{
-		alert('Please input person name.');
+		invalidateBlock('name-inp-block');
 		p_name.focus();
-		return false;
+		valid = false;
 	}
 
-	return true;
+	return valid;
 }
 
 
@@ -148,6 +149,15 @@ function initControls()
 		return;
 
 	personForm.onsubmit = onPersonSubmit;
+
+	var nameInp = ge('pname');
+	if (nameInp)
+	{
+		nameInp.addEventListener('input', function()
+		{
+			clearBlockValidation('name-inp-block');
+		});
+	}
 
 	var del_btn = ge('del_btn');
 	if (del_btn)

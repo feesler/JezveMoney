@@ -188,6 +188,34 @@ select
 }
 
 
+/* Validation */
+
+.validation-block. .std_input
+{
+	margin: 8px 0px 2px 0px;
+}
+
+
+.validation-block .invalid-feedback
+{
+	color: #FF0000;
+	display: none;
+	font-size: 14px;
+}
+
+
+.validation-block.invalid-block .invalid-feedback
+{
+	display: block;
+}
+
+
+.validation-block.invalid-block .std_input
+{
+	border-color: #FF0000;
+}
+
+
 /* Input controls color */
 input[type="text"], input[type="password"], select
 {

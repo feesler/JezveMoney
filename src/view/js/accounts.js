@@ -53,7 +53,7 @@ function initControls()
 
 	var accForm = ge('accForm');
 	if (accForm)
-		accForm.onsubmit = onNewAccountSubmit;
+		accForm.onsubmit = onAccountSubmit;
 
 	var accnameInp = ge('accname');
 	if (accnameInp)
@@ -245,6 +245,8 @@ function onAccNameInput(obj)
 	if (!obj)
 		return;
 
+	clearBlockValidation('name-inp-block');
+
 	accNameChanged = true;
 	acc_name = obj.value;
 
@@ -255,37 +257,40 @@ function onAccNameInput(obj)
 // Account initial balance input event handler
 function onAccInitBalanceInput(e)
 {
-	var obj = e.target;
-	if (!obj)
+	if (!e || !e.target)
 		return;
 
-	new_init_balance = normalize(obj.value);
+	clearBlockValidation('initbal-inp-block');
+
+	new_init_balance = normalize(e.target.value);
 
 	updateAccountTile();
 }
 
 
 // New account submit event handler
-function onNewAccountSubmit(frm)
+function onAccountSubmit(frm)
 {
 	var accname = ge('accname');
 	var balance = ge('balance');
 	if (!frm || !accname || !balance)
 		return false;
 
+	var valid = true;
+
 	if (!accname.value || accname.value.length < 1)
 	{
-		alert('Please type name of account.');
-		return false;
+		invalidateBlock('name-inp-block');
+		valid = false;
 	}
 
 	if (!balance.value || balance.value.length < 1 || !isNum(balance.value))
 	{
-		alert('Please type correct initial balance.');
-		return false;
+		invalidateBlock('initbal-inp-block');
+		valid = false;
 	}
 
-	return true;
+	return valid;
 }
 
 

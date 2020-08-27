@@ -658,51 +658,53 @@ function TransactionViewModel()
 	// Spend/Income transaction event handler
 	function onSubmit(frm)
 	{
-		var srcid, destid, src_amount, dest_amount, trdate;
-		var submitbtn;
-
 		if (self.submitStarted)
 			return false;
 
-		srcid = ge('src_id');
-		destid = ge('dest_id');
-		src_amount = ge('src_amount');
-		dest_amount = ge('dest_amount');
-		trdate = ge('date');
-		submitbtn = ge('submitbtn');
+		var srcid = ge('src_id');
+		var destid = ge('dest_id');
+		var src_amount = ge('src_amount');
+		var dest_amount = ge('dest_amount');
+		var trdate = ge('date');
+		var submitbtn = ge('submitbtn');
 		if (!frm || (!srcid && !destid) || !src_amount || !dest_amount || !trdate || !submitbtn)
 			return false;
 
-		if (Transaction.isExpense())
+		var valid = true;
+		if (isVisible('dest_amount_row'))
 		{
 			if (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value)))
 			{
-				alert('Please input correct amount.');
-				return false;
+				invalidateBlock('dest_amount_row');
+				valid = false;
 			}
 		}
-		else if (Transaction.isIncome())
+
+		if (isVisible('src_amount_row'))
 		{
 			if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
 			{
-				alert('Please input correct amount.');
-				return false;
+				invalidateBlock('src_amount_row');
+				valid = false;
 			}
 		}
 
-		src_amount.value = fixFloat(src_amount.value);
-		dest_amount.value = fixFloat(dest_amount.value);
-
 		if (!checkDate(trdate.value))
 		{
-			alert('Please input correct date.');
-			return false;
+			invalidateBlock('date_block');
+			valid = false;
 		}
 
-		self.submitStarted = true;
-		enable(submitbtn, false);
+		if (valid)
+		{
+			src_amount.value = fixFloat(src_amount.value);
+			dest_amount.value = fixFloat(dest_amount.value);
 
-		return true;
+			self.submitStarted = true;
+			enable(submitbtn, false);
+		}
+
+		return valid;
 	}
 
 
@@ -809,45 +811,46 @@ function TransactionViewModel()
 	// Transfer transaction submit event handler
 	function onTransferSubmit(frm)
 	{
-		var src_amount, dest_amount, exchrate, trdate;
-		var submitbtn;
-
 		if (self.submitStarted)
 			return false;
 
-		src_amount = ge('src_amount');
-		dest_amount = ge('dest_amount');
-		exchrate = ge('exchrate');
-		trdate = ge('date');
-		submitbtn = ge('submitbtn');
+		var src_amount = ge('src_amount');
+		var dest_amount = ge('dest_amount');
+		var exchrate = ge('exchrate');
+		var trdate = ge('date');
+		var submitbtn = ge('submitbtn');
 		if (!frm || !src_amount || !dest_amount || !exchrate || !trdate || !submitbtn)
 			return false;
 
+		var valid = true;
 		if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
 		{
-			alert('Please input correct source amount.');
-			return false;
+			invalidateBlock('src_amount_row');
+			valid = false;
 		}
 
 		if (Transaction.isDiff() && (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value))))
 		{
-			alert('Please input correct destination amount.');
-			return false;
+			invalidateBlock('dest_amount_row');
+			valid = false;
 		}
 
 		if (!checkDate(trdate.value))
 		{
-			alert('Please input correct date.');
-			return false;
+			invalidateBlock('date_block');
+			valid = false;
 		}
 
-		src_amount.value = fixFloat(src_amount.value);
-		dest_amount.value = fixFloat(dest_amount.value);
+		if (valid)
+		{
+			src_amount.value = fixFloat(src_amount.value);
+			dest_amount.value = fixFloat(dest_amount.value);
 
-		self.submitStarted = true;
-		enable(submitbtn, false);
+			self.submitStarted = true;
+			enable(submitbtn, false);
+		}
 
-		return true;
+		return valid;
 	}
 
 
@@ -930,9 +933,15 @@ function TransactionViewModel()
 		var obj = e.target;
 
 		if (obj.id == 'src_amount')
+		{
+			clearBlockValidation('src_amount_row');
 			Transaction.update('src_amount', obj.value);
+		}
 		else if (obj.id == 'dest_amount')
+		{
+			clearBlockValidation('dest_amount_row');
 			Transaction.update('dest_amount', obj.value);
+		}
 		else if (obj.id == 'exchrate')
 			Transaction.update('exchrate', obj.value);
 		else if (obj.id == 'resbal')
@@ -1234,57 +1243,53 @@ function TransactionViewModel()
 	// Debt form submit event handler
 	function onDebtSubmit(frm)
 	{
-		var accid, src_amount, dest_amount, trdate;
-		var submitbtn;
-
 		if (self.submitStarted)
 			return false;
 
-		submitbtn = ge('submitbtn');
+		var submitbtn = ge('submitbtn');
 		if (!frm || !submitbtn)
 			return false;
 
-		accid = ge('acc_id');
-		src_amount = ge('src_amount');
-		dest_amount = ge('dest_amount');
-		trdate = ge('date');
+		var accid = ge('acc_id');
+		var src_amount = ge('src_amount');
+		var dest_amount = ge('dest_amount');
+		var trdate = ge('date');
 		if (!frm || !accid || !src_amount || !dest_amount || !trdate)
 			return false;
 
 		if (Transaction.noAccount())
 			accid.value = 0;
 
+		var valid = true;
+
 		if (!src_amount.value || !src_amount.value.length || !isNum(fixFloat(src_amount.value)))
 		{
-			alert('Please input correct source amount.');
-			return false;
-		}
-
-		if (!checkDate(trdate.value))
-		{
-			alert('Please input correct date.');
-			return false;
+			invalidateBlock('src_amount_row');
+			valid = false;
 		}
 
 		if (!dest_amount.value || !dest_amount.value.length || !isNum(fixFloat(dest_amount.value)))
 		{
-			alert('Please input correct destination amount.');
-			return false;
+			invalidateBlock('dest_amount_row');
+			valid = false;
 		}
-
-		src_amount.value = fixFloat(src_amount.value);
-		dest_amount.value = fixFloat(dest_amount.value);
 
 		if (!checkDate(trdate.value))
 		{
-			alert('Please input correct date.');
-			return false;
+			invalidateBlock('date_block');
+			valid = false;
 		}
 
-		self.submitStarted = true;
-		enable(submitbtn, false);
+		if (valid)
+		{
+			src_amount.value = fixFloat(src_amount.value);
+			dest_amount.value = fixFloat(dest_amount.value);
 
-		return true;
+			self.submitStarted = true;
+			enable(submitbtn, false);
+		}
+
+		return valid;
 	}
 
 
