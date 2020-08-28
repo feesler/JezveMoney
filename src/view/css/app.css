@@ -190,7 +190,7 @@ select
 
 /* Validation */
 
-.validation-block. .std_input
+.validation-block .std_input
 {
 	margin: 8px 0px 2px 0px;
 }

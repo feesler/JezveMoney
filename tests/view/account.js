@@ -277,4 +277,16 @@ export class AccountView extends TestView
 
 		return this.checkState();
 	}
+
+
+	async submit()
+	{
+		await this.navigation(() => this.click(this.content.submitBtn));
+	}
+
+
+	async cancel()
+	{
+		await this.navigation(() => this.click(this.content.cancelBtn));
+	}
 }

@@ -5,7 +5,6 @@ import 'whatwg-fetch';
 import { setParam, formatTime, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment, visibilityResolver } from './base.js';
-import { setTimeout } from 'core-js';
 
 
 class BrowserEnvironment extends Environment
@@ -443,7 +442,7 @@ class BrowserEnvironment extends Environment
 
 		let navPromise = new Promise((resolve, reject) =>
 		{
-			this.viewframe.onload = async () =>
+			this.viewframe.addEventListener('load', async () =>
 			{
 				try
 				{
@@ -461,7 +460,7 @@ class BrowserEnvironment extends Environment
 				{
 					reject(e);
 				}
-			};
+			});
 		});
 
 		await action();
