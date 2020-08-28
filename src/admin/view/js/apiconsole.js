@@ -549,6 +549,7 @@ function isPersonsArray(obj){ return isArrayOf(obj, isPerson); }
 function isProfile(obj)
 {
 	return verifyObject(obj, {
+			login : isString,
 			user_id : isInt,
 			owner_id : isInt,
 			name : isString,

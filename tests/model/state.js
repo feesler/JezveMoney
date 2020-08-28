@@ -22,6 +22,7 @@ export class AppState
 		this.accounts = null;
 		this.persons = null;
 		this.transactions = null;
+		this.profile = null;
 	}
 
 

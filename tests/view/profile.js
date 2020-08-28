@@ -2,6 +2,7 @@ import { TestView } from './testview.js';
 import { LoginView } from './login.js';
 import { App } from '../app.js';
 import { WarningPopup } from './component/warningpopup.js';
+import { InputRow } from './component/inputrow.js';
 
 
 // Profile view class
@@ -22,8 +23,8 @@ export class ProfileView extends TestView
 		if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem)
 			throw new Error('Wrong profile view structure');
 
-		res.login = await this.prop(res.loginElem, 'innerText');
-		res.name = await this.prop(res.nameElem, 'innerText');
+		res.login = await this.prop(res.loginElem, 'textContent');
+		res.name = await this.prop(res.nameElem, 'textContent');
 
 		let buttons = await this.queryAll(blocks[3], 'input[type="button"]');
 		if (!buttons || buttons.length != 3)
@@ -35,7 +36,7 @@ export class ProfileView extends TestView
 		res.changeNamePopup = {
 			elem : await this.query('#chname_popup'),
 			content : await this.query('#changename'),
-			newNameInp : await this.query('#newname'),
+			newNameInp : await InputRow.create(this, await this.query('#name-inp-block')),
 		};
 
 		if (res.changeNamePopup.elem)
@@ -47,8 +48,8 @@ export class ProfileView extends TestView
 		res.changePassPopup = {
 			elem : await this.query('#chpass_popup'),
 			content : await this.query('#changepass'),
-			oldPassInp : await this.query('#oldpwd'),
-			newPassInp : await this.query('#newpwd'),
+			oldPassInp : await InputRow.create(this, await this.query('#old-pwd-inp-block')),
+			newPassInp : await InputRow.create(this, await this.query('#new-pwd-inp-block')),
 		};
 
 		if (res.changePassPopup.elem)
@@ -74,10 +75,19 @@ export class ProfileView extends TestView
 		if (!this.content.changeNamePopup || !(await this.isVisible(this.content.changeNamePopup.elem)))
 			throw new Error('Change name popup not appear');
 
-		await this.performAction(() => this.input(this.content.changeNamePopup.newNameInp, newName));
+		let validInput = (newName && newName != this.content.name && newName.length > 0);
+
+		await this.performAction(() => this.content.changeNamePopup.newNameInp.input(newName));
 		await this.performAction(() => this.click(this.content.changeNamePopup.okBtn));
 
-		await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
+		if (validInput)
+		{
+			await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
+		}
+		else
+		{
+			await this.performAction(() => this.click(this.content.changeNamePopup.closeBtn));
+		}
 	}
 
 
@@ -90,11 +100,22 @@ export class ProfileView extends TestView
 		if (!this.content.changePassPopup || !(await this.isVisible(this.content.changePassPopup.elem)))
 			throw new Error('Change password popup not appear');
 
-		await this.performAction(() => this.input(this.content.changePassPopup.oldPassInp, oldPass));
-		await this.performAction(() => this.input(this.content.changePassPopup.newPassInp, newPass));
+		let validInput = (oldPass && oldPass.length > 0 &&
+							newPass && newPass.length > 0 &&
+							oldPass != newPass);
+
+		await this.performAction(() => this.content.changePassPopup.oldPassInp.input(oldPass));
+		await this.performAction(() => this.content.changePassPopup.newPassInp.input(newPass));
 		await this.performAction(() => this.click(this.content.changePassPopup.okBtn));
 
-		await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
+		if (validInput)
+		{
+			await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
+		}
+		else
+		{
+			await this.performAction(() => this.click(this.content.changePassPopup.closeBtn));
+		}
 	}
 
 

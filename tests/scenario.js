@@ -466,13 +466,37 @@ export class Scenario
 	{
 		this.environment.setBlock('Profile tests', 1);
 
+		await App.state.fetch();
+
+		let origUserName = App.state.profile.name;
+		const tmpPassword = 'test123'
+
 		const tasks = [
+			// Registration tests
 			{ action : ProfileTests.register, data : { login : 'newuser', name : 'Newbie', password : '12345' } },
 			{ action : ProfileTests.deleteProfile },
+			{ action : ProfileTests.register, data : { login : '', name : '', password : '' } },
+			{ action : ProfileTests.register, data : { login : '', name : 'Newbie', password : '12345' } },
+			{ action : ProfileTests.register, data : { login : 'newuser', name : '', password : '12345' } },
+			{ action : ProfileTests.register, data : { login : 'newuser', name : 'Newbie', password : '' } },
+			// Login tests
+			{ action : ProfileTests.relogin, data : { login : App.config.testUser.login, password : '' } },
+			{ action : ProfileTests.relogin, data : { login : '', password : App.config.testUser.password } },
+			{ action : ProfileTests.relogin, data : { login : '', password : '' } },
 			{ action : ProfileTests.relogin, data : App.config.testUser },
+			// Reset data tests
 			{ action : ProfileTests.resetAll },
-			{ action : ProfileTests.changeName },
-			{ action : ProfileTests.changePass },
+			// Change name tests
+			{ action : ProfileTests.changeName, data : '' },
+			{ action : ProfileTests.changeName, data : origUserName },
+			{ action : ProfileTests.changeName, data : '^^&&>>' },
+			{ action : ProfileTests.changeName, data : origUserName },
+			// Change password tests
+			{ action : ProfileTests.changePass, data : { oldPassword : '', newPassword : '' } },
+			{ action : ProfileTests.changePass, data : { oldPassword : '123', newPassword : '' } },
+			{ action : ProfileTests.changePass, data : { oldPassword : '', newPassword : '123' } },
+			{ action : ProfileTests.changePass, data : { oldPassword : App.config.testUser.password, newPassword : tmpPassword } },
+			{ action : ProfileTests.changePass, data : { oldPassword : tmpPassword, newPassword : App.config.testUser.password } },
 		];
 
 		await this.runner.runTasks(tasks);
