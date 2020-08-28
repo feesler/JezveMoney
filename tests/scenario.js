@@ -497,6 +497,10 @@ export class Scenario
 		const data = [
 			{ name : 'acc_1', initbalance : 1000.01, curr_id : RUB },
 			{ name : 'acc_2', initbalance : '1000.01', curr_id : EUR },
+			// Try to submit account with empty name
+			{ name : '', initbalance : '100' },
+			// Try to submit account with empty initial balance
+			{ name : 'acc', initbalance : '' },
 		];
 
 		await this.runner.runGroup(AccountTests.create, data);
@@ -589,6 +593,8 @@ export class Scenario
 			{ name : 'Maria' },
 			{ name : 'Johnny' },
 			{ name : 'Иван' },
+			// Try to submit person with empty name
+			{ name : '' },
 		];
 
 		await this.runner.runGroup(PersonTests.create, data);
@@ -601,6 +607,8 @@ export class Scenario
 
 		const data = [
 			{ pos : 4, name : 'Ivan<' },
+			// Try to submit person with empty name
+			{ pos : 0, name : '' },
 		];
 
 		await this.runner.runGroup(PersonTests.update, data);
@@ -905,6 +913,11 @@ export class Scenario
 			{ fromAccount : 3, srcAmount : '100', destAmount : '7013.21', destCurr : 1 },
 			{ fromAccount : 1, destAmount : '0.01', date : App.dates.yesterday },
 			{ fromAccount : 1, srcAcc : 4, destAmount : '99.99', date : App.dates.monthAgo },
+			// Try to submit expense with invalid amount
+			{ fromAccount : 0, destAmount : '' },
+			{ fromAccount : 1, destAmount : '1', destCurr : 5, srcAmount : '' },
+			// Try to submit expense with invalid date
+			{ fromAccount : 0, destAmount : '100', date : '01.01.69' },
 		];
 
 		await this.runner.runGroup(ExpenseTransactionTests.create, data);
@@ -920,6 +933,11 @@ export class Scenario
 			{ fromAccount : 3, srcAmount : '7013.21', destAmount : '100', srcCurr : 2 },
 			{ fromAccount : 1, srcAmount : '0.01', date : App.dates.weekAgo },
 			{ fromAccount : 1, destAcc : 4, srcAmount : '99.99', date : App.dates.monthAgo },
+			// Try to submit income with invalid amount
+			{ fromAccount : 0, srcAmount : '' },
+			{ fromAccount : 1, srcAmount : '1', srcCurr : 5, destAmount : '' },
+			// Try to submit income with invalid date
+			{ fromAccount : 0, srcAmount : '100', date : '0921-dd.0' },
 		];
 
 		await this.runner.runGroup(IncomeTransactionTests.create, data);
@@ -936,6 +954,11 @@ export class Scenario
 			{ srcAcc : 1, destAcc : 3, srcAmount : '5.0301', destAmount : '4.7614' },
 			{ srcAcc : 2, srcAmount : '10', destAmount : '9.75' },
 			{ destAcc : 3, srcAmount : '10', destAmount : '9.50' },
+			// Try to submit transfer with invalid amount
+			{ srcAmount : '' },
+			{ destAcc : 2, srcAmount : '11.4', destAmount : '' },
+			// Try to submit transfer with invalid date
+			{ srcAmount : '100', date : '' },
 		];
 
 		await this.runner.runGroup(TransferTransactionTests.create, data);
@@ -953,6 +976,10 @@ export class Scenario
 			{ debtType : false, person : 1, acc : 3, srcAmount : '10', date : App.dates.yesterday },
 			{ acc : null, srcAmount : '105', date : App.dates.yesterday },
 			{ debtType : false, person : 1, acc : null, srcAmount : '105' },
+			// Try to submit debt with invalid amount
+			{ srcAmount : '' },
+			// Try to submit debt with invalid date
+			{ srcAmount : '100', date : '0921-dd.0' },
 		];
 
 		await this.runner.runGroup(DebtTransactionTests.create, data);

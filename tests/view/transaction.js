@@ -1,5 +1,5 @@
 import { TestView } from './testview.js';
-import { correctExch, isValidValue, normalizeExch } from '../common.js'
+import { convDate, correctExch, isValidValue, normalizeExch } from '../common.js'
 import { DEBT } from '../model/transaction.js';
 import { TransactionTypeMenu } from './component/transactiontypemenu.js';
 import { InputRow } from './component/inputrow.js';
@@ -118,6 +118,28 @@ export class TransactionView extends TestView
 	}
 
 
+	async isValid()
+	{
+		if (this.content.src_amount_row && await this.isVisible(this.content.src_amount_row.elem))
+		{
+			if (!this.model.srcAmount.length || !isValidValue(this.model.srcAmount))
+				return false;
+		}
+
+		if (this.content.dest_amount_row && await this.isVisible(this.content.dest_amount_row.elem))
+		{
+			if (!this.model.destAmount.length || !isValidValue(this.model.destAmount))
+				return false;
+		}
+
+		let timestamp = convDate(this.model.date);
+		if (!timestamp || timestamp < 0)
+			return false;
+
+		return true;
+	}
+
+
 	getExpectedTransaction()
 	{
 		let res = {};
@@ -217,7 +239,18 @@ export class TransactionView extends TestView
 
 	async submit()
 	{
-		return this.navigation(() => this.click(this.content.submitBtn));
+		let action = () => this.click(this.content.submitBtn);
+
+		if (await this.isValid())
+			await this.navigation(action);
+		else
+			await this.performAction(action);
+	}
+
+
+	async cancel()
+	{
+		await this.navigation(() => this.click(this.content.cancelBtn));
 	}
 
 

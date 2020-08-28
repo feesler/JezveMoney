@@ -194,6 +194,12 @@ export class AccountView extends TestView
 	}
 
 
+	isValid()
+	{
+		return (this.model.name.length > 0) && this.model.initbalance.length && isValidValue(this.model.initbalance);
+	}
+
+
 	async clickDeleteButton()
 	{
 		if (!this.content.isUpdate || !this.content.delBtn)
@@ -219,8 +225,10 @@ export class AccountView extends TestView
 
 	async inputName(val)
 	{
+		if (this.model.name.length != val.length)
+			this.model.nameTyped = this.nameTyped = true;
+
 		this.model.name = val;
-		this.model.nameTyped = this.nameTyped = true;
 
 		this.setExpectedState();
 
@@ -281,7 +289,12 @@ export class AccountView extends TestView
 
 	async submit()
 	{
-		await this.navigation(() => this.click(this.content.submitBtn));
+		let action = () => this.click(this.content.submitBtn);
+
+		if (this.isValid())
+			await this.navigation(action);
+		else
+			await this.performAction(action);
 	}
 
 

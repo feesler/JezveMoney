@@ -5,6 +5,7 @@ import { Currency } from '../model/currency.js';
 import { test, formatProps } from '../common.js';
 import { App } from '../app.js';
 import { AccountsList } from '../model/accountslist.js';
+import { AccountView } from '../view/account.js';
 
 
 export async function stateLoop()
@@ -49,12 +50,15 @@ export async function stateLoop()
 	await test('Change icon', () => App.view.changeIcon(2));
 	await test('Input (1000.01) balance', () => App.view.inputBalance('1000.01'));
 
-	await App.view.navigation(() => App.view.click(App.view.content.cancelBtn));
+	await App.view.cancel();
 }
 
 
 export async function submitAccount(params)
 {
+	if (!(App.view instanceof AccountView))
+		throw new Error('Invalid view');
+
 	// Input account name
 	if ('name' in params)
 		await test(`Input name (${params.name})`, () => App.view.inputName(params.name));
@@ -65,17 +69,21 @@ export async function submitAccount(params)
 
 	// Input balance
 	if ('initbalance' in params)
-		await test('Tile balance format update', () => App.view.inputBalance(params.initbalance));
+		await test('Input initial balance', () => App.view.inputBalance(params.initbalance));
 
 	// Change icon
 	if ('icon' in params)
 		await test('Tile icon update', () => App.view.changeIcon(params.icon));
 
-	let expected = App.view.getExpectedAccount();
+	let validInput = App.view.isValid();
+	let res = (validInput) ? App.view.getExpectedAccount() : null;
 
-	await App.view.navigation(() => App.view.click(App.view.content.submitBtn));
+	await App.view.submit();
 
-	return expected;
+	if (validInput && !(App.view instanceof AccountsView))
+		throw new Error('Fail to submit account');
+
+	return res;
 }
 
 
@@ -86,9 +94,6 @@ export async function create(params)
 
 	let title = formatProps(params);
 	App.view.setBlock(`Create account (${title})`, 2);
-
-	if (!params.name || !params.name.length)
-		throw new Error('Name not specified');
 
 // Navigate to create account view
 	if (!(App.view instanceof AccountsView))
@@ -106,8 +111,14 @@ export async function create(params)
 	await test('Initial state of account view', () => App.view.checkState());
 
 	expAccount = await submitAccount(params);
-
-	App.state.createAccount(expAccount);
+	if (expAccount)
+	{
+		App.state.createAccount(expAccount);
+	}
+	else
+	{
+		await App.view.cancel();
+	}
 
 	App.view.expectedState = AccountsView.render(App.state);
 	await test('Create account', () => App.view.checkState());
@@ -154,8 +165,14 @@ export async function update(params)
 	await test('Initial state of account view', () => App.view.checkState());
 
 	expAccount = await submitAccount(params);
-
-	App.state.updateAccount(expAccount);
+	if (expAccount)
+	{
+		App.state.updateAccount(expAccount);
+	}
+	else
+	{
+		await App.view.cancel();
+	}
 
 	App.view.expectedState = AccountsView.render(App.state);
 	await test('Update account', () => App.view.checkState());

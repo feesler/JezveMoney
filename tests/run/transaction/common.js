@@ -153,9 +153,14 @@ export async function runGroup(action, data)
 
 export async function submit()
 {
-	let res = App.view.getExpectedTransaction();
+	let validInput = await App.view.isValid();
+
+	let res = (validInput) ? App.view.getExpectedTransaction() : null;
 
 	await App.view.submit();
+
+	if (validInput && (App.view instanceof TransactionView))
+		throw new Error('Fail to submit transaction');
 
 	return res;
 }
@@ -175,8 +180,14 @@ export async function create(type, params, submitHandler)
 
 	// Input data and submit
 	let expectedTransaction = await submitHandler(params);
-
-	App.state.createTransaction(expectedTransaction);
+	if (expectedTransaction)
+	{
+		App.state.createTransaction(expectedTransaction);
+	}
+	else
+	{
+		await App.view.cancel();
+	}
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
@@ -216,10 +227,12 @@ export async function update(type, params, submitHandler)
 	await App.view.parse();
 
 	let expectedTransaction = await submitHandler(params);
-
-	expectedState.accounts.data = originalAccounts;
-	expectedState.updateTransaction(expectedTransaction);
-	App.state.setState(expectedState);
+	if (expectedTransaction)
+	{
+		expectedState.accounts.data = originalAccounts;
+		expectedState.updateTransaction(expectedTransaction);
+		App.state.setState(expectedState);
+	}
 
 	await App.goToMainView();
 
