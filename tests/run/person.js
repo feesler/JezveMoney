@@ -41,7 +41,7 @@ export async function create(params)
 	let expPerson = await submitPerson(params);
 	if (expPerson)
 	{
-		App.state.createPerson(params);
+		App.state.createPerson(expPerson);
 	}
 	else
 	{

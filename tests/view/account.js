@@ -61,6 +61,9 @@ export class AccountView extends TestView
 		res.icon = iconObj.id;
 		res.tileIcon = iconObj;
 
+		// Flags
+		res.flags = cont.flags;
+
 		return res;
 	}
 
@@ -91,10 +94,10 @@ export class AccountView extends TestView
 	{
 		let res = {
 			name : this.model.name,
-			owner_id : App.owner_id,
 			initbalance : this.model.fInitBalance,
 			curr_id : this.model.curr_id,
-			icon : this.model.icon
+			icon : this.model.icon,
+			flags : this.model.flags,
 		};
 
 		if (this.model.isUpdate)
@@ -179,6 +182,9 @@ export class AccountView extends TestView
 		elem = await this.query(`form > *:nth-child(${curChildren})`);
 
 		res.balance = await InputRow.create(this, elem);
+
+		res.flagsInp = await this.query('#flags');
+		res.flags = parseInt(await this.prop(res.flagsInp, 'value'));
 
 		res.submitBtn = await this.query('.acc_controls .ok_btn');
 		if (!res.submitBtn)

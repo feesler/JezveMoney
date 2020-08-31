@@ -94,6 +94,9 @@ export class Scenario
 
 		await this.prepareApiSecurityTests();
 
+		await ApiTests.login({ login : '', password : App.config.testUser.password });
+		await ApiTests.login({ login : App.config.testUser.login, password : '' });
+
 		// Login with main test user
 		await ApiTests.login(App.config.testUser);
 		await ApiTests.resetAll();
@@ -210,7 +213,7 @@ export class Scenario
 			{ type : DEBT, op : 1, person_id : API_USER_PERSON, acc_id : 0, src_curr : RUB, dest_curr : RUB, src_amount : 100, dest_amount : 100 },
 		];
 
-		return this.runner.runGroup(TransactionApiTests.create, data);
+		await this.runner.runGroup(TransactionApiTests.create, data);
 	}
 
 
@@ -240,7 +243,7 @@ export class Scenario
 			{ id: TR_DEBT_3, person_id : API_USER_PERSON, acc_id : API_USER_ACC_RUB },
 		];
 
-		return this.runner.runGroup(TransactionApiTests.update, data);
+		await this.runner.runGroup(TransactionApiTests.update, data);
 	}
 
 
@@ -266,6 +269,15 @@ export class Scenario
 			{ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0 },
 			// Try to create account with existing name
 			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0, flags : 0 },
+			// Try to create account without some of fields
+			{ curr_id : USD, initbalance : 10.5, icon : 0, flags : 0 },
+			{ name : 'acc tst', initbalance : 10.5 },
+			// Try to create account with excess properties
+			{ name : 'acc tst', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0, xxx : 1, yyy : 2 },
+			// Try to create account with invalid data
+			{ name : '', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0 },
+			{ name : 'acc tst', curr_id : 9999, initbalance : 10.5, icon : 5, flags : 0 },
+			{ name : 'acc tst', curr_id : USD, initbalance : 'fff', icon : 5, flags : 0 },
 		];
 
 		[ this.ACC_RUB, this.CASH_RUB, this.ACC_USD ] = await this.runner.runGroup(AccountApiTests.create, data);
@@ -305,6 +317,11 @@ export class Scenario
 			{ name : 'Y', flags : 0 },
 			// Try to create person with existing name
 			{ name : 'Y', flags : 0 },
+			// Invalid data tests
+			{ flags : 0 },
+			{ name : 'ZZZ' },
+			{ name : '', flags : 1, xxx : 1 },
+			{ name : '', flags : 1 },
 		];
 
 		[ this.PERSON_X, this.PERSON_Y ] = await this.runner.runGroup(PersonApiTests.create, data);
@@ -319,6 +336,7 @@ export class Scenario
 			{ id : PERSON_X, name : 'XX!' },
 			// Try to update name of person to an existing one
 			{ id : PERSON_X, name : 'XX!' },
+			{ id : PERSON_X, name : '' },
 		];
 
 		return this.runner.runGroup(PersonApiTests.update, data);
@@ -331,6 +349,7 @@ export class Scenario
 
 		const data = [
 			[ PERSON_Y ],
+			[]
 		];
 
 		return this.runner.runGroup(PersonApiTests.del, data);
@@ -363,6 +382,25 @@ export class Scenario
 			this.TR_TRANSFER_1, this.TR_TRANSFER_2,
 			this.TR_DEBT_1, this.TR_DEBT_2, this.TR_DEBT_3
 		] = await this.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+
+
+		const invData = [
+			{ type : EXPENSE, src_id : 0, src_amount : 100 },
+			{ type : EXPENSE, src_id : ACC_RUB, src_amount : 0 },
+			{ type : EXPENSE, src_id : 0, dest_id : ACC_RUB, src_amount : 100 },
+			{ type : INCOME, dest_id : 0, dest_amount : 100 },
+			{ type : INCOME, src_id : ACC_RUB, dest_id : 0, dest_amount : 100 },
+			{ type : INCOME, dest_id : ACC_RUB, dest_amount : '' },
+			{ type : INCOME, dest_id : ACC_RUB, dest_amount : 99.1, date: '1f1f' },
+			{ type : TRANSFER, src_id : 0, dest_id : 0, src_amount : 100 },
+			{ type : TRANSFER, src_id : ACC_RUB, dest_id : 0, src_amount : 100 },
+			{ type : TRANSFER, src_id : 0, dest_id : ACC_RUB, src_amount : 100 },
+			{ type : DEBT, op : 0, person_id : PERSON_X, acc_id : 0, src_amount : 500, src_curr : RUB },
+			{ type : DEBT, op : 1, person_id : 0, acc_id : 0, src_amount : 500, src_curr : RUB },
+			{ type : DEBT, op : 1, person_id : PERSON_X, acc_id : 0, src_amount : '', src_curr : RUB },
+			{ type : DEBT, op : 1, person_id : PERSON_X, acc_id : 0, src_amount : 10, src_curr : 9999 },
+		];
+		await this.runner.runGroup(TransactionApiTests.create, invData);
 	}
 
 
@@ -392,7 +430,26 @@ export class Scenario
 			{ id : TR_DEBT_3, op : 1, acc_id : ACC_RUB },
 		];
 
-		return this.runner.runGroup(TransactionApiTests.update, data);
+		await this.runner.runGroup(TransactionApiTests.update, data);
+
+		const invData = [
+			{ id : TR_EXPENSE_1, src_id : 0 },
+			{ id : TR_EXPENSE_2, dest_amount : 0, dest_curr : PLN },
+			{ id : TR_EXPENSE_3, date : '' },
+			{ id : TR_INCOME_1, dest_id : 0 },
+			{ id : TR_INCOME_2, src_amount : 0, src_curr : EUR },
+			{ id : TR_TRANSFER_1, src_id : 0 },
+			{ id : TR_TRANSFER_1, dest_id : 0 },
+			{ id : TR_TRANSFER_1, src_curr : 0 },
+			{ id : TR_TRANSFER_1, dest_curr : 9999 },
+			{ id : TR_TRANSFER_1, dest_id : ACC_USD, dest_curr : PLN },
+			{ id : TR_TRANSFER_2, dest_id : CASH_RUB, dest_curr : RUB, dest_amount : 0, date : 'x' },
+			{ id : TR_DEBT_1, op : 0 },
+			{ id : TR_DEBT_2, person_id : 0 },
+			{ id : TR_DEBT_3, op : 1, acc_id : 9999 },
+		];
+
+		await this.runner.runGroup(TransactionApiTests.update, invData);
 	}
 
 
@@ -402,6 +459,8 @@ export class Scenario
 
 		const data = [
 			[ TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 ],
+			[],
+			[ 9999 ]
 		];
 
 		return this.runner.runGroup(TransactionApiTests.del, data);
@@ -453,6 +512,7 @@ export class Scenario
 
 		const tasks = [
 			{ action : ApiTests.login, data : App.config.apiTestUser },
+			{ action : ApiTests.changeName, data : '' },
 			{ action : ApiTests.changeName, data : 'App tester' },
 			{ action : ApiTests.changePassword, data : { user : App.config.apiTestUser, newPassword : '54321' } },
 			{ action : ApiTests.deleteProfile },

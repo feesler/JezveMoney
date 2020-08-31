@@ -2,7 +2,6 @@ import { TestView } from './testview.js';
 import { InputRow } from './component/inputrow.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
-import { App } from '../app.js';
 
 
 // Create or update account view tests
@@ -36,6 +35,9 @@ export class PersonView extends TestView
 		if (!res.name)
 			throw new Error('Person name input not found');
 
+		res.flagsInp = await this.query('#flags');
+		res.flags = parseInt(await this.prop(res.flagsInp, 'value'));
+
 		res.submitBtn = await this.query('.acc_controls .ok_btn');
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
@@ -61,6 +63,8 @@ export class PersonView extends TestView
 		// Name
 		res.name = cont.name.value;
 
+		res.flags = cont.flags;
+
 		return res;
 	}
 
@@ -69,7 +73,7 @@ export class PersonView extends TestView
 	{
 		let res = {
 			name : this.model.name,
-			owner_id : App.owner_id,
+			flags : this.model.flags
 		};
 
 		if (this.model.isUpdate)

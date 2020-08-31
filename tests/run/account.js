@@ -4,7 +4,6 @@ import { Transaction } from '../model/transaction.js';
 import { Currency } from '../model/currency.js';
 import { test, formatProps } from '../common.js';
 import { App } from '../app.js';
-import { AccountsList } from '../model/accountslist.js';
 import { AccountView } from '../view/account.js';
 
 
@@ -106,7 +105,7 @@ export async function create(params)
 // Check initial state
 	await App.state.fetch();
 
-	let expAccount = { name : '', owner_id : App.owner_id, initbalance : '0', balance : 0, curr_id : 1, icon : 0 };
+	let expAccount = { name : '', owner_id : App.owner_id, initbalance : '0', balance : 0, curr_id : 1, icon : 0, flags : 0 };
 	App.view.setExpectedAccount(expAccount);
 	await test('Initial state of account view', () => App.view.checkState());
 

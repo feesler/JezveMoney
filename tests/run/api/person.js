@@ -11,9 +11,8 @@ export async function create(params)
 
 	await test('Create person', async () =>
 	{
+		let createRes = null;
 		let resExpected = App.state.createPerson(params);
-
-		let createRes;
 		try
 		{
 			createRes = await api.person.create(params);
@@ -48,7 +47,7 @@ export async function update(params)
 
 		try
 		{
-			updateRes = await api.person.update(params.id, updParams);
+			updateRes = await api.person.update(updParams);
 			if (resExpected != updateRes)
 				return false;
 		}

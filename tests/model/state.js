@@ -6,13 +6,62 @@ import {
 	setParam,
 	checkObjValue,
 } from '../common.js';
-import { EXPENSE, INCOME, DEBT, availTransTypes } from './transaction.js';
+import { EXPENSE, INCOME, DEBT, availTransTypes, TRANSFER } from './transaction.js';
 import { App } from '../app.js';
 import { Currency } from './currency.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
 import { api } from './api.js';
+
+
+/**
+ * Accounts
+ */
+const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon', 'flags'];
+
+
+/**
+ * Persons
+ */
+const pReqFields = ['name', 'flags'];
+
+/**
+ * Transactions
+ */
+const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
+
+
+function checkFields(fields, expFields)
+{
+	if (!fields || !expFields)
+		return false
+
+	for(let f of expFields)
+	{
+		if (!(f in fields))
+			return false;
+	}
+
+	return true;
+}
+
+
+function copyFields(fields, expFields)
+{
+	let res = {};
+
+	if (!fields || !expFields)
+		throw new Error("Wrong parameters");
+
+	for(let f of expFields)
+	{
+		if (f in fields)
+			res[f] = fields[f];
+	}
+
+	return res;
+}
 
 
 export class AppState
@@ -154,7 +203,10 @@ export class AppState
 		if (!resExpected)
 			return false;
 
-		let ind = this.accounts.create(params);
+		let data = copyFields(params, accReqFields);
+		data.owner_id = this.profile.owner_id;
+
+		let ind = this.accounts.create(data);
 		let item = this.accounts.getItemByIndex(ind);
 		this.updatePersonAccounts();
 
@@ -170,7 +222,9 @@ export class AppState
 	
 		// Prepare expected account object
 		let expAccount = copyObject(origAcc);
-		setParam(expAccount, params);
+		let data = copyFields(params, accReqFields);
+		data.owner_id = this.profile.owner_id;
+		setParam(expAccount, data);
 
 		let resExpected = this.checkAccountCorrectness(expAccount);
 		if (!resExpected)
@@ -199,6 +253,9 @@ export class AppState
 	{
 		if (!Array.isArray(ids))
 			ids = [ ids ];
+
+		if (!ids.length)
+			return false;
 
 		for(let acc_id of ids)
 		{
@@ -267,6 +324,9 @@ export class AppState
 		if (personObj && (!params.id || params.id && params.id != personObj.id))
 			return false;
 
+		if (!('flags' in params))
+			return false;
+
 		return true;
 	}
 
@@ -277,7 +337,8 @@ export class AppState
 		if (!resExpected)
 			return false;
 
-		let ind = this.persons.create(params);
+		let data = copyFields(params, pReqFields);
+		let ind = this.persons.create(data);
 		let item = this.persons.getItemByIndex(ind);
 		item.accounts = [];
 
@@ -292,9 +353,10 @@ export class AppState
 			return false;
 
 		let expPerson = copyObject(origPerson);
-		setParam(expPerson, params);
+		let data = copyFields(params, pReqFields);
+		setParam(expPerson, data);
 	
-		let resExpected = this.checkPersonCorrectness(params);
+		let resExpected = this.checkPersonCorrectness(expPerson);
 		if (!resExpected)
 			return false;
 
@@ -308,6 +370,9 @@ export class AppState
 	{
 		if (!Array.isArray(ids))
 			ids = [ ids ];
+
+		if (!ids.length)
+			return false;
 
 		let accountsToDelete = [];
 		for(let person_id of ids)
@@ -368,6 +433,16 @@ export class AppState
 		if (!availTransTypes.includes(params.type))
 			return false;
 
+		if (params.src_amount == 0 || params.dest_amount == 0)
+			return false;
+
+		let srcCurr = Currency.getById(params.src_curr);
+		if (!srcCurr)
+			return false;
+		let destCurr = Currency.getById(params.dest_curr);
+		if (!destCurr)
+			return false;
+
 		if (params.type == DEBT)
 		{
 			if (!params.person_id)
@@ -380,7 +455,7 @@ export class AppState
 			if (params.acc_id)
 			{
 				let account = this.accounts.getItem(params.acc_id);
-				if (!account)
+				if (!account || srcCurr.id != account.curr_id || destCurr.id != account.curr_id)
 					return false;
 			}
 		}
@@ -392,7 +467,12 @@ export class AppState
 					return false;
 
 				let account = this.accounts.getItem(params.src_id);
-				if (!account)
+				if (!account || srcCurr.id != account.curr_id)
+					return false;
+			}
+			else
+			{
+				if (params.type == EXPENSE || params.type == TRANSFER)
 					return false;
 			}
 
@@ -402,7 +482,12 @@ export class AppState
 					return false;
 
 				let account = this.accounts.getItem(params.dest_id);
-				if (!account)
+				if (!account || destCurr.id != account.curr_id)
+					return false;
+			}
+			else
+			{
+				if (params.type == INCOME || params.type == TRANSFER)
 					return false;
 			}
 		}
@@ -462,7 +547,7 @@ export class AppState
 		let reqCurr = (res.op == 1) ? res.src_curr : res.dest_curr;
 		let personAcc = this.getExpectedPersonAccount(res.person_id, reqCurr);
 		if (!personAcc)
-			throw new Error('Fail to obtain expected account of person');
+			return null;
 
 		if (res.op == 1)
 		{
@@ -504,7 +589,13 @@ export class AppState
 
 		// Prepare expected transaction object
 		let expTrans = this.getExpectedTransaction(params);
+		if (!expTrans)
+			return false;
 		expTrans.pos = 0;
+
+		resExpected = checkFields(expTrans, trReqFields);
+		if (!resExpected)
+			return false;
 
 		// Prepare expected updates of accounts
 		this.accounts = this.accounts.createTransaction(expTrans);
@@ -536,6 +627,8 @@ export class AppState
 
 		// Prepare expected transaction object
 		let expTrans = this.getExpectedTransaction(updTrans);
+		if (!expTrans)
+			return false;
 
 		// Prepare expected updates of accounts
 		this.accounts = this.accounts.updateTransaction(origTrans, expTrans);
@@ -553,6 +646,9 @@ export class AppState
 	{
 		if (!Array.isArray(ids))
 			ids = [ ids ];
+
+		if (!ids.length)
+			return false;
 
 		let itemsToDelete = [];
 		for(let transaction_id of ids)
