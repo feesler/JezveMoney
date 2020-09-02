@@ -485,13 +485,14 @@ export class Scenario
 	{
 		this.environment.setBlock('Filter transactions', 2);
 
-		const { ACC_RUB } = this;
+		const { ACC_RUB, ACC_USD } = this;
 
 		const data = [
 			{ order : 'desc' },
 			{ order : 'asc' },
 			{ type : DEBT },
 			{ accounts : ACC_RUB },
+			{ accounts : [ ACC_RUB, ACC_USD ] },
 			{ accounts : ACC_RUB, order : 'desc' },
 			{ type : DEBT, accounts : ACC_RUB },
 			{ onPage : 10 },
@@ -960,6 +961,7 @@ export class Scenario
 
 		await this.runner.runTasks([
 			{ action : TransactionListTests.filterByAccounts, data : data.accounts[2] },
+			{ action : TransactionListTests.filterByAccounts, data : [ data.accounts[2], data.accounts[3] ] },
 			{ action : TransactionListTests.filterByType, data : 0 },
 			{ action : TransactionListTests.filterByDate, data : { start : App.dates.weekAgo, end : App.dates.now } },
 			{ action : TransactionListTests.filterByDate, data : { start : App.dates.yearAgo, end : App.dates.monthAgo } },

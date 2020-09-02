@@ -270,7 +270,7 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		await this.performAction(() => this.content.currDropDown.select(val));
+		await this.performAction(() => this.content.currDropDown.setSelection(val));
 
 		return this.checkState();
 	}
@@ -287,7 +287,7 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		await this.performAction(() => this.content.iconDropDown.select(val));
+		await this.performAction(() => this.content.iconDropDown.setSelection(val));
 
 		return this.checkState();
 	}

@@ -370,16 +370,18 @@ function selectedValue(selectObj)
 // Select item with specified value if exist
 function selectByValue(selectObj, selValue, selBool)
 {
-	var i;
-
 	if (!selectObj || !selectObj.options)
 		return -1;
 
-	for(i = 0, l = selectObj.options.length; i < l; i++)
+	for(var i = 0, l = selectObj.options.length; i < l; i++)
 	{
-		if (selectObj.options[i] && selectObj.options[i].value == selValue)
+		var option = selectObj.options[i];
+		if (option && option.value == selValue)
 		{
-			selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+			if (selectObj.multiple)
+				option.selected = (selBool !== undefined) ? selBool : true;
+			else
+				selectObj.selectedIndex = i;
 			return true;
 		}
 	}

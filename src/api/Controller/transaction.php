@@ -55,12 +55,24 @@ class TransactionApiController extends ApiController
 
 		$params["page"] = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
-		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
-		if ($acc_id && !$accMod->is_exist($acc_id))
-			$this->fail("Invalid account");
+		// Prepare array of requested accounts filter
+		$accFilter = [];
+		if (isset($_GET["acc_id"]))
+		{
+			$accountsReq = $_GET["acc_id"];
+			if (!is_array($accountsReq))
+				$accountsReq = [ $accountsReq ];
+			foreach($accountsReq as $acc_id)
+			{
+				if (!$accMod->is_exist($acc_id))
+					$this->fail("Invalid account '$acc_id'");
 
-		if ($acc_id != 0)
-			$params["accounts"] = $acc_id;
+				$accFilter[] = intval($acc_id);
+			}
+
+			if (count($accFilter) > 0)
+				$params["accounts"] = $accFilter;
+		}
 
 		if (isset($_GET["search"]))
 			$params["search"] = $_GET["search"];

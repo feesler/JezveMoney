@@ -174,7 +174,10 @@ class BrowserEnvironment extends Environment
 		{
 			if (selectObj.options[i] && selectObj.options[i].value == selValue)
 			{
-				selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+				if (selectObj.multiple)
+					selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+				else
+					selectObj.selectedIndex = i;
 				return true;
 			}
 		}
@@ -197,6 +200,9 @@ class BrowserEnvironment extends Environment
 
 	async input(elemObj, val)
 	{
+		if (elemObj.value == '' && val == '')
+			return;
+
 		elemObj.value = val;
 
 		let event;

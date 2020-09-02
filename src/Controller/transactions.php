@@ -39,14 +39,14 @@ class TransactionsController extends TemplateController
 		$accFilter = [];
 		if (isset($_GET["acc_id"]))
 		{
-			$accExpl = explode(",", rawurldecode($_GET["acc_id"]));
-			foreach($accExpl as $acc_id)
+			$accountsReq = $_GET["acc_id"];
+			if (!is_array($accountsReq))
+				$accountsReq = [ $accountsReq ];
+			foreach($accountsReq as $acc_id)
 			{
-				$acc_id = intval(trim($acc_id));
-				if ($acc_id && $this->accModel->is_exist($acc_id))
-					$accFilter[] = $acc_id;
+				if ($this->accModel->is_exist($acc_id))
+					$accFilter[] = intval($acc_id);
 			}
-
 			if (count($accFilter) > 0)
 				$trParams["accounts"] = $filterObj->acc_id = $accFilter;
 		}
@@ -102,10 +102,8 @@ class TransactionsController extends TemplateController
 			$urlParams = (array)$filterObj;
 
 			$urlParams["type"] = strtolower($trTypeName);
-			if (isset($urlParams["acc_id"]))
-				$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
 
-			// Clear page number because list of transactions guaranteed to change on change accounts filter
+			// Clear page number because list of transactions guaranteed to change on change type filter
 			unset($urlParams["page"]);
 
 			$menuItem = new stdClass;
@@ -123,10 +121,7 @@ class TransactionsController extends TemplateController
 		{
 			// Prepare classic/details mode link
 			$urlParams = (array)$filterObj;
-
 			$urlParams["mode"] = ($showDetails) ? "classic" : "details";
-			if (isset($urlParams["acc_id"]) && count($urlParams["acc_id"]) > 0)
-				$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
 
 			$linkStr = urlJoin(BASEURL."transactions/", $urlParams);
 
@@ -138,9 +133,6 @@ class TransactionsController extends TemplateController
 				$pageCount = ceil($transCount / $trParams["onPage"]);
 				$page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
 				$pagesArr = ($transCount > $trParams["onPage"]) ? $this->model->getPaginatorArray($page_num, $pageCount) : [];
-
-				if (isset($urlParams["acc_id"]))
-					$urlParams["acc_id"] = implode(",", $urlParams["acc_id"]);
 
 				foreach($pagesArr as $ind => $pageItem)
 				{

@@ -1012,7 +1012,7 @@ class TransactionModel extends CachedTable
 	{
 		$setCond = inSetCondition($accounts);
 		if (is_null($setCond))
-			return "";
+			return NULL;
 
 		return orJoin([ "src_id".$setCond, "dest_id".$setCond ]);
 	}
@@ -1061,7 +1061,7 @@ class TransactionModel extends CachedTable
 			$condArr[] = "type=".$tr_type;
 
 		// Accounts filter condition
-		if (isset($params["accounts"]) && !is_null($params["accounts"]))
+		if (isset($params["accounts"]))
 		{
 			$accCond = $this->getAccCondition($params["accounts"]);
 			if (!is_empty($accCond))
@@ -1327,48 +1327,6 @@ class TransactionModel extends CachedTable
 		$res->series = $groupArr;
 
 		return $res;
-	}
-
-
-	// Return link to page with specified params
-	// Convert App filter to GET
-	public function getPageLink($params = NULL)
-	{
-		if (is_null($params))
-			$params = [];
-
-		$linkParams = [];
-
-		// Convert type to string
-		if (isset($params["type"]))
-			$linkParams["type"] = $this->typeToString($params["type"]);
-		// Page number
-		if (isset($params["page"]))
-		{
-			$pNum = intval($params["page"]);
-			if ($pNum > 1)
-				$linkParams["page"] = $pNum;
-		}
-		// Convert accounts list filter
-		if (is_array($params["accounts"]) && count($params["accounts"]) > 0)
-			$linkParams["acc_id"] = implode(",", $params["accounts"]);
-		// Set list view mode
-		if (isset($params["details"]) && $params["details"] == TRUE)
-			$linkParams["mode"] = "details";
-		// Copy search string if not empty
-		if (isset($params["search"]) && !is_empty($params["search"]))
-			$linkParams["search"] = $params["search"];
-		// Copy date range parameters if exists
-		if (isset($params["startDate"]) && !is_empty($params["startDate"]) &&
-			isset($params["endDate"]) && !is_empty($params["endDate"]))
-		{
-			$linkParams["stdate"] = $startDate;
-			$linkParams["enddate"] = $endDate;
-		}
-
-		$linkStr = urlJoin(BASEURL."transactions/", $linkParams);
-
-		return $linkStr;
 	}
 
 

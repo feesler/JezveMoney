@@ -225,7 +225,7 @@
 								<input name="page" type="text" value="0" disabled>
 							</div>
 							<div class="std_margin">
-								<input type="checkbox" data-target="acc_id"><label for="acc_id">Account id (0 for all accounts)</label>
+								<input type="checkbox" data-target="acc_id"><label for="acc_id">Account ids</label>
 								<input name="acc_id" type="text" value="0" disabled>
 							</div>
 							<div class="std_margin">

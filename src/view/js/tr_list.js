@@ -462,9 +462,7 @@ function buildAddress()
 		if (!Array.isArray(locFilter.acc_id))
 			locFilter.acc_id = [ locFilter.acc_id ];
 
-		if (locFilter.acc_id.length)
-			locFilter.acc_id = locFilter.acc_id.join();
-		else
+		if (!locFilter.acc_id.length)
 			delete filterObj['acc_id'];
 	}
 

@@ -73,7 +73,7 @@ export class TransactionsView extends TestView
 
 		res.filter = {
 			type : parseInt(cont.typeMenu.activeType),
-			accounts : cont.accDropDown.getSelectedValues().map(parseInt),
+			accounts : cont.accDropDown.getSelectedValues().map(item => parseInt(item)),
 			search : cont.searchForm.value,
 		};
 		let dateRange = cont.dateFilter.getSelectedRange();
@@ -221,7 +221,7 @@ export class TransactionsView extends TestView
 		this.model.filter.accounts = accounts;
 		let expected = this.onFilterUpdate();
 
-		await this.navigation(() => this.content.accDropDown.select(accounts));
+		await this.navigation(() => this.content.accDropDown.setSelection(accounts));
 
 		return App.view.checkState(expected);
 	}

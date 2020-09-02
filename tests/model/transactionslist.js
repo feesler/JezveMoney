@@ -306,9 +306,9 @@ export class TransactionsList extends List
 	{
 		let pageLimit = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
-		let totalPages = this.expectedPages(pageLimit);
+		let totalPages = this.getExpectedPages(list, pageLimit);
 		if (num < 1 || num > totalPages)
-			throw new Error(`Wrong page ${num}`);
+			throw new Error(`Invalid page number: ${num}`);
 
 		let offset = (num - 1) * pageLimit;
 

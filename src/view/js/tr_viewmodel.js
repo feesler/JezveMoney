@@ -875,6 +875,7 @@ function TransactionViewModel()
 			{
 				dest.value = newAcc;
 				Transaction.update('dest_id', newAcc);
+				self.destDDList.selectItem(newAcc);
 				onDestCurrChanged();
 			}
 		}
@@ -911,6 +912,7 @@ function TransactionViewModel()
 			{
 				src.value = newAcc;
 				Transaction.update('src_id', newAcc);
+				self.srcDDList.selectItem(newAcc);
 				onSrcCurrChanged();
 			}
 		}
