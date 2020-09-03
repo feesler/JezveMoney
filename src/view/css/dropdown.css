@@ -264,6 +264,14 @@
 }
 
 
+li[disabled] .dd__list-item
+{
+	background-color: #BBBBBB;
+	color: #505050;
+	pointer-events: none;
+}
+
+
 .dd__list-item_active
 {
 	color: #FFFFFF;
