@@ -63,8 +63,6 @@ export async function relogin({ login, password })
 
 export async function register({ login, name, password })
 {
-	await deleteUserByLogin(login);
-
 	await checkLoginNavigation();
 	await App.view.goToRegistration();
 
