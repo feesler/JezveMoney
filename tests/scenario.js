@@ -909,6 +909,20 @@ export class Scenario
 			{ type : DEBT, op : 1, person_id : ALEX, acc_id : CASH_EUR, src_amount : '4', comment: '111 кккк' },
 		];
 
+		// Check transactions already exists
+		let personsAccounts = personIds.flatMap(person_id =>
+		{
+			let person = App.state.persons.getItem(person_id);
+			if (person && Array.isArray(person.accounts))
+				return person.accounts.map(item => item.id);
+
+			return [];
+		});
+
+		let trList = App.state.transactions.filter({ accounts : accountIds.concat(personsAccounts) } );
+		if (trList.length == data.length * App.dateList.length)
+			return trList.data.map(item => item.id);
+
 		let multi = [];
 		for(let transaction of data)
 		{
