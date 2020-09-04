@@ -45,9 +45,11 @@ export class TransactionView extends TestView
 
 		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 
-		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('#trtype_menu'));
+		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
+		if (res.typeMenu.multi)
+			throw new Error('Invalid transaction type menu');
 
-		if (res.typeMenu.activeType == DEBT)
+		if (res.typeMenu.isSingleSelected(DEBT))
 		{
 			res.person = await TileBlock.create(this, await this.query('#person'));
 			if (res.person)
@@ -207,10 +209,10 @@ export class TransactionView extends TestView
 
 	async changeTransactionType(type)
 	{
-		if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
+		if (this.content.typeMenu.isSingleSelected(type))
 			return;
 
-		return this.navigation(() => this.content.typeMenu.items[type].click());
+		return this.navigation(() => this.content.typeMenu.select(type));
 	}
 
 

@@ -491,6 +491,7 @@ export class Scenario
 			{ order : 'desc' },
 			{ order : 'asc' },
 			{ type : DEBT },
+			{ type : [ EXPENSE, INCOME, TRANSFER ] },
 			{ accounts : ACC_RUB },
 			{ accounts : [ ACC_RUB, ACC_USD ] },
 			{ accounts : ACC_RUB, order : 'desc' },
@@ -963,6 +964,8 @@ export class Scenario
 			{ action : TransactionListTests.filterByAccounts, data : data.accounts[2] },
 			{ action : TransactionListTests.filterByAccounts, data : [ data.accounts[2], data.accounts[3] ] },
 			{ action : TransactionListTests.filterByType, data : 0 },
+			{ action : TransactionListTests.filterByType, data : EXPENSE },
+			{ action : TransactionListTests.filterByType, data : [ INCOME, DEBT ] },
 			{ action : TransactionListTests.filterByDate, data : { start : App.dates.weekAgo, end : App.dates.now } },
 			{ action : TransactionListTests.filterByDate, data : { start : App.dates.yearAgo, end : App.dates.monthAgo } },
 		]);

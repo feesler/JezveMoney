@@ -27,7 +27,7 @@ export class TransactionsView extends TestView
 		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.delBtn)
 			throw new Error('Invalid structure of transactions view');
 
-		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('#trtype_menu'));
+		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
 		if (!res.typeMenu)
 			throw new Error('Search form not found');
 
@@ -72,7 +72,7 @@ export class TransactionsView extends TestView
 		res.data = App.state.transactions.clone();
 
 		res.filter = {
-			type : parseInt(cont.typeMenu.activeType),
+			type : cont.typeMenu.getSelectedTypes(),
 			accounts : cont.accDropDown.getSelectedValues().map(item => parseInt(item)),
 			search : cont.searchForm.value,
 		};
@@ -196,7 +196,7 @@ export class TransactionsView extends TestView
 				modeSelector : isItemsAvailable, paginator : isItemsAvailable, transList : isItemsAvailable
 			},
 			values : {
-				typeMenu : { activeType : this.model.filter.type },
+				typeMenu : { selectedTypes : this.model.filter.type },
 				searchForm : { value : this.model.filter.search },
 			}
 		};
@@ -406,13 +406,27 @@ export class TransactionsView extends TestView
 
 	async filterByType(type)
 	{
-		if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
+		let newTypeSel = Array.isArray(type) ? type : [ type ];
+		newTypeSel.sort();
+
+		if (this.content.typeMenu.isSameSelected(newTypeSel))
 			return;
 
-		this.model.filter.type = type;
+		this.model.filter.type = newTypeSel;
 		let expected = this.onFilterUpdate();
 
-		await this.navigation(() => this.content.typeMenu.select(type));
+		if (newTypeSel.length == 1)
+		{
+			await this.navigation(() => this.content.typeMenu.select(newTypeSel[0]));
+		}
+		else
+		{
+			await this.navigation(() => this.content.typeMenu.select(0));
+			for(let typeItem of newTypeSel)
+			{
+				await App.view.navigation(() => App.view.content.typeMenu.toggle(typeItem));
+			}
+		}
 
 		return App.view.checkState(expected);
 	}

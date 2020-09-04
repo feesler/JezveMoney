@@ -175,7 +175,7 @@ export async function create(type, params, submitHandler)
 	await App.goToMainView();
 	await App.view.goToNewTransactionByAccount(accNum);
 
-	if (App.view.content.typeMenu.activeType != type)
+	if (!App.view.content.typeMenu.isSingleSelected(type))
 		await App.view.changeTransactionType(type);
 
 	// Input data and submit
@@ -212,7 +212,7 @@ export async function update(type, params, submitHandler)
 	await App.goToMainView();
 	await App.view.goToTransactions();
 
-	if (App.view.content.typeMenu.activeType != type)
+	if (!App.view.content.typeMenu.isSingleSelected(type))
 		await App.view.filterByType(type);
 
 	await App.view.goToUpdateTransaction(pos);
@@ -336,7 +336,7 @@ export async function delFromUpdate(type, pos)
 		await App.view.goToTransactions();
 	}
 
-	if (App.view.content.typeMenu.activeType != type)
+	if (!App.view.content.typeMenu.isSingleSelected(type))
 		await App.view.filterByType(type);
 
 	await App.view.goToUpdateTransaction(pos);

@@ -61,7 +61,7 @@ class StatisticsController extends TemplateController
 		$trTypes = [0 => "All", EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 		$transMenu = [];
 		$baseUrl = BASEURL."statistics/";
-		foreach($trTypes as $type => $trTypeName)
+		foreach($trTypes as $type_id => $trTypeName)
 		{
 			$params = ["type" => strtolower($trTypeName)];
 			if ($byCurrency)
@@ -76,8 +76,9 @@ class StatisticsController extends TemplateController
 			}
 
 			$menuItem = new stdClass;
-			$menuItem->type = $type;
+			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
+			$menuItem->selected = ($menuItem->type == $trans_type);
 			$menuItem->link = urlJoin($baseUrl, $params);
 
 			$transMenu[] = $menuItem;

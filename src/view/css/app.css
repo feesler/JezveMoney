@@ -677,8 +677,8 @@ label
 }
 
 
-/* sub menu header */
-.subHeader
+/* Transaction types menu */
+.trtype-menu
 {
 	padding: 10px 0px;
 	font-size: 16px;
@@ -686,9 +686,81 @@ label
 }
 
 
-.subHeader > span
+.trtype-menu_item
 {
-	padding: 0 20px 0 0;
+	padding: 2px;
+	margin: 0 12px 0 0;
+	cursor: pointer;
+}
+
+
+.trtype-menu_item .trtype-menu_item-check:hover
+{
+	background-color: #CCCCCC;
+}
+
+
+.trtype-menu_item .trtype-menu_item-check:active
+{
+	background-color: #1E82CC;
+}
+
+
+.trtype-menu_item-check
+{
+	width: 14px;
+	height: 14px;
+	display: inline-block;
+	vertical-align: bottom;
+	border: 1px solid #CCCCCC;
+	padding: 2px;
+	margin: 0 6px 0 0;
+}
+
+
+.trtype-menu_item-check svg
+{
+	width: 14px;
+	height: 14px;
+	visibility: hidden;
+}
+
+
+.trtype-menu_item-check:hover svg
+{
+	visibility: visible;
+}
+
+
+.trtype-menu_item-check:hover
+{
+	background-color: #1E82CC;
+}
+
+
+.trtype-menu_item-check:hover svg
+{
+	fill: #FFFFFF;
+}
+
+
+.trtype-menu_selected-item
+{
+	font-weight: bold;
+}
+
+
+.trtype-menu_selected-item .trtype-menu_item-check svg
+{
+	visibility: visible;
+	fill: #5082AA;
+}
+
+
+/* Show selected items for multi select menu as normal links */
+.trtype-menu-multi .trtype-menu_selected-item
+{
+	font-weight: normal;
 }
 
 

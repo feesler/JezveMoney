@@ -344,7 +344,7 @@ function onCheck(e)
 // Concatenate specified ids to URL base
 function parseIds(values)
 {
-	if (typeof values !== 'string' || !values)
+	if (typeof values !== 'string')
 		throw new Error('Invalid values specified');
 
 	// Check correctness of ids
@@ -651,7 +651,13 @@ function onListTransactionSubmit(e)
 	if (!frmData)
 		return false;
 
-	frmData.acc_id = parseIds(frmData.acc_id).id;
+	if ('type' in frmData)
+	{
+		if (frmData.type)
+			frmData.type = parseIds(frmData.type).id;
+	}
+	if ('acc_id' in frmData)
+		frmData.acc_id = parseIds(frmData.acc_id).id;
 
 	api.get({
 		method : 'transaction/list',

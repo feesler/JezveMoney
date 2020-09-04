@@ -21,11 +21,27 @@ class TransactionsController extends TemplateController
 						"desc" => TRUE ];
 
 		// Obtain requested transaction type filter
-		$filterObj->type = (isset($_GET["type"])) ? $_GET["type"] : "all";
+		$typeFilter = [];
+		if (isset($_GET["type"]))
+		{
+			$typeReq = $_GET["type"];
+			if (!is_array($typeReq))
+				$typeReq = [ $typeReq ];
 
-		$trParams["type"] = TransactionModel::getStringType($filterObj->type);
-		if (is_null($trParams["type"]))
-			$this->fail();
+			foreach($typeReq as $type_str)
+			{
+				$type_id = intval($type_str);
+				if (!$type_id)
+					$type_id = TransactionModel::getStringType($type_str);
+				if (is_null($type_id))
+					$this->fail();
+
+				if ($type_id)
+					$typeFilter[] = $type_id;
+			}
+			if (count($typeFilter) > 0)
+				$trParams["type"] = $filterObj->type = $typeFilter;
+		}
 
 		// Obtain requested page number
 		if (isset($_GET["page"]))
@@ -94,21 +110,35 @@ class TransactionsController extends TemplateController
 		$currArr = $this->currModel->getData();
 
 		// Prepare transaction types menu
-		$trTypes = ["All", "Expense", "Income", "Transfer", "Debt"];
+		$trTypes = [ 0 => "Show all", EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 		$transMenu = [];
 		$baseUrl = BASEURL."transactions/";
-		foreach($trTypes as $ind => $trTypeName)
+		foreach($trTypes as $type_id => $trTypeName)
 		{
 			$urlParams = (array)$filterObj;
 
-			$urlParams["type"] = strtolower($trTypeName);
+			if ($type_id != 0)
+				$urlParams["type"] = strtolower($trTypeName);
+			else
+				unset($urlParams["type"]);
 
 			// Clear page number because list of transactions guaranteed to change on change type filter
 			unset($urlParams["page"]);
 
 			$menuItem = new stdClass;
-			$menuItem->ind = $ind;
+			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
+
+			if ($type_id == 0)
+			{
+				$menuItem->selected = !isset($filterObj->type) ||
+										$filterObj->type == 0 ||
+										(is_array($filterObj->type) && !count($filterObj->type));
+			}
+			else
+			{
+				$menuItem->selected = isset($filterObj->type) && in_array($type_id, $filterObj->type);
+			}
 			$menuItem->url = urlJoin($baseUrl, $urlParams);
 
 			$transMenu[] = $menuItem;
@@ -289,18 +319,19 @@ class TransactionsController extends TemplateController
 		}
 
 		// Prepare transaction types menu
-		$trTypes = ["Expense", "Income", "Transfer", "Debt"];
+		$trTypes = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 		$transMenu = [];
 		$baseUrl = BASEURL."transactions/new/";
-		foreach($trTypes as $ind => $trTypeName)
+		foreach($trTypes as $type_id => $trTypeName)
 		{
 			$params = ["type" => strtolower($trTypeName)];
 			if ($acc_id != 0)
 				$params["acc_id"] = $acc_id;
 
 			$menuItem = new stdClass;
-			$menuItem->ind = $ind + 1;
+			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
+			$menuItem->selected = ($menuItem->type == $tr["type"]);
 			$menuItem->url = urlJoin($baseUrl, $params);
 
 			$transMenu[] = $menuItem;
@@ -498,16 +529,17 @@ class TransactionsController extends TemplateController
 		}
 
 		// Prepare transaction types menu
-		$trTypes = ["Expense", "Income", "Transfer", "Debt"];
+		$trTypes = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 		$transMenu = [];
 		$baseUrl = BASEURL."transactions/new/";
-		foreach($trTypes as $ind => $trTypeName)
+		foreach($trTypes as $type_id => $trTypeName)
 		{
 			$params = ["type" => strtolower($trTypeName)];
 
 			$menuItem = new stdClass;
-			$menuItem->ind = $ind + 1;
+			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
+			$menuItem->selected = ($menuItem->type == $tr["type"]);
 			$menuItem->url = urlJoin($baseUrl, $params);
 
 			$transMenu[] = $menuItem;

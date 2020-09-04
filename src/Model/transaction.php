@@ -1018,6 +1018,17 @@ class TransactionModel extends CachedTable
 	}
 
 
+	// Return condition string for list of types
+	private function getTypeCondition($types = NULL)
+	{
+		$setCond = inSetCondition($types);
+		if (is_null($setCond))
+			return NULL;
+
+		return "type".$setCond;
+	}
+
+
 	// Return array of transactions
 	// Params:
 	//   type - type of transaction filter. Default is ALL
@@ -1056,9 +1067,12 @@ class TransactionModel extends CachedTable
 		$condArr = [ "user_id=".self::$user_id ];
 
 		// Transaction type condition
-		$tr_type = isset($params["type"]) ? intval($params["type"]) : 0;
-		if ($tr_type != 0)
-			$condArr[] = "type=".$tr_type;
+		if (isset($params["type"]))
+		{
+			$typeCond = $this->getTypeCondition($params["type"]);
+			if (!is_empty($typeCond))
+				$condArr[] = $typeCond;
+		}
 
 		// Accounts filter condition
 		if (isset($params["accounts"]))
@@ -1138,9 +1152,13 @@ class TransactionModel extends CachedTable
 		if (is_null($params))
 			$params = [];
 
-		$tr_type = isset($params["type"]) ?  intval($params["type"]) : 0;
-		if ($tr_type != 0)
-			$condArr[] = "type=".$tr_type;
+		// Transaction type condition
+		if (isset($params["type"]))
+		{
+			$typeCond = $this->getTypeCondition($params["type"]);
+			if (!is_empty($typeCond))
+				$condArr[] = $typeCond;
+		}
 
 		if (isset($params["accounts"]) && !is_null($params["accounts"]))
 		{

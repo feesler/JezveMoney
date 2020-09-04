@@ -40,11 +40,28 @@ class TransactionApiController extends ApiController
 
 		$params = [];
 
-		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
+		// Obtain requested transaction type filter
+		$typeFilter = [];
+		if (isset($_GET["type"]))
+		{
+			$typeReq = $_GET["type"];
+			if (!is_array($typeReq))
+				$typeReq = [ $typeReq ];
 
-		$params["type"] = TransactionModel::getStringType($type_str);
-		if (is_null($params["type"]))
-			$this->fail();
+			foreach($typeReq as $type_str)
+			{
+				$type_id = intval($type_str);
+				if (!$type_id)
+					$type_id = TransactionModel::getStringType($type_str);
+				if (is_null($type_id))
+					$this->fail("Invalid type '$type_str'");
+
+				if ($type_id)
+					$typeFilter[] = $type_id;
+			}
+			if (count($typeFilter) > 0)
+				$params["type"] = $typeFilter;
+		}
 
 		if (isset($_GET["order"]) && is_string($_GET["order"]) && strtolower($_GET["order"]) == "desc")
 		{

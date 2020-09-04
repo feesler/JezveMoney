@@ -195,16 +195,16 @@ export class TransactionsList extends List
 	}
 
 
+	// Filter list of transactions by specified types
+	// Empty array, zero or undefined assumed filter is set as ALL
 	getItemsByType(list, type)
 	{
-		// If type == 0 or no value is specified assume filter is set as ALL
-		if (!type)
+		let types = Array.isArray(type) ? type : [ type ];
+		types = types.filter(item => availTransTypes.includes(item));
+		if (!types.length)
 			return list;
 
-		if (!availTransTypes.includes(type))
-			throw new Error('Wrong parameters');
-
-		return list.filter(item => item.type == type);
+		return list.filter(item => types.includes(item.type));
 	}
 
 
@@ -221,9 +221,9 @@ export class TransactionsList extends List
 	getItemsByAccounts(list, ids)
 	{
 		if (!ids)
-			throw new Error('Wrong parameters');
+			throw new Error('Invalid account ids specified');
 
-		let accounts = (Array.isArray(ids)) ? ids : [ ids ];
+		let accounts = Array.isArray(ids) ? ids : [ ids ];
 		if (!accounts.length)
 			return list;
 

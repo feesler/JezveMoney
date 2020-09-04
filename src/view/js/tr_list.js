@@ -252,6 +252,9 @@ function onTransClick(tr_id)
 // Initialization of page controls
 function initControls()
 {
+	var typeMenu = document.querySelector('.trtype-menu');
+	typeMenu.addEventListener('click', onToggleTransType);
+
 	DropDown.create({
 		input_id : 'acc_id',
 		placeholder : 'Select account',
@@ -457,19 +460,52 @@ function buildAddress()
 
 	setParam(locFilter, filterObj);
 
+	if ('type' in locFilter)
+	{
+		if (!Array.isArray(locFilter.type))
+			locFilter.type = [ locFilter.type ];
+
+		if (!locFilter.type.length)
+			delete locFilter.type;
+	}
+
 	if ('acc_id' in filterObj)
 	{
 		if (!Array.isArray(locFilter.acc_id))
 			locFilter.acc_id = [ locFilter.acc_id ];
 
 		if (!locFilter.acc_id.length)
-			delete filterObj['acc_id'];
+			delete locFilter.acc_id;
 	}
 
 	if (!isEmpty(locFilter))
 		newLocation += '?' + urlJoin(locFilter);
 
 	return newLocation;
+}
+
+
+// Transaction type checkbox click event handler
+function onToggleTransType(e)
+{
+	var itemElem = e.target.closest('.trtype-menu_item');
+	if (!itemElem || !itemElem.dataset)
+		return;
+
+	var selectedType = parseInt(itemElem.dataset.type);
+
+	if (!('type' in filterObj))
+		filterObj.type = [];
+	if (!Array.isArray(filterObj.type))
+		filterObj.type = [ filterObj.type ];
+
+	var ind = filterObj.type.indexOf(selectedType);
+	if (ind === -1)
+		filterObj.type.push(selectedType);
+	else
+		filterObj.type.splice(ind, 1);
+
+	window.location = buildAddress();
 }
 
 

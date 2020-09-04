@@ -121,7 +121,7 @@ export class ExpenseTransactionView extends TransactionView
 				source : true, destination : false, src_amount_left : false, dest_res_balance_left : false, result_balance_dest_row : false
 			},
 			values : {
-				typeMenu : { activeType : EXPENSE },
+				typeMenu : { selectedTypes : [ EXPENSE ] },
 				source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 				src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },
 				dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : true },
