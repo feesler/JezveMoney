@@ -20,7 +20,7 @@ export async function stateLoop()
 	await App.view.goToCreateAccount();
 
 	// Check initial state
-	let expAccount = { name : '', initbalance : 0, balance : '0', curr_id : 1, icon : 0 };
+	let expAccount = { name : '', initbalance : 0, balance : '0', curr_id : 1, icon : 0, flags : 0 };
 	App.view.setExpectedAccount(expAccount);
 	await test('Initial state of account view', () => App.view.checkState());
 

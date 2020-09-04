@@ -421,6 +421,48 @@ export class AppState
 	}
 
 
+	getPersonAccount(person_id, currency_id)
+	{
+		let p_id = parseInt(person_id);
+		let curr_id = parseInt(currency_id);
+		if (!p_id || !curr_id)
+			return null;
+
+		let accObj = this.accounts.data.find(item => item.owner_id == p_id &&
+													item.curr_id == curr_id);
+
+		return copyObject(accObj);
+	}
+
+
+	// Search for account of person in specified currency
+	// In case no such account exist create new account with expected properties
+	getExpectedPersonAccount(person_id, currency_id)
+	{
+		let p_id = parseInt(person_id);
+		let curr_id = parseInt(currency_id);
+		if (!p_id || !curr_id)
+			return null;
+
+		let accObj = this.getPersonAccount(person_id, currency_id);
+		if (accObj)
+			return accObj;
+
+		accObj = {
+			owner_id : p_id,
+			name : `acc_${person_id}_${currency_id}`,
+			initbalance : 0,
+			balance : 0,
+			curr_id : currency_id,
+			icon : 0
+		};
+
+		let ind = this.accounts.create(accObj);
+
+		return this.accounts.getItemByIndex(ind);
+	}
+
+
 /**
  * Transactions
  */
@@ -681,48 +723,6 @@ export class AppState
 		this.transactions.updateResults(this.accounts);
 
 		return true;
-	}
-
-
-	getPersonAccount(person_id, currency_id)
-	{
-		let p_id = parseInt(person_id);
-		let curr_id = parseInt(currency_id);
-		if (!p_id || !curr_id)
-			return null;
-
-		let accObj = this.accounts.data.find(item => item.owner_id == p_id &&
-													item.curr_id == curr_id);
-
-		return copyObject(accObj);
-	}
-
-
-	// Search for account of person in specified currency
-	// In case no such account exist create new account with expected properties
-	getExpectedPersonAccount(person_id, currency_id)
-	{
-		let p_id = parseInt(person_id);
-		let curr_id = parseInt(currency_id);
-		if (!p_id || !curr_id)
-			return null;
-
-		let accObj = this.getPersonAccount(person_id, currency_id);
-		if (accObj)
-			return accObj;
-
-		accObj = {
-			owner_id : p_id,
-			name : `acc_${person_id}_${currency_id}`,
-			initbalance : 0,
-			balance : 0,
-			curr_id : currency_id,
-			icon : 0
-		};
-
-		let ind = this.accounts.create(accObj);
-
-		return this.accounts.getItemByIndex(ind);
 	}
 }
 
