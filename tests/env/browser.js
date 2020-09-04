@@ -15,6 +15,7 @@ class BrowserEnvironment extends Environment
 
 		this.vdoc = null;
 		this.viewframe = null;
+		this.resContainer = null;
 		this.restbl = null;
 		this.totalRes = null;
 		this.okRes = null
@@ -317,6 +318,8 @@ class BrowserEnvironment extends Environment
 											ce('td', { innerHTML : resStr }),
 										 	ce('td', { innerHTML : message }) ]));
 
+		this.resContainer.scrollTop = this.resContainer.scrollHeight;
+
 		if (err)
 			console.error(err);
 	}
@@ -503,8 +506,9 @@ class BrowserEnvironment extends Environment
 		this.failRes = ge('failRes');
 		this.durationRes = ge('durationRes');
 		this.viewframe = ge('viewframe');
+		this.resContainer = document.querySelector('.tbl_container');
 		this.restbl = ge('restbl');
-		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.restbl)
+		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.resContainer || !this.restbl)
 			throw new Error('Fail to init tests');
 
 		startbtn.onclick = async () =>
