@@ -57,6 +57,7 @@ h3
 .cont_list > li
 {
 	padding: 5px;
+	list-style-type: none;
 }
 
 
