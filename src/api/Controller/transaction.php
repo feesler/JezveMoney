@@ -52,7 +52,7 @@ class TransactionApiController extends ApiController
 			{
 				$type_id = intval($type_str);
 				if (!$type_id)
-					$type_id = TransactionModel::getStringType($type_str);
+					$type_id = TransactionModel::stringToType($type_str);
 				if (is_null($type_id))
 					$this->fail("Invalid type '$type_str'");
 

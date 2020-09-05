@@ -7,7 +7,7 @@ class TransactionModel extends CachedTable
 
 	static private $user_id = 0;
 	static private $owner_id = 0;
-	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
+	static private $typeNames = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 	static private $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 	static private $srcAvailTypes = [ EXPENSE, TRANSFER, DEBT ];
 	static private $srcMandatoryTypes = [ EXPENSE, TRANSFER ];
@@ -1500,22 +1500,33 @@ class TransactionModel extends CachedTable
 
 
 	// Return string for specified transaction type
-	public static function getStringType($trans_type)
+	public static function stringToType($trans_type)
 	{
-		$keys = array_keys(self::$typeStrArr, $trans_type);
-		if (!count($keys))
-			return 0;
+		$reqType = strtolower($trans_type);
+		foreach(self::$typeNames as $type_id => $typeName)
+		{
+			if (strtolower($typeName) == $reqType)
+				return $type_id;
+		}
 
-		return $keys[0];
+		return 0;
 	}
 
 
 	// Return string for specified transaction type
 	public static function typeToString($trans_type)
 	{
-		if (!isset(self::$typeStrArr[$trans_type]))
+		if (!isset(self::$typeNames[$trans_type]))
 			return NULL;
 
-		return self::$typeStrArr[$trans_type];
+		return self::$typeNames[$trans_type];
+	}
+
+
+	// Return array of names of available types of transactions
+	// [ type => 'name string', ... ]
+	public static function getTypeNames()
+	{
+		return self::$typeNames;
 	}
 }

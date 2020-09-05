@@ -32,10 +32,7 @@ class TransactionsController extends TemplateController
 			{
 				$type_id = intval($type_str);
 				if (!$type_id)
-					$type_id = TransactionModel::getStringType($type_str);
-				if (is_null($type_id))
-					$this->fail();
-
+					$type_id = TransactionModel::stringToType($type_str);
 				if ($type_id)
 					$typeFilter[] = $type_id;
 			}
@@ -110,7 +107,10 @@ class TransactionsController extends TemplateController
 		$currArr = $this->currModel->getData();
 
 		// Prepare transaction types menu
-		$trTypes = [ 0 => "Show all", EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
+		$trTypes = [ 0 => "Show all" ];
+		$availTypes = TransactionModel::getTypeNames();
+		array_push($trTypes, ...$availTypes);
+
 		$transMenu = [];
 		$baseUrl = BASEURL."transactions/";
 		foreach($trTypes as $type_id => $trTypeName)
@@ -131,9 +131,7 @@ class TransactionsController extends TemplateController
 
 			if ($type_id == 0)
 			{
-				$menuItem->selected = !isset($filterObj->type) ||
-										$filterObj->type == 0 ||
-										(is_array($filterObj->type) && !count($filterObj->type));
+				$menuItem->selected = !isset($filterObj->type) || !count($filterObj->type);
 			}
 			else
 			{
@@ -217,20 +215,20 @@ class TransactionsController extends TemplateController
 
 		$defMsg = ERR_TRANS_CREATE;
 
-		$tr = [ "src_amount" => 0,
-				"dest_amount" => 0,
-				"comment" => "" ];
+		$tr = [
+			"type" => EXPENSE,
+			"src_amount" => 0,
+			"dest_amount" => 0,
+			"comment" => ""
+		];
 
 		// check predefined type of transaction
-		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
-		$tr["type"] = TransactionModel::getStringType($type_str);
-		if (!$tr["type"])
+		if (isset($_GET["type"]))
 		{
-			$type_str = "expense";
-			$tr["type"] = TransactionModel::getStringType($type_str);
+			$tr["type"] = TransactionModel::stringToType($_GET["type"]);
+			if (!$tr["type"])
+				$this->fail("Invalid transaction type");
 		}
-		if (!$tr["type"])
-			$this->fail($defMsg);
 
 		// Check specified account
 		$acc_id = 0;
@@ -319,7 +317,7 @@ class TransactionsController extends TemplateController
 		}
 
 		// Prepare transaction types menu
-		$trTypes = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
+		$trTypes = TransactionModel::getTypeNames();
 		$transMenu = [];
 		$baseUrl = BASEURL."transactions/new/";
 		foreach($trTypes as $type_id => $trTypeName)
@@ -529,7 +527,7 @@ class TransactionsController extends TemplateController
 		}
 
 		// Prepare transaction types menu
-		$trTypes = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
+		$trTypes = TransactionModel::getTypeNames();
 		$transMenu = [];
 		$baseUrl = BASEURL."transactions/new/";
 		foreach($trTypes as $type_id => $trTypeName)

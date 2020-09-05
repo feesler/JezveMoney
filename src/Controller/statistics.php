@@ -12,13 +12,16 @@ class StatisticsController extends TemplateController
 		$byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
 		$filterObj->filter = $byCurrency ? "currency" : "account";
 
-		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "expense";
+		$trans_type = EXPENSE;
+		if (isset($_GET["type"]))
+		{
+			$trans_type = TransactionModel::stringToType($_GET["type"]);
+			if (!$trans_type)
+				$this->fail("Invalid transaction type");
+		}
 
-		$trans_type = TransactionModel::getStringType($type_str);
-		if (is_null($trans_type))
-			$this->fail();
-
-		$filterObj->type = $type_str;
+		if ($trans_type)
+			$filterObj->type = TransactionModel::typeToString($trans_type);
 
 		if ($byCurrency)
 		{
@@ -58,22 +61,26 @@ class StatisticsController extends TemplateController
 		}
 
 		// Prepare transaction types menu
-		$trTypes = [0 => "All", EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
+		$trTypes = TransactionModel::getTypeNames();
+
+		$params = [];
+		if ($byCurrency)
+		{
+			if ($curr_id)
+				$params["curr_id"] = $curr_id;
+		}
+		else
+		{
+			if ($acc_id)
+				$params["acc_id"] = $acc_id;
+		}
+
 		$transMenu = [];
 		$baseUrl = BASEURL."statistics/";
 		foreach($trTypes as $type_id => $trTypeName)
 		{
-			$params = ["type" => strtolower($trTypeName)];
-			if ($byCurrency)
-			{
-				if ($curr_id)
-					$params["curr_id"] = $curr_id;
-			}
-			else
-			{
-				if ($acc_id)
-					$params["acc_id"] = $acc_id;
-			}
+			if ($type_id)
+				$params["type"] = strtolower($trTypeName);
 
 			$menuItem = new stdClass;
 			$menuItem->type = $type_id;
