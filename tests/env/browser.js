@@ -293,7 +293,6 @@ class BrowserEnvironment extends Environment
 	async addResult(descr, res)
 	{
 		let err = null;
-		let resStr;
 		let message = '';
 
 		if (descr instanceof Error)
@@ -312,13 +311,16 @@ class BrowserEnvironment extends Environment
 		this.okRes.innerHTML = (res) ? ++this.results.ok : this.results.ok;
 		this.failRes.innerHTML = (res) ? this.results.fail : ++this.results.fail;
 
-		resStr = (res ? 'OK' : 'FAIL');
+		let resStr = (res ? 'OK' : 'FAIL');
 
 		this.restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
 											ce('td', { innerHTML : resStr }),
 										 	ce('td', { innerHTML : message }) ]));
 
-		this.resContainer.scrollTop = this.resContainer.scrollHeight;
+		if (!this.resContainer.scrollHeight)
+			this.newResultsAvailable = true;
+		else
+			this.resContainer.scrollTop = this.resContainer.scrollHeight;
 
 		if (err)
 			console.error(err);
@@ -501,15 +503,37 @@ class BrowserEnvironment extends Environment
 		await this.app.init();
 
 		let startbtn = ge('startbtn');
+
+		this.newResultsAvailable = false;
+
+		this.resultsBlock = document.querySelector('.results');
 		this.totalRes = ge('totalRes');
 		this.okRes = ge('okRes');
 		this.failRes = ge('failRes');
 		this.durationRes = ge('durationRes');
 		this.viewframe = ge('viewframe');
-		this.resContainer = document.querySelector('.tbl_container');
+		this.resContainer = document.querySelector('.results-container');
+		this.toggleResBtn = ge('toggleresbtn');
 		this.restbl = ge('restbl');
-		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.resContainer || !this.restbl)
+		if (!startbtn || !this.resultsBlock || !this.totalRes || !this.okRes || !this.failRes
+			|| !this.durationRes || !this.viewframe || !this.resContainer
+			|| !this.toggleResBtn || !this.restbl)
 			throw new Error('Fail to init tests');
+
+		this.toggleResBtn.addEventListener('click', () =>
+		{
+			let clName = 'results-expanded';
+			const isExpanded = this.resultsBlock.classList.contains(clName);
+
+			this.toggleResBtn.value = isExpanded ? 'Show' : 'Hide';
+			this.resultsBlock.classList.toggle(clName);
+
+			if (!isExpanded && this.newResultsAvailable)
+			{
+				this.newResultsAvailable = false;
+				this.resContainer.scrollTop = this.resContainer.scrollHeight;
+			}
+		});
 
 		startbtn.onclick = async () =>
 		{
