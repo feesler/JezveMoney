@@ -5,6 +5,8 @@ class TransactionApiController extends ApiController
 	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
 	protected $debtRequiredFields = [ "type", "person_id", "acc_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
 
+	protected $model = NULL;
+
 
 	public function initAPI()
 	{
@@ -40,11 +42,28 @@ class TransactionApiController extends ApiController
 
 		$params = [];
 
-		$type_str = (isset($_GET["type"])) ? $_GET["type"] : "all";
+		// Obtain requested transaction type filter
+		$typeFilter = [];
+		if (isset($_GET["type"]))
+		{
+			$typeReq = $_GET["type"];
+			if (!is_array($typeReq))
+				$typeReq = [ $typeReq ];
 
-		$params["type"] = TransactionModel::getStringType($type_str);
-		if (is_null($params["type"]))
-			$this->fail();
+			foreach($typeReq as $type_str)
+			{
+				$type_id = intval($type_str);
+				if (!$type_id)
+					$type_id = TransactionModel::stringToType($type_str);
+				if (is_null($type_id))
+					$this->fail("Invalid type '$type_str'");
+
+				if ($type_id)
+					$typeFilter[] = $type_id;
+			}
+			if (count($typeFilter) > 0)
+				$params["type"] = $typeFilter;
+		}
 
 		if (isset($_GET["order"]) && is_string($_GET["order"]) && strtolower($_GET["order"]) == "desc")
 		{
@@ -55,12 +74,24 @@ class TransactionApiController extends ApiController
 
 		$params["page"] = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? (intval($_GET["page"]) - 1) : 0;
 
-		$acc_id = (isset($_GET["acc_id"])) ? intval($_GET["acc_id"]) : 0;
-		if ($acc_id && !$accMod->is_exist($acc_id))
-			$this->fail("Invalid account");
+		// Prepare array of requested accounts filter
+		$accFilter = [];
+		if (isset($_GET["acc_id"]))
+		{
+			$accountsReq = $_GET["acc_id"];
+			if (!is_array($accountsReq))
+				$accountsReq = [ $accountsReq ];
+			foreach($accountsReq as $acc_id)
+			{
+				if (!$accMod->is_exist($acc_id))
+					$this->fail("Invalid account '$acc_id'");
 
-		if ($acc_id != 0)
-			$params["accounts"] = $acc_id;
+				$accFilter[] = intval($acc_id);
+			}
+
+			if (count($accFilter) > 0)
+				$params["accounts"] = $accFilter;
+		}
 
 		if (isset($_GET["search"]))
 			$params["search"] = $_GET["search"];

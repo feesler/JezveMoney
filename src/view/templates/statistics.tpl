@@ -12,12 +12,18 @@
 					</div>
 
 					<div>
-						<div id="trtype_menu" class="subHeader">
+						<div class="trtype-menu">
 <?php	forEach($transMenu as $menuItem) {
-			if ($menuItem->type == $trans_type) {		?>
-							<span><b><?=e($menuItem->title)?></b></span>
+			if ($menuItem->selected) {		?>
+							<span class="trtype-menu_item trtype-menu_selected-item" data-type="<?=e($menuItem->type)?>">
+								<span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
+							</span>
 <?php		} else {		?>
-							<span><a href="<?=e($menuItem->link)?>"><?=e($menuItem->title)?></a></span>
+							<span class="trtype-menu_item" data-type="<?=e($menuItem->type)?>">
+								<span class="trtype-menu_item_title">
+									<a href="<?=e($menuItem->link)?>"><?=e($menuItem->title)?></a>
+								</span>
+							</span>
 <?php		}
 		}	?>
 						</div>

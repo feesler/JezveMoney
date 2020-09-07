@@ -2,8 +2,26 @@
 
 class Transaction
 {
+	public $id = 0;
+	public $type = 0;
+	public $src_id = 0;
+	public $dest_id = 0;
+	public $src_amount = 0;
+	public $dest_amount = 0;
+	public $src_curr = 0;
+	public $dest_curr = 0;
+	public $src_result = 0;
+	public $dest_result = 0;
+	public $date = 0;
+	public $comment = NULL;
+	public $pos = 0;
+
+
 	public function __construct($obj)
 	{
+		if (is_null($obj))
+			throw new Error("Invalid object");
+
 		$this->id = $obj->id;
 		$this->type = $obj->type;
 		$this->src_id = $obj->src_id;

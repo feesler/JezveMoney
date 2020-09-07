@@ -18,11 +18,12 @@
 <?php	if ($action == "edit") {		?>
 						<input id="pid" name="id" type="hidden" value="<?=e($p_id)?>">
 <?php	}	?>
-						<div class="non_float std_margin">
+						<div id="name-inp-block" class="validation-block non_float std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
 								<input id="pname" name="name" type="text" value="<?=e($pInfo->name)?>">
 							</div>
+							<div class="invalid-feedback">Please input name of person.</div>
 						</div>
 
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>persons/">cancel</a></div>
@@ -41,13 +42,11 @@
 <?php	}	?>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
-<?php	if ($action == "edit") {		?>
 <script>
 	var person_id = <?=$p_id?>;
 	var personName = <?=JSON::encode($pInfo->name)?>;
 
 	onReady(initControls);
 </script>
-<?php	}	?>
 </body>
 </html>

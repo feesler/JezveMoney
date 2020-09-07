@@ -2,8 +2,18 @@
 
 class ApiController extends Controller
 {
+	protected $response = NULL;
+	protected $uMod = NULL;
+	protected $user_id = 0;
+	protected $owner_id = 0;
+	public $authRequired = TRUE;
+
+
 	protected function setMessage($msg = NULL)
 	{
+		if (!$this->response)
+			throw new Error("Invalid response object");
+
 		if (is_null($msg))
 			unset($this->response->msg);
 		else
@@ -13,6 +23,9 @@ class ApiController extends Controller
 
 	protected function setData($data = NULL)
 	{
+		if (!$this->response)
+			throw new Error("Invalid response object");
+
 		if (is_null($data))
 			unset($this->response->data);
 		else
@@ -22,12 +35,18 @@ class ApiController extends Controller
 
 	protected function fail($msg = NULL)
 	{
+		if (!$this->response)
+			throw new Error("Invalid response object");
+
 		$this->response->fail($msg);
 	}
 
 
 	protected function ok($data = NULL)
 	{
+		if (!$this->response)
+			throw new Error("Invalid response object");
+
 		if (!is_null($data))
 			$this->setData($data);
 

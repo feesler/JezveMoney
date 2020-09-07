@@ -61,6 +61,9 @@ export class AccountView extends TestView
 		res.icon = iconObj.id;
 		res.tileIcon = iconObj;
 
+		// Flags
+		res.flags = cont.flags;
+
 		return res;
 	}
 
@@ -91,10 +94,10 @@ export class AccountView extends TestView
 	{
 		let res = {
 			name : this.model.name,
-			owner_id : App.owner_id,
 			initbalance : this.model.fInitBalance,
 			curr_id : this.model.curr_id,
-			icon : this.model.icon
+			icon : this.model.icon,
+			flags : this.model.flags,
 		};
 
 		if (this.model.isUpdate)
@@ -180,6 +183,9 @@ export class AccountView extends TestView
 
 		res.balance = await InputRow.create(this, elem);
 
+		res.flagsInp = await this.query('#flags');
+		res.flags = parseInt(await this.prop(res.flagsInp, 'value'));
+
 		res.submitBtn = await this.query('.acc_controls .ok_btn');
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
@@ -191,6 +197,12 @@ export class AccountView extends TestView
 		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
+	}
+
+
+	isValid()
+	{
+		return (this.model.name.length > 0) && this.model.initbalance.length && isValidValue(this.model.initbalance);
 	}
 
 
@@ -219,8 +231,10 @@ export class AccountView extends TestView
 
 	async inputName(val)
 	{
+		if (this.model.name.length != val.length)
+			this.model.nameTyped = this.nameTyped = true;
+
 		this.model.name = val;
-		this.model.nameTyped = this.nameTyped = true;
 
 		this.setExpectedState();
 
@@ -256,7 +270,7 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		await this.performAction(() => this.content.currDropDown.select(val));
+		await this.performAction(() => this.content.currDropDown.setSelection(val));
 
 		return this.checkState();
 	}
@@ -273,8 +287,25 @@ export class AccountView extends TestView
 
 		this.setExpectedState();
 
-		await this.performAction(() => this.content.iconDropDown.select(val));
+		await this.performAction(() => this.content.iconDropDown.setSelection(val));
 
 		return this.checkState();
+	}
+
+
+	async submit()
+	{
+		let action = () => this.click(this.content.submitBtn);
+
+		if (this.isValid())
+			await this.navigation(action);
+		else
+			await this.performAction(action);
+	}
+
+
+	async cancel()
+	{
+		await this.navigation(() => this.click(this.content.cancelBtn));
 	}
 }

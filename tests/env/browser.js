@@ -5,7 +5,6 @@ import 'whatwg-fetch';
 import { setParam, formatTime, isFunction } from '../common.js';
 import { App } from '../app.js';
 import { Environment, visibilityResolver } from './base.js';
-import { setTimeout } from 'core-js';
 
 
 class BrowserEnvironment extends Environment
@@ -16,6 +15,7 @@ class BrowserEnvironment extends Environment
 
 		this.vdoc = null;
 		this.viewframe = null;
+		this.resContainer = null;
 		this.restbl = null;
 		this.totalRes = null;
 		this.okRes = null
@@ -175,7 +175,10 @@ class BrowserEnvironment extends Environment
 		{
 			if (selectObj.options[i] && selectObj.options[i].value == selValue)
 			{
-				selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+				if (selectObj.multiple)
+					selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+				else
+					selectObj.selectedIndex = i;
 				return true;
 			}
 		}
@@ -198,6 +201,9 @@ class BrowserEnvironment extends Environment
 
 	async input(elemObj, val)
 	{
+		if (elemObj.value == '' && val == '')
+			return;
+
 		elemObj.value = val;
 
 		let event;
@@ -287,7 +293,6 @@ class BrowserEnvironment extends Environment
 	async addResult(descr, res)
 	{
 		let err = null;
-		let resStr;
 		let message = '';
 
 		if (descr instanceof Error)
@@ -306,11 +311,16 @@ class BrowserEnvironment extends Environment
 		this.okRes.innerHTML = (res) ? ++this.results.ok : this.results.ok;
 		this.failRes.innerHTML = (res) ? this.results.fail : ++this.results.fail;
 
-		resStr = (res ? 'OK' : 'FAIL');
+		let resStr = (res ? 'OK' : 'FAIL');
 
 		this.restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
 											ce('td', { innerHTML : resStr }),
 										 	ce('td', { innerHTML : message }) ]));
+
+		if (!this.resContainer.scrollHeight)
+			this.newResultsAvailable = true;
+		else
+			this.resContainer.scrollTop = this.resContainer.scrollHeight;
 
 		if (err)
 			console.error(err);
@@ -443,7 +453,7 @@ class BrowserEnvironment extends Environment
 
 		let navPromise = new Promise((resolve, reject) =>
 		{
-			this.viewframe.onload = async () =>
+			this.viewframe.addEventListener('load', async () =>
 			{
 				try
 				{
@@ -461,7 +471,7 @@ class BrowserEnvironment extends Environment
 				{
 					reject(e);
 				}
-			};
+			});
 		});
 
 		await action();
@@ -493,14 +503,37 @@ class BrowserEnvironment extends Environment
 		await this.app.init();
 
 		let startbtn = ge('startbtn');
+
+		this.newResultsAvailable = false;
+
+		this.resultsBlock = document.querySelector('.results');
 		this.totalRes = ge('totalRes');
 		this.okRes = ge('okRes');
 		this.failRes = ge('failRes');
 		this.durationRes = ge('durationRes');
 		this.viewframe = ge('viewframe');
+		this.resContainer = document.querySelector('.results-container');
+		this.toggleResBtn = ge('toggleresbtn');
 		this.restbl = ge('restbl');
-		if (!startbtn || !this.totalRes || !this.okRes || !this.failRes || !this.durationRes || !this.viewframe || !this.restbl)
+		if (!startbtn || !this.resultsBlock || !this.totalRes || !this.okRes || !this.failRes
+			|| !this.durationRes || !this.viewframe || !this.resContainer
+			|| !this.toggleResBtn || !this.restbl)
 			throw new Error('Fail to init tests');
+
+		this.toggleResBtn.addEventListener('click', () =>
+		{
+			let clName = 'results-expanded';
+			const isExpanded = this.resultsBlock.classList.contains(clName);
+
+			this.toggleResBtn.value = isExpanded ? 'Show' : 'Hide';
+			this.resultsBlock.classList.toggle(clName);
+
+			if (!isExpanded && this.newResultsAvailable)
+			{
+				this.newResultsAvailable = false;
+				this.resContainer.scrollTop = this.resContainer.scrollHeight;
+			}
+		});
 
 		startbtn.onclick = async () =>
 		{

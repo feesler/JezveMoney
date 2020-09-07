@@ -72,7 +72,7 @@ export async function stateLoop()
 	{
 		await App.goToMainView();
 		await App.view.goToNewTransactionByAccount(0);
-		if (App.view.content.typeMenu.activeType != INCOME)
+		if (!App.view.content.typeMenu.isSingleSelected(INCOME))
 			await App.view.changeTransactionType(INCOME);
 	}
 

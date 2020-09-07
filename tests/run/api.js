@@ -36,8 +36,25 @@ export async function registerAndLogin(userData)
 // UserData expected: { login, password }
 export async function login(userData)
 {
-	await test('Login main user', () => api.user.login(userData));
-	await App.state.fetch();
+	await test('Login user', async () =>
+	{
+		let resExpected = (userData.login.length > 0 && userData.password.length > 0);
+		try
+		{
+			let loginRes = await api.user.login(userData);
+			if (resExpected != loginRes)
+				return false;
+		}
+		catch(e)
+		{
+			if (!(e instanceof ApiRequestError) || resExpected)
+				throw e;
+		}
+
+		await App.state.fetch();
+
+		return true;
+	});
 }
 
 
@@ -46,12 +63,29 @@ export async function changeName(name)
 {
 	await test('Change user name', async () =>
 	{
-		let chnameRes = await api.profile.changeName({ name })
-		if (!chnameRes)
-			throw new Error('Fail to change user name');
+		let resExpected = name.length > 0 && name != App.state.profile.name;
 
-		App.state.changeName(name);
-		return App.state.fetchAndTest();
+		try
+		{
+			let chNameRes = await api.profile.changeName({ name })
+			if (resExpected != chNameRes)
+				return false;
+		}
+		catch(e)
+		{
+			if (!(e instanceof ApiRequestError) || resExpected)
+				throw e;
+		}
+
+		if (resExpected)
+		{
+			App.state.changeName(name);
+			return App.state.fetchAndTest();
+		}
+		else
+		{
+			return true;
+		}
 	});
 }
 

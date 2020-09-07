@@ -4,6 +4,9 @@ class DebtModel
 {
 	use Singleton;
 
+	protected $personModel = NULL;
+	protected $accModel = NULL;
+
 
 	protected function onStart()
 	{

@@ -2,6 +2,11 @@
 
 class StateApiController extends ApiController
 {
+	protected $trModel = NULL;
+	protected $accModel = NULL;
+	protected $pModel = NULL;
+
+
 	public function initAPI()
 	{
 		parent::initAPI();
@@ -43,10 +48,15 @@ class StateApiController extends ApiController
 		}
 		$res->persons->autoincrement = $this->pModel->autoIncrement();
 
+		$userObj = $this->uMod->getItem($this->user_id);
+		if (!$userObj)
+			$this->fail("User not found");
+
 		$res->profile = new stdClass;
 		$pObj = $this->pModel->getItem($this->owner_id);
 		if (!$pObj)
 			$this->fail("Person not found");
+		$res->profile->login = $userObj->login;
 		$res->profile->user_id = $this->user_id;
 		$res->profile->owner_id = $this->owner_id;
 		$res->profile->name = $pObj->name;

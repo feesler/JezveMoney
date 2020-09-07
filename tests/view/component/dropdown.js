@@ -112,38 +112,126 @@ export class DropDown extends NullableComponent
 	}
 
 
-	async selectItem(item_id)
+	getItem(item_id)
+	{
+		return this.items.find(item => item.id == item_id);
+	}
+
+
+	async showList(show = true)
 	{
 		let listVisible = await this.isVisible(this.listContainer);
-		if (!listVisible)
-			await this.click(this.selectBtn);
+		if (show == listVisible)
+			return;
 
-		let li = this.items.find(item => item.id == item_id);
+		await this.click(this.selectBtn);
+	}
+
+
+	async toggleItem(item_id)
+	{
+		let li = this.getItem(item_id);
 		if (!li)
-			throw new Error('List item not found');
+			throw new Error(`List item ${item_id} not found`);
 
+		if (li.selected)
+		{
+			if (this.isMulti)
+				await this.deselectItem(item_id);
+		}
+		else
+		{
+			await this.selectItem(item_id);
+		}
+	}
+
+
+	async selectItem(item_id)
+	{
+		let li = this.getItem(item_id);
+		if (!li)
+			throw new Error(`List item ${item_id} not found`);
+
+		if (li.selected)
+			return;
+
+		await this.showList();
 		await this.click(li.elem);
 	}
 
 
-	async select(val)
+	async deselectItem(item_id)
+	{
+		if (!this.isMulti)
+			throw new Error('Deselect item not available for single select DropDown');
+
+		let li = this.getItem(item_id);
+		if (!li)
+			throw new Error(`List item ${item_id} not found`);
+
+		if (!li.selected)
+			return;
+
+		await this.showList();
+		await this.click(li.elem);
+	}
+
+
+	async setSelection(val)
 	{
 		let values = Array.isArray(val) ? val : [ val ];
 
-		for(let value of values)
-		{
-			await this.selectItem(value);
-		}
+		if (values.length > 1 && !this.isMulti)
+			throw new Error('Select multiple items not available for single select DropDown');
 
 		if (this.isMulti)
-			await this.click(this.selectBtn);
+		{
+			let selectedValues = this.getSelectedValues();
+			for(let value of selectedValues)
+			{
+				if (!values.includes(value))
+					await this.deselectItem(value);
+			}
+
+			await this.parse();
+
+			for(let value of values)
+			{
+				await this.selectItem(value);
+			}
+
+			await this.showList(false);
+		}
+		else
+		{
+			await this.selectItem(values[0]);
+		}
+	}
+
+
+	async deselectAll()
+	{
+		if (!this.isMulti)
+			throw new Error('Deselect items not available for single select DropDown');
+
+		let selectedValues = this.getSelectedValues();
+		for(let value of selectedValues)
+		{
+			await this.deselectItem(value);
+		}
+
+		await this.showList(false);
+	}
+
+
+	getSelectedItems()
+	{
+		return this.items.filter(item => item.selected);
 	}
 
 
 	getSelectedValues()
 	{
-		let res = this.items.filter(item => item.selected)
-							.map(item => item.id);
-		return res;
+		return this.getSelectedItems().map(item => item.id);
 	}
 }

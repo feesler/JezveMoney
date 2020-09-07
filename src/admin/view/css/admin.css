@@ -1,14 +1,11 @@
 .admin_header
 {
+	box-sizing: border-box;
+	width: 100%;
+	position: absolute;
 	background-color: #404040;
 	color: #FFFFFF;
 	padding: 12px;
-}
-
-
-.admin_header > .menu
-{
-	height: 20px;
 }
 
 
@@ -16,12 +13,13 @@
 {
 	display: inline;
 	padding: 0px 10px 0px 0px;
+	white-space: nowrap;
 }
 
 
 .admin_cont_wrap
 {
-	padding: 12px;
+	padding: 100px 12px 50px 12px;
 }
 
 

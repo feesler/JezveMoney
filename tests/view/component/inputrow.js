@@ -48,6 +48,16 @@ export class InputRow extends NullableComponent
 
 		this.valueInput = await this.query(this.elem, '.stretch_input > input');
 		this.value = await this.prop(this.valueInput, 'value');
+
+		this.validationEnabled = await this.hasClass(this.elem, 'validation-block');
+		if (this.validationEnabled)
+		{
+			this.isInvalid = await this.hasClass(this.elem, 'invalid-block');
+			this.feedBackElem = await this.query(this.elem, '.invalid-feedback');
+			if (!this.feedBackElem)
+				throw new Error('Validation feedback element not found');
+			this.feedbackText = await this.prop(this.feedBackElem, 'textContent');
+		}
 	}
 
 
@@ -60,6 +70,6 @@ export class InputRow extends NullableComponent
 	async selectCurr(curr_id)
 	{
 		if (this.isCurrActive && this.currDropDown)
-			return this.currDropDown.select(curr_id);
+			return this.currDropDown.setSelection(curr_id);
 	}
 }

@@ -6,6 +6,8 @@ abstract class Model
 	protected $tbl_name = NULL;
 
 
+	abstract protected function rowToObj($row);
+
 	abstract protected function preCreate($params, $isMultiple = FALSE);
 	// Perform model-specific actions after new item successfully created
 	protected function postCreate($item_id){}
@@ -68,14 +70,14 @@ abstract class Model
 			return NULL;
 		unset($prepared);
 
-		if ($rowsPrepared != $this->dbObj->affected)
+		if ($rowsPrepared != $this->dbObj->affectedRows())
 		{
 			wlog("Unexpected count of affected rows");
 			return NULL;
 		}
 
 		$res = [];
-		$item_id = $this->dbObj->insert_id;
+		$item_id = $this->dbObj->insertId();
 		while($rowsPrepared--)
 		{
 			$res[] = $item_id++;

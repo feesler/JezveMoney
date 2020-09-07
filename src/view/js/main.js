@@ -9,59 +9,60 @@ var delPopup = null;	// delete profile popup
 // Log in form submit event handler
 function onLoginSubmit(frm)
 {
-	var login, password;
 
-	login = ge('login');
-	password = ge('password');
+	var login = ge('login');
+	var password = ge('password');
 	if (!frm || !login || !password)
 		return false;
 
+	var valid = true;
+
 	if (!login.value || login.value.length < 1)
 	{
-		alert('Please type your account name.');
-		return false;
+		invalidateBlock('login-inp-block');
+		valid = false;
 	}
 
 	if (!password.value || password.value.length < 1)
 	{
-		alert('Please type your password.');
-		return false;
+		invalidateBlock('pwd-inp-block');
+		valid = false;
 	}
 
-	return true;
+	return valid;
 }
 
 
 // Registration form submit event handler
 function onRegisterSubmit(frm)
 {
-	var login, password, name;
-
-	login = ge('login');
-	password = ge('password');
-	name = ge('name');
+	var login = ge('login');
+	var password = ge('password');
+	var name = ge('name');
 	if (!frm || !login || !password || !name)
 		return false;
 
+	var valid = true;
+
 	if (!login.value || login.value.length < 1)
 	{
-		alert('Please type your account name.');
-		return false;
+		invalidateBlock('login-inp-block');
+		valid = false;
 	}
 
 	if (!name.value || name.value.length < 1)
 	{
-		alert('Please type your name.');
-		return false;
+		invalidateBlock('name-inp-block');
+		valid = false;
 	}
 
 	if (!password.value || password.value.length < 1)
 	{
-		alert('Please type your password.');
-		return false;
+		invalidateBlock('pwd-inp-block');
+		valid = false;
 	}
 
-	return true;
+	return valid;
 }
 
 
@@ -82,6 +83,15 @@ function showChangeNamePopup()
 
 		cnPopup.setControls({ okBtn : { onclick : onChangeNameSubmit.bind(null, frm) },
 								closeBtn : true });
+
+		var newname = ge('newname');
+		if (newname)
+		{
+			newname.addEventListener('input', function()
+			{
+				clearBlockValidation('name-inp-block');
+			});
+		}
 	}
 
 	var newname = ge('newname');
@@ -97,10 +107,7 @@ function showChangeNamePopup()
 // Change password request callback
 function onChangePasswordResult(response)
 {
-	var userbtn, nameEl;
-
 	var res = JSON.parse(response);
-
 	if (!res)
 		return;
 
@@ -128,37 +135,34 @@ function onChangePasswordResult(response)
 // Change password submit event handler
 function onChangePassSubmit(frm)
 {
-	var oldpwd, newpwd;
-
-	oldpwd = ge('oldpwd');
-	newpwd = ge('newpwd');
+	var oldpwd = ge('oldpwd');
+	var newpwd = ge('newpwd');
 	if (!frm || !oldpwd || !newpwd)
 		return false;
 
+	var valid = true;
+
 	if (!oldpwd.value || oldpwd.value.length < 1)
 	{
-		alert('Please type your current password.');
-		return false;
+		invalidateBlock('old-pwd-inp-block');
+		valid = false;
 	}
 
-	if (!newpwd.value || newpwd.value.length < 1)
+	if (!newpwd.value || newpwd.value.length < 1 || newpwd.value == oldpwd.value)
 	{
-		alert('Please type new password.');
-		return false;
+		invalidateBlock('new-pwd-inp-block');
+		valid = false;
 	}
 
-	if (newpwd.value == oldpwd.value)
+	if (valid)
 	{
-		alert('New password must be different from the old.');
-		return false;
+		ajax.post({
+			url : baseURL + 'api/profile/changepass',
+			data : JSON.stringify({ 'current' : oldpwd.value, 'new' : newpwd.value }),
+			headers : { 'Content-Type' : 'application/json' },
+			callback : onChangePasswordResult
+		});
 	}
-
-	ajax.post({
-		url : baseURL + 'api/profile/changepass',
-		data : JSON.stringify({ 'current' : oldpwd.value, 'new' : newpwd.value }),
-		headers : { 'Content-Type' : 'application/json' },
-		callback : onChangePasswordResult
-	});
 
 	return false;
 }
@@ -181,6 +185,24 @@ function showChangePasswordPopup()
 
 		cpPopup.setControls({ okBtn : { onclick : onChangePassSubmit.bind(null, frm) },
 								closeBtn : true });
+		
+		var oldpwd = ge('oldpwd');
+		if (oldpwd)
+		{
+			oldpwd.addEventListener('input', function()
+			{
+				clearBlockValidation('old-pwd-inp-block');
+			});
+		}
+
+		var newpwd = ge('newpwd');
+		if (newpwd)
+		{
+			newpwd.addEventListener('input', function()
+			{
+				clearBlockValidation('new-pwd-inp-block');
+			});
+		}
 	}
 
 	cpPopup.show();
@@ -238,30 +260,27 @@ function onChangeNameResult(response)
 // Change name submit event handler
 function onChangeNameSubmit(frm)
 {
-	var newname;
-
-	newname = ge('newname');
+	var newname = ge('newname');
 	if (!frm || !newname)
 		return false;
 
-	if (!newname.value || newname.value.length < 1)
+	var valid = true;
+
+	if (!newname.value || newname.value.length < 1 || newname.value == p_name)
 	{
-		alert('Please type new name.');
-		return false;
+		invalidateBlock('name-inp-block');
+		valid = false;
 	}
 
-	if (newname.value == p_name)
+	if (valid)
 	{
-		alert('New name must be different from the old.');
-		return false;
+		ajax.post({
+			url : baseURL + 'api/profile/changename',
+			data : JSON.stringify({ 'name' : newname.value }),
+			headers : { 'Content-Type' : 'application/json' },
+			callback : onChangeNameResult
+		});
 	}
-
-	ajax.post({
-		url : baseURL + 'api/profile/changename',
-		data : JSON.stringify({ 'name' : newname.value }),
-		headers : { 'Content-Type' : 'application/json' },
-		callback : onChangeNameResult
-	});
 
 	return false;
 }
@@ -388,10 +407,35 @@ function initStatWidget()
 }
 
 
+function onInputLogin()
+{
+	clearBlockValidation('login-inp-block');
+}
+
+
+function onInputPassword()
+{
+	clearBlockValidation('pwd-inp-block');
+}
+
+
+function onInputName()
+{
+	clearBlockValidation('name-inp-block');
+}
+
+
 function initLoginPage()
 {
-	var loginfrm = ge('loginfrm');
+	var loginInp = ge('login');
+	if (loginInp)
+		loginInp.addEventListener('input', onInputLogin);
 
+	var pwdInp = ge('password');
+	if (pwdInp)
+		pwdInp.addEventListener('input', onInputPassword);
+
+	var loginfrm = ge('loginfrm');
 	if (loginfrm)
 		loginfrm.onsubmit = onLoginSubmit.bind(null, loginfrm);
 }
@@ -399,8 +443,19 @@ function initLoginPage()
 
 function initRegisterPage()
 {
-	var regfrm = ge('regfrm');
+	var loginInp = ge('login');
+	if (loginInp)
+		loginInp.addEventListener('input', onInputLogin);
 
+	var pwdInp = ge('password');
+	if (pwdInp)
+		pwdInp.addEventListener('input', onInputPassword);
+
+	var nameInp = ge('name');
+	if (nameInp)
+		nameInp.addEventListener('input', onInputName);
+
+	var regfrm = ge('regfrm');
 	if (regfrm)
 		regfrm.onsubmit = onRegisterSubmit.bind(null, regfrm);
 }

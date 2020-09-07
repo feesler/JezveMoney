@@ -24,6 +24,7 @@ function DropDown(params)
 	this.actItem = null;
 	this.actSelItem = null;
 	this.blockScroll = false;
+	this.focusedElem = null;
 
 	if (!params)
 		throw new Error('Inval id parameters');
@@ -379,6 +380,8 @@ DropDown.prototype.onFocus = function(e)
 		}
 	}
 
+	this.focusedElem = e.target;
+
 	return true;
 };
 
@@ -399,6 +402,8 @@ DropDown.prototype.onBlur = function(e)
 	{
 		e.target.classList.remove('dd__selection-item_active');
 	}
+
+	this.focusedElem = null;
 
 	return true;
 };
@@ -449,6 +454,10 @@ DropDown.prototype.onDeleteSelectedItem = function(e)
 	if (item)
 		this.deselectItem(item.id);
 
+	this.sendItemSelectEvent();
+	this.changed = true;
+	this.sendChangeEvent();
+
 	return true;
 };
 
@@ -467,7 +476,7 @@ DropDown.prototype.onKey = function(e)
 {
 	var newItem = null;
 	var selectedItems = null;
-	var visibleItems = null;
+	var availItems = null;
 
 	if ((this.editable && e.target == this.inputElem) ||
 		(!this.editable && e.target == this.toggleBtn))
@@ -581,39 +590,39 @@ DropDown.prototype.onKey = function(e)
 	}
 	else if (e.code == 'ArrowDown')
 	{
-		visibleItems = this.getVisibleItems();
+		availItems = this.getAvailableItems();
 
 		if (!this.visible && !this.actItem)
 		{
 			this.show(true);
-			newItem = visibleItems[0];
+			newItem = availItems[0];
 		}
 		else if (this.visible)
 		{
 			if (this.actItem)
-				newItem = this.getNextVisibleItem(this.actItem.id);
+				newItem = this.getNextAvailableItem(this.actItem.id);
 			else
-				newItem = visibleItems[0];
+				newItem = availItems[0];
 		}
 	}
 	else if (e.code == 'ArrowUp')
 	{
 		if (this.visible && this.actItem)
 		{
-			newItem = this.getPrevVisibleItem(this.actItem.id);
+			newItem = this.getPrevAvailableItem(this.actItem.id);
 		}
 	}
 	else if (e.code == 'Home')
 	{
-		visibleItems = this.getVisibleItems();
-		if (visibleItems.length > 0)
-			newItem = visibleItems[0];
+		availItems = this.getAvailableItems();
+		if (availItems.length > 0)
+			newItem = availItems[0];
 	}
 	else if (e.code == 'End')
 	{
-		visibleItems = this.getVisibleItems();
-		if (visibleItems.length > 0)
-			newItem = visibleItems[visibleItems.length - 1];
+		availItems = this.getAvailableItems();
+		if (availItems.length > 0)
+			newItem = availItems[availItems.length - 1];
 	}
 	else if (e.code == 'Enter')
 	{
@@ -631,7 +640,8 @@ DropDown.prototype.onKey = function(e)
 	else if (e.code == 'Escape')
 	{
 		this.show(false);
-		this.inputElem.blur();
+		if (this.focusedElem)
+			this.focusedElem.blur();
 		return true;
 	}
 	else
@@ -735,16 +745,26 @@ DropDown.prototype.getVisibleItems = function()
 };
 
 
-// Return previous visible list item to specified by id
+// Return array of visible and enabled list items
+DropDown.prototype.getAvailableItems = function()
+{
+	return this.items.filter(function(item)
+	{
+		return !item.hidden && !item.hidden;
+	});
+};
+
+
+// Return list item available to select prior to specified item
 // Return null in case specified list item is not found or on first position
-DropDown.prototype.getPrevVisibleItem = function(item_id)
+DropDown.prototype.getPrevAvailableItem = function(item_id)
 {
 	var item = this.getItem(item_id);
 
 	while(item)
 	{
 		item = this.getPrevItem(item.id);
-		if (item && !item.hidden)
+		if (item && !item.hidden && !item.disabled)
 			return item;
 	}
 
@@ -752,16 +772,16 @@ DropDown.prototype.getPrevVisibleItem = function(item_id)
 };
 
 
-// Return next visible list item to specified by id
+// Return list item available to select next to specified item
 // Return null in case specified list item is not found or on last position
-DropDown.prototype.getNextVisibleItem = function(item_id)
+DropDown.prototype.getNextAvailableItem = function(item_id)
 {
 	var item = this.getItem(item_id);
 
 	while(item)
 	{
 		item = this.getNextItem(item.id);
-		if (item && !item.hidden)
+		if (item && !item.hidden && !item.disabled)
 			return item;
 	}
 
@@ -1421,6 +1441,9 @@ DropDown.prototype.parseSelect = function(elem)
 				this.check(item.id, true);
 			}
 		}
+
+		if (option.disabled)
+			this.enableItem(item, false);
 	}
 
 	this.saveResult();
@@ -1449,7 +1472,7 @@ DropDown.prototype.append = function(items)
 DropDown.prototype.addOption = function(target, item_id, title)
 {
 	if (!target || target.tagName != 'SELECT')
-		return;
+		return null;
 
 	var option = ce('option', { value : item_id, innerHTML : title });
 	target.appendChild(option);
@@ -1460,15 +1483,16 @@ DropDown.prototype.addOption = function(target, item_id, title)
 
 DropDown.prototype.addItem = function(item_id, str, appendToSelect)
 {
+	if (!item_id || !this.list || !this.listElem)
+		return null;
+
 	var item = {
 		id : item_id,
 		title : str,
 		selected : false,
-		hidden : false
+		hidden : false,
+		disabled : false
 	};
-
-	if (!item.id || !this.list || !this.listElem)
-		return null;
 
 	if (typeof appendToSelect === 'undefined')
 		appendToSelect = true;
@@ -1532,6 +1556,38 @@ DropDown.prototype.setActive = function(item)
 
 	if (this.editable)
 		this.inputElem.focus();
+};
+
+
+DropDown.prototype.enableItem = function(item, val)
+{
+	if (!item || item.disabled == !val)
+		return;
+
+	// flush current active item
+	if (this.actItem == item)
+	{
+		this.actItem.divElem.classList.remove('dd__list-item_active');
+		this.actItem = null;
+	}
+
+	item.disabled = !val;
+	if (item.disabled)
+	{
+		this.deselectItem(item.id);
+
+		item.elem.setAttribute('disabled', true);
+		item.optionElem.setAttribute('disabled', true);
+		if (item.resOptionElem)
+			item.resOptionElem.setAttribute('disabled', true);
+	}
+	else
+	{
+		item.elem.removeAttribute('disabled');
+		item.optionElem.removeAttribute('disabled');
+		if (item.resOptionElem)
+			item.resOptionElem.removeAttribute('disabled');
+	}
 };
 
 

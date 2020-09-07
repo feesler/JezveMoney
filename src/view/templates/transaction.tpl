@@ -19,12 +19,16 @@
 						<input name="id" type="hidden" value="<?=e($tr["id"])?>">
 <?php	}	?>
 						<input name="type" type="hidden" value="<?=e($tr["type"])?>">
-						<div id="trtype_menu" class="subHeader">
+						<div class="trtype-menu">
 <?php	forEach($transMenu as $menuItem) {
-			if ($menuItem->ind == $tr["type"]) {		?>
-							<span><b><?=e($menuItem->title)?></b></span>
+			if ($menuItem->selected) {		?>
+							<span class="trtype-menu_item trtype-menu_selected-item" data-type="<?=e($menuItem->type)?>">
+								<span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
+							</span>
 <?php		} else {		?>
-							<span><a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a></span>
+							<span class="trtype-menu_item" data-type="<?=e($menuItem->type)?>">
+								<a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+							</span>
 <?php		}
 		}	?>
 						</div>
@@ -237,9 +241,9 @@
 						</div>
 <?php	}	?>
 <?php	if ($showSrcAmount) {		?>
-						<div id="src_amount_row" class="non_float">
+						<div id="src_amount_row" class="validation-block non_float">
 <?php	} else {	?>
-						<div id="src_amount_row" class="non_float" style="display: none;">
+						<div id="src_amount_row" class="validation-block non_float" style="display: none;">
 <?php	}	?>
 							<div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
 							<div>
@@ -260,13 +264,14 @@
 									<input id="src_amount" name="src_amount" class="summ_text" type="text" value="">
 <?php	}	?>
 								</div>
+								<div class="invalid-feedback">Please input correct amount.</div>
 							</div>
 						</div>
 
 <?php	if ($showDestAmount) {		?>
-						<div id="dest_amount_row" class="non_float">
+						<div id="dest_amount_row" class="validation-block non_float">
 <?php	} else {	?>
-						<div id="dest_amount_row" class="non_float" style="display: none;">
+						<div id="dest_amount_row" class="validation-block non_float" style="display: none;">
 <?php	}	?>
 							<div><label for="dest_amount"><?=e($destAmountLbl)?></label></div>
 							<div>
@@ -287,6 +292,7 @@
 									<input id="dest_amount" name="dest_amount" class="summ_text" type="text" value="">
 <?php	}	?>
 								</div>
+								<div class="invalid-feedback">Please input correct amount.</div>
 							</div>
 						</div>
 
@@ -333,7 +339,7 @@
 <?php	}	?>
 						<div class="non_float">
 							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
-							<div id="date_block" style="display: none;">
+							<div id="date_block" class="validation-block" style="display: none;">
 								<div><label for="date">Date</label></div>
 								<div>
 									<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><?=svgIcon("cal")?></button>
@@ -342,6 +348,7 @@
 									</div>
 									<div id="calendar"></div>
 								</div>
+								<div class="invalid-feedback">Please input correct date.</div>
 							</div>
 						</div>
 

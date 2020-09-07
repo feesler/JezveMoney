@@ -24,6 +24,6 @@ export class TileBlock extends NullableComponent
 	async selectAccount(account_id)
 	{
 		if (this.dropDown)
-			return this.dropDown.select(account_id);
+			return this.dropDown.setSelection(account_id);
 	}
 }

@@ -1,5 +1,4 @@
-import { urlJoin, formatDate, setParam } from '../common.js';
-import { DEBT } from './transaction.js'
+import { urlJoin, formatDate, copyObject } from '../common.js';
 import { App } from '../app.js';
 
 
@@ -89,37 +88,22 @@ const userReqFields = ['login', 'password', 'name'];
  */
 const currReqFields = ['name', 'sign', 'flags'];
 
-/**
- * Accounts
- */
-const accReqFields = ['name', 'initbalance', 'curr_id', 'icon', 'flags'];
-
-/**
- * Persons
- */
-const pReqFields = ['name', 'flags'];
 
 /**
  * Transactions
  */
-const trReqFields = ['type', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
 const setPosReqFields = ['id', 'pos'];
-const clTrReqFields = ['src_id', 'dest_id'];
-const debtReqFields = ['op', 'person_id', 'acc_id'];
 const filterFields = ['type', 'acc_id', 'page', 'count', 'stdate', 'enddate', 'search', 'order'];
 
 
 function prepareTransactionData(options)
 {
-	if (!options.date)
-		options.date = formatDate(new Date());
-	if (typeof options.comment === 'undefined')
-		options.comment = '';
+	let res = copyObject(options);
 
-	let res = checkFields(options, trReqFields);
-	let additionalData = checkFields(options, (res.type == DEBT) ? debtReqFields : clTrReqFields);
-
-	setParam(res, additionalData);
+	if (!('date' in res))
+		res.date = formatDate(new Date());
+	if (!('comment' in res))
+		res.comment = '';
 
 	return res;
 }
@@ -170,7 +154,7 @@ export const api = {
 
 			let apiRes = await apiPost('currency/create', postData);
 			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
-				throw new ApiRequestError('Fail to create account');
+				throw new ApiRequestError('Fail to create currency');
 
 			return apiRes.data;
 		},
@@ -391,25 +375,16 @@ export const api = {
 
 		create : async function(options)
 		{
-			let postData = checkFields(options, accReqFields);
-
-			let apiRes = await apiPost('account/create', postData);
+			let apiRes = await apiPost('account/create', options);
 			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to create account');
 
 			return apiRes.data;
 		},
 
-		update : async function(id, options)
+		update : async function(options)
 		{
-			id = parseInt(id);
-			if (!id || isNaN(id))
-				throw new ApiRequestError('Wrong id specified');
-
-			let postData = checkFields(options, accReqFields);
-			postData.id = id;
-
-			let apiRes = await apiPost('account/update', postData);
+			let apiRes = await apiPost('account/update', options);
 			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to update account');
 
@@ -476,7 +451,7 @@ export const api = {
 
 		create : async function(options)
 		{
-			let postData = checkFields(options, pReqFields);
+			let postData = copyObject(options);
 
 			let apiRes = await apiPost('person/create', postData);
 			if (!apiRes || apiRes.result != 'ok')
@@ -485,16 +460,9 @@ export const api = {
 			return apiRes.data;
 		},
 
-		update : async function(id, options)
+		update : async function(options)
 		{
-			id = parseInt(id);
-			if (!id || isNaN(id))
-				throw new ApiRequestError('Wrong id specified');
-
-			let postData = checkFields(options, pReqFields);
-			postData.id = id;
-
-			let apiRes = await apiPost('person/update', postData);
+			let apiRes = await apiPost('person/update', options);
 			if (!apiRes || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to update person');
 
@@ -505,13 +473,6 @@ export const api = {
 		{
 			if (!Array.isArray(ids))
 				ids = [ ids ];
-
-			for(let id of ids)
-			{
-				id = parseInt(id);
-				if (!id || isNaN(id))
-					throw new ApiRequestError('Wrong id specified');
-			}
 
 			let postData = { id : ids };
 
@@ -546,9 +507,7 @@ export const api = {
 
 		create : async function(options)
 		{
-			let postData = prepareTransactionData(options);
-
-			let apiRes = await apiPost('transaction/create', postData);
+			let apiRes = await apiPost('transaction/create', options);
 			if (!apiRes || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to create transaction');
 
@@ -557,16 +516,9 @@ export const api = {
 
 		createMultiple : async function(data)
 		{
-			let transactions = (Array.isArray(data)) ? data : [ data ];
+			let transactions = Array.isArray(data) ? data : [ data ];
 
-			let postData = [];
-			for(let options of transactions)
-			{
-				let itemData = prepareTransactionData(options);
-				postData.push(itemData);
-			}
-
-			let apiRes = await apiPost('transaction/createMultiple', postData);
+			let apiRes = await apiPost('transaction/createMultiple', transactions);
 			if (!apiRes || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to create transactions');
 
@@ -575,21 +527,7 @@ export const api = {
 
 		update : async function(options)
 		{
-			let id = parseInt(options.id);
-			if (!id || isNaN(id))
-			{
-				console.debug(options);
-				throw new ApiRequestError('Wrong id specified');
-			}
-
-			let postData = checkFields(options, trReqFields);
-			postData.id = id;
-
-			let addData = checkFields(options, (postData.type == DEBT) ? debtReqFields : clTrReqFields);
-
-			setParam(postData, addData);
-
-			let apiRes = await apiPost('transaction/update', postData);
+			let apiRes = await apiPost('transaction/update', options);
 			if (!apiRes || apiRes.result != 'ok')
 				throw new ApiRequestError('Fail to update transaction');
 
@@ -601,13 +539,6 @@ export const api = {
 			if (!Array.isArray(ids))
 				ids = [ ids ];
 
-			for(let id of ids)
-			{
-				id = parseInt(id);
-				if (!id || isNaN(id))
-					throw new ApiRequestError('Wrong id specified');
-			}
-
 			let postData = { id : ids };
 
 			let apiRes = await apiPost('transaction/delete', postData);
@@ -617,16 +548,11 @@ export const api = {
 			return true;
 		},
 
-		list : async function(params)
+		list : async function(params = {})
 		{
-			params = params || {};
-
-			let reqParams = { count : 0 };
-			for(let prop in params)
-			{
-				if (filterFields.includes(prop))
-					reqParams[prop] = params[prop];
-			}
+			let reqParams = copyObject(params);
+			if (!('count' in reqParams))
+				reqParams.count = 0;
 
 			let apiReq = 'transaction/list?' + urlJoin(reqParams);
 

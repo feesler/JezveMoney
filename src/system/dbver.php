@@ -4,11 +4,14 @@ class DBVersion
 {
 	use Singleton;
 
+	protected $tbl_name = "dbver";
+	protected $latestVersion = 3;
+	protected $dbClient = NULL;
+
+
 
 	protected function onStart()
 	{
-		$this->tbl_name = "dbver";
-		$this->latestVersion = 3;
 		$this->dbClient = MySqlDB::getInstance();
 
 		if (!$this->dbClient->isTableExist($this->tbl_name))
@@ -22,7 +25,8 @@ class DBVersion
 	// Create DB table if not exist
 	private function createTable()
 	{
-		wlog("CurrencyModel::createTable()");
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
 
 		$res = $this->dbClient->createTableQ($this->tbl_name,
 						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
@@ -36,6 +40,9 @@ class DBVersion
 
 	private function setVersion($version)
 	{
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
+
 		$version = intval($version);
 		if ($version < 0)
 			return FALSE;
@@ -50,6 +57,9 @@ class DBVersion
 
 	public function getCurrentVersion()
 	{
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
+
 		$qResult = $this->dbClient->selectQ("version", $this->tbl_name, "id=1");
 		if (!$qResult)
 			throw new Error("Fail to obtain DB version");
@@ -81,6 +91,9 @@ class DBVersion
 
 	private function version1()
 	{
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
+
 		$res = $this->dbClient->changeColumn("currency", "format", "flags", "INT(11) NOT NULL DEFAULT '0'");
 		if (!$res)
 			throw new Error("Fail to update currency table");
@@ -91,6 +104,9 @@ class DBVersion
 
 	private function version2()
 	{
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
+
 		$res = $this->dbClient->addColumns("accounts", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
 		if (!$res)
 			throw new Error("Fail to update accounts table");
@@ -101,6 +117,9 @@ class DBVersion
 
 	private function version3()
 	{
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
+
 		$res = $this->dbClient->addColumns("persons", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
 		if (!$res)
 			throw new Error("Fail to update persons table");

@@ -215,7 +215,7 @@
 	// Return array with only expected fields or FALSE if something goes wrong
 	function checkFields($obj, $expectedFields, $throw = FALSE)
 	{
-		if (is_null($obj) || !is_array($expectedFields))
+		if (is_null($obj) || !isset($expectedFields) || !is_array($expectedFields))
 		{
 			if ($throw)
 				throw new Error("Invalid input");

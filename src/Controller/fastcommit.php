@@ -1,21 +1,27 @@
 <?php
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 
 class FastCommitController extends TemplateController
 {
+	protected $columns = [
+		"date" => NULL,
+		"desc" => NULL,
+		"trCurr" => NULL,
+		"trAmount" => NULL,
+		"accCurr" => NULL,
+		"accAmount" => NULL,
+		"date" => NULL,
+		"date" => NULL,
+		"date" => NULL,
+	];
+
+
 	public function index()
 	{
-		if ($this->isPOST())
-		{
-			$this->commit();
-			return;
-		}
-
 		$accMod = AccountModel::getInstance();
 		$accArr = $accMod->getData();
 		$currMod = CurrencyModel::getInstance();
@@ -43,6 +49,28 @@ class FastCommitController extends TemplateController
 	private static function columnInd($str)
 	{
 		return Coordinate::columnIndexFromString($str);
+	}
+
+
+	// Set index of specified column
+	private function setColumnInd($colName, $ind)
+	{
+		if (is_empty($colName))
+			throw new Error("Invalid column name: ".$colName);
+
+		$this->columns[$colName] = self::columnStr(intval($ind));
+	}
+
+
+	// Return value from cell at specified column and row
+	private function getCellValue($sheet, $colName, $row)
+	{
+		if (!$sheet)
+			throw new Error("Invalid sheet");
+		if (!isset($this->columns[$colName]))
+			throw new Error("Invalid column ".$colName);
+
+		return $sheet->getCell($this->columns[$colName].intval($row))->getValue();
 	}
 
 
@@ -142,7 +170,7 @@ class FastCommitController extends TemplateController
 			throw new Error("Unknown file type");
 
 		$reader = IOFactory::createReader($readedType);
-		if ($readedType == "Csv")
+		if ($reader instanceof PhpOffice\PhpSpreadsheet\Reader\Csv)
 		{
 			$reader->setDelimiter(';');
 			$reader->setEnclosure('');
@@ -154,42 +182,42 @@ class FastCommitController extends TemplateController
 
 		if ($fileStatType == 1)		// debt card
 		{
-			$date_col = self::columnStr(1);
-			$desc_col = self::columnStr(3);
-			$trCurr_col = self::columnStr(7);
-			$trAmount_col = self::columnStr(8);
-			$accCurr_col = self::columnStr(9);
-			$accAmount_col = self::columnStr(10);
+			$this->setColumnInd("date", 1);
+			$this->setColumnInd("desc", 3);
+			$this->setColumnInd("trCurr", 7);
+			$this->setColumnInd("trAmount", 8);
+			$this->setColumnInd("accCurr", 9);
+			$this->setColumnInd("accAmount", 10);
 		}
 		else if ($fileStatType == 2)		// credit card
 		{
-			$date_col = self::columnStr(1);
-			$desc_col = self::columnStr(4);
-			$trCurr_col = self::columnStr(8);
-			$trAmount_col = self::columnStr(9);
-			$accCurr_col = self::columnStr(10);
-			$accAmount_col = self::columnStr(11);
+			$this->setColumnInd("date", 1);
+			$this->setColumnInd("desc", 4);
+			$this->setColumnInd("trCurr", 8);
+			$this->setColumnInd("trAmount", 9);
+			$this->setColumnInd("accCurr", 10);
+			$this->setColumnInd("accAmount", 11);
 		}
 		else if ($fileStatType == 0)	// account statement
 		{
-			$date_col = self::columnStr(1);
-			$desc_col = self::columnStr(2);
-			$trCurr_col = self::columnStr(3);
-			$trAmount_col = self::columnStr(4);
-			$accCurr_col = self::columnStr(5);
-			$accAmount_col = self::columnStr(6);
+			$this->setColumnInd("date", 1);
+			$this->setColumnInd("desc", 2);
+			$this->setColumnInd("trCurr", 3);
+			$this->setColumnInd("trAmount", 4);
+			$this->setColumnInd("accCurr", 5);
+			$this->setColumnInd("accAmount", 6);
 		}
 		$row_ind = 2;
 
 		$data = [];
 		do
 		{
-			$descVal = $src->getCell($desc_col.$row_ind)->getValue();
+			$descVal = $this->getCellValue($src, "desc", $row_ind);
 			$edesc = trim($descVal);
 
 			$dataObj = new stdClass;
 
-			$dateVal = $src->getCell($date_col.$row_ind)->getValue();
+			$dateVal = $this->getCellValue($src, "date", $row_ind);
 			if (is_empty($dateVal))
 				break;
 
@@ -205,10 +233,10 @@ class FastCommitController extends TemplateController
 
 			$dataObj->date = date("d.m.Y", $dateFmt);
 
-			$dataObj->trCurrVal = $src->getCell($trCurr_col.$row_ind)->getValue();
-			$dataObj->trAmountVal = self::floatFix($src->getCell($trAmount_col.$row_ind)->getValue());
-			$dataObj->accCurrVal = $src->getCell($accCurr_col.$row_ind)->getValue();
-			$dataObj->accAmountVal = self::floatFix($src->getCell($accAmount_col.$row_ind)->getValue());
+			$dataObj->trCurrVal = $this->getCellValue($src, "trCurr", $row_ind);
+			$dataObj->trAmountVal = self::floatFix($this->getCellValue($src, "trAmount", $row_ind));
+			$dataObj->accCurrVal = $this->getCellValue($src, "accCurr", $row_ind);
+			$dataObj->accAmountVal = self::floatFix($this->getCellValue($src, "accAmount", $row_ind));
 			$dataObj->descr = $edesc;
 
 			$data[] = $dataObj;

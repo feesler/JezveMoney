@@ -13,14 +13,21 @@
 					</div>
 
 					<div class="clearfix">
-						<div id="trtype_menu" class="subHeader">
-<?php	forEach($transMenu as $menuItem) {
-			if ($menuItem->ind == $trParams["type"]) {		?>
-							<span><b><?=e($menuItem->title)?></b></span>
+						<div class="trtype-menu trtype-menu-multi">
+<?php	foreach($transMenu as $menuItem) {
+			if ($menuItem->selected) {		?>
+							<span class="trtype-menu_item trtype-menu_selected-item" data-type="<?=e($menuItem->type)?>">
 <?php		} else {		?>
-							<span><a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a></span>
+							<span class="trtype-menu_item" data-type="<?=e($menuItem->type)?>">
 <?php		}
-		}	?>
+			if ($menuItem->type != 0) {		?>
+								<span class="trtype-menu_item-check"><?=svgIcon("check")?></span>
+<?php		}				?>
+								<span class="trtype-menu_item_title">
+									<a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+								</span>
+							</span>
+<?php	}			?>
 						</div>
 
 						<div class="std_margin clearfix">

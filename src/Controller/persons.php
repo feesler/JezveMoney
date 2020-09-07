@@ -38,6 +38,7 @@ class PersonsController extends TemplateController
 
 		$action = "new";
 
+		$p_id = 0;
 		$pInfo = new stdClass;
 		$pInfo->name = "";
 		$pInfo->flags = 0;
@@ -48,7 +49,7 @@ class PersonsController extends TemplateController
 
 		array_push($this->css->libs, "iconlink.css", "tiles.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "persons.js");
+		array_push($this->jsArr, "selection.js", "persons.js");
 
 		include(TPL_PATH."person.tpl");
 	}
@@ -118,7 +119,7 @@ class PersonsController extends TemplateController
 
 		$reqData = checkFields($_POST, $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (!$this->personMod->update($_POST["id"], $reqData))
 			$this->fail($defMsg);

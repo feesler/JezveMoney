@@ -20,7 +20,14 @@ export class PersonView extends TestView
 		if (!res.formElem)
 			throw new Error('Form element not found');
 
-		res.isUpdate = (!!await this.query('#pid'));
+		let personIdInp = await this.query('#pid');
+		res.isUpdate = !!personIdInp;
+		if (res.isUpdate)
+		{
+			res.id = parseInt(await this.prop(personIdInp, 'value'));
+			if (!res.id)
+				throw new Error('Wrong account id');
+		}
 
 		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 
@@ -28,13 +35,57 @@ export class PersonView extends TestView
 		if (!res.name)
 			throw new Error('Person name input not found');
 
+		res.flagsInp = await this.query('#flags');
+		res.flags = parseInt(await this.prop(res.flagsInp, 'value'));
+
 		res.submitBtn = await this.query('.acc_controls .ok_btn');
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
 
+		res.cancelBtn = await this.query('.acc_controls .cancel_btn');
+		if (!res.cancelBtn)
+			throw new Error('Cancel button not found');
+
 		res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
 
 		return res;
+	}
+
+
+	async buildModel(cont)
+	{
+		let res = {};
+
+		res.isUpdate = cont.isUpdate;
+		if (res.isUpdate)
+			res.id = cont.id;
+
+		// Name
+		res.name = cont.name.value;
+
+		res.flags = cont.flags;
+
+		return res;
+	}
+
+
+	getExpectedPerson()
+	{
+		let res = {
+			name : this.model.name,
+			flags : this.model.flags
+		};
+
+		if (this.model.isUpdate)
+			res.id = this.model.id;
+
+		return res;
+	}
+
+
+	isValid()
+	{
+		return (this.model.name && this.model.name.length > 0);
 	}
 
 
@@ -67,12 +118,20 @@ export class PersonView extends TestView
 	}
 
 
-	// Input name, submit and return navigation promise
-	async createPerson(personName)
+	async submit()
 	{
-		await this.inputName(personName);
+		let action = () => this.click(this.content.submitBtn);
 
-		return this.navigation(() => this.click(this.content.submitBtn));
+		if (this.isValid())
+			await this.navigation(action);
+		else
+			await this.performAction(action);
+	}
+
+
+	async cancel()
+	{
+		await this.navigation(() => this.click(this.content.cancelBtn));
 	}
 }
 

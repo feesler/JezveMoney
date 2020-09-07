@@ -17,7 +17,7 @@ export async function create(params)
 {
 	let transaction_id = 0;
 
-	await test(`Create ${Transaction.typeToStr(params.type)} transaction`, async () =>
+	await test(`Create ${Transaction.typeToString(params.type)} transaction`, async () =>
 	{
 		let resExpected = App.state.createTransaction(params);
 
@@ -169,7 +169,7 @@ export async function filter(params)
 		if ('order' in params)
 			reqParams.order = params.order;
 		if ('type' in params)
-			reqParams.type = Transaction.typeToStr(params.type);
+			reqParams.type = params.type
 		if ('accounts' in params)
 			reqParams.acc_id = params.accounts;
 		if ('startDate' in params && 'endDate' in params)

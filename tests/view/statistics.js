@@ -15,7 +15,7 @@ export class StatisticsView extends TestView
 		if (!res.titleEl)
 			throw new Error('Wrong statistics view structure');
 
-		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('#trtype_menu'));
+		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
 		res.title = await this.prop(res.titleEl, 'innerText');
 
 		let filtersList = await this.queryAll('.tr_filter.filter_sel');
@@ -56,22 +56,22 @@ export class StatisticsView extends TestView
 
 	async filterByType(type)
 	{
-		if (this.content.typeMenu.activeType == type || !this.content.typeMenu.items[type])
+		if (this.content.typeMenu.isSingleSelected(type))
 			return;
 
-		return this.navigation(() => this.content.typeMenu.items[type].click());
+		return this.navigation(() => this.content.typeMenu.select(type));
 	}
 
 
 	async byAccounts()
 	{
-		return this.navigation(() => this.content.filterByDropDown.select(0));
+		return this.navigation(() => this.content.filterByDropDown.setSelection(0));
 	}
 
 
 	async byCurrencies()
 	{
-		return this.navigation(() => this.content.filterByDropDown.select(1));
+		return this.navigation(() => this.content.filterByDropDown.setSelection(1));
 	}
 
 
@@ -80,7 +80,7 @@ export class StatisticsView extends TestView
 		if (!this.content.accountsDropDown)
 			throw new Error('Account drop down control not found');
 
-		return this.navigation(() => this.content.accountsDropDown.select(acc_id));
+		return this.navigation(() => this.content.accountsDropDown.setSelection(acc_id));
 	}
 
 
@@ -95,7 +95,7 @@ export class StatisticsView extends TestView
 
 	async selectCurrency(curr_id)
 	{
-		return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.select(1));
+		return this.navigation(() => this.content.currencyDropDown && this.content.currencyDropDown.setSelection(curr_id));
 	}
 
 
@@ -108,7 +108,7 @@ export class StatisticsView extends TestView
 
 	async groupBy(group)
 	{
-		return this.navigation(() => this.content.groupDropDown.select(group));
+		return this.navigation(() => this.content.groupDropDown.setSelection(group));
 	}
 
 

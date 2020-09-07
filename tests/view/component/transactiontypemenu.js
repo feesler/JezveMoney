@@ -9,26 +9,34 @@ class MenuItem extends Component
 		if (!this.elem)
 			throw new Error('Wrong structure of menu item');
 
-		this.text = await this.prop(this.elem, 'innerText');
-		this.type = Transaction.strToType(this.text);
+		let type_id = await this.prop(this.elem, 'dataset.type');
+		this.type = parseInt(type_id);
+		if (isNaN(this.type))
+			throw new Error(`Invalid transaction type ${type_id}`);
 
-		let tagName = await this.prop(this.elem, 'tagName');
-		if (tagName == 'B')
-		{
-			this.isActive = true;
-		}
-		else if (tagName == 'A')
-		{
-			this.link = await this.prop(this.elem, 'href');
-			this.isActive = false;
-		}
+		this.titleElem = await this.query(this.elem, '.trtype-menu_item_title');
+		this.text = await this.prop(this.titleElem, 'innerText');
+
+		this.isActive = await this.hasClass(this.elem, 'trtype-menu_selected-item');
+
+		this.checkElem = await this.query(this.elem, '.trtype-menu_item-check');
+		this.linkElem = await this.query(this.elem, 'a');
+		this.link = await this.prop(this.linkElem, 'href');
+	}
+
+
+	async toggle()
+	{
+		if (!this.checkElem)
+			throw new Error('Check not available');
+
+		return this.environment.click(this.checkElem);
 	}
 
 
 	async click()
 	{
-		if (!this.isActive)
-			return this.environment.click(this.elem);
+		return this.environment.click(this.linkElem);
 	}
 }
 
@@ -38,26 +46,65 @@ export class TransactionTypeMenu extends Component
 	async parse()
 	{
 		this.items = [];
-		this.activeType = null;
+		this.selectedTypes = [];
 
-		let menuItems = await this.queryAll(this.elem, 'span > *');
+		this.multi = await this.hasClass(this.elem, 'trtype-menu-multi');
+
+		let menuItems = await this.queryAll(this.elem, '.trtype-menu_item');
 		for(let item of menuItems)
 		{
 			let menuItemObj = await MenuItem.create(this.parent, item);
 
 			if (menuItemObj.isActive)
-				this.activeType = menuItemObj.type;
+				this.selectedTypes.push(menuItemObj.type);
 
 			this.items[menuItemObj.type] = menuItemObj;
 		}
 	}
 
 
+	isSameSelected(type)
+	{
+		let data = Array.isArray(type) ? type : [ type ];
+
+		if (this.selectedTypes.length != data.length)
+			return false;
+
+		if (data.some(item => !this.selectedTypes.includes(item)))
+			return false;
+		if (this.selectedTypes.some(item => !data.includes(item)))
+			return false;
+
+		return true;
+	}
+
+
+	isSingleSelected(type)
+	{
+		return this.selectedTypes.length == 1 && this.selectedTypes[0] == type;
+	}
+
+
+	getSelectedTypes()
+	{
+		return this.selectedTypes;
+	}
+
+
 	async select(type)
 	{
-		if (this.activeType == type || !this.items[type])
-			return;
+		if (!this.items[type])
+			throw new Error(`MenuItem of type '${type}' not found`);
 
 		return this.items[type].click();
+	}
+
+
+	async toggle(type)
+	{
+		if (!this.items[type])
+			throw new Error(`MenuItem of type '${type}' not found`);
+
+		return this.items[type].toggle();
 	}
 }

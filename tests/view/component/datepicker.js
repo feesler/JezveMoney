@@ -4,8 +4,6 @@ import { copyObject, isDate } from '../../common.js';
 const shortMonthTitles = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const monthTitles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
-const actionDelay = 600;
-
 
 export class DatePicker extends NullableComponent
 {

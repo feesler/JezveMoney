@@ -69,7 +69,7 @@ class ProfileController extends TemplateController
 
 	public function changePass()
 	{
-		$requiredFileds = [ "current", "new" ];
+		$requiredFields = [ "current", "new" ];
 
 		if (!$this->isPOST())
 			setLocation(BASEURL."profile/");

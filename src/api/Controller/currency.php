@@ -3,6 +3,7 @@
 class CurrencyApiController extends ApiController
 {
 	protected $requiredFields = [ "name", "sign", "flags" ];
+	protected $model = NULL;
 
 
 	public function initAPI()

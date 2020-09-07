@@ -6,7 +6,7 @@
 <?php	include(ADMIN_TPL_PATH."header.tpl");	?>
 		<div class="container">
 			<div class="content">
-				<div class="content_wrap tests_content">
+				<div class="admin_cont_wrap tests-content">
 					<div class="results">
 						<div class="controls">
 							<input id="startbtn" class="adm_act_btn" type="button" value="start">
@@ -18,11 +18,11 @@
 									<td id="durationRes" class="duration"></td>
 								</tr>
 							</table>
+							<input id="toggleresbtn" class="adm_act_btn toggle-res-btn" type="button" value="Show">
 						</div>
-						<div class="tbl_container"><table><tbody id="restbl"></tbody></table></div>
+						<div class="results-container"><table><tbody id="restbl"></tbody></table></div>
 					</div>
-					<div class="ph"></div>
-					<div class="testview"><iframe id="viewframe" src="<?=BASEURL?>"></iframe></div>
+					<div class="test-view"><iframe id="viewframe" src="<?=BASEURL?>"></iframe></div>
 				</div>
 			</div>
 		</div>

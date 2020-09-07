@@ -13,6 +13,6 @@ export const  config =
 
 	transactionsOnPage : 10,
 	latestTransactions : 5,
-	testsExpected : 733
+	testsExpected : 849
 };
 

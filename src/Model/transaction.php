@@ -7,13 +7,21 @@ class TransactionModel extends CachedTable
 
 	static private $user_id = 0;
 	static private $owner_id = 0;
-	static private $typeStrArr = [0 => "all", EXPENSE => "expense", INCOME => "income", TRANSFER => "transfer", DEBT => "debt"];
+	static private $typeNames = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
 	static private $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 	static private $srcAvailTypes = [ EXPENSE, TRANSFER, DEBT ];
 	static private $srcMandatoryTypes = [ EXPENSE, TRANSFER ];
 
 	static private $destAvailTypes = [ INCOME, TRANSFER, DEBT ];
 	static private $destMandatoryTypes = [ INCOME, TRANSFER ];
+
+	protected $accModel = NULL;
+	protected $currMod = NULL;
+	protected $affectedTransactions = NULL;
+	protected $balanceChanges = NULL;
+	protected $latestPos = NULL;
+	protected $removedItems = NULL;
+	protected $originalTrans = NULL;
 
 
 	protected function onStart()
@@ -255,7 +263,7 @@ class TransactionModel extends CachedTable
 		$updResult = $this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions);
 		wlog(" update result: ".$updResult);
 
-		unset($this->affectedTransactions);
+		$this->affectedTransactions = NULL;
 
 		$this->cleanCache();
 
@@ -268,7 +276,7 @@ class TransactionModel extends CachedTable
 		if (!$item || !$item->id)
 			return NULL;
 
-		if (!isset($this->affectedTransactions)
+		if (is_null($this->affectedTransactions)
 			|| !is_array($this->affectedTransactions)
 			|| !isset($this->affectedTransactions[$item->id]))
 			return $item;
@@ -282,7 +290,7 @@ class TransactionModel extends CachedTable
 		if (!$item || !$item->id)
 			return FALSE;
 
-		if (!isset($this->affectedTransactions))
+		if (is_null($this->affectedTransactions))
 			$this->affectedTransactions = [];
 
 		$this->affectedTransactions[$item->id] = $item;
@@ -315,7 +323,7 @@ class TransactionModel extends CachedTable
 
 		$uMod = UserModel::getInstance();
 
-		if (!isset($this->balanceChanges))
+		if (is_null($this->balanceChanges))
 			$this->balanceChanges = [];
 
 		$this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
@@ -334,7 +342,7 @@ class TransactionModel extends CachedTable
 		{
 			if ($isMultiple)
 			{
-				if (!isset($this->latestPos))
+				if (is_null($this->latestPos))
 					$this->latestPos = $this->getLatestPos();
 				$res["pos"] = (++$this->latestPos);
 			}
@@ -363,8 +371,8 @@ class TransactionModel extends CachedTable
 
 		// Commit balance changes for affected accounts
 		$this->accModel->updateBalances($this->balanceChanges);
-		unset($this->balanceChanges);
-		unset($this->latestPos);
+		$this->balanceChanges = NULL;
+		$this->latestPos = NULL;
 
 		foreach($items as $item_id)
 		{
@@ -386,10 +394,10 @@ class TransactionModel extends CachedTable
 
 	protected function getAffectedAccount($account_id)
 	{
-		if (isset($this->balanceChanges) && isset($this->balanceChanges[$account_id]))
+		if (is_array($this->balanceChanges) && isset($this->balanceChanges[$account_id]))
 			return $this->balanceChanges[$account_id];
 		else
-			return $this->accModel->getItem($account_id);;
+			return $this->accModel->getItem($account_id);
 	}
 
 
@@ -522,7 +530,7 @@ class TransactionModel extends CachedTable
 
 		// Commit balance changes for affected accounts
 		$this->accModel->updateBalances($this->balanceChanges);
-		unset($this->balanceChanges);
+		$this->balanceChanges = NULL;
 
 		// update position of transaction if target date is not today
 		if ($trObj->pos === 0)
@@ -541,7 +549,7 @@ class TransactionModel extends CachedTable
 		{
 			$this->updateResults([ $this->originalTrans->src_id, $this->originalTrans->dest_id ], $trObj->pos);
 		}
-		unset($this->originalTrans);
+		$this->originalTrans = NULL;
 
 		$this->commitAffected();
 	}
@@ -797,13 +805,13 @@ class TransactionModel extends CachedTable
 	{
 		// Commit balance changes for affected accounts
 		$this->accModel->updateBalances($this->balanceChanges);
-		unset($this->balanceChanges);
+		$this->balanceChanges = NULL;
 
 		foreach($this->removedItems as $trObj)
 		{
 			$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $trObj->pos + 1);
 		}
-		unset($this->removedItems);
+		$this->removedItems = NULL;
 
 		$this->commitAffected();
 
@@ -1012,9 +1020,20 @@ class TransactionModel extends CachedTable
 	{
 		$setCond = inSetCondition($accounts);
 		if (is_null($setCond))
-			return "";
+			return NULL;
 
 		return orJoin([ "src_id".$setCond, "dest_id".$setCond ]);
+	}
+
+
+	// Return condition string for list of types
+	private function getTypeCondition($types = NULL)
+	{
+		$setCond = inSetCondition($types);
+		if (is_null($setCond))
+			return NULL;
+
+		return "type".$setCond;
 	}
 
 
@@ -1056,12 +1075,15 @@ class TransactionModel extends CachedTable
 		$condArr = [ "user_id=".self::$user_id ];
 
 		// Transaction type condition
-		$tr_type = isset($params["type"]) ? intval($params["type"]) : 0;
-		if ($tr_type != 0)
-			$condArr[] = "type=".$tr_type;
+		if (isset($params["type"]))
+		{
+			$typeCond = $this->getTypeCondition($params["type"]);
+			if (!is_empty($typeCond))
+				$condArr[] = $typeCond;
+		}
 
 		// Accounts filter condition
-		if (isset($params["accounts"]) && !is_null($params["accounts"]))
+		if (isset($params["accounts"]))
 		{
 			$accCond = $this->getAccCondition($params["accounts"]);
 			if (!is_empty($accCond))
@@ -1138,9 +1160,13 @@ class TransactionModel extends CachedTable
 		if (is_null($params))
 			$params = [];
 
-		$tr_type = isset($params["type"]) ?  intval($params["type"]) : 0;
-		if ($tr_type != 0)
-			$condArr[] = "type=".$tr_type;
+		// Transaction type condition
+		if (isset($params["type"]))
+		{
+			$typeCond = $this->getTypeCondition($params["type"]);
+			if (!is_empty($typeCond))
+				$condArr[] = $typeCond;
+		}
 
 		if (isset($params["accounts"]) && !is_null($params["accounts"]))
 		{
@@ -1330,48 +1356,6 @@ class TransactionModel extends CachedTable
 	}
 
 
-	// Return link to page with specified params
-	// Convert App filter to GET
-	public function getPageLink($params = NULL)
-	{
-		if (is_null($params))
-			$params = [];
-
-		$linkParams = [];
-
-		// Convert type to string
-		if (isset($params["type"]))
-			$linkParams["type"] = $this->typeToString($params["type"]);
-		// Page number
-		if (isset($params["page"]))
-		{
-			$pNum = intval($params["page"]);
-			if ($pNum > 1)
-				$linkParams["page"] = $pNum;
-		}
-		// Convert accounts list filter
-		if (is_array($params["accounts"]) && count($params["accounts"]) > 0)
-			$linkParams["acc_id"] = implode(",", $params["accounts"]);
-		// Set list view mode
-		if (isset($params["details"]) && $params["details"] == TRUE)
-			$linkParams["mode"] = "details";
-		// Copy search string if not empty
-		if (isset($params["search"]) && !is_empty($params["search"]))
-			$linkParams["search"] = $params["search"];
-		// Copy date range parameters if exists
-		if (isset($params["startDate"]) && !is_empty($params["startDate"]) &&
-			isset($params["endDate"]) && !is_empty($params["endDate"]))
-		{
-			$linkParams["stdate"] = $startDate;
-			$linkParams["enddate"] = $endDate;
-		}
-
-		$linkStr = urlJoin(BASEURL."transactions/", $linkParams);
-
-		return $linkStr;
-	}
-
-
 	// Build paginator for specified condition:
 	// 		page_num - zero based index of current page
 	// 		pages_count - total count of pages available
@@ -1455,9 +1439,10 @@ class TransactionModel extends CachedTable
 		$res["acc"] = $accStr;
 
 		// Build amount string
+		$src_owner_id = 0;
+		$dest_owner_id = 0;
 		if ($transaction->type == DEBT)
 		{
-			$src_owner_id = $dest_owner_id = 0;
 			if ($transaction->src_id != 0)
 			{
 				$accObj = $this->accModel->getItem($transaction->src_id);
@@ -1524,22 +1509,33 @@ class TransactionModel extends CachedTable
 
 
 	// Return string for specified transaction type
-	public static function getStringType($trans_type)
+	public static function stringToType($trans_type)
 	{
-		$keys = array_keys(self::$typeStrArr, $trans_type);
-		if (!count($keys))
-			return 0;
+		$reqType = strtolower($trans_type);
+		foreach(self::$typeNames as $type_id => $typeName)
+		{
+			if (strtolower($typeName) == $reqType)
+				return $type_id;
+		}
 
-		return $keys[0];
+		return 0;
 	}
 
 
 	// Return string for specified transaction type
 	public static function typeToString($trans_type)
 	{
-		if (!isset(self::$typeStrArr[$trans_type]))
+		if (!isset(self::$typeNames[$trans_type]))
 			return NULL;
 
-		return self::$typeStrArr[$trans_type];
+		return self::$typeNames[$trans_type];
+	}
+
+
+	// Return array of names of available types of transactions
+	// [ type => 'name string', ... ]
+	public static function getTypeNames()
+	{
+		return self::$typeNames;
 	}
 }

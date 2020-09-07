@@ -152,7 +152,7 @@ export class TransferTransactionView extends TransactionView
 			model : { state : newState },
 			visibility : { delBtn : this.model.isUpdate, source : true, destination : true },
 			values : {
-				typeMenu : { activeType : TRANSFER },
+				typeMenu : { selectedTypes : [ TRANSFER ] },
 				source : { tile : { name : this.model.srcAccount.name, balance : this.model.srcAccount.fmtBalance } },
 				destination : { tile : { name : this.model.destAccount.name, balance : this.model.destAccount.fmtBalance } },
 				src_amount_row : { value : this.model.srcAmount.toString(), currSign : this.model.srcCurr.sign, isCurrActive : false },

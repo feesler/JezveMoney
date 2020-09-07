@@ -7,6 +7,11 @@ abstract class TemplateController extends Controller
 	protected $cssArr = NULL;
 	protected $css = NULL;
 	protected $jsArr = NULL;
+	protected $uMod = NULL;
+	protected $personMod = NULL;
+	protected $user_name = NULL;
+	protected $user_id = 0;
+	protected $owner_id = 0;
 
 
 	abstract public function index();

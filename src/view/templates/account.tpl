@@ -36,9 +36,10 @@
 								</select>
 							</div>
 						</div>
-						<div class="non_float std_margin">
+						<div id="name-inp-block" class="validation-block non_float std_margin">
 							<label for="accname">Account name</label>
 							<div class="stretch_input std_input"><input id="accname" name="name" type="text" value="<?=e($accInfo->name)?>"></div>
+							<div class="invalid-feedback">Please input name of account.</div>
 						</div>
 						<div class="non_float std_margin">
 							<label for="currency">Currency</label>
@@ -54,7 +55,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="non_float std_margin">
+						<div id="initbal-inp-block" class="validation-block non_float std_margin">
 							<label for="balance">Initial balance</label>
 							<div>
 								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=e($accInfo->sign)?></div></div></div>
@@ -62,6 +63,7 @@
 									<input class="summ_text" id="balance" name="initbalance" type="text" value="<?=e($accInfo->initbalance)?>">
 								</div>
 							</div>
+							<div class="invalid-feedback">Please input correct initial balance.</div>
 						</div>
 						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>accounts/">cancel</a></div>
 						<input id="flags" name="flags" type="hidden" value="<?=e($accInfo->flags)?>">

@@ -2,7 +2,7 @@ import { App } from '../app.js';
 import { test, formatDate, fixDate } from '../common.js';
 import { TransactionsView } from '../view/transactions.js';
 import { MainView } from '../view/main.js';
-import { Transaction } from '../model/transaction.js';
+import { availTransTypes, Transaction } from '../model/transaction.js';
 
 
 // Navigate to transactions list page
@@ -47,7 +47,12 @@ export async function filterByType(type)
 {
 	await checkNavigation();
 
-	let descr = (!type) ? 'Show all types of transactions' : `Filter by ${Transaction.typeToStr(type)}`;
+	let types = Array.isArray(type) ? type : [ type ];
+	types = types.filter(item => availTransTypes.includes(item));
+
+	const typeNames = types.map(Transaction.typeToString);
+
+	let descr = (!types.length) ? 'Show all types of transactions' : `Filter by [${typeNames.join()}]`;
 	await test(descr, () => App.view.filterByType(type));
 	await test('Correctness of transaction list', () => App.view.iteratePages());
 }

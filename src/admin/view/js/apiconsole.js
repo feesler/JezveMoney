@@ -267,33 +267,42 @@ function clearResults()
 }
 
 
-function onFormSubmit(e, verifyCallback)
+
+function getFormData(form)
 {
-	var els = {};
+	if (!form || !form.elements)
+		return null;
 
-	e = fixEvent(e);
+	var res = {};
 
-	var formEl = e.target;
-	if (!formEl || !formEl.elements)
-		return false;
-
-	var inputEl;
-	for(var i = 0; i < formEl.elements.length; i++)
+	for(var i = 0; i < form.elements.length; i++)
 	{
-		inputEl = formEl.elements[i];
-
+		var inputEl = form.elements[i];
 		if (inputEl.disabled || inputEl.name == '')
 			continue;
 
 		if ((inputEl.type == 'checkbox' || inputEl.type == 'radio') && !inputEl.checked)
 			continue;
 
-		els[inputEl.name] = inputEl.value;
+		res[inputEl.name] = inputEl.value;
 	}
+
+	return res;
+}
+
+
+function onFormSubmit(e, verifyCallback)
+{
+	e = fixEvent(e);
+
+	var formEl = e.target;
+	var frmData = getFormData(formEl);
+	if (!frmData)
+		return false;
 
 	var request = {
 		method : formEl.action,
-		data : els
+		data : frmData
 	};
 
 	if (formEl.method == 'get')
@@ -335,18 +344,11 @@ function onCheck(e)
 // Concatenate specified ids to URL base
 function parseIds(values)
 {
-	if (typeof values !== 'string' || !values)
+	if (typeof values !== 'string')
 		throw new Error('Invalid values specified');
 
 	// Check correctness of ids
-	var ids = values.split(',').map(function(item)
-	{
-		var id = parseInt(item);
-		if (!id || isNaN(id))
-			throw new Error('Wrong id specified');
-
-		return id;
-	});
+	var ids = values.split(',');
 
 	return { id : ids };
 }
@@ -549,6 +551,7 @@ function isPersonsArray(obj){ return isArrayOf(obj, isPerson); }
 function isProfile(obj)
 {
 	return verifyObject(obj, {
+			login : isString,
 			user_id : isInt,
 			owner_id : isInt,
 			name : isString,
@@ -639,6 +642,30 @@ function onDeletePersonSubmit()
 		method : 'person/delete',
 		data : parseIds(persondInp.value)
 	});
+}
+
+
+function onListTransactionSubmit(e)
+{
+	var frmData = getFormData(e.target);
+	if (!frmData)
+		return false;
+
+	if ('type' in frmData)
+	{
+		if (frmData.type)
+			frmData.type = parseIds(frmData.type).id;
+	}
+	if ('acc_id' in frmData)
+		frmData.acc_id = parseIds(frmData.acc_id).id;
+
+	api.get({
+		method : 'transaction/list',
+		data : frmData,
+		verify : isTransactionsArray
+	});
+
+	return false;
 }
 
 
@@ -767,7 +794,7 @@ function initControls()
 	var listTrForm = document.querySelector('#listTrForm > form');
 	if (!listTrForm)
 		throw new Error('Fail to init view');
-	listTrForm.onsubmit = function(e){ return onFormSubmit(e, isTransactionsArray); };
+	listTrForm.onsubmit = onListTransactionSubmit;
 
 	checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
 	checkboxes = Array.from(checkboxes);

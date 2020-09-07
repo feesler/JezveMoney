@@ -33,8 +33,8 @@ export class DebtTransactionView extends TransactionView
 		if (res.isUpdate)
 			res.id = cont.id;
 
-		if (cont.typeMenu.activeType != DEBT)
-			throw new Error('Wrong page');
+		if (!cont.typeMenu.isSingleSelected(DEBT))
+			throw new Error('Unexpected page');
 
 		res.person = App.state.persons.getItem(cont.person.id);
 		res.debtType = cont.operation.type;
@@ -268,7 +268,7 @@ export class DebtTransactionView extends TransactionView
 				dest_amount_row : false, dest_amount_left : false,
 				exchange_row : false, exch_left : false },
 			values : {
-				typeMenu : { activeType : DEBT },
+				typeMenu : { selectedTypes : [ DEBT ] },
 				src_amount_row : { value : this.model.srcAmount.toString(), label : 'Amount', currSign : this.model.srcCurr.sign, isCurrActive : false },
 				src_amount_left : this.model.srcCurr.format(this.model.fSrcAmount),
 				dest_amount_row : { value : this.model.destAmount.toString(), currSign : this.model.destCurr.sign, isCurrActive : false },

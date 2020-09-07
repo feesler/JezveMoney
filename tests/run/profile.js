@@ -3,13 +3,12 @@ import { MainView } from '../view/main.js';
 import { test } from '../common.js';
 import { api } from '../model/api.js';
 import { App } from '../app.js';
+import { RegisterView } from '../view/register.js';
+import { ProfileView } from '../view/profile.js';
 
 
-export async function relogin(userObj)
+async function checkLoginNavigation()
 {
-	if (!userObj || !userObj.login || !userObj.password)
-		throw new Error('Wrong user object');
-
 	if (App.view.isUserLoggedIn())
 	{
 		await App.view.logoutUser();
@@ -17,47 +16,83 @@ export async function relogin(userObj)
 
 	if (!(App.view instanceof LoginView))
 		throw new Error('Wrong page');
-
-	await App.view.loginAs(userObj.login, userObj.password);
-	App.view.expectedState = { msgPopup : null };
-	await test('Test user login', () => App.view.checkState());
-
-	await App.state.fetch();
 }
 
 
-export async function register(userObj)
+async function checkProfileNavigation()
 {
-	if (!userObj || !userObj.login || !userObj.name || !userObj.password)
-		throw new Error('Wrong user object');
+	await App.view.goToProfile();
+	if (!(App.view instanceof ProfileView))
+		throw new Error('Wrong page');
+}
 
+
+async function deleteUserByLogin(login)
+{
 	// Check user not exist
 	let users = await api.user.list();
-	let apiUser = users.find(item => item.login == userObj.login);
+	let apiUser = users.find(item => item.login == login);
 	if (apiUser)
 		await api.user.del(apiUser.id);
+}
 
-	if (App.view.isUserLoggedIn())
+
+export async function relogin({ login, password })
+{
+	await checkLoginNavigation();
+
+	await App.view.inputLogin(login);
+	await App.view.inputPassword(password);
+
+	let validInput = App.view.isValid();
+	await App.view.submit();
+
+	if (validInput)
 	{
-		await App.view.logoutUser();
+		App.view.expectedState = { msgPopup : null };
+		await test('Test user login', () => App.view.checkState());
+
+		await App.state.fetch();
 	}
+	else
+	{
+		await test('User login with invalid data', () => App.view instanceof LoginView);
+	}
+}
 
-	if (!(App.view instanceof LoginView))
-		throw new Error('Unexpected page');
 
+export async function register({ login, name, password })
+{
+	await checkLoginNavigation();
 	await App.view.goToRegistration();
 
-	await App.view.registerAs(userObj.login, userObj.name, userObj.password);
-	App.view.expectedState = { msgPopup : { success : true, message : 'You successfully registered.' } };
+	await App.view.inputLogin(login);
+	await App.view.inputName(name);
+	await App.view.inputPassword(password);
 
-	await test('User registration', () => App.view.checkState());
-	await App.view.closeNotification();
+	let validInput = App.view.isValid();
+	await App.view.submit();
 
-	await App.view.loginAs(userObj.login, userObj.password);
-	App.view.expectedState = { msgPopup : null };
-	await test('Login with new account', () => App.view.checkState());
+	if (validInput)
+	{
+		App.view.expectedState = { msgPopup : { success : true, message : 'You successfully registered.' } };
 
-	await App.state.fetch();
+		await test('User registration', () => App.view.checkState());
+		await App.view.closeNotification();
+
+		await App.view.inputLogin(login);
+		await App.view.inputPassword(password);
+		await App.view.submit();
+		App.view.expectedState = { msgPopup : null };
+		await test('Login with new account', () => App.view.checkState());
+
+		await App.state.fetch();
+	}
+	else
+	{
+		await test('User registration with invalid data', () => App.view instanceof RegisterView);
+		await App.view.goToLogin();
+	}
 }
 
 
@@ -97,77 +132,64 @@ export async function resetAll()
 }
 
 
-export async function changeName()
+export async function changeName(newName)
 {
-	await App.view.goToProfile();
-
-	await test('Change name', async () =>
+	await test('Change user name', async () =>
 	{
-		let newName = '^^&&>>';
+		await checkProfileNavigation();
 
-		if (App.view.header.user.name == newName)
-			newName += ' 1';
+		let validInput = newName && newName.length > 0 && newName != App.state.profile.name;
 
 		await App.view.changeName(newName);
 
-		App.view.expectedState = {
-			msgPopup : { success : true, message : 'User name successfully updated.' },
-			header : { user : { name : newName } }
-		};
+		if (validInput)
+		{
+			App.state.changeName(newName);
 
-		return App.view.checkState();
+			App.view.expectedState = {
+				msgPopup : { success : true, message : 'User name successfully updated.' },
+				header : { user : { name : newName } }
+			};
+
+			await App.view.checkState();
+			await App.view.closeNotification();
+		}
+
+		return App.state.fetchAndTest();
 	});
-	await App.view.closeNotification();
-
-	await test('Change name back', async () =>
-	{
-		let newName = 'Tester';
-		await App.view.changeName(newName);
-
-		App.view.expectedState = {
-			msgPopup : { success : true, message : 'User name successfully updated.' },
-			header : { user : { name : newName } }
-		};
-
-		return App.view.checkState();
-	});
-	await App.view.closeNotification();
 }
 
 
-export async function changePass()
+export async function changePass({ oldPassword, newPassword })
 {
-	await App.view.goToProfile();
-
-	let newPass = '123';
 	await test('Change password', async () =>
 	{
-		await App.view.changePassword(App.config.testUser.password, newPass);
-		App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
+		await checkProfileNavigation();
 
-		return App.view.checkState();
+		let validInput = oldPassword && oldPassword.length > 0 &&
+							newPassword && newPassword.length > 0 &&
+							oldPassword != newPassword;
+
+		await App.view.changePassword(oldPassword, newPassword);
+		if (validInput)
+		{
+			App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
+
+			await App.view.checkState();
+			await App.view.closeNotification();
+
+			await App.view.logoutUser();
+			await App.view.inputLogin(App.state.profile.login);
+			await App.view.inputPassword(newPassword);
+			await App.view.submit();
+			App.view.expectedState = { msgPopup : null };
+			return App.view.checkState();
+		}
+		else
+		{
+			return App.view instanceof ProfileView;
+		}
 	});
-	await App.view.closeNotification();
-
-	await test('Login with new password', async () =>
-	{
-		await relogin({ login : App.config.testUser.login, password : newPass });
-		await App.view.goToProfile();
-
-		return true;
-	});
-
-	await test('Change password back', async () =>
-	{
-		await App.view.changePassword(newPass, App.config.testUser.password);
-		App.view.expectedState = { msgPopup : { success : true, message : 'Password successfully updated.' } };
-
-		return App.view.checkState();
-	});
-	await App.view.closeNotification();
-
-	await relogin(App.config.testUser);
-	await App.view.goToProfile();
 }
 
 

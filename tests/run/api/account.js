@@ -61,7 +61,7 @@ export async function update(params)
 		// Send API sequest to server
 		try
 		{
-			updateRes = await api.account.update(params.id, updParams);
+			updateRes = await api.account.update(updParams);
 			if (resExpected != updateRes)
 				return false;
 		}

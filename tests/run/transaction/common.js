@@ -153,9 +153,14 @@ export async function runGroup(action, data)
 
 export async function submit()
 {
-	let res = App.view.getExpectedTransaction();
+	let validInput = await App.view.isValid();
+
+	let res = (validInput) ? App.view.getExpectedTransaction() : null;
 
 	await App.view.submit();
+
+	if (validInput && (App.view instanceof TransactionView))
+		throw new Error('Fail to submit transaction');
 
 	return res;
 }
@@ -163,20 +168,26 @@ export async function submit()
 
 export async function create(type, params, submitHandler)
 {
-	App.view.setBlock(`Create ${Transaction.typeToStr(type)} (${formatProps(params)})`, 2);
+	App.view.setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
 
 	// Navigate to create transaction page
 	let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
 	await App.goToMainView();
 	await App.view.goToNewTransactionByAccount(accNum);
 
-	if (App.view.content.typeMenu.activeType != type)
+	if (!App.view.content.typeMenu.isSingleSelected(type))
 		await App.view.changeTransactionType(type);
 
 	// Input data and submit
 	let expectedTransaction = await submitHandler(params);
-
-	App.state.createTransaction(expectedTransaction);
+	if (expectedTransaction)
+	{
+		App.state.createTransaction(expectedTransaction);
+	}
+	else
+	{
+		await App.view.cancel();
+	}
 
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
@@ -196,12 +207,12 @@ export async function update(type, params, submitHandler)
 		throw new Error('Position of transaction not specified');
 	delete params.pos;
 
-	view.setBlock(`Update ${Transaction.typeToStr(type)} [${pos}] (${formatProps(params)})`, 2);
+	view.setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(params)})`, 2);
 
 	await App.goToMainView();
 	await App.view.goToTransactions();
 
-	if (App.view.content.typeMenu.activeType != type)
+	if (!App.view.content.typeMenu.isSingleSelected(type))
 		await App.view.filterByType(type);
 
 	await App.view.goToUpdateTransaction(pos);
@@ -216,10 +227,12 @@ export async function update(type, params, submitHandler)
 	await App.view.parse();
 
 	let expectedTransaction = await submitHandler(params);
-
-	expectedState.accounts.data = originalAccounts;
-	expectedState.updateTransaction(expectedTransaction);
-	App.state.setState(expectedState);
+	if (expectedTransaction)
+	{
+		expectedState.accounts.data = originalAccounts;
+		expectedState.updateTransaction(expectedTransaction);
+		App.state.setState(expectedState);
+	}
 
 	await App.goToMainView();
 
@@ -310,7 +323,7 @@ export async function delFromUpdate(type, pos)
 	if (isNaN(pos) || pos < 0)
 		throw new Error('Position of transaction not specified');
 
-	App.view.setBlock(`Delete ${Transaction.typeToStr(type)} from update view [${pos}]`, 2);
+	App.view.setBlock(`Delete ${Transaction.typeToString(type)} from update view [${pos}]`, 2);
 
 	let expectedState = App.state.clone();
 	let ids = expectedState.transactions.filterByType(type).indexesToIds(pos);
@@ -323,7 +336,7 @@ export async function delFromUpdate(type, pos)
 		await App.view.goToTransactions();
 	}
 
-	if (App.view.content.typeMenu.activeType != type)
+	if (!App.view.content.typeMenu.isSingleSelected(type))
 		await App.view.filterByType(type);
 
 	await App.view.goToUpdateTransaction(pos);

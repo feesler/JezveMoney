@@ -1,7 +1,29 @@
 import { test, setParam } from '../common.js';
 import { PersonsView } from '../view/persons.js';
+import { PersonView } from '../view/person.js';
 import { MainView } from '../view/main.js';
 import { App } from '../app.js';
+
+
+export async function submitPerson(params)
+{
+	if (!(App.view instanceof PersonView))
+		throw new Error('Invalid view');
+
+	// Input account name
+	if ('name' in params)
+		await App.view.inputName(params.name);
+
+	let validInput = App.view.isValid();
+	let res = (validInput) ? App.view.getExpectedPerson() : null;
+
+	await App.view.submit();
+
+	if (validInput && !(App.view instanceof PersonsView))
+		throw new Error('Fail to submit person');
+
+	return res;
+}
 
 
 // From persons list view go to new person view, input name and submit
@@ -16,9 +38,15 @@ export async function create(params)
 	}
 	await App.view.goToCreatePerson();
 
-	App.state.createPerson(params);
-
-	await App.view.createPerson(params.name);
+	let expPerson = await submitPerson(params);
+	if (expPerson)
+	{
+		App.state.createPerson(expPerson);
+	}
+	else
+	{
+		await App.view.cancel();
+	}
 
 	App.view.expectedState = PersonsView.render(App.state);
 	await test(`Create person ({ name : ${params.name} })`, () => App.view.checkState());
@@ -62,13 +90,17 @@ export async function update(params)
 								values : { name : expectedPerson.name } };
 	await test('Update person view state', () => App.view.checkState());
 
-	await App.view.inputName(params.name);
-
-	await App.view.navigation(() => App.view.click(App.view.content.submitBtn));
-
-	// Check updates in the person tiles
-	setParam(expectedPerson, params);
-	App.state.updatePerson(expectedPerson);
+	let expPerson = await submitPerson(params);
+	if (expPerson)
+	{
+		// Check updates in the person tiles
+		setParam(expectedPerson, params);
+		App.state.updatePerson(expectedPerson);
+	}
+	else
+	{
+		await App.view.cancel();
+	}
 
 	App.view.expectedState = PersonsView.render(App.state);
 	await test(`Update person [${pos}]`, () => App.view.checkState());

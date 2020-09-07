@@ -3,6 +3,7 @@
 class AccountApiController extends ApiController
 {
 	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon", "flags" ];
+	protected $model = NULL;
 
 
 	public function initAPI()

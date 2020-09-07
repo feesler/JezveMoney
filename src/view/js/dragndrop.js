@@ -96,6 +96,20 @@ var dragMaster = (function()
 	}
 
 
+	// Keydown event handler
+	function onKey(e)
+	{
+		if (e.code == 'Escape')
+		{
+			if (avatar)
+				avatar.onDragCancel();
+
+			cleanUp();
+			removeDocumentEventHandlers();
+		}
+	}
+
+
 	// Clean up drag objects
 	function cleanUp()
 	{
@@ -135,25 +149,31 @@ var dragMaster = (function()
 
 
 	// Empty function return false
-	function emptyFalse()
+	function emptyFalse(e)
 	{
-		return false;
+		e.preventDefault();
 	}
 
 
 	// Set event handlers for document
 	function addDocumentEventHandlers()
 	{
-		document.onmousemove = mouseMove;
-		document.onmouseup = mouseUp;
-		document.ondragstart = document.body.onselectstart = emptyFalse;
+		document.addEventListener('keydown', onKey);
+		document.addEventListener('mousemove', mouseMove);
+		document.addEventListener('mouseup', mouseUp);
+		document.addEventListener('dragstart', emptyFalse);
+		document.body.addEventListener('selectstart', emptyFalse);
 	}
 
 
 	// Remove event handler from document
 	function removeDocumentEventHandlers()
 	{
-		document.onmousemove = document.onmouseup = document.ondragstart = document.body.onselectstart = null;
+		document.removeEventListener('keydown', onKey);
+		document.removeEventListener('mousemove', mouseMove);
+		document.removeEventListener('mouseup', mouseUp);
+		document.removeEventListener('dragstart', emptyFalse);
+		document.body.removeEventListener('selectstart', emptyFalse);
 	}
 
 
@@ -188,7 +208,7 @@ var dragMaster = (function()
 	return {
 		makeDraggable : function(element)
 		{
-			element.onmousedown = mouseDown;
+			element.addEventListener('mousedown', mouseDown);
 
 			if (element.onpointerdown !== undefined)
 				element.onpointerdown = isMousePointer;
