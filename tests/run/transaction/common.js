@@ -168,7 +168,7 @@ export async function submit()
 
 export async function create(type, params, submitHandler)
 {
-	App.view.setBlock(`Create ${Transaction.typeToStr(type)} (${formatProps(params)})`, 2);
+	App.view.setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
 
 	// Navigate to create transaction page
 	let accNum = ('fromAccount' in params) ? params.fromAccount : 0;
@@ -207,7 +207,7 @@ export async function update(type, params, submitHandler)
 		throw new Error('Position of transaction not specified');
 	delete params.pos;
 
-	view.setBlock(`Update ${Transaction.typeToStr(type)} [${pos}] (${formatProps(params)})`, 2);
+	view.setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(params)})`, 2);
 
 	await App.goToMainView();
 	await App.view.goToTransactions();
@@ -323,7 +323,7 @@ export async function delFromUpdate(type, pos)
 	if (isNaN(pos) || pos < 0)
 		throw new Error('Position of transaction not specified');
 
-	App.view.setBlock(`Delete ${Transaction.typeToStr(type)} from update view [${pos}]`, 2);
+	App.view.setBlock(`Delete ${Transaction.typeToString(type)} from update view [${pos}]`, 2);
 
 	let expectedState = App.state.clone();
 	let ids = expectedState.transactions.filterByType(type).indexesToIds(pos);

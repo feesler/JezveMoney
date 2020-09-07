@@ -17,7 +17,7 @@ export async function create(params)
 {
 	let transaction_id = 0;
 
-	await test(`Create ${Transaction.typeToStr(params.type)} transaction`, async () =>
+	await test(`Create ${Transaction.typeToString(params.type)} transaction`, async () =>
 	{
 		let resExpected = App.state.createTransaction(params);
 

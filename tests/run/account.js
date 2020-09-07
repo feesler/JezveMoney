@@ -346,7 +346,7 @@ export async function exportTest(accounts)
 	{
 		let row = [
 			transaction.id,
-			Transaction.typeToStr(transaction.type),
+			Transaction.typeToString(transaction.type),
 			Currency.format(transaction.src_curr, transaction.src_amount),
 			Currency.format(transaction.dest_curr, transaction.dest_amount),
 			Currency.format(transaction.src_curr, transaction.src_result),

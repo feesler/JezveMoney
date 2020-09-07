@@ -13,19 +13,19 @@ export const availTransTypes = [ EXPENSE, INCOME, TRANSFER, DEBT ];
 export class Transaction
 {
 	// Return string for specified type of transaction
-	static typeToStr(type)
+	static typeToString(type)
 	{
-		const typeToStr = {
-			[EXPENSE] : 'expense',
-			[INCOME] : 'income',
-			[TRANSFER] : 'transfer',
-			[DEBT] : 'debt'
+		const typesMap = {
+			[EXPENSE] : 'Expense',
+			[INCOME] : 'Income',
+			[TRANSFER] : 'Transfer',
+			[DEBT] : 'Debt'
 		};
 
-		if (!type || !(type in typeToStr))
+		if (!type || !(type in typesMap))
 			throw new Error(`Unknown transaction type ${type}`);
 
-		return typeToStr[type];
+		return typesMap[type];
 	}
 
 
