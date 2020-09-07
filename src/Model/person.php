@@ -7,6 +7,7 @@ class PersonModel extends CachedTable
 
 	static private $user_id = 0;
 	static private $owner_id = 0;		// person of user
+	protected $adminForce = FALSE;
 
 
 	protected function onStart()
@@ -358,7 +359,7 @@ class PersonModel extends CachedTable
 	/**
 	 * Return array of persons
 	 *
-	 * @param mixed[string] $params
+	 * @param array{string} $params
 	 * 		Query parameters
 	 * 		- full (boolean): if set to TRUE and current user have admin rights method will return persons of all users ;
 	 * 		- type (string): visibility filter. Possible values: "all", "visible", "hidden" ;

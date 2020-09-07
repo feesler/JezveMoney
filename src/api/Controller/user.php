@@ -90,7 +90,7 @@ class UserApiController extends ApiController
 		$defMsg = ERR_USER_UPDATE;
 
 		if (!$this->isPOST())
-			$this->fail(defMsg);
+			$this->fail($defMsg);
 
 		$request = $this->getRequestData();
 		if (!isset($request["id"]))

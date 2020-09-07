@@ -6,6 +6,7 @@ class UserModel extends CachedTable
 	use CachedInstance;
 
 	private $currentUser = NULL;
+	protected $personName = NULL;
 
 
 	protected function onStart()
@@ -138,8 +139,8 @@ class UserModel extends CachedTable
 	{
 		$expTime = time() + 31536000;	// year after now
 
-		setcookie("login", $login, $expTime, APP_PATH, APP_DOMAIN, isSecure() ? 1 : 0);
-		setcookie("passhash", $passhash, $expTime, APP_PATH, APP_DOMAIN, isSecure() ? 1 : 0);
+		setcookie("login", $login, $expTime, APP_PATH, APP_DOMAIN, isSecure());
+		setcookie("passhash", $passhash, $expTime, APP_PATH, APP_DOMAIN, isSecure());
 	}
 
 
@@ -148,8 +149,8 @@ class UserModel extends CachedTable
 	{
 		$expTime = time() - 3600;	// hour before now
 
-		setcookie("login", "", $expTime, APP_PATH, APP_DOMAIN, isSecure() ? 1 : 0);
-		setcookie("passhash", "", $expTime, APP_PATH, APP_DOMAIN, isSecure() ? 1 : 0);
+		setcookie("login", "", $expTime, APP_PATH, APP_DOMAIN, isSecure());
+		setcookie("passhash", "", $expTime, APP_PATH, APP_DOMAIN, isSecure());
 	}
 
 
@@ -374,7 +375,7 @@ class UserModel extends CachedTable
 		$pMod = PersonModel::getInstance();
 		$p_id = $pMod->create([ "name" => $this->personName, "user_id" => $item_id, "flags" => 0 ]);
 
-		unset($this->personName);
+		$this->personName = NULL;
 
 		$this->setOwner($item_id, $p_id);
 	}
@@ -411,7 +412,7 @@ class UserModel extends CachedTable
 	{
 		$this->cleanCache();
 
-		if ($this->personName)
+		if (!is_null($this->personName))
 		{
 			$userObj = $this->getItem($item_id);
 			if (!$userObj)
@@ -423,17 +424,17 @@ class UserModel extends CachedTable
 			{
 				$person_id = $personMod->create([ "name" => $this->personName, "user_id" => $item_id, "flags" => 0 ]);
 				if (!$person_id)
-					$res->fail($defMsg);
+					throw new Error("Fail to create person for user");
 
 				$this->setOwner($item_id, $person_id);
 			}
 			else
 			{
 				if (!$personMod->adminUpdate($userObj->owner_id, [ "name" => $this->personName ]))
-					$res->fail($defMsg);
+					throw new Error("Fail to update person of user");
 			}
 
-			unset($this->personName);
+			$this->personName = NULL;
 		}
 	}
 
@@ -465,7 +466,6 @@ class UserModel extends CachedTable
 		session_unset();
 		session_destroy();
 
-		unset($this->currentUser);
 		$this->currentUser = NULL;
 
 		$this->deleteCookies();

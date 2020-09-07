@@ -2,8 +2,18 @@
 
 class Person
 {
+	public $id = 0;
+	public $name = NULL;
+	public $flags = 0;
+	public $accounts = NULL;
+
+
+
 	public function __construct($obj)
 	{
+		if (is_null($obj))
+			throw new Error("Invalid object");
+
 		$this->id = $obj->id;
 		$this->name = $obj->name;
 		$this->flags = $obj->flags;

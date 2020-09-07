@@ -2,6 +2,11 @@
 
 class StateApiController extends ApiController
 {
+	protected $trModel = NULL;
+	protected $accModel = NULL;
+	protected $pModel = NULL;
+
+
 	public function initAPI()
 	{
 		parent::initAPI();

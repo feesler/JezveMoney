@@ -15,6 +15,14 @@ class TransactionModel extends CachedTable
 	static private $destAvailTypes = [ INCOME, TRANSFER, DEBT ];
 	static private $destMandatoryTypes = [ INCOME, TRANSFER ];
 
+	protected $accModel = NULL;
+	protected $currMod = NULL;
+	protected $affectedTransactions = NULL;
+	protected $balanceChanges = NULL;
+	protected $latestPos = NULL;
+	protected $removedItems = NULL;
+	protected $originalTrans = NULL;
+
 
 	protected function onStart()
 	{
@@ -255,7 +263,7 @@ class TransactionModel extends CachedTable
 		$updResult = $this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions);
 		wlog(" update result: ".$updResult);
 
-		unset($this->affectedTransactions);
+		$this->affectedTransactions = NULL;
 
 		$this->cleanCache();
 
@@ -268,7 +276,7 @@ class TransactionModel extends CachedTable
 		if (!$item || !$item->id)
 			return NULL;
 
-		if (!isset($this->affectedTransactions)
+		if (is_null($this->affectedTransactions)
 			|| !is_array($this->affectedTransactions)
 			|| !isset($this->affectedTransactions[$item->id]))
 			return $item;
@@ -282,7 +290,7 @@ class TransactionModel extends CachedTable
 		if (!$item || !$item->id)
 			return FALSE;
 
-		if (!isset($this->affectedTransactions))
+		if (is_null($this->affectedTransactions))
 			$this->affectedTransactions = [];
 
 		$this->affectedTransactions[$item->id] = $item;
@@ -315,7 +323,7 @@ class TransactionModel extends CachedTable
 
 		$uMod = UserModel::getInstance();
 
-		if (!isset($this->balanceChanges))
+		if (is_null($this->balanceChanges))
 			$this->balanceChanges = [];
 
 		$this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
@@ -334,7 +342,7 @@ class TransactionModel extends CachedTable
 		{
 			if ($isMultiple)
 			{
-				if (!isset($this->latestPos))
+				if (is_null($this->latestPos))
 					$this->latestPos = $this->getLatestPos();
 				$res["pos"] = (++$this->latestPos);
 			}
@@ -363,8 +371,8 @@ class TransactionModel extends CachedTable
 
 		// Commit balance changes for affected accounts
 		$this->accModel->updateBalances($this->balanceChanges);
-		unset($this->balanceChanges);
-		unset($this->latestPos);
+		$this->balanceChanges = NULL;
+		$this->latestPos = NULL;
 
 		foreach($items as $item_id)
 		{
@@ -386,10 +394,10 @@ class TransactionModel extends CachedTable
 
 	protected function getAffectedAccount($account_id)
 	{
-		if (isset($this->balanceChanges) && isset($this->balanceChanges[$account_id]))
+		if (is_array($this->balanceChanges) && isset($this->balanceChanges[$account_id]))
 			return $this->balanceChanges[$account_id];
 		else
-			return $this->accModel->getItem($account_id);;
+			return $this->accModel->getItem($account_id);
 	}
 
 
@@ -522,7 +530,7 @@ class TransactionModel extends CachedTable
 
 		// Commit balance changes for affected accounts
 		$this->accModel->updateBalances($this->balanceChanges);
-		unset($this->balanceChanges);
+		$this->balanceChanges = NULL;
 
 		// update position of transaction if target date is not today
 		if ($trObj->pos === 0)
@@ -541,7 +549,7 @@ class TransactionModel extends CachedTable
 		{
 			$this->updateResults([ $this->originalTrans->src_id, $this->originalTrans->dest_id ], $trObj->pos);
 		}
-		unset($this->originalTrans);
+		$this->originalTrans = NULL;
 
 		$this->commitAffected();
 	}
@@ -797,13 +805,13 @@ class TransactionModel extends CachedTable
 	{
 		// Commit balance changes for affected accounts
 		$this->accModel->updateBalances($this->balanceChanges);
-		unset($this->balanceChanges);
+		$this->balanceChanges = NULL;
 
 		foreach($this->removedItems as $trObj)
 		{
 			$this->updateResults([ $trObj->src_id, $trObj->dest_id ], $trObj->pos + 1);
 		}
-		unset($this->removedItems);
+		$this->removedItems = NULL;
 
 		$this->commitAffected();
 
@@ -1431,9 +1439,10 @@ class TransactionModel extends CachedTable
 		$res["acc"] = $accStr;
 
 		// Build amount string
+		$src_owner_id = 0;
+		$dest_owner_id = 0;
 		if ($transaction->type == DEBT)
 		{
-			$src_owner_id = $dest_owner_id = 0;
 			if ($transaction->src_id != 0)
 			{
 				$accObj = $this->accModel->getItem($transaction->src_id);

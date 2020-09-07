@@ -2,6 +2,9 @@
 
 class ProfileApiController extends ApiController
 {
+	protected $personMod = NULL;
+
+
 	public function initAPI()
 	{
 		parent::initAPI();

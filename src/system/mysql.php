@@ -164,6 +164,11 @@ class MySqlDB
 	private static $tblCache = NULL;	// cache of exist tables
 	private static $config = NULL;		// saved connection settings
 
+	protected $errno = 0;
+	protected $errorMessage = NULL;
+	protected $insert_id = 0;
+	protected $affected = 0;
+
 
 	public static function setup($config)
 	{
@@ -269,7 +274,7 @@ class MySqlDB
 		$fstr = asJoin($fields);
 		$tstr = asJoin($tables);
 		if (!$fstr || !$tstr)
-			return $resArr;
+			return NULL;
 
 		$query = "SELECT $fstr FROM $tstr";
 		if ($condition)
@@ -326,8 +331,8 @@ class MySqlDB
 		$query = "INSERT INTO `$table` ".fieldsJoin($fields)." VALUES ".valuesJoin($values).";";
 		$this->rawQ($query);
 
-		$this->insert_id = $this->insertId();
-		$this->affected = $this->affectedRows();
+		$this->insert_id = mysqli_insert_id(self::$conn);
+		$this->affected = mysqli_affected_rows(self::$conn);
 
 		return ($this->errno == 0);
 	}
@@ -336,14 +341,14 @@ class MySqlDB
 	// Return last insert id
 	public function insertId()
 	{
-		return mysqli_insert_id(self::$conn);
+		return $this->insert_id;
 	}
 
 
 	// Return last insert id
 	public function affectedRows()
 	{
-		return mysqli_affected_rows(self::$conn);
+		return $this->affected;
 	}
 
 
@@ -400,8 +405,8 @@ class MySqlDB
 		$query .= ";";
 		$this->rawQ($query);
 
-		$this->insert_id = $this->insertId();
-		$this->affected = $this->affectedRows();
+		$this->insert_id = mysqli_insert_id(self::$conn);
+		$this->affected = mysqli_affected_rows(self::$conn);
 
 		return ($this->errno == 0);
 	}
@@ -419,6 +424,8 @@ class MySqlDB
 		$query .= ";";
 
 		$this->rawQ($query);
+
+		$this->affected = mysqli_affected_rows(self::$conn);
 
 		return ($this->errno == 0);
 	}
@@ -439,6 +446,8 @@ class MySqlDB
 		$query = "TRUNCATE TABLE `".$table."`;";
 		$this->rawQ($query);
 
+		$this->affected = mysqli_affected_rows(self::$conn);
+
 		return ($this->errno == 0);
 	}
 
@@ -454,6 +463,8 @@ class MySqlDB
 
 		$query = "DELETE FROM `".$table."` WHERE ".andJoin($condition).";";
 		$this->rawQ($query);
+
+		$this->affected = mysqli_affected_rows(self::$conn);
 
 		return ($this->errno == 0);
 	}

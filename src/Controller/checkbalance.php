@@ -2,6 +2,9 @@
 
 class CheckBalanceController extends TemplateController
 {
+	protected $accName = NULL;
+
+
 	public function fail()
 	{
 		echo "fail";

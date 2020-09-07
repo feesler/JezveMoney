@@ -119,7 +119,7 @@ class PersonsController extends TemplateController
 
 		$reqData = checkFields($_POST, $this->requiredFields);
 		if ($reqData === FALSE)
-			$respObj->fail($defMsg);
+			$this->fail($defMsg);
 
 		if (!$this->personMod->update($_POST["id"], $reqData))
 			$this->fail($defMsg);

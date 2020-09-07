@@ -27,3 +27,8 @@ Update packages:
 	composer update
 Optimize autoload:
 	composer dump-autoload -a
+
+
+Phan
+Run from app root:
+.\src\vendor\bin\phan

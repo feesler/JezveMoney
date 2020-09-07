@@ -2,6 +2,9 @@
 
 class CurrencyAdminController extends AdminController
 {
+	protected $model = NULL;
+
+
 	protected function onStart()
 	{
 		$this->model = CurrencyModel::getInstance();

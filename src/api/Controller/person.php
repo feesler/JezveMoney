@@ -3,6 +3,7 @@
 class PersonApiController extends ApiController
 {
 	protected $requiredFields = [ "name", "flags" ];
+	protected $model = NULL;
 
 
 	public function initAPI()

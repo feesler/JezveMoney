@@ -11,6 +11,12 @@ class AccountModel extends CachedTable
 	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
 	static private $iconNames = [NULL, "purse", "safe", "card", "percent", "bank", "cash"];
 
+	protected $currMod = NULL;
+	protected $personMod = NULL;
+	protected $currencyUpdated = FALSE;
+	protected $balanceUpdated = FALSE;
+	protected $removedItems = NULL;
+
 
 	protected function onStart()
 	{
@@ -229,8 +235,8 @@ class AccountModel extends CachedTable
 			$transMod->onAccountUpdate($item_id);
 		}
 
-		unset($this->currencyUpdated);
-		unset($this->balanceUpdated);
+		$this->currencyUpdated = FALSE;
+		$this->balanceUpdated = FALSE;
 	}
 
 
@@ -264,7 +270,7 @@ class AccountModel extends CachedTable
 		$transMod = TransactionModel::getInstance();
 
 		$res = $transMod->onAccountDelete($this->removedItems);
-		unset($this->removedItems);
+		$this->removedItems = NULL;
 
 		return $res;
 	}

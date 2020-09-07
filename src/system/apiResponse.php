@@ -2,6 +2,10 @@
 
 class apiResponse
 {
+	public $result = NULL;
+	public $msg = NULL;
+
+
 	public function render()
 	{
 		header("Content-Type: application/json; charset=utf-8");

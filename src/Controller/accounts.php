@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class AccountsController extends TemplateController
 {
+	protected $model = null;
 	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon", "flags" ];
 
 
@@ -220,7 +221,7 @@ class AccountsController extends TemplateController
 		$defMsg = ERR_ACCOUNT_DELETE;
 
 		if (!isset($_POST["accounts"]))
-			fail($defMsg);
+			$this->fail($defMsg);
 
 		$ids = explode(",", rawurldecode($_POST["accounts"]));
 		if (!$this->model->del($ids))
@@ -259,7 +260,7 @@ class AccountsController extends TemplateController
 		$exportFileName = "Exported_".date("d.m.Y").".".strtolower($writerType);
 
 		$writer = IOFactory::createWriter($spreadsheet, $writerType);
-		if ($writerType == "Csv")
+		if ($writer instanceof PhpOffice\PhpSpreadsheet\Writer\Csv)
 		{
 			$writer->setDelimiter(';');
 			$writer->setEnclosure('"');

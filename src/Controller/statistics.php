@@ -154,8 +154,10 @@ class StatisticsController extends TemplateController
 	}
 
 
-	function fail()
+	function fail($msg = NULL)
 	{
+		if (!is_null($msg))
+			Message::set($msg);
 		setLocation(BASEURL);
 	}
 }
