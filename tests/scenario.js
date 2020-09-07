@@ -80,6 +80,7 @@ export class Scenario
 		await this.accountTests();
 		await this.personTests();
 		await this.transactionTests();
+		await this.postTransactionAccountTests();
 		await StatisticsTests.run();
 	}
 
@@ -576,6 +577,16 @@ export class Scenario
 	}
 
 
+	async postTransactionAccountTests()
+	{
+		await this.hideAccountsTest();
+		await this.showAccountsTest();
+		await this.exportAccountsTest();
+		await this.updateAccountTests();
+		await this.deleteAccountTests();
+	}
+
+
 	async createAccountTests()
 	{
 		this.environment.setBlock('Create accounts', 2);
@@ -786,12 +797,6 @@ export class Scenario
 		await this.updateTransactionTests();
 		await this.transactionsListTests();
 		await this.deleteTransactionTests();
-
-		await this.hideAccountsTest();
-		await this.showAccountsTest();
-		await this.exportAccountsTest();
-		await this.updateAccountTests();
-		await this.deleteAccountTests();
 	}
 
 
