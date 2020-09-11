@@ -6,7 +6,7 @@
 <?php	require_once(TPL_PATH."header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
-				<div class="content_wrap">
+				<div class="content_wrap profile-content">
 					<div class="heading">
 						<h1>User profile</h1>
 					</div>
@@ -61,7 +61,7 @@
 
 <div id="changename" style="display: none;">
 <form method="post" action="<?=BASEURL?>profile/changename/">
-	<div id="name-inp-block" class="validation-block non_float">
+	<div id="name-inp-block" class="validation-block view-row">
 		<label for="newname">New name</label>
 		<div class="stretch_input std_input"><input id="newname" name="name" type="text" value="<?=e($person_name)?>"></div>
 		<div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
@@ -71,13 +71,13 @@
 
 <div id="changepass" style="display: none;">
 <form method="post" action="<?=BASEURL?>profile/changepass/">
-	<div id="old-pwd-inp-block" class="validation-block non_float">
+	<div id="old-pwd-inp-block" class="validation-block view-row">
 		<label for="oldpwd">Current password</label>
 		<div class="stretch_input std_input"><input id="oldpwd" name="current" type="password"></div>
 		<div class="invalid-feedback">Please input current password.</div>
 	</div>
 
-	<div id="new-pwd-inp-block" class="validation-block non_float">
+	<div id="new-pwd-inp-block" class="validation-block view-row">
 		<label for="newpwd">New password</label>
 		<div class="stretch_input std_input"><input id="newpwd" name="new" type="password"></div>
 		<div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>

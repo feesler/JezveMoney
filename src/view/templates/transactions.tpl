@@ -12,7 +12,7 @@
 						<div id="add_btn" class="iconlink"><a href="<?=BASEURL?>transactions/new/"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>New</span></span></a></div>
 					</div>
 
-					<div class="clearfix">
+					<div>
 						<div class="trtype-menu trtype-menu-multi">
 <?php	foreach($transMenu as $menuItem) {
 			if ($menuItem->selected) {		?>
@@ -30,17 +30,8 @@
 <?php	}			?>
 						</div>
 
-						<div class="std_margin clearfix">
-							<form id="searchFrm" method="get" action="<?=BASEURL?>transactions/">
-							<div class="right_float">
-								<button class="btn icon_btn search_btn right_float" type="submit"><?=svgIcon("search")?></button>
-								<div class="stretch_input rbtn_input">
-									<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
-								</div>
-							</div>
-							</form>
-
-							<div class="tr_filter">
+						<div class="std_margin filters-container">
+							<div class="filter-item">
 								<div>
 									<select id="acc_id" name="acc_id" multiple>
 										<option value="0">All</option>
@@ -62,21 +53,32 @@
 								</div>
 							</div>
 
-							<div class="tr_filter date_filter">
+							<div class="filter-item">
 <?php if (is_empty($dateFmt)) {		?>
 								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php } else {	?>
 								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php }		?>
 								<div id="date_block" style="display: none;">
-									<div>
-										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><?=svgIcon("cal")?></button>
+									<div class="input-group">
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button"><?=svgIcon("cal")?></button>
 										<div id="calendar"></div>
 									</div>
 								</div>
+							</div>
+
+							<div class="filter-item search-filter-item">
+								<form id="searchFrm" method="get" action="<?=BASEURL?>transactions/">
+								<div class="input-group search-form">
+									<div class="stretch_input rbtn_input">
+										<input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
+									</div>
+									<button class="btn icon_btn search_btn" type="submit"><?=svgIcon("search")?></button>
+								</div>
+								</form>
 							</div>
 						</div>
 

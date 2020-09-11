@@ -7,16 +7,19 @@
 							<span>No transactions found.</span>
 <?php	} else {		?>
 <?php	if ($showPaginator == TRUE) {		?>
-							<div class="mode_selector">
+							<div class="paginator-row">
+								<div class="mode-selector">
 <?php		if ($showDetails) {		?>
-								<a class="list_mode" href="<?=e($linkStr)?>"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></a><b class="details_mode"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></b>
+									<a class="mode-selector-item" href="<?=e($linkStr)?>"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></a>
+									<b class="mode-selector-item"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></b>
 <?php		} else {		?>
-								<b class="list_mode"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></b><a class="details_mode" href="<?=e($linkStr)?>"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></a>
+									<b class="mode-selector-item"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></b>
+									<a class="mode-selector-item" href="<?=e($linkStr)?>"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></a>
 <?php		}	?>
-							</div>
+								</div>
 <?php	}	?>
 <?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
-							<div class="paginator"><?php
+								<div class="paginator"><?php
 			foreach($pagesArr as $pageItem) {
 				if (!is_numeric($pageItem["text"])) {
 					?><span><?=e($pageItem["text"])?></span><?php
@@ -27,6 +30,7 @@
 				}
 			}	?></div>
 <?php	}	?>
+							</div>
 <?php	if ($showDetails) {	?>
 							<table id="tritems" class="details_table">
 <?php	} else {	?>
@@ -54,27 +58,28 @@
 									</div></td>
 								</tr></tbody>
 <?php	} else {		?>
-							<div class="trlist_item_wrap">
-								<div id="tr_<?=e($trItem["id"])?>" class="trlist_item">
-									<div class="tritem_acc_name"><span><?=e($trItem["acc"])?></span></div>
-									<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
-									<div class="tritem_date_comm">
-										<span><?=e($trItem["date"])?></span>
+								<div class="trlist_item_wrap">
+									<div id="tr_<?=e($trItem["id"])?>" class="trlist_item">
+										<div class="tritem_acc_name"><span><?=e($trItem["acc"])?></span></div>
+										<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
+										<div class="tritem_date_comm">
+											<span><?=e($trItem["date"])?></span>
 <?php		if ($trItem["comment"] != "") {		?>
-										<span class="tritem_comm"><?=e($trItem["comment"])?></span>
+											<span class="tritem_comm"><?=e($trItem["comment"])?></span>
 <?php		}	?>
+										</div>
 									</div>
 								</div>
-							</div>
 <?php	}	?>
 <?php	}	?>
 <?php	if ($showDetails) {		?>
-						</table>
+							</table>
 <?php	} else {	?>
-						</div>
+							</div>
 <?php	}	?>
 <?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
-							<div class="paginator"><?php
+							<div class="paginator-row">
+								<div class="paginator"><?php
 			foreach($pagesArr as $pageItem) {
 				if (!is_numeric($pageItem["text"])) {
 					?><span><?=e($pageItem["text"])?></span><?php
@@ -85,5 +90,6 @@
 				}
 			}	?></div>
 <?php	}	?>
+							</div>
 <?php	}	?>
 						</div>

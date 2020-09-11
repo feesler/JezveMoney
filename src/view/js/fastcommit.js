@@ -234,7 +234,7 @@ function createRowObject()
 	});
 
 
-	rowObj.rowEl = ce('div', { className : 'tr_row clearfix' },
+	rowObj.rowEl = ce('div', { className : 'tr_row' },
 		[ rowObj.enableCheck,
 			rowObj.trTypeSel,
 			rowObj.amountInp,

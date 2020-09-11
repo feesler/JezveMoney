@@ -48,7 +48,7 @@ export class TransactionsView extends TestView
 		if (!transList)
 			throw new Error('List of transactions not found');
 
-		res.modeSelector = await ModeSelector.create(this, await this.query(transList, '.mode_selector'));
+		res.modeSelector = await ModeSelector.create(this, await this.query(transList, '.mode-selector'));
 		res.paginator = await Paginator.create(this, await this.query(transList, '.paginator'));
 
 		res.title = await this.prop(res.titleEl, 'innerText');

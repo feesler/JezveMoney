@@ -1,18 +1,15 @@
 /* Main container for charts */
 .charts
 {
-	clear: both;
-}
-
-
-.charts > .right_float
-{
-	float: right;
+	display: flex;
+	flex-flow: row nowrap;
+	flex-basis: 100%;
 }
 
 
 .chart_wrap
 {
+	flex-basis: 100%;
 	overflow: hidden;
 }
 

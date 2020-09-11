@@ -12,10 +12,10 @@
 							<input id="startbtn" class="adm_act_btn" type="button" value="start">
 							<table class="adm_tbl counter_tbl">
 								<tr>
-									<td class="title">Total</td><td id="totalRes"></td>
-									<td class="title">Ok</td><td id="okRes"></td>
-									<td class="title">Fail</td><td id="failRes"></td>
-									<td id="durationRes" class="duration"></td>
+									<th class="title">Total</th><th id="totalRes"></th>
+									<th class="title">Ok</th><th id="okRes"></th>
+									<th class="title">Fail</th><th id="failRes"></th>
+									<th id="durationRes" class="duration"></th>
 								</tr>
 							</table>
 							<input id="toggleresbtn" class="adm_act_btn toggle-res-btn" type="button" value="Show">

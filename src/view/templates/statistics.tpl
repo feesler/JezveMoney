@@ -28,8 +28,8 @@
 		}	?>
 						</div>
 
-						<div class="std_margin clearfix">
-							<div class="tr_filter filter_sel">
+						<div class="std_margin filters-container">
+							<div class="filter-item">
 								<select id="filter_type">
 <?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
 <?php		if ($byCurrItem["selected"]) {		?>
@@ -42,9 +42,9 @@
 							</div>
 
 <?php	if ($byCurrency) {		?>
-							<div id="acc_block" class="tr_filter filter_sel" style="display: none;">
+							<div id="acc_block" class="filter-item" style="display: none;">
 <?php	} else {	?>
-							<div id="acc_block" class="tr_filter filter_sel">
+							<div id="acc_block" class="filter-item">
 <?php	}	?>
 								<select id="acc_id">
 <?php	foreach($accArr as $accInfo) {
@@ -58,9 +58,9 @@
 							</div>
 
 <?php	if ($byCurrency) {		?>
-							<div id="curr_block" class="tr_filter filter_sel">
+							<div id="curr_block" class="filter-item">
 <?php	} else {	?>
-							<div id="curr_block" class="tr_filter filter_sel" style="display: none;">
+							<div id="curr_block" class="filter-item" style="display: none;">
 <?php	}	?>
 								<select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
@@ -73,7 +73,7 @@
 								</select>
 							</div>
 
-							<div class="tr_filter filter_sel">
+							<div class="filter-item">
 								<select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
@@ -84,28 +84,26 @@
 <?php	}	?>
 								</select>
 							</div>
-						</div>
 
-						<div class="std_margin clearfix">
-							<div class="tr_filter">
+							<div class="filter-item">
 <?php	if (is_empty($dateFmt)) {		?>
 								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span>Select range</span></span></button></div>
 <?php	} else { 	?>
 								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php	} 	?>
 								<div id="date_block" style="display: none;">
-									<div>
-										<button id="cal_rbtn" class="btn icon_btn cal_btn right_float" type="button"><?=svgIcon("cal")?></button>
+									<div class="input-group">
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>
+										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button"><?=svgIcon("cal")?></button>
 										<div id="calendar"></div>
 									</div>
 								</div>
 							</div>
 						</div>
 
-						<div id="chart" class="charts">
+						<div id="chart" class="stat-histogram">
 <?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
 						<span>No results found.</span>
 <?php	}		?>

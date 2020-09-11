@@ -18,7 +18,7 @@
 <?php	if ($action == "edit") {		?>
 						<input id="pid" name="id" type="hidden" value="<?=e($p_id)?>">
 <?php	}	?>
-						<div id="name-inp-block" class="validation-block non_float std_margin">
+						<div id="name-inp-block" class="validation-block view-row std_margin">
 							<label for="pname">Person name</label>
 							<div class="stretch_input std_input">
 								<input id="pname" name="name" type="text" value="<?=e($pInfo->name)?>">

@@ -3,13 +3,13 @@
 <body>
 <div class="import_form">
 <form id="fileimportfrm" method="post" enctype="multipart/form-data" action="<?=BASEURL?>fastcommit/upload">
-	<div class="clearfix">
+	<div>
 		<div class="checkwrap inputwrap"><label><input id="fileUploadRadio" type="radio" name="importTypeRadio"><span>File upload</span><input id="fileInp" type="file"></label></div>
 	</div>
-	<div class="clearfix">
+	<div>
 		<div class="checkwrap inputwrap"><label><input type="radio" name="importTypeRadio"><span>Server</span><input id="srvFilePath" name="srvFilePath" type="text"></label></div>
 	</div>
-	<div class="clearfix">
+	<div>
 		<div>
 			<label>Statement type</label>
 			<select id="statTypeSel">
@@ -18,9 +18,14 @@
 				<option value="2">Credit card</option>
 			</select>
 		</div>
-		<div class="checkwrap"><label><input id="isEncodeCheck" name="encode" type="checkbox"><span>CP-1251 encoding</span></label></div>
+		<div class="checkwrap">
+			<label>
+				<input id="isEncodeCheck" name="encode" type="checkbox">
+				<span>CP-1251 encoding</span>
+			</label>
+		</div>
 	</div>
-	<div class="clearfix">
+	<div>
 		<input id="importbtn" class="btn ok_btn" type="submit" value="Import">
 	</div>
 </form>
@@ -32,11 +37,11 @@
 <?php }	?>
 	</select>
 
-	<div class="clearfix">
+	<div>
 		<table class="import-tbl"><tbody id="importRows"></tbody></table>
 		<div id="rowsContainer"></div>
 	</div>
-	<div class="controls">
+	<div class="import-controls">
 		<div class="std_margin">
 			<input id="newRowBtn" class="btn ok_btn" type="button" value="+">
 			<input id="newPhBtn" class="btn ok_btn" type="button" value="+">

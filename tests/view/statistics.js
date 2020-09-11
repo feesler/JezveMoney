@@ -18,9 +18,9 @@ export class StatisticsView extends TestView
 		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
 		res.title = await this.prop(res.titleEl, 'innerText');
 
-		let filtersList = await this.queryAll('.tr_filter.filter_sel');
-		if (!filtersList || filtersList.length != 4)
-			throw new Error('Wrong statistics view structure');
+		let filtersList = await this.queryAll('.filters-container .filter-item');
+		if (!filtersList || filtersList.length != 5)
+			throw new Error('Invalid structure of statistics view');
 
 		res.filterByDropDown = await DropDown.createFromChild(this, await this.query('#filter_type'));
 

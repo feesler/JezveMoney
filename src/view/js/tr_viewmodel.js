@@ -343,8 +343,11 @@ function TransactionViewModel()
 		}
 
 		show('noacc_btn', Transaction.noAccount());
-		show(source.firstElementChild.nextElementSibling, Transaction.noAccount());
-		show(source.firstElementChild.nextElementSibling.nextElementSibling, Transaction.noAccount());
+		var tileContainer = source.querySelector('.tile_container');
+		var tileInfoBlock = source.querySelector('.tile_right_block');
+
+		show(tileContainer, Transaction.noAccount());
+		show(tileInfoBlock, Transaction.noAccount());
 		show('selaccount', !Transaction.noAccount());
 
 		Transaction.update('no_account', !Transaction.noAccount());

@@ -1,7 +1,9 @@
 /* Transactions page content */
 .trans_list
 {
-	clear: both;
+	display: flex;
+	flex-flow: column wrap;
+	align-items: stretch;
 }
 
 
@@ -9,7 +11,6 @@
 .trlist_item_placeholder
 {
 	width: 100%;
-	float: left;
 	margin: 2px 0px;
 	height: 85px;
 }
@@ -57,7 +58,6 @@ div.act_tr
 .tritem_acc_name
 {
 	font-size: 14px;
-	clear: both;
 }
 
 
@@ -71,7 +71,6 @@ div.act_tr
 {
 	font-size: 16px;
 	font-weight: 600;
-	clear: left;
 }
 
 
@@ -224,54 +223,61 @@ div.act_tr
 }
 
 
-/* Table drag&drop placeholder row */
-.details_table .trlist_item_wrap
-{
-	float: none;
-}
-
-
-.details_table .trlist_item_placeholder
-{
-	float: none;
-}
-
-
 .details_table .trlist_item_placeholder td > div
 {
 	opacity: 0;
 }
 
 
-.mode_selector
+/* Mode selector and paginator row */
+.paginator-row
 {
-	float: left;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+}
+
+
+/* Mode selector */
+.mode-selector
+{
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-items: center;
 	padding: 5px 0px;
 }
 
 
-.mode_selector span
+.mode-selector-item
+{
+	display: inline-flex;
+	flex-flow: row nowrap;
+}
+
+
+.mode-selector-item span
 {
 	height: 22px;
 	line-height: 22px;
-	float: left;
 	padding: 0px 10px 0px 5px;
 }
 
 
-.mode_selector .icon
+.mode-selector-item .icon
 {
 	width: 24px;
 	height: 24px;
-	float: left;
 	padding: 0;
 }
 
 
+/* Paginator */
 .paginator
 {
+	display: inline-flex;
+	flex-flow: row nowrap;
+	margin-left: auto;
 	padding: 5px 0px;
-	text-align: right;
 }
 
 
@@ -282,3 +288,16 @@ div.act_tr
 	line-height: 22px;
 }
 
+
+/* Search form */
+.search-form
+{
+	align-self: right;
+}
+
+
+.search_btn
+{
+	align-self: right;
+	flex-grow: 0;
+}

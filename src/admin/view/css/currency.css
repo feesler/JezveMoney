@@ -31,15 +31,12 @@
 .check_wr
 {
 	height: 20px;
-	float: none;
-	clear: both;
 	padding: 5px 0px;
 }
 
 
 .check_wr > input[type="checkbox"]
 {
-	float: left;
 	display: inline;
 	height: 20px;
 	line-height: 20px;
@@ -48,7 +45,6 @@
 
 .check_wr > label
 {
-	float: left;
 	display: inline;
 	width: auto;
 	padding: 0px 5px;

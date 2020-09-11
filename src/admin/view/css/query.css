@@ -1,8 +1,6 @@
 .query-form,
 .query-history
 {
-	display: inline-block;
-	float: left;
 	height: 100%;
 }
 

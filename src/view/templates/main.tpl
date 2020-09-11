@@ -6,8 +6,8 @@
 <?php	require_once(TPL_PATH."header.tpl");		?>
 		<div class="container centered">
 			<div class="content">
-				<div class="content_wrap">
-					<div class="widget">
+				<div class="content_wrap main-view">
+					<div class="widget accounts-widget">
 						<div class="widget_title"><a href="<?=BASEURL?>accounts/"><span>Accounts</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
 						<div class="tiles"><?php
 		if (!count($tilesArr)) {	?>
@@ -35,7 +35,7 @@
 						</div>
 					</div>
 
-					<div class="widget break_widget latest_widget">
+					<div class="widget transactions-widget">
 						<div class="widget_title"><a href="<?=BASEURL?>transactions/"><span>Transactions</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
 						<div id="trlist" class="trans_list">
 <?php	if (!count($trListData)) {	?>
@@ -83,7 +83,7 @@
 
 					<div class="widget">
 						<div class="widget_title"><a href="<?=BASEURL?>statistics/"><span>Statistics</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
-						<div id="chart" class="charts widget_charts"></div>
+						<div id="chart" class="widget_charts"></div>
 					</div>
 				</div>
 			</div>

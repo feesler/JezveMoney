@@ -452,8 +452,9 @@ var Charts = new (function()
 			chartContent = ce('div', { className : 'chart_content' }, chart);
 
 			chartsWrapObj = ce('div', { className : 'charts' }, [
-									ce('div', { className : 'right_float' }, vert_labels),
-									ce('div', { className : 'chart_wrap' }, chartContent) ]);
+									ce('div', { className : 'chart_wrap' }, chartContent),
+									ce('div', { className : 'vertical-legend' }, vert_labels)
+								]);
 			containerObj.appendChild(chartsWrapObj);
 
 			chartContent.onscroll = function(e){ onScroll.call(this, e); };
@@ -876,8 +877,9 @@ var Charts = new (function()
 			chartContent = ce('div', { className : 'chart_content' }, chart);
 
 			chartsWrapObj = ce('div', { className : 'charts' }, [
-									ce('div', { className : 'right_float' }, vert_labels),
-									ce('div', { className : 'chart_wrap' }, chartContent) ]);
+									ce('div', { className : 'chart_wrap' }, chartContent),
+									ce('div', { className : 'vertical-legend' }, vert_labels)
+								]);
 			containerObj.appendChild(chartsWrapObj);
 
 			chartContent.onscroll = function(e){ onScroll.call(this, e); };

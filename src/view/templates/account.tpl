@@ -19,10 +19,10 @@
 <?php	if ($action == "edit") {		?>
 						<input id="accid" name="id" type="hidden" value="<?=e($acc_id)?>">
 <?php	}	?>
-						<div class="non_float std_margin">
+						<div class="view-row std_margin">
 							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($accInfo->balfmt)?></span><span class="acc_icon"><?=useIcon("tile-".$accInfo->iconname, 60, 54)?></span><span class="acc_name"><?=e($tileAccName)?></span></span></button></div>
 						</div>
-						<div class="non_float std_margin">
+						<div class="view-row std_margin">
 							<label for="icon">Icon</label>
 							<div class="std_input">
 								<select id="icon" name="icon">
@@ -36,12 +36,12 @@
 								</select>
 							</div>
 						</div>
-						<div id="name-inp-block" class="validation-block non_float std_margin">
+						<div id="name-inp-block" class="validation-block view-row std_margin">
 							<label for="accname">Account name</label>
 							<div class="stretch_input std_input"><input id="accname" name="name" type="text" value="<?=e($accInfo->name)?>"></div>
 							<div class="invalid-feedback">Please input name of account.</div>
 						</div>
-						<div class="non_float std_margin">
+						<div class="view-row std_margin">
 							<label for="currency">Currency</label>
 							<div class="std_input">
 								<select id="currency" name="curr_id">
@@ -55,10 +55,10 @@
 								</select>
 							</div>
 						</div>
-						<div id="initbal-inp-block" class="validation-block non_float std_margin">
+						<div id="initbal-inp-block" class="validation-block view-row std_margin">
 							<label for="balance">Initial balance</label>
 							<div>
-								<div class="curr_container"><div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=e($accInfo->sign)?></div></div></div>
+								<div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=e($accInfo->sign)?></div></div>
 								<div class="stretch_input std_input">
 									<input class="summ_text" id="balance" name="initbalance" type="text" value="<?=e($accInfo->initbalance)?>">
 								</div>

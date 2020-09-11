@@ -68,7 +68,10 @@ export class TransactionView extends TestView
 
 			res.operation = await this.parseOperation(await this.query('#operation'));
 
-			res.selaccount = { elem : await this.query('#selaccount'), btn : await this.query('#selaccount > *') };
+			res.selaccount = {
+				elem : await this.query('#selaccount'),
+				btn : await this.query('#selaccount > *')
+			};
 			if (!res.selaccount.elem || !res.selaccount.btn)
 				throw new Error('Select account button not found');
 			res.selaccount.click = () => this.click(res.selaccount.btn);

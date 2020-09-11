@@ -230,7 +230,7 @@ function activateMenu(menuElem)
 			menuElem.parentNode.classList.add('active');
 		activeController = menuElem.parentNode;
 	}
-	else if (menuElem.tagName == 'LI' && menuElem.parentNode && menuElem.parentNode.classList.contains('sub_list'))
+	else if (menuElem.tagName == 'LI' && menuElem.parentNode && menuElem.parentNode.classList.contains('sub-menu-list'))
 	{
 		if (activeFormLink)
 			activeFormLink.classList.remove('active');
@@ -704,7 +704,7 @@ function initControls()
 
 	activeForm = document.querySelector('.test_form.active');
 	activeController = document.querySelector('#controllersList > li.active');
-	activeFormLink = document.querySelector('#controllersList > li.active > .sub_list > li.active');
+	activeFormLink = document.querySelector('#controllersList > li.active > .sub-menu-list > li.active');
 
 	clearResultsBtn = ge('clearResultsBtn');
 	if (clearResultsBtn)

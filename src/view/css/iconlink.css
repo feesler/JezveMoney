@@ -2,8 +2,8 @@
 .iconlink
 {
 	box-sizing: border-box;
-	display: inline-block;
-	float: left;
+	display: inline-flex;
+	flex-flow: row nowrap;
 	overflow: hidden;
 	height: 32px;
 }
@@ -18,8 +18,6 @@
 	border-radius: 50%;
 	padding: 2px;
 	overflow: hidden;
-	display: inline-block;
-	float: left;
 }
 
 
@@ -59,14 +57,15 @@
 }
 
 
-.iconlink span.icontitle
+.iconlink .icontitle
 {
 	height: 32px;
 	color: #000000;
-	display: table-cell;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	align-items: flex-start;
 	vertical-align: middle;
 	padding: 0px 0px 0px 5px;
-	float: left;
 	white-space: nowrap;
 	line-height: 32px;
 	font-size: 16px;
@@ -76,24 +75,15 @@
 }
 
 
-.iconlink .icontitle
-{
-	float: left;
-}
-
-
 .iconlink .maintitle
 {
 	height: 20px;
 	line-height: 20px;
-	float: left;
 	white-space: nowrap;
 	font-size: 16px;
 	font-weight: normal;
 	text-decoration: none;
 	text-transform: none;
-
-	clear: both;
 }
 
 
@@ -102,7 +92,6 @@
 	height: 12px;
 	line-height: 12px;
 	clear: both;
-	float : left;
 	color: #20A0FF;
 	font-size: 10px;
 	font-weight: bold;
@@ -119,7 +108,8 @@
 .iconlink > a
 {
 	height: 32px;
-	display: table-cell;
+	display: inline-flex;
+	flex-flow: row nowrap;
 	vertical-align: middle;
 	text-decoration: none;
 }
@@ -127,6 +117,8 @@
 
 .iconlink > button
 {
+	display: inline-flex;
+	flex-flow: row nowrap;
 	height: 32px;
 	border: 0 none;
 	cursor: pointer;
@@ -164,7 +156,6 @@
     margin: 0;
     background: none;
     cursor: pointer;
-    float: left;
     display: inline-block;
     line-height: 20px;
     height: 20px;

@@ -12,7 +12,6 @@
 
 .column
 {
-	float: left;
 	width: 49%;
 }
 
@@ -81,6 +80,8 @@
 
 .tr_row
 {
+	display: flex;
+	flex-flow: row nowrap;
 	height: 36px;
 }
 
@@ -88,7 +89,6 @@
 .tr_row > *
 {
 	display: inline;
-	float: left;
 }
 
 .tr_row > select,
@@ -175,11 +175,15 @@
 /* Checkbox or radiobutton wrapper */
 .checkwrap
 {
-	display: inline-block;
-	float: left;
-	white-space: nowrap;
 	height: 20px;
 	line-height: 20px;
+}
+
+.checkwrap > label
+{
+	display: inline-flex;
+	flex-flow: row nowrap;
+	white-space: nowrap;
 }
 
 
@@ -190,12 +194,6 @@
 }
 
 
-.checkwrap.inputwrap input[type="text"]
-{
-	float: none;
-}
-
-
 .checkwrap input[type="checkbox"],
 .checkwrap input[type="radio"],
 .checkwrap > label,
@@ -203,7 +201,6 @@
 {
 	height: 20px;
 	line-height: 20px;
-	float: left;
 }
 
 
@@ -213,7 +210,6 @@
 {
 	height: 20px;
 	line-height: 20px;
-	float: left;
 	padding: 0 5px;
 }
 

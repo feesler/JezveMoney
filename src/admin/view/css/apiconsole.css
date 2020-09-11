@@ -16,58 +16,58 @@ h3
 }
 
 
-
-.left_column
+.api-console
 {
-	display: inline-block;
-	float: left;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: flex-start;
+	justify-items: flex-start;
+}
+
+
+.left-column
+{
+	display: inline-flex;
+	flex-flow: column nowrap;
 	width: 15%;
 }
 
 
-.center_column
+.center-column
 {
-	display: inline-block;
-	float: left;
+	display: inline-flex;
+	flex-flow: column nowrap;
 	width: 35%;
 	padding: 0 2.5%;
 }
 
 
-.right_column
+.right-column
 {
-	display: inline-block;
-	float: left;
+	display: inline-flex;
+	flex-flow: column nowrap;
 	width: 45%;
 }
 
 
 /* Left menus */
 
-/* Section header */
-.menu_section
-{
-	font-size: 18px;
-	font-weight: 500;
-	margin: 10px 0 0 0;
-}
-
-
 /* Menu lists */
-.cont_list > li
+.menu-list > li
 {
 	padding: 5px;
 	list-style-type: none;
 }
 
 
-.cont_list > li.active > button
+.menu-list > li.active > button
 {
 	font-weight: bold;
 }
 
 
-.cont_list > li > button
+.menu-list > li > button
 {
 	font-size: 18px;
 	background: none;
@@ -75,22 +75,21 @@ h3
 }
 
 
-.cont_list .sub_list
+.menu-list .sub-menu-list
 {
 	padding: 0px 0px 0px 10px;
 	display: none;
-
 	list-style-image: none;
 }
 
 
-.cont_list > li.active .sub_list
+.menu-list > li.active .sub-menu-list
 {
 	display: block;
 }
 
 
-.cont_list .sub_list > li
+.menu-list .sub-menu-list > li
 {
 	list-style-image: none;
 	list-style-type: none;
@@ -101,13 +100,13 @@ h3
 }
 
 
-.cont_list > li.active .sub_list > li.active
+.menu-list > li.active .sub-menu-list > li.active
 {
 	font-style: italic;
 }
 
 
-.cont_list .sub_list > li:hover
+.menu-list .sub-menu-list > li:hover
 {
 	text-decoration: underline;
 	color: #222222;
@@ -149,6 +148,7 @@ h3
 	display: inline-block;
 }
 
+
 .test_form input[type="checkbox"]
 {
 	margin: 0 5px 2px 0;
@@ -159,7 +159,6 @@ h3
 .test_form input[type="text"]
 {
 	border: 1px solid #000000;
-	float: none;
 	display: inline;
 	padding: 3px;
 }
@@ -321,24 +320,23 @@ h3
 }
 
 
-
 /* Requests log */
-.req_log
+.request-log
 {
-	overflow: hidden;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
 }
 
 
-.req_log h2
+.request-log h2
 {
-	display: inline-block;
-	float: left;
-	clear: none;
+	display: inline-flex;
 }
 
 
-.req_log input[type="button"]
+.request-log input[type="button"]
 {
-	float: right;
-	display: inline-block;
+	display: inline-flex;
+	margin-left: auto;
 }

@@ -1,9 +1,15 @@
 .tiles
 {
-	display: block;
-	clear: both;
+	display: flex;
+	flex-flow: row wrap;
 	max-width: 440px;
 	overflow: hidden;
+}
+
+
+.tiles .tile
+{
+	margin: 0px 10px 10px 0px;
 }
 
 
@@ -12,10 +18,8 @@
 	width: 100px;
 	height: 100px;
 	background-color: #20A0FF;
-	margin: 0px 10px 10px 0px;
 	padding: 0;
-	display: inline-block;
-	float: left;
+	display: inline-flex;
 	position: relative;
 	overflow: hidden;
 	cursor: pointer;

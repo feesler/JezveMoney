@@ -31,7 +31,7 @@ export class PersonView extends TestView
 
 		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 
-		res.name = await InputRow.create(this, await this.query(res.formElem, 'div.non_float'));
+		res.name = await InputRow.create(this, await this.query(res.formElem, 'div.view-row'));
 		if (!res.name)
 			throw new Error('Person name input not found');
 

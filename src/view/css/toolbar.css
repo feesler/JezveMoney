@@ -76,9 +76,7 @@
 
 .siderbar_content .iconlink
 {
-	display: block;
-	clear: both;
-	float: none;
+	display: flex;
 	margin: 9px 12px;
 }
 
@@ -139,15 +137,13 @@
 
 .sidebar_buttons
 {
-	display: block;
+	display: flex;
 	padding: 0;
 }
 
 
 .siderbar_content .iconlink
 {
-	clear: none;
-	float: left;
 	margin: 9px 0px 9px 12px;
 }
 

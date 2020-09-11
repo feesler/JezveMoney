@@ -7,8 +7,9 @@
 
 .tile_header
 {
-	float: none;
-	clear: both;
+	flex-basis: 100%;
+	flex-grow: 2;
+	flex-shrink: 0;
 	height: 20px;
 	line-height: 20px;
 	overflow: hidden;
@@ -17,10 +18,22 @@
 
 .tile_header > label
 {
-	display: inline-block;
-	float: left;
+	display: inline-flex;
 	width: auto;
 	margin: 0 5px 0 0;
+}
+
+
+.tile_header > .sm-icon-btn
+{
+	display: inline-flex;
+}
+
+
+.tile-base
+{
+	display: flex;
+	flex-flow: row wrap;
 }
 
 
@@ -28,7 +41,6 @@
 {
 	width: 100px;
 	height: 100px;
-	float: left;
 	padding: 8px 5px 8px 0px;
 }
 
@@ -39,7 +51,6 @@
 	min-width: 100px;
 	margin: 8px 20px 10px 0px;
 	overflow: hidden;
-	float: left;
 }
 
 
@@ -55,11 +66,12 @@
 }
 
 
-.acc_float
+.account-container
 {
 	min-width: 100px;
 	max-width: 400px;
-	float: left;
+	display: inline-flex;
+	flex-flow: column nowrap;
 }
 
 
@@ -76,38 +88,38 @@
 .op_sel
 {
 	margin: 2px 0px 10px 0px;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-items: center;
 }
 
 .op_sel > label
 {
-	float: left;
 	width: auto;
 	height: auto;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-items: center;
 }
+
 
 .op_sel input
 {
-	float: left;
 	line-height: 22px;
 	height: 22px;
 }
 
+
 .op_sel span
 {
-	float: left;
 	line-height: 22px;
 	margin: 0px 10px 0px 5px;
 }
 
 
 /* transactions page filer */
-.tr_filter
+.search-filter-item
 {
-	float: left;
-}
-
-
-.date_filter
-{
-	margin: 0px 0px 0px 15px;
+	margin-right: 0;
+	margin-left: auto;
 }

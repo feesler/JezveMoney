@@ -39,15 +39,15 @@
 
 <form id="curr_frm" method="post" action="<?=BASEURL?>api/currency/new" style="display: none;">
 <input id="curr_id" name="id" type="hidden">
-<div class="non_float">
+<div class="view-row">
 	<label for="curr_name">Name</label>
 	<div class="stretch_input"><input id="curr_name" name="name" type="text"></div>
 </div>
-<div class="non_float">
+<div class="view-row">
 	<label for="curr_sign">Sign</label>
 	<div class="stretch_input"><input id="curr_sign" name="sign" type="text"></div>
 </div>
-<div id="admin_block" class="non_float">
+<div id="admin_block" class="view-row">
 	<div id="admin_block" class="check_wr">
 		<label for="isbefore"><input id="isbefore" name="flags" type="radio" value="1">Sign before value</label>
 	</div>
