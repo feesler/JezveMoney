@@ -338,6 +338,20 @@ class MySqlDB
 	}
 
 
+	// Return error number for last query
+	public function getError()
+	{
+		return $this->errno;
+	}
+
+
+	// Return error number for last query
+	public function getMessage()
+	{
+		return $this->errorMessage;
+	}
+
+
 	// Return last insert id
 	public function insertId()
 	{

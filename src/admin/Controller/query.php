@@ -27,8 +27,8 @@ class QueryAdminController extends AdminController
 			{
 				$resArr = [];
 				$result = $this->db->rawQ($query);
-				$qerr_num = $this->db->errno;
-				$qerror = $this->db->errorMessage;
+				$qerr_num = $this->db->getError();
+				$qerror = $this->db->getMessage();
 				if ($result && $result !== TRUE && !is_null($result) && !$qerr_num && $this->db->rowsCount($result) > 0)
 				{
 					$this->saveQuery($query);
