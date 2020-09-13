@@ -13,12 +13,12 @@ export class RegisterView extends TestView
 			loginInp : await InputRow.create(this, await this.query('#login-inp-block')),
 			nameInp : await InputRow.create(this, await this.query('#name-inp-block')),
 			passwordInp : await InputRow.create(this, await this.query('#pwd-inp-block')),
-			submitBtn : await this.query('.login_controls .btn.ok_btn'),
-			loginLink : await this.query('.login_controls .alter_link > a')
+			submitBtn : await this.query('.form-controls .btn.ok_btn'),
+			loginLink : await this.query('.form-controls .alter_link > a')
 		};
 
 		if (!res.loginInp || !res.nameInp || !res.passwordInp || !res.submitBtn || !res.loginLink)
-			throw new Error('Unexpected structure of register view');
+			throw new Error('Invalid structure of register view');
 
 		return res;
 	}

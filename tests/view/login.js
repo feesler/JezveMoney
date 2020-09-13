@@ -13,12 +13,12 @@ export class LoginView extends TestView
 		let res = {
 			loginInp : await InputRow.create(this, await this.query('#login-inp-block')),
 			passwordInp : await InputRow.create(this, await this.query('#pwd-inp-block')),
-			submitBtn : await this.query('.login_controls .btn.ok_btn'),
-			registerLink : await this.query('.login_controls .alter_link > a')
+			submitBtn : await this.query('.form-controls .btn.ok_btn'),
+			registerLink : await this.query('.form-controls .alter_link > a')
 		};
 
 		if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink)
-			throw new Error('Wrong login view structure');
+			throw new Error('Invalid structure of login view');
 
 		return res;
 	}
