@@ -33,7 +33,7 @@
 							<tr><td colspan="<?=e($cols)?>">Rows: <?=e($rows)?></td></tr>
 						</table>
 <?php		} else {	?>
-						<div style="color: red;">Error: <?=e($qerr_num)?><br><?=e($qerror)?></div><br>
+						<div class="query-error">Error: <?=e($qerr_num)?><br><?=e($qerror)?></div><br>
 <?php		}	?>
 <?php	}	?>
 					</div>

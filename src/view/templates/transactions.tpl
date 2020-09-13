@@ -59,7 +59,7 @@
 <?php } else {	?>
 								<div id="calendar_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php }		?>
-								<div id="date_block" style="display: none;">
+								<div id="date_block" class="hidden">
 									<div class="input-group">
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
@@ -91,14 +91,14 @@
 		</div>
 	</div>
 
-	<div id="toolbar" class="sidebar" style="display: none;">
+	<div id="toolbar" class="sidebar hidden">
 		<div>
 			<div class="siderbar_content">
 				<div id="tb_content">
 					<div id="sbEllipsis" class="sidebar_ellipsis"><?=svgIcon("sbellipsis")?></div>
 					<div id="sbButtons" class="sidebar_buttons">
-						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white"><?=svgIcon("edit")?></span><span class="icontitle"><span>Edit</span></span></a></div>
-						<div id="del_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="edit_btn" class="iconlink hidden"><a><span class="icon icon_white"><?=svgIcon("edit")?></span><span class="icontitle"><span>Edit</span></span></a></div>
+						<div id="del_btn" class="iconlink hidden"><button type="button"><span class="icon icon_white"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
 					</div>
 				</div>
 			</div>

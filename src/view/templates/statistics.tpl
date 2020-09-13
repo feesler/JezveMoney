@@ -42,7 +42,7 @@
 							</div>
 
 <?php	if ($byCurrency) {		?>
-							<div id="acc_block" class="filter-item" style="display: none;">
+							<div id="acc_block" class="filter-item hidden">
 <?php	} else {	?>
 							<div id="acc_block" class="filter-item">
 <?php	}	?>
@@ -60,7 +60,7 @@
 <?php	if ($byCurrency) {		?>
 							<div id="curr_block" class="filter-item">
 <?php	} else {	?>
-							<div id="curr_block" class="filter-item" style="display: none;">
+							<div id="curr_block" class="filter-item hidden">
 <?php	}	?>
 								<select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
@@ -91,7 +91,7 @@
 <?php	} else { 	?>
 								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php	} 	?>
-								<div id="date_block" style="display: none;">
+								<div id="date_block" class="hidden">
 									<div class="input-group">
 										<div class="stretch_input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">

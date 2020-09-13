@@ -31,9 +31,9 @@
 
 					<div class="acc_controls">
 						<input id="createbtn" class="adm_act_btn" type="button" value="new">
-						<input id="updbtn" class="adm_act_btn" type="button" value="update" style="display: none;">
-						<input id="passbtn" class="adm_act_btn" type="button" value="set password" style="display: none;">
-						<input id="del_btn" class="adm_act_btn" type="button" value="delete" style="display: none;">
+						<input id="updbtn" class="adm_act_btn hidden" type="button" value="update">
+						<input id="passbtn" class="adm_act_btn hidden" type="button" value="set password">
+						<input id="del_btn" class="adm_act_btn hidden" type="button" value="delete">
 					</div>
 				</div>
 			</div>
@@ -41,7 +41,7 @@
 	</div>
 </div>
 
-<form id="user_frm" method="post" style="display: none;">
+<form id="user_frm" class="hidden" method="post">
 <input id="user_id" name="id" type="hidden">
 <div id="login_block" class="view-row">
 	<label for="user_login">Login</label>

@@ -28,8 +28,8 @@
 
 					<div class="acc_controls">
 						<input id="createbtn" class="adm_act_btn" type="button" value="new">
-						<input id="updbtn" class="adm_act_btn" type="button" value="update" style="display: none;">
-						<input id="del_btn" class="adm_act_btn" type="button" value="delete" style="display: none;">
+						<input id="updbtn" class="adm_act_btn hidden" type="button" value="update">
+						<input id="del_btn" class="adm_act_btn hidden" type="button" value="delete">
 					</div>
 				</div>
 			</div>
@@ -37,7 +37,7 @@
 	</div>
 </div>
 
-<form id="curr_frm" method="post" action="<?=BASEURL?>api/currency/new" style="display: none;">
+<form id="curr_frm" class="hidden" method="post" action="<?=BASEURL?>api/currency/new">
 <input id="curr_id" name="id" type="hidden">
 <div class="view-row">
 	<label for="curr_name">Name</label>

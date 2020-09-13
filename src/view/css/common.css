@@ -50,6 +50,13 @@ input[type="button"], input[type="submit"], button
 }
 
 
+/* Hidden element */
+.hidden
+{
+	display: none !important;
+}
+
+
 /* Clearfix */
 .clearfix
 {

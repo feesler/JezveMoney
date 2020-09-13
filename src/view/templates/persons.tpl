@@ -29,23 +29,23 @@
 			}
 ?></div>
 <?php	} else {	?>
-					<div id="hiddenTilesContainer" class="tiles" style="display: none;"></div>
+					<div id="hiddenTilesContainer" class="tiles hidden"></div>
 <?php	}	?>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div id="toolbar" class="sidebar" style="display: none;">
+	<div id="toolbar" class="sidebar hidden">
 		<div>
 			<div class="siderbar_content">
 				<div id="tb_content">
 					<div id="sbEllipsis" class="sidebar_ellipsis"><?=svgIcon("sbellipsis")?></div>
 					<div id="sbButtons" class="sidebar_buttons">
-						<div id="edit_btn" class="iconlink" style="display: none;"><a><span class="icon icon_white"><?=svgIcon("edit")?></span><span class="icontitle"><span>Edit</span></span></a></div>
-						<div id="show_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("show")?></span><span class="icontitle"><span>Restore</span></span></button></div>
-						<div id="hide_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("hide")?></span><span class="icontitle"><span>Hide</span></span></button></div>
-						<div id="del_btn" class="iconlink" style="display: none;"><button type="button"><span class="icon icon_white"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="edit_btn" class="iconlink hidden"><a><span class="icon icon_white"><?=svgIcon("edit")?></span><span class="icontitle"><span>Edit</span></span></a></div>
+						<div id="show_btn" class="iconlink hidden"><button type="button"><span class="icon icon_white"><?=svgIcon("show")?></span><span class="icontitle"><span>Restore</span></span></button></div>
+						<div id="hide_btn" class="iconlink hidden"><button type="button"><span class="icon icon_white"><?=svgIcon("hide")?></span><span class="icontitle"><span>Hide</span></span></button></div>
+						<div id="del_btn" class="iconlink hidden"><button type="button"><span class="icon icon_white"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
 					</div>
 				</div>
 			</div>

@@ -59,7 +59,7 @@
 	</div>
 </div>
 
-<div id="changename" style="display: none;">
+<div id="changename" class="hidden">
 <form method="post" action="<?=BASEURL?>profile/changename/">
 	<div id="name-inp-block" class="validation-block view-row">
 		<label for="newname">New name</label>
@@ -69,7 +69,7 @@
 </form>
 </div>
 
-<div id="changepass" style="display: none;">
+<div id="changepass" class="hidden">
 <form method="post" action="<?=BASEURL?>profile/changepass/">
 	<div id="old-pwd-inp-block" class="validation-block view-row">
 		<label for="oldpwd">Current password</label>

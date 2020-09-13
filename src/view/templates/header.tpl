@@ -4,7 +4,7 @@
 <?php	if ($this->user_id != 0) {		?>
 				<div class="userblock">
 					<button id="userbtn" class="user_button" type="button"><span class="user_icon"><?=svgIcon("user")?></span><span class="user_title"><?=e($this->user_name)?></span></button>
-					<div id="menupopup" class="usermenu" style="display: none;">
+					<div id="menupopup" class="usermenu hidden">
 						<ul>
 <?php	if ($this->uMod->isAdmin($this->user_id)) {		?>
 							<li><a href="<?=BASEURL?>admin/">admin panel</a></li>

@@ -54,7 +54,7 @@
 								</div>
 
 								<div class="tile_right_block">
-									<div id="src_amount_left" style="display: none;">
+									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
 											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
@@ -63,7 +63,7 @@
 <?php		if ($srcAmountCurr != $destAmountCurr) {		?>
 									<div id="exch_left">
 <?php		} else {	?>
-									<div id="exch_left" style="display: none;">
+									<div id="exch_left" class="hidden">
 <?php		}	?>
 										<span>Exchange rate</span>
 										<div>
@@ -91,9 +91,9 @@
 
 						<div id="source" class="account-container">
 <?php		if ($noAccount) {		?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="sm-icon-btn" type="button" style="display: none;"><?=svgIcon("close")?></button></div>
+							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="sm-icon-btn hidden" type="button"><?=svgIcon("close")?></button></div>
 							<div class="tile-base">
-								<div class="tile_container" style="display: none;">
+								<div class="tile_container hidden">
 									<div id="acc_tile" class="tile<?=e($acc_ic)?>"><div class="tilelink"><span><span class="acc_bal"><?=e($acc_balance)?></span><span class="acc_name"><?=e($acc_name)?></span></span></div></div>
 									<input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
 <?php		} else {	?>
@@ -108,9 +108,9 @@
 <?php		if (!$noAccount) {		?>
 								<div class="tile_right_block">
 <?php		} else {	?>
-								<div class="tile_right_block" style="display: none;">
+								<div class="tile_right_block hidden">
 <?php		}	?>
-									<div id="dest_amount_left" style="display: none;">
+									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
 											<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=e($rtDestAmount)?></span></button>
@@ -136,7 +136,7 @@
 <?php		if ($noAccount) {		?>
 							<div id="selaccount" class="selacc_container">
 <?php		} else {	?>
-							<div id="selaccount" class="selacc_container" style="display: none;">
+							<div id="selaccount" class="selacc_container hidden">
 <?php		}	?>
 								<button class="dashed_btn resbal_btn" type="button"><span>Select account</span></button>
 							</div>
@@ -153,7 +153,7 @@
 
 								<div class="tile_right_block">
 <?php	if ($tr["type"] == TRANSFER) {		?>
-									<div id="src_amount_left" style="display: none;">
+									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
 											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
@@ -161,7 +161,7 @@
 									</div>
 <?php	}	?>
 <?php	if ($tr["type"] == EXPENSE) {		?>
-									<div id="dest_amount_left" style="display: none;">
+									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
 											<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=e($rtDestAmount)?></span></button>
@@ -175,7 +175,7 @@
 										</div>
 									</div>
 <?php	if (($tr["type"] == TRANSFER && $src->curr_id == $dest->curr_id) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
-									<div id="exch_left" style="display: none;">
+									<div id="exch_left" class="hidden">
 <?php	} else {	?>
 									<div id="exch_left">
 <?php	}	?>
@@ -201,13 +201,13 @@
 								</div>
 
 								<div class="tile_right_block">
-									<div id="src_amount_left" style="display: none;">
+									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
 											<button id="src_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
 										</div>
 									</div>
-									<div id="dest_amount_left" style="display: none;">
+									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
 											<button id="dest_amount_b" class="dashed_btn resbal_btn" type="button"><span><?=e($rtDestAmount)?></span></button>
@@ -221,7 +221,7 @@
 									</div>
 <?php	if ($tr["type"] == INCOME) {		?>
 <?php		if ($tr["src_curr"] == $tr["dest_curr"]) {		?>
-									<div id="exch_left" style="display: none;">
+									<div id="exch_left" class="hidden">
 <?php		} else {		?>
 									<div id="exch_left">
 <?php		}				?>
@@ -249,7 +249,7 @@
 <?php	if ($showSrcAmount) {		?>
 						<div id="src_amount_row" class="validation-block view-row">
 <?php	} else {	?>
-						<div id="src_amount_row" class="validation-block view-row" style="display: none;">
+						<div id="src_amount_row" class="validation-block view-row hidden">
 <?php	}	?>
 							<div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
 							<div class="input-group std_margin">
@@ -277,7 +277,7 @@
 <?php	if ($showDestAmount) {		?>
 						<div id="dest_amount_row" class="validation-block view-row">
 <?php	} else {	?>
-						<div id="dest_amount_row" class="validation-block view-row" style="display: none;">
+						<div id="dest_amount_row" class="validation-block view-row hidden">
 <?php	}	?>
 							<div><label for="dest_amount"><?=e($destAmountLbl)?></label></div>
 							<div class="input-group std_margin">
@@ -302,7 +302,7 @@
 							</div>
 						</div>
 
-						<div id="exchange" class="view-row" style="display: none;">
+						<div id="exchange" class="view-row hidden">
 							<div><label for="exchrate">Exchange rate</label></div>
 							<div class="input-group std_margin">
 								<span id="exchcomm" class="exchrate_comm"><?=e($exchSign)?></span>
@@ -313,7 +313,7 @@
 						</div>
 
 <?php	if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {		?>
-						<div id="result_balance" class="view-row" style="display: none;">
+						<div id="result_balance" class="view-row hidden">
 							<div><label for="resbal"><?=e($srcBalTitle)?></label></div>
 							<div class="input-group std_margin">
 								<div class="stretch_input">
@@ -329,7 +329,7 @@
 <?php	}	?>
 
 <?php	if ($tr["type"] == INCOME || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {		?>
-						<div id="result_balance_dest" class="view-row" style="display: none;">
+						<div id="result_balance_dest" class="view-row hidden">
 							<div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
 							<div class="input-group std_margin">
 								<div class="stretch_input">
@@ -345,7 +345,7 @@
 <?php	}	?>
 						<div class="view-row">
 							<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Change date</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
-							<div id="date_block" class="validation-block" style="display: none;">
+							<div id="date_block" class="validation-block hidden">
 								<div><label for="date">Date</label></div>
 								<div class="column-container std_margin">
 									<div class="input-group">
@@ -363,9 +363,9 @@
 						<div class="view-row">
 <?php	if (is_empty($tr["comment"])) {		?>
 							<div id="comm_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>Add comment</span></span></button></div>
-							<div id="comment_block" style="display: none;">
+							<div id="comment_block" class="hidden">
 <?php	} else {	?>
-							<div id="comm_btn" class="iconlink std_margin" style="display: none;"><button type="button"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>Add comment</span></span></button></div>
+							<div id="comm_btn" class="iconlink std_margin hidden"><button type="button"><span class="icon"><?=svgIcon("plus")?></span><span class="icontitle"><span>Add comment</span></span></button></div>
 							<div id="comment_block">
 <?php	}	?>
 								<div><label for="comm">Comment</label></div>

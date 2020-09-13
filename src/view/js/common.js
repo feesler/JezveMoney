@@ -193,13 +193,17 @@ function isVisible(obj, recursive)
 }
 
 
-// Show specified object
-function show(obj, val)
+// Show/hide specified element
+function show(elem, val)
 {
-	var robj = ge(obj);
+	var domElem = (typeof elem === 'string') ? ge(elem) : elem;
+	if (!domElem || !domElem.classList)
+		return;
 
-	if (robj)
-		robj.style.display = (val) ? '' : 'none';
+	if (!!val)
+		domElem.classList.remove('hidden');
+	else
+		domElem.classList.add('hidden');
 }
 
 

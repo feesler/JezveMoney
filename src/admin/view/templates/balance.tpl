@@ -36,15 +36,15 @@
 							<td><?=e($tr->src_amount)?></td>
 							<td><?=e($tr->dest_amount)?></td>
 <?php		if ($tr->src_result != $tr->exp_src_result) {		?>
-							<td style="background-color: red;"><?=e($tr->src_result)?></td>
-							<td style="background-color: green;"><?=e($tr->exp_src_result)?></td>
+							<td class="invalid-result"><?=e($tr->src_result)?></td>
+							<td class="expected-result"><?=e($tr->exp_src_result)?></td>
 <?php		} else {		?>
 							<td><?=e($tr->src_result)?></td>
 							<td><?=e($tr->exp_src_result)?></td>
 <?php		}		?>
 <?php		if ($tr->dest_result != $tr->exp_dest_result) {		?>
-							<td style="background-color: red;"><?=e($tr->dest_result)?></td>
-							<td style="background-color: green;"><?=e($tr->exp_dest_result)?></td>
+							<td class="invalid-result"><?=e($tr->dest_result)?></td>
+							<td class="expected-result"><?=e($tr->exp_dest_result)?></td>
 <?php		} else {		?>
 							<td><?=e($tr->dest_result)?></td>
 							<td><?=e($tr->exp_dest_result)?></td>

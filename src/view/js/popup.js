@@ -63,7 +63,7 @@ var Popup = new (function()
 			if (popupObj)
 				return false;
 
-			popupObj = ce('div', { id : params.id, className : 'popup', style : { display : 'none' } });
+			popupObj = ce('div', { id : params.id, className : 'popup hidden' });
 			if (!popupObj)
 				return false;
 

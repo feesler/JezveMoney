@@ -63,6 +63,7 @@ class BalanceAdminController extends AdminController
 
 		$titleString = "Admin panel | Balance";
 
+		$this->cssAdmin[] = "balance.css";
 		$this->buildCSS();
 
 		include(ADMIN_TPL_PATH."balance.tpl");

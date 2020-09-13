@@ -182,7 +182,7 @@ function onBarClick(barRect, val)
 
 	if (!this.popup)
 	{
-		this.popup = ce('div', { className : 'chart_popup', style : { display : 'none' } });
+		this.popup = ce('div', { className : 'chart_popup hidden' });
 		chartsWrapObj.appendChild(this.popup);
 	}
 
