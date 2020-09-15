@@ -104,7 +104,7 @@ function getRowFromEvent(e)
 	if (!e || !e.target)
 		return null;
 
-	var rowEl = e.target.closest('.tr_row');
+	var rowEl = e.target.closest('.tr-row');
 	return findRowByElement(rowEl);
 }
 
@@ -125,9 +125,9 @@ function enableRow(rowObj, val)
 
 	var newState = (typeof val === 'undefined') ? true : !!val;
 	if (newState)
-		rowObj.rowEl.classList.remove('tr-disabled-row');
+		rowObj.rowEl.classList.remove('tr-row_disabled');
 	else
-		rowObj.rowEl.classList.add('tr-disabled-row');
+		rowObj.rowEl.classList.add('tr-row_disabled');
 
 	rowObj.enableCheck.checked = newState;
 	enable(rowObj.trTypeSel, newState);
@@ -227,14 +227,14 @@ function createRowObject()
 
 	rowObj.dateInp = ce('input', { type : 'text', name : 'date[]', placeholder : 'Date' });
 	rowObj.commInp = ce('input', { type : 'text', name : 'comment[]', placeholder : 'Comment' });
-	rowObj.delBtn = ce('input', { className : 'btn ok_btn', type : 'button', value : '-' });
+	rowObj.delBtn = ce('input', { className : 'btn submit-btn', type : 'button', value : '-' });
 	rowObj.delBtn.addEventListener('click', function(e)
 	{
 		delRow(getRowFromEvent(e));
 	});
 
 
-	rowObj.rowEl = ce('div', { className : 'tr_row' },
+	rowObj.rowEl = ce('div', { className : 'tr-row' },
 		[ rowObj.enableCheck,
 			rowObj.trTypeSel,
 			rowObj.amountInp,
@@ -292,24 +292,24 @@ function findPlaceholder()
 
 	item = item.firstElementChild;
 
-	if (item.classList.contains('tr_row_placeholder'))
+	if (item.classList.contains('tr-row__placeholder'))
 		return item;
 	else
-		return findFirstSiblingByClass(item, 'tr_row_placeholder');
+		return findFirstSiblingByClass(item, 'tr-row__placeholder');
 }
 
 
 // Find first transaction item after specified
 function findNextItem(item)
 {
-	return findFirstSiblingByClass(item, 'tr_row');
+	return findFirstSiblingByClass(item, 'tr-row');
 }
 
 
 // Find first transaction item before specified
 function findPrevItem(item)
 {
-	return findLastSiblingByClass(item, 'tr_row');
+	return findLastSiblingByClass(item, 'tr-row');
 }
 
 
@@ -574,7 +574,7 @@ function onSubmitClick()
 
 	var reqObj = trRows.filter(function(rowObj)
 	{
-		return rowObj && rowObj.rowEl && !rowObj.rowEl.classList.contains('tr-disabled-row');
+		return rowObj && rowObj.rowEl && !rowObj.rowEl.classList.contains('tr-row_disabled');
 	})
 	.map(function(rowObj)
 	{
@@ -724,7 +724,7 @@ function onTransPosChanged(origRow, replacedRow)
 	if (!replacedRow)
 		return;
 
-	if (!replacedRow.classList.contains('tr_row'))	// put transaction on placeholder
+	if (!replacedRow.classList.contains('tr-row'))	// put transaction on placeholder
 	{
 		var prevItemObj = getRowByElem(findPrevItem(origRow));
 		var nextItemObj = getRowByElem(findNextItem(origRow));
@@ -759,7 +759,7 @@ function addPlaceholder(refItem)
 	if (!rowsContainer)
 		return;
 
-	phElem = ce('div', { className : 'tr_row_placeholder' });
+	phElem = ce('div', { className : 'tr-row__placeholder' });
 
 	if (!refItem)
 		rowsContainer.appendChild(phElem);
@@ -891,17 +891,17 @@ function importLoadCallback(response)
 
 		impRowObj.data = dataObj;
 
-		impRowObj.mapBtn = ce('input', { className : 'btn ok_btn', type : 'button',
+		impRowObj.mapBtn = ce('input', { className : 'btn submit-btn', type : 'button',
 						onclick : mapImportRow.bind(null, impRowObj),
 						value : '->' });
 
-		impRowObj.rowEl = ce('tr', { className : 'improw' }, [ ce('td', { innerHTML : dataObj.date }),
+		impRowObj.rowEl = ce('tr', { className : 'import-row' }, [ ce('td', { innerHTML : dataObj.date }),
 									ce('td', { innerHTML : dataObj.trAmountVal }),
 									ce('td', { innerHTML : dataObj.trCurrVal }),
 									ce('td', { innerHTML : dataObj.accAmountVal }),
 									ce('td', { innerHTML : dataObj.accCurrVal }),
 									ce('td', {},
-										ce('div', { className : 'ellipsis_cell' },
+										ce('div', { className : 'ellipsis-cell' },
 											ce('div', { title : dataObj.descr },
 												ce('span', { innerHTML : dataObj.descr })))),
 									ce('td', {}, impRowObj.mapBtn)
@@ -984,7 +984,7 @@ function mapImportRow(impRowObj)
 		return;
 
 	var replacedRow, replacedRowObj;
-	if (item.classList.contains('tr_row'))	// insert at filled transaction
+	if (item.classList.contains('tr-row'))	// insert at filled transaction
 	{
 		replacedRow = getRowByElem(item);
 
@@ -1237,8 +1237,8 @@ function initPage()
 	trListSortable = new Sortable({ oninsertat : onTransPosChanged,
 									container : 'rowsContainer',
 									group : 'transactions',
-									selector : '.tr_row',
-									placeholderClass : 'tr_row_placeholder',
+									selector : '.tr-row',
+									placeholderClass : 'tr-row__placeholder',
 									copyWidth : true,
 									onlyRootHandle : true });
 

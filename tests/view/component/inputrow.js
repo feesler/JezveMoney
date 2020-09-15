@@ -11,11 +11,11 @@ export class InputRow extends NullableComponent
 			throw new Error('Label element not found');
 		this.label = await this.prop(this.labelEl, 'innerText');
 
-		this.currElem = await this.query(this.elem, '.btn.rcurr_btn') || await this.query(this.elem, '.exchrate_comm');
+		this.currElem = await this.query(this.elem, '.btn.input-group__btn');
 		this.isCurrActive = false;
 		if (this.currElem)
 		{
-			this.isCurrActive = !await this.hasClass(this.currElem, 'inact_rbtn') && !await this.hasClass(this.currElem, 'exchrate_comm');
+			this.isCurrActive = !await this.hasClass(this.currElem, 'input-group__btn_inactive');
 			if (this.isCurrActive)
 			{
 				let ddElem = await this.query(this.currElem, ':scope > *');
@@ -23,10 +23,6 @@ export class InputRow extends NullableComponent
 				if (!this.currDropDown.isAttached)
 					throw new Error('Currency drop down is not attached');
 				this.currSignElem = this.currDropDown.selectBtn;
-			}
-			else if (await this.hasClass(this.currElem, 'exchrate_comm'))
-			{
-				this.currSignElem = this.currElem;
 			}
 			else
 			{
@@ -37,7 +33,9 @@ export class InputRow extends NullableComponent
 		}
 		else
 		{
-			this.datePickerBtn = await this.query(this.elem, '.btn.cal_btn');
+			let datePickerContainer = await this.query('#calendar');
+			if (datePickerContainer)
+				this.datePickerBtn = await this.query(this.elem, '.btn.icon-btn');
 		}
 
 		let t = await this.query(this.elem, 'input[type="hidden"]');
@@ -46,7 +44,7 @@ export class InputRow extends NullableComponent
 			this.hiddenValue = await this.prop(t, 'value');
 		}
 
-		this.valueInput = await this.query(this.elem, '.stretch_input > input');
+		this.valueInput = await this.query(this.elem, '.stretch-input > input');
 		this.value = await this.prop(this.valueInput, 'value');
 
 		this.validationEnabled = await this.hasClass(this.elem, 'validation-block');

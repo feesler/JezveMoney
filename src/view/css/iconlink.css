@@ -9,7 +9,7 @@
 }
 
 
-.iconlink .icon
+.iconlink .iconlink__icon
 {
 	box-sizing: border-box;
 	width: 32px;
@@ -21,43 +21,43 @@
 }
 
 
-.iconlink:hover .icon
+.iconlink:hover .iconlink__icon
 {
 	background-color: #000000;
 }
 
 
-.iconlink:hover .icon svg *
+.iconlink:hover .iconlink__icon svg *
 {
 	fill: #FFFFFF;
 }
 
 
-.iconlink .icon.icon_white
+.iconlink .iconlink__icon.sidebar-icon
 {
 	border-color: #FFFFFF;
 }
 
 
-.iconlink:hover .icon.icon_white
+.iconlink:hover .iconlink__icon.sidebar-icon
 {
 	background-color: #FFFFFF;
 }
 
 
-.iconlink .icon.icon_white svg *
+.iconlink .iconlink__icon.sidebar-icon svg *
 {
 	fill: #FFFFFF;
 }
 
 
-.iconlink:hover .icon.icon_white svg *
+.iconlink:hover .iconlink__icon.sidebar-icon svg *
 {
 	fill: #44AAFF;
 }
 
 
-.iconlink .icontitle
+.iconlink .iconlink__content
 {
 	height: 32px;
 	color: #000000;
@@ -75,7 +75,7 @@
 }
 
 
-.iconlink .maintitle
+.iconlink .iconlink__title
 {
 	height: 20px;
 	line-height: 20px;
@@ -87,7 +87,7 @@
 }
 
 
-.iconlink .subtitle
+.iconlink .iconlink__subtitle
 {
 	height: 12px;
 	line-height: 12px;
@@ -124,53 +124,4 @@
 	cursor: pointer;
 	padding: 0;
 	background: none;
-}
-
-
-/* flat square button with icon */
-.icon_btn,
-.btn.icon_btn
-{
-	width: 34px;
-	height: 34px;
-	padding: 5px;
-	margin: 0px;
-	color: #FFFFFF;
-	background-color: #0072C6;
-	cursor: pointer;
-}
-
-
-.icon_btn > svg
-{
-	width: 24px;
-	height: 24px;
-	fill: #FFFFFF;
-}
-
-
-/* Small icon button */
-.sm-icon-btn
-{
-    padding: 1px;
-    margin: 0;
-    background: none;
-    cursor: pointer;
-    display: inline-block;
-    line-height: 20px;
-    height: 20px;
-}
-
-
-.sm-icon-btn > svg
-{
-	height: 14px;
-	width: 14px;
-	fill: #888888;
-}
-
-
-.sm-icon-btn:hover > svg
-{
-	fill: #000000;
 }

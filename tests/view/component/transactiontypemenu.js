@@ -17,9 +17,9 @@ class MenuItem extends Component
 		this.titleElem = await this.query(this.elem, '.trtype-menu_item_title');
 		this.text = await this.prop(this.titleElem, 'innerText');
 
-		this.isActive = await this.hasClass(this.elem, 'trtype-menu_selected-item');
+		this.isActive = await this.hasClass(this.elem, 'trtype-menu__item_selected');
 
-		this.checkElem = await this.query(this.elem, '.trtype-menu_item-check');
+		this.checkElem = await this.query(this.elem, '.trtype-menu__item-check');
 		this.linkElem = await this.query(this.elem, 'a');
 		this.link = await this.prop(this.linkElem, 'href');
 	}
@@ -50,7 +50,7 @@ export class TransactionTypeMenu extends Component
 
 		this.multi = await this.hasClass(this.elem, 'trtype-menu-multi');
 
-		let menuItems = await this.queryAll(this.elem, '.trtype-menu_item');
+		let menuItems = await this.queryAll(this.elem, '.trtype-menu__item');
 		for(let item of menuItems)
 		{
 			let menuItemObj = await MenuItem.create(this.parent, item);

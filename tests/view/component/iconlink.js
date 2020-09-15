@@ -19,17 +19,17 @@ export class IconLink extends NullableComponent
 		if (tagName == 'A')
 			this.link = await this.prop(this.linkElem, 'href');
 
-		this.titleElem = await this.query(this.linkElem, '.icontitle');
+		this.titleElem = await this.query(this.linkElem, '.iconlink__content');
 		let titleInner = await this.query(this.titleElem, ':scope > *');
 		if (!titleInner)
 			throw new Error('Title element not found');
 		this.title = await this.prop(titleInner, 'innerText');
 
 		// Subtitle is optional
-		this.subTitleElem = await this.query(this.titleElem, '.subtitle');
+		this.subTitleElem = await this.query(this.titleElem, '.iconlink__subtitle');
 		if (this.subTitleElem)
 		{
-			this.subtitle = await this.prop(this.subTitleElem, 'innerText');
+			this.iconlink__subtitle = await this.prop(this.subTitleElem, 'innerText');
 		}
 	}
 

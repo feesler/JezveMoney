@@ -14,21 +14,21 @@
 						<span>You have no one account. Please create one.</span>
 <?php	} else {
 			foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink"><span><span class="acc_bal"><?=e($tile["balance"])?></span><span class="acc_icon"><?=useIcon("tile-".$tile["iconname"], 60, 54)?></span><span class="acc_name"><?=e($tile["name"])?></span></span></a></div><?php
+?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink"><span><span class="tile__subtitle"><?=e($tile["balance"])?></span><span class="tile__icon"><?=useIcon("tile-".$tile["iconname"], 60, 54)?></span><span class="tile__title"><?=e($tile["name"])?></span></span></a></div><?php
 			}
 		}	?></div>
 					</div>
 
 					<div class="widget">
 						<div class="widget_title"><span>Total</span></div>
-						<div class="info_tiles">
+						<div class="info-tiles">
 <?php	if (!count($tilesArr)) {	?>
 							<span>You have no one account. Please create one.</span>
 <?php	} else {	?>
 <?php		foreach($totalsArr as $curr_id => $currData) {	?>
-							<div class="info_tile">
-								<span class="info_title"><?=e($currData["name"])?></span>
-								<span class="info_subtitle"><?=e($currData["balfmt"])?></span>
+							<div class="info-tile">
+								<span class="info-tile__title"><?=e($currData["name"])?></span>
+								<span class="info-tile__subtitle"><?=e($currData["balfmt"])?></span>
 							</div>
 <?php		}	?>
 <?php	}	?>
@@ -37,21 +37,21 @@
 
 					<div class="widget transactions-widget">
 						<div class="widget_title"><a href="<?=BASEURL?>transactions/"><span>Transactions</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
-						<div id="trlist" class="trans_list">
+						<div id="trlist" class="trans-list">
 <?php	if (!count($trListData)) {	?>
 							<span>You have no one transaction yet.</span>
 <?php	} else if (!count($tilesArr)) {	?>
 							<span>You have no one account. Please create one.</span>
 <?php	} else {	?>
 <?php		foreach($trListData as $trItem) {	?>
-							<div class="trlist_item_wrap">
-								<div id="tr_<?=e($trItem["id"])?>" class="trlist_item">
-									<div class="tritem_acc_name"><span><?=e($trItem["acc"])?></span></div>
-									<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
-									<div class="tritem_date_comm">
+							<div class="trans-list__item-wrapper">
+								<div id="tr_<?=e($trItem["id"])?>" class="trans-list__item">
+									<div class="trans-list__item-title"><span><?=e($trItem["acc"])?></span></div>
+									<div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div>
+									<div class="trans-list__item-details">
 										<span><?=e($trItem["date"])?></span>
 <?php		if ($trItem["comment"] != "") {		?>
-										<span class="tritem_comm"><?=e($trItem["comment"])?></span>
+										<span class="trans-list__item-comment"><?=e($trItem["comment"])?></span>
 <?php		}	?>
 									</div>
 								</div>
@@ -63,17 +63,17 @@
 
 					<div class="widget">
 						<div class="widget_title"><a href="<?=BASEURL?>persons/"><span>Persons</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
-						<div class="info_tiles">
+						<div class="info-tiles">
 <?php	if (!count($persArr)) {		?>
 							<span>No persons here.</span>
 <?php	} else {	?>
 <?php		foreach($persArr as $pData) {	?>
-							<div class="info_tile">
-								<span class="info_title"><?=e($pData->name)?></span>
+							<div class="info-tile">
+								<span class="info-tile__title"><?=e($pData->name)?></span>
 <?php			if ($pData->nodebts) {		?>
-								<span class="info_subtitle">No debts</span>
+								<span class="info-tile__subtitle">No debts</span>
 <?php			} else {	?>
-								<span class="info_subtitle"><?=implode("<br>", array_map("e", $pData->balfmt))?></span>
+								<span class="info-tile__subtitle"><?=implode("<br>", array_map("e", $pData->balfmt))?></span>
 <?php			}	?>
 							</div>
 <?php		}	?>

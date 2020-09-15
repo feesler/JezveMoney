@@ -49,7 +49,7 @@ export class TestView
 		this.location = await this.url();
 
 		this.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
-		this.msgPopup = await MessagePopup.create(this, await this.query('.popup_content.msg'));
+		this.msgPopup = await MessagePopup.create(this, await this.query('.popup__content.msg'));
 		this.content = await this.parseContent();
 		await this.updateModel();
 	}

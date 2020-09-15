@@ -32,16 +32,11 @@ function onScroll()
 // Toolbar click event handler
 function onToolbarClick()
 {
-	var toolbar;
-
-	toolbar = ge('toolbar');
+	var toolbar = ge('toolbar');
 	if (!toolbar)
 		return;
 
-	if (toolbar.className == 'sidebar')
-		toolbar.className = 'sidebar active';
-	else
-		toolbar.className = 'sidebar';
+	toolbar.classList.toggle('sidebar_active');
 
 	onScroll();
 }

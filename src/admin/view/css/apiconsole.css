@@ -109,28 +109,11 @@ h3
 .menu-list .sub-menu-list > li:hover
 {
 	text-decoration: underline;
-	color: #222222;
-}
-
-
-.btn_link
-{
-	background: none;
-	cursor: pointer;
-	color: #2db8f8;
-	text-decoration: none;
-	font-size: inherit;
-}
-
-
-.btn_link:hover
-{
-	text-decoration: underline;
 }
 
 
 /* View containers */
-.test_form
+.request-data-form
 {
 	background-color: #f3f3f3;
 	max-width: 400px;
@@ -143,20 +126,20 @@ h3
 }
 
 
-.test_form.active
+.request-data-form.active
 {
 	display: inline-block;
 }
 
 
-.test_form input[type="checkbox"]
+.request-data-form input[type="checkbox"]
 {
 	margin: 0 5px 2px 0;
 	vertical-align: middle;
 }
 
 
-.test_form input[type="text"]
+.request-data-form input[type="text"]
 {
 	border: 1px solid #000000;
 	display: inline;
@@ -164,57 +147,16 @@ h3
 }
 
 
-.test_form input:disabled
+.request-data-form input:disabled
 {
 	border-color: #888888;
-}
-
-
-/* Info sections */
-.info_section
-{
-	margin: 25px 0 0 0;
-	overflow: hidden;
-}
-
-
-.info_section > div ul
-{
-	padding: 0 0 0 25px;
-	list-style-position: outside;
-}
-
-
-/* Markup */
-.params
-{
-	color: #0080BB;
-}
-
-
-.optional
-{
-	color: #808080;
-}
-
-
-.listpar
-{
-	color: #00BB80;
-}
-
-
-.objmembers
-{
-	padding: 0 0 0 15px;
-	display: block;
 }
 
 
 /* Requests log */
 
 /* Both request and response container */
-.req_item
+.request-item
 {
 	padding: 5px;
 	margin: 5px 0;
@@ -223,16 +165,16 @@ h3
 }
 
 
-.req_item .req_container,
-.req_item .res_container
+.request-item .request-container,
+.request-item .response-container
 {
 	margin: 5px 0;
 }
 
 
 /* Request */
-.req_item .req_container .title,
-.req_item .res_container .title
+.request-item .request-container .title,
+.request-item .response-container .title
 {
 	font-size: 14px;
 	font-weight: bold;
@@ -247,8 +189,8 @@ h3
 }
 
 
-.req_item .req_container .title:before,
-.req_item .res_container .title:before
+.request-item .request-container .title:before,
+.request-item .response-container .title:before
 {
 	content: '-';
 	padding: 0px 10px;
@@ -258,28 +200,28 @@ h3
 }
 
 
-.req_item .req_container .title:hover:before
+.request-item .request-container .title:hover:before
 {
 	background-color: #95c3ff;
 }
 
 
-.req_item .req_container.collapsed .title:before,
-.req_item .res_container.collapsed .title:before
+.request-item .request-container.collapsed .title:before,
+.request-item .response-container.collapsed .title:before
 {
 	content: '+';
 }
 
 
-.req_item .req_container.collapsed .req_details,
-.req_item .res_container.collapsed .res_details
+.request-item .request-container.collapsed .request-details,
+.request-item .response-container.collapsed .response-details
 {
 	display: none;
 }
 
 
-.req_item .req_container .req_details,
-.req_item .res_container .res_details
+.request-item .request-container .request-details,
+.request-item .response-container .response-details
 {
 	word-break: break-all;
 	font-size: 14px;
@@ -288,7 +230,7 @@ h3
 
 
 /* Result */
-.req_item .res_container.res_pending
+.request-item .response-container.response-container_pending
 {
 	background: none;
 	border: 1px dashed #CCCCCC;
@@ -296,25 +238,25 @@ h3
 }
 
 
-.req_item .res_container.res_ok .title
+.request-item .response-container.ok-result .title
 {
 	background-color: #65d458;
 }
 
 
-.req_item .res_container.res_fail .title
+.request-item .response-container.fail-result .title
 {
 	background-color: #FF6666;
 }
 
 
-.req_item .res_container.res_ok .title:hover:before
+.request-item .response-container.ok-result .title:hover:before
 {
 	background-color: #59b74e;
 }
 
 
-.req_item .res_container.res_fail .title:hover:before
+.request-item .response-container.fail-result .title:hover:before
 {
 	background-color: #ff8a8a;
 }

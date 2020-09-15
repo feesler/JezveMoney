@@ -220,13 +220,13 @@ function onTransClick(tr_id)
 	{
 		trSelection.deselect(tr_id);
 
-		transObj.className = (filterObj.mode == 'details') ? '' : 'trlist_item';
+		transObj.className = (filterObj.mode == 'details') ? '' : 'trans-list__item';
 	}
 	else
 	{
 		trSelection.select(tr_id);
 
-		transObj.className = 'act_tr';
+		transObj.className = 'trans-list__item_selected';
 	}
 
 	show(edit_btn, (trSelection.count() == 1));
@@ -308,8 +308,8 @@ function initTransListDrag()
 		 							oninsertat : onTransPosChanged,
 									container : 'tritems',
 									group : 'transactions',
-									selector : '.trlist_item_wrap',
-									placeholderClass : 'trlist_item_placeholder',
+									selector : '.trans-list__item-wrapper',
+									placeholderClass : 'trans-list__item-placeholder',
 									copyWidth : true,
 									table : (filterObj.mode == 'details') });
 
@@ -322,7 +322,7 @@ function initTransListDrag()
 	while(listItem_wr)
 	{
 		if ((filterObj.mode == 'details' && listItem_wr.tagName == 'TBODY') ||
-			(filterObj.mode != 'details' && listItem_wr.classList.contains('trlist_item_wrap')))
+			(filterObj.mode != 'details' && listItem_wr.classList.contains('trans-list__item-wrapper')))
 		{
 			listItem = listItem_wr.firstElementChild;
 			trans_id = transIdFromElem(listItem);
@@ -488,7 +488,7 @@ function buildAddress()
 // Transaction type checkbox click event handler
 function onToggleTransType(e)
 {
-	var itemElem = e.target.closest('.trtype-menu_item');
+	var itemElem = e.target.closest('.trtype-menu__item');
 	if (!itemElem || !itemElem.dataset)
 		return;
 

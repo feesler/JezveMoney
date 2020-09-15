@@ -34,11 +34,11 @@ export class MainView extends TestView
 			let tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
 			if (tiles)
 				widget.tiles = tiles;
-			let infoTiles = await TilesList.create(this, await this.query(widget.elem, '.info_tiles'), InfoTile);
+			let infoTiles = await TilesList.create(this, await this.query(widget.elem, '.info-tiles'), InfoTile);
 			if (infoTiles)
 				widget.infoTiles = infoTiles;
 
-			let transactions = await TransactionList.create(this, await this.query(widget.elem, '.trans_list'));
+			let transactions = await TransactionList.create(this, await this.query(widget.elem, '.trans-list'));
 			if (transactions)
 				widget.transList = transactions;
 

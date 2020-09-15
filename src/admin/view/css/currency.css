@@ -1,18 +1,18 @@
 /* Create/update currency popup */
-.popup > .curr_content
+.popup > .currency-form
 {
 	margin-top: -120px;
 }
 
 
-.popup > .curr_content > .box
+.popup > .currency-form > .popup__content-box
 {
 	max-width: 300px;
 	min-width: 130px;
 }
 
 
-.curr_content label
+.currency-form label
 {
 	display: block;
 	width: 100%;
@@ -21,21 +21,21 @@
 }
 
 
-.curr_content .stretch_input
+.currency-form .stretch-input
 {
 	border-width: 1px;
 }
 
 
 /* Checkbox wrapper */
-.check_wr
+.checkbox-wrap
 {
 	height: 20px;
 	padding: 5px 0px;
 }
 
 
-.check_wr > input[type="checkbox"]
+.checkbox-wrap > input[type="checkbox"]
 {
 	display: inline;
 	height: 20px;
@@ -43,10 +43,9 @@
 }
 
 
-.check_wr > label
+.checkbox-wrap > label
 {
 	display: inline;
-	width: auto;
 	padding: 0px 5px;
 	font-size: 16px;
 	height: 20px;

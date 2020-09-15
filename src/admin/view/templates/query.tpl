@@ -15,7 +15,7 @@
 					<div>
 <?php	if ($query != "") {		?>
 <?php		if ($qerr_num == 0) {		?>
-						<table class="adm_tbl">
+						<table class="admin-tbl">
 <?php			if (is_array($resArr) && count($resArr) > 0) {	?>
 							<tr>
 <?php				foreach($resArr[0] as $ind => $val) {		?>
@@ -51,7 +51,7 @@
 							</form>
 						</div>
 						<div class="query-history">
-							<table class="adm_tbl">
+							<table class="admin-tbl">
 <?php	foreach($latestQueries as $item) {		?>
 								<tr><td><?=e($item)?></td></tr>
 <?php	}	?>

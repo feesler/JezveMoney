@@ -10,7 +10,7 @@
 					<div class="results">
 						<div class="controls">
 							<input id="startbtn" class="adm_act_btn" type="button" value="start">
-							<table class="adm_tbl counter_tbl">
+							<table class="admin-tbl counter-tbl">
 								<tr>
 									<th class="title">Total</th><th id="totalRes"></th>
 									<th class="title">Ok</th><th id="okRes"></th>

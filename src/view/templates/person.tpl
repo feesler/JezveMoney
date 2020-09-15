@@ -10,7 +10,7 @@
 					<div class="heading">
 						<h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {		?>
-						<div id="del_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="iconlink__icon"><?=svgIcon("del")?></span><span class="iconlink__content"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 					<div>
@@ -20,13 +20,13 @@
 <?php	}	?>
 						<div id="name-inp-block" class="validation-block view-row std_margin">
 							<label for="pname">Person name</label>
-							<div class="stretch_input std_input">
+							<div class="stretch-input std_margin">
 								<input id="pname" name="name" type="text" value="<?=e($pInfo->name)?>">
 							</div>
 							<div class="invalid-feedback">Please input name of person.</div>
 						</div>
 
-						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>persons/">cancel</a></div>
+						<div class="acc_controls"><input class="btn submit-btn" type="submit" value="ok"><a class="btn cancel-btn" href="<?=BASEURL?>persons/">cancel</a></div>
 						<input id="flags" name="flags" type="hidden" value="<?=e($pInfo->flags)?>">
 						</form>
 					</div>

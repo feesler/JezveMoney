@@ -18,7 +18,7 @@
 }
 
 
-.sidebar > div > .siderbar_content
+.sidebar > div > .siderbar__content
 {
 	overflow: hidden;
 	min-width: 15px;
@@ -26,7 +26,7 @@
 }
 
 
-.sidebar.active > div > .siderbar_content
+.sidebar.sidebar_active > div > .siderbar__content
 {
 	display: block;
 	color: #FFFFFF;
@@ -34,14 +34,14 @@
 }
 
 
-.siderbar_content > div
+.siderbar__content > div
 {
 	position: relative;
 	min-height: 64px;
 }
 
 
-.sidebar_ellipsis
+.sidebar__ellipsis
 {
 	width: 15px;
 	height: 32px;
@@ -52,7 +52,7 @@
 }
 
 
-.sidebar_ellipsis svg
+.sidebar__ellipsis svg
 {
 	width: 15px;
 	height: 32px;
@@ -60,7 +60,7 @@
 }
 
 
-.sidebar_buttons
+.sidebar__controls
 {
 	display: none;
 	overflow: hidden;
@@ -68,13 +68,13 @@
 }
 
 
-.sidebar.active .sidebar_buttons
+.sidebar.sidebar_active .sidebar__controls
 {
 	display: block;
 }
 
 
-.siderbar_content .iconlink
+.siderbar__content .iconlink
 {
 	display: flex;
 	margin: 9px 12px;
@@ -82,7 +82,7 @@
 
 
 
-.siderbar_content .iconlink span
+.siderbar__content .iconlink span
 {
 	color: #FFFFFF;
 }
@@ -91,7 +91,6 @@
 @media screen and (min-width: 701px)
 {
 
-/* Sidebar */
 .sidebar
 {
 	display: block;
@@ -115,8 +114,8 @@
 }
 
 
-.sidebar > div > .siderbar_content,
-.sidebar.active > div > .siderbar_content
+.sidebar > div > .siderbar__content,
+.sidebar.sidebar_active > div > .siderbar__content
 {
 	display: block;
 	padding: 0px;
@@ -129,20 +128,20 @@
 }
 
 
-.sidebar_ellipsis
+.sidebar__ellipsis
 {
 	display: none;
 }
 
 
-.sidebar_buttons
+.sidebar__controls
 {
 	display: flex;
 	padding: 0;
 }
 
 
-.siderbar_content .iconlink
+.siderbar__content .iconlink
 {
 	margin: 9px 0px 9px 12px;
 }

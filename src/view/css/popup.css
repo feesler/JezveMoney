@@ -11,7 +11,7 @@
 }
 
 
-.popup > .popup_back
+.popup > .popup__back
 {
 	position: fixed;
 	width: 100%;
@@ -21,7 +21,7 @@
 }
 
 
-.popup > .popup_content
+.popup > .popup__content
 {
 	position: fixed;
 	background-color: #FFFFFF;
@@ -32,7 +32,7 @@
 }
 
 
-.popup > .popup_content > .box
+.popup > .popup__content > .popup__content-box
 {
 	margin: 0px auto;
 	max-width: 600px;
@@ -44,8 +44,8 @@
 
 
 /* Close button */
-.popup .close_btn,
-.box.dragging .close_btn
+.popup .close-btn,
+.popup__content-box.dragging .close-btn
 {
 	position: absolute;
 	overflow: hidden;
@@ -59,7 +59,7 @@
 }
 
 
-.close_btn > svg
+.close-btn > svg
 {
 	width: 14px;
 	height: 14px;
@@ -67,24 +67,20 @@
 }
 
 
-.close_btn:hover > svg
+.close-btn:hover > svg
 {
 	fill: #000000;
 }
 
 
-.popup_message
+.popup__message
 {
 }
 
 
-.popup_controls
+.popup__controls
 {
 	padding: 29px 0px 8px;
 	display: inline-block;
 }
 
-
-.popup_title
-{
-}

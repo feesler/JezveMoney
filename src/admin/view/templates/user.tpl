@@ -10,7 +10,7 @@
 				<div class="content_wrap admin_cont_wrap">
 					<h2>Users</h2>
 
-					<table id="users_tbl" class="adm_tbl">
+					<table id="users_tbl" class="admin-tbl">
 						<thead>
 							<tr><th>id</th><th>login</th><th>name</th><th>access</th><th>accounts</th><th>transactions</th><th>persons</th></tr>
 						</thead>
@@ -45,26 +45,26 @@
 <input id="user_id" name="id" type="hidden">
 <div id="login_block" class="view-row">
 	<label for="user_login">Login</label>
-	<div class="stretch_input"><input id="user_login" name="login" type="text"></div>
+	<div class="stretch-input"><input id="user_login" name="login" type="text"></div>
 </div>
 <div id="name_block" class="view-row">
 	<label for="user_name">Name</label>
-	<div class="stretch_input"><input id="user_name" name="name" type="text"></div>
+	<div class="stretch-input"><input id="user_name" name="name" type="text"></div>
 </div>
 <div id="pwd_block" class="view-row">
 	<label for="user_pass">Password</label>
-	<div class="stretch_input"><input id="user_pass" name="password" type="password"></div>
+	<div class="stretch-input"><input id="user_pass" name="password" type="password"></div>
 </div>
 <div id="admin_block" class="view-row">
-	<div id="admin_block" class="check_wr">
+	<div id="admin_block" class="checkbox-wrap">
 		<label for="isadmin"><input id="isadmin" name="access" type="radio" value="1">Admin access level</label>
 	</div>
-	<div id="admin_block" class="check_wr">
+	<div id="admin_block" class="checkbox-wrap">
 		<label for="isdefault"><input id="isdefault" name="access" type="radio" value="0">Default access level</label>
 	</div>
 </div>
-<div class="popup_form_controls">
-	<input class="btn ok_btn" type="submit" value="Submit">
+<div class="popup__form-controls">
+	<input class="btn submit-btn" type="submit" value="Submit">
 </div>
 </form>
 

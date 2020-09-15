@@ -37,26 +37,26 @@
 }
 
 
-.adm_tbl.counter_tbl
+.admin-tbl.counter-tbl
 {
 	display: inline;
 	border: 0 none;
 }
 
 
-.counter_tbl th.title
+.counter-tbl th.title
 {
 	border-right: 0 none;
 }
 
 
-.counter_tbl th.title + th
+.counter-tbl th.title + th
 {
 	border-left: 0 none;
 }
 
 
-.counter_tbl .duration
+.counter-tbl .duration
 {
 	border-top: 0 none;
 	border-right: 0 none;

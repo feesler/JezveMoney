@@ -26,7 +26,7 @@
 		</div>
 	</div>
 	<div>
-		<input id="importbtn" class="btn ok_btn" type="submit" value="Import">
+		<input id="importbtn" class="btn submit-btn" type="submit" value="Import">
 	</div>
 </form>
 </div>
@@ -43,12 +43,12 @@
 	</div>
 	<div class="import-controls">
 		<div class="std_margin">
-			<input id="newRowBtn" class="btn ok_btn" type="button" value="+">
-			<input id="newPhBtn" class="btn ok_btn" type="button" value="+">
-			<input id="importAllBtn" class="btn ok_btn" type="button" value="<?=e("->>")?>" disabled>
+			<input id="newRowBtn" class="btn submit-btn" type="button" value="+">
+			<input id="newPhBtn" class="btn submit-btn" type="button" value="+">
+			<input id="importAllBtn" class="btn submit-btn" type="button" value="<?=e("->>")?>" disabled>
 		</div>
 		<div>
-			<input id="submitbtn" class="btn ok_btn" type="button" value="Commit">Transactions: <span id="trcount">0</span><br>
+			<input id="submitbtn" class="btn submit-btn" type="button" value="Commit">Transactions: <span id="trcount">0</span><br>
 			<span id="importpickstats" class="hidden">Not picked on import: <span id="notpickedcount"></span></span>
 		</div>
 	</div>

@@ -15,16 +15,16 @@
 				<h1>Log in</h1>
 				<div id="login-inp-block" class="validation-block std_margin">
 					<label for="login">Username</label>
-					<div class="stretch_input"><input id="login" name="login" type="text"></div>
+					<div class="stretch-input"><input id="login" name="login" type="text"></div>
 					<div class="invalid-feedback">Please input you login.</div>
 				</div>
 				<div id="pwd-inp-block" class="validation-block std_margin">
 					<label for="password">Password</label>
-					<div class="stretch_input"><input id="password" name="password" type="password"></div>
+					<div class="stretch-input"><input id="password" name="password" type="password"></div>
 					<div class="invalid-feedback">Please input correct password.</div>
 				</div>
 				<div class="form-controls std_margin">
-					<input class="btn ok_btn" type="submit" value="Log in">
+					<input class="btn submit-btn" type="submit" value="Log in">
 					<span class="alter_link"><a href="<?=BASEURL?>register/">Register</a></span>
 				</div>
 			</div>

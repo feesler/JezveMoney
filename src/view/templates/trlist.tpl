@@ -1,4 +1,4 @@
-						<div id="trlist" class="trans_list">
+						<div id="trlist" class="trans-list">
 <?php	if (!$accounts) {		?>
 							<span>You have no one account. Please create one.</span>
 <?php	} else if (!$totalTrCount) {	?>
@@ -10,11 +10,11 @@
 							<div class="paginator-row">
 								<div class="mode-selector">
 <?php		if ($showDetails) {		?>
-									<a class="mode-selector-item" href="<?=e($linkStr)?>"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></a>
-									<b class="mode-selector-item"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></b>
+									<a class="mode-selector__item" href="<?=e($linkStr)?>"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></a>
+									<b class="mode-selector__item"><span class="icon sidebar-icon"><?=svgIcon("details")?></span><span>Details</span></b>
 <?php		} else {		?>
-									<b class="mode-selector-item"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></b>
-									<a class="mode-selector-item" href="<?=e($linkStr)?>"><span class="icon icon_white"><?=svgIcon("details")?></span><span>Details</span></a>
+									<b class="mode-selector__item"><span class="icon"><?=svgIcon("list")?></span><span>Classic</span></b>
+									<a class="mode-selector__item" href="<?=e($linkStr)?>"><span class="icon sidebar-icon"><?=svgIcon("details")?></span><span>Details</span></a>
 <?php		}	?>
 								</div>
 <?php	}	?>
@@ -32,40 +32,40 @@
 <?php	}	?>
 							</div>
 <?php	if ($showDetails) {	?>
-							<table id="tritems" class="details_table">
+							<table id="tritems" class="trans-list_details">
 <?php	} else {	?>
 							<div id="tritems">
 <?php	}	?>
 <?php	foreach($trListData as $trItem) {	?>
 <?php	if ($showDetails) {		?>
-								<tbody class="trlist_item_wrap"><tr id="tr_<?=e($trItem["id"])?>">
-									<td><div class="ellipsis_cell"><div class="tritem_acc_name" title="<?=e($trItem["acc"])?>"><span><?=e($trItem["acc"])?></span></div></div></td>
-									<td><div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div></td>
+								<tbody class="trans-list__item-wrapper"><tr id="tr_<?=e($trItem["id"])?>">
+									<td><div class="ellipsis-cell"><div class="trans-list__item-title" title="<?=e($trItem["acc"])?>"><span><?=e($trItem["acc"])?></span></div></div></td>
+									<td><div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div></td>
 									<td><div class="tritem_balance">
 										<span><?=implode("</span><span>", array_map("e", $trItem["balance"]))?></span>
 									</div></td>
 									<td>
-										<div class="tritem_date_comm">
+										<div class="trans-list__item-details">
 											<span><?=e($trItem["date"])?></span>
 										</div>
 									</td>
-									<td><div class="ellipsis_cell">
+									<td><div class="ellipsis-cell">
 <?php		if ($trItem["comment"] != "") {		?>
-										<div title="<?=e($trItem["comment"])?>"><span class="tritem_comm"><?=e($trItem["comment"])?></span></div>
+										<div title="<?=e($trItem["comment"])?>"><span class="trans-list__item-comment"><?=e($trItem["comment"])?></span></div>
 <?php		} else {		?>
 										<div></div>
 <?php		}	?>
 									</div></td>
 								</tr></tbody>
 <?php	} else {		?>
-								<div class="trlist_item_wrap">
-									<div id="tr_<?=e($trItem["id"])?>" class="trlist_item">
-										<div class="tritem_acc_name"><span><?=e($trItem["acc"])?></span></div>
-										<div class="tritem_sum"><span><?=e($trItem["amount"])?></span></div>
-										<div class="tritem_date_comm">
+								<div class="trans-list__item-wrapper">
+									<div id="tr_<?=e($trItem["id"])?>" class="trans-list__item">
+										<div class="trans-list__item-title"><span><?=e($trItem["acc"])?></span></div>
+										<div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div>
+										<div class="trans-list__item-details">
 											<span><?=e($trItem["date"])?></span>
 <?php		if ($trItem["comment"] != "") {		?>
-											<span class="tritem_comm"><?=e($trItem["comment"])?></span>
+											<span class="trans-list__item-comment"><?=e($trItem["comment"])?></span>
 <?php		}	?>
 										</div>
 									</div>

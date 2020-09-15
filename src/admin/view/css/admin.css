@@ -1,4 +1,4 @@
-.admin_header
+.admin-header
 {
 	box-sizing: border-box;
 	width: 100%;
@@ -9,7 +9,7 @@
 }
 
 
-.admin_header > .menu > span
+.admin-header > .menu > span
 {
 	display: inline;
 	padding: 0px 10px 0px 0px;
@@ -39,34 +39,33 @@
 
 
 /* Admin table */
-.adm_tbl
+.admin-tbl
 {
 	border-collapse: collapse;
 	border: 1px solid #000000;
 }
 
 
-.adm_tbl th,
-.adm_tbl td
+.admin-tbl th,
+.admin-tbl td
 {
 	border: 1px solid #000000;
 	padding: 5px;
 }
 
 
-.adm_tbl tr
+.admin-tbl tr
 {
 	cursor: pointer;
 }
 
 
-.adm_tbl tr:hover
+.admin-tbl tr:hover
 {
 	background-color: #BBBBBB;
 }
 
-
-.adm_tbl tr.act
+.admin-tbl tr.act
 {
 	background-color: #0088DD;
 	color: #FFFFFF;
@@ -81,20 +80,20 @@ textarea
 }
 
 
-.popup_form_controls
+.popup__form-controls
 {
 	position: relative;
 	top: 25px;
 }
 
 
-.check_wr label > input
+.checkbox-wrap label > input
 {
 	margin-right: 8px;
 }
 
 
-.check_wr.check_wr_inline
+.checkbox-wrap.checkbox-wrap_inline
 {
 	display: inline-block;
 	margin-right: 10px;

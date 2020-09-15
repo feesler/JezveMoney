@@ -344,7 +344,7 @@ function TransactionViewModel()
 
 		show('noacc_btn', Transaction.noAccount());
 		var tileContainer = source.querySelector('.tile_container');
-		var tileInfoBlock = source.querySelector('.tile_right_block');
+		var tileInfoBlock = source.querySelector('.tile-info-block');
 
 		show(tileContainer, Transaction.noAccount());
 		show(tileInfoBlock, Transaction.noAccount());
@@ -398,13 +398,13 @@ function TransactionViewModel()
 
 		if (act)
 		{
-			currBtn.classList.remove('inact_rbtn');
+			currBtn.classList.remove('input-group__btn_inactive');
 			inputContainer.classList.remove('trans_input');
 			inputContainer.classList.add('rbtn_input');
 		}
 		else
 		{
-			currBtn.classList.add('inact_rbtn');
+			currBtn.classList.add('input-group__btn_inactive');
 			inputContainer.classList.add('trans_input');
 			inputContainer.classList.remove('rbtn_input');
 		}

@@ -11,7 +11,7 @@ export class ModeSelector extends NullableComponent
 		this.listMode = {};
 		this.detailsMode = {};
 
-		let modeElements = await this.queryAll(this.elem, '.mode-selector-item');
+		let modeElements = await this.queryAll(this.elem, '.mode-selector__item');
 		for(let elem of modeElements)
 		{
 			let tagName = await this.prop(elem, 'tagName');

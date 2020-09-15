@@ -14,9 +14,9 @@ var api = (function()
 
 		var reqItem = {};
 
-		reqItem.itemContainer = ce('div', { className : 'req_item' });
+		reqItem.itemContainer = ce('div', { className : 'request-item' });
 
-		reqItem.requestContainer = ce('div', { className : 'req_container collapsed' });
+		reqItem.requestContainer = ce('div', { className : 'request-container collapsed' });
 		reqItem.requestContainer.onclick = function()
 		{
 			reqItem.requestContainer.classList.toggle('collapsed');
@@ -28,16 +28,16 @@ var api = (function()
 
 		reqItem.requestContainer.append(ce('div', { className : 'title', innerText : reqData.method + ' ' + reqText }));
 		if (reqData.data)
-			reqItem.requestContainer.append(ce('div', { className : 'req_details', innerText : reqData.data }));
+			reqItem.requestContainer.append(ce('div', { className : 'request-details', innerText : reqData.data }));
 
-		reqItem.resultContainer = ce('div', { className : 'res_container res_pending', innerText : 'Pending...' });
+		reqItem.resultContainer = ce('div', { className : 'response-container response-container_pending', innerText : 'Pending...' });
 
 		reqItem.itemContainer.append(reqItem.requestContainer, reqItem.resultContainer);
 
 		reqItem.addResult = function(res, title, rawResult)
 		{
-			this.resultContainer.classList.remove('res_pending')
-			this.resultContainer.classList.add('res_container', 'collapsed', (res ? 'res_ok' : 'res_fail'))
+			this.resultContainer.classList.remove('response-container_pending')
+			this.resultContainer.classList.add('response-container', 'collapsed', (res ? 'ok-result' : 'fail-result'))
 			removeChilds(this.resultContainer);
 
 			var titleEl = ce('div', { className : 'title', innerText : title });
@@ -50,7 +50,7 @@ var api = (function()
 
 			if (rawResult)
 			{
-				this.resultContainer.append(ce('div', { className : 'res_details', innerText : rawResult }));
+				this.resultContainer.append(ce('div', { className : 'response-details', innerText : rawResult }));
 			}
 
 			clearResultsBtn.disabled = false;
@@ -702,7 +702,7 @@ function initControls()
 	if (controllersList)
 		controllersList.onclick = onContrClick;
 
-	activeForm = document.querySelector('.test_form.active');
+	activeForm = document.querySelector('.request-data-form.active');
 	activeController = document.querySelector('#controllersList > li.active');
 	activeFormLink = document.querySelector('#controllersList > li.active > .sub-menu-list > li.active');
 

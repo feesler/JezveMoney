@@ -11,8 +11,8 @@ export class Tile extends Component
 			throw new Error('Wrong tile structure');
 
 		this.linkElem = await this.query(this.elem, '.tilelink');
-		this.balanceEL = await this.query(this.elem, '.acc_bal');
-		this.nameEL = await this.query(this.elem, '.acc_name');
+		this.balanceEL = await this.query(this.elem, '.tile__subtitle');
+		this.nameEL = await this.query(this.elem, '.tile__title');
 
 		this.id = this.parseId(await this.prop(this.elem, 'id'));
 		this.balance = await this.prop(this.balanceEL, 'innerText');
@@ -20,7 +20,7 @@ export class Tile extends Component
 
 		this.isActive = !!(await this.query(this.elem, '.act'));
 
-		this.iconElem = await this.query(this.elem, '.acc_icon > svg')
+		this.iconElem = await this.query(this.elem, '.tile__icon > svg')
 		let iconObj = findIconByClassName(await this.prop(this.iconElem, 'className.baseVal'));
 		this.icon = iconObj.id;
 	}

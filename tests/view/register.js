@@ -13,7 +13,7 @@ export class RegisterView extends TestView
 			loginInp : await InputRow.create(this, await this.query('#login-inp-block')),
 			nameInp : await InputRow.create(this, await this.query('#name-inp-block')),
 			passwordInp : await InputRow.create(this, await this.query('#pwd-inp-block')),
-			submitBtn : await this.query('.form-controls .btn.ok_btn'),
+			submitBtn : await this.query('.form-controls .btn.submit-btn'),
 			loginLink : await this.query('.form-controls .alter_link > a')
 		};
 

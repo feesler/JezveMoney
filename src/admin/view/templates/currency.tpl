@@ -10,7 +10,7 @@
 				<div class="content_wrap admin_cont_wrap">
 					<h2>Currencies</h2>
 
-					<table id="currencies_tbl" class="adm_tbl">
+					<table id="currencies_tbl" class="admin-tbl">
 						<thead>
 							<tr><th>id</th><th>name</th><th>sign</th><th>flags</th></tr>
 						</thead>
@@ -41,22 +41,22 @@
 <input id="curr_id" name="id" type="hidden">
 <div class="view-row">
 	<label for="curr_name">Name</label>
-	<div class="stretch_input"><input id="curr_name" name="name" type="text"></div>
+	<div class="stretch-input"><input id="curr_name" name="name" type="text"></div>
 </div>
 <div class="view-row">
 	<label for="curr_sign">Sign</label>
-	<div class="stretch_input"><input id="curr_sign" name="sign" type="text"></div>
+	<div class="stretch-input"><input id="curr_sign" name="sign" type="text"></div>
 </div>
 <div id="admin_block" class="view-row">
-	<div id="admin_block" class="check_wr">
+	<div id="admin_block" class="checkbox-wrap">
 		<label for="isbefore"><input id="isbefore" name="flags" type="radio" value="1">Sign before value</label>
 	</div>
-	<div id="admin_block" class="check_wr">
+	<div id="admin_block" class="checkbox-wrap">
 		<label for="isafter"><input id="isafter" name="flags" type="radio" value="0">Sign after value</label>
 	</div>
 </div>
-<div class="popup_form_controls">
-	<input class="btn ok_btn" type="submit" value="Submit">
+<div class="popup__form-controls">
+	<input class="btn submit-btn" type="submit" value="Submit">
 </div>
 </form>
 

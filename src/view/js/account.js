@@ -45,19 +45,19 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 	if (!tileObj)
 		return;
 
-	var subTitleObj = tileObj.querySelector('.acc_bal');
+	var subTitleObj = tileObj.querySelector('.tile__subtitle');
 	if (subTitleObj)
 	{
 		subTitleObj.innerHTML = subTitle;
 	}
 
-	var titleObj = tileObj.querySelector('.acc_name');
+	var titleObj = tileObj.querySelector('.tile__title');
 	if (titleObj)
 		titleObj.innerHTML = title;
 
 	iconType = iconType | 0;
 
-	var iconElem = tileObj.querySelector('.acc_icon');
+	var iconElem = tileObj.querySelector('.tile__icon');
 	if (iconElem)
 	{
 		removeChilds(iconElem);

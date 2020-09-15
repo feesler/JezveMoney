@@ -337,7 +337,7 @@ function initControls()
 	frm.onsubmit = onFormSubmit;
 	dwPopup = Popup.create({ id : 'user_popup',
 								content : frm,
-								additional : 'center_only curr_content',
+								additional : 'center_only currency-form',
 								btn : { closeBtn : true }
 							});
 }

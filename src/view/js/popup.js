@@ -34,7 +34,7 @@ var Popup = new (function()
 			if (!boxObj || closeBtn)
 				return;
 
-			closeBtn = ce('button', { className : 'close_btn', type : 'button' },
+			closeBtn = ce('button', { className : 'close-btn', type : 'button' },
 							svg('svg', {},
 								svg('path', { d : 'M 1.1415,2.4266 5.7838,7 1.1415,11.5356 2.4644,12.8585 7,8.2162 11.5734,12.8585 12.8585,11.5356 8.2162,7 12.8585,2.4266 11.5734,1.1415 7,5.7838 2.4644,1.1415 Z' })));
 			boxObj.appendChild(closeBtn);
@@ -67,7 +67,7 @@ var Popup = new (function()
 			if (!popupObj)
 				return false;
 
-			backObj = ce('div', { className : 'popup_back' });
+			backObj = ce('div', { className : 'popup__back' });
 			if (!backObj)
 				return false;
 
@@ -80,8 +80,8 @@ var Popup = new (function()
 			if (!setModalContent(params.content))
 				return false;
 
-			contentObj = ce('div', { className : 'popup_content' });
-			boxObj = ce('div', { className : 'box' });
+			contentObj = ce('div', { className : 'popup__content' });
+			boxObj = ce('div', { className : 'popup__content-box' });
 			if (!contentObj || !boxObj)
 				return false;
 
@@ -121,7 +121,7 @@ var Popup = new (function()
 				return false;
 
 			if (typeof content == 'string')
-				newMessageObj = ce('div', { className : 'popup_message' }, ce('div', { innerHTML : content }) );
+				newMessageObj = ce('div', { className : 'popup__message' }, ce('div', { innerHTML : content }) );
 			else
 				newMessageObj = content;
 
@@ -144,7 +144,7 @@ var Popup = new (function()
 
 			if (!titleObj)
 			{
-				titleObj = ce('h1', { className : 'popup_title', innerHTML : params.title });
+				titleObj = ce('h1', { className : 'popup__title', innerHTML : params.title });
 				prependChild(boxObj, titleObj);
 			}
 
@@ -171,7 +171,7 @@ var Popup = new (function()
 			if (newHasControls)
 			{
 				if (!controlsObj)
-					controlsObj = ce('div', { className : 'popup_controls' });
+					controlsObj = ce('div', { className : 'popup__controls' });
 			}
 			else
 			{
@@ -189,7 +189,7 @@ var Popup = new (function()
 				else
 				{
 					if (!okBtn)
-						okBtn = ce('input', { className : 'btn ok_btn',
+						okBtn = ce('input', { className : 'btn submit-btn',
 												type : 'button', value : 'ok' });
 
 					setParam(okBtn, params.okBtn);
@@ -206,7 +206,7 @@ var Popup = new (function()
 				else
 				{
 					if (!cancelBtn)
-						cancelBtn = ce('input', { className : 'btn cancel_btn',
+						cancelBtn = ce('input', { className : 'btn cancel-btn',
 													type : 'button', value : 'cancel',
 													onclick : closeModal.bind(self) });
 

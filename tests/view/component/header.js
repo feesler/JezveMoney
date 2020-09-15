@@ -18,10 +18,10 @@ export class Header extends NullableComponent
 			throw new Error('Logo link element not found');
 
 		this.user = {};
-		this.user.elem = await this.query(this.elem, '.userblock');
+		this.user.elem = await this.query(this.elem, '.user-block');
 		if (this.user.elem)
 		{
-			this.user.menuBtn = await this.query(this.elem, 'button.user_button');
+			this.user.menuBtn = await this.query(this.elem, 'button.user-menu-btn');
 			if (!this.user.menuBtn)
 				throw new Error('User button not found');
 			let el = await this.query(this.user.menuBtn, '.user_title');
@@ -29,7 +29,7 @@ export class Header extends NullableComponent
 				throw new Error('User title element not found');
 			this.user.name = await this.prop(el, 'innerText');
 
-			this.user.menuEl = await this.query(this.elem, '.usermenu');
+			this.user.menuEl = await this.query(this.elem, '.user-menu');
 			if (!this.user.menuEl)
 				throw new Error('Menu element not found');
 

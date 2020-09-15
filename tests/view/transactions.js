@@ -44,7 +44,7 @@ export class TransactionsView extends TestView
 		if (!res.searchForm)
 			throw new Error('Search form not found');
 
-		let transList = await this.query('.trans_list');
+		let transList = await this.query('.trans-list');
 		if (!transList)
 			throw new Error('List of transactions not found');
 

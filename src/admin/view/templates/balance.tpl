@@ -11,7 +11,7 @@
 					<h2>Transactions result balance</h2>
 
 
-					<table class="adm_tbl">
+					<table class="admin-tbl">
 						<tr>
 							<th>ID</th>
 							<th>Type</th>

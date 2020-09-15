@@ -1,4 +1,4 @@
-		<div class="admin_header">
+		<div class="admin-header">
 			<div class="menu"><span><a href="<?=BASEURL?>admin/">Admin</a></span><span><a href="<?=BASEURL?>">Index</a></span></div>
 			<div class="menu">
 <?php	foreach($this->menuItems as $item_id => $m_item) {	?>

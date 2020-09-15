@@ -44,19 +44,6 @@
 }
 
 
-/* inactive tile */
-.inact
-{
-	background-color: #B0B0B0;
-}
-
-
-.inact:hover
-{
-	background-color: #C0C0C0;
-}
-
-
 button.tilelink
 {
 	width: 100px;
@@ -94,7 +81,7 @@ a.tilelink
 }
 
 
-.acc_name
+.tile__title
 {
 	left: 5px;
 	bottom: 2px;
@@ -103,7 +90,7 @@ a.tilelink
 }
 
 
-.acc_bal
+.tile__subtitle
 {
 	top: 2px;
 	right: 5px;
@@ -112,7 +99,7 @@ a.tilelink
 }
 
 
-.acc_icon
+.tile__icon
 {
 	top: 23px;
 	left: 20px;

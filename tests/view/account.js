@@ -186,11 +186,11 @@ export class AccountView extends TestView
 		res.flagsInp = await this.query('#flags');
 		res.flags = parseInt(await this.prop(res.flagsInp, 'value'));
 
-		res.submitBtn = await this.query('.acc_controls .ok_btn');
+		res.submitBtn = await this.query('.acc_controls .submit-btn');
 		if (!res.submitBtn)
 			throw new Error('Submit button not found');
 
-		res.cancelBtn = await this.query('.acc_controls .cancel_btn');
+		res.cancelBtn = await this.query('.acc_controls .cancel-btn');
 		if (!res.cancelBtn)
 			throw new Error('Cancel button not found');
 

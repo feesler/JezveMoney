@@ -41,8 +41,8 @@ export class ProfileView extends TestView
 
 		if (res.changeNamePopup.elem)
 		{
-			res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, '.popup_controls > input.btn.ok_btn');
-			res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close_btn');
+			res.changeNamePopup.okBtn = await this.query(res.changeNamePopup.elem, '.popup__controls > input.btn.submit-btn');
+			res.changeNamePopup.closeBtn = await this.query(res.changeNamePopup.elem, '.close-btn');
 		}
 
 		res.changePassPopup = {
@@ -54,8 +54,8 @@ export class ProfileView extends TestView
 
 		if (res.changePassPopup.elem)
 		{
-			res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, '.popup_controls > input.btn.ok_btn');
-			res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close_btn');
+			res.changePassPopup.okBtn = await this.query(res.changePassPopup.elem, '.popup__controls > input.btn.submit-btn');
+			res.changePassPopup.closeBtn = await this.query(res.changePassPopup.elem, '.close-btn');
 		}
 
 		res.reset_warning = await WarningPopup.create(this, await this.query('#reset_warning'));
@@ -70,7 +70,7 @@ export class ProfileView extends TestView
 	{
 		await this.performAction(() => this.click(this.content.nameLinkElem));
 
-		await this.performAction(() => this.wait('.popup_content.chname_popup', { visible : true }));
+		await this.performAction(() => this.wait('.popup__content.chname_popup', { visible : true }));
 
 		if (!this.content.changeNamePopup || !(await this.isVisible(this.content.changeNamePopup.elem)))
 			throw new Error('Change name popup not appear');
@@ -82,7 +82,7 @@ export class ProfileView extends TestView
 
 		if (validInput)
 		{
-			await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
+			await this.performAction(() => this.wait('.popup__content.msg', { visible : true }));
 		}
 		else
 		{
@@ -95,7 +95,7 @@ export class ProfileView extends TestView
 	{
 		await this.performAction(() => this.click(this.content.changePassLinkElem));
 
-		await this.performAction(() => this.wait('.popup_content.chpass_popup', { visible : true }));
+		await this.performAction(() => this.wait('.popup__content.chpass_popup', { visible : true }));
 
 		if (!this.content.changePassPopup || !(await this.isVisible(this.content.changePassPopup.elem)))
 			throw new Error('Change password popup not appear');
@@ -110,7 +110,7 @@ export class ProfileView extends TestView
 
 		if (validInput)
 		{
-			await this.performAction(() => this.wait('.popup_content.msg', { visible : true }));
+			await this.performAction(() => this.wait('.popup__content.msg', { visible : true }));
 		}
 		else
 		{

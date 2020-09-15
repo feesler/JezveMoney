@@ -9,7 +9,7 @@ export class TransactionList extends NullableComponent
 	{
 		this.items = [];
 		this.details = (await this.prop(this.elem, 'tagName') == 'TABLE');
-		let listItems = await this.queryAll(this.elem, (this.details) ? 'tr' : '.trlist_item_wrap > div');
+		let listItems = await this.queryAll(this.elem, (this.details) ? 'tr' : '.trans-list__item-wrapper > div');
 		if (!listItems || !listItems.length || (listItems.length == 1 && await this.prop(listItems[0], 'tagName') == 'SPAN'))
 			return;
 

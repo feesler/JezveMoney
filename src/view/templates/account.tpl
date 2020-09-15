@@ -10,7 +10,7 @@
 					<div class="heading">
 						<h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {	?>
-						<div id="del_btn" class="iconlink"><button type="button"><span class="icon"><?=svgIcon("del")?></span><span class="icontitle"><span>Delete</span></span></button></div>
+						<div id="del_btn" class="iconlink"><button type="button"><span class="iconlink__icon"><?=svgIcon("del")?></span><span class="iconlink__content"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 
@@ -20,11 +20,11 @@
 						<input id="accid" name="id" type="hidden" value="<?=e($acc_id)?>">
 <?php	}	?>
 						<div class="view-row std_margin">
-							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="acc_bal"><?=e($accInfo->balfmt)?></span><span class="acc_icon"><?=useIcon("tile-".$accInfo->iconname, 60, 54)?></span><span class="acc_name"><?=e($tileAccName)?></span></span></button></div>
+							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($accInfo->balfmt)?></span><span class="tile__icon"><?=useIcon("tile-".$accInfo->iconname, 60, 54)?></span><span class="tile__title"><?=e($tileAccName)?></span></span></button></div>
 						</div>
 						<div class="view-row std_margin">
 							<label for="icon">Icon</label>
-							<div class="std_input">
+							<div class="std_margin">
 								<select id="icon" name="icon">
 <?php	foreach($icons as $icon_id => $icon_name) {
 			if ($icon_id == $accInfo->icon) {		?>
@@ -38,12 +38,12 @@
 						</div>
 						<div id="name-inp-block" class="validation-block view-row std_margin">
 							<label for="accname">Account name</label>
-							<div class="stretch_input std_input"><input id="accname" name="name" type="text" value="<?=e($accInfo->name)?>"></div>
+							<div class="stretch-input std_margin"><input id="accname" name="name" type="text" value="<?=e($accInfo->name)?>"></div>
 							<div class="invalid-feedback">Please input name of account.</div>
 						</div>
 						<div class="view-row std_margin">
 							<label for="currency">Currency</label>
-							<div class="std_input">
+							<div class="std_margin">
 								<select id="currency" name="curr_id">
 <?php	foreach($currArr as $currInfo) {
 			if ($currInfo->id == $accInfo->curr_id) {	?>
@@ -57,15 +57,15 @@
 						</div>
 						<div id="initbal-inp-block" class="validation-block view-row std_margin">
 							<label for="balance">Initial balance</label>
-							<div>
-								<div class="btn rcurr_btn inact_rbtn"><div id="currsign"><?=e($accInfo->sign)?></div></div>
-								<div class="stretch_input std_input">
-									<input class="summ_text" id="balance" name="initbalance" type="text" value="<?=e($accInfo->initbalance)?>">
+							<div class="input-group std_margin">
+								<div class="stretch-input">
+									<input class="amount-input" id="balance" name="initbalance" type="text" value="<?=e($accInfo->initbalance)?>">
 								</div>
+								<div class="btn input-group__btn input-group__btn_inactive"><div id="currsign"><?=e($accInfo->sign)?></div></div>
 							</div>
 							<div class="invalid-feedback">Please input correct initial balance.</div>
 						</div>
-						<div class="acc_controls"><input class="btn ok_btn" type="submit" value="ok"><a class="btn cancel_btn" href="<?=BASEURL?>accounts/">cancel</a></div>
+						<div class="acc_controls"><input class="btn submit-btn" type="submit" value="ok"><a class="btn cancel-btn" href="<?=BASEURL?>accounts/">cancel</a></div>
 						<input id="flags" name="flags" type="hidden" value="<?=e($accInfo->flags)?>">
 						</form>
 					</div>

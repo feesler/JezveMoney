@@ -33,6 +33,7 @@
 	box-sizing: border-box;
 	position: relative;
 	width: 100%;
+	height: 34px;
 	border: 2px solid #000000;
 	background-color: #FFFFFF;
 	padding: 0px 24px 0px 0px;
@@ -119,8 +120,7 @@
 	font-size: 1rem;
 	padding: 0 0 0 4px;
 	margin: 0;
-	height: 1.75rem;
-	line-height: 1.75rem;
+	align-items: center;
 	background-color: #FFFFFF;
 	color: #000000;
 }
@@ -272,10 +272,10 @@ li[disabled] .dd__list-item
 }
 
 
-.dd__list-item_active
+.dd__list-item.dd__list-item_active
 {
 	color: #FFFFFF;
-	background-color: #0000FF;
+	background-color: #3078e2;
 }
 
 

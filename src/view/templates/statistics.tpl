@@ -15,11 +15,11 @@
 						<div class="trtype-menu">
 <?php	forEach($transMenu as $menuItem) {
 			if ($menuItem->selected) {		?>
-							<span class="trtype-menu_item trtype-menu_selected-item" data-type="<?=e($menuItem->type)?>">
+							<span class="trtype-menu__item trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
 								<span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
 							</span>
 <?php		} else {		?>
-							<span class="trtype-menu_item" data-type="<?=e($menuItem->type)?>">
+							<span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
 								<span class="trtype-menu_item_title">
 									<a href="<?=e($menuItem->link)?>"><?=e($menuItem->title)?></a>
 								</span>
@@ -87,16 +87,16 @@
 
 							<div class="filter-item">
 <?php	if (is_empty($dateFmt)) {		?>
-								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span>Select range</span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="iconlink__icon"><?=svgIcon("cal")?></span><span class="iconlink__content"><span>Select range</span></span></button></div>
 <?php	} else { 	?>
-								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="icon"><?=svgIcon("cal")?></span><span class="icontitle"><span class="maintitle">Select range</span><span class="subtitle"><?=e($dateFmt)?></span></span></button></div>
+								<div id="calendar_btn" class="iconlink std_margin"><button type="button"><span class="iconlink__icon"><?=svgIcon("cal")?></span><span class="iconlink__content"><span class="iconlink__title">Select range</span><span class="iconlink__subtitle"><?=e($dateFmt)?></span></span></button></div>
 <?php	} 	?>
 								<div id="date_block" class="hidden">
 									<div class="input-group">
-										<div class="stretch_input rbtn_input">
+										<div class="stretch-input rbtn_input">
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>
-										<button id="cal_rbtn" class="btn icon_btn cal_btn" type="button"><?=svgIcon("cal")?></button>
+										<button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
 										<div id="calendar"></div>
 									</div>
 								</div>

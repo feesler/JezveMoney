@@ -12,7 +12,7 @@ export class DatePickerFilter extends NullableComponent
 		if (!this.iconLink)
 			throw new Error('Iconlink of date picker not found');
 
-		this.inputElem = await this.query(this.elem, '.stretch_input > input');
+		this.inputElem = await this.query(this.elem, '.stretch-input > input');
 		if (!this.inputElem)
 			throw new Error('Input element not found');
 

@@ -92,7 +92,7 @@
 						</div>
 
 						<div class="center-column">
-							<div id="readStateForm" class="test_form">
+							<div id="readStateForm" class="request-data-form">
 							<h3>Read state</h3>
 							<form action="<?=BASEURL?>api/state" method="list">
 								<div class="acc_controls">
@@ -101,7 +101,7 @@
 							</form>
 							</div>
 
-							<div id="listAccForm" class="test_form active">
+							<div id="listAccForm" class="request-data-form active">
 							<h3>List accounts</h3>
 							<form action="<?=BASEURL?>api/account/list" method="list">
 								<div class="std_margin">
@@ -121,7 +121,7 @@
 							</form>
 							</div>
 
-							<div id="readAccForm" class="test_form">
+							<div id="readAccForm" class="request-data-form">
 							<h3>Read accounts by ids</h3>
 							<div class="std_margin"><label for="readaccid">Id</label><input id="readaccid" type="text"></div>
 							<div class="acc_controls">
@@ -129,7 +129,7 @@
 							</div>
 							</div>
 
-							<div id="createAccForm" class="test_form">
+							<div id="createAccForm" class="request-data-form">
 							<h3>Create account</h3>
 							<form action="<?=BASEURL?>api/account/create" method="post">
 								<div class="std_margin">
@@ -154,7 +154,7 @@
 							</form>
 							</div>
 
-							<div id="updateAccForm" class="test_form">
+							<div id="updateAccForm" class="request-data-form">
 							<h3>Update account</h3>
 							<form action="<?=BASEURL?>api/account/update" method="post">
 								<div class="std_margin">
@@ -187,7 +187,7 @@
 							</form>
 							</div>
 
-							<div id="delAccForm" class="test_form">
+							<div id="delAccForm" class="request-data-form">
 							<h3>Delete accounts</h3>
 							<div class="std_margin">
 								<label for="delaccounts">Accounts (comma separated ids)</label>
@@ -198,7 +198,7 @@
 							</div>
 							</div>
 
-							<div id="resetAccForm" class="test_form">
+							<div id="resetAccForm" class="request-data-form">
 							<h3>Reset accounts</h3>
 							<form action="<?=BASEURL?>api/account/reset" method="post">
 								<div class="acc_controls">
@@ -207,15 +207,15 @@
 							</form>
 							</div>
 
-							<div id="listTrForm" class="test_form">
+							<div id="listTrForm" class="request-data-form">
 							<h3>List</h3>
 							<form action="<?=BASEURL?>api/transaction/list" method="list">
 								<div class="std_margin">
 									<input type="checkbox" data-target="order"><label>Order</label>
-									<div id="admin_block" class="check_wr check_wr_inline">
+									<div id="admin_block" class="checkbox-wrap checkbox-wrap_inline">
 										<label for="list_trans_isasc"><input id="list_trans_isasc" name="order" type="radio" value="asc" checked disabled>Ascending</label>
 									</div>
-									<div id="admin_block" class="check_wr check_wr_inline">
+									<div id="admin_block" class="checkbox-wrap checkbox-wrap_inline">
 										<label for="list_trans_isdesc"><input id="list_trans_isdesc" name="order" type="radio" value="desc" disabled>Descending</label>
 									</div>
 								</div>
@@ -253,7 +253,7 @@
 							</form>
 							</div>
 
-							<div id="readTrForm" class="test_form">
+							<div id="readTrForm" class="request-data-form">
 							<h3>Read by ids</h3>
 							<div class="std_margin">
 								<label for="read_trans_id">Id</label>
@@ -264,7 +264,7 @@
 							</div>
 							</div>
 
-							<div id="createTrForm" class="test_form">
+							<div id="createTrForm" class="request-data-form">
 							<h3>Create</h3>
 							<form action="<?=BASEURL?>api/transaction/create" method="post">
 								<div class="std_margin">
@@ -313,7 +313,7 @@
 							</form>
 							</div>
 
-							<div id="createDebtForm" class="test_form">
+							<div id="createDebtForm" class="request-data-form">
 							<h3>Create debt</h3>
 							<form action="<?=BASEURL?>api/transaction/create" method="post">
 								<input name="type" type="hidden" value="4">
@@ -364,7 +364,7 @@
 							</form>
 							</div>
 
-							<div id="updateTrForm" class="test_form">
+							<div id="updateTrForm" class="request-data-form">
 							<h3>Update</h3>
 							<form action="<?=BASEURL?>api/transaction/update" method="post">
 								<div class="std_margin">
@@ -420,7 +420,7 @@
 							</div>
 
 
-							<div id="updateDebtForm" class="test_form">
+							<div id="updateDebtForm" class="request-data-form">
 							<h3>Update debt</h3>
 							<form action="<?=BASEURL?>api/transaction/update" method="post">
 								<input name="type" type="hidden" value="4">
@@ -476,7 +476,7 @@
 							</form>
 							</div>
 
-							<div id="delTrForm" class="test_form">
+							<div id="delTrForm" class="request-data-form">
 							<h3>Delete transactions</h3>
 							<div class="std_margin">
 								<label for="deltransactions">Transactions (comma separated ids)</label>
@@ -488,7 +488,7 @@
 							</div>
 							</div>
 
-							<div id="setTrPosForm" class="test_form">
+							<div id="setTrPosForm" class="request-data-form">
 							<h3>Set position of transacction</h3>
 							<form action="<?=BASEURL?>api/transaction/setpos" method="post">
 								<div class="std_margin">
@@ -505,7 +505,7 @@
 							</form>
 							</div>
 
-							<div id="listPersonsForm" class="test_form">
+							<div id="listPersonsForm" class="request-data-form">
 							<h3>List persons</h3>
 							<form action="<?=BASEURL?>api/person/list" method="list">
 								<div class="std_margin">
@@ -522,7 +522,7 @@
 							</form>
 							</div>
 
-							<div id="readPersonForm" class="test_form">
+							<div id="readPersonForm" class="request-data-form">
 							<h3>Read person</h3>
 							<div class="std_margin">
 								<label for="read_person_id">Id</label>
@@ -533,7 +533,7 @@
 							</div>
 							</div>
 
-							<div id="createPersonForm" class="test_form">
+							<div id="createPersonForm" class="request-data-form">
 							<h3>Create person</h3>
 							<form action="<?=BASEURL?>api/person/create" method="post">
 								<div class="std_margin">
@@ -546,7 +546,7 @@
 							</form>
 							</div>
 
-							<div id="updatePersonForm" class="test_form">
+							<div id="updatePersonForm" class="request-data-form">
 							<h3>Update person</h3>
 							<form action="<?=BASEURL?>api/person/update" method="post">
 								<div class="std_margin">
@@ -563,7 +563,7 @@
 							</form>
 							</div>
 
-							<div id="delPersonForm" class="test_form">
+							<div id="delPersonForm" class="request-data-form">
 							<h3>Delete persons</h3>
 							<div class="std_margin">
 								<label for="delpersons">Persons (comma separated ids)</label>
@@ -574,7 +574,7 @@
 							</div>
 							</div>
 
-							<div id="listCurrForm" class="test_form">
+							<div id="listCurrForm" class="request-data-form">
 							<h3>Get currencies</h3>
 							<form action="<?=BASEURL?>api/currency/list" method="list">
 								<div class="acc_controls">
@@ -583,7 +583,7 @@
 							</form>
 							</div>
 
-							<div id="readCurrForm" class="test_form">
+							<div id="readCurrForm" class="request-data-form">
 							<h3>Read currency</h3>
 							<div class="std_margin">
 								<label for="read_curr_id">Id</label>
@@ -594,7 +594,7 @@
 							</div>
 							</div>
 
-							<div id="createCurrForm" class="test_form">
+							<div id="createCurrForm" class="request-data-form">
 							<h3>Create currency</h3>
 							<form action="<?=BASEURL?>api/currency/create" method="post">
 								<div class="std_margin">
@@ -615,7 +615,7 @@
 							</form>
 							</div>
 
-							<div id="updateCurrForm" class="test_form">
+							<div id="updateCurrForm" class="request-data-form">
 							<h3>Update currency</h3>
 							<form action="<?=BASEURL?>api/currency/update" method="post">
 								<div class="std_margin">
@@ -640,7 +640,7 @@
 							</form>
 							</div>
 
-							<div id="delCurrForm" class="test_form">
+							<div id="delCurrForm" class="request-data-form">
 							<h3>Delete currency</h3>
 							<div class="std_margin">
 								<label for="delcurrencies">Currencies (comma separated ids)</label>
@@ -651,7 +651,7 @@
 							</div>
 							</div>
 
-							<div id="loginForm" class="test_form">
+							<div id="loginForm" class="request-data-form">
 							<h3>Login</h3>
 							<form action="<?=BASEURL?>api/login/" method="post">
 								<div class="std_margin">
@@ -669,7 +669,7 @@
 							</form>
 							</div>
 
-							<div id="logoutForm" class="test_form">
+							<div id="logoutForm" class="request-data-form">
 								<h3>Login</h3>
 								<form action="<?=BASEURL?>api/logout/" method="post">
 									<div class="acc_controls">
@@ -678,7 +678,7 @@
 								</form>
 							</div>
 
-							<div id="registerForm" class="test_form">
+							<div id="registerForm" class="request-data-form">
 							<h3>Register</h3>
 							<form action="<?=BASEURL?>api/register/" method="post">
 								<div class="std_margin">
@@ -700,7 +700,7 @@
 							</form>
 							</div>
 
-							<div id="readProfileForm" class="test_form">
+							<div id="readProfileForm" class="request-data-form">
 							<h3>Read profile</h3>
 							<form action="<?=BASEURL?>api/profile/read" method="list">
 								<div class="acc_controls">
@@ -709,7 +709,7 @@
 							</form>
 							</div>
 
-							<div id="changeNameForm" class="test_form">
+							<div id="changeNameForm" class="request-data-form">
 							<h3>Change name</h3>
 							<form action="<?=BASEURL?>api/profile/changename" method="post">
 								<div class="std_margin">
@@ -723,7 +723,7 @@
 							</form>
 							</div>
 
-							<div id="changePwdForm" class="test_form">
+							<div id="changePwdForm" class="request-data-form">
 							<h3>Change password</h3>
 							<form action="<?=BASEURL?>api/profile/changepass" method="post">
 								<div class="std_margin">
@@ -741,7 +741,7 @@
 							</form>
 							</div>
 
-							<div id="resetAllForm" class="test_form">
+							<div id="resetAllForm" class="request-data-form">
 							<h3>Reset all data</h3>
 							<form action="<?=BASEURL?>api/profile/reset" method="post">
 								<div class="acc_controls">

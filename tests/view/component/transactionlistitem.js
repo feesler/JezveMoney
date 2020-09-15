@@ -9,23 +9,23 @@ export class TransactionListItem extends Component
 	{
 		this.id = this.parseId(await this.prop(this.elem, 'id'));
 
-		let titleElem = await this.query(this.elem, '.tritem_acc_name > span');
+		let titleElem = await this.query(this.elem, '.trans-list__item-title > span');
 		if (!titleElem)
 			throw new Error('Account title not found');
 		this.accountTitle = await this.prop(titleElem, 'innerText');
 
-		let amountElem = await this.query(this.elem, '.tritem_sum > span');
+		let amountElem = await this.query(this.elem, '.trans-list__item-content > span');
 		if (!amountElem)
 			throw new Error('Amount text not found');
 		this.amountText = await this.prop(amountElem, 'innerText');
 
-		let dateElem = await this.query(this.elem, '.tritem_date_comm > *');
+		let dateElem = await this.query(this.elem, '.trans-list__item-details > *');
 		if (!dateElem || await this.prop(dateElem, 'tagName') != 'SPAN')
 			throw new Error('Date element not found');
 
 		this.dateFmt = await this.prop(dateElem, 'innerText');
 
-		let commentElem = await this.query(this.elem, '.tritem_comm');
+		let commentElem = await this.query(this.elem, '.trans-list__item-comment');
 		this.comment = commentElem ? await this.prop(commentElem, 'innerText') : '';
 	}
 

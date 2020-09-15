@@ -13,7 +13,7 @@ export class LoginView extends TestView
 		let res = {
 			loginInp : await InputRow.create(this, await this.query('#login-inp-block')),
 			passwordInp : await InputRow.create(this, await this.query('#pwd-inp-block')),
-			submitBtn : await this.query('.form-controls .btn.ok_btn'),
+			submitBtn : await this.query('.form-controls .btn.submit-btn'),
 			registerLink : await this.query('.form-controls .alter_link > a')
 		};
 
