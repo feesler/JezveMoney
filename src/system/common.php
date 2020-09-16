@@ -9,6 +9,9 @@
 
 	define("PERSON_HIDDEN", 1);
 
+	define("WHITE_THEME", 0);
+	define("DARK_THEME", 1);
+
 
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)
@@ -183,14 +186,45 @@
 	}
 
 
+	// Return file modification timestamp
+	function getModifiedTime($file)
+	{
+		if (!is_string($file) || !file_exists(APP_ROOT.$file))
+			return FALSE;
+
+		return filemtime(APP_ROOT.$file);
+	}
+
+
 	// Append to file name unique string to fix cache issues
 	function auto_version($file)
 	{
-		if (!file_exists(APP_ROOT.$file))
+		$mtime = getModifiedTime($file);
+		if ($mtime === FALSE)
 			return $file;
 
-		$mtime = filemtime(APP_ROOT.$file);
 		return $file."?".$mtime;
+	}
+
+
+	function getThemes($base)
+	{
+		$themeFiles = [
+			WHITE_THEME => "white-theme.css",
+			DARK_THEME => "dark-theme.css"
+		];
+
+		$res = [];
+		foreach($themeFiles as $theme_id => $themeName)
+		{
+			$mtime = getModifiedTime($base.$themeName);
+			if ($mtime === FALSE)
+				continue;
+
+			$res[$theme_id] = $themeName."?".$mtime;
+		}
+
+		return $res;
 	}
 
 

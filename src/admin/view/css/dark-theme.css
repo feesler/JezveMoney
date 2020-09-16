@@ -1,0 +1,93 @@
+body
+{
+    color: #DDDDDD;
+	background-color: #101010;
+}
+
+
+.admin-tbl,
+.admin-tbl th,
+.admin-tbl td
+{
+	border-color: #DDDDDD;
+}
+
+
+.admin-tbl tr:hover td
+{
+	background-color: #444444;
+}
+
+
+textarea
+{
+	color: #DDDDDD;
+	border-color: #DDDDDD;
+	background-color: #202020;
+}
+
+
+/* Tests */
+.results-container td
+{
+	border-color: #DDDDDD;
+}
+
+
+/* API tests */
+.left-column,
+.right-column
+{
+	background-color: #202020;
+}
+
+
+.menu-list > li > button
+{
+	color: #DDDDDD;
+}
+
+
+.menu-list .sub-menu-list > li:hover
+{
+	color: #B0B0B0;
+}
+
+
+.request-data-form
+{
+	background-color: #444444;
+    border-color: #202020;
+}
+
+
+.request-data-form input[type="text"]
+{
+	color: #DDDDDD;
+    border-color: #DDDDDD;
+	background-color: #101010;
+}
+
+
+.request-data-form input[disabled],
+.request-data-form select[disabled],
+.request-data-form textarea[disabled]
+{
+	color: #888888;
+	border-color: #888888;
+}
+
+
+.request-item
+{
+	border-color: #444444;
+    background-color: #444444;
+}
+
+
+.request-item .response-container.response-container_pending
+{
+	border-color: #444444;
+	color: #444444;
+}
+

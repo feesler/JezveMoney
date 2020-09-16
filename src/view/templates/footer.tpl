@@ -3,5 +3,6 @@
 <?php	}	?>
 <script>
 	var baseURL = '<?=BASEURL?>';
+	var themes = <?=JSON::encode((object)$this->themes)?>;
 <?php		Message::check();		?>
 </script>

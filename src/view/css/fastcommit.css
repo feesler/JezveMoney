@@ -26,7 +26,6 @@
 .tr-row
 {
 	padding: 10px;
-	background-color: #DDDDDD;
 	margin: 3px 0;
 }
 
@@ -94,18 +93,10 @@
 .tr-row > select,
 .tr-row > input[type="text"]
 {
-	border: 1px solid #000;
+	border: 1px solid;
 	padding: 5px;
 	width: 100px;
 	margin: 0px 5px 0px 0px;
-}
-
-
-.tr-row > select[disabled],
-.tr-row > input[disabled]
-{
-	border-color: #DDDDDD;
-	background-color: #EEEEEE;
 }
 
 
@@ -137,9 +128,6 @@
 .tr-row_disabled > input[type="text"],
 .tr-row_disabled > input[disabled]
 {
-	color: #DDDDDD;
-	border-color: #DDDDDD;
-	background-color: #EEEEEE;
 	pointer-events: none;
 }
 

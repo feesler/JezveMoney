@@ -42,14 +42,14 @@
 .admin-tbl
 {
 	border-collapse: collapse;
-	border: 1px solid #000000;
+	border: 1px solid;
 }
 
 
 .admin-tbl th,
 .admin-tbl td
 {
-	border: 1px solid #000000;
+	border: 1px solid;
 	padding: 5px;
 }
 
@@ -59,11 +59,6 @@
 	cursor: pointer;
 }
 
-
-.admin-tbl tr:hover
-{
-	background-color: #BBBBBB;
-}
 
 .admin-tbl tr.act
 {
@@ -75,7 +70,7 @@
 /* Common style for textarea */
 textarea
 {
-	border: 1px solid #000000;
+	border: 1px solid;
 	padding: 5px;
 }
 

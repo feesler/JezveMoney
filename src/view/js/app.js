@@ -10,6 +10,9 @@ var ACCOUNT_HIDDEN = 1;
 // Person flags
 var PERSON_HIDDEN = 1;
 
+// Theme constants
+var WHITE_THEME = 0;
+var DARK_THEME = 1;
 
 
 // Clear validation state of block
@@ -50,6 +53,20 @@ function onUserClick()
 		show('menupopup', true);
 		setEmptyClick(hidePopup, ['menupopup', 'userbtn']);
 	}
+}
+
+
+function onToggleTheme(e)
+{
+	var newTheme = e.target.checked ? DARK_THEME : WHITE_THEME;
+
+	var linkElem = ge('theme-style');
+	if (linkElem)
+		linkElem.href = baseURL + 'view/css/' + themes[newTheme];
+
+	ajax.get({
+		url : baseURL + 'main/setTheme/?theme=' + newTheme
+	});
 }
 
 
@@ -160,6 +177,10 @@ function initHeader()
 	var userbtn = ge('userbtn');
 	if (userbtn)
 		userbtn.onclick = onUserClick;
+
+	var themeCheck = ge('theme-check');
+	if (themeCheck)
+		themeCheck.addEventListener('change', onToggleTheme);
 }
 
 

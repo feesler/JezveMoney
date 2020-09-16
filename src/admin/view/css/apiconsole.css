@@ -31,6 +31,7 @@ h3
 	display: inline-flex;
 	flex-flow: column nowrap;
 	width: 15%;
+	padding: 6px;
 }
 
 
@@ -48,6 +49,7 @@ h3
 	display: inline-flex;
 	flex-flow: column nowrap;
 	width: 45%;
+	padding: 6px;
 }
 
 
@@ -115,11 +117,10 @@ h3
 /* View containers */
 .request-data-form
 {
-	background-color: #f3f3f3;
 	max-width: 400px;
 	padding: 12px;
 	display: none;
-	border: 1px solid #BBBBBB;
+	border: 1px solid;
     border-radius: 3px;
 	box-sizing: border-box;
 	width: 100%;
@@ -141,15 +142,9 @@ h3
 
 .request-data-form input[type="text"]
 {
-	border: 1px solid #000000;
+	border: 1px solid;
 	display: inline;
 	padding: 3px;
-}
-
-
-.request-data-form input:disabled
-{
-	border-color: #888888;
 }
 
 
@@ -160,7 +155,7 @@ h3
 {
 	padding: 5px;
 	margin: 5px 0;
-	border: 1px solid #D7D7D7;
+	border: 1px solid;
 	border-radius: 2px;
 }
 
@@ -233,8 +228,7 @@ h3
 .request-item .response-container.response-container_pending
 {
 	background: none;
-	border: 1px dashed #CCCCCC;
-	color: #CCCCCC;
+	border: 1px dashed;
 }
 
 

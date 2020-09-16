@@ -31,4 +31,14 @@ abstract class AdminController extends TemplateController
 		$this->jsAdminModule = [];
 	}
 
+
+	protected function buildCSS()
+	{
+		$this->cssAdmin = (array)$this->cssAdmin;
+
+		parent::buildCSS();
+
+		$this->adminThemes = getThemes("view/css/");
+		$this->adminThemeStylesheet = $this->adminThemes[$this->userTheme];
+	}
 }

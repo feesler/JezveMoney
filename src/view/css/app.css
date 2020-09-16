@@ -231,15 +231,6 @@ select
 }
 
 
-/* Input controls color */
-input[type="text"], input[type="password"], select
-{
-	border-color: #000000;
-	background-color: #FFFFFF;
-	color: #000000;
-}
-
-
 /* Centered block */
 .centered
 {
@@ -313,7 +304,6 @@ input[type="text"], input[type="password"], select
 {
 	display: flex;
 	flex-flow: row nowrap;
-	justify-content: space-between;
 }
 
 
@@ -374,6 +364,77 @@ input[type="text"], input[type="password"], select
 	height: 20px;
 	font-size: 20px;
 	font-weight: 200;
+}
+
+
+/* Theme switch */
+.theme-switch
+{
+	display: flex;
+	width: 45px;
+	height: 17px;
+	padding: 0px 6px;
+	margin-left: auto;
+	align-items: center;
+}
+
+
+.switch
+{
+	position: relative;
+	width: 34px;
+	height: 20px;
+}
+
+
+.switch input
+{
+	display: none;
+}
+
+
+.switch-slider
+{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #555555;
+	cursor: pointer;
+	border-radius: 9px;
+}
+
+
+.switch-slider::before
+{
+	content: '';
+	top: 2px;
+	left: 2px;
+	transition: left 0.2s;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	background-color: #ABABAB;
+	border-radius: 8px;
+}
+
+
+.switch input:checked + .switch-slider::before
+{
+	left: 17px;
+}
+
+
+.switch-slider:hover
+{
+	background-color: #707070;
+}
+
+
+.switch-slider:hover::before
+{
+	background-color: #FFFFFF;
 }
 
 
@@ -531,7 +592,6 @@ input[type="text"], input[type="password"], select
 .widget_title > a:hover
 {
 	height: 32px;
-	color: #000000;
 	text-decoration: none;
 }
 
@@ -774,7 +834,7 @@ input[type="text"], input[type="password"], select
 	border: 0 none;
 	clear: both;
 	cursor: pointer;
-	background-color: #FFFFFF;
+	background: none;
 	font-size: 16px;
 }
 
@@ -814,6 +874,7 @@ input[type="text"], input[type="password"], select
 	height: 80px;
 	margin: 0px 10px 10px 0px;
 	padding: 5px;
+	color: #000000;
 	background-color: #D0D0D0;
 	position: relative;
 	overflow: hidden;
@@ -862,8 +923,6 @@ input[type="text"], input[type="password"], select
 
 .input-group__btn_inactive
 {
-	color: #000000;
-	background-color: #FFFFFF;
 	cursor: default;
 }
 

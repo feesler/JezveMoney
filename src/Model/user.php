@@ -193,6 +193,24 @@ class UserModel extends CachedTable
 	}
 
 
+	public function getUserTheme()
+	{
+		if (!isset($_COOKIE["theme"]))
+			return 0;
+
+		return intval($_COOKIE["theme"]);
+	}
+
+
+	public function setUserTheme($theme)
+	{
+		$themeCookie = (intval($theme) == DARK_THEME) ? DARK_THEME : WHITE_THEME;
+
+		$expTime = time() + 31536000;	// year after now
+		setcookie("theme", $themeCookie, $expTime, APP_PATH, APP_DOMAIN, isSecure());
+	}
+
+
 	// Check user has admin access
 	public function isAdmin($item_id)
 	{

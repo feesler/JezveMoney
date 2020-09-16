@@ -33,6 +33,15 @@ abstract class TemplateController extends Controller
 	}
 
 
+	public function setTheme()
+	{
+		if (!isset($_GET["theme"]))
+			return;
+
+		$this->uMod->setUserTheme($_GET["theme"]);
+	}
+
+
 	protected function buildCSS()
 	{
 		if (is_null($this->css))
@@ -42,6 +51,10 @@ abstract class TemplateController extends Controller
 									(array)$this->css->libs,
 									(array)$this->css->app,
 									(array)$this->css->page);
+
+		$this->userTheme = $this->uMod->getUserTheme();
+		$this->themes = getThemes("view/css/");
+		$this->themeStylesheet = $this->themes[$this->userTheme];
 	}
 
 

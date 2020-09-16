@@ -1,0 +1,353 @@
+/* Input controls color */
+input[type="text"], input[type="password"], select
+{
+	border-color: #000000;
+	background-color: #FFFFFF;
+	color: #000000;
+}
+
+
+/* Page */
+body,
+.page_wrapper
+{
+	color: #000000;
+	background-color: #FFFFFF;
+}
+
+
+/* Main content */
+.container
+{
+	background-color: #FFFFFF;
+}
+
+
+/* Login/Register view */
+.login-layer,
+.register-layer
+{
+	background-color: #FFFFFF;
+}
+
+
+.login-layer h1,
+.register-layer h1
+{
+	color: #000000;
+}
+
+
+.heading
+{
+	color: #000000;
+}
+
+
+.iconlink .iconlink__icon
+{
+	border-color: #000000;
+}
+
+
+.iconlink:hover .iconlink__icon
+{
+	background-color: #000000;
+}
+
+
+.iconlink .iconlink__icon svg *
+{
+	fill: #000000;
+}
+
+
+.iconlink:hover .iconlink__icon svg *
+{
+	fill: #FFFFFF;
+}
+
+
+.iconlink span.iconlink__content
+{
+	color: #000000;
+}
+
+
+.iconlink > *:hover > span
+{
+	color: #000000;
+}
+
+
+/* Main view widgets */
+.widget_title,
+.widget_title > a,
+.widget_title > a:hover
+{
+	color: #000000;
+}
+
+
+.widget_title .glyph svg *
+{
+	fill: #000000;
+}
+
+
+/* Transaction type menu */
+.trtype-menu__item_selected
+{
+	color: #000000;
+}
+
+
+/* Tile info block */
+.tile-info-block > div > span
+{
+	color: #000000;
+}
+
+
+.stretch-input
+{
+	border-color: #000000;
+	background-color: #FFFFFF;
+}
+
+
+.input-group__btn_inactive
+{
+	color: #000000;
+	background-color: #FFFFFF;
+}
+
+
+/* DropDown  */
+.dd__combo,
+.dd__input,
+.dd__single-selection,
+.dd__toggle-btn
+{
+	background-color: #FFFFFF;
+	color: #000000;
+}
+
+
+.dd__combo
+{
+	border-color: #000000;
+}
+
+
+.dd__container_active .dd__combo,
+.dd__container_active .dd__input,
+.dd__container_active .dd__single-selection,
+.dd__container_active .dd__toggle-btn
+{
+	color: #202020;
+}
+
+
+.dd__list
+{
+	background-color: #FFFFFF;
+	border-right-color: #000000;
+	border-left-color: #000000;
+}
+
+
+.dd__list_drop-down
+{
+	border-bottom-color: #000000;
+}
+
+
+.dd__list_drop-up
+{
+	border-top-color: #000000;
+}
+
+
+.dd__list-item
+{
+	color: #000000;
+	background-color: #FFFFFF;
+}
+
+
+.dd__list-item > svg
+{
+	fill: #000000;
+}
+
+
+.dd__container_enabled .dd__toggle-btn:hover path
+{
+	fill: #000000;
+}
+
+
+
+@media (max-width: 767px)
+{
+
+.dd__container.dd__fullscreen.dd__open .dd__background
+{
+	background-color: #FFFFFF;
+}
+
+
+.dd__container.dd__fullscreen.dd__open .dd__list
+{
+	border-color: #000000;
+}
+
+}
+
+
+/* Transaction list */
+.trans-list > span
+{
+	color: #000000;
+}
+
+
+/* Transaction list mode selector */
+.mode-selector > b > span
+{
+	color: #000000;
+}
+
+
+.paginator > span
+{
+	color: #000000;
+}
+
+
+/* Transaction list item */
+.trans-list_details td > div,
+.trans-list_details tr.trans-list__item_selected > td > div
+{
+	background-color: #F0F0F0;
+}
+
+
+.trans-list_details .trans-list__item-comment
+{
+	color: #808080;
+}
+
+
+.trans-list__item,
+div.trans-list__item_selected
+{
+	background-color: #F0F0F0;
+}
+
+
+.tritem_balance,
+.trans-list__item-title,
+.trans-list__item-content
+{
+	color: #000000;
+}
+
+
+.trans-list__item-details
+{
+	color: #808080;
+}
+
+
+.trans-list__item-comment
+{
+	border-left-color: #808080;
+}
+
+
+/* Bar chart */
+.charts svg text tspan
+{
+	fill: #000000;
+}
+
+
+/* Profile view */
+.profile_block
+{
+	color: #000000;
+}
+
+
+/* Popup */
+.popup > .popup__content,
+.popup > .popup__content > .popup__content-box
+{
+	color: #000000;
+    background-color: #FFFFFF;
+}
+
+
+.popup .popup__title,
+.popup .popup__message
+{
+	color: #000000;
+}
+
+
+/* Tiles list */
+.tiles > span,
+.info-tiles > span
+{
+	color: #000000;
+}
+
+
+/* Import view */
+.import-row,
+.tr-row
+{
+	background-color: #DDDDDD;
+}
+
+
+.tr-row > select,
+.tr-row > input[type="text"]
+{
+	border-color: #000000;
+}
+
+
+.tr-row > select[disabled],
+.tr-row > input[disabled]
+{
+	color: #DDDDDD;
+	border-color: #DDDDDD;
+	background-color: #EEEEEE;
+}
+
+
+.tr-row_disabled > select,
+.tr-row_disabled > select[disabled],
+.tr-row_disabled > input[type="text"],
+.tr-row_disabled > input[disabled]
+{
+	color: #DDDDDD;
+	border-color: #DDDDDD;
+	background-color: #EEEEEE;
+}
+
+
+.import-controls
+{
+	color: #FFFFFF;
+}
+
+
+/* Statistics view */
+.stat-histogram > span
+{
+	color: #000000;
+}
