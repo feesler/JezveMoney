@@ -7,6 +7,7 @@ class PersonsController extends TemplateController
 	
 	public function index()
 	{
+		$personsData = $this->personMod->getData([ "type" => "all" ]);
 		$persArr = $this->personMod->getData();
 		$hiddenPersArr = $this->personMod->getData([ "type" => "hidden" ]);
 
@@ -14,7 +15,7 @@ class PersonsController extends TemplateController
 
 		array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "toolbar.js", "persons.js");
+		array_push($this->jsArr, "selection.js", "toolbar.js", "person.js", "persons.js");
 
 		include(TPL_PATH."persons.tpl");
 	}

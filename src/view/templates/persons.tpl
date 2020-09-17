@@ -14,7 +14,7 @@
 					<div id="tilesContainer" class="tiles"><?php
 		if (count($persArr)) {
 			foreach($persArr as $pData) {
-?><div id="p_<?=e($pData->id)?>" class="tile"><button class="tilelink" type="button"><span><span class="tile__subtitle"></span><span class="tile__title"><?=e($pData->name)?></span></span></button></div><?php
+?><div class="tile" data-id="<?=e($pData->id)?>"><button class="tilelink" type="button"><span><span class="tile__subtitle"></span><span class="tile__title"><?=e($pData->name)?></span></span></button></div><?php
 			}
 		} else {	?>
 						<span>You have no one person. Please create one.</span>
@@ -25,7 +25,7 @@
 					</div>
 					<div id="hiddenTilesContainer" class="tiles"><?php
 			foreach($hiddenPersArr as $pData) {
-?><div id="p_<?=e($pData->id)?>" class="tile"><button class="tilelink" type="button"><span><span class="tile__subtitle"></span><span class="tile__title"><?=e($pData->name)?></span></span></button></div><?php
+?><div class="tile" data-id="<?=e($pData->id)?>"><button class="tilelink" type="button"><span><span class="tile__subtitle"></span><span class="tile__title"><?=e($pData->name)?></span></span></button></div><?php
 			}
 ?></div>
 <?php	} else {	?>
@@ -64,6 +64,8 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
+	var persons = <?=JSON::encode($personsData)?>;
+
 	onReady(initPersonsList);
 </script>
 </body>

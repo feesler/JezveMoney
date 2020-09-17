@@ -1,6 +1,8 @@
 var accNameChanged = false;
-var accounts = new Selection();
-var hiddenAccounts = new Selection();
+var selected = {
+	visible : new Selection(),
+	hidden : new Selection()
+};
 var dwPopup = null;		// delete warning popup
 
 var singleAccDeleteTitle = 'Delete account';
@@ -62,9 +64,20 @@ function initControls()
 
 
 // Tile click event handler
-function onTileClick(acc_id, isHidden)
+function onTileClick(e)
 {
-	var tile = ge('acc_' + acc_id);
+	if (!e || !e.target)
+		return;
+
+	var tile = e.target.closest('.tile');
+	if (!tile || !tile.dataset)
+		return;
+
+	var account_id = parseInt(tile.dataset.id);
+	var account = getAccount(account_id);
+	if (!account)
+		return;
+	
 	var edit_btn = ge('edit_btn');
 	var del_btn = ge('del_btn');
 	var showaccounts = ge('showaccounts');
@@ -73,30 +86,23 @@ function onTileClick(acc_id, isHidden)
 	var export_btn = ge('export_btn');
 	var show_btn = ge('show_btn');
 	var hide_btn = ge('hide_btn');
-	if (!tile || !edit_btn || !showaccounts || !hideaccounts || !delaccounts || !export_btn || !show_btn || !hide_btn)
+	if (!edit_btn || !del_btn || !showaccounts || !hideaccounts || !delaccounts || !export_btn || !show_btn || !hide_btn)
 		return;
 
-	var currentSelection = isHidden ? hiddenAccounts : accounts;
-	var actDiv;
-	if (currentSelection.isSelected(acc_id))
+	var currentSelection = isHiddenAccount(account) ? selected.hidden : selected.visible;
+	if (currentSelection.isSelected(account_id))
 	{
-		currentSelection.deselect(acc_id);
-
-		actDiv = ge('act_' + acc_id);
-		if (actDiv)
-			tile.removeChild(actDiv);
+		currentSelection.deselect(account_id);
+		tile.classList.remove('tile_selected');
 	}
 	else
 	{
-		currentSelection.select(acc_id);
-
-		actDiv = ce('div', { id : 'act_' + acc_id, className : 'act', onclick : onTileClick.bind(null, acc_id, isHidden) });
-
-		tile.appendChild(actDiv);
+		currentSelection.select(account_id);
+		tile.classList.add('tile_selected');
 	}
 
-	var selCount = accounts.count();
-	var hiddenSelCount = hiddenAccounts.count();
+	var selCount = selected.visible.count();
+	var hiddenSelCount = selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
 	show(edit_btn, (totalSelCount == 1));
 	show(export_btn, (totalSelCount > 0));
@@ -104,8 +110,8 @@ function onTileClick(acc_id, isHidden)
 	show(hide_btn, (selCount > 0));
 	show(del_btn, (totalSelCount > 0));
 
-	var selArr = accounts.getIdArray();
-	var hiddenSelArr = hiddenAccounts.getIdArray();
+	var selArr = selected.visible.getIdArray();
+	var hiddenSelArr = selected.hidden.getIdArray();
 	var totalSelArr = selArr.concat(hiddenSelArr);
 	showaccounts.value = totalSelArr.join();
 	hideaccounts.value = totalSelArr.join();
@@ -141,8 +147,6 @@ function onTileClick(acc_id, isHidden)
 // Initialization of page controls
 function initAccListControls()
 {
-	var btnEl, pos, tile_id;
-
 	var tilesContainer = ge('tilesContainer');
 	var hiddenTilesContainer = ge('hiddenTilesContainer');
 	var show_btn = ge('show_btn');
@@ -151,41 +155,8 @@ function initAccListControls()
 	if (!tilesContainer || !hiddenTilesContainer || !show_btn || !hide_btn || !del_btn)
 		return;
 
-	var tileEl = tilesContainer.firstElementChild;
-	while(tileEl)
-	{
-		pos = tileEl.id.indexOf('_');
-		if (pos !== -1)
-		{
-			tile_id = parseInt(tileEl.id.substr(pos + 1));
-			if (!isNaN(tile_id))
-			{
-				btnEl = tileEl.firstElementChild;
-				if (btnEl)
-					btnEl.onclick = onTileClick.bind(null, tile_id, false);
-			}
-		}
-
-		tileEl = tileEl.nextElementSibling;
-	}
-
-	tileEl = hiddenTilesContainer.firstElementChild;
-	while(tileEl)
-	{
-		pos = tileEl.id.indexOf('_');
-		if (pos !== -1)
-		{
-			tile_id = parseInt(tileEl.id.substr(pos + 1));
-			if (!isNaN(tile_id))
-			{
-				btnEl = tileEl.firstElementChild;
-				if (btnEl)
-					btnEl.onclick = onTileClick.bind(null, tile_id, true);
-			}
-		}
-
-		tileEl = tileEl.nextElementSibling;
-	}
+	tilesContainer.addEventListener('click', onTileClick);
+	hiddenTilesContainer.addEventListener('click', onTileClick);
 
 	show_btn.addEventListener('click', function()
 	{
@@ -199,7 +170,7 @@ function initAccListControls()
 			hideform.submit();
 	});
 
-	btnEl = del_btn.firstElementChild;
+	var btnEl = del_btn.firstElementChild;
 	if (btnEl)
 		btnEl.onclick = showDeletePopup;
 }
@@ -297,7 +268,7 @@ function onAccountSubmit(frm)
 // Delete account iconlink click event handler
 function onDelete()
 {
-	accounts.select(account_id);
+	selected.visible.select(account_id);
 
 	showDeletePopup();
 }
@@ -323,7 +294,7 @@ function onDeletePopup(res)
 // Create and show account delete warning popup
 function showDeletePopup()
 {
-	var totalSelCount = accounts.count() + hiddenAccounts.count();
+	var totalSelCount = selected.visible.count() + selected.hidden.count();
 	if (totalSelCount == 0)
 		return;
 

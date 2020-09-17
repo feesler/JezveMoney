@@ -7,7 +7,7 @@ export class TransactionListItem extends Component
 {
 	async parse()
 	{
-		this.id = this.parseId(await this.prop(this.elem, 'id'));
+		this.id = parseInt(await this.prop(this.elem, 'dataset.id'));
 
 		let titleElem = await this.query(this.elem, '.trans-list__item-title > span');
 		if (!titleElem)

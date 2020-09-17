@@ -1,12 +1,25 @@
-var persons = null;
-var hiddenPersons = null;
+var selected = {
+	visible : new Selection(),
+	hidden : new Selection()
+};
 var dwPopup = null;		// delete warning popup
 
 
 // Tile click event handler
-function onTileClick(p_id, isHidden)
+function onTileClick(e)
 {
-	var tile = ge('p_' + p_id);
+	if (!e || !e.target)
+		return;
+
+	var tile = e.target.closest('.tile');
+	if (!tile || !tile.dataset)
+		return;
+
+	var person_id = parseInt(tile.dataset.id);
+	var person = getPerson(person_id);
+	if (!person)
+		return;
+
 	var edit_btn = ge('edit_btn');
 	var show_btn = ge('show_btn');
 	var hide_btn = ge('hide_btn');
@@ -14,38 +27,33 @@ function onTileClick(p_id, isHidden)
 	var showpersons = ge('showpersons');
 	var hidepersons = ge('hidepersons');
 	var delpersons = ge('delpersons');
-	if (!tile || !edit_btn || !show_btn || !hide_btn || !showpersons || !hidepersons || !delpersons)
+	if (!edit_btn || !show_btn || !hide_btn || !del_btn || !showpersons || !hidepersons || !delpersons)
 		return;
 
-	var currentSelection = isHidden ? hiddenPersons : persons;
-	var actDiv;
-	if (currentSelection.isSelected(p_id))
+	var currentSelection = isHiddenPerson(person) ? selected.hidden : selected.visible;
+	if (currentSelection.isSelected(person_id))
 	{
-		currentSelection.deselect(p_id);
+		currentSelection.deselect(person_id);
 
-		actDiv = ge('act_' + p_id);
-		if (actDiv)
-			tile.removeChild(actDiv);
+		tile.classList.remove('tile_selected');
 	}
 	else
 	{
-		currentSelection.select(p_id);
+		currentSelection.select(person_id);
 
-		actDiv = ce('div', { id : 'act_' + p_id, className : 'act', onclick : onTileClick.bind(null, p_id, isHidden) });
-
-		tile.appendChild(actDiv);
+		tile.classList.add('tile_selected');
 	}
 
-	var selCount = persons.count();
-	var hiddenSelCount = hiddenPersons.count();
+	var selCount = selected.visible.count();
+	var hiddenSelCount = selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
 	show(edit_btn, (totalSelCount == 1));
 	show(show_btn, (hiddenSelCount > 0));
 	show(hide_btn, (selCount > 0));
 	show(del_btn, (totalSelCount > 0));
 
-	var selArr = persons.getIdArray();
-	var hiddenSelArr = hiddenPersons.getIdArray();
+	var selArr = selected.visible.getIdArray();
+	var hiddenSelArr = selected.hidden.getIdArray();
 	var totalSelArr = selArr.concat(hiddenSelArr);
 	showpersons.value = totalSelArr.join();
 	hidepersons.value = totalSelArr.join();
@@ -93,7 +101,7 @@ var singlePersonDeleteMsg = 'Are you sure want to delete selected person?<br>Deb
 // Delete person iconlink click event handler
 function onDelete()
 {
-	persons.select(person_id);
+	selected.visible.select(person_id);
 
 	showDeletePopup();
 }
@@ -119,7 +127,7 @@ function onDeletePopup(res)
 // Create and show person delete warning popup
 function showDeletePopup()
 {
-	var totalSelCount = persons.count() + hiddenPersons.count();
+	var totalSelCount = selected.visible.count() + selected.hidden.count();
 	if (totalSelCount == 0)
 		return;
 
@@ -162,61 +170,21 @@ function initControls()
 	var del_btn = ge('del_btn');
 	if (del_btn)
 		del_btn.onclick = onDelete;
-
-	persons = new Selection();
-	hiddenPersons = new Selection();
 }
 
 
 function initPersonsList()
 {
-	var tilesContainer, tileEl, btnEl, del_btn;
-	var pos, tile_id;
-
-	tilesContainer = ge('tilesContainer');
-	del_btn = ge('del_btn');
-	if (!tilesContainer || !del_btn)
+	var tilesContainer = ge('tilesContainer');
+	var hiddenTilesContainer = ge('hiddenTilesContainer');
+	var del_btn = ge('del_btn');
+	if (!tilesContainer || !hiddenTilesContainer || !del_btn)
 		return;
 
 	initToolbar();
-	persons = new Selection();
-	hiddenPersons = new Selection();
 
-	tileEl = tilesContainer.firstElementChild;
-	while(tileEl)
-	{
-		pos = tileEl.id.indexOf('_');
-		if (pos !== -1)
-		{
-			tile_id = parseInt(tileEl.id.substr(pos + 1));
-			if (!isNaN(tile_id))
-			{
-				btnEl = tileEl.firstElementChild;
-				if (btnEl)
-					btnEl.onclick = onTileClick.bind(null, tile_id, false);
-			}
-		}
-
-		tileEl = tileEl.nextElementSibling;
-	}
-
-	tileEl = hiddenTilesContainer.firstElementChild;
-	while(tileEl)
-	{
-		pos = tileEl.id.indexOf('_');
-		if (pos !== -1)
-		{
-			tile_id = parseInt(tileEl.id.substr(pos + 1));
-			if (!isNaN(tile_id))
-			{
-				btnEl = tileEl.firstElementChild;
-				if (btnEl)
-					btnEl.onclick = onTileClick.bind(null, tile_id, true);
-			}
-		}
-
-		tileEl = tileEl.nextElementSibling;
-	}
+	tilesContainer.addEventListener('click', onTileClick);
+	hiddenTilesContainer.addEventListener('click', onTileClick);
 
 	show_btn.addEventListener('click', function()
 	{
@@ -230,7 +198,7 @@ function initPersonsList()
 			hideform.submit();
 	});
 
-	btnEl = del_btn.firstElementChild;
+	var btnEl = del_btn.firstElementChild;
 	if (btnEl)
 		btnEl.onclick = showDeletePopup;
 }

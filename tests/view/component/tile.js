@@ -14,11 +14,11 @@ export class Tile extends Component
 		this.balanceEL = await this.query(this.elem, '.tile__subtitle');
 		this.nameEL = await this.query(this.elem, '.tile__title');
 
-		this.id = this.parseId(await this.prop(this.elem, 'id'));
+		this.id = parseInt(await this.prop(this.elem, 'dataset.id'));
 		this.balance = await this.prop(this.balanceEL, 'innerText');
 		this.name = await this.prop(this.nameEL, 'innerText');
 
-		this.isActive = !!(await this.query(this.elem, '.act'));
+		this.isActive = await this.hasClass(this.elem, 'tile_selected');
 
 		this.iconElem = await this.query(this.elem, '.tile__icon > svg');
 		if (this.iconElem)

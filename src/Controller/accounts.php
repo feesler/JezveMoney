@@ -20,7 +20,7 @@ class AccountsController extends TemplateController
 
 	public function index()
 	{
-		$transMod = TransactionModel::getInstance();
+		$accountsData = $this->model->getData([ "type" => "all" ]);
 
 		$tilesArr = $this->model->getTilesArray();
 		$hiddenTilesArr = $this->model->getTilesArray([ "type" => "hidden" ]);
@@ -29,7 +29,7 @@ class AccountsController extends TemplateController
 
 		array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
 		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "toolbar.js", "accounts.js");
+		array_push($this->jsArr, "selection.js", "currency.js", "toolbar.js", "account.js", "accounts.js");
 
 		include(TPL_PATH."accounts.tpl");
 	}

@@ -38,7 +38,7 @@
 <?php	}	?>
 <?php	foreach($trListData as $trItem) {	?>
 <?php	if ($showDetails) {		?>
-								<tbody class="trans-list__item-wrapper"><tr id="tr_<?=e($trItem["id"])?>">
+								<tbody class="trans-list__item-wrapper"><tr data-id="<?=e($trItem["id"])?>">
 									<td><div class="ellipsis-cell"><div class="trans-list__item-title" title="<?=e($trItem["acc"])?>"><span><?=e($trItem["acc"])?></span></div></div></td>
 									<td><div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div></td>
 									<td><div class="tritem_balance">
@@ -59,7 +59,7 @@
 								</tr></tbody>
 <?php	} else {		?>
 								<div class="trans-list__item-wrapper">
-									<div id="tr_<?=e($trItem["id"])?>" class="trans-list__item">
+									<div class="trans-list__item" data-id="<?=e($trItem["id"])?>">
 										<div class="trans-list__item-title"><span><?=e($trItem["acc"])?></span></div>
 										<div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div>
 										<div class="trans-list__item-details">

@@ -32,13 +32,15 @@
 }
 
 
-.tile .act
+.tile_selected .tilelink::after
 {
+	content: '';
+	display: block;
 	position: absolute;
-	left: 0px;
-	top: 0px;
-	width: 94px;
-	height: 94px;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
 	border: 3px solid #0072C6;
 	cursor: pointer;
 }

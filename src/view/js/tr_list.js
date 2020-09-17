@@ -40,7 +40,7 @@ var transactions = (function()
 			trans.dest_result = 0;
 		}
 
-		trRow = ge('tr_' + trans.id);
+		trRow = findListItemById(trans.id);
 		if (!trRow)	// tr
 			return;
 		trBalanceItem = trRow.firstElementChild;		// td
@@ -203,36 +203,49 @@ var trSelection = new Selection();
 var trListSortable = null;
 
 
-// Transaction block click event handler
-function onTransClick(tr_id)
+function findListItemById(id)
 {
-	var transObj, edit_btn, del_btn, deltrans;
-	var selArr;
+	var trlist = ge('tritems');
+	if (!trlist)
+		return null;
 
-	transObj = ge('tr_' + tr_id);
-	edit_btn = ge('edit_btn');
-	del_btn = ge('del_btn');
-	deltrans = ge('deltrans');
-	if (!transObj || !edit_btn || !deltrans)
+	return trlist.querySelector('[data-id="' + id + '"]');
+}
+
+
+// Transaction block click event handler
+function onTransClick(e)
+{
+	var listItemElem = findListItemElement(e.target);
+	if (!listItemElem || !listItemElem.dataset)
 		return;
 
-	if (trSelection.isSelected(tr_id))
-	{
-		trSelection.deselect(tr_id);
+	var transaction_id = parseInt(listItemElem.dataset.id);
+	var transaction = transactions.findById(transaction_id);
+	if (!transaction)
+		return;
 
-		transObj.className = (filterObj.mode == 'details') ? '' : 'trans-list__item';
+	var edit_btn = ge('edit_btn');
+	var del_btn = ge('del_btn');
+	var deltrans = ge('deltrans');
+	if (!edit_btn || !del_btn || !deltrans)
+		return;
+
+	if (trSelection.isSelected(transaction_id))
+	{
+		trSelection.deselect(transaction_id);
+		listItemElem.classList.remove('trans-list__item_selected');
 	}
 	else
 	{
-		trSelection.select(tr_id);
-
-		transObj.className = 'trans-list__item_selected';
+		trSelection.select(transaction_id);
+		listItemElem.classList.add('trans-list__item_selected');
 	}
 
 	show(edit_btn, (trSelection.count() == 1));
 	show(del_btn, (trSelection.count() > 0));
 
-	selArr = trSelection.getIdArray();
+	var selArr = trSelection.getIdArray();
 	deltrans.value = selArr.join();
 
 	if (trSelection.count() == 1)
@@ -296,11 +309,9 @@ function initControls()
 // Initialization of drag and drop features
 function initTransListDrag()
 {
-	var trlist, listItem_wr, listItem, trans_id;
-
 	initControls();
 
-	trlist = ge('tritems');
+	var trlist = ge('tritems');
 	if (!trlist)
 		return;
 
@@ -317,24 +328,7 @@ function initTransListDrag()
 // 0 if drag first transaction, -1 if no draggin currently
 	trListSortable.dragFrom = -1;
 
-	listItem_wr = trlist.firstElementChild;
-	listItem = null;
-	while(listItem_wr)
-	{
-		if ((filterObj.mode == 'details' && listItem_wr.tagName == 'TBODY') ||
-			(filterObj.mode != 'details' && listItem_wr.classList.contains('trans-list__item-wrapper')))
-		{
-			listItem = listItem_wr.firstElementChild;
-			trans_id = transIdFromElem(listItem);
-			if (trans_id)
-			{
-				listItem.onclick = onTransClick.bind(null, trans_id);
-				listItem.style.cursor = 'pointer';
-			}
-		}
-
-		listItem_wr = listItem_wr.nextElementSibling;
-	}
+	trlist.addEventListener('click', onTransClick);
 }
 
 
@@ -378,27 +372,25 @@ function updateTransArrPos(trans_id, newPos)
 // Cancel local changes on transaction position update fail
 function cancelPosChange(trans_id)
 {
-	var origTr, origWrap, trBefore, trBeforeWrap;
-
 	if (!trListSortable || trListSortable.dragFrom == -1)
 		return;
 
-	origTr = ge('tr_' + trans_id);
+	var origTr = findListItemById(trans_id);
 	if (!origTr || !origTr.parentNode)
 		return;
 
-	origWrap = origTr.parentNode;
+	var origWrap = origTr.parentNode;
 	if (trListSortable.dragFrom == 0)
 	{
 		prependChild(origWrap.parentNode, origWrap);
 	}
 	else
 	{
-		trBefore = ge('tr_' + trListSortable.dragFrom);
+		var trBefore = findListItemById(trListSortable.dragFrom);
 		if (!trBefore || !trBefore.parentNode)
 			return;
 
-		trBeforeWrap = trBefore.parentNode;
+		var trBeforeWrap = trBefore.parentNode;
 
 		insertAfter(origWrap, trBeforeWrap);
 	}
@@ -407,10 +399,23 @@ function cancelPosChange(trans_id)
 }
 
 
+function findListItemElement(elem)
+{
+	if (!elem)
+		return null;
+
+	return elem.closest((filterObj.mode == 'details') ? 'tr' : '.trans-list__item');
+}
+
+
 // Return transaction id from transaction item element
 function transIdFromElem(elem)
 {
-	return (elem && elem.id.length > 3) ? parseInt(elem.id.substr(3)) : 0;
+	var listItemElem = findListItemElement(elem);
+	if (!listItemElem || !listItemElem.dataset)
+		return 0;
+
+	return parseInt(listItemElem.dataset.id);
 }
 
 
