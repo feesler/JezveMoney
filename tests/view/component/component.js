@@ -28,16 +28,6 @@ export class Component
 		await instance.parse();
 		return instance;
 	}
-
-
-	parseId(id)
-	{
-		if (typeof id !== 'string')
-			return id;
-
-		let pos = id.indexOf('_');
-		return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
-	}
 }
 
 

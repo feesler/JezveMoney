@@ -108,7 +108,7 @@ export class AccountsView extends TestView
 
 		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-		if (!await this.isVisible(this.content.delete_warning.elem))
+		if (!this.content.delete_warning || !await this.isVisible(this.content.delete_warning.elem))
 			throw new Error('Delete account warning popup not appear');
 
 		if (!this.content.delete_warning.okBtn)

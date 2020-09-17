@@ -454,7 +454,7 @@ export class TransactionsView extends TestView
 		for(let tr_num of tr)
 		{
 			if (tr_num < 0 || tr_num >= this.content.transList.items.length)
-				throw 'Wrong transaction number';
+				throw new Error('Wrong transaction number');
 
 			await this.performAction(() => this.content.transList.items[tr_num].click());
 
@@ -499,10 +499,10 @@ export class TransactionsView extends TestView
 
 		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-		if (!await this.isVisible(this.content.delete_warning.elem))
-			throw 'Delete transaction warning popup not appear';
+		if (!this.content.delete_warning || !await this.isVisible(this.content.delete_warning.elem))
+			throw new Error('Delete transaction warning popup not appear');
 		if (!this.content.delete_warning.okBtn)
-			throw 'OK button not found';
+			throw new Error('OK button not found');
 
 		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}

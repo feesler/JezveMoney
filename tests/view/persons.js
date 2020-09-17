@@ -95,7 +95,7 @@ export class PersonsView extends TestView
 
 		await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-		if (!await this.isVisible(this.content.delete_warning.elem))
+		if (!this.content.delete_warning || !await this.isVisible(this.content.delete_warning.elem))
 			throw new Error('Delete person(s) warning popup not appear');
 
 		return this.navigation(() => this.click(this.content.delete_warning.okBtn));

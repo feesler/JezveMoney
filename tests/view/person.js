@@ -103,10 +103,10 @@ export class PersonView extends TestView
 	{
 		await this.clickDeleteButton();
 
-		if (!await this.isVisible(this.content.delete_warning.elem))
-			throw 'Delete transaction warning popup not appear';
+		if (!this.content.delete_warning || !await this.isVisible(this.content.delete_warning.elem))
+			throw new Error('Delete transaction warning popup not appear');
 		if (!this.content.delete_warning.okBtn)
-			throw 'OK button not found';
+			throw new Error('OK button not found');
 
 		await this.navigation(() => this.click(this.content.delete_warning.okBtn));
 	}
