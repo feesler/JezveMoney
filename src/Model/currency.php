@@ -5,32 +5,12 @@ class CurrencyModel extends CachedTable
 	use Singleton;
 	use CachedInstance;
 
+	protected $tbl_name = "currency";
+
 
 	protected function onStart()
 	{
-		$this->tbl_name = "currency";
 		$this->dbObj = MySqlDB::getInstance();
-		if (!$this->dbObj->isTableExist($this->tbl_name))
-			$this->createTable();
-	}
-
-
-	// Create DB table if not exist
-	private function createTable()
-	{
-		wlog("CurrencyModel::createTable()");
-
-		$res = $this->dbObj->createTableQ($this->tbl_name,
-						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
-						"`name` VARCHAR(128) NOT NULL, ".
-						"`sign` VARCHAR(64) NOT NULL, ".
-						"`flags` INT(11) NOT NULL DEFAULT '0', ".
-						"`createdate` DATETIME NOT NULL, ".
-						"`updatedate` DATETIME NOT NULL, ".
-						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
-
-		return $res;
 	}
 
 

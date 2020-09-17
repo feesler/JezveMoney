@@ -11,6 +11,7 @@ class AccountModel extends CachedTable
 	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
 	static private $iconNames = [NULL, "purse", "safe", "card", "percent", "bank", "cash"];
 
+	protected $tbl_name = "accounts";
 	protected $currMod = NULL;
 	protected $personMod = NULL;
 	protected $currencyUpdated = FALSE;
@@ -20,8 +21,6 @@ class AccountModel extends CachedTable
 
 	protected function onStart()
 	{
-		$this->tbl_name = "accounts";
-
 		$uMod = UserModel::getInstance();
 		self::$user_id = $uMod->getUser();
 		if (!self::$user_id)
@@ -30,34 +29,9 @@ class AccountModel extends CachedTable
 		self::$owner_id = $uMod->getOwner();
 
 		$this->dbObj = MySqlDB::getInstance();
-		if (!$this->dbObj->isTableExist($this->tbl_name))
-			$this->createTable();
 
 		$this->currMod = CurrencyModel::getInstance();
 		$this->personMod = PersonModel::getInstance();
-	}
-
-
-	// Create DB table if not exist
-	private function createTable()
-	{
-		$res = $this->dbObj->createTableQ($this->tbl_name,
-						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
-						"`owner_id` INT(11) NOT NULL, ".
-						"`user_id` INT(11) NOT NULL, ".
-						"`curr_id` INT(11) NOT NULL, ".
-						"`balance` DECIMAL(15,2) NOT NULL, ".
-						"`initbalance` DECIMAL(15,2) NOT NULL, ".
-						"`name` VARCHAR(255) NOT NULL, ".
-						"`icon` INT(11) NOT NULL DEFAULT '0', ".
-						"`flags` INT(11) NOT NULL DEFAULT '0', ".
-						"`createdate` DATETIME NOT NULL, ".
-						"`updatedate` DATETIME NOT NULL, ".
-						"PRIMARY KEY (`id`), ".
-						"KEY `user_id` (`user_id`)",
-						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
-
-		return $res;
 	}
 
 

@@ -7,6 +7,7 @@
 	$router = new Router();
 	$router->setRoutes([
 		"main" => "MainAdminController",
+		"dbinstall" => "DBInstallAdminController",
 		"balance" => "BalanceAdminController",
 		"currency" => "CurrencyAdminController",
 		"query" => "QueryAdminController",

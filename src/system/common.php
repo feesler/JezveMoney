@@ -29,6 +29,7 @@
 			"Controller" => "system/controller.php",
 			"Model" => "system/model.php",
 			"Singleton" => "system/singleton.php",
+			"DBVersion" => "system/dbver.php",
 			"TemplateController" => "system/templatecontroller.php",
 			"ApiController" => "system/apicontroller.php",
 			"AdminController" => "system/admincontroller.php",
@@ -51,6 +52,7 @@
 			"ProfileApiController" => "api/Controller/profile.php",
 			"StateApiController" => "api/Controller/state.php",
 		// Admin controllers
+			"DBInstallAdminController" => "admin/Controller/dbinstall.php",
 			"CurrencyAdminController" => "admin/Controller/currency.php",
 			"BalanceAdminController" => "admin/Controller/balance.php",
 			"UserAdminController" => "admin/Controller/user.php",

@@ -9,8 +9,6 @@ class QueryAdminController extends AdminController
 	public function onStart()
 	{
 		$this->db = MySqlDB::getInstance();
-		if (!$this->db->isTableExist($this->tableName))
-			$this->createTable();
 	}
 
 
@@ -52,20 +50,6 @@ class QueryAdminController extends AdminController
 		$this->buildCSS();
 
 		include(ADMIN_TPL_PATH."query.tpl");
-	}
-
-
-	protected function createTable()
-	{
-		$res = $this->db->createTableQ($this->tableName,
-						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
-						"`title` VARCHAR(255) NOT NULL, ".
-						"`query` TEXT NOT NULL, ".
-						"`flags` INT(11) NOT NULL DEFAULT '0', ".
-						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci");
-
-		return $res;
 	}
 
 

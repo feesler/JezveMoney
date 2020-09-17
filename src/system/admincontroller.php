@@ -7,6 +7,7 @@ abstract class AdminController extends TemplateController
 	protected $jsAdminModule = [];
 
 	protected $menuItems = [
+		"dbinstall" => [ "title" => "DB update", "link" => "dbinstall/" ],
 		"curr" => [ "title" => "Currencies", "link" => "currency/" ],
 		"query" => [ "title" => "Queries", "link" => "query/" ],
 		"log" => [ "title" => "Logs", "link" => "log/" ],

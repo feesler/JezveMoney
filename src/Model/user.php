@@ -13,28 +13,6 @@ class UserModel extends CachedTable
 	{
 		$this->tbl_name = "users";
 		$this->dbObj = MySqlDB::getInstance();
-		if (!$this->dbObj->isTableExist($this->tbl_name))
-			$this->createTable();
-	}
-
-
-	// Create DB table if not exist
-	private function createTable()
-	{
-		wlog("UserModel::createTable()");
-
-		$res = $this->dbObj->createTableQ($this->tbl_name,
-						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
-						"`login` VARCHAR(255) NOT NULL, ".
-						"`passhash` VARCHAR(64) NOT NULL, ".
-						"`owner_id` INT(11) NOT NULL, ".
-						"`access` INT(11) NOT NULL DEFAULT '0', ".
-						"`createdate` DATETIME NOT NULL, ".
-						"`updatedate` DATETIME NOT NULL, ".
-						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
-
-		return $res;
 	}
 
 

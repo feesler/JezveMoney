@@ -8,6 +8,7 @@ class PersonModel extends CachedTable
 	static private $user_id = 0;
 	static private $owner_id = 0;		// person of user
 	protected $adminForce = FALSE;
+	protected $tbl_name = "persons";
 
 
 	protected function onStart()
@@ -17,31 +18,7 @@ class PersonModel extends CachedTable
 		self::$user_id = $uMod->getUser();
 		self::$owner_id = $uMod->getOwner();
 
-		$this->tbl_name = "persons";
-		$this->adminForce = FALSE;
-
 		$this->dbObj = MySqlDB::getInstance();
-		if (!$this->dbObj->isTableExist($this->tbl_name))
-			$this->createTable();
-	}
-
-
-	// Create DB table if not exist
-	private function createTable()
-	{
-		wlog("PersonModel::createTable()");
-
-		$res = $this->dbObj->createTableQ($this->tbl_name,
-						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
-						"`name` VARCHAR(255) NOT NULL, ".
-						"`user_id` INT(11) NOT NULL, ".
-						"`flags` INT(11) NOT NULL, ".
-						"`createdate` DATETIME NOT NULL, ".
-						"`updatedate` DATETIME NOT NULL, ".
-						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
-
-		return $res;
 	}
 
 

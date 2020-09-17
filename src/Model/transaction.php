@@ -15,6 +15,7 @@ class TransactionModel extends CachedTable
 	static private $destAvailTypes = [ INCOME, TRANSFER, DEBT ];
 	static private $destMandatoryTypes = [ INCOME, TRANSFER ];
 
+	protected $tbl_name = "transactions";
 	protected $accModel = NULL;
 	protected $currMod = NULL;
 	protected $affectedTransactions = NULL;
@@ -26,10 +27,7 @@ class TransactionModel extends CachedTable
 
 	protected function onStart()
 	{
-		$this->tbl_name = "transactions";
 		$this->dbObj = MySqlDB::getInstance();
-		if (!$this->dbObj->isTableExist($this->tbl_name))
-			$this->createTable();
 
 		$uMod = UserModel::getInstance();
 		self::$user_id = $uMod->getUser();
@@ -40,33 +38,6 @@ class TransactionModel extends CachedTable
 
 		$this->accModel = AccountModel::getInstance();
 		$this->currMod = CurrencyModel::getInstance();
-	}
-
-
-	// Create DB table if not exist
-	private function createTable()
-	{
-		$res = $this->dbObj->createTableQ($this->tbl_name,
-						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
-						"`user_id` INT(11) NOT NULL, ".
-						"`src_id` INT(11) NOT NULL, ".
-						"`dest_id` INT(11) NOT NULL, ".
-						"`type` INT(11) NOT NULL, ".
-						"`src_amount` DECIMAL(15,2) NOT NULL, ".
-						"`dest_amount` DECIMAL(15,2) NOT NULL, ".
-						"`src_curr` INT(11) NOT NULL, ".
-						"`dest_curr` INT(11) NOT NULL, ".
-						"`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, ".
-						"`comment` text NOT NULL, ".
-						"`pos` INT(11) NOT NULL, ".
-						"`createdate` DATETIME NOT NULL, ".
-						"`updatedate` DATETIME NOT NULL, ".
-						"`src_result` DECIMAL(15,2) NOT NULL, ".
-						"`dest_result` DECIMAL(15,2) NOT NULL, ".
-						"PRIMARY KEY (`id`)",
-						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
-
-		return $res;
 	}
 
 
@@ -320,8 +291,6 @@ class TransactionModel extends CachedTable
 		$res = $this->checkParams($params);
 		if (is_null($res))
 			return NULL;
-
-		$uMod = UserModel::getInstance();
 
 		if (is_null($this->balanceChanges))
 			$this->balanceChanges = [];
