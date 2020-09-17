@@ -170,6 +170,14 @@ define("ERR_DEBT_CREATE", 701);
 define("MSG_DEBT_UPDATE", 702);
 define("ERR_DEBT_UPDATE", 703);
 
+define("MSG_ICON_CREATE", 800);
+define("ERR_ICON_CREATE", 801);
+define("MSG_ICON_UPDATE", 902);
+define("ERR_ICON_UPDATE", 903);
+define("MSG_ICON_DELETE", 904);
+define("ERR_ICON_DELETE", 905);
+
+
 Message::add(MSG_REGISTER, MSG_TYPE_SUCCESS, "You successfully registered.");
 Message::add(ERR_REGISTER_FAIL, MSG_TYPE_ERROR, "Fail to register.");
 Message::add(MSG_LOGIN);
@@ -234,3 +242,10 @@ Message::add(MSG_DEBT_CREATE);
 Message::add(ERR_DEBT_CREATE, MSG_TYPE_ERROR, "Fail to create new debt.");
 Message::add(MSG_DEBT_UPDATE);
 Message::add(ERR_DEBT_UPDATE, MSG_TYPE_ERROR, "Fail to update debt.");
+
+Message::add(MSG_ICON_CREATE, MSG_TYPE_SUCCESS, "Icon successfully created.");
+Message::add(ERR_ICON_CREATE, MSG_TYPE_ERROR, "Fail to create new icon.");
+Message::add(MSG_ICON_UPDATE, MSG_TYPE_SUCCESS, "Icon successfully updated.");
+Message::add(ERR_ICON_UPDATE, MSG_TYPE_ERROR, "Fail to update icon.");
+Message::add(MSG_ICON_DELETE, MSG_TYPE_SUCCESS, "Icon successfully deleted.");
+Message::add(ERR_ICON_DELETE, MSG_TYPE_ERROR, "Fail to delete icon.");

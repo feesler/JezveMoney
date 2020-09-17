@@ -15,7 +15,7 @@ function onIconSel(obj)
 	if (!obj)
 		return;
 
-	iconType = obj.id;
+	icon_id = obj.id;
 	updateAccountTile();
 }
 
@@ -235,7 +235,7 @@ function updateAccountTile()
 	else
 		name = acc_name;
 
-	setTileInfo('acc_tile', name, formatBalance, iconType);
+	setTileInfo('acc_tile', name, formatBalance, icon_id);
 }
 
 

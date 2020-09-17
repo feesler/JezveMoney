@@ -139,8 +139,8 @@ export class Scenario
 			this.API_USER_ACC_RUB,
 			this.API_USER_ACC_USD,
 		] = await this.runner.runGroup(AccountApiTests.create, [
-			{ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon : 5, flags : 0 },
-			{ name : 'USD', curr_id : USD, initbalance : 50, icon : 2, flags : 0 },
+			{ name : 'RUB', curr_id : RUB, initbalance : 100.1, icon_id : 5, flags : 0 },
+			{ name : 'USD', curr_id : USD, initbalance : 50, icon_id : 2, flags : 0 },
 		]);
 
 		[ this.API_USER_PERSON ] = await this.runner.runGroup(PersonApiTests.create, [
@@ -168,7 +168,7 @@ export class Scenario
 		this.environment.setBlock('Accounts security', 2);
 
 		const tasks = [
-			{ action : AccountApiTests.update, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon : 2, flags : 0 } },
+			{ action : AccountApiTests.update, data : { id : API_USER_ACC_RUB, name : 'EUR', curr_id : EUR, initbalance : 10, icon_id : 2, flags : 0 } },
 			{ action : AccountApiTests.del, data : API_USER_ACC_RUB },
 		];
 
@@ -265,20 +265,20 @@ export class Scenario
 	async apiCreateAccounts()
 	{
 		const data = [
-			{ name : 'acc ru', curr_id : RUB, initbalance : 100, icon : 1, flags : 0 },
-			{ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon : 3, flags : 0 },
-			{ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0 },
+			{ name : 'acc ru', curr_id : RUB, initbalance : 100, icon_id : 1, flags : 0 },
+			{ name : 'cash ru', curr_id : RUB, initbalance : 5000, icon_id : 3, flags : 0 },
+			{ name : 'acc usd', curr_id : USD, initbalance : 10.5, icon_id : 5, flags : 0 },
 			// Try to create account with existing name
-			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon : 0, flags : 0 },
+			{ name : 'acc ru', curr_id : USD, initbalance : 10.5, icon_id : 0, flags : 0 },
 			// Try to create account without some of fields
-			{ curr_id : USD, initbalance : 10.5, icon : 0, flags : 0 },
+			{ curr_id : USD, initbalance : 10.5, icon_id : 0, flags : 0 },
 			{ name : 'acc tst', initbalance : 10.5 },
 			// Try to create account with excess properties
-			{ name : 'acc tst', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0, xxx : 1, yyy : 2 },
+			{ name : 'acc tst', curr_id : USD, initbalance : 10.5, icon_id : 5, flags : 0, xxx : 1, yyy : 2 },
 			// Try to create account with invalid data
-			{ name : '', curr_id : USD, initbalance : 10.5, icon : 5, flags : 0 },
-			{ name : 'acc tst', curr_id : 9999, initbalance : 10.5, icon : 5, flags : 0 },
-			{ name : 'acc tst', curr_id : USD, initbalance : 'fff', icon : 5, flags : 0 },
+			{ name : '', curr_id : USD, initbalance : 10.5, icon_id : 5, flags : 0 },
+			{ name : 'acc tst', curr_id : 9999, initbalance : 10.5, icon_id : 5, flags : 0 },
+			{ name : 'acc tst', curr_id : USD, initbalance : 'fff', icon_id : 5, flags : 0 },
 		];
 
 		[ this.ACC_RUB, this.CASH_RUB, this.ACC_USD ] = await this.runner.runGroup(AccountApiTests.create, data);
@@ -290,7 +290,7 @@ export class Scenario
 		const { ACC_RUB, CASH_RUB } = this;
 
 		const data = [
-			{ id : ACC_RUB, name : 'acc rub', curr_id : USD, initbalance : 101, icon : 2 },
+			{ id : ACC_RUB, name : 'acc rub', curr_id : USD, initbalance : 101, icon_id : 2 },
 			// Try to update name of account to an existing one
 			{ id : CASH_RUB, name : 'acc rub' },
 		];
@@ -609,7 +609,7 @@ export class Scenario
 		this.environment.setBlock('Update accounts', 2);
 
 		const data = [
-			{ pos : 0, icon : 1, curr_id : USD },
+			{ pos : 0, icon_id : 1, curr_id : USD },
 			{ pos : 0, curr_id : RUB },
 		];
 
@@ -754,11 +754,11 @@ export class Scenario
 	async prepareTransactionTests()
 	{
 		const accList = [
-			{ name : 'acc_3', curr_id : RUB, initbalance : '500.99', icon : 2, flags : 0 },
-			{ name : 'acc RUB', curr_id : RUB, initbalance : '500.99', icon : 5, flags : 0 },
-			{ name : 'acc USD', curr_id : USD, initbalance : '500.99', icon : 4, flags : 0 },
-			{ name : 'acc EUR', curr_id : EUR, initbalance : '10000.99', icon : 3, flags : 0 },
-			{ name : 'card RUB', curr_id : RUB, initbalance : '35000.40', icon : 3, flags : 0 },
+			{ name : 'acc_3', curr_id : RUB, initbalance : '500.99', icon_id : 2, flags : 0 },
+			{ name : 'acc RUB', curr_id : RUB, initbalance : '500.99', icon_id : 5, flags : 0 },
+			{ name : 'acc USD', curr_id : USD, initbalance : '500.99', icon_id : 4, flags : 0 },
+			{ name : 'acc EUR', curr_id : EUR, initbalance : '10000.99', icon_id : 3, flags : 0 },
+			{ name : 'card RUB', curr_id : RUB, initbalance : '35000.40', icon_id : 3, flags : 0 },
 		];
 
 		for(const account of accList)
@@ -836,10 +836,10 @@ export class Scenario
 	async setupAccounts()
 	{
 		let data = [
-			{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon : 1, flags : 0 },
-			{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon : 2, flags : 0 },
-			{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon : 4, flags : 0 },
-			{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon : 5, flags : 0 },
+			{ name : 'acc_4', curr_id : RUB, initbalance : '60500.12', icon_id : 1, flags : 0 },
+			{ name : 'acc_5', curr_id : RUB, initbalance : '78000', icon_id : 2, flags : 0 },
+			{ name : 'cash USD', curr_id : USD, initbalance : '10000', icon_id : 4, flags : 0 },
+			{ name : 'cash EUR', curr_id : EUR, initbalance : '1000', icon_id : 5, flags : 0 },
 		];
 
 		let res = [];

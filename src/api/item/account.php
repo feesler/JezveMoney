@@ -8,7 +8,7 @@ class Account
 	public $curr_id = 0;
 	public $initbalance = 0;
 	public $balance = 0;
-	public $icon = 0;
+	public $icon_id = 0;
 	public $flags = 0;
 
 
@@ -23,7 +23,7 @@ class Account
 		$this->curr_id = $obj->curr_id;
 		$this->initbalance = $obj->initbalance;
 		$this->balance = $obj->balance;
-		$this->icon = $obj->icon;
+		$this->icon_id = $obj->icon_id;
 		$this->flags = $obj->flags;
 	}
 }

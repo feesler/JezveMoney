@@ -20,7 +20,7 @@ export async function stateLoop()
 	await App.view.goToCreateAccount();
 
 	// Check initial state
-	let expAccount = { name : '', initbalance : 0, balance : '0', curr_id : 1, icon : 0, flags : 0 };
+	let expAccount = { name : '', initbalance : 0, balance : '0', curr_id : 1, icon_id : 0, flags : 0 };
 	App.view.setExpectedAccount(expAccount);
 	await test('Initial state of account view', () => App.view.checkState());
 
@@ -71,8 +71,8 @@ export async function submitAccount(params)
 		await test('Input initial balance', () => App.view.inputBalance(params.initbalance));
 
 	// Change icon
-	if ('icon' in params)
-		await test('Tile icon update', () => App.view.changeIcon(params.icon));
+	if ('icon_id' in params)
+		await test('Tile icon update', () => App.view.changeIcon(params.icon_id));
 
 	let validInput = App.view.isValid();
 	let res = (validInput) ? App.view.getExpectedAccount() : null;
@@ -105,7 +105,7 @@ export async function create(params)
 // Check initial state
 	await App.state.fetch();
 
-	let expAccount = { name : '', owner_id : App.owner_id, initbalance : '0', balance : 0, curr_id : 1, icon : 0, flags : 0 };
+	let expAccount = { name : '', owner_id : App.owner_id, initbalance : '0', balance : 0, curr_id : 1, icon_id : 0, flags : 0 };
 	App.view.setExpectedAccount(expAccount);
 	await test('Initial state of account view', () => App.view.checkState());
 

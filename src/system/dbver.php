@@ -5,7 +5,7 @@ class DBVersion
 	use Singleton;
 
 	protected $tbl_name = "dbver";
-	protected $latestVersion = 3;
+	protected $latestVersion = 4;
 	protected $dbClient = NULL;
 
 
@@ -28,6 +28,7 @@ class DBVersion
 		$this->createPersonsTable();
 		$this->createTransactionsTable();
 		$this->createUsersTable();
+		$this->createIconTable();
 		$this->createAdminQueryTable();
 
 		$this->createDBVersionTable();
@@ -102,6 +103,8 @@ class DBVersion
 			$current = $this->version2();
 		if ($current < 3)
 			$current = $this->version3();
+		if ($current < 4)
+			$current = $this->version4();
 
 		$this->setVersion($this->latestVersion);
 	}
@@ -201,7 +204,7 @@ class DBVersion
 						"`balance` DECIMAL(15,2) NOT NULL, ".
 						"`initbalance` DECIMAL(15,2) NOT NULL, ".
 						"`name` VARCHAR(255) NOT NULL, ".
-						"`icon` INT(11) NOT NULL DEFAULT '0', ".
+						"`icon_id` INT(11) NOT NULL DEFAULT '0', ".
 						"`flags` INT(11) NOT NULL DEFAULT '0', ".
 						"`createdate` DATETIME NOT NULL, ".
 						"`updatedate` DATETIME NOT NULL, ".
@@ -290,6 +293,41 @@ class DBVersion
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
 			throw new Error("Fail to create table $tableName");
+	}
+
+
+	private function createIconTable()
+	{
+		if (!$this->dbClient)
+			throw new Error("Invalid DB client");
+
+		$tableName = "icon";
+		if ($this->dbClient->isTableExist($tableName))
+			return;
+
+		$res = $this->dbClient->createTableQ($tableName,
+						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
+						"`name` VARCHAR(128) NOT NULL, ".
+						"`file` VARCHAR(256) NOT NULL, ".
+						"`type` INT(11) NOT NULL DEFAULT '0', ".
+						"`createdate` DATETIME NOT NULL, ".
+						"`updatedate` DATETIME NOT NULL, ".
+						"PRIMARY KEY (`id`)",
+						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
+		if (!$res)
+			throw new Error("Fail to create table $tableName");
+
+		$data = [
+			[ "name" => "Purse", "file" => "tile-purse", "type" => ICON_TILE ],
+			[ "name" => "Safe", "file" => "tile-safe", "type" => ICON_TILE ],
+			[ "name" => "Card", "file" => "tile-card", "type" => ICON_TILE ],
+			[ "name" => "Percent", "file" => "tile-percent", "type" => ICON_TILE ],
+			[ "name" => "Bank", "file" => "tile-bank", "type" => ICON_TILE ],
+			[ "name" => "Cash", "file" => "tile-cash", "type" => ICON_TILE ],
+		];
+
+		$iconModel = IconModel::getInstance();
+		$iconModel->createMultiple($data);
 	}
 
 

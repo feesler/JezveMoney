@@ -82,6 +82,32 @@ textarea
 }
 
 
+/* Checkbox wrapper */
+.checkbox-wrap
+{
+	height: 20px;
+	padding: 5px 0px;
+}
+
+
+.checkbox-wrap > input[type="checkbox"]
+{
+	display: inline;
+	height: 20px;
+	line-height: 20px;
+}
+
+
+.checkbox-wrap > label
+{
+	display: inline;
+	padding: 0px 5px;
+	font-size: 16px;
+	height: 20px;
+	line-height: 20px;
+}
+
+
 .checkbox-wrap label > input
 {
 	margin-right: 8px;

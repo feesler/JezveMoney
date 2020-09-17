@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 class AccountsController extends TemplateController
 {
 	protected $model = null;
-	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon", "flags" ];
+	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon_id", "flags" ];
 
 
 	protected function onStart()
@@ -52,9 +52,8 @@ class AccountsController extends TemplateController
 		$accInfo->curr_id = $currMod->getIdByPos(0);
 		$accInfo->balance = 0;
 		$accInfo->initbalance = 0;
-		$accInfo->icon = 0;
-		$accInfo->iconclass = "";
-		$accInfo->iconname = NULL;
+		$accInfo->icon_id = 0;
+		$accInfo->icon = NULL;
 		$accInfo->flags = 0;
 
 		$currObj = $currMod->getItem($accInfo->curr_id);
@@ -66,7 +65,9 @@ class AccountsController extends TemplateController
 		$tileAccName = "New account";
 
 		$currArr = $currMod->getData();
-		$icons = $this->model->getIconsArray();
+
+		$iconModel = IconModel::getInstance();
+		$icons = $iconModel->getData();
 
 		$titleString = "Jezve Money | ";
 		$headString = "New account";
@@ -108,13 +109,15 @@ class AccountsController extends TemplateController
 
 		$currObj = $currMod->getItem($accInfo->curr_id);
 		$accInfo->sign = ($currObj) ? $currObj->sign : NULL;
-		$accInfo->iconclass = $this->model->getIconClass($accInfo->icon);
+		$accInfo->icon = $this->model->getIconFile($acc_id);
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
-		$accInfo->iconname = $this->model->getIconName($accInfo->icon);
+
 		$tileAccName = $accInfo->name;
 
 		$currArr = $currMod->getData();
-		$icons = $this->model->getIconsArray();
+
+		$iconModel = IconModel::getInstance();
+		$icons = $iconModel->getData();
 
 		$titleString = "Jezve Money | ";
 		$headString = "Edit account";

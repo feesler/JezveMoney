@@ -1,18 +1,18 @@
 /* Create/update currency popup */
-.popup > .currency-form
+.popup > .icon-form
 {
 	margin-top: -120px;
 }
 
 
-.popup > .currency-form > .popup__content-box
+.popup > .icon-form > .popup__content-box
 {
 	max-width: 300px;
 	min-width: 130px;
 }
 
 
-.currency-form label
+.icon-form label
 {
 	display: block;
 	width: 100%;
@@ -21,7 +21,7 @@
 }
 
 
-.currency-form .stretch-input
+.icon-form .stretch-input
 {
 	border-width: 1px;
 }

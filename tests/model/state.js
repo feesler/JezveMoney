@@ -1,5 +1,4 @@
 import {
-	getIcon,
 	isValidValue,
 	isObject,
 	copyObject,
@@ -9,6 +8,7 @@ import {
 import { EXPENSE, INCOME, DEBT, availTransTypes, TRANSFER } from './transaction.js';
 import { App } from '../app.js';
 import { Currency } from './currency.js';
+import { Icon } from './icon.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
@@ -18,7 +18,7 @@ import { api } from './api.js';
 /**
  * Accounts
  */
-const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon', 'flags'];
+const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
 
 
 /**
@@ -187,7 +187,7 @@ export class AppState
 		if (!currObj)
 			return false;
 
-		if (!getIcon(params.icon))
+		if (params.icon_id && !Icon.getItem(params.icon_id))
 			return false;
 
 		if (!isValidValue(params.initbalance))
@@ -454,7 +454,7 @@ export class AppState
 			initbalance : 0,
 			balance : 0,
 			curr_id : currency_id,
-			icon : 0
+			icon_id : 0
 		};
 
 		let ind = this.accounts.create(accObj);

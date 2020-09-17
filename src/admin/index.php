@@ -10,6 +10,7 @@
 		"dbinstall" => "DBInstallAdminController",
 		"balance" => "BalanceAdminController",
 		"currency" => "CurrencyAdminController",
+		"icon" => "IconAdminController",
 		"query" => "QueryAdminController",
 		"log" => "LogsAdminController",
 		"tests" => "TestsAdminController",

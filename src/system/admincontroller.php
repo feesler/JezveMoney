@@ -9,6 +9,7 @@ abstract class AdminController extends TemplateController
 	protected $menuItems = [
 		"dbinstall" => [ "title" => "DB update", "link" => "dbinstall/" ],
 		"curr" => [ "title" => "Currencies", "link" => "currency/" ],
+		"icon" => [ "title" => "Icons", "link" => "icon/" ],
 		"query" => [ "title" => "Queries", "link" => "query/" ],
 		"log" => [ "title" => "Logs", "link" => "log/" ],
 		"balance" => [ "title" => "Balance", "link" => "balance/" ],

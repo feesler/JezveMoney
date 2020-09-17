@@ -1,13 +1,11 @@
 import { TestView } from './testview.js';
 import { Currency } from '../model/currency.js';
+import { Icon } from '../model/icon.js';
 import {
-	getIcon,
 	isValidValue,
 	normalize,
-	findIconByTitle,
 	copyObject
 } from '../common.js'
-import { App } from '../app.js'
 import { Tile } from './component/tile.js';
 import { DropDown } from './component/dropdown.js';
 import { InputRow } from './component/inputrow.js';
@@ -57,9 +55,11 @@ export class AccountView extends TestView
 		res.curr_id = res.currObj.id
 
 		// Icon
-		let iconObj = findIconByTitle(cont.iconDropDown.textValue);
-		res.icon = iconObj.id;
+		let iconObj = Icon.findByName(cont.iconDropDown.textValue);
+		if (!iconObj)
+			iconObj = Icon.noIcon();
 		res.tileIcon = iconObj;
+		res.icon_id = iconObj.id;
 
 		// Flags
 		res.flags = cont.flags;
@@ -86,6 +86,8 @@ export class AccountView extends TestView
 
 		this.model.curr_id = this.model.currObj.id;
 
+		this.model.icon_id = account.icon_id;
+
 		this.setExpectedState();
 	}
 
@@ -96,7 +98,7 @@ export class AccountView extends TestView
 			name : this.model.name,
 			initbalance : this.model.fInitBalance,
 			curr_id : this.model.curr_id,
-			icon : this.model.icon,
+			icon_id : this.model.icon_id,
 			flags : this.model.flags,
 		};
 
@@ -129,7 +131,7 @@ export class AccountView extends TestView
 				name : this.model.name.toString(),
 				balance : this.model.initbalance.toString(),
 				currDropDown : { textValue : this.model.currObj.name },
-				iconDropDown : { textValue : this.model.tileIcon.title }
+				iconDropDown : { textValue : this.model.tileIcon.name }
 			}
 		};
 
@@ -278,11 +280,14 @@ export class AccountView extends TestView
 
 	async changeIcon(val)
 	{
-		let iconObj = getIcon(val);
-		if (!iconObj)
+		let iconObj = Icon.getItem(val);
+		if (val && !iconObj)
 			throw new Error(`Icon ${val} not found`);
 
-		this.model.icon = iconObj.id;
+		if (!val)
+			iconObj = Icon.noIcon();
+
+		this.model.icon_id = iconObj.id;
 		this.model.tileIcon = iconObj;
 
 		this.setExpectedState();

@@ -88,6 +88,11 @@ const userReqFields = ['login', 'password', 'name'];
  */
 const currReqFields = ['name', 'sign', 'flags'];
 
+/**
+ * Icon
+ */
+const iconReqFields = ['name', 'file', 'type'];
+
 
 /**
  * Transactions
@@ -203,6 +208,78 @@ export const api = {
 			let jsonRes = await apiGet(reqUrl);
 			if (!jsonRes || jsonRes.result != 'ok')
 				throw new ApiRequestError('Fail to obtain list of currencies');
+
+			return jsonRes.data;
+		}
+	},
+
+	icon : {
+		read : async function(ids)
+		{
+			let apiReq = idsRequest('icon/', ids);
+
+			let jsonRes = await apiGet(apiReq);
+			if (!jsonRes || jsonRes.result != 'ok')
+				throw new ApiRequestError('Fail to read icons');
+
+			return jsonRes.data;
+		},
+
+		create : async function(options)
+		{
+			let postData = checkFields(options, iconReqFields);
+
+			let apiRes = await apiPost('icon/create', postData);
+			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to create icon');
+
+			return apiRes.data;
+		},
+
+		update : async function(id, options)
+		{
+			id = parseInt(id);
+			if (!id || isNaN(id))
+				throw new ApiRequestError('Wrong id specified');
+
+			let postData = checkFields(options, iconReqFields);
+			postData.id = id;
+
+			let apiRes = await apiPost('icon/update', postData);
+			if (!apiRes || !apiRes.result || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to update icon');
+
+			return true;
+		},
+
+		del : async function(ids)
+		{
+			if (!Array.isArray(ids))
+				ids = [ ids ];
+
+			for(let id of ids)
+			{
+				id = parseInt(id);
+				if (!id || isNaN(id))
+					throw new ApiRequestError('Wrong id specified');
+			}
+
+			let postData = { id : ids };
+
+			let apiRes = await apiPost('icon/delete', postData);
+			if (!apiRes || apiRes.result != 'ok')
+				throw new ApiRequestError('Fail to delete icon');
+
+			return true;
+		},
+
+		list : async function()
+		{
+			let reqUrl = 'icon/list';
+
+			let jsonRes = await apiGet(reqUrl);
+			if (!jsonRes || jsonRes.result != 'ok')
+				throw new ApiRequestError('Fail to obtain list of icons');
 
 			return jsonRes.data;
 		}

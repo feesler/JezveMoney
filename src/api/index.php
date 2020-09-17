@@ -5,6 +5,7 @@
 	$router = new Router();
 	$router->setRoutes([
 		"currency" => "CurrencyApiController",
+		"icon" => "IconApiController",
 		"account" => "AccountApiController",
 		"person" => "PersonApiController",
 		"transaction" => "TransactionApiController",

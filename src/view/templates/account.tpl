@@ -20,17 +20,22 @@
 						<input id="accid" name="id" type="hidden" value="<?=e($acc_id)?>">
 <?php	}	?>
 						<div class="view-row std_margin">
-							<div id="acc_tile" class="tile<?=e($accInfo->iconclass)?>"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($accInfo->balfmt)?></span><span class="tile__icon"><?=useIcon("tile-".$accInfo->iconname, 60, 54)?></span><span class="tile__title"><?=e($tileAccName)?></span></span></button></div>
+							<div id="acc_tile" class="tile"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($accInfo->balfmt)?></span><span class="tile__icon"><?=useIcon($accInfo->icon, 60, 54)?></span><span class="tile__title"><?=e($tileAccName)?></span></span></button></div>
 						</div>
 						<div class="view-row std_margin">
 							<label for="icon">Icon</label>
 							<div class="std_margin">
-								<select id="icon" name="icon">
-<?php	foreach($icons as $icon_id => $icon_name) {
-			if ($icon_id == $accInfo->icon) {		?>
-									<option value="<?=e($icon_id)?>" selected><?=e($icon_name)?></option>
+								<select id="icon" name="icon_id">
+<?php	if ($accInfo->icon_id == 0) {	?>
+									<option value="0" selected>No icon</option>
+<?php	} else {	?>
+									<option value="0">No icon</option>
+<?php	}	?>
+<?php	foreach($icons as $icon) {
+			if ($icon->id == $accInfo->icon_id) {		?>
+									<option value="<?=e($icon->id)?>" selected><?=e($icon->name)?></option>
 <?php		} else {	?>
-									<option value="<?=e($icon_id)?>"><?=e($icon_name)?></option>
+									<option value="<?=e($icon->id)?>"><?=e($icon->name)?></option>
 <?php		}
 		}		?>
 								</select>
@@ -84,6 +89,7 @@
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
 	var currency = <?=JSON::encode($currArr)?>;
+	var icons = <?=JSON::encode($icons)?>;
 <?php	if ($action == "edit") {	?>
 	var account_id = <?=$acc_id?>;
 <?php	}	?>
@@ -92,7 +98,7 @@
 	var acc_balance = <?=$accInfo->balance?>;
 	var acc_init_balance = <?=$accInfo->initbalance?>;
 	var new_init_balance = <?=$accInfo->initbalance?>;
-	var iconType = <?=$accInfo->icon?>;
+	var icon_id = <?=$accInfo->icon_id?>;
 
 	onReady(initControls);
 </script>

@@ -36,11 +36,8 @@ function formatAccoutBalance(acc_id)
 
 
 // Update tile information
-function setTileInfo(tile_id, title, subTitle, iconType)
+function setTileInfo(tile_id, title, subTitle, icon_id)
 {
-	var tileIcons = [null, 'purse_icon', 'safe_icon', 'card_icon', 'percent_icon', 'bank_icon', 'cash_icon'];
-	var icons = [null, 'purse', 'safe', 'card', 'percent', 'bank', 'cash'];
-
 	var tileObj = ge(tile_id);
 	if (!tileObj)
 		return;
@@ -55,16 +52,17 @@ function setTileInfo(tile_id, title, subTitle, iconType)
 	if (titleObj)
 		titleObj.innerHTML = title;
 
-	iconType = iconType | 0;
+	icon_id = (typeof icon_id === 'undefined') ? 0 : parseInt(icon_id);
+	var icon = idSearch(icons, icon_id);
 
 	var iconElem = tileObj.querySelector('.tile__icon');
 	if (iconElem)
 	{
 		removeChilds(iconElem);
-		if (iconType && icons[iconType])
+		if (icon)
 		{
-			var iconSVG = svg('svg', { 'class' : 'icon-tile-' + icons[iconType], width : '60px', height : '54px' },
-								svg('use', { 'href' : '#tile-' + icons[iconType] }));
+			var iconSVG = svg('svg', { width : '60px', height : '54px' },
+								svg('use', { 'href' : '#' + icon.file }));
 
 			iconElem.appendChild(iconSVG);
 		}
@@ -79,7 +77,7 @@ function setTileAccount(tile_id, acc_id)
 	if (!acc)
 		return;
 
-	setTileInfo(tile_id, acc.name, formatCurrency(acc.balance, acc.curr_id), acc.icon);
+	setTileInfo(tile_id, acc.name, formatCurrency(acc.balance, acc.curr_id), acc.icon_id);
 }
 
 

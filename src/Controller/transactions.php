@@ -357,7 +357,7 @@ class TransactionsController extends TemplateController
 			if ($tr["type"] != DEBT && !is_null($src))
 			{
 				$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr_id);
-				$src->iconclass = $this->accModel->getIconClass($src->icon);
+				$src->icon = $this->accModel->getIconFile($src->id);
 			}
 		}
 
@@ -373,7 +373,7 @@ class TransactionsController extends TemplateController
 			if ($tr["type"] != DEBT && !is_null($dest))
 			{
 				$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr_id);
-				$dest->iconclass = $this->accModel->getIconClass($dest->icon);
+				$dest->icon = $this->accModel->getIconFile($dest->id);
 			}
 		}
 
@@ -431,6 +431,8 @@ class TransactionsController extends TemplateController
 
 		// Common arrays
 		$currArr = $this->currModel->getData();
+		$iconModel = IconModel::getInstance();
+		$icons = $iconModel->getData();
 
 		$accArr = $this->accModel->getData([ "type" => "all" ]);
 		if ($tr["type"] == DEBT)
@@ -456,7 +458,7 @@ class TransactionsController extends TemplateController
 			if ($debtAcc)
 			{
 				$debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["dest_amount"], $debtAcc->curr_id);
-				$debtAcc->iconclass = $this->accModel->getIconClass($debtAcc->icon);
+				$debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
 			}
 
 			$p_balfmt = $this->currModel->format($person_balance, $srcAmountCurr);
@@ -570,7 +572,7 @@ class TransactionsController extends TemplateController
 
 			$balDiff = $tr["src_amount"];
 			$src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr_id);
-			$src->iconclass = $this->accModel->getIconClass(($src) ? $src->icon : NULL);
+			$src->icon = $this->accModel->getIconFile($src->id);
 		}
 
 		$destBalTitle = "Result balance";
@@ -581,7 +583,7 @@ class TransactionsController extends TemplateController
 
 			$balDiff = $tr["dest_amount"];
 			$dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr_id);
-			$dest->iconclass = $this->accModel->getIconClass(($dest) ? $dest->icon : NULL);
+			$dest->icon = $this->accModel->getIconFile($dest->id);
 		}
 
 		$transAcc_id = 0;		// main transaction account id
@@ -668,7 +670,7 @@ class TransactionsController extends TemplateController
 
 				$acc_name = $accObj->name;
 				$acc_balance = $this->currModel->format($accObj->balance, $accObj->curr_id);
-				$acc_ic = $this->accModel->getIconClass(($accObj) ? $accObj->icon : NULL);
+				$acc_ic = $this->accModel->getIconFile($accObj->id);
 			}
 			else
 			{
@@ -682,6 +684,8 @@ class TransactionsController extends TemplateController
 
 		// Common arrays
 		$currArr = $this->currModel->getData();
+		$iconModel = IconModel::getInstance();
+		$icons = $iconModel->getData();
 
 		$accArr = $this->accModel->getData([ "type" => "all" ]);
 		if ($tr["type"] == DEBT)
@@ -711,7 +715,7 @@ class TransactionsController extends TemplateController
 					else
 						$debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["src_amount"], $debtAcc->curr_id);
 
-					$debtAcc->iconclass = $this->accModel->getIconClass($debtAcc->icon);
+					$debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
 				}
 			}
 

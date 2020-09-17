@@ -11,9 +11,8 @@ class TestsAdminController extends AdminController
 		$currMod = CurrencyModel::getInstance();
 		$currArr = $currMod->getData();
 
-		$accMod = AccountModel::getInstance();
-		$icons = $accMod->getIconsArray();
-
+		$iconMod = IconModel::getInstance();
+		$icons = $iconMod->getData();
 
 		$this->cssAdmin[] = "tests.css";
 		$this->buildCSS();

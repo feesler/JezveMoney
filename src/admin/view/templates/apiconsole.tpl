@@ -71,6 +71,17 @@
 								</li>
 
 								<li>
+									<button>Icon</button>
+									<ul class="sub-menu-list">
+										<li data-target="listIconForm">List</li>
+										<li data-target="readIconForm">Read</li>
+										<li data-target="createIconForm">Create</li>
+										<li data-target="updateIconForm">Update</li>
+										<li data-target="delIconForm">Delete</li>
+									</ul>
+								</li>
+
+								<li>
 									<button>User</button>
 									<ul class="sub-menu-list">
 										<li data-target="loginForm">Login</li>
@@ -648,6 +659,83 @@
 							</div>
 							<div class="acc_controls">
 								<input id="delcurrbtn" class="adm_act_btn" type="button" value="submit">
+							</div>
+							</div>
+
+							<div id="listIconForm" class="request-data-form">
+							<h3>Get icons</h3>
+							<form action="<?=BASEURL?>api/icon/list" method="list">
+								<div class="acc_controls">
+									<input class="adm_act_btn" type="submit" value="submit">
+								</div>
+							</form>
+							</div>
+
+							<div id="readIconForm" class="request-data-form">
+							<h3>Read icon</h3>
+							<div class="std_margin">
+								<label for="read_icon_id">Id</label>
+								<input id="read_icon_id" type="text">
+							</div>
+							<div class="acc_controls">
+								<input id="read_icon_btn" class="adm_act_btn" type="button" value="submit">
+							</div>
+							</div>
+
+							<div id="createIconForm" class="request-data-form">
+							<h3>Create icon</h3>
+							<form action="<?=BASEURL?>api/icon/create" method="post">
+								<div class="std_margin">
+									<label for="create_icon_name">Name</label>
+									<input id="create_icon_name" name="name" type="text">
+								</div>
+								<div class="std_margin">
+									<label for="create_icon_file">File name</label>
+									<input id="create_icon_file" name="file" type="text">
+								</div>
+								<div class="std_margin">
+									<label for="create_icon_type">Type (0 - No type, 1 - Tile icon)</label>
+									<input id="create_icon_type" name="type" type="text">
+								</div>
+								<div class="acc_controls">
+									<input class="adm_act_btn" type="submit" value="submit">
+								</div>
+							</form>
+							</div>
+
+							<div id="updateIconForm" class="request-data-form">
+							<h3>Update icon</h3>
+							<form action="<?=BASEURL?>api/icon/update" method="post">
+								<div class="std_margin">
+									<label for="update_icon_id">Id</label>
+									<input id="update_icon_id" name="id" type="text">
+								</div>
+								<div class="std_margin">
+									<label for="update_icon_name">Name</label>
+									<input id="update_icon_name" name="name" type="text">
+								</div>
+								<div class="std_margin">
+									<label for="update_icon_file">File name</label>
+									<input id="update_icon_file" name="file" type="text">
+								</div>
+								<div class="std_margin">
+									<label for="update_icon_type">Type (0 - No type, 1 - Tile icon)</label>
+									<input id="update_icon_type" name="type" type="text">
+								</div>
+								<div class="acc_controls">
+									<input class="adm_act_btn" type="submit" value="submit">
+								</div>
+							</form>
+							</div>
+
+							<div id="delIconForm" class="request-data-form">
+							<h3>Delete icons</h3>
+							<div class="std_margin">
+								<label for="del_icons">Icons (comma separated ids)</label>
+								<input id="del_icons" type="text">
+							</div>
+							<div class="acc_controls">
+								<input id="deliconbtn" class="adm_act_btn" type="button" value="submit">
 							</div>
 							</div>
 

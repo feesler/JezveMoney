@@ -1,5 +1,5 @@
 import { Component } from './component.js';
-import { findIconByClassName } from '../../common.js';
+import { Icon } from '../../model/icon.js';
 import { Currency } from '../../model/currency.js';
 
 
@@ -20,9 +20,22 @@ export class Tile extends Component
 
 		this.isActive = !!(await this.query(this.elem, '.act'));
 
-		this.iconElem = await this.query(this.elem, '.tile__icon > svg')
-		let iconObj = findIconByClassName(await this.prop(this.iconElem, 'className.baseVal'));
-		this.icon = iconObj.id;
+		this.iconElem = await this.query(this.elem, '.tile__icon > svg');
+		if (this.iconElem)
+		{
+			let svgUseElem = await this.query(this.iconElem, 'use');
+
+			let iconHRef = await this.prop(svgUseElem, 'href.baseVal');
+			if (typeof iconHRef === 'string' && iconHRef.startsWith('#'))
+				iconHRef = iconHRef.substr(1);
+
+			let iconObj = Icon.findByFile(iconHRef);
+			this.icon_id = iconObj ? iconObj.id : 0;
+		}
+		else
+		{
+			this.icon_id = 0;
+		}
 	}
 
 
@@ -37,7 +50,7 @@ export class Tile extends Component
 		let res = {
 			balance : Currency.format(account.curr_id, account.balance),
 			name : account.name,
-			icon : account.icon,
+			icon_id : account.icon_id,
 		};
 
 		return res;

@@ -451,7 +451,7 @@ function isAccount(obj)
 			balance : isNum,
 			initbalance : isNum,
 			name : isString,
-			icon : isInt,
+			icon_id : isInt,
 			flags : isInt,
 		}, {
 			user_id : isInt,
@@ -506,6 +506,23 @@ function isCurrency(obj)
 
 
 function isCurrenciesArray(obj){ return isArrayOf(obj, isCurrency); }
+
+
+function isIcon(obj)
+{
+	return verifyObject(obj, {
+			id : isInt,
+			name : isString,
+			file : isString,
+			type : isInt,
+		}, {
+			createdate : isInt,
+			updatedate : isInt,
+		});
+}
+
+
+function isIconsArray(obj){ return isArrayOf(obj, isIcon); }
 
 
 function isPersonAccount(obj)
@@ -613,6 +630,33 @@ function onDeleteCurrencySubmit()
 
 	api.post({
 		method : 'currency/delete',
+		data : parseIds(id_inp.value)
+	});
+}
+
+
+function onIconReadSubmit()
+{
+	var icon_id_inp = ge('read_icon_id');
+	if (!icon_id_inp)
+		return;
+
+	api.get({
+		method : 'icon/',
+		data : parseIds(icon_id_inp.value),
+		verify : isIconsArray
+	});
+}
+
+
+function onDeleteIconsSubmit()
+{
+	var id_inp = ge('del_icons');
+	if (!id_inp)
+		return;
+
+	api.post({
+		method : 'icon/delete',
 		data : parseIds(id_inp.value)
 	});
 }
@@ -861,6 +905,33 @@ function initControls()
 	var delcurrbtn = ge('delcurrbtn');
 	if (delcurrbtn)
 		delcurrbtn.onclick = onDeleteCurrencySubmit;
+
+/**
+ * Icons
+ */
+	var listIconForm = document.querySelector('#listIconForm > form');
+	if (!listIconForm)
+		throw new Error('Fail to init view');
+	listIconForm.onsubmit = function(e){ return onFormSubmit(e, isIconsArray); };
+
+	var read_icon_btn = ge('read_icon_btn');
+	if (read_icon_btn)
+		read_icon_btn.onclick = onIconReadSubmit;
+
+	var createIconForm = document.querySelector('#createIconForm > form');
+	if (!createIconForm)
+		throw new Error('Fail to init view');
+	createIconForm.onsubmit = function(e){ return onFormSubmit(e, isCreateResult); };
+
+	var updateIconForm = document.querySelector('#updateIconForm > form');
+	if (!updateIconForm)
+		throw new Error('Fail to init view');
+	updateIconForm.onsubmit = onFormSubmit;
+
+	var deliconbtn = ge('deliconbtn');
+	if (deliconbtn)
+		deliconbtn.onclick = onDeleteIconsSubmit;
+
 /**
  * User
  */

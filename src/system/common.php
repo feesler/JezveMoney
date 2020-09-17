@@ -12,6 +12,9 @@
 	define("WHITE_THEME", 0);
 	define("DARK_THEME", 1);
 
+	// Icon types
+	define("ICON_TILE", 1);
+
 
 	// Set location header to redirect page and exit from script
 	function setLocation($loc)
@@ -45,6 +48,7 @@
 			"CheckBalanceController" => "Controller/checkbalance.php",
 		// API controllers
 			"CurrencyApiController" => "api/Controller/currency.php",
+			"IconApiController" => "api/Controller/icon.php",
 			"AccountApiController" => "api/Controller/account.php",
 			"PersonApiController" => "api/Controller/person.php",
 			"TransactionApiController" => "api/Controller/transaction.php",
@@ -54,6 +58,7 @@
 		// Admin controllers
 			"DBInstallAdminController" => "admin/Controller/dbinstall.php",
 			"CurrencyAdminController" => "admin/Controller/currency.php",
+			"IconAdminController" => "admin/Controller/icon.php",
 			"BalanceAdminController" => "admin/Controller/balance.php",
 			"UserAdminController" => "admin/Controller/user.php",
 			"MainAdminController" => "admin/Controller/main.php",
@@ -66,9 +71,11 @@
 			"Person" => "api/item/person.php",
 			"Transaction" => "api/item/transaction.php",
 			"Currency" => "api/item/currency.php",
+			"Icon" => "api/item/icon.php",
 		// Models
 			"AccountModel" => "Model/account.php",
 			"CurrencyModel" => "Model/currency.php",
+			"IconModel" => "Model/icon.php",
 			"DebtModel" => "Model/debt.php",
 			"MySqlDB" => "system/mysql.php",
 			"PersonModel" => "Model/person.php",

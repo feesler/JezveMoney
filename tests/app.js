@@ -3,6 +3,7 @@ import { api } from './model/api.js';
 import { config } from './config.js';
 import { AppState } from './model/state.js';
 import { Currency } from './model/currency.js';
+import { Icon } from './model/icon.js';
 import { Scenario } from './scenario.js';
 
 
@@ -32,6 +33,7 @@ class Application
 		this.state = new AppState;
 		await this.state.fetch();
 		await Currency.init();
+		await Icon.init();
 
 		this.scenario = await Scenario.create(this.environment);
 

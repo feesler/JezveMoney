@@ -7,13 +7,11 @@ class AccountModel extends CachedTable
 
 	static private $user_id = 0;
 	static private $owner_id = 0;
-	static private $icons = ["No icon", "Purse", "Safe", "Card", "Percent", "Bank", "Cash"];
-	static private $iconClass = ["", "purse_icon", "safe_icon", "card_icon", "percent_icon", "bank_icon", "cash_icon"];
-	static private $iconNames = [NULL, "purse", "safe", "card", "percent", "bank", "cash"];
 
 	protected $tbl_name = "accounts";
 	protected $currMod = NULL;
 	protected $personMod = NULL;
+	protected $iconModel = NULL;
 	protected $currencyUpdated = FALSE;
 	protected $balanceUpdated = FALSE;
 	protected $removedItems = NULL;
@@ -32,6 +30,7 @@ class AccountModel extends CachedTable
 
 		$this->currMod = CurrencyModel::getInstance();
 		$this->personMod = PersonModel::getInstance();
+		$this->iconModel = IconModel::getInstance();
 	}
 
 
@@ -49,7 +48,7 @@ class AccountModel extends CachedTable
 		$res->curr_id = intval($row["curr_id"]);
 		$res->balance = floatval($row["balance"]);
 		$res->initbalance = floatval($row["initbalance"]);
-		$res->icon = intval($row["icon"]);
+		$res->icon_id = intval($row["icon_id"]);
 		$res->flags = intval($row["flags"]);
 		$res->createdate = strtotime($row["createdate"]);
 		$res->updatedate = strtotime($row["updatedate"]);
@@ -67,7 +66,7 @@ class AccountModel extends CachedTable
 
 	protected function checkParams($params, $isUpdate = FALSE)
 	{
-		$avFields = ["owner_id", "name", "initbalance", "curr_id", "icon", "flags"];
+		$avFields = ["owner_id", "name", "initbalance", "curr_id", "icon_id", "flags"];
 		$res = [];
 
 		// In CREATE mode all fields is required
@@ -109,12 +108,12 @@ class AccountModel extends CachedTable
 			}
 		}
 
-		if (isset($params["icon"]))
+		if (isset($params["icon_id"]))
 		{
-			$res["icon"] = intval($params["icon"]);
-			if ($res["icon"] < 0 || $res["icon"] > count(self::$iconClass))
+			$res["icon_id"] = intval($params["icon_id"]);
+			if ($res["icon_id"] != 0 && !$this->iconModel->is_exist($res["icon_id"]))
 			{
-				wlog("Invalid icon specified");
+				wlog("Invalid icon_id specified");
 				return NULL;
 			}
 		}
@@ -340,7 +339,7 @@ class AccountModel extends CachedTable
 							"name" => "acc_".$person_id."_".$curr_id,
 							"initbalance" => 0.0,
 							"curr_id" => $curr_id,
-							"icon" => 0,
+							"icon_id" => 0,
 							"flags" => 0
 						]);
 
@@ -491,13 +490,6 @@ class AccountModel extends CachedTable
 	}
 
 
-	// Return array of icons
-	public function getIconsArray()
-	{
-		return self::$icons;
-	}
-
-
 	// Return array of accounts
 	// $params - array of parameters
 	//   full - if set to TRUE include accounts of persons
@@ -622,37 +614,31 @@ class AccountModel extends CachedTable
 			if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden))
 				continue;
 
-			$acc_icon = $this->getIconClass($item->icon);
 			$balance_fmt = $this->currMod->format($item->balance, $item->curr_id);
 
-			$res[$acc_id] = ["name" => $item->name,
-								"balance" => $balance_fmt,
-								"icon" => $acc_icon,
-								"iconname" => $this->getIconName($item->icon)];
+			$res[$acc_id] = [
+				"name" => $item->name,
+				"balance" => $balance_fmt,
+				"icon" => $this->getIconFile($acc_id)
+			];
 		}
 
 		return $res;
 	}
 
 
-	// Return class for specified icon
-	public function getIconClass($icon_id)
+	// Return icon file name of specified account
+	public function getIconFile($item_id)
 	{
-		$icon_id = intval($icon_id);
-
-		return ($icon_id != 0 && isset(self::$iconClass[$icon_id])) ? " tile_icon ".self::$iconClass[$icon_id] : "";
-	}
-
-
-	// Return name of specified icon
-	public function getIconName($icon_id)
-	{
-		$icon_id = intval($icon_id);
-
-		if (isset(self::$iconNames[$icon_id]))
-			return self::$iconNames[$icon_id];
-		else
+		$item = $this->getItem($item_id);
+		if (!$item)
 			return NULL;
+
+		$icon = $this->iconModel->getItem($item->icon_id);
+		if (!$icon)
+			return NULL;
+
+		return $icon->file;
 	}
 
 

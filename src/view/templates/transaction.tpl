@@ -90,13 +90,13 @@
 							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button></div>
 							<div class="tile-base">
 								<div class="tile_container hidden">
-									<div id="acc_tile" class="tile<?=e($acc_ic)?>"><div class="tilelink"><span><span class="tile__subtitle"><?=e($acc_balance)?></span><span class="tile__title"><?=e($acc_name)?></span></span></div></div>
+									<div id="acc_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=e($acc_balance)?></span><span class="tile__icon"><?=useIcon($acc_ic, 60, 54)?></span><span class="tile__title"><?=e($acc_name)?></span></span></div></div>
 									<input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
 <?php		} else {	?>
 							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="close-btn" type="button"><?=svgIcon("close")?></button></div>
 							<div class="tile-base">
 								<div class="tile_container">
-									<div id="acc_tile" class="tile<?=($debtAcc->iconclass)?>"><div class="tilelink"><span><span class="tile__subtitle"><?=($debtAcc->balfmt)?></span><span class="tile__title"><?=($debtAcc->name)?></span></span></div></div>
+									<div id="acc_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=($debtAcc->balfmt)?></span><span class="tile__icon"><?=useIcon($debtAcc->icon, 60, 54)?></span><span class="tile__title"><?=($debtAcc->name)?></span></span></div></div>
 									<input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
 <?php		}	?>
 								</div>
@@ -143,7 +143,7 @@
 							<div class="tile_header"><label>Source account</label></div>
 							<div class="tile-base">
 								<div class="tile_container">
-									<div id="source_tile" class="tile<?=($src->iconclass)?>"><div class="tilelink"><span><span class="tile__subtitle"><?=($src->balfmt)?></span><span class="tile__title"><?=($src->name)?></span></span></div></div>
+									<div id="source_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=($src->balfmt)?></span><span class="tile__icon"><?=useIcon($src->icon, 60, 54)?></span><span class="tile__title"><?=($src->name)?></span></span></div></div>
 									<input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 								</div>
 
@@ -192,7 +192,7 @@
 							<div class="tile_header"><label>Destination account</label></div>
 							<div class="tile-base">
 								<div class="tile_container">
-									<div id="dest_tile" class="tile<?=($dest->iconclass)?>"><div class="tilelink"><span><span class="tile__subtitle"><?=($dest->balfmt)?></span><span class="tile__title"><?=($dest->name)?></span></span></div></div>
+									<div id="dest_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=($dest->balfmt)?></span><span class="tile__icon"><?=useIcon($dest->icon, 60, 54)?></span><span class="tile__title"><?=($dest->name)?></span></span></div></div>
 									<input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
 								</div>
 
@@ -390,10 +390,12 @@
 </form>
 <?php	}	?>
 
+<?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
 	var accounts = <?=JSON::encode($accArr)?>;
 	var currency = <?=JSON::encode($currArr)?>;
+	var icons = <?=JSON::encode($icons)?>;
 <?php	if ($action == "edit") {	?>
 	var edit_transaction =
 	{

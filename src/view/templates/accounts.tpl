@@ -14,7 +14,7 @@
 					<div id="tilesContainer" class="tiles"><?php
 	if (count($tilesArr)) {
 		foreach($tilesArr as $acc_id => $tile) {
-?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($tile["balance"])?></span><span class="tile__icon"><?=useIcon("tile-".$tile["iconname"], 60, 54)?></span><span class="tile__title"><?=e($tile["name"])?></span></span></button></div><?php
+?><div id="acc_<?=e($acc_id)?>" class="tile"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($tile["balance"])?></span><span class="tile__icon"><?=useIcon($tile["icon"], 60, 54)?></span><span class="tile__title"><?=e($tile["name"])?></span></span></button></div><?php
 		}
 	} else {	?>
 						<span>You have no one account. Please create one.</span>
@@ -27,7 +27,7 @@
 					</div>
 					<div id="hiddenTilesContainer" class="tiles"><?php
 			foreach($hiddenTilesArr as $acc_id => $tile) {
-?><div id="acc_<?=e($acc_id)?>" class="tile<?=e($tile["icon"])?>"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($tile["balance"])?></span><span class="tile__icon"><?=useIcon("tile-".$tile["iconname"], 60, 54)?></span><span class="tile__title"><?=e($tile["name"])?></span></span></button></div><?php
+?><div id="acc_<?=e($acc_id)?>" class="tile"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($tile["balance"])?></span><span class="tile__icon"><?=useIcon($tile["icon"], 60, 54)?></span><span class="tile__title"><?=e($tile["name"])?></span></span></button></div><?php
 			}
 ?></div>
 <?php	} else {	?>
