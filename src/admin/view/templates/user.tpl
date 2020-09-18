@@ -1,3 +1,6 @@
+<?php
+	use JezveMoney\Core\JSON;
+?>
 <?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body>

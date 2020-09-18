@@ -28,60 +28,61 @@
 	function autoLoadClass($className)
 	{
 		$classes = [
-			"CachedTable" => "system/cachedTable.php",
-			"Controller" => "system/controller.php",
-			"Model" => "system/model.php",
-			"Singleton" => "system/singleton.php",
-			"DBVersion" => "system/dbver.php",
-			"TemplateController" => "system/templatecontroller.php",
-			"ApiController" => "system/apicontroller.php",
-			"AdminController" => "system/admincontroller.php",
+			"JezveMoney\\Core\\MySqlDB" => "system/mysql.php",
+			"JezveMoney\\Core\\apiResponse" => "system/apiResponse.php",
+			"JezveMoney\\Core\\Logger" => "system/log.php",
+			"JezveMoney\\Core\\CachedTable" => "system/cachedTable.php",
+			"JezveMoney\\Core\\Controller" => "system/controller.php",
+			"JezveMoney\\Core\\Model" => "system/model.php",
+			"JezveMoney\\Core\\Singleton" => "system/singleton.php",
+			"JezveMoney\\Core\\DBVersion" => "system/dbver.php",
+			"JezveMoney\\Core\\TemplateController" => "system/templatecontroller.php",
+			"JezveMoney\\Core\\ApiController" => "system/apicontroller.php",
+			"JezveMoney\\Core\\AdminController" => "system/admincontroller.php",
 		// Controllers
-			"MainController" => "Controller/main.php",
-			"AccountsController" => "Controller/accounts.php",
-			"PersonsController" => "Controller/persons.php",
-			"TransactionsController" => "Controller/transactions.php",
-			"UserController" => "Controller/user.php",
-			"ProfileController" => "Controller/profile.php",
-			"StatisticsController" => "Controller/statistics.php",
-			"FastCommitController" => "Controller/fastcommit.php",
-			"CheckBalanceController" => "Controller/checkbalance.php",
+			"JezveMoney\\App\\Controller\\MainController" => "Controller/main.php",
+			"JezveMoney\\App\\Controller\\AccountsController" => "Controller/accounts.php",
+			"JezveMoney\\App\\Controller\\PersonsController" => "Controller/persons.php",
+			"JezveMoney\\App\\Controller\\TransactionsController" => "Controller/transactions.php",
+			"JezveMoney\\App\\Controller\\UserController" => "Controller/user.php",
+			"JezveMoney\\App\\Controller\\ProfileController" => "Controller/profile.php",
+			"JezveMoney\\App\\Controller\\StatisticsController" => "Controller/statistics.php",
+			"JezveMoney\\App\\Controller\\FastCommitController" => "Controller/fastcommit.php",
+			"JezveMoney\\App\\Controller\\CheckBalanceController" => "Controller/checkbalance.php",
 		// API controllers
-			"CurrencyApiController" => "api/Controller/currency.php",
-			"IconApiController" => "api/Controller/icon.php",
-			"AccountApiController" => "api/Controller/account.php",
-			"PersonApiController" => "api/Controller/person.php",
-			"TransactionApiController" => "api/Controller/transaction.php",
-			"UserApiController" => "api/Controller/user.php",
-			"ProfileApiController" => "api/Controller/profile.php",
-			"StateApiController" => "api/Controller/state.php",
+			"JezveMoney\\App\\API\\Controller\\CurrencyApiController" => "api/Controller/currency.php",
+			"JezveMoney\\App\\API\\Controller\\IconApiController" => "api/Controller/icon.php",
+			"JezveMoney\\App\\API\\Controller\\AccountApiController" => "api/Controller/account.php",
+			"JezveMoney\\App\\API\\Controller\\PersonApiController" => "api/Controller/person.php",
+			"JezveMoney\\App\\API\\Controller\\TransactionApiController" => "api/Controller/transaction.php",
+			"JezveMoney\\App\\API\\Controller\\UserApiController" => "api/Controller/user.php",
+			"JezveMoney\\App\\API\\Controller\\ProfileApiController" => "api/Controller/profile.php",
+			"JezveMoney\\App\\API\\Controller\\StateApiController" => "api/Controller/state.php",
 		// Admin controllers
-			"DBInstallAdminController" => "admin/Controller/dbinstall.php",
-			"CurrencyAdminController" => "admin/Controller/currency.php",
-			"IconAdminController" => "admin/Controller/icon.php",
-			"BalanceAdminController" => "admin/Controller/balance.php",
-			"UserAdminController" => "admin/Controller/user.php",
-			"MainAdminController" => "admin/Controller/main.php",
-			"QueryAdminController" => "admin/Controller/query.php",
-			"LogsAdminController" => "admin/Controller/log.php",
-			"TestsAdminController" => "admin/Controller/tests.php",
-			"ApiConsoleAdminController" => "admin/Controller/apiconsole.php",
+			"JezveMoney\\App\\Admin\\Controller\\DBInstallAdminController" => "admin/Controller/dbinstall.php",
+			"JezveMoney\\App\\Admin\\Controller\\CurrencyAdminController" => "admin/Controller/currency.php",
+			"JezveMoney\\App\\Admin\\Controller\\IconAdminController" => "admin/Controller/icon.php",
+			"JezveMoney\\App\\Admin\\Controller\\BalanceAdminController" => "admin/Controller/balance.php",
+			"JezveMoney\\App\\Admin\\Controller\\UserAdminController" => "admin/Controller/user.php",
+			"JezveMoney\\App\\Admin\\Controller\\MainAdminController" => "admin/Controller/main.php",
+			"JezveMoney\\App\\Admin\\Controller\\QueryAdminController" => "admin/Controller/query.php",
+			"JezveMoney\\App\\Admin\\Controller\\LogsAdminController" => "admin/Controller/log.php",
+			"JezveMoney\\App\\Admin\\Controller\\TestsAdminController" => "admin/Controller/tests.php",
+			"JezveMoney\\App\\Admin\\Controller\\ApiConsoleAdminController" => "admin/Controller/apiconsole.php",
 		// Items
-			"Account" => "api/item/account.php",
-			"Person" => "api/item/person.php",
-			"Transaction" => "api/item/transaction.php",
-			"Currency" => "api/item/currency.php",
-			"Icon" => "api/item/icon.php",
+			"JezveMoney\\App\\Item\\Account" => "api/item/account.php",
+			"JezveMoney\\App\\Item\\Person" => "api/item/person.php",
+			"JezveMoney\\App\\Item\\Transaction" => "api/item/transaction.php",
+			"JezveMoney\\App\\Item\\Currency" => "api/item/currency.php",
+			"JezveMoney\\App\\Item\\Icon" => "api/item/icon.php",
 		// Models
-			"AccountModel" => "Model/account.php",
-			"CurrencyModel" => "Model/currency.php",
-			"IconModel" => "Model/icon.php",
-			"DebtModel" => "Model/debt.php",
-			"MySqlDB" => "system/mysql.php",
-			"PersonModel" => "Model/person.php",
-			"TransactionModel" => "Model/transaction.php",
-			"UserModel" => "Model/user.php",
-			"apiResponse" => "system/apiResponse.php"
+			"JezveMoney\\App\\Model\\AccountModel" => "Model/account.php",
+			"JezveMoney\\App\\Model\\CurrencyModel" => "Model/currency.php",
+			"JezveMoney\\App\\Model\\IconModel" => "Model/icon.php",
+			"JezveMoney\\App\\Model\\DebtModel" => "Model/debt.php",
+			"JezveMoney\\App\\Model\\PersonModel" => "Model/person.php",
+			"JezveMoney\\App\\Model\\TransactionModel" => "Model/transaction.php",
+			"JezveMoney\\App\\Model\\UserModel" => "Model/user.php"
 		];
 
 		if (isset($classes[$className]))
@@ -261,7 +262,7 @@
 		if (is_null($obj) || !isset($expectedFields) || !is_array($expectedFields))
 		{
 			if ($throw)
-				throw new Error("Invalid input");
+				throw new \Error("Invalid input");
 			else
 				return FALSE;
 		}
@@ -275,7 +276,7 @@
 			if (!array_key_exists($field, $obj))
 			{
 				if ($throw)
-					throw new Error("Field $field not found");
+					throw new \Error("Field $field not found");
 				else
 					return FALSE;
 			}

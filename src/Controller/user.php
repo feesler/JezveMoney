@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Message;
+
+
 class UserController extends TemplateController
 {
 	public function index()

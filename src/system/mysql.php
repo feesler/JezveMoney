@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 // Return quotted string or NULL
 function qnull($str)
 {
@@ -84,7 +87,7 @@ function orJoin($pieces)
 
 	if (is_array($pieces))
 	{
-		$fstr = "(".implode(" OR ", array_map("brace", $pieces)).")";
+		$fstr = "(".implode(" OR ", array_map("JezveMoney\\Core\\brace", $pieces)).")";
 	}
 	else if (is_string($pieces))
 	{
@@ -112,7 +115,7 @@ function assignJoin($assignments)
 			$res[] = $value;
 		}
 		else
-			throw new Error("Incorrect syntax");
+			throw new \Error("Incorrect syntax");
 	}
 
 	return implode(", ", $res);
@@ -175,11 +178,11 @@ class MySqlDB
 		$reqFields = ["location", "user", "password", "name"];
 
 		if (!is_null(self::$config))
-			throw new Error("DB already configured");
+			throw new \Error("DB already configured");
 
 		$config = checkFields($config, $reqFields);
 		if (!$config)
-			throw new Error("Invalid DB configuration");
+			throw new \Error("Invalid DB configuration");
 
 		self::$config = $config;
 	}

@@ -1,5 +1,16 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\MySqlDB;
+use function JezveMoney\Core\inSetCondition;
+use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\Singleton;
+use JezveMoney\Core\CachedInstance;
+use JezveMoney\App\Model\UserModel;
+use JezveMoney\App\Model\IconModel;
+
+
 class AccountModel extends CachedTable
 {
 	use Singleton;
@@ -22,7 +33,7 @@ class AccountModel extends CachedTable
 		$uMod = UserModel::getInstance();
 		self::$user_id = $uMod->getUser();
 		if (!self::$user_id)
-			throw new Error("User not found");
+			throw new \Error("User not found");
 
 		self::$owner_id = $uMod->getOwner();
 
@@ -40,7 +51,7 @@ class AccountModel extends CachedTable
 		if (is_null($row))
 			return NULL;
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->id = intval($row["id"]);
 		$res->user_id = intval($row["user_id"]);
 		$res->name = $row["name"];
@@ -554,7 +565,7 @@ class AccountModel extends CachedTable
 		if (is_int($item))
 			$item = $this->getItem($item);
 		if (!$item || !is_object($item) || !isset($item->flags))
-			throw new Error("Invalid account item");
+			throw new \Error("Invalid account item");
 
 		return $item && ($item->flags & ACCOUNT_HIDDEN) == ACCOUNT_HIDDEN;
 	}

@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 abstract class Controller
 {
 	public $action = NULL;
@@ -61,7 +64,7 @@ abstract class Controller
 		{
 			$json = JSON::decode($rawData, $asArray);
 		}
-		catch(Exception $e)
+		catch(\Exception $e)
 		{
 			wlog($e);
 			$json = NULL;

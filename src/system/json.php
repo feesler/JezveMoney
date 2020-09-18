@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 class JSON
 {
 	public static function decode($jsonData, $asArray = FALSE, $depth = 512)
@@ -18,7 +21,7 @@ class JSON
 			$decodedData = json_decode($fdata, $asArray, $depth);
 			$js_err = json_last_error();
 			if ($js_err != JSON_ERROR_NONE)
-				throw new Exception(json_last_error_msg());
+				throw new \Exception(json_last_error_msg());
 		}
 
 		return $decodedData;

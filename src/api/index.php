@@ -1,8 +1,11 @@
 <?php
+	namespace JezveMoney;
+
 	require_once("../system/setup.php");
 	require_once("../system/router.php");
 
-	$router = new Router();
+	$router = new Core\Router();
+	$router->setNamespace("JezveMoney\\App\\API\\Controller");
 	$router->setRoutes([
 		"currency" => "CurrencyApiController",
 		"icon" => "IconApiController",
@@ -39,7 +42,7 @@
 
 	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
 	{
-		if ($controller instanceof ApiController)
+		if ($controller instanceof Core\ApiController)
 		{
 			$controller->initAPI();
 		}

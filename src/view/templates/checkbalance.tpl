@@ -1,3 +1,6 @@
+<?php
+	use JezveMoney\Core\JSON;
+?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 <style>
 table{border-collapse:collapse;}

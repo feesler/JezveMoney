@@ -1,5 +1,10 @@
 <?php
 
+namespace JezveMoney\App\Item;
+
+use JezveMoney\App\Model\AccountModel;
+
+
 class Person
 {
 	public $id = 0;
@@ -8,11 +13,10 @@ class Person
 	public $accounts = NULL;
 
 
-
 	public function __construct($obj)
 	{
 		if (is_null($obj))
-			throw new Error("Invalid object");
+			throw new \Error("Invalid object");
 
 		$this->id = $obj->id;
 		$this->name = $obj->name;
@@ -31,7 +35,7 @@ class Person
 		$this->accounts = [];
 		foreach($accData as $account)
 		{
-			$personAcc = new stdClass;
+			$personAcc = new \stdClass;
 			$personAcc->id = $account->id;
 			$personAcc->curr_id = $account->curr_id;
 			$personAcc->balance = $account->balance;

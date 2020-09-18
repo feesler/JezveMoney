@@ -1,5 +1,10 @@
 <?php
 
+namespace JezveMoney\Core;
+
+use JezveMoney\App\Model\UserModel;
+
+
 class ApiController extends Controller
 {
 	protected $response = NULL;
@@ -12,7 +17,7 @@ class ApiController extends Controller
 	protected function setMessage($msg = NULL)
 	{
 		if (!$this->response)
-			throw new Error("Invalid response object");
+			throw new \Error("Invalid response object");
 
 		if (is_null($msg))
 			unset($this->response->msg);
@@ -24,7 +29,7 @@ class ApiController extends Controller
 	protected function setData($data = NULL)
 	{
 		if (!$this->response)
-			throw new Error("Invalid response object");
+			throw new \Error("Invalid response object");
 
 		if (is_null($data))
 			unset($this->response->data);
@@ -36,7 +41,7 @@ class ApiController extends Controller
 	protected function fail($msg = NULL)
 	{
 		if (!$this->response)
-			throw new Error("Invalid response object");
+			throw new \Error("Invalid response object");
 
 		$this->response->fail($msg);
 	}
@@ -45,7 +50,7 @@ class ApiController extends Controller
 	protected function ok($data = NULL)
 	{
 		if (!$this->response)
-			throw new Error("Invalid response object");
+			throw new \Error("Invalid response object");
 
 		if (!is_null($data))
 			$this->setData($data);

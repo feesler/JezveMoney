@@ -1,4 +1,7 @@
 <?php
+
+namespace JezveMoney\Core;
+
 	// Type of messages
 	define("MSG_TYPE_NONE", 0);
 	define("MSG_TYPE_SUCCESS", 1);

@@ -1,5 +1,16 @@
 <?php
 
+namespace JezveMoney\App\API\Controller;
+
+use JezveMoney\Core\ApiController;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Item\Account;
+use JezveMoney\App\Item\Person;
+use JezveMoney\App\Item\Transaction;
+
+
 class StateApiController extends ApiController
 {
 	protected $trModel = NULL;
@@ -19,9 +30,9 @@ class StateApiController extends ApiController
 
 	public function index()
 	{
-		$res = new stdClass;
+		$res = new \stdClass;
 
-		$res->accounts = new stdClass;
+		$res->accounts = new \stdClass;
 		$res->accounts->data = [];
 		$items = $this->accModel->getData([ "full" => TRUE, "type" => "all" ]);
 		foreach($items as $item)
@@ -30,7 +41,7 @@ class StateApiController extends ApiController
 		}
 		$res->accounts->autoincrement = $this->accModel->autoIncrement();
 
-		$res->transactions = new stdClass;
+		$res->transactions = new \stdClass;
 		$res->transactions->data = [];
 		$items = $this->trModel->getData([ "onPage" => 0 ]);
 		foreach($items as $item)
@@ -39,7 +50,7 @@ class StateApiController extends ApiController
 		}
 		$res->transactions->autoincrement = $this->trModel->autoIncrement();
 
-		$res->persons = new stdClass;
+		$res->persons = new \stdClass;
 		$res->persons->data = [];
 		$items = $this->pModel->getData([ "type" => "all" ]);
 		foreach($items as $item)
@@ -52,7 +63,7 @@ class StateApiController extends ApiController
 		if (!$userObj)
 			$this->fail("User not found");
 
-		$res->profile = new stdClass;
+		$res->profile = new \stdClass;
 		$pObj = $this->pModel->getItem($this->owner_id);
 		if (!$pObj)
 			$this->fail("Person not found");

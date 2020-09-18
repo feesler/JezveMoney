@@ -1,5 +1,13 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\TransactionModel;
+
+
 class MainController extends TemplateController
 {
 	public function index()
@@ -17,7 +25,7 @@ class MainController extends TemplateController
 		{
 			$currObj = $currMod->getItem($curr_id);
 			if (!$currObj)
-				throw new Error('Wrong currency id: '.$curr_id);
+				throw new \Error('Wrong currency id: '.$curr_id);
 
 			$balfmt = $currMod->format($balance, $curr_id);
 
@@ -59,7 +67,7 @@ class MainController extends TemplateController
 		$byCurrency = TRUE;
 		$curr_acc_id = $currMod->getIdByPos(0);
 		if (!$curr_acc_id)
-			throw new Error("No currencies found");
+			throw new \Error("No currencies found");
 
 		$groupType_id = 2;		// group by week
 

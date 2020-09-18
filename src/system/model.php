@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 abstract class Model
 {
 	protected $dbObj = NULL;

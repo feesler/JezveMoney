@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 class Logger
 {
 	private static $filename = LOGS_PATH."log.txt";
@@ -38,19 +41,3 @@ class Logger
 
 }
 
-
-function wlog($str = NULL)
-{
-	global $noLogs;
-
-	if (isset($noLogs) && $noLogs == TRUE)
-		return;
-
-	Logger::write($str);
-}
-
-
-function clog()
-{
-	Logger::clean();
-}

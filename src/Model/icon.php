@@ -1,5 +1,13 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\MySqlDB;
+use function JezveMoney\Core\qnull;
+use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\Singleton;
+use JezveMoney\Core\CachedInstance;
+
 
 class IconModel extends CachedTable
 {
@@ -22,7 +30,7 @@ class IconModel extends CachedTable
 		if (is_null($row))
 			return NULL;
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->id = intval($row["id"]);
 		$res->name = $row["name"];
 		$res->file = $row["file"];
@@ -171,7 +179,7 @@ class IconModel extends CachedTable
 
 		foreach($this->cache as $item)
 		{
-			$itemObj = new stdClass;
+			$itemObj = new \stdClass;
 
 			$itemObj->id = $item->id;
 			$itemObj->name = $item->name;

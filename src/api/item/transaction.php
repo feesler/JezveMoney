@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\App\Item;
+
+
 class Transaction
 {
 	public $id = 0;
@@ -20,7 +23,7 @@ class Transaction
 	public function __construct($obj)
 	{
 		if (is_null($obj))
-			throw new Error("Invalid object");
+			throw new \Error("Invalid object");
 
 		$this->id = $obj->id;
 		$this->type = $obj->type;

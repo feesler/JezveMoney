@@ -1,8 +1,11 @@
 <?php
+	namespace JezveMoney;
+
 	require_once("./system/setup.php");
 	require_once("./system/router.php");
 
-	$router = new Router();
+	$router = new Core\Router();
+	$router->setNamespace("JezveMoney\\App\\Controller");
 	$router->setRoutes([
 		"main" => "MainController",
 		"accounts" => "AccountsController",

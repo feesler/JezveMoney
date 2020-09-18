@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\JSON;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -14,9 +20,6 @@ class FastCommitController extends TemplateController
 		"trAmount" => NULL,
 		"accCurr" => NULL,
 		"accAmount" => NULL,
-		"date" => NULL,
-		"date" => NULL,
-		"date" => NULL,
 	];
 
 
@@ -56,7 +59,7 @@ class FastCommitController extends TemplateController
 	private function setColumnInd($colName, $ind)
 	{
 		if (is_empty($colName))
-			throw new Error("Invalid column name: ".$colName);
+			throw new \Error("Invalid column name: ".$colName);
 
 		$this->columns[$colName] = self::columnStr(intval($ind));
 	}
@@ -66,9 +69,9 @@ class FastCommitController extends TemplateController
 	private function getCellValue($sheet, $colName, $row)
 	{
 		if (!$sheet)
-			throw new Error("Invalid sheet");
+			throw new \Error("Invalid sheet");
 		if (!isset($this->columns[$colName]))
-			throw new Error("Invalid column ".$colName);
+			throw new \Error("Invalid column ".$colName);
 
 		return $sheet->getCell($this->columns[$colName].intval($row))->getValue();
 	}
@@ -167,10 +170,10 @@ class FastCommitController extends TemplateController
 		else if ($fileType == "CSV")
 			$readedType = "Csv";
 		else
-			throw new Error("Unknown file type");
+			throw new \Error("Unknown file type");
 
 		$reader = IOFactory::createReader($readedType);
-		if ($reader instanceof PhpOffice\PhpSpreadsheet\Reader\Csv)
+		if ($reader instanceof \PhpOffice\PhpSpreadsheet\Reader\Csv)
 		{
 			$reader->setDelimiter(';');
 			$reader->setEnclosure('');
@@ -215,7 +218,7 @@ class FastCommitController extends TemplateController
 			$descVal = $this->getCellValue($src, "desc", $row_ind);
 			$edesc = trim($descVal);
 
-			$dataObj = new stdClass;
+			$dataObj = new \stdClass;
 
 			$dateVal = $this->getCellValue($src, "date", $row_ind);
 			if (is_empty($dateVal))

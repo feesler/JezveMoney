@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\App\Admin\Controller;
+
+use JezveMoney\Core\AdminController;
+use JezveMoney\App\Model\CurrencyModel;
+
+
 class CurrencyAdminController extends AdminController
 {
 	protected $model = NULL;

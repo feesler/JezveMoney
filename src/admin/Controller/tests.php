@@ -1,5 +1,12 @@
 <?php
 
+namespace JezveMoney\App\Admin\Controller;
+
+use JezveMoney\Core\AdminController;
+use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\IconModel;
+
+
 class TestsAdminController extends AdminController
 {
 	public function index()

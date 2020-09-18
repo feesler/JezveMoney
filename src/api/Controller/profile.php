@@ -1,5 +1,13 @@
 <?php
 
+namespace JezveMoney\App\API\Controller;
+
+use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\PersonModel;
+
+
 class ProfileApiController extends ApiController
 {
 	protected $personMod = NULL;
@@ -11,7 +19,7 @@ class ProfileApiController extends ApiController
 
 		$this->personMod = PersonModel::getInstance();
 		if (!$this->user_id)
-			throw new Error("User not found");
+			throw new \Error("User not found");
 	}
 
 

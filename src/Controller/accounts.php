@@ -1,5 +1,13 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Message;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\IconModel;
+use JezveMoney\App\Model\TransactionModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -47,7 +55,7 @@ class AccountsController extends TemplateController
 
 		$currMod = CurrencyModel::getInstance();
 
-		$accInfo = new stdClass;
+		$accInfo = new \stdClass;
 		$accInfo->name = "";
 		$accInfo->curr_id = $currMod->getIdByPos(0);
 		$accInfo->balance = 0;
@@ -58,7 +66,7 @@ class AccountsController extends TemplateController
 
 		$currObj = $currMod->getItem($accInfo->curr_id);
 		if (!$currObj)
-			throw new Error("Currency not found");
+			throw new \Error("Currency not found");
 
 		$accInfo->sign = $currObj->sign;
 		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
@@ -263,7 +271,7 @@ class AccountsController extends TemplateController
 		$exportFileName = "Exported_".date("d.m.Y").".".strtolower($writerType);
 
 		$writer = IOFactory::createWriter($spreadsheet, $writerType);
-		if ($writer instanceof PhpOffice\PhpSpreadsheet\Writer\Csv)
+		if ($writer instanceof \PhpOffice\PhpSpreadsheet\Writer\Csv)
 		{
 			$writer->setDelimiter(';');
 			$writer->setEnclosure('"');

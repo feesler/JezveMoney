@@ -1,5 +1,12 @@
 <?php
 
+namespace JezveMoney\App\API\Controller;
+
+use JezveMoney\Core\ApiController;
+use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Item\Person;
+
+
 class PersonApiController extends ApiController
 {
 	protected $requiredFields = [ "name", "flags" ];

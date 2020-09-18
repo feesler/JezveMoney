@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\Singleton;
+use JezveMoney\App\Model\TransactionModel;
+
+
 class DebtModel
 {
 	use Singleton;
@@ -22,7 +28,7 @@ class DebtModel
 
 		checkFields($params, $mandatoryParams, TRUE);
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->type = DEBT;
 
 		if (isset($params["id"]))
@@ -30,21 +36,21 @@ class DebtModel
 
 		$op = intval($params["op"]);
 		if ($op != 1 && $op != 2)
-			throw new Error("Unknown debt operation: $op");
+			throw new \Error("Unknown debt operation: $op");
 
 		$person_id = intval($params["person_id"]);
 
 		$res->src_curr = intval($params["src_curr"]);
 		$res->dest_curr = intval($params["dest_curr"]);
 		if (!$res->src_curr || !$res->dest_curr)
-			throw new Error("Invalid currency");
+			throw new \Error("Invalid currency");
 
 		$curr_id = ($op == 1) ? $res->src_curr : $res->dest_curr;
 		$personAccount = $this->accModel->getPersonAccount($person_id, $curr_id);
 		if (!$personAccount)
 			$personAccount = $this->accModel->createPersonAccount($person_id, $curr_id);
 		if (!$personAccount)
-			throw new Error("Fail to obtain person account: person_id: $person_id, curr_id: $curr_id");
+			throw new \Error("Fail to obtain person account: person_id: $person_id, curr_id: $curr_id");
 
 		$account_id = isset($params["acc_id"]) ? intval($params["acc_id"]) : 0;
 
@@ -62,7 +68,7 @@ class DebtModel
 		$res->src_amount = floatval($params["src_amount"]);
 		$res->dest_amount = floatval($params["dest_amount"]);
 		if ($res->src_amount == 0.0 || $res->dest_amount == 0.0)
-			throw new Error("Invalid amount");
+			throw new \Error("Invalid amount");
 
 		$res->date = $params["date"];
 		$res->comment = $params["comment"];

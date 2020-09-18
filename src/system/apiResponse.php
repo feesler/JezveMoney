@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 class apiResponse
 {
 	public $result = NULL;

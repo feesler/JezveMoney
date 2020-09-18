@@ -1,12 +1,19 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Message;
+use JezveMoney\App\Model\AccountModel;
+
+
 class ProfileController extends TemplateController
 {
 	public function index()
 	{
 		$uObj = $this->uMod->getItem($this->user_id);
 		if (!$uObj)
-			throw new Error("User not found");
+			throw new \Error("User not found");
 
 		$user_login = $uObj->login;
 
@@ -16,7 +23,7 @@ class ProfileController extends TemplateController
 
 		$pObj = $this->personMod->getItem($uObj->owner_id);
 		if (!$pObj)
-			throw new Error("Person not found");
+			throw new \Error("Person not found");
 
 		$person_name = $pObj->name;
 

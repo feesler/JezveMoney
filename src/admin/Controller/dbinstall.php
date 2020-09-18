@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\App\Admin\Controller;
+
+use JezveMoney\Core\AdminController;
+use JezveMoney\Core\DBVersion;
+
+
 class DBInstallAdminController extends AdminController
 {
 	protected $dbVer = NULL;

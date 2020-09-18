@@ -1,5 +1,12 @@
 <?php
 
+namespace JezveMoney\App\API\Controller;
+
+use JezveMoney\Core\ApiController;
+use JezveMoney\App\Model\IconModel;
+use JezveMoney\App\Item\Icon;
+
+
 class IconApiController extends ApiController
 {
 	protected $requiredFields = [ "name", "file", "type" ];

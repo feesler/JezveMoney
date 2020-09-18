@@ -1,5 +1,10 @@
 <?php
 
+namespace JezveMoney\App\Admin\Controller;
+
+use JezveMoney\Core\AdminController;
+
+
 class UserAdminController extends AdminController
 {
 	public function index()

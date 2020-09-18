@@ -150,10 +150,18 @@
 	define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads"));
 	define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs"));
 
-	require_once(APP_ROOT."system/log.php");
 	if (!isset($noLogs) || !$noLogs)
 	{
+		require_once(APP_ROOT."system/log.php");
+		function wlog($str = NULL)
+		{
+			\JezveMoney\Core\Logger::write($str);
+		}
 		bootLog();
+	}
+	else
+	{
+		function wlog(){}
 	}
 
 	require_once(APP_ROOT."system/json.php");
@@ -161,7 +169,7 @@
 	require_once(APP_ROOT."vendor/autoload.php");
 
 	$dbConfig = ( require_once(APP_ROOT."system/dbsetup.php") );
-	MySqlDB::setup($dbConfig);
+	JezveMoney\Core\MySqlDB::setup($dbConfig);
 
 	date_default_timezone_set("Europe/Moscow");
 

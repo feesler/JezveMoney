@@ -1,5 +1,14 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Message;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\TransactionModel;
+
+
 class StatisticsController extends TemplateController
 {
 	public function index()
@@ -7,7 +16,7 @@ class StatisticsController extends TemplateController
 		$transMod = TransactionModel::getInstance();
 		$accMod = AccountModel::getInstance();
 		$currMod = CurrencyModel::getInstance();
-		$filterObj = new stdClass;
+		$filterObj = new \stdClass;
 
 		$byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
 		$filterObj->filter = $byCurrency ? "currency" : "account";
@@ -82,7 +91,7 @@ class StatisticsController extends TemplateController
 			if ($type_id)
 				$params["type"] = strtolower($trTypeName);
 
-			$menuItem = new stdClass;
+			$menuItem = new \stdClass;
 			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
 			$menuItem->selected = ($menuItem->type == $trans_type);

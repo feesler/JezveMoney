@@ -1,5 +1,15 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\MySqlDB;
+use function JezveMoney\Core\inSetCondition;
+use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\CachedInstance;
+use JezveMoney\Core\Singleton;
+use JezveMoney\App\Model\UserModel;
+
+
 class PersonModel extends CachedTable
 {
 	use Singleton;
@@ -28,7 +38,7 @@ class PersonModel extends CachedTable
 		if (is_null($row))
 			return NULL;
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->id = intval($row["id"]);
 		$res->name = $row["name"];
 		$res->user_id = intval($row["user_id"]);
@@ -231,7 +241,7 @@ class PersonModel extends CachedTable
 
 
 	// Return person id by specified position
-	public function getIdByPos($pos = 0)
+	public function getIdByPos($pos)
 	{
 		if (!$this->checkCache())
 			return 0;
@@ -398,7 +408,7 @@ class PersonModel extends CachedTable
 		if (is_int($item))
 			$item = $this->getItem($item);
 		if (!$item || !is_object($item) || !isset($item->flags))
-			throw new Error("Invalid person item");
+			throw new \Error("Invalid person item");
 
 		return $item && ($item->flags & PERSON_HIDDEN) == PERSON_HIDDEN;
 	}

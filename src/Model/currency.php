@@ -1,5 +1,13 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\MySqlDB;
+use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\Singleton;
+use JezveMoney\Core\CachedInstance;
+
+
 class CurrencyModel extends CachedTable
 {
 	use Singleton;
@@ -20,7 +28,7 @@ class CurrencyModel extends CachedTable
 		if (is_null($row))
 			return NULL;
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->id = intval($row["id"]);
 		$res->name = $row["name"];
 		$res->sign = $row["sign"];
@@ -185,7 +193,7 @@ class CurrencyModel extends CachedTable
 
 		foreach($this->cache as $curr_id => $item)
 		{
-			$currObj = new stdClass;
+			$currObj = new \stdClass;
 
 			$currObj->id = $item->id;
 			$currObj->name = $item->name;

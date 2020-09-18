@@ -1,5 +1,14 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\MySqlDB;
+use JezveMoney\Core\JSON;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\TransactionModel;
+
+
 class CheckBalanceController extends TemplateController
 {
 	protected $accName = NULL;

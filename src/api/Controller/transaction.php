@@ -1,5 +1,14 @@
 <?php
 
+namespace JezveMoney\App\API\Controller;
+
+use JezveMoney\Core\ApiController;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Model\DebtModel;
+use JezveMoney\App\Item\Transaction;
+
+
 class TransactionApiController extends ApiController
 {
 	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];

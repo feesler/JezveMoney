@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 class DBVersion
 {
 	use Singleton;
@@ -40,7 +43,7 @@ class DBVersion
 	private function createDBVersionTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$res = $this->dbClient->createTableQ($this->tbl_name,
 						"`id` INT(11) NOT NULL AUTO_INCREMENT, ".
@@ -55,7 +58,7 @@ class DBVersion
 	private function setVersion($version)
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$version = intval($version);
 		if ($version < 0)
@@ -72,11 +75,11 @@ class DBVersion
 	public function getCurrentVersion()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$qResult = $this->dbClient->selectQ("version", $this->tbl_name, "id=1");
 		if (!$qResult)
-			throw new Error("Fail to obtain DB version");
+			throw new \Error("Fail to obtain DB version");
 
 		$row = $this->dbClient->fetchRow($qResult);
 		return intval($row["version"]);
@@ -113,11 +116,11 @@ class DBVersion
 	private function version1()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$res = $this->dbClient->changeColumn("currency", "format", "flags", "INT(11) NOT NULL DEFAULT '0'");
 		if (!$res)
-			throw new Error("Fail to update currency table");
+			throw new \Error("Fail to update currency table");
 
 		return 1;
 	}
@@ -126,11 +129,11 @@ class DBVersion
 	private function version2()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$res = $this->dbClient->addColumns("accounts", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
 		if (!$res)
-			throw new Error("Fail to update accounts table");
+			throw new \Error("Fail to update accounts table");
 
 		return 2;
 	}
@@ -139,11 +142,11 @@ class DBVersion
 	private function version3()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$res = $this->dbClient->addColumns("persons", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
 		if (!$res)
-			throw new Error("Fail to update persons table");
+			throw new \Error("Fail to update persons table");
 
 		return 3;
 	}
@@ -152,11 +155,11 @@ class DBVersion
 	private function version4()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$res = $this->dbClient->changeColumn("accounts", "icon", "icon_id", "INT(11) NOT NULL DEFAULT '0'");
 		if (!$res)
-			throw new Error("Fail to update accounts table");
+			throw new \Error("Fail to update accounts table");
 
 		$this->createIconTable();
 
@@ -167,7 +170,7 @@ class DBVersion
 	private function createCurrencyTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "currency";
 		if ($this->dbClient->isTableExist($tableName))
@@ -183,14 +186,14 @@ class DBVersion
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 	}
 
 
 	private function createAccountsTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "accounts";
 		if ($this->dbClient->isTableExist($tableName))
@@ -212,14 +215,14 @@ class DBVersion
 						"KEY `user_id` (`user_id`)",
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 	}
 
 
 	private function createPersonsTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "persons";
 		if ($this->dbClient->isTableExist($tableName))
@@ -235,14 +238,14 @@ class DBVersion
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 	}
 
 
 	private function createTransactionsTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "transactions";
 		if ($this->dbClient->isTableExist($tableName))
@@ -268,14 +271,14 @@ class DBVersion
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 	}
 
 
 	private function createUsersTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "users";
 		if ($this->dbClient->isTableExist($tableName))
@@ -292,14 +295,14 @@ class DBVersion
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 	}
 
 
 	private function createIconTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "icon";
 		if ($this->dbClient->isTableExist($tableName))
@@ -315,7 +318,7 @@ class DBVersion
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 
 		$data = [
 			[ "name" => "Purse", "file" => "tile-purse", "type" => ICON_TILE ],
@@ -334,7 +337,7 @@ class DBVersion
 	private function createAdminQueryTable()
 	{
 		if (!$this->dbClient)
-			throw new Error("Invalid DB client");
+			throw new \Error("Invalid DB client");
 
 		$tableName = "admin_query";
 		if ($this->dbClient->isTableExist($tableName))
@@ -348,6 +351,6 @@ class DBVersion
 						"PRIMARY KEY (`id`)",
 						"DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci");
 		if (!$res)
-			throw new Error("Fail to create table $tableName");
+			throw new \Error("Fail to create table $tableName");
 	}
 }

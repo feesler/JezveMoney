@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Message;
+
+
 class PersonsController extends TemplateController
 {
 	protected $requiredFields = [ "name", "flags" ];
@@ -40,7 +46,7 @@ class PersonsController extends TemplateController
 		$action = "new";
 
 		$p_id = 0;
-		$pInfo = new stdClass;
+		$pInfo = new \stdClass;
 		$pInfo->name = "";
 		$pInfo->flags = 0;
 

@@ -1,5 +1,16 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\Singleton;
+use JezveMoney\Core\CachedInstance;
+use JezveMoney\Core\MySqlDB;
+use function JezveMoney\Core\qnull;
+use function JezveMoney\Core\inSetCondition;
+use JezveMoney\App\Model\PersonModel;
+
+
 class UserModel extends CachedTable
 {
 	use Singleton;
@@ -22,7 +33,7 @@ class UserModel extends CachedTable
 		if (is_null($row))
 			return NULL;
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->id = intval($row["id"]);
 		$res->login = $row["login"];
 		$res->passhash = $row["passhash"];
@@ -420,14 +431,14 @@ class UserModel extends CachedTable
 			{
 				$person_id = $personMod->create([ "name" => $this->personName, "user_id" => $item_id, "flags" => 0 ]);
 				if (!$person_id)
-					throw new Error("Fail to create person for user");
+					throw new \Error("Fail to create person for user");
 
 				$this->setOwner($item_id, $person_id);
 			}
 			else
 			{
 				if (!$personMod->adminUpdate($userObj->owner_id, [ "name" => $this->personName ]))
-					throw new Error("Fail to update person of user");
+					throw new \Error("Fail to update person of user");
 			}
 
 			$this->personName = NULL;
@@ -606,7 +617,7 @@ class UserModel extends CachedTable
 		$pMod = PersonModel::getInstance();
 		foreach($this->cache as $u_id => $item)
 		{
-			$userObj = new stdClass;
+			$userObj = new \stdClass;
 
 			$userObj->id = $u_id;
 			$userObj->login = $item->login;

@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\App\Item;
+
+
 class Account
 {
 	public $id = 0;
@@ -15,7 +18,7 @@ class Account
 	public function __construct($obj)
 	{
 		if (is_null($obj))
-			throw new Error("Invalid object");
+			throw new \Error("Invalid object");
 
 		$this->id = $obj->id;
 		$this->owner_id = $obj->owner_id;

@@ -1,5 +1,12 @@
 <?php
 
+namespace JezveMoney\App\API\Controller;
+
+use JezveMoney\Core\ApiController;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Item\Account;
+
+
 class AccountApiController extends ApiController
 {
 	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon_id", "flags" ];

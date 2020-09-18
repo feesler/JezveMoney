@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 trait Singleton
 {
 	protected static $instance = NULL;

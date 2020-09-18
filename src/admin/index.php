@@ -1,10 +1,13 @@
 <?php
+	namespace JezveMoney;
+
 	$noLogs = TRUE;
 
 	require_once("../system/setup.php");
 	require_once("../system/router.php");
 
-	$router = new Router();
+	$router = new Core\Router();
+	$router->setNamespace("JezveMoney\\App\\Admin\\Controller");
 	$router->setRoutes([
 		"main" => "MainAdminController",
 		"dbinstall" => "DBInstallAdminController",

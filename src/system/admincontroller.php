@@ -1,5 +1,8 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 abstract class AdminController extends TemplateController
 {
 	protected $cssAdmin = [];
@@ -21,7 +24,7 @@ abstract class AdminController extends TemplateController
 
 	public function initDefResources()
 	{
-		$this->css = new stdClass;
+		$this->css = new \stdClass;
 		$this->css->clear = ["common.css"];
 		$this->css->libs = ["popup.css"];
 		$this->css->app = ["app.css"];

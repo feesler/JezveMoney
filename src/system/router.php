@@ -1,13 +1,24 @@
 <?php
 
+namespace JezveMoney\Core;
+
+
 class Router
 {
+	protected $routeNamespace = "";
 	protected $routes = [];
 	protected $aliasMap = [];
 	protected $actionsMap = [];
 	protected $onStartHandler = NULL;
 	protected $onBeforeActionHandler = NULL;
 	protected $onAfterActionHandler = NULL;
+
+
+	public function setNamespace($namespace)
+	{
+		if (is_string($namespace))
+			$this->routeNamespace = $namespace;
+	}
 
 
 	public function setRoutes($map)
@@ -87,7 +98,7 @@ class Router
 		if (!isset($this->routes[$contrStr]))
 			setLocation(BASEURL);
 
-		$contClass = $this->routes[$contrStr];
+		$contClass = $this->routeNamespace."\\".$this->routes[$contrStr];
 
 		$controller = new $contClass();
 

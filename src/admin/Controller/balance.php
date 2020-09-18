@@ -1,5 +1,12 @@
 <?php
 
+namespace JezveMoney\App\Admin\Controller;
+
+use JezveMoney\Core\AdminController;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\TransactionModel;
+
+
 class BalanceAdminController extends AdminController
 {
 	public function index()
@@ -25,7 +32,7 @@ class BalanceAdminController extends AdminController
 				{
 					$accObj = $accModel->getItem($tr->src_id);
 					if (!$accObj)
-						throw new Error("Account {$tr->src_id} not found");
+						throw new \Error("Account {$tr->src_id} not found");
 					$results[$tr->src_id] = $accObj->initbalance;
 				}
 
@@ -44,7 +51,7 @@ class BalanceAdminController extends AdminController
 				{
 					$accObj = $accModel->getItem($tr->dest_id);
 					if (!$accObj)
-						throw new Error("Account {$tr->dest_id} not found");
+						throw new \Error("Account {$tr->dest_id} not found");
 					$results[$tr->dest_id] = $accObj->initbalance;
 				}
 

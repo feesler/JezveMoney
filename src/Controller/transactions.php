@@ -1,5 +1,16 @@
 <?php
 
+namespace JezveMoney\App\Controller;
+
+use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Message;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\IconModel;
+use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Model\DebtModel;
+
+
 class TransactionsController extends TemplateController
 {
 	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
@@ -20,7 +31,7 @@ class TransactionsController extends TemplateController
 
 	public function index()
 	{
-		$filterObj = new stdClass;
+		$filterObj = new \stdClass;
 		$trParams = [ "onPage" => 10,
 						"desc" => TRUE ];
 
@@ -129,7 +140,7 @@ class TransactionsController extends TemplateController
 			// Clear page number because list of transactions guaranteed to change on change type filter
 			unset($urlParams["page"]);
 
-			$menuItem = new stdClass;
+			$menuItem = new \stdClass;
 			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
 
@@ -334,7 +345,7 @@ class TransactionsController extends TemplateController
 			if ($acc_id != 0)
 				$params["acc_id"] = $acc_id;
 
-			$menuItem = new stdClass;
+			$menuItem = new \stdClass;
 			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
 			$menuItem->selected = ($menuItem->type == $tr["type"]);
@@ -553,7 +564,7 @@ class TransactionsController extends TemplateController
 		{
 			$params = ["type" => strtolower($trTypeName)];
 
-			$menuItem = new stdClass;
+			$menuItem = new \stdClass;
 			$menuItem->type = $type_id;
 			$menuItem->title = $trTypeName;
 			$menuItem->selected = ($menuItem->type == $tr["type"]);
@@ -635,7 +646,7 @@ class TransactionsController extends TemplateController
 
 			$uObj = $this->uMod->getItem($this->user_id);
 			if (!$uObj)
-				throw new Error("User not found");
+				throw new \Error("User not found");
 
 			$give = (!is_null($src) && $src->owner_id != $uObj->owner_id);
 
@@ -645,7 +656,7 @@ class TransactionsController extends TemplateController
 			$person_id = ($give) ? $src->owner_id : $dest->owner_id;
 			$pObj = $this->personMod->getItem($person_id);
 			if (!$pObj)
-				throw new Error("Person not found");
+				throw new \Error("Person not found");
 
 			$person_name = $pObj->name;
 
@@ -666,7 +677,7 @@ class TransactionsController extends TemplateController
 				$acc_id = $this->accModel->getIdByPos(0);
 				$accObj = $this->accModel->getItem($acc_id);
 				if (!$accObj)
-					throw new Error("Account ".$acc_id." not found");
+					throw new \Error("Account ".$acc_id." not found");
 
 				$acc_name = $accObj->name;
 				$acc_balance = $this->currModel->format($accObj->balance, $accObj->curr_id);

@@ -1,5 +1,11 @@
 <?php
 
+namespace JezveMoney\Core;
+
+use JezveMoney\App\Model\UserModel;
+use JezveMoney\App\Model\PersonModel;
+
+
 abstract class TemplateController extends Controller
 {
 	public $action = NULL;
@@ -23,7 +29,7 @@ abstract class TemplateController extends Controller
 
 	public function initDefResources()
 	{
-		$this->css = new stdClass;
+		$this->css = new \stdClass;
 		$this->css->clear = ["common.css"];
 		$this->css->libs = ["popup.css"];
 		$this->css->app = ["app.css"];

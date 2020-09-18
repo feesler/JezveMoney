@@ -1,5 +1,17 @@
 <?php
 
+namespace JezveMoney\App\Model;
+
+use JezveMoney\Core\MySqlDB;
+use function JezveMoney\Core\inSetCondition;
+use function JezveMoney\Core\orJoin;
+use function JezveMoney\Core\qnull;
+use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\Singleton;
+use JezveMoney\Core\CachedInstance;
+use JezveMoney\App\Model\UserModel;
+
+
 class TransactionModel extends CachedTable
 {
 	use Singleton;
@@ -32,7 +44,7 @@ class TransactionModel extends CachedTable
 		$uMod = UserModel::getInstance();
 		self::$user_id = $uMod->getUser();
 		if (!self::$user_id)
-			throw new Error("User not found");
+			throw new \Error("User not found");
 
 		self::$owner_id = $uMod->getOwner();
 
@@ -47,7 +59,7 @@ class TransactionModel extends CachedTable
 		if (is_null($row))
 			return NULL;
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->id = intval($row["id"]);
 		$res->user_id = intval($row["user_id"]);
 		$res->src_id = intval($row["src_id"]);
@@ -395,7 +407,7 @@ class TransactionModel extends CachedTable
 	public function applyTransaction($trans, $accountsList = [])
 	{
 		if (!$trans)
-			throw new Error("Invalid Transaction object");
+			throw new \Error("Invalid Transaction object");
 
 		$trans = (object)$trans;
 		$res = $accountsList;
@@ -421,7 +433,7 @@ class TransactionModel extends CachedTable
 	public function cancelTransaction($trans, $accountsList = [])
 	{
 		if (!$trans)
-			throw new Error("Invalid Transaction object");
+			throw new \Error("Invalid Transaction object");
 
 		$trans = (object)$trans;
 		$res = $accountsList;
@@ -863,7 +875,7 @@ class TransactionModel extends CachedTable
 		$uMod = UserModel::getInstance();
 		$uObj = $uMod->getItem(self::$user_id);
 		if (!$uObj)
-			throw new Error("User not found");
+			throw new \Error("User not found");
 
 		if (!is_array($accounts))
 			$accounts = [ $accounts ];
@@ -1028,7 +1040,7 @@ class TransactionModel extends CachedTable
 		$uMod = UserModel::getInstance();
 		$uObj = $uMod->getItem(self::$user_id);
 		if (!$uObj)
-			throw new Error("User not found");
+			throw new \Error("User not found");
 
 		$owner_id = $uObj->owner_id;
 		if (!$owner_id)
@@ -1317,7 +1329,7 @@ class TransactionModel extends CachedTable
 			$groupArr = array_slice($groupArr, -$newGroupsCount);
 		}
 
-		$res = new stdClass;
+		$res = new \stdClass;
 		$res->values = $amountArr;
 		$res->series = $groupArr;
 
@@ -1385,7 +1397,7 @@ class TransactionModel extends CachedTable
 	public function getListItem($transaction, $detailsMode = FALSE)
 	{
 		if (!$transaction || !$transaction->id)
-			throw new Error("Invalid transaction specified");
+			throw new \Error("Invalid transaction specified");
 
 		$res = ["id" => $transaction->id];
 
