@@ -86,7 +86,7 @@ class ApiController extends Controller
 	// Common API initialization
 	public function initAPI()
 	{
-		$this->response = new apiResponse;
+		$this->response = new ApiResponse;
 
 		$this->uMod = UserModel::getInstance();
 		$this->user_id = $this->uMod->check();

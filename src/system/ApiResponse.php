@@ -3,7 +3,7 @@
 namespace JezveMoney\Core;
 
 
-class apiResponse
+class ApiResponse
 {
 	public $result = NULL;
 	public $msg = NULL;
