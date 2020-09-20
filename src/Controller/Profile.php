@@ -7,7 +7,7 @@ use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 
 
-class ProfileController extends TemplateController
+class Profile extends TemplateController
 {
 	public function index()
 	{

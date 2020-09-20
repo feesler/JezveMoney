@@ -8,7 +8,6 @@ use JezveMoney\Core\CachedInstance;
 use JezveMoney\Core\MySqlDB;
 use function JezveMoney\Core\qnull;
 use function JezveMoney\Core\inSetCondition;
-use JezveMoney\App\Model\PersonModel;
 
 
 class UserModel extends CachedTable

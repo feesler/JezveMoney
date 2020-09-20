@@ -6,7 +6,7 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Logger;
 
 
-class LogsAdminController extends AdminController
+class Logs extends AdminController
 {
 	public function index()
 	{

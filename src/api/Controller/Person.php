@@ -4,10 +4,10 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\PersonModel;
-use JezveMoney\App\Item\Person;
+use JezveMoney\App\Item\PersonItem;
 
 
-class PersonApiController extends ApiController
+class Person extends ApiController
 {
 	protected $requiredFields = [ "name", "flags" ];
 	protected $model = NULL;
@@ -34,7 +34,7 @@ class PersonApiController extends ApiController
 			if (!$item)
 				$this->fail("Person $person_id not found");
 
-			$res[] = new Person($item);
+			$res[] = new PersonItem($item);
 		}
 
 		$this->ok($res);
@@ -53,7 +53,7 @@ class PersonApiController extends ApiController
 		$persons = $this->model->getData($params);
 		foreach($persons as $item)
 		{
-			$res[] = new Person($item);
+			$res[] = new PersonItem($item);
 		}
 
 		$this->ok($res);

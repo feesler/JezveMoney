@@ -165,7 +165,6 @@
 	}
 
 	require_once(APP_ROOT."system/json.php");
-	spl_autoload_register("autoLoadClass");
 	require_once(APP_ROOT."vendor/autoload.php");
 
 	$dbConfig = ( require_once(APP_ROOT."system/dbsetup.php") );

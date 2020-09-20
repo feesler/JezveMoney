@@ -5,7 +5,7 @@ namespace JezveMoney\App\Admin\Controller;
 use JezveMoney\Core\AdminController;
 
 
-class ApiConsoleAdminController extends AdminController
+class ApiConsole extends AdminController
 {
 	public function index()
 	{

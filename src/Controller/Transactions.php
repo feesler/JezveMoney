@@ -11,14 +11,13 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\DebtModel;
 
 
-class TransactionsController extends TemplateController
+class Transactions extends TemplateController
 {
 	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
 	protected $debtRequiredFields = [ "type", "person_id", "acc_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
 	protected $model = NULL;
 	protected $accModel = NULL;
 	protected $currModel = NULL;
-
 
 
 	protected function onStart()

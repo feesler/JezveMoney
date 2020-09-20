@@ -6,10 +6,10 @@ use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\DebtModel;
-use JezveMoney\App\Item\Transaction;
+use JezveMoney\App\Item\TransactionItem;
 
 
-class TransactionApiController extends ApiController
+class Transaction extends ApiController
 {
 	protected $requiredFields = [ "type", "src_id", "dest_id", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
 	protected $debtRequiredFields = [ "type", "person_id", "acc_id", "op", "src_amount", "dest_amount", "src_curr", "dest_curr", "date", "comment" ];
@@ -38,7 +38,7 @@ class TransactionApiController extends ApiController
 			if (is_null($item))
 				$this->fail("Transaction $trans_id not found");
 
-			$res[] = new Transaction($item);
+			$res[] = new TransactionItem($item);
 		}
 
 		$this->ok($res);
@@ -115,7 +115,7 @@ class TransactionApiController extends ApiController
 		$res = [];
 		foreach($items as $item)
 		{
-			$res[] = new Transaction($item);
+			$res[] = new TransactionItem($item);
 		}
 
 		$this->ok($res);

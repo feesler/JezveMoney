@@ -8,5 +8,14 @@
 	},
 	"require-dev": {
 		"phan/phan": "^3.2"
+	},
+	"autoload": {
+		"psr-4": {
+			"JezveMoney\\Core\\": "src/system/",
+			"JezveMoney\\App\\": "src/",
+			"JezveMoney\\App\\Admin\\": "src/admin/",
+			"JezveMoney\\App\\API\\": "src/api/",
+			"JezveMoney\\App\\Item\\": "src/api/item/"
+		}
 	}
 }

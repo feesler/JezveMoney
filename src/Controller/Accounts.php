@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 
-class AccountsController extends TemplateController
+class Accounts extends TemplateController
 {
 	protected $model = null;
 	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon_id", "flags" ];

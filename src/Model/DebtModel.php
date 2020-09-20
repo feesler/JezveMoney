@@ -3,7 +3,6 @@
 namespace JezveMoney\App\Model;
 
 use JezveMoney\Core\Singleton;
-use JezveMoney\App\Model\TransactionModel;
 
 
 class DebtModel

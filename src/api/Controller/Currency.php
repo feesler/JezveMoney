@@ -4,10 +4,10 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\CurrencyModel;
-use JezveMoney\App\Item\Currency;
+use JezveMoney\App\Item\CurrencyItem;
 
 
-class CurrencyApiController extends ApiController
+class Currency extends ApiController
 {
 	protected $requiredFields = [ "name", "sign", "flags" ];
 	protected $model = NULL;
@@ -34,7 +34,7 @@ class CurrencyApiController extends ApiController
 			if (!$item)
 				$this->fail("Currency $curr_id not found");
 
-			$res[] = new Currency($item);
+			$res[] = new CurrencyItem($item);
 		}
 
 		$this->ok($res);
@@ -47,7 +47,7 @@ class CurrencyApiController extends ApiController
 		$currencies = $this->model->getData();
 		foreach($currencies as $item)
 		{
-			$res[] = new Currency($item);
+			$res[] = new CurrencyItem($item);
 		}
 
 		$this->ok($res);

@@ -7,7 +7,7 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
 
 
-class BalanceAdminController extends AdminController
+class Balance extends AdminController
 {
 	public function index()
 	{

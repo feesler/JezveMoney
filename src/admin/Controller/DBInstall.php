@@ -6,7 +6,7 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\Core\DBVersion;
 
 
-class DBInstallAdminController extends AdminController
+class DBInstall extends AdminController
 {
 	protected $dbVer = NULL;
 

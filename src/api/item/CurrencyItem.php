@@ -3,7 +3,7 @@
 namespace JezveMoney\App\Item;
 
 
-class Currency
+class CurrencyItem
 {
 	public $id = 0;
 	public $name = NULL;

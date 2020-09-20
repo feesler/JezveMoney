@@ -6,7 +6,7 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\App\Model\CurrencyModel;
 
 
-class CurrencyAdminController extends AdminController
+class Currency extends AdminController
 {
 	protected $model = NULL;
 

@@ -9,16 +9,16 @@
 	$router = new Core\Router();
 	$router->setNamespace("JezveMoney\\App\\Admin\\Controller");
 	$router->setRoutes([
-		"main" => "MainAdminController",
-		"dbinstall" => "DBInstallAdminController",
-		"balance" => "BalanceAdminController",
-		"currency" => "CurrencyAdminController",
-		"icon" => "IconAdminController",
-		"query" => "QueryAdminController",
-		"log" => "LogsAdminController",
-		"tests" => "TestsAdminController",
-		"apiconsole" => "ApiConsoleAdminController",
-		"user" => "UserAdminController"
+		"main" => "Main",
+		"dbinstall" => "DBInstall",
+		"balance" => "Balance",
+		"currency" => "Currency",
+		"icon" => "Icon",
+		"query" => "Query",
+		"log" => "Logs",
+		"tests" => "Tests",
+		"apiconsole" => "ApiConsole",
+		"user" => "User"
 	]);
 
 	$router->setActionsMap([

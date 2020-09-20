@@ -6,7 +6,7 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Message;
 
 
-class UserController extends TemplateController
+class User extends TemplateController
 {
 	public function index()
 	{

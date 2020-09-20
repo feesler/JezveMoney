@@ -4,10 +4,10 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\AccountModel;
-use JezveMoney\App\Item\Account;
+use JezveMoney\App\Item\AccountItem;
 
 
-class AccountApiController extends ApiController
+class Account extends ApiController
 {
 	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon_id", "flags" ];
 	protected $model = NULL;
@@ -34,7 +34,7 @@ class AccountApiController extends ApiController
 			if (is_null($item))
 				$this->fail("Account $acc_id not found");
 
-			$res[] = new Account($item);
+			$res[] = new AccountItem($item);
 		}
 
 		$this->ok($res);
@@ -53,7 +53,7 @@ class AccountApiController extends ApiController
 		$res = [];
 		foreach($accounts as $item)
 		{
-			$res[] = new Account($item);
+			$res[] = new AccountItem($item);
 		}
 
 		$this->ok($res);

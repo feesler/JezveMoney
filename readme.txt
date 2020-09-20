@@ -24,9 +24,9 @@ Update Node.js packages:
 
 Composer
 Update packages:
-	composer update
+	composer update --no-dev
 Optimize autoload:
-	composer dump-autoload -a
+	composer dump-autoload -a --no-dev
 
 
 Phan

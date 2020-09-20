@@ -6,7 +6,7 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\Core\MySqlDB;
 
 
-class QueryAdminController extends AdminController
+class Query extends AdminController
 {
 	protected $db = NULL;
 	protected $tableName = "admin_query";

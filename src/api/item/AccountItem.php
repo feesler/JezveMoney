@@ -3,7 +3,7 @@
 namespace JezveMoney\App\Item;
 
 
-class Account
+class AccountItem
 {
 	public $id = 0;
 	public $owner_id = 0;

@@ -3,7 +3,7 @@
 namespace JezveMoney\App\Item;
 
 
-class Transaction
+class TransactionItem
 {
 	public $id = 0;
 	public $type = 0;

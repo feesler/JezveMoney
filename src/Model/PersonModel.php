@@ -7,7 +7,6 @@ use function JezveMoney\Core\inSetCondition;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\Core\Singleton;
-use JezveMoney\App\Model\UserModel;
 
 
 class PersonModel extends CachedTable

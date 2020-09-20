@@ -6,7 +6,7 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Message;
 
 
-class PersonsController extends TemplateController
+class Persons extends TemplateController
 {
 	protected $requiredFields = [ "name", "flags" ];
 

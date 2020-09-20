@@ -7,15 +7,15 @@
 	$router = new Core\Router();
 	$router->setNamespace("JezveMoney\\App\\Controller");
 	$router->setRoutes([
-		"main" => "MainController",
-		"accounts" => "AccountsController",
-		"persons" => "PersonsController",
-		"transactions" => "TransactionsController",
-		"profile" => "ProfileController",
-		"statistics" => "StatisticsController",
-		"user" => "UserController",
-		"fastcommit" => "FastCommitController",
-		"checkbalance" => "CheckBalanceController"
+		"main" => "Main",
+		"accounts" => "Accounts",
+		"persons" => "Persons",
+		"transactions" => "Transactions",
+		"profile" => "Profile",
+		"statistics" => "Statistics",
+		"user" => "User",
+		"fastcommit" => "FastCommit",
+		"checkbalance" => "CheckBalance"
 	]);
 
 	$router->setAliases([

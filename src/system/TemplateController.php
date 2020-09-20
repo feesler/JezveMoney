@@ -2,6 +2,7 @@
 
 namespace JezveMoney\Core;
 
+use JezveMoney\Core\Controller;
 use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\PersonModel;
 

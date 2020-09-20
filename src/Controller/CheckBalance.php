@@ -9,7 +9,7 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
 
 
-class CheckBalanceController extends TemplateController
+class CheckBalance extends TemplateController
 {
 	protected $accName = NULL;
 

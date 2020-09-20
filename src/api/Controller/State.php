@@ -6,12 +6,12 @@ use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\Account;
-use JezveMoney\App\Item\Person;
-use JezveMoney\App\Item\Transaction;
+use JezveMoney\App\Item\AccountItem;
+use JezveMoney\App\Item\PersonItem;
+use JezveMoney\App\Item\TransactionItem;
 
 
-class StateApiController extends ApiController
+class State extends ApiController
 {
 	protected $trModel = NULL;
 	protected $accModel = NULL;
@@ -37,7 +37,7 @@ class StateApiController extends ApiController
 		$items = $this->accModel->getData([ "full" => TRUE, "type" => "all" ]);
 		foreach($items as $item)
 		{
-			$res->accounts->data[] = new Account($item);
+			$res->accounts->data[] = new AccountItem($item);
 		}
 		$res->accounts->autoincrement = $this->accModel->autoIncrement();
 
@@ -46,7 +46,7 @@ class StateApiController extends ApiController
 		$items = $this->trModel->getData([ "onPage" => 0 ]);
 		foreach($items as $item)
 		{
-			$res->transactions->data[] = new Transaction($item);
+			$res->transactions->data[] = new TransactionItem($item);
 		}
 		$res->transactions->autoincrement = $this->trModel->autoIncrement();
 
@@ -55,7 +55,7 @@ class StateApiController extends ApiController
 		$items = $this->pModel->getData([ "type" => "all" ]);
 		foreach($items as $item)
 		{
-			$res->persons->data[] = new Person($item);
+			$res->persons->data[] = new PersonItem($item);
 		}
 		$res->persons->autoincrement = $this->pModel->autoIncrement();
 

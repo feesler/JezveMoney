@@ -9,7 +9,6 @@ use function JezveMoney\Core\qnull;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
-use JezveMoney\App\Model\UserModel;
 
 
 class TransactionModel extends CachedTable

@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 
-class FastCommitController extends TemplateController
+class FastCommit extends TemplateController
 {
 	protected $columns = [
 		"date" => NULL,

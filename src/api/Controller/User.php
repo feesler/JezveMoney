@@ -6,7 +6,7 @@ use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
 
 
-class UserApiController extends ApiController
+class User extends ApiController
 {
 	protected $createRequiredFields = [ "login", "password", "name" ];
 

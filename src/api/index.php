@@ -7,14 +7,14 @@
 	$router = new Core\Router();
 	$router->setNamespace("JezveMoney\\App\\API\\Controller");
 	$router->setRoutes([
-		"currency" => "CurrencyApiController",
-		"icon" => "IconApiController",
-		"account" => "AccountApiController",
-		"person" => "PersonApiController",
-		"transaction" => "TransactionApiController",
-		"user" => "UserApiController",
-		"profile" => "ProfileApiController",
-		"state" => "StateApiController"
+		"currency" => "Currency",
+		"icon" => "Icon",
+		"account" => "Account",
+		"person" => "Person",
+		"transaction" => "Transaction",
+		"user" => "User",
+		"profile" => "Profile",
+		"state" => "State"
 	]);
 
 	$router->setAliases([

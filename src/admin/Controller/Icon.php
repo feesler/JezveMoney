@@ -6,7 +6,7 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\App\Model\IconModel;
 
 
-class IconAdminController extends AdminController
+class Icon extends AdminController
 {
 	protected $model = NULL;
 

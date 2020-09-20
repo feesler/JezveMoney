@@ -3,7 +3,7 @@
 namespace JezveMoney\App\Item;
 
 
-class Icon
+class IconItem
 {
 	public $id = 0;
 	public $name = NULL;

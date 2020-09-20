@@ -8,7 +8,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 
 
-class MainController extends TemplateController
+class Main extends TemplateController
 {
 	public function index()
 	{

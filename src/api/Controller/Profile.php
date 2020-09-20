@@ -8,7 +8,7 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 
 
-class ProfileApiController extends ApiController
+class Profile extends ApiController
 {
 	protected $personMod = NULL;
 

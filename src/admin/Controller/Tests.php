@@ -7,7 +7,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 
 
-class TestsAdminController extends AdminController
+class Tests extends AdminController
 {
 	public function index()
 	{

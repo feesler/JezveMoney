@@ -3,6 +3,7 @@
 namespace JezveMoney\App\Model;
 
 use JezveMoney\Core\MySqlDB;
+use function JezveMoney\Core\qnull;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;

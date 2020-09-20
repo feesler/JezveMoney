@@ -5,7 +5,7 @@ namespace JezveMoney\App\Admin\Controller;
 use JezveMoney\Core\AdminController;
 
 
-class MainAdminController extends AdminController
+class Main extends AdminController
 {
 	public function index()
 	{

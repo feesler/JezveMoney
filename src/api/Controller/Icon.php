@@ -4,10 +4,10 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\IconModel;
-use JezveMoney\App\Item\Icon;
+use JezveMoney\App\Item\IconItem;
 
 
-class IconApiController extends ApiController
+class Icon extends ApiController
 {
 	protected $requiredFields = [ "name", "file", "type" ];
 	protected $model = NULL;
@@ -34,7 +34,7 @@ class IconApiController extends ApiController
 			if (!$item)
 				$this->fail("Icon $item_id not found");
 
-			$res[] = new Icon($item);
+			$res[] = new IconItem($item);
 		}
 
 		$this->ok($res);
@@ -47,7 +47,7 @@ class IconApiController extends ApiController
 		$itemsData = $this->model->getData();
 		foreach($itemsData as $item)
 		{
-			$res[] = new Icon($item);
+			$res[] = new IconItem($item);
 		}
 
 		$this->ok($res);

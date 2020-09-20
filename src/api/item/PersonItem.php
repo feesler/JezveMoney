@@ -5,7 +5,7 @@ namespace JezveMoney\App\Item;
 use JezveMoney\App\Model\AccountModel;
 
 
-class Person
+class PersonItem
 {
 	public $id = 0;
 	public $name = NULL;

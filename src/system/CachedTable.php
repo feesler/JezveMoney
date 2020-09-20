@@ -3,12 +3,6 @@
 namespace JezveMoney\Core;
 
 
-trait CachedInstance
-{
-	static protected $dcache = NULL;
-}
-
-
 abstract class CachedTable extends Model
 {
 	protected $cache = NULL;
