@@ -32,3 +32,7 @@ Optimize autoload:
 Phan
 Run from app root:
 .\src\vendor\bin\phan
+
+PHP Code Sniffer
+Run from app root:
+.\src\vendor\bin\phpcs --standard=PSR2 <files to check>
