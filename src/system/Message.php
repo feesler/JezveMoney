@@ -2,107 +2,115 @@
 
 namespace JezveMoney\Core;
 
-	// Type of messages
-	define("MSG_TYPE_NONE", 0);
-	define("MSG_TYPE_SUCCESS", 1);
-	define("MSG_TYPE_ERROR", 2);
+    // Type of messages
+    define("MSG_TYPE_NONE", 0);
+    define("MSG_TYPE_SUCCESS", 1);
+    define("MSG_TYPE_ERROR", 2);
 
 
 class Message
 {
-	private static $msgArray = [];
+    private static $msgArray = [];
 
 
-	// Define new message constant
-	public static function add($message_id, $msgType = MSG_TYPE_NONE, $message = NULL)
-	{
-		if ($msgType != MSG_TYPE_NONE && !is_null($message))
-			self::$msgArray[$message_id] = [$msgType, $message];
-		else
-			self::$msgArray[$message_id] = [MSG_TYPE_NONE];
-	}
+    // Define new message constant
+    public static function add($message_id, $msgType = MSG_TYPE_NONE, $message = null)
+    {
+        if ($msgType != MSG_TYPE_NONE && !is_null($message)) {
+            self::$msgArray[$message_id] = [$msgType, $message];
+        } else {
+            self::$msgArray[$message_id] = [MSG_TYPE_NONE];
+        }
+    }
 
 
-	// Try to set message
-	public static function set($msg_id)
-	{
-		sessionStart();
+    // Try to set message
+    public static function set($msg_id)
+    {
+        sessionStart();
 
-		if (!isset(self::$msgArray[$msg_id]))
-			return FALSE;
+        if (!isset(self::$msgArray[$msg_id])) {
+            return false;
+        }
 
-		$_SESSION["msg"] = $msg_id;
+        $_SESSION["msg"] = $msg_id;
 
-		return TRUE;
-	}
-
-
-	// Return message string by id
-	public static function get($msg_id)
-	{
-		if (!isset(self::$msgArray[$msg_id]))
-			return NULL;
-
-		$msgParam = self::$msgArray[$msg_id];
-		$msgMessage = $msgParam[1];
-
-		return $msgMessage;
-	}
+        return true;
+    }
 
 
-	// Check message is set
-	public static function isSet()
-	{
-		sessionStart();
+    // Return message string by id
+    public static function get($msg_id)
+    {
+        if (!isset(self::$msgArray[$msg_id])) {
+            return null;
+        }
 
-		if (!isset($_SESSION["msg"]))
-			return FALSE;
+        $msgParam = self::$msgArray[$msg_id];
+        $msgMessage = $msgParam[1];
 
-		$msg_id = intval($_SESSION["msg"]);
-		if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id]))
-			return FALSE;
-
-		$msgParam = self::$msgArray[$msg_id];
-		$msgType = $msgParam[0];
-		if ($msgType == MSG_TYPE_NONE)
-			return FALSE;
-
-		return TRUE;
-	}
+        return $msgMessage;
+    }
 
 
-	// Check message and show it if available
-	public static function check()
-	{
-		sessionStart();
+    // Check message is set
+    public static function isSet()
+    {
+        sessionStart();
 
-		if (!isset($_SESSION["msg"]))
-			return;
+        if (!isset($_SESSION["msg"])) {
+            return false;
+        }
 
-		$msg_id = intval($_SESSION["msg"]);
-		if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id]))
-			return;
+        $msg_id = intval($_SESSION["msg"]);
+        if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id])) {
+            return false;
+        }
 
-		$msgParam = self::$msgArray[$msg_id];
-		$msgType = $msgParam[0];
-		if ($msgType == MSG_TYPE_NONE)
-		{
-			$_SESSION["msg"] = MSG_NONE;
-			return;
-		}
+        $msgParam = self::$msgArray[$msg_id];
+        $msgType = $msgParam[0];
+        if ($msgType == MSG_TYPE_NONE) {
+            return false;
+        }
 
-		$msgMessage = $msgParam[1];
+        return true;
+    }
 
-		$msgClass = "";
-		if ($msgType == MSG_TYPE_SUCCESS)
-			$msgClass = "msg_success";
-		else if ($msgType == MSG_TYPE_ERROR)
-			$msgClass = "msg_error";
 
-		include(TPL_PATH."message.tpl");
+    // Check message and show it if available
+    public static function check()
+    {
+        sessionStart();
 
-		$_SESSION["msg"] = MSG_NONE;
-	}
+        if (!isset($_SESSION["msg"])) {
+            return;
+        }
+
+        $msg_id = intval($_SESSION["msg"]);
+        if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id])) {
+            return;
+        }
+
+        $msgParam = self::$msgArray[$msg_id];
+        $msgType = $msgParam[0];
+        if ($msgType == MSG_TYPE_NONE) {
+            $_SESSION["msg"] = MSG_NONE;
+            return;
+        }
+
+        $msgMessage = $msgParam[1];
+
+        $msgClass = "";
+        if ($msgType == MSG_TYPE_SUCCESS) {
+            $msgClass = "msg_success";
+        } elseif ($msgType == MSG_TYPE_ERROR) {
+            $msgClass = "msg_error";
+        }
+
+        include(TPL_PATH . "message.tpl");
+
+        $_SESSION["msg"] = MSG_NONE;
+    }
 }
 
 

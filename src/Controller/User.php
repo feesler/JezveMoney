@@ -5,109 +5,104 @@ namespace JezveMoney\App\Controller;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Message;
 
-
 class User extends TemplateController
 {
-	public function index()
-	{
-	}
+    public function index()
+    {
+    }
 
 
-	function fail($msg = NULL, $action = NULL)
-	{
-		if (!is_null($msg))
-			Message::set($msg);
-		if ($action == "register")
-			setLocation(BASEURL."register/");
-		else
-			setLocation(BASEURL."login/");
-	}
+    protected function fail($msg = null, $action = null)
+    {
+        if (!is_null($msg)) {
+            Message::set($msg);
+        }
+
+        if ($action == "register") {
+            setLocation(BASEURL . "register/");
+        } else {
+            setLocation(BASEURL . "login/");
+        }
+    }
 
 
-	public function login()
-	{
-		if ($this->isPOST())
-		{
-			$this->loginUser();
-			return;
-		}
+    public function login()
+    {
+        if ($this->isPOST()) {
+            $this->loginUser();
+        }
 
-		$titleString = "Jezve Money | Log in";
+        $titleString = "Jezve Money | Log in";
 
-		$this->css->page[] = "user.css";
-		$this->buildCSS();
-		array_push($this->jsArr, "main.js");
+        $this->css->page[] = "user.css";
+        $this->buildCSS();
+        array_push($this->jsArr, "main.js");
 
-		include(TPL_PATH."login.tpl");
-	}
+        include(TPL_PATH . "login.tpl");
+    }
 
 
-	protected function loginUser()
-	{
-		if (!$this->isPOST())
-		{
-			setLocation(BASEURL."login/");
-		}
+    protected function loginUser()
+    {
+        $loginFields = [ "login", "password" ];
 
-		$defMsg = ERR_LOGIN_FAIL;
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "login/");
+        }
 
-		if (!isset($_POST["login"]) || !isset($_POST["password"]))
-			$this->fail($defMsg);
+        $reqData = checkFields($_POST, $loginFields);
+        if (!$this->uMod->login($reqData)) {
+            $this->fail(ERR_LOGIN_FAIL);
+        }
 
-		if (!$this->uMod->login($_POST["login"], $_POST["password"]))
-			$this->fail($defMsg);
+        Message::set(MSG_LOGIN);
 
-		Message::set(MSG_LOGIN);
-
-		setLocation(BASEURL);
-	}
+        setLocation(BASEURL);
+    }
 
 
-	public function logout()
-	{
-		$this->uMod->logout();
+    public function logout()
+    {
+        $this->uMod->logout();
 
-		setLocation(BASEURL."login/");
-	}
-
-
-	public function register()
-	{
-		if ($this->isPOST())
-		{
-			$this->registerUser();
-			return;
-		}
-
-		$titleString = "Jezve Money | Registration";
-
-		$this->css->page[] = "user.css";
-		$this->buildCSS();
-		array_push($this->jsArr, "main.js");
-
-		include(TPL_PATH."register.tpl");
-	}
+        setLocation(BASEURL . "login/");
+    }
 
 
-	protected function registerUser()
-	{
-		if (!$this->isPOST())
-		{
-			setLocation(BASEURL);
-		}
+    public function register()
+    {
+        if ($this->isPOST()) {
+            $this->registerUser();
+        }
 
-		$defMsg = ERR_REGISTER_FAIL;
+        $titleString = "Jezve Money | Registration";
 
-		if (!isset($_POST["login"]) || !isset($_POST["password"]) || !isset($_POST["name"]))
-			$this->fail($defMsg, "register");
+        $this->css->page[] = "user.css";
+        $this->buildCSS();
 
-		if (!$this->uMod->create([ "login" => $_POST["login"],
-									"password" => $_POST["password"],
-									"name" => $_POST["name"] ]))
-			$this->fail($defMsg);
+        array_push($this->jsArr, ...[
+            "main.js"
+        ]);
 
-		Message::set(MSG_REGISTER);
+        include(TPL_PATH . "register.tpl");
+    }
 
-		setLocation(BASEURL);
-	}
+
+    protected function registerUser()
+    {
+        $registerFields = [ "login", "password", "name" ];
+
+        if (!$this->isPOST()) {
+            setLocation(BASEURL);
+        }
+
+        $reqData = checkFields($_POST, $registerFields);
+        if (!$this->uMod->create($reqData)) {
+            $this->fail(ERR_REGISTER_FAIL);
+        }
+
+        Message::set(MSG_REGISTER);
+
+        setLocation(BASEURL);
+    }
 }

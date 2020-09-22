@@ -1,52 +1,50 @@
 <?php
-	namespace JezveMoney;
 
-	require_once("../system/setup.php");
-	require_once("../system/router.php");
+namespace JezveMoney;
 
-	$router = new Core\Router();
-	$router->setNamespace("JezveMoney\\App\\API\\Controller");
-	$router->setRoutes([
-		"currency" => "Currency",
-		"icon" => "Icon",
-		"account" => "Account",
-		"person" => "Person",
-		"transaction" => "Transaction",
-		"user" => "User",
-		"profile" => "Profile",
-		"state" => "State"
-	]);
+require_once("../system/setup.php");
+require_once("../system/router.php");
 
-	$router->setAliases([
-		"login" => "user/login",
-		"logout" => "user/logout",
-		"register" => "user/register",
-	]);
+$router = new Core\Router();
+$router->setNamespace("JezveMoney\\App\\API\\Controller");
+$router->setRoutes([
+    "currency" => "Currency",
+    "icon" => "Icon",
+    "account" => "Account",
+    "person" => "Person",
+    "transaction" => "Transaction",
+    "user" => "User",
+    "profile" => "Profile",
+    "state" => "State"
+]);
 
-	$router->setActionsMap([
-		"new" => "create",
-		"edit" => "update",
-		"delete" => "del",
-		"list" => "getList"
-	]);
+$router->setAliases([
+    "login" => "user/login",
+    "logout" => "user/logout",
+    "register" => "user/register",
+]);
 
-	$router->onStart(function($controller, $contrStr, $routeParts)
-	{
-		// Check correct user authentication for controller
-		$loggedOutControllers = ["user/login", "user/register"];
-		$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
-		$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+$router->setActionsMap([
+    "new" => "create",
+    "edit" => "update",
+    "delete" => "del",
+    "list" => "getList"
+]);
 
-		$controller->authRequired = !$isLogOutCont;
-	});
+$router->onStart(function ($controller, $contrStr, $routeParts) {
 
-	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
-	{
-		if ($controller instanceof Core\ApiController)
-		{
-			$controller->initAPI();
-		}
-	});
+    // Check correct user authentication for controller
+    $loggedOutControllers = ["user/login", "user/register"];
+    $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
+    $isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+    $controller->authRequired = !$isLogOutCont;
+});
 
+$router->onBeforeAction(function ($controller, $contrStr, $action, $routeParts) {
 
-	$router->route();
+    if ($controller instanceof Core\ApiController) {
+        $controller->initAPI();
+    }
+});
+
+$router->route();

@@ -6,149 +6,165 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 
-
 class Profile extends TemplateController
 {
-	public function index()
-	{
-		$uObj = $this->uMod->getItem($this->user_id);
-		if (!$uObj)
-			throw new \Error("User not found");
+    public function index()
+    {
+        $uObj = $this->uMod->getItem($this->user_id);
+        if (!$uObj) {
+            throw new \Error("User not found");
+        }
 
-		$user_login = $uObj->login;
+        $user_login = $uObj->login;
+        $action = $this->action;
+        $person_name = "";
 
-		$action = $this->action;
+        $pObj = $this->personMod->getItem($uObj->owner_id);
+        if (!$pObj) {
+            throw new \Error("Person not found");
+        }
 
-		$person_name = "";
+        $person_name = $pObj->name;
 
-		$pObj = $this->personMod->getItem($uObj->owner_id);
-		if (!$pObj)
-			throw new \Error("Person not found");
+        $titleString = "Jezve Money | Profile";
+        if ($action == "changename") {
+            $titleString .= " | Change name";
+        } elseif ($action == "changepassword") {
+            $titleString .= " | Change password";
+        }
 
-		$person_name = $pObj->name;
+        $this->css->libs[] = "iconlink.css";
+        $this->css->page[] = "user.css";
+        $this->buildCSS();
+        array_push($this->jsArr, "main.js");
 
-		$titleString = "Jezve Money | Profile";
-		if ($action == "changename")
-			$titleString .= " | Change name";
-		else if ($action == "changepassword")
-			$titleString .= " | Change password";
-
-		$this->css->libs[] = "iconlink.css";
-		$this->css->page[] = "user.css";
-		$this->buildCSS();
-		array_push($this->jsArr, "main.js");
-
-		include(TPL_PATH."profile.tpl");
-	}
-
-
-	function fail($msg = NULL)
-	{
-		if (!is_null($msg))
-			Message::set($msg);
-		setLocation(BASEURL."profile/");
-	}
+        include(TPL_PATH . "profile.tpl");
+    }
 
 
-	public function changeName()
-	{
-		$requiredFields = [ "name" ];
+    protected function fail($msg = null)
+    {
+        if (!is_null($msg)) {
+            Message::set($msg);
+        }
 
-		if (!$this->isPOST())
-			setLocation(BASEURL."profile/");
-
-		$defMsg = ERR_PROFILE_NAME;
-
-		$reqData = checkFields($_POST, $requiredFields);
-		if ($reqData === FALSE)
-			$this->fail($defMsg);
-
-		$owner_id = $this->uMod->getOwner($this->user_id);
-
-		if (!$this->personMod->update($owner_id, $reqData))
-			$this->fail($defMsg);
-
-		Message::set(MSG_PROFILE_NAME);
-
-		setLocation(BASEURL."profile/");
-	}
+        setLocation(BASEURL . "profile/");
+    }
 
 
-	public function changePass()
-	{
-		$requiredFields = [ "current", "new" ];
+    public function changeName()
+    {
+        $requiredFields = ["name"];
 
-		if (!$this->isPOST())
-			setLocation(BASEURL."profile/");
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "profile/");
+        }
 
-		$defMsg = ERR_PROFILE_PASSWORD;
+        $defMsg = ERR_PROFILE_NAME;
 
-		$reqData = checkFields($_POST, $requiredFields);
-		if ($reqData === FALSE)
-			$this->fail($defMsg);
+        $reqData = checkFields($_POST, $requiredFields);
+        if ($reqData === false) {
+            $this->fail($defMsg);
+        }
 
-		$uObj = $this->uMod->getItem($this->user_id);
-		if (!$uObj)
-			$this->fail($defMsg);
+        $owner_id = $this->uMod->getOwner($this->user_id);
 
-		if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]))
-			$this->fail($defMsg);
+        if (!$this->personMod->update($owner_id, $reqData)) {
+            $this->fail($defMsg);
+        }
 
-		Message::set(MSG_PROFILE_PASSWORD);
+        Message::set(MSG_PROFILE_NAME);
 
-		setLocation(BASEURL."profile/");
-	}
-
-
-	public function reset()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."profile/");
-
-		$defMsg = ERR_ACCOUNTS_RESET;
-
-		$accMod = AccountModel::getInstance();
-		if (!$accMod->reset())
-			$this->fail($defMsg);
-
-		Message::set(MSG_ACCOUNTS_RESET);
-
-		setLocation(BASEURL."profile/");
-	}
+        setLocation(BASEURL . "profile/");
+    }
 
 
-	public function resetAll()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."profile/");
+    public function changePass()
+    {
+        $requiredFields = ["current", "new"];
 
-		$defMsg = ERR_PROFILE_RESETALL;
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "profile/");
+        }
 
-		$accMod = AccountModel::getInstance();
-		if (!$accMod->reset())
-			$this->fail($defMsg);
+        $defMsg = ERR_PROFILE_PASSWORD;
 
-		if (!$this->personMod->reset())
-			$this->fail($defMsg);
+        $reqData = checkFields($_POST, $requiredFields);
+        if ($reqData === false) {
+            $this->fail($defMsg);
+        }
 
-		Message::set(MSG_PROFILE_RESETALL);
+        $uObj = $this->uMod->getItem($this->user_id);
+        if (!$uObj) {
+            $this->fail($defMsg);
+        }
 
-		setLocation(BASEURL."profile/");
-	}
+        if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"])) {
+            $this->fail($defMsg);
+        }
+
+        Message::set(MSG_PROFILE_PASSWORD);
+
+        setLocation(BASEURL . "profile/");
+    }
 
 
-	public function del()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."profile/");
+    public function reset()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "profile/");
+        }
 
-		$defMsg = ERR_PROFILE_DELETE;
+        $defMsg = ERR_ACCOUNTS_RESET;
 
-		if (!$this->uMod->del($this->user_id))
-			$this->fail($defMsg);
+        $accMod = AccountModel::getInstance();
+        if (!$accMod->reset()) {
+            $this->fail($defMsg);
+        }
 
-		Message::set(MSG_PROFILE_DELETE);
+        Message::set(MSG_ACCOUNTS_RESET);
 
-		setLocation(BASEURL."login/");
-	}
+        setLocation(BASEURL . "profile/");
+    }
+
+
+    public function resetAll()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "profile/");
+        }
+
+        $defMsg = ERR_PROFILE_RESETALL;
+
+        $accMod = AccountModel::getInstance();
+        if (!$accMod->reset()) {
+            $this->fail($defMsg);
+        }
+
+        if (!$this->personMod->reset()) {
+            $this->fail($defMsg);
+        }
+
+        Message::set(MSG_PROFILE_RESETALL);
+
+        setLocation(BASEURL . "profile/");
+    }
+
+
+    public function del()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "profile/");
+        }
+
+        $defMsg = ERR_PROFILE_DELETE;
+
+        if (!$this->uMod->del($this->user_id)) {
+            $this->fail($defMsg);
+        }
+
+        Message::set(MSG_PROFILE_DELETE);
+
+        setLocation(BASEURL . "login/");
+    }
 }

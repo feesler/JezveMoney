@@ -1,48 +1,46 @@
 <?php
-	namespace JezveMoney;
 
-	require_once("./system/setup.php");
-	require_once("./system/router.php");
+namespace JezveMoney;
 
-	$router = new Core\Router();
-	$router->setNamespace("JezveMoney\\App\\Controller");
-	$router->setRoutes([
-		"main" => "Main",
-		"accounts" => "Accounts",
-		"persons" => "Persons",
-		"transactions" => "Transactions",
-		"profile" => "Profile",
-		"statistics" => "Statistics",
-		"user" => "User",
-		"fastcommit" => "FastCommit",
-		"checkbalance" => "CheckBalance"
-	]);
+require_once("./system/setup.php");
+require_once("./system/router.php");
 
-	$router->setAliases([
-		"login" => "user/login",
-		"logout" => "user/logout",
-		"register" => "user/register",
-	]);
+$router = new Core\Router();
+$router->setNamespace("JezveMoney\\App\\Controller");
+$router->setRoutes([
+    "main" => "Main",
+    "accounts" => "Accounts",
+    "persons" => "Persons",
+    "transactions" => "Transactions",
+    "profile" => "Profile",
+    "statistics" => "Statistics",
+    "user" => "User",
+    "fastcommit" => "FastCommit",
+    "checkbalance" => "CheckBalance"
+]);
 
-	$router->setActionsMap([
-		"new" => "create",
-		"edit" => "update"
-	]);
+$router->setAliases([
+    "login" => "user/login",
+    "logout" => "user/logout",
+    "register" => "user/register",
+]);
 
-	$router->onStart(function($controller, $contrStr, $routeParts)
-	{
-		// Check correct user authentication for controller
-		$loggedOutControllers = ["user/login", "user/register"];
-		$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
-		$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+$router->setActionsMap([
+    "new" => "create",
+    "edit" => "update"
+]);
 
-		$controller->checkUser(!$isLogOutCont);
-	});
+$router->onStart(function ($controller, $contrStr, $routeParts) {
+    // Check correct user authentication for controller
+    $loggedOutControllers = ["user/login", "user/register"];
+    $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
+    $isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
 
-	$router->onBeforeAction(function($controller, $contrStr, $action)
-	{
-		$controller->initDefResources();
-	});
+    $controller->checkUser(!$isLogOutCont);
+});
 
+$router->onBeforeAction(function ($controller, $contrStr, $action) {
+    $controller->initDefResources();
+});
 
-	$router->route();
+$router->route();

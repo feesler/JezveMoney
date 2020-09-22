@@ -2,8 +2,7 @@
 
 namespace JezveMoney\Core;
 
-
 trait CachedInstance
 {
-	static protected $dcache = NULL;
+    protected static $dcache = null;
 }

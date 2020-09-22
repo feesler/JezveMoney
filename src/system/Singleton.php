@@ -2,27 +2,33 @@
 
 namespace JezveMoney\Core;
 
-
 trait Singleton
 {
-	protected static $instance = NULL;
+    protected static $instance = null;
 
 
-	private function __construct(){}
-	private function __clone(){}
-	private function __wakeup(){}
+    private function __construct()
+    {
+    }
+    private function __clone()
+    {
+    }
+    private function __wakeup()
+    {
+    }
 
-	public static function getInstance()
-	{
-		if (self::$instance === NULL)
-		{
-			self::$instance = new self();
-			self::$instance->onStart();
-		}
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+            self::$instance->onStart();
+        }
 
-		return self::$instance;
-	}
+        return self::$instance;
+    }
 
 
-	protected function onStart(){}
+    protected function onStart()
+    {
+    }
 }

@@ -13,342 +13,400 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-
 class Accounts extends TemplateController
 {
-	protected $model = null;
-	protected $requiredFields = [ "name", "initbalance", "curr_id", "icon_id", "flags" ];
+    protected $model = null;
+    protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
+
+
+    protected function onStart()
+    {
+        $this->model = AccountModel::getInstance();
+    }
+
+
+    public function index()
+    {
+        $accountsData = $this->model->getData(["type" => "all"]);
+
+        $tilesArr = $this->model->getTilesArray();
+        $hiddenTilesArr = $this->model->getTilesArray(["type" => "hidden"]);
+
+        $titleString = "Jezve Money | Accounts";
+
+        array_push($this->css->libs, ...[
+            "tiles.css",
+            "iconlink.css",
+            "toolbar.css"
+        ]);
+        $this->buildCSS();
+        array_push($this->jsArr, ...[
+            "selection.js",
+            "currency.js",
+            "toolbar.js",
+            "account.js",
+            "accounts.js"
+        ]);
 
+        include(TPL_PATH . "accounts.tpl");
+    }
 
-	protected function onStart()
-	{
-		$this->model = AccountModel::getInstance();
-	}
 
+    public function create()
+    {
+        if ($this->isPOST()) {
+            $this->createAccount();
+            return;
+        }
+
+        $action = "new";
+
+        $currMod = CurrencyModel::getInstance();
+
+        $accInfo = new \stdClass();
+        $accInfo->name = "";
+        $accInfo->curr_id = $currMod->getIdByPos(0);
+        $accInfo->balance = 0;
+        $accInfo->initbalance = 0;
+        $accInfo->icon_id = 0;
+        $accInfo->icon = null;
+        $accInfo->flags = 0;
+
+        $currObj = $currMod->getItem($accInfo->curr_id);
+        if (!$currObj) {
+            throw new \Error("Currency not found");
+        }
+
+        $accInfo->sign = $currObj->sign;
+        $accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
+        $tileAccName = "New account";
+
+        $currArr = $currMod->getData();
+
+        $iconModel = IconModel::getInstance();
+        $icons = $iconModel->getData();
+
+        $titleString = "Jezve Money | ";
+        $headString = "New account";
+        $titleString .= $headString;
+
+        array_push($this->css->libs, ...[
+            "iconlink.css",
+            "dropdown.css",
+            "tiles.css"
+        ]);
+        $this->buildCSS();
+        array_push($this->jsArr, ...[
+            "selection.js",
+            "currency.js",
+            "account.js",
+            "dropdown.js",
+            "decimalinput.js",
+            "accounts.js"
+        ]);
 
-	public function index()
-	{
-		$accountsData = $this->model->getData([ "type" => "all" ]);
+        include(TPL_PATH . "account.tpl");
+    }
 
-		$tilesArr = $this->model->getTilesArray();
-		$hiddenTilesArr = $this->model->getTilesArray([ "type" => "hidden" ]);
+
+    private function fail($msg = null)
+    {
+        if (!is_null($msg)) {
+            Message::set($msg);
+        }
 
-		$titleString = "Jezve Money | Accounts";
+        setLocation(BASEURL . "accounts/");
+    }
 
-		array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
-		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "toolbar.js", "account.js", "accounts.js");
 
-		include(TPL_PATH."accounts.tpl");
-	}
+    public function update()
+    {
+        if ($this->isPOST()) {
+            $this->updateAccount();
+            return;
+        }
 
+        $action = "edit";
 
-	public function create()
-	{
-		if ($this->isPOST())
-		{
-			$this->createAccount();
-			return;
-		}
+        $currMod = CurrencyModel::getInstance();
 
-		$action = "new";
+        $acc_id = intval($this->actionParam);
+        if (!$acc_id) {
+            $this->fail();
+        }
 
-		$currMod = CurrencyModel::getInstance();
+        $accInfo = $this->model->getItem($acc_id);
 
-		$accInfo = new \stdClass;
-		$accInfo->name = "";
-		$accInfo->curr_id = $currMod->getIdByPos(0);
-		$accInfo->balance = 0;
-		$accInfo->initbalance = 0;
-		$accInfo->icon_id = 0;
-		$accInfo->icon = NULL;
-		$accInfo->flags = 0;
+        $currObj = $currMod->getItem($accInfo->curr_id);
+        $accInfo->sign = ($currObj) ? $currObj->sign : null;
+        $accInfo->icon = $this->model->getIconFile($acc_id);
+        $accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
 
-		$currObj = $currMod->getItem($accInfo->curr_id);
-		if (!$currObj)
-			throw new \Error("Currency not found");
+        $tileAccName = $accInfo->name;
 
-		$accInfo->sign = $currObj->sign;
-		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
-		$tileAccName = "New account";
+        $currArr = $currMod->getData();
 
-		$currArr = $currMod->getData();
+        $iconModel = IconModel::getInstance();
+        $icons = $iconModel->getData();
 
-		$iconModel = IconModel::getInstance();
-		$icons = $iconModel->getData();
+        $titleString = "Jezve Money | ";
+        $headString = "Edit account";
+        $titleString .= $headString;
 
-		$titleString = "Jezve Money | ";
-		$headString = "New account";
-		$titleString .= $headString;
+        array_push($this->css->libs, ...[
+            "iconlink.css",
+            "dropdown.css",
+            "tiles.css"
+        ]);
+        $this->buildCSS();
 
-		array_push($this->css->libs, "iconlink.css", "dropdown.css", "tiles.css");
-		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "dropdown.js", "decimalinput.js", "accounts.js");
+        array_push($this->jsArr, ...[
+            "selection.js",
+            "currency.js",
+            "account.js",
+            "dropdown.js",
+            "decimalinput.js",
+            "accounts.js"
+        ]);
 
-		include(TPL_PATH."account.tpl");
-	}
+        include(TPL_PATH . "account.tpl");
+    }
 
 
-	private function fail($msg = NULL)
-	{
-		if (!is_null($msg))
-			Message::set($msg);
-		setLocation(BASEURL."accounts/");
-	}
+    protected function createAccount()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "accounts/");
+        }
 
+        $defMsg = ERR_ACCOUNT_CREATE;
 
-	public function update()
-	{
-		if ($this->isPOST())
-		{
-			$this->updateAccount();
-			return;
-		}
+        $reqData = checkFields($_POST, $this->requiredFields);
+        if ($reqData === false) {
+            $this->fail($defMsg);
+        }
 
-		$action = "edit";
+        $uObj = $this->uMod->getItem($this->user_id);
+        if (!$uObj) {
+            $this->fail($defMsg);
+        }
 
-		$currMod = CurrencyModel::getInstance();
+        $reqData["owner_id"] = $uObj->owner_id;
 
-		$acc_id = intval($this->actionParam);
-		if (!$acc_id)
-			$this->fail();
+        if (!$this->model->create($reqData)) {
+            $this->fail($defMsg);
+        }
 
-		$accInfo = $this->model->getItem($acc_id);
+        Message::set(MSG_ACCOUNT_CREATE);
 
-		$currObj = $currMod->getItem($accInfo->curr_id);
-		$accInfo->sign = ($currObj) ? $currObj->sign : NULL;
-		$accInfo->icon = $this->model->getIconFile($acc_id);
-		$accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
+        setLocation(BASEURL . "accounts/");
+    }
 
-		$tileAccName = $accInfo->name;
 
-		$currArr = $currMod->getData();
+    protected function updateAccount()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "accounts/");
+        }
 
-		$iconModel = IconModel::getInstance();
-		$icons = $iconModel->getData();
+        $defMsg = ERR_ACCOUNT_UPDATE;
 
-		$titleString = "Jezve Money | ";
-		$headString = "Edit account";
-		$titleString .= $headString;
+        if (!isset($_POST["id"])) {
+            $this->fail($defMsg);
+        }
 
-		array_push($this->css->libs, "iconlink.css", "dropdown.css", "tiles.css");
-		$this->buildCSS();
-		array_push($this->jsArr, "selection.js", "currency.js", "account.js", "dropdown.js", "decimalinput.js", "accounts.js");
+        $reqData = checkFields($_POST, $this->requiredFields);
+        if (!$this->model->update($_POST["id"], $reqData)) {
+            $this->fail($defMsg);
+        }
 
-		include(TPL_PATH."account.tpl");
-	}
+        Message::set(MSG_ACCOUNT_UPDATE);
 
+        setLocation(BASEURL . "accounts/");
+    }
 
-	protected function createAccount()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."accounts/");
 
-		$defMsg = ERR_ACCOUNT_CREATE;
+    public function show()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "accounts/");
+        }
 
-		$reqData = checkFields($_POST, $this->requiredFields);
-		if ($reqData === FALSE)
-			$this->fail($defMsg);
+        $defMsg = ERR_ACCOUNT_SHOW;
 
-		$uObj = $this->uMod->getItem($this->user_id);
-		if (!$uObj)
-			$this->fail($defMsg);
+        if (!isset($_POST["accounts"])) {
+            $this->fail($defMsg);
+        }
 
-		$reqData["owner_id"] = $uObj->owner_id;
+        $ids = explode(",", rawurldecode($_POST["accounts"]));
+        if (!$this->model->show($ids)) {
+            $this->fail($defMsg);
+        }
 
-		if (!$this->model->create($reqData))
-			$this->fail($defMsg);
+        setLocation(BASEURL . "accounts/");
+    }
 
-		Message::set(MSG_ACCOUNT_CREATE);
 
-		setLocation(BASEURL."accounts/");
-	}
+    public function hide()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "accounts/");
+        }
 
+        $defMsg = ERR_ACCOUNT_HIDE;
 
-	protected function updateAccount()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."accounts/");
+        if (!isset($_POST["accounts"])) {
+            $this->fail($defMsg);
+        }
 
-		$defMsg = ERR_ACCOUNT_UPDATE;
+        $ids = explode(",", rawurldecode($_POST["accounts"]));
+        if (!$this->model->hide($ids)) {
+            $this->fail($defMsg);
+        }
 
-		if (!isset($_POST["id"]))
-			$this->fail($defMsg);
+        setLocation(BASEURL . "accounts/");
+    }
 
-		$reqData = checkFields($_POST, $this->requiredFields);
-		if ($reqData === FALSE)
-			$this->fail($defMsg);
 
-		if (!$this->model->update($_POST["id"], $reqData))
-			$this->fail($defMsg);
+    public function del()
+    {
+        if (!$this->isPOST()) {
+            setLocation(BASEURL . "accounts/");
+        }
 
-		Message::set(MSG_ACCOUNT_UPDATE);
+        $defMsg = ERR_ACCOUNT_DELETE;
 
-		setLocation(BASEURL."accounts/");
-	}
+        if (!isset($_POST["accounts"])) {
+            $this->fail($defMsg);
+        }
 
+        $ids = explode(",", rawurldecode($_POST["accounts"]));
+        if (!$this->model->del($ids)) {
+            $this->fail($defMsg);
+        }
 
-	public function show()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."accounts/");
+        Message::set(MSG_ACCOUNT_DELETE);
 
-		$defMsg = ERR_ACCOUNT_SHOW;
+        setLocation(BASEURL . "accounts/");
+    }
 
-		if (!isset($_POST["accounts"]))
-			$this->fail($defMsg);
 
-		$ids = explode(",", rawurldecode($_POST["accounts"]));
-		if (!$this->model->show($ids))
-			$this->fail($defMsg);
+    // Short alias for Coordinate::stringFromColumnIndex() method
+    private static function columnStr($ind)
+    {
+        return Coordinate::stringFromColumnIndex($ind);
+    }
 
-		setLocation(BASEURL."accounts/");
-	}
 
-
-	public function hide()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."accounts/");
-
-		$defMsg = ERR_ACCOUNT_HIDE;
-
-		if (!isset($_POST["accounts"]))
-			$this->fail($defMsg);
-
-		$ids = explode(",", rawurldecode($_POST["accounts"]));
-		if (!$this->model->hide($ids))
-			$this->fail($defMsg);
-
-		setLocation(BASEURL."accounts/");
-	}
-
-
-	public function del()
-	{
-		if (!$this->isPOST())
-			setLocation(BASEURL."accounts/");
-
-		$defMsg = ERR_ACCOUNT_DELETE;
-
-		if (!isset($_POST["accounts"]))
-			$this->fail($defMsg);
-
-		$ids = explode(",", rawurldecode($_POST["accounts"]));
-		if (!$this->model->del($ids))
-			$this->fail($defMsg);
-
-		Message::set(MSG_ACCOUNT_DELETE);
-
-		setLocation(BASEURL."accounts/");
-	}
-
-
-	// Short alias for Coordinate::stringFromColumnIndex() method
-	private static function columnStr($ind)
-	{
-		return Coordinate::stringFromColumnIndex($ind);
-	}
-
-
-	// Short alias for Coordinate::columnIndexFromString() method
-	private static function columnInd($str)
-	{
-		return Coordinate::columnIndexFromString($str) - 1;
-	}
-
-
-	public function export()
-	{
-		$transMod = TransactionModel::getInstance();
-		$currMod = CurrencyModel::getInstance();
-		$spreadsheet = new Spreadsheet();
-		$sheet = $spreadsheet->getActiveSheet();
-
-		$ids = $this->getRequestedIds();
-
-		$writerType = "Csv";
-		$exportFileName = "Exported_".date("d.m.Y").".".strtolower($writerType);
-
-		$writer = IOFactory::createWriter($spreadsheet, $writerType);
-		if ($writer instanceof \PhpOffice\PhpSpreadsheet\Writer\Csv)
-		{
-			$writer->setDelimiter(';');
-			$writer->setEnclosure('"');
-			$writer->setLineEnding("\r\n");
-			$writer->setSheetIndex(0);
-		}
-
-		$columns = [
-			"id" => "ID",
-			"type" => "Type",
-			"src_amount" => "Source amount",
-			"dest_amount" => "Destination amount",
-			"src_result" => "Source result",
-			"dest_result" => "Destination result",
-			"date" => "Date",
-			"comment" => "Comment"
-		];
-
-		$colStr = [];
-		$row_ind = 1;
-		$ind = 1;
-		// Write header
-		foreach($columns as $col_id => $title)
-		{
-			$colStr[$col_id] = self::columnStr($ind++);
-			$sheet->setCellValue($colStr[$col_id].$row_ind, $title);
-		}
-
-		// Request transactions data and write to sheet
-		$transactionsList = $transMod->getData([ "accounts" => $ids ]);
-		foreach($transactionsList as $transaction)
-		{
-			$row_ind++;
-
-			$sheet->setCellValue($colStr["id"].$row_ind,
-									$transaction->id);
-
-			$sheet->setCellValue($colStr["type"].$row_ind,
-									TransactionModel::typeToString($transaction->type));
-
-			$sheet->setCellValue($colStr["src_amount"].$row_ind,
-									$currMod->format($transaction->src_amount, $transaction->src_curr));
-
-			$sheet->setCellValue($colStr["dest_amount"].$row_ind,
-									$currMod->format($transaction->dest_amount, $transaction->dest_curr));
-
-			$sheet->setCellValue($colStr["src_result"].$row_ind,
-									$currMod->format($transaction->src_result, $transaction->src_curr));
-
-			$sheet->setCellValue($colStr["dest_result"].$row_ind,
-									$currMod->format($transaction->dest_result, $transaction->dest_curr));
-
-			if ($writerType == "Csv")
-				$dateFmt = date("d.m.Y", $transaction->date);
-			else
-				$dateFmt = Date::PHPToExcel($transaction->date);
-			$sheet->setCellValue($colStr["date"].$row_ind, $dateFmt);
-
-			$sheet->setCellValue($colStr["comment"].$row_ind, $transaction->comment);
-		}
-
-		$spreadsheet->setActiveSheetIndex(0);
-
-		// Redirect output to a client’s web browser (Xlsx)
-		if ($writerType == "Csv")
-			header('Content-Type: test/csv');
-		header("Content-Disposition: attachment;filename=\"$exportFileName\"");
-		header("Cache-Control: max-age=0");
-		// If serving to IE 9, then the following may be needed
-		header("Cache-Control: max-age=1");
-		// If serving to IE over SSL, then the following may be needed
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");					// Date in the past
-		header("Last-Modified: ".gmdate('D, d M Y H:i:s')." GMT");			// always modified
-		header("Cache-Control: cache, must-revalidate");		// HTTP/1.1
-		header("Pragma: public");								// HTTP/1.0
-
-		$writer->save('php://output');
-		exit;
-	}
+    // Short alias for Coordinate::columnIndexFromString() method
+    private static function columnInd($str)
+    {
+        return Coordinate::columnIndexFromString($str) - 1;
+    }
+
+
+    public function export()
+    {
+        $transMod = TransactionModel::getInstance();
+        $currMod = CurrencyModel::getInstance();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $ids = $this->getRequestedIds();
+
+        $writerType = "Csv";
+        $exportFileName = "Exported_" . date("d.m.Y") . "." . strtolower($writerType);
+
+        $writer = IOFactory::createWriter($spreadsheet, $writerType);
+        if ($writer instanceof \PhpOffice\PhpSpreadsheet\Writer\Csv) {
+            $writer->setDelimiter(';');
+            $writer->setEnclosure('"');
+            $writer->setLineEnding("\r\n");
+            $writer->setSheetIndex(0);
+        }
+
+        $columns = [
+            "id" => "ID",
+            "type" => "Type",
+            "src_amount" => "Source amount",
+            "dest_amount" => "Destination amount",
+            "src_result" => "Source result",
+            "dest_result" => "Destination result",
+            "date" => "Date",
+            "comment" => "Comment"
+        ];
+
+        $colStr = [];
+        $row_ind = 1;
+        $ind = 1;
+        // Write header
+        foreach ($columns as $col_id => $title) {
+            $colStr[$col_id] = self::columnStr($ind++);
+            $sheet->setCellValue($colStr[$col_id] . $row_ind, $title);
+        }
+
+        // Request transactions data and write to sheet
+        $transactionsList = $transMod->getData(["accounts" => $ids]);
+        foreach ($transactionsList as $transaction) {
+            $row_ind++;
+
+            $sheet->setCellValue(
+                $colStr["id"] . $row_ind,
+                $transaction->id
+            );
+
+            $sheet->setCellValue(
+                $colStr["type"] . $row_ind,
+                TransactionModel::typeToString($transaction->type)
+            );
+
+            $sheet->setCellValue(
+                $colStr["src_amount"] . $row_ind,
+                $currMod->format($transaction->src_amount, $transaction->src_curr)
+            );
+
+            $sheet->setCellValue(
+                $colStr["dest_amount"] . $row_ind,
+                $currMod->format($transaction->dest_amount, $transaction->dest_curr)
+            );
+
+            $sheet->setCellValue(
+                $colStr["src_result"] . $row_ind,
+                $currMod->format($transaction->src_result, $transaction->src_curr)
+            );
+
+            $sheet->setCellValue(
+                $colStr["dest_result"] . $row_ind,
+                $currMod->format($transaction->dest_result, $transaction->dest_curr)
+            );
+
+            if ($writerType == "Csv") {
+                $dateFmt = date("d.m.Y", $transaction->date);
+            } else {
+                $dateFmt = Date::PHPToExcel($transaction->date);
+            }
+            $sheet->setCellValue($colStr["date"] . $row_ind, $dateFmt);
+
+            $sheet->setCellValue($colStr["comment"] . $row_ind, $transaction->comment);
+        }
+
+        $spreadsheet->setActiveSheetIndex(0);
+
+        // Redirect output to a client’s web browser (Xlsx)
+        if ($writerType == "Csv") {
+            header('Content-Type: test/csv');
+        }
+        header("Content-Disposition: attachment;filename=\"$exportFileName\"");
+        header("Cache-Control: max-age=0");
+        // If serving to IE 9, then the following may be needed
+        header("Cache-Control: max-age=1");
+        // If serving to IE over SSL, then the following may be needed
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");                    // Date in the past
+        header("Last-Modified: " . gmdate('D, d M Y H:i:s') . " GMT");            // always modified
+        header("Cache-Control: cache, must-revalidate");        // HTTP/1.1
+        header("Pragma: public");                                // HTTP/1.0
+
+        $writer->save('php://output');
+        exit;
+    }
 }

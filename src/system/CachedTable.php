@@ -2,145 +2,154 @@
 
 namespace JezveMoney\Core;
 
-
 abstract class CachedTable extends Model
 {
-	protected $cache = NULL;
+    protected $cache = null;
 
 
-	// Return link to cache of derived class
-	protected function &getDerivedCache()
-	{
-		return static::$dcache;
-	}
+    // Return link to cache of derived class
+    protected function &getDerivedCache()
+    {
+        return static::$dcache;
+    }
 
 
-	// Query data from DB and return result object
-	abstract protected function dataQuery();
+    // Query data from DB and return result object
+    abstract protected function dataQuery();
 
 
-	// Update cache
-	protected function updateCache()
-	{
-		$this->cache = [];
+    // Update cache
+    protected function updateCache()
+    {
+        $this->cache = [];
 
-		$qResult = $this->dataQuery();
-		if (!$qResult)
-			return;
+        $qResult = $this->dataQuery();
+        if (!$qResult) {
+            return;
+        }
 
-		while($row = $this->dbObj->fetchRow($qResult))
-		{
-			$obj = $this->rowToObj($row);
-			if (!is_null($obj))
-				$this->cache[$obj->id] = $obj;
-		}
-	}
-
-
-	// Check state of cache and update if needed
-	protected function checkCache()
-	{
-		$this->cache =& $this->getDerivedCache();
-
-		if (is_null($this->cache))
-			$this->updateCache();
-
-		return (!is_null($this->cache));
-	}
+        while ($row = $this->dbObj->fetchRow($qResult)) {
+            $obj = $this->rowToObj($row);
+            if (!is_null($obj)) {
+                $this->cache[$obj->id] = $obj;
+            }
+        }
+    }
 
 
-	// Return specified object from cache
-	public function getItem($obj_id)
-	{
-		$obj_id = intval($obj_id);
-		if (!$obj_id)
-			return NULL;
+    // Check state of cache and update if needed
+    protected function checkCache()
+    {
+        $this->cache =& $this->getDerivedCache();
 
-		if (!$this->checkCache())
-			return NULL;
+        if (is_null($this->cache)) {
+            $this->updateCache();
+        }
 
-		if (!isset($this->cache[$obj_id]))
-			return NULL;
-
-		return $this->cache[$obj_id];
-	}
+        return (!is_null($this->cache));
+    }
 
 
-	// Clean cached data. Next access to the cache will request update of data from DB
-	protected function cleanCache()
-	{
-		$this->cache = NULL;
-	}
+    // Return specified object from cache
+    public function getItem($obj_id)
+    {
+        $obj_id = intval($obj_id);
+        if (!$obj_id) {
+            return null;
+        }
+
+        if (!$this->checkCache()) {
+            return null;
+        }
+
+        if (!isset($this->cache[$obj_id])) {
+            return null;
+        }
+
+        return $this->cache[$obj_id];
+    }
 
 
-	// Return count of objects
-	public function getCount()
-	{
-		if (!$this->checkCache())
-			return 0;
-
-		return count($this->cache);
-	}
+    // Clean cached data. Next access to the cache will request update of data from DB
+    protected function cleanCache()
+    {
+        $this->cache = null;
+    }
 
 
-	// Return latest id from set of objects
-	public function getLatestId()
-	{
-		if (!$this->checkCache())
-			return 0;
+    // Return count of objects
+    public function getCount()
+    {
+        if (!$this->checkCache()) {
+            return 0;
+        }
 
-		$res = 0;
-		foreach($this->cache as $item_id => $itemObj)
-		{
-			$res = max($res, $item_id);
-		}
-
-		return $res;
-	}
+        return count($this->cache);
+    }
 
 
-	// Check is specified object is exist
-	public function is_exist($obj_id)
-	{
-		$obj_id = intval($obj_id);
-		if (!$obj_id)
-			return FALSE;
+    // Return latest id from set of objects
+    public function getLatestId()
+    {
+        if (!$this->checkCache()) {
+            return 0;
+        }
 
-		if (!$this->checkCache())
-			return FALSE;
+        $res = 0;
+        foreach ($this->cache as $item_id => $itemObj) {
+            $res = max($res, $item_id);
+        }
 
-		return isset($this->cache[$obj_id]);
-	}
-
-
-	// Return id of item by specified position
-	public function getIdByPos($position)
-	{
-		if (!$this->checkCache())
-			return 0;
-
-		$keys = array_keys($this->cache);
-		if (isset($keys[$position]))
-			return $keys[$position];
-
-		return 0;
-	}
+        return $res;
+    }
 
 
-	protected function postCreate($item_id)
-	{
-		$this->cleanCache();
-	}
+    // Check is specified object is exist
+    public function is_exist($obj_id)
+    {
+        $obj_id = intval($obj_id);
+        if (!$obj_id) {
+            return false;
+        }
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        return isset($this->cache[$obj_id]);
+    }
 
 
-	protected function postUpdate($item_id)
-	{
-		$this->cleanCache();
-	}
+    // Return id of item by specified position
+    public function getIdByPos($position)
+    {
+        if (!$this->checkCache()) {
+            return 0;
+        }
+
+        $keys = array_keys($this->cache);
+        if (isset($keys[$position])) {
+            return $keys[$position];
+        }
+
+        return 0;
+    }
 
 
-	protected function postDelete($item_id)
-	{
-		$this->cleanCache();
-	}
+    protected function postCreate($item_id)
+    {
+        $this->cleanCache();
+    }
+
+
+    protected function postUpdate($item_id)
+    {
+        $this->cleanCache();
+    }
+
+
+    protected function postDelete($item_id)
+    {
+        $this->cleanCache();
+    }
 }
