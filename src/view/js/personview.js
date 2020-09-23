@@ -49,13 +49,13 @@ PersonView.prototype.onStart = function()
 		    throw new Error('Failed to initialize Person view');
 		var btn = this.deleteBtn.querySelector('button');
 		if (!btn)
-			throw new Error('Failed to initialize Account view');
+			throw new Error('Failed to initialize Person view');
 
         btn.onclick = this.onDelete.bind(this);
 
 		this.delForm = ge('delform');
 		if (!this.delForm)
-			throw new Error('Failed to initialize Account view');
+			throw new Error('Failed to initialize Person view');
     }
 };
 
