@@ -211,7 +211,7 @@ select
 /* Transaction list */
 .trans-list > span
 {
-	color: #000000;
+	color: #DDDDDD;
 }
 
 
