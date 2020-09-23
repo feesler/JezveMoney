@@ -27,16 +27,6 @@ async function checkProfileNavigation()
 }
 
 
-async function deleteUserByLogin(login)
-{
-	// Check user not exist
-	let users = await api.user.list();
-	let apiUser = users.find(item => item.login == login);
-	if (apiUser)
-		await api.user.del(apiUser.id);
-}
-
-
 export async function relogin({ login, password })
 {
 	await checkLoginNavigation();
@@ -134,7 +124,7 @@ export async function resetAll()
 
 export async function changeName(newName)
 {
-	await test('Change user name', async () =>
+	await test(`Change user name ('${newName}')`, async () =>
 	{
 		await checkProfileNavigation();
 
@@ -162,7 +152,7 @@ export async function changeName(newName)
 
 export async function changePass({ oldPassword, newPassword })
 {
-	await test('Change password', async () =>
+	await test(`Change password ('${oldPassword}' > '${newPassword}')`, async () =>
 	{
 		await checkProfileNavigation();
 

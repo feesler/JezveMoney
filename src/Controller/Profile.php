@@ -17,14 +17,14 @@ class Profile extends TemplateController
 
         $user_login = $uObj->login;
         $action = $this->action;
-        $person_name = "";
 
         $pObj = $this->personMod->getItem($uObj->owner_id);
         if (!$pObj) {
             throw new \Error("Person not found");
         }
 
-        $person_name = $pObj->name;
+        $profileInfo = new \stdClass();
+        $profileInfo->name = $pObj->name;
 
         $titleString = "Jezve Money | Profile";
         if ($action == "changename") {
@@ -36,7 +36,10 @@ class Profile extends TemplateController
         $this->css->libs[] = "iconlink.css";
         $this->css->page[] = "user.css";
         $this->buildCSS();
-        array_push($this->jsArr, "main.js");
+        array_push($this->jsArr, ...[
+            "view.js",
+            "profileview.js"
+        ]);
 
         include(TPL_PATH . "profile.tpl");
     }

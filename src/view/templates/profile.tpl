@@ -21,7 +21,7 @@
 
 					<div class="profile_block">
 						<h2>User name</h2>
-						<span id="namestatic"><?=e($person_name)?></span>
+						<span id="namestatic"><?=e($profileInfo->name)?></span>
 						<div><a id="changeNameBtn" href="<?=BASEURL?>profile/changename/">Change</a></div>
 					</div>
 
@@ -51,11 +51,6 @@
 							<input id="delProfileBtn" class="btn submit-btn" type="button" value="Delete profile"></span>
 						</div>
 					</div>
-<?php	if ($action == "changepass") {		?>
-<script>onReady(showChangePasswordPopup);</script>
-<?php	} else if ($action == "changename") {		?>
-<script>onReady(showChangeNamePopup);</script>
-<?php	}	?>
 				</div>
 			</div>
 		</div>
@@ -66,7 +61,9 @@
 <form method="post" action="<?=BASEURL?>profile/changename/">
 	<div id="name-inp-block" class="validation-block view-row">
 		<label for="newname">New name</label>
-		<div class="stretch-input std_margin"><input id="newname" name="name" type="text" value="<?=e($person_name)?>"></div>
+		<div class="stretch-input std_margin">
+            <input id="newname" name="name" type="text" value="<?=e($profileInfo->name)?>">
+        </div>
 		<div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
 	</div>
 </form>
@@ -76,13 +73,17 @@
 <form method="post" action="<?=BASEURL?>profile/changepass/">
 	<div id="old-pwd-inp-block" class="validation-block view-row">
 		<label for="oldpwd">Current password</label>
-		<div class="stretch-input std_margin"><input id="oldpwd" name="current" type="password"></div>
+		<div class="stretch-input std_margin">
+            <input id="oldpwd" name="current" type="password">
+        </div>
 		<div class="invalid-feedback">Please input current password.</div>
 	</div>
 
 	<div id="new-pwd-inp-block" class="validation-block view-row">
 		<label for="newpwd">New password</label>
-		<div class="stretch-input std_margin"><input id="newpwd" name="new" type="password"></div>
+		<div class="stretch-input std_margin">
+            <input id="newpwd" name="new" type="password">
+        </div>
 		<div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>
 	</div>
 </form>
@@ -90,9 +91,12 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-	var p_name = <?=JSON::encode($person_name)?>;
-
-	onReady(initProfilePage);
+    var view = new ProfileView({
+        profile: <?=JSON::encode($profileInfo)?>,
+<?php	if ($this->action == "changepass" || $this->action == "changename") {		?>
+        action: <?=JSON::encode($this->action)?>
+<?php	}	?>
+    });
 </script>
 </body>
 </html>
