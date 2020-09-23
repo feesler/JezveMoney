@@ -74,7 +74,7 @@ AccountView.prototype.onStart = function()
 
 		this.delForm = ge('delform');
 		if (!this.delForm)
-			throw new Error('Invalid Account view');
+			throw new Error('Failed to initialize Account view');
 	}
 
 	this.form = ge('accForm');
@@ -161,12 +161,14 @@ AccountView.prototype.onSubmit = function()
 	if (!this.nameInp.value || this.nameInp.value.length < 1)
 	{
 		invalidateBlock('name-inp-block');
+        this.nameInp.focus();
 		valid = false;
 	}
 
 	if (!this.balanceInp.value || this.balanceInp.value.length < 1 || !isNum(this.balanceInp.value))
 	{
 		invalidateBlock('initbal-inp-block');
+        this.balanceInp.focus();
 		valid = false;
 	}
 
@@ -198,8 +200,8 @@ AccountView.prototype.showDeleteConfirmationPopup = function()
 			id : 'delete_warning',
 			content : singleAccDeleteMsg,
 			btn : {
-				okBtn : { onclick : this.onDeleteConrifmResult.bind(this, true) },
-				cancelBtn : { onclick : this.onDeleteConrifmResult.bind(this, false) }
+				okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
+				cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
 			}
 		});
 	}
@@ -211,8 +213,11 @@ AccountView.prototype.showDeleteConfirmationPopup = function()
 };
 
 
-// Delete popup callback
-AccountView.prototype.onDeleteConrifmResult = function(result)
+/**
+ * Delete confirmation result handler
+ * @param {boolean} result - user confirmed delete
+ */
+AccountView.prototype.onDeleteConfirmResult = function(result)
 {
 	if (this.delConfirmPopup)
 		this.delConfirmPopup.close();

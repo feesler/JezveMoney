@@ -181,14 +181,14 @@ AccountListView.prototype.showDeleteConfirmationPopup = function()
 			id : 'delete_warning',
 			content : singleAccDeleteMsg,
 			btn : {
-				okBtn : { onclick : this.onDeleteConrifmResult.bind(this, true) },
-				cancelBtn : { onclick : this.onDeleteConrifmResult.bind(this, false) }
+				okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
+				cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
 			}
 		});
 	}
 
-	this.delConfirmPopup.setTitle(singleAccDeleteTitle);
-	this.delConfirmPopup.setContent(singleAccDeleteMsg);
+	this.delConfirmPopup.setTitle((totalSelCount > 1) ? multiAccDeleteTitle : singleAccDeleteTitle);
+	this.delConfirmPopup.setContent((totalSelCount > 1) ? multiAccDeleteMsg : singleAccDeleteMsg);
 
 	this.delConfirmPopup.show();
 };
@@ -198,7 +198,7 @@ AccountListView.prototype.showDeleteConfirmationPopup = function()
  * Delete confirmation result handler
  * @param {boolean} result - user confirmed delete
  */
-AccountListView.prototype.onDeleteConrifmResult = function(result)
+AccountListView.prototype.onDeleteConfirmResult = function(result)
 {
 	if (this.delConfirmPopup)
 		this.delConfirmPopup.close();
