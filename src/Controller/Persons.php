@@ -49,10 +49,8 @@ class Persons extends TemplateController
             return;
         }
 
-        $action = "new";
-
-        $p_id = 0;
         $pInfo = new \stdClass();
+        $pInfo->id = 0;
         $pInfo->name = "";
         $pInfo->flags = 0;
 
@@ -76,8 +74,6 @@ class Persons extends TemplateController
         if ($this->isPOST()) {
             $this->updatePerson();
         }
-
-        $action = "edit";
 
         $p_id = intval($this->actionParam);
         if (!$p_id) {

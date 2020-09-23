@@ -12,15 +12,15 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1><?=e($headString)?></h1>
-<?php	if ($action == "edit") {	?>
+<?php	if ($this->action == "update") {	?>
 						<div id="del_btn" class="iconlink"><button type="button"><span class="iconlink__icon"><?=svgIcon("del")?></span><span class="iconlink__content"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 
 					<div>
-						<form id="accForm" method="post" action="<?=e(BASEURL."accounts/".$action)?>/">
-<?php	if ($action == "edit") {		?>
-						<input id="accid" name="id" type="hidden" value="<?=e($acc_id)?>">
+						<form id="accForm" method="post" action="<?=e(BASEURL."accounts/".$this->action)?>/">
+<?php	if ($this->action == "update") {		?>
+						<input id="accid" name="id" type="hidden" value="<?=e($accInfo->id)?>">
 <?php	}	?>
 						<div class="view-row std_margin">
 							<div id="acc_tile" class="tile"><button class="tilelink" type="button"><span><span class="tile__subtitle"><?=e($accInfo->balfmt)?></span><span class="tile__icon"><?=useIcon($accInfo->icon, 60, 54)?></span><span class="tile__title"><?=e($tileAccName)?></span></span></button></div>
@@ -82,9 +82,9 @@
 		</div>
 	</div>
 </div>
-<?php	if ($action == "edit") {	?>
+<?php	if ($this->action == "update") {	?>
 <form id="delform" method="post" action="<?=BASEURL?>accounts/del">
-<input name="accounts" type="hidden" value="<?=e($acc_id)?>">
+<input name="accounts" type="hidden" value="<?=e($accInfo->id)?>">
 </form>
 <?php	}	?>
 
@@ -95,16 +95,7 @@
 	var icons = <?=JSON::encode($icons)?>;
 
 	var view = new AccountView({
-		account: {
-<?php	if ($action == "edit") {	?>
-			id: <?=$acc_id?>,
-<?php	}	?>
-			name: <?=JSON::encode($accInfo->name)?>,
-			balance: <?=$accInfo->balance?>,
-			curr_id: <?=$accInfo->curr_id?>,
-			initBalance: <?=$accInfo->initbalance?>,
-			icon_id: <?=$accInfo->icon_id?>
-		}
+		account: <?=JSON::encode($accInfo)?>
 	});
 </script>
 </body>

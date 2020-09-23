@@ -128,7 +128,7 @@ AccountView.prototype.onInitBalanceInput = function(e)
 
 	clearBlockValidation('initbal-inp-block');
 
-	this.model.data.initBalance = normalize(e.target.value);
+	this.model.data.initbalance = normalize(e.target.value);
 
 	this.updateAccountTile();
 };
@@ -247,7 +247,7 @@ AccountView.prototype.setCurrencySign = function(curr_id)
  */
 AccountView.prototype.updateAccountTile = function()
 {
-	var bal = this.model.original.balance + this.model.data.initBalance - this.model.original.initBalance;
+	var bal = this.model.original.balance + this.model.data.initbalance - this.model.original.initbalance;
 	var formatBalance = formatCurrency(bal, this.model.data.curr_id);
 
 	var tileTitle = this.model.data.name;

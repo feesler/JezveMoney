@@ -60,11 +60,10 @@ class Accounts extends TemplateController
             return;
         }
 
-        $action = "new";
-
         $currMod = CurrencyModel::getInstance();
 
         $accInfo = new \stdClass();
+        $accInfo->id = 0;
         $accInfo->name = "";
         $accInfo->curr_id = $currMod->getIdByPos(0);
         $accInfo->balance = 0;
@@ -127,8 +126,6 @@ class Accounts extends TemplateController
             $this->updateAccount();
             return;
         }
-
-        $action = "edit";
 
         $currMod = CurrencyModel::getInstance();
 

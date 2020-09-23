@@ -12,14 +12,14 @@
 				<div class="content_wrap">
 					<div class="heading">
 						<h1><?=e($headString)?></h1>
-<?php	if ($action == "edit") {		?>
+<?php	if ($this->action == "update") {		?>
 						<div id="del_btn" class="iconlink"><button type="button"><span class="iconlink__icon"><?=svgIcon("del")?></span><span class="iconlink__content"><span>Delete</span></span></button></div>
 <?php	}	?>
 					</div>
 					<div>
-						<form id="personForm" method="post" action="<?=e(BASEURL."persons/".$action)?>/">
-<?php	if ($action == "edit") {		?>
-						<input id="pid" name="id" type="hidden" value="<?=e($p_id)?>">
+						<form id="personForm" method="post" action="<?=e(BASEURL."persons/".$this->action)?>/">
+<?php	if ($this->action == "update") {		?>
+						<input id="pid" name="id" type="hidden" value="<?=e($pInfo->id)?>">
 <?php	}	?>
 						<div id="name-inp-block" class="validation-block view-row std_margin">
 							<label for="pname">Person name</label>
@@ -38,21 +38,16 @@
 		</div>
 	</div>
 </div>
-<?php	if ($action == "edit") {		?>
+<?php	if ($this->action == "update") {		?>
 <form id="delform" method="post" action="<?=BASEURL?>persons/del/">
-<input name="persons" type="hidden" value="<?=e($p_id)?>">
+<input name="persons" type="hidden" value="<?=e($pInfo->id)?>">
 </form>
 <?php	}	?>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
 	var view = new PersonView({
-        person: {
-<?php	if ($action == "edit") {		?>
-    	    id: <?=$p_id?>,
-<?php	}	?>
-	        name: <?=JSON::encode($pInfo->name)?>
-        }
+        person: <?=JSON::encode($pInfo)?>
     });
 </script>
 </body>
