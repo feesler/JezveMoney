@@ -72,7 +72,8 @@
 	var accounts = <?=JSON::encode($accountsData)?>;
 
 	onReady(initToolbar);
-	onReady(initAccListControls);
+
+	var view = new AccountListView();
 </script>
 </body>
 </html>

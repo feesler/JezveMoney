@@ -93,17 +93,19 @@
 <script>
 	var currency = <?=JSON::encode($currArr)?>;
 	var icons = <?=JSON::encode($icons)?>;
-<?php	if ($action == "edit") {	?>
-	var account_id = <?=$acc_id?>;
-<?php	}	?>
-	var acc_name = <?=JSON::encode($accInfo->name)?>;
-	var acc_currency = <?=$accInfo->curr_id?>;
-	var acc_balance = <?=$accInfo->balance?>;
-	var acc_init_balance = <?=$accInfo->initbalance?>;
-	var new_init_balance = <?=$accInfo->initbalance?>;
-	var icon_id = <?=$accInfo->icon_id?>;
 
-	onReady(initControls);
+	var view = new AccountView({
+		account: {
+<?php	if ($action == "edit") {	?>
+			id: <?=$acc_id?>,
+<?php	}	?>
+			name: <?=JSON::encode($accInfo->name)?>,
+			balance: <?=$accInfo->balance?>,
+			curr_id: <?=$accInfo->curr_id?>,
+			initBalance: <?=$accInfo->initbalance?>,
+			icon_id: <?=$accInfo->icon_id?>
+		}
+	});
 </script>
 </body>
 </html>

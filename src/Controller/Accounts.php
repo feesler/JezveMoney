@@ -45,7 +45,8 @@ class Accounts extends TemplateController
             "currency.js",
             "toolbar.js",
             "account.js",
-            "accounts.js"
+            "view.js",
+            "accountlistview.js"
         ]);
 
         include(TPL_PATH . "accounts.tpl");
@@ -102,7 +103,8 @@ class Accounts extends TemplateController
             "account.js",
             "dropdown.js",
             "decimalinput.js",
-            "accounts.js"
+            "view.js",
+            "accountview.js"
         ]);
 
         include(TPL_PATH . "account.tpl");
@@ -166,7 +168,8 @@ class Accounts extends TemplateController
             "account.js",
             "dropdown.js",
             "decimalinput.js",
-            "accounts.js"
+            "view.js",
+            "accountview.js"
         ]);
 
         include(TPL_PATH . "account.tpl");
