@@ -20,7 +20,13 @@ class Persons extends TemplateController
 
         array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
         $this->buildCSS();
-        array_push($this->jsArr, "selection.js", "toolbar.js", "person.js", "persons.js");
+        array_push($this->jsArr, ...[
+            "selection.js",
+            "toolbar.js",
+            "person.js",
+            "view.js",
+            "personlistview.js"
+        ]);
 
         include(TPL_PATH . "persons.tpl");
     }
@@ -56,7 +62,10 @@ class Persons extends TemplateController
 
         array_push($this->css->libs, "iconlink.css", "tiles.css");
         $this->buildCSS();
-        array_push($this->jsArr, "selection.js", "persons.js");
+        array_push($this->jsArr, ...[
+            "view.js",
+            "personview.js"
+        ]);
 
         include(TPL_PATH . "person.tpl");
     }
@@ -88,7 +97,10 @@ class Persons extends TemplateController
 
         array_push($this->css->libs, "iconlink.css", "tiles.css");
         $this->buildCSS();
-        array_push($this->jsArr, "selection.js", "persons.js");
+        array_push($this->jsArr, ...[
+            "view.js",
+            "personview.js"
+        ]);
 
         include(TPL_PATH . "person.tpl");
     }

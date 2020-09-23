@@ -69,7 +69,7 @@
 <script>
 	var persons = <?=JSON::encode($personsData)?>;
 
-	onReady(initPersonsList);
+    var view = new PersonListView();
 </script>
 </body>
 </html>

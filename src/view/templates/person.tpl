@@ -46,10 +46,14 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-	var person_id = <?=$p_id?>;
-	var personName = <?=JSON::encode($pInfo->name)?>;
-
-	onReady(initControls);
+	var view = new PersonView({
+        person: {
+<?php	if ($action == "edit") {		?>
+    	    id: <?=$p_id?>,
+<?php	}	?>
+	        name: <?=JSON::encode($pInfo->name)?>
+        }
+    });
 </script>
 </body>
 </html>
