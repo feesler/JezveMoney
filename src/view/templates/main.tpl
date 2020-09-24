@@ -103,7 +103,7 @@
 	var accCurr = <?=$curr_acc_id?>;
 	var chartData = <?=JSON::encode($statArr)?>;
 
-	onReady(initStatWidget);
+	var view = new MainView();
 </script>
 </body>
 </html>

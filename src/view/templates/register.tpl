@@ -34,6 +34,8 @@
 </form>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
-<script>onReady(initRegisterPage)</script>
+<script>
+var view = new RegisterView();
+</script>
 </body>
 </html>

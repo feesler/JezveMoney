@@ -79,9 +79,10 @@ class Main extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
-            "main.js",
             "lib/raphael.min.js",
-            "charts.js"
+            "charts.js",
+			"view.js",
+			"mainview.js"
         ]);
 
         include(TPL_PATH . "main.tpl");

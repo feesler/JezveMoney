@@ -34,6 +34,8 @@
 </form>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
-<script>onReady(initLoginPage)</script>
+<script>
+var view = new LoginView();
+</script>
 </body>
 </html>

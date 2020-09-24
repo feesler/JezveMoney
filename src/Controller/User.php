@@ -36,7 +36,10 @@ class User extends TemplateController
 
         $this->css->page[] = "user.css";
         $this->buildCSS();
-        array_push($this->jsArr, "main.js");
+        array_push($this->jsArr, ...[
+			"view.js",
+			"loginview.js"
+		]);
 
         include(TPL_PATH . "login.tpl");
     }
@@ -81,7 +84,8 @@ class User extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
-            "main.js"
+            "view.js",
+			"registerview.js"
         ]);
 
         include(TPL_PATH . "register.tpl");
