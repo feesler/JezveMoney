@@ -422,11 +422,9 @@
 <?php	} else {		?>
 	var Transaction = new TransactionModel(<?=$tr["type"]?>, <?=$tr["src_curr"]?>, <?=$tr["dest_curr"]?>);
 <?php	}		?>
-
-	var ViewModel = new TransactionViewModel();
-
 	onReady(Transaction.initModel.bind(Transaction));
-	onReady(ViewModel.initControls.bind(ViewModel));
+
+	var view = new TransactionView();
 </script>
 </body>
 </html>

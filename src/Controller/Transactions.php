@@ -562,7 +562,8 @@ class Transactions extends TemplateController
             "dropdown.js",
             "decimalinput.js",
             "tr_model.js",
-            "tr_viewmodel.js"
+			"view.js",
+			"transactionview.js"
         ]);
 
         include(TPL_PATH . "transaction.tpl");
@@ -829,7 +830,8 @@ class Transactions extends TemplateController
             "dropdown.js",
             "decimalinput.js",
             "tr_model.js",
-            "tr_viewmodel.js"
+			"view.js",
+			"transactionview.js"
         ]);
 
         include(TPL_PATH . "transaction.tpl");

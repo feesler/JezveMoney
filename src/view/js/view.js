@@ -4,7 +4,10 @@
  */
 function View(props)
 {
-	this.props = copyObject(props);
+	if (typeof props === 'undefined')
+		this.props = {};
+	else
+		this.props = copyObject(props);
 
 	onReady(this.onStart.bind(this));
 }

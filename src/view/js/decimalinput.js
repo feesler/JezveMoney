@@ -102,3 +102,17 @@ DecimalInput.prototype.handleInput = function(e)
 	if (isFunction(this.oninput))
 		this.oninput(e);
 };
+
+
+Object.defineProperty(DecimalInput.prototype, 'value',
+{
+    get: function()
+    {
+        return this.elem.value;
+    },
+
+    set: function(value)
+    {
+        this.elem.value = value;
+    }
+});
