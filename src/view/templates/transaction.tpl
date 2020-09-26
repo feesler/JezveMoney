@@ -269,8 +269,8 @@
 <?php	} else {	?>
 								<div class="btn input-group__btn"><div id="srcamountsign"><?=e($srcAmountSign)?></div></div>
 <?php	}	?>
-								<div class="invalid-feedback">Please input correct amount.</div>
 							</div>
+							<div class="invalid-feedback">Please input correct amount.</div>
 						</div>
 
 <?php	if ($showDestAmount) {		?>
@@ -297,8 +297,8 @@
 <?php	} else {	?>
 								<div class="btn input-group__btn input-group__btn_inactive"><div id="destamountsign"><?=e($destAmountSign)?></div></div>
 <?php	}	?>
-								<div class="invalid-feedback">Please input correct amount.</div>
 							</div>
+							<div class="invalid-feedback">Please input correct amount.</div>
 						</div>
 
 						<div id="exchange" class="view-row hidden">
