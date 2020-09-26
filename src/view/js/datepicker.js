@@ -35,14 +35,14 @@ function DatePicker(params)
 	if (!params.wrapper_id)
 		return;
 
-	this.baseObj = ge(params.wrapper_id);
+	this.baseObj = (typeof params.wrapper_id === 'string') ? ge(params.wrapper_id) : params.wrapper_id;
 	if (!this.baseObj)
 		return;
 	removeChilds(this.baseObj);
 	this.baseObj.classList.add('dp__container');
 
 	this.wrapperObj = ce('div', { className : 'dp__wrapper' });
-	this.isStatic = params.static === true;
+	this.isStatic = (params.static === true);
 	if (this.isStatic)
 		this.wrapperObj.classList.add('dp__static-wrapper');
 	else
@@ -62,7 +62,7 @@ function DatePicker(params)
 
 	if (params.relparent)
 	{
-		this.relativeParent = ge(params.relparent);
+		this.relativeParent = (typeof params.relparent === 'string') ? ge(params.relparent) : params.relparent;
 	}
 
 	this.transitionHandler = this.onTransitionEnd.bind(this);

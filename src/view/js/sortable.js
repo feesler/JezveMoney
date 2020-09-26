@@ -425,7 +425,7 @@ function Sortable(params)
 									: dropTargetDefaults[prop];
 		}
 
-		containerElem = ge(params.container);
+		containerElem = (typeof params.container === 'string') ? ge(params.container) : params.container;
 		if (!containerElem)
 			return;
 

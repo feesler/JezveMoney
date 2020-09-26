@@ -38,7 +38,7 @@ function formatAccoutBalance(acc_id)
 // Update tile information
 function setTileInfo(tile_id, title, subTitle, icon_id)
 {
-	var tileObj = ge(tile_id);
+	var tileObj = (typeof tile_id === 'string') ? ge(tile_id) : tile_id;
 	if (!tileObj)
 		return;
 

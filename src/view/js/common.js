@@ -1,8 +1,5 @@
 // Return DOM element by id
-function ge(a)
-{
-	return (typeof a == 'string') ? document.getElementById(a) : a;
-}
+var ge = document.getElementById.bind(document);
 
 
 // Check object is date
@@ -142,11 +139,14 @@ function svg(tagName, attributues, children)
 
 
 // Remove element from DOM and return
-function re(obj)
+function re(elem)
 {
-	var robj = ge(obj);
+	var removedElem = (typeof elem === 'string') ? ge(elem) : elem;
 
-	return (robj && robj.parentNode) ? robj.parentNode.removeChild(robj) : null;
+	if (removedElem && removedElem.parentNode)
+		return removedElem.parentNode.removeChild(removedElem);
+
+	return null;
 }
 
 
@@ -173,9 +173,9 @@ function isInt(x)
 
 
 // Return object visibility
-function isVisible(obj, recursive)
+function isVisible(elem, recursive)
 {
-	var robj = ge(obj);
+	var robj = (typeof elem === 'string') ? ge(elem) : elem;
 
 	while(robj && robj.nodeType && robj.nodeType != 9)
 	{
@@ -208,9 +208,9 @@ function show(elem, val)
 
 
 // Enable or disable specified object
-function enable(obj, val)
+function enable(elem, val)
 {
-	var robj = ge(obj);
+	var robj = (typeof elem === 'string') ? ge(elem) : elem;
 
 	if (robj)
 		robj.disabled = (!val);
@@ -495,8 +495,9 @@ function onEmptyClick(e, callback, elem)
 	if (!Array.isArray(elem))
 		elem = [elem];
 
-	if (elem.every(function(el){
-		el = ge(el) || null;
+	if (elem.every(function(el)
+	{
+		el = ((typeof el === 'string') ? ge(el) : el) || null;
 
 		return ((el && !el.contains(e.target) && el != e.target) || !el);
 	}))

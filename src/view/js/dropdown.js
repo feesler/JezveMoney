@@ -69,13 +69,13 @@ function DropDown(params)
 	this.focusHandler = this.onFocus.bind(this);
 	this.blurHandler = this.onBlur.bind(this);
 
-	var inpObj = ge(params.input_id);
+	var inpObj = (typeof params.input_id === 'string') ? ge(params.input_id) : params.input_id;
 	if (!inpObj || !inpObj.parentNode)
 		throw new Error('Invalid element specified');
 
 	// Save result value to specified element
 	this.resultTarget = params.resultTarget || null;
-	if (this.resultTarget)
+	if (typeof this.resultTarget === 'string')
 	{
 		this.resultTarget = ge(this.resultTarget);
 		if (!this.resultTarget)

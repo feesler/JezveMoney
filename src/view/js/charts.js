@@ -440,7 +440,7 @@ var Charts = new (function()
 
 			if (!params.container)
 				return;
-			containerObj = ge(params.container);
+			containerObj = (typeof params.container === 'string') ? ge(params.container) : params.container;
 			if (!containerObj)
 				return;
 
@@ -865,7 +865,7 @@ var Charts = new (function()
 
 			if (!params.container)
 				return;
-			containerObj = ge(params.container);
+			containerObj = (typeof params.container === 'string') ? ge(params.container) : params.container;
 			if (!containerObj)
 				return;
 
