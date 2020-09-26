@@ -237,7 +237,8 @@ class Transactions extends TemplateController
             "sortable.js",
             "toolbar.js",
             "dropdown.js",
-            "tr_list.js"
+			"view.js",
+			"translistview.js"
         ]);
 
         include(TPL_PATH . "transactions.tpl");

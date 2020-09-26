@@ -119,7 +119,8 @@
 	var transArr = <?=JSON::encode($transArr)?>;
 	var filterObj = <?=JSON::encode($filterObj)?>;
 
-	onReady(initTransListDrag);
+    var view = new TransactionListView();
+
 	onReady(initToolbar);
 </script>
 </body>
