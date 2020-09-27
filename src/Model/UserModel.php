@@ -158,7 +158,12 @@ class UserModel extends CachedTable
         if (isset($_SESSION["userid"])) {
             $user_id = intval($_SESSION["userid"]);
             $this->currentUser = $this->getItem($user_id);
-            return $user_id;
+            if ($this->currentUser) {
+                return $this->currentUser->id;
+            } else {
+                $this->logout();
+                return 0;
+            }
         }
 
         // check cookies

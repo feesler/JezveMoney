@@ -30,10 +30,6 @@ class AccountModel extends CachedTable
     {
         $uMod = UserModel::getInstance();
         self::$user_id = $uMod->getUser();
-        if (!self::$user_id) {
-            throw new \Error("User not found");
-        }
-
         self::$owner_id = $uMod->getOwner();
 
         $this->dbObj = MySqlDB::getInstance();
