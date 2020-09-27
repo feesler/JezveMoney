@@ -8,7 +8,6 @@
 		<div class="container">
 			<div class="content">
 				<div class="content_wrap admin_cont_wrap">
-<!--					<h2></h2>		-->
 				</div>
 			</div>
 		</div>

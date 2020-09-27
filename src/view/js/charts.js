@@ -529,7 +529,7 @@ var Charts = new (function()
 
 		// Public methods of instance
 
-		// Return charts content elemtnt
+		// Return charts content element
 		this.getContent = function()
 		{
 			return chartContent;
@@ -971,12 +971,26 @@ var Charts = new (function()
 	// Global Charts object public methods
 	this.createHistogram = function(params)
 	{
-		return new Histogram(params);
+        try
+        {
+		    return new Histogram(params);
+        }
+        catch(e)
+        {
+            return null;
+        }
 	}
 
 
 	this.createLinechart = function(params)
 	{
-		return new Linechart(params);
+        try
+        {
+		    return new Linechart(params);
+        }
+        catch(e)
+        {
+            return null;
+        }
 	}
 })();

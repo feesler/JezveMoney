@@ -9,10 +9,7 @@ function PersonView(props)
 {
 	PersonView.parent.constructor.apply(this, arguments);
 
-	this.model = {
-		data : {},
-		original : {}
-	};
+	this.model = {};
 
 	if (this.props.person)
 	{

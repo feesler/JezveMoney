@@ -163,8 +163,8 @@ PersonListView.prototype.showDeleteConfirmationPopup = function()
 			id : 'delete_warning',
 			content : singlePersonDeleteMsg,
 			btn : {
-				okBtn : { onclick : this.onDeleteConrifmResult.bind(this, true) },
-				cancelBtn : { onclick : this.onDeleteConrifmResult.bind(this, false) }
+				okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
+				cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
 			}
 		});
 	}
@@ -180,7 +180,7 @@ PersonListView.prototype.showDeleteConfirmationPopup = function()
  * Delete confirmation result handler
  * @param {boolean} result - user confirmed delete
  */
-PersonListView.prototype.onDeleteConrifmResult = function(result)
+PersonListView.prototype.onDeleteConfirmResult = function(result)
 {
 	if (this.delConfirmPopup)
 		this.delConfirmPopup.close();

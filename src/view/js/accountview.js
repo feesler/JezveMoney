@@ -11,8 +11,6 @@ function AccountView(props)
 	AccountView.parent.constructor.apply(this, arguments);
 
 	this.model = {
-		data : {},
-		original : {},
 		nameChanged : false
 	};
 
