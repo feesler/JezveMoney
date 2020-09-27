@@ -853,7 +853,7 @@
 </div>
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 <script>
-	onReady(initControls);
+	var view = new AdminApiConsoleView();
 </script>
 </body>
 </html>

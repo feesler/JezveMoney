@@ -14,7 +14,11 @@ class ApiConsole extends AdminController
 
         $this->cssAdmin[] = "apiconsole.css";
         $this->buildCSS();
-        $this->jsAdmin[] = "apiconsole.js";
+
+        $this->jsArr[] = "view.js";
+        array_push($this->jsAdmin,
+            "apiconsoleview.js"
+        );
 
         include(ADMIN_TPL_PATH . "apiconsole.tpl");
     }
