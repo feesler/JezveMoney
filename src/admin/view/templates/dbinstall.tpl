@@ -35,12 +35,6 @@
 	</div>
 </div>
 
-
-
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
-
-<script>
-	onReady(initControls);
-</script>
 </body>
 </html>
