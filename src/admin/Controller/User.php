@@ -14,10 +14,13 @@ class User extends AdminController
 
         $titleString = "Admin panel | Users";
 
-        $this->cssAdmin[] = "currency.css";
         $this->buildCSS();
-        $this->jsArr[] = "currency.js";
-        $this->jsAdmin[] = "user.js";
+
+        $this->jsArr[] = "view.js";
+        array_push($this->jsAdmin,
+            "adminlistview.js",
+            "userview.js",
+        );
 
         include(ADMIN_TPL_PATH . "user.tpl");
     }

@@ -13,13 +13,13 @@
 				<div class="content_wrap admin_cont_wrap">
 					<h2>Users</h2>
 
-					<table id="users_tbl" class="admin-tbl">
+					<table class="admin-tbl">
 						<thead>
 							<tr><th>id</th><th>login</th><th>name</th><th>access</th><th>accounts</th><th>transactions</th><th>persons</th></tr>
 						</thead>
-						<tbody id="users_list">
+						<tbody id="items-list">
 <?php	foreach($uArr as $userInfo) {		?>
-							<tr>
+							<tr data-id=<?=e($userInfo->id)?>>
 								<td><?=e($userInfo->id)?></td>
 								<td><?=e($userInfo->login)?></td>
 								<td><?=e($userInfo->name)?></td>
@@ -44,7 +44,7 @@
 	</div>
 </div>
 
-<form id="user_frm" class="hidden" method="post">
+<form id="item-frm" class="hidden" method="post">
 <input id="user_id" name="id" type="hidden">
 <div id="login_block" class="view-row">
 	<label for="user_login">Login</label>
@@ -73,9 +73,9 @@
 
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 <script>
-	var users = <?=JSON::encode($uArr)?>;
-
-	onReady(initControls);
+	var view = new AdminUserListView({
+        data :  <?=JSON::encode($uArr)?>
+    });
 </script>
 </body>
 </html>

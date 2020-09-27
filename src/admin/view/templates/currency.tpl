@@ -13,13 +13,13 @@
 				<div class="content_wrap admin_cont_wrap">
 					<h2>Currencies</h2>
 
-					<table id="currencies_tbl" class="admin-tbl">
+					<table class="admin-tbl">
 						<thead>
 							<tr><th>id</th><th>name</th><th>sign</th><th>flags</th></tr>
 						</thead>
-						<tbody id="curr_list">
+						<tbody id="items-list">
 <?php	foreach($currArr as $currInfo) {		?>
-							<tr>
+							<tr data-id=<?=e($currInfo->id)?>>
 								<td><?=e($currInfo->id)?></td>
 								<td><?=e($currInfo->name)?></td>
 								<td><?=e($currInfo->sign)?></td>
@@ -40,7 +40,7 @@
 	</div>
 </div>
 
-<form id="curr_frm" class="hidden" method="post" action="<?=BASEURL?>api/currency/new">
+<form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/currency/new">
 <input id="curr_id" name="id" type="hidden">
 <div class="view-row">
 	<label for="curr_name">Name</label>
@@ -66,9 +66,9 @@
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 
 <script>
-	var currency = <?=JSON::encode($currArr)?>;
-
-	onReady(initControls);
+	var view = new AdminCurrencyListView({
+        data :  <?=JSON::encode($currArr)?>
+    });
 </script>
 </body>
 </html>

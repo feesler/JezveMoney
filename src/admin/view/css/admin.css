@@ -119,3 +119,32 @@ textarea
 	display: inline-block;
 	margin-right: 10px;
 }
+
+
+/* Create/update item popup */
+.popup > .item-form
+{
+	margin-top: -120px;
+}
+
+
+.popup > .item-form > .popup__content-box
+{
+	max-width: 300px;
+	min-width: 130px;
+}
+
+
+.item-form label
+{
+	display: block;
+	width: 100%;
+	font-size: 16px;
+	padding: 5px 0px;
+}
+
+
+.item-form .stretch-input
+{
+	border-width: 1px;
+}

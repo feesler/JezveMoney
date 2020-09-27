@@ -13,13 +13,13 @@
 				<div class="content_wrap admin_cont_wrap">
 					<h2>Icons</h2>
 
-					<table id="icons_tbl" class="admin-tbl">
+					<table class="admin-tbl">
 						<thead>
 							<tr><th>id</th><th>name</th><th>file</th><th>type</th></tr>
 						</thead>
-						<tbody id="icons_list">
+						<tbody id="items-list">
 <?php	foreach($itemsData as $item) {		?>
-							<tr>
+							<tr data-id=<?=e($item->id)?>>
 								<td><?=e($item->id)?></td>
 								<td><?=e($item->name)?></td>
 								<td><?=e($item->file)?></td>
@@ -40,7 +40,7 @@
 	</div>
 </div>
 
-<form id="icon_frm" class="hidden" method="post" action="<?=BASEURL?>api/icon/new">
+<form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/icon/new">
 <input id="icon_id" name="id" type="hidden">
 <div class="view-row">
 	<label for="icon_name">Name</label>
@@ -69,9 +69,9 @@
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 
 <script>
-	var itemsData = <?=JSON::encode($itemsData)?>;
-
-	onReady(initControls);
+	var view = new AdminIconListView({
+        data :  <?=JSON::encode($itemsData)?>
+    });
 </script>
 </body>
 </html>

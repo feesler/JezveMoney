@@ -26,9 +26,12 @@ class Icon extends AdminController
         $titleString = "Admin panel | Icons";
 
         $this->buildCSS();
-        $this->cssAdmin[] = "icon.css";
 
-        $this->jsAdmin[] = "icon.js";
+        $this->jsArr[] = "view.js";
+        array_push($this->jsAdmin,
+            "adminlistview.js",
+            "iconview.js"
+        );
 
         include(ADMIN_TPL_PATH . "icon.tpl");
     }
