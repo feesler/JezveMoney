@@ -25,14 +25,8 @@ AdminListView.prototype.onStart = function()
 	this.itemsListElem = ge('items-list')
 	if (!this.itemsListElem)
 		throw new Error('Failed to initialize view');
-// TODO : delegate
-	var row = this.itemsListElem.firstElementChild;
-	while(row)
-	{
-		row.addEventListener('click', this.onRowClick.bind(this, row));
 
-		row = row.nextElementSibling;
-	}
+    this.itemsListElem.addEventListener('click', this.onRowClick.bind(this));
 
 	this.createBtn = ge('createbtn');
 	if (this.createBtn)
@@ -292,7 +286,6 @@ AdminListView.prototype.onListResult = function(response)
         var row = this.renderItem(item);
 
         row.dataset.id = item.id;
-		row.addEventListener('click', this.onRowClick.bind(this, row));
 
 		return row;
 	}, this);
@@ -306,8 +299,12 @@ AdminListView.prototype.onListResult = function(response)
 /**
  * Table row click event handler
  */
-AdminListView.prototype.onRowClick = function(rowElem)
+AdminListView.prototype.onRowClick = function(e)
 {
+    if (!e || !e.target)
+        return;
+
+    var rowElem = e.target.closest('tr');
 	if (!rowElem || !rowElem.dataset)
 		return;
 
