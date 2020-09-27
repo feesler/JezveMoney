@@ -30,7 +30,14 @@ class Profile extends ApiController
             $this->fail("Person not found");
         }
 
-        $this->ok([ "user_id" => $this->user_id, "owner_id" => $this->owner_id, "name" => $pObj->name ]);
+        $userObj = $this->uMod->getItem($this->user_id);
+
+        $this->ok([
+            "user_id" => $this->user_id,
+            "owner_id" => $this->owner_id,
+            "login" => $userObj->login,
+            "name" => $pObj->name,
+        ]);
     }
 
 
