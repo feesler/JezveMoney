@@ -1,3 +1,9 @@
+.data-container
+{
+    display: flex;
+}
+
+
 .import_form
 {
 	padding: 10px;

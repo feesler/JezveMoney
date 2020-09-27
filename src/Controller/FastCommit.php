@@ -37,7 +37,8 @@ class FastCommit extends TemplateController
             "ajax.js",
             "dragndrop.js",
             "sortable.js",
-            "fastcommit.js",
+            "view.js",
+            "importview.js",
             "convhint.js"
         ]);
 

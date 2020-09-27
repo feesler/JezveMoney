@@ -40,7 +40,7 @@
 <?php }	?>
 	</select>
 
-	<div>
+	<div class="data-container">
 		<table class="import-tbl"><tbody id="importRows"></tbody></table>
 		<div id="rowsContainer"></div>
 	</div>
@@ -62,7 +62,7 @@ var accounts = <?=JSON::encode($accArr)?>;
 var currencies = <?=JSON::encode($currArr)?>;
 var persons = <?=JSON::encode($persArr)?>;
 
-onReady(initPage);
+var view = new ImportView();
 </script>
 </body>
 </html>
