@@ -168,7 +168,8 @@ class Statistics extends TemplateController
             "dropdown.js",
             "lib/raphael.min.js",
             "charts.js",
-            "statistics.js"
+            "view.js",
+            "statisticsview.js"
         ]);
 
         include(TPL_PATH . "statistics.tpl");

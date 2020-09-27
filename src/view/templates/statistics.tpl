@@ -100,15 +100,15 @@
 											<input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
 										</div>
 										<button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
-										<div id="calendar"></div>
 									</div>
+                                    <div id="calendar"></div>
 								</div>
 							</div>
 						</div>
 
 						<div id="chart" class="stat-histogram">
 <?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
-						<span>No results found.</span>
+					    	<span>No results found.</span>
 <?php	}		?>
 						</div>
 					</div>
@@ -125,7 +125,7 @@
 	var filterObj = <?=JSON::encode($filterObj)?>;
 	var chartData = <?=JSON::encode($statArr)?>;
 
-	onReady(initControls);
+    var view = new StatisticsView();
 </script>
 </body>
 </html>

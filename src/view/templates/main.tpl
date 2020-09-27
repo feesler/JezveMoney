@@ -86,7 +86,11 @@
 
 					<div class="widget">
 						<div class="widget_title"><a href="<?=BASEURL?>statistics/"><span>Statistics</span><div class="glyph"><?=svgIcon("glyph")?></div></a></div>
-						<div id="chart" class="widget_charts"></div>
+						<div id="chart" class="widget_charts">
+<?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
+				    		<span>No results found.</span>
+<?php	}		?>
+                        </div>
 					</div>
 				</div>
 			</div>
