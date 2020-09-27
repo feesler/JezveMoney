@@ -463,7 +463,7 @@ class UserModel extends CachedTable
 
                 $this->setOwner($item_id, $person_id);
             } else {
-                if (!$personMod->adminUpdate($userObj->owner_id, ["name" => $this->personName])) {
+                if (!$personMod->adminUpdate($userObj->owner_id, ["name" => $this->personName, "user_id" => $item_id])) {
                     throw new \Error("Fail to update person of user");
                 }
             }
