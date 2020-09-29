@@ -19,23 +19,23 @@
   "author": "Henry Feesler",
   "license": "ISC",
   "devDependencies": {
-    "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.11.1",
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/plugin-transform-regenerator": "^7.10.4",
-    "@babel/plugin-transform-runtime": "^7.11.0",
-    "@babel/preset-env": "^7.11.0",
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
     "chalk": "^2.4.2",
     "del-cli": "^3.0.1",
     "npm-run-all": "^4.1.5",
-    "puppeteer": "^5.2.1"
+    "puppeteer": "^5.3.1"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.10.4",
+    "@babel/polyfill": "^7.11.5",
     "@babel/runtime": "^7.11.2",
     "core-js": "^3.6.5",
-    "whatwg-fetch": "^3.4.0"
+    "whatwg-fetch": "^3.4.1"
   }
 }
