@@ -14,7 +14,7 @@ export class PersonView extends TestView
 		res.headingElem = await this.query('.heading > h1');
 		if (!res.headingElem)
 			throw new Error('Heading element not found');
-		res.heading = await this.prop(res.headingElem, 'innerText');
+		res.heading = await this.prop(res.headingElem, 'textContent');
 
 		res.formElem = await this.query('form');
 		if (!res.formElem)

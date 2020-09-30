@@ -20,7 +20,7 @@ export class AccountsView extends TestView
 		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.exportBtn || !res.toolbar.delBtn)
 			throw new Error('Invalid structure of accounts view');
 
-		res.title = await this.prop(res.titleEl, 'innerText');
+		res.title = await this.prop(res.titleEl, 'textContent');
 		res.tiles = await TilesList.create(this, await this.query('#tilesContainer'), Tile);
 		res.hiddenTiles = await TilesList.create(this, await this.query('#hiddenTilesContainer'), Tile);
 

@@ -59,9 +59,9 @@ AdminIconListView.prototype.renderItem = function(item)
         return null;
 
     return ce('tr', {}, [
-                ce('td', { innerText : item.id }),
-                ce('td', { innerText : item.name }),
-                ce('td', { innerText : item.file }),
-                ce('td', { innerText : item.type }),
+                ce('td', { textContent : item.id }),
+                ce('td', { textContent : item.name }),
+                ce('td', { textContent : item.file }),
+                ce('td', { textContent : item.type }),
             ]);
 };

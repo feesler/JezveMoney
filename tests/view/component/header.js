@@ -27,7 +27,7 @@ export class Header extends NullableComponent
 			let el = await this.query(this.user.menuBtn, '.user_title');
 			if (!el)
 				throw new Error('User title element not found');
-			this.user.name = await this.prop(el, 'innerText');
+			this.user.name = await this.prop(el, 'textContent');
 
 			this.user.menuEl = await this.query(this.elem, '.user-menu');
 			if (!this.user.menuEl)
@@ -38,7 +38,7 @@ export class Header extends NullableComponent
 			for(let i = 0; i < menuLinks.length; i++)
 			{
 				el = menuLinks[i];
-				this.user.menuItems.push({ elem : el, link : await this.prop(el, 'href'), text : await this.prop(el, 'innerText') });
+				this.user.menuItems.push({ elem : el, link : await this.prop(el, 'href'), text : await this.prop(el, 'textContent') });
 			}
 
 			let itemShift = (this.user.menuItems.length > 2) ? 1 : 0;

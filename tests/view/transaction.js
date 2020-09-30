@@ -41,7 +41,7 @@ export class TransactionView extends TestView
 
 		res.heading = { elem : await this.query('.heading > h1') };
 		if (res.heading.elem)
-			res.heading.title = await this.prop(res.heading.elem, 'innerText');
+			res.heading.title = await this.prop(res.heading.elem, 'textContent');
 
 		res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
 

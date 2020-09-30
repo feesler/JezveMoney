@@ -12,7 +12,7 @@ export class InfoTile extends Component
 		this.titleEl = await this.query(this.elem, '.info-tile__title');
 		this.subtitleEl = await this.query(this.elem, '.info-tile__subtitle');
 
-		this.title = await this.prop(this.titleEl, 'innerText');
+		this.title = await this.prop(this.titleEl, 'textContent');
 		this.subtitle = await this.prop(this.subtitleEl, 'innerText');
 		this.subtitle = this.subtitle.split('\r\n').join('\n');
 	}

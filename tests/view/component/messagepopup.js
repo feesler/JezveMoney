@@ -12,7 +12,7 @@ export class MessagePopup extends NullableComponent
 		if (!this.messageElem)
 			throw new Error('Wrong structure of message popup');
 
-		this.message = await this.prop(this.messageElem, 'innerText');
+		this.message = await this.prop(this.messageElem, 'textContent');
 		this.message = this.message.trim();
 		this.closeBtn = await this.query(this.elem, '.close-btn');
 

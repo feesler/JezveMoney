@@ -29,7 +29,7 @@ export class MainView extends TestView
 			if (widget.linkElem)
 				widget.link = await this.prop(widget.linkElem, 'href');
 			if (widget.textElem)
-				widget.title = await this.prop(widget.textElem, 'innerText');
+				widget.title = await this.prop(widget.textElem, 'textContent');
 
 			let tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
 			if (tiles)

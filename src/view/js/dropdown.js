@@ -949,7 +949,7 @@ DropDown.prototype.makeEditable = function(val)
 	{
 		this.inputElem.addEventListener('input', this.inputHandler);
 		this.inputElem.classList.add('dd__input');
-		this.inputElem.value = this.staticElem.innerHTML;
+		this.inputElem.value = this.staticElem.textContent;
 		this.assignFocusHandlers(this.inputElem);
 		this.inputElem.addEventListener('keydown', this.keyHandler);
 		this.inputElem.autocomplete = 'off';
@@ -1059,10 +1059,10 @@ DropDown.prototype.isChildTarget = function(elem)
 // Return selected item element for specified item object
 DropDown.prototype.renderSelectedItem = function(item)
 {
-	var deselectButton = ce('span', { className : 'dd__del-selection-item-btn', innerHTML : '&times;' });
+	var deselectButton = ce('span', { className : 'dd__del-selection-item-btn', textContent : '&times;' });
 	deselectButton.addEventListener('click', this.delSelectItemHandler);
 
-	return ce('span', { className : 'dd__selection-item', innerText : item.title }, deselectButton);
+	return ce('span', { className : 'dd__selection-item', textContent : item.title }, deselectButton);
 };
 
 
@@ -1474,7 +1474,7 @@ DropDown.prototype.addOption = function(target, item_id, title)
 	if (!target || target.tagName != 'SELECT')
 		return null;
 
-	var option = ce('option', { value : item_id, innerHTML : title });
+	var option = ce('option', { value : item_id, textContent : title });
 	target.appendChild(option);
 
 	return option;
@@ -1511,13 +1511,13 @@ DropDown.prototype.addItem = function(item_id, str, appendToSelect)
 							{ d : 'M1.08 4.93a.28.28 0 000 .4l2.35 2.34c.1.11.29.11.4 0l4.59-4.59a.28.28 0 000-.4l-.6-.6a.28.28 0 00-.4 0l-3.8 3.8-1.54-1.55a.28.28 0 00-.4 0z' }));
 		item.divElem.appendChild(item.checkIcon);
 
-		item.titleElem = ce('span', { title : str, innerText : str });
+		item.titleElem = ce('span', { title : str, textContent : str });
 		item.divElem.appendChild(item.titleElem);
 	}
 	else
 	{
 		item.divElem.title = str;
-		item.divElem.innerHTML = str;
+		item.divElem.textContent = str;
 	}
 
 	item.divElem.addEventListener('mouseover', this.hoverHandler);
@@ -1660,14 +1660,14 @@ DropDown.prototype.setText = function(str)
 		}
 		else if (!this.editable && this.staticElem)
 		{
-			this.staticElem.innerHTML = str;
+			this.staticElem.textContent = str;
 			this.staticElem.title = str;
 			this.staticElem.classList.remove('dd__single-selection_placeholder');
 		}
 	}
 	else
 	{
-		this.staticElem.innerHTML = this.placeholder;
+		this.staticElem.textContent = this.placeholder;
 		this.staticElem.title = '';
 		this.staticElem.classList.add('dd__single-selection_placeholder');
 		return;

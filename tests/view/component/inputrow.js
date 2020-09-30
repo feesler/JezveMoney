@@ -9,7 +9,7 @@ export class InputRow extends NullableComponent
 		this.labelEl = await this.query(this.elem, 'label');
 		if (!this.labelEl)
 			throw new Error('Label element not found');
-		this.label = await this.prop(this.labelEl, 'innerText');
+		this.label = await this.prop(this.labelEl, 'textContent');
 
 		this.currElem = await this.query(this.elem, '.btn.input-group__btn');
 		this.isCurrActive = false;
@@ -29,7 +29,7 @@ export class InputRow extends NullableComponent
 				this.currSignElem = await this.query(this.currElem, ':scope > *');
 			}
 
-			this.currSign = await this.prop(this.currSignElem, 'innerText');
+			this.currSign = await this.prop(this.currSignElem, 'textContent');
 		}
 		else
 		{

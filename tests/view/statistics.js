@@ -16,7 +16,7 @@ export class StatisticsView extends TestView
 			throw new Error('Wrong statistics view structure');
 
 		res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
-		res.title = await this.prop(res.titleEl, 'innerText');
+		res.title = await this.prop(res.titleEl, 'textContent');
 
 		let filtersList = await this.queryAll('.filters-container .filter-item');
 		if (!filtersList || filtersList.length != 5)

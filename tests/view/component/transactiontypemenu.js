@@ -15,7 +15,7 @@ class MenuItem extends Component
 			throw new Error(`Invalid transaction type ${type_id}`);
 
 		this.titleElem = await this.query(this.elem, '.trtype-menu_item_title');
-		this.text = await this.prop(this.titleElem, 'innerText');
+		this.text = await this.prop(this.titleElem, 'textContent');
 
 		this.isActive = await this.hasClass(this.elem, 'trtype-menu__item_selected');
 

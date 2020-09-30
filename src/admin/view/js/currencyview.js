@@ -62,9 +62,9 @@ AdminCurrencyListView.prototype.renderItem = function(item)
         return null;
 
     return ce('tr', {}, [
-                ce('td', { innerText : item.id }),
-                ce('td', { innerText : item.name }),
-                ce('td', { innerText : item.sign }),
-                ce('td', { innerText : item.flags }),
+                ce('td', { textContent : item.id }),
+                ce('td', { textContent : item.name }),
+                ce('td', { textContent : item.sign }),
+                ce('td', { textContent : item.flags }),
             ]);
 };

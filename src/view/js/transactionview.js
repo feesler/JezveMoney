@@ -825,7 +825,7 @@ TransactionView.prototype.setSrcAmount = function(val)
 TransactionView.prototype.setDestAmount = function(val)
 {
 	if (this.destAmountInfoBtn && this.destAmountInfoBtn.firstElementChild)
-		this.destAmountInfoBtn.firstElementChild.innerHTML = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
+		this.destAmountInfoBtn.firstElementChild.textContent = formatCurrency((isValidValue(val) ? val : 0), Transaction.destCurr());
 
 	if (typeof val === 'undefined')
 		return;
@@ -905,7 +905,7 @@ TransactionView.prototype.setSrcResultBalance = function(val, valid)
 
     var fmtBal = formatCurrency((isValidValue(val) ? val : valid), Transaction.srcCurr());
     if (this.srcResBalanceInfoBtn && this.srcResBalanceInfoBtn.firstElementChild)
-        this.srcResBalanceInfoBtn.firstElementChild.innerHTML = fmtBal;
+        this.srcResBalanceInfoBtn.firstElementChild.textContent = fmtBal;
 };
 
 

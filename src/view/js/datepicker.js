@@ -384,7 +384,7 @@ DatePicker.prototype.renderHead = function()
 DatePicker.prototype.setTitle = function(title)
 {
 	if (title && this.titleEl)
-		this.titleEl.innerHTML = title;
+		this.titleEl.textContent = title;
 };
 
 

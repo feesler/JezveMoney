@@ -10,7 +10,7 @@ export class TileBlock extends NullableComponent
 		let lbl = await this.query(this.elem, 'div > label');
 		if (!lbl)
 			throw new Error('Tile block label not found');
-		this.label = await this.prop(lbl, 'innerText');
+		this.label = await this.prop(lbl, 'textContent');
 
 		this.tile = await Tile.create(this.parent, await this.query(this.elem, '.tile'));
 		if (!this.tile)

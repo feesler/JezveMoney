@@ -51,7 +51,7 @@ export class TransactionsView extends TestView
 		res.modeSelector = await ModeSelector.create(this, await this.query(transList, '.mode-selector'));
 		res.paginator = await Paginator.create(this, await this.query(transList, '.paginator'));
 
-		res.title = await this.prop(res.titleEl, 'innerText');
+		res.title = await this.prop(res.titleEl, 'textContent');
 		res.transList = await TransactionList.create(this, await this.query('#tritems'));
 
 		if (res.transList && res.transList.items && res.transList.items.length && !res.modeSelector)

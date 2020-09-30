@@ -45,12 +45,12 @@ function setTileInfo(tile_id, title, subTitle, icon_id)
 	var subTitleObj = tileObj.querySelector('.tile__subtitle');
 	if (subTitleObj)
 	{
-		subTitleObj.innerHTML = subTitle;
+		subTitleObj.textContent = subTitle;
 	}
 
 	var titleObj = tileObj.querySelector('.tile__title');
 	if (titleObj)
-		titleObj.innerHTML = title;
+		titleObj.textContent = title;
 
 	icon_id = (typeof icon_id === 'undefined') ? 0 : parseInt(icon_id);
 	var icon = idSearch(icons, icon_id);

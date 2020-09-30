@@ -15,8 +15,8 @@ export class Tile extends Component
 		this.nameEL = await this.query(this.elem, '.tile__title');
 
 		this.id = parseInt(await this.prop(this.elem, 'dataset.id'));
-		this.balance = await this.prop(this.balanceEL, 'innerText');
-		this.name = await this.prop(this.nameEL, 'innerText');
+		this.balance = await this.prop(this.balanceEL, 'textContent');
+		this.name = await this.prop(this.nameEL, 'textContent');
 
 		this.isActive = await this.hasClass(this.elem, 'tile_selected');
 

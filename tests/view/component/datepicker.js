@@ -14,7 +14,7 @@ export class DatePicker extends NullableComponent
 		this.prevBtn = await this.query(this.wrapper, '.dp__header .dp__header_nav:first-child');
 		this.nextBtn = await this.query(this.wrapper, '.dp__header .dp__header_nav:last-child');
 		this.titleElem = await this.query(this.wrapper, '.dp__header .dp__header_title');
-		this.title = await this.prop(this.titleElem, 'innerText');
+		this.title = await this.prop(this.titleElem, 'textContent');
 
 		this.cells = [];
 		this.viewType = 'month';
@@ -31,7 +31,7 @@ export class DatePicker extends NullableComponent
 
 			let cell = {
 				elem : elem,
-				title : await this.prop(elem, 'innerText'),
+				title : await this.prop(elem, 'textContent'),
 				active : await this.hasClass(elem, 'dp__cell_act'),
 				highlighted : await this.hasClass(elem, 'dp__cell_hl')
 			};
@@ -93,7 +93,7 @@ export class DatePicker extends NullableComponent
 		if (!titleElem)
 			return false;
 
-		let title = await this.prop(titleElem, 'innerText');
+		let title = await this.prop(titleElem, 'textContent');
 
 		return title != this.title;
 	}

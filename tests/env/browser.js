@@ -305,17 +305,17 @@ class BrowserEnvironment extends Environment
 		}
 
 		if (this.results.expected)
-			this.totalRes.innerHTML = ++this.results.total + '/' + this.results.expected;
+			this.totalRes.textContent = ++this.results.total + '/' + this.results.expected;
 		else
-			this.totalRes.innerHTML = ++this.results.total;
-		this.okRes.innerHTML = (res) ? ++this.results.ok : this.results.ok;
-		this.failRes.innerHTML = (res) ? this.results.fail : ++this.results.fail;
+			this.totalRes.textContent = ++this.results.total;
+		this.okRes.textContent = (res) ? ++this.results.ok : this.results.ok;
+		this.failRes.textContent = (res) ? this.results.fail : ++this.results.fail;
 
 		let resStr = (res ? 'OK' : 'FAIL');
 
-		this.restbl.appendChild(ce('tr', {}, [ ce('td', { innerHTML : descr }),
-											ce('td', { innerHTML : resStr }),
-										 	ce('td', { innerHTML : message }) ]));
+		this.restbl.appendChild(ce('tr', {}, [ ce('td', { textContent : descr }),
+											ce('td', { textContent : resStr }),
+										 	ce('td', { textContent : message }) ]));
 
 		if (!this.resContainer.scrollHeight)
 			this.newResultsAvailable = true;
@@ -329,13 +329,13 @@ class BrowserEnvironment extends Environment
 
 	async setBlock(title, category)
 	{
-		this.restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, innerHTML : title }) ));
+		this.restbl.appendChild(ce('tr', { className : 'res-block-' + category }, ce('td', { colSpan : 3, textContent : title }) ));
 	}
 
 
 	setDuration(duration)
 	{
-		this.durationRes.innerText = formatTime(duration);
+		this.durationRes.textContent = formatTime(duration);
 	}
 
 
@@ -344,7 +344,7 @@ class BrowserEnvironment extends Environment
 		if (!this.vdoc || !this.vdoc.documentElement)
 			return '';
 
-		return this.vdoc.documentElement.innerHTML;
+		return this.vdoc.documentElement.textContent;
 	}
 
 

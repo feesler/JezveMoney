@@ -20,7 +20,7 @@ export class PersonsView extends TestView
 		if (!res.titleEl || !res.addBtn || !res.toolbar || !res.toolbar.editBtn || !res.toolbar.delBtn)
 			throw new Error('Invalid structure of persons view');
 
-		res.title = this.prop(res.titleEl, 'innerText');
+		res.title = this.prop(res.titleEl, 'textContent');
 		res.tiles = await TilesList.create(this, await this.query('#tilesContainer'), Tile);
 		res.hiddenTiles = await TilesList.create(this, await this.query('#hiddenTilesContainer'), Tile);
 

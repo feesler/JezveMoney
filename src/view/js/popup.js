@@ -144,11 +144,11 @@ var Popup = new (function()
 
 			if (!titleObj)
 			{
-				titleObj = ce('h1', { className : 'popup__title', innerHTML : params.title });
+				titleObj = ce('h1', { className : 'popup__title', textContent : params.title });
 				prependChild(boxObj, titleObj);
 			}
 
-			titleObj.innerHTML = titleStr;
+			titleObj.textContent = titleStr;
 		}
 
 

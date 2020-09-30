@@ -26,7 +26,7 @@ export class Paginator extends NullableComponent
 			// Check element with no child contain ellipsis and skip
 			if (!itemElem.child)
 			{
-				if (await this.prop(itemElem, 'innerText') != '...')
+				if (await this.prop(itemElem, 'textContent') != '...')
 					throw new Error('Unexpected paginator item');
 
 				// Check ellipsis is between two page number items:
@@ -55,7 +55,7 @@ export class Paginator extends NullableComponent
 			else
 				throw new Error('Unexpected stucture of paginator control');
 
-			item.title = await this.prop(itemElem.child, 'innerText');
+			item.title = await this.prop(itemElem.child, 'textContent');
 			item.num = parseInt(item.title);
 			if (!item.title || isNaN(item.num) || item.num < 1)
 				throw new Error('Unexpected title of paginator item');
