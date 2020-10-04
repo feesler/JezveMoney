@@ -155,13 +155,19 @@ TransactionView.prototype.onStart = function()
 	{
 		this.srcIdInp = ge('src_id');
 		if (this.srcIdInp)
+        {
+            Transaction.set('src_id', this.srcIdInp.value);
 			this.srcAccount = getAccount(this.srcIdInp.value);
+        }
 	}
 	if (Transaction.isIncome() || Transaction.isTransfer())
 	{
 		this.destIdInp = ge('dest_id');
 		if (this.destIdInp)
+        {
+            Transaction.set('dest_id', this.destIdInp.value);
 			this.destAccount = getAccount(this.destIdInp.value);
+        }
 	}
 
     this.srcCurrInp = ge('src_curr');
