@@ -563,6 +563,8 @@ class Transactions extends TemplateController
             "dropdown.js",
             "decimalinput.js",
             "tr_model.js",
+            "component/tile.js",
+            "component/accounttile.js",
 			"view.js",
 			"transactionview.js"
         ]);
@@ -831,6 +833,8 @@ class Transactions extends TemplateController
             "dropdown.js",
             "decimalinput.js",
             "tr_model.js",
+            "component/tile.js",
+            "component/accounttile.js",
 			"view.js",
 			"transactionview.js"
         ]);

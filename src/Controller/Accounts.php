@@ -102,6 +102,8 @@ class Accounts extends TemplateController
             "account.js",
             "dropdown.js",
             "decimalinput.js",
+            "component/tile.js",
+            "component/accounttile.js",
             "view.js",
             "accountview.js"
         ]);
@@ -165,6 +167,8 @@ class Accounts extends TemplateController
             "account.js",
             "dropdown.js",
             "decimalinput.js",
+            "component/tile.js",
+            "component/accounttile.js",
             "view.js",
             "accountview.js"
         ]);

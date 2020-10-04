@@ -35,52 +35,6 @@ function formatAccoutBalance(acc_id)
 }
 
 
-// Update tile information
-function setTileInfo(tile_id, title, subTitle, icon_id)
-{
-	var tileObj = (typeof tile_id === 'string') ? ge(tile_id) : tile_id;
-	if (!tileObj)
-		return;
-
-	var subTitleObj = tileObj.querySelector('.tile__subtitle');
-	if (subTitleObj)
-	{
-		subTitleObj.textContent = subTitle;
-	}
-
-	var titleObj = tileObj.querySelector('.tile__title');
-	if (titleObj)
-		titleObj.textContent = title;
-
-	icon_id = (typeof icon_id === 'undefined') ? 0 : parseInt(icon_id);
-	var icon = idSearch(icons, icon_id);
-
-	var iconElem = tileObj.querySelector('.tile__icon');
-	if (iconElem)
-	{
-		removeChilds(iconElem);
-		if (icon)
-		{
-			var iconSVG = svg('svg', { width : '60px', height : '54px' },
-								svg('use', { 'href' : '#' + icon.file }));
-
-			iconElem.appendChild(iconSVG);
-		}
-	}
-}
-
-
-// Set source tile to the specified account
-function setTileAccount(tile_id, acc_id)
-{
-	var acc = getAccount(acc_id);
-	if (!acc)
-		return;
-
-	setTileInfo(tile_id, acc.name, formatCurrency(acc.balance, acc.curr_id), acc.icon_id);
-}
-
-
 // Return current position of account in accounts array
 // Return -1 in case account can't be found
 function getAccountPos(acc_id)

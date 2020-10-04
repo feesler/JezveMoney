@@ -66,8 +66,8 @@ TransactionView.prototype.onStart = function()
 		this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
 	}
 
-    this.srcTile = ge('source_tile');
-    this.destTile = ge('dest_tile');
+    this.srcTile = AccountTile.fromElement('source_tile');
+    this.destTile = AccountTile.fromElement('dest_tile');
 
 	this.srcAmountInfo = ge('src_amount_left');
 	this.srcAmountInfoBtn = ge('src_amount_b');
@@ -205,10 +205,9 @@ TransactionView.prototype.onStart = function()
 			Transaction.set('dest_initbal', personAccBalance);
 
 		this.debtAccountInp = ge('acc_id');
+        this.debtAccountTile = AccountTile.fromElement('acc_tile');
 		if (!Transaction.noAccount())
 		{
-            this.debtAccountTile = ge('acc_tile');
-
 			if (this.debtAccountInp)
 				this.debtAccount = getAccount(this.debtAccountInp.value);
 
@@ -252,7 +251,7 @@ TransactionView.prototype.onStart = function()
 		if (this.debtTakeRadio)
 			this.debtTakeRadio.onclick = this.onChangeDebtOp.bind(this);
 
-        this.personTile = ge('person_tile')
+        this.personTile = Tile.fromElement('person_tile');
 
 		this.persDDList = DropDown.create({
             input_id : 'person_tile',
@@ -946,7 +945,7 @@ TransactionView.prototype.setDestResultBalance = function(val, valid)
  */
 TransactionView.prototype.updatePersonTile = function()
 {
-    if (!Transaction.isDebt())
+    if (!Transaction.isDebt() || !this.personTile)
         return;
 
     var person = getPerson(this.personIdInp.value);
@@ -957,7 +956,10 @@ TransactionView.prototype.updatePersonTile = function()
     var personAccount = getPersonAccount(person.id, curr_id);
     var personBalance = (personAccount) ? personAccount.balance : 0;
 
-    setTileInfo(this.personTile, person.name, formatCurrency(personBalance, curr_id));
+    this.personTile.render({
+        title: person.name,
+        subtitle: formatCurrency(personBalance, curr_id)
+    });
 };
 
 
@@ -1055,7 +1057,7 @@ TransactionView.prototype.onChangeAcc = function()
         this.setSrcAmount(isValidValue(srcAmount) ? srcAmount : '');
     }
 
-    setTileAccount(tile, account_id);
+    tile.render(getAccount(account_id));
 };
 
 
@@ -1266,8 +1268,10 @@ TransactionView.prototype.onChangeSource = function()
     }
     else
     {
-        setTileAccount('source_tile', Transaction.srcAcc());
-        setTileAccount('dest_tile', Transaction.destAcc());
+        if (this.srcTile)
+            this.srcTile.render(getAccount(Transaction.srcAcc()));
+        if (this.destTile)
+            this.destTile.render(getAccount(Transaction.destAcc()));
     }
 };
 
@@ -1298,8 +1302,10 @@ TransactionView.prototype.onChangeDest = function()
     }
     else
     {
-        setTileAccount('source_tile', Transaction.srcAcc());
-        setTileAccount('dest_tile', Transaction.destAcc());
+        if (this.srcTile)
+            this.srcTile.render(getAccount(Transaction.srcAcc()));
+        if (this.destTile)
+            this.destTile.render(getAccount(Transaction.destAcc()));
     }
 };
 

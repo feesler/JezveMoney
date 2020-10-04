@@ -30,6 +30,10 @@ extend(AccountView, View);
  */
 AccountView.prototype.onStart = function()
 {
+    this.tile = AccountTile.fromElement('acc_tile');
+	if (!this.tile)
+		throw new Error('Failed to initialize Account view');
+
 	this.iconSelect = DropDown.create({
 		input_id : 'icon',
 		onitemselect : this.onIconSelect.bind(this),
@@ -246,11 +250,15 @@ AccountView.prototype.setCurrencySign = function(curr_id)
 AccountView.prototype.updateAccountTile = function()
 {
 	var bal = this.model.original.balance + this.model.data.initbalance - this.model.original.initbalance;
-	var formatBalance = formatCurrency(bal, this.model.data.curr_id);
 
 	var tileTitle = this.model.data.name;
 	if (!this.model.original.id && !this.model.nameChanged)
 		tileTitle = 'New account';
 
-	setTileInfo('acc_tile', tileTitle, formatBalance, this.model.data.icon_id);
+    this.tile.render({
+        name: tileTitle,
+        balance: bal,
+        curr_id: this.model.data.curr_id,
+        icon_id: this.model.data.icon_id
+    });
 };
