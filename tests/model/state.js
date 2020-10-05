@@ -307,6 +307,37 @@ export class AppState
 		return true;
 	}
 
+
+    getAccountByIndex(ind, visibleAccList, hiddenAccList)
+    {
+        if (ind < 0 || ind > visibleAccList.length + hiddenAccList.length)
+            throw new Error(`Invalid account index ${ind}`);
+
+        if (ind < visibleAccList.length)
+        {
+            return visibleAccList[ind].id;
+        }
+        else
+        {
+            let hiddenInd = ind - visibleAccList.length;
+            return hiddenAccList[hiddenInd].id;
+        }
+    }
+
+
+    getAccountsByIndexes(accounts)
+    {
+        if (!Array.isArray(accounts))
+            accounts = [ accounts ];
+
+        let userAccList = App.state.accounts.getUserAccounts();
+        let visibleAccList = userAccList.getVisible(true);
+        let hiddenAccList = userAccList.getHidden(true);
+
+        return accounts.map(ind => this.getAccountByIndex(ind, visibleAccList, hiddenAccList));
+    }
+
+
 /**
  * Persons
  */
@@ -461,6 +492,35 @@ export class AppState
 
 		return this.accounts.getItemByIndex(ind);
 	}
+
+
+    getPersonByIndex(ind, visibleList, hiddenList)
+    {
+        if (ind < 0 || ind > visibleList.length + hiddenList.length)
+            throw new Error(`Invalid person index ${ind}`);
+
+        if (ind < visibleList.length)
+        {
+            return visibleList[ind].id;
+        }
+        else
+        {
+            let hiddenInd = ind - visibleList.length;
+            return hiddenList[hiddenInd].id;
+        }
+    }
+
+
+    getPersonsByIndexes(persons)
+    {
+        if (!Array.isArray(persons))
+            persons = [ persons ];
+
+        let visibleList = this.persons.getVisible(true);
+        let hiddenList = this.persons.getHidden(true);
+
+        return persons.map(ind => this.getPersonByIndex(ind, visibleList, hiddenList));
+    }
 
 
 /**

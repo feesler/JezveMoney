@@ -81,7 +81,7 @@ export async function update(params)
 	}
 	await App.view.goToUpdatePerson(pos);
 
-	let ids = getPersonsByIndexes(pos);
+	let ids = App.state.getPersonsByIndexes(pos);
 	let expectedPerson = App.state.persons.getItem(ids[0]);
 	if (!expectedPerson)
 		throw new Error('Can not find specified person');
@@ -119,7 +119,7 @@ export async function del(persons)
 	}
 
 	// Prepare expected updates of persons list
-	let ids = getPersonsByIndexes(persons);
+	let ids = App.state.getPersonsByIndexes(persons);
 	App.state.deletePersons(ids);
 
 	await App.view.deletePersons(persons);
@@ -146,7 +146,7 @@ export async function delFromUpdate(pos)
 		await App.view.goToPersons();
 	}
 
-	let ids = getPersonsByIndexes(pos);
+	let ids = App.state.getPersonsByIndexes(pos);
 	App.state.deletePersons(ids);
 
 	await App.view.goToUpdatePerson(pos);
@@ -160,35 +160,6 @@ export async function delFromUpdate(pos)
 	App.view.expectedState = MainView.render(App.state);
 	await test('Main page widgets update', () => App.view.checkState());
 	await test('App state', () => App.state.fetchAndTest());
-}
-
-
-function getPersonByIndex(ind, visibleList, hiddenList)
-{
-	if (ind < 0 || ind > visibleList.length + hiddenList.length)
-		throw new Error(`Invalid person index ${ind}`);
-
-	if (ind < visibleList.length)
-	{
-		return visibleList[ind].id;
-	}
-	else
-	{
-		let hiddenInd = ind - visibleList.length;
-		return hiddenList[hiddenInd].id;
-	}
-}
-
-
-function getPersonsByIndexes(persons)
-{
-	if (!Array.isArray(persons))
-		persons = [ persons ];
-
-	let visibleList = App.state.persons.getVisible(true);
-	let hiddenList = App.state.persons.getHidden(true);
-
-	return persons.map(ind => getPersonByIndex(ind, visibleList, hiddenList));
 }
 
 
@@ -209,7 +180,7 @@ export async function show(persons, val = true)
 
 	// Check initial state
 	await App.state.fetch();
-	let ids = getPersonsByIndexes(persons);
+	let ids = App.state.getPersonsByIndexes(persons);
 	App.state.showPersons(ids, val);
 
 	await App.view.showPersons(persons, val);

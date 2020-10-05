@@ -25,7 +25,11 @@ export async function runAction({ action, data })
 
 	if (action == 'changeSrcAccountByPos' || action == 'changeDestAccountByPos')
 	{
-		let acc = App.state.accounts.getItemByIndex(data);
+        let ids = App.state.getAccountsByIndexes(data);
+		if (!Array.isArray(ids) || !ids.length)
+			throw new Error(`Account (${data}) not found`);
+
+        let acc = App.state.accounts.getItem(ids[0]);
 		if (!acc)
 			throw new Error(`Account (${data}) not found`);
 
@@ -37,7 +41,11 @@ export async function runAction({ action, data })
 
 	if (action == 'changePersonByPos')
 	{
-		let person = App.state.persons.getItemByIndex(data);
+        let ids = App.state.getPersonsByIndexes(data);
+		if (!Array.isArray(ids) || !ids.length)
+			throw new Error(`Person (${data}) not found`);
+
+		let person = App.state.persons.getItem(ids[0]);
 		if (!person)
 			throw new Error(`Person (${data}) not found`);
 
@@ -64,7 +72,11 @@ export async function runAction({ action, data })
 				await test('Enable account', () => App.view.toggleAccount());
 			}
 
-			let acc = App.state.accounts.getItemByIndex(data);
+            let ids = App.state.getAccountsByIndexes(data);
+            if (!Array.isArray(ids) || !ids.length)
+                throw new Error(`Account (${data}) not found`);
+
+            let acc = App.state.accounts.getItem(ids[0]);
 			if (!acc)
 				throw new Error(`Account (${data}) not found`);
 
