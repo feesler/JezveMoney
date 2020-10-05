@@ -139,11 +139,12 @@ StatisticsView.prototype.showCalendar = function()
     if (!this.datePicker)
     {
         this.datePicker = DatePicker.create({
-            wrapper_id : this.datePickerWrapper.id,
+            wrapper : this.datePickerWrapper,
             relparent : this.datePickerWrapper.parentNode,
             range : true,
             onrangeselect : this.onRangeSelect.bind(this),
-            onhide : this.onDatePickerHide.bind(this) });
+            onhide : this.onDatePickerHide.bind(this)
+        });
     }
     if (!this.datePicker)
         return;

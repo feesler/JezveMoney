@@ -728,7 +728,7 @@ TransactionListView.prototype.showCalendar = function()
     if (!this.datePicker)
     {
         this.datePicker = DatePicker.create({
-            wrapper_id : this.datePickerWrapper.id,
+            wrapper : this.datePickerWrapper,
             relparent : this.datePickerWrapper.parentNode,
             range : true,
             onrangeselect : this.onRangeSelect.bind(this),

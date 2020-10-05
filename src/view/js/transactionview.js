@@ -379,7 +379,7 @@ TransactionView.prototype.showCalendar = function()
 	if (!this.calendarObj)
 	{
 		this.calendarObj = DatePicker.create({
-			wrapper_id : this.datePickerWrapper.id,
+			wrapper : this.datePickerWrapper,
 			relparent : this.datePickerWrapper.parentNode,
 			ondateselect : this.onSelectDate.bind(this)
 		});
