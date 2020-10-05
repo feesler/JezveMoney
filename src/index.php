@@ -15,8 +15,7 @@ $router->setRoutes([
     "profile" => "Profile",
     "statistics" => "Statistics",
     "user" => "User",
-    "fastcommit" => "FastCommit",
-    "checkbalance" => "CheckBalance"
+    "fastcommit" => "FastCommit"
 ]);
 
 $router->setAliases([
