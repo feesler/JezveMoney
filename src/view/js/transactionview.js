@@ -55,6 +55,7 @@ TransactionView.prototype.onStart = function()
 	this.srcContainer = ge('source');
 	if (this.srcContainer)
 	{
+		this.srcTileBase = this.srcContainer.querySelector('.tile-base');
 		this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
 		this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
 	}
@@ -62,6 +63,7 @@ TransactionView.prototype.onStart = function()
 	this.destContainer = ge('destination');
 	if (this.destContainer)
 	{
+		this.destTileBase = this.destContainer.querySelector('.tile-base');
 		this.destTileContainer = this.destContainer.querySelector('.tile_container');
 		this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
 	}
@@ -682,20 +684,17 @@ TransactionView.prototype.onDestCurrencySel = function(obj)
  */
 TransactionView.prototype.toggleEnableAccount = function()
 {
-	if (Transaction.noAccount())
-	{
-		this.debtAccountLabel.textContent = (Transaction.debtType()) ? 'Destination account' : 'Source account';
+    var debtAccountLabel = 'No account';
+
+	if (Transaction.noAccount()) {
+		debtAccountLabel = (Transaction.debtType()) ? 'Destination account' : 'Source account';
 	}
-	else
-	{
-		this.debtAccountLabel.textContent = 'No account';
-	}
+
+	this.debtAccountLabel.textContent = debtAccountLabel;
 
 	show(this.noAccountBtn, Transaction.noAccount());
-
-	show(this.srcTileContainer, Transaction.noAccount());
-	show(this.srcTileInfoBlock, Transaction.noAccount());
-	show('selaccount', !Transaction.noAccount());
+    show(this.srcTileBase, Transaction.noAccount());
+	show(this.selectAccountBtn, !Transaction.noAccount());
 
 	Transaction.update('no_account', !Transaction.noAccount());
 
@@ -1057,7 +1056,8 @@ TransactionView.prototype.onChangeAcc = function()
         this.setSrcAmount(isValidValue(srcAmount) ? srcAmount : '');
     }
 
-    tile.render(getAccount(account_id));
+    if (account_id)
+        tile.render(getAccount(account_id));
 };
 
 

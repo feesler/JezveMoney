@@ -91,8 +91,8 @@
 						<div id="source" class="account-container">
 <?php		if ($noAccount) {		?>
 							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button></div>
-							<div class="tile-base">
-								<div class="tile_container hidden">
+							<div class="tile-base hidden">
+								<div class="tile_container">
 									<div id="acc_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=e($acc_balance)?></span><span class="tile__icon"><?=useIcon($acc_ic, 60, 54)?></span><span class="tile__title"><?=e($acc_name)?></span></span></div></div>
 									<input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
 <?php		} else {	?>
@@ -104,11 +104,7 @@
 <?php		}	?>
 								</div>
 
-<?php		if (!$noAccount) {		?>
 								<div class="tile-info-block">
-<?php		} else {	?>
-								<div class="tile-info-block hidden">
-<?php		}	?>
 									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
