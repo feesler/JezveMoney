@@ -1,15 +1,18 @@
 import { api, ApiRequestError } from '../../model/api.js';
-import { test } from '../../common.js';
+import { test, formatProps } from '../../common.js';
 import { App } from '../../app.js';
 
 
-// Create person with specified params (name)
-// And check expected state of app
+/**
+ * Create person with specified params and check expected state of app
+ * @param {Object} params
+ * @param {string} params.name - name of person
+ */
 export async function create(params)
 {
 	let person_id = 0;
 
-	await test('Create person', async () =>
+	await test(`Create person (${formatProps(params)})`, async () =>
 	{
 		let createRes = null;
 		let resExpected = App.state.createPerson(params);
@@ -34,13 +37,17 @@ export async function create(params)
 }
 
 
-// Update person with specified params (name)
-// And check expected state of app
+/**
+ * Update person with specified params and check expected state of app
+ * @param {Object} params
+ * @param {string} params.id - person identifier
+ * @param {string} params.name - name of person
+ */
 export async function update(params)
 {
 	let updateRes = false;
 
-	await test('Update person', async () =>
+	await test(`Update person (${formatProps(params)})`, async () =>
 	{
 		let resExpected = App.state.updatePerson(params);
 		let updParams = (resExpected) ? App.state.persons.getItem(params.id) : params;
@@ -64,13 +71,15 @@ export async function update(params)
 }
 
 
-// Delete specified person(s)
-// And check expected state of app
+/**
+ * Delete specified person(s) and check expected state of app
+ * @param {number[]} ids - array of person identificators
+ */
 export async function del(ids)
 {
 	let deleteRes = false;
 
-	await test('Delete person', async () =>
+	await test(`Delete person (${ids})`, async () =>
 	{
 		let resExpected = App.state.deletePersons(ids);
 

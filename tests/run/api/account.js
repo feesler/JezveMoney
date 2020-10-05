@@ -8,13 +8,19 @@ import {
 import { App } from '../../app.js';
 
 
-// Create account with specified params (name, curr_id, balance, icon)
-// And check expected state of app
+/**
+ * Create account with specified params and check expected state of app
+ * @param {Object} params
+ * @param {string} params.name - name of account
+ * @param {number} params.curr_id - currency of account
+ * @param {number} params.initbalance - initial balance of account
+ * @param {number} params.icon_id - icon identifier
+ */
 export async function create(params)
 {
 	let acc_id = 0;
 
-	await test('Create account', async () =>
+	await test(`Create account (${formatProps(params)})`, async () =>
 	{
 		let resExpected = App.state.createAccount(params);
 
@@ -40,8 +46,15 @@ export async function create(params)
 }
 
 
-// Update account with specified params (name, curr_id, balance, icon)
-// And check expected state of app
+/**
+ * Update account with specified params and check expected state of app
+ * @param {Object} params
+ * @param {string} params.id - name of account
+ * @param {string} params.name - name of account
+ * @param {number} params.curr_id - currency of account
+ * @param {number} params.initbalance - initial balance of account
+ * @param {number} params.icon_id - icon identifier
+ */
 export async function update(params)
 {
 	let updateRes = false;
@@ -78,13 +91,15 @@ export async function update(params)
 }
 
 
-// Delete specified account(s)
-// And check expected state of app
+/**
+ * Delete specified account(s) and check expected state of app
+ * @param {number[]} ids - array of account identificators
+ */
 export async function del(ids)
 {
 	let deleteRes = false;
 
-	await test('Delete account', async () =>
+	await test(`Delete account (${ids})`, async () =>
 	{
 		let resExpected = App.state.deleteAccounts(ids);
 

@@ -10,6 +10,8 @@ import {
 	isObject,
 	copyObject,
 	formatProps,
+    formatDate,
+    fixDate
 } from '../../common.js';
 
 
@@ -135,8 +137,10 @@ export async function runAction({ action, data })
 	if (action == 'clickExchRate')
 		testDescr = 'Click on exchange rate';
 
-	if (action == 'changeDate')
-		testDescr = `Date (${data}) input`;
+	if (action == 'changeDate') {
+        let fmtDate = formatDate(new Date(fixDate(data)));
+		testDescr = `Date (${fmtDate}) input`;
+    }
 
 	if (action == 'inputComment')
 		testDescr = `Comment (${data}) input`;

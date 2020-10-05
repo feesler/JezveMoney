@@ -6,18 +6,33 @@ import {
 	formatDate,
 	fixDate,
 	checkObjValue,
+    copyObject,
 	formatProps
 } from '../../common.js';
 import { App } from '../../app.js';
 
 
-// Create transaction with specified params
-// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
+/**
+ * Create transaction with specified params and check expected state of app
+ * @param {Object} params
+ * @param {number} params.type - transaction type
+ * @param {number} params.src_id - source account
+ * @param {number} params.dest_id - destination account
+ * @param {number} params.src_curr - source currency
+ * @param {number} params.dest_curr - destination currency
+ * @param {number} params.src_amount - source amount
+ * @param {number} params.dest_amount - destination amount
+ * @param {string} params.date - date of transaction
+ * @param {string} params.comment - comment
+ */
 export async function create(params)
 {
 	let transaction_id = 0;
 
-	await test(`Create ${Transaction.typeToString(params.type)} transaction`, async () =>
+    let titleParams = copyObject(params);
+    delete titleParams.type;
+
+	await test(`Create ${Transaction.typeToString(params.type)} transaction (${formatProps(titleParams)})`, async () =>
 	{
 		let resExpected = App.state.createTransaction(params);
 
@@ -52,13 +67,24 @@ export async function extractAndCreate(data)
 }
 
 
-// Update transaction with specified params
-// (type, src_id, dest_id, src_amount, dest_amount, src_curr, dest_curr, date, comment)
+/**
+ * Update transaction with specified params and check expected state of app
+ * @param {Object} params
+ * @param {number} params.type - transaction type
+ * @param {number} params.src_id - source account
+ * @param {number} params.dest_id - destination account
+ * @param {number} params.src_curr - source currency
+ * @param {number} params.dest_curr - destination currency
+ * @param {number} params.src_amount - source amount
+ * @param {number} params.dest_amount - destination amount
+ * @param {string} params.date - date of transaction
+ * @param {string} params.comment - comment
+ */
 export async function update(params)
 {
 	let updateRes;
 
-	await test('Update transaction', async () =>
+	await test(`Update transaction (${formatProps(params)})`, async () =>
 	{
 		let resExpected = App.state.updateTransaction(params);
 
@@ -91,13 +117,15 @@ export async function update(params)
 }
 
 
-// Delete specified transaction(s)
-// And check expected state of app
+/**
+ * Delete specified transaction(s) and check expected state of app
+ * @param {number[]} ids - array of transaction identificators
+ */
 export async function del(ids)
 {
 	let deleteRes;
 
-	await test('Delete transaction', async () =>
+	await test(`Delete transaction (${ids})`, async () =>
 	{
 		let resExpected = App.state.deleteTransactions(ids);
 
@@ -126,7 +154,7 @@ export async function setPos(params)
 {
 	let result;
 
-	await test('Set position of transaction', async () =>
+	await test(`Set position of transaction (${formatProps(params)})`, async () =>
 	{
 		let resExpected = App.state.setTransactionPos(params);
 
