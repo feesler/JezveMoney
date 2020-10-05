@@ -525,11 +525,16 @@ class Transactions extends TemplateController
         $rtDestAmount = $this->currModel->format($tr["dest_amount"], $destAmountCurr);
         $rtExchange = $exchValue . " " . $exchSign;
         if ($tr["type"] != DEBT) {
+            $srcResBalance = ($src) ? $src->balance : null;
+            $destResBalance = ($dest) ? $dest->balance : null;
+
             $rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
-            $srcResBalance = ($give) ? $person_res_balance : $debtAcc->balance;
-            $destResBalance = ($give) ? $debtAcc->balance : $person_res_balance;
+            $acc_res_balance = ($debtAcc && !$noAccount) ? $debtAcc->balance : null;
+
+            $srcResBalance = ($give) ? $person_res_balance : $acc_res_balance;
+            $destResBalance = ($give) ? $acc_res_balance : $person_res_balance;
 
             $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
             $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
@@ -724,14 +729,10 @@ class Transactions extends TemplateController
                 $destAmountCurr = $person_acc->curr_id;
 
                 $acc_id = $this->accModel->getIdByPos(0);
-                $accObj = $this->accModel->getItem($acc_id);
-                if (!$accObj) {
+                $debtAcc = $this->accModel->getItem($acc_id);
+                if (!$debtAcc) {
                     throw new \Error("Account " . $acc_id . " not found");
                 }
-
-                $acc_name = $accObj->name;
-                $acc_balance = $this->currModel->format($accObj->balance, $accObj->curr_id);
-                $acc_ic = $this->accModel->getIconFile($accObj->id);
             } else {
                 $acc_id = 0;
             }
@@ -764,14 +765,15 @@ class Transactions extends TemplateController
                 } else {
                     $accLbl = "Source account";
                 }
+            }
 
-                if ($debtAcc) {
-                    $debtAccBalance = $debtAcc->balance +
-                        (($give) ? -$tr["dest_amount"] : $tr["src_amount"]);
+            if ($debtAcc) {
+                $debtAccBalance = $debtAcc->balance;
+                if (!$noAccount)
+                    $debtAccBalance += ($give) ? -$tr["dest_amount"] : $tr["src_amount"];
 
-                    $debtAcc->balfmt = $this->currModel->format($debtAccBalance, $debtAcc->curr_id);
-                    $debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
-                }
+                $debtAcc->balfmt = $this->currModel->format($debtAccBalance, $debtAcc->curr_id);
+                $debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
             }
 
             $p_balfmt = $this->currModel->format($person_balance, $srcAmountCurr);
@@ -795,10 +797,13 @@ class Transactions extends TemplateController
             $rtExchange .= " (" . $backExchValue . " " . $backExchSign . ")";
         }
         if ($tr["type"] != DEBT) {
+            $srcResBalance = ($src) ? $src->balance : null;
+            $destResBalance = ($dest) ? $dest->balance : null;
+
             $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
-            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : null;
+            $acc_res_balance = ($debtAcc && !$noAccount) ? $debtAcc->balance : null;
             $srcResBalance = ($give) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($give) ? $acc_res_balance : $person_res_balance;
             $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);

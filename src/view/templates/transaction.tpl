@@ -89,19 +89,30 @@
 						</div>
 
 						<div id="source" class="account-container">
+							<div class="tile_header">
+                                <label id="acclbl"><?=e($accLbl)?></label>
 <?php		if ($noAccount) {		?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button></div>
-							<div class="tile-base hidden">
-								<div class="tile_container">
-									<div id="acc_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=e($acc_balance)?></span><span class="tile__icon"><?=useIcon($acc_ic, 60, 54)?></span><span class="tile__title"><?=e($acc_name)?></span></span></div></div>
-									<input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
+                                <button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button>
 <?php		} else {	?>
-							<div class="tile_header"><label id="acclbl"><?=e($accLbl)?></label><button id="noacc_btn" class="close-btn" type="button"><?=svgIcon("close")?></button></div>
-							<div class="tile-base">
-								<div class="tile_container">
-									<div id="acc_tile" class="tile"><div class="tilelink"><span><span class="tile__subtitle"><?=($debtAcc->balfmt)?></span><span class="tile__icon"><?=useIcon($debtAcc->icon, 60, 54)?></span><span class="tile__title"><?=($debtAcc->name)?></span></span></div></div>
-									<input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
+                                <button id="noacc_btn" class="close-btn" type="button"><?=svgIcon("close")?></button>
 <?php		}	?>
+                            </div>
+<?php		if ($noAccount) {		?>
+							<div class="tile-base hidden">
+<?php		} else {	?>
+							<div class="tile-base">
+<?php		}	?>
+								<div class="tile_container">
+									<div id="acc_tile" class="tile">
+                                        <div class="tilelink">
+                                            <span>
+                                                <span class="tile__subtitle"><?=($debtAcc->balfmt)?></span>
+                                                <span class="tile__icon"><?=useIcon($debtAcc->icon, 60, 54)?></span>
+                                                <span class="tile__title"><?=($debtAcc->name)?></span>
+                                            </span>
+                                        </div>
+                                    </div>
+									<input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
 								</div>
 
 								<div class="tile-info-block">
@@ -314,11 +325,7 @@
 							<div><label for="resbal"><?=e($srcBalTitle)?></label></div>
 							<div class="input-group std_margin">
 								<div class="stretch-input">
-<?php	if ($tr["type"] == DEBT) {		?>
-									<input id="resbal" class="amount-input" type="text" value="<?=($give ? $person_res_balance : ($debtAcc ? $debtAcc->balance : ""))?>">
-<?php	} else {	?>
-									<input id="resbal" class="amount-input" type="text" value="<?=($src->balance)?>">
-<?php	}	?>
+									<input id="resbal" class="amount-input" type="text" value="<?=e($srcResBalance)?>">
 								</div>
 								<div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign"><?=e($srcAmountSign)?></div></div>
 							</div>
@@ -330,11 +337,7 @@
 							<div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
 							<div class="input-group std_margin">
 								<div class="stretch-input">
-<?php	if ($tr["type"] == DEBT) {		?>
-									<input id="resbal_d" class="amount-input" type="text" value="<?=($give ? ($debtAcc ? $debtAcc->balance : "") : $person_res_balance )?>">
-<?php	} else {	?>
-									<input id="resbal_d" class="amount-input" type="text" value="<?=($dest->balance)?>">
-<?php	}	?>
+									<input id="resbal_d" class="amount-input" type="text" value="<?=e($destResBalance)?>">
 								</div>
 								<div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign_d"><?=e($destAmountSign)?></div></div>
 							</div>
