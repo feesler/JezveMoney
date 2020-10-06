@@ -162,8 +162,8 @@ class Statistics extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
+            "model/currency.js",
             "selection.js",
-            "currency.js",
             "datepicker.js",
             "dropdown.js",
             "lib/raphael.min.js",

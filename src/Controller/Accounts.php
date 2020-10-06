@@ -41,10 +41,10 @@ class Accounts extends TemplateController
         ]);
         $this->buildCSS();
         array_push($this->jsArr, ...[
+            "model/account.js",
+            "model/currency.js",
             "selection.js",
-            "currency.js",
             "toolbar.js",
-            "account.js",
             "view.js",
             "accountlistview.js"
         ]);
@@ -97,9 +97,9 @@ class Accounts extends TemplateController
         ]);
         $this->buildCSS();
         array_push($this->jsArr, ...[
+            "model/currency.js",
+            "model/account.js",
             "selection.js",
-            "currency.js",
-            "account.js",
             "dropdown.js",
             "decimalinput.js",
             "component/tile.js",
@@ -162,9 +162,9 @@ class Accounts extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
+            "model/currency.js",
+            "model/account.js",
             "selection.js",
-            "currency.js",
-            "account.js",
             "dropdown.js",
             "decimalinput.js",
             "component/tile.js",
