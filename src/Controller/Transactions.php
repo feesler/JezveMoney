@@ -575,6 +575,7 @@ class Transactions extends TemplateController
             "decimalinput.js",
             "component/tile.js",
             "component/accounttile.js",
+            "component/tileinfoitem.js",
 			"view.js",
 			"transactionview.js"
         ]);
@@ -851,6 +852,7 @@ class Transactions extends TemplateController
             "decimalinput.js",
             "component/tile.js",
             "component/accounttile.js",
+            "component/tileinfoitem.js",
 			"view.js",
 			"transactionview.js"
         ]);

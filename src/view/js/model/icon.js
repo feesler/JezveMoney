@@ -2,7 +2,7 @@
  * @constructor Icon class
  * @param {*} props 
  */
-function Icon(props)
+function Icon()
 {
 	Icon.parent.constructor.apply(this, arguments);
 }
@@ -43,7 +43,7 @@ IconList.create = function(props)
  * Create list item from specified object
  * @param {Object} obj 
  */
-AccountList.prototype.createItem = function(obj)
+IconList.prototype.createItem = function(obj)
 {
     return new Icon(obj);
 };

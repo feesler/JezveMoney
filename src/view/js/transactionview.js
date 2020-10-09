@@ -95,30 +95,26 @@ TransactionView.prototype.onStart = function()
     this.srcTile = AccountTile.fromElement({ elem: 'source_tile', parent: this });
     this.destTile = AccountTile.fromElement({ elem: 'dest_tile', parent: this });
 
-	this.srcAmountInfo = ge('src_amount_left');
-	this.srcAmountInfoBtn = ge('src_amount_b');
-	if (this.srcAmountInfoBtn)
-		this.srcAmountInfoBtn.addEventListener('click', this.onSrcAmountSelect.bind(this));
-
-	this.destAmountInfo = ge('dest_amount_left');
-	this.destAmountInfoBtn = ge('dest_amount_b');
-	if (this.destAmountInfoBtn)
-		this.destAmountInfoBtn.addEventListener('click', this.onDestAmountSelect.bind(this));
-
-	this.exchangeInfo = ge('exch_left');
-	this.exchangeInfoBtn = ge('exchrate_b');
-	if (this.exchangeInfoBtn)
-		this.exchangeInfoBtn.addEventListener('click', this.onExchRateSelect.bind(this));
-
-	this.srcResBalanceInfo = ge('src_res_balance_left');
-	this.srcResBalanceInfoBtn = ge('resbal_b');
-	if (this.srcResBalanceInfoBtn)
-		this.srcResBalanceInfoBtn.addEventListener('click', this.onResBalanceSelect.bind(this));
-
-	this.destResBalanceInfo = ge('dest_res_balance_left');
-	this.destResBalanceInfoBtn = ge('resbal_d_b');
-	if (this.destResBalanceInfoBtn)
-		this.destResBalanceInfoBtn.addEventListener('click', this.onResBalanceDestSelect.bind(this));
+    this.srcAmountInfo = TileInfoItem.fromElement({
+        elem: 'src_amount_left',
+        onclick: this.onSrcAmountSelect.bind(this)
+    });
+    this.destAmountInfo = TileInfoItem.fromElement({
+        elem: 'dest_amount_left',
+        onclick: this.onDestAmountSelect.bind(this)
+    });
+    this.exchangeInfo = TileInfoItem.fromElement({
+        elem: 'exch_left',
+        onclick: this.onExchRateSelect.bind(this)
+    });
+    this.srcResBalanceInfo = TileInfoItem.fromElement({
+        elem: 'src_res_balance_left',
+        onclick: this.onResBalanceSelect.bind(this)
+    });
+    this.destResBalanceInfo = TileInfoItem.fromElement({
+        elem: 'dest_res_balance_left',
+        onclick: this.onResBalanceDestSelect.bind(this)
+    });
 
     this.srcAmountRow = ge('src_amount_row');
     if (this.srcAmountRow)
@@ -447,7 +443,8 @@ TransactionView.prototype.commonSwitch = function(inputRow, infoBlock, inputObj,
 	showInput = !!showInput;
 
 	show(inputRow, showInput);
-	show(infoBlock, !showInput);
+    if (infoBlock)
+    	show(infoBlock.elem, !showInput);
 
 	if (showInput && inputObj && inputObj.elem)
 		inputObj.elem.focus();
@@ -586,10 +583,12 @@ TransactionView.prototype.onExchRateSelect = function()
 TransactionView.prototype.hideSrcAmountAndExchange = function()
 {
 	show(this.srcAmountRow, false);
-	show(this.srcAmountInfo,  false);
+    if (this.srcAmountInfo)
+	    show(this.srcAmountInfo.elem,  false);
 
 	show(this.exchangeRow, false);
-	show(this.exchangeInfo, false);
+    if (this.exchangeInfo)
+    	show(this.exchangeInfo.elem, false);
 };
 
 
@@ -599,10 +598,12 @@ TransactionView.prototype.hideSrcAmountAndExchange = function()
 TransactionView.prototype.hideDestAmountAndExchange = function()
 {
 	show(this.destAmountRow, false);
-	show(this.destAmountInfo,  false);
+    if (this.destAmountInfo)
+	    show(this.destAmountInfo.elem,  false);
 
 	show(this.exchangeRow, false);
-	show(this.exchangeInfo, false);
+    if (this.exchangeInfo)
+	    show(this.exchangeInfo.elem, false);
 };
 
 
@@ -827,9 +828,10 @@ TransactionView.prototype.setAmountTileBlockLabel = function(src, full)
  */
 TransactionView.prototype.setSrcAmount = function(val)
 {
-	if (this.srcAmountInfoBtn && this.srcAmountInfoBtn.firstElementChild)
+    if (this.srcAmountInfo)
     {
-        this.srcAmountInfoBtn.firstElementChild.textContent = this.model.currency.formatCurrency((isValidValue(val) ? val : 0), this.model.transaction.srcCurr());
+        var title = this.model.currency.formatCurrency((isValidValue(val) ? val : 0), this.model.transaction.srcCurr());
+        this.srcAmountInfo.setTitle(title);
     }
 
 	if (typeof val === 'undefined')
@@ -853,9 +855,10 @@ TransactionView.prototype.setSrcAmount = function(val)
  */
 TransactionView.prototype.setDestAmount = function(val)
 {
-	if (this.destAmountInfoBtn && this.destAmountInfoBtn.firstElementChild)
+    if (this.destAmountInfo)
     {
-   		this.destAmountInfoBtn.firstElementChild.textContent = this.model.currency.formatCurrency((isValidValue(val) ? val : 0), this.model.transaction.destCurr());
+        var title = this.model.currency.formatCurrency((isValidValue(val) ? val : 0), this.model.transaction.destCurr());
+        this.destAmountInfo.setTitle(title);
     }
 
 	if (typeof val === 'undefined')
@@ -909,8 +912,8 @@ TransactionView.prototype.setExchRate = function(val)
         exchText += ' ('  + invExch + ' ' + srcCurr.sign + '/' + destCurr.sign + ')';
     }
 
-    if (this.exchangeInfoBtn && this.exchangeInfoBtn.firstElementChild)
-        this.exchangeInfoBtn.firstElementChild.textContent = val + ' ' + exchText;
+    if (this.exchangeInfo)
+        this.exchangeInfo.setTitle(val + ' ' + exchText);
 };
 
 
@@ -934,9 +937,10 @@ TransactionView.prototype.setSrcResultBalance = function(val, valid)
             this.srcResBalanceInput.value = val;
     }
 
-    var fmtBal = this.model.currency.formatCurrency(isValidValue(val) ? val : valid, this.model.transaction.srcCurr());
-    if (this.srcResBalanceInfoBtn && this.srcResBalanceInfoBtn.firstElementChild)
-        this.srcResBalanceInfoBtn.firstElementChild.textContent = fmtBal;
+    if (this.srcResBalanceInfo) {
+        var fmtBal = this.model.currency.formatCurrency(isValidValue(val) ? val : valid, this.model.transaction.srcCurr());
+        this.srcResBalanceInfo.setTitle(fmtBal);
+    }
 };
 
 
@@ -960,9 +964,10 @@ TransactionView.prototype.setDestResultBalance = function(val, valid)
             this.destResBalanceInput.value = val;
     }
 
-    var fmtBal = this.model.currency.formatCurrency(isValidValue(val) ? val : valid, this.model.transaction.destCurr());
-    if (this.destResBalanceInfoBtn && this.destResBalanceInfoBtn.firstElementChild)
-        this.destResBalanceInfoBtn.firstElementChild.textContent = fmtBal;
+    if (this.destResBalanceInfo) {
+        var fmtBal = this.model.currency.formatCurrency(isValidValue(val) ? val : valid, this.model.transaction.destCurr());
+        this.destResBalanceInfo.setTitle(fmtBal);
+    }
 };
 
 
@@ -1247,8 +1252,8 @@ TransactionView.prototype.onChangeDebtOp = function()
     if (dType == this.model.transaction.debtType)
         return;
 
-    insertAfter(this.srcResBalanceInfo, (dType) ? this.exchangeInfo : this.destAmountInfo);
-    insertAfter(this.destResBalanceInfo, (dType) ? this.destAmountInfo : this.exchangeInfo);
+    insertAfter(this.srcResBalanceInfo.elem, (dType) ? this.exchangeInfo.elem : this.destAmountInfo.elem);
+    insertAfter(this.destResBalanceInfo.elem, (dType) ? this.destAmountInfo.elem : this.exchangeInfo.elem);
 
     var rbv = isVisible(this.srcResBalanceRow);
     if (rbv || isVisible(this.destResBalanceRow))

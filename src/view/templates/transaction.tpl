@@ -56,7 +56,7 @@
 									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
-											<button id="src_amount_b" class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
 										</div>
 									</div>
 <?php		if ($srcAmountCurr != $destAmountCurr) {		?>
@@ -66,21 +66,21 @@
 <?php		}	?>
 										<span>Exchange rate</span>
 										<div>
-											<button id="exchrate_b" class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
 										</div>
 									</div>
 <?php		if ($give) {		?>
 									<div id="src_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_b" class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
 										</div>
 									</div>
 <?php		} else {	?>
 									<div id="dest_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_d_b" class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
 										</div>
 									</div>
 <?php		}	?>
@@ -119,21 +119,21 @@
 									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
-											<button id="dest_amount_b" class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
 										</div>
 									</div>
 <?php		if ($give) { 		?>
 									<div id="dest_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_d_b" class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
 										</div>
 									</div>
 <?php		} else {		?>
 									<div id="src_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_b" class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
 										</div>
 									</div>
 <?php		}		?>
@@ -162,7 +162,7 @@
 									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
-											<button id="src_amount_b" class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
 										</div>
 									</div>
 <?php	}	?>
@@ -170,14 +170,14 @@
 									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
-											<button id="dest_amount_b" class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
 										</div>
 									</div>
 <?php	}	?>
 									<div id="src_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_b" class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
 										</div>
 									</div>
 <?php	if (($tr["type"] == TRANSFER && $src->curr_id == $dest->curr_id) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
@@ -187,7 +187,7 @@
 <?php	}	?>
 										<span>Exchange rate</span>
 										<div>
-											<button id="exchrate_b" class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
 										</div>
 									</div>
 								</div>
@@ -210,19 +210,19 @@
 									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
-											<button id="src_amount_b" class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
 										</div>
 									</div>
 									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
-											<button id="dest_amount_b" class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
 										</div>
 									</div>
 									<div id="dest_res_balance_left">
 										<span>Result balance</span>
 										<div>
-											<button id="resbal_d_b" class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
 										</div>
 									</div>
 <?php	if ($tr["type"] == INCOME) {		?>
@@ -233,7 +233,7 @@
 <?php		}				?>
 										<span>Exchange rate</span>
 										<div>
-											<button id="exchrate_b" class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
+											<button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
 										</div>
 									</div>
 <?php	}	?>
