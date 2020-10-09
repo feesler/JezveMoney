@@ -67,9 +67,9 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-	var persons = <?=JSON::encode($personsData)?>;
-
-    var view = new PersonListView();
+    var view = new PersonListView({
+        persons: <?=JSON::encode($personsData)?>
+    });
 </script>
 </body>
 </html>

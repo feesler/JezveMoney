@@ -18,6 +18,10 @@ function AccountListView(props)
 		}
 	};
 
+    if (this.props.accounts)
+    {
+        this.model.accounts = AccountList.create(this.props.accounts);
+    }
 }
 
 
@@ -99,11 +103,11 @@ AccountListView.prototype.onTileClick = function(e)
 		return;
 
 	var account_id = parseInt(tile.dataset.id);
-	var account = getAccount(account_id);
+	var account = this.model.accounts.getItem(account_id);
 	if (!account)
 		return;
 	
-	var currentSelection = isHiddenAccount(account) ? this.model.selected.hidden : this.model.selected.visible;
+	var currentSelection = account.isVisible() ? this.model.selected.visible : this.model.selected.hidden;
 	if (currentSelection.isSelected(account_id))
 	{
 		currentSelection.deselect(account_id);

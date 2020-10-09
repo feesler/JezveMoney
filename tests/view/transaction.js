@@ -26,7 +26,7 @@ export class TransactionView extends TestView
 	{
 		let res = {};
 
-		res.isUpdate = await this.global('edit_mode');
+		res.isUpdate = (await this.url()).includes('/edit/');
 
 		if (res.isUpdate)
 		{
@@ -163,13 +163,6 @@ export class TransactionView extends TestView
 		res.comment = this.model.comment;
 
 		return res;
-	}
-
-
-	// Return null if object can't be found
-	async getUpdateTransactionObj()
-	{
-		return this.global('edit_transaction');
 	}
 
 

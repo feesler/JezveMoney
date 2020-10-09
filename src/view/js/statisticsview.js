@@ -1,7 +1,7 @@
 /**
  * Statistics view
  */
-function StatisticsView(props)
+function StatisticsView()
 {
     StatisticsView.parent.constructor.apply(this, arguments);
 
@@ -10,6 +10,11 @@ function StatisticsView(props)
     this.model = {
         selDateRange: null
     };
+
+    if (!('currency' in this.props))
+        throw new Error('Invalid Statistics view properties');
+
+    this.model.currency = CurrencyList.create(this.props.currency);
 }
 
 
@@ -284,7 +289,7 @@ StatisticsView.prototype.onBarClick = function(barRect, val)
 
         chartsWrapper.style.position = (isRelative) ? 'relative' : '';
 
-        this.popup.textContent = formatCurrency(val, accCurr);
+        this.popup.textContent = this.model.currency.formatCurrency(val, accCurr);
 
         var rectBBox = barRect.getBBox();
         var chartsBRect = chartsWrapper.getBoundingClientRect();

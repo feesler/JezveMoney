@@ -7,7 +7,7 @@ function Tile(props)
 	if (typeof props === 'undefined')
 		this.props = {};
 	else
-		this.props = copyObject(props);
+		this.props = props;
 
     if (typeof this.props.elem === 'string')
         this.elem = ge(this.props.elem);
@@ -19,13 +19,13 @@ function Tile(props)
 /**
  * Create new Tile from specified element
  */
-Tile.fromElement = function(elem)
+Tile.fromElement = function(props)
 {
     var res;
 
     try
     {
-        res = new Tile({ elem : elem });
+        res = new Tile(props);
         res.parse();
     }
     catch(e)

@@ -1,801 +1,787 @@
-function TransactionModel(trans_type, srcCurr, destCurr, person, dType, lastAcc, noAcc)
+/**
+ * @constructor TransactionModel
+ * Manage transaction data, calculate properties and notofy subscribers
+ * Main formula:
+ *  S2 = S1 - sa        source account
+ *  da = sa * e
+ *  S2_d = S1_d + da    destination account
+ *
+ * @param {object} props
+ */
+function TransactionModel(props)
 {
-	var self = this;
-// Main formula
-// S2 = S1 - sa			source account
-// da = sa * e
-// S2_d = S1_d + da		destination account
+    if (!isObject(props))
+        throw new Error('Invalid Account props');
+
+    this.props = props;
+
+    this.parent = this.props.parent;
+
+    this.S1 = undefined;			// balance before transaction
+    this.sa = undefined;			// source amount
+    this.da = undefined;			// destination amount
+    this.e = undefined;			// exchange rate
+    this.S2 = undefined;			// balance after transaction
+    this.S1_d = undefined;		// balance of destination account before transaction
+    this.S2_d = undefined;		// balance of destintation account after transaction
+
+    // parsed float values
+    this.fS1 = 0;
+    this.fsa = 0;
+    this.fda = 0;
+    this.fe = 1;
+    this.fS2 = 0;
+    this.fS1_d = 0;
+    this.fS2_d = 0;
+
+    this.s1valid = false;
+    this.s2valid = false;
+    this.davalid = false;
+    this.evalid = false;
+    this.savalid = false;
+    this.s1dvalid = false;
+    this.s2dvalid = false;
+
+    this.type = this.props.transaction.type;
+    this.src_id = this.props.transaction.src_id;
+    this.dest_id = this.props.transaction.dest_id;
+    this.setValue('src_amount', this.props.transaction.src_amount);
+    this.setValue('dest_amount', this.props.transaction.dest_amount);
+    this.src_curr = this.props.transaction.src_curr;
+    this.dest_curr = this.props.transaction.dest_curr;
+
+    this.person_id = this.props.transaction.person_id;
+    this.debtType = this.props.transaction.debtType;
+    this.lastAcc_id = this.props.transaction.lastAcc_id;
+    this.noAccount = this.props.transaction.noAccount;
+
+    this.changedCallback = [];
 
-	var S1;			// balance before transaction
-	var sa;			// source amount
-	var da;			// destination amount
-	var e;			// exchange rate
-	var S2;			// balance after transaction
-	var S1_d;		// balance of destination account before transaction
-	var S2_d;		// balance of destintation account after transaction
-
-	var fS1 = 0, fsa = 0, fda = 0, fe = 1, fS2 = 0, fS1_d = 0, fS2_d = 0;	// parsed float values
-	var s1valid = false, s2valid = false, davalid = false, evalid = false, savalid = false, s1dvalid = false, s2dvalid = false;
-
-	var type = trans_type;
-	var src_curr = srcCurr;
-	var dest_curr = destCurr;
-
-	var src_id, dest_id;
-
-	var person_id = person;
-	var debtType = dType, lastAcc_id = lastAcc, noAccount = noAcc;
-
-	var canceled = false;
-
-	var changedCallback = [];
-
-
-	// Calculate result balance of source by initial balance and source amount
-	function f1()
-	{
-		if (!self.isExpense() && !self.isTransfer() && !self.isDebt())
-			return;
-
-		S2 = fS1 - fsa;
-
-		fS2 = S2 = correct(S2);
-
-		s2valid = isValidValue(S2);
-
-		notifyChanged('src_resbal', fS2);
-	}
-
-
-	// Calculate result balance of destination by initial balance and destination amount
-	function f1_d()
-	{
-		if (!self.isIncome() && !self.isTransfer() && !self.isDebt())
-			return;
-
-		S2_d = fS1_d + fda;
-
-		fS2_d = S2_d = correct(S2_d);
-
-		s2dvalid = isValidValue(S2_d);
-
-		notifyChanged('dest_resbal', fS2_d);
-	}
-
-
-	// Calculate destination amount by source amount and exchange rate
-	function f2()
-	{
-		fda = da = correct(fsa * fe);
-
-		davalid = isValidValue(da);
-
-		notifyChanged('dest_amount', fda);
-	}
-
-
-	// Calculate source amount by initial and result balance
-	function f3()
-	{
-		sa = fS1 - fS2;
-
-		sa = correct(sa);
-
-		fsa = sa;
-
-		savalid = isValidValue(sa);
-
-		notifyChanged('src_amount', fsa);
-	}
-
-
-	// Calculate destination amount by initial and result balance
-	function f3_d()
-	{
-		fda = da = correct(fS2_d - fS1_d);
-
-		davalid = isValidValue(da);
-
-		notifyChanged('dest_amount', fda);
-	}
-
-
-	// Calculate source amount by destination amount and exchange rate
-	function f4()
-	{
-		fsa = sa = correct(fda / fe);
-
-		savalid = isValidValue(sa);
-
-		notifyChanged('src_amount', fsa);
-	}
-
-
-	// Calculate exchange rate by destination and source amount
-	function f5()
-	{
-		if (fsa == 0 || fda == 0)
-			fe = e = 1;
-		else
-			fe = e = correctExch(fda / fsa);
-
-		evalid = isValidValue(e);
-
-		notifyChanged('exchrate', fe);
-	}
-
-
-	// Sync currency of person account with currency of user account
-	function syncDebtCurrency()
-	{
-		var p_acc, new_curr;
-
-		if (!self.isDebt())
-			return;
-
-		new_curr = (debtType) ? dest_curr : src_curr;
-		if (debtType)
-		{
-			updateValue('src_curr', new_curr);
-			notifyChanged('src_curr', new_curr);
-		}
-		else
-		{
-			updateValue('dest_curr', new_curr);
-			notifyChanged('dest_curr', new_curr);
-		}
-
-		p_acc = getPersonAccount(person_id, new_curr);
-		updateValue((debtType) ? 'src_initbal' : 'dest_initbal', p_acc ? p_acc.balance : 0);
-	}
-
-
-	// Source amount field input event handler
-	function onSrcAmountUpdate(value)
-	{
-		if (!s1valid && !s1dvalid)
-			return;
-
-		if (self.isDiff())
-		{
-			if (davalid)
-			{
-				if (self.isIncome() || self.isTransfer() || (self.isDebt() && !debtType))
-					f1_d();			// calculate S2_d
-			}
-			if (savalid)
-			{
-				if (self.isExpense() || self.isTransfer() || (self.isDebt() && debtType))
-					f1();				// calculate S2
-			}
-
-			f5();		// calculate e
-		}
-		else
-		{
-			f2();		// calculate da
-			if (self.isIncome())
-			{
-				f1_d();			// calculate S2_d
-			}
-			else if (self.isTransfer() || self.isDebt())
-			{
-				f1_d();			// calculate S2_d
-				f1();				// calculate S2
-			}
-			else
-				f1();				// calculate S2
-		}
-
-		notifyChanged('src_amount', sa);
-	}
-
-
-	// Destination amount field input event handler
-	function onDestAmountUpdate(value)
-	{
-		if (!s1valid && !s1dvalid)
-			return;
-
-		if (!self.isDiff())
-		{
-			f4();		// calculate sa
-		}
-
-		if (self.isIncome() || self.isTransfer() || (self.isDebt() && debtType))
-			f1_d();		// calculate S2_d
-		if (self.isExpense() || self.isTransfer() || (self.isDebt() && !debtType))
-		{
-			if (savalid)
-				f1();			// calculate S2
-		}
-
-		f5();		// calculate e
-
-		notifyChanged('dest_amount', da);
-	}
-
-
-	// Exchange rate field input event handler
-	function onExchangeUpdate(value)
-	{
-		if (!s1valid && !s1dvalid)
-			return;
-
-		if (savalid)
-			f2();		// calculate da
-		else if (davalid)
-			f4();		// calculate sa
-
-		if (self.isIncome())
-			f1_d();		// calculate S2_d
-		else
-			f1();		// calculate S2
-
-		notifyChanged('exchrate', e);
-	}
-
-
-	//
-	function onInitBalanceUpdate(value)
-	{
-		if (savalid)
-		{
-			f1();		// calculate S2
-		}
-		else
-		{
-			setValue('src_resbal', fS1);
-			notifyChanged('src_resbal', fS1);
-		}
-	}
-
-
-	//
-	function onInitBalanceDestUpdate(value)
-	{
-		if (savalid)
-		{
-			f1_d();		// calculate S2_d
-		}
-		else
-		{
-			setValue('dest_resbal', fS1_d);
-			notifyChanged('dest_resbal', fS1_d);
-		}
-	}
-
-
-	// Result balance field input event handler
-	function onResBalanceUpdate(value)
-	{
-		if (!s1valid && !s1dvalid)
-			return;
-
-		if (self.isDebt())
-		{
-			f3();			// calculate source amount
-			f2();			// calculate destination amount
-			f1_d();		// calculate destination result balance
-		}
-		else
-		{
-			f3();					// calculate source amount
-			if (self.isDiff())
-			{
-				f5();			// calculate exchange
-			}
-			else
-			{
-				if (evalid)
-					f2();			// calculate destination amount
-				f1_d();			// calculate result balance of destination
-			}
-		}
-
-		notifyChanged('src_resbal', S2);
-	}
-
-
-	// Result balance field input event handler
-	function onResBalanceDestUpdate(value)
-	{
-		if (!s1dvalid)
-			return;
-
-		if (self.isTransfer() || self.isIncome())
-		{
-			f3_d();		// calculate destination amount
-			if (self.isDiff())
-			{
-				f5();			// calculate exchange rate
-			}
-			else
-			{
-				if (evalid)
-					f4();			// calculate source amount
-				f1();				// calculate result balance of source
-			}
-		}
-		else if (self.isDebt())
-		{
-			f3_d();		// calculate destination amount
-			f4();			// calculate source amount
-			f1();			// calculate result balance of source
-		}
-
-		notifyChanged('dest_resbal', S2_d);
-	}
-
-
-	function onSrcAccUpdate(value)
-	{
-		var acc = getAccount(value);
-
-		if (acc)
-		{
-			updateValue('src_curr', acc.curr_id);
-			notifyChanged('src_curr', acc.curr_id);
-
-			updateValue('src_initbal', acc.balance);
-			notifyChanged('src_initbal', acc.balance);
-		}
-
-		if (self.isDebt() && !debtType)
-			syncDebtCurrency();
-	}
-
-
-	function onDestAccUpdate(value)
-	{
-		var acc = getAccount(value);
-
-		if (acc)
-		{
-			updateValue('dest_curr', acc.curr_id);
-			notifyChanged('dest_curr', acc.curr_id);
-
-			updateValue('dest_initbal', acc.balance);
-			notifyChanged('dest_initbal', acc.balance);
-		}
-
-		if (self.isDebt() && debtType)
-			syncDebtCurrency();
-	}
-
-
-	function onSrcCurrUpdate(value)
-	{
-		if (!self.isDiff())
-		{
-			fe = e = 1;
-			evalid = true;
-			notifyChanged('exchrate', fe);
-
-			if (savalid)
-			{
-				f2();				// calculate da
-				f1_d();			// calculate S2_d
-			}
-		}
-
-		notifyChanged('src_curr', value);
-		notifyChanged('src_amount', fsa);
-	}
-
-
-	function onDestCurrUpdate(value)
-	{
-		if (!self.isDiff())
-		{
-			fe = e = 1;
-			evalid = true;
-			notifyChanged('exchrate', fe);
-
-			if (davalid)
-			{
-				f4();				// calculate sa
-				f1();				// calculate S2
-			}
-		}
-
-		notifyChanged('dest_curr', value);
-		notifyChanged('dest_amount', fda);
-	}
-
-
-	function onPersonUpdate(value)
-	{
-		var acc = getPersonAccount(value, (debtType) ? src_curr : dest_curr);
-
-		if (debtType)
-			updateValue('src_initbal', (acc) ? acc.balance : 0);
-		else
-			updateValue('dest_initbal', (acc) ? acc.balance : 0);
-	}
-
-
-	function onNoAccUpdate(value)
-	{
-	}
-
-
-	function onDebtTypeUpdate(value)
-	{
-		var tmp;
-
-		// Swap source and destination
-		tmp = src_id, src_id = dest_id, dest_id = tmp;
-
-		tmp = fS1;
-		setValue('src_initbal', fS1_d);
-		setValue('dest_initbal', tmp);
-
-		tmp = fS2;
-		setValue('src_resbal', fS2_d);
-		setValue('dest_resbal', tmp);
-
-		if (savalid)
-		{
-			f2();				// calculate da
-			f1_d();			// calculate S2_d
-		}
-		else
-		{
-			setValue('src_resbal', fS1);
-			notifyChanged('src_resbal', fS1);
-		}
-
-		if (davalid)
-		{
-			f4();				// calculate sa
-			f1();				// calculate S2
-		}
-		else
-		{
-			setValue('dest_resbal', fS1_d);
-			notifyChanged('dest_resbal', fS1_d);
-		}
-	}
-
-
-	function onLastAccUpdate(value)
-	{
-	}
-
-
-	function notifyChanged(item, value)
-	{
-		var callback = changedCallback[item];
-
-		if (isFunction(callback))
-			callback(value);
-	}
-
-
-	function setValue(item, value)
-	{
-		if (item == 'src_amount')
-		{
-			sa = value;
-			savalid = isValidValue(sa);
-			fsa = (savalid) ? normalize(sa) : sa;
-		}
-		else if (item == 'dest_amount')
-		{
-			da = value;
-			davalid = isValidValue(da);
-			fda = (davalid) ? normalize(da) : da;
-		}
-		else if (item == 'exchrate')
-		{
-			e = value;
-			evalid = isValidValue(e);
-			fe = (evalid) ? normalizeExch(e) : e;
-		}
-		else if (item == 'src_initbal')
-		{
-			S1 = value;
-			s1valid = isValidValue(S1);
-			fS1 = (s1valid) ? normalize(S1) : S1;
-		}
-		else if (item == 'dest_initbal')
-		{
-			S1_d = value;
-			s1dvalid = isValidValue(S1_d);
-			fS1_d = (s1dvalid) ? normalize(S1_d) : S1_d;
-		}
-		else if (item == 'src_resbal')
-		{
-			S2 = value;
-			s2valid = isValidValue(S2);
-			fS2 = (s2valid) ? normalize(S2) : S2;
-		}
-		else if (item == 'dest_resbal')
-		{
-			S2_d = value;
-			s2dvalid = isValidValue(S2_d);
-			fS2_d = (s2dvalid) ? normalize(S2_d) : S2_d;
-		}
-		else if (item == 'src_id')
-		{
-			src_id = parseInt(value);
-		}
-		else if (item == 'dest_id')
-		{
-			dest_id = parseInt(value);
-		}
-		else if (item == 'src_curr')
-		{
-			src_curr = parseInt(value);
-		}
-		else if (item == 'dest_curr')
-		{
-			dest_curr = parseInt(value);
-		}
-		else if (item == 'person_id')
-		{
-			person_id = parseInt(value);
-		}
-		else if (item == 'debt_type')
-		{
-			debtType = !!value;
-		}
-		else if (item == 'no_account')
-		{
-			noAccount = !!value;
-		}
-		else if (item == 'last_acc')
-		{
-			lastAcc_id = parseInt(value);
-		}
-	}
-
-
-	function updateValue(item, value)
-	{
-		setValue(item, value);
-
-		if (item == 'src_amount')
-			onSrcAmountUpdate(value);
-		else if (item == 'dest_amount')
-			onDestAmountUpdate(value);
-		else if (item == 'exchrate')
-			onExchangeUpdate(value);
-		else if (item == 'src_initbal')
-			onInitBalanceUpdate(value);
-		else if (item == 'dest_initbal')
-			onInitBalanceDestUpdate(value);
-		else if (item == 'src_resbal')
-			onResBalanceUpdate(value);
-		else if (item == 'dest_resbal')
-			onResBalanceDestUpdate(value);
-		else if (item == 'src_id')
-			onSrcAccUpdate(value);
-		else if (item == 'dest_id')
-			onDestAccUpdate(value);
-		else if (item == 'src_curr')
-			onSrcCurrUpdate(value);
-		else if (item == 'dest_curr')
-			onDestCurrUpdate(value);
-		else if (item == 'person_id')
-			onPersonUpdate(value);
-		else if (item == 'no_account')
-			onNoAccUpdate(value);
-		else if (item == 'debt_type')
-			onDebtTypeUpdate(value);
-		else if (item == 'last_acc')
-			onLastAccUpdate(value);
-	}
-
-
-	// Localy cancel actions of current transaction
-	function cancelTransaction()
-	{
-		var srcAcc, destAcc;
-
-		if (!edit_mode || self.canceled || !edit_transaction)
-			return;
-
-		srcAcc = getAccount(edit_transaction.srcAcc);
-		destAcc = getAccount(edit_transaction.destAcc);
-
-		if (edit_transaction.type == EXPENSE)
-		{
-			if (!srcAcc)
-				throw new Error('Invalid transaction: Account not found');
-			if (srcAcc.curr_id != edit_transaction.srcCurr)
-				throw new Error('Invalid transaction');
-
-			srcAcc.balance += edit_transaction.srcAmount;
-		}
-		else if (edit_transaction.type == INCOME)
-		{
-			if (!destAcc || destAcc.curr_id != edit_transaction.destCurr)
-				throw new Error('Invalid transaction');
-
-			destAcc.balance -= edit_transaction.destAmount;
-		}
-		else if (edit_transaction.type == TRANSFER)
-		{
-			if (!srcAcc || !destAcc || srcAcc.curr_id != edit_transaction.srcCurr || destAcc.curr_id != edit_transaction.destCurr)
-				throw new Error('Invalid transaction');
-
-			srcAcc.balance += edit_transaction.srcAmount;
-			destAcc.balance -= edit_transaction.destAmount;
-		}
-		else if (edit_transaction.type == DEBT)
-		{
-			if (debtType)		// person give
-			{
-				if (srcAcc)
-					throw new Error('Invalid transaction');
-
-				srcAcc = findPersonAccountById(edit_transaction.srcAcc);
-				if (!srcAcc)
-					throw new Error('Invalid transaction');
-
-				srcAcc.balance += edit_transaction.srcAmount;
-				if (destAcc)
-					destAcc.balance -= edit_transaction.destAmount;
-			}
-			else				// person take
-			{
-				if (destAcc)		// we should not find acount
-					throw new Error('Invalid transaction');
-
-				destAcc = findPersonAccountById(edit_transaction.destAcc);
-				if (!destAcc)
-					throw new Error('Invalid transaction');
-
-				if (srcAcc)
-					srcAcc.balance += edit_transaction.srcAmount;
-				destAcc.balance -= edit_transaction.destAmount;
-			}
-		}
-
-
-		canceled = true;
-	}
-
-
-	// Public methods
-
-	// Model initialization
-	this.initModel = function()
-	{
-		if (edit_mode)
-		{
-			cancelTransaction();
-
-			setValue('src_id', edit_transaction.srcAcc);
-			setValue('dest_id', edit_transaction.destAcc);
-
-			setValue('src_amount', edit_transaction.srcAmount);
-			setValue('dest_amount', edit_transaction.destAmount);
-		}
-	}
-
-
-	this.isExpense = function()
-	{
-		return (type == EXPENSE);
-	}
-
-
-	this.isIncome = function()
-	{
-		return (type == INCOME);
-	}
-
-
-	this.isTransfer = function()
-	{
-		return (type == TRANSFER);
-	}
-
-
-	this.isDebt = function()
-	{
-		return (type == DEBT);
-	}
-
-
-	this.srcAcc = function()
-	{
-		return src_id;
-	}
-
-
-	this.destAcc = function()
-	{
-		return dest_id;
-	}
-
-
-	this.srcCurr = function()
-	{
-		return src_curr;
-	}
-
-
-	this.destCurr = function()
-	{
-		return dest_curr;
-	}
-
-
-	this.srcAmount = function()
-	{
-		return fsa;
-	}
-
-
-	this.destAmount = function()
-	{
-		return fda;
-	}
-
-
-	this.exchRate = function()
-	{
-		return fe;
-	}
-
-
-	this.resBal = function()
-	{
-		return fS2;
-	}
-
-
-	this.resBalDest = function()
-	{
-		return fS2_d;
-	}
-
-
-	this.debtType = function()
-	{
-		return debtType;
-	}
-
-
-	this.noAccount = function()
-	{
-		return noAccount;
-	}
-
-
-	this.lastAcc_id = function()
-	{
-		return lastAcc_id;
-	}
-
-
-	// Check source and destination currencies is different
-	this.isDiff = function()
-	{
-		return (src_curr != dest_curr);
-	}
-
-
-	this.subscribe = function(item, callback)
-	{
-		changedCallback[item] = callback;
-	},
-
-
-	// Set value without update notification
-	this.set = function(item, value)
-	{
-		setValue(item, value);
-	},
-
-
-	// Set value with update notification
-	this.update = function(item, value)
-	{
-		updateValue(item, value);
-	}
 }
+
+
+/**
+ * Calculate result balance of source by initial balance and source amount
+ */
+TransactionModel.prototype.f1 = function()
+{
+    if (!this.isExpense() && !this.isTransfer() && !this.isDebt())
+        return;
+
+    this.S2 = this.fS1 - this.fsa;
+
+    this.fS2 = this.S2 = correct(this.S2);
+
+    this.s2valid = isValidValue(this.S2);
+
+    this.notifyChanged('src_resbal', this.fS2);
+};
+
+
+/**
+ * Calculate result balance of destination by initial balance and destination amount
+ */
+TransactionModel.prototype.f1_d = function()
+{
+    if (!this.isIncome() && !this.isTransfer() && !this.isDebt())
+        return;
+
+    this.S2_d = this.fS1_d + this.fda;
+
+    this.fS2_d = this.S2_d = correct(this.S2_d);
+
+    this.s2dvalid = isValidValue(this.S2_d);
+
+    this.notifyChanged('dest_resbal', this.fS2_d);
+};
+
+
+/**
+ * Calculate destination amount by source amount and exchange rate
+ */
+TransactionModel.prototype.f2 = function()
+{
+    this.fda = this.da = correct(this.fsa * this.fe);
+
+    this.davalid = isValidValue(this.da);
+
+    this.notifyChanged('dest_amount', this.fda);
+};
+
+
+/**
+ * Calculate source amount by initial and result balance
+ */
+TransactionModel.prototype.f3 = function()
+{
+    this.sa = this.fS1 - this.fS2;
+
+    this.sa = correct(this.sa);
+
+    this.fsa = this.sa;
+
+    this.savalid = isValidValue(this.sa);
+
+    this.notifyChanged('src_amount', this.fsa);
+};
+
+
+/**
+ * Calculate destination amount by initial and result balance
+ */
+TransactionModel.prototype.f3_d = function()
+{
+    this.fda = this.da = correct(this.fS2_d - this.fS1_d);
+
+    this.davalid = isValidValue(this.da);
+
+    this.notifyChanged('dest_amount', this.fda);
+};
+
+
+/**
+ * Calculate source amount by destination amount and exchange rate
+ */
+TransactionModel.prototype.f4 = function()
+{
+    this.fsa = this.sa = correct(this.fda / this.fe);
+
+    this.savalid = isValidValue(this.sa);
+
+    this.notifyChanged('src_amount', this.fsa);
+};
+
+
+/**
+ * Calculate exchange rate by destination and source amount
+ */
+TransactionModel.prototype.f5 = function()
+{
+    if (this.fsa == 0 || this.fda == 0)
+        this.fe = this.e = 1;
+    else
+        this.fe = this.e = correctExch(this.fda / this.fsa);
+
+    this.evalid = isValidValue(this.e);
+
+    this.notifyChanged('exchrate', this.fe);
+};
+
+
+/**
+ * Sync currency of person account with currency of user account
+ */
+TransactionModel.prototype.syncDebtCurrency = function()
+{
+    if (!this.isDebt())
+        return;
+
+    var new_curr = (this.debtType) ? this.dest_curr : this.src_curr;
+    if (this.debtType)
+    {
+        this.updateValue('src_curr', new_curr);
+        this.notifyChanged('src_curr', new_curr);
+    }
+    else
+    {
+        this.updateValue('dest_curr', new_curr);
+        this.notifyChanged('dest_curr', new_curr);
+    }
+
+    var p_acc = this.parent.model.accounts.getPersonAccount(this.person_id, new_curr);
+    this.updateValue((this.debtType) ? 'src_initbal' : 'dest_initbal', p_acc ? p_acc.balance : 0);
+};
+
+
+/**
+ * Source amount update event handler
+ */
+TransactionModel.prototype.onSrcAmountUpdate = function()
+{
+    if (!this.s1valid && !this.s1dvalid)
+        return;
+
+    if (this.isDiff())
+    {
+        if (this.davalid)
+        {
+            if (this.isIncome() || this.isTransfer() || (this.isDebt() && !this.debtType))
+                this.f1_d();			// calculate S2_d
+        }
+        if (this.savalid)
+        {
+            if (this.isExpense() || this.isTransfer() || (this.isDebt() && this.debtType))
+                this.f1();				// calculate S2
+        }
+
+        this.f5();		// calculate e
+    }
+    else
+    {
+        this.f2();		// calculate da
+        if (this.isIncome())
+        {
+            this.f1_d();			// calculate S2_d
+        }
+        else if (this.isTransfer() || this.isDebt())
+        {
+            this.f1_d();			// calculate S2_d
+            this.f1();				// calculate S2
+        }
+        else
+            this.f1();				// calculate S2
+    }
+
+    this.notifyChanged('src_amount', this.sa);
+};
+
+
+/**
+ * Destination amount update event handler
+ */
+TransactionModel.prototype.onDestAmountUpdate = function()
+{
+    if (!this.s1valid && !this.s1dvalid)
+        return;
+
+    if (!this.isDiff())
+    {
+        this.f4();		// calculate sa
+    }
+
+    if (this.isIncome() || this.isTransfer() || (this.isDebt() && this.debtType))
+        this.f1_d();		// calculate S2_d
+    if (this.isExpense() || this.isTransfer() || (this.isDebt() && !this.debtType))
+    {
+        if (this.savalid)
+            this.f1();			// calculate S2
+    }
+
+    this.f5();		// calculate e
+
+    this.notifyChanged('dest_amount', this.da);
+};
+
+
+/**
+ * Exchange rate update event handler
+ */
+TransactionModel.prototype.onExchangeUpdate = function()
+{
+    if (!this.s1valid && !this.s1dvalid)
+        return;
+
+    if (this.savalid)
+        this.f2();		// calculate da
+    else if (this.davalid)
+        this.f4();		// calculate sa
+
+    if (this.isIncome())
+        this.f1_d();		// calculate S2_d
+    else
+        this.f1();		// calculate S2
+
+    this.notifyChanged('exchrate', this.e);
+};
+
+
+/**
+ * Initional balance of source account update event handler
+ */
+TransactionModel.prototype.onInitBalanceUpdate = function()
+{
+    if (this.savalid)
+    {
+        this.f1();		// calculate S2
+    }
+    else
+    {
+        this.setValue('src_resbal', this.fS1);
+        this.notifyChanged('src_resbal', this.fS1);
+    }
+};
+
+
+/**
+ * Initial balance of destination account update event handler
+ */
+TransactionModel.prototype.onInitBalanceDestUpdate = function()
+{
+    if (this.savalid)
+    {
+        this.f1_d();		// calculate S2_d
+    }
+    else
+    {
+        this.setValue('dest_resbal', this.fS1_d);
+        this.notifyChanged('dest_resbal', this.fS1_d);
+    }
+};
+
+
+/**
+ * Source result balance update event handler
+ */
+TransactionModel.prototype.onResBalanceUpdate = function()
+{
+    if (!this.s1valid && !this.s1dvalid)
+        return;
+
+    if (this.isDebt())
+    {
+        this.f3();			// calculate source amount
+        this.f2();			// calculate destination amount
+        this.f1_d();		// calculate destination result balance
+    }
+    else
+    {
+        this.f3();					// calculate source amount
+        if (this.isDiff())
+        {
+            this.f5();			// calculate exchange
+        }
+        else
+        {
+            if (this.evalid)
+                this.f2();			// calculate destination amount
+            this.f1_d();			// calculate result balance of destination
+        }
+    }
+
+    this.notifyChanged('src_resbal', this.S2);
+};
+
+
+/**
+ * Destination result balance update event handler
+ */
+TransactionModel.prototype.onResBalanceDestUpdate = function()
+{
+    if (!this.s1dvalid)
+        return;
+
+    if (this.isTransfer() || this.isIncome())
+    {
+        this.f3_d();		// calculate destination amount
+        if (this.isDiff())
+        {
+            this.f5();			// calculate exchange rate
+        }
+        else
+        {
+            if (this.evalid)
+                this.f4();			// calculate source amount
+            this.f1();				// calculate result balance of source
+        }
+    }
+    else if (this.isDebt())
+    {
+        this.f3_d();		// calculate destination amount
+        this.f4();			// calculate source amount
+        this.f1();			// calculate result balance of source
+    }
+
+    this.notifyChanged('dest_resbal', this.S2_d);
+};
+
+
+/**
+ * Source account update event handler
+ * @param {number} value - identifier of new account
+ */
+TransactionModel.prototype.onSrcAccUpdate = function(value)
+{
+    var acc = this.parent.model.accounts.getItem(value);
+
+    if (acc)
+    {
+        this.updateValue('src_curr', acc.curr_id);
+        this.notifyChanged('src_curr', acc.curr_id);
+
+        this.updateValue('src_initbal', acc.balance);
+        this.notifyChanged('src_initbal', acc.balance);
+    }
+
+    if (this.isDebt() && !this.debtType)
+        this.syncDebtCurrency();
+};
+
+
+/**
+ * Destination account update event handler
+ * @param {number} value - identifier of new account
+ */
+TransactionModel.prototype.onDestAccUpdate = function(value)
+{
+    var acc = this.parent.model.accounts.getItem(value);
+
+    if (acc)
+    {
+        this.updateValue('dest_curr', acc.curr_id);
+        this.notifyChanged('dest_curr', acc.curr_id);
+
+        this.updateValue('dest_initbal', acc.balance);
+        this.notifyChanged('dest_initbal', acc.balance);
+    }
+
+    if (this.isDebt() && this.debtType)
+        this.syncDebtCurrency();
+};
+
+
+/**
+ * Source currency update event handler
+ * @param {number} value - identifier of new currency
+ */
+TransactionModel.prototype.onSrcCurrUpdate = function(value)
+{
+    if (!this.isDiff())
+    {
+        this.fe = this.e = 1;
+        this.evalid = true;
+        this.notifyChanged('exchrate', this.fe);
+
+        if (this.savalid)
+        {
+            this.f2();				// calculate da
+            this.f1_d();			// calculate S2_d
+        }
+    }
+
+    this.notifyChanged('src_curr', value);
+    this.notifyChanged('src_amount', this.fsa);
+};
+
+
+/**
+ * Destination currency update event handler
+ * @param {number} value - identifier of new currency
+ */
+TransactionModel.prototype.onDestCurrUpdate = function(value)
+{
+    if (!this.isDiff())
+    {
+        this.fe = this.e = 1;
+        this.evalid = true;
+        this.notifyChanged('exchrate', this.fe);
+
+        if (this.davalid)
+        {
+            this.f4();				// calculate sa
+            this.f1();				// calculate S2
+        }
+    }
+
+    this.notifyChanged('dest_curr', value);
+    this.notifyChanged('dest_amount', this.fda);
+};
+
+
+/**
+ * Person update event handler
+ * @param {*} value - identifier os new person
+ */
+TransactionModel.prototype.onPersonUpdate = function(value)
+{
+    var acc = this.parent.model.accounts.getPersonAccount(value, (this.debtType) ? this.src_curr : this.dest_curr);
+
+    if (this.debtType)
+        this.updateValue('src_initbal', (acc) ? acc.balance : 0);
+    else
+        this.updateValue('dest_initbal', (acc) ? acc.balance : 0);
+};
+
+
+/**
+ * Debt type update event handler
+ */
+TransactionModel.prototype.onDebtTypeUpdate = function()
+{
+    // Swap source and destination
+    var tmp = this.src_id;
+    this.src_id = this.dest_id;
+    this.dest_id = tmp;
+
+    tmp = this.fS1;
+    this.setValue('src_initbal', this.fS1_d);
+    this.setValue('dest_initbal', tmp);
+
+    tmp = this.fS2;
+    this.setValue('src_resbal', this.fS2_d);
+    this.setValue('dest_resbal', tmp);
+
+    if (this.savalid)
+    {
+        this.f2();				// calculate da
+        this.f1_d();			// calculate S2_d
+    }
+    else
+    {
+        this.setValue('src_resbal', this.fS1);
+        this.notifyChanged('src_resbal', this.fS1);
+    }
+
+    if (this.davalid)
+    {
+        this.f4();				// calculate sa
+        this.f1();				// calculate S2
+    }
+    else
+    {
+        this.setValue('dest_resbal', this.fS1_d);
+        this.notifyChanged('dest_resbal', this.fS1_d);
+    }
+};
+
+/**
+ * Send notification to subscribers about update of property
+ * @param {string} item - name of property item
+ * @param {*} value - value to set for item
+ */
+TransactionModel.prototype.notifyChanged = function(item, value)
+{
+    var callback = this.changedCallback[item];
+
+    if (isFunction(callback))
+        callback(value);
+};
+
+/**
+ * Set value of property
+ * @param {string} item - name of property item
+ * @param {*} value - value to set for item
+ */
+TransactionModel.prototype.setValue = function(item, value)
+{
+    if (item == 'src_amount')
+    {
+        this.sa = value;
+        this.savalid = isValidValue(this.sa);
+        this.fsa = (this.savalid) ? normalize(this.sa) : this.sa;
+    }
+    else if (item == 'dest_amount')
+    {
+        this.da = value;
+        this.davalid = isValidValue(this.da);
+        this.fda = (this.davalid) ? normalize(this.da) : this.da;
+    }
+    else if (item == 'exchrate')
+    {
+        this.e = value;
+        this.evalid = isValidValue(this.e);
+        this.fe = (this.evalid) ? normalizeExch(this.e) : this.e;
+    }
+    else if (item == 'src_initbal')
+    {
+        this.S1 = value;
+        this.s1valid = isValidValue(this.S1);
+        this.fS1 = (this.s1valid) ? normalize(this.S1) : this.S1;
+    }
+    else if (item == 'dest_initbal')
+    {
+        this.S1_d = value;
+        this.s1dvalid = isValidValue(this.S1_d);
+        this.fS1_d = (this.s1dvalid) ? normalize(this.S1_d) : this.S1_d;
+    }
+    else if (item == 'src_resbal')
+    {
+        this.S2 = value;
+        this.s2valid = isValidValue(this.S2);
+        this.fS2 = (this.s2valid) ? normalize(this.S2) : this.S2;
+    }
+    else if (item == 'dest_resbal')
+    {
+        this.S2_d = value;
+        this.s2dvalid = isValidValue(this.S2_d);
+        this.fS2_d = (this.s2dvalid) ? normalize(this.S2_d) : this.S2_d;
+    }
+    else if (item == 'src_id')
+    {
+        this.src_id = parseInt(value);
+    }
+    else if (item == 'dest_id')
+    {
+        this.dest_id = parseInt(value);
+    }
+    else if (item == 'src_curr')
+    {
+        this.src_curr = parseInt(value);
+    }
+    else if (item == 'dest_curr')
+    {
+        this.dest_curr = parseInt(value);
+    }
+    else if (item == 'person_id')
+    {
+        this.person_id = parseInt(value);
+    }
+    else if (item == 'debt_type')
+    {
+        this.debtType = !!value;
+    }
+    else if (item == 'no_account')
+    {
+        this.noAccount = !!value;
+    }
+    else if (item == 'last_acc')
+    {
+        this.lastAcc_id = parseInt(value);
+    }
+};
+
+
+/**
+ * Set value of property and update related properties if needed
+ * @param {string} item - name of property item
+ * @param {*} value - value to set for item
+ */
+TransactionModel.prototype.updateValue = function(item, value)
+{
+    this.setValue(item, value);
+
+    if (item == 'src_amount')
+        this.onSrcAmountUpdate(value);
+    else if (item == 'dest_amount')
+        this.onDestAmountUpdate(value);
+    else if (item == 'exchrate')
+        this.onExchangeUpdate(value);
+    else if (item == 'src_initbal')
+        this.onInitBalanceUpdate(value);
+    else if (item == 'dest_initbal')
+        this.onInitBalanceDestUpdate(value);
+    else if (item == 'src_resbal')
+        this.onResBalanceUpdate(value);
+    else if (item == 'dest_resbal')
+        this.onResBalanceDestUpdate(value);
+    else if (item == 'src_id')
+        this.onSrcAccUpdate(value);
+    else if (item == 'dest_id')
+        this.onDestAccUpdate(value);
+    else if (item == 'src_curr')
+        this.onSrcCurrUpdate(value);
+    else if (item == 'dest_curr')
+        this.onDestCurrUpdate(value);
+    else if (item == 'person_id')
+        this.onPersonUpdate(value);
+    else if (item == 'debt_type')
+        this.onDebtTypeUpdate(value);
+};
+
+
+/**
+ * @returns true if transaction type is expense
+ */
+TransactionModel.prototype.isExpense = function()
+{
+    return (this.type == EXPENSE);
+};
+
+
+/**
+ * @returns true if transaction type is income
+ */
+TransactionModel.prototype.isIncome = function()
+{
+    return (this.type === INCOME);
+};
+
+
+/**
+ * @returns true if transaction type is transfer
+ */
+TransactionModel.prototype.isTransfer = function()
+{
+    return (this.type == TRANSFER);
+};
+
+
+/**
+ * @returns true if transaction type is debt
+ */
+TransactionModel.prototype.isDebt = function()
+{
+    return (this.type == DEBT);
+};
+
+
+/**
+ * Return source account
+ */
+TransactionModel.prototype.srcAcc = function()
+{
+    return this.src_id;
+};
+
+
+/**
+ * Return destination account
+ */
+TransactionModel.prototype.destAcc = function()
+{
+    return this.dest_id;
+};
+
+
+/**
+ * Return source currency
+ */
+TransactionModel.prototype.srcCurr = function()
+{
+    return this.src_curr;
+};
+
+
+/**
+ * Return destiantion currency
+ */
+TransactionModel.prototype.destCurr = function()
+{
+    return this.dest_curr;
+};
+
+
+/**
+ * Return source amount
+ */
+TransactionModel.prototype.srcAmount = function()
+{
+    return this.fsa;
+};
+
+
+/**
+ * Return destination amount
+ */
+TransactionModel.prototype.destAmount = function()
+{
+    return this.fda;
+};
+
+
+/**
+ * Return echange rate
+ */
+TransactionModel.prototype.exchRate = function()
+{
+    return this.fe;
+};
+
+
+/**
+ * Check source and destination currencies is different
+ */
+TransactionModel.prototype.isDiff = function()
+{
+    return (this.src_curr != this.dest_curr);
+};
+
+
+/**
+ * Subscribe to updates of specified property
+ * @param {*} item - name of property
+ * @param {Function} callback - function to call on property update event
+ */
+TransactionModel.prototype.subscribe = function(item, callback)
+{
+    this.changedCallback[item] = callback;
+};

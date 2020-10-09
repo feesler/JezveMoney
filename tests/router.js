@@ -96,8 +96,12 @@ async function route(env, url)
 		}
 		else if (actPart === 'edit')
 		{
-			const trType = await env.global('edit_transaction.type');
+            let selectedMenuItem = await env.query('.trtype-menu__item_selected');
+            if (!selectedMenuItem)
+                throw new Error('Invalid transaction type menu');
 
+			let trType = await env.prop(selectedMenuItem, 'dataset.type');
+            trType = parseInt(trType);
 			if (trType === 1)
 				return ExpenseTransactionView;
 			else if (trType === 2)

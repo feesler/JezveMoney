@@ -91,11 +91,10 @@
 <?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-	var currency = <?=JSON::encode($currArr)?>;
-	var icons = <?=JSON::encode($icons)?>;
-
 	var view = new AccountView({
-		account: <?=JSON::encode($accInfo)?>
+		account: <?=JSON::encode($accInfo)?>,
+        currency: <?=JSON::encode($currArr)?>,
+        icons: <?=JSON::encode($icons)?>
 	});
 </script>
 </body>

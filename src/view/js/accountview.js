@@ -19,6 +19,9 @@ function AccountView(props)
 		this.model.original = this.props.account;
 		this.model.data = copyObject(this.model.original);
 	}
+
+    this.model.currency = CurrencyList.create(this.props.currency);
+    this.model.icons = IconList.create(this.props.icons);
 }
 
 
@@ -30,7 +33,10 @@ extend(AccountView, View);
  */
 AccountView.prototype.onStart = function()
 {
-    this.tile = AccountTile.fromElement('acc_tile');
+    this.tile = AccountTile.fromElement({
+        elem: 'acc_tile',
+        parent: this
+    });
 	if (!this.tile)
 		throw new Error('Failed to initialize Account view');
 
@@ -236,7 +242,7 @@ AccountView.prototype.onDeleteConfirmResult = function(result)
  */
 AccountView.prototype.setCurrencySign = function(curr_id)
 {
-	var currencyObj = getCurrency(curr_id);
+	var currencyObj = this.model.currency.getItem(curr_id);
 	if (!currencyObj)
 		return;
 

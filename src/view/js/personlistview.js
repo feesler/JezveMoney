@@ -18,6 +18,10 @@ function PersonListView(props)
 		}
 	};
 
+    if (this.props.persons)
+    {
+        this.model.persons = PersonList.create(this.props.persons);
+    }
 }
 
 
@@ -92,11 +96,11 @@ PersonListView.prototype.onTileClick = function(e)
 		return;
 
 	var person_id = parseInt(tile.dataset.id);
-	var person = getPerson(person_id);
+	var person = this.model.persons.getItem(person_id);
 	if (!person)
 		return;
 	
-	var currentSelection = isHiddenPerson(person) ? this.model.selected.hidden : this.model.selected.visible;
+	var currentSelection = person.isVisible() ? this.model.selected.visible : this.model.selected.hidden;
 	if (currentSelection.isSelected(person_id))
 	{
 		currentSelection.deselect(person_id);

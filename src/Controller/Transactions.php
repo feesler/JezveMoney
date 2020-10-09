@@ -298,8 +298,14 @@ class Transactions extends TemplateController
         }
 
         $give = true;
+        $person_id = 0;
         $person_acc_id = 0;
         $debtAcc = null;
+        $transAcc_id = 0;        // main transaction account id
+        $transAccCurr = 0;        // currency of transaction account
+        $noAccount = false;
+        $srcAmountCurr = 0;
+        $destAmountCurr = 0;
 
         if ($tr["type"] == DEBT) {
             $debtMod = DebtModel::getInstance();
@@ -308,7 +314,6 @@ class Transactions extends TemplateController
 
             // Prepare person account
             $visiblePersons = $this->personMod->getData();
-            $person_id = 0;
             if (is_array($visiblePersons) && count($visiblePersons) > 0) {
                 $person_id = $visiblePersons[0]->id;
             }
@@ -324,8 +329,11 @@ class Transactions extends TemplateController
             $tr["dest_id"] = $acc_id;
             $tr["src_curr"] = $debtAcc->curr_id;
             $tr["dest_curr"] = $debtAcc->curr_id;
+            $tr["person_id"] = $person_id;
+            $tr["debtType"] = $give;
+            $tr["lastAcc_id"] = $acc_id;
+            $tr["noAccount"] = $noAccount;
         } else {
-            $person_id = 0;
             // set source and destination accounts
             $src_id = 0;
             $dest_id = 0;
@@ -427,12 +435,6 @@ class Transactions extends TemplateController
             }
         }
 
-        $transAcc_id = 0;        // main transaction account id
-        $transAccCurr = 0;        // currency of transaction account
-        $noAccount = false;
-        $srcAmountCurr = 0;
-        $destAmountCurr = 0;
-
         if ($tr["type"] != DEBT) {
             if ($tr["type"] == EXPENSE) {
                 $transCurr = $src ? $src->curr_id : 0;
@@ -485,7 +487,7 @@ class Transactions extends TemplateController
         $iconModel = IconModel::getInstance();
         $icons = $iconModel->getData();
 
-        $accArr = $this->accModel->getData(["type" => "all"]);
+        $accArr = $this->accModel->getData(["type" => "all", "full" => true]);
         if ($tr["type"] == DEBT) {
             $persArr = $this->personMod->getData(["type" => "all"]);
         }
@@ -561,6 +563,7 @@ class Transactions extends TemplateController
 
         array_push($this->jsArr, ...[
             "model/currency.js",
+            "model/icon.js",
             "model/account.js",
             "model/person.js",
             "model/transaction.js",
@@ -656,7 +659,9 @@ class Transactions extends TemplateController
 
         $transAcc_id = 0;        // main transaction account id
         $transAccCurr = 0;        // currency of transaction account
+        $person_id = 0;
         $person_acc_id = 0;
+        $acc_id = 0;
         $give = true;
         $debtAcc = null;
         $noAccount = false;
@@ -733,21 +738,23 @@ class Transactions extends TemplateController
                 if (!$debtAcc) {
                     throw new \Error("Account " . $acc_id . " not found");
                 }
-            } else {
-                $acc_id = 0;
             }
 
             $showSrcAmount = true;
             $showDestAmount = false;
         }
 
+        $tr["person_id"] = $person_id;
+        $tr["debtType"] = $give;
+        $tr["lastAcc_id"] = $acc_id;
+        $tr["noAccount"] = $noAccount;
 
         // Common arrays
         $currArr = $this->currModel->getData();
         $iconModel = IconModel::getInstance();
         $icons = $iconModel->getData();
 
-        $accArr = $this->accModel->getData(["type" => "all"]);
+        $accArr = $this->accModel->getData(["type" => "all", "full" => true]);
         if ($tr["type"] == DEBT) {
             $persArr = $this->personMod->getData(["type" => "all"]);
         }
@@ -831,6 +838,7 @@ class Transactions extends TemplateController
 
         array_push($this->jsArr, ...[
             "model/currency.js",
+            "model/icon.js",
             "model/account.js",
             "model/person.js",
             "model/transaction.js",

@@ -69,11 +69,11 @@
 <?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-	var accounts = <?=JSON::encode($accountsData)?>;
-
 	onReady(initToolbar);
 
-	var view = new AccountListView();
+	var view = new AccountListView({
+        accounts: <?=JSON::encode($accountsData)?>
+    });
 </script>
 </body>
 </html>

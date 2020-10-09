@@ -1,6 +1,5 @@
 /**
  * View constructor
- * 
  */
 function View(props)
 {

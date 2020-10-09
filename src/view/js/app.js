@@ -4,12 +4,6 @@ var INCOME = 2;
 var TRANSFER = 3;
 var DEBT = 4;
 
-// Account flags
-var ACCOUNT_HIDDEN = 1;
-
-// Person flags
-var PERSON_HIDDEN = 1;
-
 // Theme constants
 var WHITE_THEME = 0;
 var DARK_THEME = 1;

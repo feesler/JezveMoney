@@ -1,96 +1,171 @@
-// Return account object by id
-function getAccount(account_id)
+/** Account flags */
+var ACCOUNT_HIDDEN = 1;
+
+
+/**
+ * @constructor Account class
+ * @param {*} props 
+ */
+function Account(props)
 {
-	return idSearch(accounts, account_id);
+    if (!isObject(props))
+        throw new Error('Invalid Account props');
+
+    for(var prop in props)
+    {
+        if (this.isAvailField(prop))
+            this[prop] = props[prop];
+    }
 }
 
 
-function isVisibleAccount(account)
+/** Static alias for Account constructor */
+Account.create = function(props)
 {
-	if (!account || !('flags' in account))
+    return new Account(props)
+};
+
+
+/**
+ * Check specified field name is available
+ * @param {string} field - field name to check
+ */
+Account.prototype.isAvailField = function(field)
+{
+    var availFields = ['id', 'owner_id', 'name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
+
+    return typeof field === 'string' && availFields.includes(field);
+};
+
+
+/**
+ * Check account is not hidden
+ */
+Account.prototype.isVisible = function()
+{
+	if (!('flags' in this))
 		throw new Error('Invalid account');
 
-	return (account.flags & ACCOUNT_HIDDEN) == 0;
+	return (this.flags & ACCOUNT_HIDDEN) == 0;
+};
+
+
+/**
+ * @constructor AccountList class
+ * @param {object[]} props - array of accounts
+ */
+function AccountList(props)
+{
+    if (!Array.isArray(props))
+        throw new Error('Invalid account list props');
+    
+    this.data = props.map(Account.create);
 }
 
 
-function isHiddenAccount(account)
+/** Static alias for AccountList constructor */
+AccountList.create = function(props)
 {
-	if (!account || !('flags' in account))
-		throw new Error('Invalid account');
-
-	return (account.flags & ACCOUNT_HIDDEN) == ACCOUNT_HIDDEN;
-}
+    return new AccountList(props);
+};
 
 
-// Format balance of account value with currency
-function formatAccoutBalance(acc_id)
+/**
+ * Return list of visible Accounts
+ */
+AccountList.prototype.getVisible = function()
 {
-	var acc = getAccount(acc_id);
+    var res = this.data.filter(function(item) {
+        return item && item.isVisible();
+    });
 
-	if (!acc)
+    return (res) ? res : null;
+};
+
+
+/**
+ * Return item with specified id
+ * @param {number} item_id - identifier of item to find
+ */
+AccountList.prototype.getItem = function(item_id)
+{
+    if (!item_id)
+        return null;
+
+    var res = this.data.find(function(item) {
+        return item && item.id == item_id
+    });
+
+    return (res) ? res : null;
+};
+
+
+/**
+ * Return index of item with specified id
+ * Return -1 in case item can't be found
+ * @param {number} item_id - identifier of item to find
+ */
+AccountList.prototype.getItemIndex = function(item_id)
+{
+	return this.data.findIndex(function(item) {
+        return item && item.id == item_id
+    });
+};
+
+
+/**
+ * Return identifier of another account if possible
+ * Return zero account can't be found
+ * @param {number} account_id - identifier of account to start looking from
+ */
+AccountList.prototype.getNextAccount = function(account_id)
+{
+	if (!Array.isArray(this.data) || this.data.length < 2 || !account_id)
+		return 0;
+
+	var pos = this.getItemIndex(account_id);
+	if (pos === -1)
+		return 0;
+
+	pos = ((pos === this.data.length - 1) ? 0 : pos + 1);
+
+	return this.data[pos].id;
+};
+
+
+/**
+ * Cancel affection of specified transaction from accounts
+ * @param {Transaction} transaction - transaction object to cancel affects of
+ */
+AccountList.prototype.cancelTransaction = function(transaction)
+{
+    if (!transaction)
+        return;
+
+    var srcAccount = this.getItem(transaction.src_id);
+    if (srcAccount)
+        srcAccount.balance += transaction.src_amount;
+
+    var destAccount = this.getItem(transaction.dest_id);
+    if (destAccount)
+        destAccount.balance -= transaction.dest_amount;
+};
+
+
+/**
+ * Search account of person in specified currency
+ * @param {number} person_id - person identifier
+ * @param {number} curr_id - currency identifier
+ */
+AccountList.prototype.getPersonAccount = function(person_id, curr_id)
+{
+	if (!person_id || !curr_id)
 		return null;
 
-	return formatCurrency(acc.balance, acc.curr_id);
-}
-
-
-// Return current position of account in accounts array
-// Return -1 in case account can't be found
-function getAccountPos(acc_id)
-{
-	var pos = -1;
-
-	if (!Array.isArray(accounts) || !acc_id)
-		return -1;
-
-	accounts.some(function(acc, ind)
-	{
-		var cond = (acc_id == acc.id);
-		if (cond)
-			pos = ind;
-
-		return cond;
+	// check person have account in specified currency
+	var res = this.data.find(function(item) {
+		return item && item.owner_id == person_id && item.curr_id == curr_id;
 	});
 
-	return pos;
-}
-
-
-// Return another account id if possible
-// Return zero if no account can't be found
-function getPrevAccount(acc_id)
-{
-	var pos;
-
-	if (!Array.isArray(accounts) || accounts.length < 2 || !acc_id)
-		return -1;
-
-	pos = getAccountPos(acc_id);
-	if (pos == -1)
-		return 0;
-
-	pos = ((pos == 0) ? accounts.length - 1 : pos - 1);
-
-	return accounts[pos].id;
-}
-
-
-// Return another account id if possible
-// Return zero if no account can't be found
-function getNextAccount(acc_id)
-{
-	var pos;
-
-	if (!Array.isArray(accounts) || accounts.length < 2 || !acc_id)
-		return -1;
-
-	pos = getAccountPos(acc_id);
-	if (pos == -1)
-		return 0;
-
-	pos = ((pos == accounts.length - 1) ? 0 : pos + 1);
-
-	return accounts[pos].id;
-}
-
+	return (res) ? res : null;
+};

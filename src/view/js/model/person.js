@@ -1,73 +1,95 @@
-// Return object for specified person
-function getPerson(person_id)
+/** Person flags */
+var PERSON_HIDDEN = 1;
+
+
+/**
+ * @constructor Person class
+ * @param {*} props 
+ */
+function Person(props)
 {
-	return idSearch(persons, person_id);
+    if (!isObject(props))
+        throw new Error('Invalid Account props');
+
+    for(var prop in props)
+    {
+        if (this.isAvailField(prop))
+            this[prop] = props[prop];
+    }
 }
 
 
-function isVisiblePerson(person)
+/** Static alias for Person constructor */
+Person.create = function(props)
 {
-	if (!person || !('flags' in person))
+    return new Person(props)
+};
+
+
+/**
+ * Check specified field name is available
+ * @param {string} field - field name to check
+ */
+Person.prototype.isAvailField = function(field)
+{
+    var availFields = ['id', 'name', 'flags', 'accounts'];
+
+    return typeof field === 'string' && availFields.includes(field);
+};
+
+
+/**
+ * Check person is not hidden
+ */
+Person.prototype.isVisible = function()
+{
+	if (!('flags' in this))
 		throw new Error('Invalid person');
 
-	return (person.flags & PERSON_HIDDEN) == 0;
-}
+	return (this.flags & PERSON_HIDDEN) == 0;
+};
 
 
-function isHiddenPerson(person)
+/**
+ * @constructor PersonList class
+ * @param {object[]} props - array of persons
+ */
+function PersonList(props)
 {
-	if (!person || !('flags' in person))
-		throw new Error('Invalid person');
-
-	return (person.flags & PERSON_HIDDEN) == PERSON_HIDDEN;
+    if (!Array.isArray(props))
+        throw new Error('Invalid person list props');
+    
+    this.data = props.map(Person.create);
 }
 
 
-// Return person account object by id
-function findPersonAccountById(account_id)
+/** Static alias for PersonList constructor */
+PersonList.create = function(props)
 {
-	var resAcc = null;
-
-	account_id = parseInt(account_id);
-	if (!account_id)
-		return resAcc;
-
-	persons.some(function(p)
-	{
-		return p.accounts.some(function(acc)
-		{
-			var cond = (acc.id == account_id);
-
-			if (cond)
-				resAcc = acc;
-
-			return cond;
-		});
-	});
-
-	return resAcc;
-}
+    return new PersonList(props);
+};
 
 
-// Return balance of current person in specified currency
-function getPersonAccount(person_id, curr_id)
+/**
+ * Return list of visible Persons
+ */
+PersonList.prototype.getVisible = function()
 {
-	var person, resAcc = null;
+    var res = this.data.filter(function(item) {
+        return item && item.isVisible();
+    });
 
-	person = getPerson(person_id);
-	if (!person || !person.accounts || !curr_id)
-		return resAcc;
+    return (res) ? res : null;
+};
 
-	// check person have account in specified currency
-	person.accounts.some(function(acc)
-	{
-		var cond = (acc.curr_id == curr_id);
 
-		if (cond)
-			resAcc = acc;
-
-		return cond;
-	});
-
-	return resAcc;
-}
+/**
+ * Return item with specified id
+ * @param {number} item_id - identifier of item to find
+ */
+PersonList.prototype.getItem = function(item_id)
+{
+    return this.data.find(function(item) {
+        return item && item.id == item_id
+    });
+};

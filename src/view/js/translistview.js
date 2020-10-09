@@ -281,14 +281,14 @@ TransactionListView.prototype.updateBalance = function(transaction, src_bal, des
     if (transaction.type == EXPENSE || transaction.type == TRANSFER || (transaction.type == DEBT && transaction.src_id != 0))
     {
         balSpan = ce('span');
-        balSpan.textContent = formatCurrency(transaction.src_result, transaction.src_curr);
+        balSpan.textContent = this.model.currency.formatCurrency(transaction.src_result, transaction.src_curr);
         transBalanceItem.appendChild(balSpan);
     }
 
     if (transaction.type == INCOME || transaction.type == TRANSFER || (transaction.type == DEBT && transaction.dest_id != 0))
     {
         balSpan = ce('span');
-        balSpan.textContent = formatCurrency(transaction.dest_result, transaction.dest_curr);
+        balSpan.textContent = this.model.currency.formatCurrency(transaction.dest_result, transaction.dest_curr);
         transBalanceItem.appendChild(balSpan);
     }
 };

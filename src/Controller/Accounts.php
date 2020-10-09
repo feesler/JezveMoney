@@ -99,6 +99,7 @@ class Accounts extends TemplateController
         array_push($this->jsArr, ...[
             "model/currency.js",
             "model/account.js",
+            "model/icon.js",
             "selection.js",
             "dropdown.js",
             "decimalinput.js",
@@ -164,6 +165,7 @@ class Accounts extends TemplateController
         array_push($this->jsArr, ...[
             "model/currency.js",
             "model/account.js",
+            "model/icon.js",
             "selection.js",
             "dropdown.js",
             "decimalinput.js",
