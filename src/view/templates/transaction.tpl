@@ -207,12 +207,14 @@
 								</div>
 
 								<div class="tile-info-block">
+<?php	if ($tr["type"] == INCOME) {		?>
 									<div id="src_amount_left" class="hidden">
 										<span><?=e($srcAmountLbl)?></span>
 										<div>
 											<button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
 										</div>
 									</div>
+<?php	}	?>
 									<div id="dest_amount_left" class="hidden">
 										<span><?=e($destAmountLbl)?></span>
 										<div>
