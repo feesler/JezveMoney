@@ -6,7 +6,7 @@ use JezveMoney\Core\Message;
 <script type="text/javascript" src="<?=e(BASEURL.auto_version("view/js/".$jsFile))?>"></script>
 <?php	}	?>
 <script>
-	var baseURL = '<?=BASEURL?>';
-	var themes = <?=JSON::encode((object)$this->themes)?>;
+    var baseURL = '<?=BASEURL?>';
+    var themes = <?=JSON::encode((object)$this->themes)?>;
 <?php		Message::check();		?>
 </script>

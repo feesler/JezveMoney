@@ -1,4 +1,4 @@
 <?php
-	use JezveMoney\Core\JSON;
+    use JezveMoney\Core\JSON;
 ?>
-	onReady(function(){ createMessage(<?=JSON::encode($msgMessage)?>, '<?=$msgClass?>'); });
+    onReady(function(){ createMessage(<?=JSON::encode($msgMessage)?>, '<?=$msgClass?>'); });
