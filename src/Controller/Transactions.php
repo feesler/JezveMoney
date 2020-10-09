@@ -229,9 +229,10 @@ class Transactions extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
-            "selection.js",
+            "model/list.js",
             "model/currency.js",
             "model/account.js",
+            "selection.js",
             "datepicker.js",
             "dragndrop.js",
             "sortable.js",
@@ -562,6 +563,7 @@ class Transactions extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
+            "model/list.js",
             "model/currency.js",
             "model/icon.js",
             "model/account.js",
@@ -837,6 +839,7 @@ class Transactions extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr, ...[
+            "model/list.js",
             "model/currency.js",
             "model/icon.js",
             "model/account.js",

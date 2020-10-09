@@ -6,25 +6,12 @@ var PERSON_HIDDEN = 1;
  * @constructor Person class
  * @param {*} props 
  */
-function Person(props)
+function Person()
 {
-    if (!isObject(props))
-        throw new Error('Invalid Account props');
-
-    for(var prop in props)
-    {
-        if (this.isAvailField(prop))
-            this[prop] = props[prop];
-    }
+	Person.parent.constructor.apply(this, arguments);
 }
 
-
-/** Static alias for Person constructor */
-Person.create = function(props)
-{
-    return new Person(props)
-};
-
+extend(Person, ListItem);
 
 /**
  * Check specified field name is available
@@ -54,19 +41,27 @@ Person.prototype.isVisible = function()
  * @constructor PersonList class
  * @param {object[]} props - array of persons
  */
-function PersonList(props)
+function PersonList()
 {
-    if (!Array.isArray(props))
-        throw new Error('Invalid person list props');
-    
-    this.data = props.map(Person.create);
+	PersonList.parent.constructor.apply(this, arguments);
 }
 
+extend(PersonList, List);
 
 /** Static alias for PersonList constructor */
 PersonList.create = function(props)
 {
     return new PersonList(props);
+};
+
+
+/**
+ * Create list item from specified object
+ * @param {Object} obj 
+ */
+PersonList.prototype.createItem = function(obj)
+{
+    return new Person(obj);
 };
 
 
@@ -80,16 +75,4 @@ PersonList.prototype.getVisible = function()
     });
 
     return (res) ? res : null;
-};
-
-
-/**
- * Return item with specified id
- * @param {number} item_id - identifier of item to find
- */
-PersonList.prototype.getItem = function(item_id)
-{
-    return this.data.find(function(item) {
-        return item && item.id == item_id
-    });
 };

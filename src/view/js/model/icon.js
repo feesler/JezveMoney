@@ -4,23 +4,10 @@
  */
 function Icon(props)
 {
-    if (!isObject(props))
-        throw new Error('Invalid Icon props');
-
-    for(var prop in props)
-    {
-        if (this.isAvailField(prop))
-            this[prop] = props[prop];
-    }
+	Icon.parent.constructor.apply(this, arguments);
 }
 
-
-/** Static alias for Icon constructor */
-Icon.create = function(props)
-{
-    return new Icon(props)
-};
-
+extend(Icon, ListItem);
 
 /**
  * Check specified field name is available
@@ -36,16 +23,14 @@ Icon.prototype.isAvailField = function(field)
 
 /**
  * @constructor IconList class
- * @param {object[]} props - array of currencies
+ * @param {object[]} props - array of icons
  */
-function IconList(props)
+function IconList()
 {
-    if (!Array.isArray(props))
-        throw new Error('Invalid icon list props');
-    
-    this.data = props.map(Icon.create);
+	IconList.parent.constructor.apply(this, arguments);
 }
 
+extend(IconList, List);
 
 /** Static alias for IconList constructor */
 IconList.create = function(props)
@@ -55,18 +40,10 @@ IconList.create = function(props)
 
 
 /**
- * Return item with specified id
- * @param {number} item_id - identifier of item to find
+ * Create list item from specified object
+ * @param {Object} obj 
  */
-IconList.prototype.getItem = function(item_id)
+AccountList.prototype.createItem = function(obj)
 {
-    if (!item_id)
-        return null;
-
-    var res = this.data.find(function(item) {
-        return item && item.id == item_id
-    });
-
-    return (res) ? res : null;
+    return new Icon(obj);
 };
-

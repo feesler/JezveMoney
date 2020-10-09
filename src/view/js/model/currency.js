@@ -9,25 +9,12 @@ function formatValue(val)
  * @constructor Currency
  * @param {object} props - properties of currency object
  */
-function Currency(props)
+function Currency()
 {
-    if (!isObject(props))
-        throw new Error('Invalid Currency props');
-
-    for(var prop in props)
-    {
-        if (this.isAvailField(prop))
-            this[prop] = props[prop];
-    }
+	Currency.parent.constructor.apply(this, arguments);
 }
 
-
-/** Static alias for Currency constructor */
-Currency.create = function(props)
-{
-    return new Currency(props)
-};
-
+extend(Currency, ListItem);
 
 /**
  * Check specified field name is available
@@ -65,14 +52,12 @@ Currency.prototype.formatValue = function(value)
  * @constructor CurrencyList class
  * @param {object[]} props - array of currencies
  */
-function CurrencyList(props)
+function CurrencyList()
 {
-    if (!Array.isArray(props))
-        throw new Error('Invalid currency list props');
-    
-    this.data = props.map(Currency.create);
+	CurrencyList.parent.constructor.apply(this, arguments);
 }
 
+extend(CurrencyList, List);
 
 /** Static alias for CurrencyList constructor */
 CurrencyList.create = function(props)
@@ -82,19 +67,12 @@ CurrencyList.create = function(props)
 
 
 /**
- * Return item with specified id
- * @param {number} item_id - identifier of item to find
+ * Create list item from specified object
+ * @param {Object} obj 
  */
-CurrencyList.prototype.getItem = function(item_id)
+CurrencyList.prototype.createItem = function(obj)
 {
-    if (!item_id)
-        return null;
-
-    var res = this.data.find(function(item) {
-        return item && item.id == item_id
-    });
-
-    return (res) ? res : null;
+    return new Currency(obj);
 };
 
 

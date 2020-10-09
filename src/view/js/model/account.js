@@ -6,25 +6,12 @@ var ACCOUNT_HIDDEN = 1;
  * @constructor Account class
  * @param {*} props 
  */
-function Account(props)
+function Account()
 {
-    if (!isObject(props))
-        throw new Error('Invalid Account props');
-
-    for(var prop in props)
-    {
-        if (this.isAvailField(prop))
-            this[prop] = props[prop];
-    }
+	Account.parent.constructor.apply(this, arguments);
 }
 
-
-/** Static alias for Account constructor */
-Account.create = function(props)
-{
-    return new Account(props)
-};
-
+extend(Account, ListItem);
 
 /**
  * Check specified field name is available
@@ -54,19 +41,27 @@ Account.prototype.isVisible = function()
  * @constructor AccountList class
  * @param {object[]} props - array of accounts
  */
-function AccountList(props)
+function AccountList()
 {
-    if (!Array.isArray(props))
-        throw new Error('Invalid account list props');
-    
-    this.data = props.map(Account.create);
+	AccountList.parent.constructor.apply(this, arguments);
 }
 
+extend(AccountList, List);
 
 /** Static alias for AccountList constructor */
 AccountList.create = function(props)
 {
     return new AccountList(props);
+};
+
+
+/**
+ * Create list item from specified object
+ * @param {Object} obj 
+ */
+AccountList.prototype.createItem = function(obj)
+{
+    return new Account(obj);
 };
 
 
@@ -80,36 +75,6 @@ AccountList.prototype.getVisible = function()
     });
 
     return (res) ? res : null;
-};
-
-
-/**
- * Return item with specified id
- * @param {number} item_id - identifier of item to find
- */
-AccountList.prototype.getItem = function(item_id)
-{
-    if (!item_id)
-        return null;
-
-    var res = this.data.find(function(item) {
-        return item && item.id == item_id
-    });
-
-    return (res) ? res : null;
-};
-
-
-/**
- * Return index of item with specified id
- * Return -1 in case item can't be found
- * @param {number} item_id - identifier of item to find
- */
-AccountList.prototype.getItemIndex = function(item_id)
-{
-	return this.data.findIndex(function(item) {
-        return item && item.id == item_id
-    });
 };
 
 
