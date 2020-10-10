@@ -63,11 +63,8 @@ TransactionListView.prototype.onStart = function()
         this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
     this.dateInput = ge('date');
 
-    this.updateIconLink = IconLink.fromElement({
-        elem: 'edit_btn',
-        onclick: this.showCalendar.bind(this)
-    });
-    if (!this.updateIconLink)
+    this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
+    if (!this.updateBtn)
         throw new Error('Failed to initialize Transaction List view');
 
     this.deleteBtn = IconLink.fromElement({
@@ -324,15 +321,15 @@ TransactionListView.prototype.onTransClick = function(e)
         listItemElem.classList.add('trans-list__item_selected');
     }
 
-    show(this.updateIconLink.elem, (this.model.selection.count() == 1));
-    show(this.delIconLink.elem, (this.model.selection.count() > 0));
+    show(this.updateBtn.elem, (this.model.selection.count() == 1));
+    show(this.deleteBtn.elem, (this.model.selection.count() > 0));
 
     var selArr = this.model.selection.getIdArray();
     this.delTransInp.value = selArr.join();
 
     if (this.model.selection.count() == 1)
     {
-        this.updateIconLink.setURL(baseURL + 'transactions/edit/' + selArr[0]);
+        this.updateBtn.setURL(baseURL + 'transactions/edit/' + selArr[0]);
     }
 
     show('toolbar', (this.model.selection.count() > 0));

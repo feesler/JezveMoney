@@ -152,12 +152,12 @@ StatisticsView.prototype.showCalendar = function()
 
     this.datePicker.show(!this.datePicker.visible());
 
-    show(this.datePickerIconLink.elem, false);
+    show(this.datePickerBtn.elem, false);
     show(this.dateBlock, true);
 
     setEmptyClick(this.datePicker.hide.bind(this.datePicker), [
         this.datePickerWrapper,
-        this.datePickerIconLink.elem,
+        this.datePickerBtn.elem,
         this.dateInputBtn
     ]);
 };
