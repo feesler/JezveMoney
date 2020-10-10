@@ -41,15 +41,10 @@ PersonView.prototype.onStart = function()
 	// Update mode
 	if (this.model.original.id)
 	{
-        this.deleteBtn = ge('del_btn');
-        if (!this.deleteBtn)
-		    throw new Error('Failed to initialize Person view');
-		var btn = this.deleteBtn.querySelector('button');
-		if (!btn)
-			throw new Error('Failed to initialize Person view');
-
-        btn.onclick = this.onDelete.bind(this);
-
+        this.deleteBtn = IconLink.fromElement({
+            elem: 'del_btn',
+            onclick: this.onDelete.bind(this)
+        });
 		this.delForm = ge('delform');
 		if (!this.delForm)
 			throw new Error('Failed to initialize Person view');

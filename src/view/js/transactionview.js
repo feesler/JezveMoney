@@ -69,10 +69,10 @@ TransactionView.prototype.onStart = function()
 
 	if (this.mode == 'update')
 	{
-		this.deleteIconlink = ge('del_btn');
-		this.deleteBtn = this.deleteIconlink.querySelector('button');
-		this.deleteBtn.addEventListener('click', this.onDelete.bind(this));
-
+        this.deleteBtn = IconLink.fromElement({
+            elem: 'del_btn',
+            onclick: this.onDelete.bind(this)
+        });
         this.deleteForm = ge('delform');
 	}
 
@@ -146,13 +146,10 @@ TransactionView.prototype.onStart = function()
 	this.exchangeInput = DecimalInput.create({ elem : ge('exchrate'), oninput : this.onFInput.bind(this) });
     this.exchangeSign = ge('exchcomm');
 
-	this.datePickerIconlink = ge('calendar_btn');
-	if (this.datePickerIconlink)
-	{
-		this.datePickerBtn = this.datePickerIconlink.querySelector('button');
-		if (this.datePickerBtn)
-			this.datePickerBtn.addEventListener('click', this.showCalendar.bind(this));
-	}
+    this.datePickerBtn = IconLink.fromElement({
+        elem: 'calendar_btn',
+        onclick: this.showCalendar.bind(this)
+    });
 	this.dateBlock = ge('date_block');
 	this.datePickerWrapper = ge('calendar');
 
@@ -160,13 +157,10 @@ TransactionView.prototype.onStart = function()
 	this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
     this.dateInput = ge('date');
 
-	this.commentIconlink = ge('comm_btn');
-	if (this.commentIconlink)
-	{
-		this.commentBtn = this.commentIconlink.querySelector('button');
-		if (this.commentBtn)
-			this.commentBtn.addEventListener('click', this.showComment.bind(this));
-	}
+    this.commentBtn = IconLink.fromElement({
+        elem: 'comm_btn',
+        onclick: this.showComment.bind(this)
+    });
 	this.commentBlock = ge('comment_block');
 	this.commentInput = ge('comm');
 
@@ -410,12 +404,12 @@ TransactionView.prototype.showCalendar = function()
 
 	this.calendarObj.show(!this.calendarObj.visible());
 
-	show(this.datePickerIconlink, false);
+	show(this.datePickerBtn.elem, false);
 	show(this.dateBlock, true);
 
 	setEmptyClick(this.calendarObj.hide.bind(this.calendarObj), [
 		this.datePickerWrapper,
-		this.datePickerIconlink,
+		this.datePickerBtn.elem,
 		this.dateInputBtn
 	]);
 };
@@ -425,7 +419,7 @@ TransactionView.prototype.showCalendar = function()
  */
 TransactionView.prototype.showComment = function()
 {
-	show(this.commentIconlink, false);
+	show(this.commentBtn.elem, false);
 	show(this.commentBlock, true);
 	this.commentInput.focus();
 };

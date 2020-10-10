@@ -43,50 +43,39 @@ AccountListView.prototype.onStart = function()
 		throw new Error('Failed to initialize Account List view');
 	this.hiddenTilesContainer.addEventListener('click', this.onTileClick.bind(this));
 
-	this.editBtn = ge('edit_btn');
-	if (!this.editBtn)
-		throw new Error('Failed to initialize Account List view');
-	this.editBtnLink = this.editBtn.querySelector('a');
-	if (!this.editBtnLink)
-		throw new Error('Failed to initialize Account List view');
+    this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
+    this.exportBtn = IconLink.fromElement({ elem: 'export_btn' });
 
-	this.exportBtn = ge('export_btn');
-	if (!this.exportBtn)
-		throw new Error('Failed to initialize Account List view');
-	this.exportBtnLink = this.exportBtn.querySelector('a');
-	if (!this.exportBtnLink)
-		throw new Error('Failed to initialize Account List view');
-
-	this.showBtn = ge('show_btn');
 	this.showForm = ge('showform');
 	this.showAccountsInp = ge('showaccounts');
+    this.showBtn = IconLink.fromElement({
+        elem: 'show_btn',
+        onclick: function() {
+            this.showForm.submit();
+        }.bind(this)
+    });
 	if (!this.showBtn || !this.showForm || !this.showAccountsInp)
 		throw new Error('Failed to initialize Account List view');
-	this.showBtn.addEventListener('click', function()
-	{
-		this.showForm.submit();
-	}.bind(this));
 
-	this.hideBtn = ge('hide_btn');
 	this.hideForm = ge('hideform');
 	this.hideAccountsInp = ge('hideaccounts');
+    this.hideBtn = IconLink.fromElement({
+        elem: 'hide_btn',
+        onclick: function() {
+            this.hideForm.submit();
+        }.bind(this)
+    });
 	if (!this.hideBtn || !this.hideForm || !this.hideAccountsInp)
 		throw new Error('Failed to initialize Account List view');
-	this.hideBtn.addEventListener('click', function()
-	{
-		this.hideForm.submit();
-	}.bind(this));
 
-	this.deleteBtn = ge('del_btn');
 	this.delForm = ge('delform');
 	this.delAccountsInp = ge('delaccounts');
-	if (!this.hideBtn || !this.hideForm || !this.delAccountsInp)
+    this.deleteBtn = IconLink.fromElement({
+        elem: 'del_btn',
+        onclick: this.showDeleteConfirmationPopup.bind(this)
+    });
+	if (!this.deleteBtn || !this.delForm || !this.delAccountsInp)
 		throw new Error('Failed to initialize Account List view');
-
-	var btn = this.deleteBtn.querySelector('button');
-	if (!btn)
-		throw new Error('Failed to initialize Account List view');
-	btn.onclick = this.showDeleteConfirmationPopup.bind(this);
 };
 
 
@@ -122,11 +111,11 @@ AccountListView.prototype.onTileClick = function(e)
 	var selCount = this.model.selected.visible.count();
 	var hiddenSelCount = this.model.selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
-	show(this.editBtn, (totalSelCount == 1));
-	show(this.exportBtn, (totalSelCount > 0));
-	show(this.showBtn, (hiddenSelCount > 0));
-	show(this.hideBtn, (selCount > 0));
-	show(this.deleteBtn, (totalSelCount > 0));
+	show(this.updateBtn.elem, (totalSelCount == 1));
+	show(this.exportBtn.elem, (totalSelCount > 0));
+	show(this.showBtn.elem, (hiddenSelCount > 0));
+	show(this.hideBtn.elem, (selCount > 0));
+	show(this.deleteBtn.elem, (totalSelCount > 0));
 
 	var selArr = this.model.selected.visible.getIdArray();
 	var hiddenSelArr = this.model.selected.hidden.getIdArray();
@@ -137,7 +126,7 @@ AccountListView.prototype.onTileClick = function(e)
 
 	if (totalSelCount == 1)
 	{
-		this.editBtnLink.href = baseURL + 'accounts/edit/' + totalSelArr[0];
+        this.updateBtn.setURL(baseURL + 'accounts/edit/' + totalSelArr[0]);
 	}
 
 	if (totalSelCount > 0)
@@ -147,7 +136,7 @@ AccountListView.prototype.onTileClick = function(e)
 			exportURL += totalSelArr[0];
 		else
 			exportURL += '?' + urlJoin({ id : totalSelArr });
-		this.exportBtnLink.href = exportURL;
+		this.exportBtn.setURL(exportURL);
 	}
 
 	show('toolbar', (totalSelCount > 0));

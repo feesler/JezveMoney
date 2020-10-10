@@ -51,13 +51,10 @@ TransactionListView.prototype.onStart = function()
         throw new Error('Failed to initialize Transaction List view');
     this.searchInp.inputMode = 'search';
 
-    this.datePickerIconLink = ge('calendar_btn');
-    if (this.datePickerIconLink)
-    {
-        this.datePickerIconLinkBtn = this.datePickerIconLink.querySelector('button');
-        if (this.datePickerIconLinkBtn)
-            this.datePickerIconLinkBtn.onclick = this.showCalendar.bind(this);
-    }
+    this.datePickerBtn = IconLink.fromElement({
+        elem: 'calendar_btn',
+        onclick: this.showCalendar.bind(this)
+    });
     this.dateBlock = ge('date_block');
     this.datePickerWrapper = ge('calendar');
 
@@ -66,23 +63,20 @@ TransactionListView.prototype.onStart = function()
         this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
     this.dateInput = ge('date');
 
-    this.updateIconLink = ge('edit_btn');
+    this.updateIconLink = IconLink.fromElement({
+        elem: 'edit_btn',
+        onclick: this.showCalendar.bind(this)
+    });
     if (!this.updateIconLink)
         throw new Error('Failed to initialize Transaction List view');
-    this.updateLink = this.updateIconLink.querySelector('a');
-    if (!this.updateLink)
-        throw new Error('Failed to initialize Transaction List view');
 
-    this.delIconLink = ge('del_btn');
-    if (this.delIconLink)
-    {
-        this.delIconLinkBtn = this.delIconLink.querySelector('button');
-        if (this.delIconLinkBtn)
-            this.delIconLinkBtn.onclick = this.showDeletePopup.bind(this);
-    }
+    this.deleteBtn = IconLink.fromElement({
+        elem: 'del_btn',
+        onclick: this.showDeletePopup.bind(this)
+    });
     this.delForm = ge('delform');
     this.delTransInp = ge('deltrans');
-    if (!this.delForm || !this.delTransInp)
+    if (!this.deleteBtn || !this.delForm || !this.delTransInp)
         throw new Error('Failed to initialize Transaction List view');
 
     this.trListSortable = null;
@@ -330,15 +324,15 @@ TransactionListView.prototype.onTransClick = function(e)
         listItemElem.classList.add('trans-list__item_selected');
     }
 
-    show(this.updateIconLink, (this.model.selection.count() == 1));
-    show(this.delIconLink, (this.model.selection.count() > 0));
+    show(this.updateIconLink.elem, (this.model.selection.count() == 1));
+    show(this.delIconLink.elem, (this.model.selection.count() > 0));
 
     var selArr = this.model.selection.getIdArray();
     this.delTransInp.value = selArr.join();
 
     if (this.model.selection.count() == 1)
     {
-        this.updateLink.href = baseURL + 'transactions/edit/' + selArr[0];
+        this.updateIconLink.setURL(baseURL + 'transactions/edit/' + selArr[0]);
     }
 
     show('toolbar', (this.model.selection.count() > 0));
@@ -740,12 +734,12 @@ TransactionListView.prototype.showCalendar = function()
 
     this.datePicker.show(!this.datePicker.visible());
 
-    show(this.datePickerIconLink, false);
+    show(this.datePickerBtn.elem, false);
     show(this.dateBlock, true);
 
     setEmptyClick(this.datePicker.hide.bind(this.datePicker), [
         this.datePickerWrapper,
-        this.datePickerIconLink,
+        this.datePickerBtn.elem,
         this.dateInputBtn
     ]);
 };

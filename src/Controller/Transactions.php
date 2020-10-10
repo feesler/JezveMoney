@@ -238,6 +238,7 @@ class Transactions extends TemplateController
             "sortable.js",
             "toolbar.js",
             "dropdown.js",
+            "component/iconlink.js",
 			"view.js",
 			"translistview.js"
         ]);
@@ -576,6 +577,7 @@ class Transactions extends TemplateController
             "component/tile.js",
             "component/accounttile.js",
             "component/tileinfoitem.js",
+            "component/iconlink.js",
 			"view.js",
 			"transactionview.js"
         ]);
@@ -853,6 +855,7 @@ class Transactions extends TemplateController
             "component/tile.js",
             "component/accounttile.js",
             "component/tileinfoitem.js",
+            "component/iconlink.js",
 			"view.js",
 			"transactionview.js"
         ]);

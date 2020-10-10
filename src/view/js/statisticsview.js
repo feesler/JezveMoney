@@ -65,14 +65,10 @@ StatisticsView.prototype.onStart = function()
         editable : false
     });
 
-
-    this.datePickerIconLink = ge('calendar_btn');
-    if (this.datePickerIconLink)
-    {
-        this.datePickerIconLinkBtn = this.datePickerIconLink.querySelector('button');
-        if (this.datePickerIconLinkBtn)
-            this.datePickerIconLinkBtn.onclick = this.showCalendar.bind(this);
-    }
+    this.datePickerBtn = IconLink.fromElement({
+        elem: 'calendar_btn',
+        onclick: this.showCalendar.bind(this)
+    });
     this.dateBlock = ge('date_block');
     this.datePickerWrapper = ge('calendar');
 
@@ -156,12 +152,12 @@ StatisticsView.prototype.showCalendar = function()
 
     this.datePicker.show(!this.datePicker.visible());
 
-    show(this.datePickerIconLink, false);
+    show(this.datePickerIconLink.elem, false);
     show(this.dateBlock, true);
 
     setEmptyClick(this.datePicker.hide.bind(this.datePicker), [
         this.datePickerWrapper,
-        this.datePickerIconLink,
+        this.datePickerIconLink.elem,
         this.dateInputBtn
     ]);
 };

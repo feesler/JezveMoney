@@ -169,6 +169,7 @@ class Statistics extends TemplateController
             "dropdown.js",
             "lib/raphael.min.js",
             "charts.js",
+            "component/iconlink.js",
             "view.js",
             "statisticsview.js"
         ]);

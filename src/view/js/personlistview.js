@@ -43,43 +43,38 @@ PersonListView.prototype.onStart = function()
 		throw new Error('Failed to initialize Person List view');
 	this.hiddenTilesContainer.addEventListener('click', this.onTileClick.bind(this));
 
-	this.editBtn = ge('edit_btn');
-	if (!this.editBtn)
-		throw new Error('Failed to initialize Person List view');
-	this.editBtnLink = this.editBtn.querySelector('a');
-	if (!this.editBtnLink)
-		throw new Error('Failed to initialize Person List view');
+    this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
 
-	this.showBtn = ge('show_btn');
 	this.showForm = ge('showform');
 	this.showPersonsInp = ge('showpersons');
+    this.showBtn = IconLink.fromElement({
+        elem: 'show_btn',
+        onclick: function() {
+            this.showForm.submit();
+        }.bind(this)
+    });
 	if (!this.showBtn || !this.showForm || !this.showPersonsInp)
 		throw new Error('Failed to initialize Person List view');
-	this.showBtn.addEventListener('click', function()
-	{
-		this.showForm.submit();
-	}.bind(this));
 
-	this.hideBtn = ge('hide_btn');
 	this.hideForm = ge('hideform');
 	this.hidePersonsInp = ge('hidepersons');
+    this.hideBtn = IconLink.fromElement({
+        elem: 'hide_btn',
+        onclick: function() {
+            this.hideForm.submit();
+        }.bind(this)
+    });
 	if (!this.hideBtn || !this.hideForm || !this.hidePersonsInp)
 		throw new Error('Failed to initialize Person List view');
-	this.hideBtn.addEventListener('click', function()
-	{
-		this.hideForm.submit();
-	}.bind(this));
 
-	this.deleteBtn = ge('del_btn');
 	this.delForm = ge('delform');
 	this.delPersonsInp = ge('delpersons');
+    this.deleteBtn = IconLink.fromElement({
+        elem: 'del_btn',
+        onclick: this.showDeleteConfirmationPopup.bind(this)
+    });
 	if (!this.hideBtn || !this.hideForm || !this.delPersonsInp)
 		throw new Error('Failed to initialize Person List view');
-
-	var btn = this.deleteBtn.querySelector('button');
-	if (!btn)
-		throw new Error('Failed to initialize Person List view');
-	btn.onclick = this.showDeleteConfirmationPopup.bind(this);
 };
 
 
@@ -115,10 +110,10 @@ PersonListView.prototype.onTileClick = function(e)
 	var selCount = this.model.selected.visible.count();
 	var hiddenSelCount = this.model.selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
-	show(this.editBtn, (totalSelCount == 1));
-	show(this.showBtn, (hiddenSelCount > 0));
-	show(this.hideBtn, (selCount > 0));
-	show(this.deleteBtn, (totalSelCount > 0));
+	show(this.updateBtn.elem, (totalSelCount == 1));
+	show(this.showBtn.elem, (hiddenSelCount > 0));
+	show(this.hideBtn.elem, (selCount > 0));
+	show(this.deleteBtn.elem, (totalSelCount > 0));
 
 	var selArr = this.model.selected.visible.getIdArray();
 	var hiddenSelArr = this.model.selected.hidden.getIdArray();
@@ -129,7 +124,7 @@ PersonListView.prototype.onTileClick = function(e)
 
 	if (totalSelCount == 1)
 	{
-		this.editBtnLink.href = baseURL + 'persons/edit/' + totalSelArr[0];
+        this.updateBtn.setURL(baseURL + 'persons/edit/' + totalSelArr[0]);
 	}
 
 	show('toolbar', (totalSelCount > 0));
