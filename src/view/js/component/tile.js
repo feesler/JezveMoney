@@ -2,19 +2,12 @@
  * Tile component constructor
  * @param {object} props 
  */
-function Tile(props)
+function Tile()
 {
-	if (typeof props === 'undefined')
-		this.props = {};
-	else
-		this.props = props;
-
-    if (typeof this.props.elem === 'string')
-        this.elem = ge(this.props.elem);
-    else
-        this.elem = this.props.elem;
+	Tile.parent.constructor.apply(this, arguments);
 }
 
+extend(Tile, Component);
 
 /**
  * Create new Tile from specified element

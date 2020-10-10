@@ -404,7 +404,7 @@ TransactionView.prototype.showCalendar = function()
 
 	this.calendarObj.show(!this.calendarObj.visible());
 
-	show(this.datePickerBtn.elem, false);
+	this.datePickerBtn.hide();
 	show(this.dateBlock, true);
 
 	setEmptyClick(this.calendarObj.hide.bind(this.calendarObj), [
@@ -419,7 +419,7 @@ TransactionView.prototype.showCalendar = function()
  */
 TransactionView.prototype.showComment = function()
 {
-	show(this.commentBtn.elem, false);
+	this.commentBtn.hide();
 	show(this.commentBlock, true);
 	this.commentInput.focus();
 };
@@ -438,7 +438,7 @@ TransactionView.prototype.commonSwitch = function(inputRow, infoBlock, inputObj,
 
 	show(inputRow, showInput);
     if (infoBlock)
-    	show(infoBlock.elem, !showInput);
+    	infoBlock.show(!showInput);
 
 	if (showInput && inputObj && inputObj.elem)
 		inputObj.elem.focus();
@@ -578,11 +578,11 @@ TransactionView.prototype.hideSrcAmountAndExchange = function()
 {
 	show(this.srcAmountRow, false);
     if (this.srcAmountInfo)
-	    show(this.srcAmountInfo.elem,  false);
+	    this.srcAmountInfo.hide();
 
 	show(this.exchangeRow, false);
     if (this.exchangeInfo)
-    	show(this.exchangeInfo.elem, false);
+    	this.exchangeInfo.hide();
 };
 
 
@@ -593,11 +593,11 @@ TransactionView.prototype.hideDestAmountAndExchange = function()
 {
 	show(this.destAmountRow, false);
     if (this.destAmountInfo)
-	    show(this.destAmountInfo.elem,  false);
+	    this.destAmountInfo.hide();
 
 	show(this.exchangeRow, false);
     if (this.exchangeInfo)
-	    show(this.exchangeInfo.elem, false);
+	    this.exchangeInfo.hide();
 };
 
 

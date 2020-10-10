@@ -28,6 +28,7 @@ class Persons extends TemplateController
             "model/person.js",
             "selection.js",
             "toolbar.js",
+            "component/component.js",
             "component/iconlink.js",
             "view.js",
             "personlistview.js"
@@ -103,6 +104,7 @@ class Persons extends TemplateController
             "tiles.css");
         $this->buildCSS();
         array_push($this->jsArr,
+            "component/component.js",
             "component/iconlink.js",
             "view.js",
             "personview.js"

@@ -111,11 +111,11 @@ AccountListView.prototype.onTileClick = function(e)
 	var selCount = this.model.selected.visible.count();
 	var hiddenSelCount = this.model.selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
-	show(this.updateBtn.elem, (totalSelCount == 1));
-	show(this.exportBtn.elem, (totalSelCount > 0));
-	show(this.showBtn.elem, (hiddenSelCount > 0));
-	show(this.hideBtn.elem, (selCount > 0));
-	show(this.deleteBtn.elem, (totalSelCount > 0));
+	this.updateBtn.show(totalSelCount == 1);
+	this.exportBtn.show(totalSelCount > 0);
+	this.showBtn.show(hiddenSelCount > 0);
+	this.hideBtn.show(selCount > 0);
+	this.deleteBtn.show(totalSelCount > 0);
 
 	var selArr = this.model.selected.visible.getIdArray();
 	var hiddenSelArr = this.model.selected.hidden.getIdArray();

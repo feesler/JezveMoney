@@ -2,19 +2,12 @@
  * IconLink component constructor
  * @param {object} props 
  */
-function IconLink(props)
+function IconLink()
 {
-	if (typeof props === 'undefined')
-		this.props = {};
-	else
-		this.props = props;
-
-    if (typeof this.props.elem === 'string')
-        this.elem = ge(this.props.elem);
-    else
-        this.elem = this.props.elem;
+	IconLink.parent.constructor.apply(this, arguments);
 }
 
+extend(IconLink, Component);
 
 /**
  * Create new IconLink from specified element

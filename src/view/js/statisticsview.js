@@ -156,7 +156,7 @@ StatisticsView.prototype.showCalendar = function()
 
     this.datePicker.show(!this.datePicker.visible());
 
-    show(this.datePickerBtn.elem, false);
+    this.datePickerBtn.hide();
     show(this.dateBlock, true);
 
     setEmptyClick(this.datePicker.hide.bind(this.datePicker), [

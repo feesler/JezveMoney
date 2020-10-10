@@ -2,19 +2,12 @@
  * TileInfoItem component constructor
  * @param {object} props 
  */
-function TileInfoItem(props)
+function TileInfoItem()
 {
-	if (typeof props === 'undefined')
-		this.props = {};
-	else
-		this.props = props;
-
-    if (typeof this.props.elem === 'string')
-        this.elem = ge(this.props.elem);
-    else
-        this.elem = this.props.elem;
+	TileInfoItem.parent.constructor.apply(this, arguments);
 }
 
+extend(TileInfoItem, Component);
 
 /**
  * Create new TileInfoItem from specified element

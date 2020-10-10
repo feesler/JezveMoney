@@ -321,8 +321,8 @@ TransactionListView.prototype.onTransClick = function(e)
         listItemElem.classList.add('trans-list__item_selected');
     }
 
-    show(this.updateBtn.elem, (this.model.selection.count() == 1));
-    show(this.deleteBtn.elem, (this.model.selection.count() > 0));
+    this.updateBtn.show(this.model.selection.count() == 1);
+    this.deleteBtn.show(this.model.selection.count() > 0);
 
     var selArr = this.model.selection.getIdArray();
     this.delTransInp.value = selArr.join();
@@ -731,7 +731,7 @@ TransactionListView.prototype.showCalendar = function()
 
     this.datePicker.show(!this.datePicker.visible());
 
-    show(this.datePickerBtn.elem, false);
+    this.datePickerBtn.hide();
     show(this.dateBlock, true);
 
     setEmptyClick(this.datePicker.hide.bind(this.datePicker), [
