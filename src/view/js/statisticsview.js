@@ -5,21 +5,25 @@ function StatisticsView()
 {
     StatisticsView.parent.constructor.apply(this, arguments);
 
+    if (!('currency' in this.props) ||
+        !('accountCurrency' in this.props) ||
+        !('chartData' in this.props)) {
+        throw new Error('Invalid Statistics view properties');
+    }
+
     this.groupTypes = [null, 'day', 'week', 'month', 'year'];
 
     this.model = {
-        selDateRange: null
+        selDateRange: null,
+        accountCurrency: this.props.accountCurrency,
+        chartData: this.props.chartData
     };
 
-    if (!('currency' in this.props))
-        throw new Error('Invalid Statistics view properties');
-
     this.model.currency = CurrencyList.create(this.props.currency);
+    this.model.filter = ('filter' in this.props) ? this.props.filter : {};
 }
 
-
 extend(StatisticsView, View);
-
 
 /**
  * View initialization
@@ -27,7 +31,7 @@ extend(StatisticsView, View);
 StatisticsView.prototype.onStart = function()
 {
     this.histogram = Charts.createHistogram({
-        data : chartData,
+        data : this.model.chartData,
         container : 'chart',
         autoScale : true,
         onbarclick : this.onBarClick.bind(this),
@@ -42,7 +46,7 @@ StatisticsView.prototype.onStart = function()
         editable : false
     });
 
-    if (filterObj.filter == 'currency')
+    if (this.model.filter.filter == 'currency')
     {
         this.currencyDropDown = DropDown.create({
             input_id : 'curr_id',
@@ -80,14 +84,14 @@ StatisticsView.prototype.onStart = function()
 
 
 /**
- * Build new location address from current filterObj
+ * Build new location address from current filter object
  */
 StatisticsView.prototype.buildAddress = function()
 {
     var newLocation = baseURL + 'statistics/';
     var locFilter = {};
 
-    setParam(locFilter, filterObj);
+    setParam(locFilter, this.model.filter);
 
     for(var name in locFilter)
     {
@@ -125,8 +129,8 @@ StatisticsView.prototype.onDatePickerHide = function()
     if (!this.selDateRange)
         return;
 
-    filterObj.stdate = DatePicker.format(this.selDateRange.start);
-    filterObj.enddate = DatePicker.format(this.selDateRange.end);
+    this.model.filter.stdate = DatePicker.format(this.selDateRange.start);
+    this.model.filter.enddate = DatePicker.format(this.selDateRange.end);
 
     window.location = this.buildAddress();
 };
@@ -174,9 +178,9 @@ StatisticsView.prototype.onFilterSel = function(obj)
 
     var filterType = (parseInt(obj.id) == 1) ? 'currency' : null;
     if (filterType)
-        filterObj.filter = filterType;
-    else if ('filter' in filterObj)
-        delete filterObj['filter'];
+        this.model.filter.filter = filterType;
+    else if ('filter' in this.model.filter)
+        delete this.model.filter['filter'];
 
     window.location = this.buildAddress();
 };
@@ -191,7 +195,7 @@ StatisticsView.prototype.onAccountSel = function(obj)
     if (!obj)
         return;
 
-    filterObj.acc_id = obj.id;
+    this.model.filter.acc_id = obj.id;
     window.location = this.buildAddress();
 };
 
@@ -205,7 +209,7 @@ StatisticsView.prototype.onCurrencySel = function(obj)
     if (!obj)
         return;
 
-    filterObj.curr_id = obj.id;
+    this.model.filter.curr_id = obj.id;
     window.location = this.buildAddress();
 };
 
@@ -222,9 +226,9 @@ StatisticsView.prototype.onGroupSel = function(obj)
     obj.id = parseInt(obj.id);
     var group = (obj.id < this.groupTypes.length) ? this.groupTypes[obj.id] : null;
     if (group)
-        filterObj.group = group;
-    else if ('group' in filterObj)
-        delete filterObj['group'];
+        this.model.filter.group = group;
+    else if ('group' in this.model.filter)
+        delete this.model.filter['group'];
 
     window.location = this.buildAddress();
 };
@@ -285,7 +289,7 @@ StatisticsView.prototype.onBarClick = function(barRect, val)
 
         chartsWrapper.style.position = (isRelative) ? 'relative' : '';
 
-        this.popup.textContent = this.model.currency.formatCurrency(val, accCurr);
+        this.popup.textContent = this.model.currency.formatCurrency(val, this.model.accountCurrency);
 
         var rectBBox = barRect.getBBox();
         var chartsBRect = chartsWrapper.getBoundingClientRect();

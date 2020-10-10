@@ -133,12 +133,12 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var currency = <?=JSON::encode($currArr)?>;
-    var accCurr = <?=$accCurr?>;
-    var filterObj = <?=JSON::encode($filterObj)?>;
-    var chartData = <?=JSON::encode($statArr)?>;
-
-    var view = new StatisticsView();
+    var view = new StatisticsView({
+        currency: <?=JSON::encode($currArr)?>,
+        accountCurrency: <?=$accCurr?>,
+        filter: <?=JSON::encode($filterObj)?>,
+        chartData: <?=JSON::encode($statArr)?>
+    });
 </script>
 </body>
 </html>
