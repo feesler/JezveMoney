@@ -92,13 +92,13 @@ class Accounts extends TemplateController
         $headString = "New account";
         $titleString .= $headString;
 
-        array_push($this->css->libs, ...[
+        array_push($this->css->libs,
             "iconlink.css",
             "dropdown.css",
             "tiles.css"
-        ]);
+        );
         $this->buildCSS();
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/account.js",
@@ -110,7 +110,7 @@ class Accounts extends TemplateController
             "component/accounttile.js",
             "view.js",
             "accountview.js"
-        ]);
+        );
 
         include(TPL_PATH . "account.tpl");
     }
@@ -158,14 +158,14 @@ class Accounts extends TemplateController
         $headString = "Edit account";
         $titleString .= $headString;
 
-        array_push($this->css->libs, ...[
+        array_push($this->css->libs,
             "iconlink.css",
             "dropdown.css",
             "tiles.css"
-        ]);
+        );
         $this->buildCSS();
 
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/account.js",
@@ -178,7 +178,7 @@ class Accounts extends TemplateController
             "component/iconlink.js",
             "view.js",
             "accountview.js"
-        ]);
+        );
 
         include(TPL_PATH . "account.tpl");
     }

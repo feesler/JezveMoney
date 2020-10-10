@@ -18,9 +18,12 @@ class Persons extends TemplateController
 
         $titleString = "Jezve Money | Persons";
 
-        array_push($this->css->libs, "tiles.css", "iconlink.css", "toolbar.css");
+        array_push($this->css->libs,
+            "tiles.css",
+            "iconlink.css",
+            "toolbar.css");
         $this->buildCSS();
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/person.js",
             "selection.js",
@@ -28,7 +31,7 @@ class Persons extends TemplateController
             "component/iconlink.js",
             "view.js",
             "personlistview.js"
-        ]);
+        );
 
         include(TPL_PATH . "persons.tpl");
     }
@@ -60,12 +63,14 @@ class Persons extends TemplateController
         $headString = "New person";
         $titleString .= $headString;
 
-        array_push($this->css->libs, "iconlink.css", "tiles.css");
+        array_push($this->css->libs,
+            "iconlink.css",
+            "tiles.css");
         $this->buildCSS();
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "view.js",
             "personview.js"
-        ]);
+        );
 
         include(TPL_PATH . "person.tpl");
     }
@@ -93,13 +98,15 @@ class Persons extends TemplateController
         $headString = "Edit person";
         $titleString .= $headString;
 
-        array_push($this->css->libs, "iconlink.css", "tiles.css");
+        array_push($this->css->libs,
+            "iconlink.css",
+            "tiles.css");
         $this->buildCSS();
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "component/iconlink.js",
             "view.js",
             "personview.js"
-        ]);
+        );
 
         include(TPL_PATH . "person.tpl");
     }

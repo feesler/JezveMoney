@@ -70,7 +70,10 @@ Tile.prototype.parse = function()
 };
 
 
-
+/**
+ * Set title of tile
+ * @param {string|null} icon - title to set, if null is set then title removed
+ */
 Tile.prototype.setTitle = function(title)
 {
     if (title !== null && typeof title !== 'string')
@@ -90,6 +93,10 @@ Tile.prototype.setTitle = function(title)
 };
 
 
+/**
+ * Set subtitle of tile
+ * @param {string|null} icon - subtitle to set, if null is set then subtitle removed
+ */
 Tile.prototype.setSubTitle = function(subTitle)
 {
     if (subTitle !== null && typeof subTitle !== 'string')
@@ -111,7 +118,7 @@ Tile.prototype.setSubTitle = function(subTitle)
 
 /**
  * Set icon of tile
- * @param {string|null} icon - icon to set, is null is set icon removed
+ * @param {string|null} icon - icon to set, if null is set then icon removed
  */
 Tile.prototype.setIcon = function(icon)
 {

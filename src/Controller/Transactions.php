@@ -217,18 +217,18 @@ class Transactions extends TemplateController
 
         $titleString = "Jezve Money | Transactions";
 
-        array_push($this->css->libs, ...[
+        array_push($this->css->libs,
             "tiles.css",
             "iconlink.css",
             "datepicker.css",
             "dropdown.css",
             "trlist.css",
             "toolbar.css"
-        ]);
+        );
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/account.js",
@@ -241,7 +241,7 @@ class Transactions extends TemplateController
             "component/iconlink.js",
 			"view.js",
 			"translistview.js"
-        ]);
+        );
 
         include(TPL_PATH . "transactions.tpl");
     }
@@ -554,16 +554,16 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
-        array_push($this->css->libs, ...[
+        array_push($this->css->libs,
             "tiles.css",
             "iconlink.css",
             "dropdown.css",
             "datepicker.css"
-        ]);
+        );
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/icon.js",
@@ -580,7 +580,7 @@ class Transactions extends TemplateController
             "component/iconlink.js",
 			"view.js",
 			"transactionview.js"
-        ]);
+        );
 
         include(TPL_PATH . "transaction.tpl");
     }
@@ -841,7 +841,7 @@ class Transactions extends TemplateController
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/icon.js",
@@ -858,7 +858,7 @@ class Transactions extends TemplateController
             "component/iconlink.js",
 			"view.js",
 			"transactionview.js"
-        ]);
+        );
 
         include(TPL_PATH . "transaction.tpl");
     }

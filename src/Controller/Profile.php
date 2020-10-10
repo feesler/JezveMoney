@@ -36,10 +36,10 @@ class Profile extends TemplateController
         $this->css->libs[] = "iconlink.css";
         $this->css->page[] = "user.css";
         $this->buildCSS();
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "view.js",
             "profileview.js"
-        ]);
+        );
 
         include(TPL_PATH . "profile.tpl");
     }

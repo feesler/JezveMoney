@@ -24,9 +24,7 @@ function AccountView(props)
     this.model.icons = IconList.create(this.props.icons);
 }
 
-
 extend(AccountView, View);
-
 
 /**
  * View initialization
