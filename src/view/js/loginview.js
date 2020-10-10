@@ -35,7 +35,7 @@ LoginView.prototype.onStart = function()
  */
 LoginView.prototype.onLoginInput = function()
 {
-	clearBlockValidation('login-inp-block');
+	this.clearBlockValidation('login-inp-block');
 };
 
 
@@ -44,7 +44,7 @@ LoginView.prototype.onLoginInput = function()
  */
 LoginView.prototype.onPasswordInput = function()
 {
-	clearBlockValidation('pwd-inp-block');
+	this.clearBlockValidation('pwd-inp-block');
 };
 
 
@@ -57,13 +57,13 @@ LoginView.prototype.onSubmit = function()
 
 	if (!this.loginInp.value || this.loginInp.value.length < 1)
 	{
-		invalidateBlock('login-inp-block');
+		this.invalidateBlock('login-inp-block');
 		valid = false;
 	}
 
 	if (!this.passwordInp.value || this.passwordInp.value.length < 1)
 	{
-		invalidateBlock('pwd-inp-block');
+		this.invalidateBlock('pwd-inp-block');
 		valid = false;
 	}
 

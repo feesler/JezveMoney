@@ -9,24 +9,6 @@ var WHITE_THEME = 0;
 var DARK_THEME = 1;
 
 
-// Clear validation state of block
-function clearBlockValidation(block)
-{
-	var blockElem = ge(block);
-	if (blockElem)
-		blockElem.classList.remove('invalid-block');
-}
-
-
-// Set invalid state for block
-function invalidateBlock(block)
-{
-	var blockElem = ge(block);
-	if (blockElem)
-		blockElem.classList.add('invalid-block');
-}
-
-
 // Hide usem menu popup
 function hidePopup()
 {

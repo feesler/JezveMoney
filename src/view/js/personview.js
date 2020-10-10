@@ -57,7 +57,7 @@ PersonView.prototype.onStart = function()
  */
 PersonView.prototype.onNameInput = function()
 {
-    clearBlockValidation('name-inp-block');
+    this.clearBlockValidation('name-inp-block');
 };
 
 
@@ -73,7 +73,7 @@ PersonView.prototype.onSubmit = function()
 
 	if (!this.nameInp.value || this.nameInp.value.length < 1)
 	{
-		invalidateBlock('name-inp-block');
+		this.invalidateBlock('name-inp-block');
         this.nameInp.focus();
 		valid = false;
 	}

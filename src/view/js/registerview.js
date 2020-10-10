@@ -37,7 +37,7 @@ RegisterView.prototype.onStart = function()
  */
 RegisterView.prototype.onLoginInput = function()
 {
-	clearBlockValidation('login-inp-block');
+	this.clearBlockValidation('login-inp-block');
 };
 
 
@@ -46,7 +46,7 @@ RegisterView.prototype.onLoginInput = function()
  */
 RegisterView.prototype.onPasswordInput = function()
 {
-	clearBlockValidation('pwd-inp-block');
+	this.clearBlockValidation('pwd-inp-block');
 };
 
 
@@ -55,7 +55,7 @@ RegisterView.prototype.onPasswordInput = function()
  */
 RegisterView.prototype.onNameInput = function()
 {
-	clearBlockValidation('name-inp-block');
+	this.clearBlockValidation('name-inp-block');
 };
 
 
@@ -68,19 +68,19 @@ RegisterView.prototype.onSubmit = function()
 
 	if (!this.loginInp.value || this.loginInp.value.length < 1)
 	{
-		invalidateBlock('login-inp-block');
+		this.invalidateBlock('login-inp-block');
 		valid = false;
 	}
 
 	if (!this.nameInp.value || this.nameInp.value.length < 1)
 	{
-		invalidateBlock('name-inp-block');
+		this.invalidateBlock('name-inp-block');
 		valid = false;
 	}
 
 	if (!this.passwordInp.value || this.passwordInp.value.length < 1)
 	{
-		invalidateBlock('pwd-inp-block');
+		this.invalidateBlock('pwd-inp-block');
 		valid = false;
 	}
 

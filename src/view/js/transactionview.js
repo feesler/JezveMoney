@@ -1103,7 +1103,7 @@ TransactionView.prototype.onSubmit = function(frm)
     {
         if (!destAmount || !destAmount.length || !isNum(fixFloat(destAmount)))
         {
-            invalidateBlock('dest_amount_row');
+            this.invalidateBlock('dest_amount_row');
             valid = false;
         }
     }
@@ -1112,14 +1112,14 @@ TransactionView.prototype.onSubmit = function(frm)
     {
         if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount)))
         {
-            invalidateBlock('src_amount_row');
+            this.invalidateBlock('src_amount_row');
             valid = false;
         }
     }
 
     if (!checkDate(this.dateInput.value))
     {
-        invalidateBlock('date_block');
+        this.invalidateBlock('date_block');
         valid = false;
     }
 
@@ -1150,19 +1150,19 @@ TransactionView.prototype.onTransferSubmit = function()
     var valid = true;
     if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount)))
     {
-        invalidateBlock('src_amount_row');
+        this.invalidateBlock('src_amount_row');
         valid = false;
     }
 
     if (this.model.transaction.isDiff() && (!destAmount || !destAmount.length || !isNum(fixFloat(destAmount))))
     {
-        invalidateBlock('dest_amount_row');
+        this.invalidateBlock('dest_amount_row');
         valid = false;
     }
 
     if (!checkDate(this.dateInput.value))
     {
-        invalidateBlock('date_block');
+        this.invalidateBlock('date_block');
         valid = false;
     }
 
@@ -1197,19 +1197,19 @@ TransactionView.prototype.onDebtSubmit = function()
 
     if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount)))
     {
-        invalidateBlock('src_amount_row');
+        this.invalidateBlock('src_amount_row');
         valid = false;
     }
 
     if (!destAmount || !destAmount.length || !isNum(fixFloat(destAmount)))
     {
-        invalidateBlock('dest_amount_row');
+        this.invalidateBlock('dest_amount_row');
         valid = false;
     }
 
     if (!checkDate(this.dateInput.value))
     {
-        invalidateBlock('date_block');
+        this.invalidateBlock('date_block');
         valid = false;
     }
 
@@ -1346,12 +1346,12 @@ TransactionView.prototype.onFInput = function(e)
 
     if (obj.id == 'src_amount')
     {
-        clearBlockValidation('src_amount_row');
+        this.clearBlockValidation('src_amount_row');
         this.model.transaction.updateValue('src_amount', obj.value);
     }
     else if (obj.id == 'dest_amount')
     {
-        clearBlockValidation('dest_amount_row');
+        this.clearBlockValidation('dest_amount_row');
         this.model.transaction.updateValue('dest_amount', obj.value);
     }
     else if (obj.id == 'exchrate')

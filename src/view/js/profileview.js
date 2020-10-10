@@ -106,7 +106,7 @@ ProfileView.prototype.onStart = function()
  */
 ProfileView.prototype.onOldPasswordInput = function()
 {
-    clearBlockValidation('old-pwd-inp-block');
+   this.clearBlockValidation('old-pwd-inp-block');
 };
 
 
@@ -115,7 +115,7 @@ ProfileView.prototype.onOldPasswordInput = function()
  */
 ProfileView.prototype.onNewPasswordInput = function()
 {
-    clearBlockValidation('new-pwd-inp-block');
+    this.clearBlockValidation('new-pwd-inp-block');
 };
 
 
@@ -124,7 +124,7 @@ ProfileView.prototype.onNewPasswordInput = function()
  */
 ProfileView.prototype.onNewNameInput = function()
 {
-    clearBlockValidation('name-inp-block');
+    this.clearBlockValidation('name-inp-block');
 };
 
 
@@ -187,13 +187,13 @@ ProfileView.prototype.onChangePassSubmit = function()
 
     if (!this.oldPassInp.value || this.oldPassInp.value.length < 1)
     {
-        invalidateBlock('old-pwd-inp-block');
+        this.invalidateBlock('old-pwd-inp-block');
         valid = false;
     }
 
     if (!this.newPassInp.value || this.newPassInp.value.length < 1 || this.newPassInp.value == this.oldPassInp.value)
     {
-        invalidateBlock('new-pwd-inp-block');
+        this.invalidateBlock('new-pwd-inp-block');
         valid = false;
     }
 
@@ -287,7 +287,7 @@ ProfileView.prototype.onChangeNameSubmit = function()
 
     if (!this.newNameInp.value || this.newNameInp.value.length < 1 || this.newNameInp.value == this.model.data.name)
     {
-        invalidateBlock('name-inp-block');
+        this.invalidateBlock('name-inp-block');
         valid = false;
     }
 

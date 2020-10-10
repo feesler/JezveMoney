@@ -129,7 +129,7 @@ AccountView.prototype.onInitBalanceInput = function(e)
 	if (!e || !e.target)
 		return;
 
-	clearBlockValidation('initbal-inp-block');
+	this.clearBlockValidation('initbal-inp-block');
 
 	this.model.data.initbalance = normalize(e.target.value);
 
@@ -142,7 +142,7 @@ AccountView.prototype.onInitBalanceInput = function(e)
  */
 AccountView.prototype.onNameInput = function(e)
 {
-	clearBlockValidation('name-inp-block');
+	this.clearBlockValidation('name-inp-block');
 
 	this.model.nameChanged = true;
 	this.model.data.name = this.nameInp.value;
@@ -163,14 +163,14 @@ AccountView.prototype.onSubmit = function()
 
 	if (!this.nameInp.value || this.nameInp.value.length < 1)
 	{
-		invalidateBlock('name-inp-block');
+		this.invalidateBlock('name-inp-block');
         this.nameInp.focus();
 		valid = false;
 	}
 
 	if (!this.balanceInp.value || this.balanceInp.value.length < 1 || !isNum(this.balanceInp.value))
 	{
-		invalidateBlock('initbal-inp-block');
+		this.invalidateBlock('initbal-inp-block');
         this.balanceInp.focus();
 		valid = false;
 	}
