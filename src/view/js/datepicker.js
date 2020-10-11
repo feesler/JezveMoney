@@ -90,8 +90,7 @@ DatePicker.YEAR_VIEW = 2;
 DatePicker.YEARRANGE_VIEW = 3;
 
 
-// Static methods
-
+/** Static alias for DatePicker constructor */
 DatePicker.create = function(params)
 {
     return new DatePicker(params);
@@ -484,7 +483,7 @@ DatePicker.prototype.onWheel = function(e)
 };
 
 
-// View click event delegate
+/** View 'click' event delegate */
 DatePicker.prototype.onViewClick = function(e)
 {
     if (!this.currView || !this.currView.callback || this.animation)
@@ -551,7 +550,7 @@ DatePicker.prototype.createLayout = function()
 };
 
 
-// Remove highlight from all cells
+/** Remove highlight from all cells */
 DatePicker.prototype.cleanHL = function()
 {
     if (!this.currView || !Array.isArray(this.currView.set))
@@ -564,7 +563,7 @@ DatePicker.prototype.cleanHL = function()
 };
 
 
-// Remove all markers from all cells
+/** Remove all markers from all cells */
 DatePicker.prototype.cleanAll = function()
 {
     if (!this.currView || !Array.isArray(this.currView.set))
@@ -577,7 +576,7 @@ DatePicker.prototype.cleanAll = function()
 };
 
 
-// Highlight specified range of cells
+/** Highlight specified range of cells */
 DatePicker.prototype.highLightRange = function(range)
 {
     if (!range || !range.start || !range.end || !this.currView || !Array.isArray(this.currView.set))
@@ -592,7 +591,7 @@ DatePicker.prototype.highLightRange = function(range)
 };
 
 
-// Activate cell by specified date
+/** Activate cell by specified date */
 DatePicker.prototype.activateCell = function(date)
 {
     var cell = this.findCell(date);
@@ -602,7 +601,7 @@ DatePicker.prototype.activateCell = function(date)
 };
 
 
-// Activate cell by specified date
+/** Activate cell by specified date */
 DatePicker.prototype.deactivateCell = function(date)
 {
     var cell = this.findCell(date);
@@ -630,7 +629,7 @@ DatePicker.prototype.findCell = function(date)
 };
 
 
-// Day cell click inner callback
+/** Day cell click inner callback */
 DatePicker.prototype.onDayClick = function(date)
 {
     if (this.actDate != null) {
@@ -650,7 +649,7 @@ DatePicker.prototype.onDayClick = function(date)
 };
 
 
-// Range select inner callback
+/** Range select inner callback */
 DatePicker.prototype.onRangeSelect = function(date)
 {
     this.cleanHL();

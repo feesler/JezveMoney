@@ -5,325 +5,325 @@ var ge = document.getElementById.bind(document);
 // Check object is date
 function isDate(obj)
 {
-	return (obj instanceof Date && !isNaN(obj.valueOf()));
+    return (obj instanceof Date && !isNaN(obj.valueOf()));
 }
 
 
 // Check object is function
 function isFunction(obj)
 {
-	var getType = {};
-	return obj && (getType.toString.call(obj) === '[object Function]' || typeof obj === 'function');
+    var getType = {};
+    return obj && (getType.toString.call(obj) === '[object Function]' || typeof obj === 'function');
 }
 
 
 // Check object is {}
 function isObject(o)
 {
-	return null != o && typeof o === 'object' && Object.prototype.toString.call(o) === '[object Object]';
+    return null != o && typeof o === 'object' && Object.prototype.toString.call(o) === '[object Object]';
 }
 
 
 // Return deep copy of object
 function copyObject(item)
 {
-	if (Array.isArray(item))
-	{
-		return item.map(copyObject);
-	}
-	else if (isObject(item))
-	{
-		var res = {};
-		for(var key in item)
-		{
-			res[key] = copyObject(item[key]);
-		}
+    if (Array.isArray(item))
+    {
+        return item.map(copyObject);
+    }
+    else if (isObject(item))
+    {
+        var res = {};
+        for(var key in item)
+        {
+            res[key] = copyObject(item[key]);
+        }
 
-		return res;
-	}
-	else
-	{
-		return item;
-	}
+        return res;
+    }
+    else
+    {
+        return item;
+    }
 }
 
 
 // Set parameters of object
 function setParam(obj, params)
 {
-	var par, val;
+    var par, val;
 
-	if (!obj || !params || typeof params !== 'object')
-		return;
+    if (!obj || !params || typeof params !== 'object')
+        return;
 
-	for(par in params)
-	{
-		val = params[par];
-		if (Array.isArray(val))
-		{
-			obj[par] = val.map(function(item){ return item; });
-		}
-		else if (isObject(val))
-		{
-			if (obj[par] == null || obj[par] === undefined)
-				obj[par] = {};
+    for(par in params)
+    {
+        val = params[par];
+        if (Array.isArray(val))
+        {
+            obj[par] = val.map(function(item){ return item; });
+        }
+        else if (isObject(val))
+        {
+            if (obj[par] == null || obj[par] === undefined)
+                obj[par] = {};
 
-			setParam(obj[par], val);
-		}
-		else
-		{
-			try
-			{
-				obj[par] = val;
-			}
-			catch(e)
-			{
-				if (obj.setAttribute)
-					obj.setAttribute(par, val);
-			}
-		}
-	}
+            setParam(obj[par], val);
+        }
+        else
+        {
+            try
+            {
+                obj[par] = val;
+            }
+            catch(e)
+            {
+                if (obj.setAttribute)
+                    obj.setAttribute(par, val);
+            }
+        }
+    }
 }
 
 
 // Append elements from array to object
 function addChilds(obj, childs)
 {
-	if (!obj || !childs)
-		return;
+    if (!obj || !childs)
+        return;
 
-	if (!Array.isArray(childs))
-		childs = [ childs ];
+    if (!Array.isArray(childs))
+        childs = [ childs ];
 
-	childs.forEach(function(child)
-	{
-		if (child)
-			obj.appendChild(child);
-	});
+    childs.forEach(function(child)
+    {
+        if (child)
+            obj.appendChild(child);
+    });
 }
 
 
 // Create specified DOM element and set parameters if specified
 function ce(tagName, params, childs)
 {
-	if (typeof tagName !== 'string')
-		return null;
+    if (typeof tagName !== 'string')
+        return null;
 
-	var elem = document.createElement(tagName);
-	if (!elem)
-		return null;
+    var elem = document.createElement(tagName);
+    if (!elem)
+        return null;
 
-	setParam(elem, params);
-	addChilds(elem, childs);
+    setParam(elem, params);
+    addChilds(elem, childs);
 
-	return elem;
+    return elem;
 }
 
 
 function svg(tagName, attributues, children)
 {
-	if (typeof tagName !== 'string')
-		return null;
+    if (typeof tagName !== 'string')
+        return null;
 
-	var elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+    var elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
 
-	for(var attr in attributues)
-	{
-		elem.setAttribute(attr, attributues[attr]);
-	}
+    for(var attr in attributues)
+    {
+        elem.setAttribute(attr, attributues[attr]);
+    }
 
-	addChilds(elem, children);
+    addChilds(elem, children);
 
-	return elem;
+    return elem;
 }
 
 
 // Remove element from DOM and return
 function re(elem)
 {
-	var removedElem = (typeof elem === 'string') ? ge(elem) : elem;
+    var removedElem = (typeof elem === 'string') ? ge(elem) : elem;
 
-	if (removedElem && removedElem.parentNode)
-		return removedElem.parentNode.removeChild(removedElem);
+    if (removedElem && removedElem.parentNode)
+        return removedElem.parentNode.removeChild(removedElem);
 
-	return null;
+    return null;
 }
 
 
 // Check is specified string is number
 function isNum(val)
 {
-	if (val == 0)
-		return true;
-	else
-		return res = (val / val) ? true : false;
+    if (val == 0)
+        return true;
+    else
+        return res = (val / val) ? true : false;
 }
 
 
 // Check parameter is integer
 function isInt(x)
 {
-	var y = parseInt(x);
+    var y = parseInt(x);
 
-	if (isNaN(y))
-		return false;
+    if (isNaN(y))
+        return false;
 
-	return x == y && x.toString() == y.toString();
+    return x == y && x.toString() == y.toString();
 }
 
 
 // Return object visibility
 function isVisible(elem, recursive)
 {
-	var robj = (typeof elem === 'string') ? ge(elem) : elem;
+    var robj = (typeof elem === 'string') ? ge(elem) : elem;
 
-	while(robj && robj.nodeType && robj.nodeType != 9)
-	{
-		var cstyle = computedStyle(robj);
-		if (!cstyle || cstyle.display == 'none' || cstyle.visibility == 'hidden')
-			return false;
+    while(robj && robj.nodeType && robj.nodeType != 9)
+    {
+        var cstyle = computedStyle(robj);
+        if (!cstyle || cstyle.display == 'none' || cstyle.visibility == 'hidden')
+            return false;
 
-		if (recursive !== true)
-			break;
+        if (recursive !== true)
+            break;
 
-		robj = robj.parentNode;
-	}
+        robj = robj.parentNode;
+    }
 
-	return !!robj;
+    return !!robj;
 }
 
 
 // Show/hide specified element
 function show(elem, val)
 {
-	var domElem = (typeof elem === 'string') ? ge(elem) : elem;
-	if (!domElem || !domElem.classList)
-		return;
+    var domElem = (typeof elem === 'string') ? ge(elem) : elem;
+    if (!domElem || !domElem.classList)
+        return;
 
-	if (!!val)
-		domElem.classList.remove('hidden');
-	else
-		domElem.classList.add('hidden');
+    if (!!val)
+        domElem.classList.remove('hidden');
+    else
+        domElem.classList.add('hidden');
 }
 
 
 // Enable or disable specified object
 function enable(elem, val)
 {
-	var robj = (typeof elem === 'string') ? ge(elem) : elem;
+    var robj = (typeof elem === 'string') ? ge(elem) : elem;
 
-	if (robj)
-		robj.disabled = (!val);
+    if (robj)
+        robj.disabled = (!val);
 }
 
 
 // Return current computed style of element
 function computedStyle(obj)
 {
-	if (!obj)
-		return null;
+    if (!obj)
+        return null;
 
-	if (window.getComputedStyle)
-		return getComputedStyle(obj, '');
-	else
-		return obj.currentStyle;
+    if (window.getComputedStyle)
+        return getComputedStyle(obj, '');
+    else
+        return obj.currentStyle;
 }
 
 
 // Get key code from event
 function getCode(e)
 {
-	var KeyIdentifierMap =
-	{
-		End		: 35,
-		Home		: 36,
-		Left		: 37,
-		Right		: 39,
-		'U+00007F'	: 46		// Delete
-	};
+    var KeyIdentifierMap =
+    {
+        End		: 35,
+        Home		: 36,
+        Left		: 37,
+        Right		: 39,
+        'U+00007F'	: 46		// Delete
+    };
 
-	var iCode;
+    var iCode;
 
-	if (!e)
-		e = event;
+    if (!e)
+        e = event;
 
-	iCode = (e.keyCode || e.charCode);
-	if (!iCode && e.keyIdentifier && (e.keyIdentifier in KeyIdentifierMap))
-			iCode = KeyIdentifierMap[e.keyIdentifier];
+    iCode = (e.keyCode || e.charCode);
+    if (!iCode && e.keyIdentifier && (e.keyIdentifier in KeyIdentifierMap))
+            iCode = KeyIdentifierMap[e.keyIdentifier];
 
-	return iCode;
+    return iCode;
 }
 
 
 // Check specified key code is digit or allowed keys
 function isDigit(iCode)
 {
-	return ((iCode >= 48 && iCode <= 57)		// Numbers
-		|| (iCode >= 35 && iCode <= 40)		// Arrows, Home, End
-		|| iCode == 44				// Delete
-		|| iCode == 8				// Backspace
-		|| iCode == 46				// Delete
-		|| iCode == 9				// Tab
-		);
+    return ((iCode >= 48 && iCode <= 57)		// Numbers
+        || (iCode >= 35 && iCode <= 40)		// Arrows, Home, End
+        || iCode == 44				// Delete
+        || iCode == 8				// Backspace
+        || iCode == 46				// Delete
+        || iCode == 9				// Tab
+        );
 }
 
 
 // Return caret position in specified input control
 function getCaretPos(obj)
 {
-	if (!obj)
-		return 0;
+    if (!obj)
+        return 0;
 
-	obj.focus();
+    obj.focus();
 
-	if (obj.selectionStart)			// Gecko
-	{
-		return obj.selectionStart;
-	}
-	else if (document.selection)		// IE
-	{
-		var sel = document.selection.createRange();
-		var clone = sel.duplicate();
-		sel.collapse(true);
-		clone.moveToElementText(obj);
-		clone.setEndPoint('EndToEnd', sel);
-		return clone.text.length;
-	}
+    if (obj.selectionStart)			// Gecko
+    {
+        return obj.selectionStart;
+    }
+    else if (document.selection)		// IE
+    {
+        var sel = document.selection.createRange();
+        var clone = sel.duplicate();
+        sel.collapse(true);
+        clone.moveToElementText(obj);
+        clone.setEndPoint('EndToEnd', sel);
+        return clone.text.length;
+    }
 
-	return 0;
+    return 0;
 }
 
 
 function getCursorPos(input)
 {
-	if ('selectionStart' in input && document.activeElement == input)
-	{
-		return {
-			start : input.selectionStart,
-			end : input.selectionEnd
-		};
-	}
-	else if (input.createTextRange)
-	{
-		var sel = document.selection.createRange();
-		if (sel.parentElement() === input)
-		{
-			var rng = input.createTextRange();
-			rng.moveToBookmark(sel.getBookmark());
-			for(var len = 0; rng.compareEndPoints('EndToStart', rng) > 0; rng.moveEnd('character', -1))
-			{
-				len++;
-			}
-			rng.setEndPoint('StartToStart', input.createTextRange());
-			for(var pos = { start: 0, end: len }; rng.compareEndPoints('EndToStart', rng) > 0; rng.moveEnd('character', -1))
-			{
-				pos.start++;
-				pos.end++;
-			}
-			return pos;
-		}
-	}
-	return -1;
+    if ('selectionStart' in input && document.activeElement == input)
+    {
+        return {
+            start : input.selectionStart,
+            end : input.selectionEnd
+        };
+    }
+    else if (input.createTextRange)
+    {
+        var sel = document.selection.createRange();
+        if (sel.parentElement() === input)
+        {
+            var rng = input.createTextRange();
+            rng.moveToBookmark(sel.getBookmark());
+            for(var len = 0; rng.compareEndPoints('EndToStart', rng) > 0; rng.moveEnd('character', -1))
+            {
+                len++;
+            }
+            rng.setEndPoint('StartToStart', input.createTextRange());
+            for(var pos = { start: 0, end: len }; rng.compareEndPoints('EndToStart', rng) > 0; rng.moveEnd('character', -1))
+            {
+                pos.start++;
+                pos.end++;
+            }
+            return pos;
+        }
+    }
+    return -1;
 }
 
 
@@ -331,394 +331,394 @@ function getCursorPos(input)
 // Check string is correct date in dd.mm.yyyy format
 function checkDate(str)
 {
-	if (!str || !str.length)
-		return false;
+    if (!str || !str.length)
+        return false;
 
-	var sparr = str.split('.');
-	if (sparr.length != 3)
-		return false;
+    var sparr = str.split('.');
+    if (sparr.length != 3)
+        return false;
 
-	if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2]))
-		return false;
+    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2]))
+        return false;
 
-	if (sparr[0] < 1 || sparr[0] > 31 || sparr[1] < 1 || sparr[1] > 12 || sparr[2] < 1970)
-		return false;
+    if (sparr[0] < 1 || sparr[0] > 31 || sparr[1] < 1 || sparr[1] > 12 || sparr[2] < 1970)
+        return false;
 
-	return true;
+    return true;
 }
 
 
 // Return text of selected option of select object
 function selectedText(selectObj)
 {
-	var option;
+    var option;
 
-	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
-		return -1;
-	option = selectObj.options[selectObj.selectedIndex];
+    if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+        return -1;
+    option = selectObj.options[selectObj.selectedIndex];
 
-	return (option.textContent) ? option.textContent : option.innerText;
+    return (option.textContent) ? option.textContent : option.innerText;
 }
 
 
 // Return value of selected option of select object
 function selectedValue(selectObj)
 {
-	if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
-		return -1;
+    if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+        return -1;
 
-	return selectObj.options[selectObj.selectedIndex].value;
+    return selectObj.options[selectObj.selectedIndex].value;
 }
 
 
 // Select item with specified value if exist
 function selectByValue(selectObj, selValue, selBool)
 {
-	if (!selectObj || !selectObj.options)
-		return -1;
+    if (!selectObj || !selectObj.options)
+        return -1;
 
-	for(var i = 0, l = selectObj.options.length; i < l; i++)
-	{
-		var option = selectObj.options[i];
-		if (option && option.value == selValue)
-		{
-			if (selectObj.multiple)
-				option.selected = (selBool !== undefined) ? selBool : true;
-			else
-				selectObj.selectedIndex = i;
-			return true;
-		}
-	}
+    for(var i = 0, l = selectObj.options.length; i < l; i++)
+    {
+        var option = selectObj.options[i];
+        if (option && option.value == selValue)
+        {
+            if (selectObj.multiple)
+                option.selected = (selBool !== undefined) ? selBool : true;
+            else
+                selectObj.selectedIndex = i;
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
 // Insert one DOM element before specified
 function insertBefore(elem, refElem)
 {
-	if (!refElem || !refElem.parentNode)
-		return null;
+    if (!refElem || !refElem.parentNode)
+        return null;
 
-	return refElem.parentNode.insertBefore(elem, refElem);
+    return refElem.parentNode.insertBefore(elem, refElem);
 }
 
 
 // Insert one DOM element after specified
 function insertAfter(elem, refElem)
 {
-	var parent = refElem.parentNode;
-	var next = refElem.nextSibling;
-	if (next)
-		return parent.insertBefore(elem, next);
-	else
-		return parent.appendChild(elem);
+    var parent = refElem.parentNode;
+    var next = refElem.nextSibling;
+    if (next)
+        return parent.insertBefore(elem, next);
+    else
+        return parent.appendChild(elem);
 }
 
 
 // Insert element as first child
 function prependChild(parent, elem)
 {
-	var fe;
+    var fe;
 
-	if (!elem || !parent)
-		return;
+    if (!elem || !parent)
+        return;
 
-	fe = parent.firstChild;
-	if (fe)
-		insertBefore(elem, fe);
-	else
-		parent.appendChild(elem);
+    fe = parent.firstChild;
+    if (fe)
+        insertBefore(elem, fe);
+    else
+        parent.appendChild(elem);
 }
 
 
 // Remove all child nodes of specified element
 function removeChilds(obj)
 {
-	if (!obj)
-		return;
+    if (!obj)
+        return;
 
-	while(obj.childNodes.length > 0)
-		 obj.removeChild(obj.childNodes[0]);
+    while(obj.childNodes.length > 0)
+         obj.removeChild(obj.childNodes[0]);
 }
 
 
 // Fix IE event object
 function fixEvent(e, _this)
 {
-	e = e || window.event;
+    e = e || window.event;
 
-	if (!e.currentTarget)
-		e.currentTarget = _this;
-	if (!e.target)
-		e.target = e.srcElement;
+    if (!e.currentTarget)
+        e.currentTarget = _this;
+    if (!e.target)
+        e.target = e.srcElement;
 
-	if (!e.relatedTarget)
-	{
-		if (e.type == 'mouseover')
-			e.relatedTarget = e.fromElement;
-		if (e.type == 'mouseout')
-			e.relatedTarget = e.toElement;
-	}
+    if (!e.relatedTarget)
+    {
+        if (e.type == 'mouseover')
+            e.relatedTarget = e.fromElement;
+        if (e.type == 'mouseout')
+            e.relatedTarget = e.toElement;
+    }
 
-	if (e.pageX == null && e.clientX != null )
-	{
-		var html = document.documentElement;
-		var body = document.body;
+    if (e.pageX == null && e.clientX != null )
+    {
+        var html = document.documentElement;
+        var body = document.body;
 
-		e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0);
-		e.pageX -= html.clientLeft || 0;
+        e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0);
+        e.pageX -= html.clientLeft || 0;
 
-		e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0);
-		e.pageY -= html.clientTop || 0;
-	}
+        e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0);
+        e.pageY -= html.clientTop || 0;
+    }
 
-	if (!e.which && e.button)
-	{
-		e.which = (e.button & 1) ? 1 : ((e.button & 2) ? 3 : ((e.button & 4) ? 2 : 0));
-	}
+    if (!e.which && e.button)
+    {
+        e.which = (e.button & 1) ? 1 : ((e.button & 2) ? 3 : ((e.button & 4) ? 2 : 0));
+    }
 
-	return e;
+    return e;
 }
 
 
 // Handler for click on empty space event
 function onEmptyClick(e, callback, elem)
 {
-	var e, elem;
+    var e, elem;
 
-	callback = callback || null;
-	if (!callback)
-		return;
-	e = fixEvent(e);
+    callback = callback || null;
+    if (!callback)
+        return;
+    e = fixEvent(e);
 
-	if (!Array.isArray(elem))
-		elem = [elem];
+    if (!Array.isArray(elem))
+        elem = [elem];
 
-	if (elem.every(function(el)
-	{
-		el = ((typeof el === 'string') ? ge(el) : el) || null;
+    if (elem.every(function(el)
+    {
+        el = ((typeof el === 'string') ? ge(el) : el) || null;
 
-		return ((el && !el.contains(e.target) && el != e.target) || !el);
-	}))
-		callback();
+        return ((el && !el.contains(e.target) && el != e.target) || !el);
+    }))
+        callback();
 }
 
 
 // Set or unset event handler for
 function setEmptyClick(callback, elem)
 {
-	callback = callback || null;
-	elem = elem || null;
+    callback = callback || null;
+    elem = elem || null;
 
-	if (!document.documentElement)
-		return;
+    if (!document.documentElement)
+        return;
 
-	var onClickHandler = ((callback) ? function(event)
-	{
-		event = event || window.event;
-		onEmptyClick(event, callback, elem);
-	} : null);
+    var onClickHandler = ((callback) ? function(event)
+    {
+        event = event || window.event;
+        onEmptyClick(event, callback, elem);
+    } : null);
 
-	var evName = 'click';
+    var evName = 'click';
 
-	if (onClickHandler && document.documentElement['on' + evName])
-		document.documentElement['on' + evName]();			// run previously set callback
-	document.documentElement['on' + evName] = null;
-	setTimeout(function()
-	{
-		document.documentElement['on' + evName] = onClickHandler;
-	});
+    if (onClickHandler && document.documentElement['on' + evName])
+        document.documentElement['on' + evName]();			// run previously set callback
+    document.documentElement['on' + evName] = null;
+    setTimeout(function()
+    {
+        document.documentElement['on' + evName] = onClickHandler;
+    });
 }
 
 
 // Calculate offset of element
 function getOffset(elem)
 {
-	if (elem.getBoundingClientRect)
-		return getOffsetRect(elem);
-	else
-		return getOffsetSum(elem);
+    if (elem.getBoundingClientRect)
+        return getOffsetRect(elem);
+    else
+        return getOffsetSum(elem);
 }
 
 
 // Calculate offset of element using getBoundingClientRect() method
 function getOffsetRect(elem)
 {
-	var box = elem.getBoundingClientRect();
-	var body = document.body;
-	var docElem = document.documentElement;
+    var box = elem.getBoundingClientRect();
+    var body = document.body;
+    var docElem = document.documentElement;
 
-	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
-	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
-	var clientTop = docElem.clientTop || body.clientTop || 0;
-	var clientLeft = docElem.clientLeft || body.clientLeft || 0;
-	var top  = box.top +  scrollTop - clientTop;
-	var left = box.left + scrollLeft - clientLeft;
+    var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+    var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+    var clientTop = docElem.clientTop || body.clientTop || 0;
+    var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+    var top  = box.top +  scrollTop - clientTop;
+    var left = box.left + scrollLeft - clientLeft;
 
-	return { top: Math.round(top), left: Math.round(left) };
+    return { top: Math.round(top), left: Math.round(left) };
 }
 
 
 // Calculate offset of element by sum of offsets of parents
 function getOffsetSum(elem)
 {
-	var top = 0, left = 0;
+    var top = 0, left = 0;
 
-	while(elem)
-	{
-		top = top + parseInt(elem.offsetTop);
-		left = left + parseInt(elem.offsetLeft);
-		elem = elem.offsetParent;
-	}
+    while(elem)
+    {
+        top = top + parseInt(elem.offsetTop);
+        left = left + parseInt(elem.offsetLeft);
+        elem = elem.offsetParent;
+    }
 
-	return { top: top, left: left };
+    return { top: top, left: left };
 }
 
 
 // Compare position of two node in the document
 function comparePosition(a, b)
 {
-	return a.compareDocumentPosition ?
-			a.compareDocumentPosition(b) :
-			(a != b && a.contains(b) && 16) +
-			(a != b && b.contains(a) && 8) +
-			(a.sourceIndex >= 0 && b.sourceIndex >= 0 ?
-			(a.sourceIndex < b.sourceIndex && 4) + (a.sourceIndex > b.sourceIndex && 2) :
-			1);
+    return a.compareDocumentPosition ?
+            a.compareDocumentPosition(b) :
+            (a != b && a.contains(b) && 16) +
+            (a != b && b.contains(a) && 8) +
+            (a.sourceIndex >= 0 && b.sourceIndex >= 0 ?
+            (a.sourceIndex < b.sourceIndex && 4) + (a.sourceIndex > b.sourceIndex && 2) :
+            1);
 }
 
 
 // Return page scroll
 function getPageScroll()
 {
-	if (window.pageXOffset != undefined)
-	{
-		return {
-			left: pageXOffset,
-			top: pageYOffset
-		};
-	}
-	else
-	{
-		var html = document.documentElement;
-		var body = document.body;
+    if (window.pageXOffset != undefined)
+    {
+        return {
+            left: pageXOffset,
+            top: pageYOffset
+        };
+    }
+    else
+    {
+        var html = document.documentElement;
+        var body = document.body;
 
-		var top = html.scrollTop || body && body.scrollTop || 0;
-		top -= html.clientTop;
+        var top = html.scrollTop || body && body.scrollTop || 0;
+        top -= html.clientTop;
 
-		var left = html.scrollLeft || body && body.scrollLeft || 0;
-		left -= html.clientLeft;
+        var left = html.scrollLeft || body && body.scrollLeft || 0;
+        left -= html.clientLeft;
 
-		return { top: top, left: left };
-	}
+        return { top: top, left: left };
+    }
 }
 
 
 // Check object is empty
 function isEmpty(obj)
 {
-	if (typeof obj === 'object')
-	{
-		for(var par in obj)
-			return false;
-	}
+    if (typeof obj === 'object')
+    {
+        for(var par in obj)
+            return false;
+    }
 
-	return true;
+    return true;
 }
 
 
 // Return count of children of object
 function childCount(obj)
 {
-	var res = 0;
+    var res = 0;
 
-	if (typeof obj === 'object')
-	{
-		for(var par in obj)
-			res++;
-	}
+    if (typeof obj === 'object')
+    {
+        for(var par in obj)
+            res++;
+    }
 
-	return res;
+    return res;
 }
 
 
 // Return string for value in pixels
 function px(val)
 {
-	return parseInt(val) + 'px';
+    return parseInt(val) + 'px';
 }
 
 
 // Join parameters and values of object to URL
 function urlJoin(obj)
 {
-	var arr = [], par;
+    var arr = [], par;
 
-	if (!isObject(obj))
-		return '';
+    if (!isObject(obj))
+        return '';
 
-	for(par in obj)
-	{
-		val = obj[par];
-		if (Array.isArray(val))
-		{
-			val.forEach(function(arrItem)
-			{
-				if (!isObject(arrItem))
-					arr.push(encodeURIComponent(par) + '[]=' + encodeURIComponent(arrItem.toString()));
-			});
-		}
-		else if (!isObject(val))
-			arr.push(encodeURIComponent(par) + '=' + encodeURIComponent(val.toString()));
-	}
+    for(par in obj)
+    {
+        val = obj[par];
+        if (Array.isArray(val))
+        {
+            val.forEach(function(arrItem)
+            {
+                if (!isObject(arrItem))
+                    arr.push(encodeURIComponent(par) + '[]=' + encodeURIComponent(arrItem.toString()));
+            });
+        }
+        else if (!isObject(val))
+            arr.push(encodeURIComponent(par) + '=' + encodeURIComponent(val.toString()));
+    }
 
-	return arr.join('&');
+    return arr.join('&');
 }
 
 
 // Cross-browser find head element
 function head()
 {
-	if (document)
-	{
-		if (document.head)
-			return document.head;
-		else if (document.documentElement && document.documentElement.firstChild)
-			return document.documentElement.firstChild;
-	}
+    if (document)
+    {
+        if (document.head)
+            return document.head;
+        else if (document.documentElement && document.documentElement.firstChild)
+            return document.documentElement.firstChild;
+    }
 
-	return null;
+    return null;
 }
 
 
 // Set cross-browser transform value
 function transform(elem, value)
 {
-	if (!elem || !elem.style)
-		return;
+    if (!elem || !elem.style)
+        return;
 
-	if (elem.style.webkitTransform !== undefined)
-		elem.style.webkitTransform = value;
-	else if (elem.style.MozTransform !== undefined)
-		elem.style.MozTransform = value;
-	else if (elem.style.msTransform !== undefined)
-		elem.style.msTransform = value;
-	else if (elem.style.transform !== undefined)
-		elem.style.transform = value;
+    if (elem.style.webkitTransform !== undefined)
+        elem.style.webkitTransform = value;
+    else if (elem.style.MozTransform !== undefined)
+        elem.style.MozTransform = value;
+    else if (elem.style.msTransform !== undefined)
+        elem.style.msTransform = value;
+    else if (elem.style.transform !== undefined)
+        elem.style.transform = value;
 }
 
 
 // Return fixed DPI value
 function getRealDPI()
 {
-	if (window.devicePixelRatio)
-		return window.devicePixelRatio;
+    if (window.devicePixelRatio)
+        return window.devicePixelRatio;
 
-	if (screen.deviceXDPI && screen.logicalXDPI)
-		return screen.deviceXDPI / screen.logicalXDPI
+    if (screen.deviceXDPI && screen.logicalXDPI)
+        return screen.deviceXDPI / screen.logicalXDPI
 
-	return screen.availWidth / document.documentElement.clientWidth;
+    return screen.availWidth / document.documentElement.clientWidth;
 }
 
 
@@ -729,62 +729,62 @@ var readyList = [];
 // Bind DOM ready event handler
 function bindReady(handler)
 {
-	var called = false
+    var called = false
 
-	function ready()
-	{
-		if (called)
-			return;
-		called = true;
-		handler();
-	}
+    function ready()
+    {
+        if (called)
+            return;
+        called = true;
+        handler();
+    }
 
-	if (document.addEventListener)
-	{
-		document.addEventListener('DOMContentLoaded', function()
-		{
-			ready();
-		}, false);
-	}
-	else if (document.attachEvent)
-	{
-		if (document.documentElement.doScroll && window == window.top)
-		{
-			function tryScroll()
-			{
-				if (called)
-					return;
-				if (!document.body)
-					return;
-				try
-				{
-					document.documentElement.doScroll('left');
-					ready();
-				}
-				catch(e)
-				{
-					setTimeout(tryScroll, 0);
-				}
-			}
-			tryScroll();
-		}
+    if (document.addEventListener)
+    {
+        document.addEventListener('DOMContentLoaded', function()
+        {
+            ready();
+        }, false);
+    }
+    else if (document.attachEvent)
+    {
+        if (document.documentElement.doScroll && window == window.top)
+        {
+            function tryScroll()
+            {
+                if (called)
+                    return;
+                if (!document.body)
+                    return;
+                try
+                {
+                    document.documentElement.doScroll('left');
+                    ready();
+                }
+                catch(e)
+                {
+                    setTimeout(tryScroll, 0);
+                }
+            }
+            tryScroll();
+        }
 
-		document.attachEvent('onreadystatechange', function()
-		{
-			if (document.readyState === 'complete')
-			{
-				ready();
-			}
-		});
-	}
+        document.attachEvent('onreadystatechange', function()
+        {
+            if (document.readyState === 'complete')
+            {
+                ready();
+            }
+        });
+    }
 
-	if (window.addEventListener)
-		window.addEventListener('load', ready, false);
-	else if (window.attachEvent)
-		window.attachEvent('onload', ready);
+    if (window.addEventListener)
+        window.addEventListener('load', ready, false);
+    else if (window.attachEvent)
+        window.attachEvent('onload', ready);
 /*
-	else
-		window.onload=ready
+    else
+        window.onload=ready
 */
 }
 
@@ -792,28 +792,28 @@ function bindReady(handler)
 // Add new DOM ready event handler to the queue
 function onReady(handler)
 {
-	if (!readyList.length)
-	{
-		bindReady(function()
-		{
-			for(var i = 0; i < readyList.length; i++)
-			{
-				readyList[i]();
-			}
-		});
-	}
+    if (!readyList.length)
+    {
+        bindReady(function()
+        {
+            for(var i = 0; i < readyList.length; i++)
+            {
+                readyList[i]();
+            }
+        });
+    }
 
-	readyList.push(handler);
+    readyList.push(handler);
 }
 
 
 // Extend child prototype by parent
 function extend(Child, Parent)
 {
-	function F(){};
+    function F(){};
 
-	F.prototype = Parent.prototype;
-	Child.prototype = new F();
-	Child.prototype.constructor = Child;
-	Child.parent = Parent.prototype;
+    F.prototype = Parent.prototype;
+    Child.prototype = new F();
+    Child.prototype.constructor = Child;
+    Child.parent = Parent.prototype;
 }

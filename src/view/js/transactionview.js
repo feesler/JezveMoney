@@ -279,7 +279,7 @@ TransactionView.prototype.onStart = function()
         var visiblePersons = this.model.persons.getVisible();
 		visiblePersons.forEach(function(person)
 		{
-			this.persDDList.addItem(person.id, person.name);
+			this.persDDList.addItem({ id: person.id, title: person.name });
 		}, this);
 
 		if (!this.model.transaction.noAccount)
@@ -297,7 +297,7 @@ TransactionView.prototype.onStart = function()
 		{
 			visibleAccounts.forEach(function(acc)
 			{
-                this.srcDDList.addItem(acc.id, acc.name);
+                this.srcDDList.addItem({ id: acc.id, title: acc.name });
 			}, this);
 		}
 
@@ -311,7 +311,7 @@ TransactionView.prototype.onStart = function()
 		{
 			visibleAccounts.forEach(function(acc)
 			{
-				this.destDDList.addItem(acc.id, acc.name);
+				this.destDDList.addItem({ id: acc.id, title: acc.name });
 			}, this);
 		}
 	}
@@ -326,7 +326,7 @@ TransactionView.prototype.onStart = function()
 		});
 		this.model.currency.data.forEach(function(curr)
 		{
-			this.srcCurrDDList.addItem(curr.id, curr.name);
+			this.srcCurrDDList.addItem({ id: curr.id, title: curr.name });
 		}, this);
 	}
 
@@ -340,7 +340,7 @@ TransactionView.prototype.onStart = function()
 		});
 		this.model.currency.data.forEach(function(curr)
 		{
-			this.destCurrDDList.addItem(curr.id, curr.name);
+			this.destCurrDDList.addItem({ id: curr.id, title: curr.name });
 		}, this);
 	}
 
@@ -366,7 +366,7 @@ TransactionView.prototype.initAccList = function()
     var visibleAccounts = this.model.accounts.getVisible();
     visibleAccounts.forEach(function(acc)
     {
-        this.accDDList.addItem(acc.id, acc.name);
+        this.accDDList.addItem({ id: acc.id, title: acc.name });
     }, this);
 };
 
