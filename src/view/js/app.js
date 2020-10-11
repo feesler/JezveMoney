@@ -4,48 +4,6 @@ var INCOME = 2;
 var TRANSFER = 3;
 var DEBT = 4;
 
-// Theme constants
-var WHITE_THEME = 0;
-var DARK_THEME = 1;
-
-
-// Hide usem menu popup
-function hidePopup()
-{
-	show('menupopup', false);
-	setEmptyClick();
-}
-
-
-// Show/hide user menu by click
-function onUserClick()
-{
-	if (isVisible('menupopup'))
-	{
-		hidePopup();
-	}
-	else
-	{
-		show('menupopup', true);
-		setEmptyClick(hidePopup, ['menupopup', 'userbtn']);
-	}
-}
-
-
-function onToggleTheme(e)
-{
-	var newTheme = e.target.checked ? DARK_THEME : WHITE_THEME;
-
-	var linkElem = ge('theme-style');
-	if (linkElem)
-		linkElem.href = baseURL + 'view/css/' + themes[newTheme];
-
-	ajax.get({
-		url : baseURL + 'main/setTheme/?theme=' + newTheme
-	});
-}
-
-
 var messageBox = null;
 
 
@@ -147,17 +105,3 @@ function idSearch(arr, id)
 	return res;
 }
 
-
-function initHeader()
-{
-	var userbtn = ge('userbtn');
-	if (userbtn)
-		userbtn.onclick = onUserClick;
-
-	var themeCheck = ge('theme-check');
-	if (themeCheck)
-		themeCheck.addEventListener('change', onToggleTheme);
-}
-
-
-onReady(initHeader);

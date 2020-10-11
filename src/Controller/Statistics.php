@@ -170,6 +170,7 @@ class Statistics extends TemplateController
             "lib/raphael.min.js",
             "charts.js",
             "component/component.js",
+            "component/header.js",
             "component/iconlink.js",
             "view.js",
             "statisticsview.js"

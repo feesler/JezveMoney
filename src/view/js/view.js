@@ -8,10 +8,23 @@ function View(props)
 	else
 		this.props = copyObject(props);
 
-	onReady(this.onStart.bind(this));
+	onReady(this.onReady.bind(this));
 }
 
 
+/**
+ * Document ready event handler
+ */
+View.prototype.onReady = function()
+{
+    this.header = Header.create();
+    this.onStart();
+};
+
+
+/**
+ * View initialization event handler
+ */
 View.prototype.onStart = function()
 {
 };

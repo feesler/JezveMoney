@@ -81,6 +81,8 @@ class Main extends TemplateController
         array_push($this->jsArr, ...[
             "lib/raphael.min.js",
             "charts.js",
+            "component/component.js",
+            "component/header.js",
 			"view.js",
 			"mainview.js"
         ]);
