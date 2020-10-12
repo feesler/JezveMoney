@@ -18,6 +18,7 @@ class User extends AdminController
 
         $this->jsArr[] = "view.js";
         array_push($this->jsAdmin,
+            "adminview.js",
             "adminlistview.js",
             "userview.js",
         );

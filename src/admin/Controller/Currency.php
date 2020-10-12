@@ -28,6 +28,7 @@ class Currency extends AdminController
 
         $this->jsArr[] = "view.js";
         array_push($this->jsAdmin,
+            "adminview.js",
             "adminlistview.js",
             "currencyview.js"
         );

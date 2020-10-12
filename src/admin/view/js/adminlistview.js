@@ -11,7 +11,7 @@ function AdminListView()
 }
 
 
-extend(AdminListView, View);
+extend(AdminListView, AdminView);
 
 
 /**
@@ -166,7 +166,7 @@ AdminListView.prototype.deleteItem = function()
 
 
 /**
- * Item ofrm submit event handler
+ * Item form submit event handler
  */
 AdminListView.prototype.onFormSubmit = function(e)
 {

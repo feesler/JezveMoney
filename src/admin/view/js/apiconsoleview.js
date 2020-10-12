@@ -11,7 +11,7 @@ function AdminApiConsoleView()
 }
 
 
-extend(AdminApiConsoleView, View);
+extend(AdminApiConsoleView, AdminView);
 
 
 /**
