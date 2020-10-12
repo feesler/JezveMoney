@@ -26,7 +26,8 @@ export async function registerAndLogin(userData)
 		if (!await api.user.login(userData))
 			throw new Error('Fail to register user');
 
-		App.state.deleteProfile();
+		App.state.setUserProfile(userData);
+        App.state.resetAll();
 		return App.state.fetchAndTest();
 	});
 }

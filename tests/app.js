@@ -18,22 +18,7 @@ class Application
 
 	async init()
 	{
-		// Login and obtain profile information
-		let loginResult = await api.user.login(this.config.testUser);
-		if (!loginResult)
-			throw new Error('Fail to login');
-
-		let userProfile = await api.profile.read();
-		if (!userProfile || !userProfile.user_id)
-			throw new Error('Fail to read user profile');
-
-		this.user_id = userProfile.user_id;
-		this.owner_id = userProfile.owner_id;
-
 		this.state = new AppState;
-		await this.state.fetch();
-		await Currency.init();
-		await Icon.init();
 
 		this.scenario = await Scenario.create(this.environment);
 
@@ -52,6 +37,22 @@ class Application
 
 		setupTest(this.environment);
 	}
+
+
+    async setupUser()
+    {
+		let userProfile = await api.profile.read();
+		if (!userProfile || !userProfile.user_id)
+			throw new Error('Fail to read user profile');
+
+		this.user_id = userProfile.user_id;
+		this.owner_id = userProfile.owner_id;
+
+		this.state = new AppState;
+		await this.state.fetch();
+		await Currency.init();
+		await Icon.init();
+    }
 
 
 	beforeRun()

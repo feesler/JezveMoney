@@ -144,6 +144,13 @@ export class AppState
 /**
  * Profile
  */
+    setUserProfile(profile)
+    {
+        this.profile = copyObject(profile);
+        if (this.profile.password)
+            delete this.profile.password;
+    }
+
 
 	resetAll()
 	{

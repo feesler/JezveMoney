@@ -90,17 +90,21 @@ export class Scenario
 		this.environment.setBlock('API tests', 1);
 		this.environment.setBlock('User', 2);
 
+        await ApiTests.login(App.config.testAdminUser);
+		await ApiTests.deleteUserIfExist(App.config.testUser);
 		await ApiTests.deleteUserIfExist(App.config.apiTestUser);
-		await ApiTests.registerAndLogin(App.config.apiTestUser);
 
+        // Register API test user and prepare data for security tests
+		await ApiTests.registerAndLogin(App.config.apiTestUser);
+		await App.setupUser();
 		await this.prepareApiSecurityTests();
 
 		await ApiTests.login({ login : '', password : App.config.testUser.password });
 		await ApiTests.login({ login : App.config.testUser.login, password : '' });
 
-		// Login with main test user
-		await ApiTests.login(App.config.testUser);
-		await ApiTests.resetAll();
+		// Register and login main test user
+        await ApiTests.registerAndLogin(App.config.testUser);
+		await App.setupUser();
 
 		this.environment.setBlock('Accounts', 2);
 
@@ -515,6 +519,7 @@ export class Scenario
 
 		const tasks = [
 			{ action : ApiTests.login, data : App.config.apiTestUser },
+			{ action : ApiTests.resetAll },
 			{ action : ApiTests.changeName, data : '' },
 			{ action : ApiTests.changeName, data : 'App tester' },
 			{ action : ApiTests.changePassword, data : { user : App.config.apiTestUser, newPassword : '54321' } },
