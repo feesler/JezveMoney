@@ -1,43 +1,29 @@
 /* Sidebar */
 .sidebar
 {
-	display: table-cell;
-	min-height: 100%;
-	height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
 	width: 15px;
-}
-
-
-.sidebar > div
-{
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
+    color: #FFFFFF;
 	background-color: #404040;
 }
 
 
-.sidebar > div > .siderbar__content
+.sidebar.sidebar_active
 {
+    width: auto;
+}
+
+
+.sidebar .siderbar__content
+{
+	display: flex;
+    align-items: center;
 	overflow: hidden;
 	min-width: 15px;
 	height: 100%;
-}
-
-
-.sidebar.sidebar_active > div > .siderbar__content
-{
-	display: block;
-	color: #FFFFFF;
-	background-color: #404040;
-}
-
-
-.siderbar__content > div
-{
-	position: relative;
-	min-height: 64px;
 }
 
 
@@ -45,10 +31,6 @@
 {
 	width: 15px;
 	height: 32px;
-	position: absolute;
-	left: 0;
-	top: 50%;
-	margin-top: -16px;
 }
 
 
@@ -93,31 +75,21 @@
 
 .sidebar
 {
-	display: block;
-	position: fixed;
 	min-height: 0;
 	height: auto;
 	width: 100%;
 	left: 0;
 	right: 0;
+    top: auto;
 	bottom: 0;
-}
-
-
-.sidebar > div
-{
-	position: static;
-	height: 50px;
-	width: 100%;
-
 	background-color: #44AAFF;
 }
 
 
-.sidebar > div > .siderbar__content,
-.sidebar.sidebar_active > div > .siderbar__content
+.sidebar .siderbar__content,
+.sidebar.sidebar_active .siderbar__content
 {
-	display: block;
+	display: flex;
 	padding: 0px;
 	color: #FFFFFF;
 	background-color: #44AAFF;
@@ -134,9 +106,11 @@
 }
 
 
-.sidebar__controls
+.sidebar .sidebar__controls,
+.sidebar.sidebar_active .sidebar__controls
 {
 	display: flex;
+    flex-flow: row nowrap;
 	padding: 0;
 }
 

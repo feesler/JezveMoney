@@ -27,9 +27,9 @@ class Persons extends TemplateController
             "model/list.js",
             "model/person.js",
             "selection.js",
-            "toolbar.js",
             "component/component.js",
             "component/header.js",
+            "component/toolbar.js",
             "component/iconlink.js",
             "view.js",
             "personlistview.js"

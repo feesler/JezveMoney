@@ -236,10 +236,10 @@ class Transactions extends TemplateController
             "datepicker.js",
             "dragndrop.js",
             "sortable.js",
-            "toolbar.js",
             "dropdown.js",
             "component/component.js",
             "component/header.js",
+            "component/toolbar.js",
             "component/iconlink.js",
 			"view.js",
 			"translistview.js"

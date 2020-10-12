@@ -63,17 +63,9 @@ TransactionListView.prototype.onStart = function()
         this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
     this.dateInput = ge('date');
 
-    this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
-    if (!this.updateBtn)
-        throw new Error('Failed to initialize Transaction List view');
-
-    this.deleteBtn = IconLink.fromElement({
-        elem: 'del_btn',
-        onclick: this.showDeletePopup.bind(this)
-    });
     this.delForm = ge('delform');
     this.delTransInp = ge('deltrans');
-    if (!this.deleteBtn || !this.delForm || !this.delTransInp)
+    if (!this.delForm || !this.delTransInp)
         throw new Error('Failed to initialize Transaction List view');
 
     this.trListSortable = null;
@@ -98,6 +90,10 @@ TransactionListView.prototype.onStart = function()
         this.listItems.addEventListener('click', this.onTransClick.bind(this));
     }
 
+    this.toolbar = Toolbar.create({
+        elem: 'toolbar',
+        ondelete: this.showDeletePopup.bind(this)
+    });
 };
 
 
@@ -321,22 +317,18 @@ TransactionListView.prototype.onTransClick = function(e)
         listItemElem.classList.add('trans-list__item_selected');
     }
 
-    this.updateBtn.show(this.model.selection.count() == 1);
-    this.deleteBtn.show(this.model.selection.count() > 0);
+    this.toolbar.updateBtn.show(this.model.selection.count() == 1);
+    this.toolbar.deleteBtn.show(this.model.selection.count() > 0);
 
     var selArr = this.model.selection.getIdArray();
     this.delTransInp.value = selArr.join();
 
     if (this.model.selection.count() == 1)
     {
-        this.updateBtn.setURL(baseURL + 'transactions/edit/' + selArr[0]);
+        this.toolbar.updateBtn.setURL(baseURL + 'transactions/edit/' + selArr[0]);
     }
 
-    show('toolbar', (this.model.selection.count() > 0));
-    if (this.model.selection.count() > 0)
-    {
-        onScroll();
-    }
+	this.toolbar.show(this.model.selection.count() > 0);
 };
 
 

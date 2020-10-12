@@ -60,36 +60,32 @@
     </div>
 
     <div id="toolbar" class="sidebar hidden">
-        <div>
-            <div class="siderbar__content">
-                <div id="tb_content">
-                    <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
-                    <div id="sbButtons" class="sidebar__controls">
-                        <div id="edit_btn" class="iconlink hidden">
-                            <a>
-                                <span class="iconlink__icon sidebar-icon"><?=svgIcon("edit")?></span>
-                                <span class="iconlink__content"><span>Edit</span></span>
-                            </a>
-                        </div>
-                        <div id="show_btn" class="iconlink hidden">
-                            <button type="button">
-                                <span class="iconlink__icon sidebar-icon"><?=svgIcon("show")?></span>
-                                <span class="iconlink__content"><span>Restore</span></span>
-                            </button>
-                        </div>
-                        <div id="hide_btn" class="iconlink hidden">
-                            <button type="button">
-                                <span class="iconlink__icon sidebar-icon"><?=svgIcon("hide")?></span>
-                                <span class="iconlink__content"><span>Hide</span></span>
-                            </button>
-                        </div>
-                        <div id="del_btn" class="iconlink hidden">
-                            <button type="button">
-                                <span class="iconlink__icon sidebar-icon"><?=svgIcon("del")?></span>
-                                <span class="iconlink__content"><span>Delete</span></span>
-                            </button>
-                        </div>
-                    </div>
+        <div class="siderbar__content">
+            <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
+            <div id="sbButtons" class="sidebar__controls">
+                <div id="edit_btn" class="iconlink hidden">
+                    <a>
+                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("edit")?></span>
+                        <span class="iconlink__content"><span>Edit</span></span>
+                    </a>
+                </div>
+                <div id="show_btn" class="iconlink hidden">
+                    <button type="button">
+                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("show")?></span>
+                        <span class="iconlink__content"><span>Restore</span></span>
+                    </button>
+                </div>
+                <div id="hide_btn" class="iconlink hidden">
+                    <button type="button">
+                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("hide")?></span>
+                        <span class="iconlink__content"><span>Hide</span></span>
+                    </button>
+                </div>
+                <div id="del_btn" class="iconlink hidden">
+                    <button type="button">
+                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("del")?></span>
+                        <span class="iconlink__content"><span>Delete</span></span>
+                    </button>
                 </div>
             </div>
         </div>

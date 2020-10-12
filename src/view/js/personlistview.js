@@ -43,38 +43,28 @@ PersonListView.prototype.onStart = function()
 		throw new Error('Failed to initialize Person List view');
 	this.hiddenTilesContainer.addEventListener('click', this.onTileClick.bind(this));
 
-    this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
-
 	this.showForm = ge('showform');
 	this.showPersonsInp = ge('showpersons');
-    this.showBtn = IconLink.fromElement({
-        elem: 'show_btn',
-        onclick: function() {
-            this.showForm.submit();
-        }.bind(this)
-    });
-	if (!this.showBtn || !this.showForm || !this.showPersonsInp)
+	if (!this.showForm || !this.showPersonsInp)
 		throw new Error('Failed to initialize Person List view');
 
 	this.hideForm = ge('hideform');
 	this.hidePersonsInp = ge('hidepersons');
-    this.hideBtn = IconLink.fromElement({
-        elem: 'hide_btn',
-        onclick: function() {
-            this.hideForm.submit();
-        }.bind(this)
-    });
-	if (!this.hideBtn || !this.hideForm || !this.hidePersonsInp)
-		throw new Error('Failed to initialize Person List view');
-
 	this.delForm = ge('delform');
 	this.delPersonsInp = ge('delpersons');
-    this.deleteBtn = IconLink.fromElement({
-        elem: 'del_btn',
-        onclick: this.showDeleteConfirmationPopup.bind(this)
-    });
-	if (!this.hideBtn || !this.hideForm || !this.delPersonsInp)
+	if (!this.showForm || !this.showPersonsInp || !this.hideForm || !this.hidePersonsInp || !this.delForm || !this.delPersonsInp)
 		throw new Error('Failed to initialize Person List view');
+
+    this.toolbar = Toolbar.create({
+        elem: 'toolbar',
+        onshow: function() {
+            this.showForm.submit();
+        }.bind(this),
+        onhide: function() {
+            this.hideForm.submit()
+        }.bind(this),
+        ondelete: this.showDeleteConfirmationPopup.bind(this)
+    });
 };
 
 
@@ -110,10 +100,10 @@ PersonListView.prototype.onTileClick = function(e)
 	var selCount = this.model.selected.visible.count();
 	var hiddenSelCount = this.model.selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
-	this.updateBtn.show(totalSelCount == 1);
-	this.showBtn.show(hiddenSelCount > 0);
-	this.hideBtn.show(selCount > 0);
-	this.deleteBtn.show(totalSelCount > 0);
+	this.toolbar.updateBtn.show(totalSelCount == 1);
+	this.toolbar.showBtn.show(hiddenSelCount > 0);
+	this.toolbar.hideBtn.show(selCount > 0);
+	this.toolbar.deleteBtn.show(totalSelCount > 0);
 
 	var selArr = this.model.selected.visible.getIdArray();
 	var hiddenSelArr = this.model.selected.hidden.getIdArray();
@@ -124,14 +114,10 @@ PersonListView.prototype.onTileClick = function(e)
 
 	if (totalSelCount == 1)
 	{
-        this.updateBtn.setURL(baseURL + 'persons/edit/' + totalSelArr[0]);
+        this.toolbar.updateBtn.setURL(baseURL + 'persons/edit/' + totalSelArr[0]);
 	}
 
-	show('toolbar', (totalSelCount > 0));
-	if (totalSelCount > 0)
-	{
-		onScroll();
-	}
+	this.toolbar.show(totalSelCount > 0);
 };
 
 

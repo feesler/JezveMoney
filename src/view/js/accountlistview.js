@@ -43,39 +43,31 @@ AccountListView.prototype.onStart = function()
 		throw new Error('Failed to initialize Account List view');
 	this.hiddenTilesContainer.addEventListener('click', this.onTileClick.bind(this));
 
-    this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
-    this.exportBtn = IconLink.fromElement({ elem: 'export_btn' });
-
 	this.showForm = ge('showform');
 	this.showAccountsInp = ge('showaccounts');
-    this.showBtn = IconLink.fromElement({
-        elem: 'show_btn',
-        onclick: function() {
-            this.showForm.submit();
-        }.bind(this)
-    });
-	if (!this.showBtn || !this.showForm || !this.showAccountsInp)
+	if (!this.showForm || !this.showAccountsInp)
 		throw new Error('Failed to initialize Account List view');
 
 	this.hideForm = ge('hideform');
 	this.hideAccountsInp = ge('hideaccounts');
-    this.hideBtn = IconLink.fromElement({
-        elem: 'hide_btn',
-        onclick: function() {
-            this.hideForm.submit();
-        }.bind(this)
-    });
-	if (!this.hideBtn || !this.hideForm || !this.hideAccountsInp)
+	if (!this.hideForm || !this.hideAccountsInp)
 		throw new Error('Failed to initialize Account List view');
 
 	this.delForm = ge('delform');
 	this.delAccountsInp = ge('delaccounts');
-    this.deleteBtn = IconLink.fromElement({
-        elem: 'del_btn',
-        onclick: this.showDeleteConfirmationPopup.bind(this)
-    });
-	if (!this.deleteBtn || !this.delForm || !this.delAccountsInp)
+	if (!this.delForm || !this.delAccountsInp)
 		throw new Error('Failed to initialize Account List view');
+
+    this.toolbar = Toolbar.create({
+        elem: 'toolbar',
+        onshow: function() {
+            this.showForm.submit();
+        }.bind(this),
+        onhide: function() {
+            this.hideForm.submit()
+        }.bind(this),
+        ondelete: this.showDeleteConfirmationPopup.bind(this)
+    });
 };
 
 
@@ -111,11 +103,11 @@ AccountListView.prototype.onTileClick = function(e)
 	var selCount = this.model.selected.visible.count();
 	var hiddenSelCount = this.model.selected.hidden.count();
 	var totalSelCount = selCount + hiddenSelCount;
-	this.updateBtn.show(totalSelCount == 1);
-	this.exportBtn.show(totalSelCount > 0);
-	this.showBtn.show(hiddenSelCount > 0);
-	this.hideBtn.show(selCount > 0);
-	this.deleteBtn.show(totalSelCount > 0);
+	this.toolbar.updateBtn.show(totalSelCount == 1);
+	this.toolbar.exportBtn.show(totalSelCount > 0);
+	this.toolbar.showBtn.show(hiddenSelCount > 0);
+	this.toolbar.hideBtn.show(selCount > 0);
+	this.toolbar.deleteBtn.show(totalSelCount > 0);
 
 	var selArr = this.model.selected.visible.getIdArray();
 	var hiddenSelArr = this.model.selected.hidden.getIdArray();
@@ -126,7 +118,7 @@ AccountListView.prototype.onTileClick = function(e)
 
 	if (totalSelCount == 1)
 	{
-        this.updateBtn.setURL(baseURL + 'accounts/edit/' + totalSelArr[0]);
+        this.toolbar.updateBtn.setURL(baseURL + 'accounts/edit/' + totalSelArr[0]);
 	}
 
 	if (totalSelCount > 0)
@@ -136,14 +128,10 @@ AccountListView.prototype.onTileClick = function(e)
 			exportURL += totalSelArr[0];
 		else
 			exportURL += '?' + urlJoin({ id : totalSelArr });
-		this.exportBtn.setURL(exportURL);
+		this.toolbar.exportBtn.setURL(exportURL);
 	}
 
-	show('toolbar', (totalSelCount > 0));
-	if (totalSelCount > 0)
-	{
-		onScroll();
-	}
+	this.toolbar.show(totalSelCount > 0);
 };
 
 

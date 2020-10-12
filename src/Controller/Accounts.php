@@ -46,9 +46,9 @@ class Accounts extends TemplateController
             "model/currency.js",
             "component/component.js",
             "component/header.js",
+            "component/toolbar.js",
             "component/iconlink.js",
             "selection.js",
-            "toolbar.js",
             "view.js",
             "accountlistview.js"
         ]);
