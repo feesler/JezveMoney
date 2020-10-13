@@ -2,6 +2,7 @@ import { copyObject } from './common.js';
 
 import { EXPENSE, INCOME, TRANSFER, DEBT, Transaction, availTransTypes } from './model/transaction.js';
 
+import * as SecurityTests from './run/security.js';
 import * as ProfileTests from './run/profile.js';
 import * as AccountTests from './run/account.js';
 import * as PersonTests from './run/person.js';
@@ -75,6 +76,7 @@ export class Scenario
 
 	async runFullScenario()
 	{
+        await this.securityTests();
 		await this.apiTests();
 		await this.profileTests();
 		await this.accountTests();
@@ -83,6 +85,20 @@ export class Scenario
 		await this.postTransactionAccountTests();
 		await StatisticsTests.run();
 	}
+
+
+	async securityTests()
+	{
+        this.environment.setBlock('Security tests', 1);
+
+        await SecurityTests.checkAccess('system');
+        await SecurityTests.checkAccess('system/logs/log.txt');
+        await SecurityTests.checkAccess('Model/');
+        await SecurityTests.checkAccess('Controller/');
+        await SecurityTests.checkAccess('view/');
+        await SecurityTests.checkAccess('api/');
+        await SecurityTests.checkAccess('admin/');
+    }
 
 
 	async apiTests()
