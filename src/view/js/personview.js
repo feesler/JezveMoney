@@ -30,7 +30,7 @@ PersonView.prototype.onStart = function()
 	this.form = ge('personForm');
 	if (!this.form)
 		throw new Error('Failed to initialize Person view');
-	this.form.onsubmit = this.onSubmit.bind(this);
+	this.form.addEventListener('submit', this.onSubmit.bind(this));
 
 	this.nameInp = ge('pname');
 	if (!this.nameInp)
@@ -64,11 +64,8 @@ PersonView.prototype.onNameInput = function()
 /**
  * Form submit event handler
  */
-PersonView.prototype.onSubmit = function()
+PersonView.prototype.onSubmit = function(e)
 {
-	if (!this.form || !this.nameInp)
-		return false;
-
 	var valid = true;
 
 	if (!this.nameInp.value || this.nameInp.value.length < 1)
@@ -78,7 +75,9 @@ PersonView.prototype.onSubmit = function()
 		valid = false;
 	}
 
-	return valid;
+	if (!valid) {
+        e.preventDefault();
+    }
 };
 
 

@@ -56,16 +56,7 @@ TransactionView.prototype.onStart = function()
 	this.form = ge('mainfrm');
 	if (!this.form)
 		throw new Error('Failed to initialize Transaction view');
-
-	this.form.onsubmit = function(e)
-	{
-		if (this.model.transaction.isDebt())
-			return this.onDebtSubmit();
-		else if (this.model.transaction.isTransfer() && this.mode != 'update')
-			return this.onTransferSubmit();
-		else
-			return this.onSubmit();
-	}.bind(this);
+	this.form.addEventListener('submit', this.onFormSubmit.bind(this));
 
 	if (this.mode == 'update')
 	{
@@ -262,10 +253,10 @@ TransactionView.prototype.onStart = function()
 
 		this.debtGiveRadio = ge('debtgive');
 		if (this.debtGiveRadio)
-			this.debtGiveRadio.onclick = this.onChangeDebtOp.bind(this);
+			this.debtGiveRadio.addEventListener('change', this.onChangeDebtOp.bind(this));
 		this.debtTakeRadio = ge('debttake');
 		if (this.debtTakeRadio)
-			this.debtTakeRadio.onclick = this.onChangeDebtOp.bind(this);
+			this.debtTakeRadio.addEventListener('change', this.onChangeDebtOp.bind(this));
 
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
@@ -1088,13 +1079,29 @@ TransactionView.prototype.onChangeAcc = function()
 
 
 /**
- * Expense/Income transaction event handler
+ * Common transaction 'submit' event handler
  */
-TransactionView.prototype.onSubmit = function(frm)
+TransactionView.prototype.onFormSubmit = function(e)
 {
-    if (this.submitStarted)
-        return false;
+    if (this.submitStarted) { 
+        e.preventDefault();
+        return;
+    }
 
+    if (this.model.transaction.isDebt())
+        this.onDebtSubmit(e);
+    else if (this.model.transaction.isTransfer() && this.mode != 'update')
+        this.onTransferSubmit(e);
+    else
+        this.onSubmit(e);
+};
+
+
+/**
+ * Expense/Income transaction 'submit' event handler
+ */
+TransactionView.prototype.onSubmit = function(e)
+{
     var srcAmount = this.srcAmountInput.value;
     var destAmount = this.destAmountInput.value;
 
@@ -1123,27 +1130,23 @@ TransactionView.prototype.onSubmit = function(frm)
         valid = false;
     }
 
-    if (valid)
-    {
+    if (valid) {
         this.srcAmountInput.value = fixFloat(srcAmount);
         this.destAmountInput.value = fixFloat(destAmount);
 
         this.submitStarted = true;
         enable(this.submitBtn, false);
+    } else {
+        e.preventDefault();
     }
-
-    return valid;
 };
 
 
 /**
  * Transfer transaction submit event handler
  */
-TransactionView.prototype.onTransferSubmit = function()
+TransactionView.prototype.onTransferSubmit = function(e)
 {
-    if (this.submitStarted)
-        return false;
-
     var srcAmount = this.srcAmountInput.value;
     var destAmount = this.destAmountInput.value;
 
@@ -1166,27 +1169,23 @@ TransactionView.prototype.onTransferSubmit = function()
         valid = false;
     }
 
-    if (valid)
-    {
+    if (valid) {
         this.srcAmountInput.value = fixFloat(srcAmount);
         this.destAmountInput.value = fixFloat(destAmount);
 
         this.submitStarted = true;
         enable(this.submitBtn, false);
+    } else {
+        e.preventDefault();
     }
-
-    return valid;
 };
 
 
 /**
  * Debt transaction submit event handler
  */
-TransactionView.prototype.onDebtSubmit = function()
+TransactionView.prototype.onDebtSubmit = function(e)
 {
-    if (this.submitStarted)
-        return false;
-
     var srcAmount = this.srcAmountInput.value;
     var destAmount = this.destAmountInput.value;
 
@@ -1213,16 +1212,15 @@ TransactionView.prototype.onDebtSubmit = function()
         valid = false;
     }
 
-    if (valid)
-    {
+    if (valid) {
         this.srcAmountInput.value = fixFloat(srcAmount);
         this.destAmountInput.value = fixFloat(destAmount);
 
-        self.submitStarted = true;
+        this.submitStarted = true;
         enable(this.submitBtn, false);
+    } else {
+        e.preventDefault();
     }
-
-    return valid;
 };
 
 

@@ -28,7 +28,7 @@ RegisterView.prototype.onStart = function()
 	this.passwordInp.addEventListener('input', this.onPasswordInput.bind(this));
 	this.nameInp.addEventListener('input', this.onNameInput.bind(this));
 
-	this.form.onsubmit = this.onSubmit.bind(this);
+	this.form.addEventListener('submit', this.onSubmit.bind(this));
 };
 
 
@@ -62,7 +62,7 @@ RegisterView.prototype.onNameInput = function()
 /**
  * Log in form submit event handler
  */
-RegisterView.prototype.onSubmit = function()
+RegisterView.prototype.onSubmit = function(e)
 {
 	var valid = true;
 
@@ -84,5 +84,7 @@ RegisterView.prototype.onSubmit = function()
 		valid = false;
 	}
 
-	return valid;
+	if (!valid) {
+        e.preventDefault();
+    }
 };

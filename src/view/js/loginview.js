@@ -26,7 +26,7 @@ LoginView.prototype.onStart = function()
 	this.loginInp.addEventListener('input', this.onLoginInput.bind(this));
 	this.passwordInp.addEventListener('input', this.onPasswordInput.bind(this));
 
-	this.form.onsubmit = this.onSubmit.bind(this);
+	this.form.addEventListener('submit', this.onSubmit.bind(this));
 };
 
 
@@ -51,7 +51,7 @@ LoginView.prototype.onPasswordInput = function()
 /**
  * Log in form submit event handler
  */
-LoginView.prototype.onSubmit = function()
+LoginView.prototype.onSubmit = function(e)
 {
 	var valid = true;
 
@@ -67,5 +67,7 @@ LoginView.prototype.onSubmit = function()
 		valid = false;
 	}
 
-	return valid;
+	if (!valid) {
+        e.preventDefault();
+    }
 };

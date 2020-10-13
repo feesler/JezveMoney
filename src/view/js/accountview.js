@@ -83,13 +83,14 @@ AccountView.prototype.onStart = function()
 	this.form = ge('accForm');
 	if (!this.form)
 		throw new Error('Invalid Account view');
-	this.form.onsubmit = this.onSubmit.bind(this);
+	this.form.addEventListener('submit', this.onSubmit.bind(this));
 
 	this.nameInp = ge('accname');
-	if (!this.nameInp)
+	if (!this.nameInp) {
 		throw new Error('Invalid Account view');
+    }
 
-	this.nameInp.oninput = this.onNameInput.bind(this);
+	this.nameInp.addEventListener('input', this.onNameInput.bind(this));
 };
 
 
@@ -154,11 +155,8 @@ AccountView.prototype.onNameInput = function(e)
 /**
  * Form submit event handler
  */
-AccountView.prototype.onSubmit = function()
+AccountView.prototype.onSubmit = function(e)
 {
-	if (!this.form || !this.nameInp || !this.balanceInp)
-		return false;
-
 	var valid = true;
 
 	if (!this.nameInp.value || this.nameInp.value.length < 1)
@@ -168,21 +166,24 @@ AccountView.prototype.onSubmit = function()
 		valid = false;
 	}
 
-	if (!this.balanceInp.value || this.balanceInp.value.length < 1 || !isNum(this.balanceInp.value))
-	{
+	if (!this.balanceInp.value ||
+        this.balanceInp.value.length < 1 ||
+        !isNum(this.balanceInp.value)) {
 		this.invalidateBlock('initbal-inp-block');
         this.balanceInp.focus();
 		valid = false;
 	}
 
-	return valid;
+	if (!valid) {
+        e.preventDefault();
+    }
 };
 
 
 /**
  * Delete button click event handler
  */
-AccountView.prototype.onDelete = function(e)
+AccountView.prototype.onDelete = function()
 {
 	this.showDeleteConfirmationPopup();
 };

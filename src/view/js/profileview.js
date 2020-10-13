@@ -40,17 +40,17 @@ ProfileView.prototype.onStart = function()
     this.changeNameBtn = ge('changeNameBtn');
     if (!this.changeNameBtn)
         throw new Error('Failed to initialize Profile view');
-    this.changeNameBtn.onclick = this.showChangeNamePopup.bind(this);
+    this.changeNameBtn.addEventListener('click', this.showChangeNamePopup.bind(this));
 
     this.changePassBtn = ge('changePassBtn');
     if (!this.changePassBtn)
         throw new Error('Failed to initialize Profile view');
-    this.changePassBtn.onclick = this.showChangePasswordPopup.bind(this);
+    this.changePassBtn.addEventListener('click', this.showChangePasswordPopup.bind(this));
 
     this.resetAccBtn = ge('resetAccBtn');
     if (!this.resetAccBtn)
         throw new Error('Failed to initialize Profile view');
-    this.resetAccBtn.onclick = this.showResetAccountsPopup.bind(this);
+    this.resetAccBtn.addEventListener('click', this.showResetAccountsPopup.bind(this));
 
     this.resetAccForm = ge('resetacc_form');
     if (!this.resetAccForm)
@@ -59,7 +59,7 @@ ProfileView.prototype.onStart = function()
     this.resetAllBtn = ge('resetAllBtn');
     if (!this.resetAllBtn)
         throw new Error('Failed to initialize Profile view');
-    this.resetAllBtn.onclick = this.showResetAllPopup.bind(this);
+    this.resetAllBtn.addEventListener('click', this.showResetAllPopup.bind(this));
 
     this.resetAllForm = ge('resetall_form');
     if (!this.resetAllForm)
@@ -68,7 +68,7 @@ ProfileView.prototype.onStart = function()
     this.delProfileBtn = ge('delProfileBtn');
     if (!this.delProfileBtn)
         throw new Error('Failed to initialize Profile view');
-    this.delProfileBtn.onclick = this.showDeletePopup.bind(this);
+    this.delProfileBtn.addEventListener('click', this.showDeletePopup.bind(this));
 
     this.deleteForm = ge('delete_form');
     if (!this.deleteForm)
@@ -80,7 +80,7 @@ ProfileView.prototype.onStart = function()
     this.changeNameForm = this.changeNameContent.querySelector('form');
     if (!this.changeNameForm)
         throw new Error('Failed to initialize Profile view');
-    this.changeNameForm.onsubmit = this.onChangeNameSubmit.bind(this);
+    this.changeNameForm.addEventListener('submit', this.onChangeNameSubmit.bind(this));
 
     this.changePassContent = ge('changepass');
     if (!this.changePassContent)
@@ -88,7 +88,7 @@ ProfileView.prototype.onStart = function()
     this.changePassForm = this.changePassContent.querySelector('form');
     if (!this.changePassForm)
         throw new Error('Failed to initialize Profile view');
-    this.changePassForm.onsubmit = this.onChangePassSubmit.bind(this);
+    this.changePassForm.addEventListener('submit', this.onChangePassSubmit.bind(this));
 
     if (this.props.action)
     {
@@ -129,8 +129,10 @@ ProfileView.prototype.onNewNameInput = function()
 
 
 // Create and show change name popup
-ProfileView.prototype.showChangeNamePopup = function()
+ProfileView.prototype.showChangeNamePopup = function(e)
 {
+    e.preventDefault();
+
     if (!this.changeNamePopup)
     {
         this.changeNamePopup = Popup.create({
@@ -155,8 +157,6 @@ ProfileView.prototype.showChangeNamePopup = function()
     this.newNameInp.value = this.model.data.name;
 
     this.changeNamePopup.show();
-
-    return false;
 }
 
 
@@ -181,9 +181,10 @@ ProfileView.prototype.onChangePasswordResult = function(response)
 /**
  * Change password form submit event handler
  */
-ProfileView.prototype.onChangePassSubmit = function()
+ProfileView.prototype.onChangePassSubmit = function(e)
 {
     var valid = true;
+    e.preventDefault();
 
     if (!this.oldPassInp.value || this.oldPassInp.value.length < 1)
     {
@@ -209,16 +210,16 @@ ProfileView.prototype.onChangePassSubmit = function()
             callback : this.onChangePasswordResult.bind(this)
         });
     }
-
-    return false;
 }
 
 
 /**
  * Show change password popup
  */
-ProfileView.prototype.showChangePasswordPopup = function()
+ProfileView.prototype.showChangePasswordPopup = function(e)
 {
+    e.preventDefault();
+
     if (!this.changePassPopup)
     {
         this.changePassPopup = Popup.create({
@@ -243,8 +244,6 @@ ProfileView.prototype.showChangePasswordPopup = function()
     }
 
     this.changePassPopup.show();
-
-    return false;
 }
 
 
@@ -281,9 +280,10 @@ ProfileView.prototype.onChangeNameResult = function(response)
 /**
  * Change name form submit event handler
  */
-ProfileView.prototype.onChangeNameSubmit = function()
+ProfileView.prototype.onChangeNameSubmit = function(e)
 {
     var valid = true;
+    e.preventDefault();
 
     if (!this.newNameInp.value || this.newNameInp.value.length < 1 || this.newNameInp.value == this.model.data.name)
     {
@@ -302,8 +302,6 @@ ProfileView.prototype.onChangeNameSubmit = function()
             callback : this.onChangeNameResult.bind(this)
         });
     }
-
-    return false;
 }
 
 
