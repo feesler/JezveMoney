@@ -92,7 +92,7 @@ TransactionListView.prototype.onStart = function()
 
     this.toolbar = Toolbar.create({
         elem: 'toolbar',
-        ondelete: this.showDeletePopup.bind(this)
+        ondelete: this.confirmDelete.bind(this)
     });
 };
 
@@ -617,47 +617,23 @@ TransactionListView.prototype.onSearchSubmit = function(e)
 
 
 /**
- * Delete confirmation result handler
- * @param {boolean} result - user confirmed delete
- */
-TransactionListView.prototype.onDeleteConfirmResult = function(result)
-{
-    if (this.delConfirmPopup)
-        this.delConfirmPopup.close();
-
-    if (result)
-    {
-        this.delForm.submit();
-    }
-};
-
-
-/**
  * Create and show transaction delete warning popup
  */
-TransactionListView.prototype.showDeletePopup = function()
+TransactionListView.prototype.confirmDelete = function()
 {
     if (this.model.selection.count() == 0)
         return;
 
     var multi = (this.model.selection.count() > 1);
 
-    if (!this.delConfirmPopup)
-    {
-        this.delConfirmPopup = Popup.create({
-            id : 'delete_warning',
-            content : (multi) ? multiTransDeleteMsg : singleTransDeleteMsg,
-            btn : {
-                okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
-                cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
-            }
-        });
-    }
-
-    this.delConfirmPopup.setTitle((multi) ? multiTransDeleteTitle : singleTransDeleteTitle);
-    this.delConfirmPopup.setContent((multi) ? multiTransDeleteMsg : singleTransDeleteMsg);
-
-    this.delConfirmPopup.show();
+    ConfirmDialog.create({
+        id: 'delete_warning',
+        title: (multi) ? multiTransDeleteTitle : singleTransDeleteTitle,
+        content: (multi) ? multiTransDeleteMsg : singleTransDeleteMsg,
+        onconfirm: function() {
+            this.delForm.submit();
+        }.bind(this)
+    });
 };
 
 

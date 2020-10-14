@@ -109,6 +109,7 @@ export class Scenario
         await ApiTests.login(App.config.testAdminUser);
 		await ApiTests.deleteUserIfExist(App.config.testUser);
 		await ApiTests.deleteUserIfExist(App.config.apiTestUser);
+		await ApiTests.deleteUserIfExist(App.config.newUser);
 
         // Register API test user and prepare data for security tests
 		await ApiTests.registerAndLogin(App.config.apiTestUser);
@@ -557,12 +558,12 @@ export class Scenario
 
 		const tasks = [
 			// Registration tests
-			{ action : ProfileTests.register, data : { login : 'newuser', name : 'Newbie', password : '12345' } },
+			{ action : ProfileTests.register, data : App.config.newUser },
 			{ action : ProfileTests.deleteProfile },
 			{ action : ProfileTests.register, data : { login : '', name : '', password : '' } },
-			{ action : ProfileTests.register, data : { login : '', name : 'Newbie', password : '12345' } },
-			{ action : ProfileTests.register, data : { login : 'newuser', name : '', password : '12345' } },
-			{ action : ProfileTests.register, data : { login : 'newuser', name : 'Newbie', password : '' } },
+			{ action : ProfileTests.register, data : { login : '', name : App.config.newUser.name, password : App.config.newUser.password } },
+			{ action : ProfileTests.register, data : { login : App.config.newUser.login, name : '', password : App.config.newUser.password } },
+			{ action : ProfileTests.register, data : { login : App.config.newUser.login, name : App.config.newUser.name, password : '' } },
 			// Login tests
 			{ action : ProfileTests.relogin, data : { login : App.config.testUser.login, password : '' } },
 			{ action : ProfileTests.relogin, data : { login : '', password : App.config.testUser.password } },

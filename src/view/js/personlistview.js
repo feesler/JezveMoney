@@ -63,7 +63,7 @@ PersonListView.prototype.onStart = function()
         onhide: function() {
             this.hideForm.submit()
         }.bind(this),
-        ondelete: this.showDeleteConfirmationPopup.bind(this)
+        ondelete: this.confirmDelete.bind(this)
     });
 };
 
@@ -122,56 +122,20 @@ PersonListView.prototype.onTileClick = function(e)
 
 
 /**
- * Delete button click event handler
- */
-PersonListView.prototype.onDelete = function(e)
-{
-	this.showDeleteConfirmationPopup();
-};
-
-
-/**
  * Show person(s) delete confirmation popup
  */
-PersonListView.prototype.showDeleteConfirmationPopup = function()
+PersonListView.prototype.confirmDelete = function()
 {
-	var selCount = this.model.selected.visible.count();
-	var hiddenSelCount = this.model.selected.hidden.count();
-	var totalSelCount = selCount + hiddenSelCount;
+	var totalSelCount = this.model.selected.visible.count() + this.model.selected.hidden.count();
 	if (!totalSelCount)
 		return;
 
-	// check popup already created
-	if (!this.delConfirmPopup)
-	{
-		this.delConfirmPopup = Popup.create({
-			id : 'delete_warning',
-			content : singlePersonDeleteMsg,
-			btn : {
-				okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
-				cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
-			}
-		});
-	}
-
-	this.delConfirmPopup.setTitle((totalSelCount > 1) ? multiPersonsDeleteTitle : singlePersonDeleteTitle);
-	this.delConfirmPopup.setContent((totalSelCount > 1) ? multiPersonsDeleteMsg : singlePersonDeleteMsg);
-
-	this.delConfirmPopup.show();
-};
-
-
-/**
- * Delete confirmation result handler
- * @param {boolean} result - user confirmed delete
- */
-PersonListView.prototype.onDeleteConfirmResult = function(result)
-{
-	if (this.delConfirmPopup)
-		this.delConfirmPopup.close();
-
-	if (result)
-	{
-		this.delForm.submit();
-	}
+    ConfirmDialog.create({
+        id: 'delete_warning',
+        title: (totalSelCount > 1) ? multiPersonsDeleteTitle : singlePersonDeleteTitle,
+        content: (totalSelCount > 1) ? multiPersonsDeleteMsg : singlePersonDeleteMsg,
+        onconfirm: function() {
+            this.delForm.submit();
+        }.bind(this)
+    });
 };

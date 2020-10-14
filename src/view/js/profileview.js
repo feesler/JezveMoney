@@ -29,9 +29,6 @@ ProfileView.prototype.onStart = function()
 {
     this.changeNamePopup = null;
     this.changePassPopup = null;
-    this.resetAccountsPopup = null;
-    this.resetAllPopup = null;
-    this.delPopup = null;
 
     this.nameElem = ge('namestatic');
     if (!this.nameElem)
@@ -50,7 +47,7 @@ ProfileView.prototype.onStart = function()
     this.resetAccBtn = ge('resetAccBtn');
     if (!this.resetAccBtn)
         throw new Error('Failed to initialize Profile view');
-    this.resetAccBtn.addEventListener('click', this.showResetAccountsPopup.bind(this));
+    this.resetAccBtn.addEventListener('click', this.confirmResetAccounts.bind(this));
 
     this.resetAccForm = ge('resetacc_form');
     if (!this.resetAccForm)
@@ -59,7 +56,7 @@ ProfileView.prototype.onStart = function()
     this.resetAllBtn = ge('resetAllBtn');
     if (!this.resetAllBtn)
         throw new Error('Failed to initialize Profile view');
-    this.resetAllBtn.addEventListener('click', this.showResetAllPopup.bind(this));
+    this.resetAllBtn.addEventListener('click', this.confirmResetAll.bind(this));
 
     this.resetAllForm = ge('resetall_form');
     if (!this.resetAllForm)
@@ -68,7 +65,7 @@ ProfileView.prototype.onStart = function()
     this.delProfileBtn = ge('delProfileBtn');
     if (!this.delProfileBtn)
         throw new Error('Failed to initialize Profile view');
-    this.delProfileBtn.addEventListener('click', this.showDeletePopup.bind(this));
+    this.delProfileBtn.addEventListener('click', this.confirmDelete.bind(this));
 
     this.deleteForm = ge('delete_form');
     if (!this.deleteForm)
@@ -306,114 +303,48 @@ ProfileView.prototype.onChangeNameSubmit = function(e)
 
 
 /**
- * Reset accounts confirmation result handler
- * @param {boolean} result - user confirmation status
- */
-ProfileView.prototype.onAccResetPopup = function(result)
-{
-    if (!this.resetAccountsPopup)
-        return;
-
-    this.resetAccountsPopup.close();
-
-    if (result)
-        this.resetAccForm.submit();
-}
-
-
-/**
  * Show reset accounts confirmation popup
  */
-ProfileView.prototype.showResetAccountsPopup = function()
+ProfileView.prototype.confirmResetAccounts = function()
 {
-    if (!this.resetAccountsPopup)
-    {
-        this.resetAccountsPopup = Popup.create({
-            id : 'reset_warning',
-            title : 'Reset accounts',
-            content : resetAccMsg,
-            btn : {
-                okBtn : { onclick : this.onAccResetPopup.bind(this, true) },
-                cancelBtn : { onclick : this.onAccResetPopup.bind(this, false) }
-            }
-        });
-    }
-
-    this.resetAccountsPopup.show();
-}
-
-
-/**
- * Reset all data confirmation result handler
- * @param {boolean} result - user confirmation status
- */
-ProfileView.prototype.onResetAllPopup = function(result)
-{
-    if (!this.resetAllPopup)
-        return;
-
-    this.resetAllPopup.close();
-
-    if (result)
-        this.resetAllForm.submit();
-}
+    ConfirmDialog.create({
+        id: 'reset_warning',
+        title: 'Reset accounts',
+        content : resetAccMsg,
+        onconfirm: function() {
+            this.resetAccForm.submit();
+        }.bind(this)
+    });
+};
 
 
 /**
  * Show reset all data confirmation popup
  */
-ProfileView.prototype.showResetAllPopup = function()
+ProfileView.prototype.confirmResetAll = function()
 {
-    if (!this.resetAllPopup)
-    {
-        this.resetAllPopup = Popup.create({
-            id : 'reset_all_warning',
-            title : 'Reset all data',
-            content : resetAllMsg,
-            btn : {
-                okBtn : { onclick : this.onResetAllPopup.bind(this, true) },
-                cancelBtn : { onclick : this.onResetAllPopup.bind(this, false) }
-            }
-        });
-    }
-
-    this.resetAllPopup.show();
-}
-
-
-/**
- * Delete profile confirmation result handler
- * @param {boolean} result - user confirmation status
- */
-ProfileView.prototype.onDeletePopup = function(result)
-{
-    if (!this.delPopup)
-        return;
-
-    this.delPopup.close();
-
-    if (result)
-        this.deleteForm.submit();
-}
+    ConfirmDialog.create({
+        id: 'reset_all_warning',
+        title: 'Reset all data',
+        content : resetAllMsg,
+        onconfirm: function() {
+            this.resetAllForm.submit();
+        }.bind(this)
+    });
+};
 
 
 /**
  * Show delete profile confirmation popup
  */
-ProfileView.prototype.showDeletePopup = function()
+ProfileView.prototype.confirmDelete = function()
 {
-    if (!this.delPopup)
-    {
-        this.delPopup = Popup.create({
-            id : 'delete_warning',
-            title : 'Delete profile',
-            content : deleteMsg,
-            btn : {
-                okBtn : { onclick : this.onDeletePopup.bind(this, true) },
-                cancelBtn : { onclick : this.onDeletePopup.bind(this, false) }
-            }
-        });
-    }
-
-    this.delPopup.show();
-}
+    ConfirmDialog.create({
+        id: 'delete_warning',
+        title: 'Delete profile',
+        content : deleteMsg,
+        onconfirm: function() {
+            this.deleteForm.submit();
+        }.bind(this)
+    });
+};

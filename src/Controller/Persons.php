@@ -31,6 +31,7 @@ class Persons extends TemplateController
             "component/header.js",
             "component/toolbar.js",
             "component/iconlink.js",
+            "component/confirmdialog.js",
             "view.js",
             "personlistview.js"
         );
@@ -110,6 +111,7 @@ class Persons extends TemplateController
             "component/component.js",
             "component/header.js",
             "component/iconlink.js",
+            "component/confirmdialog.js",
             "view.js",
             "personview.js"
         );

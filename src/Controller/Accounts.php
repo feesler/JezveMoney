@@ -34,13 +34,13 @@ class Accounts extends TemplateController
 
         $titleString = "Jezve Money | Accounts";
 
-        array_push($this->css->libs, ...[
+        array_push($this->css->libs,
             "tiles.css",
             "iconlink.css",
             "toolbar.css"
-        ]);
+        );
         $this->buildCSS();
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "model/list.js",
             "model/account.js",
             "model/currency.js",
@@ -48,10 +48,11 @@ class Accounts extends TemplateController
             "component/header.js",
             "component/toolbar.js",
             "component/iconlink.js",
+            "component/confirmdialog.js",
             "selection.js",
             "view.js",
             "accountlistview.js"
-        ]);
+        );
 
         include(TPL_PATH . "accounts.tpl");
     }
@@ -182,6 +183,7 @@ class Accounts extends TemplateController
             "component/tile.js",
             "component/accounttile.js",
             "component/iconlink.js",
+            "component/confirmdialog.js",
             "view.js",
             "accountview.js"
         );

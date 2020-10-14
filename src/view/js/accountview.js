@@ -73,7 +73,7 @@ AccountView.prototype.onStart = function()
 	{
         this.deleteBtn = IconLink.fromElement({
             elem: 'del_btn',
-            onclick: this.onDelete.bind(this)
+            onclick: this.confirmDelete.bind(this)
         });
 		this.delForm = ge('delform');
 		if (!this.delForm)
@@ -181,55 +181,21 @@ AccountView.prototype.onSubmit = function(e)
 
 
 /**
- * Delete button click event handler
- */
-AccountView.prototype.onDelete = function()
-{
-	this.showDeleteConfirmationPopup();
-};
-
-
-/**
  * Show account delete confirmation popup
  */
-AccountView.prototype.showDeleteConfirmationPopup = function()
+AccountView.prototype.confirmDelete = function()
 {
 	if (!this.model.data.id)
 		return;
 
-	// check popup already created
-	if (!this.delConfirmPopup)
-	{
-		this.delConfirmPopup = Popup.create({
-			id : 'delete_warning',
-			content : singleAccDeleteMsg,
-			btn : {
-				okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
-				cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
-			}
-		});
-	}
-
-	this.delConfirmPopup.setTitle(singleAccDeleteTitle);
-	this.delConfirmPopup.setContent(singleAccDeleteMsg);
-
-	this.delConfirmPopup.show();
-};
-
-
-/**
- * Delete confirmation result handler
- * @param {boolean} result - user confirmed delete
- */
-AccountView.prototype.onDeleteConfirmResult = function(result)
-{
-	if (this.delConfirmPopup)
-		this.delConfirmPopup.close();
-
-	if (result)
-	{
-		this.delForm.submit();
-	}
+    ConfirmDialog.create({
+        id: 'delete_warning',
+        title: singleAccDeleteTitle,
+        content: singleAccDeleteMsg,
+        onconfirm: function() {
+            this.delForm.submit();
+        }.bind(this)
+    });
 };
 
 

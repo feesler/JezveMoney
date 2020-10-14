@@ -53,19 +53,21 @@ var Popup = new (function()
 
         function create(params)
         {
-            if (!params || !params.id)
+            if (!params)
                 return false;
 
             _params = params;
 
             // check popup with same id is already exist
-            popupObj = ge(params.id);
-            if (popupObj)
-                return false;
-
-            popupObj = ce('div', { id : params.id, className : 'popup hidden' });
-            if (!popupObj)
-                return false;
+            if ('id' in params) {
+                popupObj = ge(params.id);
+                if (popupObj)
+                    return false;
+            }
+            popupObj = ce('div', { className : 'popup hidden' });
+            if ('id' in params) {
+                popupObj.id = params.id;
+            }
 
             backObj = ce('div', { className : 'popup__back' });
             if (!backObj)

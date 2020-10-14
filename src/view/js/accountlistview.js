@@ -66,7 +66,7 @@ AccountListView.prototype.onStart = function()
         onhide: function() {
             this.hideForm.submit()
         }.bind(this),
-        ondelete: this.showDeleteConfirmationPopup.bind(this)
+        ondelete: this.confirmDelete.bind(this)
     });
 };
 
@@ -136,56 +136,20 @@ AccountListView.prototype.onTileClick = function(e)
 
 
 /**
- * Delete button click event handler
- */
-AccountListView.prototype.onDelete = function(e)
-{
-	this.showDeleteConfirmationPopup();
-};
-
-
-/**
  * Show account(s) delete confirmation popup
  */
-AccountListView.prototype.showDeleteConfirmationPopup = function()
+AccountListView.prototype.confirmDelete = function()
 {
-	var selCount = this.model.selected.visible.count();
-	var hiddenSelCount = this.model.selected.hidden.count();
-	var totalSelCount = selCount + hiddenSelCount;
+	var totalSelCount = this.model.selected.visible.count() + this.model.selected.hidden.count();
 	if (!totalSelCount)
 		return;
 
-	// check popup already created
-	if (!this.delConfirmPopup)
-	{
-		this.delConfirmPopup = Popup.create({
-			id : 'delete_warning',
-			content : singleAccDeleteMsg,
-			btn : {
-				okBtn : { onclick : this.onDeleteConfirmResult.bind(this, true) },
-				cancelBtn : { onclick : this.onDeleteConfirmResult.bind(this, false) }
-			}
-		});
-	}
-
-	this.delConfirmPopup.setTitle((totalSelCount > 1) ? multiAccDeleteTitle : singleAccDeleteTitle);
-	this.delConfirmPopup.setContent((totalSelCount > 1) ? multiAccDeleteMsg : singleAccDeleteMsg);
-
-	this.delConfirmPopup.show();
-};
-
-
-/**
- * Delete confirmation result handler
- * @param {boolean} result - user confirmed delete
- */
-AccountListView.prototype.onDeleteConfirmResult = function(result)
-{
-	if (this.delConfirmPopup)
-		this.delConfirmPopup.close();
-
-	if (result)
-	{
-		this.delForm.submit();
-	}
+    ConfirmDialog.create({
+        id: 'delete_warning',
+        title: (totalSelCount > 1) ? multiAccDeleteTitle : singleAccDeleteTitle,
+        content: (totalSelCount > 1) ? multiAccDeleteMsg : singleAccDeleteMsg,
+        onconfirm: function() {
+            this.delForm.submit();
+        }.bind(this)
+    });
 };

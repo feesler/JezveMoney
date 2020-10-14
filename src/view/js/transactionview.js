@@ -62,7 +62,7 @@ TransactionView.prototype.onStart = function()
 	{
         this.deleteBtn = IconLink.fromElement({
             elem: 'del_btn',
-            onclick: this.onDelete.bind(this)
+            onclick: this.confirmDelete.bind(this)
         });
         this.deleteForm = ge('delform');
 	}
@@ -1579,48 +1579,18 @@ TransactionView.prototype.onDestCurrChanged = function(value)
 
 
 /**
- * Delete transaction icon link click event handler
- */
-TransactionView.prototype.onDelete = function()
-{
-    this.showDeletePopup();
-}
-
-
-/**
  * Create and show transaction delete warning popup
  */
-TransactionView.prototype.showDeletePopup = function()
+TransactionView.prototype.confirmDelete = function()
 {
-    if (!this.dwPopup)
-    {
-        this.dwPopup = Popup.create({
-            id : 'delete_warning',
-            title : singleTransDeleteTitle,
-            content : singleTransDeleteMsg,
-            btn : {
-                okBtn : { onclick : this.onDeletePopup.bind(this, true) },
-                cancelBtn : { onclick : this.onDeletePopup.bind(this, false) }
-            }
-        });
-    }
-
-    this.dwPopup.show();
-};
-
-
-/**
- * Delete popup callback
- */
-TransactionView.prototype.onDeletePopup = function(result)
-{
-    if (this.dwPopup)
-        this.dwPopup.close();
-
-    if (result)
-    {
-        if (this.deleteForm)
+    ConfirmDialog.create({
+        id: 'delete_warning',
+        title: singleTransDeleteTitle,
+        content: singleTransDeleteMsg,
+        onconfirm: function() {
             this.deleteForm.submit();
-    }
+        }.bind(this)
+    });
 };
+
 
