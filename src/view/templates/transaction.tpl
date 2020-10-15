@@ -448,6 +448,7 @@
 <script>
     var view = new TransactionView({
         mode: '<?=(($action == "edit") ? "update" : "create")?>',
+        profile: <?=JSON::encode($profileData)?>,
         transaction: <?=JSON::encode($tr)?>,
         accounts: <?=JSON::encode($accArr)?>,
         currency: <?=JSON::encode($currArr)?>,

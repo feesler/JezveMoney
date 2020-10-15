@@ -488,6 +488,11 @@ class Transactions extends TemplateController
         }
 
         // Common arrays
+        $profileData = [
+            "user_id" => $this->user_id,
+            "owner_id" => $this->owner_id,
+            "name" => $this->user_name,
+        ];
         $currArr = $this->currModel->getData();
         $iconModel = IconModel::getInstance();
         $icons = $iconModel->getData();
@@ -760,6 +765,11 @@ class Transactions extends TemplateController
         $tr["noAccount"] = $noAccount;
 
         // Common arrays
+        $profileData = [
+            "user_id" => $this->user_id,
+            "owner_id" => $this->owner_id,
+            "name" => $this->user_name,
+        ];
         $currArr = $this->currModel->getData();
         $iconModel = IconModel::getInstance();
         $icons = $iconModel->getData();

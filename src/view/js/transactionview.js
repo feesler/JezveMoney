@@ -10,6 +10,7 @@ function TransactionView()
     TransactionView.parent.constructor.apply(this, arguments);
 
     if (
+        !('profile' in this.props) ||
         !('currency' in this.props) ||
         !('accounts' in this.props) ||
         !('transaction' in this.props) ||
@@ -19,6 +20,7 @@ function TransactionView()
 
     this.model = {};
 
+    this.model.profile = this.props.profile;
     this.model.currency = CurrencyList.create(this.props.currency);
     this.model.icons = IconList.create(this.props.icons);
     this.model.accounts = AccountList.create(this.props.accounts);
@@ -38,6 +40,9 @@ function TransactionView()
     {
         this.model.accounts.cancelTransaction(this.props.transaction);
     }
+
+    var userAccounts = AccountList.create(this.model.accounts.getUserAccounts(this.model.profile.owner_id));
+    this.model.visibleUserAccounts = userAccounts.getVisible();
 }
 
 
@@ -49,8 +54,6 @@ extend(TransactionView, View);
  */
 TransactionView.prototype.onStart = function()
 {
-    var visibleAccounts = this.model.accounts.getVisible();
-
 	this.submitStarted = false;
 	// Init form submit event handler
 	this.form = ge('mainfrm');
@@ -286,7 +289,7 @@ TransactionView.prototype.onStart = function()
         });
 		if (this.srcDDList)
 		{
-			visibleAccounts.forEach(function(acc)
+			this.model.visibleUserAccounts.forEach(function(acc)
 			{
                 this.srcDDList.addItem({ id: acc.id, title: acc.name });
 			}, this);
@@ -300,7 +303,7 @@ TransactionView.prototype.onStart = function()
 		});
 		if (this.destDDList)
 		{
-			visibleAccounts.forEach(function(acc)
+			this.model.visibleUserAccounts.forEach(function(acc)
 			{
 				this.destDDList.addItem({ id: acc.id, title: acc.name });
 			}, this);
@@ -354,8 +357,7 @@ TransactionView.prototype.initAccList = function()
     if (!this.accDDList)
         throw new Error('Failed to initialize debt account DropDown');
 
-    var visibleAccounts = this.model.accounts.getVisible();
-    visibleAccounts.forEach(function(acc)
+    this.model.visibleUserAccounts.forEach(function(acc)
     {
         this.accDDList.addItem({ id: acc.id, title: acc.name });
     }, this);

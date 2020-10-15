@@ -66,6 +66,19 @@ AccountList.prototype.createItem = function(obj)
 
 
 /**
+ * Return list of Accounts of user
+ */
+AccountList.prototype.getUserAccounts = function(owner_id)
+{
+    var res = this.data.filter(function(item) {
+        return item && item.owner_id == owner_id;
+    });
+
+    return (res) ? res : null;
+};
+
+
+/**
  * Return list of visible Accounts
  */
 AccountList.prototype.getVisible = function()
