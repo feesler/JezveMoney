@@ -2,7 +2,7 @@ import { NullableComponent } from './component.js';
 import { Tile } from './tile.js';
 import { AccountsList } from '../../model/accountslist.js';
 import { PersonsList } from '../../model/personslist.js';
-import { asyncMap } from '../../common.js';
+import { asyncMap, copyObject } from '../../common.js';
 
 
 export class TilesList extends NullableComponent
@@ -30,12 +30,44 @@ export class TilesList extends NullableComponent
 	}
 
 
+    getItemData(item)
+    {
+        if (!item)
+            throw new Error('Invalid item');
+
+        return {
+            id: item.id,
+            balance: item.balance,
+            name: item.name,
+            isActive: item.isActive,
+            icon_id: item.icon_id
+        }
+    }
+
+
+    getItems()
+    {
+        return this.items.map(this.getItemData);
+    }
+
+
 	/**
 	 * @returns {array} active items
 	 */
 	getActive()
 	{
-		return this.items.filter(item => item.isActive);
+		return this.items.filter(item => item.isActive)
+                         .map(this.getItemData);
+	}
+
+
+	/**
+	 * @returns {number[]} indexes of active items
+	 */
+	getSelectedIndexes()
+	{
+		return this.items.filter(item => item.isActive)
+                         .map(item => this.items.indexOf(item));
 	}
 
 

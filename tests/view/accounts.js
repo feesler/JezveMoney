@@ -30,6 +30,15 @@ export class AccountsView extends TestView
 	}
 
 
+    getItems()
+    {
+        let visibleItems = this.content.tiles.getItems();
+        let hiddenItems = this.content.hiddenTiles.getItems();
+
+        return visibleItems.concat(hiddenItems);
+    }
+
+
 	// Click on add button and return navigation promise
 	goToCreateAccount()
 	{
@@ -54,50 +63,65 @@ export class AccountsView extends TestView
 		if (!Array.isArray(acc))
 			acc = [ acc ];
 
-		let ind = 0;
-		let totalTiles = this.content.tiles.items.length + this.content.hiddenTiles.items.length;
-		for(let acc_num of acc)
+        let visibleTiles = this.content.tiles.items.length;
+        let hiddenTiles = this.content.hiddenTiles.items.length;
+		let totalTiles = visibleTiles + hiddenTiles;
+        let activeTiles = this.content.tiles.getActive();
+        let activeHiddenTiles = this.content.hiddenTiles.getActive();
+        let selectedCount = activeTiles.length;
+        let selectedHiddenCount = activeHiddenTiles.length;
+		for(let num of acc)
 		{
-			if (acc_num < 0 || acc_num >= totalTiles)
+			if (num < 0 || num >= totalTiles)
 				throw new Error('Invalid account number');
 
-			if (acc_num < this.content.tiles.items.length)
+			if (num < visibleTiles)
 			{
-				await this.performAction(() => this.content.tiles.items[acc_num].click());
-				if (!await this.content.toolbar.isButtonVisible('hide'))
-					throw new Error('Hide button is not visible');
+                let item = this.content.tiles.items[num];
+                let isSelected = item.isActive;
+				await this.performAction(() => item.click());
+                selectedCount += (isSelected ? -1 : 1);
 			}
 			else
 			{
-				let hiddenAccNum = acc_num - this.content.tiles.items.length;
-				await this.performAction(() => this.content.hiddenTiles.items[hiddenAccNum].click());
-				if (!await this.content.toolbar.isButtonVisible('show'))
-					throw new Error('Show button is not visible');
+				let item = this.content.hiddenTiles.items[num - visibleTiles];
+                let isSelected = item.isActive;
+				await this.performAction(() => item.click());
+                selectedHiddenCount += (isSelected ? -1 : 1);
 			}
 
+            let showIsVisible = await this.content.toolbar.isButtonVisible('show');
+            if ((selectedHiddenCount > 0) != showIsVisible)
+				throw new Error(`Unexpected visibility (${showIsVisible}) of Show button while ${selectedHiddenCount} hidden items selected`);
+
+            let hideIsVisible = await this.content.toolbar.isButtonVisible('hide');
+            if ((selectedCount > 0) != hideIsVisible)
+				throw new Error(`Unexpected visibility (${hideIsVisible}) of Hide button while ${selectedCount} visible items selected`);
+
+            let totalSelected = selectedCount + selectedHiddenCount;
 			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
-			if (ind == 0 && !updIsVisible)
-				throw new Error('Update button is not visible');
-			else if (ind > 0 && updIsVisible)
-				throw new Error('Update button is visible while more than one accounts is selected');
+			if ((totalSelected == 1) != updIsVisible)
+				throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${totalSelected} items selected`);
 
-			if (!await this.content.toolbar.isButtonVisible('del'))
-				throw new Error('Delete button is not visible');
+			let exportIsVisible = await this.content.toolbar.isButtonVisible('export');
+			if ((totalSelected > 0) != exportIsVisible)
+				throw new Error(`Unexpected visibility (${exportIsVisible}) of Export button while ${totalSelected} items selected`);
 
-			ind++;
+			let delIsVisible = await this.content.toolbar.isButtonVisible('del');
+			if ((totalSelected > 0) != delIsVisible)
+				throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${totalSelected} items selected`);
 		}
 	}
 
 
 	async deselectAccounts()
 	{
-		let visibleActive = this.content.tiles.getActive();
-		if (visibleActive.length > 0)
-			await this.performAction(() => visibleActive.forEach(item => item.click()));
-
-		let hiddenActive = this.content.hiddenTiles.getActive();
-		if (hiddenActive.length > 0)
-			await this.performAction(() => hiddenActive.forEach(item => item.click()));
+		let visibleActive = this.content.tiles.getSelectedIndexes();
+		let hiddenActive = this.content.hiddenTiles.getSelectedIndexes()
+                                .map(ind => ind + this.content.tiles.length);
+        let selected = visibleActive.concat(hiddenActive);
+		if (selected.length > 0)
+			await this.performAction(() => this.selectAccounts(selected));
 	}
 
 

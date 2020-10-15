@@ -1,5 +1,5 @@
 import { App } from '../app.js';
-import { test, formatDate, fixDate } from '../common.js';
+import { test, formatDate, fixDate, copyObject, checkObjValue } from '../common.js';
 import { TransactionsView } from '../view/transactions.js';
 import { MainView } from '../view/main.js';
 import { availTransTypes, Transaction } from '../model/transaction.js';
@@ -40,6 +40,49 @@ export async function setDetailsMode()
 	await checkNavigation();
 
 	await test('Change list mode to details', () => App.view.setDetailsMode());
+}
+
+
+export async function toggleSelect(transactions)
+{
+	if (!Array.isArray(transactions))
+		transactions = [ transactions ];
+
+    await test(`Toggle select items [${transactions.join()}]`, async () => {
+        await checkNavigation();
+
+        let origItems = App.view.getItems();
+        // Check correctness of arguments
+        let indexes = [];
+        for(let pos of transactions)
+        {
+            let ind = parseInt(pos);
+            if (isNaN(ind) || ind < 0 || ind > origItems.length)
+                throw new Error(`Invalid item index ${pos}`);
+            indexes.push(ind);
+        }
+
+        let expectedItems = origItems.map((item, ind) =>
+        {
+            let res = copyObject(item);
+            if (indexes.includes(ind))
+                res.selected = !res.selected;
+
+            return res;
+        });
+
+	    await App.view.selectTransactions(indexes);
+        let items = App.view.getItems();
+        checkObjValue(items, expectedItems);
+
+        // Click by items again to inverse selection
+        expectedItems = origItems;
+	    await App.view.selectTransactions(indexes);
+        items = App.view.getItems();
+        checkObjValue(items, expectedItems);
+
+        return true;
+    });
 }
 
 

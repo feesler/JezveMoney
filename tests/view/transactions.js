@@ -128,6 +128,18 @@ export class TransactionsView extends TestView
 	}
 
 
+    getItems()
+    {
+        return this.content.transList.getItems();
+    }
+
+
+    getSelectedItems()
+    {
+        return this.content.transList.getSelectedItems();
+    }
+
+
 	updateModelFilter(model)
 	{
 		let res = this.cloneModel(model);
@@ -450,25 +462,27 @@ export class TransactionsView extends TestView
 		if (!this.content.transList)
 			throw new Error('No transactions available to select');
 
-		let ind = 0;
-		for(let tr_num of tr)
+        let selectedItems = this.getSelectedItems();
+		let selectedCount = selectedItems.length;
+		for(let num of tr)
 		{
-			if (tr_num < 0 || tr_num >= this.content.transList.items.length)
+			if (num < 0 || num >= this.content.transList.items.length) {
 				throw new Error('Wrong transaction number');
+            }
 
-			await this.performAction(() => this.content.transList.items[tr_num].click());
+            let isSelected = this.content.transList.items[num].selected;
+			await this.performAction(() => this.content.transList.items[num].click());
+            selectedCount += (isSelected ? -1 : 1);
 
 			let updIsVisible = await this.content.toolbar.isButtonVisible('update');
-			if (ind == 0 && !updIsVisible)
-				throw new Error('Update button is not visible');
-			else if (ind > 0 && updIsVisible)
-				throw new Error('Update button is visible while more than one transactions is selected');
+			if ((selectedCount == 1) != updIsVisible) {
+				throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${selectedCount} items selected`);
+            }
 
 			let delIsVisible = await this.content.toolbar.isButtonVisible('del');
-			if (!delIsVisible)
-				throw new Error('Delete button is not visible');
-
-			ind++;
+			if ((selectedCount > 0) != delIsVisible) {
+				throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${selectedCount} items selected`);
+            }
 		}
 	}
 

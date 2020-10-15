@@ -15,6 +15,6 @@ export const  config =
 
 	transactionsOnPage : 10,
 	latestTransactions : 5,
-	testsExpected : 857
+	testsExpected : 863
 };
 

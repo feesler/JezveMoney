@@ -602,6 +602,7 @@ export class Scenario
 	async postTransactionAccountTests()
 	{
 		await this.hideAccountsTest();
+        await this.toggleAccountsTest();
 		await this.showAccountsTest();
 		await this.exportAccountsTest();
 		await this.updateAccountTests();
@@ -690,12 +691,26 @@ export class Scenario
 	}
 
 
+	async toggleAccountsTest()
+	{
+		this.environment.setBlock('Toggle select accounts', 2);
+
+		const data = [
+			[0],
+			[1, 2],
+		];
+
+		await this.runner.runGroup(AccountTests.toggleSelect, data);
+	}
+
+
 	async personTests()
 	{
 		this.environment.setBlock('Persons', 1);
 
 		await this.createPersonTests();
 		await this.hidePersonsTest();
+        await this.togglePersonsTest();
 		await this.showPersonsTest();
 		await this.updatePersonTests();
 		await this.deletePersonTests();
@@ -770,6 +785,19 @@ export class Scenario
 		];
 
 		await this.runner.runGroup(PersonTests.show, data);
+	}
+
+
+	async togglePersonsTest()
+	{
+		this.environment.setBlock('Toggle select persons', 2);
+
+		const data = [
+			[0],
+			[1, 2],
+		];
+
+		await this.runner.runGroup(PersonTests.toggleSelect, data);
 	}
 
 
@@ -998,6 +1026,13 @@ export class Scenario
 			{ action : TransactionListTests.setDetailsMode },
 			{ action : TransactionListTests.goToNextPage },
 		]);
+
+        const toggleSelectData = [
+            0,
+            [1,2]
+        ];
+
+		await this.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
 
 		await this.runner.runGroup(TransactionListTests.filterByType, availTransTypes);
 

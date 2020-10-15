@@ -17,16 +17,40 @@ export class TransactionList extends NullableComponent
 	}
 
 
+    getItemData(item)
+    {
+        if (!item)
+            throw new Error('Invalid item');
+
+        return {
+            selected: item.selected,
+            amountText: item.amountText,
+            amountTitle: item.amountTitle,
+            dateFmt: item.dateFmt,
+            comment: item.comment,
+        }
+    }
+
+
 	getItems()
 	{
-		return this.items.map(item => {
-			return {
-				amountText : item.amountText,
-				amountTitle : item.amountTitle,
-				dateFmt : item.dateFmt,
-				comment : item.comment,
-			}
-		});
+		return this.items.map(this.getItemData);
+	}
+
+
+    getSelectedItems()
+    {
+		return this.items.filter(item => item.selected).map(this.getItemData);
+    }
+
+
+	/**
+	 * @returns {number[]} indexes of active items
+	 */
+	getSelectedIndexes()
+	{
+		return this.items.filter(item => item.isActive)
+                         .map(item => this.items.indexOf(item));
 	}
 
 

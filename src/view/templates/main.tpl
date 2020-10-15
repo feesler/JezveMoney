@@ -69,7 +69,7 @@
 <?php	} else {	?>
 <?php		foreach($trListData as $trItem) {	?>
                             <div class="trans-list__item-wrapper">
-                                <div id="tr_<?=e($trItem["id"])?>" class="trans-list__item">
+                                <div class="trans-list__item" data-id="<?=e($trItem["id"])?>">
                                     <div class="trans-list__item-title"><span><?=e($trItem["acc"])?></span></div>
                                     <div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div>
                                     <div class="trans-list__item-details">

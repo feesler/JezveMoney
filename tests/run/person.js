@@ -1,4 +1,4 @@
-import { test, setParam } from '../common.js';
+import { test, setParam, copyObject, checkObjValue } from '../common.js';
 import { PersonsView } from '../view/persons.js';
 import { PersonView } from '../view/person.js';
 import { MainView } from '../view/main.js';
@@ -195,4 +195,45 @@ export async function show(persons, val = true)
 export async function hide(persons)
 {
 	return show(persons, false);
+}
+
+
+export async function toggleSelect(persons)
+{
+	if (!Array.isArray(persons))
+		persons = [ persons ];
+
+    await test(`Toggle select items [${persons.join()}]`, async () => {
+        let origItems = App.view.getItems();
+        // Check correctness of arguments
+        let indexes = [];
+        for(let pos of persons)
+        {
+            let ind = parseInt(pos);
+            if (isNaN(ind) || ind < 0 || ind > origItems.length)
+                throw new Error(`Invalid item index ${pos}`);
+            indexes.push(ind);
+        }
+
+        let expectedItems = origItems.map((item, ind) =>
+        {
+            let res = copyObject(item);
+            if (indexes.includes(ind))
+                res.isActive = !res.isActive;
+
+            return res;
+        });
+
+	    await App.view.selectPersons(indexes);
+        let items = App.view.getItems();
+        checkObjValue(items, expectedItems);
+
+        // Click by items again to inverse selection
+        expectedItems = origItems;
+	    await App.view.selectPersons(indexes);
+        items = App.view.getItems();
+        checkObjValue(items, expectedItems);
+
+        return true;
+    });
 }

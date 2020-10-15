@@ -2,7 +2,7 @@ import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
 import { Transaction } from '../model/transaction.js';
 import { Currency } from '../model/currency.js';
-import { test, formatProps } from '../common.js';
+import { test, formatProps, copyObject, checkObjValue } from '../common.js';
 import { App } from '../app.js';
 import { AccountView } from '../view/account.js';
 
@@ -336,4 +336,45 @@ export async function exportTest(accounts)
 	content = content.trim();
 
 	await test(`Export accounts [${accounts.join()}]`, () => expectedContent == content);
+}
+
+
+export async function toggleSelect(accounts)
+{
+	if (!Array.isArray(accounts))
+		accounts = [ accounts ];
+
+    await test(`Toggle select items [${accounts.join()}]`, async () => {
+        let origItems = App.view.getItems();
+        // Check correctness of arguments
+        let indexes = [];
+        for(let pos of accounts)
+        {
+            let ind = parseInt(pos);
+            if (isNaN(ind) || ind < 0 || ind > origItems.length)
+                throw new Error(`Invalid item index ${pos}`);
+            indexes.push(ind);
+        }
+
+        let expectedItems = origItems.map((item, ind) =>
+        {
+            let res = copyObject(item);
+            if (indexes.includes(ind))
+                res.isActive = !res.isActive;
+
+            return res;
+        });
+
+	    await App.view.selectAccounts(indexes);
+        let items = App.view.getItems();
+        checkObjValue(items, expectedItems);
+
+        // Click by items again to inverse selection
+        expectedItems = origItems;
+	    await App.view.selectAccounts(indexes);
+        items = App.view.getItems();
+        checkObjValue(items, expectedItems);
+
+        return true;
+    });
 }
