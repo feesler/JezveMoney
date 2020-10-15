@@ -1114,6 +1114,7 @@ DropDown.prototype.renderSelection = function()
             return null;
 
         elem.tabIndex = -2;
+        elem.dataset.id = item.id;
         elem.addEventListener('keydown', this.keyHandler);
         this.assignFocusHandlers(elem);
 
