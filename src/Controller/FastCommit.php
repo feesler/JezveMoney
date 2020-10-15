@@ -33,14 +33,14 @@ class FastCommit extends TemplateController
         $this->css->page = "fastcommit.css";
         $this->buildCSS();
 
-        array_push($this->jsArr, ...[
-            "ajax.js",
-            "dragndrop.js",
-            "sortable.js",
+        array_push($this->jsArr,
+            "lib/ajax.js",
+            "lib/dragndrop.js",
+            "lib/sortable.js",
             "view.js",
             "importview.js",
             "convhint.js"
-        ]);
+        );
 
         $titleString = "Jezve Money | Fast Commit";
 

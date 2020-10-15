@@ -153,10 +153,10 @@ class Statistics extends TemplateController
         $titleString = "Jezve Money | Statistics";
 
         array_push($this->css->libs,
-            "iconlink.css",
-            "dropdown.css",
-            "datepicker.css",
-            "charts.css"
+            "lib/iconlink.css",
+            "lib/dropdown.css",
+            "lib/datepicker.css",
+            "lib/charts.css"
         );
         $this->css->page[] = "statistics.css";
         $this->buildCSS();
@@ -164,11 +164,11 @@ class Statistics extends TemplateController
         array_push($this->jsArr,
             "model/list.js",
             "model/currency.js",
-            "selection.js",
-            "datepicker.js",
-            "dropdown.js",
+            "lib/selection.js",
+            "lib/datepicker.js",
+            "lib/dropdown.js",
             "lib/raphael.min.js",
-            "charts.js",
+            "lib/charts.js",
             "component/component.js",
             "component/header.js",
             "component/iconlink.js",

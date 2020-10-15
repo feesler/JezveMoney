@@ -36,7 +36,7 @@ class Accounts extends TemplateController
 
         array_push($this->css->libs,
             "tiles.css",
-            "iconlink.css",
+            "lib/iconlink.css",
             "toolbar.css"
         );
         $this->buildCSS();
@@ -49,7 +49,7 @@ class Accounts extends TemplateController
             "component/toolbar.js",
             "component/iconlink.js",
             "component/confirmdialog.js",
-            "selection.js",
+            "lib/selection.js",
             "view.js",
             "accountlistview.js"
         );
@@ -96,8 +96,8 @@ class Accounts extends TemplateController
         $titleString .= $headString;
 
         array_push($this->css->libs,
-            "iconlink.css",
-            "dropdown.css",
+            "lib/iconlink.css",
+            "lib/dropdown.css",
             "tiles.css"
         );
         $this->buildCSS();
@@ -106,9 +106,9 @@ class Accounts extends TemplateController
             "model/currency.js",
             "model/account.js",
             "model/icon.js",
-            "selection.js",
-            "dropdown.js",
-            "decimalinput.js",
+            "lib/selection.js",
+            "lib/dropdown.js",
+            "component/decimalinput.js",
             "component/component.js",
             "component/header.js",
             "component/tile.js",
@@ -164,8 +164,8 @@ class Accounts extends TemplateController
         $titleString .= $headString;
 
         array_push($this->css->libs,
-            "iconlink.css",
-            "dropdown.css",
+            "lib/iconlink.css",
+            "lib/dropdown.css",
             "tiles.css"
         );
         $this->buildCSS();
@@ -175,9 +175,9 @@ class Accounts extends TemplateController
             "model/currency.js",
             "model/account.js",
             "model/icon.js",
-            "selection.js",
-            "dropdown.js",
-            "decimalinput.js",
+            "lib/selection.js",
+            "lib/dropdown.js",
+            "component/decimalinput.js",
             "component/component.js",
             "component/header.js",
             "component/tile.js",

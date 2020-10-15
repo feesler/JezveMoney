@@ -20,13 +20,13 @@ class Persons extends TemplateController
 
         array_push($this->css->libs,
             "tiles.css",
-            "iconlink.css",
+            "lib/iconlink.css",
             "toolbar.css");
         $this->buildCSS();
         array_push($this->jsArr,
             "model/list.js",
             "model/person.js",
-            "selection.js",
+            "lib/selection.js",
             "component/component.js",
             "component/header.js",
             "component/toolbar.js",
@@ -67,7 +67,7 @@ class Persons extends TemplateController
         $titleString .= $headString;
 
         array_push($this->css->libs,
-            "iconlink.css",
+            "lib/iconlink.css",
             "tiles.css");
         $this->buildCSS();
         array_push($this->jsArr,
@@ -104,7 +104,7 @@ class Persons extends TemplateController
         $titleString .= $headString;
 
         array_push($this->css->libs,
-            "iconlink.css",
+            "lib/iconlink.css",
             "tiles.css");
         $this->buildCSS();
         array_push($this->jsArr,

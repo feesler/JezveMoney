@@ -70,22 +70,22 @@ class Main extends TemplateController
 
         $titleString = "Jezve Money";
 
-        array_push($this->css->libs, ...[
-            "iconlink.css",
+        array_push($this->css->libs,
+            "lib/iconlink.css",
             "tiles.css",
             "trlist.css",
-            "charts.css"
-        ]);
+            "lib/charts.css"
+        );
         $this->buildCSS();
 
-        array_push($this->jsArr, ...[
+        array_push($this->jsArr,
             "lib/raphael.min.js",
-            "charts.js",
+            "lib/charts.js",
             "component/component.js",
             "component/header.js",
 			"view.js",
 			"mainview.js"
-        ]);
+        );
 
         include(TPL_PATH . "main.tpl");
     }

@@ -33,7 +33,7 @@ class Profile extends TemplateController
             $titleString .= " | Change password";
         }
 
-        $this->css->libs[] = "iconlink.css";
+        $this->css->libs[] = "lib/iconlink.css";
         $this->css->page[] = "user.css";
         $this->buildCSS();
         array_push($this->jsArr,

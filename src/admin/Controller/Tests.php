@@ -23,7 +23,12 @@ class Tests extends AdminController
         $this->cssAdmin[] = "tests.css";
         $this->buildCSS();
 
-        $this->jsArr = ["common.js", "ajax.js", "popup.js", "app.js"];
+        $this->jsArr = [
+            "lib/common.js",
+            "lib/ajax.js",
+            "lib/popup.js",
+            "app.js"
+        ];
         $this->jsAdmin[] = "tests/index.js";
 
         include(ADMIN_TPL_PATH . "tests.tpl");

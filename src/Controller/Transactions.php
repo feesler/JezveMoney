@@ -219,9 +219,9 @@ class Transactions extends TemplateController
 
         array_push($this->css->libs,
             "tiles.css",
-            "iconlink.css",
-            "datepicker.css",
-            "dropdown.css",
+            "lib/iconlink.css",
+            "lib/datepicker.css",
+            "lib/dropdown.css",
             "trlist.css",
             "toolbar.css"
         );
@@ -232,11 +232,11 @@ class Transactions extends TemplateController
             "model/list.js",
             "model/currency.js",
             "model/account.js",
-            "selection.js",
-            "datepicker.js",
-            "dragndrop.js",
-            "sortable.js",
-            "dropdown.js",
+            "lib/selection.js",
+            "lib/datepicker.js",
+            "lib/dragndrop.js",
+            "lib/sortable.js",
+            "lib/dropdown.js",
             "component/component.js",
             "component/header.js",
             "component/toolbar.js",
@@ -559,9 +559,9 @@ class Transactions extends TemplateController
 
         array_push($this->css->libs,
             "tiles.css",
-            "iconlink.css",
-            "dropdown.css",
-            "datepicker.css"
+            "lib/iconlink.css",
+            "lib/dropdown.css",
+            "lib/datepicker.css"
         );
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
@@ -573,10 +573,10 @@ class Transactions extends TemplateController
             "model/account.js",
             "model/person.js",
             "model/transaction.js",
-            "selection.js",
-            "datepicker.js",
-            "dropdown.js",
-            "decimalinput.js",
+            "lib/selection.js",
+            "lib/datepicker.js",
+            "lib/dropdown.js",
+            "component/decimalinput.js",
             "component/component.js",
             "component/header.js",
             "component/tile.js",
@@ -837,12 +837,12 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
-        array_push($this->css->libs, ...[
+        array_push($this->css->libs,
             "tiles.css",
-            "iconlink.css",
-            "dropdown.css",
-            "datepicker.css"
-        ]);
+            "lib/iconlink.css",
+            "lib/dropdown.css",
+            "lib/datepicker.css"
+        );
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
@@ -853,10 +853,10 @@ class Transactions extends TemplateController
             "model/account.js",
             "model/person.js",
             "model/transaction.js",
-            "selection.js",
-            "datepicker.js",
-            "dropdown.js",
-            "decimalinput.js",
+            "lib/selection.js",
+            "lib/datepicker.js",
+            "lib/dropdown.js",
+            "component/decimalinput.js",
             "component/component.js",
             "component/header.js",
             "component/tile.js",
