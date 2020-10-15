@@ -60,7 +60,7 @@
                         <div id="name-inp-block" class="validation-block view-row std_margin">
                             <label for="accname">Account name</label>
                             <div class="stretch-input std_margin">
-                                <input id="accname" name="name" type="text" value="<?=e($accInfo->name)?>">
+                                <input id="accname" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             </div>
                             <div class="invalid-feedback">Please input name of account.</div>
                         </div>
@@ -82,7 +82,7 @@
                             <label for="balance">Initial balance</label>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input class="amount-input" id="balance" name="initbalance" type="text" value="<?=e($accInfo->initbalance)?>">
+                                    <input class="amount-input" id="balance" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive"><div id="currsign"><?=e($accInfo->sign)?></div></div>
                             </div>

@@ -62,7 +62,7 @@
     <div id="name-inp-block" class="validation-block view-row">
         <label for="newname">New name</label>
         <div class="stretch-input std_margin">
-            <input id="newname" name="name" type="text" value="<?=e($profileInfo->name)?>">
+            <input id="newname" name="name" type="text" autocomplete="off" value="<?=e($profileInfo->name)?>">
         </div>
         <div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
     </div>
@@ -74,7 +74,7 @@
     <div id="old-pwd-inp-block" class="validation-block view-row">
         <label for="oldpwd">Current password</label>
         <div class="stretch-input std_margin">
-            <input id="oldpwd" name="current" type="password">
+            <input id="oldpwd" name="current" type="password" autocomplete="off">
         </div>
         <div class="invalid-feedback">Please input current password.</div>
     </div>
@@ -82,7 +82,7 @@
     <div id="new-pwd-inp-block" class="validation-block view-row">
         <label for="newpwd">New password</label>
         <div class="stretch-input std_margin">
-            <input id="newpwd" name="new" type="password">
+            <input id="newpwd" name="new" type="password" autocomplete="off">
         </div>
         <div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>
     </div>

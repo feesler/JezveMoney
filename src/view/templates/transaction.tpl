@@ -296,9 +296,9 @@
                                 <div class="stretch-input rbtn_input">
 <?php	}	?>
 <?php	if ($action == "edit") {	?>
-                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" value="<?=e($tr["src_amount"])?>">
+                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($tr["src_amount"])?>">
 <?php	} else {	?>
-                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" value="">
+                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="">
 <?php	}	?>
                                 </div>
 <?php	if ($tr["type"] != INCOME) {		?>
@@ -324,9 +324,9 @@
                                 <div class="stretch-input">
 <?php	}	?>
 <?php	if ($action == "edit") {	?>
-                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" value="<?=e($tr["dest_amount"])?>">
+                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($tr["dest_amount"])?>">
 <?php	} else {	?>
-                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" value="">
+                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="">
 <?php	}	?>
                                 </div>
 <?php	if ($tr["type"] == EXPENSE) {		?>
@@ -342,7 +342,7 @@
                             <div><label for="exchrate">Exchange rate</label></div>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input id="exchrate" class="amount-input" type="text" value="<?=e($exchValue)?>">
+                                    <input id="exchrate" class="amount-input" type="text" autocomplete="off" value="<?=e($exchValue)?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive">
                                     <div id="exchcomm"><?=e($exchSign)?></div>
@@ -355,7 +355,7 @@
                             <div><label for="resbal"><?=e($srcBalTitle)?></label></div>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input id="resbal" class="amount-input" type="text" value="<?=e($srcResBalance)?>">
+                                    <input id="resbal" class="amount-input" type="text" autocomplete="off" value="<?=e($srcResBalance)?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign"><?=e($srcAmountSign)?></div></div>
                             </div>
@@ -367,7 +367,7 @@
                             <div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input id="resbal_d" class="amount-input" type="text" value="<?=e($destResBalance)?>">
+                                    <input id="resbal_d" class="amount-input" type="text" autocomplete="off" value="<?=e($destResBalance)?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign_d"><?=e($destAmountSign)?></div></div>
                             </div>
@@ -388,7 +388,7 @@
                                 <div class="column-container std_margin">
                                     <div class="input-group">
                                         <div class="stretch-input rbtn_input">
-                                            <input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
+                                            <input id="date" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
                                         </div>
                                         <button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
                                     </div>

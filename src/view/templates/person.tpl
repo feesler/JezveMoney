@@ -29,7 +29,7 @@
                         <div id="name-inp-block" class="validation-block view-row std_margin">
                             <label for="pname">Person name</label>
                             <div class="stretch-input std_margin">
-                                <input id="pname" name="name" type="text" value="<?=e($pInfo->name)?>">
+                                <input id="pname" name="name" type="text" autocomplete="off" value="<?=e($pInfo->name)?>">
                             </div>
                             <div class="invalid-feedback">Please input name of person.</div>
                         </div>
