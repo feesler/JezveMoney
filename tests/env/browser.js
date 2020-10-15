@@ -281,8 +281,10 @@ class BrowserEnvironment extends Environment
 
 		let resp = await fetch(url, options);
 
-		let res = { status : resp.status,
-		 			headers : resp.headers }
+		let res = {
+            status : resp.status,
+            headers : resp.headers
+        };
 
 		res.body = await resp.text();
 

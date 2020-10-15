@@ -319,9 +319,11 @@ export class NodeEnvironment extends Environment
 							this.reqCookies[cookie.name] = cookie.value;
 					}
 
-					resolve({ status : res.statusCode,
-								headers : res.headers,
-								body : body });
+					resolve({
+                        status : res.statusCode,
+                        headers : res.headers,
+                        body : body
+                    });
 				});
 			});
 
