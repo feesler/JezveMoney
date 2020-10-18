@@ -1,17 +1,23 @@
+'use strict';
+
+/* global isFunction, extend, Component, IconLink */
+
 /**
  * Toolbar component constructor
- * @param {Object} props 
+ * @param {Object} props
  */
-function Toolbar()
-{
-	Toolbar.parent.constructor.apply(this, arguments);
+function Toolbar() {
+    Toolbar.parent.constructor.apply(this, arguments);
 
-    if (isFunction(this.props.onshow))
+    if (isFunction(this.props.onshow)) {
         this.onShowHandler = this.props.onshow;
-    if (isFunction(this.props.onhide))
+    }
+    if (isFunction(this.props.onhide)) {
         this.onHideHandler = this.props.onhide;
-    if (isFunction(this.props.ondelete))
+    }
+    if (isFunction(this.props.ondelete)) {
         this.onDeleteHandler = this.props.ondelete;
+    }
 }
 
 extend(Toolbar, Component);
@@ -19,31 +25,28 @@ extend(Toolbar, Component);
 /**
  * Create new Toolbar from specified element
  */
-Toolbar.create = function(props)
-{
+Toolbar.create = function (props) {
     var res;
 
-    try
-    {
+    try {
         res = new Toolbar(props);
         res.parse();
-    }
-    catch(e)
-    {
+    } catch (e) {
         res = null;
     }
 
     return res;
 };
 
-
-Toolbar.prototype.parse = function()
-{
+/**
+ * Parse DOM to obtain child elements and build state of component
+ */
+Toolbar.prototype.parse = function () {
     if (!(this.elem instanceof Element)) {
         throw new Error('Invalid element specified');
     }
 
-	this.elem.addEventListener('click', this.onClick.bind(this));
+    this.elem.addEventListener('click', this.onClick.bind(this));
 
     this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
     this.exportBtn = IconLink.fromElement({ elem: 'export_btn' });
@@ -61,41 +64,36 @@ Toolbar.prototype.parse = function()
     });
 };
 
-
 /**
  * Toolbar 'click' event handler
  */
-Toolbar.prototype.onClick = function()
-{
-	this.elem.classList.toggle('sidebar_active');
+Toolbar.prototype.onClick = function () {
+    this.elem.classList.toggle('sidebar_active');
 };
-
 
 /**
  * Show button 'click' event handler
  */
-Toolbar.prototype.onShowClick = function()
-{
-    if (isFunction(this.onShowHandler))
+Toolbar.prototype.onShowClick = function () {
+    if (isFunction(this.onShowHandler)) {
         this.onShowHandler();
+    }
 };
-
 
 /**
  * Hide button 'click' event handler
  */
-Toolbar.prototype.onHideClick = function()
-{
-    if (isFunction(this.onHideHandler))
+Toolbar.prototype.onHideClick = function () {
+    if (isFunction(this.onHideHandler)) {
         this.onHideHandler();
+    }
 };
-
 
 /**
  * Delete button 'click' event handler
  */
-Toolbar.prototype.onDeleteClick = function()
-{
-    if (isFunction(this.onDeleteHandler))
+Toolbar.prototype.onDeleteClick = function () {
+    if (isFunction(this.onDeleteHandler)) {
         this.onDeleteHandler();
+    }
 };

@@ -70,11 +70,11 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-var accounts = <?=JSON::encode($accArr)?>;
-var currencies = <?=JSON::encode($currArr)?>;
-var persons = <?=JSON::encode($persArr)?>;
-
-var view = new ImportView();
+var view = new ImportView({
+    accounts: <?=JSON::encode($accArr)?>,
+    currencies: <?=JSON::encode($currArr)?>,
+    persons: <?=JSON::encode($persArr)?>,
+});
 </script>
 </body>
 </html>

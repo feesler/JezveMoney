@@ -1,19 +1,19 @@
+'use strict';
+
+/* global extend, View */
+
 /**
  * Base Admin view
  */
-function AdminView()
-{
+function AdminView() {
     AdminView.parent.constructor.apply(this, arguments);
 }
 
-
 extend(AdminView, View);
-
 
 /**
  * Document ready event handler
  */
-View.prototype.onReady = function()
-{
+AdminView.prototype.onReady = function () {
     this.onStart();
 };

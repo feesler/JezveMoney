@@ -1,26 +1,25 @@
+'use strict';
+
+/* global extend, View, Charts */
+
 /**
  * Main view
  */
-function MainView()
-{
-	MainView.parent.constructor.apply(this, arguments);
+function MainView() {
+    MainView.parent.constructor.apply(this, arguments);
 
-	this.model = {};
+    this.model = {};
 }
 
-
 extend(MainView, View);
-
 
 /**
  * View initialization
  */
-MainView.prototype.onStart = function()
-{
-	Charts.createHistogram({
-		data : chartData,
-		container : 'chart',
-		height : 200
-	});
+MainView.prototype.onStart = function () {
+    Charts.createHistogram({
+        data: this.props.chartData,
+        container: 'chart',
+        height: 200
+    });
 };
-

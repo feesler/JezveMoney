@@ -134,12 +134,12 @@
 
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var accounts = <?=JSON::encode($accArr)?>;
-    var currency = <?=JSON::encode($currArr)?>;
-    var transArr = <?=JSON::encode($transArr)?>;
-    var filterObj = <?=JSON::encode($filterObj)?>;
-
-    var view = new TransactionListView();
+    var view = new TransactionListView({
+        accounts: <?=JSON::encode($accArr)?>,
+        currency: <?=JSON::encode($currArr)?>,
+        transArr: <?=JSON::encode($transArr)?>,
+        filterObj: <?=JSON::encode($filterObj)?>
+    });
 </script>
 </body>
 </html>

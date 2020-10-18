@@ -132,13 +132,9 @@
 <?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var currency = <?=JSON::encode($currArr)?>;
-    var accounts = <?=JSON::encode($accArr)?>;
-    var persons = <?=JSON::encode($persArr)?>;
-    var accCurr = <?=$curr_acc_id?>;
-    var chartData = <?=JSON::encode($statArr)?>;
-
-    var view = new MainView();
+    var view = new MainView({
+        chartData: <?=JSON::encode($statArr)?>
+    });
 </script>
 </body>
 </html>

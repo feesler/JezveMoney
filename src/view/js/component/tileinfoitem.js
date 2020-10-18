@@ -1,10 +1,13 @@
+'use strict';
+
+/* global isFunction, extend, Component */
+
 /**
  * TileInfoItem component constructor
- * @param {object} props 
+ * @param {Object} props
  */
-function TileInfoItem()
-{
-	TileInfoItem.parent.constructor.apply(this, arguments);
+function TileInfoItem() {
+    TileInfoItem.parent.constructor.apply(this, arguments);
 }
 
 extend(TileInfoItem, Component);
@@ -12,31 +15,28 @@ extend(TileInfoItem, Component);
 /**
  * Create new TileInfoItem from specified element
  */
-TileInfoItem.fromElement = function(props)
-{
+TileInfoItem.fromElement = function (props) {
     var res;
 
-    try
-    {
+    try {
         res = new TileInfoItem(props);
         res.parse();
-    }
-    catch(e)
-    {
+    } catch (e) {
         res = null;
     }
 
     return res;
 };
 
-
-TileInfoItem.prototype.parse = function()
-{
+/**
+ * Parse DOM to obtain child elements and build state of component
+ */
+TileInfoItem.prototype.parse = function () {
     if (!(this.elem instanceof Element)) {
         throw new Error('Invalid element specified');
     }
 
-	this.buttonElem = this.elem.querySelector('button');
+    this.buttonElem = this.elem.querySelector('button');
     if (this.buttonElem && isFunction(this.props.onclick)) {
         this.buttonElem.addEventListener('click', this.props.onclick);
     }
@@ -47,16 +47,19 @@ TileInfoItem.prototype.parse = function()
     }
 };
 
-
-TileInfoItem.prototype.setTitle = function(title)
-{
-    if (typeof title !== 'string')
+/**
+ * Set title of component
+ * @param {string|null} title - title to set
+ */
+TileInfoItem.prototype.setTitle = function (title) {
+    if (typeof title !== 'string') {
         throw new Error('Invalid title specified');
+    }
 
-    if (this.title == title) {
+    if (this.title === title) {
         return;
     }
 
     this.title = title;
-	this.titleElem.textContent = this.title;
+    this.titleElem.textContent = this.title;
 };
