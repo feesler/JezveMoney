@@ -1,155 +1,44 @@
-// Sortable drag zone
-function SortableDragZone(elem, params)
-{
-    SortableDragZone.parent.constructor.apply(this, arguments);
+'use strict';
 
-    this._sortTarget = null;
-}
-
-extend(SortableDragZone, DragZone);
-
-SortableDragZone.prototype._makeAvatar = function()
-{
-    if (this._params.table)
-        return new SortableTableDragAvatar(this, this._elem);
-    else
-        return new SortableDragAvatar(this, this._elem);
-}
-
-
-// Drag start handler
-// Return avatar object or false
-SortableDragZone.prototype.onDragStart = function(downX, downY, event)
-{
-    var avatar = SortableDragZone.parent.onDragStart.apply(this, arguments);
-
-    if (!avatar)
-        return false;
-
-    if (this._params && isFunction(this._params.ondragstart))
-        this._params.ondragstart(this._elem);
-
-    return avatar;
-};
-
-
-// Find specific drag zone element
-SortableDragZone.prototype.findDragZoneItem = function(target)
-{
-    if (!this._params || !this._params.selector)
-        return null;
-
-    var el = target;
-
-    while(el && el != this._elem)
-    {
-        if (isFunction(el.matches) && el.matches(this._params.selector))
-            return el;
-        el = el.parentNode;
-    }
-
-    return null;
-};
-
-
-// Check specified targer element is valid
-SortableDragZone.prototype.isValidDragHandle = function(target)
-{
-    if (!target)
-        return false;
-
-    // allow to drag using whole drag zone in case no handles is set
-    if (!this._params || !this._params.onlyRootHandle)
-        return SortableDragZone.parent.isValidDragHandle.apply(this, arguments);
-
-    var item = this.findDragZoneItem(target);
-
-    return this._params.onlyRootHandle && target == item;
-}
-
-
-// Return group of sortable
-SortableDragZone.prototype.getGroup = function()
-{
-    if (this._params && this._params.group)
-        return this._params.group;
-    return null;
-}
-
-
-// Return class for placeholder element
-SortableDragZone.prototype.getPlaceholder = function()
-{
-    if (this._params && this._params.placeholderClass)
-        return this._params.placeholderClass;
-    return null;
-}
-
-
-// Return class for item element
-SortableDragZone.prototype.getItemSelector = function()
-{
-    if (this._params && this._params.selector)
-        return this._params.selector;
-    return null;
-}
-
-
-// Return class for drag avatar element
-SortableDragZone.prototype.getDragClass = function()
-{
-    if (this._params && this._params.dragClass)
-    {
-        return (this._params.dragClass === true) ? 'drag' : this._params.dragClass;
-    }
-
-    return null;
-}
-
-
-// Insert event handler
-SortableDragZone.prototype.onInsertAt = function(srcElem, elem)
-{
-    if (this._params && isFunction(this._params.oninsertat))
-        this._params.oninsertat(srcElem, elem);
-}
-
+/* global isFunction, ge, re, extend, insertBefore, insertAfter, comparePosition, getOffset, px */
+/* global DragZone, DropTarget, DragAvatar */
+/* exported Sortable, SortableDragZone, SortableTableDragAvatar, SortableDragAvatar */
+/* eslint-disable no-bitwise, no-unused-vars */
 
 // Sortable drag avatar
-function SortableDragAvatar(dragZone, dragElem)
-{
+function SortableDragAvatar(dragZone, dragElem) {
     SortableDragAvatar.parent.constructor.apply(this, arguments);
 }
 
 extend(SortableDragAvatar, DragAvatar);
 
+SortableDragAvatar.prototype.initFromEvent = function (downX, downY, e) {
+    var elem;
+    var offset;
+    var quirks;
 
-SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
-{
-// Overwrite drag zone here to find exact item to manipulate
-    this._dragZoneElem = this._dragZone.findDragZoneItem(e.target);
-    if (!this._dragZoneElem)
+    // Overwrite drag zone here to find exact item to manipulate
+    this.dragZoneElem = this.dragZone.findDragZoneItem(e.target);
+    if (!this.dragZoneElem) {
         return false;
+    }
 
-    this._initialPos = this.getSortPosition();
-    var elem = this._elem = this._dragZoneElem.cloneNode(true);
+    this.initialPos = this.getSortPosition();
+    elem = this.dragZoneElem.cloneNode(true);
+    this.elem = elem;
 
-    var offset = getOffset(this._dragZoneElem);
-    this._shiftX = downX - offset.left;
-    this._shiftY = downY - offset.top;
+    offset = getOffset(this.dragZoneElem);
+    this.shiftX = downX - offset.left;
+    this.shiftY = downY - offset.top;
 
-    this._dragZoneElem.classList.add(this._dragZone.getPlaceholder());
+    this.dragZoneElem.classList.add(this.dragZone.getPlaceholder());
 
-    if (this._dragZone._params.copyWidth)
-    {
-        var quirks = !elem.style.getPropertyValue;		// IE < 9
-        if (quirks)
-        {
-            elem.style.cssText += ';width: ' + px(this._dragZoneElem.offsetWidth) + '!important';
-        }
-        else
-        {
-            elem.style.setProperty('width', px(this._dragZoneElem.offsetWidth), 'important');
+    if (this.dragZone.params.copyWidth) {
+        quirks = !elem.style.getPropertyValue; // IE < 9
+        if (quirks) {
+            elem.style.cssText += ';width: ' + px(this.dragZoneElem.offsetWidth) + '!important';
+        } else {
+            elem.style.setProperty('width', px(this.dragZoneElem.offsetWidth), 'important');
         }
     }
 
@@ -157,96 +46,83 @@ SortableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
     elem.style.zIndex = 9999;
     elem.style.position = 'absolute';
 
-    elem.classList.add(this._dragZone.getDragClass());
+    elem.classList.add(this.dragZone.getDragClass());
 
     return true;
-}
-
-
-SortableDragAvatar.prototype._destroy = function()
-{
-    re(this._elem);
-
-    this._dragZoneElem.classList.remove(this._dragZone.getPlaceholder());
 };
 
+SortableDragAvatar.prototype.destroy = function () {
+    re(this.elem);
 
-SortableDragAvatar.prototype.onDragCancel = function()
-{
-    this._destroy();
+    this.dragZoneElem.classList.remove(this.dragZone.getPlaceholder());
 };
 
-
-SortableDragAvatar.prototype.onDragEnd = function()
-{
-    this._destroy();
+SortableDragAvatar.prototype.onDragCancel = function () {
+    this.destroy();
 };
 
-
-SortableDragAvatar.prototype.saveSortTarget = function(dropTarget)
-{
-    this._sortTarget = dropTarget;
+SortableDragAvatar.prototype.onDragEnd = function () {
+    this.destroy();
 };
 
+SortableDragAvatar.prototype.saveSortTarget = function (dropTarget) {
+    this.sortTarget = dropTarget;
+};
 
-SortableDragAvatar.prototype.getSortPosition = function()
-{
+SortableDragAvatar.prototype.getSortPosition = function () {
     return {
-        prev : this._dragZoneElem.previousElementSibling,
-        next : this._dragZoneElem.nextElementSibling
+        prev: this.dragZoneElem.previousElementSibling,
+        next: this.dragZoneElem.nextElementSibling
     };
 };
-
 
 // Return drag information object for DropTarget
-SortableDragAvatar.prototype.getDragInfo = function(event)
-{
+SortableDragAvatar.prototype.getDragInfo = function (event) {
     return {
-        elem : this._elem,
-        dragZoneElem : this._dragZoneElem,
-        dragZone : this._dragZone,
-        mouseShift : { x : this._shiftX, y : this._shiftY },
-        sortTarget : this._sortTarget,
-        initialPos : this._initialPos
+        elem: this.elem,
+        dragZoneElem: this.dragZoneElem,
+        dragZone: this.dragZone,
+        mouseShift: { x: this.shiftX, y: this.shiftY },
+        sortTarget: this.sortTarget,
+        initialPos: this.initialPos
     };
 };
 
-
 // Sortable table drag avatar
-function SortableTableDragAvatar(dragZone, dragElem)
-{
+function SortableTableDragAvatar(dragZone, dragElem) {
     SortableTableDragAvatar.parent.constructor.apply(this, arguments);
 }
 
 extend(SortableTableDragAvatar, SortableDragAvatar);
 
-
-SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
-{
+SortableTableDragAvatar.prototype.initFromEvent = function (downX, downY, e) {
     var elem;
+    var offset;
+    var tbl;
+    var srcCell;
+    var destCell;
+    var tmp;
 
-    this._dragZoneElem = this._dragZone.findDragZoneItem(e.target);
-    if (!this._dragZoneElem)
+    this.dragZoneElem = this.dragZone.findDragZoneItem(e.target);
+    if (!this.dragZoneElem) {
         return false;
+    }
 
-    this._initialPos = this.getSortPosition();
-    var tbl = this._dragZoneElem.closest('table').cloneNode(false);
-    tbl.appendChild(this._dragZoneElem.cloneNode(true));
+    this.initialPos = this.getSortPosition();
+    tbl = this.dragZoneElem.closest('table').cloneNode(false);
+    tbl.appendChild(this.dragZoneElem.cloneNode(true));
 
-    elem = this._elem = tbl;
+    elem = tbl;
+    this.elem = elem;
 
-    var offset = getOffset(this._dragZoneElem);
-    this._shiftX = downX - offset.left;
-    this._shiftY = downY - offset.top;
+    offset = getOffset(this.dragZoneElem);
+    this.shiftX = downX - offset.left;
+    this.shiftY = downY - offset.top;
 
-    if (this._dragZone._params.copyWidth)
-    {
-        var srcCell, destCell, tmp;
-
-        srcCell = this._dragZoneElem.querySelector('td');
+    if (this.dragZone.params.copyWidth) {
+        srcCell = this.dragZoneElem.querySelector('td');
         destCell = tbl.querySelector('td');
-        while(srcCell && destCell)
-        {
+        while (srcCell && destCell) {
             tmp = destCell.firstElementChild;
 
             tmp.style.width = px(srcCell.offsetWidth);
@@ -255,183 +131,296 @@ SortableTableDragAvatar.prototype.initFromEvent = function(downX, downY, e)
             destCell = destCell.nextElementSibling;
         }
 
-        elem.style.width = px(this._dragZoneElem.offsetWidth);
+        elem.style.width = px(this.dragZoneElem.offsetWidth);
     }
 
-    this._dragZoneElem.classList.add(this._dragZone.getPlaceholder());
+    this.dragZoneElem.classList.add(this.dragZone.getPlaceholder());
 
     document.body.appendChild(elem);
     elem.style.zIndex = 9999;
     elem.style.position = 'absolute';
 
     return true;
+};
+
+// Sortable drag zone
+function SortableDragZone(elem, params) {
+    SortableDragZone.parent.constructor.apply(this, arguments);
+
+    this.sortTarget = null;
 }
 
+extend(SortableDragZone, DragZone);
+
+SortableDragZone.prototype.makeAvatar = function () {
+    if (this.params.table) {
+        return new SortableTableDragAvatar(this, this.elem);
+    }
+
+    return new SortableDragAvatar(this, this.elem);
+};
+
+// Drag start handler
+// Return avatar object or false
+SortableDragZone.prototype.onDragStart = function (downX, downY, event) {
+    var avatar = SortableDragZone.parent.onDragStart.apply(this, arguments);
+
+    if (!avatar) {
+        return false;
+    }
+
+    if (this.params && isFunction(this.params.ondragstart)) {
+        this.params.ondragstart(this.elem);
+    }
+
+    return avatar;
+};
+
+// Find specific drag zone element
+SortableDragZone.prototype.findDragZoneItem = function (target) {
+    var el;
+
+    if (!this.params || !this.params.selector) {
+        return null;
+    }
+
+    el = target;
+    while (el && el !== this.elem) {
+        if (isFunction(el.matches) && el.matches(this.params.selector)) {
+            return el;
+        }
+        el = el.parentNode;
+    }
+
+    return null;
+};
+
+// Check specified targer element is valid
+SortableDragZone.prototype.isValidDragHandle = function (target) {
+    var item;
+
+    if (!target) {
+        return false;
+    }
+
+    // allow to drag using whole drag zone in case no handles is set
+    if (!this.params || !this.params.onlyRootHandle) {
+        return SortableDragZone.parent.isValidDragHandle.apply(this, arguments);
+    }
+
+    item = this.findDragZoneItem(target);
+
+    return this.params.onlyRootHandle && target === item;
+};
+
+// Return group of sortable
+SortableDragZone.prototype.getGroup = function () {
+    if (this.params && this.params.group) {
+        return this.params.group;
+    }
+
+    return null;
+};
+
+// Return class for placeholder element
+SortableDragZone.prototype.getPlaceholder = function () {
+    if (this.params && this.params.placeholderClass) {
+        return this.params.placeholderClass;
+    }
+
+    return null;
+};
+
+// Return class for item element
+SortableDragZone.prototype.getItemSelector = function () {
+    if (this.params && this.params.selector) {
+        return this.params.selector;
+    }
+
+    return null;
+};
+
+// Return class for drag avatar element
+SortableDragZone.prototype.getDragClass = function () {
+    if (this.params && this.params.dragClass) {
+        return (this.params.dragClass === true) ? 'drag' : this.params.dragClass;
+    }
+
+    return null;
+};
+
+// Insert event handler
+SortableDragZone.prototype.onInsertAt = function (srcElem, elem) {
+    if (this.params && isFunction(this.params.oninsertat)) {
+        this.params.oninsertat(srcElem, elem);
+    }
+};
 
 // Sortable drop target
-function SortableDropTarget(elem)
-{
+function SortableDropTarget(elem) {
     SortableDropTarget.parent.constructor.apply(this, arguments);
 }
 
 extend(SortableDropTarget, DropTarget);
 
-
-SortableDropTarget.prototype._getTargetElem = function(avatar, event)
-{
+SortableDropTarget.prototype.getTargetElem = function (avatar, event) {
     var el = avatar.getTargetElem();
     var dragInfo = avatar.getDragInfo();
     var itemSelector = dragInfo.dragZone.getItemSelector();
     var phItemClass = dragInfo.dragZone.getPlaceholder();
     var root = dragInfo.dragZone.getElement();
 
-    while(el && el != root)
-    {
-        if ((isFunction(el.matches) && el.matches(itemSelector)) || (el.classList && el.classList.contains(phItemClass)))
+    while (el && el !== root) {
+        if ((isFunction(el.matches) && el.matches(itemSelector))
+            || (el.classList && el.classList.contains(phItemClass))) {
             return el;
+        }
+
         el = el.parentNode;
     }
 
     return null;
-}
+};
 
+SortableDropTarget.prototype.onDragMove = function (avatar, event) {
+    var newTargetElem;
+    var dragInfo;
+    var nodeCmp;
+    var pos;
 
-SortableDropTarget.prototype.onDragMove = function(avatar, event)
-{
-    var newTargetElem = this._getTargetElem(avatar, event);
-    if (this._targetElem == newTargetElem)
+    newTargetElem = this.getTargetElem(avatar, event);
+    if (this.targetElem === newTargetElem) {
         return;
+    }
 
-    this._hideHoverIndication(avatar);
-    this._targetElem = newTargetElem;
-    this._showHoverIndication(avatar);
+    this.hideHoverIndication(avatar);
+    this.targetElem = newTargetElem;
+    this.showHoverIndication(avatar);
 
-    var dragInfo = avatar.getDragInfo();
-
-    if (!this._targetElem || !(avatar instanceof SortableDragAvatar) || (dragInfo.dragZone.getGroup() != this._params.group))
+    dragInfo = avatar.getDragInfo();
+    if (
+        !this.targetElem
+        || !(avatar instanceof SortableDragAvatar)
+        || (dragInfo.dragZone.getGroup() !== this.params.group)
+    ) {
         return;
+    }
 
-    var nodeCmp = comparePosition(this._targetElem, dragInfo.dragZoneElem);
-    if (!nodeCmp)
+    nodeCmp = comparePosition(this.targetElem, dragInfo.dragZoneElem);
+    if (!nodeCmp) {
         return;
+    }
 
     // check drop target is already a placeholder
-    if (this._targetElem.classList.contains(dragInfo.dragZone.getPlaceholder()))
-    {
-        var pos = avatar.getSortPosition();
-
+    if (this.targetElem.classList.contains(dragInfo.dragZone.getPlaceholder())) {
+        pos = avatar.getSortPosition();
         // swap drag zone with drop target
-        if (nodeCmp & 2)
-            insertAfter(dragInfo.dragZoneElem, this._targetElem);
-        else if (nodeCmp & 4)
-            insertBefore(dragInfo.dragZoneElem, this._targetElem);
-        if (this._targetElem != pos.prev && this._targetElem != pos.next)
-        {
-            if (pos.prev)
-                insertAfter(this._targetElem, pos.prev);
-            else
-                insertBefore(this._targetElem, pos.next);
+        if (nodeCmp & 2) {
+            insertAfter(dragInfo.dragZoneElem, this.targetElem);
+        } else if (nodeCmp & 4) {
+            insertBefore(dragInfo.dragZoneElem, this.targetElem);
         }
-    }
-    else
-    {
-        // check moving between two different zones
-        if (dragInfo.dragZoneElem.parentNode != this._targetElem.parentNode)
-        {
-            insertBefore(dragInfo.dragZoneElem, this._targetElem);
+
+        if (this.targetElem !== pos.prev && this.targetElem !== pos.next) {
+            if (pos.prev) {
+                insertAfter(this.targetElem, pos.prev);
+            } else {
+                insertBefore(this.targetElem, pos.next);
+            }
         }
-        else
-        {
-            if (nodeCmp & 2)			// drag zone element is after current drop target
-                insertAfter(dragInfo.dragZoneElem, this._targetElem);
-            else if (nodeCmp & 4)		// drag zone element is before current drop target
-                insertBefore(dragInfo.dragZoneElem, this._targetElem);
-        }
+    } else if (dragInfo.dragZoneElem.parentNode !== this.targetElem.parentNode) {
+        insertBefore(dragInfo.dragZoneElem, this.targetElem);
+    } else if (nodeCmp & 2) {
+        /* drag zone element is after current drop target */
+        insertAfter(dragInfo.dragZoneElem, this.targetElem);
+    } else if (nodeCmp & 4) {
+        /* drag zone element is before current drop target */
+        insertBefore(dragInfo.dragZoneElem, this.targetElem);
     }
 
-    avatar.saveSortTarget(this._targetElem);
-}
+    avatar.saveSortTarget(this.targetElem);
+};
 
+SortableDropTarget.prototype.onDragEnd = function (avatar, e) {
+    var avatarInfo;
+    var newPos;
 
-SortableDropTarget.prototype.onDragEnd = function(avatar, e)
-{
-    if (!this._targetElem || !(avatar instanceof SortableDragAvatar))
-    {
+    if (!this.targetElem || !(avatar instanceof SortableDragAvatar)) {
         avatar.onDragCancel();
         return;
     }
 
-    this._hideHoverIndication();
+    this.hideHoverIndication();
 
-    var avatarInfo = avatar.getDragInfo(e);
+    avatarInfo = avatar.getDragInfo(e);
 
     avatar.onDragEnd();
 
-    if (avatarInfo.sortTarget)
-    {
-        var newPos = avatar.getSortPosition();
-
-        if (avatarInfo.initialPos.prev != newPos.prev &&
-            avatarInfo.initialPos.next != newPos.next)
-        {
+    if (avatarInfo.sortTarget) {
+        newPos = avatar.getSortPosition();
+        if (avatarInfo.initialPos.prev !== newPos.prev
+            && avatarInfo.initialPos.next !== newPos.next) {
             avatarInfo.dragZone.onInsertAt(avatarInfo.dragZoneElem, avatarInfo.sortTarget);
         }
     }
 
-    this._targetElem = null;
+    this.targetElem = null;
 };
 
-
-// Sortable widget constructor
-function Sortable(params)
-{
+/**
+ * Sortable widget constructor
+ * @param {Object} params
+ * @param {String} params.container - identifier or Element of sortable container
+ * @param {String} params.group - sortable group udentifier
+ * @param {Function} params.ondragstart - drag start event handler
+ * @param {Function} params.oninsertat - drop item on new place event handler
+ * @param {boolean} params.table - enable table sort behavior
+ * @param {boolean} params.copyWidth - enable copying width of original item to drag avatar
+ * @param {String} params.selector - CSS selector for sortable items
+ * @param {String} params.placeholderClass - CSS class for placeholder item
+ * @param {String} params.dragClass - CSS class for drag avatar
+ * @param {boolean} params.onlyRootHandle - enable drag start only on root of item
+ * @param {String|String[]} params.handles - CSS selectors for available drag start handles
+ */
+function Sortable(params) {
+    var props = (typeof params !== 'undefined') ? params : {};
     var containerElem = null;
     var dragZoneParam = {};
     var dragZoneDefaults = {
-            group : null,
-            ondragstart : null,
-            oninsertat : null,
-            table : false,
-            copyWidth : false,
-            selector : null,
-            placeholderClass : false,
-            dragClass : 'drag',
-            onlyRootHandle : false,
-            handles : null
-        };
+        group: null,
+        ondragstart: null,
+        oninsertat: null,
+        table: false,
+        copyWidth: false,
+        selector: null,
+        placeholderClass: false,
+        dragClass: 'drag',
+        onlyRootHandle: false,
+        handles: null
+    };
 
     var dropTargetParam = {};
     var dropTargetDefaults = {
-            group : null
-        };
+        group: null
+    };
 
+    Object.keys(dragZoneDefaults).forEach(function (key) {
+        dragZoneParam[key] = (key in props)
+            ? props[key]
+            : dragZoneDefaults[key];
+    });
 
-    function create(params)
-    {
-        params = params || {};
+    Object.keys(dropTargetDefaults).forEach(function (key) {
+        dropTargetParam[key] = (key in props)
+            ? props[key]
+            : dropTargetDefaults[key];
+    });
 
-        var prop;
-        for(prop in dragZoneDefaults)
-        {
-            dragZoneParam[prop] = (params.hasOwnProperty(prop))
-                                    ? params[prop]
-                                    : dragZoneDefaults[prop];
-        }
-
-        for(prop in dropTargetDefaults)
-        {
-            dropTargetParam[prop] = (params.hasOwnProperty(prop))
-                                    ? params[prop]
-                                    : dropTargetDefaults[prop];
-        }
-
-        containerElem = (typeof params.container === 'string') ? ge(params.container) : params.container;
-        if (!containerElem)
-            return;
-
-        new SortableDragZone(containerElem, dragZoneParam);
-        new SortableDropTarget(containerElem, dropTargetParam);
+    containerElem = (typeof props.container === 'string') ? ge(props.container) : props.container;
+    if (!containerElem) {
+        return;
     }
 
-    create(params);
+    this.dragZone = new SortableDragZone(containerElem, dragZoneParam);
+    this.dropTarget = new SortableDropTarget(containerElem, dropTargetParam);
 }

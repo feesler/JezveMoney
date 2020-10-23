@@ -1,117 +1,130 @@
-// Return DOM element by id
+'use strict';
+
+/* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds */
+/* exported ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
+/* exported getCaretPos, getCursorPos, checkDate, selectedText, selectedValue */
+/* exported selectByValue, insertBefore, insertAfter, prependChild, removeChilds */
+/* exported fixEvent, onEmptyClick, setEmptyClick, getOffset, getOffsetRect, getOffsetSum */
+/* exported comparePosition, getPageScroll, isEmpty, childCount, px, urlJoin, head */
+/* exported transform, getRealDPI, onReady, extend */
+/* eslint no-restricted-globals: "off" */
+/* eslint no-bitwise: "off" */
+
+/** Return DOM element by id */
 var ge = document.getElementById.bind(document);
 
-
-// Check object is date
-function isDate(obj)
-{
-    return (obj instanceof Date && !isNaN(obj.valueOf()));
+/** Check object is date */
+function isDate(obj) {
+    return obj instanceof Date && !isNaN(obj.valueOf());
 }
 
-
-// Check object is function
-function isFunction(obj)
-{
+/** Check object is function */
+function isFunction(obj) {
     var getType = {};
-    return obj && (getType.toString.call(obj) === '[object Function]' || typeof obj === 'function');
+    return obj
+        && (getType.toString.call(obj) === '[object Function]'
+            || typeof obj === 'function');
 }
 
-
-// Check object is {}
-function isObject(o)
-{
-    return null != o && typeof o === 'object' && Object.prototype.toString.call(o) === '[object Object]';
+/** Check parameter is object */
+function isObject(o) {
+    return 0 !== null
+        && typeof o === 'object'
+        && Object.prototype.toString.call(o) === '[object Object]';
 }
 
+/** Return deep copy of object */
+function copyObject(item) {
+    var res;
 
-// Return deep copy of object
-function copyObject(item)
-{
-    if (Array.isArray(item))
-    {
+    if (Array.isArray(item)) {
         return item.map(copyObject);
     }
-    else if (isObject(item))
-    {
-        var res = {};
-        for(var key in item)
-        {
+
+    if (isObject(item)) {
+        res = {};
+
+        Object.keys(item).forEach(function (key) {
             res[key] = copyObject(item[key]);
-        }
+        });
 
         return res;
     }
-    else
-    {
-        return item;
-    }
+
+    return item;
 }
 
-
-// Set parameters of object
-function setParam(obj, params)
-{
-    var par, val;
-
-    if (!obj || !params || typeof params !== 'object')
+/* eslint-disable no-param-reassign */
+/**
+ * Assign properties from second object to first
+ * @param {*} obj - object to assign properties to
+ * @param {*} params - object to obtain properties from
+ */
+function setParam(obj, params) {
+    if (!obj || !params || typeof params !== 'object') {
         return;
-
-    for(par in params)
-    {
-        val = params[par];
-        if (Array.isArray(val))
-        {
-            obj[par] = val.map(function(item){ return item; });
-        }
-        else if (isObject(val))
-        {
-            if (obj[par] == null || obj[par] === undefined)
-                obj[par] = {};
-
-            setParam(obj[par], val);
-        }
-        else
-        {
-            try
-            {
-                obj[par] = val;
-            }
-            catch(e)
-            {
-                if (obj.setAttribute)
-                    obj.setAttribute(par, val);
-            }
-        }
     }
+
+    Object.keys(params).forEach(function (key) {
+        var val = params[key];
+        if (Array.isArray(val)) {
+            obj[key] = val.map(function (item) { return item; });
+        } else if (isObject(val)) {
+            if (obj[key] === null || typeof obj[key] === 'undefined') {
+                obj[key] = {};
+            }
+
+            setParam(obj[key], val);
+        } else {
+            try {
+                obj[key] = val;
+            } catch (e) {
+                if (obj.setAttribute) {
+                    obj.setAttribute(key, val);
+                }
+            }
+        }
+    });
 }
+/* eslint-enable no-param-reassign */
 
+/**
+ * Append child to specified element
+ * @param {Element} elem - element to append child to
+ * @param {Element[]} childs - element or array of elements to append
+ */
+function addChilds(elem, childs) {
+    var ch;
 
-// Append elements from array to object
-function addChilds(obj, childs)
-{
-    if (!obj || !childs)
+    if (!elem || !childs) {
         return;
+    }
 
-    if (!Array.isArray(childs))
-        childs = [ childs ];
-
-    childs.forEach(function(child)
-    {
-        if (child)
-            obj.appendChild(child);
+    ch = Array.isArray(childs) ? childs : [childs];
+    ch.forEach(function (child) {
+        if (child) {
+            elem.appendChild(child);
+        }
     });
 }
 
+/**
+ * Create specified DOM element and set parameters if specified
+ * @param {string} tagName - tag name of element to create
+ * @param {Object} params - properties to set for created element
+ * @param {Element[]} childs - element or array of elements to append to created element
+ */
+function ce(tagName, params, childs) {
+    var elem;
 
-// Create specified DOM element and set parameters if specified
-function ce(tagName, params, childs)
-{
-    if (typeof tagName !== 'string')
+    if (typeof tagName !== 'string') {
         return null;
+    }
 
-    var elem = document.createElement(tagName);
-    if (!elem)
+    elem = document.createElement(tagName);
+    if (!elem) {
         return null;
+    }
 
     setParam(elem, params);
     addChilds(elem, childs);
@@ -119,17 +132,25 @@ function ce(tagName, params, childs)
     return elem;
 }
 
+/**
+ * Create new SVG namespace element, set attributes
+ * @param {string} tagName
+ * @param {Object} attributues
+ * @param {Element[]} children
+ */
+function svg(tagName, attributues, children) {
+    var elem;
 
-function svg(tagName, attributues, children)
-{
-    if (typeof tagName !== 'string')
+    if (typeof tagName !== 'string') {
         return null;
+    }
 
-    var elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+    elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
 
-    for(var attr in attributues)
-    {
-        elem.setAttribute(attr, attributues[attr]);
+    if (isObject(attributues)) {
+        Object.keys(attributues).forEach(function (attr) {
+            elem.setAttribute(attr, attributues[attr]);
+        });
     }
 
     addChilds(elem, children);
@@ -137,54 +158,69 @@ function svg(tagName, attributues, children)
     return elem;
 }
 
-
-// Remove element from DOM and return
-function re(elem)
-{
+/** Remove specified element from DOM and return it */
+function re(elem) {
     var removedElem = (typeof elem === 'string') ? ge(elem) : elem;
 
-    if (removedElem && removedElem.parentNode)
+    if (removedElem && removedElem.parentNode) {
         return removedElem.parentNode.removeChild(removedElem);
+    }
 
     return null;
 }
 
-
-// Check is specified string is number
-function isNum(val)
-{
-    if (val == 0)
+/** Check is specified string is number */
+function isNum(val) {
+    var fval = parseFloat(val);
+    if (fval === 0) {
         return true;
-    else
-        return res = (val / val) ? true : false;
+    }
+
+    return !!(val / val);
 }
 
+/** Check parameter is integer */
+function isInt(x) {
+    var y = parseInt(x, 10);
 
-// Check parameter is integer
-function isInt(x)
-{
-    var y = parseInt(x);
-
-    if (isNaN(y))
+    if (isNaN(y)) {
         return false;
+    }
 
-    return x == y && x.toString() == y.toString();
+    return x === y && x.toString() === y.toString();
 }
 
+/** Return current computed style of element */
+function computedStyle(elem) {
+    if (!elem) {
+        return null;
+    }
 
-// Return object visibility
-function isVisible(elem, recursive)
-{
+    if (window.getComputedStyle) {
+        return getComputedStyle(elem, '');
+    }
+
+    return elem.currentStyle;
+}
+
+/**
+ * Return visibility of specified element
+ * @param {Element|string} elem - element to check visibility of
+ * @param {boolean} recursive - if set to true will check visibility of all parent nodes
+ */
+function isVisible(elem, recursive) {
+    var cstyle;
     var robj = (typeof elem === 'string') ? ge(elem) : elem;
 
-    while(robj && robj.nodeType && robj.nodeType != 9)
-    {
-        var cstyle = computedStyle(robj);
-        if (!cstyle || cstyle.display == 'none' || cstyle.visibility == 'hidden')
+    while (robj && robj.nodeType && robj.nodeType !== 9) {
+        cstyle = computedStyle(robj);
+        if (!cstyle || cstyle.display === 'none' || cstyle.visibility === 'hidden') {
             return false;
+        }
 
-        if (recursive !== true)
+        if (recursive !== true) {
             break;
+        }
 
         robj = robj.parentNode;
     }
@@ -192,100 +228,57 @@ function isVisible(elem, recursive)
     return !!robj;
 }
 
-
-// Show/hide specified element
-function show(elem, val)
-{
+/**
+ * Show/hide specified element
+ * @param {Element|string} elem - element or id to show/hide
+ * @param {*} val - if set to true then element will be shown, hidden otherwise
+ */
+function show(elem, val) {
     var domElem = (typeof elem === 'string') ? ge(elem) : elem;
-    if (!domElem || !domElem.classList)
+    if (!domElem || !domElem.classList) {
         return;
+    }
 
-    if (!!val)
+    if (val) {
         domElem.classList.remove('hidden');
-    else
+    } else {
         domElem.classList.add('hidden');
+    }
 }
 
-
-// Enable or disable specified object
-function enable(elem, val)
-{
+/**
+ * Enable or disable specified element
+ * @param {Element|string} elem - element or id to show/hide
+ * @param {boolean} val - if set to true then element will be enabled, disable otherwise
+ */
+function enable(elem, val) {
     var robj = (typeof elem === 'string') ? ge(elem) : elem;
 
-    if (robj)
+    if (robj) {
         robj.disabled = (!val);
-}
-
-
-// Return current computed style of element
-function computedStyle(obj)
-{
-    if (!obj)
-        return null;
-
-    if (window.getComputedStyle)
-        return getComputedStyle(obj, '');
-    else
-        return obj.currentStyle;
-}
-
-
-// Get key code from event
-function getCode(e)
-{
-    var KeyIdentifierMap =
-    {
-        End		: 35,
-        Home		: 36,
-        Left		: 37,
-        Right		: 39,
-        'U+00007F'	: 46		// Delete
-    };
-
-    var iCode;
-
-    if (!e)
-        e = event;
-
-    iCode = (e.keyCode || e.charCode);
-    if (!iCode && e.keyIdentifier && (e.keyIdentifier in KeyIdentifierMap))
-            iCode = KeyIdentifierMap[e.keyIdentifier];
-
-    return iCode;
-}
-
-
-// Check specified key code is digit or allowed keys
-function isDigit(iCode)
-{
-    return ((iCode >= 48 && iCode <= 57)		// Numbers
-        || (iCode >= 35 && iCode <= 40)		// Arrows, Home, End
-        || iCode == 44				// Delete
-        || iCode == 8				// Backspace
-        || iCode == 46				// Delete
-        || iCode == 9				// Tab
-        );
-}
-
-
-// Return caret position in specified input control
-function getCaretPos(obj)
-{
-    if (!obj)
-        return 0;
-
-    obj.focus();
-
-    if (obj.selectionStart)			// Gecko
-    {
-        return obj.selectionStart;
     }
-    else if (document.selection)		// IE
-    {
-        var sel = document.selection.createRange();
-        var clone = sel.duplicate();
+}
+
+/** Return caret position in specified input control */
+function getCaretPos(elem) {
+    var sel;
+    var clone;
+
+    if (!elem) {
+        return 0;
+    }
+
+    elem.focus();
+
+    if (elem.selectionStart) {
+        return elem.selectionStart;
+    }
+    /* IE */
+    if (document.selection) {
+        sel = document.selection.createRange();
+        clone = sel.duplicate();
         sel.collapse(true);
-        clone.moveToElementText(obj);
+        clone.moveToElementText(elem);
         clone.setEndPoint('EndToEnd', sel);
         return clone.text.length;
     }
@@ -293,258 +286,298 @@ function getCaretPos(obj)
     return 0;
 }
 
+/**
+ * Return curson/selection position for specified input element
+ * @param {Element} input
+ */
+function getCursorPos(input) {
+    var sel;
+    var rng;
+    var len;
+    var pos;
 
-function getCursorPos(input)
-{
-    if ('selectionStart' in input && document.activeElement == input)
-    {
+    if ('selectionStart' in input && document.activeElement === input) {
         return {
-            start : input.selectionStart,
-            end : input.selectionEnd
+            start: input.selectionStart,
+            end: input.selectionEnd
         };
     }
-    else if (input.createTextRange)
-    {
-        var sel = document.selection.createRange();
-        if (sel.parentElement() === input)
-        {
-            var rng = input.createTextRange();
+
+    if (input.createTextRange) {
+        sel = document.selection.createRange();
+        if (sel.parentElement() === input) {
+            rng = input.createTextRange();
             rng.moveToBookmark(sel.getBookmark());
-            for(var len = 0; rng.compareEndPoints('EndToStart', rng) > 0; rng.moveEnd('character', -1))
-            {
-                len++;
+            for (
+                len = 0;
+                rng.compareEndPoints('EndToStart', rng) > 0;
+                rng.moveEnd('character', -1)
+            ) {
+                len += 1;
             }
             rng.setEndPoint('StartToStart', input.createTextRange());
-            for(var pos = { start: 0, end: len }; rng.compareEndPoints('EndToStart', rng) > 0; rng.moveEnd('character', -1))
-            {
-                pos.start++;
-                pos.end++;
+            for (
+                pos = { start: 0, end: len };
+                rng.compareEndPoints('EndToStart', rng) > 0;
+                rng.moveEnd('character', -1)
+            ) {
+                pos.start += 1;
+                pos.end += 1;
             }
             return pos;
         }
     }
-    return -1;
+
+    return null;
 }
 
+/** Check string is correct date in dd.mm.yyyy format */
+function checkDate(str) {
+    var sparr;
 
-
-// Check string is correct date in dd.mm.yyyy format
-function checkDate(str)
-{
-    if (!str || !str.length)
+    if (typeof str !== 'string' || !str.length) {
         return false;
+    }
 
-    var sparr = str.split('.');
-    if (sparr.length != 3)
+    sparr = str.split('.');
+    if (sparr.length !== 3) {
         return false;
+    }
 
-    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2]))
+    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2])) {
         return false;
+    }
 
-    if (sparr[0] < 1 || sparr[0] > 31 || sparr[1] < 1 || sparr[1] > 12 || sparr[2] < 1970)
+    if (sparr[0] < 1 || sparr[0] > 31 || sparr[1] < 1 || sparr[1] > 12 || sparr[2] < 1970) {
         return false;
+    }
 
     return true;
 }
 
-
-// Return text of selected option of select object
-function selectedText(selectObj)
-{
+/** Return text of selected option of select object */
+function selectedText(selectObj) {
     var option;
 
-    if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+    if (!selectObj || !selectObj.options || selectObj.selectedIndex === -1) {
         return -1;
+    }
+
     option = selectObj.options[selectObj.selectedIndex];
 
     return (option.textContent) ? option.textContent : option.innerText;
 }
 
-
-// Return value of selected option of select object
-function selectedValue(selectObj)
-{
-    if (!selectObj || !selectObj.options || selectObj.selectedIndex == -1)
+/* eslint-disable no-param-reassign */
+/** Return value of selected option of select object */
+function selectedValue(selectObj) {
+    if (!selectObj || !selectObj.options || selectObj.selectedIndex === -1) {
         return -1;
+    }
 
     return selectObj.options[selectObj.selectedIndex].value;
 }
 
+/**
+ * Select item with specified value if exist
+ * @param {Element} selectObj - select element
+ * @param {*} selValue - option value to select
+ * @param {boolean} selBool - if set to false then deselect option, select otherwise
+ */
+function selectByValue(selectObj, selValue, selBool) {
+    var option;
+    var i;
+    var l;
 
-// Select item with specified value if exist
-function selectByValue(selectObj, selValue, selBool)
-{
-    if (!selectObj || !selectObj.options)
+    if (!selectObj || !selectObj.options) {
         return -1;
+    }
 
-    for(var i = 0, l = selectObj.options.length; i < l; i++)
-    {
-        var option = selectObj.options[i];
-        if (option && option.value == selValue)
-        {
-            if (selectObj.multiple)
-                option.selected = (selBool !== undefined) ? selBool : true;
-            else
+    for (i = 0, l = selectObj.options.length; i < l; i += 1) {
+        option = selectObj.options[i];
+        if (option && option.value === selValue) {
+            if (selectObj.multiple) {
+                option.selected = (typeof selBool !== 'undefined') ? selBool : true;
+            } else {
                 selectObj.selectedIndex = i;
+            }
             return true;
         }
     }
 
     return false;
 }
+/* eslint-enable no-param-reassign */
 
-
-// Insert one DOM element before specified
-function insertBefore(elem, refElem)
-{
-    if (!refElem || !refElem.parentNode)
+/** Insert element before specified */
+function insertBefore(elem, refElem) {
+    if (!refElem || !refElem.parentNode) {
         return null;
+    }
 
     return refElem.parentNode.insertBefore(elem, refElem);
 }
 
-
-// Insert one DOM element after specified
-function insertAfter(elem, refElem)
-{
+/** Insert one DOM element after specified */
+function insertAfter(elem, refElem) {
     var parent = refElem.parentNode;
     var next = refElem.nextSibling;
-    if (next)
+
+    if (next) {
         return parent.insertBefore(elem, next);
-    else
-        return parent.appendChild(elem);
-}
-
-
-// Insert element as first child
-function prependChild(parent, elem)
-{
-    var fe;
-
-    if (!elem || !parent)
-        return;
-
-    fe = parent.firstChild;
-    if (fe)
-        insertBefore(elem, fe);
-    else
-        parent.appendChild(elem);
-}
-
-
-// Remove all child nodes of specified element
-function removeChilds(obj)
-{
-    if (!obj)
-        return;
-
-    while(obj.childNodes.length > 0)
-         obj.removeChild(obj.childNodes[0]);
-}
-
-
-// Fix IE event object
-function fixEvent(e, _this)
-{
-    e = e || window.event;
-
-    if (!e.currentTarget)
-        e.currentTarget = _this;
-    if (!e.target)
-        e.target = e.srcElement;
-
-    if (!e.relatedTarget)
-    {
-        if (e.type == 'mouseover')
-            e.relatedTarget = e.fromElement;
-        if (e.type == 'mouseout')
-            e.relatedTarget = e.toElement;
     }
 
-    if (e.pageX == null && e.clientX != null )
-    {
-        var html = document.documentElement;
-        var body = document.body;
+    return parent.appendChild(elem);
+}
 
-        e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0);
+/** Insert element as first child */
+function prependChild(parent, elem) {
+    var fe;
+
+    if (!elem || !parent) {
+        return;
+    }
+
+    fe = parent.firstChild;
+    if (fe) {
+        insertBefore(elem, fe);
+    } else {
+        parent.appendChild(elem);
+    }
+}
+
+/** Remove all child nodes of specified element */
+function removeChilds(elem) {
+    if (!elem) {
+        return;
+    }
+
+    while (elem.childNodes.length > 0) {
+        elem.removeChild(elem.childNodes[0]);
+    }
+}
+
+/* eslint-disable no-param-reassign */
+/** Fix IE event object */
+function fixEvent(e, _this) {
+    var html;
+    var body;
+
+    e = e || window.event;
+
+    if (!e.currentTarget) {
+        e.currentTarget = _this;
+    }
+    if (!e.target) {
+        e.target = e.srcElement;
+    }
+
+    if (!e.relatedTarget) {
+        if (e.type === 'mouseover') {
+            e.relatedTarget = e.fromElement;
+        }
+        if (e.type === 'mouseout') {
+            e.relatedTarget = e.toElement;
+        }
+    }
+
+    if (e.pageX === null && e.clientX !== null) {
+        html = document.documentElement;
+        body = document.body;
+
+        e.pageX = e.clientX + (html.scrollLeft || (body && body.scrollLeft) || 0);
         e.pageX -= html.clientLeft || 0;
 
-        e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0);
+        e.pageY = e.clientY + (html.scrollTop || (body && body.scrollTop) || 0);
         e.pageY -= html.clientTop || 0;
     }
 
-    if (!e.which && e.button)
-    {
-        e.which = (e.button & 1) ? 1 : ((e.button & 2) ? 3 : ((e.button & 4) ? 2 : 0));
+    if (!e.which && e.button) {
+        if (e.button & 1) {
+            e.which = 1;
+        } else if (e.button & 2) {
+            e.which = 3;
+        } else {
+            e.which = (e.button & 4) ? 2 : 0;
+        }
     }
 
     return e;
 }
+/* eslint-enable no-param-reassign */
 
+/**
+ * Handler for click on empty space event
+ * @param {Event} e - click event object
+ * @param {Function} callback - event handler
+ * @param {Element[]} elem - elements to skip handler if click occurs on it
+ */
+function onEmptyClick(e, callback, elem) {
+    var notExcluded = true;
+    var elems = Array.isArray(elem) ? elem : [elem];
 
-// Handler for click on empty space event
-function onEmptyClick(e, callback, elem)
-{
-    var e, elem;
-
-    callback = callback || null;
-    if (!callback)
+    if (!isFunction(callback)) {
         return;
-    e = fixEvent(e);
+    }
 
-    if (!Array.isArray(elem))
-        elem = [elem];
+    if (e) {
+        notExcluded = elems.every(function (el) {
+            var currentElem = ((typeof el === 'string') ? ge(el) : el) || null;
 
-    if (elem.every(function(el)
-    {
-        el = ((typeof el === 'string') ? ge(el) : el) || null;
+            return ((
+                currentElem
+                && !currentElem.contains(e.target)
+                && currentElem !== e.target
+            ) || !currentElem);
+        });
+    }
 
-        return ((el && !el.contains(e.target) && el != e.target) || !el);
-    }))
+    if (notExcluded) {
         callback();
+    }
 }
 
+/** Set or unset event handler for */
+function setEmptyClick(callback, elem) {
+    var onClickHandler = null;
+    var handler = callback || null;
 
-// Set or unset event handler for
-function setEmptyClick(callback, elem)
-{
-    callback = callback || null;
-    elem = elem || null;
-
-    if (!document.documentElement)
+    if (!document.documentElement) {
         return;
+    }
 
-    var onClickHandler = ((callback) ? function(event)
-    {
-        event = event || window.event;
-        onEmptyClick(event, callback, elem);
-    } : null);
+    if (isFunction(handler)) {
+        onClickHandler = function (e) {
+            onEmptyClick(e, handler, elem);
+        };
+    }
 
-    var evName = 'click';
-
-    if (onClickHandler && document.documentElement['on' + evName])
-        document.documentElement['on' + evName]();			// run previously set callback
-    document.documentElement['on' + evName] = null;
-    setTimeout(function()
-    {
-        document.documentElement['on' + evName] = onClickHandler;
+    document.documentElement.onclick = null;
+    setTimeout(function () {
+        document.documentElement.onclick = onClickHandler;
     });
 }
 
+/** Calculate offset of element by sum of offsets of parents */
+function getOffsetSum(elem) {
+    var el = elem;
+    var top = 0;
+    var left = 0;
 
-// Calculate offset of element
-function getOffset(elem)
-{
-    if (elem.getBoundingClientRect)
-        return getOffsetRect(elem);
-    else
-        return getOffsetSum(elem);
+    while (el) {
+        top += parseInt(el.offsetTop, 10);
+        left += parseInt(el.offsetLeft, 10);
+        el = el.offsetParent;
+    }
+
+    return {
+        top: top,
+        left: left
+    };
 }
 
-
-// Calculate offset of element using getBoundingClientRect() method
-function getOffsetRect(elem)
-{
+/** Calculate offset of element using getBoundingClientRect() method */
+function getOffsetRect(elem) {
     var box = elem.getBoundingClientRect();
     var body = document.body;
     var docElem = document.documentElement;
@@ -553,267 +586,231 @@ function getOffsetRect(elem)
     var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
     var clientTop = docElem.clientTop || body.clientTop || 0;
     var clientLeft = docElem.clientLeft || body.clientLeft || 0;
-    var top  = box.top +  scrollTop - clientTop;
+    var top = box.top + scrollTop - clientTop;
     var left = box.left + scrollLeft - clientLeft;
 
-    return { top: Math.round(top), left: Math.round(left) };
+    return {
+        top: Math.round(top),
+        left: Math.round(left)
+    };
 }
 
-
-// Calculate offset of element by sum of offsets of parents
-function getOffsetSum(elem)
-{
-    var top = 0, left = 0;
-
-    while(elem)
-    {
-        top = top + parseInt(elem.offsetTop);
-        left = left + parseInt(elem.offsetLeft);
-        elem = elem.offsetParent;
+/** Calculate offset of element */
+function getOffset(elem) {
+    if (elem.getBoundingClientRect) {
+        return getOffsetRect(elem);
     }
 
-    return { top: top, left: left };
+    return getOffsetSum(elem);
 }
 
+/** Compare position of two node in the document */
+function comparePosition(a, b) {
+    if (a.compareDocumentPosition) {
+        return a.compareDocumentPosition(b);
+    }
 
-// Compare position of two node in the document
-function comparePosition(a, b)
-{
-    return a.compareDocumentPosition ?
-            a.compareDocumentPosition(b) :
-            (a != b && a.contains(b) && 16) +
-            (a != b && b.contains(a) && 8) +
-            (a.sourceIndex >= 0 && b.sourceIndex >= 0 ?
-            (a.sourceIndex < b.sourceIndex && 4) + (a.sourceIndex > b.sourceIndex && 2) :
-            1);
+    return (a !== b && a.contains(b) && 16) + (a !== b && b.contains(a) && 8)
+        + ((a.sourceIndex >= 0 && b.sourceIndex >= 0)
+            ? (a.sourceIndex < b.sourceIndex && 4) + (a.sourceIndex > b.sourceIndex && 2)
+            : 1);
 }
 
+/** Return page scroll */
+function getPageScroll() {
+    var html;
+    var body;
+    var top;
+    var left;
 
-// Return page scroll
-function getPageScroll()
-{
-    if (window.pageXOffset != undefined)
-    {
+    if (typeof window.pageXOffset !== 'undefined') {
         return {
             left: pageXOffset,
             top: pageYOffset
         };
     }
-    else
-    {
-        var html = document.documentElement;
-        var body = document.body;
 
-        var top = html.scrollTop || body && body.scrollTop || 0;
-        top -= html.clientTop;
+    html = document.documentElement;
+    body = document.body;
 
-        var left = html.scrollLeft || body && body.scrollLeft || 0;
-        left -= html.clientLeft;
+    top = html.scrollTop || (body && body.scrollTop) || 0;
+    top -= html.clientTop;
 
-        return { top: top, left: left };
-    }
+    left = html.scrollLeft || (body && body.scrollLeft) || 0;
+    left -= html.clientLeft;
+
+    return { top: top, left: left };
 }
 
-
-// Check object is empty
-function isEmpty(obj)
-{
-    if (typeof obj === 'object')
-    {
-        for(var par in obj)
-            return false;
+/** Check object is empty */
+function isEmpty(obj) {
+    if (typeof obj === 'object') {
+        return Object.keys(obj).length === 0;
     }
 
     return true;
 }
 
-
-// Return count of children of object
-function childCount(obj)
-{
-    var res = 0;
-
-    if (typeof obj === 'object')
-    {
-        for(var par in obj)
-            res++;
+/** Return count of children of object */
+function childCount(obj) {
+    if (typeof obj === 'object') {
+        return Object.keys(obj).length;
     }
 
-    return res;
+    return 0;
 }
 
-
-// Return string for value in pixels
-function px(val)
-{
-    return parseInt(val) + 'px';
+/** Return string for value in pixels */
+function px(val) {
+    return parseInt(val, 10) + 'px';
 }
 
+/** Join parameters and values of object to URL */
+function urlJoin(obj) {
+    var arr = [];
 
-// Join parameters and values of object to URL
-function urlJoin(obj)
-{
-    var arr = [], par;
-
-    if (!isObject(obj))
+    if (!isObject(obj)) {
         return '';
-
-    for(par in obj)
-    {
-        val = obj[par];
-        if (Array.isArray(val))
-        {
-            val.forEach(function(arrItem)
-            {
-                if (!isObject(arrItem))
-                    arr.push(encodeURIComponent(par) + '[]=' + encodeURIComponent(arrItem.toString()));
-            });
-        }
-        else if (!isObject(val))
-            arr.push(encodeURIComponent(par) + '=' + encodeURIComponent(val.toString()));
     }
+
+    Object.keys(obj).forEach(function (key) {
+        var val = obj[key];
+        if (Array.isArray(val)) {
+            val.forEach(function (arrItem) {
+                if (!isObject(arrItem)) {
+                    arr.push(encodeURIComponent(key) + '[]=' + encodeURIComponent(arrItem.toString()));
+                }
+            });
+        } else if (!isObject(val)) {
+            arr.push(encodeURIComponent(key) + '=' + encodeURIComponent(val.toString()));
+        }
+    });
 
     return arr.join('&');
 }
 
-
-// Cross-browser find head element
-function head()
-{
-    if (document)
-    {
-        if (document.head)
+/** Cross-browser find head element */
+function head() {
+    if (document) {
+        if (document.head) {
             return document.head;
-        else if (document.documentElement && document.documentElement.firstChild)
+        }
+        if (document.documentElement && document.documentElement.firstChild) {
             return document.documentElement.firstChild;
+        }
     }
 
     return null;
 }
 
-
-// Set cross-browser transform value
-function transform(elem, value)
-{
-    if (!elem || !elem.style)
+/* eslint-disable no-param-reassign */
+/** Set cross-browser transform value */
+function transform(elem, value) {
+    if (!elem || !elem.style) {
         return;
+    }
 
-    if (elem.style.webkitTransform !== undefined)
+    if (typeof elem.style.webkitTransform !== 'undefined') {
         elem.style.webkitTransform = value;
-    else if (elem.style.MozTransform !== undefined)
+    } else if (typeof elem.style.MozTransform !== 'undefined') {
         elem.style.MozTransform = value;
-    else if (elem.style.msTransform !== undefined)
+    } else if (typeof elem.style.msTransform !== 'undefined') {
         elem.style.msTransform = value;
-    else if (elem.style.transform !== undefined)
+    } else if (typeof elem.style.transform !== 'undefined') {
         elem.style.transform = value;
+    }
 }
+/* eslint-enable no-param-reassign */
 
-
-// Return fixed DPI value
-function getRealDPI()
-{
-    if (window.devicePixelRatio)
+/** Return fixed DPI value */
+function getRealDPI() {
+    if (window.devicePixelRatio) {
         return window.devicePixelRatio;
+    }
 
-    if (screen.deviceXDPI && screen.logicalXDPI)
-        return screen.deviceXDPI / screen.logicalXDPI
+    if (screen.deviceXDPI && screen.logicalXDPI) {
+        return screen.deviceXDPI / screen.logicalXDPI;
+    }
 
     return screen.availWidth / document.documentElement.clientWidth;
 }
 
+/** Bind DOM ready event handler */
+function bindReady(handler) {
+    var called = false;
 
-// List of DOM ready handlers
-var readyList = [];
-
-
-// Bind DOM ready event handler
-function bindReady(handler)
-{
-    var called = false
-
-    function ready()
-    {
-        if (called)
+    function ready() {
+        if (called) {
             return;
+        }
         called = true;
         handler();
     }
 
-    if (document.addEventListener)
-    {
-        document.addEventListener('DOMContentLoaded', function()
-        {
+    function tryScroll() {
+        if (called) {
+            return;
+        }
+        if (!document.body) {
+            return;
+        }
+        try {
+            document.documentElement.doScroll('left');
+            ready();
+        } catch (e) {
+            setTimeout(tryScroll, 0);
+        }
+    }
+
+    if (document.addEventListener) {
+        document.addEventListener('DOMContentLoaded', function () {
             ready();
         }, false);
-    }
-    else if (document.attachEvent)
-    {
-        if (document.documentElement.doScroll && window == window.top)
-        {
-            function tryScroll()
-            {
-                if (called)
-                    return;
-                if (!document.body)
-                    return;
-                try
-                {
-                    document.documentElement.doScroll('left');
-                    ready();
-                }
-                catch(e)
-                {
-                    setTimeout(tryScroll, 0);
-                }
-            }
+    } else if (document.attachEvent) {
+        if (document.documentElement.doScroll && window === window.top) {
             tryScroll();
         }
 
-        document.attachEvent('onreadystatechange', function()
-        {
-            if (document.readyState === 'complete')
-            {
+        document.attachEvent('onreadystatechange', function () {
+            if (document.readyState === 'complete') {
                 ready();
             }
         });
     }
 
-    if (window.addEventListener)
+    if (window.addEventListener) {
         window.addEventListener('load', ready, false);
-    else if (window.attachEvent)
+    } else if (window.attachEvent) {
         window.attachEvent('onload', ready);
-/*
-    else
-        window.onload=ready
-*/
+    }
 }
 
+/** Add new DOM ready event handler to the queue */
+function onReady(handler) {
+    if (!onReady.readyList.length) {
+        bindReady(function () {
+            var i;
 
-// Add new DOM ready event handler to the queue
-function onReady(handler)
-{
-    if (!readyList.length)
-    {
-        bindReady(function()
-        {
-            for(var i = 0; i < readyList.length; i++)
-            {
-                readyList[i]();
+            for (i = 0; i < onReady.readyList.length; i += 1) {
+                onReady.readyList[i]();
             }
         });
     }
 
-    readyList.push(handler);
+    onReady.readyList.push(handler);
 }
 
+/** List of DOM ready handlers */
+onReady.readyList = [];
 
-// Extend child prototype by parent
-function extend(Child, Parent)
-{
-    function F(){};
+/* eslint-disable no-param-reassign */
+/** Extend child prototype by parent */
+function extend(Child, Parent) {
+    function F() { }
 
     F.prototype = Parent.prototype;
     Child.prototype = new F();
     Child.prototype.constructor = Child;
     Child.parent = Parent.prototype;
 }
+/* eslint-enable no-param-reassign */

@@ -1,121 +1,131 @@
-var ajax = new (function()
-{
-    // Create AJAX object
-    function createRequestObject()
-    {
-        try
-        {
+'use strict';
+
+/* global ActiveXObject, isFunction, copyObject */
+/* exported ajax */
+
+var ajax = new (function () {
+    /** Create AJAX object */
+    function createRequestObject() {
+        try {
             return new XMLHttpRequest();
-        }
-        catch(e)
-        {
-            try
-            {
+        } catch (e) {
+            try {
                 return new ActiveXObject('Msxml2.XMLHTTP');
-            }
-            catch(e)
-            {
-                try
-                {
+            } catch (e2) {
+                try {
                     return new ActiveXObject('Microsoft.XMLHTTP');
-                }
-                catch(e)
-                {
+                } catch (e3) {
                     return null;
                 }
             }
         }
     }
 
-
-    // Request ready status change event handler
-    function onStateChange(callback)
-    {
-        if (this.readyState == 4)
-        {
-            if (callback)
+    /** Request ready status change event handler */
+    function onStateChange(callback) {
+        if (this.readyState === 4) {
+            if (callback) {
                 callback(this.responseText);
+            }
         }
     }
 
+    /** Return value of specified header from headers object */
+    function getHeader(headers, name) {
+        var lname;
+        var res;
 
-    function getHeader(headers, name)
-    {
-        if (!headers || !name)
+        if (!headers || !name) {
             return null;
-
-        var lname = name.toLowerCase();
-        for(var header in headers)
-        {
-            if (lname == header.toLowerCase())
-                return headers[header];
         }
 
-        return null;
+        lname = name.toLowerCase();
+        res = Object.keys(headers).find(function (key) {
+            return lname === key.toLowerCase();
+        });
+
+        return (res) ? headers[res] : null;
     }
 
-
-    // Make asynchronous request
-    function sendRequest(options)
-    {
-        if (!options || !options.url)
-            return false;
-
+    /**
+     * Make asynchronous request
+     * @param {Object} options
+     * @param {string} options.url - request URL
+     * @param {string} options.method - request method
+     */
+    function sendRequest(options) {
         var supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
-        var http = createRequestObject();
+        var http;
+        var method;
+        var contentType;
+        var data;
 
-        if (!http)
+        if (!options || !options.url || !options.method) {
             return false;
+        }
 
-        var method = options.method.toLowerCase();
-        if (supportedMethods.indexOf(method) == -1)
+        http = createRequestObject();
+        if (!http) {
             return false;
+        }
+
+        method = options.method.toLowerCase();
+        if (!supportedMethods.includes(method)) {
+            return false;
+        }
 
         http.open(method, options.url, true);
-        if (options.headers)
-        {
-            for(var header in options.headers)
-            {
-                http.setRequestHeader(header, options.headers[header]);
+        if (options.headers) {
+            Object.keys(options.headers).forEach(function (key) {
+                http.setRequestHeader(key, options.headers[key]);
+            });
+        }
+
+        if (method === 'post') {
+            contentType = getHeader(options.headers, 'Content-Type');
+            if (!contentType) {
+                http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             }
         }
 
-        if (method == 'post')
-        {
-            var contentType = getHeader(options.headers, 'Content-Type');
-            if (!contentType)
-                http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        if (isFunction(options.callback)) {
+            http.onreadystatechange = onStateChange.bind(http, options.callback);
         }
 
-        if (isFunction(options.callback))
-            http.onreadystatechange = onStateChange.bind(http, options.callback);
-
-        var data = ('data' in options) ? options.data : null;
+        data = ('data' in options) ? options.data : null;
         http.send(data);
+
+        return true;
     }
 
+    /* ajax global object public methods */
 
-// ajax global object public methods
-    this.get = function(options)
-    {
-        if (!options || !options.url)
+    /** Send GET request */
+    this.get = function (options) {
+        var request;
+
+        if (!options || !options.url) {
             return false;
+        }
 
-        var request = copyObject(options);
+        request = copyObject(options);
         request.method = 'get';
         request.data = null;
 
         return sendRequest(request);
-    }
+    };
 
-    this.post = function(options)
-    {
-        if (!options || !options.url)
+    /** Send POST request */
+    this.post = function (options) {
+        var request;
+
+        if (!options || !options.url) {
             return false;
+        }
 
-        var request = copyObject(options);
+        request = copyObject(options);
         request.method = 'post';
 
         return sendRequest(request);
-    }
+    };
 })();
