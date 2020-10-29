@@ -368,7 +368,6 @@ function selectedText(selectObj) {
     return (option.textContent) ? option.textContent : option.innerText;
 }
 
-/* eslint-disable no-param-reassign */
 /** Return value of selected option of select object */
 function selectedValue(selectObj) {
     if (!selectObj || !selectObj.options || selectObj.selectedIndex === -1) {
@@ -384,18 +383,21 @@ function selectedValue(selectObj) {
  * @param {*} selValue - option value to select
  * @param {boolean} selBool - if set to false then deselect option, select otherwise
  */
+/* eslint-disable no-param-reassign */
 function selectByValue(selectObj, selValue, selBool) {
     var option;
     var i;
     var l;
+    var toSel;
 
-    if (!selectObj || !selectObj.options) {
-        return -1;
+    if (!selectObj || !selectObj.options || typeof selValue === 'undefined') {
+        return false;
     }
 
+    toSel = selValue.toString();
     for (i = 0, l = selectObj.options.length; i < l; i += 1) {
         option = selectObj.options[i];
-        if (option && option.value === selValue) {
+        if (option && option.value === toSel) {
             if (selectObj.multiple) {
                 option.selected = (typeof selBool !== 'undefined') ? selBool : true;
             } else {
