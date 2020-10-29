@@ -13,114 +13,126 @@ import { TransferTransactionView } from './view/transaction/transfer.js';
 import { DebtTransactionView } from './view/transaction/debt.js';
 import { StatisticsView } from './view/statistics.js';
 
+/** Process request url and return view class if match */
+export async function route(env, url) {
+    if (typeof url !== 'string') {
+        throw new Error('URL not specified');
+    }
 
-// Process request url and return view class if match
-async function route(env, url)
-{
-	if (typeof url !== 'string')
-		throw new Error('URL not specified');
+    const testUrl = new URL(env.baseUrl());
 
-	let testUrl = new URL(env.baseUrl());
+    const reqUrl = new URL(url);
+    if (reqUrl.host !== testUrl.host) {
+        throw new Error(`Invalid URL specified: ${url}`);
+    }
 
-	let reqUrl = new URL(url);
-	if (reqUrl.host !== testUrl.host)
-		throw new Error('Wrong URL specified: ' + url);
+    // Remove leading directory if needed
+    let reqPath = reqUrl.pathname;
+    if (reqPath.startsWith(testUrl.pathname)) {
+        reqPath = reqPath.substr(testUrl.pathname.length);
+    }
 
-	// Remove leading directory if needed
-	let reqPath = reqUrl.pathname;
-	if (reqPath.startsWith(testUrl.pathname))
-	{
-		reqPath = reqPath.substr(testUrl.pathname.length);
-	}
+    // cut leading and trailing slashes
+    const path = reqPath.replace(/^\/+|\/+$/g, '');
+    const parts = path.split('/');
+    const part = parts.shift();
 
-	let path = reqPath.replace(/^\/+|\/+$/g, '');		// cut leading and trailing slashes
-	let parts = path.split('/');
+    if (!part) {
+        return MainView;
+    }
 
-	let part, actPart;
+    if (part === 'login') {
+        return LoginView;
+    }
 
-	part = parts.shift();
+    if (part === 'register') {
+        return RegisterView;
+    }
 
-	if (!part)
-		return MainView;
+    if (part === 'profile') {
+        return ProfileView;
+    }
 
-	if (part === 'login')
-	{
-		return LoginView;
-	}
-	else if (part === 'register')
-	{
-		return RegisterView;
-	}
-	else if (part === 'profile')
-	{
-		return ProfileView;
-	}
-	else if (part === 'accounts')
-	{
-		actPart = parts.shift();
-		if (!actPart)
-			return AccountsView;
-		else if (actPart === 'new' || actPart === 'edit')
-			return AccountView;
-		else
-			throw new Error('Unknown route: ' + reqUrl.pathname);
-	}
-	else if (part === 'persons')
-	{
-		actPart = parts.shift();
-		if (!actPart)
-			return PersonsView;
-		else if (actPart === 'new' || actPart === 'edit')
-			return PersonView;
-		else
-			throw new Error('Unknown route: ' + reqUrl.pathname);
-	}
-	else if (part === 'transactions')
-	{
-		actPart = parts.shift();
-		if (!actPart)
-			return TransactionsView;
-		else if (actPart === 'new')
-		{
-			const trType = reqUrl.searchParams.get('type');
-			if (!trType || trType === 'expense')
-				return ExpenseTransactionView;
-			else if (trType === 'income')
-				return IncomeTransactionView;
-			else if (trType === 'transfer')
-				return TransferTransactionView;
-			else if (trType === 'debt')
-				return DebtTransactionView;
-			else
-				throw new Error('Unknown transaction type: ' + trType);
-		}
-		else if (actPart === 'edit')
-		{
-            let selectedMenuItem = await env.query('.trtype-menu__item_selected');
-            if (!selectedMenuItem)
+    if (part === 'accounts') {
+        const actPart = parts.shift();
+        if (!actPart) {
+            return AccountsView;
+        }
+
+        if (actPart === 'new' || actPart === 'edit') {
+            return AccountView;
+        }
+
+        throw new Error(`Unknown route: ${reqUrl.pathname}`);
+    }
+
+    if (part === 'persons') {
+        const actPart = parts.shift();
+        if (!actPart) {
+            return PersonsView;
+        }
+
+        if (actPart === 'new' || actPart === 'edit') {
+            return PersonView;
+        }
+
+        throw new Error(`Unknown route: ${reqUrl.pathname}`);
+    }
+
+    if (part === 'transactions') {
+        const actPart = parts.shift();
+        if (!actPart) {
+            return TransactionsView;
+        }
+
+        if (actPart === 'new') {
+            const trType = reqUrl.searchParams.get('type');
+            if (!trType || trType === 'expense') {
+                return ExpenseTransactionView;
+            }
+            if (trType === 'income') {
+                return IncomeTransactionView;
+            }
+            if (trType === 'transfer') {
+                return TransferTransactionView;
+            }
+            if (trType === 'debt') {
+                return DebtTransactionView;
+            }
+
+            throw new Error(`Unknown transaction type: ${trType}`);
+        }
+
+        if (actPart === 'edit') {
+            const selectedMenuItem = await env.query('.trtype-menu__item_selected');
+            if (!selectedMenuItem) {
                 throw new Error('Invalid transaction type menu');
+            }
 
-			let trType = await env.prop(selectedMenuItem, 'dataset.type');
-            trType = parseInt(trType);
-			if (trType === 1)
-				return ExpenseTransactionView;
-			else if (trType === 2)
-				return IncomeTransactionView;
-			else if (trType === 3)
-				return TransferTransactionView;
-			else if (trType === 4)
-				return DebtTransactionView;
-			else
-				throw new Error('Unknown transaction type: ' + trType);
-		}
-		else
-			throw new Error('Unknown route: ' + reqUrl.pathname);
-	}
-	else if (part === 'statistics')
-		return StatisticsView;
-	else
-		throw new Error('Unknown route: ' + reqUrl.pathname);
+            const trTypeData = await env.prop(selectedMenuItem, 'dataset.type');
+            const trType = parseInt(trTypeData, 10);
+            if (trType === 1) {
+                return ExpenseTransactionView;
+            }
+            if (trType === 2) {
+                return IncomeTransactionView;
+            }
+            if (trType === 3) {
+                return TransferTransactionView;
+            }
+            if (trType === 4) {
+                return DebtTransactionView;
+            }
+
+            throw new Error(`Unknown transaction type: ${trType}`);
+        }
+
+        throw new Error(`Unknown route: ${reqUrl.pathname}`);
+    }
+
+    if (part === 'statistics') {
+        return StatisticsView;
+    }
+
+    throw new Error(`Unknown route: ${reqUrl.pathname}`);
 }
-
-
-export { route };

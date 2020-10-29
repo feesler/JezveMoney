@@ -1,12 +1,11 @@
 import { api, ApiRequestError } from '../../model/api.js';
 import {
-	test,
-	copyObject,
-	setParam,
-	formatProps
+    test,
+    copyObject,
+    setParam,
+    formatProps,
 } from '../../common.js';
 import { App } from '../../app.js';
-
 
 /**
  * Create account with specified params and check expected state of app
@@ -16,35 +15,31 @@ import { App } from '../../app.js';
  * @param {number} params.initbalance - initial balance of account
  * @param {number} params.icon_id - icon identifier
  */
-export async function create(params)
-{
-	let acc_id = 0;
+export async function create(params) {
+    let accountId = 0;
 
-	await test(`Create account (${formatProps(params)})`, async () =>
-	{
-		let resExpected = App.state.createAccount(params);
+    await test(`Create account (${formatProps(params)})`, async () => {
+        const resExpected = App.state.createAccount(params);
 
-		let createRes;
-		try
-		{
-			createRes = await api.account.create(params);
-			if (resExpected && (!createRes || !createRes.id))
-				return false;
-		}
-		catch(e)
-		{
-			if (!(e instanceof ApiRequestError) || resExpected)
-				throw e;
-		}
+        let createRes;
+        try {
+            createRes = await api.account.create(params);
+            if (resExpected && (!createRes || !createRes.id)) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
 
-		acc_id = (createRes) ? createRes.id : resExpected;
+        accountId = (createRes) ? createRes.id : resExpected;
 
-		return App.state.fetchAndTest();
-	});
+        return App.state.fetchAndTest();
+    });
 
-	return acc_id;
+    return accountId;
 }
-
 
 /**
  * Update account with specified params and check expected state of app
@@ -55,69 +50,65 @@ export async function create(params)
  * @param {number} params.initbalance - initial balance of account
  * @param {number} params.icon_id - icon identifier
  */
-export async function update(params)
-{
-	let updateRes = false;
+export async function update(params) {
+    let updateRes = false;
+    const props = copyObject(params);
 
-	await test(`Update account (${formatProps(params)})`, async () =>
-	{
-		let resExpected = App.state.updateAccount(params);
-		let updParams = {};
+    await test(`Update account (${formatProps(props)})`, async () => {
+        const resExpected = App.state.updateAccount(props);
+        let updParams = {};
 
-		let item = App.state.accounts.getItem(params.id);
-		if (item)
-			updParams = copyObject(item);
+        const item = App.state.accounts.getItem(props.id);
+        if (item) {
+            updParams = copyObject(item);
+        }
 
-		if (!resExpected)
-			setParam(updParams, params);
+        if (!resExpected) {
+            setParam(updParams, props);
+        }
 
-		// Send API sequest to server
-		try
-		{
-			updateRes = await api.account.update(updParams);
-			if (resExpected != updateRes)
-				return false;
-		}
-		catch(e)
-		{
-			if (!(e instanceof ApiRequestError) || resExpected)
-				throw e;
-		}
+        // Send API sequest to server
+        try {
+            updateRes = await api.account.update(updParams);
+            if (resExpected !== updateRes) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
 
-		return App.state.fetchAndTest();
-	});
+        return App.state.fetchAndTest();
+    });
 
-	return updateRes;
+    return updateRes;
 }
-
 
 /**
  * Delete specified account(s) and check expected state of app
  * @param {number[]} ids - array of account identificators
  */
-export async function del(ids)
-{
-	let deleteRes = false;
+export async function del(ids) {
+    let deleteRes = false;
 
-	await test(`Delete account (${ids})`, async () =>
-	{
-		let resExpected = App.state.deleteAccounts(ids);
+    await test(`Delete account (${ids})`, async () => {
+        const resExpected = App.state.deleteAccounts(ids);
 
-		// Send API sequest to server
-		try
-		{
-			deleteRes = await api.account.del(ids);
-			if (resExpected != deleteRes)
-				return false;
-		}
-		catch(e)
-		{
-			if (!(e instanceof ApiRequestError) || resExpected)
-				throw e;
-		}
+        // Send API sequest to server
+        try {
+            deleteRes = await api.account.del(ids);
+            if (resExpected !== deleteRes) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
 
-		return App.state.fetchAndTest();
-	});
+        return App.state.fetchAndTest();
+    });
 
-	return deleteRes;
+    return deleteRes;
 }

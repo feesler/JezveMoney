@@ -1,6 +1,5 @@
-import { NodeEnvironment } from './env/node.js'
+import { NodeEnvironment } from './env/node.js';
 import { App } from './app.js';
 
-
-let env = new NodeEnvironment();
+const env = new NodeEnvironment();
 env.init(App);

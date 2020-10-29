@@ -1,83 +1,80 @@
 import { App } from '../app.js';
-import { test, formatDate, fixDate, copyObject, checkObjValue } from '../common.js';
+import {
+    test,
+    formatDate,
+    fixDate,
+    copyObject,
+    checkObjValue,
+} from '../common.js';
 import { TransactionsView } from '../view/transactions.js';
 import { MainView } from '../view/main.js';
 import { availTransTypes, Transaction } from '../model/transaction.js';
 
+/** Navigate to transactions list page */
+async function checkNavigation() {
+    if (App.view instanceof TransactionsView) {
+        return;
+    }
 
-// Navigate to transactions list page
-async function checkNavigation()
-{
-	if (App.view instanceof TransactionsView)
-		return true;
+    if (!(App.view instanceof MainView)) {
+        await App.goToMainView();
+    }
 
-	if (!(App.view instanceof MainView))
-		await App.goToMainView();
-
-	await App.view.goToTransactions();
+    await App.view.goToTransactions();
 }
 
+export async function checkInitialState() {
+    await checkNavigation();
 
-export async function checkInitialState()
-{
-	await checkNavigation();
-
-	App.view.expectedState = App.view.setExpectedState();
-	await test('Initial state of transaction list view', () => App.view.checkState());
+    App.view.expectedState = App.view.setExpectedState();
+    await test('Initial state of transaction list view', () => App.view.checkState());
 }
 
+export async function goToNextPage() {
+    await checkNavigation();
 
-export async function goToNextPage()
-{
-	await checkNavigation();
-
-	await test('Navigate to next page', () => App.view.goToNextPage());
+    await test('Navigate to next page', () => App.view.goToNextPage());
 }
 
+export async function setDetailsMode() {
+    await checkNavigation();
 
-export async function setDetailsMode()
-{
-	await checkNavigation();
-
-	await test('Change list mode to details', () => App.view.setDetailsMode());
+    await test('Change list mode to details', () => App.view.setDetailsMode());
 }
 
+export async function toggleSelect(transactions) {
+    const itemIds = Array.isArray(transactions) ? transactions : [transactions];
 
-export async function toggleSelect(transactions)
-{
-	if (!Array.isArray(transactions))
-		transactions = [ transactions ];
-
-    await test(`Toggle select items [${transactions.join()}]`, async () => {
+    await test(`Toggle select items [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        let origItems = App.view.getItems();
+        const origItems = App.view.getItems();
         // Check correctness of arguments
-        let indexes = [];
-        for(let pos of transactions)
-        {
-            let ind = parseInt(pos);
-            if (isNaN(ind) || ind < 0 || ind > origItems.length)
+        const indexes = [];
+        for (const pos of itemIds) {
+            const ind = parseInt(pos, 10);
+            if (Number.isNaN(ind) || ind < 0 || ind > origItems.length) {
                 throw new Error(`Invalid item index ${pos}`);
+            }
             indexes.push(ind);
         }
 
-        let expectedItems = origItems.map((item, ind) =>
-        {
-            let res = copyObject(item);
-            if (indexes.includes(ind))
+        let expectedItems = origItems.map((item, ind) => {
+            const res = copyObject(item);
+            if (indexes.includes(ind)) {
                 res.selected = !res.selected;
+            }
 
             return res;
         });
 
-	    await App.view.selectTransactions(indexes);
+        await App.view.selectTransactions(indexes);
         let items = App.view.getItems();
         checkObjValue(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
-	    await App.view.selectTransactions(indexes);
+        await App.view.selectTransactions(indexes);
         items = App.view.getItems();
         checkObjValue(items, expectedItems);
 
@@ -85,57 +82,48 @@ export async function toggleSelect(transactions)
     });
 }
 
+export async function filterByType(type) {
+    await checkNavigation();
 
-export async function filterByType(type)
-{
-	await checkNavigation();
+    let types = Array.isArray(type) ? type : [type];
+    types = types.filter((item) => availTransTypes.includes(item));
 
-	let types = Array.isArray(type) ? type : [ type ];
-	types = types.filter(item => availTransTypes.includes(item));
+    const typeNames = types.map(Transaction.typeToString);
 
-	const typeNames = types.map(Transaction.typeToString);
-
-	let descr = (!types.length) ? 'Show all types of transactions' : `Filter by [${typeNames.join()}]`;
-	await test(descr, () => App.view.filterByType(type));
-	await test('Correctness of transaction list', () => App.view.iteratePages());
+    const descr = (types.length)
+        ? `Filter by [${typeNames.join()}]`
+        : 'Show all types of transactions';
+    await test(descr, () => App.view.filterByType(type));
+    await test('Correctness of transaction list', () => App.view.iteratePages());
 }
 
+export async function filterByAccounts(accounts) {
+    const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
-export async function filterByAccounts(accounts)
-{
-	if (!Array.isArray(accounts))
-		accounts = [ accounts ];
+    await checkNavigation();
 
-	await checkNavigation();
+    const accountNames = itemIds.map((accountId) => {
+        const item = App.state.accounts.getItem(accountId);
+        return (item) ? item.name : `(${accountId})`;
+    });
 
-	const accountNames = accounts.map(account_id =>
-	{
-		const item = App.state.accounts.getItem(account_id);
-		return item ? item.name : `(${account_id})`;
-	});
-
-	await test(`Filter by accounts [${accountNames.join()}]`, () => App.view.filterByAccounts(accounts));
-	await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test(`Filter by accounts [${accountNames.join()}]`, () => App.view.filterByAccounts(itemIds));
+    await test('Correctness of transaction list', () => App.view.iteratePages());
 }
 
+export async function filterByDate({ start, end }) {
+    await checkNavigation();
 
-export async function filterByDate({ start, end })
-{
-	await checkNavigation();
+    const startDateFmt = formatDate(new Date(fixDate(start)));
+    const endDateFmt = formatDate(new Date(fixDate(end)));
 
-	let startDateFmt = formatDate(new Date(fixDate(start)));
-	let endDateFmt = formatDate(new Date(fixDate(end)));
-
-	await test(`Select date range (${startDateFmt} - ${endDateFmt})`, () => App.view.selectDateRange(start, end));
-	await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test(`Select date range (${startDateFmt} - ${endDateFmt})`, () => App.view.selectDateRange(start, end));
+    await test('Correctness of transaction list', () => App.view.iteratePages());
 }
 
+export async function search(text) {
+    await checkNavigation();
 
-export async function search(text)
-{
-	await checkNavigation();
-
-	await test(`Search (${text})`, () => App.view.search(text));
-	await test('Correctness of transaction list', () => App.view.iteratePages());
-} 
-
+    await test(`Search (${text})`, () => App.view.search(text));
+    await test('Correctness of transaction list', () => App.view.iteratePages());
+}

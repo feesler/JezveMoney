@@ -1,29 +1,27 @@
-import { NullableComponent } from './component.js';
+import { Component } from './component.js';
 import { Tile } from './tile.js';
 import { DropDown } from './dropdown.js';
 
+export class TileBlock extends Component {
+    async parse() {
+        const lbl = await this.query(this.elem, 'div > label');
+        if (!lbl) {
+            throw new Error('Tile block label not found');
+        }
+        this.label = await this.prop(lbl, 'textContent');
 
-export class TileBlock extends NullableComponent
-{
-	async parse()
-	{
-		let lbl = await this.query(this.elem, 'div > label');
-		if (!lbl)
-			throw new Error('Tile block label not found');
-		this.label = await this.prop(lbl, 'textContent');
+        this.tile = await Tile.create(this.parent, await this.query(this.elem, '.tile'));
+        if (!this.tile) {
+            throw new Error('Tile not found');
+        }
 
-		this.tile = await Tile.create(this.parent, await this.query(this.elem, '.tile'));
-		if (!this.tile)
-			throw new Error('Tile not found');
+        const ddElem = await this.query(this.elem, '.dd__container_attached');
+        this.dropDown = await DropDown.create(this.parent, ddElem);
+    }
 
-		let ddElem = await this.query(this.elem, '.dd__container_attached');
-		this.dropDown = await DropDown.create(this.parent, ddElem);
-	}
-
-
-	async selectAccount(account_id)
-	{
-		if (this.dropDown)
-			return this.dropDown.setSelection(account_id);
-	}
+    async selectAccount(accountId) {
+        if (this.dropDown) {
+            await this.dropDown.setSelection(accountId);
+        }
+    }
 }

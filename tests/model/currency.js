@@ -1,96 +1,83 @@
 import { normalize, formatValue } from '../common.js';
 import { api } from './api.js';
 
+/** Currency object */
+export class Currency {
+    constructor(props) {
+        Object.keys(props).forEach((key) => {
+            this[key] = props[key];
+        });
+    }
 
-// Currency object
-export class Currency
-{
-	constructor(props)
-	{
-		for(let key in props)
-		{
-			this[key] = props[key];
-		}
-	}
+    /** Format specified value using rules of currency */
+    format(val) {
+        let nval = normalize(val);
+        if (Math.floor(nval) !== nval) {
+            nval = nval.toFixed(2);
+        }
 
+        const fmtVal = formatValue(nval);
+        if (this.flags) {
+            return `${this.sign} ${fmtVal}`;
+        }
 
-	// Format specified value using rules of currency
-	format(val)
-	{
-		let nval = normalize(val);
+        return `${fmtVal} ${this.sign}`;
+    }
 
-		if (Math.floor(nval) != nval)
-			nval = nval.toFixed(2);
+    static currencies = null;
 
-		let fmtVal = formatValue(nval);
+    static async getList() {
+        if (!Array.isArray(this.currencies)) {
+            const apiResult = await api.currency.list();
+            this.currencies = apiResult.map((item) => new Currency(item));
+        }
 
-		if (this.flags)
-			return this.sign + ' ' + fmtVal;
-		else
-			return fmtVal + ' ' + this.sign;
-	}
+        return this.currencies;
+    }
 
+    static async init() {
+        await this.getList();
+    }
 
-	static currencies = null;
+    // Return currency object for specified id
+    static getById(currId) {
+        if (!this.currencies) {
+            throw new Error('List of currencies not initialized');
+        }
 
+        const currObj = this.currencies.find((item) => item.id === currId);
+        if (!currObj) {
+            return null;
+        }
 
-	static async getList()
-	{
-		if (!Array.isArray(this.currencies))
-		{
-			let apiResult = await api.currency.list();
-			this.currencies = apiResult.map(item => new Currency(item));
-		}
+        return currObj;
+    }
 
-		return this.currencies;
-	}
+    static findByName(name) {
+        if (!this.currencies) {
+            throw new Error('List of currencies not initialized');
+        }
 
+        const qName = name.toUpperCase();
+        const currObj = this.currencies.find((item) => item.name.toUpperCase() === qName);
+        if (!currObj) {
+            return null;
+        }
 
-	static async init()
-	{
-		await this.getList();
-	}
+        return currObj;
+    }
 
+    /** Format curency value without access to the instance of class */
+    static format(currId, val) {
+        if (!this.currencies) {
+            throw new Error('List of currencies not initialized');
+        }
 
-	// Return currency object for specified id
-	static getById(curr_id)
-	{
-		if (!this.currencies)
-			throw new Error('List of currencies not initialized');
+        const currObj = this.currencies.find((item) => item.id === currId);
+        if (!currObj) {
+            throw new Error(`Currency ${currId} not found`);
+        }
 
-		let currObj = this.currencies.find(item => item.id == curr_id);
-		if (!currObj)
-			return null;
-
-		return currObj;
-	}
-
-
-	static findByName(name)
-	{
-		if (!this.currencies)
-			throw new Error('List of currencies not initialized');
-
-		let qName = name.toUpperCase();
-		let currObj = this.currencies.find(item => item.name.toUpperCase() == qName);
-		if (!currObj)
-			return null;
-
-		return currObj;
-	}
-
-
-	// Format curency value without access to the instance of class
-	static format(curr_id, val)
-	{
-		if (!this.currencies)
-			throw new Error('List of currencies not initialized');
-
-		let currObj = this.currencies.find(item => item.id == curr_id);
-		if (!currObj)
-			throw new Error(`Currency ${curr_id} not found`);
-
-		return currObj.format(val);
-	}
+        return currObj.format(val);
+    }
 }
-

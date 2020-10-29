@@ -1,268 +1,264 @@
-import * as TransactionTests from './common.js'
-import { test } from '../../common.js'
+import * as TransactionTests from './common.js';
+import { test } from '../../common.js';
 import { DEBT } from '../../model/transaction.js';
-import { DebtTransactionView } from '../../view/transaction/debt.js'
+import { DebtTransactionView } from '../../view/transaction/debt.js';
 import { App } from '../../app.js';
 
+export async function submit(params) {
+    if ('acc' in params) {
+        await TransactionTests.runAction({ action: 'changeAccountByPos', data: params.acc });
+    }
 
-export async function submit(params)
-{
-	if ('acc' in params)
-		await TransactionTests.runAction({ action : 'changeAccountByPos', data : params.acc });
+    if ('person' in params) {
+        await TransactionTests.runAction({ action: 'changePersonByPos', data: params.person });
+    }
 
-	if ('person' in params)
-		await TransactionTests.runAction({ action : 'changePersonByPos', data : params.person });
+    if ('debtType' in params) {
+        await TransactionTests.runAction({ action: 'toggleDebtType', data: params.debtType });
+    }
 
-	if ('debtType' in params)
-		await TransactionTests.runAction({ action : 'toggleDebtType', data : params.debtType });
+    if (!('srcAmount' in params)) {
+        throw new Error('Source amount value not specified');
+    }
 
-	if (!('srcAmount' in params))
-		throw new Error('Source amount value not specified');
+    await TransactionTests.runAction({ action: 'inputSrcAmount', data: params.srcAmount });
 
-	await TransactionTests.runAction({ action : 'inputSrcAmount', data : params.srcAmount });
+    if ('date' in params) {
+        await TransactionTests.runAction({ action: 'changeDate', data: params.date });
+    }
 
-	if ('date' in params)
-		await TransactionTests.runAction({ action : 'changeDate', data : params.date });
+    if ('comment' in params) {
+        await TransactionTests.runAction({ action: 'inputComment', data: params.comment });
+    }
 
-	if ('comment' in params)
-		await TransactionTests.runAction({ action : 'inputComment', data : params.comment });
-
-	return TransactionTests.submit();
+    return TransactionTests.submit();
 }
 
-
-export async function create(params)
-{
-	await TransactionTests.create(DEBT, params, submit);
+export async function create(params) {
+    await TransactionTests.create(DEBT, params, submit);
 }
 
+export async function update(params) {
+    await TransactionTests.update(DEBT, params, async (submitParams) => {
+        let expState;
+        if (App.view.model.noAccount) {
+            expState = (App.view.model.debtType) ? 6 : 7;
+        } else {
+            expState = (App.view.model.debtType) ? 0 : 3;
+        }
 
-export async function update(params)
-{
-	await TransactionTests.update(DEBT, params, async (params) =>
-	{
-		let expState;
-		if (App.view.model.noAccount)
-			expState = (App.view.model.debtType) ? 6 : 7;
-		else
-			expState = (App.view.model.debtType) ? 0 : 3;
+        await test('Initial state of update debt view', () => App.view.setExpectedState(expState), App.view);
 
-		await test('Initial state of update debt view', () => App.view.setExpectedState(expState), App.view);
-
-		return submit(params);
-	});
+        return submit(submitParams);
+    });
 }
 
+export async function stateLoop() {
+    const ACC_3 = 0;
+    const ACC_RUB = 1;
+    const ACC_USD = 2;
+    const ACC_EUR = 3;
+    const CARD_RUB = 4;
+    const MARIA = 0;
+    const IVAN = 1;
 
-export async function stateLoop()
-{
-	const ACC_3 = 0;
-	const ACC_RUB = 1;
-	const ACC_USD = 2;
-	const ACC_EUR = 3;
-	const CARD_RUB = 4;
-	const MARIA = 0;
-	const IVAN = 1;
+    await App.state.fetch();
 
-	await App.state.fetch();
+    // Navigate to create income view
+    if (!(App.view instanceof DebtTransactionView)) {
+        await App.goToMainView();
+        await App.view.goToNewTransactionByAccount(0);
+        if (!App.view.content.typeMenu.isSingleSelected(DEBT)) {
+            await App.view.changeTransactionType(DEBT);
+        }
+    }
 
-	// Navigate to create income view
-	if (!(App.view instanceof DebtTransactionView))
-	{
-		await App.goToMainView();
-		await App.view.goToNewTransactionByAccount(0);
-		if (!App.view.content.typeMenu.isSingleSelected(DEBT))
-			await App.view.changeTransactionType(DEBT);
-	}
+    App.view.setBlock('Debt loop', 2);
+    await test('Initial state of new debt view', async () => App.view.setExpectedState(0));
 
-	let view = App.view;
+    // Input source amount
+    const saInputData = [
+        '1',
+        '1.',
+        '1.0',
+        '1.01',
+        '1.010',
+        '1.0101',
+        '',
+        '.',
+        '.0',
+        '.09',
+    ];
+    await TransactionTests.runGroup('inputSrcAmount', saInputData);
 
-	view.setBlock('Debt loop', 2);
-	await test('Initial state of new debt view', async () => view.setExpectedState(0));
+    await TransactionTests.runActions([
+        // Transition 1: Click by source result balance and move from State 0 to State 1
+        { action: 'clickSrcResultBalance' },
+        // Transition 47: Change to another one and stay on State 1
+        { action: 'changeAccountByPos', data: ACC_RUB },
+    ]);
 
-	// Input source amount
-	const saInputData = [
-		'1',
-		'1.',
-		'1.0',
-		'1.01',
-		'1.010',
-		'1.0101',
-		'',
-		'.',
-		'.0',
-		'.09',
-	];
-	await TransactionTests.runGroup('inputSrcAmount', saInputData);
+    // Input source result balance
+    const srbInputData = [
+        '400',
+        '400.',
+        '400.9',
+        '400.99',
+        '400.990',
+        '400.9901',
+        '',
+        '.',
+        '.0',
+        '.01',
+    ];
+    await TransactionTests.runGroup('inputResBalance', srbInputData);
 
-	await TransactionTests.runActions([
-		// Transition 1: Click by source result balance and move from State 0 to State 1
-		{ action : 'clickSrcResultBalance' },
-		// Transition 47: Change to another one and stay on State 1
-		{ action : 'changeAccountByPos', data : ACC_RUB },
-	]);
+    await TransactionTests.runActions([
+        // Transition 2: Click by source amount and move from State 1 to State 0
+        { action: 'clickSrcAmount' },
+        // Transition 3: Click by destination result balance and move from State 0 to State 2
+        { action: 'clickDestResultBalance' },
+        // Transition 42: Change to another one and stay on State 2
+        { action: 'changeAccountByPos', data: ACC_USD },
+    ]);
 
-	// Input source result balance
-	const srbInputData = [
-		'400',
-		'400.',
-		'400.9',
-		'400.99',
-		'400.990',
-		'400.9901',
-		'',
-		'.',
-		'.0',
-		'.01',
-	];
-	await TransactionTests.runGroup('inputResBalance', srbInputData);
+    // Input destination result balance
+    const drbInputData = [
+        '600',
+        '600.',
+        '600.9',
+        '600.90',
+        '600.901',
+        '600.9010',
+        '600.90101',
+        '',
+        '.',
+        '.0',
+    ];
+    await TransactionTests.runGroup('inputDestResBalance', drbInputData);
 
-	await TransactionTests.runActions([
-		// Transition 2: Click by source amount and move from State 1 to State 0
-		{ action : 'clickSrcAmount' },
-		// Transition 3: Click by destination result balance and move from State 0 to State 2
-		{ action : 'clickDestResultBalance' },
-		// Transition 42: Change to another one and stay on State 2
-		{ action : 'changeAccountByPos', data : ACC_USD },
-	]);
-
-	// Input destination result balance
-	const drbInputData = [
-		'600',
-		'600.',
-		'600.9',
-		'600.90',
-		'600.901',
-		'600.9010',
-		'600.90101',
-		'',
-		'.',
-		'.0',
-	];
-	await TransactionTests.runGroup('inputDestResBalance', drbInputData);
-
-	await TransactionTests.runActions([
-		// Transition 4: Click by source result balance and move from State 2 to State 1
-		{ action : 'clickSrcResultBalance' },
-		// Transition 5: Click by destination result balance and move from State 1 to State 2
-		{ action : 'clickDestResultBalance' },
-		// Transition 6: Click by source amount and move from State 2 to State 0
-		{ action : 'clickSrcAmount' },
-		// Transition 7: Change debt type to "take" and move from State 0 to State 3
-		{ action : 'toggleDebtType' },
-		// Transition 8: Change debt type back to "give" and move from State 3 to State 0
-		{ action : 'toggleDebtType' },
-		// Transition 49: Change to another one and stay on State 3
-		{ action : 'toggleDebtType' },				// move from State 0 to State 3
-		{ action : 'changeAccountByPos', data : ACC_EUR },
-		// Transition 9: Click by destination result balance and move from State 3 to State 4
-		{ action : 'clickDestResultBalance' },
-		// Transition 51: Change to another one and stay on State 4
-		{ action : 'changeAccountByPos', data : CARD_RUB },
-		// Transition 10: Click by source amount and move from State 4 to State 3
-		{ action : 'clickSrcAmount' },
-		// Transition 11: Click by source result balance and move from State 4 to State 5
-		{ action : 'clickDestResultBalance' },		// move from State 3 to State 4
-		{ action : 'clickSrcResultBalance' },
-		// Transition 48: Change to another one and stay on State 5
-		{ action : 'changeAccountByPos', data : ACC_3 },
-		// Transition 12: Click by source amount and move from State 5 to State 3
-		{ action : 'clickSrcAmount' },
-		// Transition 13: Click by source result balance and move from State 3 to State 5
-		{ action : 'clickSrcResultBalance' },
-		// Transition 14: Click by destination result balance and move from State 5 to State 4
-		{ action : 'clickDestResultBalance' },
-		// Transition 15: Change debt type to "give" and move from State 4 to State 1
-		{ action : 'toggleDebtType' },
-		// Transition 16: Change debt type to "take" and move from State 1 to State 4
-		{ action : 'toggleDebtType' },
-		// Transition 17: Change debt type to "give" and move from State 5 to State 2
-		{ action : 'clickSrcResultBalance' },			// move from State 4 to State 5
-		{ action : 'toggleDebtType' },
-		// Transition 18: Change debt type to "take" and move from State 2 to State 5
-		{ action : 'toggleDebtType' },
-		// Transition 19: Change person to another one and stay on State 0
-		{ action : 'clickSrcAmount' },				// move from State 5 to State 3
-		{ action : 'toggleDebtType' },				// move from State 3 to State 0
-		{ action : 'changePersonByPos', data : IVAN },
-		// Transition 20: Change person to another one and stay on State 1
-		{ action : 'clickSrcResultBalance' },				// move from State 0 to State 1
-		{ action : 'changePersonByPos', data : MARIA },
-		// Transition 21: Change person to another one and stay on State 2
-		{ action : 'clickDestResultBalance' },			// move from State 1 to State 2
-		{ action : 'changePersonByPos', data : IVAN },
-		// Transition 22: Change person to another one and stay on State 5
-		{ action : 'toggleDebtType' },				// move from State 2 to State 5
-		{ action : 'changePersonByPos', data : MARIA },
-		// Transition 23: Change person to another one and stay on State 4
-		{ action : 'clickDestResultBalance' },		// move from State 5 to State 4
-		{ action : 'changePersonByPos', data : IVAN },
-		// Transition 24: Change person to another one and stay on State 3
-		{ action : 'clickSrcAmount' },				// move from State 4 to State 3
-		{ action : 'changePersonByPos', data : MARIA },
-		// Transition 25: Disable account and move from State 0 to State 6
-		{ action : 'toggleDebtType' },		// move from State 3 to State 0
-		{ action : 'toggleAccount' },
-		// Transition 43: Change person to another one and stay on State 6
-		{ action : 'changePersonByPos', data : IVAN },
-		// Transition 26: Enable account and move from State 6 to State 0
-		{ action : 'toggleAccount' },
-		// Transition 27: Change debt type to "take" and move from State 6 to State 7
-		{ action : 'toggleAccount' },			// move from State 0 to State 6
-		{ action : 'toggleDebtType' },
-		// Transition 44: Change person to another one and stay on State 7
-		{ action : 'changePersonByPos', data : MARIA },
-		// Transition 28: Change debt type to "give" and move from State 7 to State 6
-		{ action : 'toggleDebtType' },
-		// Transition 29: Enable account and move from State 7 to State 3
-		{ action : 'toggleDebtType' },		// move from State 6 to State 7
-		{ action : 'toggleAccount' },
-		// Transition 30: Click by destination result balance and move from State 7 to State 8
-		{ action : 'toggleDebtType' },				// move from State 3 to State 0
-		{ action : 'toggleAccount' },					// move from State 0 to State 6
-		{ action : 'toggleDebtType' },				// move from State 6 to State 7
-		{ action : 'clickDestResultBalance' },
-		// Transition 45: Change person to another one and stay on State 8
-		{ action : 'changePersonByPos', data : IVAN },
-		// Transition 31: Click by source amount and move from State 8 to State 7
-		{ action : 'clickSrcAmount' },
-		// Transition 32: Enable account and move from State 8 to State 4
-		{ action : 'clickDestResultBalance' },		// move from State 7 to State 8
-		{ action : 'toggleAccount' },
-		// Transition 39: Disable account and move from State 4 to State 8
-		{ action : 'toggleAccount' },
-		// Transition 33: Change debt type to "give" and move from State 8 to State 9
-		{ action : 'toggleDebtType' },
-		// Transition 46: Change person to another one and stay on State 9
-		{ action : 'changePersonByPos', data : MARIA },
-		// Transition 34: Change debt type to "take" and move from State 9 to State 8
-		{ action : 'toggleDebtType' },
-		// Transition 35: Click by source amount and move from State 9 to State 6
-		{ action : 'changePersonByPos', data : IVAN },		// stay on State 8
-		{ action : 'toggleDebtType' },			// move from State 8 to State 9
-		{ action : 'clickSrcAmount' },
-		// Transition 36: Click by source result balance and move from State 6 to State 9
-		{ action : 'clickSrcResultBalance' },
-		// Transition 37: Enable account and move from State 9 to State 1
-		{ action : 'toggleAccount' },
-		// Transition 38: Disable account and move from State 1 to State 9
-		{ action : 'toggleAccount' },
-		// Transition 40: Disable account and move from State 3 to State 7
-		{ action : 'clickSrcAmount' },			// move from State 9 to State 6
-		{ action : 'toggleAccount' },			// move from State 6 to State 0
-		{ action : 'toggleDebtType' },		// move from State 0 to State 3
-		{ action : 'toggleAccount' },
-		// Transition 41: Disable account and move from State 2 to State 6
-		{ action : 'toggleDebtType' },				// move from State 7 to State 6
-		{ action : 'toggleAccount' },					// move from State 6 to State 0
-		{ action : 'clickDestResultBalance' },		// move from State 0 to State 2
-		{ action : 'toggleAccount' },
-		// Transition 52: Change to another one and stay on State 0
-		{ action : 'toggleAccount' },					// move from State 6 to State 0
-		{ action : 'changeAccountByPos', data : ACC_USD },
-		// Transition 50: Disable account and move from State 5 to State 7
-		{ action : 'clickDestResultBalance' },	// move from State 0 to State 2
-		{ action : 'toggleDebtType' },			// move from State 2 to State 5
-		{ action : 'toggleAccount' },
-	]);
+    await TransactionTests.runActions([
+        // Transition 4: Click by source result balance and move from State 2 to State 1
+        { action: 'clickSrcResultBalance' },
+        // Transition 5: Click by destination result balance and move from State 1 to State 2
+        { action: 'clickDestResultBalance' },
+        // Transition 6: Click by source amount and move from State 2 to State 0
+        { action: 'clickSrcAmount' },
+        // Transition 7: Change debt type to "take" and move from State 0 to State 3
+        { action: 'toggleDebtType' },
+        // Transition 8: Change debt type back to "give" and move from State 3 to State 0
+        { action: 'toggleDebtType' },
+        // Transition 49: Change to another one and stay on State 3
+        { action: 'toggleDebtType' }, // move from State 0 to State 3
+        { action: 'changeAccountByPos', data: ACC_EUR },
+        // Transition 9: Click by destination result balance and move from State 3 to State 4
+        { action: 'clickDestResultBalance' },
+        // Transition 51: Change to another one and stay on State 4
+        { action: 'changeAccountByPos', data: CARD_RUB },
+        // Transition 10: Click by source amount and move from State 4 to State 3
+        { action: 'clickSrcAmount' },
+        // Transition 11: Click by source result balance and move from State 4 to State 5
+        { action: 'clickDestResultBalance' }, // move from State 3 to State 4
+        { action: 'clickSrcResultBalance' },
+        // Transition 48: Change to another one and stay on State 5
+        { action: 'changeAccountByPos', data: ACC_3 },
+        // Transition 12: Click by source amount and move from State 5 to State 3
+        { action: 'clickSrcAmount' },
+        // Transition 13: Click by source result balance and move from State 3 to State 5
+        { action: 'clickSrcResultBalance' },
+        // Transition 14: Click by destination result balance and move from State 5 to State 4
+        { action: 'clickDestResultBalance' },
+        // Transition 15: Change debt type to "give" and move from State 4 to State 1
+        { action: 'toggleDebtType' },
+        // Transition 16: Change debt type to "take" and move from State 1 to State 4
+        { action: 'toggleDebtType' },
+        // Transition 17: Change debt type to "give" and move from State 5 to State 2
+        { action: 'clickSrcResultBalance' }, // move from State 4 to State 5
+        { action: 'toggleDebtType' },
+        // Transition 18: Change debt type to "take" and move from State 2 to State 5
+        { action: 'toggleDebtType' },
+        // Transition 19: Change person to another one and stay on State 0
+        { action: 'clickSrcAmount' }, // move from State 5 to State 3
+        { action: 'toggleDebtType' }, // move from State 3 to State 0
+        { action: 'changePersonByPos', data: IVAN },
+        // Transition 20: Change person to another one and stay on State 1
+        { action: 'clickSrcResultBalance' }, // move from State 0 to State 1
+        { action: 'changePersonByPos', data: MARIA },
+        // Transition 21: Change person to another one and stay on State 2
+        { action: 'clickDestResultBalance' }, // move from State 1 to State 2
+        { action: 'changePersonByPos', data: IVAN },
+        // Transition 22: Change person to another one and stay on State 5
+        { action: 'toggleDebtType' }, // move from State 2 to State 5
+        { action: 'changePersonByPos', data: MARIA },
+        // Transition 23: Change person to another one and stay on State 4
+        { action: 'clickDestResultBalance' }, // move from State 5 to State 4
+        { action: 'changePersonByPos', data: IVAN },
+        // Transition 24: Change person to another one and stay on State 3
+        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'changePersonByPos', data: MARIA },
+        // Transition 25: Disable account and move from State 0 to State 6
+        { action: 'toggleDebtType' }, // move from State 3 to State 0
+        { action: 'toggleAccount' },
+        // Transition 43: Change person to another one and stay on State 6
+        { action: 'changePersonByPos', data: IVAN },
+        // Transition 26: Enable account and move from State 6 to State 0
+        { action: 'toggleAccount' },
+        // Transition 27: Change debt type to "take" and move from State 6 to State 7
+        { action: 'toggleAccount' }, // move from State 0 to State 6
+        { action: 'toggleDebtType' },
+        // Transition 44: Change person to another one and stay on State 7
+        { action: 'changePersonByPos', data: MARIA },
+        // Transition 28: Change debt type to "give" and move from State 7 to State 6
+        { action: 'toggleDebtType' },
+        // Transition 29: Enable account and move from State 7 to State 3
+        { action: 'toggleDebtType' }, // move from State 6 to State 7
+        { action: 'toggleAccount' },
+        // Transition 30: Click by destination result balance and move from State 7 to State 8
+        { action: 'toggleDebtType' }, // move from State 3 to State 0
+        { action: 'toggleAccount' }, // move from State 0 to State 6
+        { action: 'toggleDebtType' }, // move from State 6 to State 7
+        { action: 'clickDestResultBalance' },
+        // Transition 45: Change person to another one and stay on State 8
+        { action: 'changePersonByPos', data: IVAN },
+        // Transition 31: Click by source amount and move from State 8 to State 7
+        { action: 'clickSrcAmount' },
+        // Transition 32: Enable account and move from State 8 to State 4
+        { action: 'clickDestResultBalance' }, // move from State 7 to State 8
+        { action: 'toggleAccount' },
+        // Transition 39: Disable account and move from State 4 to State 8
+        { action: 'toggleAccount' },
+        // Transition 33: Change debt type to "give" and move from State 8 to State 9
+        { action: 'toggleDebtType' },
+        // Transition 46: Change person to another one and stay on State 9
+        { action: 'changePersonByPos', data: MARIA },
+        // Transition 34: Change debt type to "take" and move from State 9 to State 8
+        { action: 'toggleDebtType' },
+        // Transition 35: Click by source amount and move from State 9 to State 6
+        { action: 'changePersonByPos', data: IVAN }, // stay on State 8
+        { action: 'toggleDebtType' }, // move from State 8 to State 9
+        { action: 'clickSrcAmount' },
+        // Transition 36: Click by source result balance and move from State 6 to State 9
+        { action: 'clickSrcResultBalance' },
+        // Transition 37: Enable account and move from State 9 to State 1
+        { action: 'toggleAccount' },
+        // Transition 38: Disable account and move from State 1 to State 9
+        { action: 'toggleAccount' },
+        // Transition 40: Disable account and move from State 3 to State 7
+        { action: 'clickSrcAmount' }, // move from State 9 to State 6
+        { action: 'toggleAccount' }, // move from State 6 to State 0
+        { action: 'toggleDebtType' }, // move from State 0 to State 3
+        { action: 'toggleAccount' },
+        // Transition 41: Disable account and move from State 2 to State 6
+        { action: 'toggleDebtType' }, // move from State 7 to State 6
+        { action: 'toggleAccount' }, // move from State 6 to State 0
+        { action: 'clickDestResultBalance' }, // move from State 0 to State 2
+        { action: 'toggleAccount' },
+        // Transition 52: Change to another one and stay on State 0
+        { action: 'toggleAccount' }, // move from State 6 to State 0
+        { action: 'changeAccountByPos', data: ACC_USD },
+        // Transition 50: Disable account and move from State 5 to State 7
+        { action: 'clickDestResultBalance' }, // move from State 0 to State 2
+        { action: 'toggleDebtType' }, // move from State 2 to State 5
+        { action: 'toggleAccount' },
+    ]);
 }
