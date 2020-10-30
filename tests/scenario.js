@@ -68,8 +68,6 @@ export class Scenario {
         await ApiTests.loginTest(App.config.testUser);
         await App.setupUser();
         await ProfileTests.relogin(App.config.testUser);
-
-        await ExpenseTransactionTests.stateLoop();
     }
 
     async runFullScenario() {

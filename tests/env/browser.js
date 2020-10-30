@@ -238,7 +238,7 @@ class BrowserEnvironment extends Environment {
             setParam(options.headers, headers);
         }
 
-        if (method === 'post' && data) {
+        if (lmethod === 'post' && data) {
             let postData;
             if (typeof data === 'string') {
                 postData = data;
@@ -256,6 +256,7 @@ class BrowserEnvironment extends Environment {
             status: resp.status,
             headers: resp.headers,
             body: await resp.text(),
+            url: resp.url,
         };
 
         return res;

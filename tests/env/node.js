@@ -268,6 +268,11 @@ export class NodeEnvironment extends Environment {
 
             const req = client.request(url, options, (res) => {
                 let body = '';
+                let finalUrl = url;
+
+                if (res && res.headers && res.headers.location) {
+                    finalUrl = res.headers.location;
+                }
 
                 res.setEncoding('utf8');
                 res.on('data', (chunk) => {
@@ -288,6 +293,7 @@ export class NodeEnvironment extends Environment {
                         status: res.statusCode,
                         headers: res.headers,
                         body,
+                        url: finalUrl,
                     });
                 });
             });

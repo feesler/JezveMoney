@@ -5,8 +5,6 @@ import { App } from '../app.js';
 export class ApiRequestError extends Error {
 }
 
-const defaultRequestHdrs = { 'X-Requested-With': 'XMLHttpRequest' };
-
 function checkFields(fields, expFields) {
     const postData = {};
 
@@ -31,7 +29,7 @@ async function apiRequest(method, url, data = null) {
     }
 
     const reqUrl = `${App.environment.baseUrl()}api/${url}`;
-    const response = await App.environment.httpReq(method, reqUrl, data, defaultRequestHdrs);
+    const response = await App.environment.httpReq(method, reqUrl, data);
     if (response.status !== 200) {
         console.log(`Invalid status code: ${response.status}`);
         return false;

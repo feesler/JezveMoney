@@ -18,12 +18,12 @@ export async function checkAccess(url) {
 
         if (isInvalidLocation) {
             const isRestricted = restrictedLocations.some(
-                (location) => requestURL.startsWith(base + location),
+                (location) => resp.url.startsWith(base + location),
             );
             if (resp.status >= 200 && resp.status < 300 && isRestricted) {
-                throw new Error(`Invalid location: ${requestURL}`);
+                throw new Error(`Invalid location: ${resp.url}`);
             }
-        } if (resp.status !== 200) {
+        } else if (resp.status !== 200) {
             throw new Error(`Invalid response status: ${resp.status}. 200 is expected`);
         }
 
