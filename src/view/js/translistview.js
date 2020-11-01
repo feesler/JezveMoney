@@ -2,7 +2,7 @@
 
 /* global ge, ce, show, isDate, urlJoin, isEmpty, insertAfter, createMessage, setEmptyClick */
 /* global extend, prependChild, removeChilds, ajax, baseURL, setParam */
-/* global EXPENSE, INCOME, TRANSFER, DEBT */
+/* global EXPENSE, INCOME, TRANSFER, DEBT, CurrencyList */
 /* global DropDown, DatePicker, IconLink, Sortable, ConfirmDialog, Toolbar, View */
 
 var singleTransDeleteTitle = 'Delete transaction';
@@ -16,9 +16,14 @@ var singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br
 function TransactionListView() {
     TransactionListView.parent.constructor.apply(this, arguments);
 
+    if (!('currency' in this.props)) {
+        throw new Error('Invalid Transaction List view properties');
+    }
+
     this.model = {
         selection: new Selection(),
-        selDateRange: null
+        selDateRange: null,
+        currency: CurrencyList.create(this.props.currency)
     };
 }
 
