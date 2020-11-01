@@ -14,6 +14,7 @@ class BrowserEnvironment extends Environment {
 
         this.vdoc = null;
         this.viewframe = null;
+        this.resContainer = null;
         this.restbl = null;
         this.totalRes = null;
         this.okRes = null;
@@ -303,6 +304,12 @@ class BrowserEnvironment extends Environment {
             ]),
         );
 
+        if (!this.resContainer.scrollHeight) {
+            this.newResultsAvailable = true;
+        } else {
+            this.resContainer.scrollTop = this.resContainer.scrollHeight;
+        }
+
         if (result.err) {
             console.error(result.err);
         }
@@ -470,6 +477,8 @@ class BrowserEnvironment extends Environment {
         this.failRes = ge('failRes');
         this.durationRes = ge('durationRes');
         this.viewframe = ge('viewframe');
+        this.resContainer = document.querySelector('.results-container');
+        this.toggleResBtn = ge('toggleresbtn');
         this.restbl = ge('restbl');
         if (!this.startbtn
             || !this.totalRes
@@ -477,10 +486,25 @@ class BrowserEnvironment extends Environment {
             || !this.failRes
             || !this.durationRes
             || !this.viewframe
+            || !this.resContainer
+            || !this.toggleResBtn
             || !this.restbl
         ) {
             throw new Error('Fail to init tests');
         }
+
+        this.toggleResBtn.addEventListener('click', () => {
+            const clName = 'results-expanded';
+            const isExpanded = this.resultsBlock.classList.contains(clName);
+
+            this.toggleResBtn.value = isExpanded ? 'Show' : 'Hide';
+            this.resultsBlock.classList.toggle(clName);
+
+            if (!isExpanded && this.newResultsAvailable) {
+                this.newResultsAvailable = false;
+                this.resContainer.scrollTop = this.resContainer.scrollHeight;
+            }
+        });
 
         this.startbtn.addEventListener('click', async () => {
             try {
