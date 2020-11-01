@@ -12,6 +12,7 @@
 .results
 {
 	margin: 0px 0px 10px 0px;
+	display: -ms-flexbox;
 	display: flex;
 	flex-flow: column nowrap;
 	max-height: 70vh;
@@ -99,6 +100,8 @@
 /* Test view */
 .test-view
 {
+	display: -ms-flexbox;
+	display: flex;
 	flex-grow: 1;
 	height: 70vh;
 }
@@ -124,7 +127,8 @@
 /* Results table */
 .results
 {
-	flex-grow: 1;
+    flex-grow: 0;
+	flex-basis: 35%;
 	margin: 0px 10px 0px 0px;
 }
 
@@ -144,7 +148,8 @@
 /* Test iframe */
 .test-view
 {
-	flex-grow: 2;
+    flex-grow: 1;
+	flex-basis: 65%;
 	overflow: hidden;
 }
 
