@@ -23,7 +23,7 @@ class DBInstall extends AdminController
 
         $this->menuItems["dbinstall"]["active"] = true;
 
-        $titleString = "Admin panel | Icons";
+        $titleString = "Admin panel | DB update";
 
         $this->buildCSS();
 

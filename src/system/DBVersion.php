@@ -2,6 +2,8 @@
 
 namespace JezveMoney\Core;
 
+use JezveMoney\App\Model\IconModel;
+
 class DBVersion
 {
     use Singleton;
