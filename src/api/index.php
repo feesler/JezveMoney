@@ -3,7 +3,6 @@
 namespace JezveMoney;
 
 require_once("../system/setup.php");
-require_once("../system/router.php");
 
 $router = new Core\Router();
 $router->setNamespace("JezveMoney\\App\\API\\Controller");

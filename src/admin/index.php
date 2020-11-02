@@ -4,7 +4,6 @@ namespace JezveMoney;
 
 $noLogs = true;
 require_once("../system/setup.php");
-require_once("../system/router.php");
 
 $router = new Core\Router();
 $router->setNamespace("JezveMoney\\App\\Admin\\Controller");
