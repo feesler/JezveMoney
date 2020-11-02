@@ -424,8 +424,10 @@ class BrowserEnvironment extends Environment {
         }
 
         const navPromise = new Promise((resolve, reject) => {
-            this.viewframe.addEventListener('load', async () => {
+            this.navigationHandler = async () => {
                 try {
+                    this.viewframe.removeEventListener('load', this.navigationHandler);
+
                     this.vdoc = this.viewframe.contentWindow.document;
                     if (!this.vdoc) {
                         throw new Error('View document not found');
@@ -439,7 +441,9 @@ class BrowserEnvironment extends Environment {
                 } catch (e) {
                     reject(e);
                 }
-            });
+            };
+
+            this.viewframe.addEventListener('load', this.navigationHandler);
         });
 
         await action();
