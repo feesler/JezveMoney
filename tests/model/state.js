@@ -328,6 +328,20 @@ export class AppState {
         ));
     }
 
+    getAccountIndexesByNames(accounts) {
+        const accNames = Array.isArray(accounts) ? accounts : [accounts];
+        const userAccounts = this.accounts.getUserAccounts().getVisible();
+
+        return accNames.map((name) => {
+            const acc = userAccounts.findByName(name);
+            if (!acc) {
+                throw new Error(`Account '${name}' not found`);
+            }
+
+            return userAccounts.getIndexOf(acc.id);
+        });
+    }
+
     /**
      * Persons
      */
@@ -497,6 +511,20 @@ export class AppState {
         const hiddenList = this.persons.getHidden(true);
 
         return itemIndexes.map((ind) => this.getPersonByIndex(ind, visibleList, hiddenList));
+    }
+
+    getPersonIndexesByNames(persons) {
+        const names = Array.isArray(persons) ? persons : [persons];
+        const visibleList = this.persons.getVisible();
+
+        return names.map((name) => {
+            const person = visibleList.findByName(name);
+            if (!person) {
+                throw new Error(`Person '${name}' not found`);
+            }
+
+            return visibleList.getIndexOf(person.id);
+        });
     }
 
     /**

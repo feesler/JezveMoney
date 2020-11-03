@@ -52,14 +52,12 @@ export async function update(params) {
 }
 
 export async function stateLoop() {
-    const ACC_3 = 0;
-    const ACC_RUB = 1;
-    const ACC_USD = 2;
-    const ACC_EUR = 3;
-
     await App.state.fetch();
 
     const [RUB, USD, EUR] = Currency.getItemsByNames(['RUB', 'USD', 'EUR']);
+    const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR] = App.state.getAccountIndexesByNames([
+        'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
+    ]);
 
     // Navigate to create income view
     if (!(App.view instanceof IncomeTransactionView)) {
