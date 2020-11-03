@@ -1,5 +1,6 @@
 import * as TransactionTests from './common.js';
 import { test } from '../../common.js';
+import { Currency } from '../../model/currency.js';
 import { INCOME } from '../../model/transaction.js';
 import { IncomeTransactionView } from '../../view/transaction/income.js';
 import { App } from '../../app.js';
@@ -51,15 +52,14 @@ export async function update(params) {
 }
 
 export async function stateLoop() {
-    const RUB = 1;
-    const USD = 2;
-    const EUR = 3;
     const ACC_3 = 0;
     const ACC_RUB = 1;
     const ACC_USD = 2;
     const ACC_EUR = 3;
 
     await App.state.fetch();
+
+    const [RUB, USD, EUR] = Currency.getItemsByNames(['RUB', 'USD', 'EUR']);
 
     // Navigate to create income view
     if (!(App.view instanceof IncomeTransactionView)) {

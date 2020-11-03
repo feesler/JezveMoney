@@ -67,6 +67,19 @@ export class Currency {
         return currObj;
     }
 
+    static getItemsByNames(names) {
+        const itemNames = Array.isArray(names) ? names : [names];
+
+        return itemNames.map((name) => {
+            const item = this.findByName(name);
+            if (!item) {
+                throw new Error(`Currency '${name}' not found`);
+            }
+
+            return item.id;
+        });
+    }
+
     /** Format curency value without access to the instance of class */
     static format(currId, val) {
         if (!this.currencies) {

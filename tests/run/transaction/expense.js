@@ -1,5 +1,6 @@
 import * as TransactionTests from './common.js';
 import { test } from '../../common.js';
+import { Currency } from '../../model/currency.js';
 import { EXPENSE } from '../../model/transaction.js';
 import { ExpenseTransactionView } from '../../view/transaction/expense.js';
 import { App } from '../../app.js';
@@ -51,9 +52,7 @@ export async function update(params) {
 }
 
 export async function stateLoop() {
-    const RUB = 1;
-    const USD = 2;
-    const EUR = 3;
+    const [RUB, USD, EUR] = Currency.getItemsByNames(['RUB', 'USD', 'EUR']);
     /* */
     const ACC_3 = 0;
     const ACC_RUB = 1;

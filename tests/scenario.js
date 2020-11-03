@@ -1,5 +1,5 @@
 import { copyObject } from './common.js';
-
+import { Currency } from './model/currency.js';
 import {
     EXPENSE,
     INCOME,
@@ -32,11 +32,6 @@ import { api } from './model/api.js';
 import { Runner } from './runner.js';
 import { App } from './app.js';
 
-const RUB = 1;
-const USD = 2;
-const EUR = 3;
-const PLN = 4;
-
 export class Scenario {
     constructor(environment) {
         this.environment = environment;
@@ -52,6 +47,16 @@ export class Scenario {
     async init() {
         // Setup test runner
         this.runner = new Runner();
+    }
+
+    setupCurrencies() {
+        [
+            this.RUB,
+            this.USD,
+            this.EUR,
+            this.PLN,
+            this.KRW,
+        ] = Currency.getItemsByNames(['RUB', 'USD', 'EUR', 'PLN', 'KRW']);
     }
 
     async run() {
@@ -105,6 +110,7 @@ export class Scenario {
         // Register API test user and prepare data for security tests
         await ApiTests.registerAndLogin(App.config.apiTestUser);
         await App.setupUser();
+        this.setupCurrencies();
         await this.prepareApiSecurityTests();
 
         await ApiTests.loginTest({ login: '', password: App.config.testUser.password });
@@ -144,6 +150,8 @@ export class Scenario {
 
     async prepareApiSecurityTests() {
         this.environment.setBlock('Prepare data for security tests', 2);
+
+        const { RUB, USD } = this;
 
         [
             this.API_USER_ACC_RUB,
@@ -194,7 +202,7 @@ export class Scenario {
     }
 
     async apiAccountsSecurity() {
-        const { API_USER_ACC_RUB } = this;
+        const { EUR, API_USER_ACC_RUB } = this;
 
         this.environment.setBlock('Accounts security', 2);
 
@@ -253,7 +261,12 @@ export class Scenario {
     async apiCreateTransactionSecurity() {
         this.environment.setBlock('Create', 3);
 
-        const { API_USER_ACC_RUB, API_USER_PERSON, CASH_RUB } = this;
+        const {
+            RUB,
+            API_USER_ACC_RUB,
+            API_USER_PERSON,
+            CASH_RUB,
+        } = this;
 
         const data = [
             {
@@ -302,6 +315,7 @@ export class Scenario {
         this.environment.setBlock('Update', 3);
 
         const {
+            RUB,
             API_USER_ACC_RUB,
             API_USER_ACC_USD,
             API_USER_PERSON,
@@ -374,6 +388,8 @@ export class Scenario {
     }
 
     async apiCreateAccounts() {
+        const { RUB, USD } = this;
+
         const data = [
             {
                 name: 'acc ru',
@@ -457,7 +473,7 @@ export class Scenario {
     }
 
     async apiUpdateAccounts() {
-        const { ACC_RUB, CASH_RUB } = this;
+        const { USD, ACC_RUB, CASH_RUB } = this;
 
         const data = [
             {
@@ -551,6 +567,9 @@ export class Scenario {
         this.environment.setBlock('Create', 3);
 
         const {
+            RUB,
+            USD,
+            EUR,
             CASH_RUB,
             ACC_RUB,
             ACC_USD,
@@ -754,6 +773,10 @@ export class Scenario {
         this.environment.setBlock('Update', 3);
 
         const {
+            RUB,
+            USD,
+            EUR,
+            PLN,
             CASH_RUB,
             ACC_RUB,
             ACC_USD,
@@ -1163,6 +1186,8 @@ export class Scenario {
     async createAccountTests() {
         this.environment.setBlock('Create accounts', 2);
 
+        const { RUB, EUR } = this;
+
         const data = [
             {
                 name: 'acc_1',
@@ -1192,6 +1217,7 @@ export class Scenario {
     async updateAccountTests() {
         this.environment.setBlock('Update accounts', 2);
 
+        const { RUB, USD } = this;
         const data = [
             {
                 pos: 0,
@@ -1351,6 +1377,8 @@ export class Scenario {
     }
 
     async prepareTransactionTests() {
+        const { RUB, USD, EUR } = this;
+
         const accList = [
             {
                 name: 'acc_3',
@@ -1459,6 +1487,7 @@ export class Scenario {
     }
 
     async setupAccounts() {
+        const { RUB, USD, EUR } = this;
         const data = [
             {
                 name: 'acc_4',
@@ -1537,6 +1566,12 @@ export class Scenario {
     async setupTransactions(accountIds, personIds) {
         const [ACC_4, ACC_5, CASH_USD, CASH_EUR] = accountIds;
         const [ALEX, NONAME] = personIds;
+        const {
+            RUB,
+            USD,
+            EUR,
+            PLN,
+        } = this;
 
         const data = [
             {
@@ -1818,6 +1853,7 @@ export class Scenario {
     async runCreateExpenseTests() {
         this.environment.setBlock('Create expense transactions', 1);
 
+        const { RUB, KRW } = this;
         const data = [
             {
                 fromAccount: 0,
@@ -1828,7 +1864,7 @@ export class Scenario {
                 fromAccount: 3,
                 srcAmount: '100',
                 destAmount: '7013.21',
-                destCurr: 1,
+                destCurr: RUB,
             },
             {
                 fromAccount: 1,
@@ -1849,7 +1885,7 @@ export class Scenario {
             {
                 fromAccount: 1,
                 destAmount: '1',
-                destCurr: 5,
+                destCurr: KRW,
                 srcAmount: '',
             },
             // Try to submit expense with invalid date
@@ -1866,6 +1902,7 @@ export class Scenario {
     async runCreateIncomeTests() {
         this.environment.setBlock('Create income transactions', 1);
 
+        const { USD, KRW } = this;
         const data = [
             {
                 fromAccount: 0,
@@ -1877,7 +1914,7 @@ export class Scenario {
                 fromAccount: 3,
                 srcAmount: '7013.21',
                 destAmount: '100',
-                srcCurr: 2,
+                srcCurr: USD,
             },
             {
                 fromAccount: 1,
@@ -1898,7 +1935,7 @@ export class Scenario {
             {
                 fromAccount: 1,
                 srcAmount: '1',
-                srcCurr: 5,
+                srcCurr: KRW,
                 destAmount: '',
             },
             // Try to submit income with invalid date
@@ -2013,6 +2050,7 @@ export class Scenario {
     async runUpdateExpenseTests() {
         this.environment.setBlock('Update expense transactions', 2);
 
+        const { RUB } = this;
         const data = [
             {
                 pos: 3,
@@ -2022,7 +2060,7 @@ export class Scenario {
                 pos: 0,
                 srcAmount: '101',
                 destAmount: '7065.30',
-                destCurr: 1,
+                destCurr: RUB,
             },
             {
                 pos: 2,
@@ -2043,6 +2081,7 @@ export class Scenario {
     async runUpdateIncomeTests() {
         this.environment.setBlock('Update income transactions', 2);
 
+        const { RUB } = this;
         const data = [
             {
                 pos: 1,
@@ -2057,7 +2096,7 @@ export class Scenario {
                 pos: 0,
                 srcAmount: '7065.30',
                 destAmount: '101',
-                srcCurr: 1,
+                srcCurr: RUB,
             },
             {
                 pos: 3,
