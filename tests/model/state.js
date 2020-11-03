@@ -317,7 +317,7 @@ export class AppState {
     getAccountsByIndexes(accounts) {
         const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
 
-        const userAccList = App.state.accounts.getUserAccounts();
+        const userAccList = this.accounts.getUserAccounts();
         const visibleAccList = userAccList.getVisible(true);
         const hiddenAccList = userAccList.getHidden(true);
 
@@ -464,8 +464,12 @@ export class AppState {
         return copyObject(accObj);
     }
 
-    // Search for account of person in specified currency
-    // In case no such account exist create new account with expected properties
+    /**
+     * Search for account of person in specified currency
+     * In case no such account exist create new account with expected properties
+     * @param {number} personId - identifier of person
+     * @param {number} currencyId - identifier of currency
+     */
     getExpectedPersonAccount(personId, currencyId) {
         const pId = parseInt(personId, 10);
         const currId = parseInt(currencyId, 10);

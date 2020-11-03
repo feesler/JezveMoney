@@ -19,14 +19,12 @@ export class PersonsList extends List {
     }
 
     findByName(name, caseSens = false) {
-        let lookupName;
         let res;
 
         if (caseSens) {
-            lookupName = name;
-            res = this.data.find((item) => item.name === lookupName);
+            res = this.data.find((item) => item.name === name);
         } else {
-            lookupName = name.toLowerCase();
+            const lookupName = name.toLowerCase();
             res = this.data.find((item) => item.name.toLowerCase() === lookupName);
         }
 
