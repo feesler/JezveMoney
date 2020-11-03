@@ -12,7 +12,7 @@
 			"JezveMoney\\App\\": "src/",
 			"JezveMoney\\App\\Admin\\": "src/admin/",
 			"JezveMoney\\App\\API\\": "src/api/",
-			"JezveMoney\\App\\Item\\": "src/api/item/"
+			"JezveMoney\\App\\Item\\": "src/api/Item/"
 		}
 	}
 }
