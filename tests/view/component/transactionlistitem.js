@@ -1,115 +1,111 @@
 import { Component } from './component.js';
 import { Currency } from '../../model/currency.js';
-import { EXPENSE, INCOME, TRANSFER, DEBT } from '../../model/transaction.js';
+import {
+    EXPENSE,
+    INCOME,
+    TRANSFER,
+    DEBT,
+} from '../../model/transaction.js';
 
+export class TransactionListItem extends Component {
+    async parse() {
+        this.id = parseInt(await this.prop(this.elem, 'dataset.id'), 10);
+        this.selected = await this.hasClass(this.elem, 'trans-list__item_selected');
 
-export class TransactionListItem extends Component
-{
-	async parse()
-	{
-		this.id = this.parseId(await this.prop(this.elem, 'id'));
+        const titleElem = await this.query(this.elem, '.trans-list__item-title > span');
+        if (!titleElem) {
+            throw new Error('Account title not found');
+        }
+        this.accountTitle = await this.prop(titleElem, 'textContent');
 
-		let titleElem = await this.query(this.elem, '.tritem_acc_name > span');
-		if (!titleElem)
-			throw new Error('Account title not found');
-		this.accountTitle = await this.prop(titleElem, 'innerText');
+        const amountElem = await this.query(this.elem, '.trans-list__item-content > span');
+        if (!amountElem) {
+            throw new Error('Amount text not found');
+        }
+        this.amountText = await this.prop(amountElem, 'textContent');
 
-		let amountElem = await this.query(this.elem, '.tritem_sum > span');
-		if (!amountElem)
-			throw new Error('Amount text not found');
-		this.amountText = await this.prop(amountElem, 'innerText');
+        const dateElem = await this.query(this.elem, '.trans-list__item-details > *');
+        if (!dateElem || await this.prop(dateElem, 'tagName') !== 'SPAN') {
+            throw new Error('Date element not found');
+        }
 
-		let dateElem = await this.query(this.elem, '.tritem_date_comm > *');
-		if (!dateElem || await this.prop(dateElem, 'tagName') != 'SPAN')
-			throw new Error('Date element not found');
+        this.dateFmt = await this.prop(dateElem, 'textContent');
 
-		this.dateFmt = await this.prop(dateElem, 'innerText');
+        const commentElem = await this.query(this.elem, '.trans-list__item-comment');
+        this.comment = (commentElem) ? await this.prop(commentElem, 'textContent') : '';
+    }
 
-		let commentElem = await this.query(this.elem, '.tritem_comm');
-		this.comment = commentElem ? await this.prop(commentElem, 'innerText') : '';
-	}
+    async click() {
+        return this.environment.click(this.elem);
+    }
 
+    static render(transaction, state) {
+        const res = {};
 
-	async click()
-	{
-		return this.environment.click(this.elem);
-	}
+        if (!transaction) {
+            throw new Error('Invalid transaction object');
+        }
+        if (!state) {
+            throw new Error('Invalid state object');
+        }
 
+        const srcAcc = state.accounts.getItem(transaction.src_id);
+        const destAcc = state.accounts.getItem(transaction.dest_id);
+        const srcAmountFmt = Currency.format(transaction.src_curr, transaction.src_amount);
+        const destAmountFmt = Currency.format(transaction.dest_curr, transaction.dest_amount);
 
-	static render(transaction, state)
-	{
-		let res = {};
+        if (transaction.type === EXPENSE) {
+            res.amountText = `- ${srcAmountFmt}`;
+            if (transaction.src_curr !== transaction.dest_curr) {
+                res.amountText += ` (- ${destAmountFmt})`;
+            }
 
-		if (!transaction)
-			throw new Error('Invalid transaction object');
-		if (!state)
-			throw new Error('Invalid state object');
+            res.accountTitle = srcAcc.name;
+        } else if (transaction.type === INCOME) {
+            res.amountText = `+ ${srcAmountFmt}`;
+            if (transaction.src_curr !== transaction.dest_curr) {
+                res.amountText += ` (+ ${destAmountFmt})`;
+            }
 
-		let srcAcc = state.accounts.getItem(transaction.src_id);
-		let destAcc = state.accounts.getItem(transaction.dest_id);
+            res.accountTitle = destAcc.name;
+        } else if (transaction.type === TRANSFER) {
+            res.amountText = Currency.format(transaction.src_curr, transaction.src_amount);
+            if (transaction.src_curr !== transaction.dest_curr) {
+                res.amountText += ` (${destAmountFmt})`;
+            }
 
-		if (transaction.type == EXPENSE)
-		{
-			res.amountText = '- ' + Currency.format(transaction.src_curr, transaction.src_amount);
-			if (transaction.src_curr != transaction.dest_curr)
-			{
-				res.amountText += ' (- ' + Currency.format(transaction.dest_curr, transaction.dest_amount) + ')';
-			}
+            res.accountTitle = `${srcAcc.name} → ${destAcc.name}`;
+        } else if (transaction.type === DEBT) {
+            res.accountTitle = '';
+            const debtType = (!!srcAcc && srcAcc.owner_id !== state.profile.owner_id);
+            const personAcc = debtType ? srcAcc : destAcc;
+            const person = state.persons.getItem(personAcc.owner_id);
+            if (!person) {
+                throw new Error(`Person ${personAcc.owner_id} not found`);
+            }
 
-			res.accountTitle = srcAcc.name;
-		}
-		else if (transaction.type == INCOME)
-		{
-			res.amountText = '+ ' + Currency.format(transaction.src_curr, transaction.src_amount);
-			if (transaction.src_curr != transaction.dest_curr)
-			{
-				res.amountText += ' (+ ' + Currency.format(transaction.dest_curr, transaction.dest_amount) + ')';
-			}
+            const acc = (debtType) ? destAcc : srcAcc;
 
-			res.accountTitle = destAcc.name;
-		}
-		else if (transaction.type == TRANSFER)
-		{
-			res.amountText = Currency.format(transaction.src_curr, transaction.src_amount);
-			if (transaction.src_curr != transaction.dest_curr)
-			{
-				res.amountText += ' (' + Currency.format(transaction.dest_curr, transaction.dest_amount) + ')';
-			}
+            if (debtType) {
+                res.accountTitle = person.name;
+                if (acc) {
+                    res.accountTitle += ` → ${acc.name}`;
+                }
+                res.amountText = (acc) ? '+ ' : '- ';
+            } else {
+                if (acc) {
+                    res.accountTitle = `${acc.name} → `;
+                }
+                res.accountTitle += person.name;
+                res.amountText = (srcAcc) ? '- ' : '+ ';
+            }
 
-			res.accountTitle = `${srcAcc.name} → ${destAcc.name}`;
-		}
-		else if (transaction.type == DEBT)
-		{
-			res.accountTitle = '';
-			let debtType = (!!srcAcc && srcAcc.owner_id != state.profile.owner_id);
-			let personAcc = debtType ? srcAcc : destAcc;
-			let person = state.persons.getItem(personAcc.owner_id);
-			if (!person)
-				throw new Error(`Person ${personAcc.owner_id} not found`);
+            res.amountText += Currency.format(personAcc.curr_id, transaction.src_amount);
+        }
 
-			let acc = debtType ? destAcc : srcAcc;
+        res.dateFmt = transaction.date;
+        res.comment = transaction.comment;
 
-			if (debtType)
-			{
-				res.accountTitle = person.name;
-				if (acc)
-					res.accountTitle += ' → ' + acc.name;
-				res.amountText = (acc) ? '+ ' : '- ';
-			}
-			else
-			{
-				if (acc)
-					res.accountTitle = acc.name + ' → ';
-				res.accountTitle += person.name;
-				res.amountText = (srcAcc) ? '- ' : '+ ';
-			}
-
-			res.amountText += Currency.format(personAcc.curr_id, transaction.src_amount);
-		}
-
-		res.dateFmt = transaction.date;
-		res.comment = transaction.comment;
-
-		return res;
-	}
+        return res;
+    }
 }

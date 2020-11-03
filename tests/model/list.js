@@ -1,196 +1,181 @@
-import { copyObject } from '../common.js'
+import { copyObject } from '../common.js';
 
+export class List {
+    constructor(data = []) {
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid data specified');
+        }
 
-export class List
-{
-	constructor(data = [])
-	{
-		if (!Array.isArray(data))
-			throw new Error('Invalid data specified');
+        this.setData(data);
+    }
 
-		this.setData(data);
-	}
+    get length() {
+        return this.data.length;
+    }
 
+    setData(data) {
+        this.data = copyObject(data);
+    }
 
-	get length()
-	{
-		return this.data.length;
-	}
+    reset() {
+        this.data = [];
+    }
 
+    async fetch() {
+        throw new Error('Fetch not implemented');
+    }
 
-	setData(data)
-	{
-		this.data = copyObject(data);
-	}
+    async refresh() {
+        const newData = await this.fetch();
+        this.setData(newData);
+    }
 
+    getItem(id) {
+        const itemId = parseInt(id, 10);
+        if (!itemId) {
+            return null;
+        }
+        const res = this.data.find((item) => item.id === itemId);
+        return copyObject(res);
+    }
 
-	reset()
-	{
-		this.data = [];
-	}
+    getItems(ids) {
+        const itemIds = (Array.isArray(ids) ? ids : [ids])
+            .map((id) => parseInt(id, 10));
+        const res = this.data.filter((item) => itemIds.includes(item.id));
+        return copyObject(res);
+    }
 
+    getItemByIndex(ind) {
+        const pos = parseInt(ind, 10);
+        if (Number.isNaN(pos) || pos < 0 || pos >= this.length) {
+            return null;
+        }
 
-	async fetch()
-	{
-		throw new Error('Fetch not implemented');
-	}
+        return copyObject(this.data[pos]);
+    }
 
+    // Return index of item with specified id
+    getIndexOf(id) {
+        const itemId = parseInt(id, 10);
+        if (!itemId) {
+            return null;
+        }
 
-	async refresh()
-	{
-		let newData = await this.fetch();
-		this.setData(newData);
-	}
+        return this.data.findIndex((item) => item.id === itemId);
+    }
 
+    getLatestId() {
+        let res = 0;
+        for (const item of this.data) {
+            res = Math.max(item.id, res);
+        }
 
-	getItem(id)
-	{
-		let res = this.data.find(item => item.id == id);
-		return copyObject(res);
-	}
+        return res;
+    }
 
+    /** Return id of item with specified index(absolute position) in list */
+    indexToId(pos) {
+        const ind = parseInt(pos, 10);
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.length) {
+            throw new Error(`Invalid position ${pos} specified`);
+        }
 
-	getItems(ids)
-	{
-		let itemIds = Array.isArray(ids) ? ids : [ ids ];
+        const item = this.data[pos];
+        return item.id;
+    }
 
-		let res = this.data.filter(item => itemIds.includes(item.id));
-		return copyObject(res);
-	}
+    indexesToIds(positions) {
+        const posList = Array.isArray(positions) ? positions : [positions];
 
+        return posList.map((pos) => this.indexToId(pos));
+    }
 
-	getItemByIndex(ind)
-	{
-		let pos = parseInt(ind);
-		if (isNaN(pos) || pos < 0 || pos >= this.length)
-			return null;
-		
-		return copyObject(this.data[pos]);
-	}
+    // Return expected value of next id
+    getNextId() {
+        if (this.autoincrement) {
+            return this.autoincrement;
+        }
 
+        const latest = this.getLatestId();
+        if (latest > 0) {
+            return latest + 1;
+        }
 
-	// Return index of item with specified id
-	getIndexOf(id)
-	{
-		return this.data.findIndex(item => item.id == id);
-	}
+        return 0;
+    }
 
+    /**
+     * Push item to the end of list, automatically generate id
+     * Return index of new item in the list
+     * @param {Object} item - item data
+     */
+    create(item) {
+        if (!item) {
+            throw new Error('Invalid item');
+        }
 
-	getLatestId()
-	{
-		let res = 0;
+        const itemObj = copyObject(item);
 
-		for(let item of this.data)
-		{
-			res = Math.max(item.id, res);
-		}
+        const nextId = this.getNextId();
+        if (nextId) {
+            itemObj.id = nextId;
+            this.autoincrement = nextId + 1;
+        }
 
-		return res;
-	}
+        const res = this.length;
+        this.data.push(itemObj);
 
+        return res;
+    }
 
-	// Return id of item with specified index(absolute position) in list
-	indexToId(pos)
-	{
-		let ind = parseInt(pos);
-		if (isNaN(ind) || ind < 0 || ind >= this.length)
-			throw new Error(`Invalid position ${pos} specified`);
+    /**
+     * Rewrite existing item in the list with specified data
+     * item object must contain valid 'id' field
+     * @param {Object} item - item data
+     */
+    update(item) {
+        if (!item || !item.id) {
+            throw new Error('Invalid item');
+        }
 
-		let item = this.data[pos];
+        const ind = this.getIndexOf(item.id);
+        if (ind === -1) {
+            return false;
+        }
 
-		return item.id;
-	}
+        const itemObj = copyObject(item);
+        this.data.splice(ind, 1, itemObj);
 
+        return true;
+    }
 
-	indexesToIds(positions)
-	{
-		let posList = Array.isArray(positions) ? positions : [ positions ];
+    deleteItems(ids) {
+        const res = List.deleteByIds(this.data, ids);
+        this.data = res;
 
-		return posList.map(pos => this.indexToId(pos));
-	}
+        return true;
+    }
 
+    static deleteByIds(list, ids) {
+        if (!Array.isArray(list) || !ids) {
+            throw new Error('Unexpected input');
+        }
 
-	// Return expected value of next id
-	getNextId()
-	{
-		if (this.autoincrement)
-			return this.autoincrement;
+        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const res = copyObject(list);
+        for (const id of itemIds) {
+            const itemId = parseInt(id, 10);
+            if (!itemId) {
+                continue;
+            }
 
-		let latest = this.getLatestId();
-		if (latest > 0)
-			return latest + 1;
+            const ind = res.findIndex((item) => item.id === itemId);
+            if (ind !== -1) {
+                res.splice(ind, 1);
+            }
+        }
 
-		return 0;
-	}
-
-
-	// Push item to the end of list, automatically generate id
-	// Return index of new item in the list
-	create(item)
-	{
-		if (!item)
-			throw new Error('Invalid item');
-
-		let itemObj = copyObject(item);
-
-		let next_id = this.getNextId();
-		if (next_id)
-		{
-			itemObj.id = next_id;
-			this.autoincrement = next_id + 1;
-		}
-
-		let res = this.length;
-		this.data.push(itemObj);
-
-		return res;
-	}
-
-
-	// Rewrite existing item in the list with specified data
-	// item object must contain valid id field
-	update(item)
-	{
-		if (!item || !item.id)
-			throw new Error('Invalid item');
-
-		let ind = this.getIndexOf(item.id);
-		if (ind === -1)
-			return false;
-
-		let itemObj = copyObject(item);
-		this.data.splice(ind, 1, itemObj);
-
-		return true;
-	}
-
-
-	deleteItems(ids)
-	{
-		let res = List.deleteByIds(this.data, ids);
-
-		this.data = res;
-
-		return true;
-	}
-
-
-	static deleteByIds(list, ids)
-	{
-		if (!Array.isArray(list) || !ids)
-			throw new Error('Unexpected input');
-
-		if (!Array.isArray(ids))
-			ids = [ ids ];
-
-		let res = copyObject(list);
-		for(let id of ids)
-		{
-			let ind = res.findIndex(item => item.id == id);
-			if (ind !== -1)
-				res.splice(ind, 1);
-		}
-
-		return res;
-	}
+        return res;
+    }
 }

@@ -1,0 +1,40 @@
+/* Main container for charts */
+.charts
+{
+	display: flex;
+	flex-flow: row nowrap;
+	flex-basis: 100%;
+}
+
+
+.chart_wrap
+{
+	flex-basis: 100%;
+	overflow: hidden;
+}
+
+
+.chart_content
+{
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: auto;
+}
+
+
+.chart_content svg *
+{
+	stroke-width: 1px;
+}
+
+
+/* Bar chart information popup */
+.chart_popup
+{
+	position: absolute;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	padding: 5px;
+	white-space: nowrap;
+}

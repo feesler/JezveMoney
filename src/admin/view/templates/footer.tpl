@@ -1,3 +1,6 @@
+<?php
+    use JezveMoney\Core\Message;
+?>
 <?php	foreach($this->jsArr as $jsFile) {	?>
 <script type="text/javascript" src="<?=e(BASEURL.auto_version("view/js/".$jsFile))?>"></script>
 <?php	}	?>
@@ -8,7 +11,7 @@
 <script type="module" src="<?=e(BASEURL.auto_version("admin/view/js/".$jsFile))?>"></script>
 <?php	}	?>
 <script>
-	var baseURL = '<?=BASEURL?>';
+    var baseURL = '<?=BASEURL?>';
 
 <?php		Message::check();		?>
 </script>

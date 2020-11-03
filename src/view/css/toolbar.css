@@ -1,58 +1,40 @@
 /* Sidebar */
 .sidebar
 {
-	display: table-cell;
-	min-height: 100%;
-	height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
 	width: 15px;
-}
-
-
-.sidebar > div
-{
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
+    color: #FFFFFF;
 	background-color: #404040;
 }
 
 
-.sidebar > div > .siderbar_content
+.sidebar.sidebar_active
 {
+    width: auto;
+}
+
+
+.sidebar .siderbar__content
+{
+	display: flex;
+    align-items: center;
 	overflow: hidden;
 	min-width: 15px;
 	height: 100%;
 }
 
 
-.sidebar.active > div > .siderbar_content
-{
-	display: block;
-	color: #FFFFFF;
-	background-color: #404040;
-}
-
-
-.siderbar_content > div
-{
-	position: relative;
-	min-height: 64px;
-}
-
-
-.sidebar_ellipsis
+.sidebar__ellipsis
 {
 	width: 15px;
 	height: 32px;
-	position: absolute;
-	left: 0;
-	top: 50%;
-	margin-top: -16px;
 }
 
 
-.sidebar_ellipsis svg
+.sidebar__ellipsis svg
 {
 	width: 15px;
 	height: 32px;
@@ -60,7 +42,7 @@
 }
 
 
-.sidebar_buttons
+.sidebar__controls
 {
 	display: none;
 	overflow: hidden;
@@ -68,23 +50,21 @@
 }
 
 
-.sidebar.active .sidebar_buttons
+.sidebar.sidebar_active .sidebar__controls
 {
 	display: block;
 }
 
 
-.siderbar_content .iconlink
+.siderbar__content .iconlink
 {
-	display: block;
-	clear: both;
-	float: none;
+	display: flex;
 	margin: 9px 12px;
 }
 
 
 
-.siderbar_content .iconlink span
+.siderbar__content .iconlink span
 {
 	color: #FFFFFF;
 }
@@ -93,34 +73,23 @@
 @media screen and (min-width: 701px)
 {
 
-/* Sidebar */
 .sidebar
 {
-	display: block;
-	position: fixed;
 	min-height: 0;
 	height: auto;
 	width: 100%;
 	left: 0;
 	right: 0;
+    top: auto;
 	bottom: 0;
-}
-
-
-.sidebar > div
-{
-	position: static;
-	height: 50px;
-	width: 100%;
-
 	background-color: #44AAFF;
 }
 
 
-.sidebar > div > .siderbar_content,
-.sidebar.active > div > .siderbar_content
+.sidebar .siderbar__content,
+.sidebar.sidebar_active .siderbar__content
 {
-	display: block;
+	display: flex;
 	padding: 0px;
 	color: #FFFFFF;
 	background-color: #44AAFF;
@@ -131,23 +100,23 @@
 }
 
 
-.sidebar_ellipsis
+.sidebar__ellipsis
 {
 	display: none;
 }
 
 
-.sidebar_buttons
+.sidebar .sidebar__controls,
+.sidebar.sidebar_active .sidebar__controls
 {
-	display: block;
+	display: flex;
+    flex-flow: row nowrap;
 	padding: 0;
 }
 
 
-.siderbar_content .iconlink
+.siderbar__content .iconlink
 {
-	clear: none;
-	float: left;
 	margin: 9px 0px 9px 12px;
 }
 

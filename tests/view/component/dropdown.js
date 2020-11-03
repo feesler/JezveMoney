@@ -1,237 +1,249 @@
-import { NullableComponent } from './component.js';
+import { Component } from './component.js';
 import { asyncMap } from '../../common.js';
 
+export class DropDown extends Component {
+    /** Find for closest parent DropDown container of element */
+    static async getParentContainer(env, elem) {
+        if (!elem) {
+            throw new Error('Invalid element');
+        }
 
-export class DropDown extends NullableComponent
-{
-	// Find for closest parent DropDown container of element
-	static async getParentContainer(env, elem)
-	{
-		if (!elem)
-			throw new Error('Invalid element');
+        let container = await env.closest(elem, '.dd__container');
+        if (!container) {
+            container = await env.closest(elem, '.dd__container_attached');
+        }
 
-		let container = await env.closest(elem, '.dd__container');
-		if (!container)
-			container = await env.closest(elem, '.dd__container_attached');
+        return container;
+    }
 
-		return container;
-	}
+    /** Create new instance of DropDown component using any child element of container */
+    static async createFromChild(parent, elem) {
+        if (!parent || !elem) {
+            throw new Error('Invalid parameters');
+        }
 
+        const container = await DropDown.getParentContainer(parent.environment, elem);
+        if (!container) {
+            throw new Error('Container not found');
+        }
 
-	// Create new instance of DropDown component using any child element of container
-	static async createFromChild(parent, elem)
-	{
-		if (!parent || !elem)
-			throw new Error('Invalid parameters');
+        return super.create(parent, container);
+    }
 
-		let container = await DropDown.getParentContainer(parent.environment, elem);
-		if (!container)
-			throw new Error('Container not found');
+    async parse() {
+        if (
+            !this.elem
+            || (!await this.hasClass(this.elem, 'dd__container')
+                && !await this.hasClass(this.elem, 'dd__container_attached'))
+        ) {
+            throw new Error('Invalid drop down element');
+        }
 
-		return super.create(parent, container);
-	}
+        this.isAttached = await this.hasClass(this.elem, 'dd__container_attached');
+        if (this.isAttached) {
+            this.selectBtn = await this.query(this.elem, ':scope > *');
+        } else {
+            this.selectBtn = await this.query(this.elem, 'button.dd__toggle-btn');
+        }
+        if (!this.selectBtn) {
+            throw new Error('Select button not found');
+        }
 
+        this.disabled = await this.hasClass(this.elem, 'dd__container_disabled');
 
-	async parse()
-	{
-		if (!this.elem || (!await this.hasClass(this.elem, 'dd__container') && !await this.hasClass(this.elem, 'dd__container_attached')))
-			throw new Error('Invalid drop down element');
+        if (!this.isAttached) {
+            this.statSel = await this.query(this.elem, '.dd__single-selection');
+            if (!this.statSel) {
+                throw new Error('Static select element not found');
+            }
+            this.inputElem = await this.query(this.elem, 'input[type="text"]');
+            if (!this.inputElem) {
+                throw new Error('Input element not found');
+            }
 
-		this.isAttached = await this.hasClass(this.elem, 'dd__container_attached');
-		if (this.isAttached)
-			this.selectBtn = await this.query(this.elem, ':scope > *');
-		else
-			this.selectBtn = await this.query(this.elem, 'button.dd__toggle-btn');
-		if (!this.selectBtn)
-			throw new Error('Select button not found');
+            this.editable = await this.isVisible(this.inputElem);
+            if (this.editable) {
+                this.textValue = await this.prop(this.inputElem, 'value');
+            } else {
+                this.textValue = await this.prop(this.statSel, 'textContent');
+            }
+        }
 
-		this.disabled = await this.hasClass(this.elem, 'dd__container_disabled');
+        this.selectElem = await this.query(this.elem, 'select');
+        this.isMulti = await this.prop(this.selectElem, 'multiple');
+        if (this.isMulti) {
+            const selItemElems = await this.queryAll(this.elem, '.dd__selection > .dd__selection-item');
+            this.selectedItems = await asyncMap(selItemElems, async (el) => {
+                const deselectBtn = await this.query(el, '.dd__del-selection-item-btn');
 
-		if (!this.isAttached)
-		{
-			this.statSel = await this.query(this.elem, '.dd__single-selection');
-			if (!this.statSel)
-				throw new Error('Static select element not found');
-			this.inputElem = await this.query(this.elem, 'input[type="text"]');
-			if (!this.inputElem)
-				throw new Error('Input element not found');
+                let title = await this.prop(el, 'textContent');
+                const ind = title.indexOf('×');
+                if (ind !== -1) {
+                    title = title.substr(0, ind);
+                }
 
-			this.editable = await this.isVisible(this.inputElem);
-			if (this.editable)
-				this.textValue = await this.prop(this.inputElem, 'value');
-			else
-				this.textValue = await this.prop(this.statSel, 'textContent')
-		}
+                const id = await this.prop(el, 'dataset.id');
 
-		this.selectElem = await this.query(this.elem, 'select');
-		this.isMulti = await this.prop(this.selectElem, 'multiple');
-		if (this.isMulti)
-		{
-			let selItemElems = await this.queryAll(this.elem, '.dd__selection > .dd__selection-item');
-			this.selectedItems = await asyncMap(selItemElems, async el =>
-			{
-				let text = await this.prop(el, 'textContent');
-				let ind = text.indexOf('×');
-				if (ind !== -1)
-					text = text.substr(0, ind);
-				
-				return text;
-			});
-		}
+                return { id, title, deselectBtn };
+            });
+        }
 
-		let selectOptions = await this.queryAll(this.selectElem, 'option');
-		let optionsData = await asyncMap(selectOptions, async (item) => {
-			return {
-				id : await this.prop(item, 'value'),
-				title : await this.prop(item, 'textContent'),
-				selected : await this.prop(item, 'selected')
-			};
-		})
+        const selectOptions = await this.queryAll(this.selectElem, 'option');
+        const optionsData = await asyncMap(selectOptions, async (item) => ({
+            id: await this.prop(item, 'value'),
+            title: await this.prop(item, 'textContent'),
+            selected: await this.prop(item, 'selected'),
+        }));
 
-		this.listContainer = await this.query(this.elem, '.dd__list');
-		if (this.listContainer)
-		{
-			let listItems = await this.queryAll(this.elem, '.dd__list li > div');
-			this.items = await asyncMap(listItems, async (item) =>
-			{
-				let res = {
-					text : await this.prop(item, 'textContent'),
-					elem : item
-				};
+        this.listContainer = await this.query(this.elem, '.dd__list');
+        if (this.listContainer) {
+            const listItems = await this.queryAll(this.elem, '.dd__list li > div');
+            this.items = await asyncMap(listItems, async (item) => {
+                const res = {
+                    text: await this.prop(item, 'textContent'),
+                    elem: item,
+                };
 
-				let option = optionsData.find(item => item.title == res.text);
-				if (option)
-				{
-					res.id = option.id;
-					res.selected = option.selected
-				}
+                const option = optionsData.find((opt) => opt.title === res.text);
+                if (option) {
+                    res.id = option.id;
+                    res.selected = option.selected;
+                }
 
-				return res;
-			});
-		}
-	}
+                return res;
+            });
+        }
+    }
 
+    getItem(itemId) {
+        const strId = itemId.toString();
 
-	getItem(item_id)
-	{
-		return this.items.find(item => item.id == item_id);
-	}
+        return this.items.find((item) => item.id === strId);
+    }
 
+    getSelectedItem(itemId) {
+        const strId = itemId.toString();
 
-	async showList(show = true)
-	{
-		let listVisible = await this.isVisible(this.listContainer);
-		if (show == listVisible)
-			return;
+        return this.selectedItems.find((item) => item.id === strId);
+    }
 
-		await this.click(this.selectBtn);
-	}
+    async showList(show = true) {
+        const listVisible = await this.isVisible(this.listContainer);
+        if (show === listVisible) {
+            return;
+        }
 
+        await this.click(this.selectBtn);
+    }
 
-	async toggleItem(item_id)
-	{
-		let li = this.getItem(item_id);
-		if (!li)
-			throw new Error(`List item ${item_id} not found`);
+    async toggleItem(itemId) {
+        const li = this.getItem(itemId);
+        if (!li) {
+            throw new Error(`List item ${itemId} not found`);
+        }
 
-		if (li.selected)
-		{
-			if (this.isMulti)
-				await this.deselectItem(item_id);
-		}
-		else
-		{
-			await this.selectItem(item_id);
-		}
-	}
+        if (li.selected) {
+            if (this.isMulti) {
+                await this.deselectItem(itemId);
+            }
+        } else {
+            await this.selectItem(itemId);
+        }
 
+        await this.parse();
+    }
 
-	async selectItem(item_id)
-	{
-		let li = this.getItem(item_id);
-		if (!li)
-			throw new Error(`List item ${item_id} not found`);
+    async selectItem(itemId) {
+        const li = this.getItem(itemId);
+        if (!li) {
+            throw new Error(`List item ${itemId} not found`);
+        }
 
-		if (li.selected)
-			return;
+        if (li.selected) {
+            return;
+        }
 
-		await this.showList();
-		await this.click(li.elem);
-	}
+        await this.showList();
+        await this.click(li.elem);
+    }
 
+    async deselectItem(itemId) {
+        if (!this.isMulti) {
+            throw new Error('Deselect item not available for single select DropDown');
+        }
 
-	async deselectItem(item_id)
-	{
-		if (!this.isMulti)
-			throw new Error('Deselect item not available for single select DropDown');
+        const li = this.getItem(itemId);
+        if (!li) {
+            throw new Error(`List item ${itemId} not found`);
+        }
 
-		let li = this.getItem(item_id);
-		if (!li)
-			throw new Error(`List item ${item_id} not found`);
+        if (!li.selected) {
+            return;
+        }
 
-		if (!li.selected)
-			return;
+        await this.showList();
+        await this.click(li.elem);
+    }
 
-		await this.showList();
-		await this.click(li.elem);
-	}
+    async deselectItemByTag(itemId) {
+        if (!this.isMulti) {
+            throw new Error('Deselect item not available for single select DropDown');
+        }
 
+        const selItem = this.getSelectedItem(itemId);
+        if (!selItem) {
+            throw new Error(`Selected item ${itemId} not found`);
+        }
 
-	async setSelection(val)
-	{
-		let values = Array.isArray(val) ? val : [ val ];
+        await this.click(selItem.deselectBtn);
+        await this.parse();
+    }
 
-		if (values.length > 1 && !this.isMulti)
-			throw new Error('Select multiple items not available for single select DropDown');
+    async setSelection(val) {
+        const values = Array.isArray(val) ? val : [val];
 
-		if (this.isMulti)
-		{
-			let selectedValues = this.getSelectedValues();
-			for(let value of selectedValues)
-			{
-				if (!values.includes(value))
-					await this.deselectItem(value);
-			}
+        if (values.length > 1 && !this.isMulti) {
+            throw new Error('Select multiple items not available for single select DropDown');
+        }
 
-			await this.parse();
+        if (this.isMulti) {
+            const selectedValues = this.getSelectedValues();
+            for (const value of selectedValues) {
+                if (!values.includes(value)) {
+                    await this.deselectItem(value);
+                }
+            }
 
-			for(let value of values)
-			{
-				await this.selectItem(value);
-			}
+            await this.parse();
 
-			await this.showList(false);
-		}
-		else
-		{
-			await this.selectItem(values[0]);
-		}
-	}
+            for (const value of values) {
+                await this.selectItem(value);
+            }
 
+            await this.showList(false);
+        } else {
+            await this.selectItem(values[0]);
+        }
+    }
 
-	async deselectAll()
-	{
-		if (!this.isMulti)
-			throw new Error('Deselect items not available for single select DropDown');
+    async deselectAll() {
+        if (!this.isMulti) {
+            throw new Error('Deselect items not available for single select DropDown');
+        }
 
-		let selectedValues = this.getSelectedValues();
-		for(let value of selectedValues)
-		{
-			await this.deselectItem(value);
-		}
+        const selectedValues = this.getSelectedValues();
+        for (const value of selectedValues) {
+            await this.deselectItem(value);
+        }
 
-		await this.showList(false);
-	}
+        await this.showList(false);
+    }
 
+    getSelectedItems() {
+        return this.items.filter((item) => item.selected);
+    }
 
-	getSelectedItems()
-	{
-		return this.items.filter(item => item.selected);
-	}
-
-
-	getSelectedValues()
-	{
-		return this.getSelectedItems().map(item => item.id);
-	}
+    getSelectedValues() {
+        return this.getSelectedItems().map((item) => item.id);
+    }
 }

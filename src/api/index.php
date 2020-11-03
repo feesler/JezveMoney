@@ -1,48 +1,49 @@
 <?php
-	require_once("../system/setup.php");
-	require_once("../system/router.php");
 
-	$router = new Router();
-	$router->setRoutes([
-		"currency" => "CurrencyApiController",
-		"account" => "AccountApiController",
-		"person" => "PersonApiController",
-		"transaction" => "TransactionApiController",
-		"user" => "UserApiController",
-		"profile" => "ProfileApiController",
-		"state" => "StateApiController"
-	]);
+namespace JezveMoney;
 
-	$router->setAliases([
-		"login" => "user/login",
-		"logout" => "user/logout",
-		"register" => "user/register",
-	]);
+require_once("../system/setup.php");
 
-	$router->setActionsMap([
-		"new" => "create",
-		"edit" => "update",
-		"delete" => "del",
-		"list" => "getList"
-	]);
+$router = new Core\Router();
+$router->setNamespace("JezveMoney\\App\\API\\Controller");
+$router->setRoutes([
+    "currency" => "Currency",
+    "icon" => "Icon",
+    "account" => "Account",
+    "person" => "Person",
+    "transaction" => "Transaction",
+    "user" => "User",
+    "profile" => "Profile",
+    "state" => "State"
+]);
 
-	$router->onStart(function($controller, $contrStr, $routeParts)
-	{
-		// Check correct user authentication for controller
-		$loggedOutControllers = ["user/login", "user/register"];
-		$rebuildRoute = $contrStr.(count($routeParts) ? "/".$routeParts[0] : "");
-		$isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+$router->setAliases([
+    "login" => "user/login",
+    "logout" => "user/logout",
+    "register" => "user/register",
+]);
 
-		$controller->authRequired = !$isLogOutCont;
-	});
+$router->setActionsMap([
+    "new" => "create",
+    "edit" => "update",
+    "delete" => "del",
+    "list" => "getList"
+]);
 
-	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
-	{
-		if ($controller instanceof ApiController)
-		{
-			$controller->initAPI();
-		}
-	});
+$router->onStart(function ($controller, $contrStr, $routeParts) {
 
+    // Check correct user authentication for controller
+    $loggedOutControllers = ["user/login", "user/register"];
+    $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
+    $isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+    $controller->authRequired = !$isLogOutCont;
+});
 
-	$router->route();
+$router->onBeforeAction(function ($controller, $contrStr, $action, $routeParts) {
+
+    if ($controller instanceof Core\ApiController) {
+        $controller->initAPI();
+    }
+});
+
+$router->route();

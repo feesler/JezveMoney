@@ -24,11 +24,19 @@ Update Node.js packages:
 
 Composer
 Update packages:
-	composer update
+	composer update --no-dev
 Optimize autoload:
-	composer dump-autoload -a
+	composer dump-autoload -a --no-dev
 
 
 Phan
 Run from app root:
-.\src\vendor\bin\phan
+.\dev-tools\vendor\bin\phan
+
+PHP Code Sniffer
+Run from app root:
+.\dev-tools\vendor\bin\phpcs --standard=PSR12 <files to check>
+.\dev-tools\vendor\bin\phpcbf --standard=PSR12 <files to fix>
+
+PHP CS Fixer
+.\dev-tools\vendor\bin\php-cs-fixer fix --rules=@PSR2 <files to fix>

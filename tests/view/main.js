@@ -5,141 +5,160 @@ import { TilesList } from './component/tileslist.js';
 import { Tile } from './component/tile.js';
 import { InfoTile } from './component/infotile.js';
 
+/** Main view class */
+export class MainView extends TestView {
+    async parseContent() {
+        const widgetsElem = await this.queryAll('.content_wrap .widget');
+        if (!widgetsElem) {
+            throw new Error('Fail to parse main view widgets');
+        }
 
-// Main view class
-export class MainView extends TestView
-{
-	async parseContent()
-	{
-		let widgetsElem = await this.queryAll('.content_wrap .widget');
-		if (!widgetsElem)
-			throw new Error('Fail to parse main view widgets');
+        const res = {
+            widgets: [],
+        };
 
-		let res = {};
-		res.widgets = [];
-		for(let wElem of widgetsElem)
-		{
-			let widget = {
-				elem : wElem,
-				titleElem : await this.query(wElem, '.widget_title'),
-				linkElem : await this.query(wElem, '.widget_title > a'),
-				textElem : await this.query(wElem, '.widget_title span')
-			};
+        for (const elem of widgetsElem) {
+            const widget = {
+                elem,
+                titleElem: await this.query(elem, '.widget_title'),
+                linkElem: await this.query(elem, '.widget_title > a'),
+                textElem: await this.query(elem, '.widget_title span'),
+            };
 
-			if (widget.linkElem)
-				widget.link = await this.prop(widget.linkElem, 'href');
-			if (widget.textElem)
-				widget.title = await this.prop(widget.textElem, 'innerText');
+            if (widget.linkElem) {
+                widget.link = await this.prop(widget.linkElem, 'href');
+            }
+            if (widget.textElem) {
+                widget.title = await this.prop(widget.textElem, 'textContent');
+            }
 
-			let tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
-			if (tiles)
-				widget.tiles = tiles;
-			let infoTiles = await TilesList.create(this, await this.query(widget.elem, '.info_tiles'), InfoTile);
-			if (infoTiles)
-				widget.infoTiles = infoTiles;
+            const tiles = await TilesList.create(this, await this.query('.tiles'), Tile);
+            if (tiles) {
+                widget.tiles = tiles;
+            }
 
-			let transactions = await TransactionList.create(this, await this.query(widget.elem, '.trans_list'));
-			if (transactions)
-				widget.transList = transactions;
+            const infoTiles = await TilesList.create(this, await this.query(widget.elem, '.info-tiles'), InfoTile);
+            if (infoTiles) {
+                widget.infoTiles = infoTiles;
+            }
 
-			res.widgets.push(widget);
-		}
+            const transactions = await TransactionList.create(this, await this.query(widget.elem, '.trans-list'));
+            if (transactions) {
+                widget.transList = transactions;
+            }
 
-		return res;
-	}
+            res.widgets.push(widget);
+        }
 
+        return res;
+    }
 
-	goToAccounts()
-	{
-	 	if (!this.content.widgets || !this.content.widgets[App.config.AccountsWidgetPos])
-			throw new Error('Accounts widget not found');
+    async goToAccounts() {
+        if (!this.content.widgets || !this.content.widgets[App.config.AccountsWidgetPos]) {
+            throw new Error('Accounts widget not found');
+        }
 
-		let widget = this.content.widgets[App.config.AccountsWidgetPos];
-		if (widget.title != 'Accounts')
-			throw new Error('Wrong widget');
+        const widget = this.content.widgets[App.config.AccountsWidgetPos];
+        if (widget.title !== 'Accounts') {
+            throw new Error('Invalid accounts widget');
+        }
 
-		return this.navigation(() => this.click(widget.linkElem));
-	}
+        await this.navigation(() => this.click(widget.linkElem));
+    }
 
+    async goToNewTransactionByAccount(accNum) {
+        if (!this.content.widgets || !this.content.widgets[App.config.AccountsWidgetPos]) {
+            throw new Error('Wrong state of main view');
+        }
 
-	goToNewTransactionByAccount(accNum)
-	{
-		if (!this.content.widgets || !this.content.widgets[App.config.AccountsWidgetPos])
-			throw new Error('Wrong state of main view');
+        const accWidget = this.content.widgets[App.config.AccountsWidgetPos];
+        if (accWidget.title !== 'Accounts') {
+            throw new Error('Wrong state of accounts widget');
+        }
 
-		let accWidget = this.content.widgets[App.config.AccountsWidgetPos];
-		if (accWidget.title != 'Accounts')
-			throw new Error('Wrong state of accounts widget');
+        if (!accWidget.tiles || accWidget.tiles.items.length <= accNum) {
+            throw new Error(`Tile ${accNum} not found`);
+        }
 
-		 if (!accWidget.tiles || accWidget.tiles.items.length <= accNum)
-			throw new Error(`Tile ${accNum} not found`);
+        const tile = accWidget.tiles.items[accNum];
+        const link = tile.linkElem;
 
-		let tile = accWidget.tiles.items[accNum];
-		let link = tile.linkElem;
+        await this.navigation(() => this.click(link));
+    }
 
-		return this.navigation(() => this.click(link));
-	}
+    async goToTransactions() {
+        if (
+            !this.content
+            || !this.content.widgets
+            || this.content.widgets.length !== App.config.widgetsCount
+        ) {
+            throw new Error('Fail to parse main view widgets');
+        }
 
+        const widget = this.content.widgets[App.config.LatestWidgetPos];
+        if (widget.title !== 'Transactions') {
+            throw new Error('Invalid transactions widget');
+        }
 
-	goToTransactions()
-	{
-		if (!this.content || !this.content.widgets || this.content.widgets.length != App.config.widgetsCount)
-			throw new Error('Fail to parse main view widgets');
+        await this.navigation(() => this.click(widget.linkElem));
+    }
 
-		let widget = this.content.widgets[App.config.LatestWidgetPos];
-		if (widget.title != 'Transactions')
-			throw new Error('Wrong widget');
+    async goToPersons() {
+        if (
+            !this.content
+            || !this.content.widgets
+            || this.content.widgets.length !== App.config.widgetsCount
+        ) {
+            throw new Error('Fail to parse main view widgets');
+        }
 
-		return this.navigation(() => this.click(widget.linkElem));
-	}
+        const widget = this.content.widgets[App.config.PersonsWidgetPos];
+        if (widget.title !== 'Persons') {
+            throw new Error('Invalid persons widget');
+        }
 
+        await this.navigation(() => this.click(widget.linkElem));
+    }
 
-	goToPersons()
-	{
-		if (!this.content || !this.content.widgets || this.content.widgets.length != App.config.widgetsCount)
-			throw new Error('Fail to parse main view widgets');
+    async goToStatistics() {
+        if (
+            !this.content
+            || !this.content.widgets
+            || this.content.widgets.length !== App.config.widgetsCount
+        ) {
+            throw new Error('Fail to parse main view widgets');
+        }
 
-		let widget = this.content.widgets[App.config.PersonsWidgetPos];
-		if (widget.title != 'Persons')
-			throw new Error('Wrong widget');
+        const widget = this.content.widgets[App.config.StatisticsWidgetPos];
+        if (widget.title !== 'Statistics') {
+            throw new Error('Invalid statistics widget');
+        }
 
-		return this.navigation(() => this.click(widget.linkElem));
-	}
+        await this.navigation(() => this.click(widget.linkElem));
+    }
 
+    static render(state) {
+        const res = {
+            values: {
+                widgets: { length: App.config.widgetsCount },
+            },
+        };
 
-	goToStatistics()
-	{
-		if (!this.content || !this.content.widgets || this.content.widgets.length != App.config.widgetsCount)
-			throw new Error('Fail to parse main view widgets');
+        // Accounts widget
+        const accWidget = { tiles: TilesList.renderAccounts(state.accounts.getUserAccounts()) };
+        res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
+        // Persons widget
+        const personsWidget = { infoTiles: TilesList.renderPersons(state.persons, InfoTile) };
+        res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
 
-		let widget = this.content.widgets[App.config.StatisticsWidgetPos];
-		if (widget.title != 'Statistics')
-			throw new Error('Wrong widget');
+        // Transactions widget
+        const latestTransactionsList = state.transactions.data.slice(
+            0,
+            App.config.latestTransactions,
+        );
+        const transWidget = TransactionList.renderWidget(latestTransactionsList, state);
+        res.values.widgets[App.config.LatestWidgetPos] = transWidget;
 
-		return this.navigation(() => this.click(widget.linkElem));
-	}
-
-
-	static render(state)
-	{
-		let res = {
-			values : {
-			widgets : { length : App.config.widgetsCount } }
-		};
-
-		// Accounts widget
-		let accWidget = { tiles : TilesList.renderAccounts(state.accounts.getUserAccounts()) };
-		res.values.widgets[App.config.AccountsWidgetPos] = accWidget;
-		// Persons widget
-		let personsWidget = { infoTiles : TilesList.renderPersons(state.persons, InfoTile) };
-		res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
-
-		// Transactions widget
-		let latestTransactionsList = state.transactions.data.slice(0, App.config.latestTransactions);
-		let transWidget = TransactionList.renderWidget(latestTransactionsList, state);
-		res.values.widgets[App.config.LatestWidgetPos] = transWidget;
-
-		return res;
-	}
+        return res;
+    }
 }
-

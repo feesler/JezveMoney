@@ -1,4 +1,4 @@
-.admin_header
+.admin-header
 {
 	box-sizing: border-box;
 	width: 100%;
@@ -9,7 +9,7 @@
 }
 
 
-.admin_header > .menu > span
+.admin-header > .menu > span
 {
 	display: inline;
 	padding: 0px 10px 0px 0px;
@@ -39,34 +39,28 @@
 
 
 /* Admin table */
-.adm_tbl
+.admin-tbl
 {
 	border-collapse: collapse;
-	border: 1px solid #000000;
+	border: 1px solid;
 }
 
 
-.adm_tbl th,
-.adm_tbl td
+.admin-tbl th,
+.admin-tbl td
 {
-	border: 1px solid #000000;
+	border: 1px solid;
 	padding: 5px;
 }
 
 
-.adm_tbl tr
+.admin-tbl tr
 {
 	cursor: pointer;
 }
 
 
-.adm_tbl tr:hover
-{
-	background-color: #BBBBBB;
-}
-
-
-.adm_tbl tr.act
+.admin-tbl tr.act
 {
 	background-color: #0088DD;
 	color: #FFFFFF;
@@ -76,26 +70,81 @@
 /* Common style for textarea */
 textarea
 {
-	border: 1px solid #000000;
+	border: 1px solid;
 	padding: 5px;
 }
 
 
-.popup_form_controls
+.popup__form-controls
 {
 	position: relative;
 	top: 25px;
 }
 
 
-.check_wr label > input
+/* Checkbox wrapper */
+.checkbox-wrap
+{
+	height: 20px;
+	padding: 5px 0px;
+}
+
+
+.checkbox-wrap > input[type="checkbox"]
+{
+	display: inline;
+	height: 20px;
+	line-height: 20px;
+}
+
+
+.checkbox-wrap > label
+{
+	display: inline;
+	padding: 0px 5px;
+	font-size: 16px;
+	height: 20px;
+	line-height: 20px;
+}
+
+
+.checkbox-wrap label > input
 {
 	margin-right: 8px;
 }
 
 
-.check_wr.check_wr_inline
+.checkbox-wrap.checkbox-wrap_inline
 {
 	display: inline-block;
 	margin-right: 10px;
+}
+
+
+/* Create/update item popup */
+.popup > .item-form
+{
+	margin-top: -120px;
+}
+
+
+.popup > .item-form > .popup__content-box
+{
+	max-width: 300px;
+	min-width: 130px;
+}
+
+
+.item-form label
+{
+	display: block;
+	width: 100%;
+	font-size: 16px;
+	padding: 5px 0px;
+}
+
+
+.item-form .stretch-input
+{
+	border-width: 1px;
 }

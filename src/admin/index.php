@@ -1,39 +1,39 @@
 <?php
-	$noLogs = TRUE;
 
-	require_once("../system/setup.php");
-	require_once("../system/router.php");
+namespace JezveMoney;
 
-	$router = new Router();
-	$router->setRoutes([
-		"main" => "MainAdminController",
-		"balance" => "BalanceAdminController",
-		"currency" => "CurrencyAdminController",
-		"query" => "QueryAdminController",
-		"log" => "LogsAdminController",
-		"tests" => "TestsAdminController",
-		"apiconsole" => "ApiConsoleAdminController",
-		"user" => "UserAdminController"
-	]);
+$noLogs = true;
+require_once("../system/setup.php");
 
-	$router->setActionsMap([
-		"new" => "create",
-		"edit" => "update",
-		"chpwd" => "changePassword"
-	]);
+$router = new Core\Router();
+$router->setNamespace("JezveMoney\\App\\Admin\\Controller");
+$router->setRoutes([
+    "main" => "Main",
+    "dbinstall" => "DBInstall",
+    "balance" => "Balance",
+    "currency" => "Currency",
+    "icon" => "Icon",
+    "query" => "Query",
+    "log" => "Logs",
+    "tests" => "Tests",
+    "apiconsole" => "ApiConsole",
+    "user" => "User"
+]);
 
-	$router->onStart(function($controller, $contrStr)
-	{
-		setLogs($contrStr != "log");
+$router->setActionsMap([
+    "new" => "create",
+    "edit" => "update",
+    "chpwd" => "changePassword"
+]);
 
-		$controller->checkUser(TRUE, TRUE);
-	});
+$router->onStart(function ($controller, $contrStr) {
+    setLogs($contrStr != "log");
+    $controller->checkUser(true, true);
+});
 
-	$router->onBeforeAction(function($controller, $contrStr, $action, $routeParts)
-	{
-		$controller->initDefResources();
-	});
+$router->onBeforeAction(function ($controller, $contrStr, $action, $routeParts) {
 
+    $controller->initDefResources();
+});
 
-	$router->route();
-
+$router->route();

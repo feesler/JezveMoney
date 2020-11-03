@@ -1,53 +1,46 @@
-export class Component
-{
-	constructor(parent, elem)
-	{
-		if (!parent)
-			throw new Error('Invalid parent specified');
-		if (!elem)
-			throw new Error('Invalid element specified');
+export class Component {
+    constructor(parent, elem) {
+        if (!parent) {
+            throw new Error('Invalid parent specified');
+        }
+        if (!elem) {
+            throw new Error('Invalid element specified');
+        }
 
-		this.elem = elem;
-		this.parent = parent;
+        this.elem = elem;
+        this.parent = parent;
 
-		this.environment = parent.environment;
-		if (this.environment)
-			this.environment.inject(this);
-	}
+        this.environment = parent.environment;
+        if (this.environment) {
+            this.environment.inject(this);
+        }
+    }
 
+    async parse() {
+        throw new Error('Not implemented');
+    }
 
-	async parse()
-	{
-		throw new Error('Not implemented');
-	}
+    static async create(...args) {
+        if (args.length < 2 || !args[1]) {
+            return null;
+        }
 
+        let instance;
+        try {
+            instance = new this(...args);
+            await instance.parse();
+        } catch (e) {
+            return null;
+        }
 
-	static async create(...args)
-	{
-		let instance = new this(...args);
-		await instance.parse();
-		return instance;
-	}
+        return instance;
+    }
 
+    static async isVisible(item) {
+        if (!item || !item.elem || !item.environment) {
+            return false;
+        }
 
-	parseId(id)
-	{
-		if (typeof id !== 'string')
-			return id;
-
-		let pos = id.indexOf('_');
-		return (pos != -1) ? parseInt(id.substr(pos + 1)) : id;
-	}
-}
-
-
-export class NullableComponent extends Component
-{
-	static async create(...args)
-	{
-		if (args.length < 2 || !args[1])
-			return null;
-
-		return super.create(...args);
-	}
+        return item.environment.isVisible(item.elem);
+    }
 }

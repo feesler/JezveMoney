@@ -1,3 +1,7 @@
 RewriteEngine on
 RewriteBase /api/
+
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.+$ https://%{SERVER_NAME}/ [R,L]
+
 RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]

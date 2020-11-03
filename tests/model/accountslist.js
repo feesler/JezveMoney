@@ -3,214 +3,204 @@ import { api } from './api.js';
 import { List } from './list.js';
 import { App } from '../app.js';
 
+/* eslint-disable no-bitwise */
 
 export const ACCOUNT_HIDDEN = 1;
 
+export class AccountsList extends List {
+    async fetch() {
+        return api.account.list(true);
+    }
 
-export class AccountsList extends List
-{
-	async fetch()
-	{
-		return api.account.list(true);
-	}
+    clone() {
+        const res = new AccountsList(this.data);
+        res.autoincrement = this.autoincrement;
 
+        return res;
+    }
 
-	clone()
-	{
-		let res = new AccountsList(this.data);
-		res.autoincrement = this.autoincrement;
+    /** Apply transaction to accounts */
+    static applyTransaction(accounts, transaction) {
+        if (!Array.isArray(accounts)) {
+            throw new Error('Invalid accounts list specified');
+        }
+        if (!transaction) {
+            throw new Error('Invalid transaction specified');
+        }
 
-		return res;
-	}
+        const res = copyObject(accounts);
 
+        const srcAcc = (transaction.src_id)
+            ? res.find((item) => item.id === transaction.src_id)
+            : null;
+        if (srcAcc) {
+            srcAcc.balance = normalize(srcAcc.balance - transaction.src_amount);
+        }
 
-	// Apply transaction to accounts
-	static applyTransaction(accounts, transaction)
-	{
-		if (!Array.isArray(accounts))
-			throw new Error('Invalid accounts list specified');
-		if (!transaction)
-			throw new Error('Invalid transaction specified');
+        const destAcc = (transaction.dest_id)
+            ? res.find((item) => item.id === transaction.dest_id)
+            : null;
+        if (destAcc) {
+            destAcc.balance = normalize(destAcc.balance + transaction.dest_amount);
+        }
 
-		let res = copyObject(accounts);
+        return res;
+    }
 
-		let srcAcc = (transaction.src_id) ? res.find(item => item.id == transaction.src_id) : null;
-		if (srcAcc)
-		{
-			srcAcc.balance = normalize(srcAcc.balance - transaction.src_amount);
-		}
+    /** Cancel transaction from accounts */
+    static cancelTransaction(accounts, transaction) {
+        if (!Array.isArray(accounts)) {
+            throw new Error('Invalid accounts list specified');
+        }
+        if (!transaction) {
+            throw new Error('Invalid transaction specified');
+        }
 
-		let destAcc = (transaction.dest_id) ? res.find(item => item.id == transaction.dest_id) : null;
-		if (destAcc)
-		{
-			destAcc.balance = normalize(destAcc.balance + transaction.dest_amount);
-		}
+        const res = copyObject(accounts);
 
-		return res;
-	}
+        const srcAcc = (transaction.src_id)
+            ? res.find((item) => item.id === transaction.src_id)
+            : null;
+        if (srcAcc) {
+            srcAcc.balance = normalize(srcAcc.balance + transaction.src_amount);
+        }
 
+        const destAcc = (transaction.dest_id)
+            ? res.find((item) => item.id === transaction.dest_id)
+            : null;
+        if (destAcc) {
+            destAcc.balance = normalize(destAcc.balance - transaction.dest_amount);
+        }
 
-	// Cancel transaction to accounts
-	static cancelTransaction(accounts, transaction)
-	{
-		if (!Array.isArray(accounts))
-			throw new Error('Invalid accounts list specified');
-		if (!transaction)
-			throw new Error('Invalid transaction specified');
+        return res;
+    }
 
-		let res = copyObject(accounts);
+    createTransaction(transaction, returnRaw = false) {
+        const res = AccountsList.applyTransaction(this.data, transaction);
 
-		let srcAcc = (transaction.src_id) ? res.find(item => item.id == transaction.src_id) : null;
-		if (srcAcc)
-		{
-			srcAcc.balance = normalize(srcAcc.balance + transaction.src_amount);
-		}
+        if (returnRaw) {
+            return res;
+        }
 
-		let destAcc = (transaction.dest_id) ? res.find(item => item.id == transaction.dest_id) : null;
-		if (destAcc)
-		{
-			destAcc.balance = normalize(destAcc.balance - transaction.dest_amount);
-		}
+        return new AccountsList(res);
+    }
 
-		return res;
-	}
+    updateTransaction(origTransaction, newTransaction, returnRaw = false) {
+        const afterCancel = AccountsList.cancelTransaction(this.data, origTransaction);
+        const res = AccountsList.applyTransaction(afterCancel, newTransaction);
 
+        if (returnRaw) {
+            return res;
+        }
 
-	createTransaction(transaction, returnRaw = false)
-	{
-		let res = AccountsList.applyTransaction(this.data, transaction);
+        return new AccountsList(res);
+    }
 
-		if (returnRaw)
-			return res;
-		else
-			return new AccountsList(res);
-	}
+    deleteTransactions(transactions, returnRaw = false) {
+        const transList = Array.isArray(transactions) ? transactions : [transactions];
+        let res = copyObject(this.data);
 
+        for (const transaction of transList) {
+            res = AccountsList.cancelTransaction(res, transaction);
+        }
 
-	updateTransaction(origTransaction, newTransaction, returnRaw = false)
-	{
-		let afterCancel = AccountsList.cancelTransaction(this.data, origTransaction)
-		let res = AccountsList.applyTransaction(afterCancel, newTransaction);
+        if (returnRaw) {
+            return res;
+        }
 
-		if (returnRaw)
-			return res;
-		else
-			return new AccountsList(res);
-	}
+        return new AccountsList(res);
+    }
 
+    /** Reset balance of all accounts to initial values */
+    toInitial(returnRaw = false) {
+        const res = copyObject(this.data);
+        for (const acc of res) {
+            acc.balance = acc.initbalance;
+        }
 
-	deleteTransactions(transactions, returnRaw = false)
-	{
-		let transList = Array.isArray(transactions) ? transactions : [ transactions ];
-		let res = copyObject(this.data);
+        if (returnRaw) {
+            return res;
+        }
 
-		for(let transaction of transList)
-		{
-			res = AccountsList.cancelTransaction(res, transaction);
-		}
+        return new AccountsList(res);
+    }
 
-		if (returnRaw)
-			return res;
-		else
-			return new AccountsList(res);
-	}
+    findByName(name, caseSens = false) {
+        let lookupName;
 
+        if (caseSens) {
+            lookupName = name;
+            return this.data.find((item) => item.name === lookupName);
+        }
 
-	// Reset balance of all accounts to initial values
-	toInitial(returnRaw = false)
-	{
-		let res = copyObject(this.data);
-		for(let acc of res)
-		{
-			acc.balance = acc.initbalance;
-		}
+        lookupName = name.toLowerCase();
+        return this.data.find((item) => item.name.toLowerCase() === lookupName);
+    }
 
-		if (returnRaw)
-			return res;
-		else
-			return new AccountsList(res);
-	}
+    getUserAccounts(returnRaw = false) {
+        const res = this.data.filter((item) => item.owner_id === App.owner_id);
 
+        if (returnRaw) {
+            return copyObject(res);
+        }
 
-	findByName(name, caseSens = false)
-	{
-		let lookupName;
+        return new AccountsList(res);
+    }
 
-		if (caseSens)
-		{
-			lookupName = name;
-			return this.data.find(item => item.name == lookupName);
-		}
-		else
-		{
-			lookupName = name.toLowerCase();
-			return this.data.find(item => item.name.toLowerCase() == lookupName);
-		}
-	}
+    isHidden(account) {
+        if (!account) {
+            throw new Error('Invalid account');
+        }
 
+        return (account.flags & ACCOUNT_HIDDEN) === ACCOUNT_HIDDEN;
+    }
 
-	getUserAccounts(returnRaw = false)
-	{
-		let res = this.data.filter(item => item.owner_id == App.owner_id);
+    getVisible(returnRaw = false) {
+        const res = this.data.filter((item) => !this.isHidden(item));
 
-		if (returnRaw)
-			return copyObject(res);
-		else
-			return new AccountsList(res);
-	}
+        if (returnRaw) {
+            return copyObject(res);
+        }
 
+        return new AccountsList(res);
+    }
 
-	isHidden(account)
-	{
-		if (!account)
-			throw new Error('Invalid account');
+    getHidden(returnRaw = false) {
+        const res = this.data.filter((item) => this.isHidden(item));
 
-		return (account.flags & ACCOUNT_HIDDEN) == ACCOUNT_HIDDEN;
-	}
+        if (returnRaw) {
+            return copyObject(res);
+        }
 
+        return new AccountsList(res);
+    }
 
-	getVisible(returnRaw = false)
-	{
-		let res = this.data.filter(item => !this.isHidden(item));
+    /**
+     * Return another visible user account id if possible
+     * Return zero if no account found
+     * @param {number} accountId - identifier of account
+     */
+    getNext(accountId) {
+        if (!accountId) {
+            return 0;
+        }
 
-		if (returnRaw)
-			return copyObject(res);
-		else
-			return new AccountsList(res);
-	}
+        const userAccounts = this.getUserAccounts();
+        if (!userAccounts) {
+            return 0;
+        }
+        const visibleAccounts = userAccounts.getVisible();
+        if (!visibleAccounts || visibleAccounts.length < 2) {
+            return 0;
+        }
 
+        let ind = visibleAccounts.getIndexOf(accountId);
+        if (ind === -1) {
+            return 0;
+        }
 
-	getHidden(returnRaw = false)
-	{
-		let res = this.data.filter(item => this.isHidden(item));
+        ind = (ind === visibleAccounts.length - 1) ? 0 : ind + 1;
 
-		if (returnRaw)
-			return copyObject(res);
-		else
-			return new AccountsList(res);
-	}
-
-
-	// Return another visible user account id if possible
-	// Return zero if no account found
-	getNext(account_id)
-	{
-		if (!account_id)
-			return 0;
-
-		let userAccounts = this.getUserAccounts();
-		if (!userAccounts)
-			return 0;
-		let visibleAccounts = userAccounts.getVisible();
-		if (!visibleAccounts || visibleAccounts.length < 2)
-			return 0;
-
-		let ind = visibleAccounts.getIndexOf(account_id);
-		if (ind === -1)
-			return 0;
-
-		ind = (ind == visibleAccounts.length - 1) ? 0 : ind + 1;
-
-		return visibleAccounts.indexToId(ind);
-	}
+        return visibleAccounts.indexToId(ind);
+    }
 }

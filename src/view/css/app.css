@@ -80,6 +80,14 @@ h1
 }
 
 
+h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	padding: 2px 0px;
+}
+
+
 /* link style */
 a, a:visited
 {
@@ -107,17 +115,23 @@ svg *
 
 
 /* single line block */
-.non_float
+.view-row
 {
-	clear: both;
 	max-width: 300px;
 }
 
 
-/* right float block */
-.right_float
+.row-container
 {
-	float: right;
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+
+.column-container
+{
+	display: flex;
+	flex-flow: column nowrap;
 }
 
 
@@ -129,7 +143,6 @@ input[type="text"], input[type="password"]
 	padding: 2px 5px;
 	height: 22px;
 	display: inline-block;
-	float: left;
 	border: 2px solid;
 	border-radius: 0;
 	box-shadow: none;
@@ -145,9 +158,25 @@ select
 }
 
 
-/* wrap for input with 100% width of parent */
-.stretch_input
+/* Group of text input and button */
+.input-group
 {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+}
+
+
+.input-group input
+{
+	margin: 0;
+}
+
+
+/* wrap for input with 100% width of parent */
+.stretch-input
+{
+	flex-basis: 100%;
 	padding: 2px 5px;
 	overflow: hidden;
 	border: 2px solid #000000;
@@ -155,8 +184,8 @@ select
 }
 
 
-.stretch_input > input[type="text"],
-.stretch_input > input[type="password"]
+.stretch-input > input[type="text"],
+.stretch-input > input[type="password"]
 {
 	width: 100%;
 	height: 26px;
@@ -167,7 +196,7 @@ select
 }
 
 
-.stretch_input > select
+.stretch-input > select
 {
 	width: 100%;
 	margin: 0;
@@ -175,27 +204,13 @@ select
 
 
 /* text input controls with button on the right */
-.stretch_input.rbtn_input
+.stretch-input.rbtn_input
 {
 	border-width: 2px 0px 2px 2px;
 }
 
 
-/* standard for text input controls */
-.std_input
-{
-	margin: 8px 0px;
-}
-
-
 /* Validation */
-
-.validation-block .std_input
-{
-	margin: 8px 0px 2px 0px;
-}
-
-
 .validation-block .invalid-feedback
 {
 	color: #FF0000;
@@ -210,18 +225,9 @@ select
 }
 
 
-.validation-block.invalid-block .std_input
+.validation-block.invalid-block .stretch-input
 {
 	border-color: #FF0000;
-}
-
-
-/* Input controls color */
-input[type="text"], input[type="password"], select
-{
-	border-color: #000000;
-	background-color: #FFFFFF;
-	color: #000000;
 }
 
 
@@ -281,7 +287,6 @@ input[type="text"], input[type="password"], select
 }
 
 
-
 /* header */
 .header
 {
@@ -295,6 +300,13 @@ input[type="text"], input[type="password"], select
 }
 
 
+.header > div
+{
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+
 .header > div > div
 {
 	height: 50px;
@@ -303,9 +315,10 @@ input[type="text"], input[type="password"], select
 
 .header > div > div > a
 {
-	display: inline-block;
 	height: 50px;
 	padding: 0px 12px 0px 0px;
+	display: flex;
+	flex-flow: row nowrap;
 }
 
 
@@ -319,12 +332,6 @@ input[type="text"], input[type="password"], select
 
 
 /* logo block */
-.logo
-{
-	float: left;
-}
-
-
 .logo > a
 {
 	text-decoration: none;
@@ -342,7 +349,6 @@ input[type="text"], input[type="password"], select
 	width: 50px;
 	height: 50px;
 	display: inline-block;
-	float: left;
 }
 
 
@@ -361,29 +367,100 @@ input[type="text"], input[type="password"], select
 }
 
 
-/* user block */
-.userblock
+/* Theme switch */
+.theme-switch
 {
-	float: right;
+	display: flex;
+	width: 45px;
+	height: 17px;
+	padding: 0px 6px;
+	margin-left: auto;
+	align-items: center;
+}
+
+
+.switch
+{
+	position: relative;
+	width: 34px;
+	height: 20px;
+}
+
+
+.switch input
+{
+	display: none;
+}
+
+
+.switch-slider
+{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #555555;
+	cursor: pointer;
+	border-radius: 9px;
+}
+
+
+.switch-slider::before
+{
+	content: '';
+	top: 2px;
+	left: 2px;
+	transition: left 0.2s;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	background-color: #ABABAB;
+	border-radius: 8px;
+}
+
+
+.switch input:checked + .switch-slider::before
+{
+	left: 17px;
+}
+
+
+.switch-slider:hover
+{
+	background-color: #707070;
+}
+
+
+.switch-slider:hover::before
+{
+	background-color: #FFFFFF;
+}
+
+
+/* user block */
+.user-block
+{
 	position: relative;
 }
 
 
-.user_button
+.user-menu-btn
 {
+	display: inline-flex;
 	border: 0 none;
 	background-color: #404040;
 	padding: 0px 12px 0px 3px;
 }
 
 
-.user_button:hover
+.user-menu-btn:hover
 {
 	background-color: #606060;
 }
 
 
-.user_button .user_title
+.user-menu-btn .user_title
 {
 	height: 16px;
 	font-size: 16px;
@@ -393,17 +470,16 @@ input[type="text"], input[type="password"], select
 }
 
 
-.user_button .user_icon
+.user-menu-btn .user_icon
 {
 	width: 24px;
 	height: 24px;
 	overflow: hidden;
-	float: left;
 	margin: 13px 2px;
 }
 
 
-.user_button .user_icon svg
+.user-menu-btn .user_icon svg
 {
 	width: 24px;
 	height: 24px;
@@ -411,9 +487,8 @@ input[type="text"], input[type="password"], select
 
 
 /* drop down user menu */
-.usermenu
+.user-menu
 {
-	float: right;
 	display: inline-block;
 	position: absolute;
 	top: 50px;
@@ -422,7 +497,7 @@ input[type="text"], input[type="password"], select
 }
 
 
-.usermenu > ul
+.user-menu > ul
 {
 	list-style-image: none;
 	list-style-type: none;
@@ -432,7 +507,7 @@ input[type="text"], input[type="password"], select
 }
 
 
-.usermenu > ul > li
+.user-menu > ul > li
 {
 	color: #FFFFFF;
 	list-style-image: none;
@@ -443,21 +518,21 @@ input[type="text"], input[type="password"], select
 }
 
 
-.usermenu > ul > li:hover
+.user-menu > ul > li:hover
 {
 	background-color: #808080;
 }
 
 
-.usermenu > ul > li > a,
-.usermenu > ul > li > a:hover
+.user-menu > ul > li > a,
+.user-menu > ul > li > a:hover
 {
 	text-decoration: none;
 	color: #FFFFFF;
 }
 
 
-.usermenu > ul > li.separator
+.user-menu > ul > li.separator
 {
 	height: 0;
 	border: 0 none;
@@ -466,12 +541,19 @@ input[type="text"], input[type="password"], select
 }
 
 
+/* Main view */
+.main-view
+{
+	display: inline-flex;
+	flex-flow: row wrap;
+}
+
 
 /* Main page widgets */
 .widget
 {
-	display: inline-block;
-	float: left;
+	display: inline-flex;
+	flex-flow: column nowrap;
 	min-width: 200px;
 	margin: 0px 20px 20px 0px;
 }
@@ -482,7 +564,6 @@ input[type="text"], input[type="password"], select
 
 .widget
 {
-	float: none;
 	display: block;
 	margin: 0px;
 	padding: 0px 0px 20px 0px;
@@ -498,18 +579,10 @@ input[type="text"], input[type="password"], select
 }
 
 
-.break_widget
-{
-	clear: left;
-}
-
-
 /* title of main page widget */
 .widget_title
 {
 	display: block;
-	float: none;
-	clear: both;
 	height: 32px;
 	margin: 10px 0px;
 }
@@ -519,7 +592,6 @@ input[type="text"], input[type="password"], select
 .widget_title > a:hover
 {
 	height: 32px;
-	color: #000000;
 	text-decoration: none;
 }
 
@@ -529,18 +601,17 @@ input[type="text"], input[type="password"], select
 	font-weight: 300;
 	font-size: 26px;
 	line-height: 32px;
-	float: left;
 	display: inline-block;
 }
 
 
 .widget_title .glyph
 {
-	width: 32px;
-	height: 32px;
-	float: left;
+	width: 24px;
+	height: 24px;
 	display: inline-block;
-	margin: 7px 0 0 4px;
+	margin: 0 0 0 4px;
+	vertical-align: text-bottom;
 }
 
 
@@ -551,12 +622,27 @@ input[type="text"], input[type="password"], select
 }
 
 
+/* Main page accounts widget */
+.accounts-widget
+{
+	max-width: 440px;
+}
+
+
+/* main page latest transactions widget */
+.transactions-widget
+{
+	flex-basis: 350px;
+}
+
+
 /* accounts page*/
 .heading
 {
-	clear: both;
+	width: 100%;
 	padding: 10px 0px;
 	height: 32px;
+	display: flex;
 }
 
 
@@ -568,41 +654,20 @@ input[type="text"], input[type="password"], select
 	height: 32px;
 	padding: 0;
 	margin: 0;
-	display: table-cell;
 	vertical-align: middle;
-	float: left;
 }
 
 
 .heading > .iconlink
 {
 	display: inline-block;
-	float: left;
-	clear: right;
 	margin: 0px 0px 0px 30px;
 }
 
 
-.summ_text
+.amount-input
 {
 	text-align: right;
-}
-
-
-h2
-{
-	font-size: 20px;
-	font-weight: normal;
-	padding: 2px 0px;
-}
-
-
-label
-{
-	width: 150px;
-	height: 20px;
-	line-height: 20px;
-	font-size: 16px;
 }
 
 
@@ -645,33 +710,33 @@ label
 }
 
 
-.ok_btn,
-.ok_btn:visited
+.submit-btn,
+.submit-btn:visited
 {
 	background-color: #0072C6;
 }
 
 
-.ok_btn:hover
+.submit-btn:hover
 {
 	background-color: #1E82CC;
 }
 
 
-.ok_btn:disabled
+.submit-btn:disabled
 {
 	background-color: #5082AA;
 }
 
 
-.cancel_btn,
-.cancel_btn:visited
+.cancel-btn,
+.cancel-btn:visited
 {
 	background-color: #B0B0B0;
 }
 
 
-.cancel_btn:hover
+.cancel-btn:hover
 {
 	background-color: #C0C0C0;
 }
@@ -682,11 +747,10 @@ label
 {
 	padding: 10px 0px;
 	font-size: 16px;
-	clear: both;
 }
 
 
-.trtype-menu_item
+.trtype-menu__item
 {
 	padding: 2px;
 	margin: 0 12px 0 0;
@@ -694,19 +758,19 @@ label
 }
 
 
-.trtype-menu_item .trtype-menu_item-check:hover
+.trtype-menu__item .trtype-menu__item-check:hover
 {
 	background-color: #CCCCCC;
 }
 
 
-.trtype-menu_item .trtype-menu_item-check:active
+.trtype-menu__item .trtype-menu__item-check:active
 {
 	background-color: #1E82CC;
 }
 
 
-.trtype-menu_item-check
+.trtype-menu__item-check
 {
 	width: 14px;
 	height: 14px;
@@ -718,7 +782,7 @@ label
 }
 
 
-.trtype-menu_item-check svg
+.trtype-menu__item-check svg
 {
 	width: 14px;
 	height: 14px;
@@ -726,31 +790,31 @@ label
 }
 
 
-.trtype-menu_item-check:hover svg
+.trtype-menu__item-check:hover svg
 {
 	visibility: visible;
 }
 
 
-.trtype-menu_item-check:hover
+.trtype-menu__item-check:hover
 {
 	background-color: #1E82CC;
 }
 
 
-.trtype-menu_item-check:hover svg
+.trtype-menu__item-check:hover svg
 {
 	fill: #FFFFFF;
 }
 
 
-.trtype-menu_selected-item
+.trtype-menu__item_selected
 {
 	font-weight: bold;
 }
 
 
-.trtype-menu_selected-item .trtype-menu_item-check svg
+.trtype-menu__item_selected .trtype-menu__item-check svg
 {
 	visibility: visible;
 	fill: #5082AA;
@@ -758,23 +822,24 @@ label
 
 
 /* Show selected items for multi select menu as normal links */
-.trtype-menu-multi .trtype-menu_selected-item
+.trtype-menu-multi .trtype-menu__item_selected
 {
 	font-weight: normal;
 }
 
 
 /* dashed underline button */
-.dashed_btn
+.dashed-btn
 {
 	border: 0 none;
 	clear: both;
 	cursor: pointer;
-	background-color: #FFFFFF;
+	background: none;
+	font-size: 16px;
 }
 
 
-.dashed_btn > span
+.dashed-btn > span
 {
 	color: #0072C6;
 	padding: 0;
@@ -786,34 +851,37 @@ label
 }
 
 
-.dashed_btn:hover > span
+.dashed-btn:hover > span
 {
 	border-bottom: 1px solid #0072C6;
 }
 
 
 /* Information tiles */
-.info_tiles
+.info-tiles
 {
+	display: flex;
+	flex-flow: row wrap;
 	min-width: 220px;
 	max-width: 300px;
 }
 
 
-.info_tile
+.info-tile
 {
-	float: left;
+	display: inline-flex;
 	width: 80px;
 	height: 80px;
 	margin: 0px 10px 10px 0px;
 	padding: 5px;
+	color: #000000;
 	background-color: #D0D0D0;
 	position: relative;
 	overflow: hidden;
 }
 
 
-.info_title
+.info-tile__title
 {
 	font-size: 16px;
 	bottom: 5px;
@@ -821,7 +889,7 @@ label
 }
 
 
-.info_subtitle
+.info-tile__subtitle
 {
 	font-size: 12px;
 	text-align: right;
@@ -840,16 +908,7 @@ label
 
 
 /* currency button */
-.curr_container
-{
-	width: 34px;
-	height: 34px;
-	float: right;
-	position: relative;
-}
-
-
-.rcurr_btn
+.input-group__btn
 {
 	width: 30px;
 	height: 30px;
@@ -862,31 +921,45 @@ label
 }
 
 
-.inact_rbtn
+.input-group__btn_inactive
 {
-	color: #000000;
-	background-color: #FFFFFF;
 	cursor: default;
 }
 
 
-.rcurr_btn > div
+.input-group__btn > div
 {
 	text-align: center;
 	height: 30px;
 	line-height: 30px;
+	white-space: nowrap;
 }
 
 
-/* main page latest transactions widget */
-.latest_widget
+/* flat square button with icon */
+.icon-btn,
+.btn.icon-btn
 {
-	max-width: 350px;
+	width: 34px;
+	height: 34px;
+	padding: 5px;
+	margin: 0px;
+	color: #FFFFFF;
+	background-color: #0072C6;
+	cursor: pointer;
+}
+
+
+.icon-btn > svg
+{
+	width: 24px;
+	height: 24px;
+	fill: #FFFFFF;
 }
 
 
 /* Messages */
-.popup > .popup_content.msg
+.popup > .popup__content.msg
 {
 	background: none;
 	top: 55px;
@@ -894,7 +967,7 @@ label
 }
 
 
-.popup > .popup_content.msg > .box
+.popup > .popup__content.msg > .popup__content-box
 {
 	padding: 0;
 	max-width: 824px;
@@ -902,7 +975,7 @@ label
 }
 
 
-.msg > .box > .popup_message
+.msg > .popup__content-box > .popup__message
 {
 	max-width: 300px;
 	min-width: 200px;
@@ -913,14 +986,14 @@ label
 }
 
 
-.msg.msg_success > .box > .popup_message
+.msg.msg_success > .popup__content-box > .popup__message
 {
 	border-color: #20D040;
 	background-color: #40D060;
 }
 
 
-.msg.msg_error > .box > .popup_message
+.msg.msg_error > .popup__content-box > .popup__message
 {
 	border-color: #F02020;
 	background-color: #F02020;
@@ -928,33 +1001,33 @@ label
 
 
 /* Custom popup styles */
-.popup > .popup_content.center_only
+.popup > .popup__content.center_only
 {
 	background: none;
 }
 
 
-.popup .msg .close_btn:hover > svg
+.popup .msg .close-btn:hover > svg
 {
 	fill: #FFFFFF;
 }
 
 
 /* Custom popup styles */
-.popup .popup_title
+.popup .popup__title
 {
 	font-weight: lighter;
 }
 
 
-.popup > .popup_content.center_only
+.popup > .popup__content.center_only
 {
 	background: none;
 }
 
 
-.popup .close_btn,
-.box.dragging .close_btn
+.popup .close-btn,
+.popup__content-box.dragging .close-btn
 {
 	display: block;
 }
@@ -967,8 +1040,8 @@ label
 }
 
 
-.popup > .chname_popup > .box,
-.popup > .chpass_popup > .box
+.popup > .chname_popup > .popup__content-box,
+.popup > .chpass_popup > .popup__content-box
 {
 	max-width: 400px;
 }
@@ -977,4 +1050,19 @@ label
 .popup > .chpass_popup
 {
 	margin-top: -146px;
+}
+
+
+/* Filters */
+.filters-container
+{
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+}
+
+
+.filter-item
+{
+	margin-right: 15px;
 }

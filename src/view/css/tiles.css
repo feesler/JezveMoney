@@ -1,9 +1,15 @@
 .tiles
 {
-	display: block;
-	clear: both;
+	display: flex;
+	flex-flow: row wrap;
 	max-width: 440px;
 	overflow: hidden;
+}
+
+
+.tiles .tile
+{
+	margin: 0px 10px 10px 0px;
 }
 
 
@@ -12,10 +18,8 @@
 	width: 100px;
 	height: 100px;
 	background-color: #20A0FF;
-	margin: 0px 10px 10px 0px;
 	padding: 0;
-	display: inline-block;
-	float: left;
+	display: inline-flex;
 	position: relative;
 	overflow: hidden;
 	cursor: pointer;
@@ -28,28 +32,17 @@
 }
 
 
-.tile .act
+.tile_selected .tilelink::after
 {
+	content: '';
+	display: block;
 	position: absolute;
-	left: 0px;
-	top: 0px;
-	width: 94px;
-	height: 94px;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
 	border: 3px solid #0072C6;
 	cursor: pointer;
-}
-
-
-/* inactive tile */
-.inact
-{
-	background-color: #B0B0B0;
-}
-
-
-.inact:hover
-{
-	background-color: #C0C0C0;
 }
 
 
@@ -90,7 +83,7 @@ a.tilelink
 }
 
 
-.acc_name
+.tile__title
 {
 	left: 5px;
 	bottom: 2px;
@@ -99,7 +92,7 @@ a.tilelink
 }
 
 
-.acc_bal
+.tile__subtitle
 {
 	top: 2px;
 	right: 5px;
@@ -108,7 +101,7 @@ a.tilelink
 }
 
 
-.acc_icon
+.tile__icon
 {
 	top: 23px;
 	left: 20px;

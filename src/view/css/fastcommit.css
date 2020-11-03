@@ -1,3 +1,9 @@
+.data-container
+{
+    display: flex;
+}
+
+
 .import_form
 {
 	padding: 10px;
@@ -12,7 +18,6 @@
 
 .column
 {
-	float: left;
 	width: 49%;
 }
 
@@ -23,16 +28,15 @@
 }
 
 
-.improw,
-.tr_row
+.import-row,
+.tr-row
 {
 	padding: 10px;
-	background-color: #DDDDDD;
 	margin: 3px 0;
 }
 
 
-.improw td
+.import-row td
 {
 	padding: 0px 5px;
 	height: 57px;
@@ -40,7 +44,7 @@
 
 
 /* Ellipsis cell */
-.ellipsis_cell > div
+.ellipsis-cell > div
 {
 	position: relative;
 	overflow: hidden;
@@ -49,7 +53,7 @@
 
 
 /* visible content */
-.ellipsis_cell > div > span
+.ellipsis-cell > div > span
 {
 	display: block;
 	position: absolute;
@@ -62,7 +66,7 @@
 
 
 /* cell stretching content */
-.ellipsis_cell > div:after
+.ellipsis-cell > div:after
 {
 	content: attr(title);
 	overflow: hidden;
@@ -79,37 +83,30 @@
 }
 
 
-.tr_row
+.tr-row
 {
+	display: flex;
+	flex-flow: row nowrap;
 	height: 36px;
 }
 
 
-.tr_row > *
+.tr-row > *
 {
 	display: inline;
-	float: left;
 }
 
-.tr_row > select,
-.tr_row > input[type="text"]
+.tr-row > select,
+.tr-row > input[type="text"]
 {
-	border: 1px solid #000;
+	border: 1px solid;
 	padding: 5px;
 	width: 100px;
 	margin: 0px 5px 0px 0px;
 }
 
 
-.tr_row > select[disabled],
-.tr_row > input[disabled]
-{
-	border-color: #DDDDDD;
-	background-color: #EEEEEE;
-}
-
-
-.tr_row > input[type="button"]
+.tr-row > input[type="button"]
 {
 	width: 30px;
 	border: 0 none;
@@ -117,7 +114,7 @@
 }
 
 
-.tr_row > input[type="checkbox"]
+.tr-row > input[type="checkbox"]
 {
 	margin: 10px;
 	width: 20px;
@@ -126,38 +123,35 @@
 
 
 /* Already exist transaction row */
-.tr_row.tr-disabled-row
+.tr-row.tr-row_disabled
 {
 	background-color: #EEEEEE;
 }
 
 
-.tr-disabled-row > select,
-.tr-disabled-row > select[disabled],
-.tr-disabled-row > input[type="text"],
-.tr-disabled-row > input[disabled]
+.tr-row_disabled > select,
+.tr-row_disabled > select[disabled],
+.tr-row_disabled > input[type="text"],
+.tr-row_disabled > input[disabled]
 {
-	color: #DDDDDD;
-	border-color: #DDDDDD;
-	background-color: #EEEEEE;
 	pointer-events: none;
 }
 
 
-.tr-disabled-row input::placeholder
+.tr-row_disabled input::placeholder
 {
 	color: #DDDDDD;
 }
 
 
-.tr_row .ok_btn
+.tr-row .submit-btn
 {
 	pointer-events: all;
 }
 
 
 /* Placeholder */
-.tr_row_placeholder
+.tr-row__placeholder
 {
 	border: 1px dashed #888888;
 	height: 54px;
@@ -165,8 +159,8 @@
 }
 
 
-.tr_row_placeholder > input,
-.tr_row_placeholder > select
+.tr-row__placeholder > input,
+.tr-row__placeholder > select
 {
 	display: none;
 }
@@ -175,11 +169,16 @@
 /* Checkbox or radiobutton wrapper */
 .checkwrap
 {
-	display: inline-block;
-	float: left;
-	white-space: nowrap;
 	height: 20px;
 	line-height: 20px;
+}
+
+.checkwrap > label
+{
+	display: inline-flex;
+	flex-flow: row nowrap;
+	white-space: nowrap;
+	font-size: 14px;
 }
 
 
@@ -190,12 +189,6 @@
 }
 
 
-.checkwrap.inputwrap input[type="text"]
-{
-	float: none;
-}
-
-
 .checkwrap input[type="checkbox"],
 .checkwrap input[type="radio"],
 .checkwrap > label,
@@ -203,7 +196,6 @@
 {
 	height: 20px;
 	line-height: 20px;
-	float: left;
 }
 
 
@@ -213,7 +205,6 @@
 {
 	height: 20px;
 	line-height: 20px;
-	float: left;
 	padding: 0 5px;
 }
 
@@ -222,10 +213,4 @@
 .checkwrap > input[type="radio"]
 {
 	margin: 0px 5px 0px 0px;
-}
-
-
-.checkwrap > label
-{
-	font-size: 14px;
 }

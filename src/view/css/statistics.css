@@ -1,24 +1,5 @@
-/* transactions page filer */
-.tr_filter
+/* Statistics view histogram chart */
+.stat-histogram
 {
-	float: left;
-}
-
-
-.group_filter
-{
-	margin-left: 15px;
-}
-
-
-.date_filter
-{
-	margin-left: 15px;
-}
-
-
-/* Filter select */
-.filter_sel
-{
-	margin-right: 15px;
+	width: 100%;
 }

@@ -1,14 +1,8 @@
-/* result balance button */
-.resbal_btn
-{
-	font-size: 16px;
-}
-
-
 .tile_header
 {
-	float: none;
-	clear: both;
+	flex-basis: 100%;
+	flex-grow: 2;
+	flex-shrink: 0;
 	height: 20px;
 	line-height: 20px;
 	overflow: hidden;
@@ -17,10 +11,42 @@
 
 .tile_header > label
 {
-	display: inline-block;
-	float: left;
-	width: auto;
+	display: inline-flex;
+	font-size: 16px;
 	margin: 0 5px 0 0;
+}
+
+
+.tile_header > .close-btn
+{
+	display: inline-flex;
+    padding: 1px;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 20px;
+    height: 20px;
+}
+
+
+.tile_header > .close-btn > svg
+{
+	height: 14px;
+	width: 14px;
+	fill: #888888;
+}
+
+
+.tile_header > .close-btn:hover > svg
+{
+	fill: #000000;
+}
+
+
+.tile-base
+{
+	display: flex;
+	flex-flow: row wrap;
 }
 
 
@@ -28,86 +54,77 @@
 {
 	width: 100px;
 	height: 100px;
-	float: left;
 	padding: 8px 5px 8px 0px;
 }
 
 
-.tile_right_block
+.tile-info-block
 {
 	height: 100px;
 	min-width: 100px;
 	margin: 8px 20px 10px 0px;
 	overflow: hidden;
-	float: left;
 }
 
 
-.tile_right_block > div
+.tile-info-block > div
 {
 	margin: 0px 0px 10px 0px;
 }
 
 
-.selacc_container
+.account-toggler
 {
 	padding: 8px 5px 8px 0px;
 }
 
 
-.acc_float
+.account-container
 {
 	min-width: 100px;
 	max-width: 400px;
-	float: left;
-}
-
-
-/* exchange rate comment */
-.exchrate_comm
-{
-	margin: 0px 5px;
-	height: 34px;
-	line-height: 34px;
+	display: inline-flex;
+	flex-flow: column nowrap;
 }
 
 
 /* Debt operation type selector */
-.op_sel
+.debt-op-selector
 {
 	margin: 2px 0px 10px 0px;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-items: center;
 }
 
-.op_sel > label
+
+.debt-op-selector > label
 {
-	float: left;
 	width: auto;
 	height: auto;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-items: center;
 }
 
-.op_sel input
+
+.debt-op-selector input
 {
-	float: left;
 	line-height: 22px;
 	height: 22px;
 }
 
-.op_sel span
+
+.debt-op-selector span
 {
-	float: left;
 	line-height: 22px;
 	margin: 0px 10px 0px 5px;
 }
 
 
 /* transactions page filer */
-.tr_filter
+.search-filter-item
 {
-	float: left;
-}
-
-
-.date_filter
-{
-	margin: 0px 0px 0px 15px;
+	margin-right: 0;
+	margin-left: auto;
 }
