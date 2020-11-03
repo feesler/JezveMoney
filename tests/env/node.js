@@ -228,88 +228,117 @@ export class NodeEnvironment extends Environment {
         return res;
     }
 
-    async httpReq(method, url, data, headers) {
-        return new Promise((resolve, reject) => {
-            const supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
+    applyCookies(cookies) {
+        if (!Array.isArray(cookies)) {
+            throw new Error('Invalid cookies: array expected');
+        }
 
-            let postData = null;
-            const options = {
-                method: method.toLowerCase(),
-                headers: {},
-            };
-
-            if (!supportedMethods.includes(options.method)) {
-                reject(new Error(`Unexpected method ${method}`));
+        cookies.forEach((cookie) => {
+            if (!cookie.name) {
+                return;
             }
 
-            if (headers) {
-                setParam(options.headers, headers);
+            if (cookie.value === '' || cookie.value === 'deleted') {
+                delete this.reqCookies[cookie.name];
+            } else {
+                this.reqCookies[cookie.name] = cookie.value;
             }
-
-            options.headers.Cookie = Object.entries(this.reqCookies).map((entry) => {
-                const [cookieName, cookieVal] = entry;
-                return `${cookieName}=${cookieVal}`;
-            });
-
-            if (options.method === 'post' && data) {
-                if (typeof data === 'string') {
-                    postData = data;
-                    options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-                } else {
-                    postData = JSON.stringify(data);
-                    options.headers['Content-Type'] = 'application/json';
-                }
-
-                options.headers['Content-Length'] = Buffer.byteLength(postData);
-            }
-
-            const targetURL = new URL(url);
-            const isHTTPS = targetURL.protocol.toLowerCase() === 'https:';
-            const client = (isHTTPS) ? https : http;
-
-            if (isHTTPS) {
-                options.rejectUnauthorized = false;
-            }
-
-            const req = client.request(url, options, (res) => {
-                let body = '';
-                let finalUrl = url;
-
-                if (res && res.headers && res.headers.location) {
-                    finalUrl = res.headers.location;
-                }
-
-                res.setEncoding('utf8');
-                res.on('data', (chunk) => {
-                    body += chunk;
-                });
-                res.on('end', () => {
-                    const newCookies = this.parseCookies(res.headers);
-
-                    newCookies.forEach((cookie) => {
-                        if (cookie.value === '' || cookie.value === 'deleted') {
-                            delete this.reqCookies[cookie.name];
-                        } else {
-                            this.reqCookies[cookie.name] = cookie.value;
-                        }
-                    });
-
-                    resolve({
-                        status: res.statusCode,
-                        headers: res.headers,
-                        body,
-                        url: finalUrl,
-                    });
-                });
-            });
-
-            if (postData) {
-                req.write(postData);
-            }
-
-            req.on('error', (e) => reject(e.message));
-            req.end();
         });
+    }
+
+    getCookiesHeader() {
+        if (!this.reqCookies) {
+            return null;
+        }
+
+        return Object.entries(this.reqCookies).map((entry) => {
+            const [cookieName, cookieVal] = entry;
+            return `${cookieName}=${cookieVal}`;
+        });
+    }
+
+    async httpReq(method, url, data, headers) {
+        const supportedMethods = ['get', 'head', 'post', 'put', 'delete', 'options'];
+        const options = {
+            method: method.toLowerCase(),
+            headers: {},
+        };
+
+        let resolveResult;
+        let rejectResult;
+        const res = new Promise((resolve, reject) => {
+            resolveResult = resolve;
+            rejectResult = reject;
+        });
+
+        if (!supportedMethods.includes(options.method)) {
+            rejectResult(new Error(`Unexpected method ${method}`));
+        }
+
+        if (headers) {
+            setParam(options.headers, headers);
+        }
+
+        options.headers.Cookie = this.getCookiesHeader();
+
+        let postData = null;
+        if (options.method === 'post' && data) {
+            if (typeof data === 'string') {
+                postData = data;
+                options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            } else {
+                postData = JSON.stringify(data);
+                options.headers['Content-Type'] = 'application/json';
+            }
+
+            options.headers['Content-Length'] = Buffer.byteLength(postData);
+        }
+
+        const targetURL = new URL(url);
+        const isHTTPS = targetURL.protocol.toLowerCase() === 'https:';
+        const client = (isHTTPS) ? https : http;
+
+        if (isHTTPS) {
+            options.rejectUnauthorized = false;
+        }
+
+        const req = client.request(url, options, (response) => {
+            let body = '';
+            let finalUrl = url;
+
+            if (!response) {
+                return;
+            }
+
+            if (response.headers && response.headers.location) {
+                finalUrl = response.headers.location;
+            }
+
+            response.setEncoding('utf8');
+            response.on('data', (chunk) => {
+                body += chunk;
+            });
+            response.on('end', () => {
+                const newCookies = this.parseCookies(response.headers);
+                this.applyCookies(newCookies);
+
+                resolveResult({
+                    status: response.statusCode,
+                    headers: response.headers,
+                    body,
+                    url: finalUrl,
+                });
+            });
+        });
+
+        if (postData) {
+            req.write(postData);
+        }
+
+        req.on('error', (e) => rejectResult(e));
+        req.end();
+
+        return res;
     }
 
     addResult(descr, res) {
