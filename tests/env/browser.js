@@ -1,4 +1,4 @@
-import '@babel/polyfill';
+import 'core-js/stable';
 import 'core-js/features/url';
 import 'core-js/features/url-search-params';
 import 'whatwg-fetch';
