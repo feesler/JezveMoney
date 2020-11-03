@@ -264,7 +264,12 @@ export class NodeEnvironment extends Environment {
             }
 
             const targetURL = new URL(url);
-            const client = (targetURL.protocol.toLowerCase() === 'https:') ? https : http;
+            const isHTTPS = targetURL.protocol.toLowerCase() === 'https:';
+            const client = (isHTTPS) ? https : http;
+
+            if (isHTTPS) {
+                options.rejectUnauthorized = false;
+            }
 
             const req = client.request(url, options, (res) => {
                 let body = '';

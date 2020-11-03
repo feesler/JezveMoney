@@ -1,5 +1,5 @@
 export const config = {
-    nodeURL: 'http://testsrv:8096/',
+    nodeURL: 'https://testsrv/',
     testAdminUser: { login: 'test', password: 'test' },
     testUser: { login: 'testuser', password: 'test123', name: 'App Tester' },
     apiTestUser: { login: 'apitest', password: '123', name: 'API Tester' },
