@@ -20,7 +20,7 @@ function ImportView() {
     };
 
     this.model.accounts = AccountList.create(this.props.accounts);
-    this.model.currency = CurrencyList.create(this.props.currency);
+    this.model.currency = CurrencyList.create(this.props.currencies);
     this.model.persons = PersonList.create(this.props.persons);
 }
 

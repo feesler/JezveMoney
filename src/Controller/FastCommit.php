@@ -34,9 +34,15 @@ class FastCommit extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr,
+            "model/list.js",
+            "model/account.js",
+            "model/currency.js",
+            "model/person.js",
             "lib/ajax.js",
             "lib/dragndrop.js",
             "lib/sortable.js",
+            "component/component.js",
+            "component/header.js",
             "view.js",
             "importview.js",
             "convhint.js"
