@@ -355,7 +355,8 @@ export async function test(descr, action) {
 
         testEnv.addResult(descr, res);
     } catch (e) {
-        e.descr = descr;
-        throw e;
+        const extError = (e instanceof Error) ? e : new Error(e);
+        extError.descr = descr;
+        throw extError;
     }
 }
