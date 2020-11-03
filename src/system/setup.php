@@ -9,7 +9,7 @@ if (strpos($approot, DIRECTORY_SEPARATOR) !== strlen($approot) - strlen(DIRECTOR
 // Check development or release environment
 $productionHost = "jezvemoney.ru";
 $devHost = "jezve.net";
-$localDevHost = "testsrv:8096";
+$localDevHost = "testsrv";
 $avHosts = [$productionHost, $devHost, $localDevHost];
 if (!isset($_SERVER["HTTP_HOST"]) || !in_array($_SERVER["HTTP_HOST"], $avHosts)) {
     header("HTTP/1.1 400 Bad Request", true, 400);
@@ -47,7 +47,7 @@ if (strcmp(APP_HOST, $productionHost) == 0) {
     define("PRODUCTION", false);
     define("LOCAL_DEV", false);
 } elseif (strcmp(APP_HOST, $localDevHost) == 0) {
-    define("APP_PROTOCOL", "http://");
+    define("APP_PROTOCOL", "https://");
     define("APP_ROOT", $approot);
     define("APP_PATH", "/");
     define("PRODUCTION", false);
