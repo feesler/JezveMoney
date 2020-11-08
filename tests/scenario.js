@@ -173,26 +173,24 @@ export class Scenario {
             },
         ]);
 
-        [this.API_USER_PERSON] = await this.runner.runGroup(
-            PersonApiTests.create,
-            [
-                {
-                    name: 'API user Person',
-                    flags: 0,
-                },
-            ],
-        );
+        [
+            this.API_USER_PERSON,
+        ] = await this.runner.runGroup(PersonApiTests.create, [
+            {
+                name: 'API user Person',
+                flags: 0,
+            },
+        ]);
 
-        [this.API_USER_TRANSACTION] = await this.runner.runGroup(
-            TransactionApiTests.extractAndCreate,
-            [
-                {
-                    type: EXPENSE,
-                    src_id: this.API_USER_ACC_RUB,
-                    src_amount: 100,
-                },
-            ],
-        );
+        [
+            this.API_USER_TRANSACTION,
+        ] = await this.runner.runGroup(TransactionApiTests.extractAndCreate, [
+            {
+                type: EXPENSE,
+                src_id: this.API_USER_ACC_RUB,
+                src_amount: 100,
+            },
+        ]);
     }
 
     async apiSecurityTests() {
@@ -202,52 +200,30 @@ export class Scenario {
     }
 
     async apiAccountsSecurity() {
-        const { EUR, API_USER_ACC_RUB } = this;
-
         this.environment.setBlock('Accounts security', 2);
 
-        const tasks = [
-            {
-                action: AccountApiTests.update,
-                data: {
-                    id: API_USER_ACC_RUB,
-                    name: 'EUR',
-                    curr_id: EUR,
-                    initbalance: 10,
-                    icon_id: 2,
-                    flags: 0,
-                },
-            },
-            {
-                action: AccountApiTests.del,
-                data: API_USER_ACC_RUB,
-            },
-        ];
+        const { EUR } = this;
 
-        await this.runner.runTasks(tasks);
+        await AccountApiTests.update({
+            id: this.API_USER_ACC_RUB,
+            name: 'EUR',
+            curr_id: EUR,
+            initbalance: 10,
+            icon_id: 2,
+            flags: 0,
+        });
+        await AccountApiTests.del(this.API_USER_ACC_RUB);
     }
 
     async apiPersonsSecurity() {
-        const { API_USER_PERSON } = this;
-
         this.environment.setBlock('Persons security', 2);
 
-        const tasks = [
-            {
-                action: PersonApiTests.update,
-                data: {
-                    id: API_USER_PERSON,
-                    name: 'API Person',
-                    flags: 0,
-                },
-            },
-            {
-                action: PersonApiTests.del,
-                data: API_USER_PERSON,
-            },
-        ];
-
-        await this.runner.runTasks(tasks);
+        await PersonApiTests.update({
+            id: this.API_USER_PERSON,
+            name: 'API Person',
+            flags: 0,
+        });
+        await PersonApiTests.del(this.API_USER_PERSON);
     }
 
     async apiTransactionsSecurity() {
@@ -261,17 +237,12 @@ export class Scenario {
     async apiCreateTransactionSecurity() {
         this.environment.setBlock('Create', 3);
 
-        const {
-            RUB,
-            API_USER_ACC_RUB,
-            API_USER_PERSON,
-            CASH_RUB,
-        } = this;
+        const { RUB } = this;
 
         const data = [
             {
                 type: EXPENSE,
-                src_id: API_USER_ACC_RUB,
+                src_id: this.API_USER_ACC_RUB,
                 dest_id: 0,
                 src_curr: RUB,
                 dest_curr: RUB,
@@ -281,7 +252,7 @@ export class Scenario {
             {
                 type: INCOME,
                 src_id: 0,
-                dest_id: API_USER_ACC_RUB,
+                dest_id: this.API_USER_ACC_RUB,
                 src_curr: RUB,
                 dest_curr: RUB,
                 src_amount: 100,
@@ -289,8 +260,8 @@ export class Scenario {
             },
             {
                 type: TRANSFER,
-                src_id: CASH_RUB,
-                dest_id: API_USER_ACC_RUB,
+                src_id: this.CASH_RUB,
+                dest_id: this.API_USER_ACC_RUB,
                 src_curr: RUB,
                 dest_curr: RUB,
                 src_amount: 100,
@@ -299,7 +270,7 @@ export class Scenario {
             {
                 type: DEBT,
                 op: 1,
-                person_id: API_USER_PERSON,
+                person_id: this.API_USER_PERSON,
                 acc_id: 0,
                 src_curr: RUB,
                 dest_curr: RUB,
@@ -314,40 +285,27 @@ export class Scenario {
     async apiUpdateTransactionSecurity() {
         this.environment.setBlock('Update', 3);
 
-        const {
-            RUB,
-            API_USER_ACC_RUB,
-            API_USER_ACC_USD,
-            API_USER_PERSON,
-            API_USER_TRANSACTION,
-            CASH_RUB,
-            TR_EXPENSE_1,
-            TR_INCOME_1,
-            TR_TRANSFER_1,
-            TR_DEBT_1,
-            TR_DEBT_2,
-            TR_DEBT_3,
-        } = this;
+        const { RUB } = this;
 
         const data = [
             {
-                id: TR_EXPENSE_1,
-                src_id: API_USER_ACC_RUB,
+                id: this.TR_EXPENSE_1,
+                src_id: this.API_USER_ACC_RUB,
             },
             {
-                id: TR_INCOME_1,
-                dest_id: API_USER_ACC_RUB,
+                id: this.TR_INCOME_1,
+                dest_id: this.API_USER_ACC_RUB,
             },
             {
-                id: TR_TRANSFER_1,
-                src_id: API_USER_ACC_RUB,
-                dest_id: API_USER_ACC_USD,
+                id: this.TR_TRANSFER_1,
+                src_id: this.API_USER_ACC_RUB,
+                dest_id: this.API_USER_ACC_USD,
             },
             // Trying to update transaction of another user
             {
-                id: API_USER_TRANSACTION,
+                id: this.API_USER_TRANSACTION,
                 type: EXPENSE,
-                src_id: CASH_RUB,
+                src_id: this.CASH_RUB,
                 dest_id: 0,
                 src_curr: RUB,
                 dest_curr: RUB,
@@ -356,19 +314,19 @@ export class Scenario {
             },
             // Trying to set person of another user
             {
-                id: TR_DEBT_1,
-                person_id: API_USER_PERSON,
+                id: this.TR_DEBT_1,
+                person_id: this.API_USER_PERSON,
             },
             // Trying to set account of another user
             {
-                id: TR_DEBT_2,
-                acc_id: API_USER_ACC_RUB,
+                id: this.TR_DEBT_2,
+                acc_id: this.API_USER_ACC_RUB,
             },
             // Trying to set both person and account of another user
             {
-                id: TR_DEBT_3,
-                person_id: API_USER_PERSON,
-                acc_id: API_USER_ACC_RUB,
+                id: this.TR_DEBT_3,
+                person_id: this.API_USER_PERSON,
+                acc_id: this.API_USER_ACC_RUB,
             },
         ];
 
@@ -378,10 +336,8 @@ export class Scenario {
     async apiDeleteTransactionSecurity() {
         this.environment.setBlock('Delete', 3);
 
-        const { API_USER_TRANSACTION } = this;
-
         const data = [
-            [API_USER_TRANSACTION],
+            [this.API_USER_TRANSACTION],
         ];
 
         await this.runner.runGroup(TransactionApiTests.del, data);
@@ -473,11 +429,11 @@ export class Scenario {
     }
 
     async apiUpdateAccounts() {
-        const { USD, ACC_RUB, CASH_RUB } = this;
+        const { USD } = this;
 
         const data = [
             {
-                id: ACC_RUB,
+                id: this.ACC_RUB,
                 name: 'acc rub',
                 curr_id: USD,
                 initbalance: 101,
@@ -485,7 +441,7 @@ export class Scenario {
             },
             // Try to update name of account to an existing one
             {
-                id: CASH_RUB,
+                id: this.CASH_RUB,
                 name: 'acc rub',
             },
         ];
@@ -494,10 +450,8 @@ export class Scenario {
     }
 
     async apiDeleteAccounts() {
-        const { ACC_USD, CASH_RUB } = this;
-
         const data = [
-            [ACC_USD, CASH_RUB],
+            [this.ACC_USD, this.CASH_RUB],
         ];
 
         return this.runner.runGroup(AccountApiTests.del, data);
@@ -540,23 +494,19 @@ export class Scenario {
     }
 
     async apiUpdatePersons() {
-        const { PERSON_X } = this;
-
         const data = [
-            { id: PERSON_X, name: 'XX!' },
+            { id: this.PERSON_X, name: 'XX!' },
             // Try to update name of person to an existing one
-            { id: PERSON_X, name: 'XX!' },
-            { id: PERSON_X, name: '' },
+            { id: this.PERSON_X, name: 'XX!' },
+            { id: this.PERSON_X, name: '' },
         ];
 
         return this.runner.runGroup(PersonApiTests.update, data);
     }
 
     async apiDeletePersons() {
-        const { PERSON_Y } = this;
-
         const data = [
-            [PERSON_Y],
+            [this.PERSON_Y],
             [],
         ];
 
@@ -566,27 +516,18 @@ export class Scenario {
     async apiCreateTransactions() {
         this.environment.setBlock('Create', 3);
 
-        const {
-            RUB,
-            USD,
-            EUR,
-            CASH_RUB,
-            ACC_RUB,
-            ACC_USD,
-            PERSON_X,
-            PERSON_Y,
-        } = this;
+        const { RUB, USD, EUR } = this;
 
         const data = [
             {
                 type: EXPENSE,
-                src_id: ACC_RUB,
+                src_id: this.ACC_RUB,
                 src_amount: 100,
                 comment: '11',
             },
             {
                 type: EXPENSE,
-                src_id: ACC_RUB,
+                src_id: this.ACC_RUB,
                 src_amount: 7608,
                 dest_amount: 100,
                 dest_curr: EUR,
@@ -594,19 +535,19 @@ export class Scenario {
             },
             {
                 type: EXPENSE,
-                src_id: ACC_USD,
+                src_id: this.ACC_USD,
                 src_amount: 1,
                 date: App.dates.yesterday,
             },
             {
                 type: INCOME,
-                dest_id: ACC_RUB,
+                dest_id: this.ACC_RUB,
                 dest_amount: 1000.50,
                 comment: 'lalala',
             },
             {
                 type: INCOME,
-                dest_id: ACC_USD,
+                dest_id: this.ACC_USD,
                 src_amount: 6500,
                 dest_amount: 100,
                 src_curr: RUB,
@@ -614,22 +555,22 @@ export class Scenario {
             },
             {
                 type: TRANSFER,
-                src_id: ACC_RUB,
-                dest_id: CASH_RUB,
+                src_id: this.ACC_RUB,
+                dest_id: this.CASH_RUB,
                 src_amount: 500,
                 dest_amount: 500,
             },
             {
                 type: TRANSFER,
-                src_id: ACC_RUB,
-                dest_id: ACC_USD,
+                src_id: this.ACC_RUB,
+                dest_id: this.ACC_USD,
                 src_amount: 6500,
                 dest_amount: 100,
             },
             {
                 type: DEBT,
                 op: 1,
-                person_id: PERSON_X,
+                person_id: this.PERSON_X,
                 acc_id: 0,
                 src_amount: 500,
                 src_curr: RUB,
@@ -638,7 +579,7 @@ export class Scenario {
             {
                 type: DEBT,
                 op: 2,
-                person_id: PERSON_Y,
+                person_id: this.PERSON_Y,
                 acc_id: 0,
                 src_amount: 1000,
                 src_curr: USD,
@@ -647,7 +588,7 @@ export class Scenario {
             {
                 type: DEBT,
                 op: 1,
-                person_id: PERSON_X,
+                person_id: this.PERSON_X,
                 acc_id: 0,
                 src_amount: 500,
                 src_curr: RUB,
@@ -656,7 +597,7 @@ export class Scenario {
             {
                 type: DEBT,
                 op: 2,
-                person_id: PERSON_Y,
+                person_id: this.PERSON_Y,
                 acc_id: 0,
                 src_amount: 1000,
                 src_curr: USD,
@@ -684,13 +625,13 @@ export class Scenario {
             },
             {
                 type: EXPENSE,
-                src_id: ACC_RUB,
+                src_id: this.ACC_RUB,
                 src_amount: 0,
             },
             {
                 type: EXPENSE,
                 src_id: 0,
-                dest_id: ACC_RUB,
+                dest_id: this.ACC_RUB,
                 src_amount: 100,
             },
             {
@@ -700,18 +641,18 @@ export class Scenario {
             },
             {
                 type: INCOME,
-                src_id: ACC_RUB,
+                src_id: this.ACC_RUB,
                 dest_id: 0,
                 dest_amount: 100,
             },
             {
                 type: INCOME,
-                dest_id: ACC_RUB,
+                dest_id: this.ACC_RUB,
                 dest_amount: '',
             },
             {
                 type: INCOME,
-                dest_id: ACC_RUB,
+                dest_id: this.ACC_RUB,
                 dest_amount: 99.1,
                 date: '1f1f',
             },
@@ -723,20 +664,20 @@ export class Scenario {
             },
             {
                 type: TRANSFER,
-                src_id: ACC_RUB,
+                src_id: this.ACC_RUB,
                 dest_id: 0,
                 src_amount: 100,
             },
             {
                 type: TRANSFER,
                 src_id: 0,
-                dest_id: ACC_RUB,
+                dest_id: this.ACC_RUB,
                 src_amount: 100,
             },
             {
                 type: DEBT,
                 op: 0,
-                person_id: PERSON_X,
+                person_id: this.PERSON_X,
                 acc_id: 0,
                 src_amount: 500,
                 src_curr: RUB,
@@ -752,7 +693,7 @@ export class Scenario {
             {
                 type: DEBT,
                 op: 1,
-                person_id: PERSON_X,
+                person_id: this.PERSON_X,
                 acc_id: 0,
                 src_amount: '',
                 src_curr: RUB,
@@ -760,7 +701,7 @@ export class Scenario {
             {
                 type: DEBT,
                 op: 1,
-                person_id: PERSON_X,
+                person_id: this.PERSON_X,
                 acc_id: 0,
                 src_amount: 10,
                 src_curr: 9999,
@@ -777,73 +718,59 @@ export class Scenario {
             USD,
             EUR,
             PLN,
-            CASH_RUB,
-            ACC_RUB,
-            ACC_USD,
-            PERSON_Y,
-            TR_EXPENSE_1,
-            TR_EXPENSE_2,
-            TR_EXPENSE_3,
-            TR_INCOME_1,
-            TR_INCOME_2,
-            TR_TRANSFER_1,
-            TR_TRANSFER_2,
-            TR_DEBT_1,
-            TR_DEBT_2,
-            TR_DEBT_3,
         } = this;
 
         const data = [
             {
-                id: TR_EXPENSE_1,
-                src_id: CASH_RUB,
+                id: this.TR_EXPENSE_1,
+                src_id: this.CASH_RUB,
             },
             {
-                id: TR_EXPENSE_2,
+                id: this.TR_EXPENSE_2,
                 dest_amount: 7608,
                 dest_curr: RUB,
             },
             {
-                id: TR_EXPENSE_3,
+                id: this.TR_EXPENSE_3,
                 dest_amount: 0.89,
                 dest_curr: EUR,
                 date: App.dates.weekAgo,
             },
             {
-                id: TR_INCOME_1,
-                dest_id: CASH_RUB,
+                id: this.TR_INCOME_1,
+                dest_id: this.CASH_RUB,
             },
             {
-                id: TR_INCOME_2,
+                id: this.TR_INCOME_2,
                 src_amount: 100,
                 src_curr: USD,
             },
             {
-                id: TR_TRANSFER_1,
-                dest_id: ACC_USD,
+                id: this.TR_TRANSFER_1,
+                dest_id: this.ACC_USD,
                 dest_curr: USD,
                 dest_amount: 8,
             },
             {
-                id: TR_TRANSFER_2,
-                dest_id: CASH_RUB,
+                id: this.TR_TRANSFER_2,
+                dest_id: this.CASH_RUB,
                 dest_curr: RUB,
                 dest_amount: 6500,
                 date: App.dates.yesterday,
             },
             {
-                id: TR_DEBT_1,
+                id: this.TR_DEBT_1,
                 op: 2,
             },
             {
-                id: TR_DEBT_2,
-                person_id: PERSON_Y,
+                id: this.TR_DEBT_2,
+                person_id: this.PERSON_Y,
                 acc_id: 0,
             },
             {
-                id: TR_DEBT_3,
+                id: this.TR_DEBT_3,
                 op: 1,
-                acc_id: ACC_RUB,
+                acc_id: this.ACC_RUB,
             },
         ];
 
@@ -851,65 +778,65 @@ export class Scenario {
 
         const invData = [
             {
-                id: TR_EXPENSE_1,
+                id: this.TR_EXPENSE_1,
                 src_id: 0,
             },
             {
-                id: TR_EXPENSE_2,
+                id: this.TR_EXPENSE_2,
                 dest_amount: 0,
                 dest_curr: PLN,
             },
             {
-                id: TR_EXPENSE_3,
+                id: this.TR_EXPENSE_3,
                 date: '',
             },
             {
-                id: TR_INCOME_1,
+                id: this.TR_INCOME_1,
                 dest_id: 0,
             },
             {
-                id: TR_INCOME_2,
+                id: this.TR_INCOME_2,
                 src_amount: 0,
                 src_curr: EUR,
             },
             {
-                id: TR_TRANSFER_1,
+                id: this.TR_TRANSFER_1,
                 src_id: 0,
             },
             {
-                id: TR_TRANSFER_1,
+                id: this.TR_TRANSFER_1,
                 dest_id: 0,
             },
             {
-                id: TR_TRANSFER_1,
+                id: this.TR_TRANSFER_1,
                 src_curr: 0,
             },
             {
-                id: TR_TRANSFER_1,
+                id: this.TR_TRANSFER_1,
                 dest_curr: 9999,
             },
             {
-                id: TR_TRANSFER_1,
-                dest_id: ACC_USD,
+                id: this.TR_TRANSFER_1,
+                dest_id: this.ACC_USD,
                 dest_curr: PLN,
             },
             {
-                id: TR_TRANSFER_2,
-                dest_id: CASH_RUB,
+                id: this.TR_TRANSFER_2,
+                dest_id: this.CASH_RUB,
                 dest_curr: RUB,
                 dest_amount: 0,
                 date: 'x',
             },
             {
-                id: TR_DEBT_1,
+                id: this.TR_DEBT_1,
                 op: 0,
             },
             {
-                id: TR_DEBT_2,
+                id: this.TR_DEBT_2,
                 person_id: 0,
             },
             {
-                id: TR_DEBT_3,
+                id: this.TR_DEBT_3,
                 op: 1,
                 acc_id: 9999,
             },
@@ -919,33 +846,23 @@ export class Scenario {
     }
 
     async apiDeleteTransactions() {
-        const { TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3 } = this;
-
-        const data = [
-            [TR_EXPENSE_2, TR_TRANSFER_1, TR_DEBT_3],
+        return this.runner.runGroup(TransactionApiTests.del, [
+            [this.TR_EXPENSE_2, this.TR_TRANSFER_1, this.TR_DEBT_3],
             [],
             [9999],
-        ];
-
-        return this.runner.runGroup(TransactionApiTests.del, data);
+        ]);
     }
 
     async apiSetTransactionPos() {
-        const { TR_EXPENSE_2, TR_INCOME_2, TR_TRANSFER_1 } = this;
-
-        const data = [
-            { id: TR_EXPENSE_2, pos: 5 },
-            { id: TR_INCOME_2, pos: 10 },
-            { id: TR_TRANSFER_1, pos: 100 },
-        ];
-
-        return this.runner.runGroup(TransactionApiTests.setPos, data);
+        return this.runner.runGroup(TransactionApiTests.setPos, [
+            { id: this.TR_EXPENSE_2, pos: 5 },
+            { id: this.TR_INCOME_2, pos: 10 },
+            { id: this.TR_TRANSFER_1, pos: 100 },
+        ]);
     }
 
     async apiFilterTransactions() {
         this.environment.setBlock('Filter transactions', 2);
-
-        const { ACC_RUB, ACC_USD } = this;
 
         const data = [
             {
@@ -961,18 +878,18 @@ export class Scenario {
                 type: [EXPENSE, INCOME, TRANSFER],
             },
             {
-                accounts: ACC_RUB,
+                accounts: this.ACC_RUB,
             },
             {
-                accounts: [ACC_RUB, ACC_USD],
+                accounts: [this.ACC_RUB, this.ACC_USD],
             },
             {
-                accounts: ACC_RUB,
+                accounts: this.ACC_RUB,
                 order: 'desc',
             },
             {
                 type: DEBT,
-                accounts: ACC_RUB,
+                accounts: this.ACC_RUB,
             },
             {
                 onPage: 10,
@@ -1040,129 +957,83 @@ export class Scenario {
         const origUserName = App.state.profile.name;
         const tmpPassword = 'test123';
 
-        const tasks = [
-            // Registration tests
-            {
-                action: ProfileTests.register,
-                data: App.config.newUser,
-            },
-            {
-                action: ProfileTests.deleteProfile,
-            },
-            {
-                action: ProfileTests.register,
-                data:
-                {
-                    login: '',
-                    name: '',
-                    password: '',
-                },
-            },
-            {
-                action: ProfileTests.register,
-                data:
-                {
-                    login: '',
-                    name: App.config.newUser.name,
-                    password: App.config.newUser.password,
-                },
-            },
-            {
-                action: ProfileTests.register,
-                data:
-                {
-                    login: App.config.newUser.login,
-                    name: '',
-                    password: App.config.newUser.password,
-                },
-            },
-            {
-                action: ProfileTests.register,
-                data:
-                {
-                    login: App.config.newUser.login,
-                    name: App.config.newUser.name,
-                    password: '',
-                },
-            },
-            // Login tests
-            {
-                action: ProfileTests.relogin,
-                data:
-                {
-                    login: App.config.testUser.login,
-                    password: '',
-                },
-            },
-            {
-                action: ProfileTests.relogin,
-                data:
-                {
-                    login: '',
-                    password: App.config.testUser.password,
-                },
-            },
-            {
-                action: ProfileTests.relogin,
-                data: { login: '', password: '' },
-            },
-            {
-                action: ProfileTests.relogin,
-                data: App.config.testUser,
-            },
-            // Reset data tests
-            {
-                action: ProfileTests.resetAll,
-            },
-            // Change name tests
-            {
-                action: ProfileTests.changeName,
-                data: '',
-            },
-            {
-                action: ProfileTests.changeName,
-                data: origUserName,
-            },
-            {
-                action: ProfileTests.changeName,
-                data: '^^&&>>',
-            },
-            {
-                action: ProfileTests.changeName,
-                data: origUserName,
-            },
-            // Change password tests
-            {
-                action: ProfileTests.changePass,
-                data: { oldPassword: '', newPassword: '' },
-            },
-            {
-                action: ProfileTests.changePass,
-                data: { oldPassword: '123', newPassword: '' },
-            },
-            {
-                action: ProfileTests.changePass,
-                data: { oldPassword: '', newPassword: '123' },
-            },
-            {
-                action: ProfileTests.changePass,
-                data:
-                {
-                    oldPassword: App.config.testUser.password,
-                    newPassword: tmpPassword,
-                },
-            },
-            {
-                action: ProfileTests.changePass,
-                data:
-                {
-                    oldPassword: tmpPassword,
-                    newPassword: App.config.testUser.password,
-                },
-            },
-        ];
+        // Registration tests
+        await ProfileTests.register(App.config.newUser);
+        await ProfileTests.deleteProfile();
 
-        await this.runner.runTasks(tasks);
+        await this.runner.runGroup(ProfileTests.register, [
+            {
+                login: '',
+                name: '',
+                password: '',
+            },
+            {
+                login: '',
+                name: App.config.newUser.name,
+                password: App.config.newUser.password,
+            },
+            {
+                login: App.config.newUser.login,
+                name: '',
+                password: App.config.newUser.password,
+            },
+            {
+                login: App.config.newUser.login,
+                name: App.config.newUser.name,
+                password: '',
+            },
+        ]);
+
+        // Login tests
+        await this.runner.runGroup(ProfileTests.relogin, [
+            {
+                login: App.config.testUser.login,
+                password: '',
+            },
+            {
+                login: '',
+                password: App.config.testUser.password,
+            },
+            {
+                login: '',
+                password: '',
+            },
+            App.config.testUser,
+        ]);
+
+        await ProfileTests.resetAll();
+
+        // Change name tests
+        await this.runner.runGroup(ProfileTests.changeName, [
+            '',
+            origUserName,
+            '^^&&>>',
+            origUserName,
+        ]);
+
+        // Change password tests
+        await this.runner.runGroup(ProfileTests.changePass, [
+            {
+                oldPassword: '',
+                newPassword: '',
+            },
+            {
+                oldPassword: '123',
+                newPassword: '',
+            },
+            {
+                oldPassword: '',
+                newPassword: '123',
+            },
+            {
+                oldPassword: App.config.testUser.password,
+                newPassword: tmpPassword,
+            },
+            {
+                oldPassword: tmpPassword,
+                newPassword: App.config.testUser.password,
+            },
+        ]);
     }
 
     async accountTests() {
