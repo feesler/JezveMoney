@@ -84,6 +84,9 @@ export class Scenario {
         await this.transactionTests();
         await this.postTransactionAccountTests();
         await StatisticsTests.run();
+
+        await ApiTests.loginTest(App.config.testUser);
+        await App.setupUser();
     }
 
     async securityTests() {
