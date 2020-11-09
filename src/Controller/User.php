@@ -37,7 +37,7 @@ class User extends TemplateController
         $this->css->page[] = "user.css";
         $this->buildCSS();
         array_push($this->jsArr,
-            "component/component.js",
+            "lib/component.js",
             "component/header.js",
 			"view.js",
 			"loginview.js"
@@ -86,7 +86,7 @@ class User extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr,
-            "component/component.js",
+            "lib/component.js",
             "component/header.js",
             "view.js",
 			"registerview.js"

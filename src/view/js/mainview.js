@@ -1,6 +1,6 @@
 'use strict';
 
-/* global extend, View, Charts */
+/* global extend, View, Histogram */
 
 /**
  * Main view
@@ -17,9 +17,9 @@ extend(MainView, View);
  * View initialization
  */
 MainView.prototype.onStart = function () {
-    Charts.createHistogram({
+    Histogram.create({
+        elem: 'chart',
         data: this.props.chartData,
-        container: 'chart',
         height: 200
     });
 };

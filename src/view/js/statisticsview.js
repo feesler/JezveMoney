@@ -1,7 +1,7 @@
 'use strict';
 
 /* global ge, ce, isDate, isVisible, show, setParam, setEmptyClick, urlJoin, px, extend, View */
-/* global isEmpty, baseURL, CurrencyList, Charts, DatePicker, DropDown, IconLink */
+/* global isEmpty, baseURL, CurrencyList, Histogram, DatePicker, DropDown, IconLink */
 
 /**
  * Statistics view
@@ -35,14 +35,14 @@ extend(StatisticsView, View);
  * View initialization
  */
 StatisticsView.prototype.onStart = function () {
-    this.histogram = Charts.createHistogram({
+    this.histogram = Histogram.create({
+        elem: 'chart',
         data: this.model.chartData,
-        container: 'chart',
         autoScale: true,
-        onbarclick: this.onBarClick.bind(this),
+        onitemclick: this.onBarClick.bind(this),
         onscroll: this.onChartsScroll.bind(this),
-        onbarover: this.onBarOver.bind(this),
-        onbarout: this.onBarOut.bind(this)
+        onitemover: this.onBarOver.bind(this),
+        onitemout: this.onBarOut.bind(this)
     });
 
     this.filterTypeDropDown = DropDown.create({
@@ -307,9 +307,9 @@ StatisticsView.prototype.onBarClick = function (e, barRect, val) {
  * Histogram bar mouse over callback
  * @param {object} bar
  */
-StatisticsView.prototype.onBarOver = function (bar) {
+StatisticsView.prototype.onBarOver = function (e, bar) {
     if (bar) {
-        bar.attr({ fill: '#00ffbf' });
+        bar.setAttribute('fill', '#00ffbf');
     }
 };
 
@@ -317,8 +317,8 @@ StatisticsView.prototype.onBarOver = function (bar) {
  * Histogram bar mouse out callback
  * @param {object} bar - bar rectangle element mouse leave from
  */
-StatisticsView.prototype.onBarOut = function (bar) {
+StatisticsView.prototype.onBarOut = function (e, bar) {
     if (bar) {
-        bar.attr({ fill: '#00bfff' });
+        bar.setAttribute('fill', '#00bfff');
     }
 };

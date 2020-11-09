@@ -79,9 +79,9 @@ class Main extends TemplateController
         $this->buildCSS();
 
         array_push($this->jsArr,
-            "lib/raphael.min.js",
-            "lib/charts.js",
-            "component/component.js",
+            "lib/component.js",
+            "lib/basechart.js",
+            "lib/histogram.js",
             "component/header.js",
 			"view.js",
 			"mainview.js"
