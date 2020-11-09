@@ -6,8 +6,9 @@
   "main": "index.js",
   "scripts": {
     "lint-php": "./dev-tools/vendor/bin/phpcs --standard=PSR12 ./src/admin/Controller/ ./src/admin/index.php ./src/api/ ./src/Controller/ ./src/Model/ ./src/system/ ./src/index.php",
+    "all": "npm-run-all lint test build",
     "test": "node ./tests/index.js",
-    "lint": "npm-run-all lint-src lint-tests",
+    "lint": "npm-run-all lint-src lint-tests lint-php",
     "lint-src": "eslint --quiet ./src/admin/view/js/ ./src/view/js/",
     "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/",
     "debug": "node --inspect-brk ./tests/index.js",
