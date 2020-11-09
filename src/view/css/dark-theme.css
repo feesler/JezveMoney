@@ -207,6 +207,58 @@ select
 
 }
 
+/* Date picker */
+.dp__wrapper
+{
+	background-color: #202020;
+	color: #DDDDDD;
+	border-color: #DDDDDD;
+}
+
+
+.dp__cell
+{
+	color: #DDDDDD;
+	border-color: #202020;
+	background-color: #202020;
+}
+
+
+.dp__other-month-cell
+{
+	color: #505050;
+}
+
+
+.dp__today-cell,
+.dp__cell_hl.dp__today-cell
+{
+	border: 1px dashed #00bef3;
+}
+
+
+.dp__cell_act
+{
+	border-color: #20D0FF;
+}
+
+
+.dp__cell_hl
+{
+    background-color: #005688;
+    border-color: #005688;
+	color: #FFFFFF;
+}
+
+.dp__year-range-view__cell:hover,
+.dp__year-view__cell:hover,
+.dp__day-cell:hover
+{
+	background-color: #3198d4;
+    color: #DDDDDD;
+}
+
+
 
 /* Transaction list */
 .trans-list > span
