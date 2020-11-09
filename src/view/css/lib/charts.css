@@ -27,14 +27,3 @@
 {
 	stroke-width: 1px;
 }
-
-
-/* Bar chart information popup */
-.chart_popup
-{
-	position: absolute;
-	border: 1px solid #000000;
-	background-color: #FFFFFF;
-	padding: 5px;
-	white-space: nowrap;
-}

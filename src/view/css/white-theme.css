@@ -351,3 +351,11 @@ div.trans-list__item_selected
 {
 	color: #000000;
 }
+
+
+.chart_popup
+{
+	border-color: #000000;
+	background-color: #FFFFFF;
+	color: #000000;
+}
