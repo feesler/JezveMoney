@@ -125,7 +125,7 @@ class Transaction extends ApiController
                 $accountsReq = [$accountsReq];
             }
             foreach ($accountsReq as $acc_id) {
-                if (!$accMod->is_exist($acc_id)) {
+                if (!$accMod->isExist($acc_id)) {
                     $this->fail("Invalid account '$acc_id'");
                 }
 

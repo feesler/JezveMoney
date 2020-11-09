@@ -176,7 +176,7 @@ class TransactionModel extends CachedTable
         if (isset($params["src_curr"])) {
             $res["src_curr"] = intval($params["src_curr"]);
             if (
-                !$this->currMod->is_exist($res["src_curr"]) ||
+                !$this->currMod->isExist($res["src_curr"]) ||
                 ($srcAcc && $srcAcc->curr_id != $res["src_curr"])
             ) {
                 wlog("Invalid src_curr specified");
@@ -187,7 +187,7 @@ class TransactionModel extends CachedTable
         if (isset($params["dest_curr"])) {
             $res["dest_curr"] = intval($params["dest_curr"]);
             if (
-                !$this->currMod->is_exist($res["dest_curr"]) ||
+                !$this->currMod->isExist($res["dest_curr"]) ||
                 ($destAcc && $destAcc->curr_id != $res["dest_curr"])
             ) {
                 wlog("Invalid dest_curr specified");

@@ -36,12 +36,13 @@ class User extends TemplateController
 
         $this->css->page[] = "user.css";
         $this->buildCSS();
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "lib/component.js",
             "component/header.js",
-			"view.js",
-			"loginview.js"
-		);
+            "view.js",
+            "loginview.js"
+        );
 
         include(TPL_PATH . "login.tpl");
     }
@@ -49,7 +50,7 @@ class User extends TemplateController
 
     protected function loginUser()
     {
-        $loginFields = [ "login", "password" ];
+        $loginFields = ["login", "password"];
 
         if (!$this->isPOST()) {
             setLocation(BASEURL . "login/");
@@ -85,11 +86,12 @@ class User extends TemplateController
         $this->css->page[] = "user.css";
         $this->buildCSS();
 
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "lib/component.js",
             "component/header.js",
             "view.js",
-			"registerview.js"
+            "registerview.js"
         );
 
         include(TPL_PATH . "register.tpl");
@@ -98,7 +100,7 @@ class User extends TemplateController
 
     protected function registerUser()
     {
-        $registerFields = [ "login", "password", "name" ];
+        $registerFields = ["login", "password", "name"];
 
         if (!$this->isPOST()) {
             setLocation(BASEURL);

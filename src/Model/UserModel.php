@@ -456,14 +456,23 @@ class UserModel extends CachedTable
             $personMod = PersonModel::getInstance();
             $personObj = $personMod->getItem($userObj->owner_id);
             if (!$personObj) {
-                $person_id = $personMod->create(["name" => $this->personName, "user_id" => $item_id, "flags" => 0]);
+                $personData = [
+                    "name" => $this->personName,
+                    "user_id" => $item_id,
+                    "flags" => 0
+                ];
+                $person_id = $personMod->create($personData);
                 if (!$person_id) {
                     throw new \Error("Fail to create person for user");
                 }
 
                 $this->setOwner($item_id, $person_id);
             } else {
-                if (!$personMod->adminUpdate($userObj->owner_id, ["name" => $this->personName, "user_id" => $item_id])) {
+                $personData = [
+                    "name" => $this->personName,
+                    "user_id" => $item_id
+                ];
+                if (!$personMod->adminUpdate($userObj->owner_id, $personData)) {
                     throw new \Error("Fail to update person of user");
                 }
             }

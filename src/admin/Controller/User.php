@@ -8,7 +8,7 @@ class User extends AdminController
 {
     public function index()
     {
-        $uArr = $this->uMod->getData([ "all" => true ]);
+        $uArr = $this->uMod->getData(["all" => true]);
 
         $this->menuItems["users"]["active"] = true;
 
@@ -17,7 +17,8 @@ class User extends AdminController
         $this->buildCSS();
 
         $this->jsArr[] = "view.js";
-        array_push($this->jsAdmin,
+        array_push(
+            $this->jsAdmin,
             "adminview.js",
             "adminlistview.js",
             "userview.js",

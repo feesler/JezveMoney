@@ -34,13 +34,15 @@ class Accounts extends TemplateController
 
         $titleString = "Jezve Money | Accounts";
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
             "toolbar.css"
         );
         $this->buildCSS();
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/account.js",
             "model/currency.js",
@@ -95,13 +97,15 @@ class Accounts extends TemplateController
         $headString = "New account";
         $titleString .= $headString;
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "lib/iconlink.css",
             "lib/dropdown.css",
             "tiles.css"
         );
         $this->buildCSS();
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/account.js",
@@ -163,14 +167,16 @@ class Accounts extends TemplateController
         $headString = "Edit account";
         $titleString .= $headString;
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "lib/iconlink.css",
             "lib/dropdown.css",
             "tiles.css"
         );
         $this->buildCSS();
 
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/account.js",
@@ -314,13 +320,6 @@ class Accounts extends TemplateController
     private static function columnStr($ind)
     {
         return Coordinate::stringFromColumnIndex($ind);
-    }
-
-
-    // Short alias for Coordinate::columnIndexFromString() method
-    private static function columnInd($str)
-    {
-        return Coordinate::columnIndexFromString($str) - 1;
     }
 
 

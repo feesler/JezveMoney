@@ -16,7 +16,8 @@ class ApiConsole extends AdminController
         $this->buildCSS();
 
         $this->jsArr[] = "view.js";
-        array_push($this->jsAdmin,
+        array_push(
+            $this->jsAdmin,
             "adminview.js",
             "apiconsoleview.js"
         );

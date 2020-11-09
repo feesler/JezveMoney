@@ -2,6 +2,7 @@
 
 namespace JezveMoney;
 
+require_once("./system/defines.php");
 require_once("./system/setup.php");
 
 $router = new Core\Router();

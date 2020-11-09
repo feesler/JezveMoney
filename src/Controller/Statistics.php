@@ -35,7 +35,7 @@ class Statistics extends TemplateController
         if ($byCurrency) {
             if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"])) {
                 $curr_id = intval($_GET["curr_id"]);
-                if (!$currMod->is_exist($curr_id)) {
+                if (!$currMod->isExist($curr_id)) {
                     $this->fail();
                 }
             } else {        // try to get first currency
@@ -50,7 +50,7 @@ class Statistics extends TemplateController
         } else {
             if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"])) {
                 $acc_id = intval($_GET["acc_id"]);
-                if (!$accMod->is_exist($acc_id)) {
+                if (!$accMod->isExist($acc_id)) {
                     $this->fail();
                 }
             } else {    /* try to get first account of user */
@@ -152,7 +152,8 @@ class Statistics extends TemplateController
 
         $titleString = "Jezve Money | Statistics";
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "lib/iconlink.css",
             "lib/dropdown.css",
             "lib/datepicker.css",
@@ -161,7 +162,8 @@ class Statistics extends TemplateController
         $this->css->page[] = "statistics.css";
         $this->buildCSS();
 
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/currency.js",
             "lib/selection.js",

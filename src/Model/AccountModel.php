@@ -103,7 +103,7 @@ class AccountModel extends CachedTable
 
         if (isset($params["curr_id"])) {
             $res["curr_id"] = intval($params["curr_id"]);
-            if (!$this->currMod->is_exist($res["curr_id"])) {
+            if (!$this->currMod->isExist($res["curr_id"])) {
                 wlog("Invalid curr_id specified");
                 return null;
             }
@@ -111,7 +111,7 @@ class AccountModel extends CachedTable
 
         if (isset($params["icon_id"])) {
             $res["icon_id"] = intval($params["icon_id"]);
-            if ($res["icon_id"] != 0 && !$this->iconModel->is_exist($res["icon_id"])) {
+            if ($res["icon_id"] != 0 && !$this->iconModel->isExist($res["icon_id"])) {
                 wlog("Invalid icon_id specified");
                 return null;
             }
@@ -291,13 +291,13 @@ class AccountModel extends CachedTable
     public function getPersonAccount($person_id, $curr_id)
     {
         $person_id = intval($person_id);
-        if ($person_id == self::$owner_id || !$this->personMod->is_exist($person_id)) {
+        if ($person_id == self::$owner_id || !$this->personMod->isExist($person_id)) {
             wlog("Invalid person specified");
             return null;
         }
 
         $curr_id = intval($curr_id);
-        if (!$this->currMod->is_exist($curr_id)) {
+        if (!$this->currMod->isExist($curr_id)) {
             wlog("Invalid currency specified");
             return null;
         }
@@ -320,7 +320,7 @@ class AccountModel extends CachedTable
     public function createPersonAccount($person_id, $curr_id)
     {
         $person_id = intval($person_id);
-        if ($person_id == self::$owner_id || !$this->personMod->is_exist($person_id)) {
+        if ($person_id == self::$owner_id || !$this->personMod->isExist($person_id)) {
             wlog("Invalid person specified");
             return null;
         }
@@ -530,7 +530,7 @@ class AccountModel extends CachedTable
         }
 
         $itemsData = [];
-        if ($person_id && !$this->personMod->is_exist($person_id) && UserModel::isAdminUser()) {
+        if ($person_id && !$this->personMod->isExist($person_id) && UserModel::isAdminUser()) {
             $qResult = $this->dbObj->selectQ("*", $this->tbl_name, null, null, "id ASC");
             while ($row = $this->dbObj->fetchRow($qResult)) {
                 $obj = $this->rowToObj($row);

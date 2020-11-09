@@ -94,7 +94,7 @@ class Transactions extends TemplateController
                 $accountsReq = [$accountsReq];
             }
             foreach ($accountsReq as $acc_id) {
-                if ($this->accModel->is_exist($acc_id)) {
+                if ($this->accModel->isExist($acc_id)) {
                     $accFilter[] = intval($acc_id);
                 }
             }
@@ -217,7 +217,8 @@ class Transactions extends TemplateController
 
         $titleString = "Jezve Money | Transactions";
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
             "lib/datepicker.css",
@@ -228,7 +229,8 @@ class Transactions extends TemplateController
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/account.js",
@@ -242,8 +244,8 @@ class Transactions extends TemplateController
             "component/toolbar.js",
             "component/iconlink.js",
             "component/confirmdialog.js",
-			"view.js",
-			"translistview.js"
+            "view.js",
+            "translistview.js"
         );
 
         include(TPL_PATH . "transactions.tpl");
@@ -291,7 +293,7 @@ class Transactions extends TemplateController
             $acc_id = intval($_GET["acc_id"]);
         }
         // Redirect if invalid account is specified
-        if ($acc_id && !$this->accModel->is_exist($acc_id)) {
+        if ($acc_id && !$this->accModel->isExist($acc_id)) {
             $this->fail($defMsg);
         }
         // Use first account if nothing is specified
@@ -562,7 +564,8 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
             "lib/dropdown.css",
@@ -571,7 +574,8 @@ class Transactions extends TemplateController
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/icon.js",
@@ -588,8 +592,8 @@ class Transactions extends TemplateController
             "component/accounttile.js",
             "component/tileinfoitem.js",
             "component/iconlink.js",
-			"view.js",
-			"transactionview.js"
+            "view.js",
+            "transactionview.js"
         );
 
         include(TPL_PATH . "transaction.tpl");
@@ -610,7 +614,7 @@ class Transactions extends TemplateController
         if (!$trans_id) {
             $this->fail($defMsg);
         }
-        if (!$this->model->is_exist($trans_id)) {
+        if (!$this->model->isExist($trans_id)) {
             $this->fail($defMsg);
         }
 
@@ -686,7 +690,7 @@ class Transactions extends TemplateController
         if ($tr["type"] != DEBT) {
             if (
                 (($tr["type"] == EXPENSE && $tr["dest_id"] == 0) ||
-                ($tr["type"] == TRANSFER && $tr["dest_id"] != 0)) &&
+                    ($tr["type"] == TRANSFER && $tr["dest_id"] != 0)) &&
                 $tr["src_id"] != 0
             ) {
                 $transAcc_id = $tr["src_id"];
@@ -796,8 +800,9 @@ class Transactions extends TemplateController
 
             if ($debtAcc) {
                 $debtAccBalance = $debtAcc->balance;
-                if (!$noAccount)
+                if (!$noAccount) {
                     $debtAccBalance += ($give) ? -$tr["dest_amount"] : $tr["src_amount"];
+                }
 
                 $debtAcc->balfmt = $this->currModel->format($debtAccBalance, $debtAcc->curr_id);
                 $debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
@@ -847,7 +852,8 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
             "lib/dropdown.css",
@@ -856,7 +862,8 @@ class Transactions extends TemplateController
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
 
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/currency.js",
             "model/icon.js",
@@ -874,8 +881,8 @@ class Transactions extends TemplateController
             "component/tileinfoitem.js",
             "component/iconlink.js",
             "component/confirmdialog.js",
-			"view.js",
-			"transactionview.js"
+            "view.js",
+            "transactionview.js"
         );
 
         include(TPL_PATH . "transaction.tpl");
