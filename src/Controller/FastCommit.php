@@ -62,13 +62,6 @@ class FastCommit extends TemplateController
     }
 
 
-    // Short alias for Coordinate::columnIndexFromString() method
-    private static function columnInd($str)
-    {
-        return Coordinate::columnIndexFromString($str);
-    }
-
-
     // Set index of specified column
     private function setColumnInd($colName, $ind)
     {

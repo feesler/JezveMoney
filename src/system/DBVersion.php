@@ -202,16 +202,16 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`name` VARCHAR(128) NOT NULL, " .
-                        "`sign` VARCHAR(64) NOT NULL, " .
-                        "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                        "`createdate` DATETIME NOT NULL, " .
-                        "`updatedate` DATETIME NOT NULL, " .
-                        "PRIMARY KEY (`id`)",
+            "`name` VARCHAR(128) NOT NULL, " .
+            "`sign` VARCHAR(64) NOT NULL, " .
+            "`flags` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
     }
 
@@ -230,22 +230,22 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`owner_id` INT(11) NOT NULL, " .
-                        "`user_id` INT(11) NOT NULL, " .
-                        "`curr_id` INT(11) NOT NULL, " .
-                        "`balance` DECIMAL(15,2) NOT NULL, " .
-                        "`initbalance` DECIMAL(15,2) NOT NULL, " .
-                        "`name` VARCHAR(255) NOT NULL, " .
-                        "`icon_id` INT(11) NOT NULL DEFAULT '0', " .
-                        "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                        "`createdate` DATETIME NOT NULL, " .
-                        "`updatedate` DATETIME NOT NULL, " .
-                        "PRIMARY KEY (`id`), " .
-                        "KEY `user_id` (`user_id`)",
+            "`owner_id` INT(11) NOT NULL, " .
+            "`user_id` INT(11) NOT NULL, " .
+            "`curr_id` INT(11) NOT NULL, " .
+            "`balance` DECIMAL(15,2) NOT NULL, " .
+            "`initbalance` DECIMAL(15,2) NOT NULL, " .
+            "`name` VARCHAR(255) NOT NULL, " .
+            "`icon_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`flags` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`), " .
+            "KEY `user_id` (`user_id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
     }
 
@@ -264,16 +264,16 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`name` VARCHAR(255) NOT NULL, " .
-                        "`user_id` INT(11) NOT NULL, " .
-                        "`flags` INT(11) NOT NULL, " .
-                        "`createdate` DATETIME NOT NULL, " .
-                        "`updatedate` DATETIME NOT NULL, " .
-                        "PRIMARY KEY (`id`)",
+            "`name` VARCHAR(255) NOT NULL, " .
+            "`user_id` INT(11) NOT NULL, " .
+            "`flags` INT(11) NOT NULL, " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
     }
 
@@ -292,26 +292,26 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`user_id` INT(11) NOT NULL, " .
-                        "`src_id` INT(11) NOT NULL, " .
-                        "`dest_id` INT(11) NOT NULL, " .
-                        "`type` INT(11) NOT NULL, " .
-                        "`src_amount` DECIMAL(15,2) NOT NULL, " .
-                        "`dest_amount` DECIMAL(15,2) NOT NULL, " .
-                        "`src_curr` INT(11) NOT NULL, " .
-                        "`dest_curr` INT(11) NOT NULL, " .
-                        "`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " .
-                        "`comment` text NOT NULL, " .
-                        "`pos` INT(11) NOT NULL, " .
-                        "`createdate` DATETIME NOT NULL, " .
-                        "`updatedate` DATETIME NOT NULL, " .
-                        "`src_result` DECIMAL(15,2) NOT NULL, " .
-                        "`dest_result` DECIMAL(15,2) NOT NULL, " .
-                        "PRIMARY KEY (`id`)",
+            "`user_id` INT(11) NOT NULL, " .
+            "`src_id` INT(11) NOT NULL, " .
+            "`dest_id` INT(11) NOT NULL, " .
+            "`type` INT(11) NOT NULL, " .
+            "`src_amount` DECIMAL(15,2) NOT NULL, " .
+            "`dest_amount` DECIMAL(15,2) NOT NULL, " .
+            "`src_curr` INT(11) NOT NULL, " .
+            "`dest_curr` INT(11) NOT NULL, " .
+            "`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " .
+            "`comment` text NOT NULL, " .
+            "`pos` INT(11) NOT NULL, " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "`src_result` DECIMAL(15,2) NOT NULL, " .
+            "`dest_result` DECIMAL(15,2) NOT NULL, " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
     }
 
@@ -330,17 +330,17 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`login` VARCHAR(255) NOT NULL, " .
-                        "`passhash` VARCHAR(64) NOT NULL, " .
-                        "`owner_id` INT(11) NOT NULL, " .
-                        "`access` INT(11) NOT NULL DEFAULT '0', " .
-                        "`createdate` DATETIME NOT NULL, " .
-                        "`updatedate` DATETIME NOT NULL, " .
-                        "PRIMARY KEY (`id`)",
+            "`login` VARCHAR(255) NOT NULL, " .
+            "`passhash` VARCHAR(64) NOT NULL, " .
+            "`owner_id` INT(11) NOT NULL, " .
+            "`access` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
     }
 
@@ -359,16 +359,16 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`name` VARCHAR(128) NOT NULL, " .
-                        "`file` VARCHAR(256) NOT NULL, " .
-                        "`type` INT(11) NOT NULL DEFAULT '0', " .
-                        "`createdate` DATETIME NOT NULL, " .
-                        "`updatedate` DATETIME NOT NULL, " .
-                        "PRIMARY KEY (`id`)",
+            "`name` VARCHAR(128) NOT NULL, " .
+            "`file` VARCHAR(256) NOT NULL, " .
+            "`type` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
 
         $data = [
@@ -399,14 +399,14 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`title` VARCHAR(255) NOT NULL, " .
-                        "`query` TEXT NOT NULL, " .
-                        "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                        "PRIMARY KEY (`id`)",
+            "`title` VARCHAR(255) NOT NULL, " .
+            "`query` TEXT NOT NULL, " .
+            "`flags` INT(11) NOT NULL DEFAULT '0', " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
-            throw new \Error("Fail to create table $tableName");
+            throw new \Error("Fail to create table '$tableName'");
         }
     }
 }
