@@ -9,7 +9,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 4;
+    protected $latestVersion = 5;
     protected $dbClient = null;
 
 
@@ -32,6 +32,7 @@ class DBVersion
         $this->createTransactionsTable();
         $this->createUsersTable();
         $this->createIconTable();
+        $this->createImportTemplateTable();
         $this->createAdminQueryTable();
 
         $this->createDBVersionTable();
@@ -49,8 +50,8 @@ class DBVersion
         $res = $this->dbClient->createTableQ(
             $this->tbl_name,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                        "`version` INT(11) NOT NULL DEFAULT '0', " .
-                        "PRIMARY KEY (`id`)",
+            "`version` INT(11) NOT NULL DEFAULT '0', " .
+            "PRIMARY KEY (`id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
 
@@ -121,8 +122,11 @@ class DBVersion
         if ($current < 4) {
             $current = $this->version4();
         }
+        if ($current < 5) {
+            $current = $this->version5();
+        }
 
-        $this->setVersion($this->latestVersion);
+        $this->setVersion($current);
     }
 
 
@@ -185,6 +189,14 @@ class DBVersion
         $this->createIconTable();
 
         return 4;
+    }
+
+
+    private function version5()
+    {
+        $this->createImportTemplateTable();
+
+        return 5;
     }
 
 
@@ -382,6 +394,40 @@ class DBVersion
 
         $iconModel = IconModel::getInstance();
         $iconModel->createMultiple($data);
+    }
+
+
+    private function createImportTemplateTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "import_tpl";
+        if ($this->dbClient->isTableExist($tableName)) {
+            wlog("Table '$tableName' already exist");
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+            "`name` VARCHAR(128) NOT NULL, " .
+            "`type_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`date_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`comment_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`trans_curr_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`trans_amount_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`account_curr_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`account_amount_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
+            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
     }
 
 

@@ -14,6 +14,7 @@ $router->setRoutes([
     "balance" => "Balance",
     "currency" => "Currency",
     "icon" => "Icon",
+    "importtpl" => "ImportTemplate",
     "query" => "Query",
     "log" => "Logs",
     "tests" => "Tests",

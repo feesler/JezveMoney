@@ -39,7 +39,7 @@ ImportView.prototype.onStart = function () {
     this.notPickedCountElem = ge('notpickedcount');
     this.acc_id = ge('acc_id');
     this.fileUploadRadio = ge('fileUploadRadio');
-    this.statTypeSel = ge('statTypeSel');
+    this.templateSel = ge('templateSel');
     this.serverPathInput = ge('srvFilePath');
     this.fileInput = ge('fileInp');
     this.isEncodeCheck = ge('isEncodeCheck');
@@ -52,12 +52,12 @@ ImportView.prototype.onStart = function () {
         || !this.acc_id
         || !this.notPickedCountElem
         || !this.fileUploadRadio
-        || !this.statTypeSel
+        || !this.templateSel
         || !this.serverPathInput
         || !this.fileInput
         || !this.isEncodeCheck
     ) {
-        throw new Error('Failer to initialize Import view');
+        throw new Error('Failed to initialize Import view');
     }
 
     this.newRowBtn.addEventListener('click', this.createRow.bind(this));
@@ -1198,7 +1198,7 @@ function Uploader(file, options, onSuccess, onError, onProgress) {
         // which file upload
         xhrUpload.setRequestHeader('X-File-Id', fileId);
         xhrUpload.setRequestHeader('X-File-Type', fileType);
-        xhrUpload.setRequestHeader('X-File-Stat-Type', options.statType);
+        xhrUpload.setRequestHeader('X-File-Tpl', options.template);
         if (options.encode) {
             xhrUpload.setRequestHeader('X-File-Encode', 1);
         }
@@ -1284,7 +1284,7 @@ ImportView.prototype.onFileImport = function (e) {
     var file;
     var uploader;
     var reqObj;
-    var statementType = this.statTypeSel.value;
+    var templateId = this.templateSel.value;
     var isEncoded = this.isEncodeCheck.checked;
 
     e.preventDefault();
@@ -1297,7 +1297,7 @@ ImportView.prototype.onFileImport = function (e) {
 
         uploader = new Uploader(
             file,
-            { statType: statementType, encode: isEncoded },
+            { template: templateId, encode: isEncoded },
             this.onImportSuccess.bind(this),
             this.onImportError.bind(this),
             this.onImportProgress.bind(this)
@@ -1306,7 +1306,7 @@ ImportView.prototype.onFileImport = function (e) {
     } else {
         reqObj = {
             fileName: this.serverPathInput.value,
-            statType: statementType,
+            template: templateId,
             encode: (isEncoded ? 1 : 0)
         };
 

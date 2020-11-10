@@ -6,6 +6,7 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\ImportTemplateModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -21,6 +22,11 @@ class FastCommit extends TemplateController
         "accAmount" => null,
     ];
 
+    protected function onStart()
+    {
+        $this->templateModel = ImportTemplateModel::getInstance();
+    }
+
 
     public function index()
     {
@@ -29,6 +35,7 @@ class FastCommit extends TemplateController
         $currMod = CurrencyModel::getInstance();
         $currArr = $currMod->getData();
         $persArr = $this->personMod->getData();
+        $impTemplates = $this->templateModel->getData();
 
         $this->css->page = "fastcommit.css";
         $this->buildCSS();
@@ -70,6 +77,21 @@ class FastCommit extends TemplateController
         }
 
         $this->columns[$colName] = self::columnStr(intval($ind));
+    }
+
+    // Appli import template
+    private function applyTemplate($template)
+    {
+        if (is_null($template)) {
+            throw new \Error("Invalid template");
+        }
+
+        $this->setColumnInd("date", $template->dateColumn);
+        $this->setColumnInd("desc", $template->commentColumn);
+        $this->setColumnInd("trCurr", $template->transactionCurrColumn);
+        $this->setColumnInd("trAmount", $template->transactionAmountColumn);
+        $this->setColumnInd("accCurr", $template->accountCurrColumn);
+        $this->setColumnInd("accAmount", $template->accountAmountColumn);
     }
 
 
@@ -136,7 +158,7 @@ class FastCommit extends TemplateController
         if (isset($hdrs["x-file-id"])) {
             $fileId = $hdrs["x-file-id"];
             $fileType = $hdrs["x-file-type"];
-            $fileStatType = $hdrs["x-file-stat-type"];
+            $fileTemplate = $hdrs["x-file-tpl"];
             if (isset($hdrs["x-file-encode"]) && intval($hdrs["x-file-encode"]) == 1) {
                 $encodeCP1251 = true;
             }
@@ -144,7 +166,7 @@ class FastCommit extends TemplateController
             $fname = UPLOAD_PATH . $fileId . "." . $fileType;
             $fhnd = fopen($fname, "a");
             if ($fhnd === false) {
-                wlog("Can't open file $fname");
+                wlog("Can't open file '$fname'");
                 exit;
             }
             $bytesWrite = fwrite($fhnd, $file_cont);
@@ -161,7 +183,7 @@ class FastCommit extends TemplateController
 
             $fname = UPLOAD_PATH . $_POST["fileName"];
             $fileType = substr(strrchr($fname, "."), 1);
-            $fileStatType = intval($_POST["statType"]);
+            $fileTemplate = intval($_POST["template"]);
             $encodeCP1251 = (intval($_POST["encode"]) == 1);
         }
 
@@ -189,28 +211,12 @@ class FastCommit extends TemplateController
         $spreadsheet = $reader->load($fname);
         $src = $spreadsheet->getActiveSheet();
 
-        if ($fileStatType == 1) {            // debt card
-            $this->setColumnInd("date", 1);
-            $this->setColumnInd("desc", 3);
-            $this->setColumnInd("trCurr", 7);
-            $this->setColumnInd("trAmount", 8);
-            $this->setColumnInd("accCurr", 9);
-            $this->setColumnInd("accAmount", 10);
-        } elseif ($fileStatType == 2) {        // credit card
-            $this->setColumnInd("date", 1);
-            $this->setColumnInd("desc", 4);
-            $this->setColumnInd("trCurr", 8);
-            $this->setColumnInd("trAmount", 9);
-            $this->setColumnInd("accCurr", 10);
-            $this->setColumnInd("accAmount", 11);
-        } elseif ($fileStatType == 0) {        // account statement
-            $this->setColumnInd("date", 1);
-            $this->setColumnInd("desc", 2);
-            $this->setColumnInd("trCurr", 3);
-            $this->setColumnInd("trAmount", 4);
-            $this->setColumnInd("accCurr", 5);
-            $this->setColumnInd("accAmount", 6);
+        $importTemplate = $this->templateModel->getItem($fileTemplate);
+        if (!$importTemplate) {
+            throw new \Error("Import template '$fileTemplate' not found");
         }
+        $this->applyTemplate($importTemplate);
+
         $row_ind = 2;
 
         $data = [];

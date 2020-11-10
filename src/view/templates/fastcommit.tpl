@@ -27,10 +27,10 @@
     <div>
         <div>
             <label>Statement type</label>
-            <select id="statTypeSel">
-                <option value="0">Account</option>
-                <option value="1">Debt card</option>
-                <option value="2">Credit card</option>
+            <select id="templateSel">
+<?php   foreach($impTemplates as $impTpl) {     ?>
+                <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
+<?php   }   ?>
             </select>
         </div>
         <div class="checkwrap">

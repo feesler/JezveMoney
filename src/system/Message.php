@@ -183,7 +183,14 @@ define("ERR_DEBT_UPDATE", 703);
 
 define("MSG_ICON_CREATE", 800);
 define("ERR_ICON_CREATE", 801);
-define("MSG_ICON_UPDATE", 902);
-define("ERR_ICON_UPDATE", 903);
-define("MSG_ICON_DELETE", 904);
-define("ERR_ICON_DELETE", 905);
+define("MSG_ICON_UPDATE", 802);
+define("ERR_ICON_UPDATE", 803);
+define("MSG_ICON_DELETE", 804);
+define("ERR_ICON_DELETE", 805);
+
+define("MSG_IMPTPL_CREATE", 900);
+define("ERR_IMPTPL_CREATE", 901);
+define("MSG_IMPTPL_UPDATE", 902);
+define("ERR_IMPTPL_UPDATE", 903);
+define("MSG_IMPTPL_DELETE", 904);
+define("ERR_IMPTPL_DELETE", 905);

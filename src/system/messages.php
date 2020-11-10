@@ -73,3 +73,10 @@ Message::add(MSG_ICON_UPDATE, MSG_TYPE_SUCCESS, "Icon successfully updated.");
 Message::add(ERR_ICON_UPDATE, MSG_TYPE_ERROR, "Fail to update icon.");
 Message::add(MSG_ICON_DELETE, MSG_TYPE_SUCCESS, "Icon successfully deleted.");
 Message::add(ERR_ICON_DELETE, MSG_TYPE_ERROR, "Fail to delete icon.");
+
+Message::add(MSG_IMPTPL_CREATE, MSG_TYPE_SUCCESS, "Import template successfully created.");
+Message::add(ERR_IMPTPL_CREATE, MSG_TYPE_ERROR, "Fail to create new import template.");
+Message::add(MSG_IMPTPL_UPDATE, MSG_TYPE_SUCCESS, "Import template successfully updated.");
+Message::add(ERR_IMPTPL_UPDATE, MSG_TYPE_ERROR, "Fail to update import template.");
+Message::add(MSG_IMPTPL_DELETE, MSG_TYPE_SUCCESS, "Import template successfully deleted.");
+Message::add(ERR_IMPTPL_DELETE, MSG_TYPE_ERROR, "Fail to delete import template.");
