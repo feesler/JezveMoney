@@ -150,34 +150,15 @@ AdminListView.prototype.deleteItem = function () {
  * @param {Event} e - submit event object
  */
 AdminListView.prototype.onFormSubmit = function (e) {
-    var i;
-    var inputEl;
     var formEl;
     var params;
     var link;
-    var els = {};
+    var els;
 
     e.preventDefault();
 
     formEl = e.target;
-    if (!formEl || !formEl.elements) {
-        return;
-    }
-
-    for (i = 0; i < formEl.elements.length; i += 1) {
-        inputEl = formEl.elements[i];
-
-        if (inputEl.disabled || inputEl.name === '') {
-            continue;
-        }
-
-        if ((inputEl.type === 'checkbox' || inputEl.type === 'radio')
-            && !inputEl.checked) {
-            continue;
-        }
-
-        els[inputEl.name] = inputEl.value;
-    }
+    els = this.getFormData(formEl);
 
     if (formEl.method === 'get') {
         params = urlJoin(els);

@@ -682,36 +682,6 @@ AdminApiConsoleView.prototype.clearResults = function () {
 };
 
 /**
- * Obtain request data of specified form element
- * @param {HTMLFormElement} form - form element to obtain data from
- */
-AdminApiConsoleView.prototype.getFormData = function (form) {
-    var i;
-    var inputEl;
-    var res = {};
-
-    if (!form || !form.elements) {
-        return null;
-    }
-
-    for (i = 0; i < form.elements.length; i += 1) {
-        inputEl = form.elements[i];
-        if (inputEl.disabled || inputEl.name === '') {
-            continue;
-        }
-
-        if ((inputEl.type === 'checkbox' || inputEl.type === 'radio')
-            && !inputEl.checked) {
-            continue;
-        }
-
-        res[inputEl.name] = inputEl.value;
-    }
-
-    return res;
-};
-
-/**
  * Form submit event handler
  * @param {Event} e - submit event object
  * @param {Function} verifyCallback - response verification callback
