@@ -52,14 +52,12 @@
 </div>
 <div id="admin_block" class="view-row">
     <label for="icon_type">Type</label>
-    <div class="stretch-input">
-        <select id="icon_type" name="type">
-            <option value="0">Select type</option>
+    <select id="icon_type" class="admin-select" name="type">
+        <option value="0">Select type</option>
 <?php	foreach($typesData as $type_id => $typeName) {		?>
-            <option value="<?=e($type_id)?>"><?=e($typeName)?></option>
+        <option value="<?=e($type_id)?>"><?=e($typeName)?></option>
 <?php	}		?>
-        </select>
-    </div>
+    </select>
 </div>
 <div class="popup__form-controls">
     <input class="btn submit-btn" type="submit" value="Submit">

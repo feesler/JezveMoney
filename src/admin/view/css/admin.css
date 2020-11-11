@@ -82,6 +82,14 @@ textarea
 }
 
 
+/* Select */
+.admin-select
+{
+    width: 100%;
+    border: 1px solid;
+}
+
+
 /* Checkbox wrapper */
 .checkbox-wrap
 {
@@ -122,12 +130,6 @@ textarea
 
 
 /* Create/update item popup */
-.popup > .item-form
-{
-	margin-top: -120px;
-}
-
-
 .popup > .item-form > .popup__content-box
 {
 	max-width: 300px;
