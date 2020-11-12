@@ -157,7 +157,11 @@
             </div>
             <div class="std_margin">
                 <label for="create_account_icon">Icon (1-6; 0 - no icon)</label>
-                <input id="create_account_icon" name="icon" type="text">
+                <input id="create_account_icon" name="icon_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_account_flags">Flags (0 - account is visible; 1 - hidden)</label>
+                <input id="create_account_flags" name="flags" type="text">
             </div>
             <div class="acc_controls">
                 <input class="adm_act_btn" type="submit" value="submit">
@@ -186,10 +190,10 @@
             </div>
             <div class="std_margin">
                 <label for="update_account_icon">Icon (1-6; 0 - no icon)</label>
-                <input id="update_account_icon" name="icon" type="text">
+                <input id="update_account_icon" name="icon_id" type="text">
             </div>
             <div class="std_margin">
-                <label for="update_account_flags">Flags (0 - sign on right, 1 - sign on left)</label>
+                <label for="update_account_flags">Flags (0 - account is visible; 1 - hidden)</label>
                 <input id="update_account_flags" name="flags" type="text">
             </div>
             <div class="acc_controls">
@@ -551,6 +555,10 @@
                 <label for="create_person_name">Name</label>
                 <input id="create_person_name" name="name" type="text">
             </div>
+            <div class="std_margin">
+                <label for="create_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
+                <input id="create_person_flags" name="flags" type="text">
+            </div>
             <div class="acc_controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
@@ -567,6 +575,10 @@
             <div class="std_margin">
                 <label for="update_person_name">Name</label>
                 <input id="update_person_name" name="name" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
+                <input id="update_person_flags" name="flags" type="text">
             </div>
             <div class="acc_controls">
                 <input class="adm_act_btn" type="submit" value="submit">
