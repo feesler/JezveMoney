@@ -26,7 +26,12 @@ class ImportTemplate extends AdminController
 
         $this->buildCSS();
 
-        $this->jsArr[] = "view.js";
+        array_push(
+            $this->jsArr,
+            "lib/component.js",
+            "component/confirmdialog.js",
+            "view.js"
+        );
         array_push(
             $this->jsAdmin,
             "adminview.js",
