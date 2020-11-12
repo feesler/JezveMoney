@@ -150,3 +150,9 @@ textarea
 {
 	border-width: 1px;
 }
+
+/* Cusmot popup styles */
+.popup > .popup__content.center_only
+{
+	background: none;
+}

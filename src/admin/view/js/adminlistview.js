@@ -127,13 +127,20 @@ AdminListView.prototype.updateItem = function () {
  * Show delete item confirmation
  */
 AdminListView.prototype.deleteItem = function () {
+    var popupContent;
+
     if (!this.selectedItem || !this.selectedItem.id) {
         return;
     }
 
+    popupContent = (this.deleteConfirmMessage)
+        ? this.deleteConfirmMessage
+        : 'Are you sure want to delete selected item?';
+
     ConfirmDialog.create({
         title: 'Delete',
-        content: 'Are you sure want to delete selected currency?',
+        content: popupContent,
+        additional: 'center_only',
         onconfirm: function () {
             ajax.post({
                 url: baseURL + 'api/' + this.apiController + '/del',

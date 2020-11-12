@@ -9,6 +9,7 @@ function AdminUserListView() {
     AdminUserListView.parent.constructor.apply(this, arguments);
 
     this.apiController = 'user';
+    this.deleteConfirmMessage = 'Are you sure want to delete selected user?';
 }
 
 extend(AdminUserListView, AdminListView);

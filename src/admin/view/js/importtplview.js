@@ -9,6 +9,7 @@ function AdminImportTemplateListView() {
     AdminImportTemplateListView.parent.constructor.apply(this, arguments);
 
     this.apiController = 'importtpl';
+    this.deleteConfirmMessage = 'Are you sure want to delete selected template?';
 }
 
 extend(AdminImportTemplateListView, AdminListView);

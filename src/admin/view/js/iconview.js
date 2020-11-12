@@ -9,6 +9,7 @@ function AdminIconListView() {
     AdminIconListView.parent.constructor.apply(this, arguments);
 
     this.apiController = 'icon';
+    this.deleteConfirmMessage = 'Are you sure want to delete selected icon?';
 }
 
 extend(AdminIconListView, AdminListView);

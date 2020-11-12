@@ -9,6 +9,7 @@ function AdminCurrencyListView() {
     AdminCurrencyListView.parent.constructor.apply(this, arguments);
 
     this.apiController = 'currency';
+    this.deleteConfirmMessage = 'Are you sure want to delete selected currency?';
 }
 
 extend(AdminCurrencyListView, AdminListView);

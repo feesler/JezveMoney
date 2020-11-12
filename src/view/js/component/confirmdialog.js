@@ -34,6 +34,9 @@ function ConfirmDialog() {
     if ('id' in this.props) {
         popupProps.id = this.props.id;
     }
+    if ('additional' in this.props) {
+        popupProps.additional = this.props.additional;
+    }
 
     this.popup = Popup.create(popupProps);
     if (!this.popup) {
