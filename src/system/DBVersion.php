@@ -9,7 +9,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 5;
+    protected $latestVersion = 6;
     protected $dbClient = null;
 
 
@@ -33,6 +33,8 @@ class DBVersion
         $this->createUsersTable();
         $this->createIconTable();
         $this->createImportTemplateTable();
+        $this->createImportRuleTable();
+        $this->createImportActionTable();
         $this->createAdminQueryTable();
 
         $this->createDBVersionTable();
@@ -125,6 +127,9 @@ class DBVersion
         if ($current < 5) {
             $current = $this->version5();
         }
+        if ($current < 6) {
+            $current = $this->version6();
+        }
 
         $this->setVersion($current);
     }
@@ -199,6 +204,13 @@ class DBVersion
         return 5;
     }
 
+    private function version6()
+    {
+        $this->createImportRuleTable();
+        $this->createImportActionTable();
+
+        return 6;
+    }
 
     private function createCurrencyTable()
     {
@@ -420,6 +432,63 @@ class DBVersion
             "`trans_amount_col` INT(11) NOT NULL DEFAULT '0', " .
             "`account_curr_col` INT(11) NOT NULL DEFAULT '0', " .
             "`account_amount_col` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
+            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
+    }
+
+
+    private function createImportRuleTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "import_rule";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+            "`user_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`parent_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`field_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`operator` INT(11) NOT NULL DEFAULT '0', " .
+            "`value` VARCHAR(255) NOT NULL, " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
+            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
+    }
+
+
+    private function createImportActionTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "import_act";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+            "`user_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`rule_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`action_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`value` VARCHAR(255) NOT NULL, " .
             "`createdate` DATETIME NOT NULL, " .
             "`updatedate` DATETIME NOT NULL, " .
             "PRIMARY KEY (`id`)",

@@ -11,6 +11,8 @@ $router->setRoutes([
     "currency" => "Currency",
     "icon" => "Icon",
     "importtpl" => "ImportTemplate",
+    "importrule" => "ImportRule",
+    "importaction" => "ImportAction",
     "account" => "Account",
     "person" => "Person",
     "transaction" => "Transaction",

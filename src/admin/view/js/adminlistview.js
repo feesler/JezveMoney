@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, addChilds, removeChilds, show, urlJoin, extend, ajax */
+/* global isObject, ge, addChilds, removeChilds, show, urlJoin, extend, ajax */
 /* global createMessage, AdminView, Popup, ConfirmDialog, baseURL */
 
 /**
@@ -13,6 +13,19 @@ function AdminListView() {
     if (this.props.data) {
         this.setData(this.props.data);
     }
+
+    this.elements = {
+        itemsListElem: 'items-list',
+        createBtn: 'createbtn',
+        updateBtn: 'updbtn',
+        deleteBtn: 'del_btn',
+        itemForm: 'item-frm',
+        dialogPopup: 'item_popup'
+    };
+
+    if (isObject(this.props.elements)) {
+        setParam(this.elements, this.props.elements);
+    }
 }
 
 extend(AdminListView, AdminView);
@@ -23,16 +36,18 @@ extend(AdminListView, AdminView);
 AdminListView.prototype.onStart = function () {
     this.activeRow = null;
 
-    this.itemsListElem = ge('items-list');
-    this.createBtn = ge('createbtn');
-    this.updateBtn = ge('updbtn');
-    this.deleteBtn = ge('del_btn');
-    this.itemForm = ge('item-frm');
-    if (!this.itemsListElem
+    this.itemsListElem = ge(this.elements.itemsListElem);
+    this.createBtn = ge(this.elements.createBtn);
+    this.updateBtn = ge(this.elements.updateBtn);
+    this.deleteBtn = ge(this.elements.deleteBtn);
+    this.itemForm = ge(this.elements.itemForm);
+    if (
+        !this.itemsListElem
         || !this.createBtn
         || !this.updateBtn
         || !this.deleteBtn
-        || !this.itemForm) {
+        || !this.itemForm
+    ) {
         throw new Error('Failed to initialize view');
     }
     this.itemsListElem.addEventListener('click', this.onRowClick.bind(this));
@@ -43,7 +58,7 @@ AdminListView.prototype.onStart = function () {
     /* popup initialization */
     this.itemForm.addEventListener('submit', this.onFormSubmit.bind(this));
     this.dialogPopup = Popup.create({
-        id: 'item_popup',
+        id: this.elements.dialogPopup,
         content: this.itemForm,
         additional: 'center_only item-form',
         btn: { closeBtn: true }
@@ -153,6 +168,14 @@ AdminListView.prototype.deleteItem = function () {
 };
 
 /**
+ * Process from data if needed and return request data
+ * @param {object} data - form data
+ */
+AdminListView.prototype.prepareRequestData = function (data) {
+    return data;
+};
+
+/**
  * Item form submit event handler
  * @param {Event} e - submit event object
  */
@@ -166,6 +189,7 @@ AdminListView.prototype.onFormSubmit = function (e) {
 
     formEl = e.target;
     els = this.getFormData(formEl);
+    els = this.prepareRequestData(els);
 
     if (formEl.method === 'get') {
         params = urlJoin(els);

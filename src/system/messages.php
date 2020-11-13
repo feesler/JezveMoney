@@ -80,3 +80,17 @@ Message::add(MSG_IMPTPL_UPDATE, MSG_TYPE_SUCCESS, "Import template successfully 
 Message::add(ERR_IMPTPL_UPDATE, MSG_TYPE_ERROR, "Fail to update import template.");
 Message::add(MSG_IMPTPL_DELETE, MSG_TYPE_SUCCESS, "Import template successfully deleted.");
 Message::add(ERR_IMPTPL_DELETE, MSG_TYPE_ERROR, "Fail to delete import template.");
+
+Message::add(MSG_IMPORT_RULE_CREATE, MSG_TYPE_SUCCESS, "Import rule successfully created.");
+Message::add(ERR_IMPORT_RULE_CREATE, MSG_TYPE_ERROR, "Fail to create new import rule.");
+Message::add(MSG_IMPORT_RULE_UPDATE, MSG_TYPE_SUCCESS, "Import rule successfully updated.");
+Message::add(ERR_IMPORT_RULE_UPDATE, MSG_TYPE_ERROR, "Fail to update import rule.");
+Message::add(MSG_IMPORT_RULE_DELETE, MSG_TYPE_SUCCESS, "Import rule successfully deleted.");
+Message::add(ERR_IMPORT_RULE_DELETE, MSG_TYPE_ERROR, "Fail to delete import rule.");
+
+Message::add(MSG_IMPORT_ACT_CREATE, MSG_TYPE_SUCCESS, "Import action successfully created.");
+Message::add(ERR_IMPORT_ACT_CREATE, MSG_TYPE_ERROR, "Fail to create new import action.");
+Message::add(MSG_IMPORT_ACT_UPDATE, MSG_TYPE_SUCCESS, "Import action successfully updated.");
+Message::add(ERR_IMPORT_ACT_UPDATE, MSG_TYPE_ERROR, "Fail to update import action.");
+Message::add(MSG_IMPORT_ACT_DELETE, MSG_TYPE_SUCCESS, "Import action successfully deleted.");
+Message::add(ERR_IMPORT_ACT_DELETE, MSG_TYPE_ERROR, "Fail to delete import action.");

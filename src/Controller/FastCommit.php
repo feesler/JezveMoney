@@ -6,6 +6,8 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\ImportRuleModel;
+use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -25,6 +27,8 @@ class FastCommit extends TemplateController
     protected function onStart()
     {
         $this->templateModel = ImportTemplateModel::getInstance();
+        $this->ruleModel = ImportRuleModel::getInstance();
+        $this->actionModel = ImportActionModel::getInstance();
     }
 
 
@@ -37,6 +41,13 @@ class FastCommit extends TemplateController
         $persArr = $this->personMod->getData();
         $impTemplates = $this->templateModel->getData();
 
+        $rules = $this->ruleModel->getData();
+        $rulesData = [];
+        foreach ($rules as $rule) {
+            $rule->actions = $this->actionModel->getData(["rule" => $rule->id]);
+            $rulesData[] = $rule;
+        }
+
         $this->css->page = "fastcommit.css";
         $this->buildCSS();
 
@@ -46,14 +57,15 @@ class FastCommit extends TemplateController
             "model/account.js",
             "model/currency.js",
             "model/person.js",
+            "model/importaction.js",
+            "model/importrule.js",
             "lib/ajax.js",
             "lib/dragndrop.js",
             "lib/sortable.js",
             "lib/component.js",
             "component/header.js",
             "view.js",
-            "importview.js",
-            "convhint.js"
+            "importview.js"
         );
 
         $titleString = "Jezve Money | Fast Commit";

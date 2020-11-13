@@ -13,6 +13,7 @@ abstract class AdminController extends TemplateController
         "curr" => [ "title" => "Currencies", "link" => "currency/" ],
         "icon" => [ "title" => "Icons", "link" => "icon/" ],
         "importtpl" => [ "title" => "Import templates", "link" => "importtpl/" ],
+        "importrule" => [ "title" => "Import rules", "link" => "importrule/" ],
         "query" => [ "title" => "Queries", "link" => "query/" ],
         "log" => [ "title" => "Logs", "link" => "log/" ],
         "balance" => [ "title" => "Balance", "link" => "balance/" ],

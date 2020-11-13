@@ -22,6 +22,7 @@ function ImportView() {
     this.model.accounts = AccountList.create(this.props.accounts);
     this.model.currency = CurrencyList.create(this.props.currencies);
     this.model.persons = PersonList.create(this.props.persons);
+    this.model.rules = ImportRuleList.create(this.props.rules);
 }
 
 extend(ImportView, View);
@@ -1086,9 +1087,7 @@ ImportView.prototype.mapImportRow = function (impRowObj) {
     rowObj.dateInp.value = impRowObj.data.date;
     rowObj.commInp.value = impRowObj.data.descr;
 
-    if (typeof window.convertHint !== 'undefined' && isFunction(window.convertHint)) {
-        rowObj = convertHint.call(this, impRowObj.data, rowObj);
-    }
+    this.model.rules.applyTo(impRowObj.data, rowObj, this);
 
     item = this.findNthItem(this.rowsContainer, impRowObj.pos + 1);
     if (!item) {

@@ -266,6 +266,26 @@ function checkFields($obj, $expectedFields, $throw = false)
 }
 
 
+// Convert associative array to array of objects {id, name}
+function convertToObjectArray($data)
+{
+    if (!is_array($data)) {
+        return null;
+    }
+
+    $res = [];
+    foreach($data as $item_id => $value) {
+        $item = new \stdClass();
+        $item->id = $item_id;
+        $item->name = $value;
+
+        $res[] = $item;
+    }
+
+    return $res;
+}
+
+
 // Return content of specified SVG icon
 function svgIcon($name)
 {
