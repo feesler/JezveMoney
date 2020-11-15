@@ -460,6 +460,7 @@ class DBVersion
             "`parent_id` INT(11) NOT NULL DEFAULT '0', " .
             "`field_id` INT(11) NOT NULL DEFAULT '0', " .
             "`operator` INT(11) NOT NULL DEFAULT '0', " .
+            "`flags` INT(11) NOT NULL DEFAULT '0', " .
             "`value` VARCHAR(255) NOT NULL, " .
             "`createdate` DATETIME NOT NULL, " .
             "`updatedate` DATETIME NOT NULL, " .

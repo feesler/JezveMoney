@@ -19,7 +19,7 @@ var IMPORT_RULE_OP_NOT_EQUAL = 3;
 var IMPORT_RULE_OP_LESS = 4;
 var IMPORT_RULE_OP_GREATER = 5;
 /** Rule flags */
-var IMPORT_RULE_OP_FIELD_FLAG = 0x8000;
+var IMPORT_RULE_OP_FIELD_FLAG = 0x01;
 
 /**
  * @constructor Import rule class
@@ -81,7 +81,7 @@ ImportRule.getFieldValue = function (fieldId, data) {
  * @param {string} field - field name to check
  */
 ImportRule.prototype.isAvailField = function (field) {
-    var availFields = ['id', 'parent_id', 'field_id', 'operator', 'value', 'actions'];
+    var availFields = ['id', 'parent_id', 'field_id', 'operator', 'flags', 'value', 'actions'];
 
     return typeof field === 'string' && availFields.includes(field);
 };
@@ -91,25 +91,12 @@ ImportRule.prototype.isAvailField = function (field) {
  * @param {number} data - operator value
  */
 ImportRule.prototype.isFieldValueOperator = function () {
-    var res = parseInt(this.operator, 10);
-    if (!res) {
-        throw new Error('Invalid operator value');
+    var res = parseInt(this.flags, 10);
+    if (Number.isNaN(res)) {
+        throw new Error('Invalid flags value');
     }
 
     return (res & IMPORT_RULE_OP_FIELD_FLAG) == IMPORT_RULE_OP_FIELD_FLAG;
-};
-
-/**
- * Return operator id without flags
- * @param {number} data - identifier of operator
- */
-ImportRule.prototype.getOperator = function () {
-    var res = parseInt(this.operator, 10);
-    if (!res) {
-        throw new Error('Invalid operator value');
-    }
-
-    return (res & ~IMPORT_RULE_OP_FIELD_FLAG);
 };
 
 /**
@@ -118,23 +105,22 @@ ImportRule.prototype.getOperator = function () {
  * @param {number} rightVal - value on the right to operator
  */
 ImportRule.prototype.applyOperator = function (leftVal, rightVal) {
-    var operator = this.getOperator();
     var left = leftVal;
     var right = (typeof left === 'string') ? rightVal.toString() : rightVal;
 
-    if (operator === IMPORT_RULE_OP_STRING_INCLUDES) {
+    if (this.operator === IMPORT_RULE_OP_STRING_INCLUDES) {
         return left.includes(right);
     }
-    if (operator === IMPORT_RULE_OP_EQUAL) {
+    if (this.operator === IMPORT_RULE_OP_EQUAL) {
         return left === right;
     }
-    if (operator === IMPORT_RULE_OP_NOT_EQUAL) {
+    if (this.operator === IMPORT_RULE_OP_NOT_EQUAL) {
         return left !== right;
     }
-    if (operator === IMPORT_RULE_OP_LESS) {
+    if (this.operator === IMPORT_RULE_OP_LESS) {
         return left < right;
     }
-    if (operator === IMPORT_RULE_OP_GREATER) {
+    if (this.operator === IMPORT_RULE_OP_GREATER) {
         return left > right;
     }
 
@@ -259,7 +245,6 @@ ImportRuleList.prototype.applyRules = function (rules, data, rowObj, context) {
         this.applyRules(childRules, data, rowObj, context);
     }, this);
 };
-
 
 /**
  * Apply list of import rules to specified transaction data

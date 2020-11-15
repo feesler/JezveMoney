@@ -24,6 +24,7 @@
                                         <th>Field</th>
                                         <th>Operator</th>
                                         <th>Value</th>
+                                        <th>Flags</th>
                                     </tr>
                                 </thead>
                                 <tbody id="items-list">
@@ -35,6 +36,7 @@
                                         <td><?=e($item->fieldName)?></td>
                                         <td><?=e($item->operatorName)?></td>
                                         <td><?=e($item->valueStr)?></td>
+                                        <td><?=e($item->flags)?></td>
                                     </tr>
 <?php   }   ?>
                                 </tbody>

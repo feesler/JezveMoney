@@ -26,7 +26,7 @@ class ImportRule extends AdminController
             $item = clone $rule;
             $item->fieldName = ImportRuleModel::getFieldName($item->field_id);
             $item->operatorName = ImportRuleModel::getOperatorName($item->operator);
-            if (ImportRuleModel::isFieldValueOperator($item->operator)){
+            if (ImportRuleModel::isFieldValueOperator($item->flags)){
                 $item->valueStr = ImportRuleModel::getFieldName($item->value);
             } else {
                 $item->valueStr = $item->value;

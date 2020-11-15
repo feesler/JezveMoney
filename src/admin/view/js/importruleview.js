@@ -4,7 +4,7 @@
 /* global AdminImportActionListView */
 /* eslint no-bitwise: "off" */
 
-var IMPORT_RULE_OP_FIELD_FLAG = 0x8000;
+var IMPORT_RULE_OP_FIELD_FLAG = 0x01;
 
 /**
  * Admin import rule list view
@@ -74,7 +74,7 @@ AdminImportRuleListView.prototype.setItemValues = function (item) {
         this.idInput.value = item.id;
         this.parentInput.value = item.parent_id;
         selectByValue(this.fieldSel, item.field_id);
-        selectByValue(this.operatorSel, this.unflagOperator(item.operator));
+        selectByValue(this.operatorSel, item.operator);
 
         isFieldValue = this.isFieldValueOperator(item.operator);
         this.fieldFlagCheck.checked = isFieldValue;
@@ -112,25 +112,12 @@ AdminImportRuleListView.prototype.onFieldFlagChange = function () {
  * @param {number} data - operator value
  */
 AdminImportRuleListView.prototype.isFieldValueOperator = function (data) {
-    var operator = parseInt(data, 10);
-    if (!operator) {
-        throw new Error('Invalid operator value');
+    var flags = parseInt(data, 10);
+    if (!flags) {
+        throw new Error('Invalid flags value');
     }
 
-    return (operator & IMPORT_RULE_OP_FIELD_FLAG) == IMPORT_RULE_OP_FIELD_FLAG;
-};
-
-/**
- * Return operator id without flags
- * @param {number} data - identifier of operator
- */
-AdminImportRuleListView.prototype.unflagOperator = function (data) {
-    var operator = parseInt(data, 10);
-    if (!operator) {
-        throw new Error('Invalid operator value');
-    }
-
-    return (operator & ~IMPORT_RULE_OP_FIELD_FLAG);
+    return (flags & IMPORT_RULE_OP_FIELD_FLAG) === IMPORT_RULE_OP_FIELD_FLAG;
 };
 
 /**
@@ -166,8 +153,9 @@ AdminImportRuleListView.prototype.getOperatorName = function (operatorId) {
 AdminImportRuleListView.prototype.prepareRequestData = function (data) {
     var res = copyObject(data);
 
+    res.flags = 0;
     if (this.fieldFlagCheck.checked) {
-        res.operator |= IMPORT_RULE_OP_FIELD_FLAG;
+        res.flags |= IMPORT_RULE_OP_FIELD_FLAG;
         res.value = this.fieldValueSel.value;
     } else {
         res.value = this.valueInput.value;
@@ -220,6 +208,7 @@ AdminImportRuleListView.prototype.renderItem = function (item) {
         ce('td', { textContent: item.parent_id }),
         ce('td', { textContent: fieldName }),
         ce('td', { textContent: operatorName }),
-        ce('td', { textContent: valueStr })
+        ce('td', { textContent: valueStr }),
+        ce('td', { textContent: item.flags })
     ]);
 };

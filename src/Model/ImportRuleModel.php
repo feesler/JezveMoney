@@ -19,16 +19,14 @@ define("IMPORT_RULE_FIELD_ACC_AMOUNT", 5);
 define("IMPORT_RULE_FIELD_ACC_CURRENCY", 6);
 define("IMPORT_RULE_FIELD_COMMENT", 7);
 define("IMPORT_RULE_FIELD_DATE", 8);
-
 // Rule operators
 define("IMPORT_RULE_OP_STRING_INCLUDES", 1);
 define("IMPORT_RULE_OP_EQUAL", 2);
 define("IMPORT_RULE_OP_NOT_EQUAL", 3);
 define("IMPORT_RULE_OP_LESS", 4);
 define("IMPORT_RULE_OP_GREATER", 5);
-// Field flag of rule operator
-// If operator include field flag, then value is field
-define("IMPORT_RULE_OP_FIELD_FLAG", 0x8000);
+// Rule flags
+define("IMPORT_RULE_OP_FIELD_FLAG", 0x01);
 
 class ImportRuleModel extends CachedTable
 {
@@ -96,6 +94,7 @@ class ImportRuleModel extends CachedTable
         $res->parent_id = intval($row["parent_id"]);
         $res->field_id = intval($row["field_id"]);
         $res->operator = intval($row["operator"]);
+        $res->flags = intval($row["flags"]);
         $res->value = $row["value"];
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
@@ -118,6 +117,7 @@ class ImportRuleModel extends CachedTable
             "field_id",
             "operator",
             "value",
+            "flags"
         ];
         $res = [];
 
@@ -144,11 +144,14 @@ class ImportRuleModel extends CachedTable
 
         if (isset($params["operator"])) {
             $res["operator"] = intval($params["operator"]);
-            $unflagged = self::unflagOperator($res["operator"]);
-            if (!in_array($unflagged, self::$availRuleOperators)) {
+            if (!in_array($res["operator"], self::$availRuleOperators)) {
                 wlog("Invalid operator: " . $res["operator"]);
                 return null;
             }
+        }
+
+        if (isset($params["flags"])) {
+            $res["flags"] = intval($params["flags"]);
         }
 
         if (isset($params["value"])) {
@@ -310,12 +313,6 @@ class ImportRuleModel extends CachedTable
     }
 
 
-    public static function unflagOperator($data)
-    {
-        return intval($data) & ~IMPORT_RULE_OP_FIELD_FLAG;
-    }
-
-
     public static function getFields()
     {
         return convertToObjectArray(self::$ruleFieldNames);
@@ -340,7 +337,7 @@ class ImportRuleModel extends CachedTable
 
     public static function getOperatorName($operator_id)
     {
-        $operator_id = self::unflagOperator($operator_id);
+        $operator_id = intval($operator_id);
         if (!isset(self::$ruleOperatorNames[$operator_id])) {
             return null;
         }
