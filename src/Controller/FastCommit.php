@@ -64,6 +64,7 @@ class FastCommit extends TemplateController
             "lib/sortable.js",
             "lib/component.js",
             "component/header.js",
+            "component/importtransactionitem.js",
             "view.js",
             "importview.js"
         );

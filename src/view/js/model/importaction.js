@@ -1,7 +1,6 @@
 'use strict';
 
-/* global isObject, selectByValue, extend, ListItem */
-/* global EXPENSE, INCOME, TRANSFER, DEBT */
+/* global extend, ListItem, ImportTransactionItem */
 /* eslint no-bitwise: "off" */
 
 /** Action types */
@@ -34,108 +33,26 @@ ImportAction.prototype.isAvailField = function (field) {
 
 /**
  * Execute import action
- * @param {number} data - value on the left to operator
- * @param {number} rightVal - value on the right to operator
+ * @param {ImportTransactionItem} context - import item component
  */
-ImportAction.prototype.execute = function (data, rowObj, context) {
-    if (!isObject(data)) {
-        throw new Error('Invalid data object');
-    }
-    if (!isObject(rowObj)) {
-        throw new Error('Invalid row object');
-    }
-    if (!context) {
-        throw new Error('Invalid context');
+ImportAction.prototype.execute = function (context) {
+    if (!(context instanceof ImportTransactionItem)) {
+        throw new Error('Invalid import item');
     }
 
     if (this.action_id === IMPORT_ACTION_SET_TR_TYPE) {
-        this.setTransactionType(data, rowObj, context);
+        context.setTransactionType(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_ACCOUNT) {
-        this.setAccount(data, rowObj, context);
+        context.setAccount(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_PERSON) {
-        this.setPerson(data, rowObj, context);
+        context.setPerson(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_SRC_AMOUNT) {
-        this.setSourceAmount(data, rowObj, context);
+        context.setSourceAmount(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_DEST_AMOUNT) {
-        this.setDestinationAmount(data, rowObj, context);
+        context.setDestinationAmount(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_COMMENT) {
-        this.setComment(data, rowObj, context);
+        context.setComment(this.value);
     } else {
         throw new Error('Invalid action');
     }
-};
-
-/** Set type of transaction action */
-ImportAction.prototype.setTransactionType = function (data, rowObj, context) {
-    var typeValue;
-
-    if (!isObject(data) || !isObject(rowObj) || !context) {
-        throw new Error('Invalid data object');
-    }
-
-    if (this.value === EXPENSE) {
-        typeValue = 'expense';
-    } else if (this.value === INCOME) {
-        typeValue = 'income';
-    } else if (this.value === TRANSFER) {
-        typeValue = (data.trAmountVal > 0) ? 'transferto' : 'transferfrom';
-    } else if (this.value === DEBT) {
-        typeValue = (data.trAmountVal > 0) ? 'debtto' : 'debtfrom';
-    }
-
-    selectByValue(rowObj.trTypeSel, typeValue);
-    context.onTrTypeChanged(rowObj);
-};
-
-/** Set account action */
-ImportAction.prototype.setAccount = function (data, rowObj, context) {
-    if (!isObject(data) || !isObject(rowObj) || !context) {
-        throw new Error('Invalid data object');
-    }
-
-    selectByValue(rowObj.destAccSel, this.value);
-    context.onDestChanged(rowObj);
-};
-
-/** Set person action */
-ImportAction.prototype.setPerson = function (data, rowObj, context) {
-    if (!isObject(data) || !isObject(rowObj) || !context) {
-        throw new Error('Invalid data object');
-    }
-
-    selectByValue(rowObj.personSel, this.value);
-    context.onPersonChanged(rowObj);
-};
-
-/** Set source amount action */
-ImportAction.prototype.setSourceAmount = function (data, rowObj, context) {
-    var res = rowObj;
-
-    if (!isObject(data) || !isObject(res) || !context) {
-        throw new Error('Invalid data object');
-    }
-
-    res.amountInp.value = this.value;
-};
-
-/** Set destination amount action */
-ImportAction.prototype.setDestinationAmount = function (data, rowObj, context) {
-    var res = rowObj;
-
-    if (!isObject(data) || !isObject(res) || !context) {
-        throw new Error('Invalid data object');
-    }
-
-    res.destAmountInp.value = this.value;
-};
-
-/** Set comment action */
-ImportAction.prototype.setComment = function (data, rowObj, context) {
-    var res = rowObj;
-
-    if (!isObject(data) || !isObject(res) || !context) {
-        throw new Error('Invalid data object');
-    }
-
-    res.commInp.value = this.value;
 };

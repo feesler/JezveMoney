@@ -1,9 +1,10 @@
 'use strict';
 
-/* global ge, ce, re, isDate, isFunction, removeChilds, show, enable, extend, selectedValue */
-/* global fixFloat, selectByValue, insertAfter, urlJoin, ajax */
-/* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL, ImportRuleList */
-/* global AccountList, CurrencyList, PersonList, View, Sortable */
+/* global ge, ce, re, isDate, isFunction, removeChilds, show, extend, selectedValue */
+/* global fixFloat, insertAfter, urlJoin, ajax */
+/* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL */
+/* global AccountList, CurrencyList, PersonList, ImportRuleList */
+/* global View, Sortable, ImportTransactionItem */
 /* eslint no-bitwise: "off" */
 
 /**
@@ -149,30 +150,26 @@ ImportView.prototype.findRowByElement = function (elem) {
         return null;
     }
 
-    return this.model.transactionRows.find(function (rowObj) {
-        return rowObj && rowObj.rowEl === elem;
+    return this.model.transactionRows.find(function (item) {
+        return item && item.elem === elem;
     });
 };
 
 /**
- *
- * @param {Object|Event} e - row object or Event object
+ * Transaction item remove event handler
  */
-ImportView.prototype.delRow = function (e) {
+ImportView.prototype.onRemoveItem = function (item) {
     var delPos;
-    var rowObj;
 
-    rowObj = (e instanceof Event) ? this.getRowFromEvent(e) : e;
-    if (!rowObj) {
+    if (!item) {
         return;
     }
 
     if (this.model.importedRows.length) {
-        this.addPlaceholder(rowObj.rowEl);
+        this.addPlaceholder(item.elem);
     }
-    re(rowObj.rowEl);
 
-    delPos = rowObj.pos;
+    delPos = item.pos;
     this.model.transactionRows.splice(delPos, 1);
     this.updateRowsPos();
 
@@ -192,161 +189,6 @@ ImportView.prototype.getRowFromEvent = function (e) {
 
     rowEl = e.target.closest('.tr-row');
     return this.findRowByElement(rowEl);
-};
-
-/**
- * Row checkbox 'change' event handler. Enable/disable related row
- * @param {Event} e - event object
- */
-ImportView.prototype.onRowChecked = function (e) {
-    var rowObj = this.getRowFromEvent(e);
-    if (!rowObj) {
-        return;
-    }
-
-    this.enableRow(rowObj, rowObj.enableCheck.checked);
-};
-
-/**
- *
- * @param {*} rowObj
- * @param {*} val
- */
-ImportView.prototype.enableRow = function (rowObj, val) {
-    var newState;
-    var checkbox;
-
-    if (!rowObj) {
-        return;
-    }
-
-    newState = (typeof val === 'undefined') ? true : !!val;
-    if (newState) {
-        rowObj.rowEl.classList.remove('tr-row_disabled');
-    } else {
-        rowObj.rowEl.classList.add('tr-row_disabled');
-    }
-
-    checkbox = rowObj.enableCheck;
-    checkbox.checked = newState;
-    enable(rowObj.trTypeSel, newState);
-    enable(rowObj.amountInp, newState);
-    enable(rowObj.currIdInp, newState);
-    enable(rowObj.currSel, newState);
-    enable(rowObj.destAccIdInp, newState);
-    enable(rowObj.destAccSel, newState);
-    enable(rowObj.personIdInp, newState);
-    enable(rowObj.personSel, newState);
-    enable(rowObj.destAmountInp, newState);
-    enable(rowObj.dateInp, newState);
-    enable(rowObj.commInp, newState);
-
-    if (newState) {
-        this.onTrTypeChanged(rowObj);
-    }
-};
-
-/**
- * Create new row object
- */
-ImportView.prototype.createRowObject = function () {
-    var rowObj = {};
-
-    // Row enable checkbox
-    rowObj.enableCheck = ce('input', { type: 'checkbox', checked: true });
-    rowObj.enableCheck.addEventListener('change', this.onRowChecked.bind(this));
-
-    // Currency controls
-    rowObj.currIdInp = ce('input', { type: 'hidden', name: 'curr_id[]', value: this.model.mainAccount.curr_id });
-    rowObj.currSel = ce('select');
-    this.model.currency.data.forEach(function (currency) {
-        var option = ce('option', {
-            value: currency.id,
-            textContent: currency.name,
-            selected: (currency.id === this.model.mainAccount.curr_id)
-        });
-
-        rowObj.currSel.appendChild(option);
-    }, this);
-    rowObj.currSel.addEventListener('change', this.onCurrChanged.bind(this));
-
-    // Transaction type select
-    rowObj.trTypeSel = ce('select',
-        { name: 'tr_type[]' },
-        [
-            ce('option', { value: 'expense', textContent: '-' }),
-            ce('option', { value: 'income', textContent: '+' }),
-            ce('option', { value: 'transferfrom', textContent: 'T>' }),
-            ce('option', { value: 'transferto', textContent: 'T<' }),
-            ce('option', { value: 'debtfrom', textContent: 'D>' }),
-            ce('option', { value: 'debtto', textContent: 'D<' })
-        ]);
-    rowObj.trTypeSel.addEventListener('change', this.onTrTypeChanged.bind(this));
-
-    // Destination account controls
-    rowObj.destAccIdInp = ce('input', { type: 'hidden', name: 'dest_acc_id[]', value: '' });
-    rowObj.destAccSel = ce('select',
-        { disabled: true },
-        ce('option',
-            {
-                value: 0,
-                textContent: 'Destination account',
-                selected: true,
-                disabled: true
-            }));
-    this.model.accounts.data.forEach(function (account) {
-        var option = ce('option', { value: account.id, textContent: account.name });
-        if (account.id === this.model.mainAccount.id) {
-            enable(option, false);
-        }
-
-        rowObj.destAccSel.appendChild(option);
-    }, this);
-    rowObj.destAccSel.addEventListener('change', this.onDestChanged.bind(this));
-
-    // Person controls
-    rowObj.personIdInp = ce('input', { type: 'hidden', name: 'person_id[]', value: '' });
-    rowObj.personSel = ce('select');
-    this.model.persons.data.forEach(function (person) {
-        var option = ce('option', { value: person.id, textContent: person.name });
-        rowObj.personSel.appendChild(option);
-    });
-    show(rowObj.personSel, false);
-    rowObj.personSel.addEventListener('change', this.onPersonChanged.bind(this));
-
-    // Amount controls
-    rowObj.amountInp = ce('input', { type: 'text', name: 'amount[]', placeholder: 'Amount' });
-    rowObj.destAmountInp = ce('input', {
-        type: 'text',
-        name: 'dest_amount[]',
-        disabled: true,
-        placeholder: 'Destination amount'
-    });
-
-    rowObj.dateInp = ce('input', { type: 'text', name: 'date[]', placeholder: 'Date' });
-    rowObj.commInp = ce('input', { type: 'text', name: 'comment[]', placeholder: 'Comment' });
-    rowObj.delBtn = ce('input', { className: 'btn submit-btn', type: 'button', value: '-' });
-    rowObj.delBtn.addEventListener('click', this.delRow.bind(this));
-
-    rowObj.rowEl = ce('div',
-        { className: 'tr-row' },
-        [
-            rowObj.enableCheck,
-            rowObj.trTypeSel,
-            rowObj.amountInp,
-            rowObj.currIdInp,
-            rowObj.currSel,
-            rowObj.destAccIdInp,
-            rowObj.destAccSel,
-            rowObj.personIdInp,
-            rowObj.personSel,
-            rowObj.destAmountInp,
-            rowObj.dateInp,
-            rowObj.commInp,
-            rowObj.delBtn
-        ]);
-
-    return rowObj;
 };
 
 /**
@@ -443,14 +285,14 @@ ImportView.prototype.createRow = function () {
         return;
     }
 
-    rowObj = this.createRowObject();
-    this.enableRow(rowObj, true);
+    rowObj = ImportTransactionItem.create({ parent: this });
+    rowObj.enable(true);
 
     firstPlaceholder = this.findPlaceholder();
     if (firstPlaceholder) {
         nextTrRow = this.findNextItem(firstPlaceholder);
 
-        insertAfter(rowObj.rowEl, firstPlaceholder);
+        insertAfter(rowObj.elem, firstPlaceholder);
         if (nextTrRow) {
             nextTrRowObj = this.getRowByElem(nextTrRow);
             this.model.transactionRows.splice(nextTrRowObj.pos, 0, rowObj);
@@ -462,7 +304,7 @@ ImportView.prototype.createRow = function () {
 
         re(firstPlaceholder);
     } else {
-        this.rowsContainer.appendChild(rowObj.rowEl);
+        this.rowsContainer.appendChild(rowObj.elem);
 
         rowObj.pos = this.model.transactionRows.length;
 
@@ -470,148 +312,6 @@ ImportView.prototype.createRow = function () {
     }
 
     this.transCountElem.textContent = this.model.transactionRows.length;
-};
-
-/** Disable account option if it's the same as main account */
-ImportView.prototype.syncAccountOption = function (opt) {
-    var optVal;
-    var res = opt;
-
-    if (!res) {
-        return;
-    }
-
-    optVal = parseInt(res.value, 10);
-    if (optVal === 0 || optVal === this.model.mainAccount.id) {
-        res.disabled = true;
-        res.selected = false;
-    } else {
-        res.disabled = false;
-    }
-};
-
-ImportView.prototype.syncDestAccountSelect = function (rowObj) {
-    var i;
-    var l;
-
-    for (i = 0, l = rowObj.destAccSel.options.length; i < l; i += 1) {
-        this.syncAccountOption(rowObj.destAccSel.options[i]);
-    }
-};
-
-ImportView.prototype.syncDestAmountAvail = function (rowObj) {
-    var trType;
-    var currObj;
-    var destAccObj;
-    var isDiff;
-
-    trType = selectedValue(rowObj.trTypeSel);
-    if (trType === 'expense' || trType === 'income') {
-        currObj = this.currFromSelect(rowObj.currSel);
-        isDiff = (currObj !== null && this.model.mainAccount.curr_id !== currObj.id);
-        enable(rowObj.destAmountInp, isDiff);
-    } else if (trType === 'transferfrom' || trType === 'transferto') {
-        destAccObj = this.accFromSelect(rowObj.destAccSel);
-        isDiff = (destAccObj !== null && this.model.mainAccount.curr_id !== destAccObj.curr_id);
-        enable(rowObj.destAmountInp, isDiff);
-    } else {
-        /** Debt */
-        enable(rowObj.destAmountInp, false);
-    }
-};
-
-/** Copy destination account id from select to hidden input */
-ImportView.prototype.copyDestAcc = function (rowObj) {
-    var destAccountInput;
-
-    if (!rowObj || !rowObj.destAccIdInp || !rowObj.destAccSel) {
-        return;
-    }
-
-    destAccountInput = rowObj.destAccIdInp;
-    destAccountInput.value = selectedValue(rowObj.destAccSel);
-};
-
-/** Transaction type select 'change' event handler */
-ImportView.prototype.onTrTypeChanged = function (e) {
-    var rowObj;
-    var trType;
-
-    rowObj = (e instanceof Event) ? this.getRowFromEvent(e) : e;
-    if (!rowObj) {
-        return;
-    }
-
-    trType = selectedValue(rowObj.trTypeSel);
-    if (!rowObj.destAccSel || !rowObj.destAccSel.options) {
-        return;
-    }
-
-    this.syncCurrAvail(rowObj);
-    if (trType === 'transferfrom' || trType === 'transferto') {
-        show(rowObj.personSel, false);
-        show(rowObj.destAccSel, true);
-        enable(rowObj.destAccSel, true);
-        this.syncDestAccountSelect(rowObj);
-        this.copyDestAcc(rowObj);
-    } else if (trType === 'debtfrom' || trType === 'debtto') {
-        this.copyPerson(rowObj);
-        show(rowObj.personSel, true);
-        show(rowObj.destAccSel, false);
-        enable(rowObj.destAccSel, false);
-    } else {
-        show(rowObj.personSel, false);
-        show(rowObj.destAccSel, true);
-        enable(rowObj.destAccSel, false);
-    }
-
-    this.syncDestAmountAvail(rowObj);
-};
-
-/**
- * Enable/disable currency select according to transaction type
- * @param {Object} rowObj - row object
- */
-ImportView.prototype.syncCurrAvail = function (rowObj) {
-    var trType = selectedValue(rowObj.trTypeSel);
-
-    /**
-     * transfer expect currencies will be the same as source and destination account
-     * debt curently expect only the same currency as account
-     */
-    if (
-        trType === 'transferfrom'
-        || trType === 'transferto'
-        || trType === 'debtfrom'
-        || trType === 'debtto'
-    ) {
-        enable(rowObj.currSel, false);
-        selectByValue(rowObj.currSel, this.model.mainAccount.curr_id);
-        this.copyCurr(rowObj);
-    } else {
-        enable(rowObj.currSel, true);
-    }
-};
-
-ImportView.prototype.copyCurr = function (rowObj) {
-    var currencyInput;
-
-    if (!rowObj || !rowObj.currIdInp || !rowObj.currSel) {
-        return;
-    }
-
-    currencyInput = rowObj.currIdInp;
-    currencyInput.value = selectedValue(rowObj.currSel);
-};
-
-ImportView.prototype.onCurrChanged = function (e) {
-    var rowObj = (e instanceof Event) ? this.getRowFromEvent(e) : e;
-    if (!rowObj) {
-        return;
-    }
-
-    this.copyCurr(rowObj);
-    this.syncDestAmountAvail(rowObj);
 };
 
 /**
@@ -624,58 +324,11 @@ ImportView.prototype.onMainAccChange = function () {
     }
 
     this.model.transactionRows.forEach(function (rowObj) {
-        var trType = selectedValue(rowObj.trTypeSel);
-        if (trType === 'transferfrom' || trType === 'transferto') {
-            this.syncDestAccountSelect(rowObj);
-            this.copyDestAcc(rowObj);
-        }
-        this.syncCurrAvail(rowObj);
-        this.syncDestAmountAvail(rowObj);
+        rowObj.onMainAccountChanged();
     }, this);
 };
 
-/**
- * Destination account select 'change' event handler
- * @param {Event} e - event object
- */
-ImportView.prototype.onDestChanged = function (e) {
-    var rowObj = (e instanceof Event) ? this.getRowFromEvent(e) : e;
-    if (!rowObj) {
-        return;
-    }
-
-    this.copyDestAcc(rowObj);
-    this.syncDestAmountAvail(rowObj);
-};
-
-/**
- * Copy person id value from select to hidden input
- * @param {Object} rowObj - row object
- */
-ImportView.prototype.copyPerson = function (rowObj) {
-    var personInput;
-
-    if (!rowObj || !rowObj.personIdInp || !rowObj.personSel) {
-        return;
-    }
-
-    personInput = rowObj.personIdInp;
-    personInput.value = selectedValue(rowObj.personSel);
-};
-
-/**
- * Person select 'change' event handler
- * @param {Event} e - event object
- */
-ImportView.prototype.onPersonChanged = function (e) {
-    var rowObj = (e instanceof Event) ? this.getRowFromEvent(e) : e;
-    if (!rowObj) {
-        return;
-    }
-
-    this.copyPerson(rowObj);
-};
-
+/** Submit buttom 'click' event handler */
 ImportView.prototype.onSubmitClick = function () {
     var reqObj;
 
@@ -684,7 +337,7 @@ ImportView.prototype.onSubmitClick = function () {
     }
 
     reqObj = this.model.transactionRows.filter(function (rowObj) {
-        return rowObj && rowObj.rowEl && !rowObj.rowEl.classList.contains('tr-row_disabled');
+        return rowObj.isEnabled();
     }).map(function (rowObj) {
         var trObj = {};
         var selType = selectedValue(rowObj.trTypeSel);
@@ -796,7 +449,7 @@ ImportView.prototype.onCommitResult = function (response) {
  */
 ImportView.prototype.getRowByElem = function (rowEl) {
     return this.model.transactionRows.find(function (rowObj) {
-        return (rowEl === rowObj.rowEl);
+        return (rowEl === rowObj.elem);
     });
 };
 
@@ -1044,8 +697,7 @@ ImportView.prototype.importLoadCallback = function (response) {
 ImportView.prototype.mapImportRow = function (impRowObj) {
     var accCurr;
     var trCurr;
-    var rowObj;
-    var trType;
+    var trItem;
     var item;
     var replacedRow;
     var replacedRowObj;
@@ -1072,22 +724,19 @@ ImportView.prototype.mapImportRow = function (impRowObj) {
         return;
     }
 
-    rowObj = this.createRowObject();
-    trType = (impRowObj.data.accAmountVal > 0) ? 'income' : 'expense';
-    selectByValue(rowObj.trTypeSel, trType);
-    this.onTrTypeChanged(rowObj);
-    rowObj.amountInp.value = Math.abs(impRowObj.data.accAmountVal);
+    trItem = ImportTransactionItem.create({ parent: this });
+    trItem.setTransactionType((impRowObj.data.accAmountVal > 0) ? INCOME : EXPENSE);
+    trItem.setSourceAmount(Math.abs(impRowObj.data.accAmountVal));
 
     if (trCurr.id !== accCurr.id) {
-        selectByValue(rowObj.currSel, trCurr.id);
-        this.onCurrChange(rowObj.currSel, rowObj);
-        rowObj.destAmountInp.value = Math.abs(impRowObj.data.trAmountVal);
+        trItem.setCurrency(trCurr.id);
+        trItem.setDestinationAmount(impRowObj.data.trAmountVal);
     }
 
-    rowObj.dateInp.value = impRowObj.data.date;
-    rowObj.commInp.value = impRowObj.data.descr;
+    trItem.setDate(impRowObj.data.date);
+    trItem.setComment(impRowObj.data.descr);
 
-    this.model.rules.applyTo(impRowObj.data, rowObj, this);
+    this.model.rules.applyTo(impRowObj.data, trItem);
 
     item = this.findNthItem(this.rowsContainer, impRowObj.pos + 1);
     if (!item) {
@@ -1097,10 +746,10 @@ ImportView.prototype.mapImportRow = function (impRowObj) {
     if (item.classList.contains('tr-row')) {
         /* insert at filled transaction */
         replacedRow = this.getRowByElem(item);
-        this.model.transactionRows[replacedRow.pos] = rowObj;
+        this.model.transactionRows[replacedRow.pos] = trItem;
     } else if (!this.model.transactionRows.length) {
         /* insert to empty list */
-        this.model.transactionRows.push(rowObj);
+        this.model.transactionRows.push(trItem);
     } else {
         /* insert at placeholder */
         replacedRow = this.findNextItem(item);
@@ -1109,19 +758,19 @@ ImportView.prototype.mapImportRow = function (impRowObj) {
             if (!replacedRowObj) {
                 return;
             }
-            this.model.transactionRows.splice(replacedRowObj.pos - 1, 0, rowObj);
+            this.model.transactionRows.splice(replacedRowObj.pos - 1, 0, trItem);
         } else {
             replacedRow = this.findPrevItem(item);
             replacedRowObj = this.getRowByElem(replacedRow);
             if (!replacedRowObj) {
                 return;
             }
-            this.model.transactionRows.splice(replacedRowObj.pos, 0, rowObj);
+            this.model.transactionRows.splice(replacedRowObj.pos, 0, trItem);
         }
     }
 
-    this.enableRow(rowObj, !impRowObj.data.sameFound);
-    insertAfter(rowObj.rowEl, item);
+    trItem.enable(!impRowObj.data.sameFound);
+    insertAfter(trItem.elem, item);
     re(item);
 
     this.transCountElem.textContent = this.model.transactionRows.length;

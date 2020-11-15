@@ -164,13 +164,13 @@ ImportRule.prototype.meetCondition = function (data) {
 /**
  * Run actions assigned to rule
  */
-ImportRule.prototype.runActions = function (data, rowObj, context) {
+ImportRule.prototype.runActions = function (context) {
     if (!Array.isArray(this.actions)) {
         return;
     }
 
     this.actions.forEach(function (item) {
-        item.execute(data, rowObj, context);
+        item.execute(context);
     });
 };
 
@@ -227,10 +227,11 @@ ImportRuleList.prototype.getChildRules = function (ruleId) {
 
 /**
  * Apply list of import rules to specified transaction data
+ * @param {ImportRule[]} rules - imported transaction data
  * @param {Object} data - imported transaction data
- * @param {Object} rowObj - transaction row object
+ * @param {Object} context - transaction row object
  */
-ImportRuleList.prototype.applyRules = function (rules, data, rowObj, context) {
+ImportRuleList.prototype.applyRules = function (rules, data, context) {
     var rulesData = (Array.isArray(rules)) ? rules : [rules];
 
     rulesData.forEach(function (rule) {
@@ -240,20 +241,19 @@ ImportRuleList.prototype.applyRules = function (rules, data, rowObj, context) {
             return;
         }
 
-        rule.runActions(data, rowObj, context);
+        rule.runActions(context);
         childRules = this.getChildRules(rule.id);
 
-        this.applyRules(childRules, data, rowObj, context);
+        this.applyRules(childRules, data, context);
     }, this);
 };
 
 /**
  * Apply list of import rules to specified transaction data
  * @param {Object} data - imported transaction data
- * @param {Object} rowObj - transaction row object
- * @param {Object} context - import view
+ * @param {Object} context - transaction row object
  */
-ImportRuleList.prototype.applyTo = function (data, rowObj, context) {
+ImportRuleList.prototype.applyTo = function (data, context) {
     var rules = this.getRootRules();
-    this.applyRules(rules, data, rowObj, context);
+    this.applyRules(rules, data, context);
 };
