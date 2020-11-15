@@ -1,6 +1,7 @@
 'use strict';
 
-/* global ge, ce, show, selectByValue, extend, AdminListView, List */
+/* global ge, ce, ajax, selectByValue, extend, urlJoin, baseURL */
+/* global AdminListView, List */
 /* eslint no-bitwise: "off" */
 
 /**
@@ -61,7 +62,7 @@ AdminImportActionListView.prototype.setItemValues = function (item) {
 AdminImportActionListView.prototype.setParentRule = function (ruleId) {
     var rule = parseInt(ruleId, 10);
     if (!rule) {
-        throw new Error('Invalid rule: '+ ruleId);
+        throw new Error('Invalid rule: ' + ruleId);
     }
 
     this.parentRule = ruleId;

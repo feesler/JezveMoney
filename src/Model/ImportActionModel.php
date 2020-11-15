@@ -273,7 +273,7 @@ class ImportActionModel extends CachedTable
     // Return array of items
     public function getData($params = [])
     {
-        if (!is_array($params)){
+        if (!is_array($params)) {
             $params = [];
         }
 
@@ -283,7 +283,7 @@ class ImportActionModel extends CachedTable
         if ($filterByRule) {
             $rule_id = intval($params["rule"]);
             if (!$rule_id) {
-                wlog("Invalid rule id: ".$params["rule"]);
+                wlog("Invalid rule id: " . $params["rule"]);
                 return null;
             }
         }

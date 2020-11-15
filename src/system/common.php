@@ -253,7 +253,7 @@ function checkFields($obj, $expectedFields, $throw = false)
     foreach ($expectedFields as $field) {
         if (!array_key_exists($field, $obj)) {
             if ($throw) {
-                throw new \Error("Field $field not found");
+                throw new \Error("Field '$field' not found");
             } else {
                 return false;
             }
@@ -274,7 +274,7 @@ function convertToObjectArray($data)
     }
 
     $res = [];
-    foreach($data as $item_id => $value) {
+    foreach ($data as $item_id => $value) {
         $item = new \stdClass();
         $item->id = $item_id;
         $item->name = $value;

@@ -76,12 +76,12 @@ class ImportTemplate extends ApiController
             $this->fail($defMsg);
         }
 
-        $curr_id = $this->model->create($reqData);
-        if (!$curr_id) {
+        $item_id = $this->model->create($reqData);
+        if (!$item_id) {
             $this->fail($defMsg);
         }
 
-        $this->ok([ "id" => $curr_id ]);
+        $this->ok([ "id" => $item_id ]);
     }
 
 

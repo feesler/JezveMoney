@@ -5,7 +5,6 @@ namespace JezveMoney\Core;
 class ApiResponse
 {
     public $result = null;
-    public $msg = null;
 
 
     public function render()

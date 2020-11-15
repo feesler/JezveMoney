@@ -1,7 +1,7 @@
 'use strict';
 
-/* global ge, ce, show, selectByValue, extend, AdminListView, List */
-/* global AdminImportActionListView */
+/* global ge, ce, show, copyObject, ajax, selectByValue, extend, baseURL */
+/* global AdminListView, List, AdminImportActionListView */
 /* eslint no-bitwise: "off" */
 
 var IMPORT_RULE_OP_FIELD_FLAG = 0x01;
@@ -24,7 +24,7 @@ function AdminImportRuleListView() {
         throw new Error('Invalid data');
     }
 
-    this.actionTypes = new List(this.props.actionTypes)
+    this.actionTypes = new List(this.props.actionTypes);
     this.fields = new List(this.props.fields);
     this.operators = new List(this.props.operators);
 

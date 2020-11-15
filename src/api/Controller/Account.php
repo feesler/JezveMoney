@@ -8,7 +8,7 @@ use JezveMoney\App\Item\AccountItem;
 
 class Account extends ApiController
 {
-    protected $requiredFields = [ "name", "initbalance", "curr_id", "icon_id", "flags" ];
+    protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
     protected $model = null;
 
 

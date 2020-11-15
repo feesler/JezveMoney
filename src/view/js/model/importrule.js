@@ -1,6 +1,6 @@
 'use strict';
 
-/* global extend, ListItem, List, ImportAction */
+/* global isObject, extend, ListItem, List, ImportAction */
 /* eslint no-bitwise: "off" */
 
 /** Rule field types */
@@ -96,7 +96,7 @@ ImportRule.prototype.isFieldValueOperator = function () {
         throw new Error('Invalid flags value');
     }
 
-    return (res & IMPORT_RULE_OP_FIELD_FLAG) == IMPORT_RULE_OP_FIELD_FLAG;
+    return (res & IMPORT_RULE_OP_FIELD_FLAG) === IMPORT_RULE_OP_FIELD_FLAG;
 };
 
 /**
@@ -212,12 +212,13 @@ ImportRuleList.prototype.getRootRules = function () {
  * Return array of top level import rules
  */
 ImportRuleList.prototype.getChildRules = function (ruleId) {
+    var res;
     var parentId = parseInt(ruleId, 10);
     if (!parentId) {
         throw new Error('Invalid rule id: ' + ruleId);
     }
 
-    var res = this.data.filter(function (item) {
+    res = this.data.filter(function (item) {
         return item && item.parent_id === parentId;
     });
 

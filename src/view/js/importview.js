@@ -2,7 +2,7 @@
 
 /* global ge, ce, re, isDate, isFunction, removeChilds, show, enable, extend, selectedValue */
 /* global fixFloat, selectByValue, insertAfter, urlJoin, ajax */
-/* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL, convertHint */
+/* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL, ImportRuleList */
 /* global AccountList, CurrencyList, PersonList, View, Sortable */
 /* eslint no-bitwise: "off" */
 

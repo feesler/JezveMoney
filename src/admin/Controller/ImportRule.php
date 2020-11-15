@@ -22,11 +22,11 @@ class ImportRule extends AdminController
     {
         $rulesData = $this->model->getData(["full" => true]);
         $itemsData = [];
-        foreach($rulesData as $rule){
+        foreach ($rulesData as $rule) {
             $item = clone $rule;
             $item->fieldName = ImportRuleModel::getFieldName($item->field_id);
             $item->operatorName = ImportRuleModel::getOperatorName($item->operator);
-            if (ImportRuleModel::isFieldValueOperator($item->flags)){
+            if (ImportRuleModel::isFieldValueOperator($item->flags)) {
                 $item->valueStr = ImportRuleModel::getFieldName($item->value);
             } else {
                 $item->valueStr = $item->value;

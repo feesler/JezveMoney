@@ -265,7 +265,7 @@ class ImportRuleModel extends CachedTable
     // Return array of items
     public function getData($params = [])
     {
-        if (!is_array($params)){
+        if (!is_array($params)) {
             $params = [];
         }
 

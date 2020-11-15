@@ -1,6 +1,6 @@
 'use strict';
 
-/* global isObject, ge, addChilds, removeChilds, show, urlJoin, extend, ajax */
+/* global setParam, isObject, ge, addChilds, removeChilds, show, urlJoin, extend, ajax */
 /* global createMessage, AdminView, Popup, ConfirmDialog, baseURL */
 
 /**

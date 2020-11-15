@@ -24,14 +24,14 @@ class Icon extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No currency specified");
+            $this->fail("No items specified");
         }
 
         $res = [];
         foreach ($ids as $item_id) {
             $item = $this->model->getItem($item_id);
             if (!$item) {
-                $this->fail("Icon $item_id not found");
+                $this->fail("Icon '$item_id' not found");
             }
 
             $res[] = new IconItem($item);
@@ -67,12 +67,12 @@ class Icon extends ApiController
             $this->fail($defMsg);
         }
 
-        $curr_id = $this->model->create($reqData);
-        if (!$curr_id) {
+        $item_id = $this->model->create($reqData);
+        if (!$item_id) {
             $this->fail($defMsg);
         }
 
-        $this->ok([ "id" => $curr_id ]);
+        $this->ok([ "id" => $item_id ]);
     }
 
 

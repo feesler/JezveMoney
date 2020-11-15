@@ -1,6 +1,7 @@
 'use strict';
 
-/* global extend, ListItem, List, normalize */
+/* global isObject, selectByValue, extend, ListItem */
+/* global EXPENSE, INCOME, TRANSFER, DEBT */
 /* eslint no-bitwise: "off" */
 
 /** Action types */
@@ -78,12 +79,12 @@ ImportAction.prototype.setTransactionType = function (data, rowObj, context) {
         typeValue = 'income';
     } else if (this.value === TRANSFER) {
         typeValue = (data.trAmountVal > 0) ? 'transferto' : 'transferfrom';
-    } else if (this.value == DEBT) {
+    } else if (this.value === DEBT) {
         typeValue = (data.trAmountVal > 0) ? 'debtto' : 'debtfrom';
     }
 
     selectByValue(rowObj.trTypeSel, typeValue);
-    context.onTrTypeChanged(res);
+    context.onTrTypeChanged(rowObj);
 };
 
 /** Set account action */
@@ -108,27 +109,33 @@ ImportAction.prototype.setPerson = function (data, rowObj, context) {
 
 /** Set source amount action */
 ImportAction.prototype.setSourceAmount = function (data, rowObj, context) {
-    if (!isObject(data) || !isObject(rowObj) || !context) {
+    var res = rowObj;
+
+    if (!isObject(data) || !isObject(res) || !context) {
         throw new Error('Invalid data object');
     }
 
-    rowObj.amountInp.value = this.value;
+    res.amountInp.value = this.value;
 };
 
 /** Set destination amount action */
 ImportAction.prototype.setDestinationAmount = function (data, rowObj, context) {
-    if (!isObject(data) || !isObject(rowObj) || !context) {
+    var res = rowObj;
+
+    if (!isObject(data) || !isObject(res) || !context) {
         throw new Error('Invalid data object');
     }
 
-    rowObj.destAmountInp.value = this.value;
+    res.destAmountInp.value = this.value;
 };
 
 /** Set comment action */
 ImportAction.prototype.setComment = function (data, rowObj, context) {
-    if (!isObject(data) || !isObject(rowObj) || !context) {
+    var res = rowObj;
+
+    if (!isObject(data) || !isObject(res) || !context) {
         throw new Error('Invalid data object');
     }
 
-    rowObj.commInp.value = this.value;
+    res.commInp.value = this.value;
 };
