@@ -26,7 +26,7 @@ export class Header extends Component {
             if (!this.user.menuBtn) {
                 throw new Error('User button not found');
             }
-            const el = await this.query(this.user.menuBtn, '.user_title');
+            const el = await this.query(this.user.menuBtn, '.user__title');
             if (!el) {
                 throw new Error('User title element not found');
             }
