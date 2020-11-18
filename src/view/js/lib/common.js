@@ -135,10 +135,10 @@ function ce(tagName, params, childs) {
 /**
  * Create new SVG namespace element, set attributes
  * @param {string} tagName
- * @param {Object} attributues
+ * @param {Object} attributes
  * @param {Element[]} children
  */
-function svg(tagName, attributues, children) {
+function svg(tagName, attributes, children) {
     var elem;
 
     if (typeof tagName !== 'string') {
@@ -147,15 +147,26 @@ function svg(tagName, attributues, children) {
 
     elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
 
-    if (isObject(attributues)) {
-        Object.keys(attributues).forEach(function (attr) {
-            elem.setAttribute(attr, attributues[attr]);
-        });
+    if (attributes) {
+        setAttributes(elem, attributes);
     }
 
-    addChilds(elem, children);
+    if (children) {
+        addChilds(elem, children);
+    }
 
     return elem;
+}
+
+/** Set attributes to specified element */
+function setAttributes(element, attrs) {
+    if (!element || !isObject(attrs)) {
+        return;
+    }
+
+    Object.keys(attrs).forEach(function (key) {
+        element.setAttribute(key, attrs[key]);
+    });
 }
 
 /** Remove specified element from DOM and return it */
