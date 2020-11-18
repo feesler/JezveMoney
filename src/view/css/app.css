@@ -974,6 +974,7 @@ select
 {
 	padding: 0;
 	max-width: 824px;
+    width: 100%;
 	background: none;
 }
 
