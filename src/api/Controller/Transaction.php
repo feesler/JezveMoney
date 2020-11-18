@@ -200,6 +200,10 @@ class Transaction extends ApiController
         $request = $this->getRequestData();
         $transactions = [];
         foreach ($request as $item) {
+            if (!is_array($item)) {
+                $this->fail("Invalid transaction data");
+            }
+
             if ($item["type"] == DEBT) {
                 $debtModel = DebtModel::getInstance();
                 $debtTrans = $debtModel->prepareTransaction($item);
