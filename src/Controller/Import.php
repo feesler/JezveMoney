@@ -4,6 +4,7 @@ namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\JSON;
+use JezveMoney\Core\ApiResponse;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
@@ -13,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class FastCommit extends TemplateController
+class Import extends TemplateController
 {
     protected $columns = [
         "date" => null,
@@ -48,7 +49,8 @@ class FastCommit extends TemplateController
             $rulesData[] = $rule;
         }
 
-        $this->css->page = "fastcommit.css";
+        $this->css->libs[] = "lib/iconlink.css";
+        $this->css->page = "import.css";
         $this->buildCSS();
 
         array_push(
@@ -64,14 +66,15 @@ class FastCommit extends TemplateController
             "lib/sortable.js",
             "lib/component.js",
             "component/header.js",
+            "component/iconlink.js",
             "component/importtransactionitem.js",
             "view.js",
             "importview.js"
         );
 
-        $titleString = "Jezve Money | Fast Commit";
+        $titleString = "Jezve Money | Import transactions";
 
-        include(TPL_PATH . "fastcommit.tpl");
+        include(TPL_PATH . "import.tpl");
     }
 
 
@@ -92,7 +95,8 @@ class FastCommit extends TemplateController
         $this->columns[$colName] = self::columnStr(intval($ind));
     }
 
-    // Appli import template
+
+    // Apply import template
     private function applyTemplate($template)
     {
         if (is_null($template)) {
@@ -161,14 +165,19 @@ class FastCommit extends TemplateController
             return;
         }
 
-        $file_cont = file_get_contents('php://input');
+        $res = new ApiResponse();
         $hdrs = [];
         foreach (getallheaders() as $hdrName => $value) {
             $hdrs[strtolower($hdrName)] = $value;
         }
 
-        $encodeCP1251 = false;
-        if (isset($hdrs["x-file-id"])) {
+        try {
+            if (!isset($hdrs["x-file-id"])) {
+                throw new \Error("Invalid request");
+            }
+
+            $encodeCP1251 = false;
+            $file_cont = file_get_contents('php://input');
             $fileId = $hdrs["x-file-id"];
             $fileType = $hdrs["x-file-type"];
             $fileTemplate = $hdrs["x-file-tpl"];
@@ -179,8 +188,7 @@ class FastCommit extends TemplateController
             $fname = UPLOAD_PATH . $fileId . "." . $fileType;
             $fhnd = fopen($fname, "a");
             if ($fhnd === false) {
-                wlog("Can't open file '$fname'");
-                exit;
+                throw new \Error("Fail to open file");
             }
             $bytesWrite = fwrite($fhnd, $file_cont);
             fclose($fhnd);
@@ -189,85 +197,82 @@ class FastCommit extends TemplateController
 
             // Start process file
             header("Content-type: text/html; charset=UTF-8");
-        } else {
-            if (!isset($_POST["fileName"]) || !isset($_POST["isCard"])) {
-                return;
-            }
 
-            $fname = UPLOAD_PATH . $_POST["fileName"];
-            $fileType = substr(strrchr($fname, "."), 1);
-            $fileTemplate = intval($_POST["template"]);
-            $encodeCP1251 = (intval($_POST["encode"]) == 1);
-        }
+            $fileType = strtoupper($fileType);
+            wlog("File type: " . $fileType);
 
-        $fileType = strtoupper($fileType);
-        wlog("File type: " . $fileType);
-
-        if ($fileType == "XLS") {
-            $readedType = "Xls";
-        } elseif ($fileType == "XLSX") {
-            $readedType = "Xlsx";
-        } elseif ($fileType == "CSV") {
-            $readedType = "Csv";
-        } else {
-            throw new \Error("Unknown file type");
-        }
-
-        $reader = IOFactory::createReader($readedType);
-        if ($reader instanceof \PhpOffice\PhpSpreadsheet\Reader\Csv) {
-            $reader->setDelimiter(';');
-            $reader->setEnclosure('');
-            if ($encodeCP1251) {
-                $reader->setInputEncoding('CP1251');
-            }
-        }
-        $spreadsheet = $reader->load($fname);
-        $src = $spreadsheet->getActiveSheet();
-
-        $importTemplate = $this->templateModel->getItem($fileTemplate);
-        if (!$importTemplate) {
-            throw new \Error("Import template '$fileTemplate' not found");
-        }
-        $this->applyTemplate($importTemplate);
-
-        $row_ind = 2;
-
-        $data = [];
-        do {
-            $descVal = $this->getCellValue($src, "desc", $row_ind);
-            $edesc = trim($descVal);
-
-            $dataObj = new \stdClass();
-
-            $dateVal = $this->getCellValue($src, "date", $row_ind);
-            if (is_empty($dateVal)) {
-                break;
-            }
-
-            if ($readedType == "Csv") {
-                $dateFmt = strtotime($dateVal);
+            if ($fileType == "XLS") {
+                $readedType = "Xls";
+            } elseif ($fileType == "XLSX") {
+                $readedType = "Xlsx";
+            } elseif ($fileType == "CSV") {
+                $readedType = "Csv";
             } else {
-                $dateTime = Date::excelToDateTimeObject($dateVal);
-                $dateFmt = $dateTime->getTimestamp();
+                throw new \Error("Unknown file type");
             }
 
-            $dataObj->date = date("d.m.Y", $dateFmt);
+            $reader = IOFactory::createReader($readedType);
+            if ($reader instanceof \PhpOffice\PhpSpreadsheet\Reader\Csv) {
+                $reader->setDelimiter(';');
+                $reader->setEnclosure('');
+                if ($encodeCP1251) {
+                    $reader->setInputEncoding('CP1251');
+                }
+            }
+            $spreadsheet = $reader->load($fname);
+            $src = $spreadsheet->getActiveSheet();
 
-            $dataObj->trCurrVal = $this->getCellValue($src, "trCurr", $row_ind);
-            $dataObj->trAmountVal = self::floatFix($this->getCellValue($src, "trAmount", $row_ind));
-            $dataObj->accCurrVal = $this->getCellValue($src, "accCurr", $row_ind);
-            $dataObj->accAmountVal = self::floatFix($this->getCellValue($src, "accAmount", $row_ind));
-            $dataObj->descr = $edesc;
+            $importTemplate = $this->templateModel->getItem($fileTemplate);
+            if (!$importTemplate) {
+                throw new \Error("Import template '$fileTemplate' not found");
+            }
+            $this->applyTemplate($importTemplate);
 
-            $data[] = $dataObj;
+            $row_ind = 2;
 
-            $row_ind++;
-        } while (!is_empty($dateVal));
+            $data = [];
+            do {
+                $descVal = $this->getCellValue($src, "desc", $row_ind);
+                $edesc = trim($descVal);
+
+                $dataObj = new \stdClass();
+
+                $dateVal = $this->getCellValue($src, "date", $row_ind);
+                if (is_empty($dateVal)) {
+                    break;
+                }
+
+                if ($readedType == "Csv") {
+                    $dateFmt = strtotime($dateVal);
+                } else {
+                    $dateTime = Date::excelToDateTimeObject($dateVal);
+                    $dateFmt = $dateTime->getTimestamp();
+                }
+
+                $dataObj->date = date("d.m.Y", $dateFmt);
+
+                $dataObj->trCurrVal = $this->getCellValue($src, "trCurr", $row_ind);
+                $dataObj->trAmountVal = self::floatFix($this->getCellValue($src, "trAmount", $row_ind));
+                $dataObj->accCurrVal = $this->getCellValue($src, "accCurr", $row_ind);
+                $dataObj->accAmountVal = self::floatFix($this->getCellValue($src, "accAmount", $row_ind));
+                $dataObj->descr = $edesc;
+
+                $data[] = $dataObj;
+
+                $row_ind++;
+            } while (!is_empty($dateVal));
+
+            $res->data = $data;
+            $res->result = "ok";
+        } catch (\Error $e) {
+            $res->msg = $e->getMessage();
+            $res->result = "fail";
+        }
 
         if (isset($hdrs["x-file-id"])) {
             unlink($fname);
         }
 
-        echo (JSON::encode($data));
+        $res->render();
     }
 }

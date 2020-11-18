@@ -6,7 +6,13 @@
                 <span class="logo__title">Jezve Money</span>
             </a>
         </div>
-        <div class="theme-switch right-align">
+        <div class="iconlink right-align">
+            <a href="<?=BASEURL?>import/">
+                <span class="iconlink__icon"><?=svgIcon("import")?></span>
+                <span class="iconlink__content"><span>Import</span></span>
+            </a>
+        </div>
+        <div class="theme-switch">
             <label class="switch">
 <?php	if ($this->userTheme == DARK_THEME) {	?>
                 <input id="theme-check" type="checkbox" checked>

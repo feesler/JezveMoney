@@ -1,113 +1,204 @@
 'use strict';
 
-/* global ce, re, show, enable, selectedValue, selectByValue, extend, Component */
+/* global ce, re, svg, fixFloat, show, enable, selectedValue, selectByValue, extend, Component */
+/* global addChilds, removeChilds */
 /* global EXPENSE, INCOME, TRANSFER, DEBT */
 
 /**
  * ImportTransactionItem component constructor
- * @param {object} props
+ * @param {Object} props
  */
 function ImportTransactionItem() {
     ImportTransactionItem.parent.constructor.apply(this, arguments);
 
+    if (
+        !this.parent
+        || !this.props
+        || !this.props.mainAccount
+        || !this.props.currencyModel
+        || !this.props.accountModel
+        || !this.props.personModel
+    ) {
+        throw new Error('Invalid props');
+    }
+
+    this.model = {
+        currency: this.props.currencyModel,
+        accounts: this.props.accountModel,
+        persons: this.props.personModel,
+        mainAccount: this.props.mainAccount
+    };
+
+    this.data = {
+        type: EXPENSE,
+        src_id: this.model.mainAccount.id,
+        dest_id: 0,
+        src_curr: this.model.mainAccount.curr_id,
+        dest_curr: this.model.mainAccount.curr_id,
+        src_amount: 0,
+        dest_amount: 0,
+        date: '',
+        comment: ''
+    };
+
+    this.enabled = true;
+
     // Row enable checkbox
-    this.enableCheck = ce('input', { type: 'checkbox', checked: true });
+    this.enableCheck = ce('input', { type: 'checkbox', checked: this.enabled });
     this.enableCheck.addEventListener('change', this.onRowChecked.bind(this));
 
     // Currency controls
     this.currIdInp = ce('input', {
         type: 'hidden',
         name: 'curr_id[]',
-        value: this.parent.model.mainAccount.curr_id
+        value: this.data.dest_curr
     });
-    this.currSel = ce('select');
+    this.currSel = ce('select', {
+        disabled: true
+    });
 
-    this.parent.model.currency.data.forEach(function (currency) {
+    this.model.currency.data.forEach(function (currency) {
         var option = ce('option', {
             value: currency.id,
             textContent: currency.name,
-            selected: (currency.id === this.parent.model.mainAccount.curr_id)
+            selected: (currency.id === this.data.dest_curr)
         });
 
         this.currSel.appendChild(option);
     }, this);
     this.currSel.addEventListener('change', this.onCurrChanged.bind(this));
+    this.currField = this.createField('Currency', this.currSel);
 
     // Transaction type select
     this.trTypeSel = ce('select',
         { name: 'tr_type[]' },
         [
-            ce('option', { value: 'expense', textContent: '-' }),
-            ce('option', { value: 'income', textContent: '+' }),
-            ce('option', { value: 'transferfrom', textContent: 'T>' }),
-            ce('option', { value: 'transferto', textContent: 'T<' }),
-            ce('option', { value: 'debtfrom', textContent: 'D>' }),
-            ce('option', { value: 'debtto', textContent: 'D<' })
+            ce('option', { value: 'expense', textContent: 'Expense' }),
+            ce('option', { value: 'income', textContent: 'Income' }),
+            ce('option', { value: 'transferfrom', textContent: 'Transfer>' }),
+            ce('option', { value: 'transferto', textContent: 'Transfer<' }),
+            ce('option', { value: 'debtfrom', textContent: 'Debt>' }),
+            ce('option', { value: 'debtto', textContent: 'Debt<' })
         ]);
     this.trTypeSel.addEventListener('change', this.onTrTypeChanged.bind(this));
+    this.trTypeField = this.createField('Type', this.trTypeSel);
 
     // Destination account controls
     this.destAccIdInp = ce('input', { type: 'hidden', name: 'dest_acc_id[]', value: '' });
-    this.destAccSel = ce('select',
-        { disabled: true },
-        ce('option',
-            {
-                value: 0,
-                textContent: 'Destination account',
-                selected: true,
-                disabled: true
-            }));
-    this.parent.model.accounts.data.forEach(function (account) {
-        var option = ce('option', { value: account.id, textContent: account.name });
-        if (account.id === this.parent.model.mainAccount.id) {
-            enable(option, false);
-        }
+    this.destAccSel = ce('select', { disabled: true });
+    this.model.accounts.data.forEach(function (account) {
+        var option = ce('option', {
+            value: account.id,
+            textContent: account.name,
+            disabled: (account.id === this.data.src_id)
+        });
 
         this.destAccSel.appendChild(option);
     }, this);
     this.destAccSel.addEventListener('change', this.onDestChanged.bind(this));
+    this.destAccountField = this.createField('Destination account', this.destAccSel);
+    show(this.destAccountField, false);
 
     // Person controls
     this.personIdInp = ce('input', { type: 'hidden', name: 'person_id[]', value: '' });
-    this.personSel = ce('select');
-    this.parent.model.persons.data.forEach(function (person) {
+    this.personSel = ce('select', { disabled: true });
+    this.model.persons.data.forEach(function (person) {
         var option = ce('option', { value: person.id, textContent: person.name });
         this.personSel.appendChild(option);
     }, this);
-    show(this.personSel, false);
     this.personSel.addEventListener('change', this.onPersonChanged.bind(this));
+    this.personField = this.createField('Person', this.personSel);
+    show(this.personField, false);
 
     // Amount controls
-    this.amountInp = ce('input', { type: 'text', name: 'amount[]', placeholder: 'Amount' });
+    this.amountInp = ce('input', {
+        type: 'text',
+        name: 'amount[]',
+        placeholder: 'Amount'
+    });
+    this.amountField = this.createField('Amount', this.amountInp, 'amount-field');
+
     this.destAmountInp = ce('input', {
         type: 'text',
         name: 'dest_amount[]',
         disabled: true,
         placeholder: 'Destination amount'
     });
+    this.destAmountField = this.createField('Destination amount', this.destAmountInp, 'amount-field');
+    show(this.destAmountField, false);
 
-    this.dateInp = ce('input', { type: 'text', name: 'date[]', placeholder: 'Date' });
-    this.commInp = ce('input', { type: 'text', name: 'comment[]', placeholder: 'Comment' });
-    this.delBtn = ce('input', { className: 'btn submit-btn', type: 'button', value: '-' });
+    // Date field
+    this.dateInp = ce('input', {
+        type: 'text',
+        name: 'date[]',
+        placeholder: 'Date'
+    });
+    this.dateField = this.createField('Date', this.dateInp, 'date-field');
+
+    // Comment field
+    this.commInp = ce('input', {
+        type: 'text',
+        name: 'comment[]',
+        placeholder: 'Comment'
+    });
+    this.commentField = this.createField('Comment', this.commInp, 'comment-field');
+
+    this.delBtn = ce(
+        'button',
+        { className: 'btn delete-btn', type: 'button' },
+        this.createIcon('del')
+    );
     this.delBtn.addEventListener('click', this.remove.bind(this));
 
-    this.elem = ce('div',
-        { className: 'tr-row' },
-        [
-            this.enableCheck,
-            this.trTypeSel,
-            this.amountInp,
-            this.currIdInp,
-            this.currSel,
-            this.destAccIdInp,
-            this.destAccSel,
-            this.personIdInp,
-            this.personSel,
-            this.destAmountInp,
-            this.dateInp,
-            this.commInp,
-            this.delBtn
-        ]);
+    this.toggleExtBtn = ce(
+        'button',
+        { className: 'btn toggle-btn hidden', type: 'button' },
+        this.createIcon('toggle-ext')
+    );
+    this.toggleExtBtn.addEventListener('click', this.toggleCollapse.bind(this));
+
+    this.topRow = this.createContainer('form-row', [
+        this.amountField,
+        this.currIdInp,
+        this.currField,
+        this.dateField,
+        this.commentField
+    ]);
+
+    this.bottomRow = this.createContainer('form-row hidden', [
+        this.destAccIdInp,
+        this.destAccountField,
+        this.personIdInp,
+        this.personField,
+        this.destAmountField
+    ]);
+
+    this.formContainer = this.createContainer('form-container', [
+        this.trTypeField,
+        this.createContainer('form-rows', [
+            this.topRow,
+            this.bottomRow
+        ])
+    ]);
+
+    this.mainContainer = this.createContainer('main-content', [
+        this.createCheck('enable-check', this.enableCheck),
+        this.formContainer,
+        this.createContainer('row-container controls', [
+            this.delBtn,
+            this.toggleExtBtn
+        ])
+    ]);
+    this.extendedContainer = this.createContainer('extended-content');
+
+    this.elem = this.createContainer('tr-row', [
+        this.mainContainer,
+        this.extendedContainer
+    ]);
+
+    if (this.props.originalData) {
+        this.setExtendedContent(this.createOrigDataContainer(this.props.originalData));
+    }
 }
 
 extend(ImportTransactionItem, Component);
@@ -118,29 +209,124 @@ extend(ImportTransactionItem, Component);
 ImportTransactionItem.create = function (props) {
     var res;
 
-    // try {
-    res = new ImportTransactionItem(props);
-    // } catch (e) {
-    //     res = null;
-    // }
+    try {
+        res = new ImportTransactionItem(props);
+    } catch (e) {
+        res = null;
+    }
 
     return res;
+};
+
+/** Create container element */
+ImportTransactionItem.prototype.createContainer = function (elemClass, children) {
+    return ce('div', { className: elemClass }, children);
+};
+
+/** Create checkbox element */
+ImportTransactionItem.prototype.createCheck = function (elemClass, children) {
+    return ce('label', { className: elemClass }, children);
+};
+
+/** Create field element */
+ImportTransactionItem.prototype.createField = function (title, input, extraClass) {
+    var elemClasses = ['field'];
+
+    if (typeof extraClass === 'string' && extraClass.length > 0) {
+        elemClasses.push(extraClass);
+    }
+
+    return ce('div', { className: elemClasses.join(' ') }, [
+        ce('label', { textContent: title }),
+        ce('div', {}, input)
+    ]);
+};
+
+/** Create static data value element */
+ImportTransactionItem.prototype.createDataValue = function (title, value, extraClass) {
+    var elemClasses = ['data-value'];
+
+    if (typeof extraClass === 'string' && extraClass.length > 0) {
+        elemClasses.push(extraClass);
+    }
+
+    return ce('div', { className: elemClasses.join(' ') }, [
+        ce('label', { textContent: title }),
+        ce('div', { textContent: value })
+    ]);
+};
+
+/**
+ * Create set of static data values for original transaction data
+ * @param {Object} data - import transaction object
+ */
+ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
+    if (!data) {
+        throw new Error('Invalid data');
+    }
+
+    return this.createContainer('orig-data-table', [
+        this.createDataValue('Date', data.date),
+        this.createDataValue('Tr. amount', data.trAmountVal),
+        this.createDataValue('Tr. currency', data.trCurrVal),
+        this.createDataValue('Acc. amount', data.accAmountVal),
+        this.createDataValue('Acc. currency', data.accCurrVal),
+        this.createDataValue('Comment', data.descr, 'comment-value')
+    ]);
+};
+
+/** Create SVG icon element */
+ImportTransactionItem.prototype.createIcon = function (icon) {
+    var useElem = svg('use');
+    var res = svg('svg', {}, useElem);
+
+    useElem.href.baseVal = (icon) ? '#' + icon : '';
+
+    return res;
+};
+
+/**
+ * Setup extended content of item
+ * If value is null content is removed and toggle button hidden
+ * @param {Element|null} content - value to set extended content
+ */
+ImportTransactionItem.prototype.setExtendedContent = function (content) {
+    removeChilds(this.extendedContainer);
+
+    if (content) {
+        addChilds(this.extendedContainer, content);
+    } else {
+        this.elem.classList.remove('tr-row_expanded');
+    }
+
+    show(this.toggleExtBtn, content);
 };
 
 /**
  * Remove item component
  */
 ImportTransactionItem.prototype.remove = function () {
-    this.parent.onRemoveItem(this);
+    if (!this.parent.onRemoveItem(this)) {
+        return;
+    }
 
     re(this.elem);
 };
 
 /**
- * Row checkbox 'change' event handler. Enable/disable related row
+ * Row checkbox 'change' event handler. Enable/disable item
  */
 ImportTransactionItem.prototype.onRowChecked = function () {
     this.enable(this.enableCheck.checked);
+
+    this.parent.onEnableItem(this, this.enableCheck.checked);
+};
+
+/**
+ * Toggle collapse/expande button 'click' event handler
+ */
+ImportTransactionItem.prototype.toggleCollapse = function () {
+    this.elem.classList.toggle('tr-row_expanded');
 };
 
 /**
@@ -169,6 +355,8 @@ ImportTransactionItem.prototype.enable = function (val) {
     enable(this.dateInp, newState);
     enable(this.commInp, newState);
 
+    this.enabled = newState;
+
     if (newState) {
         this.onTrTypeChanged();
     }
@@ -176,12 +364,32 @@ ImportTransactionItem.prototype.enable = function (val) {
 
 /** Return component enabled status */
 ImportTransactionItem.prototype.isEnabled = function () {
-    return this.elem && !this.elem.classList.contains('tr-row_disabled');
+    return this.enabled;
 };
 
 /** Main account of transaction select 'change' event handler */
-ImportTransactionItem.prototype.onMainAccountChanged = function () {
-    var trType = selectedValue(this.trTypeSel);
+ImportTransactionItem.prototype.onMainAccountChanged = function (value) {
+    var account;
+    var trType;
+
+    account = this.model.accounts.getItem(value);
+    if (!account) {
+        throw new Error('Account not found');
+    }
+    this.model.mainAccount = account;
+
+    trType = selectedValue(this.trTypeSel);
+    if (trType === 'expense'
+        || trType === 'transferfrom'
+        || trType === 'debtfrom'
+    ) {
+        this.data.src_id = account.id;
+        this.data.src_curr = account.curr_id;
+    } else {
+        this.data.dest_id = account.id;
+        this.data.dest_curr = account.curr_id;
+    }
+
     if (trType === 'transferfrom' || trType === 'transferto') {
         this.syncDestAccountSelect();
         this.copyDestAcc();
@@ -193,25 +401,37 @@ ImportTransactionItem.prototype.onMainAccountChanged = function () {
 /** Transaction type select 'change' event handler */
 ImportTransactionItem.prototype.onTrTypeChanged = function () {
     var trType = selectedValue(this.trTypeSel);
-    if (!this.destAccSel || !this.destAccSel.options) {
-        return;
+
+    if (trType === 'expense') {
+        this.data.type = EXPENSE;
+    } else if (trType === 'income') {
+        this.data.type = INCOME;
+    } else if (trType === 'transferfrom' || trType === 'transferto') {
+        this.data.type = TRANSFER;
+    } else if (trType === 'debtfrom' || trType === 'debtto') {
+        this.data.type = DEBT;
+    } else {
+        throw new Error('Invalid transaction type');
     }
 
     this.syncCurrAvail();
-    if (trType === 'transferfrom' || trType === 'transferto') {
-        show(this.personSel, false);
-        show(this.destAccSel, true);
+    if (this.data.type === TRANSFER) {
+        show(this.personField, false);
+        enable(this.personSel, false);
+        show(this.destAccountField, true);
         enable(this.destAccSel, true);
         this.syncDestAccountSelect(this);
         this.copyDestAcc();
-    } else if (trType === 'debtfrom' || trType === 'debtto') {
+    } else if (this.data.type === DEBT) {
         this.copyPerson();
-        show(this.personSel, true);
-        show(this.destAccSel, false);
+        show(this.personField, true);
+        enable(this.personSel, true);
+        show(this.destAccountField, false);
         enable(this.destAccSel, false);
     } else {
-        show(this.personSel, false);
-        show(this.destAccSel, true);
+        show(this.personField, false);
+        enable(this.personSel, false);
+        show(this.destAccountField, false);
         enable(this.destAccSel, false);
     }
 
@@ -220,36 +440,52 @@ ImportTransactionItem.prototype.onTrTypeChanged = function () {
 
 /** Synchronize availability of destination amount input */
 ImportTransactionItem.prototype.syncDestAmountAvail = function () {
-    var trType;
-    var currObj;
-    var destAccObj;
     var isDiff;
+    var showBottom;
+    var trType = selectedValue(this.trTypeSel);
 
-    trType = selectedValue(this.trTypeSel);
-    if (trType === 'expense' || trType === 'income') {
-        currObj = this.parent.currFromSelect(this.currSel);
-        isDiff = (currObj !== null && this.parent.model.mainAccount.curr_id !== currObj.id);
-        enable(this.destAmountInp, isDiff);
-    } else if (trType === 'transferfrom' || trType === 'transferto') {
-        destAccObj = this.parent.accFromSelect(this.destAccSel);
-        isDiff = (
-            destAccObj !== null
-            && this.parent.model.mainAccount.curr_id !== destAccObj.curr_id
-        );
-        enable(this.destAmountInp, isDiff);
+    isDiff = (this.data.src_curr !== this.data.dest_curr);
+    if (trType === 'expense') {
+        showBottom = isDiff;
+    } else if (trType === 'income') {
+        showBottom = isDiff;
+    } else if (trType === 'transferfrom') {
+        showBottom = true;
+    } else if (trType === 'transferto') {
+        showBottom = true;
     } else {
-        /** Debt */
-        enable(this.destAmountInp, false);
+        showBottom = true;
     }
+
+    enable(this.destAmountInp, isDiff);
+    show(this.destAmountField, isDiff);
+    show(this.bottomRow, showBottom);
 };
 
 /** Copy destination account id from select to hidden input */
 ImportTransactionItem.prototype.copyDestAcc = function () {
-    if (!this.destAccIdInp || !this.destAccSel) {
-        return;
+    var account;
+    var trType;
+
+    if (this.data.type !== TRANSFER) {
+        throw new Error('Invalid transaction type');
     }
 
-    this.destAccIdInp.value = selectedValue(this.destAccSel);
+    account = this.model.accounts.getItem(selectedValue(this.destAccSel));
+    if (!account) {
+        throw new Error('Account not found');
+    }
+
+    trType = selectedValue(this.trTypeSel);
+    if (trType === 'transferfrom') {
+        this.data.dest_id = account.id;
+        this.data.dest_curr = account.curr_id;
+    } else {
+        this.data.src_id = account.id;
+        this.data.src_curr = account.curr_id;
+    }
+
+    this.destAccIdInp.value = account.id;
 };
 
 /**
@@ -270,7 +506,7 @@ ImportTransactionItem.prototype.syncAccountOption = function (opt) {
     }
 
     optVal = parseInt(res.value, 10);
-    if (optVal === 0 || optVal === this.parent.model.mainAccount.id) {
+    if (optVal === 0 || optVal === this.model.mainAccount.id) {
         res.disabled = true;
         res.selected = false;
     } else {
@@ -292,11 +528,14 @@ ImportTransactionItem.prototype.syncDestAccountSelect = function () {
  * Copy person id value from select to hidden input
  */
 ImportTransactionItem.prototype.copyPerson = function () {
-    if (!this.personIdInp || !this.personSel) {
-        return;
+    var person = this.model.persons.getItem(selectedValue(this.personSel));
+    if (!person) {
+        throw new Error('Person not found');
     }
 
-    this.personIdInp.value = selectedValue(this.personSel);
+    this.data.person_id = person.id;
+
+    this.personIdInp.value = person.id;
 };
 
 /**
@@ -310,11 +549,18 @@ ImportTransactionItem.prototype.onPersonChanged = function () {
  * Copy currency id value from select to hidden input
  */
 ImportTransactionItem.prototype.copyCurr = function () {
-    if (!this.currIdInp || !this.currSel) {
-        return;
+    var currency = this.model.currency.getItem(selectedValue(this.currSel));
+    if (!currency) {
+        throw new Error('Currency not found');
     }
 
-    this.currIdInp.value = selectedValue(this.currSel);
+    if (this.data.type === EXPENSE) {
+        this.data.dest_curr = currency.id;
+    } else if (this.data.type === INCOME) {
+        this.data.src_curr = currency.id;
+    }
+
+    this.currIdInp.value = currency.id;
 };
 
 /**
@@ -342,9 +588,8 @@ ImportTransactionItem.prototype.syncCurrAvail = function () {
         || trType === 'debtto'
     ) {
         enable(this.currSel, false);
-        selectByValue(this.currSel, this.parent.model.mainAccount.curr_id);
-        this.copyCurr();
-    } else {
+        this.setCurrency(this.model.mainAccount.curr_id);
+    } else if (this.enabled) {
         enable(this.currSel, true);
     }
 };
@@ -397,7 +642,7 @@ ImportTransactionItem.prototype.invertTransactionType = function () {
 /** Set currency */
 ImportTransactionItem.prototype.setCurrency = function (value) {
     if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+        throw new Error('Invalid currency value');
     }
 
     selectByValue(this.currSel, value);
@@ -407,7 +652,7 @@ ImportTransactionItem.prototype.setCurrency = function (value) {
 /** Set second account */
 ImportTransactionItem.prototype.setAccount = function (value) {
     if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+        throw new Error('Invalid account value');
     }
 
     selectByValue(this.destAccSel, value);
@@ -417,7 +662,7 @@ ImportTransactionItem.prototype.setAccount = function (value) {
 /** Set person */
 ImportTransactionItem.prototype.setPerson = function (value) {
     if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+        throw new Error('Invalid person value');
     }
 
     selectByValue(this.personSel, value);
@@ -429,19 +674,26 @@ ImportTransactionItem.prototype.setSourceAmount = function (value) {
     var res;
 
     if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+        throw new Error('Invalid amount value');
     }
 
-    res = parseFloat(value);
+    res = parseFloat(fixFloat(value));
     if (Number.isNaN(res)) {
-        throw new Error('Invalid value');
+        throw new Error('Invalid amount value');
     }
 
     if (res < 0) {
         this.invertTransactionType();
+        res = Math.abs(res);
     }
 
-    this.amountInp.value = Math.abs(res);
+    if (this.data.type === INCOME) {
+        this.data.dest_amount = res;
+    } else {
+        this.data.src_amount = res;
+    }
+
+    this.amountInp.value = res;
 };
 
 /** Set destination amount */
@@ -449,31 +701,37 @@ ImportTransactionItem.prototype.setDestinationAmount = function (value) {
     var res;
 
     if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+        throw new Error('Invalid amount value');
     }
 
-    res = parseFloat(value);
+    res = parseFloat(fixFloat(value));
     if (Number.isNaN(res)) {
-        throw new Error('Invalid value');
+        throw new Error('Invalid amount value');
     }
+    res = Math.abs(res);
 
-    this.destAmountInp.value = Math.abs(res);
+    this.data.dest_amount = res;
+
+    this.destAmountInp.value = res;
 };
 
 /** Set date */
 ImportTransactionItem.prototype.setDate = function (value) {
     if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+        throw new Error('Invalid date value');
     }
 
+    this.data.date = value;
     this.dateInp.value = value;
 };
 
 /** Set comment */
 ImportTransactionItem.prototype.setComment = function (value) {
-    if (typeof value === 'undefined') {
-        throw new Error('Invalid value');
+    if (typeof value !== 'string') {
+        throw new Error('Invalid comment value');
     }
 
-    this.commInp.value = value;
+    this.data.comment = value;
+
+    this.commInp.value = this.data.comment;
 };

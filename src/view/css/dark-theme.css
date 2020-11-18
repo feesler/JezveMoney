@@ -2,15 +2,15 @@
 body,
 .page_wrapper
 {
-	color: #DDDDDD;
-	background-color: #101010;
+    color: #DDDDDD;
+    background-color: #101010;
 }
 
 
 /* Main content */
 .container
 {
-	background-color: #202020;
+    background-color: #202020;
 }
 
 
@@ -19,9 +19,9 @@ input[type="text"],
 input[type="password"],
 select
 {
-	border-color: #DDDDDD;
-	background-color: #202020;
-	color: #DDDDDD;
+    border-color: #DDDDDD;
+    background-color: #202020;
+    color: #DDDDDD;
 }
 
 
@@ -29,56 +29,56 @@ select
 .login-layer,
 .register-layer
 {
-	background-color: #101010;
+    background-color: #101010;
 }
 
 
 .login-layer h1,
 .register-layer h1
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .heading
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .iconlink .iconlink__icon
 {
-	border-color: #DDDDDD;
+    border-color: #DDDDDD;
 }
 
 
 .iconlink:hover .iconlink__icon
 {
-	background-color: #DDDDDD;
+    background-color: #DDDDDD;
 }
 
 
 .iconlink .iconlink__icon svg *
 {
-	fill: #DDDDDD;
+    fill: #DDDDDD;
 }
 
 
 .iconlink:hover .iconlink__icon svg *
 {
-	fill: #202020;
+    fill: #202020;
 }
 
 
 .iconlink span.iconlink__content
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .iconlink > *:hover > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
@@ -87,41 +87,41 @@ select
 .widget_title > a,
 .widget_title > a:hover
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .widget_title .glyph svg *
 {
-	fill: #DDDDDD;
+    fill: #DDDDDD;
 }
 
 
 /* Transaction type menu */
 .trtype-menu__item_selected
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 /* Tile info block */
 .tile-info-block > div > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .stretch-input
 {
-	border-color: #DDDDDD;
-	background-color: #202020;
+    border-color: #DDDDDD;
+    background-color: #202020;
 }
 
 
 .input-group__btn_inactive
 {
-	color: #DDDDDD;
-	background-color: #202020;
+    color: #DDDDDD;
+    background-color: #202020;
 }
 
 
@@ -131,14 +131,14 @@ select
 .dd__single-selection,
 .dd__toggle-btn
 {
-	background-color: #202020;
-	color: #DDDDDD;
+    background-color: #202020;
+    color: #DDDDDD;
 }
 
 
 .dd__combo
 {
-	border-color: #DDDDDD;
+    border-color: #DDDDDD;
 }
 
 
@@ -147,46 +147,46 @@ select
 .dd__container_active .dd__single-selection,
 .dd__container_active .dd__toggle-btn
 {
-	color: #202020;
+    color: #202020;
 }
 
 
 .dd__list
 {
-	background-color: #202020;
-	border-right-color: #DDDDDD;
-	border-left-color: #DDDDDD;
+    background-color: #202020;
+    border-right-color: #DDDDDD;
+    border-left-color: #DDDDDD;
 }
 
 
 .dd__list_drop-down
 {
-	border-bottom-color: #DDDDDD;
+    border-bottom-color: #DDDDDD;
 }
 
 
 .dd__list_drop-up
 {
-	border-top-color: #DDDDDD;
+    border-top-color: #DDDDDD;
 }
 
 
 .dd__list-item
 {
-	color: #DDDDDD;
-	background-color: #202020;
+    color: #DDDDDD;
+    background-color: #202020;
 }
 
 
 .dd__list-item > svg
 {
-	fill: #DDDDDD;
+    fill: #DDDDDD;
 }
 
 
 .dd__container_enabled .dd__toggle-btn:hover path
 {
-	fill: #DDDDDD;
+    fill: #DDDDDD;
 }
 
 
@@ -196,13 +196,13 @@ select
 
 .dd__container.dd__fullscreen.dd__open .dd__background
 {
-	background-color: #202020;
+    background-color: #202020;
 }
 
 
 .dd__container.dd__fullscreen.dd__open .dd__list
 {
-	border-color: #DDDDDD;
+    border-color: #DDDDDD;
 }
 
 }
@@ -210,36 +210,36 @@ select
 /* Date picker */
 .dp__wrapper
 {
-	background-color: #202020;
-	color: #DDDDDD;
-	border-color: #DDDDDD;
+    background-color: #202020;
+    color: #DDDDDD;
+    border-color: #DDDDDD;
 }
 
 
 .dp__cell
 {
-	color: #DDDDDD;
-	border-color: #202020;
-	background-color: #202020;
+    color: #DDDDDD;
+    border-color: #202020;
+    background-color: #202020;
 }
 
 
 .dp__other-month-cell
 {
-	color: #505050;
+    color: #505050;
 }
 
 
 .dp__today-cell,
 .dp__cell_hl.dp__today-cell
 {
-	border: 1px dashed #00bef3;
+    border: 1px dashed #00bef3;
 }
 
 
 .dp__cell_act
 {
-	border-color: #20D0FF;
+    border-color: #20D0FF;
 }
 
 
@@ -247,36 +247,35 @@ select
 {
     background-color: #005688;
     border-color: #005688;
-	color: #FFFFFF;
+    color: #FFFFFF;
 }
 
 .dp__year-range-view__cell:hover,
 .dp__year-view__cell:hover,
 .dp__day-cell:hover
 {
-	background-color: #3198d4;
+    background-color: #3198d4;
     color: #DDDDDD;
 }
-
 
 
 /* Transaction list */
 .trans-list > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 /* Transaction list mode selector */
 .mode-selector > b > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .paginator > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
@@ -284,20 +283,20 @@ select
 .trans-list_details td > div,
 .trans-list_details tr.trans-list__item_selected > td > div
 {
-	background-color: #505050;
+    background-color: #505050;
 }
 
 
 .trans-list_details .trans-list__item-comment
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .trans-list__item,
 div.trans-list__item_selected
 {
-	background-color: #505050;
+    background-color: #505050;
 }
 
 
@@ -305,33 +304,33 @@ div.trans-list__item_selected
 .trans-list__item-title,
 .trans-list__item-content
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .trans-list__item-details
 {
-	color: #B0B0B0;
+    color: #B0B0B0;
 }
 
 
 .trans-list__item-comment
 {
-	border-left-color: #B0B0B0;
+    border-left-color: #B0B0B0;
 }
 
 
 /* Bar chart */
 .charts svg text tspan
 {
-	fill: #DDDDDD;
+    fill: #DDDDDD;
 }
 
 
 /* Profile view */
 .profile_block
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
@@ -339,7 +338,7 @@ div.trans-list__item_selected
 .popup > .popup__content,
 .popup > .popup__content > .popup__content-box
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
     background-color: #505050;
 }
 
@@ -347,7 +346,7 @@ div.trans-list__item_selected
 .popup .popup__title,
 .popup .popup__message
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
@@ -355,61 +354,110 @@ div.trans-list__item_selected
 .tiles > span,
 .info-tiles > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 /* Import view */
-.import-row,
 .tr-row
 {
-	background-color: #505050;
+    background-color: #505050;
 }
 
-
-.tr-row > select,
-.tr-row > input[type="text"]
+.tr-row .extended-content
 {
-	border-color: #DDDDDD;
+    color: #BBBBBB;
+    border-color: #3C3C3C;
+    background-color: #444444;
 }
 
-
-.tr-row > select[disabled],
-.tr-row > input[disabled]
+.tr-row.tr-row_disabled .extended-content
 {
-	color: #808080;
-	border-color: #808080;
-	background-color: #202020;
+    color: #707070;
+    border-color: #333333;
+    background-color: #232323;
 }
 
-
-.tr-row_disabled > select,
-.tr-row_disabled > select[disabled],
-.tr-row_disabled > input[type="text"],
-.tr-row_disabled > input[disabled]
+.tr-row select,
+.tr-row input[type="text"]
 {
-	color: #BBBBBB;
-	border-color: #BBBBBB;
-	background-color: #505050;
+    border-color: #DDDDDD;
 }
 
+.tr-row select[disabled],
+.tr-row input[disabled]
+{
+    color: #808080;
+    border-color: #808080;
+    background-color: #202020;
+}
+
+.tr-row.tr-row_disabled
+{
+    background-color: #292929;
+    color: #707070;
+    border-color: #707070;
+}
+
+.tr-row_disabled select,
+.tr-row_disabled select[disabled],
+.tr-row_disabled input[type="text"],
+.tr-row_disabled input[disabled]
+{
+    color: #707070;
+    border-color: #202020;
+    background-color: #202020;
+}
+
+.tr-row_disabled input::placeholder
+{
+    color: #707070;
+}
+
+.tr-row .btn,
+.tr-row .btn:visited,
+.tr-row .btn:active
+{
+    color: #DDDDDD;
+}
+
+.tr-row .btn:hover
+{
+    background-color: #303030;
+}
+
+.tr-row .btn svg
+{
+    fill: #888888;
+}
+
+.tr-row .btn:hover svg
+{
+    fill: #DDDDDD;
+}
+
+/* Placeholder */
+.tr-row.tr-row__placeholder
+{
+    border-color:#888888;
+    background-color: #202020;
+}
 
 .import-controls
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
-
 
 /* Statistics view */
 .stat-histogram > span
 {
-	color: #DDDDDD;
+    color: #DDDDDD;
 }
 
 
 .chart_popup
 {
-	border-color: #000000;
-	background-color: #202020;
-	color: #DDDDDD;
+    border-color: #000000;
+    background-color: #202020;
+    color: #DDDDDD;
 }

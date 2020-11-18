@@ -1,25 +1,27 @@
-/* Input controls color */
-input[type="text"], input[type="password"], select
-{
-	border-color: #000000;
-	background-color: #FFFFFF;
-	color: #000000;
-}
-
-
 /* Page */
 body,
 .page_wrapper
 {
-	color: #000000;
-	background-color: #FFFFFF;
+    color: #000000;
+    background-color: #FFFFFF;
 }
 
 
 /* Main content */
 .container
 {
-	background-color: #FFFFFF;
+    background-color: #FFFFFF;
+}
+
+
+/* Input controls color */
+input[type="text"],
+input[type="password"],
+select
+{
+    border-color: #000000;
+    background-color: #FFFFFF;
+    color: #000000;
 }
 
 
@@ -27,56 +29,56 @@ body,
 .login-layer,
 .register-layer
 {
-	background-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 
 .login-layer h1,
 .register-layer h1
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .heading
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .iconlink .iconlink__icon
 {
-	border-color: #000000;
+    border-color: #000000;
 }
 
 
 .iconlink:hover .iconlink__icon
 {
-	background-color: #000000;
+    background-color: #000000;
 }
 
 
 .iconlink .iconlink__icon svg *
 {
-	fill: #000000;
+    fill: #000000;
 }
 
 
 .iconlink:hover .iconlink__icon svg *
 {
-	fill: #FFFFFF;
+    fill: #FFFFFF;
 }
 
 
 .iconlink span.iconlink__content
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .iconlink > *:hover > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
@@ -85,41 +87,41 @@ body,
 .widget_title > a,
 .widget_title > a:hover
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .widget_title .glyph svg *
 {
-	fill: #000000;
+    fill: #000000;
 }
 
 
 /* Transaction type menu */
 .trtype-menu__item_selected
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 /* Tile info block */
 .tile-info-block > div > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .stretch-input
 {
-	border-color: #000000;
-	background-color: #FFFFFF;
+    border-color: #000000;
+    background-color: #FFFFFF;
 }
 
 
 .input-group__btn_inactive
 {
-	color: #000000;
-	background-color: #FFFFFF;
+    color: #000000;
+    background-color: #FFFFFF;
 }
 
 
@@ -129,14 +131,14 @@ body,
 .dd__single-selection,
 .dd__toggle-btn
 {
-	background-color: #FFFFFF;
-	color: #000000;
+    background-color: #FFFFFF;
+    color: #000000;
 }
 
 
 .dd__combo
 {
-	border-color: #000000;
+    border-color: #000000;
 }
 
 
@@ -145,46 +147,46 @@ body,
 .dd__container_active .dd__single-selection,
 .dd__container_active .dd__toggle-btn
 {
-	color: #202020;
+    color: #202020;
 }
 
 
 .dd__list
 {
-	background-color: #FFFFFF;
-	border-right-color: #000000;
-	border-left-color: #000000;
+    background-color: #FFFFFF;
+    border-right-color: #000000;
+    border-left-color: #000000;
 }
 
 
 .dd__list_drop-down
 {
-	border-bottom-color: #000000;
+    border-bottom-color: #000000;
 }
 
 
 .dd__list_drop-up
 {
-	border-top-color: #000000;
+    border-top-color: #000000;
 }
 
 
 .dd__list-item
 {
-	color: #000000;
-	background-color: #FFFFFF;
+    color: #000000;
+    background-color: #FFFFFF;
 }
 
 
 .dd__list-item > svg
 {
-	fill: #000000;
+    fill: #000000;
 }
 
 
 .dd__container_enabled .dd__toggle-btn:hover path
 {
-	fill: #000000;
+    fill: #000000;
 }
 
 
@@ -194,13 +196,13 @@ body,
 
 .dd__container.dd__fullscreen.dd__open .dd__background
 {
-	background-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 
 .dd__container.dd__fullscreen.dd__open .dd__list
 {
-	border-color: #000000;
+    border-color: #000000;
 }
 
 }
@@ -208,73 +210,72 @@ body,
 /* Date picker */
 .dp__wrapper
 {
-	background-color: #FFFFFF;
-	color: #000000;
-	border-color: #000000;
+    background-color: #FFFFFF;
+    color: #000000;
+    border-color: #000000;
 }
 
 
 .dp__cell
 {
-	color: #000000;
-	border-color: #FFFFFF;
-	background-color: #FFFFFF;
+    color: #000000;
+    border-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 
 .dp__other-month-cell
 {
-	color: #B0B0B0;
+    color: #B0B0B0;
 }
 
 
 .dp__today-cell,
 .dp__cell_hl.dp__today-cell
 {
-	border: 1px dashed #00bef3;
+    border: 1px dashed #00bef3;
 }
 
 
 .dp__cell_act
 {
-	border-color: #20D0FF;
+    border-color: #20D0FF;
 }
 
 
 .dp__cell_hl
 {
-	background-color: #005688;
-	border-color: #005688;
-	color: #FFFFFF;
+    background-color: #005688;
+    border-color: #005688;
+    color: #FFFFFF;
 }
-
 
 .dp__year-range-view__cell:hover,
 .dp__year-view__cell:hover,
 .dp__day-cell:hover
 {
-	background-color: #80D0FF;
-	color: #FFFFFF;
+    background-color: #80D0FF;
+    color: #FFFFFF;
 }
 
 
 /* Transaction list */
 .trans-list > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 /* Transaction list mode selector */
 .mode-selector > b > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .paginator > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
@@ -282,20 +283,20 @@ body,
 .trans-list_details td > div,
 .trans-list_details tr.trans-list__item_selected > td > div
 {
-	background-color: #F0F0F0;
+    background-color: #F0F0F0;
 }
 
 
 .trans-list_details .trans-list__item-comment
 {
-	color: #808080;
+    color: #808080;
 }
 
 
 .trans-list__item,
 div.trans-list__item_selected
 {
-	background-color: #F0F0F0;
+    background-color: #F0F0F0;
 }
 
 
@@ -303,33 +304,33 @@ div.trans-list__item_selected
 .trans-list__item-title,
 .trans-list__item-content
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .trans-list__item-details
 {
-	color: #808080;
+    color: #808080;
 }
 
 
 .trans-list__item-comment
 {
-	border-left-color: #808080;
+    border-left-color: #808080;
 }
 
 
 /* Bar chart */
 .charts svg text tspan
 {
-	fill: #000000;
+    fill: #000000;
 }
 
 
 /* Profile view */
 .profile_block
 {
-	color: #000000;
+    color: #000000;
 }
 
 
@@ -337,7 +338,7 @@ div.trans-list__item_selected
 .popup > .popup__content,
 .popup > .popup__content > .popup__content-box
 {
-	color: #000000;
+    color: #000000;
     background-color: #FFFFFF;
 }
 
@@ -345,7 +346,7 @@ div.trans-list__item_selected
 .popup .popup__title,
 .popup .popup__message
 {
-	color: #000000;
+    color: #000000;
 }
 
 
@@ -353,61 +354,110 @@ div.trans-list__item_selected
 .tiles > span,
 .info-tiles > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 /* Import view */
-.import-row,
 .tr-row
 {
-	background-color: #DDDDDD;
+    background-color: #DDDDDD;
 }
 
-
-.tr-row > select,
-.tr-row > input[type="text"]
+.tr-row .extended-content
 {
-	border-color: #000000;
+    color: #202020;
+    border-color: #B0B0B0;
+    background-color: #CCCCCC;
 }
 
-
-.tr-row > select[disabled],
-.tr-row > input[disabled]
+.tr-row.tr-row_disabled .extended-content
 {
-	color: #DDDDDD;
-	border-color: #DDDDDD;
-	background-color: #EEEEEE;
+    color: #A0A0A0;
+    border-color: #D0D0D0;
+    background-color: #E0E0E0;
 }
 
-
-.tr-row_disabled > select,
-.tr-row_disabled > select[disabled],
-.tr-row_disabled > input[type="text"],
-.tr-row_disabled > input[disabled]
+.tr-row select,
+.tr-row input[type="text"]
 {
-	color: #DDDDDD;
-	border-color: #DDDDDD;
-	background-color: #EEEEEE;
+    border-color: #000000;
 }
 
+.tr-row select[disabled],
+.tr-row input[disabled]
+{
+    color: #DDDDDD;
+    border-color: #DDDDDD;
+    background-color: #EEEEEE;
+}
+
+.tr-row.tr-row_disabled
+{
+    background-color: #E8E8E8;
+    color: #808080;
+    border-color: #E8E8E8;
+}
+
+.tr-row_disabled select,
+.tr-row_disabled select[disabled],
+.tr-row_disabled input[type="text"],
+.tr-row_disabled input[disabled]
+{
+    color: #DDDDDD;
+    border-color: #EEEEEE;
+    background-color: #EEEEEE;
+}
+
+.tr-row_disabled input::placeholder
+{
+    color: #DDDDDD;
+}
+
+.tr-row .btn,
+.tr-row .btn:visited,
+.tr-row .btn:active
+{
+    color: #202020;
+}
+
+.tr-row .btn:hover
+{
+    background-color: #808080;
+}
+
+.tr-row .btn svg
+{
+    fill: #A7A7A7;
+}
+
+.tr-row .btn:hover svg
+{
+    fill: #FFFFFF;
+}
+
+/* Placeholder */
+.tr-row.tr-row__placeholder
+{
+    border-color:#888888;
+    background-color: #FFFFFF;
+}
 
 .import-controls
 {
-	color: #FFFFFF;
+    color: #FFFFFF;
 }
-
 
 /* Statistics view */
 .stat-histogram > span
 {
-	color: #000000;
+    color: #000000;
 }
 
 
 .chart_popup
 {
-	border-color: #000000;
-	background-color: #FFFFFF;
-	color: #000000;
+    border-color: #000000;
+    background-color: #FFFFFF;
+    color: #000000;
 }

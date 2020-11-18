@@ -46,5 +46,14 @@
     </g>
 </symbol>
 
+<symbol id="del" viewBox="0 0 24 24">
+    <path d="m6.0173 5.9912 11.975-1e-4c1.146.0135 2.0016.9822 1.9944 1.9832h-15.963c.00195-1.1416.73632-1.9854 1.9944-1.9831z" stroke-linejoin="round" stroke-width=".2"/>
+    <rect x="9.9683" y="3.9965" width="3.9931" height=".96273" stroke-linejoin="round" stroke-width=".2"/>
+    <path d="m5.9642 8.9902v11.023h12.055v-11.023zm2.0099 2.0098h2.021v7.0035h-2.021zm3.0259 0h2.0366v7.0035h-2.0366zm2.9882 0h2.021l-1e-4 7.0035h-2.0209z" stroke-linejoin="round" stroke-width=".2"/>
+</symbol>
+
+<symbol id="toggle-ext" viewBox="0 0 6.35 6.35">
+    <path d="m1.0935 1.6138-.52039.52039 2.6019 2.6019 2.6019-2.6019-.52039-.52039-2.0815 2.0815z"/>
+</symbol>
 
 </svg>
