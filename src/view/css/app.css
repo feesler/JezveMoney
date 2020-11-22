@@ -1038,22 +1038,11 @@ select
 
 
 /* Change name and change password popups */
-.popup > .chname_popup
-{
-	margin-top: -110px;
-}
-
-
 .popup > .chname_popup > .popup__content-box,
 .popup > .chpass_popup > .popup__content-box
 {
 	max-width: 400px;
-}
-
-
-.popup > .chpass_popup
-{
-	margin-top: -146px;
+    width: 100%;
 }
 
 
