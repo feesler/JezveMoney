@@ -1,6 +1,6 @@
 'use strict';
 
-/* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds */
+/* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds, setEvents */
 /* exported ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
 /* exported getCaretPos, getCursorPos, checkDate, selectedText, selectedValue */
 /* exported selectByValue, insertBefore, insertAfter, prependChild, removeChilds */
@@ -109,12 +109,28 @@ function addChilds(elem, childs) {
 }
 
 /**
+ * Set up event handlers for specified element
+ * @param {Element} elem - element to set event handlers
+ * @param {Object} events - event handlers object
+ */
+function setEvents(elem, events) {
+    if (!elem || !events) {
+        return;
+    }
+
+    Object.keys(events).forEach(function (eventName) {
+        elem.addEventListener(eventName, events[eventName]);
+    });
+}
+
+/**
  * Create specified DOM element and set parameters if specified
  * @param {string} tagName - tag name of element to create
  * @param {Object} params - properties to set for created element
- * @param {Element[]} childs - element or array of elements to append to created element
+ * @param {Element[]} children - element or array of elements to append to created element
+ * @param {Object} events - event handlers object
  */
-function ce(tagName, params, childs) {
+function ce(tagName, params, children, events) {
     var elem;
 
     if (typeof tagName !== 'string') {
@@ -126,8 +142,15 @@ function ce(tagName, params, childs) {
         return null;
     }
 
-    setParam(elem, params);
-    addChilds(elem, childs);
+    if (params) {
+        setParam(elem, params);
+    }
+    if (children) {
+        addChilds(elem, children);
+    }
+    if (events) {
+        setEvents(elem, events);
+    }
 
     return elem;
 }

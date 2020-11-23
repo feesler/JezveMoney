@@ -40,8 +40,8 @@ var Popup = new (function () {
         function closeModal() {
             hideModal();
 
-            if (isFunction(this.onCloseHandler)) {
-                this.onCloseHandler();
+            if (isFunction(onCloseHandler)) {
+                onCloseHandler();
             }
         }
 
@@ -49,7 +49,7 @@ var Popup = new (function () {
         function setOnClose(elem) {
             var btn = (elem) ? elem.firstElementChild : null;
             if (btn) {
-                btn.onclick = closeModal.bind(self);
+                btn.addEventListener('click', closeModal);
             }
         }
 
@@ -217,7 +217,7 @@ var Popup = new (function () {
             }
 
             if (isFunction(props.onclose)) {
-                this.onCloseHandler = props.onclose;
+                onCloseHandler = props.onclose;
             }
 
             if (!setModalContent(props.content)) {
@@ -262,7 +262,7 @@ var Popup = new (function () {
 
             if (props.closeOnEmptyClick === true) {
                 setTimeout(function () {
-                    setEmptyClick(closeModal.bind(self), [boxObj]);
+                    setEmptyClick(closeModal, [boxObj]);
                 });
             }
         }
