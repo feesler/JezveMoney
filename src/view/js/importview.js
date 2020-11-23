@@ -4,7 +4,7 @@
 /* global selectByValue, selectedValue, fixFloat, urlJoin, ajax */
 /* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList */
-/* global View, IconLink, Sortable, ImportTransactionItem */
+/* global View, IconLink, Popup, Sortable, ImportTransactionItem */
 /* eslint no-bitwise: "off" */
 
 /** Uploader constructor */
@@ -347,11 +347,13 @@ ImportView.prototype.onInitialAccChange = function () {
 
 /** Hide import file form */
 ImportView.prototype.copyMainAccount = function () {
+    var accountId;
+
     if (!this.uploadDialog) {
         throw new Error('Upload dialog not initialized');
     }
 
-    var accountId = selectedValue(this.uploadDialog.initialAccountSel);
+    accountId = selectedValue(this.uploadDialog.initialAccountSel);
     selectByValue(this.acc_id, accountId);
     this.updMainAccObj();
 };
