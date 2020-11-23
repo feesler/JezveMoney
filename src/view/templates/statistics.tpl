@@ -121,7 +121,7 @@
 
                         <div id="chart" class="stat-histogram">
 <?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
-                            <span>No results found.</span>
+                            <span class="nodata-message">No results found.</span>
 <?php	}		?>
                         </div>
                     </div>

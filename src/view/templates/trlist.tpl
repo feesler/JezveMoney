@@ -1,10 +1,10 @@
 <div id="trlist" class="trans-list">
 <?php	if (!$accounts) {		?>
-    <span>You have no one account. Please create one.</span>
+    <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else if (!$totalTrCount) {	?>
-    <span>You have no one transaction yet.</span>
+    <span class="nodata-message">You have no one transaction yet.</span>
 <?php	} else if (!count($transArr)) {	?>
-    <span>No transactions found.</span>
+    <span class="nodata-message">No transactions found.</span>
 <?php	} else {		?>
 <?php	if ($showPaginator == TRUE) {		?>
     <div class="paginator-row">

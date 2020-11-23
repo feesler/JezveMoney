@@ -42,11 +42,11 @@
                         </div>
 
 <?php	if ($action == "new" && $acc_count < 2 && $tr["type"] == TRANSFER) {	?>
-                        <div class="align_block"><span>You need at least two active accounts for transfer.</span></div>
+                        <span class="nodata-message">You need at least two active accounts for transfer.</span>
 <?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
-                        <div class="align_block"><span>You have no one active account. Please create one.</span></div>
+                        <span class="nodata-message">You have no one active account. Please create one.</span>
 <?php	} else if ($action == "new" && !$person_id && $tr["type"] == DEBT) {		?>
-                        <div class="align_block"><span>You have no one active person. Please create one for debts.</span></div>
+                        <span class="nodata-message">You have no one active person. Please create one for debts.</span>
 <?php	} else {		?>
 <?php	if ($tr["type"] == DEBT) {		?>
                         <div id="person" class="account-container">

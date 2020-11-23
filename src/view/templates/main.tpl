@@ -19,7 +19,7 @@
                         </div>
                         <div class="tiles">
 <?php   if (!count($tilesArr)) {	?>
-                            <span>You have no one account. Please create one.</span>
+                            <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else {
             foreach($tilesArr as $acc_id => $tile) {    ?>
                             <div class="tile" data-id="<?=e($acc_id)?>">
@@ -42,7 +42,7 @@
                         </div>
                         <div class="info-tiles">
 <?php	if (!count($tilesArr)) {	?>
-                            <span>You have no one account. Please create one.</span>
+                            <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else {	?>
 <?php		foreach($totalsArr as $curr_id => $currData) {	?>
                             <div class="info-tile">
@@ -63,9 +63,9 @@
                         </div>
                         <div id="trlist" class="trans-list">
 <?php	if (!count($trListData)) {	?>
-                            <span>You have no one transaction yet.</span>
+                            <span class="nodata-message">You have no one transaction yet.</span>
 <?php	} else if (!count($tilesArr)) {	?>
-                            <span>You have no one account. Please create one.</span>
+                            <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else {	?>
 <?php		foreach($trListData as $trItem) {	?>
                             <div class="trans-list__item-wrapper">
@@ -94,7 +94,7 @@
                         </div>
                         <div class="info-tiles">
 <?php	if (!count($persArr)) {		?>
-                            <span>No persons here.</span>
+                            <span class="nodata-message">No persons here.</span>
 <?php	} else {	?>
 <?php		foreach($persArr as $pData) {	?>
                             <div class="info-tile">
@@ -119,7 +119,7 @@
                         </div>
                         <div id="chart" class="widget_charts">
 <?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
-                            <span>No results found.</span>
+                            <span class="nodata-message">No results found.</span>
 <?php	}		?>
                         </div>
                     </div>

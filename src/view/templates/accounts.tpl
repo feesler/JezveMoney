@@ -33,7 +33,7 @@
                         </div>
 <?php       }   ?>
 <?php	} else {	?>
-                        <span>You have no one account. Please create one.</span>
+                        <span class="nodata-message">You have no one account. Please create one.</span>
 <?php   }   ?>
                     </div>
 <?php	if (count($hiddenTilesArr)) {	?>

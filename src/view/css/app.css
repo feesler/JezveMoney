@@ -682,13 +682,6 @@ select
 }
 
 
-/* block aligned to the left rule by margins */
-.align_block
-{
-	margin: 0px 5px;
-}
-
-
 /* buttons */
 .btn,
 .btn:visited
@@ -864,6 +857,11 @@ select
 {
     text-align: center;
     padding: 12px 0;
+}
+
+.widget .nodata-message
+{
+    text-align: left;
 }
 
 /* Information tiles */
