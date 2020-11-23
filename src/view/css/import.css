@@ -119,6 +119,12 @@
     margin: 9px 0;
 }
 
+/* Main account header field */
+.account-field div
+{
+    justify-content: left;
+}
+
 /* Transaction items container */
 .data-container
 {

@@ -22,7 +22,7 @@
 
                     <div id="dataForm" class="data-form">
                         <div class="data-header">
-                            <div class="header-field">
+                            <div class="header-field account-field">
                                 <label>Main account</label>
                                 <div>
                                     <select id="acc_id">
