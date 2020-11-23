@@ -81,6 +81,12 @@ select
     color: #000000;
 }
 
+/* No data message for lists & etc. */
+.nodata-message
+{
+    background-color: #FFFFFF;
+    color: #404040;
+}
 
 /* Main view widgets */
 .widget_title,

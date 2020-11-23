@@ -64,6 +64,7 @@ class Import extends TemplateController
             "lib/ajax.js",
             "lib/dragndrop.js",
             "lib/sortable.js",
+            "lib/popup.js",
             "lib/component.js",
             "component/header.js",
             "component/iconlink.js",

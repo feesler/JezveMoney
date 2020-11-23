@@ -1,9 +1,23 @@
 /* Import file form */
+.popup > .upload-popup > .popup__content-box
+{
+    max-width: 600px;
+    width: 100%;
+}
+
 .import-form
 {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
+}
+
+.upload-form__browser
+{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
 .import-form__title
@@ -23,7 +37,7 @@
 .import-form__file > input[type="file"]
 {
     position: absolute;
-    z-index: 2;
+    z-index: 22;
     width: 100%;
     height: 30px;
     left: 0;
@@ -33,7 +47,7 @@
 
 .import-form__file > .import-form__overlap
 {
-    z-index: 1;
+    z-index: 21;
 }
 
 .browse-btn
@@ -68,32 +82,6 @@
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
-    margin-top: 24px;
-}
-
-.import-form__submit
-{
-    text-align: center;
-}
-
-/* Skip file import section */
-.import-skip
-{
-    margin-top: 24px;
-}
-
-.skip-btn
-{
-    background: none;
-    border: 0 none;
-    color: #0072C6;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.skip-btn:hover
-{
-    color: #1E82CC;
 }
 
 /* Transactions list */

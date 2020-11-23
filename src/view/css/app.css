@@ -859,6 +859,12 @@ select
 	border-bottom: 1px solid #0072C6;
 }
 
+/* No data message for lists & etc. */
+.nodata-message
+{
+    text-align: center;
+    padding: 12px 0;
+}
 
 /* Information tiles */
 .info-tiles

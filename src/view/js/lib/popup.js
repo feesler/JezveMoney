@@ -40,8 +40,8 @@ var Popup = new (function () {
         function closeModal() {
             hideModal();
 
-            if (isFunction(onCloseHandler)) {
-                onCloseHandler();
+            if (isFunction(this.onCloseHandler)) {
+                this.onCloseHandler();
             }
         }
 

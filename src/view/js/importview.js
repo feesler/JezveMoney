@@ -156,51 +156,30 @@ ImportView.prototype.onStart = function () {
         onclick: this.createItem.bind(this)
     });
 
-    this.skipBtn = ge('skipbtn');
+    this.uploadBtn = IconLink.fromElement({
+        elem: 'uploadBtn',
+        onclick: this.showUploadDialog.bind(this)
+    });
+
     this.submitBtn = ge('submitbtn');
-    this.fileimportfrm = ge('fileimportfrm');
     this.transCountElem = ge('trcount');
     this.enabledTransCountElem = ge('entrcount');
-    this.initialAccountSel = ge('initialAccount');
     this.acc_id = ge('acc_id');
-    this.templateSel = ge('templateSel');
-    this.fileBrowser = {};
-    this.fileBrowser.elem = ge('fileBrowser');
-    this.importControls = ge('importControls');
-    this.isEncodeCheck = ge('isEncodeCheck');
     this.dataForm = ge('dataForm');
     this.rowsContainer = ge('rowsContainer');
     if (!this.newItemBtn
-        || !this.skipBtn
+        || !this.uploadBtn
         || !this.submitBtn
-        || !this.fileimportfrm
         || !this.transCountElem
         || !this.enabledTransCountElem
-        || !this.initialAccountSel
         || !this.acc_id
-        || !this.templateSel
-        || !this.fileBrowser
-        || !this.fileBrowser.elem
-        || !this.importControls
-        || !this.isEncodeCheck
         || !this.dataForm
         || !this.rowsContainer
     ) {
         throw new Error('Failed to initialize Import view');
     }
 
-    this.skipBtn.addEventListener('click', this.onSkipClick.bind(this));
-
-    this.fileBrowser.inputElem = this.fileBrowser.elem.querySelector('input[type="file"]');
-    this.fileBrowser.filenameElem = document.querySelector('.import-form .import-form__filename');
-    if (!this.fileBrowser.inputElem || !this.fileBrowser.filenameElem) {
-        throw new Error('Failed to initialize Import view');
-    }
-
-    this.fileBrowser.inputElem.addEventListener('change', this.onChangeUploadFile.bind(this));
-
     this.acc_id.addEventListener('change', this.onMainAccChange.bind(this));
-    this.initialAccountSel.addEventListener('change', this.onInitialAccChange.bind(this));
     this.submitBtn.addEventListener('click', this.onSubmitClick.bind(this));
 
     this.trListSortable = new Sortable({
@@ -213,10 +192,81 @@ ImportView.prototype.onStart = function () {
         handles: [{ query: 'div' }, { query: 'label' }]
     });
 
-    this.fileimportfrm.addEventListener('submit', this.onFileImport.bind(this));
-    this.fileimportfrm.addEventListener('reset', this.onResetFileImport.bind(this));
-
     this.updMainAccObj();
+};
+
+/** Show upload file dialog popup */
+ImportView.prototype.showUploadDialog = function () {
+    if (!this.uploadDialog) {
+        this.uploadDialog = {};
+
+        this.uploadDialog.formElem = ge('fileimportfrm');
+        if (!this.uploadDialog.formElem) {
+            throw new Error('Failed to initialize upload file dialog');
+        }
+
+        this.uploadDialog.formElem.addEventListener('submit', this.onFileImport.bind(this));
+        this.uploadDialog.formElem.addEventListener('reset', this.onResetFileImport.bind(this));
+
+        this.uploadDialog.popup = Popup.create({
+            id: 'fileupload_popup',
+            title: 'Upload',
+            content: this.uploadDialog.formElem,
+            onclose: this.resetUploadForm.bind(this),
+            btn: {
+                okBtn: false,
+                cancelBtn: false,
+                closeBtn: true
+            },
+            additional: 'center_only upload-popup'
+        });
+
+        this.uploadDialog.inputElem = ge('fileInp');
+        this.uploadDialog.filenameElem = document.querySelector('.import-form .import-form__filename');
+        if (!this.uploadDialog.inputElem || !this.uploadDialog.filenameElem) {
+            throw new Error('Failed to initialize upload file dialog');
+        }
+        this.uploadDialog.inputElem.addEventListener('change', this.onChangeUploadFile.bind(this));
+
+        this.uploadDialog.initialAccountSel = ge('initialAccount');
+        this.uploadDialog.templateSel = ge('templateSel');
+        this.uploadDialog.importControls = ge('importControls');
+        this.uploadDialog.isEncodeCheck = ge('isEncodeCheck');
+        if (
+            !this.uploadDialog.initialAccountSel
+            || !this.uploadDialog.templateSel
+            || !this.uploadDialog.importControls
+            || !this.uploadDialog.isEncodeCheck
+        ) {
+            throw new Error('Failed to initialize upload file dialog');
+        }
+
+        this.uploadDialog.initialAccountSel.addEventListener('change', this.onInitialAccChange.bind(this));
+    }
+
+    this.uploadDialog.popup.show();
+};
+
+/**
+ * Enable/disable upload button
+ */
+ImportView.prototype.enableUploadButton = function (val) {
+    var submitBtn;
+
+    if (!this.uploadDialog) {
+        throw new Error('Upload dialog not initialized');
+    }
+
+    if (val) {
+        submitBtn = { value: 'Import', onclick: this.onFileImport.bind(this) };
+    } else {
+        submitBtn = false;
+    }
+
+    this.uploadDialog.popup.setControls({
+        okBtn: submitBtn,
+        cancelBtn: false
+    });
 };
 
 /** Copy file name from file input */
@@ -224,16 +274,16 @@ ImportView.prototype.updateUploadFileName = function () {
     var pos;
     var fileName;
 
-    if (!this.fileBrowser || !this.fileBrowser.inputElem) {
-        throw new Error('Can\'t obtain file browser component');
+    if (!this.uploadDialog || !this.uploadDialog.inputElem) {
+        throw new Error('Upload dialog not initialized');
     }
-    fileName = this.fileBrowser.inputElem.value;
+    fileName = this.uploadDialog.inputElem.value;
     if (fileName.includes('fakepath')) {
         pos = fileName.lastIndexOf('\\');
         fileName = fileName.substr(pos + 1);
     }
 
-    this.fileBrowser.filenameElem.textContent = fileName;
+    this.uploadDialog.filenameElem.textContent = fileName;
 };
 
 /**
@@ -243,7 +293,8 @@ ImportView.prototype.updateUploadFileName = function () {
 ImportView.prototype.onChangeUploadFile = function () {
     this.updateUploadFileName();
 
-    show(this.importControls, true);
+    this.enableUploadButton(true);
+    show(this.uploadDialog.importControls, true);
 };
 
 /**
@@ -252,7 +303,15 @@ ImportView.prototype.onChangeUploadFile = function () {
 ImportView.prototype.resetImportForm = function () {
     this.updateUploadFileName();
 
-    show(this.importControls, false);
+    this.enableUploadButton(false);
+    show(this.uploadDialog.importControls, false);
+};
+
+/**
+ * Import form 'reset' event handler
+ */
+ImportView.prototype.onResetFileImport = function () {
+    this.enableUploadButton();
 };
 
 /**
@@ -264,20 +323,21 @@ ImportView.prototype.onResetFileImport = function () {
 
 /** Hide import file form */
 ImportView.prototype.importDone = function () {
-    show(this.fileimportfrm, false);
-    show(this.importControls, false);
+    this.uploadDialog.popup.hide();
+    this.enableUploadButton(false);
+    show(this.uploadDialog.importControls, false);
     show(this.dataForm, true);
 
     this.updateItemsCount();
 };
 
-/** Skip file import */
-ImportView.prototype.onSkipClick = function () {
-    this.fileimportfrm.reset();
-    show(this.fileimportfrm, false);
-    show(this.dataForm, true);
+/** Reset file upload form */
+ImportView.prototype.resetUploadForm = function () {
+    if (!this.uploadDialog || !this.uploadDialog.formElem) {
+        throw new Error('Upload dialog not initialized');
+    }
 
-    this.createItem();
+    this.uploadDialog.formElem.reset();
 };
 
 /** Hide import file form */
@@ -287,7 +347,11 @@ ImportView.prototype.onInitialAccChange = function () {
 
 /** Hide import file form */
 ImportView.prototype.copyMainAccount = function () {
-    var accountId = selectedValue(this.initialAccountSel);
+    if (!this.uploadDialog) {
+        throw new Error('Upload dialog not initialized');
+    }
+
+    var accountId = selectedValue(this.uploadDialog.initialAccountSel);
     selectByValue(this.acc_id, accountId);
     this.updMainAccObj();
 };
@@ -546,8 +610,9 @@ ImportView.prototype.onSubmitResult = function (response) {
     }
 
     createMessage(message, (status ? 'msg_success' : 'msg_error'));
-    show(this.fileimportfrm, status);
-    show(this.importControls, !status);
+
+    this.enableUploadButton(!status);
+    show(this.uploadDialog.importControls, !status);
     show(this.dataForm, !status);
 };
 
@@ -712,7 +777,7 @@ ImportView.prototype.importLoadCallback = function (response) {
     var reqParams;
 
     try {
-        this.fileimportfrm.reset();
+        this.resetUploadForm();
         res = JSON.parse(response);
         if (!res || res.result !== 'ok' || !Array.isArray(res.data)) {
             throw new Error((res && 'msg' in res) ? res.msg : defErrorMessage);
@@ -842,18 +907,15 @@ ImportView.prototype.onImportProgress = function () {
 };
 
 /**
- * Import file form 'submit' event handler
- * @param {Event} e - event object
+ * Upload file to server
  */
-ImportView.prototype.onFileImport = function (e) {
+ImportView.prototype.onFileImport = function () {
     var file;
     var uploader;
-    var templateId = this.templateSel.value;
-    var isEncoded = this.isEncodeCheck.checked;
+    var templateId = this.uploadDialog.templateSel.value;
+    var isEncoded = this.uploadDialog.isEncodeCheck.checked;
 
-    e.preventDefault();
-
-    file = this.fileBrowser.inputElem.files[0];
+    file = this.uploadDialog.inputElem.files[0];
     if (!file) {
         return;
     }
