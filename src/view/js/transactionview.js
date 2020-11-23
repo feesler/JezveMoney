@@ -163,7 +163,9 @@ TransactionView.prototype.onStart = function () {
     this.datePickerWrapper = ge('calendar');
 
     this.dateInputBtn = ge('cal_rbtn');
-    this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
+    if (this.dateInputBtn) {
+        this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
+    }
     this.dateInput = ge('date');
 
     this.commentBtn = IconLink.fromElement({
@@ -357,8 +359,9 @@ TransactionView.prototype.initAccList = function () {
         onitemselect: this.onDebtAccSel.bind(this),
         editable: false
     });
+    // In case there is no persons, components will be not available
     if (!this.accDDList) {
-        throw new Error('Failed to initialize debt account DropDown');
+        return;
     }
 
     this.model.visibleUserAccounts.forEach(function (acc) {
