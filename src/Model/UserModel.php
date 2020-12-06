@@ -218,6 +218,15 @@ class UserModel extends CachedTable
     }
 
 
+    // Check user has test access
+    public function isTester($item_id)
+    {
+        $uObj = $this->getItem($item_id);
+
+        return ($uObj && ($uObj->access & 0x2) == 0x2);
+    }
+
+
     // Check current user has admin access
     public static function isAdminUser()
     {

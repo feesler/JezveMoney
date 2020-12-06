@@ -10,6 +10,19 @@ class User extends AdminController
     {
         $uArr = $this->uMod->getData(["all" => true]);
 
+        $accessLevels = [
+            "0" => "Default",
+            "1" => "Admin",
+            "2" => "Tester",
+        ];
+        foreach ($uArr as $userInfo) {
+            if (isset($accessLevels[$userInfo->access])) {
+                $userInfo->accessTitle = $accessLevels[$userInfo->access];
+            } else {
+                $userInfo->accessTitle = "Unknown access level: " . $userInfo->access;
+            }
+        }
+
         $this->menuItems["users"]["active"] = true;
 
         $titleString = "Admin panel | Users";

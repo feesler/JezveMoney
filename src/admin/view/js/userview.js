@@ -29,6 +29,7 @@ AdminUserListView.prototype.onStart = function () {
     this.passwordInput = ge('user_pass');
     this.adminBlock = ge('admin_block');
     this.adminRadio = ge('isadmin');
+    this.testerRadio = ge('istester');
     this.defaultRadio = ge('isdefault');
 
     this.changePassBtn = ge('passbtn');
@@ -47,12 +48,14 @@ AdminUserListView.prototype.setItemValues = function (item) {
         this.loginInput.value = item.login;
         this.nameInput.value = item.name;
         this.adminRadio.checked = (item.access === 1);
+        this.testerRadio.checked = (item.access === 2);
         this.defaultRadio.checked = (item.access === 0);
     } else {
         this.idInput.value = '';
         this.loginInput.value = '';
         this.nameInput.value = '';
         this.adminRadio.checked = false;
+        this.testerRadio.checked = false;
         this.defaultRadio.checked = false;
     }
     this.passwordInput.value = '';
@@ -82,6 +85,7 @@ AdminUserListView.prototype.preCreateItem = function () {
     enable(this.passwordInput, true);
     show(this.adminBlock, true);
     enable(this.adminRadio, true);
+    enable(this.testerRadio, true);
     enable(this.defaultRadio, true);
 };
 
@@ -99,6 +103,7 @@ AdminUserListView.prototype.preUpdateItem = function () {
     enable(this.passwordInput, true);
     show(this.adminBlock, true);
     enable(this.adminRadio, true);
+    enable(this.testerRadio, true);
     enable(this.defaultRadio, true);
 };
 
@@ -117,6 +122,7 @@ AdminUserListView.prototype.setUserPass = function () {
     enable(this.passwordInput, true);
     show(this.adminBlock, false);
     enable(this.adminRadio, false);
+    enable(this.testerRadio, false);
     enable(this.defaultRadio, false);
 
     this.itemForm.action = baseURL + 'api/' + this.apiController + '/changePassword';
@@ -129,15 +135,28 @@ AdminUserListView.prototype.setUserPass = function () {
  * @param {object} item - item object
  */
 AdminUserListView.prototype.renderItem = function (item) {
+    var accessLevels = {
+        0: 'Default',
+        1: 'Admin',
+        2: 'Tester'
+    };
+    var accessTitle;
+
     if (!item) {
         return null;
+    }
+
+    if (accessLevels[item.access]) {
+        accessTitle = accessLevels[item.access];
+    } else {
+        accessTitle = 'Unknown access level: ' + item.access;
     }
 
     return ce('tr', {}, [
         ce('td', { textContent: item.id }),
         ce('td', { textContent: item.login }),
         ce('td', { textContent: item.name }),
-        ce('td', { textContent: item.access }),
+        ce('td', { textContent: accessTitle }),
         ce('td', { textContent: item.accCount }),
         ce('td', { textContent: item.trCount }),
         ce('td', { textContent: item.pCount })

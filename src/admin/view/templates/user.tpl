@@ -23,7 +23,7 @@
                                 <td><?=e($userInfo->id)?></td>
                                 <td><?=e($userInfo->login)?></td>
                                 <td><?=e($userInfo->name)?></td>
-                                <td><?=e($userInfo->access)?></td>
+                                <td><?=e($userInfo->accessTitle)?></td>
                                 <td><?=e($userInfo->accCount)?></td>
                                 <td><?=e($userInfo->trCount)?></td>
                                 <td><?=e($userInfo->pCount)?></td>
@@ -59,10 +59,13 @@
     <div class="stretch-input"><input id="user_pass" name="password" type="password"></div>
 </div>
 <div id="admin_block" class="view-row">
-    <div id="admin_block" class="checkbox-wrap">
+    <div class="checkbox-wrap">
         <label for="isadmin"><input id="isadmin" name="access" type="radio" value="1">Admin access level</label>
     </div>
-    <div id="admin_block" class="checkbox-wrap">
+    <div class="checkbox-wrap">
+        <label for="istester"><input id="istester" name="access" type="radio" value="2">Tester access level</label>
+    </div>
+    <div class="checkbox-wrap">
         <label for="isdefault"><input id="isdefault" name="access" type="radio" value="0">Default access level</label>
     </div>
 </div>
