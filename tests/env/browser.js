@@ -145,28 +145,40 @@ class BrowserEnvironment extends Environment {
     }
 
     /* eslint-disable no-param-reassign */
-    async selectByValue(selectObj, selValue, selBool) {
-        if (!selectObj || !selectObj.options) {
-            return -1;
+    async selectByValue(elem, value, bool = true) {
+        if (!elem || !elem.options) {
+            throw new Error('Invalid select element');
+        }
+        if (typeof value === 'undefined') {
+            throw new Error('Invalid value');
         }
 
-        for (let i = 0, l = selectObj.options.length; i < l; i += 1) {
-            if (selectObj.options[i] && selectObj.options[i].value === selValue) {
-                if (selectObj.multiple) {
-                    selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+        const selValue = value.toString();
+        const selBool = !!bool;
+        for (let i = 0, l = elem.options.length; i < l; i += 1) {
+            const option = elem.options[i];
+            if (option && option.value === selValue) {
+                if (elem.multiple) {
+                    option.selected = selBool;
                 } else {
-                    selectObj.selectedIndex = i;
+                    elem.selectedIndex = i;
                 }
-                return true;
+                return;
             }
         }
 
-        return false;
+        throw new Error('Value not found');
     }
     /* eslint-enable no-param-reassign */
 
     async onChange(elem) {
-        return elem.onchange();
+        if ('createEvent' in this.vdoc) {
+            const evt = this.vdoc.createEvent('HTMLEvents');
+            evt.initEvent('change', true, false);
+            elem.dispatchEvent(evt);
+        } else {
+            elem.fireEvent('onchange');
+        }
     }
 
     async onBlur(elem) {
