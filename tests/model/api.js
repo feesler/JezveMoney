@@ -1,9 +1,6 @@
 import { urlJoin, copyObject } from '../common.js';
+import { ApiRequestError } from '../error/apirequest.js';
 import { App } from '../app.js';
-
-/** Error class to throw in case of API response with result: fail */
-export class ApiRequestError extends Error {
-}
 
 function checkFields(fields, expFields) {
     const postData = {};
