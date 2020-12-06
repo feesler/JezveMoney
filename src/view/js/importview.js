@@ -242,6 +242,10 @@ ImportView.prototype.showUploadDialog = function () {
         }
 
         this.uploadDialog.initialAccountSel.addEventListener('change', this.onInitialAccChange.bind(this));
+
+        if (isFunction(this.initDialogExtras)) {
+            this.initDialogExtras();
+        }
     }
 
     this.uploadDialog.popup.show();
@@ -916,6 +920,10 @@ ImportView.prototype.onFileImport = function () {
     var uploader;
     var templateId = this.uploadDialog.templateSel.value;
     var isEncoded = this.uploadDialog.isEncodeCheck.checked;
+
+    if (isFunction(this.beforeUpload) && !this.beforeUpload()) {
+        return;
+    }
 
     file = this.uploadDialog.inputElem.files[0];
     if (!file) {

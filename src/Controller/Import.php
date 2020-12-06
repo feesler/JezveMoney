@@ -73,6 +73,13 @@ class Import extends TemplateController
             "importview.js"
         );
 
+        if (
+            $this->uMod->isAdmin($this->user_id)
+            || $this->uMod->isTester($this->user_id)
+        ) {
+            array_push($this->jsArr, "importadmin.js");
+        }
+
         $titleString = "Jezve Money | Import transactions";
 
         include(TPL_PATH . "import.tpl");
@@ -173,28 +180,46 @@ class Import extends TemplateController
         }
 
         try {
-            if (!isset($hdrs["x-file-id"])) {
-                throw new \Error("Invalid request");
-            }
+            if (isset($hdrs["x-file-id"])) {
+                $encodeCP1251 = false;
+                $file_cont = file_get_contents('php://input');
+                $fileId = $hdrs["x-file-id"];
+                $fileType = $hdrs["x-file-type"];
+                $fileTemplate = $hdrs["x-file-tpl"];
+                if (isset($hdrs["x-file-encode"]) && intval($hdrs["x-file-encode"]) == 1) {
+                    $encodeCP1251 = true;
+                }
 
-            $encodeCP1251 = false;
-            $file_cont = file_get_contents('php://input');
-            $fileId = $hdrs["x-file-id"];
-            $fileType = $hdrs["x-file-type"];
-            $fileTemplate = $hdrs["x-file-tpl"];
-            if (isset($hdrs["x-file-encode"]) && intval($hdrs["x-file-encode"]) == 1) {
-                $encodeCP1251 = true;
-            }
+                $fname = UPLOAD_PATH . $fileId . "." . $fileType;
 
-            $fname = UPLOAD_PATH . $fileId . "." . $fileType;
-            $fhnd = fopen($fname, "a");
-            if ($fhnd === false) {
-                throw new \Error("Fail to open file");
-            }
-            $bytesWrite = fwrite($fhnd, $file_cont);
-            fclose($fhnd);
+                // Save uploaded content to file
+                $fhnd = fopen($fname, "a");
+                if ($fhnd === false) {
+                    throw new \Error("Fail to open file");
+                }
+                fwrite($fhnd, $file_cont);
+                fclose($fhnd);
+            } else {
+                if (
+                    (!$this->uMod->isAdmin($this->user_id)
+                        && !$this->uMod->isTester($this->user_id))
+                    || !isset($_POST["filename"])
+                    || !isset($_POST["template"])
+                    || !isset($_POST["encode"])
+                ) {
+                    throw new \Error("Invalid request");
+                }
 
-            $totalSize = filesize($fname);
+                $fname = UPLOAD_PATH . $_POST["filename"];
+                $fileExt = strrchr($fname, ".");
+                $fileType = ($fileExt === false) ? "" : substr($fileExt, 1);
+                $fileTemplate = intval($_POST["template"]);
+                $encodeCP1251 = (intval($_POST["encode"]) == 1);
+
+                if (!file_exists($fname) || !is_readable($fname)) {
+                    throw new \Error("File not found");
+                }
+            }
 
             // Start process file
             header("Content-type: text/html; charset=UTF-8");

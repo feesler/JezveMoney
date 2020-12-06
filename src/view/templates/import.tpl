@@ -73,6 +73,19 @@
             </div>
         </label>
         <div class="import-form__filename"></div>
+<?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
+        <div>
+            <div class="checkwrap std_margin">
+                <label>
+                    <input id="useServerCheck" type="checkbox">
+                    <span>Use address on server</span>
+                </label>
+            </div>
+            <div id="serverAddressBlock" class="hidden">
+                <input id="serverAddress" type="text">
+            </div>
+        </div>
+<?php   }   ?>
     </div>
     <div id="importControls" class="import-form__controls hidden">
         <div>
