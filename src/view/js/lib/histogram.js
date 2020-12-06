@@ -70,24 +70,20 @@ Histogram.prototype.createItems = function () {
         };
 
         item.bgRect = svg('rect', {
+            class: 'histogram__bar-bg',
             x: leftPos,
             y: this.chartMarginTop,
             width: this.barWidth,
-            height: this.chartHeight,
-            fill: '#00bfff',
-            'fill-opacity': 0,
-            stroke: 'none'
+            height: this.chartHeight
         });
         this.r.appendChild(item.bgRect);
 
         item.rect = svg('rect', {
+            class: 'histogram__bar',
             x: leftPos,
             y: y,
             width: this.barWidth,
-            height: barHeight,
-            fill: '#00bfff',
-            'fill-opacity': 1,
-            stroke: 'none'
+            height: barHeight
         });
         this.r.appendChild(item.rect);
 

@@ -125,7 +125,8 @@ var Popup = new (function () {
                 return false;
             }
 
-            newHasControls = (controlsProps.okBtn !== false || controlsProps.cancelBtn !== false);
+            newHasControls = ('okBtn' in controlsProps && controlsProps.okBtn !== false)
+                || ('cancelBtn' in controlsProps && controlsProps.cancelBtn !== false);
             if (newHasControls) {
                 if (!controlsObj) {
                     controlsObj = ce('div', { className: 'popup__controls' });
@@ -135,7 +136,7 @@ var Popup = new (function () {
                 controlsObj = null;
             }
 
-            if (typeof controlsProps.okBtn !== 'undefined') {
+            if ('okBtn' in controlsProps) {
                 if (controlsProps.okBtn === false && okBtn) {
                     re(okBtn);
                     okBtn = null;
@@ -152,7 +153,7 @@ var Popup = new (function () {
                 }
             }
 
-            if (typeof controlsProps.cancelBtn !== 'undefined') {
+            if ('cancelBtn' in controlsProps) {
                 if (controlsProps.cancelBtn === false && cancelBtn) {
                     re(cancelBtn);
                     cancelBtn = null;

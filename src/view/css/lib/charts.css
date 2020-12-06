@@ -22,8 +22,61 @@
 	overflow: auto;
 }
 
-
-.chart_content svg *
+/* Bar chart information popup */
+.chart_popup
 {
-	stroke-width: 1px;
+	position: absolute;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	padding: 5px;
+	white-space: nowrap;
+}
+
+/* Chart grid line */
+.chart__grid-line
+{
+	stroke-width: 1;
+    fill: none;
+    stroke: #808080;
+    stroke-dasharray: 4,3;
+}
+
+/* Chart text */
+.chart__text
+{
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    text-anchor: 'start';
+}
+
+/* Histogram bar item */
+.histogram__bar
+{
+    fill: #00BFFF;
+    fill-opacity: 1;
+    stroke: none;
+}
+
+/* Histogram bar background */
+.histogram__bar-bg,
+.linechart__item-bg
+{
+    fill-opacity: 0;
+    stroke: none;
+}
+
+/* Linechart circle item */
+.linechart__item
+{
+    fill: #FFFFFF;
+    stroke: #00BFFF;
+    stroke-width: 1.5;
+}
+
+/* Linechart line path */
+.linechart__path
+{
+    stroke-width: 3;
+    stroke: #00BFFF;
+    fill: none;
 }

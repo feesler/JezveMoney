@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ce, svg, copyObject, prependChild, isFunction, extend, Component */
+/* global ce, svg, prependChild, isFunction, extend, Component */
 /* exported BaseChart */
 
 /**
@@ -30,7 +30,6 @@ function BaseChart() {
     this.items = [];
     this.gridLines = [];
     this.vertLabels = [];
-    this.textStyle = {};
     this.fitToWidth = false;
     this.autoScale = false;
     this.itemClickHandler = null;
@@ -106,11 +105,9 @@ BaseChart.prototype.init = function () {
     this.verticalLabels.appendChild(this.lr);
 
     // create grid
-    this.textStyle = { 'font-family': 'Segoe UI', 'font-size': 14, 'text-anchor': 'start' };
-
     grid = this.calculateGrid(minVal, maxVal, this.chartHeight, this.chartMarginTop);
 
-    this.drawVLabels(this.lr, grid, this.textStyle);
+    this.drawVLabels(this.lr, grid);
 
     if (this.fitToWidth) {
         this.barWidth = (this.chart.parentNode.offsetWidth / (this.data.values.length + 1));
@@ -146,7 +143,7 @@ BaseChart.prototype.init = function () {
 
         grid = this.calculateGrid(minVal, maxVal, this.chartHeight, this.chartMarginTop);
 
-        this.drawVLabels(this.lr, grid, this.textStyle);
+        this.drawVLabels(this.lr, grid);
         this.removeElements(this.gridLines);
         this.gridLines = this.drawGrid(this.r, grid, this.chartWidth);
 
@@ -245,18 +242,19 @@ BaseChart.prototype.removeElements = function (elem) {
 
 /** Draw grid and return array of grid lines */
 BaseChart.prototype.drawGrid = function (paper, grid, width) {
-    var dashed = { fill: 'none', stroke: '#808080', 'stroke-dasharray': '4,3' };
-    var attrs;
     var i;
+    var linePath;
     var curY;
     var el;
     var lines = [];
 
     curY = grid.yFirst;
     for (i = 0; i <= grid.steps; i += 1) {
-        attrs = copyObject(dashed);
-        attrs.d = 'M0,' + Math.round(curY) + '.5L' + width + ',' + Math.round(curY) + '.5';
-        el = svg('path', attrs);
+        linePath = 'M0,' + Math.round(curY) + '.5L' + width + ',' + Math.round(curY) + '.5';
+        el = svg('path', {
+            class: 'chart__grid-line',
+            d: linePath
+        });
 
         prependChild(paper, el);
 
@@ -356,11 +354,12 @@ BaseChart.prototype.getVisibleItems = function () {
 };
 
 /** Draw vertical labels */
-BaseChart.prototype.drawVLabels = function (paper, grid, textAttr) {
+BaseChart.prototype.drawVLabels = function (paper, grid) {
+    var xOffset = 5;
+    var dyOffset = 5.5;
     var curY;
     var val;
     var el;
-    var attrs;
     var tspan;
     var i;
 
@@ -374,13 +373,14 @@ BaseChart.prototype.drawVLabels = function (paper, grid, textAttr) {
     this.removeElements(this.vertLabels);
 
     this.vertLabels = [];
-    attrs = copyObject(textAttr);
-    attrs.x = 5;
     for (i = 0; i <= grid.steps; i += 1) {
-        attrs.y = Math.round(curY);
-        tspan = svg('tspan', { dy: '5.5' });
+        tspan = svg('tspan', { dy: dyOffset });
         tspan.innerHTML = val.toString();
-        el = svg('text', attrs, tspan);
+        el = svg('text', {
+            className: 'chart__text',
+            x: xOffset,
+            y: Math.round(curY)
+        }, tspan);
 
         paper.appendChild(el);
         this.vertLabels.push(el);
@@ -400,22 +400,23 @@ BaseChart.prototype.createHLabels = function () {
     var labelShift = 0;
     var lastOffset = 0;
     var lblMarginLeft = 10;
+    var dyOffset = 5.5;
+    var lblY = this.paperHeight - (this.hLabelsHeight / 2);
 
     this.data.series.forEach(function (val) {
         var txtEl;
         var tspan;
-        var attrs;
         var itemDate = val[0];
         var itemsCount = val[1];
 
         if (lastOffset === 0 || labelShift > lastOffset + lblMarginLeft) {
-            attrs = copyObject(this.textStyle);
-            attrs.x = labelShift;
-            attrs.y = this.paperHeight - (this.hLabelsHeight / 2);
-
-            tspan = svg('tspan', { dy: '5.5' });
+            tspan = svg('tspan', { dy: dyOffset });
             tspan.innerHTML = itemDate.toString();
-            txtEl = svg('text', attrs, tspan);
+            txtEl = svg('text', {
+                className: 'chart__text',
+                x: labelShift,
+                y: lblY
+            }, tspan);
 
             this.r.appendChild(txtEl);
 
@@ -475,7 +476,7 @@ BaseChart.prototype.onScroll = function () {
     getHeight = this.convertRelToAbs(minVal, maxVal, this.chartHeight);
 
     grid = this.calculateGrid(minVal, maxVal, this.chartHeight, this.chartMarginTop);
-    this.drawVLabels(this.lr, grid, this.textStyle);
+    this.drawVLabels(this.lr, grid);
     this.removeElements(this.gridLines);
     this.gridLines = this.drawGrid(this.r, grid, this.chartWidth);
 

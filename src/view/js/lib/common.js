@@ -88,6 +88,17 @@ function setParam(obj, params) {
 }
 /* eslint-enable no-param-reassign */
 
+/** Set attributes to specified element */
+function setAttributes(element, attrs) {
+    if (!element || !isObject(attrs)) {
+        return;
+    }
+
+    Object.keys(attrs).forEach(function (key) {
+        element.setAttribute(key, attrs[key]);
+    });
+}
+
 /**
  * Append child to specified element
  * @param {Element} elem - element to append child to
@@ -179,17 +190,6 @@ function svg(tagName, attributes, children) {
     }
 
     return elem;
-}
-
-/** Set attributes to specified element */
-function setAttributes(element, attrs) {
-    if (!element || !isObject(attrs)) {
-        return;
-    }
-
-    Object.keys(attrs).forEach(function (key) {
-        element.setAttribute(key, attrs[key]);
-    });
 }
 
 /** Remove specified element from DOM and return it */
