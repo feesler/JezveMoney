@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, isDate, isFunction, removeChilds, show, enable, extend */
+/* global ge, re, ce, isDate, isFunction, removeChilds, show, enable, extend */
 /* global selectByValue, selectedValue, fixFloat, urlJoin, ajax */
 /* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList */
@@ -181,6 +181,8 @@ ImportView.prototype.onStart = function () {
 
     this.acc_id.addEventListener('change', this.onMainAccChange.bind(this));
     this.submitBtn.addEventListener('click', this.onSubmitClick.bind(this));
+
+    this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
 
     this.trListSortable = new Sortable({
         oninsertat: this.onTransPosChanged.bind(this),
@@ -389,8 +391,17 @@ ImportView.prototype.updateItemsCount = function () {
 
     enable(this.submitBtn, (enabledList.length > 0));
     this.enabledTransCountElem.textContent = enabledList.length;
-
     this.transCountElem.textContent = this.model.transactionRows.length;
+
+    if (this.model.transactionRows.length > 0) {
+        re(this.noDataMsg);
+        this.noDataMsg = null;
+    } else {
+        if (!this.noDataMsg) {
+            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No transactions to import' });
+        }
+        this.rowsContainer.appendChild(this.noDataMsg);
+    }
 };
 
 /** Remove all transaction rows */
