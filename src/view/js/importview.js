@@ -685,8 +685,8 @@ ImportView.prototype.isSameTransaction = function (item, reference) {
     }
 
     // Check date, source and destination accounts
-    if ((item.src_id !== this.model.mainAccount.id
-        && item.dest_id !== this.model.mainAccount.id)
+    if (item.src_id !== reference.src_id
+        || item.dest_id !== reference.dest_id
         || item.date !== reference.date) {
         return false;
     }
@@ -731,12 +731,9 @@ ImportView.prototype.onTrCacheResult = function (response) {
 
     this.model.transCache = jsondata.data;
     this.model.transactionRows.forEach(function (row) {
-        var data;
         var transaction = this.findSameTransaction(row.data);
         if (transaction) {
             transaction.picked = true;
-            data = row.data;
-            data.sameFound = true;
             row.enable(false);
         }
     }, this);
