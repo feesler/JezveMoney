@@ -216,8 +216,6 @@ ImportView.prototype.showUploadDialog = function () {
             content: this.uploadDialog.formElem,
             onclose: this.resetUploadForm.bind(this),
             btn: {
-                okBtn: false,
-                cancelBtn: false,
                 closeBtn: true
             },
             additional: 'center_only upload-popup'
@@ -271,7 +269,7 @@ ImportView.prototype.enableUploadButton = function (val) {
 
     this.uploadDialog.popup.setControls({
         okBtn: submitBtn,
-        cancelBtn: false
+        closeBtn: true
     });
 };
 
@@ -562,7 +560,7 @@ ImportView.prototype.itemToTransaction = function (item) {
         }
 
         transaction.type = DEBT;
-        transaction.op = (selType === 'debtfrom') ? 1 : 2;
+        transaction.op = (selType === 'debtto') ? 1 : 2;
         transaction.person_id = person.id;
         transaction.acc_id = this.model.mainAccount.id;
         transaction.src_curr = this.model.mainAccount.curr_id;
@@ -628,9 +626,10 @@ ImportView.prototype.onSubmitResult = function (response) {
 
     createMessage(message, (status ? 'msg_success' : 'msg_error'));
 
-    this.enableUploadButton(!status);
-    show(this.uploadDialog.importControls, !status);
-    show(this.dataForm, !status);
+    if (this.uploadDialog) {
+        this.enableUploadButton(!status);
+        show(this.uploadDialog.importControls, !status);
+    }
 };
 
 /**
@@ -805,46 +804,51 @@ ImportView.prototype.importLoadCallback = function (response) {
     }
 
     this.removeAllItems();
-    res.data.forEach(function (item) {
-        var timestamp;
-        var transactionItem;
+    try {
+        res.data.forEach(function (item) {
+            var timestamp;
+            var transactionItem;
 
-        if (!item) {
-            return;
-        }
+            if (!item) {
+                return;
+            }
 
-        // Store date region of imported transactions
-        timestamp = this.timestampFromDateString(item.date);
+            // Store date region of imported transactions
+            timestamp = this.timestampFromDateString(item.date);
 
-        if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
-            importedDateRange.start = timestamp;
-        }
-        if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
-            importedDateRange.end = timestamp;
-        }
+            if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
+                importedDateRange.start = timestamp;
+            }
+            if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
+                importedDateRange.end = timestamp;
+            }
 
-        transactionItem = this.mapImportRow(item);
-        if (!transactionItem) {
-            return;
-        }
+            transactionItem = this.mapImportRow(item);
+            if (!transactionItem) {
+                throw new Error('Invalid transaction object');
+            }
 
-        this.rowsContainer.appendChild(transactionItem.elem);
-        transactionItem.pos = this.model.transactionRows.length;
-        this.model.transactionRows.push(transactionItem);
-        this.transCountElem.textContent = this.model.transactionRows.length;
-    }, this);
+            this.rowsContainer.appendChild(transactionItem.elem);
+            transactionItem.pos = this.model.transactionRows.length;
+            this.model.transactionRows.push(transactionItem);
+            this.transCountElem.textContent = this.model.transactionRows.length;
+        }, this);
 
-    reqParams = urlJoin({
-        count: 0,
-        stdate: this.formatDate(new Date(importedDateRange.start)),
-        enddate: this.formatDate(new Date(importedDateRange.end)),
-        acc_id: this.model.mainAccount.id
-    });
+        reqParams = urlJoin({
+            count: 0,
+            stdate: this.formatDate(new Date(importedDateRange.start)),
+            enddate: this.formatDate(new Date(importedDateRange.end)),
+            acc_id: this.model.mainAccount.id
+        });
 
-    ajax.get({
-        url: baseURL + 'api/transaction/list/?' + reqParams,
-        callback: this.onTrCacheResult.bind(this)
-    });
+        ajax.get({
+            url: baseURL + 'api/transaction/list/?' + reqParams,
+            callback: this.onTrCacheResult.bind(this)
+        });
+    } catch (e) {
+        this.removeAllItems();
+        this.importDone();
+    }
 };
 
 /**
@@ -857,25 +861,22 @@ ImportView.prototype.mapImportRow = function (data) {
     var item;
 
     if (!data) {
-        return null;
+        throw new Error('Invalid data');
     }
 
     accCurr = this.model.currency.findByName(data.accCurrVal);
     if (!accCurr) {
-        console.log('Unknown currency ' + data.accCurrVal);
-        return null;
+        throw new Error('Unknown currency ' + data.accCurrVal);
     }
 
     trCurr = this.model.currency.findByName(data.trCurrVal);
     if (!trCurr) {
-        console.log('Unknown currency ' + data.trCurrVal);
-        return null;
+        throw new Error('Unknown currency ' + data.trCurrVal);
     }
 
     /** Currency should be same as main account */
     if (accCurr.id !== this.model.mainAccount.curr_id) {
-        console.log('Currency must be the same as main account');
-        return null;
+        throw new Error('Currency must be the same as main account');
     }
 
     item = ImportTransactionItem.create({
@@ -887,7 +888,7 @@ ImportView.prototype.mapImportRow = function (data) {
         originalData: data
     });
 
-    item.setSourceAmount(data.accAmountVal);
+    item.setSourceAmount(-data.accAmountVal);
 
     if (trCurr.id !== accCurr.id) {
         item.setCurrency(trCurr.id);
