@@ -851,6 +851,8 @@ ImportView.prototype.importLoadCallback = function (response) {
             callback: this.onTrCacheResult.bind(this)
         });
     } catch (e) {
+        createMessage(e.message, 'msg_error');
+
         this.removeAllItems();
         this.importDone();
     }
