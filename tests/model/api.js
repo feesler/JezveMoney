@@ -286,8 +286,7 @@ export const api = {
         },
 
         async create(options) {
-            const postData = checkFields(options, userReqFields);
-            const apiRes = await apiPost('user/create', postData);
+            const apiRes = await apiPost('user/create', options);
             if (!apiRes || apiRes.result !== 'ok') {
                 throw new ApiRequestError('Fail to create user');
             }
@@ -301,7 +300,7 @@ export const api = {
                 throw new ApiRequestError('Wrong id specified');
             }
 
-            const postData = checkFields(options, userReqFields);
+            const postData = copyObject(options);
             postData.id = id;
 
             const apiRes = await apiPost('user/update', postData);
