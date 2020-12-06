@@ -792,6 +792,7 @@ ImportTransactionItem.prototype.setPerson = function (value) {
 
 /** Set source amount */
 ImportTransactionItem.prototype.setSourceAmount = function (value) {
+    var isDiff = (this.data.src_curr !== this.data.dest_curr);
     var res;
 
     if (typeof value === 'undefined') {
@@ -810,8 +811,14 @@ ImportTransactionItem.prototype.setSourceAmount = function (value) {
 
     if (this.data.type === INCOME) {
         this.data.dest_amount = res;
+        if (!isDiff) {
+            this.data.src_amount = res;
+        }
     } else {
         this.data.src_amount = res;
+        if (!isDiff) {
+            this.data.dest_amount = res;
+        }
     }
 
     this.amountInp.value = res;
