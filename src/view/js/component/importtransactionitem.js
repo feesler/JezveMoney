@@ -53,9 +53,11 @@ function ImportTransactionItem() {
         name: 'curr_id[]',
         value: this.data.dest_curr
     });
-    this.currSel = ce('select', {
-        disabled: false
-    });
+    this.currSel = ce(
+        'select',
+        { disabled: false },
+        ce('option', { value: 0, textContent: '', disabled: true })
+    );
 
     this.model.currency.data.forEach(function (currency) {
         var option = ce('option', {
@@ -107,7 +109,16 @@ function ImportTransactionItem() {
 
     // Destination account controls
     this.destAccIdInp = ce('input', { type: 'hidden', name: 'dest_acc_id[]', value: '' });
-    this.destAccSel = ce('select', { disabled: true });
+    this.destAccSel = ce(
+        'select',
+        { disabled: true },
+        ce('option', {
+            value: 0,
+            textContent: '',
+            disabled: true,
+            selected: true
+        })
+    );
     this.model.accounts.data.forEach(function (account) {
         var option = ce('option', {
             value: account.id,
@@ -123,7 +134,16 @@ function ImportTransactionItem() {
 
     // Person controls
     this.personIdInp = ce('input', { type: 'hidden', name: 'person_id[]', value: '' });
-    this.personSel = ce('select', { disabled: true });
+    this.personSel = ce(
+        'select',
+        { disabled: true },
+        ce('option', {
+            value: 0,
+            textContent: '',
+            disabled: true,
+            selected: true
+        })
+    );
     this.model.persons.data.forEach(function (person) {
         var option = ce('option', { value: person.id, textContent: person.name });
         this.personSel.appendChild(option);
@@ -393,6 +413,7 @@ ImportTransactionItem.prototype.isEnabled = function () {
 ImportTransactionItem.prototype.onMainAccountChanged = function (value) {
     var account;
     var trType;
+    var isDiffBefore = (this.data.src_curr !== this.data.dest_curr);
 
     account = this.model.accounts.getItem(value);
     if (!account) {
@@ -401,27 +422,46 @@ ImportTransactionItem.prototype.onMainAccountChanged = function (value) {
     this.model.mainAccount = account;
 
     trType = selectedValue(this.trTypeSel);
-    if (trType === 'expense'
-        || trType === 'transferfrom'
-        || trType === 'debtfrom'
-    ) {
+    if (trType === 'expense') {
         this.data.src_id = account.id;
         this.data.src_curr = account.curr_id;
-    } else {
+        if (!isDiffBefore) {
+            this.setCurrency(this.model.mainAccount.curr_id);
+        }
+    } else if (trType === 'income') {
         this.data.dest_id = account.id;
         this.data.dest_curr = account.curr_id;
-    }
-
-    if (trType === 'transferfrom' || trType === 'transferto') {
+        if (!isDiffBefore) {
+            this.setCurrency(this.model.mainAccount.curr_id);
+        }
+    } else if (trType === 'transferfrom' || trType === 'transferto') {
+        if (trType === 'transferfrom') {
+            this.data.src_id = account.id;
+            this.data.src_curr = account.curr_id;
+        } else {
+            this.data.dest_id = account.id;
+            this.data.dest_curr = account.curr_id;
+        }
         this.syncDestAccountSelect();
         this.copyDestAcc();
+    } else if (trType === 'debtfrom' || trType === 'debtto') {
+        this.data.acc_id = account.id;
+        this.data.src_curr = account.curr_id;
+        this.data.dest_curr = account.curr_id;
+
+        // Set same currency as main account
+        this.setCurrency(this.model.mainAccount.curr_id);
     }
+
     this.syncCurrAvail();
     this.syncDestAmountAvail();
 };
 
 /** Transaction type select 'change' event handler */
 ImportTransactionItem.prototype.onTrTypeChanged = function () {
+    var personId;
+    var typeBefore = this.data.type;
+    var isDiffBefore = (this.data.src_curr !== this.data.dest_curr);
     var trType = selectedValue(this.trTypeSel);
 
     if (trType === 'expense') {
@@ -441,7 +481,19 @@ ImportTransactionItem.prototype.onTrTypeChanged = function () {
     if (this.data.type === DEBT) {
         delete this.data.src_id;
         delete this.data.dest_id;
+        // Set same currency as main account
+        this.setCurrency(this.model.mainAccount.curr_id);
+        // Select first person if previous type of transaction was not DEBT
+        if (!this.data.person_id) {
+            personId = this.model.persons.data[0].id;
+            this.setPerson(personId);
+        }
     } else {
+        // Deselect person if previous type of transaction was DEBT
+        if (this.data.person_id) {
+            this.setPerson(0);
+        }
+
         delete this.data.person_id;
         delete this.data.acc_id;
         delete this.data.op;
@@ -455,21 +507,28 @@ ImportTransactionItem.prototype.onTrTypeChanged = function () {
         this.syncDestAccountSelect();
         this.copyDestAcc();
     } else if (this.data.type === DEBT) {
-        this.copyPerson();
         show(this.personField, true);
         enable(this.personSel, true);
         show(this.destAccountField, false);
         enable(this.destAccSel, false);
+        this.setAccount(0);
     } else {
         if (this.data.type === EXPENSE) {
             this.data.src_id = this.model.mainAccount.id;
             this.data.src_curr = this.model.mainAccount.curr_id;
             this.data.dest_id = 0;
+            if (!isDiffBefore || typeBefore !== INCOME) {
+                this.setCurrency(this.data.src_curr);
+            }
         } else if (this.data.type === INCOME) {
             this.data.src_id = 0;
             this.data.dest_id = this.model.mainAccount.id;
             this.data.dest_curr = this.model.mainAccount.curr_id;
+            if (!isDiffBefore || typeBefore !== EXPENSE) {
+                this.setCurrency(this.data.dest_curr);
+            }
         }
+        this.setAccount(0);
         this.copyCurr();
 
         show(this.personField, false);
@@ -485,36 +544,36 @@ ImportTransactionItem.prototype.onTrTypeChanged = function () {
 ImportTransactionItem.prototype.syncDestAmountAvail = function () {
     var isDiff;
     var showBottom;
-    var trType = selectedValue(this.trTypeSel);
 
     isDiff = (this.data.src_curr !== this.data.dest_curr);
-    if (trType === 'expense') {
+    if (this.data.type === EXPENSE || this.data.type === INCOME) {
         showBottom = isDiff;
-    } else if (trType === 'income') {
-        showBottom = isDiff;
-    } else if (trType === 'transferfrom') {
-        showBottom = true;
-    } else if (trType === 'transferto') {
-        showBottom = true;
     } else {
         showBottom = true;
     }
 
     enable(this.destAmountInp, isDiff);
     show(this.destAmountField, isDiff);
+    if (!isDiff) {
+        this.destAmountInp.value = '';
+    }
     show(this.bottomRow, showBottom);
 };
 
 /** Copy destination account id from select to hidden input */
 ImportTransactionItem.prototype.copyDestAcc = function () {
+    var destAccountId;
     var account;
     var trType;
 
+    destAccountId = selectedValue(this.destAccSel);
+    this.destAccIdInp.value = destAccountId;
+
     if (this.data.type !== TRANSFER) {
-        throw new Error('Invalid transaction type');
+        return;
     }
 
-    account = this.model.accounts.getItem(selectedValue(this.destAccSel));
+    account = this.model.accounts.getItem(destAccountId);
     if (!account) {
         throw new Error('Account not found');
     }
@@ -532,7 +591,7 @@ ImportTransactionItem.prototype.copyDestAcc = function () {
         this.data.dest_curr = this.model.mainAccount.curr_id;
     }
 
-    this.destAccIdInp.value = account.id;
+    this.setCurrency(account.curr_id);
 };
 
 /**
@@ -576,12 +635,21 @@ ImportTransactionItem.prototype.syncDestAccountSelect = function () {
  */
 ImportTransactionItem.prototype.copyPerson = function () {
     var trType;
-    var person = this.model.persons.getItem(selectedValue(this.personSel));
+    var person;
+    var personId = selectedValue(this.personSel);
+
+    this.personIdInp.value = personId;
+
+    if (this.data.type !== DEBT) {
+        return;
+    }
+
+    person = this.model.persons.getItem(personId);
     if (!person) {
         throw new Error('Person not found');
     }
 
-    this.data.person_id = person.id;
+    this.data.person_id = personId;
     this.data.acc_id = this.model.mainAccount.id;
 
     this.data.src_curr = this.model.mainAccount.curr_id;
@@ -593,8 +661,6 @@ ImportTransactionItem.prototype.copyPerson = function () {
     } else {
         this.data.op = 1;
     }
-
-    this.personIdInp.value = person.id;
 };
 
 /**
@@ -647,7 +713,6 @@ ImportTransactionItem.prototype.syncCurrAvail = function () {
         || trType === 'debtto'
     ) {
         enable(this.currSel, false);
-        this.setCurrency(this.model.mainAccount.curr_id);
     } else {
         enable(this.currSel, true);
     }
