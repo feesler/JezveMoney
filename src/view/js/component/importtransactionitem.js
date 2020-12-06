@@ -377,6 +377,7 @@ ImportTransactionItem.prototype.toggleCollapse = function () {
  */
 ImportTransactionItem.prototype.enable = function (val) {
     var newState = (typeof val === 'undefined') ? true : !!val;
+    var isDiff = (this.data.src_curr !== this.data.dest_curr);
 
     if (newState) {
         this.elem.classList.remove('tr-row_disabled');
@@ -388,20 +389,16 @@ ImportTransactionItem.prototype.enable = function (val) {
     enable(this.trTypeSel, newState);
     enable(this.amountInp, newState);
     enable(this.currIdInp, newState);
-    enable(this.currSel, newState);
-    enable(this.destAccIdInp, newState);
-    enable(this.destAccSel, newState);
-    enable(this.personIdInp, newState);
-    enable(this.personSel, newState);
-    enable(this.destAmountInp, newState);
+    enable(this.currSel, newState && [EXPENSE,INCOME].includes(this.data.type));
+    enable(this.destAccIdInp, newState && (this.data.type === TRANSFER));
+    enable(this.destAccSel, newState && (this.data.type === TRANSFER));
+    enable(this.personIdInp, newState && (this.data.type === DEBT));
+    enable(this.personSel, newState && (this.data.type === DEBT));
+    enable(this.destAmountInp, newState && isDiff);
     enable(this.dateInp, newState);
     enable(this.commInp, newState);
 
     this.enabled = newState;
-
-    if (newState) {
-        this.onTrTypeChanged();
-    }
 };
 
 /** Return component enabled status */
