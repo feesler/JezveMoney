@@ -51,6 +51,14 @@ function Uploader(file, options, onSuccess, onError, onProgress) {
 
     function send() {
         xhrUpload = new XMLHttpRequest();
+        xhrUpload.onreadystatechange = function () {
+            if (this.readyState === 2
+                && this.responseURL === baseURL + 'login/') {
+                this.abort();
+                window.location = this.responseURL;
+            }
+        };
+
         xhrUpload.onload = function () {
             if (this.status === 200) {
                 if (isFunction(onSuccess)) {
