@@ -44,8 +44,12 @@ export class Currency {
         if (!this.currencies) {
             throw new Error('List of currencies not initialized');
         }
+        const id = parseInt(currId, 10);
+        if (Number.isNaN(id)) {
+            return null;
+        }
 
-        const currObj = this.currencies.find((item) => item.id === currId);
+        const currObj = this.currencies.find((item) => item.id === id);
         if (!currObj) {
             return null;
         }

@@ -389,7 +389,7 @@ ImportTransactionItem.prototype.enable = function (val) {
     enable(this.trTypeSel, newState);
     enable(this.amountInp, newState);
     enable(this.currIdInp, newState);
-    enable(this.currSel, newState && [EXPENSE,INCOME].includes(this.data.type));
+    enable(this.currSel, newState && [EXPENSE, INCOME].includes(this.data.type));
     enable(this.destAccIdInp, newState && (this.data.type === TRANSFER));
     enable(this.destAccSel, newState && (this.data.type === TRANSFER));
     enable(this.personIdInp, newState && (this.data.type === DEBT));

@@ -194,6 +194,41 @@ export function isValidValue(val) {
 * Other
 */
 
+/** Quote string for CSV */
+function quoteString(str) {
+    const escaped = str.toString().split('"').join('\\"');
+
+    return `"${escaped}"`;
+}
+
+/** Return CSV */
+export function createCSV({
+    header = null,
+    data = [],
+    delimiter = ';',
+    newLine = '\r\n',
+}) {
+    let rows = [];
+
+    if (typeof delimiter !== 'string'
+        || typeof newLine !== 'string'
+        || !Array.isArray(data)) {
+        throw new Error('Invalid parameters');
+    }
+
+    if (Array.isArray(header)) {
+        rows.push(header);
+    }
+
+    rows = rows.concat(data);
+
+    const res = rows.map(
+        (row) => row.map(quoteString).join(delimiter),
+    ).join(newLine).trim();
+
+    return `${res}${newLine}`;
+}
+
 /** Return deep copy of object */
 export function copyObject(item) {
     if (Array.isArray(item)) {

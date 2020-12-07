@@ -167,8 +167,6 @@ class Import extends TemplateController
 
     public function upload()
     {
-        wlog("FastCommitController::upload()");
-
         if (!$this->isPOST()) {
             return;
         }
@@ -225,8 +223,6 @@ class Import extends TemplateController
             header("Content-type: text/html; charset=UTF-8");
 
             $fileType = strtoupper($fileType);
-            wlog("File type: " . $fileType);
-
             if ($fileType == "XLS") {
                 $readedType = "Xls";
             } elseif ($fileType == "XLSX") {
@@ -234,7 +230,7 @@ class Import extends TemplateController
             } elseif ($fileType == "CSV") {
                 $readedType = "Csv";
             } else {
-                throw new \Error("Unknown file type");
+                throw new \Error("Unknown file type: $fileType");
             }
 
             $reader = IOFactory::createReader($readedType);

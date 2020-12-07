@@ -302,15 +302,18 @@ export class AppState {
     }
 
     getAccountByIndex(ind, visibleAccList, hiddenAccList) {
-        if (ind < 0 || ind > visibleAccList.length + hiddenAccList.length) {
+        const index = parseInt(ind, 10);
+        if (Number.isNaN(index)
+            || index < 0
+            || index > visibleAccList.length + hiddenAccList.length) {
             throw new Error(`Invalid account index ${ind}`);
         }
 
-        if (ind < visibleAccList.length) {
-            return visibleAccList[ind].id;
+        if (index < visibleAccList.length) {
+            return visibleAccList[index].id;
         }
 
-        const hiddenInd = ind - visibleAccList.length;
+        const hiddenInd = index - visibleAccList.length;
         return hiddenAccList[hiddenInd].id;
     }
 

@@ -81,7 +81,7 @@ export class List {
             throw new Error(`Invalid position ${pos} specified`);
         }
 
-        const item = this.data[pos];
+        const item = this.data[ind];
         return item.id;
     }
 

@@ -600,4 +600,205 @@ export const api = {
             return true;
         },
     },
+
+    importrule: {
+        async read(ids) {
+            const apiReq = idsRequest('importrule/', ids);
+            const jsonRes = await apiGet(apiReq);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to read import rule');
+            }
+
+            return jsonRes.data;
+        },
+
+        async create(options) {
+            const postData = checkFields(options, currReqFields);
+            const apiRes = await apiPost('importrule/create', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import rule');
+            }
+
+            return apiRes.data;
+        },
+
+        async update(id, options) {
+            const itemId = parseInt(id, 10);
+            if (!itemId || Number.isNaN(itemId)) {
+                throw new ApiRequestError('Invalid id specified');
+            }
+
+            const postData = checkFields(options, currReqFields);
+            postData.id = itemId;
+
+            const apiRes = await apiPost('importrule/update', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to update import rule');
+            }
+
+            return true;
+        },
+
+        async del(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            for (const id of itemIds) {
+                const fid = parseInt(id, 10);
+                if (!fid || Number.isNaN(fid)) {
+                    throw new ApiRequestError(`Invalid id specified: ${id}`);
+                }
+            }
+
+            const postData = { id: ids };
+            const apiRes = await apiPost('importrule/delete', postData);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to delete import rule');
+            }
+
+            return true;
+        },
+
+        async list() {
+            const reqUrl = 'importrule/list';
+            const jsonRes = await apiGet(reqUrl);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to obtain list of import rules');
+            }
+
+            return jsonRes.data;
+        },
+    },
+
+    importaction: {
+        async read(ids) {
+            const apiReq = idsRequest('importaction/', ids);
+            const jsonRes = await apiGet(apiReq);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to read import action');
+            }
+
+            return jsonRes.data;
+        },
+
+        async create(options) {
+            const postData = checkFields(options, currReqFields);
+            const apiRes = await apiPost('importaction/create', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import action');
+            }
+
+            return apiRes.data;
+        },
+
+        async update(id, options) {
+            const itemId = parseInt(id, 10);
+            if (!itemId || Number.isNaN(itemId)) {
+                throw new ApiRequestError('Invalid id specified');
+            }
+
+            const postData = checkFields(options, currReqFields);
+            postData.id = itemId;
+
+            const apiRes = await apiPost('importaction/update', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to update import action');
+            }
+
+            return true;
+        },
+
+        async del(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            for (const id of itemIds) {
+                const fid = parseInt(id, 10);
+                if (!fid || Number.isNaN(fid)) {
+                    throw new ApiRequestError(`Invalid id specified: ${id}`);
+                }
+            }
+
+            const postData = { id: ids };
+            const apiRes = await apiPost('importaction/delete', postData);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to delete import action');
+            }
+
+            return true;
+        },
+
+        async list() {
+            const reqUrl = 'importaction/list';
+            const jsonRes = await apiGet(reqUrl);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to obtain list of import actions');
+            }
+
+            return jsonRes.data;
+        },
+    },
+
+    importtemplate: {
+        async read(ids) {
+            const apiReq = idsRequest('importtpl/', ids);
+            const jsonRes = await apiGet(apiReq);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to read import template');
+            }
+
+            return jsonRes.data;
+        },
+
+        async create(options) {
+            const postData = checkFields(options, currReqFields);
+            const apiRes = await apiPost('importtpl/create', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import template');
+            }
+
+            return apiRes.data;
+        },
+
+        async update(id, options) {
+            const itemId = parseInt(id, 10);
+            if (!itemId || Number.isNaN(itemId)) {
+                throw new ApiRequestError('Invalid id specified');
+            }
+
+            const postData = checkFields(options, currReqFields);
+            postData.id = itemId;
+
+            const apiRes = await apiPost('importtpl/update', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to update import template');
+            }
+
+            return true;
+        },
+
+        async del(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            for (const id of itemIds) {
+                const fid = parseInt(id, 10);
+                if (!fid || Number.isNaN(fid)) {
+                    throw new ApiRequestError(`Invalid id specified: ${id}`);
+                }
+            }
+
+            const postData = { id: ids };
+            const apiRes = await apiPost('importtpl/delete', postData);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to delete import template');
+            }
+
+            return true;
+        },
+
+        async list() {
+            const reqUrl = 'importtpl/list';
+            const jsonRes = await apiGet(reqUrl);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to obtain list of import templates');
+            }
+
+            return jsonRes.data;
+        },
+    },
 };

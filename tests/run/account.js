@@ -7,6 +7,7 @@ import {
     formatProps,
     copyObject,
     checkObjValue,
+    createCSV,
 } from '../common.js';
 import { App } from '../app.js';
 import { AccountView } from '../view/account.js';
@@ -281,12 +282,6 @@ export async function hide(accounts) {
     return show(accounts, false);
 }
 
-function quoteString(str) {
-    const escaped = str.toString().split('"').join('\\"');
-
-    return `"${escaped}"`;
-}
-
 export async function exportTest(accounts) {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
@@ -297,8 +292,6 @@ export async function exportTest(accounts) {
     }
 
     // Prepare expected content
-    const delimiter = ';';
-    const rows = [];
     const headerRow = [
         'ID',
         'Type',
@@ -309,7 +302,6 @@ export async function exportTest(accounts) {
         'Date',
         'Comment',
     ];
-    rows.push(headerRow);
 
     // Prepare state
     await App.state.fetch();
@@ -317,23 +309,19 @@ export async function exportTest(accounts) {
     const trList = App.state.transactions.filterByAccounts(ids);
     const transactions = trList.sortAsc();
 
-    for (const transaction of transactions) {
-        const row = [
-            transaction.id,
-            Transaction.typeToString(transaction.type),
-            Currency.format(transaction.src_curr, transaction.src_amount),
-            Currency.format(transaction.dest_curr, transaction.dest_amount),
-            Currency.format(transaction.src_curr, transaction.src_result),
-            Currency.format(transaction.dest_curr, transaction.dest_result),
-            transaction.date,
-            transaction.comment,
-        ];
+    const rows = transactions.map((transaction) => [
+        transaction.id,
+        Transaction.typeToString(transaction.type),
+        Currency.format(transaction.src_curr, transaction.src_amount),
+        Currency.format(transaction.dest_curr, transaction.dest_amount),
+        Currency.format(transaction.src_curr, transaction.src_result),
+        Currency.format(transaction.dest_curr, transaction.dest_result),
+        transaction.date,
+        transaction.comment,
+    ]);
 
-        rows.push(row);
-    }
-
-    const expectedContent = rows.map((row) => row.map(quoteString).join(delimiter))
-        .join('\r\n').trim();
+    let expectedContent = createCSV({ header: headerRow, data: rows });
+    expectedContent = expectedContent.trim();
 
     let content = await App.view.exportAccounts(itemIds);
     content = content.trim();

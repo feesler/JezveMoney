@@ -11,6 +11,7 @@ import { ExpenseTransactionView } from './view/transaction/expense.js';
 import { IncomeTransactionView } from './view/transaction/income.js';
 import { TransferTransactionView } from './view/transaction/transfer.js';
 import { DebtTransactionView } from './view/transaction/debt.js';
+import { ImportView } from './view/import.js';
 import { StatisticsView } from './view/statistics.js';
 
 /** Process request url and return view class if match */
@@ -128,6 +129,10 @@ export async function route(env, url) {
         }
 
         throw new Error(`Unknown route: ${reqUrl.pathname}`);
+    }
+
+    if (part === 'import') {
+        return ImportView;
     }
 
     if (part === 'statistics') {
