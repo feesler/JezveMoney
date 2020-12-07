@@ -2142,7 +2142,7 @@ export class Scenario {
     createDummyTransaction(data) {
         const [
             date,
-            descr,
+            comment,
             city,
             country,
             trCurr,
@@ -2161,8 +2161,8 @@ export class Scenario {
             `${formatDate(date)} 00:00`,
             `${formatDate(confirmDate)} 00:00`,
             '*7777',
-            `${descr} ${city} ${country}`,
-            descr,
+            `${comment} ${city} ${country}`,
+            comment,
             city,
             country,
             trCurr,

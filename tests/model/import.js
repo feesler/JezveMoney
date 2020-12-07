@@ -117,7 +117,7 @@ function fromImportData(data, mainAccount) {
         mainAccount,
         type: (data.accAmountVal < 0) ? EXPENSE : INCOME,
         date: data.date,
-        comment: data.descr,
+        comment: data.comment,
         original: data,
     };
 
@@ -182,7 +182,7 @@ export function applyTemplate(data, template, mainAccount) {
         original.date = dateFromString(getColumn(row, template.dateColumn));
         original.date = formatDate(original.date);
 
-        original.descr = getColumn(row, template.commentColumn);
+        original.comment = getColumn(row, template.commentColumn);
 
         const item = fromImportData(original, mainAccount);
 
@@ -365,7 +365,7 @@ function getFieldValue(transaction, fieldId) {
         return data.accCurrVal;
     }
     if (field === IMPORT_RULE_FIELD_COMMENT) {
-        return data.descr;
+        return data.comment;
     }
     if (field === IMPORT_RULE_FIELD_DATE) {
         return data.date;

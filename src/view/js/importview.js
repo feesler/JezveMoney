@@ -903,7 +903,7 @@ ImportView.prototype.mapImportRow = function (data) {
     }
 
     item.setDate(data.date);
-    item.setComment(data.descr);
+    item.setComment(data.comment);
 
     this.model.rules.applyTo(data, item);
 

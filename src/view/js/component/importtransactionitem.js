@@ -313,7 +313,7 @@ ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
         this.createDataValue('Tr. currency', data.trCurrVal),
         this.createDataValue('Acc. amount', data.accAmountVal),
         this.createDataValue('Acc. currency', data.accCurrVal),
-        this.createDataValue('Comment', data.descr, 'comment-value')
+        this.createDataValue('Comment', data.comment, 'comment-value')
     ]);
 };
 

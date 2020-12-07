@@ -112,7 +112,7 @@ class Import extends TemplateController
         }
 
         $this->setColumnInd("date", $template->dateColumn);
-        $this->setColumnInd("desc", $template->commentColumn);
+        $this->setColumnInd("comment", $template->commentColumn);
         $this->setColumnInd("trCurr", $template->transactionCurrColumn);
         $this->setColumnInd("trAmount", $template->transactionAmountColumn);
         $this->setColumnInd("accCurr", $template->accountCurrColumn);
@@ -254,15 +254,12 @@ class Import extends TemplateController
 
             $data = [];
             do {
-                $descVal = $this->getCellValue($src, "desc", $row_ind);
-                $edesc = trim($descVal);
-
-                $dataObj = new \stdClass();
-
                 $dateVal = $this->getCellValue($src, "date", $row_ind);
                 if (is_empty($dateVal)) {
                     break;
                 }
+
+                $dataObj = new \stdClass();
 
                 if ($readedType == "Csv") {
                     $dateFmt = strtotime($dateVal);
@@ -277,7 +274,9 @@ class Import extends TemplateController
                 $dataObj->trAmountVal = self::floatFix($this->getCellValue($src, "trAmount", $row_ind));
                 $dataObj->accCurrVal = $this->getCellValue($src, "accCurr", $row_ind);
                 $dataObj->accAmountVal = self::floatFix($this->getCellValue($src, "accAmount", $row_ind));
-                $dataObj->descr = $edesc;
+
+                $commentVal = $this->getCellValue($src, "comment", $row_ind);
+                $dataObj->comment = trim($commentVal);
 
                 $data[] = $dataObj;
 

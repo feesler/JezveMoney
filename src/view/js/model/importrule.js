@@ -67,7 +67,7 @@ ImportRule.getFieldValue = function (fieldId, data) {
         return data.accCurrVal;
     }
     if (field === IMPORT_RULE_FIELD_COMMENT) {
-        return data.descr;
+        return data.comment;
     }
     if (field === IMPORT_RULE_FIELD_DATE) {
         return data.date;
