@@ -3,13 +3,22 @@ import {
     setParam,
     copyObject,
     checkObjValue,
+    formatProps,
 } from '../common.js';
 import { PersonsView } from '../view/persons.js';
 import { PersonView } from '../view/person.js';
 import { MainView } from '../view/main.js';
 import { App } from '../app.js';
 
-export async function submitPerson(params) {
+/** Navigate to persons list page */
+async function checkNavigation() {
+    if (!(App.view instanceof PersonsView)) {
+        await App.goToMainView();
+        await App.view.goToPersons();
+    }
+}
+
+async function submitPerson(params) {
     if (!(App.view instanceof PersonView)) {
         throw new Error('Invalid view');
     }
@@ -37,24 +46,23 @@ export async function submitPerson(params) {
  * @param {Object} params
  */
 export async function create(params) {
-    // Navigate to create person view
-    if (!(App.view instanceof PersonsView)) {
-        await App.goToMainView();
-        await App.view.goToPersons();
-    }
-    await App.view.goToCreatePerson();
+    await test(`Create person ({${formatProps(params)} })`, async () => {
+        // Navigate to create person view
+        await checkNavigation();
+        await App.view.goToCreatePerson();
 
-    const expPerson = await submitPerson(params);
-    if (expPerson) {
-        App.state.createPerson(expPerson);
-    } else {
-        await App.view.cancel();
-    }
+        const expPerson = await submitPerson(params);
+        if (expPerson) {
+            App.state.createPerson(expPerson);
+        } else {
+            await App.view.cancel();
+        }
 
-    App.view.expectedState = PersonsView.render(App.state);
-    await test(`Create person ({ name : ${params.name} })`, () => App.view.checkState());
+        App.view.expectedState = PersonsView.render(App.state);
+        await App.view.checkState();
 
-    await App.state.fetch();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function update(params) {
@@ -74,57 +82,55 @@ export async function update(params) {
         delete props.pos;
     }
 
-    // Navigate to update person view
-    if (!(App.view instanceof PersonsView)) {
-        await App.goToMainView();
-        await App.view.goToPersons();
-    }
-    await App.view.goToUpdatePerson(pos);
+    await test(`Update person [${pos}]`, async () => {
+        // Navigate to update person view
+        await checkNavigation();
+        await App.view.goToUpdatePerson(pos);
 
-    const ids = App.state.getPersonsByIndexes(pos);
-    const expectedPerson = App.state.persons.getItem(ids[0]);
-    if (!expectedPerson) {
-        throw new Error('Can not find specified person');
-    }
+        const ids = App.state.getPersonsByIndexes(pos);
+        const expectedPerson = App.state.persons.getItem(ids[0]);
+        if (!expectedPerson) {
+            throw new Error('Can not find specified person');
+        }
 
-    App.view.expectedState = {
-        visibility: { name: true },
-        values: { name: expectedPerson.name },
-    };
-    await test('Update person view state', () => App.view.checkState());
+        // Check initial state of view
+        App.view.expectedState = {
+            visibility: { name: true },
+            values: { name: expectedPerson.name },
+        };
+        await App.view.checkState();
 
-    const expPerson = await submitPerson(props);
-    if (expPerson) {
-        // Check updates in the person tiles
-        setParam(expectedPerson, props);
-        App.state.updatePerson(expectedPerson);
-    } else {
-        await App.view.cancel();
-    }
+        const expPerson = await submitPerson(props);
+        if (expPerson) {
+            // Check updates in the person tiles
+            setParam(expectedPerson, props);
+            App.state.updatePerson(expectedPerson);
+        } else {
+            await App.view.cancel();
+        }
 
-    App.view.expectedState = PersonsView.render(App.state);
-    await test(`Update person [${pos}]`, () => App.view.checkState());
+        App.view.expectedState = PersonsView.render(App.state);
+        await App.view.checkState();
 
-    await App.state.fetch();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function del(persons) {
-    // Navigate to persons list view
-    if (!(App.view instanceof PersonsView)) {
-        await App.goToMainView();
-        await App.view.goToPersons();
-    }
+    await test(`Delete persons [${persons.join()}]`, async () => {
+        // Navigate to persons list view
+        await checkNavigation();
+        // Prepare expected state
+        const ids = App.state.getPersonsByIndexes(persons);
+        App.state.deletePersons(ids);
+        // Perform actions on view
+        await App.view.deletePersons(persons);
 
-    // Prepare expected updates of persons list
-    const ids = App.state.getPersonsByIndexes(persons);
-    App.state.deletePersons(ids);
+        App.view.expectedState = PersonsView.render(App.state);
+        await App.view.checkState();
 
-    await App.view.deletePersons(persons);
-
-    App.view.expectedState = PersonsView.render(App.state);
-    await test(`Delete persons [${persons.join()}]`, () => App.view.checkState());
-
-    await App.state.fetch();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function delFromUpdate(pos) {
@@ -133,54 +139,47 @@ export async function delFromUpdate(pos) {
         throw new Error('Position of person not specified');
     }
 
-    App.view.setBlock(`Delete person from update view [${ind}]`, 2);
-
-    if (!(App.view instanceof PersonsView)) {
-        if (!(App.view instanceof MainView)) {
-            await App.goToMainView();
-        }
-        await App.view.goToPersons();
-    }
-
-    const ids = App.state.getPersonsByIndexes(ind);
-    App.state.deletePersons(ids);
-
-    await App.view.goToUpdatePerson(ind);
-    await App.view.deleteSelfItem();
-
-    App.view.expectedState = PersonsView.render(App.state);
-    await test(`Delete person [${ind}]`, () => App.view.checkState());
-
-    await App.goToMainView();
-
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main page widgets update', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test(`Delete person from update view [${ind}]`, async () => {
+        // Navigate to persons list view
+        await checkNavigation();
+        // Prepare expected state
+        const ids = App.state.getPersonsByIndexes(ind);
+        App.state.deletePersons(ids);
+        // Perform actions on view
+        await App.view.goToUpdatePerson(ind);
+        await App.view.deleteSelfItem();
+        // Check state of persons list view
+        App.view.expectedState = PersonsView.render(App.state);
+        await App.view.checkState();
+        // Check state of main view
+        await App.goToMainView();
+        App.view.expectedState = MainView.render(App.state);
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function show(persons, val = true) {
     const itemIds = Array.isArray(persons) ? persons : [persons];
 
-    const showVerb = (val) ? 'Show' : 'Hide';
-    App.view.setBlock(`${showVerb} person(s) [${itemIds.join()}]`, 2);
+    const actVerb = (val) ? 'Show' : 'Hide';
+    await test(`${actVerb} person(s) [${itemIds.join()}]`, async () => {
+        // Navigate to persons list view
+        await checkNavigation();
 
-    // Navigate to create persons view
-    if (!(App.view instanceof PersonsView)) {
-        await App.goToMainView();
-        await App.view.goToPersons();
-    }
-
-    // Check initial state
-    await App.state.fetch();
-    const ids = App.state.getPersonsByIndexes(itemIds);
-    App.state.showPersons(ids, val);
-
-    await App.view.showPersons(itemIds, val);
-
-    App.view.expectedState = PersonsView.render(App.state);
-
-    await test(`${showVerb} persons [${itemIds.join()}]`, () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+        // Check initial state
+        await App.state.fetch();
+        const ids = App.state.getPersonsByIndexes(itemIds);
+        App.state.showPersons(ids, val);
+        // Perform actions on view
+        await App.view.showPersons(itemIds, val);
+        // Check state of persons list view
+        App.view.expectedState = PersonsView.render(App.state);
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function hide(persons) {
@@ -191,6 +190,9 @@ export async function toggleSelect(persons) {
     const itemIds = Array.isArray(persons) ? persons : [persons];
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
+        // Navigate to persons list view
+        await checkNavigation();
+
         const origItems = App.view.getItems();
         // Check correctness of arguments
         const indexes = [];

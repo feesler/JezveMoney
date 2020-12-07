@@ -12,14 +12,19 @@ import {
 import { App } from '../app.js';
 import { AccountView } from '../view/account.js';
 
-export async function stateLoop() {
-    App.view.setBlock('View state loop', 2);
-
-    // Navigate to create account view
+/** Navigate to accounts list page */
+async function checkNavigation() {
     if (!(App.view instanceof AccountsView)) {
         await App.goToMainView();
         await App.view.goToAccounts();
     }
+}
+
+export async function stateLoop() {
+    App.view.setBlock('View state loop', 2);
+
+    // Navigate to create account view
+    await checkNavigation();
     await App.view.goToCreateAccount();
 
     // Check initial state
@@ -69,22 +74,22 @@ export async function submitAccount(params) {
 
     // Input account name
     if ('name' in params) {
-        await test(`Input name (${params.name})`, () => App.view.inputName(params.name));
+        await App.view.inputName(params.name);
     }
 
     // Change currency
     if ('curr_id' in params) {
-        await test(`Select currency ${params.curr_id}`, () => App.view.changeCurrency(params.curr_id));
+        await App.view.changeCurrency(params.curr_id);
     }
 
     // Input balance
     if ('initbalance' in params) {
-        await test('Input initial balance', () => App.view.inputBalance(params.initbalance));
+        await App.view.inputBalance(params.initbalance);
     }
 
     // Change icon
     if ('icon_id' in params) {
-        await test('Tile icon update', () => App.view.changeIcon(params.icon_id));
+        await App.view.changeIcon(params.icon_id);
     }
 
     const validInput = App.view.isValid();
@@ -104,40 +109,34 @@ export async function create(params) {
         throw new Error('No params specified');
     }
 
-    const title = formatProps(params);
-    App.view.setBlock(`Create account (${title})`, 2);
-
-    // Navigate to create account view
-    if (!(App.view instanceof AccountsView)) {
-        await App.goToMainView();
-        await App.view.goToAccounts();
-    }
-    await App.view.goToCreateAccount();
-
-    // Check initial state
-    await App.state.fetch();
-
-    let expAccount = {
-        name: '',
-        owner_id: App.owner_id,
-        initbalance: '0',
-        balance: 0,
-        curr_id: 1,
-        icon_id: 0,
-        flags: 0,
-    };
-    App.view.setExpectedAccount(expAccount);
-    await test('Initial state of account view', () => App.view.checkState());
-
-    expAccount = await submitAccount(params);
-    if (expAccount) {
-        App.state.createAccount(expAccount);
-    } else {
-        await App.view.cancel();
-    }
-
-    App.view.expectedState = AccountsView.render(App.state);
-    await test('Create account', () => App.view.checkState());
+    await test(`Create account (${formatProps(params)})`, async () => {
+        // Navigate to create account view
+        await checkNavigation();
+        await App.view.goToCreateAccount();
+        // Check initial state of view
+        await App.state.fetch();
+        let expAccount = {
+            name: '',
+            owner_id: App.owner_id,
+            initbalance: '0',
+            balance: 0,
+            curr_id: 1,
+            icon_id: 0,
+            flags: 0,
+        };
+        App.view.setExpectedAccount(expAccount);
+        await App.view.checkState();
+        // Perform actions on view
+        expAccount = await submitAccount(params);
+        if (expAccount) {
+            App.state.createAccount(expAccount);
+        } else {
+            await App.view.cancel();
+        }
+        // Check state of accounts list view
+        App.view.expectedState = AccountsView.render(App.state);
+        return App.view.checkState();
+    });
 }
 
 export async function update(params) {
@@ -160,58 +159,51 @@ export async function update(params) {
         delete props.pos;
     }
 
-    const title = formatProps(props);
-    App.view.setBlock(`Update account [${pos}] (${title})`, 2);
+    await test(`Update account [${pos}] (${formatProps(props)})`, async () => {
+        // Navigate to update account view
+        await checkNavigation();
+        await App.view.goToUpdateAccount(pos);
+        // Prepare expected state
+        const [accountId] = App.state.getAccountsByIndexes(pos);
+        let expAccount = App.state.accounts.getItem(accountId);
+        if (!expAccount) {
+            throw new Error('Can not find specified account');
+        }
+        App.view.setExpectedAccount(expAccount);
+        await App.view.checkState();
 
-    // Navigate to create account view
-    if (!(App.view instanceof AccountsView)) {
-        await App.goToMainView();
-        await App.view.goToAccounts();
-    }
-    await App.view.goToUpdateAccount(pos);
+        expAccount = await submitAccount(props);
+        if (expAccount) {
+            App.state.updateAccount(expAccount);
+        } else {
+            await App.view.cancel();
+        }
 
-    const ids = App.state.getAccountsByIndexes(pos);
-    let expAccount = App.state.accounts.getItem(ids[0]);
-    if (!expAccount) {
-        throw new Error('Can not find specified account');
-    }
-    App.view.setExpectedAccount(expAccount);
-    await test('Initial state of account view', () => App.view.checkState());
-
-    expAccount = await submitAccount(props);
-    if (expAccount) {
-        App.state.updateAccount(expAccount);
-    } else {
-        await App.view.cancel();
-    }
-
-    App.view.expectedState = AccountsView.render(App.state);
-    await test('Update account', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+        App.view.expectedState = AccountsView.render(App.state);
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function del(accounts) {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
-    App.view.setBlock(`Delete account(s) [${itemIds.join()}]`, 2);
-
-    // Navigate to create account view
-    if (!(App.view instanceof AccountsView)) {
-        await App.goToMainView();
-        await App.view.goToAccounts();
-    }
-
-    // Check initial state
-    await App.state.fetch();
-
-    const ids = App.state.getAccountsByIndexes(itemIds);
-    App.state.deleteAccounts(ids);
-
-    await App.view.deleteAccounts(itemIds);
-
-    App.view.expectedState = AccountsView.render(App.state);
-    await test(`Delete accounts [${itemIds.join()}]`, () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test(`Delete account(s) [${itemIds.join()}]`, async () => {
+        // Navigate to accounts list view
+        await checkNavigation();
+        // Prepare expected state
+        await App.state.fetch();
+        const ids = App.state.getAccountsByIndexes(itemIds);
+        App.state.deleteAccounts(ids);
+        // Perform actions on view
+        await App.view.deleteAccounts(itemIds);
+        // Check state of view
+        App.view.expectedState = AccountsView.render(App.state);
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function delFromUpdate(pos) {
@@ -220,62 +212,51 @@ export async function delFromUpdate(pos) {
         throw new Error('Invalid position of account specified');
     }
 
-    App.view.setBlock(`Delete account from update view [${ind}]`, 2);
-
-    if (!(App.view instanceof AccountsView)) {
-        if (!(App.view instanceof MainView)) {
-            await App.goToMainView();
-        }
-        await App.view.goToAccounts();
-    }
-
-    await App.view.goToUpdateAccount(ind);
-
-    await App.state.fetch();
-
-    const ids = App.state.getAccountsByIndexes(ind);
-    App.state.deleteAccounts(ids);
-
-    await App.view.deleteSelfItem();
-
-    App.view.expectedState = AccountsView.render(App.state);
-    await test(`Delete account [${ind}]`, () => App.view.checkState());
-
-    await App.goToMainView();
-
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main page widgets update', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test(`Delete account from update view [${ind}]`, async () => {
+        // Navigate to update account view
+        await checkNavigation();
+        await App.view.goToUpdateAccount(ind);
+        // Prepare expected state
+        await App.state.fetch();
+        const ids = App.state.getAccountsByIndexes(ind);
+        App.state.deleteAccounts(ids);
+        // Perform actions on view
+        await App.view.deleteSelfItem();
+        // Check state of accounts list view
+        App.view.expectedState = AccountsView.render(App.state);
+        await App.view.checkState();
+        // Check state of main view
+        await App.goToMainView();
+        App.view.expectedState = MainView.render(App.state);
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function show(accounts, val = true) {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
+    const actVerb = (val) ? 'Show' : 'Hide';
 
-    const showVerb = (val) ? 'Show' : 'Hide';
-    App.view.setBlock(`${showVerb} account(s) [${itemIds.join()}]`, 2);
-
-    // Navigate to create account view
-    if (!(App.view instanceof AccountsView)) {
-        await App.goToMainView();
-        await App.view.goToAccounts();
-    }
-
-    // Check initial state
-    await App.state.fetch();
-
-    const ids = App.state.getAccountsByIndexes(itemIds);
-    App.state.showAccounts(ids, val);
-
-    if (val) {
-        await App.view.showAccounts(itemIds);
-    } else {
-        await App.view.hideAccounts(itemIds);
-    }
-
-    App.view.expectedState = AccountsView.render(App.state);
-
-    await test(`${showVerb} accounts [${accounts.join()}]`, () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test(`${actVerb} account(s) [${itemIds.join()}]`, async () => {
+        // Navigate to accounts list view
+        await checkNavigation();
+        // Prepare expected state
+        await App.state.fetch();
+        const ids = App.state.getAccountsByIndexes(itemIds);
+        App.state.showAccounts(ids, val);
+        // Perform actions on view
+        if (val) {
+            await App.view.showAccounts(itemIds);
+        } else {
+            await App.view.hideAccounts(itemIds);
+        }
+        // Check state of view
+        App.view.expectedState = AccountsView.render(App.state);
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function hide(accounts) {
@@ -285,54 +266,51 @@ export async function hide(accounts) {
 export async function exportTest(accounts) {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
-    // Navigate to create account view
-    if (!(App.view instanceof AccountsView)) {
-        await App.goToMainView();
-        await App.view.goToAccounts();
-    }
+    await test(`Export accounts [${itemIds.join()}]`, async () => {
+        // Navigate to accounts list view
+        await checkNavigation();
 
-    // Prepare expected content
-    const headerRow = [
-        'ID',
-        'Type',
-        'Source amount',
-        'Destination amount',
-        'Source result',
-        'Destination result',
-        'Date',
-        'Comment',
-    ];
+        // Prepare expected content
+        await App.state.fetch();
+        const ids = App.state.getAccountsByIndexes(itemIds);
+        const trList = App.state.transactions.filterByAccounts(ids);
+        const transactions = trList.sortAsc();
 
-    // Prepare state
-    await App.state.fetch();
-    const ids = App.state.getAccountsByIndexes(itemIds);
-    const trList = App.state.transactions.filterByAccounts(ids);
-    const transactions = trList.sortAsc();
+        const header = [
+            'ID',
+            'Type',
+            'Source amount',
+            'Destination amount',
+            'Source result',
+            'Destination result',
+            'Date',
+            'Comment',
+        ];
+        const data = transactions.map((transaction) => [
+            transaction.id,
+            Transaction.typeToString(transaction.type),
+            Currency.format(transaction.src_curr, transaction.src_amount),
+            Currency.format(transaction.dest_curr, transaction.dest_amount),
+            Currency.format(transaction.src_curr, transaction.src_result),
+            Currency.format(transaction.dest_curr, transaction.dest_result),
+            transaction.date,
+            transaction.comment,
+        ]);
 
-    const rows = transactions.map((transaction) => [
-        transaction.id,
-        Transaction.typeToString(transaction.type),
-        Currency.format(transaction.src_curr, transaction.src_amount),
-        Currency.format(transaction.dest_curr, transaction.dest_amount),
-        Currency.format(transaction.src_curr, transaction.src_result),
-        Currency.format(transaction.dest_curr, transaction.dest_result),
-        transaction.date,
-        transaction.comment,
-    ]);
+        const expectedContent = createCSV({ header, data });
+        const content = await App.view.exportAccounts(itemIds);
 
-    let expectedContent = createCSV({ header: headerRow, data: rows });
-    expectedContent = expectedContent.trim();
-
-    let content = await App.view.exportAccounts(itemIds);
-    content = content.trim();
-
-    await test(`Export accounts [${itemIds.join()}]`, () => expectedContent === content);
+        return checkObjValue(content.trim(), expectedContent.trim());
+    });
 }
 
 export async function toggleSelect(accounts) {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
+        // Navigate to accounts list view
+        await checkNavigation();
+
         const origItems = App.view.getItems();
         // Check correctness of arguments
         const indexes = [];
