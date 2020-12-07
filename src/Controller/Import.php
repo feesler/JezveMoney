@@ -68,6 +68,7 @@ class Import extends TemplateController
             "lib/component.js",
             "component/header.js",
             "component/iconlink.js",
+            "component/uploader.js",
             "component/importtransactionitem.js",
             "view.js",
             "importview.js"
