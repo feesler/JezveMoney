@@ -581,33 +581,32 @@ ImportView.prototype.formatDate = function (date) {
 ImportView.prototype.importLoadCallback = function (response) {
     var defErrorMessage = 'Fail to import file';
     var importedDateRange = { start: 0, end: 0 };
-    var res;
+    var importedItems;
+    var rows;
     var reqParams;
 
     try {
         this.resetUploadForm();
-        res = JSON.parse(response);
-        if (!res || res.result !== 'ok' || !Array.isArray(res.data)) {
-            throw new Error((res && 'msg' in res) ? res.msg : defErrorMessage);
+        rows = JSON.parse(response);
+        if (!rows || rows.result !== 'ok' || !Array.isArray(rows.data)) {
+            throw new Error((rows && 'msg' in rows) ? rows.msg : defErrorMessage);
         }
     } catch (e) {
         createMessage(e.message, 'msg_error');
         return;
     }
 
-    this.removeAllItems();
     try {
-        res.data.forEach(function (item) {
+        importedItems = rows.data.map(function (row) {
             var timestamp;
-            var transactionItem;
+            var item;
 
-            if (!item) {
-                return;
+            if (!row) {
+                throw new Error('Invalid data row object');
             }
 
             // Store date region of imported transactions
-            timestamp = this.timestampFromDateString(item.date);
-
+            timestamp = this.timestampFromDateString(row.date);
             if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
                 importedDateRange.start = timestamp;
             }
@@ -615,16 +614,22 @@ ImportView.prototype.importLoadCallback = function (response) {
                 importedDateRange.end = timestamp;
             }
 
-            transactionItem = this.mapImportRow(item);
-            if (!transactionItem) {
+            item = this.mapImportRow(row);
+            if (!item) {
                 throw new Error('Invalid transaction object');
             }
 
-            this.rowsContainer.appendChild(transactionItem.elem);
-            transactionItem.pos = this.model.transactionRows.length;
-            this.model.transactionRows.push(transactionItem);
-            this.transCountElem.textContent = this.model.transactionRows.length;
+            return item;
         }, this);
+
+        importedItems.forEach(function (item) {
+            var res = item;
+
+            res.pos = this.model.transactionRows.length;
+            this.model.transactionRows.push(res);
+            this.rowsContainer.appendChild(res.elem);
+        }, this);
+        this.updateItemsCount();
 
         reqParams = urlJoin({
             count: 0,
@@ -639,8 +644,6 @@ ImportView.prototype.importLoadCallback = function (response) {
         });
     } catch (e) {
         createMessage(e.message, 'msg_error');
-
-        this.removeAllItems();
         this.importDone();
     }
 };
