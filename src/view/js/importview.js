@@ -1,8 +1,7 @@
 'use strict';
 
 /* global ge, re, ce, isDate, isFunction, removeChilds, show, enable, extend */
-/* global selectByValue, selectedValue, fixFloat, urlJoin, ajax */
-/* global EXPENSE, INCOME, TRANSFER, DEBT, createMessage, baseURL */
+/* global selectByValue, selectedValue, urlJoin, ajax, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList */
 /* global View, IconLink, Popup, Sortable, Uploader, ImportTransactionItem */
 /* eslint no-bitwise: "off" */
@@ -335,6 +334,7 @@ ImportView.prototype.createItem = function () {
         mainAccount: this.model.mainAccount
     });
     item.enable(true);
+    item.render();
 
     this.rowsContainer.appendChild(item.elem);
     item.pos = this.model.transactionRows.length;
@@ -368,93 +368,6 @@ ImportView.prototype.getEnabledItems = function () {
     });
 };
 
-/** Filter enabled transaction items */
-ImportView.prototype.itemToTransaction = function (item) {
-    var transaction = {};
-    var selType;
-    var isDiff;
-    var secondAcc;
-    var person;
-    var amountVal;
-    var secondAmountVal;
-    var selectedCurr;
-
-    if (!item) {
-        throw new Error('Invalid item');
-    }
-
-    selType = selectedValue(item.trTypeSel);
-    secondAcc = this.model.accounts.getItem(parseInt(item.destAccIdInp.value, 10));
-    person = this.model.persons.getItem(parseInt(item.personIdInp.value, 10));
-    amountVal = fixFloat(item.amountInp.value);
-    secondAmountVal = fixFloat(item.destAmountInp.value);
-    selectedCurr = parseInt(item.currIdInp.value, 10);
-
-    if (selType === 'expense') {
-        transaction.type = EXPENSE;
-        transaction.src_id = this.model.mainAccount.id;
-        transaction.dest_id = 0;
-        transaction.src_curr = this.model.mainAccount.curr_id;
-        transaction.dest_curr = selectedCurr;
-        transaction.src_amount = amountVal;
-        isDiff = (transaction.src_curr !== transaction.dest_curr);
-        transaction.dest_amount = (isDiff) ? secondAmountVal : amountVal;
-    } else if (selType === 'income') {
-        transaction.type = INCOME;
-        transaction.src_id = 0;
-        transaction.dest_id = this.model.mainAccount.id;
-        transaction.src_curr = selectedCurr;
-        transaction.dest_curr = this.model.mainAccount.curr_id;
-        isDiff = (transaction.src_curr !== transaction.dest_curr);
-        transaction.src_amount = (isDiff) ? secondAmountVal : amountVal;
-        transaction.dest_amount = amountVal;
-    } else if (selType === 'transferfrom') {
-        if (!secondAcc) {
-            throw new Error('Invalid transaction: Second account not set');
-        }
-
-        transaction.type = TRANSFER;
-        transaction.src_id = this.model.mainAccount.id;
-        transaction.dest_id = secondAcc.id;
-        transaction.src_curr = this.model.mainAccount.curr_id;
-        transaction.dest_curr = secondAcc.curr_id;
-        transaction.src_amount = amountVal;
-        isDiff = (transaction.src_curr !== transaction.dest_curr);
-        transaction.dest_amount = (isDiff) ? secondAmountVal : amountVal;
-    } else if (selType === 'transferto') {
-        if (!secondAcc) {
-            throw new Error('Invalid transaction: Second account not set');
-        }
-
-        transaction.type = TRANSFER;
-        transaction.src_id = secondAcc.id;
-        transaction.dest_id = this.model.mainAccount.id;
-        transaction.src_curr = secondAcc.curr_id;
-        transaction.dest_curr = this.model.mainAccount.curr_id;
-        isDiff = (transaction.src_curr !== transaction.dest_curr);
-        transaction.src_amount = (isDiff) ? secondAmountVal : amountVal;
-        transaction.dest_amount = amountVal;
-    } else if (selType === 'debtfrom' || selType === 'debtto') {
-        if (!person) {
-            throw new Error('Invalid transaction: Person not set');
-        }
-
-        transaction.type = DEBT;
-        transaction.op = (selType === 'debtto') ? 1 : 2;
-        transaction.person_id = person.id;
-        transaction.acc_id = this.model.mainAccount.id;
-        transaction.src_curr = this.model.mainAccount.curr_id;
-        transaction.dest_curr = this.model.mainAccount.curr_id;
-        transaction.src_amount = amountVal;
-        transaction.dest_amount = amountVal;
-    }
-
-    transaction.date = item.dateInp.value;
-    transaction.comment = item.commInp.value;
-
-    return transaction;
-};
-
 /** Submit buttom 'click' event handler */
 ImportView.prototype.onSubmitClick = function () {
     var requestObj;
@@ -466,7 +379,7 @@ ImportView.prototype.onSubmitClick = function () {
     }
 
     requestObj = enabledList.map(function (item) {
-        var res = this.itemToTransaction(item);
+        var res = item.getData();
         if (!res) {
             throw new Error('Invalid transaction object');
         }
@@ -610,11 +523,13 @@ ImportView.prototype.onTrCacheResult = function (response) {
     }
 
     this.model.transCache = jsondata.data;
-    this.model.transactionRows.forEach(function (row) {
-        var transaction = this.findSameTransaction(row.data);
+    this.model.transactionRows.forEach(function (item) {
+        var data = item.getData();
+        var transaction = this.findSameTransaction(data);
         if (transaction) {
             transaction.picked = true;
-            row.enable(false);
+            item.enable(false);
+            item.render();
         }
     }, this);
 
@@ -767,17 +682,16 @@ ImportView.prototype.mapImportRow = function (data) {
         originalData: data
     });
 
-    item.setSourceAmount(-data.accAmountVal);
-
+    item.setAmount(-data.accAmountVal);
     if (trCurr.id !== accCurr.id) {
         item.setCurrency(trCurr.id);
-        item.setDestinationAmount(data.trAmountVal);
+        item.setSecondAmount(-data.trAmountVal);
     }
-
     item.setDate(data.date);
     item.setComment(data.comment);
 
     this.model.rules.applyTo(data, item);
+    item.render();
 
     return item;
 };

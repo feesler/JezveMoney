@@ -47,9 +47,9 @@ ImportAction.prototype.execute = function (context) {
     } else if (this.action_id === IMPORT_ACTION_SET_PERSON) {
         context.setPerson(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_SRC_AMOUNT) {
-        context.setSourceAmount(this.value);
+        context.setAmount(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_DEST_AMOUNT) {
-        context.setDestinationAmount(this.value);
+        context.setSecondAmount(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_COMMENT) {
         context.setComment(this.value);
     } else {
