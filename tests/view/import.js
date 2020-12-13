@@ -48,6 +48,9 @@ export class ImportView extends TestView {
     async buildModel(cont) {
         const res = {};
 
+        res.totalCount = cont.totalCount;
+        res.enabledCount = cont.enabledCount;
+        res.mainAccount = cont.mainAccount;
         res.items = cont.itemsList.getItems();
 
         return res;

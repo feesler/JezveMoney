@@ -491,7 +491,7 @@ export class ImportListItem extends Component {
     async inputDate(value) {
         this.checkEnabled(this.dateField);
 
-        this.model.comment = value;
+        this.model.date = value;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.input(this.dateField.inputElem, value);

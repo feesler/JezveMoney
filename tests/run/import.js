@@ -135,6 +135,35 @@ export async function removeFile(filename) {
     return true;
 }
 
+export async function addItem() {
+    await test('Add import item', async () => {
+        await checkNavigation();
+
+        const itemsList = App.view.content.itemsList.getExpectedState();
+        const mainAccount = App.state.accounts.getItem(App.view.model.mainAccount);
+        const expectedItem = {
+            enabled: true,
+            typeField: { value: 'expense', disabled: false },
+            amountField: { value: '', disabled: false },
+            destAmountField: { value: '', disabled: true },
+            currencyField: { value: mainAccount.curr_id.toString(), disabled: false },
+            destAccountField: { value: '0', disabled: true },
+            dateField: { value: '', disabled: false },
+            commentField: { value: '', disabled: false },
+            personField: { value: '0', disabled: true }
+        };
+
+        itemsList.items.push(expectedItem);
+
+        await App.view.addItem();
+
+        App.view.expectedState = {
+            values: { itemsList },
+        };
+        return App.view.checkState();
+    });
+}
+
 export async function uploadFile(params) {
     if (!params || !params.data || !params.filename || !params.template) {
         throw new Error('Invalid parameters');
@@ -148,6 +177,8 @@ export async function uploadFile(params) {
     const importTpl = await api.importtemplate.read(params.template);
     const importRules = await api.importrule.list();
     const importActions = await api.importaction.list();
+
+    const itemsList = App.view.content.itemsList.getExpectedState();
 
     let mainAccountId;
     if (params.account) {
@@ -178,6 +209,9 @@ export async function uploadFile(params) {
         },
     );
 
+    const importedItems = ImportList.render(importTransactions, App.state);
+    itemsList.items = itemsList.items.concat(importedItems.items);
+
     // Perform actions on view
     if (!params.filename) {
         throw new Error('Invalid file name');
@@ -197,9 +231,7 @@ export async function uploadFile(params) {
     await App.view.upload();
 
     App.view.expectedState = {
-        values: {
-            itemsList: ImportList.render(importTransactions, App.state),
-        },
+        values: { itemsList },
     };
     await test('Upload file', () => App.view.checkState());
 }

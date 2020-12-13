@@ -2227,8 +2227,19 @@ export class Scenario {
         await ProfileTests.relogin(App.config.testUser);
 
         await ImportTests.checkInitialState();
+        // Add item
+        this.environment.setBlock('Add item', 2);
+        await ImportTests.addItem();
+        await ImportTests.updateItem({
+            pos: 0,
+            action: [
+                { action: 'inputAmount', data: '1' },
+                { action: 'inputDate', data: App.dates.now },
+            ],
+        });
 
         // Upload CSV file
+        this.environment.setBlock('Upload CSV', 2);
         await ImportTests.uploadFile({
             filename: uploadFilename,
             data: csvStatement,
@@ -2237,7 +2248,7 @@ export class Scenario {
 
         // Disable all items except 0 and 1
         await ImportTests.enableItems({
-            index: [2, 3, 4, 5, 6, 7, 8, 9],
+            index: [2, 3, 4, 5, 6, 7, 8, 9, 10],
             value: false,
         });
         await ImportTests.submit();
@@ -2253,7 +2264,7 @@ export class Scenario {
             template: 2,
         });
         await ImportTests.enableItems({
-            index: [2, 3, 4, 5, 6, 7, 8, 9],
+            index: [1, 2, 3, 4, 5, 6, 7, 8, 9],
             value: false,
         });
         await ImportTests.submit();
