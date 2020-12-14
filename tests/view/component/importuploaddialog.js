@@ -69,6 +69,7 @@ export class ImportUploadDialog extends Component {
     }
 
     async submit() {
+        await this.parse();
         if (!this.submitBtn) {
             throw new Error('Invalid state of upload dialog');
         }

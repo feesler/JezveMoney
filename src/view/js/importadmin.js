@@ -1,63 +1,59 @@
 'use strict';
 
 /* global ge, show, ajax, urlJoin, baseURL */
-/* global ImportView */
+/* global ImportUploadDialog */
 
 /** Setup extra controls of file upload dialog */
-ImportView.prototype.initDialogExtras = function () {
-    if (!this.uploadDialog) {
-        throw new Error('Invalid state');
-    }
-
-    this.uploadDialog.useServerCheck = ge('useServerCheck');
-    this.uploadDialog.serverAddressBlock = ge('serverAddressBlock');
-    this.uploadDialog.serverAddressInput = ge('serverAddress');
+ImportUploadDialog.prototype.initDialogExtras = function () {
+    this.useServerCheck = ge('useServerCheck');
+    this.serverAddressBlock = ge('serverAddressBlock');
+    this.serverAddressInput = ge('serverAddress');
     if (
-        !this.uploadDialog.useServerCheck
-        || !this.uploadDialog.serverAddressBlock
-        || !this.uploadDialog.serverAddressInput
+        !this.useServerCheck
+        || !this.serverAddressBlock
+        || !this.serverAddressInput
     ) {
         throw new Error('Failed to initialize extras of file upload dialog');
     }
 
-    this.uploadDialog.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
-    this.uploadDialog.serverAddressInput.addEventListener('input', this.onInputServerAddress.bind(this));
+    this.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
+    this.serverAddressInput.addEventListener('input', this.onInputServerAddress.bind(this));
 };
 
 /** Copy file name from server address input */
-ImportView.prototype.updateServerFileName = function () {
+ImportUploadDialog.prototype.updateServerFileName = function () {
     var pos;
     var fileName;
 
-    if (!this.uploadDialog || !this.uploadDialog.serverAddressInput) {
+    if (!this.serverAddressInput) {
         throw new Error('Upload dialog not initialized');
     }
-    fileName = this.uploadDialog.serverAddressInput.value;
+    fileName = this.serverAddressInput.value;
     pos = fileName.lastIndexOf('/');
     if (pos !== -1) {
         fileName = fileName.substr(pos + 1);
     }
 
-    this.uploadDialog.filenameElem.textContent = fileName;
+    this.filenameElem.textContent = fileName;
 };
 
 /** Server address input 'input' event handler */
-ImportView.prototype.onInputServerAddress = function () {
+ImportUploadDialog.prototype.onInputServerAddress = function () {
     var showOptions;
 
     this.updateServerFileName();
 
-    showOptions = this.uploadDialog.filenameElem.textContent.length > 0;
+    showOptions = this.filenameElem.textContent.length > 0;
 
     this.enableUploadButton(showOptions);
-    show(this.uploadDialog.importControls, showOptions);
+    show(this.importControls, showOptions);
 };
 
 /** Use server checkbox 'change' event handler */
-ImportView.prototype.onCheckServer = function () {
-    var useServer = this.uploadDialog.useServerCheck.checked;
+ImportUploadDialog.prototype.onCheckServer = function () {
+    var useServer = this.useServerCheck.checked;
 
-    show(this.uploadDialog.serverAddressBlock, useServer);
+    show(this.serverAddressBlock, useServer);
     if (useServer) {
         this.updateServerFileName();
     } else {
@@ -66,18 +62,18 @@ ImportView.prototype.onCheckServer = function () {
 };
 
 /** Use server checkbox 'change' event handler */
-ImportView.prototype.beforeUpload = function () {
+ImportUploadDialog.prototype.beforeUpload = function () {
     var reqObj;
-    var useServer = this.uploadDialog.useServerCheck.checked;
-    var templateId = this.uploadDialog.templateSel.value;
-    var isEncoded = this.uploadDialog.isEncodeCheck.checked;
+    var useServer = this.useServerCheck.checked;
+    var templateId = this.templateSel.value;
+    var isEncoded = this.isEncodeCheck.checked;
 
     if (!useServer) {
         return true;
     }
 
     reqObj = {
-        filename: this.uploadDialog.serverAddressInput.value,
+        filename: this.serverAddressInput.value,
         template: templateId,
         encode: (isEncoded ? 1 : 0)
     };
