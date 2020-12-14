@@ -139,7 +139,7 @@ ImportUploadDialog.prototype.resetUploadForm = function () {
     this.formElem.reset();
 };
 
-/** Import form 'reset' event handler */
+/** Upload form 'reset' event handler */
 ImportUploadDialog.prototype.onResetFileImport = function () {
     setTimeout(this.resetImportForm.bind(this));
 };
@@ -219,6 +219,7 @@ ImportUploadDialog.prototype.onImportProgress = function () {
  */
 ImportUploadDialog.prototype.onImportSuccess = function (response) {
     var defErrorMessage = 'Fail to import file';
+    var jsonParseErrorMessage = 'Fail to parse server response';
     var importedDateRange = { start: 0, end: 0 };
     var rows;
     var reqParams;
@@ -226,15 +227,16 @@ ImportUploadDialog.prototype.onImportSuccess = function (response) {
     try {
         this.resetUploadForm();
         rows = JSON.parse(response);
-        if (!rows || rows.result !== 'ok' || !Array.isArray(rows.data)) {
-            throw new Error((rows && 'msg' in rows) ? rows.msg : defErrorMessage);
-        }
     } catch (e) {
-        createMessage(e.message, 'msg_error');
+        createMessage(jsonParseErrorMessage, 'msg_error');
         return;
     }
 
     try {
+        if (!rows || rows.result !== 'ok' || !Array.isArray(rows.data)) {
+            throw new Error((rows && 'msg' in rows) ? rows.msg : defErrorMessage);
+        }
+
         this.importedItems = rows.data.map(function (row) {
             var timestamp;
             var item;

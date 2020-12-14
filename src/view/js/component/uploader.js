@@ -46,21 +46,25 @@ function Uploader(file, options, onSuccess, onError, onProgress) {
      */
     fileId = hashCode(fileId);
 
+    function abort() {
+        if (xhrStatus) {
+            xhrStatus.abort();
+        }
+        if (xhrUpload) {
+            xhrUpload.abort();
+        }
+    }
+
     function send() {
         xhrUpload = new XMLHttpRequest();
-        xhrUpload.onreadystatechange = function () {
-            if (this.readyState === 2
-                && this.responseURL === baseURL + 'login/') {
-                this.abort();
-                window.location = this.responseURL;
-            }
-        };
-
         xhrUpload.onload = function () {
             if (this.status === 200) {
                 if (isFunction(onSuccess)) {
                     onSuccess(this.response);
                 }
+            } else if (this.status === 401) {
+                abort();
+                window.location = baseURL + 'login/';
             } else {
                 /** Try again if failed */
                 errorCount += 1;
@@ -73,7 +77,7 @@ function Uploader(file, options, onSuccess, onError, onProgress) {
         };
         xhrUpload.onerror = xhrUpload.onload;
 
-        xhrUpload.open('POST', baseURL + 'import/upload', true);
+        xhrUpload.open('POST', baseURL + 'api/import/upload', true);
         // which file upload
         xhrUpload.setRequestHeader('X-File-Id', fileId);
         xhrUpload.setRequestHeader('X-File-Type', fileType);
@@ -100,6 +104,9 @@ function Uploader(file, options, onSuccess, onError, onProgress) {
             if (this.status === 200) {
                 startByte = +this.responseText || 0;
                 send();
+            } else if (this.status === 401) {
+                abort();
+                window.location = baseURL + 'login/';
             } else {
                 /* on fail try again after 1 second */
                 errorCount += 1;
@@ -113,21 +120,12 @@ function Uploader(file, options, onSuccess, onError, onProgress) {
 
         xhrStatus.onerror = xhrStatus.onload;
 
-        xhrStatus.open('GET', baseURL + 'import/uploadstatus', true);
+        xhrStatus.open('GET', baseURL + 'api/import/uploadstatus', true);
         xhrStatus.setRequestHeader('X-File-Id', fileId);
         xhrStatus.setRequestHeader('X-File-Type', fileType);
         xhrStatus.send();
     }
 
-    function pause() {
-        if (xhrStatus) {
-            xhrStatus.abort();
-        }
-        if (xhrUpload) {
-            xhrUpload.abort();
-        }
-    }
-
     this.upload = upload;
-    this.pause = pause;
+    this.abort = abort;
 }

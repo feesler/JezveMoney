@@ -384,7 +384,7 @@ export async function deleteItems(indexes) {
         await App.view.deleteItem(itemInds);
 
         App.view.expectedState = {
-            values: { itemsList : { items: expected } },
+            values: { itemsList: { items: expected } },
         };
 
         return App.view.checkState();

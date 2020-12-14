@@ -63,7 +63,7 @@
     </div>
 </div>
 
-<form id="fileimportfrm" class="import-form hidden" method="post" enctype="multipart/form-data" action="<?=BASEURL?>import/upload">
+<form id="fileimportfrm" class="import-form hidden" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
     <div class="upload-form__browser">
         <div class="import-form__title">Select file to start</div>
         <label id="fileBrowser" class="import-form__file">

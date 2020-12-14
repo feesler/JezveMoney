@@ -18,6 +18,8 @@ ImportUploadDialog.prototype.initDialogExtras = function () {
 
     this.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
     this.serverAddressInput.addEventListener('input', this.onInputServerAddress.bind(this));
+
+    this.formElem.addEventListener('reset', this.onResetUploadAdmin.bind(this));
 };
 
 /** Copy file name from server address input */
@@ -47,6 +49,13 @@ ImportUploadDialog.prototype.onInputServerAddress = function () {
 
     this.enableUploadButton(showOptions);
     show(this.importControls, showOptions);
+};
+
+/** Upload form 'reset' event handler */
+ImportUploadDialog.prototype.onResetUploadAdmin = function () {
+    setTimeout(function () {
+        show(this.serverAddressBlock, false);
+    }.bind(this));
 };
 
 /** Use server checkbox 'change' event handler */
@@ -79,7 +88,7 @@ ImportUploadDialog.prototype.beforeUpload = function () {
     };
 
     ajax.post({
-        url: baseURL + 'import/upload/',
+        url: baseURL + 'api/import/upload/',
         data: urlJoin(reqObj),
         callback: this.onImportSuccess.bind(this)
     });

@@ -10,6 +10,7 @@ $router->setNamespace("JezveMoney\\App\\API\\Controller");
 $router->setRoutes([
     "currency" => "Currency",
     "icon" => "Icon",
+    "import" => "Import",
     "importtpl" => "ImportTemplate",
     "importrule" => "ImportRule",
     "importaction" => "ImportAction",
@@ -35,7 +36,6 @@ $router->setActionsMap([
 ]);
 
 $router->onStart(function ($controller, $contrStr, $routeParts) {
-
     // Check correct user authentication for controller
     $loggedOutControllers = ["user/login", "user/register"];
     $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
@@ -44,7 +44,6 @@ $router->onStart(function ($controller, $contrStr, $routeParts) {
 });
 
 $router->onBeforeAction(function ($controller, $contrStr, $action, $routeParts) {
-
     if ($controller instanceof Core\ApiController) {
         $controller->initAPI();
     }
