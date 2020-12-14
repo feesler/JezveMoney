@@ -7,7 +7,12 @@ import {
     availTransTypes,
 } from '../../model/transaction.js';
 import { Currency } from '../../model/currency.js';
-import { normalize, setParam, copyObject } from '../../common.js';
+import {
+    normalize,
+    setParam,
+    copyObject,
+    asyncMap,
+} from '../../common.js';
 import { App } from '../../app.js';
 
 export class ImportListItem extends Component {
@@ -17,6 +22,32 @@ export class ImportListItem extends Component {
         this.mainAccount = mainAccount;
 
         this.model = {};
+    }
+
+    mapField(field) {
+        const fieldsMap = {
+            typeField: 'Type',
+            amountField: 'Amount',
+            destAmountField: 'Destination amount',
+            destAccountField: 'Destination account',
+            personField: 'Person',
+            currencyField: 'Currency',
+            dateField: 'Date',
+            commentField: 'Comment',
+        };
+
+        if (!field || !field.title) {
+            throw new Error('Invalid field');
+        }
+
+        for (const fieldName in fieldsMap) {
+            if (fieldsMap[fieldName] === field.title) {
+                this[fieldName] = field;
+                return;
+            }
+        }
+
+        throw new Error(`Unknown field '${field.title}'`);
     }
 
     async parseField(elem) {
@@ -42,6 +73,8 @@ export class ImportListItem extends Component {
             res.environment.inject(res);
         }
 
+        this.mapField(res);
+
         return res;
     }
 
@@ -53,31 +86,10 @@ export class ImportListItem extends Component {
         this.enabled = await this.prop(this.enableCheck, 'checked');
 
         const fieldElems = await this.queryAll(this.elem, '.field');
-        if (!Array.isArray(fieldElems)) {
-            throw new Error('Invalid structure of import item');
-        }
+        await asyncMap(fieldElems, (field) => this.parseField(field));
 
-        for (const elem of fieldElems) {
-            const field = await this.parseField(elem);
-
-            if (field.title === 'Type') {
-                this.typeField = field;
-            } else if (field.title === 'Amount') {
-                this.amountField = field;
-            } else if (field.title === 'Destination amount') {
-                this.destAmountField = field;
-            } else if (field.title === 'Destination account') {
-                this.destAccountField = field;
-            } else if (field.title === 'Person') {
-                this.personField = field;
-            } else if (field.title === 'Currency') {
-                this.currencyField = field;
-            } else if (field.title === 'Date') {
-                this.dateField = field;
-            } else if (field.title === 'Comment') {
-                this.commentField = field;
-            }
-        }
+        this.deleteBtn = await this.query(this.elem, '.delete-btn');
+        this.toggleBtn = await this.query(this.elem, '.toggle-btn');
 
         if (
             !this.typeField
@@ -88,8 +100,9 @@ export class ImportListItem extends Component {
             || !this.currencyField
             || !this.dateField
             || !this.commentField
+            || !this.deleteBtn
         ) {
-            throw new Error('Invalid structure of import view');
+            throw new Error('Invalid structure of import item');
         }
 
         this.model = await this.buildModel();
@@ -510,6 +523,10 @@ export class ImportListItem extends Component {
         await this.parse();
 
         return this.checkState();
+    }
+
+    async clickDelete() {
+        return this.click(this.deleteBtn);
     }
 
     static typeFromString(str) {

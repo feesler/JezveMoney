@@ -2251,6 +2251,7 @@ export class Scenario {
             index: [2, 3, 4, 5, 6, 7, 8, 9, 10],
             value: false,
         });
+        await ImportTests.deleteItems([3, 5]);
         await ImportTests.submit();
 
         // Verify submit is disabled for empty list

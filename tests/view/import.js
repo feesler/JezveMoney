@@ -142,13 +142,24 @@ export class ImportView extends TestView {
 
     async runItemAction(index, { action, data }) {
         const item = this.content.itemsList.getItem(index);
-        if (!item) {
-            throw new Error(`Item [${index}] not found`);
-        }
 
         await this.performAction(() => item.runAction(action, data));
 
         return true;
+    }
+
+    async deleteItem(index) {
+        if (typeof index === 'undefined') {
+            throw new Error('No items specified');
+        }
+
+        const items = Array.isArray(index) ? index : [index];
+        items.sort();
+        let removed = 0;
+        for (const ind of items) {
+            await this.runItemAction(ind - removed, { action: 'clickDelete' });
+            removed += 1;
+        }
     }
 
     async submit() {

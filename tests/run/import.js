@@ -150,7 +150,7 @@ export async function addItem() {
             destAccountField: { value: '0', disabled: true },
             dateField: { value: '', disabled: false },
             commentField: { value: '', disabled: false },
-            personField: { value: '0', disabled: true }
+            personField: { value: '0', disabled: true },
         };
 
         itemsList.items.push(expectedItem);
@@ -355,6 +355,40 @@ export async function updateItem(params) {
         },
     };
     await test('View state', () => App.view.checkState());
+}
+
+/**
+ * Click by delete button of items specified by indexes
+ * @param {number|number[]} indexes - index or array of indexes of items to delete
+ */
+export async function deleteItems(indexes) {
+    const itemInds = Array.isArray(indexes) ? indexes : [indexes];
+
+    await test(`Delete import item(s) [${itemInds.join()}]`, async () => {
+        await checkNavigation();
+
+        const itemsList = App.view.content.itemsList.getExpectedState();
+        const expected = copyObject(itemsList.items);
+        let removed = 0;
+        itemInds.sort();
+        for (const ind of itemInds) {
+            const index = parseInt(ind, 10);
+            if (Number.isNaN(index) || index < 0 || index > itemsList.items.length) {
+                throw new Error(`Invalid item index: ${ind}`);
+            }
+
+            expected.splice(ind - removed, 1);
+            removed += 1;
+        }
+
+        await App.view.deleteItem(itemInds);
+
+        App.view.expectedState = {
+            values: { itemsList : { items: expected } },
+        };
+
+        return App.view.checkState();
+    });
 }
 
 /** Submit */
