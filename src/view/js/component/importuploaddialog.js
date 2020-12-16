@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, ce, removeChilds, isDate, isFunction, show, extend */
+/* global ge, ce, removeChilds, copyObject, isDate, isFunction, show, extend */
 /* global selectedValue, urlJoin, ajax, createMessage, baseURL */
 /* global Component, Popup, Uploader, ImportTransactionItem */
 
@@ -19,6 +19,7 @@ function ImportUploadDialog() {
         || !this.props.accountModel
         || !this.props.personModel
         || !this.props.rulesModel
+        || !this.props.tplModel
     ) {
         throw new Error('Invalid props');
     }
@@ -28,6 +29,7 @@ function ImportUploadDialog() {
         accounts: this.props.accountModel,
         persons: this.props.personModel,
         rules: this.props.rulesModel,
+        templates: this.props.tplModel,
         mainAccount: this.props.mainAccount
     };
 
@@ -37,6 +39,11 @@ function ImportUploadDialog() {
     this.uploadDoneHandler = this.props.onuploaddone;
     this.accountChangeHandler = this.props.onaccountchange;
 
+    this.BROWSE_STATE = 1;
+    this.RAW_DATA_STATE = 2;
+    this.TPL_APPLIED_STATE = 3;
+
+    this.state = { id: this.BROWSE_STATE };
     this.importedItems = null;
 
     this.formElem = ge('fileimportfrm');
@@ -80,6 +87,7 @@ function ImportUploadDialog() {
         throw new Error('Failed to initialize upload file dialog');
     }
 
+    this.templateSel.addEventListener('change', this.onTemplateChange.bind(this));
     this.initialAccountSel.addEventListener('change', this.onAccountChange.bind(this));
 
     if (isFunction(this.initDialogExtras)) {
@@ -172,6 +180,22 @@ ImportUploadDialog.prototype.onAccountChange = function () {
     }
 };
 
+/** Import template select 'change' event handler */
+ImportUploadDialog.prototype.onTemplateChange = function () {
+    var value;
+    var template;
+
+    if (this.state.id !== this.RAW_DATA_STATE) {
+        return;
+    }
+
+    value = selectedValue(this.templateSel);
+    template = this.model.templates.getItem(value);
+    this.state.template = template;
+
+    this.renderRawData(this.state);
+};
+
 /** Update displaying file name and hide controls of form */
 ImportUploadDialog.prototype.resetImportForm = function () {
     this.updateUploadFileName();
@@ -242,8 +266,14 @@ ImportUploadDialog.prototype.onImportSuccess = function (response) {
         }
 
         if (!templateId) {
-            this.renderRawData(rows.data, 3);
+            this.state = {
+                id: this.RAW_DATA_STATE,
+                rawData: copyObject(rows.data),
+                rowsToShow: 3
+            };
+            this.renderRawData(this.state);
         } else {
+            this.state = { id: this.TPL_APPLIED_STATE };
             this.importedItems = rows.data.map(function (row) {
                 var timestamp;
                 var item;
@@ -289,21 +319,33 @@ ImportUploadDialog.prototype.onImportSuccess = function (response) {
 };
 
 /** Render raw data table to select/create import template */
-ImportUploadDialog.prototype.renderRawData = function (data, rowsToShow) {
-    var headerRow = data.slice(0, 1)[0];
-    var dataRows = data.slice(1, rowsToShow);
+ImportUploadDialog.prototype.renderRawData = function (state) {
+    var headerRow = state.rawData.slice(0, 1)[0];
+    var dataRows = state.rawData.slice(1, state.rowsToShow);
 
     var colElems = headerRow.map(function (title, columnInd) {
-        var columnData = dataRows
-            .map(function (row) {
-                return ce('div', { className: 'raw-data-column__cell', textContent: row[columnInd] });
-            });
-        var headElem = ce('div', { className: 'raw-data-column__header', textContent: title });
+        var columnInfo;
+        var tplElem;
+        var headElem;
+        var columnData;
+
+        tplElem = ce('div', { className: 'raw-data-column__tpl' });
+        if (state.template) {
+            columnInfo = state.template.getColumnByIndex(columnInd);
+            if (columnInfo) {
+                tplElem.textContent = columnInfo.title;
+            }
+        }
+
+        headElem = ce('div', { className: 'raw-data-column__header', textContent: title });
+        columnData = dataRows.map(function (row) {
+            return ce('div', { className: 'raw-data-column__cell', textContent: row[columnInd] });
+        });
 
         return ce(
             'div',
             { className: 'raw-data-column' },
-            [headElem].concat(columnData)
+            [tplElem, headElem].concat(columnData)
         );
     });
 

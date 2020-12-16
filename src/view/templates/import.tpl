@@ -136,7 +136,8 @@ var view = new ImportView({
     accounts: <?=JSON::encode($accArr)?>,
     currencies: <?=JSON::encode($currArr)?>,
     persons: <?=JSON::encode($persArr)?>,
-    rules: <?=JSON::encode($rulesData)?>
+    rules: <?=JSON::encode($rulesData)?>,
+    templates: <?=JSON::encode($impTemplates)?>
 });
 </script>
 </body>

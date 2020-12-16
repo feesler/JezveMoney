@@ -47,6 +47,7 @@ class Import extends TemplateController
             "model/person.js",
             "model/importaction.js",
             "model/importrule.js",
+            "model/importtpl.js",
             "lib/ajax.js",
             "lib/dragndrop.js",
             "lib/sortable.js",

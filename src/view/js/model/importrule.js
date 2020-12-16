@@ -184,7 +184,7 @@ function ImportRuleList() {
 
 extend(ImportRuleList, List);
 
-/** Static alias for CurrencyList constructor */
+/** Static alias for ImportRuleList constructor */
 ImportRuleList.create = function (props) {
     return new ImportRuleList(props);
 };

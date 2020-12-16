@@ -93,6 +93,7 @@
 {
     display: flex;
     flex-flow: row nowrap;
+    margin-bottom: 4px;
 }
 
 .raw-data-column
@@ -106,17 +107,30 @@
     background-color: #7B7B7B;
 }
 
-.raw-data-column__header
+.raw-data-column__tpl
 {
+    text-align: center;
     font-weight: 500;
+    background-color: #214B6F;
 }
 
+.raw-data-column:hover .raw-data-column__tpl
+{
+    background-color: #2C6290;
+}
+
+.raw-data-column__header
+{
+    font-weight: 600;
+}
+
+.raw-data-column__tpl,
 .raw-data-column__header,
 .raw-data-column__cell
 {
-    flex: 1 1;
     white-space: nowrap;
     padding: 4px;
+    height: 1.25rem;
     border: 1px solid #9b9b9b;
 }
 

@@ -2,7 +2,7 @@
 
 /* global ge, re, ce, removeChilds, show, enable, extend */
 /* global selectByValue, selectedValue, ajax, createMessage, baseURL */
-/* global AccountList, CurrencyList, PersonList, ImportRuleList */
+/* global AccountList, CurrencyList, PersonList, ImportRuleList, ImportTemplateList */
 /* global View, IconLink, Sortable, ImportUploadDialog, ImportTransactionItem */
 /* eslint no-bitwise: "off" */
 
@@ -22,6 +22,7 @@ function ImportView() {
     this.model.currency = CurrencyList.create(this.props.currencies);
     this.model.persons = PersonList.create(this.props.persons);
     this.model.rules = ImportRuleList.create(this.props.rules);
+    this.model.templates = ImportTemplateList.create(this.props.templates);
 }
 
 extend(ImportView, View);
@@ -85,6 +86,7 @@ ImportView.prototype.showUploadDialog = function () {
             accountModel: this.model.accounts,
             personModel: this.model.persons,
             rulesModel: this.model.rules,
+            tplModel: this.model.templates,
             mainAccount: this.model.mainAccount,
             elem: 'fileimportfrm',
             onaccountchange: this.onUploadAccChange.bind(this),
