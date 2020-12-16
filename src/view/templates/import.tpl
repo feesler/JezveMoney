@@ -94,11 +94,14 @@
             </div>
             <div class="std_margin">
                 <select id="templateSel">
+                    <option value="0">No template selected</option>
 <?php   foreach($impTemplates as $impTpl) {     ?>
                     <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
 <?php   }   ?>
                 </select>
             </div>
+        </div>
+        <div id="rawDataTable" class="import-tpl__block">
         </div>
         <div>
             <div>

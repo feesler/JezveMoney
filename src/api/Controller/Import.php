@@ -20,18 +20,12 @@ class Import extends ApiController
         "accAmount" => null,
     ];
 
+
     public function initAPI()
     {
         parent::initAPI();
 
         $this->templateModel = ImportTemplateModel::getInstance();
-    }
-
-
-    // Short alias for Coordinate::stringFromColumnIndex() method
-    private static function columnStr($ind)
-    {
-        return Coordinate::stringFromColumnIndex($ind);
     }
 
 
@@ -42,7 +36,7 @@ class Import extends ApiController
             throw new \Error("Invalid column name: " . $colName);
         }
 
-        $this->columns[$colName] = self::columnStr(intval($ind));
+        $this->columns[$colName] = intval($ind);
     }
 
 
@@ -63,7 +57,7 @@ class Import extends ApiController
 
 
     // Return value from cell at specified column and row
-    private function getCellValue($sheet, $colName, $row)
+    private function getCellValue($sheet, $colName, $rowIndex)
     {
         if (!$sheet) {
             throw new \Error("Invalid sheet");
@@ -72,7 +66,7 @@ class Import extends ApiController
             throw new \Error("Invalid column " . $colName);
         }
 
-        return $sheet->getCell($this->columns[$colName] . intval($row))->getValue();
+        return $sheet->getCellByColumnAndRow($this->columns[$colName], intval($rowIndex))->getValue();
     }
 
 
@@ -80,6 +74,118 @@ class Import extends ApiController
     private static function floatFix($str)
     {
         return floatval(str_replace(" ", "", $str));
+    }
+
+
+    private function createReader($fileType, $encodeCP1251)
+    {
+        $fileType = strtoupper($fileType);
+        if ($fileType == "XLS") {
+            $readedType = "Xls";
+        } elseif ($fileType == "XLSX") {
+            $readedType = "Xlsx";
+        } elseif ($fileType == "CSV") {
+            $readedType = "Csv";
+        } else {
+            throw new \Error("Unknown file type: $fileType");
+        }
+
+        $reader = IOFactory::createReader($readedType);
+        if ($reader instanceof \PhpOffice\PhpSpreadsheet\Reader\Csv) {
+            $reader->setDelimiter(';');
+            $reader->setEnclosure('');
+            if ($encodeCP1251) {
+                $reader->setInputEncoding('CP1251');
+            }
+        }
+
+        return $reader;
+    }
+
+
+    private function readWithTemplate($reader, $fileName, $fileTemplate)
+    {
+        if (!$reader) {
+            throw new \Error("Invalid reader");
+        }
+
+        $spreadsheet = $reader->load($fileName);
+        $src = $spreadsheet->getActiveSheet();
+
+        $importTemplate = $this->templateModel->getItem($fileTemplate);
+        if (!$importTemplate) {
+            throw new \Error("Import template '$fileTemplate' not found");
+        }
+        $this->applyTemplate($importTemplate);
+
+        $res = [];
+        $lastRow = $src->getHighestRow();
+        $rowIndex = 2;
+        do {
+            $dateVal = $this->getCellValue($src, "date", $rowIndex);
+            if (is_empty($dateVal)) {
+                break;
+            }
+
+            $dataObj = new \stdClass();
+
+            if ($reader instanceof \PhpOffice\PhpSpreadsheet\Reader\Csv) {
+                $dateFmt = strtotime($dateVal);
+            } else {
+                $dateTime = Date::excelToDateTimeObject($dateVal);
+                $dateFmt = $dateTime->getTimestamp();
+            }
+
+            $dataObj->date = date("d.m.Y", $dateFmt);
+
+            $dataObj->trCurrVal = $this->getCellValue($src, "trCurr", $rowIndex);
+            $dataObj->trAmountVal = self::floatFix($this->getCellValue($src, "trAmount", $rowIndex));
+            $dataObj->accCurrVal = $this->getCellValue($src, "accCurr", $rowIndex);
+            $dataObj->accAmountVal = self::floatFix($this->getCellValue($src, "accAmount", $rowIndex));
+
+            $commentVal = $this->getCellValue($src, "comment", $rowIndex);
+            $dataObj->comment = trim($commentVal);
+
+            $res[] = $dataObj;
+
+            $rowIndex++;
+        } while ($rowIndex <= $lastRow);
+
+        return $res;
+    }
+
+
+    private function readRaw($reader, $fileName)
+    {
+        if (!$reader) {
+            throw new \Error("Invalid reader");
+        }
+
+        $spreadsheet = $reader->load($fileName);
+        $src = $spreadsheet->getActiveSheet();
+
+        $res = [];
+        $lastColumn = $src->getHighestColumn();
+        $lastColumnInd = Coordinate::columnIndexFromString($lastColumn);
+        $lastRow = $src->getHighestRow();
+        $rowIndex = 1;
+        do {
+            $rowData = [];
+
+            for ($col = 1; $col <= $lastColumnInd; $col++) {
+                $val = $src->getCellByColumnAndRow($col, $rowIndex)->getValue();
+                if (is_null($val)) {
+                    $val = "";
+                }
+
+                $rowData[] = $val;
+            }
+
+            $res[] = $rowData;
+            $rowIndex++;
+        } while ($rowIndex <= $lastRow);
+
+        return $res;
     }
 
 
@@ -161,68 +267,12 @@ class Import extends ApiController
             }
 
             // Start process file
-            header("Content-type: text/html; charset=UTF-8");
-
-            $fileType = strtoupper($fileType);
-            if ($fileType == "XLS") {
-                $readedType = "Xls";
-            } elseif ($fileType == "XLSX") {
-                $readedType = "Xlsx";
-            } elseif ($fileType == "CSV") {
-                $readedType = "Csv";
+            $reader = $this->createReader($fileType, $encodeCP1251);
+            if ($fileTemplate != 0) {
+                $data = $this->readWithTemplate($reader, $fname, $fileTemplate);
             } else {
-                throw new \Error("Unknown file type: $fileType");
+                $data = $this->readRaw($reader, $fname);
             }
-
-            $reader = IOFactory::createReader($readedType);
-            if ($reader instanceof \PhpOffice\PhpSpreadsheet\Reader\Csv) {
-                $reader->setDelimiter(';');
-                $reader->setEnclosure('');
-                if ($encodeCP1251) {
-                    $reader->setInputEncoding('CP1251');
-                }
-            }
-            $spreadsheet = $reader->load($fname);
-            $src = $spreadsheet->getActiveSheet();
-
-            $importTemplate = $this->templateModel->getItem($fileTemplate);
-            if (!$importTemplate) {
-                throw new \Error("Import template '$fileTemplate' not found");
-            }
-            $this->applyTemplate($importTemplate);
-
-            $row_ind = 2;
-
-            $data = [];
-            do {
-                $dateVal = $this->getCellValue($src, "date", $row_ind);
-                if (is_empty($dateVal)) {
-                    break;
-                }
-
-                $dataObj = new \stdClass();
-
-                if ($readedType == "Csv") {
-                    $dateFmt = strtotime($dateVal);
-                } else {
-                    $dateTime = Date::excelToDateTimeObject($dateVal);
-                    $dateFmt = $dateTime->getTimestamp();
-                }
-
-                $dataObj->date = date("d.m.Y", $dateFmt);
-
-                $dataObj->trCurrVal = $this->getCellValue($src, "trCurr", $row_ind);
-                $dataObj->trAmountVal = self::floatFix($this->getCellValue($src, "trAmount", $row_ind));
-                $dataObj->accCurrVal = $this->getCellValue($src, "accCurr", $row_ind);
-                $dataObj->accAmountVal = self::floatFix($this->getCellValue($src, "accAmount", $row_ind));
-
-                $commentVal = $this->getCellValue($src, "comment", $row_ind);
-                $dataObj->comment = trim($commentVal);
-
-                $data[] = $dataObj;
-
-                $row_ind++;
-            } while (!is_empty($dateVal));
 
             $this->setData($data);
         } catch (\Error $e) {

@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, isDate, isFunction, show, extend */
+/* global ge, ce, removeChilds, isDate, isFunction, show, extend */
 /* global selectedValue, urlJoin, ajax, createMessage, baseURL */
 /* global Component, Popup, Uploader, ImportTransactionItem */
 
@@ -67,11 +67,13 @@ function ImportUploadDialog() {
 
     this.initialAccountSel = ge('initialAccount');
     this.templateSel = ge('templateSel');
+    this.rawDataTable = ge('rawDataTable');
     this.importControls = ge('importControls');
     this.isEncodeCheck = ge('isEncodeCheck');
     if (
         !this.initialAccountSel
         || !this.templateSel
+        || !this.rawDataTable
         || !this.importControls
         || !this.isEncodeCheck
     ) {
@@ -179,11 +181,13 @@ ImportUploadDialog.prototype.resetImportForm = function () {
 };
 
 /** Upload file to server */
-ImportUploadDialog.prototype.onFileImport = function () {
+ImportUploadDialog.prototype.onFileImport = function (e) {
     var file;
     var uploader;
     var templateId = this.templateSel.value;
     var isEncoded = this.isEncodeCheck.checked;
+
+    e.preventDefault();
 
     if (isFunction(this.beforeUpload) && !this.beforeUpload()) {
         return;
@@ -220,12 +224,12 @@ ImportUploadDialog.prototype.onImportProgress = function () {
 ImportUploadDialog.prototype.onImportSuccess = function (response) {
     var defErrorMessage = 'Fail to import file';
     var jsonParseErrorMessage = 'Fail to parse server response';
+    var templateId = parseInt(this.templateSel.value, 10);
     var importedDateRange = { start: 0, end: 0 };
     var rows;
     var reqParams;
 
     try {
-        this.resetUploadForm();
         rows = JSON.parse(response);
     } catch (e) {
         createMessage(jsonParseErrorMessage, 'msg_error');
@@ -237,47 +241,76 @@ ImportUploadDialog.prototype.onImportSuccess = function (response) {
             throw new Error((rows && 'msg' in rows) ? rows.msg : defErrorMessage);
         }
 
-        this.importedItems = rows.data.map(function (row) {
-            var timestamp;
-            var item;
+        if (!templateId) {
+            this.renderRawData(rows.data, 3);
+        } else {
+            this.importedItems = rows.data.map(function (row) {
+                var timestamp;
+                var item;
 
-            if (!row) {
-                throw new Error('Invalid data row object');
-            }
+                if (!row) {
+                    throw new Error('Invalid data row object');
+                }
 
-            // Store date region of imported transactions
-            timestamp = this.timestampFromDateString(row.date);
-            if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
-                importedDateRange.start = timestamp;
-            }
-            if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
-                importedDateRange.end = timestamp;
-            }
+                // Store date region of imported transactions
+                timestamp = this.timestampFromDateString(row.date);
+                if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
+                    importedDateRange.start = timestamp;
+                }
+                if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
+                    importedDateRange.end = timestamp;
+                }
 
-            item = this.mapImportItem(row);
-            if (!item) {
-                throw new Error('Failed to map data row');
-            }
+                item = this.mapImportItem(row);
+                if (!item) {
+                    throw new Error('Failed to map data row');
+                }
 
-            return item;
-        }, this);
+                return item;
+            }, this);
 
-        reqParams = urlJoin({
-            count: 0,
-            stdate: this.formatDate(new Date(importedDateRange.start)),
-            enddate: this.formatDate(new Date(importedDateRange.end)),
-            acc_id: this.model.mainAccount.id
-        });
+            reqParams = urlJoin({
+                count: 0,
+                stdate: this.formatDate(new Date(importedDateRange.start)),
+                enddate: this.formatDate(new Date(importedDateRange.end)),
+                acc_id: this.model.mainAccount.id
+            });
 
-        ajax.get({
-            url: baseURL + 'api/transaction/list/?' + reqParams,
-            callback: this.onTrCacheResult.bind(this)
-        });
+            ajax.get({
+                url: baseURL + 'api/transaction/list/?' + reqParams,
+                callback: this.onTrCacheResult.bind(this)
+            });
+        }
     } catch (e) {
         createMessage(e.message, 'msg_error');
         this.importedItems = null;
         this.importDone();
     }
+};
+
+/** Render raw data table to select/create import template */
+ImportUploadDialog.prototype.renderRawData = function (data, rowsToShow) {
+    var headerRow = data.slice(0, 1)[0];
+    var dataRows = data.slice(1, rowsToShow);
+
+    var colElems = headerRow.map(function (title, columnInd) {
+        var columnData = dataRows
+            .map(function (row) {
+                return ce('div', { className: 'raw-data-column__cell', textContent: row[columnInd] });
+            });
+        var headElem = ce('div', { className: 'raw-data-column__header', textContent: title });
+
+        return ce(
+            'div',
+            { className: 'raw-data-column' },
+            [headElem].concat(columnData)
+        );
+    });
+
+    var tbl = ce('div', { className: 'raw-data-table' }, colElems);
+
+    removeChilds(this.rawDataTable);
+    this.rawDataTable.appendChild(tbl);
 };
 
 /**
@@ -406,6 +439,8 @@ ImportUploadDialog.prototype.onTrCacheResult = function (response) {
 
 /** Hide import file form */
 ImportUploadDialog.prototype.importDone = function () {
+    this.resetUploadForm();
+
     this.enableUploadButton(false);
     show(this.importControls, false);
 
