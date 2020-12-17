@@ -14,12 +14,16 @@ class ImportTemplateModel extends CachedTable
     use Singleton;
     use CachedInstance;
 
+    private static $user_id = 0;
+
     protected $tbl_name = "import_tpl";
 
 
     protected function onStart()
     {
         $this->dbObj = MySqlDB::getInstance();
+        $uMod = UserModel::getInstance();
+        self::$user_id = $uMod->getUser();
     }
 
 
@@ -33,6 +37,7 @@ class ImportTemplateModel extends CachedTable
         $res = new \stdClass();
         $res->id = intval($row["id"]);
         $res->name = $row["name"];
+        $res->user_id = intval($row["user_id"]);
         $res->type_id = intval($row["type_id"]);
         $res->dateColumn = intval($row["date_col"]);
         $res->commentColumn = intval($row["comment_col"]);
@@ -50,7 +55,7 @@ class ImportTemplateModel extends CachedTable
     // Called from CachedTable::updateCache() and return data query object
     protected function dataQuery()
     {
-        return $this->dbObj->selectQ("*", $this->tbl_name);
+        return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
 
@@ -118,7 +123,8 @@ class ImportTemplateModel extends CachedTable
             $this->tbl_name,
             [
                 "name=" . qnull($res["name"]),
-                "type_id=" . qnull($res["type_id"])
+                "type_id=" . qnull($res["type_id"]),
+                "user_id=" . qnull(self::$user_id)
             ]
         );
         if ($this->dbObj->rowsCount($qResult) > 0) {
@@ -126,6 +132,7 @@ class ImportTemplateModel extends CachedTable
             return null;
         }
 
+        $res["user_id"] = self::$user_id;
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
@@ -136,8 +143,14 @@ class ImportTemplateModel extends CachedTable
     protected function preUpdate($item_id, $params)
     {
         // check currency is exist
-        $currObj = $this->getItem($item_id);
-        if (!$currObj) {
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            return false;
+        }
+
+        // check user of template
+        if ($item->user_id != self::$user_id) {
+            wlog("Invalid user of item");
             return false;
         }
 
@@ -151,7 +164,8 @@ class ImportTemplateModel extends CachedTable
             $this->tbl_name,
             [
                 "name=" . qnull($res["name"]),
-                "type_id=" . qnull($res["type_id"])
+                "type_id=" . qnull($res["type_id"]),
+                "user_id=" . qnull(self::$user_id)
             ]
         );
         $row = $this->dbObj->fetchRow($qResult);
@@ -166,13 +180,6 @@ class ImportTemplateModel extends CachedTable
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
-    }
-
-
-    // Check currency is in use
-    public function isInUse($item_id)
-    {
-        return false;
     }
 
 

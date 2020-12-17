@@ -9,7 +9,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 6;
+    protected $latestVersion = 7;
     protected $dbClient = null;
 
 
@@ -130,6 +130,9 @@ class DBVersion
         if ($current < 6) {
             $current = $this->version6();
         }
+        if ($current < 7) {
+            $current = $this->version7();
+        }
 
         $this->setVersion($current);
     }
@@ -204,6 +207,7 @@ class DBVersion
         return 5;
     }
 
+
     private function version6()
     {
         $this->createImportRuleTable();
@@ -211,6 +215,27 @@ class DBVersion
 
         return 6;
     }
+
+
+    private function version7()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $res = $this->dbClient->addColumns("import_tpl", ["user_id" => "INT(11) NOT NULL"]);
+        if (!$res) {
+            throw new \Error("Fail to update 'import_tpl' table");
+        }
+
+        $res = $this->dbClient->addKeys("import_tpl", ["user_id" => "user_id"]);
+        if (!$res) {
+            throw new \Error("Fail to update 'import_tpl' table");
+        }
+
+        return 7;
+    }
+
 
     private function createCurrencyTable()
     {
@@ -426,6 +451,7 @@ class DBVersion
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
             "`name` VARCHAR(128) NOT NULL, " .
             "`type_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`user_id` INT(11) NOT NULL DEFAULT '0', " .
             "`date_col` INT(11) NOT NULL DEFAULT '0', " .
             "`comment_col` INT(11) NOT NULL DEFAULT '0', " .
             "`trans_curr_col` INT(11) NOT NULL DEFAULT '0', " .
@@ -434,7 +460,8 @@ class DBVersion
             "`account_amount_col` INT(11) NOT NULL DEFAULT '0', " .
             "`createdate` DATETIME NOT NULL, " .
             "`updatedate` DATETIME NOT NULL, " .
-            "PRIMARY KEY (`id`)",
+            "PRIMARY KEY (`id`), " .
+            "KEY `user_id` (`user_id`)",
             "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
         );
         if (!$res) {
