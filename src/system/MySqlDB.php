@@ -585,6 +585,8 @@ class MySqlDB
 
 
     // Add columns to specified table
+    // $columns expected to be an array as follows:
+    //  ["column_1" => "INT NOT NULL", "column_2" => "VARCHAR(255) NULL"]
     public function addColumns($table, $columns)
     {
         if (!$table || $table == "") {
@@ -596,6 +598,10 @@ class MySqlDB
 
         $colDefs = [];
         foreach ($columns as $columnName => $columnDef) {
+            if (!is_string($columnName)) {
+                wlog("String key for column name is expected");
+                return false;
+            }
             $colDefs[] = $columnName . " " . $columnDef;
         }
 
@@ -619,6 +625,35 @@ class MySqlDB
         }
 
         $query = "ALTER TABLE `" . $table . "` CHANGE COLUMN `" . $oldName . "` `" . $newName . "` " . $dataType . ";";
+        $this->rawQ($query);
+
+        return ($this->errno == 0);
+    }
+
+
+    // Add keys(indexes) to specified table
+    // $keys expected to be an associative array as follows:
+    //  ["key_name_1" => "field_name", "key_name_2" => ["field_1", "field_2"]]
+    public function addKeys($table, $keys)
+    {
+        if (!$table || $table == "") {
+            return false;
+        }
+        if (!is_array($keys)) {
+            return false;
+        }
+
+        $keyDefs = [];
+        foreach ($keys as $keyName => $keyDef) {
+            if (!is_string($keyName)) {
+                wlog("String key name is expected");
+                return false;
+            }
+            $keyColumns = is_array($keyDef) ? $keyDef : [$keyDef];
+            $keyDefs[] = $keyName . " (`" . implode("`, `", $keyColumns) . "`)";
+        }
+
+        $query = "ALTER TABLE `" . $table . "` ADD KEY " . implode(", ", $keyDefs) . ";";
         $this->rawQ($query);
 
         return ($this->errno == 0);
