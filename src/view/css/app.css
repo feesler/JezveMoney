@@ -737,6 +737,23 @@ select
 	background-color: #C0C0C0;
 }
 
+/* Underlined text button */
+.link-btn,
+.link-btn:visited
+{
+    padding: 4px;
+    vertical-align: baseline;
+    background: none;
+	color: #0072C6;
+}
+
+.link-btn:hover
+{
+    text-decoration: underline;
+    cursor: pointer;
+	color: #1E82CC;
+}
+
 
 /* Transaction types menu */
 .trtype-menu

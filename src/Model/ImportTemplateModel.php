@@ -17,7 +17,14 @@ class ImportTemplateModel extends CachedTable
     private static $user_id = 0;
 
     protected $tbl_name = "import_tpl";
-
+    protected $columnTypes = [
+        "accountAmountColumn" => ["title" => "Account amount"],
+        "accountCurrColumn" => ["title" => "Account currency"],
+        "transactionAmountColumn" => ["title" => "Transaction amount"],
+        "transactionCurrColumn" => ["title" => "Transaction currency"],
+        "dateColumn" => ["title" => "Date"],
+        "commentColumn" => ["title" => "Comment"]
+    ];
 
     protected function onStart()
     {
@@ -224,5 +231,11 @@ class ImportTemplateModel extends CachedTable
         }
 
         return $res;
+    }
+
+
+    public function getColumnTypes()
+    {
+        return $this->columnTypes;
     }
 }

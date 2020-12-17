@@ -89,6 +89,16 @@
     overflow-x: auto;
 }
 
+.create-tpl-btn
+{
+    margin-left: 8px;
+}
+
+.validation-block.invalid-block .tpl-name-inp
+{
+	border-color: #FF0000;
+}
+
 .raw-data-table
 {
     display: flex;
@@ -100,6 +110,10 @@
 {
     display: flex;
     flex-flow: column nowrap;
+    margin-right: 2px;
+    border: 1px solid;
+    border-bottom: 0 none;
+    border-color: #9b9b9b;
 }
 
 .raw-data-column:hover
@@ -131,7 +145,8 @@
     white-space: nowrap;
     padding: 4px;
     height: 1.25rem;
-    border: 1px solid #9b9b9b;
+    border-bottom: 1px solid;
+    border-color: #9b9b9b;
 }
 
 

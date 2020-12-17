@@ -90,18 +90,39 @@
     <div id="importControls" class="import-form__controls hidden">
         <div>
             <div>
-                <label>Import template</label>
+                <label>Import template</label><input id="createTplBtn" class="btn link-btn create-tpl-btn" type="button" value="Create">
             </div>
-            <div class="std_margin">
+            <div class="row-container std_margin">
                 <select id="templateSel">
                     <option value="0">No template selected</option>
 <?php   foreach($impTemplates as $impTpl) {     ?>
                     <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
 <?php   }   ?>
                 </select>
+                <div id="nameInpBlock" class="validation-block hidden">
+                    <label for="tplNameInp">Template name</label>
+                    <div>
+                        <input id="tplNameInp" class="tpl-name-inp" type="text">
+                    </div>
+                    <div class="invalid-feedback">Please input template name</div>
+                </div>
+                <input id="updateTplBtn" class="btn link-btn hidden" type="button" value="Update">
+                <input id="deleteTplBtn" class="btn link-btn hidden" type="button" value="Delete">
+            </div>
+            <div id="columnTypeBlock" class="row-container std_margin hidden">
+                <label for="columnSel">Column</label>
+                <select id="columnSel">
+                    <option value="0">No column selected</option>
+<?php   foreach($tplColumnTypes as $colType => $tplColumn) {     ?>
+                    <option value="<?=e($colType)?>"><?=e($tplColumn["title"])?></option>
+<?php   }   ?>
+                </select>
             </div>
         </div>
-        <div id="rawDataTable" class="import-tpl__block">
+        <div id="rawDataTable" class="import-tpl__block"></div>
+        <div id="tplControls" class="std_margin hidden">
+            <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
+            <input id="cancelTplBtn" class="btn link-btn" type="button" value="Cancel">
         </div>
         <div>
             <div>

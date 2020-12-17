@@ -27,6 +27,7 @@ class Import extends TemplateController
         $currArr = $currMod->getData();
         $persArr = $this->personMod->getData();
         $impTemplates = $this->templateModel->getData();
+        $tplColumnTypes = $this->templateModel->getColumnTypes();
 
         $rules = $this->ruleModel->getData();
         $rulesData = [];
@@ -56,6 +57,7 @@ class Import extends TemplateController
             "component/header.js",
             "component/iconlink.js",
             "component/uploader.js",
+            "component/confirmdialog.js",
             "component/importuploaddialog.js",
             "component/importtransactionitem.js",
             "view.js",

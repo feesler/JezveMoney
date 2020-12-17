@@ -7,16 +7,24 @@
  * @param {object[]} props - array of list items
  */
 function List(props) {
-    if (!Array.isArray(props)) {
-        throw new Error('Invalid account list props');
-    }
-
-    this.data = props.map(this.createItem.bind(this));
+    this.setData(props);
 }
 
 /** Static alias for List constructor */
 List.create = function (props) {
     return new List(props);
+};
+
+/**
+ * Assign new data to the list
+ * @param {Array} data - array of list items
+ */
+List.prototype.setData = function (data) {
+    if (!Array.isArray(data)) {
+        throw new Error('Invalid account list props');
+    }
+
+    this.data = data.map(this.createItem.bind(this));
 };
 
 /**
