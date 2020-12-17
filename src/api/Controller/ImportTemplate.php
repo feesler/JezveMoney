@@ -3,6 +3,7 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Item\ImportTemplateItem;
 
@@ -62,9 +63,9 @@ class ImportTemplate extends ApiController
     }
 
 
-    protected function create()
+    public function create()
     {
-        $defMsg = ERR_IMPTPL_CREATE;
+        $defMsg = Message::get(ERR_IMPTPL_CREATE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
@@ -85,9 +86,9 @@ class ImportTemplate extends ApiController
     }
 
 
-    protected function update()
+    public function update()
     {
-        $defMsg = ERR_IMPTPL_UPDATE;
+        $defMsg = Message::get(ERR_IMPTPL_UPDATE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
@@ -111,9 +112,9 @@ class ImportTemplate extends ApiController
     }
 
 
-    protected function del()
+    public function del()
     {
-        $defMsg = ERR_IMPTPL_DELETE;
+        $defMsg = Message::get(ERR_IMPTPL_DELETE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
