@@ -66,7 +66,7 @@ function andJoin($pieces)
 function brace($str)
 {
     $len = strlen($str);
-    if ($len > 1 && ($str[0] != "(" || $str[ $len - 1 ] != ")")) {
+    if ($len > 1 && ($str[0] != "(" || $str[$len - 1] != ")")) {
         return "($str)";
     }
 
@@ -92,7 +92,7 @@ function orJoin($pieces)
 function assignJoin($assignments)
 {
     if (!is_array($assignments)) {
-        $assignments = [ $assignments ];
+        $assignments = [$assignments];
     }
 
     $res = [];
@@ -676,8 +676,10 @@ class MySqlDB
         $qResult = $this->selectQ(
             "AUTO_INCREMENT",
             "INFORMATION_SCHEMA.TABLES",
-            [ "TABLE_SCHEMA=" . qnull(self::$dbname),
-                                        "TABLE_NAME=" . qnull($table)]
+            [
+                "TABLE_SCHEMA=" . qnull(self::$dbname),
+                "TABLE_NAME=" . qnull($table)
+            ]
         );
         $row = $this->fetchRow($qResult);
         if (!$row) {
