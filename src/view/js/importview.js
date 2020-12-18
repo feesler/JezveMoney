@@ -88,7 +88,7 @@ ImportView.prototype.showUploadDialog = function () {
             rulesModel: this.model.rules,
             tplModel: this.model.templates,
             mainAccount: this.model.mainAccount,
-            elem: 'fileimportfrm',
+            elem: 'uploadDialog',
             onaccountchange: this.onUploadAccChange.bind(this),
             onuploaddone: this.onImportDone.bind(this)
         });

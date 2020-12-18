@@ -63,28 +63,37 @@
     </div>
 </div>
 
-<form id="fileimportfrm" class="import-form hidden" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
-    <div class="upload-form__browser">
-        <div class="import-form__title">Select file to start</div>
-        <label id="fileBrowser" class="import-form__file">
-            <input id="fileInp" type="file">
-            <div class="import-form__overlap">
-                <button class="btn browse-btn" type="button">Browse</button>
-            </div>
-        </label>
-        <div class="import-form__filename"></div>
+<div id="uploadDialog" class="hidden">
+    <div id="fileBlock" class="upload-form__browser">
+        <div class="upload-form__inner">
+            <div class="import-form__title">Select file to start</div>
+            <form id="fileimportfrm" class="import-form" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
+                <label id="fileBrowser" class="import-form__file">
+                    <input id="fileInp" type="file">
+                    <div class="import-form__overlap">
+                        <button class="btn browse-btn" type="button">Browse</button>
+                    </div>
+                </label>
+                <div class="import-form__filename"></div>
+            </form>
 <?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
-        <div>
-            <div class="checkwrap std_margin">
-                <label>
-                    <input id="useServerCheck" type="checkbox">
-                    <span>Use address on server</span>
+            <div id="serverAddressBlock" class="row-container hidden">
+                <input id="serverAddress" type="text">
+                <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
+            </div>
+<?php   }   ?>
+            <div class="import-form__options">
+                <label class="checkwrap">
+                    <input id="isEncodeCheck" name="encode" type="checkbox" checked>
+                    <span>CP-1251 encoding</span>
                 </label>
             </div>
-            <div id="serverAddressBlock" class="hidden">
-                <input id="serverAddress" type="text">
-            </div>
         </div>
+<?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
+        <label class="checkwrap std_margin">
+            <input id="useServerCheck" type="checkbox">
+            <span>Use address on server</span>
+        </label>
 <?php   }   ?>
     </div>
     <div id="importControls" class="import-form__controls hidden">
@@ -136,19 +145,8 @@
                 </select>
             </div>
         </div>
-        <div>
-            <div>
-                <label>Options</label>
-            </div>
-            <div class="checkwrap std_margin">
-                <label>
-                    <input id="isEncodeCheck" name="encode" type="checkbox" checked>
-                    <span>CP-1251 encoding</span>
-                </label>
-            </div>
-        </div>
     </div>
-</form>
+</div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>

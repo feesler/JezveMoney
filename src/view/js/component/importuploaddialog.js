@@ -2,7 +2,8 @@
 
 /* global ge, ce, addChilds, removeChilds, copyObject, isDate, isFunction, show, extend */
 /* global selectedValue, selectByValue, urlJoin, ajax, createMessage, baseURL */
-/* global Component, Popup, Uploader, ImportTemplate, ConfirmDialog, ImportTransactionItem */
+/* global Component, Popup, ImportTemplate, ConfirmDialog, ImportTransactionItem */
+/* global ImportFileUploader */
 
 var jsonParseErrorMessage = 'Fail to parse server response';
 var templateDeleteTitle = 'Delete import template';
@@ -51,31 +52,21 @@ function ImportUploadDialog() {
     this.state = { id: this.BROWSE_STATE };
     this.importedItems = null;
 
-    this.formElem = ge('fileimportfrm');
-    if (!this.formElem) {
-        throw new Error('Failed to initialize upload file dialog');
-    }
-
-    this.formElem.addEventListener('submit', this.onFileImport.bind(this));
-    this.formElem.addEventListener('reset', this.onResetFileImport.bind(this));
+    this.uploader = new ImportFileUploader({
+        elem: 'fileBlock',
+        uploaded: this.onUploaded.bind(this)
+    });
 
     this.popup = Popup.create({
         id: 'fileupload_popup',
         title: 'Upload',
-        content: this.formElem,
-        onclose: this.resetUploadForm.bind(this),
+        content: this.elem,
+        onclose: this.onClose.bind(this),
         btn: {
             closeBtn: true
         },
         additional: 'center_only upload-popup'
     });
-
-    this.inputElem = ge('fileInp');
-    this.filenameElem = document.querySelector('.import-form .import-form__filename');
-    if (!this.inputElem || !this.filenameElem) {
-        throw new Error('Failed to initialize upload file dialog');
-    }
-    this.inputElem.addEventListener('change', this.onChangeUploadFile.bind(this));
 
     this.initialAccountSel = ge('initialAccount');
     this.templateSel = ge('templateSel');
@@ -91,7 +82,6 @@ function ImportUploadDialog() {
     this.cancelTplBtn = ge('cancelTplBtn');
     this.rawDataTable = ge('rawDataTable');
     this.importControls = ge('importControls');
-    this.isEncodeCheck = ge('isEncodeCheck');
     if (
         !this.initialAccountSel
         || !this.templateSel
@@ -107,7 +97,6 @@ function ImportUploadDialog() {
         || !this.cancelTplBtn
         || !this.rawDataTable
         || !this.importControls
-        || !this.isEncodeCheck
     ) {
         throw new Error('Failed to initialize upload file dialog');
     }
@@ -120,10 +109,6 @@ function ImportUploadDialog() {
     this.submitTplBtn.addEventListener('click', this.onSubmitTemplateClick.bind(this));
     this.cancelTplBtn.addEventListener('click', this.onCancelTemplateClick.bind(this));
     this.initialAccountSel.addEventListener('change', this.onAccountChange.bind(this));
-
-    if (isFunction(this.initDialogExtras)) {
-        this.initDialogExtras();
-    }
 }
 
 extend(ImportUploadDialog, Component);
@@ -138,12 +123,17 @@ ImportUploadDialog.prototype.hide = function () {
     this.popup.hide();
 };
 
+/** Hide dialog */
+ImportUploadDialog.prototype.onClose = function () {
+    this.uploader.reset();
+};
+
 /** Enable/disable upload button */
 ImportUploadDialog.prototype.enableUploadButton = function (val) {
     var submitBtn;
 
     if (val) {
-        submitBtn = { value: 'Import', onclick: this.onFileImport.bind(this) };
+        submitBtn = { value: 'Import' };
     } else {
         submitBtn = false;
     }
@@ -152,48 +142,6 @@ ImportUploadDialog.prototype.enableUploadButton = function (val) {
         okBtn: submitBtn,
         closeBtn: true
     });
-};
-
-/** Copy file name from file input */
-ImportUploadDialog.prototype.updateUploadFileName = function () {
-    var pos;
-    var fileName;
-
-    if (!this.inputElem) {
-        throw new Error('Upload dialog not initialized');
-    }
-    fileName = this.inputElem.value;
-    if (fileName.includes('fakepath')) {
-        pos = fileName.lastIndexOf('\\');
-        fileName = fileName.substr(pos + 1);
-    }
-
-    this.filenameElem.textContent = fileName;
-};
-
-/** Reset file upload form */
-ImportUploadDialog.prototype.resetUploadForm = function () {
-    if (!this.formElem) {
-        throw new Error('Upload dialog not initialized');
-    }
-
-    this.formElem.reset();
-};
-
-/** Upload form 'reset' event handler */
-ImportUploadDialog.prototype.onResetFileImport = function () {
-    setTimeout(this.resetImportForm.bind(this));
-};
-
-/**
- * File input 'change' event handler
- * Update displayng file name and show control of form
- */
-ImportUploadDialog.prototype.onChangeUploadFile = function () {
-    this.updateUploadFileName();
-
-    this.enableUploadButton(true);
-    show(this.importControls, true);
 };
 
 /** Initial account select 'change' event handler */
@@ -438,125 +386,73 @@ ImportUploadDialog.prototype.onDataColumnClick = function (index) {
     this.renderRawData(this.state);
 };
 
-/** Update displaying file name and hide controls of form */
-ImportUploadDialog.prototype.resetImportForm = function () {
-    this.updateUploadFileName();
-
-    this.enableUploadButton(false);
-    show(this.importControls, false);
-};
-
-/** Upload file to server */
-ImportUploadDialog.prototype.onFileImport = function (e) {
-    var file;
-    var uploader;
-    var templateId = this.templateSel.value;
-    var isEncoded = this.isEncodeCheck.checked;
-
-    e.preventDefault();
-
-    if (isFunction(this.beforeUpload) && !this.beforeUpload()) {
-        return;
-    }
-
-    file = this.inputElem.files[0];
-    if (!file) {
-        return;
-    }
-
-    uploader = new Uploader(
-        file,
-        { template: templateId, encode: isEncoded },
-        this.onImportSuccess.bind(this),
-        this.onImportError.bind(this),
-        this.onImportProgress.bind(this)
-    );
-    uploader.upload();
-};
-
-/** Import error callback */
-ImportUploadDialog.prototype.onImportError = function () {
-    this.importLoadCallback(null);
-};
-
-/** Import progress callback */
-ImportUploadDialog.prototype.onImportProgress = function () {
-};
-
 /**
  * Import data request callback
- * @param {string} response - data for import request
+ * @param {Array} data - data from uploader file
  */
-ImportUploadDialog.prototype.onImportSuccess = function (response) {
-    var defErrorMessage = 'Fail to import file';
-    var templateId = parseInt(this.templateSel.value, 10);
-    var importedDateRange = { start: 0, end: 0 };
-    var rows;
-    var reqParams;
-
+ImportUploadDialog.prototype.onUploaded = function (data) {
     try {
-        rows = JSON.parse(response);
-    } catch (e) {
-        createMessage(jsonParseErrorMessage, 'msg_error');
-        return;
-    }
-
-    try {
-        if (!rows || rows.result !== 'ok' || !Array.isArray(rows.data)) {
-            throw new Error((rows && 'msg' in rows) ? rows.msg : defErrorMessage);
+        if (!data) {
+            throw new Error('Invalid import data');
         }
 
-        if (!templateId) {
-            this.state = {
-                id: this.RAW_DATA_STATE,
-                rawData: copyObject(rows.data),
-                rowsToShow: 3
-            };
-            this.renderRawData(this.state);
-        } else {
-            this.state = { id: this.TPL_APPLIED_STATE };
-            this.importedItems = rows.data.map(function (row) {
-                var timestamp;
-                var item;
+        this.state = {
+            id: this.RAW_DATA_STATE,
+            rawData: copyObject(data),
+            rowsToShow: 3
+        };
 
-                if (!row) {
-                    throw new Error('Invalid data row object');
-                }
-
-                // Store date region of imported transactions
-                timestamp = this.timestampFromDateString(row.date);
-                if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
-                    importedDateRange.start = timestamp;
-                }
-                if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
-                    importedDateRange.end = timestamp;
-                }
-
-                item = this.mapImportItem(row);
-                if (!item) {
-                    throw new Error('Failed to map data row');
-                }
-
-                return item;
-            }, this);
-
-            reqParams = urlJoin({
-                count: 0,
-                stdate: this.formatDate(new Date(importedDateRange.start)),
-                enddate: this.formatDate(new Date(importedDateRange.end)),
-                acc_id: this.model.mainAccount.id
-            });
-
-            ajax.get({
-                url: baseURL + 'api/transaction/list/?' + reqParams,
-                callback: this.onTrCacheResult.bind(this)
-            });
-        }
+        show(this.importControls, true);
+        this.renderRawData(this.state);
     } catch (e) {
         createMessage(e.message, 'msg_error');
         this.importedItems = null;
         this.importDone();
     }
+};
+
+/** Apply import template */
+ImportUploadDialog.prototype.applyTemplate = function (data) {
+    var importedDateRange = { start: 0, end: 0 };
+    var reqParams;
+
+    this.state = { id: this.TPL_APPLIED_STATE };
+    this.importedItems = data.map(function (row) {
+        var timestamp;
+        var item;
+
+        if (!row) {
+            throw new Error('Invalid data row object');
+        }
+
+        // Store date region of imported transactions
+        timestamp = this.timestampFromDateString(row.date);
+        if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
+            importedDateRange.start = timestamp;
+        }
+        if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
+            importedDateRange.end = timestamp;
+        }
+
+        item = this.mapImportItem(row);
+        if (!item) {
+            throw new Error('Failed to map data row');
+        }
+
+        return item;
+    }, this);
+
+    reqParams = urlJoin({
+        count: 0,
+        stdate: this.formatDate(new Date(importedDateRange.start)),
+        enddate: this.formatDate(new Date(importedDateRange.end)),
+        acc_id: this.model.mainAccount.id
+    });
+
+    ajax.get({
+        url: baseURL + 'api/transaction/list/?' + reqParams,
+        callback: this.onTrCacheResult.bind(this)
+    });
 };
 
 /** Render raw data table to select/create import template */
@@ -752,7 +648,7 @@ ImportUploadDialog.prototype.onTrCacheResult = function (response) {
 
 /** Hide import file form */
 ImportUploadDialog.prototype.importDone = function () {
-    this.resetUploadForm();
+    this.uploader.reset();
 
     this.enableUploadButton(false);
     show(this.importControls, false);

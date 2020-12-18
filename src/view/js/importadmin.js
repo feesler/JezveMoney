@@ -1,29 +1,31 @@
 'use strict';
 
 /* global ge, show, ajax, urlJoin, baseURL */
-/* global ImportUploadDialog */
+/* global ImportFileUploader */
 
 /** Setup extra controls of file upload dialog */
-ImportUploadDialog.prototype.initDialogExtras = function () {
+ImportFileUploader.prototype.initUploadExtras = function () {
     this.useServerCheck = ge('useServerCheck');
     this.serverAddressBlock = ge('serverAddressBlock');
     this.serverAddressInput = ge('serverAddress');
+    this.uploadBtn = ge('serverUploadBtn');
     if (
         !this.useServerCheck
         || !this.serverAddressBlock
         || !this.serverAddressInput
+        || !this.uploadBtn
     ) {
         throw new Error('Failed to initialize extras of file upload dialog');
     }
 
+    this.formElem.addEventListener('reset', this.onResetUploadAdmin.bind(this));
     this.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
     this.serverAddressInput.addEventListener('input', this.onInputServerAddress.bind(this));
-
-    this.formElem.addEventListener('reset', this.onResetUploadAdmin.bind(this));
+    this.uploadBtn.addEventListener('click', this.uploadFromServer.bind(this));
 };
 
 /** Copy file name from server address input */
-ImportUploadDialog.prototype.updateServerFileName = function () {
+ImportFileUploader.prototype.updateServerFileName = function () {
     var pos;
     var fileName;
 
@@ -40,7 +42,8 @@ ImportUploadDialog.prototype.updateServerFileName = function () {
 };
 
 /** Server address input 'input' event handler */
-ImportUploadDialog.prototype.onInputServerAddress = function () {
+ImportFileUploader.prototype.onInputServerAddress = function () {
+/*
     var showOptions;
 
     this.updateServerFileName();
@@ -49,41 +52,43 @@ ImportUploadDialog.prototype.onInputServerAddress = function () {
 
     this.enableUploadButton(showOptions);
     show(this.importControls, showOptions);
+*/
 };
 
 /** Upload form 'reset' event handler */
-ImportUploadDialog.prototype.onResetUploadAdmin = function () {
+ImportFileUploader.prototype.onResetUploadAdmin = function () {
     setTimeout(function () {
         show(this.serverAddressBlock, false);
     }.bind(this));
 };
 
 /** Use server checkbox 'change' event handler */
-ImportUploadDialog.prototype.onCheckServer = function () {
+ImportFileUploader.prototype.onCheckServer = function () {
     var useServer = this.useServerCheck.checked;
 
     show(this.serverAddressBlock, useServer);
     if (useServer) {
-        this.updateServerFileName();
+        show(this.formElem, false);
+        show(this.serverAddressBlock, true);
     } else {
-        this.updateUploadFileName();
+        show(this.formElem, true);
+        show(this.serverAddressBlock, false);
     }
 };
 
-/** Use server checkbox 'change' event handler */
-ImportUploadDialog.prototype.beforeUpload = function () {
+/** Send file upload request using address on server */
+ImportFileUploader.prototype.uploadFromServer = function () {
     var reqObj;
     var useServer = this.useServerCheck.checked;
-    var templateId = this.templateSel.value;
     var isEncoded = this.isEncodeCheck.checked;
 
     if (!useServer) {
-        return true;
+        return;
     }
 
     reqObj = {
         filename: this.serverAddressInput.value,
-        template: templateId,
+        template: 0,
         encode: (isEncoded ? 1 : 0)
     };
 
@@ -92,6 +97,4 @@ ImportUploadDialog.prototype.beforeUpload = function () {
         data: urlJoin(reqObj),
         callback: this.onImportSuccess.bind(this)
     });
-
-    return false;
 };

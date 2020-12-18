@@ -9,6 +9,7 @@
 {
     display: flex;
     flex-flow: column nowrap;
+    align-items: center;
 }
 
 .upload-form__browser
@@ -17,6 +18,13 @@
     flex-flow: column nowrap;
     align-items: center;
     margin-bottom: 24px;
+}
+
+.upload-form__inner
+{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
 }
 
 .import-form__title
@@ -76,6 +84,41 @@
     color: #7B7B7B;
 }
 
+.import-form__options
+{
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 9px 0;
+}
+
+/* Collapsed state of import file uploader */
+.upload-form__collapsed
+{
+    align-items: normal;
+}
+
+.upload-form__collapsed .import-form__title
+{
+    display: none;
+}
+
+.upload-form__collapsed .import-form,
+.upload-form__collapsed .upload-form__inner
+{
+    flex-flow: row nowrap;
+}
+
+.upload-form__collapsed .import-form__filename
+{
+    margin-left: 8px;
+}
+
+.upload-form__collapsed .import-form__options
+{
+    margin: 0 0 0 auto;
+}
+
+/* Import template section */
 .import-form__controls
 {
     display: flex;
@@ -431,45 +474,16 @@
 /* Checkbox or radiobutton wrapper */
 .checkwrap
 {
-	height: 20px;
-	line-height: 20px;
+	display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
 }
 
-.checkwrap > label
+.checkwrap > span
 {
-	display: inline-flex;
-	flex-flow: row nowrap;
 	white-space: nowrap;
 	font-size: 14px;
 }
-
-
-.checkwrap.inputwrap
-{
-	height: 30px;
-	line-height: 30px;
-}
-
-
-.checkwrap input[type="checkbox"],
-.checkwrap input[type="radio"],
-.checkwrap > label,
-.checkwrap > label > span
-{
-	height: 20px;
-	line-height: 20px;
-}
-
-
-.checkwrap > label > input[type="checkbox"],
-.checkwrap > label > input[type="radio"],
-.checkwrap > label > span
-{
-	height: 20px;
-	line-height: 20px;
-	padding: 0 5px;
-}
-
 
 .checkwrap > input[type="checkbox"],
 .checkwrap > input[type="radio"]
