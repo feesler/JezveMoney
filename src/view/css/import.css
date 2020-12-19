@@ -38,7 +38,6 @@
     position: relative;
     height: 30px;
     text-align: center;
-    overflow: hidden;
 }
 
 .import-form__file > input[type="file"]
@@ -112,6 +111,7 @@
 {
     overflow: hidden;
     margin-right: 20px;
+    align-items: baseline;
 }
 
 .upload-form__collapsed .import-form__filename
@@ -128,6 +128,14 @@
 }
 
 /* Import template section */
+/* Header */
+.import-tpl-header
+{
+    display: flex;
+    flex-flow: row;
+    align-items: baseline;
+}
+
 .import-tpl-header label
 {
     font-size: 24px;
@@ -147,7 +155,6 @@
 {
     text-align: center;
     padding: 12px 0;
-    background-color: #292929;
     color: #B0B0B0;
 }
 
@@ -163,6 +170,7 @@
     display: flex;
     flex-flow: column nowrap;
     margin-right: 18px;
+    align-items: baseline;
 }
 
 .tpl-form-field label
@@ -174,6 +182,7 @@
 .tpl-form-field select
 {
     height: 34px;
+    font-size: 14px;
     padding: 2px 5px;
     box-sizing: border-box;
 }
@@ -232,6 +241,14 @@
     height: 1.25rem;
     border-bottom: 1px solid;
     border-color: #9b9b9b;
+}
+
+/* Carete/update template controls: Save, cancel buttons */
+.import-tpl-controls
+{
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: baseline;
 }
 
 /* Transactions list */

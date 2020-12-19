@@ -133,9 +133,9 @@
         </div>
         <div id="loadingIndicator" class="import-tpl__loading hidden">Loading...</div>
         <div id="rawDataTable" class="import-tpl__block"></div>
-        <div id="tplControls" class="std_margin hidden">
+        <div id="tplControls" class="import-tpl-controls std_margin hidden">
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
-            <input id="cancelTplBtn" class="btn link-btn" type="button" value="Cancel">
+            <input id="cancelTplBtn" class="btn link-btn cancel-btn" type="button" value="Cancel">
         </div>
     </div>
     <div id="initialAccField" class="tpl-form-field hidden">
