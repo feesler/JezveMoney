@@ -96,36 +96,39 @@
         </label>
 <?php   }   ?>
     </div>
-    <div id="importControls" class="import-form__controls hidden">
+
+    <div id="templateBlock" class="import-form__controls hidden">
         <div>
-            <div>
-                <label>Import template</label><input id="createTplBtn" class="btn link-btn create-tpl-btn" type="button" value="Create">
+            <div class="import-tpl-header">
+                <label>Import template</label>
+                <input id="createTplBtn" class="btn link-btn" type="button" value="Create">
             </div>
             <div class="row-container std_margin">
-                <select id="templateSel">
-                    <option value="0">No template selected</option>
+                <div id="tplField" class="tpl-form-field">
+                    <select id="templateSel">
+                        <option value="0">No template selected</option>
 <?php   foreach($impTemplates as $impTpl) {     ?>
-                    <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
+                        <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
 <?php   }   ?>
-                </select>
-                <div id="nameInpBlock" class="validation-block hidden">
+                    </select>
+                </div>
+                <div id="nameField" class="tpl-form-field validation-block hidden">
                     <label for="tplNameInp">Template name</label>
-                    <div>
-                        <input id="tplNameInp" class="tpl-name-inp" type="text">
-                    </div>
+                    <input id="tplNameInp" class="tpl-name-inp" type="text">
                     <div class="invalid-feedback">Please input template name</div>
                 </div>
                 <input id="updateTplBtn" class="btn link-btn hidden" type="button" value="Update">
                 <input id="deleteTplBtn" class="btn link-btn hidden" type="button" value="Delete">
-            </div>
-            <div id="columnTypeBlock" class="row-container std_margin hidden">
-                <label for="columnSel">Column</label>
-                <select id="columnSel">
-                    <option value="0">No column selected</option>
+                <div id="columnField" class="tpl-form-field validation-block hidden">
+                    <label for="columnSel">Column</label>
+                    <select id="columnSel">
+                        <option value="0">No column selected</option>
 <?php   foreach($tplColumnTypes as $colType => $tplColumn) {     ?>
-                    <option value="<?=e($colType)?>"><?=e($tplColumn["title"])?></option>
+                        <option value="<?=e($colType)?>"><?=e($tplColumn["title"])?></option>
 <?php   }   ?>
-                </select>
+                    </select>
+                    <div id="columnFeedback" class="invalid-feedback"></div>
+                </div>
             </div>
         </div>
         <div id="rawDataTable" class="import-tpl__block"></div>

@@ -60,6 +60,7 @@ class Import extends TemplateController
             "component/confirmdialog.js",
             "component/importuploaddialog.js",
             "component/importfileuploader.js",
+            "component/importtemplatemanager.js",
             "component/importtransactionitem.js",
             "view.js",
             "importview.js"

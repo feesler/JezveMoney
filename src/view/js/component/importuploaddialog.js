@@ -1,13 +1,9 @@
 'use strict';
 
-/* global ge, ce, addChilds, removeChilds, copyObject, isDate, isFunction, show, extend */
-/* global selectedValue, selectByValue, urlJoin, ajax, createMessage, baseURL */
-/* global Component, Popup, ImportTemplate, ConfirmDialog, ImportTransactionItem */
-/* global ImportFileUploader */
-
-var jsonParseErrorMessage = 'Fail to parse server response';
-var templateDeleteTitle = 'Delete import template';
-var templateDeleteMsg = 'Are you sure to delete this import template?';
+/* global ge, isDate, isFunction, show, extend */
+/* global selectedValue, urlJoin, ajax, createMessage, baseURL */
+/* global Component, Popup, ImportTransactionItem */
+/* global ImportFileUploader, ImportTemplateManager */
 
 /**
  * ImportUploadDialog component constructor
@@ -34,7 +30,6 @@ function ImportUploadDialog() {
         accounts: this.props.accountModel,
         persons: this.props.personModel,
         rules: this.props.rulesModel,
-        templates: this.props.tplModel,
         mainAccount: this.props.mainAccount
     };
 
@@ -44,17 +39,17 @@ function ImportUploadDialog() {
     this.uploadDoneHandler = this.props.onuploaddone;
     this.accountChangeHandler = this.props.onaccountchange;
 
-    this.BROWSE_STATE = 1;
-    this.RAW_DATA_STATE = 2;
-    this.TPL_UPDATE_STATE = 3;
-    this.TPL_APPLIED_STATE = 4;
-
-    this.state = { id: this.BROWSE_STATE };
     this.importedItems = null;
 
     this.uploader = new ImportFileUploader({
         elem: 'fileBlock',
+        parent: this.parent,
         uploaded: this.onUploaded.bind(this)
+    });
+    this.tplManager = new ImportTemplateManager({
+        elem: 'templateBlock',
+        parent: this.parent,
+        tplModel: this.props.tplModel
     });
 
     this.popup = Popup.create({
@@ -69,45 +64,12 @@ function ImportUploadDialog() {
     });
 
     this.initialAccountSel = ge('initialAccount');
-    this.templateSel = ge('templateSel');
-    this.nameInpBlock = ge('nameInpBlock');
-    this.tplNameInp = ge('tplNameInp');
-    this.createTplBtn = ge('createTplBtn');
-    this.updateTplBtn = ge('updateTplBtn');
-    this.deleteTplBtn = ge('deleteTplBtn');
-    this.columnTypeBlock = ge('columnTypeBlock');
-    this.columnSel = ge('columnSel');
-    this.tplControls = ge('tplControls');
-    this.submitTplBtn = ge('submitTplBtn');
-    this.cancelTplBtn = ge('cancelTplBtn');
-    this.rawDataTable = ge('rawDataTable');
-    this.importControls = ge('importControls');
     if (
         !this.initialAccountSel
-        || !this.templateSel
-        || !this.nameInpBlock
-        || !this.tplNameInp
-        || !this.createTplBtn
-        || !this.updateTplBtn
-        || !this.deleteTplBtn
-        || !this.columnTypeBlock
-        || !this.columnSel
-        || !this.tplControls
-        || !this.submitTplBtn
-        || !this.cancelTplBtn
-        || !this.rawDataTable
-        || !this.importControls
     ) {
         throw new Error('Failed to initialize upload file dialog');
     }
 
-    this.templateSel.addEventListener('change', this.onTemplateChange.bind(this));
-    this.tplNameInp.addEventListener('input', this.onTemplateNameInput.bind(this));
-    this.createTplBtn.addEventListener('click', this.onCreateTemplateClick.bind(this));
-    this.updateTplBtn.addEventListener('click', this.onUpdateTemplateClick.bind(this));
-    this.deleteTplBtn.addEventListener('click', this.onDeleteTemplateClick.bind(this));
-    this.submitTplBtn.addEventListener('click', this.onSubmitTemplateClick.bind(this));
-    this.cancelTplBtn.addEventListener('click', this.onCancelTemplateClick.bind(this));
     this.initialAccountSel.addEventListener('change', this.onAccountChange.bind(this));
 }
 
@@ -159,233 +121,6 @@ ImportUploadDialog.prototype.onAccountChange = function () {
     }
 };
 
-/** Import template select 'change' event handler */
-ImportUploadDialog.prototype.onTemplateChange = function () {
-    var value;
-    var template;
-
-    if (this.state.id !== this.RAW_DATA_STATE) {
-        return;
-    }
-
-    value = selectedValue(this.templateSel);
-    template = this.model.templates.getItem(value);
-    this.state.template = template;
-
-    this.renderRawData(this.state);
-};
-
-/** Template name field 'input' event handler */
-ImportUploadDialog.prototype.onTemplateNameInput = function () {
-    this.state.template.name = this.tplNameInp.value;
-
-    this.parent.clearBlockValidation(this.nameInpBlock);
-};
-
-/** Create template button 'click' event handler */
-ImportUploadDialog.prototype.onCreateTemplateClick = function () {
-    this.state.id = this.TPL_UPDATE_STATE;
-    this.state.template = new ImportTemplate({
-        name: '',
-        type_id: 0
-    });
-
-    this.renderRawData(this.state);
-};
-
-/** Update template button 'click' event handler */
-ImportUploadDialog.prototype.onUpdateTemplateClick = function () {
-    this.state.id = this.TPL_UPDATE_STATE;
-
-    this.renderRawData(this.state);
-};
-
-/** Delete template button 'click' event handler */
-ImportUploadDialog.prototype.onDeleteTemplateClick = function () {
-    var requestObj = {
-        id: this.state.template.id
-    };
-
-    ConfirmDialog.create({
-        id: 'tpl_delete_warning',
-        title: templateDeleteTitle,
-        content: templateDeleteMsg,
-        onconfirm: function () {
-            ajax.post({
-                url: baseURL + 'api/importtpl/delete',
-                data: JSON.stringify(requestObj),
-                headers: { 'Content-Type': 'application/json' },
-                callback: this.onDeleteTemplateResult.bind(this)
-            });
-        }.bind(this)
-    });
-};
-
-/** Delete template API request result handler */
-ImportUploadDialog.prototype.onDeleteTemplateResult = function (response) {
-    var defErrorMessage = 'Fail to delete import template';
-    var jsondata;
-
-    try {
-        jsondata = JSON.parse(response);
-    } catch (e) {
-        createMessage(jsonParseErrorMessage, 'msg_error');
-        return;
-    }
-
-    try {
-        if (!jsondata || jsondata.result !== 'ok') {
-            throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
-        }
-
-        this.state.id = this.RAW_DATA_STATE;
-        this.requestTemplatesList();
-    } catch (e) {
-        createMessage(e.message, 'msg_error');
-    }
-};
-
-/** Save template button 'click' event handler */
-ImportUploadDialog.prototype.onSubmitTemplateClick = function () {
-    var reqURL = baseURL + 'api/importtpl/';
-    var requestObj = {
-        name: this.state.template.name,
-        type_id: this.state.template.type_id,
-        date_col: this.state.template.dateColumn,
-        comment_col: this.state.template.commentColumn,
-        trans_curr_col: this.state.template.transactionCurrColumn,
-        trans_amount_col: this.state.template.transactionAmountColumn,
-        account_curr_col: this.state.template.accountCurrColumn,
-        account_amount_col: this.state.template.accountAmountColumn
-    };
-
-    if (!this.state.template.name.length) {
-        this.parent.invalidateBlock(this.nameInpBlock);
-        return;
-    }
-
-    if (this.state.template.id) {
-        reqURL += 'update';
-        requestObj.id = this.state.template.id;
-    } else {
-        reqURL += 'create';
-    }
-
-    ajax.post({
-        url: reqURL,
-        data: JSON.stringify(requestObj),
-        headers: { 'Content-Type': 'application/json' },
-        callback: this.onSubmitTemplateResult.bind(this)
-    });
-};
-
-/** Cancel template button 'click' event handler */
-ImportUploadDialog.prototype.onSubmitTemplateResult = function (response) {
-    var defErrorMessage = 'Fail to submit import template';
-    var jsondata;
-
-    try {
-        jsondata = JSON.parse(response);
-    } catch (e) {
-        createMessage(jsonParseErrorMessage, 'msg_error');
-        return;
-    }
-
-    try {
-        if (!jsondata || jsondata.result !== 'ok') {
-            throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
-        }
-
-        this.state.id = this.RAW_DATA_STATE;
-        this.requestTemplatesList();
-    } catch (e) {
-        createMessage(e.message, 'msg_error');
-    }
-};
-
-/** Send API request to obain list of import templates */
-ImportUploadDialog.prototype.requestTemplatesList = function () {
-    ajax.get({
-        url: baseURL + 'api/importtpl/list/',
-        callback: this.onTemplateListResult.bind(this)
-    });
-};
-
-/** Send API request to obain list of import templates */
-ImportUploadDialog.prototype.onTemplateListResult = function (response) {
-    var defErrorMessage = 'Fail to read list of import templates';
-    var jsondata;
-
-    try {
-        jsondata = JSON.parse(response);
-    } catch (e) {
-        createMessage(jsonParseErrorMessage, 'msg_error');
-        return;
-    }
-
-    try {
-        if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-            throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
-        }
-
-        this.model.templates.setData(jsondata.data);
-        this.renderTemplateSelect();
-        this.renderRawData(this.state);
-    } catch (e) {
-        createMessage(e.message, 'msg_error');
-    }
-};
-
-/** Render import template select element according to the data in model */
-ImportUploadDialog.prototype.renderTemplateSelect = function () {
-    var dataOptions;
-    var noItemOption;
-
-    removeChilds(this.templateSel);
-
-    noItemOption = ce('option', { value: 0, textContent: 'No template selected' });
-    this.templateSel.appendChild(noItemOption);
-
-    dataOptions = this.model.templates.data.map(function (item) {
-        return ce('option', { value: item.id, textContent: item.name });
-    });
-    addChilds(this.templateSel, dataOptions);
-
-    selectByValue(this.templateSel, 0);
-    this.state.template = null;
-};
-
-/** Cancel template button 'click' event handler */
-ImportUploadDialog.prototype.onCancelTemplateClick = function () {
-    var value;
-    var template;
-
-    if (this.state.id !== this.TPL_UPDATE_STATE) {
-        return;
-    }
-
-    this.state.id = this.RAW_DATA_STATE;
-    // Restore previously selected template
-    value = selectedValue(this.templateSel);
-    template = this.model.templates.getItem(value);
-    this.state.template = template;
-    this.renderRawData(this.state);
-};
-
-/** Raw data table column 'click' event handler */
-ImportUploadDialog.prototype.onDataColumnClick = function (index) {
-    var value;
-
-    if (this.state.id !== this.TPL_UPDATE_STATE) {
-        return;
-    }
-
-    value = selectedValue(this.columnSel);
-    this.state.template[value] = index + 1;
-
-    this.renderRawData(this.state);
-};
-
 /**
  * Import data request callback
  * @param {Array} data - data from uploader file
@@ -396,14 +131,8 @@ ImportUploadDialog.prototype.onUploaded = function (data) {
             throw new Error('Invalid import data');
         }
 
-        this.state = {
-            id: this.RAW_DATA_STATE,
-            rawData: copyObject(data),
-            rowsToShow: 3
-        };
-
-        show(this.importControls, true);
-        this.renderRawData(this.state);
+        this.tplManager.setRawData(data);
+        this.tplManager.show();
     } catch (e) {
         createMessage(e.message, 'msg_error');
         this.importedItems = null;
@@ -453,73 +182,6 @@ ImportUploadDialog.prototype.applyTemplate = function (data) {
         url: baseURL + 'api/transaction/list/?' + reqParams,
         callback: this.onTrCacheResult.bind(this)
     });
-};
-
-/** Render raw data table to select/create import template */
-ImportUploadDialog.prototype.renderRawData = function (state) {
-    var headerRow;
-    var dataRows;
-    var colElems;
-    var tableElem;
-
-    if (this.state.id === this.RAW_DATA_STATE) {
-        show(this.templateSel, true);
-        show(this.nameInpBlock, false);
-        show(this.columnTypeBlock, false);
-
-        show(this.createTplBtn, true);
-        show(this.updateTplBtn, !!state.template);
-        show(this.deleteTplBtn, !!state.template);
-
-        show(this.tplControls, false);
-    } else if (this.state.id === this.TPL_UPDATE_STATE) {
-        show(this.templateSel, false);
-        show(this.nameInpBlock, true);
-        show(this.columnTypeBlock, true);
-
-        show(this.createTplBtn, false);
-        show(this.updateTplBtn, false);
-        show(this.deleteTplBtn, false);
-
-        show(this.tplControls, true);
-    }
-
-    headerRow = state.rawData.slice(0, 1)[0];
-    dataRows = state.rawData.slice(1, state.rowsToShow);
-
-    this.tplNameInp.value = (state.template) ? state.template.name : '';
-
-    colElems = headerRow.map(function (title, columnInd) {
-        var columnInfo;
-        var tplElem;
-        var headElem;
-        var columnData;
-
-        tplElem = ce('div', { className: 'raw-data-column__tpl' });
-        if (state.template) {
-            columnInfo = state.template.getColumnByIndex(columnInd + 1);
-            if (columnInfo) {
-                tplElem.textContent = columnInfo.title;
-            }
-        }
-
-        headElem = ce('div', { className: 'raw-data-column__header', textContent: title });
-        columnData = dataRows.map(function (row) {
-            return ce('div', { className: 'raw-data-column__cell', textContent: row[columnInd] });
-        });
-
-        return ce(
-            'div',
-            { className: 'raw-data-column' },
-            [tplElem, headElem].concat(columnData),
-            { click: this.onDataColumnClick.bind(this, columnInd) }
-        );
-    }, this);
-
-    tableElem = ce('div', { className: 'raw-data-table' }, colElems);
-
-    removeChilds(this.rawDataTable);
-    this.rawDataTable.appendChild(tableElem);
 };
 
 /**

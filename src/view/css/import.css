@@ -119,6 +119,13 @@
 }
 
 /* Import template section */
+.import-tpl-header label
+{
+    font-size: 24px;
+    font-weight: 100;
+    margin-right: 18px;
+}
+
 .import-form__controls
 {
     display: flex;
@@ -126,15 +133,31 @@
     align-items: stretch;
 }
 
-/* Import template and raw data table block */
+/* Import template form and raw data table block */
 .import-tpl__block
 {
     overflow-x: auto;
 }
 
-.create-tpl-btn
+/* Template form fields: name, column type & etc. */
+.tpl-form-field
 {
-    margin-left: 8px;
+    display: flex;
+    flex-flow: column nowrap;
+    margin-right: 18px;
+}
+
+.tpl-form-field label
+{
+    font-size: 14px;
+}
+
+.tpl-form-field input,
+.tpl-form-field select
+{
+    height: 34px;
+    padding: 2px 5px;
+    box-sizing: border-box;
 }
 
 .validation-block.invalid-block .tpl-name-inp
@@ -142,6 +165,7 @@
 	border-color: #FF0000;
 }
 
+/* Raw data table */
 .raw-data-table
 {
     display: flex;
@@ -191,7 +215,6 @@
     border-bottom: 1px solid;
     border-color: #9b9b9b;
 }
-
 
 /* Transactions list */
 /* Header */

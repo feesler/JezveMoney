@@ -20,39 +20,7 @@ ImportFileUploader.prototype.initUploadExtras = function () {
 
     this.formElem.addEventListener('reset', this.onResetUploadAdmin.bind(this));
     this.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
-    this.serverAddressInput.addEventListener('input', this.onInputServerAddress.bind(this));
     this.uploadBtn.addEventListener('click', this.uploadFromServer.bind(this));
-};
-
-/** Copy file name from server address input */
-ImportFileUploader.prototype.updateServerFileName = function () {
-    var pos;
-    var fileName;
-
-    if (!this.serverAddressInput) {
-        throw new Error('Upload dialog not initialized');
-    }
-    fileName = this.serverAddressInput.value;
-    pos = fileName.lastIndexOf('/');
-    if (pos !== -1) {
-        fileName = fileName.substr(pos + 1);
-    }
-
-    this.filenameElem.textContent = fileName;
-};
-
-/** Server address input 'input' event handler */
-ImportFileUploader.prototype.onInputServerAddress = function () {
-/*
-    var showOptions;
-
-    this.updateServerFileName();
-
-    showOptions = this.filenameElem.textContent.length > 0;
-
-    this.enableUploadButton(showOptions);
-    show(this.importControls, showOptions);
-*/
 };
 
 /** Upload form 'reset' event handler */
@@ -91,6 +59,13 @@ ImportFileUploader.prototype.uploadFromServer = function () {
         template: 0,
         encode: (isEncoded ? 1 : 0)
     };
+
+    if (!reqObj.filename.length) {
+        return;
+    }
+
+    this.state.collapsed = true;
+    this.render(this.state);
 
     ajax.post({
         url: baseURL + 'api/import/upload/',
