@@ -86,6 +86,7 @@ ImportTemplateManager.prototype.reset = function () {
         rowsToShow: 3
     };
     this.render(this.state);
+    this.hide();
 };
 
 /** Show/hide loading indication */
