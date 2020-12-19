@@ -53,7 +53,13 @@ ImportFileUploader.prototype.getUploadFileName = function () {
  * Update displayng file name and show control of form
  */
 ImportFileUploader.prototype.onChangeUploadFile = function () {
-    this.state.fileName = this.getUploadFileName();
+    var value = this.getUploadFileName();
+
+    if (!value || !value.length) {
+        return;
+    }
+
+    this.state.fileName = value;
     this.state.collapsed = true;
     this.render(this.state);
 
