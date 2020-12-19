@@ -142,6 +142,15 @@
     align-items: stretch;
 }
 
+/* Raw data loading indicator */
+.import-tpl__loading
+{
+    text-align: center;
+    padding: 12px 0;
+    background-color: #292929;
+    color: #B0B0B0;
+}
+
 /* Import template form and raw data table block */
 .import-tpl__block
 {

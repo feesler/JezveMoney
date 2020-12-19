@@ -44,6 +44,7 @@ function ImportUploadDialog() {
     this.uploader = new ImportFileUploader({
         elem: 'fileBlock',
         parent: this.parent,
+        uploadStarted: this.onUploadStart.bind(this),
         uploaded: this.onUploaded.bind(this)
     });
     this.tplManager = new ImportTemplateManager({
@@ -88,6 +89,7 @@ ImportUploadDialog.prototype.hide = function () {
 /** Hide dialog */
 ImportUploadDialog.prototype.onClose = function () {
     this.uploader.reset();
+    this.tplManager.reset();
 };
 
 /** Enable/disable upload button */
@@ -125,6 +127,15 @@ ImportUploadDialog.prototype.onAccountChange = function () {
  * Import data request callback
  * @param {Array} data - data from uploader file
  */
+ImportUploadDialog.prototype.onUploadStart = function () {
+    this.tplManager.setLoading(true);
+    this.tplManager.show();
+};
+
+/**
+ * Import data request callback
+ * @param {Array} data - data from uploader file
+ */
 ImportUploadDialog.prototype.onUploaded = function (data) {
     try {
         if (!data) {
@@ -132,7 +143,6 @@ ImportUploadDialog.prototype.onUploaded = function (data) {
         }
 
         this.tplManager.setRawData(data);
-        this.tplManager.show();
     } catch (e) {
         createMessage(e.message, 'msg_error');
         this.importedItems = null;

@@ -11,6 +11,7 @@
 function ImportFileUploader() {
     ImportFileUploader.parent.constructor.apply(this, arguments);
 
+    this.uploadStartHandler = this.props.uploadStarted;
     this.uploadedHandler = this.props.uploaded;
     this.state = {
         fileName: null,
@@ -133,6 +134,10 @@ ImportFileUploader.prototype.uploadFile = function () {
         this.onImportProgress.bind(this)
     );
     uploader.upload();
+
+    if (isFunction(this.uploadStartHandler)) {
+        this.uploadStartHandler();
+    }
 };
 
 /** Render component */

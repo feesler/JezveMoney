@@ -98,7 +98,7 @@
     </div>
 
     <div id="templateBlock" class="import-form__controls hidden">
-        <div>
+        <div id="tplHeading" class="hidden">
             <div class="import-tpl-header">
                 <label>Import template</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create">
@@ -106,7 +106,7 @@
             <div class="row-container std_margin">
                 <div id="tplField" class="tpl-form-field">
                     <select id="templateSel">
-                        <option value="0">No template selected</option>
+                        <option value="0">Select template</option>
 <?php   foreach($impTemplates as $impTpl) {     ?>
                         <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
 <?php   }   ?>
@@ -131,23 +131,20 @@
                 </div>
             </div>
         </div>
+        <div id="loadingIndicator" class="import-tpl__loading hidden">Loading...</div>
         <div id="rawDataTable" class="import-tpl__block"></div>
         <div id="tplControls" class="std_margin hidden">
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
             <input id="cancelTplBtn" class="btn link-btn" type="button" value="Cancel">
         </div>
-        <div>
-            <div>
-                <label>Main account</label>
-            </div>
-            <div class="std_margin">
-                <select id="initialAccount">
+    </div>
+    <div id="initialAccField" class="tpl-form-field hidden">
+        <label>Main account</label>
+        <select id="initialAccount">
 <?php foreach($accArr as $accObj) {	?>
-                    <option value="<?=e($accObj->id)?>"><?=e($accObj->name)?></option>
+            <option value="<?=e($accObj->id)?>"><?=e($accObj->name)?></option>
 <?php }	?>
-                </select>
-            </div>
-        </div>
+        </select>
     </div>
 </div>
 

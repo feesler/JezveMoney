@@ -25,17 +25,12 @@ function ImportTemplateManager() {
     this.templateDeleteTitle = 'Delete import template';
     this.templateDeleteMsg = 'Are you sure to delete this import template?';
 
-    this.BROWSE_STATE = 1;
+    this.LOADING_STATE = 1;
     this.RAW_DATA_STATE = 2;
     this.TPL_UPDATE_STATE = 3;
     this.TPL_APPLIED_STATE = 4;
 
-    this.state = {
-        id: this.RAW_DATA_STATE,
-        rawData: null,
-        rowsToShow: 3
-    };
-
+    this.tplHeading = ge('tplHeading');
     this.templateSel = ge('templateSel');
     this.tplField = ge('tplField');
     this.nameField = ge('nameField');
@@ -48,9 +43,11 @@ function ImportTemplateManager() {
     this.tplControls = ge('tplControls');
     this.submitTplBtn = ge('submitTplBtn');
     this.cancelTplBtn = ge('cancelTplBtn');
+    this.loadingIndicator = ge('loadingIndicator');
     this.rawDataTable = ge('rawDataTable');
     if (
-        !this.templateSel
+        !this.tplHeading
+        || !this.templateSel
         || !this.tplField
         || !this.nameField
         || !this.tplNameInp
@@ -62,6 +59,7 @@ function ImportTemplateManager() {
         || !this.tplControls
         || !this.submitTplBtn
         || !this.cancelTplBtn
+        || !this.loadingIndicator
         || !this.rawDataTable
     ) {
         throw new Error('Failed to initialize upload file dialog');
@@ -74,12 +72,31 @@ function ImportTemplateManager() {
     this.deleteTplBtn.addEventListener('click', this.onDeleteTemplateClick.bind(this));
     this.submitTplBtn.addEventListener('click', this.onSubmitTemplateClick.bind(this));
     this.cancelTplBtn.addEventListener('click', this.onCancelTemplateClick.bind(this));
+
+    this.reset();
 }
 
 extend(ImportTemplateManager, Component);
 
-/** Import template select 'change' event handler */
+/** Reset component state */
+ImportTemplateManager.prototype.reset = function () {
+    this.state = {
+        id: this.LOADING_STATE,
+        rawData: null,
+        rowsToShow: 3
+    };
+    this.render(this.state);
+};
+
+/** Show/hide loading indication */
+ImportTemplateManager.prototype.setLoading = function () {
+    this.state.id = this.LOADING_STATE;
+    this.render(this.state);
+};
+
+/** Copy specified data to component */
 ImportTemplateManager.prototype.setRawData = function (data) {
+    this.state.id = this.RAW_DATA_STATE;
     this.state.rawData = copyObject(data);
     this.render(this.state);
 };
@@ -318,26 +335,32 @@ ImportTemplateManager.prototype.render = function (state) {
     var colElems;
     var tableElem;
 
-    if (state.id === this.RAW_DATA_STATE) {
+    if (state.id === this.LOADING_STATE) {
+        show(this.loadingIndicator, true);
+        show(this.rawDataTable, false);
+        show(this.tplControls, false);
+    } else if (state.id === this.RAW_DATA_STATE) {
+        show(this.tplHeading, true);
+        show(this.loadingIndicator, false);
+        show(this.rawDataTable, true);
         show(this.tplField, true);
         show(this.nameField, false);
         this.parent.clearBlockValidation(this.nameField);
         show(this.columnField, false);
-
         show(this.createTplBtn, true);
         show(this.updateTplBtn, !!state.template);
         show(this.deleteTplBtn, !!state.template);
-
         show(this.tplControls, false);
     } else if (state.id === this.TPL_UPDATE_STATE) {
+        show(this.tplHeading, true);
+        show(this.loadingIndicator, false);
+        show(this.rawDataTable, true);
         show(this.tplField, false);
         show(this.nameField, true);
         show(this.columnField, true);
-
         show(this.createTplBtn, false);
         show(this.updateTplBtn, false);
         show(this.deleteTplBtn, false);
-
         show(this.tplControls, true);
     }
 
