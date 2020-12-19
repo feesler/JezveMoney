@@ -108,9 +108,18 @@
     flex-flow: row nowrap;
 }
 
+.upload-form__collapsed .import-form
+{
+    overflow: hidden;
+    margin-right: 20px;
+}
+
 .upload-form__collapsed .import-form__filename
 {
     margin-left: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .upload-form__collapsed .import-form__options
