@@ -282,6 +282,14 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
 ImportTemplateManager.prototype.renderTemplateSelect = function () {
     var dataOptions;
     var noItemOption;
+    var selectedTemplate = null;
+
+    // Find template with same name as currently selected
+    if (this.state.template) {
+        selectedTemplate = this.model.template.data.find(function(item){
+            return (item.name === this.state.template.name);
+        }, this);
+    }
 
     removeChilds(this.templateSel);
 
@@ -293,8 +301,9 @@ ImportTemplateManager.prototype.renderTemplateSelect = function () {
     });
     addChilds(this.templateSel, dataOptions);
 
-    selectByValue(this.templateSel, 0);
-    this.state.template = null;
+    // Restore selection
+    selectByValue(this.templateSel, (selectedTemplate) ? selectedTemplate.id : 0);
+    this.state.template = selectedTemplate;
 };
 
 /** Cancel template button 'click' event handler */
