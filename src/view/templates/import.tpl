@@ -65,8 +65,10 @@
 
 <div id="uploadDialog" class="hidden">
     <div id="fileBlock" class="upload-form__browser">
+        <div class="upload-form__header">
+            <label>Select file</label>
+        </div>
         <div class="upload-form__inner">
-            <div class="import-form__title">Select file to start</div>
             <form id="fileimportfrm" class="import-form" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
                 <label id="fileBrowser" class="import-form__file">
                     <input id="fileInp" type="file">
@@ -100,9 +102,10 @@
     <div id="templateBlock" class="import-form__controls hidden">
         <div id="tplHeading" class="hidden">
             <div class="import-tpl-header">
-                <label>Import template</label>
-                <input id="createTplBtn" class="btn link-btn" type="button" value="Create">
+                <label>Convert</label>
+                <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
             </div>
+            <label id="tplStateLbl" class="hidden">Create template</label>
             <div class="row-container std_margin">
                 <div id="tplField" class="tpl-form-field">
                     <select id="templateSel">
@@ -113,7 +116,7 @@
                     </select>
                 </div>
                 <div id="nameField" class="tpl-form-field validation-block hidden">
-                    <label for="tplNameInp">Template name</label>
+                    <label for="tplNameInp">Name</label>
                     <input id="tplNameInp" class="tpl-name-inp" type="text">
                     <div class="invalid-feedback">Please input template name</div>
                 </div>
@@ -122,7 +125,6 @@
                 <div id="columnField" class="tpl-form-field validation-block hidden">
                     <label for="columnSel">Column</label>
                     <select id="columnSel">
-                        <option value="0">No column selected</option>
 <?php   foreach($tplColumnTypes as $colType => $tplColumn) {     ?>
                         <option value="<?=e($colType)?>"><?=e($tplColumn["title"])?></option>
 <?php   }   ?>
@@ -132,6 +134,7 @@
             </div>
         </div>
         <div id="loadingIndicator" class="import-tpl__loading hidden">Loading...</div>
+        <div id="tableDescr" class="import-tpl__title">Column map</div>
         <div id="rawDataTable" class="import-tpl__block"></div>
         <div id="tplControls" class="import-tpl-controls std_margin hidden">
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">

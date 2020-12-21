@@ -31,6 +31,7 @@ function ImportTemplateManager() {
     this.TPL_APPLIED_STATE = 4;
 
     this.tplHeading = ge('tplHeading');
+    this.tplStateLbl = ge('tplStateLbl');
     this.templateSel = ge('templateSel');
     this.tplField = ge('tplField');
     this.nameField = ge('nameField');
@@ -44,9 +45,11 @@ function ImportTemplateManager() {
     this.submitTplBtn = ge('submitTplBtn');
     this.cancelTplBtn = ge('cancelTplBtn');
     this.loadingIndicator = ge('loadingIndicator');
+    this.tableDescr = ge('tableDescr');
     this.rawDataTable = ge('rawDataTable');
     if (
         !this.tplHeading
+        || !this.tplStateLbl
         || !this.templateSel
         || !this.tplField
         || !this.nameField
@@ -60,6 +63,7 @@ function ImportTemplateManager() {
         || !this.submitTplBtn
         || !this.cancelTplBtn
         || !this.loadingIndicator
+        || !this.tableDescr
         || !this.rawDataTable
     ) {
         throw new Error('Failed to initialize upload file dialog');
@@ -97,9 +101,14 @@ ImportTemplateManager.prototype.setLoading = function () {
 
 /** Copy specified data to component */
 ImportTemplateManager.prototype.setRawData = function (data) {
-    this.state.id = this.RAW_DATA_STATE;
     this.state.rawData = copyObject(data);
-    this.render(this.state);
+
+    if (this.model.template.data.length > 0) {
+        this.state.id = this.RAW_DATA_STATE;
+        this.render(this.state);
+    } else {
+        this.setCreateTemplateState();
+    }
 };
 
 /** Import template select 'change' event handler */
@@ -127,6 +136,11 @@ ImportTemplateManager.prototype.onTemplateNameInput = function () {
 
 /** Create template button 'click' event handler */
 ImportTemplateManager.prototype.onCreateTemplateClick = function () {
+    this.setCreateTemplateState();
+};
+
+/** Set create template state */
+ImportTemplateManager.prototype.setCreateTemplateState = function () {
     this.state.id = this.TPL_UPDATE_STATE;
     this.state.template = new ImportTemplate({
         name: '',
@@ -340,6 +354,7 @@ ImportTemplateManager.prototype.onDataColumnClick = function (index) {
 
 /** Render component */
 ImportTemplateManager.prototype.render = function (state) {
+    var templateAvail;
     var headerRow;
     var dataRows;
     var colElems;
@@ -347,23 +362,35 @@ ImportTemplateManager.prototype.render = function (state) {
 
     if (state.id === this.LOADING_STATE) {
         show(this.loadingIndicator, true);
+        show(this.tableDescr, false);
         show(this.rawDataTable, false);
         show(this.tplControls, false);
     } else if (state.id === this.RAW_DATA_STATE) {
+        templateAvail = (this.model.template.length > 0);
+        show(this.tplField, templateAvail);
+        show(this.noTplLabel, !templateAvail);
         show(this.tplHeading, true);
+        show(this.tplStateLbl, false);
         show(this.loadingIndicator, false);
+        show(this.tableDescr, true);
         show(this.rawDataTable, true);
-        show(this.tplField, true);
         show(this.nameField, false);
         this.parent.clearBlockValidation(this.nameField);
         show(this.columnField, false);
-        show(this.createTplBtn, true);
+        show(this.createTplBtn, templateAvail);
         show(this.updateTplBtn, !!state.template);
         show(this.deleteTplBtn, !!state.template);
         show(this.tplControls, false);
     } else if (state.id === this.TPL_UPDATE_STATE) {
+        this.tplStateLbl.textContent = (state.template && state.template.id)
+            ? 'Update template'
+            : 'Create template';
+
+        show(this.noTplLabel, false);
+        show(this.tplStateLbl, true);
         show(this.tplHeading, true);
         show(this.loadingIndicator, false);
+        show(this.tableDescr, true);
         show(this.rawDataTable, true);
         show(this.tplField, false);
         show(this.nameField, true);
@@ -372,6 +399,7 @@ ImportTemplateManager.prototype.render = function (state) {
         show(this.updateTplBtn, false);
         show(this.deleteTplBtn, false);
         show(this.tplControls, true);
+        show(this.cancelTplBtn, templateAvail);
     }
 
     this.tplNameInp.value = (state.template) ? state.template.name : '';
