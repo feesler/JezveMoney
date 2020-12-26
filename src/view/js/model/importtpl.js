@@ -1,6 +1,6 @@
 'use strict';
 
-/* global extend, ListItem, List */
+/* global fixFloat, extend, ListItem, List */
 
 /**
  * @constructor Import template class
@@ -52,6 +52,140 @@ ImportTemplate.prototype.getColumnByIndex = function (index) {
     }, this);
 
     return (res) ? tplColumns[res] : null;
+};
+
+/**
+ * Return column data by specified index
+ * @param {Array} data - row data array
+ * @param {number} index - column index, starting from 1
+ */
+ImportTemplate.prototype.getColumnData = function (data, index) {
+    var col;
+
+    if (!Array.isArray(data)) {
+        throw new Error('Invalid row data');
+    }
+
+    col = parseInt(index, 10);
+    if (Number.isNaN(col) || col < 1 || col > data.length) {
+        throw new Error('Invalid column ' + index + '. Total columns: ' + data.length);
+    }
+
+    return data[col - 1];
+};
+
+/** Convert string to amount value */
+ImportTemplate.prototype.amountFix = function (value) {
+    var res;
+
+    if (typeof value === 'number') {
+        return value;
+    }
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    res = value.replace(/ /, '');
+    return parseFloat(fixFloat(res));
+};
+
+/** Convert DD.MM.YYYY string to timestamp */
+ImportTemplate.prototype.fixDate = function (str) {
+    var res;
+
+    if (typeof str !== 'string') {
+        return null;
+    }
+
+    res = Date.parse(str.split('.').reverse().join('-'));
+    if (Number.isNaN(res)) {
+        return null;
+    }
+
+    return res;
+};
+
+/** Convert date string to timestamp */
+ImportTemplate.prototype.timestampFromString = function (str) {
+    var tmpDate = str;
+    var pos = str.indexOf(' ');
+    if (pos !== -1) {
+        tmpDate = tmpDate.substr(0, pos);
+    }
+
+    return this.fixDate(tmpDate);
+};
+
+ImportTemplate.prototype.getProperty = function (name, data, safe) {
+    var propGetterMap = {
+        accountAmount: this.getAccountAmount,
+        accountCurrency: this.getAccountCurrency,
+        transactionAmount: this.getTransactionAmount,
+        transactionCurrency: this.getTransactionCurrency,
+        date: this.getDate,
+        comment: this.getComment
+    };
+
+    try {
+        if (!(name in propGetterMap)) {
+            throw new Error('Invalid property');
+        }
+
+        return propGetterMap[name].call(this, data);
+    } catch (e) {
+        if (safe) {
+            return null;
+        }
+
+        throw e;
+    }
+};
+
+/** Extract account amount value from data */
+ImportTemplate.prototype.getAccountAmount = function (data) {
+    var value = this.getColumnData(data, this.accountAmountColumn);
+    return this.amountFix(value);
+};
+
+/** Extract account currency value from data */
+ImportTemplate.prototype.getAccountCurrency = function (data) {
+    return this.getColumnData(data, this.accountCurrColumn);
+};
+
+/** Extract transaction amount value from data */
+ImportTemplate.prototype.getTransactionAmount = function (data) {
+    var value = this.getColumnData(data, this.transactionAmountColumn);
+    return this.amountFix(value);
+};
+
+/** Extract transaction currency value from data */
+ImportTemplate.prototype.getTransactionCurrency = function (data) {
+    return this.getColumnData(data, this.transactionCurrColumn);
+};
+
+/** Extract date value from data */
+ImportTemplate.prototype.getDate = function (data) {
+    var value = this.getColumnData(data, this.dateColumn);
+    return this.timestampFromString(value);
+};
+
+/** Extract comment value from data */
+ImportTemplate.prototype.getComment = function (data) {
+    return this.getColumnData(data, this.commentColumn);
+};
+
+/** Apply import template to specified data row */
+ImportTemplate.prototype.applyTo = function (data) {
+    var res = {
+        accAmountVal: this.getAccountAmount(data),
+        accCurrVal: this.getAccountCurrency(data),
+        trAmountVal: this.getTransactionAmount(data),
+        trCurrVal: this.getTransactionCurrency(data),
+        date: this.getDate(data),
+        comment: this.getComment(data)
+    };
+
+    return res;
 };
 
 /**

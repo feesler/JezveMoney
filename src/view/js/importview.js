@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, re, ce, removeChilds, show, enable, extend */
+/* global ge, re, ce, removeChilds, enable, extend */
 /* global selectByValue, selectedValue, ajax, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList, ImportTemplateList */
 /* global View, IconLink, Sortable, ImportUploadDialog, ImportTransactionItem */
@@ -45,7 +45,6 @@ ImportView.prototype.onStart = function () {
     this.transCountElem = ge('trcount');
     this.enabledTransCountElem = ge('entrcount');
     this.acc_id = ge('acc_id');
-    this.dataForm = ge('dataForm');
     this.rowsContainer = ge('rowsContainer');
     if (!this.newItemBtn
         || !this.uploadBtn
@@ -53,7 +52,6 @@ ImportView.prototype.onStart = function () {
         || !this.transCountElem
         || !this.enabledTransCountElem
         || !this.acc_id
-        || !this.dataForm
         || !this.rowsContainer
     ) {
         throw new Error('Failed to initialize Import view');
@@ -100,7 +98,6 @@ ImportView.prototype.showUploadDialog = function () {
 /** Hide import file form */
 ImportView.prototype.onImportDone = function (items) {
     this.uploadDialog.hide();
-    show(this.dataForm, true);
 
     if (Array.isArray(items)) {
         items.forEach(function (item) {

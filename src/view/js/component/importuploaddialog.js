@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, isDate, isFunction, show, extend */
+/* global ge, isDate, isFunction, show, enable, extend */
 /* global selectedValue, urlJoin, ajax, createMessage, baseURL */
 /* global Component, Popup, ImportTransactionItem */
 /* global ImportFileUploader, ImportTemplateManager */
@@ -50,7 +50,9 @@ function ImportUploadDialog() {
     this.tplManager = new ImportTemplateManager({
         elem: 'templateBlock',
         parent: this.parent,
-        tplModel: this.props.tplModel
+        currencyModel: this.props.currencyModel,
+        tplModel: this.props.tplModel,
+        templateStatus: this.onTemplateStatus.bind(this)
     });
 
     this.popup = Popup.create({
@@ -64,14 +66,21 @@ function ImportUploadDialog() {
         additional: 'center_only upload-popup'
     });
 
+    this.initialAccField = ge('initialAccField');
     this.initialAccountSel = ge('initialAccount');
+    this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
+    this.submitUploadedBtn = ge('submitUploadedBtn');
     if (
-        !this.initialAccountSel
+        !this.initialAccField
+        || !this.initialAccountSel
+        || !this.controlsBlock
+        || !this.submitUploadedBtn
     ) {
         throw new Error('Failed to initialize upload file dialog');
     }
 
     this.initialAccountSel.addEventListener('change', this.onAccountChange.bind(this));
+    this.submitUploadedBtn.addEventListener('click', this.onSubmit.bind(this));
 }
 
 extend(ImportUploadDialog, Component);
@@ -86,26 +95,27 @@ ImportUploadDialog.prototype.hide = function () {
     this.popup.hide();
 };
 
-/** Hide dialog */
-ImportUploadDialog.prototype.onClose = function () {
+/** Reset dialog */
+ImportUploadDialog.prototype.reset = function () {
     this.uploader.reset();
     this.tplManager.reset();
+    this.enableUpload(false);
+
+    this.importedItems = null;
+};
+
+/** Hide dialog */
+ImportUploadDialog.prototype.onClose = function () {
+    this.reset();
 };
 
 /** Enable/disable upload button */
-ImportUploadDialog.prototype.enableUploadButton = function (val) {
-    var submitBtn;
+ImportUploadDialog.prototype.enableUpload = function (val) {
+    enable(this.initialAccountSel, !!val);
+    show(this.initialAccField, !!val);
 
-    if (val) {
-        submitBtn = { value: 'Import' };
-    } else {
-        submitBtn = false;
-    }
-
-    this.popup.setControls({
-        okBtn: submitBtn,
-        closeBtn: true
-    });
+    enable(this.submitUploadedBtn, !!val);
+    show(this.controlsBlock, !!val);
 };
 
 /** Initial account select 'change' event handler */
@@ -120,6 +130,20 @@ ImportUploadDialog.prototype.onAccountChange = function () {
 
     if (isFunction(this.accountChangeHandler)) {
         this.accountChangeHandler(accountId);
+    }
+};
+
+/** Submit event handler */
+ImportUploadDialog.prototype.onSubmit = function () {
+    var data;
+
+    try {
+        data = this.tplManager.applyTemplate();
+        this.mapImportedItems(data);
+    } catch (e) {
+        createMessage(e.message, 'msg_error');
+        this.importedItems = null;
+        this.importDone();
     }
 };
 
@@ -150,12 +174,19 @@ ImportUploadDialog.prototype.onUploaded = function (data) {
     }
 };
 
-/** Apply import template */
-ImportUploadDialog.prototype.applyTemplate = function (data) {
+/**
+ * Template status handler
+ * @param {boolean} status - is valid template flag
+ */
+ImportUploadDialog.prototype.onTemplateStatus = function (status) {
+    this.enableUpload(status);
+};
+
+/** Map data after template applied and request API for transactions in same date range */
+ImportUploadDialog.prototype.mapImportedItems = function (data) {
     var importedDateRange = { start: 0, end: 0 };
     var reqParams;
 
-    this.state = { id: this.TPL_APPLIED_STATE };
     this.importedItems = data.map(function (row) {
         var timestamp;
         var item;
@@ -236,7 +267,7 @@ ImportUploadDialog.prototype.mapImportItem = function (data) {
         item.setCurrency(trCurr.id);
         item.setSecondAmount(-data.trAmountVal);
     }
-    item.setDate(data.date);
+    item.setDate(this.formatDate(new Date(data.date)));
     item.setComment(data.comment);
 
     this.model.rules.applyTo(data, item);
@@ -320,13 +351,8 @@ ImportUploadDialog.prototype.onTrCacheResult = function (response) {
 
 /** Hide import file form */
 ImportUploadDialog.prototype.importDone = function () {
-    this.uploader.reset();
-
-    this.enableUploadButton(false);
-    show(this.importControls, false);
-
     this.uploadDoneHandler(this.importedItems);
-    this.importedItems = null;
+    this.reset();
 };
 
 /**
@@ -358,6 +384,14 @@ ImportUploadDialog.prototype.formatDate = function (date) {
 ImportUploadDialog.prototype.timestampFromDateString = function (str) {
     var dparts;
     var res;
+
+    if (typeof str === 'number') {
+        return str;
+    }
+
+    if (isDate(str)) {
+        return str.getTime();
+    }
 
     if (typeof str !== 'string') {
         throw new Error('Invalid type of parameter');

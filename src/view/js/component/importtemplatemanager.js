@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, ce, addChilds, removeChilds, copyObject, show, extend */
+/* global isFunction, ge, ce, addChilds, removeChilds, copyObject, show, enable, extend */
 /* global selectedValue, selectByValue, ajax, createMessage, baseURL */
 /* global Component, ImportTemplate, ConfirmDialog */
 
@@ -13,11 +13,13 @@ function ImportTemplateManager() {
 
     if (!this.parent
         || !this.props
+        || !this.props.currencyModel
         || !this.props.tplModel) {
         throw new Error('Failed to initialize upload file dialog');
     }
 
     this.model = {
+        currency: this.props.currencyModel,
         template: this.props.tplModel
     };
 
@@ -29,6 +31,8 @@ function ImportTemplateManager() {
     this.RAW_DATA_STATE = 2;
     this.TPL_UPDATE_STATE = 3;
     this.TPL_APPLIED_STATE = 4;
+
+    this.statusHanlder = this.props.templateStatus;
 
     this.tplHeading = ge('tplHeading');
     this.tplStateLbl = ge('tplStateLbl');
@@ -47,6 +51,7 @@ function ImportTemplateManager() {
     this.loadingIndicator = ge('loadingIndicator');
     this.tableDescr = ge('tableDescr');
     this.rawDataTable = ge('rawDataTable');
+    this.tplFeedback = ge('tplFeedback');
     if (
         !this.tplHeading
         || !this.tplStateLbl
@@ -65,6 +70,7 @@ function ImportTemplateManager() {
         || !this.loadingIndicator
         || !this.tableDescr
         || !this.rawDataTable
+        || !this.tplFeedback
     ) {
         throw new Error('Failed to initialize upload file dialog');
     }
@@ -82,11 +88,50 @@ function ImportTemplateManager() {
 
 extend(ImportTemplateManager, Component);
 
+/**
+ * Return data rows from raw data
+ * @param {Object} state - component state object
+ * @param {boolean} limit - if true then maximum count of rows returned is state.rowsToShow
+ */
+ImportTemplateManager.prototype.getDataRows = function (state, limit) {
+    var start;
+    var end;
+
+    if (!state || !Array.isArray(state.rawData)) {
+        throw new Error('Invalid state');
+    }
+
+    start = state.startFromRow - 1;
+    if (limit) {
+        end = Math.min(state.rawData.length, state.rowsToShow);
+    }
+
+    return state.rawData.slice(start, end);
+};
+
+/** Apply currently selected template to raw data and return array of import data items */
+ImportTemplateManager.prototype.applyTemplate = function () {
+    var data;
+
+    if (!this.state
+        || !Array.isArray(this.state.rawData)
+        || !this.state.template) {
+        throw new Error('Invalid state');
+    }
+
+    data = this.getDataRows(this.state, false);
+
+    return data.map(function (item) {
+        return this.state.template.applyTo(item);
+    }, this);
+};
+
 /** Reset component state */
 ImportTemplateManager.prototype.reset = function () {
     this.state = {
         id: this.LOADING_STATE,
         rawData: null,
+        startFromRow: 2,
         rowsToShow: 3
     };
     this.render(this.state);
@@ -101,11 +146,14 @@ ImportTemplateManager.prototype.setLoading = function () {
 
 /** Copy specified data to component */
 ImportTemplateManager.prototype.setRawData = function (data) {
+    var value;
+
     this.state.rawData = copyObject(data);
 
     if (this.model.template.data.length > 0) {
         this.state.id = this.RAW_DATA_STATE;
-        this.render(this.state);
+        value = selectedValue(this.templateSel);
+        this.setTemplate(value);
     } else {
         this.setCreateTemplateState();
     }
@@ -114,15 +162,26 @@ ImportTemplateManager.prototype.setRawData = function (data) {
 /** Import template select 'change' event handler */
 ImportTemplateManager.prototype.onTemplateChange = function () {
     var value;
-    var template;
 
     if (this.state.id !== this.RAW_DATA_STATE) {
         return;
     }
 
     value = selectedValue(this.templateSel);
-    template = this.model.template.getItem(value);
-    this.state.template = template;
+    this.setTemplate(value);
+};
+
+/**
+ * Set specified template
+ * @param {number} value - import template id
+ */
+ImportTemplateManager.prototype.setTemplate = function (value) {
+    var template = this.model.template.getItem(value);
+    if (template) {
+        this.state.template = new ImportTemplate(template);
+    } else {
+        this.state.template = null;
+    }
 
     this.render(this.state);
 };
@@ -296,20 +355,17 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
 /** Render import template select element according to the data in model */
 ImportTemplateManager.prototype.renderTemplateSelect = function () {
     var dataOptions;
-    var noItemOption;
     var selectedTemplate = null;
+    var templateId;
 
     // Find template with same name as currently selected
     if (this.state.template) {
-        selectedTemplate = this.model.template.data.find(function(item){
+        selectedTemplate = this.model.template.data.find(function (item) {
             return (item.name === this.state.template.name);
         }, this);
     }
 
     removeChilds(this.templateSel);
-
-    noItemOption = ce('option', { value: 0, textContent: 'No template selected' });
-    this.templateSel.appendChild(noItemOption);
 
     dataOptions = this.model.template.data.map(function (item) {
         return ce('option', { value: item.id, textContent: item.name });
@@ -317,14 +373,14 @@ ImportTemplateManager.prototype.renderTemplateSelect = function () {
     addChilds(this.templateSel, dataOptions);
 
     // Restore selection
-    selectByValue(this.templateSel, (selectedTemplate) ? selectedTemplate.id : 0);
-    this.state.template = selectedTemplate;
+    templateId = (selectedTemplate) ? selectedTemplate.id : 0;
+    selectByValue(this.templateSel, templateId);
+    this.setTemplate(templateId);
 };
 
 /** Cancel template button 'click' event handler */
 ImportTemplateManager.prototype.onCancelTemplateClick = function () {
     var value;
-    var template;
 
     if (this.state.id !== this.TPL_UPDATE_STATE) {
         return;
@@ -333,9 +389,7 @@ ImportTemplateManager.prototype.onCancelTemplateClick = function () {
     this.state.id = this.RAW_DATA_STATE;
     // Restore previously selected template
     value = selectedValue(this.templateSel);
-    template = this.model.template.getItem(value);
-    this.state.template = template;
-    this.render(this.state);
+    this.setTemplate(value);
 };
 
 /** Raw data table column 'click' event handler */
@@ -352,6 +406,94 @@ ImportTemplateManager.prototype.onDataColumnClick = function (index) {
     this.render(this.state);
 };
 
+/** Validate current template on raw data */
+ImportTemplateManager.prototype.setTemplateFeedback = function (message) {
+    if (typeof message === 'string' && message.length) {
+        this.tplFeedback.textContent = message;
+        show(this.tplFeedback, true);
+    } else {
+        this.tplFeedback.textContent = '';
+        show(this.tplFeedback, false);
+    }
+};
+
+/** Validate current template on raw data */
+ImportTemplateManager.prototype.validateTemplate = function (state) {
+    var data;
+    var value;
+    var currency;
+
+    var columns = {
+        accountAmountColumn: { msg: 'Please select decimal column for account amount' },
+        accountCurrColumn: { msg: 'Please select correct column for account currency' },
+        transactionAmountColumn: { msg: 'Please select decimal column for transaction amount' },
+        transactionCurrColumn: { msg: 'Please select correct column for transaction currency' },
+        dateColumn: { msg: 'Please select column for date' },
+        commentColumn: { msg: 'Please select column for comment' }
+    };
+
+    if (!state) {
+        throw new Error('Invalid state');
+    }
+
+    if (!state.template) {
+        return false;
+    }
+
+    data = state.rawData.slice(1, 2)[0];
+    // Account amount
+    value = state.template.getProperty('accountAmount', data, true);
+    if (!value) {
+        if (state.id === this.TPL_UPDATE_STATE) {
+            this.setTemplateFeedback(columns.accountAmountColumn.msg);
+            selectByValue(this.columnSel, 'accountAmountColumn');
+        }
+        return false;
+    }
+    // Transaction amount
+    value = state.template.getProperty('transactionAmount', data, true);
+    if (!value) {
+        if (state.id === this.TPL_UPDATE_STATE) {
+            this.setTemplateFeedback(columns.transactionAmountColumn.msg);
+            selectByValue(this.columnSel, 'transactionAmountColumn');
+        }
+        return false;
+    }
+    // Account currency
+    value = state.template.getProperty('accountCurrency', data, true);
+    currency = this.model.currency.findByName(value);
+    if (!currency) {
+        if (state.id === this.TPL_UPDATE_STATE) {
+            this.setTemplateFeedback('Unknown currency \'' + value + '\'. '
+                + columns.accountCurrColumn.msg);
+            selectByValue(this.columnSel, 'accountCurrColumn');
+        }
+        return false;
+    }
+    // Transaction currency
+    value = state.template.getProperty('transactionCurrency', data, true);
+    currency = this.model.currency.findByName(value);
+    if (!currency) {
+        if (state.id === this.TPL_UPDATE_STATE) {
+            this.setTemplateFeedback('Unknown currency \'' + value + '\'. '
+                + columns.transactionCurrColumn.msg);
+            selectByValue(this.columnSel, 'transactionCurrColumn');
+        }
+        return false;
+    }
+    // Date
+    value = state.template.getProperty('date', data, true);
+    if (!value) {
+        if (state.id === this.TPL_UPDATE_STATE) {
+            this.setTemplateFeedback(columns.dateColumn.msg);
+            selectByValue(this.columnSel, 'dateColumn');
+        }
+        return false;
+    }
+
+    return true;
+};
+
 /** Render component */
 ImportTemplateManager.prototype.render = function (state) {
     var templateAvail;
@@ -359,14 +501,15 @@ ImportTemplateManager.prototype.render = function (state) {
     var dataRows;
     var colElems;
     var tableElem;
+    var isValid;
 
+    templateAvail = (this.model.template.data.length > 0);
     if (state.id === this.LOADING_STATE) {
         show(this.loadingIndicator, true);
         show(this.tableDescr, false);
         show(this.rawDataTable, false);
         show(this.tplControls, false);
     } else if (state.id === this.RAW_DATA_STATE) {
-        templateAvail = (this.model.template.length > 0);
         show(this.tplField, templateAvail);
         show(this.noTplLabel, !templateAvail);
         show(this.tplHeading, true);
@@ -411,7 +554,7 @@ ImportTemplateManager.prototype.render = function (state) {
     }
     // Render data table
     headerRow = state.rawData.slice(0, 1)[0];
-    dataRows = state.rawData.slice(1, Math.min(state.rawData.length, state.rowsToShow));
+    dataRows = this.getDataRows(state, true);
     colElems = headerRow.map(function (title, columnInd) {
         var columnInfo;
         var tplElem;
@@ -443,4 +586,19 @@ ImportTemplateManager.prototype.render = function (state) {
 
     removeChilds(this.rawDataTable);
     this.rawDataTable.appendChild(tableElem);
+
+    isValid = this.validateTemplate(state);
+    if (isValid) {
+        enable(this.submitTplBtn, true);
+        this.setTemplateFeedback();
+    } else {
+        enable(this.submitTplBtn, false);
+        if (state.id === this.RAW_DATA_STATE) {
+            this.setTemplateFeedback('Template does not matche data');
+        }
+    }
+
+    if (isFunction(this.statusHanlder)) {
+        this.statusHanlder(isValid);
+    }
 };

@@ -20,7 +20,7 @@
                         </div>
                     </div>
 
-                    <div id="dataForm" class="data-form">
+                    <div class="data-form">
                         <div class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
@@ -109,7 +109,6 @@
             <div class="row-container std_margin">
                 <div id="tplField" class="tpl-form-field">
                     <select id="templateSel">
-                        <option value="0">Select template</option>
 <?php   foreach($impTemplates as $impTpl) {     ?>
                         <option value="<?=e($impTpl->id)?>"><?=e($impTpl->name)?></option>
 <?php   }   ?>
@@ -136,18 +135,22 @@
         <div id="loadingIndicator" class="import-tpl__loading hidden">Loading...</div>
         <div id="tableDescr" class="import-tpl__title">Column map</div>
         <div id="rawDataTable" class="import-tpl__block"></div>
+        <div id="tplFeedback" class="invalid-feedback hidden"></div>
         <div id="tplControls" class="import-tpl-controls std_margin hidden">
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
             <input id="cancelTplBtn" class="btn link-btn cancel-btn" type="button" value="Cancel">
         </div>
     </div>
-    <div id="initialAccField" class="tpl-form-field hidden">
+    <div id="initialAccField" class="upload-dialog-account tpl-form-field hidden">
         <label>Main account</label>
         <select id="initialAccount">
 <?php foreach($accArr as $accObj) {	?>
             <option value="<?=e($accObj->id)?>"><?=e($accObj->name)?></option>
 <?php }	?>
         </select>
+    </div>
+    <div class="upload-dialog-controls hidden">
+        <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Ok">
     </div>
 </div>
 

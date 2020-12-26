@@ -151,6 +151,7 @@
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
+    margin-bottom: 12px;
 }
 
 /* Raw data loading indicator */
@@ -258,6 +259,18 @@
     display: flex;
     flex-flow: row nowrap;
     align-items: baseline;
+}
+
+/* Main account block */
+.upload-dialog-account
+{
+    margin-bottom: 12px;
+}
+
+/* Upload dialog controls block */
+.upload-dialog-controls
+{
+    margin-bottom: 12px;
 }
 
 /* Transactions list */
