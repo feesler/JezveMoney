@@ -30,7 +30,6 @@ function ImportTemplateManager() {
     this.LOADING_STATE = 1;
     this.RAW_DATA_STATE = 2;
     this.TPL_UPDATE_STATE = 3;
-    this.TPL_APPLIED_STATE = 4;
 
     this.statusHanlder = this.props.templateStatus;
 
@@ -312,7 +311,6 @@ ImportTemplateManager.prototype.onSubmitTemplateResult = function (response) {
             throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
         }
 
-        this.state.id = this.RAW_DATA_STATE;
         this.requestTemplatesList();
     } catch (e) {
         createMessage(e.message, 'msg_error');
@@ -345,8 +343,8 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
         }
 
         this.model.template.setData(jsondata.data);
+        this.state.id = this.RAW_DATA_STATE;
         this.renderTemplateSelect();
-        this.render(this.state);
     } catch (e) {
         createMessage(e.message, 'msg_error');
     }
@@ -598,7 +596,7 @@ ImportTemplateManager.prototype.render = function (state) {
         }
     }
 
-    if (isFunction(this.statusHanlder)) {
+    if (state.id === this.RAW_DATA_STATE && isFunction(this.statusHanlder)) {
         this.statusHanlder(isValid);
     }
 };
