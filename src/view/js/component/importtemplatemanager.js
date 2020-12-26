@@ -515,8 +515,8 @@ ImportTemplateManager.prototype.render = function (state) {
         show(this.tplHeading, true);
         show(this.tplStateLbl, false);
         show(this.loadingIndicator, false);
-        show(this.tableDescr, true);
-        show(this.rawDataTable, true);
+        show(this.tableDescr, false);
+        show(this.rawDataTable, false);
         show(this.nameField, false);
         this.parent.clearBlockValidation(this.nameField);
         show(this.columnField, false);
