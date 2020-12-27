@@ -72,4 +72,8 @@ ImportFileUploader.prototype.uploadFromServer = function () {
         data: urlJoin(reqObj),
         callback: this.onImportSuccess.bind(this)
     });
+
+    if (isFunction(this.uploadStartHandler)) {
+        this.uploadStartHandler();
+    }
 };
