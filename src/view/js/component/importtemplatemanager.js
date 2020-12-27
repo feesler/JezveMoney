@@ -353,8 +353,12 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
         }
 
         this.model.template.setData(jsondata.data);
-        this.state.id = this.RAW_DATA_STATE;
-        this.renderTemplateSelect();
+        if (this.model.template.data.length > 0) {
+            this.state.id = this.RAW_DATA_STATE;
+            this.renderTemplateSelect();
+        } else {
+            this.setCreateTemplateState();
+        }
     } catch (e) {
         createMessage(e.message, 'msg_error');
     }
@@ -381,8 +385,12 @@ ImportTemplateManager.prototype.renderTemplateSelect = function () {
     addChilds(this.templateSel, dataOptions);
 
     // Restore selection
-    templateId = (selectedTemplate) ? selectedTemplate.id : 0;
-    selectByValue(this.templateSel, templateId);
+    if (selectedTemplate) {
+        templateId = selectedTemplate.id;
+        selectByValue(this.templateSel, templateId);
+    } else {
+        templateId = selectedValue(this.templateSel);
+    }
     this.setTemplate(templateId);
 };
 
@@ -594,7 +602,7 @@ ImportTemplateManager.prototype.render = function (state) {
         }
     }
 
-    if (state.id === this.RAW_DATA_STATE && isFunction(this.statusHanlder)) {
-        this.statusHanlder(isValid);
+    if (isFunction(this.statusHanlder)) {
+        this.statusHanlder(state.id === this.RAW_DATA_STATE && isValid);
     }
 };
