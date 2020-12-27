@@ -40,12 +40,12 @@ AdminImportTemplateListView.prototype.setItemValues = function (item) {
         this.idInput.value = item.id;
         this.nameInput.value = item.name;
         this.typeInput.value = item.type_id;
-        this.dateColInput.value = item.dateColumn;
-        this.commentColInput.value = item.commentColumn;
-        this.trCurrColInput.value = item.transactionCurrColumn;
-        this.trAmountColInput.value = item.transactionAmountColumn;
-        this.accCurrColInput.value = item.accountCurrColumn;
-        this.accAmountColInput.value = item.accountAmountColumn;
+        this.dateColInput.value = item.columns.date;
+        this.commentColInput.value = item.columns.comment;
+        this.trCurrColInput.value = item.columns.transactionCurrency;
+        this.trAmountColInput.value = item.columns.transactionAmount;
+        this.accCurrColInput.value = item.columns.accountCurrency;
+        this.accAmountColInput.value = item.columns.accountAmount;
     } else {
         this.idInput.value = '';
         this.nameInput.value = '';
@@ -72,11 +72,11 @@ AdminImportTemplateListView.prototype.renderItem = function (item) {
         ce('td', { textContent: item.id }),
         ce('td', { textContent: item.name }),
         ce('td', { textContent: item.type_id }),
-        ce('td', { textContent: item.dateColumn }),
-        ce('td', { textContent: item.commentColumn }),
-        ce('td', { textContent: item.transactionCurrColumn }),
-        ce('td', { textContent: item.transactionAmountColumn }),
-        ce('td', { textContent: item.accountCurrColumn }),
-        ce('td', { textContent: item.accountAmountColumn })
+        ce('td', { textContent: item.columns.date }),
+        ce('td', { textContent: item.columns.comment }),
+        ce('td', { textContent: item.columns.transactionCurrency }),
+        ce('td', { textContent: item.columns.transactionAmount }),
+        ce('td', { textContent: item.columns.accountCurrency }),
+        ce('td', { textContent: item.columns.accountAmount })
     ]);
 };

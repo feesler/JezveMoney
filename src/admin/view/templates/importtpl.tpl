@@ -36,12 +36,12 @@
                                 <td><?=e($item->id)?></td>
                                 <td><?=e($item->name)?></td>
                                 <td><?=e($item->type_id)?></td>
-                                <td><?=e($item->dateColumn)?></td>
-                                <td><?=e($item->commentColumn)?></td>
-                                <td><?=e($item->transactionCurrColumn)?></td>
-                                <td><?=e($item->transactionAmountColumn)?></td>
-                                <td><?=e($item->accountCurrColumn)?></td>
-                                <td><?=e($item->accountAmountColumn)?></td>
+                                <td><?=e($item->columns["date"])?></td>
+                                <td><?=e($item->columns["comment"])?></td>
+                                <td><?=e($item->columns["transactionCurrency"])?></td>
+                                <td><?=e($item->columns["transactionAmount"])?></td>
+                                <td><?=e($item->columns["accountCurrency"])?></td>
+                                <td><?=e($item->columns["accountAmount"])?></td>
                             </tr>
 <?php	}	?>
                         </tbody>

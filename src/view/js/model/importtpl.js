@@ -17,17 +17,7 @@ extend(ImportTemplate, ListItem);
  * @param {string} field - field name to check
  */
 ImportTemplate.prototype.isAvailField = function (field) {
-    var availFields = [
-        'id',
-        'name',
-        'type_id',
-        'accountAmountColumn',
-        'accountCurrColumn',
-        'transactionAmountColumn',
-        'transactionCurrColumn',
-        'dateColumn',
-        'commentColumn'
-    ];
+    var availFields = ['id', 'name', 'type_id', 'columns'];
 
     return typeof field === 'string' && availFields.includes(field);
 };
@@ -39,16 +29,16 @@ ImportTemplate.prototype.isAvailField = function (field) {
  */
 ImportTemplate.prototype.getColumnByIndex = function (index) {
     var tplColumns = {
-        accountAmountColumn: { title: 'Account amount' },
-        accountCurrColumn: { title: 'Account currency' },
-        transactionAmountColumn: { title: 'Transaction amount' },
-        transactionCurrColumn: { title: 'Transaction currency' },
-        dateColumn: { title: 'Date' },
-        commentColumn: { title: 'Comment' }
+        accountAmount: { title: 'Account amount' },
+        accountCurrency: { title: 'Account currency' },
+        transactionAmount: { title: 'Transaction amount' },
+        transactionCurrency: { title: 'Transaction currency' },
+        date: { title: 'Date' },
+        comment: { title: 'Comment' }
     };
 
     var res = Object.keys(tplColumns).find(function (columnName) {
-        return this[columnName] === index;
+        return this.columns[columnName] === index;
     }, this);
 
     return (res) ? tplColumns[res] : null;
@@ -143,35 +133,35 @@ ImportTemplate.prototype.getProperty = function (name, data, safe) {
 
 /** Extract account amount value from data */
 ImportTemplate.prototype.getAccountAmount = function (data) {
-    var value = this.getColumnData(data, this.accountAmountColumn);
+    var value = this.getColumnData(data, this.columns.accountAmount);
     return this.amountFix(value);
 };
 
 /** Extract account currency value from data */
 ImportTemplate.prototype.getAccountCurrency = function (data) {
-    return this.getColumnData(data, this.accountCurrColumn);
+    return this.getColumnData(data, this.columns.accountCurrency);
 };
 
 /** Extract transaction amount value from data */
 ImportTemplate.prototype.getTransactionAmount = function (data) {
-    var value = this.getColumnData(data, this.transactionAmountColumn);
+    var value = this.getColumnData(data, this.columns.transactionAmount);
     return this.amountFix(value);
 };
 
 /** Extract transaction currency value from data */
 ImportTemplate.prototype.getTransactionCurrency = function (data) {
-    return this.getColumnData(data, this.transactionCurrColumn);
+    return this.getColumnData(data, this.columns.transactionCurrency);
 };
 
 /** Extract date value from data */
 ImportTemplate.prototype.getDate = function (data) {
-    var value = this.getColumnData(data, this.dateColumn);
+    var value = this.getColumnData(data, this.columns.date);
     return this.timestampFromString(value);
 };
 
 /** Extract comment value from data */
 ImportTemplate.prototype.getComment = function (data) {
-    return this.getColumnData(data, this.commentColumn);
+    return this.getColumnData(data, this.columns.comment);
 };
 
 /** Apply import template to specified data row */

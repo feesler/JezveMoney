@@ -47,12 +47,12 @@ class Import extends ApiController
             throw new \Error("Invalid template");
         }
 
-        $this->setColumnInd("date", $template->dateColumn);
-        $this->setColumnInd("comment", $template->commentColumn);
-        $this->setColumnInd("trCurr", $template->transactionCurrColumn);
-        $this->setColumnInd("trAmount", $template->transactionAmountColumn);
-        $this->setColumnInd("accCurr", $template->accountCurrColumn);
-        $this->setColumnInd("accAmount", $template->accountAmountColumn);
+        $this->setColumnInd("date", $template->columns["date"]);
+        $this->setColumnInd("comment", $template->columns["comment"]);
+        $this->setColumnInd("trCurr", $template->columns["transactionCurrency"]);
+        $this->setColumnInd("trAmount", $template->columns["transactionAmount"]);
+        $this->setColumnInd("accCurr", $template->columns["accountCurrency"]);
+        $this->setColumnInd("accAmount", $template->columns["accountAmount"]);
     }
 
 

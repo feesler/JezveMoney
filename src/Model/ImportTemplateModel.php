@@ -6,6 +6,7 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
+use JezveMoney\App\Item\ImportTemplateItem;
 
 use function JezveMoney\Core\qnull;
 
@@ -18,12 +19,12 @@ class ImportTemplateModel extends CachedTable
 
     protected $tbl_name = "import_tpl";
     protected $columnTypes = [
-        "accountAmountColumn" => ["title" => "Account amount"],
-        "accountCurrColumn" => ["title" => "Account currency"],
-        "transactionAmountColumn" => ["title" => "Transaction amount"],
-        "transactionCurrColumn" => ["title" => "Transaction currency"],
-        "dateColumn" => ["title" => "Date"],
-        "commentColumn" => ["title" => "Comment"]
+        "accountAmount" => ["title" => "Account amount"],
+        "accountCurrency" => ["title" => "Account currency"],
+        "transactionAmount" => ["title" => "Transaction amount"],
+        "transactionCurrency" => ["title" => "Transaction currency"],
+        "date" => ["title" => "Date"],
+        "comment" => ["title" => "Comment"]
     ];
 
     protected function onStart()
@@ -46,12 +47,14 @@ class ImportTemplateModel extends CachedTable
         $res->name = $row["name"];
         $res->user_id = intval($row["user_id"]);
         $res->type_id = intval($row["type_id"]);
-        $res->dateColumn = intval($row["date_col"]);
-        $res->commentColumn = intval($row["comment_col"]);
-        $res->transactionCurrColumn = intval($row["trans_curr_col"]);
-        $res->transactionAmountColumn = intval($row["trans_amount_col"]);
-        $res->accountCurrColumn = intval($row["account_curr_col"]);
-        $res->accountAmountColumn = intval($row["account_amount_col"]);
+        $res->columns = [
+            "date" => intval($row["date_col"]),
+            "comment" => intval($row["comment_col"]),
+            "transactionCurrency" => intval($row["trans_curr_col"]),
+            "transactionAmount" => intval($row["trans_amount_col"]),
+            "accountCurrency" => intval($row["account_curr_col"]),
+            "accountAmount" => intval($row["account_amount_col"]),
+        ];
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
 
@@ -215,18 +218,7 @@ class ImportTemplateModel extends CachedTable
         }
 
         foreach ($this->cache as $item) {
-            $itemObj = new \stdClass();
-
-            $itemObj->id = $item->id;
-            $itemObj->name = $item->name;
-            $itemObj->type_id = $item->type_id;
-            $itemObj->dateColumn = $item->dateColumn;
-            $itemObj->commentColumn = $item->commentColumn;
-            $itemObj->transactionCurrColumn = $item->transactionCurrColumn;
-            $itemObj->transactionAmountColumn = $item->transactionAmountColumn;
-            $itemObj->accountCurrColumn = $item->accountCurrColumn;
-            $itemObj->accountAmountColumn = $item->accountAmountColumn;
-
+            $itemObj = new ImportTemplateItem($item);
             $res[] = $itemObj;
         }
 

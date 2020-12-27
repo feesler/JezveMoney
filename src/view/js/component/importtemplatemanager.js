@@ -27,6 +27,15 @@ function ImportTemplateManager() {
     this.templateDeleteTitle = 'Delete import template';
     this.templateDeleteMsg = 'Are you sure to delete this import template?';
 
+    this.columnFeedback = {
+        accountAmount: { msg: 'Please select decimal column for account amount' },
+        accountCurrency: { msg: 'Please select correct column for account currency' },
+        transactionAmount: { msg: 'Please select decimal column for transaction amount' },
+        transactionCurrency: { msg: 'Please select correct column for transaction currency' },
+        date: { msg: 'Please select column for date' },
+        comment: { msg: 'Please select column for comment' }
+    };
+
     this.LOADING_STATE = 1;
     this.RAW_DATA_STATE = 2;
     this.TPL_UPDATE_STATE = 3;
@@ -202,7 +211,8 @@ ImportTemplateManager.prototype.setCreateTemplateState = function () {
     this.state.id = this.TPL_UPDATE_STATE;
     this.state.template = new ImportTemplate({
         name: '',
-        type_id: 0
+        type_id: 0,
+        columns: {}
     });
 
     this.render(this.state);
@@ -266,12 +276,12 @@ ImportTemplateManager.prototype.onSubmitTemplateClick = function () {
     var requestObj = {
         name: this.state.template.name,
         type_id: this.state.template.type_id,
-        date_col: this.state.template.dateColumn,
-        comment_col: this.state.template.commentColumn,
-        trans_curr_col: this.state.template.transactionCurrColumn,
-        trans_amount_col: this.state.template.transactionAmountColumn,
-        account_curr_col: this.state.template.accountCurrColumn,
-        account_amount_col: this.state.template.accountAmountColumn
+        date_col: this.state.template.columns.date,
+        comment_col: this.state.template.columns.comment,
+        trans_curr_col: this.state.template.columns.transactionCurrency,
+        trans_amount_col: this.state.template.columns.transactionAmount,
+        account_curr_col: this.state.template.columns.accountCurrency,
+        account_amount_col: this.state.template.columns.accountAmount
     };
 
     if (!this.state.template.name.length) {
@@ -399,7 +409,7 @@ ImportTemplateManager.prototype.onDataColumnClick = function (index) {
     }
 
     value = selectedValue(this.columnSel);
-    this.state.template[value] = index + 1;
+    this.state.template.columns[value] = index + 1;
 
     this.render(this.state);
 };
@@ -416,19 +426,29 @@ ImportTemplateManager.prototype.setTemplateFeedback = function (message) {
 };
 
 /** Validate current template on raw data */
+ImportTemplateManager.prototype.onInvalidPropertyValue = function (state, propName) {
+    if (!state) {
+        throw new Error('Invalid state');
+    }
+    if (typeof propName !== 'string'
+        || !propName.length
+        || !this.columnFeedback[propName]) {
+        throw new Error('Invalid property');
+    }
+
+    if (state.id === this.TPL_UPDATE_STATE) {
+        this.setTemplateFeedback(this.columnFeedback[propName].msg);
+        selectByValue(this.columnSel, propName);
+    }
+
+    return false;
+};
+
+/** Validate current template on raw data */
 ImportTemplateManager.prototype.validateTemplate = function (state) {
     var data;
     var value;
     var currency;
-
-    var columns = {
-        accountAmountColumn: { msg: 'Please select decimal column for account amount' },
-        accountCurrColumn: { msg: 'Please select correct column for account currency' },
-        transactionAmountColumn: { msg: 'Please select decimal column for transaction amount' },
-        transactionCurrColumn: { msg: 'Please select correct column for transaction currency' },
-        dateColumn: { msg: 'Please select column for date' },
-        commentColumn: { msg: 'Please select column for comment' }
-    };
 
     if (!state) {
         throw new Error('Invalid state');
@@ -442,51 +462,29 @@ ImportTemplateManager.prototype.validateTemplate = function (state) {
     // Account amount
     value = state.template.getProperty('accountAmount', data, true);
     if (!value) {
-        if (state.id === this.TPL_UPDATE_STATE) {
-            this.setTemplateFeedback(columns.accountAmountColumn.msg);
-            selectByValue(this.columnSel, 'accountAmountColumn');
-        }
-        return false;
+        return this.onInvalidPropertyValue(state, 'accountAmount');
     }
     // Transaction amount
     value = state.template.getProperty('transactionAmount', data, true);
     if (!value) {
-        if (state.id === this.TPL_UPDATE_STATE) {
-            this.setTemplateFeedback(columns.transactionAmountColumn.msg);
-            selectByValue(this.columnSel, 'transactionAmountColumn');
-        }
-        return false;
+        return this.onInvalidPropertyValue(state, 'transactionAmount');
     }
     // Account currency
     value = state.template.getProperty('accountCurrency', data, true);
     currency = this.model.currency.findByName(value);
     if (!currency) {
-        if (state.id === this.TPL_UPDATE_STATE) {
-            this.setTemplateFeedback('Unknown currency \'' + value + '\'. '
-                + columns.accountCurrColumn.msg);
-            selectByValue(this.columnSel, 'accountCurrColumn');
-        }
-        return false;
+        return this.onInvalidPropertyValue(state, 'accountCurrency');
     }
     // Transaction currency
     value = state.template.getProperty('transactionCurrency', data, true);
     currency = this.model.currency.findByName(value);
     if (!currency) {
-        if (state.id === this.TPL_UPDATE_STATE) {
-            this.setTemplateFeedback('Unknown currency \'' + value + '\'. '
-                + columns.transactionCurrColumn.msg);
-            selectByValue(this.columnSel, 'transactionCurrColumn');
-        }
-        return false;
+        return this.onInvalidPropertyValue(state, 'transactionCurrency');
     }
     // Date
     value = state.template.getProperty('date', data, true);
     if (!value) {
-        if (state.id === this.TPL_UPDATE_STATE) {
-            this.setTemplateFeedback(columns.dateColumn.msg);
-            selectByValue(this.columnSel, 'dateColumn');
-        }
-        return false;
+        return this.onInvalidPropertyValue(state, 'date');
     }
 
     return true;
@@ -592,7 +590,7 @@ ImportTemplateManager.prototype.render = function (state) {
     } else {
         enable(this.submitTplBtn, false);
         if (state.id === this.RAW_DATA_STATE) {
-            this.setTemplateFeedback('Template does not matche data');
+            this.setTemplateFeedback('Template does not match data');
         }
     }
 

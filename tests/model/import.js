@@ -155,34 +155,34 @@ export function applyTemplate(data, template, mainAccount) {
 
         const original = { mainAccount };
 
-        const accAmount = getColumn(row, template.accountAmountColumn);
+        const accAmount = getColumn(row, template.columns.accountAmount);
         original.accAmountVal = amountFix(accAmount);
         if (!original.accAmountVal) {
             return;
         }
-        original.accCurrVal = getColumn(row, template.accountCurrColumn);
+        original.accCurrVal = getColumn(row, template.columns.accountCurrency);
         original.accCurr = Currency.findByName(original.accCurrVal);
         if (!original.accCurr) {
             console.log(`Currency ${original.accCurrVal} not found`);
             return;
         }
 
-        const trAmount = getColumn(row, template.transactionAmountColumn);
+        const trAmount = getColumn(row, template.columns.transactionAmount);
         original.trAmountVal = amountFix(trAmount);
         if (!original.accAmountVal) {
             return;
         }
-        original.trCurrVal = getColumn(row, template.transactionCurrColumn);
+        original.trCurrVal = getColumn(row, template.columns.transactionCurrency);
         original.trCurr = Currency.findByName(original.trCurrVal);
         if (!original.trCurr) {
             console.log(`Currency ${original.trCurrVal} not found`);
             return;
         }
 
-        original.date = dateFromString(getColumn(row, template.dateColumn));
+        original.date = dateFromString(getColumn(row, template.columns.date));
         original.date = formatDate(original.date);
 
-        original.comment = getColumn(row, template.commentColumn);
+        original.comment = getColumn(row, template.columns.comment);
 
         const item = fromImportData(original, mainAccount);
 

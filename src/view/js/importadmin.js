@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, show, ajax, urlJoin, baseURL */
+/* global isFunction, ge, show, ajax, urlJoin, baseURL */
 /* global ImportFileUploader */
 
 /** Setup extra controls of file upload dialog */
