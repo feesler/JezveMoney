@@ -604,7 +604,7 @@ ImportTemplateManager.prototype.render = function (state) {
     isValid = this.validateTemplate(state);
     if (isValid) {
         enable(this.submitTplBtn, true);
-        this.setTemplateFeedback();
+        this.setTemplateFeedback('Valid template');
     } else {
         enable(this.submitTplBtn, false);
         if (state.id === this.RAW_DATA_STATE) {
