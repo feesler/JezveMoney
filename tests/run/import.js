@@ -297,7 +297,6 @@ export async function submitUploaded(params) {
         if (params.account) {
             mainAccountId = params.account;
         } else {
-            //[mainAccountId] = App.state.getAccountsByIndexes(0);
             mainAccountId = App.view.model.mainAccount;
         }
         const mainAccount = App.state.accounts.getItem(mainAccountId);
@@ -331,7 +330,7 @@ export async function submitUploaded(params) {
         );
 
         let itemsList;
-        if (params.account){
+        if (params.account) {
             itemsList = {};
             itemsList.items = App.view.content.itemsList.items.map(
                 (item) => {

@@ -77,7 +77,7 @@ class Application {
     }
 
     async goToMainView() {
-        if (this.view){
+        if (this.view) {
             await this.view.goToMainView();
         } else {
             await this.environment.goTo(this.environment.baseUrl());

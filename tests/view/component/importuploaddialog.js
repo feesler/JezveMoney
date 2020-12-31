@@ -1,6 +1,11 @@
 import { Component } from './component.js';
 import { App } from '../../app.js';
-import { asyncMap, setParam, fixFloat, isNum } from '../../common.js';
+import {
+    asyncMap,
+    setParam,
+    fixFloat,
+    isNum,
+} from '../../common.js';
 
 const BROWSE_FILE_STATE = 1;
 const LOADING_STATE = 2;
@@ -166,7 +171,11 @@ export class ImportUploadDialog extends Component {
                         comment: 'Comment',
                     };
 
-                    for(const propName in propTitleMap) {
+                    for (const propName in propTitleMap) {
+                        if (!Object.prototype.hasOwnProperty.call(propTitleMap, propName)) {
+                            continue;
+                        }
+
                         const propTitle = propTitleMap[propName];
 
                         if (column.tplProperties.includes(propTitle)) {

@@ -742,7 +742,7 @@ class UserModel extends CachedTable
         }
 
         $tables = ["persons", "import_tpl", "import_rule", "import_act"];
-        foreach($tables as $table){
+        foreach ($tables as $table) {
             if (!$this->dbObj->deleteQ($table, "user_id" . $setCond)) {
                 return false;
             }

@@ -350,19 +350,6 @@ export class ImportListItem extends Component {
         }
     }
 
-    getFirstAvailAccount (state) {
-        const userAccountsData = App.state.accounts.getUserAccounts(App.owner_id);
-        var userAccounts = new AccountList(userAccountsData);
-        var visibleAccounts = userAccounts.getVisible();
-        var res = visibleAccounts[0];
-
-        if (res.id === state.accountId) {
-            res = visibleAccounts[1];
-        }
-
-        return res;
-    }
-
     onChangeMainAccount(value) {
         const res = copyObject(this.model);
 

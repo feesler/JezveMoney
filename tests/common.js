@@ -20,7 +20,7 @@ export function isObject(o) {
 
 /** Check is specified string is number */
 export function isNum(val) {
-    var fval = parseFloat(val);
+    const fval = parseFloat(val);
     if (fval === 0) {
         return true;
     }
