@@ -487,7 +487,6 @@ export class NodeEnvironment extends Environment {
 
             this.addResult('Test initialization', true);
 
-            await this.goTo(this.base);
             await this.app.startTests();
             res = 0;
         } catch (e) {

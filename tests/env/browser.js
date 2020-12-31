@@ -537,7 +537,6 @@ class BrowserEnvironment extends Environment {
 
                 this.addResult('Test initialization', true);
 
-                await this.goTo(this.base);
                 await this.app.startTests();
             } catch (e) {
                 this.addResult(e);

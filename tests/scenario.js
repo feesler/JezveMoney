@@ -85,6 +85,7 @@ export class Scenario {
     async runFullScenario() {
         await this.securityTests();
         await this.apiTests();
+        await App.goToMainView();
         await this.profileTests();
         await this.accountTests();
         await this.personTests();

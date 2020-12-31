@@ -38,7 +38,7 @@ export async function route(env, url) {
     const parts = path.split('/');
     const part = parts.shift();
 
-    if (!part) {
+    if (!part || !part.length) {
         return MainView;
     }
 
