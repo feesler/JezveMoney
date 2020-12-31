@@ -1,11 +1,27 @@
 import { Component } from './component.js';
 
 export class MessagePopup extends Component {
-    async parse() {
-        if (!await Component.isVisible(this)) {
-            throw new Error('Message popup found, but invisible');
+    static async create(...args) {
+        if (args.length < 2 || !args[1]) {
+            return null;
         }
 
+        let instance;
+        try {
+            instance = new this(...args);
+            if (!await Component.isVisible(instance)) {
+                return null;
+            }
+
+            await instance.parse();
+        } catch (e) {
+            return null;
+        }
+
+        return instance;
+    }
+
+    async parse() {
         this.success = await this.hasClass(this.elem, 'msg_success')
             && !(await this.hasClass(this.elem, 'msg_error'));
 

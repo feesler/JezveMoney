@@ -2214,9 +2214,9 @@ export class Scenario {
         ]);
         const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR] = App.state.getAccountsByIndexes(accIndexes);
         const personIndexes = App.state.getPersonIndexesByNames([
-            'Maria', 'Johnny',
+            'Maria', 'Alex',
         ]);
-        const [MARIA, IVAN] = App.state.getPersonsByIndexes(personIndexes);
+        const [MARIA, ALEX] = App.state.getPersonsByIndexes(personIndexes);
 
         const csvStatement = this.generateCSV();
 
@@ -2244,8 +2244,27 @@ export class Scenario {
         await ImportTests.uploadFile({
             filename: uploadFilename,
             data: csvStatement,
-            template: 2,
         });
+
+        // Select columns for template
+        await ImportTests.selectTemplateColumn({ column: 'accountAmount', index: 11 });
+        await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 9 });
+        await ImportTests.selectTemplateColumn({ column: 'accountCurrency', index: 10 });
+        await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 8 });
+        await ImportTests.selectTemplateColumn({ column: 'date', index: 1 });
+        await ImportTests.selectTemplateColumn({ column: 'comment', index: 2 });
+        // Input template name and save
+        await ImportTests.inputTemplateName('Template_1');
+        await ImportTests.submitTemplate();
+        // Update template
+        await ImportTests.updateTemplate();
+        await ImportTests.inputTemplateName('Template_2');
+        await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 11 });
+        await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 10 });
+        await ImportTests.submitTemplate();
+
+        // Submit converted transactions
+        await ImportTests.submitUploaded({ data: csvStatement, account: ACC_RUB });
 
         // Disable all items except 0 and 1
         await ImportTests.enableItems({
@@ -2263,7 +2282,10 @@ export class Scenario {
         await ImportTests.uploadFile({
             filename: uploadFilename,
             data: csvStatement,
-            template: 2,
+        });
+        await ImportTests.submitUploaded({
+            data: csvStatement,
+            template: 0,
         });
         await ImportTests.enableItems({
             index: [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -2272,6 +2294,7 @@ export class Scenario {
         await ImportTests.submit();
 
         this.environment.setBlock('Import item state loop', 2);
+        await ImportTests.changeMainAccount(ACC_3);
         await ImportTests.enableItems({
             index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
             value: true,
@@ -2383,7 +2406,7 @@ export class Scenario {
             pos: 7,
             action: [
                 { action: 'changeType', data: 'debtfrom' }, // 1-9
-                { action: 'changePerson', data: IVAN },
+                { action: 'changePerson', data: ALEX },
             ],
         });
         await ImportTests.updateItem({

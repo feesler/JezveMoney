@@ -6,9 +6,11 @@ use JezveMoney\Core\ApiController;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Item\AccountItem;
 use JezveMoney\App\Item\PersonItem;
 use JezveMoney\App\Item\TransactionItem;
+use JezveMoney\App\Item\ImportTemplateItem;
 
 class State extends ApiController
 {
@@ -24,13 +26,14 @@ class State extends ApiController
         $this->trModel = TransactionModel::getInstance();
         $this->accModel = AccountModel::getInstance();
         $this->pModel = PersonModel::getInstance();
+        $this->tplModel = ImportTemplateModel::getInstance();
     }
 
 
     public function index()
     {
         $res = new \stdClass();
-
+        // Accounts
         $res->accounts = new \stdClass();
         $res->accounts->data = [];
         $items = $this->accModel->getData([ "full" => true, "type" => "all" ]);
@@ -38,7 +41,7 @@ class State extends ApiController
             $res->accounts->data[] = new AccountItem($item);
         }
         $res->accounts->autoincrement = $this->accModel->autoIncrement();
-
+        // Transactions
         $res->transactions = new \stdClass();
         $res->transactions->data = [];
         $items = $this->trModel->getData([ "onPage" => 0 ]);
@@ -46,7 +49,7 @@ class State extends ApiController
             $res->transactions->data[] = new TransactionItem($item);
         }
         $res->transactions->autoincrement = $this->trModel->autoIncrement();
-
+        // Persons
         $res->persons = new \stdClass();
         $res->persons->data = [];
         $items = $this->pModel->getData([ "type" => "all" ]);
@@ -54,7 +57,15 @@ class State extends ApiController
             $res->persons->data[] = new PersonItem($item);
         }
         $res->persons->autoincrement = $this->pModel->autoIncrement();
-
+        // Import templates
+        $res->templates = new \stdClass();
+        $res->templates->data = [];
+        $items = $this->tplModel->getData();
+        foreach ($items as $item) {
+            $res->templates->data[] = new ImportTemplateItem($item);
+        }
+        $res->templates->autoincrement = $this->pModel->autoIncrement();
+        // User profile
         $userObj = $this->uMod->getItem($this->user_id);
         if (!$userObj) {
             $this->fail("User not found");

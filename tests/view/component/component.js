@@ -86,7 +86,7 @@ export class Component {
             if (isObject(expVisible)) {
                 res = await this.checkVisibility(control, expVisible);
             } else {
-                factVisible = await Component.isVisible(control);
+                factVisible = !!control && await this.isVisible(control.elem, true);
                 res = (expVisible === factVisible);
             }
 
@@ -125,7 +125,7 @@ export class Component {
             ) {
                 res = {
                     key: countrolName,
-                    value: control.value,
+                    value: (isObj) ? control.value : control,
                     expected,
                 };
                 break;

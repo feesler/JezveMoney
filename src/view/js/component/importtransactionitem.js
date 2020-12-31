@@ -432,6 +432,42 @@ ImportTransactionItem.prototype.getFirstAvailAccount = function (state) {
     return res;
 };
 
+/**
+ * Return next available user account different from specified
+ * @param {number} accountId - account id to find next account for
+ */
+ImportTransactionItem.prototype.getNextAccount = function (accountId) {
+    var userAccountsData = this.model.accounts.getUserAccounts(this.model.mainAccount.owner_id);
+    var userAccounts = new AccountList(userAccountsData);
+    var visibleAccountsData = userAccounts.getVisible();
+    var userVisible = new AccountList(visibleAccountsData);
+    var ind;
+    var resInd;
+    var res;
+
+    if (!userVisible.data.length) {
+        return null;
+    }
+
+    if (!accountId) {
+        return userVisible.getItemByIndex(0);
+    }
+
+    if (userVisible.data.length < 2) {
+        return null;
+    }
+
+    ind = userVisible.getItemIndex(accountId);
+    if (ind === -1 || ind === null) {
+        return null;
+    }
+
+    resInd = (ind === userVisible.data.length - 1) ? 0 : ind + 1;
+    res = userVisible.getItemByIndex(resInd);
+
+    return res;
+};
+
 /** Transaction type select 'change' event handler */
 ImportTransactionItem.prototype.onTrTypeChanged = function () {
     var value = selectedValue(this.trTypeSel);
@@ -642,7 +678,7 @@ ImportTransactionItem.prototype.setMainAccount = function (value) {
         }
     } else if (state.type === 'transferfrom' || state.type === 'transferto') {
         if (state.secondAccountId === state.accountId) {
-            secondAccount = this.getFirstAvailAccount(state);
+            secondAccount = this.getNextAccount(state.secondAccountId);
             state.secondAccountId = secondAccount.id;
             state.secondAccountCurrId = secondAccount.curr_id;
         }

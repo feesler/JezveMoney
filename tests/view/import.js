@@ -48,6 +48,7 @@ export class ImportView extends TestView {
     async buildModel(cont) {
         const res = {};
 
+        res.title = cont.title;
         res.totalCount = cont.totalCount;
         res.enabledCount = cont.enabledCount;
         res.mainAccount = cont.mainAccount;
@@ -56,7 +57,7 @@ export class ImportView extends TestView {
         return res;
     }
 
-    getExpectedState() {
+    getExpectedState(model) {
         const res = {
             visibility: {
                 uploadBtn: true,
@@ -67,6 +68,10 @@ export class ImportView extends TestView {
                 itemsList: true,
             },
             values: {
+                title: model.title,
+                mainAccount: model.mainAccount,
+                totalCount: model.totalCount,
+                enabledCount: model.enabledCount,
             },
         };
 
@@ -83,8 +88,11 @@ export class ImportView extends TestView {
         }
     }
 
-    async inputUploadFileName(val) {
-        await this.performAction(() => this.content.uploadDialog.setFile(val));
+    async setUploadFile(name, data) {
+        this.uploadFilename = name;
+        this.fileData = data;
+
+        await this.performAction(() => this.content.uploadDialog.setFile(name, data));
     }
 
     async selectUploadTemplate(val) {
@@ -99,10 +107,45 @@ export class ImportView extends TestView {
         await this.performAction(() => this.content.uploadDialog.selectEncoding(val));
     }
 
+    /** Select file to upload */
     async upload() {
-        await this.performAction(() => this.content.uploadDialog.submit());
+        await this.performAction(() => this.content.uploadDialog.upload());
+    }
 
+    async inputTemplateName(val) {
+        await this.performAction(() => this.content.uploadDialog.inputTemplateName(val));
+    }
+
+    async selectTemplateColumn(name, index) {
+        await this.performAction(() => this.content.uploadDialog.selectTemplateColumn(name, index));
+    }
+
+    async createTemplate() {
+        await this.performAction(() => this.content.uploadDialog.createTemplate());
+    }
+
+    async updateTemplate() {
+        await this.performAction(() => this.content.uploadDialog.updateTemplate());
+    }
+
+    /** Submit template */
+    async submitTemplate() {
+        await this.performAction(() => this.content.uploadDialog.submitTemplate());
+    }
+
+    /** Cancel create/update template */
+    async cancelTemplate() {
+        await this.performAction(() => this.content.uploadDialog.cancelTemplate());
+    }
+
+    /** Submit converted file data */
+    async submitUploaded() {
+        await this.performAction(() => this.content.uploadDialog.submit());
         await this.performAction(() => this.wait('#fileupload_popup', { hidden: true }));
+    }
+
+    async isUploadState() {
+        return Component.isVisible(this.content.uploadDialog);
     }
 
     async selectMainAccount(val) {

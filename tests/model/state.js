@@ -13,6 +13,7 @@ import {
     TRANSFER,
 } from './transaction.js';
 import { App } from '../app.js';
+import { List } from './list.js';
 import { Currency } from './currency.js';
 import { Icon } from './icon.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
@@ -72,6 +73,7 @@ export class AppState {
         this.accounts = null;
         this.persons = null;
         this.transactions = null;
+        this.templates = null;
         this.profile = null;
     }
 
@@ -100,6 +102,12 @@ export class AppState {
         this.transactions.sort();
         this.transactions.autoincrement = state.transactions.autoincrement;
 
+        if (!this.templates) {
+            this.templates = new List();
+        }
+        this.templates.data = copyObject(state.templates.data);
+        this.templates.autoincrement = state.templates.autoincrement;
+
         this.profile = copyObject(state.profile);
     }
 
@@ -121,6 +129,7 @@ export class AppState {
         res.accounts = this.accounts.clone();
         res.persons = this.persons.clone();
         res.transactions = this.transactions.clone();
+        res.templates = this.templates.clone();
         res.profile = copyObject(this.profile);
 
         return res;
@@ -130,6 +139,7 @@ export class AppState {
         const res = checkObjValue(this.accounts.data, expected.accounts.data)
             && checkObjValue(this.transactions.data, expected.transactions.data)
             && checkObjValue(this.persons.data, expected.persons.data)
+            && checkObjValue(this.templates.data, expected.templates.data)
             && checkObjValue(this.profile, expected.profile);
         return res;
     }

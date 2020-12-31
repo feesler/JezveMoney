@@ -41,9 +41,9 @@ ImportTemplate.prototype.getColumnsByIndex = function (index) {
         return this.columns[columnName] === index;
     }, this);
 
-    return res.map(function(columnName){
+    return res.map(function (columnName) {
         return tplColumns[columnName];
-    })
+    });
 };
 
 /**

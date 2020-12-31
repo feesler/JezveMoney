@@ -9,6 +9,13 @@ export class List {
         this.setData(data);
     }
 
+    clone() {
+        const res = new List(this.data);
+        res.autoincrement = this.autoincrement;
+
+        return res;
+    }
+
     get length() {
         return this.data.length;
     }

@@ -115,7 +115,7 @@ ImportView.prototype.onImportDone = function (items) {
 /** Initial account of upload change callback */
 ImportView.prototype.onUploadAccChange = function (accountId) {
     selectByValue(this.acc_id, accountId);
-    this.updMainAccObj();
+    this.onMainAccChange();
 };
 
 /** Refresh main account at model according to current selection */

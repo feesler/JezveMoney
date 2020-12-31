@@ -18,6 +18,16 @@ export function isObject(o) {
         && Object.prototype.toString.call(o) === '[object Object]';
 }
 
+/** Check is specified string is number */
+export function isNum(val) {
+    var fval = parseFloat(val);
+    if (fval === 0) {
+        return true;
+    }
+
+    return !!(val / val);
+}
+
 export async function asyncMap(data, func) {
     if (!Array.isArray(data)) {
         throw new Error('Invalid data type');

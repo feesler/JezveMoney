@@ -334,6 +334,7 @@ export class ImportListItem extends Component {
         this.expectedState = this.getExpectedState(this.model);
 
         await this.click(this.enableCheck);
+        await this.onChange(this.enableCheck);
         await this.parse();
 
         return this.checkState();
@@ -347,6 +348,19 @@ export class ImportListItem extends Component {
         if (field.disabled) {
             throw new Error(`'${field.title}' field is disabled`);
         }
+    }
+
+    getFirstAvailAccount (state) {
+        const userAccountsData = App.state.accounts.getUserAccounts(App.owner_id);
+        var userAccounts = new AccountList(userAccountsData);
+        var visibleAccounts = userAccounts.getVisible();
+        var res = visibleAccounts[0];
+
+        if (res.id === state.accountId) {
+            res = visibleAccounts[1];
+        }
+
+        return res;
     }
 
     onChangeMainAccount(value) {

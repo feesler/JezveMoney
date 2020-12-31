@@ -19,7 +19,7 @@ async function checkNavigation() {
 export async function checkInitialState() {
     await checkNavigation();
 
-    App.view.expectedState = App.view.getExpectedState();
+    App.view.expectedState = App.view.getExpectedState(App.view.model);
     await test('Initial state of import view', () => App.view.checkState());
 }
 
@@ -165,75 +165,205 @@ export async function addItem() {
 }
 
 export async function uploadFile(params) {
-    if (!params || !params.data || !params.filename || !params.template) {
-        throw new Error('Invalid parameters');
-    }
+    await test('Upload file', async () => {
+        if (!params || !params.data || !params.filename) {
+            throw new Error('Invalid parameters');
+        }
 
-    await checkNavigation();
+        await checkNavigation();
 
-    await App.state.fetch();
+        await App.state.fetch();
 
-    const importData = parseCSV(params.data);
-    const importTpl = await api.importtemplate.read(params.template);
-    const importRules = await api.importrule.list();
-    const importActions = await api.importaction.list();
+        const importData = parseCSV(params.data);
 
-    const itemsList = App.view.content.itemsList.getExpectedState();
+        // Perform actions on view
+        if (!params.filename) {
+            throw new Error('Invalid file name');
+        }
 
-    let mainAccountId;
-    if (params.account) {
-        mainAccountId = params.account;
-    } else {
-        [mainAccountId] = App.state.getAccountsByIndexes(0);
-    }
-    const mainAccount = App.state.accounts.getItem(mainAccountId);
-    if (!mainAccount) {
-        throw new Error('Main account not found');
-    }
+        await App.view.launchUploadDialog();
 
-    let importTransactions = applyTemplate(importData, importTpl[0], mainAccount);
+        if (params.encode) {
+            await App.view.selectUploadEncoding(params.encode);
+        }
+        await App.view.setUploadFile(params.filename, importData);
+        await App.view.upload();
 
-    const skipList = [];
-    const rootRules = getChildRules(importRules, 0);
-    importTransactions = importTransactions.map(
-        (item) => {
-            const res = applyRules(item, rootRules, importRules, importActions);
-            const tr = findSimilar(res, skipList);
+        App.view.expectedState = App.view.getExpectedState(App.view.model);
 
-            if (tr) {
-                skipList.push(tr.id);
-                res.enabled = false;
-            }
+        return App.view.checkState();
+    });
+}
 
-            return res;
-        },
-    );
+export async function selectTemplate(value) {
+    await test(`Select upload template [${value}]`, async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
 
-    const importedItems = ImportList.render(importTransactions, App.state);
-    itemsList.items = itemsList.items.concat(importedItems.items);
+        await App.state.fetch();
+        await App.view.selectTemplate(value);
+        return App.view.checkState();
+    });
+}
 
-    // Perform actions on view
-    if (!params.filename) {
-        throw new Error('Invalid file name');
-    }
+export async function inputTemplateName(value) {
+    await test(`Input template name (${value})`, async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
 
-    await App.view.launchUploadDialog();
-    await App.view.inputUploadFileName(params.filename);
-    await App.view.selectUploadTemplate(params.template);
+        await App.state.fetch();
+        await App.view.inputTemplateName(value);
+        return App.view.checkState();
+    });
+}
 
-    if (params.account) {
-        await App.view.selectUploadAccount(params.account);
-    }
-    if (params.encode) {
-        await App.view.selectUploadEncoding(params.encode);
-    }
+export async function selectTemplateColumn({ column, index }) {
+    await test(`Select template column [${column} => ${index}]`, async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
 
-    await App.view.upload();
+        await App.state.fetch();
+        await App.view.selectTemplateColumn(column, index);
+        return App.view.checkState();
+    });
+}
 
-    App.view.expectedState = {
-        values: { itemsList },
-    };
-    await test('Upload file', () => App.view.checkState());
+export async function createTemplate() {
+    await test('Create template', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        await App.state.fetch();
+        await App.view.createTemplate();
+        return App.view.checkState();
+    });
+}
+
+export async function updateTemplate() {
+    await test('Update template', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        await App.state.fetch();
+        await App.view.updateTemplate();
+        return App.view.checkState();
+    });
+}
+
+export async function submitTemplate() {
+    await test('Submit template', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        await App.state.fetch();
+        await App.view.submitTemplate();
+        return App.view.checkState();
+    });
+}
+
+export async function cancelTemplate() {
+    await test('Cancel template', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        await App.state.fetch();
+        await App.view.cancelTemplate();
+        return App.view.checkState();
+    });
+}
+
+export async function submitUploaded(params) {
+    await test('Submit file', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        if (!await App.view.isUploadState()) {
+            throw new Error('Invalid state of view');
+        }
+
+        const importData = parseCSV(params.data);
+        const importRules = await api.importrule.list();
+        const importActions = await api.importaction.list();
+
+        let mainAccountId;
+        if (params.account) {
+            mainAccountId = params.account;
+        } else {
+            //[mainAccountId] = App.state.getAccountsByIndexes(0);
+            mainAccountId = App.view.model.mainAccount;
+        }
+        const mainAccount = App.state.accounts.getItem(mainAccountId);
+        if (!mainAccount) {
+            throw new Error('Main account not found');
+        }
+
+        let importTpl;
+        if (params.template) {
+            importTpl = App.state.templates.getItemByIndex(params.template);
+        } else {
+            importTpl = App.view.content.uploadDialog.model.template;
+        }
+
+        let importTransactions = applyTemplate(importData, importTpl, mainAccount);
+
+        const skipList = [];
+        const rootRules = getChildRules(importRules, 0);
+        importTransactions = importTransactions.map(
+            (item) => {
+                const res = applyRules(item, rootRules, importRules, importActions);
+                const tr = findSimilar(res, skipList);
+
+                if (tr) {
+                    skipList.push(tr.id);
+                    res.enabled = false;
+                }
+
+                return res;
+            },
+        );
+
+        let itemsList;
+        if (params.account){
+            itemsList = {};
+            itemsList.items = App.view.content.itemsList.items.map(
+                (item) => {
+                    const model = item.onChangeMainAccount(params.account);
+                    return copyObject(item.getExpectedState(model).values);
+                },
+            );
+        } else {
+            itemsList = App.view.content.itemsList.getExpectedState();
+        }
+
+        const importedItems = ImportList.render(importTransactions, App.state);
+        itemsList.items = itemsList.items.concat(importedItems.items);
+
+        if (params.template) {
+            await App.view.selectUploadTemplate(params.template);
+        }
+        if (params.account) {
+            await App.view.selectUploadAccount(params.account);
+        }
+        if (params.encode) {
+            await App.view.selectUploadEncoding(params.encode);
+        }
+
+        await App.view.submitUploaded();
+
+        App.view.expectedState = {
+            values: { itemsList },
+        };
+
+        return App.view.checkState();
+    });
 }
 
 /** Change main account */
@@ -286,6 +416,7 @@ export async function enableItems({ index, value = true }) {
                 itemsList: App.view.content.itemsList.getExpectedState(),
             },
         };
+
         return App.view.checkState();
     });
 }

@@ -26,7 +26,7 @@ ImportFileUploader.prototype.initUploadExtras = function () {
 /** Upload form 'reset' event handler */
 ImportFileUploader.prototype.onResetUploadAdmin = function () {
     setTimeout(function () {
-        show(this.serverAddressBlock, false);
+        this.setUseServerAddress(false);
     }.bind(this));
 };
 
@@ -34,8 +34,14 @@ ImportFileUploader.prototype.onResetUploadAdmin = function () {
 ImportFileUploader.prototype.onCheckServer = function () {
     var useServer = this.useServerCheck.checked;
 
-    show(this.serverAddressBlock, useServer);
-    if (useServer) {
+    this.setUseServerAddress(useServer);
+};
+
+ImportFileUploader.prototype.setUseServerAddress = function (value) {
+    this.useServerCheck.checked = value;
+
+    show(this.serverAddressBlock, value);
+    if (value) {
         show(this.formElem, false);
         show(this.serverAddressBlock, true);
     } else {

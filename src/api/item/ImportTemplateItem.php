@@ -19,7 +19,7 @@ class ImportTemplateItem
         $this->id = $obj->id;
         $this->name = $obj->name;
         $this->type_id = $obj->type_id;
-        foreach($obj->columns as $column => $ind) {
+        foreach ($obj->columns as $column => $ind) {
             $this->columns[$column] = $ind;
         }
     }

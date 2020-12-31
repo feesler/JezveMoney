@@ -67,6 +67,20 @@ List.prototype.getItemIndex = function (itemId) {
 };
 
 /**
+ * Return item by specified index
+ * Return null in case item can't be found
+ * @param {Number} index - index of item to return
+ */
+List.prototype.getItemByIndex = function (index) {
+    var ind = parseInt(index, 10);
+    if (Number.isNaN(ind) || ind < 0 || ind >= this.data.length) {
+        return null;
+    }
+
+    return this.data[ind];
+};
+
+/**
  * @constructor ListItem
  * @param {object} props - properties of list item object
  */
