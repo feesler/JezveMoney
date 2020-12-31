@@ -741,8 +741,11 @@ class UserModel extends CachedTable
             return false;
         }
 
-        if (!$this->dbObj->deleteQ("persons", "user_id" . $setCond)) {
-            return false;
+        $tables = ["persons", "import_tpl", "import_rule", "import_act"];
+        foreach($tables as $table){
+            if (!$this->dbObj->deleteQ($table, "user_id" . $setCond)) {
+                return false;
+            }
         }
 
         return true;
