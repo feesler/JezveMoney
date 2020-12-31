@@ -27,7 +27,7 @@ ImportTemplate.prototype.isAvailField = function (field) {
  * Return information object if column found else null is returned
  * @param {number} index - column index in raw data
  */
-ImportTemplate.prototype.getColumnByIndex = function (index) {
+ImportTemplate.prototype.getColumnsByIndex = function (index) {
     var tplColumns = {
         accountAmount: { title: 'Account amount' },
         accountCurrency: { title: 'Account currency' },
@@ -37,11 +37,13 @@ ImportTemplate.prototype.getColumnByIndex = function (index) {
         comment: { title: 'Comment' }
     };
 
-    var res = Object.keys(tplColumns).find(function (columnName) {
+    var res = Object.keys(tplColumns).filter(function (columnName) {
         return this.columns[columnName] === index;
     }, this);
 
-    return (res) ? tplColumns[res] : null;
+    return res.map(function(columnName){
+        return tplColumns[columnName];
+    })
 };
 
 /**

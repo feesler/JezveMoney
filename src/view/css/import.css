@@ -227,6 +227,9 @@
 
 .raw-data-column__tpl
 {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
     text-align: center;
     font-weight: 500;
     background-color: #214B6F;
@@ -251,6 +254,31 @@
     height: 1.25rem;
     border-bottom: 1px solid;
     border-color: #9b9b9b;
+}
+
+.raw-data-table__tpl-2 .raw-data-column__tpl
+{
+    height: 2.5rem;
+}
+
+.raw-data-table__tpl-3 .raw-data-column__tpl
+{
+    height: 3.75rem;
+}
+
+.raw-data-table__tpl-4 .raw-data-column__tpl
+{
+    height: 5rem;
+}
+
+.raw-data-table__tpl-5 .raw-data-column__tpl
+{
+    height: 6.25rem;
+}
+
+.raw-data-table__tpl-6 .raw-data-column__tpl
+{
+    height: 7.5rem;
 }
 
 /* Carete/update template controls: Save, cancel buttons */

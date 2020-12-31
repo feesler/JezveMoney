@@ -505,6 +505,7 @@ ImportTemplateManager.prototype.render = function (state) {
     var dataRows;
     var colElems;
     var tableElem;
+    var propertiesPerColumn = 0;
     var isValid;
 
     templateAvail = (this.model.template.data.length > 0);
@@ -560,16 +561,22 @@ ImportTemplateManager.prototype.render = function (state) {
     headerRow = state.rawData.slice(0, 1)[0];
     dataRows = this.getDataRows(state, true);
     colElems = headerRow.map(function (title, columnInd) {
-        var columnInfo;
+        var columnsInfo;
+        var columnElems;
         var tplElem;
         var headElem;
         var columnData;
 
         tplElem = ce('div', { className: 'raw-data-column__tpl' });
         if (state.template) {
-            columnInfo = state.template.getColumnByIndex(columnInd + 1);
-            if (columnInfo) {
-                tplElem.textContent = columnInfo.title;
+            columnsInfo = state.template.getColumnsByIndex(columnInd + 1);
+            if (Array.isArray(columnsInfo)) {
+                columnElems = columnsInfo.map(function (column) {
+                    return ce('div', { className: 'raw-data-column__tpl-prop', textContent: column.title });
+                });
+                addChilds(tplElem, columnElems);
+
+                propertiesPerColumn = Math.max(propertiesPerColumn, columnElems.length);
             }
         }
 
@@ -587,6 +594,9 @@ ImportTemplateManager.prototype.render = function (state) {
     }, this);
 
     tableElem = ce('div', { className: 'raw-data-table' }, colElems);
+    if (propertiesPerColumn > 1) {
+        tableElem.classList.add('raw-data-table__tpl-' + propertiesPerColumn);
+    }
 
     removeChilds(this.rawDataTable);
     this.rawDataTable.appendChild(tableElem);
