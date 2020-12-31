@@ -71,14 +71,15 @@ export class Scenario {
         if (this.fullTest) {
             await this.runFullScenario();
         } else {
-            await this.runTestScenatio();
+            await this.runTestScenario();
         }
     }
 
-    async runTestScenatio() {
+    async runTestScenario() {
         await ApiTests.loginTest(App.config.testUser);
         await App.setupUser();
         this.setupCurrencies();
+        await App.goToMainView();
         await ProfileTests.relogin(App.config.testUser);
     }
 
