@@ -494,6 +494,11 @@ ImportTemplateManager.prototype.validateTemplate = function (state) {
     if (!value) {
         return this.onInvalidPropertyValue(state, 'date');
     }
+    // Comment
+    value = state.template.getProperty('comment', data, true);
+    if (!value) {
+        return this.onInvalidPropertyValue(state, 'comment');
+    }
 
     return true;
 };
