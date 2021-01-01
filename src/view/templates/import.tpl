@@ -69,14 +69,14 @@
             <label>Select file</label>
         </div>
         <div class="upload-form__inner">
-            <form id="fileimportfrm" class="import-form" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
-                <label id="fileBrowser" class="import-form__file">
+            <form id="fileimportfrm" class="upload-form" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
+                <label id="fileBrowser" class="upload-form__file">
                     <input id="fileInp" type="file">
-                    <div class="import-form__overlap">
+                    <div class="upload-form__overlap">
                         <button class="btn browse-btn" type="button">Browse</button>
                     </div>
                 </label>
-                <div class="import-form__filename"></div>
+                <div class="upload-form__filename"></div>
             </form>
 <?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
             <div id="serverAddressBlock" class="row-container hidden">
@@ -84,7 +84,7 @@
                 <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
             </div>
 <?php   }   ?>
-            <div class="import-form__options">
+            <div class="upload-form__options">
                 <label class="checkwrap">
                     <input id="isEncodeCheck" name="encode" type="checkbox" checked>
                     <span>CP-1251 encoding</span>
@@ -99,9 +99,9 @@
 <?php   }   ?>
     </div>
 
-    <div id="templateBlock" class="import-form__controls hidden">
+    <div id="templateBlock" class="tpl-form hidden">
         <div id="tplHeading" class="hidden">
-            <div class="import-tpl-header">
+            <div class="tpl-form-header">
                 <label>Convert</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
             </div>
@@ -132,9 +132,9 @@
                 </div>
             </div>
         </div>
-        <div id="loadingIndicator" class="import-tpl__loading hidden">Loading...</div>
-        <div id="tableDescr" class="import-tpl__title">Column map</div>
-        <div id="rawDataTable" class="import-tpl__block"></div>
+        <div id="loadingIndicator" class="tpl-form__loading hidden">Loading...</div>
+        <div id="tableDescr" class="tpl-form__title">Column map</div>
+        <div id="rawDataTable" class="tpl-form__block"></div>
         <div id="tplFeedback" class="invalid-feedback hidden"></div>
         <div id="tplControls" class="import-tpl-controls std_margin hidden">
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">

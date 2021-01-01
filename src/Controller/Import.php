@@ -37,7 +37,12 @@ class Import extends TemplateController
         }
 
         $this->css->libs[] = "lib/iconlink.css";
-        $this->css->page = "import.css";
+        $this->css->page = [
+            "import-upload-form.css",
+            "import-template.css",
+            "import-item.css",
+            "import.css"
+        ];
         $this->buildCSS();
 
         array_push(

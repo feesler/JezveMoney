@@ -66,8 +66,8 @@ ImportView.prototype.onStart = function () {
         oninsertat: this.onTransPosChanged.bind(this),
         container: 'rowsContainer',
         group: 'transactions',
-        selector: '.tr-row',
-        placeholderClass: 'tr-row__placeholder',
+        selector: '.import-item',
+        placeholderClass: 'import-item__placeholder',
         copyWidth: true,
         handles: [{ query: 'div' }, { query: 'label' }]
     });

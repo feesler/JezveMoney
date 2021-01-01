@@ -20,7 +20,7 @@ export class ImportUploadDialog extends Component {
         }
 
         this.uploadFormBrowser = { elem: await this.query(this.elem, '.upload-form__browser') };
-        this.fileNameElem = { elem: await this.query(this.elem, '.import-form__filename') };
+        this.fileNameElem = { elem: await this.query(this.elem, '.upload-form__filename') };
         this.templateSel = { elem: await this.query(this.elem, '#templateSel') };
         this.isEncodeCheck = { elem: await this.query(this.elem, '#isEncodeCheck') };
         this.submitBtn = { elem: await this.query(this.elem, '#submitUploadedBtn') };

@@ -246,7 +246,7 @@ function ImportTransactionItem() {
     ]);
     this.extendedContainer = this.createContainer('extended-content');
 
-    this.elem = this.createContainer('tr-row', [
+    this.elem = this.createContainer('import-item', [
         this.mainContainer,
         this.extendedContainer
     ]);
@@ -353,7 +353,7 @@ ImportTransactionItem.prototype.setExtendedContent = function (content) {
     if (content) {
         addChilds(this.extendedContainer, content);
     } else {
-        this.elem.classList.remove('tr-row_expanded');
+        this.elem.classList.remove('import-item_expanded');
     }
 
     show(this.toggleExtBtn, content);
@@ -383,7 +383,7 @@ ImportTransactionItem.prototype.onRowChecked = function () {
  * Toggle collapse/expande button 'click' event handler
  */
 ImportTransactionItem.prototype.toggleCollapse = function () {
-    this.elem.classList.toggle('tr-row_expanded');
+    this.elem.classList.toggle('import-item_expanded');
 };
 
 /**
@@ -915,9 +915,9 @@ ImportTransactionItem.prototype.render = function () {
     showBottom = (!isExpenseOrIncome || state.isDiff);
 
     if (state.enabled) {
-        this.elem.classList.remove('tr-row_disabled');
+        this.elem.classList.remove('import-item_disabled');
     } else {
-        this.elem.classList.add('tr-row_disabled');
+        this.elem.classList.add('import-item_disabled');
     }
 
     this.enableCheck.checked = state.enabled;

@@ -20,7 +20,7 @@ function ImportFileUploader() {
 
     this.formElem = ge('fileimportfrm');
     this.inputElem = ge('fileInp');
-    this.filenameElem = this.elem.querySelector('.import-form__filename');
+    this.filenameElem = this.elem.querySelector('.upload-form__filename');
     this.isEncodeCheck = ge('isEncodeCheck');
     if (!this.formElem || !this.inputElem || !this.filenameElem || !this.isEncodeCheck) {
         throw new Error('Failed to initialize import file uploader');

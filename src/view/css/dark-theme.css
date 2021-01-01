@@ -365,85 +365,85 @@ div.trans-list__item_selected
 
 
 /* Import view */
-.tr-row
+.import-item
 {
     background-color: #505050;
 }
 
-.tr-row .extended-content
+.import-item .extended-content
 {
     color: #BBBBBB;
     border-color: #3C3C3C;
     background-color: #444444;
 }
 
-.tr-row.tr-row_disabled .extended-content
+.import-item.import-item_disabled .extended-content
 {
     color: #707070;
     border-color: #333333;
     background-color: #232323;
 }
 
-.tr-row select,
-.tr-row input[type="text"]
+.import-item select,
+.import-item input[type="text"]
 {
     border-color: #DDDDDD;
 }
 
-.tr-row select[disabled],
-.tr-row input[disabled]
+.import-item select[disabled],
+.import-item input[disabled]
 {
     color: #808080;
     border-color: #808080;
     background-color: #202020;
 }
 
-.tr-row.tr-row_disabled
+.import-item.import-item_disabled
 {
     background-color: #292929;
     color: #707070;
     border-color: #707070;
 }
 
-.tr-row_disabled select,
-.tr-row_disabled select[disabled],
-.tr-row_disabled input[type="text"],
-.tr-row_disabled input[disabled]
+.import-item_disabled select,
+.import-item_disabled select[disabled],
+.import-item_disabled input[type="text"],
+.import-item_disabled input[disabled]
 {
     color: #707070;
     border-color: #202020;
     background-color: #202020;
 }
 
-.tr-row_disabled input::placeholder
+.import-item_disabled input::placeholder
 {
     color: #707070;
 }
 
-.tr-row .btn,
-.tr-row .btn:visited,
-.tr-row .btn:active
+.import-item .btn,
+.import-item .btn:visited,
+.import-item .btn:active
 {
     color: #DDDDDD;
 }
 
-.tr-row .btn:hover
+.import-item .btn:hover
 {
     background-color: #303030;
 }
 
-.tr-row .btn svg
+.import-item .btn svg
 {
     fill: #888888;
 }
 
-.tr-row .btn:hover svg
+.import-item .btn:hover svg
 {
     fill: #DDDDDD;
 }
 
 /* Placeholder */
-.tr-row.tr-row__placeholder
+.import-item.import-item__placeholder
 {
     border-color:#888888;
     background-color: #202020;
