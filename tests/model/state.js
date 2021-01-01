@@ -164,6 +164,9 @@ export class AppState {
         if (this.transactions) {
             this.transactions.reset();
         }
+        if (this.templates) {
+            this.templates.reset();
+        }
     }
 
     changeName(name) {
