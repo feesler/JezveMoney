@@ -5,13 +5,15 @@ import {
     setParam,
     fixFloat,
     isNum,
+    copyObject,
 } from '../../common.js';
+import { WarningPopup } from './warningpopup.js';
 
-const BROWSE_FILE_STATE = 1;
-const LOADING_STATE = 2;
-const RAW_DATA_STATE = 3;
-const CREATE_TPL_STATE = 4;
-const UPDATE_TPL_STATE = 5;
+export const BROWSE_FILE_STATE = 1;
+export const LOADING_STATE = 2;
+export const RAW_DATA_STATE = 3;
+export const CREATE_TPL_STATE = 4;
+export const UPDATE_TPL_STATE = 5;
 
 export class ImportUploadDialog extends Component {
     async parse() {
@@ -77,6 +79,17 @@ export class ImportUploadDialog extends Component {
             throw new Error('Failed to initialize extras of file upload dialog');
         }
 
+        this.templateSel.disabled = await this.prop(this.templateSel.elem, 'disabled');
+        this.templateSel.options = await asyncMap(
+            await this.queryAll(this.templateSel.elem, 'option'),
+            async (elem) => ({
+                elem,
+                value: await this.prop(elem, 'value'),
+                title: await this.prop(elem, 'textContent'),
+            }),
+        );
+        this.isTplLoading = this.templateSel.disabled;
+
         this.isLoading = await this.isVisible(this.loadingIndicator.elem, true);
         this.columns = null;
         if (!this.isLoading) {
@@ -133,6 +146,8 @@ export class ImportUploadDialog extends Component {
             this.state = BROWSE_FILE_STATE;
         }
 
+        this.delete_warning = await WarningPopup.create(this, await this.query('#tpl_delete_warning'));
+
         this.model = await this.buildModel(this);
     }
 
@@ -140,6 +155,7 @@ export class ImportUploadDialog extends Component {
         const res = {};
 
         res.state = cont.state;
+        res.isTplLoading = cont.isTplLoading;
 
         res.uploadCollapsed = cont.uploadCollapsed;
         res.useServerAddress = cont.useServerAddress;
@@ -245,6 +261,10 @@ export class ImportUploadDialog extends Component {
 
         if (model.state === CREATE_TPL_STATE
             || model.state === UPDATE_TPL_STATE) {
+            if (model.state === UPDATE_TPL_STATE && !model.template) {
+                throw new Error('Invalid model: expected template');
+            }
+
             setParam(res.visibility, {
                 templateBlock: true,
                 loadingIndicator: false,
@@ -288,7 +308,7 @@ export class ImportUploadDialog extends Component {
                 deleteTplBtn: true,
                 submitTplBtn: false,
                 cancelTplBtn: false,
-                tplFeedback: true,
+                tplFeedback: false,
             });
         } else if (model.state === BROWSE_FILE_STATE) {
             setParam(res.visibility, {
@@ -382,7 +402,7 @@ export class ImportUploadDialog extends Component {
         await this.parse();
 
         const tplVisible = await this.isVisible(this.templateBlock.elem, true);
-        if (App.state.templates.data.length) {
+        if (App.state.templates.length > 0) {
             this.model.state = RAW_DATA_STATE;
         } else {
             this.model.state = CREATE_TPL_STATE;
@@ -400,7 +420,7 @@ export class ImportUploadDialog extends Component {
         return this.checkState();
     }
 
-    async selectTemplate(val) {
+    async selectTemplateById(val) {
         if (this.model.state !== RAW_DATA_STATE) {
             throw new Error('Invalid state');
         }
@@ -415,12 +435,18 @@ export class ImportUploadDialog extends Component {
         return this.checkState();
     }
 
+    async selectTemplateByIndex(val) {
+        const itemId = App.state.templates.indexToId(val);
+        return this.selectTemplateById(itemId);
+    }
+
     async createTemplate() {
         if (this.model.state !== RAW_DATA_STATE) {
             throw new Error('Invalid state');
         }
 
         this.model.state = CREATE_TPL_STATE;
+        this.model.template = null;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.click(this.createTplBtn.elem);
@@ -440,6 +466,46 @@ export class ImportUploadDialog extends Component {
 
         await this.click(this.updateTplBtn.elem);
         await this.parse();
+
+        return this.checkState();
+    }
+
+    async deleteTemplate() {
+        if (this.model.state !== RAW_DATA_STATE) {
+            throw new Error('Invalid state');
+        }
+
+        if (this.templateSel.options.length === 1) {
+            this.model.state = CREATE_TPL_STATE;
+            this.model.template = null;
+        } else {
+            this.model.state = RAW_DATA_STATE;
+            const currentInd = this.templateSel.options.findIndex(
+                (option) => option.value === this.templateSel.value,
+            );
+            const newInd = (currentInd > 0) ? 0 : 1;
+            const newTplId = this.templateSel.options[newInd].value;
+            this.model.template = App.state.templates.getItem(newTplId);
+        }
+
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.click(this.deleteTplBtn.elem);
+        await this.parse();
+
+        if (!await Component.isVisible(this.delete_warning)) {
+            throw new Error('Delete template warning popup not appear');
+        }
+        if (!this.delete_warning.okBtn) {
+            throw new Error('OK button not found');
+        }
+
+        await this.click(this.delete_warning.okBtn);
+        await this.waitForFunction(async () => {
+            await this.parse();
+            console.log('wait: ', !this.isTplLoading);
+            return !this.isTplLoading;
+        });
 
         return this.checkState();
     }
@@ -493,10 +559,26 @@ export class ImportUploadDialog extends Component {
         this.expectedState = this.getExpectedState(this.model);
 
         await this.click(this.submitTplBtn.elem);
-        await this.wait('#tplControls', { hidden: true });
-        await this.parse();
+        await this.waitForFunction(async () => {
+            await this.parse();
+            return !this.isTplLoading;
+        });
 
         return this.checkState();
+    }
+
+    getCurrentState() {
+        return this.model.state;
+    }
+
+    getExpectedTemplate() {
+        const res = copyObject(this.model.template);
+
+        if (res) {
+            res.type_id = 0;
+        }
+
+        return res;
     }
 
     async cancelTemplate() {

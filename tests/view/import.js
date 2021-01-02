@@ -95,8 +95,12 @@ export class ImportView extends TestView {
         await this.performAction(() => this.content.uploadDialog.setFile(name, data));
     }
 
-    async selectUploadTemplate(val) {
-        await this.performAction(() => this.content.uploadDialog.selectTemplate(val));
+    async selectUploadTemplateById(val) {
+        await this.performAction(() => this.content.uploadDialog.selectTemplateById(val));
+    }
+
+    async selectUploadTemplateByIndex(val) {
+        await this.performAction(() => this.content.uploadDialog.selectTemplateByIndex(val));
     }
 
     async selectUploadAccount(val) {
@@ -120,12 +124,19 @@ export class ImportView extends TestView {
         await this.performAction(() => this.content.uploadDialog.selectTemplateColumn(name, index));
     }
 
+    /** Create new import template */
     async createTemplate() {
         await this.performAction(() => this.content.uploadDialog.createTemplate());
     }
 
+    /** Update currently selected template */
     async updateTemplate() {
         await this.performAction(() => this.content.uploadDialog.updateTemplate());
+    }
+
+    /** Delete currently selected template */
+    async deleteTemplate() {
+        await this.performAction(() => this.content.uploadDialog.deleteTemplate());
     }
 
     /** Submit template */
@@ -142,6 +153,16 @@ export class ImportView extends TestView {
     async submitUploaded() {
         await this.performAction(() => this.content.uploadDialog.submit());
         await this.performAction(() => this.wait('#fileupload_popup', { hidden: true }));
+    }
+
+    /** Return current state of upload dialog */
+    getUploadState() {
+        return this.content.uploadDialog.getCurrentState();
+    }
+
+    /** Return expected template object */
+    getExpectedTemplate() {
+        return this.content.uploadDialog.getExpectedTemplate();
     }
 
     async isUploadState() {

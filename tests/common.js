@@ -28,6 +28,17 @@ export function isNum(val) {
     return !!(val / val);
 }
 
+/** Check parameter is integer */
+export function isInt(x) {
+    const y = parseInt(x, 10);
+
+    if (Number.isNaN(y)) {
+        return false;
+    }
+
+    return x === y && x.toString() === y.toString();
+}
+
 export async function asyncMap(data, func) {
     if (!Array.isArray(data)) {
         throw new Error('Invalid data type');

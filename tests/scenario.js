@@ -2247,6 +2247,7 @@ export class Scenario {
             data: csvStatement,
         });
 
+        this.environment.setBlock('Create import template', 2);
         // Select columns for template
         await ImportTests.selectTemplateColumn({ column: 'accountAmount', index: 11 });
         await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 9 });
@@ -2258,11 +2259,28 @@ export class Scenario {
         await ImportTests.inputTemplateName('Template_1');
         await ImportTests.submitTemplate();
         // Update template
+        this.environment.setBlock('Update import template', 2);
         await ImportTests.updateTemplate();
         await ImportTests.inputTemplateName('Template_2');
         await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 11 });
         await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 10 });
         await ImportTests.submitTemplate();
+
+        // Create another template
+        await ImportTests.createTemplate();
+        await ImportTests.selectTemplateColumn({ column: 'accountAmount', index: 11 });
+        await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 9 });
+        await ImportTests.selectTemplateColumn({ column: 'accountCurrency', index: 10 });
+        await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 8 });
+        await ImportTests.selectTemplateColumn({ column: 'date', index: 1 });
+        await ImportTests.selectTemplateColumn({ column: 'comment', index: 2 });
+        await ImportTests.inputTemplateName('Template_dup');
+        await ImportTests.submitTemplate();
+
+        // Delete new template
+        this.environment.setBlock('Delete import template', 2);
+        await ImportTests.selectTemplateByIndex(0);
+        await ImportTests.deleteTemplate();
 
         // Submit converted transactions
         await ImportTests.submitUploaded({ data: csvStatement, account: ACC_RUB });

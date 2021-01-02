@@ -1,6 +1,7 @@
 import {
     isValidValue,
     isObject,
+    isInt,
     copyObject,
     setParam,
     checkObjValue,
@@ -38,6 +39,17 @@ const pReqFields = ['name', 'flags'];
  */
 const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
 
+/**
+ * Import templates
+ */
+const tplReqFields = ['name', 'type_id', 'columns'];
+const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
+
+/**
+ * Check all properties of expected object are presents in specified object
+ * @param {Object} fields - object to check
+ * @param {Object} expFields - expected object
+ */
 function checkFields(fields, expFields) {
     if (!fields || !expFields) {
         return false;
@@ -52,6 +64,11 @@ function checkFields(fields, expFields) {
     return true;
 }
 
+/**
+ * Return new object with properties of specified object which are presents in expected object
+ * @param {Object} fields - object to check
+ * @param {Object} expFields - expected object
+ */
 function copyFields(fields, expFields) {
     const res = {};
 
@@ -803,6 +820,84 @@ export class AppState {
         }
 
         this.transactions.updateResults(this.accounts);
+
+        return true;
+    }
+
+    /**
+     * Import templates
+     */
+    checkTemplateCorrectness(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        if (!checkFields(params, tplReqFields)) {
+            return false;
+        }
+
+        if (typeof params.name !== 'string' || params.name === '') {
+            return false;
+        }
+
+        if (!isObject(params.columns)) {
+            return false;
+        }
+        // Check every column value is present and have correct value
+        return tplReqColumns.every((columnName) => (
+            (columnName in params.columns)
+            && isInt(params.columns[columnName])
+            && params.columns[columnName] > 0
+        ));
+    }
+
+    createTemplate(params) {
+        const resExpected = this.checkTemplateCorrectness(params);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(params, tplReqFields);
+
+        const ind = this.templates.create(data);
+        const item = this.templates.getItemByIndex(ind);
+
+        return item.id;
+    }
+
+    updateTemplate(params) {
+        const origItem = this.templates.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expTemplate = copyObject(origItem);
+        const data = copyFields(params, tplReqFields);
+        setParam(expTemplate, data);
+
+        const resExpected = this.checkTemplateCorrectness(expTemplate);
+        if (!resExpected) {
+            return false;
+        }
+
+        this.templates.update(expTemplate);
+
+        return true;
+    }
+
+    deleteTemplates(ids) {
+        const itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return false;
+        }
+
+        for (const itemId of itemIds) {
+            if (!this.templates.getItem(itemId)) {
+                return false;
+            }
+        }
+
+        this.templates.deleteItems(ids);
 
         return true;
     }

@@ -6,6 +6,7 @@ import { applyTemplate, getChildRules, applyRules } from '../model/import.js';
 import { ImportList } from '../view/component/importlist.js';
 import { ImportView } from '../view/import.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
+import { CREATE_TPL_STATE } from '../view/component/importuploaddialog.js';
 
 /** Navigate to transactions list page */
 async function checkNavigation() {
@@ -195,14 +196,26 @@ export async function uploadFile(params) {
     });
 }
 
-export async function selectTemplate(value) {
+export async function selectTemplateById(value) {
     await test(`Select upload template [${value}]`, async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
         }
 
         await App.state.fetch();
-        await App.view.selectTemplate(value);
+        await App.view.selectUploadTemplateById(value);
+        return App.view.checkState();
+    });
+}
+
+export async function selectTemplateByIndex(value) {
+    await test(`Select upload template by index [${value}]`, async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        await App.state.fetch();
+        await App.view.selectUploadTemplateByIndex(value);
         return App.view.checkState();
     });
 }
@@ -243,6 +256,7 @@ export async function createTemplate() {
     });
 }
 
+/** Update currently selected template */
 export async function updateTemplate() {
     await test('Update template', async () => {
         if (!(App.view instanceof ImportView)) {
@@ -255,15 +269,46 @@ export async function updateTemplate() {
     });
 }
 
+/** Delete currently selected template */
+export async function deleteTemplate() {
+    await test('Delete template', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+        // Prepare expected content
+        await App.state.fetch();
+        const expectedTpl = App.view.getExpectedTemplate();
+        App.state.templates.deleteItems(expectedTpl.id);
+
+        // Perform actions on view
+        await App.view.deleteTemplate();
+        await App.view.checkState();
+
+        return App.state.fetchAndTest();
+    });
+}
+
 export async function submitTemplate() {
     await test('Submit template', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
         }
 
+        // Prepare expected content
         await App.state.fetch();
+
+        const expectedTpl = App.view.getExpectedTemplate();
+        const uploadState = App.view.getUploadState();
+        if (uploadState === CREATE_TPL_STATE) {
+            App.state.createTemplate(expectedTpl);
+        } else {
+            App.state.updateTemplate(expectedTpl);
+        }
+
         await App.view.submitTemplate();
-        return App.view.checkState();
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
     });
 }
 
@@ -308,7 +353,7 @@ export async function submitUploaded(params) {
         if (params.template) {
             importTpl = App.state.templates.getItemByIndex(params.template);
         } else {
-            importTpl = App.view.content.uploadDialog.model.template;
+            importTpl = App.view.getExpectedTemplate();
         }
 
         let importTransactions = applyTemplate(importData, importTpl, mainAccount);
