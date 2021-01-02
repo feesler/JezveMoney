@@ -606,14 +606,18 @@ ImportTemplateManager.prototype.render = function (state) {
     removeChilds(this.rawDataTable);
     this.rawDataTable.appendChild(tableElem);
 
-    isValid = this.validateTemplate(state);
-    if (isValid) {
-        enable(this.submitTplBtn, true);
-        this.setTemplateFeedback('Valid template');
+    if (state.id === this.LOADING_STATE) {
+        this.setTemplateFeedback();
     } else {
-        enable(this.submitTplBtn, false);
-        if (state.id === this.RAW_DATA_STATE) {
-            this.setTemplateFeedback('Template does not match data');
+        isValid = this.validateTemplate(state);
+        if (isValid) {
+            enable(this.submitTplBtn, true);
+            this.setTemplateFeedback('Valid template');
+        } else {
+            enable(this.submitTplBtn, false);
+            if (state.id === this.RAW_DATA_STATE) {
+                this.setTemplateFeedback('Template does not match data');
+            }
         }
     }
 
