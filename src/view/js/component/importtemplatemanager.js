@@ -140,7 +140,8 @@ ImportTemplateManager.prototype.reset = function () {
         id: this.LOADING_STATE,
         rawData: null,
         startFromRow: 2,
-        rowsToShow: 3
+        rowsToShow: 3,
+        listLoading: false
     };
     this.render(this.state);
     this.hide();
@@ -236,6 +237,8 @@ ImportTemplateManager.prototype.onDeleteTemplateClick = function () {
         title: this.templateDeleteTitle,
         content: this.templateDeleteMsg,
         onconfirm: function () {
+            this.state.listLoading = true;
+            this.render(this.state);
             ajax.post({
                 url: baseURL + 'api/importtpl/delete',
                 data: JSON.stringify(requestObj),
@@ -296,6 +299,8 @@ ImportTemplateManager.prototype.onSubmitTemplateClick = function () {
         reqURL += 'create';
     }
 
+    this.state.listLoading = true;
+    this.render(this.state);
     ajax.post({
         url: reqURL,
         data: JSON.stringify(requestObj),
@@ -352,6 +357,7 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
             throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
         }
 
+        this.state.listLoading = false;
         this.model.template.setData(jsondata.data);
         if (this.model.template.data.length > 0) {
             this.state.id = this.RAW_DATA_STATE;
@@ -554,6 +560,15 @@ ImportTemplateManager.prototype.render = function (state) {
         show(this.tplControls, true);
         show(this.cancelTplBtn, templateAvail);
     }
+
+    enable(this.templateSel, !state.listLoading);
+    enable(this.tplNameInp, !state.listLoading);
+    enable(this.columnSel, !state.listLoading);
+    enable(this.createTplBtn, !state.listLoading);
+    enable(this.updateTplBtn, !state.listLoading);
+    enable(this.deleteTplBtn, !state.listLoading);
+    enable(this.submitTplBtn, !state.listLoading);
+    enable(this.cancelTplBtn, !state.listLoading);
 
     this.tplNameInp.value = (state.template) ? state.template.name : '';
 
