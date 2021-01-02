@@ -135,7 +135,9 @@ export async function create(params) {
         }
         // Check state of accounts list view
         App.view.expectedState = AccountsView.render(App.state);
-        return App.view.checkState();
+        await App.view.checkState();
+        // Check app state
+        return App.state.fetchAndTest();
     });
 }
 
