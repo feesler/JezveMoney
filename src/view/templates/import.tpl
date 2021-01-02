@@ -12,7 +12,7 @@
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Import transactions</h1>
-                        <div id="uploadBtn" class="iconlink right-align">
+                        <div id="uploadBtn" class="iconlink">
                             <button type="button">
                                 <span class="iconlink__icon"><?=svgIcon("import")?></span>
                                 <span class="iconlink__content"><span>Upload file</span></span>
