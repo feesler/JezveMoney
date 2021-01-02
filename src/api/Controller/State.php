@@ -64,7 +64,7 @@ class State extends ApiController
         foreach ($items as $item) {
             $res->templates->data[] = new ImportTemplateItem($item);
         }
-        $res->templates->autoincrement = $this->pModel->autoIncrement();
+        $res->templates->autoincrement = $this->tplModel->autoIncrement();
         // User profile
         $userObj = $this->uMod->getItem($this->user_id);
         if (!$userObj) {
