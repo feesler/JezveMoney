@@ -13,6 +13,7 @@ class ImportRule extends ApiController
         "field_id",
         "operator",
         "value",
+        "flags"
     ];
     protected $model = null;
 
