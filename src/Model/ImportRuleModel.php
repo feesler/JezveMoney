@@ -78,6 +78,7 @@ class ImportRuleModel extends CachedTable
         self::$user_id = $uMod->getUser();
 
         $this->dbObj = MySqlDB::getInstance();
+        $this->actionModel = ImportActionModel::getInstance();
     }
 
 

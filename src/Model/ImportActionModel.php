@@ -319,7 +319,7 @@ class ImportActionModel extends CachedTable
     }
 
 
-    public function onRuleDelete($rules)
+    public function onDeleteRules($rules)
     {
         if (is_null($rules)) {
             return;
