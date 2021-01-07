@@ -122,6 +122,7 @@ AdminListView.prototype.createItem = function () {
     this.preCreateItem();
     this.itemForm.action = baseURL + 'api/' + this.apiController + '/create';
     this.setItemValues(null);
+    this.dialogPopup.setTitle('Create');
     this.dialogPopup.show();
 };
 
@@ -135,6 +136,7 @@ AdminListView.prototype.preUpdateItem = function () { };
  */
 AdminListView.prototype.updateItem = function () {
     this.preUpdateItem();
+    this.dialogPopup.setTitle('Update');
     this.dialogPopup.show();
 };
 

@@ -77,8 +77,7 @@ textarea
 
 .popup__form-controls
 {
-	position: relative;
-	top: 25px;
+	margin-top: 25px;
 }
 
 
@@ -132,6 +131,7 @@ textarea
 /* Create/update item popup */
 .popup > .item-form > .popup__content-box
 {
+    width: 100%;
 	max-width: 300px;
 	min-width: 130px;
 }
