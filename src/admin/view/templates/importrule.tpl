@@ -11,10 +11,9 @@
         <div class="container">
             <div class="content">
                 <div class="content_wrap admin_cont_wrap">
-                    <h2>Import rules</h2>
-
                     <div class="row-container">
                         <div>
+                            <h2>Import rules</h2>
                             <table class="admin-tbl">
                                 <thead>
                                     <tr>
@@ -50,6 +49,7 @@
                         </div>
 
                         <div id="actionsContainer" class="hidden">
+                            <h2>Actions</h2>
                             <table class="admin-tbl">
                                 <thead>
                                     <tr>

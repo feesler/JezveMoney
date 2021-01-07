@@ -76,7 +76,7 @@ AdminImportRuleListView.prototype.setItemValues = function (item) {
         selectByValue(this.fieldSel, item.field_id);
         selectByValue(this.operatorSel, item.operator);
 
-        isFieldValue = this.isFieldValueOperator(item.operator);
+        isFieldValue = this.isFieldValueOperator(item.flags);
         this.fieldFlagCheck.checked = isFieldValue;
         if (isFieldValue) {
             selectByValue(this.fieldValueSel, parseInt(item.value, 10));
@@ -84,7 +84,6 @@ AdminImportRuleListView.prototype.setItemValues = function (item) {
         this.valueInput.value = item.value;
 
         this.actionsView.setParentRule(item.id);
-        show(this.actionsContainer, true);
     } else {
         this.idInput.value = '';
         this.parentInput.value = '';
@@ -92,9 +91,9 @@ AdminImportRuleListView.prototype.setItemValues = function (item) {
         selectByValue(this.operatorSel, 0);
         this.fieldFlagCheck.checked = false;
         this.valueInput.value = '';
-
-        show(this.actionsContainer, false);
     }
+
+    show(this.actionsContainer, !!item);
 
     this.onFieldFlagChange();
 };
@@ -113,7 +112,7 @@ AdminImportRuleListView.prototype.onFieldFlagChange = function () {
  */
 AdminImportRuleListView.prototype.isFieldValueOperator = function (data) {
     var flags = parseInt(data, 10);
-    if (!flags) {
+    if (Number.isNaN(flags)) {
         throw new Error('Invalid flags value');
     }
 
@@ -196,7 +195,7 @@ AdminImportRuleListView.prototype.renderItem = function (item) {
         operatorName = item.operator;
     }
 
-    if (this.isFieldValueOperator(item.operator)) {
+    if (this.isFieldValueOperator(item.flags)) {
         valueStr = this.getFieldName(item.value);
     } else {
         valueStr = item.value;
