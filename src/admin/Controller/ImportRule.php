@@ -26,6 +26,13 @@ class ImportRule extends AdminController
         $fieldsData = ImportConditionModel::getFields();
         $operatorsData = ImportConditionModel::getOperators();
 
+        $viewData = [
+            "data" => $itemsData,
+            "actionTypes" => $actTypeData,
+            "fields" => $fieldsData,
+            "operators" => $operatorsData
+        ];
+
         $this->menuItems["importrule"]["active"] = true;
 
         $titleString = "Admin panel | Import rules";

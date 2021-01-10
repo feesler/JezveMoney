@@ -41,35 +41,33 @@
 </div>
 
 <form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/icon/new">
-<input id="icon_id" name="id" type="hidden">
-<div class="view-row">
-    <label for="icon_name">Name</label>
-    <div class="stretch-input"><input id="icon_name" name="name" type="text"></div>
-</div>
-<div class="view-row">
-    <label for="icon_file">File name</label>
-    <div class="stretch-input"><input id="icon_file" name="file" type="text"></div>
-</div>
-<div id="admin_block" class="view-row">
-    <label for="icon_type">Type</label>
-    <select id="icon_type" class="admin-select" name="type">
-        <option value="0">Select type</option>
-<?php	foreach($typesData as $type_id => $typeName) {		?>
-        <option value="<?=e($type_id)?>"><?=e($typeName)?></option>
-<?php	}		?>
-    </select>
-</div>
-<div class="popup__form-controls">
-    <input class="btn submit-btn" type="submit" value="Submit">
-</div>
+    <input id="icon_id" name="id" type="hidden">
+    <div class="view-row">
+        <label for="icon_name">Name</label>
+        <div class="stretch-input"><input id="icon_name" name="name" type="text"></div>
+    </div>
+    <div class="view-row">
+        <label for="icon_file">File name</label>
+        <div class="stretch-input"><input id="icon_file" name="file" type="text"></div>
+    </div>
+    <div id="admin_block" class="view-row">
+        <label for="icon_type">Type</label>
+        <select id="icon_type" class="admin-select" name="type">
+            <option value="0">Select type</option>
+    <?php	foreach($typesData as $type_id => $typeName) {		?>
+            <option value="<?=e($type_id)?>"><?=e($typeName)?></option>
+    <?php	}		?>
+        </select>
+    </div>
+    <div class="popup__form-controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
+    </div>
 </form>
 
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 
 <script>
-    var view = new AdminIconListView({
-        data :  <?=JSON::encode($itemsData)?>
-    });
+var view = new AdminIconListView(<?=JSON::encode($viewData)?>);
 </script>
 </body>
 </html>

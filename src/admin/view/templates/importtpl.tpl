@@ -59,50 +59,48 @@
 </div>
 
 <form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/importtpl/new">
-<input id="item_id" name="id" type="hidden">
-<div class="view-row">
-    <label for="item_name">Name</label>
-    <div class="stretch-input"><input id="item_name" name="name" type="text"></div>
-</div>
-<div class="view-row">
-    <label for="item_type_id">Type id</label>
-    <div class="stretch-input"><input id="item_type_id" name="type_id" type="text" autocomplete="off"></div>
-</div>
-<div class="view-row">
-    <label for="item_date_col">Date column index</label>
-    <div class="stretch-input"><input id="item_date_col" name="date_col" type="text" autocomplete="off"></div>
-</div>
-<div class="view-row">
-    <label for="item_comment_col">Comment column index</label>
-    <div class="stretch-input"><input id="item_comment_col" name="comment_col" type="text" autocomplete="off"></div>
-</div>
-<div class="view-row">
-    <label for="item_trans_curr_col">Currency of transaction column index</label>
-    <div class="stretch-input"><input id="item_trans_curr_col" name="trans_curr_col" type="text" autocomplete="off"></div>
-</div>
-<div class="view-row">
-    <label for="item_trans_amount_col">Amount of transaction column index</label>
-    <div class="stretch-input"><input id="item_trans_amount_col" name="trans_amount_col" type="text" autocomplete="off"></div>
-</div>
-<div class="view-row">
-    <label for="item_account_curr_col">Currency of account column index</label>
-    <div class="stretch-input"><input id="item_account_curr_col" name="account_curr_col" type="text" autocomplete="off"></div>
-</div>
-<div class="view-row">
-    <label for="item_account_amount_col">Amount of account column index</label>
-    <div class="stretch-input"><input id="item_account_amount_col" name="account_amount_col" type="text" autocomplete="off"></div>
-</div>
-<div class="popup__form-controls">
-    <input class="btn submit-btn" type="submit" value="Submit">
-</div>
+    <input id="item_id" name="id" type="hidden">
+    <div class="view-row">
+        <label for="item_name">Name</label>
+        <div class="stretch-input"><input id="item_name" name="name" type="text"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_type_id">Type id</label>
+        <div class="stretch-input"><input id="item_type_id" name="type_id" type="text" autocomplete="off"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_date_col">Date column index</label>
+        <div class="stretch-input"><input id="item_date_col" name="date_col" type="text" autocomplete="off"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_comment_col">Comment column index</label>
+        <div class="stretch-input"><input id="item_comment_col" name="comment_col" type="text" autocomplete="off"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_trans_curr_col">Currency of transaction column index</label>
+        <div class="stretch-input"><input id="item_trans_curr_col" name="trans_curr_col" type="text" autocomplete="off"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_trans_amount_col">Amount of transaction column index</label>
+        <div class="stretch-input"><input id="item_trans_amount_col" name="trans_amount_col" type="text" autocomplete="off"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_account_curr_col">Currency of account column index</label>
+        <div class="stretch-input"><input id="item_account_curr_col" name="account_curr_col" type="text" autocomplete="off"></div>
+    </div>
+    <div class="view-row">
+        <label for="item_account_amount_col">Amount of account column index</label>
+        <div class="stretch-input"><input id="item_account_amount_col" name="account_amount_col" type="text" autocomplete="off"></div>
+    </div>
+    <div class="popup__form-controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
+    </div>
 </form>
 
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 
 <script>
-    var view = new AdminImportTemplateListView({
-        data :  <?=JSON::encode($itemsData)?>
-    });
+var view = new AdminImportTemplateListView(<?=JSON::encode($viewData)?>);
 </script>
 </body>
 </html>

@@ -20,6 +20,9 @@ class Icon extends AdminController
     {
         $itemsData = $this->model->getData();
         $typesData = $this->model->getTypes();
+        $viewData = [
+            "data" => $itemsData
+        ];
 
         $this->menuItems["icon"]["active"] = true;
 

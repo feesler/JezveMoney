@@ -12,7 +12,7 @@
                         <h1>API test</h1>
                     </div>
 
-                    <div class="api-console">
+<div class="api-console">
     <div class="left-column">
         <ul id="controllersList" class="menu-list">
             <li>
@@ -858,7 +858,7 @@
         <div id="results"></div>
     </div>
 
-                    </div>
+</div>
                 </div>
             </div>
         </div>
@@ -866,7 +866,7 @@
 </div>
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new AdminApiConsoleView();
+var view = new AdminApiConsoleView();
 </script>
 </body>
 </html>

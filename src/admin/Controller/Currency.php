@@ -18,7 +18,10 @@ class Currency extends AdminController
 
     public function index()
     {
-        $currArr = $this->model->getData();
+        $itemsData = $this->model->getData();
+        $viewData = [
+            "data" => $itemsData
+        ];
 
         $this->menuItems["curr"]["active"] = true;
 

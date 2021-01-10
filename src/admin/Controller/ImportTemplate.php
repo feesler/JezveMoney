@@ -19,6 +19,9 @@ class ImportTemplate extends AdminController
     public function index()
     {
         $itemsData = $this->model->getData();
+        $viewData = [
+            "data" => $itemsData
+        ];
 
         $this->menuItems["importtpl"]["active"] = true;
 
