@@ -631,6 +631,36 @@ class MySqlDB
     }
 
 
+    // Remove specified columns from table
+    public function dropColumns($table, $columns)
+    {
+        if (!$table || $table == "") {
+            return false;
+        }
+        if (is_null($columns) || $columns == "") {
+            return false;
+        }
+
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+
+        $dropOperations = [];
+        foreach ($columns as $columnName) {
+            if (!is_string($columnName) || $columnName == "") {
+                return false;
+            }
+
+            $dropOperations[] = "DROP COLUMN `$columnName`";
+        }
+
+        $query = "ALTER TABLE `" . $table . "` " . implode(", ", $dropOperations) . ";";
+        $this->rawQ($query);
+
+        return ($this->errno == 0);
+    }
+
+
     // Add keys(indexes) to specified table
     // $keys expected to be an associative array as follows:
     //  ["key_name_1" => "field_name", "key_name_2" => ["field_1", "field_2"]]
