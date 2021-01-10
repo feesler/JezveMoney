@@ -668,6 +668,73 @@ export const api = {
         },
     },
 
+    importcondition: {
+        async read(ids) {
+            const apiReq = idsRequest('importcond/', ids);
+            const jsonRes = await apiGet(apiReq);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to read import condition(s)');
+            }
+
+            return jsonRes.data;
+        },
+
+        async create(options) {
+            const postData = checkFields(options, currReqFields);
+            const apiRes = await apiPost('importcond/create', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import condition');
+            }
+
+            return apiRes.data;
+        },
+
+        async update(id, options) {
+            const itemId = parseInt(id, 10);
+            if (!itemId || Number.isNaN(itemId)) {
+                throw new ApiRequestError('Invalid id specified');
+            }
+
+            const postData = checkFields(options, currReqFields);
+            postData.id = itemId;
+
+            const apiRes = await apiPost('importcond/update', postData);
+            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to update import condition');
+            }
+
+            return true;
+        },
+
+        async del(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            for (const id of itemIds) {
+                const fid = parseInt(id, 10);
+                if (!fid || Number.isNaN(fid)) {
+                    throw new ApiRequestError(`Invalid id specified: ${id}`);
+                }
+            }
+
+            const postData = { id: ids };
+            const apiRes = await apiPost('importcond/delete', postData);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to delete import condition(s)');
+            }
+
+            return true;
+        },
+
+        async list() {
+            const reqUrl = 'importrule/list';
+            const jsonRes = await apiGet(reqUrl);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to obtain list of import conditions');
+            }
+
+            return jsonRes.data;
+        },
+    },
+
     importaction: {
         async read(ids) {
             const apiReq = idsRequest('importaction/', ids);

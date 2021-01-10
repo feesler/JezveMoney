@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, ce, ajax, selectByValue, extend, urlJoin, baseURL */
+/* global ge, ce, show, ajax, selectByValue, extend, urlJoin, baseURL */
 /* global AdminListView, List */
 /* eslint no-bitwise: "off" */
 
@@ -78,6 +78,7 @@ AdminImportActionListView.prototype.requestList = function () {
         rule: this.parentRule
     };
 
+    show(this.itemsListElem, false);
     ajax.get({
         url: baseURL + 'api/' + this.apiController + '/list?' + urlJoin(options),
         callback: this.onListResult.bind(this)

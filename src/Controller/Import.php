@@ -51,6 +51,7 @@ class Import extends TemplateController
             "model/account.js",
             "model/currency.js",
             "model/person.js",
+            "model/importcondition.js",
             "model/importaction.js",
             "model/importrule.js",
             "model/importtpl.js",

@@ -13,6 +13,7 @@ $router->setRoutes([
     "import" => "Import",
     "importtpl" => "ImportTemplate",
     "importrule" => "ImportRule",
+    "importcond" => "ImportCondition",
     "importaction" => "ImportAction",
     "account" => "Account",
     "person" => "Person",

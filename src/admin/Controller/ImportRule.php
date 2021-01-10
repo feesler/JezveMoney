@@ -4,6 +4,7 @@ namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
 use JezveMoney\App\Model\ImportRuleModel;
+use JezveMoney\App\Model\ImportConditionModel;
 use JezveMoney\App\Model\ImportActionModel;
 
 class ImportRule extends AdminController
@@ -14,29 +15,16 @@ class ImportRule extends AdminController
     protected function onStart()
     {
         $this->model = ImportRuleModel::getInstance();
-        $this->actionModel = ImportActionModel::getInstance();
     }
 
 
     public function index()
     {
-        $rulesData = $this->model->getData(["full" => true]);
-        $itemsData = [];
-        foreach ($rulesData as $rule) {
-            $item = clone $rule;
-            $item->fieldName = ImportRuleModel::getFieldName($item->field_id);
-            $item->operatorName = ImportRuleModel::getOperatorName($item->operator);
-            if (ImportRuleModel::isFieldValueOperator($item->flags)) {
-                $item->valueStr = ImportRuleModel::getFieldName($item->value);
-            } else {
-                $item->valueStr = $item->value;
-            }
-            $itemsData[] = $item;
-        }
+        $itemsData = $this->model->getData(["full" => true]);
 
         $actTypeData = ImportActionModel::getActions();
-        $fieldsData = ImportRuleModel::getFields();
-        $operatorsData = ImportRuleModel::getOperators();
+        $fieldsData = ImportConditionModel::getFields();
+        $operatorsData = ImportConditionModel::getOperators();
 
         $this->menuItems["importrule"]["active"] = true;
 
@@ -56,6 +44,7 @@ class ImportRule extends AdminController
             $this->jsAdmin,
             "adminview.js",
             "adminlistview.js",
+            "importconditionview.js",
             "importactionview.js",
             "importruleview.js"
         );

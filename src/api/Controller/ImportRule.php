@@ -3,17 +3,18 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportRuleModel;
+use JezveMoney\App\Model\ImportConditionModel;
+use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Item\ImportRuleItem;
 
 class ImportRule extends ApiController
 {
     protected $requiredFields = [
-        "parent_id",
-        "field_id",
-        "operator",
-        "value",
-        "flags"
+        "flags",
+        "conditions",
+        "actions"
     ];
     protected $model = null;
 
@@ -23,6 +24,8 @@ class ImportRule extends ApiController
         parent::initAPI();
 
         $this->model = ImportRuleModel::getInstance();
+        $this->condModel = ImportConditionModel::getInstance();
+        $this->actionModel = ImportActionModel::getInstance();
     }
 
 
@@ -53,8 +56,8 @@ class ImportRule extends ApiController
         if (isset($_GET["full"]) && $_GET["full"] == true) {
             $params["full"] = true;
         }
-        if (isset($_GET["parent"])) {
-            $params["parent"] = $_GET["parent"];
+        if (isset($_GET["extended"]) && $_GET["extended"] == true) {
+            $params["extended"] = true;
         }
 
         $res = $this->model->getData($params);
@@ -65,7 +68,7 @@ class ImportRule extends ApiController
 
     protected function create()
     {
-        $defMsg = ERR_IMPORT_RULE_CREATE;
+        $defMsg = Message::get(ERR_IMPORT_RULE_CREATE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
@@ -82,13 +85,27 @@ class ImportRule extends ApiController
             $this->fail($defMsg);
         }
 
-        $this->ok([ "id" => $item_id ]);
+        if (isset($request["conditions"])) {
+            $res = $this->condModel->setRuleConditions($item_id, $request["conditions"]);
+            if (!$res) {
+                $this->fail($defMsg);
+            }
+        }
+
+        if (isset($request["actions"])) {
+            $res = $this->actionModel->setRuleActions($item_id, $request["actions"]);
+            if (!$res) {
+                $this->fail($defMsg);
+            }
+        }
+
+        $this->ok(["id" => $item_id]);
     }
 
 
     protected function update()
     {
-        $defMsg = ERR_IMPORT_RULE_UPDATE;
+        $defMsg = Message::get(ERR_IMPORT_RULE_UPDATE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
@@ -108,13 +125,27 @@ class ImportRule extends ApiController
             $this->fail($defMsg);
         }
 
+        if (isset($request["conditions"])) {
+            $res = $this->condModel->setRuleConditions($request["id"], $request["conditions"]);
+            if (!$res) {
+                $this->fail($defMsg);
+            }
+        }
+
+        if (isset($request["actions"])) {
+            $res = $this->actionModel->setRuleActions($request["id"], $request["actions"]);
+            if (!$res) {
+                $this->fail($defMsg);
+            }
+        }
+
         $this->ok();
     }
 
 
     protected function del()
     {
-        $defMsg = ERR_IMPORT_RULE_DELETE;
+        $defMsg = Message::get(ERR_IMPORT_RULE_DELETE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);

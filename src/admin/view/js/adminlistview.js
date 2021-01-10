@@ -243,6 +243,7 @@ AdminListView.prototype.onSubmitResult = function (response) {
  * Request list of items from API
  */
 AdminListView.prototype.requestList = function () {
+    show(this.itemsListElem, false);
     ajax.get({
         url: baseURL + 'api/' + this.apiController + '/list',
         callback: this.onListResult.bind(this)
@@ -279,6 +280,7 @@ AdminListView.prototype.onListResult = function (response) {
 
     addChilds(this.itemsListElem, rows);
     this.selectItem(null);
+    show(this.itemsListElem, true);
     this.dialogPopup.close();
 };
 

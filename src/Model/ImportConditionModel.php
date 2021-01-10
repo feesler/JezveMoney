@@ -6,43 +6,70 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
-use JezveMoney\App\Item\ImportActionItem;
+use JezveMoney\App\Item\ImportConditionItem;
 
 use function JezveMoney\Core\qnull;
 
-// Action types
-// Consider not to change date
-define("IMPORT_ACTION_SET_TR_TYPE", 1);
-define("IMPORT_ACTION_SET_ACCOUNT", 2);
-define("IMPORT_ACTION_SET_PERSON", 3);
-define("IMPORT_ACTION_SET_SRC_AMOUNT", 4);
-define("IMPORT_ACTION_SET_DEST_AMOUNT", 5);
-define("IMPORT_ACTION_SET_COMMENT", 6);
+// Rule field
+define("IMPORT_COND_FIELD_MAIN_ACCOUNT", 1);
+define("IMPORT_COND_FIELD_TPL", 2);
+define("IMPORT_COND_FIELD_TR_AMOUNT", 3);
+define("IMPORT_COND_FIELD_TR_CURRENCY", 4);
+define("IMPORT_COND_FIELD_ACC_AMOUNT", 5);
+define("IMPORT_COND_FIELD_ACC_CURRENCY", 6);
+define("IMPORT_COND_FIELD_COMMENT", 7);
+define("IMPORT_COND_FIELD_DATE", 8);
+// Rule operators
+define("IMPORT_COND_OP_STRING_INCLUDES", 1);
+define("IMPORT_COND_OP_EQUAL", 2);
+define("IMPORT_COND_OP_NOT_EQUAL", 3);
+define("IMPORT_COND_OP_LESS", 4);
+define("IMPORT_COND_OP_GREATER", 5);
+// Rule flags
+define("IMPORT_COND_OP_FIELD_FLAG", 0x01);
 
-class ImportActionModel extends CachedTable
+class ImportConditionModel extends CachedTable
 {
     use Singleton;
     use CachedInstance;
 
     private static $user_id = 0;
 
-    protected $tbl_name = "import_act";
-    protected static $availActions = [
-        IMPORT_ACTION_SET_TR_TYPE,
-        IMPORT_ACTION_SET_ACCOUNT,
-        IMPORT_ACTION_SET_PERSON,
-        IMPORT_ACTION_SET_SRC_AMOUNT,
-        IMPORT_ACTION_SET_DEST_AMOUNT,
-        IMPORT_ACTION_SET_COMMENT,
+    protected $tbl_name = "import_cond";
+    protected static $availCondFields = [
+        IMPORT_COND_FIELD_MAIN_ACCOUNT,
+        IMPORT_COND_FIELD_TPL,
+        IMPORT_COND_FIELD_TR_AMOUNT,
+        IMPORT_COND_FIELD_TR_CURRENCY,
+        IMPORT_COND_FIELD_ACC_AMOUNT,
+        IMPORT_COND_FIELD_ACC_CURRENCY,
+        IMPORT_COND_FIELD_COMMENT,
+        IMPORT_COND_FIELD_DATE,
+    ];
+    protected static $condFieldNames = [
+        IMPORT_COND_FIELD_MAIN_ACCOUNT => "Main account",
+        IMPORT_COND_FIELD_TPL => "Import template",
+        IMPORT_COND_FIELD_TR_AMOUNT => "Transaction amount",
+        IMPORT_COND_FIELD_TR_CURRENCY => "Transaction currency",
+        IMPORT_COND_FIELD_ACC_AMOUNT => "Account amount",
+        IMPORT_COND_FIELD_ACC_CURRENCY => "Account currency",
+        IMPORT_COND_FIELD_COMMENT => "Comment",
+        IMPORT_COND_FIELD_DATE => "Date",
     ];
 
-    protected static $actionNames = [
-        IMPORT_ACTION_SET_TR_TYPE => "Set transaction type",
-        IMPORT_ACTION_SET_ACCOUNT => "Set account",
-        IMPORT_ACTION_SET_PERSON => "Set person",
-        IMPORT_ACTION_SET_SRC_AMOUNT => "Set source amount",
-        IMPORT_ACTION_SET_DEST_AMOUNT => "Set destination amount",
-        IMPORT_ACTION_SET_COMMENT => "Set comment",
+    protected static $availCondOperators = [
+        IMPORT_COND_OP_STRING_INCLUDES,
+        IMPORT_COND_OP_EQUAL,
+        IMPORT_COND_OP_NOT_EQUAL,
+        IMPORT_COND_OP_LESS,
+        IMPORT_COND_OP_GREATER,
+    ];
+    protected static $condOperatorNames = [
+        IMPORT_COND_OP_STRING_INCLUDES => "Includes",
+        IMPORT_COND_OP_EQUAL => "Equal",
+        IMPORT_COND_OP_NOT_EQUAL => "Not equal",
+        IMPORT_COND_OP_LESS => "Less",
+        IMPORT_COND_OP_GREATER => "Greater",
     ];
 
     protected function onStart()
@@ -51,8 +78,6 @@ class ImportActionModel extends CachedTable
         self::$user_id = $uMod->getUser();
 
         $this->dbObj = MySqlDB::getInstance();
-        $this->accModel = AccountModel::getInstance();
-        $this->personModel = PersonModel::getInstance();
         $this->ruleModel = ImportRuleModel::getInstance();
     }
 
@@ -68,7 +93,9 @@ class ImportActionModel extends CachedTable
         $res->id = intval($row["id"]);
         $res->user_id = intval($row["user_id"]);
         $res->rule_id = intval($row["rule_id"]);
-        $res->action_id = intval($row["action_id"]);
+        $res->field_id = intval($row["field_id"]);
+        $res->operator = intval($row["operator"]);
+        $res->flags = intval($row["flags"]);
         $res->value = $row["value"];
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
@@ -80,7 +107,7 @@ class ImportActionModel extends CachedTable
     // Called from CachedTable::updateCache() and return data query object
     protected function dataQuery()
     {
-        return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
+        return $this->dbObj->selectQ("*", $this->tbl_name);
     }
 
 
@@ -88,8 +115,10 @@ class ImportActionModel extends CachedTable
     {
         $avFields = [
             "rule_id",
-            "action_id",
+            "field_id",
+            "operator",
             "value",
+            "flags"
         ];
         $res = [];
 
@@ -101,17 +130,29 @@ class ImportActionModel extends CachedTable
         if (isset($params["rule_id"])) {
             $res["rule_id"] = intval($params["rule_id"]);
             if (!$this->ruleModel->isExist($res["rule_id"])) {
-                wlog("Invalid rule_id: " . $params["rule_id"]);
+                wlog("Parent rule not found: " . $res["rule_id"]);
                 return null;
             }
         }
 
-        if (isset($params["action_id"])) {
-            $res["action_id"] = intval($params["action_id"]);
-            if (!in_array($res["action_id"], self::$availActions)) {
-                wlog("Invalid action: " . $res["action_id"]);
+        if (isset($params["field_id"])) {
+            $res["field_id"] = intval($params["field_id"]);
+            if (!in_array($res["field_id"], self::$availCondFields)) {
+                wlog("Invalid field_id: " . $res["field_id"]);
                 return null;
             }
+        }
+
+        if (isset($params["operator"])) {
+            $res["operator"] = intval($params["operator"]);
+            if (!in_array($res["operator"], self::$availCondOperators)) {
+                wlog("Invalid operator: " . $res["operator"]);
+                return null;
+            }
+        }
+
+        if (isset($params["flags"])) {
+            $res["flags"] = intval($params["flags"]);
         }
 
         if (isset($params["value"])) {
@@ -119,55 +160,6 @@ class ImportActionModel extends CachedTable
         }
 
         return $res;
-    }
-
-
-    protected function validateAction($actionId, $value)
-    {
-        $importTransactionTypes = [
-            "expense",
-            "income",
-            "transferfrom",
-            "transferto",
-            "debtfrom",
-            "debtto"
-        ];
-
-        $action = intval($actionId);
-        if (!in_array($action, self::$availActions)) {
-            wlog("Invalid action: " . $actionId);
-            return false;
-        }
-
-        if ($action == IMPORT_ACTION_SET_TR_TYPE) {
-            if (!in_array(strtolower($value), $importTransactionTypes)) {
-                wlog("Invalid transaction type: " . $value);
-                return false;
-            }
-        } elseif ($action == IMPORT_ACTION_SET_ACCOUNT) {
-            $accountId = intval($value);
-            if (!$this->accModel->isExist($accountId)) {
-                wlog("Invalid account id: " . $value);
-                return false;
-            }
-        } elseif ($action == IMPORT_ACTION_SET_PERSON) {
-            $personId = intval($value);
-            if (!$this->personModel->isExist($personId)) {
-                wlog("Invalid person id: " . $value);
-                return false;
-            }
-        } elseif (
-            $action == IMPORT_ACTION_SET_SRC_AMOUNT
-            || $action == IMPORT_ACTION_SET_SRC_AMOUNT
-        ) {
-            $amount = floatval($value);
-            if ($amount == 0.0) {
-                wlog("Invalid amount: " . $value);
-                return false;
-            }
-        }
-
-        return true;
     }
 
 
@@ -183,18 +175,14 @@ class ImportActionModel extends CachedTable
             "*",
             $this->tbl_name,
             [
-                "user_id=" . qnull(self::$user_id),
                 "rule_id=" . qnull($res["rule_id"]),
-                "action_id=" . qnull($res["action_id"]),
+                "field_id=" . qnull($res["field_id"]),
+                "operator=" . qnull($res["operator"]),
+                "value=" . qnull($res["value"])
             ]
         );
         if ($this->dbObj->rowsCount($qResult) > 0) {
             wlog("Such item already exist");
-            return null;
-        }
-
-        if (!$this->validateAction($res["action_id"], $res["value"])) {
-            wlog("Invalid import action");
             return null;
         }
 
@@ -208,14 +196,9 @@ class ImportActionModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check currency is exist
-        $actionObj = $this->getItem($item_id);
-        if (!$actionObj) {
-            return false;
-        }
-
-        // check user of account
-        if ($actionObj->user_id != self::$user_id) {
+        // check item is exist
+        $ruleObj = $this->getItem($item_id);
+        if (!$ruleObj) {
             return false;
         }
 
@@ -228,9 +211,10 @@ class ImportActionModel extends CachedTable
             "*",
             $this->tbl_name,
             [
-                "user_id=" . qnull(self::$user_id),
                 "rule_id=" . qnull($res["rule_id"]),
-                "action_id=" . qnull($res["action_id"]),
+                "field_id=" . qnull($res["field_id"]),
+                "operator=" . qnull($res["operator"]),
+                "value=" . qnull($res["value"])
             ]
         );
         $row = $this->dbObj->fetchRow($qResult);
@@ -240,14 +224,6 @@ class ImportActionModel extends CachedTable
                 wlog("Such item already exist");
                 return null;
             }
-        }
-
-        $targetAction = isset($res["action_id"]) ? $res["action_id"] : $actionObj->action;
-        $targetValue = isset($res["value"]) ? $res["value"] : $actionObj->value;
-
-        if (!$this->validateAction($targetAction, $targetValue)) {
-            wlog("Invalid import action");
-            return null;
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");
@@ -283,10 +259,6 @@ class ImportActionModel extends CachedTable
         $rule_id = 0;
         if ($filterByRule) {
             $rule_id = intval($params["rule"]);
-            if (!$rule_id) {
-                wlog("Invalid rule id: " . $params["rule"]);
-                return null;
-            }
         }
 
         $itemsData = [];
@@ -312,35 +284,37 @@ class ImportActionModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new ImportActionItem($item, $requestAll);
+            $itemObj = new ImportConditionItem($item, $requestAll);
+
             $res[] = $itemObj;
         }
 
         return $res;
     }
 
-
-    public function getRuleActions($rule_id)
+    // Return array of conditions of specified rule
+    public function getRuleConditions($rule_id)
     {
         return $this->getData(["rule" => $rule_id]);
     }
 
-
-    public function setRuleActions($rule_id, $actions)
+    // Set conditions for specified rule
+    // Delete any previously set conditions for rule
+    public function setRuleConditions($rule_id, $conditions)
     {
         $rule_id = intval($rule_id);
         if (!$rule_id) {
             return false;
         }
 
-        if (!$this->deleteRuleActions($rule_id)) {
+        if (!$this->deleteRuleConditions($rule_id)) {
             return false;
         }
 
-        $actions = asArray($actions);
-        foreach ($actions as $action) {
-            $action["rule_id"] = $rule_id;
-            if (!$this->create($action)) {
+        $conditions = asArray($conditions);
+        foreach ($conditions as $condition) {
+            $condition["rule_id"] = $rule_id;
+            if (!$this->create($condition)) {
                 return false;
             }
         }
@@ -348,15 +322,13 @@ class ImportActionModel extends CachedTable
         return true;
     }
 
-
-    public function deleteRuleActions($rules)
+    // Delete all conditions of specified rules
+    public function deleteRuleConditions($rules)
     {
         if (is_null($rules)) {
             return;
         }
-        if (!is_array($rules)) {
-            $rules = [$rules];
-        }
+        $rules = asArray($rules);
 
         if (!$this->checkCache()) {
             return false;
@@ -373,18 +345,41 @@ class ImportActionModel extends CachedTable
     }
 
 
-    public static function getActions()
+    public static function isFieldValueOperator($data)
     {
-        return convertToObjectArray(self::$actionNames);
+        return (intval($data) & IMPORT_COND_OP_FIELD_FLAG) == IMPORT_COND_OP_FIELD_FLAG;
     }
 
 
-    public static function getActionName($action_id)
+    public static function getFields()
     {
-        if (!isset(self::$actionNames[$action_id])) {
+        return convertToObjectArray(self::$condFieldNames);
+    }
+
+
+    public static function getFieldName($field_id)
+    {
+        if (!isset(self::$condFieldNames[$field_id])) {
             return null;
         }
 
-        return self::$actionNames[$action_id];
+        return self::$condFieldNames[$field_id];
+    }
+
+
+    public static function getOperators()
+    {
+        return convertToObjectArray(self::$condOperatorNames);
+    }
+
+
+    public static function getOperatorName($operator_id)
+    {
+        $operator_id = intval($operator_id);
+        if (!isset(self::$condOperatorNames[$operator_id])) {
+            return null;
+        }
+
+        return self::$condOperatorNames[$operator_id];
     }
 }

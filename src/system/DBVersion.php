@@ -9,7 +9,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 7;
+    protected $latestVersion = 8;
     protected $dbClient = null;
 
 
@@ -34,6 +34,7 @@ class DBVersion
         $this->createIconTable();
         $this->createImportTemplateTable();
         $this->createImportRuleTable();
+        $this->createImportConditionTable();
         $this->createImportActionTable();
         $this->createAdminQueryTable();
 
@@ -132,6 +133,9 @@ class DBVersion
         }
         if ($current < 7) {
             $current = $this->version7();
+        }
+        if ($current < 8) {
+            $current = $this->version8();
         }
 
         $this->setVersion($current);
@@ -234,6 +238,32 @@ class DBVersion
         }
 
         return 7;
+    }
+
+
+    private function version8()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        if ($this->dbClient->isTableExist("import_rule")) {
+            $res = $this->dbClient->dropColumns("import_rule", [
+                "parent_id",
+                "field_id",
+                "operator",
+                "value"
+            ]);
+            if (!$res) {
+                throw new \Error("Fail to update 'import_rule' table");
+            }
+        } else {
+            $this->createImportRuleTable();
+        }
+
+        $this->createImportConditionTable();
+
+        return 8;
     }
 
 
@@ -484,7 +514,33 @@ class DBVersion
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
             "`user_id` INT(11) NOT NULL DEFAULT '0', " .
-            "`parent_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`flags` INT(11) NOT NULL DEFAULT '0', " .
+            "`createdate` DATETIME NOT NULL, " .
+            "`updatedate` DATETIME NOT NULL, " .
+            "PRIMARY KEY (`id`)",
+            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
+    }
+
+
+    private function createImportConditionTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "import_cond";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+            "`user_id` INT(11) NOT NULL DEFAULT '0', " .
+            "`rule_id` INT(11) NOT NULL DEFAULT '0', " .
             "`field_id` INT(11) NOT NULL DEFAULT '0', " .
             "`operator` INT(11) NOT NULL DEFAULT '0', " .
             "`flags` INT(11) NOT NULL DEFAULT '0', " .

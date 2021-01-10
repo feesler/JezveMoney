@@ -88,6 +88,14 @@ function is_empty($str)
 }
 
 
+// If specified object is array just return it
+// If object is not array then return array contains it
+function asArray($obj)
+{
+    return is_array($obj) ? $obj : [$obj];
+}
+
+
 // Convert string to be compatible with HTML
 function e($str, $lineEnd = false)
 {
@@ -255,6 +263,7 @@ function checkFields($obj, $expectedFields, $throw = false)
             if ($throw) {
                 throw new \Error("Field '$field' not found");
             } else {
+                wlog("Field '$field' not found");
                 return false;
             }
         }

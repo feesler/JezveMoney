@@ -94,3 +94,10 @@ Message::add(MSG_IMPORT_ACT_UPDATE, MSG_TYPE_SUCCESS, "Import action successfull
 Message::add(ERR_IMPORT_ACT_UPDATE, MSG_TYPE_ERROR, "Fail to update import action.");
 Message::add(MSG_IMPORT_ACT_DELETE, MSG_TYPE_SUCCESS, "Import action successfully deleted.");
 Message::add(ERR_IMPORT_ACT_DELETE, MSG_TYPE_ERROR, "Fail to delete import action.");
+
+Message::add(MSG_IMPORT_COND_CREATE, MSG_TYPE_SUCCESS, "Import condition successfully created.");
+Message::add(ERR_IMPORT_COND_CREATE, MSG_TYPE_ERROR, "Fail to create new import condition.");
+Message::add(MSG_IMPORT_COND_UPDATE, MSG_TYPE_SUCCESS, "Import condition successfully updated.");
+Message::add(ERR_IMPORT_COND_UPDATE, MSG_TYPE_ERROR, "Fail to update import condition.");
+Message::add(MSG_IMPORT_COND_DELETE, MSG_TYPE_SUCCESS, "Import condition successfully deleted.");
+Message::add(ERR_IMPORT_COND_DELETE, MSG_TYPE_ERROR, "Fail to delete import condition.");

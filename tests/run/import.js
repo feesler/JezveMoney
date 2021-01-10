@@ -2,7 +2,7 @@ import { App } from '../app.js';
 import { test, copyObject } from '../common.js';
 import { api } from '../model/api.js';
 import { Currency } from '../model/currency.js';
-import { applyTemplate, getChildRules, applyRules } from '../model/import.js';
+import { applyTemplate, applyRules } from '../model/import.js';
 import { ImportList } from '../view/component/importlist.js';
 import { ImportView } from '../view/import.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
@@ -336,6 +336,7 @@ export async function submitUploaded(params) {
 
         const importData = parseCSV(params.data);
         const importRules = await api.importrule.list();
+        const importConditios = await api.importcondition.list();
         const importActions = await api.importaction.list();
 
         let mainAccountId;
@@ -359,10 +360,9 @@ export async function submitUploaded(params) {
         let importTransactions = applyTemplate(importData, importTpl, mainAccount);
 
         const skipList = [];
-        const rootRules = getChildRules(importRules, 0);
         importTransactions = importTransactions.map(
             (item) => {
-                const res = applyRules(item, rootRules, importRules, importActions);
+                const res = applyRules(item, importRules, importConditios, importActions);
                 const tr = findSimilar(res, skipList);
 
                 if (tr) {

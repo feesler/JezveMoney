@@ -4,15 +4,17 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
-use JezveMoney\App\Model\ImportActionModel;
-use JezveMoney\App\Item\ImportActionItem;
+use JezveMoney\App\Model\ImportConditionModel;
+use JezveMoney\App\Item\ImportConditionItem;
 
-class ImportAction extends ApiController
+class ImportCondition extends ApiController
 {
     protected $requiredFields = [
         "rule_id",
-        "action_id",
+        "field_id",
+        "operator",
         "value",
+        "flags"
     ];
     protected $model = null;
 
@@ -21,7 +23,7 @@ class ImportAction extends ApiController
     {
         parent::initAPI();
 
-        $this->model = ImportActionModel::getInstance();
+        $this->model = ImportConditionModel::getInstance();
     }
 
 
@@ -39,7 +41,7 @@ class ImportAction extends ApiController
                 $this->fail("Item '$item_id' not found");
             }
 
-            $res[] = new ImportActionItem($item);
+            $res[] = new ImportConditionItem($item);
         }
 
         $this->ok($res);
@@ -64,7 +66,7 @@ class ImportAction extends ApiController
 
     protected function create()
     {
-        $defMsg = Message::get(ERR_IMPORT_ACT_CREATE);
+        $defMsg = Message::get(ERR_IMPORT_COND_CREATE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
@@ -81,13 +83,20 @@ class ImportAction extends ApiController
             $this->fail($defMsg);
         }
 
-        $this->ok([ "id" => $item_id ]);
+        if (isset($request["actions"])) {
+            $res = $this->actionModel->setRuleActions($item_id, $request["actions"]);
+            if (!$res) {
+                $this->fail($defMsg);
+            }
+        }
+
+        $this->ok(["id" => $item_id]);
     }
 
 
     protected function update()
     {
-        $defMsg = Message::get(ERR_IMPORT_ACT_UPDATE);
+        $defMsg = Message::get(ERR_IMPORT_COND_UPDATE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
@@ -107,13 +116,20 @@ class ImportAction extends ApiController
             $this->fail($defMsg);
         }
 
+        if (isset($request["actions"])) {
+            $res = $this->actionModel->setRuleActions($request["id"], $request["actions"]);
+            if (!$res) {
+                $this->fail($defMsg);
+            }
+        }
+
         $this->ok();
     }
 
 
     protected function del()
     {
-        $defMsg = Message::get(ERR_IMPORT_ACT_DELETE);
+        $defMsg = Message::get(ERR_IMPORT_COND_DELETE);
 
         if (!$this->isPOST()) {
             $this->fail($defMsg);
