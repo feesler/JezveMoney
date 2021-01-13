@@ -166,4 +166,36 @@ class ImportRuleModel extends CachedTable
 
         return $res;
     }
+
+    // Update import rule conditiona and actions
+    public function onTemplateDelete($templates)
+    {
+        if (is_null($templates)) {
+            return false;
+        }
+
+        return $this->condModel->deleteTemplateConditions($templates);
+    }
+
+    // Delete conditions and actions related to removed accounts
+    public function onAccountDelete($accounts)
+    {
+        if (is_null($accounts)) {
+            return false;
+        }
+
+        $res = $this->condModel->deleteAccountConditions($accounts)
+            && $this->actionModel->deleteAccountActions($accounts);
+        return $res;
+    }
+
+    // Delete conditions and actions related to removed accounts
+    public function onPersonDelete($persons)
+    {
+        if (is_null($persons)) {
+            return false;
+        }
+
+        return $this->actionModel->deletePersonActions($persons);
+    }
 }

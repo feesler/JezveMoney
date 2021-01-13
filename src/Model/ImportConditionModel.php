@@ -344,6 +344,56 @@ class ImportConditionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
+    // Delete all conditions for specified templates
+    public function deleteTemplateConditions($templates)
+    {
+        if (is_null($templates)) {
+            return;
+        }
+        $templates = asArray($templates);
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        $itemsToDelete = [];
+        foreach ($this->cache as $item_id => $item) {
+            if (
+                $item->field_id === IMPORT_COND_FIELD_TPL
+                && in_array($item->value, $templates)
+            ) {
+                $itemsToDelete[] = $item_id;
+            }
+        }
+
+        return $this->del($itemsToDelete);
+    }
+
+    // Delete all conditions for specified accounts
+    public function deleteAccountConditions($accounts)
+    {
+        if (is_null($accounts)) {
+            return;
+        }
+        $accounts = asArray($accounts);
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        $itemsToDelete = [];
+        foreach ($this->cache as $item_id => $item) {
+            if (
+                $item->field_id === IMPORT_COND_FIELD_MAIN_ACCOUNT
+                && in_array($item->value, $accounts)
+            ) {
+                $itemsToDelete[] = $item_id;
+            }
+        }
+
+        return $this->del($itemsToDelete);
+    }
+
 
     public static function isFieldValueOperator($data)
     {

@@ -372,6 +372,55 @@ class ImportActionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
+    // Delete all actions for specified accounts
+    public function deleteAccountActions($accounts)
+    {
+        if (is_null($accounts)) {
+            return false;
+        }
+        $accounts = asArray($accounts);
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        $itemsToDelete = [];
+        foreach ($this->cache as $item_id => $item) {
+            if (
+                $item->action_id === IMPORT_ACTION_SET_ACCOUNT
+                && in_array($item->value, $accounts)
+            ) {
+                $itemsToDelete[] = $item_id;
+            }
+        }
+
+        return $this->del($itemsToDelete);
+    }
+
+    // Delete all actions for specified persons
+    public function deletePersonActions($persons)
+    {
+        if (is_null($persons)) {
+            return false;
+        }
+        $persons = asArray($persons);
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        $itemsToDelete = [];
+        foreach ($this->cache as $item_id => $item) {
+            if (
+                $item->action_id === IMPORT_ACTION_SET_PERSON
+                && in_array($item->value, $persons)
+            ) {
+                $itemsToDelete[] = $item_id;
+            }
+        }
+
+        return $this->del($itemsToDelete);
+    }
 
     public static function getActions()
     {

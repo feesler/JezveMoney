@@ -182,8 +182,6 @@ class PersonModel extends CachedTable
     // Preparations for items delete
     protected function preDelete($items)
     {
-        $accMod = AccountModel::getInstance();
-
         foreach ($items as $item_id) {
             // check person is exist
             $pObj = $this->getItem($item_id);
@@ -197,7 +195,13 @@ class PersonModel extends CachedTable
             }
         }
 
-        return $accMod->onPersonDelete($items);
+        $accMod = AccountModel::getInstance();
+        $ruleModel = ImportRuleModel::getInstance();
+
+        $res = $accMod->onPersonDelete($items)
+            && $ruleModel->onPersonDelete($items);
+
+        return $res;
     }
 
 

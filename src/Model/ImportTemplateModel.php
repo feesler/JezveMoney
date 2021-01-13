@@ -204,7 +204,8 @@ class ImportTemplateModel extends CachedTable
             }
         }
 
-        return true;
+        $ruleModel = ImportRuleModel::getInstance();
+        return $ruleModel->onTemplateDelete($items);
     }
 
 
