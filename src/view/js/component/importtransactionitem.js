@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ce, re, svg, fixFloat, show, enable, selectedValue, selectByValue, extend, Component */
+/* global ce, re, fixFloat, show, enable, selectedValue, selectByValue, extend, AppComponent */
 /* global copyObject, addChilds, removeChilds */
 /* global EXPENSE, INCOME, TRANSFER, DEBT, AccountList */
 
@@ -157,13 +157,13 @@ function ImportTransactionItem() {
             textContent: '',
             disabled: true,
             selected: true
-        })
+        }),
+        { change: this.onPersonChanged.bind(this) }
     );
     this.model.persons.data.forEach(function (person) {
         var option = ce('option', { value: person.id, textContent: person.name });
         this.personSel.appendChild(option);
     }, this);
-    this.personSel.addEventListener('change', this.onPersonChanged.bind(this));
     this.personField = this.createField('Person', this.personSel);
 
     // Amount controls
@@ -174,43 +174,48 @@ function ImportTransactionItem() {
     }, null, { input: this.onAmountInput.bind(this) });
     this.amountField = this.createField('Amount', this.amountInp, 'amount-field');
 
-    this.destAmountInp = ce('input', {
-        type: 'text',
-        name: 'dest_amount[]',
-        disabled: true,
-        placeholder: 'Destination amount'
-    }, null, { input: this.onDestAmountInput.bind(this) });
+    this.destAmountInp = ce(
+        'input',
+        {
+            type: 'text',
+            name: 'dest_amount[]',
+            disabled: true,
+            placeholder: 'Destination amount'
+        },
+        null,
+        { input: this.onDestAmountInput.bind(this) }
+    );
     this.destAmountField = this.createField('Destination amount', this.destAmountInp, 'amount-field');
-
     // Date field
-    this.dateInp = ce('input', {
-        type: 'text',
-        name: 'date[]',
-        placeholder: 'Date'
-    }, null, { input: this.onDateInput.bind(this) });
+    this.dateInp = ce(
+        'input',
+        { type: 'text', name: 'date[]', placeholder: 'Date' },
+        null,
+        { input: this.onDateInput.bind(this) }
+    );
     this.dateField = this.createField('Date', this.dateInp, 'date-field');
-
     // Comment field
-    this.commInp = ce('input', {
-        type: 'text',
-        name: 'comment[]',
-        placeholder: 'Comment'
-    }, null, { input: this.onCommentInput.bind(this) });
+    this.commInp = ce(
+        'input',
+        { type: 'text', name: 'comment[]', placeholder: 'Comment' },
+        null,
+        { input: this.onCommentInput.bind(this) }
+    );
     this.commentField = this.createField('Comment', this.commInp, 'comment-field');
-
+    // Delete button
     this.delBtn = ce(
         'button',
         { className: 'btn delete-btn', type: 'button' },
-        this.createIcon('del')
+        this.createIcon('del'),
+        { click: this.remove.bind(this) }
     );
-    this.delBtn.addEventListener('click', this.remove.bind(this));
-
+    // Toggle expand/collapse
     this.toggleExtBtn = ce(
         'button',
         { className: 'btn toggle-btn hidden', type: 'button' },
-        this.createIcon('toggle-ext')
+        this.createIcon('toggle-ext'),
+        { click: this.toggleCollapse.bind(this) }
     );
-    this.toggleExtBtn.addEventListener('click', this.toggleCollapse.bind(this));
 
     this.topRow = this.createContainer('form-row', [
         this.amountField,
@@ -237,7 +242,7 @@ function ImportTransactionItem() {
     ]);
 
     this.mainContainer = this.createContainer('main-content', [
-        this.createCheck('enable-check', this.enableCheck),
+        this.createCheck(this.enableCheck, 'enable-check'),
         this.formContainer,
         this.createContainer('row-container controls', [
             this.delBtn,
@@ -258,7 +263,7 @@ function ImportTransactionItem() {
     this.render();
 }
 
-extend(ImportTransactionItem, Component);
+extend(ImportTransactionItem, AppComponent);
 
 /**
  * Create new ImportTransactionItem from specified element
@@ -273,30 +278,6 @@ ImportTransactionItem.create = function (props) {
     }
 
     return res;
-};
-
-/** Create container element */
-ImportTransactionItem.prototype.createContainer = function (elemClass, children) {
-    return ce('div', { className: elemClass }, children);
-};
-
-/** Create checkbox element */
-ImportTransactionItem.prototype.createCheck = function (elemClass, children) {
-    return ce('label', { className: elemClass }, children);
-};
-
-/** Create field element */
-ImportTransactionItem.prototype.createField = function (title, input, extraClass) {
-    var elemClasses = ['field'];
-
-    if (typeof extraClass === 'string' && extraClass.length > 0) {
-        elemClasses.push(extraClass);
-    }
-
-    return ce('div', { className: elemClasses.join(' ') }, [
-        ce('label', { textContent: title }),
-        ce('div', {}, input)
-    ]);
 };
 
 /** Create static data value element */
@@ -330,16 +311,6 @@ ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
         this.createDataValue('Acc. currency', data.accCurrVal),
         this.createDataValue('Comment', data.comment, 'comment-value')
     ]);
-};
-
-/** Create SVG icon element */
-ImportTransactionItem.prototype.createIcon = function (icon) {
-    var useElem = svg('use');
-    var res = svg('svg', {}, useElem);
-
-    useElem.href.baseVal = (icon) ? '#' + icon : '';
-
-    return res;
 };
 
 /**
@@ -379,9 +350,7 @@ ImportTransactionItem.prototype.onRowChecked = function () {
     this.parent.onEnableItem(this, this.enableCheck.checked);
 };
 
-/**
- * Toggle collapse/expande button 'click' event handler
- */
+/** Toggle collapse/expand button 'click' event handler */
 ImportTransactionItem.prototype.toggleCollapse = function () {
     this.elem.classList.toggle('import-item_expanded');
 };
@@ -475,9 +444,7 @@ ImportTransactionItem.prototype.onTrTypeChanged = function () {
     this.render();
 };
 
-/**
- * Destination account select 'change' event handler
- */
+/** Destination account select 'change' event handler */
 ImportTransactionItem.prototype.onDestChanged = function () {
     var value = selectedValue(this.destAccSel);
     this.setSecondAccount(value);
