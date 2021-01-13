@@ -454,12 +454,87 @@ div.trans-list__item_selected
     color: #DDDDDD;
 }
 
+/* Import rule */
+.rule-item
+{
+    background-color: #202020;
+}
+
+.rule-item__main,
+.rule-form__collapse-header
+{
+    background-color: #202020;
+    border-color: #202020;
+}
+
+.rule-item__main:hover,
+.rule-form__collapse-header:hover
+{
+    background-color: #2E2E2E;
+    border-color: #505050;
+}
+
+.rule-item__operator
+{
+    color: #808080;
+}
+
+.rule-item .icon-btn:hover,
+.rule-form .icon-btn:hover
+{
+    background-color: #2E2E2E;
+}
+
+.rule-item .icon-btn svg,
+.rule-form .icon-btn svg
+{
+    fill: #888888;
+}
+
+.rule-item .icon-btn:hover svg,
+.rule-form .icon-btn:hover svg
+{
+    fill: #DDDDDD;
+}
+
+.rule-item__info
+{
+    color: #B0B0B0;
+}
+
+.rule-form__collapse,
+.rule-item .rule-item__ext
+{
+    color: #BBBBBB;
+    border-color: #303030;
+    background-color: #252525;
+}
+
+/* Condition item */
+.cond-item,
+.cond-form
+{
+    background-color: #353535;
+    border-color: #353535;
+}
+
+.cond-item__operator
+{
+    color: #808080;
+}
+
+/* Action item */
+.action-item,
+.action-form
+{
+    background-color: #353535;
+}
+
 /* Statistics view */
 .stat-histogram > span
 {
     color: #DDDDDD;
 }
-
 
 .chart_popup
 {

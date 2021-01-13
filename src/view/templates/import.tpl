@@ -50,6 +50,13 @@
                             </div>
                         </div>
 
+                        <div class="rules-container">
+                            <label class="checkwrap">
+                                <input id="rulesCheck" type="checkbox" checked>
+                            </label>
+                            <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($rulesData)?></span>)</button>
+                        </div>
+
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
                         </div>
@@ -154,16 +161,19 @@
     </div>
 </div>
 
+<div id="rulesDialog" class="rules-dialog hidden">
+    <div class="rules-header">
+        <label>Import rules</label>
+        <input id="createRuleBtn" class="btn link-btn create-btn" type="button" value="Create">
+    </div>
+    <div class="rules-list"></div>
+    <div class="rule-form hidden"></div>
+</div>
+
 <?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-var view = new ImportView({
-    accounts: <?=JSON::encode($accArr)?>,
-    currencies: <?=JSON::encode($currArr)?>,
-    persons: <?=JSON::encode($persArr)?>,
-    rules: <?=JSON::encode($rulesData)?>,
-    templates: <?=JSON::encode($impTemplates)?>
-});
+var view = new ImportView(<?=JSON::encode($viewData)?>);
 </script>
 </body>
 </html>

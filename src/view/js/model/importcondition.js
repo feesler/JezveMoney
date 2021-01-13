@@ -1,6 +1,6 @@
 'use strict';
 
-/* global copyObject, isObject, extend, ListItem, List */
+/* global timestampFromString, copyObject, isObject, extend, ListItem, List */
 /* eslint no-bitwise: "off" */
 
 /** Condition field types */
@@ -29,16 +29,80 @@ function ImportCondition() {
     ImportCondition.parent.constructor.apply(this, arguments);
 }
 
+/** Amount field types */
+ImportCondition.amountFields = [
+    IMPORT_COND_FIELD_TR_AMOUNT,
+    IMPORT_COND_FIELD_ACC_AMOUNT
+];
+/** Currency field types */
+ImportCondition.currencyFields = [
+    IMPORT_COND_FIELD_TR_CURRENCY,
+    IMPORT_COND_FIELD_ACC_CURRENCY
+];
+
+/** Item(account, template, currency) operators */
+ImportCondition.itemOperators = [
+    IMPORT_COND_OP_EQUAL,
+    IMPORT_COND_OP_NOT_EQUAL
+];
+/** Numeric(amount and date) operators */
+ImportCondition.numOperators = [
+    IMPORT_COND_OP_EQUAL,
+    IMPORT_COND_OP_NOT_EQUAL,
+    IMPORT_COND_OP_LESS,
+    IMPORT_COND_OP_GREATER
+];
+/** String operators */
+ImportCondition.stringOperators = [
+    IMPORT_COND_OP_STRING_INCLUDES,
+    IMPORT_COND_OP_EQUAL,
+    IMPORT_COND_OP_NOT_EQUAL,
+    IMPORT_COND_OP_LESS,
+    IMPORT_COND_OP_GREATER
+];
+
 /** List of available field types */
 ImportCondition.fieldTypes = [
-    { id: IMPORT_COND_FIELD_MAIN_ACCOUNT, title: 'Main account' },
-    { id: IMPORT_COND_FIELD_TPL, title: 'Template' },
-    { id: IMPORT_COND_FIELD_TR_AMOUNT, title: 'Transaction amount' },
-    { id: IMPORT_COND_FIELD_TR_CURRENCY, title: 'Transaction currency' },
-    { id: IMPORT_COND_FIELD_ACC_AMOUNT, title: 'Account amount' },
-    { id: IMPORT_COND_FIELD_ACC_CURRENCY, title: 'Account currency' },
-    { id: IMPORT_COND_FIELD_DATE, title: 'Date' },
-    { id: IMPORT_COND_FIELD_COMMENT, title: 'Comment' }
+    {
+        id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
+        title: 'Main account',
+        operators: ImportCondition.itemOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_TPL,
+        title: 'Template',
+        operators: ImportCondition.itemOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_TR_AMOUNT,
+        title: 'Transaction amount',
+        operators: ImportCondition.numOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_TR_CURRENCY,
+        title: 'Transaction currency',
+        operators: ImportCondition.itemOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_ACC_AMOUNT,
+        title: 'Account amount',
+        operators: ImportCondition.numOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_ACC_CURRENCY,
+        title: 'Account currency',
+        operators: ImportCondition.itemOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_DATE,
+        title: 'Date',
+        operators: ImportCondition.numOperators
+    },
+    {
+        id: IMPORT_COND_FIELD_COMMENT,
+        title: 'Comment',
+        operators: ImportCondition.stringOperators
+    }
 ];
 
 /** List of available condition operator types */
@@ -93,6 +157,36 @@ ImportCondition.getFieldValue = function (fieldId, data) {
     throw new Error('Invalid field id: ' + field);
 };
 
+/** Check value for specified field type is account */
+ImportCondition.isAccountField = function (value) {
+    return parseInt(value, 10) === IMPORT_COND_FIELD_MAIN_ACCOUNT;
+};
+
+/** Check value for specified field type is template */
+ImportCondition.isTemplateField = function (value) {
+    return parseInt(value, 10) === IMPORT_COND_FIELD_TPL;
+};
+
+/** Check value for specified field type is currency */
+ImportCondition.isCurrencyField = function (value) {
+    return ImportCondition.currencyFields.includes(parseInt(value, 10));
+};
+
+/** Check value for specified field type is amount */
+ImportCondition.isAmountField = function (value) {
+    return ImportCondition.amountFields.includes(parseInt(value, 10));
+};
+
+/** Check value for specified field type is string */
+ImportCondition.isDateField = function (value) {
+    return parseInt(value, 10) === IMPORT_COND_FIELD_DATE;
+};
+
+/** Check value for specified field type is string */
+ImportCondition.isStringField = function (value) {
+    return parseInt(value, 10) === IMPORT_COND_FIELD_COMMENT;
+};
+
 /** Return array of available field types */
 ImportCondition.getFieldTypes = function () {
     var res = copyObject(ImportCondition.fieldTypes);
@@ -118,7 +212,17 @@ ImportCondition.getFieldTypeById = function (value) {
     return copyObject(res);
 };
 
-/** Return array of available operators */
+/** Return array of operators available for specified type of field */
+ImportCondition.getAvailOperators = function (value) {
+    var field = ImportCondition.getFieldTypeById(value);
+    if (!field) {
+        return null;
+    }
+
+    return copyObject(field.operators);
+};
+
+/** Return array of operators */
 ImportCondition.getOperatorTypes = function () {
     var res = copyObject(ImportCondition.operatorTypes);
 
@@ -143,6 +247,16 @@ ImportCondition.getOperatorById = function (value) {
     return copyObject(res);
 };
 
+/** Check field value flag */
+ImportCondition.isFieldValueFlag = function (value) {
+    var res = parseInt(value, 10);
+    if (Number.isNaN(res)) {
+        throw new Error('Invalid flags value');
+    }
+
+    return (res & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG;
+};
+
 /**
  * Check specified field name is available
  * @param {string} field - field name to check
@@ -150,7 +264,7 @@ ImportCondition.getOperatorById = function (value) {
 ImportCondition.prototype.isAvailField = function (field) {
     var availFields = [
         'id',
-        'parent_id',
+        'rule_id',
         'field_id',
         'operator',
         'flags',
@@ -165,12 +279,12 @@ ImportCondition.prototype.isAvailField = function (field) {
  * @param {number} data - operator value
  */
 ImportCondition.prototype.isFieldValueOperator = function () {
-    var res = parseInt(this.flags, 10);
-    if (Number.isNaN(res)) {
-        throw new Error('Invalid flags value');
-    }
+    return ImportCondition.isFieldValueFlag(this.flags);
+};
 
-    return (res & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG;
+/** Return array of operators available for current type of field */
+ImportCondition.prototype.getAvailOperators = function () {
+    return ImportCondition.getAvailOperators(this.field_id);
 };
 
 /**
@@ -222,6 +336,10 @@ ImportCondition.prototype.getConditionValue = function (data) {
         return ImportCondition.getFieldValue(this.value, data);
     }
 
+    if (ImportCondition.isDateField(this.field_id)) {
+        return timestampFromString(this.value);
+    }
+
     return this.value;
 };
 
@@ -268,5 +386,60 @@ ImportConditionList.prototype.getRuleConditions = function (ruleId) {
 
     return this.data.filter(function (item) {
         return item.rule_id === id;
+    });
+};
+
+/**
+ * Check list of conditions has condition with same field type
+ * @param {ImportCondition} condition
+ */
+ImportConditionList.prototype.hasSameFieldCondition = function (condition) {
+    if (!(condition instanceof ImportCondition)) {
+        throw new Error('Invalid condition');
+    }
+
+    return !!this.data.find(function (item) {
+        return (
+            item !== condition
+            && item.field_id === condition.field_id
+        );
+    });
+};
+
+/**
+ * Check list of conditions has condition with same field type
+ * and equal or greater value than specified condition
+ * @param {ImportCondition} condition
+ */
+ImportConditionList.prototype.hasNotLessCondition = function (condition) {
+    if (!(condition instanceof ImportCondition)) {
+        throw new Error('Invalid rule id');
+    }
+
+    return !!this.data.find(function (item) {
+        return (
+            item !== condition
+            && item.field_id === condition.field_id
+            && !(item.value < condition.value)
+        );
+    });
+};
+
+/**
+ * Check list of conditions has condition with same field type
+ * and equal or less value than specified condition
+ * @param {ImportCondition} condition
+ */
+ImportConditionList.prototype.hasNotGreaterCondition = function (condition) {
+    if (!(condition instanceof ImportCondition)) {
+        throw new Error('Invalid rule id');
+    }
+
+    return !!this.data.find(function (item) {
+        return (
+            item !== condition
+            && item.field_id === condition.field_id
+            && !(item.value > condition.value)
+        );
     });
 };

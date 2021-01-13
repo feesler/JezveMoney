@@ -9,17 +9,8 @@
 function ImportRule() {
     ImportRule.parent.constructor.apply(this, arguments);
 
-    if (Array.isArray(this.conditions)) {
-        this.conditions = new ImportConditionList(this.conditions);
-    } else {
-        this.conditions = [];
-    }
-
-    if (Array.isArray(this.actions)) {
-        this.actions = new ImportActionList(this.actions);
-    } else {
-        this.actions = [];
-    }
+    this.conditions = new ImportConditionList(this.conditions);
+    this.actions = new ImportActionList(this.actions);
 }
 
 extend(ImportRule, ListItem);
@@ -50,10 +41,6 @@ ImportRule.prototype.meetConditions = function (data) {
 
 /** Run actions assigned to rule */
 ImportRule.prototype.runActions = function (context) {
-    if (!Array.isArray(this.actions)) {
-        return;
-    }
-
     this.actions.forEach(function (item) {
         item.execute(context);
     });

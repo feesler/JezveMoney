@@ -31,15 +31,28 @@ ImportAction.actionTypes = [
     { id: IMPORT_ACTION_SET_COMMENT, title: 'Set comment' }
 ];
 
-/**
- * Check specified field name is available
- * @param {string} field - field name to check
- */
-ImportAction.prototype.isAvailField = function (field) {
-    var availFields = ['id', 'rule_id', 'action_id', 'value'];
+/** List of action types requires select value from list */
+ImportAction.selectActions = [
+    IMPORT_ACTION_SET_TR_TYPE,
+    IMPORT_ACTION_SET_ACCOUNT,
+    IMPORT_ACTION_SET_PERSON
+];
 
-    return typeof field === 'string' && availFields.includes(field);
-};
+/** List of action types requires amount value */
+ImportAction.amountActions = [
+    IMPORT_ACTION_SET_SRC_AMOUNT,
+    IMPORT_ACTION_SET_DEST_AMOUNT
+];
+
+/** List of available transaction types */
+ImportAction.transactionTypes = [
+    { id: 'expense', title: 'Expense' },
+    { id: 'income', title: 'Income' },
+    { id: 'transferfrom', title: 'Transfer from' },
+    { id: 'transferto', title: 'Transfer to' },
+    { id: 'debtfrom', title: 'Debt from' },
+    { id: 'debtto', title: 'Debt to' }
+];
 
 /** Return array of available action types */
 ImportAction.getTypes = function () {
@@ -64,6 +77,55 @@ ImportAction.getActionById = function (value) {
     }
 
     return copyObject(res);
+};
+
+/** Check action type requires select value from list */
+ImportAction.isSelectValue = function (value) {
+    return ImportAction.selectActions.includes(parseInt(value, 10));
+};
+
+/** Check action type requires amount value */
+ImportAction.isAmountValue = function (value) {
+    return ImportAction.amountActions.includes(parseInt(value, 10));
+};
+
+/** Return array of available transaction types */
+ImportAction.getTransactionTypes = function () {
+    var res = copyObject(ImportAction.transactionTypes);
+
+    return res;
+};
+
+/** Search transaction type by id */
+ImportAction.getTransactionTypeById = function (value) {
+    var res = this.transactionTypes.find(function (item) {
+        return item.id === value;
+    });
+    if (!res) {
+        return null;
+    }
+
+    return copyObject(res);
+};
+
+/**
+ * Check specified field name is available
+ * @param {string} field - field name to check
+ */
+ImportAction.prototype.isAvailField = function (field) {
+    var availFields = ['id', 'rule_id', 'action_id', 'value'];
+
+    return typeof field === 'string' && availFields.includes(field);
+};
+
+/** Check action requires select value from list */
+ImportAction.prototype.isSelectValue = function () {
+    return ImportAction.isSelectValue(this.action_id);
+};
+
+/** Check action requires amount value */
+ImportAction.prototype.isAmountValue = function () {
+    return ImportAction.isAmountValue(this.action_id);
 };
 
 /**

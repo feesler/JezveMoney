@@ -43,6 +43,13 @@ class Import extends TemplateController
             "import-upload-form.css",
             "import-template.css",
             "import-item.css",
+            "import-rules.css",
+            "import-rule-item.css",
+            "import-rule-form.css",
+            "import-cond-item.css",
+            "import-cond-form.css",
+            "import-action-item.css",
+            "import-action-form.css",
             "import.css"
         ];
         $this->buildCSS();
@@ -66,11 +73,19 @@ class Import extends TemplateController
             "component/iconlink.js",
             "component/uploader.js",
             "component/confirmdialog.js",
+            "component/decimalinput.js",
             "component/appcomponent.js",
             "component/importuploaddialog.js",
             "component/importfileuploader.js",
             "component/importtemplatemanager.js",
             "component/importtransactionitem.js",
+            "component/importrulesdialog.js",
+            "component/importruleitem.js",
+            "component/importruleform.js",
+            "component/importconditionitem.js",
+            "component/importconditionform.js",
+            "component/importactionitem.js",
+            "component/importactionform.js",
             "view.js",
             "importview.js"
         );

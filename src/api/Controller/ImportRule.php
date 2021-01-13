@@ -66,7 +66,7 @@ class ImportRule extends ApiController
     }
 
 
-    protected function create()
+    public function create()
     {
         $defMsg = Message::get(ERR_IMPORT_RULE_CREATE);
 
@@ -103,7 +103,7 @@ class ImportRule extends ApiController
     }
 
 
-    protected function update()
+    public function update()
     {
         $defMsg = Message::get(ERR_IMPORT_RULE_UPDATE);
 
@@ -143,7 +143,7 @@ class ImportRule extends ApiController
     }
 
 
-    protected function del()
+    public function del()
     {
         $defMsg = Message::get(ERR_IMPORT_RULE_DELETE);
 

@@ -52,6 +52,7 @@ function ImportUploadDialog() {
         parent: this.parent,
         currencyModel: this.props.currencyModel,
         tplModel: this.props.tplModel,
+        rulesModel: this.model.rules,
         templateStatus: this.onTemplateStatus.bind(this)
     });
 

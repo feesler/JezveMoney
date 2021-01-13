@@ -3,7 +3,7 @@
 /* global ge, re, ce, removeChilds, enable, extend */
 /* global selectByValue, selectedValue, ajax, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList, ImportTemplateList */
-/* global View, IconLink, Sortable, ImportUploadDialog, ImportTransactionItem */
+/* global View, IconLink, Sortable, ImportUploadDialog, ImportRulesDialog, ImportTransactionItem */
 /* eslint no-bitwise: "off" */
 
 /**
@@ -15,7 +15,8 @@ function ImportView() {
     this.model = {
         transactionRows: [],
         mainAccount: null,
-        transCache: null
+        transCache: null,
+        rulesEnabled: true
     };
 
     this.model.accounts = AccountList.create(this.props.accounts);
@@ -45,6 +46,9 @@ ImportView.prototype.onStart = function () {
     this.transCountElem = ge('trcount');
     this.enabledTransCountElem = ge('entrcount');
     this.acc_id = ge('acc_id');
+    this.rulesCheck = ge('rulesCheck');
+    this.rulesBtn = ge('rulesBtn');
+    this.rulesCountElem = ge('rulescount');
     this.rowsContainer = ge('rowsContainer');
     if (!this.newItemBtn
         || !this.uploadBtn
@@ -52,6 +56,9 @@ ImportView.prototype.onStart = function () {
         || !this.transCountElem
         || !this.enabledTransCountElem
         || !this.acc_id
+        || !this.rulesCheck
+        || !this.rulesBtn
+        || !this.rulesCountElem
         || !this.rowsContainer
     ) {
         throw new Error('Failed to initialize Import view');
@@ -59,6 +66,8 @@ ImportView.prototype.onStart = function () {
 
     this.acc_id.addEventListener('change', this.onMainAccChange.bind(this));
     this.submitBtn.addEventListener('click', this.onSubmitClick.bind(this));
+    this.rulesCheck.addEventListener('change', this.onToggleEnableRules.bind(this));
+    this.rulesBtn.addEventListener('click', this.onRulesClick.bind(this));
 
     this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
 
@@ -73,6 +82,13 @@ ImportView.prototype.onStart = function () {
     });
 
     this.updMainAccObj();
+};
+
+/** Import rules 'update' event handler */
+ImportView.prototype.onUpdateRules = function () {
+    var rulesCount = this.model.rules.data.length;
+
+    this.rulesCountElem.textContent = rulesCount;
 };
 
 /** Show upload file dialog popup */
@@ -295,6 +311,38 @@ ImportView.prototype.onSubmitResult = function (response) {
     }
 
     createMessage(message, (status ? 'msg_success' : 'msg_error'));
+};
+
+/** Rules checkbox 'change' event handler */
+ImportView.prototype.onToggleEnableRules = function () {
+    this.model.rulesEnabled = !!this.rulesCheck.checked;
+    enable(this.rulesBtn, this.model.rulesEnabled);
+};
+
+/** Rules button 'click' event handler */
+ImportView.prototype.onRulesClick = function () {
+    if (!this.model.rulesEnabled) {
+        return;
+    }
+
+    this.showRulesDialog();
+};
+
+/** Show rules dialog popup */
+ImportView.prototype.showRulesDialog = function () {
+    if (!this.rulesDialog) {
+        this.rulesDialog = new ImportRulesDialog({
+            parent: this,
+            tplModel: this.model.templates,
+            currencyModel: this.model.currency,
+            accountModel: this.model.accounts,
+            personModel: this.model.persons,
+            rulesModel: this.model.rules,
+            elem: 'rulesDialog'
+        });
+    }
+
+    this.rulesDialog.show();
 };
 
 /**

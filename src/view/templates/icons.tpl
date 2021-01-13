@@ -46,6 +46,12 @@
     </g>
 </symbol>
 
+<symbol id="update" viewBox="0 0 24 24">
+    <path d="m6.0243 14.357-1.8944 5.5228 5.5984-1.781z" stroke-width="0"/>
+    <path d="m7.1253 13.283 6.9499-7.0522 3.6506 3.6884-6.9388 7.0788z" stroke-width="0"/>
+    <path d="m15.095 5.2111 2.0031-2.041 3.7418 3.7418-2.041 2.0409z" stroke-width="0"/>
+</symbol>
+
 <symbol id="del" viewBox="0 0 24 24">
     <path d="m6.0173 5.9912 11.975-1e-4c1.146.0135 2.0016.9822 1.9944 1.9832h-15.963c.00195-1.1416.73632-1.9854 1.9944-1.9831z" stroke-linejoin="round" stroke-width=".2"/>
     <rect x="9.9683" y="3.9965" width="3.9931" height=".96273" stroke-linejoin="round" stroke-width=".2"/>

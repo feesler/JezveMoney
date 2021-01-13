@@ -11,16 +11,20 @@
 function ImportTemplateManager() {
     ImportTemplateManager.parent.constructor.apply(this, arguments);
 
-    if (!this.parent
+    if (
+        !this.parent
         || !this.props
         || !this.props.currencyModel
-        || !this.props.tplModel) {
+        || !this.props.tplModel
+        || !this.props.rulesModel
+    ) {
         throw new Error('Failed to initialize upload file dialog');
     }
 
     this.model = {
         currency: this.props.currencyModel,
-        template: this.props.tplModel
+        template: this.props.tplModel,
+        rules: this.props.rulesModel
     };
 
     this.jsonParseErrorMessage = 'Fail to parse server response';
@@ -243,34 +247,10 @@ ImportTemplateManager.prototype.onDeleteTemplateClick = function () {
                 url: baseURL + 'api/importtpl/delete',
                 data: JSON.stringify(requestObj),
                 headers: { 'Content-Type': 'application/json' },
-                callback: this.onDeleteTemplateResult.bind(this)
+                callback: this.onTemplateRequestResult.bind(this)
             });
         }.bind(this)
     });
-};
-
-/** Delete template API request result handler */
-ImportTemplateManager.prototype.onDeleteTemplateResult = function (response) {
-    var defErrorMessage = 'Fail to delete import template';
-    var jsondata;
-
-    try {
-        jsondata = JSON.parse(response);
-    } catch (e) {
-        createMessage(this.jsonParseErrorMessage, 'msg_error');
-        return;
-    }
-
-    try {
-        if (!jsondata || jsondata.result !== 'ok') {
-            throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
-        }
-
-        this.state.id = this.RAW_DATA_STATE;
-        this.requestTemplatesList();
-    } catch (e) {
-        createMessage(e.message, 'msg_error');
-    }
 };
 
 /** Save template button 'click' event handler */
@@ -305,13 +285,13 @@ ImportTemplateManager.prototype.onSubmitTemplateClick = function () {
         url: reqURL,
         data: JSON.stringify(requestObj),
         headers: { 'Content-Type': 'application/json' },
-        callback: this.onSubmitTemplateResult.bind(this)
+        callback: this.onTemplateRequestResult.bind(this)
     });
 };
 
-/** Cancel template button 'click' event handler */
-ImportTemplateManager.prototype.onSubmitTemplateResult = function (response) {
-    var defErrorMessage = 'Fail to submit import template';
+/** API response handler for template create/update/delete request */
+ImportTemplateManager.prototype.onTemplateRequestResult = function (response) {
+    var defErrorMessage = 'Import template request failed';
     var jsondata;
 
     try {
@@ -340,7 +320,7 @@ ImportTemplateManager.prototype.requestTemplatesList = function () {
     });
 };
 
-/** Send API request to obain list of import templates */
+/** API response handler for templates list request */
 ImportTemplateManager.prototype.onTemplateListResult = function (response) {
     var defErrorMessage = 'Fail to read list of import templates';
     var jsondata;
@@ -365,6 +345,40 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
         } else {
             this.setCreateTemplateState();
         }
+
+        this.requestRulesList();
+    } catch (e) {
+        createMessage(e.message, 'msg_error');
+    }
+};
+
+/** Send API request to obain list of import rules */
+ImportTemplateManager.prototype.requestRulesList = function () {
+    ajax.get({
+        url: baseURL + 'api/importrule/list/?extended=true',
+        callback: this.onRulesListResult.bind(this)
+    });
+};
+
+/** API response handler for rules list request */
+ImportTemplateManager.prototype.onRulesListResult = function (response) {
+    var defErrorMessage = 'Fail to read list of import rules';
+    var jsondata;
+
+    try {
+        jsondata = JSON.parse(response);
+    } catch (e) {
+        createMessage(this.jsonParseErrorMessage, 'msg_error');
+        return;
+    }
+
+    try {
+        if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
+            throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
+        }
+
+        this.model.rules.setData(jsondata.data);
+        this.parent.onUpdateRules();
     } catch (e) {
         createMessage(e.message, 'msg_error');
     }
