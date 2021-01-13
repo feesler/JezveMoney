@@ -874,7 +874,7 @@ class TransactionModel extends CachedTable
     // Remove specified account from transactions
     public function onAccountDelete($accounts)
     {
-        if (!self::$user_id) {
+        if (!self::$user_id || is_null($accounts)) {
             return false;
         }
 
@@ -884,10 +884,7 @@ class TransactionModel extends CachedTable
             throw new \Error("User not found");
         }
 
-        if (!is_array($accounts)) {
-            $accounts = [$accounts];
-        }
-
+        $accounts = asArray($accounts);
         $ids = [];
         $personAccounts = [];
         $userAccounts = [];

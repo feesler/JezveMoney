@@ -226,7 +226,7 @@ class ImportTemplateModel extends CachedTable
         return $res;
     }
 
-
+    // Return array of template column types
     public function getColumnTypes()
     {
         return $this->columnTypes;

@@ -299,7 +299,7 @@ class ImportConditionModel extends CachedTable
     }
 
     // Set conditions for specified rule
-    // Delete any previously set conditions for rule
+    // Delete all previous conditions for rule
     public function setRuleConditions($rule_id, $conditions)
     {
         $rule_id = intval($rule_id);

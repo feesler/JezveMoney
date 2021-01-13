@@ -325,7 +325,8 @@ class ImportActionModel extends CachedTable
         return $this->getData(["rule" => $rule_id]);
     }
 
-
+    // Set actions for specified rule
+    // Delete all previous actions for rule
     public function setRuleActions($rule_id, $actions)
     {
         $rule_id = intval($rule_id);
@@ -348,15 +349,13 @@ class ImportActionModel extends CachedTable
         return true;
     }
 
-
+    // Delete all actions of specified rules
     public function deleteRuleActions($rules)
     {
         if (is_null($rules)) {
             return;
         }
-        if (!is_array($rules)) {
-            $rules = [$rules];
-        }
+        $rules = asArray($rules);
 
         if (!$this->checkCache()) {
             return false;

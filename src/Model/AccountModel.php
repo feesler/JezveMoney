@@ -384,8 +384,8 @@ class AccountModel extends CachedTable
             !$this->update(
                 $acc_id,
                 [
-                $field => $newValue,
-                "updatedate" => date("Y-m-d H:i:s")
+                    $field => $newValue,
+                    "updatedate" => date("Y-m-d H:i:s")
                 ]
             )
         ) {

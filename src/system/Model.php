@@ -145,9 +145,7 @@ abstract class Model
     // Delete specified item
     public function del($items)
     {
-        if (!is_array($items)) {
-            $items = [ $items ];
-        }
+        $items = asArray($items);
         if (!count($items)) {
             return true;
         }

@@ -28,13 +28,15 @@ class Import extends TemplateController
         $persArr = $this->personMod->getData();
         $impTemplates = $this->templateModel->getData();
         $tplColumnTypes = $this->templateModel->getColumnTypes();
+        $rulesData = $this->ruleModel->getData(["extended" => true]);
 
-        $rules = $this->ruleModel->getData();
-        $rulesData = [];
-        foreach ($rules as $rule) {
-            $rule->actions = $this->actionModel->getData(["rule" => $rule->id]);
-            $rulesData[] = $rule;
-        }
+        $viewData = [
+            "accounts" => $accArr,
+            "currencies" => $currArr,
+            "persons" => $persArr,
+            "rules" => $rulesData,
+            "templates" => $impTemplates
+        ];
 
         $this->css->libs[] = "lib/iconlink.css";
         $this->css->page = [

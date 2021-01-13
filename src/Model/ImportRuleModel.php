@@ -8,8 +8,6 @@ use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportRuleItem;
 
-use function JezveMoney\Core\qnull;
-
 class ImportRuleModel extends CachedTable
 {
     use Singleton;
@@ -118,12 +116,10 @@ class ImportRuleModel extends CachedTable
             }
         }
 
-        $res = $this->condModel->deleteRuleConditions($items);
-        if (!$res) {
-            return false;
-        }
+        $res = $this->condModel->deleteRuleConditions($items)
+            && $this->actionModel->deleteRuleActions($items);
 
-        return $this->actionModel->deleteRuleActions($items);
+        return $res;
     }
 
 
