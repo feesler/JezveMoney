@@ -1,8 +1,8 @@
 'use strict';
 
-/* global Popup */
+/* global isDate, Popup */
 /* exported EXPENSE, INCOME, TRANSFER, DEBT */
-/* exported amountFix, fixDate, timestampFromString */
+/* exported formatDate, amountFix, fixDate, timestampFromString */
 /* exported createMessage, fixFloat, correct, correctExch, normalize, normalizeExch, isValidValue */
 
 /** Types of transactions */
@@ -12,6 +12,28 @@ var TRANSFER = 3;
 var DEBT = 4;
 
 var messageBox = null;
+
+/**
+ * Format date as DD.MM.YYYY
+ * @param {Date} date - date to format
+ */
+function formatDate(date) {
+    var month;
+    var year;
+    var day;
+
+    if (!isDate(date)) {
+        throw new Error('Invalid type of parameter');
+    }
+
+    month = date.getMonth();
+    year = date.getFullYear();
+    day = date.getDate();
+
+    return ((day > 9) ? '' : '0') + day + '.'
+        + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.'
+        + year;
+}
 
 /** Convert DD.MM.YYYY string to timestamp */
 function fixDate(str) {
@@ -31,8 +53,21 @@ function fixDate(str) {
 
 /** Convert date string to timestamp */
 function timestampFromString(str) {
-    var tmpDate = str;
-    var pos = str.indexOf(' ');
+    var tmpDate;
+    var pos;
+
+    if (typeof str === 'number') {
+        return str;
+    }
+    if (isDate(str)) {
+        return str.getTime();
+    }
+    if (typeof str !== 'string') {
+        throw new Error('Invalid type of parameter');
+    }
+
+    tmpDate = str;
+    pos = str.indexOf(' ');
     if (pos !== -1) {
         tmpDate = tmpDate.substr(0, pos);
     }

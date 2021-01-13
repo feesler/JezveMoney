@@ -1,7 +1,7 @@
 'use strict';
 
-/* global ge, isDate, isFunction, show, enable, extend */
-/* global selectedValue, urlJoin, ajax, createMessage, baseURL */
+/* global ge, fixFloat, formatDate, isFunction, show, enable, extend */
+/* global selectedValue, urlJoin, ajax, timestampFromString, createMessage, baseURL */
 /* global Component, Popup, ImportTransactionItem */
 /* global ImportFileUploader, ImportTemplateManager */
 
@@ -196,7 +196,7 @@ ImportUploadDialog.prototype.mapImportedItems = function (data) {
         }
 
         // Store date region of imported transactions
-        timestamp = this.timestampFromDateString(row.date);
+        timestamp = timestampFromString(row.date);
         if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
             importedDateRange.start = timestamp;
         }
@@ -214,8 +214,8 @@ ImportUploadDialog.prototype.mapImportedItems = function (data) {
 
     reqParams = urlJoin({
         count: 0,
-        stdate: this.formatDate(new Date(importedDateRange.start)),
-        enddate: this.formatDate(new Date(importedDateRange.end)),
+        stdate: formatDate(new Date(importedDateRange.start)),
+        enddate: formatDate(new Date(importedDateRange.end)),
         acc_id: this.model.mainAccount.id
     });
 
@@ -282,7 +282,7 @@ ImportUploadDialog.prototype.mapImportItem = function (data) {
         item.setCurrency(trCurr.id);
         item.setSecondAmount(Math.abs(trAmount));
     }
-    item.setDate(this.formatDate(new Date(data.date)));
+    item.setDate(formatDate(new Date(data.date)));
     item.setComment(data.comment);
 
     this.model.rules.applyTo(data, item);
@@ -368,52 +368,4 @@ ImportUploadDialog.prototype.onTrCacheResult = function (response) {
 ImportUploadDialog.prototype.importDone = function () {
     this.uploadDoneHandler(this.importedItems);
     this.reset();
-};
-
-/**
- * Format date as DD.MM.YYYY
- * @param {Date} date - date to format
- */
-ImportUploadDialog.prototype.formatDate = function (date) {
-    var month;
-    var year;
-    var day;
-
-    if (!isDate(date)) {
-        throw new Error('Invalid type of parameter');
-    }
-
-    month = date.getMonth();
-    year = date.getFullYear();
-    day = date.getDate();
-
-    return ((day > 9) ? '' : '0') + day + '.'
-        + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.'
-        + year;
-};
-
-/**
- * Convert date string to timestamp
- * @param {string} str - date string in DD.MM.YYYY format
- */
-ImportUploadDialog.prototype.timestampFromDateString = function (str) {
-    var dparts;
-    var res;
-
-    if (typeof str === 'number') {
-        return str;
-    }
-
-    if (isDate(str)) {
-        return str.getTime();
-    }
-
-    if (typeof str !== 'string') {
-        throw new Error('Invalid type of parameter');
-    }
-
-    dparts = str.split('.');
-    res = new Date(dparts[2], dparts[1] - 1, dparts[0]);
-
-    return res.getTime();
 };
