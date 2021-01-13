@@ -163,6 +163,25 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
+    // Delete import rules without conditions or actions
+    protected function removeEmptyRules()
+    {
+        $items = $this->getData(["extended" => true]);
+        $itemsToDelete = [];
+        foreach ($items as $item) {
+            if (
+                !is_array($item->conditions)
+                || !count($item->conditions)
+                || !is_array($item->actions)
+                || !count($item->actions)
+            ) {
+                $itemsToDelete[] = $item->id;
+            }
+        }
+
+        return $this->del($itemsToDelete);
+    }
+
     // Update import rule conditiona and actions
     public function onTemplateDelete($templates)
     {
@@ -170,7 +189,10 @@ class ImportRuleModel extends CachedTable
             return false;
         }
 
-        return $this->condModel->deleteTemplateConditions($templates);
+        $res = $this->condModel->deleteTemplateConditions($templates)
+            && $this->removeEmptyRules();
+
+        return $res;
     }
 
     // Delete conditions and actions related to removed accounts
@@ -181,7 +203,9 @@ class ImportRuleModel extends CachedTable
         }
 
         $res = $this->condModel->deleteAccountConditions($accounts)
-            && $this->actionModel->deleteAccountActions($accounts);
+            && $this->actionModel->deleteAccountActions($accounts)
+            && $this->removeEmptyRules();
+
         return $res;
     }
 
@@ -192,6 +216,9 @@ class ImportRuleModel extends CachedTable
             return false;
         }
 
-        return $this->actionModel->deletePersonActions($persons);
+        $res = $this->actionModel->deletePersonActions($persons)
+            && $this->removeEmptyRules();
+
+        return $res;
     }
 }
