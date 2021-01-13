@@ -230,6 +230,8 @@ ImportUploadDialog.prototype.mapImportedItems = function (data) {
  * @param {Object} data - import data
  */
 ImportUploadDialog.prototype.mapImportItem = function (data) {
+    var amount;
+    var trAmount;
     var accCurr;
     var trCurr;
     var item;
@@ -262,10 +264,23 @@ ImportUploadDialog.prototype.mapImportItem = function (data) {
         originalData: data
     });
 
-    item.setAmount(-data.accAmountVal);
+    amount = parseFloat(fixFloat(data.accAmountVal));
+    if (Number.isNaN(amount) || amount === 0) {
+        throw new Error('Invalid account amount value');
+    }
+    trAmount = parseFloat(fixFloat(data.trAmountVal));
+    if (Number.isNaN(trAmount) || trAmount === 0) {
+        throw new Error('Invalid transaction amount value');
+    }
+
+    if (amount > 0) {
+        item.invertTransactionType();
+    }
+
+    item.setAmount(Math.abs(amount));
     if (trCurr.id !== accCurr.id) {
         item.setCurrency(trCurr.id);
-        item.setSecondAmount(-data.trAmountVal);
+        item.setSecondAmount(Math.abs(trAmount));
     }
     item.setDate(this.formatDate(new Date(data.date)));
     item.setComment(data.comment);
