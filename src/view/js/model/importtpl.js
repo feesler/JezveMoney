@@ -1,6 +1,6 @@
 'use strict';
 
-/* global fixFloat, extend, ListItem, List */
+/* global amountFix, timestampFromString, extend, ListItem, List */
 
 /**
  * @constructor Import template class
@@ -66,48 +66,7 @@ ImportTemplate.prototype.getColumnData = function (data, index) {
     return data[col - 1];
 };
 
-/** Convert string to amount value */
-ImportTemplate.prototype.amountFix = function (value) {
-    var res;
-
-    if (typeof value === 'number') {
-        return value;
-    }
-    if (typeof value !== 'string') {
-        return null;
-    }
-
-    res = value.replace(/ /, '');
-    return parseFloat(fixFloat(res));
-};
-
-/** Convert DD.MM.YYYY string to timestamp */
-ImportTemplate.prototype.fixDate = function (str) {
-    var res;
-
-    if (typeof str !== 'string') {
-        return null;
-    }
-
-    res = Date.parse(str.split('.').reverse().join('-'));
-    if (Number.isNaN(res)) {
-        return null;
-    }
-
-    return res;
-};
-
-/** Convert date string to timestamp */
-ImportTemplate.prototype.timestampFromString = function (str) {
-    var tmpDate = str;
-    var pos = str.indexOf(' ');
-    if (pos !== -1) {
-        tmpDate = tmpDate.substr(0, pos);
-    }
-
-    return this.fixDate(tmpDate);
-};
-
+/** Obtain specified property from data */
 ImportTemplate.prototype.getProperty = function (name, data, safe) {
     var propGetterMap = {
         accountAmount: this.getAccountAmount,
@@ -135,34 +94,64 @@ ImportTemplate.prototype.getProperty = function (name, data, safe) {
 
 /** Extract account amount value from data */
 ImportTemplate.prototype.getAccountAmount = function (data) {
-    var value = this.getColumnData(data, this.columns.accountAmount);
-    return this.amountFix(value);
+    var value;
+
+    if (!('accountAmount' in this.columns)) {
+        return null;
+    }
+
+    value = this.getColumnData(data, this.columns.accountAmount);
+    return amountFix(value);
 };
 
 /** Extract account currency value from data */
 ImportTemplate.prototype.getAccountCurrency = function (data) {
+    if (!('accountCurrency' in this.columns)) {
+        return null;
+    }
+
     return this.getColumnData(data, this.columns.accountCurrency);
 };
 
 /** Extract transaction amount value from data */
 ImportTemplate.prototype.getTransactionAmount = function (data) {
-    var value = this.getColumnData(data, this.columns.transactionAmount);
-    return this.amountFix(value);
+    var value;
+
+    if (!('transactionAmount' in this.columns)) {
+        return null;
+    }
+
+    value = this.getColumnData(data, this.columns.transactionAmount);
+    return amountFix(value);
 };
 
 /** Extract transaction currency value from data */
 ImportTemplate.prototype.getTransactionCurrency = function (data) {
+    if (!('transactionCurrency' in this.columns)) {
+        return null;
+    }
+
     return this.getColumnData(data, this.columns.transactionCurrency);
 };
 
 /** Extract date value from data */
 ImportTemplate.prototype.getDate = function (data) {
-    var value = this.getColumnData(data, this.columns.date);
-    return this.timestampFromString(value);
+    var value;
+
+    if (!('date' in this.columns)) {
+        return null;
+    }
+
+    value = this.getColumnData(data, this.columns.date);
+    return timestampFromString(value);
 };
 
 /** Extract comment value from data */
 ImportTemplate.prototype.getComment = function (data) {
+    if (!('comment' in this.columns)) {
+        return null;
+    }
+
     return this.getColumnData(data, this.columns.comment);
 };
 

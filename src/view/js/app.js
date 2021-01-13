@@ -2,6 +2,7 @@
 
 /* global Popup */
 /* exported EXPENSE, INCOME, TRANSFER, DEBT */
+/* exported amountFix, fixDate, timestampFromString */
 /* exported createMessage, fixFloat, correct, correctExch, normalize, normalizeExch, isValidValue */
 
 /** Types of transactions */
@@ -11,6 +12,33 @@ var TRANSFER = 3;
 var DEBT = 4;
 
 var messageBox = null;
+
+/** Convert DD.MM.YYYY string to timestamp */
+function fixDate(str) {
+    var res;
+
+    if (typeof str !== 'string') {
+        return null;
+    }
+
+    res = Date.parse(str.split('.').reverse().join('-'));
+    if (Number.isNaN(res)) {
+        return null;
+    }
+
+    return res;
+}
+
+/** Convert date string to timestamp */
+function timestampFromString(str) {
+    var tmpDate = str;
+    var pos = str.indexOf(' ');
+    if (pos !== -1) {
+        tmpDate = tmpDate.substr(0, pos);
+    }
+
+    return fixDate(tmpDate);
+}
 
 /**
  * Create notification message
@@ -55,6 +83,21 @@ function fixFloat(str) {
     }
 
     return null;
+}
+
+/** Convert string to amount value */
+function amountFix(value) {
+    var res;
+
+    if (typeof value === 'number') {
+        return value;
+    }
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    res = value.replace(/ /, '');
+    return parseFloat(fixFloat(res));
 }
 
 /**
