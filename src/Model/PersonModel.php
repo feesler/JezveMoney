@@ -6,6 +6,7 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\Core\Singleton;
+use JezveMoney\App\Item\PersonItem;
 
 use function JezveMoney\Core\inSetCondition;
 
@@ -418,7 +419,7 @@ class PersonModel extends CachedTable
                 continue;
             }
 
-            $itemObj = clone $item;
+            $itemObj = new PersonItem($item);
             $itemObj->accounts = $accMod->getData(["person" => $item->id]);
 
             $res[] = $itemObj;

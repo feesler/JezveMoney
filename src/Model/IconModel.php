@@ -6,6 +6,7 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
+use JezveMoney\App\Item\IconItem;
 
 use function JezveMoney\Core\qnull;
 
@@ -195,12 +196,7 @@ class IconModel extends CachedTable
         }
 
         foreach ($this->cache as $item) {
-            $itemObj = new \stdClass();
-
-            $itemObj->id = $item->id;
-            $itemObj->name = $item->name;
-            $itemObj->file = $item->file;
-            $itemObj->type = $item->type;
+            $itemObj = new IconItem($item);
 
             $res[] = $itemObj;
         }

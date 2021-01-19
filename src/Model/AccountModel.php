@@ -6,6 +6,7 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
+use JezveMoney\App\Item\AccountItem;
 
 use function JezveMoney\Core\inSetCondition;
 
@@ -556,7 +557,7 @@ class AccountModel extends CachedTable
                 continue;
             }
 
-            $accObj = clone $item;
+            $accObj = new AccountItem($item);
 
             $resArr[] = $accObj;
         }
