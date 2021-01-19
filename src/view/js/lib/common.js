@@ -330,6 +330,10 @@ function getCursorPos(input) {
     var len;
     var pos;
 
+    if (!input) {
+        return null;
+    }
+
     if ('selectionStart' in input && document.activeElement === input) {
         return {
             start: input.selectionStart,
@@ -363,6 +367,29 @@ function getCursorPos(input) {
     }
 
     return null;
+}
+
+/**
+ * Set curson position for specified input element
+ * @param {Element} input
+ * @param {number} pos
+ */
+function setCursorPos(input, pos) {
+    var range;
+
+    if (!input) {
+        return;
+    }
+
+    if (input.createTextRange) {
+        range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', pos);
+        range.moveStart('character', pos);
+        range.select();
+    } else if (input.setSelectionRange) {
+        input.setSelectionRange(pos, pos);
+    }
 }
 
 /** Check string is correct date in dd.mm.yyyy format */

@@ -129,7 +129,7 @@ textarea
 
 
 /* Create/update item popup */
-.popup > .item-form > .popup__content-box
+.item-form .popup__content-box
 {
     width: 100%;
 	max-width: 300px;
@@ -151,8 +151,8 @@ textarea
 	border-width: 1px;
 }
 
-/* Cusmot popup styles */
-.popup > .popup__content.center_only
+/* Custom popup styles */
+.popup__content.center_only
 {
 	background: none;
 }

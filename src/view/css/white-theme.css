@@ -341,16 +341,16 @@ div.trans-list__item_selected
 
 
 /* Popup */
-.popup > .popup__content,
-.popup > .popup__content > .popup__content-box
+.popup__content,
+.popup__content .popup__content-box
 {
     color: #000000;
     background-color: #FFFFFF;
 }
 
 
-.popup .popup__title,
-.popup .popup__message
+.popup__title,
+.popup__message
 {
     color: #000000;
 }

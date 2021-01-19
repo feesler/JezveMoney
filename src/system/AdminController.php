@@ -36,6 +36,7 @@ abstract class AdminController extends TemplateController
             "lib/polyfill.min.js",
             "lib/common.js",
             "lib/ajax.js",
+            "lib/component.js",
             "lib/popup.js",
             "app.js"
         ];

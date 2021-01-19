@@ -976,7 +976,7 @@ select
 
 
 /* Messages */
-.popup > .popup__content.msg
+.popup__content.msg
 {
 	background: none;
 	top: 55px;
@@ -984,7 +984,7 @@ select
 }
 
 
-.popup > .popup__content.msg > .popup__content-box
+.popup__content.msg .popup__content-box
 {
 	padding: 0;
 	max-width: 824px;
@@ -993,7 +993,7 @@ select
 }
 
 
-.msg > .popup__content-box > .popup__message
+.msg .popup__content-box > .popup__message
 {
 	max-width: 300px;
 	min-width: 200px;
@@ -1004,14 +1004,14 @@ select
 }
 
 
-.msg.msg_success > .popup__content-box > .popup__message
+.msg.msg_success .popup__content-box .popup__message
 {
 	border-color: #20D040;
 	background-color: #40D060;
 }
 
 
-.msg.msg_error > .popup__content-box > .popup__message
+.msg.msg_error .popup__content-box .popup__message
 {
 	border-color: #F02020;
 	background-color: #F02020;
@@ -1019,28 +1019,22 @@ select
 
 
 /* Custom popup styles */
-.popup > .popup__content.center_only
+.popup__content.center_only
 {
 	background: none;
 }
 
 
-.popup .msg .close-btn:hover > svg
+.msg .close-btn:hover > svg
 {
 	fill: #FFFFFF;
 }
 
 
 /* Custom popup styles */
-.popup .popup__title
+.popup__title
 {
 	font-weight: lighter;
-}
-
-
-.popup > .popup__content.center_only
-{
-	background: none;
 }
 
 
@@ -1052,8 +1046,8 @@ select
 
 
 /* Change name and change password popups */
-.popup > .chname_popup > .popup__content-box,
-.popup > .chpass_popup > .popup__content-box
+.chname_popup .popup__content-box,
+.chpass_popup .popup__content-box
 {
 	max-width: 400px;
     width: 100%;

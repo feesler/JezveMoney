@@ -39,6 +39,7 @@ abstract class TemplateController extends Controller
             "lib/polyfill.min.js",
             "lib/common.js",
             "lib/ajax.js",
+            "lib/component.js",
             "lib/popup.js",
             "app.js"
         ];

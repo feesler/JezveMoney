@@ -26,6 +26,20 @@ textarea
     background-color: #FFFFFF;
 }
 
+/* Popup */
+.popup__content,
+.popup__content .popup__content-box
+{
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+
+.popup__title,
+.popup__message
+{
+    color: #000000;
+}
 
 /* Tests */
 .results-container td

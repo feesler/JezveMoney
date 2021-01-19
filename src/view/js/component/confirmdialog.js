@@ -72,6 +72,7 @@ ConfirmDialog.prototype.show = function () {
  * @param {boolean} toShow - if true component will be shown, hidden otherwise. Default is true
  */
 ConfirmDialog.prototype.onResult = function (confirmResult) {
+    this.popup.hide();
     this.popup.destroy();
 
     if (confirmResult) {

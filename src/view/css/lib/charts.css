@@ -1,14 +1,18 @@
 /* Main container for charts */
 .charts
 {
+    display: -ms-flexbox;
 	display: flex;
+    -ms-flex-flow: row nowrap;
 	flex-flow: row nowrap;
+    -ms-flex-basis: 100%;
 	flex-basis: 100%;
 }
 
 
 .chart_wrap
 {
+    -ms-flex-basis: 100%;
 	flex-basis: 100%;
 	overflow: hidden;
 }
