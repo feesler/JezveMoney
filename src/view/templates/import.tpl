@@ -166,8 +166,8 @@
         <label>Import rules</label>
         <input id="createRuleBtn" class="btn link-btn create-btn" type="button" value="Create">
     </div>
+    <div class="rules-dialog__loading hidden">Loading...</div>
     <div class="rules-list"></div>
-    <div class="rule-form hidden"></div>
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>

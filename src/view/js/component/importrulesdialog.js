@@ -52,10 +52,12 @@ function ImportRulesDialog() {
 
     this.createRuleBtn = ge('createRuleBtn');
     this.titleElem = this.elem.querySelector('.rules-header label');
+    this.loadingIndicator = this.elem.querySelector('.rules-dialog__loading');
     this.listContainer = this.elem.querySelector('.rules-list');
     if (
         !this.createRuleBtn
         || !this.titleElem
+        || !this.loadingIndicator
         || !this.listContainer
     ) {
         throw new Error('Failed to initialize import rules dialog');
@@ -83,7 +85,8 @@ ImportRulesDialog.prototype.hide = function () {
 /** Reset dialog state */
 ImportRulesDialog.prototype.reset = function () {
     this.state = {
-        id: this.LIST_STATE
+        id: this.LIST_STATE,
+        listLoading: false
     };
 };
 
@@ -162,6 +165,9 @@ ImportRulesDialog.prototype.submitRule = function (data) {
 
     reqURL += (data.id) ? 'update' : 'create';
 
+    this.state.listLoading = true;
+    this.render(this.state);
+
     ajax.post({
         url: reqURL,
         data: JSON.stringify(data),
@@ -179,6 +185,9 @@ ImportRulesDialog.prototype.deleteRule = function (ruleId) {
     if (!data.id) {
         throw new Error('Invalid rule id');
     }
+
+    this.state.listLoading = true;
+    this.render(this.state);
 
     ajax.post({
         url: reqURL,
@@ -247,7 +256,7 @@ ImportRulesDialog.prototype.onRulesListResult = function (response) {
     }
 };
 
-/** Render component state */
+/** Render list state of component */
 ImportRulesDialog.prototype.renderList = function () {
     var ruleItems;
 
@@ -281,7 +290,8 @@ ImportRulesDialog.prototype.renderList = function () {
     show(this.listContainer, true);
     show(this.createRuleBtn, true);
     if (this.formContainer) {
-        show(this.formContainer.elem, false);
+        re(this.formContainer.elem);
+        this.formContainer = null;
     }
 };
 
@@ -311,6 +321,10 @@ ImportRulesDialog.prototype.renderForm = function (state) {
 
 /** Render component state */
 ImportRulesDialog.prototype.render = function (state) {
+    if (state.listLoading) {
+        show(this.loadingIndicator, true);
+    }
+
     if (state.id === this.LIST_STATE) {
         this.titleElem.textContent = 'Import rules';
 
@@ -321,5 +335,9 @@ ImportRulesDialog.prototype.render = function (state) {
             : 'Update import rule';
 
         this.renderForm(state);
+    }
+
+    if (!state.listLoading) {
+        show(this.loadingIndicator, false);
     }
 };

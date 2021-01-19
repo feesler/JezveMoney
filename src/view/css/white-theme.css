@@ -454,6 +454,13 @@ div.trans-list__item_selected
     color: #FFFFFF;
 }
 
+/* Import rules dialog */
+.rules-dialog__loading
+{
+    color: #000000;
+    background-color: #D0D0D0;
+}
+
 /* Import rule */
 .rule-item
 {
