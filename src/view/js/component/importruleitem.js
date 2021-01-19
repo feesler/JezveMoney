@@ -229,6 +229,10 @@ ImportRuleItem.prototype.render = function (state) {
         throw new Error('Invalid state');
     }
 
+    if (state.ruleId) {
+        this.elem.setAttribute('data-id', state.ruleId);
+    }
+
     if (state.expanded) {
         this.elem.classList.add('rule-item_expanded');
     } else {

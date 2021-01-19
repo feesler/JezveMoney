@@ -49,7 +49,7 @@ export class ImportList extends Component {
     }
 
     getItems() {
-        return this.items.map(this.getItemData);
+        return this.items.map((item) => this.getItemData(item));
     }
 
     getEnabledItems() {

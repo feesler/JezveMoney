@@ -20,6 +20,8 @@ import { Icon } from './icon.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
+import { ImportCondition } from './importcondition.js';
+import { ImportAction } from './importaction.js';
 import { api } from './api.js';
 
 /* eslint-disable no-bitwise */
@@ -44,6 +46,11 @@ const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', '
  */
 const tplReqFields = ['name', 'type_id', 'columns'];
 const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
+
+/**
+ * Import rules
+ */
+const ruleReqFields = ['flags', 'conditions', 'actions'];
 
 /**
  * Check all properties of expected object are presents in specified object
@@ -91,6 +98,7 @@ export class AppState {
         this.persons = null;
         this.transactions = null;
         this.templates = null;
+        this.rules = null;
         this.profile = null;
     }
 
@@ -125,6 +133,12 @@ export class AppState {
         this.templates.data = copyObject(state.templates.data);
         this.templates.autoincrement = state.templates.autoincrement;
 
+        if (!this.rules) {
+            this.rules = new List();
+        }
+        this.rules.data = copyObject(state.rules.data);
+        this.rules.autoincrement = state.rules.autoincrement;
+
         this.profile = copyObject(state.profile);
     }
 
@@ -147,6 +161,7 @@ export class AppState {
         res.persons = this.persons.clone();
         res.transactions = this.transactions.clone();
         res.templates = this.templates.clone();
+        res.rules = this.rules.clone();
         res.profile = copyObject(this.profile);
 
         return res;
@@ -157,6 +172,7 @@ export class AppState {
             && checkObjValue(this.transactions.data, expected.transactions.data)
             && checkObjValue(this.persons.data, expected.persons.data)
             && checkObjValue(this.templates.data, expected.templates.data)
+            && checkObjValue(this.rules.data, expected.rules.data)
             && checkObjValue(this.profile, expected.profile);
         return res;
     }
@@ -183,6 +199,9 @@ export class AppState {
         }
         if (this.templates) {
             this.templates.reset();
+        }
+        if (this.rules) {
+            this.rules.reset();
         }
     }
 
@@ -281,17 +300,19 @@ export class AppState {
     }
 
     deleteAccounts(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        let itemIds = Array.isArray(ids) ? ids : [ids];
         if (!itemIds.length) {
             return false;
         }
 
+        itemIds = itemIds.map((id) => parseInt(id, 10));
         for (const accountId of itemIds) {
             if (!this.accounts.getItem(accountId)) {
                 return false;
             }
         }
 
+        this.rulesDeleteAccounts(itemIds);
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, itemIds);
 
         // Prepare expected updates of accounts list
@@ -453,6 +474,7 @@ export class AppState {
             }
         }
 
+        this.rulesDeletePersons(ids);
         this.persons.deleteItems(ids);
 
         // Prepare expected updates of transactions
@@ -897,8 +919,180 @@ export class AppState {
             }
         }
 
+        this.rulesDeleteTemplate(ids);
         this.templates.deleteItems(ids);
 
         return true;
+    }
+
+    /**
+     * Import rules
+     */
+    checkRuleCorrectness(params) {
+        if (!checkFields(params, ruleReqFields)) {
+            return false;
+        }
+
+        if (
+            !Array.isArray(params.conditions)
+            || !params.conditions.length
+            || !Array.isArray(params.actions)
+            || !params.actions.length
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    createRule(params) {
+        const resExpected = this.checkRuleCorrectness(params);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(params, ruleReqFields);
+
+        const ind = this.rules.create(data);
+        const item = this.rules.getItemByIndex(ind);
+
+        return item.id;
+    }
+
+    updateRule(params) {
+        const origItem = this.rules.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expRule = copyObject(origItem);
+        const data = copyFields(params, ruleReqFields);
+        setParam(expRule, data);
+
+        const resExpected = this.checkRuleCorrectness(expRule);
+        if (!resExpected) {
+            return false;
+        }
+
+        this.rules.update(expRule);
+
+        return true;
+    }
+
+    deleteRules(ids) {
+        const itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return false;
+        }
+
+        for (const itemId of itemIds) {
+            if (!this.rules.getItem(itemId)) {
+                return false;
+            }
+        }
+
+        this.rules.deleteItems(ids);
+
+        return true;
+    }
+
+    deleteEmptyRules() {
+        this.rules.data = this.rules.data.filter(
+            (rule) => (rule.conditions.length > 0 && rule.actions.length > 0),
+        );
+    }
+
+    rulesDeleteAccounts(ids) {
+        let itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return;
+        }
+
+        itemIds = itemIds.map((id) => parseInt(id, 10));
+        this.rules.data = this.rules.data.map((rule) => {
+            const res = rule;
+
+            res.conditions = res.conditions.filter(
+                (condition) => {
+                    if (!ImportCondition.isAccountField(condition.field_id)
+                        || ImportCondition.isFieldValueFlag(condition.flags)) {
+                        return true;
+                    }
+
+                    const accountId = parseInt(condition.value, 10);
+                    return !itemIds.includes(accountId);
+                },
+            );
+
+            res.actions = res.actions.filter(
+                (action) => {
+                    if (!ImportAction.isAccountValue(action.action_id)) {
+                        return true;
+                    }
+
+                    const accountId = parseInt(action.value, 10);
+                    return !itemIds.includes(accountId);
+                },
+            );
+
+            return res;
+        });
+
+        this.deleteEmptyRules();
+    }
+
+    rulesDeletePersons(ids) {
+        let itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return;
+        }
+
+        itemIds = itemIds.map((id) => parseInt(id, 10));
+        this.rules.data = this.rules.data.map((rule) => {
+            const res = rule;
+
+            res.conditions = res.conditions.filter(
+                (condition) => {
+                    if (!ImportCondition.isTemplateField(condition.field_id)
+                        || ImportCondition.isFieldValueFlag(condition.flags)) {
+                        return true;
+                    }
+
+                    const templateId = parseInt(condition.value, 10);
+                    return !itemIds.includes(templateId);
+                },
+            );
+
+            return res;
+        });
+
+        this.deleteEmptyRules();
+    }
+
+    rulesDeleteTemplate(ids) {
+        let itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return;
+        }
+
+        itemIds = itemIds.map((id) => parseInt(id, 10));
+        this.rules.data = this.rules.data.map((rule) => {
+            const res = rule;
+
+            res.actions = res.actions.filter(
+                (action) => {
+                    if (!ImportAction.isPersonValue(action.action_id)) {
+                        return true;
+                    }
+
+                    const personId = parseInt(action.value, 10);
+                    return !itemIds.includes(personId);
+                },
+            );
+
+            return res;
+        });
+
+        this.deleteEmptyRules();
     }
 }

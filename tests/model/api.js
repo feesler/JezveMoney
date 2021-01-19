@@ -657,8 +657,8 @@ export const api = {
             return true;
         },
 
-        async list() {
-            const reqUrl = 'importrule/list';
+        async list(params = {}) {
+            const reqUrl = `importrule/list?${urlJoin(params)}`;
             const jsonRes = await apiGet(reqUrl);
             if (!jsonRes || jsonRes.result !== 'ok') {
                 throw new ApiRequestError('Fail to obtain list of import rules');

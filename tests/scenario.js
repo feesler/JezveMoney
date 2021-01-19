@@ -14,6 +14,22 @@ import {
     availTransTypes,
 } from './model/transaction.js';
 
+import {
+    IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    IMPORT_COND_FIELD_ACC_AMOUNT,
+    IMPORT_COND_FIELD_COMMENT,
+    IMPORT_COND_OP_EQUAL,
+    IMPORT_COND_OP_STRING_INCLUDES,
+    IMPORT_COND_OP_LESS,
+    IMPORT_COND_OP_GREATER,
+} from './model/importcondition.js';
+import {
+    IMPORT_ACTION_SET_TR_TYPE,
+    IMPORT_ACTION_SET_ACCOUNT,
+    IMPORT_ACTION_SET_PERSON,
+    IMPORT_ACTION_SET_COMMENT,
+} from './model/importaction.js';
+
 import * as SecurityTests from './run/security.js';
 import * as ProfileTests from './run/profile.js';
 import * as AccountTests from './run/account.js';
@@ -2200,6 +2216,10 @@ export class Scenario {
             [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
             [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
             [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
+            [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
+            [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
+            [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
+            [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
         ];
 
         const data = rows.map((item) => this.createDummyTransaction(item));
@@ -2229,6 +2249,174 @@ export class Scenario {
         await ProfileTests.relogin(App.config.testUser);
 
         await ImportTests.checkInitialState();
+
+        // Import rules
+        this.environment.setBlock('Import rules', 1);
+        await ImportTests.openRulesDialog();
+
+        this.environment.setBlock('Create import rules', 1);
+        // Create rule #1
+        this.environment.setBlock('Create import rule', 2);
+        await ImportTests.createRule();
+        // Add condition #1: Comment includes 'Bank Name'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'Bank Name' },
+        ]);
+        // Add condition #2: Acount amount is greater 100.01
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
+            { action: 'inputAmount', data: '100.01' },
+        ]);
+        // Add condition #3: Acount amount is less 999.99
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
+            { action: 'inputAmount', data: '999.99' },
+        ]);
+        // Add action #1: Set comment 'Ba'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Ba' },
+        ]);
+        await ImportTests.submitRule();
+
+        // Create rule #2
+        this.environment.setBlock('Create import rule', 2);
+        await ImportTests.createRule();
+        // Add condition #1: Comment includes 'C2C'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'C2C' },
+        ]);
+        // Add condition #2: Comment includes 'RBA'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'RBA' },
+        ]);
+        // Add condition #3: Main account equal 'ACC_RUB'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+            { action: 'changeAccount', data: ACC_RUB },
+        ]);
+        // Update condition #2: Comment includes 'R-BANK'
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'inputValue', data: 'R-BANK' },
+        });
+        // Add action #1: Set transaction type to 'Transfer from'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'transferfrom' },
+        ]);
+        // Add action #2: Set account to 'ACC_EUR'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+            { action: 'changeAccount', data: ACC_EUR },
+        ]);
+        // Add action #3: Set comment 'Transfer something'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Transfer something' },
+        ]);
+        // Update action #2: Set account to 'ACC_RUB'
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'changeAccount', data: ACC_RUB },
+        });
+        // Delete condition #1
+        await ImportTests.deleteRuleCondition(0);
+        // Delete action #3:
+        await ImportTests.deleteRuleAction(2);
+        await ImportTests.submitRule();
+
+        // Create rule #3
+        await ImportTests.createRule();
+        // Add condition #1: Comment includes 'Bank Name'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'PRODUCTY' },
+        ]);
+        // Add action #1: Set comment 'Local shop'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Local shop' },
+        ]);
+        await ImportTests.submitRule();
+
+        // Create rule #4
+        await ImportTests.createRule();
+        // Add condition #1: Comment includes 'Bank Name'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'BOOKING' },
+        ]);
+        // Add action #1: Set comment 'Local shop'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Hotel, Booking' },
+        ]);
+        await ImportTests.submitRule();
+
+        // Update import rules
+        this.environment.setBlock('Update import rules', 1);
+        // Update rule #1
+        this.environment.setBlock('Update import rule', 2);
+        await ImportTests.updateRule(0);
+        // Update action #1: Set comment 'Bar Name'
+        await ImportTests.updateRuleAction({
+            pos: 0,
+            action: { action: 'inputValue', data: 'Bar Name' },
+        });
+        // Update condition #1: Comment includes 'BAR'
+        await ImportTests.updateRuleCondition({
+            pos: 0,
+            action: { action: 'inputValue', data: 'BAR' },
+        });
+        // Delete condition #3
+        await ImportTests.deleteRuleCondition(2);
+        // Add action #2: Set transaction type to 'debtfrom'
+        // Also test correctness of data after change action type
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+            { action: 'changePerson', data: ALEX },
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'debtfrom' },
+        ]);
+        // Add action #3: Set person to 'ALEX'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+            { action: 'changePerson', data: ALEX },
+        ]);
+        await ImportTests.submitRule();
+
+        // Update rule #2
+        this.environment.setBlock('Update import rule', 2);
+        await ImportTests.updateRule(1);
+        // Delete action #2:
+        await ImportTests.deleteRuleAction(1);
+        // Add condition #4: Comment includes 'C2C'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'C2C' },
+        ]);
+        await ImportTests.submitRule();
+
+        // Delete import rules
+        this.environment.setBlock('Delete import rules', 1);
+        // Delete rule #3
+        await ImportTests.deleteRule(2);
+
+        await ImportTests.closeRulesDialog();
+
         // Add item
         this.environment.setBlock('Add item', 2);
         await ImportTests.addItem();
@@ -2287,7 +2475,7 @@ export class Scenario {
 
         // Disable all items except 0 and 1
         await ImportTests.enableItems({
-            index: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             value: false,
         });
         await ImportTests.deleteItems([3, 5]);
@@ -2307,7 +2495,7 @@ export class Scenario {
             template: 0,
         });
         await ImportTests.enableItems({
-            index: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
             value: false,
         });
         await ImportTests.submit();
@@ -2315,7 +2503,7 @@ export class Scenario {
         this.environment.setBlock('Import item state loop', 2);
         await ImportTests.changeMainAccount(ACC_3);
         await ImportTests.enableItems({
-            index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
             value: true,
         });
 

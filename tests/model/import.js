@@ -1,6 +1,30 @@
 import { App } from '../app.js';
 import { Currency } from './currency.js';
 import {
+    IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    IMPORT_COND_FIELD_TPL,
+    IMPORT_COND_FIELD_TR_AMOUNT,
+    IMPORT_COND_FIELD_TR_CURRENCY,
+    IMPORT_COND_FIELD_ACC_AMOUNT,
+    IMPORT_COND_FIELD_ACC_CURRENCY,
+    IMPORT_COND_FIELD_COMMENT,
+    IMPORT_COND_FIELD_DATE,
+    IMPORT_COND_OP_STRING_INCLUDES,
+    IMPORT_COND_OP_EQUAL,
+    IMPORT_COND_OP_NOT_EQUAL,
+    IMPORT_COND_OP_LESS,
+    IMPORT_COND_OP_GREATER,
+    ImportCondition,
+} from './importcondition.js';
+import {
+    IMPORT_ACTION_SET_TR_TYPE,
+    IMPORT_ACTION_SET_ACCOUNT,
+    IMPORT_ACTION_SET_PERSON,
+    IMPORT_ACTION_SET_SRC_AMOUNT,
+    IMPORT_ACTION_SET_DEST_AMOUNT,
+    IMPORT_ACTION_SET_COMMENT,
+} from './importaction.js';
+import {
     fixDate,
     formatDate,
     setParam,
@@ -14,34 +38,6 @@ import {
     TRANSFER,
     DEBT,
 } from './transaction.js';
-
-/* eslint-disable no-bitwise */
-
-/** Rule field types */
-const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
-const IMPORT_COND_FIELD_TPL = 2;
-const IMPORT_COND_FIELD_TR_AMOUNT = 3;
-const IMPORT_COND_FIELD_TR_CURRENCY = 4;
-const IMPORT_COND_FIELD_ACC_AMOUNT = 5;
-const IMPORT_COND_FIELD_ACC_CURRENCY = 6;
-const IMPORT_COND_FIELD_COMMENT = 7;
-const IMPORT_COND_FIELD_DATE = 8;
-/** Rule operators */
-const IMPORT_COND_OP_STRING_INCLUDES = 1;
-const IMPORT_COND_OP_EQUAL = 2;
-const IMPORT_COND_OP_NOT_EQUAL = 3;
-const IMPORT_COND_OP_LESS = 4;
-const IMPORT_COND_OP_GREATER = 5;
-/** Rule flags */
-const IMPORT_COND_OP_FIELD_FLAG = 0x01;
-
-/** Action types */
-const IMPORT_ACTION_SET_TR_TYPE = 1;
-const IMPORT_ACTION_SET_ACCOUNT = 2;
-const IMPORT_ACTION_SET_PERSON = 3;
-const IMPORT_ACTION_SET_SRC_AMOUNT = 4;
-const IMPORT_ACTION_SET_DEST_AMOUNT = 5;
-const IMPORT_ACTION_SET_COMMENT = 6;
 
 function amountFix(value) {
     const res = value.replace(/ /, '');
@@ -379,7 +375,7 @@ function getConditionValue(transaction, rule) {
         throw new Error('Invalid parameters');
     }
 
-    if ((rule.flags & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG) {
+    if (ImportCondition.isFieldValueFlag(rule.flags)) {
         return getFieldValue(transaction, rule.value);
     }
 

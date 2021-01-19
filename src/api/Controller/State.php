@@ -7,10 +7,10 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Item\AccountItem;
 use JezveMoney\App\Item\PersonItem;
 use JezveMoney\App\Item\TransactionItem;
-use JezveMoney\App\Item\ImportTemplateItem;
 
 class State extends ApiController
 {
@@ -27,6 +27,7 @@ class State extends ApiController
         $this->accModel = AccountModel::getInstance();
         $this->pModel = PersonModel::getInstance();
         $this->tplModel = ImportTemplateModel::getInstance();
+        $this->ruleModel = ImportRuleModel::getInstance();
     }
 
 
@@ -36,7 +37,7 @@ class State extends ApiController
         // Accounts
         $res->accounts = new \stdClass();
         $res->accounts->data = [];
-        $items = $this->accModel->getData([ "full" => true, "type" => "all" ]);
+        $items = $this->accModel->getData(["full" => true, "type" => "all"]);
         foreach ($items as $item) {
             $res->accounts->data[] = new AccountItem($item);
         }
@@ -44,7 +45,7 @@ class State extends ApiController
         // Transactions
         $res->transactions = new \stdClass();
         $res->transactions->data = [];
-        $items = $this->trModel->getData([ "onPage" => 0 ]);
+        $items = $this->trModel->getData(["onPage" => 0]);
         foreach ($items as $item) {
             $res->transactions->data[] = new TransactionItem($item);
         }
@@ -52,19 +53,19 @@ class State extends ApiController
         // Persons
         $res->persons = new \stdClass();
         $res->persons->data = [];
-        $items = $this->pModel->getData([ "type" => "all" ]);
+        $items = $this->pModel->getData(["type" => "all"]);
         foreach ($items as $item) {
             $res->persons->data[] = new PersonItem($item);
         }
         $res->persons->autoincrement = $this->pModel->autoIncrement();
         // Import templates
         $res->templates = new \stdClass();
-        $res->templates->data = [];
-        $items = $this->tplModel->getData();
-        foreach ($items as $item) {
-            $res->templates->data[] = new ImportTemplateItem($item);
-        }
+        $res->templates->data = $this->tplModel->getData();
         $res->templates->autoincrement = $this->tplModel->autoIncrement();
+        // Import templates
+        $res->rules = new \stdClass();
+        $res->rules->data = $this->ruleModel->getData(["extended" => true]);
+        $res->rules->autoincrement = $this->ruleModel->autoIncrement();
         // User profile
         $userObj = $this->uMod->getItem($this->user_id);
         if (!$userObj) {

@@ -173,7 +173,7 @@ export class NodeEnvironment extends Environment {
         await elem.evaluate((el) => {
             el.value = '';
         });
-        return elem.type(val);
+        return elem.type(val.toString());
     }
     /* eslint-enable no-param-reassign */
 

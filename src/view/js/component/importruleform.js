@@ -58,6 +58,8 @@ ImportRuleForm.create = function (props) {
 
 /** Form controls initialization */
 ImportRuleForm.prototype.init = function () {
+    // Hidden id input
+    this.idInput = ce('input', { type: 'hidden' });
     // Conditions
     this.createCondBtn = ce(
         'button',
@@ -123,6 +125,7 @@ ImportRuleForm.prototype.init = function () {
     ]);
 
     this.elem = this.createContainer('rule-form', [
+        this.idInput,
         this.formConditions,
         this.formActions,
         this.controls
@@ -590,6 +593,8 @@ ImportRuleForm.prototype.render = function (state) {
     if (!state) {
         throw new Error('Invalid state');
     }
+
+    this.idInput.value = (state.ruleId) ? (state.ruleId) : '';
 
     this.validateActionsAvail(state);
     this.validateSubmit(state);

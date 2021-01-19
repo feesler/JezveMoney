@@ -21,6 +21,8 @@ export class ImportUploadDialog extends Component {
             throw new Error('Invalid import upload dialog element');
         }
 
+        this.closeBtn = await this.query(this.elem, '.close-btn');
+
         this.uploadFormBrowser = { elem: await this.query(this.elem, '.upload-form__browser') };
         this.fileNameElem = { elem: await this.query(this.elem, '.upload-form__filename') };
         this.templateSel = { elem: await this.query(this.elem, '#templateSel') };
@@ -50,7 +52,8 @@ export class ImportUploadDialog extends Component {
         this.tplFeedback = { elem: await this.query('#tplFeedback') };
         this.initialAccount = { elem: await this.query('#initialAccount') };
         if (
-            !this.uploadFormBrowser.elem
+            !this.closeBtn
+            || !this.uploadFormBrowser.elem
             || !this.fileNameElem.elem
             || !this.templateSel.elem
             || !this.isEncodeCheck.elem
@@ -375,6 +378,10 @@ export class ImportUploadDialog extends Component {
         return true;
     }
 
+    async close() {
+        await this.click(this.closeBtn);
+    }
+
     async toggleServerAddress() {
         await this.click(this.useServerCheck.elem);
         await this.parse();
@@ -503,7 +510,6 @@ export class ImportUploadDialog extends Component {
         await this.click(this.delete_warning.okBtn);
         await this.waitForFunction(async () => {
             await this.parse();
-            console.log('wait: ', !this.isTplLoading);
             return !this.isTplLoading;
         });
 
