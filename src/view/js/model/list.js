@@ -1,13 +1,21 @@
 'use strict';
 
-/* global isObject */
+/* global isObject, copyObject */
 
 /**
  * @constructor Base List class
  * @param {object[]} props - array of list items
  */
 function List(props) {
-    this.setData(props);
+    var data;
+
+    if (props instanceof List) {
+        data = props.data;
+    } else {
+        data = Array.isArray(props) ? props : [];
+    }
+
+    this.setData(data);
 }
 
 /** Static alias for List constructor */
@@ -20,11 +28,14 @@ List.create = function (props) {
  * @param {Array} data - array of list items
  */
 List.prototype.setData = function (data) {
+    var newData;
+
     if (!Array.isArray(data)) {
-        throw new Error('Invalid account list props');
+        throw new Error('Invalid list props');
     }
 
-    this.data = data.map(this.createItem.bind(this));
+    newData = copyObject(data);
+    this.data = newData.map(this.createItem.bind(this));
 };
 
 /**
@@ -33,6 +44,14 @@ List.prototype.setData = function (data) {
  */
 List.prototype.createItem = function (obj) {
     return obj;
+};
+
+/**
+ * Add new item to the list
+ * @param {Object} obj - object to create new item from
+ */
+List.prototype.addItem = function (obj) {
+    this.data.push(this.createItem(obj));
 };
 
 /**
