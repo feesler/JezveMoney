@@ -155,6 +155,7 @@ ImportActionForm.prototype.setData = function (data) {
     // Check value changed
     value = this.getActionValue(this.state);
     if (data.value !== value) {
+        this.state.value = value;
         this.sendUpdate();
     }
 };
