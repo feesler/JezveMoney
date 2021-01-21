@@ -6,12 +6,13 @@ import {
     applyTemplate,
     applyRules,
 } from '../model/import.js';
-import { ImportCondition } from '../model/importcondition.js';
-import { ImportAction } from '../model/importaction.js';
 import { ImportList } from '../view/component/importlist.js';
 import { ImportView } from '../view/import.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
-import { CREATE_TPL_STATE } from '../view/component/importuploaddialog.js';
+
+/** Reexport import templates and import rules runners */
+export * from './import/templates.js';
+export * from './import/rules.js';
 
 /** Navigate to transactions list page */
 async function checkNavigation() {
@@ -22,6 +23,7 @@ async function checkNavigation() {
     await App.view.goToImportView();
 }
 
+/** Check initial state of import view */
 export async function checkInitialState() {
     await checkNavigation();
 
@@ -43,9 +45,9 @@ function parseCSV(data) {
 }
 
 /**
- *
- * @param {*} item - transaction object from API
- * @param {*} reference - transaction item to compare
+ * Check specified transaction have same proporties as reference
+ * @param {Object} item - transaction object from API
+ * @param {Object} reference - transaction item to compare
  */
 function isSimilarTransaction(item, reference) {
     if (!item || !reference) {
@@ -141,6 +143,7 @@ export async function removeFile(filename) {
     return true;
 }
 
+/** Test manual add new import item */
 export async function addItem() {
     await test('Add import item', async () => {
         await checkNavigation();
@@ -170,6 +173,7 @@ export async function addItem() {
     });
 }
 
+/** Test file upload */
 export async function uploadFile(params) {
     await test('Upload file', async () => {
         if (!params || !params.data || !params.filename) {
@@ -201,134 +205,7 @@ export async function uploadFile(params) {
     });
 }
 
-export async function selectTemplateById(value) {
-    await test(`Select upload template [${value}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.selectUploadTemplateById(value);
-        return App.view.checkState();
-    });
-}
-
-export async function selectTemplateByIndex(value) {
-    await test(`Select upload template by index [${value}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.selectUploadTemplateByIndex(value);
-        return App.view.checkState();
-    });
-}
-
-export async function inputTemplateName(value) {
-    await test(`Input template name (${value})`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.inputTemplateName(value);
-        return App.view.checkState();
-    });
-}
-
-export async function selectTemplateColumn({ column, index }) {
-    await test(`Select template column [${column} => ${index}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.selectTemplateColumn(column, index);
-        return App.view.checkState();
-    });
-}
-
-export async function createTemplate() {
-    await test('Create template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.createTemplate();
-        return App.view.checkState();
-    });
-}
-
-/** Update currently selected template */
-export async function updateTemplate() {
-    await test('Update template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.updateTemplate();
-        return App.view.checkState();
-    });
-}
-
-/** Delete currently selected template */
-export async function deleteTemplate() {
-    await test('Delete template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-        // Prepare expected content
-        await App.state.fetch();
-        const expectedTpl = App.view.getExpectedTemplate();
-        App.state.templates.deleteItems(expectedTpl.id);
-
-        // Perform actions on view
-        await App.view.deleteTemplate();
-        await App.view.checkState();
-
-        return App.state.fetchAndTest();
-    });
-}
-
-export async function submitTemplate() {
-    await test('Submit template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        // Prepare expected content
-        await App.state.fetch();
-
-        const expectedTpl = App.view.getExpectedTemplate();
-        const uploadState = App.view.getUploadState();
-        if (uploadState === CREATE_TPL_STATE) {
-            App.state.createTemplate(expectedTpl);
-        } else {
-            App.state.updateTemplate(expectedTpl);
-        }
-
-        await App.view.submitTemplate();
-        await App.view.checkState();
-        // Check app state
-        return App.state.fetchAndTest();
-    });
-}
-
-export async function cancelTemplate() {
-    await test('Cancel template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        await App.state.fetch();
-        await App.view.cancelTemplate();
-        return App.view.checkState();
-    });
-}
-
+/** Submit uploaded file with current options */
 export async function submitUploaded(params) {
     await test('Submit file', async () => {
         if (!(App.view instanceof ImportView)) {
@@ -443,350 +320,6 @@ export async function changeMainAccount(accountId) {
             },
         };
         return App.view.checkState();
-    });
-}
-
-/** Open import rules dialog */
-export async function openRulesDialog() {
-    await test('Open rules dialog', async () => {
-        await checkNavigation();
-
-        await App.view.launchRulesDialog();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Close import rules dialog */
-export async function closeRulesDialog() {
-    await test('Close rules dialog', async () => {
-        await checkNavigation();
-
-        await App.view.closeRulesDialog();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Click by create import rule button */
-export async function createRule() {
-    await test('Create rule', async () => {
-        await checkNavigation();
-
-        await App.view.createRule();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Click by update import rule button */
-export async function updateRule(index) {
-    const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid rule index');
-    }
-
-    await test(`Update rule [${ind}]`, async () => {
-        await checkNavigation();
-
-        await App.view.updateRule(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Click by delete import rule button */
-export async function deleteRule(index) {
-    const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid rule index');
-    }
-
-    await test(`Delete rule [${ind}]`, async () => {
-        await checkNavigation();
-
-        await App.view.deleteRule(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Run set of actions on specified rule condition item */
-async function runOnRuleCondition(params) {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
-
-    await checkNavigation();
-
-    const actDescr = {
-        changeFieldType: 'Change field type',
-        changeProperty: 'Change value property',
-        changeOperator: 'Change operator',
-        changeTemplate: 'Change template',
-        changeAccount: 'Change account',
-        changeCurrency: 'Change currency',
-        togglePropValue: 'Toggle enable property value',
-        inputAmount: 'Input amount value',
-        inputValue: 'Input value',
-    };
-
-    const actions = Array.isArray(params.action) ? params.action : [params.action];
-    for (const action of actions) {
-        let descr;
-
-        if (!(action.action in actDescr)) {
-            throw new Error(`Unknown action (${action.action})`);
-        }
-
-        if (action.action === 'changeFieldType'
-            || action.action === 'changeProperty') {
-            const property = ImportCondition.getFieldTypeById(action.data);
-            if (!property) {
-                throw new Error(`Property (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${property.title}'`;
-        } else if (action.action === 'changeOperator') {
-            const operator = ImportCondition.getOperatorById(action.data);
-            if (!operator) {
-                throw new Error(`Operator (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${operator.title}'`;
-        } else if (action.action === 'changeTemplate') {
-            const template = App.state.templates.getItem(action.data);
-            if (!template) {
-                throw new Error(`Template (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${template.name}'`;
-        } else if (action.action === 'changeAccount') {
-            const userAccounts = App.state.accounts.getUserVisible();
-            const account = userAccounts.getItem(action.data);
-            if (!account) {
-                throw new Error(`Account (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${account.name}'`;
-        } else if (action.action === 'changeCurrency') {
-            const currency = Currency.getById(action.data);
-            if (!currency) {
-                throw new Error(`Currency (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${currency.name}'`;
-        } else if (action.action === 'togglePropValue') {
-            descr = `${actDescr[action.action]}`;
-        } else {
-            descr = `${actDescr[action.action]} '${action.data}'`;
-        }
-
-        await test(descr, () => App.view.runOnRuleCondition(params.pos, action));
-    }
-}
-
-/** Click by create import condition button */
-export async function addRuleCondition() {
-    await test('Add rule condition', async () => {
-        await checkNavigation();
-
-        await App.view.addRuleCondition();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Create new import rule condition */
-export async function createRuleCondition(params) {
-    App.view.setBlock('Create rule condition', 2);
-
-    await addRuleCondition();
-
-    if (params) {
-        const conditions = App.view.getRuleConditions();
-        await runOnRuleCondition({
-            pos: conditions.length - 1,
-            action: params,
-        });
-    }
-}
-
-/** Update rule condition */
-export async function updateRuleCondition(params) {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
-
-    App.view.setBlock(`Update rule condition [${params.pos}]`, 2);
-
-    await runOnRuleCondition(params);
-}
-
-/** Click by delete import condition button */
-export async function deleteRuleCondition(index) {
-    const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid index');
-    }
-
-    await test(`Delete rule condition [${ind}]`, async () => {
-        await checkNavigation();
-
-        await App.view.deleteRuleCondition(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
-}
-
-/** Run set of actions on specified rule action item */
-async function runOnRuleAction(params) {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
-
-    await checkNavigation();
-
-    const actDescr = {
-        changeAction: 'Change action',
-        changeTransactionType: 'Change transaction type',
-        changeAccount: 'Change account',
-        changePerson: 'Change person',
-        inputAmount: 'Input amount value',
-        inputValue: 'Input value',
-    };
-
-    const actions = Array.isArray(params.action) ? params.action : [params.action];
-    for (const action of actions) {
-        let descr;
-
-        if (action.action === 'changeAction') {
-            const actionType = ImportAction.getActionById(action.data);
-            if (!actionType) {
-                throw new Error(`Property (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${actionType.title}'`;
-        } else if (action.action === 'changeTransactionType') {
-            const transType = ImportAction.getTransactionTypeById(action.data);
-            if (!transType) {
-                throw new Error(`Transaction type (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${transType.title}'`;
-        } else if (action.action === 'changeAccount') {
-            const userAccounts = App.state.accounts.getUserVisible();
-            const account = userAccounts.getItem(action.data);
-            if (!account) {
-                throw new Error(`Account (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${account.name}'`;
-        } else if (action.action === 'changePerson') {
-            const person = App.state.persons.getItem(action.data);
-            if (!person) {
-                throw new Error(`Person (${action.data}) not found`);
-            }
-
-            descr = `${actDescr[action.action]} to '${person.name}'`;
-        } else if (action.action === 'togglePropValue') {
-            descr = `${actDescr[action.action]}`;
-        } else {
-            descr = `${actDescr[action.action]} '${action.data}'`;
-        }
-
-        await test(descr, () => App.view.runOnRuleAction(params.pos, action));
-    }
-}
-
-/** Click by create import action button */
-export async function addRuleAction() {
-    await test('Add rule action', async () => {
-        await checkNavigation();
-
-        await App.view.addRuleAction();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-
-        return App.view.checkState();
-    });
-}
-
-/** Create new import rule action */
-export async function createRuleAction(params) {
-    App.view.setBlock('Create rule action', 2);
-
-    await addRuleAction();
-
-    if (params) {
-        const actions = App.view.getRuleActions();
-        await runOnRuleAction({
-            pos: actions.length - 1,
-            action: params,
-        });
-    }
-}
-
-export async function updateRuleAction(params) {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
-
-    App.view.setBlock(`Update rule action [${params.pos}]`, 2);
-
-    await runOnRuleAction(params);
-}
-
-/** Click by delete import action button */
-export async function deleteRuleAction(index) {
-    const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid index');
-    }
-
-    await test(`Delete rule action [${ind}]`, async () => {
-        await checkNavigation();
-
-        await App.view.deleteRuleAction(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-
-        return App.view.checkState();
-    });
-}
-
-/** Submit import rule */
-export async function submitRule() {
-    await test('Submit import rule', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
-
-        // Prepare expected content
-        await App.state.fetch();
-
-        const expectedRule = App.view.getExpectedRule();
-        const dialogState = App.view.getRulesState();
-
-        if (dialogState === 'create') {
-            App.state.createRule(expectedRule);
-        } else if (dialogState === 'update') {
-            App.state.updateRule(expectedRule);
-        } else {
-            throw new Error('Invalid state of rules dialog');
-        }
-
-        await App.view.submitRule();
-
-        // Check app state
-        return App.state.fetchAndTest();
     });
 }
 

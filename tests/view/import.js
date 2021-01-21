@@ -213,6 +213,10 @@ export class ImportView extends TestView {
         });
     }
 
+    async isRulesDialogVisible() {
+        return Component.isVisible(this.content.rulesDialog);
+    }
+
     async launchRulesDialog() {
         await this.performAction(() => this.click(this.content.rulesBtn.elem));
         await this.performAction(() => this.wait(this.rulesPopupId, { visible: true }));
