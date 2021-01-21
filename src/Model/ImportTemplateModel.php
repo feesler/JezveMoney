@@ -19,12 +19,12 @@ class ImportTemplateModel extends CachedTable
 
     protected $tbl_name = "import_tpl";
     protected $columnTypes = [
-        "accountAmount" => ["title" => "Account amount"],
-        "accountCurrency" => ["title" => "Account currency"],
-        "transactionAmount" => ["title" => "Transaction amount"],
-        "transactionCurrency" => ["title" => "Transaction currency"],
-        "date" => ["title" => "Date"],
-        "comment" => ["title" => "Comment"]
+        "accountAmount" => ["title" => "Account amount", "name" => "account_amount_col"],
+        "accountCurrency" => ["title" => "Account currency", "name" => "account_curr_col"],
+        "transactionAmount" => ["title" => "Transaction amount", "name" => "trans_amount_col"],
+        "transactionCurrency" => ["title" => "Transaction currency", "name" => "trans_curr_col"],
+        "date" => ["title" => "Date", "name" => "date_col"],
+        "comment" => ["title" => "Comment", "name" => "comment_col"]
     ];
 
     protected function onStart()

@@ -153,6 +153,35 @@ function isTransaction(obj) {
 /** Verify object is array of transactions */
 function isTransactionsArray(obj) { return isArrayOf(obj, isTransaction); }
 
+/** Verify object is import template */
+function isTemplateColumns(obj) {
+    return verifyObject(obj, {
+        accountAmount: isInt,
+        accountCurrency: isInt,
+        transactionAmount: isInt,
+        transactionCurrency: isInt,
+        date: isInt,
+        comment: isInt
+    });
+}
+
+/** Verify object is import template */
+function isTemplate(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        name: isString,
+        type_id: isInt,
+        columns: isTemplateColumns
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import templates */
+function isTemplatesArray(obj) { return isArrayOf(obj, isTemplate); }
+
 /** Verify object is currency */
 function isCurrency(obj) {
     return verifyObject(obj, {
@@ -274,6 +303,7 @@ AdminApiConsoleView.prototype.onStart = function () {
     this.initAccountForms();
     this.initPersonForms();
     this.initTransactionForms();
+    this.initTemplateForms();
     this.initCurrencyForms();
     this.initIconForms();
     this.initUserForms();
@@ -453,6 +483,45 @@ AdminApiConsoleView.prototype.initTransactionForms = function () {
         throw new Error('Fail to init view');
     }
     setTrPosForm.addEventListener('submit', this.onFormSubmit.bind(this));
+};
+
+/** Initialization of forms for Import template API controller */
+AdminApiConsoleView.prototype.initTemplateForms = function () {
+    var listForm;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listTplForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isTemplatesArray));
+
+    readBtn = ge('readtplbtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', this.onReadTemplateSubmit.bind(this));
+
+    createForm = document.querySelector('#createTplForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateTplForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('deltplbtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', this.onDeleteTemplateSubmit.bind(this));
 };
 
 /** Initialization of forms for Currency API controller */
@@ -998,6 +1067,39 @@ AdminApiConsoleView.prototype.onDeleteAccountSubmit = function (e) {
     this.apiPost({
         method: 'account/delete',
         data: this.parseIds(accountsInp.value)
+    });
+};
+
+/** Read import templates form 'submit' event handler */
+AdminApiConsoleView.prototype.onReadTemplateSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('readtplid');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiGet({
+        method: 'importtpl/',
+        data: this.parseIds(itemsInp.value),
+        verify: isTemplatesArray
+    });
+};
+
+/** Delete import templates form 'submit' event handler */
+AdminApiConsoleView.prototype.onDeleteTemplateSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('deltemplates');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiPost({
+        method: 'importtpl/delete',
+        data: this.parseIds(itemsInp.value)
     });
 };
 
