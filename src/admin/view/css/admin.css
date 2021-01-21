@@ -132,8 +132,8 @@ textarea
 .item-form .popup__content-box
 {
     width: 100%;
-	max-width: 300px;
-	min-width: 130px;
+	max-width: 400px;
+	min-width: 200px;
 }
 
 
