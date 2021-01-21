@@ -60,6 +60,39 @@
             </li>
 
             <li>
+                <button>Import rules</button>
+                <ul class="sub-menu-list">
+                    <li data-target="listRuleForm">List</li>
+                    <li data-target="readRuleForm">Read</li>
+                    <li data-target="createRuleForm">Create</li>
+                    <li data-target="updateRuleForm">Update</li>
+                    <li data-target="delRuleForm">Delete</li>
+                </ul>
+            </li>
+
+            <li>
+                <button>Import conditions</button>
+                <ul class="sub-menu-list">
+                    <li data-target="listCondForm">List</li>
+                    <li data-target="readCondForm">Read</li>
+                    <li data-target="createCondForm">Create</li>
+                    <li data-target="updateCondForm">Update</li>
+                    <li data-target="delCondForm">Delete</li>
+                </ul>
+            </li>
+
+            <li>
+                <button>Import actions</button>
+                <ul class="sub-menu-list">
+                    <li data-target="listActForm">List</li>
+                    <li data-target="readActForm">Read</li>
+                    <li data-target="createActForm">Create</li>
+                    <li data-target="updateActForm">Update</li>
+                    <li data-target="delActForm">Delete</li>
+                </ul>
+            </li>
+
+            <li>
                 <button>Persons</button>
                 <ul class="sub-menu-list">
                     <li data-target="listPersonsForm">List</li>
@@ -607,6 +640,248 @@
         </div>
         <div class="acc_controls">
             <input id="deltplbtn" class="adm_act_btn" type="button" value="submit">
+        </div>
+        </div>
+
+        <div id="listRuleForm" class="request-data-form">
+        <h3>List import rules</h3>
+        <form action="<?=BASEURL?>api/importrule/list" method="list">
+            <div class="std_margin">
+                <input name="full" type="checkbox" value="true"><label for="count">List for all users</label>
+            </div>
+            <div class="std_margin">
+                <input name="extended" type="checkbox" value="true"><label for="count">Extended</label>
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="readRuleForm" class="request-data-form">
+        <h3>Read import rules by ids</h3>
+        <div class="std_margin"><label for="readruleid">Id</label><input id="readruleid" type="text"></div>
+        <div class="acc_controls">
+            <input id="readrulebtn" class="adm_act_btn" type="button" value="submit">
+        </div>
+        </div>
+
+        <div id="createRuleForm" class="request-data-form">
+        <h3>Create import rules</h3>
+        <form action="<?=BASEURL?>api/importrule/create" method="post">
+            <div class="std_margin">
+                <label for="create_rule_flags">Flags</label>
+                <input id="create_rule_flags" name="flags" type="text">
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="updateRuleForm" class="request-data-form">
+        <h3>Update import rules</h3>
+        <form action="<?=BASEURL?>api/importrule/update" method="post">
+            <div class="std_margin">
+                <label for="update_rule_id">Id</label>
+                <input id="update_rule_id" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_rule_flags">Flags</label>
+                <input id="update_rule_flags" name="flags" type="text">
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="delRuleForm" class="request-data-form">
+        <h3>Delete import rules</h3>
+        <div class="std_margin">
+            <label for="delrules">Rules (comma separated ids)</label>
+            <input id="delrules" type="text">
+        </div>
+        <div class="acc_controls">
+            <input id="delrulebtn" class="adm_act_btn" type="button" value="submit">
+        </div>
+        </div>
+
+        <div id="listCondForm" class="request-data-form">
+        <h3>List import conditions</h3>
+        <form action="<?=BASEURL?>api/importcond/list" method="list">
+            <div class="std_margin">
+                <input name="full" type="checkbox" value="true"><label for="count">List for all users</label>
+            </div>
+            <div class="std_margin">
+                <input type="checkbox" data-target="rule"><label for="list_cond_rule">Import rule id</label>
+                <input id="list_cond_rule" name="rule" type="text" value="0" disabled>
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="readCondForm" class="request-data-form">
+        <h3>Read import conditions by ids</h3>
+        <div class="std_margin"><label for="readcondid">Id</label><input id="readcondid" type="text"></div>
+        <div class="acc_controls">
+            <input id="readcondbtn" class="adm_act_btn" type="button" value="submit">
+        </div>
+        </div>
+
+        <div id="createCondForm" class="request-data-form">
+        <h3>Create import condition</h3>
+        <form action="<?=BASEURL?>api/importcond/create" method="post">
+            <div class="std_margin">
+                <label for="create_cond_rule">Parent rule id</label>
+                <input id="create_cond_rule" name="rule_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_cond_field">Field type (1-8)</label>
+                <input id="create_cond_field" name="field_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_cond_op">Operator (1-5)</label>
+                <input id="create_cond_op" name="operator" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_cond_value">Value</label>
+                <input id="create_cond_value" name="value" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_cond_flags">Flags</label>
+                <input id="create_cond_flags" name="flags" type="text">
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="updateCondForm" class="request-data-form">
+        <h3>Update import condition</h3>
+        <form action="<?=BASEURL?>api/importcond/update" method="post">
+            <div class="std_margin">
+                <label for="update_cond_id">Id</label>
+                <input id="update_cond_id" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_cond_rule">Parent rule id</label>
+                <input id="update_cond_rule" name="rule_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_cond_field">Field type (1-8)</label>
+                <input id="update_cond_field" name="field_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_cond_op">Operator (1-5)</label>
+                <input id="update_cond_op" name="operator" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_cond_value">Value</label>
+                <input id="update_cond_value" name="value" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_cond_flags">Flags</label>
+                <input id="update_cond_flags" name="flags" type="text">
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="delCondForm" class="request-data-form">
+        <h3>Delete import conditions</h3>
+        <div class="std_margin">
+            <label for="delconds">Conditions (comma separated ids)</label>
+            <input id="delconds" type="text">
+        </div>
+        <div class="acc_controls">
+            <input id="delcondbtn" class="adm_act_btn" type="button" value="submit">
+        </div>
+        </div>
+
+        <div id="listActForm" class="request-data-form">
+        <h3>List import actions</h3>
+        <form action="<?=BASEURL?>api/importaction/list" method="list">
+            <div class="std_margin">
+                <input name="full" type="checkbox" value="true"><label for="count">List for all users</label>
+            </div>
+            <div class="std_margin">
+                <input type="checkbox" data-target="rule"><label for="list_act_rule">Import rule id</label>
+                <input id="list_act_rule" name="rule" type="text" value="0" disabled>
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="readActForm" class="request-data-form">
+        <h3>Read import actions by ids</h3>
+        <div class="std_margin"><label for="readactid">Id</label><input id="readactid" type="text"></div>
+        <div class="acc_controls">
+            <input id="readactbtn" class="adm_act_btn" type="button" value="submit">
+        </div>
+        </div>
+
+        <div id="createActForm" class="request-data-form">
+        <h3>Create import action</h3>
+        <form action="<?=BASEURL?>api/importaction/create" method="post">
+            <div class="std_margin">
+                <label for="create_act_rule">Parent rule id</label>
+                <input id="create_act_rule" name="rule_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_act_type">Action type (1-6)</label>
+                <input id="create_act_type" name="action_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_act_value">Value</label>
+                <input id="create_act_value" name="value" type="text">
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="updateActForm" class="request-data-form">
+        <h3>Update import action</h3>
+        <form action="<?=BASEURL?>api/importaction/update" method="post">
+            <div class="std_margin">
+                <label for="update_act_id">Id</label>
+                <input id="update_act_id" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_act_rule">Parent rule id</label>
+                <input id="update_act_rule" name="rule_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_act_type">Action type (1-6)</label>
+                <input id="update_act_type" name="action_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_act_value">Value</label>
+                <input id="update_act_value" name="value" type="text">
+            </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="delActForm" class="request-data-form">
+        <h3>Delete import actions</h3>
+        <div class="std_margin">
+            <label for="delactions">Rules (comma separated ids)</label>
+            <input id="delactions" type="text">
+        </div>
+        <div class="acc_controls">
+            <input id="delactbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
 

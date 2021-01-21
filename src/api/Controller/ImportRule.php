@@ -12,9 +12,7 @@ use JezveMoney\App\Item\ImportRuleItem;
 class ImportRule extends ApiController
 {
     protected $requiredFields = [
-        "flags",
-        "conditions",
-        "actions"
+        "flags"
     ];
     protected $model = null;
 
@@ -65,6 +63,28 @@ class ImportRule extends ApiController
         $this->ok($res);
     }
 
+    private function setRuleData($ruleId, $data)
+    {
+        if (!is_array($data)) {
+            return false;
+        }
+
+        if (isset($data["conditions"])) {
+            $res = $this->condModel->setRuleConditions($ruleId, $data["conditions"]);
+            if (!$res) {
+                return false;
+            }
+        }
+
+        if (isset($data["actions"])) {
+            $res = $this->actionModel->setRuleActions($ruleId, $data["actions"]);
+            if (!$res) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public function create()
     {
@@ -85,18 +105,8 @@ class ImportRule extends ApiController
             $this->fail($defMsg);
         }
 
-        if (isset($request["conditions"])) {
-            $res = $this->condModel->setRuleConditions($item_id, $request["conditions"]);
-            if (!$res) {
-                $this->fail($defMsg);
-            }
-        }
-
-        if (isset($request["actions"])) {
-            $res = $this->actionModel->setRuleActions($item_id, $request["actions"]);
-            if (!$res) {
-                $this->fail($defMsg);
-            }
+        if (!$this->setRuleData($item_id, $request)) {
+            $this->fail($defMsg);
         }
 
         $this->ok(["id" => $item_id]);
@@ -125,18 +135,8 @@ class ImportRule extends ApiController
             $this->fail($defMsg);
         }
 
-        if (isset($request["conditions"])) {
-            $res = $this->condModel->setRuleConditions($request["id"], $request["conditions"]);
-            if (!$res) {
-                $this->fail($defMsg);
-            }
-        }
-
-        if (isset($request["actions"])) {
-            $res = $this->actionModel->setRuleActions($request["id"], $request["actions"]);
-            if (!$res) {
-                $this->fail($defMsg);
-            }
+        if (!$this->setRuleData($request["id"], $request)) {
+            $this->fail($defMsg);
         }
 
         $this->ok();

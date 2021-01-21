@@ -182,6 +182,59 @@ function isTemplate(obj) {
 /** Verify object is array of import templates */
 function isTemplatesArray(obj) { return isArrayOf(obj, isTemplate); }
 
+/** Verify object is import condition */
+function isImportCondition(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        rule_id: isInt,
+        field_id: isInt,
+        operator: isInt,
+        value: isString,
+        flags: isInt
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import conditions */
+function isConditionsArray(obj) { return isArrayOf(obj, isImportCondition); }
+
+/** Verify object is import action */
+function isImportAction(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        rule_id: isInt,
+        action_id: isInt,
+        value: isString
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import conditions */
+function isActionsArray(obj) { return isArrayOf(obj, isImportAction); }
+
+/** Verify object is import rule */
+function isImportRule(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        flags: isInt,
+    }, {
+        user_id: isInt,
+        actions: isActionsArray,
+        conditions: isConditionsArray,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import templates */
+function isImportRulesArray(obj) { return isArrayOf(obj, isImportRule); }
+
 /** Verify object is currency */
 function isCurrency(obj) {
     return verifyObject(obj, {
@@ -304,6 +357,9 @@ AdminApiConsoleView.prototype.onStart = function () {
     this.initPersonForms();
     this.initTransactionForms();
     this.initTemplateForms();
+    this.initRuleForms();
+    this.initConditionForms();
+    this.initActionForms();
     this.initCurrencyForms();
     this.initIconForms();
     this.initUserForms();
@@ -522,6 +578,137 @@ AdminApiConsoleView.prototype.initTemplateForms = function () {
         throw new Error('Fail to init view');
     }
     delBtn.addEventListener('click', this.onDeleteTemplateSubmit.bind(this));
+};
+
+/** Initialization of forms for Import rules API controller */
+AdminApiConsoleView.prototype.initRuleForms = function () {
+    var listForm;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listRuleForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isImportRulesArray));
+
+    readBtn = ge('readrulebtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', this.onReadRuleSubmit.bind(this));
+
+    createForm = document.querySelector('#createRuleForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateRuleForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('delrulebtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', this.onDeleteRuleSubmit.bind(this));
+};
+
+/** Initialization of forms for Import conditions API controller */
+AdminApiConsoleView.prototype.initConditionForms = function () {
+    var listForm;
+    var checkboxes;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listCondForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isConditionsArray));
+
+    checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
+    checkboxes = Array.from(checkboxes);
+    checkboxes.forEach(function (elem) {
+        elem.addEventListener('change', this.onCheck.bind(this));
+    }, this);
+
+    readBtn = ge('readcondbtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', this.onReadConditionsSubmit.bind(this));
+
+    createForm = document.querySelector('#createCondForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateCondForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('delcondbtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', this.onDeleteConditionsSubmit.bind(this));
+};
+
+/** Initialization of forms for Import actions API controller */
+AdminApiConsoleView.prototype.initActionForms = function () {
+    var listForm;
+    var checkboxes;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listActForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isActionsArray));
+
+    checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
+    checkboxes = Array.from(checkboxes);
+    checkboxes.forEach(function (elem) {
+        elem.addEventListener('change', this.onCheck.bind(this));
+    }, this);
+
+    readBtn = ge('readactbtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', this.onReadActionsSubmit.bind(this));
+
+    createForm = document.querySelector('#createActForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateActForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('delactbtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', this.onDeleteActionsSubmit.bind(this));
 };
 
 /** Initialization of forms for Currency API controller */
@@ -1099,6 +1286,105 @@ AdminApiConsoleView.prototype.onDeleteTemplateSubmit = function (e) {
 
     this.apiPost({
         method: 'importtpl/delete',
+        data: this.parseIds(itemsInp.value)
+    });
+};
+
+/** Read import rules form 'submit' event handler */
+AdminApiConsoleView.prototype.onReadRuleSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('readruleid');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiGet({
+        method: 'importrule/',
+        data: this.parseIds(itemsInp.value),
+        verify: isImportRulesArray
+    });
+};
+
+/** Delete import rules form 'submit' event handler */
+AdminApiConsoleView.prototype.onDeleteRuleSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('delrules');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiPost({
+        method: 'importrule/delete',
+        data: this.parseIds(itemsInp.value)
+    });
+};
+
+/** Read import conditions form 'submit' event handler */
+AdminApiConsoleView.prototype.onReadConditionsSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('readcondid');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiGet({
+        method: 'importcond/',
+        data: this.parseIds(itemsInp.value),
+        verify: isConditionsArray
+    });
+};
+
+/** Delete import rules form 'submit' event handler */
+AdminApiConsoleView.prototype.onDeleteConditionsSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('delconds');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiPost({
+        method: 'importcond/delete',
+        data: this.parseIds(itemsInp.value)
+    });
+};
+
+/** Read import actions form 'submit' event handler */
+AdminApiConsoleView.prototype.onReadActionsSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('readactid');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiGet({
+        method: 'importaction/',
+        data: this.parseIds(itemsInp.value),
+        verify: isActionsArray
+    });
+};
+
+/** Delete import actions form 'submit' event handler */
+AdminApiConsoleView.prototype.onDeleteActionsSubmit = function (e) {
+    var itemsInp;
+
+    e.preventDefault();
+    itemsInp = ge('delactions');
+    if (!itemsInp) {
+        return;
+    }
+
+    this.apiPost({
+        method: 'importaction/delete',
         data: this.parseIds(itemsInp.value)
     });
 };
