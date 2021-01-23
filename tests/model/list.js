@@ -113,6 +113,22 @@ export class List {
     }
 
     /**
+     * Push item to the end of list
+     * Return index of new item in the list
+     * @param {Object} item - item data
+     */
+    addItem(item) {
+        if (!item) {
+            throw new Error('Invalid item');
+        }
+
+        const res = this.length;
+        this.data.push(item);
+
+        return res;
+    }
+
+    /**
      * Push item to the end of list, automatically generate id
      * Return index of new item in the list
      * @param {Object} item - item data
@@ -130,10 +146,7 @@ export class List {
             this.autoincrement = nextId + 1;
         }
 
-        const res = this.length;
-        this.data.push(itemObj);
-
-        return res;
+        return this.addItem(itemObj);
     }
 
     /**

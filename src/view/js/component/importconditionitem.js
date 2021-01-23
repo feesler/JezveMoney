@@ -76,7 +76,7 @@ ImportConditionItem.prototype.setData = function (data) {
         parentRuleId: data.rule_id,
         fieldType: data.field_id,
         operator: data.operator,
-        isFieldValue: data.isFieldValueOperator(),
+        isFieldValue: data.isPropertyValue(),
         value: data.value
     };
 

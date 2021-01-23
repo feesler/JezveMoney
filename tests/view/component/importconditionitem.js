@@ -4,19 +4,6 @@ import { Currency } from '../../model/currency.js';
 import { App } from '../../app.js';
 
 export class ImportConditionItem extends Component {
-    /* TMP */
-    static async create(...args) {
-        if (args.length < 2 || !args[1]) {
-            return null;
-        }
-
-        const instance = new this(...args);
-        await instance.parse();
-
-        return instance;
-    }
-    /* TMP */
-
     async parse() {
         if (!this.elem) {
             throw new Error('Invalid import condition item');

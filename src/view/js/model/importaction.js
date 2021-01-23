@@ -84,6 +84,21 @@ ImportAction.isSelectValue = function (value) {
     return ImportAction.selectActions.includes(parseInt(value, 10));
 };
 
+/** Check action type requires transaction type value */
+ImportAction.isTransactionTypeValue = function (value) {
+    return parseInt(value, 10) === IMPORT_ACTION_SET_TR_TYPE;
+};
+
+/** Check action type requires account id value */
+ImportAction.isAccountValue = function (value) {
+    return parseInt(value, 10) === IMPORT_ACTION_SET_ACCOUNT;
+};
+
+/** Check action type requires person id value */
+ImportAction.isPersonValue = function (value) {
+    return parseInt(value, 10) === IMPORT_ACTION_SET_PERSON;
+};
+
 /** Check action type requires amount value */
 ImportAction.isAmountValue = function (value) {
     return ImportAction.amountActions.includes(parseInt(value, 10));
@@ -121,6 +136,16 @@ ImportAction.prototype.isAvailField = function (field) {
 /** Check action requires select value from list */
 ImportAction.prototype.isSelectValue = function () {
     return ImportAction.isSelectValue(this.action_id);
+};
+
+/** Check action requires account value */
+ImportAction.prototype.isAccountValue = function () {
+    return ImportAction.isAccountValue(this.action_id);
+};
+
+/** Check action requires person value */
+ImportAction.prototype.isPersonValue = function () {
+    return ImportAction.isPersonValue(this.action_id);
 };
 
 /** Check action requires amount value */
@@ -189,5 +214,31 @@ ImportActionList.prototype.getRuleActions = function (ruleId) {
 
     return this.data.filter(function (item) {
         return item.rule_id === id;
+    });
+};
+
+/** Check list has `Set transaction type` action with 'transferfrom' or 'transferto' value */
+ImportActionList.prototype.hasSetTransfer = function () {
+    return !!this.data.find(function (item) {
+        return (
+            item.action_id === IMPORT_ACTION_SET_TR_TYPE
+            && (
+                item.value === 'transferfrom'
+                || item.value === 'transferto'
+            )
+        );
+    });
+};
+
+/** Check list has `Set transaction type` action with 'debtfrom' or 'debtto' value */
+ImportActionList.prototype.hasSetDebt = function () {
+    return !!this.data.find(function (item) {
+        return (
+            item.action_id === IMPORT_ACTION_SET_TR_TYPE
+            && (
+                item.value === 'debtfrom'
+                || item.value === 'debtto'
+            )
+        );
     });
 };

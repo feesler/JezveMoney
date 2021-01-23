@@ -1,7 +1,7 @@
 'use strict';
 
 /* global ce, isFunction, show, selectedValue, selectByValue, extend, AppComponent */
-/* global addChilds, removeChilds, DecimalInput */
+/* global addChilds, removeChilds, DecimalInput, View */
 /* global ImportCondition, IMPORT_COND_OP_FIELD_FLAG */
 
 /**
@@ -23,6 +23,10 @@ function ImportConditionForm() {
         throw new Error('Invalid props');
     }
 
+    this.parentView = (this.parent instanceof View)
+        ? this.parent
+        : this.parent.parentView;
+
     this.updateHandler = this.props.update;
     this.deleteHandler = this.props.remove;
 
@@ -36,6 +40,8 @@ function ImportConditionForm() {
     if (!(this.props.data instanceof ImportCondition)) {
         throw new Error('Invalid condition item');
     }
+    this.props.data.isValid = this.props.isValid;
+    this.props.data.message = this.props.message;
 
     this.fieldTypes = ImportCondition.getFieldTypes();
     this.operatorTypes = ImportCondition.getOperatorTypes();
@@ -158,6 +164,13 @@ ImportConditionForm.prototype.init = function () {
         this.valueFieldBlock
     ]);
 
+    // Invalid feedback message
+    this.validFeedback = ce('div', { className: 'invalid-feedback' });
+    this.container = this.createContainer('cond-form__container validation-block', [
+        this.fields,
+        this.validFeedback
+    ]);
+
     // Delete button
     this.delBtn = ce(
         'button',
@@ -168,7 +181,7 @@ ImportConditionForm.prototype.init = function () {
     this.controls = this.createContainer('cond-form__controls', this.delBtn);
 
     this.elem = this.createContainer('cond-form', [
-        this.fields,
+        this.container,
         this.controls
     ]);
 };
@@ -199,8 +212,10 @@ ImportConditionForm.prototype.setData = function (data) {
         fieldType: data.field_id,
         availOperators: data.getAvailOperators(),
         operator: data.operator,
-        isFieldValue: data.isFieldValueOperator(),
-        value: data.value
+        isFieldValue: data.isPropertyValue(),
+        value: data.value,
+        isValid: data.isValid,
+        message: data.message
     };
 
     this.verifyOperator(this.state);
@@ -233,6 +248,7 @@ ImportConditionForm.prototype.onPropertyChange = function () {
     }
 
     this.state.value = this.getConditionValue(this.state);
+    this.state.isValid = true;
 
     this.verifyOperator(this.state);
     this.render(this.state);
@@ -252,6 +268,7 @@ ImportConditionForm.prototype.onOperatorChange = function () {
     }
 
     this.state.operator = operatorId;
+    this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
 };
@@ -311,6 +328,7 @@ ImportConditionForm.prototype.onValueChange = function () {
     }
 
     this.state.value = value;
+    this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
 };
@@ -318,6 +336,7 @@ ImportConditionForm.prototype.onValueChange = function () {
 /** Field value checkbox 'change' event handler */
 ImportConditionForm.prototype.onFieldValueChecked = function () {
     this.state.isFieldValue = this.fieldValueCheck.checked;
+    this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
 };
@@ -390,6 +409,14 @@ ImportConditionForm.prototype.render = function (state) {
 
     if (!state) {
         throw new Error('Invalid state');
+    }
+
+    if (state.isValid) {
+        this.validFeedback.textContent = '';
+        this.parentView.clearBlockValidation(this.container);
+    } else {
+        this.validFeedback.textContent = state.message;
+        this.parentView.invalidateBlock(this.container);
     }
 
     selectByValue(this.propertySel, state.fieldType);

@@ -1,5 +1,6 @@
 import { Component } from './component.js';
 import { Currency } from '../../model/currency.js';
+import { ImportRule } from '../../model/importrule.js';
 import { ImportCondition } from '../../model/importcondition.js';
 import { ImportAction } from '../../model/importaction.js';
 import { ImportConditionForm } from './importconditionform.js';
@@ -11,19 +12,6 @@ import {
 import { App } from '../../app.js';
 
 export class ImportRuleForm extends Component {
-    /* TMP */
-    static async create(...args) {
-        if (args.length < 2 || !args[1]) {
-            return null;
-        }
-
-        const instance = new this(...args);
-        await instance.parse();
-
-        return instance;
-    }
-    /* TMP */
-
     async parse() {
         const accordionElems = await this.queryAll(this.elem, '.rule-form__collapse');
         const accordionItems = await asyncMap(
@@ -69,6 +57,7 @@ export class ImportRuleForm extends Component {
         this.idInput = { elem: await this.query(this.elem, 'input[type=hidden]') };
         this.submitBtn = { elem: await this.query(this.elem, '.rule-form__controls .submit-btn') };
         this.cancelBtn = { elem: await this.query(this.elem, '.rule-form__controls .cancel-btn') };
+        this.feedbackElem = { elem: await this.query(this.elem, '.rule-form__feedback .invalid-feedback') };
         if (
             !this.idInput.elem
             || !this.conditionsList
@@ -77,6 +66,7 @@ export class ImportRuleForm extends Component {
             || !this.actionsList.elem
             || !this.submitBtn.elem
             || !this.cancelBtn.elem
+            || !this.feedbackElem.elem
         ) {
             throw new Error('Invalid structure of import rule from');
         }
@@ -108,10 +98,21 @@ export class ImportRuleForm extends Component {
             ),
         };
 
+        const ruleData = {};
         const ruleId = parseInt(cont.idInput.value, 10);
         if (ruleId) {
             res.id = ruleId;
+            ruleData.id = ruleId;
         }
+
+        ruleData.conditions = res.conditions.map(
+            (item) => this.getExpectedCondition(item),
+        );
+        ruleData.actions = res.actions.map(
+            (item) => this.getExpectedAction(item),
+        );
+
+        res.rule = new ImportRule(ruleData);
 
         return res;
     }
@@ -169,6 +170,11 @@ export class ImportRuleForm extends Component {
         }
 
         return res;
+    }
+
+    /** Return validation result for expected import rule */
+    isValid() {
+        return this.model.rule.validate();
     }
 
     async openConditions() {

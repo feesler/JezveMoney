@@ -2,11 +2,11 @@
 
 /* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds, setEvents */
 /* exported ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
-/* exported getCaretPos, getCursorPos, checkDate, selectedText, selectedValue */
+/* exported getCaretPos, getCursorPos, setCursorPos, checkDate, selectedText, selectedValue */
 /* exported selectByValue, insertBefore, insertAfter, prependChild, removeChilds */
 /* exported fixEvent, onEmptyClick, setEmptyClick, getOffset, getOffsetRect, getOffsetSum */
 /* exported comparePosition, getPageScroll, isEmpty, childCount, px, urlJoin, head */
-/* exported transform, getRealDPI, onReady, extend */
+/* exported transform, getRealDPI, onReady, extend, extendError */
 /* eslint no-restricted-globals: "off" */
 /* eslint no-bitwise: "off" */
 
@@ -875,5 +875,23 @@ function extend(Child, Parent) {
     Child.prototype = new F();
     Child.prototype.constructor = Child;
     Child.parent = Parent.prototype;
+}
+
+/** Extends Error with specified class constructor */
+function extendError(Class) {
+    Class.prototype = Object.create(Error.prototype, {
+        constructor: {
+            value: Error,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+
+    if (Object.setPrototypeOf) {
+        Object.setPrototypeOf(Class, Error);
+    } else {
+        Class.__proto__ = Error;
+    }
 }
 /* eslint-enable no-param-reassign */

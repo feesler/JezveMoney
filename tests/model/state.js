@@ -17,6 +17,7 @@ import { App } from '../app.js';
 import { List } from './list.js';
 import { Currency } from './currency.js';
 import { Icon } from './icon.js';
+import { ImportRule } from './importrule.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
@@ -933,16 +934,12 @@ export class AppState {
             return false;
         }
 
-        if (
-            !Array.isArray(params.conditions)
-            || !params.conditions.length
-            || !Array.isArray(params.actions)
-            || !params.actions.length
-        ) {
+        try {
+            const rule = new ImportRule(params);
+            return rule.validate();
+        } catch (e) {
             return false;
         }
-
-        return true;
     }
 
     createRule(params) {
@@ -1015,7 +1012,7 @@ export class AppState {
             res.conditions = res.conditions.filter(
                 (condition) => {
                     if (!ImportCondition.isAccountField(condition.field_id)
-                        || ImportCondition.isFieldValueFlag(condition.flags)) {
+                        || ImportCondition.isPropertyValueFlag(condition.flags)) {
                         return true;
                     }
 
@@ -1054,7 +1051,7 @@ export class AppState {
             res.conditions = res.conditions.filter(
                 (condition) => {
                     if (!ImportCondition.isTemplateField(condition.field_id)
-                        || ImportCondition.isFieldValueFlag(condition.flags)) {
+                        || ImportCondition.isPropertyValueFlag(condition.flags)) {
                         return true;
                     }
 

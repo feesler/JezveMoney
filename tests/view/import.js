@@ -304,10 +304,16 @@ export class ImportView extends TestView {
         return true;
     }
 
+    isValidRule() {
+        return this.content.rulesDialog.isValidRule();
+    }
+
     async submitRule() {
-        const rulesState = this.getRulesState();
-        if (rulesState === 'create') {
-            this.model.rulesCount += 1;
+        if (this.isValidRule()) {
+            const rulesState = this.getRulesState();
+            if (rulesState === 'create') {
+                this.model.rulesCount += 1;
+            }
         }
         this.expectedState = this.getExpectedState(this.model);
 

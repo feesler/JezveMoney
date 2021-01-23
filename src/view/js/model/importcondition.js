@@ -113,6 +113,33 @@ ImportCondition.operatorTypes = [
     { id: IMPORT_COND_OP_LESS, title: 'Less than' },
     { id: IMPORT_COND_OP_GREATER, title: 'Greater than' }
 ];
+/** Field type to data property name map */
+ImportCondition.fieldsMap = {};
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_MAIN_ACCOUNT] = 'mainAccount';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_TPL] = 'template';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_TR_AMOUNT] = 'trAmountVal';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_TR_CURRENCY] = 'trCurrVal';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_ACC_AMOUNT] = 'accAmountVal';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_ACC_CURRENCY] = 'accCurrVal';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_DATE] = 'date';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_COMMENT] = 'comment';
+/** Operator functions map */
+ImportCondition.operatorsMap = {};
+ImportCondition.operatorsMap[IMPORT_COND_OP_STRING_INCLUDES] = function (left, right) {
+    return left.includes(right);
+};
+ImportCondition.operatorsMap[IMPORT_COND_OP_EQUAL] = function (left, right) {
+    return left === right;
+};
+ImportCondition.operatorsMap[IMPORT_COND_OP_NOT_EQUAL] = function (left, right) {
+    return left !== right;
+};
+ImportCondition.operatorsMap[IMPORT_COND_OP_LESS] = function (left, right) {
+    return left < right;
+};
+ImportCondition.operatorsMap[IMPORT_COND_OP_GREATER] = function (left, right) {
+    return left > right;
+};
 
 extend(ImportCondition, ListItem);
 
@@ -121,40 +148,18 @@ extend(ImportCondition, ListItem);
  * @param {string} field - field name to check
  */
 ImportCondition.getFieldValue = function (fieldId, data) {
+    var dataProp;
     var field = parseInt(fieldId, 10);
-    if (!field) {
+    if (!field || !(field in ImportCondition.fieldsMap)) {
         throw new Error('Invalid field id: ' + fieldId);
     }
     if (!isObject(data)) {
         throw new Error('Invalid transaction data');
     }
 
-    if (field === IMPORT_COND_FIELD_MAIN_ACCOUNT) {
-        return data.mainAccount;
-    }
-    if (field === IMPORT_COND_FIELD_TPL) {
-        return data.template;
-    }
-    if (field === IMPORT_COND_FIELD_TR_AMOUNT) {
-        return data.trAmountVal;
-    }
-    if (field === IMPORT_COND_FIELD_TR_CURRENCY) {
-        return data.trCurrVal;
-    }
-    if (field === IMPORT_COND_FIELD_ACC_AMOUNT) {
-        return data.accAmountVal;
-    }
-    if (field === IMPORT_COND_FIELD_ACC_CURRENCY) {
-        return data.accCurrVal;
-    }
-    if (field === IMPORT_COND_FIELD_COMMENT) {
-        return data.comment;
-    }
-    if (field === IMPORT_COND_FIELD_DATE) {
-        return data.date;
-    }
+    dataProp = ImportCondition.fieldsMap[field];
 
-    throw new Error('Invalid field id: ' + field);
+    return data[dataProp];
 };
 
 /** Check value for specified field type is account */
@@ -229,7 +234,7 @@ ImportCondition.getOperatorTypes = function () {
     return res;
 };
 
-/** Search field type by id */
+/** Search condition operator by id */
 ImportCondition.getOperatorById = function (value) {
     var res;
     var id = parseInt(value, 10);
@@ -247,8 +252,23 @@ ImportCondition.getOperatorById = function (value) {
     return copyObject(res);
 };
 
+/** Check specified value is item operator(equal or not equal) */
+ImportCondition.isItemOperator = function (value) {
+    return ImportCondition.itemOperators.includes(parseInt(value, 10));
+};
+
+/** Check specified value is numeric operator */
+ImportCondition.isNumOperator = function (value) {
+    return ImportCondition.numOperators.includes(parseInt(value, 10));
+};
+
+/** Check specified value is string operator */
+ImportCondition.isStringOperator = function (value) {
+    return ImportCondition.stringOperators.includes(parseInt(value, 10));
+};
+
 /** Check field value flag */
-ImportCondition.isFieldValueFlag = function (value) {
+ImportCondition.isPropertyValueFlag = function (value) {
     var res = parseInt(value, 10);
     if (Number.isNaN(res)) {
         throw new Error('Invalid flags value');
@@ -274,12 +294,54 @@ ImportCondition.prototype.isAvailField = function (field) {
     return typeof field === 'string' && availFields.includes(field);
 };
 
-/**
- * Check operator id has field value flag
- * @param {number} data - operator value
- */
-ImportCondition.prototype.isFieldValueOperator = function () {
-    return ImportCondition.isFieldValueFlag(this.flags);
+/** Check field type of condition is account */
+ImportCondition.prototype.isAccountField = function () {
+    return ImportCondition.isAccountField(this.field_id);
+};
+
+/** Check field type of condition is template */
+ImportCondition.prototype.isTemplateField = function () {
+    return ImportCondition.isTemplateField(this.field_id);
+};
+
+/** Check field type of condition is currency */
+ImportCondition.prototype.isCurrencyField = function () {
+    return ImportCondition.isCurrencyField(this.field_id);
+};
+
+/** Check field type of condition is amount */
+ImportCondition.prototype.isAmountField = function () {
+    return ImportCondition.isAmountField(this.field_id);
+};
+
+/** Check field type of condition is date */
+ImportCondition.prototype.isDateField = function () {
+    return ImportCondition.isDateField(this.field_id);
+};
+
+/** Check field type of condition is string */
+ImportCondition.prototype.isStringField = function () {
+    return ImportCondition.isStringField(this.field_id);
+};
+
+/** Check condition use item operator */
+ImportCondition.prototype.isItemOperator = function () {
+    return ImportCondition.isItemOperator(this.operator);
+};
+
+/** Check condition use numeric operator */
+ImportCondition.prototype.isNumOperator = function () {
+    return ImportCondition.isNumOperator(this.operator);
+};
+
+/** Check condition use string operator */
+ImportCondition.prototype.isStringOperator = function () {
+    return ImportCondition.isStringOperator(this.operator);
+};
+
+/** Check condition use property as value */
+ImportCondition.prototype.isPropertyValue = function () {
+    return ImportCondition.isPropertyValueFlag(this.flags);
 };
 
 /** Return array of operators available for current type of field */
@@ -293,26 +355,16 @@ ImportCondition.prototype.getAvailOperators = function () {
  * @param {number} rightVal - value on the right to operator
  */
 ImportCondition.prototype.applyOperator = function (leftVal, rightVal) {
+    var operatorFunc;
     var left = leftVal;
     var right = (typeof left === 'string') ? rightVal.toString() : rightVal;
 
-    if (this.operator === IMPORT_COND_OP_STRING_INCLUDES) {
-        return left.includes(right);
-    }
-    if (this.operator === IMPORT_COND_OP_EQUAL) {
-        return left === right;
-    }
-    if (this.operator === IMPORT_COND_OP_NOT_EQUAL) {
-        return left !== right;
-    }
-    if (this.operator === IMPORT_COND_OP_LESS) {
-        return left < right;
-    }
-    if (this.operator === IMPORT_COND_OP_GREATER) {
-        return left > right;
+    if (!(this.operator in ImportCondition.operatorsMap)) {
+        throw new Error('Invalid operator');
     }
 
-    throw new Error('Invalid operator');
+    operatorFunc = ImportCondition.operatorsMap[this.operator];
+    return operatorFunc(left, right);
 };
 
 /**
@@ -332,8 +384,12 @@ ImportCondition.prototype.getConditionValue = function (data) {
         throw new Error('Invalid transaction data');
     }
 
-    if (this.isFieldValueOperator()) {
+    if (this.isPropertyValue()) {
         return ImportCondition.getFieldValue(this.value, data);
+    }
+
+    if (ImportCondition.isAmountField(this.field_id)) {
+        return parseFloat(this.value);
     }
 
     if (ImportCondition.isDateField(this.field_id)) {
@@ -390,6 +446,26 @@ ImportConditionList.prototype.getRuleConditions = function (ruleId) {
 };
 
 /**
+ * Check list of conditions has condition with same properties
+ * @param {ImportCondition} condition
+ */
+ImportConditionList.prototype.hasSameCondition = function (condition) {
+    if (!(condition instanceof ImportCondition)) {
+        throw new Error('Invalid condition');
+    }
+
+    return !!this.data.find(function (item) {
+        return (
+            item !== condition
+            && item.field_id === condition.field_id
+            && item.operator === condition.operator
+            && item.value === condition.value
+            && item.flags === condition.flags
+        );
+    });
+};
+
+/**
  * Check list of conditions has condition with same field type
  * @param {ImportCondition} condition
  */
@@ -401,6 +477,7 @@ ImportConditionList.prototype.hasSameFieldCondition = function (condition) {
     return !!this.data.find(function (item) {
         return (
             item !== condition
+            && item.flags === condition.flags
             && item.field_id === condition.field_id
         );
     });
@@ -412,15 +489,23 @@ ImportConditionList.prototype.hasSameFieldCondition = function (condition) {
  * @param {ImportCondition} condition
  */
 ImportConditionList.prototype.hasNotLessCondition = function (condition) {
+    var value;
+
     if (!(condition instanceof ImportCondition)) {
         throw new Error('Invalid rule id');
     }
 
+    if (condition.isPropertyValue()) {
+        return false;
+    }
+
+    value = condition.getConditionValue({});
     return !!this.data.find(function (item) {
         return (
             item !== condition
+            && !item.isPropertyValue()
             && item.field_id === condition.field_id
-            && !(item.value < condition.value)
+            && !(item.getConditionValue({}) < value)
         );
     });
 };
@@ -431,15 +516,23 @@ ImportConditionList.prototype.hasNotLessCondition = function (condition) {
  * @param {ImportCondition} condition
  */
 ImportConditionList.prototype.hasNotGreaterCondition = function (condition) {
+    var value;
+
     if (!(condition instanceof ImportCondition)) {
         throw new Error('Invalid rule id');
     }
 
+    if (condition.isPropertyValue()) {
+        return false;
+    }
+
+    value = condition.getConditionValue({});
     return !!this.data.find(function (item) {
         return (
             item !== condition
+            && !item.isPropertyValue()
             && item.field_id === condition.field_id
-            && !(item.value > condition.value)
+            && !(item.getConditionValue({}) > value)
         );
     });
 };

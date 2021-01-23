@@ -1,7 +1,7 @@
 'use strict';
 
 /* global ce, show, isFunction, selectedValue, selectByValue, extend, AppComponent */
-/* global DecimalInput, ImportAction */
+/* global DecimalInput, ImportAction, View */
 /* global IMPORT_ACTION_SET_TR_TYPE, IMPORT_ACTION_SET_ACCOUNT, IMPORT_ACTION_SET_PERSON */
 
 /**
@@ -22,6 +22,10 @@ function ImportActionForm() {
         throw new Error('Invalid props');
     }
 
+    this.parentView = (this.parent instanceof View)
+        ? this.parent
+        : this.parent.parentView;
+
     this.updateHandler = this.props.update;
     this.deleteHandler = this.props.remove;
 
@@ -30,6 +34,12 @@ function ImportActionForm() {
         accounts: this.props.accountModel,
         persons: this.props.personModel
     };
+
+    if (!(this.props.data instanceof ImportAction)) {
+        throw new Error('Invalid action item');
+    }
+    this.props.data.isValid = this.props.isValid;
+    this.props.data.message = this.props.message;
 
     this.actionTypes = ImportAction.getTypes();
     this.transactionTypes = ImportAction.getTransactionTypes();
@@ -110,14 +120,7 @@ ImportActionForm.prototype.init = function () {
         { input: this.onValueChange.bind(this) }
     );
     this.valueField = this.createField('Value', this.valueInput);
-    // Delete button
-    this.delBtn = ce(
-        'button',
-        { className: 'btn icon-btn delete-btn right-align', type: 'button' },
-        this.createIcon('del'),
-        { click: this.onDelete.bind(this) }
-    );
-
+    // Form fields container
     this.fieldsContainer = this.createContainer('action-form__fields', [
         this.actionTypeField,
         this.transTypeField,
@@ -126,13 +129,27 @@ ImportActionForm.prototype.init = function () {
         this.amountField,
         this.valueField
     ]);
+    // Invalid feedback message
+    this.validFeedback = ce('div', { className: 'invalid-feedback' });
+    this.container = this.createContainer('action-form__container validation-block', [
+        this.fieldsContainer,
+        this.validFeedback
+    ]);
+
+    // Delete button
+    this.delBtn = ce(
+        'button',
+        { className: 'btn icon-btn delete-btn right-align', type: 'button' },
+        this.createIcon('del'),
+        { click: this.onDelete.bind(this) }
+    );
 
     this.controls = this.createContainer('action-form__controls', [
         this.delBtn
     ]);
 
     this.elem = this.createContainer('action-form', [
-        this.fieldsContainer,
+        this.container,
         this.controls
     ]);
 };
@@ -148,7 +165,9 @@ ImportActionForm.prototype.setData = function (data) {
     this.state = {
         actionId: data.id,
         actionType: data.action_id,
-        value: data.value
+        value: data.value,
+        isValid: data.isValid,
+        message: data.message
     };
 
     this.render(this.state);
@@ -172,6 +191,7 @@ ImportActionForm.prototype.onActionTypeChange = function () {
 
     this.state.actionType = value;
     this.state.value = this.getActionValue(this.state);
+    this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
 };
@@ -207,6 +227,7 @@ ImportActionForm.prototype.onValueChange = function () {
     }
 
     this.state.value = value;
+    this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
 };
@@ -252,6 +273,14 @@ ImportActionForm.prototype.render = function (state) {
 
     if (!state) {
         throw new Error('Invalid state');
+    }
+
+    if (state.isValid) {
+        this.validFeedback.textContent = '';
+        this.parentView.clearBlockValidation(this.container);
+    } else {
+        this.validFeedback.textContent = state.message;
+        this.parentView.invalidateBlock(this.container);
     }
 
     isSelectTarget = ImportAction.isSelectValue(state.actionType);

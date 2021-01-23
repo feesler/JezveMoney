@@ -1,21 +1,7 @@
 import { App } from '../app.js';
+import { List } from './list.js';
 import { Currency } from './currency.js';
-import {
-    IMPORT_COND_FIELD_MAIN_ACCOUNT,
-    IMPORT_COND_FIELD_TPL,
-    IMPORT_COND_FIELD_TR_AMOUNT,
-    IMPORT_COND_FIELD_TR_CURRENCY,
-    IMPORT_COND_FIELD_ACC_AMOUNT,
-    IMPORT_COND_FIELD_ACC_CURRENCY,
-    IMPORT_COND_FIELD_COMMENT,
-    IMPORT_COND_FIELD_DATE,
-    IMPORT_COND_OP_STRING_INCLUDES,
-    IMPORT_COND_OP_EQUAL,
-    IMPORT_COND_OP_NOT_EQUAL,
-    IMPORT_COND_OP_LESS,
-    IMPORT_COND_OP_GREATER,
-    ImportCondition,
-} from './importcondition.js';
+import { ImportRule } from './importrule.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
@@ -55,6 +41,7 @@ function dateFromString(str) {
     return new Date(timestamp);
 }
 
+/** Extract specified column data from raw data row */
 function getColumn(row, colInd) {
     if (!Array.isArray(row)) {
         throw new Error('Invalid row');
@@ -136,6 +123,12 @@ function fromImportData(data, mainAccount) {
     return res;
 }
 
+/**
+ * Apply import template to raw data of uploaded file and return
+ * @param {string[][]} data - raw data from uploaded file
+ * @param {ImportTemplate} template - import template object
+ * @param {Account} mainAccount - main account object
+ */
 export function applyTemplate(data, template, mainAccount) {
     const skipRows = 1;
 
@@ -188,19 +181,7 @@ export function applyTemplate(data, template, mainAccount) {
     return res;
 }
 
-/** Return actions of specified rule */
-function getRuleActions(actions, ruleId) {
-    if (!Array.isArray(actions)) {
-        throw new Error('Invalid list of actions');
-    }
-    const id = parseInt(ruleId, 10);
-    if (!id) {
-        throw new Error(`Invalid rule id: ${ruleId}`);
-    }
-
-    return actions.filter((item) => item.rule_id === id);
-}
-
+/** Apply action to specified transaction and return result transaction */
 function applyAction(transaction, action) {
     if (!transaction || !action) {
         throw new Error('Invalid parameters');
@@ -327,151 +308,30 @@ function applyAction(transaction, action) {
 }
 
 /**
- * Return data value for specified field type
- * @param {Object} transaction - import transaction data
- * @param {Number} fieldId - field type to check
+ * Apply import rules to specified transaction and return result transaction
+ * @param {Object} transaction - imported transaction object
+ * @param {ImportRule[]} rules - array of import rules to apply
  */
-function getFieldValue(transaction, fieldId) {
-    if (!transaction || !transaction.original) {
-        throw new Error('Invalid transaction data');
-    }
-
-    const field = parseInt(fieldId, 10);
-    if (!field) {
-        throw new Error(`Invalid field id: ${fieldId}`);
-    }
-    const data = transaction.original;
-
-    if (field === IMPORT_COND_FIELD_MAIN_ACCOUNT) {
-        throw new Error('Main account field not implemented yet');
-    }
-    if (field === IMPORT_COND_FIELD_TPL) {
-        throw new Error('Template field not implemented yet');
-    }
-    if (field === IMPORT_COND_FIELD_TR_AMOUNT) {
-        return data.trAmountVal;
-    }
-    if (field === IMPORT_COND_FIELD_TR_CURRENCY) {
-        return data.trCurrVal;
-    }
-    if (field === IMPORT_COND_FIELD_ACC_AMOUNT) {
-        return data.accAmountVal;
-    }
-    if (field === IMPORT_COND_FIELD_ACC_CURRENCY) {
-        return data.accCurrVal;
-    }
-    if (field === IMPORT_COND_FIELD_COMMENT) {
-        return data.comment;
-    }
-    if (field === IMPORT_COND_FIELD_DATE) {
-        return data.date;
-    }
-
-    throw new Error(`Invalid field id: ${field}`);
-}
-
-function getConditionValue(transaction, rule) {
-    if (!transaction || !rule) {
-        throw new Error('Invalid parameters');
-    }
-
-    if (ImportCondition.isFieldValueFlag(rule.flags)) {
-        return getFieldValue(transaction, rule.value);
-    }
-
-    return rule.value;
-}
-
-/**
- * Apply operator of condition to specified data and return result
- * @param {Object} condition - import condition object
- * @param {number} leftVal - value on the left to operator
- * @param {number} rightVal - value on the right to operator
- */
-function applyOperator(condition, leftVal, rightVal) {
-    if (!condition || typeof leftVal === 'undefined') {
-        throw new Error('Invalid parameters');
-    }
-
-    const left = leftVal;
-    const right = (typeof left === 'string') ? rightVal.toString() : rightVal;
-
-    if (condition.operator === IMPORT_COND_OP_STRING_INCLUDES) {
-        return left.includes(right);
-    }
-    if (condition.operator === IMPORT_COND_OP_EQUAL) {
-        return left === right;
-    }
-    if (condition.operator === IMPORT_COND_OP_NOT_EQUAL) {
-        return left !== right;
-    }
-    if (condition.operator === IMPORT_COND_OP_LESS) {
-        return left < right;
-    }
-    if (condition.operator === IMPORT_COND_OP_GREATER) {
-        return left > right;
-    }
-
-    throw new Error('Invalid operator');
-}
-
-export function getRuleConditions(conditions, ruleId) {
-    if (!Array.isArray(conditions)) {
-        throw new Error('Invalid list of conditions');
-    }
-
-    const id = parseInt(ruleId, 10);
-    if (Number.isNaN(id)) {
-        throw new Error(`Invalid rule id: ${ruleId}`);
-    }
-
-    return conditions.filter((item) => item.rule_id === id);
-}
-
-/**
- * Check specified data is meet condition
- */
-function conditionMatch(transaction, condition) {
-    if (!transaction || !condition) {
-        throw new Error('Invalid parameters');
-    }
-
-    const fieldValue = getFieldValue(transaction, condition.field_id);
-    const conditionValue = getConditionValue(transaction, condition);
-
-    return applyOperator(condition, fieldValue, conditionValue);
-}
-
-export function applyRules(transaction, rules, allConditions, allActions) {
+export function applyRules(transaction, rules) {
     if (!transaction) {
         throw new Error('Invalid transaction object');
     }
-    if (!Array.isArray(rules)) {
+    if (!(rules instanceof List)) {
         throw new Error('Invalid rules');
-    }
-    if (!Array.isArray(allConditions)) {
-        throw new Error('Invalid all conditions');
-    }
-    if (!Array.isArray(allActions)) {
-        throw new Error('Invalid all actions');
     }
 
     let res = transaction;
 
-    rules.forEach((rule) => {
-        const ruleConditions = getRuleConditions(allConditions, rule.id);
-        if (!Array.isArray(ruleConditions) || !ruleConditions.length) {
-            return;
-        }
+    for (const ruleData of rules.data) {
+        const rule = new ImportRule(ruleData);
 
-        if (!ruleConditions.every((cond) => conditionMatch(res, cond))) {
-            return;
+        if (!rule.meetConditions(transaction)) {
+            continue;
         }
 
         // Run actions of matched rule
-        const ruleActions = getRuleActions(allActions, rule.id);
-        res = ruleActions.reduce((data, act) => applyAction(data, act), res);
-    });
+        res = rule.actions.data.reduce((data, act) => applyAction(data, act), res);
+    }
 
     return res;
 }

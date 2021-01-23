@@ -12,6 +12,15 @@
     margin-top: 3px;
 }
 
+/* Form and validation message container */
+.action-form__container
+{
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+}
+
+/* Fields container */
 .action-form__fields
 {
     display: flex;

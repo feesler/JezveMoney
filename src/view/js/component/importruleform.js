@@ -1,11 +1,9 @@
 'use strict';
 
-/* global ce, enable, isFunction, checkDate, extend, AppComponent */
-/* global fixFloat, copyObject, removeChilds */
-/* global ImportRule, ImportAction, ImportActionList, ImportActionForm */
-/* global ImportCondition, ImportConditionList, ImportConditionForm */
-/* global IMPORT_COND_OP_EQUAL, IMPORT_COND_OP_NOT_EQUAL */
-/* global IMPORT_COND_OP_LESS, IMPORT_COND_OP_GREATER */
+/* global ce, enable, isFunction, extend, AppComponent, View */
+/* global copyObject, removeChilds */
+/* global ImportRule, ImportAction, ImportActionForm */
+/* global ImportCondition, ImportConditionForm */
 
 /**
  * ImportRuleForm component constructor
@@ -25,6 +23,10 @@ function ImportRuleForm() {
     ) {
         throw new Error('Invalid props');
     }
+
+    this.parentView = (this.parent instanceof View)
+        ? this.parent
+        : this.parent.parentView;
 
     this.submitHandler = this.props.submit;
     this.cancelHandler = this.props.cancel;
@@ -119,6 +121,14 @@ ImportRuleForm.prototype.init = function () {
         null,
         { click: this.onCancel.bind(this) }
     );
+
+    // Invalid feedback message
+    this.validFeedback = ce('div', { className: 'invalid-feedback' });
+    this.feedbackContainer = this.createContainer(
+        'rule-form__feedback validation-block',
+        this.validFeedback
+    );
+
     this.controls = this.createContainer('rule-form__controls', [
         this.saveBtn,
         this.cancelBtn
@@ -128,6 +138,7 @@ ImportRuleForm.prototype.init = function () {
         this.idInput,
         this.formConditions,
         this.formActions,
+        this.feedbackContainer,
         this.controls
     ]);
 };
@@ -139,11 +150,8 @@ ImportRuleForm.prototype.setData = function (data) {
     }
 
     this.state = {
-        ruleId: data.id,
-        parent: data.parent_id,
-        conditions: data.conditions,
+        rule: data,
         conditionsCollapsed: false,
-        actions: data.actions,
         actionsCollapsed: true
     };
 
@@ -159,7 +167,7 @@ ImportRuleForm.prototype.getNextAvailAction = function (state) {
     }
 
     // Obtain action types currently used by rule
-    ruleActionTypes = state.actions.data.map(function (action) {
+    ruleActionTypes = state.rule.actions.data.map(function (action) {
         return action.action_id;
     });
     // Search for first action type not in list
@@ -187,10 +195,11 @@ ImportRuleForm.prototype.onCreateActionClick = function (e) {
     };
 
     action = new ImportAction(actionData);
-    this.state.actions.data.push(action);
+    this.state.rule.actions.data.push(action);
 
     this.state.conditionsCollapsed = true;
     this.state.actionsCollapsed = false;
+    this.state.validation = null;
 
     this.render(this.state);
 };
@@ -205,7 +214,7 @@ ImportRuleForm.prototype.getNextAvailProperty = function (state) {
     }
 
     // Obtain condition field types currently used by rule
-    ruleFieldTypes = state.conditions.data.map(function (condition) {
+    ruleFieldTypes = state.rule.conditions.data.map(function (condition) {
         return condition.field_id;
     });
     // Filter available field types
@@ -282,10 +291,11 @@ ImportRuleForm.prototype.onCreateConditionClick = function (e) {
     };
 
     condition = new ImportCondition(conditionData);
-    this.state.conditions.data.push(condition);
+    this.state.rule.conditions.data.push(condition);
 
     this.state.conditionsCollapsed = false;
     this.state.actionsCollapsed = true;
+    this.state.validation = null;
 
     this.render(this.state);
 };
@@ -320,174 +330,31 @@ ImportRuleForm.prototype.getData = function (state) {
         throw new Error('Invalid state');
     }
 
-    if (state.ruleId) {
-        res.id = state.ruleId;
+    if (state.rule.id) {
+        res.id = state.rule.id;
     }
 
-    res.conditions = copyObject(state.conditions.data);
-    res.actions = copyObject(state.actions.data);
+    res.conditions = copyObject(state.rule.conditions.data);
+    res.actions = copyObject(state.rule.actions.data);
 
     return res;
 };
 
-/** Validate amount value */
-ImportRuleForm.prototype.isValidAmount = function (value) {
-    var amount = parseFloat(fixFloat(value));
-    return (!Number.isNaN(amount) && amount !== 0);
-};
-
 /** Validate import rule from state object */
-ImportRuleForm.prototype.isValidRule = function (state) {
-    var valid;
-    var notEqConds;
-    var lessConds;
-    var greaterConds;
-    var ruleActionTypes = [];
+ImportRuleForm.prototype.validateRule = function () {
+    var validation = this.state.rule.validate();
 
-    if (!state
-        || !(state.conditions instanceof ImportConditionList)
-        || !(state.actions instanceof ImportActionList)) {
-        throw new Error('Invalid state');
-    }
-
-    // Check conditions
-    if (!state.conditions.data.length) {
-        console.log('No conditions');
-        return false;
-    }
-
-    notEqConds = new ImportConditionList();
-    lessConds = new ImportConditionList();
-    greaterConds = new ImportConditionList();
-
-    valid = state.conditions.data.every(function (condition) {
-        // Check empty condition value is used only for string field
-        // with 'equal' and 'not equal' operators
-        if (condition.value === ''
-            && !(
-                ImportCondition.isStringField(condition.field_id)
-                && ImportCondition.itemOperators.includes(condition.operator)
-            )
-        ) {
-            console.log('Invalid empty value condition');
-            return false;
-        }
-
-        // Check amount value
-        if (ImportCondition.isAmountField(condition.field_id)
-            && !this.isValidAmount(condition.value)
-        ) {
-            console.log('Invalid amount value');
-            return false;
-        }
-
-        // Check date condition
-        if (ImportCondition.isDateField(condition.field_id)
-            && !checkDate(condition.value)
-        ) {
-            console.log('Invalid date value');
-            return false;
-        }
-
-        // Skip field value condition because final value may take any value
-        // and fit to any region, so assume it correct
-        if (condition.isFieldValueOperator()) {
-            return true;
-        }
-
-        // Check 'equal' conditions for each field type present only once
-        // 'Equal' operator is exclusive: conjunction with any other operator gives the same result,
-        // so it is meaningless
-        if (condition.operator === IMPORT_COND_OP_EQUAL) {
-            if (state.conditions.hasSameFieldCondition(condition)) {
-                console.log('equal: has same field condition');
-                return false;
-            }
-        }
-
-        if (condition.operator === IMPORT_COND_OP_LESS) {
-            // Check 'less' condition for each field type present only once
-            if (lessConds.hasSameFieldCondition(condition)) {
-                console.log('less: already has less operator condition');
-                return false;
-            }
-            // Check value regions of 'greater' and 'not equal' conditions is intersected
-            // with value region of current condition
-            if (greaterConds.hasNotLessCondition(condition)
-                || notEqConds.hasNotLessCondition(condition)) {
-                console.log('less: not intersected value regions');
-                return false;
-            }
-
-            lessConds.addItem(condition);
-        }
-
-        if (condition.operator === IMPORT_COND_OP_GREATER) {
-            // Check 'greater' condition for each field type present only once
-            if (greaterConds.hasSameFieldCondition(condition)) {
-                console.log('greater: already has greater operator condition');
-                return false;
-            }
-            // Check value regions of 'less' and 'not equal' conditions is intersected
-            // with value region of current condition
-            if (lessConds.hasNotGreaterCondition(condition)
-                || notEqConds.hasNotGreaterCondition(condition)) {
-                console.log('greater: not intersected value regions');
-                return false;
-            }
-
-            greaterConds.addItem(condition);
-        }
-
-        if (condition.operator === IMPORT_COND_OP_NOT_EQUAL) {
-            // Check value regions of 'less' and 'greater' conditions es intersected
-            // with current value
-            if (lessConds.hasNotGreaterCondition(condition)
-                || greaterConds.hasNotLessCondition(condition)) {
-                console.log('not equal: not intersected value regions');
-                return false;
-            }
-
-            notEqConds.addItem(condition);
-        }
-
-        return true;
-    }, this);
-    if (!valid) {
-        return false;
-    }
-
-    // Check actions
-    if (!state.actions.data.length) {
-        console.log('No actions');
-        return false;
-    }
-    valid = state.actions.data.every(function (action) {
-        // Check each type of action is used only once
-        if (ruleActionTypes.includes(action.action_id)) {
-            return false;
-        }
-
-        ruleActionTypes.push(action.action_id);
-        // Amount value
-        if (action.isAmountValue()) {
-            if (!this.isValidAmount(action.value)) {
-                console.log('Invalid amount value');
-                return false;
-            }
-        }
-
-        return true;
-    }, this);
-    if (!valid) {
-        return false;
-    }
-
-    return true;
+    this.state.validation = validation;
+    this.render(this.state);
 };
 
 /** Save button 'click' event handler */
 ImportRuleForm.prototype.onSubmit = function () {
+    this.validateRule();
+    if (!this.state.validation.valid) {
+        return;
+    }
+
     if (isFunction(this.submitHandler)) {
         this.submitHandler(this.getData(this.state));
     }
@@ -504,23 +371,21 @@ ImportRuleForm.prototype.onCancel = function () {
 ImportRuleForm.prototype.onConditionUpdate = function (index, data) {
     if (!data
         || index < 0
-        || index >= this.state.conditions.data.length) {
+        || index >= this.state.rule.conditions.data.length) {
         return;
     }
 
-    this.state.conditions.data[index] = new ImportCondition(data);
-
-    this.validateSubmit(this.state);
+    this.state.rule.conditions.data[index] = new ImportCondition(data);
 };
 
 /** Condition 'delete' event handler */
 ImportRuleForm.prototype.onConditionDelete = function (index) {
-    if (index < 0 || index >= this.state.conditions.data.length) {
+    if (index < 0 || index >= this.state.rule.conditions.data.length) {
         return;
     }
 
-    this.state.conditions.data.splice(index, 1);
-
+    this.state.rule.conditions.data.splice(index, 1);
+    this.state.validation = null;
     this.render(this.state);
 };
 
@@ -528,23 +393,21 @@ ImportRuleForm.prototype.onConditionDelete = function (index) {
 ImportRuleForm.prototype.onActionUpdate = function (index, data) {
     if (!data
         || index < 0
-        || index >= this.state.actions.data.length) {
+        || index >= this.state.rule.actions.data.length) {
         return;
     }
 
-    this.state.actions.data[index] = new ImportAction(data);
-
-    this.validateSubmit(this.state);
+    this.state.rule.actions.data[index] = new ImportAction(data);
 };
 
 /** Action 'delete' event handler */
 ImportRuleForm.prototype.onActionDelete = function (index) {
-    if (index < 0 || index >= this.state.actions.data.length) {
+    if (index < 0 || index >= this.state.rule.actions.data.length) {
         return;
     }
 
-    this.state.actions.data.splice(index, 1);
-
+    this.state.rule.actions.data.splice(index, 1);
+    this.state.validation = null;
     this.render(this.state);
 };
 
@@ -579,12 +442,6 @@ ImportRuleForm.prototype.validateActionsAvail = function (state) {
     enable(this.createActionBtn, !!isAvail);
 };
 
-/** Validate rule data and enable/disable submit button */
-ImportRuleForm.prototype.validateSubmit = function (state) {
-    var isValid = this.isValidRule(state);
-    enable(this.saveBtn, isValid);
-};
-
 /** Render component state */
 ImportRuleForm.prototype.render = function (state) {
     var actionItems;
@@ -594,10 +451,21 @@ ImportRuleForm.prototype.render = function (state) {
         throw new Error('Invalid state');
     }
 
-    this.idInput.value = (state.ruleId) ? (state.ruleId) : '';
+    this.idInput.value = (state.rule.id) ? state.rule.id : '';
 
     this.validateActionsAvail(state);
-    this.validateSubmit(state);
+
+    if (state.validation
+        && !state.validation.valid
+        && !('conditionIndex' in state.validation)
+        && !('actionIndex' in state.validation)
+    ) {
+        this.validFeedback.textContent = state.validation.message;
+        this.parentView.invalidateBlock(this.feedbackContainer);
+    } else {
+        this.validFeedback.textContent = '';
+        this.parentView.clearBlockValidation(this.feedbackContainer);
+    }
 
     // Actions
     if (state.actionsCollapsed) {
@@ -605,17 +473,27 @@ ImportRuleForm.prototype.render = function (state) {
     } else {
         this.formActions.classList.remove('collapsed');
     }
-    actionItems = state.actions.data.map(function (action, index) {
-        var res = new ImportActionForm({
+    actionItems = state.rule.actions.data.map(function (action, index) {
+        var props = {
             parent: this,
             data: action,
+            isValid: true,
             currencyModel: this.model.currency,
             accountModel: this.model.accounts,
             personModel: this.model.persons,
             update: this.onActionUpdate.bind(this, index),
             remove: this.onActionDelete.bind(this, index)
-        });
-        return res;
+        };
+
+        if (state.validation
+            && !state.validation.valid
+            && state.validation.actionIndex === index
+        ) {
+            props.isValid = false;
+            props.message = state.validation.message;
+        }
+
+        return new ImportActionForm(props);
     }, this);
     this.setListContainerData(this.formActionsContainer, actionItems, 'No actions');
     // Conditions
@@ -624,18 +502,27 @@ ImportRuleForm.prototype.render = function (state) {
     } else {
         this.formConditions.classList.remove('collapsed');
     }
-    conditionItems = state.conditions.data.map(function (condition, index) {
-        var res = new ImportConditionForm({
+    conditionItems = state.rule.conditions.data.map(function (condition, index) {
+        var props = {
             parent: this,
             data: condition,
+            isValid: true,
             tplModel: this.model.template,
             currencyModel: this.model.currency,
             accountModel: this.model.accounts,
             personModel: this.model.persons,
             update: this.onConditionUpdate.bind(this, index),
             remove: this.onConditionDelete.bind(this, index)
-        });
-        return res;
+        };
+
+        if (state.validation
+            && !state.validation.valid
+            && state.validation.conditionIndex === index) {
+            props.isValid = false;
+            props.message = state.validation.message;
+        }
+
+        return new ImportConditionForm(props);
     }, this);
     this.setListContainerData(this.conditionsContainer, conditionItems, 'No conditions');
 };

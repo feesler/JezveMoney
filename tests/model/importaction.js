@@ -8,6 +8,15 @@ export const IMPORT_ACTION_SET_COMMENT = 6;
 
 /** Import action model */
 export class ImportAction {
+    constructor(data) {
+        if (!data) {
+            throw new Error('Invalid data');
+        }
+
+        this.action_id = data.action_id;
+        this.value = data.value;
+    }
+
     static actionTypes = [
         { id: IMPORT_ACTION_SET_TR_TYPE, title: 'Set transaction type' },
         { id: IMPORT_ACTION_SET_ACCOUNT, title: 'Set account' },
@@ -42,7 +51,7 @@ export class ImportAction {
 
     /** Check action type requires select value from list */
     static isSelectValue(value) {
-        return ImportAction.selectActions.includes(parseInt(value, 10));
+        return this.selectActions.includes(parseInt(value, 10));
     }
 
     /** Check action type requires transaction type value */
@@ -62,7 +71,7 @@ export class ImportAction {
 
     /** Check action type requires amount value */
     static isAmountValue(value) {
-        return ImportAction.amountActions.includes(parseInt(value, 10));
+        return this.amountActions.includes(parseInt(value, 10));
     }
 
     /** Search action type by id */
@@ -72,7 +81,7 @@ export class ImportAction {
             throw new Error('Invalid parameter');
         }
 
-        return ImportAction.actionTypes.find((item) => item.id === id);
+        return this.actionTypes.find((item) => item.id === id);
     }
 
     /** Search action type by name (case insensitive) */
@@ -82,7 +91,7 @@ export class ImportAction {
         }
 
         const lcName = name.toLowerCase();
-        return ImportAction.actionTypes.find((item) => item.title.toLowerCase() === lcName);
+        return this.actionTypes.find((item) => item.title.toLowerCase() === lcName);
     }
 
     /**
@@ -90,7 +99,7 @@ export class ImportAction {
      * @param {string} id - transaction type id string
      */
     static getTransactionTypeById(value) {
-        return ImportAction.transactionTypes.find((item) => item.id === value);
+        return this.transactionTypes.find((item) => item.id === value);
     }
 
     /** Search import transaction type by name (case insensitive) */
@@ -100,6 +109,26 @@ export class ImportAction {
         }
 
         const lcName = name.toLowerCase();
-        return ImportAction.transactionTypes.find((item) => item.title.toLowerCase() === lcName);
+        return this.transactionTypes.find((item) => item.title.toLowerCase() === lcName);
+    }
+
+    /** Check action requires select value from list */
+    isSelectValue() {
+        return ImportAction.isSelectValue(this.action_id);
+    }
+
+    /** Check action requires account value */
+    isAccountValue() {
+        return ImportAction.isAccountValue(this.action_id);
+    }
+
+    /** Check action requires person value */
+    isPersonValue() {
+        return ImportAction.isPersonValue(this.action_id);
+    }
+
+    /** Check action requires amount value */
+    isAmountValue() {
+        return ImportAction.isAmountValue(this.action_id);
     }
 }

@@ -360,17 +360,18 @@ export async function submitRule() {
         }
 
         // Prepare expected content
-        await App.state.fetch();
-
-        const expectedRule = App.view.getExpectedRule();
-        const dialogState = App.view.getRulesState();
-
-        if (dialogState === 'create') {
-            App.state.createRule(expectedRule);
-        } else if (dialogState === 'update') {
-            App.state.updateRule(expectedRule);
-        } else {
-            throw new Error('Invalid state of rules dialog');
+        const validInput = App.view.isValidRule();
+        console.log('submitRule() view valid result: ', validInput);
+        if (validInput) {
+            const expectedRule = App.view.getExpectedRule();
+            const dialogState = App.view.getRulesState();
+            if (dialogState === 'create') {
+                App.state.createRule(expectedRule);
+            } else if (dialogState === 'update') {
+                App.state.updateRule(expectedRule);
+            } else {
+                throw new Error('Invalid state of rules dialog');
+            }
         }
 
         await App.view.submitRule();

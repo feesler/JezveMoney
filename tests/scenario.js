@@ -17,6 +17,7 @@ import {
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_ACC_AMOUNT,
+    IMPORT_COND_FIELD_DATE,
     IMPORT_COND_FIELD_COMMENT,
     IMPORT_COND_OP_EQUAL,
     IMPORT_COND_OP_STRING_INCLUDES,
@@ -27,6 +28,7 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
+    IMPORT_ACTION_SET_SRC_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
 } from './model/importaction.js';
 
@@ -2258,40 +2260,102 @@ export class Scenario {
         // Create rule #1
         this.environment.setBlock('Create import rule', 2);
         await ImportTests.createRule();
+        // Check empty rule is not submitted
+        this.environment.setBlock('Test empty rule', 3);
+        await ImportTests.submitRule();
         // Add condition #1: Comment includes 'Bank Name'
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
             { action: 'inputValue', data: 'Bank Name' },
         ]);
-        // Add condition #2: Acount amount is greater 100.01
+        // Check rule without actions is not submitted
+        await ImportTests.submitRule();
+        // Add condition #2: Acount amount is greater than (empty value)
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
-            { action: 'inputAmount', data: '100.01' },
         ]);
-        // Add condition #3: Acount amount is less 999.99
+
+        // Check condition with empty amount is not submitted
+        this.environment.setBlock('Test condition with empty amount', 3);
+        await ImportTests.submitRule();
+
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'inputAmount', data: '100.01' },
+        });
+
+        // Check duplicate conditions is not submitted
+        this.environment.setBlock('Test duplicate conditions', 3);
+        // Add condition #3: Acount amount is greater than 99.99
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
-            { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
-            { action: 'inputAmount', data: '999.99' },
+            { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
+            { action: 'inputAmount', data: '99.99' },
         ]);
+        await ImportTests.submitRule();
+        // Update condition #3: Acount amount is less than 99.99
+        await ImportTests.updateRuleCondition({
+            pos: 2,
+            action: { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
+        });
+
+        // Check condition with not intersected value regions is not submitted
+        this.environment.setBlock('Test conditions with non-intersecting value regions', 3);
+        await ImportTests.submitRule();
+
+        // Update condition #3: Acount amount is less than 999.99
+        await ImportTests.updateRuleCondition({
+            pos: 2,
+            action: { action: 'inputAmount', data: '999.99' },
+        });
+
         // Add action #1: Set comment 'Ba'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'Ba' },
         ]);
+        // Check duplicate actions is not submitted
+        this.environment.setBlock('Test duplicate actions', 3);
+        // Add action #2: Set comment (empty value)
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+        ]);
+        await ImportTests.submitRule();
+        // Check duplicate actions is not submitted
+        this.environment.setBlock('Test empty amount action', 3);
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'changeAction', data: IMPORT_ACTION_SET_SRC_AMOUNT },
+        });
+        await ImportTests.submitRule();
+        await ImportTests.deleteRuleAction(1);
+        // Submit valid rule
         await ImportTests.submitRule();
 
         // Create rule #2
         this.environment.setBlock('Create import rule', 2);
         await ImportTests.createRule();
-        // Add condition #1: Comment includes 'C2C'
+        // Check rule without conditions is not submitted
+        this.environment.setBlock('Test rule without conditions', 3);
+        await ImportTests.createRuleAction();
+        await ImportTests.submitRule();
+        // Add condition #1: Comment includes (empty value)
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-            { action: 'inputValue', data: 'C2C' },
         ]);
+        // Check `Comment includes` condition is not submitted with empty value
+        this.environment.setBlock('Test `Comment includes` condition with empty value', 3);
+        await ImportTests.submitRule();
+        await ImportTests.deleteRuleAction(0);
+        // Update condition #1: Comment includes 'C2C'
+        await ImportTests.updateRuleCondition({
+            pos: 0,
+            action: { action: 'inputValue', data: 'C2C' },
+        });
+
         // Add condition #2: Comment includes 'RBA'
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -2309,6 +2373,28 @@ export class Scenario {
             pos: 1,
             action: { action: 'inputValue', data: 'R-BANK' },
         });
+
+        // Check Date condition is not submitted with empty value
+        this.environment.setBlock('Test Date condition with empty value', 3);
+        // Add condition #4: Date greater than (empty value)
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_DATE },
+            { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
+        ]);
+        // Check Date condition is not submitted with invalid value
+        this.environment.setBlock('Test Date condition with invalid value', 3);
+        // Update condition #4: Date greater than '01xx'
+        await ImportTests.updateRuleCondition({
+            pos: 3,
+            action: { action: 'inputValue', data: '01xx' },
+        });
+        await ImportTests.submitRule();
+        // Update condition #4: Date greater than yesterday
+        await ImportTests.updateRuleCondition({
+            pos: 3,
+            action: { action: 'inputValue', data: App.dates.yesterday },
+        });
+
         // Add action #1: Set transaction type to 'Transfer from'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },

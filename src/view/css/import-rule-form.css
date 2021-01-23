@@ -79,6 +79,12 @@
     padding: 6px;
 }
 
+/* Validation feedback container */
+.rule-form__feedback
+{
+    margin-bottom: 9px;
+}
+
 /* From submit and cancel buttons */
 .rule-form__controls
 {

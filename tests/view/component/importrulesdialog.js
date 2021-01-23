@@ -11,19 +11,6 @@ import { App } from '../../app.js';
 /* eslint-disable no-bitwise */
 
 export class ImportRulesDialog extends Component {
-    /* TMP */
-    static async create(...args) {
-        if (args.length < 2 || !args[1]) {
-            return null;
-        }
-
-        const instance = new this(...args);
-        await instance.parse();
-
-        return instance;
-    }
-    /* TMP */
-
     async parse() {
         if (!this.elem) {
             throw new Error('Invalid import rules dialog element');
@@ -133,6 +120,15 @@ export class ImportRulesDialog extends Component {
         return this.ruleForm.getExpectedRule();
     }
 
+    /** Return validation result for expected import rule */
+    isValidRule() {
+        if (!this.isFormState(this.model)) {
+            throw new Error('Invalid state');
+        }
+
+        return this.ruleForm.isValid();
+    }
+
     async close() {
         await this.click(this.closeBtn);
     }
@@ -236,22 +232,25 @@ export class ImportRulesDialog extends Component {
             throw new Error('Invalid state');
         }
 
-        if (this.model.state === 'create') {
-            this.model.rules.push(this.model.rule);
-        } else {
-            const index = this.model.rules.findIndex((rule) => rule.id === this.model.rule.id);
-            if (index === -1) {
-                throw new Error('Invalid state');
+        const valid = this.ruleForm.isValid();
+        if (valid) {
+            if (this.model.state === 'create') {
+                this.model.rules.push(this.model.rule);
+            } else {
+                const index = this.model.rules.findIndex((rule) => rule.id === this.model.rule.id);
+                if (index === -1) {
+                    throw new Error('Invalid state');
+                }
+                this.model.rules[index] = this.model.rule;
             }
-            this.model.rules[index] = this.model.rule;
+            this.model.state = 'list';
         }
-        this.model.state = 'list';
         this.expectedState = this.getExpectedState(this.model);
 
         await this.ruleForm.submit();
         await this.waitForFunction(async () => {
             await this.parse();
-            return !this.model.loading && this.model.state === 'list';
+            return !valid || (!this.model.loading && this.model.state === 'list');
         });
 
         return this.checkState();

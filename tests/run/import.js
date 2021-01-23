@@ -1,6 +1,5 @@
 import { App } from '../app.js';
 import { test, copyObject } from '../common.js';
-import { api } from '../model/api.js';
 import { Currency } from '../model/currency.js';
 import {
     applyTemplate,
@@ -217,9 +216,6 @@ export async function submitUploaded(params) {
         }
 
         const importData = parseCSV(params.data);
-        const importRules = await api.importrule.list();
-        const importConditios = await api.importcondition.list();
-        const importActions = await api.importaction.list();
 
         let mainAccountId;
         if (params.account) {
@@ -244,7 +240,7 @@ export async function submitUploaded(params) {
         const skipList = [];
         importTransactions = importTransactions.map(
             (item) => {
-                const res = applyRules(item, importRules, importConditios, importActions);
+                const res = applyRules(item, App.state.rules);
                 const tr = findSimilar(res, skipList);
 
                 if (tr) {

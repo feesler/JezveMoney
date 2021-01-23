@@ -395,7 +395,7 @@ class ImportConditionModel extends CachedTable
     }
 
 
-    public static function isFieldValueOperator($data)
+    public static function isPropertyValue($data)
     {
         return (intval($data) & IMPORT_COND_OP_FIELD_FLAG) == IMPORT_COND_OP_FIELD_FLAG;
     }

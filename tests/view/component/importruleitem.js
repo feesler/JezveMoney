@@ -15,19 +15,6 @@ export class ImportRuleItem extends Component {
         this.model = {};
     }
 
-    /* TMP */
-    static async create(...args) {
-        if (args.length < 2 || !args[1]) {
-            return null;
-        }
-
-        const instance = new this(...args);
-        await instance.parse();
-
-        return instance;
-    }
-    /* TMP */
-
     async parse() {
         this.ruleId = await this.prop(this.elem, 'dataset.id');
 

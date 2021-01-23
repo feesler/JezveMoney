@@ -63,7 +63,7 @@ AdminImportConditionListView.prototype.setItemValues = function (item) {
         selectByValue(this.fieldSel, item.field_id);
         selectByValue(this.operatorSel, item.operator);
 
-        isFieldValue = this.isFieldValueOperator(item.flags);
+        isFieldValue = this.isPropertyValue(item.flags);
         this.fieldFlagCheck.checked = isFieldValue;
         if (isFieldValue) {
             selectByValue(this.fieldValueSel, parseInt(item.value, 10));
@@ -93,7 +93,7 @@ AdminImportConditionListView.prototype.onFieldFlagChange = function () {
  * Check operator id has field value flag
  * @param {number} data - operator value
  */
-AdminImportConditionListView.prototype.isFieldValueOperator = function (data) {
+AdminImportConditionListView.prototype.isPropertyValue = function (data) {
     var flags = parseInt(data, 10);
     if (Number.isNaN(flags)) {
         throw new Error('Invalid flags value');
@@ -198,7 +198,7 @@ AdminImportConditionListView.prototype.renderItem = function (item) {
         operatorName = item.operator;
     }
 
-    if (this.isFieldValueOperator(item.flags)) {
+    if (this.isPropertyValue(item.flags)) {
         valueStr = this.getFieldName(item.value);
     } else {
         valueStr = item.value;

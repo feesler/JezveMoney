@@ -30,19 +30,6 @@ const actionValueMap = {
 
 /** Import action form */
 export class ImportActionForm extends Component {
-    /* TMP */
-    static async create(...args) {
-        if (args.length < 2 || !args[1]) {
-            return null;
-        }
-
-        const instance = new this(...args);
-        await instance.parse();
-
-        return instance;
-    }
-    /* TMP */
-
     async parse() {
         const fieldElems = await this.queryAll(this.elem, '.field');
         await asyncMap(fieldElems, (field) => this.parseField(field));
