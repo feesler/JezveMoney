@@ -1,9 +1,4 @@
-import {
-    isDate,
-    formatDate,
-    copyObject,
-    createCSV,
-} from './common.js';
+import { copyObject } from './common.js';
 import { Currency } from './model/currency.js';
 import {
     EXPENSE,
@@ -13,7 +8,7 @@ import {
     Transaction,
     availTransTypes,
 } from './model/transaction.js';
-
+import { generateCSV } from './model/import.js';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_ACC_AMOUNT,
@@ -103,6 +98,8 @@ export class Scenario {
 
     async runFullScenario() {
         await this.securityTests();
+        await this.prepareTests();
+
         await this.apiTests();
         await App.goToMainView();
         await this.profileTests();
@@ -112,30 +109,61 @@ export class Scenario {
         await this.postTransactionAccountTests();
         await StatisticsTests.run();
 
-        await ApiTests.loginTest(App.config.testUser);
-        await App.setupUser();
+        await this.finishTests();
     }
 
     async securityTests() {
         this.environment.setBlock('Security tests', 1);
 
-        await SecurityTests.checkAccess('system');
-        await SecurityTests.checkAccess('system/logs/log.txt');
-        await SecurityTests.checkAccess('Model/');
-        await SecurityTests.checkAccess('Controller/');
-        await SecurityTests.checkAccess('view/');
-        await SecurityTests.checkAccess('api/');
-        await SecurityTests.checkAccess('admin/');
+        await this.runner.runGroup(SecurityTests.checkAccess, [
+            'system',
+            'system/logs/log.txt',
+            'Model/',
+            'Controller/',
+            'view/',
+            'api/',
+            'admin/',
+        ]);
+    }
+
+    async prepareTests() {
+        await ApiTests.loginTest(App.config.testAdminUser);
+        // Remove possible users
+        await ApiTests.deleteUserIfExist(App.config.testUser);
+        await ApiTests.deleteUserIfExist(App.config.apiTestUser);
+        await ApiTests.deleteUserIfExist(App.config.newUser);
+
+        // Upload CSV file for import tests
+        const now = new Date();
+        this.csvStatement = generateCSV([
+            [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
+            [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
+            [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
+            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
+            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
+            [now, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+            [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+            [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
+            [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
+            [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
+            [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
+            [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
+            [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
+            [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
+        ]);
+
+        this.uploadFilename = await ImportTests.putFile(this.csvStatement);
+    }
+
+    async finishTests() {
+        await ApiTests.loginTest(App.config.testAdminUser);
+        await App.setupUser();
+        await ImportTests.removeFile(this.uploadFilename);
     }
 
     async apiTests() {
         this.environment.setBlock('API tests', 1);
         this.environment.setBlock('User', 2);
-
-        await ApiTests.loginTest(App.config.testAdminUser);
-        await ApiTests.deleteUserIfExist(App.config.testUser);
-        await ApiTests.deleteUserIfExist(App.config.apiTestUser);
-        await ApiTests.deleteUserIfExist(App.config.newUser);
 
         // Register API test user and prepare data for security tests
         await ApiTests.registerAndLogin(App.config.apiTestUser);
@@ -2159,109 +2187,338 @@ export class Scenario {
         await this.runner.runTasks(tasks);
     }
 
-    createDummyTransaction(data) {
-        const [
-            date,
-            comment,
-            city,
-            country,
-            trCurr,
-            trAmount,
-            accCurr = trCurr,
-            accAmount = trAmount,
-        ] = data;
-
-        if (!isDate(date)) {
-            throw new Error('Invalid date object');
-        }
-
-        const confirmDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 3);
-
-        return [
-            `${formatDate(date)} 00:00`,
-            `${formatDate(confirmDate)} 00:00`,
-            '*7777',
-            `${comment} ${city} ${country}`,
-            comment,
-            city,
-            country,
-            trCurr,
-            trAmount,
-            accCurr,
-            accAmount,
-        ];
-    }
-
-    generateCSV() {
-        const header = [
-            'Transaction date',
-            'Posting date',
-            'Card',
-            'Description',
-            'Merchant',
-            'City',
-            'Country',
-            'Transaction currency',
-            'Amount in transaction currency',
-            'Account currency',
-            'Amount in account currency',
-        ];
-        const now = new Date();
-        const rows = [
-            [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
-            [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
-            [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
-            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
-            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
-            [now, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
-            [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
-            [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
-            [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
-            [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
-            [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
-            [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
-            [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
-            [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
-        ];
-
-        const data = rows.map((item) => this.createDummyTransaction(item));
-
-        return createCSV({ header, data });
-    }
-
     async importTests() {
         this.environment.setBlock('Import', 1);
 
         const accIndexes = App.state.getAccountIndexesByNames([
             'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
         ]);
-        const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR] = App.state.getAccountsByIndexes(accIndexes);
+        [
+            this.ACC_3,
+            this.ACC_RUB,
+            this.ACC_USD,
+            this.ACC_EUR,
+        ] = App.state.getAccountsByIndexes(accIndexes);
         const personIndexes = App.state.getPersonIndexesByNames([
             'Maria', 'Alex',
         ]);
-        const [MARIA, ALEX] = App.state.getPersonsByIndexes(personIndexes);
-
-        const csvStatement = this.generateCSV();
-
-        await ApiTests.loginTest(App.config.testAdminUser);
-        await App.setupUser();
-        const uploadFilename = await ImportTests.putFile(csvStatement);
-        await ApiTests.loginTest(App.config.testUser);
-        await App.setupUser();
-        await ProfileTests.relogin(App.config.testUser);
+        [this.MARIA, this.ALEX] = App.state.getPersonsByIndexes(personIndexes);
 
         await ImportTests.checkInitialState();
+        await this.runImportRuleTests();
+        await this.runCreateImportItemTests();
 
-        // Import rules
+        // Upload CSV file
+        this.environment.setBlock('Upload CSV', 2);
+        await ImportTests.uploadFile({
+            filename: this.uploadFilename,
+            data: this.csvStatement,
+        });
+
+        await this.runImportTemplateTests();
+
+        // Submit converted transactions
+        await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
+
+        // Disable all items except 0 and 1
+        await ImportTests.enableItems({
+            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            value: false,
+        });
+        await this.runDeleteImportItemTests();
+        await this.runSubmitImportTests();
+        await this.runImportItemStateLoop();
+    }
+
+    async runSubmitImportTests() {
+        // Verify submit is disabled for empty list
+        this.environment.setBlock('Verify submit is disabled for empty list', 2);
+        await ImportTests.submit();
+        // Verify submit is disabled for list with no enabled items
+        this.environment.setBlock('Verify submit is disabled for list with no enabled items', 2);
+        await ImportTests.uploadFile({
+            filename: this.uploadFilename,
+            data: this.csvStatement,
+        });
+        await ImportTests.submitUploaded({
+            data: this.csvStatement,
+            template: 0,
+        });
+        await ImportTests.enableItems({
+            index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            value: false,
+        });
+        await ImportTests.submit();
+    }
+
+    async runCreateImportItemTests() {
+        this.environment.setBlock('Add item', 2);
+
+        await ImportTests.addItem();
+        await ImportTests.updateItem({
+            pos: 0,
+            action: [
+                { action: 'inputAmount', data: '1' },
+                { action: 'inputDate', data: App.dates.now },
+            ],
+        });
+    }
+
+    async runDeleteImportItemTests() {
+        await ImportTests.deleteItems([3, 5]);
+        await ImportTests.submit();
+    }
+
+    async runImportItemStateLoop() {
+        const { RUB, USD } = this;
+
+        this.environment.setBlock('Import item state loop', 2);
+
+        await ImportTests.changeMainAccount(this.ACC_3);
+        // Enable all items
+        await ImportTests.enableItems({
+            index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            value: true,
+        });
+        await ImportTests.updateItem({
+            pos: 0,
+            action: [
+                { action: 'changeCurrency', data: USD }, // 1-2
+                { action: 'changeCurrency', data: RUB }, // 2-1
+                { action: 'changeType', data: 'income' }, // 1-3
+                { action: 'changeType', data: 'expense' }, // 3-1
+                { action: 'changeType', data: 'transferfrom' }, // 1-5
+                { action: 'changeType', data: 'expense' }, // 5-1
+                { action: 'changeType', data: 'transferto' }, // 1-7
+                { action: 'changeType', data: 'expense' }, // 7-1
+                { action: 'changeType', data: 'debtfrom' }, // 1-9
+                { action: 'changeType', data: 'expense' }, // 9-1
+                { action: 'changeType', data: 'debtto' }, // 1-10
+                { action: 'changeType', data: 'expense' }, // 10-1
+                { action: 'changeType', data: 'income' }, // 1-3
+                { action: 'changeCurrency', data: USD }, // 3-4
+                { action: 'changeType', data: 'expense' }, // 4-2
+                { action: 'changeType', data: 'income' }, // 2-4
+                { action: 'changeCurrency', data: RUB }, // 4-3
+                { action: 'changeType', data: 'transferfrom' }, // 3-5
+                { action: 'changeType', data: 'income' }, // 5-3
+                { action: 'changeType', data: 'transferto' }, // 3-7
+                { action: 'changeType', data: 'income' }, // 7-3
+                { action: 'changeType', data: 'debtfrom' }, // 3-9
+                { action: 'changeType', data: 'income' }, // 9-3
+                { action: 'changeType', data: 'debtto' }, // 3-10
+                { action: 'changeType', data: 'income' }, // 10-3
+                { action: 'changeCurrency', data: USD }, // 3-4
+                { action: 'changeType', data: 'expense' }, // 4-2
+                { action: 'changeType', data: 'transferfrom' }, // 2-5
+                { action: 'changeType', data: 'transferto' }, // 5-7
+                { action: 'changeType', data: 'transferfrom' }, // 7-5
+                { action: 'changeType', data: 'debtfrom' }, // 5-9
+                { action: 'changeType', data: 'transferfrom' }, // 9-5
+                { action: 'changeType', data: 'debtto' }, // 5-10
+                { action: 'changeType', data: 'transferfrom' }, // 10-5
+                { action: 'changeType', data: 'expense' }, // 5-1
+                { action: 'changeCurrency', data: USD }, // 1-2
+                { action: 'changeType', data: 'transferto' }, // 2-7
+                { action: 'changeType', data: 'debtfrom' }, // 7-9
+                { action: 'changeType', data: 'transferto' }, // 9-7
+                { action: 'changeType', data: 'debtto' }, // 7-10
+                { action: 'changeType', data: 'income' }, // 10-3
+                { action: 'changeCurrency', data: USD }, // 3-4
+                { action: 'changeType', data: 'transferfrom' }, // 4-5
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 5-6
+                { action: 'changeType', data: 'expense' }, // 6-1
+                { action: 'changeType', data: 'transferfrom' }, // 1-5
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 5-6
+                { action: 'changeType', data: 'income' }, // 6-3
+                { action: 'changeType', data: 'transferfrom' }, // 3-5
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 5-6
+                { action: 'changeDestAccount', data: this.ACC_RUB }, // 6-5
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 5-6
+                { action: 'changeType', data: 'transferto' }, // 6-8
+                { action: 'changeType', data: 'expense' }, // 8-1
+                { action: 'changeType', data: 'transferto' }, // 1-7
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 7-8
+                { action: 'changeType', data: 'income' }, // 8-3
+                { action: 'changeCurrency', data: USD }, // 3-4
+                { action: 'changeType', data: 'transferto' }, // 4-7
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 7-8
+            ],
+        });
+
+        /** Prepare items of all states */
+        await ImportTests.updateItem({
+            pos: 1,
+            action: [
+                { action: 'changeCurrency', data: USD }, // 1-2
+                { action: 'inputDestAmount', data: '50.03' },
+            ],
+        });
+        await ImportTests.updateItem({
+            pos: 2,
+            action: { action: 'changeType', data: 'income' }, // 1-3
+        });
+        await ImportTests.updateItem({
+            pos: 3,
+            action: [
+                { action: 'changeCurrency', data: USD }, // 1-2
+                { action: 'changeType', data: 'income' }, // 2-4
+                { action: 'inputDestAmount', data: '500' },
+            ],
+        });
+        await ImportTests.updateItem({
+            pos: 4,
+            action: { action: 'changeType', data: 'transferfrom' }, // 1-5
+        });
+        await ImportTests.updateItem({
+            pos: 5,
+            action: [
+                { action: 'changeType', data: 'transferfrom' }, // 1-5
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 5-6
+                { action: 'inputDestAmount', data: '50.03' },
+            ],
+        });
+        await ImportTests.updateItem({
+            pos: 6,
+            action: { action: 'changeType', data: 'transferto' }, // 1-7
+        });
+        await ImportTests.updateItem({
+            pos: 7,
+            action: [
+                { action: 'changeType', data: 'debtfrom' }, // 1-9
+                { action: 'changePerson', data: this.ALEX },
+            ],
+        });
+        await ImportTests.updateItem({
+            pos: 8,
+            action: { action: 'changeType', data: 'debtto' }, // 1-10
+        });
+        await ImportTests.changeMainAccount(this.ACC_EUR);
+        await ImportTests.updateItem({
+            pos: 0,
+            action: { action: 'changeDestAccount', data: this.ACC_3 }, // 8-8
+        });
+        await ImportTests.changeMainAccount(this.ACC_3); // for item 0: 8-7
+        await ImportTests.updateItem({
+            pos: 0,
+            action: [
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 7-8
+                { action: 'changeType', data: 'transferfrom' }, // 8-6
+                { action: 'changeType', data: 'debtfrom' }, // 6-9
+                { action: 'changeType', data: 'debtto' }, // 9-10
+                { action: 'changeType', data: 'transferto' }, // 10-7
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 7-8
+                { action: 'changeType', data: 'debtfrom' }, // 8-9
+                { action: 'changeType', data: 'income' }, // 9-3
+                { action: 'changeCurrency', data: USD }, // 3-4
+                { action: 'changeType', data: 'debtfrom' }, // 4-9
+                { action: 'changeType', data: 'income' }, // 9-3
+                { action: 'changeCurrency', data: USD }, // 3-4
+                { action: 'changeType', data: 'debtto' }, // 4-10
+                { action: 'changeType', data: 'debtfrom' }, // 10-9
+                { action: 'changeType', data: 'transferfrom' }, // 9-5
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 5-6
+                { action: 'changeType', data: 'debtto' }, // 6-10
+                { action: 'changeType', data: 'transferto' }, // 10-7
+                { action: 'changeDestAccount', data: this.ACC_USD }, // 7-8
+                { action: 'changeType', data: 'debtto' }, // 8-10
+                { action: 'changeType', data: 'expense' }, // 10-1
+                { action: 'changeCurrency', data: USD }, // 1-2
+                { action: 'changeType', data: 'debtfrom' }, // 2-9
+                { action: 'changeType', data: 'expense' }, // 9-1
+                { action: 'changeCurrency', data: USD }, // 1-2
+                { action: 'changeType', data: 'debtto' }, // 2-10
+            ],
+        });
+
+        await ImportTests.updateItem({
+            pos: 7,
+            action: { action: 'changePerson', data: this.MARIA },
+        });
+
+        await ImportTests.submit();
+    }
+
+    // Import templates
+    async runImportTemplateTests() {
+        await this.runCreateImportTemplateTests();
+        await this.runUpdateImportTemplateTests();
+        await this.runDeleteImportTemplateTests();
+    }
+
+    // Create import template tests
+    async runCreateImportTemplateTests() {
+        this.environment.setBlock('Create import template', 2);
+        // Select columns for template
+        await this.runner.runGroup(ImportTests.selectTemplateColumn, [
+            { column: 'accountAmount', index: 11 },
+            { column: 'transactionAmount', index: 9 },
+            { column: 'accountCurrency', index: 10 },
+            { column: 'transactionCurrency', index: 8 },
+            { column: 'date', index: 1 },
+            { column: 'comment', index: 2 },
+        ]);
+        // Input template name and save
+        await ImportTests.inputTemplateName('Template_1');
+        await ImportTests.submitTemplate();
+
+        // Create another template
+        await ImportTests.createTemplate();
+        await this.runner.runGroup(ImportTests.selectTemplateColumn, [
+            { column: 'accountAmount', index: 11 },
+            { column: 'transactionAmount', index: 9 },
+            { column: 'accountCurrency', index: 10 },
+            { column: 'transactionCurrency', index: 8 },
+            { column: 'date', index: 1 },
+            { column: 'comment', index: 2 },
+        ]);
+        await ImportTests.inputTemplateName('Template_dup');
+        await ImportTests.submitTemplate();
+    }
+
+    // Update import template tests
+    async runUpdateImportTemplateTests() {
+        this.environment.setBlock('Update import template', 2);
+
+        await ImportTests.selectTemplateByIndex(0);
+        await ImportTests.updateTemplate();
+        await ImportTests.inputTemplateName('Template_2');
+        await this.runner.runGroup(ImportTests.selectTemplateColumn, [
+            { column: 'transactionAmount', index: 11 },
+            { column: 'transactionCurrency', index: 10 },
+        ]);
+        await ImportTests.submitTemplate();
+    }
+
+    // Delete import template tests
+    async runDeleteImportTemplateTests() {
+        this.environment.setBlock('Delete import template', 2);
+
+        await ImportTests.selectTemplateByIndex(0);
+        await ImportTests.deleteTemplate();
+    }
+
+    // Import rules
+    async runImportRuleTests() {
         this.environment.setBlock('Import rules', 1);
         await ImportTests.openRulesDialog();
 
+        await this.runCreateImportRuleTests();
+        await this.runUpdateImportRuleTests();
+        await this.runDeleteImportRuleTests();
+
+        await ImportTests.closeRulesDialog();
+    }
+
+    // Create import rule tests
+    async runCreateImportRuleTests() {
         this.environment.setBlock('Create import rules', 1);
+
         // Create rule #1
         this.environment.setBlock('Create import rule', 2);
         await ImportTests.createRule();
         // Check empty rule is not submitted
-        this.environment.setBlock('Test empty rule', 3);
+        this.environment.setBlock('Submit empty rule', 3);
         await ImportTests.submitRule();
         // Add condition #1: Comment includes 'Bank Name'
         await ImportTests.createRuleCondition([
@@ -2270,24 +2527,23 @@ export class Scenario {
             { action: 'inputValue', data: 'Bank Name' },
         ]);
         // Check rule without actions is not submitted
+        this.environment.setBlock('Submit rule without actions', 3);
         await ImportTests.submitRule();
         // Add condition #2: Acount amount is greater than (empty value)
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
         ]);
-
         // Check condition with empty amount is not submitted
-        this.environment.setBlock('Test condition with empty amount', 3);
+        this.environment.setBlock('Submit condition with empty amount', 3);
         await ImportTests.submitRule();
-
+        // Update condition #2: Acount amount is greater than 100.01
         await ImportTests.updateRuleCondition({
             pos: 1,
             action: { action: 'inputAmount', data: '100.01' },
         });
-
         // Check duplicate conditions is not submitted
-        this.environment.setBlock('Test duplicate conditions', 3);
+        this.environment.setBlock('Submit duplicate conditions', 3);
         // Add condition #3: Acount amount is greater than 99.99
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
@@ -2295,36 +2551,33 @@ export class Scenario {
             { action: 'inputAmount', data: '99.99' },
         ]);
         await ImportTests.submitRule();
+        // Check condition with not intersected value regions is not submitted
+        this.environment.setBlock('Submit conditions with non-intersecting value regions', 3);
         // Update condition #3: Acount amount is less than 99.99
         await ImportTests.updateRuleCondition({
             pos: 2,
             action: { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
         });
-
-        // Check condition with not intersected value regions is not submitted
-        this.environment.setBlock('Test conditions with non-intersecting value regions', 3);
         await ImportTests.submitRule();
-
         // Update condition #3: Acount amount is less than 999.99
         await ImportTests.updateRuleCondition({
             pos: 2,
             action: { action: 'inputAmount', data: '999.99' },
         });
-
         // Add action #1: Set comment 'Ba'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'Ba' },
         ]);
         // Check duplicate actions is not submitted
-        this.environment.setBlock('Test duplicate actions', 3);
+        this.environment.setBlock('Submit duplicate actions', 3);
         // Add action #2: Set comment (empty value)
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
         ]);
         await ImportTests.submitRule();
         // Check duplicate actions is not submitted
-        this.environment.setBlock('Test empty amount action', 3);
+        this.environment.setBlock('Submit empty amount action', 3);
         await ImportTests.updateRuleAction({
             pos: 1,
             action: { action: 'changeAction', data: IMPORT_ACTION_SET_SRC_AMOUNT },
@@ -2355,7 +2608,6 @@ export class Scenario {
             pos: 0,
             action: { action: 'inputValue', data: 'C2C' },
         });
-
         // Add condition #2: Comment includes 'RBA'
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -2366,16 +2618,15 @@ export class Scenario {
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-            { action: 'changeAccount', data: ACC_RUB },
+            { action: 'changeAccount', data: this.ACC_RUB },
         ]);
         // Update condition #2: Comment includes 'R-BANK'
         await ImportTests.updateRuleCondition({
             pos: 1,
             action: { action: 'inputValue', data: 'R-BANK' },
         });
-
         // Check Date condition is not submitted with empty value
-        this.environment.setBlock('Test Date condition with empty value', 3);
+        this.environment.setBlock('Submit date condition with empty value', 3);
         // Add condition #4: Date greater than (empty value)
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_DATE },
@@ -2394,7 +2645,6 @@ export class Scenario {
             pos: 3,
             action: { action: 'inputValue', data: App.dates.yesterday },
         });
-
         // Add action #1: Set transaction type to 'Transfer from'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
@@ -2403,7 +2653,7 @@ export class Scenario {
         // Add action #2: Set account to 'ACC_EUR'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-            { action: 'changeAccount', data: ACC_EUR },
+            { action: 'changeAccount', data: this.ACC_EUR },
         ]);
         // Add action #3: Set comment 'Transfer something'
         await ImportTests.createRuleAction([
@@ -2413,7 +2663,7 @@ export class Scenario {
         // Update action #2: Set account to 'ACC_RUB'
         await ImportTests.updateRuleAction({
             pos: 1,
-            action: { action: 'changeAccount', data: ACC_RUB },
+            action: { action: 'changeAccount', data: this.ACC_RUB },
         });
         // Delete condition #1
         await ImportTests.deleteRuleCondition(0);
@@ -2422,6 +2672,7 @@ export class Scenario {
         await ImportTests.submitRule();
 
         // Create rule #3
+        this.environment.setBlock('Create import rule', 2);
         await ImportTests.createRule();
         // Add condition #1: Comment includes 'Bank Name'
         await ImportTests.createRuleCondition([
@@ -2437,6 +2688,7 @@ export class Scenario {
         await ImportTests.submitRule();
 
         // Create rule #4
+        this.environment.setBlock('Create import rule', 2);
         await ImportTests.createRule();
         // Add condition #1: Comment includes 'Bank Name'
         await ImportTests.createRuleCondition([
@@ -2450,8 +2702,10 @@ export class Scenario {
             { action: 'inputValue', data: 'Hotel, Booking' },
         ]);
         await ImportTests.submitRule();
+    }
 
-        // Update import rules
+    // Update import rule tests
+    async runUpdateImportRuleTests() {
         this.environment.setBlock('Update import rules', 1);
         // Update rule #1
         this.environment.setBlock('Update import rule', 2);
@@ -2472,14 +2726,14 @@ export class Scenario {
         // Also test correctness of data after change action type
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: ALEX },
+            { action: 'changePerson', data: this.ALEX },
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
             { action: 'changeTransactionType', data: 'debtfrom' },
         ]);
         // Add action #3: Set person to 'ALEX'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: ALEX },
+            { action: 'changePerson', data: this.ALEX },
         ]);
         await ImportTests.submitRule();
 
@@ -2495,272 +2749,12 @@ export class Scenario {
             { action: 'inputValue', data: 'C2C' },
         ]);
         await ImportTests.submitRule();
+    }
 
-        // Delete import rules
+    // Delete import rule tests
+    async runDeleteImportRuleTests() {
         this.environment.setBlock('Delete import rules', 1);
         // Delete rule #3
         await ImportTests.deleteRule(2);
-
-        await ImportTests.closeRulesDialog();
-
-        // Add item
-        this.environment.setBlock('Add item', 2);
-        await ImportTests.addItem();
-        await ImportTests.updateItem({
-            pos: 0,
-            action: [
-                { action: 'inputAmount', data: '1' },
-                { action: 'inputDate', data: App.dates.now },
-            ],
-        });
-
-        // Upload CSV file
-        this.environment.setBlock('Upload CSV', 2);
-        await ImportTests.uploadFile({
-            filename: uploadFilename,
-            data: csvStatement,
-        });
-
-        this.environment.setBlock('Create import template', 2);
-        // Select columns for template
-        await ImportTests.selectTemplateColumn({ column: 'accountAmount', index: 11 });
-        await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 9 });
-        await ImportTests.selectTemplateColumn({ column: 'accountCurrency', index: 10 });
-        await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 8 });
-        await ImportTests.selectTemplateColumn({ column: 'date', index: 1 });
-        await ImportTests.selectTemplateColumn({ column: 'comment', index: 2 });
-        // Input template name and save
-        await ImportTests.inputTemplateName('Template_1');
-        await ImportTests.submitTemplate();
-        // Update template
-        this.environment.setBlock('Update import template', 2);
-        await ImportTests.updateTemplate();
-        await ImportTests.inputTemplateName('Template_2');
-        await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 11 });
-        await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 10 });
-        await ImportTests.submitTemplate();
-
-        // Create another template
-        await ImportTests.createTemplate();
-        await ImportTests.selectTemplateColumn({ column: 'accountAmount', index: 11 });
-        await ImportTests.selectTemplateColumn({ column: 'transactionAmount', index: 9 });
-        await ImportTests.selectTemplateColumn({ column: 'accountCurrency', index: 10 });
-        await ImportTests.selectTemplateColumn({ column: 'transactionCurrency', index: 8 });
-        await ImportTests.selectTemplateColumn({ column: 'date', index: 1 });
-        await ImportTests.selectTemplateColumn({ column: 'comment', index: 2 });
-        await ImportTests.inputTemplateName('Template_dup');
-        await ImportTests.submitTemplate();
-
-        // Delete new template
-        this.environment.setBlock('Delete import template', 2);
-        await ImportTests.selectTemplateByIndex(0);
-        await ImportTests.deleteTemplate();
-
-        // Submit converted transactions
-        await ImportTests.submitUploaded({ data: csvStatement, account: ACC_RUB });
-
-        // Disable all items except 0 and 1
-        await ImportTests.enableItems({
-            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-            value: false,
-        });
-        await ImportTests.deleteItems([3, 5]);
-        await ImportTests.submit();
-
-        // Verify submit is disabled for empty list
-        this.environment.setBlock('Verify submit is disabled for empty list', 2);
-        await ImportTests.submit();
-        // Verify submit is disabled for list with no enabled items
-        this.environment.setBlock('Verify submit is disabled for list with no enabled items', 2);
-        await ImportTests.uploadFile({
-            filename: uploadFilename,
-            data: csvStatement,
-        });
-        await ImportTests.submitUploaded({
-            data: csvStatement,
-            template: 0,
-        });
-        await ImportTests.enableItems({
-            index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-            value: false,
-        });
-        await ImportTests.submit();
-
-        this.environment.setBlock('Import item state loop', 2);
-        await ImportTests.changeMainAccount(ACC_3);
-        await ImportTests.enableItems({
-            index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-            value: true,
-        });
-
-        await ImportTests.updateItem({
-            pos: 0,
-            action: [
-                { action: 'changeCurrency', data: this.USD }, // 1-2
-                { action: 'changeCurrency', data: this.RUB }, // 2-1
-                { action: 'changeType', data: 'income' }, // 1-3
-                { action: 'changeType', data: 'expense' }, // 3-1
-                { action: 'changeType', data: 'transferfrom' }, // 1-5
-                { action: 'changeType', data: 'expense' }, // 5-1
-                { action: 'changeType', data: 'transferto' }, // 1-7
-                { action: 'changeType', data: 'expense' }, // 7-1
-                { action: 'changeType', data: 'debtfrom' }, // 1-9
-                { action: 'changeType', data: 'expense' }, // 9-1
-                { action: 'changeType', data: 'debtto' }, // 1-10
-                { action: 'changeType', data: 'expense' }, // 10-1
-                { action: 'changeType', data: 'income' }, // 1-3
-                { action: 'changeCurrency', data: this.USD }, // 3-4
-                { action: 'changeType', data: 'expense' }, // 4-2
-                { action: 'changeType', data: 'income' }, // 2-4
-                { action: 'changeCurrency', data: this.RUB }, // 4-3
-                { action: 'changeType', data: 'transferfrom' }, // 3-5
-                { action: 'changeType', data: 'income' }, // 5-3
-                { action: 'changeType', data: 'transferto' }, // 3-7
-                { action: 'changeType', data: 'income' }, // 7-3
-                { action: 'changeType', data: 'debtfrom' }, // 3-9
-                { action: 'changeType', data: 'income' }, // 9-3
-                { action: 'changeType', data: 'debtto' }, // 3-10
-                { action: 'changeType', data: 'income' }, // 10-3
-                { action: 'changeCurrency', data: this.USD }, // 3-4
-                { action: 'changeType', data: 'expense' }, // 4-2
-                { action: 'changeType', data: 'transferfrom' }, // 2-5
-                { action: 'changeType', data: 'transferto' }, // 5-7
-                { action: 'changeType', data: 'transferfrom' }, // 7-5
-                { action: 'changeType', data: 'debtfrom' }, // 5-9
-                { action: 'changeType', data: 'transferfrom' }, // 9-5
-                { action: 'changeType', data: 'debtto' }, // 5-10
-                { action: 'changeType', data: 'transferfrom' }, // 10-5
-                { action: 'changeType', data: 'expense' }, // 5-1
-                { action: 'changeCurrency', data: this.USD }, // 1-2
-                { action: 'changeType', data: 'transferto' }, // 2-7
-                { action: 'changeType', data: 'debtfrom' }, // 7-9
-                { action: 'changeType', data: 'transferto' }, // 9-7
-                { action: 'changeType', data: 'debtto' }, // 7-10
-                { action: 'changeType', data: 'income' }, // 10-3
-                { action: 'changeCurrency', data: this.USD }, // 3-4
-                { action: 'changeType', data: 'transferfrom' }, // 4-5
-                { action: 'changeDestAccount', data: ACC_USD }, // 5-6
-                { action: 'changeType', data: 'expense' }, // 6-1
-                { action: 'changeType', data: 'transferfrom' }, // 1-5
-                { action: 'changeDestAccount', data: ACC_USD }, // 5-6
-                { action: 'changeType', data: 'income' }, // 6-3
-                { action: 'changeType', data: 'transferfrom' }, // 3-5
-                { action: 'changeDestAccount', data: ACC_USD }, // 5-6
-                { action: 'changeDestAccount', data: ACC_RUB }, // 6-5
-                { action: 'changeDestAccount', data: ACC_USD }, // 5-6
-                { action: 'changeType', data: 'transferto' }, // 6-8
-                { action: 'changeType', data: 'expense' }, // 8-1
-                { action: 'changeType', data: 'transferto' }, // 1-7
-                { action: 'changeDestAccount', data: ACC_USD }, // 7-8
-                { action: 'changeType', data: 'income' }, // 8-3
-                { action: 'changeCurrency', data: this.USD }, // 3-4
-                { action: 'changeType', data: 'transferto' }, // 4-7
-                { action: 'changeDestAccount', data: ACC_USD }, // 7-8
-            ],
-        });
-
-        /** Prepare items of all states */
-        await ImportTests.updateItem({
-            pos: 1,
-            action: [
-                { action: 'changeCurrency', data: this.USD }, // 1-2
-                { action: 'inputDestAmount', data: '50.03' },
-            ],
-        });
-        await ImportTests.updateItem({
-            pos: 2,
-            action: { action: 'changeType', data: 'income' }, // 1-3
-        });
-        await ImportTests.updateItem({
-            pos: 3,
-            action: [
-                { action: 'changeCurrency', data: this.USD }, // 1-2
-                { action: 'changeType', data: 'income' }, // 2-4
-                { action: 'inputDestAmount', data: '500' },
-            ],
-        });
-        await ImportTests.updateItem({
-            pos: 4,
-            action: { action: 'changeType', data: 'transferfrom' }, // 1-5
-        });
-        await ImportTests.updateItem({
-            pos: 5,
-            action: [
-                { action: 'changeType', data: 'transferfrom' }, // 1-5
-                { action: 'changeDestAccount', data: ACC_USD }, // 5-6
-                { action: 'inputDestAmount', data: '50.03' },
-            ],
-        });
-        await ImportTests.updateItem({
-            pos: 6,
-            action: { action: 'changeType', data: 'transferto' }, // 1-7
-        });
-        await ImportTests.updateItem({
-            pos: 7,
-            action: [
-                { action: 'changeType', data: 'debtfrom' }, // 1-9
-                { action: 'changePerson', data: ALEX },
-            ],
-        });
-        await ImportTests.updateItem({
-            pos: 8,
-            action: { action: 'changeType', data: 'debtto' }, // 1-10
-        });
-
-        await ImportTests.changeMainAccount(ACC_EUR);
-
-        await ImportTests.updateItem({
-            pos: 0,
-            action: { action: 'changeDestAccount', data: ACC_3 }, // 8-8
-        });
-
-        await ImportTests.changeMainAccount(ACC_3); // for item 0: 8-7
-
-        await ImportTests.updateItem({
-            pos: 0,
-            action: [
-                { action: 'changeDestAccount', data: ACC_USD }, // 7-8
-                { action: 'changeType', data: 'transferfrom' }, // 8-6
-                { action: 'changeType', data: 'debtfrom' }, // 6-9
-                { action: 'changeType', data: 'debtto' }, // 9-10
-                { action: 'changeType', data: 'transferto' }, // 10-7
-                { action: 'changeDestAccount', data: ACC_USD }, // 7-8
-                { action: 'changeType', data: 'debtfrom' }, // 8-9
-                { action: 'changeType', data: 'income' }, // 9-3
-                { action: 'changeCurrency', data: this.USD }, // 3-4
-                { action: 'changeType', data: 'debtfrom' }, // 4-9
-                { action: 'changeType', data: 'income' }, // 9-3
-                { action: 'changeCurrency', data: this.USD }, // 3-4
-                { action: 'changeType', data: 'debtto' }, // 4-10
-                { action: 'changeType', data: 'debtfrom' }, // 10-9
-                { action: 'changeType', data: 'transferfrom' }, // 9-5
-                { action: 'changeDestAccount', data: ACC_USD }, // 5-6
-                { action: 'changeType', data: 'debtto' }, // 6-10
-                { action: 'changeType', data: 'transferto' }, // 10-7
-                { action: 'changeDestAccount', data: ACC_USD }, // 7-8
-                { action: 'changeType', data: 'debtto' }, // 8-10
-                { action: 'changeType', data: 'expense' }, // 10-1
-                { action: 'changeCurrency', data: this.USD }, // 1-2
-                { action: 'changeType', data: 'debtfrom' }, // 2-9
-                { action: 'changeType', data: 'expense' }, // 9-1
-                { action: 'changeCurrency', data: this.USD }, // 1-2
-                { action: 'changeType', data: 'debtto' }, // 2-10
-            ],
-        });
-
-        await ImportTests.updateItem({
-            pos: 7,
-            action: { action: 'changePerson', data: MARIA },
-        });
-
-        await ImportTests.submit();
-
-        // Remove uploaded file
-        await ApiTests.loginTest(App.config.testAdminUser);
-        await App.setupUser();
-        await ImportTests.removeFile(uploadFilename);
-        await ApiTests.loginTest(App.config.testUser);
-        await App.setupUser();
-        await ProfileTests.relogin(App.config.testUser);
     }
 }
