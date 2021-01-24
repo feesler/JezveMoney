@@ -90,6 +90,18 @@ ImportRulesDialog.prototype.reset = function () {
     };
 };
 
+/** Set loading state and render component */
+ImportRulesDialog.prototype.startLoading = function () {
+    this.state.listLoading = true;
+    this.render(this.state);
+};
+
+/** Remove loading state and render component */
+ImportRulesDialog.prototype.stopLoading = function () {
+    this.state.listLoading = false;
+    this.render(this.state);
+};
+
 /** Hide dialog */
 ImportRulesDialog.prototype.onClose = function () {
     this.reset();
@@ -165,8 +177,7 @@ ImportRulesDialog.prototype.submitRule = function (data) {
 
     reqURL += (data.id) ? 'update' : 'create';
 
-    this.state.listLoading = true;
-    this.render(this.state);
+    this.startLoading();
 
     ajax.post({
         url: reqURL,
@@ -186,8 +197,7 @@ ImportRulesDialog.prototype.deleteRule = function (ruleId) {
         throw new Error('Invalid rule id');
     }
 
-    this.state.listLoading = true;
-    this.render(this.state);
+    this.startLoading();
 
     ajax.post({
         url: reqURL,
@@ -206,6 +216,7 @@ ImportRulesDialog.prototype.onRuleRequestResult = function (response) {
         jsondata = JSON.parse(response);
     } catch (e) {
         createMessage(this.jsonParseErrorMessage, 'msg_error');
+        this.stopLoading();
         return;
     }
 
@@ -217,6 +228,7 @@ ImportRulesDialog.prototype.onRuleRequestResult = function (response) {
         this.requestRulesList();
     } catch (e) {
         createMessage(e.message, 'msg_error');
+        this.stopLoading();
     }
 };
 
@@ -237,6 +249,7 @@ ImportRulesDialog.prototype.onRulesListResult = function (response) {
         jsondata = JSON.parse(response);
     } catch (e) {
         createMessage(this.jsonParseErrorMessage, 'msg_error');
+        this.stopLoading();
         return;
     }
 
@@ -245,14 +258,14 @@ ImportRulesDialog.prototype.onRulesListResult = function (response) {
             throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
         }
 
-        this.state.listLoading = false;
         this.model.rules.setData(jsondata.data);
         this.state.id = this.LIST_STATE;
         delete this.state.rule;
-        this.render(this.state);
+        this.stopLoading();
         this.parent.onUpdateRules();
     } catch (e) {
         createMessage(e.message, 'msg_error');
+        this.stopLoading();
     }
 };
 
