@@ -391,7 +391,7 @@ export function applyRules(transaction, rules) {
         }
 
         // Run actions of matched rule
-        res = rule.actions.data.reduce((data, act) => applyAction(data, act), res);
+        res = rule.actions.reduce((data, act) => applyAction(data, act), res);
     }
 
     return res;

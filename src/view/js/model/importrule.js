@@ -105,7 +105,7 @@ ImportRule.prototype.validate = function () {
     var result = { valid: false };
 
     // Check conditions
-    if (!this.conditions.data.length) {
+    if (!this.conditions.length) {
         result.message = 'Rule must contain at least one condition';
         return result;
     }
@@ -115,7 +115,7 @@ ImportRule.prototype.validate = function () {
     greaterConds = new ImportConditionList();
 
     try {
-        this.conditions.data.forEach(function (condition, ind) {
+        this.conditions.forEach(function (condition, ind) {
             // Check full duplicates of condition
             if (this.conditions.hasSameCondition(condition)) {
                 throw new ImportConditionValidationError('Duplicate condition', ind);
@@ -209,12 +209,12 @@ ImportRule.prototype.validate = function () {
     }
 
     // Check actions
-    if (!this.actions.data.length) {
+    if (!this.actions.length) {
         result.message = 'Rule must contain at least one action';
         return result;
     }
     try {
-        this.actions.data.forEach(function (action, ind) {
+        this.actions.forEach(function (action, ind) {
             // Check each type of action is used only once
             if (ruleActionTypes.includes(action.action_id)) {
                 throw new ImportActionValidationError('Duplicate action type', ind);
@@ -282,7 +282,7 @@ ImportRuleList.prototype.createItem = function (obj) {
  * @param {Object} context - transaction row object
  */
 ImportRuleList.prototype.applyTo = function (data, context) {
-    this.data.forEach(function (rule) {
+    this.forEach(function (rule) {
         if (!rule.meetConditions(data)) {
             return;
         }

@@ -16,7 +16,7 @@ export class ImportConditionList extends List {
             throw new Error('Invalid rule id');
         }
 
-        return this.data.filter((item) => item.rule_id === id);
+        return this.filter((item) => item.rule_id === id);
     }
 
     /**
@@ -28,7 +28,7 @@ export class ImportConditionList extends List {
             throw new Error('Invalid condition');
         }
 
-        return !!this.data.find((item) => (
+        return !!this.find((item) => (
             item !== condition
             && item.field_id === condition.field_id
             && item.operator === condition.operator
@@ -46,7 +46,7 @@ export class ImportConditionList extends List {
             throw new Error('Invalid condition');
         }
 
-        return !!this.data.find((item) => (
+        return !!this.find((item) => (
             item !== condition
             && item.flags === condition.flags
             && item.field_id === condition.field_id
@@ -68,7 +68,7 @@ export class ImportConditionList extends List {
         }
 
         const value = condition.getConditionValue({});
-        return !!this.data.find((item) => (
+        return !!this.find((item) => (
             item !== condition
             && !item.isPropertyValue()
             && item.field_id === condition.field_id
@@ -91,7 +91,7 @@ export class ImportConditionList extends List {
         }
 
         const value = condition.getConditionValue({});
-        return !!this.data.find((item) => (
+        return !!this.find((item) => (
             item !== condition
             && !item.isPropertyValue()
             && item.field_id === condition.field_id

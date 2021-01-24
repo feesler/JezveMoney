@@ -1677,11 +1677,11 @@ export class Scenario {
             return [];
         });
 
-        const trList = App.state.transactions.filter({
+        const trList = App.state.transactions.applyFilter({
             accounts: accountIds.concat(personsAccounts),
         });
         if (trList.length === data.length * App.dateList.length) {
-            return trList.data.map((item) => item.id);
+            return trList.getIds();
         }
 
         const multi = [];

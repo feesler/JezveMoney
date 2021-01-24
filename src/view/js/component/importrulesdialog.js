@@ -258,13 +258,7 @@ ImportRulesDialog.prototype.onRulesListResult = function (response) {
 
 /** Render list state of component */
 ImportRulesDialog.prototype.renderList = function () {
-    var ruleItems;
-
-    if (!Array.isArray(this.model.rules.data)) {
-        throw new Error('Invalid list of rules');
-    }
-
-    ruleItems = this.model.rules.data.map(function (rule) {
+    var ruleItems = this.model.rules.map(function (rule) {
         return new ImportRuleItem({
             parent: this.parent,
             data: rule,

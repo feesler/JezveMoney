@@ -76,7 +76,7 @@ function ImportTransactionItem() {
     // Currency controls
     this.currIdInp = ce('input', { type: 'hidden', name: 'curr_id[]' });
     this.currSel = ce('select', {}, ce('option', { value: 0, textContent: '', disabled: true }));
-    this.model.currency.data.forEach(function (currency) {
+    this.model.currency.forEach(function (currency) {
         var option = ce('option', {
             value: currency.id,
             textContent: currency.name
@@ -102,22 +102,22 @@ function ImportTransactionItem() {
             ce('option', {
                 value: 'transferfrom',
                 textContent: 'Transfer>',
-                disabled: (this.model.accounts.data.length < 2)
+                disabled: (this.model.accounts.length < 2)
             }),
             ce('option', {
                 value: 'transferto',
                 textContent: 'Transfer<',
-                disabled: (this.model.accounts.data.length < 2)
+                disabled: (this.model.accounts.length < 2)
             }),
             ce('option', {
                 value: 'debtfrom',
                 textContent: 'Debt>',
-                disabled: (!this.model.persons.data.length)
+                disabled: (!this.model.persons.length)
             }),
             ce('option', {
                 value: 'debtto',
                 textContent: 'Debt<',
-                disabled: (!this.model.persons.data.length)
+                disabled: (!this.model.persons.length)
             })
         ]);
     this.trTypeSel.addEventListener('change', this.onTrTypeChanged.bind(this));
@@ -135,7 +135,7 @@ function ImportTransactionItem() {
             selected: true
         })
     );
-    this.model.accounts.data.forEach(function (account) {
+    this.model.accounts.forEach(function (account) {
         var option = ce('option', {
             value: account.id,
             textContent: account.name,
@@ -160,7 +160,7 @@ function ImportTransactionItem() {
         }),
         { change: this.onPersonChanged.bind(this) }
     );
-    this.model.persons.data.forEach(function (person) {
+    this.model.persons.forEach(function (person) {
         var option = ce('option', { value: person.id, textContent: person.name });
         this.personSel.appendChild(option);
     }, this);
@@ -414,7 +414,7 @@ ImportTransactionItem.prototype.getNextAccount = function (accountId) {
     var resInd;
     var res;
 
-    if (!userVisible.data.length) {
+    if (!userVisible.length) {
         return null;
     }
 
@@ -422,7 +422,7 @@ ImportTransactionItem.prototype.getNextAccount = function (accountId) {
         return userVisible.getItemByIndex(0);
     }
 
-    if (userVisible.data.length < 2) {
+    if (userVisible.length < 2) {
         return null;
     }
 
@@ -431,7 +431,7 @@ ImportTransactionItem.prototype.getNextAccount = function (accountId) {
         return null;
     }
 
-    resInd = (ind === userVisible.data.length - 1) ? 0 : ind + 1;
+    resInd = (ind === userVisible.length - 1) ? 0 : ind + 1;
     res = userVisible.getItemByIndex(resInd);
 
     return res;

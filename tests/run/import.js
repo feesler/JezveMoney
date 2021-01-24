@@ -73,7 +73,7 @@ function isSimilarTransaction(item, reference) {
 }
 
 function findSimilar(transaction, skipList) {
-    const res = App.state.transactions.data.find(
+    const res = App.state.transactions.find(
         (item) => !skipList.includes(item.id) && isSimilarTransaction(item, transaction),
     );
 

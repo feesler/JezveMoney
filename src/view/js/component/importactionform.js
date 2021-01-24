@@ -89,7 +89,7 @@ ImportActionForm.prototype.init = function () {
     this.accountSel = ce(
         'select',
         {},
-        this.model.accounts.data.map(function (account) {
+        this.model.accounts.map(function (account) {
             return ce('option', { value: account.id, textContent: account.name });
         }),
         { change: this.onValueChange.bind(this) }
@@ -99,7 +99,7 @@ ImportActionForm.prototype.init = function () {
     this.personSel = ce(
         'select',
         {},
-        this.model.persons.data.map(function (person) {
+        this.model.persons.map(function (person) {
             return ce('option', { value: person.id, textContent: person.name });
         }),
         { change: this.onValueChange.bind(this) }

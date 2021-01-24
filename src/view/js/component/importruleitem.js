@@ -258,7 +258,7 @@ ImportRuleItem.prototype.render = function (state) {
     show(this.operatorLabel, (conditionItems.length > 0));
     show(this.valueLabel, (conditionItems.length > 0));
 
-    if (!state.actions.data.length) {
+    if (!state.actions.length) {
         actionsTitle = 'No actions.';
     } else {
         actionsTitle = state.actions.length + ' action(s).';

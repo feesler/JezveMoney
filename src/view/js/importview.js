@@ -86,7 +86,7 @@ ImportView.prototype.onStart = function () {
 
 /** Import rules 'update' event handler */
 ImportView.prototype.onUpdateRules = function () {
-    var rulesCount = this.model.rules.data.length;
+    var rulesCount = this.model.rules.length;
 
     this.rulesCountElem.textContent = rulesCount;
 };

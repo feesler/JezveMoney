@@ -30,12 +30,12 @@ export class ImportRule {
 
     /** Check specified data is meet all conditions of rule */
     meetConditions(data) {
-        return this.conditions.data.every((condition) => condition.meet(data));
+        return this.conditions.every((condition) => condition.meet(data));
     }
 
     /** Run actions assigned to rule */
     runActions(context) {
-        this.actions.data.forEach((item) => item.execute(context));
+        this.actions.forEach((item) => item.execute(context));
     }
 
     /** Validate amount value */
@@ -141,7 +141,7 @@ export class ImportRule {
         }
 
         // Check actions
-        if (!this.actions.data.length) {
+        if (!this.actions.length) {
             return false;
         }
 

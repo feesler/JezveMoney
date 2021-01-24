@@ -67,7 +67,7 @@ ImportConditionForm.prototype.init = function () {
             var isDisabled = false;
 
             if (ImportCondition.isTemplateField(fieldType.id)) {
-                isDisabled = !this.model.template.data.length;
+                isDisabled = !this.model.template.length;
             }
 
             return ce('option', {
@@ -93,7 +93,7 @@ ImportConditionForm.prototype.init = function () {
     this.accountSel = ce(
         'select',
         {},
-        this.model.accounts.data.map(function (account) {
+        this.model.accounts.map(function (account) {
             return ce('option', { value: account.id, textContent: account.name });
         }),
         { change: this.onValueChange.bind(this) }
@@ -103,7 +103,7 @@ ImportConditionForm.prototype.init = function () {
     this.templateSel = ce(
         'select',
         {},
-        this.model.template.data.map(function (template) {
+        this.model.template.map(function (template) {
             return ce('option', { value: template.id, textContent: template.name });
         }),
         { change: this.onValueChange.bind(this) }
@@ -113,7 +113,7 @@ ImportConditionForm.prototype.init = function () {
     this.currencySel = ce(
         'select',
         {},
-        this.model.currency.data.map(function (currency) {
+        this.model.currency.map(function (currency) {
             return ce('option', { value: currency.id, textContent: currency.name });
         }),
         { change: this.onValueChange.bind(this) }

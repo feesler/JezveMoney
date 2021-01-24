@@ -37,6 +37,10 @@ export class List {
         this.setData(newData);
     }
 
+    getIds() {
+        return this.data.map((item) => item.id);
+    }
+
     getItem(id) {
         const itemId = parseInt(id, 10);
         if (!itemId) {
@@ -197,5 +201,41 @@ export class List {
         }
 
         return res;
+    }
+
+    forEach(...args) {
+        this.data.forEach(...args);
+    }
+
+    every(...args) {
+        return this.data.every(...args);
+    }
+
+    some(...args) {
+        return this.data.some(...args);
+    }
+
+    find(...args) {
+        return this.data.find(...args);
+    }
+
+    findIndex(...args) {
+        return this.data.findIndex(...args);
+    }
+
+    filter(...args) {
+        return this.data.filter(...args);
+    }
+
+    map(...args) {
+        return this.data.map(...args);
+    }
+
+    reduce(...args) {
+        return this.data.reduce(...args);
+    }
+
+    slice(...args) {
+        return this.data.slice(...args);
     }
 }

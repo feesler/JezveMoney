@@ -91,7 +91,7 @@ CurrencyList.prototype.formatCurrency = function (value, currencyId) {
  * @param {string} name - currency name
  */
 CurrencyList.prototype.findByName = function (name) {
-    return this.data.find(function (item) {
+    return this.find(function (item) {
         return item.name === name;
     });
 };

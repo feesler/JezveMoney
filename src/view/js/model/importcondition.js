@@ -440,7 +440,7 @@ ImportConditionList.prototype.getRuleConditions = function (ruleId) {
         throw new Error('Invalid rule id');
     }
 
-    return this.data.filter(function (item) {
+    return this.filter(function (item) {
         return item.rule_id === id;
     });
 };
@@ -454,7 +454,7 @@ ImportConditionList.prototype.hasSameCondition = function (condition) {
         throw new Error('Invalid condition');
     }
 
-    return !!this.data.find(function (item) {
+    return !!this.find(function (item) {
         return (
             item !== condition
             && item.field_id === condition.field_id
@@ -474,7 +474,7 @@ ImportConditionList.prototype.hasSameFieldCondition = function (condition) {
         throw new Error('Invalid condition');
     }
 
-    return !!this.data.find(function (item) {
+    return !!this.find(function (item) {
         return (
             item !== condition
             && item.flags === condition.flags
@@ -500,7 +500,7 @@ ImportConditionList.prototype.hasNotLessCondition = function (condition) {
     }
 
     value = condition.getConditionValue({});
-    return !!this.data.find(function (item) {
+    return !!this.find(function (item) {
         return (
             item !== condition
             && !item.isPropertyValue()
@@ -527,7 +527,7 @@ ImportConditionList.prototype.hasNotGreaterCondition = function (condition) {
     }
 
     value = condition.getConditionValue({});
-    return !!this.data.find(function (item) {
+    return !!this.find(function (item) {
         return (
             item !== condition
             && !item.isPropertyValue()

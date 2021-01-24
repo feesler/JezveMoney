@@ -163,7 +163,7 @@ ImportTemplateManager.prototype.setRawData = function (data) {
 
     this.state.rawData = copyObject(data);
 
-    if (this.model.template.data.length > 0) {
+    if (this.model.template.length > 0) {
         this.state.id = this.RAW_DATA_STATE;
         value = selectedValue(this.templateSel);
         this.setTemplate(value);
@@ -339,7 +339,7 @@ ImportTemplateManager.prototype.onTemplateListResult = function (response) {
 
         this.state.listLoading = false;
         this.model.template.setData(jsondata.data);
-        if (this.model.template.data.length > 0) {
+        if (this.model.template.length > 0) {
             this.state.id = this.RAW_DATA_STATE;
             this.renderTemplateSelect();
         } else {
@@ -392,14 +392,14 @@ ImportTemplateManager.prototype.renderTemplateSelect = function () {
 
     // Find template with same name as currently selected
     if (this.state.template) {
-        selectedTemplate = this.model.template.data.find(function (item) {
+        selectedTemplate = this.model.template.find(function (item) {
             return (item.name === this.state.template.name);
         }, this);
     }
 
     removeChilds(this.templateSel);
 
-    dataOptions = this.model.template.data.map(function (item) {
+    dataOptions = this.model.template.map(function (item) {
         return ce('option', { value: item.id, textContent: item.name });
     });
     addChilds(this.templateSel, dataOptions);
@@ -533,7 +533,7 @@ ImportTemplateManager.prototype.render = function (state) {
     var propertiesPerColumn = 0;
     var isValid;
 
-    templateAvail = (this.model.template.data.length > 0);
+    templateAvail = (this.model.template.length > 0);
     if (state.id === this.LOADING_STATE) {
         show(this.loadingIndicator, true);
         show(this.tableDescr, false);

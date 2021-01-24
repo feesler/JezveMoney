@@ -167,7 +167,7 @@ ImportRuleForm.prototype.getNextAvailAction = function (state) {
     }
 
     // Obtain action types currently used by rule
-    ruleActionTypes = state.rule.actions.data.map(function (action) {
+    ruleActionTypes = state.rule.actions.map(function (action) {
         return action.action_id;
     });
     // Search for first action type not in list
@@ -178,7 +178,6 @@ ImportRuleForm.prototype.getNextAvailAction = function (state) {
 
 /** Create action button 'click' event handler */
 ImportRuleForm.prototype.onCreateActionClick = function (e) {
-    var action;
     var actionType;
     var actionData;
 
@@ -194,8 +193,7 @@ ImportRuleForm.prototype.onCreateActionClick = function (e) {
         value: ''
     };
 
-    action = new ImportAction(actionData);
-    this.state.rule.actions.data.push(action);
+    this.state.rule.actions.addItem(actionData);
 
     this.state.conditionsCollapsed = true;
     this.state.actionsCollapsed = false;
@@ -214,13 +212,13 @@ ImportRuleForm.prototype.getNextAvailProperty = function (state) {
     }
 
     // Obtain condition field types currently used by rule
-    ruleFieldTypes = state.rule.conditions.data.map(function (condition) {
+    ruleFieldTypes = state.rule.conditions.map(function (condition) {
         return condition.field_id;
     });
     // Filter available field types
     availFields = this.fieldTypes.filter(function (fieldType) {
         if (ImportCondition.isTemplateField(fieldType.id)) {
-            return this.model.template.data.length > 0;
+            return this.model.template.length > 0;
         }
 
         return true;
@@ -273,7 +271,6 @@ ImportRuleForm.prototype.getDefaultValue = function (fieldId) {
 /** Create condition button 'click' event handler */
 ImportRuleForm.prototype.onCreateConditionClick = function (e) {
     var fieldType;
-    var condition;
     var conditionData;
 
     e.stopPropagation();
@@ -290,8 +287,7 @@ ImportRuleForm.prototype.onCreateConditionClick = function (e) {
         flags: 0
     };
 
-    condition = new ImportCondition(conditionData);
-    this.state.rule.conditions.data.push(condition);
+    this.state.rule.conditions.addItem(conditionData);
 
     this.state.conditionsCollapsed = false;
     this.state.actionsCollapsed = true;
@@ -369,44 +365,24 @@ ImportRuleForm.prototype.onCancel = function () {
 
 /** Condition 'update' event handler */
 ImportRuleForm.prototype.onConditionUpdate = function (index, data) {
-    if (!data
-        || index < 0
-        || index >= this.state.rule.conditions.data.length) {
-        return;
-    }
-
-    this.state.rule.conditions.data[index] = new ImportCondition(data);
+    this.state.rule.conditions.updateItemByIndex(index, data);
 };
 
 /** Condition 'delete' event handler */
 ImportRuleForm.prototype.onConditionDelete = function (index) {
-    if (index < 0 || index >= this.state.rule.conditions.data.length) {
-        return;
-    }
-
-    this.state.rule.conditions.data.splice(index, 1);
+    this.state.rule.conditions.deleteItemByIndex(index);
     this.state.validation = null;
     this.render(this.state);
 };
 
 /** Action 'update' event handler */
 ImportRuleForm.prototype.onActionUpdate = function (index, data) {
-    if (!data
-        || index < 0
-        || index >= this.state.rule.actions.data.length) {
-        return;
-    }
-
-    this.state.rule.actions.data[index] = new ImportAction(data);
+    this.state.rule.actions.updateItemByIndex(index, data);
 };
 
 /** Action 'delete' event handler */
 ImportRuleForm.prototype.onActionDelete = function (index) {
-    if (index < 0 || index >= this.state.rule.actions.data.length) {
-        return;
-    }
-
-    this.state.rule.actions.data.splice(index, 1);
+    this.state.rule.actions.deleteItemByIndex(index);
     this.state.validation = null;
     this.render(this.state);
 };
@@ -473,7 +449,7 @@ ImportRuleForm.prototype.render = function (state) {
     } else {
         this.formActions.classList.remove('collapsed');
     }
-    actionItems = state.rule.actions.data.map(function (action, index) {
+    actionItems = state.rule.actions.map(function (action, index) {
         var props = {
             parent: this,
             data: action,
@@ -502,7 +478,7 @@ ImportRuleForm.prototype.render = function (state) {
     } else {
         this.formConditions.classList.remove('collapsed');
     }
-    conditionItems = state.rule.conditions.data.map(function (condition, index) {
+    conditionItems = state.rule.conditions.map(function (condition, index) {
         var props = {
             parent: this,
             data: condition,

@@ -130,15 +130,15 @@ export class AccountsList extends List {
 
         if (caseSens) {
             lookupName = name;
-            return this.data.find((item) => item.name === lookupName);
+            return this.find((item) => item.name === lookupName);
         }
 
         lookupName = name.toLowerCase();
-        return this.data.find((item) => item.name.toLowerCase() === lookupName);
+        return this.find((item) => item.name.toLowerCase() === lookupName);
     }
 
     getUserAccounts(returnRaw = false) {
-        const res = this.data.filter((item) => item.owner_id === App.owner_id);
+        const res = this.filter((item) => item.owner_id === App.owner_id);
 
         if (returnRaw) {
             return copyObject(res);
@@ -156,7 +156,7 @@ export class AccountsList extends List {
     }
 
     getVisible(returnRaw = false) {
-        const res = this.data.filter((item) => !this.isHidden(item));
+        const res = this.filter((item) => !this.isHidden(item));
 
         if (returnRaw) {
             return copyObject(res);
@@ -166,7 +166,7 @@ export class AccountsList extends List {
     }
 
     getHidden(returnRaw = false) {
-        const res = this.data.filter((item) => this.isHidden(item));
+        const res = this.filter((item) => this.isHidden(item));
 
         if (returnRaw) {
             return copyObject(res);

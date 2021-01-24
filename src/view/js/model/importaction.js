@@ -212,14 +212,14 @@ ImportActionList.prototype.getRuleActions = function (ruleId) {
         throw new Error('Invalid rule id');
     }
 
-    return this.data.filter(function (item) {
+    return this.filter(function (item) {
         return item.rule_id === id;
     });
 };
 
 /** Check list has `Set transaction type` action with 'transferfrom' or 'transferto' value */
 ImportActionList.prototype.hasSetTransfer = function () {
-    return !!this.data.find(function (item) {
+    return !!this.find(function (item) {
         return (
             item.action_id === IMPORT_ACTION_SET_TR_TYPE
             && (
@@ -232,7 +232,7 @@ ImportActionList.prototype.hasSetTransfer = function () {
 
 /** Check list has `Set transaction type` action with 'debtfrom' or 'debtto' value */
 ImportActionList.prototype.hasSetDebt = function () {
-    return !!this.data.find(function (item) {
+    return !!this.find(function (item) {
         return (
             item.action_id === IMPORT_ACTION_SET_TR_TYPE
             && (

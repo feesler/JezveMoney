@@ -513,7 +513,7 @@ export class AppState {
             return null;
         }
 
-        const accObj = this.accounts.data.find(
+        const accObj = this.accounts.find(
             (item) => item.owner_id === pId && item.curr_id === currId,
         );
 
@@ -739,7 +739,7 @@ export class AppState {
 
     updatePersonAccounts() {
         for (const person of this.persons.data) {
-            person.accounts = this.accounts.data.filter((item) => item.owner_id === person.id)
+            person.accounts = this.accounts.filter((item) => item.owner_id === person.id)
                 .map((item) => ({ id: item.id, balance: item.balance, curr_id: item.curr_id }));
         }
     }
@@ -994,7 +994,7 @@ export class AppState {
     }
 
     deleteEmptyRules() {
-        this.rules.data = this.rules.data.filter(
+        this.rules.data = this.rules.filter(
             (rule) => (rule.conditions.length > 0 && rule.actions.length > 0),
         );
     }
@@ -1006,7 +1006,7 @@ export class AppState {
         }
 
         itemIds = itemIds.map((id) => parseInt(id, 10));
-        this.rules.data = this.rules.data.map((rule) => {
+        this.rules.data = this.rules.map((rule) => {
             const res = rule;
 
             res.conditions = res.conditions.filter(
@@ -1045,7 +1045,7 @@ export class AppState {
         }
 
         itemIds = itemIds.map((id) => parseInt(id, 10));
-        this.rules.data = this.rules.data.map((rule) => {
+        this.rules.data = this.rules.map((rule) => {
             const res = rule;
 
             res.conditions = res.conditions.filter(
@@ -1073,7 +1073,7 @@ export class AppState {
         }
 
         itemIds = itemIds.map((id) => parseInt(id, 10));
-        this.rules.data = this.rules.data.map((rule) => {
+        this.rules.data = this.rules.map((rule) => {
             const res = rule;
 
             res.actions = res.actions.filter(

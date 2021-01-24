@@ -329,7 +329,7 @@ TransactionView.prototype.onStart = function () {
             onitemselect: this.onSrcCurrencySel.bind(this),
             editable: false
         });
-        this.model.currency.data.forEach(function (curr) {
+        this.model.currency.forEach(function (curr) {
             this.srcCurrDDList.addItem({ id: curr.id, title: curr.name });
         }, this);
     }
@@ -341,7 +341,7 @@ TransactionView.prototype.onStart = function () {
             onitemselect: this.onDestCurrencySel.bind(this),
             editable: false
         });
-        this.model.currency.data.forEach(function (curr) {
+        this.model.currency.forEach(function (curr) {
             this.destCurrDDList.addItem({ id: curr.id, title: curr.name });
         }, this);
     }

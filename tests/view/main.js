@@ -152,7 +152,7 @@ export class MainView extends TestView {
         res.values.widgets[App.config.PersonsWidgetPos] = personsWidget;
 
         // Transactions widget
-        const latestTransactionsList = state.transactions.data.slice(
+        const latestTransactionsList = state.transactions.slice(
             0,
             App.config.latestTransactions,
         );

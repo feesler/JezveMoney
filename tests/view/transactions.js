@@ -102,7 +102,7 @@ export class TransactionsView extends TestView {
             res.filter.endDate = dateRange.endDate;
         }
 
-        res.filtered = res.data.filter(res.filter);
+        res.filtered = res.data.applyFilter(res.filter);
 
         if (cont.paginator && cont.transList) {
             res.list = {
@@ -148,7 +148,7 @@ export class TransactionsView extends TestView {
     updateModelFilter(model) {
         const res = this.cloneModel(model);
 
-        res.filtered = res.data.filter(res.filter);
+        res.filtered = res.data.applyFilter(res.filter);
 
         const pageItems = res.filtered.getPage(1);
         if (res.filtered.length > 0) {
@@ -180,7 +180,7 @@ export class TransactionsView extends TestView {
 
         const res = this.cloneModel(model);
 
-        res.filtered = res.data.filter(res.filter);
+        res.filtered = res.data.applyFilter(res.filter);
         res.list.page = page;
         const pageItems = res.filtered.getPage(page);
         res.list.items = TransactionList.render(pageItems.data, App.state);

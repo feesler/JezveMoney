@@ -43,7 +43,7 @@ export class TransactionsList extends List {
         const cmpDate = convDate(date);
         let checkList;
         if (cmpDate) {
-            checkList = this.data.filter((item) => convDate(item.date) <= cmpDate);
+            checkList = this.filter((item) => convDate(item.date) <= cmpDate);
         } else {
             checkList = this.data;
         }
@@ -76,7 +76,7 @@ export class TransactionsList extends List {
             return;
         }
 
-        if (this.data.find((item) => item.pos === pos)) {
+        if (this.find((item) => item.pos === pos)) {
             for (const item of this.data) {
                 if (oldPos === 0) { // insert with specified position
                     if (item.pos >= pos) {
@@ -127,7 +127,7 @@ export class TransactionsList extends List {
         }
 
         if (origObj.date !== transObj.date) {
-            transObj = this.data.find((item) => item.id === id);
+            transObj = this.find((item) => item.id === id);
 
             transObj.pos = 0;
             const newPos = this.getExpectedPos(transObj);
@@ -334,7 +334,7 @@ export class TransactionsList extends List {
         return res;
     }
 
-    filter(params) {
+    applyFilter(params) {
         const items = this.getItems(this.data, params);
         if (items === this.data) {
             return this;

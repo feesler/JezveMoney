@@ -195,7 +195,7 @@ export class ImportRuleForm extends Component {
         // Filter available field types
         const availFields = ImportCondition.fieldTypes.filter((fieldType) => {
             if (ImportCondition.isTemplateField(fieldType.id)) {
-                return App.state.templates.data.length > 0;
+                return App.state.templates.length > 0;
             }
 
             return true;

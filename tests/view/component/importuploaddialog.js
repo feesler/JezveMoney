@@ -282,7 +282,7 @@ export class ImportUploadDialog extends Component {
             });
 
             res.visibility.cancelTplBtn = (model.state === CREATE_TPL_STATE)
-                ? (App.state.templates.data.length > 0)
+                ? (App.state.templates.length > 0)
                 : true;
 
             res.values.tplNameInp = (model.template) ? model.template.name : '';
