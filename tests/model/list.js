@@ -63,7 +63,7 @@ export class List {
     }
 
     // Return index of item with specified id
-    getIndexOf(id) {
+    getIndexById(id) {
         const itemId = parseInt(id, 10);
         if (!itemId) {
             return null;
@@ -159,7 +159,7 @@ export class List {
             throw new Error('Invalid item');
         }
 
-        const ind = this.getIndexOf(item.id);
+        const ind = this.getIndexById(item.id);
         if (ind === -1) {
             return false;
         }

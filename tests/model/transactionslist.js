@@ -53,7 +53,7 @@ export class TransactionsList extends List {
     }
 
     updatePosById(itemId, pos) {
-        const ind = this.getIndexOf(itemId);
+        const ind = this.getIndexById(itemId);
         if (ind === -1) {
             throw new Error(`Transaction ${itemId} not found`);
         }
@@ -108,7 +108,7 @@ export class TransactionsList extends List {
 
         this.sort();
 
-        return this.getIndexOf(transObj.id);
+        return this.getIndexById(transObj.id);
     }
 
     update(id, data) {

@@ -152,7 +152,7 @@ export async function update(params) {
 
     let pos;
     if ('id' in props) {
-        pos = App.state.accounts.getIndexOf(props.id);
+        pos = App.state.accounts.getIndexById(props.id);
     } else {
         pos = parseInt(props.pos, 10);
         if (Number.isNaN(pos)) {

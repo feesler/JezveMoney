@@ -361,7 +361,6 @@ export async function submitRule() {
 
         // Prepare expected content
         const validInput = App.view.isValidRule();
-        console.log('submitRule() view valid result: ', validInput);
         if (validInput) {
             const expectedRule = App.view.getExpectedRule();
             const dialogState = App.view.getRulesState();

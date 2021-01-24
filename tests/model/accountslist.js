@@ -199,7 +199,7 @@ export class AccountsList extends List {
         if (userVisible.length < 2) {
             return 0;
         }
-        let ind = userVisible.getIndexOf(accountId);
+        let ind = userVisible.getIndexById(accountId);
         if (ind === -1) {
             return 0;
         }

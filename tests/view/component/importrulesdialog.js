@@ -220,7 +220,6 @@ export class ImportRulesDialog extends Component {
         await this.wait(this.ruleDeletePopupId, { hidden: true });
         await this.waitForFunction(async () => {
             await this.parse();
-            console.log(`Delete rule loading: ${this.model.loading} state: ${this.model.state}`);
             return !this.model.loading && this.model.state === 'list';
         });
 

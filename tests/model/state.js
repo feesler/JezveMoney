@@ -393,7 +393,7 @@ export class AppState {
                 throw new Error(`Account '${name}' not found`);
             }
 
-            return userAccounts.getIndexOf(acc.id);
+            return userAccounts.getIndexById(acc.id);
         });
     }
 
@@ -583,7 +583,7 @@ export class AppState {
                 throw new Error(`Person '${name}' not found`);
             }
 
-            return visibleList.getIndexOf(person.id);
+            return visibleList.getIndexById(person.id);
         });
     }
 
