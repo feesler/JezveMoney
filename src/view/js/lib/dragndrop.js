@@ -11,7 +11,34 @@ var dragMaster = (function () {
     var dropTarget;
     var downX;
     var downY;
+    var touchTimeout = 0;
+    var touchMoveReady = false;
     var handlers = null;
+
+    function disableTextSelect() {
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+    }
+
+    function enableTextSelect() {
+        document.body.style.userSelect = '';
+        document.body.style.webkitUserSelect = '';
+    }
+
+    /** Set event handlers for document */
+    function addTouchEventHandlers() {
+        if (!handlers) {
+            return;
+        }
+
+        document.addEventListener('keydown', handlers.keydown);
+        document.addEventListener('touchmove', handlers.touchmove, { passive: false });
+        document.addEventListener('touchend', handlers.touchend);
+        document.addEventListener('touchcancel', handlers.touchcancel);
+        document.addEventListener('dragstart', handlers.dragstart);
+        document.body.addEventListener('selectstart', handlers.selectstart);
+        disableTextSelect();
+    }
 
     /** Set event handlers for document */
     function addDocumentEventHandlers() {
@@ -24,6 +51,21 @@ var dragMaster = (function () {
         document.addEventListener('mouseup', handlers.mouseup);
         document.addEventListener('dragstart', handlers.dragstart);
         document.body.addEventListener('selectstart', handlers.selectstart);
+    }
+
+    /** Remove event handler from document */
+    function removeTouchEventHandlers() {
+        if (!handlers) {
+            return;
+        }
+
+        document.removeEventListener('keydown', handlers.keydown);
+        document.removeEventListener('touchmove', handlers.touchmove);
+        document.removeEventListener('touchend', handlers.touchend);
+        document.removeEventListener('touchcancel', handlers.touchcancel);
+        document.removeEventListener('dragstart', handlers.dragstart);
+        document.body.removeEventListener('selectstart', handlers.selectstart);
+        enableTextSelect();
     }
 
     /** Remove event handler from document */
@@ -72,24 +114,68 @@ var dragMaster = (function () {
         return elem.dropTarget;
     }
 
-    /** Document mouse move event handler */
-    function mouseMove(e) {
+    function getEventCoordinatesObject(e) {
+        if (e.touches) {
+            if (e.type === 'touchend' || e.type === 'touchcancel') {
+                return e.changedTouches[0];
+            }
+
+            return e.touches[0];
+        }
+
+        return e;
+    }
+
+    function getEventPageCoordinates(e) {
+        var coords = getEventCoordinatesObject(e);
+
+        return {
+            x: coords.pageX,
+            y: coords.pageY
+        };
+    }
+
+    function getEventClientCoordinates(e) {
+        var coords = getEventCoordinatesObject(e);
+
+        return {
+            x: coords.clientX,
+            y: coords.clientY
+        };
+    }
+
+    function initAvatar(e) {
+        var coords;
+
+        if (avatar) {
+            return;
+        }
+
+        coords = getEventPageCoordinates(e);
+        if (!e.touches) {
+            if (Math.abs(downX - coords.x) < 5 && Math.abs(downY - coords.y) < 5) {
+                return;
+            }
+        }
+
+        avatar = dragZone.onDragStart(downX, downY, e);
+        if (!avatar) {
+            cleanUp();
+        }
+    }
+
+    function handleMove(e) {
         var newDropTarget;
 
         if (!dragZone) {
-            return false;
+            return;
         }
 
         if (!avatar) {
-            if (Math.abs(downX - e.pageX) < 5 && Math.abs(downY - e.pageY) < 5) {
-                return false;
-            }
-
-            avatar = dragZone.onDragStart(downX, downY, e);
-            if (!avatar) {
-                cleanUp();
-                return false;
-            }
+            initAvatar(e);
+        }
+        if (!avatar) {
+            return;
         }
 
         avatar.onDragMove(e);
@@ -108,14 +194,33 @@ var dragMaster = (function () {
         if (dropTarget) {
             dropTarget.onDragMove(avatar, e);
         }
+    }
 
-        return false;
+    /** Document mouse move event handler */
+    function mouseMove(e) {
+        if (e.touches) {
+            if (!touchMoveReady) {
+                clearTimeout(touchTimeout);
+                touchTimeout = 0;
+                return;
+            }
+            e.preventDefault();
+        }
+
+        handleMove(e);
     }
 
     /** Document mouse up event handler */
     function mouseUp(e) {
-        if (e.which !== 1) {
-            return false;
+        if (touchTimeout) {
+            clearTimeout(touchTimeout);
+            touchTimeout = 0;
+        }
+
+        if (!e.touches) {
+            if (e.which !== 1) {
+                return false;
+            }
         }
 
         if (avatar) {
@@ -127,7 +232,11 @@ var dragMaster = (function () {
         }
 
         cleanUp();
-        removeDocumentEventHandlers();
+        if (e.touches) {
+            removeTouchEventHandlers();
+        } else {
+            removeDocumentEventHandlers();
+        }
 
         return false;
     }
@@ -151,32 +260,62 @@ var dragMaster = (function () {
 
     /** Mouse down on drag object element event handler */
     function mouseDown(e) {
-        if (e.which !== 1) {
-            return false;
+        var touchStartEvent;
+        var coord;
+
+        if (e.touches) {
+            if (e.touches.length > 1) {
+                return;
+            }
+        } else if (e.type === 'mousedown') {
+            if (e.which !== 1) {
+                return;
+            }
+        } else {
+            return;
         }
 
         dragZone = findDragZone(e);
-        if (!dragZone) {
-            return false;
+        if (!dragZone || !dragZone.isValidDragHandle(e.target)) {
+            return;
         }
 
-        if (!dragZone.isValidDragHandle(e.target)) {
-            return false;
+        coord = getEventPageCoordinates(e);
+        downX = coord.x;
+        downY = coord.y;
+
+        if (e.touches) {
+            touchMoveReady = false;
+            handlers = {
+                keydown: onKey,
+                touchmove: mouseMove,
+                touchend: mouseUp,
+                touchcancel: mouseUp,
+                dragstart: emptyFalse,
+                selectstart: emptyFalse
+            };
+            addTouchEventHandlers();
+
+            if (touchTimeout) {
+                clearTimeout(touchTimeout);
+                touchTimeout = 0;
+            }
+
+            touchStartEvent = e;
+            touchTimeout = setTimeout(function () {
+                touchMoveReady = true;
+                handleMove(touchStartEvent);
+            }, 200);
+        } else {
+            handlers = {
+                keydown: onKey,
+                mousemove: mouseMove,
+                mouseup: mouseUp,
+                dragstart: emptyFalse,
+                selectstart: emptyFalse
+            };
+            addDocumentEventHandlers();
         }
-
-        downX = e.pageX;
-        downY = e.pageY;
-
-        handlers = {
-            keydown: onKey,
-            mousemove: mouseMove,
-            mouseup: mouseUp,
-            dragstart: emptyFalse,
-            selectstart: emptyFalse
-        };
-        addDocumentEventHandlers();
-
-        return false;
     }
 
     // Check pointer is mouse
@@ -204,6 +343,7 @@ var dragMaster = (function () {
         makeDraggable: function (elem) {
             var el = elem;
             el.addEventListener('mousedown', mouseDown);
+            el.addEventListener('touchstart', mouseDown);
 
             if (typeof el.onpointerdown !== 'undefined') {
                 el.onpointerdown = isMousePointer;
@@ -241,6 +381,14 @@ var dragMaster = (function () {
             }
 
             return target;
+        },
+
+        getEventPageCoordinates: function (e) {
+            return getEventPageCoordinates(e);
+        },
+
+        getEventClientCoordinates: function (e) {
+            return getEventClientCoordinates(e);
         }
     };
 }());
@@ -381,20 +529,45 @@ DragAvatar.prototype.getTargetElem = function () {
     return this.currentTargetElem;
 };
 
+/** Scroll document if needed on drag avatar to top or bottom of screen */
+DragAvatar.prototype.scrollDocument = function (coords) {
+    var scrollMargin = 30;
+    var docElem = document.documentElement;
+
+    if (coords.y > docElem.clientHeight - scrollMargin) {
+        if (docElem.scrollTop + docElem.clientHeight === docElem.scrollHeight) {
+            return;
+        }
+
+        docElem.scrollTop += scrollMargin;
+    } else if (coords.y < scrollMargin) {
+        if (docElem.scrollTop === 0) {
+            return;
+        }
+
+        docElem.scrollTop -= scrollMargin;
+    }
+};
+
 /**
  * Move avatag element on mouse move
  * Also save current element under avatar
  * @param {Event} e - event object
  */
 DragAvatar.prototype.onDragMove = function (e) {
-    this.elem.style.left = px(e.pageX - this.shiftX);
-    this.elem.style.top = px(e.pageY - this.shiftY);
+    var page = dragMaster.getEventPageCoordinates(e);
+    var client = dragMaster.getEventClientCoordinates(e);
+
+    this.elem.style.left = px(page.x - this.shiftX);
+    this.elem.style.top = px(page.y - this.shiftY);
 
     this.currentTargetElem = dragMaster.getElementUnderClientXY(
         this.elem,
-        e.clientX,
-        e.clientY
+        client.x,
+        client.y
     );
+
+    this.scrollDocument(client);
 };
 
 /** Drop fail handler */

@@ -30,7 +30,6 @@ class Currency extends AdminController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "lib/component.js",
             "component/confirmdialog.js",
             "view.js"
         );

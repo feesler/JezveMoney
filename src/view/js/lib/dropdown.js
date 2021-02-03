@@ -21,7 +21,6 @@ var CHECK_ICON = 'M1.08 4.93a.28.28 0 000 .4l2.35 2.34c.1.11.29.11.4 0l4.59-4.59
  * @param {boolean|Function} params.oninput - text input event handler
  *    If set to true list items will be filtered by input value
  * @param {Function} params.renderItem - callback for custom selected item render
- * @param {string|Element} params.resultTarget - identifier or element to copy selection data to
  * @param {string} params.extraClass - additional CSS classes
  * @param {Object} params.data - array of item objects { id, title }
  */
@@ -87,15 +86,6 @@ function DropDown(params) {
     inpObj = (typeof params.input_id === 'string') ? ge(params.input_id) : params.input_id;
     if (!inpObj || !inpObj.parentNode) {
         throw new Error('Invalid element specified');
-    }
-
-    // Save result value to specified element
-    this.resultTarget = params.resultTarget || null;
-    if (typeof this.resultTarget === 'string') {
-        this.resultTarget = ge(this.resultTarget);
-        if (!this.resultTarget) {
-            throw new Error('resultTarget not found');
-        }
     }
 
     if (this.listAttach) {
@@ -1146,31 +1136,7 @@ DropDown.prototype.sendChangeEvent = function () {
         this.changeCallback.call(this, data);
     }
 
-    this.saveResult();
-
     this.changed = false;
-};
-
-/** Save current selection data to result target element if exist */
-DropDown.prototype.saveResult = function () {
-    var selectedItems;
-
-    if (!this.resultTarget) {
-        return;
-    }
-
-    if (this.multi && this.resultTarget.multiple) {
-        this.items.forEach(function (item) {
-            selectByValue(this.resultTarget, item.id, item.selected);
-        }, this);
-    } else {
-        selectedItems = this.getSelectedItems();
-        if (Array.isArray(selectedItems) && selectedItems.length > 0) {
-            this.resultTarget.value = selectedItems[0].id;
-        } else {
-            this.resultTarget.value = '';
-        }
-    }
 };
 
 /** Toggle item selected status */
@@ -1207,9 +1173,6 @@ DropDown.prototype.selectItem = function (itemId) {
     if (this.selectElem) {
         selectByValue(this.selectElem, item.id);
     }
-    if (this.resultTarget) {
-        selectByValue(this.resultTarget, item.id);
-    }
 
     item.selected = true;
 
@@ -1230,14 +1193,8 @@ DropDown.prototype.deselectItem = function (itemId) {
     if (this.multi) {
         this.check(itemId, false);
         selectByValue(this.selectElem, itemId, false);
-        if (this.resultTarget) {
-            selectByValue(this.resultTarget, itemId, false);
-        }
     } else {
         selectByValue(this.selectElem, 0);
-        if (this.resultTarget) {
-            selectByValue(this.resultTarget, 0);
-        }
     }
 
     item.selectedElem = null;
@@ -1502,7 +1459,6 @@ DropDown.prototype.parseSelect = function (elem) {
         }
     }
 
-    this.saveResult();
     this.renderSelection();
 
     return true;
@@ -1627,7 +1583,6 @@ DropDown.prototype.addItem = function (props) {
     if (appendToSelect) {
         item.optionElem = this.addOption(this.selectElem, item.id, item.title);
     }
-    item.resOptionElem = this.addOption(this.resultTarget, item.id, item.title);
     this.items.push(item);
 
     return item;
@@ -1717,15 +1672,9 @@ DropDown.prototype.enableItem = function (item, val) {
 
         listItem.elem.setAttribute('disabled', true);
         listItem.optionElem.setAttribute('disabled', true);
-        if (listItem.resOptionElem) {
-            listItem.resOptionElem.setAttribute('disabled', true);
-        }
     } else {
         listItem.elem.removeAttribute('disabled');
         listItem.optionElem.removeAttribute('disabled');
-        if (listItem.resOptionElem) {
-            listItem.resOptionElem.removeAttribute('disabled');
-        }
     }
 };
 

@@ -30,7 +30,6 @@ class Persons extends TemplateController
             "model/list.js",
             "model/person.js",
             "lib/selection.js",
-            "lib/component.js",
             "component/header.js",
             "component/toolbar.js",
             "component/iconlink.js",
@@ -77,7 +76,6 @@ class Persons extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "lib/component.js",
             "component/header.js",
             "view.js",
             "personview.js"
@@ -117,7 +115,6 @@ class Persons extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "lib/component.js",
             "component/header.js",
             "component/iconlink.js",
             "component/confirmdialog.js",

@@ -42,7 +42,6 @@ class ImportRule extends AdminController
 
         array_push(
             $this->jsArr,
-            "lib/component.js",
             "component/confirmdialog.js",
             "model/list.js",
             "view.js"

@@ -9,6 +9,11 @@
 	flex-basis: 100%;
 }
 
+.charts svg
+{
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    user-select: none;
+}
 
 .chart_wrap
 {
@@ -58,14 +63,6 @@
 {
     fill: #00BFFF;
     fill-opacity: 1;
-    stroke: none;
-}
-
-/* Histogram bar background */
-.histogram__bar-bg,
-.linechart__item-bg
-{
-    fill-opacity: 0;
     stroke: none;
 }
 

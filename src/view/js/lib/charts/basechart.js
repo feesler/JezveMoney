@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ce, svg, prependChild, isFunction, extend, Component */
+/* global ce, svg, isFunction, getOffset, extend, Component, ChartGrid */
 /* exported BaseChart */
 
 /**
@@ -11,47 +11,6 @@
 function BaseChart() {
     BaseChart.parent.constructor.apply(this, arguments);
 
-    this.chartsWrapObj = null;
-    this.chart = null;
-    this.chartContent = null;
-    this.verticalLabels = null;
-    this.r = null;
-    this.lr = null;
-    this.paperHeight = 300;
-    this.hLabelsHeight = 20;
-    this.vLabelsWidth = 10;
-    this.chartMarginTop = 10;
-    this.barMargin = 10;
-    this.barWidth = 0;
-    this.chartWidth = 0;
-    this.chartHeight = 0;
-    this.chartContentWidth = 0;
-    this.data = {};
-    this.items = [];
-    this.gridLines = [];
-    this.vertLabels = [];
-    this.fitToWidth = false;
-    this.autoScale = false;
-    this.itemClickHandler = null;
-    this.scrollHandler = null;
-    this.itemOverHandler = null;
-    this.itemOutHandler = null;
-
-    this.init();
-}
-
-extend(BaseChart, Component);
-
-/** Initialization of chart */
-BaseChart.prototype.init = function () {
-    var minVal;
-    var maxVal;
-    var grid;
-    var getHeight;
-    var vBars;
-    var values;
-    var zeroBaseValues;
-
     if (
         !this.elem
         || !this.props
@@ -61,6 +20,42 @@ BaseChart.prototype.init = function () {
     ) {
         throw new Error('Invalid chart properties');
     }
+
+    this.chartsWrapObj = null;
+    this.chart = null;
+    this.chartContent = null;
+    this.verticalLabels = null;
+    this.container = null;
+    this.labelsContainer = null;
+    this.paperHeight = 300;
+    this.hLabelsHeight = 25;
+    this.vLabelsWidth = 10;
+    this.chartMarginTop = 10;
+    this.barMargin = 10;
+    this.barWidth = 0;
+    this.chartWidth = 0;
+    this.chartHeight = 0;
+    this.chartContentWidth = 0;
+    this.gridValuesMargin = 0.1;
+    this.minGridStep = 30;
+    this.maxGridStep = 60;
+    if (!('visibilityOffset' in this)) {
+        this.visibilityOffset = 1;
+    }
+    if (!('scaleAroundAxis' in this)) {
+        this.scaleAroundAxis = true;
+    }
+    this.data = {};
+    this.items = [];
+    this.grid = null;
+    this.gridLines = [];
+    this.vertLabels = [];
+    this.fitToWidth = false;
+    this.autoScale = false;
+    this.itemClickHandler = null;
+    this.scrollHandler = null;
+    this.itemOverHandler = null;
+    this.itemOutHandler = null;
 
     this.data = this.props.data;
 
@@ -79,12 +74,23 @@ BaseChart.prototype.init = function () {
     this.itemOverHandler = isFunction(this.props.onitemover) ? this.props.onitemover : null;
     this.itemOutHandler = isFunction(this.props.onitemout) ? this.props.onitemout : null;
 
-    // Vertical labels
-    this.verticalLabels = ce('div');
+    this.init();
+}
 
-    // Histogram
+extend(BaseChart, Component);
+
+/** Initialization of chart */
+BaseChart.prototype.init = function () {
+    var events = {};
+
+    this.verticalLabels = ce('div');
     this.chart = ce('div');
-    this.chartContent = ce('div', { className: 'chart_content' }, this.chart);
+    this.chartContent = ce(
+        'div',
+        { className: 'chart_content' },
+        this.chart,
+        { scroll: this.onScroll.bind(this) }
+    );
 
     this.chartsWrapObj = ce('div', { className: 'charts' }, [
         ce('div', { className: 'chart_wrap' }, this.chartContent),
@@ -92,22 +98,14 @@ BaseChart.prototype.init = function () {
     ]);
     this.elem.appendChild(this.chartsWrapObj);
 
-    this.chartContent.onscroll = this.onScroll.bind(this);
-
     this.chartHeight = this.paperHeight - this.hLabelsHeight - this.chartMarginTop;
     this.barWidth = 38;
-    zeroBaseValues = this.getZeroBased(this.data.values);
-    minVal = this.getMin(zeroBaseValues);
-    maxVal = this.getMax(zeroBaseValues);
-    getHeight = this.convertRelToAbs(minVal, maxVal, this.chartHeight);
 
-    this.lr = svg('svg', { width: this.vLabelsWidth, height: this.paperHeight + 20 });
-    this.verticalLabels.appendChild(this.lr);
+    this.labelsContainer = svg('svg', { width: this.vLabelsWidth, height: this.paperHeight + 20 });
+    this.verticalLabels.appendChild(this.labelsContainer);
 
     // create grid
-    grid = this.calculateGrid(minVal, maxVal, this.chartHeight, this.chartMarginTop);
-
-    this.drawVLabels(this.lr, grid);
+    this.calculateGrid(this.data.values);
 
     if (this.fitToWidth) {
         this.barWidth = (this.chart.parentNode.offsetWidth / (this.data.values.length + 1));
@@ -122,33 +120,31 @@ BaseChart.prototype.init = function () {
     this.chartContentWidth = (this.data.values.length) * (this.barWidth + this.barMargin);
     this.chartWidth = Math.max(this.chart.offsetWidth, this.chartContentWidth);
 
-    this.r = svg('svg', { width: this.chartWidth, height: this.paperHeight });
-    this.chart.appendChild(this.r);
+    if (isFunction(this.itemOverHandler) || isFunction(this.itemOutHandler)) {
+        events.mousemove = this.onItemOver.bind(this);
+        events.mouseout = this.onItemOut.bind(this);
+    }
+    if (isFunction(this.itemClickHandler)) {
+        events.click = this.onItemClick.bind(this);
+    }
 
-    this.removeElements(this.gridLines);
-    this.gridLines = this.drawGrid(this.r, grid, this.chartWidth);
+    this.container = svg(
+        'svg',
+        { width: this.chartWidth, height: this.paperHeight },
+        null,
+        events
+    );
+
+    this.chart.appendChild(this.container);
+
+    this.containerOffset = getOffset(this.container);
+
+    this.drawGrid();
+    this.drawVLabels();
 
     // create bars
     this.createItems();
-
-    if (this.autoScale) {
-        vBars = this.getVisibleItems();
-        values = this.mapValues(vBars);
-
-        // zeroBaseValues = values.concat(0);
-        zeroBaseValues = this.getZeroBased(values);
-        minVal = this.getMin(zeroBaseValues);
-        maxVal = this.getMax(zeroBaseValues);
-        getHeight = this.convertRelToAbs(minVal, maxVal, this.chartHeight);
-
-        grid = this.calculateGrid(minVal, maxVal, this.chartHeight, this.chartMarginTop);
-
-        this.drawVLabels(this.lr, grid);
-        this.removeElements(this.gridLines);
-        this.gridLines = this.drawGrid(this.r, grid, this.chartWidth);
-
-        this.updateItemsScale(vBars, getHeight);
-    }
+    this.scaleVisible();
 
     // create horizontal labels
     this.createHLabels();
@@ -164,71 +160,25 @@ BaseChart.prototype.getWrapObject = function () {
     return this.chartsWrapObj;
 };
 
-/** Return minimum value from array */
-BaseChart.prototype.getMin = function (arrObj) {
-    if (!Array.isArray(arrObj)) {
-        return null;
-    }
+/**
+ * Calculate grid for specified set of values
+ * @param {number[]} values
+ */
+BaseChart.prototype.calculateGrid = function (values) {
+    var grid;
 
-    return Math.min.apply(null, arrObj);
-};
+    grid = new ChartGrid({
+        scaleAroundAxis: this.scaleAroundAxis,
+        height: this.chartHeight,
+        margin: this.chartMarginTop,
+        minStep: this.minGridStep,
+        maxStep: this.maxGridStep,
+        valuesMargin: this.gridValuesMargin
+    });
 
-/** Return maximum value from array */
-BaseChart.prototype.getMax = function (arrObj) {
-    if (!Array.isArray(arrObj)) {
-        return null;
-    }
+    grid.calculate(values);
 
-    return Math.max.apply(null, arrObj);
-};
-
-/** Return function to convert relative value to absolute */
-BaseChart.prototype.convertRelToAbs = function (minVal, maxVal, absMaxVal) {
-    var dVal = Math.abs(maxVal - minVal);
-
-    return function (val) {
-        return absMaxVal * ((val - minVal) / dVal);
-    };
-};
-
-/** Calculate grid */
-BaseChart.prototype.calculateGrid = function (minValue, maxValue, height, margin) {
-    var gridStepRatio;
-    var getHeight;
-    var dVal;
-    var grid = {};
-
-    getHeight = this.convertRelToAbs(minValue, maxValue, height);
-
-    dVal = Math.abs(maxValue - minValue);
-
-    // calculate vertical grid step
-    grid.valueStep = 5;
-    while ((dVal / grid.valueStep) > 1) {
-        grid.valueStep *= 10;
-    }
-
-    gridStepRatio = Math.floor(height / 50);
-
-    while ((dVal / grid.valueStep) < gridStepRatio) {
-        grid.valueStep /= 2;
-    }
-
-    // calculate first label value
-    if (maxValue > 0) {
-        grid.valueFirst = maxValue - (maxValue % grid.valueStep);
-    } else {
-        grid.valueFirst = 0;
-    }
-
-    // calculate y of first grid line
-    grid.yFirst = height - getHeight(grid.valueFirst) + margin;
-
-    // calculate absolute grid step
-    grid.steps = Math.floor(dVal / grid.valueStep);
-    grid.yStep = (height - grid.yFirst + margin) / grid.steps;
-
-    return grid;
+    this.grid = grid;
 };
 
 /** Remove elements */
@@ -241,29 +191,44 @@ BaseChart.prototype.removeElements = function (elem) {
 };
 
 /** Draw grid and return array of grid lines */
-BaseChart.prototype.drawGrid = function (paper, grid, width) {
-    var i;
+BaseChart.prototype.drawGrid = function () {
     var linePath;
     var curY;
+    var rY;
     var el;
+    var width = this.chartWidth;
+    var step = 0;
     var lines = [];
 
-    curY = grid.yFirst;
-    for (i = 0; i <= grid.steps; i += 1) {
-        linePath = 'M0,' + Math.round(curY) + '.5L' + width + ',' + Math.round(curY) + '.5';
+    if (!this.grid.steps) {
+        return;
+    }
+
+    curY = this.grid.yFirst;
+    while (step <= this.grid.steps) {
+        rY = Math.round(curY);
+        if (rY > curY) {
+            rY -= 0.5;
+        } else {
+            rY += 0.5;
+        }
+
+        linePath = 'M0,' + rY + 'L' + width + ',' + rY;
         el = svg('path', {
             class: 'chart__grid-line',
             d: linePath
         });
 
-        prependChild(paper, el);
-
         lines.push(el);
 
-        curY += grid.yStep;
+        curY += this.grid.yStep;
+        step += 1;
     }
 
-    return lines;
+    this.removeElements(this.gridLines);
+    this.container.prepend.apply(this.container, lines);
+
+    this.gridLines = lines;
 };
 
 /** Save total width of chart block with labels */
@@ -296,27 +261,27 @@ BaseChart.prototype.updateChartWidth = function () {
     var paperWidth;
     var chartOffset;
 
-    if (!this.r) {
-        return;
-    }
-
     chartOffset = this.getChartOffset(this.chart);
     paperWidth = Math.max(chartOffset - this.vLabelsWidth, this.chartContentWidth);
 
-    this.r.setAttribute('width', paperWidth);
-    this.r.setAttribute('height', this.paperHeight);
+    this.container.setAttribute('width', paperWidth);
+    this.container.setAttribute('height', this.paperHeight);
 
     this.chartWidth = Math.max(paperWidth, this.chartContentWidth);
 };
 
 /** Set new width for vertical labels block and SVG object */
 BaseChart.prototype.setVertLabelsWidth = function (width) {
-    if (!this.lr || !this.chart) {
+    if (!this.labelsContainer || !this.chart) {
         return;
     }
 
-    this.lr.setAttribute('width', width);
-    this.lr.setAttribute('height', this.paperHeight + 20);
+    if (this.vLabelsWidth === width) {
+        return;
+    }
+
+    this.labelsContainer.setAttribute('width', width);
+    this.labelsContainer.setAttribute('height', this.paperHeight + 20);
     this.vLabelsWidth = width;
 
     this.updateChartWidth();
@@ -330,10 +295,6 @@ BaseChart.prototype.getVisibleItems = function () {
     var firstItem;
     var i;
     var offs = this.visibilityOffset;
-
-    if (!this.chartContent) {
-        return null;
-    }
 
     itemOutWidth = this.barWidth + this.barMargin;
     itemsOnWidth = Math.round(this.chartContent.offsetWidth / itemOutWidth);
@@ -354,45 +315,47 @@ BaseChart.prototype.getVisibleItems = function () {
 };
 
 /** Draw vertical labels */
-BaseChart.prototype.drawVLabels = function (paper, grid) {
+BaseChart.prototype.drawVLabels = function () {
+    var tVal;
+    var tspan;
+    var el;
+    var isZero;
     var xOffset = 5;
     var dyOffset = 5.5;
-    var curY;
-    var val;
-    var el;
-    var tspan;
-    var i;
+    var curY = this.grid.yFirst;
+    var val = this.grid.valueFirst;
+    var step = 0;
+    var labelsWidth = 0;
 
-    if (!paper || !grid) {
+    if (!this.grid.steps) {
         return;
     }
-
-    curY = grid.yFirst;
-    val = grid.valueFirst;
 
     this.removeElements(this.vertLabels);
 
     this.vertLabels = [];
-    for (i = 0; i <= grid.steps; i += 1) {
+    while (step <= this.grid.steps) {
+        isZero = Math.abs(this.grid.toPrec(val)) === 0;
+        tVal = (isZero) ? 0 : this.grid.toPrecString(val);
+
         tspan = svg('tspan', { dy: dyOffset });
-        tspan.innerHTML = val.toString();
+        tspan.innerHTML = tVal.toString();
         el = svg('text', {
             className: 'chart__text',
             x: xOffset,
             y: Math.round(curY)
         }, tspan);
 
-        paper.appendChild(el);
+        this.labelsContainer.appendChild(el);
         this.vertLabels.push(el);
 
-        if (el.clientWidth + 10 > this.vLabelsWidth) {
-            this.setVertLabelsWidth(el.clientWidth + 10);
-        }
-
-        val -= grid.valueStep;
-
-        curY += grid.yStep;
+        labelsWidth = Math.max(labelsWidth, el.clientWidth + 10);
+        val -= this.grid.valueStep;
+        curY += this.grid.yStep;
+        step += 1;
     }
+
+    this.setVertLabelsWidth(labelsWidth);
 };
 
 /** Create horizontal labels */
@@ -418,7 +381,7 @@ BaseChart.prototype.createHLabels = function () {
                 y: lblY
             }, tspan);
 
-            this.r.appendChild(txtEl);
+            this.container.appendChild(txtEl);
 
             lastOffset = labelShift + txtEl.clientWidth;
         }
@@ -426,42 +389,71 @@ BaseChart.prototype.createHLabels = function () {
     }, this);
 };
 
+/** Find item by event object */
+BaseChart.prototype.findItemByEvent = function (e) {
+    var x = e.clientX - this.containerOffset.left + this.chartContent.scrollLeft;
+    var index = Math.floor(x / (this.barWidth + this.barMargin));
+
+    if (index < 0 || index >= this.items.length) {
+        return null;
+    }
+
+    return this.items[index];
+};
+
 /** Chart item click event handler */
-BaseChart.prototype.onItemClick = function (e, barRect, val) {
+BaseChart.prototype.onItemClick = function (e) {
+    var item;
+
     if (!isFunction(this.itemClickHandler)) {
         return;
     }
-
-    this.itemClickHandler.call(this, e, barRect, val);
-};
-
-/** Chart item mouse over event handler */
-BaseChart.prototype.onItemOver = function (e, barRect) {
-    if (!isFunction(this.itemOverHandler)) {
+    item = this.findItemByEvent(e);
+    if (!item) {
         return;
     }
 
-    this.itemOverHandler.call(this, e, barRect);
+    this.itemClickHandler.call(this, e, item);
+};
+
+/** Chart item mouse over event handler */
+BaseChart.prototype.onItemOver = function (e) {
+    var item;
+
+    if (!isFunction(this.itemOverHandler)) {
+        return;
+    }
+    item = this.findItemByEvent(e);
+    if (!item || this.activeItem === item) {
+        return;
+    }
+    if (this.activeItem && isFunction(this.itemOutHandler)) {
+        this.itemOutHandler.call(this, e, this.activeItem);
+    }
+
+    this.activeItem = item;
+
+    this.itemOverHandler.call(this, e, item);
 };
 
 /** Chart item mouse out from bar event handler */
-BaseChart.prototype.onItemOut = function (e, barRect) {
+BaseChart.prototype.onItemOut = function (e) {
+    var item;
+
     if (!isFunction(this.itemOutHandler)) {
         return;
     }
 
-    this.itemOutHandler.call(this, e, barRect);
+    item = this.activeItem;
+    this.activeItem = null;
+
+    this.itemOutHandler.call(this, e, item);
 };
 
-/** Chart content 'scroll' event handler */
-BaseChart.prototype.onScroll = function () {
+/** Scale visible items of chart */
+BaseChart.prototype.scaleVisible = function () {
     var vItems;
     var values;
-    var minVal;
-    var maxVal;
-    var getHeight;
-    var grid;
-    var zeroBaseValues;
 
     if (!this.autoScale) {
         return;
@@ -470,26 +462,20 @@ BaseChart.prototype.onScroll = function () {
     vItems = this.getVisibleItems();
     values = this.mapValues(vItems);
 
-    zeroBaseValues = this.getZeroBased(values);
-    minVal = this.getMin(zeroBaseValues);
-    maxVal = this.getMax(zeroBaseValues);
-    getHeight = this.convertRelToAbs(minVal, maxVal, this.chartHeight);
+    this.calculateGrid(values);
+    this.drawVLabels();
+    this.drawGrid();
 
-    grid = this.calculateGrid(minVal, maxVal, this.chartHeight, this.chartMarginTop);
-    this.drawVLabels(this.lr, grid);
-    this.removeElements(this.gridLines);
-    this.gridLines = this.drawGrid(this.r, grid, this.chartWidth);
+    this.updateItemsScale(vItems);
+};
 
-    this.updateItemsScale(vItems, getHeight);
+/** Chart content 'scroll' event handler */
+BaseChart.prototype.onScroll = function () {
+    this.scaleVisible();
 
     if (isFunction(this.scrollHandler)) {
         this.scrollHandler.call(this);
     }
-};
-
-/** Normalize array of values with conditions of chart */
-BaseChart.prototype.getZeroBased = function (values) {
-    return values;
 };
 
 /** Create items with default scale */
@@ -498,5 +484,5 @@ BaseChart.prototype.createItems = function () {
 
 /** Update scale of items */
 /* eslint-disable-next-line no-unused-vars */
-BaseChart.prototype.updateItemsScale = function (itemsArr, getHeight) {
+BaseChart.prototype.updateItemsScale = function (items) {
 };

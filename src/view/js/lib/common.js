@@ -171,8 +171,9 @@ function ce(tagName, params, children, events) {
  * @param {string} tagName
  * @param {Object} attributes
  * @param {Element[]} children
+ * @param {Object} events - event handlers object
  */
-function svg(tagName, attributes, children) {
+function svg(tagName, attributes, children, events) {
     var elem;
 
     if (typeof tagName !== 'string') {
@@ -184,9 +185,11 @@ function svg(tagName, attributes, children) {
     if (attributes) {
         setAttributes(elem, attributes);
     }
-
     if (children) {
         addChilds(elem, children);
+    }
+    if (events) {
+        setEvents(elem, events);
     }
 
     return elem;
@@ -891,6 +894,7 @@ function extendError(Class) {
     if (Object.setPrototypeOf) {
         Object.setPrototypeOf(Class, Error);
     } else {
+        /* eslint-disable-next-line no-proto */
         Class.__proto__ = Error;
     }
 }

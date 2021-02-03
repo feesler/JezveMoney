@@ -34,7 +34,6 @@ class User extends AdminController
 
         array_push(
             $this->jsArr,
-            "lib/component.js",
             "component/confirmdialog.js",
             "view.js"
         );

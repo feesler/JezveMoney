@@ -81,9 +81,9 @@ class Main extends TemplateController
 
         array_push(
             $this->jsArr,
-            "lib/component.js",
-            "lib/basechart.js",
-            "lib/histogram.js",
+            "lib/charts/chartgrid.js",
+            "lib/charts/basechart.js",
+            "lib/charts/histogram.js",
             "component/header.js",
             "view.js",
             "mainview.js"

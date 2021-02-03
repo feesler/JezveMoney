@@ -38,7 +38,6 @@ class Profile extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "lib/component.js",
             "component/header.js",
             "component/confirmdialog.js",
             "view.js",

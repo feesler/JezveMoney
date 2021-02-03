@@ -1,6 +1,6 @@
 'use strict';
 
-/* global isFunction, getCursorPos, isNum, fixFloat */
+/* global isFunction, getCursorPos, isNum */
 
 /**
  * Decimal value input
@@ -82,6 +82,41 @@ DecimalInput.prototype.getInputContent = function (e) {
     return null;
 };
 
+/**
+ * Fix string to correct float number format
+ * @param {string} str - decimal value string
+ */
+DecimalInput.prototype.fixFloat = function (str) {
+    var res;
+
+    if (typeof str === 'number') {
+        return str;
+    }
+
+    if (typeof str === 'string') {
+        res = str.replace(/,/g, '.');
+        if (res.indexOf('-') === 0
+            && (
+                res.length === 1
+                || res.indexOf('.') === 1
+            )
+        ) {
+            res = '-0' + res.substr(1);
+        }
+        if (res.indexOf('.') === 0 || !res.length) {
+            res = '0' + res;
+        }
+        return res;
+    }
+
+    return null;
+};
+
+/** Validate specified value */
+DecimalInput.prototype.isValidValue = function (value) {
+    return isNum(this.fixFloat(value));
+};
+
 /** Before input events('keypress', 'paste', 'beforeinput) handler */
 DecimalInput.prototype.validateInput = function (e) {
     var expectedContent;
@@ -94,7 +129,7 @@ DecimalInput.prototype.validateInput = function (e) {
     }
 
     expectedContent = this.replaceSelection(inputContent);
-    res = isNum(fixFloat(expectedContent));
+    res = this.isValidValue(expectedContent);
     if (!res) {
         e.preventDefault();
         e.stopPropagation();
@@ -117,6 +152,8 @@ Object.defineProperty(DecimalInput.prototype, 'value', {
     },
 
     set: function (value) {
-        this.elem.value = value;
+        if (this.isValidValue(value)) {
+            this.elem.value = value;
+        }
     }
 });
