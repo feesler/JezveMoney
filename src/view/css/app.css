@@ -974,13 +974,19 @@ select
 	fill: #FFFFFF;
 }
 
+/* Popup */
+.popup__content-box
+{
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+}
 
 /* Messages */
 .popup__content.msg
 {
 	background: none;
-	top: 55px;
-	margin: 0;
+    margin-top: 60px;
+    align-self: baseline;
 }
 
 
@@ -1019,7 +1025,7 @@ select
 
 
 /* Custom popup styles */
-.popup__content.center_only
+.popup__content
 {
 	background: none;
 }

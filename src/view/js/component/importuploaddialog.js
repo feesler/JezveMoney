@@ -64,7 +64,7 @@ function ImportUploadDialog() {
         btn: {
             closeBtn: true
         },
-        additional: 'center_only upload-popup'
+        additional: 'upload-popup'
     });
 
     this.initialAccField = ge('initialAccField');

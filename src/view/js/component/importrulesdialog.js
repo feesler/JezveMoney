@@ -47,7 +47,7 @@ function ImportRulesDialog() {
         btn: {
             closeBtn: true
         },
-        additional: 'center_only rules-popup'
+        additional: 'rules-popup'
     });
 
     this.createRuleBtn = ge('createRuleBtn');

@@ -341,7 +341,6 @@ div.trans-list__item_selected
 
 
 /* Popup */
-.popup__content,
 .popup__content .popup__content-box
 {
     color: #000000;

@@ -60,7 +60,7 @@ AdminListView.prototype.onStart = function () {
     this.dialogPopup = Popup.create({
         id: this.elements.dialogPopup,
         content: this.itemForm,
-        additional: 'center_only item-form',
+        additional: 'item-form',
         btn: { closeBtn: true }
     });
 };
@@ -157,7 +157,6 @@ AdminListView.prototype.deleteItem = function () {
     ConfirmDialog.create({
         title: 'Delete',
         content: popupContent,
-        additional: 'center_only',
         onconfirm: function () {
             ajax.post({
                 url: baseURL + 'api/' + this.apiController + '/del',

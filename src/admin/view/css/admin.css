@@ -152,7 +152,7 @@ textarea
 }
 
 /* Custom popup styles */
-.popup__content.center_only
+.popup__content
 {
 	background: none;
 }
