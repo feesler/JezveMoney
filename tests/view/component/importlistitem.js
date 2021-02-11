@@ -4,8 +4,8 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-    availTransTypes,
 } from '../../model/transaction.js';
+import { ImportTransaction } from '../../model/importtransaction.js';
 import { Currency } from '../../model/currency.js';
 import {
     normalize,
@@ -260,7 +260,7 @@ export class ImportListItem extends Component {
 
     getExpectedTransaction(model) {
         const res = {
-            type: ImportListItem.typeFromString(model.type),
+            type: ImportTransaction.typeFromString(model.type),
         };
 
         if (res.type === EXPENSE) {
@@ -530,32 +530,10 @@ export class ImportListItem extends Component {
         return this.click(this.deleteBtn);
     }
 
-    static typeFromString(str) {
-        if (typeof str !== 'string') {
-            throw new Error('Invalid parameter');
-        }
-
-        const typeMap = {
-            expense: EXPENSE,
-            income: INCOME,
-            transferfrom: TRANSFER,
-            transferto: TRANSFER,
-            debtfrom: DEBT,
-            debtto: DEBT,
-        };
-
-        const lstr = str.toLowerCase();
-        if (!(lstr in typeMap)) {
-            throw new Error(`Unknown type: ${str}`);
-        }
-
-        return typeMap[lstr];
-    }
-
     /**
      * Convert transaction object to expected state of component
      * Transaction object: { mainAccount, enabled, ...fields of transaction }
-     * @param {Object} item - transaction item object
+     * @param {ImportTransaction} item - transaction item object
      * @param {AppState} state - application state
      */
     static render(item, state) {
@@ -565,8 +543,9 @@ export class ImportListItem extends Component {
         if (!item.mainAccount) {
             throw new Error('Main account not defined');
         }
-        if (!availTransTypes.includes(item.type)) {
-            throw new Error(`Invalid type of transaction: ${item.type}`);
+        const trType = ImportTransaction.getTypeById(item.type);
+        if (!trType) {
+            throw new Error(`Unknown import transaction type: ${item.type}`);
         }
 
         const isDifferent = (item.src_curr !== item.dest_curr);
@@ -584,8 +563,8 @@ export class ImportListItem extends Component {
             },
         };
 
-        if (item.type === EXPENSE) {
-            res.typeField.value = 'expense';
+        res.typeField.value = item.type;
+        if (item.type === 'expense') {
             res.amountField.value = item.src_amount.toString();
             res.destAmountField = {
                 value: (isDifferent) ? item.dest_amount.toString() : '',
@@ -603,8 +582,7 @@ export class ImportListItem extends Component {
                 value: '0',
                 disabled: true,
             };
-        } else if (item.type === INCOME) {
-            res.typeField.value = 'income';
+        } else if (item.type === 'income') {
             res.amountField.value = item.dest_amount.toString();
             // Use destination account and amount fields as source for income
             res.destAmountField = {
@@ -623,10 +601,9 @@ export class ImportListItem extends Component {
                 value: '0',
                 disabled: true,
             };
-        } else if (item.type === TRANSFER) {
-            const isFrom = (item.mainAccount.id === item.src_id);
+        } else if (item.type === 'transferfrom' || item.type === 'transferto') {
+            const isFrom = (item.type === 'transferfrom');
 
-            res.typeField.value = (isFrom) ? 'transferfrom' : 'transferto';
             res.amountField.value = ((isFrom) ? item.src_amount : item.dest_amount).toString();
             res.destAmountField = {
                 value: (isDifferent)
@@ -646,10 +623,7 @@ export class ImportListItem extends Component {
                 value: '0',
                 disabled: true,
             };
-        } else if (item.type === DEBT) {
-            res.typeField.value = (item.op === 1)
-                ? 'debtto'
-                : 'debtfrom';
+        } else if (item.type === 'debtfrom' || item.type === 'debtto') {
             res.amountField.value = item.src_amount.toString();
             res.destAmountField = {
                 value: '',

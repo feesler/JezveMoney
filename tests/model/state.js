@@ -21,8 +21,7 @@ import { ImportRule } from './importrule.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
-import { ImportCondition } from './importcondition.js';
-import { ImportAction } from './importaction.js';
+import { ImportRuleList } from './importrulelist.js';
 import { api } from './api.js';
 
 /* eslint-disable no-bitwise */
@@ -86,7 +85,7 @@ function copyFields(fields, expFields) {
 
     for (const f of expFields) {
         if (f in fields) {
-            res[f] = fields[f];
+            res[f] = copyObject(fields[f]);
         }
     }
 
@@ -112,32 +111,31 @@ export class AppState {
         if (!this.accounts) {
             this.accounts = new AccountsList();
         }
-        this.accounts.data = copyObject(state.accounts.data);
+        this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
 
         if (!this.persons) {
             this.persons = new PersonsList();
         }
-        this.persons.data = copyObject(state.persons.data);
+        this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
 
         if (!this.transactions) {
             this.transactions = new TransactionsList();
         }
-        this.transactions.data = copyObject(state.transactions.data);
-        this.transactions.sort();
+        this.transactions.setData(state.transactions.data);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.templates) {
             this.templates = new List();
         }
-        this.templates.data = copyObject(state.templates.data);
+        this.templates.setData(state.templates.data);
         this.templates.autoincrement = state.templates.autoincrement;
 
         if (!this.rules) {
-            this.rules = new List();
+            this.rules = new ImportRuleList();
         }
-        this.rules.data = copyObject(state.rules.data);
+        this.rules.setData(state.rules.data);
         this.rules.autoincrement = state.rules.autoincrement;
 
         this.profile = copyObject(state.profile);
@@ -313,7 +311,7 @@ export class AppState {
             }
         }
 
-        this.rulesDeleteAccounts(itemIds);
+        this.rules.deleteAccounts(itemIds);
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, itemIds);
 
         // Prepare expected updates of accounts list
@@ -475,7 +473,7 @@ export class AppState {
             }
         }
 
-        this.rulesDeletePersons(ids);
+        this.rules.deletePersons(ids);
         this.persons.deleteItems(ids);
 
         // Prepare expected updates of transactions
@@ -963,6 +961,8 @@ export class AppState {
         }
 
         const expRule = copyObject(origItem);
+        expRule.conditions = expRule.conditions.data;
+        expRule.actions = expRule.actions.data;
         const data = copyFields(params, ruleReqFields);
         setParam(expRule, data);
 
@@ -991,105 +991,5 @@ export class AppState {
         this.rules.deleteItems(ids);
 
         return true;
-    }
-
-    deleteEmptyRules() {
-        this.rules.data = this.rules.filter(
-            (rule) => (rule.conditions.length > 0 && rule.actions.length > 0),
-        );
-    }
-
-    rulesDeleteAccounts(ids) {
-        let itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
-            return;
-        }
-
-        itemIds = itemIds.map((id) => parseInt(id, 10));
-        this.rules.data = this.rules.map((rule) => {
-            const res = rule;
-
-            res.conditions = res.conditions.filter(
-                (condition) => {
-                    if (!ImportCondition.isAccountField(condition.field_id)
-                        || ImportCondition.isPropertyValueFlag(condition.flags)) {
-                        return true;
-                    }
-
-                    const accountId = parseInt(condition.value, 10);
-                    return !itemIds.includes(accountId);
-                },
-            );
-
-            res.actions = res.actions.filter(
-                (action) => {
-                    if (!ImportAction.isAccountValue(action.action_id)) {
-                        return true;
-                    }
-
-                    const accountId = parseInt(action.value, 10);
-                    return !itemIds.includes(accountId);
-                },
-            );
-
-            return res;
-        });
-
-        this.deleteEmptyRules();
-    }
-
-    rulesDeletePersons(ids) {
-        let itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
-            return;
-        }
-
-        itemIds = itemIds.map((id) => parseInt(id, 10));
-        this.rules.data = this.rules.map((rule) => {
-            const res = rule;
-
-            res.conditions = res.conditions.filter(
-                (condition) => {
-                    if (!ImportCondition.isTemplateField(condition.field_id)
-                        || ImportCondition.isPropertyValueFlag(condition.flags)) {
-                        return true;
-                    }
-
-                    const templateId = parseInt(condition.value, 10);
-                    return !itemIds.includes(templateId);
-                },
-            );
-
-            return res;
-        });
-
-        this.deleteEmptyRules();
-    }
-
-    rulesDeleteTemplate(ids) {
-        let itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
-            return;
-        }
-
-        itemIds = itemIds.map((id) => parseInt(id, 10));
-        this.rules.data = this.rules.map((rule) => {
-            const res = rule;
-
-            res.actions = res.actions.filter(
-                (action) => {
-                    if (!ImportAction.isPersonValue(action.action_id)) {
-                        return true;
-                    }
-
-                    const personId = parseInt(action.value, 10);
-                    return !itemIds.includes(personId);
-                },
-            );
-
-            return res;
-        });
-
-        this.deleteEmptyRules();
     }
 }

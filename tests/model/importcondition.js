@@ -33,6 +33,14 @@ export class ImportCondition {
         this.flags = data.flags;
     }
 
+    /** Item field types */
+    static itemFields = [
+        IMPORT_COND_FIELD_MAIN_ACCOUNT,
+        IMPORT_COND_FIELD_TPL,
+        IMPORT_COND_FIELD_TR_CURRENCY,
+        IMPORT_COND_FIELD_ACC_CURRENCY,
+    ];
+
     /** Amount field types */
     static amountFields = [
         IMPORT_COND_FIELD_TR_AMOUNT,
@@ -128,6 +136,11 @@ export class ImportCondition {
     }
 
     /** Check value for specified field type is account */
+    static isItemField(value) {
+        return this.itemFields.includes(parseInt(value, 10));
+    }
+
+    /** Check value for specified field type is account */
     static isAccountField(value) {
         return parseInt(value, 10) === IMPORT_COND_FIELD_MAIN_ACCOUNT;
     }
@@ -147,7 +160,7 @@ export class ImportCondition {
         return this.amountFields.includes(parseInt(value, 10));
     }
 
-    /** Check value for specified field type is string */
+    /** Check value for specified field type is date */
     static isDateField(value) {
         return parseInt(value, 10) === IMPORT_COND_FIELD_DATE;
     }
@@ -220,6 +233,11 @@ export class ImportCondition {
         }
 
         return (flags & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG;
+    }
+
+    /** Check field type of condition is account */
+    isItemField() {
+        return ImportCondition.isItemField(this.field_id);
     }
 
     /** Check field type of condition is account */
@@ -319,12 +337,13 @@ export class ImportCondition {
         if (this.isPropertyValue()) {
             return ImportCondition.getFieldValue(this.value, data);
         }
-
-        if (ImportCondition.isAmountField(this.field_id)) {
+        if (this.isItemField()) {
+            return parseInt(this.value, 10);
+        }
+        if (this.isAmountField()) {
             return parseFloat(this.value);
         }
-
-        if (ImportCondition.isDateField(this.field_id)) {
+        if (this.isDateField()) {
             return convDate(this.value);
         }
 

@@ -11,6 +11,7 @@ import {
     IMPORT_COND_FIELD_ACC_CURRENCY,
     IMPORT_COND_FIELD_DATE,
     IMPORT_COND_FIELD_COMMENT,
+    ImportCondition,
 } from '../../model/importcondition.js';
 
 const fieldValueTypes = [
@@ -186,6 +187,10 @@ export class ImportConditionForm extends Component {
     async changeFieldType(value) {
         const fieldId = parseInt(value, 10);
         this.model.fieldType = fieldId;
+        const field = ImportCondition.getFieldTypeById(fieldId);
+        if (!field.operators.includes(this.model.operator)) {
+            [this.model.operator] = field.operators;
+        }
         this.model.state = ImportConditionForm.getStateName(this.model);
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
@@ -199,7 +204,7 @@ export class ImportConditionForm extends Component {
 
     async changeValue(name, value, isSelect) {
         if (this.model.state !== name) {
-            throw new Error('Invalid state');
+            throw new Error(`Invalid state ${this.model.state} expected ${name}`);
         }
 
         this.model[name] = value;

@@ -1,6 +1,7 @@
 import { App } from '../../app.js';
 import { test } from '../../common.js';
 import { Currency } from '../../model/currency.js';
+import { ImportTransaction } from '../../model/importtransaction.js';
 import { ImportCondition } from '../../model/importcondition.js';
 import { ImportAction } from '../../model/importaction.js';
 import { ImportView } from '../../view/import.js';
@@ -18,8 +19,7 @@ async function checkNavigation() {
 async function checkRulesDialog() {
     await checkNavigation();
 
-    const isDialogVisible = await App.view.isRulesDialogVisible();
-    if (!isDialogVisible) {
+    if (!App.view.isRulesState()) {
         await App.view.launchRulesDialog();
     }
 }
@@ -261,7 +261,7 @@ async function runOnRuleAction(params) {
 
             descr = `${actDescr[action.action]} to '${actionType.title}'`;
         } else if (action.action === 'changeTransactionType') {
-            const transType = ImportAction.getTransactionTypeById(action.data);
+            const transType = ImportTransaction.getTypeById(action.data);
             if (!transType) {
                 throw new Error(`Transaction type (${action.data}) not found`);
             }
@@ -374,6 +374,20 @@ export async function submitRule() {
         }
 
         await App.view.submitRule();
+
+        // Check app state
+        return App.state.fetchAndTest();
+    });
+}
+
+/** Cancel import rule form */
+export async function cancelRule() {
+    await test('Cancel import rule', async () => {
+        if (!(App.view instanceof ImportView)) {
+            throw new Error('Invalid view instance');
+        }
+
+        await App.view.cancelRule();
 
         // Check app state
         return App.state.fetchAndTest();

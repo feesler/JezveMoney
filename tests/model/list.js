@@ -2,11 +2,13 @@ import { copyObject } from '../common.js';
 
 export class List {
     constructor(data = []) {
-        if (!Array.isArray(data)) {
+        if (data instanceof List) {
+            this.setData(data.data);
+        } else if (Array.isArray(data)) {
+            this.setData(data);
+        } else {
             throw new Error('Invalid data specified');
         }
-
-        this.setData(data);
     }
 
     clone() {
@@ -21,7 +23,7 @@ export class List {
     }
 
     setData(data) {
-        this.data = copyObject(data);
+        this.data = data.map((item) => this.createItem(item));
     }
 
     reset() {
@@ -47,14 +49,14 @@ export class List {
             return null;
         }
         const res = this.data.find((item) => item.id === itemId);
-        return copyObject(res);
+        return this.createItem(res);
     }
 
     getItems(ids) {
         const itemIds = (Array.isArray(ids) ? ids : [ids])
             .map((id) => parseInt(id, 10));
         const res = this.data.filter((item) => itemIds.includes(item.id));
-        return copyObject(res);
+        return res.map((item) => this.createItem(item));
     }
 
     getItemByIndex(ind) {
@@ -63,7 +65,7 @@ export class List {
             return null;
         }
 
-        return copyObject(this.data[pos]);
+        return this.createItem(this.data[pos]);
     }
 
     // Return index of item with specified id
@@ -116,6 +118,11 @@ export class List {
         return 0;
     }
 
+    /** Convert object to list item */
+    createItem(obj) {
+        return copyObject(obj);
+    }
+
     /**
      * Push item to the end of list
      * Return index of new item in the list
@@ -142,7 +149,7 @@ export class List {
             throw new Error('Invalid item');
         }
 
-        const itemObj = copyObject(item);
+        const itemObj = this.createItem(item);
 
         const nextId = this.getNextId();
         if (nextId) {
@@ -168,7 +175,7 @@ export class List {
             return false;
         }
 
-        const itemObj = copyObject(item);
+        const itemObj = this.createItem(item);
         this.data.splice(ind, 1, itemObj);
 
         return true;

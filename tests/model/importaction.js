@@ -1,3 +1,6 @@
+import { isFunction } from '../common.js';
+import { ImportTransaction } from './importtransaction.js';
+
 /** Action types */
 export const IMPORT_ACTION_SET_TR_TYPE = 1;
 export const IMPORT_ACTION_SET_ACCOUNT = 2;
@@ -26,15 +29,14 @@ export class ImportAction {
         { id: IMPORT_ACTION_SET_COMMENT, title: 'Set comment' },
     ];
 
-    /** List of available transaction types */
-    static transactionTypes = [
-        { id: 'expense', title: 'Expense' },
-        { id: 'income', title: 'Income' },
-        { id: 'transferfrom', title: 'Transfer from' },
-        { id: 'transferto', title: 'Transfer to' },
-        { id: 'debtfrom', title: 'Debt from' },
-        { id: 'debtto', title: 'Debt to' },
-    ];
+    static actionsMap = {
+        [IMPORT_ACTION_SET_TR_TYPE]: 'setTransactionType',
+        [IMPORT_ACTION_SET_ACCOUNT]: 'setAccount',
+        [IMPORT_ACTION_SET_PERSON]: 'setPerson',
+        [IMPORT_ACTION_SET_SRC_AMOUNT]: 'setAmount',
+        [IMPORT_ACTION_SET_DEST_AMOUNT]: 'setSecondAmount',
+        [IMPORT_ACTION_SET_COMMENT]: 'setComment',
+    };
 
     /** List of action types requires select value from list */
     static selectActions = [
@@ -94,24 +96,6 @@ export class ImportAction {
         return this.actionTypes.find((item) => item.title.toLowerCase() === lcName);
     }
 
-    /**
-     * Search import transaction type by id
-     * @param {string} id - transaction type id string
-     */
-    static getTransactionTypeById(value) {
-        return this.transactionTypes.find((item) => item.id === value);
-    }
-
-    /** Search import transaction type by name (case insensitive) */
-    static findTransactionTypeByName(name) {
-        if (typeof name !== 'string') {
-            throw new Error('Invalid parameter');
-        }
-
-        const lcName = name.toLowerCase();
-        return this.transactionTypes.find((item) => item.title.toLowerCase() === lcName);
-    }
-
     /** Check action requires select value from list */
     isSelectValue() {
         return ImportAction.isSelectValue(this.action_id);
@@ -130,5 +114,25 @@ export class ImportAction {
     /** Check action requires amount value */
     isAmountValue() {
         return ImportAction.isAmountValue(this.action_id);
+    }
+
+    /**
+    * Execute import action on specified context
+    * @param {ImportTransaction} context - import transaction object
+    */
+    execute(context) {
+        if (!(context instanceof ImportTransaction)) {
+            throw new Error('Invalid import item');
+        }
+        if (!(this.action_id in ImportAction.actionsMap)) {
+            throw new Error('Invalid action');
+        }
+
+        const actionName = ImportAction.actionsMap[this.action_id];
+        if (!isFunction(context[actionName])) {
+            throw new Error('Invalid action');
+        }
+
+        context[actionName](this.value);
     }
 }

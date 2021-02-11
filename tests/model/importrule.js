@@ -13,8 +13,8 @@ export class ImportRule {
     constructor(data) {
         if (
             !data
-            || !Array.isArray(data.conditions)
-            || !Array.isArray(data.actions)
+            || !data.conditions
+            || !data.actions
         ) {
             throw new Error('Invalid properties');
         }
@@ -41,7 +41,7 @@ export class ImportRule {
     /** Validate amount value */
     isValidAmount(value) {
         const amount = parseFloat(fixFloat(value));
-        return (!Number.isNaN(amount) && amount !== 0);
+        return (!Number.isNaN(amount) && amount > 0);
     }
 
     /** Validate import rule */

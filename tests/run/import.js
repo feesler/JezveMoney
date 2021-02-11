@@ -1,10 +1,7 @@
 import { App } from '../app.js';
 import { test, copyObject } from '../common.js';
 import { Currency } from '../model/currency.js';
-import {
-    applyTemplate,
-    applyRules,
-} from '../model/import.js';
+import { applyTemplate } from '../model/import.js';
 import { ImportList } from '../view/component/importlist.js';
 import { ImportView } from '../view/import.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
@@ -211,9 +208,7 @@ export async function submitUploaded(params) {
             throw new Error('Invalid view instance');
         }
 
-        if (!await App.view.isUploadState()) {
-            throw new Error('Invalid state of view');
-        }
+        App.view.checkUploadState();
 
         const importData = parseCSV(params.data);
 
@@ -235,22 +230,16 @@ export async function submitUploaded(params) {
             importTpl = App.view.getExpectedTemplate();
         }
 
-        let importTransactions = applyTemplate(importData, importTpl, mainAccount);
-
         const skipList = [];
-        importTransactions = importTransactions.map(
-            (item) => {
-                const res = applyRules(item, App.state.rules);
-                const tr = findSimilar(res, skipList);
-
-                if (tr) {
-                    skipList.push(tr.id);
-                    res.enabled = false;
-                }
-
-                return res;
-            },
-        );
+        const importTransactions = applyTemplate(importData, importTpl, mainAccount);
+        for (const item of importTransactions) {
+            App.state.rules.applyTo(item);
+            const tr = findSimilar(item, skipList);
+            if (tr) {
+                skipList.push(tr.id);
+                item.enabled = false;
+            }
+        }
 
         let itemsList;
         if (params.account) {
@@ -453,7 +442,6 @@ export async function submit() {
 
         const enabledItems = App.view.content.itemsList.getEnabledItems();
         let isValid = (enabledItems.length > 0);
-
         for (const item of enabledItems) {
             const expectedTransaction = item.getExpectedTransaction(item.model);
             const createRes = App.state.createTransaction(expectedTransaction);

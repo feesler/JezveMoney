@@ -107,13 +107,21 @@ export class ImportRulesDialog extends Component {
         return res;
     }
 
-    isFormState(model) {
+    getState(model = this.model) {
+        return model.state;
+    }
+
+    isListState(model = this.model) {
+        return (model.state === 'list');
+    }
+
+    isFormState(model = this.model) {
         return (model.state === 'create' || model.state === 'update');
     }
 
     /** Return expected import rule object */
     getExpectedRule() {
-        if (!this.isFormState(this.model)) {
+        if (!this.isFormState()) {
             throw new Error('Invalid state');
         }
 
@@ -122,7 +130,7 @@ export class ImportRulesDialog extends Component {
 
     /** Return validation result for expected import rule */
     isValidRule() {
-        if (!this.isFormState(this.model)) {
+        if (!this.isFormState()) {
             throw new Error('Invalid state');
         }
 
@@ -134,7 +142,7 @@ export class ImportRulesDialog extends Component {
     }
 
     async createRule() {
-        if (this.model.state !== 'list') {
+        if (!this.isListState()) {
             throw new Error('Invalid state');
         }
 
@@ -160,7 +168,7 @@ export class ImportRulesDialog extends Component {
             throw new Error(`Invalid rule index: ${index}`);
         }
 
-        if (this.model.state !== 'list') {
+        if (!this.isListState()) {
             throw new Error('Invalid state');
         }
 
@@ -193,13 +201,13 @@ export class ImportRulesDialog extends Component {
     }
 
     async deleteRule(index) {
+        if (this.model.state !== 'list') {
+            throw new Error('Invalid state');
+        }
+
         const ind = parseInt(index, 10);
         if (Number.isNaN(ind) || ind < 0 || ind >= this.items.length) {
             throw new Error(`Invalid rule index: ${index}`);
-        }
-
-        if (this.model.state !== 'list') {
-            throw new Error('Invalid state');
         }
 
         this.model.rules.splice(ind, 1);
@@ -220,14 +228,14 @@ export class ImportRulesDialog extends Component {
         await this.wait(this.ruleDeletePopupId, { hidden: true });
         await this.waitForFunction(async () => {
             await this.parse();
-            return !this.model.loading && this.model.state === 'list';
+            return !this.model.loading && this.isListState();
         });
 
         return this.checkState();
     }
 
     async submitRule() {
-        if (!this.isFormState(this.model)) {
+        if (!this.isFormState()) {
             throw new Error('Invalid state');
         }
 
@@ -249,14 +257,14 @@ export class ImportRulesDialog extends Component {
         await this.ruleForm.submit();
         await this.waitForFunction(async () => {
             await this.parse();
-            return !valid || (!this.model.loading && this.model.state === 'list');
+            return !valid || (!this.model.loading && this.isListState());
         });
 
         return this.checkState();
     }
 
     async cancelRule() {
-        if (!this.isFormState(this.model)) {
+        if (!this.isFormState()) {
             throw new Error('Invalid state');
         }
 
@@ -266,7 +274,7 @@ export class ImportRulesDialog extends Component {
         await this.ruleForm.cancel();
         await this.waitForFunction(async () => {
             await this.parse();
-            return !this.model.loading && this.model.state === 'list';
+            return !this.model.loading && this.isListState();
         });
 
         return this.checkState();

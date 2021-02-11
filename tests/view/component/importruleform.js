@@ -1,5 +1,6 @@
 import { Component } from './component.js';
 import { Currency } from '../../model/currency.js';
+import { ImportTransaction } from '../../model/importtransaction.js';
 import { ImportRule } from '../../model/importrule.js';
 import { ImportCondition } from '../../model/importcondition.js';
 import { ImportAction } from '../../model/importaction.js';
@@ -262,7 +263,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportAction.isTransactionTypeValue(type)) {
-            const transType = ImportAction.transactionTypes[0];
+            const [transType] = ImportTransaction.availTypes;
             return transType.id;
         }
 

@@ -1,5 +1,6 @@
 import { Component } from './component.js';
 import { ImportAction } from '../../model/importaction.js';
+import { ImportTransaction } from '../../model/importtransaction.js';
 import { App } from '../../app.js';
 
 export class ImportActionItem extends Component {
@@ -32,7 +33,7 @@ export class ImportActionItem extends Component {
 
         const { value } = cont.valueTitle;
         if (ImportAction.isTransactionTypeValue(actionType.id)) {
-            const transactionType = ImportAction.findTransactionTypeByName(value);
+            const transactionType = ImportTransaction.findTypeByName(value);
             if (!transactionType) {
                 throw new Error(`Unknown transaction type: '${value}'`);
             }
@@ -86,7 +87,7 @@ export class ImportActionItem extends Component {
 
         let value;
         if (ImportAction.isTransactionTypeValue(actionType.id)) {
-            const transactionType = ImportAction.getTransactionTypeById(model.value);
+            const transactionType = ImportTransaction.getTypeById(model.value);
             if (!transactionType) {
                 throw new Error(`Unknown transaction type: '${model.value}'`);
             }

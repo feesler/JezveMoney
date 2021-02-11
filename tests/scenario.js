@@ -12,9 +12,11 @@ import { generateCSV } from './model/import.js';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_ACC_AMOUNT,
+    IMPORT_COND_FIELD_TR_AMOUNT,
     IMPORT_COND_FIELD_DATE,
     IMPORT_COND_FIELD_COMMENT,
     IMPORT_COND_OP_EQUAL,
+    IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_STRING_INCLUDES,
     IMPORT_COND_OP_LESS,
     IMPORT_COND_OP_GREATER,
@@ -24,6 +26,7 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
     IMPORT_ACTION_SET_SRC_AMOUNT,
+    IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
 } from './model/importaction.js';
 
@@ -133,7 +136,11 @@ export class Scenario {
         await ApiTests.deleteUserIfExist(App.config.apiTestUser);
         await ApiTests.deleteUserIfExist(App.config.newUser);
 
-        // Upload CSV file for import tests
+        await this.prepareImportTests();
+    }
+
+    // Upload CSV file for import tests
+    async prepareImportTests() {
         const now = new Date();
         this.csvStatement = generateCSV([
             [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
@@ -2231,6 +2238,7 @@ export class Scenario {
     }
 
     async runSubmitImportTests() {
+        await ImportTests.submit();
         // Verify submit is disabled for empty list
         this.environment.setBlock('Verify submit is disabled for empty list', 2);
         await ImportTests.submit();
@@ -2266,7 +2274,6 @@ export class Scenario {
 
     async runDeleteImportItemTests() {
         await ImportTests.deleteItems([3, 5]);
-        await ImportTests.submit();
     }
 
     async runImportItemStateLoop() {
@@ -2470,7 +2477,7 @@ export class Scenario {
             { column: 'accountCurrency', index: 10 },
             { column: 'transactionCurrency', index: 8 },
             { column: 'date', index: 1 },
-            { column: 'comment', index: 2 },
+            { column: 'comment', index: 4 },
         ]);
         await ImportTests.inputTemplateName('Template_dup');
         await ImportTests.submitTemplate();
@@ -2503,6 +2510,7 @@ export class Scenario {
         this.environment.setBlock('Import rules', 1);
         await ImportTests.openRulesDialog();
 
+        await this.runImportRuleValidationTests();
         await this.runCreateImportRuleTests();
         await this.runUpdateImportRuleTests();
         await this.runDeleteImportRuleTests();
@@ -2510,196 +2518,299 @@ export class Scenario {
         await ImportTests.closeRulesDialog();
     }
 
-    // Create import rule tests
-    async runCreateImportRuleTests() {
-        this.environment.setBlock('Create import rules', 1);
+    // Import rule validation tests
+    async runImportRuleValidationTests() {
+        this.environment.setBlock('Import rule validation', 1);
 
-        // Create rule #1
-        this.environment.setBlock('Create import rule', 2);
+        this.environment.setBlock('Submit empty rule', 2);
         await ImportTests.createRule();
-        // Check empty rule is not submitted
-        this.environment.setBlock('Submit empty rule', 3);
         await ImportTests.submitRule();
-        // Add condition #1: Comment includes 'Bank Name'
+
+        this.environment.setBlock('Submit rule without actions', 2);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
             { action: 'inputValue', data: 'Bank Name' },
         ]);
-        // Check rule without actions is not submitted
-        this.environment.setBlock('Submit rule without actions', 3);
         await ImportTests.submitRule();
-        // Add condition #2: Acount amount is greater than (empty value)
+
+        this.environment.setBlock('Submit condition with empty amount', 2);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Ba' },
+        ]);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
         ]);
-        // Check condition with empty amount is not submitted
-        this.environment.setBlock('Submit condition with empty amount', 3);
         await ImportTests.submitRule();
-        // Update condition #2: Acount amount is greater than 100.01
         await ImportTests.updateRuleCondition({
             pos: 1,
-            action: { action: 'inputAmount', data: '100.01' },
+            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
         });
-        // Check duplicate conditions is not submitted
-        this.environment.setBlock('Submit duplicate conditions', 3);
-        // Add condition #3: Acount amount is greater than 99.99
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Submit condition with zero amount', 2);
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'inputAmount', data: '00.0' },
+        });
+        await ImportTests.submitRule();
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+        });
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Submit condition with negative amount', 2);
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'inputAmount', data: '-100.0' },
+        });
+        await ImportTests.submitRule();
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
+        });
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Submit duplicate conditions', 2);
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: [
+                { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+                { action: 'inputAmount', data: '100.01' },
+            ],
+        });
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
             { action: 'inputAmount', data: '99.99' },
         ]);
         await ImportTests.submitRule();
-        // Check condition with not intersected value regions is not submitted
-        this.environment.setBlock('Submit conditions with non-intersecting value regions', 3);
-        // Update condition #3: Acount amount is less than 99.99
+
+        this.environment.setBlock('Submit conditions with non-intersecting value regions', 2);
         await ImportTests.updateRuleCondition({
             pos: 2,
             action: { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
         });
         await ImportTests.submitRule();
-        // Update condition #3: Acount amount is less than 999.99
         await ImportTests.updateRuleCondition({
             pos: 2,
             action: { action: 'inputAmount', data: '999.99' },
         });
-        // Add action #1: Set comment 'Ba'
-        await ImportTests.createRuleAction([
-            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
-            { action: 'inputValue', data: 'Ba' },
-        ]);
-        // Check duplicate actions is not submitted
-        this.environment.setBlock('Submit duplicate actions', 3);
-        // Add action #2: Set comment (empty value)
-        await ImportTests.createRuleAction([
-            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
+            { action: 'inputAmount', data: '5' },
         ]);
         await ImportTests.submitRule();
-        // Check duplicate actions is not submitted
-        this.environment.setBlock('Submit empty amount action', 3);
+        await ImportTests.deleteRuleCondition(3);
+
+        this.environment.setBlock('Submit duplicate actions', 2);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'New comment' },
+        ]);
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Submit empty amount action', 2);
         await ImportTests.updateRuleAction({
             pos: 1,
             action: { action: 'changeAction', data: IMPORT_ACTION_SET_SRC_AMOUNT },
         });
         await ImportTests.submitRule();
-        await ImportTests.deleteRuleAction(1);
-        // Submit valid rule
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'changeAction', data: IMPORT_ACTION_SET_DEST_AMOUNT },
+        });
         await ImportTests.submitRule();
 
-        // Create rule #2
-        this.environment.setBlock('Create import rule', 2);
-        await ImportTests.createRule();
-        // Check rule without conditions is not submitted
-        this.environment.setBlock('Test rule without conditions', 3);
-        await ImportTests.createRuleAction();
+        this.environment.setBlock('Submit zero amount action', 2);
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'inputAmount', data: '0.' },
+        });
         await ImportTests.submitRule();
-        // Add condition #1: Comment includes (empty value)
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'changeAction', data: IMPORT_ACTION_SET_SRC_AMOUNT },
+        });
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Submit negative amount action', 2);
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'inputAmount', data: '-10.' },
+        });
+        await ImportTests.submitRule();
+        await ImportTests.updateRuleAction({
+            pos: 1,
+            action: { action: 'changeAction', data: IMPORT_ACTION_SET_DEST_AMOUNT },
+        });
+        await ImportTests.submitRule();
+        await ImportTests.deleteRuleAction(1);
+
+        this.environment.setBlock('Submit rule without conditions', 2);
+        await ImportTests.deleteRuleCondition(2);
+        await ImportTests.deleteRuleCondition(1);
+        await ImportTests.deleteRuleCondition(0);
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Submit `Comment includes` condition with empty value', 2);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
         ]);
-        // Check `Comment includes` condition is not submitted with empty value
-        this.environment.setBlock('Test `Comment includes` condition with empty value', 3);
         await ImportTests.submitRule();
-        await ImportTests.deleteRuleAction(0);
-        // Update condition #1: Comment includes 'C2C'
+
+        this.environment.setBlock('Submit date condition with empty value', 2);
         await ImportTests.updateRuleCondition({
             pos: 0,
-            action: { action: 'inputValue', data: 'C2C' },
+            action: [
+                { action: 'changeFieldType', data: IMPORT_COND_FIELD_DATE },
+                { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
+            ],
         });
-        // Add condition #2: Comment includes 'RBA'
-        await ImportTests.createRuleCondition([
-            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
-            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-            { action: 'inputValue', data: 'RBA' },
-        ]);
-        // Add condition #3: Main account equal 'ACC_RUB'
-        await ImportTests.createRuleCondition([
-            { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
-            { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-            { action: 'changeAccount', data: this.ACC_RUB },
-        ]);
-        // Update condition #2: Comment includes 'R-BANK'
+
+        this.environment.setBlock('Submit Date condition with invalid value', 2);
         await ImportTests.updateRuleCondition({
-            pos: 1,
-            action: { action: 'inputValue', data: 'R-BANK' },
-        });
-        // Check Date condition is not submitted with empty value
-        this.environment.setBlock('Submit date condition with empty value', 3);
-        // Add condition #4: Date greater than (empty value)
-        await ImportTests.createRuleCondition([
-            { action: 'changeFieldType', data: IMPORT_COND_FIELD_DATE },
-            { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
-        ]);
-        // Check Date condition is not submitted with invalid value
-        this.environment.setBlock('Test Date condition with invalid value', 3);
-        // Update condition #4: Date greater than '01xx'
-        await ImportTests.updateRuleCondition({
-            pos: 3,
+            pos: 0,
             action: { action: 'inputValue', data: '01xx' },
         });
         await ImportTests.submitRule();
-        // Update condition #4: Date greater than yesterday
-        await ImportTests.updateRuleCondition({
-            pos: 3,
-            action: { action: 'inputValue', data: App.dates.yesterday },
-        });
-        // Add action #1: Set transaction type to 'Transfer from'
+
+        await ImportTests.cancelRule();
+    }
+
+    // Create import rule tests
+    async runCreateImportRuleTests() {
+        this.environment.setBlock('Create import rules', 1);
+
+        this.environment.setBlock('Create import rule #1', 2);
+        await ImportTests.createRule();
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'MOBILE' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'income' },
+        ]);
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Create import rule #2', 2);
+        await ImportTests.createRule();
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+            { action: 'inputAmount', data: '80' },
+        ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
             { action: 'changeTransactionType', data: 'transferfrom' },
         ]);
-        // Add action #2: Set account to 'ACC_EUR'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
             { action: 'changeAccount', data: this.ACC_EUR },
         ]);
-        // Add action #3: Set comment 'Transfer something'
-        await ImportTests.createRuleAction([
-            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
-            { action: 'inputValue', data: 'Transfer something' },
-        ]);
-        // Update action #2: Set account to 'ACC_RUB'
-        await ImportTests.updateRuleAction({
-            pos: 1,
-            action: { action: 'changeAccount', data: this.ACC_RUB },
-        });
-        // Delete condition #1
-        await ImportTests.deleteRuleCondition(0);
-        // Delete action #3:
-        await ImportTests.deleteRuleAction(2);
         await ImportTests.submitRule();
 
-        // Create rule #3
-        this.environment.setBlock('Create import rule', 2);
+        this.environment.setBlock('Create import rule #3', 2);
         await ImportTests.createRule();
-        // Add condition #1: Comment includes 'Bank Name'
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-            { action: 'inputValue', data: 'PRODUCTY' },
+            { action: 'inputValue', data: 'SIGMA' },
         ]);
-        // Add action #1: Set comment 'Local shop'
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'transferto' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+            { action: 'changeAccount', data: this.ACC_USD },
+        ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'Local shop' },
         ]);
         await ImportTests.submitRule();
 
-        // Create rule #4
-        this.environment.setBlock('Create import rule', 2);
+        this.environment.setBlock('Create import rule #4', 2);
         await ImportTests.createRule();
-        // Add condition #1: Comment includes 'Bank Name'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'TAXI' },
+        ]);
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
+            { action: 'inputAmount', data: '100' },
+        ]);
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
+            { action: 'inputAmount', data: '500' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'debtfrom' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+            { action: 'changePerson', data: this.MARIA },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: '' },
+        ]);
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Create import rule #5', 2);
+        await ImportTests.createRule();
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'MAGAZIN' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'debtto' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+            { action: 'changePerson', data: this.ALEX },
+        ]);
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Create import rule #6', 2);
+        await ImportTests.createRule();
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'AMSTERDAM' },
+        ]);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
             { action: 'inputValue', data: 'BOOKING' },
         ]);
-        // Add action #1: Set comment 'Local shop'
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
+            { action: 'togglePropValue' },
+            { action: 'changeProperty', data: IMPORT_COND_FIELD_TR_AMOUNT },
+        ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'Hotel, Booking' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_DEST_AMOUNT },
+            { action: 'inputAmount', data: '500.5' },
         ]);
         await ImportTests.submitRule();
     }
@@ -2707,47 +2818,40 @@ export class Scenario {
     // Update import rule tests
     async runUpdateImportRuleTests() {
         this.environment.setBlock('Update import rules', 1);
-        // Update rule #1
-        this.environment.setBlock('Update import rule', 2);
+
+        this.environment.setBlock('Update import rule #1', 2);
         await ImportTests.updateRule(0);
-        // Update action #1: Set comment 'Bar Name'
-        await ImportTests.updateRuleAction({
-            pos: 0,
-            action: { action: 'inputValue', data: 'Bar Name' },
-        });
-        // Update condition #1: Comment includes 'BAR'
-        await ImportTests.updateRuleCondition({
-            pos: 0,
-            action: { action: 'inputValue', data: 'BAR' },
-        });
-        // Delete condition #3
-        await ImportTests.deleteRuleCondition(2);
-        // Add action #2: Set transaction type to 'debtfrom'
-        // Also test correctness of data after change action type
-        await ImportTests.createRuleAction([
-            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: this.ALEX },
-            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-            { action: 'changeTransactionType', data: 'debtfrom' },
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+            { action: 'changeAccount', data: this.ACC_3 },
         ]);
-        // Add action #3: Set person to 'ALEX'
         await ImportTests.createRuleAction([
-            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: this.ALEX },
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Mobile' },
         ]);
         await ImportTests.submitRule();
 
-        // Update rule #2
-        this.environment.setBlock('Update import rule', 2);
-        await ImportTests.updateRule(1);
-        // Delete action #2:
-        await ImportTests.deleteRuleAction(1);
-        // Add condition #4: Comment includes 'C2C'
-        await ImportTests.createRuleCondition([
-            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
-            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-            { action: 'inputValue', data: 'C2C' },
-        ]);
+        this.environment.setBlock('Update import rule #4', 2);
+        await ImportTests.updateRule(3);
+        await ImportTests.updateRuleCondition({
+            pos: 1,
+            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
+        });
+        await ImportTests.updateRuleCondition({
+            pos: 2,
+            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
+        });
+        await ImportTests.updateRuleAction({
+            pos: 2,
+            action: { action: 'inputValue', data: 'Taxi for Maria' },
+        });
+        await ImportTests.submitRule();
+
+        this.environment.setBlock('Update import rule #6', 2);
+        await ImportTests.updateRule(5);
+        await ImportTests.deleteRuleCondition(0);
+        await ImportTests.deleteRuleAction(0);
         await ImportTests.submitRule();
     }
 

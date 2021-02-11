@@ -72,6 +72,18 @@ export class ImportView extends TestView {
     async buildModel(cont) {
         const res = {};
 
+        const uploadVisible = await Component.isVisible(cont.uploadDialog);
+        const rulesVisible = await Component.isVisible(cont.rulesDialog);
+        if (uploadVisible && !rulesVisible) {
+            res.state = 'upload';
+        } else if (!uploadVisible && rulesVisible) {
+            res.state = 'rules';
+        } else if (!uploadVisible && !rulesVisible) {
+            res.state = 'main';
+        } else {
+            throw new Error('Invalid state of import view');
+        }
+
         res.title = cont.title.value;
         res.totalCount = parseInt(cont.totalCount.value, 10);
         res.enabledCount = parseInt(cont.enabledCount.value, 10);
@@ -107,7 +119,31 @@ export class ImportView extends TestView {
         return res;
     }
 
+    isRulesState() {
+        return this.model.state === 'rules';
+    }
+
+    assertStateId(state) {
+        if (this.model.state !== state) {
+            throw new Error('Invalid state of import view');
+        }
+    }
+
+    checkMainState() {
+        this.assertStateId('main');
+    }
+
+    checkUploadState() {
+        this.assertStateId('upload');
+    }
+
+    checkRulesState() {
+        this.assertStateId('rules');
+    }
+
     async launchUploadDialog() {
+        this.checkMainState();
+
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
 
@@ -117,6 +153,8 @@ export class ImportView extends TestView {
     }
 
     async closeUploadDialog() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
 
@@ -126,6 +164,8 @@ export class ImportView extends TestView {
     }
 
     async setUploadFile(name, data) {
+        this.checkUploadState();
+
         this.uploadFilename = name;
         this.fileData = data;
 
@@ -133,123 +173,167 @@ export class ImportView extends TestView {
     }
 
     async selectUploadTemplateById(val) {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.selectTemplateById(val));
     }
 
     async selectUploadTemplateByIndex(val) {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.selectTemplateByIndex(val));
     }
 
     async selectUploadAccount(val) {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.selectAccount(val));
     }
 
     async selectUploadEncoding(val) {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.selectEncoding(val));
     }
 
     /** Select file to upload */
     async upload() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.upload());
     }
 
     async inputTemplateName(val) {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.inputTemplateName(val));
     }
 
     async selectTemplateColumn(name, index) {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.selectTemplateColumn(name, index));
     }
 
     /** Create new import template */
     async createTemplate() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.createTemplate());
     }
 
     /** Update currently selected template */
     async updateTemplate() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.updateTemplate());
     }
 
     /** Delete currently selected template */
     async deleteTemplate() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.deleteTemplate());
     }
 
     /** Submit template */
     async submitTemplate() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.submitTemplate());
     }
 
     /** Cancel create/update template */
     async cancelTemplate() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.cancelTemplate());
     }
 
     /** Submit converted file data */
     async submitUploaded() {
+        this.checkUploadState();
+
         await this.performAction(() => this.content.uploadDialog.submit());
         await this.performAction(() => this.wait(this.uploadPopupId, { hidden: true }));
     }
 
     /** Return current state of upload dialog */
     getUploadState() {
+        this.checkUploadState();
+
         return this.content.uploadDialog.getCurrentState();
     }
 
     /** Return expected template object */
     getExpectedTemplate() {
+        this.checkUploadState();
+
         return this.content.uploadDialog.getExpectedTemplate();
     }
 
-    async isUploadState() {
-        return Component.isVisible(this.content.uploadDialog);
-    }
-
     async selectMainAccount(val) {
+        this.checkMainState();
+
         await this.performAction(async () => {
             await this.selectByValue(this.content.mainAccountSelect.elem, val.toString());
             await this.onChange(this.content.mainAccountSelect.elem);
         });
     }
 
-    async isRulesDialogVisible() {
-        return Component.isVisible(this.content.rulesDialog);
+    checkRulesFormState() {
+        this.checkRulesState();
+        if (!this.content.rulesDialog.isFormState()) {
+            throw new Error('Invalid state');
+        }
+    }
+
+    checkRulesListState() {
+        this.checkRulesState();
+        if (!this.content.rulesDialog.isListState()) {
+            throw new Error('Invalid state');
+        }
     }
 
     async launchRulesDialog() {
+        this.checkMainState();
+
         await this.performAction(() => this.click(this.content.rulesBtn.elem));
         await this.performAction(() => this.wait(this.rulesPopupId, { visible: true }));
 
-        if (!await Component.isVisible(this.content.rulesDialog)) {
-            throw new Error('Import rules dialog not appear');
-        }
+        this.checkRulesListState();
 
         return true;
     }
 
     async closeRulesDialog() {
+        this.checkRulesState();
+
         await this.performAction(() => this.content.rulesDialog.close());
         await this.performAction(() => this.wait(this.rulesPopupId, { hidden: true }));
 
-        if (await Component.isVisible(this.content.rulesDialog)) {
-            throw new Error('Import rules dialog not closed');
-        }
+        this.checkMainState();
 
         return true;
     }
 
     async createRule() {
+        this.checkRulesListState();
+
         await this.performAction(() => this.content.rulesDialog.createRule());
         return true;
     }
 
     async updateRule(index) {
+        this.checkRulesListState();
+
         await this.performAction(() => this.content.rulesDialog.updateRule(index));
         return true;
     }
 
     async deleteRule(index) {
+        this.checkRulesListState();
+
         this.model.rulesCount -= 1;
         this.expectedState = this.getExpectedState(this.model);
 
@@ -259,38 +343,58 @@ export class ImportView extends TestView {
     }
 
     async addRuleCondition() {
-        await this.performAction(() => this.content.rulesDialog.ruleForm.addCondition());
+        this.checkRulesFormState();
+
+        const { ruleForm } = this.content.rulesDialog;
+        await this.performAction(() => ruleForm.addCondition());
+
         return true;
     }
 
     async deleteRuleCondition(index) {
+        this.checkRulesFormState();
+
         const { ruleForm } = this.content.rulesDialog;
         await this.performAction(() => ruleForm.deleteCondition(index));
+
         return true;
     }
 
     async runOnRuleCondition(index, action) {
+        this.checkRulesFormState();
+
         const { ruleForm } = this.content.rulesDialog;
         await this.performAction(() => ruleForm.runOnCondition(index, action));
+
         return true;
     }
 
     getRuleConditions() {
-        const res = copyObject(this.content.rulesDialog.ruleForm.model.conditions);
-        return res;
+        this.checkRulesFormState();
+
+        const { ruleForm } = this.content.rulesDialog;
+        return copyObject(ruleForm.model.conditions);
     }
 
     getRuleActions() {
-        const res = copyObject(this.content.rulesDialog.ruleForm.model.actions);
-        return res;
+        this.checkRulesFormState();
+
+        const { ruleForm } = this.content.rulesDialog;
+        return copyObject(ruleForm.model.actions);
     }
 
     async addRuleAction() {
-        await this.performAction(() => this.content.rulesDialog.ruleForm.addAction());
+        this.checkRulesFormState();
+
+        const { ruleForm } = this.content.rulesDialog;
+        await this.performAction(() => ruleForm.addAction());
+
         return true;
     }
 
     async deleteRuleAction(index) {
+        this.checkRulesFormState();
+
         const { ruleForm } = this.content.rulesDialog;
         await this.performAction(() => ruleForm.deleteAction(index));
 
@@ -298,6 +402,8 @@ export class ImportView extends TestView {
     }
 
     async runOnRuleAction(index, action) {
+        this.checkRulesFormState();
+
         const { ruleForm } = this.content.rulesDialog;
         await this.performAction(() => ruleForm.runOnAction(index, action));
 
@@ -305,10 +411,14 @@ export class ImportView extends TestView {
     }
 
     isValidRule() {
+        this.checkRulesFormState();
+
         return this.content.rulesDialog.isValidRule();
     }
 
     async submitRule() {
+        this.checkRulesFormState();
+
         if (this.isValidRule()) {
             const rulesState = this.getRulesState();
             if (rulesState === 'create') {
@@ -323,6 +433,8 @@ export class ImportView extends TestView {
     }
 
     async cancelRule() {
+        this.checkRulesFormState();
+
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.rulesDialog.cancelRule());
@@ -330,27 +442,28 @@ export class ImportView extends TestView {
         return this.checkState();
     }
 
-    /** Return expected import rule object */
     getRulesState() {
-        const { state, isUpdate } = this.content.rulesDialog.model;
+        this.checkRulesState();
 
-        if (state === 'form') {
-            return isUpdate ? 'update' : 'create';
-        }
-
-        return state;
+        return this.content.rulesDialog.getState();
     }
 
     /** Return expected import rule object */
     getExpectedRule() {
+        this.checkRulesState();
+
         return this.content.rulesDialog.getExpectedRule();
     }
 
     async addItem() {
+        this.checkMainState();
+
         await this.performAction(() => this.content.addBtn.click());
     }
 
     async enableItems(index, value) {
+        this.checkMainState();
+
         if (typeof index === 'undefined') {
             throw new Error('No items specified');
         }
@@ -375,6 +488,8 @@ export class ImportView extends TestView {
     }
 
     async runItemAction(index, { action, data }) {
+        this.checkMainState();
+
         const item = this.content.itemsList.getItem(index);
 
         await this.performAction(() => item.runAction(action, data));
@@ -383,6 +498,8 @@ export class ImportView extends TestView {
     }
 
     async deleteItem(index) {
+        this.checkMainState();
+
         if (typeof index === 'undefined') {
             throw new Error('No items specified');
         }
@@ -397,13 +514,14 @@ export class ImportView extends TestView {
     }
 
     async submit() {
+        this.checkMainState();
+
         const disabled = await this.prop(this.content.submitBtn, 'disabled');
         if (disabled) {
             throw new ImportViewSubmitError('Submit is not available');
         }
 
         await this.performAction(() => this.click(this.content.submitBtn));
-
         await this.performAction(() => this.wait('#notificationPopup', { visible: true }));
     }
 }
