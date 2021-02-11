@@ -77,6 +77,10 @@
     min-height: 48px;
     overflow-y: auto;
     padding: 6px;
+    border: 0 none;
+    margin: 0 1px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 /* Validation feedback container */

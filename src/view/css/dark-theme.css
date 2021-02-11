@@ -461,7 +461,7 @@ div.trans-list__item_selected
 }
 
 /* Import rule */
-.rule-item
+.rule-item__ext
 {
     background-color: #202020;
 }
@@ -508,7 +508,7 @@ div.trans-list__item_selected
     color: #B0B0B0;
 }
 
-.rule-form__collapse,
+.rule-form__collapse-content,
 .rule-item .rule-item__ext
 {
     color: #BBBBBB;

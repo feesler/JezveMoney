@@ -104,9 +104,10 @@
     display: none;
     flex-flow: column nowrap;
     padding: 8px;
-    border-width: 1px;
-    border-style: solid;
-    border-top: 0 none;
+    margin: 0 1px;
+    border: 0 none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .rule-item_expanded > .rule-item__ext
@@ -117,7 +118,7 @@
 .rule-item__header
 {
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .rule-item__conditions,
@@ -131,3 +132,18 @@
 {
     margin-bottom: 8px;
 }
+
+.rule-item__conditions .cond-item:first-child,
+.rule-item__actions .action-item:first-child
+{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.rule-item__conditions .cond-item:last-child,
+.rule-item__actions .action-item:last-child
+{
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+

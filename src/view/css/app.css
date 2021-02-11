@@ -709,12 +709,13 @@ select
 .submit-btn:disabled
 {
 	background-color: #5082AA;
+    opacity: 0.3;
 }
 
 
 * + .cancel-btn
 {
-	margin-left: 15px;
+	margin-left: 30px;
 }
 
 
@@ -725,7 +726,7 @@ select
 }
 
 
-.cancel-btn:hover
+.acc_controls .cancel-btn:hover
 {
 	background-color: #C0C0C0;
 }
@@ -745,6 +746,12 @@ select
     text-decoration: underline;
     cursor: pointer;
 	color: #1E82CC;
+}
+
+.link-btn:disabled
+{
+    color: #808080;
+    pointer-events: none;
 }
 
 
@@ -960,7 +967,6 @@ select
 	width: 34px;
 	height: 34px;
 	padding: 5px;
-	margin: 0px;
 	color: #FFFFFF;
 	background-color: #0072C6;
 	cursor: pointer;
