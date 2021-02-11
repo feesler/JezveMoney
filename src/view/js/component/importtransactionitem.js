@@ -1,7 +1,7 @@
 'use strict';
 
 /* global ce, re, fixFloat, show, enable, selectedValue, selectByValue, extend, AppComponent */
-/* global copyObject, addChilds, removeChilds */
+/* global formatDate, copyObject, addChilds, removeChilds */
 /* global EXPENSE, INCOME, TRANSFER, DEBT, AccountList */
 
 /**
@@ -29,18 +29,6 @@ function ImportTransactionItem() {
         mainAccount: this.props.mainAccount
     };
 
-    this.data = {
-        type: EXPENSE,
-        src_id: this.model.mainAccount.id,
-        dest_id: 0,
-        src_curr: this.model.mainAccount.curr_id,
-        dest_curr: this.model.mainAccount.curr_id,
-        src_amount: 0,
-        dest_amount: 0,
-        date: '',
-        comment: ''
-    };
-
     this.transTypeMap = {
         expense: EXPENSE,
         income: INCOME,
@@ -48,18 +36,17 @@ function ImportTransactionItem() {
         transferto: TRANSFER,
         debtfrom: DEBT,
         debtto: DEBT
-
     };
 
     this.state = {
         enabled: true,
         type: 'expense',
-        accountId: this.data.src_id,
-        accountCurrId: this.data.src_curr,
+        accountId: this.model.mainAccount.id,
+        accountCurrId: this.model.mainAccount.curr_id,
         secondAccountId: 0,
         secondAccountCurrId: 0,
         secondAccountVisible: false,
-        currId: this.data.dest_curr,
+        currId: this.model.mainAccount.curr_id,
         isDiff: false,
         amount: '',
         secondAmount: '',
@@ -139,7 +126,7 @@ function ImportTransactionItem() {
         var option = ce('option', {
             value: account.id,
             textContent: account.name,
-            disabled: (account.id === this.data.src_id)
+            disabled: (account.id === this.state.accountId)
         });
 
         this.destAccSel.appendChild(option);
@@ -257,6 +244,7 @@ function ImportTransactionItem() {
     ]);
 
     if (this.props.originalData) {
+        this.setOriginal(this.props.originalData);
         this.setExtendedContent(this.createOrigDataContainer(this.props.originalData));
     }
 
@@ -328,6 +316,61 @@ ImportTransactionItem.prototype.setExtendedContent = function (content) {
     }
 
     show(this.toggleExtBtn, content);
+};
+
+/**
+ * Remove item component
+ */
+ImportTransactionItem.prototype.setOriginal = function (data) {
+    var amount;
+    var trAmount;
+    var accCurr;
+    var trCurr;
+
+    if (!data) {
+        throw new Error('Invalid data');
+    }
+
+    this.data = copyObject(data);
+
+    this.data.mainAccount = this.model.mainAccount.id;
+
+    accCurr = this.model.currency.findByName(this.data.accCurrVal);
+    if (!accCurr) {
+        throw new Error('Unknown currency ' + this.data.accCurrVal);
+    }
+    if (accCurr.id !== this.model.mainAccount.curr_id) {
+        throw new Error('Currency must be the same as main account');
+    }
+
+    trCurr = this.model.currency.findByName(this.data.trCurrVal);
+    if (!trCurr) {
+        throw new Error('Unknown currency ' + data.trCurrVal);
+    }
+
+    amount = parseFloat(fixFloat(data.accAmountVal));
+    if (Number.isNaN(amount) || amount === 0) {
+        throw new Error('Invalid account amount value');
+    }
+    trAmount = parseFloat(fixFloat(data.trAmountVal));
+    if (Number.isNaN(trAmount) || trAmount === 0) {
+        throw new Error('Invalid transaction amount value');
+    }
+
+    if (amount > 0) {
+        this.invertTransactionType();
+    }
+
+    this.data.accAmountVal = Math.abs(amount);
+    this.data.trAmount = Math.abs(trAmount);
+
+    this.setAmount(this.data.accAmountVal);
+    if (trCurr.id !== accCurr.id) {
+        this.setCurrency(trCurr.id);
+        this.setSecondAmount(this.data.trAmount);
+    }
+    this.setDate(formatDate(new Date(this.data.date)));
+    this.setComment(this.data.comment);
 };
 
 /**
@@ -636,6 +679,9 @@ ImportTransactionItem.prototype.setMainAccount = function (value) {
     state = copyObject(this.state);
 
     this.model.mainAccount = account;
+    if (this.data) {
+        this.data.mainAccount = account.id;
+    }
     state.accountId = account.id;
     state.accountCurrId = account.curr_id;
 
@@ -795,6 +841,11 @@ ImportTransactionItem.prototype.setComment = function (value) {
     this.state = state;
 
     return state;
+};
+
+/** Return original data object */
+ImportTransactionItem.prototype.getOriginal = function () {
+    return this.data;
 };
 
 /** Return transaction object */

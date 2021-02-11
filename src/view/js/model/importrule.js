@@ -83,17 +83,10 @@ ImportRule.prototype.runActions = function (context) {
     });
 };
 
-/** Run actions assigned to rule */
-ImportRule.prototype.runActions = function (context) {
-    this.actions.forEach(function (item) {
-        item.execute(context);
-    });
-};
-
 /** Validate amount value */
 ImportRule.prototype.isValidAmount = function (value) {
     var amount = parseFloat(fixFloat(value));
-    return (!Number.isNaN(amount) && amount !== 0);
+    return (!Number.isNaN(amount) && amount > 0);
 };
 
 /** Validate import rule */
@@ -277,16 +270,17 @@ ImportRuleList.prototype.createItem = function (obj) {
 };
 
 /**
- * Apply list of import rules to specified transaction data
- * @param {Object} data - imported transaction data
- * @param {Object} context - transaction row object
+ * Apply list of import rules to specified transaction
+ * @param {Object} item - import transaction
  */
-ImportRuleList.prototype.applyTo = function (data, context) {
+ImportRuleList.prototype.applyTo = function (item) {
+    var data = item.getOriginal();
+
     this.forEach(function (rule) {
         if (!rule.meetConditions(data)) {
             return;
         }
 
-        rule.runActions(context);
+        rule.runActions(item);
     }, this);
 };

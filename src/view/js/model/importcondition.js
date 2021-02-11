@@ -29,6 +29,14 @@ function ImportCondition() {
     ImportCondition.parent.constructor.apply(this, arguments);
 }
 
+/** Item field types */
+ImportCondition.itemFields = [
+    IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    IMPORT_COND_FIELD_TPL,
+    IMPORT_COND_FIELD_TR_CURRENCY,
+    IMPORT_COND_FIELD_ACC_CURRENCY
+];
+
 /** Amount field types */
 ImportCondition.amountFields = [
     IMPORT_COND_FIELD_TR_AMOUNT,
@@ -160,6 +168,11 @@ ImportCondition.getFieldValue = function (fieldId, data) {
     dataProp = ImportCondition.fieldsMap[field];
 
     return data[dataProp];
+};
+
+/** Check value for specified field type is account, template or currency */
+ImportCondition.isItemField = function (value) {
+    return ImportCondition.itemFields.includes(parseInt(value, 10));
 };
 
 /** Check value for specified field type is account */
@@ -294,6 +307,11 @@ ImportCondition.prototype.isAvailField = function (field) {
     return typeof field === 'string' && availFields.includes(field);
 };
 
+/** Check field type of condition is item */
+ImportCondition.prototype.isItemField = function () {
+    return ImportCondition.isItemField(this.field_id);
+};
+
 /** Check field type of condition is account */
 ImportCondition.prototype.isAccountField = function () {
     return ImportCondition.isAccountField(this.field_id);
@@ -387,12 +405,13 @@ ImportCondition.prototype.getConditionValue = function (data) {
     if (this.isPropertyValue()) {
         return ImportCondition.getFieldValue(this.value, data);
     }
-
-    if (ImportCondition.isAmountField(this.field_id)) {
+    if (this.isItemField()) {
+        return parseInt(this.value, 10);
+    }
+    if (this.isAmountField()) {
         return parseFloat(this.value);
     }
-
-    if (ImportCondition.isDateField(this.field_id)) {
+    if (this.isDateField()) {
         return timestampFromString(this.value);
     }
 

@@ -163,7 +163,8 @@ ImportTemplate.prototype.applyTo = function (data) {
         trAmountVal: this.getTransactionAmount(data),
         trCurrVal: this.getTransactionCurrency(data),
         date: this.getDate(data),
-        comment: this.getComment(data)
+        comment: this.getComment(data),
+        template: this.id
     };
 
     return res;

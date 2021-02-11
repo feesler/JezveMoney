@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, fixFloat, formatDate, isFunction, show, enable, extend */
+/* global ge, formatDate, isFunction, show, enable, extend */
 /* global selectedValue, urlJoin, ajax, timestampFromString, createMessage, baseURL */
 /* global Component, Popup, ImportTransactionItem */
 /* global ImportFileUploader, ImportTemplateManager */
@@ -231,29 +231,10 @@ ImportUploadDialog.prototype.mapImportedItems = function (data) {
  * @param {Object} data - import data
  */
 ImportUploadDialog.prototype.mapImportItem = function (data) {
-    var amount;
-    var trAmount;
-    var accCurr;
-    var trCurr;
     var item;
 
     if (!data) {
         throw new Error('Invalid data');
-    }
-
-    accCurr = this.model.currency.findByName(data.accCurrVal);
-    if (!accCurr) {
-        throw new Error('Unknown currency ' + data.accCurrVal);
-    }
-
-    trCurr = this.model.currency.findByName(data.trCurrVal);
-    if (!trCurr) {
-        throw new Error('Unknown currency ' + data.trCurrVal);
-    }
-
-    /** Currency should be same as main account */
-    if (accCurr.id !== this.model.mainAccount.curr_id) {
-        throw new Error('Currency must be the same as main account');
     }
 
     item = new ImportTransactionItem({
@@ -265,28 +246,7 @@ ImportUploadDialog.prototype.mapImportItem = function (data) {
         originalData: data
     });
 
-    amount = parseFloat(fixFloat(data.accAmountVal));
-    if (Number.isNaN(amount) || amount === 0) {
-        throw new Error('Invalid account amount value');
-    }
-    trAmount = parseFloat(fixFloat(data.trAmountVal));
-    if (Number.isNaN(trAmount) || trAmount === 0) {
-        throw new Error('Invalid transaction amount value');
-    }
-
-    if (amount > 0) {
-        item.invertTransactionType();
-    }
-
-    item.setAmount(Math.abs(amount));
-    if (trCurr.id !== accCurr.id) {
-        item.setCurrency(trCurr.id);
-        item.setSecondAmount(Math.abs(trAmount));
-    }
-    item.setDate(formatDate(new Date(data.date)));
-    item.setComment(data.comment);
-
-    this.model.rules.applyTo(data, item);
+    this.model.rules.applyTo(item);
     item.render();
 
     return item;

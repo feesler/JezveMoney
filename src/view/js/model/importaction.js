@@ -165,7 +165,7 @@ ImportAction.prototype.execute = function (context) {
     if (this.action_id === IMPORT_ACTION_SET_TR_TYPE) {
         context.setTransactionType(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_ACCOUNT) {
-        context.setAccount(this.value);
+        context.setSecondAccount(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_PERSON) {
         context.setPerson(this.value);
     } else if (this.action_id === IMPORT_ACTION_SET_SRC_AMOUNT) {
