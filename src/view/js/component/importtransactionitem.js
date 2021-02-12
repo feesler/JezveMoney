@@ -291,13 +291,16 @@ ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
         throw new Error('Invalid data');
     }
 
-    return this.createContainer('orig-data-table', [
-        this.createDataValue('Date', data.date),
-        this.createDataValue('Tr. amount', data.trAmountVal),
-        this.createDataValue('Tr. currency', data.trCurrVal),
-        this.createDataValue('Acc. amount', data.accAmountVal),
-        this.createDataValue('Acc. currency', data.accCurrVal),
-        this.createDataValue('Comment', data.comment, 'comment-value')
+    return this.createContainer('orig-data', [
+        ce('h3', {textContent:'Original imported data'}),
+        this.createContainer('orig-data-table', [
+            this.createDataValue('Date', data.date),
+            this.createDataValue('Tr. amount', data.trAmountVal),
+            this.createDataValue('Tr. currency', data.trCurrVal),
+            this.createDataValue('Acc. amount', data.accAmountVal),
+            this.createDataValue('Acc. currency', data.accCurrVal),
+            this.createDataValue('Comment', data.comment, 'comment-value')
+        ])
     ]);
 };
 
