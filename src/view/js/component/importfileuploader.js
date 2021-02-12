@@ -35,36 +35,25 @@ function ImportFileUploader() {
 
 extend(ImportFileUploader, Component);
 
-/** Return file name from file input */
-ImportFileUploader.prototype.getUploadFileName = function () {
-    var pos;
-    var fileName;
-
-    fileName = this.inputElem.value;
-    if (fileName.includes('fakepath')) {
-        pos = fileName.lastIndexOf('\\');
-        fileName = fileName.substr(pos + 1);
-    }
-
-    return fileName;
-};
-
 /**
  * File input 'change' event handler
  * Update displayng file name and show control of form
  */
 ImportFileUploader.prototype.onChangeUploadFile = function () {
-    var value = this.getUploadFileName();
+    this.setFile(this.inputElem.files[0]);
+};
 
-    if (!value || !value.length) {
+/** Set upload file */
+ImportFileUploader.prototype.setFile = function (file) {
+    if (!file) {
         return;
     }
 
-    this.state.fileName = value;
+    this.state.fileName = file.name;
     this.state.collapsed = true;
     this.render(this.state);
 
-    this.uploadFile();
+    this.uploadFile(file);
 };
 
 /** Reset file upload form */
@@ -116,12 +105,10 @@ ImportFileUploader.prototype.onImportProgress = function () {
 };
 
 /** Upload file to server */
-ImportFileUploader.prototype.uploadFile = function () {
-    var file;
+ImportFileUploader.prototype.uploadFile = function (file) {
     var uploader;
     var isEncoded = this.isEncodeCheck.checked;
 
-    file = this.inputElem.files[0];
     if (!file) {
         return;
     }

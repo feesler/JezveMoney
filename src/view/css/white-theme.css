@@ -453,6 +453,12 @@ div.trans-list__item_selected
     color: #FFFFFF;
 }
 
+/* Upload dialog */
+.upload-form__browser.drag-over
+{
+    outline-color: #202020;
+}
+
 /* Import rules dialog */
 .rules-dialog__loading
 {

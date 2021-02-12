@@ -14,6 +14,11 @@
     margin-bottom: 12px;
 }
 
+.upload-form__browser.drag-over
+{
+    outline: 2px dashed;
+}
+
 .upload-form__header
 {
     font-size: 18px;

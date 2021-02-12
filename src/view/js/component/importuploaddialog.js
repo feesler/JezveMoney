@@ -67,6 +67,11 @@ function ImportUploadDialog() {
         additional: 'upload-popup'
     });
 
+    this.elem.addEventListener('dragenter', this.onDragEnter.bind(this), false);
+    this.elem.addEventListener('dragleave', this.onDragLeave.bind(this), false);
+    this.elem.addEventListener('dragover', this.onDragOver.bind(this), false);
+    this.elem.addEventListener('drop', this.onDrop.bind(this), false);
+
     this.initialAccField = ge('initialAccField');
     this.initialAccountSel = ge('initialAccount');
     this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
@@ -108,6 +113,46 @@ ImportUploadDialog.prototype.reset = function () {
 /** Hide dialog */
 ImportUploadDialog.prototype.onClose = function () {
     this.reset();
+};
+
+/** File 'dragenter' event handler */
+ImportUploadDialog.prototype.onDragEnter = function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (e.target === this.uploader.elem) {
+        this.uploader.elem.classList.add('drag-over');
+    }
+};
+
+/** File 'dragenter' event handler */
+ImportUploadDialog.prototype.onDragLeave = function (e) {
+    if (e.target === this.uploader.elem) {
+        this.uploader.elem.classList.remove('drag-over');
+    }
+};
+
+/** File 'dragend' event handler */
+ImportUploadDialog.prototype.onDragOver = function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+};
+
+/** File 'drop' event handler */
+ImportUploadDialog.prototype.onDrop = function (e) {
+    var files;
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    this.uploader.elem.classList.remove('drag-over');
+
+    files = e.dataTransfer.files;
+    if (!files.length) {
+        return;
+    }
+
+    this.uploader.setFile(files[0]);
 };
 
 /** Enable/disable upload button */
