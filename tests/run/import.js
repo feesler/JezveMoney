@@ -1,7 +1,7 @@
 import { App } from '../app.js';
 import { test, copyObject } from '../common.js';
 import { Currency } from '../model/currency.js';
-import { applyTemplate } from '../model/import.js';
+import { ImportTemplate } from '../model/importtemplate.js';
 import { ImportList } from '../view/component/importlist.js';
 import { ImportView } from '../view/import.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
@@ -223,15 +223,13 @@ export async function submitUploaded(params) {
             throw new Error('Main account not found');
         }
 
-        let importTpl;
-        if (params.template) {
-            importTpl = App.state.templates.getItemByIndex(params.template);
-        } else {
-            importTpl = App.view.getExpectedTemplate();
-        }
+        const templateData = (params.template)
+            ? App.state.templates.getItemByIndex(params.template)
+            : App.view.getExpectedTemplate();
+        const template = new ImportTemplate(templateData);
 
         const skipList = [];
-        const importTransactions = applyTemplate(importData, importTpl, mainAccount);
+        const importTransactions = template.applyTo(importData, mainAccount);
         for (const item of importTransactions) {
             App.state.rules.applyTo(item);
             const tr = findSimilar(item, skipList);
