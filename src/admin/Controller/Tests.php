@@ -27,6 +27,7 @@ class Tests extends AdminController
         $this->jsArr = [
             "lib/common.js",
             "lib/ajax.js",
+            "lib/component.js",
             "lib/popup.js",
             "app.js"
         ];
