@@ -341,6 +341,17 @@ ImportRuleForm.prototype.validateRule = function () {
     var validation = this.state.rule.validate();
 
     this.state.validation = validation;
+
+    if (validation && !validation.valid) {
+        if ('conditionIndex' in validation) {
+            this.state.conditionsCollapsed = false;
+            this.state.actionsCollapsed = true;
+        } else if ('actionIndex' in validation) {
+            this.state.conditionsCollapsed = true;
+            this.state.actionsCollapsed = false;
+        }
+    }
+
     this.render(this.state);
 };
 
