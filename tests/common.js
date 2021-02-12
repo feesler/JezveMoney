@@ -142,6 +142,34 @@ export function fixDate(date) {
     return convDate(date);
 }
 
+/** Check string is correct date in dd.mm.yyyy format */
+export function checkDate(str) {
+    if (typeof str !== 'string' || !str.length) {
+        return false;
+    }
+
+    const sparr = str.split('.');
+    if (sparr.length !== 3) {
+        return false;
+    }
+
+    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2])) {
+        return false;
+    }
+
+    if (
+        sparr[0] < 1
+        || sparr[0] > 31
+        || sparr[1] < 1
+        || sparr[1] > 12
+        || sparr[2] < 1970
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
 const SECOND = 1000;
 const MINUTE = 60000;
 const HOUR = 3600000;

@@ -449,14 +449,24 @@ export async function submit() {
         }
 
         const okNotification = { success: true, message: 'All transactions have been successfully imported' };
-        const failNotification = { success: false, message: 'Fail to import transactions' };
 
         try {
             await App.view.submit();
 
-            App.view.expectedState = {
-                msgPopup: ((isValid) ? okNotification : failNotification),
-            };
+            if (isValid) {
+                App.view.expectedState = {
+                    msgPopup: okNotification,
+                    values: {
+                        itemsList: { items: [] },
+                    },
+                };
+            } else {
+                App.view.expectedState = {
+                    values: {
+                        itemsList: App.view.content.itemsList.getExpectedState(),
+                    },
+                };
+            }
             await App.view.checkState();
             await App.view.closeNotification();
         } catch (e) {

@@ -265,10 +265,18 @@ ImportView.prototype.getEnabledItems = function () {
 ImportView.prototype.onSubmitClick = function () {
     var requestObj;
     var enabledList;
+    var valid;
 
     enabledList = this.getEnabledItems();
     if (!Array.isArray(enabledList) || !enabledList.length) {
         throw new Error('Invalid list of items');
+    }
+
+    valid = enabledList.every(function (item) {
+        return item.validate();
+    });
+    if (!valid) {
+        return;
     }
 
     requestObj = enabledList.map(function (item) {

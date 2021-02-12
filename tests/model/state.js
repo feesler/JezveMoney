@@ -1,4 +1,5 @@
 import {
+    checkDate,
     isValidValue,
     isObject,
     isInt,
@@ -598,7 +599,7 @@ export class AppState {
             return false;
         }
 
-        if (params.src_amount === 0 || params.dest_amount === 0) {
+        if (params.src_amount <= 0 || params.dest_amount <= 0) {
             return false;
         }
 
@@ -657,6 +658,10 @@ export class AppState {
             } else if (params.type === INCOME || params.type === TRANSFER) {
                 return false;
             }
+        }
+
+        if ('date' in params && !checkDate(params.date)) {
+            return false;
         }
 
         return true;

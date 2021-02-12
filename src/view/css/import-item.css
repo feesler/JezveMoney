@@ -72,6 +72,24 @@
     flex-grow: 1;
 }
 
+/* Validation */
+.import-item .invalid-feedback
+{
+    padding: 4px 8px;
+    color: #FF0000;
+}
+
+.field.invalid-block label
+{
+    color: #FF0000;
+}
+
+.import-item .field.invalid-block input,
+.import-item .field.invalid-block select
+{
+    border-color: #FF0000;
+}
+
 /* Controls */
 .import-item .controls
 {

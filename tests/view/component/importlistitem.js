@@ -8,6 +8,7 @@ import {
 import { ImportTransaction } from '../../model/importtransaction.js';
 import { Currency } from '../../model/currency.js';
 import {
+    checkDate,
     normalize,
     setParam,
     copyObject,
@@ -88,6 +89,7 @@ export class ImportListItem extends Component {
         const fieldElems = await this.queryAll(this.elem, '.field');
         await asyncMap(fieldElems, (field) => this.parseField(field));
 
+        this.invFeedback = { elem: await this.query(this.elem, '.invalid-feedback') };
         this.deleteBtn = await this.query(this.elem, '.delete-btn');
         this.toggleBtn = await this.query(this.elem, '.toggle-btn');
 
@@ -100,6 +102,7 @@ export class ImportListItem extends Component {
             || !this.currencyField
             || !this.dateField
             || !this.commentField
+            || !this.invFeedback.elem
             || !this.deleteBtn
         ) {
             throw new Error('Invalid structure of import item');
@@ -107,8 +110,10 @@ export class ImportListItem extends Component {
 
         this.model = await this.buildModel();
         this.data = this.getExpectedTransaction(this.model);
-        this.data.enabled = this.model.enabled;
-        this.data.mainAccount = this.model.mainAccount;
+        if (this.data) {
+            this.data.enabled = this.model.enabled;
+            this.data.mainAccount = this.model.mainAccount;
+        }
     }
 
     isDifferentCurrencies(model) {
@@ -158,6 +163,8 @@ export class ImportListItem extends Component {
 
         res.isDifferent = this.isDifferentCurrencies(res);
 
+        res.invalidated = await this.isVisible(this.invFeedback.elem, true);
+
         return res;
     }
 
@@ -169,6 +176,7 @@ export class ImportListItem extends Component {
                 currencyField: true,
                 dateField: true,
                 commentField: true,
+                invFeedback: model.invalidated,
             },
             values: {
                 enabled: model.enabled,
@@ -326,6 +334,14 @@ export class ImportListItem extends Component {
         res.date = model.date;
         res.comment = model.comment;
 
+        if (
+            res.src_amount <= 0
+            || res.dest_amount <= 0
+            || !checkDate(res.date)
+        ) {
+            return null;
+        }
+
         return res;
     }
 
@@ -415,6 +431,7 @@ export class ImportListItem extends Component {
         this.model.currency = Currency.getById(this.model.currId);
         this.model.person = App.state.persons.getItem(this.model.personId);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.selectByValue(this.typeField.inputElem, value);
@@ -440,6 +457,7 @@ export class ImportListItem extends Component {
         this.model.currId = this.model.destAccount.curr_id;
         this.model.currency = Currency.getById(this.model.currId);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.selectByValue(this.destAccountField.inputElem, value);
@@ -454,6 +472,7 @@ export class ImportListItem extends Component {
 
         this.model.personId = value;
         this.model.person = App.state.persons.getItem(value);
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.selectByValue(this.personField.inputElem, value);
@@ -467,6 +486,7 @@ export class ImportListItem extends Component {
         this.checkEnabled(this.amountField);
 
         this.model.amount = value;
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.input(this.amountField.inputElem, value);
@@ -479,6 +499,7 @@ export class ImportListItem extends Component {
         this.checkEnabled(this.destAmountField);
 
         this.model.destAmount = value;
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.input(this.destAmountField.inputElem, value);
@@ -493,6 +514,7 @@ export class ImportListItem extends Component {
         this.model.currId = value;
         this.model.currency = Currency.getById(value);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.selectByValue(this.currencyField.inputElem, value.toString());
@@ -506,6 +528,7 @@ export class ImportListItem extends Component {
         this.checkEnabled(this.dateField);
 
         this.model.date = value;
+        this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.input(this.dateField.inputElem, value);

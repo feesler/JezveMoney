@@ -91,6 +91,7 @@ export class ImportView extends TestView {
         res.rulesEnabled = cont.rulesCheck.checked;
         res.rulesCount = parseInt(cont.rulesCount.value, 10);
         res.items = cont.itemsList.getItems();
+        res.invalidated = cont.itemsList.invalidated;
 
         return res;
     }
@@ -522,6 +523,19 @@ export class ImportView extends TestView {
         }
 
         await this.performAction(() => this.click(this.content.submitBtn));
-        await this.performAction(() => this.wait('#notificationPopup', { visible: true }));
+        await this.waitForFunction(async () => {
+            await this.parse();
+
+            if (this.model.invalidated) {
+                return true;
+            }
+
+            const notification = await Component.isVisible(this.msgPopup, true);
+            if (notification) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }

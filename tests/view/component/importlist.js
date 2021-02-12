@@ -13,6 +13,7 @@ export class ImportList extends Component {
 
     async parse() {
         this.items = [];
+        this.invalidated = false;
 
         const listItems = await this.queryAll(this.elem, ':scope > *');
         if (
@@ -27,6 +28,8 @@ export class ImportList extends Component {
             listItems,
             (item) => ImportListItem.create(this.parent, item, this.mainAccount),
         );
+
+        this.invalidated = this.items.some((item) => item.model.invalidated);
     }
 
     getItem(index) {

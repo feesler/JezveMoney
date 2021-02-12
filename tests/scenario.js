@@ -1993,6 +1993,50 @@ export class Scenario {
         // Verify submit is disabled for empty list
         this.environment.setBlock('Verify submit is disabled for empty list', 2);
         await ImportTests.submit();
+
+        this.environment.setBlock('Verify invalid items are not submitted', 2);
+        // Empty amount
+        await ImportTests.addItem();
+        await ImportTests.submit();
+
+        // Zero amount
+        await ImportTests.updateItem({
+            pos: 0,
+            action: { action: 'inputAmount', data: '0' },
+        });
+        await ImportTests.submit();
+
+        // Valid amount, different currencies and empty dest amount
+        await ImportTests.updateItem({
+            pos: 0,
+            action: [
+                { action: 'inputAmount', data: '1' },
+                { action: 'changeCurrency', data: this.USD },
+            ],
+        });
+        await ImportTests.submit();
+
+        // Empty date
+        await ImportTests.updateItem({
+            pos: 0,
+            action: { action: 'inputDestAmount', data: '2' },
+        });
+        await ImportTests.submit();
+
+        // Invalida date
+        await ImportTests.updateItem({
+            pos: 0,
+            action: { action: 'inputDate', data: '2.ssa' },
+        });
+        await ImportTests.submit();
+
+        // Correct date
+        await ImportTests.updateItem({
+            pos: 0,
+            action: { action: 'inputDate', data: App.dates.now },
+        });
+        await ImportTests.submit();
+
         // Verify submit is disabled for list with no enabled items
         this.environment.setBlock('Verify submit is disabled for list with no enabled items', 2);
         await ImportTests.uploadFile({

@@ -1,7 +1,7 @@
 'use strict';
 
 /* global ce, re, fixFloat, show, enable, selectedValue, selectByValue, extend, AppComponent */
-/* global formatDate, copyObject, addChilds, removeChilds */
+/* global checkDate, formatDate, copyObject, addChilds, removeChilds */
 /* global EXPENSE, INCOME, TRANSFER, DEBT, AccountList */
 
 /**
@@ -236,10 +236,12 @@ function ImportTransactionItem() {
             this.toggleExtBtn
         ])
     ]);
+    this.feedbackElem = ce('div', { className: 'invalid-feedback hidden' });
     this.extendedContainer = this.createContainer('extended-content');
 
     this.elem = this.createContainer('import-item', [
         this.mainContainer,
+        this.feedbackElem,
         this.extendedContainer
     ]);
 
@@ -292,7 +294,7 @@ ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
     }
 
     return this.createContainer('orig-data', [
-        ce('h3', {textContent:'Original imported data'}),
+        ce('h3', { textContent: 'Original imported data' }),
         this.createContainer('orig-data-table', [
             this.createDataValue('Date', data.date),
             this.createDataValue('Tr. amount', data.trAmountVal),
@@ -487,6 +489,7 @@ ImportTransactionItem.prototype.getNextAccount = function (accountId) {
 ImportTransactionItem.prototype.onTrTypeChanged = function () {
     var value = selectedValue(this.trTypeSel);
     this.setTransactionType(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -494,6 +497,7 @@ ImportTransactionItem.prototype.onTrTypeChanged = function () {
 ImportTransactionItem.prototype.onDestChanged = function () {
     var value = selectedValue(this.destAccSel);
     this.setSecondAccount(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -523,6 +527,7 @@ ImportTransactionItem.prototype.syncDestAccountSelect = function (state) {
 ImportTransactionItem.prototype.onPersonChanged = function () {
     var value = selectedValue(this.personSel);
     this.setPerson(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -530,6 +535,7 @@ ImportTransactionItem.prototype.onPersonChanged = function () {
 ImportTransactionItem.prototype.onAmountInput = function () {
     var value = this.amountInp.value;
     this.setAmount(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -537,6 +543,7 @@ ImportTransactionItem.prototype.onAmountInput = function () {
 ImportTransactionItem.prototype.onDestAmountInput = function () {
     var value = this.destAmountInp.value;
     this.setSecondAmount(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -544,6 +551,7 @@ ImportTransactionItem.prototype.onDestAmountInput = function () {
 ImportTransactionItem.prototype.onCurrChanged = function () {
     var value = selectedValue(this.currSel);
     this.setCurrency(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -551,6 +559,7 @@ ImportTransactionItem.prototype.onCurrChanged = function () {
 ImportTransactionItem.prototype.onDateInput = function () {
     var value = this.dateInp.value;
     this.setDate(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -558,6 +567,7 @@ ImportTransactionItem.prototype.onDateInput = function () {
 ImportTransactionItem.prototype.onCommentInput = function () {
     var value = this.dateInp.value;
     this.setComment(value);
+    this.clearInvalid();
     this.render();
 };
 
@@ -849,6 +859,56 @@ ImportTransactionItem.prototype.setComment = function (value) {
 /** Return original data object */
 ImportTransactionItem.prototype.getOriginal = function () {
     return this.data;
+};
+
+/** Validate transaction object */
+ImportTransactionItem.prototype.setFeedback = function (value) {
+    if (typeof value === 'string' && value.length > 0) {
+        this.feedbackElem.textContent = value;
+        show(this.feedbackElem, true);
+    } else {
+        this.feedbackElem.textContent = '';
+        show(this.feedbackElem, false);
+    }
+};
+
+/** Remove all invalidated marks */
+ImportTransactionItem.prototype.clearInvalid = function () {
+    this.parent.clearBlockValidation(this.amountField);
+    this.parent.clearBlockValidation(this.destAmountField);
+    this.parent.clearBlockValidation(this.dateField);
+    this.setFeedback();
+};
+
+/** Validate transaction object */
+ImportTransactionItem.prototype.validate = function () {
+    var state = this.state;
+    var amountVal;
+    var secondAmountVal = parseFloat(fixFloat(state.secondAmount));
+
+    amountVal = parseFloat(fixFloat(state.amount));
+    if (Number.isNaN(amountVal) || amountVal <= 0) {
+        this.parent.invalidateBlock(this.amountField);
+        this.setFeedback('Please input correct amount');
+        return false;
+    }
+
+    if (state.isDiff) {
+        secondAmountVal = parseFloat(fixFloat(state.secondAmount));
+        if (Number.isNaN(secondAmountVal) || secondAmountVal <= 0) {
+            this.parent.invalidateBlock(this.destAmountField);
+            this.setFeedback('Please input correct second amount');
+            return false;
+        }
+    }
+
+    if (!checkDate(state.date)) {
+        this.parent.invalidateBlock(this.dateField);
+        this.setFeedback('Please input correct date');
+        return false;
+    }
+
+    return true;
 };
 
 /** Return transaction object */
