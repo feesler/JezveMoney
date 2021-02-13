@@ -125,3 +125,10 @@
 	padding: 0;
 	background: none;
 }
+
+
+.iconlink[disabled]
+{
+    pointer-events: none;
+    opacity: 0.3;
+}
