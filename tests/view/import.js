@@ -22,6 +22,7 @@ export class ImportView extends TestView {
             uploadBtn: await IconLink.create(this, await this.query('#uploadBtn')),
             mainAccountSelect: { elem: await this.query('#acc_id') },
             addBtn: await IconLink.create(this, await this.query('#newItemBtn')),
+            clearBtn: await IconLink.create(this, await this.query('#clearFormBtn')),
             totalCount: { elem: await this.query('#trcount') },
             enabledCount: { elem: await this.query('#entrcount') },
             rulesCheck: { elem: await this.query('#rulesCheck') },
@@ -41,6 +42,7 @@ export class ImportView extends TestView {
             || !res.uploadBtn
             || !res.mainAccountSelect.elem
             || !res.addBtn
+            || !res.clearBtn
             || !res.totalCount.elem
             || !res.enabledCount.elem
             || !res.rulesCheck.elem
@@ -102,6 +104,7 @@ export class ImportView extends TestView {
                 uploadBtn: true,
                 mainAccountSelect: true,
                 addBtn: true,
+                clearBtn: true,
                 totalCount: true,
                 enabledCount: true,
                 rulesCount: true,
@@ -460,6 +463,12 @@ export class ImportView extends TestView {
         this.checkMainState();
 
         await this.performAction(() => this.content.addBtn.click());
+    }
+
+    async deleteAllItems() {
+        this.checkMainState();
+
+        await this.performAction(() => this.content.clearBtn.click());
     }
 
     async enableItems(index, value) {

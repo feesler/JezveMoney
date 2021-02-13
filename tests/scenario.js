@@ -1977,10 +1977,20 @@ export class Scenario {
 
         // Submit converted transactions
         await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
+        // Delete all
+        this.environment.setBlock('Delete all items', 2);
+        await ImportTests.deleteAllItems();
+
+        // Upload again
+        await ImportTests.uploadFile({
+            filename: this.uploadFilename,
+            data: this.csvStatement,
+        });
+        await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
 
         // Disable all items except 0 and 1
         await ImportTests.enableItems({
-            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
             value: false,
         });
         await this.runDeleteImportItemTests();
@@ -2048,7 +2058,7 @@ export class Scenario {
             template: 0,
         });
         await ImportTests.enableItems({
-            index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
             value: false,
         });
         await ImportTests.submit();

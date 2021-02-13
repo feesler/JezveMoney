@@ -431,6 +431,23 @@ export async function deleteItems(indexes) {
     });
 }
 
+/**
+ * Click by delete all items button test
+ */
+export async function deleteAllItems() {
+    await test('Delete all import items', async () => {
+        await checkNavigation();
+
+        await App.view.deleteAllItems();
+
+        App.view.expectedState = {
+            values: { itemsList: { items: [] } },
+        };
+
+        return App.view.checkState();
+    });
+}
+
 /** Submit */
 export async function submit() {
     await test('Submit items', async () => {

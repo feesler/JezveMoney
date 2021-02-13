@@ -36,6 +36,10 @@ ImportView.prototype.onStart = function () {
         elem: 'newItemBtn',
         onclick: this.createItem.bind(this)
     });
+    this.clearFormBtn = IconLink.fromElement({
+        elem: 'clearFormBtn',
+        onclick: this.removeAllItems.bind(this)
+    });
 
     this.uploadBtn = IconLink.fromElement({
         elem: 'uploadBtn',
@@ -157,13 +161,15 @@ ImportView.prototype.updateRowsPos = function () {
 
 /** Update count of total/enabled import items and perform related actions */
 ImportView.prototype.updateItemsCount = function () {
+    var hasItems = (this.model.transactionRows.length > 0);
     var enabledList = this.getEnabledItems();
 
     enable(this.submitBtn, (enabledList.length > 0));
     this.enabledTransCountElem.textContent = enabledList.length;
     this.transCountElem.textContent = this.model.transactionRows.length;
 
-    if (this.model.transactionRows.length > 0) {
+    this.clearFormBtn.enable(hasItems);
+    if (hasItems) {
         re(this.noDataMsg);
         this.noDataMsg = null;
     } else {

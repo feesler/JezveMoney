@@ -39,6 +39,12 @@
                                         <span class="iconlink__content"><span>Add item</span></span>
                                     </button>
                                 </div>
+                                <div id="clearFormBtn" class="iconlink" disabled>
+                                    <button type="button" disabled>
+                                        <span class="iconlink__icon"><?=svgIcon("del")?></span>
+                                        <span class="iconlink__content"><span>Delete all</span></span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="header-field">
                                 <label>Total</label>
