@@ -1,9 +1,10 @@
 'use strict';
 
 /* global ge, re, ce, removeChilds, enable, extend */
-/* global selectByValue, selectedValue, ajax, createMessage, baseURL */
+/* global ajax, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList, ImportTemplateList */
-/* global View, IconLink, Sortable, ImportUploadDialog, ImportRulesDialog, ImportTransactionItem */
+/* global View, IconLink, Sortable, DropDown, ImportUploadDialog, ImportRulesDialog */
+/* global ImportTransactionItem */
 /* eslint no-bitwise: "off" */
 
 /**
@@ -46,10 +47,15 @@ ImportView.prototype.onStart = function () {
         onclick: this.showUploadDialog.bind(this)
     });
 
+    this.accountDropDown = DropDown.create({
+        input_id: 'acc_id',
+        onchange: this.onMainAccChange.bind(this),
+        editable: false
+    });
+
     this.submitBtn = ge('submitbtn');
     this.transCountElem = ge('trcount');
     this.enabledTransCountElem = ge('entrcount');
-    this.acc_id = ge('acc_id');
     this.rulesCheck = ge('rulesCheck');
     this.rulesBtn = ge('rulesBtn');
     this.rulesCountElem = ge('rulescount');
@@ -59,7 +65,7 @@ ImportView.prototype.onStart = function () {
         || !this.submitBtn
         || !this.transCountElem
         || !this.enabledTransCountElem
-        || !this.acc_id
+        || !this.accountDropDown
         || !this.rulesCheck
         || !this.rulesBtn
         || !this.rulesCountElem
@@ -68,7 +74,6 @@ ImportView.prototype.onStart = function () {
         throw new Error('Failed to initialize Import view');
     }
 
-    this.acc_id.addEventListener('change', this.onMainAccChange.bind(this));
     this.submitBtn.addEventListener('click', this.onSubmitClick.bind(this));
     this.rulesCheck.addEventListener('change', this.onToggleEnableRules.bind(this));
     this.rulesBtn.addEventListener('click', this.onRulesClick.bind(this));
@@ -134,13 +139,19 @@ ImportView.prototype.onImportDone = function (items) {
 
 /** Initial account of upload change callback */
 ImportView.prototype.onUploadAccChange = function (accountId) {
-    selectByValue(this.acc_id, accountId);
+    this.accountDropDown.selectItem(accountId.toString());
     this.onMainAccChange();
 };
 
 /** Refresh main account at model according to current selection */
 ImportView.prototype.updMainAccObj = function () {
-    var account = this.model.accounts.getItem(selectedValue(this.acc_id));
+    var selectedAccount;
+    var account = null;
+
+    selectedAccount = this.accountDropDown.getSelectionData();
+    if (selectedAccount) {
+        account = this.model.accounts.getItem(selectedAccount.id);
+    }
     if (!account) {
         throw new Error('Account not found');
     }

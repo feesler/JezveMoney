@@ -1,8 +1,8 @@
 'use strict';
 
 /* global isFunction, ge, ce, addChilds, removeChilds, copyObject, show, enable, extend */
-/* global selectedValue, selectByValue, ajax, createMessage, baseURL */
-/* global Component, ImportTemplate, ConfirmDialog */
+/* global ajax, createMessage, baseURL */
+/* global Component, DropDown, ImportTemplate, ConfirmDialog */
 
 /**
  * ImportTemplateManager component constructor
@@ -46,9 +46,18 @@ function ImportTemplateManager() {
 
     this.statusHanlder = this.props.templateStatus;
 
+    this.templateDropDown = DropDown.create({
+        input_id: 'templateSel',
+        onchange: this.onTemplateChange.bind(this),
+        editable: false
+    });
+    this.columnDropDown = DropDown.create({
+        input_id: 'columnSel',
+        editable: false
+    });
+
     this.tplHeading = ge('tplHeading');
     this.tplStateLbl = ge('tplStateLbl');
-    this.templateSel = ge('templateSel');
     this.tplField = ge('tplField');
     this.nameField = ge('nameField');
     this.tplNameInp = ge('tplNameInp');
@@ -56,7 +65,6 @@ function ImportTemplateManager() {
     this.updateTplBtn = ge('updateTplBtn');
     this.deleteTplBtn = ge('deleteTplBtn');
     this.columnField = ge('columnField');
-    this.columnSel = ge('columnSel');
     this.tplControls = ge('tplControls');
     this.submitTplBtn = ge('submitTplBtn');
     this.cancelTplBtn = ge('cancelTplBtn');
@@ -67,7 +75,7 @@ function ImportTemplateManager() {
     if (
         !this.tplHeading
         || !this.tplStateLbl
-        || !this.templateSel
+        || !this.templateDropDown
         || !this.tplField
         || !this.nameField
         || !this.tplNameInp
@@ -75,7 +83,7 @@ function ImportTemplateManager() {
         || !this.updateTplBtn
         || !this.deleteTplBtn
         || !this.columnField
-        || !this.columnSel
+        || !this.columnDropDown
         || !this.tplControls
         || !this.submitTplBtn
         || !this.cancelTplBtn
@@ -87,7 +95,6 @@ function ImportTemplateManager() {
         throw new Error('Failed to initialize upload file dialog');
     }
 
-    this.templateSel.addEventListener('change', this.onTemplateChange.bind(this));
     this.tplNameInp.addEventListener('input', this.onTemplateNameInput.bind(this));
     this.createTplBtn.addEventListener('click', this.onCreateTemplateClick.bind(this));
     this.updateTplBtn.addEventListener('click', this.onUpdateTemplateClick.bind(this));
@@ -159,29 +166,34 @@ ImportTemplateManager.prototype.setLoading = function () {
 
 /** Copy specified data to component */
 ImportTemplateManager.prototype.setRawData = function (data) {
-    var value;
+    var selectedTemplate;
 
     this.state.rawData = copyObject(data);
 
     if (this.model.template.length > 0) {
         this.state.id = this.RAW_DATA_STATE;
-        value = selectedValue(this.templateSel);
-        this.setTemplate(value);
+        selectedTemplate = this.templateDropDown.getSelectionData();
+        if (!selectedTemplate) {
+            throw new Error('Invalid selection');
+        }
+
+        this.setTemplate(selectedTemplate.id);
     } else {
         this.setCreateTemplateState();
     }
 };
 
 /** Import template select 'change' event handler */
-ImportTemplateManager.prototype.onTemplateChange = function () {
-    var value;
-
+ImportTemplateManager.prototype.onTemplateChange = function (selectedTemplate) {
     if (this.state.id !== this.RAW_DATA_STATE) {
         return;
     }
 
-    value = selectedValue(this.templateSel);
-    this.setTemplate(value);
+    if (!selectedTemplate) {
+        throw new Error('Invalid selection');
+    }
+
+    this.setTemplate(selectedTemplate.id);
 };
 
 /**
@@ -386,9 +398,8 @@ ImportTemplateManager.prototype.onRulesListResult = function (response) {
 
 /** Render import template select element according to the data in model */
 ImportTemplateManager.prototype.renderTemplateSelect = function () {
-    var dataOptions;
     var selectedTemplate = null;
-    var templateId;
+    var templateItems;
 
     // Find template with same name as currently selected
     if (this.state.template) {
@@ -397,26 +408,25 @@ ImportTemplateManager.prototype.renderTemplateSelect = function () {
         }, this);
     }
 
-    removeChilds(this.templateSel);
+    this.templateDropDown.removeAll();
 
-    dataOptions = this.model.template.map(function (item) {
-        return ce('option', { value: item.id, textContent: item.name });
-    });
-    addChilds(this.templateSel, dataOptions);
+    templateItems = this.model.template.map(function (item) {
+        return { id: item.id, title: item.name };
+    }, this);
+    this.templateDropDown.append(templateItems);
 
     // Restore selection
-    if (selectedTemplate) {
-        templateId = selectedTemplate.id;
-        selectByValue(this.templateSel, templateId);
-    } else {
-        templateId = selectedValue(this.templateSel);
+    if (!selectedTemplate) {
+        selectedTemplate = templateItems[0];
     }
-    this.setTemplate(templateId);
+    this.templateDropDown.selectItem(selectedTemplate.id);
+
+    this.setTemplate(selectedTemplate.id);
 };
 
 /** Cancel template button 'click' event handler */
 ImportTemplateManager.prototype.onCancelTemplateClick = function () {
-    var value;
+    var selectedTemplate;
 
     if (this.state.id !== this.TPL_UPDATE_STATE) {
         return;
@@ -424,20 +434,23 @@ ImportTemplateManager.prototype.onCancelTemplateClick = function () {
 
     this.state.id = this.RAW_DATA_STATE;
     // Restore previously selected template
-    value = selectedValue(this.templateSel);
-    this.setTemplate(value);
+    selectedTemplate = this.templateDropDown.getSelectionData();
+    this.setTemplate(selectedTemplate.id);
 };
 
 /** Raw data table column 'click' event handler */
 ImportTemplateManager.prototype.onDataColumnClick = function (index) {
-    var value;
+    var selectedColumn;
 
     if (this.state.id !== this.TPL_UPDATE_STATE) {
         return;
     }
 
-    value = selectedValue(this.columnSel);
-    this.state.template.columns[value] = index + 1;
+    selectedColumn = this.columnDropDown.getSelectionData();
+    if (!selectedColumn) {
+        throw new Error('Invalid column selection');
+    }
+    this.state.template.columns[selectedColumn.id] = index + 1;
 
     this.render(this.state);
 };
@@ -466,7 +479,7 @@ ImportTemplateManager.prototype.onInvalidPropertyValue = function (state, propNa
 
     if (state.id === this.TPL_UPDATE_STATE) {
         this.setTemplateFeedback(this.columnFeedback[propName].msg);
-        selectByValue(this.columnSel, propName);
+        this.columnDropDown.selectItem(propName);
     }
 
     return false;
@@ -575,9 +588,9 @@ ImportTemplateManager.prototype.render = function (state) {
         show(this.cancelTplBtn, templateAvail);
     }
 
-    enable(this.templateSel, !state.listLoading);
+    this.templateDropDown.enable(!state.listLoading);
+    this.columnDropDown.enable(!state.listLoading);
     enable(this.tplNameInp, !state.listLoading);
-    enable(this.columnSel, !state.listLoading);
     enable(this.createTplBtn, !state.listLoading);
     enable(this.updateTplBtn, !state.listLoading);
     enable(this.deleteTplBtn, !state.listLoading);

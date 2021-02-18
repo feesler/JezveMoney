@@ -46,6 +46,7 @@ function ImportRuleForm() {
 
     this.fieldTypes = ImportCondition.getFieldTypes();
     this.actionTypes = ImportAction.getTypes();
+    this.transactionTypes = ImportAction.getTransactionTypes();
 
     this.init();
     this.setData(this.props.data);
@@ -176,6 +177,40 @@ ImportRuleForm.prototype.getNextAvailAction = function (state) {
     });
 };
 
+/** Return default value for specified action type */
+ImportRuleForm.prototype.getActionDefaultValue = function (actionTypeId) {
+    var item;
+    var actionType = parseInt(actionTypeId, 10);
+    if (!actionType) {
+        throw new Error('Invalid action type');
+    }
+
+    if (ImportAction.isTransactionTypeValue(actionType)) {
+        item = this.transactionTypes[0];
+        return item.id;
+    }
+
+    if (ImportAction.isAccountValue(actionType)) {
+        item = this.model.accounts.getItemByIndex(0);
+        if (!item) {
+            throw new Error('No accounts available');
+        }
+
+        return item.id;
+    }
+
+    if (ImportAction.isPersonValue(actionType)) {
+        item = this.model.persons.getItemByIndex(0);
+        if (!item) {
+            throw new Error('No persons available');
+        }
+
+        return item.id;
+    }
+
+    return '';
+};
+
 /** Create action button 'click' event handler */
 ImportRuleForm.prototype.onCreateActionClick = function (e) {
     var actionType;
@@ -190,7 +225,7 @@ ImportRuleForm.prototype.onCreateActionClick = function (e) {
 
     actionData = {
         action_id: actionType.id,
-        value: ''
+        value: this.getActionDefaultValue(actionType.id)
     };
 
     this.state.rule.actions.addItem(actionData);
@@ -230,8 +265,8 @@ ImportRuleForm.prototype.getNextAvailProperty = function (state) {
     });
 };
 
-/** Search for first condition field type not used in rule */
-ImportRuleForm.prototype.getDefaultValue = function (fieldId) {
+/** Return default condition value for specified field type */
+ImportRuleForm.prototype.getConditionDefaultValue = function (fieldId) {
     var item;
     var fieldType = parseInt(fieldId, 10);
     if (!fieldType) {
@@ -283,7 +318,7 @@ ImportRuleForm.prototype.onCreateConditionClick = function (e) {
     conditionData = {
         field_id: fieldType.id,
         operator: fieldType.operators[0],
-        value: this.getDefaultValue(fieldType.id),
+        value: this.getConditionDefaultValue(fieldType.id),
         flags: 0
     };
 

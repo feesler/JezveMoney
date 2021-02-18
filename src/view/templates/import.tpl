@@ -24,7 +24,7 @@
                         <div class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
-                                <div>
+                                <div class="header-field__content">
                                     <select id="acc_id">
 <?php foreach($accArr as $accObj) {	?>
                                         <option value="<?=e($accObj->id)?>"><?=e($accObj->name)?></option>
@@ -48,11 +48,11 @@
                             </div>
                             <div class="header-field">
                                 <label>Total</label>
-                                <div><span id="trcount">0</span></div>
+                                <div class="header-field__content"><span id="trcount">0</span></div>
                             </div>
                             <div class="header-field">
                                 <label>Enabled</label>
-                                <div><span id="entrcount">0</span></div>
+                                <div class="header-field__content"><span id="entrcount">0</span></div>
                             </div>
                         </div>
 

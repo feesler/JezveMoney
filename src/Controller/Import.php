@@ -38,7 +38,11 @@ class Import extends TemplateController
             "templates" => $impTemplates
         ];
 
-        $this->css->libs[] = "lib/iconlink.css";
+        array_push(
+            $this->css->libs,
+            "lib/iconlink.css",
+            "lib/dropdown.css"
+        );
         $this->css->page = [
             "import-upload-form.css",
             "import-template.css",
@@ -66,6 +70,7 @@ class Import extends TemplateController
             "model/importtpl.js",
             "lib/dragndrop.js",
             "lib/sortable.js",
+            "lib/dropdown.js",
             "lib/decimalinput.js",
             "component/header.js",
             "component/iconlink.js",

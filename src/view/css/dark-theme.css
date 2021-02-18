@@ -153,9 +153,17 @@ select
 .dd__container_active .dd__single-selection,
 .dd__container_active .dd__toggle-btn
 {
-    color: #202020;
+    color: #DDDDDD;
+    border-color: #DDDDDD;
+    background-color: #202020;
 }
 
+.dd__container.dd__container_disabled .dd__combo
+{
+    color: #707070;
+    border-color: #202020;
+    background-color: #202020;
+}
 
 .dd__list
 {

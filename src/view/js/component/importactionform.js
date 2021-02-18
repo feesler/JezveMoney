@@ -1,7 +1,7 @@
 'use strict';
 
-/* global ce, show, isFunction, selectedValue, selectByValue, extend, AppComponent */
-/* global DecimalInput, ImportAction, View */
+/* global ce, show, isFunction, extend, AppComponent */
+/* global DropDown, DecimalInput, ImportAction, View */
 /* global IMPORT_ACTION_SET_TR_TYPE, IMPORT_ACTION_SET_ACCOUNT, IMPORT_ACTION_SET_PERSON */
 
 /**
@@ -65,46 +65,11 @@ ImportActionForm.create = function (props) {
 
 /** Form controls initialization */
 ImportActionForm.prototype.init = function () {
-    // Create action type select element
-    this.actionTypeSel = ce(
-        'select',
-        {},
-        this.actionTypes.map(function (type) {
-            return ce('option', { value: type.id, textContent: type.title });
-        }),
-        { change: this.onActionTypeChange.bind(this) }
-    );
-    this.actionTypeField = this.createField('Action', this.actionTypeSel);
-    // Create transaction type select element
-    this.transTypeSel = ce(
-        'select',
-        {},
-        this.transactionTypes.map(function (type) {
-            return ce('option', { value: type.id, textContent: type.title });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.transTypeField = this.createField('Transaction type', this.transTypeSel);
-    // Create account select element
-    this.accountSel = ce(
-        'select',
-        {},
-        this.model.accounts.map(function (account) {
-            return ce('option', { value: account.id, textContent: account.name });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.accountField = this.createField('Account', this.accountSel);
-    // Create person select element
-    this.personSel = ce(
-        'select',
-        {},
-        this.model.persons.map(function (person) {
-            return ce('option', { value: person.id, textContent: person.name });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.personField = this.createField('Person', this.personSel);
+    this.createActionTypeField();
+    this.createTransTypeField();
+    this.createAccountField();
+    this.createPersonField();
+
     // Create amount input element
     this.amountInput = ce('input', { type: 'text' });
     this.decAmountInput = DecimalInput.create({
@@ -154,6 +119,74 @@ ImportActionForm.prototype.init = function () {
     ]);
 };
 
+/** Create action type field */
+ImportActionForm.prototype.createActionTypeField = function () {
+    var items = this.actionTypes.map(function (type) {
+        return { id: type.id, title: type.title };
+    });
+
+    var selectElem = ce('select');
+    this.actionTypeField = this.createField('Action', selectElem);
+
+    this.actionDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onActionTypeChange.bind(this),
+        editable: false
+    });
+    this.actionDropDown.append(items);
+};
+
+/** Create transaction type field */
+ImportActionForm.prototype.createTransTypeField = function () {
+    var items = this.transactionTypes.map(function (type) {
+        return { id: type.id, title: type.title };
+    });
+
+    var selectElem = ce('select');
+    this.transTypeField = this.createField('Transaction type', selectElem);
+
+    this.trTypeDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.trTypeDropDown.append(items);
+};
+
+/** Create account field */
+ImportActionForm.prototype.createAccountField = function () {
+    var items = this.model.accounts.map(function (account) {
+        return { id: account.id, title: account.name };
+    });
+
+    var selectElem = ce('select');
+    this.accountField = this.createField('Account', selectElem);
+
+    this.accountDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.accountDropDown.append(items);
+};
+
+/** Create person field */
+ImportActionForm.prototype.createPersonField = function () {
+    var items = this.model.persons.map(function (person) {
+        return { id: person.id, title: person.name };
+    });
+
+    var selectElem = ce('select');
+    this.personField = this.createField('Person', selectElem);
+
+    this.personDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.personDropDown.append(items);
+};
+
 /** Set data for component */
 ImportActionForm.prototype.setData = function (data) {
     var value;
@@ -180,16 +213,12 @@ ImportActionForm.prototype.setData = function (data) {
 };
 
 /** Action type select 'change' event handler */
-ImportActionForm.prototype.onActionTypeChange = function () {
-    var value;
-
-    value = selectedValue(this.actionTypeSel);
-    value = parseInt(value, 10);
-    if (!value) {
+ImportActionForm.prototype.onActionTypeChange = function (action) {
+    if (!action) {
         return;
     }
 
-    this.state.actionType = value;
+    this.state.actionType = action.id;
     this.state.value = this.getActionValue(this.state);
     this.state.isValid = true;
     this.render(this.state);
@@ -198,24 +227,48 @@ ImportActionForm.prototype.onActionTypeChange = function () {
 
 /** Return action value */
 ImportActionForm.prototype.getActionValue = function (state) {
+    var selection;
+
     if (!state) {
         throw new Error('Invalid state');
     }
 
     if (state.actionType === IMPORT_ACTION_SET_TR_TYPE) {
-        return selectedValue(this.transTypeSel);
+        selection = this.trTypeDropDown.getSelectionData();
+        return selection.id;
     }
     if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
-        return selectedValue(this.accountSel);
+        selection = this.accountDropDown.getSelectionData();
+        return selection.id;
     }
     if (state.actionType === IMPORT_ACTION_SET_PERSON) {
-        return selectedValue(this.personSel);
+        selection = this.personDropDown.getSelectionData();
+        return selection.id;
     }
     if (ImportAction.isAmountValue(state.actionType)) {
         return this.decAmountInput.value;
     }
 
     return this.valueInput.value;
+};
+
+/** Set action value */
+ImportActionForm.prototype.setActionValue = function (state) {
+    if (!state) {
+        throw new Error('Invalid state');
+    }
+
+    if (state.actionType === IMPORT_ACTION_SET_TR_TYPE) {
+        this.trTypeDropDown.selectItem(state.value);
+    } else if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
+        this.accountDropDown.selectItem(parseInt(state.value, 10));
+    } else if (state.actionType === IMPORT_ACTION_SET_PERSON) {
+        this.personDropDown.selectItem(parseInt(state.value, 10));
+    } else if (ImportAction.isAmountValue(state.actionType)) {
+        this.decAmountInput.value = state.value;
+    } else {
+        this.valueInput.value = state.value;
+    }
 };
 
 /** Value select 'change' event handler */
@@ -285,7 +338,7 @@ ImportActionForm.prototype.render = function (state) {
 
     isSelectTarget = ImportAction.isSelectValue(state.actionType);
     isAmountTarget = ImportAction.isAmountValue(state.actionType);
-    selectByValue(this.actionTypeSel, state.actionType);
+    this.actionDropDown.selectItem(state.actionType);
 
     show(this.transTypeField, (state.actionType === IMPORT_ACTION_SET_TR_TYPE));
     show(this.accountField, (state.actionType === IMPORT_ACTION_SET_ACCOUNT));
@@ -293,15 +346,5 @@ ImportActionForm.prototype.render = function (state) {
     show(this.amountField, isAmountTarget);
     show(this.valueField, !isSelectTarget && !isAmountTarget);
 
-    if (state.actionType === IMPORT_ACTION_SET_TR_TYPE) {
-        selectByValue(this.transTypeSel, state.value);
-    } else if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
-        selectByValue(this.accountSel, state.value);
-    } else if (state.actionType === IMPORT_ACTION_SET_PERSON) {
-        selectByValue(this.personSel, state.value);
-    } else if (isAmountTarget) {
-        this.decAmountInput.value = state.value;
-    } else {
-        this.valueInput.value = state.value;
-    }
+    this.setActionValue(state);
 };

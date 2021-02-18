@@ -4,6 +4,7 @@ import { ImportList } from './component/importlist.js';
 import { ImportUploadDialog } from './component/importuploaddialog.js';
 import { ImportRulesDialog } from './component/importrulesdialog.js';
 import { Component } from './component/component.js';
+import { DropDown } from './component/dropdown.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
 import { copyObject } from '../common.js';
 
@@ -20,7 +21,7 @@ export class ImportView extends TestView {
         const res = {
             title: { elem: await this.query('.content_wrap > .heading > h1') },
             uploadBtn: await IconLink.create(this, await this.query('#uploadBtn')),
-            mainAccountSelect: { elem: await this.query('#acc_id') },
+            mainAccountSelect: await DropDown.createFromChild(this, await this.query('#acc_id')),
             addBtn: await IconLink.create(this, await this.query('#newItemBtn')),
             clearBtn: await IconLink.create(this, await this.query('#clearFormBtn')),
             totalCount: { elem: await this.query('#trcount') },
@@ -32,15 +33,13 @@ export class ImportView extends TestView {
         };
 
         res.title.value = await this.prop(res.title.elem, 'textContent');
-        const mainAccountId = await this.prop(res.mainAccountSelect.elem, 'value');
-        res.mainAccountSelect.value = mainAccountId;
         res.totalCount.value = await this.prop(res.totalCount.elem, 'textContent');
         res.enabledCount.value = await this.prop(res.enabledCount.elem, 'textContent');
 
         if (
             !res.title.elem
             || !res.uploadBtn
-            || !res.mainAccountSelect.elem
+            || !res.mainAccountSelect
             || !res.addBtn
             || !res.clearBtn
             || !res.totalCount.elem
@@ -57,6 +56,7 @@ export class ImportView extends TestView {
         res.rulesCount.value = await this.prop(res.rulesCount.elem, 'textContent');
 
         const rowsContainer = await this.query('#rowsContainer');
+        const mainAccountId = res.mainAccountSelect.value;
         res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
         if (!res.itemsList) {
             throw new Error('Invalid structure of import view');
@@ -279,10 +279,7 @@ export class ImportView extends TestView {
     async selectMainAccount(val) {
         this.checkMainState();
 
-        await this.performAction(async () => {
-            await this.selectByValue(this.content.mainAccountSelect.elem, val.toString());
-            await this.onChange(this.content.mainAccountSelect.elem);
-        });
+        await this.performAction(() => this.content.mainAccountSelect.selectItem(val));
     }
 
     checkRulesFormState() {

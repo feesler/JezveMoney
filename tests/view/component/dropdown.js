@@ -43,7 +43,7 @@ export class DropDown extends Component {
         if (this.isAttached) {
             this.selectBtn = await this.query(this.elem, ':scope > *');
         } else {
-            this.selectBtn = await this.query(this.elem, 'button.dd__toggle-btn');
+            this.selectBtn = await this.query(this.elem, '.dd__toggle-btn');
         }
         if (!this.selectBtn) {
             throw new Error('Select button not found');
@@ -86,6 +86,10 @@ export class DropDown extends Component {
 
                 return { id, title, deselectBtn };
             });
+
+            this.value = this.selectedItems;
+        } else {
+            this.value = await this.prop(this.selectElem, 'value');
         }
 
         const selectOptions = await this.queryAll(this.selectElem, 'option');

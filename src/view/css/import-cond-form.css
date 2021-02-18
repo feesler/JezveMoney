@@ -54,7 +54,18 @@
     overflow: hidden;
 }
 
-.cond-form select,
+.cond-form .dd__combo
+{
+    min-height: auto;
+    padding-right: 30px;
+}
+
+.cond-form .dd__combo,
+.cond-form .dd__list
+{
+    border-width: 1px;
+}
+
 .cond-form input[type="text"]
 {
     display: flex;

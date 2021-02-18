@@ -1,4 +1,4 @@
-import { isObject, convDate } from '../common.js';
+import { isFunction, isObject, convDate } from '../common.js';
 
 /* eslint-disable no-bitwise */
 
@@ -90,7 +90,7 @@ export class ImportCondition {
 
     /** Field type to data property name map */
     static fieldsMap = {
-        [IMPORT_COND_FIELD_MAIN_ACCOUNT]: 'mainAccount',
+        [IMPORT_COND_FIELD_MAIN_ACCOUNT]: (data) => data.mainAccount.id,
         [IMPORT_COND_FIELD_TPL]: 'template',
         [IMPORT_COND_FIELD_TR_AMOUNT]: 'trAmountVal',
         [IMPORT_COND_FIELD_TR_CURRENCY]: 'trCurrVal',
@@ -131,8 +131,12 @@ export class ImportCondition {
             throw new Error('Invalid transaction data');
         }
 
-        const dataProp = this.fieldsMap[field];
-        return data[dataProp];
+        const mapper = this.fieldsMap[field];
+        if (isFunction(mapper)) {
+            return mapper(data);
+        }
+
+        return data[mapper];
     }
 
     /** Check value for specified field type is account */
@@ -313,7 +317,6 @@ export class ImportCondition {
         }
 
         const operatorFunction = ImportCondition.operatorsMap[this.operator];
-
         return operatorFunction(left, right);
     }
 

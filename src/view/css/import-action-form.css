@@ -48,7 +48,18 @@
     overflow: hidden;
 }
 
-.action-form select,
+.action-form .dd__combo
+{
+    min-height: auto;
+    padding-right: 30px;
+}
+
+.action-form .dd__combo,
+.action-form .dd__list
+{
+    border-width: 1px;
+}
+
 .action-form input[type="text"]
 {
     display: flex;

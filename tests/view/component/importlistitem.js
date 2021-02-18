@@ -1,4 +1,5 @@
 import { Component } from './component.js';
+import { DropDown } from './dropdown.js';
 import {
     EXPENSE,
     INCOME,
@@ -59,15 +60,27 @@ export class ImportListItem extends Component {
         }
 
         res.labelElem = await this.query(elem, ':scope > label');
-        res.inputElem = await this.query(elem, ':scope > div > *');
-        if (!res.labelElem || !res.inputElem) {
+        if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-
         res.title = await this.prop(res.labelElem, 'textContent');
 
-        res.disabled = await this.prop(res.inputElem, 'disabled');
-        res.value = await this.prop(res.inputElem, 'value');
+        const dropDownElem = await this.query(elem, '.dd__container');
+        if (dropDownElem) {
+            res.dropDown = await DropDown.create(this, dropDownElem);
+            if (!res.dropDown) {
+                throw new Error('Invalid structure of field element');
+            }
+            res.disabled = res.dropDown.disabled;
+            res.value = res.dropDown.value;
+        } else {
+            res.inputElem = await this.query(elem, ':scope > div > *');
+            if (!res.inputElem) {
+                throw new Error('Invalid structure of field element');
+            }
+            res.disabled = await this.prop(res.inputElem, 'disabled');
+            res.value = await this.prop(res.inputElem, 'value');
+        }
 
         res.environment = this.environment;
         if (res.environment) {
@@ -434,8 +447,7 @@ export class ImportListItem extends Component {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.selectByValue(this.typeField.inputElem, value);
-        await this.onChange(this.typeField.inputElem);
+        await this.typeField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
@@ -460,8 +472,7 @@ export class ImportListItem extends Component {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.selectByValue(this.destAccountField.inputElem, value);
-        await this.onChange(this.destAccountField.inputElem);
+        await this.destAccountField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
@@ -475,8 +486,7 @@ export class ImportListItem extends Component {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.selectByValue(this.personField.inputElem, value);
-        await this.onChange(this.personField.inputElem);
+        await this.personField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
@@ -517,8 +527,7 @@ export class ImportListItem extends Component {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.selectByValue(this.currencyField.inputElem, value.toString());
-        await this.onChange(this.currencyField.inputElem);
+        await this.currencyField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();

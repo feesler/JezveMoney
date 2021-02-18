@@ -1,7 +1,7 @@
 'use strict';
 
-/* global ce, isFunction, show, selectedValue, selectByValue, extend, AppComponent */
-/* global addChilds, removeChilds, DecimalInput, View */
+/* global ce, isFunction, show, extend, AppComponent */
+/* global DropDown, DecimalInput, View */
 /* global ImportCondition, IMPORT_COND_OP_FIELD_FLAG */
 
 /**
@@ -59,76 +59,13 @@ ImportConditionForm.create = function (props) {
 
 /** Form controls initialization */
 ImportConditionForm.prototype.init = function () {
-    // Create property select element
-    this.propertySel = ce(
-        'select',
-        {},
-        this.fieldTypes.map(function (fieldType) {
-            var isDisabled = false;
+    this.createPropertyField();
+    this.createOperatorField();
+    this.createAccountField();
+    this.createTemplateField();
+    this.createCurrencyField();
+    this.createValuePropField();
 
-            if (ImportCondition.isTemplateField(fieldType.id)) {
-                isDisabled = !this.model.template.length;
-            }
-
-            return ce('option', {
-                value: fieldType.id,
-                textContent: fieldType.title,
-                disabled: isDisabled
-            });
-        }, this),
-        { change: this.onPropertyChange.bind(this) }
-    );
-    this.propertyField = this.createField('Property', this.propertySel);
-    // Create operator select element
-    this.operatorSel = ce(
-        'select',
-        {},
-        this.operatorTypes.map(function (operatorType) {
-            return ce('option', { value: operatorType.id, textContent: operatorType.title });
-        }),
-        { change: this.onOperatorChange.bind(this) }
-    );
-    this.operatorField = this.createField('Operator', this.operatorSel);
-    // Create account value select element
-    this.accountSel = ce(
-        'select',
-        {},
-        this.model.accounts.map(function (account) {
-            return ce('option', { value: account.id, textContent: account.name });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.accountField = this.createField('Account', this.accountSel);
-    // Create account value select element
-    this.templateSel = ce(
-        'select',
-        {},
-        this.model.template.map(function (template) {
-            return ce('option', { value: template.id, textContent: template.name });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.templateField = this.createField('Template', this.templateSel);
-    // Create currency value select element
-    this.currencySel = ce(
-        'select',
-        {},
-        this.model.currency.map(function (currency) {
-            return ce('option', { value: currency.id, textContent: currency.name });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.currencyField = this.createField('Currency', this.currencySel);
-    // Create value property select element
-    this.valuePropSel = ce(
-        'select',
-        {},
-        this.fieldTypes.map(function (fieldType) {
-            return ce('option', { value: fieldType.id, textContent: fieldType.title });
-        }),
-        { change: this.onValueChange.bind(this) }
-    );
-    this.valuePropField = this.createField('Value property', this.valuePropSel);
     // Create amount input element
     this.amountInput = ce('input', { type: 'text' });
     this.decAmountInput = DecimalInput.create({
@@ -186,6 +123,109 @@ ImportConditionForm.prototype.init = function () {
     ]);
 };
 
+/** Create property field */
+ImportConditionForm.prototype.createPropertyField = function () {
+    var selectElem = ce('select');
+    this.propertyField = this.createField('Property', selectElem);
+
+    this.propertyDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onPropertyChange.bind(this),
+        editable: false
+    });
+
+    this.fieldTypes.forEach(function (fieldType) {
+        if (ImportCondition.isTemplateField(fieldType.id)) {
+            return;
+        }
+
+        this.propertyDropDown.addItem({
+            id: fieldType.id,
+            title: fieldType.title
+        });
+    }, this);
+};
+
+/** Create operator field */
+ImportConditionForm.prototype.createOperatorField = function () {
+    var operatorItems = this.operatorTypes.map(function (operatorType) {
+        return { id: operatorType.id, title: operatorType.title };
+    });
+    var selectElem = ce('select');
+    this.operatorField = this.createField('Operator', selectElem);
+
+    this.operatorDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onOperatorChange.bind(this),
+        editable: false
+    });
+    this.operatorDropDown.append(operatorItems);
+};
+
+/** Create account field */
+ImportConditionForm.prototype.createAccountField = function () {
+    var accountItems = this.model.accounts.map(function (account) {
+        return { id: account.id, title: account.name };
+    });
+    var selectElem = ce('select');
+    this.accountField = this.createField('Account', selectElem);
+
+    this.accountDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.accountDropDown.append(accountItems);
+};
+
+/** Create template field */
+ImportConditionForm.prototype.createTemplateField = function () {
+    var templateItems = this.model.template.map(function (template) {
+        return { id: template.id, title: template.name };
+    });
+    var selectElem = ce('select');
+    this.templateField = this.createField('Template', selectElem);
+
+    this.templateDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.templateDropDown.append(templateItems);
+};
+
+/** Create currency field */
+ImportConditionForm.prototype.createCurrencyField = function () {
+    var currencyItems = this.model.currency.map(function (currency) {
+        return { id: currency.id, title: currency.name };
+    });
+    var selectElem = ce('select');
+    this.currencyField = this.createField('Currency', selectElem);
+
+    this.currencyDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.currencyDropDown.append(currencyItems);
+};
+
+/** Create value property field */
+ImportConditionForm.prototype.createValuePropField = function () {
+    var items = this.fieldTypes.map(function (fieldType) {
+        return { id: fieldType.id, title: fieldType.title };
+    });
+    var selectElem = ce('select');
+    this.valuePropField = this.createField('Value property', selectElem);
+
+    this.valuePropDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onValueChange.bind(this),
+        editable: false
+    });
+    this.valuePropDropDown.append(items);
+};
+
 /** Verify correctness of operator */
 ImportConditionForm.prototype.verifyOperator = function (state) {
     if (
@@ -229,9 +269,14 @@ ImportConditionForm.prototype.setData = function (data) {
 };
 
 /** Property select 'change' event handler */
-ImportConditionForm.prototype.onPropertyChange = function () {
-    var value = selectedValue(this.propertySel);
-    var fieldType = ImportCondition.getFieldTypeById(value);
+ImportConditionForm.prototype.onPropertyChange = function (property) {
+    var fieldType;
+
+    if (!property || !property.id) {
+        throw new Error('Invalid property');
+    }
+
+    fieldType = ImportCondition.getFieldTypeById(property.id);
     if (!fieldType) {
         throw new Error('Invalid property type');
     }
@@ -256,18 +301,16 @@ ImportConditionForm.prototype.onPropertyChange = function () {
 };
 
 /** Operator select 'change' event handler */
-ImportConditionForm.prototype.onOperatorChange = function () {
-    var value = selectedValue(this.operatorSel);
-    var operatorId = parseInt(value, 10);
-    if (!operatorId) {
+ImportConditionForm.prototype.onOperatorChange = function (operator) {
+    if (!operator || !operator.id) {
         throw new Error('Invalid operator');
     }
 
-    if (this.state.operator === operatorId) {
+    if (this.state.operator === operator.id) {
         return;
     }
 
-    this.state.operator = operatorId;
+    this.state.operator = operator.id;
     this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
@@ -275,21 +318,27 @@ ImportConditionForm.prototype.onOperatorChange = function () {
 
 /** Return condition value */
 ImportConditionForm.prototype.getConditionValue = function (state) {
+    var selection;
+
     if (!state) {
         throw new Error('Invalid state');
     }
 
     if (state.isFieldValue) {
-        return selectedValue(this.valuePropSel);
+        selection = this.valuePropDropDown.getSelectionData();
+        return selection.id;
     }
     if (ImportCondition.isAccountField(state.fieldType)) {
-        return selectedValue(this.accountSel);
+        selection = this.accountDropDown.getSelectionData();
+        return selection.id;
     }
     if (ImportCondition.isTemplateField(state.fieldType)) {
-        return selectedValue(this.templateSel);
+        selection = this.templateDropDown.getSelectionData();
+        return selection.id;
     }
     if (ImportCondition.isCurrencyField(state.fieldType)) {
-        return selectedValue(this.currencySel);
+        selection = this.currencyDropDown.getSelectionData();
+        return selection.id;
     }
     if (ImportCondition.isAmountField(state.fieldType)) {
         return this.decAmountInput.value;
@@ -300,18 +349,24 @@ ImportConditionForm.prototype.getConditionValue = function (state) {
 
 /** Set condition value */
 ImportConditionForm.prototype.setConditionValue = function (state) {
+    var value;
+
     if (!state) {
         throw new Error('Invalid state');
     }
 
+    if (ImportCondition.isItemField(state.fieldType) || state.isFieldValue) {
+        value = parseInt(state.value, 10);
+    }
+
     if (state.isFieldValue) {
-        selectByValue(this.valuePropSel, state.value);
+        this.valuePropDropDown.selectItem(value);
     } else if (ImportCondition.isAccountField(state.fieldType)) {
-        selectByValue(this.accountSel, state.value);
+        this.accountDropDown.selectItem(value);
     } else if (ImportCondition.isTemplateField(state.fieldType)) {
-        selectByValue(this.templateSel, state.value);
+        this.templateDropDown.selectItem(value);
     } else if (ImportCondition.isCurrencyField(state.fieldType)) {
-        selectByValue(this.currencySel, state.value);
+        this.currencyDropDown.selectItem(value);
     } else if (ImportCondition.isAmountField(state.fieldType)) {
         this.decAmountInput.value = state.value;
     } else {
@@ -336,6 +391,7 @@ ImportConditionForm.prototype.onValueChange = function () {
 /** Field value checkbox 'change' event handler */
 ImportConditionForm.prototype.onFieldValueChecked = function () {
     this.state.isFieldValue = this.fieldValueCheck.checked;
+    this.state.value = this.getConditionValue(this.state);
     this.state.isValid = true;
     this.render(this.state);
     this.sendUpdate();
@@ -380,23 +436,24 @@ ImportConditionForm.prototype.onDelete = function () {
 
 /** Render operator select */
 ImportConditionForm.prototype.renderOperator = function (state) {
-    var options;
+    var items;
 
     if (!state) {
         throw new Error('Invalid state');
     }
 
-    options = this.operatorTypes.map(function (operatorType) {
-        return ce('option', {
-            value: operatorType.id,
-            selected: (operatorType.id === state.operator),
-            textContent: operatorType.title,
-            disabled: !state.availOperators.includes(operatorType.id)
-        });
+    items = this.operatorTypes.filter(function (operatorType) {
+        return state.availOperators.includes(operatorType.id);
+    }).map(function (operatorType) {
+        return {
+            id: operatorType.id,
+            title: operatorType.title
+        };
     });
 
-    removeChilds(this.operatorSel);
-    addChilds(this.operatorSel, options);
+    this.operatorDropDown.removeAll();
+    this.operatorDropDown.append(items);
+    this.operatorDropDown.selectItem(state.operator);
 };
 
 /** Render component state */
@@ -419,7 +476,7 @@ ImportConditionForm.prototype.render = function (state) {
         this.parentView.invalidateBlock(this.container);
     }
 
-    selectByValue(this.propertySel, state.fieldType);
+    this.propertyDropDown.selectItem(state.fieldType);
     this.renderOperator(state);
     this.fieldValueCheck.checked = state.isFieldValue;
 

@@ -1,4 +1,5 @@
 import { Component } from './component.js';
+import { DropDown } from './dropdown.js';
 import {
     asyncMap,
 } from '../../common.js';
@@ -97,15 +98,27 @@ export class ImportConditionForm extends Component {
         }
 
         res.labelElem = await this.query(elem, ':scope > label');
-        res.inputElem = await this.query(elem, ':scope > div > *');
-        if (!res.labelElem || !res.inputElem) {
+        if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-
         res.title = await this.prop(res.labelElem, 'textContent');
 
-        res.disabled = await this.prop(res.inputElem, 'disabled');
-        res.value = await this.prop(res.inputElem, 'value');
+        const dropDownElem = await this.query(elem, '.dd__container');
+        if (dropDownElem) {
+            res.dropDown = await DropDown.create(this, dropDownElem);
+            if (!res.dropDown) {
+                throw new Error('Invalid structure of field element');
+            }
+            res.disabled = res.dropDown.disabled;
+            res.value = res.dropDown.value;
+        } else {
+            res.inputElem = await this.query(elem, ':scope > div > *');
+            if (!res.inputElem) {
+                throw new Error('Invalid structure of field element');
+            }
+            res.disabled = await this.prop(res.inputElem, 'disabled');
+            res.value = await this.prop(res.inputElem, 'value');
+        }
 
         res.environment = this.environment;
         if (res.environment) {
@@ -195,14 +208,13 @@ export class ImportConditionForm extends Component {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await this.selectByValue(this.fieldTypeField.inputElem, fieldId);
-        await this.onChange(this.fieldTypeField.inputElem);
+        await this.fieldTypeField.dropDown.selectItem(fieldId);
         await this.parse();
 
         return this.checkState();
     }
 
-    async changeValue(name, value, isSelect) {
+    async changeValue(name, value) {
         if (this.model.state !== name) {
             throw new Error(`Invalid state ${this.model.state} expected ${name}`);
         }
@@ -212,9 +224,8 @@ export class ImportConditionForm extends Component {
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
         const control = this[`${name}Field`];
-        if (isSelect) {
-            await this.selectByValue(control.inputElem, value.toString());
-            await this.onChange(control.inputElem);
+        if (control.dropDown) {
+            await control.dropDown.selectItem(parseInt(value, 10));
         } else {
             await this.input(control.inputElem, value.toString());
         }
@@ -228,27 +239,26 @@ export class ImportConditionForm extends Component {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await this.selectByValue(this.operatorField.inputElem, value);
-        await this.onChange(this.operatorField.inputElem);
+        await this.operatorField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
     }
 
     async changeTemplate(value) {
-        return this.changeValue('template', value, true);
+        return this.changeValue('template', value);
     }
 
     async changeAccount(value) {
-        return this.changeValue('account', value, true);
+        return this.changeValue('account', value);
     }
 
     async changeCurrency(value) {
-        return this.changeValue('currency', value, true);
+        return this.changeValue('currency', value);
     }
 
     async changeProperty(value) {
-        return this.changeValue('property', value, true);
+        return this.changeValue('property', value);
     }
 
     async togglePropValue() {
@@ -265,11 +275,11 @@ export class ImportConditionForm extends Component {
     }
 
     async inputAmount(value) {
-        return this.changeValue('amount', value, false);
+        return this.changeValue('amount', value);
     }
 
     async inputValue(value) {
-        return this.changeValue('text', value, false);
+        return this.changeValue('text', value);
     }
 
     async clickDelete() {

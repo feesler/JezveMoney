@@ -1,8 +1,8 @@
 'use strict';
 
 /* global ge, formatDate, isFunction, show, enable, extend */
-/* global selectedValue, urlJoin, ajax, timestampFromString, createMessage, baseURL */
-/* global Component, Popup, ImportTransactionItem */
+/* global urlJoin, ajax, timestampFromString, createMessage, baseURL */
+/* global Component, Popup, DropDown, ImportTransactionItem */
 /* global ImportFileUploader, ImportTemplateManager */
 
 /**
@@ -72,20 +72,24 @@ function ImportUploadDialog() {
     this.elem.addEventListener('dragover', this.onDragOver.bind(this), false);
     this.elem.addEventListener('drop', this.onDrop.bind(this), false);
 
+    this.accountDropDown = DropDown.create({
+        input_id: 'initialAccount',
+        onchange: this.onAccountChange.bind(this),
+        editable: false
+    });
+
     this.initialAccField = ge('initialAccField');
-    this.initialAccountSel = ge('initialAccount');
     this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
     this.submitUploadedBtn = ge('submitUploadedBtn');
     if (
         !this.initialAccField
-        || !this.initialAccountSel
+        || !this.accountDropDown
         || !this.controlsBlock
         || !this.submitUploadedBtn
     ) {
         throw new Error('Failed to initialize upload file dialog');
     }
 
-    this.initialAccountSel.addEventListener('change', this.onAccountChange.bind(this));
     this.submitUploadedBtn.addEventListener('click', this.onSubmit.bind(this));
 }
 
@@ -165,9 +169,12 @@ ImportUploadDialog.prototype.enableUpload = function (val) {
 };
 
 /** Initial account select 'change' event handler */
-ImportUploadDialog.prototype.onAccountChange = function () {
-    var accountId = selectedValue(this.initialAccountSel);
-    var account = this.model.accounts.getItem(accountId);
+ImportUploadDialog.prototype.onAccountChange = function (selectedAccount) {
+    var account = null;
+
+    if (selectedAccount) {
+        account = this.model.accounts.getItem(selectedAccount.id);
+    }
     if (!account) {
         throw new Error('Account not found');
     }
@@ -175,7 +182,7 @@ ImportUploadDialog.prototype.onAccountChange = function () {
     this.model.mainAccount = account;
 
     if (isFunction(this.accountChangeHandler)) {
-        this.accountChangeHandler(accountId);
+        this.accountChangeHandler(account.id);
     }
 };
 

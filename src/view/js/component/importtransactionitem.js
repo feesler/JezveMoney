@@ -1,8 +1,8 @@
 'use strict';
 
-/* global ce, re, fixFloat, show, enable, selectedValue, selectByValue, extend, AppComponent */
+/* global ce, re, fixFloat, show, enable, extend, AppComponent */
 /* global checkDate, formatDate, copyObject, addChilds, removeChilds */
-/* global EXPENSE, INCOME, TRANSFER, DEBT, AccountList */
+/* global EXPENSE, INCOME, TRANSFER, DEBT, AccountList, DropDown */
 
 /**
  * ImportTransactionItem component constructor
@@ -60,98 +60,10 @@ function ImportTransactionItem() {
     this.enableCheck = ce('input', { type: 'checkbox' });
     this.enableCheck.addEventListener('change', this.onRowChecked.bind(this));
 
-    // Currency controls
-    this.currIdInp = ce('input', { type: 'hidden', name: 'curr_id[]' });
-    this.currSel = ce('select', {}, ce('option', { value: 0, textContent: '', disabled: true }));
-    this.model.currency.forEach(function (currency) {
-        var option = ce('option', {
-            value: currency.id,
-            textContent: currency.name
-        });
-
-        this.currSel.appendChild(option);
-    }, this);
-    this.currSel.addEventListener('change', this.onCurrChanged.bind(this));
-    this.currField = this.createField('Currency', this.currSel);
-
-    // Transaction type select
-    this.trTypeSel = ce('select',
-        { name: 'tr_type[]' },
-        [
-            ce('option', {
-                value: 'expense',
-                textContent: 'Expense'
-            }),
-            ce('option', {
-                value: 'income',
-                textContent: 'Income'
-            }),
-            ce('option', {
-                value: 'transferfrom',
-                textContent: 'Transfer>',
-                disabled: (this.model.accounts.length < 2)
-            }),
-            ce('option', {
-                value: 'transferto',
-                textContent: 'Transfer<',
-                disabled: (this.model.accounts.length < 2)
-            }),
-            ce('option', {
-                value: 'debtfrom',
-                textContent: 'Debt>',
-                disabled: (!this.model.persons.length)
-            }),
-            ce('option', {
-                value: 'debtto',
-                textContent: 'Debt<',
-                disabled: (!this.model.persons.length)
-            })
-        ]);
-    this.trTypeSel.addEventListener('change', this.onTrTypeChanged.bind(this));
-    this.trTypeField = this.createField('Type', this.trTypeSel);
-
-    // Destination account controls
-    this.destAccIdInp = ce('input', { type: 'hidden', name: 'dest_acc_id[]', value: '' });
-    this.destAccSel = ce(
-        'select',
-        { disabled: true },
-        ce('option', {
-            value: 0,
-            textContent: '',
-            disabled: true,
-            selected: true
-        })
-    );
-    this.model.accounts.forEach(function (account) {
-        var option = ce('option', {
-            value: account.id,
-            textContent: account.name,
-            disabled: (account.id === this.state.accountId)
-        });
-
-        this.destAccSel.appendChild(option);
-    }, this);
-    this.destAccSel.addEventListener('change', this.onDestChanged.bind(this));
-    this.destAccountField = this.createField('Destination account', this.destAccSel);
-
-    // Person controls
-    this.personIdInp = ce('input', { type: 'hidden', name: 'person_id[]', value: '' });
-    this.personSel = ce(
-        'select',
-        { disabled: true },
-        ce('option', {
-            value: 0,
-            textContent: '',
-            disabled: true,
-            selected: true
-        }),
-        { change: this.onPersonChanged.bind(this) }
-    );
-    this.model.persons.forEach(function (person) {
-        var option = ce('option', { value: person.id, textContent: person.name });
-        this.personSel.appendChild(option);
-    }, this);
-    this.personField = this.createField('Person', this.personSel);
+    this.createCurrencyField();
+    this.createTypeField();
+    this.createAccountField();
+    this.createPersonField();
 
     // Amount controls
     this.amountInp = ce('input', {
@@ -206,16 +118,13 @@ function ImportTransactionItem() {
 
     this.topRow = this.createContainer('form-row', [
         this.amountField,
-        this.currIdInp,
         this.currField,
         this.dateField,
         this.commentField
     ]);
 
     this.bottomRow = this.createContainer('form-row hidden', [
-        this.destAccIdInp,
         this.destAccountField,
-        this.personIdInp,
         this.personField,
         this.destAmountField
     ]);
@@ -268,6 +177,89 @@ ImportTransactionItem.create = function (props) {
     }
 
     return res;
+};
+
+/** Create transaction type field */
+ImportTransactionItem.prototype.createTypeField = function () {
+    var transferDisabled = this.model.accounts.length < 2;
+    var debtDisabled = !this.model.persons.length;
+    var typeItems = [
+        { id: 'expense', title: 'Expense' },
+        { id: 'income', title: 'Income' },
+        { id: 'transferfrom', title: 'Transfer from', disabled: transferDisabled },
+        { id: 'transferto', title: 'Transfer to', disabled: transferDisabled },
+        { id: 'debtfrom', title: 'Debt from', disabled: debtDisabled },
+        { id: 'debtto', title: 'Debt to', disabled: debtDisabled }
+    ];
+    var selectElem = ce('select');
+
+    this.trTypeField = this.createField('Type', selectElem);
+
+    this.typeDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onTrTypeChanged.bind(this),
+        editable: false
+    });
+    typeItems.forEach(function (typeItem) {
+        this.typeDropDown.addItem(typeItem);
+        if (typeItem.disabled) {
+            this.typeDropDown.enableItem(typeItem.id, false);
+        }
+    }, this);
+};
+
+/** Create destination(second) account field */
+ImportTransactionItem.prototype.createAccountField = function () {
+    var selectElem = ce('select');
+    var accountItems = this.model.accounts.map(function (account) {
+        return { id: account.id, title: account.name };
+    });
+    this.destAccountField = this.createField('Destination account', selectElem);
+
+    this.destAccDropDown = DropDown.create({
+        input_id: selectElem,
+        disabled: true,
+        onchange: this.onDestChanged.bind(this),
+        editable: false
+    });
+
+    this.destAccDropDown.append(accountItems);
+    this.destAccDropDown.enableItem(this.state.accountId, false);
+};
+
+/** Create person field */
+ImportTransactionItem.prototype.createPersonField = function () {
+    var personItems = this.model.persons.map(function (person) {
+        return { id: person.id, title: person.name };
+    });
+    var selectElem = ce('select');
+    this.personField = this.createField('Person', selectElem);
+
+    this.personDropDown = DropDown.create({
+        input_id: selectElem,
+        disabled: true,
+        onchange: this.onPersonChanged.bind(this),
+        editable: false
+    });
+
+    this.personDropDown.append(personItems);
+};
+
+/** Create currency field */
+ImportTransactionItem.prototype.createCurrencyField = function () {
+    var currencyItems = this.model.currency.map(function (currency) {
+        return { id: currency.id, title: currency.name };
+    });
+    var selectElem = ce('select');
+    this.currField = this.createField('Currency', selectElem);
+
+    this.currencyDropDown = DropDown.create({
+        input_id: selectElem,
+        onchange: this.onCurrChanged.bind(this),
+        editable: false
+    });
+
+    this.currencyDropDown.append(currencyItems);
 };
 
 /** Create static data value element */
@@ -486,47 +478,31 @@ ImportTransactionItem.prototype.getNextAccount = function (accountId) {
 };
 
 /** Transaction type select 'change' event handler */
-ImportTransactionItem.prototype.onTrTypeChanged = function () {
-    var value = selectedValue(this.trTypeSel);
-    this.setTransactionType(value);
+ImportTransactionItem.prototype.onTrTypeChanged = function (type) {
+    this.setTransactionType(type.id);
     this.clearInvalid();
     this.render();
 };
 
 /** Destination account select 'change' event handler */
-ImportTransactionItem.prototype.onDestChanged = function () {
-    var value = selectedValue(this.destAccSel);
-    this.setSecondAccount(value);
+ImportTransactionItem.prototype.onDestChanged = function (account) {
+    this.setSecondAccount(account.id);
     this.clearInvalid();
     this.render();
 };
 
 /** Synchronize options of destination account select */
 ImportTransactionItem.prototype.syncDestAccountSelect = function (state) {
-    var i;
-    var l;
-    var option;
-    var value;
-
-    for (i = 0, l = this.destAccSel.options.length; i < l; i += 1) {
-        option = this.destAccSel.options[i];
-        value = parseInt(option.value, 10);
-        if (Number.isNaN(value)) {
-            throw new Error('Invalid option value: ' + option.value);
-        }
-        if (value === 0 || value === state.accountId) {
-            option.disabled = true;
-            option.selected = false;
-        } else {
-            option.disabled = false;
-        }
-    }
+    var accountItems = this.destAccDropDown.getVisibleItems();
+    accountItems.forEach(function (accountItem) {
+        var isMainAccount = accountItem.id === state.accountId;
+        this.destAccDropDown.enableItem(accountItem.id, !isMainAccount);
+    }, this);
 };
 
 /** Person select 'change' event handler */
-ImportTransactionItem.prototype.onPersonChanged = function () {
-    var value = selectedValue(this.personSel);
-    this.setPerson(value);
+ImportTransactionItem.prototype.onPersonChanged = function (person) {
+    this.setPerson(person.id);
     this.clearInvalid();
     this.render();
 };
@@ -548,9 +524,8 @@ ImportTransactionItem.prototype.onDestAmountInput = function () {
 };
 
 /** Currency select 'change' event handler */
-ImportTransactionItem.prototype.onCurrChanged = function () {
-    var value = selectedValue(this.currSel);
-    this.setCurrency(value);
+ImportTransactionItem.prototype.onCurrChanged = function (currency) {
+    this.setCurrency(currency.id);
     this.clearInvalid();
     this.render();
 };
@@ -628,19 +603,19 @@ ImportTransactionItem.prototype.setTransactionType = function (value) {
 /** Invert type of transaction */
 ImportTransactionItem.prototype.invertTransactionType = function () {
     var typeValue;
-    var trType = selectedValue(this.trTypeSel);
+    var trType = this.typeDropDown.getSelectionData();
 
-    if (trType === 'expense') {
+    if (trType.id === 'expense') {
         typeValue = 'income';
-    } else if (trType === 'income') {
+    } else if (trType.id === 'income') {
         typeValue = 'expense';
-    } else if (trType === 'transferfrom') {
+    } else if (trType.id === 'transferfrom') {
         typeValue = 'transferto';
-    } else if (trType === 'transferto') {
+    } else if (trType.id === 'transferto') {
         typeValue = 'transferfrom';
-    } else if (trType === 'debtto') {
+    } else if (trType.id === 'debtto') {
         typeValue = 'debtfrom';
-    } else if (trType === 'debtfrom') {
+    } else if (trType.id === 'debtfrom') {
         typeValue = 'debtto';
     }
 
@@ -1002,34 +977,28 @@ ImportTransactionItem.prototype.render = function () {
     }
 
     this.enableCheck.checked = state.enabled;
-    enable(this.trTypeSel, state.enabled);
+    this.typeDropDown.enable(state.enabled);
     enable(this.amountInp, state.enabled);
-    enable(this.currIdInp, state.enabled);
-    enable(this.currSel, state.enabled && isExpenseOrIncome);
-    enable(this.destAccIdInp, state.enabled && isTransfer);
-    enable(this.destAccSel, state.enabled && isTransfer);
-    enable(this.personIdInp, state.enabled && isDebt);
-    enable(this.personSel, state.enabled && isDebt);
+    this.currencyDropDown.enable(state.enabled && isExpenseOrIncome);
+    this.destAccDropDown.enable(state.enabled && isTransfer);
+    this.personDropDown.enable(state.enabled && isDebt);
     enable(this.destAmountInp, state.enabled && state.isDiff);
     enable(this.dateInp, state.enabled);
     enable(this.commInp, state.enabled);
 
-    selectByValue(this.trTypeSel, state.type);
+    this.typeDropDown.selectItem(state.type);
 
     // Amount field
     this.amountInp.value = state.amount;
-
     // Currency field
-    selectByValue(this.currSel, state.currId);
-    this.currIdInp.value = state.currId;
+    this.currencyDropDown.selectItem(state.currId);
 
     // Bottom row
     show(this.bottomRow, showBottom);
 
     // Second account field
     this.syncDestAccountSelect(state);
-    selectByValue(this.destAccSel, state.secondAccountId);
-    this.destAccIdInp.value = state.secondAccountId;
+    this.destAccDropDown.selectItem(state.secondAccountId);
     show(this.destAccountField, state.secondAccountVisible);
 
     // Second amount field
@@ -1037,8 +1006,7 @@ ImportTransactionItem.prototype.render = function () {
     show(this.destAmountField, state.isDiff);
 
     // Person field
-    selectByValue(this.personSel, state.personId);
-    this.personIdInp.value = state.personId;
+    this.personDropDown.selectItem(state.personId);
     show(this.personField, state.personVisible);
 
     this.dateInp.value = state.date;

@@ -1,4 +1,5 @@
 import { Component } from './component.js';
+import { DropDown } from './dropdown.js';
 import {
     asyncMap,
 } from '../../common.js';
@@ -83,15 +84,27 @@ export class ImportActionForm extends Component {
         }
 
         res.labelElem = await this.query(elem, ':scope > label');
-        res.inputElem = await this.query(elem, ':scope > div > *');
-        if (!res.labelElem || !res.inputElem) {
+        if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-
         res.title = await this.prop(res.labelElem, 'textContent');
 
-        res.disabled = await this.prop(res.inputElem, 'disabled');
-        res.value = await this.prop(res.inputElem, 'value');
+        const dropDownElem = await this.query(elem, '.dd__container');
+        if (dropDownElem) {
+            res.dropDown = await DropDown.create(this, dropDownElem);
+            if (!res.dropDown) {
+                throw new Error('Invalid structure of field element');
+            }
+            res.disabled = res.dropDown.disabled;
+            res.value = res.dropDown.value;
+        } else {
+            res.inputElem = await this.query(elem, ':scope > div > *');
+            if (!res.inputElem) {
+                throw new Error('Invalid structure of field element');
+            }
+            res.disabled = await this.prop(res.inputElem, 'disabled');
+            res.value = await this.prop(res.inputElem, 'value');
+        }
 
         res.environment = this.environment;
         if (res.environment) {
@@ -167,14 +180,13 @@ export class ImportActionForm extends Component {
         this.model.value = ImportActionForm.getStateValue(this.model);
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 
-        await this.selectByValue(this.actionField.inputElem, actionId);
-        await this.onChange(this.actionField.inputElem);
+        await this.actionField.dropDown.selectItem(actionId);
         await this.parse();
 
         return this.checkState();
     }
 
-    async changeValue(name, value, isSelect) {
+    async changeValue(name, value) {
         if (this.model.state !== name) {
             throw new Error('Invalid state');
         }
@@ -184,9 +196,8 @@ export class ImportActionForm extends Component {
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 
         const control = this[`${name}Field`];
-        if (isSelect) {
-            await this.selectByValue(control.inputElem, value);
-            await this.onChange(control.inputElem);
+        if (control.dropDown) {
+            await control.dropDown.selectItem(value);
         } else {
             await this.input(control.inputElem, value.toString());
         }
@@ -196,23 +207,23 @@ export class ImportActionForm extends Component {
     }
 
     async changeTransactionType(value) {
-        return this.changeValue('transType', value, true);
+        return this.changeValue('transType', value);
     }
 
     async changeAccount(value) {
-        return this.changeValue('account', value, true);
+        return this.changeValue('account', value);
     }
 
     async changePerson(value) {
-        return this.changeValue('person', value, true);
+        return this.changeValue('person', value);
     }
 
     async inputAmount(value) {
-        return this.changeValue('amount', value, false);
+        return this.changeValue('amount', value);
     }
 
     async inputValue(value) {
-        return this.changeValue('text', value, false);
+        return this.changeValue('text', value);
     }
 
     async clickDelete() {

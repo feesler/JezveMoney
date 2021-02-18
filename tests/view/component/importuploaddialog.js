@@ -1,4 +1,5 @@
 import { Component } from './component.js';
+import { DropDown } from './dropdown.js';
 import { App } from '../../app.js';
 import {
     asyncMap,
@@ -25,7 +26,7 @@ export class ImportUploadDialog extends Component {
 
         this.uploadFormBrowser = { elem: await this.query(this.elem, '.upload-form__browser') };
         this.fileNameElem = { elem: await this.query(this.elem, '.upload-form__filename') };
-        this.templateSel = { elem: await this.query(this.elem, '#templateSel') };
+        this.templateSel = await DropDown.createFromChild(this, await this.query(this.elem, '#templateSel'));
         this.isEncodeCheck = { elem: await this.query(this.elem, '#isEncodeCheck') };
         this.submitBtn = { elem: await this.query(this.elem, '#submitUploadedBtn') };
 
@@ -50,12 +51,12 @@ export class ImportUploadDialog extends Component {
         this.submitTplBtn = { elem: await this.query('#submitTplBtn') };
         this.cancelTplBtn = { elem: await this.query('#cancelTplBtn') };
         this.tplFeedback = { elem: await this.query('#tplFeedback') };
-        this.initialAccount = { elem: await this.query('#initialAccount') };
+        this.initialAccount = await DropDown.createFromChild(this, await this.query('#initialAccount'));
         if (
             !this.closeBtn
             || !this.uploadFormBrowser.elem
             || !this.fileNameElem.elem
-            || !this.templateSel.elem
+            || !this.templateSel
             || !this.isEncodeCheck.elem
             || !this.useServerCheck.elem
             || !this.serverAddressBlock.elem
@@ -77,20 +78,11 @@ export class ImportUploadDialog extends Component {
             || !this.submitTplBtn.elem
             || !this.cancelTplBtn.elem
             || !this.tplFeedback.elem
-            || !this.initialAccount.elem
+            || !this.initialAccount
         ) {
             throw new Error('Failed to initialize extras of file upload dialog');
         }
 
-        this.templateSel.disabled = await this.prop(this.templateSel.elem, 'disabled');
-        this.templateSel.options = await asyncMap(
-            await this.queryAll(this.templateSel.elem, 'option'),
-            async (elem) => ({
-                elem,
-                value: await this.prop(elem, 'value'),
-                title: await this.prop(elem, 'textContent'),
-            }),
-        );
         this.isTplLoading = this.templateSel.disabled;
 
         this.isLoading = await this.isVisible(this.loadingIndicator.elem, true);
@@ -130,9 +122,7 @@ export class ImportUploadDialog extends Component {
         this.encode = await this.prop(this.isEncodeCheck.elem, 'checked');
         this.uploadFilename = (this.useServerAddress) ? this.serverAddress : this.fileName;
 
-        this.templateSel.value = await this.prop(this.templateSel.elem, 'value');
         this.tplNameInp.value = await this.prop(this.tplNameInp.elem, 'value');
-        this.initialAccount.value = await this.prop(this.initialAccount.elem, 'value');
 
         this.tplVisible = await this.isVisible(this.templateBlock.elem, true);
         if (this.isLoading) {
@@ -435,8 +425,7 @@ export class ImportUploadDialog extends Component {
         this.model.template = App.state.templates.getItem(val);
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.selectByValue(this.templateSel.elem, val.toString());
-        await this.onChange(this.templateSel.elem);
+        this.templateSel.selectItem(val);
         await this.parse();
 
         return this.checkState();
@@ -482,16 +471,16 @@ export class ImportUploadDialog extends Component {
             throw new Error('Invalid state');
         }
 
-        if (this.templateSel.options.length === 1) {
+        if (this.templateSel.items.length === 1) {
             this.model.state = CREATE_TPL_STATE;
             this.model.template = null;
         } else {
             this.model.state = RAW_DATA_STATE;
-            const currentInd = this.templateSel.options.findIndex(
-                (option) => option.value === this.templateSel.value,
+            const currentInd = this.templateSel.items.findIndex(
+                (item) => item.id === this.templateSel.value,
             );
             const newInd = (currentInd > 0) ? 0 : 1;
-            const newTplId = this.templateSel.options[newInd].value;
+            const newTplId = this.templateSel.items[newInd].id;
             this.model.template = App.state.templates.getItem(newTplId);
         }
 
@@ -607,8 +596,7 @@ export class ImportUploadDialog extends Component {
         this.model.initialAccount = App.state.accounts.getItem(val);
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.selectByValue(this.initialAccount.elem, val.toString());
-        await this.onChange(this.initialAccount.elem);
+        await this.initialAccount.selectItem(val);
         await this.parse();
 
         return this.checkState();
