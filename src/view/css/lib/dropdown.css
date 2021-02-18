@@ -3,7 +3,8 @@
 {
 	display: -ms-inline-flexbox;
 	display: inline-flex;
-	position: relative;
+    align-self: baseline;
+	position: static;
 }
 
 
@@ -165,7 +166,7 @@
 /* Select Drop Down button */
 .dd__toggle-btn
 {
-	background: none;
+    background-color: #ffffff;
 	height: 100%;
 	max-height: 2rem;
 	overflow: hidden;
@@ -193,12 +194,13 @@
 /* Drop down list */
 .dd__list
 {
+    box-sizing: border-box;
 	background-color: #FFFFFF;
 	border-right: 2px solid #000000;
 	border-left: 2px solid #000000;
 	overflow-y: auto;
 	position: absolute;
-	min-width: 100%;
+    max-width: 100%;
 	display: none;
 	z-index: 100;
 }
@@ -206,7 +208,7 @@
 
 .dd__open .dd__list
 {
-	display: inline-block;
+	display: flex;
 }
 
 
@@ -214,37 +216,20 @@
 {
 	border-top: 0 none;
 	border-bottom: 2px solid #000000;
-	top: 100%;
 }
-
 
 /* Drop up list */
 .dd__list_drop-up
 {
 	border-top: 2px solid #000000;
 	border-bottom: 0 none;
-	bottom: 100%;
 }
-
-
-/* Drop list to right */
-.dd__list_drop-right
-{
-	left: -2px;
-}
-
-
-/* Drop list to left */
-.dd__list_drop-left
-{
-	right: -2px;
-}
-
 
 .dd__list > ul
 {
 	padding: 0;
 	margin: 0;
+    width: 100%;
 	list-style-image: none;
 	list-style-type: none;
 	overflow-x: hidden;
@@ -294,11 +279,16 @@
 }
 
 
-li[disabled] .dd__list-item
+.dd__list li[disabled]
+{
+	pointer-events: none;
+}
+
+
+.dd__list li[disabled] .dd__list-item
 {
 	background-color: #BBBBBB;
 	color: #505050;
-	pointer-events: none;
 }
 
 
@@ -347,6 +337,7 @@ li[disabled] .dd__list-item
 	opacity: 0;
 	height: 100%;
 	width: 100%;
+    z-index: 1000;
 }
 
 
@@ -409,7 +400,7 @@ li[disabled] .dd__list-item
 /* Attached drop down list */
 .dd__container_attached
 {
-	position: relative;
+	position: static;
 }
 
 
@@ -427,31 +418,6 @@ li[disabled] .dd__list-item
 	min-width: 130px;
 	max-width: 250px;
 }
-
-
-.dd__container_attached .dd__list_drop-down
-{
-	top: 0;
-}
-
-
-.dd__container_attached .dd__list_drop-up
-{
-	bottom: 0;
-}
-
-
-.dd__container_attached .dd__list_drop-right
-{
-	left: 0;
-}
-
-
-.dd__container_attached .dd__list_drop-left
-{
-	right: 0;
-}
-
 
 /* Disabled drop down */
 .dd__container.dd__container_disabled .dd__combo

@@ -1,7 +1,7 @@
 'use strict';
 
 /* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds, setEvents */
-/* exported ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
+/* exported removeEvents, ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
 /* exported getCaretPos, getCursorPos, setCursorPos, checkDate, selectedText, selectedValue */
 /* exported selectByValue, insertBefore, insertAfter, prependChild, removeChilds */
 /* exported fixEvent, onEmptyClick, setEmptyClick, getOffset, getOffsetRect, getOffsetSum */
@@ -131,6 +131,21 @@ function setEvents(elem, events) {
 
     Object.keys(events).forEach(function (eventName) {
         elem.addEventListener(eventName, events[eventName]);
+    });
+}
+
+/**
+ * Remove event handlers from specified element
+ * @param {Element} elem - element to remove event handlers from
+ * @param {Object} events - event handlers object
+ */
+function removeEvents(elem, events) {
+    if (!elem || !events) {
+        return;
+    }
+
+    Object.keys(events).forEach(function (eventName) {
+        elem.removeEventListener(eventName, events[eventName]);
     });
 }
 

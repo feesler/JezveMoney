@@ -2,6 +2,7 @@
 
 /* global isFunction, ge, ce, svg, addChilds, removeChilds, re, px, insertAfter, selectByValue */
 /* global prependChild, show, setEmptyClick, getOffset, isVisible, getCursorPos */
+/* global setEvents, removeEvents */
 
 var CHECK_ICON = 'M1.08 4.93a.28.28 0 000 .4l2.35 2.34c.1.11.29.11.4 0l4.59-4.59a.28.28 0 000-.4l-.6-.6a.28.28 0 00-.4 0l-3.8 3.8-1.54-1.55a.28.28 0 00-.4 0z';
 
@@ -74,14 +75,16 @@ function DropDown(params) {
 
     this.toggleHandler = this.toggleList.bind(this);
     this.inputHandler = this.onInput.bind(this);
-    this.keyHandler = this.onKey.bind(this);
     this.hoverHandler = this.onMouseOver.bind(this);
     this.scrollHandler = this.onScroll.bind(this);
     this.selectChangeHandler = this.onChange.bind(this);
     this.listItemClickHandler = this.onListItemClick.bind(this);
     this.delSelectItemHandler = this.onDeleteSelectedItem.bind(this);
-    this.focusHandler = this.onFocus.bind(this);
-    this.blurHandler = this.onBlur.bind(this);
+    this.inpHandlers = {
+        focus: this.onFocus.bind(this),
+        blur: this.onBlur.bind(this),
+        keydown: this.onKey.bind(this)
+    };
 
     inpObj = (typeof params.input_id === 'string') ? ge(params.input_id) : params.input_id;
     if (!inpObj || !inpObj.parentNode) {
@@ -93,6 +96,12 @@ function DropDown(params) {
     } else {
         this.attachToInput(inpObj);
     }
+
+    if (!this.disabled) {
+        this.assignInputHandlers(this.containerElem);
+    }
+
+    this.selectElem.tabIndex = -1;
 
     if (params.extraClass) {
         this.containerElem.classList.add(params.extraClass);
@@ -111,17 +120,17 @@ function DropDown(params) {
     this.fixIOS(this.selectElem);
 
     this.listElem = ce('ul');
-    this.list = ce('div', { className: 'dd__list', tabIndex: -2 }, this.listElem);
-    this.list.addEventListener('keydown', this.keyHandler);
-    this.list.addEventListener('scroll', this.scrollHandler);
+    this.list = ce(
+        'div',
+        { className: 'dd__list' },
+        this.listElem,
+        { scroll: this.scrollHandler }
+    );
 
-    if (this.listAttach) {
-        this.containerElem.appendChild(this.list);
-        this.list.style.top = px(this.containerElem.offsetHeight);
-    }
+    this.containerElem.appendChild(this.list);
 
     this.selectElem.addEventListener('change', this.selectChangeHandler);
-    this.assignFocusHandlers(this.selectElem);
+    this.assignInputHandlers(this.selectElem);
 
     if (this.disabled) {
         this.selectElem.disabled = true;
@@ -136,6 +145,7 @@ function DropDown(params) {
     }
 
     this.makeEditable(this.editable);
+    this.setTabIndexes();
 
     this.groups = [];
     this.items = [];
@@ -208,22 +218,16 @@ DropDown.prototype.attachToInput = function (elem) {
             this.selectElem.multiple = true;
         }
     }
-
-    if (this.editable) {
-        this.containerElem.classList.add('dd__editable');
-        this.inputElem.className = 'dd__input';
-    } else {
-        show(this.inputElem, false);
-    }
 };
 
 /** Attach DropDown to specified element */
 DropDown.prototype.attachToElement = function (elem) {
     var hostElement;
 
-    this.containerElem = ce('div', { className: 'dd__container_attached', tabIndex: 0 });
-    this.containerElem.addEventListener('keydown', this.keyHandler);
-    this.assignFocusHandlers(this.containerElem);
+    this.containerElem = ce(
+        'div',
+        { className: 'dd__container_attached' }
+    );
 
     insertAfter(this.containerElem, elem);
     this.containerElem.style.width = px(elem.offsetWidth);
@@ -296,7 +300,6 @@ DropDown.prototype.createCombo = function () {
         this.staticElem,
         this.inputElem,
         this.selectElem,
-        this.list,
         this.toggleBtn
     ]);
 
@@ -311,16 +314,11 @@ DropDown.prototype.createToggleButton = function () {
         svg('path', { d: 'm5.5 12 6.5 6 6.5-6z' })
     );
     var res = ce(
-        'button',
-        { type: 'button', className: 'dd__toggle-btn' },
-        arrowIcon
+        'div',
+        { className: 'dd__toggle-btn' },
+        arrowIcon,
+        { click: this.toggleHandler }
     );
-    if (this.editable) {
-        res.tabIndex = -1;
-    }
-    res.addEventListener('click', this.toggleHandler);
-    res.addEventListener('keydown', this.keyHandler);
-    this.assignFocusHandlers(res);
 
     if (this.disabled) {
         res.disabled = true;
@@ -334,9 +332,11 @@ DropDown.prototype.createToggleButton = function () {
 /** List item 'click' event handler */
 DropDown.prototype.onListItemClick = function (e) {
     var item = this.getItemByElem(e.target);
-    if (item) {
-        this.toggleItem(item.id);
+    if (!item || item.disabled) {
+        return;
     }
+
+    this.toggleItem(item.id);
 
     this.sendItemSelectEvent();
     this.changed = true;
@@ -344,8 +344,6 @@ DropDown.prototype.onListItemClick = function (e) {
     if (!this.multi) {
         this.show(false);
     }
-
-    return true;
 };
 
 /** Handler of 'change' event of native select */
@@ -353,7 +351,6 @@ DropDown.prototype.onChange = function () {
     if (
         !this.selectElem
         || !this.selectElem.options
-        || this.selectElem.selectedIndex === -1
     ) {
         return;
     }
@@ -377,7 +374,7 @@ DropDown.prototype.onChange = function () {
 /** 'focus' event handler */
 DropDown.prototype.onFocus = function (e) {
     if (this.disabled) {
-        return false;
+        return;
     }
 
     this.activate(true);
@@ -386,13 +383,17 @@ DropDown.prototype.onFocus = function (e) {
         e.target.classList.add('dd__selection-item_active');
     } else if (e.target === this.inputElem) {
         this.activateSelectedItem(null);
-    } else if (this.editable && this.inputElem) {
-        this.inputElem.focus();
+    } else if (e.target === this.containerElem) {
+        if (e.relatedTarget === this.inputElem) {
+            return;
+        }
+
+        if (this.editable && this.inputElem) {
+            this.inputElem.focus();
+        }
     }
 
     this.focusedElem = e.target;
-
-    return true;
 };
 
 /** 'blur' event handler */
@@ -408,8 +409,6 @@ DropDown.prototype.onBlur = function (e) {
     }
 
     this.focusedElem = null;
-
-    return true;
 };
 
 /** Click by delete button of selected item event handler */
@@ -484,34 +483,36 @@ DropDown.prototype.onKey = function (e) {
     var selectedItems = null;
     var availItems = null;
 
+    e.stopPropagation();
+
     if (
         (this.editable && e.target === this.inputElem)
-        || (!this.editable && e.target === this.toggleBtn)
+        || (!this.editable && e.target === this.containerElem)
     ) {
-        if (e.code === 'Backspace' || e.code === 'ArrowLeft') {
-            if (this.editable) {
+        if (this.multi && (e.code === 'Backspace' || e.code === 'ArrowLeft')) {
+            if (this.editable && e.currentTarget === this.inputElem) {
                 cursorPos = getCursorPos(this.inputElem);
-                if (cursorPos.start === cursorPos.end && cursorPos.start === 0) {
+                if (cursorPos && cursorPos.start === cursorPos.end && cursorPos.start === 0) {
                     this.activateLastSelectedItem();
                 }
             } else {
                 this.activateLastSelectedItem();
             }
 
-            return true;
+            return;
         }
     }
 
     if (e.code === 'Backspace') {
-        if (this.isSelectedItemElement(e.target)) {
+        if (this.multi && this.isSelectedItemElement(e.target)) {
             selectedItems = this.getSelectedItems();
             if (!selectedItems.length) {
-                return true;
+                return;
             }
 
             index = this.getSelectedItemIndex(e.target);
             if (index === -1) {
-                return true;
+                return;
             }
 
             if (index === 0) {
@@ -533,41 +534,42 @@ DropDown.prototype.onKey = function (e) {
             }
         }
 
-        return true;
+        return;
     }
 
-    if (e.code === 'Delete') {
-        return this.onDeleteSelectedItem(e);
+    if (this.multi && e.code === 'Delete') {
+        this.onDeleteSelectedItem(e);
+        return;
     }
 
-    if (e.code === 'ArrowLeft') {
+    if (this.multi && e.code === 'ArrowLeft') {
         if (this.isSelectedItemElement(e.target)) {
             selectedItems = this.getSelectedItems();
             if (!selectedItems.length) {
-                return true;
+                return;
             }
 
             index = this.getSelectedItemIndex(e.target);
             if (index === 0) {
-                return true;
+                return;
             }
 
             this.activateSelectedItem(selectedItems[index - 1]);
         }
 
-        return true;
+        return;
     }
 
-    if (e.code === 'ArrowRight') {
+    if (this.multi && e.code === 'ArrowRight') {
         if (this.isSelectedItemElement(e.target)) {
             selectedItems = this.getSelectedItems();
             if (!selectedItems.length) {
-                return true;
+                return;
             }
 
             index = this.getSelectedItemIndex(e.target);
             if (index === -1) {
-                return true;
+                return;
             }
 
             if (index === selectedItems.length - 1) {
@@ -578,7 +580,7 @@ DropDown.prototype.onKey = function (e) {
             }
         }
 
-        return true;
+        return;
     }
 
     if (e.code === 'ArrowDown') {
@@ -618,32 +620,22 @@ DropDown.prototype.onKey = function (e) {
                 this.show(false);
             }
         }
-        if (e.preventDefault) {
-            e.preventDefault();
-        } else {
-            e.returnValue = false;
-        }
+
+        e.preventDefault();
     } else if (e.code === 'Escape') {
         this.show(false);
         if (this.focusedElem) {
             this.focusedElem.blur();
         }
-        return true;
     } else {
-        return true;
+        return;
     }
 
     if (newItem) {
         this.setActive(newItem);
         this.scrollToItem(newItem);
-        if (e.preventDefault) {
-            e.preventDefault();
-        } else {
-            e.returnValue = false;
-        }
+        e.preventDefault();
     }
-
-    return true;
 };
 
 /** Handler for 'mouseover' event on list item */
@@ -723,6 +715,11 @@ DropDown.prototype.getNextItem = function (itemId) {
     return null;
 };
 
+/** Return array of all list items */
+DropDown.prototype.getItems = function () {
+    return this.items;
+};
+
 /** Return array of visible(not hidden) list items */
 DropDown.prototype.getVisibleItems = function () {
     return this.items.filter(function (item) {
@@ -733,7 +730,7 @@ DropDown.prototype.getVisibleItems = function () {
 /** Return array of visible and enabled list items */
 DropDown.prototype.getAvailableItems = function () {
     return this.items.filter(function (item) {
-        return !item.hidden && !item.hidden;
+        return !item.hidden && !item.disabled;
     });
 };
 
@@ -801,13 +798,17 @@ DropDown.prototype.getListHeight = function () {
 
 /** Show or hide drop down list */
 DropDown.prototype.show = function (val) {
+    var html;
+    var scrollHeight;
     var screenBottom;
     var visibleItems;
     var itemHeight;
     var itemsToShow;
-    var listHeight;
+    var listHeight = 0;
     var fullScreenListHeight;
-    var containerOffset;
+    var offset;
+    var container;
+    var border = 0;
     var totalListHeight;
     var listWidth;
     var leftOffset;
@@ -829,8 +830,9 @@ DropDown.prototype.show = function (val) {
         }
         this.activate(true);
 
-        screenBottom = document.documentElement.scrollTop
-            + document.documentElement.clientHeight;
+        html = document.documentElement;
+        scrollHeight = html.scrollHeight;
+        screenBottom = html.scrollTop + html.clientHeight;
 
         this.containerElem.classList.add('dd__open');
 
@@ -841,54 +843,54 @@ DropDown.prototype.show = function (val) {
             listHeight = itemsToShow * itemHeight;
         }
 
-        containerOffset = getOffset(this.containerElem);
-        totalListHeight = this.containerElem.offsetHeight + listHeight;
-        listBottom = containerOffset.top + totalListHeight;
+        if (!this.listAttach) {
+            border = (this.comboElem.offsetHeight - this.comboElem.scrollHeight) / 2;
+        }
+
+        offset = getOffset(this.list.offsetParent);
+        container = getOffset(this.containerElem);
+        container.width = this.containerElem.offsetWidth;
+        container.height = this.containerElem.offsetHeight;
+        totalListHeight = container.height + listHeight;
+        listBottom = container.top + totalListHeight;
 
         if (this.fullScreen && isVisible(this.backgroundElem)) {
             document.body.style.overflow = 'hidden';
             this.list.classList.add('dd__list_drop-down');
 
-            fullScreenListHeight = document.documentElement.clientHeight
-                - this.comboElem.offsetHeight;
+            fullScreenListHeight = html.clientHeight - this.comboElem.offsetHeight;
             this.list.style.height = px(fullScreenListHeight / 2);
         } else {
-            this.list.style.height = px(listHeight);
-
             // Check vertical offset of drop down list
-            if (listBottom > document.documentElement.scrollHeight) {
-                this.list.classList.remove('dd__list_drop-down');
+            if (listBottom > scrollHeight) {
                 this.list.classList.add('dd__list_drop-up');
-
-                if (this.listAttach) {
-                    this.list.style.bottom = px(this.containerElem.offsetHeight);
-                    this.list.style.top = '';
-                }
+                this.list.style.top = px(container.top - offset.top - listHeight + border);
             } else {
-                this.list.classList.remove('dd__list_drop-up');
                 this.list.classList.add('dd__list_drop-down');
-
                 if (listBottom > screenBottom) {
-                    document.documentElement.scrollTop += listBottom - screenBottom;
+                    html.scrollTop += listBottom - screenBottom;
                 }
-
-                if (this.listAttach) {
-                    this.list.style.top = px(this.containerElem.offsetHeight);
-                    this.list.style.bottom = '';
-                }
+                this.list.style.top = px(
+                    container.top - offset.top + container.height - border
+                );
             }
+
+            this.list.style.height = px(
+                listHeight + this.list.offsetHeight - this.list.scrollHeight
+            );
         }
 
         // Check horizontal offset of drop down list
+        this.list.style.minWidth = px(container.width);
+
         listWidth = this.list.offsetWidth;
-        leftOffset = containerOffset.left - document.documentElement.scrollLeft
-            + this.containerElem.offsetWidth;
-        if (leftOffset + listWidth > document.documentElement.clientWidth) {
-            this.list.classList.remove('dd__list_drop-right');
-            this.list.classList.add('dd__list_drop-left');
+        leftOffset = container.left - html.scrollLeft + container.width;
+        if (leftOffset + listWidth > html.clientWidth) {
+            this.list.style.left = px(
+                container.left + container.width - listWidth - offset.left
+            );
         } else {
-            this.list.classList.remove('dd__list_drop-left');
-            this.list.classList.add('dd__list_drop-right');
+            this.list.style.left = px(container.left - offset.left);
         }
 
         setEmptyClick(
@@ -905,6 +907,9 @@ DropDown.prototype.show = function (val) {
         if (this.fullScreen) {
             document.body.style.overflow = '';
         }
+
+        this.list.classList.remove('dd__list_drop-down');
+        this.list.classList.remove('dd__list_drop-up');
 
         setEmptyClick();
         this.sendChangeEvent();
@@ -935,15 +940,15 @@ DropDown.prototype.makeEditable = function (val) {
     show(this.inputElem, this.editable);
 
     if (this.editable) {
+        this.containerElem.classList.add('dd__editable');
         this.inputElem.addEventListener('input', this.inputHandler);
         this.inputElem.classList.add('dd__input');
         this.inputElem.value = this.staticElem.textContent;
-        this.assignFocusHandlers(this.inputElem);
-        this.inputElem.addEventListener('keydown', this.keyHandler);
+        this.assignInputHandlers(this.inputElem);
         this.inputElem.autocomplete = 'off';
-
-        this.toggleBtn.tabIndex = -1;
     } else {
+        this.containerElem.classList.remove('dd__editable');
+        this.removeInputHandlers(this.inputElem);
         this.inputElem.removeEventListener('input', this.inputHandler);
         this.inputElem.classList.remove('dd__input');
 
@@ -953,11 +958,34 @@ DropDown.prototype.makeEditable = function (val) {
         if (!this.disabled) {
             this.staticElem.addEventListener('click', this.toggleHandler);
         }
-
-        this.toggleBtn.tabIndex = 0;
     }
 
+    this.setTabIndexes();
+
     return true;
+};
+
+/** Setup tabindexes of component */
+DropDown.prototype.setTabIndexes = function () {
+    if (this.disabled) {
+        this.containerElem.removeAttribute('tabindex');
+        if (this.inputElem) {
+            this.inputElem.removeAttribute('tabindex');
+        }
+        this.selectElem.removeAttribute('tabindex');
+    } else if (isVisible(this.selectElem)) {
+        this.selectElem.setAttribute('tabindex', 0);
+        this.containerElem.setAttribute('tabindex', -1);
+        if (this.inputElem) {
+            this.inputElem.setAttribute('tabindex', (this.editable) ? 0 : -1);
+        }
+    } else {
+        this.selectElem.setAttribute('tabindex', -1);
+        this.containerElem.setAttribute('tabindex', (this.editable) ? -1 : 0);
+        if (this.inputElem) {
+            this.inputElem.setAttribute('tabindex', (this.editable) ? 0 : -1);
+        }
+    }
 };
 
 /** Enable or disable component */
@@ -973,13 +1001,18 @@ DropDown.prototype.enable = function (val) {
         this.containerElem.classList.add('dd__container_disabled');
         this.containerElem.classList.remove('dd__container_enabled');
         this.makeEditable(false);
+        this.removeInputHandlers(this.containerElem);
     } else {
         this.containerElem.classList.remove('dd__container_disabled');
         this.containerElem.classList.add('dd__container_enabled');
         if (this.createParams.editable !== false) {
             this.makeEditable();
         }
+
+        this.assignInputHandlers(this.containerElem);
     }
+
+    this.setTabIndexes();
 
     this.inputElem.disabled = this.disabled;
     this.selectElem.disabled = this.disabled;
@@ -1035,9 +1068,10 @@ DropDown.prototype.isChildTarget = function (elem) {
 DropDown.prototype.renderSelectedItem = function (item) {
     var deselectButton = ce(
         'span',
-        { className: 'dd__del-selection-item-btn', innerHTML: '&times;' }
+        { className: 'dd__del-selection-item-btn', innerHTML: '&times;' },
+        null,
+        { click: this.delSelectItemHandler }
     );
-    deselectButton.addEventListener('click', this.delSelectItemHandler);
 
     return ce(
         'span',
@@ -1069,10 +1103,9 @@ DropDown.prototype.renderSelection = function () {
             return null;
         }
 
-        elem.tabIndex = -2;
+        elem.tabIndex = -1;
         elem.dataset.id = listItem.id;
-        elem.addEventListener('keydown', this.keyHandler);
-        this.assignFocusHandlers(elem);
+        this.assignInputHandlers(elem);
 
         listItem.selectedElem = elem;
 
@@ -1156,25 +1189,26 @@ DropDown.prototype.toggleItem = function (itemId) {
 /** Select specified item */
 DropDown.prototype.selectItem = function (itemId) {
     var item = this.getItem(itemId);
-    if (!item) {
-        throw new Error('Item ' + itemId + ' not found');
-    }
 
-    if (item.selected) {
+    if (item && item.selected) {
         return;
     }
 
     if (this.multi) {
-        this.check(item.id, true);
+        if (item) {
+            this.check(item.id, true);
+        }
     } else {
         this.clearSelection();
     }
 
     if (this.selectElem) {
-        selectByValue(this.selectElem, item.id);
+        selectByValue(this.selectElem, (item) ? item.id : 0);
     }
 
-    item.selected = true;
+    if (item) {
+        item.selected = true;
+    }
 
     this.renderSelection();
 };
@@ -1228,6 +1262,8 @@ DropDown.prototype.activateSelectedItem = function (item) {
 
     this.actSelItem = item;
     this.actSelItem.selectedElem.focus();
+
+    this.setActive(null);
 };
 
 /** Activate last(right) selected item */
@@ -1414,7 +1450,7 @@ DropDown.prototype.parseOption = function (option, group) {
     }
 
     if (option.disabled) {
-        this.enableItem(item, false);
+        this.enableItem(itemId, false);
     }
 
     return item;
@@ -1477,18 +1513,15 @@ DropDown.prototype.append = function (items) {
 
     data = Array.isArray(items) ? items : [items];
     data.forEach(function (item) {
-        this.addItem({
-            id: item.id,
-            title: item.title,
-            appendToSelect: true
-        });
+        var props = Object.assign({}, item, { appendToSelect: true });
+        this.addItem(props);
     }, this);
 
     return true;
 };
 
 /** Append option to specified target element */
-DropDown.prototype.addOption = function (target, itemId, title) {
+DropDown.prototype.addOption = function (target, itemId, title, disabled) {
     var option;
     var availTargets = ['SELECT', 'OPTGROUP'];
 
@@ -1497,6 +1530,10 @@ DropDown.prototype.addOption = function (target, itemId, title) {
     }
 
     option = ce('option', { value: itemId, textContent: title });
+    if (disabled) {
+        option.setAttribute('disabled', '');
+    }
+
     target.appendChild(option);
 
     return option;
@@ -1523,15 +1560,16 @@ DropDown.prototype.addOptGroup = function (target, groupTitle, groupDisabled) {
  * Create new list item
  * @param {Object} props
  * @param {string} props.id - identifier of new list item
- * @param {string} props.group - optional target group identifier
  * @param {string} props.title - title of list item
+ * @param {string} props.group - optional target group identifier
+ * @param {string} props.disabled - optional disabled item flag
  * @param {bool} props.appendToSelect - append new item to select element or not
  */
 DropDown.prototype.addItem = function (props) {
     var item;
     var appendToSelect = true;
 
-    if (!props || !props.id || !this.list || !this.listElem) {
+    if (!props || !('id' in props) || !this.list || !this.listElem) {
         return null;
     }
 
@@ -1540,18 +1578,23 @@ DropDown.prototype.addItem = function (props) {
         title: props.title,
         selected: false,
         hidden: false,
-        disabled: false
+        disabled: props.disabled
     };
 
     if ('appendToSelect' in props) {
         appendToSelect = !!props.appendToSelect;
     }
 
-    if (appendToSelect && !this.multi && !this.items.length) {
-        this.selectElem.appendChild(ce('option', { disabled: true, value: 0, selected: true }));
+    if (appendToSelect && !this.multi && !this.items.length && item.id !== 0) {
+        this.selectElem.appendChild(ce('option', { disabled: true, value: 0 }));
     }
 
-    item.divElem = ce('div', { className: 'dd__list-item' });
+    item.divElem = ce(
+        'div',
+        { className: 'dd__list-item' },
+        null,
+        { mouseover: this.hoverHandler }
+    );
     if (this.multi) {
         item.checkIcon = svg(
             'svg',
@@ -1567,10 +1610,10 @@ DropDown.prototype.addItem = function (props) {
         item.divElem.textContent = item.title;
     }
 
-    item.divElem.addEventListener('mouseover', this.hoverHandler);
-
-    item.elem = ce('li', {}, item.divElem);
-    item.elem.addEventListener('click', this.listItemClickHandler);
+    item.elem = ce('li', {}, item.divElem, { click: this.listItemClickHandler });
+    if (item.disabled) {
+        item.elem.setAttribute('disabled', '');
+    }
 
     if (props.group) {
         props.group.listElem.appendChild(item.elem);
@@ -1581,9 +1624,16 @@ DropDown.prototype.addItem = function (props) {
     }
 
     if (appendToSelect) {
-        item.optionElem = this.addOption(this.selectElem, item.id, item.title);
+        item.optionElem = this.addOption(this.selectElem, item.id, item.title, item.disabled);
+        if (!this.multi) {
+            item.selected = item.optionElem.selected;
+        }
     }
     this.items.push(item);
+
+    if (item.selected) {
+        this.renderSelection();
+    }
 
     return item;
 };
@@ -1628,6 +1678,41 @@ DropDown.prototype.addGroup = function (label, appendToSelect) {
     return group;
 };
 
+/** Remove elements of item */
+DropDown.prototype.detachItem = function (item) {
+    if (!item) {
+        return;
+    }
+
+    this.deselectItem(item.id);
+    re(item.optionElem);
+    re(item.divElem);
+};
+
+/** Remove item by id */
+DropDown.prototype.removeItem = function (itemId) {
+    var item;
+
+    var itemIndex = this.getItemIndex(itemId);
+    if (itemIndex === -1) {
+        return;
+    }
+
+    item = this.items[itemIndex];
+    this.detachItem(item);
+
+    this.items.splice(itemIndex, 1);
+};
+
+/** Remove all items */
+DropDown.prototype.removeAll = function () {
+    this.items.forEach(function (item) {
+        this.detachItem(item);
+    }, this);
+
+    this.items = [];
+};
+
 /** Set active state for specified list item */
 DropDown.prototype.setActive = function (item) {
     var listItem = item;
@@ -1653,28 +1738,28 @@ DropDown.prototype.setActive = function (item) {
     }
 };
 
-/** Enable/disable specified list item */
-DropDown.prototype.enableItem = function (item, val) {
-    var listItem = item;
+/** Enable/disable list item by id */
+DropDown.prototype.enableItem = function (itemId, val) {
+    var item = this.getItem(itemId);
 
     if (!item || item.disabled === !val) {
         return;
     }
 
-    if (this.actItem === listItem) {
+    if (this.actItem === item) {
         this.actItem.divElem.classList.remove('dd__list-item_active');
         this.actItem = null;
     }
 
-    listItem.disabled = !val;
-    if (listItem.disabled) {
-        this.deselectItem(listItem.id);
+    item.disabled = !val;
+    if (item.disabled) {
+        this.deselectItem(item.id);
 
-        listItem.elem.setAttribute('disabled', true);
-        listItem.optionElem.setAttribute('disabled', true);
+        item.elem.setAttribute('disabled', '');
+        item.optionElem.setAttribute('disabled', '');
     } else {
-        listItem.elem.removeAttribute('disabled');
-        listItem.optionElem.removeAttribute('disabled');
+        item.elem.removeAttribute('disabled');
+        item.optionElem.removeAttribute('disabled');
     }
 };
 
@@ -1749,11 +1834,11 @@ DropDown.prototype.setText = function (str) {
 };
 
 /** Add focus/blur event handlers to specified element */
-DropDown.prototype.assignFocusHandlers = function (elem) {
-    if (!elem) {
-        return;
-    }
+DropDown.prototype.assignInputHandlers = function (elem) {
+    setEvents(elem, this.inpHandlers);
+};
 
-    elem.addEventListener('focus', this.focusHandler);
-    elem.addEventListener('blur', this.blurHandler);
+/** Remove focus/blur event handlers from specified element */
+DropDown.prototype.removeInputHandlers = function (elem) {
+    removeEvents(elem, this.inpHandlers);
 };
