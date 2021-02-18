@@ -53,7 +53,7 @@ function TransactionView() {
     userAccounts = AccountList.create(
         this.model.accounts.getUserAccounts(this.model.profile.owner_id)
     );
-    this.model.visibleUserAccounts = userAccounts.getVisible();
+    this.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
 }
 
 extend(TransactionView, View);
@@ -292,6 +292,7 @@ TransactionView.prototype.onStart = function () {
         visiblePersons.forEach(function (person) {
             this.persDDList.addItem({ id: person.id, title: person.name });
         }, this);
+        this.persDDList.selectItem(parseInt(this.personIdInp.value, 10));
 
         if (!this.model.transaction.noAccount) {
             this.initAccList();
@@ -307,6 +308,7 @@ TransactionView.prototype.onStart = function () {
             this.model.visibleUserAccounts.forEach(function (acc) {
                 this.srcDDList.addItem({ id: acc.id, title: acc.name });
             }, this);
+            this.srcDDList.selectItem(this.model.transaction.srcAcc());
         }
 
         this.destDDList = DropDown.create({
@@ -319,6 +321,7 @@ TransactionView.prototype.onStart = function () {
             this.model.visibleUserAccounts.forEach(function (acc) {
                 this.destDDList.addItem({ id: acc.id, title: acc.name });
             }, this);
+            this.destDDList.selectItem(this.model.transaction.destAcc());
         }
     }
 
@@ -332,6 +335,7 @@ TransactionView.prototype.onStart = function () {
         this.model.currency.forEach(function (curr) {
             this.srcCurrDDList.addItem({ id: curr.id, title: curr.name });
         }, this);
+        this.srcCurrDDList.selectItem(this.model.transaction.srcCurr());
     }
 
     if (this.model.transaction.isExpense()) {
@@ -344,6 +348,7 @@ TransactionView.prototype.onStart = function () {
         this.model.currency.forEach(function (curr) {
             this.destCurrDDList.addItem({ id: curr.id, title: curr.name });
         }, this);
+        this.destCurrDDList.selectItem(this.model.transaction.destCurr());
     }
 
     this.submitBtn = ge('submitbtn');
@@ -367,6 +372,7 @@ TransactionView.prototype.initAccList = function () {
     this.model.visibleUserAccounts.forEach(function (acc) {
         this.accDDList.addItem({ id: acc.id, title: acc.name });
     }, this);
+    this.accDDList.selectItem(this.debtAccount.id);
 };
 
 /**
@@ -1288,7 +1294,7 @@ TransactionView.prototype.onChangeSource = function () {
     this.onSrcCurrChanged();
 
     if (this.srcIdInp.value === this.destIdInp.value) {
-        nextAccount = this.model.accounts.getNextAccount(this.destIdInp.value);
+        nextAccount = this.model.visibleUserAccounts.getNextAccount(this.destIdInp.value);
         if (nextAccount !== 0) {
             this.destIdInp.value = nextAccount;
             this.model.transaction.updateValue('dest_id', nextAccount);
@@ -1323,7 +1329,7 @@ TransactionView.prototype.onChangeDest = function () {
     this.onDestCurrChanged();
 
     if (this.srcIdInp.value === this.destIdInp.value) {
-        nextAccount = this.model.accounts.getNextAccount(this.srcIdInp.value);
+        nextAccount = this.model.visibleUserAccounts.getNextAccount(this.srcIdInp.value);
         if (nextAccount !== 0) {
             this.srcIdInp.value = nextAccount;
             this.model.transaction.updateValue('src_id', nextAccount);
