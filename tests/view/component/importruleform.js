@@ -2,7 +2,10 @@ import { Component } from './component.js';
 import { Currency } from '../../model/currency.js';
 import { ImportTransaction } from '../../model/importtransaction.js';
 import { ImportRule } from '../../model/importrule.js';
-import { ImportCondition } from '../../model/importcondition.js';
+import {
+    ImportCondition,
+    IMPORT_COND_OP_FIELD_FLAG,
+} from '../../model/importcondition.js';
 import { ImportAction } from '../../model/importaction.js';
 import { ImportConditionForm } from './importconditionform.js';
 import { ImportActionForm } from './importactionform.js';
@@ -146,7 +149,7 @@ export class ImportRuleForm extends Component {
             field_id: parseInt(model.fieldType, 10),
             operator: parseInt(model.operator, 10),
             value: model.value.toString(),
-            flags: (model.isFieldValue) ? 1 : 0, // TODO: use real flag
+            flags: (model.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0,
         };
     }
 
