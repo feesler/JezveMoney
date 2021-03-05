@@ -187,8 +187,9 @@ export class Scenario {
         const testUserId = App.state.profile.user_id;
         await ApiTests.loginTest(App.config.testAdminUser);
         const testUserData = copyObject(App.config.testUser);
+        testUserData.id = testUserId;
         testUserData.access = 2;
-        await api.user.update(testUserId, testUserData);
+        await api.user.update(testUserData);
         await ApiTests.loginTest(App.config.testUser);
         await App.setupUser();
 
